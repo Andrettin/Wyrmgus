@@ -1347,14 +1347,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 		if (site->get_mass() != 0 && base_unit_type->get_default_mass() != 0 && site->get_mass() != base_unit_type->get_default_mass() && unit->ResourcesHeld != 0) {
 			//change the unit's resources held depending on the difference between its mass and the default mass of its base unit type
-			int mass_multiplier = 100;
-			if (site->get_mass() < base_unit_type->get_default_mass()) {
-				mass_multiplier *= 10;
-				mass_multiplier /= static_cast<int>(isqrt(base_unit_type->get_default_mass() * 100 / site->get_mass()));
-			} else {
-				mass_multiplier *= static_cast<int>(isqrt(site->get_mass() * 100 / base_unit_type->get_default_mass()));
-				mass_multiplier /= 10;
-			}
+			const int mass_multiplier = resource::get_mass_multiplier(site->get_mass(), base_unit_type->get_default_mass());
 
 			const int resource_quantity = unit->ResourcesHeld * mass_multiplier / 100;
 			unit->SetResourcesHeld(resource_quantity);

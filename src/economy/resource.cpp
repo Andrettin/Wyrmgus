@@ -29,9 +29,25 @@
 #include "economy/resource.h"
 
 #include "database/defines.h"
+#include "util/util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
+
+int resource::get_mass_multiplier(const uint64_t mass, const uint64_t base_mass)
+{
+	int mass_multiplier = 100;
+
+	if (mass < base_mass) {
+		mass_multiplier *= 10;
+		mass_multiplier /= static_cast<int>(isqrt(base_mass * 100 / mass));
+	} else {
+		mass_multiplier *= static_cast<int>(isqrt(mass * 100 / base_mass));
+		mass_multiplier /= 10;
+	}
+
+	return mass_multiplier;
+}
 
 void resource::process_sml_property(const sml_property &property)
 {
