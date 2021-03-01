@@ -1158,6 +1158,11 @@ set(wyrmgus_main_SRCS
 	src/stratagus/main.cpp
 )
 
+set(economy_test_SRCS
+	test/economy/resource_test.cpp
+)
+source_group(economy FILES ${economy_test_SRCS})
+
 set(util_test_SRCS
 	test/util/angle_test.cpp
 	test/util/astronomy_test.cpp
@@ -1170,6 +1175,7 @@ set(util_test_SRCS
 source_group(util FILES ${util_test_SRCS})
 
 set(wyrmgus_test_SRCS
+	${economy_test_SRCS}
 	${util_test_SRCS}
 	test/main.cpp
 )
@@ -1664,6 +1670,7 @@ if(ENABLE_UNITY_BUILD)
 	set_source_files_properties(${xbrz_SRCS} PROPERTIES UNITY_GROUP "xbrz")
 	
 	set_target_properties(wyrmgus_test PROPERTIES UNITY_BUILD_MODE GROUP)
+	set_source_files_properties(${economy_test_SRCS} PROPERTIES UNITY_GROUP "economy_test")
 	set_source_files_properties(${util_test_SRCS} PROPERTIES UNITY_GROUP "util_test")
 endif()
 

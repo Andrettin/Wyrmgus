@@ -87,6 +87,9 @@ BOOST_AUTO_TEST_CASE(jovian_mass_to_zg_test)
     uint64_t zg = astronomy::jovian_mass_to_zg(centesimal_int(1));
     BOOST_CHECK(zg == astronomy::zg_per_jovian_mass);
 
+    zg = astronomy::jovian_mass_to_zg(centesimal_int("0.46"));
+    BOOST_CHECK(zg == 873139800);
+
     zg = astronomy::jovian_mass_to_zg(centesimal_int("1.19"));
     BOOST_CHECK(zg == 2258774700);
 
