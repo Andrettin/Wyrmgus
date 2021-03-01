@@ -1345,6 +1345,24 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			}
 		}
 
+		if (site->get_mass() != 0 && base_unit_type->get_default_mass() != 0 && site->get_mass() != base_unit_type->get_default_mass() && unit->ResourcesHeld != 0) {
+			//change the unit's resources held depending on the difference between its mass and the default mass of its base unit type
+			int mass_multiplier = 100;
+			if (site->get_mass() < base_unit_type->get_default_mass()) {
+				mass_multiplier *= 10;
+				mass_multiplier /= static_cast<int>(isqrt(base_unit_type->get_default_mass() * 100 / site->get_mass()));
+			} else {
+				mass_multiplier *= static_cast<int>(isqrt(site->get_mass() * 100 / base_unit_type->get_default_mass()));
+				mass_multiplier /= 10;
+			}
+
+			const int resource_quantity = unit->ResourcesHeld * mass_multiplier / 100;
+			unit->SetResourcesHeld(resource_quantity);
+			unit->Variable[GIVERESOURCE_INDEX].Value = resource_quantity;
+			unit->Variable[GIVERESOURCE_INDEX].Max = resource_quantity;
+			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
+		}
+
 		//if the site is a connector, and the destination site has already been applied, establish the connection
 		if (site->get_connection_destination() != nullptr) {
 			CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
