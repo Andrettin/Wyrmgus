@@ -780,6 +780,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
 	Q_PROPERTY(wyrmgus::resource* given_resource MEMBER given_resource)
 	Q_PROPERTY(int random_movement_probability MEMBER random_movement_probability READ get_random_movement_probability)
+	Q_PROPERTY(quint64 default_mass MEMBER default_mass READ get_default_mass)
 	Q_PROPERTY(QColor neutral_minimap_color MEMBER neutral_minimap_color READ get_neutral_minimap_color)
 
 public:
@@ -1055,6 +1056,11 @@ public:
 		return this->random_movement_probability;
 	}
 
+	uint64_t get_default_mass() const
+	{
+		return this->default_mass;
+	}
+
 	const std::vector<std::unique_ptr<unit_type_variation>> &get_variations() const
 	{
 		return this->variations;
@@ -1255,6 +1261,10 @@ public:
 	unsigned CanAttack : 1;         /// Unit can attack.
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
+private:
+	uint64_t default_mass = 0; //the default mass of the unit type, if it is a celestial body
+
+public:
 	CUnitStats DefaultStat;
 	CUnitStats MapDefaultStat;
 	//Wyrmgus start

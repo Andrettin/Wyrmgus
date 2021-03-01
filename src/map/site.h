@@ -78,6 +78,8 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(int distance_from_orbit_center MEMBER distance_from_orbit_center)
 	Q_PROPERTY(wyrmgus::centesimal_int distance_from_orbit_center_au READ get_distance_from_orbit_center_au WRITE set_distance_from_orbit_center_au)
 	Q_PROPERTY(wyrmgus::unit_type* base_unit_type MEMBER base_unit_type)
+	Q_PROPERTY(quint64 mass MEMBER mass READ get_mass)
+	Q_PROPERTY(wyrmgus::centesimal_int mass_jm READ get_mass_jm WRITE set_mass_jm)
 	Q_PROPERTY(wyrmgus::site* connection_destination MEMBER connection_destination)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
 	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
@@ -233,6 +235,14 @@ public:
 	const QSize &get_size() const;
 	QSize get_size_with_satellites() const;
 
+	uint64_t get_mass() const
+	{
+		return this->mass;
+	}
+
+	centesimal_int get_mass_jm() const;
+	void set_mass_jm(const centesimal_int &mass_jm);
+
 	const site *get_connection_destination() const
 	{
 		return this->connection_destination;
@@ -315,6 +325,7 @@ private:
 	int distance_from_orbit_center = 0; //in gigameters (millions of kilometers)
 	std::vector<site *> satellites;
 	unit_type *base_unit_type = nullptr;
+	uint64_t mass = 0; //the mass of the site in zettagrams, if it is a celestial body
 	site *connection_destination = nullptr;
 	std::vector<region *> regions; //regions where this site is located
 	std::vector<faction *> cores; //factions which have this site as a core

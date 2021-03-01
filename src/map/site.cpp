@@ -492,6 +492,16 @@ QSize site::get_size_with_satellites() const
 	return size;
 }
 
+centesimal_int site::get_mass_jm() const
+{
+	return astronomy::zg_to_jovian_mass(this->mass);
+}
+
+void site::set_mass_jm(const centesimal_int &mass_jm)
+{
+	this->mass = astronomy::jovian_mass_to_zg(mass_jm);
+}
+
 QVariantList site::get_cores_qvariant_list() const
 {
 	return container::to_qvariant_list(this->get_cores());
