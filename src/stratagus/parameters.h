@@ -49,7 +49,6 @@ private:
 	void SetDefaultUserDirectory();
 
 public:
-	std::string applicationName = "stratagus";
 	std::string luaStartFilename = "scripts/stratagus.lua";
 	std::string luaEditorStartFilename = "scripts/editor.lua";
 	std::string luaScriptArguments;

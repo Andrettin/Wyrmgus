@@ -419,7 +419,7 @@ static void Usage()
 		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
 #endif
 		"map is relative to the root data path, use ./map for relative to cwd\n",
-		parameters::get()->applicationName.c_str());
+		QApplication::applicationName().toStdString().c_str());
 }
 
 #ifdef REDIRECT_OUTPUT
@@ -626,10 +626,6 @@ void stratagusMain(int argc, char **argv)
 #ifdef REDIRECT_OUTPUT
 	RedirectOutput();
 #endif
-
-	if (argc > 0) {
-		parameters->applicationName = argv[0];
-	}
 
 	// FIXME: Parse options before or after scripts?
 	ParseCommandLine(argc, argv);

@@ -1295,6 +1295,8 @@ endif()
 # Binary name
 set(BINARY_NAME "wyrmgus" CACHE PATH "Sets the name of the binary.")
 
+add_definitions(-DBINARY_NAME=\"${BINARY_NAME}\")
+
 # Install paths
 set(BINDIR "bin" CACHE PATH "Where to install user binaries")
 set(SBINDIR "sbin" CACHE PATH "Where to install system binaries")

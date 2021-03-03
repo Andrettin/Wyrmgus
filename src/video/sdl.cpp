@@ -461,8 +461,6 @@ void InitVideoSdl()
 		// Set WindowManager Title
 		if (!FullGameName.empty()) {
 			SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
-		} else if (!parameters::get()->applicationName.empty()) {
-			SDL_WM_SetCaption(parameters::get()->applicationName.c_str(), parameters::get()->applicationName.c_str());
 		} else {
 			const std::string name = QApplication::applicationName().toStdString();
 			SDL_WM_SetCaption(name.c_str(), name.c_str());
@@ -480,7 +478,7 @@ void InitVideoSdl()
 			FullGameNameL[i] = tolower(FullGameNameL[i]);
 		}
 
-		std::string ApplicationName = parameters::get()->applicationName;
+		std::string ApplicationName = QApplication::applicationName().toStdString();
 		std::string ApplicationNameL = ApplicationName;
 		for (size_t i = 0; i < ApplicationNameL.size(); ++i) {
 			ApplicationNameL[i] = tolower(ApplicationNameL[i]);
@@ -499,7 +497,7 @@ void InitVideoSdl()
 		}
 
 		if (hwnd) {
-			hicon = ExtractIcon(GetModuleHandle(nullptr), parameters::get()->applicationName.c_str(), 0);
+			hicon = ExtractIcon(GetModuleHandle(nullptr), BINARY_NAME ".exe", 0);
 		}
 
 		if (hicon) {
