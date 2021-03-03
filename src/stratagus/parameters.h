@@ -34,8 +34,13 @@ namespace wyrmgus {
 class parameters final : public singleton<parameters>
 {
 public:
-	void SetDefaultValues();
+	void process();
 	void SetLocalPlayerNameFromEnv();
+
+	bool is_test_run() const
+	{
+		return this->test_run;
+	}
 
 	void SetUserDirectory(const std::string &path) { userDirectory = path; }
 	const std::string &GetUserDirectory() const { return userDirectory; }
@@ -44,13 +49,13 @@ private:
 	void SetDefaultUserDirectory();
 
 public:
-	std::string applicationName;
-	std::string luaStartFilename;
-	std::string luaEditorStartFilename;
+	std::string applicationName = "stratagus";
+	std::string luaStartFilename = "scripts/stratagus.lua";
+	std::string luaEditorStartFilename = "scripts/editor.lua";
 	std::string luaScriptArguments;
 	std::string LocalPlayerName;        /// Name of local player
-	bool isTestRun;
 private:
+	bool test_run = false;
 	std::string userDirectory;          /// Directory containing user settings and data
 };
 

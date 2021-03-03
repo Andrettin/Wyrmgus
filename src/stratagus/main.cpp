@@ -27,11 +27,11 @@
 #include "stratagus.h"
 
 #include "database/database.h"
+#include "parameters.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "version.h"
 
-#include <QCommandLineParser>
 #include <QDir>
 #include <QQmlApplicationEngine>
 
@@ -61,23 +61,7 @@ int main(int argc, char **argv)
 		database::get()->set_root_path(pathPtr);
 #endif
 
-		QCommandLineParser cmd_parser;
-
-		QCommandLineOption data_path_option("d", "Specify a custom data path.", "data path");
-		cmd_parser.addOption(data_path_option);
-
-		QCommandLineOption test_option { "t", "Check startup and exit." };
-		cmd_parser.addOption(test_option);
-
-		cmd_parser.setApplicationDescription("The free real time strategy game engine.");
-		cmd_parser.addHelpOption();
-		cmd_parser.addVersionOption();
-
-		cmd_parser.process(app);
-
-		if (cmd_parser.isSet(data_path_option)) {
-			database::get()->set_root_path(cmd_parser.value(data_path_option).toStdString());
-		}
+		parameters::get()->process();
 
 		std::thread stratagus_thread([argc, argv]() {
 			try {

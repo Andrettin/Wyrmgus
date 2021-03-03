@@ -30,21 +30,43 @@
 
 #include "database/database.h"
 
+#include <QCommandLineParser>
+
 namespace wyrmgus {
 
-void parameters::SetDefaultValues()
+void parameters::process()
 {
-	applicationName = "stratagus";
-	luaStartFilename = "scripts/stratagus.lua";
-	luaEditorStartFilename = "scripts/editor.lua";
-	isTestRun = false;
-	SetDefaultUserDirectory();
+	QCommandLineParser cmd_parser;
+
+	QCommandLineOption data_path_option("d", "Specify a custom data path.", "data path");
+	cmd_parser.addOption(data_path_option);
+
+	QCommandLineOption test_option{ "t", "Check startup and exit." };
+	cmd_parser.addOption(test_option);
+
+	cmd_parser.setApplicationDescription("The free real time strategy game engine.");
+	cmd_parser.addHelpOption();
+	cmd_parser.addVersionOption();
+
+	cmd_parser.process(*QApplication::instance());
+
+	if (cmd_parser.isSet(data_path_option)) {
+		database::get()->set_root_path(cmd_parser.value(data_path_option).toStdString());
+	}
+
+	if (cmd_parser.isSet(test_option)) {
+		this->test_run = true;
+	}
+
+	//FIXME: add the command line parsing from ParseCommandLine() here
+
+	this->SetDefaultUserDirectory();
 }
 
 void parameters::SetDefaultUserDirectory()
 {
 #ifdef USE_GAME_DIR
-	userDirectory = wyrmgus::database::get()->get_root_path().string();
+	userDirectory = database::get()->get_root_path().string();
 #elif USE_WIN32
 	userDirectory = getenv("APPDATA");
 #elif __MORPHOS__

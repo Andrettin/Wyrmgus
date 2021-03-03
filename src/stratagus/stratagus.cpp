@@ -528,7 +528,6 @@ static void ParseCommandLine(int argc, char **argv)
 				VideoSyncSpeed = atoi(optarg);
 				continue;
 			case 't':
-				parameters->isTestRun = true;
 				continue;
 			case 'u':
 				parameters->SetUserDirectory(optarg);
@@ -630,7 +629,6 @@ void stratagusMain(int argc, char **argv)
 #endif
 
 	parameters *parameters = parameters::get();
-	parameters->SetDefaultValues();
 	parameters->SetLocalPlayerNameFromEnv();
 
 #ifdef REDIRECT_OUTPUT
@@ -837,7 +835,7 @@ void initialize_database()
 
 bool is_test_run()
 {
-	return parameters::get()->isTestRun;
+	return parameters::get()->is_test_run();
 }
 
 void save_preferences()
