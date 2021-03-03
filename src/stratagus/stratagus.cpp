@@ -229,7 +229,6 @@ std::string CliMapName;				/// Filename of the map given on the command line
 std::string MenuRace;
 
 bool EnableDebugPrint;				/// if enabled, print the debug messages
-bool EnableAssert;					/// if enabled, halt on assertion failures
 
 /*============================================================================
 ==  MAIN
@@ -473,9 +472,6 @@ static void ParseCommandLine(int argc, char **argv)
 
 	for (;;) {
 		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:tu:v:Wx:Z?-")) {
-			case 'a':
-				EnableAssert = true;
-				continue;
 			case 'c':
 				parameters->luaStartFilename = optarg;
 				if (strlen(optarg) > 4 &&
