@@ -387,7 +387,6 @@ static void Usage()
 	PrintHeader();
 	printf(
 		"\n\nUsage: %s [OPTIONS] [map.smp|map.smp.gz]\n"
-		"\t-a\t\tEnables asserts check in engine code (for debugging)\n"
 		"\t-c file.lua\tConfiguration start file (default stratagus.lua)\n"
 		"\t-d datapath\tPath to stratagus data (default current directory)\n"
 		"\t-D depth\tVideo mode depth = pixel per point\n"
@@ -396,7 +395,6 @@ static void Usage()
 		"\t-F\t\tFull screen video mode\n"
 		"\t-G \"options\"\tGame options (passed to game scripts)\n"
 		"\t-h\t\tHelp shows this page\n"
-		"\t-i\t\tEnables unit info dumping into log (for debugging)\n"
 		"\t-I addr\t\tNetwork address to use\n"
 		"\t-l\t\tDisable command log\n"
 		"\t-N name\t\tName of the player\n"
