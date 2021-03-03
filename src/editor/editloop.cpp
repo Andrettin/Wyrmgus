@@ -2355,9 +2355,9 @@ static void EditorCallbackExit()
 void CEditor::Init()
 {
 	// Load and evaluate the editor configuration file
-	const std::string filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.c_str());
+	const std::string filename = LibraryFileName(parameters::get()->luaEditorStartFilename.c_str());
 	if (!CanAccessFile(filename.c_str())) {
-		throw std::runtime_error("Editor configuration file \"" + Parameters::Instance.luaEditorStartFilename  + "\" was not found, specify another with '-E file.lua'");
+		throw std::runtime_error("Editor configuration file \"" + parameters::get()->luaEditorStartFilename  + "\" was not found, specify another with '-E file.lua'");
 	}
 
 	ShowLoadProgress(_("Loading Script \"%s\""), filename.c_str());
@@ -2684,7 +2684,7 @@ void EditorMainLoop()
 
 		CleanModules();
 
-		LoadCcl(Parameters::Instance.luaStartFilename); // Reload the main config file
+		LoadCcl(parameters::get()->luaStartFilename); // Reload the main config file
 
 		PreMenuSetup();
 

@@ -449,7 +449,7 @@ void ExitNetwork1()
 */
 void NetworkOnStartGame()
 {
-	CPlayer::GetThisPlayer()->SetName(Parameters::Instance.LocalPlayerName);
+	CPlayer::GetThisPlayer()->SetName(parameters::get()->LocalPlayerName);
 	for (int i = 0; i < HostsCount; ++i) {
 		CPlayer::Players[Hosts[i].PlyNr]->SetName(Hosts[i].PlyName);
 	}

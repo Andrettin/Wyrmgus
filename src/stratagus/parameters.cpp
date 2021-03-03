@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_train.cpp - The building train action. */
-//
-//      (c) Copyright 1998-2013 by Joris Dauphin
+//      (c) Copyright 1998-2021 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -32,9 +30,9 @@
 
 #include "database/database.h"
 
-Parameters Parameters::Instance;
+namespace wyrmgus {
 
-void Parameters::SetDefaultValues()
+void parameters::SetDefaultValues()
 {
 	applicationName = "stratagus";
 	luaStartFilename = "scripts/stratagus.lua";
@@ -43,14 +41,14 @@ void Parameters::SetDefaultValues()
 	SetDefaultUserDirectory();
 }
 
-void Parameters::SetDefaultUserDirectory()
+void parameters::SetDefaultUserDirectory()
 {
 #ifdef USE_GAME_DIR
 	userDirectory = wyrmgus::database::get()->get_root_path().string();
 #elif USE_WIN32
 	userDirectory = getenv("APPDATA");
 #elif __MORPHOS__
-	userDirectory = "home";	
+	userDirectory = "home";
 #else
 	userDirectory = getenv("HOME");
 #endif
@@ -86,7 +84,9 @@ static std::string GetLocalPlayerNameFromEnv()
 	}
 }
 
-void Parameters::SetLocalPlayerNameFromEnv()
+void parameters::SetLocalPlayerNameFromEnv()
 {
 	LocalPlayerName = GetLocalPlayerNameFromEnv();
+}
+
 }

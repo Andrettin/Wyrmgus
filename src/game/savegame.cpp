@@ -57,7 +57,7 @@ extern void StartMap(const std::string &filename, bool clean);
 void ExpandPath(std::string &newpath, const std::string &path)
 {
 	if (path[0] == '~') {
-		newpath = Parameters::Instance.GetUserDirectory();
+		newpath = parameters::get()->GetUserDirectory();
 		if (!GameName.empty()) {
 			newpath += "/";
 			newpath += GameName;
@@ -74,7 +74,7 @@ void ExpandPath(std::string &newpath, const std::string &path)
 static std::string GetSaveDir()
 {
 	struct stat tmp;
-	std::string dir(Parameters::Instance.GetUserDirectory());
+	std::string dir(parameters::get()->GetUserDirectory());
 	if (!GameName.empty()) {
 		dir += "/";
 		dir += GameName;

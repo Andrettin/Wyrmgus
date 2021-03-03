@@ -1709,7 +1709,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//Wyrmgus start
 	/*
 	} else {
-		const std::string &localPlayerName = Parameters::Instance.LocalPlayerName;
+		const std::string &localPlayerName = parameters::get()->LocalPlayerName;
 
 		if (!localPlayerName.empty() && localPlayerName != "Anonymous") {
 			ThisPlayer->SetName(localPlayerName);
@@ -1948,7 +1948,7 @@ static int CclSetGameName(lua_State *l)
 	}
 
 	if (!GameName.empty()) {
-		std::string path = Parameters::Instance.GetUserDirectory() + "/" + GameName;
+		std::string path = parameters::get()->GetUserDirectory() + "/" + GameName;
 		makedir(path.c_str(), 0777);
 	}
 	return 0;
@@ -2242,7 +2242,7 @@ static int ScriptSetUseHPForXp(lua_State *l)
 static int CclSetLocalPlayerName(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	Parameters::Instance.LocalPlayerName = LuaToString(l, 1);
+	parameters::get()->LocalPlayerName = LuaToString(l, 1);
 	return 0;
 }
 
@@ -2254,7 +2254,7 @@ static int CclSetLocalPlayerName(lua_State *l)
 static int CclGetLocalPlayerName(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushstring(l, Parameters::Instance.LocalPlayerName.c_str());
+	lua_pushstring(l, parameters::get()->LocalPlayerName.c_str());
 	return 1;
 }
 

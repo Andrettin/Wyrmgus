@@ -422,7 +422,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	if (!LogFile) {
 		struct stat tmp;
-		std::string path(Parameters::Instance.GetUserDirectory());
+		std::string path(parameters::get()->GetUserDirectory());
 		if (!GameName.empty()) {
 			path += "/";
 			path += GameName;
@@ -1010,9 +1010,9 @@ int SaveReplay(const std::string &filename)
 		return -1;
 	}
 
-	destination = Parameters::Instance.GetUserDirectory() + "/" + GameName + "/logs/" + filename;
+	destination = parameters::get()->GetUserDirectory() + "/" + GameName + "/logs/" + filename;
 
-	logfile << Parameters::Instance.GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << CPlayer::GetThisPlayer()->Index << ".log";
+	logfile << parameters::get()->GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << CPlayer::GetThisPlayer()->Index << ".log";
 
 	if (stat(logfile.str().c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");

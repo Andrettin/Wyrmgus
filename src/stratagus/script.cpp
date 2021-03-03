@@ -3083,7 +3083,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask, int sortmo
 
 	if (pathtype == 1) {
 		++userdir;
-		std::string dir(Parameters::Instance.GetUserDirectory());
+		std::string dir(parameters::get()->GetUserDirectory());
 		if (!GameName.empty()) {
 			dir += "/";
 			dir += GameName;
@@ -3515,7 +3515,7 @@ void SavePreferences()
 	}
 	blockTableNames.push_back("preferences");
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
-		std::string path = Parameters::Instance.GetUserDirectory();
+		std::string path = parameters::get()->GetUserDirectory();
 
 		if (!GameName.empty()) {
 			path += "/";

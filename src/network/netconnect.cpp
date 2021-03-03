@@ -1448,7 +1448,7 @@ void NetworkInitClientConnect()
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
-	Client.Init(Parameters::Instance.LocalPlayerName, &NetworkFildes, &ServerSetupState, &LocalSetupState, GetTicks());
+	Client.Init(parameters::get()->LocalPlayerName, &NetworkFildes, &ServerSetupState, &LocalSetupState, GetTicks());
 }
 
 /**
@@ -1752,10 +1752,10 @@ void NetworkInitServerConnect(int openslots)
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear(); // Unused when we are server
-	Server.Init(Parameters::Instance.LocalPlayerName, &NetworkFildes, &ServerSetupState);
+	Server.Init(parameters::get()->LocalPlayerName, &NetworkFildes, &ServerSetupState);
 
 	// preset the server (initially always slot 0)
-	Hosts[0].SetName(Parameters::Instance.LocalPlayerName.c_str());
+	Hosts[0].SetName(parameters::get()->LocalPlayerName.c_str());
 
 	for (int i = openslots; i < PlayerMax - 1; ++i) {
 		ServerSetupState.CompOpt[i] = 1;
@@ -1791,7 +1791,7 @@ void NetworkGamePrepareGameSettings()
 				}
 			}
 			if (i == NetLocalPlayerNumber) {
-				printf("%s (localhost)", Parameters::Instance.LocalPlayerName.c_str());
+				printf("%s (localhost)", parameters::get()->LocalPlayerName.c_str());
 			}
 		}
 		printf("\n");

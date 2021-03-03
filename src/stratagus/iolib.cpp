@@ -580,13 +580,13 @@ static void LibraryFileName(const char *file, std::array<char, PATH_MAX> &buffer
 
 	// In user home directory
 	if (!GameName.empty()) {
-		snprintf(buffer.data(), PATH_MAX, "%s/%s/%s", Parameters::Instance.GetUserDirectory().c_str(), GameName.c_str(), file);
+		snprintf(buffer.data(), PATH_MAX, "%s/%s/%s", parameters::get()->GetUserDirectory().c_str(), GameName.c_str(), file);
 		if (FindFileWithExtension(buffer)) {
 			return;
 		}
 	}
 
-	snprintf(buffer.data(), PATH_MAX, "%s/%s", Parameters::Instance.GetUserDirectory().c_str(), file);
+	snprintf(buffer.data(), PATH_MAX, "%s/%s", parameters::get()->GetUserDirectory().c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}

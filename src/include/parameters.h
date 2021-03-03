@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name parameters.h - General parameters. */
-//
-//      (c) Copyright 1998-2013 by Joris Dauphin
+//      (c) Copyright 1998-2021 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,7 +26,12 @@
 
 #pragma once
 
-class Parameters
+#include "util/singleton.h"
+
+namespace wyrmgus {
+
+//command line parameters
+class parameters final : public singleton<parameters>
 {
 public:
 	void SetDefaultValues();
@@ -49,6 +52,6 @@ public:
 	bool isTestRun;
 private:
 	std::string userDirectory;          /// Directory containing user settings and data
-public:
-	static Parameters Instance;
 };
+
+}

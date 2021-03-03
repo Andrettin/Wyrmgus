@@ -421,7 +421,7 @@ static void Usage()
 		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
 #endif
 		"map is relative to the root data path, use ./map for relative to cwd\n",
-		Parameters::Instance.applicationName.c_str());
+		parameters::get()->applicationName.c_str());
 }
 
 #ifdef REDIRECT_OUTPUT
@@ -446,7 +446,7 @@ static void CleanupOutput()
 
 static void RedirectOutput()
 {
-	std::string path = Parameters::Instance.GetUserDirectory();
+	std::string path = parameters::get()->GetUserDirectory();
 
 	makedir(path.c_str(), 0777);
 	
@@ -468,18 +468,20 @@ static void RedirectOutput()
 }
 #endif
 
-static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
+static void ParseCommandLine(int argc, char **argv)
 {
+	parameters *parameters = parameters::get();
+
 	for (;;) {
 		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:tu:v:Wx:Z?-")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
 			case 'c':
-				parameters.luaStartFilename = optarg;
+				parameters->luaStartFilename = optarg;
 				if (strlen(optarg) > 4 &&
 					!(strstr(optarg, ".lua") == optarg + strlen(optarg) - 4)) {
-						parameters.luaStartFilename += ".lua";
+						parameters->luaStartFilename += ".lua";
 				}
 				continue;
 			case 'd': {
@@ -492,14 +494,14 @@ static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				Editor.Running = EditorCommandLine;
 				continue;
 			case 'E':
-				parameters.luaEditorStartFilename = optarg;
+				parameters->luaEditorStartFilename = optarg;
 				continue;
 			case 'F':
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 1;
 				continue;
 			case 'G':
-				parameters.luaScriptArguments = optarg;
+				parameters->luaScriptArguments = optarg;
 				continue;
 			case 'i':
 				EnableUnitDebug = true;
@@ -511,7 +513,7 @@ static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				CommandLogDisabled = true;
 				continue;
 			case 'N':
-				parameters.LocalPlayerName = optarg;
+				parameters->LocalPlayerName = optarg;
 				continue;
 			case 'P':
 				CNetworkParameter::Instance.localPort = atoi(optarg);
@@ -526,10 +528,10 @@ static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				VideoSyncSpeed = atoi(optarg);
 				continue;
 			case 't':
-				parameters.isTestRun = true;
+				parameters->isTestRun = true;
 				continue;
 			case 'u':
-				Parameters::Instance.SetUserDirectory(optarg);
+				parameters->SetUserDirectory(optarg);
 				continue;
 			case 'v': {
 				char *sep = strchr(optarg, 'x');
@@ -627,22 +629,22 @@ void stratagusMain(int argc, char **argv)
 	SetupConsole();
 #endif
 
-	Parameters &parameters = Parameters::Instance;
-	parameters.SetDefaultValues();
-	parameters.SetLocalPlayerNameFromEnv();
+	parameters *parameters = parameters::get();
+	parameters->SetDefaultValues();
+	parameters->SetLocalPlayerNameFromEnv();
 
 #ifdef REDIRECT_OUTPUT
 	RedirectOutput();
 #endif
 
 	if (argc > 0) {
-		parameters.applicationName = argv[0];
+		parameters->applicationName = argv[0];
 	}
 
 	// FIXME: Parse options before or after scripts?
-	ParseCommandLine(argc, argv, parameters);
+	ParseCommandLine(argc, argv);
 
-	makedir(parameters.GetUserDirectory().c_str(), 0777);
+	makedir(parameters->GetUserDirectory().c_str(), 0777);
 
 	// Init Lua and register lua functions!
 	InitLua();
@@ -655,7 +657,7 @@ void stratagusMain(int argc, char **argv)
 	// Initialise AI module
 	InitAiModule();
 
-	LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
+	LoadCcl(parameters->luaStartFilename, parameters->luaScriptArguments);
 
 	PrintHeader();
 	PrintLicense();
@@ -835,7 +837,7 @@ void initialize_database()
 
 bool is_test_run()
 {
-	return Parameters::Instance.isTestRun;
+	return parameters::get()->isTestRun;
 }
 
 void save_preferences()

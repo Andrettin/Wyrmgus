@@ -815,7 +815,7 @@ void SaveHeroes()
 	}
 			
 	//see if the old heroes.lua save file is present, and if so, delete it
-	std::string path = Parameters::Instance.GetUserDirectory();
+	std::string path = parameters::get()->GetUserDirectory();
 
 	if (!GameName.empty()) {
 		path += "/";
@@ -832,7 +832,7 @@ void SaveHeroes()
 void SaveHero(const wyrmgus::character *hero)
 {
 	struct stat tmp;
-	std::string path = Parameters::Instance.GetUserDirectory();
+	std::string path = parameters::get()->GetUserDirectory();
 
 	if (!GameName.empty()) {
 		path += "/";
@@ -1010,7 +1010,7 @@ void DeleteCustomHero(const std::string &hero_full_name)
 	}
 	
 	//delete hero save file
-	std::string path = Parameters::Instance.GetUserDirectory();
+	std::string path = parameters::get()->GetUserDirectory();
 	if (!GameName.empty()) {
 		path += "/";
 		path += GameName;
@@ -1063,7 +1063,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 
 		wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
 		//delete old hero save file
-		std::string path = Parameters::Instance.GetUserDirectory();
+		std::string path = parameters::get()->GetUserDirectory();
 		if (!GameName.empty()) {
 			path += "/";
 			path += GameName;

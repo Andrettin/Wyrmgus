@@ -48,7 +48,7 @@ wyrmgus::quest *CurrentQuest = nullptr;
 
 void SaveQuestCompletion()
 {
-	std::string path = Parameters::Instance.GetUserDirectory();
+	std::string path = parameters::get()->GetUserDirectory();
 
 	if (!GameName.empty()) {
 		path += "/";
