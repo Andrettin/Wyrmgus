@@ -1053,7 +1053,6 @@ set(wyrmgus_generic_HDRS
 	src/include/netconnect.h
 	src/include/network.h
 	src/include/network/netsockets.h
-	src/include/parameters.h
 	src/include/particle.h
 	src/include/pathfinder.h
 	src/include/player.h
@@ -1090,6 +1089,7 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/literary_text.h
 	src/stratagus/magic_domain.h
 	src/stratagus/name_generator.h
+	src/stratagus/parameters.h
 	src/stratagus/player_container.h
 	src/stratagus/text_processing_context.h
 	src/stratagus/text_processor.h
