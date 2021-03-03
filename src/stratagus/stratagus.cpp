@@ -230,7 +230,6 @@ std::string MenuRace;
 
 bool EnableDebugPrint;				/// if enabled, print the debug messages
 bool EnableAssert;					/// if enabled, halt on assertion failures
-bool EnableUnitDebug;				/// if enabled, a unit info dump will be created
 
 /*============================================================================
 ==  MAIN
@@ -502,9 +501,6 @@ static void ParseCommandLine(int argc, char **argv)
 				continue;
 			case 'G':
 				parameters->luaScriptArguments = optarg;
-				continue;
-			case 'i':
-				EnableUnitDebug = true;
 				continue;
 			case 'I':
 				CNetworkParameter::Instance.localHost = optarg;
