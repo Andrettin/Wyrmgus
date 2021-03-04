@@ -59,7 +59,7 @@ This is the absolute minimum, install all together with:
 
 6. Let's compile! Run this in the build directory:
 
-  cmake ..
+  cmake -DWITH_GEOJSON=OFF ..
   make
 
 The build will take some time ...
