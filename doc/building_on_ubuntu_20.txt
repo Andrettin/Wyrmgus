@@ -1,10 +1,10 @@
 ############################################################
-# Building Wyrmsun on Ubuntu 16.04 LTS
+# Building Wyrmsun on Ubuntu 20.04 LTS
 ############################################################
 
 We are going to download and compile Wyrmsun, the open-source retro RTS game.
 
-This guide should work for all recent ubuntu versions (tested on 16.04 and 16.10). It should also work for all recent Mint versions (tested on 18.2).
+This guide should work for all recent ubuntu versions (tested on 20.04).
 
 Required disk space: about 1 GiB
 
@@ -29,39 +29,34 @@ Required disk space: about 1 GiB
 
 
 
-4. Enter the engine repo. First, init the oaml sound submodule:
-
-  cd Wyrmgus
-  git submodule update --init
-
-
-
-5. Prepare the compilation. Create build directory:
+4. Prepare the compilation. Create build directory:
 
   mkdir build
   cd build
 
 
 
-6. Install dependencies:
+5. Install dependencies:
 
   cmake (3.5.1)
   liblua5.1-0-dev (5.1.5)
   libtolua++5.1-dev (1.0.93)
   zlib1g-dev (1.2.8)
-  libpng++-dev (0.2.5)
   libsdl1.2-dev (1.2.15)
-  libogg-dev (1.3.2)
-  libvorbis-dev (1.3.5)
+  libboost-dev
+  qtbase5-dev
+  qtlocation5-dev
+  qtmultimedia5-dev
+  qtpositioning5-dev
 
 This is the absolute minimum, install all together with:
 
-  sudo apt install cmake liblua5.1-0-dev libtolua++5.1-dev zlib1g-dev libpng++-dev \
-      libsdl1.2-dev libogg-dev libvorbis-dev
+  sudo apt install cmake liblua5.1-0-dev libtolua++5.1-dev zlib1g-dev libsdl1.2-dev \
+      libboost-dev qtbase5-dev qtlocation5-dev qtmultimedia5-dev qtpositioning5-dev
 
 
 
-7. Let's compile! Run this in the build directory:
+6. Let's compile! Run this in the build directory:
 
   cmake ..
   make
@@ -70,9 +65,9 @@ The build will take some time ...
 
 
 
-8. If everything worked out you now have a 'stratagus' executable. Run the game with:
+7. If everything worked out you now have a 'wyrmgus' executable. Run the game with:
 
-  ./stratagus -d ../../Wyrmsun
+  ./wyrmgus -d ../../Wyrmsun
 
 The game data will be stored in './wyr'
 
