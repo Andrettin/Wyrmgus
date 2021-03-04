@@ -43,6 +43,7 @@ Required disk space: about 1 GiB
   libtolua++5.1-dev (1.0.93)
   zlib1g-dev (1.2.8)
   libsdl1.2-dev (1.2.15)
+  libsdl-mixer1.2-dev
   libboost-dev
   qtbase5-dev
   qtlocation5-dev
