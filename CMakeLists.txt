@@ -517,6 +517,7 @@ set(video_SRCS
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
 	src/video/png.cpp
+	src/video/render_context.cpp
 	src/video/renderer.cpp
 	src/video/sdl.cpp
 	src/video/sprite.cpp
@@ -1019,6 +1020,7 @@ set(wyrmgus_video_HDRS
 	src/video/font_color.h
 	src/video/frame_buffer_object.h
 	src/video/intern_video.h
+	src/video/render_context.h
 	src/video/renderer.h
 	src/video/video.h
 )
