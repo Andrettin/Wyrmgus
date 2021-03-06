@@ -46,6 +46,7 @@
 #include "dialogue.h"
 #include "dynasty.h"
 #include "economy/resource.h"
+#include "engine_interface.h"
 #include "faction.h"
 #include "faction_tier.h"
 #include "faction_type.h"
@@ -782,6 +783,8 @@ void database::initialize()
 			std::throw_with_nested(std::runtime_error("Error when checking the instances of the " + metadata->get_class_identifier() + " class."));
 		}
 	}
+
+	engine_interface::get()->set_running(true);
 }
 
 void database::clear()

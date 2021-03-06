@@ -1086,6 +1086,7 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/dialogue_option.h
 	src/stratagus/diplomacy_state.h
 	src/stratagus/dynasty.h
+	src/stratagus/engine_interface.h
 	src/stratagus/faction.h
 	src/stratagus/faction_history.h
 	src/stratagus/faction_tier.h

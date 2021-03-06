@@ -27,6 +27,7 @@
 #include "stratagus.h"
 
 #include "database/database.h"
+#include "engine_interface.h"
 #include "parameters.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
@@ -35,6 +36,7 @@
 
 #include <QDir>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 
 int main(int argc, char **argv)
 {
@@ -75,6 +77,8 @@ int main(int argc, char **argv)
 		QQmlApplicationEngine engine;
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
+
+		engine.rootContext()->setContextProperty("wyrmgus", engine_interface::get());
 
 		QString root_path { QString::fromStdString(database::get()->get_root_path().string()) };
 		engine.addImportPath(root_path + "/libraries/qml");

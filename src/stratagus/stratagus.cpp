@@ -793,7 +793,7 @@ Vec2i GetDirectionOffset(int direction)
 void load_database(const bool initial_definition)
 {
 	try {
-		wyrmgus::database::get()->load(initial_definition);
+		database::get()->load(initial_definition);
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error loading database."));
 	}
@@ -813,7 +813,7 @@ void load_defines()
 void initialize_database()
 {
 	try {
-		wyrmgus::database::get()->initialize();
+		database::get()->initialize();
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error initializing database."));
 	}

@@ -28,52 +28,37 @@
 
 #include "util/singleton.h"
 
-namespace boost::asio {
-	class io_context;
-}
-
 namespace wyrmgus {
 
-//a singleton providing an OpenGL render context, to be used by the render which communicates with QtQuick
-class render_context final : public singleton<render_context>
+//interface for the engine, to be used in the context of QML
+class engine_interface final : public QObject, public singleton<engine_interface>
 {
-public:
-	render_context();
-	~render_context();
+	Q_OBJECT
 
-	void post(const std::function<void()> &function);
-
-private:
-	void post_internal(const std::function<void()> &function);
+	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 
 public:
-	std::future<void> async(const std::function<void()> &function)
+	bool is_running() const
 	{
-		//execute the function in the current context too, temporarily
-		//function();
-
-		std::shared_ptr<std::promise<void>> promise = std::make_unique<std::promise<void>>();;
-		std::future<void> future = promise->get_future();
-
-		this->post_internal([promise, function]() {
-			function();
-			promise->set_value();
-		});
-
-		return future;
+		return this->running;
 	}
 
-	//post an action, and then wait for it to be completed
-	void sync(const std::function<void()> &function)
+	void set_running(const bool running)
 	{
-		std::future<void> future = this->async(function);
-		future.wait();
+		if (running == this->is_running()) {
+			return;
+		}
+
+		this->running = running;
+
+		emit running_changed();
 	}
 
-	void run();
+signals:
+	void running_changed();
 
 private:
-	std::unique_ptr<boost::asio::io_context> io_context;
+	bool running = false;
 };
 
 }

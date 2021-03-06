@@ -85,26 +85,6 @@ public:
 	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const std::string &value);
 	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const sml_data &scope);
 
-	const std::filesystem::path &get_root_path() const
-	{
-		return this->root_path;
-	}
-
-	void set_root_path(const std::filesystem::path &path)
-	{
-		this->root_path = path;
-	}
-
-	std::filesystem::path get_modules_path() const
-	{
-		return this->get_root_path() / "modules";
-	}
-
-	std::filesystem::path get_dlcs_path() const
-	{
-		return this->get_root_path() / "dlcs";
-	}
-
 	static std::filesystem::path get_documents_modules_path()
 	{
 		return database::get_documents_path() / "modules";
@@ -113,28 +93,6 @@ public:
 	static std::filesystem::path get_documents_path();
 	static std::filesystem::path get_user_data_path();
 	static void ensure_path_exists(const std::filesystem::path &path);
-
-	const std::filesystem::path &get_base_path(const data_module *data_module) const;
-
-	std::filesystem::path get_graphics_path(const data_module *data_module) const
-	{
-		return this->get_base_path(data_module) / database::graphics_folder;
-	}
-
-	std::filesystem::path get_maps_path(const data_module *data_module) const
-	{
-		return this->get_base_path(data_module) / database::maps_folder;
-	}
-
-	std::filesystem::path get_music_path(const data_module *data_module)
-	{
-		return this->get_base_path(data_module) / database::music_folder;
-	}
-
-	std::filesystem::path get_sounds_path(const data_module *data_module)
-	{
-		return this->get_base_path(data_module) / database::sounds_folder;
-	}
 
 	static void parse_folder(const std::filesystem::path &path, std::vector<sml_data> &sml_data_list);
 
@@ -171,6 +129,48 @@ public:
 		}
 
 		throw std::runtime_error("No module found with identifier \"" + identifier + "\".");
+	}
+
+	const std::filesystem::path &get_root_path() const
+	{
+		return this->root_path;
+	}
+
+	void set_root_path(const std::filesystem::path &path)
+	{
+		this->root_path = path;
+	}
+
+	std::filesystem::path get_modules_path() const
+	{
+		return this->get_root_path() / "modules";
+	}
+
+	std::filesystem::path get_dlcs_path() const
+	{
+		return this->get_root_path() / "dlcs";
+	}
+
+	const std::filesystem::path &get_base_path(const data_module *data_module) const;
+
+	std::filesystem::path get_graphics_path(const data_module *data_module) const
+	{
+		return this->get_base_path(data_module) / database::graphics_folder;
+	}
+
+	std::filesystem::path get_maps_path(const data_module *data_module) const
+	{
+		return this->get_base_path(data_module) / database::maps_folder;
+	}
+
+	std::filesystem::path get_music_path(const data_module *data_module)
+	{
+		return this->get_base_path(data_module) / database::music_folder;
+	}
+
+	std::filesystem::path get_sounds_path(const data_module *data_module)
+	{
+		return this->get_base_path(data_module) / database::sounds_folder;
 	}
 
 	std::vector<std::filesystem::path> get_base_paths() const
