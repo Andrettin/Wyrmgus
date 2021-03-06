@@ -513,9 +513,11 @@ set(video_SRCS
 	src/video/color.cpp
 	src/video/font.cpp
 	src/video/font_color.cpp
+	src/video/frame_buffer_object.cpp
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
 	src/video/png.cpp
+	src/video/renderer.cpp
 	src/video/sdl.cpp
 	src/video/sprite.cpp
 	src/video/video.cpp
@@ -1015,7 +1017,9 @@ set(wyrmgus_util_HDRS
 set(wyrmgus_video_HDRS
 	src/video/font.h
 	src/video/font_color.h
+	src/video/frame_buffer_object.h
 	src/video/intern_video.h
+	src/video/renderer.h
 	src/video/video.h
 )
 

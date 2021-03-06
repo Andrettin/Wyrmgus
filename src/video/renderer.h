@@ -26,64 +26,41 @@
 
 #pragma once
 
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <cctype>
-#include <cerrno>
-#include <cinttypes>
-#include <climits>
-#include <cmath>
-#include <cstdarg>
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <deque>
-#include <filesystem>
-#include <fstream>
-#include <functional>
-#include <iostream>
-#include <list>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <optional>
-#include <queue>
-#include <random>
-#include <set>
-#include <shared_mutex>
-#include <sstream>
-#include <stack>
-#include <stdexcept>
-#include <string>
-#include <thread>
-#include <tuple>
-#include <type_traits>
-#include <typeinfo>
-#include <variant>
-#include <vector>
-#include <QApplication>
-#include <QColor>
-#include <QDateTime>
-#include <QDebug>
-#include <QGeoCircle>
-#include <QGeoCoordinate>
-#include <QGeoPath>
-#include <QGeoPolygon>
-#include <QGeoRectangle>
-#include <QImage>
-#include <QJsonDocument>
-#include <QMetaProperty>
-#include <QObject>
-#include <QPoint>
-#include <QQuickFramebufferObject>
-#include <QStandardPaths>
-#include <QString>
-#include <QThread>
-#include <QTime>
-#include <QVariant>
-#include <QVariantList>
-#include "util/point_operators.h" //to ensure the / operator with an int as RHS is used instead of the Qt one with qreal (which uses rounding)
-#include "util/size_operators.h" //as above
+namespace wyrmgus {
+
+class frame_buffer_object;
+
+//a singleton providing an OpenGL renderer to be used by QtQuick
+class renderer final : public QQuickFramebufferObject::Renderer
+{
+public:
+    static renderer *get()
+    {
+        return renderer::instance;
+    }
+
+private:
+    static inline renderer *instance = nullptr;
+
+public:
+    renderer(const frame_buffer_object *fbo) : fbo(fbo)
+    {
+        renderer::instance = this;
+    }
+
+    ~renderer()
+    {
+        if (renderer::instance == this) {
+            renderer::instance = nullptr;
+        }
+    }
+
+    virtual QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) override;
+
+    virtual void render() override;
+
+private:
+    const frame_buffer_object *fbo = nullptr;
+};
+
+}
