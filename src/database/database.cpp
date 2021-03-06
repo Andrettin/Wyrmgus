@@ -233,6 +233,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 
 		if (property_class_name == "std::string") {
 			new_property_value = QVariant::fromValue(property.get_value());
+		} else if (property_class_name == "std::filesystem::path") {
+			new_property_value = QVariant::fromValue(std::filesystem::path(property.get_value()));
 		} else if (property_class_name == "wyrmgus::age*") {
 			new_property_value = QVariant::fromValue(age::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::animation_set*") {

@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name util.h - General utilities. */
-//
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -180,3 +178,5 @@ extern std::string NameToIdent(const std::string &text);				/// Make the name be
 extern std::string SeparateCapitalizedStringElements(const std::string &text);	/// Make the string's capitalized elements become separated
 extern std::string GeneratePersonalName(const std::string &unit_type_ident);
 //Wyrmgus end
+
+Q_DECLARE_METATYPE(std::filesystem::path)
