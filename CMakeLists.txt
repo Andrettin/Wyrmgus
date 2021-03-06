@@ -1287,6 +1287,7 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18.0")
 endif()
 
 option(WITH_GEOJSON "Compile with support for generating map data from GeoJSON files" ON)
+option(WITH_TEST "Compile the test project" ON)
 
 if(NOT WITH_RENDERER)
 	if(OPENGL_FOUND)
@@ -1627,14 +1628,18 @@ set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp PROPERTY SKIP_AUTOMOC 
 add_library(wyrmgus STATIC ${wyrmgus_SRCS} ${wyrmgus_HDRS})
 add_executable(wyrmgus_main WIN32 ${wyrmgus_main_SRCS})
 
-add_executable(wyrmgus_test ${wyrmgus_test_SRCS})
-add_test(wyrmgus_test wyrmgus_test)
-enable_testing()
+if(WITH_TEST)
+	add_executable(wyrmgus_test ${wyrmgus_test_SRCS})
+	add_test(wyrmgus_test wyrmgus_test)
+	enable_testing()
+endif()
 
 if (MSVC)
 	target_compile_options(wyrmgus PRIVATE /W4 /w44800 /wd4458)
 	target_compile_options(wyrmgus_main PRIVATE /W4 /w44800 /wd4458)
-	target_compile_options(wyrmgus_test PRIVATE /W4 /w44800 /wd4458)
+	if(WITH_TEST)
+		target_compile_options(wyrmgus_test PRIVATE /W4 /w44800 /wd4458)
+	endif()
 endif()
 
 target_precompile_headers(wyrmgus PRIVATE src/pch.h)
@@ -1675,9 +1680,11 @@ if(ENABLE_UNITY_BUILD)
 	set_source_files_properties(${video_SRCS} PROPERTIES UNITY_GROUP "video")
 	set_source_files_properties(${xbrz_SRCS} PROPERTIES UNITY_GROUP "xbrz")
 	
-	set_target_properties(wyrmgus_test PROPERTIES UNITY_BUILD_MODE GROUP)
-	set_source_files_properties(${economy_test_SRCS} PROPERTIES UNITY_GROUP "economy_test")
-	set_source_files_properties(${util_test_SRCS} PROPERTIES UNITY_GROUP "util_test")
+	if(WITH_TEST)
+		set_target_properties(wyrmgus_test PROPERTIES UNITY_BUILD_MODE GROUP)
+		set_source_files_properties(${economy_test_SRCS} PROPERTIES UNITY_GROUP "economy_test")
+		set_source_files_properties(${util_test_SRCS} PROPERTIES UNITY_GROUP "util_test")
+	endif()
 endif()
 
 target_link_libraries(wyrmgus ${wyrmgus_LIBS})
@@ -1700,18 +1707,24 @@ endif()
 target_link_libraries(wyrmgus ${wyrmgus_LIBS})
 
 target_precompile_headers(wyrmgus_main REUSE_FROM wyrmgus)
-target_precompile_headers(wyrmgus_test REUSE_FROM wyrmgus)
+if(WITH_TEST)
+	target_precompile_headers(wyrmgus_test REUSE_FROM wyrmgus)
+endif()
 
 set_target_properties(wyrmgus_main PROPERTIES OUTPUT_NAME ${BINARY_NAME})
 
 if (MSVC)
 	#ignore linker warning due to missing .pdb files, as otherwise a stream of warnings comes from linking external libraries
 	set_target_properties(wyrmgus_main PROPERTIES LINK_FLAGS "/ignore:4099")
-	set_target_properties(wyrmgus_test PROPERTIES LINK_FLAGS "/ignore:4099")
+	if(WITH_TEST)
+		set_target_properties(wyrmgus_test PROPERTIES LINK_FLAGS "/ignore:4099")
+	endif()
 endif()
 
 target_link_libraries(wyrmgus_main LINK_PUBLIC wyrmgus)
-target_link_libraries(wyrmgus_test LINK_PUBLIC wyrmgus)
+if(WITH_TEST)
+	target_link_libraries(wyrmgus_test LINK_PUBLIC wyrmgus)
+endif()
 
 ########### next target ###############
 
