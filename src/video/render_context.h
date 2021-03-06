@@ -26,42 +26,54 @@
 
 #pragma once
 
+#include "util/singleton.h"
+
+namespace boost::asio {
+    class io_context;
+}
+
 namespace wyrmgus {
 
-//a class providing an OpenGL frame buffer to be used by QtQuick
-class frame_buffer_object : public QQuickFramebufferObject
+//a singleton providing an OpenGL render context, to be used by the render which communicates with QtQuick
+class render_context final : public singleton<render_context>
 {
+public:
+    render_context();
+    ~render_context();
+
+    void post(const std::function<void()> &function);
+
 private:
-    static inline frame_buffer_object *instance = nullptr;
-    static inline std::mutex mutex;
+	void post_internal(const std::function<void()> &function);
 
 public:
-    static void request_update()
-    {
-        std::lock_guard<std::mutex> lock(frame_buffer_object::mutex);
+	std::future<void> async(const std::function<void()> &function)
+	{
+		//execute the function in the current context too, temporarily
+		function();
 
-        if (frame_buffer_object::instance != nullptr) {
-            QMetaObject::invokeMethod(frame_buffer_object::instance, &frame_buffer_object::update, Qt::QueuedConnection);
-        }
-    }
+		std::shared_ptr<std::promise<void>> promise = std::make_unique<std::promise<void>>();;
+		std::future<void> future = promise->get_future();
 
-    frame_buffer_object()
-    {
-        std::lock_guard<std::mutex> lock(frame_buffer_object::mutex);
+		this->post_internal([promise, function]() {
+			function();
+			promise->set_value();
+		});
 
-        frame_buffer_object::instance = this;
-    }
+		return future;
+	}
 
-    ~frame_buffer_object()
-    {
-        if (frame_buffer_object::instance == this) {
-            std::lock_guard<std::mutex> lock(frame_buffer_object::mutex);
-            frame_buffer_object::instance = nullptr;
-        }
-    }
+	//post an action, and then wait for it to be completed
+	void sync(const std::function<void()> &function)
+	{
+		std::future<void> future = this->async(function);
+		future.wait();
+	}
 
-public:
-    virtual QQuickFramebufferObject::Renderer *createRenderer() const override;
+	void run();
+
+private:
+    std::unique_ptr<boost::asio::io_context> io_context;
 };
 
 }

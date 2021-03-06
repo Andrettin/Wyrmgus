@@ -29,6 +29,7 @@
 #include "video/renderer.h"
 
 #include "video/frame_buffer_object.h"
+#include "video/render_context.h"
 
 #include <QOpenGLFramebufferObjectFormat>
 #include <QQuickWindow>
@@ -44,6 +45,9 @@ QOpenGLFramebufferObject *renderer::createFramebufferObject(const QSize &size)
 
 void renderer::render()
 {
+    //run the posted OpenGL commands
+    render_context::get()->run();
+
     this->fbo->window()->resetOpenGLState();
 }
 

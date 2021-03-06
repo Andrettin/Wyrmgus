@@ -24,44 +24,45 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
+
+#include "video/render_context.h"
+
+#include "video/frame_buffer_object.h"
+
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/post.hpp>
 
 namespace wyrmgus {
 
-//a class providing an OpenGL frame buffer to be used by QtQuick
-class frame_buffer_object : public QQuickFramebufferObject
+render_context::render_context()
 {
-private:
-    static inline frame_buffer_object *instance = nullptr;
-    static inline std::mutex mutex;
+    this->io_context = std::make_unique<boost::asio::io_context>();
+}
 
-public:
-    static void request_update()
-    {
-        std::lock_guard<std::mutex> lock(frame_buffer_object::mutex);
+render_context::~render_context()
+{
+}
 
-        if (frame_buffer_object::instance != nullptr) {
-            QMetaObject::invokeMethod(frame_buffer_object::instance, &frame_buffer_object::update, Qt::QueuedConnection);
-        }
-    }
+void render_context::run()
+{
+    //run the posted OpenGL commands
+    this->io_context->run();
+    this->io_context->restart();
+}
 
-    frame_buffer_object()
-    {
-        std::lock_guard<std::mutex> lock(frame_buffer_object::mutex);
+void render_context::post(const std::function<void()> &function)
+{
+    //execute the function in the current context too, temporarily
+    function();
 
-        frame_buffer_object::instance = this;
-    }
+    this->post_internal(function);
+}
 
-    ~frame_buffer_object()
-    {
-        if (frame_buffer_object::instance == this) {
-            std::lock_guard<std::mutex> lock(frame_buffer_object::mutex);
-            frame_buffer_object::instance = nullptr;
-        }
-    }
-
-public:
-    virtual QQuickFramebufferObject::Renderer *createRenderer() const override;
-};
+void render_context::post_internal(const std::function<void()> &function)
+{
+    boost::asio::post(*this->io_context, function);
+    frame_buffer_object::request_update();
+}
 
 }

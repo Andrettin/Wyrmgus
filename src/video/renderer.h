@@ -34,25 +34,8 @@ class frame_buffer_object;
 class renderer final : public QQuickFramebufferObject::Renderer
 {
 public:
-    static renderer *get()
+    explicit renderer(const frame_buffer_object *fbo) : fbo(fbo)
     {
-        return renderer::instance;
-    }
-
-private:
-    static inline renderer *instance = nullptr;
-
-public:
-    renderer(const frame_buffer_object *fbo) : fbo(fbo)
-    {
-        renderer::instance = this;
-    }
-
-    ~renderer()
-    {
-        if (renderer::instance == this) {
-            renderer::instance = nullptr;
-        }
     }
 
     virtual QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) override;
