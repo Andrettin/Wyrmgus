@@ -29,6 +29,7 @@
 #include "database/database.h"
 #include "engine_interface.h"
 #include "parameters.h"
+#include "ui/interface_image_provider.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "version.h"
@@ -79,6 +80,8 @@ int main(int argc, char **argv)
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
 
 		engine.rootContext()->setContextProperty("wyrmgus", engine_interface::get());
+
+		engine.addImageProvider("interface", new interface_image_provider);
 
 		QString root_path { QString::fromStdString(database::get()->get_root_path().string()) };
 		engine.addImportPath(root_path + "/libraries/qml");
