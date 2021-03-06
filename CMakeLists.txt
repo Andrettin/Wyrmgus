@@ -444,6 +444,7 @@ set(ui_SRCS
 	src/ui/icon.cpp
 	src/ui/icon_base.cpp
 	src/ui/interface.cpp
+	src/ui/interface_style.cpp
 	src/ui/mainscr.cpp
 	src/ui/uibuttons_proc.cpp
 	src/ui/mouse.cpp
@@ -941,6 +942,8 @@ set(wyrmgus_ui_HDRS
 	src/ui/icon.h
 	src/ui/icon_base.h
 	src/ui/interface.h
+	src/ui/interface_element_type.h
+	src/ui/interface_style.h
 	src/ui/popup.h
 	src/ui/resource_icon.h
 	src/ui/statusline.h

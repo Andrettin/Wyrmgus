@@ -66,8 +66,6 @@ const wyrmgus::unit_type *CursorBuilding;           /// building cursor
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
 wyrmgus::cursor *GameCursor = nullptr;                 /// current shown cursor-type
 
-static SDL_Surface *HiddenSurface;
-
 namespace wyrmgus {
 
 void cursor::clear()
