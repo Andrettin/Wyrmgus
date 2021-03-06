@@ -1007,6 +1007,7 @@ set(wyrmgus_util_HDRS
 	src/util/size_util.h
 	src/util/string_conversion_util.h
 	src/util/string_util.h
+	src/util/string_view_util.h
 	src/util/thread_pool.h
 	src/util/time_util.h
 	src/util/type_traits.h
