@@ -30,6 +30,7 @@
 #include "widgets.h"
 
 #include "database/defines.h"
+#include "engine_interface.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -2932,6 +2933,8 @@ int MenuScreen::run(bool loop)
 			if (GameResult == GameExit) {
 				break;
 			}
+
+			engine_interface::get()->run_event_loop();
 
 			UpdateDisplay();
 			RealizeVideoMemory();

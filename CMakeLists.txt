@@ -393,6 +393,7 @@ set(wyrmgus_base_SRCS
 	src/stratagus/dialogue_node.cpp
 	src/stratagus/dialogue_option.cpp
 	src/stratagus/dynasty.cpp
+	src/stratagus/engine_interface.cpp
 	src/stratagus/faction.cpp
 	src/stratagus/faction_history.cpp
 	src/stratagus/fallback_name_generator.cpp

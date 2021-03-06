@@ -24,73 +24,34 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/singleton.h"
+#include "engine_interface.h"
 
-namespace boost::asio {
-	class io_context;
-}
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/post.hpp>
 
 namespace wyrmgus {
 
-//interface for the engine, to be used in the context of QML
-class engine_interface final : public QObject, public singleton<engine_interface>
+engine_interface::engine_interface()
 {
-	Q_OBJECT
+	this->io_context = std::make_unique<boost::asio::io_context>();
+}
 
-	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
+engine_interface::~engine_interface()
+{
+}
 
-public:
-	engine_interface();
-	~engine_interface();
+void engine_interface::run_event_loop()
+{
+	//run the commands posted from the Qt thread
+	this->io_context->run();
+	this->io_context->restart();
+}
 
-	void post(const std::function<void()> &function);
-
-	std::future<void> async(const std::function<void()> &function)
-	{
-		std::shared_ptr<std::promise<void>> promise = std::make_unique<std::promise<void>>();;
-		std::future<void> future = promise->get_future();
-
-		this->post([promise, function]() {
-			function();
-			promise->set_value();
-		});
-
-		return future;
-	}
-
-	void sync(const std::function<void()> &function)
-	{
-		//post an action, and then wait for it to be completed
-		std::future<void> future = this->async(function);
-		future.wait();
-	}
-
-	void run_event_loop();
-
-	bool is_running() const
-	{
-		return this->running;
-	}
-
-	void set_running(const bool running)
-	{
-		if (running == this->is_running()) {
-			return;
-		}
-
-		this->running = running;
-
-		emit running_changed();
-	}
-
-signals:
-	void running_changed();
-
-private:
-	std::unique_ptr<boost::asio::io_context> io_context;
-	bool running = false;
-};
+void engine_interface::post(const std::function<void()> &function)
+{
+	boost::asio::post(*this->io_context, function);
+}
 
 }
