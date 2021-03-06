@@ -37,7 +37,7 @@ namespace wyrmgus {
 
 render_context::render_context()
 {
-    this->io_context = std::make_unique<boost::asio::io_context>();
+	this->io_context = std::make_unique<boost::asio::io_context>();
 }
 
 render_context::~render_context()
@@ -46,23 +46,23 @@ render_context::~render_context()
 
 void render_context::run()
 {
-    //run the posted OpenGL commands
-    this->io_context->run();
-    this->io_context->restart();
+	//run the posted OpenGL commands
+	this->io_context->run();
+	this->io_context->restart();
 }
 
 void render_context::post(const std::function<void()> &function)
 {
-    //execute the function in the current context too, temporarily
-    function();
+	//execute the function in the current context too, temporarily
+	//function();
 
-    this->post_internal(function);
+	this->post_internal(function);
 }
 
 void render_context::post_internal(const std::function<void()> &function)
 {
-    boost::asio::post(*this->io_context, function);
-    frame_buffer_object::request_update();
+	boost::asio::post(*this->io_context, function);
+	frame_buffer_object::request_update();
 }
 
 }

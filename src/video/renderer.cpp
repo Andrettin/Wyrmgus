@@ -38,17 +38,17 @@ namespace wyrmgus {
 
 QOpenGLFramebufferObject *renderer::createFramebufferObject(const QSize &size)
 {
-    QOpenGLFramebufferObjectFormat format;
-    format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-    return new QOpenGLFramebufferObject(size, format);
+	QOpenGLFramebufferObjectFormat format;
+	format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+	return new QOpenGLFramebufferObject(size, format);
 }
 
 void renderer::render()
 {
-    //run the posted OpenGL commands
-    render_context::get()->run();
+	//run the posted OpenGL commands
+	render_context::get()->run();
 
-    this->fbo->window()->resetOpenGLState();
+	//this->fbo->window()->resetOpenGLState();
 }
 
 }
