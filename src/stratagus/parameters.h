@@ -31,8 +31,12 @@
 namespace wyrmgus {
 
 //command line parameters
-class parameters final : public singleton<parameters>
+class parameters final : public QObject, public singleton<parameters>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(bool test_run READ is_test_run CONSTANT)
+
 public:
 	void process();
 	void SetLocalPlayerNameFromEnv();

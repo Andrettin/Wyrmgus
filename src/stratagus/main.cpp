@@ -77,6 +77,8 @@ int main(int argc, char **argv)
 
 		QQmlApplicationEngine engine;
 
+		qmlRegisterType<parameters>();
+
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
 
 		engine.rootContext()->setContextProperty("wyrmgus", engine_interface::get());

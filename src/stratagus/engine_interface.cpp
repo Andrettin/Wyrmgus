@@ -28,6 +28,8 @@
 
 #include "engine_interface.h"
 
+#include "parameters.h"
+
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 
@@ -40,6 +42,11 @@ engine_interface::engine_interface()
 
 engine_interface::~engine_interface()
 {
+}
+
+parameters *engine_interface::get_parameters() const
+{
+	return parameters::get();
 }
 
 void engine_interface::run_event_loop()

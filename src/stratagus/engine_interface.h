@@ -34,11 +34,14 @@ namespace boost::asio {
 
 namespace wyrmgus {
 
+class parameters;
+
 //interface for the engine, to be used in the context of QML
 class engine_interface final : public QObject, public singleton<engine_interface>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::parameters* parameters READ get_parameters CONSTANT)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 
 public:
@@ -68,6 +71,8 @@ public:
 	}
 
 	void run_event_loop();
+
+	parameters *get_parameters() const;
 
 	bool is_running() const
 	{
