@@ -32,6 +32,7 @@
 #include "editor.h"
 #include "parameters.h"
 #include "results.h"
+#include "script.h"
 #include "sound/sound.h"
 
 #include <boost/asio/io_context.hpp>
@@ -68,6 +69,13 @@ void engine_interface::run_event_loop()
 void engine_interface::post(const std::function<void()> &function)
 {
 	boost::asio::post(*this->io_context, function);
+}
+
+void engine_interface::call_lua_command(const QString &command)
+{
+	this->post([command]() {
+		CclCommand(command.toStdString());
+	});
 }
 
 void engine_interface::play_sound(const QString &sound_identifier)

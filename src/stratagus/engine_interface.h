@@ -93,6 +93,7 @@ public:
 		emit running_changed();
 	}
 
+	Q_INVOKABLE void call_lua_command(const QString &command);
 	Q_INVOKABLE void play_sound(const QString &sound_identifier);
 
 	Q_INVOKABLE void exit();
