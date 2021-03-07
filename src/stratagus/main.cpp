@@ -37,6 +37,7 @@
 #include "video/frame_buffer_object.h"
 
 #include <QDir>
+#include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 
@@ -87,7 +88,10 @@ int main(int argc, char **argv)
 
 		engine.addImageProvider("interface", new interface_image_provider);
 
-		QString root_path { QString::fromStdString(database::get()->get_root_path().string()) };
+		const QString root_path = QString::fromStdString(database::get()->get_root_path().string());
+
+		app.setWindowIcon(QIcon(root_path + "/graphics/interface/icons/wyrmsun_icon_32.png"));
+
 		engine.addImportPath(root_path + "/libraries/qml");
 
 		QUrl url = QDir(root_path + "/interface/").absoluteFilePath("Main.qml");
