@@ -345,7 +345,7 @@ public:
 
 	void Load();
 
-	minimap *get_minimap() const
+	wyrmgus::minimap *get_minimap() const
 	{
 		return this->minimap.get();
 	}
