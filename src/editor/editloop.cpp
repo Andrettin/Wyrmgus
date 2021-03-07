@@ -1547,7 +1547,7 @@ void EditorUpdateDisplay()
 */
 static void EditorCallbackButtonUp(unsigned button)
 {
-	if (cursor::get_current_cursor() == UI.get_cursor(wyrmgus::cursor_type::scroll)) {
+	if (cursor::get_current_cursor() == UI.get_cursor(cursor_type::scroll)) {
 		// Move map.
 		cursor::set_current_cursor(UI.get_cursor(cursor_type::point)); // Reset
 		return;
@@ -2134,7 +2134,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	const PixelPos screenPos = pos;
 
 	// Move map.
-	if (cursor::get_current_cursor() == UI.get_cursor(wyrmgus::cursor_type::scroll)) {
+	if (cursor::get_current_cursor() == UI.get_cursor(cursor_type::scroll)) {
 		Vec2i tilePos = UI.MouseViewport->MapPos;
 
 		// FIXME: Support with CTRL for faster scrolling.

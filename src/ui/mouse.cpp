@@ -1477,7 +1477,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	}
 
 	//  Move map.
-	if (cursor::get_current_cursor() == UI.get_cursor(wyrmgus::cursor_type::scroll)) {
+	if (cursor::get_current_cursor() == UI.get_cursor(cursor_type::scroll)) {
 		MouseScrollMap(cursorPos);
 		return;
 	}

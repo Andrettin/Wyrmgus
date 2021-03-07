@@ -142,7 +142,7 @@ void cursor::set_file(const std::filesystem::path &filepath)
 int GetCursorsCount()
 {
 	int count = 0;
-	for (const wyrmgus::cursor *cursor : wyrmgus::cursor::get_all()) {
+	for (const cursor *cursor : cursor::get_all()) {
 		if (cursor->get_graphics() != nullptr && !cursor->get_graphics()->IsLoaded()) {
 			count++;
 		}

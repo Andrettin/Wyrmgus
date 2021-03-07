@@ -345,14 +345,14 @@ public:
 
 	void Load();
 
-	wyrmgus::minimap *get_minimap() const
+	minimap *get_minimap() const
 	{
 		return this->minimap.get();
 	}
 
-	wyrmgus::cursor *get_cursor(const wyrmgus::cursor_type cursor_type) const
+	cursor *get_cursor(const cursor_type cursor_type) const
 	{
-		auto find_iterator = this->cursors.find(cursor_type);
+		const auto find_iterator = this->cursors.find(cursor_type);
 
 		if (find_iterator != this->cursors.end()) {
 			return find_iterator->second;
@@ -494,7 +494,7 @@ public:
 	//  Cursors used.
 	//
 private:
-	std::map<wyrmgus::cursor_type, wyrmgus::cursor *> cursors;
+	std::map<cursor_type, cursor *> cursors;
 
 	/// @todo could use different sounds/speech for the errors
 	/// Is in gamesounds?

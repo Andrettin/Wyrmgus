@@ -666,13 +666,13 @@ void stratagusMain(int argc, char **argv)
 
 	NumPlayers = 0;
 
-	wyrmgus::unit_manager::get()->init();	// Units memory management
+	unit_manager::get()->init();	// Units memory management
 	PreMenuSetup();		// Load everything needed for menus
 
 	try {
 		MenuLoop();
 	} catch (const std::exception &exception) {
-		wyrmgus::exception::report(exception);
+		exception::report(exception);
 		Exit(EXIT_FAILURE);
 		return;
 	}

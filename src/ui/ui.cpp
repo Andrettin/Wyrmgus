@@ -217,7 +217,7 @@ void CUserInterface::Load()
 		}
 		
 		if (CPlayer::GetThisPlayer()->Race != -1) {
-			civilization = wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race];
+			civilization = civilization::get_all()[CPlayer::GetThisPlayer()->Race];
 		}
 	}
 	
@@ -233,24 +233,24 @@ void CUserInterface::Load()
 	}
 
 	if (InfoPanel.G) {
-		InfoPanel.G->Load(false, wyrmgus::defines::get()->get_scale_factor());
+		InfoPanel.G->Load(false, defines::get()->get_scale_factor());
 	}
 	if (ButtonPanel.G) {
-		ButtonPanel.G->Load(false, wyrmgus::defines::get()->get_scale_factor());
+		ButtonPanel.G->Load(false, defines::get()->get_scale_factor());
 	}
 	if (PieMenu.G) {
-		PieMenu.G->Load(false, wyrmgus::defines::get()->get_scale_factor());
+		PieMenu.G->Load(false, defines::get()->get_scale_factor());
 	}
 
 	//  Resolve cursors
-	for (int i = 0; i < static_cast<int>(wyrmgus::cursor_type::count); ++i) {
+	for (int i = 0; i < static_cast<int>(cursor_type::count); ++i) {
 		auto cursor_type = static_cast<wyrmgus::cursor_type>(i);
-		wyrmgus::cursor *cursor = nullptr;
+		cursor *cursor = nullptr;
 
 		if (civilization != nullptr) {
 			cursor = civilization->get_cursor(cursor_type);
 		} else {
-			cursor = wyrmgus::cursor::get_cursor_by_type(cursor_type);
+			cursor = cursor::get_cursor_by_type(cursor_type);
 		}
 
 		if (cursor != nullptr) {
