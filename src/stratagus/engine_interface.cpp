@@ -28,6 +28,7 @@
 
 #include "engine_interface.h"
 
+#include "database/defines.h"
 #include "parameters.h"
 
 #include <boost/asio/io_context.hpp>
@@ -47,6 +48,11 @@ engine_interface::~engine_interface()
 parameters *engine_interface::get_parameters() const
 {
 	return parameters::get();
+}
+
+defines *engine_interface::get_defines() const
+{
+	return defines::get();
 }
 
 void engine_interface::run_event_loop()
