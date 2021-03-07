@@ -37,14 +37,10 @@
 #include "script.h"
 #include "sound/sound.h"
 
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/post.hpp>
-
 namespace wyrmgus {
 
 engine_interface::engine_interface()
 {
-	this->io_context = std::make_unique<boost::asio::io_context>();
 }
 
 engine_interface::~engine_interface()
@@ -74,13 +70,23 @@ game *engine_interface::get_game() const
 void engine_interface::run_event_loop()
 {
 	//run the commands posted from the Qt thread
-	this->io_context->run();
-	this->io_context->restart();
+	std::vector<std::function<void()>> commands;
+
+	{
+		std::lock_guard lock(this->command_mutex);
+
+		commands = std::move(this->posted_commands);
+	}
+
+	for (const std::function<void()> &command : commands) {
+		command();
+	}
 }
 
 void engine_interface::post(const std::function<void()> &function)
 {
-	boost::asio::post(*this->io_context, function);
+	std::lock_guard lock(this->command_mutex);
+	this->posted_commands.push_back(function);
 }
 
 void engine_interface::call_lua_command(const QString &command)

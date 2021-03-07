@@ -108,7 +108,8 @@ signals:
 	void running_changed();
 
 private:
-	std::unique_ptr<boost::asio::io_context> io_context;
+	std::vector<std::function<void()>> posted_commands;
+	std::mutex command_mutex;
 	bool running = false;
 };
 
