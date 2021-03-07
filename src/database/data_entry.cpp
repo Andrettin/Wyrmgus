@@ -52,7 +52,7 @@ void data_entry::process_sml_property(const sml_property &property)
 		return; //alias addition is already handled in the data type class
 	}
 
-	database::process_sml_property_for_object(this, property);
+	basic_data_entry::process_sml_property(property);
 }
 
 void data_entry::process_sml_scope(const sml_data &scope)
@@ -60,7 +60,7 @@ void data_entry::process_sml_scope(const sml_data &scope)
 	if (scope.get_tag() == "history") {
 		this->history_data.push_back(scope);
 	} else {
-		database::process_sml_scope_for_object(this, scope);
+		basic_data_entry::process_sml_scope(scope);
 	}
 }
 

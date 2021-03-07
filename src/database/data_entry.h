@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "database/basic_data_entry.h"
+
 namespace wyrmgus {
 
 class data_entry_history;
@@ -34,7 +36,7 @@ class sml_data;
 class sml_property;
 
 //a (de)serializable and identifiable entry to the database
-class data_entry : public QObject
+class data_entry : public basic_data_entry
 {
 	Q_OBJECT
 
@@ -64,8 +66,8 @@ public:
 		this->aliases.insert(alias);
 	}
 
-	virtual void process_sml_property(const sml_property &property);
-	virtual void process_sml_scope(const sml_data &scope);
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void process_sml_dated_property(const sml_property &property, const QDateTime &date);
 	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date);
 

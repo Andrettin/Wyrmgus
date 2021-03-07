@@ -119,6 +119,7 @@ set(beos_SRCS
 source_group(beos FILES ${beos_SRCS})
 
 set(database_SRCS
+	src/database/basic_data_entry.cpp
 	src/database/data_entry.cpp
 	src/database/data_entry_history.cpp
 	src/database/data_module.cpp
@@ -700,6 +701,7 @@ set(wyrmgus_animation_HDRS
 )
 
 set(wyrmgus_database_HDRS
+	src/database/basic_data_entry.h
 	src/database/data_entry.h
 	src/database/data_entry_history.h
 	src/database/data_module.h
