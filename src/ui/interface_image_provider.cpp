@@ -62,7 +62,7 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 		graphics->Load(false, defines::get()->get_scale_factor());
 	});
 
-	const QImage &image = graphics->get_image();
+	const QImage &image = graphics->get_scaled_image();
 
 	if (size != nullptr) {
 		*size = image.size();

@@ -199,6 +199,20 @@ public:
 		return this->image;
 	}
 
+	const QImage &get_scaled_image() const
+	{
+		if (!this->scaled_image.isNull()) {
+			return this->scaled_image;
+		}
+
+		return this->get_image();
+	}
+
+	void set_scaled_image(const QImage &image)
+	{
+		this->scaled_image = image;
+	}
+
 	const wyrmgus::player_color *get_conversible_player_color() const;
 
 	bool has_player_color() const
@@ -232,6 +246,7 @@ public:
 	std::string HashFile;      /// Filename used in hash
 private:
 	QImage image;
+	QImage scaled_image;
 public:
 	std::vector<frame_pos_t> frame_map;
 	std::vector<frame_pos_t> frameFlip_map;

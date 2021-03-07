@@ -1042,7 +1042,7 @@ void MakeTextures2(const QImage &image, GLuint texture, const int ow, const int 
 	}
 }
 
-static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::player_color *player_color, const wyrmgus::time_of_day *time_of_day)
+static void MakeTextures(CGraphic *g, const bool grayscale, const player_color *player_color, const time_of_day *time_of_day)
 {
 	const int tw = (g->get_width() - 1) / GLMaxTextureSize + 1;
 	const int th = (g->get_height() - 1) / GLMaxTextureSize + 1;
@@ -1136,7 +1136,11 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::playe
 		if (g->get_width() > image.width() && g->get_height() > image.height() && (g->get_width() % image.width()) == 0 && (g->get_height() % image.height()) == 0 && (g->get_width() / image.width()) == (g->get_height() / image.height())) {
 			//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
 			const int scale_factor = g->get_width() / image.width();
-			image = wyrmgus::image::scale(image, scale_factor, g->get_original_frame_size());
+			image = image::scale(image, scale_factor, g->get_original_frame_size());
+
+			if (!grayscale && player_color == nullptr && time_of_day == nullptr) {
+				g->set_scaled_image(image);
+			}
 		} else {
 			image = image.scaled(g->get_size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 			if (image.format() != QImage::Format_RGBA8888) {
@@ -1219,7 +1223,7 @@ void CGraphic::Resize(int w, int h)
 
 	// Resizing the same image multiple times looks horrible
 	// If the image has already been resized then get a clean copy first
-	if (Resized) {
+	if (this->Resized) {
 		this->SetOriginalSize();
 		if (this->GraphicWidth == w && this->GraphicHeight == h) {
 			return;
@@ -1270,9 +1274,6 @@ void CGraphic::SetOriginalSize()
 		return;
 	}
 	
-	if (!this->get_image().isNull()) {
-		this->image = QImage();
-	}
 	this->frame_map.clear();
 
 	if (this->textures != nullptr) {
@@ -1287,6 +1288,7 @@ void CGraphic::SetOriginalSize()
 
 	this->Width = this->Height = 0;
 	this->image = QImage();
+	this->scaled_image = QImage();
 	this->Load();
 
 	this->Resized = false;
