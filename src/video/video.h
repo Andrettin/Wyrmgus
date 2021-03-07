@@ -191,6 +191,11 @@ public:
 		return this->get_height() / this->get_frame_height();
 	}
 
+	int get_frame_count() const
+	{
+		return this->get_frames_per_row() * this->get_frames_per_column();
+	}
+
 	int get_frame_index(const QPoint &frame_pos) const;
 	QPoint get_frame_pos(const int frame_index) const;
 
