@@ -26,34 +26,44 @@
 
 #pragma once
 
-#include "database/data_entry.h"
-#include "database/data_type.h"
+#include "database/basic_data_entry.h"
 
 class CGraphic;
 
 namespace wyrmgus {
 
-class button_style;
-enum class interface_element_type;
+class interface_style;
+enum class button_state;
 
-class interface_style final : public data_entry, public data_type<interface_style>
+class button_style final : public basic_data_entry
 {
 	Q_OBJECT
 
+	Q_PROPERTY(std::filesystem::path normal_file MEMBER normal_file WRITE set_normal_file)
+	Q_PROPERTY(std::filesystem::path pressed_file MEMBER pressed_file WRITE set_pressed_file)
+	Q_PROPERTY(std::filesystem::path grayed_file MEMBER grayed_file WRITE set_grayed_file)
+
 public:
-	static constexpr const char *class_identifier = "interface_style";
-	static constexpr const char *database_folder = "interface_styles";
+	explicit button_style(const interface_style *interface) : interface(interface)
+	{
+	}
 
-	explicit interface_style(const std::string &identifier);
-	~interface_style();
+	void initialize();
 
-	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void initialize() override;
+	void set_normal_file(const std::filesystem::path &filepath);
+	void set_pressed_file(const std::filesystem::path &filepath);
+	void set_grayed_file(const std::filesystem::path &filepath);
 
-	const std::shared_ptr<CGraphic> &get_interface_element_graphics(const interface_element_type type, const std::string &qualifier) const;
+	const std::shared_ptr<CGraphic> &get_graphics(const button_state state) const;
 
 private:
-	std::unique_ptr<button_style> large_button;
+	const interface_style *interface = nullptr;
+	std::filesystem::path normal_file;
+	std::filesystem::path pressed_file;
+	std::filesystem::path grayed_file;
+	std::shared_ptr<CGraphic> normal_graphics;
+	std::shared_ptr<CGraphic> pressed_graphics;
+	std::shared_ptr<CGraphic> grayed_graphics;
 };
 
 }

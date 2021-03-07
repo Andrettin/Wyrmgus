@@ -50,7 +50,12 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 	const std::string &interface_element_str = id_list.at(1);
 	const interface_element_type interface_element_type = string_to_interface_element_type(interface_element_str);
 
-	const std::shared_ptr<CGraphic> graphics = interface->get_interface_element_graphics(interface_element_type);
+	std::string qualifier;
+	if (id_list.size() > 2) {
+		qualifier = id_list.at(2);
+	}
+
+	const std::shared_ptr<CGraphic> graphics = interface->get_interface_element_graphics(interface_element_type, qualifier);
 
 	engine_interface::get()->sync([&graphics]() {
 		//this has to run in the main Wyrmgus thread, as it performs OpenGL calls

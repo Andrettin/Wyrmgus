@@ -29,16 +29,13 @@
 namespace wyrmgus {
 
 enum class interface_element_type {
-	large_button,
-	large_button_pressed
+	large_button
 };
 
 inline interface_element_type string_to_interface_element_type(const std::string &str)
 {
 	if (str == "large_button") {
 		return interface_element_type::large_button;
-	} else if (str == "large_button_pressed") {
-		return interface_element_type::large_button_pressed;
 	}
 
 	throw std::runtime_error("Invalid interface element type: \"" + str + "\".");

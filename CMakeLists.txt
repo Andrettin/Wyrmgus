@@ -440,6 +440,7 @@ set(ui_SRCS
 	src/ui/botpanel.cpp
 	src/ui/button.cpp
 	src/ui/button_checks.cpp
+	src/ui/button_style.cpp
 	src/ui/contenttype.cpp
 	src/ui/cursor.cpp
 	src/ui/icon.cpp
@@ -940,6 +941,7 @@ set(wyrmgus_ui_HDRS
 	src/ui/button_cmd.h
 	src/ui/button_level.h
 	src/ui/button_state.h
+	src/ui/button_style.h
 	src/ui/contenttype.h
 	src/ui/cursor.h
 	src/ui/cursor_type.h

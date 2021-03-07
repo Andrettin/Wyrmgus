@@ -24,36 +24,51 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "database/data_entry.h"
-#include "database/data_type.h"
+#include "ui/button_style.h"
 
-class CGraphic;
+#include "database/database.h"
+#include "ui/button_state.h"
+#include "ui/interface_style.h"
+#include "video/video.h"
 
 namespace wyrmgus {
 
-class button_style;
-enum class interface_element_type;
-
-class interface_style final : public data_entry, public data_type<interface_style>
+void button_style::initialize()
 {
-	Q_OBJECT
+	this->normal_graphics = CGraphic::New(this->normal_file.string());
+	this->pressed_graphics = CGraphic::New(this->pressed_file.string());
+	this->grayed_graphics = CGraphic::New(this->grayed_file.string());
+}
 
-public:
-	static constexpr const char *class_identifier = "interface_style";
-	static constexpr const char *database_folder = "interface_styles";
+void button_style::set_normal_file(const std::filesystem::path &filepath)
+{
+	this->normal_file = database::get()->get_graphics_path(this->interface->get_module()) / filepath;
+}
 
-	explicit interface_style(const std::string &identifier);
-	~interface_style();
+void button_style::set_pressed_file(const std::filesystem::path &filepath)
+{
+	this->pressed_file = database::get()->get_graphics_path(this->interface->get_module()) / filepath;
+}
 
-	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void initialize() override;
+void button_style::set_grayed_file(const std::filesystem::path &filepath)
+{
+	this->grayed_file = database::get()->get_graphics_path(this->interface->get_module()) / filepath;
+}
 
-	const std::shared_ptr<CGraphic> &get_interface_element_graphics(const interface_element_type type, const std::string &qualifier) const;
-
-private:
-	std::unique_ptr<button_style> large_button;
-};
+const std::shared_ptr<CGraphic> &button_style::get_graphics(const button_state state) const
+{
+	switch (state) {
+		case button_state::normal:
+			return this->normal_graphics;
+		case button_state::pressed:
+			return this->pressed_graphics;
+		case button_state::grayed:
+			return this->grayed_graphics;
+		default:
+			throw std::runtime_error("Invalid button state: \"" + std::to_string(static_cast<int>(state)) + "\".");
+	}
+}
 
 }

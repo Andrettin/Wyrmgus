@@ -29,38 +29,47 @@
 #include "ui/interface_style.h"
 
 #include "database/database.h"
+#include "ui/button_state.h"
+#include "ui/button_style.h"
 #include "ui/interface_element_type.h"
 #include "video/video.h"
 
 namespace wyrmgus {
 
+interface_style::interface_style(const std::string &identifier) : data_entry(identifier)
+{
+}
+
+interface_style::~interface_style()
+{
+}
+
+void interface_style::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "large_button") {
+		this->large_button = std::make_unique<button_style>(this);
+		database::process_sml_data(this->large_button, scope);
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
 void interface_style::initialize()
 {
-	this->large_button_graphics = CGraphic::New(this->large_button_file.string());
-	this->large_button_pressed_graphics = CGraphic::New(this->large_button_pressed_file.string());
+	if (this->large_button != nullptr) {
+		this->large_button->initialize();
+	}
 
 	data_entry::initialize();
 }
 
-void interface_style::set_large_button_file(const std::filesystem::path &filepath)
-{
-	this->large_button_file = database::get()->get_graphics_path(this->get_module()) / filepath;
-}
-
-void interface_style::set_large_button_pressed_file(const std::filesystem::path &filepath)
-{
-	this->large_button_pressed_file = database::get()->get_graphics_path(this->get_module()) / filepath;
-}
-
-const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics(const interface_element_type type) const
+const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics(const interface_element_type type, const std::string &qualifier) const
 {
 	switch (type) {
 		case interface_element_type::large_button:
-			return this->large_button_graphics;
-			break;
-		case interface_element_type::large_button_pressed:
-			return this->large_button_pressed_graphics;
-			break;
+			return this->large_button->get_graphics(string_to_button_state(qualifier));
 		default:
 			throw std::runtime_error("Invalid interface element type: \"" + std::to_string(static_cast<int>(type)) + "\".");
 	}
