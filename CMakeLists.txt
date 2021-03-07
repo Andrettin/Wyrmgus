@@ -939,6 +939,7 @@ set(wyrmgus_ui_HDRS
 	src/ui/button.h
 	src/ui/button_cmd.h
 	src/ui/button_level.h
+	src/ui/button_state.h
 	src/ui/contenttype.h
 	src/ui/cursor.h
 	src/ui/cursor_type.h
