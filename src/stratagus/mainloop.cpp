@@ -35,6 +35,7 @@
 #include "database/defines.h"
 #include "dialogue.h"
 #include "editor.h"
+#include "engine_interface.h"
 #include "faction.h"
 #include "game.h"
 //Wyrmgus start
@@ -471,6 +472,8 @@ static void DisplayLoop()
 static void SingleGameLoop()
 {
 	while (GameRunning) {
+		engine_interface::get()->run_event_loop();
+
 		DisplayLoop();
 		GameLogicLoop();
 	}

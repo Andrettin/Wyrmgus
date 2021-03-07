@@ -321,26 +321,26 @@ public:
 **  This is placed in the video part, because it depends on the video
 **  hardware driver.
 */
-struct EventCallback {
-
+struct EventCallback
+{
 	/// Callback for mouse button press
-	void (*ButtonPressed)(unsigned buttons);
+	void (*ButtonPressed)(unsigned buttons) = nullptr;
 	/// Callback for mouse button release
-	void (*ButtonReleased)(unsigned buttons);
+	void (*ButtonReleased)(unsigned buttons) = nullptr;
 	/// Callback for mouse move
-	void (*MouseMoved)(const PixelPos &screenPos);
+	void (*MouseMoved)(const PixelPos &screenPos) = nullptr;
 	/// Callback for mouse exit of game window
-	void (*MouseExit)();
+	void (*MouseExit)() = nullptr;
 
 	/// Callback for key press
-	void (*KeyPressed)(unsigned keycode, unsigned keychar);
+	void (*KeyPressed)(unsigned keycode, unsigned keychar) = nullptr;
 	/// Callback for key release
-	void (*KeyReleased)(unsigned keycode, unsigned keychar);
+	void (*KeyReleased)(unsigned keycode, unsigned keychar) = nullptr;
 	/// Callback for key repeated
-	void (*KeyRepeated)(unsigned keycode, unsigned keychar);
+	void (*KeyRepeated)(unsigned keycode, unsigned keychar) = nullptr;
 
 	/// Callback for network event
-	void (*NetworkEvent)();
+	void (*NetworkEvent)() = nullptr;
 
 };
 

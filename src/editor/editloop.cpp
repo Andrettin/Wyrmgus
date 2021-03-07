@@ -33,6 +33,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "engine_interface.h"
 #include "game.h"
 #include "guichan.h"
 #include "iocompat.h"
@@ -2649,6 +2650,8 @@ void EditorMainLoop()
 		TileCursorSize = 1;
 
 		while (Editor.Running) {
+			engine_interface::get()->run_event_loop();
+
 			CheckMusicFinished();
 
 			if (FrameCounter % FRAMES_PER_SECOND == 0) {
