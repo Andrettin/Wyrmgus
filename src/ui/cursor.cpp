@@ -49,6 +49,8 @@
 //Wyrmgus end
 #include "video/video.h"
 
+#include <QPixmap>
+
 CursorState CurrentCursorState;    /// current cursor state (point,...)
 ButtonCmd CursorAction;            /// action for selection
 int CursorValue;             /// value for CursorAction (spell type f.e.)
@@ -86,6 +88,18 @@ void cursor::set_current_cursor(cursor *cursor)
 		if (!cursor->get_graphics()->IsLoaded()) {
 			cursor->get_graphics()->Load(false, defines::get()->get_scale_factor());
 		}
+
+		const QPixmap pixmap = QPixmap::fromImage(cursor->get_graphics()->get_scaled_image());
+		const QPoint hot_pos = cursor->get_hot_pos() * defines::get()->get_scale_factor();
+		const QCursor qcursor(pixmap, hot_pos.x(), hot_pos.y());
+
+		QMetaObject::invokeMethod(QApplication::instance(), [qcursor] {
+			if (QApplication::overrideCursor() != nullptr) {
+				QApplication::changeOverrideCursor(qcursor);
+			} else {
+				QApplication::setOverrideCursor(qcursor);
+			}
+		}, Qt::QueuedConnection);
 	}
 }
 
