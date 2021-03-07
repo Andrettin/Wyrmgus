@@ -29,7 +29,9 @@
 #include "engine_interface.h"
 
 #include "database/defines.h"
+#include "editor.h"
 #include "parameters.h"
+#include "results.h"
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
@@ -65,6 +67,17 @@ void engine_interface::run_event_loop()
 void engine_interface::post(const std::function<void()> &function)
 {
 	boost::asio::post(*this->io_context, function);
+}
+
+void engine_interface::exit()
+{
+	this->post([]() {
+		if (Editor.Running) {
+			Editor.Running = EditorNotRunning;
+		} else {
+			StopGame(GameExit);
+		}
+	});
 }
 
 }

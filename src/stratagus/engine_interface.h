@@ -93,6 +93,8 @@ public:
 		emit running_changed();
 	}
 
+	Q_INVOKABLE void exit();
+
 signals:
 	void running_changed();
 
