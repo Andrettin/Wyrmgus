@@ -32,6 +32,7 @@
 #include "editor.h"
 #include "parameters.h"
 #include "results.h"
+#include "sound/sound.h"
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
@@ -67,6 +68,15 @@ void engine_interface::run_event_loop()
 void engine_interface::post(const std::function<void()> &function)
 {
 	boost::asio::post(*this->io_context, function);
+}
+
+void engine_interface::play_sound(const QString &sound_identifier)
+{
+	const sound *sound = sound::get(sound_identifier.toStdString());
+
+	this->post([sound]() {
+		PlayGameSound(sound, MaxSampleVolume);
+	});
 }
 
 void engine_interface::exit()

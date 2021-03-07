@@ -93,6 +93,8 @@ public:
 		emit running_changed();
 	}
 
+	Q_INVOKABLE void play_sound(const QString &sound_identifier);
+
 	Q_INVOKABLE void exit();
 
 signals:
