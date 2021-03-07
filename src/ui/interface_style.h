@@ -52,6 +52,8 @@ public:
 
 	const std::shared_ptr<CGraphic> &get_interface_element_graphics(const interface_element_type type, const std::string &qualifier) const;
 
+	const button_style *get_button(const interface_element_type type) const;
+
 private:
 	std::unique_ptr<button_style> large_button;
 };

@@ -68,10 +68,23 @@ void interface_style::initialize()
 const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics(const interface_element_type type, const std::string &qualifier) const
 {
 	switch (type) {
-		case interface_element_type::large_button:
-			return this->large_button->get_graphics(string_to_button_state(qualifier));
+		case interface_element_type::large_button: {
+			const button_style *button = this->get_button(type);
+			const button_state state = string_to_button_state(qualifier);
+			return button->get_graphics(state);
+		}
 		default:
 			throw std::runtime_error("Invalid interface element type: \"" + std::to_string(static_cast<int>(type)) + "\".");
+	}
+}
+
+const button_style *interface_style::get_button(const interface_element_type type) const
+{
+	switch (type) {
+		case interface_element_type::large_button:
+			return this->large_button.get();
+		default:
+			throw std::runtime_error("Invalid button interface element type: \"" + std::to_string(static_cast<int>(type)) + "\".");
 	}
 }
 
