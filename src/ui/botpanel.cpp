@@ -1787,7 +1787,7 @@ void CButtonPanel::DoClicked_SelectTarget(int button)
 {
 	// Select target.
 	CurrentCursorState = CursorState::Select;
-	GameCursor = UI.get_cursor(wyrmgus::cursor_type::yellow_hair);
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::yellow_hair));
 	CursorAction = CurrentButtons[button]->Action;
 	CursorValue = CurrentButtons[button]->Value;
 	CurrentButtonLevel = wyrmgus::defines::get()->get_cancel_button_level(); // the cancel-only button level
@@ -1921,7 +1921,7 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = nullptr;
 	UI.ButtonPanel.Update();
-	GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 	CursorBuilding = nullptr;
 	CurrentCursorState = CursorState::Point;
 }

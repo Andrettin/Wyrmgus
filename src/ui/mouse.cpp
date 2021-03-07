@@ -1305,7 +1305,7 @@ void HandleMouseExit()
 	// FIXME: couldn't define a hour-glass that easily, so used pointer
 	CursorScreenPos.x = Video.Width / 2;
 	CursorScreenPos.y = Video.Height / 2;
-	GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 }
 
 /**
@@ -1438,7 +1438,7 @@ static void handle_mouse_move_on_map(const PixelPos &cursor_pos)
 			}
 		}
 		if (has_terrain_resource) {
-			GameCursor = UI.get_cursor(wyrmgus::cursor_type::yellow_hair);
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::yellow_hair));
 		}
 	}
 	//Wyrmgus end
@@ -1477,13 +1477,13 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	}
 
 	//  Move map.
-	if (GameCursor == UI.get_cursor(wyrmgus::cursor_type::scroll)) {
+	if (cursor::get_current_cursor() == UI.get_cursor(wyrmgus::cursor_type::scroll)) {
 		MouseScrollMap(cursorPos);
 		return;
 	}
 
 	UnitUnderCursor = nullptr;
-	GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);  // Reset
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point));  // Reset
 	HandleMouseOn(cursorPos);
 
 	//  Make the piemenu "follow" the mouse
@@ -1543,16 +1543,16 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	//  Selecting target.
 	if (CurrentCursorState == CursorState::Select) {
 		if (CursorOn == cursor_on::map || CursorOn == cursor_on::minimap) {
-			GameCursor = UI.get_cursor(wyrmgus::cursor_type::yellow_hair);
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::yellow_hair));
 			if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				if (UnitUnderCursor->Player == CPlayer::GetThisPlayer() ||
 					CPlayer::GetThisPlayer()->IsAllied(*UnitUnderCursor)) {
-					GameCursor = UI.get_cursor(wyrmgus::cursor_type::green_hair);
+					cursor::set_current_cursor(UI.get_cursor(cursor_type::green_hair));
 				//Wyrmgus start
 //				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
 				} else if (CPlayer::GetThisPlayer()->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
 				//Wyrmgus end
-					GameCursor = UI.get_cursor(wyrmgus::cursor_type::red_hair);
+					cursor::set_current_cursor(UI.get_cursor(cursor_type::red_hair));
 				}
 			}
 			if (CursorOn == cursor_on::minimap && (MouseButtons & RightButton)) {
@@ -1571,12 +1571,12 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value
 			&& (UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap)) {
 			//Wyrmgus start
-//			GameCursor = UI.Glass.Cursor;
+//			cursor::set_current_cursor(UI.Glass.Cursor);
 			if (
 				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() && UnitUnderCursor->Player != CPlayer::GetThisPlayer()
 				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value)
 			) {
-				GameCursor = UI.get_cursor(wyrmgus::cursor_type::red_hair);
+				cursor::set_current_cursor(UI.get_cursor(cursor_type::red_hair));
 			} else if (
 				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() &&
 				(
@@ -1584,9 +1584,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->can_store(Selected[0]->get_current_resource()) || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->Player != CPlayer::GetThisPlayer()))
 				)
 			) {
-				GameCursor = UI.get_cursor(wyrmgus::cursor_type::yellow_hair);
+				cursor::set_current_cursor(UI.get_cursor(cursor_type::yellow_hair));
 			} else {
-				GameCursor = UI.get_cursor(wyrmgus::cursor_type::magnifying_glass);
+				cursor::set_current_cursor(UI.get_cursor(cursor_type::magnifying_glass));
 			}
 			//Wyrmgus end
 		}
@@ -2236,7 +2236,7 @@ static void UISelectStateButtonDown(unsigned)
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentCursorState = CursorState::Point;
-		GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 		CustomCursor.clear();
 		CurrentButtonLevel = nullptr;
 		UI.ButtonPanel.Update();
@@ -2265,7 +2265,7 @@ static void UISelectStateButtonDown(unsigned)
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
 			CurrentCursorState = CursorState::Point;
-			GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 			CustomCursor.clear();
 			CurrentButtonLevel = nullptr;
 			UI.ButtonPanel.Update();
@@ -2290,7 +2290,7 @@ static void UISelectStateButtonDown(unsigned)
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 	CurrentCursorState = CursorState::Point;
-	GameCursor = UI.get_cursor(wyrmgus::cursor_type::yellow_hair);
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::yellow_hair));
 	CurrentButtonLevel = nullptr;
 	UI.ButtonPanel.Update();
 }
@@ -2359,7 +2359,7 @@ static void UIHandleButtonDown_OnMap()
 
 	if (MouseButtons & UI.PieMenu.MouseButton) { // enter pie menu
 		UnitUnderCursor = nullptr;
-		GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);  // Reset
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point));  // Reset
 		CursorStartScreenPos = CursorScreenPos;
 		if (!Selected.empty() && Selected[0]->Player == CPlayer::GetThisPlayer() && CurrentCursorState == CursorState::Point) {
 			CurrentCursorState = CursorState::PieMenu;
@@ -2391,11 +2391,11 @@ static void UIHandleButtonDown_OnMap()
 	} else if (MouseButtons & LeftButton) { // enter select mode
 		CursorStartScreenPos = CursorScreenPos;
 		CursorStartMapPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
-		GameCursor = UI.get_cursor(wyrmgus::cursor_type::cross);
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::cross));
 		CurrentCursorState = CursorState::Rectangle;
 	} else if (MouseButtons & MiddleButton) {// enter move map mode
 		CursorStartScreenPos = CursorScreenPos;
-		GameCursor = UI.get_cursor(wyrmgus::cursor_type::scroll);
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::scroll));
 		//Wyrmgus start
 		UnitUnderCursor = nullptr;
 		//Wyrmgus end
@@ -2776,8 +2776,8 @@ void UIHandleButtonUp(unsigned button)
 	//
 	//  Move map.
 	//
-	if (GameCursor == UI.get_cursor(wyrmgus::cursor_type::scroll)) {
-		GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+	if (cursor::get_current_cursor() == UI.get_cursor(cursor_type::scroll)) {
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 		return;
 	}
 
@@ -3074,7 +3074,7 @@ void UIHandleButtonUp(unsigned button)
 
 		CursorStartScreenPos.x = 0;
 		CursorStartScreenPos.y = 0;
-		GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 		CurrentCursorState = CursorState::Point;
 	}
 }

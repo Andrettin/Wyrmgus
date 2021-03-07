@@ -2921,7 +2921,7 @@ int MenuScreen::run(bool loop)
 	running = true;
 
 	CurrentCursorState = CursorState::Point;
-	GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 	CursorOn = cursor_on::unknown;
 
 	CallbackMusicOn();

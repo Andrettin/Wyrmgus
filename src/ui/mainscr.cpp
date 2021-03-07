@@ -1130,7 +1130,7 @@ void DrawPopups()
 			ba->Value = index;
 			ba->ValueStr = resource->get_identifier();
 			ba->Popup = "popup_resource";
-			DrawPopup(*ba, UI.Resources[index].IconX, UI.Resources[index].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, false);
+			DrawPopup(*ba, UI.Resources[index].IconX, UI.Resources[index].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false);
 			LastDrawnButtonPopup = nullptr;
 		}
 	}
@@ -1142,13 +1142,13 @@ void DrawPopups()
 		ba.Hint = _("Food");
 		ba.Action = ButtonCmd::None;
 		ba.Popup = "popup_food";
-		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, false);
+		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false);
 		LastDrawnButtonPopup = nullptr;
 	}
 	
 	const wyrmgus::resource_icon *score_icon = wyrmgus::defines::get()->get_score_icon();
 	if (score_icon != nullptr && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + score_icon->get_graphics()->get_frame_height())) {
-		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, nullptr, nullptr, false);
+		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
 	const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
@@ -1167,7 +1167,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.TimeOfDayPanel.IconY
 		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + time_of_day_icon_graphics->get_frame_height())
 	) {
-		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, nullptr, nullptr, false);
+		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
 	const wyrmgus::season *season = UI.CurrentMapLayer->get_tile_season(tile_pos);
@@ -1185,7 +1185,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
 		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + season_icon_graphics->get_frame_height())
 	) {
-		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, nullptr, nullptr, false);
+		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text
@@ -1205,7 +1205,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.AgePanel.TextY
 		&& CursorScreenPos.y < (UI.AgePanel.TextY + UI.AgePanel.Font->Height())
 	) {
-		DrawGenericPopup(_(age->get_name().c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(age->get_name().c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 * wyrmgus::defines::get()->get_scale_factor() + cursor::get_current_cursor()->G->getHeight() / 2, "", "", false);
 	}
 	*/
 	

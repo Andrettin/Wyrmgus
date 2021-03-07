@@ -63,9 +63,6 @@ PixelPos CursorStartMapPos;/// position of starting point of selection rectangle
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
 const wyrmgus::unit_type *CursorBuilding;           /// building cursor
 
-/*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
-wyrmgus::cursor *GameCursor = nullptr;                 /// current shown cursor-type
-
 namespace wyrmgus {
 
 void cursor::clear()
@@ -73,8 +70,23 @@ void cursor::clear()
 	data_type::clear();
 
 	CursorBuilding = nullptr;
-	GameCursor = nullptr;
+	cursor::current_cursor = nullptr;
 	UnitUnderCursor = nullptr;
+}
+
+void cursor::set_current_cursor(cursor *cursor)
+{
+	if (cursor == cursor::current_cursor) {
+		return;
+	}
+
+	cursor::current_cursor = cursor;
+
+	if (cursor != nullptr) {
+		if (!cursor->get_graphics()->IsLoaded()) {
+			cursor->get_graphics()->Load(false, defines::get()->get_scale_factor());
+		}
+	}
 }
 
 cursor::cursor(const std::string &identifier) : data_entry(identifier), type(cursor_type::point)
@@ -89,7 +101,6 @@ cursor::~cursor()
 void cursor::initialize()
 {
 	this->graphics = CGraphic::New(this->get_file().string(), this->get_frame_size());
-	this->graphics->Load(false, wyrmgus::defines::get()->get_scale_factor());
 
 	if (this->civilization != nullptr) {
 		this->civilization->set_cursor(this->get_type(), this);
@@ -313,16 +324,14 @@ void DrawCursor()
 
 	//  Cursor may not exist if we are loading a game or something.
 	//  Only draw it if it exists
-	if (GameCursor == nullptr) {
+	if (cursor::get_current_cursor() == nullptr) {
 		return;
 	}
-	const PixelPos pos = CursorScreenPos - GameCursor->get_hot_pos() * wyrmgus::defines::get()->get_scale_factor();
+
+	const PixelPos pos = CursorScreenPos - cursor::get_current_cursor()->get_hot_pos() * defines::get()->get_scale_factor();
 
 	//  Last, Normal cursor.
-	if (!GameCursor->get_graphics()->IsLoaded()) {
-		GameCursor->get_graphics()->Load();
-	}
-	GameCursor->get_graphics()->DrawFrameClip(GameCursor->get_current_frame(), pos.x, pos.y);
+	cursor::get_current_cursor()->get_graphics()->DrawFrameClip(cursor::get_current_cursor()->get_current_frame(), pos.x, pos.y);
 }
 
 /**
@@ -334,14 +343,15 @@ void CursorAnimate(unsigned ticks)
 {
 	static unsigned last = 0;
 
-	if (!GameCursor || !GameCursor->get_frame_rate()) {
+	if (cursor::get_current_cursor() == nullptr || !cursor::get_current_cursor()->get_frame_rate()) {
 		return;
 	}
-	if (ticks > last + GameCursor->get_frame_rate()) {
-		last = ticks + GameCursor->get_frame_rate();
-		GameCursor->increment_current_frame();
-		if ((GameCursor->get_frame_rate() & 127) >= GameCursor->get_graphics()->NumFrames) {
-			GameCursor->reset_current_frame();
+
+	if (ticks > last + cursor::get_current_cursor()->get_frame_rate()) {
+		last = ticks + cursor::get_current_cursor()->get_frame_rate();
+		cursor::get_current_cursor()->increment_current_frame();
+		if ((cursor::get_current_cursor()->get_frame_rate() & 127) >= cursor::get_current_cursor()->get_graphics()->NumFrames) {
+			cursor::get_current_cursor()->reset_current_frame();
 		}
 	}
 }

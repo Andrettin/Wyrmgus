@@ -1056,7 +1056,7 @@ void SelectionChanged()
 	LastDrawnButtonPopup = nullptr;
 
 	UI.ButtonPanel.Update();
-	GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 	CursorBuilding = nullptr;
 	CurrentCursorState = CursorState::Point;
 	UI.ButtonPanel.Update();

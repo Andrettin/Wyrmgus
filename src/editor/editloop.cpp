@@ -1546,9 +1546,9 @@ void EditorUpdateDisplay()
 */
 static void EditorCallbackButtonUp(unsigned button)
 {
-	if (GameCursor == UI.get_cursor(wyrmgus::cursor_type::scroll)) {
+	if (cursor::get_current_cursor() == UI.get_cursor(wyrmgus::cursor_type::scroll)) {
 		// Move map.
-		GameCursor = UI.get_cursor(wyrmgus::cursor_type::point); // Reset
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point)); // Reset
 		return;
 	}
 
@@ -1763,7 +1763,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
 			CursorStartScreenPos = CursorScreenPos;
-			GameCursor = UI.get_cursor(wyrmgus::cursor_type::scroll);
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::scroll));
 			//Wyrmgus start
 			UnitUnderCursor = nullptr;
 			//Wyrmgus end
@@ -2133,7 +2133,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	const PixelPos screenPos = pos;
 
 	// Move map.
-	if (GameCursor == UI.get_cursor(wyrmgus::cursor_type::scroll)) {
+	if (cursor::get_current_cursor() == UI.get_cursor(wyrmgus::cursor_type::scroll)) {
 		Vec2i tilePos = UI.MouseViewport->MapPos;
 
 		// FIXME: Support with CTRL for faster scrolling.
@@ -2223,7 +2223,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	MouseScrollState = ScrollNone;
-	GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 	CursorOn = cursor_on::unknown;
 	Editor.CursorPlayer = -1;
 	Editor.CursorUnitIndex = -1;
@@ -2642,7 +2642,7 @@ void EditorMainLoop()
 
 		SetVideoSync();
 
-		GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 		current_interface_state = interface_state::normal;
 		Editor.State = EditorSelecting;
 		UI.SelectedViewport = UI.Viewports;
@@ -2689,7 +2689,7 @@ void EditorMainLoop()
 		PreMenuSetup();
 
 		current_interface_state = interface_state::menu;
-		GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
 
 		Video.ClearScreen();
 	}

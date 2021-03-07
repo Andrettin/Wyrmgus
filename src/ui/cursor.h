@@ -76,8 +76,16 @@ public:
 		cursor::cursors_by_type[type] = cursor;
 	}
 
+	static cursor *get_current_cursor()
+	{
+		return cursor::current_cursor;
+	}
+
+	static void set_current_cursor(cursor *cursor);
+
 private:
 	static inline std::map<cursor_type, cursor *> cursors_by_type;
+	static inline cursor *current_cursor = nullptr;
 
 public:
 	explicit cursor(const std::string &identifier);
@@ -174,7 +182,6 @@ extern int CursorValue;           /// value for action (spell type f.e.)
 extern const wyrmgus::unit_type *CursorBuilding; /// building cursor
 extern std::string CustomCursor;  /// custom cursor for button
 
-extern wyrmgus::cursor *GameCursor;     /// cursor-type
 extern PixelPos CursorScreenPos; /// cursor position on screen
 extern PixelPos CursorStartScreenPos; /// rectangle started on screen
 extern PixelPos CursorStartMapPos; /// the same in screen map coordinate system
