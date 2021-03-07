@@ -35,7 +35,9 @@ namespace boost::asio {
 namespace wyrmgus {
 
 class defines;
+class game;
 class parameters;
+class preferences;
 
 //interface for the engine, to be used in the context of QML
 class engine_interface final : public QObject, public singleton<engine_interface>
@@ -44,6 +46,8 @@ class engine_interface final : public QObject, public singleton<engine_interface
 
 	Q_PROPERTY(wyrmgus::parameters* parameters READ get_parameters CONSTANT)
 	Q_PROPERTY(wyrmgus::defines* defines READ get_defines CONSTANT)
+	Q_PROPERTY(wyrmgus::preferences* preferences READ get_preferences CONSTANT)
+	Q_PROPERTY(wyrmgus::game*game READ get_game CONSTANT)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 
 public:
@@ -76,6 +80,8 @@ public:
 
 	parameters *get_parameters() const;
 	defines *get_defines() const;
+	preferences *get_preferences() const;
+	game *get_game() const;
 
 	bool is_running() const
 	{

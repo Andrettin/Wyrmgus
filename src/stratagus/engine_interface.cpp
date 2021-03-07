@@ -29,7 +29,9 @@
 #include "engine_interface.h"
 
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "editor.h"
+#include "game.h"
 #include "parameters.h"
 #include "results.h"
 #include "script.h"
@@ -57,6 +59,16 @@ parameters *engine_interface::get_parameters() const
 defines *engine_interface::get_defines() const
 {
 	return defines::get();
+}
+
+preferences *engine_interface::get_preferences() const
+{
+	return preferences::get();
+}
+
+game *engine_interface::get_game() const
+{
+	return game::get();
 }
 
 void engine_interface::run_event_loop()

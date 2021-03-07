@@ -42,8 +42,12 @@ class trigger;
 template <typename scope_type>
 class delayed_effect_instance;
 
-class game final : public singleton<game>
+class game final : public QObject, public singleton<game>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign WRITE set_current_campaign)
+
 public:
 	static inline const QDateTime base_date = QDateTime(QDate(-100000, 1, 1)); //100,000 BC; base date from which to calculate the current total hours from the base date
 

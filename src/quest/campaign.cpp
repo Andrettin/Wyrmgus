@@ -220,12 +220,12 @@ void campaign::remove_map_template(map_template *map_template)
 void SetCurrentCampaign(const std::string &campaign_ident)
 {
 	if (campaign_ident.empty()) {
-		wyrmgus::game::get()->set_current_campaign(nullptr);
+		game::get()->set_current_campaign(nullptr);
 		return;
 	}
 	
-	wyrmgus::campaign *campaign = wyrmgus::campaign::get(campaign_ident);
-	wyrmgus::game::get()->set_current_campaign(campaign);
+	campaign *campaign = campaign::get(campaign_ident);
+	game::get()->set_current_campaign(campaign);
 }
 
 /**

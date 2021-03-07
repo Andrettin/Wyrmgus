@@ -28,7 +28,9 @@
 
 #include "database/database.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "engine_interface.h"
+#include "game.h"
 #include "parameters.h"
 #include "ui/interface_image_provider.h"
 #include "util/exception_util.h"
@@ -80,7 +82,9 @@ int main(int argc, char **argv)
 		QQmlApplicationEngine engine;
 
 		qmlRegisterType<defines>();
+		qmlRegisterType<game>();
 		qmlRegisterType<parameters>();
+		qmlRegisterType<preferences>();
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
 
