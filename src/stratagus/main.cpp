@@ -31,6 +31,7 @@
 #include "database/preferences.h"
 #include "engine_interface.h"
 #include "game.h"
+#include "map/tile_image_provider.h"
 #include "parameters.h"
 #include "ui/interface_image_provider.h"
 #include "util/exception_util.h"
@@ -91,6 +92,7 @@ int main(int argc, char **argv)
 		engine.rootContext()->setContextProperty("wyrmgus", engine_interface::get());
 
 		engine.addImageProvider("interface", new interface_image_provider);
+		engine.addImageProvider("tile", new tile_image_provider);
 
 		const QString root_path = QString::fromStdString(database::get()->get_root_path().string());
 

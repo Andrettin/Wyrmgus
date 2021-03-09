@@ -477,7 +477,7 @@ void terrain_type::set_image_file(const std::filesystem::path &filepath)
 const std::shared_ptr<CPlayerColorGraphic> &terrain_type::get_graphics(const season *season) const
 {
 	if (season != nullptr) {
-		auto find_iterator = this->season_graphics.find(season);
+		const auto find_iterator = this->season_graphics.find(season);
 
 		if (find_iterator != this->season_graphics.end()) {
 			return find_iterator->second;
