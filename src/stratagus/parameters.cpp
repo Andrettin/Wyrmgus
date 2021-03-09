@@ -32,6 +32,10 @@
 
 #include <QCommandLineParser>
 
+#include <QMap>
+
+#include <QCommandLineOption>
+
 namespace wyrmgus {
 
 void parameters::process()
@@ -39,55 +43,26 @@ void parameters::process()
 	QCommandLineParser cmd_parser;
 
 	// TODO Long version
-	QCommandLineOption data_path_option { "d", "Specify a custom data path.", "data path" };
-	cmd_parser.addOption(data_path_option);
-
-	QCommandLineOption test_option { "t", "Check startup and exit." };
-	cmd_parser.addOption(test_option);
-
-	QCommandLineOption conf_file_option { "c", "Configuration start file (default is 'stratagus.lua').", "config file" };
-	cmd_parser.addOption(conf_file_option);
-
-	QCommandLineOption depth_option { "D", "Video mode depth (pixel per point).", "depth" };
-	cmd_parser.addOption(depth_option);
-
-	QCommandLineOption start_editor_option { "e", "Start editor instead of game." };
-	cmd_parser.addOption(start_editor_option);
-
-	QCommandLineOption editor_conf_file_option {
-		"E", "Editor configuration start file (default is 'editor.lua').", "editor config file"
+	QMap<QString, QCommandLineOption> options {
+		{ "start_editor", { "e", "Start editor instead of game." } },
+		{ "depth", { "D", "Video mode depth (pixel per point).", "depth" } },
+		{ "conf_file", { "c", "Configuration start file (default is 'stratagus.lua').", "config file" } },
+		{
+			"editor_conf_file",
+			{ "E", "Editor configuration start file (default is 'editor.lua').", "editor config file" }
+		},
+		{ "data_path", { "d", "Specify a custom data path.", "data path" } },
+		{ "test", { "t", "Check startup and exit (data files must respect this flag)." } },
+		{ "fullscreen", { "F", "Full screen video mode." } },
+		{ "game_options", { "G", "Game options passed to game scripts", "game options." } },
+		{ "net_address", { "I", "Network address to use", "address." } },
+		{ "disable_log", { "l", "Disable command log." } },
+		{ "player_name", { "N", "Name of the player.", "name" } },
 	};
-	cmd_parser.addOption(editor_conf_file_option);
 
-//	QCommandLineOption  { "", "" };
-//	cmd_parser.addOption();
-//
-//	QCommandLineOption  { "", "" };
-//	cmd_parser.addOption();
-//
-//	QCommandLineOption  { "", "" };
-//	cmd_parser.addOption();
-//
-//	QCommandLineOption  { "", "" };
-//	cmd_parser.addOption();
-//
-//	QCommandLineOption  { "", "" };
-//	cmd_parser.addOption();
-//
-//	QCommandLineOption  { "", "" };
-//	cmd_parser.addOption();
-//
-//	QCommandLineOption  { "", "" };
-//	cmd_parser.addOption();
+	cmd_parser.addOptions(options.values());
 
   /**
-		-E file.lua\t\n"
-		-F\t\tFull screen video mode\n"
-		-G \"options\"\tGame options (passed to game scripts)\n"
-		-h\t\tHelp shows this page\n"
-		-I addr\t\tNetwork address to use\n"
-		-l\t\tDisable command log\n"
-		-N name\t\tName of the player\n"
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
 		-O\t\tUse OpenGL or OpenGL ES 1.1\n"
@@ -107,8 +82,6 @@ void parameters::process()
 		-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
 #endif
 		"map is relative to the root data path, use ./map for relative to cwd\n",
-		QApplication::applicationName().toStdString().c_str());
-}
 */
 
 	cmd_parser.setApplicationDescription("The free real time strategy game engine.");
@@ -117,11 +90,12 @@ void parameters::process()
 
 	cmd_parser.process(*QApplication::instance());
 
+	auto & data_path_option { options.find("data_path").value() };
 	if (cmd_parser.isSet(data_path_option)) {
 		database::get()->set_root_path(cmd_parser.value(data_path_option).toStdString());
 	}
 
-	if (cmd_parser.isSet(test_option)) {
+	if (cmd_parser.isSet(options.find("test").value())) {
 		this->test_run = true;
 	}
 
