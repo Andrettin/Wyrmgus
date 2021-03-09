@@ -379,47 +379,6 @@ void Exit(int err)
 	QMetaObject::invokeMethod(QApplication::instance(), [err] { QApplication::exit(err); }, Qt::QueuedConnection);
 }
 
-/**
-**  Display the usage.
-*/
-static void Usage()
-{
-	PrintHeader();
-	printf(
-		"\n\nUsage: %s [OPTIONS] [map.smp|map.smp.gz]\n"
-		"\t-c file.lua\tConfiguration start file (default stratagus.lua)\n"
-		"\t-d datapath\tPath to stratagus data (default current directory)\n"
-		"\t-D depth\tVideo mode depth = pixel per point\n"
-		"\t-e\t\tStart editor (instead of game)\n"
-		"\t-E file.lua\tEditor configuration start file (default editor.lua)\n"
-		"\t-F\t\tFull screen video mode\n"
-		"\t-G \"options\"\tGame options (passed to game scripts)\n"
-		"\t-h\t\tHelp shows this page\n"
-		"\t-I addr\t\tNetwork address to use\n"
-		"\t-l\t\tDisable command log\n"
-		"\t-N name\t\tName of the player\n"
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		"\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
-		"\t-O\t\tUse OpenGL or OpenGL ES 1.1\n"
-#endif
-		"\t-p\t\tEnables debug messages printing in console\n"
-		"\t-P port\t\tNetwork port to use\n"
-		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
-		"\t-S speed\tSync speed (100 = 30 frames/s)\n"
-		"\t-u userpath\tPath where stratagus saves preferences, log and savegame\n"
-		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
-		"\t-W\t\tWindowed video mode\n"
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		"\t-x idx\t\tControls fullscreen scaling if your graphics card supports shaders.\n"\
-		"\t  \t\tPass 1 for nearest-neigubour, 2 for EPX/AdvMame, 3 for HQx, 4 for SAL, 5 for SuperEagle\n"\
-		"\t  \t\tYou can also use Ctrl+Alt+/ to cycle between these scaling algorithms at runtime.\n"
-		"\t  \t\tPass -1 to force old-school nearest neighbour scaling without shaders\n"\
-		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
-#endif
-		"map is relative to the root data path, use ./map for relative to cwd\n",
-		QApplication::applicationName().toStdString().c_str());
-}
-
 #ifdef REDIRECT_OUTPUT
 
 static std::string stdoutFile;
@@ -464,124 +423,6 @@ static void RedirectOutput()
 }
 #endif
 
-static void ParseCommandLine(int argc, char **argv)
-{
-	parameters *parameters = parameters::get();
-
-	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:tu:v:Wx:Z?-")) {
-			case 'c':
-				parameters->luaStartFilename = optarg;
-				if (strlen(optarg) > 4 &&
-					!(strstr(optarg, ".lua") == optarg + strlen(optarg) - 4)) {
-						parameters->luaStartFilename += ".lua";
-				}
-				continue;
-			case 'd': {
-				continue;
-			}
-			case 'D':
-				Video.Depth = atoi(optarg);
-				continue;
-			case 'e':
-				Editor.Running = EditorCommandLine;
-				continue;
-			case 'E':
-				parameters->luaEditorStartFilename = optarg;
-				continue;
-			case 'F':
-				VideoForceFullScreen = 1;
-				Video.FullScreen = 1;
-				continue;
-			case 'G':
-				parameters->luaScriptArguments = optarg;
-				continue;
-			case 'I':
-				CNetworkParameter::Instance.localHost = optarg;
-				continue;
-			case 'l':
-				CommandLogDisabled = true;
-				continue;
-			case 'N':
-				parameters->LocalPlayerName = optarg;
-				continue;
-			case 'P':
-				CNetworkParameter::Instance.localPort = atoi(optarg);
-				continue;
-			case 'p':
-				EnableDebugPrint = true;
-				continue;
-			case 's':
-				AiSleepCycles = atoi(optarg);
-				continue;
-			case 'S':
-				VideoSyncSpeed = atoi(optarg);
-				continue;
-			case 't':
-				continue;
-			case 'u':
-				parameters->SetUserDirectory(optarg);
-				continue;
-			case 'v': {
-				char *sep = strchr(optarg, 'x');
-				if (!sep || !*(sep + 1)) {
-					throw std::runtime_error(std::string(argv[0]) + ": incorrect format of video mode resolution -- '" + optarg + "'");
-				}
-				Video.Height = atoi(sep + 1);
-				*sep = 0;
-				Video.Width = atoi(optarg);
-				if (!Video.Height || !Video.Width) {
-					throw std::runtime_error(std::string(argv[0]) + ": incorrect format of video mode resolution -- '" + optarg + "x + " + (sep + 1) + "'");
-				}
-#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (ZoomNoResize) {
-					Video.ViewportHeight = Video.Height;
-					Video.ViewportWidth = Video.Width;
-					Video.Height = 0;
-					Video.Width = 0;
-				}
-#endif
-				continue;
-			}
-			case 'W':
-				VideoForceFullScreen = 1;
-				Video.FullScreen = 0;
-				continue;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			case 'Z':
-				ZoomNoResize = 1;
-				Video.ViewportHeight = Video.Height;
-				Video.ViewportWidth = Video.Width;
-				Video.Height = 0;
-				Video.Width = 0;
-				continue;
-#endif
-			case -1:
-				break;
-			case '?':
-			case 'h':
-				Usage();
-				Exit(EXIT_SUCCESS);
-				break;
-			default:
-				throw std::runtime_error("Invalid command line arguments.");
-		}
-		break;
-	}
-
-	if (argc - optind > 1) {
-		throw std::runtime_error("too many map files. if you meant to pass game arguments, these go after '--'");
-	}
-
-	if (argc - optind) {
-		size_t index;
-		CliMapName = argv[optind];
-		while ((index = CliMapName.find('\\')) != std::string::npos) {
-			CliMapName[index] = '/';
-		}
-	}
-}
-
 #ifdef USE_WIN32
 static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 {
@@ -624,9 +465,6 @@ void stratagusMain(int argc, char **argv)
 #ifdef REDIRECT_OUTPUT
 	RedirectOutput();
 #endif
-
-	// FIXME: Parse options before or after scripts?
-	ParseCommandLine(argc, argv);
 
 	makedir(parameters->GetUserDirectory().c_str(), 0777);
 
