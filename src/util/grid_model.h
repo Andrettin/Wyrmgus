@@ -51,16 +51,23 @@ public:
 
 	virtual QVariant data(const QModelIndex &index, int role) const override
 	{
+		Q_UNUSED(index)
+		Q_UNUSED(role)
+
 		return QVariant();
 	}
 
-	virtual QModelIndex QAbstractItemModel::index(int row, int column, const QModelIndex &parent = QModelIndex()) const override
+	virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override
 	{
+		Q_UNUSED(parent)
+
 		return this->createIndex(row, column);
 	}
 
-	virtual QModelIndex QAbstractItemModel::parent(const QModelIndex &index) const override
+	virtual QModelIndex parent(const QModelIndex &index) const override
 	{
+		Q_UNUSED(index)
+		
 		return QModelIndex();
 	}
 };
