@@ -32,10 +32,6 @@
 
 #include <QCommandLineParser>
 
-#include <QMap>
-
-#include <QCommandLineOption>
-
 namespace wyrmgus {
 
 void parameters::process()
@@ -43,46 +39,42 @@ void parameters::process()
 	QCommandLineParser cmd_parser;
 
 	// TODO Long version
-	QMap<QString, QCommandLineOption> options {
-		{ "start_editor", { "e", "Start editor instead of game." } },
-		{ "depth", { "D", "Video mode depth (pixel per point).", "depth" } },
-		{ "conf_file", { "c", "Configuration start file (default is 'stratagus.lua').", "config file" } },
+	QList<QCommandLineOption> options {
+		{ "e", "Start editor instead of game." },
+		{ "D", "Video mode depth (pixel per point).", "depth" },
+		{ "c", "Configuration start file (default is 'stratagus.lua').", "config file" },
+		{ "E", "Editor configuration start file (default is 'editor.lua').", "editor config file" },
+		{ "d", "Specify a custom data path.", "data path" },
+		{ "t", "Check startup and exit (data files must respect this flag)." },
+		{ "F", "Full screen video mode." },
+		{ "G", "Game options passed to game scripts", "game options." },
+		{ "I", "Network address to use", "address." },
+		{ "l", "Disable command log." },
+		{ "N", "Name of the player.", "name" },
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		{ "o", "Do not use OpenGL or OpenGL ES 1.1." },
+		{ "O", "Use OpenGL or OpenGL ES 1.1." },
+#endif
+		{ "p", "Enables debug messages printing in console." },
+		{ "P", "Network port to use.", "port" },
+		{ "s", "Number of frames for the AI to sleep before it starts.", "frames" },
+		{ "S", "Sync speed (100 = 30 frames/s).", "speed" },
+		{ "u", "Path where wyrmgus saves preferences, log and savegame", "path" },
+		// FIXME { "v", "Video mode resolution in format <xres>x<yres>.", "mode" },
+		{ "W", "Windowed video mode." },
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		{
-			"editor_conf_file",
-			{ "E", "Editor configuration start file (default is 'editor.lua').", "editor config file" }
+			"x",
+			"Controls fullscreen scaling if your graphics card supports shaders. "
+				"Pass 1 for nearest-neigubour, 2 for EPX/AdvMame, 3 for HQx, 4 for SAL, 5 for SuperEagle. "
+				"You can also use Ctrl+Alt+/ to cycle between these scaling algorithms at runtime. "
+				"Pass -1 to force old-school nearest neighbour scaling without shaders.",
+			"idx"
 		},
-		{ "data_path", { "d", "Specify a custom data path.", "data path" } },
-		{ "test", { "t", "Check startup and exit (data files must respect this flag)." } },
-		{ "fullscreen", { "F", "Full screen video mode." } },
-		{ "game_options", { "G", "Game options passed to game scripts", "game options." } },
-		{ "net_address", { "I", "Network address to use", "address." } },
-		{ "disable_log", { "l", "Disable command log." } },
-		{ "player_name", { "N", "Name of the player.", "name" } },
+		{ "Z", "Use OpenGL to scale the screen to the viewport (retro-style). Implies -O." },
+#endif
 	};
-
-	cmd_parser.addOptions(options.values());
-
-  /**
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
-		-O\t\tUse OpenGL or OpenGL ES 1.1\n"
-#endif
-		-p\t\tEnables debug messages printing in console\n"
-		-P port\t\tNetwork port to use\n"
-		-s sleep\tNumber of frames for the AI to sleep before it starts\n"
-		-S speed\tSync speed (100 = 30 frames/s)\n"
-		-u userpath\tPath where stratagus saves preferences, log and savegame\n"
-		-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
-		-W\t\tWindowed video mode\n"
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		-x idx\t\tControls fullscreen scaling if your graphics card supports shaders.\n"\
-		  \t\tPass 1 for nearest-neigubour, 2 for EPX/AdvMame, 3 for HQx, 4 for SAL, 5 for SuperEagle\n"\
-		  \t\tYou can also use Ctrl+Alt+/ to cycle between these scaling algorithms at runtime.\n"
-		  \t\tPass -1 to force old-school nearest neighbour scaling without shaders\n"\
-		-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
-#endif
-		"map is relative to the root data path, use ./map for relative to cwd\n",
-*/
+	cmd_parser.addOptions(options);
 
 	cmd_parser.setApplicationDescription("The free real time strategy game engine.");
 	cmd_parser.addHelpOption();
@@ -90,15 +82,18 @@ void parameters::process()
 
 	cmd_parser.process(*QApplication::instance());
 
-	auto & data_path_option { options.find("data_path").value() };
-	if (cmd_parser.isSet(data_path_option)) {
-		database::get()->set_root_path(cmd_parser.value(data_path_option).toStdString());
+	if (cmd_parser.isSet("d")) {
+		database::get()->set_root_path(cmd_parser.value("d").toStdString());
 	}
 
-	if (cmd_parser.isSet(options.find("test").value())) {
+	if (cmd_parser.isSet("t")) {
 		this->test_run = true;
 	}
 
+	// TODO
+	if (cmd_parser.isSet("D")) {
+		qDebug() << cmd_parser.value("D").toInt();
+	}
 
   /**
 			case 'c':
@@ -111,9 +106,6 @@ void parameters::process()
 			case 'd': {
 				continue;
 			}
-			case 'D':
-				Video.Depth = atoi(optarg);
-				continue;
 			case 'e':
 				Editor.Running = EditorCommandLine;
 				continue;
