@@ -31,11 +31,11 @@
 #include "database/preferences.h"
 #include "engine_interface.h"
 #include "game.h"
+#include "map/map_grid_model.h"
 #include "map/tile_image_provider.h"
 #include "parameters.h"
 #include "ui/interface_image_provider.h"
 #include "util/exception_util.h"
-#include "util/grid_model.h"
 #include "util/log_util.h"
 #include "version.h"
 #include "video/frame_buffer_object.h"
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 		qmlRegisterType<preferences>();
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
-		qmlRegisterType<grid_model>("grid_model", 1, 0, "GridModel");
+		qmlRegisterType<map_grid_model>("map_grid_model", 1, 0, "MapGridModel");
 
 		engine.rootContext()->setContextProperty("wyrmgus", engine_interface::get());
 

@@ -24,52 +24,39 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include <QAbstractItemModel> 
+#include "map/map_grid_model.h"
+
+#include "map/map.h"
+#include "map/map_layer.h"
 
 namespace wyrmgus {
 
-class grid_model : public QAbstractItemModel
+map_grid_model::map_grid_model()
 {
-	Q_OBJECT
+}
 
-public:
-	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override
-	{
-		Q_UNUSED(parent)
+int map_grid_model::rowCount(const QModelIndex &parent) const
+{
+	Q_UNUSED(parent)
 
-		return 512;
+	if (this->get_map_layer() < CMap::get()->MapLayers.size()) {
+		return CMap::get()->MapLayers[this->get_map_layer()]->get_height();
 	}
 
-	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override
-	{
-		Q_UNUSED(parent)
+	return 0;
+}
 
-		return 512;
+int map_grid_model::columnCount(const QModelIndex &parent) const
+{
+	Q_UNUSED(parent)
+
+	if (this->get_map_layer() < CMap::get()->MapLayers.size()) {
+		return CMap::get()->MapLayers[this->get_map_layer()]->get_width();
 	}
 
-	virtual QVariant data(const QModelIndex &index, int role) const override
-	{
-		Q_UNUSED(index)
-		Q_UNUSED(role)
-
-		return QVariant();
-	}
-
-	virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override
-	{
-		Q_UNUSED(parent)
-
-		return this->createIndex(row, column);
-	}
-
-	virtual QModelIndex parent(const QModelIndex &index) const override
-	{
-		Q_UNUSED(index)
-		
-		return QModelIndex();
-	}
-};
+	return 0;
+}
 
 }

@@ -220,6 +220,7 @@ set(map_SRCS
 	src/map/map.cpp
 	src/map/map_draw.cpp
 	src/map/map_fog.cpp
+	src/map/map_grid_model.cpp
 	src/map/map_layer.cpp
 	src/map/map_projection.cpp
 	src/map/map_radar.cpp
@@ -755,6 +756,7 @@ set(wyrmgus_map_HDRS
 	src/map/landmass.h
 	src/map/landmass_container.h
 	src/map/map.h
+	src/map/map_grid_model.h
 	src/map/map_layer.h
 	src/map/map_projection.h
 	src/map/map_template.h
@@ -1002,7 +1004,6 @@ set(wyrmgus_util_HDRS
 	src/util/geopath_util.h
 	src/util/georectangle_util.h
 	src/util/geoshape_util.h
-	src/util/grid_model.h
 	src/util/image_util.h
 	src/util/list_util.h
 	src/util/log_util.h
