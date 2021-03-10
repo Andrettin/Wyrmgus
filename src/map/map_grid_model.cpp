@@ -74,6 +74,8 @@ QVariant map_grid_model::data(const QModelIndex &index, const int role) const
 		switch (model_role) {
 			case role::image_source:
 				return tile_data.image_source;
+			case role::overlay_image_source:
+				return tile_data.overlay_image_source;
 			default:
 				throw std::runtime_error("Invalid map grid model role: " + std::to_string(role) + ".");
 		}
@@ -103,6 +105,9 @@ void map_grid_model::set_map_layer(const size_t z)
 				tile_data tile_data;
 
 				tile_data.image_source = QString::fromStdString(tile->get_terrain()->get_identifier()) + "/" + QString::number(tile->SolidTile);
+				if (tile->get_overlay_terrain() != nullptr) {
+					tile_data.overlay_image_source = QString::fromStdString(tile->get_overlay_terrain()->get_identifier()) + "/" + QString::number(tile->OverlaySolidTile);
+				}
 
 				this->tile_data_list.push_back(std::move(tile_data));
 			}

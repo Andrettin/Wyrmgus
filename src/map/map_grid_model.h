@@ -38,11 +38,13 @@ class map_grid_model : public QAbstractItemModel
 
 public:
 	enum class role {
-		image_source = Qt::UserRole
+		image_source = Qt::UserRole,
+		overlay_image_source
 	};
 
 	struct tile_data {
 		QString image_source;
+		QString overlay_image_source;
 	};
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override final;
@@ -68,6 +70,7 @@ public:
 		QHash<int, QByteArray> role_names;
 
 		role_names.insert(static_cast<int>(role::image_source), "image_source");
+		role_names.insert(static_cast<int>(role::overlay_image_source), "overlay_image_source");
 
 		return role_names;
 	}
