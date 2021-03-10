@@ -47,7 +47,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(wyrmgus::parameters* parameters READ get_parameters CONSTANT)
 	Q_PROPERTY(wyrmgus::defines* defines READ get_defines CONSTANT)
 	Q_PROPERTY(wyrmgus::preferences* preferences READ get_preferences CONSTANT)
-	Q_PROPERTY(wyrmgus::game*game READ get_game CONSTANT)
+	Q_PROPERTY(wyrmgus::game* game READ get_game CONSTANT)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 
 public:
@@ -108,7 +108,7 @@ signals:
 	void running_changed();
 
 private:
-	std::vector<std::function<void()>> posted_commands;
+	std::queue<std::function<void()>> posted_commands;
 	std::mutex command_mutex;
 	bool running = false;
 };

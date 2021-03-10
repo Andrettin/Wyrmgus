@@ -36,6 +36,7 @@
 #include "results.h"
 #include "script.h"
 #include "sound/sound.h"
+#include "util/queue_util.h"
 
 namespace wyrmgus {
 
@@ -70,15 +71,20 @@ game *engine_interface::get_game() const
 void engine_interface::run_event_loop()
 {
 	//run the commands posted from the Qt thread
-	std::vector<std::function<void()>> commands;
 
-	{
-		std::lock_guard lock(this->command_mutex);
+	while (true) {
+		std::function<void()> command;
 
-		commands = std::move(this->posted_commands);
-	}
+		{
+			std::lock_guard lock(this->command_mutex);
 
-	for (const std::function<void()> &command : commands) {
+			if (this->posted_commands.empty()) {
+				break;
+			}
+
+			command = queue::take(this->posted_commands);
+		}
+
 		command();
 	}
 }
@@ -86,7 +92,7 @@ void engine_interface::run_event_loop()
 void engine_interface::post(const std::function<void()> &function)
 {
 	std::lock_guard lock(this->command_mutex);
-	this->posted_commands.push_back(function);
+	this->posted_commands.push(function);
 }
 
 void engine_interface::call_lua_command(const QString &command)
