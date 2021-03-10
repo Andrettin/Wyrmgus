@@ -352,8 +352,8 @@ public:
 	short OverlaySolidTile = 0;
 	bool OverlayTerrainDestroyed = false;
 	bool OverlayTerrainDamaged = false;
-	std::vector<std::pair<const terrain_type *, short>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
-	std::vector<std::pair<const terrain_type *, short>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<const terrain_type *, short>> TransitionTiles; //transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<const terrain_type *, short>> OverlayTransitionTiles; //overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 private:
 	unsigned char movement_cost = 0; //unit cost to move in this tile
