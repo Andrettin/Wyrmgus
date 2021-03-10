@@ -466,8 +466,8 @@ void CMapLayer::SetSeason(const scheduled_season *season)
 	this->season = season;
 	
 	//update map layer tiles affected by the season change
-	for (int x = 0; x < this->get_width(); x++) {
-		for (int y = 0; y < this->get_height(); y++) {
+	for (int x = 0; x < this->get_width(); ++x) {
+		for (int y = 0; y < this->get_height(); ++y) {
 			const wyrmgus::tile &mf = *this->Field(x, y);
 			
 			//check if the tile's terrain graphics have changed due to the new season and if so, update the minimap

@@ -34,22 +34,20 @@ class map_grid_model : public QAbstractItemModel
 {
 	Q_OBJECT
 
-	Q_PROPERTY(size_t map_layer READ get_map_layer WRITE set_map_layer NOTIFY map_layer_changed)
+	Q_PROPERTY(int map_layer READ get_map_layer WRITE set_map_layer NOTIFY map_layer_changed)
 
 public:
-	map_grid_model();
+	enum class role {
+		image_source = Qt::UserRole
+	};
+
+	struct tile_data {
+		QString image_source;
+	};
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override final;
-
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override final;
-
-	virtual QVariant data(const QModelIndex &index, int role) const override final
-	{
-		Q_UNUSED(index)
-		Q_UNUSED(role)
-
-		return QVariant();
-	}
+	virtual QVariant data(const QModelIndex &index, int role) const override final;
 
 	virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override final
 	{
@@ -65,26 +63,28 @@ public:
 		return QModelIndex();
 	}
 
+	virtual QHash<int, QByteArray> roleNames() const override final
+	{
+		QHash<int, QByteArray> role_names;
+
+		role_names.insert(static_cast<int>(role::image_source), "image_source");
+
+		return role_names;
+	}
+
 	size_t get_map_layer() const
 	{
 		return this->map_layer;
 	}
 
-	void set_map_layer(const size_t z)
-	{
-		if (z == this->get_map_layer()) {
-			return;
-		}
-
-		this->map_layer = z;
-		emit map_layer_changed();
-	}
+	void set_map_layer(const size_t z);
 
 signals:
 	void map_layer_changed();
 
 private:
-	size_t map_layer = 0;
+	int map_layer = -1;
+	std::vector<tile_data> tile_data_list;
 };
 
 }

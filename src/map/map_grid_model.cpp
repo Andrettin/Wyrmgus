@@ -28,35 +28,88 @@
 
 #include "map/map_grid_model.h"
 
+#include "engine_interface.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/terrain_type.h"
+#include "map/tile.h"
+#include "util/exception_util.h"
+#include "util/point_util.h"
+#include "video/video.h"
 
 namespace wyrmgus {
-
-map_grid_model::map_grid_model()
-{
-}
 
 int map_grid_model::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
 
-	if (this->get_map_layer() < CMap::get()->MapLayers.size()) {
-		return CMap::get()->MapLayers[this->get_map_layer()]->get_height();
-	}
-
-	return 0;
+	return CMap::get()->MapLayers[this->get_map_layer()]->get_height();
 }
 
 int map_grid_model::columnCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
 
-	if (this->get_map_layer() < CMap::get()->MapLayers.size()) {
-		return CMap::get()->MapLayers[this->get_map_layer()]->get_width();
+	return CMap::get()->MapLayers[this->get_map_layer()]->get_width();
+}
+
+QVariant map_grid_model::data(const QModelIndex &index, const int role) const
+{
+	if (!index.isValid()) {
+		return QVariant();
 	}
 
-	return 0;
+	try {
+		const map_grid_model::role model_role = static_cast<map_grid_model::role>(role);
+		const QPoint tile_pos(index.column(), index.row());
+
+		if (!CMap::get()->Info.IsPointOnMap(tile_pos, this->get_map_layer())) {
+			throw std::runtime_error("Invalid tile position: " + point::to_string(tile_pos) + ", map layer " + std::to_string(this->get_map_layer()) + ".");
+		}
+
+		const int tile_index = point::to_index(tile_pos, this->columnCount());
+
+		const tile_data &tile_data = this->tile_data_list.at(tile_index);
+
+		switch (model_role) {
+			case role::image_source:
+				return tile_data.image_source;
+			default:
+				throw std::runtime_error("Invalid map grid model role: " + std::to_string(role) + ".");
+		}
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+	}
+
+	return QVariant();
+}
+
+void map_grid_model::set_map_layer(const size_t z)
+{
+	if (z == this->get_map_layer()) {
+		return;
+	}
+
+	this->map_layer = z;
+
+	this->tile_data_list.clear();
+
+	engine_interface::get()->sync([this]() {
+		const CMapLayer *map_layer = CMap::get()->MapLayers[this->get_map_layer()].get();
+		for (int y = 0; y < map_layer->get_height(); ++y) {
+			for (int x = 0; x < map_layer->get_width(); ++x) {
+				const tile *tile = map_layer->Field(x, y);
+
+				tile_data tile_data;
+
+				tile_data.image_source = QString::fromStdString(tile->get_terrain()->get_identifier()) + "/" + QString::number(tile->SolidTile);
+
+				this->tile_data_list.push_back(std::move(tile_data));
+			}
+		}
+	});
+
+	emit map_layer_changed();
 }
 
 }
