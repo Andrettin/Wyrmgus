@@ -64,7 +64,7 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 		graphics->Load(false, defines::get()->get_scale_factor());
 	});
 
-	const QImage &image = graphics->get_scaled_image();
+	const QImage &image = graphics->get_scaled_frame(0);
 
 	if (image.isNull()) {
 		log::log_error("Interface image for ID \"" + id_str + "\" is null.");

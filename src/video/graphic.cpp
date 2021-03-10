@@ -1140,7 +1140,8 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const player_color *
 
 			if (!grayscale && player_color == nullptr && time_of_day == nullptr) {
 				if (g->stores_scaled_image()) {
-					g->set_scaled_image(image);
+					std::vector<QImage> frames = image::to_frames(image, g->get_frame_size());
+					g->set_scaled_frames(std::move(frames));
 				}
 			}
 		} else {
@@ -1290,7 +1291,7 @@ void CGraphic::SetOriginalSize()
 
 	this->Width = this->Height = 0;
 	this->image = QImage();
-	this->scaled_image = QImage();
+	this->scaled_frames.clear();
 	this->Load();
 
 	this->Resized = false;

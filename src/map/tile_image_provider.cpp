@@ -49,10 +49,13 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 	const terrain_type *terrain = terrain_type::get(terrain_identifier);
 
 	const season *season = nullptr;
-	if (id_list.size() > 1) {
+	if (id_list.size() > 2) {
 		const std::string &season_identifier = id_list.at(1);
 		season = season::get(season_identifier);
 	}
+
+	const std::string &frame_str = id_list.back();
+	const size_t frame_index = std::stoul(frame_str);
 
 	const std::shared_ptr<CGraphic> graphics = terrain->get_graphics(season);
 
@@ -61,7 +64,7 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 		graphics->Load(false, defines::get()->get_scale_factor());
 	});
 
-	const QImage &image = graphics->get_scaled_image();
+	const QImage &image = graphics->get_scaled_frame(frame_index);
 
 	if (image.isNull()) {
 		log::log_error("Tile image for ID \"" + id_str + "\" is null.");

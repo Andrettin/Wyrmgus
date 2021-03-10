@@ -1272,6 +1272,7 @@ static int CclDefineTerrainType(lua_State *l)
 	
 	if (!graphics_file.empty()) {
 		terrain->graphics = CPlayerColorGraphic::New(graphics_file, wyrmgus::defines::get()->get_tile_size(), nullptr);
+		terrain->graphics->set_store_scaled_image(true);
 	}
 	if (!elevation_graphics_file.empty()) {
 		terrain->elevation_graphics = CGraphic::New(elevation_graphics_file, wyrmgus::defines::get()->get_tile_size());

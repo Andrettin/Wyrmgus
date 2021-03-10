@@ -204,18 +204,14 @@ public:
 		return this->image;
 	}
 
-	const QImage &get_scaled_image() const
+	const QImage &get_scaled_frame(const size_t frame_index) const
 	{
-		if (!this->scaled_image.isNull()) {
-			return this->scaled_image;
-		}
-
-		return this->get_image();
+		return this->scaled_frames.at(frame_index);
 	}
 
-	void set_scaled_image(const QImage &image)
+	void set_scaled_frames(std::vector<QImage> &&frames)
 	{
-		this->scaled_image = image;
+		this->scaled_frames = std::move(frames);
 	}
 
 	const wyrmgus::player_color *get_conversible_player_color() const;
@@ -261,7 +257,7 @@ public:
 	std::string HashFile;      /// Filename used in hash
 private:
 	QImage image;
-	QImage scaled_image;
+	std::vector<QImage> scaled_frames;
 public:
 	std::vector<frame_pos_t> frame_map;
 	std::vector<frame_pos_t> frameFlip_map;
