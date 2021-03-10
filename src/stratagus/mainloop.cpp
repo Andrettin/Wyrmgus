@@ -557,6 +557,8 @@ void GameMainLoop()
 	}
 	//Wyrmgus end
 
+	emit game::get()->started();
+
 	SingleGameLoop();
 
 #ifdef REALVIDEO

@@ -127,6 +127,9 @@ public:
 
 	void clear_delayed_effects();
 
+signals:
+	void started();
+
 private:
 	campaign *current_campaign = nullptr;
 	QDateTime current_date;

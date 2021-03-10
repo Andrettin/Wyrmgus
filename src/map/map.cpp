@@ -1678,7 +1678,7 @@ void CMapInfo::Clear()
 
 CMap::CMap()
 {
-	Tileset = std::make_unique<CTileset>();
+	this->Tileset = std::make_unique<CTileset>();
 }
 
 CMap::~CMap()
