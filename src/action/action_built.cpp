@@ -346,7 +346,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			unit.Release();
 			return;
 		} catch (...) {
-			std::throw_with_nested(std::runtime_error("Error transforming an under-construction terrain unit into a tile."));
+			std::throw_with_nested(std::runtime_error("Error transforming an under-construction terrain unit into a tile terrain."));
 		}
 	}
 
