@@ -329,21 +329,25 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	// FIXME: Johns: hardcoded unit-type wall / more races!
 	//Wyrmgus start
 //	if (&type == UnitTypeOrcWall || &type == UnitTypeHumanWall) {
-	if (type.TerrainType) {
+	if (type.TerrainType != nullptr) {
 	//Wyrmgus end
-		//Wyrmgus start
-//		CMap::Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
-		if (type.TerrainType->is_overlay() && CMap::Map.GetTileTerrain(unit.tilePos, type.TerrainType->is_overlay(), unit.MapLayer->ID) != nullptr) {
-			//remove an existent overlay terrain if present, e.g. so that if a destroyed wall of the same type is present here, the new wall can be properly placed without still being destroyed
-			CMap::Map.RemoveTileOverlayTerrain(unit.tilePos, unit.MapLayer->ID);
+		try {
+			//Wyrmgus start
+	//		CMap::Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
+			if (type.TerrainType->is_overlay() && CMap::Map.GetTileTerrain(unit.tilePos, type.TerrainType->is_overlay(), unit.MapLayer->ID) != nullptr) {
+				//remove an existent overlay terrain if present, e.g. so that if a destroyed wall of the same type is present here, the new wall can be properly placed without still being destroyed
+				CMap::Map.RemoveTileOverlayTerrain(unit.tilePos, unit.MapLayer->ID);
+			}
+			CMap::Map.SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer->ID);
+			//Wyrmgus end
+			unit.Remove(nullptr);
+			UnitLost(unit);
+			unit.clear_orders();
+			unit.Release();
+			return;
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Error transforming an under-construction terrain unit into a tile."));
 		}
-		CMap::Map.SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer->ID);
-		//Wyrmgus end
-		unit.Remove(nullptr);
-		UnitLost(unit);
-		unit.clear_orders();
-		unit.Release();
-		return;
 	}
 
 	UpdateForNewUnit(unit, 0);
