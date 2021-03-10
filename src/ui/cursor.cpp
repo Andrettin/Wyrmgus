@@ -86,6 +86,7 @@ void cursor::set_current_cursor(cursor *cursor)
 
 	if (cursor != nullptr) {
 		if (!cursor->get_graphics()->IsLoaded()) {
+			cursor->get_graphics()->set_store_scaled_image(true);
 			cursor->get_graphics()->Load(false, defines::get()->get_scale_factor());
 		}
 

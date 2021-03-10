@@ -32,6 +32,7 @@
 #include "engine_interface.h"
 #include "ui/interface_element_type.h"
 #include "ui/interface_style.h"
+#include "util/log_util.h"
 #include "util/string_util.h"
 #include "video/video.h"
 
@@ -59,10 +60,15 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 
 	engine_interface::get()->sync([&graphics]() {
 		//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
+		graphics->set_store_scaled_image(true);
 		graphics->Load(false, defines::get()->get_scale_factor());
 	});
 
 	const QImage &image = graphics->get_scaled_image();
+
+	if (image.isNull()) {
+		log::log_error("Interface image for ID \"" + id_str + "\" is null.");
+	}
 
 	if (size != nullptr) {
 		*size = image.size();

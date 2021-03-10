@@ -32,6 +32,7 @@
 #include "engine_interface.h"
 #include "map/terrain_type.h"
 #include "time/season.h"
+#include "util/log_util.h"
 #include "util/string_util.h"
 #include "video/video.h"
 
@@ -61,6 +62,10 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 	});
 
 	const QImage &image = graphics->get_scaled_image();
+
+	if (image.isNull()) {
+		log::log_error("Tile image for ID \"" + id_str + "\" is null.");
+	}
 
 	if (size != nullptr) {
 		*size = image.size();

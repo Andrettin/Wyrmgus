@@ -1139,8 +1139,7 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const player_color *
 			image = image::scale(image, scale_factor, g->get_original_frame_size());
 
 			if (!grayscale && player_color == nullptr && time_of_day == nullptr) {
-				if (g->stores_scaled_image() || g->get_frame_count() <= 1) {
-					//only do this for images with only one frame for now, so as to not overflow memory
+				if (g->stores_scaled_image()) {
 					g->set_scaled_image(image);
 				}
 			}

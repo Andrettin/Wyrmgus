@@ -1778,9 +1778,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 
 	UnitUnderCursor = NoUnitP;
 
-	//Wyrmgus start
 	terrain_type::LoadTerrainTypeGraphics();
-	//Wyrmgus end
 	resource_icon::load_all();
 	icon::load_all();
 	InitMissileTypes();

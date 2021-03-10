@@ -200,10 +200,10 @@ void LoadModules()
 {
 	UI.Load();
 	//Wyrmgus start
-	wyrmgus::terrain_type::LoadTerrainTypeGraphics();
+	terrain_type::LoadTerrainTypeGraphics();
 	//Wyrmgus end
-	wyrmgus::resource_icon::load_all();
-	wyrmgus::icon::load_all();
+	resource_icon::load_all();
+	icon::load_all();
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
 #endif
