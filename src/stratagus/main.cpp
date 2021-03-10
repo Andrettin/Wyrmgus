@@ -34,6 +34,7 @@
 #include "map/map_grid_model.h"
 #include "map/tile_image_provider.h"
 #include "parameters.h"
+#include "ui/empty_image_provider.h"
 #include "ui/interface_image_provider.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
@@ -93,6 +94,7 @@ int main(int argc, char **argv)
 
 		engine.rootContext()->setContextProperty("wyrmgus", engine_interface::get());
 
+		engine.addImageProvider("empty", new empty_image_provider);
 		engine.addImageProvider("interface", new interface_image_provider);
 		engine.addImageProvider("tile", new tile_image_provider);
 
