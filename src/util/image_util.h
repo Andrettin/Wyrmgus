@@ -53,6 +53,25 @@ inline int get_frames_per_column(const QImage &image, const int frame_height)
 extern int get_frame_index(const QImage &image, const QSize &frame_size, const QPoint &frame_pos);
 extern QPoint get_frame_pos(const QImage &image, const QSize &frame_size, const int frame_index, const frame_order frame_order);
 
+inline std::vector<QImage> to_frames(const QImage &image, const QSize &frame_size)
+{
+	std::vector<QImage> frames;
+
+	const int horizontal_frame_count = image::get_frames_per_row(image, frame_size.width());
+	const int vertical_frame_count = image::get_frames_per_column(image, frame_size.height());
+
+	for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
+		for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
+			const int pixel_x = frame_x * frame_size.width();
+			const int pixel_y = frame_y * frame_size.height();
+
+			frames.push_back(image.copy(pixel_x, pixel_y, frame_size.width(), frame_size.height()));
+		}
+	}
+
+	return frames;
+}
+
 extern void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_order, const int frames_per_row);
 
 extern void index_to_palette(QImage &image, const color_set &palette);
