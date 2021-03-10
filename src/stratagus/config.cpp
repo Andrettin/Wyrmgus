@@ -37,7 +37,6 @@
 #include "map/map_template.h"
 #include "map/plane.h"
 #include "map/site.h"
-#include "map/terrain_type.h"
 #include "missile.h"
 #include "quest/campaign.h"
 #include "script/trigger.h"
@@ -249,11 +248,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			wyrmgus::site *site = wyrmgus::site::get_or_add(ident, nullptr);
 			if (!define_only) {
 				site->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "terrain_type") {
-			wyrmgus::terrain_type *terrain_type = wyrmgus::terrain_type::get_or_add(ident, nullptr);
-			if (!define_only) {
-				terrain_type->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "unit_type") {
 			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_or_add(ident, nullptr);

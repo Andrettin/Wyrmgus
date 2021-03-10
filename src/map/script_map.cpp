@@ -1014,7 +1014,7 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
 	*/
-	lua_pushstring(l, CMap::Map.GetTileTopTerrain(pos, false, z)->Ident.c_str());
+	lua_pushstring(l, CMap::Map.GetTileTopTerrain(pos, false, z)->get_identifier().c_str());
 	//Wyrmgus end
 	return 1;
 }

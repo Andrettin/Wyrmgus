@@ -26,10 +26,8 @@
 
 #pragma once
 
-#include "color.h"
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
-#include "data_type.h"
 #include "util/color_container.h"
 
 class CGraphic;
@@ -46,7 +44,7 @@ class unit_type;
 enum class tile_flag : uint32_t;
 enum class tile_transition_type;
 
-class terrain_type final : public named_data_entry, public data_type<terrain_type>, public CDataType
+class terrain_type final : public named_data_entry, public data_type<terrain_type>
 {
 	Q_OBJECT
 
@@ -165,7 +163,6 @@ private:
 public:
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	virtual void check() const override;
 

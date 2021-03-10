@@ -77,7 +77,7 @@ void terrain_type::LoadTerrainTypeGraphics()
 }
 
 terrain_type::terrain_type(const std::string &identifier)
-	: named_data_entry(identifier), CDataType(identifier), Flags(tile_flag::none)
+	: named_data_entry(identifier), Flags(tile_flag::none)
 {
 }
 
@@ -181,147 +181,6 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 	}
 }
 
-void terrain_type::ProcessConfigData(const CConfigData *config_data)
-{
-	std::string graphics_file;
-	std::string elevation_graphics_file;
-	
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->set_name(value);
-		} else if (key == "character") {
-			this->set_character(value.front());
-		} else if (key == "character_alias") {
-			const char c = value.front();
-			this->map_to_character(c);
-		} else if (key == "color") {
-			const CColor color = CColor::FromString(value);
-			this->set_color(QColor(color.R, color.G, color.B));
-		} else if (key == "overlay") {
-			this->overlay = string::to_bool(value);
-		} else if (key == "buildable") {
-			this->buildable = string::to_bool(value);
-		} else if (key == "allow_single") {
-			this->allow_single = string::to_bool(value);
-		} else if (key == "hidden") {
-			this->hidden = string::to_bool(value);
-		} else if (key == "resource") {
-			this->resource = resource::get(value);
-		} else if (key == "flag") {
-			value = FindAndReplaceString(value, "_", "-");
-			const tile_flag flag = string_to_tile_flag(value);
-			this->Flags |= flag;
-		} else if (key == "graphics") {
-			graphics_file = value;
-			if (!CanAccessFile(graphics_file.c_str())) {
-				fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
-			}
-		} else if (key == "elevation_graphics") {
-			elevation_graphics_file = value;
-			if (!CanAccessFile(elevation_graphics_file.c_str())) {
-				fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
-			}
-		} else if (key == "base_terrain_type") {
-			terrain_type *base_terrain_type = terrain_type::get(value);
-			this->add_base_terrain_type(base_terrain_type);
-		} else if (key == "inner_border_terrain_type") {
-			terrain_type *border_terrain_type = terrain_type::get(value);
-			this->add_inner_border_terrain_type(border_terrain_type);
-		} else if (key == "outer_border_terrain_type") {
-			terrain_type *border_terrain_type = terrain_type::get(value);
-			this->add_outer_border_terrain_type(border_terrain_type);
-		} else if (key == "solid_tile") {
-			this->solid_tiles.push_back(std::stoi(value));
-		} else if (key == "damaged_tile") {
-			this->damaged_tiles.push_back(std::stoi(value));
-		} else if (key == "destroyed_tile") {
-			this->destroyed_tiles.push_back(std::stoi(value));
-		} else {
-			fprintf(stderr, "Invalid terrain type property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "season_graphics") {
-			std::string season_graphics_file;
-			season *season = nullptr;
-			
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "season") {
-					season = season::get(value);
-				} else if (key == "graphics") {
-					season_graphics_file = value;
-					if (!CanAccessFile(season_graphics_file.c_str())) {
-						fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
-					}
-				} else {
-					fprintf(stderr, "Invalid season graphics property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (season_graphics_file.empty()) {
-				fprintf(stderr, "Season graphics have no file.\n");
-				continue;
-			}
-			
-			if (!season) {
-				fprintf(stderr, "Season graphics have no season.\n");
-				continue;
-			}
-			
-			this->season_graphics[season] = CPlayerColorGraphic::New(season_graphics_file, defines::get()->get_tile_size(), nullptr);
-		} else if (child_config_data->Tag == "transition_tile" || child_config_data->Tag == "adjacent_transition_tile") {
-			const terrain_type *transition_terrain = nullptr; //any terrain, by default
-			tile_transition_type transition_type = tile_transition_type::none;
-			std::vector<int> tiles;
-			
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "terrain_type") {
-					transition_terrain = terrain_type::get(value);
-				} else if (key == "transition_type") {
-					value = FindAndReplaceString(value, "_", "-");
-					transition_type = GetTransitionTypeIdByName(value);
-				} else if (key == "tile") {
-					tiles.push_back(std::stoi(value));
-				} else {
-					fprintf(stderr, "Invalid transition tile property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (transition_type == tile_transition_type::none) {
-				fprintf(stderr, "Transition tile has no transition type.\n");
-				continue;
-			}
-
-			for (size_t j = 0; j < tiles.size(); ++j) {
-				if (child_config_data->Tag == "transition_tile") {
-					this->transition_tiles[transition_terrain][transition_type].push_back(tiles[j]);
-				} else if (child_config_data->Tag == "adjacent_transition_tile") {
-					this->adjacent_transition_tiles[transition_terrain][transition_type].push_back(tiles[j]);
-				}
-			}
-		} else {
-			fprintf(stderr, "Invalid terrain type property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
-	
-	if (!graphics_file.empty()) {
-		this->graphics = CPlayerColorGraphic::New(graphics_file, defines::get()->get_tile_size(), nullptr);
-	}
-	if (!elevation_graphics_file.empty()) {
-		this->elevation_graphics = CGraphic::New(elevation_graphics_file, defines::get()->get_tile_size());
-	}
-}
-
 void terrain_type::initialize()
 {
 	if (!this->get_image_file().empty() && this->graphics == nullptr) {
@@ -394,7 +253,7 @@ void terrain_type::set_color(const QColor &color)
 const QColor &terrain_type::get_minimap_color(const season *season) const
 {
 	if (season != nullptr) {
-		auto find_iterator = this->season_minimap_colors.find(season);
+		const auto find_iterator = this->season_minimap_colors.find(season);
 
 		if (find_iterator != this->season_minimap_colors.end()) {
 			return find_iterator->second;

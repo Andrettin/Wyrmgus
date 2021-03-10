@@ -374,22 +374,22 @@ void tile::Save(CFile &file) const
 
 	const int landmass_index = this->get_landmass() ? static_cast<int>(this->get_landmass()->get_index()) : -1;
 
-	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (this->get_terrain() != nullptr ? this->get_terrain()->get_identifier().c_str() : ""), (this->get_overlay_terrain() != nullptr ? this->get_overlay_terrain()->get_identifier().c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_movement_cost(), landmass_index, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
+	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (this->get_terrain() != nullptr ? this->get_terrain()->get_identifier().c_str() : ""), (this->get_overlay_terrain() != nullptr ? this->get_overlay_terrain()->get_identifier().c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->get_identifier().c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->get_identifier().c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_movement_cost(), landmass_index, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
-		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
+		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->get_identifier().c_str(), TransitionTiles[i].second);
 	}
 
 	for (size_t i = 0; i != OverlayTransitionTiles.size(); ++i) {
-		file.printf(", \"overlay-transition-tile\", \"%s\", %d", OverlayTransitionTiles[i].first->Ident.c_str(), OverlayTransitionTiles[i].second);
+		file.printf(", \"overlay-transition-tile\", \"%s\", %d", OverlayTransitionTiles[i].first->get_identifier().c_str(), OverlayTransitionTiles[i].second);
 	}
 
 	for (size_t i = 0; i != player_info->SeenTransitionTiles.size(); ++i) {
-		file.printf(", \"seen-transition-tile\", \"%s\", %d", player_info->SeenTransitionTiles[i].first->Ident.c_str(), player_info->SeenTransitionTiles[i].second);
+		file.printf(", \"seen-transition-tile\", \"%s\", %d", player_info->SeenTransitionTiles[i].first->get_identifier().c_str(), player_info->SeenTransitionTiles[i].second);
 	}
 
 	for (size_t i = 0; i != player_info->SeenOverlayTransitionTiles.size(); ++i) {
-		file.printf(", \"seen-overlay-transition-tile\", \"%s\", %d", player_info->SeenOverlayTransitionTiles[i].first->Ident.c_str(), player_info->SeenOverlayTransitionTiles[i].second);
+		file.printf(", \"seen-overlay-transition-tile\", \"%s\", %d", player_info->SeenOverlayTransitionTiles[i].first->get_identifier().c_str(), player_info->SeenOverlayTransitionTiles[i].second);
 	}
 	//Wyrmgus end
 
