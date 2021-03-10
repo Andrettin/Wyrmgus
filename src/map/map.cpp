@@ -1277,105 +1277,109 @@ bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z)
 */
 void PreprocessMap()
 {
-	ShowLoadProgress("%s", _("Initializing Map"));
-		
-	//Wyrmgus start
-	/*
-	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
-		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
-			wyrmgus::tile &mf = *Map.Field(ix, iy);
-			mf.player_info->SeenTile = mf.getGraphicTile();
-		}
-	}
-	*/
+	try {
+		ShowLoadProgress("%s", _("Initializing Map"));
 
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
-			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
-				const QPoint tile_pos(ix, iy);
-				wyrmgus::tile &mf = *CMap::Map.Field(tile_pos, z);
-				CMap::Map.calculate_tile_solid_tile(tile_pos, false, z);
-				if (mf.get_overlay_terrain() != nullptr) {
-					CMap::Map.calculate_tile_solid_tile(tile_pos, true, z);
-				}
-				CMap::Map.CalculateTileTransitions(tile_pos, false, z);
-				CMap::Map.CalculateTileTransitions(tile_pos, true, z);
+		//Wyrmgus start
+		/*
+		for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
+			for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
+				wyrmgus::tile &mf = *Map.Field(ix, iy);
+				mf.player_info->SeenTile = mf.getGraphicTile();
 			}
 		}
+		*/
 
-		CMap::Map.expand_terrain_features_to_same_terrain(z);
-
-		//settlement territories need to be generated after tile transitions are calculated, so that the coast map field has been set
-		CMap::Map.generate_settlement_territories(z);
-
-		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
-			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
-				const QPoint tile_pos(ix, iy);
-				wyrmgus::tile &mf = *CMap::Map.Field(tile_pos, z);
-				CMap::Map.CalculateTileLandmass(tile_pos, z);
-				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
-				mf.bump_incompatible_units();
-				mf.UpdateSeenTile();
-				UI.get_minimap()->UpdateXY(tile_pos, z);
-				UI.get_minimap()->update_territory_xy(tile_pos, z);
-				if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-					CMap::Map.MarkSeenTile(mf);
+		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+			for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
+				for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
+					const QPoint tile_pos(ix, iy);
+					wyrmgus::tile &mf = *CMap::Map.Field(tile_pos, z);
+					CMap::Map.calculate_tile_solid_tile(tile_pos, false, z);
+					if (mf.get_overlay_terrain() != nullptr) {
+						CMap::Map.calculate_tile_solid_tile(tile_pos, true, z);
+					}
+					CMap::Map.CalculateTileTransitions(tile_pos, false, z);
+					CMap::Map.CalculateTileTransitions(tile_pos, true, z);
 				}
 			}
-		}
-	}
-	//Wyrmgus end
 
-	//set the season and time of day for worlds
-	const world *main_world = nullptr;
-	int largest_world_area = 0;
+			CMap::Map.expand_terrain_features_to_same_terrain(z);
 
-	for (const world *world : world::get_all()) {
-		const world_game_data *world_game_data = world->get_game_data();
-		if (!world_game_data->is_on_map()) {
-			continue;
-		}
+			//settlement territories need to be generated after tile transitions are calculated, so that the coast map field has been set
+			CMap::Map.generate_settlement_territories(z);
 
-		const int map_area = world_game_data->get_map_rect().width() * world_game_data->get_map_rect().height();
-		if (map_area > largest_world_area) {
-			main_world = world;
-			largest_world_area = map_area;
-		}
-	}
-
-	for (const world *world : world::get_all()) {
-		world_game_data *world_game_data = world->get_game_data();
-		if (!world_game_data->is_on_map()) {
-			continue;
-		}
-
-		uint64_t hours = game::get()->get_current_total_hours();
-		if (world != main_world) {
-			//for the main world, just use the current total hours, but for other worlds, use a random offset for their schedules, so that they have different times of day and seasons than the main world
-			const unsigned total_schedule_hours = std::max(world->get_season_schedule()->get_total_hours(), world->get_time_of_day_schedule()->get_total_hours());
-			hours += random::get()->generate(total_schedule_hours);
-		}
-
-		world_game_data->set_season_by_hours(hours);
-		world_game_data->set_time_of_day_by_hours(hours);
-	}
-
-	CMap::get()->calculate_settlement_resource_units();
-
-	//Wyrmgus start
-	/*
-	// it is required for fixing the wood that all tiles are marked as seen!
-	if (Map.Tileset->TileTypeTable.empty() == false) {
-		Vec2i pos;
-		for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
-			for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {
-				MapFixWallTile(pos);
-				MapFixSeenWallTile(pos);
+			for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
+				for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
+					const QPoint tile_pos(ix, iy);
+					wyrmgus::tile &mf = *CMap::Map.Field(tile_pos, z);
+					CMap::Map.CalculateTileLandmass(tile_pos, z);
+					CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
+					mf.bump_incompatible_units();
+					mf.UpdateSeenTile();
+					UI.get_minimap()->UpdateXY(tile_pos, z);
+					UI.get_minimap()->update_territory_xy(tile_pos, z);
+					if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+						CMap::Map.MarkSeenTile(mf);
+					}
+				}
 			}
 		}
+		//Wyrmgus end
+
+		//set the season and time of day for worlds
+		const world *main_world = nullptr;
+		int largest_world_area = 0;
+
+		for (const world *world : world::get_all()) {
+			const world_game_data *world_game_data = world->get_game_data();
+			if (!world_game_data->is_on_map()) {
+				continue;
+			}
+
+			const int map_area = world_game_data->get_map_rect().width() * world_game_data->get_map_rect().height();
+			if (map_area > largest_world_area) {
+				main_world = world;
+				largest_world_area = map_area;
+			}
+		}
+
+		for (const world *world : world::get_all()) {
+			world_game_data *world_game_data = world->get_game_data();
+			if (!world_game_data->is_on_map()) {
+				continue;
+			}
+
+			uint64_t hours = game::get()->get_current_total_hours();
+			if (world != main_world) {
+				//for the main world, just use the current total hours, but for other worlds, use a random offset for their schedules, so that they have different times of day and seasons than the main world
+				const unsigned total_schedule_hours = std::max(world->get_season_schedule()->get_total_hours(), world->get_time_of_day_schedule()->get_total_hours());
+				hours += random::get()->generate(total_schedule_hours);
+			}
+
+			world_game_data->set_season_by_hours(hours);
+			world_game_data->set_time_of_day_by_hours(hours);
+		}
+
+		CMap::get()->calculate_settlement_resource_units();
+
+		//Wyrmgus start
+		/*
+		// it is required for fixing the wood that all tiles are marked as seen!
+		if (Map.Tileset->TileTypeTable.empty() == false) {
+			Vec2i pos;
+			for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
+				for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {
+					MapFixWallTile(pos);
+					MapFixSeenWallTile(pos);
+				}
+			}
+		}
+		*/
+		//Wyrmgus end
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error preprocessing the map."));
 	}
-	*/
-	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -2090,71 +2094,75 @@ void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 //Wyrmgus end
 
 //Wyrmgus start
-void CMap::SetTileTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain, const int z)
+void CMap::SetTileTerrain(const Vec2i &pos, const terrain_type *terrain, const int z)
 {
 	if (!terrain) {
 		return;
 	}
 	
-	wyrmgus::tile &mf = *this->Field(pos, z);
-	
-	const wyrmgus::terrain_type *old_terrain = this->GetTileTerrain(pos, terrain->is_overlay(), z);
-	
-	if (terrain == old_terrain) {
-		return;
-	}
-	
-	mf.SetTerrain(terrain);
-	
-	if (terrain->is_overlay()) {
-		//remove decorations if the overlay terrain has changed
-		std::vector<CUnit *> table;
-		Select(pos, pos, table, z);
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
-				if (Editor.Running == EditorNotRunning) {
-					LetUnitDie(*table[i]);
-				} else {
-					EditorActionRemoveUnit(*table[i], false);
+	try {
+		tile &mf = *this->Field(pos, z);
+
+		const terrain_type *old_terrain = this->GetTileTerrain(pos, terrain->is_overlay(), z);
+
+		if (terrain == old_terrain) {
+			return;
+		}
+
+		mf.SetTerrain(terrain);
+
+		if (terrain->is_overlay()) {
+			//remove decorations if the overlay terrain has changed
+			std::vector<CUnit *> table;
+			Select(pos, pos, table, z);
+			for (size_t i = 0; i != table.size(); ++i) {
+				if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+					if (Editor.Running == EditorNotRunning) {
+						LetUnitDie(*table[i]);
+					} else {
+						EditorActionRemoveUnit(*table[i], false);
+					}
 				}
 			}
 		}
-	}
-	
-	//recalculate transitions and solid tiles for both non-overlay and overlay, since setting one may have changed the other
-	this->calculate_tile_solid_tile(pos, false, z);
-	if (mf.get_overlay_terrain() != nullptr) {
-		this->calculate_tile_solid_tile(pos, true, z);
-	}
-	this->CalculateTileTransitions(pos, false, z); 
-	this->CalculateTileTransitions(pos, true, z);
-	
-	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		MarkSeenTile(mf);
-	}
-	UI.get_minimap()->UpdateXY(pos, z);
-	
-	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
-					
-					if (terrain->is_overlay() && adjacent_mf.get_overlay_terrain() != terrain && adjacent_mf.get_overlay_terrain() != old_terrain && Editor.Running == EditorNotRunning) {
-						continue;
+
+		//recalculate transitions and solid tiles for both non-overlay and overlay, since setting one may have changed the other
+		this->calculate_tile_solid_tile(pos, false, z);
+		if (mf.get_overlay_terrain() != nullptr) {
+			this->calculate_tile_solid_tile(pos, true, z);
+		}
+		this->CalculateTileTransitions(pos, false, z);
+		this->CalculateTileTransitions(pos, true, z);
+
+		if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+			MarkSeenTile(mf);
+		}
+		UI.get_minimap()->UpdateXY(pos, z);
+
+		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+				if (x_offset != 0 || y_offset != 0) {
+					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+						tile &adjacent_mf = *this->Field(adjacent_pos, z);
+
+						if (terrain->is_overlay() && adjacent_mf.get_overlay_terrain() != terrain && adjacent_mf.get_overlay_terrain() != old_terrain && Editor.Running == EditorNotRunning) {
+							continue;
+						}
+
+						this->CalculateTileTransitions(adjacent_pos, false, z);
+						this->CalculateTileTransitions(adjacent_pos, true, z);
+
+						if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+							MarkSeenTile(adjacent_mf);
+						}
+						UI.get_minimap()->UpdateXY(adjacent_pos, z);
 					}
-					
-					this->CalculateTileTransitions(adjacent_pos, false, z);
-					this->CalculateTileTransitions(adjacent_pos, true, z);
-					
-					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-						MarkSeenTile(adjacent_mf);
-					}
-					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 				}
 			}
 		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error setting terrain \"" + terrain->get_identifier() + "\" for tile " + point::to_string(pos) + ", map layer " + std::to_string(z) + "."));
 	}
 }
 
@@ -2194,215 +2202,223 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	}
 }
 
-void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
+void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, const int z)
 {
-	const std::unique_ptr<CMapLayer> &map_layer = this->MapLayers[z];
-	
-	if (!map_layer) {
-		return;
-	}
-	
-	wyrmgus::tile &mf = *map_layer->Field(pos);
-	
-	if (mf.get_overlay_terrain() == nullptr || mf.OverlayTerrainDestroyed == destroyed) {
-		return;
-	}
-	
-	mf.SetOverlayTerrainDestroyed(destroyed);
-	
-	if (destroyed) {
-		if (mf.get_overlay_terrain()->has_flag(tile_flag::tree)) {
-			mf.Flags &= ~(tile_flag::tree | tile_flag::impassable);
-			mf.Flags |= tile_flag::stumps;
-			map_layer->destroyed_tree_tiles.push_back(pos);
+	try {
+		const std::unique_ptr<CMapLayer> &map_layer = this->MapLayers[z];
+
+		if (!map_layer) {
+			return;
+		}
+
+		tile &mf = *map_layer->Field(pos);
+
+		if (mf.get_overlay_terrain() == nullptr || mf.OverlayTerrainDestroyed == destroyed) {
+			return;
+		}
+
+		mf.SetOverlayTerrainDestroyed(destroyed);
+
+		if (destroyed) {
+			if (mf.get_overlay_terrain()->has_flag(tile_flag::tree)) {
+				mf.Flags &= ~(tile_flag::tree | tile_flag::impassable);
+				mf.Flags |= tile_flag::stumps;
+				map_layer->destroyed_tree_tiles.push_back(pos);
+			} else {
+				if (mf.get_overlay_terrain()->has_flag(tile_flag::rock)) {
+					mf.Flags &= ~(tile_flag::rock | tile_flag::impassable);
+					mf.Flags |= tile_flag::gravel;
+				} else if (mf.get_overlay_terrain()->has_flag(tile_flag::wall)) {
+					mf.Flags &= ~(tile_flag::wall | tile_flag::impassable);
+					mf.Flags |= tile_flag::gravel;
+					if (mf.has_flag(tile_flag::underground)) {
+						mf.Flags &= ~(tile_flag::air_impassable);
+					}
+				}
+
+				map_layer->destroyed_overlay_terrain_tiles.push_back(pos);
+			}
+
+			mf.set_value(0);
 		} else {
-			if (mf.get_overlay_terrain()->has_flag(tile_flag::rock)) {
-				mf.Flags &= ~(tile_flag::rock | tile_flag::impassable);
-				mf.Flags |= tile_flag::gravel;
-			} else if (mf.get_overlay_terrain()->has_flag(tile_flag::wall)) {
-				mf.Flags &= ~(tile_flag::wall | tile_flag::impassable);
-				mf.Flags |= tile_flag::gravel;
-				if (mf.has_flag(tile_flag::underground)) {
-					mf.Flags &= ~(tile_flag::air_impassable);
-				}
+			if (mf.has_flag(tile_flag::stumps)) { //if is a cleared tree tile regrowing trees
+				mf.Flags &= ~(tile_flag::stumps);
+				mf.Flags |= tile_flag::tree | tile_flag::impassable;
+				mf.set_value(mf.get_overlay_terrain()->get_resource()->get_default_amount());
 			}
-
-			map_layer->destroyed_overlay_terrain_tiles.push_back(pos);
 		}
 
-		mf.set_value(0);
-	} else {
-		if (mf.has_flag(tile_flag::stumps)) { //if is a cleared tree tile regrowing trees
-			mf.Flags &= ~(tile_flag::stumps);
-			mf.Flags |= tile_flag::tree | tile_flag::impassable;
-			mf.set_value(mf.get_overlay_terrain()->get_resource()->get_default_amount());
+		if (destroyed) {
+			if (mf.get_overlay_terrain()->get_destroyed_tiles().size() > 0) {
+				mf.OverlaySolidTile = mf.get_overlay_terrain()->get_destroyed_tiles()[SyncRand(mf.get_overlay_terrain()->get_destroyed_tiles().size())];
+			}
+		} else {
+			this->calculate_tile_solid_tile(pos, true, z);
 		}
-	}
-	
-	if (destroyed) {
-		if (mf.get_overlay_terrain()->get_destroyed_tiles().size() > 0) {
-			mf.OverlaySolidTile = mf.get_overlay_terrain()->get_destroyed_tiles()[SyncRand(mf.get_overlay_terrain()->get_destroyed_tiles().size())];
-		}
-	} else {
-		this->calculate_tile_solid_tile(pos, true, z);
-	}
 
-	this->CalculateTileTransitions(pos, true, z);
-	
-	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		MarkSeenTile(mf);
-	}
-	UI.get_minimap()->UpdateXY(pos, z);
-	
-	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
-					
-					if (adjacent_mf.get_overlay_terrain() != mf.get_overlay_terrain()) {
-						continue;
+		this->CalculateTileTransitions(pos, true, z);
+
+		if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+			MarkSeenTile(mf);
+		}
+		UI.get_minimap()->UpdateXY(pos, z);
+
+		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+				if (x_offset != 0 || y_offset != 0) {
+					const QPoint adjacent_pos(pos.x() + x_offset, pos.y() + y_offset);
+					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+						tile &adjacent_mf = *this->Field(adjacent_pos, z);
+
+						if (adjacent_mf.get_overlay_terrain() != mf.get_overlay_terrain()) {
+							continue;
+						}
+
+						this->CalculateTileTransitions(adjacent_pos, true, z);
+
+						if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+							MarkSeenTile(adjacent_mf);
+						}
+						UI.get_minimap()->UpdateXY(adjacent_pos, z);
 					}
-					
-					this->CalculateTileTransitions(adjacent_pos, true, z);
-					
-					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-						MarkSeenTile(adjacent_mf);
-					}
-					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 				}
 			}
 		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error setting the overlay terrain of tile " + point::to_string(pos) + ", map layer " + std::to_string(z) + " to " + (destroyed ? "" : "not") + " destroyed."));
 	}
 }
 
-void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
+void CMap::SetOverlayTerrainDamaged(const QPoint &pos, const bool damaged, const int z)
 {
-	wyrmgus::tile &mf = *this->Field(pos, z);
-	
-	if (mf.get_overlay_terrain() == nullptr || mf.OverlayTerrainDamaged == damaged) {
-		return;
-	}
-	
-	mf.SetOverlayTerrainDamaged(damaged);
-	
-	if (damaged) {
-		if (mf.get_overlay_terrain()->get_damaged_tiles().size() > 0) {
-			mf.OverlaySolidTile = mf.get_overlay_terrain()->get_damaged_tiles()[SyncRand(mf.get_overlay_terrain()->get_damaged_tiles().size())];
-		}
-	} else {
-		this->calculate_tile_solid_tile(pos, true, z);
-	}
+	try {
+		tile &mf = *this->Field(pos, z);
 
-	this->CalculateTileTransitions(pos, true, z);
-	
-	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		MarkSeenTile(mf);
+		if (mf.get_overlay_terrain() == nullptr || mf.OverlayTerrainDamaged == damaged) {
+			return;
+		}
+
+		mf.SetOverlayTerrainDamaged(damaged);
+
+		if (damaged) {
+			if (mf.get_overlay_terrain()->get_damaged_tiles().size() > 0) {
+				mf.OverlaySolidTile = mf.get_overlay_terrain()->get_damaged_tiles()[SyncRand(mf.get_overlay_terrain()->get_damaged_tiles().size())];
+			}
+		} else {
+			this->calculate_tile_solid_tile(pos, true, z);
+		}
+
+		this->CalculateTileTransitions(pos, true, z);
+
+		if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+			MarkSeenTile(mf);
+		}
+		UI.get_minimap()->UpdateXY(pos, z);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error setting the overlay terrain of tile " + point::to_string(pos) + ", map layer " + std::to_string(z) + " to " + (damaged ? "" : "not") + " damaged."));
 	}
-	UI.get_minimap()->UpdateXY(pos, z);
 }
 
-static wyrmgus::tile_transition_type GetTransitionType(std::vector<int> &adjacent_directions, bool allow_single = false)
+static tile_transition_type GetTransitionType(std::vector<int> &adjacent_directions, const bool allow_single = false)
 {
 	if (adjacent_directions.size() == 0) {
-		return wyrmgus::tile_transition_type::none;
+		return tile_transition_type::none;
 	}
 	
-	wyrmgus::tile_transition_type transition_type = wyrmgus::tile_transition_type::none;
+	tile_transition_type transition_type = tile_transition_type::none;
 
-	if (allow_single && wyrmgus::vector::contains(adjacent_directions, North) && wyrmgus::vector::contains(adjacent_directions, South) && wyrmgus::vector::contains(adjacent_directions, West) && wyrmgus::vector::contains(adjacent_directions, East)) {
-		transition_type = wyrmgus::tile_transition_type::single;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, West) && wyrmgus::vector::contains(adjacent_directions, East)) {
-		transition_type = wyrmgus::tile_transition_type::north_single;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, South) && wyrmgus::vector::contains(adjacent_directions, West) && wyrmgus::vector::contains(adjacent_directions, East)) {
-		transition_type = wyrmgus::tile_transition_type::south_single;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, North) && wyrmgus::vector::contains(adjacent_directions, South) && wyrmgus::vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::west_single;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, North) && wyrmgus::vector::contains(adjacent_directions, South) && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, East)) {
-		transition_type = wyrmgus::tile_transition_type::east_single;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, North) && wyrmgus::vector::contains(adjacent_directions, South) && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::north_south;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, West) && wyrmgus::vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::west_east;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southwest) && wyrmgus::vector::contains(adjacent_directions, Southeast)) {
-		transition_type = wyrmgus::tile_transition_type::north_southwest_inner_southeast_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southwest)) {
-		transition_type = wyrmgus::tile_transition_type::north_southwest_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southeast)) {
-		transition_type = wyrmgus::tile_transition_type::north_southeast_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, South) && wyrmgus::vector::contains(adjacent_directions, Northwest) && wyrmgus::vector::contains(adjacent_directions, Northeast)) {
-		transition_type = wyrmgus::tile_transition_type::south_northwest_inner_northeast_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, South) && wyrmgus::vector::contains(adjacent_directions, Northwest)) {
-		transition_type = wyrmgus::tile_transition_type::south_northwest_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, South) && wyrmgus::vector::contains(adjacent_directions, Northeast)) {
-		transition_type = wyrmgus::tile_transition_type::south_northeast_inner;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Northeast) && wyrmgus::vector::contains(adjacent_directions, Southeast)) {
-		transition_type = wyrmgus::tile_transition_type::west_northeast_inner_southeast_inner;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Northeast)) {
-		transition_type = wyrmgus::tile_transition_type::west_northeast_inner;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southeast)) {
-		transition_type = wyrmgus::tile_transition_type::west_southeast_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Northwest) && wyrmgus::vector::contains(adjacent_directions, Southwest)) {
-		transition_type = wyrmgus::tile_transition_type::east_northwest_inner_southwest_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Northwest)) {
-		transition_type = wyrmgus::tile_transition_type::east_northwest_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southwest)) {
-		transition_type = wyrmgus::tile_transition_type::east_southwest_inner;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southeast)) {
-		transition_type = wyrmgus::tile_transition_type::northwest_outer_southeast_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, East) && wyrmgus::vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southwest)) {
-		transition_type = wyrmgus::tile_transition_type::northeast_outer_southwest_inner;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, South) && wyrmgus::vector::contains(adjacent_directions, Northeast)) {
-		transition_type = wyrmgus::tile_transition_type::southwest_outer_northeast_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, South) && wyrmgus::vector::contains(adjacent_directions, Northwest)) {
-		transition_type = wyrmgus::tile_transition_type::southeast_outer_northwest_inner;
-	} else if (wyrmgus::vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::north;
-	} else if (wyrmgus::vector::contains(adjacent_directions, South) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::south;
-	} else if (wyrmgus::vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::west;
-	} else if (wyrmgus::vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::east;
-	} else if ((wyrmgus::vector::contains(adjacent_directions, North) || wyrmgus::vector::contains(adjacent_directions, West)) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northwest_outer;
-	} else if ((wyrmgus::vector::contains(adjacent_directions, North) || wyrmgus::vector::contains(adjacent_directions, East)) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northeast_outer;
-	} else if ((wyrmgus::vector::contains(adjacent_directions, South) || wyrmgus::vector::contains(adjacent_directions, West)) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::southwest_outer;
-	} else if ((wyrmgus::vector::contains(adjacent_directions, South) || wyrmgus::vector::contains(adjacent_directions, East)) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::southeast_outer;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, Northwest) && wyrmgus::vector::contains(adjacent_directions, Southeast) && wyrmgus::vector::contains(adjacent_directions, Northeast) && wyrmgus::vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northwest_northeast_southwest_southeast_inner;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Northeast) && wyrmgus::vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northwest_northeast_southwest_inner;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, Northwest) && wyrmgus::vector::contains(adjacent_directions, Southeast) && wyrmgus::vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northwest_northeast_southeast_inner;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, Northwest) && wyrmgus::vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northwest_southwest_southeast_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southeast) && wyrmgus::vector::contains(adjacent_directions, Northeast) && wyrmgus::vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northeast_southwest_southeast_inner;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northwest_northeast_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::southwest_southeast_inner;
-	} else if (allow_single && wyrmgus::vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northwest_southwest_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && wyrmgus::vector::contains(adjacent_directions, Southeast) && wyrmgus::vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northeast_southeast_inner;
-	} else if (wyrmgus::vector::contains(adjacent_directions, Northwest) && wyrmgus::vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northwest_southeast_inner;
-	} else if (wyrmgus::vector::contains(adjacent_directions, Northeast) && wyrmgus::vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northeast_southwest_inner;
-	} else if (wyrmgus::vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northwest_inner;
-	} else if (wyrmgus::vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::northeast_inner;
-	} else if (wyrmgus::vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::southwest_inner;
-	} else if (wyrmgus::vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
-		transition_type = wyrmgus::tile_transition_type::southeast_inner;
+	if (allow_single && vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East)) {
+		transition_type = tile_transition_type::single;
+	} else if (allow_single && vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East)) {
+		transition_type = tile_transition_type::north_single;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East)) {
+		transition_type = tile_transition_type::south_single;
+	} else if (allow_single && vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::west_single;
+	} else if (allow_single && vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && vector::contains(adjacent_directions, East)) {
+		transition_type = tile_transition_type::east_single;
+	} else if (allow_single && vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::north_south;
+	} else if (allow_single && vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::west_east;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Southwest) && vector::contains(adjacent_directions, Southeast)) {
+		transition_type = tile_transition_type::north_southwest_inner_southeast_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Southwest)) {
+		transition_type = tile_transition_type::north_southwest_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Southeast)) {
+		transition_type = tile_transition_type::north_southeast_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Northeast)) {
+		transition_type = tile_transition_type::south_northwest_inner_northeast_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northwest)) {
+		transition_type = tile_transition_type::south_northwest_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northeast)) {
+		transition_type = tile_transition_type::south_northeast_inner;
+	} else if (allow_single && vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Northeast) && vector::contains(adjacent_directions, Southeast)) {
+		transition_type = tile_transition_type::west_northeast_inner_southeast_inner;
+	} else if (allow_single && vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Northeast)) {
+		transition_type = tile_transition_type::west_northeast_inner;
+	} else if (allow_single && vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Southeast)) {
+		transition_type = tile_transition_type::west_southeast_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Southwest)) {
+		transition_type = tile_transition_type::east_northwest_inner_southwest_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Northwest)) {
+		transition_type = tile_transition_type::east_northwest_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Southwest)) {
+		transition_type = tile_transition_type::east_southwest_inner;
+	} else if (allow_single && vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Southeast)) {
+		transition_type = tile_transition_type::northwest_outer_southeast_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && vector::contains(adjacent_directions, East) && vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && vector::contains(adjacent_directions, Southwest)) {
+		transition_type = tile_transition_type::northeast_outer_southwest_inner;
+	} else if (allow_single && vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northeast)) {
+		transition_type = tile_transition_type::southwest_outer_northeast_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northwest)) {
+		transition_type = tile_transition_type::southeast_outer_northwest_inner;
+	} else if (vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::north;
+	} else if (vector::contains(adjacent_directions, South) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::south;
+	} else if (vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::west;
+	} else if (vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::east;
+	} else if ((vector::contains(adjacent_directions, North) || vector::contains(adjacent_directions, West)) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northwest_outer;
+	} else if ((vector::contains(adjacent_directions, North) || vector::contains(adjacent_directions, East)) && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northeast_outer;
+	} else if ((vector::contains(adjacent_directions, South) || vector::contains(adjacent_directions, West)) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::southwest_outer;
+	} else if ((vector::contains(adjacent_directions, South) || vector::contains(adjacent_directions, East)) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::southeast_outer;
+	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Southeast) && vector::contains(adjacent_directions, Northeast) && vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northwest_northeast_southwest_southeast_inner;
+	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && vector::contains(adjacent_directions, Northeast) && vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northwest_northeast_southwest_inner;
+	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Southeast) && vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northwest_northeast_southeast_inner;
+	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northwest_southwest_southeast_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && vector::contains(adjacent_directions, Southeast) && vector::contains(adjacent_directions, Northeast) && vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northeast_southwest_southeast_inner;
+	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northwest_northeast_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::southwest_southeast_inner;
+	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northwest_southwest_inner;
+	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && vector::contains(adjacent_directions, Southeast) && vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northeast_southeast_inner;
+	} else if (vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northwest_southeast_inner;
+	} else if (vector::contains(adjacent_directions, Northeast) && vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northeast_southwest_inner;
+	} else if (vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northwest_inner;
+	} else if (vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::northeast_inner;
+	} else if (vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::southwest_inner;
+	} else if (vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), North) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), South) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), West) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), East) == adjacent_directions.end()) {
+		transition_type = tile_transition_type::southeast_inner;
 	}
 
 	return transition_type;
@@ -2410,9 +2426,9 @@ static wyrmgus::tile_transition_type GetTransitionType(std::vector<int> &adjacen
 
 void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, const int z)
 {
-	wyrmgus::tile *tile = this->Field(pos, z);
+	tile *tile = this->Field(pos, z);
 
-	const wyrmgus::terrain_type *terrain_type = nullptr;
+	const terrain_type *terrain_type = nullptr;
 	int solid_tile = 0;
 
 	if (overlay) {
@@ -2422,7 +2438,7 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 	}
 
 	if (terrain_type == nullptr) {
-		throw std::runtime_error("Failed to calculate solid tile for tile " + wyrmgus::point::to_string(pos) + ", map layer " + std::to_string(z) + ": " + (overlay ? "overlay " : "") + "terrain is null.");
+		throw std::runtime_error("Failed to calculate solid tile for tile " + point::to_string(pos) + ", map layer " + std::to_string(z) + ": " + (overlay ? "overlay " : "") + "terrain is null.");
 	}
 
 	if (terrain_type->has_tiled_background()) {
@@ -2445,8 +2461,8 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 
 void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 {
-	wyrmgus::tile &mf = *this->Field(pos, z);
-	const wyrmgus::terrain_type *terrain = nullptr;
+	tile &mf = *this->Field(pos, z);
+	const terrain_type *terrain = nullptr;
 	if (overlay) {
 		terrain = mf.get_overlay_terrain();
 		mf.OverlayTransitionTiles.clear();
@@ -2466,16 +2482,16 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					const wyrmgus::terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
+					const terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
 						adjacent_terrain = nullptr;
 					}
 					if (adjacent_terrain && terrain != adjacent_terrain) {
-						if (wyrmgus::vector::contains(terrain->get_inner_border_terrain_types(), adjacent_terrain)) {
+						if (vector::contains(terrain->get_inner_border_terrain_types(), adjacent_terrain)) {
 							adjacent_terrain_directions[adjacent_terrain->ID].push_back(GetDirectionFromOffset(x_offset, y_offset));
 						} else if (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), adjacent_terrain) == terrain->BorderTerrains.end()) { //if the two terrain types can't border, look for a third terrain type which can border both, and which treats both as outer border terrains, and then use for transitions between both tiles
-							for (const wyrmgus::terrain_type *border_terrain : terrain->BorderTerrains) {
-								if (wyrmgus::vector::contains(terrain->get_inner_border_terrain_types(), border_terrain) && wyrmgus::vector::contains(adjacent_terrain->get_inner_border_terrain_types(), border_terrain)) {
+							for (const terrain_type *border_terrain : terrain->BorderTerrains) {
+								if (vector::contains(terrain->get_inner_border_terrain_types(), border_terrain) && vector::contains(adjacent_terrain->get_inner_border_terrain_types(), border_terrain)) {
 									adjacent_terrain_directions[border_terrain->ID].push_back(GetDirectionFromOffset(x_offset, y_offset));
 									break;
 								}
@@ -2483,7 +2499,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 						}
 					}
 					if (!adjacent_terrain || (overlay && terrain != adjacent_terrain && std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), adjacent_terrain) == terrain->BorderTerrains.end())) { // happens if terrain is null or if it is an overlay tile which doesn't have a border with this one, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
-						adjacent_terrain_directions[wyrmgus::terrain_type::get_all().size()].push_back(GetDirectionFromOffset(x_offset, y_offset));
+						adjacent_terrain_directions[terrain_type::get_all().size()].push_back(GetDirectionFromOffset(x_offset, y_offset));
 					}
 				}
 			}
@@ -2492,27 +2508,27 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 	
 	for (std::map<int, std::vector<int>>::iterator iterator = adjacent_terrain_directions.begin(); iterator != adjacent_terrain_directions.end(); ++iterator) {
 		int adjacent_terrain_id = iterator->first;
-		wyrmgus::terrain_type *adjacent_terrain = adjacent_terrain_id < (int) wyrmgus::terrain_type::get_all().size() ? wyrmgus::terrain_type::get_all()[adjacent_terrain_id] : nullptr;
-		const wyrmgus::tile_transition_type transition_type = GetTransitionType(iterator->second, terrain->allows_single());
+		terrain_type *adjacent_terrain = adjacent_terrain_id < (int) terrain_type::get_all().size() ? terrain_type::get_all()[adjacent_terrain_id] : nullptr;
+		const tile_transition_type transition_type = GetTransitionType(iterator->second, terrain->allows_single());
 		
-		if (transition_type != wyrmgus::tile_transition_type::none) {
+		if (transition_type != tile_transition_type::none) {
 			bool found_transition = false;
 			
 			if (!overlay) {
 				if (adjacent_terrain != nullptr) {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(adjacent_terrain, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.TransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.TransitionTiles.push_back(std::pair<const terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
 						found_transition = true;
 					} else {
 						const std::vector<int> &adjacent_transition_tiles = adjacent_terrain->get_adjacent_transition_tiles(terrain, transition_type);
 						if (!adjacent_transition_tiles.empty()) {
-							mf.TransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
+							mf.TransitionTiles.push_back(std::pair<const terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
 							found_transition = true;
 						} else {
 							const std::vector<int> &sub_adjacent_transition_tiles = adjacent_terrain->get_adjacent_transition_tiles(nullptr, transition_type);
 							if (!sub_adjacent_transition_tiles.empty()) {
-								mf.TransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(adjacent_terrain, wyrmgus::vector::get_random(sub_adjacent_transition_tiles)));
+								mf.TransitionTiles.push_back(std::pair<terrain_type *, int>(adjacent_terrain, vector::get_random(sub_adjacent_transition_tiles)));
 								found_transition = true;
 							}
 						}
@@ -2520,24 +2536,24 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				} else {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(nullptr, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.TransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.TransitionTiles.push_back(std::pair<const terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
 					}
 				}
 			} else {
 				if (adjacent_terrain != nullptr) {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(adjacent_terrain, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.OverlayTransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.OverlayTransitionTiles.push_back(std::pair<const terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
 						found_transition = true;
 					} else {
 						const std::vector<int> &adjacent_transition_tiles = adjacent_terrain->get_transition_tiles(terrain, transition_type);
 						if (!adjacent_transition_tiles.empty()) {
-							mf.OverlayTransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
+							mf.OverlayTransitionTiles.push_back(std::pair<const terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
 							found_transition = true;
 						} else {
 							const std::vector<int> &sub_adjacent_transition_tiles = adjacent_terrain->get_transition_tiles(nullptr, transition_type);
 							if (!sub_adjacent_transition_tiles.empty()) {
-								mf.OverlayTransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(adjacent_terrain, wyrmgus::vector::get_random(sub_adjacent_transition_tiles)));
+								mf.OverlayTransitionTiles.push_back(std::pair<const terrain_type *, int>(adjacent_terrain, vector::get_random(sub_adjacent_transition_tiles)));
 								found_transition = true;
 							}
 						}
@@ -2545,7 +2561,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				} else {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(nullptr, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.OverlayTransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.OverlayTransitionTiles.push_back(std::pair<const terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
 					}
 				}
 				
