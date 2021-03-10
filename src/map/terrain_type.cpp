@@ -326,6 +326,7 @@ void terrain_type::initialize()
 {
 	if (!this->get_image_file().empty() && this->graphics == nullptr) {
 		this->graphics = CPlayerColorGraphic::New(this->get_image_file().string(), defines::get()->get_tile_size(), nullptr);
+		this->graphics->set_store_scaled_image(true);
 	}
 
 	if (!this->get_transition_image_file().empty() && this->transition_graphics == nullptr) {
