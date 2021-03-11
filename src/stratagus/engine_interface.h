@@ -58,7 +58,7 @@ public:
 
 	std::future<void> async(const std::function<void()> &function)
 	{
-		std::shared_ptr<std::promise<void>> promise = std::make_unique<std::promise<void>>();;
+		std::shared_ptr<std::promise<void>> promise = std::make_unique<std::promise<void>>();
 		std::future<void> future = promise->get_future();
 
 		this->post([promise, function]() {
@@ -71,6 +71,11 @@ public:
 
 	void sync(const std::function<void()> &function)
 	{
+		if (this->is_waiting_for_interface()) {
+			function();
+			return;
+		}
+
 		//post an action, and then wait for it to be completed
 		std::future<void> future = this->async(function);
 		future.wait();
@@ -104,6 +109,31 @@ public:
 
 	Q_INVOKABLE void exit();
 
+	std::future<void> get_map_view_created_future()
+	{
+		return this->map_view_created_promise.get_future();
+	}
+
+	Q_INVOKABLE inline void on_map_view_created()
+	{
+		this->map_view_created_promise.set_value();
+	}
+
+	void reset_map_view_created_promise()
+	{
+		this->map_view_created_promise = std::promise<void>();
+	}
+
+	bool is_waiting_for_interface() const
+	{
+		return this->waiting_for_interface;
+	}
+
+	void set_waiting_for_interface(const bool value)
+	{
+		this->waiting_for_interface = value;
+	}
+
 signals:
 	void running_changed();
 
@@ -111,6 +141,8 @@ private:
 	std::queue<std::function<void()>> posted_commands;
 	std::mutex command_mutex;
 	bool running = false;
+	std::promise<void> map_view_created_promise;
+	std::atomic<bool> waiting_for_interface = false;
 };
 
 }

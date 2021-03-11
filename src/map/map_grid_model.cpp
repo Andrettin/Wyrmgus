@@ -100,31 +100,30 @@ void map_grid_model::set_map_layer(const size_t z)
 
 	this->tile_data_list.clear();
 
-	engine_interface::get()->sync([this]() {
-		const CMapLayer *map_layer = CMap::get()->MapLayers[this->get_map_layer()].get();
-		for (int y = 0; y < map_layer->get_height(); ++y) {
-			for (int x = 0; x < map_layer->get_width(); ++x) {
-				const tile *tile = map_layer->Field(x, y);
+	//the game loop thread will be waiting while the map view is created, so it is safe to access map data here
+	const CMapLayer *map_layer = CMap::get()->MapLayers[this->get_map_layer()].get();
+	for (int y = 0; y < map_layer->get_height(); ++y) {
+		for (int x = 0; x < map_layer->get_width(); ++x) {
+			const tile *tile = map_layer->Field(x, y);
 
-				tile_data tile_data;
+			tile_data tile_data;
 
-				tile_data.image_source = QString::fromStdString(tile->get_terrain()->get_identifier()) + "/" + QString::number(tile->SolidTile);
-				if (tile->get_overlay_terrain() != nullptr) {
-					tile_data.overlay_image_source = QString::fromStdString(tile->get_overlay_terrain()->get_identifier()) + "/" + QString::number(tile->OverlaySolidTile);
-				}
-
-				for (const auto &[terrain_type, tile_frame] : tile->TransitionTiles) {
-					tile_data.transition_image_sources.push_back(QString::fromStdString(terrain_type->get_identifier()) + "/" + QString::number(tile_frame));
-				}
-
-				for (const auto &[terrain_type, tile_frame] : tile->OverlayTransitionTiles) {
-					tile_data.overlay_transition_image_sources.push_back(QString::fromStdString(terrain_type->get_identifier()) + "/" + QString::number(tile_frame));
-				}
-
-				this->tile_data_list.push_back(std::move(tile_data));
+			tile_data.image_source = QString::fromStdString(tile->get_terrain()->get_identifier()) + "/" + QString::number(tile->SolidTile);
+			if (tile->get_overlay_terrain() != nullptr) {
+				tile_data.overlay_image_source = QString::fromStdString(tile->get_overlay_terrain()->get_identifier()) + "/" + QString::number(tile->OverlaySolidTile);
 			}
+
+			for (const auto &[terrain_type, tile_frame] : tile->TransitionTiles) {
+				tile_data.transition_image_sources.push_back(QString::fromStdString(terrain_type->get_identifier()) + "/" + QString::number(tile_frame));
+			}
+
+			for (const auto &[terrain_type, tile_frame] : tile->OverlayTransitionTiles) {
+				tile_data.overlay_transition_image_sources.push_back(QString::fromStdString(terrain_type->get_identifier()) + "/" + QString::number(tile_frame));
+			}
+
+			this->tile_data_list.push_back(std::move(tile_data));
 		}
-	});
+	}
 
 	emit map_layer_changed();
 }

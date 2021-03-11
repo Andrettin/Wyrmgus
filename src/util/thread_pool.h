@@ -45,7 +45,7 @@ public:
 
 	std::future<void> async(const std::function<void()> &function)
 	{
-		std::shared_ptr<std::promise<void>> promise = std::make_unique<std::promise<void>>();;
+		std::shared_ptr<std::promise<void>> promise = std::make_unique<std::promise<void>>();
 		std::future<void> future = promise->get_future();
 
 		this->post([promise, function]() {
