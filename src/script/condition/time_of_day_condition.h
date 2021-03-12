@@ -45,7 +45,7 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
-		return CMap::Map.MapLayers[player->StartMapLayer]->get_tile_time_of_day(player->StartPos) == this->time_of_day;
+		return CMap::get()->MapLayers[player->StartMapLayer]->get_tile_time_of_day(player->StartPos) == this->time_of_day;
 	}
 
 	virtual bool check(const CUnit *unit, const bool ignore_units) const override

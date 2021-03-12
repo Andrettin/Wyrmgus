@@ -58,11 +58,11 @@ int Spell_Teleport::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit * /*t
 	Q_UNUSED(modifier)
 	Q_UNUSED(spell)
 
-	if (CMap::Map.Info.IsPointOnMap(goalPos, z)) {
+	if (CMap::get()->Info.IsPointOnMap(goalPos, z)) {
 		unsigned int selected = caster.Selected;
 		caster.Remove(nullptr);
 		caster.tilePos = goalPos;
-		caster.MapLayer = CMap::Map.MapLayers[z].get();
+		caster.MapLayer = CMap::get()->MapLayers[z].get();
 		DropOutNearest(caster, goalPos, nullptr);
 		if (selected) {
 			SelectUnit(caster);

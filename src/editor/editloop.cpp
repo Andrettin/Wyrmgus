@@ -2446,10 +2446,10 @@ void CEditor::Init()
 	//Wyrmgus start
 	}
 	if (CurrentMapPath.empty()) {
-		CreateGame("", &CMap::Map, IsMod);
+		CreateGame("", CMap::get(), IsMod);
 	//Wyrmgus end
 	} else {
-		CreateGame(CurrentMapPath, &CMap::Map, IsMod);
+		CreateGame(CurrentMapPath, CMap::get(), IsMod);
 	}
 
 	ReplayRevealMap = 1;
@@ -2565,8 +2565,8 @@ int EditorSaveMap(const std::string &file, bool is_mod)
 		}
 	}
 	
-//	if (SaveStratagusMap(fullName, CMap::Map, Editor.TerrainEditable) == -1) {
-	if (SaveStratagusMap(fullName, CMap::Map, Editor.TerrainEditable && !is_mod, is_mod) == -1) {
+//	if (SaveStratagusMap(fullName, *CMap::get(), Editor.TerrainEditable) == -1) {
+	if (SaveStratagusMap(fullName, *CMap::get(), Editor.TerrainEditable && !is_mod, is_mod) == -1) {
 	//Wyrmgus end
 		fprintf(stderr, "Cannot save map\n");
 		return -1;

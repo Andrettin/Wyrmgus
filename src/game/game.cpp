@@ -365,7 +365,7 @@ void StartMap(const std::string &filename, bool clean)
 		//Wyrmgus start
 		GameEstablishing = true;
 		//Wyrmgus end
-		CreateGame(filename, &CMap::Map);
+		CreateGame(filename, CMap::get());
 
 		//Wyrmgus start
 	//	UI.StatusLine.Set(NameLine);

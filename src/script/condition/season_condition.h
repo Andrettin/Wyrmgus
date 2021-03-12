@@ -47,7 +47,7 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
-		return CMap::Map.MapLayers[player->StartMapLayer]->get_tile_season(player->StartPos) == this->season;
+		return CMap::get()->MapLayers[player->StartMapLayer]->get_tile_season(player->StartPos) == this->season;
 	}
 
 	virtual bool check(const CUnit *unit, const bool ignore_units) const override

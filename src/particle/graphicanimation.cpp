@@ -79,13 +79,13 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int 
 	PixelSize graphicSize(g->Width, g->Height);
 	PixelDiff margin(wyrmgus::defines::get()->get_tile_width() - 1, wyrmgus::defines::get()->get_tile_height() - 1);
 	PixelPos position(pos.x, pos.y);
-	Vec2i minPos = CMap::Map.map_pixel_pos_to_tile_pos(position);
-	Vec2i maxPos = CMap::Map.map_pixel_pos_to_tile_pos(position + graphicSize + margin);
+	Vec2i minPos = CMap::get()->map_pixel_pos_to_tile_pos(position);
+	Vec2i maxPos = CMap::get()->map_pixel_pos_to_tile_pos(position + graphicSize + margin);
 	//Wyrmgus start
-//	CMap::Map.Clamp(minPos);
-//	CMap::Map.Clamp(maxPos);
-	CMap::Map.Clamp(minPos, z);
-	CMap::Map.Clamp(maxPos, z);
+//	CMap::get()->Clamp(minPos);
+//	CMap::get()->Clamp(maxPos);
+	CMap::get()->Clamp(minPos, z);
+	CMap::get()->Clamp(maxPos, z);
 	//Wyrmgus end
 
 	if (!vp.AnyMapAreaVisibleInViewport(minPos, maxPos)) {
@@ -96,8 +96,8 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int 
 	for (p.x = minPos.x; p.x <= maxPos.x; ++p.x) {
 		for (p.y = minPos.y; p.y <= maxPos.y; ++p.y) {
 			//Wyrmgus start
-//			if (ReplayRevealMap || CMap::Map.Field(p)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			if (ReplayRevealMap || CMap::Map.Field(p, z)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+//			if (ReplayRevealMap || CMap::get()->Field(p)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+			if (ReplayRevealMap || CMap::get()->Field(p, z)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			//Wyrmgus end
 				return true;
 			}

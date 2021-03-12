@@ -95,9 +95,9 @@ int Spell_AreaBombardment::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, 
 			// find new destination in the map
 			dpos.x = goalPos.x + SyncRand(5) - 2;
 			dpos.y = goalPos.y + SyncRand(5) - 2;
-		} while (!CMap::Map.Info.IsPointOnMap(dpos, z));
+		} while (!CMap::get()->Info.IsPointOnMap(dpos, z));
 
-		const PixelPos dest = CMap::Map.tile_pos_to_map_pixel_pos_center(dpos);
+		const PixelPos dest = CMap::get()->tile_pos_to_map_pixel_pos_center(dpos);
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
 			::Missile *mis = MakeMissile(*missile, start, dest, z);

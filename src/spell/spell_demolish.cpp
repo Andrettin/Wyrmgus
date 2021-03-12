@@ -111,8 +111,8 @@ int Spell_Demolish::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, const V
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	CMap::Map.FixSelectionArea(minpos, maxpos);
-	CMap::Map.FixSelectionArea(minpos, maxpos, z);
+//	CMap::get()->FixSelectionArea(minpos, maxpos);
+	CMap::get()->FixSelectionArea(minpos, maxpos, z);
 	//Wyrmgus end
 
 	//
@@ -143,8 +143,8 @@ int Spell_Demolish::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, const V
 		for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 			for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 				//Wyrmgus start
-//				const wyrmgus::tile &mf = *CMap::Map.Field(ipos);
-				const wyrmgus::tile &mf = *CMap::Map.Field(ipos, z);
+//				const wyrmgus::tile &mf = *CMap::get()->Field(ipos);
+				const wyrmgus::tile &mf = *CMap::get()->Field(ipos, z);
 				//Wyrmgus end
 				//Wyrmgus start
 //				if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {
@@ -154,8 +154,8 @@ int Spell_Demolish::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, const V
 					continue;
 				} else if (mf.RockOnMap() || mf.ForestOnMap() || mf.isAWall()) {
 					//Wyrmgus start
-//					CMap::Map.ClearOverlayTile(ipos);
-					CMap::Map.ClearOverlayTile(ipos, z);
+//					CMap::get()->ClearOverlayTile(ipos);
+					CMap::get()->ClearOverlayTile(ipos, z);
 					//Wyrmgus end
 				}
 			}

@@ -572,7 +572,7 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 			autocast->PositionAutoCast->pushIntegers(array);
 			autocast->PositionAutoCast->run(2);
 			Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
-			if (CMap::Map.Info.IsPointOnMap(resPos, map_layer)) {
+			if (CMap::get()->Info.IsPointOnMap(resPos, map_layer)) {
 				return std::make_unique<Target>(wyrmgus::spell_target_type::position, nullptr, resPos, map_layer->ID);
 			}
 		}

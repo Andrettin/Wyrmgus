@@ -64,11 +64,11 @@ struct LandMineTargetFinder {
 */
 void MissileLandMine::Action()
 {
-	const Vec2i pos = CMap::Map.map_pixel_pos_to_tile_pos(this->position);
+	const Vec2i pos = CMap::get()->map_pixel_pos_to_tile_pos(this->position);
 
 	//Wyrmgus start
-//	if (LandMineTargetFinder(this->get_source_unit(), this->Type->CanHitOwner).FindOnTile(CMap::Map.Field(pos)) != nullptr) {
-	if (LandMineTargetFinder(this->get_source_unit(), this->Type->CanHitOwner).FindOnTile(CMap::Map.Field(pos, this->MapLayer)) != nullptr) {
+//	if (LandMineTargetFinder(this->get_source_unit(), this->Type->CanHitOwner).FindOnTile(CMap::get()->Field(pos)) != nullptr) {
+	if (LandMineTargetFinder(this->get_source_unit(), this->Type->CanHitOwner).FindOnTile(CMap::get()->Field(pos, this->MapLayer)) != nullptr) {
 	//Wyrmgus end
 		DebugPrint("Landmine explosion at %d,%d.\n" _C_ pos.x _C_ pos.y);
 		this->MissileHit();

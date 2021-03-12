@@ -340,8 +340,8 @@ template <bool circle, typename Pred>
 inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z, Pred pred)
 //Wyrmgus end
 {
-	Assert(CMap::Map.Info.IsPointOnMap(ltPos, z));
-	Assert(CMap::Map.Info.IsPointOnMap(rbPos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(ltPos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(rbPos, z));
 	Assert(units.empty());
 	
 	wyrmgus::decimillesimal_int middle_x;
@@ -365,7 +365,7 @@ inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUni
 				}
 			}
 
-			const CUnitCache &cache = CMap::Map.get_tile_unit_cache(posIt, z);
+			const CUnitCache &cache = CMap::get()->get_tile_unit_cache(posIt, z);
 
 			for (CUnit *unit : cache) {
 				if (unit->CacheLock == 0 && pred(unit)) {
@@ -405,9 +405,9 @@ inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> 
 	Vec2i maxPos = rbPos;
 
 	//Wyrmgus start
-//	CMap::Map.FixSelectionArea(minPos, maxPos);
+//	CMap::get()->FixSelectionArea(minPos, maxPos);
 //	SelectFixed(minPos, maxPos, units, pred);
-	CMap::Map.FixSelectionArea(minPos, maxPos, z);
+	CMap::get()->FixSelectionArea(minPos, maxPos, z);
 	SelectFixed<circle>(minPos, maxPos, units, z, pred);
 	//Wyrmgus end
 }
@@ -448,12 +448,12 @@ inline void SelectAroundUnit(const CUnit &unit, const int range, std::vector<CUn
 template <typename Pred>
 CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(ltPos, z));
-	Assert(CMap::Map.Info.IsPointOnMap(rbPos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(ltPos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(rbPos, z));
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
-			const CUnitCache &cache = CMap::Map.get_tile_unit_cache(posIt, z);
+			const CUnitCache &cache = CMap::get()->get_tile_unit_cache(posIt, z);
 
 			CUnitCache::const_iterator it = std::find_if(cache.begin(), cache.end(), pred);
 			if (it != cache.end()) {
@@ -470,7 +470,7 @@ CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 	Vec2i minPos = ltPos;
 	Vec2i maxPos = rbPos;
 
-	CMap::Map.FixSelectionArea(minPos, maxPos, z);
+	CMap::get()->FixSelectionArea(minPos, maxPos, z);
 	return FindUnit_IfFixed(minPos, maxPos, z, pred);
 }
 

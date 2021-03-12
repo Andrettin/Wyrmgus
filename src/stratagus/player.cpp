@@ -1750,7 +1750,7 @@ bool CPlayer::HasSettlementNearWaterZone(const landmass *water_zone) const
 			continue;
 		}
 		
-		const landmass *settlement_landmass = CMap::Map.get_tile_landmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		const landmass *settlement_landmass = CMap::get()->get_tile_landmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 		if (settlement_landmass == nullptr || !settlement_landmass->borders_landmass(water_zone)) {
 			//settlement's landmass doesn't even border the water zone, continue
 			continue;
@@ -1783,7 +1783,7 @@ const wyrmgus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, cons
 	CUnit *best_hall = nullptr;
 	int best_distance = -1;
 	
-	for (CUnit *settlement_unit : CMap::Map.get_settlement_units()) {
+	for (CUnit *settlement_unit : CMap::get()->get_settlement_units()) {
 		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer->ID) {
 			continue;
 		}
@@ -2117,7 +2117,7 @@ landmass_set CPlayer::get_builder_landmasses(const wyrmgus::unit_type *building)
 			FindPlayerUnitsByType(*this, *builder_type, builder_table, true);
 
 			for (const CUnit *builder : builder_table) {
-				const landmass *landmass = CMap::Map.get_tile_landmass(builder->tilePos, builder->MapLayer->ID);
+				const landmass *landmass = CMap::get()->get_tile_landmass(builder->tilePos, builder->MapLayer->ID);
 
 				if (landmass == nullptr) {
 					continue;
@@ -2138,7 +2138,7 @@ landmass_set CPlayer::get_builder_landmasses(const wyrmgus::unit_type *building)
 				FindPlayerUnitsByType(*this, *builder_type, builder_table, true);
 
 				for (const CUnit *builder : builder_table) {
-					const landmass *landmass = CMap::Map.get_tile_landmass(builder->tilePos, builder->MapLayer->ID);
+					const landmass *landmass = CMap::get()->get_tile_landmass(builder->tilePos, builder->MapLayer->ID);
 
 					if (landmass == nullptr) {
 						continue;
@@ -3679,7 +3679,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, const bool type_change)
 		this->change_resource_demand(resource, quantity);
 	}
 	
-	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && CMap::Map.Info.IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && CMap::get()->Info.IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		this->Ai->Scouts.push_back(unit);
 	}
 	
@@ -3911,7 +3911,7 @@ void SetPlayersPalette()
 */
 void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
 	std::array<char, 128> temp{};
 	uint32_t color;
 	va_list va;
@@ -4240,7 +4240,7 @@ bool CPlayer::IsTeamed(const CUnit &unit) const
 */
 bool CPlayer::HasContactWith(const CPlayer &player) const
 {
-	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::Map.MapLayers.size() && this->StartMapLayer < (int) CMap::Map.MapLayers.size() && CMap::Map.MapLayers[player.StartMapLayer]->world == CMap::Map.MapLayers[this->StartMapLayer]->world && CMap::Map.MapLayers[player.StartMapLayer]->plane == CMap::Map.MapLayers[this->StartMapLayer]->plane);
+	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::get()->MapLayers.size() && this->StartMapLayer < (int) CMap::get()->MapLayers.size() && CMap::get()->MapLayers[player.StartMapLayer]->world == CMap::get()->MapLayers[this->StartMapLayer]->world && CMap::get()->MapLayers[player.StartMapLayer]->plane == CMap::get()->MapLayers[this->StartMapLayer]->plane);
 }
 
 /**

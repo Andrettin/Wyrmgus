@@ -646,8 +646,8 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 		this->set_site(replaced_unit.site);
 
 		if (replaced_unit.site->is_settlement()) {
-			CMap::Map.remove_settlement_unit(&replaced_unit);
-			CMap::Map.add_settlement_unit(this);
+			CMap::get()->remove_settlement_unit(&replaced_unit);
+			CMap::get()->add_settlement_unit(this);
 		}
 
 		replaced_unit.set_site(nullptr);
@@ -1092,14 +1092,14 @@ bool CUnit::CheckTerrainForVariation(const wyrmgus::unit_type_variation *variati
 {
 	//if the variation has one or more terrain types set as a precondition, then all tiles underneath the unit must match at least one of those terrains
 	if (variation->Terrains.size() > 0) {
-		if (!CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
+		if (!CMap::get()->Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
 		}
 
 		for (int x = 0; x < this->Type->get_tile_width(); ++x) {
 			for (int y = 0; y < this->Type->get_tile_height(); ++y) {
-				if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-					if (!wyrmgus::vector::contains(variation->Terrains, CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
+				if (CMap::get()->Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
+					if (!wyrmgus::vector::contains(variation->Terrains, CMap::get()->GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
 						return false;
 					}
 				}
@@ -1109,11 +1109,11 @@ bool CUnit::CheckTerrainForVariation(const wyrmgus::unit_type_variation *variati
 	
 	//if the variation has one or more terrains set as a forbidden precondition, then no tiles underneath the unit may match one of those terrains
 	if (variation->TerrainsForbidden.size() > 0) {
-		if (CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
+		if (CMap::get()->Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			for (int x = 0; x < this->Type->get_tile_width(); ++x) {
 				for (int y = 0; y < this->Type->get_tile_height(); ++y) {
-					if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-						if (wyrmgus::vector::contains(variation->TerrainsForbidden, CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
+					if (CMap::get()->Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
+						if (wyrmgus::vector::contains(variation->TerrainsForbidden, CMap::get()->GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
 							return false;
 						}
 					}
@@ -2529,7 +2529,7 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	if (this->UnderConstruction == 1 || !CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
+	if (this->UnderConstruction == 1 || !CMap::get()->Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
 		return;
 	}
 	
@@ -2737,13 +2737,13 @@ void CUnit::Scout()
 	target_pos.y += SyncRand(scout_range * 2 + 1) - scout_range;
 
 	// restrict to map
-	CMap::Map.Clamp(target_pos, this->MapLayer->ID);
+	CMap::get()->Clamp(target_pos, this->MapLayer->ID);
 
 	// move if possible
 	if (target_pos != this->tilePos) {
 		// if the tile the scout is moving to happens to have a layer connector, use it
 		bool found_connector = false;
-		CUnitCache &unitcache = CMap::Map.Field(target_pos, this->MapLayer->ID)->UnitCache;
+		CUnitCache &unitcache = CMap::get()->Field(target_pos, this->MapLayer->ID)->UnitCache;
 		for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
 			CUnit *connector = *it;
 
@@ -3609,7 +3609,7 @@ void CUnit::UpdateSettlement()
 			if (potential_settlements.size() > 0) {
 				this->settlement = vector::take_random(potential_settlements);
 				this->set_site(this->settlement);
-				CMap::Map.add_settlement_unit(this);
+				CMap::get()->add_settlement_unit(this);
 
 				//set the tiles the settlement unit is located to its settlement
 				for (int x = this->tilePos.x; x < (this->tilePos.x + this->Type->get_tile_width()); ++x) {
@@ -3704,8 +3704,8 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 	CUnit *unit_inside = unit.UnitInside;
 
 	unit.tilePos = pos;
-	unit.Offset = CMap::Map.get_pos_index(pos, z);
-	unit.MapLayer = CMap::Map.MapLayers[z].get();
+	unit.Offset = CMap::get()->get_pos_index(pos, z);
+	unit.MapLayer = CMap::get()->MapLayers[z].get();
 
 	const wyrmgus::time_of_day *new_time_of_day = unit.get_center_tile_time_of_day();
 
@@ -3733,7 +3733,7 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 //Wyrmgus end
 {
 	MapUnmarkUnitSight(*this);
-	CMap::Map.Remove(*this);
+	CMap::get()->Remove(*this);
 	UnmarkUnitFieldFlags(*this);
 
 	//Wyrmgus start
@@ -3746,7 +3746,7 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 	UnitInXY(*this, pos, z);
 	//Wyrmgus end
 
-	CMap::Map.Insert(*this);
+	CMap::get()->Insert(*this);
 	MarkUnitFieldFlags(*this);
 	//  Recalculate the seen count.
 	UnitCountSeen(*this);
@@ -3755,7 +3755,7 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 	//Wyrmgus start
 	// if there is a trap in the new tile, trigger it
 	if ((this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow && this->Type->UnitType != UnitTypeType::Space) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
-		const CUnitCache &cache = CMap::Map.Field(pos, z)->UnitCache;
+		const CUnitCache &cache = CMap::get()->Field(pos, z)->UnitCache;
 		for (size_t i = 0; i != cache.size(); ++i) {
 			if (!cache[i]) {
 				fprintf(stderr, "Error in CUnit::MoveToXY (pos %d, %d): a unit in the tile's unit cache is null.\n", pos.x, pos.y);
@@ -3793,7 +3793,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 	// Pathfinding info.
 	MarkUnitFieldFlags(*this);
 	// Tha cache list.
-	CMap::Map.Insert(*this);
+	CMap::get()->Insert(*this);
 	//  Calculate the seen count.
 	UnitCountSeen(*this);
 	// Vision
@@ -3816,13 +3816,13 @@ void CUnit::Place(const Vec2i &pos, int z)
 		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
 			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->get_tile_width(); ++x) {
 				for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->get_tile_height(); ++y) {
-					if (!CMap::Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
+					if (!CMap::get()->Info.IsPointOnMap(x, y, this->MapLayer)) {
 						continue;
 					}
 					const QPoint building_tile_pos(x, y);
 					wyrmgus::tile &mf = *this->MapLayer->Field(building_tile_pos);
 					if (mf.get_overlay_terrain() != nullptr && mf.get_overlay_terrain()->is_constructed()) {
-						CMap::Map.RemoveTileOverlayTerrain(building_tile_pos, this->MapLayer->ID);
+						CMap::get()->RemoveTileOverlayTerrain(building_tile_pos, this->MapLayer->ID);
 					}
 					//remove decorations if a building has been built here
 					std::vector<CUnit *> table;
@@ -3892,7 +3892,7 @@ CUnit *CreateUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *pla
 	CUnit *unit = MakeUnit(type, player);
 
 	if (unit != nullptr) {
-		unit->MapLayer = CMap::Map.MapLayers[z].get();
+		unit->MapLayer = CMap::get()->MapLayers[z].get();
 
 		Vec2i res_pos;
 		const int heading = SyncRand(256);
@@ -3901,7 +3901,7 @@ CUnit *CreateUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *pla
 		if (type.BoolFlag[BUILDING_INDEX].value) {
 			const CBuildRestrictionOnTop *b = OnTopDetails(type, nullptr);
 			if (b && b->ReplaceOnBuild) {
-				CUnitCache &unitCache = CMap::Map.Field(res_pos, z)->UnitCache;
+				CUnitCache &unitCache = CMap::get()->Field(res_pos, z)->UnitCache;
 				CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));
 
 				if (it != unitCache.end()) {
@@ -3975,7 +3975,7 @@ void FindNearestDrop(const wyrmgus::unit_type &type, const Vec2i &goalPos, Vec2i
 		searched_any_tile_inside_map = false;
 startw:
 		for (int i = addy; i--; ++pos.y) {
-			if (CMap::Map.Info.IsPointOnMap(pos, z)) {
+			if (CMap::get()->Info.IsPointOnMap(pos, z)) {
 				searched_any_tile_inside_map = true;
 			} else {
 				continue;
@@ -3986,7 +3986,7 @@ startw:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
-				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
+				&& (settlement == nullptr || CMap::get()->is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3995,7 +3995,7 @@ startw:
 		++addx;
 starts:
 		for (int i = addx; i--; ++pos.x) {
-			if (CMap::Map.Info.IsPointOnMap(pos, z)) {
+			if (CMap::get()->Info.IsPointOnMap(pos, z)) {
 				searched_any_tile_inside_map = true;
 			} else {
 				continue;
@@ -4006,7 +4006,7 @@ starts:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
-				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
+				&& (settlement == nullptr || CMap::get()->is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
 				goto found;
@@ -4015,7 +4015,7 @@ starts:
 		++addy;
 starte:
 		for (int i = addy; i--; --pos.y) {
-			if (CMap::Map.Info.IsPointOnMap(pos, z)) {
+			if (CMap::get()->Info.IsPointOnMap(pos, z)) {
 				searched_any_tile_inside_map = true;
 			} else {
 				continue;
@@ -4026,7 +4026,7 @@ starte:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
-				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
+				&& (settlement == nullptr || CMap::get()->is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
 				goto found;
@@ -4035,7 +4035,7 @@ starte:
 		++addx;
 startn:
 		for (int i = addx; i--; --pos.x) {
-			if (CMap::Map.Info.IsPointOnMap(pos, z)) {
+			if (CMap::get()->Info.IsPointOnMap(pos, z)) {
 				searched_any_tile_inside_map = true;
 			} else {
 				continue;
@@ -4046,7 +4046,7 @@ startn:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
-				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
+				&& (settlement == nullptr || CMap::get()->is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
 				goto found;
@@ -4088,7 +4088,7 @@ void CUnit::Remove(CUnit *host)
 		}
 	}
 
-	CMap::Map.Remove(*this);
+	CMap::get()->Remove(*this);
 	MapUnmarkUnitSight(*this);
 	UnmarkUnitFieldFlags(*this);
 	if (host) {
@@ -4313,8 +4313,8 @@ void UnitLost(CUnit &unit)
 
 					if (unit.get_site()->is_settlement()) {
 						temp->settlement = unit.settlement;
-						CMap::Map.remove_settlement_unit(&unit);
-						CMap::Map.add_settlement_unit(temp);
+						CMap::get()->remove_settlement_unit(&unit);
+						CMap::get()->add_settlement_unit(temp);
 					}
 
 					unit.set_site(nullptr);
@@ -4439,7 +4439,7 @@ void CorrectWallDirections(CUnit &unit)
 	Assert(unit.Type->get_num_directions() == 16);
 	Assert(!unit.Type->Flip);
 
-	if (!CMap::Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer)) {
+	if (!CMap::get()->Info.IsPointOnMap(unit.tilePos, unit.MapLayer)) {
 		return;
 	}
 	const struct {
@@ -4454,10 +4454,10 @@ void CorrectWallDirections(CUnit &unit)
 		const Vec2i pos = unit.tilePos + configs[i].offset;
 		const int dirFlag = configs[i].dirFlag;
 
-		if (CMap::Map.Info.IsPointOnMap(pos, unit.MapLayer) == false) {
+		if (CMap::get()->Info.IsPointOnMap(pos, unit.MapLayer) == false) {
 			flags |= dirFlag;
 		} else {
-			const CUnitCache &unitCache = CMap::Map.Field(pos, unit.MapLayer->ID)->UnitCache;
+			const CUnitCache &unitCache = CMap::get()->Field(pos, unit.MapLayer->ID)->UnitCache;
 			const CUnit *neighbor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
 			if (neighbor != nullptr) {
@@ -4482,7 +4482,7 @@ void CorrectWallNeighBours(CUnit &unit)
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		const Vec2i pos = unit.tilePos + offset[i];
 
-		if (CMap::Map.Info.IsPointOnMap(pos, unit.MapLayer) == false) {
+		if (CMap::get()->Info.IsPointOnMap(pos, unit.MapLayer) == false) {
 			continue;
 		}
 		CUnitCache &unitCache = unit.MapLayer->Field(pos)->UnitCache;
@@ -4699,7 +4699,7 @@ bool CUnit::IsVisibleOnMinimap() const
 		&& this->is_seen_by_player(CPlayer::GetThisPlayer())
 		&& !this->is_seen_destroyed_by_player(CPlayer::GetThisPlayer())
 		&& !Destroyed
-		&& CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)
+		&& CMap::get()->Info.IsPointOnMap(this->tilePos, this->MapLayer)
 		&& this->MapLayer->Field(this->tilePos)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer());
 }
 
@@ -4731,7 +4731,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	int x = tilePos.x * wyrmgus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width()) / 2 + this->Type->get_offset().x() * scale_factor;
 	int y = tilePos.y * wyrmgus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->get_tile_height() * wyrmgus::defines::get()->get_scaled_tile_height()) / 2 + this->Type->get_offset().y() * scale_factor;
 	const PixelSize vpSize = vp.GetPixelSize();
-	const PixelPos vpTopLeftMapPos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(vp.MapPos) + vp.Offset;
+	const PixelPos vpTopLeftMapPos = CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(vp.MapPos) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
 	//Wyrmgus start
@@ -6658,13 +6658,13 @@ bool CUnit::HasAdjacentRailForUnitType(const wyrmgus::unit_type *type) const
 			
 	for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
 		Vec2i tile_pos(x, top_left_pos.y);
-		if (CMap::Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+		if (CMap::get()->Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 			has_adjacent_rail = true;
 			break;
 		}
 				
 		tile_pos.y = bottom_right_pos.y;
-		if (CMap::Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+		if (CMap::get()->Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 			has_adjacent_rail = true;
 			break;
 		}
@@ -6673,13 +6673,13 @@ bool CUnit::HasAdjacentRailForUnitType(const wyrmgus::unit_type *type) const
 	if (!has_adjacent_rail) {
 		for (int y = top_left_pos.y; y <= bottom_right_pos.y; ++y) {
 			Vec2i tile_pos(top_left_pos.x, y);
-			if (CMap::Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+			if (CMap::get()->Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 				has_adjacent_rail = true;
 				break;
 			}
 					
 			tile_pos.x = bottom_right_pos.x;
-			if (CMap::Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+			if (CMap::get()->Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 				has_adjacent_rail = true;
 				break;
 			}
@@ -7078,7 +7078,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	// This enables us to be tracked.  Possibly for spells (eg raise dead)
 	if (type->get_corpse_type() != nullptr || (unit.get_animation_set() && unit.get_animation_set()->Death)) {
 		unit.Removed = 0;
-		CMap::Map.Insert(unit);
+		CMap::get()->Insert(unit);
 
 		// FIXME: rb: Maybe we need this here because corpse of cloaked units
 		//	may crash Sign code
@@ -7495,7 +7495,7 @@ void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 	}
 	pos.x = target.tilePos.x + (pos.x * 5) / d + SyncRand(4);
 	pos.y = target.tilePos.y + (pos.y * 5) / d + SyncRand(4);
-	CMap::Map.Clamp(pos, target.MapLayer->ID);
+	CMap::get()->Clamp(pos, target.MapLayer->ID);
 	CommandStopUnit(target);
 	CommandMove(target, pos, 0, target.MapLayer->ID);
 }
@@ -8199,7 +8199,7 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 		return true;
 	}
 	
-	if (!goal && CMap::Map.Info.IsPointOnMap(goalPos, z) && this->MapDistanceTo(goalPos, z) > 1) {
+	if (!goal && CMap::get()->Info.IsPointOnMap(goalPos, z) && this->MapDistanceTo(goalPos, z) > 1) {
 		return true;
 	}
 	

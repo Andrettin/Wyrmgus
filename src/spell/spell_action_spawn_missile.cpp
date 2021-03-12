@@ -328,7 +328,7 @@ void spell_action_spawn_missile::missile_location::evaluate(const CUnit &caster,
 		if (target) {
 			*res = target->get_map_pixel_pos_center();
 		} else {
-			*res = CMap::Map.tile_pos_to_map_pixel_pos_center(goalPos);
+			*res = CMap::get()->tile_pos_to_map_pixel_pos_center(goalPos);
 		}
 	}
 	res->x += this->AddX;

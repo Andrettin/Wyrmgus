@@ -184,15 +184,15 @@ static int CclGetNumUnitsAt(lua_State *l)
 		z = LuaToNumber(l, 5);
 	}
 	
-	if (z == 0 && (CMap::Map.Info.MapWidths.size() == 0 || CMap::Map.Info.MapHeights.size() == 0)) {
-		maxPos.x = std::min<int>(maxPos.x, CMap::Map.Info.MapWidth - 1);
-		maxPos.y = std::min<int>(maxPos.y, CMap::Map.Info.MapHeight - 1);
+	if (z == 0 && (CMap::get()->Info.MapWidths.size() == 0 || CMap::get()->Info.MapHeights.size() == 0)) {
+		maxPos.x = std::min<int>(maxPos.x, CMap::get()->Info.MapWidth - 1);
+		maxPos.y = std::min<int>(maxPos.y, CMap::get()->Info.MapHeight - 1);
 	} else if (z != -1) {
-		maxPos.x = std::min<int>(maxPos.x, CMap::Map.Info.MapWidths[z] - 1);
-		maxPos.y = std::min<int>(maxPos.y, CMap::Map.Info.MapHeights[z] - 1);
+		maxPos.x = std::min<int>(maxPos.x, CMap::get()->Info.MapWidths[z] - 1);
+		maxPos.y = std::min<int>(maxPos.y, CMap::get()->Info.MapHeights[z] - 1);
 	}
 	
-	if (z == -1 || !CMap::Map.Info.IsPointOnMap(minPos, z) || !CMap::Map.Info.IsPointOnMap(maxPos, z)) {
+	if (z == -1 || !CMap::get()->Info.IsPointOnMap(minPos, z) || !CMap::get()->Info.IsPointOnMap(maxPos, z)) {
 		lua_pushnumber(l, 0);
 		return 1;
 	}

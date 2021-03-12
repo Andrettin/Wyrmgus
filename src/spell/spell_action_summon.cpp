@@ -150,7 +150,7 @@ int spell_action_summon::Cast(CUnit &caster, const spell &spell, CUnit *target, 
 		target = MakeUnit(unittype, caster.Player);
 		if (target != nullptr) {
 			target->tilePos = pos;
-			target->MapLayer = CMap::Map.MapLayers[z].get();
+			target->MapLayer = CMap::get()->MapLayers[z].get();
 			DropOutOnSide(*target, LookingW, nullptr);
 			// To avoid defending summoned unit for AI
 			target->Summoned = 1;

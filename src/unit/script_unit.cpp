@@ -327,7 +327,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "site")) {
 			unit->set_site(wyrmgus::site::get(LuaToString(l, 2, j + 1)));
 			if (unit->site->is_settlement()) {
-				CMap::Map.add_settlement_unit(unit);
+				CMap::get()->add_settlement_unit(unit);
 			}
 		} else if (!strcmp(value, "settlement")) {
 			unit->settlement = wyrmgus::site::get(LuaToString(l, 2, j + 1));
@@ -428,12 +428,12 @@ static int CclUnit(lua_State *l)
 			// Radar(Jammer) not.
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "map-layer")) {
-			unit->MapLayer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)].get();
+			unit->MapLayer = CMap::get()->MapLayers[LuaToNumber(l, 2, j + 1)].get();
 		} else if (!strcmp(value, "tile")) {
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->tilePos.x , &unit->tilePos.y, -1);
 			lua_pop(l, 1);
-			unit->Offset = CMap::Map.get_pos_index(unit->tilePos, unit->MapLayer->ID);
+			unit->Offset = CMap::get()->get_pos_index(unit->tilePos, unit->MapLayer->ID);
 		} else if (!strcmp(value, "seen-tile")) {
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->Seen.tilePos.x , &unit->Seen.tilePos.y, -1);
@@ -707,7 +707,7 @@ static int CclUnit(lua_State *l)
 			int rally_point_y = LuaToNumber(l, 2, j + 1);
 			unit->rally_point_pos = QPoint(rally_point_x, rally_point_y);
 		} else if (!strcmp(value, "rally_point_map_layer")) {
-			unit->rally_point_map_layer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)].get();
+			unit->rally_point_map_layer = CMap::get()->MapLayers[LuaToNumber(l, 2, j + 1)].get();
 		//Wyrmgus end
 		} else if (!strcmp(value, "last_created_player_unit")) {
 			unit->Player->last_created_unit = unit;
@@ -831,7 +831,7 @@ static int CclCreateUnit(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	//Wyrmgus start
-	if (!CMap::Map.Info.IsPointOnMap(ipos, z)) {
+	if (!CMap::get()->Info.IsPointOnMap(ipos, z)) {
 		fprintf(stderr, "Point on map %d, %d (map layer %d) is invalid.\n", ipos.x, ipos.y, z);
 		return 0;
 	}
@@ -1015,7 +1015,7 @@ static int CclCreateUnitOnTop(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		unit->MapLayer = CMap::Map.MapLayers[z].get();
+		unit->MapLayer = CMap::get()->MapLayers[z].get();
 		unit->ReplaceOnTop(*on_top);
 		unit->Place(ipos, z);
 		UpdateForNewUnit(*unit, 0);
@@ -1069,7 +1069,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	Vec2i new_pos;
 	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true, worker->MapLayer->ID);
 	
-	if (!CMap::Map.Info.IsPointOnMap(new_pos, worker->MapLayer)) {
+	if (!CMap::get()->Info.IsPointOnMap(new_pos, worker->MapLayer)) {
 		new_pos = CPlayer::Players[playerno]->StartPos;
 	}
 	

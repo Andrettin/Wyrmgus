@@ -3114,9 +3114,9 @@ void UpdateUnitVariables(CUnit &unit)
 	// Target Position
 	const Vec2i goalPos = unit.CurrentOrder()->GetGoalPos();
 	unit.Variable[TARGETPOSX_INDEX].Value = goalPos.x;
-	unit.Variable[TARGETPOSX_INDEX].Max = CMap::Map.Info.MapWidths[unit.CurrentOrder()->GetGoalMapLayer()];
+	unit.Variable[TARGETPOSX_INDEX].Max = CMap::get()->Info.MapWidths[unit.CurrentOrder()->GetGoalMapLayer()];
 	unit.Variable[TARGETPOSY_INDEX].Value = goalPos.y;
-	unit.Variable[TARGETPOSY_INDEX].Max = CMap::Map.Info.MapHeights[unit.CurrentOrder()->GetGoalMapLayer()];
+	unit.Variable[TARGETPOSY_INDEX].Max = CMap::get()->Info.MapHeights[unit.CurrentOrder()->GetGoalMapLayer()];
 
 	// RadarRange
 	unit.Variable[RADAR_INDEX].Value = unit.Stats->Variables[RADAR_INDEX].Value;
