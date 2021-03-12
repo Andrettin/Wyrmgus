@@ -251,6 +251,11 @@ public:
 		this->store_scaled_image = value;
 	}
 
+	std::mutex &get_load_mutex()
+	{
+		return this->load_mutex;
+	}
+
 private:
 	std::filesystem::path filepath;
 public:
@@ -284,6 +289,7 @@ private:
 	int custom_scale_factor = 1; //the scale factor of the loaded image, if it is a custom scaled image
 	bool player_color = false;
 	bool store_scaled_image = false;
+	std::mutex load_mutex;
 
 	friend wyrmgus::font;
 	friend int LoadGraphicPNG(CGraphic *g, const int scale_factor);

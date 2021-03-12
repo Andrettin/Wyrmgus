@@ -59,10 +59,18 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 
 	const std::shared_ptr<CGraphic> graphics = terrain->get_graphics(season);
 
-	engine_interface::get()->sync([&graphics]() {
-		//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
-		graphics->Load(false, defines::get()->get_scale_factor());
-	});
+	graphics->get_load_mutex().lock();
+
+	if (!graphics->IsLoaded()) {
+		graphics->get_load_mutex().unlock();
+
+		engine_interface::get()->sync([&graphics]() {
+			//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
+			graphics->Load(false, defines::get()->get_scale_factor());
+		});
+	} else {
+		graphics->get_load_mutex().unlock();
+	}
 
 	const QImage &image = graphics->get_scaled_frame(frame_index);
 

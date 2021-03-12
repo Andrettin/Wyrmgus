@@ -793,6 +793,8 @@ static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
 */
 void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor)
 {
+	std::lock_guard lock(this->load_mutex);
+
 	if (this->IsLoaded()) {
 		return;
 	}
