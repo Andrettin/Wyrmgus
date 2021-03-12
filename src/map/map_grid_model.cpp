@@ -80,6 +80,8 @@ QVariant map_grid_model::data(const QModelIndex &index, const int role) const
 				return tile_data.transition_image_sources;
 			case role::overlay_transition_image_sources:
 				return tile_data.overlay_transition_image_sources;
+			case role::overlay_transition_elevation_image_sources:
+				return tile_data.overlay_transition_elevation_image_sources;
 			default:
 				throw std::runtime_error("Invalid map grid model role: " + std::to_string(role) + ".");
 		}
@@ -119,6 +121,10 @@ void map_grid_model::set_map_layer(const size_t z)
 
 			for (const auto &[terrain_type, tile_frame] : tile->OverlayTransitionTiles) {
 				tile_data.overlay_transition_image_sources.push_back(QString::fromStdString(terrain_type->get_identifier()) + "/" + QString::number(tile_frame));
+
+				if (terrain_type->get_elevation_graphics() != nullptr) {
+					tile_data.overlay_transition_elevation_image_sources.push_back(QString::fromStdString(terrain_type->get_identifier()) + "/elevation/" + QString::number(tile_frame));
+				}
 			}
 
 			this->tile_data_list.push_back(std::move(tile_data));

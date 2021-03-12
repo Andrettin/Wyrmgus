@@ -45,19 +45,37 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 	const std::string id_str = id.toStdString();
 	const std::vector<std::string> id_list = string::split(id_str, '/');
 
-	const std::string &terrain_identifier = id_list.at(0);
+	size_t index = 0;
+	const std::string &terrain_identifier = id_list.at(index);
 	const terrain_type *terrain = terrain_type::get(terrain_identifier);
 
+	++index;
+
 	const season *season = nullptr;
-	if (id_list.size() > 2) {
-		const std::string &season_identifier = id_list.at(1);
-		season = season::get(season_identifier);
+	if ((index + 1) < id_list.size()) {
+		const std::string &season_identifier = id_list.at(index);
+		season = season::try_get(season_identifier);
+		if (season != nullptr) {
+			++index;
+		}
+	}
+
+	bool elevation = false;
+	if ((index + 1) < id_list.size() && id_list.at(index) == "elevation") {
+		elevation = true;
+		++index;
 	}
 
 	const std::string &frame_str = id_list.back();
 	const size_t frame_index = std::stoul(frame_str);
 
-	const std::shared_ptr<CGraphic> graphics = terrain->get_graphics(season);
+	std::shared_ptr<CGraphic> graphics;
+
+	if (elevation) {
+		graphics = terrain->get_elevation_graphics();
+	} else {
+		graphics = terrain->get_graphics(season);
+	}
 
 	graphics->get_load_mutex().lock();
 

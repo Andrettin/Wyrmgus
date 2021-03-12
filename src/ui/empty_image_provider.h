@@ -39,6 +39,7 @@ public:
 
 	virtual QImage requestImage(const QString &id, QSize *size, const QSize &requested_size) override
 	{
+		Q_UNUSED(id)
 		Q_UNUSED(requested_size)
 
 		QImage image(QSize(1, 1), QImage::Format_ARGB32);

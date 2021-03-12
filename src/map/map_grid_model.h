@@ -41,7 +41,8 @@ public:
 		image_source = Qt::UserRole,
 		overlay_image_source,
 		transition_image_sources,
-		overlay_transition_image_sources
+		overlay_transition_image_sources,
+		overlay_transition_elevation_image_sources
 	};
 
 	struct tile_data {
@@ -49,6 +50,7 @@ public:
 		QString overlay_image_source;
 		QStringList transition_image_sources;
 		QStringList overlay_transition_image_sources;
+		QStringList overlay_transition_elevation_image_sources;
 	};
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override final;
@@ -77,6 +79,7 @@ public:
 		role_names.insert(static_cast<int>(role::overlay_image_source), "overlay_image_source");
 		role_names.insert(static_cast<int>(role::transition_image_sources), "transition_image_sources");
 		role_names.insert(static_cast<int>(role::overlay_transition_image_sources), "overlay_transition_image_sources");
+		role_names.insert(static_cast<int>(role::overlay_transition_elevation_image_sources), "overlay_transition_elevation_image_sources");
 
 		return role_names;
 	}
