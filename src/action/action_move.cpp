@@ -60,7 +60,7 @@
 std::unique_ptr<COrder> COrder::NewActionMove(const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
 
 	auto order = std::make_unique<COrder_Move>();
 

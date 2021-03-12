@@ -672,7 +672,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	*/
-	if (CMap::Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->get_owner() == nullptr || CPlayer::GetThisPlayer()->IsEnemy(*UI.CurrentMapLayer->Field(pos)->get_owner()))) {
+	if (CMap::get()->WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->get_owner() == nullptr || CPlayer::GetThisPlayer()->IsEnemy(*UI.CurrentMapLayer->Field(pos)->get_owner()))) {
 		if (!UI.CurrentMapLayer->Field(pos)->get_overlay_terrain()->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 			SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
 			return;
@@ -973,7 +973,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	if (Selected.empty()) {
 		return;
 	}
-	const Vec2i pos = CMap::Map.scaled_map_pixel_pos_to_tile_pos(mapPixelPos);
+	const Vec2i pos = CMap::get()->scaled_map_pixel_pos_to_tile_pos(mapPixelPos);
 	CUnit *dest;            // unit under the cursor if any.
 
 	if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
@@ -1498,7 +1498,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		const Vec2i cursor_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 
 		RestrictCursorToMinimap();
-		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos));
+		UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos));
 		return;
 	}
 
@@ -1558,7 +1558,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			if (CursorOn == cursor_on::minimap && (MouseButtons & RightButton)) {
 				const Vec2i cursor_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 				//  Minimap move viewpoint
-				UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos));
+				UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos));
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -1597,7 +1597,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		//  Minimap move viewpoint
 		const Vec2i tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(tile_pos));
+		UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(tile_pos));
 
 		//if clicking the minimap made the hovered tile change (e.g. because the minimap is in zoomed mode), then set the cursor's position to that of the old tile pos
 		if (tile_pos != UI.get_minimap()->screen_to_tile_pos(CursorScreenPos)) {
@@ -2248,7 +2248,7 @@ static void UISelectStateButtonDown(unsigned)
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*wyrmgus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
-			SendCommand(CMap::Map.map_pixel_pos_to_tile_pos(mapPixelPos));
+			SendCommand(CMap::get()->map_pixel_pos_to_tile_pos(mapPixelPos));
 		}
 		return;
 	}
@@ -2260,7 +2260,7 @@ static void UISelectStateButtonDown(unsigned)
 		const Vec2i cursorTilePos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 
 		if (MouseButtons & LeftButton) {
-			const PixelPos mapPixelPos = CMap::Map.tile_pos_to_map_pixel_pos_center(cursorTilePos);
+			const PixelPos mapPixelPos = CMap::get()->tile_pos_to_map_pixel_pos_center(cursorTilePos);
 
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
@@ -2274,7 +2274,7 @@ static void UISelectStateButtonDown(unsigned)
 			}
 			SendCommand(cursorTilePos);
 		} else {
-			UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorTilePos));
+			UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(cursorTilePos));
 		}
 		return;
 	}
@@ -2346,7 +2346,7 @@ static void UIHandleButtonDown_OnMap()
 					CancelBuildingMode();
 				}
 			} else {
-				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->plane != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->plane || UI.CurrentMapLayer->world != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->world)) {
+				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->plane != CMap::get()->MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->plane || UI.CurrentMapLayer->world != CMap::get()->MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->world)) {
 					CPlayer::GetThisPlayer()->Notify("%s", _("Cannot build in another plane or world"));
 				}
 				PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
@@ -2407,7 +2407,7 @@ static void UIHandleButtonDown_OnMinimap()
 	const Vec2i cursor_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 
 	if (MouseButtons & LeftButton) { // enter move mini-mode
-		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos));
+		UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos));
 		if (cursor_tile_pos != UI.get_minimap()->screen_to_tile_pos(CursorScreenPos)) {
 			CursorScreenPos = UI.get_minimap()->tile_to_screen_pos(cursor_tile_pos);
 			UI.MouseWarpPos = CursorStartScreenPos = CursorScreenPos;
@@ -2415,10 +2415,10 @@ static void UIHandleButtonDown_OnMinimap()
 	} else if (MouseButtons & RightButton) {
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
 			if (!ClickMissile.empty()) {
-				const PixelPos map_pixel_pos = CMap::Map.tile_pos_to_map_pixel_pos_center(cursor_tile_pos);
+				const PixelPos map_pixel_pos = CMap::get()->tile_pos_to_map_pixel_pos_center(cursor_tile_pos);
 				MakeLocalMissile(*wyrmgus::missile_type::get(ClickMissile), map_pixel_pos, map_pixel_pos, UI.CurrentMapLayer->ID);
 			}
-			const PixelPos scaled_map_pixel_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos);
+			const PixelPos scaled_map_pixel_pos = CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos);
 			DoRightButton(scaled_map_pixel_pos);
 		}
 	}
@@ -2874,7 +2874,7 @@ void UIHandleButtonUp(unsigned button)
 			if (world_button.Clicked) {
 				world_button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-					CMap::Map.SetCurrentWorld(wyrmgus::world::get_all()[i]);
+					CMap::get()->SetCurrentWorld(wyrmgus::world::get_all()[i]);
 					if (world_button.Callback) {
 						world_button.Callback->action("");
 					}

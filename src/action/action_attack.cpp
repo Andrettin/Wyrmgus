@@ -124,11 +124,11 @@ std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, CUnit &ta
 
 std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(dest, z));
+	Assert(CMap::get()->Info.IsPointOnMap(dest, z));
 
 	auto order = std::make_unique<COrder_Attack>(false);
 
-	if (CMap::Map.WallOnMap(dest, z) && CMap::Map.Field(dest, z)->player_info->IsTeamExplored(*attacker.Player)) {
+	if (CMap::get()->WallOnMap(dest, z) && CMap::get()->Field(dest, z)->player_info->IsTeamExplored(*attacker.Player)) {
 		// FIXME: look into action_attack.cpp about this ugly problem
 		order->goalPos = dest;
 		order->MapLayer = z;
@@ -224,11 +224,11 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 		if (this->has_goal()) {
 			return this->get_goal()->IsAliveOnMap();
 		} else {
-			return CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
+			return CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer);
 		}
 	} else {
 		Assert(Action == UnitAction::AttackGround);
-		return CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
+		return CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer);
 	}
 }
 
@@ -390,8 +390,8 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 	if (!this->has_goal()
 		&& this->Action != UnitAction::AttackGround
 		//Wyrmgus start
-//		&& !CMap::Map.WallOnMap(this->goalPos)) {
-		&& !CMap::Map.WallOnMap(this->goalPos, this->MapLayer)) {
+//		&& !CMap::get()->WallOnMap(this->goalPos)) {
+		&& !CMap::get()->WallOnMap(this->goalPos, this->MapLayer)) {
 		//Wyrmgus end
 		CUnit *goal = AttackUnitsInReactRange(unit);
 
@@ -455,7 +455,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	Assert(unit.CurrentOrder() == this);
 	Assert(unit.CanMove());
-	Assert(this->has_goal() || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
+	Assert(this->has_goal() || CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer));
 
 	//Wyrmgus start
 	//if is on a moving raft and target is now within range, stop the raft
@@ -527,7 +527,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		if (((goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
 			//Wyrmgus start
 //			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitAction::AttackGround)))
-			 || (!goal && (this->Action == UnitAction::AttackGround || CMap::Map.WallOnMap(this->goalPos, this->MapLayer))))
+			 || (!goal && (this->Action == UnitAction::AttackGround || CMap::get()->WallOnMap(this->goalPos, this->MapLayer))))
 			//Wyrmgus end
 			&& unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.get_best_attack_range()) {
 			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, tile_flag::air_impassable, MapLayer)) {
@@ -592,7 +592,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 */
 void COrder_Attack::AttackTarget(CUnit &unit)
 {
-	Assert(this->has_goal() || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
+	Assert(this->has_goal() || CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer));
 
 	AnimateActionAttack(unit, *this);
 	if (unit.Anim.Unbreakable) {
@@ -600,8 +600,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	}
 
 	//Wyrmgus start
-//	if (!this->has_goal() && (this->Action == UnitAction::AttackGround || CMap::Map.WallOnMap(this->goalPos))) {
-	if (!this->has_goal() && (this->Action == UnitAction::AttackGround || CMap::Map.WallOnMap(this->goalPos, this->MapLayer))) {
+//	if (!this->has_goal() && (this->Action == UnitAction::AttackGround || CMap::get()->WallOnMap(this->goalPos))) {
+	if (!this->has_goal() && (this->Action == UnitAction::AttackGround || CMap::get()->WallOnMap(this->goalPos, this->MapLayer))) {
 	//Wyrmgus end
 		return;
 	}
@@ -735,7 +735,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 */
 void COrder_Attack::Execute(CUnit &unit)
 {
-	Assert(this->has_goal() || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
+	Assert(this->has_goal() || CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer));
 
 	if (unit.Wait) {
 		if (!unit.Waiting) {

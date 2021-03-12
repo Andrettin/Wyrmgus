@@ -117,14 +117,14 @@ void minimap::create_texture(GLuint &texture, const unsigned char *texture_data,
 */
 void minimap::Create()
 {
-	this->terrain_textures.resize(CMap::Map.MapLayers.size());
-	this->overlay_textures.resize(CMap::Map.MapLayers.size());
-	MinimapTextureWidth.resize(CMap::Map.MapLayers.size());
-	MinimapTextureHeight.resize(CMap::Map.MapLayers.size());
+	this->terrain_textures.resize(CMap::get()->MapLayers.size());
+	this->overlay_textures.resize(CMap::get()->MapLayers.size());
+	MinimapTextureWidth.resize(CMap::get()->MapLayers.size());
+	MinimapTextureHeight.resize(CMap::get()->MapLayers.size());
 
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
 		// Scale to biggest value.
-		int n = std::max(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
+		int n = std::max(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
 		n = std::max(n, 32);
 
 		const int texture_width = this->get_texture_width(z);
@@ -133,8 +133,8 @@ void minimap::Create()
 		MinimapScaleX.push_back((texture_width * MINIMAP_FAC + n - 1) / n);
 		MinimapScaleY.push_back((texture_height * MINIMAP_FAC + n - 1) / n);
 
-		XOffset.push_back((texture_width - (CMap::Map.Info.MapWidths[z] * MinimapScaleX[z]) / MINIMAP_FAC + 1) / 2);
-		YOffset.push_back((texture_height - (CMap::Map.Info.MapHeights[z] * MinimapScaleY[z]) / MINIMAP_FAC + 1) / 2);
+		XOffset.push_back((texture_width - (CMap::get()->Info.MapWidths[z] * MinimapScaleX[z]) / MINIMAP_FAC + 1) / 2);
+		YOffset.push_back((texture_height - (CMap::get()->Info.MapHeights[z] * MinimapScaleY[z]) / MINIMAP_FAC + 1) / 2);
 
 		DebugPrint("MinimapScale %d %d (%d %d), X off %d, Y off %d\n" _C_
 				   MinimapScaleX[z] / MINIMAP_FAC _C_ MinimapScaleY[z] / MINIMAP_FAC _C_
@@ -150,14 +150,14 @@ void minimap::Create()
 			Minimap2MapX[z][i] = ((i - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z];
 		}
 		for (int i = YOffset[z]; i < texture_height - YOffset[z]; ++i) {
-			Minimap2MapY[z][i] = (((i - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]) * CMap::Map.Info.MapWidths[z];
+			Minimap2MapY[z][i] = (((i - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]) * CMap::get()->Info.MapWidths[z];
 		}
-		Map2MinimapX.push_back(std::vector<int>(CMap::Map.Info.MapWidths[z], 0));
-		Map2MinimapY.push_back(std::vector<int>(CMap::Map.Info.MapHeights[z], 0));
-		for (int i = 0; i < CMap::Map.Info.MapWidths[z]; ++i) {
+		Map2MinimapX.push_back(std::vector<int>(CMap::get()->Info.MapWidths[z], 0));
+		Map2MinimapY.push_back(std::vector<int>(CMap::get()->Info.MapHeights[z], 0));
+		for (int i = 0; i < CMap::get()->Info.MapWidths[z]; ++i) {
 			Map2MinimapX[z][i] = (i * MinimapScaleX[z]) / MINIMAP_FAC;
 		}
-		for (int i = 0; i < CMap::Map.Info.MapHeights[z]; ++i) {
+		for (int i = 0; i < CMap::get()->Info.MapHeights[z]; ++i) {
 			Map2MinimapY[z][i] = (i * MinimapScaleY[z]) / MINIMAP_FAC;
 		}
 
@@ -208,7 +208,7 @@ void minimap::FreeOpenGL()
 */
 void minimap::Reload()
 {
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
 		this->create_textures(z);
 	}
 }
@@ -227,7 +227,7 @@ void minimap::UpdateTerrain(int z)
 		scaley = 1;
 	}
 	
-	const CMapLayer *map_layer = CMap::Map.MapLayers[z].get();
+	const CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
 	const int texture_width = this->get_texture_width(z);
 	const int texture_height = this->get_texture_height(z);
 	
@@ -280,9 +280,9 @@ void minimap::UpdateXY(const Vec2i &pos, const int z)
 		scaley = 1;
 	}
 
-	const season *season = CMap::Map.MapLayers[z]->get_tile_season(pos);
+	const season *season = CMap::get()->MapLayers[z]->get_tile_season(pos);
 
-	const int ty = pos.y * CMap::Map.Info.MapWidths[z];
+	const int ty = pos.y * CMap::get()->Info.MapWidths[z];
 	const int tx = pos.x;
 
 	const int texture_width = this->get_texture_width(z);
@@ -307,7 +307,7 @@ void minimap::UpdateXY(const Vec2i &pos, const int z)
 				break;
 			}
 
-			const tile &mf = *CMap::Map.MapLayers[z]->Field(x + y);
+			const tile &mf = *CMap::get()->MapLayers[z]->Field(x + y);
 			const terrain_type *terrain = mf.get_top_terrain(true);
 
 			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
@@ -323,7 +323,7 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 	const int texture_width = this->get_texture_width(z);
 	const int texture_height = this->get_texture_height(z);
 
-	const int ty = pos.y() * CMap::Map.Info.MapWidths[z];
+	const int ty = pos.y() * CMap::get()->Info.MapWidths[z];
 	const int tx = pos.x();
 	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
 
@@ -353,7 +353,7 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 
 void minimap::update_territory_pixel(const int mx, const int my, const int z)
 {
-	const CMapLayer *map_layer = CMap::Map.MapLayers[z].get();
+	const CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
 	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
 	const int minimap_color_index = defines::get()->get_minimap_color_index();
 
@@ -600,7 +600,7 @@ void minimap::Update()
 				visiontype = 2;
 			} else {
 				const Vec2i tilePos(Minimap2MapX[z][mx], Minimap2MapY[z][my] / UI.CurrentMapLayer->get_width());
-				visiontype = CMap::Map.Field(tilePos, z)->player_info->TeamVisibilityState(*CPlayer::GetThisPlayer());
+				visiontype = CMap::get()->Field(tilePos, z)->player_info->TeamVisibilityState(*CPlayer::GetThisPlayer());
 			}
 
 			switch (visiontype) {
@@ -738,7 +738,7 @@ QPoint minimap::texture_to_tile_pos(const QPoint &texture_pos) const
 	Vec2i tile_pos(((texture_pos.x() - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z],
 		((texture_pos.y() - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]);
 
-	CMap::Map.Clamp(tile_pos, UI.CurrentMapLayer->ID);
+	CMap::get()->Clamp(tile_pos, UI.CurrentMapLayer->ID);
 
 	return tile_pos;
 }
@@ -875,12 +875,12 @@ bool minimap::Contains(const PixelPos &screenPos) const
 
 int minimap::get_texture_width(const size_t z) const
 {
-	return std::max(this->get_width(), CMap::Map.Info.MapWidths[z]);
+	return std::max(this->get_width(), CMap::get()->Info.MapWidths[z]);
 }
 
 int minimap::get_texture_height(const size_t z) const
 {
-	return std::max(this->get_height(), CMap::Map.Info.MapHeights[z]);
+	return std::max(this->get_height(), CMap::get()->Info.MapHeights[z]);
 }
 
 bool minimap::is_mode_valid(const minimap_mode mode) const

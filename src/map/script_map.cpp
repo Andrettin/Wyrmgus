@@ -91,9 +91,9 @@ static int CclStratagusMap(lua_State *l)
 				fprintf(stderr, "Warning: not saved with this version.\n");
 			}
 		} else if (!strcmp(value, "uid")) {
-			CMap::Map.Info.MapUID = LuaToNumber(l, j + 1);
+			CMap::get()->Info.MapUID = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "description")) {
-			CMap::Map.Info.Description = LuaToString(l, j + 1);
+			CMap::get()->Info.Description = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "the-map")) {
 			if (!lua_istable(l, j + 1)) {
 				//Wyrmgus start
@@ -107,13 +107,13 @@ static int CclStratagusMap(lua_State *l)
 				++k;
 
 				if (!strcmp(subvalue, "fog-of-war")) {
-					CMap::Map.NoFogOfWar = false;
+					CMap::get()->NoFogOfWar = false;
 					--k;
 				} else if (!strcmp(subvalue, "no-fog-of-war")) {
-					CMap::Map.NoFogOfWar = true;
+					CMap::get()->NoFogOfWar = true;
 					--k;
 				} else if (!strcmp(subvalue, "filename")) {
-					CMap::Map.Info.Filename = LuaToString(l, j + 1, k + 1);
+					CMap::get()->Info.Filename = LuaToString(l, j + 1, k + 1);
 				//Wyrmgus start
 				} else if (!strcmp(subvalue, "extra-map-layers")) {
 					lua_rawgeti(l, j + 1, k + 1);
@@ -129,10 +129,10 @@ static int CclStratagusMap(lua_State *l)
 						const int width = LuaToNumber(l, -1, 1);
 						const int height = LuaToNumber(l, -1, 2);
 						auto map_layer = std::make_unique<CMapLayer>(width, height);
-						CMap::Map.Info.MapWidths.push_back(map_layer->get_width());
-						CMap::Map.Info.MapHeights.push_back(map_layer->get_height());
-						map_layer->ID = CMap::Map.MapLayers.size();
-						CMap::Map.MapLayers.push_back(std::move(map_layer));
+						CMap::get()->Info.MapWidths.push_back(map_layer->get_width());
+						CMap::get()->Info.MapHeights.push_back(map_layer->get_height());
+						map_layer->ID = CMap::get()->MapLayers.size();
+						CMap::get()->MapLayers.push_back(std::move(map_layer));
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -143,7 +143,7 @@ static int CclStratagusMap(lua_State *l)
 					}
 					const int subsubargs = lua_rawlen(l, -1);
 					for (int z = 0; z < subsubargs; ++z) {
-						const std::unique_ptr<CMapLayer> &map_layer = CMap::Map.MapLayers[z];
+						const std::unique_ptr<CMapLayer> &map_layer = CMap::get()->MapLayers[z];
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument for \"time-of-day\"");
 						}
@@ -173,12 +173,12 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"season\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						CMap::Map.MapLayers[z]->set_season_schedule(season_schedule::try_get(LuaToString(l, -1, 1)));
+						CMap::get()->MapLayers[z]->set_season_schedule(season_schedule::try_get(LuaToString(l, -1, 1)));
 						unsigned season = LuaToNumber(l, -1, 2);
-						if (CMap::Map.MapLayers[z]->get_season_schedule() && season < CMap::Map.MapLayers[z]->get_season_schedule()->get_scheduled_seasons().size()) {
-							CMap::Map.MapLayers[z]->season = CMap::Map.MapLayers[z]->get_season_schedule()->get_scheduled_seasons()[season].get();
+						if (CMap::get()->MapLayers[z]->get_season_schedule() && season < CMap::get()->MapLayers[z]->get_season_schedule()->get_scheduled_seasons().size()) {
+							CMap::get()->MapLayers[z]->season = CMap::get()->MapLayers[z]->get_season_schedule()->get_scheduled_seasons()[season].get();
 						}
-						CMap::Map.MapLayers[z]->RemainingSeasonHours = LuaToNumber(l, -1, 3);
+						CMap::get()->MapLayers[z]->RemainingSeasonHours = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -193,8 +193,8 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"layer-references\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						CMap::Map.MapLayers[z]->plane = wyrmgus::plane::try_get(LuaToString(l, -1, 1));
-						CMap::Map.MapLayers[z]->world = wyrmgus::world::try_get(LuaToString(l, -1, 2));
+						CMap::get()->MapLayers[z]->plane = wyrmgus::plane::try_get(LuaToString(l, -1, 1));
+						CMap::get()->MapLayers[z]->world = wyrmgus::world::try_get(LuaToString(l, -1, 2));
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -226,14 +226,14 @@ static int CclStratagusMap(lua_State *l)
 					}
 					const int subsubargs = lua_rawlen(l, -1);
 					for (int z = 0; z < subsubargs; ++z) {
-						const std::unique_ptr<CMapLayer> &map_layer = CMap::Map.MapLayers[z];
+						const std::unique_ptr<CMapLayer> &map_layer = CMap::get()->MapLayers[z];
 						
 						lua_rawgeti(l, -1, z + 1);
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument");
 						}
 						const int subsubsubargs = lua_rawlen(l, -1);
-						if (subsubsubargs != CMap::Map.Info.MapWidths[z] * CMap::Map.Info.MapHeights[z]) {
+						if (subsubsubargs != CMap::get()->Info.MapWidths[z] * CMap::get()->Info.MapHeights[z]) {
 							fprintf(stderr, "Wrong tile table length: %d\n", subsubsubargs);
 						}
 						for (int i = 0; i < subsubsubargs; ++i) {
@@ -263,13 +263,13 @@ static int CclStratagusMap(lua_State *l)
 		}
 	}
 	
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
 		CMap::get()->process_settlement_territory_tiles(z);
 
-		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
-			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
+		for (int ix = 0; ix < CMap::get()->Info.MapWidths[z]; ++ix) {
+			for (int iy = 0; iy < CMap::get()->Info.MapHeights[z]; ++iy) {
 				const QPoint tile_pos(ix, iy);
-				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z); //so that the correct ownership border is shown after a loaded game
+				CMap::get()->CalculateTileOwnershipTransition(tile_pos, z); //so that the correct ownership border is shown after a loaded game
 			}
 		}
 	}
@@ -288,8 +288,8 @@ static int CclRevealMap(lua_State *l)
 //	LuaCheckArgs(l, 0);
 	//Wyrmgus end
 	//Wyrmgus start
-//	if (CclInConfigFile || !CMap::Map.Fields) {
-	if (CclInConfigFile || CMap::Map.MapLayers.size() == 0) {
+//	if (CclInConfigFile || !CMap::get()->Fields) {
+	if (CclInConfigFile || CMap::get()->MapLayers.size() == 0) {
 	//Wyrmgus end
 		FlagRevealMap = 1;
 	} else {
@@ -300,7 +300,7 @@ static int CclRevealMap(lua_State *l)
 		if (nargs == 1) {
 			only_person_players = LuaToBoolean(l, 1);
 		}
-		CMap::Map.Reveal(only_person_players);
+		CMap::get()->Reveal(only_person_players);
 		//Wyrmgus end
 	}
 	return 0;
@@ -316,7 +316,7 @@ static int CclCenterMap(lua_State *l)
 	LuaCheckArgs(l, 2);
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
-	UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(pos));
+	UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(pos));
 	return 0;
 }
 
@@ -386,10 +386,10 @@ static int CclShowMapLocation(lua_State *l)
 static int CclSetFogOfWar(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	CMap::Map.NoFogOfWar = !LuaToBoolean(l, 1);
+	CMap::get()->NoFogOfWar = !LuaToBoolean(l, 1);
 	//Wyrmgus start
-//	if (!CclInConfigFile && CMap::Map.Fields) {
-	if (!CclInConfigFile && CMap::Map.MapLayers.size() > 0) {
+//	if (!CclInConfigFile && CMap::get()->Fields) {
+	if (!CclInConfigFile && CMap::get()->MapLayers.size() > 0) {
 	//Wyrmgus end
 		UpdateFogOfWarChange();
 		// FIXME: save setting in replay log
@@ -401,7 +401,7 @@ static int CclSetFogOfWar(lua_State *l)
 static int CclGetFogOfWar(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushboolean(l, !CMap::Map.NoFogOfWar);
+	lua_pushboolean(l, !CMap::get()->NoFogOfWar);
 	return 1;
 }
 
@@ -422,7 +422,7 @@ static int CclSetFogOfWarOpacity(lua_State *l)
 	FogOfWarOpacity = i;
 
 	if (!CclInConfigFile) {
-		CMap::Map.Init();
+		CMap::get()->Init();
 	}
 	return 0;
 }
@@ -477,11 +477,11 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 */
 void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
 {
-	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
+	if (!CMap::get()->Info.IsPointOnMap(pos, z)) {
 		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
-	if (CMap::Map.Tileset->getTileCount() <= tileIndex) {
+	if (CMap::get()->Tileset->getTileCount() <= tileIndex) {
 		fprintf(stderr, "Invalid tile number: %d\n", tileIndex);
 		return;
 	}
@@ -498,14 +498,14 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
 	
 	//Wyrmgus start
 //	if (Map.Fields) {
-	if (static_cast<int>(CMap::Map.MapLayers.size()) >= z) {
+	if (static_cast<int>(CMap::get()->MapLayers.size()) >= z) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		wyrmgus::tile &mf = *CMap::Map.Field(pos);
-		wyrmgus::tile &mf = *CMap::Map.Field(pos, z);
+//		wyrmgus::tile &mf = *CMap::get()->Field(pos);
+		wyrmgus::tile &mf = *CMap::get()->Field(pos, z);
 		//Wyrmgus end
 
-		mf.setTileIndex(*CMap::Map.Tileset, tileIndex, value);
+		mf.setTileIndex(*CMap::get()->Tileset, tileIndex, value);
 	}
 }
 
@@ -519,7 +519,7 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
 */
 void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int value, int z)
 {
-	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
+	if (!CMap::get()->Info.IsPointOnMap(pos, z)) {
 		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
@@ -531,8 +531,8 @@ void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int valu
 		return;
 	}
 	
-	if (static_cast<int>(CMap::Map.MapLayers.size()) >= z) {
-		wyrmgus::tile &mf = *CMap::Map.Field(pos, z);
+	if (static_cast<int>(CMap::get()->MapLayers.size()) >= z) {
+		wyrmgus::tile &mf = *CMap::get()->Field(pos, z);
 
 		mf.set_value(value);
 		mf.SetTerrain(terrain);
@@ -875,26 +875,26 @@ static int CclDefinePlayerTypes(lua_State *l)
 		}
 		const char *type = LuaToString(l, i + 1);
 		if (!strcmp(type, "neutral")) {
-			CMap::Map.Info.PlayerType[i] = PlayerNeutral;
+			CMap::get()->Info.PlayerType[i] = PlayerNeutral;
 		} else if (!strcmp(type, "nobody")) {
-			CMap::Map.Info.PlayerType[i] = PlayerNobody;
+			CMap::get()->Info.PlayerType[i] = PlayerNobody;
 		} else if (!strcmp(type, "computer")) {
-			CMap::Map.Info.PlayerType[i] = PlayerComputer;
+			CMap::get()->Info.PlayerType[i] = PlayerComputer;
 		} else if (!strcmp(type, "person")) {
-			CMap::Map.Info.PlayerType[i] = PlayerPerson;
+			CMap::get()->Info.PlayerType[i] = PlayerPerson;
 		} else if (!strcmp(type, "rescue-passive")) {
-			CMap::Map.Info.PlayerType[i] = PlayerRescuePassive;
+			CMap::get()->Info.PlayerType[i] = PlayerRescuePassive;
 		} else if (!strcmp(type, "rescue-active")) {
-			CMap::Map.Info.PlayerType[i] = PlayerRescueActive;
+			CMap::get()->Info.PlayerType[i] = PlayerRescueActive;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ type);
 		}
 	}
 	for (int i = numplayers; i < PlayerMax - 1; ++i) {
-		CMap::Map.Info.PlayerType[i] = PlayerNobody;
+		CMap::get()->Info.PlayerType[i] = PlayerNobody;
 	}
 	if (numplayers < PlayerMax) {
-		CMap::Map.Info.PlayerType[PlayerMax - 1] = PlayerNeutral;
+		CMap::get()->Info.PlayerType[PlayerMax - 1] = PlayerNeutral;
 	}
 	return 0;
 }
@@ -909,8 +909,8 @@ static int CclLoadTileModels(lua_State *l)
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	CMap::Map.TileModelsFileName = LuaToString(l, 1);
-	const std::string filename = LibraryFileName(CMap::Map.TileModelsFileName.c_str());
+	CMap::get()->TileModelsFileName = LuaToString(l, 1);
+	const std::string filename = LibraryFileName(CMap::get()->TileModelsFileName.c_str());
 	if (LuaLoadFile(filename) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ filename.c_str());
 	}
@@ -924,11 +924,11 @@ static int CclLoadTileModels(lua_State *l)
 */
 static int CclDefineTileset(lua_State *l)
 {
-	CMap::Map.Tileset->parse(l);
+	CMap::get()->Tileset->parse(l);
 
-	ShowLoadProgress(_("Loading Tileset \"%s\""), CMap::Map.Tileset->ImageFile.c_str());
-	CMap::Map.TileGraphic = CGraphic::New(CMap::Map.Tileset->ImageFile, wyrmgus::defines::get()->get_tile_size());
-	CMap::Map.TileGraphic->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	ShowLoadProgress(_("Loading Tileset \"%s\""), CMap::get()->Tileset->ImageFile.c_str());
+	CMap::get()->TileGraphic = CGraphic::New(CMap::get()->Tileset->ImageFile, wyrmgus::defines::get()->get_tile_size());
+	CMap::get()->TileGraphic->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	return 0;
 }
 /**
@@ -942,7 +942,7 @@ static int CclBuildTilesetTables(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
-	CMap::Map.Tileset->buildTable();
+	CMap::get()->Tileset->buildTable();
 	return 0;
 }
 /**
@@ -957,14 +957,14 @@ static int CclSetTileFlags(lua_State *l)
 	}
 	const unsigned int tilenumber = LuaToNumber(l, 1);
 
-	if (tilenumber >= CMap::Map.Tileset->tiles.size()) {
+	if (tilenumber >= CMap::get()->Tileset->tiles.size()) {
 		LuaError(l, "Accessed a tile that's not defined");
 	}
 	int j = 0;
 	tile_flag flags = tile_flag::none;
 
 	ParseTilesetTileFlags(l, &flags, &j);
-	CMap::Map.Tileset->tiles[tilenumber].flag = flags;
+	CMap::get()->Tileset->tiles[tilenumber].flag = flags;
 	return 0;
 }
 
@@ -978,7 +978,7 @@ static int CclSetTileFlags(lua_State *l)
 */
 static int CclGetCurrentTileset(lua_State *l)
 {
-	const CTileset &tileset = *CMap::Map.Tileset;
+	const CTileset &tileset = *CMap::get()->Tileset;
 	lua_pushstring(l, tileset.Ident.c_str());
 	return 1;
 }
@@ -1014,7 +1014,7 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
 	*/
-	lua_pushstring(l, CMap::Map.GetTileTopTerrain(pos, false, z)->get_identifier().c_str());
+	lua_pushstring(l, CMap::get()->GetTileTopTerrain(pos, false, z)->get_identifier().c_str());
 	//Wyrmgus end
 	return 1;
 }
@@ -1070,7 +1070,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	//Wyrmgus start
-	if (pos.x < 0 || pos.x >= CMap::Map.Info.MapWidths[z] || pos.y < 0 || pos.y >= CMap::Map.Info.MapHeights[z]) {
+	if (pos.x < 0 || pos.x >= CMap::get()->Info.MapWidths[z] || pos.y < 0 || pos.y >= CMap::get()->Info.MapHeights[z]) {
 		lua_pushboolean(l, 0);
 		return 1;
 	}
@@ -1080,8 +1080,8 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	const tile_flag flag = string_to_tile_flag(flag_name);
 
 	//Wyrmgus start
-//	const wyrmgus::tile &mf = *CMap::Map.Field(pos);
-	const wyrmgus::tile &mf = *CMap::Map.Field(pos, z);
+//	const wyrmgus::tile &mf = *CMap::get()->Field(pos);
+	const wyrmgus::tile &mf = *CMap::get()->Field(pos, z);
 	//Wyrmgus end
 
 	if (mf.has_flag(flag)) {
@@ -1673,23 +1673,23 @@ static int CclGetMapTemplateData(lua_State *l)
 		lua_pushnumber(l, map_template->current_start_pos.y());
 		return 1;
 	} else if (!strcmp(data, "MapStartPosX")) {
-		Vec2i pos = CMap::Map.get_subtemplate_pos(map_template);
+		Vec2i pos = CMap::get()->get_subtemplate_pos(map_template);
 		lua_pushnumber(l, pos.x);
 		return 1;
 	} else if (!strcmp(data, "MapStartPosY")) {
-		Vec2i pos = CMap::Map.get_subtemplate_pos(map_template);
+		Vec2i pos = CMap::get()->get_subtemplate_pos(map_template);
 		lua_pushnumber(l, pos.y);
 		return 1;
 	} else if (!strcmp(data, "MapEndPosX")) {
-		Vec2i pos = CMap::Map.get_subtemplate_end_pos(map_template);
+		Vec2i pos = CMap::get()->get_subtemplate_end_pos(map_template);
 		lua_pushnumber(l, pos.x);
 		return 1;
 	} else if (!strcmp(data, "MapEndPosY")) {
-		Vec2i pos = CMap::Map.get_subtemplate_end_pos(map_template);
+		Vec2i pos = CMap::get()->get_subtemplate_end_pos(map_template);
 		lua_pushnumber(l, pos.y);
 		return 1;
 	} else if (!strcmp(data, "MapLayer")) {
-		const CMapLayer *map_layer = CMap::Map.get_subtemplate_map_layer(map_template);
+		const CMapLayer *map_layer = CMap::get()->get_subtemplate_map_layer(map_template);
 		if (map_layer) {
 			lua_pushnumber(l, map_layer->ID);
 		} else {

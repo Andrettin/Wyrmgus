@@ -44,10 +44,10 @@
 
 static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 {
-	if (CMap::Map.Info.IsPointOnMap(pos, z) == false) {
+	if (CMap::get()->Info.IsPointOnMap(pos, z) == false) {
 		return false;
 	}
-	const wyrmgus::tile &mf = *CMap::Map.Field(pos, z);
+	const wyrmgus::tile &mf = *CMap::get()->Field(pos, z);
 	const CUnitCache &unitCache = mf.UnitCache;
 	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
 		return true;
@@ -194,7 +194,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 #endif
 	*/
 
-	const wyrmgus::tile *tile = CMap::Map.Field(pos, z);
+	const wyrmgus::tile *tile = CMap::get()->Field(pos, z);
 
 	if (!IgnoreExploration && !tile->player_info->IsTeamExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
@@ -206,7 +206,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	
 //	if (CanBuildUnitType(&worker, type, pos, 1)
 	if (
-		(!landmass || CMap::Map.get_tile_landmass(pos, z) == landmass)
+		(!landmass || CMap::get()->get_tile_landmass(pos, z) == landmass)
 		&& CanBuildUnitType(&worker, type, pos, 1, IgnoreExploration, z)
 		&& !AiEnemyUnitsInDistance(*worker.Player, nullptr, pos, 8, z)
 		&& (!this->settlement || this->settlement == tile->get_settlement())
@@ -249,15 +249,15 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const wyrmgus::unit_type &
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
-	terrainTraversal.SetSize(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::get()->Info.MapWidth, CMap::get()->Info.MapHeight);
+	terrainTraversal.SetSize(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
 	if (startUnit != nullptr) {
 		terrainTraversal.PushUnitPosAndNeighbor(*startUnit);
 	} else {
-		Assert(CMap::Map.Info.IsPointOnMap(startPos, z));
+		Assert(CMap::get()->Info.IsPointOnMap(startPos, z));
 		terrainTraversal.PushPos(startPos);
 	}
 
@@ -267,7 +267,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const wyrmgus::unit_type &
 	//Wyrmgus end
 
 	terrainTraversal.Run(buildingPlaceFinder);
-	return CMap::Map.Info.IsPointOnMap(*resultPos, z);
+	return CMap::get()->Info.IsPointOnMap(*resultPos, z);
 }
 
 class HallPlaceFinder final
@@ -370,14 +370,14 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 #endif
 	*/
 	//Wyrmgus start
-//	if (!IgnoreExploration && !CMap::Map.Field(pos)->player_info->IsTeamExplored(*worker.Player)) {
-	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->player_info->IsTeamExplored(*worker.Player)) {
+//	if (!IgnoreExploration && !CMap::get()->Field(pos)->player_info->IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !CMap::get()->Field(pos, z)->player_info->IsTeamExplored(*worker.Player)) {
 	//Wyrmgus end
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->get_owner() != nullptr && CMap::Map.Field(pos, z)->get_owner() != worker.Player && !CMap::Map.Field(pos, z)->get_owner()->has_neutral_faction_type() && !worker.Player->has_neutral_faction_type()) {
+	if (CMap::get()->Field(pos, z)->get_owner() != nullptr && CMap::get()->Field(pos, z)->get_owner() != worker.Player && !CMap::get()->Field(pos, z)->get_owner()->has_neutral_faction_type() && !worker.Player->has_neutral_faction_type()) {
 		return VisitResult::DeadEnd;
 	}
 	
@@ -452,12 +452,12 @@ static bool AiFindHallPlace(const CUnit &worker,
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
-	terrainTraversal.SetSize(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::get()->Info.MapWidth, CMap::get()->Info.MapHeight);
+	terrainTraversal.SetSize(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(CMap::Map.Info.IsPointOnMap(startPos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(startPos, z));
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -516,7 +516,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 #endif
 	*/
 
-	const wyrmgus::tile *tile = CMap::Map.Field(pos, z);
+	const wyrmgus::tile *tile = CMap::get()->Field(pos, z);
 	if (!IgnoreExploration && !tile->player_info->IsTeamExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
 	}
@@ -528,7 +528,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 		return VisitResult::DeadEnd;
 	}
 
-//	if (CMap::Map.Field(pos)->get_resource() == wyrmgus::resource::get_all()[resource]) {
+//	if (CMap::get()->Field(pos)->get_resource() == wyrmgus::resource::get_all()[resource]) {
 	if (tile->get_resource() == wyrmgus::resource::get_all()[resource]) {
 	//Wyrmgus end
 		//Wyrmgus start
@@ -567,12 +567,12 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const wyrmgus::unit_type 
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
-	terrainTraversal.SetSize(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::get()->Info.MapWidth, CMap::get()->Info.MapHeight);
+	terrainTraversal.SetSize(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(CMap::Map.Info.IsPointOnMap(startPos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(startPos, z));
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -631,7 +631,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, co
 	}
 	//Wyrmgus end
 
-	const Vec2i &startPos = CMap::Map.Info.IsPointOnMap(nearPos, z) ? nearPos : worker.tilePos;
+	const Vec2i &startPos = CMap::get()->Info.IsPointOnMap(nearPos, z) ? nearPos : worker.tilePos;
 	
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {

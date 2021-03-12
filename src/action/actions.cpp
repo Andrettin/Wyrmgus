@@ -451,11 +451,11 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		}
 		
 		//apply "-stalk" abilities
-		if ((unit.Variable[DESERTSTALK_INDEX].Value > 0 || unit.Variable[FORESTSTALK_INDEX].Value > 0 || unit.Variable[SWAMPSTALK_INDEX].Value > 0) && CMap::Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)) {
+		if ((unit.Variable[DESERTSTALK_INDEX].Value > 0 || unit.Variable[FORESTSTALK_INDEX].Value > 0 || unit.Variable[SWAMPSTALK_INDEX].Value > 0) && CMap::get()->Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)) {
 			if (
 				(
 					(unit.Variable[DESERTSTALK_INDEX].Value > 0 && unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->has_flag(tile_flag::desert))
-					|| (unit.Variable[FORESTSTALK_INDEX].Value > 0 && CMap::Map.TileBordersFlag(unit.tilePos, unit.MapLayer->ID, tile_flag::tree))
+					|| (unit.Variable[FORESTSTALK_INDEX].Value > 0 && CMap::get()->TileBordersFlag(unit.tilePos, unit.MapLayer->ID, tile_flag::tree))
 					|| (unit.Variable[SWAMPSTALK_INDEX].Value > 0 && unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->has_flag(tile_flag::mud))
 				)
 				&& (unit.Variable[INVISIBLE_INDEX].Value > 0 || !unit.IsInCombat())
@@ -472,7 +472,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		
 		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
 			unit.Type->BoolFlag[ORGANIC_INDEX].value
-			&& CMap::Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer)
+			&& CMap::get()->Info.IsPointOnMap(unit.tilePos, unit.MapLayer)
 			&& unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::desert)
 			&& unit.MapLayer->Field(unit.tilePos)->get_owner() != unit.Player
 			&& unit.get_center_tile_time_of_day() != nullptr

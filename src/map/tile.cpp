@@ -865,7 +865,7 @@ unsigned char tile_player_info::TeamVisibilityState(const CPlayer &player) const
 		}
 	}
 
-	if (maxVision == 1 && CMap::Map.NoFogOfWar) {
+	if (maxVision == 1 && CMap::get()->NoFogOfWar) {
 		return 2;
 	}
 
@@ -886,7 +886,7 @@ bool tile_player_info::IsTeamExplored(const CPlayer &player) const
 
 bool tile_player_info::IsVisible(const CPlayer &player) const
 {
-	const bool fogOfWar = !CMap::Map.NoFogOfWar;
+	const bool fogOfWar = !CMap::get()->NoFogOfWar;
 	return Visible[player.Index] >= 2 || (!fogOfWar && IsExplored(player));
 }
 

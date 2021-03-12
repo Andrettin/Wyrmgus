@@ -101,7 +101,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		return VisitResult::DeadEnd;
 	}
 	
-	if (unit.MapLayer->Field(pos)->CheckMask(tile_flag::wall) && !CMap::Map.Info.IsPointOnMap(*result_enemy_wall_pos, *result_enemy_wall_map_layer)) {
+	if (unit.MapLayer->Field(pos)->CheckMask(tile_flag::wall) && !CMap::get()->Info.IsPointOnMap(*result_enemy_wall_pos, *result_enemy_wall_map_layer)) {
 		const CPlayer *tile_owner = unit.MapLayer->Field(pos)->get_owner();
 		if (
 			tile_owner != nullptr
@@ -538,7 +538,7 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 	Q_UNUSED(from)
 
 	//Wyrmgus start
-	if (!CMap::Map.Field(pos, z)->player_info->IsTeamExplored(*startUnit.Player)) { // don't pick unexplored positions
+	if (!CMap::get()->Field(pos, z)->player_info->IsTeamExplored(*startUnit.Player)) { // don't pick unexplored positions
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
@@ -617,12 +617,12 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
-	terrainTraversal.SetSize(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::get()->Info.MapWidth, CMap::get()->Info.MapHeight);
+	terrainTraversal.SetSize(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(CMap::Map.Info.IsPointOnMap(startPos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(startPos, z));
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -636,8 +636,8 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 //Wyrmgus start
 bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 {
-	const landmass *home_landmass = CMap::Map.get_tile_landmass(this->HomePos, this->HomeMapLayer);
-	const landmass *goal_landmass = CMap::Map.get_tile_landmass(pos, z);
+	const landmass *home_landmass = CMap::get()->get_tile_landmass(this->HomePos, this->HomeMapLayer);
+	const landmass *goal_landmass = CMap::get()->get_tile_landmass(pos, z);
 
 	const landmass *water_landmass = nullptr;
 	if (home_landmass != nullptr && goal_landmass != nullptr) {
@@ -662,7 +662,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 			continue;
 		}
 		
-		if (CMap::Map.get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 		
@@ -705,7 +705,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 			continue;
 		}
 		
-		if (CMap::Map.get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 		
@@ -741,7 +741,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	for (size_t i = 0; i != this->get_units().size(); ++i) {
 		CUnit *ai_unit = *this->get_units()[i];
 		
-		if (CMap::Map.get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 
@@ -915,7 +915,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			break;
 		}
 	}
-	if (CMap::Map.Info.IsPointOnMap(goalPos, z) == false) {
+	if (CMap::get()->Info.IsPointOnMap(goalPos, z) == false) {
 		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 		const wyrmgus::quest *current_quest = current_campaign ? current_campaign->get_quest() : nullptr;
 
@@ -951,10 +951,10 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			}
 			//Wyrmgus end
 		//Wyrmgus start
-		} else if (CMap::Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
+		} else if (CMap::get()->Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 			goalPos = enemy_wall_pos;
 			z = enemy_wall_map_layer;
-			CPlayer *enemy_wall_owner = CMap::Map.Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
+			CPlayer *enemy_wall_owner = CMap::get()->Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
 			if (!AiPlayer->Player->IsEnemy(*enemy_wall_owner) && enemy_wall_owner->Type != PlayerNeutral) {
 				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
 			}
@@ -977,7 +977,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	}
 	//Wyrmgus end
 
-	if (CMap::Map.Info.IsPointOnMap(goalPos, z) == false || isTransporter) {
+	if (CMap::get()->Info.IsPointOnMap(goalPos, z) == false || isTransporter) {
 		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
 		if (State == AiForceAttackingState::Waiting && !PlanAttack()) {
 			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
@@ -991,7 +991,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		bool needs_transport = false;
 		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
 			CUnit *unit = unit_ref->get();
-			if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && CMap::Map.get_tile_landmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.get_tile_landmass(goalPos, z)) {
+			if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && CMap::get()->get_tile_landmass(unit->tilePos, unit->MapLayer->ID) != CMap::get()->get_tile_landmass(goalPos, z)) {
 				needs_transport = true;
 				break;
 			}
@@ -1079,7 +1079,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 
 void AiForce::ReturnToHome()
 {
-	if (CMap::Map.Info.IsPointOnMap(this->HomePos, this->HomeMapLayer)) {
+	if (CMap::get()->Info.IsPointOnMap(this->HomePos, this->HomeMapLayer)) {
 		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
 			CUnit *unit = unit_ref->get();
 			//Wyrmgus start
@@ -1325,11 +1325,11 @@ void AiAttackWithForceAt(unsigned int force, int x, int y, int z)
 		return ;
 	}
 
-	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
+	if (!CMap::get()->Info.IsPointOnMap(pos, z)) {
 		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ pos.x _C_ pos.y
 				   //Wyrmgus start
-//				   _C_ CMap::Map.Info.MapWidth _C_ CMap::Map.Info.MapHeight);
-				   _C_ CMap::Map.Info.MapWidths[z] _C_ CMap::Map.Info.MapHeights[z]);
+//				   _C_ CMap::get()->Info.MapWidth _C_ CMap::get()->Info.MapHeight);
+				   _C_ CMap::get()->Info.MapWidths[z] _C_ CMap::get()->Info.MapHeights[z]);
 				   //Wyrmgus end
 		return ;
 	}
@@ -1562,7 +1562,7 @@ void AiForce::Update()
 	//Wyrmgus end
 
 	//if force still has no goal, run its Attack function again to get a target
-	if (CMap::Map.Info.IsPointOnMap(GoalPos, GoalMapLayer) == false) {
+	if (CMap::get()->Info.IsPointOnMap(GoalPos, GoalMapLayer) == false) {
 		const Vec2i invalidPos(-1, -1);
 		//Wyrmgus start
 		int z = AiPlayer->Player->StartMapLayer;
@@ -1654,7 +1654,7 @@ void AiForce::Update()
 	bool needs_transport = false;
 	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
 		CUnit *unit = unit_ref->get();
-		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && unit->Type->UnitType != UnitTypeType::Naval && CMap::Map.get_tile_landmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.get_tile_landmass(this->GoalPos, this->GoalMapLayer)) {
+		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && unit->Type->UnitType != UnitTypeType::Naval && CMap::get()->get_tile_landmass(unit->tilePos, unit->MapLayer->ID) != CMap::get()->get_tile_landmass(this->GoalPos, this->GoalMapLayer)) {
 			needs_transport = true;
 			break;
 		}
@@ -1680,7 +1680,7 @@ void AiForce::Update()
 //	const int thresholdDist = 5; // Hard coded value
 	const int thresholdDist = std::max(5, static_cast<int>(this->get_units().size()) / 8);
 	//Wyrmgus end
-	Assert(CMap::Map.Info.IsPointOnMap(GoalPos, GoalMapLayer));
+	Assert(CMap::get()->Info.IsPointOnMap(GoalPos, GoalMapLayer));
 
 	const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 	const wyrmgus::quest *current_quest = current_campaign ? current_campaign->get_quest() : nullptr;
@@ -1723,7 +1723,7 @@ void AiForce::Update()
 //				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
 				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, true);
 				//Wyrmgus end
-				if (!unit && !CMap::Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
+				if (!unit && !CMap::get()->Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 					//Wyrmgus start
 					/*
 					// No enemy found, give up
@@ -1749,10 +1749,10 @@ void AiForce::Update()
 				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
 				}
-			} else if (CMap::Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
+			} else if (CMap::get()->Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 				this->GoalPos = enemy_wall_pos;
 				this->GoalMapLayer = enemy_wall_map_layer;
-				CPlayer *enemy_wall_owner = CMap::Map.Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
+				CPlayer *enemy_wall_owner = CMap::get()->Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
 				if (!AiPlayer->Player->IsEnemy(*enemy_wall_owner) && enemy_wall_owner->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
 				}
@@ -1823,7 +1823,7 @@ void AiForce::Update()
 			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, true);
 			//Wyrmgus end
 		}
-		if (!unit && !CMap::Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
+		if (!unit && !CMap::get()->Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 			//Wyrmgus start
 			/*
 			// No enemy found, give up
@@ -1853,14 +1853,14 @@ void AiForce::Update()
 				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
 				}
-			} else if (CMap::Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
+			} else if (CMap::get()->Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 				NewRallyPoint(enemy_wall_pos, &resultPos, enemy_wall_map_layer);
 				if (resultPos.x == 0 && resultPos.y == 0) {
 					resultPos = enemy_wall_pos;
 				}
 				this->GoalPos = resultPos;
 				this->GoalMapLayer = enemy_wall_map_layer;
-				CPlayer *enemy_wall_owner = CMap::Map.Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
+				CPlayer *enemy_wall_owner = CMap::get()->Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
 				if (!AiPlayer->Player->IsEnemy(*enemy_wall_owner) && enemy_wall_owner->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
 				}
@@ -2059,7 +2059,7 @@ void AiForceManager::Update()
 			}
 			const int nearDist = 5;
 
-			if (CMap::Map.Info.IsPointOnMap(force.GoalPos, force.GoalMapLayer) == false) {
+			if (CMap::get()->Info.IsPointOnMap(force.GoalPos, force.GoalMapLayer) == false) {
 				force.ReturnToHome();
 			} else {
 				//  Check if some unit from force reached goal point

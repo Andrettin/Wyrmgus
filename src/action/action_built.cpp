@@ -333,12 +333,12 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus end
 		try {
 			//Wyrmgus start
-	//		CMap::Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
-			if (type.TerrainType->is_overlay() && CMap::Map.GetTileTerrain(unit.tilePos, type.TerrainType->is_overlay(), unit.MapLayer->ID) != nullptr) {
+	//		CMap::get()->SetWall(unit.tilePos, &type == UnitTypeHumanWall);
+			if (type.TerrainType->is_overlay() && CMap::get()->GetTileTerrain(unit.tilePos, type.TerrainType->is_overlay(), unit.MapLayer->ID) != nullptr) {
 				//remove an existent overlay terrain if present, e.g. so that if a destroyed wall of the same type is present here, the new wall can be properly placed without still being destroyed
-				CMap::Map.RemoveTileOverlayTerrain(unit.tilePos, unit.MapLayer->ID);
+				CMap::get()->RemoveTileOverlayTerrain(unit.tilePos, unit.MapLayer->ID);
 			}
-			CMap::Map.SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer->ID);
+			CMap::get()->SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer->ID);
 			//Wyrmgus end
 			unit.Remove(nullptr);
 			UnitLost(unit);
@@ -453,7 +453,7 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
-	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, CMap::Map.get_tile_landmass(unit.tilePos, unit.MapLayer->ID), unit.settlement);
+	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, CMap::get()->get_tile_landmass(unit.tilePos, unit.MapLayer->ID), unit.settlement);
 	//Wyrmgus end
 }
 

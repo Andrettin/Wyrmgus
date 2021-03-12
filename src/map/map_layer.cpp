@@ -143,7 +143,7 @@ void CMapLayer::handle_destroyed_overlay_terrain()
 
 void CMapLayer::decay_destroyed_overlay_terrain_tile(const QPoint &pos)
 {
-	if (!CMap::Map.Info.IsPointOnMap(pos, this->ID)) {
+	if (!CMap::get()->Info.IsPointOnMap(pos, this->ID)) {
 		throw std::runtime_error("Tried to decay a destroyed overlay terrain tile for an invalid tile position.");
 	}
 
@@ -179,7 +179,7 @@ void CMapLayer::regenerate_forests()
 
 void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 {
-	if (!CMap::Map.Info.IsPointOnMap(pos, this->ID)) {
+	if (!CMap::get()->Info.IsPointOnMap(pos, this->ID)) {
 		throw std::runtime_error("Tried to regenerate a tree tile for an invalid tile position.");
 	}
 	
@@ -225,18 +225,18 @@ void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 			wyrmgus::tile &diagonalMf = *this->Field(pos + diagonalOffset);
 			
 			if (
-				CMap::Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
-				&& CMap::Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
-				&& CMap::Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
+				CMap::get()->Info.IsPointOnMap(pos + diagonalOffset, this->ID)
+				&& CMap::get()->Info.IsPointOnMap(pos + verticalOffset, this->ID)
+				&& CMap::get()->Info.IsPointOnMap(pos + horizontalOffset, this->ID)
 				&& ((verticalMf.is_destroyed_tree_tile() && verticalMf.get_value() >= forest_regeneration_threshold && !verticalMf.has_flag(occupied_flag)) || verticalMf.has_flag(tile_flag::tree))
 				&& ((diagonalMf.is_destroyed_tree_tile() && diagonalMf.get_value() >= forest_regeneration_threshold && !diagonalMf.has_flag(occupied_flag)) || diagonalMf.has_flag(tile_flag::tree))
 				&& ((horizontalMf.is_destroyed_tree_tile() && horizontalMf.get_value() >= forest_regeneration_threshold && !horizontalMf.has_flag(occupied_flag)) || horizontalMf.has_flag(tile_flag::tree))
 			) {
 				DebugPrint("Real place wood\n");
-				CMap::Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
-				CMap::Map.SetOverlayTerrainDestroyed(pos + diagonalOffset, false, this->ID);
-				CMap::Map.SetOverlayTerrainDestroyed(pos + horizontalOffset, false, this->ID);
-				CMap::Map.SetOverlayTerrainDestroyed(pos, false, this->ID);
+				CMap::get()->SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
+				CMap::get()->SetOverlayTerrainDestroyed(pos + diagonalOffset, false, this->ID);
+				CMap::get()->SetOverlayTerrainDestroyed(pos + horizontalOffset, false, this->ID);
+				CMap::get()->SetOverlayTerrainDestroyed(pos, false, this->ID);
 				
 				return;
 			}

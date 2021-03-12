@@ -155,7 +155,7 @@ static void SetBestMapLayerForUnitGroup(const std::vector<CUnit *> &unit_group)
 	int best_map_layer = UI.CurrentMapLayer->ID;
 	
 	std::vector<int> map_layer_count;
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
 		map_layer_count.push_back(0);
 	}
 	for (size_t i = 0; i != unit_group.size(); ++i) {

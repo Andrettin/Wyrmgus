@@ -150,7 +150,7 @@ bool COrder_SpellCast::IsValid() const
 	if (this->has_goal()) {
 		return this->get_goal()->IsAliveOnMap();
 	} else {
-		return CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
+		return CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer);
 	}
 }
 
@@ -217,7 +217,7 @@ void COrder_SpellCast::OnAnimationAttack(CUnit &unit)
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		unit.ReCast = 0;
 	} else {
-		unit.ReCast = SpellCast(unit, *this->Spell, goal, this->goalPos, CMap::Map.MapLayers[this->MapLayer].get());
+		unit.ReCast = SpellCast(unit, *this->Spell, goal, this->goalPos, CMap::get()->MapLayers[this->MapLayer].get());
 	}
 }
 
@@ -486,7 +486,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
 					unit.ReCast = 0;
 				} else {
-					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos, CMap::Map.MapLayers[order.MapLayer].get());
+					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos, CMap::get()->MapLayers[order.MapLayer].get());
 				}
 			}
 

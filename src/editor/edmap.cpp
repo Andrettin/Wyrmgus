@@ -99,7 +99,7 @@ static unsigned QuadFromTile(const Vec2i &pos)
 */
 void EditorChangeTile(const Vec2i &pos, int tileIndex)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 
 	// Change the flags
 	wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
@@ -108,7 +108,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	if (TileToolRandom) {
 		int n = 0;
 		for (int i = 0; i < 16; ++i) {
-			if (!CMap::Map.Tileset->tiles[tile + i].tile) {
+			if (!CMap::get()->Tileset->tiles[tile + i].tile) {
 				break;
 			} else {
 				++n;
@@ -117,29 +117,29 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 		n = random::get()->generate_async(n);
 		int i = -1;
 		do {
-			while (++i < 16 && !CMap::Map.Tileset->tiles[tile + i].tile) {
+			while (++i < 16 && !CMap::get()->Tileset->tiles[tile + i].tile) {
 			}
 		} while (i < 16 && n--);
 		Assert(i != 16);
 		tile += i;
 	}
 	//Wyrmgus start
-	mf.setTileIndex(*CMap::Map.Tileset, tile, 0);
+	mf.setTileIndex(*CMap::get()->Tileset, tile, 0);
 //	mf.player_info->SeenTile = mf.getGraphicTile();
 	mf.UpdateSeenTile();
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	CMap::Map.CalculateTileTransitions(pos, false, UI.CurrentMapLayer->ID);
-	CMap::Map.CalculateTileTransitions(pos, true, UI.CurrentMapLayer->ID);
+	CMap::get()->CalculateTileTransitions(pos, false, UI.CurrentMapLayer->ID);
+	CMap::get()->CalculateTileTransitions(pos, true, UI.CurrentMapLayer->ID);
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
-					CMap::Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
-					CMap::Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
+				if (CMap::get()->Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+					CMap::get()->CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
+					CMap::get()->CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
 				}
 			}
 		}
@@ -185,7 +185,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 	
 	//Wyrmgus start
 	//see if the tile's terrain can be here as is, or if it is needed to change surrounding tiles
-	const wyrmgus::terrain_type *terrain = CMap::Map.GetTileTopTerrain(pos, false, UI.CurrentMapLayer->ID);
+	const wyrmgus::terrain_type *terrain = CMap::get()->GetTileTopTerrain(pos, false, UI.CurrentMapLayer->ID);
 	const bool overlay = mf.get_overlay_terrain() != nullptr ? true : false;
 	if (!terrain->allows_single()) {
 		std::vector<int> transition_directions;
@@ -194,8 +194,8 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
-						const wyrmgus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
+					if (CMap::get()->Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+						const wyrmgus::terrain_type *adjacent_terrain = CMap::get()->GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
 						if (overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 							adjacent_terrain = nullptr;
 						}
@@ -324,7 +324,7 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 	Vec2i ipos = pos - diag;
 	Vec2i apos = pos + diag;
 
-	CMap::Map.FixSelectionArea(ipos, apos, UI.CurrentMapLayer->ID);
+	CMap::get()->FixSelectionArea(ipos, apos, UI.CurrentMapLayer->ID);
 
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {

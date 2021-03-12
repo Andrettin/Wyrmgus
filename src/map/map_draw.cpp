@@ -113,7 +113,7 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 {
 	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);
 
-	return CMap::Map.Info.IsPointOnMap(tilePos, UI.CurrentMapLayer);
+	return CMap::get()->Info.IsPointOnMap(tilePos, UI.CurrentMapLayer);
 }
 
 // Convert viewport coordinates into map pixel coordinates
@@ -125,7 +125,7 @@ PixelPos CViewport::screen_to_map_pixel_pos(const PixelPos &screenPixelPos) cons
 PixelPos CViewport::screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPos) const
 {
 	const PixelDiff relPos = screenPixelPos - this->TopLeftPos + this->Offset;
-	const PixelPos mapPixelPos = relPos + CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(this->MapPos);
+	const PixelPos mapPixelPos = relPos + CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(this->MapPos);
 
 	return mapPixelPos;
 }
@@ -138,7 +138,7 @@ PixelPos CViewport::map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const
 
 PixelPos CViewport::scaled_map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const
 {
-	const PixelDiff relPos = mapPixelPos - CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(this->MapPos);
+	const PixelDiff relPos = mapPixelPos - CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(this->MapPos);
 
 	return this->TopLeftPos + relPos - this->Offset;
 }
@@ -147,7 +147,7 @@ PixelPos CViewport::scaled_map_to_screen_pixel_pos(const PixelPos &mapPixelPos) 
 Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 {
 	const PixelPos mapPixelPos = this->screen_to_scaled_map_pixel_pos(screenPixelPos);
-	const Vec2i tilePos = CMap::Map.scaled_map_pixel_pos_to_tile_pos(mapPixelPos);
+	const Vec2i tilePos = CMap::get()->scaled_map_pixel_pos_to_tile_pos(mapPixelPos);
 
 	return tilePos;
 }
@@ -155,7 +155,7 @@ Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 /// convert tilepos coordonates into screen (take the top left of the tile)
 PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 {
-	const PixelPos mapPos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
+	const PixelPos mapPos = CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
 
 	return this->scaled_map_to_screen_pixel_pos(mapPos);
 }
@@ -190,8 +190,8 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const PixelSize pixelSize = this->GetPixelSize();
 
-	x = std::min(x, (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (CMap::get()->Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info.MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (CMap::get()->Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info.MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
 	this->MapPos.x = x / wyrmgus::defines::get()->get_scaled_tile_width();
 	if (x < 0 && x % wyrmgus::defines::get()->get_scaled_tile_width()) {
@@ -221,7 +221,7 @@ void CViewport::Set(const PixelPos &mapPos)
 */
 void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
 {
-	const PixelPos mapPixelPos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos) + offset;
+	const PixelPos mapPixelPos = CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(tilePos) + offset;
 
 	this->Set(mapPixelPos);
 }

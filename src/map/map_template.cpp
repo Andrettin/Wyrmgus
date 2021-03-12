@@ -484,7 +484,7 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 	const terrain_character_map_type &terrain_character_map = overlay ? this->overlay_terrain_character_map : this->terrain_character_map;
 
 	for (int y = template_start_pos.y(); y < static_cast<int>(terrain_character_map.size()); ++y) {
-		if (y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
+		if (y >= (template_start_pos.y() + CMap::get()->Info.MapHeights[z])) {
 			break;
 		}
 
@@ -496,7 +496,7 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 
 		for (int x = template_start_pos.x(); x < static_cast<int>(row.size()); ++x) {
 			try {
-				if (x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z])) {
+				if (x >= (template_start_pos.x() + CMap::get()->Info.MapWidths[z])) {
 					break;
 				}
 
@@ -516,7 +516,7 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 					continue;
 				}
 
-				tile *tile = CMap::Map.Field(real_pos, z);
+				tile *tile = CMap::get()->Field(real_pos, z);
 
 				if (terrain_character == '0') {
 					if (overlay) { //"0" in an overlay terrain file means no overlay, while "=" means no change
@@ -573,7 +573,7 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 	const QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
 
 	for (int y = 0; y < terrain_image.height(); ++y) {
-		if (y < template_start_pos.y() || y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
+		if (y < template_start_pos.y() || y >= (template_start_pos.y() + CMap::get()->Info.MapHeights[z])) {
 			continue;
 		}
 		
@@ -582,7 +582,7 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 		}
 
 		for (int x = 0; x < terrain_image.width(); ++x) {
-			if (x < template_start_pos.x() || x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z])) {
+			if (x < template_start_pos.x() || x >= (template_start_pos.x() + CMap::get()->Info.MapWidths[z])) {
 				continue;
 			}
 
@@ -605,7 +605,7 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 			}
 			const Vec2i real_pos(map_start_pos.x() + (x - template_start_pos.x()), map_start_pos.y() + (y - template_start_pos.y()));
 
-			if (!CMap::Map.Info.IsPointOnMap(real_pos, z)) {
+			if (!CMap::get()->Info.IsPointOnMap(real_pos, z)) {
 				continue;
 			}
 
@@ -613,7 +613,7 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 				continue;
 			}
 
-			tile *tile = CMap::Map.Field(real_pos, z);
+			tile *tile = CMap::get()->Field(real_pos, z);
 
 			if (terrain != nullptr) {
 				//if we are setting base terrain and the tile already has an overlay terrain set to it, remove it, so that when subtemplates are applied on top of base terrain they remove overlays (e.g. space terrain)
@@ -659,7 +659,7 @@ void map_template::apply_territory_image(const QPoint &template_start_pos, const
 			continue;
 		}
 		
-		if (y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
+		if (y >= (template_start_pos.y() + CMap::get()->Info.MapHeights[z])) {
 			break;
 		}
 
@@ -672,7 +672,7 @@ void map_template::apply_territory_image(const QPoint &template_start_pos, const
 				continue;
 			}
 
-			if (x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z])) {
+			if (x >= (template_start_pos.x() + CMap::get()->Info.MapWidths[z])) {
 				break;
 			}
 
@@ -689,7 +689,7 @@ void map_template::apply_territory_image(const QPoint &template_start_pos, const
 			site *settlement = site::get_by_color(color);
 			const QPoint real_pos(map_start_pos.x() + (x - template_start_pos.x()), map_start_pos.y() + (y - template_start_pos.y()));
 
-			if (!CMap::Map.Info.IsPointOnMap(real_pos, z)) {
+			if (!CMap::get()->Info.IsPointOnMap(real_pos, z)) {
 				continue;
 			}
 
@@ -697,7 +697,7 @@ void map_template::apply_territory_image(const QPoint &template_start_pos, const
 				continue;
 			}
 
-			CMap::Map.Field(real_pos, z)->set_settlement(settlement);
+			CMap::get()->Field(real_pos, z)->set_settlement(settlement);
 		}
 	}
 }
@@ -720,9 +720,9 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 
 	const campaign *current_campaign = game::get()->get_current_campaign();
 	
-	if (z >= (int)CMap::Map.MapLayers.size()) {
-		int width = std::min(applied_size.width(), CMap::Map.Info.MapWidth);
-		int height = std::min(applied_size.height(), CMap::Map.Info.MapHeight);
+	if (z >= (int) CMap::get()->MapLayers.size()) {
+		int width = std::min(applied_size.width(), CMap::get()->Info.MapWidth);
+		int height = std::min(applied_size.height(), CMap::get()->Info.MapHeight);
 		if (current_campaign != nullptr && z < static_cast<int>(current_campaign->MapSizes.size())) {
 			//applies the map size set for the campaign for this map layer; for the first map layer that is already Map.Info.Width/Height, so it isn't necessary here
 			width = current_campaign->MapSizes[z].x;
@@ -730,50 +730,50 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 	
 		auto map_layer = std::make_unique<CMapLayer>(width, height);
-		map_layer->ID = CMap::Map.MapLayers.size();
-		CMap::Map.Info.MapWidths.push_back(map_layer->get_width());
-		CMap::Map.Info.MapHeights.push_back(map_layer->get_height());
+		map_layer->ID = CMap::get()->MapLayers.size();
+		CMap::get()->Info.MapWidths.push_back(map_layer->get_width());
+		CMap::get()->Info.MapHeights.push_back(map_layer->get_height());
 		map_layer->plane = this->get_plane();
 		map_layer->world = this->get_world();
-		CMap::Map.MapLayers.push_back(std::move(map_layer));
+		CMap::get()->MapLayers.push_back(std::move(map_layer));
 	} else {
 		if (!this->IsSubtemplateArea()) {
-			CMap::Map.MapLayers[z]->plane = this->get_plane();
-			CMap::Map.MapLayers[z]->world = this->get_world();
+			CMap::get()->MapLayers[z]->plane = this->get_plane();
+			CMap::get()->MapLayers[z]->world = this->get_world();
 		}
 	}
 
 	if (!this->IsSubtemplateArea()) {
 		if (Editor.Running == EditorNotRunning) {
 			if (this->get_world() != nullptr && this->get_world()->get_season_schedule() != nullptr) {
-				CMap::Map.MapLayers[z]->set_season_schedule(this->get_world()->get_season_schedule());
+				CMap::get()->MapLayers[z]->set_season_schedule(this->get_world()->get_season_schedule());
 			} else if (this->get_world() == nullptr && this->get_plane() != nullptr && this->get_plane()->get_season_schedule() != nullptr) {
-				CMap::Map.MapLayers[z]->set_season_schedule(this->get_plane()->get_season_schedule());
+				CMap::get()->MapLayers[z]->set_season_schedule(this->get_plane()->get_season_schedule());
 			} else {
-				CMap::Map.MapLayers[z]->set_season_schedule(defines::get()->get_default_season_schedule());
+				CMap::get()->MapLayers[z]->set_season_schedule(defines::get()->get_default_season_schedule());
 			}
 			
-			CMap::Map.MapLayers[z]->SetSeasonByHours(game::get()->get_current_total_hours());
+			CMap::get()->MapLayers[z]->SetSeasonByHours(game::get()->get_current_total_hours());
 			
-			CMap::Map.MapLayers[z]->set_time_of_day_schedule(nullptr);
-			CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
+			CMap::get()->MapLayers[z]->set_time_of_day_schedule(nullptr);
+			CMap::get()->MapLayers[z]->SetTimeOfDay(nullptr);
 			
 			if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
 				if (this->get_world() != nullptr && this->get_world()->get_time_of_day_schedule() != nullptr) {
-					CMap::Map.MapLayers[z]->set_time_of_day_schedule(this->get_world()->get_time_of_day_schedule());
+					CMap::get()->MapLayers[z]->set_time_of_day_schedule(this->get_world()->get_time_of_day_schedule());
 				} else if (this->get_world() == nullptr && this->get_plane() != nullptr && this->get_plane()->get_time_of_day_schedule() != nullptr) {
-					CMap::Map.MapLayers[z]->set_time_of_day_schedule(this->get_plane()->get_time_of_day_schedule());
+					CMap::get()->MapLayers[z]->set_time_of_day_schedule(this->get_plane()->get_time_of_day_schedule());
 				} else {
-					CMap::Map.MapLayers[z]->set_time_of_day_schedule(defines::get()->get_default_time_of_day_schedule());
+					CMap::get()->MapLayers[z]->set_time_of_day_schedule(defines::get()->get_default_time_of_day_schedule());
 				}
 				
-				CMap::Map.MapLayers[z]->SetTimeOfDayByHours(game::get()->get_current_total_hours());
+				CMap::get()->MapLayers[z]->SetTimeOfDayByHours(game::get()->get_current_total_hours());
 			}
 		}
 	}
 	
-	const QPoint map_end(std::min(CMap::Map.Info.MapWidths[z], map_start_pos.x() + applied_size.width()), std::min(CMap::Map.Info.MapHeights[z], map_start_pos.y() + applied_size.height()));
-	if (!CMap::Map.Info.IsPointOnMap(map_start_pos, z)) {
+	const QPoint map_end(std::min(CMap::get()->Info.MapWidths[z], map_start_pos.x() + applied_size.width()), std::min(CMap::get()->Info.MapHeights[z], map_start_pos.y() + applied_size.height()));
+	if (!CMap::get()->Info.IsPointOnMap(map_start_pos, z)) {
 		fprintf(stderr, "Invalid map coordinate for map template \"%s\": (%d, %d)\n", this->Ident.c_str(), map_start_pos.x(), map_start_pos.y());
 		return;
 	}
@@ -804,12 +804,12 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 					continue;
 				}
 
-				CMap::Map.Field(tile_pos, z)->SetTerrain(terrain);
+				CMap::get()->Field(tile_pos, z)->SetTerrain(terrain);
 				
 				if (overlay_terrain != nullptr) {
-					CMap::Map.Field(tile_pos, z)->SetTerrain(overlay_terrain);
+					CMap::get()->Field(tile_pos, z)->SetTerrain(overlay_terrain);
 				} else {
-					CMap::Map.Field(tile_pos, z)->RemoveOverlayTerrain();
+					CMap::get()->Field(tile_pos, z)->RemoveOverlayTerrain();
 				}
 			}
 		}
@@ -828,12 +828,12 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 					continue;
 				}
 
-				CMap::Map.Field(tile_pos, z)->SetTerrain(this->get_unusable_area_terrain_type());
+				CMap::get()->Field(tile_pos, z)->SetTerrain(this->get_unusable_area_terrain_type());
 				
 				if (this->get_unusable_area_overlay_terrain_type() != nullptr) {
-					CMap::Map.Field(tile_pos, z)->SetTerrain(this->get_unusable_area_overlay_terrain_type());
+					CMap::get()->Field(tile_pos, z)->SetTerrain(this->get_unusable_area_overlay_terrain_type());
 				} else {
-					CMap::Map.Field(tile_pos, z)->RemoveOverlayTerrain();
+					CMap::get()->Field(tile_pos, z)->RemoveOverlayTerrain();
 				}
 			}
 		}
@@ -860,13 +860,13 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 			continue;
 		}
 
-		CMap::Map.Field(tile_map_pos, z)->SetTerrain(terrain);
+		CMap::get()->Field(tile_map_pos, z)->SetTerrain(terrain);
 	}
 
 	if (current_campaign) {
 		for (size_t i = 0; i < HistoricalTerrains.size(); ++i) {
 			Vec2i history_pos = std::get<0>(HistoricalTerrains[i]);
-			if (history_pos.x < template_start_pos.x() || history_pos.x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z]) || history_pos.y < template_start_pos.y() || history_pos.y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
+			if (history_pos.x < template_start_pos.x() || history_pos.x >= (template_start_pos.x() + CMap::get()->Info.MapWidths[z]) || history_pos.y < template_start_pos.y() || history_pos.y >= (template_start_pos.y() + CMap::get()->Info.MapHeights[z])) {
 				continue;
 			}
 			if (current_campaign->get_start_date() >= std::get<2>(HistoricalTerrains[i]) || std::get<2>(HistoricalTerrains[i]).Year == 0) {
@@ -874,17 +874,17 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				
 				Vec2i real_pos(map_start_pos.x() + history_pos.x - template_start_pos.x(), map_start_pos.y() + history_pos.y - template_start_pos.y());
 
-				if (!CMap::Map.Info.IsPointOnMap(real_pos, z)) {
+				if (!CMap::get()->Info.IsPointOnMap(real_pos, z)) {
 					continue;
 				}
 
 				if (historical_terrain) {
-					if (historical_terrain->is_overlay() && historical_terrain->is_pathway() && !CMap::Map.Field(real_pos, z)->has_flag(tile_flag::land_allowed)) {
+					if (historical_terrain->is_overlay() && historical_terrain->is_pathway() && !CMap::get()->Field(real_pos, z)->has_flag(tile_flag::land_allowed)) {
 						continue;
 					}
-					CMap::Map.Field(real_pos, z)->SetTerrain(historical_terrain);
+					CMap::get()->Field(real_pos, z)->SetTerrain(historical_terrain);
 				} else { //if the terrain type is null, then that means a previously set overlay terrain should be removed
-					CMap::Map.Field(real_pos, z)->RemoveOverlayTerrain();
+					CMap::get()->Field(real_pos, z)->RemoveOverlayTerrain();
 				}
 			}
 		}
@@ -896,24 +896,24 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		for (int x = surrounding_start_pos.x(); x < surrounding_end.x(); ++x) {
 			for (int y = surrounding_start_pos.y(); y < surrounding_end.y(); y += (surrounding_end.y() - surrounding_start_pos.y() - 1)) {
 				const QPoint surrounding_pos(x, y);
-				if (!CMap::Map.Info.IsPointOnMap(surrounding_pos, z) || CMap::Map.is_point_in_a_subtemplate_area(surrounding_pos, z)) {
+				if (!CMap::get()->Info.IsPointOnMap(surrounding_pos, z) || CMap::get()->is_point_in_a_subtemplate_area(surrounding_pos, z)) {
 					continue;
 				}
-				CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_terrain_type());
+				CMap::get()->Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_terrain_type());
 				if (this->get_surrounding_overlay_terrain_type() != nullptr) {
-					CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_overlay_terrain_type());
+					CMap::get()->Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_overlay_terrain_type());
 				}
 			}
 		}
 		for (int x = surrounding_start_pos.x(); x < surrounding_end.x(); x += (surrounding_end.x() - surrounding_start_pos.x() - 1)) {
 			for (int y = surrounding_start_pos.y(); y < surrounding_end.y(); ++y) {
 				const QPoint surrounding_pos(x, y);
-				if (!CMap::Map.Info.IsPointOnMap(surrounding_pos, z) || CMap::Map.is_point_in_a_subtemplate_area(surrounding_pos, z)) {
+				if (!CMap::get()->Info.IsPointOnMap(surrounding_pos, z) || CMap::get()->is_point_in_a_subtemplate_area(surrounding_pos, z)) {
 					continue;
 				}
-				CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_terrain_type());
+				CMap::get()->Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_terrain_type());
 				if (this->get_surrounding_overlay_terrain_type() != nullptr) {
-					CMap::Map.Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_overlay_terrain_type());
+					CMap::get()->Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_overlay_terrain_type());
 				}
 			}
 		}
@@ -937,11 +937,11 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	
 	if (!this->IsSubtemplateArea()) {
 		ShowLoadProgress(_("Adjusting \"%s\" Map Template Terrain"), this->get_name().c_str());
-		CMap::Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
-		CMap::Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
-		CMap::Map.AdjustTileMapTransitions(map_start_pos, map_end, z);
-		CMap::Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
-		CMap::Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapTransitions(map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->get_name().c_str());
@@ -949,7 +949,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	for (std::map<std::pair<int, int>, std::tuple<unit_type *, int, unique_item *>>::const_iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
 		Vec2i unit_raw_pos(iterator->first.first, iterator->first.second);
 		Vec2i unit_pos(map_start_pos.x() + unit_raw_pos.x - template_start_pos.x(), map_start_pos.y() + unit_raw_pos.y - template_start_pos.y());
-		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z)) {
+		if (!CMap::get()->Info.IsPointOnMap(unit_pos, z)) {
 			continue;
 		}
 		
@@ -957,7 +957,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		
 		Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 		
-		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
+		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::get()->Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::get()->Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
@@ -991,21 +991,21 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 
 	if (!this->IsSubtemplateArea()) {
-		CMap::Map.generate_missing_terrain(QRect(map_start_pos, map_end - QPoint(1, 1)), z);
+		CMap::get()->generate_missing_terrain(QRect(map_start_pos, map_end - QPoint(1, 1)), z);
 	}
 
 	ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
 	for (const auto &generated_terrain : this->generated_terrains) {
-		CMap::Map.GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
+		CMap::get()->GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
 	}
 
 	if (!this->IsSubtemplateArea()) {
 		ShowLoadProgress(_("Readjusting \"%s\" Map Template Terrain"), this->get_name().c_str());
-		CMap::Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
-		CMap::Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
-		CMap::Map.AdjustTileMapTransitions(map_start_pos, map_end, z);
-		CMap::Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
-		CMap::Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapTransitions(map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 
 	if (!this->get_subtemplates().empty()) {
@@ -1027,7 +1027,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer && CPlayer::Players[i]->Type != PlayerRescueActive) {
 			continue;
 		}
-		if (CMap::Map.is_point_in_a_subtemplate_area(CPlayer::Players[i]->StartPos, z)) {
+		if (CMap::get()->is_point_in_a_subtemplate_area(CPlayer::Players[i]->StartPos, z)) {
 			continue;
 		}
 		if (CPlayer::Players[i]->StartPos.x < map_start_pos.x() || CPlayer::Players[i]->StartPos.y < map_start_pos.y() || CPlayer::Players[i]->StartPos.x >= map_end.x() || CPlayer::Players[i]->StartPos.y >= map_end.y() || CPlayer::Players[i]->StartMapLayer != z) {
@@ -1081,29 +1081,29 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		
 		if (CPlayer::Players[i]->NumTownHalls > 0 || CPlayer::Players[i]->Index == CPlayer::GetThisPlayer()->Index) {
 			for (size_t j = 0; j < this->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
-				CMap::Map.generate_neutral_units(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, CPlayer::Players[i]->StartPos - QPoint(8, 8), CPlayer::Players[i]->StartPos + QPoint(8, 8), true, z);
+				CMap::get()->generate_neutral_units(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, CPlayer::Players[i]->StartPos - QPoint(8, 8), CPlayer::Players[i]->StartPos + QPoint(8, 8), true, z);
 			}
 		}
 	}
 	
 	for (size_t i = 0; i < this->GeneratedNeutralUnits.size(); ++i) {
 		const bool grouped = this->GeneratedNeutralUnits[i].first->get_given_resource() != nullptr && this->GeneratedNeutralUnits[i].first->get_tile_width() == 1 && this->GeneratedNeutralUnits[i].first->get_tile_height() == 1; // group small resources
-		CMap::Map.generate_neutral_units(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
+		CMap::get()->generate_neutral_units(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
 	}
 
 	if (!this->IsSubtemplateArea()) {
-		CMap::Map.adjust_territory_irregularities(map_start_pos, map_end - QPoint(1, 1), z);
+		CMap::get()->adjust_territory_irregularities(map_start_pos, map_end - QPoint(1, 1), z);
 	}
 
 	//this has to be done at the end, so that it doesn't prevent the application from working properly, due to the map template code thinking that its own area belongs to another map template
 	if (this->IsSubtemplateArea()) {
 		const QRect map_rect(map_start_pos, map_end - Vec2i(1, 1));
 
-		CMap::Map.MapLayers[z]->subtemplate_areas[this] = map_rect;
+		CMap::get()->MapLayers[z]->subtemplate_areas[this] = map_rect;
 
 		//if this is the top subtemplate for a given world, set the world's map rect to this map template's map rect
 		if (this->get_world() != nullptr && this->get_world() != this->get_main_template()->get_world()) {
-			this->get_world()->get_game_data()->set_map_rect(map_rect, CMap::Map.MapLayers[z].get());
+			this->get_world()->get_game_data()->set_map_rect(map_rect, CMap::get()->MapLayers[z].get());
 		}
 	}
 
@@ -1129,7 +1129,7 @@ void map_template::apply_subtemplates(const QPoint &template_start_pos, const QP
 			continue;
 		}
 
-		if (CMap::Map.is_subtemplate_on_map(subtemplate)) {
+		if (CMap::get()->is_subtemplate_on_map(subtemplate)) {
 			continue;
 		}
 
@@ -1143,14 +1143,14 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 	bool found_location = false;
 
 	if (subtemplate->UpperTemplate != nullptr && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has an upper template, use its coordinates instead
-		subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->UpperTemplate);
+		subtemplate_pos = CMap::get()->get_subtemplate_pos(subtemplate->UpperTemplate);
 		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0) {
 			found_location = true;
 		}
 	}
 
 	if (subtemplate->LowerTemplate != nullptr && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has a lower template, use its coordinates instead
-		subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->LowerTemplate);
+		subtemplate_pos = CMap::get()->get_subtemplate_pos(subtemplate->LowerTemplate);
 		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0) {
 			found_location = true;
 		}
@@ -1197,7 +1197,7 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 	}
 
 	if (found_location) {
-		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0 && subtemplate_pos.x() < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y() < CMap::Map.Info.MapHeights[z]) {
+		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0 && subtemplate_pos.x() < CMap::get()->Info.MapWidths[z] && subtemplate_pos.y() < CMap::get()->Info.MapHeights[z]) {
 			try {
 				subtemplate->apply(subtemplate->get_start_pos(), subtemplate_pos, z);
 			} catch (...) {
@@ -1206,13 +1206,13 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 
 			//also apply all dependent adjacent templates, if the other templates they depend on have also been applied, so that they are more likely to be close to this subtemplate
 			for (map_template *dependent_subtemplate : subtemplate->dependent_adjacent_templates) {
-				if (CMap::Map.is_subtemplate_on_map(dependent_subtemplate)) {
+				if (CMap::get()->is_subtemplate_on_map(dependent_subtemplate)) {
 					continue;
 				}
 
 				bool other_dependencies_fulfilled = true;
 				for (const map_template *dependency_template : dependent_subtemplate->dependency_templates) {
-					if (!CMap::Map.is_subtemplate_on_map(dependency_template)) {
+					if (!CMap::get()->is_subtemplate_on_map(dependency_template)) {
 						other_dependencies_fulfilled = false;
 						break;
 					}
@@ -1265,7 +1265,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					if (site->orbits_map_template()) {
 						site_pos = this->generate_celestial_site_position(site, z);
 					} else {
-						site_pos = CMap::Map.generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
+						site_pos = CMap::get()->generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
 						site_pos += unit_offset;
 					}
 				} catch (...) {
@@ -1287,7 +1287,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			}
 		}
 
-		if (!CMap::Map.Info.IsPointOnMap(site_pos, z) || site_pos.x() < map_start_pos.x() || site_pos.y() < map_start_pos.y()) {
+		if (!CMap::get()->Info.IsPointOnMap(site_pos, z) || site_pos.x() < map_start_pos.x() || site_pos.y() < map_start_pos.y()) {
 			continue;
 		}
 
@@ -1315,7 +1315,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 	site_game_data *site_game_data = site->get_game_data();
 
 	site_game_data->set_map_pos(site_pos);
-	site_game_data->set_map_layer(CMap::Map.MapLayers[z].get());
+	site_game_data->set_map_layer(CMap::get()->MapLayers[z].get());
 
 	//it is acceptable sites with geocoordinate to have their positions shifted, e.g. if it was coastal to shift it enough inland to give space for the building to be placed
 	const bool is_position_shift_acceptable = !site->get_geocoordinate().is_null() || !site->get_astrocoordinate().is_null();
@@ -1323,7 +1323,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 	bool first_building = true;
 
 	if (base_unit_type != nullptr) {
-		if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
+		if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::get()->Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::get()->Info.IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
 			fprintf(stderr, "The site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
 		}
 		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::Players[PlayerNumNeutral], z, true, site);
@@ -1336,11 +1336,11 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		}
 
 		if (site->is_settlement()) {
-			CMap::Map.add_settlement_unit(unit);
+			CMap::get()->add_settlement_unit(unit);
 			for (int x = unit->tilePos.x; x < (unit->tilePos.x + unit->Type->get_tile_width()); ++x) {
 				for (int y = unit->tilePos.y; y < (unit->tilePos.y + unit->Type->get_tile_height()); ++y) {
 					const QPoint tile_pos(x, y);
-					CMap::Map.Field(tile_pos, z)->set_settlement(unit->settlement);
+					CMap::get()->Field(tile_pos, z)->set_settlement(unit->settlement);
 				}
 			}
 		}
@@ -1358,7 +1358,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 		//if the site is a connector, and the destination site has already been applied, establish the connection
 		if (site->get_connection_destination() != nullptr) {
-			CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
+			CMap::get()->MapLayers[z]->LayerConnectors.push_back(unit);
 
 			wyrmgus::site_game_data *destination_site_game_data = site->get_connection_destination()->get_game_data();
 
@@ -1507,7 +1507,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 		const QPoint building_unit_offset = unit_type->get_tile_center_pos_offset();
 		if (!is_position_shift_acceptable && first_building) {
-			if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
+			if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::get()->Info.IsPointOnMap(site_pos - building_unit_offset, z) && CMap::get()->Info.IsPointOnMap(site_pos - building_unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
 				throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on " + point::to_string(site->get_pos()) + ", but it cannot be there.");
 			}
 		}
@@ -1528,7 +1528,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		if (pathway_type != nullptr) {
 			for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->get_tile_width() + 1; ++x) {
 				for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->get_tile_height() + 1; ++y) {
-					if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
+					if (!CMap::get()->Info.IsPointOnMap(x, y, unit->MapLayer)) {
 						continue;
 					}
 					tile &mf = *unit->MapLayer->Field(x, y);
@@ -1571,7 +1571,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			}
 			const Vec2i building_unit_offset((unit_type->get_tile_size() - QSize(1, 1)) / 2);
 			if (!is_position_shift_acceptable && first_building) {
-				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset + Vec2i(unit_type->get_tile_size() - QSize(1, 1)), z)) {
+				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::get()->Info.IsPointOnMap(site_pos - building_unit_offset, z) && CMap::get()->Info.IsPointOnMap(site_pos - building_unit_offset + Vec2i(unit_type->get_tile_size() - QSize(1, 1)), z)) {
 					fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->Ident.c_str(), site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
 				}
 			}
@@ -1603,7 +1603,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			if (pathway_type != nullptr) {
 				for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->get_tile_width() + 1; ++x) {
 					for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->get_tile_height() + 1; ++y) {
-						if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
+						if (!CMap::get()->Info.IsPointOnMap(x, y, unit->MapLayer)) {
 							continue;
 						}
 						tile &mf = *unit->MapLayer->Field(x, y);
@@ -1705,14 +1705,14 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::Map.generate_unit_location(type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
 			unit_pos += unit_offset;
 		}
-		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
+		if (!CMap::get()->Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
 			continue;
 		}
 		
-		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
+		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::get()->Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::get()->Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
@@ -1720,14 +1720,14 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 		if (std::get<3>(this->PlaneConnectors[i])) {
 			unit->set_unique(std::get<3>(this->PlaneConnectors[i]));
 		}
-		CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
-		for (size_t second_z = 0; second_z < CMap::Map.MapLayers.size(); ++second_z) {
+		CMap::get()->MapLayers[z]->LayerConnectors.push_back(unit);
+		for (size_t second_z = 0; second_z < CMap::get()->MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (CMap::Map.MapLayers[second_z]->plane == std::get<2>(this->PlaneConnectors[i])) {
-				for (size_t j = 0; j < CMap::Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
-					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->get_unique() == unit->get_unique() && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
-						CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
-						unit->ConnectingDestination = CMap::Map.MapLayers[second_z]->LayerConnectors[j];
+			if (CMap::get()->MapLayers[second_z]->plane == std::get<2>(this->PlaneConnectors[i])) {
+				for (size_t j = 0; j < CMap::get()->MapLayers[second_z]->LayerConnectors.size(); ++j) {
+					if (CMap::get()->MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::get()->MapLayers[second_z]->LayerConnectors[j]->get_unique() == unit->get_unique() && CMap::get()->MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
+						CMap::get()->MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = CMap::get()->MapLayers[second_z]->LayerConnectors[j];
 						found_other_connector = true;
 						break;
 					}
@@ -1748,14 +1748,14 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::Map.generate_unit_location(type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
 			unit_pos += unit_offset;
 		}
-		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
+		if (!CMap::get()->Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
 			continue;
 		}
 		
-		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
+		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::get()->Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::get()->Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
@@ -1763,14 +1763,14 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 		if (std::get<3>(this->WorldConnectors[i])) {
 			unit->set_unique(std::get<3>(this->WorldConnectors[i]));
 		}
-		CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
-		for (size_t second_z = 0; second_z < CMap::Map.MapLayers.size(); ++second_z) {
+		CMap::get()->MapLayers[z]->LayerConnectors.push_back(unit);
+		for (size_t second_z = 0; second_z < CMap::get()->MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (CMap::Map.MapLayers[second_z]->world == std::get<2>(this->WorldConnectors[i])) {
-				for (size_t j = 0; j < CMap::Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
-					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->get_unique() == unit->get_unique() && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
-						CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
-						unit->ConnectingDestination = CMap::Map.MapLayers[second_z]->LayerConnectors[j];
+			if (CMap::get()->MapLayers[second_z]->world == std::get<2>(this->WorldConnectors[i])) {
+				for (size_t j = 0; j < CMap::get()->MapLayers[second_z]->LayerConnectors.size(); ++j) {
+					if (CMap::get()->MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::get()->MapLayers[second_z]->LayerConnectors[j]->get_unique() == unit->get_unique() && CMap::get()->MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
+						CMap::get()->MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = CMap::get()->MapLayers[second_z]->LayerConnectors[j];
 						found_other_connector = true;
 						break;
 					}
@@ -1800,10 +1800,10 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::Map.generate_unit_location(type, std::get<2>(this->Units[i]), map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(type, std::get<2>(this->Units[i]), map_start_pos, map_end - QPoint(1, 1), z);
 			unit_pos += unit_offset;
 		}
-		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
+		if (!CMap::get()->Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
 			continue;
 		}
 		
@@ -1854,10 +1854,10 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::Map.generate_unit_location(hero->get_unit_type(), std::get<2>(this->Heroes[i]), map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(hero->get_unit_type(), std::get<2>(this->Heroes[i]), map_start_pos, map_end - QPoint(1, 1), z);
 			unit_pos += unit_offset;
 		}
-		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
+		if (!CMap::get()->Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
 			continue;
 		}
 		
@@ -1949,7 +1949,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			}
 		}
 		
-		if (!CMap::Map.Info.IsPointOnMap(hero_pos, z) || hero_pos.x < map_start_pos.x() || hero_pos.y < map_start_pos.y()) { //heroes whose faction hasn't been created already and who don't have a valid historical location set won't be created
+		if (!CMap::get()->Info.IsPointOnMap(hero_pos, z) || hero_pos.x < map_start_pos.x() || hero_pos.y < map_start_pos.y()) { //heroes whose faction hasn't been created already and who don't have a valid historical location set won't be created
 			continue;
 		}
 		
@@ -2017,7 +2017,7 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 		unit_pos = this->get_location_map_position(unit_location, template_start_pos, map_start_pos, true);
 
 		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
-			unit_pos = CMap::Map.generate_unit_location(unit_type, unit_faction, map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(unit_type, unit_faction, map_start_pos, map_end - QPoint(1, 1), z);
 			if (unit_pos.x() != -1 && unit_pos.y() != -1) {
 				unit_pos += unit_type->get_tile_center_pos_offset();
 			}
@@ -2030,7 +2030,7 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 
 	const QPoint unit_top_left_pos = unit_pos - unit_type->get_tile_center_pos_offset();
 	const QPoint unit_bottom_right_pos = unit_top_left_pos + size::to_point(unit_type->get_tile_size()) - QPoint(1, 1);
-	if (!CMap::Map.Info.IsPointOnMap(unit_top_left_pos, z) || !CMap::Map.Info.IsPointOnMap(unit_bottom_right_pos, z) || !this->contains_map_pos(unit_top_left_pos) || !this->contains_map_pos(unit_bottom_right_pos)) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
+	if (!CMap::get()->Info.IsPointOnMap(unit_top_left_pos, z) || !CMap::get()->Info.IsPointOnMap(unit_bottom_right_pos, z) || !this->contains_map_pos(unit_top_left_pos) || !this->contains_map_pos(unit_bottom_right_pos)) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
 		return;
 	}
 
@@ -2119,7 +2119,7 @@ void map_template::apply_character(character *character, const QPoint &template_
 		unit_pos = this->get_location_map_position(character_location, template_start_pos, map_start_pos, true);
 
 		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
-			unit_pos = CMap::Map.generate_unit_location(unit_type, unit_faction, map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(unit_type, unit_faction, map_start_pos, map_end - QPoint(1, 1), z);
 			if (unit_pos.x() != -1 && unit_pos.y() != -1) {
 				unit_pos += unit_type->get_tile_center_pos_offset();
 			}
@@ -2132,7 +2132,7 @@ void map_template::apply_character(character *character, const QPoint &template_
 
 	const QPoint unit_top_left_pos = unit_pos - unit_type->get_tile_center_pos_offset();
 	const QPoint unit_bottom_right_pos = unit_top_left_pos + size::to_point(unit_type->get_tile_size()) - QPoint(1, 1);
-	if (!CMap::Map.Info.IsPointOnMap(unit_top_left_pos, z) || !CMap::Map.Info.IsPointOnMap(unit_bottom_right_pos, z) || !this->contains_map_pos(unit_top_left_pos) || !this->contains_map_pos(unit_bottom_right_pos)) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
+	if (!CMap::get()->Info.IsPointOnMap(unit_top_left_pos, z) || !CMap::get()->Info.IsPointOnMap(unit_bottom_right_pos, z) || !this->contains_map_pos(unit_top_left_pos) || !this->contains_map_pos(unit_bottom_right_pos)) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
 		return;
 	}
 
@@ -2451,9 +2451,9 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 
 	//bound the minimum and maximum positions depending on which other templates should be adjacent to this one (if they have already been applied to the map)
 	for (const map_template *adjacent_template : subtemplate->AdjacentTemplates) {
-		const QPoint adjacent_template_pos = CMap::Map.get_subtemplate_pos(adjacent_template);
+		const QPoint adjacent_template_pos = CMap::get()->get_subtemplate_pos(adjacent_template);
 
-		if (!CMap::Map.Info.IsPointOnMap(adjacent_template_pos, z)) {
+		if (!CMap::get()->Info.IsPointOnMap(adjacent_template_pos, z)) {
 			fprintf(stderr, "Could not apply adjacency restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), adjacent_template->Ident.c_str());
 			continue;
 		}
@@ -2480,32 +2480,32 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 
 	//bound the minimum and maximum positions depending on whether this template should be to the north, south, west or east of other ones
 	for (const map_template *other_template : subtemplate->NorthOfTemplates) {
-		const QPoint other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
-		if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+		const QPoint other_template_pos = CMap::get()->get_subtemplate_pos(other_template);
+		if (!CMap::get()->Info.IsPointOnMap(other_template_pos, z)) {
 			fprintf(stderr, "Could not apply \"north of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
 			continue;
 		}
 		max_pos.setY(std::min<short>(max_pos.y(), other_template_pos.y() - (subtemplate_applied_size.height() / 2)));
 	}
 	for (const map_template *other_template : subtemplate->SouthOfTemplates) {
-		const QPoint other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
-		if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+		const QPoint other_template_pos = CMap::get()->get_subtemplate_pos(other_template);
+		if (!CMap::get()->Info.IsPointOnMap(other_template_pos, z)) {
 			fprintf(stderr, "Could not apply \"south of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
 			continue;
 		}
 		min_pos.setY(std::max<short>(min_pos.y(), other_template_pos.y() + other_template->get_applied_height() - (subtemplate_applied_size.height() / 2)));
 	}
 	for (const map_template *other_template : subtemplate->WestOfTemplates) {
-		const QPoint other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
-		if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+		const QPoint other_template_pos = CMap::get()->get_subtemplate_pos(other_template);
+		if (!CMap::get()->Info.IsPointOnMap(other_template_pos, z)) {
 			fprintf(stderr, "Could not apply \"west of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
 			continue;
 		}
 		max_pos.setX(std::min<short>(max_pos.x(), other_template_pos.x() - (subtemplate_applied_size.width() / 2)));
 	}
 	for (const map_template *other_template : subtemplate->EastOfTemplates) {
-		const QPoint other_template_pos = CMap::Map.get_subtemplate_pos(other_template);
-		if (!CMap::Map.Info.IsPointOnMap(other_template_pos, z)) {
+		const QPoint other_template_pos = CMap::get()->get_subtemplate_pos(other_template);
+		if (!CMap::get()->Info.IsPointOnMap(other_template_pos, z)) {
 			fprintf(stderr, "Could not apply \"east of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
 			continue;
 		}
@@ -2538,7 +2538,7 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 		bool on_usable_area = true;
 		for (int x = (subtemplate->get_min_adjacent_template_distance().x() * -1) - west_offset; x < (subtemplate_applied_size.width() + subtemplate->get_min_adjacent_template_distance().x() + east_offset); ++x) {
 			for (int y = (subtemplate->get_min_adjacent_template_distance().y() * -1) - north_offset; y < (subtemplate_applied_size.height() + subtemplate->get_min_adjacent_template_distance().y() + south_offset); ++y) {
-				if (CMap::Map.is_point_in_a_subtemplate_area(subtemplate_pos + Vec2i(x, y), z)) {
+				if (CMap::get()->is_point_in_a_subtemplate_area(subtemplate_pos + Vec2i(x, y), z)) {
 					on_usable_area = false;
 					break;
 				}
@@ -2608,7 +2608,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(map_t
 	const terrain_character_map_type &terrain_character_map = subtemplate->overlay_terrain_character_map;
 
 	for (int y = template_start_pos.y(); y < static_cast<int>(terrain_character_map.size()); ++y) {
-		if (y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
+		if (y >= (template_start_pos.y() + CMap::get()->Info.MapHeights[z])) {
 			break;
 		}
 
@@ -2620,7 +2620,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(map_t
 
 		for (int x = template_start_pos.x(); x < static_cast<int>(row.size()); ++x) {
 			try {
-				if (x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z])) {
+				if (x >= (template_start_pos.x() + CMap::get()->Info.MapWidths[z])) {
 					break;
 				}
 
@@ -2637,7 +2637,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(map_t
 
 				const QPoint map_pos(map_start_pos.x() + x - template_start_pos.x(), map_start_pos.y() + y - template_start_pos.y());
 
-				const tile *tile = CMap::Map.Field(map_pos, z);
+				const tile *tile = CMap::get()->Field(map_pos, z);
 
 				if (terrain_character == '0' || subtemplate->get_character_unit(terrain_character) != nullptr) {
 					//the '0' character means the tile must have no overlay
@@ -2686,7 +2686,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(map_
 		const int x = template_start_pos.x() + x_offset;
 		const int map_x = map_start_pos.x() + x_offset;
 
-		if (map_x >= CMap::Map.Info.MapWidths[z]) {
+		if (map_x >= CMap::get()->Info.MapWidths[z]) {
 			break;
 		}
 
@@ -2694,7 +2694,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(map_
 			const int y = template_start_pos.y() + y_offset;
 			const int map_y = map_start_pos.y() + y_offset;
 
-			if (map_y >= CMap::Map.Info.MapHeights[z]) {
+			if (map_y >= CMap::get()->Info.MapHeights[z]) {
 				break;
 			}
 
@@ -2705,7 +2705,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(map_
 				continue;
 			}
 
-			const tile *tile = CMap::Map.Field(map_x, map_y, z);
+			const tile *tile = CMap::get()->Field(map_x, map_y, z);
 
 			if (color.red() == 0 && color.green() == 0 && color.blue() == 0) {
 				//a pure black pixel means the tile must have no overlay
@@ -2831,7 +2831,7 @@ QPoint map_template::generate_site_orbit_position(const site *site, const int z,
 				for (int x = top_left_pos.x() - 1; x < top_left_pos.x() + unit_type->get_tile_width() + 1; ++x) {
 					for (int y = top_left_pos.y() - 1; y < top_left_pos.y() + unit_type->get_tile_height() + 1; ++y) {
 						const QPoint tile_pos(x, y);
-						if (!CMap::Map.Info.IsPointOnMap(tile_pos, z)) {
+						if (!CMap::get()->Info.IsPointOnMap(tile_pos, z)) {
 							continue;
 						}
 

@@ -187,9 +187,9 @@ void InitUserInterface()
 	//
 	// Calculations
 	//
-	if (CMap::Map.Info.MapWidth) {
-		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::Map.Info.MapWidth * wyrmgus::defines::get()->get_scaled_tile_width() - 1);
-		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::Map.Info.MapHeight * wyrmgus::defines::get()->get_scaled_tile_height() - 1);
+	if (CMap::get()->Info.MapWidth) {
+		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::get()->Info.MapWidth * wyrmgus::defines::get()->get_scaled_tile_width() - 1);
+		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::get()->Info.MapHeight * wyrmgus::defines::get()->get_scaled_tile_height() - 1);
 	}
 
 	UI.SelectedViewport = UI.Viewports;
@@ -399,7 +399,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 		if (vp) {
 			const PixelDiff relDiff = new_vps[i].GetTopLeftPos() - vp->GetTopLeftPos();
 
-			new_vps[i].Offset = relDiff + CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(vp->MapPos) + vp->Offset;
+			new_vps[i].Offset = relDiff + CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(vp->MapPos) + vp->Offset;
 		} else {
 			new_vps[i].Offset.x = 0;
 			new_vps[i].Offset.y = 0;
@@ -445,8 +445,8 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	//Wyrmgus start
 //	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * wyrmgus::defines::get()->get_scaled_tile_width() - 1;
 //	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * wyrmgus::defines::get()->get_scaled_tile_height() - 1;
-	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - 1;
+	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::get()->Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info.MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - 1;
+	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::get()->Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info.MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary

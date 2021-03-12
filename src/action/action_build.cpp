@@ -75,7 +75,7 @@ enum {
 
 std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
 
 	auto order = std::make_unique<COrder_Build>();
 
@@ -222,7 +222,7 @@ void COrder_Build::AiUnitKilled(CUnit &unit)
 	if (this->BuildingUnit == nullptr) {
 		//Wyrmgus start
 //		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
-		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type, CMap::Map.get_tile_landmass(this->goalPos, this->MapLayer), this->settlement);
+		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type, CMap::get()->get_tile_landmass(this->goalPos, this->MapLayer), this->settlement);
 		//Wyrmgus end
 	}
 }
@@ -273,7 +273,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 			if (unit.Player->AiEnabled) {
 				//Wyrmgus start
 //				AiCanNotReach(unit, this->GetUnitType());
-				AiCanNotReach(unit, this->GetUnitType(), CMap::Map.get_tile_landmass(this->goalPos, this->MapLayer), this->settlement);
+				AiCanNotReach(unit, this->GetUnitType(), CMap::get()->get_tile_landmass(this->goalPos, this->MapLayer), this->settlement);
 				//Wyrmgus end
 			}
 			return true;
@@ -425,13 +425,13 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 							_("Unable to create building %s"), type.GetDefaultName(unit.Player).c_str());
 							//Wyrmgus end
 		if (unit.Player->AiEnabled) {
-			AiCanNotBuild(unit, type, CMap::Map.get_tile_landmass(this->goalPos, this->MapLayer), this->settlement);
+			AiCanNotBuild(unit, type, CMap::get()->get_tile_landmass(this->goalPos, this->MapLayer), this->settlement);
 		}
 		return false;
 	}
 	build->UnderConstruction = 1;
 	build->CurrentSightRange = 0;
-	build->MapLayer = CMap::Map.MapLayers[this->MapLayer].get();
+	build->MapLayer = CMap::get()->MapLayers[this->MapLayer].get();
 
 	// Building on top of something, may remove what is beneath it
 	if (&ontop != &unit) {
@@ -569,7 +569,7 @@ void COrder_Build::Execute(CUnit &unit)
 
 		if (ontop != nullptr) {
 			//Wyrmgus start
-			if (CheckLimit(unit, type, CMap::Map.get_tile_landmass(this->goalPos, this->MapLayer), this->settlement) == false) {
+			if (CheckLimit(unit, type, CMap::get()->get_tile_landmass(this->goalPos, this->MapLayer), this->settlement) == false) {
 				this->Finished = true;
 				return;
 			}
@@ -579,7 +579,7 @@ void COrder_Build::Execute(CUnit &unit)
 			// Check if already building
 			const Vec2i pos = this->goalPos;
 
-			CUnit *building = AlreadyBuildingFinder(unit, type).Find(CMap::Map.Field(pos, this->MapLayer));
+			CUnit *building = AlreadyBuildingFinder(unit, type).Find(CMap::get()->Field(pos, this->MapLayer));
 
 			if (building != nullptr) {
 				this->HelpBuild(unit, *building);
@@ -604,7 +604,7 @@ void COrder_Build::Execute(CUnit &unit)
 		if (unit.Player->AiEnabled) {
 			//Wyrmgus start
 //			AiCanNotBuild(unit, type);
-			AiCanNotBuild(unit, type, CMap::Map.get_tile_landmass(this->goalPos, this->MapLayer), this->settlement);
+			AiCanNotBuild(unit, type, CMap::get()->get_tile_landmass(this->goalPos, this->MapLayer), this->settlement);
 			//Wyrmgus end
 		}
 		this->Finished = true;

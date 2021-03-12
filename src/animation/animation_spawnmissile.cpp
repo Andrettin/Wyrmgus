@@ -84,10 +84,10 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 				return;
 			} else if (goal->CurrentAction() == UnitAction::Attack || goal->CurrentAction() == UnitAction::AttackGround) {
 				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
-				dest = CMap::Map.tile_pos_to_map_pixel_pos_center(order.GetGoalPos());
+				dest = CMap::get()->tile_pos_to_map_pixel_pos_center(order.GetGoalPos());
 			} else if (goal->CurrentAction() == UnitAction::SpellCast) {
 				COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-				dest = CMap::Map.tile_pos_to_map_pixel_pos_center(order.GetGoalPos());
+				dest = CMap::get()->tile_pos_to_map_pixel_pos_center(order.GetGoalPos());
 			}
 			if (flags & SM_Pixel) {
 				dest.x += destx;
@@ -114,7 +114,7 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 			dest += goal->get_tile_pixel_size() / 2;
 		}
 	}
-	Vec2i destTilePos = CMap::Map.map_pixel_pos_to_tile_pos(dest);
+	Vec2i destTilePos = CMap::get()->map_pixel_pos_to_tile_pos(dest);
 	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer->ID);
 	if ((flags & SM_Ranged) && !(flags & SM_Pixel)
 		&& dist > goal->GetModifiedVariable(ATTACKRANGE_INDEX)

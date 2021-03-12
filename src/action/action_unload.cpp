@@ -186,7 +186,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addy; i--; ++pos.y) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.get_tile_landmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::get()->get_tile_landmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				if (target_pos.has_value()) {
 					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
@@ -206,7 +206,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addx; i--; ++pos.x) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.get_tile_landmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::get()->get_tile_landmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				if (target_pos.has_value()) {
 					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
@@ -226,7 +226,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addy; i--; --pos.y) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.get_tile_landmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::get()->get_tile_landmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				if (target_pos.has_value()) {
 					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
@@ -246,7 +246,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addx; i--; --pos.x) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.get_tile_landmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::get()->get_tile_landmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				if (target_pos.has_value()) {
 					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());

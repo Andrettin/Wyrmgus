@@ -108,16 +108,16 @@ tile_flag MapFogFilterFlags(CPlayer &player, const unsigned int index, const til
 
 	_filter_flags filter(player, &fogMask);
 	//Wyrmgus start
-//	CMap::Map.Field(index)->UnitCache.for_each(filter);
-	CMap::Map.Field(index, z)->UnitCache.for_each(filter);
+//	CMap::get()->Field(index)->UnitCache.for_each(filter);
+	CMap::get()->Field(index, z)->UnitCache.for_each(filter);
 	//Wyrmgus end
 	return fogMask;
 }
 
 tile_flag MapFogFilterFlags(CPlayer &player, const Vec2i &pos, const tile_flag mask, const int z)
 {
-	if (CMap::Map.Info.IsPointOnMap(pos, z)) {
-		return MapFogFilterFlags(player, CMap::Map.get_pos_index(pos, z), mask, z);
+	if (CMap::get()->Info.IsPointOnMap(pos, z)) {
+		return MapFogFilterFlags(player, CMap::get()->get_pos_index(pos, z), mask, z);
 	}
 	return mask;
 }
@@ -249,13 +249,13 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	wyrmgus::tile &mf = *CMap::Map.Field(index);
-	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
+//	wyrmgus::tile &mf = *CMap::get()->Field(index);
+	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	//Wyrmgus end
 	unsigned short &v = mf.player_info->Visible[player.Index];
 	if (v == 0 || v == 1) { // Unexplored or unseen
 		// When there is no fog only unexplored tiles are marked.
-		if (!CMap::Map.NoFogOfWar || v == 0) {
+		if (!CMap::get()->NoFogOfWar || v == 0) {
 			//Wyrmgus start
 //			UnitsOnTileMarkSeen(player, mf, 0);
 			UnitsOnTileMarkSeen(player, mf, 0, 0);
@@ -263,7 +263,7 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 		}
 		v = 2;
 		if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			CMap::Map.MarkSeenTile(mf);
+			CMap::get()->MarkSeenTile(mf);
 		}
 		return;
 	}
@@ -276,8 +276,8 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 void MapMarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
-	MapMarkTileSight(player, CMap::Map.get_pos_index(pos, z), z);
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	MapMarkTileSight(player, CMap::get()->get_pos_index(pos, z), z);
 }
 
 /**
@@ -292,8 +292,8 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	wyrmgus::tile &mf = *CMap::Map.Field(index);
-	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
+//	wyrmgus::tile &mf = *CMap::get()->Field(index);
+	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	//Wyrmgus end
 	unsigned short &v = mf.player_info->Visible[player.Index];
 	switch (v) {
@@ -303,7 +303,7 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 			break;
 		case 2:
 			// When there is NoFogOfWar units never get unmarked.
-			if (!CMap::Map.NoFogOfWar) {
+			if (!CMap::get()->NoFogOfWar) {
 				//Wyrmgus start
 //				UnitsOnTileUnmarkSeen(player, mf, 0);
 				UnitsOnTileUnmarkSeen(player, mf, 0, 0);
@@ -311,7 +311,7 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 			}
 			// Check visible Tile, then deduct...
 			if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-				CMap::Map.MarkSeenTile(mf);
+				CMap::get()->MarkSeenTile(mf);
 			}
 		default:  // seen -> seen
 			--v;
@@ -324,8 +324,8 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
-	MapUnmarkTileSight(player, CMap::Map.get_pos_index(pos, z), z);
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	MapUnmarkTileSight(player, CMap::get()->get_pos_index(pos, z), z);
 }
 
 /**
@@ -340,8 +340,8 @@ void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index, int
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	wyrmgus::tile &mf = *CMap::Map.Field(index);
-	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
+//	wyrmgus::tile &mf = *CMap::get()->Field(index);
+	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	//Wyrmgus end
 	unsigned char &v = mf.player_info->VisCloak[player.Index];
 	if (v == 0) {
@@ -360,8 +360,8 @@ void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	MapMarkTileDetectCloak(player, CMap::Map.get_pos_index(pos));
-	MapMarkTileDetectCloak(player, CMap::Map.get_pos_index(pos, z), z);
+//	MapMarkTileDetectCloak(player, CMap::get()->get_pos_index(pos));
+	MapMarkTileDetectCloak(player, CMap::get()->get_pos_index(pos, z), z);
 	//Wyrmgus end
 }
 
@@ -377,8 +377,8 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index, i
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	wyrmgus::tile &mf = *CMap::Map.Field(index);
-	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
+//	wyrmgus::tile &mf = *CMap::get()->Field(index);
+	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	//Wyrmgus end
 	unsigned char &v = mf.player_info->VisCloak[player.Index];
 	Assert(v != 0);
@@ -397,8 +397,8 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	MapUnmarkTileDetectCloak(player, CMap::Map.get_pos_index(pos));
-	MapUnmarkTileDetectCloak(player, CMap::Map.get_pos_index(pos, z), z);
+//	MapUnmarkTileDetectCloak(player, CMap::get()->get_pos_index(pos));
+	MapUnmarkTileDetectCloak(player, CMap::get()->get_pos_index(pos, z), z);
 	//Wyrmgus end
 }
 
@@ -411,7 +411,7 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
 */
 void MapMarkTileDetectEthereal(const CPlayer &player, const unsigned int index, int z)
 {
-	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
+	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	unsigned char &v = mf.player_info->VisEthereal[player.Index];
 	if (v == 0) {
 		UnitsOnTileMarkSeen(player, mf, 0, 1);
@@ -422,7 +422,7 @@ void MapMarkTileDetectEthereal(const CPlayer &player, const unsigned int index, 
 
 void MapMarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
 {
-	MapMarkTileDetectEthereal(player, CMap::Map.get_pos_index(pos, z), z);
+	MapMarkTileDetectEthereal(player, CMap::get()->get_pos_index(pos, z), z);
 }
 
 /**
@@ -433,7 +433,7 @@ void MapMarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
 */
 void MapUnmarkTileDetectEthereal(const CPlayer &player, const unsigned int index, int z)
 {
-	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
+	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	unsigned char &v = mf.player_info->VisEthereal[player.Index];
 	Assert(v != 0);
 	if (v == 1) {
@@ -444,7 +444,7 @@ void MapUnmarkTileDetectEthereal(const CPlayer &player, const unsigned int index
 
 void MapUnmarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
 {
-	MapUnmarkTileDetectEthereal(player, CMap::Map.get_pos_index(pos, z), z);
+	MapUnmarkTileDetectEthereal(player, CMap::get()->get_pos_index(pos, z), z);
 }
 //Wyrmgus end
 
@@ -479,13 +479,13 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		const int offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
 		//Wyrmgus start
-//		const int maxx = std::min(CMap::Map.Info.MapWidth, pos.x + w + offsetx);
-		const int maxx = std::min(CMap::Map.Info.MapWidths[z], pos.x + w + offsetx);
+//		const int maxx = std::min(CMap::get()->Info.MapWidth, pos.x + w + offsetx);
+		const int maxx = std::min(CMap::get()->Info.MapWidths[z], pos.x + w + offsetx);
 		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + offsety);
 		//Wyrmgus start
-//		const unsigned int index = mpos.y * CMap::Map.Info.MapWidth;
-		const unsigned int index = mpos.y * CMap::Map.Info.MapWidths[z];
+//		const unsigned int index = mpos.y * CMap::get()->Info.MapWidth;
+		const unsigned int index = mpos.y * CMap::get()->Info.MapWidths[z];
 		//Wyrmgus end
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -514,13 +514,13 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	for (int offsety = 0; offsety < h; ++offsety) {
 		const int minx = std::max(0, pos.x - range);
 		//Wyrmgus start
-//		const int maxx = std::min(CMap::Map.Info.MapWidth, pos.x + w + range);
-		const int maxx = std::min(CMap::Map.Info.MapWidths[z], pos.x + w + range);
+//		const int maxx = std::min(CMap::get()->Info.MapWidth, pos.x + w + range);
+		const int maxx = std::min(CMap::get()->Info.MapWidths[z], pos.x + w + range);
 		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + offsety);
 		//Wyrmgus start
-//		const unsigned int index = mpos.y * CMap::Map.Info.MapWidth;
-		const unsigned int index = mpos.y * CMap::Map.Info.MapWidths[z];
+//		const unsigned int index = mpos.y * CMap::get()->Info.MapWidth;
+		const unsigned int index = mpos.y * CMap::get()->Info.MapWidths[z];
 		//Wyrmgus end
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -548,20 +548,20 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	}
 	// bottom hemi-cycle
 	//Wyrmgus start
-//	const int maxy = std::min(range, CMap::Map.Info.MapHeight - pos.y - h);
-	const int maxy = std::min(range, CMap::Map.Info.MapHeights[z] - pos.y - h);
+//	const int maxy = std::min(range, CMap::get()->Info.MapHeight - pos.y - h);
+	const int maxy = std::min(range, CMap::get()->Info.MapHeights[z] - pos.y - h);
 	//Wyrmgus end
 	for (int offsety = 0; offsety < maxy; ++offsety) {
 		const int offsetx = isqrt(square(range + 1) - square(offsety + 1) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
 		//Wyrmgus start
-//		const int maxx = std::min(CMap::Map.Info.MapWidth, pos.x + w + offsetx);
-		const int maxx = std::min(CMap::Map.Info.MapWidths[z], pos.x + w + offsetx);
+//		const int maxx = std::min(CMap::get()->Info.MapWidth, pos.x + w + offsetx);
+		const int maxx = std::min(CMap::get()->Info.MapWidths[z], pos.x + w + offsetx);
 		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + h + offsety);
 		//Wyrmgus start
-//		const unsigned int index = mpos.y * CMap::Map.Info.MapWidth;
-		const unsigned int index = mpos.y * CMap::Map.Info.MapWidths[z];
+//		const unsigned int index = mpos.y * CMap::get()->Info.MapWidth;
+		const unsigned int index = mpos.y * CMap::get()->Info.MapWidths[z];
 		//Wyrmgus end
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -607,7 +607,7 @@ void UpdateFogOfWarChange()
 {
 	DebugPrint("::UpdateFogOfWarChange\n");
 	//  Mark all explored fields as visible again.
-	if (CMap::Map.NoFogOfWar) {
+	if (CMap::get()->NoFogOfWar) {
 		//Wyrmgus start
 		/*
 		const unsigned int w = Map.Info.MapHeight * Map.Info.MapWidth;
@@ -618,12 +618,12 @@ void UpdateFogOfWarChange()
 			}
 		}
 		*/
-		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-			const unsigned int w = CMap::Map.Info.MapHeights[z] * CMap::Map.Info.MapWidths[z];
+		for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+			const unsigned int w = CMap::get()->Info.MapHeights[z] * CMap::get()->Info.MapWidths[z];
 			for (unsigned int index = 0; index != w; ++index) {
-				wyrmgus::tile &mf = *CMap::Map.Field(index, z);
+				wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 				if (mf.player_info->IsExplored(*CPlayer::GetThisPlayer())) {
-					CMap::Map.MarkSeenTile(mf);
+					CMap::get()->MarkSeenTile(mf);
 				}
 			}
 		}
@@ -667,8 +667,8 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 //Wyrmgus end
 
 	//Wyrmgus start
-//	int w = CMap::Map.Info.MapWidth;
-	int w = CMap::Map.Info.MapWidths[z];
+//	int w = CMap::get()->Info.MapWidth;
+	int w = CMap::get()->Info.MapWidths[z];
 	//Wyrmgus end
 	int fogTileIndex = 0;
 	int blackFogTileIndex = 0;
@@ -694,8 +694,8 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 
 	if (sy) {
 		//Wyrmgus start
-//		unsigned int index = sy - CMap::Map.Info.MapWidth;//(y-1) * Map.Info.MapWidth;
-		unsigned int index = sy - CMap::Map.Info.MapWidths[z];//(y-1) * Map.Info.MapWidth;
+//		unsigned int index = sy - CMap::get()->Info.MapWidth;//(y-1) * Map.Info.MapWidth;
+		unsigned int index = sy - CMap::get()->Info.MapWidths[z];//(y-1) * Map.Info.MapWidth;
 		//Wyrmgus end
 		if (sx != sy) {
 			//if (!IsMapFieldExploredTable(x - 1, y - 1)) {
@@ -781,12 +781,12 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 	}
 
 	//Wyrmgus start
-//	if (sy + w < CMap::Map.Info.MapHeight * w) {
-	if (sy + w < CMap::Map.Info.MapHeights[z] * w) {
+//	if (sy + w < CMap::get()->Info.MapHeight * w) {
+	if (sy + w < CMap::get()->Info.MapHeights[z] * w) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		unsigned int index = sy + CMap::Map.Info.MapWidth;//(y+1) * Map.Info.MapWidth;
-		unsigned int index = sy + CMap::Map.Info.MapWidths[z];//(y+1) * Map.Info.MapWidth;
+//		unsigned int index = sy + CMap::get()->Info.MapWidth;//(y+1) * Map.Info.MapWidth;
+		unsigned int index = sy + CMap::get()->Info.MapWidths[z];//(y+1) * Map.Info.MapWidth;
 		//Wyrmgus end
 		if (sx != sy) {
 			//if (!IsMapFieldExploredTable(x - 1, y + 1)) {
@@ -841,7 +841,7 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 //	*blackFogTile = FogTable[blackFogTileIndex];
 	//apply variation according to tile index (sx is equal to the tile index, so let's use it)
 	int FogTileVariation = 0;
-	const std::shared_ptr<CGraphic> &fog_graphic = CMap::Map.FogGraphics;
+	const std::shared_ptr<CGraphic> &fog_graphic = CMap::get()->FogGraphics;
 	if (sx % 3 == 0 && fog_graphic->get_height() / wyrmgus::defines::get()->get_scaled_tile_height() >= 3) {
 		FogTileVariation = 2;
 	} else if (sx % 2 == 0 && fog_graphic->get_height() / wyrmgus::defines::get()->get_scaled_tile_height() >= 2) {
@@ -879,7 +879,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	//Wyrmgus end
 
 	//Wyrmgus start
-	const std::shared_ptr<CGraphic> &fog_graphic = CMap::Map.FogGraphics;
+	const std::shared_ptr<CGraphic> &fog_graphic = CMap::get()->FogGraphics;
 	
 //	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
 	if ((IsMapFieldVisibleTable(sx, UI.CurrentMapLayer->ID) && blackFogTile != 16 && fogTile != 16) || ReplayRevealMap) {
@@ -920,8 +920,8 @@ void CViewport::DrawMapFogOfWar() const
 	for (; my < ey; ++my) {
 		for (int mx = sx; mx < ex; ++mx) {
 			//Wyrmgus start
-//			VisibleTable[my_index + mx] = CMap::Map.Field(mx + my_index)->player_info->TeamVisibilityState(*ThisPlayer);
-			VisibleTable[UI.CurrentMapLayer->ID][my_index + mx] = CMap::Map.Field(mx + my_index, UI.CurrentMapLayer->ID)->player_info->TeamVisibilityState(*CPlayer::GetThisPlayer());
+//			VisibleTable[my_index + mx] = CMap::get()->Field(mx + my_index)->player_info->TeamVisibilityState(*ThisPlayer);
+			VisibleTable[UI.CurrentMapLayer->ID][my_index + mx] = CMap::get()->Field(mx + my_index, UI.CurrentMapLayer->ID)->player_info->TeamVisibilityState(*CPlayer::GetThisPlayer());
 			//Wyrmgus end
 		}
 		my_index += UI.CurrentMapLayer->get_width();

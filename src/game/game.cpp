@@ -173,7 +173,7 @@ void game::do_cycle()
 
 		this->current_date = this->current_date.addSecs(1 * 60 * 60 * DEFAULT_DAY_MULTIPLIER_PER_YEAR);
 
-		for (const std::unique_ptr<CMapLayer> &map_layer : CMap::Map.MapLayers) {
+		for (const std::unique_ptr<CMapLayer> &map_layer : CMap::get()->MapLayers) {
 			map_layer->DoPerHourLoop();
 		}
 
@@ -380,10 +380,10 @@ void StartMap(const std::string &filename, bool clean)
 			CPlayer::Players[i]->update_quest_pool();
 		}
 
-		if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
-			UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer].get();
+		if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::get()->MapLayers.size())) {
+			UI.CurrentMapLayer = CMap::get()->MapLayers[CPlayer::GetThisPlayer()->StartMapLayer].get();
 		}
-		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(CPlayer::GetThisPlayer()->StartPos));
+		UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(CPlayer::GetThisPlayer()->StartPos));
 
 		UI.get_minimap()->Update();
 
@@ -482,10 +482,10 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 		throw std::runtime_error(mapname + ": invalid map");
 	}
 #endif
-	if (!CMap::Map.Info.MapWidth || !CMap::Map.Info.MapHeight) {
+	if (!CMap::get()->Info.MapWidth || !CMap::get()->Info.MapHeight) {
 		throw std::runtime_error(mapname + ": invalid map");
 	}
-	CMap::Map.Info.Filename = mapname;
+	CMap::get()->Info.Filename = mapname;
 }
 
 // Write the map presentation file
@@ -589,7 +589,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		mod_file = FindAndReplaceStringBeginning(mod_file, database::get()->get_root_path().string() + "/", "");
 		
 		for (const faction *faction : faction::get_all()) {
-			if (faction->Mod != CMap::Map.Info.Filename) {
+			if (faction->Mod != CMap::get()->Info.Filename) {
 				continue;
 			}
 				
@@ -613,7 +613,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}
 		
 		for (const unit_type *unit_type : unit_type::get_all()) {
-			if (unit_type->Mod != CMap::Map.Info.Filename) {
+			if (unit_type->Mod != CMap::get()->Info.Filename) {
 				continue;
 			}
 			
@@ -781,7 +781,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		
 		//save the definition of trained unit types separately, to avoid issues like a trained unit being defined after the unit that trains it
 		for (const unit_type *unit_type : unit_type::get_all()) {
-			if (unit_type->Mod != CMap::Map.Info.Filename) {
+			if (unit_type->Mod != CMap::get()->Info.Filename) {
 				continue;
 			}
 			
@@ -799,7 +799,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}		
 
 		for (const unit_type *unit_type : unit_type::get_all()) {
-			const auto mod_trains_find_iterator = unit_type->ModTrains.find(CMap::Map.Info.Filename);
+			const auto mod_trains_find_iterator = unit_type->ModTrains.find(CMap::get()->Info.Filename);
 			if (mod_trains_find_iterator != unit_type->ModTrains.end()) {
 				f->printf("SetModTrains(\"%s\", \"%s\", {", mod_file.c_str(), unit_type->Ident.c_str());
 				for (size_t j = 0; j < mod_trains_find_iterator->second.size(); ++j) {
@@ -808,7 +808,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("})\n\n");
 			}
 			
-			const auto mod_ai_drops_find_iterator = unit_type->ModAiDrops.find(CMap::Map.Info.Filename);
+			const auto mod_ai_drops_find_iterator = unit_type->ModAiDrops.find(CMap::get()->Info.Filename);
 			if (mod_ai_drops_find_iterator != unit_type->ModAiDrops.end()) {
 				f->printf("SetModAiDrops(\"%s\", \"%s\", {", mod_file.c_str(), unit_type->Ident.c_str());
 				for (size_t j = 0; j < mod_ai_drops_find_iterator->second.size(); ++j) {
@@ -849,7 +849,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		if (!is_mod) {
 			f->printf("-- player configuration\n");
 			for (int i = 0; i < PlayerMax; ++i) {
-				if (CMap::Map.Info.PlayerType[i] == PlayerNobody) {
+				if (CMap::get()->Info.PlayerType[i] == PlayerNobody) {
 					continue;
 				}
 				f->printf("SetStartView(%d, %d, %d)\n", i, CPlayer::Players[i]->StartPos.x, CPlayer::Players[i]->StartPos.y);
@@ -910,103 +910,103 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			
 		f->printf("\n-- set map default stat and map sound for unit types\n");
 		for (unit_type *unit_type : unit_type::get_all()) {
-			if (unit_type->ModDefaultStats.find(CMap::Map.Info.Filename) != unit_type->ModDefaultStats.end()) {
-				for (const auto &[resource, cost] : unit_type->ModDefaultStats[CMap::Map.Info.Filename].get_costs()) {
+			if (unit_type->ModDefaultStats.find(CMap::get()->Info.Filename) != unit_type->ModDefaultStats.end()) {
+				for (const auto &[resource, cost] : unit_type->ModDefaultStats[CMap::get()->Info.Filename].get_costs()) {
 					f->printf("SetModStat(\"%s\", \"%s\", \"Costs\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), cost, resource->get_identifier().c_str());
 				}
 
-				for (const auto &[resource, quantity] : unit_type->ModDefaultStats[CMap::Map.Info.Filename].get_improve_incomes()) {
+				for (const auto &[resource, quantity] : unit_type->ModDefaultStats[CMap::get()->Info.Filename].get_improve_incomes()) {
 					f->printf("SetModStat(\"%s\", \"%s\", \"ImproveProduction\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), quantity, resource->get_identifier().c_str());
 				}
 
-				for (const auto &[other_unit_type, unit_stock] : unit_type->ModDefaultStats[CMap::Map.Info.Filename].get_unit_stocks()) {
+				for (const auto &[other_unit_type, unit_stock] : unit_type->ModDefaultStats[CMap::get()->Info.Filename].get_unit_stocks()) {
 					f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), unit_type->get_identifier().c_str(), unit_stock, other_unit_type->get_identifier().c_str());
 				}
 
 				for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
-					if (unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Value != 0) {
-						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Value\")\n", mod_file.c_str(), unit_type->Ident.c_str(), UnitTypeVar.VariableNameLookup[j], unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Value);
+					if (unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Value != 0) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Value\")\n", mod_file.c_str(), unit_type->Ident.c_str(), UnitTypeVar.VariableNameLookup[j], unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Value);
 					}
-					if (unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Max != 0) {
-						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Max\")\n", mod_file.c_str(), unit_type->Ident.c_str(), UnitTypeVar.VariableNameLookup[j], unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Max);
+					if (unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Max != 0) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Max\")\n", mod_file.c_str(), unit_type->Ident.c_str(), UnitTypeVar.VariableNameLookup[j], unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Max);
 					}
-					if (unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Enable != 0 && (unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Value != 0 || unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Max != 0 || unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Increase != 0)) {
-						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Enable\")\n", mod_file.c_str(), unit_type->Ident.c_str(), UnitTypeVar.VariableNameLookup[j], unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Enable);
+					if (unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Enable != 0 && (unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Value != 0 || unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Max != 0 || unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Increase != 0)) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Enable\")\n", mod_file.c_str(), unit_type->Ident.c_str(), UnitTypeVar.VariableNameLookup[j], unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Enable);
 					}
-					if (unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Increase != 0) {
-						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Increase\")\n", mod_file.c_str(), unit_type->Ident.c_str(), UnitTypeVar.VariableNameLookup[j], unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Increase);
+					if (unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Increase != 0) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Increase\")\n", mod_file.c_str(), unit_type->Ident.c_str(), UnitTypeVar.VariableNameLookup[j], unit_type->ModDefaultStats[CMap::get()->Info.Filename].Variables[j].Increase);
 					}
 				}
 			}
 			
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Selected.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"selected\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Selected.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Selected.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"selected\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Selected.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Acknowledgement.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"acknowledge\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Acknowledgement.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Acknowledgement.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"acknowledge\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Acknowledgement.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Attack.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"attack\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Attack.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Attack.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"attack\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Attack.Name.c_str());
 			}
 			//Wyrmgus start
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Idle.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"idle\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Idle.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Idle.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"idle\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Idle.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Hit.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"hit\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Hit.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Hit.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"hit\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Hit.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Miss.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"miss\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Miss.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Miss.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"miss\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Miss.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].FireMissile.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"fire-missile\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].FireMissile.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].FireMissile.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"fire-missile\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].FireMissile.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Step.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Step.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Step.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Step.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].StepDirt.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-dirt\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].StepDirt.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].StepDirt.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-dirt\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].StepDirt.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].StepGrass.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-grass\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].StepGrass.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].StepGrass.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-grass\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].StepGrass.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].StepGravel.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-gravel\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].StepGravel.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].StepGravel.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-gravel\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].StepGravel.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].StepMud.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-mud\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].StepMud.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].StepMud.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-mud\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].StepMud.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].StepStone.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-stone\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].StepStone.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].StepStone.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-stone\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].StepStone.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Used.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"used\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Used.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Used.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"used\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Used.Name.c_str());
 			}
 			//Wyrmgus end
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Build.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"build\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Build.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Build.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"build\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Build.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Ready.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"ready\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Ready.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Ready.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"ready\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Ready.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Repair.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"repair\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Repair.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Repair.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"repair\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Repair.Name.c_str());
 			}
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				if (!unit_type->ModSounds[CMap::Map.Info.Filename].Harvest[j].Name.empty()) {
-					f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"harvest\", \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Harvest[j].Name.c_str(), DefaultResourceNames[j].c_str());
+				if (!unit_type->ModSounds[CMap::get()->Info.Filename].Harvest[j].Name.empty()) {
+					f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"harvest\", \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Harvest[j].Name.c_str(), DefaultResourceNames[j].c_str());
 				}
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Help.Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"help\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Help.Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Help.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"help\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Help.Name.c_str());
 			}
-			if (!unit_type->ModSounds[CMap::Map.Info.Filename].Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
-				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"dead\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+			if (!unit_type->ModSounds[CMap::get()->Info.Filename].Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"dead\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
 			}
 			int death;
 			for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-				if (!unit_type->ModSounds[CMap::Map.Info.Filename].Dead[death].Name.empty()) {
-					f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"dead\", \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::Map.Info.Filename].Dead[death].Name.c_str(), ExtraDeathTypes[death].c_str());
+				if (!unit_type->ModSounds[CMap::get()->Info.Filename].Dead[death].Name.empty()) {
+					f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"dead\", \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModSounds[CMap::get()->Info.Filename].Dead[death].Name.c_str(), ExtraDeathTypes[death].c_str());
 				}
 			}
 		}
@@ -1306,7 +1306,7 @@ static void GameTypeFreeForAll()
 */
 static void GameTypeTopVsBottom()
 {
-	const int middle = CMap::Map.Info.MapHeight / 2;
+	const int middle = CMap::get()->Info.MapHeight / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (CPlayer::Players[i]->has_neutral_faction_type()) {
@@ -1340,7 +1340,7 @@ static void GameTypeTopVsBottom()
 */
 static void GameTypeLeftVsRight()
 {
-	const int middle = CMap::Map.Info.MapWidth / 2;
+	const int middle = CMap::get()->Info.MapWidth / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (CPlayer::Players[i]->has_neutral_faction_type()) {
@@ -1658,7 +1658,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	age::current_age = nullptr;
 	//Wyrmgus end
 
-	if (CMap::Map.Info.Filename.empty() && !filename.empty()) {
+	if (CMap::get()->Info.Filename.empty() && !filename.empty()) {
 		const std::string path = LibraryFileName(filename.c_str());
 
 		if (strcasestr(filename.c_str(), ".smp")) {
@@ -1667,7 +1667,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		int playertype = (PlayerTypes) CMap::Map.Info.PlayerType[i];
+		int playertype = (PlayerTypes) CMap::get()->Info.PlayerType[i];
 		// Network games only:
 		if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
 			playertype = GameSettings.Presets[i].Type;
@@ -1725,7 +1725,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 #endif
 
 	if (FlagRevealMap) {
-		CMap::Map.Reveal();
+		CMap::get()->Reveal();
 	}
 
 	//
@@ -1792,7 +1792,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	InitUserInterface();
 	UI.Load();
 
-	CMap::Map.Init();
+	CMap::get()->Init();
 	UI.get_minimap()->Create();
 
 	try {
@@ -1845,10 +1845,10 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
-	if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
-		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer].get();
+	if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::get()->MapLayers.size())) {
+		UI.CurrentMapLayer = CMap::get()->MapLayers[CPlayer::GetThisPlayer()->StartMapLayer].get();
 	}
-	UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(CPlayer::GetThisPlayer()->StartPos));
+	UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(CPlayer::GetThisPlayer()->StartPos));
 
 	//
 	// Various hacks which must be done after the map is loaded.
@@ -1920,9 +1920,9 @@ void CleanGame()
 	CleanUnits();
 	CleanSelections();
 	//Wyrmgus start
-	DisableMod(CMap::Map.Info.Filename);
+	DisableMod(CMap::get()->Info.Filename);
 	//Wyrmgus end
-	CMap::Map.Clean();
+	CMap::get()->Clean();
 	CleanReplayLog();
 	FreePathfinder();
 	CursorBuilding = nullptr;

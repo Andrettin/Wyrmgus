@@ -1216,7 +1216,7 @@ const wyrmgus::world *CMap::GetCurrentWorld() const
 */
 bool CheckedCanMoveToMask(const Vec2i &pos, const tile_flag mask, const int z)
 {
-	return CMap::Map.Info.IsPointOnMap(pos, z) && CanMoveToMask(pos, mask, z);
+	return CMap::get()->Info.IsPointOnMap(pos, z) && CanMoveToMask(pos, mask, z);
 }
 
 /**
@@ -1230,21 +1230,21 @@ bool CheckedCanMoveToMask(const Vec2i &pos, const tile_flag mask, const int z)
 bool UnitTypeCanBeAt(const wyrmgus::unit_type &type, const Vec2i &pos, int z)
 {
 	const tile_flag mask = type.MovementMask;
-	unsigned int index = pos.y * CMap::Map.Info.MapWidths[z];
+	unsigned int index = pos.y * CMap::get()->Info.MapWidths[z];
 
 	for (int addy = 0; addy < type.get_tile_height(); ++addy) {
 		for (int addx = 0; addx < type.get_tile_width(); ++addx) {
-			if (CMap::Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false) {
+			if (CMap::get()->Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false) {
 				return false;
 			}
 
-			const wyrmgus::tile *tile = CMap::Map.Field(pos.x + addx + index, z);
+			const wyrmgus::tile *tile = CMap::get()->Field(pos.x + addx + index, z);
 			if (tile->CheckMask(mask) == true || (tile->get_terrain() == nullptr && wyrmgus::game::get()->get_current_campaign() != nullptr)) {
 				return false;
 			}
 			
 		}
-		index += CMap::Map.Info.MapWidths[z];
+		index += CMap::get()->Info.MapWidths[z];
 	}
 	return true;
 }
@@ -1290,37 +1290,37 @@ void PreprocessMap()
 		}
 		*/
 
-		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-			for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
-				for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
+		for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+			for (int ix = 0; ix < CMap::get()->Info.MapWidths[z]; ++ix) {
+				for (int iy = 0; iy < CMap::get()->Info.MapHeights[z]; ++iy) {
 					const QPoint tile_pos(ix, iy);
-					wyrmgus::tile &mf = *CMap::Map.Field(tile_pos, z);
-					CMap::Map.calculate_tile_solid_tile(tile_pos, false, z);
+					wyrmgus::tile &mf = *CMap::get()->Field(tile_pos, z);
+					CMap::get()->calculate_tile_solid_tile(tile_pos, false, z);
 					if (mf.get_overlay_terrain() != nullptr) {
-						CMap::Map.calculate_tile_solid_tile(tile_pos, true, z);
+						CMap::get()->calculate_tile_solid_tile(tile_pos, true, z);
 					}
-					CMap::Map.CalculateTileTransitions(tile_pos, false, z);
-					CMap::Map.CalculateTileTransitions(tile_pos, true, z);
+					CMap::get()->CalculateTileTransitions(tile_pos, false, z);
+					CMap::get()->CalculateTileTransitions(tile_pos, true, z);
 				}
 			}
 
-			CMap::Map.expand_terrain_features_to_same_terrain(z);
+			CMap::get()->expand_terrain_features_to_same_terrain(z);
 
 			//settlement territories need to be generated after tile transitions are calculated, so that the coast map field has been set
-			CMap::Map.generate_settlement_territories(z);
+			CMap::get()->generate_settlement_territories(z);
 
-			for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
-				for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
+			for (int ix = 0; ix < CMap::get()->Info.MapWidths[z]; ++ix) {
+				for (int iy = 0; iy < CMap::get()->Info.MapHeights[z]; ++iy) {
 					const QPoint tile_pos(ix, iy);
-					wyrmgus::tile &mf = *CMap::Map.Field(tile_pos, z);
-					CMap::Map.CalculateTileLandmass(tile_pos, z);
-					CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
+					wyrmgus::tile &mf = *CMap::get()->Field(tile_pos, z);
+					CMap::get()->CalculateTileLandmass(tile_pos, z);
+					CMap::get()->CalculateTileOwnershipTransition(tile_pos, z);
 					mf.bump_incompatible_units();
 					mf.UpdateSeenTile();
 					UI.get_minimap()->UpdateXY(tile_pos, z);
 					UI.get_minimap()->update_territory_xy(tile_pos, z);
 					if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-						CMap::Map.MarkSeenTile(mf);
+						CMap::get()->MarkSeenTile(mf);
 					}
 				}
 			}
@@ -1388,8 +1388,8 @@ int GetMapLayer(const std::string &plane_ident, const std::string &world_ident)
 	wyrmgus::plane *plane = wyrmgus::plane::try_get(plane_ident);
 	wyrmgus::world *world = wyrmgus::world::try_get(world_ident);
 
-	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-		if (CMap::Map.MapLayers[z]->plane == plane && CMap::Map.MapLayers[z]->world == world) {
+	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+		if (CMap::get()->MapLayers[z]->plane == plane && CMap::get()->MapLayers[z]->world == world) {
 			return z;
 		}
 	}
@@ -1416,14 +1416,14 @@ void ChangeToPreviousMapLayer()
 */
 void ChangeCurrentMapLayer(const int z)
 {
-	if (z < 0 || z >= static_cast<int>(CMap::Map.MapLayers.size()) || UI.CurrentMapLayer->ID == z) {
+	if (z < 0 || z >= static_cast<int>(CMap::get()->MapLayers.size()) || UI.CurrentMapLayer->ID == z) {
 		return;
 	}
 	
-	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * CMap::Map.Info.MapWidths[z] / UI.CurrentMapLayer->get_width(), UI.SelectedViewport->MapPos.y * CMap::Map.Info.MapHeights[z] / UI.CurrentMapLayer->get_height());
+	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * CMap::get()->Info.MapWidths[z] / UI.CurrentMapLayer->get_width(), UI.SelectedViewport->MapPos.y * CMap::get()->Info.MapHeights[z] / UI.CurrentMapLayer->get_height());
 	
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
-	UI.CurrentMapLayer = CMap::Map.MapLayers[z].get();
+	UI.CurrentMapLayer = CMap::get()->MapLayers[z].get();
 	UI.get_minimap()->UpdateCache = true;
 	UI.SelectedViewport->Set(new_viewport_map_pos, wyrmgus::size::to_point(wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
 }
@@ -1497,21 +1497,21 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 */
 void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, const int z)
 {
-	if (z >= static_cast<int>(CMap::Map.MapLayers.size())) {
-		fprintf(stderr, "Error in CMap::SetTimeOfDaySchedule: the given map layer index (%d) is not valid given the map layer quantity (%ld).\n", z, CMap::Map.MapLayers.size());
+	if (z >= static_cast<int>(CMap::get()->MapLayers.size())) {
+		fprintf(stderr, "Error in CMap::SetTimeOfDaySchedule: the given map layer index (%d) is not valid given the map layer quantity (%ld).\n", z, CMap::get()->MapLayers.size());
 		return;
 	}
 
 	if (time_of_day_schedule_ident.empty()) {
-		CMap::Map.MapLayers[z]->set_time_of_day_schedule(nullptr);
-		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
-		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
+		CMap::get()->MapLayers[z]->set_time_of_day_schedule(nullptr);
+		CMap::get()->MapLayers[z]->SetTimeOfDay(nullptr);
+		CMap::get()->MapLayers[z]->RemainingTimeOfDayHours = 0;
 	} else {
 		const time_of_day_schedule *schedule = time_of_day_schedule::try_get(time_of_day_schedule_ident);
 		if (schedule != nullptr) {
-			CMap::Map.MapLayers[z]->set_time_of_day_schedule(schedule);
-			CMap::Map.MapLayers[z]->SetTimeOfDay(schedule->get_scheduled_times_of_day().front().get());
-			CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = CMap::Map.MapLayers[z]->get_scheduled_time_of_day()->get_hours(CMap::Map.MapLayers[z]->GetSeason());
+			CMap::get()->MapLayers[z]->set_time_of_day_schedule(schedule);
+			CMap::get()->MapLayers[z]->SetTimeOfDay(schedule->get_scheduled_times_of_day().front().get());
+			CMap::get()->MapLayers[z]->RemainingTimeOfDayHours = CMap::get()->MapLayers[z]->get_scheduled_time_of_day()->get_hours(CMap::get()->MapLayers[z]->GetSeason());
 		}
 	}
 }
@@ -1586,15 +1586,15 @@ void SetSeason(const std::string &season_ident, int z)
 void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 {
 	if (season_schedule_ident.empty()) {
-		CMap::Map.MapLayers[z]->set_season_schedule(nullptr);
-		CMap::Map.MapLayers[z]->SetSeason(nullptr);
-		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
+		CMap::get()->MapLayers[z]->set_season_schedule(nullptr);
+		CMap::get()->MapLayers[z]->SetSeason(nullptr);
+		CMap::get()->MapLayers[z]->RemainingSeasonHours = 0;
 	} else {
 		const season_schedule *schedule = season_schedule::try_get(season_schedule_ident);
 		if (schedule != nullptr) {
-			CMap::Map.MapLayers[z]->set_season_schedule(schedule);
-			CMap::Map.MapLayers[z]->SetSeason(schedule->get_scheduled_seasons().front().get());
-			CMap::Map.MapLayers[z]->RemainingSeasonHours = CMap::Map.MapLayers[z]->get_scheduled_season()->get_hours();
+			CMap::get()->MapLayers[z]->set_season_schedule(schedule);
+			CMap::get()->MapLayers[z]->SetSeason(schedule->get_scheduled_seasons().front().get());
+			CMap::get()->MapLayers[z]->RemainingSeasonHours = CMap::get()->MapLayers[z]->get_scheduled_season()->get_hours();
 		}
 	}
 }
@@ -1602,7 +1602,7 @@ void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 
 bool CanMoveToMask(const Vec2i &pos, const tile_flag mask, const int z)
 {
-	return !CMap::Map.Field(pos, z)->CheckMask(mask);
+	return !CMap::get()->Field(pos, z)->CheckMask(mask);
 }
 
 /**
@@ -3927,8 +3927,8 @@ void LoadStratagusMapInfo(const std::string &mapname)
 	// Set the default map setup by replacing .smp with .sms
 	size_t loc = mapname.find(".smp");
 	if (loc != std::string::npos) {
-		CMap::Map.Info.Filename = mapname;
-		CMap::Map.Info.Filename.replace(loc, 4, ".sms");
+		CMap::get()->Info.Filename = mapname;
+		CMap::get()->Info.Filename.replace(loc, 4, ".sms");
 	}
 
 	const std::string filename = LibraryFileName(mapname.c_str());

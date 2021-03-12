@@ -930,7 +930,7 @@ void DrawMapLayerButtons()
 		if (UI.WorldButtons[i].X != -1) {
 			DrawUIButton(UI.WorldButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerWorld && ButtonUnderCursor == static_cast<int>(i) ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.WorldButtons[i].Clicked || CMap::Map.GetCurrentWorld() == wyrmgus::world::get_all()[i]) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.WorldButtons[i].Clicked || CMap::get()->GetCurrentWorld() == wyrmgus::world::get_all()[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.WorldButtons[i].X, UI.WorldButtons[i].Y,
 				UI.WorldButtons[i].Text
 			);
@@ -966,7 +966,7 @@ void DrawPopups()
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
 				if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
-					PixelPos unit_center_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(UnitUnderCursor->tilePos);
+					PixelPos unit_center_pos = CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(UnitUnderCursor->tilePos);
 					unit_center_pos = vp->scaled_map_to_screen_pixel_pos(unit_center_pos);
 					std::string unit_name;
 					if (UnitUnderCursor->get_unique() != nullptr || UnitUnderCursor->Prefix != nullptr || UnitUnderCursor->Suffix != nullptr || UnitUnderCursor->Work != nullptr || UnitUnderCursor->Spell != nullptr || UnitUnderCursor->get_character() != nullptr) {
@@ -993,7 +993,7 @@ void DrawPopups()
 					LastDrawnButtonPopup = nullptr;
 				} else if (mf.get_terrain_feature() != nullptr || mf.get_world() != nullptr) {
 					if (UI.get_tooltip_cycle_count() >= UI.get_tooltip_cycle_threshold()) {
-						PixelPos tile_center_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
+						PixelPos tile_center_pos = CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
 						tile_center_pos = vp->scaled_map_to_screen_pixel_pos(tile_center_pos);
 
 						//hackish way to make the popup appear correctly for the tile under cursor
@@ -1215,7 +1215,7 @@ void DrawPopups()
 
 	if (CursorOn == cursor_on::minimap) {
 		const QPoint minimap_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
-		if (CMap::Map.Info.IsPointOnMap(minimap_tile_pos, UI.CurrentMapLayer->ID)) {
+		if (CMap::get()->Info.IsPointOnMap(minimap_tile_pos, UI.CurrentMapLayer->ID)) {
 			const wyrmgus::tile *tile = UI.CurrentMapLayer->Field(minimap_tile_pos);
 
 			if (tile->player_info->IsTeamExplored(*CPlayer::GetThisPlayer())) {
@@ -1772,7 +1772,7 @@ void ShiftMessagesEvent()
 */
 void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
 
 	char temp[256];
 	va_list va;
@@ -1824,7 +1824,7 @@ void CenterOnMessage()
 		return;
 	}
 	const Vec2i &pos(MessagesEventPos[MessagesEventIndex]);
-	UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(pos));
+	UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(pos));
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
 }

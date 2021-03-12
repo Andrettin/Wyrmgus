@@ -200,8 +200,8 @@ static std::unique_ptr<FullReplay> StartReplay()
 	replay->LocalPlayer = CPlayer::GetThisPlayer()->Index;
 
 	replay->Date = dateStr;
-	replay->Map = CMap::Map.Info.Description;
-	replay->MapId = CMap::Map.Info.MapUID;
+	replay->Map = CMap::get()->Info.Description;
+	replay->MapId = CMap::get()->Info.MapUID;
 	replay->MapPath = CurrentMapPath;
 	replay->Resource = GameSettings.Resources;
 	replay->NumUnits = GameSettings.NumUnits;
@@ -261,7 +261,7 @@ static void ApplyReplaySettings()
 	GameSettings.Resources = CurrentReplay->Resource;
 	GameSettings.NumUnits = CurrentReplay->NumUnits;
 	GameSettings.Difficulty = CurrentReplay->Difficulty;
-	CMap::Map.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
+	CMap::get()->NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
 	GameSettings.Inside = CurrentReplay->Inside;
 	GameSettings.GameType = CurrentReplay->GameType;
 	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;

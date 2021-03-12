@@ -1164,15 +1164,15 @@ static int CclPresentMap(lua_State *l)
 	Map.Info.MapUID = LuaToNumber(l, 5);
 	*/
 
-	CMap::Map.Info.Description = LuaToString(l, 1);
+	CMap::get()->Info.Description = LuaToString(l, 1);
 	
 	if (lua_gettop(l) > 1) {
 		LuaCheckArgs(l, 5);
 		
 		// Number of players in LuaToNumber(l, 3); // Not used yet.
-		CMap::Map.Info.MapWidth = LuaToNumber(l, 3);
-		CMap::Map.Info.MapHeight = LuaToNumber(l, 4);
-		CMap::Map.Info.MapUID = LuaToNumber(l, 5);
+		CMap::get()->Info.MapWidth = LuaToNumber(l, 3);
+		CMap::get()->Info.MapHeight = LuaToNumber(l, 4);
+		CMap::get()->Info.MapUID = LuaToNumber(l, 5);
 	}
 	//Wyrmgus end
 
@@ -1187,7 +1187,7 @@ static int CclPresentMap(lua_State *l)
 static int CclDefineMapSetup(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	CMap::Map.Info.Filename = LuaToString(l, 1);
+	CMap::get()->Info.Filename = LuaToString(l, 1);
 
 	return 0;
 }

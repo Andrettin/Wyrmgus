@@ -112,14 +112,14 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 */
 void MapMarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 {
-	Assert(CMap::Map.Field(index, z)->player_info->Radar[player.Index] != 255);
-	CMap::Map.Field(index, z)->player_info->Radar[player.Index]++;
+	Assert(CMap::get()->Field(index, z)->player_info->Radar[player.Index] != 255);
+	CMap::get()->Field(index, z)->player_info->Radar[player.Index]++;
 }
 
 void MapMarkTileRadar(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
-	MapMarkTileRadar(player, CMap::Map.get_pos_index(x, y, z), z);
+	Assert(CMap::get()->Info.IsPointOnMap(x, y, z));
+	MapMarkTileRadar(player, CMap::get()->get_pos_index(x, y, z), z);
 }
 
 
@@ -134,8 +134,8 @@ void MapUnmarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 {
 	// Reduce radar coverage if it exists.
 	//Wyrmgus start
-//	unsigned char *v = &(CMap::Map.Field(index)->player_info->Radar[player.Index]);
-	unsigned char *v = &(CMap::Map.Field(index, z)->player_info->Radar[player.Index]);
+//	unsigned char *v = &(CMap::get()->Field(index)->player_info->Radar[player.Index]);
+	unsigned char *v = &(CMap::get()->Field(index, z)->player_info->Radar[player.Index]);
 	//Wyrmgus end
 	if (*v) {
 		--*v;
@@ -144,8 +144,8 @@ void MapUnmarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 
 void MapUnmarkTileRadar(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
-	MapUnmarkTileRadar(player, CMap::Map.get_pos_index(x, y, z), z);
+	Assert(CMap::get()->Info.IsPointOnMap(x, y, z));
+	MapUnmarkTileRadar(player, CMap::get()->get_pos_index(x, y, z), z);
 }
 
 
@@ -162,17 +162,17 @@ void MapMarkTileRadarJammer(const CPlayer &player, const unsigned int index, int
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	Assert(CMap::Map.Field(index)->player_info->RadarJammer[player.Index] != 255);
-//	CMap::Map.Field(index)->player_info->RadarJammer[player.Index]++;
-	Assert(CMap::Map.Field(index, z)->player_info->RadarJammer[player.Index] != 255);
-	CMap::Map.Field(index, z)->player_info->RadarJammer[player.Index]++;
+//	Assert(CMap::get()->Field(index)->player_info->RadarJammer[player.Index] != 255);
+//	CMap::get()->Field(index)->player_info->RadarJammer[player.Index]++;
+	Assert(CMap::get()->Field(index, z)->player_info->RadarJammer[player.Index] != 255);
+	CMap::get()->Field(index, z)->player_info->RadarJammer[player.Index]++;
 	//Wyrmgus end
 }
 
 void MapMarkTileRadarJammer(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
-	MapMarkTileRadarJammer(player, CMap::Map.get_pos_index(x, y, z), z);
+	Assert(CMap::get()->Info.IsPointOnMap(x, y, z));
+	MapMarkTileRadarJammer(player, CMap::get()->get_pos_index(x, y, z), z);
 }
 
 /**
@@ -189,8 +189,8 @@ void MapUnmarkTileRadarJammer(const CPlayer &player, const unsigned int index, i
 {
 	// Reduce radar coverage if it exists.
 	//Wyrmgus start
-//	unsigned char *v = &(CMap::Map.Field(index)->player_info->RadarJammer[player.Index]);
-	unsigned char *v = &(CMap::Map.Field(index, z)->player_info->RadarJammer[player.Index]);
+//	unsigned char *v = &(CMap::get()->Field(index)->player_info->RadarJammer[player.Index]);
+	unsigned char *v = &(CMap::get()->Field(index, z)->player_info->RadarJammer[player.Index]);
 	//Wyrmgus end
 	if (*v) {
 		--*v;
@@ -199,6 +199,6 @@ void MapUnmarkTileRadarJammer(const CPlayer &player, const unsigned int index, i
 
 void MapUnmarkTileRadarJammer(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(x, y, z));
-	MapUnmarkTileRadarJammer(player, CMap::Map.get_pos_index(x, y, z), z);
+	Assert(CMap::get()->Info.IsPointOnMap(x, y, z));
+	MapUnmarkTileRadarJammer(player, CMap::get()->get_pos_index(x, y, z), z);
 }

@@ -169,8 +169,8 @@ static void StopRaft(CUnit &unit)
 
 static std::vector<CUnit *> GetLayerConnectorPath(CUnit &unit, int old_z, int new_z, std::vector<CUnit *> &checked_connectors)
 {
-	for (size_t i = 0; i != CMap::Map.MapLayers[old_z]->LayerConnectors.size(); ++i) {
-		CUnit *connector = CMap::Map.MapLayers[old_z]->LayerConnectors[i];
+	for (size_t i = 0; i != CMap::get()->MapLayers[old_z]->LayerConnectors.size(); ++i) {
+		CUnit *connector = CMap::get()->MapLayers[old_z]->LayerConnectors[i];
 		CUnit *connector_destination = connector->ConnectingDestination;
 		std::vector<CUnit *> connector_path;
 		if (std::find(checked_connectors.begin(), checked_connectors.end(), connector) == checked_connectors.end() && unit.CanUseItem(connector) && connector->IsVisibleAsGoal(*unit.Player)) {
@@ -327,14 +327,14 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 */
 void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
 	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
-	wyrmgus::tile &new_mf = *CMap::Map.Field(pos, z);
+	wyrmgus::tile &new_mf = *CMap::get()->Field(pos, z);
 	//if the unit is a land unit over a raft, move the raft instead of the unit
 	if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
@@ -380,12 +380,12 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 */
 void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
 	
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	unit.set_rally_point(pos, CMap::Map.MapLayers[z].get());
+	unit.set_rally_point(pos, CMap::get()->MapLayers[z].get());
 }
 
 /**
@@ -556,7 +556,7 @@ void CommandAutoRepair(CUnit &unit, int on)
 */
 void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int z)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -610,7 +610,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 */
 void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -726,7 +726,7 @@ void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 */
 void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1275,7 +1275,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus:
 			   UnitNumber(unit) _C_ spell.get_identifier().c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
 	Assert(std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), &spell) != unit.Type->Spells.end());
 	
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1406,21 +1406,21 @@ void CommandSharedVision(int player, bool state, int opponent)
 			}
 		}
 		*/
-		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-			for (int i = 0; i != CMap::Map.Info.MapWidths[z] * CMap::Map.Info.MapHeights[z]; ++i) {
-				wyrmgus::tile &mf = *CMap::Map.Field(i, z);
+		for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+			for (int i = 0; i != CMap::get()->Info.MapWidths[z] * CMap::get()->Info.MapHeights[z]; ++i) {
+				wyrmgus::tile &mf = *CMap::get()->Field(i, z);
 				const std::unique_ptr<wyrmgus::tile_player_info> &mfp = mf.player_info;
 
 				if (mfp->Visible[player] && !mfp->Visible[opponent] && !CPlayer::Players[player]->is_revealed()) {
 					mfp->Visible[opponent] = 1;
 					if (opponent == CPlayer::GetThisPlayer()->Index) {
-						CMap::Map.MarkSeenTile(mf);
+						CMap::get()->MarkSeenTile(mf);
 					}
 				}
 				if (mfp->Visible[opponent] && !mfp->Visible[player] && !CPlayer::Players[opponent]->is_revealed()) {
 					mfp->Visible[player] = 1;
 					if (player == CPlayer::GetThisPlayer()->Index) {
-						CMap::Map.MarkSeenTile(mf);
+						CMap::get()->MarkSeenTile(mf);
 					}
 				}
 			}

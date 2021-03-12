@@ -380,7 +380,7 @@ static void AiCheckUnits()
 							if (
 								mercenary_type->get_unit_class() == queue.Type->get_unit_class()
 								&& queue.Want > queue.Made
-								&& (!queue.landmass || queue.landmass == CMap::Map.get_tile_landmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
+								&& (!queue.landmass || queue.landmass == CMap::get()->get_tile_landmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
 								&& (!queue.settlement || queue.settlement == mercenary_building->settlement)
 							) {
 								queue.Made++;
@@ -1188,7 +1188,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 	Assert(what.Player->Type != PlayerPerson);
 	//Wyrmgus start
 //	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
-	AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::Map.get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
+	AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
 	//Wyrmgus end
 }
 
@@ -1315,7 +1315,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			const Vec2i pos = blocker.tilePos + Vec2i(blocker.Type->get_tile_size()) * dirs[r];
 
 			// Out of the map => no !
-			if (!CMap::Map.Info.IsPointOnMap(pos, unit.MapLayer)) {
+			if (!CMap::get()->Info.IsPointOnMap(pos, unit.MapLayer)) {
 				continue;
 			}
 			// move to blocker ? => no !
@@ -1408,11 +1408,11 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
 	if (unit.Player == what.Player) {
-		AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::Map.get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
+		AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
 	} else { //remove the request of the unit the mercenary is substituting
 		wyrmgus::unit_type *requested_unit_type = what.Player->get_faction()->get_class_unit_type(what.Type->get_unit_class());
 		if (requested_unit_type != nullptr) {
-			AiRemoveFromBuilt(what.Player->Ai.get(), *requested_unit_type, CMap::Map.get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
+			AiRemoveFromBuilt(what.Player->Ai.get(), *requested_unit_type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
 		}
 	}
 	//Wyrmgus end
@@ -1423,7 +1423,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	
 	if (what.Player->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
 		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeType::Naval || what.Type->UnitType == UnitTypeType::Fly || what.Type->UnitType == UnitTypeType::FlyLow || what.Type->UnitType == UnitTypeType::Space)) {
-			const landmass *landmass = CMap::Map.get_tile_landmass(what.tilePos, what.MapLayer->ID);
+			const landmass *landmass = CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID);
 			
 			if (landmass != nullptr) {
 				what.Player->Ai->Transporters[landmass].push_back(&what);
@@ -1581,7 +1581,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, cons
 		for (size_t i = 0; i < table.size(); ++i) {
 			CUnit &unit = *table[i];
 					
-			if (CMap::Map.get_tile_landmass(unit.tilePos, unit.MapLayer->ID) == landmass) {
+			if (CMap::get()->get_tile_landmass(unit.tilePos, unit.MapLayer->ID) == landmass) {
 				count++;
 			}
 		}
