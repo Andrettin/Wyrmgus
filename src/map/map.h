@@ -70,6 +70,7 @@
 
 #include "color.h"
 #include "util/point_container.h"
+#include "util/singleton.h"
 #include "vec2i.h"
 
 class CGraphic;
@@ -142,16 +143,9 @@ public:
 ----------------------------------------------------------------------------*/
 
 /// Describes the world map
-class CMap final
+class CMap final : public singleton<CMap>
 {
 public:
-	static CMap *get()
-	{
-		return &CMap::Map;
-	}
-
-	static CMap Map; //the current map
-
 	CMap();
 	~CMap();
 

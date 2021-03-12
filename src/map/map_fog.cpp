@@ -969,7 +969,7 @@ void CMap::InitFogOfWar()
 //	VisibleTable.resize(Info.MapWidth * Info.MapHeight);
 	VisibleTable.clear();
 	VisibleTable.resize(this->MapLayers.size());
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		VisibleTable[z].resize(Info.MapWidths[z] * Info.MapHeights[z]);
 	}
 	//Wyrmgus end
