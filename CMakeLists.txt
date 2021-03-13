@@ -145,7 +145,6 @@ source_group(economy FILES ${economy_SRCS})
 set(editor_SRCS
 	src/editor/editloop.cpp
 	src/editor/editor.cpp
-	src/editor/edmap.cpp
 	src/editor/script_editor.cpp
 )
 source_group(editor FILES ${editor_SRCS})

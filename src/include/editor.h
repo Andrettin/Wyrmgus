@@ -54,15 +54,13 @@ enum EditorStateType {
 	EditorSetStartLocation   /// Set the start location
 };
 
-class CEditor
+class CEditor final
 {
 public:
 	CEditor();
 	~CEditor() {}
 
 	void Init();
-	/// Make random map
-	void CreateRandomMap() const;
 
 
 	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
@@ -101,17 +99,9 @@ public:
 
 };
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern CEditor Editor;
 
 extern char TileToolRandom;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Start the editor
 //Wyrmgus start
@@ -136,15 +126,6 @@ extern int EditorSaveMap(const std::string &file, bool is_mod = false);
 
 /// Register ccl features
 extern void EditorCclRegister();
-
-/// Update surroundings for tile changes
-//Wyrmgus start
-//extern void EditorTileChanged(const Vec2i &pos);
-extern void EditorTileChanged(const Vec2i &pos, int tile);
-
-//extern void EditorChangeTile(const Vec2i &pos, int tileIndex, int d);
-extern void EditorChangeTile(const Vec2i &pos, int tileIndex);
-//Wyrmgus end
 
 //Wyrmgus start
 extern void RecalculateShownUnits();

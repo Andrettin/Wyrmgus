@@ -211,7 +211,7 @@ static std::unique_ptr<EditorSliderListener> editorSliderListener;
 */
 //Wyrmgus start
 //static void EditTile(const Vec2i &pos, int tile)
-static void EditTile(const Vec2i &pos, wyrmgus::terrain_type *terrain)
+static void EditTile(const Vec2i &pos, const terrain_type *terrain)
 //Wyrmgus end
 {
 	Assert(CMap::get()->Info.IsPointOnMap(pos, UI.CurrentMapLayer));
@@ -257,9 +257,6 @@ static void EditTile(const Vec2i &pos, wyrmgus::terrain_type *terrain)
 	UI.get_minimap()->UpdateXY(pos, UI.CurrentMapLayer->ID);
 	//Wyrmgus end
 
-	//Wyrmgus start
-//	EditorTileChanged(pos);
-	//Wyrmgus end
 	UpdateMinimap = true;
 }
 
@@ -274,7 +271,7 @@ static void EditTile(const Vec2i &pos, wyrmgus::terrain_type *terrain)
 */
 //Wyrmgus start
 //static void EditTilesInternal(const Vec2i &pos, int tile, int size)
-static void EditTilesInternal(const Vec2i &pos, wyrmgus::terrain_type *terrain, int size)
+static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int size)
 //Wyrmgus end
 {
 	Vec2i minPos = pos;
@@ -452,7 +449,7 @@ static void EditTilesInternal(const Vec2i &pos, wyrmgus::terrain_type *terrain, 
 */
 //Wyrmgus start
 //static void EditTiles(const Vec2i &pos, int tile, int size)
-static void EditTiles(const Vec2i &pos, wyrmgus::terrain_type *terrain, int size)
+static void EditTiles(const Vec2i &pos, const terrain_type *terrain, int size)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -1806,13 +1803,6 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				CycleViewportMode(-1);
 			} else {
 				CycleViewportMode(1);
-			}
-			break;
-
-		// FIXME: move to lua
-		case 'r': // CTRL+R Randomize map
-			if (KeyModifiers & ModifierControl) {
-				Editor.CreateRandomMap();
 			}
 			break;
 
