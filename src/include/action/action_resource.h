@@ -103,7 +103,7 @@ private:
 	// duplicate of Resource.Pos ?
 	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer = 0;;
+	int MapLayer = 0;
 	//Wyrmgus end
 
 	//Wyrmgus start

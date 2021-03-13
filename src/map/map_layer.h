@@ -194,7 +194,14 @@ public:
 
 		return empty_rect;
 	}
-	
+
+signals:
+	void tile_image_changed(const int tile_index, const terrain_type *terrain, const short tile_frame) const;
+	void tile_overlay_image_changed(const int tile_index, const terrain_type *terrain, const short tile_frame) const;
+	void tile_transition_images_changed(const int tile_index, const std::vector<std::pair<const terrain_type *, short>> tile_transitions) const;
+	void tile_overlay_transition_images_changed(const int tile_index, const std::vector<std::pair<const terrain_type *, short>> tile_transitions) const;
+
+public:
 	int ID = -1;
 private:
 	std::unique_ptr<wyrmgus::tile[]> Fields; //fields on the map layer

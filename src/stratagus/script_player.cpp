@@ -2307,14 +2307,14 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "TotalPriceDifferenceWith")) {
 		LuaCheckArgs(l, 3);
 		
-		int other_player = LuaToNumber(l, 3);;
+		int other_player = LuaToNumber(l, 3);
 
 		lua_pushnumber(l, p->GetTotalPriceDifferenceWith(*CPlayer::Players[other_player]));
 		return 1;
 	} else if (!strcmp(data, "TradePotentialWith")) {
 		LuaCheckArgs(l, 3);
 		
-		int other_player = LuaToNumber(l, 3);;
+		int other_player = LuaToNumber(l, 3);
 
 		lua_pushnumber(l, p->GetTradePotentialWith(*CPlayer::Players[other_player]));
 		return 1;

@@ -485,8 +485,8 @@ static std::unique_ptr<CContentType> CclParseContent(lua_State *l)
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Pos")) {
 			CclGetPos(l, &pos.x, &pos.y);
-			pos.x *= wyrmgus::defines::get()->get_scale_factor();;
-			pos.y *= wyrmgus::defines::get()->get_scale_factor();;
+			pos.x *= wyrmgus::defines::get()->get_scale_factor();
+			pos.y *= wyrmgus::defines::get()->get_scale_factor();
 		//Wyrmgus start
 		} else if (!strcmp(key, "TextColor")) {
 			textColor = LuaToString(l, -1);

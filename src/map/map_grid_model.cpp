@@ -39,6 +39,19 @@
 
 namespace wyrmgus {
 
+QString map_grid_model::build_image_source(const terrain_type *terrain, const short tile_frame, const bool elevation)
+{
+	QString image_source = QString::fromStdString(terrain->get_identifier());
+
+	if (elevation) {
+		image_source += "/elevation";
+	}
+	
+	image_source += "/" + QString::number(tile_frame);
+
+	return image_source;
+}
+
 int map_grid_model::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
@@ -110,26 +123,31 @@ void map_grid_model::set_map_layer(const size_t z)
 
 			tile_data tile_data;
 
-			tile_data.image_source = QString::fromStdString(tile->get_terrain()->get_identifier()) + "/" + QString::number(tile->SolidTile);
+			tile_data.image_source = map_grid_model::build_image_source(tile->get_terrain(), tile->SolidTile);
 			if (tile->get_overlay_terrain() != nullptr) {
-				tile_data.overlay_image_source = QString::fromStdString(tile->get_overlay_terrain()->get_identifier()) + "/" + QString::number(tile->OverlaySolidTile);
+				tile_data.overlay_image_source = map_grid_model::build_image_source(tile->get_overlay_terrain(), tile->OverlaySolidTile);
 			}
 
 			for (const auto &[terrain_type, tile_frame] : tile->TransitionTiles) {
-				tile_data.transition_image_sources.push_back(QString::fromStdString(terrain_type->get_identifier()) + "/" + QString::number(tile_frame));
+				tile_data.transition_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame));
 			}
 
 			for (const auto &[terrain_type, tile_frame] : tile->OverlayTransitionTiles) {
-				tile_data.overlay_transition_image_sources.push_back(QString::fromStdString(terrain_type->get_identifier()) + "/" + QString::number(tile_frame));
+				tile_data.overlay_transition_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame));
 
 				if (terrain_type->get_elevation_graphics() != nullptr) {
-					tile_data.overlay_transition_elevation_image_sources.push_back(QString::fromStdString(terrain_type->get_identifier()) + "/elevation/" + QString::number(tile_frame));
+					tile_data.overlay_transition_elevation_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame, true));
 				}
 			}
 
 			this->tile_data_list.push_back(std::move(tile_data));
 		}
 	}
+
+	connect(map_layer, &CMapLayer::tile_image_changed, this, &map_grid_model::update_tile_image_source);
+	connect(map_layer, &CMapLayer::tile_overlay_image_changed, this, &map_grid_model::update_tile_overlay_image_source);
+	connect(map_layer, &CMapLayer::tile_transition_images_changed, this, &map_grid_model::update_tile_transition_image_sources);
+	connect(map_layer, &CMapLayer::tile_overlay_transition_images_changed, this, &map_grid_model::update_tile_overlay_transition_image_sources);
 
 	emit map_layer_changed();
 }

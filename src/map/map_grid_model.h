@@ -30,6 +30,8 @@
 
 namespace wyrmgus {
 
+class terrain_type;
+
 class map_grid_model : public QAbstractItemModel
 {
 	Q_OBJECT
@@ -52,6 +54,8 @@ public:
 		QStringList overlay_transition_image_sources;
 		QStringList overlay_transition_elevation_image_sources;
 	};
+
+	static QString build_image_source(const terrain_type *terrain, const short tile_frame, const bool elevation = false);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override final;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override final;
@@ -90,6 +94,42 @@ public:
 	}
 
 	void set_map_layer(const size_t z);
+
+	void update_tile_image_source(const int tile_index, const terrain_type *terrain, const short tile_frame)
+	{
+		this->tile_data_list.at(tile_index).image_source = map_grid_model::build_image_source(terrain, tile_frame);
+	}
+
+	void update_tile_overlay_image_source(const int tile_index, const terrain_type *terrain, const short tile_frame)
+	{
+		tile_data &tile_data = this->tile_data_list.at(tile_index);
+
+		if (terrain != nullptr) {
+			tile_data.overlay_image_source = map_grid_model::build_image_source(terrain, tile_frame);
+		} else {
+			tile_data.overlay_image_source.clear();
+		}
+	}
+
+	void update_tile_transition_image_sources(const int tile_index, const std::vector<std::pair<const terrain_type *, short>> &tile_transitions)
+	{
+		tile_data &tile_data = this->tile_data_list.at(tile_index);
+		
+		tile_data.transition_image_sources.clear();
+		for (const auto &[terrain_type, tile_frame] : tile_transitions) {
+			tile_data.transition_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame));
+		}
+	}
+
+	void update_tile_overlay_transition_image_sources(const int tile_index, const std::vector<std::pair<const terrain_type *, short>> &tile_transitions)
+	{
+		tile_data &tile_data = this->tile_data_list.at(tile_index);
+		
+		tile_data.overlay_transition_image_sources.clear();
+		for (const auto &[terrain_type, tile_frame] : tile_transitions) {
+			tile_data.overlay_transition_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame));
+		}
+	}
 
 signals:
 	void map_layer_changed();
