@@ -32,6 +32,11 @@ class terrain_type;
 
 struct tile_transition final
 {
+	explicit tile_transition(const terrain_type *terrain, const short tile_frame)
+		: terrain(terrain), tile_frame(tile_frame)
+	{
+	}
+
 	const terrain_type *terrain = nullptr;
 	short tile_frame = 0;
 
