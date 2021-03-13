@@ -46,8 +46,10 @@ namespace wyrmgus {
 	class world;
 }
 
-class CMapLayer final
+class CMapLayer final : public QObject
 {
+	Q_OBJECT
+
 public:
 	explicit CMapLayer(const QSize &size);
 

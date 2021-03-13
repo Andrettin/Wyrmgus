@@ -730,6 +730,11 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 	
 		auto map_layer = std::make_unique<CMapLayer>(width, height);
+
+		if (QApplication::instance()->thread() != QThread::currentThread()) {
+			map_layer->moveToThread(QApplication::instance()->thread());
+		}
+
 		map_layer->ID = CMap::get()->MapLayers.size();
 		CMap::get()->Info.MapWidths.push_back(map_layer->get_width());
 		CMap::get()->Info.MapHeights.push_back(map_layer->get_height());

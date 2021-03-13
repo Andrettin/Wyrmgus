@@ -1729,6 +1729,11 @@ void CMap::Create()
 	Assert(this->MapLayers.size() == 0);
 
 	auto map_layer = std::make_unique<CMapLayer>(this->Info.MapWidth, this->Info.MapHeight);
+
+	if (QApplication::instance()->thread() != QThread::currentThread()) {
+		map_layer->moveToThread(QApplication::instance()->thread());
+	}
+
 	map_layer->ID = this->MapLayers.size();
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
 	this->Info.MapHeights.push_back(this->Info.MapHeight);
@@ -1822,6 +1827,11 @@ void CMap::process_sml_scope(const sml_data &scope)
 
 		this->ClearMapLayers();
 		auto map_layer = std::make_unique<CMapLayer>(this->Info.MapWidth, this->Info.MapHeight);
+
+		if (QApplication::instance()->thread() != QThread::currentThread()) {
+			map_layer->moveToThread(QApplication::instance()->thread());
+		}
+
 		map_layer->ID = this->MapLayers.size();
 		this->Info.MapWidths.clear();
 		this->Info.MapWidths.push_back(this->Info.MapWidth);

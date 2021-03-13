@@ -129,6 +129,11 @@ static int CclStratagusMap(lua_State *l)
 						const int width = LuaToNumber(l, -1, 1);
 						const int height = LuaToNumber(l, -1, 2);
 						auto map_layer = std::make_unique<CMapLayer>(width, height);
+
+						if (QApplication::instance()->thread() != QThread::currentThread()) {
+							map_layer->moveToThread(QApplication::instance()->thread());
+						}
+
 						CMap::get()->Info.MapWidths.push_back(map_layer->get_width());
 						CMap::get()->Info.MapHeights.push_back(map_layer->get_height());
 						map_layer->ID = CMap::get()->MapLayers.size();

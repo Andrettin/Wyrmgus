@@ -2415,6 +2415,11 @@ void CEditor::Init()
 //		Map.Fields = new wyrmgus::tile[Map.Info.MapWidth * Map.Info.MapHeight];
 		CMap::get()->ClearMapLayers();
 		auto new_map_layer = std::make_unique<CMapLayer>(CMap::get()->Info.MapWidth, CMap::get()->Info.MapHeight);
+
+		if (QApplication::instance()->thread() != QThread::currentThread()) {
+			new_map_layer->moveToThread(QApplication::instance()->thread());
+		}
+
 		new_map_layer->ID = CMap::get()->MapLayers.size();
 		CMap::get()->Info.MapWidths.clear();
 		CMap::get()->Info.MapWidths.push_back(CMap::get()->Info.MapWidth);
