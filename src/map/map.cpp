@@ -2112,8 +2112,7 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 	try {
 		const CMapLayer *map_layer = this->MapLayers[z].get();
 
-		const int tile_index = point::to_index(pos, map_layer->get_width());
-		tile *tile = map_layer->Field(tile_index);
+		tile *tile = map_layer->Field(pos);
 
 		const terrain_type *old_terrain = this->GetTileTerrain(pos, terrain->is_overlay(), z);
 
@@ -2159,19 +2158,19 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 		UI.get_minimap()->UpdateXY(pos, z);
 
 		if (old_base_terrain != tile->get_terrain() || old_base_solid_tile != tile->SolidTile) {
-			emit map_layer->tile_image_changed(tile_index, tile->get_terrain(), tile->SolidTile);
+			emit map_layer->tile_image_changed(pos, tile->get_terrain(), tile->SolidTile);
 		}
 
 		if (old_overlay_terrain != tile->get_overlay_terrain() || old_overlay_solid_tile != tile->OverlaySolidTile) {
-			emit map_layer->tile_overlay_image_changed(tile_index, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+			emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile);
 		}
 
 		if (old_base_transition_count != 0 || tile->TransitionTiles.size() != 0) {
-			emit map_layer->tile_transition_images_changed(tile_index, tile->TransitionTiles);
+			emit map_layer->tile_transition_images_changed(pos, tile->TransitionTiles);
 		}
 
 		if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
-			emit map_layer->tile_overlay_transition_images_changed(tile_index, tile->OverlayTransitionTiles);
+			emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles);
 		}
 
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -2183,8 +2182,7 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 						continue;
 					}
 
-					const int adjacent_tile_index = point::to_index(adjacent_pos, map_layer->get_width());
-					wyrmgus::tile *adjacent_tile = map_layer->Field(adjacent_tile_index);
+					wyrmgus::tile *adjacent_tile = map_layer->Field(adjacent_pos);
 
 					if (terrain->is_overlay() && adjacent_tile->get_overlay_terrain() != terrain && adjacent_tile->get_overlay_terrain() != old_terrain && Editor.Running == EditorNotRunning) {
 						continue;
@@ -2202,11 +2200,11 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 
 					if (old_adjacent_base_transition_count != 0 || adjacent_tile->TransitionTiles.size() != 0) {
-						emit map_layer->tile_transition_images_changed(adjacent_tile_index, adjacent_tile->TransitionTiles);
+						emit map_layer->tile_transition_images_changed(adjacent_pos, adjacent_tile->TransitionTiles);
 					}
 
 					if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
-						emit map_layer->tile_overlay_transition_images_changed(adjacent_tile_index, adjacent_tile->OverlayTransitionTiles);
+						emit map_layer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles);
 					}
 				}
 			}
@@ -2220,8 +2218,7 @@ void CMap::RemoveTileOverlayTerrain(const QPoint &pos, const int z)
 {
 	const CMapLayer *map_layer = this->MapLayers[z].get();
 
-	const int tile_index = point::to_index(pos, map_layer->get_width());
-	tile *tile = map_layer->Field(tile_index);
+	tile *tile = map_layer->Field(pos);
 	
 	if (tile->get_overlay_terrain() == nullptr) {
 		return;
@@ -2238,10 +2235,10 @@ void CMap::RemoveTileOverlayTerrain(const QPoint &pos, const int z)
 	}
 	UI.get_minimap()->UpdateXY(pos, z);
 
-	emit map_layer->tile_overlay_image_changed(tile_index, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+	emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile);
 
 	if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
-		emit map_layer->tile_overlay_transition_images_changed(tile_index, tile->OverlayTransitionTiles);
+		emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles);
 	}
 
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -2253,8 +2250,7 @@ void CMap::RemoveTileOverlayTerrain(const QPoint &pos, const int z)
 					continue;
 				}
 
-				const int adjacent_tile_index = point::to_index(adjacent_pos, map_layer->get_width());
-				wyrmgus::tile *adjacent_tile = map_layer->Field(adjacent_tile_index);
+				wyrmgus::tile *adjacent_tile = map_layer->Field(adjacent_pos);
 
 				const size_t old_adjacent_overlay_transition_count = adjacent_tile->OverlayTransitionTiles.size();
 
@@ -2266,7 +2262,7 @@ void CMap::RemoveTileOverlayTerrain(const QPoint &pos, const int z)
 				UI.get_minimap()->UpdateXY(adjacent_pos, z);
 
 				if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
-					emit map_layer->tile_overlay_transition_images_changed(adjacent_tile_index, adjacent_tile->OverlayTransitionTiles);
+					emit map_layer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles);
 				}
 			}
 		}
@@ -2282,8 +2278,7 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 			return;
 		}
 
-		const int tile_index = point::to_index(pos, map_layer->get_width());
-		tile *tile = map_layer->Field(tile_index);
+		tile *tile = map_layer->Field(pos);
 
 		if (tile->get_overlay_terrain() == nullptr || tile->OverlayTerrainDestroyed == destroyed) {
 			return;
@@ -2339,11 +2334,11 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 		UI.get_minimap()->UpdateXY(pos, z);
 
 		if (old_overlay_solid_tile != tile->OverlaySolidTile) {
-			emit map_layer->tile_overlay_image_changed(tile_index, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+			emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile);
 		}
 
 		if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
-			emit map_layer->tile_overlay_transition_images_changed(tile_index, tile->OverlayTransitionTiles);
+			emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles);
 		}
 
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -2354,8 +2349,7 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 						continue;
 					}
 
-					const int adjacent_tile_index = point::to_index(adjacent_pos, map_layer->get_width());
-					wyrmgus::tile *adjacent_tile = map_layer->Field(adjacent_tile_index);
+					wyrmgus::tile *adjacent_tile = map_layer->Field(adjacent_pos);
 
 					if (adjacent_tile->get_overlay_terrain() != adjacent_tile->get_overlay_terrain()) {
 						continue;
@@ -2371,7 +2365,7 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 
 					if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
-						emit map_layer->tile_overlay_transition_images_changed(adjacent_tile_index, adjacent_tile->OverlayTransitionTiles);
+						emit map_layer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles);
 					}
 				}
 			}
@@ -2386,8 +2380,7 @@ void CMap::SetOverlayTerrainDamaged(const QPoint &pos, const bool damaged, const
 	try {
 		const CMapLayer *map_layer = this->MapLayers[z].get();
 
-		const int tile_index = point::to_index(pos, map_layer->get_width());
-		tile *tile = map_layer->Field(tile_index);
+		tile *tile = map_layer->Field(pos);
 
 		if (tile->get_overlay_terrain() == nullptr || tile->OverlayTerrainDamaged == damaged) {
 			return;
@@ -2414,11 +2407,11 @@ void CMap::SetOverlayTerrainDamaged(const QPoint &pos, const bool damaged, const
 		UI.get_minimap()->UpdateXY(pos, z);
 
 		if (old_overlay_solid_tile != tile->OverlaySolidTile) {
-			emit map_layer->tile_overlay_image_changed(tile_index, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+			emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile);
 		}
 
 		if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
-			emit map_layer->tile_overlay_transition_images_changed(tile_index, tile->OverlayTransitionTiles);
+			emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles);
 		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error setting the overlay terrain of tile " + point::to_string(pos) + ", map layer " + std::to_string(z) + " to " + (damaged ? "" : "not") + " damaged."));

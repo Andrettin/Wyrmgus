@@ -42,3 +42,5 @@ struct tile_transition final
 };
 
 }
+
+Q_DECLARE_METATYPE(std::vector<wyrmgus::tile_transition>)

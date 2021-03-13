@@ -27,6 +27,7 @@
 #pragma once
 
 #include "map/map_template_container.h"
+#include "map/tile_transition.h"
 #include "vec2i.h"
 
 class CUnit;
@@ -40,10 +41,12 @@ namespace wyrmgus {
 	class scheduled_time_of_day;
 	class season;
 	class season_schedule;
+	class terrain_type;
 	class tile;
 	class time_of_day;
 	class time_of_day_schedule;
 	class world;
+	struct tile_transition;
 }
 
 class CMapLayer final : public QObject
@@ -196,10 +199,10 @@ public:
 	}
 
 signals:
-	void tile_image_changed(const int tile_index, const terrain_type *terrain, const short tile_frame) const;
-	void tile_overlay_image_changed(const int tile_index, const terrain_type *terrain, const short tile_frame) const;
-	void tile_transition_images_changed(const int tile_index, const std::vector<std::pair<const terrain_type *, short>> tile_transitions) const;
-	void tile_overlay_transition_images_changed(const int tile_index, const std::vector<std::pair<const terrain_type *, short>> tile_transitions) const;
+	void tile_image_changed(QPoint tile_pos, const terrain_type *terrain, short tile_frame) const;
+	void tile_overlay_image_changed(QPoint tile_pos, const terrain_type *terrain, short tile_frame) const;
+	void tile_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions) const;
+	void tile_overlay_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions) const;
 
 public:
 	int ID = -1;

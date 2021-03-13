@@ -105,51 +105,123 @@ QVariant map_grid_model::data(const QModelIndex &index, const int role) const
 	return QVariant();
 }
 
-void map_grid_model::set_map_layer(const size_t z)
+int map_grid_model::get_map_layer() const
+{
+	if (this->map_layer == nullptr) {
+		return -1;
+	}
+
+	return this->map_layer->ID;
+}
+
+void map_grid_model::set_map_layer(const int z)
 {
 	if (z == this->get_map_layer()) {
 		return;
 	}
 
-	this->map_layer = z;
-
 	this->tile_data_list.clear();
 
-	//the game loop thread will be waiting while the map view is created, so it is safe to access map data here
-	const CMapLayer *map_layer = CMap::get()->MapLayers[this->get_map_layer()].get();
-	for (int y = 0; y < map_layer->get_height(); ++y) {
-		for (int x = 0; x < map_layer->get_width(); ++x) {
-			const tile *tile = map_layer->Field(x, y);
+	if (z != -1) {
+		this->map_layer = CMap::get()->MapLayers[z].get();
+	} else {
+		this->map_layer = nullptr;
+	}
 
-			tile_data tile_data;
+	if (this->map_layer != nullptr) {
+		//the game loop thread will be waiting while the map view is created, so it is safe to access map data here
+		for (int y = 0; y < this->map_layer->get_height(); ++y) {
+			for (int x = 0; x < this->map_layer->get_width(); ++x) {
+				const tile *tile = this->map_layer->Field(x, y);
 
-			tile_data.image_source = map_grid_model::build_image_source(tile->get_terrain(), tile->SolidTile);
-			if (tile->get_overlay_terrain() != nullptr) {
-				tile_data.overlay_image_source = map_grid_model::build_image_source(tile->get_overlay_terrain(), tile->OverlaySolidTile);
-			}
+				tile_data tile_data;
 
-			for (const auto &[terrain_type, tile_frame] : tile->TransitionTiles) {
-				tile_data.transition_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame));
-			}
-
-			for (const auto &[terrain_type, tile_frame] : tile->OverlayTransitionTiles) {
-				tile_data.overlay_transition_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame));
-
-				if (terrain_type->get_elevation_graphics() != nullptr) {
-					tile_data.overlay_transition_elevation_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame, true));
+				tile_data.image_source = map_grid_model::build_image_source(tile->get_terrain(), tile->SolidTile);
+				if (tile->get_overlay_terrain() != nullptr) {
+					tile_data.overlay_image_source = map_grid_model::build_image_source(tile->get_overlay_terrain(), tile->OverlaySolidTile);
 				}
-			}
 
-			this->tile_data_list.push_back(std::move(tile_data));
+				for (const auto &[terrain_type, tile_frame] : tile->TransitionTiles) {
+					tile_data.transition_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame));
+				}
+
+				for (const auto &[terrain_type, tile_frame] : tile->OverlayTransitionTiles) {
+					tile_data.overlay_transition_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame));
+
+					if (terrain_type->get_elevation_graphics() != nullptr) {
+						tile_data.overlay_transition_elevation_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame, true));
+					}
+				}
+
+				this->tile_data_list.push_back(std::move(tile_data));
+			}
+		}
+
+		connect(this->map_layer, &CMapLayer::tile_image_changed, this, &map_grid_model::update_tile_image_source);
+		connect(this->map_layer, &CMapLayer::tile_overlay_image_changed, this, &map_grid_model::update_tile_overlay_image_source);
+		connect(this->map_layer, &CMapLayer::tile_transition_images_changed, this, &map_grid_model::update_tile_transition_image_sources);
+		connect(this->map_layer, &CMapLayer::tile_overlay_transition_images_changed, this, &map_grid_model::update_tile_overlay_transition_image_sources);
+	}
+
+	emit map_layer_changed();
+}
+
+void map_grid_model::update_tile_image_source(const QPoint &tile_pos, const terrain_type *terrain, const short tile_frame)
+{
+	const int tile_index = point::to_index(tile_pos, this->map_layer->get_width());
+	this->tile_data_list.at(tile_index).image_source = map_grid_model::build_image_source(terrain, tile_frame);
+
+	const QModelIndex index = this->index(tile_pos.y(), tile_pos.x());
+	emit dataChanged(index, index, { static_cast<int>(role::image_source) });
+}
+
+void map_grid_model::update_tile_overlay_image_source(const QPoint &tile_pos, const terrain_type *terrain, const short tile_frame)
+{
+	const int tile_index = point::to_index(tile_pos, this->map_layer->get_width());
+	tile_data &tile_data = this->tile_data_list.at(tile_index);
+
+	if (terrain != nullptr) {
+		tile_data.overlay_image_source = map_grid_model::build_image_source(terrain, tile_frame);
+	} else {
+		tile_data.overlay_image_source.clear();
+	}
+
+	const QModelIndex index = this->index(tile_pos.y(), tile_pos.x());
+	emit dataChanged(index, index, { static_cast<int>(role::overlay_image_source) });
+}
+
+void map_grid_model::update_tile_transition_image_sources(const QPoint &tile_pos, const std::vector<tile_transition> &tile_transitions)
+{
+	const int tile_index = point::to_index(tile_pos, this->map_layer->get_width());
+	tile_data &tile_data = this->tile_data_list.at(tile_index);
+
+	tile_data.transition_image_sources.clear();
+	for (const auto &[terrain_type, tile_frame] : tile_transitions) {
+		tile_data.transition_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame));
+	}
+
+	const QModelIndex index = this->index(tile_pos.y(), tile_pos.x());
+	emit dataChanged(index, index, { static_cast<int>(role::transition_image_sources) });
+}
+
+void map_grid_model::update_tile_overlay_transition_image_sources(const QPoint &tile_pos, const std::vector<tile_transition> &tile_transitions)
+{
+	const int tile_index = point::to_index(tile_pos, this->map_layer->get_width());
+	tile_data &tile_data = this->tile_data_list.at(tile_index);
+
+	tile_data.overlay_transition_image_sources.clear();
+	tile_data.overlay_transition_elevation_image_sources.clear();
+
+	for (const auto &[terrain_type, tile_frame] : tile_transitions) {
+		tile_data.overlay_transition_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame));
+
+		if (terrain_type->get_elevation_graphics() != nullptr) {
+			tile_data.overlay_transition_elevation_image_sources.push_back(map_grid_model::build_image_source(terrain_type, tile_frame, true));
 		}
 	}
 
-	connect(map_layer, &CMapLayer::tile_image_changed, this, &map_grid_model::update_tile_image_source);
-	connect(map_layer, &CMapLayer::tile_overlay_image_changed, this, &map_grid_model::update_tile_overlay_image_source);
-	connect(map_layer, &CMapLayer::tile_transition_images_changed, this, &map_grid_model::update_tile_transition_image_sources);
-	connect(map_layer, &CMapLayer::tile_overlay_transition_images_changed, this, &map_grid_model::update_tile_overlay_transition_image_sources);
-
-	emit map_layer_changed();
+	const QModelIndex index = this->index(tile_pos.y(), tile_pos.x());
+	emit dataChanged(index, index, { static_cast<int>(role::overlay_transition_image_sources), static_cast<int>(role::overlay_transition_elevation_image_sources) });
 }
 
 }

@@ -33,6 +33,7 @@
 #include "game.h"
 #include "map/map_grid_model.h"
 #include "map/tile_image_provider.h"
+#include "map/tile_transition.h"
 #include "parameters.h"
 #include "ui/empty_image_provider.h"
 #include "ui/interface_image_provider.h"
@@ -56,6 +57,8 @@ int main(int argc, char **argv)
 		QApplication app(argc, argv);
 		app.setApplicationName(NAME);
 		app.setApplicationVersion(VERSION);
+
+		qRegisterMetaType<std::vector<wyrmgus::tile_transition>>();
 
 		//  Setup some defaults.
 #ifdef MAC_BUNDLE
