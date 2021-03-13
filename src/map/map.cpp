@@ -2103,14 +2103,17 @@ void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 //Wyrmgus end
 
 //Wyrmgus start
-void CMap::SetTileTerrain(const Vec2i &pos, const terrain_type *terrain, const int z)
+void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const int z)
 {
 	if (!terrain) {
 		return;
 	}
 	
 	try {
-		tile &mf = *this->Field(pos, z);
+		const CMapLayer *map_layer = this->MapLayers[z].get();
+
+		const int tile_index = point::to_index(pos, map_layer->get_width());
+		tile *tile = map_layer->Field(tile_index);
 
 		const terrain_type *old_terrain = this->GetTileTerrain(pos, terrain->is_overlay(), z);
 
@@ -2118,7 +2121,14 @@ void CMap::SetTileTerrain(const Vec2i &pos, const terrain_type *terrain, const i
 			return;
 		}
 
-		mf.SetTerrain(terrain);
+		const terrain_type *old_base_terrain = tile->get_terrain();
+		const terrain_type *old_overlay_terrain = tile->get_overlay_terrain();
+		const short old_base_solid_tile = tile->SolidTile;
+		const short old_overlay_solid_tile = tile->OverlaySolidTile;
+		const size_t old_base_transition_count = tile->TransitionTiles.size();
+		const size_t old_overlay_transition_count = tile->OverlayTransitionTiles.size();
+
+		tile->SetTerrain(terrain);
 
 		if (terrain->is_overlay()) {
 			//remove decorations if the overlay terrain has changed
@@ -2137,35 +2147,66 @@ void CMap::SetTileTerrain(const Vec2i &pos, const terrain_type *terrain, const i
 
 		//recalculate transitions and solid tiles for both non-overlay and overlay, since setting one may have changed the other
 		this->calculate_tile_solid_tile(pos, false, z);
-		if (mf.get_overlay_terrain() != nullptr) {
+		if (tile->get_overlay_terrain() != nullptr) {
 			this->calculate_tile_solid_tile(pos, true, z);
 		}
 		this->CalculateTileTransitions(pos, false, z);
 		this->CalculateTileTransitions(pos, true, z);
 
-		if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			MarkSeenTile(mf);
+		if (tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+			MarkSeenTile(*tile);
 		}
 		UI.get_minimap()->UpdateXY(pos, z);
+
+		if (old_base_terrain != tile->get_terrain() || old_base_solid_tile != tile->SolidTile) {
+			emit map_layer->tile_image_changed(tile_index, tile->get_terrain(), tile->SolidTile);
+		}
+
+		if (old_overlay_terrain != tile->get_overlay_terrain() || old_overlay_solid_tile != tile->OverlaySolidTile) {
+			emit map_layer->tile_overlay_image_changed(tile_index, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+		}
+
+		if (old_base_transition_count != 0 || tile->TransitionTiles.size() != 0) {
+			emit map_layer->tile_transition_images_changed(tile_index, tile->TransitionTiles);
+		}
+
+		if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
+			emit map_layer->tile_overlay_transition_images_changed(tile_index, tile->OverlayTransitionTiles);
+		}
 
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (this->Info.IsPointOnMap(adjacent_pos, z)) {
-						tile &adjacent_mf = *this->Field(adjacent_pos, z);
+					const QPoint adjacent_pos(pos.x() + x_offset, pos.y() + y_offset);
 
-						if (terrain->is_overlay() && adjacent_mf.get_overlay_terrain() != terrain && adjacent_mf.get_overlay_terrain() != old_terrain && Editor.Running == EditorNotRunning) {
-							continue;
-						}
+					if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
+						continue;
+					}
 
-						this->CalculateTileTransitions(adjacent_pos, false, z);
-						this->CalculateTileTransitions(adjacent_pos, true, z);
+					const int adjacent_tile_index = point::to_index(adjacent_pos, map_layer->get_width());
+					wyrmgus::tile *adjacent_tile = map_layer->Field(adjacent_tile_index);
 
-						if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-							MarkSeenTile(adjacent_mf);
-						}
-						UI.get_minimap()->UpdateXY(adjacent_pos, z);
+					if (terrain->is_overlay() && adjacent_tile->get_overlay_terrain() != terrain && adjacent_tile->get_overlay_terrain() != old_terrain && Editor.Running == EditorNotRunning) {
+						continue;
+					}
+
+					const size_t old_adjacent_base_transition_count = adjacent_tile->TransitionTiles.size();
+					const size_t old_adjacent_overlay_transition_count = adjacent_tile->OverlayTransitionTiles.size();
+
+					this->CalculateTileTransitions(adjacent_pos, false, z);
+					this->CalculateTileTransitions(adjacent_pos, true, z);
+
+					if (adjacent_tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+						MarkSeenTile(*adjacent_tile);
+					}
+					UI.get_minimap()->UpdateXY(adjacent_pos, z);
+
+					if (old_adjacent_base_transition_count != 0 || adjacent_tile->TransitionTiles.size() != 0) {
+						emit map_layer->tile_transition_images_changed(adjacent_tile_index, adjacent_tile->TransitionTiles);
+					}
+
+					if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
+						emit map_layer->tile_overlay_transition_images_changed(adjacent_tile_index, adjacent_tile->OverlayTransitionTiles);
 					}
 				}
 			}
@@ -2175,36 +2216,57 @@ void CMap::SetTileTerrain(const Vec2i &pos, const terrain_type *terrain, const i
 	}
 }
 
-void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
+void CMap::RemoveTileOverlayTerrain(const QPoint &pos, const int z)
 {
-	wyrmgus::tile &mf = *this->Field(pos, z);
+	const CMapLayer *map_layer = this->MapLayers[z].get();
+
+	const int tile_index = point::to_index(pos, map_layer->get_width());
+	tile *tile = map_layer->Field(tile_index);
 	
-	if (mf.get_overlay_terrain() == nullptr) {
+	if (tile->get_overlay_terrain() == nullptr) {
 		return;
 	}
 	
-	mf.RemoveOverlayTerrain();
+	const size_t old_overlay_transition_count = tile->OverlayTransitionTiles.size();
+
+	tile->RemoveOverlayTerrain();
 	
 	this->CalculateTileTransitions(pos, true, z);
 	
-	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		MarkSeenTile(mf);
+	if (tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+		MarkSeenTile(*tile);
 	}
 	UI.get_minimap()->UpdateXY(pos, z);
-	
+
+	emit map_layer->tile_overlay_image_changed(tile_index, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+
+	if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
+		emit map_layer->tile_overlay_transition_images_changed(tile_index, tile->OverlayTransitionTiles);
+	}
+
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (this->Info.IsPointOnMap(adjacent_pos, z)) {
-					wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
-					
-					this->CalculateTileTransitions(adjacent_pos, true, z);
-					
-					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-						MarkSeenTile(adjacent_mf);
-					}
-					UI.get_minimap()->UpdateXY(adjacent_pos, z);
+				const QPoint adjacent_pos(pos.x() + x_offset, pos.y() + y_offset);
+
+				if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
+					continue;
+				}
+
+				const int adjacent_tile_index = point::to_index(adjacent_pos, map_layer->get_width());
+				wyrmgus::tile *adjacent_tile = map_layer->Field(adjacent_tile_index);
+
+				const size_t old_adjacent_overlay_transition_count = adjacent_tile->OverlayTransitionTiles.size();
+
+				this->CalculateTileTransitions(adjacent_pos, true, z);
+
+				if (adjacent_tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+					MarkSeenTile(*adjacent_tile);
+				}
+				UI.get_minimap()->UpdateXY(adjacent_pos, z);
+
+				if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
+					emit map_layer->tile_overlay_transition_images_changed(adjacent_tile_index, adjacent_tile->OverlayTransitionTiles);
 				}
 			}
 		}
@@ -2214,52 +2276,56 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, const int z)
 {
 	try {
-		const std::unique_ptr<CMapLayer> &map_layer = this->MapLayers[z];
+		CMapLayer *map_layer = this->MapLayers[z].get();
 
 		if (!map_layer) {
 			return;
 		}
 
-		tile &mf = *map_layer->Field(pos);
+		const int tile_index = point::to_index(pos, map_layer->get_width());
+		tile *tile = map_layer->Field(tile_index);
 
-		if (mf.get_overlay_terrain() == nullptr || mf.OverlayTerrainDestroyed == destroyed) {
+		if (tile->get_overlay_terrain() == nullptr || tile->OverlayTerrainDestroyed == destroyed) {
 			return;
 		}
 
-		mf.SetOverlayTerrainDestroyed(destroyed);
+		const short old_overlay_solid_tile = tile->OverlaySolidTile;
+		const size_t old_overlay_transition_count = tile->OverlayTransitionTiles.size();
+
+		tile->SetOverlayTerrainDestroyed(destroyed);
 
 		if (destroyed) {
-			if (mf.get_overlay_terrain()->has_flag(tile_flag::tree)) {
-				mf.Flags &= ~(tile_flag::tree | tile_flag::impassable);
-				mf.Flags |= tile_flag::stumps;
+			if (tile->get_overlay_terrain()->has_flag(tile_flag::tree)) {
+				tile->Flags &= ~(tile_flag::tree | tile_flag::impassable);
+				tile->Flags |= tile_flag::stumps;
 				map_layer->destroyed_tree_tiles.push_back(pos);
 			} else {
-				if (mf.get_overlay_terrain()->has_flag(tile_flag::rock)) {
-					mf.Flags &= ~(tile_flag::rock | tile_flag::impassable);
-					mf.Flags |= tile_flag::gravel;
-				} else if (mf.get_overlay_terrain()->has_flag(tile_flag::wall)) {
-					mf.Flags &= ~(tile_flag::wall | tile_flag::impassable);
-					mf.Flags |= tile_flag::gravel;
-					if (mf.has_flag(tile_flag::underground)) {
-						mf.Flags &= ~(tile_flag::air_impassable);
+				if (tile->get_overlay_terrain()->has_flag(tile_flag::rock)) {
+					tile->Flags &= ~(tile_flag::rock | tile_flag::impassable);
+					tile->Flags |= tile_flag::gravel;
+				} else if (tile->get_overlay_terrain()->has_flag(tile_flag::wall)) {
+					tile->Flags &= ~(tile_flag::wall | tile_flag::impassable);
+					tile->Flags |= tile_flag::gravel;
+					if (tile->has_flag(tile_flag::underground)) {
+						tile->Flags &= ~(tile_flag::air_impassable);
 					}
 				}
 
 				map_layer->destroyed_overlay_terrain_tiles.push_back(pos);
 			}
 
-			mf.set_value(0);
+			tile->set_value(0);
 		} else {
-			if (mf.has_flag(tile_flag::stumps)) { //if is a cleared tree tile regrowing trees
-				mf.Flags &= ~(tile_flag::stumps);
-				mf.Flags |= tile_flag::tree | tile_flag::impassable;
-				mf.set_value(mf.get_overlay_terrain()->get_resource()->get_default_amount());
+			if (tile->has_flag(tile_flag::stumps)) { //if is a cleared tree tile regrowing trees
+				tile->Flags &= ~(tile_flag::stumps);
+				tile->Flags |= tile_flag::tree | tile_flag::impassable;
+				tile->set_value(tile->get_overlay_terrain()->get_resource()->get_default_amount());
 			}
 		}
 
 		if (destroyed) {
-			if (mf.get_overlay_terrain()->get_destroyed_tiles().size() > 0) {
-				mf.OverlaySolidTile = mf.get_overlay_terrain()->get_destroyed_tiles()[SyncRand(mf.get_overlay_terrain()->get_destroyed_tiles().size())];
+			if (tile->get_overlay_terrain()->get_destroyed_tiles().size() > 0) {
+				tile->OverlaySolidTile = vector::get_random(tile->get_overlay_terrain()->get_destroyed_tiles());
 			}
 		} else {
 			this->calculate_tile_solid_tile(pos, true, z);
@@ -2267,28 +2333,45 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 
 		this->CalculateTileTransitions(pos, true, z);
 
-		if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			MarkSeenTile(mf);
+		if (tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+			MarkSeenTile(*tile);
 		}
 		UI.get_minimap()->UpdateXY(pos, z);
+
+		if (old_overlay_solid_tile != tile->OverlaySolidTile) {
+			emit map_layer->tile_overlay_image_changed(tile_index, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+		}
+
+		if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
+			emit map_layer->tile_overlay_transition_images_changed(tile_index, tile->OverlayTransitionTiles);
+		}
 
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					const QPoint adjacent_pos(pos.x() + x_offset, pos.y() + y_offset);
-					if (this->Info.IsPointOnMap(adjacent_pos, z)) {
-						tile &adjacent_mf = *this->Field(adjacent_pos, z);
+					if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
+						continue;
+					}
 
-						if (adjacent_mf.get_overlay_terrain() != mf.get_overlay_terrain()) {
-							continue;
-						}
+					const int adjacent_tile_index = point::to_index(adjacent_pos, map_layer->get_width());
+					wyrmgus::tile *adjacent_tile = map_layer->Field(adjacent_tile_index);
 
-						this->CalculateTileTransitions(adjacent_pos, true, z);
+					if (adjacent_tile->get_overlay_terrain() != adjacent_tile->get_overlay_terrain()) {
+						continue;
+					}
 
-						if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-							MarkSeenTile(adjacent_mf);
-						}
-						UI.get_minimap()->UpdateXY(adjacent_pos, z);
+					const size_t old_adjacent_overlay_transition_count = adjacent_tile->OverlayTransitionTiles.size();
+
+					this->CalculateTileTransitions(adjacent_pos, true, z);
+
+					if (adjacent_tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+						MarkSeenTile(*adjacent_tile);
+					}
+					UI.get_minimap()->UpdateXY(adjacent_pos, z);
+
+					if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
+						emit map_layer->tile_overlay_transition_images_changed(adjacent_tile_index, adjacent_tile->OverlayTransitionTiles);
 					}
 				}
 			}
@@ -2301,17 +2384,23 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 void CMap::SetOverlayTerrainDamaged(const QPoint &pos, const bool damaged, const int z)
 {
 	try {
-		tile &mf = *this->Field(pos, z);
+		const CMapLayer *map_layer = this->MapLayers[z].get();
 
-		if (mf.get_overlay_terrain() == nullptr || mf.OverlayTerrainDamaged == damaged) {
+		const int tile_index = point::to_index(pos, map_layer->get_width());
+		tile *tile = map_layer->Field(tile_index);
+
+		if (tile->get_overlay_terrain() == nullptr || tile->OverlayTerrainDamaged == damaged) {
 			return;
 		}
 
-		mf.SetOverlayTerrainDamaged(damaged);
+		const short old_overlay_solid_tile = tile->OverlaySolidTile;
+		const size_t old_overlay_transition_count = tile->OverlayTransitionTiles.size();
+
+		tile->SetOverlayTerrainDamaged(damaged);
 
 		if (damaged) {
-			if (mf.get_overlay_terrain()->get_damaged_tiles().size() > 0) {
-				mf.OverlaySolidTile = mf.get_overlay_terrain()->get_damaged_tiles()[SyncRand(mf.get_overlay_terrain()->get_damaged_tiles().size())];
+			if (tile->get_overlay_terrain()->get_damaged_tiles().size() > 0) {
+				tile->OverlaySolidTile = vector::get_random(tile->get_overlay_terrain()->get_damaged_tiles());
 			}
 		} else {
 			this->calculate_tile_solid_tile(pos, true, z);
@@ -2319,10 +2408,18 @@ void CMap::SetOverlayTerrainDamaged(const QPoint &pos, const bool damaged, const
 
 		this->CalculateTileTransitions(pos, true, z);
 
-		if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			MarkSeenTile(mf);
+		if (tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+			MarkSeenTile(*tile);
 		}
 		UI.get_minimap()->UpdateXY(pos, z);
+
+		if (old_overlay_solid_tile != tile->OverlaySolidTile) {
+			emit map_layer->tile_overlay_image_changed(tile_index, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+		}
+
+		if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
+			emit map_layer->tile_overlay_transition_images_changed(tile_index, tile->OverlayTransitionTiles);
+		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error setting the overlay terrain of tile " + point::to_string(pos) + ", map layer " + std::to_string(z) + " to " + (damaged ? "" : "not") + " damaged."));
 	}

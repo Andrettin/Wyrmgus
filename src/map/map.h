@@ -186,8 +186,8 @@ public:
 	}
 	
 	//Wyrmgus start
-	void SetTileTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain, int z);
-	void RemoveTileOverlayTerrain(const Vec2i &pos, int z);
+	void SetTileTerrain(const QPoint &pos, const terrain_type *terrain, int z);
+	void RemoveTileOverlayTerrain(const QPoint &pos, const int z);
 	void SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, const int z);
 	void SetOverlayTerrainDamaged(const QPoint &pos, const bool damaged, const int z);
 	void calculate_tile_solid_tile(const QPoint &pos, const bool overlay, const int z);
