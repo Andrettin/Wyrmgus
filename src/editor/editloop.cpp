@@ -303,7 +303,7 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 	//now, check if the tiles adjacent to the placed ones need correction
 	//Wyrmgus start
 	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
-		const wyrmgus::terrain_type *tile_terrain = CMap::get()->GetTileTerrain(changed_tiles[i], terrain->is_overlay(), UI.CurrentMapLayer->ID);
+		const terrain_type *tile_terrain = CMap::get()->GetTileTerrain(changed_tiles[i], terrain->is_overlay(), UI.CurrentMapLayer->ID);
 		
 		CMap::get()->CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
 		CMap::get()->CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
@@ -414,24 +414,45 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 		}
 	}
 	
-	for (size_t i = 0; i != changed_tiles.size(); ++i) {
-		CMap::get()->CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
-		CMap::get()->CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
-		UI.get_minimap()->UpdateXY(changed_tiles[i], UI.CurrentMapLayer->ID);
-		
+	for (const Vec2i &tile_pos : changed_tiles) {
+		CMap::get()->CalculateTileTransitions(tile_pos, false, UI.CurrentMapLayer->ID);
+		CMap::get()->CalculateTileTransitions(tile_pos, true, UI.CurrentMapLayer->ID);
+		UI.get_minimap()->UpdateXY(tile_pos, UI.CurrentMapLayer->ID);
+
+		const tile *tile = UI.CurrentMapLayer->Field(tile_pos);
+		emit UI.CurrentMapLayer->tile_image_changed(tile_pos, tile->get_terrain(), tile->SolidTile);
+		emit UI.CurrentMapLayer->tile_overlay_image_changed(tile_pos, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+		emit UI.CurrentMapLayer->tile_transition_images_changed(tile_pos, tile->TransitionTiles);
+		emit UI.CurrentMapLayer->tile_overlay_transition_images_changed(tile_pos, tile->OverlayTransitionTiles);
+
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
+					const QPoint adjacent_pos(tile_pos.x + x_offset, tile_pos.y + y_offset);
 					
 					if (std::find(changed_tiles.begin(), changed_tiles.end(), adjacent_pos) != changed_tiles.end()) {
 						continue;
 					}
 					
-					if (CMap::get()->Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
-						CMap::get()->CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
-						CMap::get()->CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
-						UI.get_minimap()->UpdateXY(adjacent_pos, UI.CurrentMapLayer->ID);
+					if (!CMap::get()->Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+						continue;
+					}
+
+					const wyrmgus::tile *adjacent_tile = UI.CurrentMapLayer->Field(adjacent_pos);
+
+					const size_t old_adjacent_base_transition_count = adjacent_tile->TransitionTiles.size();
+					const size_t old_adjacent_overlay_transition_count = adjacent_tile->OverlayTransitionTiles.size();
+
+					CMap::get()->CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
+					CMap::get()->CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
+					UI.get_minimap()->UpdateXY(adjacent_pos, UI.CurrentMapLayer->ID);
+
+					if (old_adjacent_base_transition_count != 0 || adjacent_tile->TransitionTiles.size() != 0) {
+						emit UI.CurrentMapLayer->tile_transition_images_changed(adjacent_pos, adjacent_tile->TransitionTiles);
+					}
+
+					if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
+						emit UI.CurrentMapLayer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles);
 					}
 				}
 			}
