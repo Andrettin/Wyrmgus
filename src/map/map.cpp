@@ -2624,17 +2624,17 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				if (adjacent_terrain != nullptr) {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(adjacent_terrain, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.TransitionTiles.push_back(std::pair<const terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.TransitionTiles.emplace_back(terrain, vector::get_random(transition_tiles));
 						found_transition = true;
 					} else {
 						const std::vector<int> &adjacent_transition_tiles = adjacent_terrain->get_adjacent_transition_tiles(terrain, transition_type);
 						if (!adjacent_transition_tiles.empty()) {
-							mf.TransitionTiles.push_back(std::pair<const terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
+							mf.TransitionTiles.emplace_back(adjacent_terrain, vector::get_random(adjacent_transition_tiles));
 							found_transition = true;
 						} else {
 							const std::vector<int> &sub_adjacent_transition_tiles = adjacent_terrain->get_adjacent_transition_tiles(nullptr, transition_type);
 							if (!sub_adjacent_transition_tiles.empty()) {
-								mf.TransitionTiles.push_back(std::pair<terrain_type *, int>(adjacent_terrain, vector::get_random(sub_adjacent_transition_tiles)));
+								mf.TransitionTiles.emplace_back(adjacent_terrain, vector::get_random(sub_adjacent_transition_tiles));
 								found_transition = true;
 							}
 						}
@@ -2642,24 +2642,24 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				} else {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(nullptr, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.TransitionTiles.push_back(std::pair<const terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.TransitionTiles.emplace_back(terrain, vector::get_random(transition_tiles));
 					}
 				}
 			} else {
 				if (adjacent_terrain != nullptr) {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(adjacent_terrain, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.OverlayTransitionTiles.push_back(std::pair<const terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.OverlayTransitionTiles.emplace_back(terrain, vector::get_random(transition_tiles));
 						found_transition = true;
 					} else {
 						const std::vector<int> &adjacent_transition_tiles = adjacent_terrain->get_transition_tiles(terrain, transition_type);
 						if (!adjacent_transition_tiles.empty()) {
-							mf.OverlayTransitionTiles.push_back(std::pair<const terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
+							mf.OverlayTransitionTiles.emplace_back(adjacent_terrain, vector::get_random(adjacent_transition_tiles));
 							found_transition = true;
 						} else {
 							const std::vector<int> &sub_adjacent_transition_tiles = adjacent_terrain->get_transition_tiles(nullptr, transition_type);
 							if (!sub_adjacent_transition_tiles.empty()) {
-								mf.OverlayTransitionTiles.push_back(std::pair<const terrain_type *, int>(adjacent_terrain, vector::get_random(sub_adjacent_transition_tiles)));
+								mf.OverlayTransitionTiles.emplace_back(adjacent_terrain, vector::get_random(sub_adjacent_transition_tiles));
 								found_transition = true;
 							}
 						}
@@ -2667,7 +2667,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				} else {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(nullptr, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.OverlayTransitionTiles.push_back(std::pair<const terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.OverlayTransitionTiles.emplace_back(terrain, vector::get_random(transition_tiles));
 					}
 				}
 				
@@ -2698,8 +2698,8 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		for (int passes = 0; passes < (int) mf.OverlayTransitionTiles.size() && swapped; ++passes) {
 			swapped = false;
 			for (int i = 0; i < ((int) mf.OverlayTransitionTiles.size()) - 1; ++i) {
-				if (vector::contains(mf.OverlayTransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.OverlayTransitionTiles[i].first)) {
-					std::pair<const terrain_type *, int> temp_transition = mf.OverlayTransitionTiles[i];
+				if (vector::contains(mf.OverlayTransitionTiles[i + 1].terrain->get_inner_border_terrain_types(), mf.OverlayTransitionTiles[i].terrain)) {
+					tile_transition temp_transition = mf.OverlayTransitionTiles[i];
 					mf.OverlayTransitionTiles[i] = mf.OverlayTransitionTiles[i + 1];
 					mf.OverlayTransitionTiles[i + 1] = temp_transition;
 					swapped = true;
@@ -2711,8 +2711,8 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		for (int passes = 0; passes < (int) mf.TransitionTiles.size() && swapped; ++passes) {
 			swapped = false;
 			for (int i = 0; i < ((int) mf.TransitionTiles.size()) - 1; ++i) {
-				if (vector::contains(mf.TransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.TransitionTiles[i].first)) {
-					std::pair<const terrain_type *, int> temp_transition = mf.TransitionTiles[i];
+				if (vector::contains(mf.TransitionTiles[i + 1].terrain->get_inner_border_terrain_types(), mf.TransitionTiles[i].terrain)) {
+					tile_transition temp_transition = mf.TransitionTiles[i];
 					mf.TransitionTiles[i] = mf.TransitionTiles[i + 1];
 					mf.TransitionTiles[i + 1] = temp_transition;
 					swapped = true;
@@ -3577,7 +3577,7 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 			return;
 		}
 
-		std::map<std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *>, int> terrain_type_pair_neighbor_count;
+		std::map<std::pair<const terrain_type *, const terrain_type *>, int> terrain_type_pair_neighbor_count;
 
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -3605,7 +3605,7 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 					continue;
 				}
 
-				std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *> terrain_type_pair(adjacent_terrain_type, adjacent_overlay_terrain_type);
+				std::pair<const terrain_type *, const terrain_type *> terrain_type_pair(adjacent_terrain_type, adjacent_overlay_terrain_type);
 
 				auto find_iterator = terrain_type_pair_neighbor_count.find(terrain_type_pair);
 				if (find_iterator == terrain_type_pair_neighbor_count.end()) {
@@ -3616,7 +3616,7 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 			}
 		}
 
-		std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *> best_terrain_type_pair(nullptr, nullptr);
+		std::pair<const terrain_type *, const terrain_type *> best_terrain_type_pair(nullptr, nullptr);
 		int best_terrain_type_neighbor_count = 0;
 		for (const auto &element : terrain_type_pair_neighbor_count) {
 			if (element.second > best_terrain_type_neighbor_count) {

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,15 +24,21 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#include "stratagus.h"
-
-#include "util/color_container.h"
+#pragma once
 
 namespace wyrmgus {
 
-bool color_compare::operator()(const QColor &color, const QColor &other_color) const
+class terrain_type;
+
+struct tile_transition final
 {
-	return color.rgba() < other_color.rgba();
-}
+	const terrain_type *terrain = nullptr;
+	short tile_frame = 0;
+
+	bool operator==(const tile_transition &other) const
+	{
+		return this->terrain == other.terrain && this->tile_frame == other.tile_frame;
+	}
+};
 
 }

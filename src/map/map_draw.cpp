@@ -303,8 +303,8 @@ void CViewport::DrawMapBackgroundInViewport() const
 				overlay_solid_tile = mf.player_info->SeenOverlaySolidTile;
 			}
 
-			const std::vector<std::pair<const wyrmgus::terrain_type *, short>> &transition_tiles = ReplayRevealMap ? mf.TransitionTiles : mf.player_info->SeenTransitionTiles;
-			const std::vector<std::pair<const wyrmgus::terrain_type *, short>> &overlay_transition_tiles = ReplayRevealMap ? mf.OverlayTransitionTiles : mf.player_info->SeenOverlayTransitionTiles;
+			const std::vector<tile_transition> &transition_tiles = ReplayRevealMap ? mf.TransitionTiles : mf.player_info->SeenTransitionTiles;
+			const std::vector<tile_transition> &overlay_transition_tiles = ReplayRevealMap ? mf.OverlayTransitionTiles : mf.player_info->SeenOverlayTransitionTiles;
 
 			const bool is_unpassable = overlay_terrain && overlay_terrain->has_flag(tile_flag::impassable) && !vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
 			const bool is_space = terrain != nullptr && terrain->has_flag(tile_flag::space);
@@ -331,7 +331,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			for (size_t i = 0; i != transition_tiles.size(); ++i) {
-				const wyrmgus::terrain_type *transition_terrain = transition_tiles[i].first;
+				const terrain_type *transition_terrain = transition_tiles[i].terrain;
 				const std::shared_ptr<CPlayerColorGraphic> &transition_terrain_graphics = transition_terrain->get_graphics(season);
 
 				if (transition_terrain_graphics != nullptr) {
@@ -348,7 +348,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						}
 					}
 
-					transition_terrain_graphics->DrawFrameClip(transition_tiles[i].second, dx, dy, transition_time_of_day);
+					transition_terrain_graphics->DrawFrameClip(transition_tiles[i].tile_frame, dx, dy, transition_time_of_day);
 				}
 			}
 
@@ -368,14 +368,14 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				const wyrmgus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].first;
+				const wyrmgus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
 				if (overlay_transition_terrain->has_transition_mask()) {
 					continue;
 				}
 
 				const bool is_overlay_transition_space = overlay_transition_terrain->has_flag(tile_flag::space);
 				if (overlay_transition_terrain->get_transition_graphics(season)) {
-					overlay_transition_terrain->get_transition_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_transition_tiles[i].second, dx, dy, is_overlay_transition_space ? nullptr : time_of_day);
+					overlay_transition_terrain->get_transition_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_transition_tiles[i].tile_frame, dx, dy, is_overlay_transition_space ? nullptr : time_of_day);
 				}
 			}
 
@@ -388,9 +388,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				const wyrmgus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].first;
+				const wyrmgus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
 				if (overlay_transition_terrain->get_elevation_graphics()) {
-					overlay_transition_terrain->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].second, dx, dy, time_of_day);
+					overlay_transition_terrain->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].tile_frame, dx, dy, time_of_day);
 				}
 			}
 

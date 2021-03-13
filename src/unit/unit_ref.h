@@ -70,22 +70,22 @@ public:
 		return this->unit;
 	}
 
-	bool operator== (const unit_ref &other) const
+	bool operator==(const unit_ref &other) const
 	{
 		return this->unit == other.unit;
 	}
 
-	bool operator!= (const unit_ref &other) const
+	bool operator!=(const unit_ref &other) const
 	{
 		return this->unit != other.unit;
 	}
 
-	bool operator== (CUnit *u) const
+	bool operator==(CUnit *u) const
 	{
 		return this->unit == u;
 	}
 
-	bool operator!= (CUnit *u) const
+	bool operator!=(CUnit *u) const
 	{
 		return this->unit != u;
 	}

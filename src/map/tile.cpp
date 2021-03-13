@@ -377,19 +377,19 @@ void tile::Save(CFile &file) const
 	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (this->get_terrain() != nullptr ? this->get_terrain()->get_identifier().c_str() : ""), (this->get_overlay_terrain() != nullptr ? this->get_overlay_terrain()->get_identifier().c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->get_identifier().c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->get_identifier().c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_movement_cost(), landmass_index, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
-		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->get_identifier().c_str(), TransitionTiles[i].second);
+		file.printf(", \"transition-tile\", \"%s\", %d", this->TransitionTiles[i].terrain->get_identifier().c_str(), this->TransitionTiles[i].tile_frame);
 	}
 
 	for (size_t i = 0; i != OverlayTransitionTiles.size(); ++i) {
-		file.printf(", \"overlay-transition-tile\", \"%s\", %d", OverlayTransitionTiles[i].first->get_identifier().c_str(), OverlayTransitionTiles[i].second);
+		file.printf(", \"overlay-transition-tile\", \"%s\", %d", this->OverlayTransitionTiles[i].terrain->get_identifier().c_str(), this->OverlayTransitionTiles[i].tile_frame);
 	}
 
 	for (size_t i = 0; i != player_info->SeenTransitionTiles.size(); ++i) {
-		file.printf(", \"seen-transition-tile\", \"%s\", %d", player_info->SeenTransitionTiles[i].first->get_identifier().c_str(), player_info->SeenTransitionTiles[i].second);
+		file.printf(", \"seen-transition-tile\", \"%s\", %d", player_info->SeenTransitionTiles[i].terrain->get_identifier().c_str(), player_info->SeenTransitionTiles[i].tile_frame);
 	}
 
 	for (size_t i = 0; i != player_info->SeenOverlayTransitionTiles.size(); ++i) {
-		file.printf(", \"seen-overlay-transition-tile\", \"%s\", %d", player_info->SeenOverlayTransitionTiles[i].first->get_identifier().c_str(), player_info->SeenOverlayTransitionTiles[i].second);
+		file.printf(", \"seen-overlay-transition-tile\", \"%s\", %d", player_info->SeenOverlayTransitionTiles[i].terrain->get_identifier().c_str(), player_info->SeenOverlayTransitionTiles[i].tile_frame);
 	}
 	//Wyrmgus end
 
@@ -598,25 +598,25 @@ void tile::parse(lua_State *l)
 			terrain_type *terrain = terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->TransitionTiles.push_back(std::pair<terrain_type *, int>(terrain, tile_number));
+			this->TransitionTiles.emplace_back(terrain, tile_number);
 		} else if (!strcmp(value, "overlay-transition-tile")) {
 			++j;
 			terrain_type *terrain = terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->OverlayTransitionTiles.push_back(std::pair<terrain_type *, int>(terrain, tile_number));
+			this->OverlayTransitionTiles.emplace_back(terrain, tile_number);
 		} else if (!strcmp(value, "seen-transition-tile")) {
 			++j;
 			terrain_type *terrain = terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->player_info->SeenTransitionTiles.push_back(std::pair<terrain_type *, int>(terrain, tile_number));
+			this->player_info->SeenTransitionTiles.emplace_back(terrain, tile_number);
 		} else if (!strcmp(value, "seen-overlay-transition-tile")) {
 			++j;
 			terrain_type *terrain = terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->player_info->SeenOverlayTransitionTiles.push_back(std::pair<terrain_type *, int>(terrain, tile_number));
+			this->player_info->SeenOverlayTransitionTiles.emplace_back(terrain, tile_number);
 		} else if (!strcmp(value, "explored")) {
 			//Wyrmgus end
 			++j;

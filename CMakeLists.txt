@@ -776,6 +776,7 @@ set(wyrmgus_map_HDRS
 	src/map/tile.h
 	src/map/tile_flag.h
 	src/map/tile_image_provider.h
+	src/map/tile_transition.h
 	src/map/tileset.h
 	src/map/world.h
 	src/map/world_game_data.h

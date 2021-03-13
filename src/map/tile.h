@@ -108,6 +108,7 @@
 **    top and right most map coordinate.
 */
 
+#include "map/tile_transition.h"
 #include "unit/unit_cache.h"
 #include "vec2i.h"
 
@@ -158,8 +159,8 @@ public:
 	const wyrmgus::terrain_type *SeenOverlayTerrain = nullptr;
 	short SeenSolidTile = 0;
 	short SeenOverlaySolidTile = 0;
-	std::vector<std::pair<const wyrmgus::terrain_type *, short>> SeenTransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
-	std::vector<std::pair<const wyrmgus::terrain_type *, short>> SeenOverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
+	std::vector<tile_transition> SeenTransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
+	std::vector<tile_transition> SeenOverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 	std::array<unsigned short, PlayerMax> Visible = {};    /// Seen counter 0 unexplored
 	std::array<unsigned char, PlayerMax> VisCloak = {};    /// Visiblity for cloaking.
@@ -352,8 +353,8 @@ public:
 	short OverlaySolidTile = 0;
 	bool OverlayTerrainDestroyed = false;
 	bool OverlayTerrainDamaged = false;
-	std::vector<std::pair<const terrain_type *, short>> TransitionTiles; //transition tiles; the pair contains the terrain type and the tile index
-	std::vector<std::pair<const terrain_type *, short>> OverlayTransitionTiles; //overlay transition tiles; the pair contains the terrain type and the tile index
+	std::vector<tile_transition> TransitionTiles; //transition tiles; the pair contains the terrain type and the tile index
+	std::vector<tile_transition> OverlayTransitionTiles; //overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 private:
 	unsigned char movement_cost = 0; //unit cost to move in this tile
