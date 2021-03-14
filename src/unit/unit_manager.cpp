@@ -125,6 +125,7 @@ CUnit *unit_manager::AllocUnit()
 		return unit;
 	} else {
 		auto unit = std::make_unique<CUnit>();
+		unit->moveToThread(QApplication::instance()->thread());
 
 		unit->UnitManagerData.slot = this->unit_slots.size();
 		CUnit *unit_ptr = unit.get();
@@ -243,6 +244,7 @@ void unit_manager::Load(lua_State *l)
 	}
 	for (unsigned int i = 0; i < unitCount; i++) {
 		auto unit = std::make_unique<CUnit>();
+		unit->moveToThread(QApplication::instance()->thread());
 		unit->UnitManagerData.slot = i;
 		this->unit_slots.push_back(std::move(unit));
 	}

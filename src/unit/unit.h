@@ -115,11 +115,13 @@ enum _directions_ {
 };
 
 constexpr int NextDirection = 32;        /// Next direction N->NE->E...
-#define UnitNotSeen 0x7fffffff  /// Unit not seen, used by CUnit::SeenFrame
+constexpr int UnitNotSeen = 0x7fffffff;  /// Unit not seen, used by CUnit::SeenFrame
 
 /// The big unit structure
-class CUnit final
+class CUnit final : public QObject
 {
+	Q_OBJECT
+
 public:
 	static constexpr unsigned char max_step_count = 10;
 
