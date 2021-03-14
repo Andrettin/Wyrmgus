@@ -35,8 +35,23 @@ enum class frame_order {
 	top_to_bottom
 };
 
+inline QImage get_frame(const QImage &image, const int frame_x, const int frame_y, const QSize &frame_size)
+{
+	const int pixel_x = frame_x * frame_size.width();
+	const int pixel_y = frame_y * frame_size.height();
+	return image.copy(pixel_x, pixel_y, frame_size.width(), frame_size.height());
+}
+
 extern QImage scale(const QImage &src_image, const int scale_factor);
 extern QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_frame_size);
+
+inline QImage scale_frame(const QImage &image, const int frame_x, const int frame_y, const int scale_factor, const QSize &old_frame_size)
+{
+	const QImage frame_image = image::get_frame(image, frame_x, frame_y, old_frame_size);
+
+	return image::scale(frame_image, scale_factor);
+}
+
 extern std::set<QRgb> get_rgbs(const QImage &image);
 extern color_set get_colors(const QImage &image);
 
@@ -51,7 +66,7 @@ inline int get_frames_per_column(const QImage &image, const int frame_height)
 }
 
 extern int get_frame_index(const QImage &image, const QSize &frame_size, const QPoint &frame_pos);
-extern QPoint get_frame_pos(const QImage &image, const QSize &frame_size, const int frame_index, const frame_order frame_order);
+extern QPoint get_frame_pos(const QImage &image, const QSize &frame_size, const int frame_index, const frame_order frame_order = frame_order::left_to_right);
 
 inline std::vector<QImage> to_frames(const QImage &image, const QSize &frame_size)
 {
@@ -62,10 +77,7 @@ inline std::vector<QImage> to_frames(const QImage &image, const QSize &frame_siz
 
 	for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
 		for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
-			const int pixel_x = frame_x * frame_size.width();
-			const int pixel_y = frame_y * frame_size.height();
-
-			frames.push_back(image.copy(pixel_x, pixel_y, frame_size.width(), frame_size.height()));
+			frames.push_back(image::get_frame(image, frame_x, frame_y, frame_size));
 		}
 	}
 

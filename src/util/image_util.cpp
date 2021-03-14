@@ -110,9 +110,7 @@ QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_f
 	for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
 		for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
 			std::future<void> future = thread_pool::get()->async([&, frame_x, frame_y]() {
-				const QImage src_frame_image = src_image.copy(frame_x * old_frame_size.width(), frame_y * old_frame_size.height(), old_frame_size.width(), old_frame_size.height());
-
-				QImage result_frame_image = image::scale(src_frame_image, scale_factor);
+				const QImage result_frame_image = image::scale_frame(src_image, frame_x, frame_y, scale_factor, old_frame_size);
 
 				const uint32_t *frame_data = reinterpret_cast<const uint32_t *>(result_frame_image.constBits());
 				image::copy_frame_data(frame_data, dst_data, new_frame_size, frame_x, frame_y, result_width);
@@ -198,7 +196,7 @@ QPoint get_frame_pos(const QImage &image, const QSize &frame_size, const int fra
 		return QPoint(frame_index / frames_per_column, frame_index % frames_per_column);
 	} else {
 		//left to right
-		return wyrmgus::point::from_index(frame_index, image::get_frames_per_row(image, frame_size.width()));
+		return point::from_index(frame_index, image::get_frames_per_row(image, frame_size.width()));
 	}
 }
 
@@ -274,7 +272,6 @@ void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_
 
 	image.save(QString::fromStdString(dir_path.string() + ".png"));
 }
-
 
 void index_to_palette(QImage &image, const color_set &palette)
 {
