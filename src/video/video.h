@@ -204,9 +204,9 @@ public:
 		return this->image;
 	}
 
-	const QImage &get_scaled_frame(const size_t frame_index, const player_color *player_color = nullptr);
+	const QImage &get_scaled_frame(const size_t frame_index, const wyrmgus::player_color *player_color = nullptr);
 
-	void set_scaled_frames(std::vector<QImage> &&frames, const player_color *player_color)
+	void set_scaled_frames(std::vector<QImage> &&frames, const wyrmgus::player_color *player_color)
 	{
 		if (player_color == nullptr) {
 			this->scaled_frames = std::move(frames);
@@ -264,7 +264,7 @@ public:
 private:
 	QImage image;
 	std::vector<QImage> scaled_frames;
-	std::map<const player_color *, std::vector<QImage>> scaled_player_color_frames;
+	std::map<const wyrmgus::player_color *, std::vector<QImage>> scaled_player_color_frames;
 public:
 	std::vector<frame_pos_t> frame_map;
 	std::vector<frame_pos_t> frameFlip_map;
