@@ -58,23 +58,30 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 
 	const std::shared_ptr<CGraphic> graphics = interface->get_interface_element_graphics(interface_element_type, qualifier);
 
-	engine_interface::get()->sync([&graphics]() {
-		//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
-		graphics->set_store_scaled_image(true);
-		graphics->Load(false, defines::get()->get_scale_factor());
-	});
+	graphics->get_load_mutex().lock();
 
-	const QImage *image = graphics->get_scaled_frame(0);
+	if (!graphics->IsLoaded()) {
+		graphics->get_load_mutex().unlock();
 
-	if (image->isNull()) {
+		engine_interface::get()->sync([&graphics]() {
+			//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
+			graphics->Load(false, defines::get()->get_scale_factor());
+		});
+	} else {
+		graphics->get_load_mutex().unlock();
+	}
+
+	const QImage &image = graphics->get_or_create_scaled_frame(0, nullptr);
+
+	if (image.isNull()) {
 		log::log_error("Interface image for ID \"" + id_str + "\" is null.");
 	}
 
 	if (size != nullptr) {
-		*size = image->size();
+		*size = image.size();
 	}
 
-	return *image;
+	return image;
 }
 
 }

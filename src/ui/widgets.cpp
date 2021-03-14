@@ -339,7 +339,6 @@ ImageWidget::ImageWidget(const std::string &image_path, const int scale_factor, 
 
 ImageWidget::ImageWidget(const std::shared_ptr<CGraphic> &graphic, const int scale_factor, const int image_width, const int image_height) : gcn::Icon(graphic.get()), graphic(graphic)
 {
-	this->graphic->set_store_scaled_image(true);
 	this->graphic->Load(false, scale_factor);
 
 	if (image_width != -1 && image_height != -1) {
@@ -361,7 +360,6 @@ PlayerColorImageWidget::PlayerColorImageWidget(const std::string &image_path, co
 	ImageOrigin.y = 0;
 
 	CPlayerColorGraphic *graphic = static_cast<CPlayerColorGraphic *>(this->mImage);
-	graphic->set_store_scaled_image(true);
 	graphic->Load(false, defines::get()->get_scale_factor());
 
 	setHeight(graphic->getHeight());
@@ -592,7 +590,6 @@ void ImageButton::adjustSize()
 void ImageButton::setNormalImage(const std::string &image_path)
 { 
 	normalImage = CGraphic::New(image_path); 
-	normalImage->set_store_scaled_image(true);
 	normalImage->Load(false, defines::get()->get_scale_factor());
 	adjustSize();
 }
@@ -600,14 +597,12 @@ void ImageButton::setNormalImage(const std::string &image_path)
 void ImageButton::setPressedImage(const std::string &image_path) 
 { 
 	pressedImage = CGraphic::New(image_path);
-	pressedImage->set_store_scaled_image(true);
 	pressedImage->Load(false, defines::get()->get_scale_factor());
 }
 
 void ImageButton::setDisabledImage(const std::string &image_path) 
 { 
 	disabledImage = CGraphic::New(image_path);
-	disabledImage->set_store_scaled_image(true);
 	disabledImage->Load(false, defines::get()->get_scale_factor());
 }
 
@@ -789,7 +784,6 @@ void PlayerColorImageButton::adjustSize()
 void PlayerColorImageButton::setNormalImage(const std::string &image_path)
 {
 	normalImage = CPlayerColorGraphic::Get(image_path);
-	normalImage->set_store_scaled_image(true);
 	normalImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	adjustSize();
 }
@@ -797,14 +791,12 @@ void PlayerColorImageButton::setNormalImage(const std::string &image_path)
 void PlayerColorImageButton::setPressedImage(const std::string &image_path)
 {
 	pressedImage = CPlayerColorGraphic::Get(image_path);
-	pressedImage->set_store_scaled_image(true);
 	pressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
 void PlayerColorImageButton::setDisabledImage(const std::string &image_path)
 {
 	disabledImage = CPlayerColorGraphic::Get(image_path);
-	disabledImage->set_store_scaled_image(true);
 	disabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
@@ -975,42 +967,36 @@ void ImageRadioButton::adjustSize()
 void ImageRadioButton::setUncheckedNormalImage(const std::string &image_path)
 { 
 	uncheckedNormalImage = CGraphic::New(image_path);
-	uncheckedNormalImage->set_store_scaled_image(true);
 	uncheckedNormalImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
 void ImageRadioButton::setUncheckedPressedImage(const std::string &image_path)
 {
 	uncheckedPressedImage = CGraphic::New(image_path);
-	uncheckedPressedImage->set_store_scaled_image(true);
 	uncheckedPressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
 void ImageRadioButton::setUncheckedDisabledImage(const std::string &image_path)
 {
 	uncheckedDisabledImage = CGraphic::New(image_path);
-	uncheckedDisabledImage->set_store_scaled_image(true);
 	uncheckedDisabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
 void ImageRadioButton::setCheckedNormalImage(const std::string &image_path)
 {
 	checkedNormalImage = CGraphic::New(image_path);
-	checkedNormalImage->set_store_scaled_image(true);
 	checkedNormalImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
 void ImageRadioButton::setCheckedPressedImage(const std::string &image_path)
 {
 	checkedPressedImage = CGraphic::New(image_path);
-	checkedPressedImage->set_store_scaled_image(true);
 	checkedPressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
 void ImageRadioButton::setCheckedDisabledImage(const std::string &image_path)
 {
 	checkedDisabledImage = CGraphic::New(image_path);
-	checkedDisabledImage->set_store_scaled_image(true);
 	checkedDisabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 

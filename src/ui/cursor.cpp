@@ -86,11 +86,10 @@ void cursor::set_current_cursor(cursor *cursor)
 
 	if (cursor != nullptr) {
 		if (!cursor->get_graphics()->IsLoaded()) {
-			cursor->get_graphics()->set_store_scaled_image(true);
 			cursor->get_graphics()->Load(false, defines::get()->get_scale_factor());
 		}
 
-		const QPixmap pixmap = QPixmap::fromImage(*cursor->get_graphics()->get_scaled_frame(0));
+		const QPixmap pixmap = QPixmap::fromImage(cursor->get_graphics()->get_or_create_scaled_frame(0, nullptr));
 		const QPoint hot_pos = cursor->get_hot_pos() * defines::get()->get_scale_factor();
 		const QCursor qcursor(pixmap, hot_pos.x(), hot_pos.y());
 

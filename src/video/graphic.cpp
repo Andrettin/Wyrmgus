@@ -1115,13 +1115,6 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const player_color *
 			//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
 			const int scale_factor = g->get_width() / image.width();
 			image = image::scale(image, scale_factor, g->get_original_frame_size());
-
-			if (!grayscale && player_color == nullptr && time_of_day == nullptr) {
-				if (g->stores_scaled_image()) {
-					std::vector<QImage> frames = image::to_frames(image, g->get_frame_size());
-					g->set_scaled_frames(std::move(frames), nullptr);
-				}
-			}
 		} else {
 			image = image.scaled(g->get_size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 			if (image.format() != QImage::Format_RGBA8888) {

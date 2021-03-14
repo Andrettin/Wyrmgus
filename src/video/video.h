@@ -222,6 +222,22 @@ public:
 
 	void create_scaled_frames(const wyrmgus::player_color *player_color);
 
+	const QImage &get_or_create_scaled_frame(const size_t frame_index, const wyrmgus::player_color *player_color)
+	{
+		const QImage *image = this->get_scaled_frame(frame_index, player_color);
+
+		if (image == nullptr) {
+			this->create_scaled_frames(player_color);
+			image = this->get_scaled_frame(frame_index, player_color);
+		}
+
+		if (image == nullptr) {
+			throw std::runtime_error("Failed to get or create scaled frame.");
+		}
+
+		return *image;
+	}
+
 	void set_scaled_frames(std::vector<QImage> &&frames, const wyrmgus::player_color *player_color)
 	{
 		if (player_color == nullptr) {
@@ -256,16 +272,6 @@ public:
 	const GLuint *get_grayscale_textures() const
 	{
 		return this->grayscale_textures.get();
-	}
-
-	bool stores_scaled_image() const
-	{
-		return this->store_scaled_image;
-	}
-
-	void set_store_scaled_image(const bool value)
-	{
-		this->store_scaled_image = value;
 	}
 
 	std::mutex &get_load_mutex()
@@ -306,7 +312,6 @@ public:
 private:
 	int custom_scale_factor = 1; //the scale factor of the loaded image, if it is a custom scaled image
 	bool player_color = false;
-	bool store_scaled_image = false;
 	std::mutex load_mutex;
 
 	friend wyrmgus::font;
