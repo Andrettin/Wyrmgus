@@ -1106,31 +1106,7 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const player_color *
 			ApplyGrayScale(image);
 		}
 	} else if (player_color != nullptr && g->has_player_color()) {
-		const int bpp = image.depth() / 8;
-
-		if (bpp < 3) {
-			throw std::runtime_error("Image BPP must be at least 3.");
-		}
-
-		unsigned char *image_data = image.bits();
-		const wyrmgus::player_color *conversible_player_color = g->get_conversible_player_color();
-		const std::vector<QColor> &conversible_colors = conversible_player_color->get_colors();
-		const std::vector<QColor> &colors = player_color->get_colors();
-
-		for (int i = 0; i < image.sizeInBytes(); i += bpp) {
-			unsigned char &red = image_data[i];
-			unsigned char &green = image_data[i + 1];
-			unsigned char &blue = image_data[i + 2];
-
-			for (size_t z = 0; z < conversible_colors.size(); ++z) {
-				const QColor &color = conversible_colors[z];
-				if (red == color.red() && green == color.green() && blue == color.blue()) {
-					red = colors[z].red();
-					green = colors[z].green();
-					blue = colors[z].blue();
-				}
-			}
-		}
+		player_color->apply_to_image(image, g->get_conversible_player_color());
 	}
 
 	if (image.size() != g->get_size()) {
