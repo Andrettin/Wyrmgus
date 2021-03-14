@@ -122,6 +122,10 @@ class CUnit final : public QObject
 {
 	Q_OBJECT
 
+	Q_PROPERTY(int tile_x READ get_tile_x NOTIFY tile_pos_changed)
+	Q_PROPERTY(int tile_y READ get_tile_y NOTIFY tile_pos_changed)
+	Q_PROPERTY(QString image_source READ get_image_source NOTIFY image_source_changed)
+
 public:
 	static constexpr unsigned char max_step_count = 10;
 
@@ -135,6 +139,16 @@ public:
 	int get_ref_count() const
 	{
 		return this->ref.use_count();
+	}
+
+	int get_tile_x() const
+	{
+		return this->tilePos.x;
+	}
+
+	int get_tile_y() const
+	{
+		return this->tilePos.y;
 	}
 
 	COrder *CurrentOrder() const
@@ -654,6 +668,12 @@ public:
 	{
 		this->step_count = 0;
 	}
+
+	QString get_image_source() const;
+
+signals:
+	void tile_pos_changed();
+	void image_source_changed();
 
 public:
 	class CUnitManagerData final
