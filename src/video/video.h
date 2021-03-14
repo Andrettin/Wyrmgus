@@ -204,7 +204,23 @@ public:
 		return this->image;
 	}
 
-	const QImage &get_scaled_frame(const size_t frame_index, const wyrmgus::player_color *player_color = nullptr);
+	const QImage *get_scaled_frame(const size_t frame_index, const wyrmgus::player_color *player_color = nullptr) const
+	{
+		if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
+			if (!this->scaled_frames.empty()) {
+				return &this->scaled_frames.at(frame_index);
+			}
+		} else {
+			const auto find_iterator = this->scaled_player_color_frames.find(player_color);
+			if (find_iterator != this->scaled_player_color_frames.end()) {
+				return &find_iterator->second.at(frame_index);
+			}
+		}
+
+		return nullptr;
+	}
+
+	void create_scaled_frames(const wyrmgus::player_color *player_color);
 
 	void set_scaled_frames(std::vector<QImage> &&frames, const wyrmgus::player_color *player_color)
 	{
@@ -229,7 +245,7 @@ public:
 
 	const GLuint *get_textures(const CColor &color_modification) const
 	{
-		auto find_iterator = this->texture_color_modifications.find(color_modification);
+		const auto find_iterator = this->texture_color_modifications.find(color_modification);
 		if (find_iterator != this->texture_color_modifications.end()) {
 			return find_iterator->second.get();
 		}

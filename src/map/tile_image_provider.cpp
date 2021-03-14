@@ -100,17 +100,22 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 		graphics->get_load_mutex().unlock();
 	}
 
-	const QImage &image = graphics->get_scaled_frame(frame_index, player_color);
+	const QImage *image = graphics->get_scaled_frame(frame_index, player_color);
 
-	if (image.isNull()) {
+	if (image == nullptr) {
+		graphics->create_scaled_frames(player_color);
+		image = graphics->get_scaled_frame(frame_index, player_color);
+	}
+
+	if (image->isNull()) {
 		log::log_error("Tile image for ID \"" + id_str + "\" is null.");
 	}
 
 	if (size != nullptr) {
-		*size = image.size();
+		*size = image->size();
 	}
 
-	return image;
+	return *image;
 }
 
 }

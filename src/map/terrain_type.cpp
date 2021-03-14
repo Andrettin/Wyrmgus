@@ -185,17 +185,14 @@ void terrain_type::initialize()
 {
 	if (!this->get_image_file().empty() && this->graphics == nullptr) {
 		this->graphics = CPlayerColorGraphic::New(this->get_image_file().string(), defines::get()->get_tile_size(), nullptr);
-		this->graphics->set_store_scaled_image(true);
 	}
 
 	if (!this->get_transition_image_file().empty() && this->transition_graphics == nullptr) {
 		this->transition_graphics = CPlayerColorGraphic::New(this->get_transition_image_file().string(), defines::get()->get_tile_size(), nullptr);
-		this->transition_graphics->set_store_scaled_image(true);
 	}
 
 	if (!this->get_elevation_image_file().empty() && this->elevation_graphics == nullptr) {
 		this->elevation_graphics = CGraphic::New(this->get_elevation_image_file().string(), defines::get()->get_tile_size());
-		this->elevation_graphics->set_store_scaled_image(true);
 	}
 
 	for (const auto &kv_pair : this->season_image_files) {
@@ -204,7 +201,6 @@ void terrain_type::initialize()
 
 		if (!this->season_graphics.contains(season)) {
 			this->season_graphics[season] = CPlayerColorGraphic::New(filepath.string(), defines::get()->get_tile_size(), nullptr);
-			this->season_graphics[season]->set_store_scaled_image(true);
 		}
 	}
 
