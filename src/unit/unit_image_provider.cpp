@@ -31,6 +31,7 @@
 #include "database/defines.h"
 #include "engine_interface.h"
 #include "player_color.h"
+#include "ui/empty_image_provider.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "util/exception_util.h"
@@ -76,10 +77,14 @@ QImage unit_image_provider::requestImage(const QString &id, QSize *size, const Q
 
 		std::shared_ptr<CPlayerColorGraphic> graphics;
 
-		if (variation != nullptr) {
+		if (variation != nullptr && variation->Sprite != nullptr) {
 			graphics = variation->Sprite;
 		} else {
 			graphics = unit_type->Sprite;
+		}
+
+		if (graphics == nullptr) {
+			return empty_image_provider::get_empty_image();
 		}
 
 		graphics->get_load_mutex().lock();
