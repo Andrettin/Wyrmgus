@@ -3857,6 +3857,8 @@ void CUnit::Place(const Vec2i &pos, int z)
 		}
 	}
 	//Wyrmgus end
+
+	emit this->MapLayer->unit_added(UnitNumber(*this), this->Type, this->GetVariation(), this->Frame, this->get_player_color(), this->tilePos);
 }
 
 /**
@@ -4128,6 +4130,8 @@ void CUnit::Remove(CUnit *host)
 	if (UnitUnderCursor == this) {
 		UnitUnderCursor = nullptr;
 	}
+
+	emit this->MapLayer->unit_removed(UnitNumber(*this));
 }
 
 /**

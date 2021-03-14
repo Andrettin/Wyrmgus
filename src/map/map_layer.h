@@ -207,11 +207,11 @@ signals:
 	void tile_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions, const player_color *player_color) const;
 	void tile_overlay_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions, const player_color *player_color) const;
 
-	void unit_added(int unit_index, const unit_type *unit_type, const unit_type_variation *variation, int frame, const player_color *player_color, QPoint tile_pos);
-	void unit_removed(int unit_index);
-	void unit_image_changed(int unit_index, const unit_type *unit_type, const unit_type_variation *variation, int frame, const player_color *player_color);
-	void unit_tile_pos_changed(int unit_index, QPoint tile_pos);
-	void unit_tile_size_changed(int unit_index, QSize tile_size);
+	void unit_added(int unit_index, const unit_type *unit_type, const unit_type_variation *variation, int frame, const player_color *player_color, QPoint tile_pos) const;
+	void unit_removed(int unit_index) const;
+	void unit_image_changed(int unit_index, const unit_type *unit_type, const unit_type_variation *variation, int frame, const player_color *player_color) const;
+	void unit_tile_pos_changed(int unit_index, QPoint tile_pos) const;
+	void unit_tile_size_changed(int unit_index, QSize tile_size) const;
 
 public:
 	int ID = -1;
