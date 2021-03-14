@@ -1351,7 +1351,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 
 		if (Editor.Running == EditorNotRunning) {
 			//update the territory on the minimap for the new color
-			this->update_minimap_territory();
+			this->update_territory_tiles();
 		}
 
 		if (!this->get_faction()->FactionUpgrade.empty()) {
@@ -1615,7 +1615,7 @@ int CPlayer::get_player_color_usage_count(const wyrmgus::player_color *player_co
 	return count;
 }
 
-void CPlayer::update_minimap_territory()
+void CPlayer::update_territory_tiles()
 {
 	for (const auto &kv_pair : this->get_units_by_type()) {
 		const wyrmgus::unit_type *unit_type = kv_pair.first;
@@ -1624,13 +1624,13 @@ void CPlayer::update_minimap_territory()
 		}
 
 		for (const CUnit *town_hall : kv_pair.second) {
-			town_hall->settlement->get_game_data()->update_minimap_territory();
+			town_hall->settlement->get_game_data()->update_territory_tiles();
 		}
 	}
 
 	//also update the minimap territory of vassals, as they get strokes of the overlord's colors
 	for (CPlayer *vassal : this->get_vassals()) {
-		vassal->update_minimap_territory();
+		vassal->update_territory_tiles();
 	}
 }
 
@@ -4101,7 +4101,7 @@ void CPlayer::set_overlord(CPlayer *overlord, const wyrmgus::vassalage_type)
 		}
 	}
 
-	this->update_minimap_territory();
+	this->update_territory_tiles();
 }
 
 void CPlayer::establish_overlordship_alliance(CPlayer *overlord)

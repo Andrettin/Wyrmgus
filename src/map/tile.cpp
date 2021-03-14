@@ -790,6 +790,15 @@ CPlayer *tile::get_realm_owner() const
 	return this->get_settlement()->get_game_data()->get_realm_owner();
 }
 
+const player_color *tile::get_player_color() const
+{
+	if (this->get_owner() != nullptr) {
+		return this->get_owner()->get_player_color();
+	}
+
+	return CPlayer::Players[PlayerNumNeutral]->get_player_color();
+}
+
 const world *tile::get_world() const
 {
 	if (this->get_landmass() != nullptr) {

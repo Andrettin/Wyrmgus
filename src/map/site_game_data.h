@@ -116,7 +116,7 @@ public:
 	}
 
 	void update_border_tiles();
-	void update_minimap_territory();
+	void update_territory_tiles();
 
 	const std::vector<QPoint> &get_trade_route_tiles() const
 	{

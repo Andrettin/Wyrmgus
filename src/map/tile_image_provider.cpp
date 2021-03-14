@@ -31,6 +31,7 @@
 #include "database/defines.h"
 #include "engine_interface.h"
 #include "map/terrain_type.h"
+#include "player_color.h"
 #include "time/season.h"
 #include "util/log_util.h"
 #include "util/string_util.h"
@@ -56,6 +57,15 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 		const std::string &season_identifier = id_list.at(index);
 		season = season::try_get(season_identifier);
 		if (season != nullptr) {
+			++index;
+		}
+	}
+
+	const player_color *player_color = nullptr;
+	if ((index + 1) < id_list.size()) {
+		const std::string &player_color_identifier = id_list.at(index);
+		player_color = player_color::try_get(player_color_identifier);
+		if (player_color != nullptr) {
 			++index;
 		}
 	}
@@ -90,7 +100,7 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 		graphics->get_load_mutex().unlock();
 	}
 
-	const QImage &image = graphics->get_scaled_frame(frame_index);
+	const QImage &image = graphics->get_scaled_frame(frame_index, player_color);
 
 	if (image.isNull()) {
 		log::log_error("Tile image for ID \"" + id_str + "\" is null.");

@@ -420,10 +420,11 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 		UI.get_minimap()->UpdateXY(tile_pos, UI.CurrentMapLayer->ID);
 
 		const tile *tile = UI.CurrentMapLayer->Field(tile_pos);
-		emit UI.CurrentMapLayer->tile_image_changed(tile_pos, tile->get_terrain(), tile->SolidTile);
-		emit UI.CurrentMapLayer->tile_overlay_image_changed(tile_pos, tile->get_overlay_terrain(), tile->OverlaySolidTile);
-		emit UI.CurrentMapLayer->tile_transition_images_changed(tile_pos, tile->TransitionTiles);
-		emit UI.CurrentMapLayer->tile_overlay_transition_images_changed(tile_pos, tile->OverlayTransitionTiles);
+		const player_color *player_color = tile->get_player_color();
+		emit UI.CurrentMapLayer->tile_image_changed(tile_pos, tile->get_terrain(), tile->SolidTile, player_color);
+		emit UI.CurrentMapLayer->tile_overlay_image_changed(tile_pos, tile->get_overlay_terrain(), tile->OverlaySolidTile, player_color);
+		emit UI.CurrentMapLayer->tile_transition_images_changed(tile_pos, tile->TransitionTiles, player_color);
+		emit UI.CurrentMapLayer->tile_overlay_transition_images_changed(tile_pos, tile->OverlayTransitionTiles, player_color);
 
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -447,12 +448,14 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 					CMap::get()->CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
 					UI.get_minimap()->UpdateXY(adjacent_pos, UI.CurrentMapLayer->ID);
 
+					const wyrmgus::player_color *adjacent_player_color = adjacent_tile->get_player_color();
+
 					if (old_adjacent_base_transition_count != 0 || adjacent_tile->TransitionTiles.size() != 0) {
-						emit UI.CurrentMapLayer->tile_transition_images_changed(adjacent_pos, adjacent_tile->TransitionTiles);
+						emit UI.CurrentMapLayer->tile_transition_images_changed(adjacent_pos, adjacent_tile->TransitionTiles, adjacent_player_color);
 					}
 
 					if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
-						emit UI.CurrentMapLayer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles);
+						emit UI.CurrentMapLayer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles, adjacent_player_color);
 					}
 				}
 			}

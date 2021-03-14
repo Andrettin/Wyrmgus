@@ -1119,7 +1119,7 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const player_color *
 			if (!grayscale && player_color == nullptr && time_of_day == nullptr) {
 				if (g->stores_scaled_image()) {
 					std::vector<QImage> frames = image::to_frames(image, g->get_frame_size());
-					g->set_scaled_frames(std::move(frames));
+					g->set_scaled_frames(std::move(frames), nullptr);
 				}
 			}
 		} else {
@@ -1285,13 +1285,43 @@ QPoint CGraphic::get_frame_pos(const int frame_index) const
 	return wyrmgus::point::from_index(frame_index, this->get_frames_per_row());
 }
 
+const QImage &CGraphic::get_scaled_frame(const size_t frame_index, const wyrmgus::player_color *player_color)
+{
+	if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
+		return this->scaled_frames.at(frame_index);
+	}
+
+	const auto find_iterator = this->scaled_player_color_frames.find(player_color);
+	if (find_iterator != this->scaled_player_color_frames.end()) {
+		return find_iterator->second.at(frame_index);
+	}
+
+	//the scaled frame isn't present yet, so we need to scale the image for the given player color
+	QImage image = this->get_image();
+
+	if (image.format() != QImage::Format_RGBA8888) {
+		image = image.convertToFormat(QImage::Format_RGBA8888);
+	}
+
+	player_color->apply_to_image(image, this->get_conversible_player_color());
+
+	const int scale_factor = defines::get()->get_scale_factor();
+	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
+		image = image::scale(image, scale_factor, this->get_original_frame_size());
+	}
+
+	this->scaled_player_color_frames[player_color] = image::to_frames(image, this->get_frame_size());
+
+	return this->scaled_player_color_frames.find(player_color)->second.at(frame_index);
+}
+
 const wyrmgus::player_color *CGraphic::get_conversible_player_color() const
 {
 	if (this->conversible_player_color != nullptr) {
 		return this->conversible_player_color;
 	}
 
-	return wyrmgus::defines::get()->get_conversible_player_color();
+	return defines::get()->get_conversible_player_color();
 }
 
 CFiller &CFiller::operator =(const CFiller &other_filler)

@@ -191,7 +191,7 @@ public:
 
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	int get_player_color_usage_count(const wyrmgus::player_color *player_color) const;
-	void update_minimap_territory();
+	void update_territory_tiles();
 
 	unit_type *get_class_unit_type(const wyrmgus::unit_class *unit_class) const;
 	bool is_class_unit_type(const unit_type *unit_type) const;

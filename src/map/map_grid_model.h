@@ -32,6 +32,7 @@ class CMapLayer;
 
 namespace wyrmgus {
 
+class player_color;
 class terrain_type;
 struct tile_transition;
 
@@ -58,7 +59,7 @@ public:
 		QStringList overlay_transition_elevation_image_sources;
 	};
 
-	static QString build_image_source(const terrain_type *terrain, const short tile_frame, const bool elevation = false);
+	static QString build_image_source(const terrain_type *terrain, const short tile_frame, const player_color *player_color, const bool elevation = false);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override final;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override final;
@@ -94,10 +95,10 @@ public:
 	int get_map_layer() const;
 	void set_map_layer(const int z);
 
-	void update_tile_image_source(const QPoint &tile_pos, const terrain_type *terrain, const short tile_frame);
-	void update_tile_overlay_image_source(const QPoint &tile_pos, const terrain_type *terrain, const short tile_frame);
-	void update_tile_transition_image_sources(const QPoint &tile_pos, const std::vector<tile_transition> &tile_transitions);
-	void update_tile_overlay_transition_image_sources(const QPoint &tile_pos, const std::vector<tile_transition> &tile_transitions);
+	void update_tile_image_source(const QPoint &tile_pos, const terrain_type *terrain, const short tile_frame, const player_color *player_color);
+	void update_tile_overlay_image_source(const QPoint &tile_pos, const terrain_type *terrain, const short tile_frame, const player_color *player_color);
+	void update_tile_transition_image_sources(const QPoint &tile_pos, const std::vector<tile_transition> &tile_transitions, const player_color *player_color);
+	void update_tile_overlay_transition_image_sources(const QPoint &tile_pos, const std::vector<tile_transition> &tile_transitions, const player_color *player_color);
 
 signals:
 	void map_layer_changed();

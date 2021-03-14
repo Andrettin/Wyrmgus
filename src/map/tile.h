@@ -123,6 +123,7 @@ struct lua_State;
 namespace wyrmgus {
 
 class landmass;
+class player_color;
 class resource;
 class site;
 class terrain_feature;
@@ -293,6 +294,8 @@ public:
 
 	CPlayer *get_owner() const;
 	CPlayer *get_realm_owner() const;
+
+	const player_color *get_player_color() const;
 
 	bool is_border_tile() const
 	{

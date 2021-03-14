@@ -319,9 +319,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 			}
 
-			const wyrmgus::season *season = UI.CurrentMapLayer->get_tile_season(sx);
+			const season *season = UI.CurrentMapLayer->get_tile_season(sx);
 
-			const wyrmgus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
+			const player_color *player_color = mf.get_player_color();
 
 			if (terrain != nullptr) {
 				const std::shared_ptr<CPlayerColorGraphic> &terrain_graphics = terrain->get_graphics(season);

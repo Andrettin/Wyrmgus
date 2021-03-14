@@ -2157,20 +2157,22 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 		}
 		UI.get_minimap()->UpdateXY(pos, z);
 
+		const player_color *player_color = tile->get_player_color();
+
 		if (old_base_terrain != tile->get_terrain() || old_base_solid_tile != tile->SolidTile) {
-			emit map_layer->tile_image_changed(pos, tile->get_terrain(), tile->SolidTile);
+			emit map_layer->tile_image_changed(pos, tile->get_terrain(), tile->SolidTile, player_color);
 		}
 
 		if (old_overlay_terrain != tile->get_overlay_terrain() || old_overlay_solid_tile != tile->OverlaySolidTile) {
-			emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+			emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile, player_color);
 		}
 
 		if (old_base_transition_count != 0 || tile->TransitionTiles.size() != 0) {
-			emit map_layer->tile_transition_images_changed(pos, tile->TransitionTiles);
+			emit map_layer->tile_transition_images_changed(pos, tile->TransitionTiles, player_color);
 		}
 
 		if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
-			emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles);
+			emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles, player_color);
 		}
 
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -2199,12 +2201,14 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 					}
 					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 
+					const wyrmgus::player_color *adjacent_player_color = adjacent_tile->get_player_color();
+
 					if (old_adjacent_base_transition_count != 0 || adjacent_tile->TransitionTiles.size() != 0) {
-						emit map_layer->tile_transition_images_changed(adjacent_pos, adjacent_tile->TransitionTiles);
+						emit map_layer->tile_transition_images_changed(adjacent_pos, adjacent_tile->TransitionTiles, adjacent_player_color);
 					}
 
 					if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
-						emit map_layer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles);
+						emit map_layer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles, adjacent_player_color);
 					}
 				}
 			}
@@ -2235,10 +2239,12 @@ void CMap::RemoveTileOverlayTerrain(const QPoint &pos, const int z)
 	}
 	UI.get_minimap()->UpdateXY(pos, z);
 
-	emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+	const player_color *player_color = tile->get_player_color();
+
+	emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile, player_color);
 
 	if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
-		emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles);
+		emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles, player_color);
 	}
 
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -2262,7 +2268,9 @@ void CMap::RemoveTileOverlayTerrain(const QPoint &pos, const int z)
 				UI.get_minimap()->UpdateXY(adjacent_pos, z);
 
 				if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
-					emit map_layer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles);
+					const wyrmgus::player_color *adjacent_player_color = adjacent_tile->get_player_color();
+
+					emit map_layer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles, adjacent_player_color);
 				}
 			}
 		}
@@ -2333,12 +2341,14 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 		}
 		UI.get_minimap()->UpdateXY(pos, z);
 
+		const player_color *player_color = tile->get_player_color();
+
 		if (old_overlay_solid_tile != tile->OverlaySolidTile) {
-			emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+			emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile, player_color);
 		}
 
 		if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
-			emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles);
+			emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles, player_color);
 		}
 
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -2365,7 +2375,9 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 
 					if (old_adjacent_overlay_transition_count != 0 || adjacent_tile->OverlayTransitionTiles.size() != 0) {
-						emit map_layer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles);
+						const wyrmgus::player_color *adjacent_player_color = adjacent_tile->get_player_color();
+
+						emit map_layer->tile_overlay_transition_images_changed(adjacent_pos, adjacent_tile->OverlayTransitionTiles, adjacent_player_color);
 					}
 				}
 			}
@@ -2406,12 +2418,14 @@ void CMap::SetOverlayTerrainDamaged(const QPoint &pos, const bool damaged, const
 		}
 		UI.get_minimap()->UpdateXY(pos, z);
 
+		const player_color *player_color = tile->get_player_color();
+
 		if (old_overlay_solid_tile != tile->OverlaySolidTile) {
-			emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile);
+			emit map_layer->tile_overlay_image_changed(pos, tile->get_overlay_terrain(), tile->OverlaySolidTile, player_color);
 		}
 
 		if (old_overlay_transition_count != 0 || tile->OverlayTransitionTiles.size() != 0) {
-			emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles);
+			emit map_layer->tile_overlay_transition_images_changed(pos, tile->OverlayTransitionTiles, player_color);
 		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error setting the overlay terrain of tile " + point::to_string(pos) + ", map layer " + std::to_string(z) + " to " + (damaged ? "" : "not") + " damaged."));

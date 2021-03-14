@@ -125,7 +125,7 @@ void site_game_data::set_owner(CPlayer *player)
 
 	if (this->site->is_settlement() && GameCycle > 0) {
 		this->update_border_tiles();
-		this->update_minimap_territory();
+		this->update_territory_tiles();
 	}
 }
 
@@ -191,22 +191,31 @@ void site_game_data::update_border_tiles()
 	}
 }
 
-void site_game_data::update_minimap_territory()
+void site_game_data::update_territory_tiles()
 {
 	if (this->get_site_unit() == nullptr || !this->site->is_settlement()) {
 		return;
 	}
 
-	const int z = this->get_site_unit()->MapLayer->ID;
+	const CMapLayer *map_layer = this->get_site_unit()->MapLayer;
+	const int z = map_layer->ID;
+	const player_color *player_color = this->get_site_unit()->get_player_color();
 
 	for (int x = this->territory_rect.x(); x <= this->territory_rect.right(); ++x) {
 		for (int y = this->territory_rect.y(); y <= this->territory_rect.bottom(); ++y) {
 			const QPoint tile_pos(x, y);
-			const tile *tile = CMap::get()->Field(tile_pos, z);
+			const tile *tile = map_layer->Field(tile_pos);
 
-			if (tile->get_settlement() == this->site) {
-				UI.get_minimap()->update_territory_xy(tile_pos, z);
+			if (tile->get_settlement() != this->site) {
+				continue;
 			}
+
+			UI.get_minimap()->update_territory_xy(tile_pos, z);
+
+			emit map_layer->tile_image_changed(tile_pos, tile->get_terrain(), tile->SolidTile, player_color);
+			emit map_layer->tile_overlay_image_changed(tile_pos, tile->get_overlay_terrain(), tile->OverlaySolidTile, player_color);
+			emit map_layer->tile_transition_images_changed(tile_pos, tile->TransitionTiles, player_color);
+			emit map_layer->tile_overlay_transition_images_changed(tile_pos, tile->OverlayTransitionTiles, player_color);
 		}
 	}
 }

@@ -37,6 +37,7 @@ static int CclStratagusMap(lua_State *l);
 
 namespace wyrmgus {
 	class plane;
+	class player_color;
 	class scheduled_season;
 	class scheduled_time_of_day;
 	class season;
@@ -199,10 +200,10 @@ public:
 	}
 
 signals:
-	void tile_image_changed(QPoint tile_pos, const terrain_type *terrain, short tile_frame) const;
-	void tile_overlay_image_changed(QPoint tile_pos, const terrain_type *terrain, short tile_frame) const;
-	void tile_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions) const;
-	void tile_overlay_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions) const;
+	void tile_image_changed(QPoint tile_pos, const terrain_type *terrain, short tile_frame, const player_color *player_color) const;
+	void tile_overlay_image_changed(QPoint tile_pos, const terrain_type *terrain, short tile_frame, const player_color *player_color) const;
+	void tile_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions, const player_color *player_color) const;
+	void tile_overlay_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions, const player_color *player_color) const;
 
 public:
 	int ID = -1;
