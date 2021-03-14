@@ -114,7 +114,7 @@ public:
 		return this->map_view_created_promise.get_future();
 	}
 
-	Q_INVOKABLE inline void on_map_view_created()
+	Q_INVOKABLE void on_map_view_created()
 	{
 		this->map_view_created_promise.set_value();
 	}
@@ -133,6 +133,8 @@ public:
 	{
 		this->waiting_for_interface = value;
 	}
+
+	Q_INVOKABLE QVariantList get_units(const int z) const;
 
 signals:
 	void running_changed();

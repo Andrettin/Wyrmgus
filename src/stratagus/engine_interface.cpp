@@ -32,10 +32,13 @@
 #include "database/preferences.h"
 #include "editor.h"
 #include "game.h"
+#include "map/map_layer.h"
 #include "parameters.h"
 #include "results.h"
 #include "script.h"
 #include "sound/sound.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
 #include "util/queue_util.h"
 
 namespace wyrmgus {
@@ -120,6 +123,29 @@ void engine_interface::exit()
 			StopGame(GameExit);
 		}
 	});
+}
+
+QVariantList engine_interface::get_units(const int z) const
+{
+	QVariantList units;
+
+	for (CUnit *unit : unit_manager::get()->get_units()) {
+		if (unit->Destroyed) {
+			continue;
+		}
+
+		if (unit->Removed) {
+			continue;
+		}
+
+		if (unit->MapLayer->ID != z) {
+			continue;
+		}
+
+		units.push_back(QVariant::fromValue(unit));
+	}
+
+	return units;
 }
 
 }
