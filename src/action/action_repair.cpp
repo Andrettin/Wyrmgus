@@ -193,7 +193,7 @@ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, c
 
 	Vec2i tileSize;
 	if (this->get_reparable_target() != nullptr) {
-		tileSize = this->get_reparable_target()->GetTileSize();
+		tileSize = this->get_reparable_target()->get_tile_size();
 		input.SetGoal(this->get_reparable_target()->tilePos, tileSize, this->get_reparable_target()->MapLayer->ID);
 	} else {
 		tileSize.x = 0;

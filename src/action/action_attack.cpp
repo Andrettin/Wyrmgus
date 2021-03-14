@@ -260,7 +260,7 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	Vec2i tileSize;
 	if (this->has_goal()) {
 		CUnit *goal = this->get_goal();
-		tileSize = goal->GetTileSize();
+		tileSize = goal->get_tile_size();
 		//Wyrmgus start
 //		input.SetGoal(goal->tilePos, tileSize);
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);

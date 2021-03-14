@@ -5520,25 +5520,25 @@ PixelPos CUnit::get_scaled_map_pixel_pos_center() const
 	return this->get_scaled_map_pixel_pos_top_left() + this->get_scaled_half_tile_pixel_size();
 }
 
-//Wyrmgus start
-Vec2i CUnit::GetTileSize() const
+const QSize &CUnit::get_tile_size() const
 {
 	return this->Type->get_tile_size();
 }
 
+//Wyrmgus start
 Vec2i CUnit::GetHalfTileSize() const
 {
-	return this->GetTileSize() / 2;
+	return this->get_tile_size() / 2;
 }
 
 PixelSize CUnit::get_tile_pixel_size() const
 {
-	return PixelSize(this->GetTileSize()) * wyrmgus::defines::get()->get_tile_size();
+	return PixelSize(this->get_tile_size()) * defines::get()->get_tile_size();
 }
 
 PixelSize CUnit::get_scaled_tile_pixel_size() const
 {
-	return this->get_tile_pixel_size() * wyrmgus::defines::get()->get_scale_factor();
+	return this->get_tile_pixel_size() * defines::get()->get_scale_factor();
 }
 
 PixelSize CUnit::get_half_tile_pixel_size() const
@@ -5548,13 +5548,13 @@ PixelSize CUnit::get_half_tile_pixel_size() const
 
 PixelSize CUnit::get_scaled_half_tile_pixel_size() const
 {
-	return this->get_half_tile_pixel_size() * wyrmgus::defines::get()->get_scale_factor();
+	return this->get_half_tile_pixel_size() * defines::get()->get_scale_factor();
 }
 
 QPoint CUnit::get_bottom_right_tile_pos() const
 {
 	const CUnit *first_container = this->GetFirstContainer();
-	return first_container->tilePos + wyrmgus::size::to_point(first_container->Type->get_tile_size()) - QPoint(1, 1);
+	return first_container->tilePos + size::to_point(first_container->Type->get_tile_size()) - QPoint(1, 1);
 }
 
 QPoint CUnit::get_center_tile_pos() const
@@ -5563,14 +5563,14 @@ QPoint CUnit::get_center_tile_pos() const
 	return first_container->tilePos + first_container->Type->get_tile_center_pos_offset();
 }
 
-const wyrmgus::tile *CUnit::get_center_tile() const
+const tile *CUnit::get_center_tile() const
 {
 	return this->MapLayer->Field(this->get_center_tile_pos());
 }
 
 QPoint CUnit::get_scaled_pixel_offset() const
 {
-	return this->get_pixel_offset() * wyrmgus::defines::get()->get_scale_factor();
+	return this->get_pixel_offset() * defines::get()->get_scale_factor();
 }
 
 const resource *CUnit::get_given_resource() const

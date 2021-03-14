@@ -92,6 +92,8 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(int forest_regeneration_threshold MEMBER forest_regeneration_threshold READ get_forest_regeneration_threshold)
 	Q_PROPERTY(int destroyed_overlay_terrain_decay_threshold MEMBER destroyed_overlay_terrain_decay_threshold READ get_destroyed_overlay_terrain_decay_threshold)
 	Q_PROPERTY(int scale_factor READ get_scale_factor CONSTANT)
+	Q_PROPERTY(int scaled_tile_width READ get_scaled_tile_width CONSTANT)
+	Q_PROPERTY(int scaled_tile_height READ get_scaled_tile_height CONSTANT)
 
 public:
 	~defines();

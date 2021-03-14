@@ -124,6 +124,8 @@ class CUnit final : public QObject
 
 	Q_PROPERTY(int tile_x READ get_tile_x NOTIFY tile_pos_changed)
 	Q_PROPERTY(int tile_y READ get_tile_y NOTIFY tile_pos_changed)
+	Q_PROPERTY(int tile_width READ get_tile_width NOTIFY tile_size_changed)
+	Q_PROPERTY(int tile_height READ get_tile_height NOTIFY tile_size_changed)
 	Q_PROPERTY(QString image_source READ get_image_source NOTIFY image_source_changed)
 
 public:
@@ -436,8 +438,19 @@ public:
 	PixelPos get_map_pixel_pos_center() const;
 	PixelPos get_scaled_map_pixel_pos_center() const;
 	
+	const QSize &get_tile_size() const;
+
+	int get_tile_width() const
+	{
+		return this->get_tile_size().width();
+	}
+
+	int get_tile_height() const
+	{
+		return this->get_tile_size().height();
+	}
+
 	//Wyrmgus start
-	Vec2i GetTileSize() const;
 	Vec2i GetHalfTileSize() const;
 	PixelSize get_tile_pixel_size() const;
 	PixelSize get_scaled_tile_pixel_size() const;
@@ -673,6 +686,7 @@ public:
 
 signals:
 	void tile_pos_changed();
+	void tile_size_changed();
 	void image_source_changed();
 
 public:

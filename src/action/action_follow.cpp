@@ -156,7 +156,7 @@ bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	Vec2i tileSize;
 	if (this->has_goal()) {
 		CUnit *goal = this->get_goal();
-		tileSize = goal->GetTileSize();
+		tileSize = goal->get_tile_size();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
