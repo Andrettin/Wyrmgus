@@ -6925,22 +6925,6 @@ wyrmgus::gender CUnit::get_gender() const
 	return static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value);
 }
 
-QString CUnit::get_image_source() const
-{
-	QString image_source = this->Type->get_identifier_qstring() + "/";
-
-	const unit_type_variation *variation = this->GetVariation();
-	if (variation != nullptr && variation->Sprite != nullptr) {
-		image_source += QString::fromStdString(variation->get_identifier()) + "/";
-	}
-
-	image_source += this->get_player_color()->get_identifier_qstring() + "/";
-
-	image_source += QString::number(std::abs(this->Frame));
-
-	return image_source;
-}
-
 /**
 **  Let an unit die.
 **

@@ -118,16 +118,8 @@ constexpr int NextDirection = 32;        /// Next direction N->NE->E...
 constexpr int UnitNotSeen = 0x7fffffff;  /// Unit not seen, used by CUnit::SeenFrame
 
 /// The big unit structure
-class CUnit final : public QObject
+class CUnit final
 {
-	Q_OBJECT
-
-	Q_PROPERTY(int tile_x READ get_tile_x NOTIFY tile_pos_changed)
-	Q_PROPERTY(int tile_y READ get_tile_y NOTIFY tile_pos_changed)
-	Q_PROPERTY(int tile_width READ get_tile_width NOTIFY tile_size_changed)
-	Q_PROPERTY(int tile_height READ get_tile_height NOTIFY tile_size_changed)
-	Q_PROPERTY(QString image_source READ get_image_source NOTIFY image_source_changed)
-
 public:
 	static constexpr unsigned char max_step_count = 10;
 
@@ -681,13 +673,6 @@ public:
 	{
 		this->step_count = 0;
 	}
-
-	QString get_image_source() const;
-
-signals:
-	void tile_pos_changed();
-	void tile_size_changed();
-	void image_source_changed();
 
 public:
 	class CUnitManagerData final

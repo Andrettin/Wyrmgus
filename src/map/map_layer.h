@@ -46,6 +46,8 @@ namespace wyrmgus {
 	class tile;
 	class time_of_day;
 	class time_of_day_schedule;
+	class unit_type;
+	class unit_type_variation;
 	class world;
 	struct tile_transition;
 }
@@ -204,6 +206,12 @@ signals:
 	void tile_overlay_image_changed(QPoint tile_pos, const terrain_type *terrain, short tile_frame, const player_color *player_color) const;
 	void tile_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions, const player_color *player_color) const;
 	void tile_overlay_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions, const player_color *player_color) const;
+
+	void unit_added(int unit_index, const unit_type *unit_type, const unit_type_variation *variation, int frame, const player_color *player_color, QPoint tile_pos);
+	void unit_removed(int unit_index);
+	void unit_image_changed(int unit_index, const unit_type *unit_type, const unit_type_variation *variation, int frame, const player_color *player_color);
+	void unit_tile_pos_changed(int unit_index, QPoint tile_pos);
+	void unit_tile_size_changed(int unit_index, QSize tile_size);
 
 public:
 	int ID = -1;

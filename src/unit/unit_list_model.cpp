@@ -30,11 +30,29 @@
 
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "player_color.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "unit/unit_type.h"
+#include "unit/unit_type_variation.h"
 #include "util/exception_util.h"
 
 namespace wyrmgus {
+
+QString unit_list_model::build_image_source(const unit_type *unit_type, const unit_type_variation *variation, const int frame, const player_color *player_color)
+{
+	QString image_source = unit_type->get_identifier_qstring() + "/";
+
+	if (variation != nullptr && variation->Sprite != nullptr) {
+		image_source += QString::fromStdString(variation->get_identifier()) + "/";
+	}
+
+	image_source += player_color->get_identifier_qstring() + "/";
+
+	image_source += QString::number(std::abs(frame));
+
+	return image_source;
+}
 
 int unit_list_model::rowCount(const QModelIndex &parent) const
 {
@@ -52,11 +70,33 @@ QVariant unit_list_model::data(const QModelIndex &index, const int role) const
 	try {
 		const unit_list_model::role model_role = static_cast<unit_list_model::role>(role);
 		const int unit_slot = index.row();
-		CUnit *unit = this->get_unit(unit_slot);
+		const unit_data *unit_data = this->get_unit_data(unit_slot);
 
 		switch (model_role) {
-			case role::unit:
-				return QVariant::fromValue(unit);
+			case role::image_source:
+				if (unit_data != nullptr) {
+					return unit_data->image_source;
+				} else {
+					return QString();
+				}
+			case role::mirrored_image:
+				if (unit_data != nullptr) {
+					return unit_data->mirrored_image;
+				} else {
+					return false;
+				}
+			case role::tile_pos:
+				if (unit_data != nullptr) {
+					return unit_data->tile_pos;
+				} else {
+					return QPoint(0, 0);
+				}
+			case role::tile_size:
+				if (unit_data != nullptr) {
+					return unit_data->tile_size;
+				} else {
+					return QSize(0, 0);
+				}
 			default:
 				throw std::runtime_error("Invalid unit list model role: " + std::to_string(role) + ".");
 		}
@@ -82,7 +122,7 @@ void unit_list_model::set_map_layer(const int z)
 		return;
 	}
 
-	this->units.clear();
+	this->unit_data_map.clear();
 
 	if (z != -1) {
 		this->map_layer = CMap::get()->MapLayers[z].get();
@@ -104,29 +144,39 @@ void unit_list_model::set_map_layer(const int z)
 				continue;
 			}
 
-			this->units[UnitNumber(*unit)] = unit;
+			unit_data unit_data;
+
+			unit_data.image_source = unit_list_model::build_image_source(unit->Type, unit->GetVariation(), unit->Frame, unit->get_player_color());
+			unit_data.mirrored_image = unit->Frame < 0;
+			unit_data.tile_pos = unit->tilePos;
+			unit_data.tile_size = unit->get_tile_size();
+
+			this->unit_data_map[UnitNumber(*unit)] = std::move(unit_data);
 		}
+
+		connect(this->map_layer, &CMapLayer::unit_added, this, &unit_list_model::add_unit_data);
+		connect(this->map_layer, &CMapLayer::unit_removed, this, &unit_list_model::remove_unit_data);
+		connect(this->map_layer, &CMapLayer::unit_image_changed, this, &unit_list_model::update_unit_image);
+		connect(this->map_layer, &CMapLayer::unit_tile_pos_changed, this, &unit_list_model::update_unit_tile_pos);
+		connect(this->map_layer, &CMapLayer::unit_tile_size_changed, this, &unit_list_model::update_unit_tile_size);
 	}
 
 	emit map_layer_changed();
 }
 
-void unit_list_model::add_unit(CUnit *unit)
+void unit_list_model::add_unit_data(const int unit_index, const unit_type *unit_type, const unit_type_variation *variation, const int frame, const player_color *player_color, const QPoint &tile_pos)
 {
-	const int slot = UnitNumber(*unit);
-	this->units[slot] = unit;
+	unit_data unit_data;
 
-	const QModelIndex index = this->index(slot);
-	emit dataChanged(index, index, { static_cast<int>(role::unit) });
-}
+	unit_data.image_source = unit_list_model::build_image_source(unit_type, variation, frame, player_color);
+	unit_data.mirrored_image = frame < 0;
+	unit_data.tile_pos = tile_pos;
+	unit_data.tile_size = unit_type->get_tile_size();
 
-void unit_list_model::remove_unit(CUnit *unit)
-{
-	const int slot = UnitNumber(*unit);
-	this->units.erase(slot);
+	this->unit_data_map[unit_index] = std::move(unit_data);
 
-	const QModelIndex index = this->index(slot);
-	emit dataChanged(index, index, { static_cast<int>(role::unit) });
+	const QModelIndex index = this->index(unit_index);
+	emit dataChanged(index, index);
 }
 
 }

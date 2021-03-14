@@ -37,7 +37,6 @@
 #include "parameters.h"
 #include "ui/empty_image_provider.h"
 #include "ui/interface_image_provider.h"
-#include "unit/unit.h"
 #include "unit/unit_image_provider.h"
 #include "unit/unit_list_model.h"
 #include "util/exception_util.h"
@@ -94,7 +93,6 @@ int main(int argc, char **argv)
 		qmlRegisterType<game>();
 		qmlRegisterType<parameters>();
 		qmlRegisterType<preferences>();
-		qmlRegisterType<CUnit>();
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
 		qmlRegisterType<map_grid_model>("map_grid_model", 1, 0, "MapGridModel");
