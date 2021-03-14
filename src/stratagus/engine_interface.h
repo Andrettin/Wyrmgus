@@ -134,8 +134,6 @@ public:
 		this->waiting_for_interface = value;
 	}
 
-	Q_INVOKABLE QVariantList get_units(const int z) const;
-
 signals:
 	void running_changed();
 

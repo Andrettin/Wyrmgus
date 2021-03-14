@@ -125,27 +125,4 @@ void engine_interface::exit()
 	});
 }
 
-QVariantList engine_interface::get_units(const int z) const
-{
-	QVariantList units;
-
-	for (CUnit *unit : unit_manager::get()->get_units()) {
-		if (unit->Destroyed) {
-			continue;
-		}
-
-		if (unit->Removed) {
-			continue;
-		}
-
-		if (unit->MapLayer->ID != z) {
-			continue;
-		}
-
-		units.push_back(QVariant::fromValue(unit));
-	}
-
-	return units;
-}
-
 }

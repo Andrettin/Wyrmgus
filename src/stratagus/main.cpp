@@ -39,6 +39,7 @@
 #include "ui/interface_image_provider.h"
 #include "unit/unit.h"
 #include "unit/unit_image_provider.h"
+#include "unit/unit_list_model.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "version.h"
@@ -97,6 +98,7 @@ int main(int argc, char **argv)
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
 		qmlRegisterType<map_grid_model>("map_grid_model", 1, 0, "MapGridModel");
+		qmlRegisterType<unit_list_model>("unit_list_model", 1, 0, "UnitListModel");
 
 		engine.rootContext()->setContextProperty("wyrmgus", engine_interface::get());
 

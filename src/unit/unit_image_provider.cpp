@@ -30,7 +30,6 @@
 
 #include "database/defines.h"
 #include "engine_interface.h"
-#include "time/season.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "util/exception_util.h"

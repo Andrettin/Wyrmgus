@@ -28,7 +28,6 @@
 
 #include "map/map_grid_model.h"
 
-#include "engine_interface.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
