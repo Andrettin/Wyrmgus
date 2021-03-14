@@ -95,24 +95,7 @@ QImage unit_image_provider::requestImage(const QString &id, QSize *size, const Q
 			graphics->get_load_mutex().unlock();
 		}
 
-		const QImage &original_image = graphics->get_image();
-		const QSize &original_frame_size = graphics->get_original_frame_size();
-
-		const QPoint frame_pos = image::get_frame_pos(original_image, original_frame_size, frame_index);
-
-		QImage image = image::get_frame(original_image, frame_pos.x(), frame_pos.y(), original_frame_size);
-
-		if (image.format() != QImage::Format_RGBA8888) {
-			image = image.convertToFormat(QImage::Format_RGBA8888);
-		}
-
-		if (player_color != nullptr && graphics->has_player_color()) {
-			player_color->apply_to_image(image, graphics->get_conversible_player_color());
-		}
-
-		if (defines::get()->get_scale_factor() > 1) {
-			image = image::scale(image, defines::get()->get_scale_factor());
-		}
+		const QImage &image = graphics->get_or_create_scaled_frame(frame_index, player_color);
 
 		if (image.isNull()) {
 			throw std::runtime_error("Unit image for ID \"" + id_str + "\" is null.");
