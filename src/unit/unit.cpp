@@ -68,6 +68,7 @@
 #include "network.h"
 #include "pathfinder.h"
 #include "player.h"
+#include "player_color.h"
 #include "quest/achievement.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
@@ -6932,6 +6933,8 @@ QString CUnit::get_image_source() const
 	if (variation != nullptr && variation->Sprite != nullptr) {
 		image_source += QString::fromStdString(variation->get_identifier()) + "/";
 	}
+
+	image_source += this->get_player_color()->get_identifier_qstring() + "/";
 
 	image_source += QString::number(std::abs(this->Frame));
 
