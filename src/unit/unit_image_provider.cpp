@@ -33,8 +33,8 @@
 #include "time/season.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
+#include "util/exception_util.h"
 #include "util/image_util.h"
-#include "util/log_util.h"
 #include "util/string_util.h"
 #include "video/video.h"
 
@@ -42,72 +42,77 @@ namespace wyrmgus {
 
 QImage unit_image_provider::requestImage(const QString &id, QSize *size, const QSize &requested_size)
 {
-	Q_UNUSED(requested_size)
+	try {
+		Q_UNUSED(requested_size)
 
-	const std::string id_str = id.toStdString();
-	const std::vector<std::string> id_list = string::split(id_str, '/');
+		const std::string id_str = id.toStdString();
+		const std::vector<std::string> id_list = string::split(id_str, '/');
 
-	size_t index = 0;
-	const std::string &type_identifier = id_list.at(index);
-	const unit_type *unit_type = unit_type::get(type_identifier);
+		size_t index = 0;
+		const std::string &type_identifier = id_list.at(index);
+		const unit_type *unit_type = unit_type::get(type_identifier);
 
-	++index;
+		++index;
 
-	const unit_type_variation *variation = nullptr;
-	if ((index + 1) < id_list.size()) {
-		const std::string &variation_identifier = id_list.at(index);
-		variation = unit_type->GetVariation(variation_identifier);
-		if (variation != nullptr) {
-			++index;
+		const unit_type_variation *variation = nullptr;
+		if ((index + 1) < id_list.size()) {
+			const std::string &variation_identifier = id_list.at(index);
+			variation = unit_type->GetVariation(variation_identifier);
+			if (variation != nullptr) {
+				++index;
+			}
 		}
+
+		const std::string &frame_str = id_list.back();
+		const int frame_index = std::stoi(frame_str);
+
+		std::shared_ptr<CPlayerColorGraphic> graphics;
+
+		if (variation != nullptr) {
+			graphics = variation->Sprite;
+		} else {
+			graphics = unit_type->Sprite;
+		}
+
+		graphics->get_load_mutex().lock();
+
+		if (!graphics->IsLoaded()) {
+			graphics->get_load_mutex().unlock();
+
+			engine_interface::get()->sync([&graphics]() {
+				//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
+				graphics->Load(false, defines::get()->get_scale_factor());
+			});
+		} else {
+			graphics->get_load_mutex().unlock();
+		}
+
+		const QImage &original_image = graphics->get_image();
+		const QSize &original_frame_size = graphics->get_original_frame_size();
+
+		const QPoint frame_pos = image::get_frame_pos(original_image, original_frame_size, frame_index);
+
+		QImage image;
+
+		if (defines::get()->get_scale_factor() > 1) {
+			image = image::scale_frame(original_image, frame_pos.x(), frame_pos.y(), defines::get()->get_scale_factor(), original_frame_size);
+		} else {
+			image = image::get_frame(original_image, frame_pos.x(), frame_pos.y(), original_frame_size);
+		}
+
+		if (image.isNull()) {
+			throw std::runtime_error("Unit image for ID \"" + id_str + "\" is null.");
+		}
+
+		if (size != nullptr) {
+			*size = image.size();
+		}
+
+		return image;
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		return QImage();
 	}
-
-	const std::string &frame_str = id_list.back();
-	const int frame_index = std::stoi(frame_str);
-
-	std::shared_ptr<CPlayerColorGraphic> graphics;
-
-	if (variation != nullptr) {
-		graphics = variation->Sprite;
-	} else {
-		graphics = unit_type->Sprite;
-	}
-
-	graphics->get_load_mutex().lock();
-
-	if (!graphics->IsLoaded()) {
-		graphics->get_load_mutex().unlock();
-
-		engine_interface::get()->sync([&graphics]() {
-			//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
-			graphics->Load(false, defines::get()->get_scale_factor());
-		});
-	} else {
-		graphics->get_load_mutex().unlock();
-	}
-
-	const QImage &original_image = graphics->get_image();
-	const QSize &original_frame_size = graphics->get_original_frame_size();
-
-	const QPoint frame_pos = image::get_frame_pos(original_image, original_frame_size, frame_index);
-
-	QImage image;
-
-	if (defines::get()->get_scale_factor() > 1) {
-		image = image::scale_frame(original_image, frame_pos.x(), frame_pos.y(), defines::get()->get_scale_factor(), original_frame_size);
-	} else {
-		image = image::get_frame(original_image, frame_pos.x(), frame_pos.y(), original_frame_size);
-	}
-
-	if (image.isNull()) {
-		log::log_error("Unit image for ID \"" + id_str + "\" is null.");
-	}
-
-	if (size != nullptr) {
-		*size = image.size();
-	}
-
-	return image;
 }
 
 }
