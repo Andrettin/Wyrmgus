@@ -559,10 +559,12 @@ void GameMainLoop()
 
 	game::get()->set_running(true);
 
-	engine_interface::get()->set_waiting_for_interface(true);
-	engine_interface::get()->get_map_view_created_future().wait();
-	engine_interface::get()->reset_map_view_created_promise();
-	engine_interface::get()->set_waiting_for_interface(false);
+	if (engine_interface::get()->is_qml_window_active()) {
+		engine_interface::get()->set_waiting_for_interface(true);
+		engine_interface::get()->get_map_view_created_future().wait();
+		engine_interface::get()->reset_map_view_created_promise();
+		engine_interface::get()->set_waiting_for_interface(false);
+	}
 
 	SingleGameLoop();
 
