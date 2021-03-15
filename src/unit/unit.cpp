@@ -3730,7 +3730,7 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 */
 //Wyrmgus start
 //void CUnit::MoveToXY(const Vec2i &pos)
-void CUnit::MoveToXY(const Vec2i &pos, int z)
+void CUnit::MoveToXY(const Vec2i &pos, const int z)
 //Wyrmgus end
 {
 	MapUnmarkUnitSight(*this);

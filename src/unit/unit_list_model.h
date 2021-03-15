@@ -123,33 +123,9 @@ public:
 		emit dataChanged(index, index);
 	}
 
-	void update_unit_image(const int unit_index, const unit_type *unit_type, const unit_type_variation *variation, const int frame, const player_color *player_color)
-	{
-		unit_data *unit_data = this->get_unit_data(unit_index);
-		unit_data->image_source = unit_list_model::build_image_source(unit_type, variation, frame, player_color);
-		unit_data->mirrored_image = frame < 0;
-
-		const QModelIndex index = this->index(unit_index);
-		emit dataChanged(index, index, { static_cast<int>(role::image_source), static_cast<int>(role::mirrored_image) });
-	}
-
-	void update_unit_tile_pos(const int unit_index, const QPoint &tile_pos)
-	{
-		unit_data *unit_data = this->get_unit_data(unit_index);
-		unit_data->tile_pos = tile_pos;
-
-		const QModelIndex index = this->index(unit_index);
-		emit dataChanged(index, index, { static_cast<int>(role::tile_pos) });
-	}
-
-	void update_unit_tile_size(const int unit_index, const QSize &tile_size)
-	{
-		unit_data *unit_data = this->get_unit_data(unit_index);
-		unit_data->tile_size = tile_size;
-
-		const QModelIndex index = this->index(unit_index);
-		emit dataChanged(index, index, { static_cast<int>(role::tile_size) });
-	}
+	void update_unit_image(const int unit_index, const unit_type *unit_type, const unit_type_variation *variation, const int frame, const player_color *player_color);
+	void update_unit_tile_pos(const int unit_index, const QPoint &tile_pos);
+	void update_unit_tile_size(const int unit_index, const QSize &tile_size);
 
 signals:
 	void map_layer_changed();

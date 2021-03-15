@@ -180,7 +180,7 @@ public:
 	/// Move unit to tile(pos). (Do special stuff : vision, cachelist, pathfinding)
 	//Wyrmgus start
 //	void MoveToXY(const Vec2i &pos);
-	void MoveToXY(const Vec2i &pos, int z);
+	void MoveToXY(const Vec2i &pos, const int z);
 	//Wyrmgus end
 	/// Add a unit inside a container. Only deal with list stuff.
 	void AddInContainer(CUnit &host);

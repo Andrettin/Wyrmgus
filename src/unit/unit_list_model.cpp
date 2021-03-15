@@ -36,6 +36,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "util/exception_util.h"
+#include "util/log_util.h"
 
 namespace wyrmgus {
 
@@ -177,6 +178,52 @@ void unit_list_model::add_unit_data(const int unit_index, const unit_type *unit_
 
 	const QModelIndex index = this->index(unit_index);
 	emit dataChanged(index, index);
+}
+
+void unit_list_model::update_unit_image(const int unit_index, const unit_type *unit_type, const unit_type_variation *variation, const int frame, const player_color *player_color)
+{
+	unit_data *unit_data = this->get_unit_data(unit_index);
+
+	if (unit_data == nullptr) {
+		log::log_error("Tried to update the image for unit " + std::to_string(unit_index) + ", of type \"" + unit_type->get_identifier() + "\", but it is not a part of the unit list model.");
+		return;
+	}
+
+	unit_data->image_source = unit_list_model::build_image_source(unit_type, variation, frame, player_color);
+	unit_data->mirrored_image = frame < 0;
+
+	const QModelIndex index = this->index(unit_index);
+	emit dataChanged(index, index, { static_cast<int>(role::image_source), static_cast<int>(role::mirrored_image) });
+}
+
+void unit_list_model::update_unit_tile_pos(const int unit_index, const QPoint &tile_pos)
+{
+	unit_data *unit_data = this->get_unit_data(unit_index);
+
+	if (unit_data == nullptr) {
+		log::log_error("Tried to update the tile position for unit " + std::to_string(unit_index) + ", but it is not a part of the unit list model.");
+		return;
+	}
+
+	unit_data->tile_pos = tile_pos;
+
+	const QModelIndex index = this->index(unit_index);
+	emit dataChanged(index, index, { static_cast<int>(role::tile_pos) });
+}
+
+void unit_list_model::update_unit_tile_size(const int unit_index, const QSize &tile_size)
+{
+	unit_data *unit_data = this->get_unit_data(unit_index);
+
+	if (unit_data == nullptr) {
+		log::log_error("Tried to update the tile size for unit " + std::to_string(unit_index) + ", but it is not a part of the unit list model.");
+		return;
+	}
+
+	unit_data->tile_size = tile_size;
+
+	const QModelIndex index = this->index(unit_index);
+	emit dataChanged(index, index, { static_cast<int>(role::tile_size) });
 }
 
 }
