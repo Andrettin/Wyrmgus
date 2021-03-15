@@ -557,7 +557,7 @@ void GameMainLoop()
 	}
 	//Wyrmgus end
 
-	emit game::get()->started();
+	game::get()->set_running(true);
 
 	engine_interface::get()->set_waiting_for_interface(true);
 	engine_interface::get()->get_map_view_created_future().wait();

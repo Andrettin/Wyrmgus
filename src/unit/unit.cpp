@@ -1246,7 +1246,7 @@ bool CUnit::can_have_variation(const wyrmgus::unit_type_variation *variation) co
 	return true;
 }
 
-void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, bool ignore_old_variation, int image_layer)
+void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, const bool ignore_old_variation, const int image_layer, const bool emit_signal)
 {
 	std::string priority_variation;
 	if (image_layer == -1) {
@@ -1288,11 +1288,11 @@ void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, bool ignore_old_
 		}
 	}
 	if (type_variations.size() > 0) {
-		this->SetVariation(type_variations[SyncRand(type_variations.size())], image_layer);
+		this->SetVariation(vector::get_random(type_variations), image_layer, emit_signal);
 	}
 }
 
-void CUnit::SetVariation(const wyrmgus::unit_type_variation *new_variation, const int image_layer)
+void CUnit::SetVariation(const wyrmgus::unit_type_variation *new_variation, const int image_layer, const bool emit_signal)
 {
 	if (image_layer == -1) {
 		if (
@@ -1302,6 +1302,10 @@ void CUnit::SetVariation(const wyrmgus::unit_type_variation *new_variation, cons
 			this->Frame = this->Type->StillFrame;
 		}
 		this->Variation = new_variation ? new_variation->get_index() : 0;
+
+		if (emit_signal && this->MapLayer != nullptr && !this->Removed && game::get()->is_running()) {
+			emit this->MapLayer->unit_image_changed(UnitNumber(*this), this->Type, this->GetVariation(), this->Frame, this->get_player_color());
+		}
 	} else {
 		this->LayerVariation[image_layer] = new_variation ? new_variation->get_index() : -1;
 	}
@@ -3752,7 +3756,11 @@ void CUnit::MoveToXY(const Vec2i &pos, const int z)
 	//  Recalculate the seen count.
 	UnitCountSeen(*this);
 	MapMarkUnitSight(*this);
-	
+
+	if (game::get()->is_running()) {
+		emit this->MapLayer->unit_tile_pos_changed(UnitNumber(*this), this->tilePos);
+	}
+
 	//Wyrmgus start
 	// if there is a trap in the new tile, trigger it
 	if ((this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow && this->Type->UnitType != UnitTypeType::Space) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
@@ -3776,7 +3784,7 @@ void CUnit::MoveToXY(const Vec2i &pos, const int z)
 **
 **  @param pos  map tile position.
 */
-void CUnit::Place(const Vec2i &pos, int z)
+void CUnit::Place(const Vec2i &pos, const int z)
 {
 	Assert(Removed);
 	
@@ -3803,7 +3811,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 	// Correct directions for wall units
 	if (this->Type->BoolFlag[WALL_INDEX].value && this->CurrentAction() != UnitAction::Built) {
 		CorrectWallDirections(*this);
-		UnitUpdateHeading(*this);
+		UnitUpdateHeading(*this, false);
 		CorrectWallNeighBours(*this);
 	}
 
@@ -3845,7 +3853,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 		if (variation != nullptr) {
 			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, or if this is the first position the unit is being placed in, repick the unit's variation
 			if (old_map_layer == nullptr || !this->can_have_variation(variation)) {
-				this->ChooseVariation();
+				this->ChooseVariation(nullptr, false, -1, false);
 			}
 		}
 
@@ -3858,7 +3866,9 @@ void CUnit::Place(const Vec2i &pos, int z)
 	}
 	//Wyrmgus end
 
-	emit this->MapLayer->unit_added(UnitNumber(*this), this->Type, this->GetVariation(), this->Frame, this->get_player_color(), this->tilePos);
+	if (game::get()->is_running()) {
+		emit this->MapLayer->unit_added(UnitNumber(*this), this->Type, this->GetVariation(), this->Frame, this->get_player_color(), this->tilePos);
+	}
 }
 
 /**
@@ -4131,7 +4141,9 @@ void CUnit::Remove(CUnit *host)
 		UnitUnderCursor = nullptr;
 	}
 
-	emit this->MapLayer->unit_removed(UnitNumber(*this));
+	if (game::get()->is_running()) {
+		emit this->MapLayer->unit_removed(UnitNumber(*this));
+	}
 }
 
 /**
@@ -5109,7 +5121,7 @@ int DirectionToHeading(const Vec2i &delta)
 /**
 **  Update sprite frame for new heading.
 */
-void UnitUpdateHeading(CUnit &unit)
+void UnitUpdateHeading(CUnit &unit, const bool emit_signal)
 {
 	//Wyrmgus start
 	//fix direction if it does not correspond to one of the defined directions
@@ -5143,6 +5155,10 @@ void UnitUpdateHeading(CUnit &unit)
 	}
 	if (neg && !unit.Frame && unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		unit.Frame = -1;
+	}
+
+	if (emit_signal && unit.MapLayer != nullptr && !unit.Removed && game::get()->is_running()) {
+		emit unit.MapLayer->unit_image_changed(UnitNumber(unit), unit.Type, unit.GetVariation(), unit.Frame, unit.get_player_color());
 	}
 }
 

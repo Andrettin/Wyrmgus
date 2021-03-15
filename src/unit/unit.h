@@ -174,7 +174,7 @@ public:
 	/// Place a unit on map
 	//Wyrmgus start
 //	void Place(const Vec2i &pos);
-	void Place(const Vec2i &pos, int z);
+	void Place(const Vec2i &pos, const int z);
 	//Wyrmgus end
 
 	/// Move unit to tile(pos). (Do special stuff : vision, cachelist, pathfinding)
@@ -225,8 +225,8 @@ public:
 	bool CheckTerrainForVariation(const wyrmgus::unit_type_variation *variation) const;
 	bool CheckSeasonForVariation(const wyrmgus::unit_type_variation *variation) const;
 	bool can_have_variation(const wyrmgus::unit_type_variation *variation) const;
-	void ChooseVariation(const wyrmgus::unit_type *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
-	void SetVariation(const wyrmgus::unit_type_variation *new_variation, int image_layer = -1);
+	void ChooseVariation(const wyrmgus::unit_type *new_type = nullptr, const bool ignore_old_variation = false, const int image_layer = -1, const bool emit_signal = true);
+	void SetVariation(const wyrmgus::unit_type_variation *new_variation, const int image_layer = -1, const bool emit_signal = true);
 	const wyrmgus::unit_type_variation *GetVariation() const;
 	const wyrmgus::unit_type_variation *GetLayerVariation(const unsigned int image_layer) const;
 	void UpdateButtonIcons();
@@ -957,7 +957,7 @@ extern void CorrectWallDirections(CUnit &unit);
 extern void CorrectWallNeighBours(CUnit &unit);
 
 /// Update frame from heading
-extern void UnitUpdateHeading(CUnit &unit);
+extern void UnitUpdateHeading(CUnit &unit, const bool emit_signal = true);
 /// Heading and frame from delta direction
 extern void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta);
 

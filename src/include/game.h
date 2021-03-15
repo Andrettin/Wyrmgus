@@ -54,6 +54,26 @@ public:
 	game();
 	~game();
 
+	bool is_running() const
+	{
+		return this->running;
+	}
+
+	void set_running(const bool running)
+	{
+		if (running == this->is_running()) {
+			return;
+		}
+
+		this->running = running;
+
+		if (running) {
+			emit started();
+		} else {
+			emit stopped();
+		}
+	}
+
 	campaign *get_current_campaign() const
 	{
 		return this->current_campaign;
@@ -129,8 +149,10 @@ public:
 
 signals:
 	void started();
+	void stopped();
 
 private:
+	bool running = false;
 	campaign *current_campaign = nullptr;
 	QDateTime current_date;
 	uint64_t current_total_hours = 0; //the total in-game hours
