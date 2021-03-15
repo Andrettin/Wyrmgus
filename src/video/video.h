@@ -204,6 +204,53 @@ public:
 		return this->image;
 	}
 
+	const QImage *get_scaled_image(const wyrmgus::player_color *player_color = nullptr) const
+	{
+		if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
+			if (!this->scaled_image.isNull()) {
+				return &this->scaled_image;
+			}
+		} else {
+			const auto find_iterator = this->scaled_player_color_images.find(player_color);
+			if (find_iterator != this->scaled_player_color_images.end()) {
+				return &find_iterator->second;
+			}
+		}
+
+		return nullptr;
+	}
+
+	QImage create_scaled_image(const wyrmgus::player_color *player_color);
+
+	const QImage &get_or_create_scaled_image(const wyrmgus::player_color *player_color)
+	{
+		if (player_color != nullptr) {
+			if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
+				return this->get_or_create_scaled_image(nullptr);
+			}
+		}
+
+		const QImage *image = this->get_scaled_image(player_color);
+
+		if (image == nullptr) {
+			QImage new_image = this->create_scaled_image(player_color);
+
+			if (player_color == nullptr) {
+				this->scaled_image = std::move(new_image);
+			} else {
+				this->scaled_player_color_images[player_color] = std::move(new_image);
+			}
+
+			image = this->get_scaled_image(player_color);
+		}
+
+		if (image == nullptr) {
+			throw std::runtime_error("Failed to get or create scaled frame.");
+		}
+
+		return *image;
+	}
+
 	const QImage *get_scaled_frame(const size_t frame_index, const wyrmgus::player_color *player_color = nullptr) const
 	{
 		if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
@@ -236,15 +283,6 @@ public:
 		}
 
 		return *image;
-	}
-
-	void set_scaled_frames(std::vector<QImage> &&frames, const wyrmgus::player_color *player_color)
-	{
-		if (player_color == nullptr) {
-			this->scaled_frames = std::move(frames);
-		} else {
-			this->scaled_player_color_frames[player_color] = std::move(frames);
-		}
 	}
 
 	const wyrmgus::player_color *get_conversible_player_color() const;
@@ -285,6 +323,8 @@ public:
 	std::string HashFile;      /// Filename used in hash
 private:
 	QImage image;
+	QImage scaled_image;
+	std::map<const wyrmgus::player_color *, QImage> scaled_player_color_images;
 	std::vector<QImage> scaled_frames;
 	std::map<const wyrmgus::player_color *, std::vector<QImage>> scaled_player_color_frames;
 public:

@@ -1278,12 +1278,11 @@ QPoint CGraphic::get_frame_pos(const int frame_index) const
 	return wyrmgus::point::from_index(frame_index, this->get_frames_per_row());
 }
 
-void CGraphic::create_scaled_frames(const wyrmgus::player_color *player_color)
+QImage CGraphic::create_scaled_image(const wyrmgus::player_color *player_color)
 {
 	if (player_color != nullptr) {
 		if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-			this->create_scaled_frames(nullptr);
-			return;
+			return this->create_scaled_image(nullptr);
 		}
 	}
 
@@ -1301,6 +1300,20 @@ void CGraphic::create_scaled_frames(const wyrmgus::player_color *player_color)
 	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
 		image = image::scale(image, scale_factor, this->get_original_frame_size());
 	}
+
+	return image;
+}
+
+void CGraphic::create_scaled_frames(const wyrmgus::player_color *player_color)
+{
+	if (player_color != nullptr) {
+		if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
+			this->create_scaled_frames(nullptr);
+			return;
+		}
+	}
+
+	QImage image = this->create_scaled_image(player_color);
 
 	std::vector<QImage> frames = image::to_frames(image, this->get_frame_size());
 

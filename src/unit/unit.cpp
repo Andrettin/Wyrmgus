@@ -1304,7 +1304,8 @@ void CUnit::SetVariation(const wyrmgus::unit_type_variation *new_variation, cons
 		this->Variation = new_variation ? new_variation->get_index() : 0;
 
 		if (emit_signal && this->MapLayer != nullptr && !this->Removed && game::get()->is_running()) {
-			emit this->MapLayer->unit_image_changed(UnitNumber(*this), this->Type, this->GetVariation(), this->Frame, this->get_player_color());
+			emit this->MapLayer->unit_image_changed(UnitNumber(*this), this->Type, this->GetVariation(), this->get_player_color());
+			emit this->MapLayer->unit_frame_changed(UnitNumber(*this), this->Frame);
 		}
 	} else {
 		this->LayerVariation[image_layer] = new_variation ? new_variation->get_index() : -1;
@@ -5158,7 +5159,7 @@ void UnitUpdateHeading(CUnit &unit, const bool emit_signal)
 	}
 
 	if (emit_signal && unit.MapLayer != nullptr && !unit.Removed && game::get()->is_running()) {
-		emit unit.MapLayer->unit_image_changed(UnitNumber(unit), unit.Type, unit.GetVariation(), unit.Frame, unit.get_player_color());
+		emit unit.MapLayer->unit_frame_changed(UnitNumber(unit), unit.Frame);
 	}
 }
 

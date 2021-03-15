@@ -40,17 +40,15 @@
 
 namespace wyrmgus {
 
-QString unit_list_model::build_image_source(const unit_type *unit_type, const unit_type_variation *variation, const int frame, const player_color *player_color)
+QString unit_list_model::build_image_source(const unit_type *unit_type, const unit_type_variation *variation, const player_color *player_color)
 {
-	QString image_source = unit_type->get_identifier_qstring() + "/";
+	QString image_source = unit_type->get_identifier_qstring();
 
 	if (variation != nullptr && variation->Sprite != nullptr) {
-		image_source += QString::fromStdString(variation->get_identifier()) + "/";
+		image_source += "/" + QString::fromStdString(variation->get_identifier());
 	}
 
-	image_source += player_color->get_identifier_qstring() + "/";
-
-	image_source += QString::number(std::abs(frame));
+	image_source += "/" + player_color->get_identifier_qstring();
 
 	return image_source;
 }
@@ -79,6 +77,18 @@ QVariant unit_list_model::data(const QModelIndex &index, const int role) const
 					return unit_data->image_source;
 				} else {
 					return QString();
+				}
+			case role::frame_size:
+				if (unit_data != nullptr) {
+					return unit_data->frame_size;
+				} else {
+					return QSize(0, 0);
+				}
+			case role::frame:
+				if (unit_data != nullptr) {
+					return unit_data->frame;
+				} else {
+					return 0;
 				}
 			case role::mirrored_image:
 				if (unit_data != nullptr) {
@@ -147,7 +157,16 @@ void unit_list_model::set_map_layer(const int z)
 
 			unit_data unit_data;
 
-			unit_data.image_source = unit_list_model::build_image_source(unit->Type, unit->GetVariation(), unit->Frame, unit->get_player_color());
+			const unit_type_variation *variation = unit->GetVariation();
+			unit_data.image_source = unit_list_model::build_image_source(unit->Type, variation, unit->get_player_color());
+
+			if (variation != nullptr && variation->get_frame_size() != QSize(0, 0)) {
+				unit_data.frame_size = variation->get_frame_size();
+			} else {
+				unit_data.frame_size = unit->Type->get_frame_size();
+			}
+
+			unit_data.frame = std::abs(unit->Frame);
 			unit_data.mirrored_image = unit->Frame < 0;
 			unit_data.tile_pos = unit->tilePos;
 			unit_data.tile_size = unit->get_tile_size();
@@ -158,6 +177,7 @@ void unit_list_model::set_map_layer(const int z)
 		connect(this->map_layer, &CMapLayer::unit_added, this, &unit_list_model::add_unit_data);
 		connect(this->map_layer, &CMapLayer::unit_removed, this, &unit_list_model::remove_unit_data);
 		connect(this->map_layer, &CMapLayer::unit_image_changed, this, &unit_list_model::update_unit_image);
+		connect(this->map_layer, &CMapLayer::unit_frame_changed, this, &unit_list_model::update_unit_frame);
 		connect(this->map_layer, &CMapLayer::unit_tile_pos_changed, this, &unit_list_model::update_unit_tile_pos);
 		connect(this->map_layer, &CMapLayer::unit_tile_size_changed, this, &unit_list_model::update_unit_tile_size);
 	}
@@ -169,7 +189,15 @@ void unit_list_model::add_unit_data(const int unit_index, const unit_type *unit_
 {
 	unit_data unit_data;
 
-	unit_data.image_source = unit_list_model::build_image_source(unit_type, variation, frame, player_color);
+	unit_data.image_source = unit_list_model::build_image_source(unit_type, variation, player_color);
+
+	if (variation != nullptr && variation->get_frame_size() != QSize(0, 0)) {
+		unit_data.frame_size = variation->get_frame_size();
+	} else {
+		unit_data.frame_size = unit_type->get_frame_size();
+	}
+
+	unit_data.frame = std::abs(frame);
 	unit_data.mirrored_image = frame < 0;
 	unit_data.tile_pos = tile_pos;
 	unit_data.tile_size = unit_type->get_tile_size();
@@ -180,7 +208,7 @@ void unit_list_model::add_unit_data(const int unit_index, const unit_type *unit_
 	emit dataChanged(index, index);
 }
 
-void unit_list_model::update_unit_image(const int unit_index, const unit_type *unit_type, const unit_type_variation *variation, const int frame, const player_color *player_color)
+void unit_list_model::update_unit_image(const int unit_index, const unit_type *unit_type, const unit_type_variation *variation, const player_color *player_color)
 {
 	unit_data *unit_data = this->get_unit_data(unit_index);
 
@@ -189,11 +217,32 @@ void unit_list_model::update_unit_image(const int unit_index, const unit_type *u
 		return;
 	}
 
-	unit_data->image_source = unit_list_model::build_image_source(unit_type, variation, frame, player_color);
+	unit_data->image_source = unit_list_model::build_image_source(unit_type, variation, player_color);
+
+	if (variation != nullptr && variation->get_frame_size() != QSize(0, 0)) {
+		unit_data->frame_size = variation->get_frame_size();
+	} else {
+		unit_data->frame_size = unit_type->get_frame_size();
+	}
+
+	const QModelIndex index = this->index(unit_index);
+	emit dataChanged(index, index, { static_cast<int>(role::image_source), static_cast<int>(role::frame_size) });
+}
+
+void unit_list_model::update_unit_frame(const int unit_index, const int frame)
+{
+	unit_data *unit_data = this->get_unit_data(unit_index);
+
+	if (unit_data == nullptr) {
+		log::log_error("Tried to update the frame for unit " + std::to_string(unit_index) + ", but it is not a part of the unit list model.");
+		return;
+	}
+
+	unit_data->frame = std::abs(frame);
 	unit_data->mirrored_image = frame < 0;
 
 	const QModelIndex index = this->index(unit_index);
-	emit dataChanged(index, index, { static_cast<int>(role::image_source), static_cast<int>(role::mirrored_image) });
+	emit dataChanged(index, index, { static_cast<int>(role::frame), static_cast<int>(role::mirrored_image) });
 }
 
 void unit_list_model::update_unit_tile_pos(const int unit_index, const QPoint &tile_pos)

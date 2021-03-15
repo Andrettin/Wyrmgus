@@ -46,6 +46,8 @@ class unit_list_model : public QAbstractListModel
 public:
 	enum class role {
 		image_source = Qt::UserRole,
+		frame_size,
+		frame,
 		mirrored_image,
 		tile_pos,
 		tile_size
@@ -53,12 +55,14 @@ public:
 
 	struct unit_data {
 		QString image_source;
+		QSize frame_size = QSize(0, 0);
+		int frame = 0;
 		bool mirrored_image = false;
 		QPoint tile_pos = QPoint(0, 0);
 		QSize tile_size = QSize(0, 0);
 	};
 
-	static QString build_image_source(const unit_type *unit_type, const unit_type_variation *variation, const int frame, const player_color *player_color);
+	static QString build_image_source(const unit_type *unit_type, const unit_type_variation *variation, const player_color *player_color);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override final;
 
@@ -83,6 +87,8 @@ public:
 		QHash<int, QByteArray> role_names;
 
 		role_names.insert(static_cast<int>(role::image_source), "image_source");
+		role_names.insert(static_cast<int>(role::frame_size), "frame_size");
+		role_names.insert(static_cast<int>(role::frame), "frame");
 		role_names.insert(static_cast<int>(role::mirrored_image), "mirrored_image");
 		role_names.insert(static_cast<int>(role::tile_pos), "tile_pos");
 		role_names.insert(static_cast<int>(role::tile_size), "tile_size");
@@ -123,7 +129,8 @@ public:
 		emit dataChanged(index, index);
 	}
 
-	void update_unit_image(const int unit_index, const unit_type *unit_type, const unit_type_variation *variation, const int frame, const player_color *player_color);
+	void update_unit_image(const int unit_index, const unit_type *unit_type, const unit_type_variation *variation, const player_color *player_color);
+	void update_unit_frame(const int unit_index, const int frame);
 	void update_unit_tile_pos(const int unit_index, const QPoint &tile_pos);
 	void update_unit_tile_size(const int unit_index, const QSize &tile_size);
 

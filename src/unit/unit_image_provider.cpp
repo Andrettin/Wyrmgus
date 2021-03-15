@@ -72,9 +72,6 @@ QImage unit_image_provider::requestImage(const QString &id, QSize *size, const Q
 			}
 		}
 
-		const std::string &frame_str = id_list.back();
-		const int frame_index = std::stoi(frame_str);
-
 		std::shared_ptr<CPlayerColorGraphic> graphics;
 
 		if (variation != nullptr && variation->Sprite != nullptr) {
@@ -100,7 +97,7 @@ QImage unit_image_provider::requestImage(const QString &id, QSize *size, const Q
 			graphics->get_load_mutex().unlock();
 		}
 
-		const QImage &image = graphics->get_or_create_scaled_frame(frame_index, player_color);
+		const QImage &image = graphics->get_or_create_scaled_image(player_color);
 
 		if (image.isNull()) {
 			throw std::runtime_error("Unit image for ID \"" + id_str + "\" is null.");

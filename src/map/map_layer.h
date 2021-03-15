@@ -209,7 +209,8 @@ signals:
 
 	void unit_added(int unit_index, const unit_type *unit_type, const unit_type_variation *variation, int frame, const player_color *player_color, QPoint tile_pos) const;
 	void unit_removed(int unit_index) const;
-	void unit_image_changed(int unit_index, const unit_type *unit_type, const unit_type_variation *variation, int frame, const player_color *player_color) const;
+	void unit_image_changed(int unit_index, const unit_type *unit_type, const unit_type_variation *variation, const player_color *player_color) const;
+	void unit_frame_changed(int unit_index, int frame) const;
 	void unit_tile_pos_changed(int unit_index, QPoint tile_pos) const;
 	void unit_tile_size_changed(int unit_index, QSize tile_size) const;
 
