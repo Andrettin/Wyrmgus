@@ -145,16 +145,6 @@ public:
 		this->waiting_for_interface = value;
 	}
 
-	WId get_sdl_window_id() const
-	{
-		return this->sdl_window_id;
-	}
-
-	void set_sdl_window_id(const WId id)
-	{
-		this->sdl_window_id = id;
-	}
-
 signals:
 	void running_changed();
 
@@ -165,7 +155,6 @@ private:
 	bool qml_window_active = false;
 	std::promise<void> map_view_created_promise;
 	std::atomic<bool> waiting_for_interface = false;
-	WId sdl_window_id;
 };
 
 }

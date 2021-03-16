@@ -528,7 +528,6 @@ set(video_SRCS
 	src/video/render_context.cpp
 	src/video/renderer.cpp
 	src/video/sdl.cpp
-	src/video/sdl_window_painted_item.cpp
 	src/video/sprite.cpp
 	src/video/video.cpp
 )
@@ -1044,7 +1043,6 @@ set(wyrmgus_video_HDRS
 	src/video/intern_video.h
 	src/video/render_context.h
 	src/video/renderer.h
-	src/video/sdl_window_painted_item.h
 	src/video/video.h
 )
 

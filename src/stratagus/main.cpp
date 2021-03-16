@@ -43,7 +43,6 @@
 #include "util/log_util.h"
 #include "version.h"
 #include "video/frame_buffer_object.h"
-#include "video/sdl_window_painted_item.h"
 
 #include <QDir>
 #include <QIcon>
@@ -97,7 +96,6 @@ int main(int argc, char **argv)
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
 		qmlRegisterType<map_grid_model>("map_grid_model", 1, 0, "MapGridModel");
-		qmlRegisterType<sdl_window_painted_item>("sdl_window_painted_item", 1, 0, "SdlWindowPaintedItem");
 		qmlRegisterType<unit_list_model>("unit_list_model", 1, 0, "UnitListModel");
 
 		engine.rootContext()->setContextProperty("wyrmgus", engine_interface::get());
