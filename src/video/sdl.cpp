@@ -62,6 +62,7 @@
 #endif
 
 #include "editor.h"
+#include "engine_interface.h"
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -459,6 +460,7 @@ void InitVideoSdl()
 		signal(SIGABRT, CleanExit);
 #endif
 		// Set WindowManager Title
+
 		if (!FullGameName.empty()) {
 			SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
 		} else {
@@ -486,10 +488,12 @@ void InitVideoSdl()
 #endif
 		
 #endif
+
+		SDL_SysWMinfo info{};
+
 #ifdef USE_WIN32
 		HWND hwnd = nullptr;
 		HICON hicon = nullptr;
-		SDL_SysWMinfo info{};
 		SDL_VERSION(&info.version);
 
 		if (SDL_GetWMInfo(&info)) {
@@ -498,11 +502,18 @@ void InitVideoSdl()
 
 		if (hwnd) {
 			hicon = ExtractIcon(GetModuleHandle(nullptr), BINARY_NAME ".exe", 0);
+			engine_interface::get()->set_sdl_window_id(reinterpret_cast<WId>(hwnd));
 		}
 
 		if (hicon) {
 			SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
 			SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
+		}
+#elif defined(USE_X11)
+		SDL_SysWMinfo info{};
+
+		if (SDL_GetWMInfo(&info)) {
+			engine_interface::get()->set_sdl_window_id(reinterpret_cast<WId>(info.info.window));
 		}
 #endif
 	}
