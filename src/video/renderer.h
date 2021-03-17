@@ -87,13 +87,11 @@ public:
 		glDisable(GL_DEPTH_TEST);
 	}
 
-	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pos, const QSize &frame_size)
+	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pixel_pos, const QSize &frame_size)
 	{
-		this->blitter.bind();
-
 		const QSize target_size = this->get_target_size();
 
-		const QRect source_rect(frame_pos, frame_size);
+		const QRect source_rect(frame_pixel_pos, frame_size);
 		const QSize texture_size(texture->width(), texture->height());
 		const QMatrix3x3 source = QOpenGLTextureBlitter::sourceTransform(source_rect, texture_size, QOpenGLTextureBlitter::OriginBottomLeft);
 
@@ -101,8 +99,6 @@ public:
 		const QMatrix4x4 target = QOpenGLTextureBlitter::targetTransform(target_rect, QRect(QPoint(0, 0), target_size));
 
 		this->blitter.blit(texture->textureId(), target, source);
-
-		this->blitter.release();
 	}
 
 	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size);

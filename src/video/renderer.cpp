@@ -48,6 +48,8 @@ void renderer::render()
 {
 	this->init_opengl();
 
+	this->blitter.bind();
+
 	//run the posted OpenGL commands
 	render_context::get()->run(this);
 
@@ -57,6 +59,8 @@ void renderer::render()
 	this->blit_texture_frame(texture, QPoint(0, 0), image.size(), 1, QSize(46, 38));
 
 	this->fbo->window()->resetOpenGLState();
+
+	this->blitter.release();
 }
 
 QSizeF renderer::get_target_sizef() const
