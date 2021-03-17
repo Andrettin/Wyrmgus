@@ -95,7 +95,14 @@ void parameters::process()
 		qDebug() << cmd_parser.value("D").toInt();
 	}
 
-  /**
+	if (cmd_parser.isSet("c")) {
+		// FIXME Use appropriate type for properly suffix processing
+		QString filename { cmd_parser.value("c") };
+		if (!filename.endsWith(".lua")) filename += ".lua";
+		this->luaStartFilename = filename.toStdString();
+	}
+
+	/**
 			case 'c':
 				parameters->luaStartFilename = optarg;
 				if (strlen(optarg) > 4 &&
