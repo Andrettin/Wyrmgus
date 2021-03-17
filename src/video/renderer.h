@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <QOpenGLTexture>
 #include <QOpenGLTextureBlitter>
 
 namespace wyrmgus {
@@ -45,7 +46,66 @@ public:
 
     virtual void render() override;
 
-    void init_opengl() const;
+	QSizeF get_target_sizef() const;
+
+	QSize get_target_size() const
+	{
+		return this->get_target_sizef().toSize();
+	}
+
+    void init_opengl()
+    {
+		const QSizeF target_sizef = this->get_target_sizef();
+		const QSize target_size = target_sizef.toSize();
+
+		glViewport(0, 0, static_cast<GLsizei>(target_size.width()), static_cast<GLsizei>(target_size.height()));
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+
+		glOrtho(0, target_sizef.width(), target_sizef.height(), 0, -1, 1);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+
+		glTranslatef(0.375, 0.375, 0.);
+
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+		glClearDepth(1.0f);
+
+		glShadeModel(GL_FLAT);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_LINE_SMOOTH);
+		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	}
+
+	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pos, const QSize &frame_size)
+	{
+		this->blitter.bind();
+
+		const QSize target_size = this->get_target_size();
+
+		const QRect source_rect(frame_pos, frame_size);
+		const QSize texture_size(texture->width(), texture->height());
+		const QMatrix3x3 source = QOpenGLTextureBlitter::sourceTransform(source_rect, texture_size, QOpenGLTextureBlitter::OriginBottomLeft);
+
+		const QRect target_rect(QPoint(pos.x(), target_size.height() - frame_size.height() - pos.y()), frame_size);
+		const QMatrix4x4 target = QOpenGLTextureBlitter::targetTransform(target_rect, QRect(QPoint(0, 0), target_size));
+
+		this->blitter.blit(texture->textureId(), target, source);
+
+		this->blitter.release();
+	}
+
+	void blit_texture(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size)
+	{
+		this->blit_texture_frame(texture, pos, QPoint(0, 0), size);
+	}
 
 private:
     const frame_buffer_object *fbo = nullptr;
