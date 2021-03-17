@@ -2458,13 +2458,14 @@ void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraph
 				sprite->DrawPlayerColorFrameClipTransX(player_color, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
 				sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
+				sprite->render_frame(player_color, -frame, pos, true, render_commands);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 				sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
 				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
-				sprite->render_frame(player_color, frame, pos, render_commands);
+				sprite->render_frame(player_color, frame, pos, false, render_commands);
 			}
 		}
 	} else {
@@ -2479,7 +2480,7 @@ void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraph
 			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 		} else {
 			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
-			sprite->render_frame(player_color, frame, pos, render_commands);
+			sprite->render_frame(player_color, frame, pos, false, render_commands);
 		}
 	}
 	//Wyrmgus end

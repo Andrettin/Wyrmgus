@@ -1367,12 +1367,12 @@ void CGraphic::create_texture(const player_color *player_color)
 	}
 }
 
-void CGraphic::render_frame(const player_color *player_color, const int frame_index, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands)
+void CGraphic::render_frame(const player_color *player_color, const int frame_index, const QPoint &pixel_pos, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 //	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		render_commands.push_back([this, player_color, frame_index, pixel_pos](renderer *renderer) {
+		render_commands.push_back([this, player_color, frame_index, pixel_pos, flip](renderer *renderer) {
 			const QOpenGLTexture *texture = this->get_or_create_texture(player_color);
-			renderer->blit_texture_frame(texture, pixel_pos, this->get_size(), frame_index, this->get_frame_size());
+			renderer->blit_texture_frame(texture, pixel_pos, this->get_size(), frame_index, this->get_frame_size(), flip);
 		});
 	/*
 	} else {

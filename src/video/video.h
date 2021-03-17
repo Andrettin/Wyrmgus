@@ -360,7 +360,7 @@ public:
 		return this->load_mutex;
 	}
 
-	void render_frame(const player_color *player_color, const int frame_index, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands);
+	void render_frame(const player_color *player_color, const int frame_index, const QPoint &pixel_pos, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands);
 
 private:
 	std::filesystem::path filepath;
