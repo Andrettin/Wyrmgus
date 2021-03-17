@@ -102,6 +102,8 @@ public:
 		this->blitter.release();
 	}
 
+	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size);
+
 	void blit_texture(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size)
 	{
 		this->blit_texture_frame(texture, pos, QPoint(0, 0), size);

@@ -28,6 +28,7 @@
 
 #include "video/renderer.h"
 
+#include "util/point_util.h"
 #include "video/frame_buffer_object.h"
 #include "video/render_context.h"
 
@@ -53,7 +54,7 @@ void renderer::render()
 	const QImage image("./graphics/icons/items/baronial_crown.png");
 	static QOpenGLTexture *texture = new QOpenGLTexture(image);
 
-	this->blit_texture_frame(texture, QPoint(0, 0), QPoint(46, 38), QSize(46, 38));
+	this->blit_texture_frame(texture, QPoint(0, 0), image.size(), 1, QSize(46, 38));
 
 	this->fbo->window()->resetOpenGLState();
 }
@@ -61,6 +62,12 @@ void renderer::render()
 QSizeF renderer::get_target_sizef() const
 {
 	return this->fbo->size();
+}
+
+void renderer::blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size)
+{
+	const int frames_per_row = size.width() / frame_size.width();
+	this->blit_texture_frame(texture, pos, point::from_index(frame_index, frames_per_row), frame_size);
 }
 
 }
