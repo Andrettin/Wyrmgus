@@ -204,7 +204,6 @@ void DrawTexture(const CGraphic *g, const GLuint *textures,
 			glDisableClientState(GL_VERTEX_ARRAY);
 #endif
 
-#ifdef USE_OPENGL
 			glBegin(GL_QUADS);
 			glTexCoord2f(clip_tx_beg, clip_ty_beg);
 			glVertex2i(clip_sx_beg, clip_sy_beg);
@@ -215,8 +214,6 @@ void DrawTexture(const CGraphic *g, const GLuint *textures,
 			glTexCoord2f(clip_tx_end, clip_ty_beg);
 			glVertex2i(clip_sx_end, clip_sy_beg);
 			glEnd();
-#endif
-
 		}
 	}
 }

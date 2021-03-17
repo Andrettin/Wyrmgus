@@ -32,6 +32,8 @@
 #include "video/render_context.h"
 
 #include <QOpenGLFramebufferObjectFormat>
+#include <QOpenGLFunctions>
+#include <QOpenGLTexture>
 #include <QQuickWindow>
 
 namespace wyrmgus {
@@ -45,10 +47,54 @@ QOpenGLFramebufferObject *renderer::createFramebufferObject(const QSize &size)
 
 void renderer::render()
 {
-	//run the posted OpenGL commands
-	render_context::get()->run();
+	this->init_opengl();
 
-	//this->fbo->window()->resetOpenGLState();
+	//run the posted OpenGL commands
+	//render_context::get()->run();
+
+	QImage image(512, 512, QImage::Format_RGBA8888);
+	image.fill(Qt::black);
+
+	static QOpenGLTexture *texture = new QOpenGLTexture(image.mirrored());
+
+	this->blitter.bind();
+
+	const QRect target_rect(QPoint(0, 0), image.size());
+	const QMatrix4x4 target = QOpenGLTextureBlitter::targetTransform(target_rect, QRect(QPoint(0, 0), this->fbo->size().toSize()));
+
+	this->blitter.blit(texture->textureId(), target, QOpenGLTextureBlitter::OriginTopLeft);
+
+	this->blitter.release();
+
+	this->fbo->window()->resetOpenGLState();
+}
+
+void renderer::init_opengl() const
+{
+	glViewport(0, 0, (GLsizei) this->fbo->size().width(), (GLsizei) this->fbo->size().height());
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glOrtho(0, this->fbo->size().width(), this->fbo->size().height(), 0, -1, 1);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glTranslatef(0.375, 0.375, 0.);
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	glClearDepth(1.0f);
+
+	glShadeModel(GL_FLAT);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 }
 
 }

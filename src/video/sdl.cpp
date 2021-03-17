@@ -104,10 +104,6 @@ const EventCallback *Callbacks = nullptr;
 static bool RegenerateScreen = false;
 bool IsSDLWindowVisible = true;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 // ARB_texture_compression
 #ifdef USE_OPENGL
 static PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
@@ -198,7 +194,6 @@ static bool IsExtensionSupported(const char *extension)
 static void InitOpenGLExtensions()
 {
 	// ARB_texture_compression
-#ifdef USE_OPENGL
 	if (IsExtensionSupported("GL_ARB_texture_compression")) {
 		glCompressedTexImage3DARB =
 			(PFNGLCOMPRESSEDTEXIMAGE3DARBPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompressedTexImage3DARB");
@@ -226,9 +221,6 @@ static void InitOpenGLExtensions()
 	} else {
 		GLTextureCompressionSupported = false;
 	}
-#else
-	GLTextureCompressionSupported = false;
-#endif
 }
 
 /**
@@ -236,30 +228,23 @@ static void InitOpenGLExtensions()
 */
 static void InitOpenGL()
 {
-
 	InitOpenGLExtensions();
 
 	glViewport(0, 0, (GLsizei)Video.ViewportWidth, (GLsizei)Video.ViewportHeight);
 
-#ifdef USE_OPENGL
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-#endif
 
 #ifdef USE_GLES
 	glOrthof(0.0f, (GLfloat)Video.Width, (GLfloat)Video.Height, 0.0f, -1.0f, 1.0f);
 #endif
 
-#ifdef USE_OPENGL
 	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
-#endif
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-#ifdef USE_OPENGL
 	glTranslatef(0.375, 0.375, 0.);
-#endif
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -267,9 +252,7 @@ static void InitOpenGL()
 	glClearDepthf(1.0f);
 #endif
 
-#ifdef USE_OPENGL
 	glClearDepth(1.0f);
-#endif
 
 	glShadeModel(GL_FLAT);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

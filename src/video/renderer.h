@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <QOpenGLTextureBlitter>
+
 namespace wyrmgus {
 
 class frame_buffer_object;
@@ -36,14 +38,18 @@ class renderer final : public QQuickFramebufferObject::Renderer
 public:
     explicit renderer(const frame_buffer_object *fbo) : fbo(fbo)
     {
+        blitter.create();
     }
 
     virtual QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) override;
 
     virtual void render() override;
 
+    void init_opengl() const;
+
 private:
     const frame_buffer_object *fbo = nullptr;
+    QOpenGLTextureBlitter blitter;
 };
 
 }
