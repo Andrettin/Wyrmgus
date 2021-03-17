@@ -49,7 +49,7 @@ void renderer::render()
 	this->init_opengl();
 
 	//run the posted OpenGL commands
-	//render_context::get()->run();
+	render_context::get()->run(this);
 
 	const QImage image("./graphics/icons/items/baronial_crown.png");
 	static QOpenGLTexture *texture = new QOpenGLTexture(image);

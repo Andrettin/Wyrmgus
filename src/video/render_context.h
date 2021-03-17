@@ -28,52 +28,42 @@
 
 #include "util/singleton.h"
 
-namespace boost::asio {
-	class io_context;
-}
-
 namespace wyrmgus {
+
+class renderer;
 
 //a singleton providing an OpenGL render context, to be used by the render which communicates with QtQuick
 class render_context final : public singleton<render_context>
 {
 public:
-	render_context();
-	~render_context();
+	void set_commands(std::vector<std::function<void(renderer *)>> &&commands);
 
-	void post(const std::function<void()> &function);
-
-private:
-	void post_internal(const std::function<void()> &function);
-
-public:
-	std::future<void> async(const std::function<void()> &function)
+	void run(renderer *renderer)
 	{
-		//execute the function in the current context too, temporarily
-		//function();
+		std::vector<std::function<void(wyrmgus::renderer *)>> commands;
 
-		std::shared_ptr<std::promise<void>> promise = std::make_unique<std::promise<void>>();
-		std::future<void> future = promise->get_future();
+		{
+			std::lock_guard<std::mutex> lock(this->mutex);
+			commands = std::move(this->commands);
+		}
 
-		this->post_internal([promise, function]() {
-			function();
-			promise->set_value();
-		});
+		//run the posted OpenGL commands
+		for (const std::function<void(wyrmgus::renderer *)> &command : commands) {
+			command(renderer);
+		}
 
-		return future;
+		{
+			std::lock_guard<std::mutex> lock(this->mutex);
+			//if no new commands have been set while we were rendering, store the old commands for being run again if necessary (e.g. if the window is resized)
+			if (this->commands.empty()) {
+				this->commands = std::move(commands);
+			}
+		}
 	}
 
-	//post an action, and then wait for it to be completed
-	void sync(const std::function<void()> &function)
-	{
-		std::future<void> future = this->async(function);
-		future.wait();
-	}
-
-	void run();
-
 private:
-	std::unique_ptr<boost::asio::io_context> io_context;
+	std::vector<std::function<void(renderer *)>> commands;
+	std::mutex mutex;
 };
 
 }

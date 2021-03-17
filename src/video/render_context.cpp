@@ -30,38 +30,15 @@
 
 #include "video/frame_buffer_object.h"
 
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/post.hpp>
-
 namespace wyrmgus {
 
-render_context::render_context()
+void render_context::set_commands(std::vector<std::function<void(renderer *)>> &&commands)
 {
-	this->io_context = std::make_unique<boost::asio::io_context>();
-}
+	{
+		std::lock_guard<std::mutex> lock(this->mutex);
+		this->commands = std::move(commands);
+	}
 
-render_context::~render_context()
-{
-}
-
-void render_context::run()
-{
-	//run the posted OpenGL commands
-	this->io_context->run();
-	this->io_context->restart();
-}
-
-void render_context::post(const std::function<void()> &function)
-{
-	//execute the function in the current context too, temporarily
-	//function();
-
-	this->post_internal(function);
-}
-
-void render_context::post_internal(const std::function<void()> &function)
-{
-	boost::asio::post(*this->io_context, function);
 	frame_buffer_object::request_update();
 }
 
