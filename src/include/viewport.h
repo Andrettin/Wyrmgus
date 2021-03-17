@@ -32,6 +32,10 @@
 
 class CUnit;
 
+namespace wyrmgus {
+	class renderer;
+}
+
 /**
 **  A map viewport.
 **
@@ -89,7 +93,7 @@ public:
 	void SetClipping() const;
 
 	/// Draw the full Viewport.
-	void Draw() const;
+	void Draw(std::vector<std::function<void(renderer *)>> &render_commands) const;
 	void DrawBorder() const;
 	/// Check if any part of an area is visible in viewport
 	bool AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const;
@@ -110,15 +114,14 @@ private:
 	void DrawMapFogOfWar() const;
 
 public:
-	//private:
 	PixelPos TopLeftPos;      /// Screen pixel top-left corner
 	PixelPos BottomRightPos;  /// Screen pixel bottom-right corner
 
 public:
 	Vec2i MapPos;             /// Map tile left-upper corner
 	PixelDiff Offset;         /// Offset within MapX, MapY
-	int MapWidth;             /// Width in map tiles
-	int MapHeight;            /// Height in map tiles
+	int MapWidth = 0;             /// Width in map tiles
+	int MapHeight = 0;            /// Height in map tiles
 
-	CUnit *Unit;              /// Bound to this unit
+	CUnit *Unit = nullptr;              /// Bound to this unit
 };

@@ -65,6 +65,7 @@ namespace wyrmgus {
 	class name_generator;
 	class plane;
 	class player_color;
+	class renderer;
 	class resource;
 	class species;
 	class spell;
@@ -1471,7 +1472,7 @@ extern std::string GetUnitTypeStatsString(const std::string &unit_type_ident);
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite,
-						 int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day);
+						 int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 //Wyrmgus start

@@ -59,6 +59,7 @@ namespace wyrmgus {
 	class construction_frame;
 	class map_template;
 	class player_color;
+	class renderer;
 	class site;
 	class spell;
 	class tile;
@@ -170,7 +171,7 @@ public:
 	const wyrmgus::civilization *get_civilization() const;
 
 	/// Draw a single unit
-	void Draw(const CViewport &vp) const;
+	void Draw(const CViewport &vp, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	/// Place a unit on map
 	//Wyrmgus start
 //	void Place(const Vec2i &pos);

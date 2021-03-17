@@ -49,6 +49,7 @@
 //Wyrmgus end
 #include "util/image_util.h"
 #include "util/point_util.h"
+#include "video/renderer.h"
 #include "video/video.h"
 #include "xbrz.h"
 
@@ -829,24 +830,24 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
 
-	this->player_color = false;
+	this->has_player_color_value = false;
 	const wyrmgus::color_set color_set = wyrmgus::image::get_colors(this->get_image());
 	const wyrmgus::player_color *conversible_player_color = this->get_conversible_player_color();
 	for (const QColor &color : color_set) {
-		if (!this->player_color) {
+		if (!this->has_player_color_value) {
 			for (const QColor &player_color : conversible_player_color->get_colors()) {
 				if (color.red() == player_color.red() && color.green() == player_color.green() && color.blue() == player_color.blue()) {
-					this->player_color = true;
+					this->has_player_color_value = true;
 					break;
 				}
 			}
 
-			if (this->player_color) {
+			if (this->has_player_color_value) {
 				break;
 			}
 		}
 
-		if (this->player_color) {
+		if (this->has_player_color_value) {
 			break; //nothing left to check
 		}
 	}
@@ -1331,6 +1332,56 @@ const wyrmgus::player_color *CGraphic::get_conversible_player_color() const
 	}
 
 	return defines::get()->get_conversible_player_color();
+}
+
+void CGraphic::create_texture(const player_color *player_color)
+{
+	if (player_color != nullptr) {
+		if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
+			this->create_texture(nullptr);
+			return;
+		}
+	}
+
+	QImage image = this->get_image();
+
+	if (image.format() != QImage::Format_RGBA8888) {
+		image = image.convertToFormat(QImage::Format_RGBA8888);
+	}
+
+	if (player_color != nullptr) {
+		player_color->apply_to_image(image, this->get_conversible_player_color());
+	}
+
+	const int scale_factor = defines::get()->get_scale_factor();
+	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
+		image = image::scale(image, scale_factor, this->get_original_frame_size());
+	}
+
+	auto texture = std::make_unique<QOpenGLTexture>(image);
+
+	if (player_color == nullptr) {
+		this->texture = std::move(texture);
+	} else {
+		this->player_color_textures[player_color] = std::move(texture);
+	}
+}
+
+void CGraphic::render_frame(const player_color *player_color, const int frame_index, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands)
+{
+//	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
+		render_commands.push_back([this, player_color, frame_index, pixel_pos](renderer *renderer) {
+			const QOpenGLTexture *texture = this->get_or_create_texture(player_color);
+			renderer->blit_texture_frame(texture, pixel_pos, this->get_size(), frame_index, this->get_frame_size());
+		});
+	/*
+	} else {
+		if (this->get_textures(player_color, time_of_day->ColorModification) == nullptr) {
+			MakePlayerColorTexture(this, player_color, time_of_day);
+		}
+		DoDrawFrameClip(this->get_textures(player_color, time_of_day->ColorModification), frame, x, y, show_percent);
+	}
+	*/
 }
 
 CFiller &CFiller::operator =(const CFiller &other_filler)

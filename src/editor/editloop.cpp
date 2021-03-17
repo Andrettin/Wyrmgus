@@ -70,6 +70,7 @@
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
+#include "video/render_context.h"
 #include "video/video.h"
 #include "widgets.h"
 
@@ -1366,7 +1367,7 @@ static void DrawCross(const PixelPos &topleft_pos, const QSize &size, uint32_t c
 /**
 **  Draw the start locations of all active players on the map
 */
-static void DrawStartLocations()
+static void DrawStartLocations(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const wyrmgus::unit_type *type = Editor.StartUnit;
 	for (const CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
@@ -1378,7 +1379,7 @@ static void DrawStartLocations()
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(CPlayer::Players[i]->StartPos);
 
 				if (type) {
-					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos, nullptr);
+					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos, nullptr, render_commands);
 				} else { // Draw a cross
 					DrawCross(startScreenPos, wyrmgus::defines::get()->get_scaled_tile_size(), CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()));
 				}
@@ -1484,9 +1485,11 @@ static void ShowUnitInfo(const CUnit &unit)
 */
 void EditorUpdateDisplay()
 {
-	DrawMapArea(); // draw the map area
+	std::vector<std::function<void(renderer *)>> render_commands;
 
-	DrawStartLocations();
+	DrawMapArea(render_commands); // draw the map area
+
+	DrawStartLocations(render_commands);
 
 	//Wyrmgus start
 	/*
@@ -1503,9 +1506,11 @@ void EditorUpdateDisplay()
 
 	//Wyrmgus start
 	if (CursorBuilding && CursorOn == cursor_on::map) {
-		DrawBuildingCursor();
+		DrawBuildingCursor(render_commands);
 	}
 	//Wyrmgus end
+
+	render_context::get()->set_commands(std::move(render_commands));
 	
 	//Wyrmgus start
 	// Fillers

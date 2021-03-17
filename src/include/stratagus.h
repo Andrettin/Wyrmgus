@@ -177,6 +177,10 @@ constexpr int DefaultTileMovementCost = 8;
 --  stratagus.cpp
 ----------------------------------------------------------------------------*/
 
+namespace wyrmgus {
+	class renderer;
+}
+
 extern std::string MenuRace;
 //Wyrmgus start
 extern std::string PlayerFaction;
@@ -188,7 +192,7 @@ extern unsigned long FastForwardCycle;		/// Game Replay Fast Forward Counter
 extern void Exit(int err);                  /// Exit
 
 extern void UpdateDisplay();            /// Game display update
-extern void DrawMapArea();              /// Draw the map area
+extern void DrawMapArea(std::vector<std::function<void(wyrmgus::renderer *)>> &render_commands);              /// Draw the map area
 extern void GameMainLoop();             /// Game main loop
 extern void stratagusMain(int argc, char **argv); /// main entry
 

@@ -34,6 +34,8 @@
 #include "color.h"
 #include "vec2i.h"
 
+#include <QOpenGLTexture>
+
 struct SDL_Cursor;
 struct SDL_Surface;
 typedef float GLfloat;
@@ -44,6 +46,7 @@ namespace wyrmgus {
 	class font;
 	class map_template;
 	class player_color;
+	class renderer;
 	class time_of_day;
 }
 
@@ -289,8 +292,48 @@ public:
 
 	bool has_player_color() const
 	{
-		return this->player_color;
+		return this->has_player_color_value;
 	}
+
+	const QOpenGLTexture *get_texture(const player_color *player_color) const
+	{
+		if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
+			if (this->texture != nullptr) {
+				return this->texture.get();
+			}
+		} else {
+			const auto find_iterator = this->player_color_textures.find(player_color);
+			if (find_iterator != this->player_color_textures.end()) {
+				return find_iterator->second.get();
+			}
+		}
+
+		return nullptr;
+	}
+
+	const QOpenGLTexture *get_or_create_texture(const player_color *player_color)
+	{
+		if (player_color != nullptr) {
+			if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
+				return this->get_or_create_texture(nullptr);
+			}
+		}
+
+		const QOpenGLTexture *texture = this->get_texture(player_color);
+
+		if (texture == nullptr) {
+			this->create_texture(player_color);
+			texture = this->get_texture(player_color);
+		}
+
+		if (texture == nullptr) {
+			throw std::runtime_error("Failed to get or create texture.");
+		}
+
+		return texture;
+	}
+
+	void create_texture(const player_color *player_color);
 
 	const GLuint *get_textures() const
 	{
@@ -316,6 +359,8 @@ public:
 	{
 		return this->load_mutex;
 	}
+
+	void render_frame(const player_color *player_color, const int frame_index, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands);
 
 private:
 	std::filesystem::path filepath;
@@ -350,8 +395,10 @@ public:
 	std::map<CColor, std::unique_ptr<GLuint[]>> texture_color_modifications; //textures with a color modification applied to them
 	int NumTextures = 0;           /// Number of textures
 private:
+	std::unique_ptr<QOpenGLTexture> texture;
+	std::map<const player_color *, std::unique_ptr<QOpenGLTexture>> player_color_textures;
 	int custom_scale_factor = 1; //the scale factor of the loaded image, if it is a custom scaled image
-	bool player_color = false;
+	bool has_player_color_value = false;
 	std::mutex load_mutex;
 
 	friend wyrmgus::font;
@@ -371,7 +418,7 @@ public:
 	void DrawPlayerColorSub(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
 	void DrawPlayerColorSubClip(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
 	void DrawPlayerColorFrameClipX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr);
-	void DrawPlayerColorFrameClip(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
+	void DrawPlayerColorFrameClip(const player_color *player_color, unsigned frame, int x, int y, const time_of_day *time_of_day = nullptr, int show_percent = 100);
 	void DrawPlayerColorFrameClipTransX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr);
 	void DrawPlayerColorFrameClipTrans(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 

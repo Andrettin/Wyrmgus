@@ -53,7 +53,7 @@
 #include "video/font_color.h"
 #include "video/video.h"
 
-CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
+CViewport::CViewport()
 {
 	this->TopLeftPos.x = this->TopLeftPos.y = 0;
 	this->BottomRightPos.x = this->BottomRightPos.y = 0;
@@ -271,7 +271,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 
 	while (sy  < 0) {
 		sy++;
-		dy += wyrmgus::defines::get()->get_scaled_tile_height();
+		dy += defines::get()->get_scaled_tile_height();
 	}
 	sy *=  UI.CurrentMapLayer->get_width();
 
@@ -281,13 +281,13 @@ void CViewport::DrawMapBackgroundInViewport() const
 		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->get_width())) {
 			if (sx - sy < 0) {
 				++sx;
-				dx += wyrmgus::defines::get()->get_scaled_tile_width();
+				dx += defines::get()->get_scaled_tile_width();
 				continue;
 			}
-			const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(sx);
+			const tile &mf = *UI.CurrentMapLayer->Field(sx);
 
-			const wyrmgus::terrain_type *terrain = nullptr;
-			const wyrmgus::terrain_type *overlay_terrain = nullptr;
+			const terrain_type *terrain = nullptr;
+			const terrain_type *overlay_terrain = nullptr;
 			int solid_tile = 0;
 			int overlay_solid_tile = 0;
 
@@ -352,8 +352,8 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 			}
 
-			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && wyrmgus::defines::get()->get_border_terrain_type() && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = wyrmgus::defines::get()->get_border_terrain_type()->get_graphics(season);
+			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && defines::get()->get_border_terrain_type() && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_terrain_type()->get_graphics(season);
 				if (border_graphics != nullptr) {
 					border_graphics->DrawPlayerColorFrameClip(player_color, mf.get_ownership_border_tile(), dx, dy, nullptr);
 				}
@@ -368,7 +368,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				const wyrmgus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
+				const terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
 				if (overlay_transition_terrain->has_transition_mask()) {
 					continue;
 				}
@@ -380,32 +380,32 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			//if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && wyrmgus::defines::get()->get_border_terrain_type() && !is_unpassable) {
-				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = wyrmgus::defines::get()->get_border_terrain_type()->get_graphics(season);
+			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && defines::get()->get_border_terrain_type() && !is_unpassable) {
+				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_terrain_type()->get_graphics(season);
 				if (border_graphics != nullptr) {
 					border_graphics->DrawPlayerColorFrameClip(player_color, mf.get_ownership_border_tile(), dx, dy, nullptr);
 				}
 			}
 
 			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				const wyrmgus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
+				const terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
 				if (overlay_transition_terrain->get_elevation_graphics()) {
 					overlay_transition_terrain->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].tile_frame, dx, dy, time_of_day);
 				}
 			}
 
 			++sx;
-			dx += wyrmgus::defines::get()->get_scaled_tile_width();
+			dx += defines::get()->get_scaled_tile_width();
 		}
 		sy += UI.CurrentMapLayer->get_width();
-		dy += wyrmgus::defines::get()->get_scaled_tile_height();
+		dy += defines::get()->get_scaled_tile_height();
 	}
 }
 
 /**
 **  Draw a map viewport.
 */
-void CViewport::Draw() const
+void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	PushClipping();
 	this->SetClipping();
@@ -444,7 +444,7 @@ void CViewport::Draw() const
 				}
 			} else if (j == nmissiles) {
 				if (unittable[i]->Type->get_draw_level() < particletable[k]->getDrawLevel()) {
-					unittable[i]->Draw(*this);
+					unittable[i]->Draw(*this, render_commands);
 					++i;
 				} else {
 					particletable[k]->draw();
@@ -452,7 +452,7 @@ void CViewport::Draw() const
 				}
 			} else if (k == nparticles) {
 				if (unittable[i]->Type->get_draw_level() < missiletable[j]->Type->get_draw_level()) {
-					unittable[i]->Draw(*this);
+					unittable[i]->Draw(*this, render_commands);
 					++i;
 				} else {
 					missiletable[j]->DrawMissile(*this);
@@ -461,7 +461,7 @@ void CViewport::Draw() const
 			} else {
 				if (unittable[i]->Type->get_draw_level() <= missiletable[j]->Type->get_draw_level()) {
 					if (unittable[i]->Type->get_draw_level() < particletable[k]->getDrawLevel()) {
-						unittable[i]->Draw(*this);
+						unittable[i]->Draw(*this, render_commands);
 						++i;
 					} else {
 						particletable[k]->draw();
@@ -479,7 +479,7 @@ void CViewport::Draw() const
 			}
 		}
 		for (; i < nunits; ++i) {
-			unittable[i]->Draw(*this);
+			unittable[i]->Draw(*this, render_commands);
 		}
 		for (; j < nmissiles; ++j) {
 			missiletable[j]->DrawMissile(*this);
@@ -488,6 +488,7 @@ void CViewport::Draw() const
 			particletable[k]->draw();
 		}
 		ParticleManager.endDraw();
+
 		//Wyrmgus start
 		//draw fog of war below the "click missile"
 		this->DrawMapFogOfWar();

@@ -2417,7 +2417,7 @@ void SaveUnitTypes(CFile &file)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
+void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite, int player, int frame, const PixelPos &screenPos, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	//Wyrmgus start
 	if (sprite == nullptr) {
@@ -2464,6 +2464,7 @@ void DrawUnitType(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerC
 				sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			} else {
 				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				sprite->render_frame(player_color, frame, pos, render_commands);
 			}
 		}
 	} else {
@@ -2478,6 +2479,7 @@ void DrawUnitType(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerC
 			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 		} else {
 			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+			sprite->render_frame(player_color, frame, pos, render_commands);
 		}
 	}
 	//Wyrmgus end

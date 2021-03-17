@@ -36,6 +36,7 @@ enum class ButtonCmd;
 namespace wyrmgus {
 
 class civilization;
+class renderer;
 class unit_type;
 enum class cursor_type;
 
@@ -193,10 +194,7 @@ extern int GetCursorsCount();
 extern void DrawCursor();
 //Wyrmgus start
 /// Draw building cursor
-extern void DrawBuildingCursor();
+extern void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_commands);
 //Wyrmgus end
 /// Animate the cursor
 extern void CursorAnimate(unsigned ticks);
-
-/// Cleanup the cursor module
-extern void CleanCursors();

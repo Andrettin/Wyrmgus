@@ -1006,7 +1006,7 @@ static void DrawConstruction(const int player, const wyrmgus::construction_frame
 /**
 **  Draw unit on map.
 */
-void CUnit::Draw(const CViewport &vp) const
+void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	int frame;
 	int state;
@@ -1207,13 +1207,13 @@ void CUnit::Draw(const CViewport &vp) const
 			const PixelPos pos(screenPos + type->get_scaled_half_tile_pixel_size());
 			DrawConstruction(player, cframe, *this, *type, frame, pos, time_of_day);
 		} else {
-			DrawUnitType(*type, sprite, player, frame, screenPos, time_of_day);
+			DrawUnitType(*type, sprite, player, frame, screenPos, time_of_day, render_commands);
 		}
 		//
 		// Draw the future unit type, if upgrading to it.
 		//
 	} else {
-		DrawUnitType(*type, sprite, player, frame, screenPos, time_of_day);
+		DrawUnitType(*type, sprite, player, frame, screenPos, time_of_day, render_commands);
 	}
 	
 	//Wyrmgus start

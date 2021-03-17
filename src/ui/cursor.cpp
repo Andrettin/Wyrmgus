@@ -182,7 +182,7 @@ static void DrawVisibleRectangleCursor(PixelPos corner1, PixelPos corner2)
 */
 //Wyrmgus start
 //static void DrawBuildingCursor()
-void DrawBuildingCursor()
+void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_commands)
 //Wyrmgus end
 {
 	// Align to grid
@@ -220,14 +220,14 @@ void DrawBuildingCursor()
 	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(CPlayer::GetThisPlayer(), MountImageLayer), CPlayer::GetThisPlayer()->Index, CursorBuilding->StillFrame, screenPos, time_of_day);
 
 //	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, CPlayer::GetThisPlayer()->Index,
-//				 CursorBuilding->StillFrame, screenPos);
+//				 CursorBuilding->StillFrame, screenPos, render_commands);
 	// get the first variation which has the proper upgrades for this player (to have the proper appearance of buildings drawn in the cursor, according to the upgrades)
 	if (CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer()) && CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->Sprite) {
 		DrawUnitType(*CursorBuilding, CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->Sprite, CPlayer::GetThisPlayer()->Index,
-				CursorBuilding->StillFrame, screenPos, time_of_day);
+				CursorBuilding->StillFrame, screenPos, time_of_day, render_commands);
 	} else {
 		DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, CPlayer::GetThisPlayer()->Index,
-				CursorBuilding->StillFrame, screenPos, time_of_day);
+				CursorBuilding->StillFrame, screenPos, time_of_day, render_commands);
 	}
 	//Wyrmgus end
 	

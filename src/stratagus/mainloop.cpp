@@ -77,6 +77,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "video/font.h"
+#include "video/render_context.h"
 #include "video/video.h"
 
 #include <guichan.h>
@@ -169,12 +170,12 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 /**
 **  Draw map area
 */
-void DrawMapArea()
+void DrawMapArea(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	// Draw all of the viewports
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		// Center viewport on tracked unit
-		if (vp->Unit) {
+		if (vp->Unit != nullptr) {
 			if (vp->Unit->Destroyed || vp->Unit->CurrentAction() == UnitAction::Die) {
 				vp->Unit = nullptr;
 			} else {
@@ -184,7 +185,7 @@ void DrawMapArea()
 				vp->Center(vp->Unit->get_scaled_map_pixel_pos_center());
 			}
 		}
-		vp->Draw();
+		vp->Draw(render_commands);
 	}
 }
 
@@ -203,7 +204,9 @@ void UpdateDisplay()
 #else
 		Video.FillRectangleClip(ColorBlack, 0, 0, Video.Width, Video.Height);
 #endif
-		DrawMapArea();
+		std::vector<std::function<void(renderer *)>> render_commands;
+
+		DrawMapArea(render_commands);
 		DrawMessages();
 
 		if (CurrentCursorState == CursorState::Rectangle) {
@@ -212,10 +215,12 @@ void UpdateDisplay()
 
 		//Wyrmgus start
 		if (CursorBuilding && CursorOn == cursor_on::map) {
-			DrawBuildingCursor();
+			DrawBuildingCursor(render_commands);
 		}
 		//Wyrmgus end
-	
+
+		render_context::get()->set_commands(std::move(render_commands));
+
 		if ((Preference.BigScreen && !BigMapMode) || (!Preference.BigScreen && BigMapMode)) {
 			UiToggleBigMap();
 		}
