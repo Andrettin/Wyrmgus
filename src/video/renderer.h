@@ -82,6 +82,9 @@ public:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_LINE_SMOOTH);
 		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+		//this is necessary so that the alpha channel of a texture does not overwrite an underlying texture
+		glDisable(GL_DEPTH_TEST);
 	}
 
 	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pos, const QSize &frame_size)
