@@ -73,37 +73,37 @@ extern int ClipY2; /// current clipping bottom right
 ** @param height unsigned int height to display
 ** (return value of width and height can be made smaller)
 */
-#define CLIP_RECTANGLE(x, y, width, height) do { \
-		int f; \
-		if (x < ClipX1) { \
-			f = ClipX1 - x; \
-			if (width <= f) { \
-				return; \
-			} \
-			width -= f; \
-			x = ClipX1; \
-		} \
-		if ((x + width) > ClipX2 + 1) { \
-			if (x > ClipX2) { \
-				return; \
-			} \
-			width = ClipX2 - x + 1; \
-		} \
-		if (y < ClipY1) { \
-			f = ClipY1 - y; \
-			if (height <= f) { \
-				return; \
-			} \
-			height -= f; \
-			y = ClipY1; \
-		} \
-		if ((y + height) > ClipY2 + 1) { \
-			if (y > ClipY2) { \
-				return; \
-			} \
-			height = ClipY2 - y + 1; \
-		} \
-	} while(0)
+inline void CLIP_RECTANGLE(int &x, int &y, int &width, int &height) {
+	int f;
+	if (x < ClipX1) {
+		f = ClipX1 - x;
+		if (width <= f) {
+			return;
+		}
+		width -= f;
+		x = ClipX1;
+	}
+	if ((x + width) > ClipX2 + 1) {
+		if (x > ClipX2) {
+			return;
+		}
+		width = ClipX2 - x + 1;
+	}
+	if (y < ClipY1) {
+		f = ClipY1 - y;
+		if (height <= f) {
+			return;
+		}
+		height -= f;
+		y = ClipY1;
+	}
+	if ((y + height) > ClipY2 + 1) {
+		if (y > ClipY2) {
+			return;
+		}
+		height = ClipY2 - y + 1;
+	}
+}
 
 /**
 ** Clip rectangle area (just like CLIP_RECTANGLE), but also return offsets
