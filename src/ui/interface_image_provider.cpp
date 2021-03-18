@@ -71,7 +71,7 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 		graphics->get_load_mutex().unlock();
 	}
 
-	const QImage &image = graphics->get_or_create_scaled_frame(0, nullptr);
+	const QImage &image = graphics->get_or_create_frame_image(0, nullptr);
 
 	if (image.isNull()) {
 		log::log_error("Interface image for ID \"" + id_str + "\" is null.");

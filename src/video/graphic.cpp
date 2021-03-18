@@ -1261,7 +1261,8 @@ void CGraphic::SetOriginalSize()
 
 	this->Width = this->Height = 0;
 	this->image = QImage();
-	this->scaled_frames.clear();
+	this->frame_images.clear();
+	this->player_color_frame_images.clear();
 	this->Load();
 
 	this->Resized = false;
@@ -1277,7 +1278,7 @@ QPoint CGraphic::get_frame_pos(const int frame_index) const
 	return wyrmgus::point::from_index(frame_index, this->get_frames_per_row());
 }
 
-QImage CGraphic::create_scaled_image(const wyrmgus::player_color *player_color)
+QImage CGraphic::create_scaled_image(const player_color *player_color)
 {
 	if (player_color != nullptr) {
 		if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
@@ -1303,11 +1304,11 @@ QImage CGraphic::create_scaled_image(const wyrmgus::player_color *player_color)
 	return image;
 }
 
-void CGraphic::create_scaled_frames(const wyrmgus::player_color *player_color)
+void CGraphic::create_frame_images(const player_color *player_color)
 {
 	if (player_color != nullptr) {
 		if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-			this->create_scaled_frames(nullptr);
+			this->create_frame_images(nullptr);
 			return;
 		}
 	}
@@ -1317,9 +1318,9 @@ void CGraphic::create_scaled_frames(const wyrmgus::player_color *player_color)
 	std::vector<QImage> frames = image::to_frames(image, this->get_frame_size());
 
 	if (player_color == nullptr) {
-		this->scaled_frames = std::move(frames);
+		this->frame_images = std::move(frames);
 	} else {
-		this->scaled_player_color_frames[player_color] = std::move(frames);
+		this->player_color_frame_images[player_color] = std::move(frames);
 	}
 }
 
