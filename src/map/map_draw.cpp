@@ -261,7 +261,7 @@ void CViewport::Center(const PixelPos &mapPixelPos)
 ** (in pixels)
 ** </PRE>
 */
-void CViewport::DrawMapBackgroundInViewport() const
+void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	int ex = this->BottomRightPos.x;
 	int ey = this->BottomRightPos.y;
@@ -326,7 +326,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 			if (terrain != nullptr) {
 				const std::shared_ptr<CPlayerColorGraphic> &terrain_graphics = terrain->get_graphics(season);
 				if (terrain_graphics != nullptr) {
-					terrain_graphics->DrawFrameClip(solid_tile + (terrain == mf.get_terrain() ? mf.AnimationFrame : 0), dx, dy, time_of_day);
+					const int frame_index = solid_tile + (terrain == mf.get_terrain() ? mf.AnimationFrame : 0);
+					terrain_graphics->DrawFrameClip(frame_index, dx, dy, time_of_day);
+					terrain_graphics->render_frame(player_color, frame_index, QPoint(dx, dy), false, render_commands);
 				}
 			}
 
@@ -349,6 +351,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 					}
 
 					transition_terrain_graphics->DrawFrameClip(transition_tiles[i].tile_frame, dx, dy, transition_time_of_day);
+					transition_terrain_graphics->render_frame(player_color, transition_tiles[i].tile_frame, QPoint(dx, dy), false, render_commands);
 				}
 			}
 
@@ -356,6 +359,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_terrain_type()->get_graphics(season);
 				if (border_graphics != nullptr) {
 					border_graphics->DrawPlayerColorFrameClip(player_color, mf.get_ownership_border_tile(), dx, dy, nullptr);
+					border_graphics->render_frame(player_color, mf.get_ownership_border_tile(), QPoint(dx, dy), false, render_commands);
 				}
 			}
 
@@ -363,7 +367,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 				const bool is_overlay_space = overlay_terrain->has_flag(tile_flag::space);
 				const std::shared_ptr<CPlayerColorGraphic> &overlay_terrain_graphics = overlay_terrain->get_graphics(season);
 				if (overlay_terrain_graphics != nullptr) {
-					overlay_terrain_graphics->DrawPlayerColorFrameClip(player_color, overlay_solid_tile + (overlay_terrain == mf.get_overlay_terrain() ? mf.OverlayAnimationFrame : 0), dx, dy, is_overlay_space ? nullptr : time_of_day);
+					const int frame_index = overlay_solid_tile + (overlay_terrain == mf.get_overlay_terrain() ? mf.OverlayAnimationFrame : 0);
+					overlay_terrain_graphics->DrawPlayerColorFrameClip(player_color, frame_index, dx, dy, is_overlay_space ? nullptr : time_of_day);
+					overlay_terrain_graphics->render_frame(player_color, frame_index, QPoint(dx, dy), false, render_commands);
 				}
 			}
 
@@ -374,8 +380,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 
 				const bool is_overlay_transition_space = overlay_transition_terrain->has_flag(tile_flag::space);
-				if (overlay_transition_terrain->get_transition_graphics(season)) {
-					overlay_transition_terrain->get_transition_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_transition_tiles[i].tile_frame, dx, dy, is_overlay_transition_space ? nullptr : time_of_day);
+				const std::shared_ptr<CPlayerColorGraphic> &overlay_transition_graphics = overlay_transition_terrain->get_transition_graphics(season);
+				if (overlay_transition_graphics != nullptr) {
+					overlay_transition_graphics->DrawPlayerColorFrameClip(player_color, overlay_transition_tiles[i].tile_frame, dx, dy, is_overlay_transition_space ? nullptr : time_of_day);
+					overlay_transition_graphics->render_frame(player_color, overlay_transition_tiles[i].tile_frame, QPoint(dx, dy), false, render_commands);
 				}
 			}
 
@@ -384,6 +392,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_terrain_type()->get_graphics(season);
 				if (border_graphics != nullptr) {
 					border_graphics->DrawPlayerColorFrameClip(player_color, mf.get_ownership_border_tile(), dx, dy, nullptr);
+					border_graphics->render_frame(player_color, mf.get_ownership_border_tile(), QPoint(dx, dy), false, render_commands);
 				}
 			}
 
@@ -391,6 +400,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 				const terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
 				if (overlay_transition_terrain->get_elevation_graphics()) {
 					overlay_transition_terrain->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].tile_frame, dx, dy, time_of_day);
+					overlay_transition_terrain->get_elevation_graphics()->render_frame(player_color, overlay_transition_tiles[i].tile_frame, QPoint(dx, dy), false, render_commands);
 				}
 			}
 
@@ -411,7 +421,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 	this->SetClipping();
 
 	/* this may take while */
-	this->DrawMapBackgroundInViewport();
+	this->DrawMapBackgroundInViewport(render_commands);
 
 	CurrentViewport = this;
 	{

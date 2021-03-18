@@ -109,7 +109,7 @@ private:
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const PixelPos &mapPixelPos);
 	/// Draw the map background
-	void DrawMapBackgroundInViewport() const;
+	void DrawMapBackgroundInViewport(std::vector<std::function<void(renderer *)>> &render_commands) const;
 	/// Draw the map fog of war
 	void DrawMapFogOfWar() const;
 
