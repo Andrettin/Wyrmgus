@@ -39,7 +39,7 @@ class renderer final : public QQuickFramebufferObject::Renderer
 public:
     explicit renderer(const frame_buffer_object *fbo) : fbo(fbo)
     {
-        blitter.create();
+        this->blitter.create();
     }
 
     virtual QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) override;
@@ -53,7 +53,13 @@ public:
 		return this->get_target_sizef().toSize();
 	}
 
-    void init_opengl()
+	QPoint get_mirrored_pos(const QPoint &pos, const QSize &element_size) const
+	{
+		const QSize target_size = this->get_target_size();
+		return QPoint(pos.x(), target_size.height() - element_size.height() - pos.y());
+	}
+
+	void init_opengl()
     {
 		const QSizeF target_sizef = this->get_target_sizef();
 		const QSize target_size = target_sizef.toSize();
@@ -87,7 +93,7 @@ public:
 		glDisable(GL_DEPTH_TEST);
 	}
 
-	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pixel_pos, const QSize &frame_size, const bool flip)
+	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pixel_pos, const QSize &frame_size, const bool flip, const unsigned char opacity)
 	{
 		const QSize target_size = this->get_target_size();
 
@@ -102,17 +108,55 @@ public:
 		const QSize texture_size(texture->width(), texture->height());
 		const QMatrix3x3 source = QOpenGLTextureBlitter::sourceTransform(source_rect, texture_size, QOpenGLTextureBlitter::OriginBottomLeft);
 
-		const QRect target_rect(QPoint(pos.x(), target_size.height() - frame_size.height() - pos.y()), frame_size);
+		const QRect target_rect(this->get_mirrored_pos(pos, frame_size), frame_size);
 		const QMatrix4x4 target = QOpenGLTextureBlitter::targetTransform(target_rect, QRect(QPoint(0, 0), target_size));
 
+		this->blitter.bind();
+
+		if (opacity != 255) {
+			this->blitter.setOpacity(opacity / 255.0);
+		}
+
 		this->blitter.blit(texture->textureId(), target, source);
+
+		if (opacity != 255) {
+			this->blitter.setOpacity(1.0);
+		}
+
+		this->blitter.release();
 	}
 
-	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size, const bool flip);
+	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size, const bool flip, const unsigned char opacity);
 
-	void blit_texture(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const bool flip)
+	void blit_texture(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const bool flip, const unsigned char opacity)
 	{
-		this->blit_texture_frame(texture, pos, QPoint(0, 0), size, flip);
+		this->blit_texture_frame(texture, pos, QPoint(0, 0), size, flip, opacity);
+	}
+
+	void fill_rect(const QRect &rect, const QColor &color)
+	{
+		const QSize target_size = this->get_target_size();
+
+		glDisable(GL_TEXTURE_2D);
+		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
+
+		const QPoint pos = rect.topLeft();
+		const QSize size = rect.size();
+		const QPoint mirrored_pos = this->get_mirrored_pos(pos, size);
+
+		glBegin(GL_TRIANGLE_STRIP);
+		glVertex2i(mirrored_pos.x(), mirrored_pos.y());
+		glVertex2i(mirrored_pos.x() + size.width(), mirrored_pos.y());
+		glVertex2i(mirrored_pos.x(), mirrored_pos.y() + size.height());
+		glVertex2i(mirrored_pos.x() + size.width(), mirrored_pos.y() + size.height());
+		glEnd();
+
+		glEnable(GL_TEXTURE_2D);
+	}
+
+	void fill_rect(const QPoint &pixel_pos, const QSize &size, const QColor &color)
+	{
+		this->fill_rect(QRect(pixel_pos, size), color);
 	}
 
 private:

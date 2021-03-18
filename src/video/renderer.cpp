@@ -48,14 +48,10 @@ void renderer::render()
 {
 	this->init_opengl();
 
-	this->blitter.bind();
-
 	//run the posted OpenGL commands
 	render_context::get()->run(this);
 
 	this->fbo->window()->resetOpenGLState();
-
-	this->blitter.release();
 }
 
 QSizeF renderer::get_target_sizef() const
@@ -63,12 +59,12 @@ QSizeF renderer::get_target_sizef() const
 	return this->fbo->size();
 }
 
-void renderer::blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size, const bool flip)
+void renderer::blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size, const bool flip, const unsigned char opacity)
 {
 	const int frames_per_row = size.width() / frame_size.width();
 	const QPoint frame_pos = point::from_index(frame_index, frames_per_row);
 	const QPoint frame_pixel_pos(frame_pos.x() * frame_size.width(), frame_pos.y() * frame_size.height());
-	this->blit_texture_frame(texture, pos, frame_pixel_pos, frame_size, flip);
+	this->blit_texture_frame(texture, pos, frame_pixel_pos, frame_size, flip, opacity);
 }
 
 }
