@@ -125,4 +125,21 @@ void engine_interface::exit()
 	});
 }
 
+bool engine_interface::eventFilter(QObject *source, QEvent *event)
+{
+	Q_UNUSED(source)
+
+	switch (event->type()) {
+		case QEvent::MouseButtonPress:
+		case QEvent::MouseButtonRelease:
+		case QEvent::MouseMove: {
+			const QMouseEvent *mouse_event = static_cast<QMouseEvent *>(event);
+			this->store_mouse_event(*mouse_event);
+			return true;
+		}
+		default:
+			return false;
+	}
+}
+
 }

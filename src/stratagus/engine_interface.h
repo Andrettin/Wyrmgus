@@ -145,6 +145,25 @@ public:
 		this->waiting_for_interface = value;
 	}
 
+	Q_INVOKABLE void install_event_filter_on(QObject *object)
+	{
+		object->installEventFilter(this);
+	}
+
+	virtual bool eventFilter(QObject *watched, QEvent *event) override;
+
+	std::queue<QMouseEvent> take_stored_mouse_events()
+	{
+		std::lock_guard<std::mutex> lock(this->mouse_event_mutex);
+		return std::move(this->stored_mouse_events);
+	}
+
+	void store_mouse_event(QMouseEvent event)
+	{
+		std::lock_guard<std::mutex> lock(this->mouse_event_mutex);
+		this->stored_mouse_events.push(std::move(event));
+	}
+
 signals:
 	void running_changed();
 
@@ -155,6 +174,8 @@ private:
 	bool qml_window_active = false;
 	std::promise<void> map_view_created_promise;
 	std::atomic<bool> waiting_for_interface = false;
+	std::queue<QMouseEvent> stored_mouse_events;
+	std::mutex mouse_event_mutex;
 };
 
 }

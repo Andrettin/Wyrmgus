@@ -62,6 +62,7 @@
 #endif
 
 #include "editor.h"
+#include "engine_interface.h"
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -76,6 +77,7 @@
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "util/queue_util.h"
 #include "video/font.h"
 #include "video/video.h"
 #include "widgets.h"
@@ -785,6 +787,49 @@ void PollEvents()
 	while (PollEvent()) { }
 }
 
+static SDL_Event qevent_to_sdl_event(const QMouseEvent &qevent)
+{
+	SDL_Event sdl_event{};
+
+	switch (qevent.type()) {
+		case QEvent::MouseButtonPress:
+		case QEvent::MouseButtonRelease:
+			if (qevent.type() == QEvent::MouseButtonPress) {
+				sdl_event.button.type = SDL_MOUSEBUTTONDOWN;
+				sdl_event.button.state = SDL_PRESSED;
+			} else if (qevent.type() == QEvent::MouseButtonRelease) {
+				sdl_event.button.type = SDL_MOUSEBUTTONUP;
+				sdl_event.button.state = SDL_RELEASED;
+			}
+
+			switch (qevent.button()) {
+				case Qt::LeftButton:
+					sdl_event.button.button = SDL_BUTTON_LEFT;
+					break;
+				case Qt::MiddleButton:
+					sdl_event.button.button = SDL_BUTTON_MIDDLE;
+					break;
+				case Qt::RightButton:
+					sdl_event.button.button = SDL_BUTTON_RIGHT;
+					break;
+				default:
+					break;
+			}
+
+			sdl_event.button.x = qevent.pos().x();
+			sdl_event.button.y = qevent.pos().y();
+			break;
+		case QEvent::MouseMove:
+			sdl_event.motion.type = SDL_MOUSEMOTION;
+			sdl_event.motion.x = qevent.pos().x();
+			sdl_event.motion.y = qevent.pos().y();
+		default:
+			break;
+	}
+
+	return sdl_event;
+}
+
 /**
 **  Wait for interactive input event for one frame.
 **
@@ -807,6 +852,13 @@ void WaitEventsOneFrame()
 	InputMouseTimeout(*GetCallbacks(), ticks);
 	InputKeyTimeout(*GetCallbacks(), ticks);
 	CursorAnimate(ticks);
+
+	std::queue<QMouseEvent> mouse_events = engine_interface::get()->take_stored_mouse_events();
+	while (!mouse_events.empty()) {
+		QMouseEvent mouse_event = queue::take(mouse_events);
+		SDL_Event sdl_event = qevent_to_sdl_event(mouse_event);
+		SdlDoEvent(*GetCallbacks(), sdl_event);
+	}
 
 	int interrupts = 0;
 
