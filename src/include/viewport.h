@@ -111,7 +111,7 @@ private:
 	/// Draw the map background
 	void DrawMapBackgroundInViewport(std::vector<std::function<void(renderer *)>> &render_commands) const;
 	/// Draw the map fog of war
-	void DrawMapFogOfWar() const;
+	void DrawMapFogOfWar(std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 public:
 	PixelPos TopLeftPos;      /// Screen pixel top-left corner

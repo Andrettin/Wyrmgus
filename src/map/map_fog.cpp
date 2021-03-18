@@ -45,6 +45,7 @@
 #include "unit/unit_manager.h"
 #include "util/util.h"
 #include "video/intern_video.h"
+#include "video/renderer.h"
 #include "video/video.h"
 
 
@@ -645,9 +646,19 @@ void UpdateFogOfWarChange()
 **  @param x  X position into video memory
 **  @param y  Y position into video memory
 */
-void VideoDrawOnlyFog(int x, int y)
+static void VideoDrawOnlyFog(const int x, const int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	Video.FillRectangleClip(CVideo::MapRGBA(0, 0, 0, FogOfWarOpacity), x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height());
+	Video.FillRectangleClip(CVideo::MapRGBA(0, 0, 0, FogOfWarOpacity), x, y, defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height());
+
+	render_commands.push_back([x, y](renderer *renderer) {
+		int x2 = x;
+		int y2 = y;
+		int w = defines::get()->get_scaled_tile_width();
+		int h = defines::get()->get_scaled_tile_height();
+		CLIP_RECTANGLE(x2, y2, w, h);
+
+		renderer->fill_rect(QPoint(x2, y2), QSize(w, h), QColor(0, 0, 0, FogOfWarOpacity));
+	});
 }
 
 /*----------------------------------------------------------------------------
@@ -868,7 +879,7 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 **  @param dx  X position into video memory.
 **  @param dy  Y position into video memory.
 */
-static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
+static void DrawFogOfWarTile(const int sx, const int sy, const int dx, const int dy, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int fogTile = 0;
 	int blackFogTile = 0;
@@ -886,12 +897,14 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	//Wyrmgus end
 		if (fogTile && fogTile != blackFogTile) {
 			fog_graphic->DrawFrameClipTrans(fogTile, dx, dy, FogOfWarOpacity);
+			fog_graphic->render_frame(nullptr, nullptr, fogTile, QPoint(dx, dy), false, FogOfWarOpacity, render_commands);
 		}
 	} else {
-		VideoDrawOnlyFog(dx, dy);
+		VideoDrawOnlyFog(dx, dy, render_commands);
 	}
 	if (blackFogTile) {
 		fog_graphic->DrawFrameClip(blackFogTile, dx, dy);
+		fog_graphic->render_frame(nullptr, nullptr, blackFogTile, QPoint(dx, dy), false, render_commands);
 	}
 
 #undef IsMapFieldExploredTable
@@ -901,7 +914,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 /**
 **  Draw the map fog of war.
 */
-void CViewport::DrawMapFogOfWar() const
+void CViewport::DrawMapFogOfWar(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	// flags must redraw or not
 	if (ReplayRevealMap) {
@@ -939,15 +952,25 @@ void CViewport::DrawMapFogOfWar() const
 //			if (VisibleTable[sx]) {
 			if (VisibleTable[UI.CurrentMapLayer->ID][sx]) {
 			//Wyrmgus end
-				DrawFogOfWarTile(sx, sy, dx, dy);
+				DrawFogOfWarTile(sx, sy, dx, dy, render_commands);
 			} else {
-				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height());
+				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, wyrmgus::defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height());
+
+				render_commands.push_back([dx, dy](renderer *renderer) {
+					int x = dx;
+					int y = dy;
+					int w = defines::get()->get_scaled_tile_width();
+					int h = defines::get()->get_scaled_tile_height();
+					CLIP_RECTANGLE(x, y, w, h);
+
+					renderer->fill_rect(QPoint(x, y), defines::get()->get_scaled_tile_size(), QColor(Qt::black));
+				});
 			}
 			++sx;
-			dx += wyrmgus::defines::get()->get_scaled_tile_width();
+			dx += defines::get()->get_scaled_tile_width();
 		}
 		sy += UI.CurrentMapLayer->get_width();
-		dy += wyrmgus::defines::get()->get_scaled_tile_height();
+		dy += defines::get()->get_scaled_tile_height();
 	}
 }
 

@@ -503,7 +503,8 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 
 		//Wyrmgus start
 		//draw fog of war below the "click missile"
-		this->DrawMapFogOfWar();
+		this->DrawMapFogOfWar(render_commands);
+
 		j = 0;
 		for (; j < nmissiles; ++j) {
 			if (!ClickMissile.empty() && ClickMissile == missiletable[j]->Type->Ident) {
