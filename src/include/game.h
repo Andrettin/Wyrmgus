@@ -47,6 +47,7 @@ class game final : public QObject, public singleton<game>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign WRITE set_current_campaign)
+	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 
 public:
 	static inline const QDateTime base_date = QDateTime(QDate(-100000, 1, 1)); //100,000 BC; base date from which to calculate the current total hours from the base date
@@ -72,6 +73,8 @@ public:
 		} else {
 			emit stopped();
 		}
+
+		emit running_changed();
 	}
 
 	campaign *get_current_campaign() const
@@ -150,6 +153,7 @@ public:
 signals:
 	void started();
 	void stopped();
+	void running_changed();
 
 private:
 	bool running = false;
