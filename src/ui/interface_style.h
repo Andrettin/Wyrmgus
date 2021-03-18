@@ -40,6 +40,8 @@ class interface_style final : public data_entry, public data_type<interface_styl
 {
 	Q_OBJECT
 
+	Q_PROPERTY(std::filesystem::path top_bar_file MEMBER top_bar_file WRITE set_top_bar_file)
+
 public:
 	static constexpr const char *class_identifier = "interface_style";
 	static constexpr const char *database_folder = "interface_styles";
@@ -50,11 +52,15 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 
+	void set_top_bar_file(const std::filesystem::path &filepath);
+
 	const std::shared_ptr<CGraphic> &get_interface_element_graphics(const interface_element_type type, const std::string &qualifier) const;
 
 	const button_style *get_button(const interface_element_type type) const;
 
 private:
+	std::filesystem::path top_bar_file;
+	std::shared_ptr<CGraphic> top_bar_graphics;
 	std::unique_ptr<button_style> large_button;
 };
 

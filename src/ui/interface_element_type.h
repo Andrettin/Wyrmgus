@@ -29,12 +29,15 @@
 namespace wyrmgus {
 
 enum class interface_element_type {
+	top_bar,
 	large_button
 };
 
 inline interface_element_type string_to_interface_element_type(const std::string &str)
 {
-	if (str == "large_button") {
+	if (str == "top_bar") {
+		return interface_element_type::top_bar;
+	} else if (str == "large_button") {
 		return interface_element_type::large_button;
 	}
 

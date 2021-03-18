@@ -58,6 +58,10 @@ void interface_style::process_sml_scope(const sml_data &scope)
 
 void interface_style::initialize()
 {
+	if (!this->top_bar_file.empty()) {
+		this->top_bar_graphics = CGraphic::New(this->top_bar_file.string());
+	}
+
 	if (this->large_button != nullptr) {
 		this->large_button->initialize();
 	}
@@ -65,9 +69,16 @@ void interface_style::initialize()
 	data_entry::initialize();
 }
 
+void interface_style::set_top_bar_file(const std::filesystem::path &filepath)
+{
+	this->top_bar_file = database::get()->get_graphics_path(this->get_module()) / filepath;
+}
+
 const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics(const interface_element_type type, const std::string &qualifier) const
 {
 	switch (type) {
+		case interface_element_type::top_bar:
+			return this->top_bar_graphics;
 		case interface_element_type::large_button: {
 			const button_style *button = this->get_button(type);
 			const button_state state = string_to_button_state(qualifier);
