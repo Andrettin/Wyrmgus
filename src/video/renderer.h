@@ -91,7 +91,14 @@ public:
 	{
 		const QSize target_size = this->get_target_size();
 
-		const QRect source_rect(frame_pixel_pos, QSize(flip ? -frame_size.width() : frame_size.width(), frame_size.height()));
+		QRect source_rect;
+
+		if (flip) {
+			source_rect = QRect(QPoint(frame_pixel_pos.x() + frame_size.width(), frame_pixel_pos.y()), QSize(-frame_size.width(), frame_size.height()));
+		} else {
+			source_rect = QRect(frame_pixel_pos, frame_size);
+		}
+
 		const QSize texture_size(texture->width(), texture->height());
 		const QMatrix3x3 source = QOpenGLTextureBlitter::sourceTransform(source_rect, texture_size, QOpenGLTextureBlitter::OriginBottomLeft);
 
