@@ -29,6 +29,7 @@
 #include "ui/interface_style.h"
 
 #include "database/database.h"
+#include "database/defines.h"
 #include "ui/button_state.h"
 #include "ui/button_style.h"
 #include "ui/interface_element_type.h"
@@ -60,6 +61,9 @@ void interface_style::initialize()
 {
 	if (!this->top_bar_file.empty()) {
 		this->top_bar_graphics = CGraphic::New(this->top_bar_file.string());
+
+		//this is necessary for now, to ensure the top bar graphics are loaded in the Wyrmgus thread's context
+		this->top_bar_graphics->Load(false, defines::get()->get_scale_factor());
 	}
 
 	if (this->large_button != nullptr) {
