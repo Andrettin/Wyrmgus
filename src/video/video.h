@@ -377,7 +377,12 @@ public:
 		return this->load_mutex;
 	}
 
-	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands);
+	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->render_frame(player_color, time_of_day, frame_index, pixel_pos, flip, 255, render_commands);
+	}
 
 private:
 	std::filesystem::path filepath;
