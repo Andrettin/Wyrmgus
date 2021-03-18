@@ -295,35 +295,52 @@ public:
 		return this->has_player_color_value;
 	}
 
-	const QOpenGLTexture *get_texture(const player_color *player_color) const
+	const QOpenGLTexture *get_texture(const player_color *player_color, const CColor *color_modification) const
 	{
 		if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-			if (this->texture != nullptr) {
-				return this->texture.get();
+			if (color_modification == nullptr) {
+				if (this->texture != nullptr) {
+					return this->texture.get();
+				}
+			} else {
+				const auto find_iterator = this->color_modification_textures.find(*color_modification);
+				if (find_iterator != this->color_modification_textures.end()) {
+					return find_iterator->second.get();
+				}
 			}
 		} else {
-			const auto find_iterator = this->player_color_textures.find(player_color);
-			if (find_iterator != this->player_color_textures.end()) {
-				return find_iterator->second.get();
+			if (color_modification == nullptr) {
+				const auto find_iterator = this->player_color_textures.find(player_color);
+				if (find_iterator != this->player_color_textures.end()) {
+					return find_iterator->second.get();
+				}
+			} else {
+				const auto find_iterator = this->player_color_color_modification_textures.find(player_color);
+				if (find_iterator != this->player_color_color_modification_textures.end()) {
+					const auto sub_find_iterator = find_iterator->second.find(*color_modification);
+					if (sub_find_iterator != find_iterator->second.end()) {
+						return sub_find_iterator->second.get();
+					}
+				}
 			}
 		}
 
 		return nullptr;
 	}
 
-	const QOpenGLTexture *get_or_create_texture(const player_color *player_color)
+	const QOpenGLTexture *get_or_create_texture(const player_color *player_color, const CColor *color_modification)
 	{
 		if (player_color != nullptr) {
 			if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-				return this->get_or_create_texture(nullptr);
+				return this->get_or_create_texture(nullptr, color_modification);
 			}
 		}
 
-		const QOpenGLTexture *texture = this->get_texture(player_color);
+		const QOpenGLTexture *texture = this->get_texture(player_color, color_modification);
 
 		if (texture == nullptr) {
-			this->create_texture(player_color);
-			texture = this->get_texture(player_color);
+			this->create_texture(player_color, color_modification);
+			texture = this->get_texture(player_color, color_modification);
 		}
 
 		if (texture == nullptr) {
@@ -333,7 +350,7 @@ public:
 		return texture;
 	}
 
-	void create_texture(const player_color *player_color);
+	void create_texture(const player_color *player_color, const CColor *color_modification);
 
 	const GLuint *get_textures() const
 	{
@@ -360,7 +377,7 @@ public:
 		return this->load_mutex;
 	}
 
-	void render_frame(const player_color *player_color, const int frame_index, const QPoint &pixel_pos, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands);
+	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands);
 
 private:
 	std::filesystem::path filepath;
@@ -396,7 +413,9 @@ public:
 	int NumTextures = 0;           /// Number of textures
 private:
 	std::unique_ptr<QOpenGLTexture> texture;
+	std::map<CColor, std::unique_ptr<QOpenGLTexture>> color_modification_textures;
 	std::map<const player_color *, std::unique_ptr<QOpenGLTexture>> player_color_textures;
+	std::map<const player_color *, std::map<CColor, std::unique_ptr<QOpenGLTexture>>> player_color_color_modification_textures;
 	int custom_scale_factor = 1; //the scale factor of the loaded image, if it is a custom scaled image
 	bool has_player_color_value = false;
 	std::mutex load_mutex;

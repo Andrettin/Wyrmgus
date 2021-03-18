@@ -1334,11 +1334,11 @@ const wyrmgus::player_color *CGraphic::get_conversible_player_color() const
 	return defines::get()->get_conversible_player_color();
 }
 
-void CGraphic::create_texture(const player_color *player_color)
+void CGraphic::create_texture(const player_color *player_color, const CColor *color_modification)
 {
 	if (player_color != nullptr) {
 		if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-			this->create_texture(nullptr);
+			this->create_texture(nullptr, color_modification);
 			return;
 		}
 	}
@@ -1358,30 +1358,49 @@ void CGraphic::create_texture(const player_color *player_color)
 		image = image::scale(image, scale_factor, this->get_original_frame_size());
 	}
 
+	if (color_modification != nullptr) {
+		unsigned char *image_data = image.bits();
+		const int bpp = image.depth() / 8;
+
+		for (int i = 0; i < image.sizeInBytes(); i += bpp) {
+			unsigned char &red = image_data[i];
+			unsigned char &green = image_data[i + 1];
+			unsigned char &blue = image_data[i + 2];
+
+			red = std::max<int>(0, std::min<int>(255, red + color_modification->R));
+			green = std::max<int>(0, std::min<int>(255, green + color_modification->G));
+			blue = std::max<int>(0, std::min<int>(255, blue + color_modification->B));
+		}
+	}
+
 	auto texture = std::make_unique<QOpenGLTexture>(image);
 
 	if (player_color == nullptr) {
-		this->texture = std::move(texture);
+		if (color_modification == nullptr) {
+			this->texture = std::move(texture);
+		} else {
+			this->color_modification_textures[*color_modification] = std::move(texture);
+		}
 	} else {
-		this->player_color_textures[player_color] = std::move(texture);
+		if (color_modification == nullptr) {
+			this->player_color_textures[player_color] = std::move(texture);
+		} else {
+			this->player_color_color_modification_textures[player_color][*color_modification] = std::move(texture);
+		}
 	}
 }
 
-void CGraphic::render_frame(const player_color *player_color, const int frame_index, const QPoint &pixel_pos, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands)
+void CGraphic::render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-//	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		render_commands.push_back([this, player_color, frame_index, pixel_pos, flip](renderer *renderer) {
-			const QOpenGLTexture *texture = this->get_or_create_texture(player_color);
-			renderer->blit_texture_frame(texture, pixel_pos, this->get_size(), frame_index, this->get_frame_size(), flip);
-		});
-	/*
-	} else {
-		if (this->get_textures(player_color, time_of_day->ColorModification) == nullptr) {
-			MakePlayerColorTexture(this, player_color, time_of_day);
-		}
-		DoDrawFrameClip(this->get_textures(player_color, time_of_day->ColorModification), frame, x, y, show_percent);
+	const CColor *color_modification = nullptr;
+	if (time_of_day != nullptr && time_of_day->HasColorModification()) {
+		color_modification = &time_of_day->ColorModification;
 	}
-	*/
+
+	render_commands.push_back([this, player_color, color_modification, frame_index, pixel_pos, flip](renderer *renderer) {
+		const QOpenGLTexture *texture = this->get_or_create_texture(player_color, color_modification);
+		renderer->blit_texture_frame(texture, pixel_pos, this->get_size(), frame_index, this->get_frame_size(), flip);
+	});
 }
 
 CFiller &CFiller::operator =(const CFiller &other_filler)
