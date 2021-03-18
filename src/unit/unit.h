@@ -1049,11 +1049,11 @@ extern void LoadDecorations();
 extern void CleanDecorations();
 
 /// Draw unit's shadow
-extern void DrawShadow(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> &sprite, int frame, const PixelPos &screenPos);
+extern void DrawShadow(const unit_type &type, const std::shared_ptr<CGraphic> &sprite, int frame, const PixelPos &screenPos, std::vector<std::function<void(renderer *)>> &render_commands);
 //Wyrmgus start
 /// Draw unit's overlay
-extern void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite, const int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day);
-extern void DrawOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> &sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day);
+extern void DrawPlayerColorOverlay(const unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite, const int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands);
+extern void DrawOverlay(const unit_type &type, const std::shared_ptr<CGraphic> &sprite, int player, int frame, const PixelPos &screenPos, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands);
 //Wyrmgus end
 /// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table);

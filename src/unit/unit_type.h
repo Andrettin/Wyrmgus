@@ -425,13 +425,14 @@ class CUnit;
 class CDecoVar
 {
 public:
-	CDecoVar() {};
+	CDecoVar() {}
+
 	virtual ~CDecoVar()
 	{
-	};
+	}
 
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const = 0;
+	virtual void Draw(int x, int y, const unit_type &type, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const = 0;
 
 	unsigned int Index;     /// Index of the variable. @see DefineVariables
 
@@ -468,7 +469,7 @@ class CDecoVarBar final : public CDecoVar
 {
 public:
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const override;
+	virtual void Draw(int x, int y, const unit_type &type, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	bool IsVertical;            /// if true, vertical bar, else horizontal.
 	bool SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
@@ -485,7 +486,7 @@ class CDecoVarText final : public CDecoVar
 {
 public:
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const override;
+	virtual void Draw(int x, int y, const unit_type &type, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	wyrmgus::font *Font = nullptr;  /// Font to use to display value.
 	// FIXME : Add Color, format
@@ -497,7 +498,7 @@ class CDecoVarSpriteBar final : public CDecoVar
 public:
 	CDecoVarSpriteBar() : NSprite(-1) {};
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const override;
+	virtual void Draw(int x, int y, const unit_type &type, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
 	// FIXME Sprite info. better way ?
@@ -507,14 +508,12 @@ public:
 class CDecoVarStaticSprite final : public CDecoVar
 {
 public:
-	CDecoVarStaticSprite() : NSprite(-1), n(0), FadeValue(0) {}
-	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const override;
+	virtual void Draw(int x, int y, const unit_type &type, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	// FIXME Sprite info. and Replace n with more appropriate var.
-	char NSprite;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
-	int n;         /// identifiant in SpellSprite
-	int FadeValue; /// if variable's value is below than FadeValue, it drawn transparent.
+	char NSprite = -1;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
+	int n = 0;         /// identifiant in SpellSprite
+	int FadeValue = 0; /// if variable's value is below than FadeValue, it drawn transparent.
 };
 
 enum class DistanceTypeType {

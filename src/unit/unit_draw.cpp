@@ -422,8 +422,7 @@ void CleanDecorations()
 **  @param unit    Unit pointer
 **  @todo fix color configuration.
 */
-void CDecoVarBar::Draw(int x, int y,
-					   const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const
+void CDecoVarBar::Draw(int x, int y, const unit_type &type, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	Assert(var.Max);
 
@@ -484,7 +483,7 @@ void CDecoVarBar::Draw(int x, int y,
 **  @param unit    Unit pointer
 **  @todo fix font/color configuration.
 */
-void CDecoVarText::Draw(int x, int y, const wyrmgus::unit_type &/*type*/, const wyrmgus::unit_variable &var) const
+void CDecoVarText::Draw(int x, int y, const unit_type &/*type*/, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	if (this->IsCenteredInX) {
 		x -= 2; // wyrmgus::defines::get()->get_game_font()->Width(buf) / 2, with buf = str(Value)
@@ -503,7 +502,7 @@ void CDecoVarText::Draw(int x, int y, const wyrmgus::unit_type &/*type*/, const 
 **  @param unit    Unit pointer
 **  @todo fix sprite configuration.
 */
-void CDecoVarSpriteBar::Draw(int x, int y, const wyrmgus::unit_type &/*type*/, const wyrmgus::unit_variable &var) const
+void CDecoVarSpriteBar::Draw(int x, int y, const unit_type &/*type*/, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	Assert(var.Max);
 	Assert(this->NSprite != -1);
@@ -529,6 +528,7 @@ void CDecoVarSpriteBar::Draw(int x, int y, const wyrmgus::unit_type &/*type*/, c
 		y -= sprite.Height / 2;
 	}
 	sprite.DrawFrameClip(n, x, y);
+	sprite.render_frame(nullptr, nullptr, n, QPoint(x, y), false, render_commands);
 }
 
 /**
@@ -540,7 +540,7 @@ void CDecoVarSpriteBar::Draw(int x, int y, const wyrmgus::unit_type &/*type*/, c
 **
 **  @todo fix sprite configuration configuration.
 */
-void CDecoVarStaticSprite::Draw(int x, int y, const wyrmgus::unit_type &/*type*/, const wyrmgus::unit_variable &var) const
+void CDecoVarStaticSprite::Draw(int x, int y, const unit_type &/*type*/, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
@@ -556,8 +556,10 @@ void CDecoVarStaticSprite::Draw(int x, int y, const wyrmgus::unit_type &/*type*/
 	if (this->FadeValue && var.Value < this->FadeValue) {
 		int alpha = var.Value * 255 / this->FadeValue;
 		sprite.DrawFrameClipTrans(this->n, x, y, alpha);
+		sprite.render_frame(nullptr, nullptr, this->n, QPoint(x, y), false, alpha, render_commands);
 	} else {
 		sprite.DrawFrameClip(this->n, x, y);
+		sprite.render_frame(nullptr, nullptr, this->n, QPoint(x, y), false, render_commands);
 	}
 }
 
@@ -568,15 +570,14 @@ void CDecoVarStaticSprite::Draw(int x, int y, const wyrmgus::unit_type &/*type*/
 **  @param type       Type of the unit.
 **  @param screenPos  Screen position of the unit.
 */
-static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, const PixelPos &screenPos)
+static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, const PixelPos &screenPos, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int x = screenPos.x;
 	int y = screenPos.y;
 
 	UpdateUnitVariables(const_cast<CUnit &>(unit));
 	// Now show decoration for each variable.
-	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
-		 i < UnitTypeVar.DecoVar.end(); ++i) {
+	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin(); i < UnitTypeVar.DecoVar.end(); ++i) {
 		const CDecoVar &var = *(*i);
 		const int value = unit.Variable[var.Index].Value;
 		//Wyrmgus start
@@ -603,9 +604,9 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end
 			var.Draw(
-				x + var.OffsetX * wyrmgus::defines::get()->get_scale_factor() + var.OffsetXPercent * unit.Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width() / 100,
-				y + var.OffsetY * wyrmgus::defines::get()->get_scale_factor() + var.OffsetYPercent * unit.Type->get_tile_height() * wyrmgus::defines::get()->get_scaled_tile_height() / 100,
-				type, unit.Variable[var.Index]);
+				x + var.OffsetX * defines::get()->get_scale_factor() + var.OffsetXPercent * unit.Type->get_tile_width() * defines::get()->get_scaled_tile_width() / 100,
+				y + var.OffsetY * defines::get()->get_scale_factor() + var.OffsetYPercent * unit.Type->get_tile_height() * defines::get()->get_scaled_tile_height() / 100,
+				type, unit.Variable[var.Index], render_commands);
 		}
 	}
 
@@ -624,10 +625,10 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 			}
 		}
 		const int width = wyrmgus::defines::get()->get_game_font()->Width(groupId);
-		x += (unit.Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width() + unit.Type->get_box_width() * wyrmgus::defines::get()->get_scale_factor()) / 2 - width;
+		x += (unit.Type->get_tile_width() * defines::get()->get_scaled_tile_width() + unit.Type->get_box_width() * defines::get()->get_scale_factor()) / 2 - width;
 		const int height = wyrmgus::defines::get()->get_game_font()->Height();
-		y += (unit.Type->get_tile_height() * wyrmgus::defines::get()->get_scaled_tile_height() + unit.Type->get_box_height() * wyrmgus::defines::get()->get_scale_factor()) / 2 - height;
-		CLabel(wyrmgus::defines::get()->get_game_font()).DrawClip(x, y, groupId);
+		y += (unit.Type->get_tile_height() * defines::get()->get_scaled_tile_height() + unit.Type->get_box_height() * defines::get()->get_scale_factor()) / 2 - height;
+		CLabel(defines::get()->get_game_font()).DrawClip(x, y, groupId);
 	}
 }
 
@@ -640,7 +641,7 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-void DrawShadow(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> &sprite, int frame, const PixelPos &screenPos)
+void DrawShadow(const unit_type &type, const std::shared_ptr<CGraphic> &sprite, int frame, const PixelPos &screenPos, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	// Draw normal shadow sprite if available
 	//Wyrmgus start
@@ -650,9 +651,9 @@ void DrawShadow(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> 
 		return;
 	}
 	PixelPos pos = screenPos;
-	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += (type.get_offset().x() + type.ShadowOffsetX) * wyrmgus::defines::get()->get_scale_factor();
-	pos.y += (type.get_offset().y() + type.ShadowOffsetY) * wyrmgus::defines::get()->get_scale_factor();
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * defines::get()->get_scaled_tile_size()) / 2);
+	pos.x += (type.get_offset().x() + type.ShadowOffsetX) * defines::get()->get_scale_factor();
+	pos.y += (type.get_offset().y() + type.ShadowOffsetY) * defines::get()->get_scale_factor();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -660,11 +661,13 @@ void DrawShadow(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> 
 //			type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			//Wyrmgus end
+			sprite->render_frame(nullptr, nullptr, -frame - 1, pos, true, render_commands);
 		} else {
 			//Wyrmgus start
 //			type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 			sprite->DrawFrameClip(frame, pos.x, pos.y);
 			//Wyrmgus end
+			sprite->render_frame(nullptr, nullptr, frame, pos, false, render_commands);
 		}
 	} else {
 		int row = type.get_num_directions() / 2 + 1;
@@ -677,36 +680,41 @@ void DrawShadow(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> 
 //		type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 		sprite->DrawFrameClip(frame, pos.x, pos.y);
 		//Wyrmgus end
+		sprite->render_frame(nullptr, nullptr, frame, pos, false, render_commands);
 	}
 }
 
 //Wyrmgus start
-void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite, const int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
+void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite, const int player, int frame, const PixelPos &screenPos, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (!sprite) {
 		return;
 	}
 
-	const wyrmgus::player_color *player_color = CPlayer::Players[player]->get_player_color();
+	const player_color *player_color = CPlayer::Players[player]->get_player_color();
 
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.get_offset().x() * wyrmgus::defines::get()->get_scale_factor();
-	pos.y += type.get_offset().y() * wyrmgus::defines::get()->get_scale_factor();
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * defines::get()->get_scaled_tile_size()) / 2);
+	pos.x += type.get_offset().x() * defines::get()->get_scale_factor();
+	pos.y += type.get_offset().y() * defines::get()->get_scale_factor();
 
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 				sprite->DrawPlayerColorFrameClipTransX(player_color, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+				sprite->render_frame(player_color, time_of_day, -frame - 1, pos, true, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 			} else {
 				sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
+				sprite->render_frame(player_color, time_of_day, -frame - 1, pos, true, render_commands);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 				sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+				sprite->render_frame(player_color, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 			} else {
 				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				sprite->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 			}
 		}
 	} else {
@@ -719,13 +727,15 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_pt
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+			sprite->render_frame(player_color, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 		} else {
 			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+			sprite->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 		}
 	}
 }
 
-void DrawOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> &sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
+void DrawOverlay(const unit_type &type, const std::shared_ptr<CGraphic> &sprite, int player, int frame, const PixelPos &screenPos, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (!sprite) {
 		return;
@@ -740,14 +750,18 @@ void DrawOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic>
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 				sprite->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+				sprite->render_frame(nullptr, time_of_day, -frame - 1, pos, true, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 			} else {
 				sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, time_of_day);
+				sprite->render_frame(nullptr, time_of_day, -frame - 1, pos, true, render_commands);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 				sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+				sprite->render_frame(nullptr, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 			} else {
 				sprite->DrawFrameClip(frame, pos.x, pos.y, time_of_day);
+				sprite->render_frame(nullptr, time_of_day, frame, pos, false, render_commands);
 			}
 		}
 	} else {
@@ -760,8 +774,10 @@ void DrawOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic>
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 			sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
+			sprite->render_frame(nullptr, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 		} else {
 			sprite->DrawFrameClip(frame, pos.x, pos.y, time_of_day);
+			sprite->render_frame(nullptr, time_of_day, frame, pos, false, render_commands);
 		}
 	}
 }
@@ -822,19 +838,8 @@ void ShowOrder(const CUnit &unit)
 **
 **  @todo FIXME: The different styles should become a function call.
 */
-static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, const PixelPos &screenPos)
+static void DrawInformations(const CUnit &unit, const unit_type &type, const PixelPos &screenPos, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-#if 0
-#if DEBUG // This is for showing vis counts and refs.
-	std::array<char, 10> buf{};
-	sprintf(buf, "%d%c%c%d", unit.VisCount[ThisPlayer->Index],
-			unit.is_seen_by_player(ThisPlayer) ? 'Y' : 'N',
-			unit.is_seen_destroyed_by_player(ThisPlayer) ? 'Y' : 'N',
-			unit.get_ref_count());
-	CLabel(GetSmallFont()).Draw(screenPos.x + 10, screenPos.y + 10, buf);
-#endif
-#endif
-
 	// For debug draw sight, react and attack range!
 	if (IsOnlySelected(unit)) {
 		const PixelPos center(screenPos + type.get_scaled_half_tile_pixel_size());
@@ -854,7 +859,7 @@ static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, 
 		//Wyrmgus end
 			if (Preference.ShowReactionRange) {
 				const int value = unit.GetReactionRange();
-				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * wyrmgus::defines::get()->get_scaled_tile_width() / 2;
+				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -866,7 +871,7 @@ static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, 
 				const int value = unit.get_best_attack_range();
 				
 				//Wyrmgus end
-				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * wyrmgus::defines::get()->get_scaled_tile_width() / 2;
+				const int radius = value * defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
 					// Radius +1 so you can see all ranges
@@ -880,7 +885,7 @@ static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, 
 			//show aura range if the unit has an aura
 			if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0 || unit.Variable[REGENERATIONAURA_INDEX].Value > 0 || unit.Variable[HYDRATINGAURA_INDEX].Value > 0) {
 				const int value = AuraRange - (unit.Type->get_tile_width() - 1);
-				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * wyrmgus::defines::get()->get_scaled_tile_width() / 2;
+				const int radius = value * defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -892,7 +897,7 @@ static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, 
 
 	// FIXME: johns: ugly check here, should be removed!
 	if (unit.CurrentAction() != UnitAction::Die && (unit.IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap)) {
-		DrawDecoration(unit, type, screenPos);
+		DrawDecoration(unit, type, screenPos, render_commands);
 	}
 }
 
@@ -904,20 +909,22 @@ static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, 
 **  @param frame   Frame number to draw.
 **  @param screenPos  screen (top left) position of the unit.
 */
-static void DrawConstructionShadow(const CUnit &unit, const wyrmgus::unit_type &type, const wyrmgus::construction_frame *cframe, int frame, const PixelPos &screenPos)
+static void DrawConstructionShadow(const CUnit &unit, const unit_type &type, const construction_frame *cframe, int frame, const PixelPos &screenPos, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	PixelPos pos = screenPos;
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
-	const wyrmgus::unit_type_variation *variation = unit.GetVariation();
-	if (cframe->get_image_type() != wyrmgus::construction_image_type::construction) {
+	const int scale_factor = defines::get()->get_scale_factor();
+	const unit_type_variation *variation = unit.GetVariation();
+	if (cframe->get_image_type() != construction_image_type::construction) {
 		if (variation && variation->ShadowSprite) {
 			pos -= PixelPos((variation->ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
 			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
 			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
 			if (frame < 0) {
 				variation->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				variation->ShadowSprite->render_frame(nullptr, nullptr, -frame - 1, pos, true, render_commands);
 			} else {
 				variation->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+				variation->ShadowSprite->render_frame(nullptr, nullptr, frame, pos, false, render_commands);
 			}
 		} else if (type.ShadowSprite) {
 			pos -= PixelPos((type.ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
@@ -925,8 +932,10 @@ static void DrawConstructionShadow(const CUnit &unit, const wyrmgus::unit_type &
 			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				type.ShadowSprite->render_frame(nullptr, nullptr, -frame - 1, pos, true, render_commands);
 			} else {
 				type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+				type.ShadowSprite->render_frame(nullptr, nullptr, frame, pos, false, render_commands);
 			}
 		}
 	}
@@ -941,31 +950,36 @@ static void DrawConstructionShadow(const CUnit &unit, const wyrmgus::unit_type &
 **  @param frame   Frame number.
 **  @param screenPos  screen (top left) position of the unit.
 */
-static void DrawConstruction(const int player, const wyrmgus::construction_frame *cframe,
-							 const CUnit &unit, const wyrmgus::unit_type &type, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
+static void DrawConstruction(const int player, const construction_frame *cframe,
+							 const CUnit &unit, const unit_type &type, int frame, const PixelPos &screenPos, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	PixelPos pos = screenPos;
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
-	const wyrmgus::player_color *player_color = CPlayer::Players[player]->get_player_color();
-	if (cframe->get_image_type() == wyrmgus::construction_image_type::construction) {
-		const wyrmgus::unit_type_variation *variation = unit.GetVariation();
+	const int scale_factor = defines::get()->get_scale_factor();
+	const player_color *player_color = CPlayer::Players[player]->get_player_color();
+
+	if (cframe->get_image_type() == construction_image_type::construction) {
+		const unit_type_variation *variation = unit.GetVariation();
 		if (variation != nullptr && variation->get_construction() != nullptr) {
-			const wyrmgus::construction *construction = variation->get_construction();
+			const construction *construction = variation->get_construction();
 			pos.x -= construction->get_frame_width() * scale_factor / 2;
 			pos.y -= construction->get_frame_height() * scale_factor / 2;
 			if (frame < 0) {
 				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
+				construction->get_graphics()->render_frame(player_color, time_of_day, -frame - 1, pos, true, render_commands);
 			} else {
 				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				construction->get_graphics()->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 			}
 		} else {
-			const wyrmgus::construction *construction = type.get_construction();
+			const construction *construction = type.get_construction();
 			pos.x -= construction->get_frame_width() * scale_factor / 2;
 			pos.y -= construction->get_frame_height() * scale_factor / 2;
 			if (frame < 0) {
 				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
+				construction->get_graphics()->render_frame(player_color, time_of_day, -frame - 1, pos, true, render_commands);
 			} else {
 				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				construction->get_graphics()->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 			}
 		}
 		//Wyrmgus end
@@ -992,8 +1006,10 @@ static void DrawConstruction(const int player, const wyrmgus::construction_frame
 //		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		if (variation && variation->Sprite) {
 			variation->Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+			variation->Sprite->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 		} else {
 			type.Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+			type.Sprite->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 		}
 		//Wyrmgus end
 	}
@@ -1052,8 +1068,8 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 	} else {
 		screenPos = vp.TilePosToScreen_TopLeft(this->Seen.tilePos);
 
-		screenPos.x += this->Seen.pixel_offset.x() * wyrmgus::defines::get()->get_scale_factor();
-		screenPos.y += this->Seen.pixel_offset.y() * wyrmgus::defines::get()->get_scale_factor();
+		screenPos.x += this->Seen.pixel_offset.x() * defines::get()->get_scale_factor();
+		screenPos.y += this->Seen.pixel_offset.y() * defines::get()->get_scale_factor();
 		frame = this->Seen.Frame;
 		type = this->Seen.Type;
 		under_construction = this->Seen.UnderConstruction;
@@ -1086,7 +1102,7 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 	if (state == 1 && under_construction && cframe) {
 		//Wyrmgus start
 //		DrawConstructionShadow(*type, cframe, frame, screenPos);
-		DrawConstructionShadow(*this, *type, cframe, frame, screenPos);
+		DrawConstructionShadow(*this, *type, cframe, frame, screenPos, render_commands);
 		//Wyrmgus end
 	} else {
 		//Wyrmgus start
@@ -1095,9 +1111,9 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 			//Wyrmgus start
 //			DrawShadow(*type, frame, screenPos);
 			if (variation && variation->ShadowSprite) {
-				DrawShadow(*type, variation->ShadowSprite, frame, screenPos);
+				DrawShadow(*type, variation->ShadowSprite, frame, screenPos, render_commands);
 			} else if (type->ShadowSprite) {
-				DrawShadow(*type, type->ShadowSprite, frame, screenPos);
+				DrawShadow(*type, type->ShadowSprite, frame, screenPos, render_commands);
 			}
 			//Wyrmgus end
 		//Wyrmgus start
@@ -1112,14 +1128,14 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 //	DrawUnitSelection(vp, *this);
 	//Wyrmgus end
 
-	const wyrmgus::time_of_day *time_of_day = this->get_center_tile_time_of_day();
+	const time_of_day *time_of_day = this->get_center_tile_time_of_day();
 	
 	//Wyrmgus start
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(MountImageLayer), player, frame, screenPos, time_of_day); // draw the mount just before the body
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(MountImageLayer), player, frame, screenPos, time_of_day, render_commands); // draw the mount just before the body
 	
 	//draw the backpack before everything but the shadow if facing south (or the still frame, since that also faces south), southeast or southwest
 	if (this->Direction == LookingS || frame == type->StillFrame || this->Direction == LookingSE || this->Direction == LookingSW) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos, time_of_day, render_commands);
 	}
 	
 	//draw the left arm before the body if not facing south (or the still frame, since that also faces south); if the position of the arms in the southeast frame is inverted, don't draw the left arm yet either
@@ -1137,9 +1153,9 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 		)
 	) {
 		//draw the shield before the left arm if not facing south
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, frame, screenPos, time_of_day, render_commands);
 
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos, time_of_day, render_commands);
 	}
 	
 	//draw the right arm before the body if facing north, or if facing southeast/southwest and the arms are inverted for that direction
@@ -1155,9 +1171,9 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos, time_of_day);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, time_of_day);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, time_of_day, render_commands);
 	}
 	//Wyrmgus end
 
@@ -1205,7 +1221,7 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 	if (state == 1) {
 		if (under_construction && cframe) {
 			const PixelPos pos(screenPos + type->get_scaled_half_tile_pixel_size());
-			DrawConstruction(player, cframe, *this, *type, frame, pos, time_of_day);
+			DrawConstruction(player, cframe, *this, *type, frame, pos, time_of_day, render_commands);
 		} else {
 			DrawUnitType(*type, sprite, player, frame, screenPos, time_of_day, render_commands);
 		}
@@ -1219,7 +1235,7 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 	//Wyrmgus start
 	//draw the left arm and right arm clothing after the body, even if the arms were drawn before
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitAction::Die) && frame != type->StillFrame) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos, time_of_day, render_commands);
 	}
 	if (
 		(this->Direction == LookingN && this->CurrentAction() != UnitAction::Die)
@@ -1233,20 +1249,20 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos, time_of_day, render_commands);
 	}
 
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(PantsImageLayer), player, frame, screenPos, time_of_day);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingImageLayer), player, frame, screenPos, time_of_day);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(PantsImageLayer), player, frame, screenPos, time_of_day, render_commands);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingImageLayer), player, frame, screenPos, time_of_day, render_commands);
 	
 	//draw the backpack after the clothing if facing east or west, if isn't dying (dying animations for east and west use northeast frames)
 	if ((this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() != UnitAction::Die) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos, time_of_day, render_commands);
 	}
 	
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player, frame, screenPos, time_of_day);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HelmetImageLayer), player, frame, screenPos, time_of_day);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(BootsImageLayer), player, frame, screenPos, time_of_day);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player, frame, screenPos, time_of_day, render_commands);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HelmetImageLayer), player, frame, screenPos, time_of_day, render_commands);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(BootsImageLayer), player, frame, screenPos, time_of_day, render_commands);
 	
 	//draw the left arm just after the body if facing south
 	if (
@@ -1262,9 +1278,9 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos, time_of_day);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos, time_of_day);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, frame, screenPos, time_of_day, render_commands);
 	}
 
 	//draw the right arm just after the body if not facing north
@@ -1281,15 +1297,15 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 		)
 	) {
 		if ((this->Direction == LookingS || this->Direction == LookingSE || this->Direction == LookingSW) && this->CurrentAction() != UnitAction::Die && this->GetLayerSprite(RightHandImageLayer) != nullptr) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, time_of_day);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos, time_of_day);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos, time_of_day);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, time_of_day);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, time_of_day, render_commands);
 		} else {
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos, time_of_day);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, time_of_day);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, time_of_day);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos, time_of_day);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos, time_of_day, render_commands);
 		}
 	}
 
@@ -1302,18 +1318,18 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 			(this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() == UnitAction::Die
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos, time_of_day);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos, time_of_day, render_commands);
 	}
 
 	if (variation && variation->LightSprite) {
-		DrawOverlay(*type, variation->LightSprite, player, frame, screenPos, time_of_day);
+		DrawOverlay(*type, variation->LightSprite, player, frame, screenPos, time_of_day, render_commands);
 	} else if (type->LightSprite) {
-		DrawOverlay(*type, type->LightSprite, player, frame, screenPos, time_of_day);
+		DrawOverlay(*type, type->LightSprite, player, frame, screenPos, time_of_day, render_commands);
 	}
 	//Wyrmgus end
 	
 	// Unit's extras not fully supported.. need to be decorations themselves.
-	DrawInformations(*this, *type, screenPos);
+	DrawInformations(*this, *type, screenPos, render_commands);
 }
 
 /**
