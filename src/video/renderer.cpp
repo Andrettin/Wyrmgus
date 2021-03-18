@@ -53,11 +53,6 @@ void renderer::render()
 	//run the posted OpenGL commands
 	render_context::get()->run(this);
 
-	const QImage image("./graphics/icons/items/baronial_crown.png");
-	static QOpenGLTexture *texture = new QOpenGLTexture(image);
-
-	this->blit_texture_frame(texture, QPoint(0, 0), image.size(), 1, QSize(46, 38));
-
 	this->fbo->window()->resetOpenGLState();
 
 	this->blitter.release();
