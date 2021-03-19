@@ -52,6 +52,8 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "stratagus.h"
+
 #include "guichan/exception.h"
 #include "guichan/widgets/dropdown.h"
 
@@ -177,7 +179,7 @@ namespace gcn
         mFocusHandler.applyChanges();
     }
 
-    void DropDown::draw(Graphics* graphics)
+    void DropDown::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         if (mScrollArea == nullptr || mScrollArea->getContent() == nullptr)
         {
@@ -214,7 +216,7 @@ namespace gcn
         if (mListBox->getListModel() && mListBox->getSelected() >= 0)
         {
             graphics->drawText(mListBox->getListModel()->getElementAt(mListBox->getSelected()),
-                2, (h - getFont()->getHeight()) / 2);
+                2, (h - getFont()->getHeight()) / 2, render_commands);
         }
 
         if (hasFocus())
@@ -222,12 +224,12 @@ namespace gcn
             graphics->drawRectangle(Rectangle(0, 0, getWidth() - h, h));
         }
 
-        drawButton(graphics);
+        drawButton(graphics, render_commands);
 
          if (mDroppedDown)
          {
              graphics->pushClipArea(mScrollArea->getDimension());
-             mScrollArea->draw(graphics);
+             mScrollArea->draw(graphics, render_commands);
              graphics->popClipArea();
 
             // Draw two lines separating the ListBox with se selected
@@ -263,7 +265,7 @@ namespace gcn
         }
     }
 
-    void DropDown::drawButton(Graphics *graphics)
+    void DropDown::drawButton(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color faceColor, highlightColor, shadowColor;
         int offset;

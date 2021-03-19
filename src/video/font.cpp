@@ -49,7 +49,7 @@ namespace wyrmgus {
 
 //Wyrmgus start
 //void font::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y)
-void font::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y, bool is_normal)
+void font::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands)
 //Wyrmgus end
 {
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();

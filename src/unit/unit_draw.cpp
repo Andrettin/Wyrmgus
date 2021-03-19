@@ -713,7 +713,7 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_pt
 				sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 				sprite->render_frame(player_color, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 				sprite->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 			}
 		}
@@ -729,7 +729,7 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_pt
 			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			sprite->render_frame(player_color, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 			sprite->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 		}
 	}
@@ -967,7 +967,7 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
 				construction->get_graphics()->render_frame(player_color, time_of_day, -frame - 1, pos, true, render_commands);
 			} else {
-				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 				construction->get_graphics()->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 			}
 		} else {
@@ -978,7 +978,7 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
 				construction->get_graphics()->render_frame(player_color, time_of_day, -frame - 1, pos, true, render_commands);
 			} else {
-				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 				construction->get_graphics()->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 			}
 		}
@@ -1005,10 +1005,10 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 		//Wyrmgus start
 //		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		if (variation && variation->Sprite) {
-			variation->Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+			variation->Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 			variation->Sprite->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 		} else {
-			type.Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+			type.Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 			type.Sprite->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 		}
 		//Wyrmgus end

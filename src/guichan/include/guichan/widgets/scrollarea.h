@@ -234,9 +234,9 @@ namespace gcn
 
         // Inherited from Widget
 
-        virtual void draw(Graphics *graphics);
+        virtual void draw(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        virtual void drawBorder(Graphics* graphics);
+        virtual void drawBorder(Graphics* graphics) override;
 
         virtual void logic();
 
@@ -321,7 +321,7 @@ namespace gcn
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawContent(Graphics* graphics);
+        virtual void drawContent(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Draws the vertical scrollbar.

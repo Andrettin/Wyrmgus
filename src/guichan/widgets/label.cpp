@@ -55,6 +55,8 @@
 /*
  * For comments regarding functions please see the header file.
  */
+#include "stratagus.h"
+
 #include "guichan/widgets/label.h"
 #include "guichan/exception.h"
 
@@ -95,7 +97,7 @@ namespace gcn
         return mAlignment;
     }
 
-    void Label::draw(Graphics* graphics)
+    void Label::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         int textX = 0;
         int textY = getHeight() / 2 - getFont()->getHeight() / 2;
@@ -118,7 +120,7 @@ namespace gcn
 
         graphics->setFont(getFont());
         graphics->setColor(getForegroundColor());
-        graphics->drawText(getCaption(), textX, textY, getAlignment());
+        graphics->drawText(getCaption(), textX, textY, getAlignment(), true, render_commands);
     }
 
     void Label::drawBorder(Graphics* graphics)

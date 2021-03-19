@@ -55,6 +55,8 @@
 /*
  * For comments regarding functions please see the header file.
  */
+#include "stratagus.h"
+
 #include "guichan/widgets/button.h"
 #include "guichan/exception.h"
 #include "guichan/mouseinput.h"
@@ -125,7 +127,7 @@ namespace gcn
     }
     //Wyrmgus end
 
-    void Button::draw(Graphics* graphics)
+    void Button::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color faceColor = getBaseColor();
         Color highlightColor, shadowColor;
@@ -197,11 +199,11 @@ namespace gcn
 
         if (isPressed())
         {
-            graphics->drawText(getCaption(), textX + 1, textY + 1, getAlignment());
+            graphics->drawText(getCaption(), textX + 1, textY + 1, getAlignment(), true, render_commands);
         }
         else
         {
-            graphics->drawText(getCaption(), textX, textY, getAlignment());
+            graphics->drawText(getCaption(), textX, textY, getAlignment(), true, render_commands);
 
             if (hasFocus())
             {

@@ -55,6 +55,8 @@
 /*
  * For comments regarding functions please see the header file.
  */
+#include "stratagus.h"
+
 #include "guichan/graphics.h"
 #include "guichan/exception.h"
 #include "guichan/font.h"
@@ -118,9 +120,9 @@ namespace gcn
         return mClipStack.top();
     }
 
-    void Graphics::drawImage(const Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color, unsigned int transparency) const
+    void Graphics::drawImage(const Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color, unsigned int transparency, std::vector<std::function<void(renderer *)>> &render_commands) const
     {
-        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight(), player_color, transparency);
+        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight(), player_color, transparency, false, render_commands);
     }
 
     void Graphics::setFont(Font* font)
@@ -132,7 +134,7 @@ namespace gcn
 //    void Graphics::drawText(const std::string& text, int x, int y,
 //                            unsigned int alignment)
     void Graphics::drawText(const std::string& text, int x, int y,
-                            unsigned int alignment, bool is_normal)
+                            unsigned int alignment, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands)
 	//Wyrmgus end
     {
         if (mFont == nullptr)
@@ -146,19 +148,19 @@ namespace gcn
           case LEFT:
 			  //Wyrmgus start
 //              mFont->drawString(this, text, x, y);
-              mFont->drawString(this, text, x, y, is_normal);
+              mFont->drawString(this, text, x, y, is_normal, render_commands);
 			  //Wyrmgus end
               break;
           case CENTER:
 			  //Wyrmgus start
 //              mFont->drawString(this, text, x - mFont->getWidth(text) / 2, y);
-              mFont->drawString(this, text, x - mFont->getWidth(text) / 2, y, is_normal);
+              mFont->drawString(this, text, x - mFont->getWidth(text) / 2, y, is_normal, render_commands);
 			  //Wyrmgus end
               break;
           case RIGHT:
 			  //Wyrmgus start
 //              mFont->drawString(this, text, x - mFont->getWidth(text), y);
-              mFont->drawString(this, text, x - mFont->getWidth(text), y, is_normal);
+              mFont->drawString(this, text, x - mFont->getWidth(text), y, is_normal, render_commands);
 			  //Wyrmgus end
               break;
           default:

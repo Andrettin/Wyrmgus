@@ -2466,7 +2466,7 @@ void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraph
 				sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 				sprite->render_frame(player_color, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 				sprite->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 			}
 		}
@@ -2482,7 +2482,7 @@ void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraph
 			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
 			sprite->render_frame(player_color, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 			sprite->render_frame(player_color, time_of_day, frame, pos, false, render_commands);
 		}
 	}

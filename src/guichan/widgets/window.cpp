@@ -55,6 +55,8 @@
 /*
  * For comments regarding functions please see the header file.
  */
+#include "stratagus.h"
+
 #include "guichan/widgets/window.h"
 #include "guichan/exception.h"
 #include "guichan/mouseinput.h"
@@ -179,7 +181,7 @@ namespace gcn
         return mAlignment;
     }
 
-    void Window::draw(Graphics* graphics)
+    void Window::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color faceColor = getBaseColor();
         Color highlightColor, shadowColor;
@@ -246,7 +248,7 @@ namespace gcn
                            d.x + d.width - 1,
                            d.y + d.height - 1);
 
-        drawContent(graphics);
+        drawContent(graphics, render_commands);
 
         int textX = 0;
         int textY;
@@ -269,7 +271,7 @@ namespace gcn
 
         graphics->setColor(getForegroundColor());
         graphics->setFont(getFont());
-        graphics->drawText(getCaption(), textX, textY, getAlignment());
+        graphics->drawText(getCaption(), textX, textY, getAlignment(), true, render_commands);
     }
 
     void Window::drawBorder(Graphics* graphics)
@@ -296,14 +298,14 @@ namespace gcn
         }
     }
 
-    void Window::drawContent(Graphics* graphics)
+    void Window::drawContent(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         if (getContent() != nullptr)
         {
             graphics->pushClipArea(getContentDimension());
             graphics->pushClipArea(Rectangle(0, 0, getContent()->getWidth(),
                                              getContent()->getHeight()));
-            getContent()->draw(graphics);
+            getContent()->draw(graphics, render_commands);
             graphics->popClipArea();
             graphics->popClipArea();
         }

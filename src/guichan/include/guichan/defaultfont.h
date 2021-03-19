@@ -86,14 +86,14 @@ namespace gcn
          * @param y the y coordinate where to draw the glyph.
          * @return the width of the glyph in pixels.
          */
-        virtual int drawGlyph(Graphics* graphics, unsigned char glyph, int x, int y);
+        virtual int drawGlyph(Graphics* graphics, unsigned char glyph, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 
 
         // Inherited from Font
 
 		//Wyrmgus start
 //        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y);
-        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal = true);
+        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands) override;
 		//Wyrmgus end
 
         virtual int getWidth(const std::string& text);

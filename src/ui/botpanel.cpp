@@ -993,13 +993,13 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const wyrmgus
 **
 **  Draw all action buttons.
 */
-void CButtonPanel::Draw()
+void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	//  Draw background
 	if (UI.ButtonPanel.G) {
 		UI.ButtonPanel.G->DrawSubClip(0, 0,
 									  UI.ButtonPanel.G->Width, UI.ButtonPanel.G->Height,
-									  UI.ButtonPanel.X, UI.ButtonPanel.Y);
+									  UI.ButtonPanel.X, UI.ButtonPanel.Y, render_commands);
 	}
 
 	// No buttons
@@ -1103,7 +1103,7 @@ void CButtonPanel::Draw()
 //			button->Icon.Icon->DrawCooldownSpellIcon(pos,
 			button_icon->DrawCooldownSpellIcon(pos,
 			//Wyrmgus end
-				maxCooldown * 100 / wyrmgus::spell::get_all()[button->Value]->get_cooldown());
+				maxCooldown * 100 / wyrmgus::spell::get_all()[button->Value]->get_cooldown(), render_commands);
 		} else if (gray) {
 			//Wyrmgus start
 //			button->Icon.Icon->DrawGrayscaleIcon(pos);
@@ -1125,7 +1125,7 @@ void CButtonPanel::Draw()
 			if (IsButtonUsable(*Selected[0], *button)) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(*button, ButtonUnderCursor),
-												   pos, str, player_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], *button));
+												   pos, str, player_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], *button), render_commands);
 												   
 				if (
 					((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(button_unit_type) != 0)
@@ -1149,11 +1149,11 @@ void CButtonPanel::Draw()
 			) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(*button, ButtonUnderCursor),
-												   pos, str, player_color, false, true);
+												   pos, str, player_color, false, true, 100, render_commands);
 			} else {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(*button, ButtonUnderCursor),
-												   pos, str, player_color, true);
+												   pos, str, player_color, true, false, 100, render_commands);
 			}
 		}
 	}

@@ -56,6 +56,8 @@
  * For comments regarding functions please see the header file.
  */
 
+#include "stratagus.h"
+
 #include "guichan/widgets/radiobutton.h"
 
 namespace gcn
@@ -92,16 +94,16 @@ namespace gcn
         setGroup("");
     }
 
-    void RadioButton::draw(Graphics* graphics)
+    void RadioButton::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
-        drawBox(graphics);
+        drawBox(graphics, render_commands);
 
         graphics->setFont(getFont());
         graphics->setColor(getForegroundColor());
 
         int h = getHeight() + getHeight() / 2;
 
-        graphics->drawText(getCaption(), h - 2, 0);
+        graphics->drawText(getCaption(), h - 2, 0, render_commands);
 
         if (hasFocus())
         {
@@ -133,7 +135,7 @@ namespace gcn
         }
     }
 
-    void RadioButton::drawBox(Graphics *graphics)
+    void RadioButton::drawBox(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         int h;
 

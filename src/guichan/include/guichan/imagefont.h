@@ -136,7 +136,7 @@ pqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"); @endcode
          * @return the width of the glyph in pixels.
          * @see Graphics
          */
-        virtual int drawGlyph(Graphics* graphics, unsigned char glyph, int x, int y);
+        virtual int drawGlyph(Graphics* graphics, unsigned char glyph, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Sets the spacing between rows in pixels.  Default is 0 pixels.
@@ -183,7 +183,7 @@ pqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"); @endcode
 
 		//Wyrmgus start
 //        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y);
-        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal = true);
+        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands) override;
 		//Wyrmgus end
 
         virtual int getHeight() const;

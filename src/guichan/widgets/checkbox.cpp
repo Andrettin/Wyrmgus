@@ -56,6 +56,8 @@
  * For comments regarding functions please see the header file.
  */
 
+#include "stratagus.h"
+
 #include "guichan/widgets/checkbox.h"
 
 namespace gcn
@@ -82,16 +84,16 @@ namespace gcn
         adjustSize();
     }
 
-    void CheckBox::draw(Graphics* graphics)
+    void CheckBox::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
-        drawBox(graphics);
+        drawBox(graphics, render_commands);
 
         graphics->setFont(getFont());
         graphics->setColor(getForegroundColor());
 
         int h = getHeight() + getHeight() / 2;
 
-        graphics->drawText(getCaption(), h - 2, 0);
+        graphics->drawText(getCaption(), h - 2, 0, render_commands);
 
         if (hasFocus() && !getCaption().empty())
         {
@@ -123,7 +125,7 @@ namespace gcn
         }
     }
 
-    void CheckBox::drawBox(Graphics *graphics)
+    void CheckBox::drawBox(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         int h = getHeight() - 1;
 

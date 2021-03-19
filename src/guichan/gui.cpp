@@ -242,7 +242,7 @@ namespace gcn
         mTop->logic();
     }
 
-    void Gui::draw(Widget* top)
+    void Gui::draw(Widget* top, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         if (!top)
         {
@@ -274,7 +274,7 @@ namespace gcn
             }
 
             mGraphics->pushClipArea(top->getDimension());
-            top->draw(mGraphics.get());
+            top->draw(mGraphics.get(), render_commands);
             top->setDirty(false);
             mGraphics->popClipArea();
 
@@ -282,9 +282,9 @@ namespace gcn
         }
     }
 
-    void Gui::draw()
+    void Gui::draw(std::vector<std::function<void(renderer *)>> &render_commands)
     {
-        draw(mTop);
+        draw(mTop, render_commands);
     }
 
     void Gui::focusNone()

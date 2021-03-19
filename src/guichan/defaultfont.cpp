@@ -56,6 +56,8 @@
  * For comments regarding functions please see the header file.
  */
 
+#include "stratagus.h"
+
 #include "guichan/defaultfont.h"
 #include "guichan/rectangle.h"
 
@@ -71,7 +73,7 @@ namespace gcn
         return 8*text.size();
     }
 
-    int DefaultFont::drawGlyph(Graphics* graphics, unsigned char, int x, int y)
+    int DefaultFont::drawGlyph(Graphics* graphics, unsigned char, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         graphics->drawRectangle( Rectangle(x, y, 8, 8));
 
@@ -80,14 +82,14 @@ namespace gcn
 
 	//Wyrmgus start
 //    void DefaultFont::drawString(Graphics* graphics, const std::string& text, int x, int y)
-    void DefaultFont::drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal)
+    void DefaultFont::drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands)
 	//Wyrmgus end
     {
         unsigned int i;
 
         for (i = 0; i< text.size(); ++i)
         {
-            drawGlyph(graphics, text.at(i), x, y);
+            drawGlyph(graphics, text.at(i), x, y, render_commands);
             x += getWidth(text);
         }
     }

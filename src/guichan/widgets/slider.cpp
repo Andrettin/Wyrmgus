@@ -56,6 +56,8 @@
  * For comments regarding functions please see the header file.
  */
 
+#include "stratagus.h"
+
 #include "guichan/widgets/slider.h"
 #include "guichan/mouseinput.h"
 
@@ -124,7 +126,7 @@ namespace gcn
         mScaleEnd = scaleEnd;
     }
 
-    void Slider::draw(gcn::Graphics* graphics)
+    void Slider::draw(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color shadowColor = getBaseColor() - 0x101010;
         int alpha = getBaseColor().a;
@@ -133,7 +135,7 @@ namespace gcn
         graphics->setColor(shadowColor);
         graphics->fillRectangle(gcn::Rectangle(0,0,getWidth(),getHeight()));
 
-        drawMarker(graphics);
+        drawMarker(graphics, render_commands);
     }
 
     void Slider::drawBorder(gcn::Graphics* graphics)
@@ -160,7 +162,7 @@ namespace gcn
         }
     }
 
-    void Slider::drawMarker(gcn::Graphics* graphics)
+    void Slider::drawMarker(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         gcn::Color faceColor = getBaseColor();
         Color highlightColor, shadowColor;

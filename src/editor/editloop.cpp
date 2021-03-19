@@ -75,7 +75,7 @@
 #include "widgets.h"
 
 extern void DoScrollArea(int state, bool fast, bool isKeyboard);
-extern void DrawGuichanWidgets();
+extern void DrawGuichanWidgets(std::vector<std::function<void(renderer *)>> &render_commands);
 extern void CleanGame();
 
 static int IconWidth;                       /// Icon width in panels
@@ -864,7 +864,7 @@ static void DrawPopup()
 /**
 **  Draw unit icons.
 */
-static void DrawUnitIcons()
+static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int i = Editor.UnitIndex;
 
@@ -899,7 +899,7 @@ static void DrawUnitIcons()
 		flag |= IconCommandButton;
 		//Wyrmgus end
 
-		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color());
+		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color(), render_commands);
 
 		//Wyrmgus start
 //		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
@@ -1143,7 +1143,7 @@ static void DrawTileIcons()
 	}
 }
 
-static void DrawEditorPanel_SelectIcon()
+static void DrawEditorPanel_SelectIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
@@ -1167,10 +1167,10 @@ static void DrawEditorPanel_SelectIcon()
 	//Wyrmgus end
 		
 	// FIXME: wrong button style
-	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color());
+	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color(), render_commands);
 }
 
-static void DrawEditorPanel_UnitsIcon()
+static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
@@ -1191,10 +1191,10 @@ static void DrawEditorPanel_UnitsIcon()
 	//Wyrmgus end
 		
 	// FIXME: wrong button style
-	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color());
+	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color(), render_commands);
 }
 
-static void DrawEditorPanel_StartIcon()
+static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
@@ -1218,7 +1218,7 @@ static void DrawEditorPanel_StartIcon()
 		flag |= IconCommandButton;
 		//Wyrmgus end
 		
-		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color());
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color(), render_commands);
 	} else {
 		//  No unit specified : draw a cross.
 		//  Todo : FIXME Should we just warn user to define Start unit ?
@@ -1245,12 +1245,12 @@ static void DrawEditorPanel_StartIcon()
 /**
 **  Draw the editor panels.
 */
-static void DrawEditorPanel()
+static void DrawEditorPanel(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
-	DrawEditorPanel_SelectIcon();
-	DrawEditorPanel_UnitsIcon();
+	DrawEditorPanel_SelectIcon(render_commands);
+	DrawEditorPanel_UnitsIcon(render_commands);
 
 	if (Editor.TerrainEditable) {
 		const int x = UI.InfoPanel.X + get_tile_icon_x() + 11 * scale_factor;
@@ -1260,7 +1260,7 @@ static void DrawEditorPanel()
 					 (ButtonUnderCursor == TileButton ? IconActive : 0) |
 					 (Editor.State == EditorEditTile ? IconSelected : 0));
 	}
-	DrawEditorPanel_StartIcon();
+	DrawEditorPanel_StartIcon(render_commands);
 
 	switch (Editor.State) {
 		case EditorSelecting:
@@ -1273,7 +1273,7 @@ static void DrawEditorPanel()
 			break;
 		case EditorEditUnit:
 			DrawPlayers();
-			DrawUnitIcons();
+			DrawUnitIcons(render_commands);
 			break;
 	}
 }
@@ -1529,7 +1529,7 @@ void EditorUpdateDisplay()
 	DrawUIButton(UI.MenuButton.Style,
 				 flag_active | flag_clicked,
 				 UI.MenuButton.X, UI.MenuButton.Y,
-				 UI.MenuButton.Text);
+				 UI.MenuButton.Text, render_commands);
 
 
 	// Minimap
@@ -1545,7 +1545,7 @@ void EditorUpdateDisplay()
 	if (UI.ButtonPanel.G) {
 		UI.ButtonPanel.G->DrawClip(UI.ButtonPanel.X, UI.ButtonPanel.Y);
 	}
-	DrawEditorPanel();
+	DrawEditorPanel(render_commands);
 
 	if (CursorOn == cursor_on::map) {
 		DrawEditorInfo();
@@ -1554,7 +1554,7 @@ void EditorUpdateDisplay()
 	// Status line
 	UI.StatusLine.Draw();
 
-	DrawGuichanWidgets();
+	DrawGuichanWidgets(render_commands);
 
 	// DrawPopup();
 

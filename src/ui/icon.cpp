@@ -108,10 +108,10 @@ std::shared_ptr<CPlayerColorGraphic> icon::get_graphics() const
 **  @param player  Player pointer used for icon colors
 **  @param pos     display pixel position
 */
-void icon::DrawIcon(const PixelPos &pos, const player_color *player_color) const
+void icon::DrawIcon(const PixelPos &pos, const player_color *player_color, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	if (player_color != nullptr) {
-		this->get_graphics()->DrawPlayerColorFrameClip(player_color, this->get_frame(), pos.x, pos.y, nullptr);
+		this->get_graphics()->DrawPlayerColorFrameClip(player_color, this->get_frame(), pos.x, pos.y, nullptr, render_commands);
 	} else {
 		this->get_graphics()->DrawFrameClip(this->get_frame(), pos.x, pos.y);
 	}
@@ -133,12 +133,12 @@ void icon::DrawGrayscaleIcon(const PixelPos &pos) const
 **  @param pos       display pixel position
 **  @param percent   cooldown percent
 */
-void icon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
+void icon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	// TO-DO: implement more effect types (clock-like)
 	this->get_graphics()->DrawGrayscaleFrameClip(this->get_frame(), pos.x, pos.y);
 	const int height = (this->get_graphics()->Height * (100 - percent)) / 100;
-	this->get_graphics()->DrawSubClip(this->get_graphics()->frame_map[this->get_frame()].x, this->get_graphics()->frame_map[this->get_frame()].y + this->get_graphics()->Height - height, this->get_graphics()->Width, height, pos.x, pos.y + this->get_graphics()->Height - height);
+	this->get_graphics()->DrawSubClip(this->get_graphics()->frame_map[this->get_frame()].x, this->get_graphics()->frame_map[this->get_frame()].y + this->get_graphics()->Height - height, this->get_graphics()->Width, height, pos.x, pos.y + this->get_graphics()->Height - height, render_commands);
 }
 
 /**
@@ -149,8 +149,7 @@ void icon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 **  @param pos     display pixel position
 **  @param text    Optional text to display
 */
-void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
-						 const PixelPos &pos, const std::string &text, const player_color *player_color, bool transparent, bool grayscale, int show_percent) const
+void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player_color, bool transparent, bool grayscale, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	ButtonStyle s(style);
 
@@ -177,9 +176,9 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		Video.FillRectangle(ColorBlack, pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
 			if (show_percent < 100) {
-				DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, grayscale, player_color, true);
+				DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, grayscale, player_color, true, render_commands);
 			}
-			DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, grayscale, player_color, transparent, show_percent);
+			DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, grayscale, player_color, transparent, show_percent, render_commands);
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, 46 * scale_factor - 1 * scale_factor, 38 * scale_factor - 1 * scale_factor);
 			} else if (flags & IconAutoCast) {
@@ -192,9 +191,9 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			}
 		} else {
 			if (show_percent < 100) {
-				DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, true);
+				DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, true, render_commands);
 			}
-			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, transparent, show_percent);
+			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, transparent, show_percent, render_commands);
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 			} else if (flags & IconAutoCast) {
@@ -229,18 +228,18 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		if (flags & IconActive) { // Code to make a border appear around the icon when the mouse hovers over it.
 			Video.DrawRectangle(ColorGray, pos.x - 4 * scale_factor, pos.y - 4, 54 * scale_factor, 46 * scale_factor);
 			if (show_percent < 100) {
-				DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, true);
+				DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, true, render_commands);
 			}
-			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, transparent, show_percent);
+			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, transparent, show_percent, render_commands);
 		}
 
 		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
 			//Wyrmgus start
 //			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player);
 			if (show_percent < 100) {
-				DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, grayscale, player_color, true);
+				DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, grayscale, player_color, true, render_commands);
 			}
-			DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, grayscale, player_color, transparent, show_percent);
+			DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, grayscale, player_color, transparent, show_percent, render_commands);
 			//Wyrmgus end
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, 46 * scale_factor, 38 * scale_factor);
@@ -253,18 +252,18 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			Video.DrawRectangle(ColorGray, pos.x - 4 * scale_factor, pos.y - 4 * scale_factor, 54 * scale_factor, 46 * scale_factor);
 		} else {
 			if (show_percent < 100) {
-				DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, true);
+				DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, true, render_commands);
 			}
-			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, transparent, show_percent);
+			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, transparent, show_percent, render_commands);
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 			}
 		}
 	} else {
 		if (show_percent < 100) {
-			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, true);
+			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, true, render_commands);
 		}
-		DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, transparent, show_percent);
+		DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, player_color, transparent, show_percent, render_commands);
 	}
 }
 

@@ -152,8 +152,8 @@ namespace gcn
          * Draws the Gui. By calling this funcion all draw functions
          * down in the Gui hierarchy will be called.
          */
-        void draw();
-		void draw(Widget* top);
+        void draw(std::vector<std::function<void(renderer *)>> &render_commands);
+		void draw(Widget* top, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Focus none of the Widgets in the Gui.

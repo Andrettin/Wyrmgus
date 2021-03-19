@@ -56,6 +56,8 @@
  * For comments regarding functions please see the header file.
  */
 
+#include "stratagus.h"
+
 #include "guichan/basiccontainer.h"
 #include "guichan/keyinput.h"
 #include "guichan/mouseinput.h"
@@ -128,7 +130,7 @@ namespace gcn
         adjustSize();
     }
 
-    void TextBox::draw(Graphics* graphics)
+    void TextBox::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         unsigned int i;
 
@@ -149,7 +151,7 @@ namespace gcn
         for (i = 0; i < mTextRows.size(); i++)
         {
             // Move the text one pixel so we can have a caret before a letter.
-            graphics->drawText(mTextRows[i], 1, i * getFont()->getHeight());
+            graphics->drawText(mTextRows[i], 1, i * getFont()->getHeight(), render_commands);
         }
     }
 

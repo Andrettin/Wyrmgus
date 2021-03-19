@@ -56,6 +56,8 @@
  * For comments regarding functions please see the header file.
  */
 
+#include "stratagus.h"
+
 #include "guichan/basiccontainer.h"
 #include "guichan/widgets/listbox.h"
 #include "guichan/widgets/scrollarea.h"
@@ -84,7 +86,7 @@ namespace gcn
         addKeyListener(this);
     }
 
-    void ListBox::draw(Graphics* graphics)
+    void ListBox::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         if (mListModel == nullptr)
         {
@@ -111,7 +113,7 @@ namespace gcn
 				graphics->fillRectangle(Rectangle(1, y + 1, getWidth() - 2, fontHeight - 2));
 			}
 
-            graphics->drawText(mListModel->getElementAt(i), 1, y);
+            graphics->drawText(mListModel->getElementAt(i), 1, y, render_commands);
 
             y += fontHeight;
         }

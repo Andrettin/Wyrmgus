@@ -58,7 +58,7 @@ CContentTypeText::~CContentTypeText()
 **  @param unit         unit with variable to show.
 **  @param defaultfont  default font if no specific font in extra data.
 */
-void CContentTypeText::Draw(const CUnit &unit, wyrmgus::font *defaultfont) const
+void CContentTypeText::Draw(const CUnit &unit, font *defaultfont, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	std::string text;       // Optional text to display.
 	int x = this->Pos.x;
@@ -139,7 +139,7 @@ CContentTypeFormattedText::CContentTypeFormattedText() : Component(VariableAttri
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-void CContentTypeFormattedText::Draw(const CUnit &unit, wyrmgus::font *defaultfont) const
+void CContentTypeFormattedText::Draw(const CUnit &unit, font *defaultfont, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	char buf[256];
 	UStrInt usi1;
@@ -185,7 +185,7 @@ CContentTypeFormattedText2::CContentTypeFormattedText2() : Component1(VariableAt
 **  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
-void CContentTypeFormattedText2::Draw(const CUnit &unit, wyrmgus::font *defaultfont) const
+void CContentTypeFormattedText2::Draw(const CUnit &unit, font *defaultfont, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	char buf[256];
 	UStrInt usi1, usi2;
@@ -266,13 +266,13 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **  @param unit         unit with icon to show.
 **  @param defaultfont  unused.
 */
-/* virtual */ void CContentTypeIcon::Draw(const CUnit &unit, wyrmgus::font *) const
+void CContentTypeIcon::Draw(const CUnit &unit, font *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
 	if (unitToDraw && unitToDraw->get_icon() != nullptr) {
 		unitToDraw->get_icon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
-			unitToDraw->get_player_color());
+			unitToDraw->get_player_color(), render_commands);
 	}
 }
 
@@ -285,7 +285,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **
 **  @todo Color and percent value Parametrisation.
 */
-/* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, wyrmgus::font *) const
+/* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, font *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start
@@ -373,8 +373,8 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	//Wyrmgus start
 //	Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
 //							this->Width + 3, this->Height + 3);
-	if (wyrmgus::defines::get()->get_bar_frame_graphics() != nullptr) {
-		wyrmgus::defines::get()->get_bar_frame_graphics()->DrawClip(this->Pos.x + (-1 - 4) * scale_factor, this->Pos.y + (-1 - 4) * scale_factor);
+	if (defines::get()->get_bar_frame_graphics() != nullptr) {
+		defines::get()->get_bar_frame_graphics()->DrawClip(this->Pos.x + (-1 - 4) * scale_factor, this->Pos.y + (-1 - 4) * scale_factor);
 		Video.FillRectangleClip(ColorBlack, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
 								this->Width * scale_factor, this->Height * scale_factor);
 	} else {
@@ -400,7 +400,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **
 **  @todo Color and percent value Parametrisation.
 */
-void CContentTypeCompleteBar::Draw(const CUnit &unit, wyrmgus::font *) const
+void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	Assert((unsigned int) this->varIndex < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start

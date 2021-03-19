@@ -476,7 +476,6 @@ class MultiLineLabel : public Widget
 	virtual void setLineWidth(int width);
 	virtual int getLineWidth();
 	virtual void adjustSize();
-	virtual void draw(gcn::Graphics *graphics);
 
 	enum {
 		LEFT = 0,

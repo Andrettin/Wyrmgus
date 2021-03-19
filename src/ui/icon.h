@@ -65,6 +65,7 @@ static int CclDefineIcon(lua_State *l);
 namespace wyrmgus {
 
 class player_color;
+class renderer;
 
 /// Icon: rectangle image used in menus
 class icon final : public icon_base, public data_type<icon>
@@ -95,14 +96,19 @@ public:
 	std::shared_ptr<CPlayerColorGraphic> get_graphics() const;
 
 	/// Draw icon
-	void DrawIcon(const PixelPos &pos, const player_color *player_color = nullptr) const;
+	void DrawIcon(const PixelPos &pos, const player_color *player_color, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	/// Draw grayscale icon
 	void DrawGrayscaleIcon(const PixelPos &pos) const;
 	/// Draw cooldown spell
-	void DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const;
+	void DrawCooldownSpellIcon(const PixelPos &pos, const int percent, std::vector<std::function<void(renderer *)>> &render_commands) const;
+
 	/// Draw icon of a unit
-	void DrawUnitIcon(const ButtonStyle &style,
-					  unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player = nullptr, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
+	void DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player, bool transparent, bool grayscale, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands) const;
+
+	void DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player, std::vector<std::function<void(renderer *)>> &render_commands) const
+	{
+		this->DrawUnitIcon(style, flags, pos, text, player, false, false, 100, render_commands);
+	}
 
 private:
 	player_color *conversible_player_color = nullptr;

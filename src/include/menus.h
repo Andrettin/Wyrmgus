@@ -35,11 +35,21 @@ class ButtonStyle;
 
 namespace wyrmgus {
 	class player_color;
+	class renderer;
 }
 
 /// Draw menu button
-extern void DrawUIButton(ButtonStyle *style, unsigned flags,
-						 int x, int y, const std::string &text, const bool grayscale = false, const wyrmgus::player_color *player_color = nullptr, bool transparent = false, int show_percent = 100);
+extern void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, const bool grayscale, const player_color *player_color, bool transparent, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
+
+inline void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, const bool grayscale, const player_color *player_color, bool transparent, std::vector<std::function<void(renderer *)>> &render_commands)
+{
+	DrawUIButton(style, flags, x, y, text, grayscale, player_color, transparent, 100, render_commands);
+}
+
+inline void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands)
+{
+	DrawUIButton(style, flags, x, y, text, false, nullptr, false, render_commands);
+}
 
 /// Pre menu setup
 extern void PreMenuSetup();

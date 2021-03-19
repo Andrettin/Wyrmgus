@@ -72,7 +72,7 @@ public:
 	virtual int getWidth(const std::string &text) override { return Width(text); }
 	//Wyrmgus start
 //	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y);
-	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y, bool is_normal = true) override;
+	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	//Wyrmgus end
 
 	void Reload();

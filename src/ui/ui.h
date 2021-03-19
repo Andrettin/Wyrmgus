@@ -226,7 +226,7 @@ private:
 class CButtonPanel
 {
 public:
-	void Draw();
+	void Draw(std::vector<std::function<void(renderer *)>> &render_commands);
 	void Update();
 	void DoClicked(int button);
 	int DoKey(int key);
@@ -310,10 +310,10 @@ public:
 
 constexpr int MaxResourceInfo = MaxCosts + 4; /// +4 for food and score and mana and free workers count
 
-class CInfoPanel
+class CInfoPanel final
 {
 public:
-	void Draw();
+	void Draw(std::vector<std::function<void(renderer *)>> &render_commands);
 
 	std::shared_ptr<CGraphic> G;
 	int X = 0;

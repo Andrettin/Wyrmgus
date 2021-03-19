@@ -40,6 +40,7 @@ struct StringDesc;
 namespace wyrmgus {
 	class font;
 	class font_color;
+	class renderer;
 }
 
 /**
@@ -51,7 +52,7 @@ public:
 	virtual ~CContentType();
 
 	/// Tell how show the variable Index.
-	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const = 0;
+	virtual void Draw(const CUnit &unit, font *defaultfont, std::vector<std::function<void(renderer *)>> &render_commands) const = 0;
 
 	virtual void Parse(lua_State *l) = 0;
 
@@ -65,13 +66,13 @@ public:
 /**
 **  Show simple text followed by variable value.
 */
-class CContentTypeText : public CContentType
+class CContentTypeText final : public CContentType
 {
 public:
 	CContentTypeText();
 	virtual ~CContentTypeText();
 
-	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, font *defaultfont, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:
@@ -87,13 +88,13 @@ private:
 /**
 **  Show formatted text with variable value.
 */
-class CContentTypeFormattedText : public CContentType
+class CContentTypeFormattedText final : public CContentType
 {
 public:
 	CContentTypeFormattedText();
 	virtual ~CContentTypeFormattedText() {}
 
-	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, font *defaultfont, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:
@@ -107,13 +108,13 @@ private:
 /**
 **  Show formatted text with variable value.
 */
-class CContentTypeFormattedText2 : public CContentType
+class CContentTypeFormattedText2 final : public CContentType
 {
 public:
 	CContentTypeFormattedText2();
 	virtual ~CContentTypeFormattedText2() {}
 
-	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, font *defaultfont, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:
@@ -129,10 +130,10 @@ private:
 /**
 **  Show icon of the unit
 */
-class CContentTypeIcon : public CContentType
+class CContentTypeIcon final : public CContentType
 {
 public:
-	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, font *defaultfont, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:
@@ -142,12 +143,12 @@ private:
 /**
 **  Show bar which change color depend of value.
 */
-class CContentTypeLifeBar : public CContentType
+class CContentTypeLifeBar final : public CContentType
 {
 public:
 	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {}
 
-	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, font *defaultfont, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:
@@ -163,12 +164,12 @@ private:
 /**
 **  Show bar.
 */
-class CContentTypeCompleteBar : public CContentType
+class CContentTypeCompleteBar final : public CContentType
 {
 public:
 	CContentTypeCompleteBar() : varIndex(-1), width(0), height(0), hasBorder(false), colorIndex(-1) {}
 
-	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, font *defaultfont, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:

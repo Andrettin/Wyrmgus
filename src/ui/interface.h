@@ -38,6 +38,7 @@ namespace wyrmgus {
 	class button;
 	class button_level;
 	class font_color;
+	class renderer;
 }
 
 /// Button area under cursor
@@ -283,9 +284,9 @@ bool HandleCommandKey(int key);
 extern void CancelBuildingMode();
 
 /// Draw menu button area
-extern void DrawMenuButtonArea();
+extern void DrawMenuButtonArea(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw user defined buttons
-extern void DrawUserDefinedButtons();
+extern void DrawUserDefinedButtons(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Update messages
 extern void UpdateMessages();
 /// Draw messages as overlay over of the map
@@ -297,10 +298,10 @@ extern void DrawTime();
 /// Draw the age
 extern void DrawAge();
 /// Draw the map layer buttons
-extern void DrawMapLayerButtons();
+extern void DrawMapLayerButtons(std::vector<std::function<void(renderer *)>> &render_commands);
 //Wyrmgus start
 /// Draw certain popups if something is being hovered over
-extern void DrawPopups();
+extern void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands);
 //Wyrmgus end
 /// Set message to display
 extern void SetMessage(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
@@ -329,7 +330,7 @@ extern void DrawTimer();
 /// Update the timer
 extern void UpdateTimer();
 /// Draw the Pie Menu
-extern void DrawPieMenu();
+extern void DrawPieMenu(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw the button popup
 extern void DrawPopup(const wyrmgus::button &button, int x = 0, int y = 0, bool above = true);
 //Wyrmgus start

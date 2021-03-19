@@ -85,7 +85,7 @@ public:
 	void DrawClip(int x, int y) const;
 	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y) const;
-	void DrawSubClip(int gx, int gy, int w, int h, int x, int y) const;
+	void DrawSubClip(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha) const;
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha) const;
@@ -377,7 +377,12 @@ public:
 		return this->load_mutex;
 	}
 
-	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands);
+	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->render_frame(player_color, time_of_day, frame_index, pixel_pos, flip, opacity, 100, render_commands);
+	}
 
 	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands)
 	{
@@ -442,7 +447,13 @@ public:
 	void DrawPlayerColorSub(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
 	void DrawPlayerColorSubClip(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
 	void DrawPlayerColorFrameClipX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr);
-	void DrawPlayerColorFrameClip(const player_color *player_color, unsigned frame, int x, int y, const time_of_day *time_of_day = nullptr, int show_percent = 100);
+	void DrawPlayerColorFrameClip(const player_color *player_color, const unsigned frame, const int x, const int y, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void DrawPlayerColorFrameClip(const player_color *player_color, const unsigned frame, const int x, const int y, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->DrawPlayerColorFrameClip(player_color, frame, x, y, time_of_day, 100, render_commands);
+	}
+
 	void DrawPlayerColorFrameClipTransX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr);
 	void DrawPlayerColorFrameClipTrans(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 

@@ -82,7 +82,7 @@
 
 #include <guichan.h>
 
-void DrawGuichanWidgets();
+void DrawGuichanWidgets(std::vector<std::function<void(renderer *)>> &render_commands);
 
 /// variable set when we are scrolling via keyboard
 int KeyScrollState = ScrollNone;
@@ -197,14 +197,11 @@ void DrawMapArea(std::vector<std::function<void(renderer *)>> &render_commands)
 */
 void UpdateDisplay()
 {
+	std::vector<std::function<void(renderer *)>> render_commands;
+
 	if (GameRunning || Editor.Running == EditorEditing) {
 		// to prevent empty spaces in the UI
-#if defined(USE_OPENGL) || defined(USE_GLES)
 		Video.FillRectangleClip(ColorBlack, 0, 0, Video.ViewportWidth, Video.ViewportHeight);
-#else
-		Video.FillRectangleClip(ColorBlack, 0, 0, Video.Width, Video.Height);
-#endif
-		std::vector<std::function<void(renderer *)>> render_commands;
 
 		DrawMapArea(render_commands);
 		DrawMessages();
@@ -219,8 +216,6 @@ void UpdateDisplay()
 		}
 		//Wyrmgus end
 
-		render_context::get()->set_commands(std::move(render_commands));
-
 		if ((Preference.BigScreen && !BigMapMode) || (!Preference.BigScreen && BigMapMode)) {
 			UiToggleBigMap();
 		}
@@ -230,22 +225,22 @@ void UpdateDisplay()
 				UI.Fillers[i].G->DrawSubClip(0, 0,
 											 UI.Fillers[i].G->Width,
 											 UI.Fillers[i].G->Height,
-											 UI.Fillers[i].X, UI.Fillers[i].Y);
+											 UI.Fillers[i].X, UI.Fillers[i].Y, render_commands);
 			}
-			DrawMenuButtonArea();
-			DrawUserDefinedButtons();
+			DrawMenuButtonArea(render_commands);
+			DrawUserDefinedButtons(render_commands);
 
 			UI.get_minimap()->Draw();
 			UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport);
 
-			UI.InfoPanel.Draw();
+			UI.InfoPanel.Draw(render_commands);
 			DrawResources();
 			DrawTime();
 			DrawAge();
-			DrawMapLayerButtons();
+			DrawMapLayerButtons(render_commands);
 			UI.StatusLine.Draw();
 			UI.StatusLine.DrawCosts();
-			UI.ButtonPanel.Draw();
+			UI.ButtonPanel.Draw(render_commands);
 		}
 		
 		DrawTimer();
@@ -256,7 +251,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 
-			CPlayer::GetThisPlayer()->FreeWorkers[0]->get_icon()->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", CPlayer::GetThisPlayer()->get_player_color());
+			CPlayer::GetThisPlayer()->FreeWorkers[0]->get_icon()->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", CPlayer::GetThisPlayer()->get_player_color(), render_commands);
 		}
 		
 		//draw icon if there are units with available level up upgrades
@@ -264,7 +259,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 								 
-			CPlayer::GetThisPlayer()->LevelUpUnits[0]->get_icon()->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", CPlayer::GetThisPlayer()->get_player_color());
+			CPlayer::GetThisPlayer()->LevelUpUnits[0]->get_icon()->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", CPlayer::GetThisPlayer()->get_player_color(), render_commands);
 		}
 		
 		//draw icon if the player has a hero
@@ -272,20 +267,22 @@ void UpdateDisplay()
 			const PixelPos pos(UI.HeroUnitButtons[i].X, UI.HeroUnitButtons[i].Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == static_cast<int>(i)) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 									 
-			CPlayer::GetThisPlayer()->Heroes[i]->get_icon()->DrawUnitIcon(*UI.HeroUnitButtons[i].Style, flag, pos, "", CPlayer::GetThisPlayer()->get_player_color());
+			CPlayer::GetThisPlayer()->Heroes[i]->get_icon()->DrawUnitIcon(*UI.HeroUnitButtons[i].Style, flag, pos, "", CPlayer::GetThisPlayer()->get_player_color(), render_commands);
 		}
 		
-		DrawPopups();
+		DrawPopups(render_commands);
 		//Wyrmgus end
 	}
 
-	DrawPieMenu(); // draw pie menu only if needed
+	DrawPieMenu(render_commands); // draw pie menu only if needed
 
-	DrawGuichanWidgets();
+	DrawGuichanWidgets(render_commands);
 	
 	if (CurrentCursorState != CursorState::Rectangle) {
 		DrawCursor();
 	}
+
+	render_context::get()->set_commands(std::move(render_commands));
 }
 
 static void InitGameCallbacks()

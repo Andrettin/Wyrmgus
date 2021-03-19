@@ -50,7 +50,7 @@
 **  @param text   text to print on button
 */
 void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
-				  const std::string &text, const bool grayscale, const wyrmgus::player_color *player_color, bool transparent, int show_percent)
+				  const std::string &text, const bool grayscale, const wyrmgus::player_color *player_color, bool transparent, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	ButtonStyleProperties *p;
 
@@ -86,7 +86,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 			if (transparent) {
 				colorGraphic->DrawPlayerColorFrameClipTrans(player_color, pimage->Frame, x, y, 64, nullptr, show_percent);
 			} else {
-				colorGraphic->DrawPlayerColorFrameClip(player_color, pimage->Frame, x, y, nullptr, show_percent);
+				colorGraphic->DrawPlayerColorFrameClip(player_color, pimage->Frame, x, y, nullptr, show_percent, render_commands);
 			}
 		} else {
 			pimage->Sprite->DrawFrame(pimage->Frame, x, y);

@@ -148,7 +148,7 @@ namespace gcn
          *
          * @param graphics a graphics object to draw with.
          */
-        virtual void drawMarker(gcn::Graphics* graphics);
+        virtual void drawMarker(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Sets the length of the marker.
@@ -197,7 +197,7 @@ namespace gcn
 
         // Inherited from Widget
 
-        virtual void draw(gcn::Graphics* graphics) override;
+        virtual void draw(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
         virtual void drawBorder(gcn::Graphics* graphics) override;
 

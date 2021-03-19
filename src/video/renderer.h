@@ -93,22 +93,27 @@ public:
 		glDisable(GL_DEPTH_TEST);
 	}
 
-	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pixel_pos, const QSize &frame_size, const bool flip, const unsigned char opacity)
+	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pixel_pos, const QSize &frame_size, const bool flip, const unsigned char opacity, const int show_percent)
 	{
 		const QSize target_size = this->get_target_size();
 
 		QRect source_rect;
 
+		QSize source_frame_size = frame_size;
+		if (show_percent < 100) {
+			source_frame_size = QSize(frame_size.width() * show_percent / 100, frame_size.height() * show_percent / 100);
+		}
+
 		if (flip) {
-			source_rect = QRect(QPoint(frame_pixel_pos.x() + frame_size.width(), frame_pixel_pos.y()), QSize(-frame_size.width(), frame_size.height()));
+			source_rect = QRect(QPoint(frame_pixel_pos.x() + source_frame_size.width(), frame_pixel_pos.y()), QSize(-source_frame_size.width(), source_frame_size.height()));
 		} else {
-			source_rect = QRect(frame_pixel_pos, frame_size);
+			source_rect = QRect(frame_pixel_pos, source_frame_size);
 		}
 
 		const QSize texture_size(texture->width(), texture->height());
 		const QMatrix3x3 source = QOpenGLTextureBlitter::sourceTransform(source_rect, texture_size, QOpenGLTextureBlitter::OriginBottomLeft);
 
-		const QRect target_rect(this->get_mirrored_pos(pos, frame_size), frame_size);
+		const QRect target_rect(this->get_mirrored_pos(pos, source_frame_size), source_frame_size);
 		const QMatrix4x4 target = QOpenGLTextureBlitter::targetTransform(target_rect, QRect(QPoint(0, 0), target_size));
 
 		this->blitter.bind();
@@ -126,11 +131,11 @@ public:
 		this->blitter.release();
 	}
 
-	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size, const bool flip, const unsigned char opacity);
+	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size, const bool flip, const unsigned char opacity, const int show_percent);
 
 	void blit_texture(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const bool flip, const unsigned char opacity)
 	{
-		this->blit_texture_frame(texture, pos, QPoint(0, 0), size, flip, opacity);
+		this->blit_texture_frame(texture, pos, QPoint(0, 0), size, flip, opacity, 100);
 	}
 
 	void fill_rect(const QRect &rect, const QColor &color)

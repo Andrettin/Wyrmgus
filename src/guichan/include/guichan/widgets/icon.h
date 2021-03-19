@@ -58,6 +58,10 @@
 #include "guichan/platform.h"
 #include "guichan/widget.h"
 
+namespace wyrmgus {
+    class renderer;
+}
+
 namespace gcn
 {
     /**
@@ -76,9 +80,9 @@ namespace gcn
 
         // Inherited from Widget
 
-        virtual void draw(Graphics* graphics);
+        virtual void draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        virtual void drawBorder(Graphics* graphics);
+        virtual void drawBorder(Graphics* graphics) override;
 
 	//Wyrmgus start
 //    private:

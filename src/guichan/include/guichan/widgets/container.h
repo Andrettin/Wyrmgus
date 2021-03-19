@@ -141,9 +141,9 @@ namespace gcn
 
         // Inherited from Widget
 
-        virtual void draw(Graphics* graphics);
+        virtual void draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        virtual void drawBorder(Graphics* graphics);
+        virtual void drawBorder(Graphics* graphics) override;
 
         virtual void logic();
 
@@ -175,7 +175,7 @@ namespace gcn
          *
          * @param graphics the Graphics object to draw with.
          */
-        virtual void drawChildren(Graphics* graphics);
+        virtual void drawChildren(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Calls the logic function for all children of Container. The Widgets

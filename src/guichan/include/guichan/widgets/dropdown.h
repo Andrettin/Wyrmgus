@@ -175,9 +175,9 @@ namespace gcn
 
         // Inherited from Widget
 
-        virtual void draw(Graphics* graphics);
+        virtual void draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        virtual void drawBorder(Graphics* graphics);
+        virtual void drawBorder(Graphics* graphics) override;
 
         virtual bool _keyInputMessage(const KeyInput& keyInput);
 
@@ -231,7 +231,7 @@ namespace gcn
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawButton(Graphics *graphics);
+        virtual void drawButton(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Sets the DropDown Widget to dropped-down mode.

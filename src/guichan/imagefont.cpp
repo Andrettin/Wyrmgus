@@ -188,7 +188,7 @@ namespace gcn
         return mHeight + mRowSpacing;
     }
 
-    int ImageFont::drawGlyph(Graphics* graphics, unsigned char glyph, int x, int y)
+    int ImageFont::drawGlyph(Graphics* graphics, unsigned char glyph, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         // This is needed for drawing the Glyph in the middle if we have spacing
         int yoffset = getRowSpacing() >> 1;
@@ -202,21 +202,21 @@ namespace gcn
         }
 
         graphics->drawImage(mImage.get(), mGlyph[glyph].x, mGlyph[glyph].y, x,
-                            y + yoffset, mGlyph[glyph].width, mGlyph[glyph].height);
+                            y + yoffset, mGlyph[glyph].width, mGlyph[glyph].height, render_commands);
 
         return mGlyph[glyph].width + mGlyphSpacing;
     }
 
 	//Wyrmgus start
 //    void ImageFont::drawString(Graphics* graphics, const std::string& text, int x, int y)
-    void ImageFont::drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal)
+    void ImageFont::drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands)
 	//Wyrmgus end
     {
         unsigned int i;
 
         for (i = 0; i< text.size(); ++i)
         {
-            drawGlyph(graphics, text.at(i), x, y);
+            drawGlyph(graphics, text.at(i), x, y, render_commands);
             x += getWidth(text.at(i));
         }
     }

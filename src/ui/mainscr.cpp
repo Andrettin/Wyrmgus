@@ -88,7 +88,7 @@
 --  UI BUTTONS
 ----------------------------------------------------------------------------*/
 
-static void DrawMenuButtonArea_noNetwork()
+static void DrawMenuButtonArea_noNetwork(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (UI.MenuButton.X != -1) {
 		DrawUIButton(UI.MenuButton.Style,
@@ -96,11 +96,11 @@ static void DrawMenuButtonArea_noNetwork()
 					  && ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
 					 (UI.MenuButton.Clicked ? MI_FLAGS_CLICKED : 0),
 					 UI.MenuButton.X, UI.MenuButton.Y,
-					 UI.MenuButton.Text);
+					 UI.MenuButton.Text, render_commands);
 	}
 }
 
-static void DrawMenuButtonArea_Network()
+static void DrawMenuButtonArea_Network(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (UI.MenuButton.X != -1) {
 		DrawUIButton(UI.MenuButton.Style,
@@ -108,7 +108,7 @@ static void DrawMenuButtonArea_Network()
 					  && ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
 					 (UI.MenuButton.Clicked ? MI_FLAGS_CLICKED : 0),
 					 UI.MenuButton.X, UI.MenuButton.Y,
-					 UI.MenuButton.Text);
+					 UI.MenuButton.Text, render_commands);
 	}
 	if (UI.NetworkDiplomacyButton.X != -1) {
 		DrawUIButton(UI.NetworkDiplomacyButton.Style,
@@ -116,23 +116,23 @@ static void DrawMenuButtonArea_Network()
 					  && ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
 					 (UI.NetworkDiplomacyButton.Clicked ? MI_FLAGS_CLICKED : 0),
 					 UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
-					 UI.NetworkDiplomacyButton.Text);
+					 UI.NetworkDiplomacyButton.Text, render_commands);
 	}
 }
 
 /**
 **  Draw menu button area.
 */
-void DrawMenuButtonArea()
+void DrawMenuButtonArea(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (!IsNetworkGame()) {
-		DrawMenuButtonArea_noNetwork();
+		DrawMenuButtonArea_noNetwork(render_commands);
 	} else {
-		DrawMenuButtonArea_Network();
+		DrawMenuButtonArea_Network(render_commands);
 	}
 }
 
-void DrawUserDefinedButtons()
+void DrawUserDefinedButtons(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
 		const CUIUserButton &button = UI.UserButtons[i];
@@ -143,7 +143,7 @@ void DrawUserDefinedButtons()
 						  && size_t(ButtonUnderCursor) == i ? MI_FLAGS_ACTIVE : 0) |
 						 (button.Clicked ? MI_FLAGS_CLICKED : 0),
 						 button.Button.X, button.Button.Y,
-						 button.Button.Text);
+						 button.Button.Text, render_commands);
 		}
 	}
 }
@@ -489,7 +489,7 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, const int index, const Vari
 	return val;
 }
 
-static void DrawUnitInfo_Training(const CUnit &unit)
+static void DrawUnitInfo_Training(const CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (unit.Orders.size() == 1 || unit.Orders[1]->Action != UnitAction::Train) {
 		if (!UI.SingleTrainingText.empty()) {
@@ -512,7 +512,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			flags |= IconCommandButton;
 			//Wyrmgus end
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
-			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.get_player_color());
+			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.get_player_color(), render_commands);
 		}
 	} else {
 		if (!UI.TrainingText.empty()) {
@@ -546,7 +546,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					const PixelPos pos(UI.TrainingButtons[j].X, UI.TrainingButtons[j].Y);
 					//Wyrmgus start
 					flag |= IconCommandButton;
-					icon.DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.get_player_color());
+					icon.DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.get_player_color(), render_commands);
 					train_counter.push_back(1);
 					++j;
 				}
@@ -565,7 +565,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 	}
 }
 
-static void DrawUnitInfo_portrait(const CUnit &unit)
+static void DrawUnitInfo_portrait(const CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (UI.SingleSelectedButton) {
 		const PixelPos pos(UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
@@ -580,11 +580,11 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		}
 		 //Wyrmgus end
 
-		unit.get_icon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.get_player_color());
+		unit.get_icon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.get_player_color(), render_commands);
 	}
 }
 
-static bool DrawUnitInfo_single_selection(const CUnit &unit)
+static bool DrawUnitInfo_single_selection(const CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	switch (unit.CurrentAction()) {
 		case UnitAction::Train: { //  Building training units.
@@ -594,7 +594,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				return false;
 			}
 			//Wyrmgus end
-			DrawUnitInfo_Training(unit);
+			DrawUnitInfo_Training(unit, render_commands);
 			return true;
 		}
 		case UnitAction::UpgradeTo: { //  Building upgrading to better type.
@@ -613,7 +613,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 									(IconActive | (MouseButtons & LeftButton)) : 0;
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
 				flag |= IconCommandButton;
-				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.get_player_color());
+				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.get_player_color(), render_commands);
 			}
 			return true;
 		}
@@ -634,7 +634,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
 				flag |= IconCommandButton;
-				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.get_player_color());
+				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.get_player_color(), render_commands);
 			}
 			return true;
 		}
@@ -643,7 +643,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 	}
 }
 
-static void DrawUnitInfo_transporter(CUnit &unit)
+static void DrawUnitInfo_transporter(CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	CUnit *uins = unit.UnitInside;
 	size_t j = 0;
@@ -662,7 +662,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		flag |= IconCommandButton;
 		//Wyrmgus end
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-		uins->get_icon()->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->get_player_color());
+		uins->get_icon()->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->get_player_color(), render_commands);
 		//Wyrmgus start
 //		UiDrawLifeBar(*uins, pos.x, pos.y);
 //		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
@@ -678,7 +678,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 }
 
 //Wyrmgus start
-static void DrawUnitInfo_inventory(CUnit &unit)
+static void DrawUnitInfo_inventory(CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	CUnit *uins = unit.UnitInside;
 	size_t j = 0;
@@ -698,7 +698,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			flag |= IconSelected;
 		}
 		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-		uins->get_icon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.get_player_color());
+		uins->get_icon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.get_player_color(), render_commands);
 		++j;
 	}
 }
@@ -709,7 +709,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 */
-static void DrawUnitInfo(CUnit &unit)
+static void DrawUnitInfo(CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	UpdateUnitVariables(unit);
 	
@@ -717,7 +717,7 @@ static void DrawUnitInfo(CUnit &unit)
 		if (CanShowContent(UI.InfoPanelContents[i]->Condition.get(), unit)) {
 			for (const std::unique_ptr<CContentType> &content : UI.InfoPanelContents[i]->Contents) {
 				if (CanShowContent(content->Condition.get(), unit)) {
-					content->Draw(unit, UI.InfoPanelContents[i]->DefaultFont);
+					content->Draw(unit, UI.InfoPanelContents[i]->DefaultFont, render_commands);
 				}
 			}
 		}
@@ -727,7 +727,7 @@ static void DrawUnitInfo(CUnit &unit)
 	Assert(&type);
 
 	// Draw IconUnit
-	DrawUnitInfo_portrait(unit);
+	DrawUnitInfo_portrait(unit, render_commands);
 
 	//Wyrmgus start
 //	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*unit.Player)) {
@@ -738,20 +738,20 @@ static void DrawUnitInfo(CUnit &unit)
 
 	//  Show progress if they are selected.
 	if (IsOnlySelected(unit)) {
-		if (DrawUnitInfo_single_selection(unit)) {
+		if (DrawUnitInfo_single_selection(unit, render_commands)) {
 			return;
 		}
 	}
 
 	//  Transporting units.
 	if (type.CanTransport() && unit.BoardCount && CurrentButtonLevel == unit.Type->ButtonLevelForTransporter) {
-		DrawUnitInfo_transporter(unit);
+		DrawUnitInfo_transporter(unit, render_commands);
 		return;
 	}
 	
 	//Wyrmgus start
 	if (unit.HasInventory() && unit.InsideCount && CurrentButtonLevel == wyrmgus::defines::get()->get_inventory_button_level()) {
-		DrawUnitInfo_inventory(unit);
+		DrawUnitInfo_inventory(unit, render_commands);
 		return;
 	}
 	//Wyrmgus end
@@ -924,7 +924,7 @@ void DrawAge()
 /**
 **	@brief	Draw the map layer buttons.
 */
-void DrawMapLayerButtons()
+void DrawMapLayerButtons(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
 		if (UI.WorldButtons[i].X != -1) {
@@ -932,7 +932,7 @@ void DrawMapLayerButtons()
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerWorld && ButtonUnderCursor == static_cast<int>(i) ? MI_FLAGS_ACTIVE : 0)
 				| ((UI.WorldButtons[i].Clicked || CMap::get()->GetCurrentWorld() == wyrmgus::world::get_all()[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.WorldButtons[i].X, UI.WorldButtons[i].Y,
-				UI.WorldButtons[i].Text
+				UI.WorldButtons[i].Text, render_commands
 			);
 		}
 	}
@@ -952,7 +952,7 @@ static std::unique_ptr<wyrmgus::button> get_territory_tooltip_button(const CPlay
 /**
 **	@brief	Draw certain popups if something is being hovered over
 */
-void DrawPopups()
+void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	//
 	// Draw unit under the cursor's name popup
@@ -1046,7 +1046,7 @@ void DrawPopups()
 					flag |= IconSelected;
 				}
 				const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-				uins->get_icon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->get_player_color());
+				uins->get_icon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->get_player_color(), render_commands);
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
 					//hackish way to make the popup appear correctly for the inventory item
@@ -1857,7 +1857,7 @@ static void DrawInfoPanelBackground(unsigned frame)
 	}
 }
 
-static void InfoPanel_draw_no_selection()
+static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
@@ -1865,7 +1865,7 @@ static void InfoPanel_draw_no_selection()
 	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer())
 		&& !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		// FIXME: not correct for enemies units
-		DrawUnitInfo(*UnitUnderCursor);
+		DrawUnitInfo(*UnitUnderCursor, render_commands);
 	} else {
 		// FIXME: need some cool ideas for this.
 		int x = UI.InfoPanel.X + 16 * scale_factor;
@@ -1918,7 +1918,7 @@ static void InfoPanel_draw_no_selection()
 	}
 }
 
-static void InfoPanel_draw_single_selection(CUnit *selUnit)
+static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	CUnit &unit = (selUnit ? *selUnit : *Selected[0]);
 	int panelIndex;
@@ -1959,7 +1959,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		wyrmgus::defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - 4 * wyrmgus::defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * wyrmgus::defines::get()->get_scale_factor());
 	}
 	//Wyrmgus end	
-	DrawUnitInfo(unit);
+	DrawUnitInfo(unit, render_commands);
 	//Wyrmgus start
 	/*
 	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
@@ -1980,7 +1980,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	//Wyrmgus end
 }
 
-static void InfoPanel_draw_multiple_selection()
+static void InfoPanel_draw_multiple_selection(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	//  If there are more units selected draw their pictures and a health bar
 	DrawInfoPanelBackground(0);
@@ -1995,7 +1995,7 @@ static void InfoPanel_draw_multiple_selection()
 		//Wyrmgus end
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
-						  pos, "", Selected[i]->get_player_color());
+						  pos, "", Selected[i]->get_player_color(), render_commands);
 
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
@@ -2026,16 +2026,16 @@ static void InfoPanel_draw_multiple_selection()
 **    magic unit   - magic units
 **    construction - under construction
 */
-void CInfoPanel::Draw()
+void CInfoPanel::Draw(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value
 		&& (ReplayRevealMap || UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer()))) {
-			InfoPanel_draw_single_selection(UnitUnderCursor);
+			InfoPanel_draw_single_selection(UnitUnderCursor, render_commands);
 	} else {
 		switch (Selected.size()) {
-			case 0: { InfoPanel_draw_no_selection(); break; }
-			case 1: { InfoPanel_draw_single_selection(nullptr); break; }
-			default: { InfoPanel_draw_multiple_selection(); break; }
+			case 0: { InfoPanel_draw_no_selection(render_commands); break; }
+			case 1: { InfoPanel_draw_single_selection(nullptr, render_commands); break; }
+			default: { InfoPanel_draw_multiple_selection(render_commands); break; }
 		}
 	}
 }

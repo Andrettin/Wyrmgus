@@ -114,7 +114,7 @@ namespace gcn
          */
 		//Wyrmgus start
 //        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y) = 0;
-        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal = true) = 0;
+        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands) = 0;
 		//Wyrmgus end
     };
 }

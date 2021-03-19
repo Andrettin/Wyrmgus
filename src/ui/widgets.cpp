@@ -171,11 +171,11 @@ void handleInput(const SDL_Event *event)
 	}
 }
 
-void DrawGuichanWidgets()
+void DrawGuichanWidgets(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (Gui) {
 		Gui->setUseDirtyDrawing(false);
-		Gui->draw();
+		Gui->draw(render_commands);
 	}
 }
 
@@ -234,7 +234,7 @@ void MyOpenGLGraphics::_endDraw()
 	popClipArea();
 }
 
-void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const wyrmgus::player_color *player_color, unsigned int transparency, bool grayscale) const
+void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const wyrmgus::player_color *player_color, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
@@ -256,8 +256,8 @@ void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, in
 		static_cast<const CGraphic *>(image)->DrawGrayscaleSubClip(srcX, srcY, width, height,
 										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
 	} else {
-		static_cast<const CGraphic *>(image)->DrawSubClip(srcX, srcY, width, height,
-										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+		((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
+										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset, render_commands);
 	}
 	//Wyrmgus end
 	PopClipping();
@@ -366,14 +366,14 @@ PlayerColorImageWidget::PlayerColorImageWidget(const std::string &image_path, co
 	setWidth(graphic->getWidth());
 }
 
-void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
+void PlayerColorImageWidget::draw(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const wyrmgus::player_color *player_color = nullptr;
 	if (!this->WidgetPlayerColor.empty()) {
 		player_color = wyrmgus::player_color::get(WidgetPlayerColor);
 	}
 	
-	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), player_color, 0, this->grayscale);
+	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), player_color, 0, this->grayscale, render_commands);
 }
 
 void PlayerColorImageWidget::set_frame(const int frame)
@@ -432,10 +432,10 @@ ImageButton::~ImageButton()
 **
 **  @param graphics  Graphics object to draw with
 */
-void ImageButton::draw(gcn::Graphics *graphics)
+void ImageButton::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (!normalImage) {
-		Button::draw(graphics);
+		Button::draw(graphics, render_commands);
 		return;
 	}
 
@@ -457,20 +457,20 @@ void ImageButton::draw(gcn::Graphics *graphics)
         graphics->setColor(ColorBlack);
 		graphics->fillRectangle(gcn::Rectangle((frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2, img->getWidth(), img->getHeight()));
 		graphics->drawImage(frameImage.get(), 0, 0, 0, 0,
-							frameImage->getWidth(), frameImage->getHeight());
+							frameImage->getWidth(), frameImage->getHeight(), render_commands);
 		if (isPressed()) {
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img.get(), ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth() - 1, img->getHeight() - 1);
+								img->getWidth() - 1, img->getHeight() - 1, render_commands);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 			if (pressedframeImage) {
 				graphics->drawImage(pressedframeImage.get(), 0, 0, 0, 0,
-									pressedframeImage->getWidth(), pressedframeImage->getHeight());
+									pressedframeImage->getWidth(), pressedframeImage->getHeight(), render_commands);
 			}
 		} else {
 			if (Transparency) {
@@ -478,7 +478,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img.get(), ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-								img->getWidth(), img->getHeight());
+								img->getWidth(), img->getHeight(), render_commands);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
@@ -489,7 +489,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 			glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 		}
 		graphics->drawImage(img.get(), ImageOrigin.x, ImageOrigin.y, 0, 0,
-							img->getWidth(), img->getHeight());
+							img->getWidth(), img->getHeight(), render_commands);
 		if (Transparency) {
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}
@@ -549,7 +549,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 			textY = 0;
 		}
 	}
-	graphics->drawText(getCaption(), textX, textY, getAlignment(), is_normal);
+	graphics->drawText(getCaption(), textX, textY, getAlignment(), is_normal, render_commands);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -658,10 +658,10 @@ PlayerColorImageButton::PlayerColorImageButton(const std::string &caption, const
 **
 **  @param graphics  Graphics object to draw with
 */
-void PlayerColorImageButton::draw(gcn::Graphics *graphics)
+void PlayerColorImageButton::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (!normalImage) {
-		Button::draw(graphics);
+		Button::draw(graphics, render_commands);
 		return;
 	}
 
@@ -684,20 +684,20 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
         graphics->setColor(ColorBlack);
 		graphics->fillRectangle(gcn::Rectangle((frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2, img->getWidth(), img->getHeight()));
 		graphics->drawImage(frameImage.get(), 0, 0, 0, 0,
-							frameImage->getWidth(), frameImage->getHeight());
+							frameImage->getWidth(), frameImage->getHeight(), render_commands);
 		if (isPressed()) {
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth() - 1, img->getHeight() - 1, player_color, Transparency, this->grayscale);
+								img->getWidth() - 1, img->getHeight() - 1, player_color, Transparency, this->grayscale, render_commands);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 			if (pressedframeImage) {
 				graphics->drawImage(pressedframeImage.get(), 0, 0, 0, 0,
-									pressedframeImage->getWidth(), pressedframeImage->getHeight());
+									pressedframeImage->getWidth(), pressedframeImage->getHeight(), render_commands);
 			}
 		} else {
 			if (Transparency) {
@@ -705,7 +705,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-								img->getWidth(), img->getHeight(), player_color, Transparency, this->grayscale);
+								img->getWidth(), img->getHeight(), player_color, Transparency, this->grayscale, render_commands);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
@@ -716,7 +716,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
-							img->getWidth(), img->getHeight(), player_color, Transparency, this->grayscale);
+							img->getWidth(), img->getHeight(), player_color, Transparency, this->grayscale, render_commands);
 		if (Transparency) {
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}
@@ -749,9 +749,9 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		is_normal = false;
 	}
 	if (isPressed()) {
-		graphics->drawText(getCaption(), textX + 4, textY + 4, getAlignment(), is_normal);
+		graphics->drawText(getCaption(), textX + 4, textY + 4, getAlignment(), is_normal, render_commands);
 	} else {
-		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment(), is_normal);
+		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment(), is_normal, render_commands);
 	}
 
 	if (isPressed() && !frameImage) {
@@ -856,7 +856,7 @@ ImageRadioButton::ImageRadioButton(const std::string &caption,
 /**
 **  Draw the image radio button (not the caption)
 */
-void ImageRadioButton::drawBox(gcn::Graphics *graphics)
+void ImageRadioButton::drawBox(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	std::shared_ptr<CGraphic> img;
 
@@ -880,18 +880,18 @@ void ImageRadioButton::drawBox(gcn::Graphics *graphics)
 
 	if (img) {
 		graphics->drawImage(img.get(), 0, 0, 0, (getHeight() - img->getHeight()) / 2,
-							img->getWidth(), img->getHeight());
+							img->getWidth(), img->getHeight(), render_commands);
 	} else {
-		RadioButton::drawBox(graphics);
+		RadioButton::drawBox(graphics, render_commands);
 	}
 }
 
 /**
 **  Draw the image radio button
 */
-void ImageRadioButton::draw(gcn::Graphics *graphics)
+void ImageRadioButton::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	drawBox(graphics);
+	drawBox(graphics, render_commands);
 
 	graphics->setFont(getFont());
 	graphics->setColor(getForegroundColor());
@@ -905,7 +905,7 @@ void ImageRadioButton::draw(gcn::Graphics *graphics)
 		width += width / 2;
 	}
 
-	graphics->drawText(getCaption(), width - 2, 0);
+	graphics->drawText(getCaption(), width - 2, 0, render_commands);
 
 	if (hasFocus()) {
 		graphics->drawRectangle(gcn::Rectangle(width - 4, 0, getWidth() - width + 3, getHeight()));
@@ -1022,9 +1022,9 @@ ImageCheckBox::ImageCheckBox(const std::string &caption, bool marked) :
 /**
 **  Draw the image checkbox
 */
-void ImageCheckBox::draw(gcn::Graphics *graphics)
+void ImageCheckBox::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	drawBox(graphics);
+	drawBox(graphics, render_commands);
 
 	graphics->setFont(getFont());
 	graphics->setColor(getForegroundColor());
@@ -1038,7 +1038,7 @@ void ImageCheckBox::draw(gcn::Graphics *graphics)
 		width += width / 2;
 	}
 
-	graphics->drawText(getCaption(), width - 2, 0);
+	graphics->drawText(getCaption(), width - 2, 0, render_commands);
 
 	if (hasFocus()) {
 		graphics->drawRectangle(gcn::Rectangle(width - 4, 0, getWidth() - width + 3, getHeight()));
@@ -1048,7 +1048,7 @@ void ImageCheckBox::draw(gcn::Graphics *graphics)
 /**
 **  Draw the checkbox (not the caption)
 */
-void ImageCheckBox::drawBox(gcn::Graphics *graphics)
+void ImageCheckBox::drawBox(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	std::shared_ptr<CGraphic> img;
 
@@ -1072,9 +1072,9 @@ void ImageCheckBox::drawBox(gcn::Graphics *graphics)
 
 	if (img) {
 		graphics->drawImage(img.get(), 0, 0, 0, (getHeight() - img->getHeight()) / 2,
-							img->getWidth(), img->getHeight());
+							img->getWidth(), img->getHeight(), render_commands);
 	} else {
-		CheckBox::drawBox(graphics);
+		CheckBox::drawBox(graphics, render_commands);
 	}
 }
 
@@ -1180,7 +1180,7 @@ ImageSlider::ImageSlider(double scaleStart, double scaleEnd) :
 {
 }
 
-void ImageSlider::drawMarker(gcn::Graphics *graphics)
+void ImageSlider::drawMarker(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	std::shared_ptr<CGraphic> img = markerImage;
 
@@ -1189,19 +1189,19 @@ void ImageSlider::drawMarker(gcn::Graphics *graphics)
 			if (getOrientation() == HORIZONTAL) {
 				int v = getMarkerPosition();
 				graphics->drawImage(img.get(), 0, 0, v, 0,
-					img->getWidth(), img->getHeight());
+					img->getWidth(), img->getHeight(), render_commands);
 			} else {
 				int v = (getHeight() - getMarkerLength()) - getMarkerPosition();
 				graphics->drawImage(img.get(), 0, 0, 0, v,
-					img->getWidth(), img->getHeight());
+					img->getWidth(), img->getHeight(), render_commands);
 			}
 		} else {
-			Slider::drawMarker(graphics);
+			Slider::drawMarker(graphics, render_commands);
 		}
 	}
 }
 
-void ImageSlider::draw(gcn::Graphics *graphics)
+void ImageSlider::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	std::shared_ptr<CGraphic> img;
 
@@ -1212,12 +1212,12 @@ void ImageSlider::draw(gcn::Graphics *graphics)
 	}
 
 	if (img) {
-		graphics->drawImage(img.get(), 0, 0, 0, 0, img->getWidth(), img->getHeight());
+		graphics->drawImage(img.get(), 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 		if (isEnabled()) {
-			drawMarker(graphics);
+			drawMarker(graphics, render_commands);
 		}
 	} else {
-		Slider::draw(graphics);
+		Slider::draw(graphics, render_commands);
 	}
 }
 
@@ -1355,7 +1355,7 @@ void MultiLineLabel::adjustSize()
 /**
 **  Draw the label
 */
-void MultiLineLabel::draw(gcn::Graphics *graphics)
+void MultiLineLabel::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	graphics->setFont(getFont());
 	graphics->setColor(getForegroundColor());
@@ -1394,7 +1394,7 @@ void MultiLineLabel::draw(gcn::Graphics *graphics)
 
 	for (int i = 0; i < (int)this->mTextRows.size(); ++i) {
 		graphics->drawText(this->mTextRows[i], textX, textY + i * this->getFont()->getHeight(),
-						   this->getAlignment());
+						   this->getAlignment(), true, render_commands);
 	}
 }
 
@@ -1710,7 +1710,7 @@ void Windows::setBaseColor(const gcn::Color &color)
 --  ImageTextField
 ----------------------------------------------------------------------------*/
 
-void ImageTextField::draw(gcn::Graphics *graphics)
+void ImageTextField::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Font *font;
 	int x, y;
@@ -1719,7 +1719,7 @@ void ImageTextField::draw(gcn::Graphics *graphics)
 		throw std::runtime_error("Not all graphics for ImageTextField were set.");
 	}
 	img->Resize(getWidth(), img->getHeight());
-	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), img->getHeight(), render_commands);
 
 	if (hasFocus())
 	{
@@ -1753,7 +1753,7 @@ void ImageTextField::draw(gcn::Graphics *graphics)
 		graphics->fillRectangle(gcn::Rectangle(x + selX, y, selW, font->getHeight()));
 	}
 
-	graphics->drawText(mText, x, y);
+	graphics->drawText(mText, x, y, render_commands);
 }
 
 void ImageTextField::drawBorder(gcn::Graphics *graphics)
@@ -1810,7 +1810,7 @@ ImageListBox::ImageListBox(gcn::ListModel *listModel) : gcn::ListBox(listModel),
 {
 }
 
-void ImageListBox::draw(gcn::Graphics *graphics)
+void ImageListBox::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (mListModel == nullptr) {
 		return;
@@ -1832,11 +1832,11 @@ void ImageListBox::draw(gcn::Graphics *graphics)
         * @todo Check cliprects so we do not have to iterate over elements in the list model
         */
 	for (i = 0; i < mListModel->getNumberOfElements(); ++i) {
-		graphics->drawImage(img, 0, 0, 0, y, getWidth(), img->getHeight());
+		graphics->drawImage(img, 0, 0, 0, y, getWidth(), img->getHeight(), render_commands);
 		if (i == mSelected) {
-			graphics->drawText("~<" + mListModel->getElementAt(i) + "~>", 1, y + (fontHeight - getFont()->getHeight()) / 2);
+			graphics->drawText("~<" + mListModel->getElementAt(i) + "~>", 1, y + (fontHeight - getFont()->getHeight()) / 2, render_commands);
 		} else {
-			graphics->drawText(mListModel->getElementAt(i), 1, y + (fontHeight - getFont()->getHeight()) / 2);
+			graphics->drawText(mListModel->getElementAt(i), 1, y + (fontHeight - getFont()->getHeight()) / 2, render_commands);
 		}
 
 		y += fontHeight;
@@ -2156,7 +2156,7 @@ void ImageListBoxWidget::setVBarImage(CGraphic *image) {
 **
 **  @param  graphics Graphics to use
 */
-void ImageListBoxWidget::draw(gcn::Graphics *graphics)
+void ImageListBoxWidget::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	CGraphic *img = nullptr;
 
@@ -2172,7 +2172,7 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics)
 	img->Resize(rect.width, img->getHeight());
 	int y = 0;
 	while (y + img->getHeight() <= rect.height) {
-		graphics->drawImage(img, 0, 0, 0, y, getWidth(), img->getHeight());
+		graphics->drawImage(img, 0, 0, 0, y, getWidth(), img->getHeight(), render_commands);
 		y += img->getHeight();
 	}
 	img->SetOriginalSize();
@@ -2180,32 +2180,32 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics)
 	if (mVBarVisible)
 	{
 		if (mUpButtonPressed) {
-			this->drawUpPressedButton(graphics);
+			this->drawUpPressedButton(graphics, render_commands);
 		} else {
-			this->drawUpButton(graphics);
+			this->drawUpButton(graphics, render_commands);
 		}
 		if (mDownButtonPressed) {
-			this->drawDownPressedButton(graphics);
+			this->drawDownPressedButton(graphics, render_commands);
 		} else {
-			this->drawDownButton(graphics);
+			this->drawDownButton(graphics, render_commands);
 		}
-		this->drawVBar(graphics);
-		this->drawVMarker(graphics);
+		this->drawVBar(graphics, render_commands);
+		this->drawVMarker(graphics, render_commands);
 	}
 	if (mHBarVisible)
 	{
 		if (mLeftButtonPressed) {
-			this->drawLeftPressedButton(graphics);
+			this->drawLeftPressedButton(graphics, render_commands);
 		} else {
-			this->drawLeftButton(graphics);
+			this->drawLeftButton(graphics, render_commands);
 		}
 		if (mRightButtonPressed) {
-			this->drawRightPressedButton(graphics);
+			this->drawRightPressedButton(graphics, render_commands);
 		} else {
-			this->drawRightButton(graphics);
+			this->drawRightButton(graphics, render_commands);
 		}
-		this->drawHBar(graphics);
-		this->drawHMarker(graphics);
+		this->drawHBar(graphics, render_commands);
+		this->drawHMarker(graphics, render_commands);
 	}
 	if (mContent)
 	{
@@ -2226,7 +2226,7 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics)
 		}
 
 		graphics->pushClipArea(contdim);
-		mContent->draw(graphics);
+		mContent->draw(graphics, render_commands);
 		graphics->popClipArea();
 		graphics->popClipArea();
 	}
@@ -2261,7 +2261,7 @@ void ImageListBoxWidget::drawBorder(gcn::Graphics *graphics)
 	}
 }
 
-void ImageListBoxWidget::drawUpButton(gcn::Graphics* graphics)
+void ImageListBoxWidget::drawUpButton(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getUpButtonDimension();
 	graphics->pushClipArea(dim);
@@ -2269,11 +2269,11 @@ void ImageListBoxWidget::drawUpButton(gcn::Graphics* graphics)
 	CGraphic *img = nullptr;
 
 	img = upButtonImage;
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawDownButton(gcn::Graphics* graphics)
+void ImageListBoxWidget::drawDownButton(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getDownButtonDimension();
 	graphics->pushClipArea(dim);
@@ -2281,11 +2281,11 @@ void ImageListBoxWidget::drawDownButton(gcn::Graphics* graphics)
 	CGraphic *img = nullptr;
 
 	img = downButtonImage;
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawLeftButton(gcn::Graphics* graphics)
+void ImageListBoxWidget::drawLeftButton(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getLeftButtonDimension();
 	graphics->pushClipArea(dim);
@@ -2293,11 +2293,11 @@ void ImageListBoxWidget::drawLeftButton(gcn::Graphics* graphics)
 	CGraphic *img = nullptr;
 
 	img = leftButtonImage;
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawRightButton(gcn::Graphics* graphics)
+void ImageListBoxWidget::drawRightButton(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getRightButtonDimension();
 	graphics->pushClipArea(dim);
@@ -2305,11 +2305,11 @@ void ImageListBoxWidget::drawRightButton(gcn::Graphics* graphics)
 	CGraphic *img = nullptr;
 
 	img = rightButtonImage;
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawUpPressedButton(gcn::Graphics* graphics)
+void ImageListBoxWidget::drawUpPressedButton(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getUpButtonDimension();
 	graphics->pushClipArea(dim);
@@ -2317,11 +2317,11 @@ void ImageListBoxWidget::drawUpPressedButton(gcn::Graphics* graphics)
 	CGraphic *img = nullptr;
 
 	img = upPressedButtonImage;
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawDownPressedButton(gcn::Graphics* graphics)
+void ImageListBoxWidget::drawDownPressedButton(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getDownButtonDimension();
 	graphics->pushClipArea(dim);
@@ -2329,11 +2329,11 @@ void ImageListBoxWidget::drawDownPressedButton(gcn::Graphics* graphics)
 	CGraphic *img = nullptr;
 
 	img = downPressedButtonImage;
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawLeftPressedButton(gcn::Graphics* graphics)
+void ImageListBoxWidget::drawLeftPressedButton(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getLeftButtonDimension();
 	graphics->pushClipArea(dim);
@@ -2341,11 +2341,11 @@ void ImageListBoxWidget::drawLeftPressedButton(gcn::Graphics* graphics)
 	CGraphic *img = nullptr;
 
 	img = leftPressedButtonImage;
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawRightPressedButton(gcn::Graphics* graphics)
+void ImageListBoxWidget::drawRightPressedButton(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getRightButtonDimension();
 	graphics->pushClipArea(dim);
@@ -2353,11 +2353,11 @@ void ImageListBoxWidget::drawRightPressedButton(gcn::Graphics* graphics)
 	CGraphic *img = nullptr;
 
 	img = rightPressedButtonImage;
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawHBar(gcn::Graphics *graphics)
+void ImageListBoxWidget::drawHBar(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getHorizontalBarDimension();
 	graphics->pushClipArea(dim);
@@ -2366,13 +2366,13 @@ void ImageListBoxWidget::drawHBar(gcn::Graphics *graphics)
 
 	img = hBarButtonImage;
 	img->Resize(dim.width, dim.height);
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	img->SetOriginalSize();
 
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawVBar(gcn::Graphics *graphics)
+void ImageListBoxWidget::drawVBar(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getVerticalBarDimension();
 	graphics->pushClipArea(dim);
@@ -2381,13 +2381,13 @@ void ImageListBoxWidget::drawVBar(gcn::Graphics *graphics)
 
 	img = vBarButtonImage;
 	img->Resize(dim.width, dim.height);
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	img->SetOriginalSize();
 
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawHMarker(gcn::Graphics *graphics)
+void ImageListBoxWidget::drawHMarker(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getHorizontalMarkerDimension();
 	graphics->pushClipArea(dim);
@@ -2395,12 +2395,12 @@ void ImageListBoxWidget::drawHMarker(gcn::Graphics *graphics)
 	CGraphic *img = nullptr;
 
 	img = markerImage;
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 
 	graphics->popClipArea();
 }
 
-void ImageListBoxWidget::drawVMarker(gcn::Graphics *graphics)
+void ImageListBoxWidget::drawVMarker(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Rectangle dim = getVerticalMarkerDimension();
 	graphics->pushClipArea(dim);
@@ -2408,7 +2408,7 @@ void ImageListBoxWidget::drawVMarker(gcn::Graphics *graphics)
 	CGraphic *img = nullptr;
 
 	img = markerImage;
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 
 	graphics->popClipArea();
 }
@@ -2576,7 +2576,7 @@ void ImageDropDownWidget::setDownPressedImage(const std::string &image_path)
 	DownPressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
-void ImageDropDownWidget::draw(gcn::Graphics *graphics)
+void ImageDropDownWidget::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	Assert(mScrollArea && mScrollArea->getContent() != nullptr);
 	int h;
@@ -2608,7 +2608,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 //	img->Resize(getWidth(), h);
 //	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), h);
 //	img->SetOriginalSize();
-	graphics->drawImage(img.get(), 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img.get(), 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
 	//Wyrmgus end
 	
 	graphics->setFont(getFont());
@@ -2616,7 +2616,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 	if (mListBox.getListModel() && mListBox.getSelected() >= 0)
 	{
 		graphics->drawText(mListBox.getListModel()->getElementAt(mListBox.getSelected()),
-			2, (h - getFont()->getHeight()) / 2);
+			2, (h - getFont()->getHeight()) / 2, render_commands);
 	}
 
 	//Wyrmgus start
@@ -2628,12 +2628,12 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 	*/
 	//Wyrmgus end
 
-	drawButton(graphics);
+	drawButton(graphics, render_commands);
 
 	if (mDroppedDown)
 	{
 		graphics->pushClipArea(mScrollArea->getDimension());
-		mScrollArea->draw(graphics);
+		mScrollArea->draw(graphics, render_commands);
 		graphics->popClipArea();
 
 		// Draw two lines separating the ListBox with se selected
@@ -2673,7 +2673,7 @@ void ImageDropDownWidget::drawBorder(gcn::Graphics *graphics)
 	}
 }
 
-void ImageDropDownWidget::drawButton(gcn::Graphics *graphics)
+void ImageDropDownWidget::drawButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int h;
 	if (mDroppedDown)
@@ -2699,7 +2699,7 @@ void ImageDropDownWidget::drawButton(gcn::Graphics *graphics)
 	//Wyrmgus start
 //	img->Resize(h, h);
 	//Wyrmgus end
-	graphics->drawImage(img.get(), 0, 0, x, y, h, h);
+	graphics->drawImage(img.get(), 0, 0, x, y, h, h, render_commands);
 	//Wyrmgus start
 //	img->SetOriginalSize();
 	//Wyrmgus end
@@ -2828,7 +2828,7 @@ StatBoxWidget::StatBoxWidget(int width, int height) : percent(100)
 **  @todo caption seem to be placed upper than the middle.
 **  @todo set direction (hor./vert.) and growing direction(up/down, left/rigth).
 */
-void StatBoxWidget::draw(gcn::Graphics *graphics)
+void StatBoxWidget::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int width;
 	int height;
@@ -2848,7 +2848,7 @@ void StatBoxWidget::draw(gcn::Graphics *graphics)
 	graphics->setFont(getFont());
 	graphics->drawText(getCaption(),
 					   (getWidth() - getFont()->getWidth(getCaption())) / 2,
-					   (height - getFont()->getHeight()) / 2);
+					   (height - getFont()->getHeight()) / 2, render_commands);
 }
 
 /**
@@ -2993,15 +2993,15 @@ void MenuScreen::addLogicCallback(LuaActionListener *listener)
 	logiclistener = listener;
 }
 
-void MenuScreen::draw(gcn::Graphics *graphics)
+void MenuScreen::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (this->drawUnder) {
 		gcn::Rectangle r = Gui->getGraphics()->getCurrentClipArea();
 		Gui->getGraphics()->popClipArea();
-		Gui->draw(oldtop);
+		Gui->draw(oldtop, render_commands);
 		Gui->getGraphics()->pushClipArea(r);
 	}
-	gcn::Container::draw(graphics);
+	gcn::Container::draw(graphics, render_commands);
 }
 
 void MenuScreen::logic()

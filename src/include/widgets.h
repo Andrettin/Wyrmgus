@@ -46,7 +46,7 @@ class LuaActionListener : public gcn::ActionListener
 	LuaCallback callback;
 public:
 	LuaActionListener(lua_State *lua, lua_Object function);
-	virtual void action(const std::string &eventId);
+	virtual void action(const std::string &eventId) override;
 	virtual ~LuaActionListener();
 };
 
@@ -54,18 +54,25 @@ public:
 class MyOpenGLGraphics : public gcn::Graphics
 {
 public:
-	virtual void _beginDraw();
-	virtual void _endDraw();
+	virtual void _beginDraw() override;
+	virtual void _endDraw() override;
 
-	virtual void drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false) const;
+	virtual void drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const player_color *player_color, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
-	virtual void drawPoint(int x, int y);
-	virtual void drawLine(int x1, int y1, int x2, int y2);
-	virtual void drawRectangle(const gcn::Rectangle &rectangle);
-	virtual void fillRectangle(const gcn::Rectangle &rectangle);
+	virtual void drawPoint(int x, int y) override;
+	virtual void drawLine(int x1, int y1, int x2, int y2) override;
+	virtual void drawRectangle(const gcn::Rectangle &rectangle) override;
+	virtual void fillRectangle(const gcn::Rectangle &rectangle) override;
 
-	virtual void setColor(const gcn::Color &color) { mColor = color; }
-	virtual const gcn::Color &getColor() { return mColor; }
+	virtual void setColor(const gcn::Color &color) override
+	{
+		mColor = color;
+	}
+
+	virtual const gcn::Color &getColor() override
+	{
+		return mColor;
+	}
 
 private:
 	gcn::Color mColor;
@@ -87,7 +94,7 @@ class PlayerColorImageWidget : public gcn::Icon
 public:
 	explicit PlayerColorImageWidget(const std::string &image_path, const std::string &playercolor);
 
-	virtual void draw(gcn::Graphics *graphics);
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
 	void setGrayscale(bool grayscale)
@@ -116,14 +123,14 @@ public:
 	explicit ImageButton(const std::string &caption);
 	~ImageButton();
 
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void adjustSize();
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void adjustSize() override;
 
 	void setNormalImage(const std::string &image_path);
 	void setPressedImage(const std::string &image_path);
 	void setDisabledImage(const std::string &image_path);
 	void setIconFrameImage();
-	virtual void setPosition(int x, int y);
+	virtual void setPosition(int x, int y) override;
 	void setTransparency(int alpha) { Transparency = alpha; }
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
@@ -142,14 +149,14 @@ public:
 	PlayerColorImageButton();
 	explicit PlayerColorImageButton(const std::string &caption, const std::string &playercolor);
 
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void adjustSize();
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void adjustSize() override;
 
 	void setNormalImage(const std::string &image_path);
 	void setPressedImage(const std::string &image_path);
 	void setDisabledImage(const std::string &image_path);
 	void setIconFrameImage();
-	virtual void setPosition(int x, int y);
+	virtual void setPosition(int x, int y) override;
 	void setTransparency(int alpha) { Transparency = alpha; }
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
@@ -179,13 +186,13 @@ public:
 	ImageRadioButton(const std::string &caption, const std::string &group,
 					 bool marked);
 
-	virtual void drawBox(gcn::Graphics *graphics);
-	virtual void draw(gcn::Graphics *graphics);
+	virtual void drawBox(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-	virtual void mousePress(int x, int y, int button);
+	virtual void mousePress(int x, int y, int button) override;
 	virtual void mouseRelease(int button) override;
-	virtual void mouseClick(int x, int y, int button, int count);
-	virtual void adjustSize();
+	virtual void mouseClick(int x, int y, int button, int count) override;
+	virtual void adjustSize() override;
 
 	void setUncheckedNormalImage(const std::string &image_path);
 	void setUncheckedPressedImage(const std::string &image_path);
@@ -209,13 +216,13 @@ public:
 	ImageCheckBox();
 	ImageCheckBox(const std::string &caption, bool marked = false);
 
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBox(gcn::Graphics *graphics);
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void drawBox(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-	virtual void mousePress(int x, int y, int button);
+	virtual void mousePress(int x, int y, int button) override;
 	virtual void mouseRelease(int button) override;
-	virtual void mouseClick(int x, int y, int button, int count);
-	virtual void adjustSize();
+	virtual void mouseClick(int x, int y, int button, int count) override;
+	virtual void adjustSize() override;
 
 	void setUncheckedNormalImage(const std::string &image_path);
 	void setUncheckedPressedImage(const std::string &image_path);
@@ -239,8 +246,8 @@ public:
 	explicit ImageSlider(double scaleEnd = 1.0);
 	ImageSlider(double scaleStart, double scaleEnd);
 
-	virtual void drawMarker(gcn::Graphics *graphics);
-	virtual void draw(gcn::Graphics *graphics);
+	virtual void drawMarker(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
 	void setMarkerImage(const std::string &image_path);
 	void setBackgroundImage(const std::string &image_path);
@@ -251,7 +258,7 @@ public:
 	std::shared_ptr<CGraphic> disabledBackgroundImage;
 };
 
-class MultiLineLabel : public gcn::Widget
+class MultiLineLabel final : public gcn::Widget
 {
 public:
 	MultiLineLabel();
@@ -266,8 +273,8 @@ public:
 	virtual void setLineWidth(int width);
 	virtual int getLineWidth();
 	virtual void adjustSize();
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBorder(gcn::Graphics *graphics);
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void drawBorder(gcn::Graphics *graphics) override;
 
 	enum {
 		LEFT = 0,
@@ -296,7 +303,7 @@ public:
 	void setSpeed(float speed) { this->speedY = speed; }
 	float getSpeed() const { return this->speedY; }
 private:
-	virtual void logic();
+	virtual void logic() override;
 private:
 	gcn::Container container; /// Data container
 	float speedY;             /// vertical speed of the container (positive number: go up).
@@ -310,9 +317,9 @@ public:
 	Windows(const std::string &text, int width, int height);
 	void add(gcn::Widget *widget, int x, int y);
 private:
-	virtual void mouseMotion(int x, int y);
-	virtual void setBackgroundColor(const gcn::Color &color);
-	virtual void setBaseColor(const gcn::Color &color);
+	virtual void mouseMotion(int x, int y) override;
+	virtual void setBackgroundColor(const gcn::Color &color) override;
+	virtual void setBaseColor(const gcn::Color &color) override;
 private:
 	gcn::ScrollArea scroll;   /// To use scroll bar.
 	gcn::Container container; /// data container.
@@ -326,8 +333,8 @@ class ImageTextField : public gcn::TextField
 public:
 	ImageTextField() : TextField(), itemImage(nullptr) {}
 	ImageTextField(const std::string& text) : gcn::TextField(text), itemImage(nullptr) {}
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBorder(gcn::Graphics *graphics);
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void drawBorder(gcn::Graphics *graphics) override;
 	void setItemImage(CGraphic *image) { itemImage = image; }
 private:
 	CGraphic *itemImage;
@@ -340,8 +347,16 @@ public:
 	LuaListModel() {}
 
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual int getNumberOfElements() {return list.size();}
-	virtual std::string getElementAt(int i) {return list[i];}
+
+	virtual int getNumberOfElements() override
+	{
+		return list.size();
+	}
+
+	virtual std::string getElementAt(int i) override
+	{
+		return list[i];
+	}
 };
 
 class ImageListBox : public gcn::ListBox
@@ -349,8 +364,8 @@ class ImageListBox : public gcn::ListBox
 public:
 	ImageListBox();
 	ImageListBox(gcn::ListModel *listModel);
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBorder(gcn::Graphics *graphics);
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void drawBorder(gcn::Graphics *graphics) override;
 	void setItemImage(CGraphic *image) { itemImage = image; }
 	void adjustSize();
 	void mousePress(int, int y, int button);
@@ -371,9 +386,9 @@ public:
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected(int i);
 	int getSelected() const;
-	virtual void setBackgroundColor(const gcn::Color &color);
-	virtual void setFont(gcn::Font *font);
-	virtual void addActionListener(gcn::ActionListener *actionListener);
+	virtual void setBackgroundColor(const gcn::Color &color) override;
+	virtual void setFont(gcn::Font *font) override;
+	virtual void addActionListener(gcn::ActionListener *actionListener) override;
 private:
 	void adjustSize();
 private:
@@ -388,9 +403,9 @@ public:
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected(int i);
 	int getSelected() const;
-	virtual void setBackgroundColor(const gcn::Color &color);
-	virtual void setFont(gcn::Font *font);
-	virtual void addActionListener(gcn::ActionListener *actionListener);
+	virtual void setBackgroundColor(const gcn::Color &color) override;
+	virtual void setFont(gcn::Font *font) override;
+	virtual void addActionListener(gcn::ActionListener *actionListener) override;
 
 	void setItemImage(CGraphic *image) {
 		itemImage = image;
@@ -408,25 +423,25 @@ public:
 	void setVBarImage(CGraphic *image);
 	void setMarkerImage(CGraphic *image) { markerImage = image; }
 
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBorder(gcn::Graphics *graphics);
-	virtual gcn::Rectangle getVerticalMarkerDimension();
-	virtual gcn::Rectangle getHorizontalMarkerDimension();
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void drawBorder(gcn::Graphics *graphics) override;
+	virtual gcn::Rectangle getVerticalMarkerDimension() override;
+	virtual gcn::Rectangle getHorizontalMarkerDimension() override;
 private:
 	void adjustSize();
 
-	void drawUpButton(gcn::Graphics *graphics);
-	void drawDownButton(gcn::Graphics *graphics);
-	void drawLeftButton(gcn::Graphics *graphics);
-	void drawRightButton(gcn::Graphics *graphics);
-	void drawUpPressedButton(gcn::Graphics *graphics);
-	void drawDownPressedButton(gcn::Graphics *graphics);
-	void drawLeftPressedButton(gcn::Graphics *graphics);
-	void drawRightPressedButton(gcn::Graphics *graphics);
-	void drawHMarker(gcn::Graphics *graphics);
-	void drawVMarker(gcn::Graphics *graphics);
-	void drawHBar(gcn::Graphics *graphics);
-	void drawVBar(gcn::Graphics *graphics);
+	void drawUpButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawDownButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawLeftButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawRightButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawUpPressedButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawDownPressedButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawLeftPressedButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawRightPressedButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawHMarker(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawVMarker(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawHBar(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
+	void drawVBar(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 private:
 	CGraphic *itemImage;
 	CGraphic *upButtonImage;
@@ -451,7 +466,7 @@ class DropDownWidget : public gcn::DropDown
 public:
 	DropDownWidget() {}
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual void setSize(int width, int height);
+	virtual void setSize(int width, int height) override;
 };
 
 class ImageDropDownWidget : public DropDownWidget
@@ -467,12 +482,16 @@ public:
 	void setDownNormalImage(const std::string &image_path);
 	void setDownPressedImage(const std::string &image_path);
 
-	virtual ImageListBox *getListBox() { return &mListBox; }
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBorder(gcn::Graphics *graphics);
-	void drawButton(gcn::Graphics *graphics);
+	virtual ImageListBox *getListBox() override
+	{
+		return &mListBox;
+	}
+
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void drawBorder(gcn::Graphics *graphics) override;
+	void drawButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual void setSize(int width, int height);
+	virtual void setSize(int width, int height) override;
 	void setListModel(LuaListModel *listModel);
 	int getSelected();
 	void setSelected(int selected);
@@ -493,7 +512,7 @@ class StatBoxWidget : public gcn::Widget
 public:
 	StatBoxWidget(int width, int height);
 
-	virtual void draw(gcn::Graphics *graphics);
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	void setCaption(const std::string &s);
 	const std::string &getCaption() const;
 	void setPercent(const int percent);
@@ -513,8 +532,8 @@ public:
 	void stop(int result = 0, bool stopAll = false);
 	void stopAll(int result = 0) { stop(result, true); }
 	void addLogicCallback(LuaActionListener *listener);
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void logic();
+	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
+	virtual void logic() override;
 	void setDrawMenusUnder(bool drawUnder) { this->drawUnder = drawUnder; }
 	bool getDrawMenusUnder() const { return this->drawUnder; }
 

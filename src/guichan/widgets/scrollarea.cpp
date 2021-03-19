@@ -55,6 +55,8 @@
 /*
  * For comments regarding functions please see the header file.
  */
+#include "stratagus.h"
+
 #include "database/defines.h"
 #include "guichan/exception.h"
 #include "guichan/widgets/scrollarea.h"
@@ -419,7 +421,7 @@ namespace gcn
         }
     }
 
-    void ScrollArea::draw(Graphics *graphics)
+    void ScrollArea::draw(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         graphics->setColor(getBackgroundColor());
         graphics->fillRectangle(getContentDimension());
@@ -473,7 +475,7 @@ namespace gcn
             }
 
             graphics->pushClipArea(contdim);
-            mContent->draw(graphics);
+            mContent->draw(graphics, render_commands);
             graphics->popClipArea();
             graphics->popClipArea();
         }
@@ -919,11 +921,11 @@ namespace gcn
         }
     }
 
-    void ScrollArea::drawContent(Graphics* graphics)
+    void ScrollArea::drawContent(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         if (mContent)
         {
-            mContent->draw(graphics);
+            mContent->draw(graphics, render_commands);
         }
     }
 

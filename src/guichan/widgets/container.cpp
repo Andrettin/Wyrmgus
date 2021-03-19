@@ -55,10 +55,12 @@
 /*
  * For comments regarding functions please see the header file.
  */
+#include "stratagus.h"
+
 #include "guichan/exception.h"
 #include "guichan/widgets/container.h"
+
 //Wyrmgus start
-#include "stratagus.h"
 #include "font.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
@@ -84,7 +86,7 @@ namespace gcn
 		logicChildren();
 	}
 
-	void Container::draw(Graphics* graphics)
+	void Container::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 	{
 		if (isOpaque())
 		{
@@ -92,7 +94,7 @@ namespace gcn
 			graphics->fillRectangle(Rectangle(0, 0, getWidth(), getHeight()));
 		}
 
-		drawChildren(graphics);
+		drawChildren(graphics, render_commands);
 	}
 
 	void Container::drawBorder(Graphics* graphics)
@@ -128,7 +130,7 @@ namespace gcn
 		}
 	}
 
-	void Container::drawChildren(Graphics* graphics)
+	void Container::drawChildren(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 	{
 		WidgetIterator iter;
 		for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
@@ -150,7 +152,7 @@ namespace gcn
 				}
 
 				graphics->pushClipArea((*iter)->getDimension());
-				(*iter)->draw(graphics);
+				(*iter)->draw(graphics, render_commands);
 				graphics->popClipArea();
 			}
 		}

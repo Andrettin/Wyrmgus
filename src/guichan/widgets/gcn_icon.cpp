@@ -56,6 +56,8 @@
  * For comments regarding functions please see the header file.
  */
 
+#include "stratagus.h"
+
 #include "guichan/rectangle.h"
 #include "guichan/widgets/icon.h"
 
@@ -68,9 +70,9 @@ namespace gcn
         setWidth(image->getWidth());
     }
 
-    void Icon::draw(Graphics* graphics)
+    void Icon::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
-        graphics->drawImage(mImage, 0, 0);
+        graphics->drawImage(mImage, 0, 0, nullptr, 0, render_commands);
 
     }
 

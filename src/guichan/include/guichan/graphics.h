@@ -61,6 +61,7 @@
 
 namespace wyrmgus {
     class player_color;
+    class renderer;
 }
 
 namespace gcn
@@ -181,8 +182,16 @@ namespace gcn
                                int dstX, int dstY, int width,
 							   //Wyrmgus start
 //                               int height) = 0;
-                               int height, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false) const = 0;
+                               int height, const wyrmgus::player_color *player_color, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const = 0;
 							   //Wyrmgus end
+
+        void drawImage(const Image *image, int srcX, int srcY,
+            int dstX, int dstY, int width,
+            int height, std::vector<std::function<void(renderer *)>> &render_commands) const
+        {
+            this->drawImage(image, srcX, srcY, dstX, dstY, width, height, nullptr, 0, false, render_commands);
+        }
+
         /**
          * Draws an image. A simplified version of the other drawImage.
          * It will draw a whole image at the coordinate you specify.
@@ -191,7 +200,7 @@ namespace gcn
          */
 		//Wyrmgus start
 //        virtual void drawImage(const Image* image, int dstX, int dstY);
-        virtual void drawImage(const Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0) const;
+        virtual void drawImage(const Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color, unsigned int transparency, std::vector<std::function<void(renderer *)>> &render_commands) const;
 		//Wyrmgus end
 
         /**
@@ -260,7 +269,12 @@ namespace gcn
 //        virtual void drawText(const std::string& text, int x, int y,
 //                              unsigned int alignment = LEFT);
         virtual void drawText(const std::string& text, int x, int y,
-                              unsigned int alignment = LEFT, bool is_normal = true);
+                              unsigned int alignment, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands);
+
+        void drawText(const std::string &text, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
+        {
+            this->drawText(text, x, y, LEFT, true, render_commands);
+        }
 		//Wyrmgus end
         /**
          * Alignments for text drawing.

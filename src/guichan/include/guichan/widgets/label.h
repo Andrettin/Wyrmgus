@@ -114,9 +114,9 @@ namespace gcn
 
         // Inherited from Widget
 
-        virtual void draw(Graphics* graphics);
+        virtual void draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        virtual void drawBorder(Graphics* graphics);
+        virtual void drawBorder(Graphics* graphics) override;
 
     private:
         std::string mCaption;

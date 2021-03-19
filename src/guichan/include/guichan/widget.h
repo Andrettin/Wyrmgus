@@ -66,6 +66,10 @@
 #include "guichan/rectangle.h"
 #include "guichan/platform.h"
 
+namespace wyrmgus {
+    class renderer;
+}
+
 namespace gcn
 {
     /*
@@ -110,7 +114,7 @@ namespace gcn
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void draw(Graphics* graphics) = 0;
+        virtual void draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) = 0;
 
         /**
          * Draws a the Widget border. A border is drawn around a Widget.

@@ -3100,7 +3100,7 @@ static int GetPieUnderCursor()
 /**
 **  Draw Pie Menu
 */
-void DrawPieMenu()
+void DrawPieMenu(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	char buf[2] = "?";
 
@@ -3141,7 +3141,7 @@ void DrawPieMenu()
 			if (gray) {
 				buttons[i]->Icon.Icon->DrawGrayscaleIcon(pos);
 			} else {
-				buttons[i]->Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->get_player_color());
+				buttons[i]->Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->get_player_color(), render_commands);
 			}
 
 			// Tutorial show command key in icons

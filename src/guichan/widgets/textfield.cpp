@@ -55,6 +55,8 @@
 /*
  * For comments regarding functions please see the header file.
  */
+#include "stratagus.h"
+
 #include "guichan/keyinput.h"
 #include "guichan/mouseinput.h"
 #include "guichan/widgets/textfield.h"
@@ -105,7 +107,7 @@ namespace gcn
         mText = text;
     }
 
-    void TextField::draw(Graphics* graphics)
+    void TextField::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
 		Font *font;
 		int x, y;
@@ -145,7 +147,7 @@ namespace gcn
 			graphics->fillRectangle(Rectangle(x + selX, y, selW, font->getHeight()));
 		}
 
-        graphics->drawText(mText, x, y);
+        graphics->drawText(mText, x, y, render_commands);
     }
 
     void TextField::drawBorder(Graphics* graphics)
