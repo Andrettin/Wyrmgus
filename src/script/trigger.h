@@ -151,8 +151,6 @@ struct TriggerDataType {
 	const wyrmgus::tile *tile = nullptr;
 };
 
-extern CTimer GameTimer; /// the game timer
-
 /// Some data accessible for script during the game.
 extern TriggerDataType TriggerData;
 
