@@ -45,6 +45,7 @@ enum class item_class {
 
 	shield,
 	horn,
+	trinket,
 
 	helmet,
 	armor,
@@ -92,6 +93,8 @@ inline item_class string_to_item_class(const std::string &str)
 		return item_class::shield;
 	} else if (str == "horn") {
 		return item_class::horn;
+	} else if (str == "trinket") {
+		return item_class::trinket;
 	} else if (str == "helmet") {
 		return item_class::helmet;
 	} else if (str == "armor") {
@@ -150,6 +153,8 @@ inline std::string item_class_to_string(const item_class item_class)
 			return "shield";
 		case item_class::horn:
 			return "horn";
+		case item_class::trinket:
+			return "trinket";
 		case item_class::helmet:
 			return "helmet";
 		case item_class::armor:

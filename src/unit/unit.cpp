@@ -2222,7 +2222,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 	}
 
 	if (this->get_unique() == nullptr) {
-		if (this->Type->get_item_class() == wyrmgus::item_class::scroll || this->Type->get_item_class() == wyrmgus::item_class::book || this->Type->get_item_class() == wyrmgus::item_class::ring || this->Type->get_item_class() == wyrmgus::item_class::amulet || this->Type->get_item_class() == wyrmgus::item_class::horn || always_magic) { //scrolls, books, jewelry and horns must always have a property
+		if (this->Type->get_item_class() == item_class::scroll || this->Type->get_item_class() == item_class::book || this->Type->get_item_class() == item_class::ring || this->Type->get_item_class() == item_class::amulet || this->Type->get_item_class() == item_class::horn || this->Type->get_item_class() == item_class::trinket || always_magic) { //scrolls, books, jewelry, horns and trinkets must always have a property
 			magic_affix_chance = 100;
 		}
 
@@ -6387,25 +6387,25 @@ bool CUnit::can_equip_item(const CUnit *item) const
 	return true;
 }
 
-bool CUnit::can_equip_item_class(const wyrmgus::item_class item_class) const
+bool CUnit::can_equip_item_class(const item_class item_class) const
 {
-	if (item_class == wyrmgus::item_class::none) {
+	if (item_class == item_class::none) {
 		return false;
 	}
 	
-	if (wyrmgus::get_item_class_slot(item_class) == wyrmgus::item_slot::none) { //can't equip items that don't correspond to an equippable slot
+	if (get_item_class_slot(item_class) == item_slot::none) { //can't equip items that don't correspond to an equippable slot
 		return false;
 	}
 	
-	if (wyrmgus::get_item_class_slot(item_class) == wyrmgus::item_slot::weapon && !wyrmgus::vector::contains(this->Type->WeaponClasses, item_class)) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
+	if (get_item_class_slot(item_class) == item_slot::weapon && !vector::contains(this->Type->WeaponClasses, item_class)) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
 		return false;
 	}
 	
 	if ( //if the item uses the shield (off-hand) slot, but that slot is unavailable for the weapon (because it is two-handed), return false
-		wyrmgus::get_item_class_slot(item_class) == wyrmgus::item_slot::shield
+		get_item_class_slot(item_class) == item_slot::shield
 		&& this->Type->WeaponClasses.size() > 0
 		&& (
-			this->Type->WeaponClasses[0] == wyrmgus::item_class::bow
+			this->Type->WeaponClasses[0] == item_class::bow
 			// add other two-handed weapons here as necessary
 		)
 	) {
@@ -6413,17 +6413,17 @@ bool CUnit::can_equip_item_class(const wyrmgus::item_class item_class) const
 	}
 	
 	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return false
-		item_class == wyrmgus::item_class::shield
+		item_class == item_class::shield
 		&& (
 			Type->WeaponClasses.size() == 0
-			|| wyrmgus::is_shield_incompatible_weapon_item_class(this->Type->WeaponClasses[0])
+			|| is_shield_incompatible_weapon_item_class(this->Type->WeaponClasses[0])
 			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
 		)
 	) {
 		return false;
 	}
 	
-	if (this->get_item_slot_quantity(wyrmgus::get_item_class_slot(item_class)) == 0) {
+	if (this->get_item_slot_quantity(get_item_class_slot(item_class)) == 0) {
 		return false;
 	}
 	

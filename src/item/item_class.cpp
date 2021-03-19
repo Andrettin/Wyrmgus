@@ -48,6 +48,7 @@ item_slot get_item_class_slot(const item_class item_class)
 			return item_slot::weapon;
 		case item_class::shield:
 		case item_class::horn:
+		case item_class::trinket:
 			return item_slot::shield;
 		case item_class::helmet:
 			return item_slot::helmet;
