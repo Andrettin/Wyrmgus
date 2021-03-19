@@ -1556,6 +1556,30 @@ void CalculateItemsToLoad()
 	}
 }
 
+void UpdateLoadingBackground()
+{
+	int y = Video.Height / 2;
+
+	if (loadingBackground != nullptr) {
+		loadingBackground->DrawClip(0, 0);
+	}
+
+	if (loadingFont == nullptr) {
+		loadingFont = font::get("game");
+	}
+
+	if (loadingFont != nullptr) {
+		std::vector<std::function<void(renderer *)>> render_commands;
+
+		CLabel label(loadingFont);
+		for (size_t i = 0; i < loadingTip.size(); ++i) {
+			label.DrawCentered(Video.Width / 2, y + 10 + (defines::get()->get_game_font()->Height() * i), loadingTip[i], render_commands);
+		}
+
+		//FIXME: do something with the render commands
+	}
+}
+
 void IncItemsLoaded()
 {
 	if (itemsToLoad == 0 || itemsLoaded >= itemsToLoad) {

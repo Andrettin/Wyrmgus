@@ -128,6 +128,10 @@ void ShowLoadProgress(const char *fmt, ...)
 */
 void UpdateLoadProgress()
 {
+	if (Video.Depth && wyrmgus::defines::get()->get_game_font() != nullptr && wyrmgus::defines::get()->get_game_font()->is_initialized()) {
+		UpdateLoadingBackground();
+	}
+
 	PollEvents();
 }
 
