@@ -3,22 +3,12 @@ $#include "script/trigger.h"
 $int GetNumOpponents(int player);
 int GetNumOpponents(int player);
 
-$int GetTimer();
-int GetTimer();
-
 $void ActionVictory();
 void ActionVictory();
 $void ActionDefeat();
 void ActionDefeat();
 $void ActionDraw();
 void ActionDraw();
-
-$void ActionSetTimer(int cycles, bool increasing);
-void ActionSetTimer(int cycles, bool increasing);
-$void ActionStartTimer();
-void ActionStartTimer();
-$void ActionStopTimer();
-void ActionStopTimer();
 
 $void SetCurrentTriggerId(unsigned int trigger_id);
 void SetCurrentTriggerId(unsigned int trigger_id);

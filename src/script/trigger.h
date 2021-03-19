@@ -51,25 +51,6 @@ namespace wyrmgus {
 	class effect_list;
 }
 
-class CTimer
-{
-public:
-	void Reset()
-	{
-		Init = false;
-		Running = false;
-		Increasing = false;
-		Cycles = 0;
-		LastUpdate = 0;
-	}
-
-	bool Init = false;				/// timer is initialized
-	bool Running = false;			/// timer is running
-	bool Increasing = false;		/// increasing or decreasing
-	long Cycles = 0;				/// current value in game cycles
-	unsigned long LastUpdate = 0;	/// GameCycle of last update
-};
-
 namespace wyrmgus {
 
 class trigger final : public data_entry, public data_type<trigger>

@@ -456,7 +456,6 @@ set(ui_SRCS
 	src/ui/script_ui.cpp
 	src/ui/statusline.cpp
 	src/ui/ui.cpp
-	src/ui/uitimer.cpp
 	src/ui/widgets.cpp
 )
 source_group(ui FILES ${ui_SRCS})
@@ -962,7 +961,6 @@ set(wyrmgus_ui_HDRS
 	src/ui/resource_icon.h
 	src/ui/statusline.h
 	src/ui/ui.h
-	src/ui/uitimer.h
 )
 
 set(wyrmgus_unit_HDRS

@@ -2039,38 +2039,3 @@ void CInfoPanel::Draw(std::vector<std::function<void(renderer *)>> &render_comma
 		}
 	}
 }
-
-/*----------------------------------------------------------------------------
---  TIMER
-----------------------------------------------------------------------------*/
-
-/**
-**  Draw the timer
-**
-**  @todo FIXME : make DrawTimer more configurable (Pos, format).
-*/
-void DrawTimer()
-{
-	if (!GameTimer.Init) {
-		return;
-	}
-
-	int sec = GameTimer.Cycles / CYCLES_PER_SECOND;
-	UI.Timer.Draw(sec);
-}
-
-/**
-**  Update the timer
-*/
-void UpdateTimer()
-{
-	if (GameTimer.Running) {
-		if (GameTimer.Increasing) {
-			GameTimer.Cycles += GameCycle - GameTimer.LastUpdate;
-		} else {
-			GameTimer.Cycles -= GameCycle - GameTimer.LastUpdate;
-			GameTimer.Cycles = std::max(GameTimer.Cycles, 0l);
-		}
-		GameTimer.LastUpdate = GameCycle;
-	}
-}

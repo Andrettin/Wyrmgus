@@ -325,12 +325,9 @@ extern void CleanObjectives();
 /// show/hide messages
 extern void ToggleShowMessages();
 
-/// Draw the timer
-extern void DrawTimer();
-/// Update the timer
-extern void UpdateTimer();
 /// Draw the Pie Menu
 extern void DrawPieMenu(std::vector<std::function<void(renderer *)>> &render_commands);
+
 /// Draw the button popup
 extern void DrawPopup(const wyrmgus::button &button, int x = 0, int y = 0, bool above = true);
 //Wyrmgus start

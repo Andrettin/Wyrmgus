@@ -35,7 +35,6 @@
 #include "economy/resource.h"
 #include "ui/interface.h"
 #include "ui/statusline.h"
-#include "ui/uitimer.h"
 #include "util/singleton.h"
 #include "viewport.h"
 
@@ -482,9 +481,6 @@ public:
 
 	// The status line
 	CStatusLine StatusLine;             /// status line
-
-	// Game timer
-	CUITimer Timer;                     /// game timer
 
 	// Offsets for 640x480 center used by menus
 	int Offset640X;                     /// Offset for 640x480 X position

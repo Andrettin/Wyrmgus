@@ -51,8 +51,6 @@
 #include "unit/unit_type.h"
 #include "util/vector_util.h"
 
-CTimer GameTimer;               /// The game timer
-
 /// Some data accessible for script during the game.
 TriggerDataType TriggerData;
 
@@ -394,17 +392,6 @@ int GetNumOpponents(int player)
 	return n;
 }
 
-/**
-**  Check the timer value
-*/
-int GetTimer()
-{
-	if (!GameTimer.Init) {
-		return 0;
-	}
-	return GameTimer.Cycles;
-}
-
 /*---------------------------------------------------------------------------
 -- Actions
 ---------------------------------------------------------------------------*/
@@ -442,34 +429,6 @@ void ActionDefeat()
 void ActionDraw()
 {
 	StopGame(GameDraw);
-}
-
-/**
-**  Action set timer
-*/
-void ActionSetTimer(int cycles, bool increasing)
-{
-	GameTimer.Cycles = cycles;
-	GameTimer.Increasing = increasing;
-	GameTimer.Init = true;
-	GameTimer.LastUpdate = GameCycle;
-}
-
-/**
-**  Action start timer
-*/
-void ActionStartTimer()
-{
-	GameTimer.Running = true;
-	GameTimer.Init = true;
-}
-
-/**
-**  Action stop timer
-*/
-void ActionStopTimer()
-{
-	GameTimer.Running = false;
 }
 
 /**
@@ -672,8 +631,6 @@ void trigger::ClearActiveTriggers()
 		quest->CurrentCompleted = false;
 	}
 	//Wyrmgus end
-
-	GameTimer.Reset();
 }
 
 trigger::trigger(const std::string &identifier) : data_entry(identifier)
@@ -791,14 +748,6 @@ void SaveTriggers(CFile &file)
 	file.printf(")\n");
 
 	file.printf("SetCurrentTriggerId(%d)\n", wyrmgus::trigger::CurrentTriggerId);
-
-	if (GameTimer.Init) {
-		file.printf("ActionSetTimer(%ld, %s)\n",
-					GameTimer.Cycles, (GameTimer.Increasing ? "true" : "false"));
-		if (GameTimer.Running) {
-			file.printf("ActionStartTimer()\n");
-		}
-	}
 
 	file.printf("\n");
 	file.printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
