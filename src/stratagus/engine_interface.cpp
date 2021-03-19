@@ -134,7 +134,12 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 		case QEvent::MouseButtonRelease:
 		case QEvent::MouseMove: {
 			const QMouseEvent *mouse_event = static_cast<QMouseEvent *>(event);
-			this->store_mouse_event(*mouse_event);
+			this->store_input_event(std::make_unique<QMouseEvent>(*mouse_event));
+			return true;
+		}
+		case QEvent::HoverMove: {
+			const QHoverEvent *hover_event = static_cast<QHoverEvent *>(event);
+			this->store_input_event(std::make_unique<QHoverEvent>(*hover_event));
 			return true;
 		}
 		default:

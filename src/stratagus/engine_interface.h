@@ -152,16 +152,16 @@ public:
 
 	virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
-	std::queue<QMouseEvent> take_stored_mouse_events()
+	std::queue<std::unique_ptr<QInputEvent>> take_stored_input_events()
 	{
-		std::lock_guard<std::mutex> lock(this->mouse_event_mutex);
-		return std::move(this->stored_mouse_events);
+		std::lock_guard<std::mutex> lock(this->input_event_mutex);
+		return std::move(this->stored_input_events);
 	}
 
-	void store_mouse_event(QMouseEvent event)
+	void store_input_event(std::unique_ptr<QInputEvent> &&event)
 	{
-		std::lock_guard<std::mutex> lock(this->mouse_event_mutex);
-		this->stored_mouse_events.push(std::move(event));
+		std::lock_guard<std::mutex> lock(this->input_event_mutex);
+		this->stored_input_events.push(std::move(event));
 	}
 
 signals:
@@ -174,8 +174,8 @@ private:
 	bool qml_window_active = false;
 	std::promise<void> map_view_created_promise;
 	std::atomic<bool> waiting_for_interface = false;
-	std::queue<QMouseEvent> stored_mouse_events;
-	std::mutex mouse_event_mutex;
+	std::queue<std::unique_ptr<QInputEvent>> stored_input_events;
+	std::mutex input_event_mutex;
 };
 
 }

@@ -787,22 +787,24 @@ void PollEvents()
 	while (PollEvent()) { }
 }
 
-static SDL_Event qevent_to_sdl_event(const QMouseEvent &qevent)
+static SDL_Event qevent_to_sdl_event(std::unique_ptr<QInputEvent> &&qevent)
 {
 	SDL_Event sdl_event{};
 
-	switch (qevent.type()) {
+	switch (qevent->type()) {
 		case QEvent::MouseButtonPress:
-		case QEvent::MouseButtonRelease:
-			if (qevent.type() == QEvent::MouseButtonPress) {
+		case QEvent::MouseButtonRelease: {
+			if (qevent->type() == QEvent::MouseButtonPress) {
 				sdl_event.button.type = SDL_MOUSEBUTTONDOWN;
 				sdl_event.button.state = SDL_PRESSED;
-			} else if (qevent.type() == QEvent::MouseButtonRelease) {
+			} else if (qevent->type() == QEvent::MouseButtonRelease) {
 				sdl_event.button.type = SDL_MOUSEBUTTONUP;
 				sdl_event.button.state = SDL_RELEASED;
 			}
 
-			switch (qevent.button()) {
+			const QMouseEvent *mouse_event = static_cast<QMouseEvent *>(qevent.get());
+
+			switch (mouse_event->button()) {
 				case Qt::LeftButton:
 					sdl_event.button.button = SDL_BUTTON_LEFT;
 					break;
@@ -816,13 +818,26 @@ static SDL_Event qevent_to_sdl_event(const QMouseEvent &qevent)
 					break;
 			}
 
-			sdl_event.button.x = qevent.pos().x();
-			sdl_event.button.y = qevent.pos().y();
+			sdl_event.button.x = mouse_event->pos().x();
+			sdl_event.button.y = mouse_event->pos().y();
 			break;
-		case QEvent::MouseMove:
+		}
+		case QEvent::MouseMove: {
+			const QMouseEvent *mouse_event = static_cast<QMouseEvent *>(qevent.get());
+
 			sdl_event.motion.type = SDL_MOUSEMOTION;
-			sdl_event.motion.x = qevent.pos().x();
-			sdl_event.motion.y = qevent.pos().y();
+			sdl_event.motion.x = mouse_event->pos().x();
+			sdl_event.motion.y = mouse_event->pos().y();
+			break;
+		}
+		case QEvent::HoverMove: {
+			const QHoverEvent *hover_event = static_cast<QHoverEvent *>(qevent.get());
+
+			sdl_event.motion.type = SDL_MOUSEMOTION;
+			sdl_event.motion.x = hover_event->pos().x();
+			sdl_event.motion.y = hover_event->pos().y();
+			break;
+		}
 		default:
 			break;
 	}
@@ -853,10 +868,10 @@ void WaitEventsOneFrame()
 	InputKeyTimeout(*GetCallbacks(), ticks);
 	CursorAnimate(ticks);
 
-	std::queue<QMouseEvent> mouse_events = engine_interface::get()->take_stored_mouse_events();
-	while (!mouse_events.empty()) {
-		QMouseEvent mouse_event = queue::take(mouse_events);
-		SDL_Event sdl_event = qevent_to_sdl_event(mouse_event);
+	std::queue<std::unique_ptr<QInputEvent>> input_events = engine_interface::get()->take_stored_input_events();
+	while (!input_events.empty()) {
+		std::unique_ptr<QInputEvent> input_event = queue::take(input_events);
+		SDL_Event sdl_event = qevent_to_sdl_event(std::move(input_event));
 		SdlDoEvent(*GetCallbacks(), sdl_event);
 	}
 
