@@ -145,8 +145,8 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				variable_increase = item->get_unit_type()->DefaultStat.Variables[var].Increase;
 			}
 
-			if (var == GIVERESOURCE_INDEX && item->ResourcesHeld != 0) {
-				variable_value = item->ResourcesHeld;
+			if (var == GIVERESOURCE_INDEX && item->get_resources_held() != 0) {
+				variable_value = item->get_resources_held();
 			}
 
 			for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {

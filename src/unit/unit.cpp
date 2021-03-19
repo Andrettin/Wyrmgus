@@ -1971,10 +1971,10 @@ void CUnit::set_unique(const wyrmgus::unique_item *unique)
 		SetSpell(unique->get_spell());
 		SetWork(unique->get_work());
 		SetElixir(unique->get_elixir());
-		if (unique->ResourcesHeld != 0) {
-			this->SetResourcesHeld(unique->ResourcesHeld);
-			this->Variable[GIVERESOURCE_INDEX].Value = unique->ResourcesHeld;
-			this->Variable[GIVERESOURCE_INDEX].Max = unique->ResourcesHeld;
+		if (unique->get_resources_held() != 0) {
+			this->SetResourcesHeld(unique->get_resources_held());
+			this->Variable[GIVERESOURCE_INDEX].Value = unique->get_resources_held();
+			this->Variable[GIVERESOURCE_INDEX].Max = unique->get_resources_held();
 			this->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
 		if (unique->get_set() != nullptr) {

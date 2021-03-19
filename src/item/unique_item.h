@@ -51,6 +51,7 @@ class unique_item final : public detailed_data_entry, public data_type<unique_it
 	Q_PROPERTY(wyrmgus::spell* spell MEMBER spell)
 	Q_PROPERTY(CUpgrade* work MEMBER work)
 	Q_PROPERTY(CUpgrade* elixir MEMBER elixir)
+	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
 
 public:
 	static constexpr const char *class_identifier = "unique_item";
@@ -102,11 +103,15 @@ public:
 		return this->elixir;
 	}
 
+	int get_resources_held() const
+	{
+		return this->resources_held;
+	}
+
 	bool can_drop() const;				/// Check whether this unique item can drop
 	int get_magic_level() const;			/// Get this unique item's magic level
 	wyrmgus::icon *get_icon() const;
 
-	int ResourcesHeld = 0;
 private:
 	wyrmgus::icon *icon = nullptr; //the unique item's icon (if it differs from that of its type)
 	wyrmgus::unit_type *unit_type = nullptr; //unit type of the unique
@@ -116,6 +121,7 @@ private:
 	wyrmgus::spell *spell = nullptr;
 	CUpgrade *work = nullptr;
 	CUpgrade *elixir = nullptr;
+	int resources_held = 0;
 
 	friend int ::CclDefineUniqueItem(lua_State *l);
 };

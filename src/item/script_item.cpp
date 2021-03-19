@@ -89,7 +89,7 @@ static int CclDefineUniqueItem(lua_State *l)
 		} else if (!strcmp(value, "Quote")) {
 			item->set_quote(LuaToString(l, -1));
 		} else if (!strcmp(value, "ResourcesHeld")) {
-			item->ResourcesHeld = LuaToNumber(l, -1);
+			item->resources_held = LuaToNumber(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -159,7 +159,7 @@ static int CclGetUniqueItemData(lua_State *l)
 		lua_pushstring(l, item->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "ResourcesHeld")) {
-		lua_pushnumber(l, item->ResourcesHeld);
+		lua_pushnumber(l, item->get_resources_held());
 		return 1;
 	} else if (!strcmp(data, "Type")) {
 		if (item->get_unit_type() != nullptr) {
