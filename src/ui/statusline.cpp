@@ -37,13 +37,13 @@
 #include "video/font.h"
 #include "video/video.h"
 
-void CStatusLine::Draw()
+void CStatusLine::Draw(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (!this->StatusLine.empty()) {
 		PushClipping();
 		SetClipping(this->TextX, this->TextY,
 					this->TextX + this->Width - 1, Video.Height - 1);
-		CLabel(this->Font).DrawClip(this->TextX, this->TextY, this->StatusLine);
+		CLabel(this->Font).DrawClip(this->TextX, this->TextY, this->StatusLine, render_commands);
 		PopClipping();
 	}
 }
@@ -91,7 +91,7 @@ void CStatusLine::ClearCosts()
 **
 **  @internal MaxCost == FoodCost.
 */
-void CStatusLine::DrawCosts()
+void CStatusLine::DrawCosts(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int x = UI.StatusLine.TextX + 268;
 	CLabel label(wyrmgus::defines::get()->get_game_font());
@@ -100,7 +100,7 @@ void CStatusLine::DrawCosts()
 		mana_icon->get_graphics()->DrawFrameClip(mana_icon->get_frame(), x, UI.StatusLine.TextY);
 
 		x += 20;
-		x += label.Draw(x, UI.StatusLine.TextY, this->Costs[ManaResCost]);
+		x += label.Draw(x, UI.StatusLine.TextY, this->Costs[ManaResCost], render_commands);
 	}
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
@@ -111,7 +111,7 @@ void CStatusLine::DrawCosts()
 
 			switch (i) {
 				case FoodCost:
-					icon = wyrmgus::defines::get()->get_food_icon();
+					icon = defines::get()->get_food_icon();
 					break;
 				default: {
 					const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
@@ -125,7 +125,7 @@ void CStatusLine::DrawCosts()
 				icon_graphics->DrawFrameClip(icon->get_frame(), x, UI.StatusLine.TextY);
 				x += 20;
 			}
-			x += label.Draw(x, UI.StatusLine.TextY, this->Costs[i]);
+			x += label.Draw(x, UI.StatusLine.TextY, this->Costs[i], render_commands);
 			if (x > Video.Width - 60) {
 				break;
 			}

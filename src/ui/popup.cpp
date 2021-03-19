@@ -128,7 +128,7 @@ int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *)
 	return height;
 }
 
-void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
+void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -154,7 +154,7 @@ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const 
 							 ? std::min(this->MaxWidth, popupWidth - 2 * popup.MarginX)
 							 : 0;
 		while ((sub = GetLineFont(++i, draw, width, font)).length()) {
-			label.Draw(x, y_off, sub);
+			label.Draw(x, y_off, sub, render_commands);
 			y_off += font->Height() + 2 * scale_factor;
 		}
 		return;
@@ -255,7 +255,7 @@ CPopupContentTypeText::~CPopupContentTypeText()
 {
 }
 
-void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
+void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
@@ -280,7 +280,7 @@ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsign
 //	while ((sub = GetLineFont(++i, this->Text, width, &font)).length()) {
 	while ((sub = GetLineFont(++i, text, width, font)).length()) {
 	//Wyrmgus end
-		label.Draw(x, y_off, sub);
+		label.Draw(x, y_off, sub, render_commands);
 		y_off += font->Height() + 2 * scale_factor;
 	}
 }
@@ -404,7 +404,7 @@ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs)
 	return std::max(popupHeight, font->Height());
 }
 
-void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *Costs) const
+void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *Costs, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -443,7 +443,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 				y_offset -= label.Height();
 				y_offset /= 2;
 			}
-			x += label.Draw(x, y + y_offset, Costs[i]);
+			x += label.Draw(x, y + y_offset, Costs[i], render_commands);
 			x += 5 * scale_factor;
 		}
 	}
@@ -463,7 +463,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 				y_offset -= font->Height();
 				y_offset /= 2;
 			}
-			label.Draw(x, y + y_offset, spell.get_mana_cost());
+			label.Draw(x, y + y_offset, spell.get_mana_cost(), render_commands);
 		}
 	}
 }
@@ -506,7 +506,7 @@ int CPopupContentTypeLine::GetHeight(const wyrmgus::button &button, int *Costs) 
 	return this->Height;
 }
 
-void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const
+void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	Q_UNUSED(button)
 	Q_UNUSED(Costs)
@@ -564,7 +564,7 @@ CPopupContentTypeVariable::~CPopupContentTypeVariable()
 {
 }
 
-void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *) const
+void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font(); // Font to use.
 
@@ -581,9 +581,9 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 		const std::string text = EvalString(this->Text.get());
 		button.CleanTriggerData();
 		if (this->Centered) {
-			x += (label.DrawCentered(x, y, text) * 2);
+			x += (label.DrawCentered(x, y, text, render_commands) * 2);
 		} else {
-			x += label.Draw(x, y, text);
+			x += label.Draw(x, y, text, render_commands);
 		}
 	}
 
@@ -621,12 +621,12 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 					) {
 					value = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Container->GetItemVariableChange(&wyrmgus::unit_manager::get()->GetSlotUnit(button.Value), this->Index);
 					if (value >= 0) {
-						x += label.Draw(x, y, "+");
+						x += label.Draw(x, y, "+", render_commands);
 					}
 				} else if (wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Work != nullptr || wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Elixir != nullptr) {
 					value = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).GetItemVariableChange(&wyrmgus::unit_manager::get()->GetSlotUnit(button.Value), this->Index);
 					if (value >= 0) {
-						x += label.Draw(x, y, "+");
+						x += label.Draw(x, y, "+", render_commands);
 					}
 				} else {
 					value = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Variable[this->Index].Value;
@@ -635,7 +635,7 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 						|| IsBonusVariable(this->Index)
 						) {
 						if (value >= 0) {
-							x += label.Draw(x, y, "+");
+							x += label.Draw(x, y, "+", render_commands);
 						}
 					}
 				}
@@ -643,14 +643,14 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 			default:
 				value = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
 				if (value >= 0 && IsBonusVariable(this->Index)) {
-					x += label.Draw(x, y, "+");
+					x += label.Draw(x, y, "+", render_commands);
 				}
 				break;
 		}
 
-		x += label.Draw(x, y, value);
+		x += label.Draw(x, y, value, render_commands);
 		if (IsPercentageVariable(this->Index)) {
-			x += label.Draw(x, y, "%");
+			x += label.Draw(x, y, "%", render_commands);
 		}
 		//Wyrmgus end
 	}

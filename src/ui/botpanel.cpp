@@ -762,7 +762,7 @@ static struct PopupDrawCache {
 /**
 **  Draw popup
 */
-void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
+void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	CPopup *popup = PopupByIdent(button.Popup);
 	bool useCache = false;
@@ -849,7 +849,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 	// Contents
 	for (const std::unique_ptr<CPopupContentType> &content : popup->Contents) {
 		if (CanShowPopupContent(content->Condition.get(), button, unit_type)) {
-			content->Draw(x + content->pos.x, y + content->pos.y, *popup, popupWidth, button, Costs.data());
+			content->Draw(x + content->pos.x, y + content->pos.y, *popup, popupWidth, button, Costs.data(), render_commands);
 		}
 	}
 }
@@ -858,7 +858,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 /**
 **  Draw popup
 */
-void DrawGenericPopup(const std::string &popup_text, int x, int y, const wyrmgus::font_color *text_color, const wyrmgus::font_color *highlight_color, bool above)
+void DrawGenericPopup(const std::string &popup_text, int x, int y, const font_color *text_color, const font_color *highlight_color, bool above, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	wyrmgus::font *font = wyrmgus::defines::get()->get_game_font();
 	
@@ -972,16 +972,16 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const wyrmgus
 			const int res = std::stoi(sub.substr(cost_symbol_pos + 5, sub.find(" ", cost_symbol_pos) - (cost_symbol_pos + 5) + 1));
 			std::string sub_first = sub.substr(0, cost_symbol_pos);
 			std::string sub_second = sub.substr(cost_symbol_pos + 5 + std::to_string(res).length(), sub.length() - cost_symbol_pos - (5 + std::to_string(res).length()));
-			label.Draw(x, y_off, sub_first);
+			label.Draw(x, y_off, sub_first, render_commands);
 			x_offset += font->getWidth(sub_first);
 			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[res];
 			const wyrmgus::resource_icon *icon = resource->get_icon();
 			const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
 			icon_graphics->DrawFrameClip(icon->get_frame(), x + x_offset, y + ((font->getHeight() - icon_graphics->Height) / 2), nullptr);
 			x_offset += icon_graphics->Width;
-			label.Draw(x + x_offset, y_off, sub_second);
+			label.Draw(x + x_offset, y_off, sub_second, render_commands);
 		} else {
-			label.Draw(x, y_off, sub);
+			label.Draw(x, y_off, sub, render_commands);
 		}
 		y_off += font->Height() + 2 * scale_factor;
 	}
@@ -1141,7 +1141,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 					}
 					CLabel label(wyrmgus::defines::get()->get_game_font());
 
-					label.Draw(pos.x + 46 - wyrmgus::defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string);
+					label.Draw(pos.x + 46 - wyrmgus::defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string, render_commands);
 				}
 			} else if ( //draw researched technologies (or acquired abilities) grayed
 				((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass || button->Action == ButtonCmd::Dynasty) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), button_upgrade->ID) == 'R')
@@ -1174,7 +1174,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 				} else if (uins->Prefix != nullptr || uins->Suffix != nullptr) {
 					text_color = wyrmgus::defines::get()->get_magic_font_color();
 				}
-				DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, text_color);
+				DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, text_color, nullptr, render_commands);
 			}
 			++j;
 		}

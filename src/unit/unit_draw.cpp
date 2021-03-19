@@ -491,7 +491,7 @@ void CDecoVarText::Draw(int x, int y, const unit_type &/*type*/, const unit_vari
 	if (this->IsCenteredInY) {
 		y -= this->Font->Height() / 2;
 	}
-	CLabel(this->Font).DrawClip(x, y, var.Value);
+	CLabel(this->Font).DrawClip(x, y, var.Value, render_commands);
 }
 
 /**
@@ -628,7 +628,7 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 		x += (unit.Type->get_tile_width() * defines::get()->get_scaled_tile_width() + unit.Type->get_box_width() * defines::get()->get_scale_factor()) / 2 - width;
 		const int height = wyrmgus::defines::get()->get_game_font()->Height();
 		y += (unit.Type->get_tile_height() * defines::get()->get_scaled_tile_height() + unit.Type->get_box_height() * defines::get()->get_scale_factor()) / 2 - height;
-		CLabel(defines::get()->get_game_font()).DrawClip(x, y, groupId);
+		CLabel(defines::get()->get_game_font()).DrawClip(x, y, groupId, render_commands);
 	}
 }
 

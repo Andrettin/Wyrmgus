@@ -765,7 +765,7 @@ void RecalculateShownUnits()
 /**
 **  Draw a table with the players
 */
-static void DrawPlayers()
+static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	std::array<char, 256> buf{};
@@ -805,7 +805,7 @@ static void DrawPlayers()
 //		sprintf(buf, "%d", i);
 		sprintf(buf.data(), "%d", (i == PlayerNumNeutral) ? 16 : i + 1);
 		//Wyrmgus end
-		label.DrawCentered(x + i % 8 * rectangle_size + 10 * scale_factor, y + 7 * scale_factor, buf.data());
+		label.DrawCentered(x + i % 8 * rectangle_size + 10 * scale_factor, y + 7 * scale_factor, buf.data(), render_commands);
 	}
 
 	//Wyrmgus start
@@ -841,7 +841,7 @@ static void DrawPlayers()
 				break;
 		}
 		label.SetFont(wyrmgus::defines::get()->get_game_font());
-		label.Draw(x, y, buf.data());
+		label.Draw(x, y, buf.data(), render_commands);
 	}
 }
 
@@ -932,9 +932,9 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 		
 		if (i == Editor.CursorUnitIndex) {
 			if (i == (int) Editor.ShownUnitTypes.size()) {
-				DrawGenericPopup("Create Unit Type", UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
+				DrawGenericPopup("Create Unit Type", UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y, render_commands);
 			} else {
-				DrawPopup(*CurrentButtons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
+				DrawPopup(*CurrentButtons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y, render_commands);
 			}
 		}
 		
@@ -1014,7 +1014,7 @@ static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsig
 **        If we have more solid tiles, than they fit into the panel, we need
 **        some new ideas.
 */
-static void DrawTileIcons()
+static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	CLabel label(wyrmgus::defines::get()->get_game_font());
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
@@ -1033,27 +1033,27 @@ static void DrawTileIcons()
 	}
 
 	if (TileCursorSize == 1) {
-		label.DrawReverseCentered(x, y, "1x1");
+		label.DrawReverseCentered(x, y, "1x1", render_commands);
 	} else {
-		label.DrawCentered(x, y, "1x1");
+		label.DrawCentered(x, y, "1x1", render_commands);
 	}
 	y += 20 * scale_factor;
 	if (TileCursorSize == 2) {
-		label.DrawReverseCentered(x, y, "2x2");
+		label.DrawReverseCentered(x, y, "2x2", render_commands);
 	} else {
-		label.DrawCentered(x, y, "2x2");
+		label.DrawCentered(x, y, "2x2", render_commands);
 	}
 	y += 20 * scale_factor;
 	if (TileCursorSize == 3) {
-		label.DrawReverseCentered(x, y, "3x3");
+		label.DrawReverseCentered(x, y, "3x3", render_commands);
 	} else {
-		label.DrawCentered(x, y, "3x3");
+		label.DrawCentered(x, y, "3x3", render_commands);
 	}
 	y += 20 * scale_factor;
 	if (TileCursorSize == 4) {
-		label.DrawReverseCentered(x, y, "4x4");
+		label.DrawReverseCentered(x, y, "4x4", render_commands);
 	} else {
-		label.DrawCentered(x, y, "4x4");
+		label.DrawCentered(x, y, "4x4", render_commands);
 	}
 	//Wyrmgus start
 //	y += 20 * scale_factor;
@@ -1069,9 +1069,9 @@ static void DrawTileIcons()
 	}
 	*/
 	if (TileCursorSize == 5) {
-		label.DrawReverseCentered(x, y, "5x5");
+		label.DrawReverseCentered(x, y, "5x5", render_commands);
 	} else {
-		label.DrawCentered(x, y, "5x5");
+		label.DrawCentered(x, y, "5x5", render_commands);
 	}
 	//Wyrmgus end
 	y += 20 * scale_factor;
@@ -1084,9 +1084,9 @@ static void DrawTileIcons()
 	}
 	*/
 	if (TileCursorSize == 10) {
-		label.DrawReverseCentered(x, y, "10x10");
+		label.DrawReverseCentered(x, y, "10x10", render_commands);
 	} else {
-		label.DrawCentered(x, y, "10x10");
+		label.DrawCentered(x, y, "10x10", render_commands);
 	}
 	//Wyrmgus end
 	y += 20 * scale_factor;
@@ -1266,13 +1266,13 @@ static void DrawEditorPanel(std::vector<std::function<void(renderer *)>> &render
 		case EditorSelecting:
 			break;
 		case EditorEditTile:
-			DrawTileIcons();
+			DrawTileIcons(render_commands);
 			break;
 		case EditorSetStartLocation:
-			DrawPlayers();
+			DrawPlayers(render_commands);
 			break;
 		case EditorEditUnit:
-			DrawPlayers();
+			DrawPlayers(render_commands);
 			DrawUnitIcons(render_commands);
 			break;
 	}
@@ -1394,7 +1394,7 @@ static void DrawStartLocations(std::vector<std::function<void(renderer *)>> &ren
 **
 **  If cursor is on map or minimap show information about the current tile.
 */
-static void DrawEditorInfo()
+static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 #if 1
 	Vec2i pos(0, 0);
@@ -1407,7 +1407,7 @@ static void DrawEditorInfo()
 
 	std::array<char, 256> buf{};
 	snprintf(buf.data(), buf.size(), _("Editor (%d %d)"), pos.x, pos.y);
-	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 2 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data());
+	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 2 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data(), render_commands);
 	const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 	//
 	// Flags info
@@ -1434,7 +1434,7 @@ static void DrawEditorInfo()
 			mf.has_flag(tile_flag::bridge) ? 'B' : '-',
 			mf.has_flag(tile_flag::space) ? 'S' : '-');
 
-	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 118 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data());
+	CLabel(defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 118 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data(), render_commands);
 
 	//Wyrmgus start
 //	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
@@ -1460,7 +1460,7 @@ static void DrawEditorInfo()
 	//Wyrmgus end
 	//Wyrmgus start
 //	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
-	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 298 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data());
+	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 298 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data(), render_commands);
 	//Wyrmgus end
 #endif
 }
@@ -1509,8 +1509,6 @@ void EditorUpdateDisplay()
 		DrawBuildingCursor(render_commands);
 	}
 	//Wyrmgus end
-
-	render_context::get()->set_commands(std::move(render_commands));
 	
 	//Wyrmgus start
 	// Fillers
@@ -1548,17 +1546,19 @@ void EditorUpdateDisplay()
 	DrawEditorPanel(render_commands);
 
 	if (CursorOn == cursor_on::map) {
-		DrawEditorInfo();
+		DrawEditorInfo(render_commands);
 	}
 
 	// Status line
-	UI.StatusLine.Draw();
+	UI.StatusLine.Draw(render_commands);
 
 	DrawGuichanWidgets(render_commands);
 
 	// DrawPopup();
 
 	DrawCursor();
+
+	render_context::get()->set_commands(std::move(render_commands));
 
 	// refresh entire screen, so no further invalidate needed
 	RealizeVideoMemory();

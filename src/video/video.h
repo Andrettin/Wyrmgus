@@ -389,6 +389,8 @@ public:
 		this->render_frame(player_color, time_of_day, frame_index, pixel_pos, flip, 255, render_commands);
 	}
 
+	void render_rect(const QRect &rect, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands);
+
 private:
 	std::filesystem::path filepath;
 public:

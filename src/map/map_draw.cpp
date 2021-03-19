@@ -448,7 +448,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 			   || (j < nmissiles && k < nparticles)) {
 			if (i == nunits) {
 				if (missiletable[j]->Type->get_draw_level() < particletable[k]->getDrawLevel()) {
-					missiletable[j]->DrawMissile(*this);
+					missiletable[j]->DrawMissile(*this, render_commands);
 					++j;
 				} else {
 					particletable[k]->draw();
@@ -467,7 +467,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 					unittable[i]->Draw(*this, render_commands);
 					++i;
 				} else {
-					missiletable[j]->DrawMissile(*this);
+					missiletable[j]->DrawMissile(*this, render_commands);
 					++j;
 				}
 			} else {
@@ -481,7 +481,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 					}
 				} else {
 					if (missiletable[j]->Type->get_draw_level() < particletable[k]->getDrawLevel()) {
-						missiletable[j]->DrawMissile(*this);
+						missiletable[j]->DrawMissile(*this, render_commands);
 						++j;
 					} else {
 						particletable[k]->draw();
@@ -494,7 +494,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 			unittable[i]->Draw(*this, render_commands);
 		}
 		for (; j < nmissiles; ++j) {
-			missiletable[j]->DrawMissile(*this);
+			missiletable[j]->DrawMissile(*this, render_commands);
 		}
 		for (; k < nparticles; ++k) {
 			particletable[k]->draw();
@@ -508,7 +508,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 		j = 0;
 		for (; j < nmissiles; ++j) {
 			if (!ClickMissile.empty() && ClickMissile == missiletable[j]->Type->Ident) {
-				missiletable[j]->DrawMissile(*this); //draw click missile again to make it appear on top of the fog of war
+				missiletable[j]->DrawMissile(*this, render_commands); //draw click missile again to make it appear on top of the fog of war
 			}
 		}
 		//Wyrmgus end

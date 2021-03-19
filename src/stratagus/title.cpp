@@ -90,7 +90,7 @@ static void WaitCallbackExit()
 {
 }
 
-void TitleScreen::ShowLabels() const
+void TitleScreen::ShowLabels(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const std::vector<TitleScreenLabel> &labels = this->Labels;
 
@@ -108,14 +108,14 @@ void TitleScreen::ShowLabels() const
 		CLabel label(title_label.Font);
 
 		if (title_label.Flags & TitleFlagCenter) {
-			label.DrawCentered(x, y, title_label.Text);
+			label.DrawCentered(x, y, title_label.Text, render_commands);
 		} else {
-			label.Draw(x, y, title_label.Text);
+			label.Draw(x, y, title_label.Text, render_commands);
 		}
 	}
 }
 
-void TitleScreen::ShowTitleImage() const
+void TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const EventCallback *old_callbacks = GetCallbacks();
 	EventCallback callbacks;
@@ -144,7 +144,7 @@ void TitleScreen::ShowTitleImage() const
 
 	while (timeout-- && WaitNoEvent) {
 		g->DrawClip((Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
-		this->ShowLabels();
+		this->ShowLabels(render_commands);
 
 		RealizeVideoMemory();
 		WaitEventsOneFrame();
@@ -156,7 +156,7 @@ void TitleScreen::ShowTitleImage() const
 /**
 **  Show the title screens
 */
-void ShowTitleScreens()
+void ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (TitleScreens.empty() || !CliMapName.empty()) {
 		return;
@@ -170,19 +170,19 @@ void ShowTitleScreens()
 		}
 
 		if (!title_screen.File.empty()) {
-			title_screen.ShowTitleImage();
+			title_screen.ShowTitleImage(render_commands);
 		}
 
 		Video.ClearScreen();
 	}
 }
 
-void ShowFullImage(const std::string &filename, unsigned int timeOutInSecond)
+void ShowFullImage(const std::string &filename, unsigned int timeOutInSecond, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	TitleScreen titleScreen;
 
 	titleScreen.File = filename;
 	titleScreen.Timeout = timeOutInSecond;
 
-	titleScreen.ShowTitleImage();
+	titleScreen.ShowTitleImage(render_commands);
 }

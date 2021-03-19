@@ -42,8 +42,8 @@ public:
 		memset(Costs, 0, (ManaResCost + 1) * sizeof(int));
 	}
 
-	void Draw();
-	void DrawCosts();
+	void Draw(std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawCosts(std::vector<std::function<void(renderer *)>> &render_commands);
 	void Set(const std::string &status);
 	void SetCosts(int mana, int food, const int *costs);
 	const std::string &Get() const { return this->StatusLine; }

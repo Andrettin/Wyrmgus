@@ -3154,7 +3154,7 @@ void DrawPieMenu(std::vector<std::function<void(renderer *)>> &render_commands)
 					buf[0] = toupper(buttons[i]->get_key());
 					text = (const char *)buf;
 				}
-				label.DrawClip(x + 4, y + 4, text);
+				label.DrawClip(x + 4, y + 4, text, render_commands);
 			}
 		}
 	}
@@ -3163,7 +3163,7 @@ void DrawPieMenu(std::vector<std::function<void(renderer *)>> &render_commands)
 
 	int i = GetPieUnderCursor();
 	if (i != -1 && KeyState != KeyStateInput && buttons[i]->get_pos() != -1) {
-		DrawPopup(*buttons[i], CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
+		DrawPopup(*buttons[i], CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i], render_commands);
 	}
 }
 

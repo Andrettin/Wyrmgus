@@ -104,11 +104,11 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 					  style->TextReverseColor != nullptr ? style->TextReverseColor : wyrmgus::defines::get()->get_default_highlight_font_color()));
 
 		if (p->TextAlign == TextAlignment::Center || p->TextAlign == TextAlignment::Undefined) {
-			label.DrawCentered(x + p->TextPos.x, y + p->TextPos.y, text);
+			label.DrawCentered(x + p->TextPos.x, y + p->TextPos.y, text, render_commands);
 		} else if (p->TextAlign == TextAlignment::Left) {
-			label.Draw(x + p->TextPos.x, y + p->TextPos.y, text);
+			label.Draw(x + p->TextPos.x, y + p->TextPos.y, text, render_commands);
 		} else {
-			label.Draw(x + p->TextPos.x - style->Font->Width(text), y + p->TextPos.y, text);
+			label.Draw(x + p->TextPos.x - style->Font->Width(text), y + p->TextPos.y, text, render_commands);
 		}
 	}
 

@@ -77,18 +77,18 @@ void CContentTypeText::Draw(const CUnit &unit, font *defaultfont, std::vector<st
 		text = EvalString(this->Text.get());
 		std::string::size_type pos;
 		if ((pos = text.find("~|")) != std::string::npos) {
-			x += (label.Draw(x - font->getWidth(text.substr(0, pos)), y, text) - font->getWidth(text.substr(0, pos)));
+			x += (label.Draw(x - font->getWidth(text.substr(0, pos)), y, text, render_commands) - font->getWidth(text.substr(0, pos)));
 		} else if (this->Centered) {
-			x += (label.DrawCentered(x, y, text) * 2);
+			x += (label.DrawCentered(x, y, text, render_commands) * 2);
 		} else {
-			x += label.Draw(x, y, text);
+			x += label.Draw(x, y, text, render_commands);
 		}
 	}
 
 	if (this->ShowName) {
 		//Wyrmgus start
 //		label.DrawCentered(x, y, unit.Type->Name);
-		label.DrawCentered(x, y, unit.get_type_name());
+		label.DrawCentered(x, y, unit.get_type_name(), render_commands);
 		//Wyrmgus end
 		return;
 	}
@@ -102,10 +102,10 @@ void CContentTypeText::Draw(const CUnit &unit, font *defaultfont, std::vector<st
 				case VariableAttribute::Increase:
 				case VariableAttribute::Diff:
 				case VariableAttribute::Percent:
-					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).i);
+					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).i, render_commands);
 					break;
 				case VariableAttribute::Name:
-					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).s);
+					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).s, render_commands);
 					break;
 				default:
 					Assert(0);
@@ -115,11 +115,11 @@ void CContentTypeText::Draw(const CUnit &unit, font *defaultfont, std::vector<st
 			int diff = unit.Stats->Variables[this->Index].Value - value;
 
 			if (!diff) {
-				label.Draw(x, y, value);
+				label.Draw(x, y, value, render_commands);
 			} else {
 				char buf[64];
 				snprintf(buf, sizeof(buf), diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
-				label.Draw(x, y, buf);
+				label.Draw(x, y, buf, render_commands);
 			}
 		}
 	}
@@ -163,11 +163,11 @@ void CContentTypeFormattedText::Draw(const CUnit &unit, font *defaultfont, std::
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
 		std::string buf2(buf);
-		label.Draw(this->Pos.x - font->getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
+		label.Draw(this->Pos.x - font->getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf, render_commands);
 	} else if (this->Centered) {
-		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
+		label.DrawCentered(this->Pos.x, this->Pos.y, buf, render_commands);
 	} else {
-		label.Draw(this->Pos.x, this->Pos.y, buf);
+		label.Draw(this->Pos.x, this->Pos.y, buf, render_commands);
 	}
 }
 
@@ -215,11 +215,11 @@ void CContentTypeFormattedText2::Draw(const CUnit &unit, font *defaultfont, std:
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
 		std::string buf2(buf);
-		label.Draw(this->Pos.x - font->getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
+		label.Draw(this->Pos.x - font->getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf, render_commands);
 	} else if (this->Centered) {
-		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
+		label.DrawCentered(this->Pos.x, this->Pos.y, buf, render_commands);
 	} else {
-		label.Draw(this->Pos.x, this->Pos.y, buf);
+		label.Draw(this->Pos.x, this->Pos.y, buf, render_commands);
 	}
 }
 

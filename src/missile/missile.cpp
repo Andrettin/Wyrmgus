@@ -989,7 +989,7 @@ void missile_type::DrawMissileType(int frame, const PixelPos &pos) const
 /**
 **  Draw missile.
 */
-void Missile::DrawMissile(const CViewport &vp) const
+void Missile::DrawMissile(const CViewport &vp, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	Assert(this->Type);
 	CUnit *sunit = this->get_source_unit();
@@ -1005,7 +1005,7 @@ void Missile::DrawMissile(const CViewport &vp) const
 
 	switch (this->Type->get_missile_class()) {
 		case wyrmgus::missile_class::hit:
-			CLabel(wyrmgus::defines::get()->get_game_font()).DrawClip(screenPixelPos.x, screenPixelPos.y, this->Damage);
+			CLabel(defines::get()->get_game_font()).DrawClip(screenPixelPos.x, screenPixelPos.y, this->Damage, render_commands);
 			break;
 		default:
 			if (Type->G) {

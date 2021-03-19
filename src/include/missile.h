@@ -294,6 +294,7 @@ struct NumberDesc;
 
 namespace wyrmgus {
 
+class renderer;
 class sound;
 class unit_ref;
 enum class missile_class;
@@ -495,7 +496,7 @@ public:
 
 	virtual void Action() = 0;
 
-	void DrawMissile(const CViewport &vp) const;
+	void DrawMissile(const CViewport &vp, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	void SaveMissile(CFile &file) const;
 	void MissileHit(CUnit *unit = nullptr);
 	bool NextMissileFrame(char sign, char longAnimation);

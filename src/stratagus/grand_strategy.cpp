@@ -66,7 +66,7 @@ std::map<std::string, int> GrandStrategyHeroStringToIndex;
 std::vector<std::unique_ptr<CGrandStrategyEvent>> GrandStrategyEvents;
 std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPointer;
 
-void CGrandStrategyGame::DrawInterface()
+void CGrandStrategyGame::DrawInterface(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (this->PlayerFaction != nullptr && this->PlayerFaction->OwnedProvinces.size() > 0) { //draw resource bar
 		std::vector<int> stored_resources;
@@ -105,9 +105,9 @@ void CGrandStrategyGame::DrawInterface()
 			std::string resource_stored_string = std::to_string(quantity_stored) + income_string;
 			
 			if (resource_stored_string.size() <= 9) {
-				CLabel(wyrmgus::defines::get()->get_game_font()).Draw(x + 18, y + 1, resource_stored_string);
+				CLabel(defines::get()->get_game_font()).Draw(x + 18, y + 1, resource_stored_string, render_commands);
 			} else {
-				CLabel(wyrmgus::defines::get()->get_small_font()).Draw(x + 18, y + 1 + 2, resource_stored_string);
+				CLabel(defines::get()->get_small_font()).Draw(x + 18, y + 1 + 2, resource_stored_string, render_commands);
 			}
 			
 			if (CursorScreenPos.x >= x && CursorScreenPos.x <= (x + icon_graphics->get_width()) && CursorScreenPos.y >= y && CursorScreenPos.y <= (y + icon_graphics->get_height())) {
@@ -121,9 +121,9 @@ void CGrandStrategyGame::DrawInterface()
 			}
 		}
 		if (hovered_research_icon.x != -1 && hovered_research_icon.y != -1) {
-			DrawGenericPopup("Gain Research by building town halls, lumber mills, smithies and temples", hovered_research_icon.x, hovered_research_icon.y);
+			DrawGenericPopup("Gain Research by building town halls, lumber mills, smithies and temples", hovered_research_icon.x, hovered_research_icon.y, render_commands);
 		} else if (hovered_prestige_icon.x != -1 && hovered_prestige_icon.y != -1) {
-			DrawGenericPopup("Prestige influences trade priority between nations, and factions with negative prestige cannot declare war", hovered_prestige_icon.x, hovered_prestige_icon.y);
+			DrawGenericPopup("Prestige influences trade priority between nations, and factions with negative prestige cannot declare war", hovered_prestige_icon.x, hovered_prestige_icon.y, render_commands);
 		}
 	}
 }

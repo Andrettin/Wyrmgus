@@ -166,7 +166,7 @@ namespace gcn
 				int popup_x;
 				int popup_y;
 				(*iter)->getAbsolutePosition(popup_x, popup_y);
-				DrawGenericPopup((*iter)->getTooltip(), popup_x, popup_y);
+				DrawGenericPopup((*iter)->getTooltip(), popup_x, popup_y, render_commands);
 			}
 		}
 		//Wyrmgus end

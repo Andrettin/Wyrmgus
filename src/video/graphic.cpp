@@ -114,16 +114,12 @@ void CGraphic::DrawClip(int x, int y) const
 */
 void CGraphic::DrawSub(const int gx, const int gy, const int w, const int h, const int x, const int y) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	DrawTexture(this, this->textures.get(), gx, gy, gx + w, gy + h, x, y, 0);
-#endif
 }
 
 void CGraphic::DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	DrawTexture(this, this->grayscale_textures.get(), gx, gy, gx + w, gy + h, x, y, 0);
-#endif
 }
 
 CPlayerColorGraphic::~CPlayerColorGraphic()
@@ -139,7 +135,7 @@ CPlayerColorGraphic::~CPlayerColorGraphic()
 	}
 }
 
-void CPlayerColorGraphic::DrawPlayerColorSub(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y)
+void CPlayerColorGraphic::DrawPlayerColorSub(const player_color *player_color, int gx, int gy, int w, int h, int x, int y)
 {
 	if (this->get_textures(player_color) == nullptr) {
 		MakePlayerColorTexture(this, player_color, nullptr);
@@ -189,12 +185,10 @@ void CPlayerColorGraphic::DrawPlayerColorSubClip(const wyrmgus::player_color *pl
 */
 void CGraphic::DrawSubTrans(const int gx, const int gy, const int w, const int h, const int x, const int y, const unsigned char alpha) const
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4ub(255, 255, 255, alpha);
 	DrawSub(gx, gy, w, h, x, y);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-#endif
 }
 
 /**
@@ -1407,6 +1401,15 @@ void CGraphic::render_frame(const player_color *player_color, const time_of_day 
 		const QOpenGLTexture *texture = this->get_or_create_texture(player_color, color_modification);
 
 		renderer->blit_texture_frame(texture, pixel_pos, this->get_size(), frame_index, this->get_frame_size(), flip, opacity, show_percent);
+	});
+}
+
+void CGraphic::render_rect(const QRect &rect, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands)
+{
+	render_commands.push_back([this, rect, pixel_pos](renderer *renderer) {
+		const QOpenGLTexture *texture = this->get_or_create_texture(nullptr, nullptr);
+
+		renderer->blit_texture_frame(texture, pixel_pos, rect.topLeft(), rect.size(), false, 255, 100);
 	});
 }
 

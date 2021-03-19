@@ -290,13 +290,13 @@ extern void DrawUserDefinedButtons(std::vector<std::function<void(renderer *)>> 
 /// Update messages
 extern void UpdateMessages();
 /// Draw messages as overlay over of the map
-extern void DrawMessages();
+extern void DrawMessages(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw the player resource in resource line
-extern void DrawResources();
+extern void DrawResources(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw the time of day, season and date
-extern void DrawTime();
+extern void DrawTime(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw the age
-extern void DrawAge();
+extern void DrawAge(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw the map layer buttons
 extern void DrawMapLayerButtons(std::vector<std::function<void(renderer *)>> &render_commands);
 //Wyrmgus start
@@ -329,10 +329,26 @@ extern void ToggleShowMessages();
 extern void DrawPieMenu(std::vector<std::function<void(renderer *)>> &render_commands);
 
 /// Draw the button popup
-extern void DrawPopup(const wyrmgus::button &button, int x = 0, int y = 0, bool above = true);
+extern void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vector<std::function<void(renderer *)>> &render_commands);
+
+inline void DrawPopup(const wyrmgus::button &button, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
+{
+	DrawPopup(button, x, y, true, render_commands);
+}
+
 //Wyrmgus start
-extern void DrawGenericPopup(const std::string &popup_text, int x = 0, int y = 0, const wyrmgus::font_color *text_color = nullptr, const wyrmgus::font_color *highlight_color = nullptr, bool above = true);
+extern void DrawGenericPopup(const std::string &popup_text, int x, int y, const font_color *text_color, const font_color *highlight_color, bool above, std::vector<std::function<void(renderer *)>> &render_commands);
 //Wyrmgus end
+
+inline void DrawGenericPopup(const std::string &popup_text, int x, int y, const font_color *text_color, const font_color *highlight_color, std::vector<std::function<void(renderer *)>> &render_commands)
+{
+	DrawGenericPopup(popup_text, x, y, text_color, highlight_color, true, render_commands);
+}
+
+inline void DrawGenericPopup(const std::string &popup_text, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
+{
+	DrawGenericPopup(popup_text, x, y, nullptr, nullptr, render_commands);
+}
 
 /// Handle the mouse in scroll area
 extern bool HandleMouseScrollArea(const PixelPos &mousePos);

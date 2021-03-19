@@ -32,6 +32,7 @@
 #include "database/defines.h"
 #include "intern_video.h"
 #include "util/image_util.h"
+#include "util/point_util.h"
 #include "util/util.h"
 #include "video/font_color.h"
 #include "video/video.h"
@@ -64,7 +65,7 @@ void font::drawString(gcn::Graphics *graphics, const std::string &txt, int x, in
 	SetClipping(r.x, r.y, right, bottom);
 	//Wyrmgus start
 //	CLabel(this).DrawClip(x + r.xOffset, y + r.yOffset, txt);
-	CLabel(this).DrawClip(x + r.xOffset, y + r.yOffset, txt, is_normal);
+	CLabel(this).DrawClip(x + r.xOffset, y + r.yOffset, txt, is_normal, render_commands);
 	//Wyrmgus end
 	PopClipping();
 }
@@ -82,12 +83,15 @@ void font::drawString(gcn::Graphics *graphics, const std::string &txt, int x, in
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-static void VideoDrawChar(const CGraphic &g,
-						  int gx, int gy, int w, int h, int x, int y)
+static void VideoDrawChar(CGraphic &g,
+						  int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	g.DrawSub(gx, gy, w, h, x, y);
-#endif
+
+	const QPoint frame_pos(gx / g.get_frame_width(), gy * g.get_frame_height());
+	const int frame_index = point::to_index(frame_pos, g.get_frames_per_row());
+
+	g.render_rect(QRect(gx, gy, w, h), QPoint(x, y), render_commands);
 }
 
 /**
@@ -323,21 +327,21 @@ font::~font()
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-static void VideoDrawCharClip(const CGraphic &g, int gx, int gy, int w, int h,
-							  int x, int y)
+static void VideoDrawCharClip(CGraphic &g, int gx, int gy, int w, int h,
+							  int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int ox;
 	int oy;
 	int ex;
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
 	UNUSED(ex);
-	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y);
+	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y, render_commands);
 }
 
 namespace wyrmgus {
 
 template<bool CLIP>
-unsigned int font::DrawChar(CGraphic &g, int utf8, int x, int y) const
+unsigned int font::DrawChar(CGraphic &g, int utf8, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	int c = utf8 - 32;
 	Assert(c >= 0);
@@ -351,9 +355,9 @@ unsigned int font::DrawChar(CGraphic &g, int utf8, int x, int y) const
 	const int gy = (c / ipr) * this->G->Height;
 
 	if constexpr (CLIP) {
-		VideoDrawCharClip(g, gx, gy, w, this->G->Height, x , y);
+		VideoDrawCharClip(g, gx, gy, w, this->G->Height, x , y, render_commands);
 	} else {
-		VideoDrawChar(g, gx, gy, w, this->G->Height, x, y);
+		VideoDrawChar(g, gx, gy, w, this->G->Height, x, y, render_commands);
 	}
 	return w + 1;
 }
@@ -394,8 +398,7 @@ CGraphic *font::get_font_color_graphic(const wyrmgus::font_color *font_color)
 **  @return      The length of the printed text.
 */
 template <const bool CLIP>
-int CLabel::DoDrawText(int x, int y,
-					   const char *const text, const size_t len, const wyrmgus::font_color *fc) const
+int CLabel::DoDrawText(int x, int y, const char *const text, const size_t len, const font_color *fc, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	int widths = 0;
 	int utf8;
@@ -475,10 +478,10 @@ int CLabel::DoDrawText(int x, int y,
 		}
 		if (tab) {
 			for (int tabs = 0; tabs < tabSize; ++tabs) {
-				widths += font->DrawChar<CLIP>(*g, ' ', x + widths, y);
+				widths += font->DrawChar<CLIP>(*g, ' ', x + widths, y, render_commands);
 			}
 		} else {
-			widths += font->DrawChar<CLIP>(*g, utf8, x + widths, y);
+			widths += font->DrawChar<CLIP>(*g, utf8, x + widths, y, render_commands);
 		}
 
 		if (isColor == false && fc != backup) {
@@ -510,95 +513,95 @@ void CLabel::SetNormalColor(const wyrmgus::font_color *nc)
 }
 
 /// Draw text/number unclipped
-int CLabel::Draw(int x, int y, const char *const text) const
+int CLabel::Draw(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	return DoDrawText<false>(x, y, text, strlen(text), normal);
+	return DoDrawText<false>(x, y, text, strlen(text), normal, render_commands);
 }
 
-int CLabel::Draw(int x, int y, const std::string &text) const
+int CLabel::Draw(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	return DoDrawText<false>(x, y, text.c_str(), text.size(), normal);
+	return DoDrawText<false>(x, y, text.c_str(), text.size(), normal, render_commands);
 }
 
-int CLabel::Draw(int x, int y, int number) const
+int CLabel::Draw(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	std::string str = FormatNumber(number);
-	return DoDrawText<false>(x, y, str.c_str(), str.length(), normal);
+	return DoDrawText<false>(x, y, str.c_str(), str.length(), normal, render_commands);
 }
 
 /// Draw text/number clipped
-int CLabel::DrawClip(int x, int y, const char *const text) const
+int CLabel::DrawClip(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	return DoDrawText<true>(x, y, text, strlen(text), normal);
+	return DoDrawText<true>(x, y, text, strlen(text), normal, render_commands);
 }
 
 //Wyrmgus start
 //int CLabel::DrawClip(int x, int y, const std::string &text) const
-int CLabel::DrawClip(int x, int y, const std::string &text, bool is_normal) const
+int CLabel::DrawClip(int x, int y, const std::string &text, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands) const
 //Wyrmgus end
 {
 	//Wyrmgus start
 //	return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
 	if (is_normal) {
-		return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
+		return DoDrawText<true>(x, y, text.c_str(), text.size(), normal, render_commands);
 	} else {
-		return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse);
+		return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse, render_commands);
 	}
 	//Wyrmgus end
 }
 
-int CLabel::DrawClip(int x, int y, int number) const
+int CLabel::DrawClip(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	std::string str = FormatNumber(number);
-	return DoDrawText<true>(x, y, str.c_str(), str.length(), normal);
+	return DoDrawText<true>(x, y, str.c_str(), str.length(), normal, render_commands);
 }
 
 
 /// Draw reverse text/number unclipped
-int CLabel::DrawReverse(int x, int y, const char *const text) const
+int CLabel::DrawReverse(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	return DoDrawText<false>(x, y, text, strlen(text), reverse);
+	return DoDrawText<false>(x, y, text, strlen(text), reverse, render_commands);
 }
 
-int CLabel::DrawReverse(int x, int y, const std::string &text) const
+int CLabel::DrawReverse(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	return DoDrawText<false>(x, y, text.c_str(), text.size(), reverse);
+	return DoDrawText<false>(x, y, text.c_str(), text.size(), reverse, render_commands);
 }
 
-int CLabel::DrawReverse(int x, int y, int number) const
+int CLabel::DrawReverse(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	std::string str = FormatNumber(number);
-	return DoDrawText<false>(x, y, str.c_str(), str.length(), reverse);
+	return DoDrawText<false>(x, y, str.c_str(), str.length(), reverse, render_commands);
 }
 
 /// Draw reverse text/number clipped
-int CLabel::DrawReverseClip(int x, int y, const char *const text) const
+int CLabel::DrawReverseClip(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	return DoDrawText<true>(x, y, text, strlen(text), reverse);
+	return DoDrawText<true>(x, y, text, strlen(text), reverse, render_commands);
 }
 
-int CLabel::DrawReverseClip(int x, int y, const std::string &text) const
+int CLabel::DrawReverseClip(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse);
+	return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse, render_commands);
 }
 
-int CLabel::DrawReverseClip(int x, int y, int number) const
+int CLabel::DrawReverseClip(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	std::string str = FormatNumber(number);
-	return DoDrawText<true>(x, y, str.c_str(), str.length(), reverse);
+	return DoDrawText<true>(x, y, str.c_str(), str.length(), reverse, render_commands);
 }
 
-int CLabel::DrawCentered(int x, int y, const std::string &text) const
+int CLabel::DrawCentered(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	int dx = font->Width(text);
-	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), normal);
+	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), normal, render_commands);
 	return dx / 2;
 }
 
-int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
+int CLabel::DrawReverseCentered(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	int dx = font->Width(text);
-	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), reverse);
+	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), reverse, render_commands);
 	return dx / 2;
 }
 

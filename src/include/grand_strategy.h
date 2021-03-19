@@ -258,7 +258,7 @@ public:
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}
 
-	void DrawInterface();					/// Draw the interface
+	void DrawInterface(std::vector<std::function<void(renderer *)>> &render_commands);					/// Draw the interface
 	void DoTurn();							/// Process the grand strategy turn
 	void PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource);
 	void CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province);

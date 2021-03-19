@@ -30,6 +30,7 @@
 
 namespace wyrmgus {
 	class font;
+	class renderer;
 }
 
 enum {
@@ -49,10 +50,10 @@ public:
 class TitleScreen final
 {
 public:
-	void ShowTitleImage() const;
+	void ShowTitleImage(std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 private:
-	void ShowLabels() const;
+	void ShowLabels(std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 public:
 	std::string File;
@@ -65,4 +66,4 @@ public:
 
 extern std::vector<TitleScreen> TitleScreens;          /// File for title screen
 
-extern void ShowTitleScreens();
+extern void ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands);

@@ -109,8 +109,11 @@ void ShowLoadProgress(const char *fmt, ...)
 			Video.FillRectangle(ColorBlack, 0, Video.Height - 18 * wyrmgus::defines::get()->get_scale_factor(), Video.Width, 18 * wyrmgus::defines::get()->get_scale_factor());
 		}
 		//Wyrmgus end
-		CLabel(wyrmgus::defines::get()->get_game_font()).DrawCentered(Video.Width / 2, Video.Height - 16 * wyrmgus::defines::get()->get_scale_factor(), temp);
+		std::vector<std::function<void(renderer *)>> render_commands;
+		CLabel(defines::get()->get_game_font()).DrawCentered(Video.Width / 2, Video.Height - 16 * defines::get()->get_scale_factor(), temp, render_commands);
 		//Wyrmgus end
+
+		//FIXME: do something with the render commands
 
 		RealizeVideoMemory();
 	} else {

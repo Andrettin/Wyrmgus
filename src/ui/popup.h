@@ -126,7 +126,7 @@ public:
 	}
 
 	/// Tell how show the variable Index.
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const = 0;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const button &button, int *Costs, std::vector<std::function<void(renderer *)>> &render_commands) const = 0;
 	/// Get the content's width
 	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const = 0;
 	/// Get the content's height
@@ -159,7 +159,7 @@ enum PopupButtonInfo_Types {
 class CPopupContentTypeButtonInfo final : public CPopupContentType
 {
 public:
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const override;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const override;
 	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const override;
@@ -180,7 +180,7 @@ public:
 	virtual ~CPopupContentTypeText();
 	//Wyrmgus end
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const override;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const override;
 	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const override;
@@ -199,7 +199,7 @@ private:
 class CPopupContentTypeCosts final : public CPopupContentType
 {
 public:
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const override;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const override;
 	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const override;
@@ -216,7 +216,7 @@ class CPopupContentTypeLine final : public CPopupContentType
 public:
 	CPopupContentTypeLine();
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const override;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const override;
 	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const override;
@@ -234,7 +234,7 @@ class CPopupContentTypeVariable final : public CPopupContentType
 public:
 	virtual ~CPopupContentTypeVariable();
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const override;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const override;
 	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const override;

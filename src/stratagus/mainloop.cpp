@@ -204,7 +204,7 @@ void UpdateDisplay()
 		Video.FillRectangleClip(ColorBlack, 0, 0, Video.ViewportWidth, Video.ViewportHeight);
 
 		DrawMapArea(render_commands);
-		DrawMessages();
+		DrawMessages(render_commands);
 
 		if (CurrentCursorState == CursorState::Rectangle) {
 			DrawCursor();
@@ -234,12 +234,12 @@ void UpdateDisplay()
 			UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport);
 
 			UI.InfoPanel.Draw(render_commands);
-			DrawResources();
-			DrawTime();
-			DrawAge();
+			DrawResources(render_commands);
+			DrawTime(render_commands);
+			DrawAge(render_commands);
 			DrawMapLayerButtons(render_commands);
-			UI.StatusLine.Draw();
-			UI.StatusLine.DrawCosts();
+			UI.StatusLine.Draw(render_commands);
+			UI.StatusLine.DrawCosts(render_commands);
 			UI.ButtonPanel.Draw(render_commands);
 		}
 		
