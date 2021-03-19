@@ -243,8 +243,6 @@ void UpdateDisplay()
 			UI.ButtonPanel.Draw(render_commands);
 		}
 		
-		DrawTimer();
-		
 		//Wyrmgus start
 		//draw worker icon if there are idle workers
 		if (UI.IdleWorkerButton && !CPlayer::GetThisPlayer()->FreeWorkers.empty()) {
@@ -315,7 +313,6 @@ static void GameLogicLoop()
 		UnitActions();      // handle units
 		MissileActions();   // handle missiles
 		PlayersEachCycle(); // handle players
-		UpdateTimer();      // update game timer
 
 		for (const std::unique_ptr<CMapLayer> &map_layer : CMap::get()->MapLayers) {
 			map_layer->DoPerCycleLoop();

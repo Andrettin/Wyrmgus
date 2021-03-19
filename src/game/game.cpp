@@ -1556,35 +1556,6 @@ void CalculateItemsToLoad()
 	}
 }
 
-void UpdateLoadingBar()
-{
-	int y = Video.Height/2;
-	
-	if (loadingBackground != nullptr) {
-		loadingBackground->DrawClip(0, 0);
-	}
-	
-	if (itemsToLoad > 0) {
-		int x = Video.Width/2 - loadingEmpty->Width/2;
-		int pct = (itemsLoaded * 100) / itemsToLoad;
-		
-		loadingEmpty->DrawClip(x, y - loadingEmpty->Height/2);
-		loadingFull->DrawSub(0, 0, (loadingFull->Width * pct) / 100, loadingFull->Height, x, y - loadingEmpty->Height/2);
-		y+= loadingEmpty->Height/2;
-	}
-
-	if (loadingFont == nullptr) {
-		loadingFont = font::get("game");
-	}
-
-	if (loadingFont != nullptr) {
-		CLabel label(loadingFont);
-		for (size_t i = 0; i < loadingTip.size(); ++i) {
-			label.DrawCentered(Video.Width/2, y + 10 + (defines::get()->get_game_font()->Height() * i), loadingTip[i]);
-		}
-	}
-}
-
 void IncItemsLoaded()
 {
 	if (itemsToLoad == 0 || itemsLoaded >= itemsToLoad) {

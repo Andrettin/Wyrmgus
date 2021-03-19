@@ -586,6 +586,5 @@ extern void ShowLoadProgress(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 extern void UpdateLoadProgress();
 
 extern void CalculateItemsToLoad();
-extern void UpdateLoadingBar();
 extern void IncItemsLoaded();
 extern void ResetItemsToLoad();
