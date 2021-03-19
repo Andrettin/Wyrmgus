@@ -56,6 +56,8 @@
  * For comments regarding functions please see the header file.
  */
 
+#include "stratagus.h"
+
 #include "guichan/cliprectangle.h"
 
 namespace gcn

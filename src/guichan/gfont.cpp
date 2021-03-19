@@ -55,6 +55,8 @@
 /*
  * For comments regarding functions please see the header file.
  */
+#include "stratagus.h"
+
 #include "guichan/font.h"
 #include "guichan/exception.h"
 
