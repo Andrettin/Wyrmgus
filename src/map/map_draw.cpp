@@ -359,7 +359,6 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_terrain_type()->get_graphics(season);
 				if (border_graphics != nullptr) {
 					border_graphics->DrawPlayerColorFrameClip(player_color, mf.get_ownership_border_tile(), dx, dy, nullptr, render_commands);
-					border_graphics->render_frame(player_color, nullptr, mf.get_ownership_border_tile(), QPoint(dx, dy), false, render_commands);
 				}
 			}
 
@@ -370,7 +369,6 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 					const int frame_index = overlay_solid_tile + (overlay_terrain == mf.get_overlay_terrain() ? mf.OverlayAnimationFrame : 0);
 					const wyrmgus::time_of_day *overlay_time_of_day = is_overlay_space ? nullptr : time_of_day;
 					overlay_terrain_graphics->DrawPlayerColorFrameClip(player_color, frame_index, dx, dy, overlay_time_of_day, render_commands);
-					overlay_terrain_graphics->render_frame(player_color, overlay_time_of_day, frame_index, QPoint(dx, dy), false, render_commands);
 				}
 			}
 
@@ -385,7 +383,6 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 				if (overlay_transition_graphics != nullptr) {
 					const wyrmgus::time_of_day *overlay_transition_time_of_day = is_overlay_transition_space ? nullptr : time_of_day;
 					overlay_transition_graphics->DrawPlayerColorFrameClip(player_color, overlay_transition_tiles[i].tile_frame, dx, dy, overlay_transition_time_of_day, render_commands);
-					overlay_transition_graphics->render_frame(player_color, overlay_transition_time_of_day, overlay_transition_tiles[i].tile_frame, QPoint(dx, dy), false, render_commands);
 				}
 			}
 
@@ -394,7 +391,6 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_terrain_type()->get_graphics(season);
 				if (border_graphics != nullptr) {
 					border_graphics->DrawPlayerColorFrameClip(player_color, mf.get_ownership_border_tile(), dx, dy, nullptr, render_commands);
-					border_graphics->render_frame(player_color, nullptr, mf.get_ownership_border_tile(), QPoint(dx, dy), false, render_commands);
 				}
 			}
 
