@@ -1009,6 +1009,8 @@ static SDLKey qt_key_to_sdl_key(const Qt::Key qt_key)
 			return SDLK_BACKQUOTE;
 		case Qt::Key_Undo:
 			return SDLK_UNDO;
+		default:
+			return SDLK_UNKNOWN;
 	}
 }
 
