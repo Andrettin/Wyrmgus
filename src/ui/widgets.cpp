@@ -251,10 +251,10 @@ void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, in
 //									 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
 	if (player_color != nullptr) {
 		((CPlayerColorGraphic *)image)->DrawPlayerColorSubClip(player_color, srcX, srcY, width, height,
-										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset, render_commands);
 	} else if (grayscale) {
-		static_cast<const CGraphic *>(image)->DrawGrayscaleSubClip(srcX, srcY, width, height,
-										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+		((CGraphic *) image)->DrawGrayscaleSubClip(srcX, srcY, width, height,
+										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset, render_commands);
 	} else {
 		((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
 										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset, render_commands);

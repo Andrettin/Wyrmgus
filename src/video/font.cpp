@@ -91,7 +91,7 @@ static void VideoDrawChar(CGraphic &g,
 	const QPoint frame_pos(gx / g.get_frame_width(), gy * g.get_frame_height());
 	const int frame_index = point::to_index(frame_pos, g.get_frames_per_row());
 
-	g.render_rect(QRect(gx, gy, w, h), QPoint(x, y), render_commands);
+	g.render_rect(nullptr, QRect(gx, gy, w, h), QPoint(x, y), false, render_commands);
 }
 
 /**

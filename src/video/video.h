@@ -84,9 +84,9 @@ public:
 	// Draw
 	void DrawClip(int x, int y) const;
 	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
-	void DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y) const;
+	void DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawSubClip(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y) const;
+	void DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha) const;
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha) const;
 
@@ -296,7 +296,7 @@ public:
 
 	void create_frame_images(const wyrmgus::player_color *player_color);
 
-	const QImage &get_or_create_frame_image(const size_t frame_index, const wyrmgus::player_color *player_color)
+	const QImage &get_or_create_frame_image(const size_t frame_index, const player_color *player_color)
 	{
 		const QImage *image = this->get_frame_image(frame_index, player_color);
 
@@ -319,13 +319,13 @@ public:
 		return this->has_player_color_value;
 	}
 
-	const QOpenGLTexture *get_texture(const player_color *player_color, const CColor *color_modification) const
+	const QOpenGLTexture *get_texture(const player_color *player_color, const CColor *color_modification, const bool grayscale) const
 	{
-		if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
+		if (grayscale) {
+			return this->grayscale_texture.get();
+		} else if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
 			if (color_modification == nullptr) {
-				if (this->texture != nullptr) {
-					return this->texture.get();
-				}
+				return this->texture.get();
 			} else {
 				const auto find_iterator = this->color_modification_textures.find(*color_modification);
 				if (find_iterator != this->color_modification_textures.end()) {
@@ -352,19 +352,19 @@ public:
 		return nullptr;
 	}
 
-	const QOpenGLTexture *get_or_create_texture(const player_color *player_color, const CColor *color_modification)
+	const QOpenGLTexture *get_or_create_texture(const player_color *player_color, const CColor *color_modification, const bool grayscale)
 	{
 		if (player_color != nullptr) {
 			if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-				return this->get_or_create_texture(nullptr, color_modification);
+				return this->get_or_create_texture(nullptr, color_modification, grayscale);
 			}
 		}
 
-		const QOpenGLTexture *texture = this->get_texture(player_color, color_modification);
+		const QOpenGLTexture *texture = this->get_texture(player_color, color_modification, grayscale);
 
 		if (texture == nullptr) {
-			this->create_texture(player_color, color_modification);
-			texture = this->get_texture(player_color, color_modification);
+			this->create_texture(player_color, color_modification, grayscale);
+			texture = this->get_texture(player_color, color_modification, grayscale);
 		}
 
 		if (texture == nullptr) {
@@ -374,7 +374,7 @@ public:
 		return texture;
 	}
 
-	void create_texture(const player_color *player_color, const CColor *color_modification);
+	void create_texture(const player_color *player_color, const CColor *color_modification, const bool grayscale);
 
 	const GLuint *get_textures() const
 	{
@@ -418,7 +418,7 @@ public:
 		this->render_frame(player_color, time_of_day, frame_index, pixel_pos, false, render_commands);
 	}
 
-	void render_rect(const QRect &rect, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands);
+	void render_rect(const player_color *player_color, const QRect &rect, const QPoint &pixel_pos, const bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands);
 
 private:
 	std::filesystem::path filepath;
@@ -454,6 +454,7 @@ public:
 	int NumTextures = 0;           /// Number of textures
 private:
 	std::unique_ptr<QOpenGLTexture> texture;
+	std::unique_ptr<QOpenGLTexture> grayscale_texture;
 	std::map<CColor, std::unique_ptr<QOpenGLTexture>> color_modification_textures;
 	std::map<const player_color *, std::unique_ptr<QOpenGLTexture>> player_color_textures;
 	std::map<const player_color *, std::map<CColor, std::unique_ptr<QOpenGLTexture>>> player_color_color_modification_textures;
@@ -475,8 +476,8 @@ public:
 
 	virtual ~CPlayerColorGraphic() override;
 
-	void DrawPlayerColorSub(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
-	void DrawPlayerColorSubClip(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
+	void DrawPlayerColorSub(const player_color *player_color, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawPlayerColorSubClip(const player_color *player_color, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawPlayerColorFrameClipX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr);
 	void DrawPlayerColorFrameClip(const player_color *player_color, const unsigned frame, const int x, const int y, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
 
