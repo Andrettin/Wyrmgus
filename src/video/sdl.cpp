@@ -1092,6 +1092,7 @@ static SDL_Event qevent_to_sdl_event(std::unique_ptr<QInputEvent> &&qevent)
 			sdl_event.motion.y = mouse_event->pos().y();
 			break;
 		}
+		case QEvent::HoverEnter:
 		case QEvent::HoverMove: {
 			const QHoverEvent *hover_event = static_cast<QHoverEvent *>(qevent.get());
 
