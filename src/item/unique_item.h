@@ -45,6 +45,7 @@ class unique_item final : public detailed_data_entry, public data_type<unique_it
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::unit_type* unit_type MEMBER unit_type)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
 	Q_PROPERTY(CUpgrade* prefix MEMBER prefix)
 	Q_PROPERTY(CUpgrade* suffix MEMBER suffix)
 	Q_PROPERTY(CUpgrade* set MEMBER set)
@@ -110,11 +111,11 @@ public:
 
 	bool can_drop() const;				/// Check whether this unique item can drop
 	int get_magic_level() const;			/// Get this unique item's magic level
-	wyrmgus::icon *get_icon() const;
+	const wyrmgus::icon *get_icon() const;
 
 private:
-	wyrmgus::icon *icon = nullptr; //the unique item's icon (if it differs from that of its type)
 	wyrmgus::unit_type *unit_type = nullptr; //unit type of the unique
+	wyrmgus::icon *icon = nullptr; //the unique item's icon (if it differs from that of its type)
 	CUpgrade *prefix = nullptr;
 	CUpgrade *suffix = nullptr;
 	CUpgrade *set = nullptr;
