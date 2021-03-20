@@ -82,13 +82,13 @@ public:
 	virtual ~CGraphic();
 
 	// Draw
-	void DrawClip(int x, int y) const;
-	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
+	void DrawClip(int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawSub(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawSubClip(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha) const;
-	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha) const;
+	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
@@ -401,6 +401,8 @@ public:
 		return this->load_mutex;
 	}
 
+	void render(const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands);
+
 	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -418,7 +420,7 @@ public:
 		this->render_frame(player_color, time_of_day, frame_index, pixel_pos, false, render_commands);
 	}
 
-	void render_rect(const player_color *player_color, const QRect &rect, const QPoint &pixel_pos, const bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands);
+	void render_rect(const player_color *player_color, const QRect &rect, const QPoint &pixel_pos, const bool grayscale, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands);
 
 private:
 	std::filesystem::path filepath;

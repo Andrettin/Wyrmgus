@@ -374,7 +374,7 @@ void CContentTypeIcon::Draw(const CUnit &unit, font *, std::vector<std::function
 //	Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
 //							this->Width + 3, this->Height + 3);
 	if (defines::get()->get_bar_frame_graphics() != nullptr) {
-		defines::get()->get_bar_frame_graphics()->DrawClip(this->Pos.x + (-1 - 4) * scale_factor, this->Pos.y + (-1 - 4) * scale_factor);
+		defines::get()->get_bar_frame_graphics()->DrawClip(this->Pos.x + (-1 - 4) * scale_factor, this->Pos.y + (-1 - 4) * scale_factor, render_commands);
 		Video.FillRectangleClip(ColorBlack, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
 								this->Width * scale_factor, this->Height * scale_factor, render_commands);
 	} else {
@@ -430,8 +430,8 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 
 	if (!this->hasBorder) {
 		//Wyrmgus start
-		if (wyrmgus::defines::get()->get_progress_bar_graphics() != nullptr) {
-			wyrmgus::defines::get()->get_progress_bar_graphics()->DrawClip(this->Pos.x - 4 * scale_factor, this->Pos.y - 5 * scale_factor);
+		if (defines::get()->get_progress_bar_graphics() != nullptr) {
+			defines::get()->get_progress_bar_graphics()->DrawClip(this->Pos.x - 4 * scale_factor, this->Pos.y - 5 * scale_factor, render_commands);
 		}
 		//Wyrmgus end
 		Video.FillRectangleClip(color, x, y, f * w / 100, h, render_commands);

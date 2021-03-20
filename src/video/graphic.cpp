@@ -92,14 +92,14 @@ CGraphic::~CGraphic()
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-void CGraphic::DrawClip(int x, int y) const
+void CGraphic::DrawClip(int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int oldx = x;
 	int oldy = y;
 	int w = Width;
 	int h = Height;
 	CLIP_RECTANGLE(x, y, w, h);
-	DrawSub(x - oldx, y - oldy, w, h, x, y);
+	DrawSub(x - oldx, y - oldy, w, h, x, y, render_commands);
 }
 
 /**
@@ -112,16 +112,18 @@ void CGraphic::DrawClip(int x, int y) const
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-void CGraphic::DrawSub(const int gx, const int gy, const int w, const int h, const int x, const int y) const
+void CGraphic::DrawSub(const int gx, const int gy, const int w, const int h, const int x, const int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	DrawTexture(this, this->textures.get(), gx, gy, gx + w, gy + h, x, y, 0);
+
+	this->render_rect(nullptr, QRect(gx, gy, w, h), QPoint(x, y), false, 255, render_commands);
 }
 
 void CGraphic::DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	DrawTexture(this, this->grayscale_textures.get(), gx, gy, gx + w, gy + h, x, y, 0);
 
-	this->render_rect(nullptr, QRect(gx, gy, w, h), QPoint(x, y), true, render_commands);
+	this->render_rect(nullptr, QRect(gx, gy, w, h), QPoint(x, y), true, 255, render_commands);
 }
 
 CPlayerColorGraphic::~CPlayerColorGraphic()
@@ -144,7 +146,7 @@ void CPlayerColorGraphic::DrawPlayerColorSub(const player_color *player_color, i
 	}
 	DrawTexture(this, this->get_textures(player_color), gx, gy, gx + w, gy + h, x, y, 0);
 
-	this->render_rect(player_color, QRect(gx, gy, w, h), QPoint(x, y), false, render_commands);
+	this->render_rect(player_color, QRect(gx, gy, w, h), QPoint(x, y), false, 255, render_commands);
 }
 
 void CGraphic::DrawSubClip(const int gx, const int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -152,9 +154,7 @@ void CGraphic::DrawSubClip(const int gx, const int gy, int w, int h, int x, int 
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
-
-	this->render_rect(nullptr, QRect(gx, gy, w, h), QPoint(x, y), false, render_commands);
+	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y, render_commands);
 }
 
 void CGraphic::DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -184,12 +184,9 @@ void CPlayerColorGraphic::DrawPlayerColorSubClip(const wyrmgus::player_color *pl
 **  @param y      Y screen position
 **  @param alpha  Alpha
 */
-void CGraphic::DrawSubTrans(const int gx, const int gy, const int w, const int h, const int x, const int y, const unsigned char alpha) const
+void CGraphic::DrawSubTrans(const int gx, const int gy, const int w, const int h, const int x, const int y, const unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glColor4ub(255, 255, 255, alpha);
-	DrawSub(gx, gy, w, h, x, y);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	this->render_rect(nullptr, QRect(gx, gy, w, h), QPoint(x, y), false, alpha, render_commands);
 }
 
 /**
@@ -203,12 +200,12 @@ void CGraphic::DrawSubTrans(const int gx, const int gy, const int w, const int h
 **  @param y      Y screen position
 **  @param alpha  Alpha
 */
-void CGraphic::DrawSubClipTrans(const int gx, const int gy, int w, int h, int x, int y, const unsigned char alpha) const
+void CGraphic::DrawSubClipTrans(const int gx, const int gy, int w, int h, int x, int y, const unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
+	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha, render_commands);
 }
 
 /**
@@ -272,7 +269,7 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 
 void CGraphic::DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_frame(nullptr, time_of_day, frame, QPoint(x, y), false, alpha, render_commands);
+	this->render_frame(nullptr, time_of_day, frame, QPoint(x, y), false, alpha, show_percent, render_commands);
 }
 
 void CGraphic::DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent)
@@ -1396,6 +1393,15 @@ void CGraphic::create_texture(const player_color *player_color, const CColor *co
 	}
 }
 
+void CGraphic::render(const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands)
+{
+	render_commands.push_back([this, pixel_pos](renderer *renderer) {
+		const QOpenGLTexture *texture = this->get_or_create_texture(nullptr, nullptr, false);
+
+		renderer->blit_texture(texture, pixel_pos, this->get_size(), false, 255);
+	});
+}
+
 void CGraphic::render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const CColor *color_modification = nullptr;
@@ -1410,12 +1416,12 @@ void CGraphic::render_frame(const player_color *player_color, const time_of_day 
 	});
 }
 
-void CGraphic::render_rect(const player_color *player_color, const QRect &rect, const QPoint &pixel_pos, const bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands)
+void CGraphic::render_rect(const player_color *player_color, const QRect &rect, const QPoint &pixel_pos, const bool grayscale, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	render_commands.push_back([this, player_color, rect, pixel_pos, grayscale](renderer *renderer) {
+	render_commands.push_back([this, player_color, rect, pixel_pos, grayscale, opacity](renderer *renderer) {
 		const QOpenGLTexture *texture = this->get_or_create_texture(player_color, nullptr, grayscale);
 
-		renderer->blit_texture_frame(texture, pixel_pos, rect.topLeft(), rect.size(), false, 255, 100);
+		renderer->blit_texture_frame(texture, pixel_pos, rect.topLeft(), rect.size(), false, opacity, 100);
 	});
 }
 

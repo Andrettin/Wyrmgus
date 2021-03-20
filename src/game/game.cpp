@@ -1558,10 +1558,12 @@ void CalculateItemsToLoad()
 
 void UpdateLoadingBackground()
 {
+	std::vector<std::function<void(renderer *)>> render_commands;
+
 	int y = Video.Height / 2;
 
 	if (loadingBackground != nullptr) {
-		loadingBackground->DrawClip(0, 0);
+		loadingBackground->DrawClip(0, 0, render_commands);
 	}
 
 	if (loadingFont == nullptr) {
@@ -1569,8 +1571,6 @@ void UpdateLoadingBackground()
 	}
 
 	if (loadingFont != nullptr) {
-		std::vector<std::function<void(renderer *)>> render_commands;
-
 		CLabel label(loadingFont);
 		for (size_t i = 0; i < loadingTip.size(); ++i) {
 			label.DrawCentered(Video.Width / 2, y + 10 + (defines::get()->get_game_font()->Height() * i), loadingTip[i], render_commands);

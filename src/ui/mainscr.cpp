@@ -186,7 +186,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 		unit.Type->Icon.Icon->G->Width + 8, hAll);
 	*/
 	if (defines::get()->get_bar_frame_graphics() != nullptr) {
-		defines::get()->get_bar_frame_graphics()->DrawClip(x + (-2 - 4) * scale_factor, y + (4 - 4) * scale_factor);
+		defines::get()->get_bar_frame_graphics()->DrawClip(x + (-2 - 4) * scale_factor, y + (4 - 4) * scale_factor, render_commands);
 		Video.FillRectangleClip(ColorBlack, x - 2 * scale_factor, y + 4 * scale_factor,
 			unit.Type->Icon.Icon->get_graphics()->Width + (6 - 2) * scale_factor, hBar, render_commands);
 	} else {
@@ -1956,7 +1956,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
 		&& (unit.Player->Type != PlayerNeutral || unit.Type->get_given_resource() != nullptr)
 	) {
-		wyrmgus::defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - 4 * wyrmgus::defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * wyrmgus::defines::get()->get_scale_factor());
+		defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - 4 * defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * defines::get()->get_scale_factor(), render_commands);
 	}
 	//Wyrmgus end	
 	DrawUnitInfo(unit, render_commands);

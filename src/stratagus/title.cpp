@@ -143,7 +143,7 @@ void TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &r
 	int timeout = this->Timeout ? this->Timeout * CYCLES_PER_SECOND : -1;
 
 	while (timeout-- && WaitNoEvent) {
-		g->DrawClip((Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
+		g->DrawClip((Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2, render_commands);
 		this->ShowLabels(render_commands);
 
 		RealizeVideoMemory();

@@ -1513,7 +1513,7 @@ void EditorUpdateDisplay()
 	//Wyrmgus start
 	// Fillers
 	for (size_t i = 0; i != UI.Fillers.size(); ++i) {
-		UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y);
+		UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y, render_commands);
 	}
 	//Wyrmgus end
 	
@@ -1537,11 +1537,11 @@ void EditorUpdateDisplay()
 	}
 	// Info panel
 	if (UI.InfoPanel.G) {
-		UI.InfoPanel.G->DrawClip(UI.InfoPanel.X, UI.InfoPanel.Y);
+		UI.InfoPanel.G->DrawClip(UI.InfoPanel.X, UI.InfoPanel.Y, render_commands);
 	}
 	// Button panel
 	if (UI.ButtonPanel.G) {
-		UI.ButtonPanel.G->DrawClip(UI.ButtonPanel.X, UI.ButtonPanel.Y);
+		UI.ButtonPanel.G->DrawClip(UI.ButtonPanel.X, UI.ButtonPanel.Y, render_commands);
 	}
 	DrawEditorPanel(render_commands);
 

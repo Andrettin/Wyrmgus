@@ -86,12 +86,7 @@ void font::drawString(gcn::Graphics *graphics, const std::string &txt, int x, in
 static void VideoDrawChar(CGraphic &g,
 						  int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	g.DrawSub(gx, gy, w, h, x, y);
-
-	const QPoint frame_pos(gx / g.get_frame_width(), gy * g.get_frame_height());
-	const int frame_index = point::to_index(frame_pos, g.get_frames_per_row());
-
-	g.render_rect(nullptr, QRect(gx, gy, w, h), QPoint(x, y), false, render_commands);
+	g.DrawSub(gx, gy, w, h, x, y, render_commands);
 }
 
 /**
