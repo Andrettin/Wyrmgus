@@ -81,13 +81,12 @@ void ShowLoadProgress(const char *fmt, ...)
 	static unsigned int lastProgressUpdate = SDL_GetTicks();
 	const uint32_t ticks = SDL_GetTicks();
 	if (ticks < lastProgressUpdate + 16) {
-		// Only show progress updates every c. 1/60th of a second, otherwise we're waiting for the screen too much
+		//only show progress updates every c. 1/60th of a second, otherwise we're waiting for the screen too much
 		return;
 	}
 	lastProgressUpdate = ticks;
 
 	CheckMusicFinished(); //update music
-	UpdateLoadProgress();
 	
 	va_list va;
 	char temp[4096];
@@ -97,44 +96,14 @@ void ShowLoadProgress(const char *fmt, ...)
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 
-	if (Video.Depth && defines::get()->get_game_font() != nullptr && defines::get()->get_game_font()->is_initialized()) {
-		// Remove non printable chars
-		for (unsigned char *s = (unsigned char *)temp; *s; ++s) {
-			if (*s < 32) {
-				*s = ' ';
-			}
+	//remove non printable chars
+	for (unsigned char *s = (unsigned char *) temp; *s; ++s) {
+		if (*s < 32) {
+			*s = ' ';
 		}
-		std::vector<std::function<void(renderer *)>> render_commands;
-
-		//Wyrmgus start
-//		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
-		if (loadingBackground == nullptr) {
-			Video.FillRectangle(ColorBlack, 0, Video.Height - 18 * defines::get()->get_scale_factor(), Video.Width, 18 * defines::get()->get_scale_factor(), render_commands);
-		}
-		//Wyrmgus end
-		CLabel(defines::get()->get_game_font()).DrawCentered(Video.Width / 2, Video.Height - 16 * defines::get()->get_scale_factor(), temp, render_commands);
-		//Wyrmgus end
-
-		engine_interface::get()->set_loading_message(temp);
-
-		//FIXME: do something with the render commands
-
-		RealizeVideoMemory();
-	} else {
-		DebugPrint("!!!!%s\n" _C_ temp);
 	}
 
-	PollEvents();
-}
-
-/**
-**	@brief	Update load progress.
-*/
-void UpdateLoadProgress()
-{
-	if (Video.Depth && wyrmgus::defines::get()->get_game_font() != nullptr && wyrmgus::defines::get()->get_game_font()->is_initialized()) {
-		UpdateLoadingBackground();
-	}
+	engine_interface::get()->set_loading_message(temp);
 
 	PollEvents();
 }

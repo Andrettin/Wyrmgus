@@ -194,6 +194,5 @@ extern std::string FullGameName;            /// Full Name of the game
 extern bool UseHPForXp;                     /// true if gain XP by dealing damage, false if by killing.
 
 //Wyrmgus start
-extern std::shared_ptr<CGraphic> loadingBackground;
 extern bool DefiningData;
 //Wyrmgus end

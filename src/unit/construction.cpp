@@ -95,7 +95,6 @@ void construction::process_sml_scope(const sml_data &scope)
 void construction::load()
 {
 	if (!this->image_file.empty()) {
-		UpdateLoadProgress();
 		this->graphics = CPlayerColorGraphic::New(this->image_file, this->get_frame_size(), nullptr);
 		this->graphics->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		IncItemsLoaded();

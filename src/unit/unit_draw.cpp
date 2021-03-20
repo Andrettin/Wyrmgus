@@ -403,7 +403,7 @@ void LoadDecorations()
 		if ((*i).Sprite) {
 			continue;
 		}
-		UpdateLoadProgress();
+
 		(*i).Sprite = CGraphic::New((*i).File, (*i).Width, (*i).Height);
 		(*i).Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}

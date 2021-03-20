@@ -53,7 +53,6 @@ bool MissileConfig::MapMissile()
 	bool res = MapMissileNoLog();
 	if (res == true) {
 		if (Name.empty() == false) {
-			UpdateLoadProgress();
 			IncItemsLoaded();
 		}
 	} else {
