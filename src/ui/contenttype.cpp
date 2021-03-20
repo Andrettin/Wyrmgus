@@ -437,16 +437,16 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 		Video.FillRectangleClip(color, x, y, f * w / 100, h, render_commands);
 		if (UI.CompletedBarShadow) {
 			// Shadow
-			Video.DrawVLine(ColorGray, x + f * w / 100, y, h);
-			Video.DrawHLine(ColorGray, x, y + h, f * w / 100);
+			Video.DrawVLine(ColorGray, x + f * w / 100, y, h, render_commands);
+			Video.DrawHLine(ColorGray, x, y + h, f * w / 100, render_commands);
 
 			// |~  Light
-			Video.DrawVLine(ColorWhite, x, y, h);
-			Video.DrawHLine(ColorWhite, x, y, f * w / 100);
+			Video.DrawVLine(ColorWhite, x, y, h, render_commands);
+			Video.DrawHLine(ColorWhite, x, y, f * w / 100, render_commands);
 		}
 	} else {
-		Video.DrawRectangleClip(ColorWhite, x, y, w + 4 * scale_factor, h);
-		Video.DrawRectangleClip(ColorBlack, x + 1 * scale_factor, y + 1 * scale_factor, w + 2 * scale_factor, h - 2 * scale_factor);
+		Video.DrawRectangleClip(ColorWhite, x, y, w + 4 * scale_factor, h, render_commands);
+		Video.DrawRectangleClip(ColorBlack, x + 1 * scale_factor, y + 1 * scale_factor, w + 2 * scale_factor, h - 2 * scale_factor, render_commands);
 		Video.FillRectangleClip(color, x + 2 * scale_factor, y + 2 * scale_factor, f * w / 100, h - 4 * scale_factor, render_commands);
 	}
 }

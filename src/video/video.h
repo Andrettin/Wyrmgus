@@ -547,15 +547,15 @@ public:
 	void DrawPixelClip(uint32_t color, int x, int y);
 	void DrawTransPixelClip(uint32_t color, int x, int y, unsigned char alpha);
 
-	void DrawVLine(uint32_t color, int x, int y, int height);
-	void DrawTransVLine(uint32_t color, int x, int y, int height, unsigned char alpha);
-	void DrawVLineClip(uint32_t color, int x, int y, int height);
-	void DrawTransVLineClip(uint32_t color, int x, int y, int height, unsigned char alpha);
+	void DrawVLine(uint32_t color, int x, int y, int height, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawTransVLine(uint32_t color, int x, int y, int height, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawVLineClip(uint32_t color, int x, int y, int height, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawTransVLineClip(uint32_t color, int x, int y, int height, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
-	void DrawHLine(uint32_t color, int x, int y, int width);
-	void DrawTransHLine(uint32_t color, int x, int y, int width, unsigned char alpha);
-	void DrawHLineClip(uint32_t color, int x, int y, int width);
-	void DrawTransHLineClip(uint32_t color, int x, int y, int width, unsigned char alpha);
+	void DrawHLine(uint32_t color, int x, int y, int width, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawTransHLine(uint32_t color, int x, int y, int width, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawHLineClip(uint32_t color, int x, int y, int width, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawTransHLineClip(uint32_t color, int x, int y, int width, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void DrawLine(uint32_t color, int sx, int sy, int dx, int dy);
 	void DrawTransLine(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha);
@@ -564,8 +564,8 @@ public:
 
 	void DrawRectangle(uint32_t color, int x, int y, int w, int h);
 	void DrawTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha);
-	void DrawRectangleClip(uint32_t color, int x, int y, int w, int h);
-	void DrawTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha);
+	void DrawRectangleClip(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void FillRectangle(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands);
 	void FillTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
@@ -577,10 +577,10 @@ public:
 	void DrawCircleClip(uint32_t color, int x, int y, int r);
 	void DrawTransCircleClip(uint32_t color, int x, int y, int r, unsigned char alpha);
 
-	void FillCircle(uint32_t color, int x, int y, int radius);
-	void FillTransCircle(uint32_t color, int x, int y, int radius, unsigned char alpha);
-	void FillCircleClip(uint32_t color, const PixelPos &screenPos, int radius);
-	void FillTransCircleClip(uint32_t color, int x, int y, int radius, unsigned char alpha);
+	void FillCircle(uint32_t color, int x, int y, int radius, std::vector<std::function<void(renderer *)>> &render_commands);
+	void FillTransCircle(uint32_t color, int x, int y, int radius, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
+	void FillCircleClip(uint32_t color, const PixelPos &screenPos, int radius, std::vector<std::function<void(renderer *)>> &render_commands);
+	void FillTransCircleClip(uint32_t color, int x, int y, int radius, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	static uint32_t MapRGB(const uint8_t r, const uint8_t g, const uint8_t b)
 	{
@@ -712,9 +712,6 @@ extern void ReloadOpenGL();
 
 /// Initializes video synchronization.
 extern void SetVideoSync();
-
-/// Init line draw
-extern void InitLineDraw();
 
 /// Set clipping for nearly all vector primitives. Functions which support
 /// clipping will be marked Clip. Set the system-wide clipping rectangle.

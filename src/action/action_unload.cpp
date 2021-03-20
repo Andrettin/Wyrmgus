@@ -32,6 +32,7 @@
 //Wyrmgus start
 #include "character.h"
 #include "commands.h"
+#include "database/defines.h"
 //Wyrmgus end
 #include "iolib.h"
 #include "map/landmass.h"
@@ -134,9 +135,9 @@ PixelPos COrder_Unload::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	const PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
 
 	if (Preference.ShowPathlines) {
-		Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
+		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
-		Video.FillCircleClip(ColorGreen, targetPos, 3);
+		Video.FillCircleClip(ColorGreen, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
 	}
 
 	return targetPos;

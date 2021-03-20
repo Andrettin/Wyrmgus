@@ -34,6 +34,7 @@
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
+#include "database/defines.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -148,9 +149,9 @@ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 
 	if (Preference.ShowPathlines) {
 		Video.DrawLineClip(ColorGreen, lastScreenPos, pos1);
-		Video.FillCircleClip(ColorBlue, pos1, 2);
+		Video.FillCircleClip(ColorBlue, pos1, 2 * defines::get()->get_scale_factor(), render_commands);
 		Video.DrawLineClip(ColorBlue, pos1, pos2);
-		Video.FillCircleClip(ColorBlue, pos2, 3);
+		Video.FillCircleClip(ColorBlue, pos2, 3 * defines::get()->get_scale_factor(), render_commands);
 	}
 
 	return pos2;

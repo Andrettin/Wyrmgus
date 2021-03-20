@@ -909,7 +909,7 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 //			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
 //									icon.G->Width - 2, icon.G->Height - 2);
 			Video.DrawRectangleClip(ColorGreen, x, y,
-									icon.get_graphics()->Width, icon.get_graphics()->Height);
+									icon.get_graphics()->Width, icon.get_graphics()->Height, render_commands);
 			//Wyrmgus end
 		}
 		if (i == Editor.CursorUnitIndex) {
@@ -971,21 +971,21 @@ static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsig
 	Video.DrawVLine(color, x + 3, y + 3, wyrmgus::defines::get()->get_scaled_tile_height() + 3);
 	Video.DrawVLine(color, x + 4, y + 3, wyrmgus::defines::get()->get_scaled_tile_height() + 3);
 	*/
-	Video.DrawVLine(ColorGray, x + wyrmgus::defines::get()->get_scaled_tile_width() + 4 - 1, y + 5 - 1, wyrmgus::defines::get()->get_scaled_tile_height() - 1 - 1); // _|
-	Video.DrawVLine(ColorGray, x + wyrmgus::defines::get()->get_scaled_tile_width() + 5 - 1, y + 5 - 1, wyrmgus::defines::get()->get_scaled_tile_height() - 1 - 1);
-	Video.DrawHLine(ColorGray, x + 5 - 1, y + wyrmgus::defines::get()->get_scaled_tile_height() + 4 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1);
-	Video.DrawHLine(ColorGray, x + 5 - 1, y + wyrmgus::defines::get()->get_scaled_tile_height() + 5 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1);
+	Video.DrawVLine(ColorGray, x + wyrmgus::defines::get()->get_scaled_tile_width() + 4 - 1, y + 5 - 1, wyrmgus::defines::get()->get_scaled_tile_height() - 1 - 1, render_commands); // _|
+	Video.DrawVLine(ColorGray, x + wyrmgus::defines::get()->get_scaled_tile_width() + 5 - 1, y + 5 - 1, wyrmgus::defines::get()->get_scaled_tile_height() - 1 - 1, render_commands);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + defines::get()->get_scaled_tile_height() + 4 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + wyrmgus::defines::get()->get_scaled_tile_height() + 5 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
 
 	uint32_t color = (flags & IconClicked) ? ColorGray : ColorWhite;
-	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1);
-	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1);
-	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_height() + 3 - 1);
-	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_height() + 3 - 1);
+	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
+	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
+	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_height() + 3 - 1, render_commands);
+	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_height() + 3 - 1, render_commands);
 	
 	color = (flags & IconActive) ? ColorGray : ColorBlack;
 
-	Video.DrawRectangleClip(color, x, y, wyrmgus::defines::get()->get_scaled_tile_width() + 7, wyrmgus::defines::get()->get_scaled_tile_height() + 7);
-	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, wyrmgus::defines::get()->get_scaled_tile_width() + 5, wyrmgus::defines::get()->get_scaled_tile_height() + 5);
+	Video.DrawRectangleClip(color, x, y, wyrmgus::defines::get()->get_scaled_tile_width() + 7, wyrmgus::defines::get()->get_scaled_tile_height() + 7, render_commands);
+	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, wyrmgus::defines::get()->get_scaled_tile_width() + 5, wyrmgus::defines::get()->get_scaled_tile_height() + 5, render_commands);
 	//Wyrmgus end
 
 	if (flags & IconClicked) {
@@ -1003,7 +1003,7 @@ static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsig
 	//Wyrmgus end
 
 	if (flags & IconSelected) {
-		Video.DrawRectangleClip(ColorGreen, x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height());
+		Video.DrawRectangleClip(ColorGreen, x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height(), render_commands);
 	}
 }
 
@@ -1117,15 +1117,15 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 				terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles()[0], x, y, render_commands);
 			}
 			//Wyrmgus end
-			Video.DrawRectangleClip(ColorGray, x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height());
+			Video.DrawRectangleClip(ColorGray, x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height(), render_commands);
 
 			if (i == Editor.SelectedTileIndex) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-					wyrmgus::defines::get()->get_scaled_tile_width() - 2, wyrmgus::defines::get()->get_scaled_tile_height() - 2);
+					wyrmgus::defines::get()->get_scaled_tile_width() - 2, wyrmgus::defines::get()->get_scaled_tile_height() - 2, render_commands);
 			}
 			if (i == Editor.CursorTileIndex) {
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-					wyrmgus::defines::get()->get_scaled_tile_width() + 2, wyrmgus::defines::get()->get_scaled_tile_height() + 2);
+					wyrmgus::defines::get()->get_scaled_tile_width() + 2, wyrmgus::defines::get()->get_scaled_tile_height() + 2, render_commands);
 				Editor.PopUpX = x;
 				Editor.PopUpY = y;
 			}
@@ -1226,7 +1226,7 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 		x += get_start_icon_x() + 1 * scale_factor;
 		y += get_start_icon_y() + 1 * scale_factor;
 		if (ButtonUnderCursor == StartButton) {
-			Video.DrawRectangleClip(ColorGray, x - 1 * scale_factor, y - 1 * scale_factor, IconHeight, IconHeight);
+			Video.DrawRectangleClip(ColorGray, x - 1 * scale_factor, y - 1 * scale_factor, IconHeight, IconHeight, render_commands);
 		}
 		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2 * scale_factor, IconHeight - 2 * scale_factor, render_commands);
 
@@ -1338,7 +1338,7 @@ static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_c
 					//Wyrmgus end
 				}
 			}
-			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, wyrmgus::defines::get()->get_scaled_tile_width() * TileCursorSize, wyrmgus::defines::get()->get_scaled_tile_height() * TileCursorSize);
+			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, wyrmgus::defines::get()->get_scaled_tile_width() * TileCursorSize, wyrmgus::defines::get()->get_scaled_tile_height() * TileCursorSize, render_commands);
 			PopClipping();
 		} else {
 			// If there is an unit under the cursor, it's selection thing
@@ -1346,7 +1346,7 @@ static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_c
 			if (UnitUnderCursor != nullptr) {
 				PushClipping();
 				UI.MouseViewport->SetClipping();
-				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height());
+				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height(), render_commands);
 				PopClipping();
 			}
 		}

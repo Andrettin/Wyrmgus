@@ -117,22 +117,14 @@ bool COrder_Still::IsValid() const
 
 PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	//Wyrmgus start
-	/*
-	if (this->Action == UnitAction::StandGround) {
-		Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
-	} else {
-		Video.FillCircleClip(ColorGray, lastScreenPos, 2);
-	}
-	*/
 	if (Preference.ShowPathlines) {
 		if (this->Action == UnitAction::StandGround) {
-			Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
+			Video.FillCircleClip(ColorBlack, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		} else {
-			Video.FillCircleClip(ColorGray, lastScreenPos, 2);
+			Video.FillCircleClip(ColorGray, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		}
 	}
-	//Wyrmgus end
+
 	return lastScreenPos;
 }
 

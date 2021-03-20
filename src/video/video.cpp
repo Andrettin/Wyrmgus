@@ -349,7 +349,6 @@ unsigned long GetTicks()
 void InitVideo()
 {
 	InitVideoSdl();
-	InitLineDraw();
 }
 
 void DeInitVideo()

@@ -189,16 +189,13 @@ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos, 
 	const int w = this->GetUnitType().get_box_width() * wyrmgus::defines::get()->get_scale_factor();
 	const int h = this->GetUnitType().get_box_height() * wyrmgus::defines::get()->get_scale_factor();
 	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2, render_commands);
-	//Wyrmgus start
-//	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
-//	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
-//	Video.FillCircleClip(ColorGreen, targetPos, 3);
+
 	if (Preference.ShowPathlines) {
-		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * wyrmgus::defines::get()->get_scale_factor());
+		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
-		Video.FillCircleClip(ColorGreen, targetPos, 3 * wyrmgus::defines::get()->get_scale_factor());
+		Video.FillCircleClip(ColorGreen, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
 	}
-	//Wyrmgus end
+
 	return targetPos;
 }
 

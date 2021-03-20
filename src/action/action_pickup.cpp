@@ -33,6 +33,7 @@
 #include "character.h"
 #include "commands.h"
 //Wyrmgus end
+#include "database/defines.h"
 #include "iolib.h"
 #include "item/persistent_item.h"
 #include "luacallback.h"
@@ -138,9 +139,9 @@ PixelPos COrder_PickUp::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	}
 
 	if (Preference.ShowPathlines) {
-		Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
+		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
-		Video.FillCircleClip(ColorGreen, targetPos, 3);
+		Video.FillCircleClip(ColorGreen, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
 	}
 
 	return targetPos;

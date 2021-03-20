@@ -173,9 +173,9 @@ PixelPos COrder_SpellCast::Show(const CViewport &vp, const PixelPos &lastScreenP
 	}
 
 	if (Preference.ShowPathlines) {
-		Video.FillCircleClip(ColorBlue, lastScreenPos, 2);
+		Video.FillCircleClip(ColorBlue, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		Video.DrawLineClip(ColorBlue, lastScreenPos, targetPos);
-		Video.FillCircleClip(ColorBlue, targetPos, 3);
+		Video.FillCircleClip(ColorBlue, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
 	}
 
 	return targetPos;

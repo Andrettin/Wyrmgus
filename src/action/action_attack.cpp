@@ -248,9 +248,9 @@ PixelPos COrder_Attack::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
 	if (Preference.ShowPathlines) {
-		Video.FillCircleClip(ColorRed, lastScreenPos, 2);
+		Video.FillCircleClip(ColorRed, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
-		Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
+		Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
 	}
 	return targetPos;
 }

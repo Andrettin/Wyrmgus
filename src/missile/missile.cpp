@@ -1004,7 +1004,7 @@ void Missile::DrawMissile(const CViewport &vp, std::vector<std::function<void(re
 	const PixelPos screenPixelPos = vp.map_to_screen_pixel_pos(this->position);
 
 	switch (this->Type->get_missile_class()) {
-		case wyrmgus::missile_class::hit:
+		case missile_class::hit:
 			CLabel(defines::get()->get_game_font()).DrawClip(screenPixelPos.x, screenPixelPos.y, this->Damage, render_commands);
 			break;
 		default:

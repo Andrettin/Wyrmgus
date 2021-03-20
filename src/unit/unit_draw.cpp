@@ -244,7 +244,7 @@ void DrawSelectionCircle(IntColor color, int x1, int y1, int x2, int y2, std::ve
 void DrawSelectionCircleWithTrans(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-							  std::min((x2 - x1) / 2, (y2 - y1) / 2), 95);
+							  std::min((x2 - x1) / 2, (y2 - y1) / 2), 95, render_commands);
 	//Wyrmgus start
 	/*
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
@@ -262,7 +262,7 @@ void DrawSelectionCircleWithTrans(IntColor color, int x1, int y1, int x2, int y2
 */
 void DrawSelectionRectangle(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
+	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1, render_commands);
 }
 
 /**
@@ -274,7 +274,7 @@ void DrawSelectionRectangle(IntColor color, int x1, int y1, int x2, int y2, std:
 */
 void DrawSelectionRectangleWithTrans(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
+	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1, render_commands);
 	Video.FillTransRectangleClip(color, x1 + 1, y1 + 1,
 								 x2 - x1 - 2, y2 - y1 - 2, 75, render_commands);
 }
@@ -290,17 +290,17 @@ void DrawSelectionCorners(IntColor color, int x1, int y1, int x2, int y2, std::v
 {
 	const int CORNER_PIXELS = 6;
 
-	Video.DrawVLineClip(color, x1, y1, CORNER_PIXELS);
-	Video.DrawHLineClip(color, x1 + 1, y1, CORNER_PIXELS - 1);
+	Video.DrawVLineClip(color, x1, y1, CORNER_PIXELS, render_commands);
+	Video.DrawHLineClip(color, x1 + 1, y1, CORNER_PIXELS - 1, render_commands);
 
-	Video.DrawVLineClip(color, x2, y1, CORNER_PIXELS);
-	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y1, CORNER_PIXELS - 1);
+	Video.DrawVLineClip(color, x2, y1, CORNER_PIXELS, render_commands);
+	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y1, CORNER_PIXELS - 1, render_commands);
 
-	Video.DrawVLineClip(color, x1, y2 - CORNER_PIXELS, CORNER_PIXELS);
-	Video.DrawHLineClip(color, x1, y2, CORNER_PIXELS - 1);
+	Video.DrawVLineClip(color, x1, y2 - CORNER_PIXELS, CORNER_PIXELS, render_commands);
+	Video.DrawHLineClip(color, x1, y2, CORNER_PIXELS - 1, render_commands);
 
-	Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS, CORNER_PIXELS);
-	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1);
+	Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS, CORNER_PIXELS, render_commands);
+	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1, render_commands);
 }
 
 
@@ -816,7 +816,7 @@ void ShowOrder(const CUnit &unit, std::vector<std::function<void(renderer *)>> &
 	//Wyrmgus start
 	//if unit has rally point, show it
 	if (unit.get_rally_point_pos().x() != -1 && unit.get_rally_point_pos().y() != -1 && unit.get_rally_point_map_layer() != nullptr && unit.get_rally_point_map_layer() == UI.CurrentMapLayer) {
-		Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(unit.get_rally_point_pos()), 3);
+		Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(unit.get_rally_point_pos()), 3 * defines::get()->get_scale_factor(), render_commands);
 	}
 	//Wyrmgus end
 }

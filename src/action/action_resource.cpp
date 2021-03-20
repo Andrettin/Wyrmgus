@@ -421,16 +421,13 @@ PixelPos COrder_Resource::Show(const CViewport &vp, const PixelPos &lastScreenPo
 		//Wyrmgus end
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
-	//Wyrmgus start
-//	Video.FillCircleClip(ColorYellow, lastScreenPos, 2);
-//	Video.DrawLineClip(ColorYellow, lastScreenPos, targetPos);
-//	Video.FillCircleClip(ColorYellow, targetPos, 3);
+
 	if (Preference.ShowPathlines) {
-		Video.FillCircleClip(ColorYellow, lastScreenPos, 2);
+		Video.FillCircleClip(ColorYellow, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		Video.DrawLineClip(ColorYellow, lastScreenPos, targetPos);
-		Video.FillCircleClip(ColorYellow, targetPos, 3);
+		Video.FillCircleClip(ColorYellow, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
 	}
-	//Wyrmgus end
+
 	return targetPos;
 }
 

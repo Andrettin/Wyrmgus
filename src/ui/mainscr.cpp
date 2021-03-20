@@ -1905,7 +1905,7 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 				label.SetNormalColor(wyrmgus::defines::get()->get_default_font_color());
 			}
 
-			Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor);
+			Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor, render_commands);
 			Video.FillRectangleClip(CVideo::MapRGB(player->get_minimap_color()), x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2, render_commands);
 
 			label.Draw(x + 15 * scale_factor, y, _(player->get_full_name().c_str()), render_commands);

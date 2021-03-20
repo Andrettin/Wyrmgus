@@ -157,7 +157,7 @@ int GetCursorsCount()
 **  @param corner1   Screen start position of rectangle
 **  @param corner2   Screen end position of rectangle
 */
-static void DrawVisibleRectangleCursor(PixelPos corner1, PixelPos corner2)
+static void DrawVisibleRectangleCursor(PixelPos corner1, PixelPos corner2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const CViewport &vp = *UI.SelectedViewport;
 
@@ -174,7 +174,7 @@ static void DrawVisibleRectangleCursor(PixelPos corner1, PixelPos corner2)
 	const int w = corner2.x - corner1.x + 1;
 	const int h = corner2.y - corner1.y + 1;
 
-	Video.DrawRectangleClip(ColorGreen, corner1.x, corner1.y, w, h);
+	Video.DrawRectangleClip(ColorGreen, corner1.x, corner1.y, w, h, render_commands);
 }
 
 /**
@@ -332,7 +332,7 @@ void DrawCursor(std::vector<std::function<void(renderer *)>> &render_commands)
 	if (CurrentCursorState == CursorState::Rectangle && CursorStartScreenPos != CursorScreenPos) {
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->scaled_map_to_screen_pixel_pos(CursorStartMapPos);
 
-		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos);
+		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos, render_commands);
 	}
 
 	//  Cursor may not exist if we are loading a game or something.
