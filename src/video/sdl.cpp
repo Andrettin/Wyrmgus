@@ -121,6 +121,10 @@ static PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
 #undef KeyPress
 #endif
 
+#ifdef KeyRelease
+#undef KeyRelease
+#endif
+
 /*----------------------------------------------------------------------------
 --  Sync
 ----------------------------------------------------------------------------*/
