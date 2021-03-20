@@ -68,6 +68,7 @@
 #include <QColor>
 #include <QDateTime>
 #include <QDebug>
+#include <QEvent>
 #include <QGeoCircle>
 #include <QGeoCoordinate>
 #include <QGeoPath>
