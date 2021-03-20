@@ -330,7 +330,7 @@ public:
 	/// load the graphics for a missile type
 	void LoadMissileSprite();
 	void Init();
-	void DrawMissileType(int frame, const PixelPos &pos) const;
+	void DrawMissileType(int frame, const PixelPos &pos, std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 	void Load(lua_State *l);
 

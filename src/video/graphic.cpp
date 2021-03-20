@@ -223,7 +223,6 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 					frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 0);
 }
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 void CGraphic::DoDrawFrameClip(const GLuint *textures,
 							   unsigned frame, int x, int y, int show_percent) const
 {
@@ -240,7 +239,6 @@ void CGraphic::DoDrawFrameClip(const GLuint *textures,
 				frame_map[frame].x + ox + (w),
 				frame_map[frame].y + oy + (h * show_percent / 100), x, y, 0);
 }
-#endif
 
 /**
 **  Draw graphic object clipped.
@@ -249,7 +247,7 @@ void CGraphic::DoDrawFrameClip(const GLuint *textures,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day, int show_percent)
+void CGraphic::DrawFrameClip(const unsigned frame, const int x, const int y, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		DoDrawFrameClip(this->textures.get(), frame, x, y, show_percent);
@@ -259,6 +257,8 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const wyrmgus::time_o
 		}
 		DoDrawFrameClip(this->get_textures(time_of_day->ColorModification), frame, x, y, show_percent);
 	}
+
+	this->render_frame(nullptr, time_of_day, frame, QPoint(x, y), render_commands);
 }
 
 void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
@@ -269,12 +269,9 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
-void CGraphic::DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const wyrmgus::time_of_day *time_of_day, const int show_percent)
+void CGraphic::DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glColor4ub(255, 255, 255, alpha);
-	DrawFrameClip(frame, x, y, time_of_day, show_percent);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	this->render_frame(nullptr, time_of_day, frame, QPoint(x, y), false, alpha, render_commands);
 }
 
 void CGraphic::DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent)
@@ -394,7 +391,7 @@ void CGraphic::DoDrawFrameClipX(const GLuint *textures, unsigned frame,
 */
 //Wyrmgus start
 //void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
-void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day)
+void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const time_of_day *time_of_day)
 //Wyrmgus end
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {

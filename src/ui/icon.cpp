@@ -113,7 +113,7 @@ void icon::DrawIcon(const PixelPos &pos, const player_color *player_color, std::
 	if (player_color != nullptr) {
 		this->get_graphics()->DrawPlayerColorFrameClip(player_color, this->get_frame(), pos.x, pos.y, nullptr, render_commands);
 	} else {
-		this->get_graphics()->DrawFrameClip(this->get_frame(), pos.x, pos.y);
+		this->get_graphics()->DrawFrameClip(this->get_frame(), pos.x, pos.y, render_commands);
 	}
 }
 

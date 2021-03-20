@@ -55,10 +55,10 @@ bool StaticParticle::isVisible(const CViewport &vp) const
 	//Wyrmgus end
 }
 
-void StaticParticle::draw() const
+void StaticParticle::draw(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
-	animation->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
+	animation->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y), render_commands);
 }
 
 void StaticParticle::update(int ticks)

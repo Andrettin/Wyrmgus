@@ -951,7 +951,7 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 **  @param y        Y display position
 **  @param flags    State of the icon (::IconActive,::IconClicked,...)
 */
-static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsigned y, unsigned flags)
+static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsigned y, unsigned flags, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	//Wyrmgus start
 	/*
@@ -999,7 +999,7 @@ static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsig
 	x -= 1;
 	y -= 1;
 //	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
-	terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles().front(), x, y);
+	terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles().front(), x, y, render_commands);
 	//Wyrmgus end
 
 	if (flags & IconSelected) {
@@ -1114,7 +1114,7 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 			const wyrmgus::terrain_type *terrain = Editor.ShownTileTypes[i];
 
 			if (terrain->get_graphics() && terrain->get_solid_tiles().size() > 0) {
-				terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles()[0], x, y);
+				terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles()[0], x, y, render_commands);
 			}
 			//Wyrmgus end
 			Video.DrawRectangleClip(ColorGray, x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height());
@@ -1258,7 +1258,7 @@ static void DrawEditorPanel(std::vector<std::function<void(renderer *)>> &render
 
 		DrawTileIcon(Editor.ShownTileTypes[0], x, y,
 					 (ButtonUnderCursor == TileButton ? IconActive : 0) |
-					 (Editor.State == EditorEditTile ? IconSelected : 0));
+					 (Editor.State == EditorEditTile ? IconSelected : 0), render_commands);
 	}
 	DrawEditorPanel_StartIcon(render_commands);
 
@@ -1283,7 +1283,7 @@ static void DrawEditorPanel(std::vector<std::function<void(renderer *)>> &render
 **
 **  @todo support for bigger cursors (2x2, 3x3 ...)
 */
-static void DrawMapCursor()
+static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	//  Affect CursorBuilding if necessary.
 	//  (Menu reset CursorBuilding)
@@ -1333,7 +1333,7 @@ static void DrawMapCursor()
 //					Map.TileGraphic->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
 
 					if (terrain->get_graphics() && terrain->get_solid_tiles().size() > 0) {
-						terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles()[0], screenPosIt.x, screenPosIt.y);
+						terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles()[0], screenPosIt.x, screenPosIt.y, render_commands);
 					}
 					//Wyrmgus end
 				}
@@ -1501,7 +1501,7 @@ void EditorUpdateDisplay()
 	//Wyrmgus end
 
 	if (CursorOn == cursor_on::map && Gui->getTop() == editorContainer.get() && !GamePaused) {
-		DrawMapCursor(); // cursor on map
+		DrawMapCursor(render_commands); // cursor on map
 	}
 
 	//Wyrmgus start
@@ -1556,7 +1556,7 @@ void EditorUpdateDisplay()
 
 	// DrawPopup();
 
-	DrawCursor();
+	DrawCursor(render_commands);
 
 	render_context::get()->set_commands(std::move(render_commands));
 

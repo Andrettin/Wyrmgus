@@ -437,7 +437,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 			if (icon != nullptr) {
 				int x_offset = UI.Resources[i].IconWidth;
 				const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
-				icon_graphics->DrawFrameClip(icon->get_frame(),	x , y);
+				icon_graphics->DrawFrameClip(icon->get_frame(),	x , y, render_commands);
 				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + 5 * scale_factor);
 				y_offset = icon_graphics->Height;
 				y_offset -= label.Height();
@@ -457,7 +457,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 				int x_offset =  UI.Resources[ManaResCost].IconWidth;
 				x += 5 * scale_factor;
 				const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
-				icon_graphics->DrawFrameClip(icon->get_frame(), x, y);
+				icon_graphics->DrawFrameClip(icon->get_frame(), x, y, render_commands);
 				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + 5 * scale_factor);
 				y_offset = icon_graphics->Height;
 				y_offset -= font->Height();

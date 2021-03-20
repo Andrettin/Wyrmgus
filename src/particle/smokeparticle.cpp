@@ -61,10 +61,10 @@ bool CSmokeParticle::isVisible(const CViewport &vp) const
 	//Wyrmgus end
 }
 
-void CSmokeParticle::draw() const
+void CSmokeParticle::draw(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
-	puff->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
+	puff->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y), render_commands);
 }
 
 void CSmokeParticle::update(int ticks)

@@ -93,9 +93,33 @@ public:
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
 	void DoDrawFrameClip(const GLuint *textures, unsigned frame, int x, int y, int show_percent = 100) const;
-	void DrawFrameClip(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
+
+	void DrawFrameClip(const unsigned frame, const int x, const int y, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void DrawFrameClip(const unsigned frame, const int x, const int y, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->DrawFrameClip(frame, x, y, time_of_day, 100, render_commands);
+	}
+
+	void DrawFrameClip(const unsigned frame, const int x, const int y, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->DrawFrameClip(frame, x, y, nullptr, render_commands);
+	}
+
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
+
+	void DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->DrawFrameClipTrans(frame, x, y, alpha, time_of_day, 100, render_commands);
+	}
+
+	void DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->DrawFrameClipTrans(frame, x, y, alpha, nullptr, render_commands);
+	}
+
 	void DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent = 100);
 
 	// Draw frame flipped horizontally
@@ -387,6 +411,11 @@ public:
 	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands)
 	{
 		this->render_frame(player_color, time_of_day, frame_index, pixel_pos, flip, 255, render_commands);
+	}
+
+	void render_frame(const player_color *player_color, const time_of_day *time_of_day, const int frame_index, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->render_frame(player_color, time_of_day, frame_index, pixel_pos, false, render_commands);
 	}
 
 	void render_rect(const QRect &rect, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands);

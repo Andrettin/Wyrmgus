@@ -327,8 +327,7 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 				const std::shared_ptr<CPlayerColorGraphic> &terrain_graphics = terrain->get_graphics(season);
 				if (terrain_graphics != nullptr) {
 					const int frame_index = solid_tile + (terrain == mf.get_terrain() ? mf.AnimationFrame : 0);
-					terrain_graphics->DrawFrameClip(frame_index, dx, dy, time_of_day);
-					terrain_graphics->render_frame(player_color, time_of_day, frame_index, QPoint(dx, dy), false, render_commands);
+					terrain_graphics->DrawFrameClip(frame_index, dx, dy, time_of_day, render_commands);
 				}
 			}
 
@@ -350,8 +349,7 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 						}
 					}
 
-					transition_terrain_graphics->DrawFrameClip(transition_tiles[i].tile_frame, dx, dy, transition_time_of_day);
-					transition_terrain_graphics->render_frame(player_color, transition_time_of_day, transition_tiles[i].tile_frame, QPoint(dx, dy), false, render_commands);
+					transition_terrain_graphics->DrawFrameClip(transition_tiles[i].tile_frame, dx, dy, transition_time_of_day, render_commands);
 				}
 			}
 
@@ -397,8 +395,7 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
 				const terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
 				if (overlay_transition_terrain->get_elevation_graphics()) {
-					overlay_transition_terrain->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].tile_frame, dx, dy, time_of_day);
-					overlay_transition_terrain->get_elevation_graphics()->render_frame(player_color, time_of_day, overlay_transition_tiles[i].tile_frame, QPoint(dx, dy), false, render_commands);
+					overlay_transition_terrain->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].tile_frame, dx, dy, time_of_day, render_commands);
 				}
 			}
 
@@ -447,7 +444,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 					missiletable[j]->DrawMissile(*this, render_commands);
 					++j;
 				} else {
-					particletable[k]->draw();
+					particletable[k]->draw(render_commands);
 					++k;
 				}
 			} else if (j == nmissiles) {
@@ -455,7 +452,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 					unittable[i]->Draw(*this, render_commands);
 					++i;
 				} else {
-					particletable[k]->draw();
+					particletable[k]->draw(render_commands);
 					++k;
 				}
 			} else if (k == nparticles) {
@@ -472,7 +469,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 						unittable[i]->Draw(*this, render_commands);
 						++i;
 					} else {
-						particletable[k]->draw();
+						particletable[k]->draw(render_commands);
 						++k;
 					}
 				} else {
@@ -480,7 +477,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 						missiletable[j]->DrawMissile(*this, render_commands);
 						++j;
 					} else {
-						particletable[k]->draw();
+						particletable[k]->draw(render_commands);
 						++k;
 					}
 				}
@@ -493,7 +490,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 			missiletable[j]->DrawMissile(*this, render_commands);
 		}
 		for (; k < nparticles; ++k) {
-			particletable[k]->draw();
+			particletable[k]->draw(render_commands);
 		}
 		ParticleManager.endDraw();
 

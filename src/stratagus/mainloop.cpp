@@ -207,7 +207,7 @@ void UpdateDisplay()
 		DrawMessages(render_commands);
 
 		if (CurrentCursorState == CursorState::Rectangle) {
-			DrawCursor();
+			DrawCursor(render_commands);
 		}
 
 		//Wyrmgus start
@@ -277,7 +277,7 @@ void UpdateDisplay()
 	DrawGuichanWidgets(render_commands);
 	
 	if (CurrentCursorState != CursorState::Rectangle) {
-		DrawCursor();
+		DrawCursor(render_commands);
 	}
 
 	render_context::get()->set_commands(std::move(render_commands));

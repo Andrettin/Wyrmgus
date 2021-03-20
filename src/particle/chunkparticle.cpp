@@ -90,11 +90,11 @@ bool CChunkParticle::isVisible(const CViewport &vp) const
 	//Wyrmgus end
 }
 
-void CChunkParticle::draw() const
+void CChunkParticle::draw(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	screenPos.y = calculateScreenPos(screenPos.y, height);
-	debrisAnimation->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
+	debrisAnimation->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y), render_commands);
 }
 
 static float getHorizontalPosition(int initialVelocity, float trajectoryAngle, float time)

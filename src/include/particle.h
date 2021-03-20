@@ -31,6 +31,9 @@
 class CGraphic;
 class CViewport;
 
+namespace wyrmgus {
+	class renderer;
+}
 
 struct CPosition {
 	CPosition(float x, float y) : x(x), y(y) {}
@@ -53,7 +56,7 @@ public:
 	**  @param x x screen coordinate where to draw the animation.
 	**  @param y y screen coordinate where to draw the animation.
 	*/
-	void draw(int x, int y) const;
+	void draw(int x, int y, std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 	/**
 	**  Update the animation.
@@ -85,7 +88,7 @@ public:
 	virtual ~CParticle() {}
 
 	virtual bool isVisible(const CViewport &vp) const = 0;
-	virtual void draw() const = 0;
+	virtual void draw(std::vector<std::function<void(renderer *)>> &render_commands) const = 0;
 	virtual void update(int) = 0;
 
 	void destroy() { destroyed = true; }
@@ -115,7 +118,7 @@ public:
 	virtual ~StaticParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw() const;
+	virtual void draw(std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void update(int ticks);
 	virtual std::unique_ptr<CParticle> clone() const;
 
@@ -137,7 +140,7 @@ public:
 	virtual ~CChunkParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw() const;
+	virtual void draw(std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void update(int ticks);
 	virtual std::unique_ptr<CParticle> clone() const;
 	int getSmokeDrawLevel() const { return smokeDrawLevel; }
@@ -180,7 +183,7 @@ public:
 	virtual ~CSmokeParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw() const;
+	virtual void draw(std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void update(int ticks);
 	virtual std::unique_ptr<CParticle> clone() const;
 
@@ -202,7 +205,7 @@ public:
 	virtual ~CRadialParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw() const;
+	virtual void draw(std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void update(int ticks);
 	virtual std::unique_ptr<CParticle> clone() const;
 

@@ -84,7 +84,7 @@ void CGrandStrategyGame::DrawInterface(std::vector<std::function<void(renderer *
 			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[stored_resources[i]];
 			const wyrmgus::resource_icon *icon = resource->get_icon();
 			const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
-			icon_graphics->DrawFrameClip(icon->get_frame(), x, y, nullptr);
+			icon_graphics->DrawFrameClip(icon->get_frame(), x, y, nullptr, render_commands);
 			
 			int quantity_stored = this->PlayerFaction->Resources[stored_resources[i]];
 			int income = 0;

@@ -3122,7 +3122,7 @@ void DrawPieMenu(std::vector<std::function<void(renderer *)>> &render_commands)
 	if (UI.PieMenu.G) {
 		UI.PieMenu.G->DrawFrameClip(0,
 									CursorStartScreenPos.x - UI.PieMenu.G->Width / 2,
-									CursorStartScreenPos.y - UI.PieMenu.G->Height / 2);
+									CursorStartScreenPos.y - UI.PieMenu.G->Height / 2, render_commands);
 	}
 	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 9; ++i) {
 		if (buttons[i]->get_pos() != -1) {

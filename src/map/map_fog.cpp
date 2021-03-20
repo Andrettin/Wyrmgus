@@ -886,15 +886,13 @@ static void DrawFogOfWarTile(const int sx, const int sy, const int dx, const int
 	if ((IsMapFieldVisibleTable(sx, UI.CurrentMapLayer->ID) && blackFogTile != 16 && fogTile != 16) || ReplayRevealMap) {
 	//Wyrmgus end
 		if (fogTile && fogTile != blackFogTile) {
-			fog_graphic->DrawFrameClipTrans(fogTile, dx, dy, FogOfWarOpacity);
-			fog_graphic->render_frame(nullptr, nullptr, fogTile, QPoint(dx, dy), false, FogOfWarOpacity, render_commands);
+			fog_graphic->DrawFrameClipTrans(fogTile, dx, dy, FogOfWarOpacity, render_commands);
 		}
 	} else {
 		VideoDrawOnlyFog(dx, dy, render_commands);
 	}
 	if (blackFogTile) {
-		fog_graphic->DrawFrameClip(blackFogTile, dx, dy);
-		fog_graphic->render_frame(nullptr, nullptr, blackFogTile, QPoint(dx, dy), false, render_commands);
+		fog_graphic->DrawFrameClip(blackFogTile, dx, dy, render_commands);
 	}
 
 #undef IsMapFieldExploredTable

@@ -946,7 +946,7 @@ namespace wyrmgus {
 **  @param frame  Animation frame
 **  @param pos    Screen pixel position
 */
-void missile_type::DrawMissileType(int frame, const PixelPos &pos) const
+void missile_type::DrawMissileType(int frame, const PixelPos &pos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 #ifdef DYNAMIC_LOAD
 	if (!this->G->IsLoaded()) {
@@ -963,9 +963,9 @@ void missile_type::DrawMissileType(int frame, const PixelPos &pos) const
 			}
 		} else {
 			if (this->Transparency > 0) {
-				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
+				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency), render_commands);
 			} else {
-				this->G->DrawFrameClip(frame, pos.x, pos.y);
+				this->G->DrawFrameClip(frame, pos.x, pos.y, render_commands);
 			}
 		}
 	} else {
@@ -977,9 +977,9 @@ void missile_type::DrawMissileType(int frame, const PixelPos &pos) const
 			frame = (frame / row) * this->get_num_directions() + frame % row;
 		}
 		if (this->Transparency > 0) {
-			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
+			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency), render_commands);
 		} else {
-			this->G->DrawFrameClip(frame, pos.x, pos.y);
+			this->G->DrawFrameClip(frame, pos.x, pos.y, render_commands);
 		}
 	}
 }
@@ -1009,7 +1009,7 @@ void Missile::DrawMissile(const CViewport &vp, std::vector<std::function<void(re
 			break;
 		default:
 			if (Type->G) {
-				this->Type->DrawMissileType(this->SpriteFrame, screenPixelPos);
+				this->Type->DrawMissileType(this->SpriteFrame, screenPixelPos, render_commands);
 			}
 			break;
 	}

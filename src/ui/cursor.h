@@ -191,7 +191,7 @@ extern PixelPos CursorStartMapPos; /// the same in screen map coordinate system
 extern int GetCursorsCount();
 
 /// Draw any cursor
-extern void DrawCursor();
+extern void DrawCursor(std::vector<std::function<void(renderer *)>> &render_commands);
 //Wyrmgus start
 /// Draw building cursor
 extern void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_commands);

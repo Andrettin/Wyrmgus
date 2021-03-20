@@ -97,7 +97,7 @@ void CStatusLine::DrawCosts(std::vector<std::function<void(renderer *)>> &render
 	CLabel label(wyrmgus::defines::get()->get_game_font());
 	if (this->Costs[ManaResCost]) {
 		const wyrmgus::resource_icon *mana_icon = wyrmgus::defines::get()->get_mana_icon();
-		mana_icon->get_graphics()->DrawFrameClip(mana_icon->get_frame(), x, UI.StatusLine.TextY);
+		mana_icon->get_graphics()->DrawFrameClip(mana_icon->get_frame(), x, UI.StatusLine.TextY, render_commands);
 
 		x += 20;
 		x += label.Draw(x, UI.StatusLine.TextY, this->Costs[ManaResCost], render_commands);
@@ -122,7 +122,7 @@ void CStatusLine::DrawCosts(std::vector<std::function<void(renderer *)>> &render
 
 			if (icon != nullptr) {
 				const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
-				icon_graphics->DrawFrameClip(icon->get_frame(), x, UI.StatusLine.TextY);
+				icon_graphics->DrawFrameClip(icon->get_frame(), x, UI.StatusLine.TextY, render_commands);
 				x += 20;
 			}
 			x += label.Draw(x, UI.StatusLine.TextY, this->Costs[i], render_commands);

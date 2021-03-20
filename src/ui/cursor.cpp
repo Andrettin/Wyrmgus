@@ -326,7 +326,7 @@ void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_com
 /**
 **  Draw the cursor.
 */
-void DrawCursor()
+void DrawCursor(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	// Selecting rectangle
 	if (CurrentCursorState == CursorState::Rectangle && CursorStartScreenPos != CursorScreenPos) {
@@ -344,7 +344,7 @@ void DrawCursor()
 	const PixelPos pos = CursorScreenPos - cursor::get_current_cursor()->get_hot_pos() * defines::get()->get_scale_factor();
 
 	//  Last, Normal cursor.
-	cursor::get_current_cursor()->get_graphics()->DrawFrameClip(cursor::get_current_cursor()->get_current_frame(), pos.x, pos.y);
+	cursor::get_current_cursor()->get_graphics()->DrawFrameClip(cursor::get_current_cursor()->get_current_frame(), pos.x, pos.y, render_commands);
 }
 
 /**

@@ -45,10 +45,10 @@ GraphicAnimation::GraphicAnimation(CGraphic *g, int ticksPerFrame) :
 }
 
 
-void GraphicAnimation::draw(int x, int y) const
+void GraphicAnimation::draw(int x, int y, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	if (!isFinished()) {
-		g->DrawFrameClip(currentFrame, x - g->Width / 2, y - g->Height / 2);
+		g->DrawFrameClip(currentFrame, x - g->Width / 2, y - g->Height / 2, render_commands);
 	}
 }
 
