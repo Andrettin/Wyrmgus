@@ -53,10 +53,15 @@ public:
 		return this->get_target_sizef().toSize();
 	}
 
-	QPoint get_mirrored_pos(const QPoint &pos, const QSize &element_size) const
+	QPoint get_mirrored_pos(const QPoint &pos, const int element_height) const
 	{
 		const QSize target_size = this->get_target_size();
-		return QPoint(pos.x(), target_size.height() - element_size.height() - pos.y());
+		return QPoint(pos.x(), target_size.height() - element_height - pos.y());
+	}
+
+	QPoint get_mirrored_pos(const QPoint &pos, const QSize &element_size) const
+	{
+		return this->get_mirrored_pos(pos, element_size.height());
 	}
 
 	void init_opengl()
@@ -162,6 +167,36 @@ public:
 	void fill_rect(const QPoint &pixel_pos, const QSize &size, const QColor &color)
 	{
 		this->fill_rect(QRect(pixel_pos, size), color);
+	}
+
+	void draw_horizontal_line(const QPoint &pos, const int width, const QColor &color)
+	{
+		glDisable(GL_TEXTURE_2D);
+		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
+
+		const QPoint mirrored_pos = this->get_mirrored_pos(pos, 1);
+
+		glBegin(GL_LINES);
+		glVertex2i(mirrored_pos.x(), mirrored_pos.y());
+		glVertex2i(mirrored_pos.x() + width, mirrored_pos.y());
+		glEnd();
+
+		glEnable(GL_TEXTURE_2D);
+	}
+
+	void draw_vertical_line(const QPoint &pos, const int height, const QColor &color)
+	{
+		glDisable(GL_TEXTURE_2D);
+		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
+
+		const QPoint mirrored_pos = this->get_mirrored_pos(pos, height);
+
+		glBegin(GL_LINES);
+		glVertex2i(mirrored_pos.x(), mirrored_pos.y());
+		glVertex2i(mirrored_pos.x(), mirrored_pos.y() + height);
+		glEnd();
+
+		glEnable(GL_TEXTURE_2D);
 	}
 
 private:
