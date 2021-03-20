@@ -334,17 +334,6 @@ void DrawCursor(std::vector<std::function<void(renderer *)>> &render_commands)
 
 		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos, render_commands);
 	}
-
-	//  Cursor may not exist if we are loading a game or something.
-	//  Only draw it if it exists
-	if (cursor::get_current_cursor() == nullptr) {
-		return;
-	}
-
-	const PixelPos pos = CursorScreenPos - cursor::get_current_cursor()->get_hot_pos() * defines::get()->get_scale_factor();
-
-	//  Last, Normal cursor.
-	cursor::get_current_cursor()->get_graphics()->DrawFrameClip(cursor::get_current_cursor()->get_current_frame(), pos.x, pos.y, render_commands);
 }
 
 /**
