@@ -49,7 +49,6 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(wyrmgus::preferences* preferences READ get_preferences CONSTANT)
 	Q_PROPERTY(wyrmgus::game* game READ get_game CONSTANT)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
-	Q_PROPERTY(bool qml_window_active READ is_qml_window_active WRITE set_qml_window_active)
 
 public:
 	engine_interface();
@@ -110,16 +109,6 @@ public:
 
 	Q_INVOKABLE void exit();
 
-	bool is_qml_window_active() const
-	{
-		return this->qml_window_active;
-	}
-
-	void set_qml_window_active(const bool active)
-	{
-		this->qml_window_active = active;
-	}
-
 	std::future<void> get_map_view_created_future()
 	{
 		return this->map_view_created_promise.get_future();
@@ -171,7 +160,6 @@ private:
 	std::queue<std::function<void()>> posted_commands;
 	std::mutex command_mutex;
 	bool running = false;
-	bool qml_window_active = false;
 	std::promise<void> map_view_created_promise;
 	std::atomic<bool> waiting_for_interface = false;
 	std::queue<std::unique_ptr<QInputEvent>> stored_input_events;
