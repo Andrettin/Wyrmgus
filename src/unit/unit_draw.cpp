@@ -103,7 +103,7 @@ unsigned long ShowNameTime;                  /// Show unit's name for some time
 **  @param x1,y1    Coordinates of the top left corner.
 **  @param x2,y2    Coordinates of the bottom right corner.
 */
-void (*DrawSelection)(IntColor color, int x1, int y1, int x2, int y2) = DrawSelectionNone;
+void (*DrawSelection)(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands) = DrawSelectionNone;
 
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
@@ -117,7 +117,7 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 **
 **  @param unit  Pointer to unit.
 */
-void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
+void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	IntColor color;
 
@@ -141,7 +141,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	
 	// show player color circle below unit if that is activated
 	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
-		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor - 1);
+		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor - 1, render_commands);
 //		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
 	//Wyrmgus end
@@ -205,7 +205,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	y = screenPos.y - box_height / 2 - (frame_height - sprite_height) / 2;
 	
 //	DrawSelection(color, x + type.BoxOffsetX * scale_factor, y + type.BoxOffsetY * scale_factor, x + type.BoxWidth * scale_factor + type.BoxOffsetX * scale_factor, y + type.BoxHeight * scale_factor + type.BoxOffsetY * scale_factor);
-	DrawSelection(color, x + type.BoxOffsetX * scale_factor, y + type.BoxOffsetY * scale_factor, x + box_width + type.BoxOffsetX * scale_factor, y + box_height + type.BoxOffsetY * scale_factor);
+	DrawSelection(color, x + type.BoxOffsetX * scale_factor, y + type.BoxOffsetY * scale_factor, x + box_width + type.BoxOffsetX * scale_factor, y + box_height + type.BoxOffsetY * scale_factor, render_commands);
 	//Wyrmgus end
 }
 
@@ -216,8 +216,9 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionNone(IntColor, int, int, int, int)
+void DrawSelectionNone(IntColor, int, int, int, int, std::vector<std::function<void(renderer *)>> &render_commands)
 {
+	Q_UNUSED(render_commands)
 }
 
 /**
@@ -227,7 +228,7 @@ void DrawSelectionNone(IntColor, int, int, int, int)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCircle(IntColor color, int x1, int y1, int x2, int y2)
+void DrawSelectionCircle(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 						 std::min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
@@ -240,7 +241,7 @@ void DrawSelectionCircle(IntColor color, int x1, int y1, int x2, int y2)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCircleWithTrans(IntColor color, int x1, int y1, int x2, int y2)
+void DrawSelectionCircleWithTrans(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 							  std::min((x2 - x1) / 2, (y2 - y1) / 2), 95);
@@ -259,7 +260,7 @@ void DrawSelectionCircleWithTrans(IntColor color, int x1, int y1, int x2, int y2
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionRectangle(IntColor color, int x1, int y1, int x2, int y2)
+void DrawSelectionRectangle(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
 }
@@ -271,11 +272,11 @@ void DrawSelectionRectangle(IntColor color, int x1, int y1, int x2, int y2)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionRectangleWithTrans(IntColor color, int x1, int y1, int x2, int y2)
+void DrawSelectionRectangleWithTrans(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
 	Video.FillTransRectangleClip(color, x1 + 1, y1 + 1,
-								 x2 - x1 - 2, y2 - y1 - 2, 75);
+								 x2 - x1 - 2, y2 - y1 - 2, 75, render_commands);
 }
 
 /**
@@ -285,7 +286,7 @@ void DrawSelectionRectangleWithTrans(IntColor color, int x1, int y1, int x2, int
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCorners(IntColor color, int x1, int y1, int x2, int y2)
+void DrawSelectionCorners(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const int CORNER_PIXELS = 6;
 
@@ -458,20 +459,20 @@ void CDecoVarBar::Draw(int x, int y, const unit_type &type, const unit_variable 
 	// Deco->Data.Bar.Color
 	if (b) {
 		if (this->ShowFullBackground) {
-			Video.FillRectangleClip(bcolor, x - b, y - b, 2 * b + width, 2 * b + height);
+			Video.FillRectangleClip(bcolor, x - b, y - b, 2 * b + width, 2 * b + height, render_commands);
 		} else {
 			if (this->SEToNW) {
 				Video.FillRectangleClip(bcolor, x - b - w + width, y - b - h + height,
-										2 * b + w, 2 * b + h);
+										2 * b + w, 2 * b + h, render_commands);
 			} else {
-				Video.FillRectangleClip(bcolor, x - b, y - b, 2 * b + w, 2 * b + h);
+				Video.FillRectangleClip(bcolor, x - b, y - b, 2 * b + w, 2 * b + h, render_commands);
 			}
 		}
 	}
 	if (this->SEToNW) {
-		Video.FillRectangleClip(color, x - w + width, y - h + height, w, h);
+		Video.FillRectangleClip(color, x - w + width, y - h + height, w, h, render_commands);
 	} else {
-		Video.FillRectangleClip(color, x, y, w, h);
+		Video.FillRectangleClip(color, x, y, w, h, render_commands);
 	}
 }
 
@@ -786,7 +787,7 @@ void DrawOverlay(const unit_type &type, const std::shared_ptr<CGraphic> &sprite,
 **
 **  @param unit  Pointer to the unit.
 */
-void ShowOrder(const CUnit &unit)
+void ShowOrder(const CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (unit.Destroyed || unit.Removed) {
 		return;
@@ -808,15 +809,15 @@ void ShowOrder(const CUnit &unit)
 	} else {
 		order = unit.Orders[0].get();
 	}
-	PixelPos screenPos = order->Show(*CurrentViewport, screenStartPos);
+	PixelPos screenPos = order->Show(*CurrentViewport, screenStartPos, render_commands);
 	// Show the rest of the orders
 	for (size_t i = 1 + (flushed ? 1 : 0); i < unit.Orders.size(); ++i) {
-		screenPos = unit.Orders[i]->Show(*CurrentViewport, screenPos);
+		screenPos = unit.Orders[i]->Show(*CurrentViewport, screenPos, render_commands);
 	}
 
 	// Show order for new trained units
 	if (unit.NewOrder) {
-		unit.NewOrder->Show(*CurrentViewport, screenStartPos);
+		unit.NewOrder->Show(*CurrentViewport, screenStartPos, render_commands);
 	}
 	
 	//Wyrmgus start
@@ -1088,7 +1089,7 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 	// Show that the unit is selected
 	//
 	// draw it under everything else
-	DrawUnitSelection(vp, *this);
+	DrawUnitSelection(vp, *this, render_commands);
 	//Wyrmgus end
 
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();

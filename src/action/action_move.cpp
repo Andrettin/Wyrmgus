@@ -113,12 +113,12 @@ bool COrder_Move::ParseSpecificData(lua_State *l, int &j, const char *value, con
 	return true;
 }
 
-/* virtual */ bool COrder_Move::IsValid() const
+bool COrder_Move::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Move::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Move::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	if (this->MapLayer != UI.CurrentMapLayer->ID) {
 		return lastScreenPos;

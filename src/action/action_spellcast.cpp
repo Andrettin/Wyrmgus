@@ -154,7 +154,7 @@ bool COrder_SpellCast::IsValid() const
 	}
 }
 
-PixelPos COrder_SpellCast::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_SpellCast::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	PixelPos targetPos;
 

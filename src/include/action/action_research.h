@@ -50,8 +50,12 @@ public:
 
 	virtual void Execute(CUnit &unit) override;
 	virtual void Cancel(CUnit &unit) override;
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
-	virtual void UpdatePathFinderData(PathFinderInput &input) override { UpdatePathFinderData_NotCalled(input); }
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
+
+	virtual void UpdatePathFinderData(PathFinderInput &input) override
+	{
+		UpdatePathFinderData_NotCalled(input);
+	}
 
 	virtual void UpdateUnitVariables(CUnit &unit) const override;
 

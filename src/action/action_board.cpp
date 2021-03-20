@@ -108,7 +108,7 @@ bool COrder_Board::IsValid() const
 	return this->has_goal() && this->get_goal()->IsAliveOnMap();
 }
 
-PixelPos COrder_Board::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Board::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	PixelPos targetPos;
 

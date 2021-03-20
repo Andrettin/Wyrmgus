@@ -796,7 +796,7 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 			i == Editor.CursorPlayer && CMap::get()->Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
 			x + i % 8 * rectangle_size, y, rectangle_size - 1, rectangle_size - 1);
 		if (CMap::get()->Info.PlayerType[i] != PlayerNobody) {
-			Video.FillRectangle(CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2);
+			Video.FillRectangle(CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2, render_commands);
 		}
 		if (i == Editor.SelectedPlayer) {
 			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2);
@@ -1228,7 +1228,7 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 		if (ButtonUnderCursor == StartButton) {
 			Video.DrawRectangleClip(ColorGray, x - 1 * scale_factor, y - 1 * scale_factor, IconHeight, IconHeight);
 		}
-		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2 * scale_factor, IconHeight - 2 * scale_factor);
+		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2 * scale_factor, IconHeight - 2 * scale_factor, render_commands);
 
 		const PixelPos lt(x, y);
 		const PixelPos lb(x, y + IconHeight - 3 * scale_factor);

@@ -160,7 +160,7 @@ void DrawUserDefinedButtons(std::vector<std::function<void(renderer *)>> &render
 **  @param x     Screen X position of icon
 **  @param y     Screen Y position of icon
 */
-static void UiDrawLifeBar(const CUnit &unit, int x, int y)
+static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	// FIXME: add icon borders
 	int hBar, hAll;
@@ -185,13 +185,13 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 	Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
 		unit.Type->Icon.Icon->G->Width + 8, hAll);
 	*/
-	if (wyrmgus::defines::get()->get_bar_frame_graphics() != nullptr) {
-		wyrmgus::defines::get()->get_bar_frame_graphics()->DrawClip(x + (-2 - 4) * scale_factor, y + (4 - 4) * scale_factor);
+	if (defines::get()->get_bar_frame_graphics() != nullptr) {
+		defines::get()->get_bar_frame_graphics()->DrawClip(x + (-2 - 4) * scale_factor, y + (4 - 4) * scale_factor);
 		Video.FillRectangleClip(ColorBlack, x - 2 * scale_factor, y + 4 * scale_factor,
-			unit.Type->Icon.Icon->get_graphics()->Width + (6 - 2) * scale_factor, hBar);
+			unit.Type->Icon.Icon->get_graphics()->Width + (6 - 2) * scale_factor, hBar, render_commands);
 	} else {
 		Video.FillRectangleClip(ColorBlack, x - 4 * scale_factor, y + 2 * scale_factor,
-			unit.Type->Icon.Icon->get_graphics()->Width + 8 * scale_factor, hAll);
+			unit.Type->Icon.Icon->get_graphics()->Width + 8 * scale_factor, hAll, render_commands);
 	}
 	//Wyrmgus end
 
@@ -227,10 +227,10 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 
 		f = (f * (unit.Type->Icon.Icon->get_graphics()->Width + 6 * scale_factor)) / 100;
 		Video.FillRectangleClip(color, x - 2 * scale_factor, y + 4 * scale_factor,
-			f > 1 ? f - 2 : 0, hBar);
+			f > 1 ? f - 2 : 0, hBar, render_commands);
 		//Wyrmgus start
 		Video.FillRectangleClip(lighter_color, x - 2 * scale_factor, y + 4 * scale_factor,
-			f > 1 ? f - 2 : 0, 1);
+			f > 1 ? f - 2 : 0, 1, render_commands);
 		//Wyrmgus end
 	}
 }
@@ -243,11 +243,11 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 **  @param x     Screen X position of icon
 **  @param y     Screen Y position of icon
 */
-static void UiDrawManaBar(const CUnit &unit, int x, int y)
+static void UiDrawManaBar(const CUnit &unit, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	// FIXME: add icon borders
 	y += unit.Type->Icon.Icon->get_graphics()->Height;
-	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->Icon.Icon->get_graphics()->Width, 4);
+	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->Icon.Icon->get_graphics()->Width, 4, render_commands);
 
 	//Wyrmgus start
 //	if (unit.Stats->Variables[MANA_INDEX].Max) {
@@ -258,7 +258,7 @@ static void UiDrawManaBar(const CUnit &unit, int x, int y)
 		int f = (100 * unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Value)) / unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max);
 		//Wyrmgus end
 		f = (f * (unit.Type->Icon.Icon->get_graphics()->Width)) / 100;
-		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
+		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2, render_commands);
 	}
 }
 
@@ -1408,7 +1408,7 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 			*/
 			Video.FillTransRectangleClip(color, UI.MapArea.X + 6 * scale_factor + 1, UI.MapArea.EndY + (-16 - 2) * scale_factor + 1 - textHeight + MessagesScrollY,
 				UI.MapArea.EndX - UI.MapArea.X - 16 * scale_factor,
-				textHeight + 1 * scale_factor, 0x80);
+				textHeight + 1 * scale_factor, 0x80, render_commands);
 
 			Video.DrawRectangle(color, UI.MapArea.X + 6 * scale_factor, UI.MapArea.EndY + (-16 - 2) * scale_factor - textHeight + MessagesScrollY,
 				UI.MapArea.EndX - UI.MapArea.X - 15 * scale_factor,
@@ -1906,7 +1906,7 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 			}
 
 			Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor);
-			Video.FillRectangleClip(CVideo::MapRGB(player->get_minimap_color()), x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2);
+			Video.FillRectangleClip(CVideo::MapRGB(player->get_minimap_color()), x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2, render_commands);
 
 			label.Draw(x + 15 * scale_factor, y, _(player->get_full_name().c_str()), render_commands);
 			y += 14 * scale_factor;
@@ -1997,7 +1997,7 @@ static void InfoPanel_draw_multiple_selection(std::vector<std::function<void(ren
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
 						  pos, "", Selected[i]->get_player_color(), render_commands);
 
-		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
+		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, render_commands);
 
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
 			const wyrmgus::font_color *text_color = nullptr;

@@ -55,7 +55,7 @@ public:
 
 	virtual void Execute(CUnit &unit) override;
 	virtual void OnAnimationAttack(CUnit &unit) override;
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/) override;
 

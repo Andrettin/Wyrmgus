@@ -197,23 +197,23 @@ namespace gcn
         // Fill the background around the content
         graphics->setColor(faceColor);
         // Fill top
-        graphics->fillRectangle(Rectangle(0,0,getWidth(),d.y - 1));
+        graphics->fillRectangle(Rectangle(0,0,getWidth(),d.y - 1), render_commands);
         // Fill left
-        graphics->fillRectangle(Rectangle(0,d.y - 1, d.x - 1, getHeight() - d.y + 1));
+        graphics->fillRectangle(Rectangle(0,d.y - 1, d.x - 1, getHeight() - d.y + 1), render_commands);
         // Fill right
         graphics->fillRectangle(Rectangle(d.x + d.width + 1,
                                           d.y - 1,
                                           getWidth() - d.x - d.width - 1,
-                                          getHeight() - d.y + 1));
+                                          getHeight() - d.y + 1), render_commands);
         // Fill bottom
         graphics->fillRectangle(Rectangle(d.x - 1,
                                           d.y + d.height + 1,
                                           d.width + 2,
-                                          getHeight() - d.height - d.y - 1));
+                                          getHeight() - d.height - d.y - 1), render_commands);
 
         if (isOpaque())
         {
-            graphics->fillRectangle(d);
+            graphics->fillRectangle(d, render_commands);
         }
 
         // Construct a rectangle one pixel bigger than the content

@@ -316,8 +316,8 @@ void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_com
 			} else {
 				color = ColorRed;
 			}
-			Video.FillTransRectangleClip(color, screenPos.x + w * wyrmgus::defines::get()->get_scaled_tile_width(),
-										 screenPos.y + h * wyrmgus::defines::get()->get_scaled_tile_height(), wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height(), 95);
+			Video.FillTransRectangleClip(color, screenPos.x + w * defines::get()->get_scaled_tile_width(),
+										 screenPos.y + h * defines::get()->get_scaled_tile_height(), defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height(), 95, render_commands);
 		}
 	}
 	PopClipping();

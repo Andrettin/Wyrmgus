@@ -121,7 +121,7 @@ bool COrder_PickUp::IsValid() const
 	return true;
 }
 
-PixelPos COrder_PickUp::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_PickUp::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	PixelPos targetPos;
 

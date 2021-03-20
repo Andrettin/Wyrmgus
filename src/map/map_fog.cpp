@@ -648,17 +648,7 @@ void UpdateFogOfWarChange()
 */
 static void VideoDrawOnlyFog(const int x, const int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	Video.FillRectangleClip(CVideo::MapRGBA(0, 0, 0, FogOfWarOpacity), x, y, defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height());
-
-	render_commands.push_back([x, y](renderer *renderer) {
-		int x2 = x;
-		int y2 = y;
-		int w = defines::get()->get_scaled_tile_width();
-		int h = defines::get()->get_scaled_tile_height();
-		CLIP_RECTANGLE(x2, y2, w, h);
-
-		renderer->fill_rect(QPoint(x2, y2), QSize(w, h), QColor(0, 0, 0, FogOfWarOpacity));
-	});
+	Video.FillRectangleClip(CVideo::MapRGBA(0, 0, 0, FogOfWarOpacity), x, y, defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height(), render_commands);
 }
 
 /*----------------------------------------------------------------------------
@@ -954,17 +944,7 @@ void CViewport::DrawMapFogOfWar(std::vector<std::function<void(renderer *)>> &re
 			//Wyrmgus end
 				DrawFogOfWarTile(sx, sy, dx, dy, render_commands);
 			} else {
-				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, wyrmgus::defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height());
-
-				render_commands.push_back([dx, dy](renderer *renderer) {
-					int x = dx;
-					int y = dy;
-					int w = defines::get()->get_scaled_tile_width();
-					int h = defines::get()->get_scaled_tile_height();
-					CLIP_RECTANGLE(x, y, w, h);
-
-					renderer->fill_rect(QPoint(x, y), defines::get()->get_scaled_tile_size(), QColor(Qt::black));
-				});
+				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, wyrmgus::defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height(), render_commands);
 			}
 			++sx;
 			dx += defines::get()->get_scaled_tile_width();

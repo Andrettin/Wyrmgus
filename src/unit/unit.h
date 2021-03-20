@@ -910,8 +910,8 @@ extern bool EnableBuildingCapture;             /// Config: building capture enab
 extern bool RevealAttacker;                    /// Config: reveal attacker enabled
 extern int ResourcesMultiBuildersMultiplier;   /// Config: spend resources for building with multiple workers
 extern const CViewport *CurrentViewport; /// CurrentViewport
-extern void DrawUnitSelection(const CViewport &vp, const CUnit &unit);
-extern void (*DrawSelection)(IntColor, int, int, int, int);
+extern void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands);
+extern void (*DrawSelection)(IntColor, int, int, int, int, std::vector<std::function<void(renderer *)>> &render_commands);
 
 extern unsigned int MaxSelectable;    /// How many units could be selected
 extern std::vector<CUnit *> Selected; /// currently selected units
@@ -1027,17 +1027,17 @@ extern void CleanUnits();
 // in unit_draw.c
 //--------------------
 /// Draw nothing around unit
-extern void DrawSelectionNone(IntColor, int, int, int, int);
+extern void DrawSelectionNone(IntColor, int, int, int, int, std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw circle around unit
-extern void DrawSelectionCircle(IntColor, int, int, int, int);
+extern void DrawSelectionCircle(IntColor, int, int, int, int, std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw circle filled with alpha around unit
-extern void DrawSelectionCircleWithTrans(IntColor, int, int, int, int);
+extern void DrawSelectionCircleWithTrans(IntColor, int, int, int, int, std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw rectangle around unit
-extern void DrawSelectionRectangle(IntColor, int, int, int, int);
+extern void DrawSelectionRectangle(IntColor, int, int, int, int, std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw rectangle filled with alpha around unit
-extern void DrawSelectionRectangleWithTrans(IntColor, int, int, int, int);
+extern void DrawSelectionRectangleWithTrans(IntColor, int, int, int, int, std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw corners around unit
-extern void DrawSelectionCorners(IntColor, int, int, int, int);
+extern void DrawSelectionCorners(IntColor, int, int, int, int, std::vector<std::function<void(renderer *)>> &render_commands);
 
 /// Register CCL decorations features
 extern void DecorationCclRegister();
@@ -1059,7 +1059,7 @@ extern void DrawOverlay(const unit_type &type, const std::shared_ptr<CGraphic> &
 extern int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table);
 
 /// Show a unit's orders.
-extern void ShowOrder(const CUnit &unit);
+extern void ShowOrder(const CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands);
 
 // in groups.c
 

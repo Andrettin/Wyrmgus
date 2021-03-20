@@ -424,7 +424,7 @@ namespace gcn
     void ScrollArea::draw(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         graphics->setColor(getBackgroundColor());
-        graphics->fillRectangle(getContentDimension());
+        graphics->fillRectangle(getContentDimension(), render_commands);
 #if 0
         int alpha = getBaseColor().a;
         Color highlightColor = getBaseColor() + 0x303030;
@@ -434,18 +434,18 @@ namespace gcn
 #endif
         if (mVBarVisible)
         {
-            drawUpButton(graphics);
-            drawDownButton(graphics);
-            drawVBar(graphics);
-            drawVMarker(graphics);
+            drawUpButton(graphics, render_commands);
+            drawDownButton(graphics, render_commands);
+            drawVBar(graphics, render_commands);
+            drawVMarker(graphics, render_commands);
         }
 
         if (mHBarVisible)
         {
-            drawLeftButton(graphics);
-            drawRightButton(graphics);
-            drawHBar(graphics);
-            drawHMarker(graphics);
+            drawLeftButton(graphics, render_commands);
+            drawRightButton(graphics, render_commands);
+            drawHBar(graphics, render_commands);
+            drawHMarker(graphics, render_commands);
         }
 
         if (mHBarVisible && mVBarVisible)
@@ -454,7 +454,7 @@ namespace gcn
             graphics->fillRectangle(Rectangle(getWidth() - mScrollbarWidth,
                                               getHeight() - mScrollbarWidth,
                                               mScrollbarWidth,
-                                              mScrollbarWidth));
+                                              mScrollbarWidth), render_commands);
         }
 
         if (mContent)
@@ -505,7 +505,7 @@ namespace gcn
         }
     }
 
-    void ScrollArea::drawHBar(Graphics* graphics)
+    void ScrollArea::drawHBar(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Rectangle dim = getHorizontalBarDimension();
 
@@ -518,7 +518,7 @@ namespace gcn
         shadowColor.a = alpha;
 
         graphics->setColor(trackColor);
-        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height));
+        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(shadowColor);
         graphics->drawLine(0, 0, dim.width, 0);
@@ -526,7 +526,7 @@ namespace gcn
         graphics->popClipArea();
     }
 
-    void ScrollArea::drawVBar(Graphics* graphics)
+    void ScrollArea::drawVBar(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Rectangle dim = getVerticalBarDimension();
 
@@ -539,7 +539,7 @@ namespace gcn
         shadowColor.a = alpha;
 
         graphics->setColor(trackColor);
-        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height));
+        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(shadowColor);
         graphics->drawLine(0, 0, 0, dim.height);
@@ -547,7 +547,7 @@ namespace gcn
         graphics->popClipArea();
     }
 
-    void ScrollArea::drawUpButton(Graphics* graphics)
+    void ScrollArea::drawUpButton(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Rectangle dim = getUpButtonDimension();
         graphics->pushClipArea(dim);
@@ -582,7 +582,7 @@ namespace gcn
         }
 
         graphics->setColor(faceColor);
-        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height));
+        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(highlightColor);
         graphics->drawLine(0, 0, dim.width - 1, 0);
@@ -608,7 +608,7 @@ namespace gcn
         graphics->popClipArea();
     }
 
-    void ScrollArea::drawDownButton(Graphics* graphics)
+    void ScrollArea::drawDownButton(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Rectangle dim = getDownButtonDimension();
         graphics->pushClipArea(dim);
@@ -643,7 +643,7 @@ namespace gcn
         }
 
         graphics->setColor(faceColor);
-        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height));
+        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(highlightColor);
         graphics->drawLine(0, 0, dim.width - 1, 0);
@@ -669,7 +669,7 @@ namespace gcn
         graphics->popClipArea();
     }
 
-    void ScrollArea::drawLeftButton(Graphics* graphics)
+    void ScrollArea::drawLeftButton(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Rectangle dim = getLeftButtonDimension();
         graphics->pushClipArea(dim);
@@ -704,7 +704,7 @@ namespace gcn
         }
 
         graphics->setColor(faceColor);
-        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height));
+        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(highlightColor);
         graphics->drawLine(0, 0, dim.width - 1, 0);
@@ -730,7 +730,7 @@ namespace gcn
         graphics->popClipArea();
     }
 
-    void ScrollArea::drawRightButton(Graphics* graphics)
+    void ScrollArea::drawRightButton(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Rectangle dim = getRightButtonDimension();
         graphics->pushClipArea(dim);
@@ -765,7 +765,7 @@ namespace gcn
         }
 
         graphics->setColor(faceColor);
-        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height));
+        graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(highlightColor);
         graphics->drawLine(0, 0, dim.width - 1, 0);
@@ -791,7 +791,7 @@ namespace gcn
         graphics->popClipArea();
     }
 
-    void ScrollArea::drawVMarker(Graphics* graphics)
+    void ScrollArea::drawVMarker(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Rectangle dim = getVerticalMarkerDimension();
         graphics->pushClipArea(dim);
@@ -805,7 +805,7 @@ namespace gcn
         shadowColor.a = alpha;
 
         graphics->setColor(faceColor);
-        graphics->fillRectangle(Rectangle(1, 1, dim.width - 1, dim.height - 1));
+        graphics->fillRectangle(Rectangle(1, 1, dim.width - 1, dim.height - 1), render_commands);
 
         graphics->setColor(highlightColor);
         graphics->drawLine(0, 0, dim.width - 1, 0);
@@ -818,7 +818,7 @@ namespace gcn
         graphics->popClipArea();
     }
 
-    void ScrollArea::drawHMarker(Graphics* graphics)
+    void ScrollArea::drawHMarker(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Rectangle dim = getHorizontalMarkerDimension();
         graphics->pushClipArea(dim);
@@ -832,7 +832,7 @@ namespace gcn
         shadowColor.a = alpha;
 
         graphics->setColor(faceColor);
-        graphics->fillRectangle(Rectangle(1, 1, dim.width - 1, dim.height - 1));
+        graphics->fillRectangle(Rectangle(1, 1, dim.width - 1, dim.height - 1), render_commands);
 
         graphics->setColor(highlightColor);
         graphics->drawLine(0, 0, dim.width - 1, 0);

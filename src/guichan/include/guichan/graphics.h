@@ -233,7 +233,7 @@ namespace gcn
          *
          * @param rectangle the filled Rectangle to draw.
          */
-        virtual void fillRectangle(const Rectangle& rectangle) = 0;
+        virtual void fillRectangle(const Rectangle& rectangle, std::vector<std::function<void(renderer *)>> &render_commands) = 0;
 
         /**
          * Sets the Color to use when drawing.

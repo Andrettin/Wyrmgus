@@ -103,13 +103,14 @@ void ShowLoadProgress(const char *fmt, ...)
 				*s = ' ';
 			}
 		}
+		std::vector<std::function<void(renderer *)>> render_commands;
+
 		//Wyrmgus start
 //		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
 		if (loadingBackground == nullptr) {
-			Video.FillRectangle(ColorBlack, 0, Video.Height - 18 * wyrmgus::defines::get()->get_scale_factor(), Video.Width, 18 * wyrmgus::defines::get()->get_scale_factor());
+			Video.FillRectangle(ColorBlack, 0, Video.Height - 18 * defines::get()->get_scale_factor(), Video.Width, 18 * defines::get()->get_scale_factor(), render_commands);
 		}
 		//Wyrmgus end
-		std::vector<std::function<void(renderer *)>> render_commands;
 		CLabel(defines::get()->get_game_font()).DrawCentered(Video.Width / 2, Video.Height - 16 * defines::get()->get_scale_factor(), temp, render_commands);
 		//Wyrmgus end
 

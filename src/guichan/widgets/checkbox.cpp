@@ -146,7 +146,7 @@ namespace gcn
         graphics->drawLine(1, h, h - 1, h);
 
         graphics->setColor(getBackgroundColor());
-        graphics->fillRectangle(Rectangle(1, 1, h - 1, h - 1));
+        graphics->fillRectangle(Rectangle(1, 1, h - 1, h - 1), render_commands);
 
         graphics->setColor(getForegroundColor());
 

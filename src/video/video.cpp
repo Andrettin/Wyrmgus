@@ -264,7 +264,10 @@ void PopClipping()
 */
 void CVideo::ClearScreen()
 {
-	FillRectangle(ColorBlack, 0, 0, Video.Width, Video.Height);
+	std::vector<std::function<void(renderer *)>> render_commands;
+	FillRectangle(ColorBlack, 0, 0, Video.Width, Video.Height, render_commands);
+
+	//FIXME: do something with the render commands, or remove this function altogether
 }
 
 /**

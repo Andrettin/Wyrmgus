@@ -376,18 +376,18 @@ void CContentTypeIcon::Draw(const CUnit &unit, font *, std::vector<std::function
 	if (defines::get()->get_bar_frame_graphics() != nullptr) {
 		defines::get()->get_bar_frame_graphics()->DrawClip(this->Pos.x + (-1 - 4) * scale_factor, this->Pos.y + (-1 - 4) * scale_factor);
 		Video.FillRectangleClip(ColorBlack, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
-								this->Width * scale_factor, this->Height * scale_factor);
+								this->Width * scale_factor, this->Height * scale_factor, render_commands);
 	} else {
 		Video.FillRectangleClip(ColorBlack, this->Pos.x - 3 * scale_factor, this->Pos.y - 3 * scale_factor,
-								(this->Width + 4) * scale_factor, (this->Height + 4) * scale_factor);
+								(this->Width + 4) * scale_factor, (this->Height + 4) * scale_factor, render_commands);
 	}
 	//Wyrmgus end
 
 	Video.FillRectangleClip(color, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
-							(this->Width * scale_factor * f) / 100, this->Height * scale_factor);
+							(this->Width * scale_factor * f) / 100, this->Height * scale_factor, render_commands);
 	//Wyrmgus start
 	Video.FillRectangleClip(lighter_color, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
-							(this->Width * scale_factor * f) / 100, 1 * scale_factor);
+							(this->Width * scale_factor * f) / 100, 1 * scale_factor, render_commands);
 	//Wyrmgus end
 }
 
@@ -434,7 +434,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 			wyrmgus::defines::get()->get_progress_bar_graphics()->DrawClip(this->Pos.x - 4 * scale_factor, this->Pos.y - 5 * scale_factor);
 		}
 		//Wyrmgus end
-		Video.FillRectangleClip(color, x, y, f * w / 100, h);
+		Video.FillRectangleClip(color, x, y, f * w / 100, h, render_commands);
 		if (UI.CompletedBarShadow) {
 			// Shadow
 			Video.DrawVLine(ColorGray, x + f * w / 100, y, h);
@@ -447,7 +447,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 	} else {
 		Video.DrawRectangleClip(ColorWhite, x, y, w + 4 * scale_factor, h);
 		Video.DrawRectangleClip(ColorBlack, x + 1 * scale_factor, y + 1 * scale_factor, w + 2 * scale_factor, h - 2 * scale_factor);
-		Video.FillRectangleClip(color, x + 2 * scale_factor, y + 2 * scale_factor, f * w / 100, h - 4 * scale_factor);
+		Video.FillRectangleClip(color, x + 2 * scale_factor, y + 2 * scale_factor, f * w / 100, h - 4 * scale_factor, render_commands);
 	}
 }
 

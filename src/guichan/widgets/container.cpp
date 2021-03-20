@@ -91,7 +91,7 @@ namespace gcn
 		if (isOpaque())
 		{
 			graphics->setColor(getBaseColor());
-			graphics->fillRectangle(Rectangle(0, 0, getWidth(), getHeight()));
+			graphics->fillRectangle(Rectangle(0, 0, getWidth(), getHeight()), render_commands);
 		}
 
 		drawChildren(graphics, render_commands);

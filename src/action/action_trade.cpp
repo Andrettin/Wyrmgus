@@ -117,12 +117,12 @@ bool COrder_Trade::ParseSpecificData(lua_State *l, int &j, const char *value, co
 	return true;
 }
 
-/* virtual */ bool COrder_Trade::IsValid() const
+bool COrder_Trade::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Trade::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Trade::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	PixelPos targetPos;
 

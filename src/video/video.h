@@ -535,10 +535,10 @@ public:
 	void DrawRectangleClip(uint32_t color, int x, int y, int w, int h);
 	void DrawTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha);
 
-	void FillRectangle(uint32_t color, int x, int y, int w, int h);
-	void FillTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha);
-	void FillRectangleClip(uint32_t color, int x, int y, int w, int h);
-	void FillTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha);
+	void FillRectangle(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands);
+	void FillTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
+	void FillRectangleClip(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands);
+	void FillTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void DrawCircle(uint32_t color, int x, int y, int r);
 	void DrawTransCircle(uint32_t color, int x, int y, int r, unsigned char alpha);

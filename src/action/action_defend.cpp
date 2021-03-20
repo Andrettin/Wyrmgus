@@ -113,12 +113,12 @@ bool COrder_Defend::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	return true;
 }
 
-/* virtual */ bool COrder_Defend::IsValid() const
+bool COrder_Defend::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Defend::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Defend::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	PixelPos targetPos;
 

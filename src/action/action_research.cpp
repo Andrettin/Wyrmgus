@@ -100,12 +100,12 @@ bool COrder_Research::ParseSpecificData(lua_State *l, int &j, const char *value,
 	return true;
 }
 
-/* virtual */ bool COrder_Research::IsValid() const
+bool COrder_Research::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Research::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_Research::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	return lastScreenPos;
 }

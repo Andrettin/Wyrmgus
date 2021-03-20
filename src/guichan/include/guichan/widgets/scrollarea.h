@@ -293,28 +293,28 @@ namespace gcn
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawUpButton(Graphics *graphics);
+        virtual void drawUpButton(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Draws the down button.
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawDownButton(Graphics *graphics);
+        virtual void drawDownButton(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Draws the left button.
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawLeftButton(Graphics *graphics);
+        virtual void drawLeftButton(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Draws the right button.
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawRightButton(Graphics *graphics);
+        virtual void drawRightButton(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Draws the content in the ScrollArea.
@@ -328,28 +328,28 @@ namespace gcn
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawVBar(Graphics* graphics);
+        virtual void drawVBar(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Draws the horizontal scrollbar.
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawHBar(Graphics* graphics);
+        virtual void drawHBar(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Draws the vertical marker.
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawVMarker(Graphics* graphics);
+        virtual void drawVMarker(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Draws the horizontal marker.
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawHMarker(Graphics* graphics);
+        virtual void drawHMarker(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Checks the policies for the scrollbars.

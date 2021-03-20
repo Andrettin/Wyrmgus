@@ -115,12 +115,12 @@ bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	return true;
 }
 
-/* virtual */ bool COrder_Follow::IsValid() const
+bool COrder_Follow::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Follow::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Follow::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	PixelPos targetPos;
 

@@ -137,7 +137,7 @@ namespace gcn
         if (mOpaque)
         {
             graphics->setColor(getBackgroundColor());
-            graphics->fillRectangle(Rectangle(0, 0, getWidth(), getHeight()));
+            graphics->fillRectangle(Rectangle(0, 0, getWidth(), getHeight()), render_commands);
         }
 
         if (hasFocus() && isEditable())

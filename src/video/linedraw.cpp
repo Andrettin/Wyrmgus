@@ -32,6 +32,8 @@
 
 #include "intern_video.h"
 
+#include "video/renderer.h"
+
 #ifdef USE_OPENGL
 #ifdef __APPLE__
 #define GL_GLEXT_PROTOTYPES 1
@@ -725,7 +727,7 @@ void DrawTransRectangleClip(uint32_t color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 */
 void FillRectangle(uint32_t color, int x, int y,
-				   int w, int h)
+				   int w, int h, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	GLubyte r, g, b, a;
 
@@ -756,6 +758,10 @@ void FillRectangle(uint32_t color, int x, int y,
 	glEnd();
 #endif
 	glEnable(GL_TEXTURE_2D);
+
+	render_commands.push_back([x, y, w, h, r, g, b, a](renderer *renderer) {
+		renderer->fill_rect(QPoint(x, y), QSize(w, h), QColor(r, g, b, a));
+	});
 }
 
 /**
@@ -769,13 +775,13 @@ void FillRectangle(uint32_t color, int x, int y,
 **  @param alpha  alpha value of pixel.
 */
 void FillTransRectangle(uint32_t color, int x, int y,
-						int w, int h, unsigned char alpha)
+						int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	GLubyte r, g, b;
 
 	CVideo::GetRGB(color, &r, &g, &b);
 	color = CVideo::MapRGBA(r, g, b, alpha);
-	FillRectangle(color, x, y, w, h);
+	FillRectangle(color, x, y, w, h, render_commands);
 }
 
 /**
@@ -788,10 +794,10 @@ void FillTransRectangle(uint32_t color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 */
 void FillRectangleClip(uint32_t color, int x, int y,
-					   int w, int h)
+					   int w, int h, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	CLIP_RECTANGLE(x, y, w, h);
-	FillRectangle(color, x, y, w, h);
+	FillRectangle(color, x, y, w, h, render_commands);
 }
 
 /**
@@ -805,13 +811,13 @@ void FillRectangleClip(uint32_t color, int x, int y,
 **  @param alpha  alpha value of pixels.
 */
 void FillTransRectangleClip(uint32_t color, int x, int y,
-							int w, int h, unsigned char alpha)
+							int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	GLubyte r, g, b;
 
 	CVideo::GetRGB(color, &r, &g, &b);
 	color = CVideo::MapRGBA(r, g, b, alpha);
-	FillRectangleClip(color, x, y, w, h);
+	FillRectangleClip(color, x, y, w, h, render_commands);
 }
 
 /**
@@ -1174,24 +1180,24 @@ void CVideo::DrawTransRectangleClip(uint32_t color, int x, int y, int w, int h, 
 	linedraw_gl::DrawTransRectangleClip(color, x, y, w, h, alpha);
 }
 
-void CVideo::FillRectangle(uint32_t color, int x, int y, int w, int h)
+void CVideo::FillRectangle(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	linedraw_gl::FillRectangle(color, x, y, w, h);
+	linedraw_gl::FillRectangle(color, x, y, w, h, render_commands);
 }
 
-void CVideo::FillTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha)
+void CVideo::FillTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	linedraw_gl::FillTransRectangle(color, x, y, w, h, alpha);
+	linedraw_gl::FillTransRectangle(color, x, y, w, h, alpha, render_commands);
 }
 
-void CVideo::FillRectangleClip(uint32_t color, int x, int y, int w, int h)
+void CVideo::FillRectangleClip(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	linedraw_gl::FillRectangleClip(color, x, y, w, h);
+	linedraw_gl::FillRectangleClip(color, x, y, w, h, render_commands);
 }
 
-void CVideo::FillTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha)
+void CVideo::FillTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	linedraw_gl::FillTransRectangleClip(color, x, y, w, h, alpha);
+	linedraw_gl::FillTransRectangleClip(color, x, y, w, h, alpha, render_commands);
 }
 
 void CVideo::DrawCircle(uint32_t color, int x, int y, int r)

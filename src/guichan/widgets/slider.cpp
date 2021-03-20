@@ -133,7 +133,7 @@ namespace gcn
          shadowColor.a = alpha;
 
         graphics->setColor(shadowColor);
-        graphics->fillRectangle(gcn::Rectangle(0,0,getWidth(),getHeight()));
+        graphics->fillRectangle(gcn::Rectangle(0,0,getWidth(),getHeight()), render_commands);
 
         drawMarker(graphics, render_commands);
     }
@@ -177,7 +177,7 @@ namespace gcn
         if (getOrientation() == HORIZONTAL)
         {
             int v = getMarkerPosition();
-            graphics->fillRectangle(gcn::Rectangle(v + 1, 1, getMarkerLength() - 2, getHeight() - 2));
+            graphics->fillRectangle(gcn::Rectangle(v + 1, 1, getMarkerLength() - 2, getHeight() - 2), render_commands);
             graphics->setColor(highlightColor);
             graphics->drawLine(v, 0, v + getMarkerLength() - 1,0);
             graphics->drawLine(v, 0, v, getHeight() - 1);
@@ -194,7 +194,7 @@ namespace gcn
         else
         {
             int v = (getHeight() - getMarkerLength()) - getMarkerPosition();
-            graphics->fillRectangle(gcn::Rectangle(1, v + 1, getWidth() - 2, getMarkerLength() - 2));
+            graphics->fillRectangle(gcn::Rectangle(1, v + 1, getWidth() - 2, getMarkerLength() - 2), render_commands);
             graphics->setColor(highlightColor);
             graphics->drawLine(0, v, 0, v + getMarkerLength() - 1);
             graphics->drawLine(0, v, getWidth() - 1, v);

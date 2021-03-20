@@ -47,7 +47,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
 	//Wyrmgus start
@@ -80,7 +80,7 @@ public:
 
 	virtual void Execute(CUnit &unit) override;
 	virtual void Cancel(CUnit &unit) override;
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void UpdatePathFinderData(PathFinderInput &input) override { UpdatePathFinderData_NotCalled(input); }
 
 	virtual void UpdateUnitVariables(CUnit &unit) const override;

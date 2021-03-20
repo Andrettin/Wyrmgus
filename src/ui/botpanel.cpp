@@ -843,7 +843,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 	y = std::clamp(y, 0, Video.Height - 1);
 
 	// Background
-	Video.FillTransRectangle(popup->BackgroundColor, x, y, popupWidth, popupHeight, popup->BackgroundColor >> ASHIFT);
+	Video.FillTransRectangle(popup->BackgroundColor, x, y, popupWidth, popupHeight, popup->BackgroundColor >> ASHIFT, render_commands);
 	Video.DrawRectangle(popup->BorderColor, x, y, popupWidth, popupHeight);
 
 	// Contents
@@ -940,7 +940,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const font_co
 	const IntColor BackgroundColor = CVideo::MapRGBA(28, 28, 28, 208);
 	const IntColor BorderColor = CVideo::MapRGBA(93, 93, 93, 160);
 
-	Video.FillTransRectangle(BackgroundColor, x, y, popupWidth, popupHeight, BackgroundColor >> ASHIFT);
+	Video.FillTransRectangle(BackgroundColor, x, y, popupWidth, popupHeight, BackgroundColor >> ASHIFT, render_commands);
 	Video.DrawRectangle(BorderColor, x, y, popupWidth, popupHeight);
 
 	if (text_color == nullptr) {
@@ -963,7 +963,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const font_co
 	while ((sub = GetLineFont(++i, popup_text, width, font)).length()) {
 		if (sub.find("LINE", 0) != std::string::npos) {
 			Video.FillRectangle(BorderColor, x + (-MARGIN_X + 1 - MARGIN_X) * scale_factor,
-								y_off, popupWidth - 2 * scale_factor, 1);
+								y_off, popupWidth - 2 * scale_factor, 1, render_commands);
 			sub = sub.substr(sub.find("LINE", 0) + 4, sub.length());
 		}
 		int cost_symbol_pos = sub.find("COST_", 0);

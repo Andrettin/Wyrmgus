@@ -175,7 +175,7 @@ bool COrder_Build::IsValid() const
 	return true;
 }
 
-PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	//Wyrmgus start
 	if (this->MapLayer != UI.CurrentMapLayer->ID) {
@@ -188,7 +188,7 @@ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) 
 
 	const int w = this->GetUnitType().get_box_width() * wyrmgus::defines::get()->get_scale_factor();
 	const int h = this->GetUnitType().get_box_height() * wyrmgus::defines::get()->get_scale_factor();
-	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2);
+	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2, render_commands);
 	//Wyrmgus start
 //	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
 //	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);

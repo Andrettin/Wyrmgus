@@ -304,7 +304,7 @@ void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle &rectangle)
 							 x1, y1, x2 - x1, y2 - y1, mColor.a);
 }
 
-void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
+void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const gcn::Color c = this->getColor();
 
@@ -327,7 +327,7 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 	int y2 = std::min<int>(area.y + area.height, top.y + top.height);
 
 	Video.FillTransRectangle(CVideo::MapRGB(c.r, c.g, c.b),
-							 x1, y1, x2 - x1, y2 - y1, c.a);
+							 x1, y1, x2 - x1, y2 - y1, c.a, render_commands);
 }
 
 #endif
@@ -455,7 +455,7 @@ void ImageButton::draw(gcn::Graphics *graphics, std::vector<std::function<void(r
 
 	if (frameImage) {
         graphics->setColor(ColorBlack);
-		graphics->fillRectangle(gcn::Rectangle((frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2, img->getWidth(), img->getHeight()));
+		graphics->fillRectangle(gcn::Rectangle((frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2, img->getWidth(), img->getHeight()), render_commands);
 		graphics->drawImage(frameImage.get(), 0, 0, 0, 0,
 							frameImage->getWidth(), frameImage->getHeight(), render_commands);
 		if (isPressed()) {
@@ -682,7 +682,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics, std::vector<std::func
 		
 	if (frameImage) {
         graphics->setColor(ColorBlack);
-		graphics->fillRectangle(gcn::Rectangle((frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2, img->getWidth(), img->getHeight()));
+		graphics->fillRectangle(gcn::Rectangle((frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2, img->getWidth(), img->getHeight()), render_commands);
 		graphics->drawImage(frameImage.get(), 0, 0, 0, 0,
 							frameImage->getWidth(), frameImage->getHeight(), render_commands);
 		if (isPressed()) {
@@ -1750,7 +1750,7 @@ void ImageTextField::draw(gcn::Graphics *graphics, std::vector<std::function<voi
 		selW = font->getWidth(tmpStr);
 
 		graphics->setColor(gcn::Color(127, 127, 127));
-		graphics->fillRectangle(gcn::Rectangle(x + selX, y, selW, font->getHeight()));
+		graphics->fillRectangle(gcn::Rectangle(x + selX, y, selW, font->getHeight()), render_commands);
 	}
 
 	graphics->drawText(mText, x, y, render_commands);
@@ -2837,14 +2837,14 @@ void StatBoxWidget::draw(gcn::Graphics *graphics, std::vector<std::function<void
 	height = getHeight();
 
 	graphics->setColor(getBackgroundColor());
-	graphics->fillRectangle(gcn::Rectangle(0, 0, width, height));
+	graphics->fillRectangle(gcn::Rectangle(0, 0, width, height), render_commands);
 
 	graphics->setColor(getBaseColor());
 	graphics->drawRectangle(gcn::Rectangle(1, 1, width - 2, height - 2));
 
 	graphics->setColor(getForegroundColor());
 	width = percent * width / 100;
-	graphics->fillRectangle(gcn::Rectangle(2, 2, width - 4, height - 4));
+	graphics->fillRectangle(gcn::Rectangle(2, 2, width - 4, height - 4), render_commands);
 	graphics->setFont(getFont());
 	graphics->drawText(getCaption(),
 					   (getWidth() - getFont()->getWidth(getCaption())) / 2,

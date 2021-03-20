@@ -32,6 +32,7 @@
 
 namespace wyrmgus {
 	class landmass;
+	class renderer;
 	class unit_ref;
 }
 
@@ -117,7 +118,7 @@ public:
 
 	virtual bool IsValid() const = 0;
 
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const = 0;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const = 0;
 
 	virtual void OnAnimationAttack(CUnit &unit);
 

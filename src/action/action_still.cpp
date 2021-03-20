@@ -110,12 +110,12 @@ bool COrder_Still::ParseSpecificData(lua_State *l, int &j, const char *value, co
 	return true;
 }
 
-/* virtual */ bool COrder_Still::IsValid() const
+bool COrder_Still::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	//Wyrmgus start
 	/*

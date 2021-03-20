@@ -154,12 +154,12 @@ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	return true;
 }
 
-/* virtual */ bool COrder_Repair::IsValid() const
+bool COrder_Repair::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Repair::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Repair::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	PixelPos targetPos;
 

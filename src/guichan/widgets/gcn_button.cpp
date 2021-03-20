@@ -159,7 +159,7 @@ namespace gcn
         }
 
         graphics->setColor(faceColor);
-        graphics->fillRectangle(Rectangle(1, 1, getDimension().width-1, getHeight() - 1));
+        graphics->fillRectangle(Rectangle(1, 1, getDimension().width-1, getHeight() - 1), render_commands);
 
         graphics->setColor(highlightColor);
         graphics->drawLine(0, 0, getWidth() - 1, 0);

@@ -173,7 +173,7 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos
 
 	//Wyrmgus start
 	if (Preference.IconsShift && defines::get()->get_icon_frame_graphics() != nullptr && defines::get()->get_pressed_icon_frame_graphics() != nullptr) {
-		Video.FillRectangle(ColorBlack, pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
+		Video.FillRectangle(ColorBlack, pos.x, pos.y, 46 * scale_factor, 38 * scale_factor, render_commands);
 		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
 			if (show_percent < 100) {
 				DrawUIButton(&s, flags, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, text, grayscale, player_color, true, render_commands);

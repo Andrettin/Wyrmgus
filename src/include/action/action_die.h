@@ -48,7 +48,7 @@ public:
 	virtual bool IsValid() const override;
 
 	virtual void Execute(CUnit &unit) override;
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 	virtual void UpdatePathFinderData(PathFinderInput &input) override
 	{
 		UpdatePathFinderData_NotCalled(input);

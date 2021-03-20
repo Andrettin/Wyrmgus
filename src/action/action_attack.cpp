@@ -218,7 +218,7 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	return true;
 }
 
-/* virtual */ bool COrder_Attack::IsValid() const
+bool COrder_Attack::IsValid() const
 {
 	if (Action == UnitAction::Attack) {
 		if (this->has_goal()) {
@@ -232,7 +232,7 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	}
 }
 
-/* virtual */ PixelPos COrder_Attack::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Attack::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	PixelPos targetPos;
 
@@ -255,7 +255,7 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	return targetPos;
 }
 
-/* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
 {
 	Vec2i tileSize;
 	if (this->has_goal()) {

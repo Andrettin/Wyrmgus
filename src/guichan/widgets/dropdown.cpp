@@ -208,7 +208,7 @@ namespace gcn
 
 
         graphics->setColor(getBackgroundColor());
-        graphics->fillRectangle(Rectangle(0, 0, getWidth(), h));
+        graphics->fillRectangle(Rectangle(0, 0, getWidth(), h), render_commands);
 
         graphics->setColor(getForegroundColor());
         graphics->setFont(getFont());
@@ -305,7 +305,7 @@ namespace gcn
         int y = 0;
 
         graphics->setColor(faceColor);
-        graphics->fillRectangle(Rectangle(x+1, y+1, h-2, h-2));
+        graphics->fillRectangle(Rectangle(x+1, y+1, h-2, h-2), render_commands);
 
         graphics->setColor(highlightColor);
         graphics->drawLine(x, y, x+h-1, y);

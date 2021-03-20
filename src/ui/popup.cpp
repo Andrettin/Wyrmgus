@@ -512,7 +512,7 @@ void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsign
 	Q_UNUSED(Costs)
 
 	Video.FillRectangle(this->Color, x - popup.MarginX - this->MarginX + 1,
-						y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height);
+						y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height, render_commands);
 }
 
 void CPopupContentTypeLine::Parse(lua_State *l)

@@ -397,12 +397,12 @@ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value,
 	return true;
 }
 
-/* virtual */ bool COrder_Resource::IsValid() const
+bool COrder_Resource::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Resource::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Resource::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	PixelPos targetPos;
 

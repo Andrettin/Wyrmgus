@@ -120,12 +120,12 @@ bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	return true;
 }
 
-/* virtual */ bool COrder_Unload::IsValid() const
+bool COrder_Unload::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Unload::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Unload::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	if (this->MapLayer != UI.CurrentMapLayer->ID) {
 		return lastScreenPos;

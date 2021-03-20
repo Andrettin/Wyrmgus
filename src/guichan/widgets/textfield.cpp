@@ -113,7 +113,7 @@ namespace gcn
 		int x, y;
         Color faceColor = getBackgroundColor();
         graphics->setColor(faceColor);
-        graphics->fillRectangle(Rectangle(0, 0, getWidth(), getHeight()));
+        graphics->fillRectangle(Rectangle(0, 0, getWidth(), getHeight()), render_commands);
 
         if (hasFocus())
         {
@@ -144,7 +144,7 @@ namespace gcn
 			selW = font->getWidth(tmpStr);
 
 			graphics->setColor(Color(127, 127, 127));
-			graphics->fillRectangle(Rectangle(x + selX, y, selW, font->getHeight()));
+			graphics->fillRectangle(Rectangle(x + selX, y, selW, font->getHeight()), render_commands);
 		}
 
         graphics->drawText(mText, x, y, render_commands);

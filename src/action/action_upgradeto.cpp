@@ -394,19 +394,19 @@ bool COrder_TransformInto::ParseSpecificData(lua_State *l, int &j, const char *v
 	return true;
 }
 
-/* virtual */ bool COrder_TransformInto::IsValid() const
+bool COrder_TransformInto::IsValid() const
 {
 	return true;
 }
 
 
-/* virtual */ PixelPos COrder_TransformInto::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_TransformInto::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	return lastScreenPos;
 }
 
 
-/* virtual */ void COrder_TransformInto::Execute(CUnit &unit)
+void COrder_TransformInto::Execute(CUnit &unit)
 {
 	TransformUnitIntoType(unit, *this->Type);
 	this->Finished = true;
@@ -452,12 +452,12 @@ bool COrder_UpgradeTo::ParseSpecificData(lua_State *l, int &j, const char *value
 	return true;
 }
 
-/* virtual */ bool COrder_UpgradeTo::IsValid() const
+bool COrder_UpgradeTo::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_UpgradeTo::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_UpgradeTo::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	return lastScreenPos;
 }
