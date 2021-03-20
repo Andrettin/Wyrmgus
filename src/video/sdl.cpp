@@ -117,6 +117,10 @@ static PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
 static PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
 #endif
 
+#ifdef KeyPress
+#undef KeyPress
+#endif
+
 /*----------------------------------------------------------------------------
 --  Sync
 ----------------------------------------------------------------------------*/
