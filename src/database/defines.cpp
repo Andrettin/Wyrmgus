@@ -36,6 +36,8 @@
 #include "sound/game_sound_set.h"
 #include "sound/music.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/container_util.h"
+#include "util/vector_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -127,6 +129,16 @@ void defines::initialize()
 	if (this->progress_bar_graphics != nullptr) {
 		this->progress_bar_graphics->Load(false, this->get_scale_factor());
 	}
+}
+
+QStringList defines::get_tips_qstring_list() const
+{
+	return container::to_qstring_list(this->get_tips());
+}
+
+void defines::remove_tip(const std::string &tip)
+{
+	vector::remove_one(this->tips, tip);
 }
 
 }

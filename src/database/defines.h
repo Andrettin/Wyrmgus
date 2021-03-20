@@ -94,6 +94,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(int scale_factor READ get_scale_factor CONSTANT)
 	Q_PROPERTY(int scaled_tile_width READ get_scaled_tile_width CONSTANT)
 	Q_PROPERTY(int scaled_tile_height READ get_scaled_tile_height CONSTANT)
+	Q_PROPERTY(QStringList tips READ get_tips_qstring_list NOTIFY tips_changed)
 
 public:
 	~defines();
@@ -343,6 +344,23 @@ public:
 		return this->destroyed_overlay_terrain_decay_threshold;
 	}
 
+	const std::vector<std::string> &get_tips() const
+	{
+		return this->tips;
+	}
+
+	QStringList get_tips_qstring_list() const;
+
+	Q_INVOKABLE void add_tip(const std::string &tip)
+	{
+		this->tips.push_back(tip);
+	}
+
+	Q_INVOKABLE void remove_tip(const std::string &tip);
+
+signals:
+	void tips_changed();
+
 private:
 	font *small_font = nullptr;
 	font *game_font = nullptr;
@@ -386,6 +404,7 @@ private:
 	resource_icon *mana_icon = nullptr;
 	int forest_regeneration_threshold = 0;
 	int destroyed_overlay_terrain_decay_threshold = 0;
+	std::vector<std::string> tips;
 };
 
 }

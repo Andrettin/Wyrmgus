@@ -66,7 +66,6 @@ void word::set_language(wyrmgus::language *language)
 	language->add_word(this);
 }
 
-
 QStringList word::get_meanings_qstring_list() const
 {
 	return container::to_qstring_list(this->get_meanings());

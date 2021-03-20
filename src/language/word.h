@@ -143,7 +143,7 @@ public:
 	std::string ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// For adjectives
 	std::string Participles[MaxGrammaticalTenses];		/// For verbs
 private:
-	std::vector<std::string> meanings; //meanings of the word in English.
+	std::vector<std::string> meanings; //meanings of the word in English
 	std::vector<const word *> compound_elements; //from which compound elements is this word formed
 	std::vector<const word *> compound_element_of; //which words are formed from this word as a compound element
 
