@@ -563,6 +563,8 @@ void GameMainLoop()
 	engine_interface::get()->reset_map_view_created_promise();
 	engine_interface::get()->set_waiting_for_interface(false);
 
+	engine_interface::get()->set_loading_message("");
+
 	SingleGameLoop();
 
 #ifdef REALVIDEO

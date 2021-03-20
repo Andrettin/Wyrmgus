@@ -33,6 +33,7 @@
 
 #include "civilization.h"
 #include "database/defines.h"
+#include "engine_interface.h"
 #include "faction.h"
 //Wyrmgus start
 #include "game.h"
@@ -96,7 +97,7 @@ void ShowLoadProgress(const char *fmt, ...)
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 
-	if (Video.Depth && wyrmgus::defines::get()->get_game_font() != nullptr && wyrmgus::defines::get()->get_game_font()->is_initialized()) {
+	if (Video.Depth && defines::get()->get_game_font() != nullptr && defines::get()->get_game_font()->is_initialized()) {
 		// Remove non printable chars
 		for (unsigned char *s = (unsigned char *)temp; *s; ++s) {
 			if (*s < 32) {
@@ -113,6 +114,8 @@ void ShowLoadProgress(const char *fmt, ...)
 		//Wyrmgus end
 		CLabel(defines::get()->get_game_font()).DrawCentered(Video.Width / 2, Video.Height - 16 * defines::get()->get_scale_factor(), temp, render_commands);
 		//Wyrmgus end
+
+		engine_interface::get()->set_loading_message(temp);
 
 		//FIXME: do something with the render commands
 

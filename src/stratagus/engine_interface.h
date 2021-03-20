@@ -49,6 +49,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(wyrmgus::preferences* preferences READ get_preferences CONSTANT)
 	Q_PROPERTY(wyrmgus::game* game READ get_game CONSTANT)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
+	Q_PROPERTY(QString loading_message READ get_loading_message NOTIFY loading_message_changed)
 
 public:
 	engine_interface();
@@ -104,6 +105,27 @@ public:
 		emit running_changed();
 	}
 
+	const QString &get_loading_message() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->loading_message_mutex);
+		return this->loading_message;
+	}
+
+	void set_loading_message(const QString &loading_message)
+	{
+		{
+			std::unique_lock<std::shared_mutex> lock(this->loading_message_mutex);
+
+			if (loading_message == this->loading_message) {
+				return;
+			}
+
+			this->loading_message = loading_message;
+		}
+
+		emit loading_message_changed();
+	}
+
 	Q_INVOKABLE void call_lua_command(const QString &command);
 	Q_INVOKABLE void play_sound(const QString &sound_identifier);
 
@@ -155,6 +177,7 @@ public:
 
 signals:
 	void running_changed();
+	void loading_message_changed();
 
 private:
 	std::queue<std::function<void()>> posted_commands;
@@ -164,6 +187,8 @@ private:
 	std::atomic<bool> waiting_for_interface = false;
 	std::queue<std::unique_ptr<QInputEvent>> stored_input_events;
 	std::mutex input_event_mutex;
+	QString loading_message; //the loading message to be displayed
+	mutable std::shared_mutex loading_message_mutex;
 };
 
 }

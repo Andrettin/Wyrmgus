@@ -137,6 +137,7 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 			this->store_input_event(std::make_unique<QMouseEvent>(*mouse_event));
 			return true;
 		}
+		case QEvent::HoverEnter:
 		case QEvent::HoverMove: {
 			const QHoverEvent *hover_event = static_cast<QHoverEvent *>(event);
 			this->store_input_event(std::make_unique<QHoverEvent>(*hover_event));
