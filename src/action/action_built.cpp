@@ -150,6 +150,8 @@ bool COrder_Built::IsValid() const
 
 PixelPos COrder_Built::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
+	Q_UNUSED(render_commands)
+
 	return lastScreenPos;
 }
 

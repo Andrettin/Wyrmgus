@@ -1445,18 +1445,18 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_left_up;
 			MouseScrollState = ScrollLeftUp;
-			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_northwest));
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_northwest), false);
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
 		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * wyrmgus::defines::get()->get_scaled_tile_height()) - 1) {
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_left_down;
 			MouseScrollState = ScrollLeftDown;
-			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_southwest));
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_southwest), false);
 		} else {
 			CursorOn = cursor_on::scroll_left;
 			MouseScrollState = ScrollLeft;
-			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_west));
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_west), false);
 		}
 	//Wyrmgus start
 //	} else if (mousePos.x > SCROLL_RIGHT) {
@@ -1468,18 +1468,18 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_right_up;
 			MouseScrollState = ScrollRightUp;
-			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_northeast));
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_northeast), false);
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
 		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * wyrmgus::defines::get()->get_scaled_tile_height()) - 1) {
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_right_down;
 			MouseScrollState = ScrollRightDown;
-			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_southeast));
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_southeast), false);
 		} else {
 			CursorOn = cursor_on::scroll_right;
 			MouseScrollState = ScrollRight;
-			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_east));
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_east), false);
 		}
 	} else {
 		//Wyrmgus start
@@ -1488,14 +1488,14 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_up;
 			MouseScrollState = ScrollUp;
-			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_north));
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_north), false);
 			//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
 		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * wyrmgus::defines::get()->get_scaled_tile_height()) - 1) {
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_down;
 			MouseScrollState = ScrollDown;
-			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_south));
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::arrow_south), false);
 		} else {
 			return false;
 		}

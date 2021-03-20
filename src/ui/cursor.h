@@ -82,7 +82,8 @@ public:
 		return cursor::current_cursor;
 	}
 
-	static void set_current_cursor(cursor *cursor);
+	static void set_current_cursor(cursor *cursor, const bool notify);
+	static void on_current_cursor_changed();
 
 private:
 	static inline std::map<cursor_type, cursor *> cursors_by_type;

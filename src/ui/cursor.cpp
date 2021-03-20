@@ -76,13 +76,22 @@ void cursor::clear()
 	UnitUnderCursor = nullptr;
 }
 
-void cursor::set_current_cursor(cursor *cursor)
+void cursor::set_current_cursor(cursor *cursor, const bool notify)
 {
 	if (cursor == cursor::current_cursor) {
 		return;
 	}
 
 	cursor::current_cursor = cursor;
+
+	if (notify) {
+		cursor::on_current_cursor_changed();
+	}
+}
+
+void cursor::on_current_cursor_changed()
+{
+	cursor *cursor = cursor::get_current_cursor();
 
 	if (cursor != nullptr) {
 		if (!cursor->get_graphics()->IsLoaded()) {

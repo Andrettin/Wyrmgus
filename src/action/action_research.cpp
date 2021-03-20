@@ -107,10 +107,12 @@ bool COrder_Research::IsValid() const
 
 PixelPos COrder_Research::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
+	Q_UNUSED(render_commands)
+
 	return lastScreenPos;
 }
 
-/* virtual */ void COrder_Research::UpdateUnitVariables(CUnit &unit) const
+void COrder_Research::UpdateUnitVariables(CUnit &unit) const
 {
 	//Wyrmgus start
 //	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->ID];

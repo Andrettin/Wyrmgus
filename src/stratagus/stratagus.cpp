@@ -259,7 +259,7 @@ static int MenuLoop()
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	CurrentCursorState = CursorState::Point;
-	cursor::set_current_cursor(nullptr);
+	cursor::set_current_cursor(nullptr, true);
 
 	// FIXME delete this when switching to full guichan GUI
 	const std::string filename = LibraryFileName("scripts/guichan.lua");

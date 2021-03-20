@@ -1575,7 +1575,7 @@ static void EditorCallbackButtonUp(unsigned button)
 {
 	if (cursor::get_current_cursor() == UI.get_cursor(cursor_type::scroll)) {
 		// Move map.
-		cursor::set_current_cursor(UI.get_cursor(cursor_type::point)); // Reset
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false); // Reset
 		return;
 	}
 
@@ -1790,7 +1790,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
 			CursorStartScreenPos = CursorScreenPos;
-			cursor::set_current_cursor(UI.get_cursor(cursor_type::scroll));
+			cursor::set_current_cursor(UI.get_cursor(cursor_type::scroll), false);
 			//Wyrmgus start
 			UnitUnderCursor = nullptr;
 			//Wyrmgus end
@@ -2243,7 +2243,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	MouseScrollState = ScrollNone;
-	cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false);
 	CursorOn = cursor_on::unknown;
 	Editor.CursorPlayer = -1;
 	Editor.CursorUnitIndex = -1;
@@ -2667,7 +2667,7 @@ void EditorMainLoop()
 
 		SetVideoSync();
 
-		cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 		current_interface_state = interface_state::normal;
 		Editor.State = EditorSelecting;
 		UI.SelectedViewport = UI.Viewports;
@@ -2716,7 +2716,7 @@ void EditorMainLoop()
 		PreMenuSetup();
 
 		current_interface_state = interface_state::menu;
-		cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 
 		Video.ClearScreen();
 	}

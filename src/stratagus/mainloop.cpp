@@ -498,7 +498,7 @@ void GameMainLoop()
 	SetCallbacks(&GameCallbacks);
 
 	SetVideoSync();
-	cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 	//Wyrmgus start
 	GameEstablishing = false;
 	//Wyrmgus end

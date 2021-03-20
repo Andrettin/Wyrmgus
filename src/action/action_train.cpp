@@ -116,6 +116,8 @@ bool COrder_Train::IsValid() const
 
 PixelPos COrder_Train::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
+	Q_UNUSED(render_commands)
+
 	return lastScreenPos;
 }
 

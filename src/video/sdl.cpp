@@ -1139,6 +1139,8 @@ void WaitEventsOneFrame()
 		++SlowFrameCounter;
 	}
 
+	const cursor *old_cursor = cursor::get_current_cursor();
+
 	InputMouseTimeout(*GetCallbacks(), ticks);
 	InputKeyTimeout(*GetCallbacks(), ticks);
 	CursorAnimate(ticks);
@@ -1180,6 +1182,13 @@ void WaitEventsOneFrame()
 		}
 	}
 	handleInput(nullptr);
+
+	const cursor *new_cursor = cursor::get_current_cursor();
+
+	if (old_cursor != new_cursor) {
+		//if the current cursor changed because of mouse events, trigger the necessary updates
+		cursor::on_current_cursor_changed();
+	}
 
 	if (!SkipGameCycle--) {
 		SkipGameCycle = SkipFrames;

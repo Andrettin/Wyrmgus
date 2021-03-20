@@ -67,6 +67,8 @@ bool COrder_Die::IsValid() const
 
 PixelPos COrder_Die::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
+	Q_UNUSED(render_commands)
+
 	return lastScreenPos;
 }
 

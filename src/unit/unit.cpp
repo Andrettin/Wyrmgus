@@ -1246,7 +1246,7 @@ bool CUnit::can_have_variation(const wyrmgus::unit_type_variation *variation) co
 	return true;
 }
 
-void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, const bool ignore_old_variation, const int image_layer, const bool emit_signal)
+void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, const bool ignore_old_variation, const int image_layer, const bool notify)
 {
 	std::string priority_variation;
 	if (image_layer == -1) {
@@ -1288,11 +1288,11 @@ void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, const bool ignor
 		}
 	}
 	if (type_variations.size() > 0) {
-		this->SetVariation(vector::get_random(type_variations), image_layer, emit_signal);
+		this->SetVariation(vector::get_random(type_variations), image_layer, notify);
 	}
 }
 
-void CUnit::SetVariation(const wyrmgus::unit_type_variation *new_variation, const int image_layer, const bool emit_signal)
+void CUnit::SetVariation(const wyrmgus::unit_type_variation *new_variation, const int image_layer, const bool notify)
 {
 	if (image_layer == -1) {
 		if (
@@ -1303,7 +1303,7 @@ void CUnit::SetVariation(const wyrmgus::unit_type_variation *new_variation, cons
 		}
 		this->Variation = new_variation ? new_variation->get_index() : 0;
 
-		if (emit_signal && this->MapLayer != nullptr && !this->Removed && game::get()->is_running()) {
+		if (notify && this->MapLayer != nullptr && !this->Removed && game::get()->is_running()) {
 			emit this->MapLayer->unit_image_changed(UnitNumber(*this), this->Type, this->GetVariation(), this->get_player_color());
 			emit this->MapLayer->unit_frame_changed(UnitNumber(*this), this->Frame);
 		}
@@ -5122,7 +5122,7 @@ int DirectionToHeading(const Vec2i &delta)
 /**
 **  Update sprite frame for new heading.
 */
-void UnitUpdateHeading(CUnit &unit, const bool emit_signal)
+void UnitUpdateHeading(CUnit &unit, const bool notify)
 {
 	//Wyrmgus start
 	//fix direction if it does not correspond to one of the defined directions
@@ -5158,7 +5158,7 @@ void UnitUpdateHeading(CUnit &unit, const bool emit_signal)
 		unit.Frame = -1;
 	}
 
-	if (emit_signal && unit.MapLayer != nullptr && !unit.Removed && game::get()->is_running()) {
+	if (notify && unit.MapLayer != nullptr && !unit.Removed && game::get()->is_running()) {
 		emit unit.MapLayer->unit_frame_changed(UnitNumber(unit), unit.Frame);
 	}
 }

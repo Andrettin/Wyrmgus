@@ -1056,7 +1056,7 @@ void SelectionChanged()
 	LastDrawnButtonPopup = nullptr;
 
 	UI.ButtonPanel.Update();
-	cursor::set_current_cursor(UI.get_cursor(cursor_type::point));
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 	CursorBuilding = nullptr;
 	CurrentCursorState = CursorState::Point;
 	UI.ButtonPanel.Update();
