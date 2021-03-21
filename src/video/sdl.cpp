@@ -82,6 +82,8 @@
 #include "video/video.h"
 #include "widgets.h"
 
+#include <QWindow>
+
 #ifdef USE_GLES_EGL
 static EGLDisplay eglDisplay;
 static EGLSurface eglSurface;
@@ -658,7 +660,10 @@ static void do_mouse_warp()
 	int yw = UI.MouseWarpPos.y;
 	UI.MouseWarpPos.x = -1;
 	UI.MouseWarpPos.y = -1;
-	SDL_WarpMouse(xw, yw);
+
+	QMetaObject::invokeMethod(QApplication::instance(), [xw, yw] {
+		QCursor::setPos(QGuiApplication::focusWindow()->mapToGlobal(QPoint(xw, yw)));
+	}, Qt::QueuedConnection);
 }
 
 /**
