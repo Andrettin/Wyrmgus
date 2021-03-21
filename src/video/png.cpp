@@ -103,6 +103,11 @@ int LoadGraphicPNG(CGraphic *g, const int scale_factor)
 void SaveScreenshotPNG(const char *name)
 {
 	const QWindow *window = QApplication::focusWindow();
+
+	if (window == nullptr) {
+		return;
+	}
+
 	const QPixmap screen_pixmap = window->screen()->grabWindow(window->winId());
 	screen_pixmap.save(name);
 }
