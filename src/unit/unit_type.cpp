@@ -2455,11 +2455,9 @@ void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraph
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player_color, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
-				sprite->render_frame(-frame - 1, pos, player_color, time_of_day, true, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), 100, render_commands);
+				sprite->DrawPlayerColorFrameClipTransX(player_color, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day, render_commands);
 			} else {
-				sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
-				sprite->render_frame(-frame - 1, pos, player_color, time_of_day, true, 255, 100, render_commands);
+				sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day, render_commands);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
