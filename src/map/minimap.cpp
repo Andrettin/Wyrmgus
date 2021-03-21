@@ -415,25 +415,18 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		QColor settlement_with_non_land_color = settlement_color;
 
 		if (is_tile_water == is_settlement_water && is_tile_space == is_settlement_space) {
-			*(uint32_t *) &(this->mode_overlay_images[minimap_mode::settlements][z].bits()[pixel_index]) = CVideo::MapRGBA(settlement_color);
+			this->mode_overlay_images[minimap_mode::settlements][z].setPixelColor(mx, my, settlement_color);
 		} else {
 			settlement_with_non_land_color.setAlpha(non_land_territory_alpha);
 		}
 
-		*(uint32_t *) &(this->mode_overlay_images[minimap_mode::settlements_with_non_land][z].bits()[pixel_index]) = CVideo::MapRGBA(settlement_with_non_land_color);
+		this->mode_overlay_images[minimap_mode::settlements_with_non_land][z].setPixelColor(mx, my, settlement_with_non_land_color);
 	}
 
-	const uint32_t c = CVideo::MapRGBA(color);
-	*(uint32_t *) &(this->mode_overlay_images[minimap_mode::territories][z].bits()[pixel_index]) = c;
-
-	const uint32_t with_non_land_c = CVideo::MapRGBA(with_non_land_color);
-	*(uint32_t *) &(this->mode_overlay_images[minimap_mode::territories_with_non_land][z].bits()[pixel_index]) = with_non_land_c;
-
-	const uint32_t realm_c = CVideo::MapRGBA(realm_color);
-	*(uint32_t *) &(this->mode_overlay_images[minimap_mode::realms][z].bits()[pixel_index]) = realm_c;
-
-	const uint32_t realm_with_non_land_c = CVideo::MapRGBA(realm_with_non_land_color);
-	*(uint32_t *) &(this->mode_overlay_images[minimap_mode::realms_with_non_land][z].bits()[pixel_index]) = realm_with_non_land_c;
+	this->mode_overlay_images[minimap_mode::territories][z].setPixelColor(mx, my, color);
+	this->mode_overlay_images[minimap_mode::territories_with_non_land][z].setPixelColor(mx, my, with_non_land_color);
+	this->mode_overlay_images[minimap_mode::realms][z].setPixelColor(mx, my, realm_color);
+	this->mode_overlay_images[minimap_mode::realms_with_non_land][z].setPixelColor(mx, my, realm_with_non_land_color);
 }
 
 const unit_type *minimap::get_unit_minimap_type(const CUnit *unit) const

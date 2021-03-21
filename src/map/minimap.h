@@ -158,7 +158,7 @@ private:
 
 	std::map<minimap_mode, std::vector<QImage>> mode_overlay_images;
 
-	//texture data for the overlay with units and unexplored terrain
+	//image for the overlay with units and unexplored terrain
 	std::vector<QImage> overlay_images;
 };
 
