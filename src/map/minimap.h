@@ -70,7 +70,7 @@ private:
 
 public:
 	void AddEvent(const Vec2i &pos, int z, IntColor color);
-	void draw_events() const;
+	void draw_events(std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 	QPoint texture_to_tile_pos(const QPoint &texture_pos) const;
 	QPoint texture_to_screen_pos(const QPoint &texture_pos) const;

@@ -595,7 +595,7 @@ void minimap::Update()
 	}
 }
 
-void minimap::draw_events() const
+void minimap::draw_events(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const unsigned char alpha = 192;
 
@@ -612,7 +612,7 @@ void minimap::draw_events() const
 			screen_pos.setY(this->Y + this->get_height() - 1);
 		}
 
-		Video.DrawTransCircleClip(MinimapEvents[i].Color, screen_pos.x(), screen_pos.y(), MinimapEvents[i].Size, alpha);
+		Video.DrawTransCircleClip(MinimapEvents[i].Color, screen_pos.x(), screen_pos.y(), MinimapEvents[i].Size, alpha, render_commands);
 		MinimapEvents[i].Size -= 1;
 		if (MinimapEvents[i].Size < 2) {
 			MinimapEvents[i] = MinimapEvents[--NumMinimapEvents];
@@ -630,7 +630,7 @@ void minimap::Draw(std::vector<std::function<void(renderer *)>> &render_commands
 	}
 
 	this->draw_image(this->overlay_images[z], z, render_commands);
-	this->draw_events();
+	this->draw_events(render_commands);
 }
 
 void minimap::draw_image(const QImage &image, const int z, std::vector<std::function<void(renderer *)>> &render_commands) const

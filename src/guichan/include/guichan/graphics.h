@@ -209,7 +209,7 @@ namespace gcn
          * @param x the x coordinate.
          * @param y the y coordinate.
          */
-        virtual void drawPoint(int x, int y) = 0;
+        virtual void drawPoint(int x, int y, std::vector<std::function<void(renderer *)>> &render_commands) = 0;
 
         /**
          * Ddraws a line.

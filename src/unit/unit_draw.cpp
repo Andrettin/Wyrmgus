@@ -231,7 +231,7 @@ void DrawSelectionNone(IntColor, int, int, int, int, std::vector<std::function<v
 void DrawSelectionCircle(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-						 std::min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
+						 std::min((x2 - x1) / 2, (y2 - y1) / 2) + 2, render_commands);
 }
 
 /**
@@ -827,7 +827,7 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 
 			if (value) {
 				// Radius -1 so you can see all ranges
-				Video.DrawCircleClip(ColorGreen, center.x, center.y, radius - 1);
+				Video.DrawCircleClip(ColorGreen, center.x, center.y, radius - 1, render_commands);
 			}
 		}
 		//Wyrmgus start
@@ -839,7 +839,7 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
-					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
+					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius, render_commands);
 				}
 			}
 			if (Preference.ShowAttackRange) {
@@ -852,7 +852,7 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 
 				if (value) {
 					// Radius +1 so you can see all ranges
-					Video.DrawCircleClip(ColorGreen, center.x, center.y, radius - 1);
+					Video.DrawCircleClip(ColorGreen, center.x, center.y, radius - 1, render_commands);
 				}
 			}
 		}
@@ -865,7 +865,7 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 				const int radius = value * defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
-					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
+					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius, render_commands);
 				}
 			}
 		}

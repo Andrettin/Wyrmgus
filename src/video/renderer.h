@@ -145,6 +145,20 @@ public:
 		this->blit_texture_frame(texture, pos, QPoint(0, 0), size, flip, opacity, 100, rendered_size);
 	}
 
+	void draw_pixel(const QPoint &pos, const QColor &color)
+	{
+		glDisable(GL_TEXTURE_2D);
+		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
+
+		const QPoint mirrored_pos = this->get_mirrored_pos(pos, 1);
+
+		glBegin(GL_POINTS);
+		glVertex2i(mirrored_pos.x(), mirrored_pos.y());
+		glEnd();
+
+		glEnable(GL_TEXTURE_2D);
+	}
+
 	void draw_rect(const QPoint &pos, const QSize &size, const QColor &color)
 	{
 		glDisable(GL_TEXTURE_2D);

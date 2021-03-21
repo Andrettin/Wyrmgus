@@ -263,11 +263,11 @@ void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, in
 	PopClipping();
 }
 
-void MyOpenGLGraphics::drawPoint(int x, int y)
+void MyOpenGLGraphics::drawPoint(int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Color c = this->getColor();
 	Video.DrawPixelClip(CVideo::MapRGBA(c.r, c.g, c.b, c.a),
-						x + mClipStack.top().xOffset, y + mClipStack.top().yOffset);
+						x + mClipStack.top().xOffset, y + mClipStack.top().yOffset, render_commands);
 }
 
 void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
