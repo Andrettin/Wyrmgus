@@ -74,7 +74,7 @@ CUserInterface &UI = *CUserInterface::get();
 */
 void ShowLoadProgress(const char *fmt, ...)
 {
-	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
+	if (SDL_WasInit(SDL_INIT_AUDIO) == 0) {
 		return;
 	}
 

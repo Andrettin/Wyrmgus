@@ -612,13 +612,6 @@ public:
 	int ViewportWidth;         /// Actual width of the window
 	int ViewportHeight;        /// Actual height of the window
 #endif
-//Wyrmgus start
-//#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
-//Wyrmgus end
-	SDL_Cursor *blankCursor;
-//Wyrmgus start
-//#endif
-//Wyrmgus end
 	int Depth;
 	bool FullScreen;
 };
@@ -652,9 +645,6 @@ extern unsigned long SlowFrameCounter;
 /// (bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette();
 
-/// The SDL screen
-extern SDL_Surface *TheScreen;
-
 /// register lua function
 extern void VideoCclRegister();
 
@@ -663,9 +653,6 @@ extern void InitVideo();
 
 /// deinitialize the video part
 void DeInitVideo();
-
-/// Check if a resolution is valid
-extern int VideoValidResolution(int w, int h);
 
 /// Load graphic from PNG file
 extern int LoadGraphicPNG(CGraphic *g, const int scale_factor);

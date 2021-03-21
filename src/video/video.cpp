@@ -277,25 +277,21 @@ void CVideo::ClearScreen()
 */
 bool CVideo::ResizeScreen(int w, int h)
 {
-	if (VideoValidResolution(w, h)) {
-		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
-		ViewportWidth = w;
-		ViewportHeight = h;
-		if (!ZoomNoResize) {
-			Width = w;
-			Height = h;
-			SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-		}
-
-		//Wyrmgus start
-		if (GameRunning) {
-			InitUserInterface();
-			UI.Load();
-		}
-		//Wyrmgus end
-		return true;
+	ViewportWidth = w;
+	ViewportHeight = h;
+	if (!ZoomNoResize) {
+		Width = w;
+		Height = h;
+		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 	}
-	return false;
+
+	//Wyrmgus start
+	if (GameRunning) {
+		InitUserInterface();
+		UI.Load();
+	}
+	//Wyrmgus end
+	return true;
 }
 
 uint32_t CVideo::MapRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a)

@@ -84,8 +84,6 @@
 
 #include <QWindow>
 
-SDL_Surface *TheScreen; /// Internal screen
-
 static std::map<int, std::string> Key2Str;
 static std::map<std::string, int> Str2Key;
 
@@ -257,7 +255,7 @@ void InitVideoSdl()
 {
 	Uint32 flags = 0;
 
-	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
+	if (SDL_WasInit(SDL_INIT_AUDIO) == 0) {
 //Wyrmgus start
 //#ifndef USE_WIN32
 //Wyrmgus end
@@ -272,7 +270,7 @@ void InitVideoSdl()
 #ifdef DEBUG
 					  SDL_INIT_NOPARACHUTE |
 #endif
-					  SDL_INIT_AUDIO | SDL_INIT_VIDEO |
+					  SDL_INIT_AUDIO |
 					  SDL_INIT_TIMER);
 		if (res < 0) {
 			throw std::runtime_error("Couldn't initialize SDL: " + std::string(SDL_GetError()));
@@ -287,66 +285,7 @@ void InitVideoSdl()
 		signal(SIGSEGV, CleanExit);
 		signal(SIGABRT, CleanExit);
 #endif
-		// Set WindowManager Title
-		if (!FullGameName.empty()) {
-			SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
-		} else {
-			const std::string name = QApplication::applicationName().toStdString();
-			SDL_WM_SetCaption(name.c_str(), name.c_str());
-		}
-
-#if ! defined(USE_WIN32)
-
-#ifndef __MORPHOS__	
-		SDL_Surface *icon = nullptr;
-		std::shared_ptr<CGraphic> g = nullptr;
-		struct stat st;
-
-		std::string FullGameNameL = FullGameName;
-		for (size_t i = 0; i < FullGameNameL.size(); ++i) {
-			FullGameNameL[i] = tolower(FullGameNameL[i]);
-		}
-
-		std::string ApplicationName = QApplication::applicationName().toStdString();
-		std::string ApplicationNameL = ApplicationName;
-		for (size_t i = 0; i < ApplicationNameL.size(); ++i) {
-			ApplicationNameL[i] = tolower(ApplicationNameL[i]);
-		}
-#endif
-		
-#endif
-#ifdef USE_WIN32
-		HWND hwnd = nullptr;
-		HICON hicon = nullptr;
-		SDL_SysWMinfo info{};
-		SDL_VERSION(&info.version);
-
-		if (SDL_GetWMInfo(&info)) {
-			hwnd = info.window;
-		}
-
-		if (hwnd) {
-			hicon = ExtractIcon(GetModuleHandle(nullptr), BINARY_NAME ".exe", 0);
-		}
-
-		if (hicon) {
-			SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
-			SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
-		}
-#endif
 	}
-
-	// Initialize the display
-
-	// Sam said: better for windows.
-	/* SDL_HWSURFACE|SDL_HWPALETTE | */
-	if (Video.FullScreen) {
-		flags |= SDL_FULLSCREEN;
-	}
-
-#ifdef USE_OPENGL
-	flags |= SDL_OPENGL | SDL_GL_DOUBLEBUFFER;
-#endif
 
 	if (!Video.Width || !Video.Height) {
 		Video.Width = 640;
@@ -357,50 +296,10 @@ void InitVideoSdl()
 		Video.Depth = 32;
 	}
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!Video.ViewportWidth || !Video.ViewportHeight) {
 		Video.ViewportWidth = Video.Width;
 		Video.ViewportHeight = Video.Height;
 	}
-	TheScreen = SDL_SetVideoMode(Video.ViewportWidth, Video.ViewportHeight, Video.Depth, flags);
-#else
-	TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, flags);
-#endif
-	if (TheScreen && (TheScreen->format->BitsPerPixel != 16
-					  && TheScreen->format->BitsPerPixel != 32)) {
-		// Only support 16 and 32 bpp, default to 16
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		TheScreen = SDL_SetVideoMode(Video.ViewportWidth, Video.ViewportHeight, 16, flags);
-#else
-		TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, 16, flags);
-#endif
-	}
-	if (TheScreen == nullptr) {
-		throw std::runtime_error("Couldn't set " + std::to_string(Video.Width) + "x" + std::to_string(Video.Height) + "x" + std::to_string(Video.Depth) + " video mode: " + std::string(SDL_GetError()));
-	}
-
-	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
-	Video.Depth = TheScreen->format->BitsPerPixel;
-
-//Wyrmgus start
-//#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
-//Wyrmgus end
-	// Must not allow SDL to switch to relative mouse coordinates
-	// with touchscreen when going fullscreen. So we don't hide the
-	// cursor, but instead set a transparent 1px cursor
-	Uint8 emptyCursor[] = {'\0'};
-	Video.blankCursor = SDL_CreateCursor(emptyCursor, emptyCursor, 1, 1, 0, 0);
-	SDL_SetCursor(Video.blankCursor);
-//Wyrmgus start
-//#else
-//Wyrmgus end
-	// Turn cursor off, we use our own.
-	//Wyrmgus start
-//	SDL_ShowCursor(SDL_DISABLE);
-	//Wyrmgus end
-//Wyrmgus start
-//#endif
-//Wyrmgus end
 
 	// Make default character translation easier
 	SDL_EnableUNICODE(1);
@@ -421,17 +320,6 @@ void InitVideoSdl()
 	ColorYellow = CVideo::MapRGB(252, 252, 0);
 
 	UI.MouseWarpPos.x = UI.MouseWarpPos.y = -1;
-}
-
-/**
-**  Check if a resolution is valid
-**
-**  @param w  Width
-**  @param h  Height
-*/
-int VideoValidResolution(int w, int h)
-{
-	return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 }
 
 static void do_mouse_warp()
@@ -1045,54 +933,5 @@ void ToggleGrabMouse(int mode)
 */
 void ToggleFullScreen()
 {
-#if defined(USE_WIN32) || defined(__APPLE__)
-	long framesize;
-	SDL_Rect clip;
-
-	if (!TheScreen) { // don't bother if there's no surface.
-		return;
-	}
-
-	Uint32 flags = TheScreen->flags;
-	int w = TheScreen->w;
-	int h = TheScreen->h;
-	int bpp = TheScreen->format->BitsPerPixel;
-
-	if (!SDL_VideoModeOK(w, h, bpp,	flags ^ SDL_FULLSCREEN)) {
-		return;
-	}
-
-	SDL_GetClipRect(TheScreen, &clip);
-
-	// save the contents of the screen.
-	framesize = w * h * TheScreen->format->BytesPerPixel;
-
-	TheScreen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
-	if (!TheScreen) {
-		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
-		if (!TheScreen) { // completely screwed.
-			throw std::runtime_error("Toggle to fullscreen, crashed all.");
-		}
-	}
-
-#ifndef USE_TOUCHSCREEN
-	// Cannot hide cursor on Windows with touchscreen, as it switches
-	// to relative mouse coordinates in fullscreen. See above initial
-	// call to ShowCursor
-	//
-	// Windows shows the SDL cursor when starting in fullscreen mode
-	// then switching to window mode.  This hides the cursor again.
-	//Wyrmgus start
-//	SDL_ShowCursor(SDL_ENABLE);
-//	SDL_ShowCursor(SDL_DISABLE);
-	//Wyrmgus end
-#endif
-
-	SDL_SetClipRect(TheScreen, &clip);
-
-#else // !USE_WIN32
-	SDL_WM_ToggleFullScreen(TheScreen);
-#endif
-
-	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
+	Video.FullScreen = !Video.FullScreen;
 }
