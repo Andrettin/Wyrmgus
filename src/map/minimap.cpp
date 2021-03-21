@@ -44,7 +44,9 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/log_util.h"
 #include "util/vector_util.h"
+#include "video/renderer.h"
 #include "video/video.h"
 
 #ifdef USE_OPENGL
@@ -94,7 +96,6 @@ minimap::minimap() : mode(minimap_mode::terrain)
 
 void minimap::create_textures(const int z)
 {
-	this->create_texture(this->terrain_textures[z], this->terrain_images[z].constBits(), z);
 	this->create_texture(this->overlay_textures[z], this->overlay_images[z].constBits(), z);
 }
 
@@ -117,12 +118,13 @@ void minimap::create_texture(GLuint &texture, const unsigned char *texture_data,
 */
 void minimap::Create()
 {
-	this->terrain_textures.resize(CMap::get()->MapLayers.size());
 	this->overlay_textures.resize(CMap::get()->MapLayers.size());
 	MinimapTextureWidth.resize(CMap::get()->MapLayers.size());
 	MinimapTextureHeight.resize(CMap::get()->MapLayers.size());
 
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+		this->terrain_textures.push_back(std::make_unique<QOpenGLTexture>(QOpenGLTexture::Target2D));
+
 		// Scale to biggest value.
 		int n = std::max(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
 		n = std::max(n, 32);
@@ -193,16 +195,13 @@ void minimap::Create()
 	NumMinimapEvents = 0;
 }
 
-/**
-**  Free OpenGL minimap
-*/
+void minimap::free_textures()
+{
+	this->terrain_textures.clear();
+}
+
 void minimap::FreeOpenGL()
 {
-	for (size_t z = 0; z < this->terrain_textures.size(); ++z) {
-		glDeleteTextures(1, &this->terrain_textures[z]);
-	}
-	this->terrain_textures.clear();
-
 	for (size_t z = 0; z < this->overlay_textures.size(); ++z) {
 		glDeleteTextures(1, &this->overlay_textures[z]);
 	}
@@ -674,12 +673,30 @@ void minimap::draw_events() const
 	}
 }
 
-void minimap::Draw() const
+void minimap::Draw(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const int z = UI.CurrentMapLayer->ID;
 
 	if (this->is_terrain_visible()) {
-		this->draw_texture(this->terrain_textures[z], this->terrain_images[z].constBits(), z);
+		QRect rect = this->get_texture_draw_rect(z);
+
+		render_commands.push_back([this, image = this->terrain_images[z], z, rect](renderer *renderer) {
+			QOpenGLTexture *texture = this->terrain_textures[z].get();
+
+			if (texture == nullptr) {
+				log::log_error("Minimap terrain texture is null.");
+				return;
+			}
+
+			if (image.isNull()) {
+				log::log_error("Minimap terrain image is null.");
+				return;
+			}
+
+			texture->setData(image);
+
+			renderer->blit_texture_frame(texture, QPoint(X, Y), rect.topLeft(), rect.size(), false, 255, 100, QSize(W, H));
+		});
 	}
 
 	this->draw_texture(this->overlay_textures[z], this->overlay_images[z].constBits(), z);
@@ -777,12 +794,7 @@ QPoint minimap::tile_to_screen_pos(const QPoint &tile_pos) const
 */
 void minimap::Destroy()
 {
-	for (size_t z = 0; z < this->terrain_images.size(); ++z) {
-		glDeleteTextures(1, &this->terrain_textures[z]);
-	}
 	this->terrain_images.clear();
-	this->terrain_textures.clear();
-
 	this->mode_overlay_images.clear();
 
 	for (size_t z = 0; z < this->overlay_images.size(); ++z) {

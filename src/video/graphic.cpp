@@ -1398,7 +1398,7 @@ void CGraphic::render(const QPoint &pixel_pos, std::vector<std::function<void(re
 	render_commands.push_back([this, pixel_pos](renderer *renderer) {
 		const QOpenGLTexture *texture = this->get_or_create_texture(nullptr, nullptr, false);
 
-		renderer->blit_texture(texture, pixel_pos, this->get_size(), false, 255);
+		renderer->blit_texture(texture, pixel_pos, this->get_size(), false, 255, this->get_size());
 	});
 }
 
@@ -1421,7 +1421,7 @@ void CGraphic::render_rect(const player_color *player_color, const QRect &rect, 
 	render_commands.push_back([this, player_color, rect, pixel_pos, grayscale, opacity](renderer *renderer) {
 		const QOpenGLTexture *texture = this->get_or_create_texture(player_color, nullptr, grayscale);
 
-		renderer->blit_texture_frame(texture, pixel_pos, rect.topLeft(), rect.size(), false, opacity, 100);
+		renderer->blit_texture_frame(texture, pixel_pos, rect.topLeft(), rect.size(), false, opacity, 100, rect.size());
 	});
 }
 

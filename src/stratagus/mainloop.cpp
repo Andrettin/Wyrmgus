@@ -230,7 +230,7 @@ void UpdateDisplay()
 			DrawMenuButtonArea(render_commands);
 			DrawUserDefinedButtons(render_commands);
 
-			UI.get_minimap()->Draw();
+			UI.get_minimap()->Draw(render_commands);
 			UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport);
 
 			UI.InfoPanel.Draw(render_commands);

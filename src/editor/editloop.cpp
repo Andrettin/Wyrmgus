@@ -1532,7 +1532,7 @@ void EditorUpdateDisplay()
 
 	// Minimap
 	if (UI.SelectedViewport) {
-		UI.get_minimap()->Draw();
+		UI.get_minimap()->Draw(render_commands);
 		UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport);
 	}
 	// Info panel
