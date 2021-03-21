@@ -205,6 +205,8 @@ extern void HandleMouseMove(const PixelPos &pos);
 /// Called if the mouse exits the game window (only for some videomodes)
 extern void HandleMouseExit();
 
+extern void Screenshot();
+
 /// Update KeyModifiers if a key is pressed
 extern int HandleKeyModifiersDown(unsigned keycode, unsigned keychar);
 /// Update KeyModifiers if a key is released

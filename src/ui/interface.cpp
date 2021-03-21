@@ -1214,7 +1214,7 @@ static int InputKey(int key)
 /**
 **  Save a screenshot.
 */
-static void Screenshot()
+void Screenshot()
 {
 	CFile fd;
 	char filename[30];
@@ -1262,14 +1262,6 @@ int HandleKeyModifiersDown(unsigned key, unsigned)
 		case SDLK_LSUPER:
 		case SDLK_RSUPER:
 			KeyModifiers |= ModifierSuper;
-			return 1;
-		case SDLK_SYSREQ:
-		case SDLK_PRINT:
-		case SDLK_F11:
-			Screenshot();
-			if (GameRunning) {
-				SetMessage("%s", _("Screenshot made."));
-			}
 			return 1;
 		default:
 			break;
@@ -1350,6 +1342,19 @@ static bool IsKeyPad(unsigned key, unsigned *kp)
 */
 void HandleKeyDown(unsigned key, unsigned keychar)
 {
+	switch (key) {
+		case SDLK_SYSREQ:
+		case SDLK_PRINT:
+		case SDLK_F11:
+			Screenshot();
+			if (GameRunning) {
+				SetMessage("%s", _("Screenshot made."));
+			}
+			return;
+		default:
+			break;
+	}
+
 	if (HandleKeyModifiersDown(key, keychar)) {
 		return;
 	}

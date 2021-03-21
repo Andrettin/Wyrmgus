@@ -1806,6 +1806,16 @@ static void EditorCallbackButtonDown(unsigned button)
 */
 static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 {
+	switch (key) {
+		case SDLK_SYSREQ:
+		case SDLK_PRINT:
+		case SDLK_F11:
+			Screenshot();
+			return;
+		default:
+			break;
+	}
+
 	if (HandleKeyModifiersDown(key, keychar)) {
 		return;
 	}

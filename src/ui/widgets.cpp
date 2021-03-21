@@ -80,6 +80,16 @@ static void MenuHandleMouseMove(const PixelPos &screenPos)
 
 static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 {
+	switch (key) {
+		case SDLK_SYSREQ:
+		case SDLK_PRINT:
+		case SDLK_F11:
+			Screenshot();
+			return;
+		default:
+			break;
+	}
+
 	HandleKeyModifiersDown(key, keychar);
 }
 
