@@ -805,6 +805,7 @@ static SDLKey qt_key_to_sdl_key(const Qt::Key qt_key)
 		case Qt::Key_Escape:
 			return SDLK_ESCAPE;
 		case Qt::Key_Tab:
+		case Qt::Key_Backtab:
 			return SDLK_TAB;
 		case Qt::Key_Backspace:
 			return SDLK_BACKSPACE;
