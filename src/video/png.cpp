@@ -32,6 +32,10 @@
 #include "iocompat.h"
 #include "video/video.h"
 
+#include <QPixmap>
+#include <QScreen>
+#include <QWindow>
+
 #ifdef USE_OPENGL
 #ifdef __APPLE__
 #define GL_GLEXT_PROTOTYPES 1
@@ -98,17 +102,7 @@ int LoadGraphicPNG(CGraphic *g, const int scale_factor)
 */
 void SaveScreenshotPNG(const char *name)
 {
-	QImage image(Video.ViewportWidth, Video.ViewportHeight, QImage::Format_RGB888);
-	image.fill(Qt::transparent);
-
-	glPixelStorei(GL_PACK_ALIGNMENT, 1); //allows screenshots of resolution widths that aren't multiples of 4
-#ifdef USE_OPENGL
-	glReadBuffer(GL_FRONT);
-#endif
-	glReadPixels(0, 0, image.width(), image.height(), GL_RGB, GL_UNSIGNED_BYTE, image.bits());
-
-	//we need to flip the image vertically, as glReadPixels returns a vertically-inverted image
-	const QImage screenshot_image = image.mirrored(false, true);
-
-	screenshot_image.save(name);
+	const QWindow *window = QApplication::focusWindow();
+	const QPixmap screen_pixmap = window->screen()->grabWindow(window->winId());
+	screen_pixmap.save(name);
 }

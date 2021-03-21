@@ -661,7 +661,7 @@ static void do_mouse_warp()
 	UI.MouseWarpPos.y = -1;
 
 	QMetaObject::invokeMethod(QApplication::instance(), [xw, yw] {
-		QCursor::setPos(QGuiApplication::focusWindow()->mapToGlobal(QPoint(xw, yw)));
+		QCursor::setPos(QApplication::focusWindow()->mapToGlobal(QPoint(xw, yw)));
 	}, Qt::QueuedConnection);
 }
 
