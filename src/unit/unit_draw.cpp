@@ -659,7 +659,7 @@ void DrawShadow(const unit_type &type, const std::shared_ptr<CGraphic> &sprite, 
 //			type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			//Wyrmgus end
-			sprite->render_frame(nullptr, nullptr, -frame - 1, pos, true, render_commands);
+			sprite->render_frame(-frame - 1, pos, nullptr, nullptr, true, render_commands);
 		} else {
 			//Wyrmgus start
 //			type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
@@ -699,15 +699,15 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_pt
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 				sprite->DrawPlayerColorFrameClipTransX(player_color, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
-				sprite->render_frame(player_color, time_of_day, -frame - 1, pos, true, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
+				sprite->render_frame(-frame - 1, pos, player_color, time_of_day, true, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 			} else {
 				sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
-				sprite->render_frame(player_color, time_of_day, -frame - 1, pos, true, render_commands);
+				sprite->render_frame(-frame - 1, pos, player_color, time_of_day, true, render_commands);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 				sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
-				sprite->render_frame(player_color, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
+				sprite->render_frame(frame, pos, player_color, time_of_day, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 			} else {
 				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 			}
@@ -722,7 +722,7 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_pt
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
-			sprite->render_frame(player_color, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
+			sprite->render_frame(frame, pos, player_color, time_of_day, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 		} else {
 			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 		}
@@ -744,15 +744,15 @@ void DrawOverlay(const unit_type &type, const std::shared_ptr<CGraphic> &sprite,
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 				sprite->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
-				sprite->render_frame(nullptr, time_of_day, -frame - 1, pos, true, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
+				sprite->render_frame(-frame - 1, pos, nullptr, time_of_day, true, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 			} else {
 				sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, time_of_day);
-				sprite->render_frame(nullptr, time_of_day, -frame - 1, pos, true, render_commands);
+				sprite->render_frame(-frame - 1, pos, nullptr, time_of_day, true, render_commands);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 				sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day, render_commands);
-				sprite->render_frame(nullptr, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
+				sprite->render_frame(frame, pos, nullptr, time_of_day, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 			} else {
 				sprite->DrawFrameClip(frame, pos.x, pos.y, time_of_day, render_commands);
 			}
@@ -767,7 +767,7 @@ void DrawOverlay(const unit_type &type, const std::shared_ptr<CGraphic> &sprite,
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 			sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day, render_commands);
-			sprite->render_frame(nullptr, time_of_day, frame, pos, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
+			sprite->render_frame(frame, pos, nullptr, time_of_day, false, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), render_commands);
 		} else {
 			sprite->DrawFrameClip(frame, pos.x, pos.y, time_of_day, render_commands);
 		}
@@ -913,7 +913,7 @@ static void DrawConstructionShadow(const CUnit &unit, const unit_type &type, con
 			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
 			if (frame < 0) {
 				variation->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-				variation->ShadowSprite->render_frame(nullptr, nullptr, -frame - 1, pos, true, render_commands);
+				variation->ShadowSprite->render_frame(-frame - 1, pos, nullptr, nullptr, true, render_commands);
 			} else {
 				variation->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y, render_commands);
 			}
@@ -923,7 +923,7 @@ static void DrawConstructionShadow(const CUnit &unit, const unit_type &type, con
 			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-				type.ShadowSprite->render_frame(nullptr, nullptr, -frame - 1, pos, true, render_commands);
+				type.ShadowSprite->render_frame(-frame - 1, pos, nullptr, nullptr, true, render_commands);
 			} else {
 				type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y, render_commands);
 			}
@@ -955,7 +955,7 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 			pos.y -= construction->get_frame_height() * scale_factor / 2;
 			if (frame < 0) {
 				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
-				construction->get_graphics()->render_frame(player_color, time_of_day, -frame - 1, pos, true, render_commands);
+				construction->get_graphics()->render_frame(-frame - 1, pos, player_color, time_of_day, true, render_commands);
 			} else {
 				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 			}
@@ -965,7 +965,7 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 			pos.y -= construction->get_frame_height() * scale_factor / 2;
 			if (frame < 0) {
 				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
-				construction->get_graphics()->render_frame(player_color, time_of_day, -frame - 1, pos, true, render_commands);
+				construction->get_graphics()->render_frame(-frame - 1, pos, player_color, time_of_day, true, render_commands);
 			} else {
 				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 			}
