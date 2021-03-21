@@ -58,7 +58,6 @@ public:
 	void Destroy();
 	void Draw(std::vector<std::function<void(renderer *)>> &render_commands) const;
 	void draw_image(const QImage &image, const int z, std::vector<std::function<void(renderer *)>> &render_commands) const;
-	void draw_texture(const GLuint &texture, const unsigned char *texture_data, const int z) const;
 	void DrawViewportArea(const CViewport &viewport) const;
 
 private:

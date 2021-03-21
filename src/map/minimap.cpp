@@ -649,29 +649,6 @@ void minimap::draw_image(const QImage &image, const int z, std::vector<std::func
 	});
 }
 
-void minimap::draw_texture(const GLuint &texture, const unsigned char *texture_data, const int z) const
-{
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth[z], MinimapTextureHeight[z], GL_RGBA, GL_UNSIGNED_BYTE, texture_data);
-
-	const QRect texture_draw_rect = this->get_texture_draw_rect(z);
-	const float start_x = static_cast<float>(texture_draw_rect.x()) / MinimapTextureWidth[z];
-	const float start_y = static_cast<float>(texture_draw_rect.y()) / MinimapTextureHeight[z];
-	const float end_x = static_cast<float>(texture_draw_rect.x() + texture_draw_rect.width()) / MinimapTextureWidth[z];
-	const float end_y = static_cast<float>(texture_draw_rect.y() + texture_draw_rect.height()) / MinimapTextureHeight[z];
-
-	glBegin(GL_QUADS);
-	glTexCoord2f(start_x, start_y);
-	glVertex2i(X, Y);
-	glTexCoord2f(start_x, end_y);
-	glVertex2i(X, Y + H);
-	glTexCoord2f(end_x, end_y);
-	glVertex2i(X + W, Y + H);
-	glTexCoord2f(end_x, start_y);
-	glVertex2i(X + W, Y);
-	glEnd();
-}
-
 QPoint minimap::texture_to_tile_pos(const QPoint &texture_pos) const
 {
 	const int z = UI.CurrentMapLayer->ID;
