@@ -775,6 +775,7 @@ static bool CommandKey(int key)
 			break;
 
 		case SDLK_EQUALS: // plus is shift-equals.
+		case SDLK_PLUS:
 		case SDLK_KP_PLUS:
 			UiIncreaseGameSpeed();
 			break;
