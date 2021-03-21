@@ -91,7 +91,7 @@ QImage unit_image_provider::requestImage(const QString &id, QSize *size, const Q
 
 			engine_interface::get()->sync([&graphics]() {
 				//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
-				graphics->Load(false, defines::get()->get_scale_factor());
+				graphics->Load(defines::get()->get_scale_factor());
 			});
 		} else {
 			graphics->get_load_mutex().unlock();

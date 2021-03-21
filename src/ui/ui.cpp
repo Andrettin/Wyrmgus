@@ -209,13 +209,13 @@ void CUserInterface::Load()
 	}
 
 	if (InfoPanel.G) {
-		InfoPanel.G->Load(false, defines::get()->get_scale_factor());
+		InfoPanel.G->Load(defines::get()->get_scale_factor());
 	}
 	if (ButtonPanel.G) {
-		ButtonPanel.G->Load(false, defines::get()->get_scale_factor());
+		ButtonPanel.G->Load(defines::get()->get_scale_factor());
 	}
 	if (PieMenu.G) {
-		PieMenu.G->Load(false, defines::get()->get_scale_factor());
+		PieMenu.G->Load(defines::get()->get_scale_factor());
 	}
 
 	//  Resolve cursors

@@ -933,7 +933,7 @@ static int CclDefineTileset(lua_State *l)
 
 	ShowLoadProgress(_("Loading Tileset \"%s\""), CMap::get()->Tileset->ImageFile.c_str());
 	CMap::get()->TileGraphic = CGraphic::New(CMap::get()->Tileset->ImageFile, wyrmgus::defines::get()->get_tile_size());
-	CMap::get()->TileGraphic->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	CMap::get()->TileGraphic->Load(defines::get()->get_scale_factor());
 	return 0;
 }
 /**

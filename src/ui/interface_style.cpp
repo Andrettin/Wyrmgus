@@ -63,7 +63,7 @@ void interface_style::initialize()
 		this->top_bar_graphics = CGraphic::New(this->top_bar_file.string());
 
 		//this is necessary for now, to ensure the top bar graphics are loaded in the Wyrmgus thread's context
-		this->top_bar_graphics->Load(false, defines::get()->get_scale_factor());
+		this->top_bar_graphics->Load(defines::get()->get_scale_factor());
 	}
 
 	if (this->large_button != nullptr) {

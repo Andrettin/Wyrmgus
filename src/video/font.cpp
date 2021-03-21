@@ -786,7 +786,7 @@ void font::load()
 		return;
 	}
 
-	this->G->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	this->G->Load(defines::get()->get_scale_factor());
 	this->MeasureWidths();
 }
 

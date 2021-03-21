@@ -95,7 +95,7 @@ void cursor::on_current_cursor_changed()
 
 	if (cursor != nullptr) {
 		if (!cursor->get_graphics()->IsLoaded()) {
-			cursor->get_graphics()->Load(false, defines::get()->get_scale_factor());
+			cursor->get_graphics()->Load(defines::get()->get_scale_factor());
 		}
 
 		const QPixmap pixmap = QPixmap::fromImage(cursor->get_graphics()->get_or_create_frame_image(0, nullptr));

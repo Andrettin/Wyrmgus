@@ -107,27 +107,27 @@ void defines::process_sml_scope(const sml_data &scope)
 void defines::initialize()
 {
 	if (this->icon_frame_graphics != nullptr) {
-		this->icon_frame_graphics->Load(false, this->get_scale_factor());
+		this->icon_frame_graphics->Load(this->get_scale_factor());
 	}
 
 	if (this->pressed_icon_frame_graphics != nullptr) {
-		this->pressed_icon_frame_graphics->Load(false, this->get_scale_factor());
+		this->pressed_icon_frame_graphics->Load(this->get_scale_factor());
 	}
 
 	if (this->command_button_frame_graphics != nullptr) {
-		this->command_button_frame_graphics->Load(false, this->get_scale_factor());
+		this->command_button_frame_graphics->Load(this->get_scale_factor());
 	}
 
 	if (this->bar_frame_graphics != nullptr) {
-		this->bar_frame_graphics->Load(false, this->get_scale_factor());
+		this->bar_frame_graphics->Load(this->get_scale_factor());
 	}
 
 	if (this->infopanel_frame_graphics != nullptr) {
-		this->infopanel_frame_graphics->Load(false, this->get_scale_factor());
+		this->infopanel_frame_graphics->Load(this->get_scale_factor());
 	}
 
 	if (this->progress_bar_graphics != nullptr) {
-		this->progress_bar_graphics->Load(false, this->get_scale_factor());
+		this->progress_bar_graphics->Load(this->get_scale_factor());
 	}
 }
 

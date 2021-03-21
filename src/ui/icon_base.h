@@ -60,11 +60,6 @@ public:
 
 	virtual const QSize &get_size() const = 0;
 
-	virtual bool is_grayscale_enabled() const
-	{
-		return false;
-	}
-
 	const std::filesystem::path &get_file() const
 	{
 		return this->file;

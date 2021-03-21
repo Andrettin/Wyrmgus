@@ -34,13 +34,6 @@
 
 #include "video/renderer.h"
 
-#ifdef USE_OPENGL
-#ifdef __APPLE__
-#define GL_GLEXT_PROTOTYPES 1
-#endif
-#include <SDL_opengl.h>
-#endif
-
 /**
 ** Bitmask, denoting a position left/right/above/below clip rectangle
 ** (mainly used by VideoDrawLineClip)
@@ -320,16 +313,6 @@ void DrawLine(uint32_t color, int x1, int y1, int x2, int y2, std::vector<std::f
 	}
 
 	CVideo::GetRGBA(color, &r, &g, &b, &a);
-
-	glDisable(GL_TEXTURE_2D);
-	glColor4ub(r, g, b, a);
-
-	glBegin(GL_LINES);
-	glVertex2f(xx1, yy1);
-	glVertex2f(xx2, yy2);
-	glEnd();
-
-	glEnable(GL_TEXTURE_2D);
 
 	render_commands.push_back([xx1, yy1, xx2, yy2, r, g, b, a](renderer *renderer) {
 		renderer->draw_line(QPoint(xx1, yy1), QPoint(xx2, yy2), QColor(r, g, b, a));

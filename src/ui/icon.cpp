@@ -91,12 +91,6 @@ const QSize &icon::get_size() const
 	return defines::get()->get_icon_size();
 }
 
-bool icon::is_grayscale_enabled() const
-{
-	return Preference.GrayscaleIcons;
-}
-
-
 std::shared_ptr<CPlayerColorGraphic> icon::get_graphics() const
 {
 	return std::static_pointer_cast<CPlayerColorGraphic>(icon_base::get_graphics());

@@ -150,7 +150,7 @@ public:
 		return CGraphic::New(filepath.string(), size);
 	}
 
-	void Load(const bool create_grayscale_textures = false, const int scale_factor = 1);
+	void Load(const int scale_factor = 1);
 	void Resize(int w, int h);
 	void SetOriginalSize();
 

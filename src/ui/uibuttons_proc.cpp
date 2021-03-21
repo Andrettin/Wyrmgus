@@ -75,7 +75,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 		}
 	}
 	if (pimage->Sprite) {
-		pimage->Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
+		pimage->Sprite->Load(defines::get()->get_scale_factor());
 	}
 	if (pimage->Sprite) {
 		auto colorGraphic = std::dynamic_pointer_cast<CPlayerColorGraphic>(pimage->Sprite);

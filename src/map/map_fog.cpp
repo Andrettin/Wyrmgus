@@ -963,7 +963,7 @@ void CMap::InitFogOfWar()
 	//calculate this once from the settings and store it
 	FogOfWarColorSDL = CVideo::MapRGB(FogOfWarColor);
 
-	fog_graphic->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	fog_graphic->Load(defines::get()->get_scale_factor());
 
 	//Wyrmgus start
 //	VisibleTable.clear();

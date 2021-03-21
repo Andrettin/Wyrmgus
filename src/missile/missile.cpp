@@ -166,7 +166,7 @@ void missile_type::set_image_file(const std::filesystem::path &filepath)
 void missile_type::LoadMissileSprite()
 {
 	if (this->G && !this->G->IsLoaded()) {
-		this->G->Load(false, defines::get()->get_scale_factor());
+		this->G->Load(defines::get()->get_scale_factor());
 
 		// Correct the number of frames in graphic
 		Assert(this->G->NumFrames >= this->get_frames());

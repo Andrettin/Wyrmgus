@@ -86,7 +86,6 @@ public:
 	virtual void initialize() override;
 
 	virtual const QSize &get_size() const override;
-	virtual bool is_grayscale_enabled() const override;
 
 	player_color *get_conversible_player_color() const
 	{

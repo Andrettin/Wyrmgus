@@ -56,13 +56,6 @@
 #include "video/video.h"
 #include "xbrz.h"
 
-#ifdef USE_OPENGL
-#ifdef __APPLE__
-#define GL_GLEXT_PROTOTYPES 1
-#endif
-#include <SDL_opengl.h>
-#endif
-
 std::map<std::string, std::weak_ptr<CGraphic>> CGraphic::graphics_by_filepath;
 std::list<CGraphic *> CGraphic::graphics;
 
@@ -595,7 +588,7 @@ static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
 **
 **  @param grayscale  Make a grayscale surface
 */
-void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor)
+void CGraphic::Load(const int scale_factor)
 {
 	std::lock_guard lock(this->load_mutex);
 
@@ -911,11 +904,11 @@ CFiller &CFiller::operator =(const CFiller &other_filler)
 void CFiller::Load()
 {
 	if (this->G != nullptr) {
-		this->G->Load(false, wyrmgus::defines::get()->get_scale_factor());
+		this->G->Load(defines::get()->get_scale_factor());
 	}
 
-	this->X *= wyrmgus::defines::get()->get_scale_factor();
-	this->Y *= wyrmgus::defines::get()->get_scale_factor();
+	this->X *= defines::get()->get_scale_factor();
+	this->Y *= defines::get()->get_scale_factor();
 
 	if (this->X < 0) {
 		this->X = Video.Width + this->X;

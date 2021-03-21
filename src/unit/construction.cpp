@@ -96,7 +96,7 @@ void construction::load()
 {
 	if (!this->image_file.empty()) {
 		this->graphics = CPlayerColorGraphic::New(this->image_file, this->get_frame_size(), nullptr);
-		this->graphics->Load(false, wyrmgus::defines::get()->get_scale_factor());
+		this->graphics->Load(defines::get()->get_scale_factor());
 		IncItemsLoaded();
 	}
 }
