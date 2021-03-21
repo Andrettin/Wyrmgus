@@ -36,13 +36,6 @@
 #include <QScreen>
 #include <QWindow>
 
-#ifdef USE_OPENGL
-#ifdef __APPLE__
-#define GL_GLEXT_PROTOTYPES 1
-#endif
-#include <SDL_opengl.h>
-#endif
-
 /**
 **  Load a png graphic file.
 **

@@ -49,13 +49,6 @@
 #include "results.h"
 //Wyrmgus end
 
-#ifdef USE_OPENGL
-#ifdef __APPLE__
-#define GL_GLEXT_PROTOTYPES 1
-#endif
-#include <SDL_opengl.h>
-#endif
-
 // Guichan stuff we need
 std::unique_ptr<gcn::Gui> Gui;         /// A Gui object - binds it all together
 static std::unique_ptr<gcn::SDLInput> Input;  /// Input driver

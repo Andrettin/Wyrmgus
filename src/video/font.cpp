@@ -37,13 +37,6 @@
 #include "video/font_color.h"
 #include "video/video.h"
 
-#ifdef USE_OPENGL
-#ifdef __APPLE__
-#define GL_GLEXT_PROTOTYPES 1
-#endif
-#include <SDL_opengl.h>
-#endif
-
 static const wyrmgus::font_color *LastTextColor;      /// Last text color
 
 namespace wyrmgus {

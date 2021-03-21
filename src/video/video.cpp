@@ -91,17 +91,6 @@
 
 #include <SDL.h>
 
-#ifdef USE_GLES
-#include "GLES/gl.h"
-#endif
-
-#ifdef USE_OPENGL
-#ifdef __APPLE__
-#define GL_GLEXT_PROTOTYPES 1
-#endif
-#include <SDL_opengl.h>
-#endif
-
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
 #define RSHIFT  0
 #define GSHIFT  8

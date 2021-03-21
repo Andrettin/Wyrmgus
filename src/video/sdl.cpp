@@ -39,26 +39,9 @@
 #endif
 
 #include <SDL.h>
-#include <SDL_syswm.h>
-
-#ifdef USE_GLES_EGL
-#include "EGL/egl.h"
-#endif
-
-#ifdef USE_GLES
-#include "GLES/gl.h"
-#endif
-
-#ifdef USE_OPENGL
-#include <SDL_opengl.h>
-#endif
 
 #ifdef USE_BEOS
 #include <sys/socket.h>
-#endif
-
-#ifdef USE_WIN32
-#include <shellapi.h>
 #endif
 
 #include "editor.h"
@@ -253,8 +236,6 @@ static void InitKey2Str()
 */
 void InitVideoSdl()
 {
-	Uint32 flags = 0;
-
 	if (SDL_WasInit(SDL_INIT_AUDIO) == 0) {
 //Wyrmgus start
 //#ifndef USE_WIN32
