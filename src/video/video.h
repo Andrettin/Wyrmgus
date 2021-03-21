@@ -60,6 +60,8 @@ class CGraphic : public gcn::Image
 	};
 
 public:
+	static void free_all_textures();
+
 	static std::map<std::string, std::weak_ptr<CGraphic>> graphics_by_filepath;
 	static std::list<CGraphic *> graphics;
 
@@ -422,6 +424,13 @@ public:
 
 	void render_rect(const player_color *player_color, const QRect &rect, const QPoint &pixel_pos, const bool grayscale, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands);
 
+	bool has_textures() const
+	{
+		return this->texture != nullptr || this->grayscale_texture != nullptr || !this->color_modification_textures.empty() || !this->player_color_textures.empty() || !this->player_color_color_modification_textures.empty();
+	}
+
+	void free_textures();
+
 private:
 	std::filesystem::path filepath;
 public:
@@ -689,14 +698,12 @@ extern int VideoValidResolution(int w, int h);
 /// Load graphic from PNG file
 extern int LoadGraphicPNG(CGraphic *g, const int scale_factor);
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-
 /// Make an OpenGL texture
-extern void MakeTexture(CGraphic *graphic, const bool grayscale, const wyrmgus::time_of_day *time_of_day);
+extern void MakeTexture(CGraphic *graphic, const bool grayscale, const time_of_day *time_of_day);
 //Wyrmgus start
 extern void MakeTextures2(const QImage &image, GLuint texture, const int ow, const int oh, const wyrmgus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
-extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, const wyrmgus::player_color *player_color, const wyrmgus::time_of_day *time_of_day = nullptr);
+extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, const player_color *player_color, const time_of_day *time_of_day = nullptr);
 
 /// Regenerate Window screen if needed
 extern void ValidateOpenGLScreen();
@@ -707,8 +714,6 @@ extern void FreeOpenGLGraphics();
 extern void ReloadGraphics();
 /// Reload OpenGL
 extern void ReloadOpenGL();
-
-#endif
 
 /// Initializes video synchronization.
 extern void SetVideoSync();

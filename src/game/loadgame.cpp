@@ -125,6 +125,8 @@ static void delete_lua_callbacks()
 */
 void CleanModules()
 {
+	CGraphic::free_all_textures();
+
 	EndReplayLog();
 	CleanMessages();
 
@@ -155,7 +157,7 @@ void CleanModules()
 	//delete lua callbacks, as that needs to be done before closing the Lua state, and database clearing is done in the Qt main thread
 	delete_lua_callbacks();
 
-	wyrmgus::database::get()->clear();
+	database::get()->clear();
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
 }

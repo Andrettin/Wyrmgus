@@ -813,6 +813,21 @@ void font::Reload()
 	}
 }
 
+void font::free_textures(std::vector<std::function<void(renderer *)>> &render_commands)
+{
+	for (const auto &kv_pair : this->font_color_graphics) {
+		std::shared_ptr<CGraphic> graphic = kv_pair.second;
+
+		if (!graphic->has_textures()) {
+			continue;
+		}
+
+		render_commands.push_back([graphic](renderer *) {
+			graphic->free_textures();
+		});
+	}
+}
+
 }
 
 void FreeOpenGLFonts()

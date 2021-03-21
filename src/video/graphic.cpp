@@ -48,7 +48,10 @@
 #include "unit/unit.h" //for using CPreference
 //Wyrmgus end
 #include "util/image_util.h"
+#include "util/log_util.h"
 #include "util/point_util.h"
+#include "video/font.h"
+#include "video/render_context.h"
 #include "video/renderer.h"
 #include "video/video.h"
 #include "xbrz.h"
@@ -63,6 +66,31 @@
 std::map<std::string, std::weak_ptr<CGraphic>> CGraphic::graphics_by_filepath;
 std::list<CGraphic *> CGraphic::graphics;
 
+void CGraphic::free_all_textures()
+{
+	std::shared_lock<std::shared_mutex> lock(CGraphic::mutex);
+
+	std::vector<std::function<void(renderer *)>> render_commands;
+
+	for (const auto &kv_pair : CGraphic::graphics_by_filepath) {
+		std::shared_ptr<CGraphic> graphic = kv_pair.second.lock();
+
+		if (!graphic->has_textures()) {
+			continue;
+		}
+
+		render_commands.push_back([graphic](renderer *) {
+			graphic->free_textures();
+		});
+	}
+
+	for (font *font : font::get_all()) {
+		font->free_textures(render_commands);
+	}
+
+	render_context::get()->set_commands(std::move(render_commands));
+}
+
 CGraphic::~CGraphic()
 {
 	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
@@ -71,6 +99,10 @@ CGraphic::~CGraphic()
 
 	if (!this->HashFile.empty()) {
 		CGraphic::graphics_by_filepath.erase(this->HashFile);
+	}
+
+	if (this->has_textures()) {
+		log::log_error("Graphic \"" + this->get_filepath().string() + "\" is being destroyed before its textures have been freed in the Qt OpenGL context.");
 	}
 
 	if (this->textures != nullptr) {
@@ -1423,6 +1455,15 @@ void CGraphic::render_rect(const player_color *player_color, const QRect &rect, 
 
 		renderer->blit_texture_frame(texture, pixel_pos, rect.topLeft(), rect.size(), false, opacity, 100, rect.size());
 	});
+}
+
+void CGraphic::free_textures()
+{
+	this->texture.reset();
+	this->grayscale_texture.reset();
+	this->color_modification_textures.clear();
+	this->player_color_textures.clear();
+	this->player_color_color_modification_textures.clear();
 }
 
 CFiller &CFiller::operator =(const CFiller &other_filler)

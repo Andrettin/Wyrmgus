@@ -86,8 +86,10 @@ public:
 	template<bool CLIP>
 	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands) const;
 
+	void free_textures(std::vector<std::function<void(renderer *)>> &render_commands);
+
 private:
-	void make_font_color_texture(const wyrmgus::font_color *fc);
+	void make_font_color_texture(const font_color *fc);
 	void MeasureWidths();
 
 private:
@@ -95,7 +97,7 @@ private:
 	QSize size;
 	std::vector<char> char_width; //real font width (starting with ' ')
 	std::shared_ptr<CGraphic> G; /// Graphic object used to draw
-	std::map<const wyrmgus::font_color *, std::unique_ptr<CGraphic>> font_color_graphics;
+	std::map<const font_color *, std::shared_ptr<CGraphic>> font_color_graphics;
 };
 
 }
