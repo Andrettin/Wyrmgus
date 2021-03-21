@@ -39,6 +39,7 @@
 #include "sound/sound.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "util/exception_util.h"
 #include "util/queue_util.h"
 
 namespace wyrmgus {
@@ -107,11 +108,15 @@ void engine_interface::call_lua_command(const QString &command)
 
 void engine_interface::play_sound(const QString &sound_identifier)
 {
-	const sound *sound = sound::get(sound_identifier.toStdString());
+	try {
+		const sound *sound = sound::get(sound_identifier.toStdString());
 
-	this->post([sound]() {
-		PlayGameSound(sound, MaxSampleVolume);
-	});
+		this->post([sound]() {
+			PlayGameSound(sound, MaxSampleVolume);
+		});
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+	}
 }
 
 void engine_interface::exit()
