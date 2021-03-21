@@ -49,13 +49,6 @@
 #include "video/renderer.h"
 #include "video/video.h"
 
-#ifdef USE_OPENGL
-#ifdef __APPLE__
-#define GL_GLEXT_PROTOTYPES 1
-#endif
-#include <SDL_opengl.h>
-#endif
-
 static constexpr int MINIMAP_FAC = 16 * 3;  /// integer scale factor
 
 /// unit attacked are shown red for at least this amount of cycles
@@ -94,23 +87,6 @@ minimap::minimap() : mode(minimap_mode::terrain)
 {
 }
 
-void minimap::create_textures(const int z)
-{
-	this->create_texture(this->overlay_textures[z], this->overlay_images[z].constBits(), z);
-}
-
-void minimap::create_texture(GLuint &texture, const unsigned char *texture_data, const int z)
-{
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth[z], MinimapTextureHeight[z], 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data);
-}
-
 /**
 **  Create a mini-map from the tiles of the map.
 **
@@ -118,7 +94,6 @@ void minimap::create_texture(GLuint &texture, const unsigned char *texture_data,
 */
 void minimap::Create()
 {
-	this->overlay_textures.resize(CMap::get()->MapLayers.size());
 	MinimapTextureWidth.resize(CMap::get()->MapLayers.size());
 	MinimapTextureHeight.resize(CMap::get()->MapLayers.size());
 
@@ -184,28 +159,11 @@ void minimap::Create()
 		overlay_image.fill(Qt::transparent);
 		this->overlay_images.push_back(std::move(overlay_image));
 
-		this->create_textures(z);
-
 		this->UpdateTerrain(z);
 		this->update_territories(z);
 	}
 
 	NumMinimapEvents = 0;
-}
-
-void minimap::FreeOpenGL()
-{
-	for (size_t z = 0; z < this->overlay_textures.size(); ++z) {
-		glDeleteTextures(1, &this->overlay_textures[z]);
-	}
-	this->overlay_textures.clear();
-}
-
-void minimap::Reload()
-{
-	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
-		this->create_textures(z);
-	}
 }
 
 /**
@@ -671,7 +629,7 @@ void minimap::Draw(std::vector<std::function<void(renderer *)>> &render_commands
 		this->draw_image(this->terrain_images[z], z, render_commands);
 	}
 
-	this->draw_texture(this->overlay_textures[z], this->overlay_images[z].constBits(), z);
+	this->draw_image(this->overlay_images[z], z, render_commands);
 	this->draw_events();
 }
 
@@ -783,13 +741,8 @@ QPoint minimap::tile_to_screen_pos(const QPoint &tile_pos) const
 void minimap::Destroy()
 {
 	this->terrain_images.clear();
-	this->mode_overlay_images.clear();
-
-	for (size_t z = 0; z < this->overlay_images.size(); ++z) {
-		glDeleteTextures(1, &this->overlay_textures[z]);
-	}
 	this->overlay_images.clear();
-	this->overlay_textures.clear();
+	this->mode_overlay_images.clear();
 
 	Minimap2MapX.clear();
 	Minimap2MapY.clear();

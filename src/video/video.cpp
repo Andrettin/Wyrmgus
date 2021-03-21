@@ -280,7 +280,6 @@ bool CVideo::ResizeScreen(int w, int h)
 	if (VideoValidResolution(w, h)) {
 		FreeOpenGLGraphics();
 		FreeOpenGLFonts();
-		UI.get_minimap()->FreeOpenGL();
 
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 		ViewportWidth = w;

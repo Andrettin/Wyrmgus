@@ -55,10 +55,6 @@ public:
 	void update_territory_pixel(const int mx, const int my, const int z);
 	void Update();
 	void Create();
-	void create_textures(const int z);
-	void create_texture(GLuint &texture, const unsigned char *texture_data, const int z);
-	void FreeOpenGL();
-	void Reload();
 	void Destroy();
 	void Draw(std::vector<std::function<void(renderer *)>> &render_commands) const;
 	void draw_image(const QImage &image, const int z, std::vector<std::function<void(renderer *)>> &render_commands) const;
@@ -152,12 +148,11 @@ private:
 	minimap_mode mode;
 	bool zoomed = false; //whether the minimap texture is being shown at full resolution
 	std::vector<QImage> terrain_images;
-	std::vector<GLuint> overlay_textures;
-
-	std::map<minimap_mode, std::vector<QImage>> mode_overlay_images;
 
 	//image for the overlay with units and unexplored terrain
 	std::vector<QImage> overlay_images;
+
+	std::map<minimap_mode, std::vector<QImage>> mode_overlay_images;
 };
 
 }

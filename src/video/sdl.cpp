@@ -296,7 +296,6 @@ void ReloadOpenGL()
 	InitOpenGL();
 	ReloadGraphics();
 	ReloadFonts();
-	UI.get_minimap()->Reload();
 }
 
 #endif
