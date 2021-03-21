@@ -1236,8 +1236,8 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 		const PixelPos rb(x + IconHeight - 2 * scale_factor, y + IconHeight - 2 * scale_factor);
 		const uint32_t color = CVideo::MapRGB(CPlayer::Players[Editor.SelectedPlayer]->get_minimap_color());
 
-		Video.DrawLineClip(color, lt, rb);
-		Video.DrawLineClip(color, rt, lb);
+		Video.DrawLineClip(color, lt, rb, render_commands);
+		Video.DrawLineClip(color, rt, lb, render_commands);
 		PopClipping();
 	}
 }
@@ -1353,15 +1353,15 @@ static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_c
 	}
 }
 
-static void DrawCross(const PixelPos &topleft_pos, const QSize &size, uint32_t color)
+static void DrawCross(const PixelPos &topleft_pos, const QSize &size, uint32_t color, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const PixelPos lt = topleft_pos;
 	const PixelPos lb(topleft_pos.x, topleft_pos.y + size.height());
 	const PixelPos rt(topleft_pos.x + size.width(), topleft_pos.y);
 	const PixelPos rb = topleft_pos + size;
 
-	Video.DrawLineClip(color, lt, rb);
-	Video.DrawLineClip(color, lb, rt);
+	Video.DrawLineClip(color, lt, rb, render_commands);
+	Video.DrawLineClip(color, lb, rt, render_commands);
 }
 
 /**
@@ -1381,7 +1381,7 @@ static void DrawStartLocations(std::vector<std::function<void(renderer *)>> &ren
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos, nullptr, render_commands);
 				} else { // Draw a cross
-					DrawCross(startScreenPos, wyrmgus::defines::get()->get_scaled_tile_size(), CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()));
+					DrawCross(startScreenPos, defines::get()->get_scaled_tile_size(), CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()), render_commands);
 				}
 			}
 		}

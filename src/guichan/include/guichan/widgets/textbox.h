@@ -213,7 +213,7 @@ namespace gcn
 
         virtual void draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        virtual void drawBorder(Graphics* graphics) override;
+        virtual void drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
         virtual void fontChanged();
 
@@ -236,7 +236,7 @@ namespace gcn
          * @param x the x position.
          * @param y the y position.
          */
-        virtual void drawCaret(Graphics* graphics, int x, int y);
+        virtual void drawCaret(Graphics* graphics, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Adjusts the TextBox size to fit the font size.

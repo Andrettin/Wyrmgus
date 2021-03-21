@@ -219,7 +219,7 @@ namespace gcn
          * @param x2 the second x coordinate.
          * @param y2 the second y coordinate.
          */
-        virtual void drawLine(int x1, int y1, int x2, int y2) = 0;
+        virtual void drawLine(int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands) = 0;
 
         /**
          * Draws a simple, non-filled, Rectangle with one pixel width.

@@ -199,7 +199,7 @@ namespace gcn
 
         virtual void draw(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        virtual void drawBorder(gcn::Graphics* graphics) override;
+        virtual void drawBorder(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
         virtual void lostFocus() override;
 

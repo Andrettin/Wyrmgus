@@ -124,7 +124,7 @@ namespace gcn
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawBorder(Graphics*) { }
+        virtual void drawBorder(Graphics*, std::vector<std::function<void(renderer *)>> &) { }
 
         /**
          * Called for all Widgets in the gui each time Gui::logic is called.

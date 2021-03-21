@@ -138,7 +138,7 @@ namespace gcn
         drawMarker(graphics, render_commands);
     }
 
-    void Slider::drawBorder(gcn::Graphics* graphics)
+    void Slider::drawBorder(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color faceColor = getBaseColor();
         Color highlightColor, shadowColor;
@@ -154,11 +154,11 @@ namespace gcn
         for (i = 0; i < getBorderSize(); ++i)
         {
             graphics->setColor(shadowColor);
-            graphics->drawLine(i,i, width - i, i);
-            graphics->drawLine(i,i + 1, i, height - i - 1);
+            graphics->drawLine(i,i, width - i, i, render_commands);
+            graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
             graphics->setColor(highlightColor);
-            graphics->drawLine(width - i,i + 1, width - i, height - i);
-            graphics->drawLine(i,height - i, width - i - 1, height - i);
+            graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+            graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
         }
     }
 
@@ -179,11 +179,11 @@ namespace gcn
             int v = getMarkerPosition();
             graphics->fillRectangle(gcn::Rectangle(v + 1, 1, getMarkerLength() - 2, getHeight() - 2), render_commands);
             graphics->setColor(highlightColor);
-            graphics->drawLine(v, 0, v + getMarkerLength() - 1,0);
-            graphics->drawLine(v, 0, v, getHeight() - 1);
+            graphics->drawLine(v, 0, v + getMarkerLength() - 1,0, render_commands);
+            graphics->drawLine(v, 0, v, getHeight() - 1, render_commands);
             graphics->setColor(shadowColor);
-            graphics->drawLine(v + getMarkerLength() - 1, 1, v + getMarkerLength() - 1, getHeight() - 1);
-            graphics->drawLine(v + 1, getHeight() - 1, v + getMarkerLength() - 1, getHeight() - 1);
+            graphics->drawLine(v + getMarkerLength() - 1, 1, v + getMarkerLength() - 1, getHeight() - 1, render_commands);
+            graphics->drawLine(v + 1, getHeight() - 1, v + getMarkerLength() - 1, getHeight() - 1, render_commands);
 
             if (hasFocus())
             {
@@ -196,11 +196,11 @@ namespace gcn
             int v = (getHeight() - getMarkerLength()) - getMarkerPosition();
             graphics->fillRectangle(gcn::Rectangle(1, v + 1, getWidth() - 2, getMarkerLength() - 2), render_commands);
             graphics->setColor(highlightColor);
-            graphics->drawLine(0, v, 0, v + getMarkerLength() - 1);
-            graphics->drawLine(0, v, getWidth() - 1, v);
+            graphics->drawLine(0, v, 0, v + getMarkerLength() - 1, render_commands);
+            graphics->drawLine(0, v, getWidth() - 1, v, render_commands);
             graphics->setColor(shadowColor);
-            graphics->drawLine(1, v + getMarkerLength() - 1, getWidth() - 1, v + getMarkerLength() - 1);
-            graphics->drawLine(getWidth() - 1, v + 1, getWidth() - 1, v + getMarkerLength() - 1);
+            graphics->drawLine(1, v + getMarkerLength() - 1, getWidth() - 1, v + getMarkerLength() - 1, render_commands);
+            graphics->drawLine(getWidth() - 1, v + 1, getWidth() - 1, v + getMarkerLength() - 1, render_commands);
 
             if (hasFocus())
             {

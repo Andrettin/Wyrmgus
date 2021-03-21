@@ -142,7 +142,7 @@ namespace gcn
 
         if (hasFocus() && isEditable())
         {
-            drawCaret(graphics, getFont()->getWidth(mTextRows[mCaretRow].substr(0, mCaretColumn)), mCaretRow * getFont()->getHeight());
+            drawCaret(graphics, getFont()->getWidth(mTextRows[mCaretRow].substr(0, mCaretColumn)), mCaretRow * getFont()->getHeight(), render_commands);
         }
 
         graphics->setColor(getForegroundColor());
@@ -155,7 +155,7 @@ namespace gcn
         }
     }
 
-    void TextBox::drawBorder(Graphics* graphics)
+    void TextBox::drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         int width = getWidth() + getBorderSize() * 2 - 1;
         int height = getHeight() + getBorderSize() * 2 - 1;
@@ -165,17 +165,17 @@ namespace gcn
         unsigned int i;
         for (i = 0; i < getBorderSize(); ++i)
         {
-            graphics->drawLine(i,i, width - i, i);
-            graphics->drawLine(i,i + 1, i, height - i - 1);
-            graphics->drawLine(width - i,i + 1, width - i, height - i);
-            graphics->drawLine(i,height - i, width - i - 1, height - i);
+            graphics->drawLine(i,i, width - i, i, render_commands);
+            graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
+            graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+            graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
         }
     }
 
-    void TextBox::drawCaret(Graphics* graphics, int x, int y)
+    void TextBox::drawCaret(Graphics* graphics, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         graphics->setColor(getForegroundColor());
-        graphics->drawLine(x, getFont()->getHeight() + y, x, y);
+        graphics->drawLine(x, getFont()->getHeight() + y, x, y, render_commands);
     }
 
     void TextBox::mousePress(int x, int y, int button)

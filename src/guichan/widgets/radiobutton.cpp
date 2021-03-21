@@ -111,7 +111,7 @@ namespace gcn
         }
     }
 
-    void RadioButton::drawBorder(Graphics* graphics)
+    void RadioButton::drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color faceColor = getBaseColor();
         Color highlightColor, shadowColor;
@@ -127,11 +127,11 @@ namespace gcn
         for (i = 0; i < getBorderSize(); ++i)
         {
             graphics->setColor(shadowColor);
-            graphics->drawLine(i,i, width - i, i);
-            graphics->drawLine(i,i + 1, i, height - i - 1);
+            graphics->drawLine(i,i, width - i, i, render_commands);
+            graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
             graphics->setColor(highlightColor);
-            graphics->drawLine(width - i,i + 1, width - i, height - i);
-            graphics->drawLine(i,height - i, width - i - 1, height - i);
+            graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+            graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
         }
     }
 
@@ -166,7 +166,7 @@ namespace gcn
             graphics->drawLine(hh - i + 1,
                                i,
                                hh + i - 1,
-                               i);
+                               i, render_commands);
         }
 
         for (i = 1; i < hh; ++i)
@@ -174,16 +174,16 @@ namespace gcn
             graphics->drawLine(hh - i + 1,
                                h - i,
                                hh + i - 1,
-                               h - i);
+                               h - i, render_commands);
         }
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(hh, 0, 0, hh);
-        graphics->drawLine(hh + 1, 1, h - 1, hh - 1);
+        graphics->drawLine(hh, 0, 0, hh, render_commands);
+        graphics->drawLine(hh + 1, 1, h - 1, hh - 1, render_commands);
 
         graphics->setColor(highlightColor);
-        graphics->drawLine(1, hh + 1, hh, h);
-        graphics->drawLine(hh + 1, h - 1, h, hh);
+        graphics->drawLine(1, hh + 1, hh, h, render_commands);
+        graphics->drawLine(hh + 1, h - 1, h, hh, render_commands);
 
         graphics->setColor(getForegroundColor());
 
@@ -192,11 +192,11 @@ namespace gcn
         {
             for (i = 0; i < hhh; ++i)
             {
-                graphics->drawLine(hh - i, 4 + i, hh + i, 4 + i);
+                graphics->drawLine(hh - i, 4 + i, hh + i, 4 + i, render_commands);
             }
             for (i = 0; i < hhh; ++i)
             {
-                graphics->drawLine(hh - i, h - 4 - i, hh + i, h - 4 -  i);
+                graphics->drawLine(hh - i, h - 4 - i, hh + i, h - 4 -  i, render_commands);
             }
 
         }

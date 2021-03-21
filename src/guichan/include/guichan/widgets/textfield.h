@@ -102,7 +102,7 @@ namespace gcn
          * @param graphics the Graphics object to draw with.
          * @param x the caret's x-position.
          */
-        virtual void drawCaret(Graphics* graphics, int x);
+        virtual void drawCaret(Graphics* graphics, int x, std::vector<std::function<void(renderer *)>> &render_commands);
 
         /**
          * Adjusts the size of the TextField to fit the font size. The
@@ -141,7 +141,7 @@ namespace gcn
 
         virtual void draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        virtual void drawBorder(Graphics* graphics) override;
+        virtual void drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
 
         // Inherited from MouseListener

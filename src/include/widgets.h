@@ -60,7 +60,7 @@ public:
 	virtual void drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const player_color *player_color, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	virtual void drawPoint(int x, int y, std::vector<std::function<void(renderer *)>> &render_commands) override;
-	virtual void drawLine(int x1, int y1, int x2, int y2) override;
+	virtual void drawLine(int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	virtual void drawRectangle(const gcn::Rectangle &rectangle, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	virtual void fillRectangle(const gcn::Rectangle &rectangle, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
@@ -274,7 +274,7 @@ public:
 	virtual int getLineWidth();
 	virtual void adjustSize();
 	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
-	virtual void drawBorder(gcn::Graphics *graphics) override;
+	virtual void drawBorder(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
 	enum {
 		LEFT = 0,
@@ -334,7 +334,7 @@ public:
 	ImageTextField() : TextField(), itemImage(nullptr) {}
 	ImageTextField(const std::string& text) : gcn::TextField(text), itemImage(nullptr) {}
 	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
-	virtual void drawBorder(gcn::Graphics *graphics) override;
+	virtual void drawBorder(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	void setItemImage(CGraphic *image) { itemImage = image; }
 private:
 	CGraphic *itemImage;
@@ -365,7 +365,7 @@ public:
 	ImageListBox();
 	ImageListBox(gcn::ListModel *listModel);
 	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
-	virtual void drawBorder(gcn::Graphics *graphics) override;
+	virtual void drawBorder(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	void setItemImage(CGraphic *image) { itemImage = image; }
 	void adjustSize();
 	void mousePress(int, int y, int button);
@@ -424,7 +424,7 @@ public:
 	void setMarkerImage(CGraphic *image) { markerImage = image; }
 
 	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
-	virtual void drawBorder(gcn::Graphics *graphics) override;
+	virtual void drawBorder(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	virtual gcn::Rectangle getVerticalMarkerDimension() override;
 	virtual gcn::Rectangle getHorizontalMarkerDimension() override;
 private:
@@ -488,7 +488,7 @@ public:
 	}
 
 	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
-	virtual void drawBorder(gcn::Graphics *graphics) override;
+	virtual void drawBorder(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	void drawButton(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands);
 	void setList(lua_State *lua, lua_Object *lo);
 	virtual void setSize(int width, int height) override;

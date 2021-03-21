@@ -236,7 +236,7 @@ namespace gcn
 
         virtual void draw(Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        virtual void drawBorder(Graphics* graphics) override;
+        virtual void drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
         virtual void logic();
 

@@ -269,7 +269,7 @@ namespace gcn
                 rec.width += 2 * top->getBorderSize();
                 rec.height += 2 * top->getBorderSize();
                 mGraphics->pushClipArea(rec);
-                top->drawBorder(mGraphics.get());
+                top->drawBorder(mGraphics.get(), render_commands);
                 mGraphics->popClipArea();
             }
 

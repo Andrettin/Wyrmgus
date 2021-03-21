@@ -549,10 +549,10 @@ public:
 	void DrawHLineClip(uint32_t color, int x, int y, int width, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawTransHLineClip(uint32_t color, int x, int y, int width, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
-	void DrawLine(uint32_t color, int sx, int sy, int dx, int dy);
-	void DrawTransLine(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha);
-	void DrawLineClip(uint32_t color, const PixelPos &pos1, const PixelPos &pos2);
-	void DrawTransLineClip(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha);
+	void DrawLine(uint32_t color, int sx, int sy, int dx, int dy, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawTransLine(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawLineClip(uint32_t color, const PixelPos &pos1, const PixelPos &pos2, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawTransLineClip(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void DrawRectangle(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);

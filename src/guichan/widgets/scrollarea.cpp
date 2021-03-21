@@ -470,7 +470,7 @@ namespace gcn
                 rec.width += 2 * mContent->getBorderSize();
                 rec.height += 2 * mContent->getBorderSize();
                 graphics->pushClipArea(rec);
-                mContent->drawBorder(graphics);
+                mContent->drawBorder(graphics, render_commands);
                 graphics->popClipArea();
             }
 
@@ -481,7 +481,7 @@ namespace gcn
         }
     }
 
-    void ScrollArea::drawBorder(Graphics* graphics)
+    void ScrollArea::drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color faceColor = getBaseColor();
         Color highlightColor, shadowColor;
@@ -497,11 +497,11 @@ namespace gcn
         for (i = 0; i < getBorderSize(); ++i)
         {
             graphics->setColor(shadowColor);
-            graphics->drawLine(i,i, width - i, i);
-            graphics->drawLine(i,i + 1, i, height - i - 1);
+            graphics->drawLine(i,i, width - i, i, render_commands);
+            graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
             graphics->setColor(highlightColor);
-            graphics->drawLine(width - i,i + 1, width - i, height - i);
-            graphics->drawLine(i,height - i, width - i - 1, height - i);
+            graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+            graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
         }
     }
 
@@ -521,7 +521,7 @@ namespace gcn
         graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(0, 0, dim.width, 0);
+        graphics->drawLine(0, 0, dim.width, 0, render_commands);
 
         graphics->popClipArea();
     }
@@ -542,7 +542,7 @@ namespace gcn
         graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(0, 0, 0, dim.height);
+        graphics->drawLine(0, 0, 0, dim.height, render_commands);
 
         graphics->popClipArea();
     }
@@ -585,12 +585,12 @@ namespace gcn
         graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(highlightColor);
-        graphics->drawLine(0, 0, dim.width - 1, 0);
-        graphics->drawLine(0, 1, 0, dim.height - 1);
+        graphics->drawLine(0, 0, dim.width - 1, 0, render_commands);
+        graphics->drawLine(0, 1, 0, dim.height - 1, render_commands);
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1);
-        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1);
+        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1, render_commands);
+        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1, render_commands);
 
         graphics->setColor(getForegroundColor());
 
@@ -602,7 +602,7 @@ namespace gcn
             graphics->drawLine(w - i + offset,
                                i + h + offset,
                                w + i + offset,
-                               i + h + offset);
+                               i + h + offset, render_commands);
         }
 
         graphics->popClipArea();
@@ -646,12 +646,12 @@ namespace gcn
         graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(highlightColor);
-        graphics->drawLine(0, 0, dim.width - 1, 0);
-        graphics->drawLine(0, 1, 0, dim.height - 1);
+        graphics->drawLine(0, 0, dim.width - 1, 0, render_commands);
+        graphics->drawLine(0, 1, 0, dim.height - 1, render_commands);
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1);
-        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1);
+        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1, render_commands);
+        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1, render_commands);
 
         graphics->setColor(getForegroundColor());
 
@@ -663,7 +663,7 @@ namespace gcn
             graphics->drawLine(w - i + offset,
                                -i + h + offset,
                                w + i + offset,
-                               -i + h + offset);
+                               -i + h + offset, render_commands);
         }
 
         graphics->popClipArea();
@@ -707,12 +707,12 @@ namespace gcn
         graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(highlightColor);
-        graphics->drawLine(0, 0, dim.width - 1, 0);
-        graphics->drawLine(0, 1, 0, dim.height - 1);
+        graphics->drawLine(0, 0, dim.width - 1, 0, render_commands);
+        graphics->drawLine(0, 1, 0, dim.height - 1, render_commands);
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1);
-        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1);
+        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1, render_commands);
+        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1, render_commands);
 
         graphics->setColor(getForegroundColor());
 
@@ -724,7 +724,7 @@ namespace gcn
             graphics->drawLine(i + h + offset,
                                w - i + offset,
                                i + h + offset,
-                               w + i + offset);
+                               w + i + offset, render_commands);
         }
 
         graphics->popClipArea();
@@ -768,12 +768,12 @@ namespace gcn
         graphics->fillRectangle(Rectangle(0, 0, dim.width, dim.height), render_commands);
 
         graphics->setColor(highlightColor);
-        graphics->drawLine(0, 0, dim.width - 1, 0);
-        graphics->drawLine(0, 1, 0, dim.height - 1);
+        graphics->drawLine(0, 0, dim.width - 1, 0, render_commands);
+        graphics->drawLine(0, 1, 0, dim.height - 1, render_commands);
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1);
-        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1);
+        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1, render_commands);
+        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1, render_commands);
 
         graphics->setColor(getForegroundColor());
 
@@ -785,7 +785,7 @@ namespace gcn
             graphics->drawLine(-i + h + offset,
                                w - i + offset,
                                -i + h + offset,
-                               w + i + offset);
+                               w + i + offset, render_commands);
         }
 
         graphics->popClipArea();
@@ -808,12 +808,12 @@ namespace gcn
         graphics->fillRectangle(Rectangle(1, 1, dim.width - 1, dim.height - 1), render_commands);
 
         graphics->setColor(highlightColor);
-        graphics->drawLine(0, 0, dim.width - 1, 0);
-        graphics->drawLine(0, 1, 0, dim.height - 1);
+        graphics->drawLine(0, 0, dim.width - 1, 0, render_commands);
+        graphics->drawLine(0, 1, 0, dim.height - 1, render_commands);
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1);
-        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1);
+        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1, render_commands);
+        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1, render_commands);
 
         graphics->popClipArea();
     }
@@ -835,12 +835,12 @@ namespace gcn
         graphics->fillRectangle(Rectangle(1, 1, dim.width - 1, dim.height - 1), render_commands);
 
         graphics->setColor(highlightColor);
-        graphics->drawLine(0, 0, dim.width - 1, 0);
-        graphics->drawLine(0, 1, 0, dim.height - 1);
+        graphics->drawLine(0, 0, dim.width - 1, 0, render_commands);
+        graphics->drawLine(0, 1, 0, dim.height - 1, render_commands);
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1);
-        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1);
+        graphics->drawLine(1, dim.height - 1, dim.width - 1, dim.height - 1, render_commands);
+        graphics->drawLine(dim.width - 1, 0, dim.width - 1, dim.height - 1, render_commands);
 
         graphics->popClipArea();
     }

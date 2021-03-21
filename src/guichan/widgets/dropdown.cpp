@@ -235,13 +235,13 @@ namespace gcn
             // Draw two lines separating the ListBox with se selected
             // element view.
             graphics->setColor(highlightColor);
-            graphics->drawLine(0, h, getWidth(), h);
+            graphics->drawLine(0, h, getWidth(), h, render_commands);
             graphics->setColor(shadowColor);
-            graphics->drawLine(0, h + 1,getWidth(),h + 1);
+            graphics->drawLine(0, h + 1,getWidth(),h + 1, render_commands);
          }
     }
 
-    void DropDown::drawBorder(Graphics* graphics)
+    void DropDown::drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color faceColor = getBaseColor();
         Color highlightColor, shadowColor;
@@ -257,11 +257,11 @@ namespace gcn
         for (i = 0; i < getBorderSize(); ++i)
         {
             graphics->setColor(shadowColor);
-            graphics->drawLine(i,i, width - i, i);
-            graphics->drawLine(i,i + 1, i, height - i - 1);
+            graphics->drawLine(i,i, width - i, i, render_commands);
+            graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
             graphics->setColor(highlightColor);
-            graphics->drawLine(width - i,i + 1, width - i, height - i);
-            graphics->drawLine(i,height - i, width - i - 1, height - i);
+            graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+            graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
         }
     }
 
@@ -308,12 +308,12 @@ namespace gcn
         graphics->fillRectangle(Rectangle(x+1, y+1, h-2, h-2), render_commands);
 
         graphics->setColor(highlightColor);
-        graphics->drawLine(x, y, x+h-1, y);
-        graphics->drawLine(x, y+1, x, y+h-1);
+        graphics->drawLine(x, y, x+h-1, y, render_commands);
+        graphics->drawLine(x, y+1, x, y+h-1, render_commands);
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(x+h-1, y+1, x+h-1, y+h-1);
-        graphics->drawLine(x+1, y+h-1, x+h-2, y+h-1);
+        graphics->drawLine(x+h-1, y+1, x+h-1, y+h-1, render_commands);
+        graphics->drawLine(x+1, y+h-1, x+h-2, y+h-1, render_commands);
 
         graphics->setColor(getForegroundColor());
 
@@ -326,7 +326,7 @@ namespace gcn
             graphics->drawLine(hx - i + offset,
                                hy - i + offset,
                                hx + i + offset,
-                               hy - i + offset);
+                               hy - i + offset, render_commands);
         }
     }
 

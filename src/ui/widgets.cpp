@@ -270,13 +270,13 @@ void MyOpenGLGraphics::drawPoint(int x, int y, std::vector<std::function<void(re
 						x + mClipStack.top().xOffset, y + mClipStack.top().yOffset, render_commands);
 }
 
-void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
+void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Color c = this->getColor();
 	const PixelPos pos1(x1 + mClipStack.top().xOffset, y1 + mClipStack.top().yOffset);
 	const PixelPos pos2(x2 + mClipStack.top().xOffset, y2 + mClipStack.top().yOffset);
 
-	Video.DrawLineClip(CVideo::MapRGBA(c.r, c.g, c.b, c.a), pos1, pos2);
+	Video.DrawLineClip(CVideo::MapRGBA(c.r, c.g, c.b, c.a), pos1, pos2, render_commands);
 }
 
 void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle &rectangle, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -1401,7 +1401,7 @@ void MultiLineLabel::draw(gcn::Graphics *graphics, std::vector<std::function<voi
 /**
 **  Draw the border
 */
-void MultiLineLabel::drawBorder(gcn::Graphics *graphics)
+void MultiLineLabel::drawBorder(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Color faceColor = getBaseColor();
 	gcn::Color highlightColor, shadowColor;
@@ -1415,11 +1415,11 @@ void MultiLineLabel::drawBorder(gcn::Graphics *graphics)
 
 	for (unsigned int i = 0; i < getBorderSize(); ++i) {
 		graphics->setColor(shadowColor);
-		graphics->drawLine(i, i, width - i, i);
-		graphics->drawLine(i, i + 1, i, height - i - 1);
+		graphics->drawLine(i, i, width - i, i, render_commands);
+		graphics->drawLine(i, i + 1, i, height - i - 1, render_commands);
 		graphics->setColor(highlightColor);
-		graphics->drawLine(width - i, i + 1, width - i, height - i);
-		graphics->drawLine(i, height - i, width - i - 1, height - i);
+		graphics->drawLine(width - i, i + 1, width - i, height - i, render_commands);
+		graphics->drawLine(i, height - i, width - i - 1, height - i, render_commands);
 	}
 }
 
@@ -1723,7 +1723,7 @@ void ImageTextField::draw(gcn::Graphics *graphics, std::vector<std::function<voi
 
 	if (hasFocus())
 	{
-		drawCaret(graphics, getFont()->getWidth(mText.substr(0, mCaretPosition)) - mXScroll);
+		drawCaret(graphics, getFont()->getWidth(mText.substr(0, mCaretPosition)) - mXScroll, render_commands);
 	}
 
 	graphics->setColor(getForegroundColor());
@@ -1756,7 +1756,7 @@ void ImageTextField::draw(gcn::Graphics *graphics, std::vector<std::function<voi
 	graphics->drawText(mText, x, y, render_commands);
 }
 
-void ImageTextField::drawBorder(gcn::Graphics *graphics)
+void ImageTextField::drawBorder(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Color faceColor = getBaseColor();
 	gcn::Color highlightColor, shadowColor;
@@ -1773,11 +1773,11 @@ void ImageTextField::drawBorder(gcn::Graphics *graphics)
 	for (i = 0; i < getBorderSize(); ++i)
 	{
 		graphics->setColor(shadowColor);
-		graphics->drawLine(i,i, width - i, i);
-		graphics->drawLine(i,i + 1, i, height - i - 1);
+		graphics->drawLine(i,i, width - i, i, render_commands);
+		graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
 		graphics->setColor(highlightColor);
-		graphics->drawLine(width - i,i + 1, width - i, height - i);
-		graphics->drawLine(i,height - i, width - i - 1, height - i);
+		graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+		graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
 	}
 }
 
@@ -1844,7 +1844,7 @@ void ImageListBox::draw(gcn::Graphics *graphics, std::vector<std::function<void(
 	//img->SetOriginalSize();
 }
 
-void ImageListBox::drawBorder(gcn::Graphics *graphics)
+void ImageListBox::drawBorder(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Color faceColor = getBaseColor();
 	gcn::Color highlightColor, shadowColor;
@@ -1860,11 +1860,11 @@ void ImageListBox::drawBorder(gcn::Graphics *graphics)
 	for (i = 0; i < getBorderSize(); ++i)
 	{
 		graphics->setColor(shadowColor);
-		graphics->drawLine(i,i, width - i, i);
-		graphics->drawLine(i,i + 1, i, height - i - 1);
+		graphics->drawLine(i,i, width - i, i, render_commands);
+		graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
 		graphics->setColor(highlightColor);
-		graphics->drawLine(width - i,i + 1, width - i, height - i);
-		graphics->drawLine(i,height - i, width - i - 1, height - i);
+		graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+		graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
 	}
 }
 
@@ -2221,7 +2221,7 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics, std::vector<std::function
 			rec.width += 2 * mContent->getBorderSize();
 			rec.height += 2 * mContent->getBorderSize();
 			graphics->pushClipArea(rec);
-			mContent->drawBorder(graphics);
+			mContent->drawBorder(graphics, render_commands);
 			graphics->popClipArea();
 		}
 
@@ -2237,7 +2237,7 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics, std::vector<std::function
 **
 **  @param  graphics Graphics to use
 */
-void ImageListBoxWidget::drawBorder(gcn::Graphics *graphics)
+void ImageListBoxWidget::drawBorder(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Color faceColor = getBaseColor();
 	gcn::Color highlightColor, shadowColor;
@@ -2253,11 +2253,11 @@ void ImageListBoxWidget::drawBorder(gcn::Graphics *graphics)
 	for (i = 0; i < getBorderSize(); ++i)
 	{
 		graphics->setColor(shadowColor);
-		graphics->drawLine(i,i, width - i, i);
-		graphics->drawLine(i,i + 1, i, height - i - 1);
+		graphics->drawLine(i,i, width - i, i, render_commands);
+		graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
 		graphics->setColor(highlightColor);
-		graphics->drawLine(width - i,i + 1, width - i, height - i);
-		graphics->drawLine(i,height - i, width - i - 1, height - i);
+		graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+		graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
 	}
 }
 
@@ -2649,7 +2649,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics, std::vector<std::functio
 	}
 }
 
-void ImageDropDownWidget::drawBorder(gcn::Graphics *graphics)
+void ImageDropDownWidget::drawBorder(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Color faceColor = getBaseColor();
 	gcn::Color highlightColor, shadowColor;
@@ -2665,11 +2665,11 @@ void ImageDropDownWidget::drawBorder(gcn::Graphics *graphics)
 	for (i = 0; i < getBorderSize(); ++i)
 	{
 		graphics->setColor(shadowColor);
-		graphics->drawLine(i,i, width - i, i);
-		graphics->drawLine(i,i + 1, i, height - i - 1);
+		graphics->drawLine(i,i, width - i, i, render_commands);
+		graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
 		graphics->setColor(highlightColor);
-		graphics->drawLine(width - i,i + 1, width - i, height - i);
-		graphics->drawLine(i,height - i, width - i - 1, height - i);
+		graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+		graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
 	}
 }
 

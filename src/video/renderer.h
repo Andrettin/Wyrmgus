@@ -215,6 +215,22 @@ public:
 		this->fill_rect(QRect(pixel_pos, size), color);
 	}
 
+	void draw_line(const QPoint &start_pos, const QPoint &end_pos, const QColor &color)
+	{
+		glDisable(GL_TEXTURE_2D);
+		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
+
+		const QPoint mirrored_start_pos = this->get_mirrored_pos(start_pos, 0);
+		const QPoint mirrored_end_pos = this->get_mirrored_pos(end_pos, 0);
+
+		glBegin(GL_LINES);
+		glVertex2f(mirrored_start_pos.x(), mirrored_start_pos.y());
+		glVertex2f(mirrored_end_pos.x(), mirrored_end_pos.y());
+		glEnd();
+
+		glEnable(GL_TEXTURE_2D);
+	}
+
 	void draw_horizontal_line(const QPoint &pos, const int width, const QColor &color)
 	{
 		glDisable(GL_TEXTURE_2D);

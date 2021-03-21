@@ -249,7 +249,7 @@ PixelPos COrder_Attack::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	}
 	if (Preference.ShowPathlines) {
 		Video.FillCircleClip(ColorRed, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
-		Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
+		Video.DrawLineClip(ColorRed, lastScreenPos, targetPos, render_commands);
 		Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
 	}
 	return targetPos;

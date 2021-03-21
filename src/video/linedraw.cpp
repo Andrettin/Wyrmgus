@@ -67,15 +67,6 @@ void DrawPixel(uint32_t color, int x, int y, std::vector<std::function<void(rend
 
 	CVideo::GetRGBA(color, &r, &g, &b, &a);
 
-	glDisable(GL_TEXTURE_2D);
-	glColor4ub(r, g, b, a);
-
-	glBegin(GL_POINTS);
-	glVertex2i(x, y);
-	glEnd();
-
-	glEnable(GL_TEXTURE_2D);
-
 	render_commands.push_back([x, y, r, g, b, a](renderer *renderer) {
 		renderer->draw_pixel(QPoint(x, y), QColor(r, g, b, a));
 	});
@@ -308,7 +299,7 @@ void DrawTransVLineClip(uint32_t color, int x, int y, int height, unsigned char 
 **  @param x2     Destination x coordinate on the screen
 **  @param y2     Destination y coordinate on the screen
 */
-void DrawLine(uint32_t color, int x1, int y1, int x2, int y2)
+void DrawLine(uint32_t color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	GLubyte r, g, b, a;
 
@@ -329,15 +320,20 @@ void DrawLine(uint32_t color, int x1, int y1, int x2, int y2)
 	}
 
 	CVideo::GetRGBA(color, &r, &g, &b, &a);
+
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
-#ifdef USE_OPENGL
+
 	glBegin(GL_LINES);
 	glVertex2f(xx1, yy1);
 	glVertex2f(xx2, yy2);
 	glEnd();
-#endif
+
 	glEnable(GL_TEXTURE_2D);
+
+	render_commands.push_back([xx1, yy1, xx2, yy2, r, g, b, a](renderer *renderer) {
+		renderer->draw_line(QPoint(xx1, yy1), QPoint(xx2, yy2), QColor(r, g, b, a));
+	});
 }
 
 /**
@@ -404,7 +400,7 @@ static int LineIsUnclipped(int code1, int code2)
 **  @param x2     Destination x coordinate on the screen
 **  @param y2     Destination y coordinate on the screen
 */
-void DrawLineClip(uint32_t color, int x1, int y1, int x2, int y2)
+void DrawLineClip(uint32_t color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int code1;
 	int code2;
@@ -448,27 +444,27 @@ void DrawLineClip(uint32_t color, int x1, int y1, int x2, int y2)
 	//        drawing routine..
 	Assert(x1 >= ClipX1 && x2 >= ClipX1 && x1 <= ClipX2 && x2 <= ClipX2 &&
 		   y1 >= ClipY1 && y2 >= ClipY1 && y1 <= ClipY2 && y2 <= ClipY2);
-	DrawLine(color, x1, y1, x2, y2);
+	DrawLine(color, x1, y1, x2, y2, render_commands);
 }
 
 /**
 **  Draw a transparent line
 */
 void DrawTransLine(uint32_t color, int sx, int sy,
-				   int dx, int dy, unsigned char)
+				   int dx, int dy, unsigned char, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	// FIXME: trans
-	DrawLine(color, sx, sy, dx, dy);
+	DrawLine(color, sx, sy, dx, dy, render_commands);
 }
 
 /**
 **  Draw a transparent line clipped
 */
 void DrawTransLineClip(uint32_t color, int sx, int sy,
-					   int dx, int dy, unsigned char)
+					   int dx, int dy, unsigned char, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	// FIXME: trans
-	DrawLineClip(color, sx, sy, dx, dy);
+	DrawLineClip(color, sx, sy, dx, dy, render_commands);
 }
 
 /**
@@ -1007,24 +1003,24 @@ void CVideo::DrawTransHLineClip(uint32_t color, int x, int y, int width, unsigne
 	linedraw_gl::DrawTransHLineClip(color, x, y, width, alpha, render_commands);
 }
 
-void CVideo::DrawLine(uint32_t color, int sx, int sy, int dx, int dy)
+void CVideo::DrawLine(uint32_t color, int sx, int sy, int dx, int dy, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	linedraw_gl::DrawLine(color, sx, sy, dx, dy);
+	linedraw_gl::DrawLine(color, sx, sy, dx, dy, render_commands);
 }
 
-void CVideo::DrawTransLine(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha)
+void CVideo::DrawTransLine(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	linedraw_gl::DrawTransLine(color, sx, sy, dx, dy, alpha);
+	linedraw_gl::DrawTransLine(color, sx, sy, dx, dy, alpha, render_commands);
 }
 
-void CVideo::DrawLineClip(uint32_t color, const PixelPos &pos1, const PixelPos &pos2)
+void CVideo::DrawLineClip(uint32_t color, const PixelPos &pos1, const PixelPos &pos2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	linedraw_gl::DrawLineClip(color, pos1.x, pos1.y, pos2.x, pos2.y);
+	linedraw_gl::DrawLineClip(color, pos1.x, pos1.y, pos2.x, pos2.y, render_commands);
 }
 
-void CVideo::DrawTransLineClip(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha)
+void CVideo::DrawTransLineClip(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	linedraw_gl::DrawTransLineClip(color, sx, sy, dx, dy, alpha);
+	linedraw_gl::DrawTransLineClip(color, sx, sy, dx, dy, alpha, render_commands);
 }
 
 void CVideo::DrawRectangle(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands)

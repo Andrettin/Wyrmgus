@@ -117,7 +117,7 @@ namespace gcn
 
         if (hasFocus())
         {
-            drawCaret(graphics, getFont()->getWidth(mText.substr(0, mCaretPosition)) - mXScroll);
+            drawCaret(graphics, getFont()->getWidth(mText.substr(0, mCaretPosition)) - mXScroll, render_commands);
         }
 
         graphics->setColor(getForegroundColor());
@@ -150,7 +150,7 @@ namespace gcn
         graphics->drawText(mText, x, y, render_commands);
     }
 
-    void TextField::drawBorder(Graphics* graphics)
+    void TextField::drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color faceColor = getBaseColor();
         Color highlightColor, shadowColor;
@@ -166,18 +166,18 @@ namespace gcn
         for (i = 0; i < getBorderSize(); ++i)
         {
             graphics->setColor(shadowColor);
-            graphics->drawLine(i,i, width - i, i);
-            graphics->drawLine(i,i + 1, i, height - i - 1);
+            graphics->drawLine(i,i, width - i, i, render_commands);
+            graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
             graphics->setColor(highlightColor);
-            graphics->drawLine(width - i,i + 1, width - i, height - i);
-            graphics->drawLine(i,height - i, width - i - 1, height - i);
+            graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+            graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
         }
     }
 
-    void TextField::drawCaret(Graphics* graphics, int x)
+    void TextField::drawCaret(Graphics* graphics, int x, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         graphics->setColor(getForegroundColor());
-        graphics->drawLine(x, getHeight() - 2, x, 1);
+        graphics->drawLine(x, getHeight() - 2, x, 1, render_commands);
     }
 
     void TextField::mousePress(int x, int, int button)

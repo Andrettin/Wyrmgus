@@ -424,7 +424,7 @@ PixelPos COrder_Resource::Show(const CViewport &vp, const PixelPos &lastScreenPo
 
 	if (Preference.ShowPathlines) {
 		Video.FillCircleClip(ColorYellow, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
-		Video.DrawLineClip(ColorYellow, lastScreenPos, targetPos);
+		Video.DrawLineClip(ColorYellow, lastScreenPos, targetPos, render_commands);
 		Video.FillCircleClip(ColorYellow, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
 	}
 

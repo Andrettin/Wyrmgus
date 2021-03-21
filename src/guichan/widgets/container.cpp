@@ -97,7 +97,7 @@ namespace gcn
 		drawChildren(graphics, render_commands);
 	}
 
-	void Container::drawBorder(Graphics* graphics)
+	void Container::drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 	{
 		Color faceColor = getBaseColor();
 		Color highlightColor, shadowColor;
@@ -113,11 +113,11 @@ namespace gcn
 		for (i = 0; i < getBorderSize(); ++i)
 		{
 			graphics->setColor(shadowColor);
-			graphics->drawLine(i,i, width - i, i);
-			graphics->drawLine(i,i + 1, i, height - i - 1);
+			graphics->drawLine(i,i, width - i, i, render_commands);
+			graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
 			graphics->setColor(highlightColor);
-			graphics->drawLine(width - i,i + 1, width - i, height - i);
-			graphics->drawLine(i,height - i, width - i - 1, height - i);
+			graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+			graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
 		}
 	}
 
@@ -147,7 +147,7 @@ namespace gcn
 					rec.width += 2 * (*iter)->getBorderSize();
 					rec.height += 2 * (*iter)->getBorderSize();
 					graphics->pushClipArea(rec);
-					(*iter)->drawBorder(graphics);
+					(*iter)->drawBorder(graphics, render_commands);
 					graphics->popClipArea();
 				}
 

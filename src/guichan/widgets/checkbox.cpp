@@ -101,7 +101,7 @@ namespace gcn
         }
     }
 
-    void CheckBox::drawBorder(Graphics* graphics)
+    void CheckBox::drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color faceColor = getBaseColor();
         Color highlightColor, shadowColor;
@@ -117,11 +117,11 @@ namespace gcn
         for (i = 0; i < getBorderSize(); ++i)
         {
             graphics->setColor(shadowColor);
-            graphics->drawLine(i,i, width - i, i);
-            graphics->drawLine(i,i + 1, i, height - i - 1);
+            graphics->drawLine(i,i, width - i, i, render_commands);
+            graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
             graphics->setColor(highlightColor);
-            graphics->drawLine(width - i,i + 1, width - i, height - i);
-            graphics->drawLine(i,height - i, width - i - 1, height - i);
+            graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+            graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
         }
     }
 
@@ -138,12 +138,12 @@ namespace gcn
         shadowColor.a = alpha;
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(0, 0, h, 0);
-        graphics->drawLine(0, 1, 0, h);
+        graphics->drawLine(0, 0, h, 0, render_commands);
+        graphics->drawLine(0, 1, 0, h, render_commands);
 
         graphics->setColor(highlightColor);
-        graphics->drawLine(h, 1, h, h);
-        graphics->drawLine(1, h, h - 1, h);
+        graphics->drawLine(h, 1, h, h, render_commands);
+        graphics->drawLine(1, h, h - 1, h, render_commands);
 
         graphics->setColor(getBackgroundColor());
         graphics->fillRectangle(Rectangle(1, 1, h - 1, h - 1), render_commands);
@@ -152,11 +152,11 @@ namespace gcn
 
         if (mMarked)
         {
-            graphics->drawLine(3, 5, 3, h - 3);
-            graphics->drawLine(4, 5, 4, h - 3);
+            graphics->drawLine(3, 5, 3, h - 3, render_commands);
+            graphics->drawLine(4, 5, 4, h - 3, render_commands);
 
-             graphics->drawLine(5, h - 4, h - 2, 3);
-             graphics->drawLine(5, h - 5, h - 4, 4);
+             graphics->drawLine(5, h - 4, h - 2, 3, render_commands);
+             graphics->drawLine(5, h - 5, h - 4, 4, render_commands);
         }
     }
 

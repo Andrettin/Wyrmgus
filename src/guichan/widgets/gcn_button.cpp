@@ -162,14 +162,14 @@ namespace gcn
         graphics->fillRectangle(Rectangle(1, 1, getDimension().width-1, getHeight() - 1), render_commands);
 
         graphics->setColor(highlightColor);
-        graphics->drawLine(0, 0, getWidth() - 1, 0);
-        graphics->drawLine(0, 1, 0, getHeight() - 1);
+        graphics->drawLine(0, 0, getWidth() - 1, 0, render_commands);
+        graphics->drawLine(0, 1, 0, getHeight() - 1, render_commands);
         //graphics->drawHLine(0, 0, getWidth() - 1);
         //graphics->drawVLine(0, 1, 0, getHeight() - 1);
 
         graphics->setColor(shadowColor);
-        graphics->drawLine(getWidth() - 1, 1, getWidth() - 1, getHeight() - 1);
-        graphics->drawLine(1, getHeight() - 1, getWidth() - 1, getHeight() - 1);
+        graphics->drawLine(getWidth() - 1, 1, getWidth() - 1, getHeight() - 1, render_commands);
+        graphics->drawLine(1, getHeight() - 1, getWidth() - 1, getHeight() - 1, render_commands);
         //graphics->drawVLine(getWidth() - 1, 1 , getHeight() - 1);
         //graphics->drawHLine(1, getHeight() - 1, getWidth() - 1);
 
@@ -213,7 +213,7 @@ namespace gcn
         }
     }
 
-    void Button::drawBorder(Graphics* graphics)
+    void Button::drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
         Color faceColor = getBaseColor();
         Color highlightColor, shadowColor;
@@ -229,11 +229,11 @@ namespace gcn
         for (i = 0; i < getBorderSize(); ++i)
         {
             graphics->setColor(shadowColor);
-            graphics->drawLine(i,i, width - i, i);
-            graphics->drawLine(i,i + 1, i, height - i - 1);
+            graphics->drawLine(i,i, width - i, i, render_commands);
+            graphics->drawLine(i,i + 1, i, height - i - 1, render_commands);
             graphics->setColor(highlightColor);
-            graphics->drawLine(width - i,i + 1, width - i, height - i);
-            graphics->drawLine(i,height - i, width - i - 1, height - i);
+            graphics->drawLine(width - i,i + 1, width - i, height - i, render_commands);
+            graphics->drawLine(i,height - i, width - i - 1, height - i, render_commands);
         }
     }
 

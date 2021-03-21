@@ -177,7 +177,7 @@ PixelPos COrder_Repair::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 
 	if (Preference.ShowPathlines) {
 		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
-		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
+		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos, render_commands);
 		Video.FillCircleClip(ColorYellow, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
 	}
 
