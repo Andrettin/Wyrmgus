@@ -3139,7 +3139,7 @@ void DrawPieMenu(std::vector<std::function<void(renderer *)>> &render_commands)
 			}
 			// Draw icon
 			if (gray) {
-				buttons[i]->Icon.Icon->DrawGrayscaleIcon(pos);
+				buttons[i]->Icon.Icon->DrawGrayscaleIcon(pos, render_commands);
 			} else {
 				buttons[i]->Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->get_player_color(), render_commands);
 			}

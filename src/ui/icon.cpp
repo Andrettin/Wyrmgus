@@ -122,9 +122,9 @@ void icon::DrawIcon(const PixelPos &pos, const player_color *player_color, std::
 **
 **  @param pos     display pixel position
 */
-void icon::DrawGrayscaleIcon(const PixelPos &pos) const
+void icon::DrawGrayscaleIcon(const PixelPos &pos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	this->get_graphics()->DrawGrayscaleFrameClip(this->get_frame(), pos.x, pos.y);
+	this->get_graphics()->DrawGrayscaleFrameClip(this->get_frame(), pos.x, pos.y, render_commands);
 }
 
 /**
@@ -136,7 +136,7 @@ void icon::DrawGrayscaleIcon(const PixelPos &pos) const
 void icon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	// TO-DO: implement more effect types (clock-like)
-	this->get_graphics()->DrawGrayscaleFrameClip(this->get_frame(), pos.x, pos.y);
+	this->get_graphics()->DrawGrayscaleFrameClip(this->get_frame(), pos.x, pos.y, render_commands);
 	const int height = (this->get_graphics()->Height * (100 - percent)) / 100;
 	this->get_graphics()->DrawSubClip(this->get_graphics()->frame_map[this->get_frame()].x, this->get_graphics()->frame_map[this->get_frame()].y + this->get_graphics()->Height - height, this->get_graphics()->Width, height, pos.x, pos.y + this->get_graphics()->Height - height, render_commands);
 }

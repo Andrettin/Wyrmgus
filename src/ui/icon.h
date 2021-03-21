@@ -98,7 +98,7 @@ public:
 	/// Draw icon
 	void DrawIcon(const PixelPos &pos, const player_color *player_color, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	/// Draw grayscale icon
-	void DrawGrayscaleIcon(const PixelPos &pos) const;
+	void DrawGrayscaleIcon(const PixelPos &pos, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	/// Draw cooldown spell
 	void DrawCooldownSpellIcon(const PixelPos &pos, const int percent, std::vector<std::function<void(renderer *)>> &render_commands) const;
 

@@ -246,23 +246,6 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 					frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 0);
 }
 
-void CGraphic::DoDrawFrameClip(const GLuint *textures,
-							   unsigned frame, int x, int y, int show_percent) const
-{
-	int ox;
-	int oy;
-	int skip;
-	int w = Width;
-	int h = Height;
-
-	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, skip);
-	UNUSED(skip);
-	DrawTexture(this, textures, frame_map[frame].x + ox,
-				frame_map[frame].y + oy,
-				frame_map[frame].x + ox + (w),
-				frame_map[frame].y + oy + (h * show_percent / 100), x, y, 0);
-}
-
 /**
 **  Draw graphic object clipped.
 **
@@ -277,28 +260,28 @@ void CGraphic::DrawFrameClip(const unsigned frame, const int x, const int y, con
 
 void CGraphic::DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, false, alpha, show_percent, render_commands);
+	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, false, false, alpha, show_percent, render_commands);
 }
 
-void CGraphic::DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent)
+void CGraphic::DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	DoDrawFrameClip(this->grayscale_textures.get(), frame, x, y, show_percent);
+	this->render_grayscale_frame(frame, QPoint(x, y), show_percent, render_commands);
 }
 
 void CPlayerColorGraphic::DrawPlayerColorFrameClip(const player_color *player_color, const unsigned frame, const int x, const int y, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_frame(frame, QPoint(x, y), player_color, time_of_day, false, 255, show_percent, render_commands);
+	this->render_player_color_frame(frame, QPoint(x, y), player_color, time_of_day, false, 255, show_percent, render_commands);
 }
 
 //Wyrmgus start
 void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(const player_color *player_color, unsigned frame, int x, int y, int alpha, const time_of_day *time_of_day, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_frame(frame, QPoint(x, y), player_color, time_of_day, false, alpha, show_percent, render_commands);
+	this->render_player_color_frame(frame, QPoint(x, y), player_color, time_of_day, false, alpha, show_percent, render_commands);
 }
 
 void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(const player_color *player_color, unsigned frame, int x, int y, int alpha, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_frame(frame, QPoint(x, y), player_color, time_of_day, true, alpha, 100, render_commands);
+	this->render_player_color_frame(frame, QPoint(x, y), player_color, time_of_day, true, alpha, 100, render_commands);
 }
 //Wyrmgus end
 
@@ -314,7 +297,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(const player_color *pla
 void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 //Wyrmgus end
 {
-	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, true, 255, 100, render_commands);
+	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, false, true, 255, 100, render_commands);
 }
 
 //Wyrmgus start
@@ -322,7 +305,7 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const time_of_day *t
 void CGraphic::DrawFrameClipTransX(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 //Wyrmgus end
 {
-	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, true, alpha, 100, render_commands);
+	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, false, true, alpha, 100, render_commands);
 }
 
 /**
@@ -335,7 +318,7 @@ void CGraphic::DrawFrameClipTransX(const unsigned frame, const int x, const int 
 */
 void CPlayerColorGraphic::DrawPlayerColorFrameClipX(const player_color *player_color, unsigned frame, int x, int y, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_frame(frame, QPoint(x, y), player_color, time_of_day, true, 255, 100, render_commands);
+	this->render_player_color_frame(frame, QPoint(x, y), player_color, time_of_day, true, 255, 100, render_commands);
 }
 
 /*----------------------------------------------------------------------------
@@ -1287,15 +1270,15 @@ void CGraphic::render(const QPoint &pixel_pos, std::vector<std::function<void(re
 	});
 }
 
-void CGraphic::render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
+void CGraphic::render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool grayscale, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	const CColor *color_modification = nullptr;
 	if (time_of_day != nullptr && time_of_day->HasColorModification()) {
 		color_modification = &time_of_day->ColorModification;
 	}
 
-	render_commands.push_back([this, frame_index, pixel_pos, player_color, color_modification, flip, opacity, show_percent](renderer *renderer) {
-		const QOpenGLTexture *texture = this->get_or_create_texture(player_color, color_modification, false);
+	render_commands.push_back([this, frame_index, pixel_pos, player_color, color_modification, grayscale, flip, opacity, show_percent](renderer *renderer) {
+		const QOpenGLTexture *texture = this->get_or_create_texture(player_color, color_modification, grayscale);
 
 		renderer->blit_texture_frame(texture, pixel_pos, this->get_size(), frame_index, this->get_frame_size(), flip, opacity, show_percent);
 	});

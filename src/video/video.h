@@ -94,7 +94,6 @@ public:
 
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
-	void DoDrawFrameClip(const GLuint *textures, unsigned frame, int x, int y, int show_percent = 100) const;
 
 	void DrawFrameClip(const unsigned frame, const int x, const int y, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
 
@@ -120,7 +119,12 @@ public:
 		this->DrawFrameClipTrans(frame, x, y, alpha, nullptr, render_commands);
 	}
 
-	void DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent = 100);
+	void DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void DrawGrayscaleFrameClip(unsigned frame, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->DrawGrayscaleFrameClip(frame, x, y, 100, render_commands);
+	}
 
 	// Draw frame flipped horizontally
 	void DrawFrameClipX(unsigned frame, int x, int y, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands);
@@ -411,16 +415,26 @@ public:
 
 	void render(const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands);
 
-	void render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
+	void render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool grayscale, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 	{
-		this->render_frame(frame_index, pixel_pos, player_color, time_of_day, false, 255, 100, render_commands);
+		this->render_frame(frame_index, pixel_pos, player_color, time_of_day, false, false, 255, 100, render_commands);
 	}
 
 	void render_frame(const int frame_index, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands)
 	{
 		this->render_frame(frame_index, pixel_pos, nullptr, nullptr, render_commands);
+	}
+
+	void render_player_color_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->render_frame(frame_index, pixel_pos, player_color, time_of_day, false, flip, opacity, show_percent, render_commands);
+	}
+
+	void render_grayscale_frame(const int frame_index, const QPoint &pixel_pos, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->render_frame(frame_index, pixel_pos, nullptr, nullptr, true, false, 255, show_percent, render_commands);
 	}
 
 	void render_rect(const QRect &rect, const QPoint &pixel_pos, const player_color *player_color, const bool grayscale, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands);
