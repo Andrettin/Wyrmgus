@@ -655,16 +655,9 @@ void DrawShadow(const unit_type &type, const std::shared_ptr<CGraphic> &sprite, 
 
 	if (type.Flip) {
 		if (frame < 0) {
-			//Wyrmgus start
-//			type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-			sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-			//Wyrmgus end
-			sprite->render_frame(-frame - 1, pos, nullptr, nullptr, true, 255, 100, render_commands);
+			sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, render_commands);
 		} else {
-			//Wyrmgus start
-//			type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 			sprite->DrawFrameClip(frame, pos.x, pos.y, render_commands);
-			//Wyrmgus end
 		}
 	} else {
 		int row = type.get_num_directions() / 2 + 1;
@@ -739,11 +732,9 @@ void DrawOverlay(const unit_type &type, const std::shared_ptr<CGraphic> &sprite,
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
-				sprite->render_frame(-frame - 1, pos, nullptr, time_of_day, true, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), 100, render_commands);
+				sprite->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day, render_commands);
 			} else {
-				sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, time_of_day);
-				sprite->render_frame(-frame - 1, pos, nullptr, time_of_day, true, 255, 100, render_commands);
+				sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, time_of_day, render_commands);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
@@ -906,8 +897,7 @@ static void DrawConstructionShadow(const CUnit &unit, const unit_type &type, con
 			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
 			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
 			if (frame < 0) {
-				variation->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-				variation->ShadowSprite->render_frame(-frame - 1, pos, nullptr, nullptr, true, 255, 100, render_commands);
+				variation->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, render_commands);
 			} else {
 				variation->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y, render_commands);
 			}
@@ -916,8 +906,7 @@ static void DrawConstructionShadow(const CUnit &unit, const unit_type &type, con
 			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
 			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
 			if (frame < 0) {
-				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-				type.ShadowSprite->render_frame(-frame - 1, pos, nullptr, nullptr, true, 255, 100, render_commands);
+				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, render_commands);
 			} else {
 				type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y, render_commands);
 			}

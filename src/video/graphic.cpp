@@ -275,14 +275,6 @@ void CGraphic::DrawFrameClip(const unsigned frame, const int x, const int y, con
 	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, render_commands);
 }
 
-void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
-{
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glColor4ub(255, 255, 255, alpha);
-	DrawFrame(frame, x, y);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-}
-
 void CGraphic::DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, false, alpha, show_percent, render_commands);
@@ -311,46 +303,6 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(const player_color *pla
 //Wyrmgus end
 
 /**
-**  Draw graphic object unclipped and flipped in X direction.
-**
-**  @param frame   number of frame (object index)
-**  @param x       x coordinate on the screen
-**  @param y       y coordinate on the screen
-*/
-void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
-{
-	DrawTexture(this, this->textures.get(), frame_map[frame].x, frame_map[frame].y,
-				frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 1);
-}
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-void CGraphic::DoDrawFrameClipX(const GLuint *textures, unsigned frame,
-								int x, int y) const
-{
-	int ox;
-	int oy;
-	int skip;
-	int w = Width;
-	int h = Height;
-	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, skip);
-	UNUSED(skip);
-
-	if (w < Width) {
-		if (ox == 0) {
-			ox = Width - w;
-		} else {
-			ox = 0;
-		}
-	}
-
-	DrawTexture(this, textures, frame_map[frame].x + ox,
-				frame_map[frame].y + oy,
-				frame_map[frame].x + ox + w,
-				frame_map[frame].y + oy + h, x, y, 1);
-}
-#endif
-
-/**
 **  Draw graphic object clipped and flipped in X direction.
 **
 **  @param frame   number of frame (object index)
@@ -359,43 +311,18 @@ void CGraphic::DoDrawFrameClipX(const GLuint *textures, unsigned frame,
 */
 //Wyrmgus start
 //void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
-void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const time_of_day *time_of_day)
+void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 //Wyrmgus end
 {
-	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		DoDrawFrameClipX(this->textures.get(), frame, x, y);
-	} else {
-		if (this->get_textures(time_of_day->ColorModification) == nullptr) {
-			MakeTexture(this, false, time_of_day);
-		}
-		DoDrawFrameClipX(this->get_textures(time_of_day->ColorModification), frame, x, y);
-	}
-}
-
-void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
-{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glColor4ub(255, 255, 255, alpha);
-	DrawFrameX(frame, x, y);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-#endif
+	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, true, 255, 100, render_commands);
 }
 
 //Wyrmgus start
 //void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
-void CGraphic::DrawFrameClipTransX(const unsigned frame, const int x, const int y, const int alpha, const wyrmgus::time_of_day *time_of_day)
+void CGraphic::DrawFrameClipTransX(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 //Wyrmgus end
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glColor4ub(255, 255, 255, alpha);
-	//Wyrmgus start
-//	DrawFrameClipX(frame, x, y);
-	DrawFrameClipX(frame, x, y, time_of_day);
-	//Wyrmgus end
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-#endif
+	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, true, alpha, 100, render_commands);
 }
 
 /**

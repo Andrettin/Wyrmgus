@@ -108,8 +108,6 @@ public:
 		this->DrawFrameClip(frame, x, y, nullptr, render_commands);
 	}
 
-	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
-
 	void DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -125,11 +123,19 @@ public:
 	void DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent = 100);
 
 	// Draw frame flipped horizontally
-	void DrawFrameX(unsigned frame, int x, int y) const;
-	void DoDrawFrameClipX(const GLuint *textures, unsigned frame, int x, int y) const;
-	void DrawFrameClipX(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr);
-	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr);
+	void DrawFrameClipX(unsigned frame, int x, int y, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void DrawFrameClipX(unsigned frame, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->DrawFrameClipX(frame, x, y, nullptr, render_commands);
+	}
+
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		return this->DrawFrameClipTransX(frame, x, y, alpha, nullptr, render_commands);
+	}
 
 	static std::shared_ptr<CGraphic> New(const std::string &filepath, const int w = 0, const int h = 0);
 

@@ -957,9 +957,9 @@ void missile_type::DrawMissileType(int frame, const PixelPos &pos, std::vector<s
 	if (this->Flip) {
 		if (frame < 0) {
 			if (this->Transparency > 0) {
-				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * Transparency));
+				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * Transparency), render_commands);
 			} else {
-				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y, render_commands);
 			}
 		} else {
 			if (this->Transparency > 0) {
