@@ -1850,10 +1850,10 @@ void ToggleShowBuilListMessages()
 **
 **  @param frame  frame nr. of the info panel background.
 */
-static void DrawInfoPanelBackground(unsigned frame)
+static void DrawInfoPanelBackground(unsigned frame, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (UI.InfoPanel.G) {
-		UI.InfoPanel.G->DrawFrame(frame, UI.InfoPanel.X, UI.InfoPanel.Y);
+		UI.InfoPanel.G->DrawFrame(frame, UI.InfoPanel.X, UI.InfoPanel.Y, render_commands);
 	}
 }
 
@@ -1861,7 +1861,7 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 {
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
-	DrawInfoPanelBackground(0);
+	DrawInfoPanelBackground(0, render_commands);
 	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer())
 		&& !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		// FIXME: not correct for enemies units
@@ -1944,7 +1944,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 	} else {
 		panelIndex = 0;
 	}
-	DrawInfoPanelBackground(panelIndex);
+	DrawInfoPanelBackground(panelIndex, render_commands);
 	//Wyrmgus start
 	//draw icon panel frame, if any
 	if (
@@ -1983,7 +1983,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 static void InfoPanel_draw_multiple_selection(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	//  If there are more units selected draw their pictures and a health bar
-	DrawInfoPanelBackground(0);
+	DrawInfoPanelBackground(0, render_commands);
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 		//Wyrmgus start
 //		const wyrmgus::icon &icon = *Selected[i]->Type->Icon.Icon;

@@ -527,7 +527,6 @@ set(video_SRCS
 	src/video/render_context.cpp
 	src/video/renderer.cpp
 	src/video/sdl.cpp
-	src/video/sprite.cpp
 	src/video/video.cpp
 )
 source_group(video FILES ${video_SRCS})

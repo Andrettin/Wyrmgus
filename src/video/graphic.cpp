@@ -104,18 +104,6 @@ CGraphic::~CGraphic()
 	if (this->has_textures()) {
 		log::log_error("Graphic \"" + this->get_filepath().string() + "\" is being destroyed before its textures have been freed in the Qt OpenGL context.");
 	}
-
-	if (this->textures != nullptr) {
-		glDeleteTextures(this->NumTextures, this->textures.get());
-	}
-
-	if (this->grayscale_textures != nullptr) {
-		glDeleteTextures(this->NumTextures, this->grayscale_textures.get());
-	}
-
-	for (const auto &kv_pair : this->texture_color_modifications) {
-		glDeleteTextures(this->NumTextures, kv_pair.second.get());
-	}
 }
 
 /**
@@ -146,27 +134,12 @@ void CGraphic::DrawClip(int x, int y, std::vector<std::function<void(renderer *)
 */
 void CGraphic::DrawSub(const int gx, const int gy, const int w, const int h, const int x, const int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	DrawTexture(this, this->textures.get(), gx, gy, gx + w, gy + h, x, y, 0);
-
 	this->render_rect(QRect(gx, gy, w, h), QPoint(x, y), nullptr, false, 255, render_commands);
 }
 
 void CGraphic::DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	this->render_rect(QRect(gx, gy, w, h), QPoint(x, y), nullptr, true, 255, render_commands);
-}
-
-CPlayerColorGraphic::~CPlayerColorGraphic()
-{
-	for (const auto &kv_pair : this->player_color_textures) {
-		glDeleteTextures(this->NumTextures, kv_pair.second.get());
-	}
-
-	for (const auto &kv_pair : this->player_color_texture_color_modifications) {
-		for (const auto &sub_kv_pair : kv_pair.second) {
-			glDeleteTextures(this->NumTextures, sub_kv_pair.second.get());
-		}
-	}
 }
 
 void CPlayerColorGraphic::DrawPlayerColorSub(const player_color *player_color, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -240,10 +213,9 @@ void CGraphic::DrawSubClipTrans(const int gx, const int gy, int w, int h, int x,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawFrame(unsigned frame, int x, int y) const
+void CGraphic::DrawFrame(unsigned frame, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	DrawTexture(this, this->textures.get(), frame_map[frame].x, frame_map[frame].y,
-					frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 0);
+	this->render_frame(frame, QPoint(x, y), render_commands);
 }
 
 /**
@@ -412,37 +384,6 @@ std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::New(const std::string 
 	CGraphic::graphics_by_filepath[g->HashFile] = g;
 
 	return g;
-}
-
-const GLuint *CPlayerColorGraphic::get_textures(const wyrmgus::player_color *player_color) const
-{
-	if (!this->has_player_color() || player_color == nullptr || player_color == this->get_conversible_player_color()) {
-		return CGraphic::get_textures();
-	}
-
-	auto find_iterator = this->player_color_textures.find(player_color);
-	if (find_iterator != this->player_color_textures.end()) {
-		return find_iterator->second.get();
-	}
-
-	return nullptr;
-}
-
-const GLuint *CPlayerColorGraphic::get_textures(const wyrmgus::player_color *player_color, const CColor &color_modification) const
-{
-	if (!this->has_player_color() || player_color == nullptr || player_color == this->get_conversible_player_color()) {
-		return CGraphic::get_textures(color_modification);
-	}
-
-	auto find_iterator = this->player_color_texture_color_modifications.find(player_color);
-	if (find_iterator != this->player_color_texture_color_modifications.end()) {
-		auto sub_find_iterator = find_iterator->second.find(color_modification);
-		if (sub_find_iterator != find_iterator->second.end()) {
-			return sub_find_iterator->second.get();
-		}
-	}
-
-	return nullptr;
 }
 
 /**
@@ -714,12 +655,6 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 		}
 	}
 	
-	MakeTexture(this, false, nullptr);
-
-	if (create_grayscale_textures) {
-		MakeTexture(this, true, nullptr);
-	}
-
 	CGraphic::graphics.push_back(this);
 
 	GenFramesMap();
@@ -728,317 +663,6 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 		this->Resize(this->GraphicWidth * scale_factor / this->custom_scale_factor, this->GraphicHeight * scale_factor / this->custom_scale_factor);
 	}
 }
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-
-void FreeOpenGLGraphics()
-{
-	for (CGraphic *graphic : CGraphic::graphics) {
-		if (graphic->textures != nullptr) {
-			glDeleteTextures(graphic->NumTextures, graphic->textures.get());
-			//don't clear the texture pointer to indicate to the reload OpenGL graphics function that they need to be recreated
-		}
-		
-		if (graphic->grayscale_textures != nullptr) {
-			glDeleteTextures(graphic->NumTextures, graphic->grayscale_textures.get());
-			//don't clear the texture pointer to indicate to the reload OpenGL graphics function that they need to be recreated
-		}
-		
-		for (const auto &kv_pair : graphic->texture_color_modifications) {
-			glDeleteTextures(graphic->NumTextures, kv_pair.second.get());
-		}
-		graphic->texture_color_modifications.clear();
-		
-		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(graphic);
-		if (cg) {
-			for (const auto &kv_pair : cg->player_color_textures) {
-				glDeleteTextures(cg->NumTextures, kv_pair.second.get());
-			}
-			cg->player_color_textures.clear();
-			
-			for (const auto &kv_pair : cg->player_color_texture_color_modifications) {
-				for (const auto &sub_kv_pair : kv_pair.second) {
-					glDeleteTextures(cg->NumTextures, sub_kv_pair.second.get());
-				}
-			}
-			cg->player_color_texture_color_modifications.clear();
-		}
-	}
-}
-
-/**
-**	@brief	Reload OpenGL graphics
-*/
-void ReloadGraphics()
-{
-	for (CGraphic *graphic : CGraphic::graphics) {
-		if (graphic->textures != nullptr) {
-			graphic->textures.reset();
-			MakeTexture(graphic, false, nullptr);
-		}
-		
-		if (graphic->grayscale_textures != nullptr) {
-			graphic->grayscale_textures.reset();
-			MakeTexture(graphic, true, nullptr);
-		}
-		
-		graphic->texture_color_modifications.clear();
-				
-		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(graphic);
-		if (cg != nullptr) {
-			cg->player_color_texture_color_modifications.clear();
-			cg->player_color_textures.clear();
-		}
-	}
-}
-
-#endif
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-
-/**
-**  Find the next power of 2 >= x
-*/
-static int PowerOf2(int x)
-{
-	int i;
-	for (i = 1; i < x; i <<= 1) ;
-	return i;
-}
-
-/**
-**  Make an OpenGL texture or textures out of a graphic object.
-**
-**  @param g        The graphic object.
-**  @param texture  Texture.
-**  @param colors   Unit colors.
-**  @param ow       Offset width.
-**  @param oh       Offset height.
-*/
-void MakeTextures2(const QImage &image, GLuint texture, const int ow, const int oh, const wyrmgus::time_of_day *time_of_day)
-{
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	int maxw = std::min<int>(image.width() - ow, GLMaxTextureSize);
-	int maxh = std::min<int>(image.height() - oh, GLMaxTextureSize);
-	int w = PowerOf2(maxw);
-	int h = PowerOf2(maxh);
-	auto tex = std::make_unique<unsigned char[]>(w * h * 4);
-
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	GLenum error_code = glGetError();
-	if (error_code != GL_NO_ERROR) {
-		throw std::runtime_error("glBindTexture failed with error code " + std::to_string(error_code) + ".");
-	}
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	int time_of_day_red = 0;
-	int time_of_day_green = 0;
-	int time_of_day_blue = 0;
-	
-	const bool has_time_of_day_color_modification = time_of_day != nullptr && time_of_day->HasColorModification();
-	if (has_time_of_day_color_modification) {
-		time_of_day_red = time_of_day->ColorModification.R;
-		time_of_day_green = time_of_day->ColorModification.G;
-		time_of_day_blue = time_of_day->ColorModification.B;
-	}
-
-	if (image.isNull()) {
-		throw std::runtime_error("Cannot generate a texture for a null image.");
-	}
-
-	const int depth = image.depth();
-	const int bpp = depth / 8;
-
-	if (bpp != 4) {
-		throw std::runtime_error("The image BPP must be 4 for generating textures.");
-	}
-
-	const unsigned char *image_data = image.constBits();
-	for (int x = 0; x < maxw; ++x) {
-		for (int y = 0; y < maxh; ++y) {
-			const int src_index = ((oh + y) * image.width() + ow + x) * bpp;
-			const unsigned char &src_red = image_data[src_index];
-			const unsigned char &src_green = image_data[src_index + 1];
-			const unsigned char &src_blue = image_data[src_index + 2];
-			const unsigned char &src_alpha = image_data[src_index + 3];
-
-			const int dst_index = (y * w + x) * 4;
-			unsigned char &dst_red = tex[dst_index];
-			unsigned char &dst_green = tex[dst_index + 1];
-			unsigned char &dst_blue = tex[dst_index + 2];
-			unsigned char &dst_alpha = tex[dst_index + 3];
-
-			dst_red = src_red;
-			dst_green = src_green;
-			dst_blue = src_blue;
-			dst_alpha = src_alpha;
-
-			if (has_time_of_day_color_modification) {
-				if (time_of_day_red != 0) {
-					dst_red = std::max<int>(0, std::min<int>(255, dst_red + time_of_day_red));
-				}
-				if (time_of_day_green != 0) {
-					dst_green = std::max<int>(0, std::min<int>(255, dst_green + time_of_day_green));
-				}
-				if (time_of_day_blue != 0) {
-					dst_blue = std::max<int>(0, std::min<int>(255, dst_blue + time_of_day_blue));
-				}
-			}
-		}
-	}
-
-	GLint internalformat = GL_RGBA;
-#ifdef USE_OPENGL
-	if (GLTextureCompressionSupported && UseGLTextureCompression) {
-		internalformat = GL_COMPRESSED_RGBA;
-	}
-#endif
-
-	glTexImage2D(GL_TEXTURE_2D, 0, internalformat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex.get());
-
-	error_code = glGetError();
-	if (error_code != GL_NO_ERROR) {
-		throw std::runtime_error("glTexImage2D failed with error code " + std::to_string(error_code) + ".");
-	}
-}
-
-static void MakeTextures(CGraphic *g, const bool grayscale, const player_color *player_color, const time_of_day *time_of_day)
-{
-	const int tw = (g->get_width() - 1) / GLMaxTextureSize + 1;
-	const int th = (g->get_height() - 1) / GLMaxTextureSize + 1;
-
-	int w = g->get_width() % GLMaxTextureSize;
-	if (w == 0) {
-		w = GLMaxTextureSize;
-	}
-	g->TextureWidth = (GLfloat)w / PowerOf2(w);
-
-	int h = g->get_height() % GLMaxTextureSize;
-	if (h == 0) {
-		h = GLMaxTextureSize;
-	}
-	g->TextureHeight = (GLfloat)h / PowerOf2(h);
-
-	g->NumTextures = tw * th;
-
-	CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
-	GLuint *textures = nullptr;
-	if (!player_color || !cg) {
-		if (time_of_day && time_of_day->HasColorModification()) {
-			g->texture_color_modifications[time_of_day->ColorModification] = std::make_unique<GLuint[]>(g->NumTextures);
-			textures = g->texture_color_modifications[time_of_day->ColorModification].get();
-			glGenTextures(g->NumTextures, g->texture_color_modifications[time_of_day->ColorModification].get());
-		} else if (grayscale) {
-			g->grayscale_textures = std::make_unique<GLuint[]>(g->NumTextures);
-			textures = g->grayscale_textures.get();
-			glGenTextures(g->NumTextures, g->grayscale_textures.get());
-		} else {
-			g->textures = std::make_unique<GLuint[]>(g->NumTextures);
-			textures = g->textures.get();
-			glGenTextures(g->NumTextures, g->textures.get());
-		}
-	} else if (time_of_day && time_of_day->HasColorModification()) {
-		cg->player_color_texture_color_modifications[player_color][time_of_day->ColorModification] = std::make_unique<GLuint[]>(cg->NumTextures);
-		textures = cg->player_color_texture_color_modifications[player_color][time_of_day->ColorModification].get();
-		glGenTextures(cg->NumTextures, cg->player_color_texture_color_modifications[player_color][time_of_day->ColorModification].get());
-	} else {
-		cg->player_color_textures[player_color] = std::make_unique<GLuint[]>(cg->NumTextures);
-		textures = cg->player_color_textures[player_color].get();
-		glGenTextures(cg->NumTextures, cg->player_color_textures[player_color].get());
-	}
-
-	const GLenum error_code = glGetError();
-	if (error_code != GL_NO_ERROR) {
-		throw std::runtime_error("glGenTextures failed with error code " + std::to_string(error_code) + ".");
-	}
-
-	QImage image = g->get_image();
-	if (image.format() != QImage::Format_RGBA8888) {
-		image = image.convertToFormat(QImage::Format_RGBA8888);
-	}
-
-	if (grayscale) {
-		if (Preference.SepiaForGrayscale) {
-			ApplySepiaScale(image);
-		} else {
-			ApplyGrayScale(image);
-		}
-	} else if (player_color != nullptr && g->has_player_color()) {
-		player_color->apply_to_image(image, g->get_conversible_player_color());
-	}
-
-	if (image.size() != g->get_size()) {
-		//the texture needs to be rescaled compared to the source image
-		if (g->get_width() > image.width() && g->get_height() > image.height() && (g->get_width() % image.width()) == 0 && (g->get_height() % image.height()) == 0 && (g->get_width() / image.width()) == (g->get_height() / image.height())) {
-			//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
-			const int scale_factor = g->get_width() / image.width();
-			image = image::scale(image, scale_factor, g->get_original_frame_size());
-		} else {
-			image = image.scaled(g->get_size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-			if (image.format() != QImage::Format_RGBA8888) {
-				//the image's format could have changed due to the rescaling
-				image = image.convertToFormat(QImage::Format_RGBA8888);
-			}
-		}
-	}
-
-	for (int j = 0; j < th; ++j) {
-		for (int i = 0; i < tw; ++i) {
-			MakeTextures2(image, textures[j * tw + i], GLMaxTextureSize * i, GLMaxTextureSize * j, time_of_day);
-		}
-	}
-}
-
-/**
-**  Make an OpenGL texture or textures out of a graphic object.
-**
-**  @param g  The graphic object.
-*/
-void MakeTexture(CGraphic *g, const bool grayscale, const wyrmgus::time_of_day *time_of_day)
-{
-	if (time_of_day && time_of_day->HasColorModification()) {
-		if (g->get_textures(time_of_day->ColorModification) != nullptr) {
-			return;
-		}
-	} else if (grayscale) {
-		if (g->grayscale_textures) {
-			return;
-		}
-	} else {
-		if (g->textures) {
-			return;
-		}
-	}
-
-	MakeTextures(g, grayscale, nullptr, time_of_day);
-}
-
-void MakePlayerColorTexture(CPlayerColorGraphic *g, const wyrmgus::player_color *player_color, const wyrmgus::time_of_day *time_of_day)
-{
-	if (time_of_day && time_of_day->HasColorModification()) {
-		if (g->get_textures(player_color, time_of_day->ColorModification) != nullptr) {
-			return;
-		}
-
-		if (!g->has_player_color() || player_color == nullptr || player_color == g->get_conversible_player_color()) {
-			MakeTextures(g, false, nullptr, time_of_day);
-			return;
-		}
-	} else {
-		if (g->get_textures(player_color) != nullptr) {
-			return;
-		}
-	}
-
-	MakeTextures(g, false, player_color, time_of_day);
-}
-
-#endif
 
 /**
 **  Resize a graphic
@@ -1075,27 +699,6 @@ void CGraphic::Resize(int w, int h)
 	this->Width = frame_size.width();
 	this->Height = frame_size.height();
 
-	const bool has_textures = this->textures != nullptr;
-	const bool has_grayscale_textures = this->grayscale_textures != nullptr;
-
-	if (has_textures) {
-		glDeleteTextures(this->NumTextures, this->textures.get());
-		this->textures.reset();
-	}
-
-	if (has_grayscale_textures) {
-		glDeleteTextures(this->NumTextures, this->grayscale_textures.get());
-		this->grayscale_textures.reset();
-	}
-
-	if (has_textures) {
-		MakeTexture(this, false, nullptr);
-	}
-
-	if (has_grayscale_textures) {
-		MakeTexture(this, true, nullptr);
-	}
-
 	this->GenFramesMap();
 }
 
@@ -1112,16 +715,6 @@ void CGraphic::SetOriginalSize()
 	}
 	
 	this->frame_map.clear();
-
-	if (this->textures != nullptr) {
-		glDeleteTextures(this->NumTextures, this->textures.get());
-		this->textures.reset();
-	}
-
-	if (this->grayscale_textures != nullptr) {
-		glDeleteTextures(this->NumTextures, this->grayscale_textures.get());
-		this->grayscale_textures.reset();
-	}
 
 	this->Width = this->Height = 0;
 	this->image = QImage();

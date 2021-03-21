@@ -38,9 +38,6 @@
 
 struct SDL_Cursor;
 struct SDL_Surface;
-typedef float GLfloat;
-typedef int GLint;
-typedef unsigned int GLuint;
 
 namespace wyrmgus {
 	class font;
@@ -93,7 +90,7 @@ public:
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	// Draw frame
-	void DrawFrame(unsigned frame, int x, int y) const;
+	void DrawFrame(unsigned frame, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void DrawFrameClip(const unsigned frame, const int x, const int y, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
 
@@ -388,26 +385,6 @@ public:
 
 	void create_texture(const player_color *player_color, const CColor *color_modification, const bool grayscale);
 
-	const GLuint *get_textures() const
-	{
-		return this->textures.get();
-	}
-
-	const GLuint *get_textures(const CColor &color_modification) const
-	{
-		const auto find_iterator = this->texture_color_modifications.find(color_modification);
-		if (find_iterator != this->texture_color_modifications.end()) {
-			return find_iterator->second.get();
-		}
-
-		return nullptr;
-	}
-
-	const GLuint *get_grayscale_textures() const
-	{
-		return this->grayscale_textures.get();
-	}
-
 	std::mutex &get_load_mutex()
 	{
 		return this->load_mutex;
@@ -471,13 +448,6 @@ private:
 	const player_color *conversible_player_color = nullptr;
 public:
 	bool Resized = false;			/// Image has been resized
-public:
-	GLfloat TextureWidth = 0.f;      /// Width of the texture
-	GLfloat TextureHeight = 0.f;     /// Height of the texture
-	std::unique_ptr<GLuint[]> textures; //texture names
-	std::unique_ptr<GLuint[]> grayscale_textures;
-	std::map<CColor, std::unique_ptr<GLuint[]>> texture_color_modifications; //textures with a color modification applied to them
-	int NumTextures = 0;           /// Number of textures
 private:
 	std::unique_ptr<QOpenGLTexture> texture;
 	std::unique_ptr<QOpenGLTexture> grayscale_texture;
@@ -499,8 +469,6 @@ public:
 		: CGraphic(filepath, conversible_player_color)
 	{
 	}
-
-	virtual ~CPlayerColorGraphic() override;
 
 	void DrawPlayerColorSub(const player_color *player_color, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawPlayerColorSubClip(const player_color *player_color, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
@@ -529,12 +497,6 @@ public:
 	}
 
 	static CPlayerColorGraphic *Get(const std::string &file);
-
-	const GLuint *get_textures(const wyrmgus::player_color *player_color) const;
-	const GLuint *get_textures(const wyrmgus::player_color *player_color, const CColor &color_modification) const;
-
-	std::map<const wyrmgus::player_color *, std::unique_ptr<GLuint[]>> player_color_textures;
-	std::map<const wyrmgus::player_color *, std::map<CColor, std::unique_ptr<GLuint[]>>> player_color_texture_color_modifications; //player color textures with a color modification applied to them
 };
 
 /**
@@ -719,20 +681,9 @@ extern int VideoValidResolution(int w, int h);
 /// Load graphic from PNG file
 extern int LoadGraphicPNG(CGraphic *g, const int scale_factor);
 
-/// Make an OpenGL texture
-extern void MakeTexture(CGraphic *graphic, const bool grayscale, const time_of_day *time_of_day);
-//Wyrmgus start
-extern void MakeTextures2(const QImage &image, GLuint texture, const int ow, const int oh, const wyrmgus::time_of_day *time_of_day = nullptr);
-//Wyrmgus end
-extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, const player_color *player_color, const time_of_day *time_of_day = nullptr);
-
 /// Regenerate Window screen if needed
 extern void ValidateOpenGLScreen();
 
-/// Free OpenGL graphics
-extern void FreeOpenGLGraphics();
-/// Reload OpenGL graphics
-extern void ReloadGraphics();
 /// Reload OpenGL
 extern void ReloadOpenGL();
 
@@ -795,11 +746,6 @@ extern uint32_t ColorDarkGray;
 extern uint32_t ColorRed;
 extern uint32_t ColorGreen;
 extern uint32_t ColorYellow;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-void DrawTexture(const CGraphic *g, const GLuint *textures, int sx, int sy,
-				 int ex, int ey, int x, int y, int flip);
-#endif
 
 //  Color Cycling stuff
 

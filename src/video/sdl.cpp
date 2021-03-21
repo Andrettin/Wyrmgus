@@ -296,7 +296,6 @@ static void InitOpenGL()
 void ReloadOpenGL()
 {
 	InitOpenGL();
-	ReloadGraphics();
 	ReloadFonts();
 }
 

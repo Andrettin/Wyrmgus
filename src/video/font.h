@@ -77,9 +77,6 @@ public:
 	//Wyrmgus end
 
 	void Reload();
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	void FreeOpenGL();
-#endif
 
 	CGraphic *get_font_color_graphic(const wyrmgus::font_color *font_color);
 
@@ -108,12 +105,8 @@ extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned
 /// Get the hot key from a string
 extern int GetHotKey(const std::string &text);
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-/// Free OpenGL fonts
-extern void FreeOpenGLFonts();
 /// Reload OpenGL fonts
 extern void ReloadFonts();
-#endif
 
 class CLabel
 {

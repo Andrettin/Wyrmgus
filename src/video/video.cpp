@@ -278,9 +278,6 @@ void CVideo::ClearScreen()
 bool CVideo::ResizeScreen(int w, int h)
 {
 	if (VideoValidResolution(w, h)) {
-		FreeOpenGLGraphics();
-		FreeOpenGLFonts();
-
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 		ViewportWidth = w;
 		ViewportHeight = h;

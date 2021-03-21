@@ -753,8 +753,6 @@ void font::make_font_color_texture(const wyrmgus::font_color *fc)
 		newg->image.setColor(j, qRgba(color.red(), color.green(), color.blue(), j == 0 ? 0 : 255));
 	}
 
-	MakeTexture(newg.get(), false, nullptr);
-
 	this->font_color_graphics[fc] = std::move(newg);
 }
 
@@ -792,20 +790,6 @@ void font::load()
 	this->MeasureWidths();
 }
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-void font::FreeOpenGL()
-{
-	if (this->G) {
-		for (const auto &kv_pair : this->font_color_graphics) {
-			CGraphic &g = *kv_pair.second;
-			if (g.textures != nullptr) {
-				glDeleteTextures(g.NumTextures, g.textures.get());
-				g.textures.reset();
-			}
-		}
-	}
-}
-
 void font::Reload()
 {
 	if (this->G != nullptr) {
@@ -829,14 +813,6 @@ void font::free_textures(std::vector<std::function<void(renderer *)>> &render_co
 }
 
 }
-
-void FreeOpenGLFonts()
-{
-	for (wyrmgus::font *font : wyrmgus::font::get_all()) {
-		font->FreeOpenGL();
-	}
-}
-#endif
 
 /**
 **  Reload OpenGL fonts

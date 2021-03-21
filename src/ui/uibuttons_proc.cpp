@@ -89,7 +89,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 				colorGraphic->DrawPlayerColorFrameClip(player_color, pimage->Frame, x, y, nullptr, show_percent, render_commands);
 			}
 		} else {
-			pimage->Sprite->DrawFrame(pimage->Frame, x, y);
+			pimage->Sprite->DrawFrame(pimage->Frame, x, y, render_commands);
 		}
 	}
 
