@@ -107,8 +107,8 @@ public:
 		QSize source_frame_size = frame_size;
 		QSize source_rendered_size = rendered_size;
 		if (show_percent < 100) {
-			source_frame_size = QSize(frame_size.width() * show_percent / 100, frame_size.height() * show_percent / 100);
-			source_rendered_size = QSize(rendered_size.width() * show_percent / 100, rendered_size.height() * show_percent / 100);
+			source_frame_size = QSize(frame_size.width(), frame_size.height() * show_percent / 100);
+			source_rendered_size = QSize(rendered_size.width(), rendered_size.height() * show_percent / 100);
 		}
 
 		if (flip) {

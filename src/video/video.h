@@ -407,19 +407,9 @@ public:
 
 	void render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
 
-	void render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool flip, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands)
-	{
-		this->render_frame(frame_index, pixel_pos, player_color, time_of_day, flip, opacity, 100, render_commands);
-	}
-
-	void render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool flip, std::vector<std::function<void(renderer *)>> &render_commands)
-	{
-		this->render_frame(frame_index, pixel_pos, player_color, time_of_day, flip, 255, render_commands);
-	}
-
 	void render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 	{
-		this->render_frame(frame_index, pixel_pos, player_color, time_of_day, false, render_commands);
+		this->render_frame(frame_index, pixel_pos, player_color, time_of_day, false, 255, 100, render_commands);
 	}
 
 	void render_frame(const int frame_index, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -503,7 +493,12 @@ public:
 	}
 
 	void DrawPlayerColorFrameClipTransX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr);
-	void DrawPlayerColorFrameClipTrans(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
+	void DrawPlayerColorFrameClipTrans(const player_color *player_color, unsigned frame, int x, int y, int alpha, const time_of_day *time_of_day, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void DrawPlayerColorFrameClipTrans(const player_color *player_color, unsigned frame, int x, int y, int alpha, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->DrawPlayerColorFrameClipTrans(player_color, frame, x, y, alpha, time_of_day, 100, render_commands);
+	}
 
 	static std::shared_ptr<CPlayerColorGraphic> New(const std::string &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color);
 

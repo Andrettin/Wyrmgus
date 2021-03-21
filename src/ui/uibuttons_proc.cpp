@@ -84,7 +84,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 			pimage->Sprite->DrawGrayscaleFrameClip(pimage->Frame, x, y, show_percent);
 		} else if (colorGraphic && player_color != nullptr) {
 			if (transparent) {
-				colorGraphic->DrawPlayerColorFrameClipTrans(player_color, pimage->Frame, x, y, 64, nullptr, show_percent);
+				colorGraphic->DrawPlayerColorFrameClipTrans(player_color, pimage->Frame, x, y, 64, nullptr, show_percent, render_commands);
 			} else {
 				colorGraphic->DrawPlayerColorFrameClip(player_color, pimage->Frame, x, y, nullptr, show_percent, render_commands);
 			}

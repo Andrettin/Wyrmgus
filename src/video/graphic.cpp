@@ -299,29 +299,12 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(const player_color *player_co
 }
 
 //Wyrmgus start
-void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day, int show_percent)
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(const player_color *player_color, unsigned frame, int x, int y, int alpha, const time_of_day *time_of_day, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		if (this->get_textures(player_color) == nullptr) {
-			MakePlayerColorTexture(this, player_color, nullptr);
-		}
-	} else {
-		if (this->get_textures(player_color, time_of_day->ColorModification) == nullptr) {
-			MakePlayerColorTexture(this, player_color, time_of_day);
-		}
-	}
-	
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glColor4ub(255, 255, 255, alpha);
-	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		DoDrawFrameClip(this->get_textures(player_color), frame, x, y, show_percent);
-	} else {
-		DoDrawFrameClip(this->get_textures(player_color, time_of_day->ColorModification), frame, x, y, show_percent);
-	}
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	this->render_frame(frame, QPoint(x, y), player_color, time_of_day, false, alpha, show_percent, render_commands);
 }
 
-void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day)
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(const player_color *player_color, unsigned frame, int x, int y, int alpha, const time_of_day *time_of_day)
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		if (this->get_textures(player_color) == nullptr) {
