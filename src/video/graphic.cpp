@@ -220,7 +220,7 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y, std::vector<std::function
 */
 void CGraphic::DrawFrameClip(const unsigned frame, const int x, const int y, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, render_commands);
+	this->render_frame(frame, QPoint(x, y), nullptr, time_of_day, false, false, 255, show_percent, render_commands);
 }
 
 void CGraphic::DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
