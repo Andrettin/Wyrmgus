@@ -123,8 +123,6 @@ void minimap::Create()
 	MinimapTextureHeight.resize(CMap::get()->MapLayers.size());
 
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
-		this->terrain_textures.push_back(std::make_unique<QOpenGLTexture>(QOpenGLTexture::Target2D));
-
 		// Scale to biggest value.
 		int n = std::max(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
 		n = std::max(n, 32);
@@ -195,11 +193,6 @@ void minimap::Create()
 	NumMinimapEvents = 0;
 }
 
-void minimap::free_textures()
-{
-	this->terrain_textures.clear();
-}
-
 void minimap::FreeOpenGL()
 {
 	for (size_t z = 0; z < this->overlay_textures.size(); ++z) {
@@ -208,9 +201,6 @@ void minimap::FreeOpenGL()
 	this->overlay_textures.clear();
 }
 
-/**
-**  Reload OpenGL minimap
-*/
 void minimap::Reload()
 {
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
@@ -678,29 +668,27 @@ void minimap::Draw(std::vector<std::function<void(renderer *)>> &render_commands
 	const int z = UI.CurrentMapLayer->ID;
 
 	if (this->is_terrain_visible()) {
-		QRect rect = this->get_texture_draw_rect(z);
-
-		render_commands.push_back([this, image = this->terrain_images[z], z, rect](renderer *renderer) {
-			QOpenGLTexture *texture = this->terrain_textures[z].get();
-
-			if (texture == nullptr) {
-				log::log_error("Minimap terrain texture is null.");
-				return;
-			}
-
-			if (image.isNull()) {
-				log::log_error("Minimap terrain image is null.");
-				return;
-			}
-
-			texture->setData(image);
-
-			renderer->blit_texture_frame(texture, QPoint(X, Y), rect.topLeft(), rect.size(), false, 255, 100, QSize(W, H));
-		});
+		this->draw_image(this->terrain_images[z], z, render_commands);
 	}
 
 	this->draw_texture(this->overlay_textures[z], this->overlay_images[z].constBits(), z);
 	this->draw_events();
+}
+
+void minimap::draw_image(const QImage &image, const int z, std::vector<std::function<void(renderer *)>> &render_commands) const
+{
+	QRect rect = this->get_texture_draw_rect(z);
+
+	render_commands.push_back([this, image, z, rect](renderer *renderer) {
+		if (image.isNull()) {
+			log::log_error("Minimap image is null.");
+			return;
+		}
+
+		QOpenGLTexture texture(image);
+
+		renderer->blit_texture_frame(&texture, QPoint(X, Y), rect.topLeft(), rect.size(), false, 255, 100, QSize(W, H));
+	});
 }
 
 void minimap::draw_texture(const GLuint &texture, const unsigned char *texture_data, const int z) const
