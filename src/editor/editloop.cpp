@@ -1559,9 +1559,6 @@ void EditorUpdateDisplay()
 	DrawCursor(render_commands);
 
 	render_context::get()->set_commands(std::move(render_commands));
-
-	// refresh entire screen, so no further invalidate needed
-	RealizeVideoMemory();
 }
 
 /*----------------------------------------------------------------------------

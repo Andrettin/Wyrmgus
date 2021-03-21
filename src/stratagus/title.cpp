@@ -146,7 +146,6 @@ void TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &r
 		g->DrawClip((Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2, render_commands);
 		this->ShowLabels(render_commands);
 
-		RealizeVideoMemory();
 		WaitEventsOneFrame();
 	}
 

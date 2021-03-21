@@ -655,17 +655,6 @@ extern void SetPlayersPalette();
 /// The SDL screen
 extern SDL_Surface *TheScreen;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-/// Max texture size supported on the video card
-extern GLint GLMaxTextureSize;
-/// User-specified limit for ::GLMaxTextureSize
-extern GLint GLMaxTextureSizeOverride;
-/// Is OpenGL texture compression supported
-extern bool GLTextureCompressionSupported;
-/// Use OpenGL texture compression
-extern bool UseGLTextureCompression;
-#endif
-
 /// register lua function
 extern void VideoCclRegister();
 
@@ -684,18 +673,12 @@ extern int LoadGraphicPNG(CGraphic *g, const int scale_factor);
 /// Regenerate Window screen if needed
 extern void ValidateOpenGLScreen();
 
-/// Reload OpenGL
-extern void ReloadOpenGL();
-
 /// Initializes video synchronization.
 extern void SetVideoSync();
 
 /// Set clipping for nearly all vector primitives. Functions which support
 /// clipping will be marked Clip. Set the system-wide clipping rectangle.
 extern void SetClipping(int left, int top, int right, int bottom);
-
-/// Realize video memory.
-extern void RealizeVideoMemory();
 
 /// Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char *name);

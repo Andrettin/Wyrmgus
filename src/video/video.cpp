@@ -281,13 +281,10 @@ bool CVideo::ResizeScreen(int w, int h)
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 		ViewportWidth = w;
 		ViewportHeight = h;
-		if (ZoomNoResize) {
-			ReloadOpenGL();
-		} else {
+		if (!ZoomNoResize) {
 			Width = w;
 			Height = h;
 			SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-			ReloadOpenGL();
 		}
 
 		//Wyrmgus start

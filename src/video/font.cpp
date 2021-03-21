@@ -790,13 +790,6 @@ void font::load()
 	this->MeasureWidths();
 }
 
-void font::Reload()
-{
-	if (this->G != nullptr) {
-		this->font_color_graphics.clear();
-	}
-}
-
 void font::free_textures(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	for (const auto &kv_pair : this->font_color_graphics) {
@@ -812,14 +805,4 @@ void font::free_textures(std::vector<std::function<void(renderer *)>> &render_co
 	}
 }
 
-}
-
-/**
-**  Reload OpenGL fonts
-*/
-void ReloadFonts()
-{
-	for (wyrmgus::font *font : wyrmgus::font::get_all()) {
-		font->Reload();
-	}
 }

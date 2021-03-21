@@ -2947,7 +2947,6 @@ int MenuScreen::run(bool loop)
 			engine_interface::get()->run_event_loop();
 
 			UpdateDisplay();
-			RealizeVideoMemory();
 			CheckMusicFinished();
 			WaitEventsOneFrame();
 		}

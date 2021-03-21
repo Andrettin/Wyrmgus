@@ -76,8 +76,6 @@ public:
 	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	//Wyrmgus end
 
-	void Reload();
-
 	CGraphic *get_font_color_graphic(const wyrmgus::font_color *font_color);
 
 	template<bool CLIP>
@@ -104,9 +102,6 @@ extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned
 
 /// Get the hot key from a string
 extern int GetHotKey(const std::string &text);
-
-/// Reload OpenGL fonts
-extern void ReloadFonts();
 
 class CLabel
 {
