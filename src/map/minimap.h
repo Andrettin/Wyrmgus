@@ -152,16 +152,14 @@ public:
 private:
 	minimap_mode mode;
 	bool zoomed = false; //whether the minimap texture is being shown at full resolution
+	std::vector<QImage> terrain_images;
 	std::vector<GLuint> terrain_textures;
 	std::vector<GLuint> overlay_textures;
 
-	// Minimap surface with terrain only (for OpenGL)
-	std::vector<std::vector<unsigned char>> terrain_texture_data;
-
-	std::map<minimap_mode, std::vector<std::vector<unsigned char>>> mode_overlay_texture_data;
+	std::map<minimap_mode, std::vector<QImage>> mode_overlay_images;
 
 	//texture data for the overlay with units and unexplored terrain
-	std::vector<std::vector<unsigned char>> overlay_texture_data;
+	std::vector<QImage> overlay_images;
 };
 
 }
