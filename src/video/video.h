@@ -592,8 +592,8 @@ public:
 	void DrawLineClip(uint32_t color, const PixelPos &pos1, const PixelPos &pos2);
 	void DrawTransLineClip(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha);
 
-	void DrawRectangle(uint32_t color, int x, int y, int w, int h);
-	void DrawTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha);
+	void DrawRectangle(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawRectangleClip(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 

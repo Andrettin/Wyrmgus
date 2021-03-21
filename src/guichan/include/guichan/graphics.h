@@ -226,7 +226,7 @@ namespace gcn
          *
          * @param rectangle the Rectangle to draw.
          */
-        virtual void drawRectangle(const Rectangle& rectangle) = 0;
+        virtual void drawRectangle(const Rectangle& rectangle, std::vector<std::function<void(renderer *)>> &render_commands) = 0;
 
         /**
          * Draws a filled Rectangle.

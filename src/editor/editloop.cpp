@@ -790,16 +790,16 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 			y += rectangle_size;
 		}
 		if (i == Editor.CursorPlayer && CMap::get()->Info.PlayerType[i] != PlayerNobody) {
-			Video.DrawRectangle(ColorWhite, x + i % 8 * rectangle_size, y, rectangle_size, rectangle_size);
+			Video.DrawRectangle(ColorWhite, x + i % 8 * rectangle_size, y, rectangle_size, rectangle_size, render_commands);
 		}
 		Video.DrawRectangle(
 			i == Editor.CursorPlayer && CMap::get()->Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
-			x + i % 8 * rectangle_size, y, rectangle_size - 1, rectangle_size - 1);
+			x + i % 8 * rectangle_size, y, rectangle_size - 1, rectangle_size - 1, render_commands);
 		if (CMap::get()->Info.PlayerType[i] != PlayerNobody) {
 			Video.FillRectangle(CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2, render_commands);
 		}
 		if (i == Editor.SelectedPlayer) {
-			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2);
+			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2, render_commands);
 		}
 		//Wyrmgus start
 //		sprintf(buf, "%d", i);
@@ -1025,9 +1025,9 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 		//Wyrmgus start
 //		Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
 		if (ButtonUnderCursor <= 303) {
-			Video.DrawRectangle(ColorGray, x - 42 * scale_factor, y - 3 * scale_factor + (ButtonUnderCursor - 300) * 20 * scale_factor, 100 * scale_factor, 20 * scale_factor);
+			Video.DrawRectangle(ColorGray, x - 42 * scale_factor, y - 3 * scale_factor + (ButtonUnderCursor - 300) * 20 * scale_factor, 100 * scale_factor, 20 * scale_factor, render_commands);
 		} else {
-			Video.DrawRectangle(ColorGray, x + (-42 + 100) * scale_factor, y - 3 * scale_factor + (ButtonUnderCursor - 304) * 20 * scale_factor, 100 * scale_factor, 20 * scale_factor);
+			Video.DrawRectangle(ColorGray, x + (-42 + 100) * scale_factor, y - 3 * scale_factor + (ButtonUnderCursor - 304) * 20 * scale_factor, 100 * scale_factor, 20 * scale_factor, render_commands);
 		}
 		//Wyrmgus end
 	}
@@ -1533,7 +1533,7 @@ void EditorUpdateDisplay()
 	// Minimap
 	if (UI.SelectedViewport) {
 		UI.get_minimap()->Draw(render_commands);
-		UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport);
+		UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport, render_commands);
 	}
 	// Info panel
 	if (UI.InfoPanel.G) {

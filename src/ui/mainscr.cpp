@@ -1412,7 +1412,7 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 
 			Video.DrawRectangle(color, UI.MapArea.X + 6 * scale_factor, UI.MapArea.EndY + (-16 - 2) * scale_factor - textHeight + MessagesScrollY,
 				UI.MapArea.EndX - UI.MapArea.X - 15 * scale_factor,
-				textHeight + 2 * scale_factor);
+				textHeight + 2 * scale_factor, render_commands);
 			//Wyrmgus end
 		}
 

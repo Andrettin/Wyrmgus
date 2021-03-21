@@ -145,6 +145,36 @@ public:
 		this->blit_texture_frame(texture, pos, QPoint(0, 0), size, flip, opacity, 100, rendered_size);
 	}
 
+	void draw_rect(const QPoint &pos, const QSize &size, const QColor &color)
+	{
+		glDisable(GL_TEXTURE_2D);
+		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
+
+		const QPoint mirrored_pos = this->get_mirrored_pos(pos, size);
+
+		glBegin(GL_LINES);
+		glVertex2i(mirrored_pos.x(), mirrored_pos.y());
+		//Wyrmgus start
+	//	glVertex2i(mirrored_pos.x() + size.width(), mirrored_pos.y());
+		glVertex2i(mirrored_pos.x() + size.width() - 1, mirrored_pos.y());
+		//Wyrmgus end
+
+		glVertex2i(mirrored_pos.x() + size.width() - 1, mirrored_pos.y() + 1);
+		//Wyrmgus start
+	//	glVertex2i(mirrored_pos.x() + size.width() - 1, mirrored_pos.y() + size.height());
+		glVertex2i(mirrored_pos.x() + size.width() - 1, mirrored_pos.y() + size.height() - 1);
+		//Wyrmgus end
+
+		glVertex2i(mirrored_pos.x() + size.width() - 1, mirrored_pos.y() + size.height() - 1);
+		glVertex2i(mirrored_pos.x(), mirrored_pos.y() + size.height() - 1);
+
+		glVertex2i(mirrored_pos.x(), mirrored_pos.y() + size.height() - 1);
+		glVertex2i(mirrored_pos.x(), mirrored_pos.y() + 1);
+		glEnd();
+
+		glEnable(GL_TEXTURE_2D);
+	}
+
 	void fill_rect(const QRect &rect, const QColor &color)
 	{
 		const QSize target_size = this->get_target_size();

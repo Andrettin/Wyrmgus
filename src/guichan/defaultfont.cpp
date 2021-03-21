@@ -75,7 +75,7 @@ namespace gcn
 
     int DefaultFont::drawGlyph(Graphics* graphics, unsigned char, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
     {
-        graphics->drawRectangle( Rectangle(x, y, 8, 8));
+        graphics->drawRectangle(Rectangle(x, y, 8, 8), render_commands);
 
         return 8;
     }

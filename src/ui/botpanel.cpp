@@ -844,7 +844,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 
 	// Background
 	Video.FillTransRectangle(popup->BackgroundColor, x, y, popupWidth, popupHeight, popup->BackgroundColor >> ASHIFT, render_commands);
-	Video.DrawRectangle(popup->BorderColor, x, y, popupWidth, popupHeight);
+	Video.DrawRectangle(popup->BorderColor, x, y, popupWidth, popupHeight, render_commands);
 
 	// Contents
 	for (const std::unique_ptr<CPopupContentType> &content : popup->Contents) {
@@ -941,7 +941,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const font_co
 	const IntColor BorderColor = CVideo::MapRGBA(93, 93, 93, 160);
 
 	Video.FillTransRectangle(BackgroundColor, x, y, popupWidth, popupHeight, BackgroundColor >> ASHIFT, render_commands);
-	Video.DrawRectangle(BorderColor, x, y, popupWidth, popupHeight);
+	Video.DrawRectangle(BorderColor, x, y, popupWidth, popupHeight, render_commands);
 
 	if (text_color == nullptr) {
 		text_color = wyrmgus::defines::get()->get_default_font_color();

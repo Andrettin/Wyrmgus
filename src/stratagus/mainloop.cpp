@@ -231,7 +231,7 @@ void UpdateDisplay()
 			DrawUserDefinedButtons(render_commands);
 
 			UI.get_minimap()->Draw(render_commands);
-			UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport);
+			UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport, render_commands);
 
 			UI.InfoPanel.Draw(render_commands);
 			DrawResources(render_commands);

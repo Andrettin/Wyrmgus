@@ -208,7 +208,7 @@ namespace gcn
             if (hasFocus())
             {
                 graphics->drawRectangle(Rectangle(2, 2, getWidth() - 4,
-                                                  getHeight() - 4));
+                                                  getHeight() - 4), render_commands);
             }
         }
     }

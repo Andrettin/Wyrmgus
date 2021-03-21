@@ -221,7 +221,7 @@ namespace gcn
 
         if (hasFocus())
         {
-            graphics->drawRectangle(Rectangle(0, 0, getWidth() - h, h));
+            graphics->drawRectangle(Rectangle(0, 0, getWidth() - h, h), render_commands);
         }
 
         drawButton(graphics, render_commands);

@@ -61,7 +61,7 @@ public:
 
 	virtual void drawPoint(int x, int y) override;
 	virtual void drawLine(int x1, int y1, int x2, int y2) override;
-	virtual void drawRectangle(const gcn::Rectangle &rectangle) override;
+	virtual void drawRectangle(const gcn::Rectangle &rectangle, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	virtual void fillRectangle(const gcn::Rectangle &rectangle, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
 	virtual void setColor(const gcn::Color &color) override

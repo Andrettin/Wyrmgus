@@ -519,33 +519,15 @@ void DrawTransLineClip(uint32_t color, int sx, int sy,
 **  @param h      height of rectangle (0=don't draw).
 **  @param w      width of rectangle (0=don't draw).
 */
-void DrawRectangle(uint32_t color, int x, int y, int w, int h)
+void DrawRectangle(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	GLubyte r, g, b, a;
 
 	CVideo::GetRGBA(color, &r, &g, &b, &a);
+
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
-#ifdef USE_GLES
-	float vertex[] = {
-		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *y + 1.0f,
-		2.0f / (GLfloat)Video.Width *(x + w) - 1.0f, -2.0f / (GLfloat)Video.Height *y + 1.0f,
-		2.0f / (GLfloat)Video.Width *(x + w - 1) - 1.0f, -2.0f / (GLfloat)Video.Height *(y + 1) + 1.0f,
-		2.0f / (GLfloat)Video.Width *(x + w - 1) - 1.0f, -2.0f / (GLfloat)Video.Height *(y + h) + 1.0f,
-		2.0f / (GLfloat)Video.Width *(x + w - 1) - 1.0f, -2.0f / (GLfloat)Video.Height *(y + h - 1) + 1.0f,
-		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *(y + h - 1) + 1.0f,
-		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *(y + h - 1) + 1.0f,
-		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *(y + 1) + 1.0f
-	};
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glVertexPointer(2, GL_FLOAT, 0, vertex);
-	glDrawArrays(GL_LINES, 0, 8);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-#endif
-#ifdef USE_OPENGL
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
 	//Wyrmgus start
@@ -565,8 +547,12 @@ void DrawRectangle(uint32_t color, int x, int y, int w, int h)
 	glVertex2i(x, y + h - 1);
 	glVertex2i(x, y + 1);
 	glEnd();
-#endif
+
 	glEnable(GL_TEXTURE_2D);
+
+	render_commands.push_back([x, y, w, h, r, g, b, a](renderer *renderer) {
+		renderer->draw_rect(QPoint(x, y), QSize(w, h), QColor(r, g, b, a));
+	});
 }
 
 /**
@@ -580,13 +566,13 @@ void DrawRectangle(uint32_t color, int x, int y, int w, int h)
 **  @param alpha  alpha value of pixel.
 */
 void DrawTransRectangle(uint32_t color, int x, int y,
-						int w, int h, unsigned char alpha)
+						int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	GLubyte r, g, b;
 
 	CVideo::GetRGB(color, &r, &g, &b);
 	color = CVideo::MapRGBA(r, g, b, alpha);
-	DrawRectangle(color, x, y, w, h);
+	DrawRectangle(color, x, y, w, h, render_commands);
 }
 
 /**
@@ -1131,14 +1117,14 @@ void CVideo::DrawTransLineClip(uint32_t color, int sx, int sy, int dx, int dy, u
 	linedraw_gl::DrawTransLineClip(color, sx, sy, dx, dy, alpha);
 }
 
-void CVideo::DrawRectangle(uint32_t color, int x, int y, int w, int h)
+void CVideo::DrawRectangle(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	linedraw_gl::DrawRectangle(color, x, y, w, h);
+	linedraw_gl::DrawRectangle(color, x, y, w, h, render_commands);
 }
 
-void CVideo::DrawTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha)
+void CVideo::DrawTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	linedraw_gl::DrawTransRectangle(color, x, y, w, h, alpha);
+	linedraw_gl::DrawTransRectangle(color, x, y, w, h, alpha, render_commands);
 }
 
 void CVideo::DrawRectangleClip(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands)

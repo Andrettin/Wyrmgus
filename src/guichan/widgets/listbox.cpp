@@ -108,7 +108,7 @@ namespace gcn
         {
             if (i == mSelected)
             {
-                graphics->drawRectangle(Rectangle(0, y, getWidth(), fontHeight));
+                graphics->drawRectangle(Rectangle(0, y, getWidth(), fontHeight), render_commands);
 				graphics->setColor(Color(40, 60, 120));
 				graphics->fillRectangle(Rectangle(1, y + 1, getWidth() - 2, fontHeight - 2), render_commands);
 			}

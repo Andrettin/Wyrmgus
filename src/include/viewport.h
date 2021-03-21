@@ -94,7 +94,7 @@ public:
 
 	/// Draw the full Viewport.
 	void Draw(std::vector<std::function<void(renderer *)>> &render_commands) const;
-	void DrawBorder() const;
+	void DrawBorder(std::vector<std::function<void(renderer *)>> &render_commands) const;
 	/// Check if any part of an area is visible in viewport
 	bool AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const;
 

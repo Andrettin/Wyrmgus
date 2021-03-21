@@ -107,7 +107,7 @@ namespace gcn
 
         if (hasFocus())
         {
-            graphics->drawRectangle(Rectangle(h - 4, 0, getWidth() - h + 3, getHeight()));
+            graphics->drawRectangle(Rectangle(h - 4, 0, getWidth() - h + 3, getHeight()), render_commands);
         }
     }
 

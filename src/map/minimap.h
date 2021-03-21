@@ -58,7 +58,7 @@ public:
 	void Destroy();
 	void Draw(std::vector<std::function<void(renderer *)>> &render_commands) const;
 	void draw_image(const QImage &image, const int z, std::vector<std::function<void(renderer *)>> &render_commands) const;
-	void DrawViewportArea(const CViewport &viewport) const;
+	void DrawViewportArea(const CViewport &viewport, std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 private:
 	const unit_type *get_unit_minimap_type(const CUnit *unit) const;

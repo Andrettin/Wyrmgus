@@ -196,7 +196,7 @@ namespace gcn
         if (mGlyph[glyph].width == 0)
         {
             graphics->drawRectangle(Rectangle(x, y + 1 + yoffset, mGlyph[(int)(' ')].width - 1,
-                                              mGlyph[(int)(' ')].height - 2));
+                                              mGlyph[(int)(' ')].height - 2), render_commands);
 
             return mGlyph[(int)(' ')].width + mGlyphSpacing;
         }

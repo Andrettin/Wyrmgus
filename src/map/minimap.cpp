@@ -735,7 +735,7 @@ void minimap::Destroy()
 /**
 **  Draw viewport area contour.
 */
-void minimap::DrawViewportArea(const CViewport &viewport) const
+void minimap::DrawViewportArea(const CViewport &viewport, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	// Determine and save region below minimap cursor
 	const int z = UI.CurrentMapLayer->ID;
@@ -752,7 +752,7 @@ void minimap::DrawViewportArea(const CViewport &viewport) const
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
 	//Wyrmgus start
 //	Video.DrawTransRectangle(UI.ViewportCursorColor, screenPos.x, screenPos.y, w, h, 128);
-	Video.DrawTransRectangle(UI.ViewportCursorColor, screenPos.x, screenPos.y, w + 1, h + 1, 128);
+	Video.DrawTransRectangle(UI.ViewportCursorColor, screenPos.x, screenPos.y, w + 1, h + 1, 128, render_commands);
 	//Wyrmgus end
 }
 

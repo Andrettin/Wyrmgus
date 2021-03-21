@@ -535,14 +535,14 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 	*/
 	//Wyrmgus end
 
-	DrawBorder();
+	DrawBorder(render_commands);
 	PopClipping();
 }
 
 /**
 **  Draw border around the viewport
 */
-void CViewport::DrawBorder() const
+void CViewport::DrawBorder(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	// if we a single viewport, no need to denote the "selected" one
 	if (UI.NumViewports == 1) {
@@ -555,5 +555,5 @@ void CViewport::DrawBorder() const
 	}
 
 	const PixelSize pixelSize = this->GetPixelSize();
-	Video.DrawRectangle(color, this->TopLeftPos.x, this->TopLeftPos.y, pixelSize.x + 1, pixelSize.y + 1);
+	Video.DrawRectangle(color, this->TopLeftPos.x, this->TopLeftPos.y, pixelSize.x + 1, pixelSize.y + 1, render_commands);
 }

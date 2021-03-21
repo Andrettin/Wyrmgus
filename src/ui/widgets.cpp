@@ -279,7 +279,7 @@ void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
 	Video.DrawLineClip(CVideo::MapRGBA(c.r, c.g, c.b, c.a), pos1, pos2);
 }
 
-void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle &rectangle)
+void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle &rectangle, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	gcn::Color c = this->getColor();
 	if (c.a == 0) {
@@ -301,7 +301,7 @@ void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle &rectangle)
 	int y2 = std::min<int>(area.y + area.height, top.y + top.height);
 
 	Video.DrawTransRectangle(CVideo::MapRGB(c.r, c.g, c.b),
-							 x1, y1, x2 - x1, y2 - y1, mColor.a);
+							 x1, y1, x2 - x1, y2 - y1, mColor.a, render_commands);
 }
 
 void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -559,9 +559,9 @@ void ImageButton::draw(gcn::Graphics *graphics, std::vector<std::function<void(r
 		//Wyrmgus start
 //		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 		if (getWidth() == getHeight() && getWidth() > 64 && getHeight() > 64) {
-			graphics->drawRectangle(gcn::Rectangle(0 + ((getWidth() - 64) / 2), 0 + ((getHeight() - 64) / 2), getWidth() - (getWidth() - 64), getHeight() - (getHeight() - 64))); //hack to make it appear properly in grand strategy mode
+			graphics->drawRectangle(gcn::Rectangle(0 + ((getWidth() - 64) / 2), 0 + ((getHeight() - 64) / 2), getWidth() - (getWidth() - 64), getHeight() - (getHeight() - 64)), render_commands); //hack to make it appear properly in grand strategy mode
 		} else {
-			graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+			graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()), render_commands);
 		}
 		//Wyrmgus end
 	}
@@ -757,9 +757,9 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics, std::vector<std::func
 	if (isPressed() && !frameImage) {
 //		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 		if (getWidth() == getHeight() && getWidth() > 64 && getHeight() > 64) {
-			graphics->drawRectangle(gcn::Rectangle(0 + ((getWidth() - 64) / 2), 0 + ((getHeight() - 64) / 2), getWidth() - (getWidth() - 64), getHeight() - (getHeight() - 64))); //hack to make it appear properly in grand strategy mode
+			graphics->drawRectangle(gcn::Rectangle(0 + ((getWidth() - 64) / 2), 0 + ((getHeight() - 64) / 2), getWidth() - (getWidth() - 64), getHeight() - (getHeight() - 64)), render_commands); //hack to make it appear properly in grand strategy mode
 		} else {
-			graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+			graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()), render_commands);
 		}
 	}
 }
@@ -908,7 +908,7 @@ void ImageRadioButton::draw(gcn::Graphics *graphics, std::vector<std::function<v
 	graphics->drawText(getCaption(), width - 2, 0, render_commands);
 
 	if (hasFocus()) {
-		graphics->drawRectangle(gcn::Rectangle(width - 4, 0, getWidth() - width + 3, getHeight()));
+		graphics->drawRectangle(gcn::Rectangle(width - 4, 0, getWidth() - width + 3, getHeight()), render_commands);
 	}
 }
 
@@ -1041,7 +1041,7 @@ void ImageCheckBox::draw(gcn::Graphics *graphics, std::vector<std::function<void
 	graphics->drawText(getCaption(), width - 2, 0, render_commands);
 
 	if (hasFocus()) {
-		graphics->drawRectangle(gcn::Rectangle(width - 4, 0, getWidth() - width + 3, getHeight()));
+		graphics->drawRectangle(gcn::Rectangle(width - 4, 0, getWidth() - width + 3, getHeight()), render_commands);
 	}
 }
 
@@ -2840,7 +2840,7 @@ void StatBoxWidget::draw(gcn::Graphics *graphics, std::vector<std::function<void
 	graphics->fillRectangle(gcn::Rectangle(0, 0, width, height), render_commands);
 
 	graphics->setColor(getBaseColor());
-	graphics->drawRectangle(gcn::Rectangle(1, 1, width - 2, height - 2));
+	graphics->drawRectangle(gcn::Rectangle(1, 1, width - 2, height - 2), render_commands);
 
 	graphics->setColor(getForegroundColor());
 	width = percent * width / 100;

@@ -188,7 +188,7 @@ namespace gcn
             if (hasFocus())
             {
                 graphics->setColor(getForegroundColor());
-                graphics->drawRectangle(Rectangle(v + 2, 2, getMarkerLength() - 4, getHeight() - 4));
+                graphics->drawRectangle(Rectangle(v + 2, 2, getMarkerLength() - 4, getHeight() - 4), render_commands);
             }
         }
         else
@@ -205,7 +205,7 @@ namespace gcn
             if (hasFocus())
             {
                 graphics->setColor(getForegroundColor());
-                graphics->drawRectangle(Rectangle(2, v + 2, getWidth() - 4, getMarkerLength() - 4));
+                graphics->drawRectangle(Rectangle(2, v + 2, getWidth() - 4, getMarkerLength() - 4), render_commands);
             }
         }
     }
