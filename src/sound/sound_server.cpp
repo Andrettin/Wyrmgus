@@ -347,32 +347,32 @@ void SetMusicFinishedCallback(void (*callback)())
 
 void play_menu_music()
 {
-	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::menu);
+	music_player::get()->play_music_type(music_type::menu);
 }
 
 void play_credits_music()
 {
-	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::credits);
+	music_player::get()->play_music_type(music_type::credits);
 }
 
 void play_loading_music()
 {
-	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::loading);
+	music_player::get()->play_music_type(music_type::loading);
 }
 
 void play_map_music()
 {
-	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::map);
+	music_player::get()->play_music_type(music_type::map);
 }
 
 void play_victory_music()
 {
-	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::victory);
+	music_player::get()->play_music_type(music_type::victory);
 }
 
 void play_defeat_music()
 {
-	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::defeat);
+	music_player::get()->play_music_type(music_type::defeat);
 }
 
 /**

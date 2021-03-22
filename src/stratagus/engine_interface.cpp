@@ -36,6 +36,8 @@
 #include "parameters.h"
 #include "results.h"
 #include "script.h"
+#include "sound/music_player.h"
+#include "sound/music_type.h"
 #include "sound/sound.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
@@ -113,6 +115,19 @@ void engine_interface::play_sound(const QString &sound_identifier)
 
 		this->post([sound]() {
 			PlayGameSound(sound, MaxSampleVolume);
+		});
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+	}
+}
+
+void engine_interface::play_music(const QString &type_str)
+{
+	try {
+		const music_type type = string_to_music_type(type_str.toStdString());
+
+		this->post([type]() {
+			music_player::get()->play_music_type(type);
 		});
 	} catch (const std::exception &exception) {
 		exception::report(exception);

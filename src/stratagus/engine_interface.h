@@ -38,6 +38,7 @@ class defines;
 class game;
 class parameters;
 class preferences;
+enum class music_type;
 
 //interface for the engine, to be used in the context of QML
 class engine_interface final : public QObject, public singleton<engine_interface>
@@ -128,6 +129,7 @@ public:
 
 	Q_INVOKABLE void call_lua_command(const QString &command);
 	Q_INVOKABLE void play_sound(const QString &sound_identifier);
+	Q_INVOKABLE void play_music(const QString &type_str);
 
 	Q_INVOKABLE void exit();
 
