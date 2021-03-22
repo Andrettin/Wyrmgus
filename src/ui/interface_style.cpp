@@ -52,6 +52,9 @@ void interface_style::process_sml_scope(const sml_data &scope)
 	if (tag == "large_button") {
 		this->large_button = std::make_unique<button_style>(this);
 		database::process_sml_data(this->large_button, scope);
+	} else if (tag == "small_button") {
+		this->small_button = std::make_unique<button_style>(this);
+		database::process_sml_data(this->small_button, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -61,13 +64,14 @@ void interface_style::initialize()
 {
 	if (!this->top_bar_file.empty()) {
 		this->top_bar_graphics = CGraphic::New(this->top_bar_file.string());
-
-		//this is necessary for now, to ensure the top bar graphics are loaded in the Wyrmgus thread's context
-		this->top_bar_graphics->Load(defines::get()->get_scale_factor());
 	}
 
 	if (this->large_button != nullptr) {
 		this->large_button->initialize();
+	}
+
+	if (this->small_button != nullptr) {
+		this->small_button->initialize();
 	}
 
 	data_entry::initialize();
@@ -83,7 +87,8 @@ const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics
 	switch (type) {
 		case interface_element_type::top_bar:
 			return this->top_bar_graphics;
-		case interface_element_type::large_button: {
+		case interface_element_type::large_button:
+		case interface_element_type::small_button: {
 			const button_style *button = this->get_button(type);
 			const button_state state = string_to_button_state(qualifier);
 			return button->get_graphics(state);
@@ -98,6 +103,8 @@ const button_style *interface_style::get_button(const interface_element_type typ
 	switch (type) {
 		case interface_element_type::large_button:
 			return this->large_button.get();
+		case interface_element_type::small_button:
+			return this->small_button.get();
 		default:
 			throw std::runtime_error("Invalid button interface element type: \"" + std::to_string(static_cast<int>(type)) + "\".");
 	}

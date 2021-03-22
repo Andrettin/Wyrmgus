@@ -62,6 +62,7 @@ private:
 	std::filesystem::path top_bar_file;
 	std::shared_ptr<CGraphic> top_bar_graphics;
 	std::unique_ptr<button_style> large_button;
+	std::unique_ptr<button_style> small_button;
 };
 
 }
