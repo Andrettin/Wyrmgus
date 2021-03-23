@@ -31,6 +31,8 @@
 #include "util/fractional_int.h"
 #include "util/number_util.h"
 
+#include <boost/math/constants/constants.hpp>
+
 namespace wyrmgus::angle {
 
 const number_type pi("3.1416");
@@ -38,6 +40,11 @@ const number_type pi("3.1416");
 number_type degrees_to_radians(const number_type &degrees)
 {
 	return degrees * angle::pi / 180;
+}
+
+double degrees_to_radians(const double degrees)
+{
+	return degrees * boost::math::constants::pi<double>() / 180.;
 }
 
 number_type radians_to_degrees(const number_type &radians)
