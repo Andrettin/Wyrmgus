@@ -61,18 +61,7 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 
 		const std::shared_ptr<CGraphic> graphics = interface->get_interface_element_graphics(interface_element_type, qualifiers);
 
-		graphics->get_load_mutex().lock();
-
-		if (!graphics->IsLoaded()) {
-			graphics->get_load_mutex().unlock();
-
-			engine_interface::get()->sync([&graphics]() {
-				//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
-				graphics->Load(defines::get()->get_scale_factor());
-			});
-		} else {
-			graphics->get_load_mutex().unlock();
-		}
+		graphics->Load(defines::get()->get_scale_factor());
 
 		const QImage &image = graphics->get_or_create_frame_image(0, nullptr);
 

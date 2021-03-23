@@ -76,6 +76,7 @@ const std::shared_ptr<CGraphic> &checkbox_style::get_graphics(const checkbox_sta
 				default:
 					break;
 			}
+			break;
 		case checkbox_state::unchecked:
 			switch (button_state) {
 				case button_state::normal:
@@ -85,6 +86,7 @@ const std::shared_ptr<CGraphic> &checkbox_style::get_graphics(const checkbox_sta
 				default:
 					break;
 			}
+			break;
 		default:
 			throw std::runtime_error("Invalid checkbox state: \"" + std::to_string(static_cast<int>(checkbox_state)) + "\".");
 	}
