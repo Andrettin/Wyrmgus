@@ -32,6 +32,7 @@
 #include "engine_interface.h"
 #include "ui/interface_element_type.h"
 #include "ui/interface_style.h"
+#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
@@ -43,46 +44,51 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 {
 	Q_UNUSED(requested_size)
 
-	const std::string id_str = id.toStdString();
-	const std::vector<std::string> id_list = string::split(id_str, '/');
+	try {
+		const std::string id_str = id.toStdString();
+		const std::vector<std::string> id_list = string::split(id_str, '/');
 
-	const std::string &interface_identifier = id_list.at(0);
-	const interface_style *interface = interface_style::get(interface_identifier);
+		const std::string &interface_identifier = id_list.at(0);
+		const interface_style *interface = interface_style::get(interface_identifier);
 
-	const std::string &interface_element_str = id_list.at(1);
-	const interface_element_type interface_element_type = string_to_interface_element_type(interface_element_str);
+		const std::string &interface_element_str = id_list.at(1);
+		const interface_element_type interface_element_type = string_to_interface_element_type(interface_element_str);
 
-	std::vector<std::string> qualifiers;
-	if (id_list.size() > 2) {
-		qualifiers = vector::subvector(id_list, 2);
+		std::vector<std::string> qualifiers;
+		if (id_list.size() > 2) {
+			qualifiers = vector::subvector(id_list, 2);
+		}
+
+		const std::shared_ptr<CGraphic> graphics = interface->get_interface_element_graphics(interface_element_type, qualifiers);
+
+		graphics->get_load_mutex().lock();
+
+		if (!graphics->IsLoaded()) {
+			graphics->get_load_mutex().unlock();
+
+			engine_interface::get()->sync([&graphics]() {
+				//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
+				graphics->Load(defines::get()->get_scale_factor());
+			});
+		} else {
+			graphics->get_load_mutex().unlock();
+		}
+
+		const QImage &image = graphics->get_or_create_frame_image(0, nullptr);
+
+		if (image.isNull()) {
+			throw std::runtime_error("Interface image for ID \"" + id_str + "\" is null.");
+		}
+
+		if (size != nullptr) {
+			*size = image.size();
+		}
+
+		return image;
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		return QImage();
 	}
-
-	const std::shared_ptr<CGraphic> graphics = interface->get_interface_element_graphics(interface_element_type, qualifiers);
-
-	graphics->get_load_mutex().lock();
-
-	if (!graphics->IsLoaded()) {
-		graphics->get_load_mutex().unlock();
-
-		engine_interface::get()->sync([&graphics]() {
-			//this has to run in the main Wyrmgus thread, as it performs OpenGL calls
-			graphics->Load(defines::get()->get_scale_factor());
-		});
-	} else {
-		graphics->get_load_mutex().unlock();
-	}
-
-	const QImage &image = graphics->get_or_create_frame_image(0, nullptr);
-
-	if (image.isNull()) {
-		log::log_error("Interface image for ID \"" + id_str + "\" is null.");
-	}
-
-	if (size != nullptr) {
-		*size = image.size();
-	}
-
-	return image;
 }
 
 }
