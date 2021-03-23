@@ -32,6 +32,8 @@
 #include "database/defines.h"
 #include "ui/button_state.h"
 #include "ui/button_style.h"
+#include "ui/checkbox_state.h"
+#include "ui/checkbox_style.h"
 #include "ui/interface_element_type.h"
 #include "video/video.h"
 
@@ -55,6 +57,9 @@ void interface_style::process_sml_scope(const sml_data &scope)
 	} else if (tag == "small_button") {
 		this->small_button = std::make_unique<button_style>(this);
 		database::process_sml_data(this->small_button, scope);
+	} else if (tag == "radio_button") {
+		this->radio_button = std::make_unique<checkbox_style>(this);
+		database::process_sml_data(this->radio_button, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -74,6 +79,10 @@ void interface_style::initialize()
 		this->small_button->initialize();
 	}
 
+	if (this->radio_button != nullptr) {
+		this->radio_button->initialize();
+	}
+
 	data_entry::initialize();
 }
 
@@ -82,7 +91,7 @@ void interface_style::set_top_bar_file(const std::filesystem::path &filepath)
 	this->top_bar_file = database::get()->get_graphics_path(this->get_module()) / filepath;
 }
 
-const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics(const interface_element_type type, const std::string &qualifier) const
+const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics(const interface_element_type type, const std::vector<std::string> &qualifiers) const
 {
 	switch (type) {
 		case interface_element_type::top_bar:
@@ -90,8 +99,14 @@ const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics
 		case interface_element_type::large_button:
 		case interface_element_type::small_button: {
 			const button_style *button = this->get_button(type);
-			const button_state state = string_to_button_state(qualifier);
+			const button_state state = string_to_button_state(qualifiers.front());
 			return button->get_graphics(state);
+		}
+		case interface_element_type::radio_button: {
+			const checkbox_style *checkbox = this->radio_button.get();
+			const checkbox_state checkbox_state = string_to_checkbox_state(qualifiers.at(0));
+			const button_state button_state = string_to_button_state(qualifiers.at(1));
+			return checkbox->get_graphics(checkbox_state, button_state);
 		}
 		default:
 			throw std::runtime_error("Invalid interface element type: \"" + std::to_string(static_cast<int>(type)) + "\".");

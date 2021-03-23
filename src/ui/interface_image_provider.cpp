@@ -34,6 +34,7 @@
 #include "ui/interface_style.h"
 #include "util/log_util.h"
 #include "util/string_util.h"
+#include "util/vector_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -51,12 +52,12 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 	const std::string &interface_element_str = id_list.at(1);
 	const interface_element_type interface_element_type = string_to_interface_element_type(interface_element_str);
 
-	std::string qualifier;
+	std::vector<std::string> qualifiers;
 	if (id_list.size() > 2) {
-		qualifier = id_list.at(2);
+		qualifiers = vector::subvector(id_list, 2);
 	}
 
-	const std::shared_ptr<CGraphic> graphics = interface->get_interface_element_graphics(interface_element_type, qualifier);
+	const std::shared_ptr<CGraphic> graphics = interface->get_interface_element_graphics(interface_element_type, qualifiers);
 
 	graphics->get_load_mutex().lock();
 

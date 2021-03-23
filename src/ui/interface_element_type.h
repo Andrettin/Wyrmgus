@@ -31,7 +31,8 @@ namespace wyrmgus {
 enum class interface_element_type {
 	top_bar,
 	large_button,
-	small_button
+	small_button,
+	radio_button
 };
 
 inline interface_element_type string_to_interface_element_type(const std::string &str)
@@ -42,6 +43,8 @@ inline interface_element_type string_to_interface_element_type(const std::string
 		return interface_element_type::large_button;
 	} else if (str == "small_button") {
 		return interface_element_type::small_button;
+	} else if (str == "radio_button") {
+		return interface_element_type::radio_button;
 	}
 
 	throw std::runtime_error("Invalid interface element type: \"" + str + "\".");

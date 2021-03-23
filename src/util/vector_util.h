@@ -126,6 +126,18 @@ void fill(std::vector<T> &vector, const U &value)
 	}
 }
 
+template <typename T>
+std::vector<T> subvector(const std::vector<T> &vector, const size_t pos, const size_t size)
+{
+	return std::vector<T>(vector.begin() + pos, vector.begin() + pos + size);
+}
+
+template <typename T>
+std::vector<T> subvector(const std::vector<T> &vector, const size_t pos)
+{
+	return vector::subvector(vector, pos, vector.size() - pos);
+}
+
 template <typename T, typename function_type>
 void for_each_until(const std::vector<T> &vector, function_type &function)
 {

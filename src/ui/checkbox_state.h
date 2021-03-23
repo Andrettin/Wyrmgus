@@ -26,45 +26,22 @@
 
 #pragma once
 
-#include "database/data_entry.h"
-#include "database/data_type.h"
-
-class CGraphic;
-
 namespace wyrmgus {
 
-class button_style;
-class checkbox_style;
-enum class interface_element_type;
-
-class interface_style final : public data_entry, public data_type<interface_style>
-{
-	Q_OBJECT
-
-	Q_PROPERTY(std::filesystem::path top_bar_file MEMBER top_bar_file WRITE set_top_bar_file)
-
-public:
-	static constexpr const char *class_identifier = "interface_style";
-	static constexpr const char *database_folder = "interface_styles";
-
-	explicit interface_style(const std::string &identifier);
-	~interface_style();
-
-	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void initialize() override;
-
-	void set_top_bar_file(const std::filesystem::path &filepath);
-
-	const std::shared_ptr<CGraphic> &get_interface_element_graphics(const interface_element_type type, const std::vector<std::string> &qualifiers) const;
-
-	const button_style *get_button(const interface_element_type type) const;
-
-private:
-	std::filesystem::path top_bar_file;
-	std::shared_ptr<CGraphic> top_bar_graphics;
-	std::unique_ptr<button_style> large_button;
-	std::unique_ptr<button_style> small_button;
-	std::unique_ptr<checkbox_style> radio_button;
+enum class checkbox_state {
+	unchecked,
+	checked
 };
+
+inline checkbox_state string_to_checkbox_state(const std::string &str)
+{
+	if (str == "unchecked") {
+		return checkbox_state::unchecked;
+	} else if (str == "checked") {
+		return checkbox_state::checked;
+	}
+
+	throw std::runtime_error("Invalid checkbox state: \"" + str + "\".");
+}
 
 }
