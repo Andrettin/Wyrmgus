@@ -305,7 +305,7 @@ void index_to_palette(QImage &image, const color_set &palette)
 	}
 }
 
-void rotate_hue(QImage &image, const double degrees)
+void rotate_hue(QImage &image, const double degrees, const color_set &ignored_colors)
 {
 	//rotate the RGB color cube for the image by a certain amount of degrees
 	const double radians = angle::degrees_to_radians(degrees);
@@ -320,6 +320,10 @@ void rotate_hue(QImage &image, const double degrees)
 	for (int x = 0; x < image.width(); ++x) {
 		for (int y = 0; y < image.height(); ++y) {
 			QColor pixel_color = image.pixelColor(x, y);
+
+			if (ignored_colors.contains(pixel_color)) {
+				continue;
+			}
 
 			const int old_red = pixel_color.red();
 			const int old_green = pixel_color.green();
