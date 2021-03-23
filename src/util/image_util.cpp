@@ -28,6 +28,7 @@
 
 #include "util/image_util.h"
 
+#include "util/angle_util.h"
 #include "util/container_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
@@ -300,6 +301,39 @@ void index_to_palette(QImage &image, const color_set &palette)
 			}
 
 			image.setPixelColor(x, y, best_color);
+		}
+	}
+}
+
+void rotate_hue(QImage &image, const double degrees)
+{
+	//rotate the RGB color cube for the image by a certain amount of degrees
+	const double radians = angle::degrees_to_radians(degrees);
+	const double cos = std::cos(radians);
+	const double sin = std::sin(radians);
+
+	static constexpr double third = 1. / 3.;
+	const double c = cos * third;
+	const double c2 = c * 2;
+	const double s = sqrt(third) * sin;
+
+	for (int x = 0; x < image.width(); ++x) {
+		for (int y = 0; y < image.height(); ++y) {
+			QColor pixel_color = image.pixelColor(x, y);
+
+			const int old_red = pixel_color.red();
+			const int old_green = pixel_color.green();
+			const int old_blue = pixel_color.blue();
+
+			const int red = static_cast<int>(old_red * (third + c2) + old_green * (third - c - s) + old_blue * (third - c + s));
+			const int green = static_cast<int>(old_red * (third - c + s) + old_green * (third + c2) + old_blue * (third - c - s));
+			const int blue = static_cast<int>(old_red * (third - c - s) + old_green * (third - c + s) + old_blue * (third + c2));
+
+			pixel_color.setRed(std::clamp(red, 0, 255));
+			pixel_color.setGreen(std::clamp(green, 0, 255));
+			pixel_color.setBlue(std::clamp(blue, 0, 255));
+
+			image.setPixelColor(x, y, pixel_color);
 		}
 	}
 }
