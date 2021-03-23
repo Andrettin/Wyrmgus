@@ -323,7 +323,6 @@ static void do_mouse_warp()
 */
 static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 {
-#if (defined(USE_OPENGL) || defined(USE_GLES))
 	// Scale mouse-coordinates to viewport
 	if (ZoomNoResize && (event.type & (SDL_MOUSEBUTTONUP | SDL_MOUSEBUTTONDOWN | SDL_MOUSEMOTION))) {
 		event.button.x = (Uint16)floorf(event.button.x * float(Video.Width) / Video.ViewportWidth);
@@ -333,7 +332,6 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 		event.motion.y = (Uint16)floorf(event.motion.y * float(Video.Height) / Video.ViewportHeight);
 		//Wyrmgus end
 	}
-#endif
 
 	switch (event.type) {
 		case SDL_MOUSEBUTTONDOWN:
@@ -748,6 +746,12 @@ static SDL_Event qevent_to_sdl_event(std::unique_ptr<QInputEvent> &&qevent)
 			break;
 		}
 		case QEvent::HoverEnter:
+		case QEvent::HoverLeave: {
+			sdl_event.active.type = SDL_ACTIVEEVENT;
+			sdl_event.active.gain = qevent->type() == QEvent::HoverEnter ? 1 : 0;
+			sdl_event.active.state = SDL_APPMOUSEFOCUS;
+			break;
+		}
 		case QEvent::HoverMove: {
 			const QHoverEvent *hover_event = static_cast<QHoverEvent *>(qevent.get());
 

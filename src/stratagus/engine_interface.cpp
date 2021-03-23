@@ -39,8 +39,6 @@
 #include "sound/music_player.h"
 #include "sound/music_type.h"
 #include "sound/sound.h"
-#include "unit/unit.h"
-#include "unit/unit_manager.h"
 #include "util/exception_util.h"
 #include "util/queue_util.h"
 
@@ -158,6 +156,7 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 			return true;
 		}
 		case QEvent::HoverEnter:
+		case QEvent::HoverLeave:
 		case QEvent::HoverMove: {
 			const QHoverEvent *hover_event = static_cast<QHoverEvent *>(event);
 			this->store_input_event(std::make_unique<QHoverEvent>(*hover_event));
