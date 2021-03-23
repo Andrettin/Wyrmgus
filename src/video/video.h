@@ -385,11 +385,6 @@ public:
 
 	void create_texture(const player_color *player_color, const CColor *color_modification, const bool grayscale);
 
-	std::mutex &get_load_mutex()
-	{
-		return this->load_mutex;
-	}
-
 	void render(const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool grayscale, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
