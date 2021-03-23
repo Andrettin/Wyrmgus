@@ -40,13 +40,14 @@ class preferences final : public QObject, public singleton<preferences>
 
 	Q_PROPERTY(int scale_factor READ get_scale_factor WRITE set_scale_factor)
 	Q_PROPERTY(wyrmgus::campaign* selected_campaign READ get_selected_campaign WRITE set_selected_campaign)
+	Q_PROPERTY(bool fullscreen MEMBER fullscreen READ is_fullscreen)
 
 public:
 	static std::filesystem::path get_path();
 	static std::filesystem::path get_fallback_path();
 
 	void load();
-	void save() const;
+	Q_INVOKABLE void save() const;
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
@@ -67,9 +68,15 @@ public:
 		this->selected_campaign = campaign;
 	}
 
+	bool is_fullscreen() const
+	{
+		return this->fullscreen;
+	}
+
 private:
 	int scale_factor = 1;
 	campaign *selected_campaign = nullptr;
+	bool fullscreen = false;
 };
 
 }

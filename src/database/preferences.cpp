@@ -35,6 +35,7 @@
 #include "quest/campaign.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
+#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 
@@ -74,6 +75,9 @@ void preferences::save() const
 	data.add_property("scale_factor", std::to_string(this->get_scale_factor()));
 	if (this->get_selected_campaign() != nullptr) {
 		data.add_property("selected_campaign", this->get_selected_campaign()->get_identifier());
+	}
+	if (this->is_fullscreen()) {
+		data.add_property("fullscreen", string::from_bool(this->is_fullscreen()));
 	}
 
 	try {
