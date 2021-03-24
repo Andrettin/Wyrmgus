@@ -129,6 +129,11 @@ public:
 	{
 	}
 
+	virtual bool has_encyclopedia_entry() const
+	{
+		return false;
+	}
+
 private:
 	std::string identifier;
 	std::set<std::string> aliases;

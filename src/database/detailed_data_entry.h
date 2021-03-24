@@ -49,6 +49,15 @@ public:
 
 	virtual void process_text() override;
 
+	virtual bool has_encyclopedia_entry() const override
+	{
+		if (this->get_notes().empty() && this->get_description().empty() && this->get_background().empty()) {
+			return false;
+		}
+
+		return true;
+	}
+
 	const std::string &get_notes() const
 	{
 		return this->notes;
