@@ -57,7 +57,7 @@ public:
 	virtual void _beginDraw() override;
 	virtual void _endDraw() override;
 
-	virtual void drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const player_color *player_color, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const override;
+	virtual void drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const color_modification &color_modification, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const override;
 
 	virtual void drawPoint(int x, int y, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	virtual void drawLine(int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands) override;

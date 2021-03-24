@@ -60,6 +60,7 @@
 
 #include "guichan/rectangle.h"
 #include "guichan/widgets/icon.h"
+#include "video/color_modification.h"
 
 namespace gcn
 {
@@ -72,7 +73,7 @@ namespace gcn
 
     void Icon::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
     {
-        graphics->drawImage(mImage, 0, 0, nullptr, 0, render_commands);
+        graphics->drawImage(mImage, 0, 0, color_modification(), 0, render_commands);
 
     }
 

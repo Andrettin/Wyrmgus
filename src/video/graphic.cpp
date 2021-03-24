@@ -128,17 +128,17 @@ void CGraphic::DrawClip(int x, int y, std::vector<std::function<void(renderer *)
 */
 void CGraphic::DrawSub(const int gx, const int gy, const int w, const int h, const int x, const int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_rect(QRect(gx, gy, w, h), QPoint(x, y), nullptr, false, 255, render_commands);
+	this->render_rect(QRect(gx, gy, w, h), QPoint(x, y), color_modification(), false, 255, render_commands);
 }
 
 void CGraphic::DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_rect(QRect(gx, gy, w, h), QPoint(x, y), nullptr, true, 255, render_commands);
+	this->render_rect(QRect(gx, gy, w, h), QPoint(x, y), color_modification(), true, 255, render_commands);
 }
 
-void CPlayerColorGraphic::DrawPlayerColorSub(const player_color *player_color, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
+void CPlayerColorGraphic::DrawPlayerColorSub(const color_modification &color_modification, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_rect(QRect(gx, gy, w, h), QPoint(x, y), player_color, false, 255, render_commands);
+	this->render_rect(QRect(gx, gy, w, h), QPoint(x, y), color_modification, false, 255, render_commands);
 }
 
 void CGraphic::DrawSubClip(const int gx, const int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -157,12 +157,12 @@ void CGraphic::DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y, 
 	DrawGrayscaleSub(gx + x - oldx, gy + y - oldy, w, h, x, y, render_commands);
 }
 
-void CPlayerColorGraphic::DrawPlayerColorSubClip(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
+void CPlayerColorGraphic::DrawPlayerColorSubClip(const color_modification &color_modification, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	DrawPlayerColorSub(player_color, gx + x - oldx, gy + y - oldy, w, h, x, y, render_commands);
+	DrawPlayerColorSub(color_modification, gx + x - oldx, gy + y - oldy, w, h, x, y, render_commands);
 }
 
 /**
@@ -178,7 +178,7 @@ void CPlayerColorGraphic::DrawPlayerColorSubClip(const wyrmgus::player_color *pl
 */
 void CGraphic::DrawSubTrans(const int gx, const int gy, const int w, const int h, const int x, const int y, const unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	this->render_rect(QRect(gx, gy, w, h), QPoint(x, y), nullptr, false, alpha, render_commands);
+	this->render_rect(QRect(gx, gy, w, h), QPoint(x, y), color_modification(), false, alpha, render_commands);
 }
 
 /**
@@ -869,10 +869,8 @@ void CGraphic::render_frame(const int frame_index, const QPoint &pixel_pos, cons
 	this->render_frame(frame_index, pixel_pos, color_modification, grayscale, flip, opacity, show_percent, render_commands);
 }
 
-void CGraphic::render_rect(const QRect &rect, const QPoint &pixel_pos, const player_color *player_color, const bool grayscale, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands)
+void CGraphic::render_rect(const QRect &rect, const QPoint &pixel_pos, const color_modification &color_modification, const bool grayscale, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const color_modification color_modification(0, player_color, 0, 0, 0);
-
 	render_commands.push_back([this, rect, pixel_pos, color_modification, grayscale, opacity](renderer *renderer) {
 		const QOpenGLTexture *texture = this->get_or_create_texture(color_modification, grayscale);
 

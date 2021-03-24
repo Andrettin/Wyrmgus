@@ -60,7 +60,7 @@
 #include "guichan/platform.h"
 
 namespace wyrmgus {
-    class player_color;
+    class color_modification;
     class renderer;
 }
 
@@ -182,15 +182,12 @@ namespace gcn
                                int dstX, int dstY, int width,
 							   //Wyrmgus start
 //                               int height) = 0;
-                               int height, const wyrmgus::player_color *player_color, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const = 0;
+                               int height, const color_modification &color_modification, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const = 0;
 							   //Wyrmgus end
 
         void drawImage(const Image *image, int srcX, int srcY,
             int dstX, int dstY, int width,
-            int height, std::vector<std::function<void(renderer *)>> &render_commands) const
-        {
-            this->drawImage(image, srcX, srcY, dstX, dstY, width, height, nullptr, 0, false, render_commands);
-        }
+            int height, std::vector<std::function<void(renderer *)>> &render_commands) const;
 
         /**
          * Draws an image. A simplified version of the other drawImage.
@@ -200,7 +197,7 @@ namespace gcn
          */
 		//Wyrmgus start
 //        virtual void drawImage(const Image* image, int dstX, int dstY);
-        virtual void drawImage(const Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color, unsigned int transparency, std::vector<std::function<void(renderer *)>> &render_commands) const;
+        virtual void drawImage(const Image* image, int dstX, int dstY, const color_modification &color_modification, unsigned int transparency, std::vector<std::function<void(renderer *)>> &render_commands) const;
 		//Wyrmgus end
 
         /**

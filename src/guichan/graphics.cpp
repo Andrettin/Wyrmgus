@@ -60,10 +60,10 @@
 #include "guichan/graphics.h"
 #include "guichan/exception.h"
 #include "guichan/font.h"
+#include "video/color_modification.h"
 
 namespace gcn
 {
-
     Graphics::Graphics()
     {
         mFont = nullptr;
@@ -120,9 +120,16 @@ namespace gcn
         return mClipStack.top();
     }
 
-    void Graphics::drawImage(const Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color, unsigned int transparency, std::vector<std::function<void(renderer *)>> &render_commands) const
+    void Graphics::drawImage(const Image *image, int srcX, int srcY,
+        int dstX, int dstY, int width,
+        int height, std::vector<std::function<void(renderer *)>> &render_commands) const
     {
-        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight(), player_color, transparency, false, render_commands);
+        this->drawImage(image, srcX, srcY, dstX, dstY, width, height, color_modification(), 0, false, render_commands);
+    }
+
+    void Graphics::drawImage(const Image* image, int dstX, int dstY, const color_modification &color_modification, unsigned int transparency, std::vector<std::function<void(renderer *)>> &render_commands) const
+    {
+        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight(), color_modification, transparency, false, render_commands);
     }
 
     void Graphics::setFont(Font* font)

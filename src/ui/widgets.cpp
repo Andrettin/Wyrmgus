@@ -237,7 +237,7 @@ void MyOpenGLGraphics::_endDraw()
 	popClipArea();
 }
 
-void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const wyrmgus::player_color *player_color, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const
+void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const color_modification &color_modification, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
@@ -252,8 +252,8 @@ void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, in
 	//Wyrmgus start
 //	((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
 //									 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
-	if (player_color != nullptr) {
-		((CPlayerColorGraphic *)image)->DrawPlayerColorSubClip(player_color, srcX, srcY, width, height,
+	if (!color_modification.is_null()) {
+		((CPlayerColorGraphic *)image)->DrawPlayerColorSubClip(color_modification, srcX, srcY, width, height,
 										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset, render_commands);
 	} else if (grayscale) {
 		((CGraphic *) image)->DrawGrayscaleSubClip(srcX, srcY, width, height,
@@ -371,12 +371,12 @@ PlayerColorImageWidget::PlayerColorImageWidget(const std::string &image_path, co
 
 void PlayerColorImageWidget::draw(gcn::Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const wyrmgus::player_color *player_color = nullptr;
+	const player_color *player_color = nullptr;
 	if (!this->WidgetPlayerColor.empty()) {
-		player_color = wyrmgus::player_color::get(WidgetPlayerColor);
+		player_color = player_color::get(WidgetPlayerColor);
 	}
 	
-	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), player_color, 0, this->grayscale, render_commands);
+	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), color_modification(0, player_color), 0, this->grayscale, render_commands);
 }
 
 void PlayerColorImageWidget::set_frame(const int frame)
@@ -694,7 +694,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics, std::vector<std::func
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth() - 1, img->getHeight() - 1, player_color, Transparency, this->grayscale, render_commands);
+								img->getWidth() - 1, img->getHeight() - 1, color_modification(0, player_color), Transparency, this->grayscale, render_commands);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
@@ -708,7 +708,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics, std::vector<std::func
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-								img->getWidth(), img->getHeight(), player_color, Transparency, this->grayscale, render_commands);
+								img->getWidth(), img->getHeight(), color_modification(0, player_color), Transparency, this->grayscale, render_commands);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
@@ -719,7 +719,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics, std::vector<std::func
 			glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
-							img->getWidth(), img->getHeight(), player_color, Transparency, this->grayscale, render_commands);
+							img->getWidth(), img->getHeight(), color_modification(0, player_color), Transparency, this->grayscale, render_commands);
 		if (Transparency) {
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}

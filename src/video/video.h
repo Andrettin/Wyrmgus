@@ -405,7 +405,7 @@ public:
 		this->render_frame(frame_index, pixel_pos, nullptr, nullptr, true, false, 255, show_percent, render_commands);
 	}
 
-	void render_rect(const QRect &rect, const QPoint &pixel_pos, const player_color *player_color, const bool grayscale, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands);
+	void render_rect(const QRect &rect, const QPoint &pixel_pos, const color_modification &color_modification, const bool grayscale, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	bool has_textures() const
 	{
@@ -459,8 +459,8 @@ public:
 	{
 	}
 
-	void DrawPlayerColorSub(const player_color *player_color, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawPlayerColorSubClip(const player_color *player_color, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawPlayerColorSub(const color_modification &color_modification, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawPlayerColorSubClip(const color_modification &color_modification, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawPlayerColorFrameClipX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void DrawPlayerColorFrameClip(const player_color *player_color, const unsigned frame, const int x, const int y, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
