@@ -32,7 +32,9 @@ enum class interface_element_type {
 	top_bar,
 	large_button,
 	small_button,
-	radio_button
+	radio_button,
+	icon_frame,
+	pressed_icon_frame
 };
 
 inline interface_element_type string_to_interface_element_type(const std::string &str)
@@ -45,6 +47,10 @@ inline interface_element_type string_to_interface_element_type(const std::string
 		return interface_element_type::small_button;
 	} else if (str == "radio_button") {
 		return interface_element_type::radio_button;
+	} else if (str == "icon_frame") {
+		return interface_element_type::icon_frame;
+	} else if (str == "pressed_icon_frame") {
+		return interface_element_type::pressed_icon_frame;
 	}
 
 	throw std::runtime_error("Invalid interface element type: \"" + str + "\".");

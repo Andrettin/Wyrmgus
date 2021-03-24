@@ -108,6 +108,10 @@ const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics
 			const button_state button_state = string_to_button_state(qualifiers.at(1));
 			return checkbox->get_graphics(checkbox_state, button_state);
 		}
+		case interface_element_type::icon_frame:
+			return defines::get()->get_icon_frame_graphics();
+		case interface_element_type::pressed_icon_frame:
+			return defines::get()->get_pressed_icon_frame_graphics();
 		default:
 			throw std::runtime_error("Invalid interface element type: \"" + std::to_string(static_cast<int>(type)) + "\".");
 	}
