@@ -50,7 +50,7 @@
 **  @param text   text to print on button
 */
 void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
-				  const std::string &text, const bool grayscale, const wyrmgus::player_color *player_color, bool transparent, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
+				  const std::string &text, const bool grayscale, const color_modification &color_modification, bool transparent, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	ButtonStyleProperties *p;
 
@@ -82,12 +82,9 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 
 		if (grayscale) {
 			pimage->Sprite->DrawGrayscaleFrameClip(pimage->Frame, x, y, show_percent, render_commands);
-		} else if (colorGraphic && player_color != nullptr) {
-			if (transparent) {
-				colorGraphic->DrawPlayerColorFrameClipTrans(player_color, pimage->Frame, x, y, 64, nullptr, show_percent, render_commands);
-			} else {
-				colorGraphic->DrawPlayerColorFrameClip(player_color, pimage->Frame, x, y, nullptr, show_percent, render_commands);
-			}
+		} else if (colorGraphic && !color_modification.is_null()) {
+			const unsigned char opacity = transparent ? 64 : 255;
+			colorGraphic->render_frame(pimage->Frame, QPoint(x, y), color_modification, grayscale, false, opacity, show_percent, render_commands);
 		} else {
 			pimage->Sprite->DrawFrame(pimage->Frame, x, y, render_commands);
 		}
@@ -144,4 +141,9 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 			//Wyrmgus end
 		}
 	}
+}
+
+void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands)
+{
+	DrawUIButton(style, flags, x, y, text, false, color_modification(), false, render_commands);
 }

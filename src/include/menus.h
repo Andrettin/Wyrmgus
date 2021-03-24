@@ -34,22 +34,19 @@ constexpr int MI_FLAGS_CLICKED = 2; /// mouse button pressed down on item
 class ButtonStyle;
 
 namespace wyrmgus {
-	class player_color;
+	class color_modification;
 	class renderer;
 }
 
 /// Draw menu button
-extern void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, const bool grayscale, const player_color *player_color, bool transparent, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
+extern void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, const bool grayscale, const color_modification &color_modification, bool transparent, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
 
-inline void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, const bool grayscale, const player_color *player_color, bool transparent, std::vector<std::function<void(renderer *)>> &render_commands)
+inline void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, const bool grayscale, const color_modification &color_modification, bool transparent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	DrawUIButton(style, flags, x, y, text, grayscale, player_color, transparent, 100, render_commands);
+	DrawUIButton(style, flags, x, y, text, grayscale, color_modification, transparent, 100, render_commands);
 }
 
-inline void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	DrawUIButton(style, flags, x, y, text, false, nullptr, false, render_commands);
-}
+void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands);
 
 /// Pre menu setup
 extern void PreMenuSetup();
