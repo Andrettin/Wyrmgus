@@ -447,6 +447,7 @@ set(ui_SRCS
 	src/ui/cursor.cpp
 	src/ui/icon.cpp
 	src/ui/icon_base.cpp
+	src/ui/icon_image_provider.cpp
 	src/ui/interface.cpp
 	src/ui/interface_image_provider.cpp
 	src/ui/interface_style.cpp
@@ -956,6 +957,7 @@ set(wyrmgus_ui_HDRS
 	src/ui/empty_image_provider.h
 	src/ui/icon.h
 	src/ui/icon_base.h
+	src/ui/icon_image_provider.h
 	src/ui/interface.h
 	src/ui/interface_element_type.h
 	src/ui/interface_image_provider.h

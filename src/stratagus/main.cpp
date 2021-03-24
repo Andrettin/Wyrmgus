@@ -36,6 +36,7 @@
 #include "map/tile_transition.h"
 #include "parameters.h"
 #include "ui/empty_image_provider.h"
+#include "ui/icon_image_provider.h"
 #include "ui/interface_image_provider.h"
 #include "unit/unit_image_provider.h"
 #include "unit/unit_list_model.h"
@@ -101,6 +102,7 @@ int main(int argc, char **argv)
 		engine.rootContext()->setContextProperty("wyrmgus", engine_interface::get());
 
 		engine.addImageProvider("empty", new empty_image_provider);
+		engine.addImageProvider("icon", new icon_image_provider);
 		engine.addImageProvider("interface", new interface_image_provider);
 		engine.addImageProvider("tile", new tile_image_provider);
 		engine.addImageProvider("unit", new unit_image_provider);
