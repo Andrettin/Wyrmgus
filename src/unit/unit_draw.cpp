@@ -688,19 +688,12 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_pt
 	pos.x += type.get_offset().x() * defines::get()->get_scale_factor();
 	pos.y += type.get_offset().y() * defines::get()->get_scale_factor();
 
+	bool flip = false;
+
 	if (type.Flip) {
 		if (frame < 0) {
-			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player_color, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day, render_commands);
-			} else {
-				sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day, render_commands);
-			}
-		} else {
-			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day, render_commands);
-			} else {
-				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
-			}
+			flip = true;
+			frame = -frame - 1;
 		}
 	} else {
 		const int row = type.get_num_directions() / 2 + 1;
@@ -710,12 +703,15 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_pt
 		} else {
 			frame = (frame / row) * type.get_num_directions() + frame % row;
 		}
-		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day, render_commands);
-		} else {
-			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
-		}
 	}
+
+	unsigned char opacity = 255;
+	if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+		opacity = int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value);
+	}
+
+	const color_modification color_modification(type.get_hue_rotation(), player_color, time_of_day);
+	sprite->render_frame(frame, pos, color_modification, false, flip, opacity, 100, render_commands);
 }
 
 void DrawOverlay(const unit_type &type, const std::shared_ptr<CGraphic> &sprite, int player, int frame, const PixelPos &screenPos, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -951,7 +947,6 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 			}
 		}
-		//Wyrmgus end
 	} else {
 		//Wyrmgus start
 //		pos.x += type.get_offset().x() - type.Width / 2;

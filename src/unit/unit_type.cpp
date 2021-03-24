@@ -2425,21 +2425,19 @@ void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraph
 	}
 	//Wyrmgus end
 	
-	const wyrmgus::player_color *player_color = CPlayer::Players[player]->get_player_color();
+	const player_color *player_color = CPlayer::Players[player]->get_player_color();
 
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.get_offset().x() * wyrmgus::defines::get()->get_scale_factor();
-	pos.y += type.get_offset().y() * wyrmgus::defines::get()->get_scale_factor();
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * defines::get()->get_scaled_tile_size()) / 2);
+	pos.x += type.get_offset().x() * defines::get()->get_scale_factor();
+	pos.y += type.get_offset().y() * defines::get()->get_scale_factor();
 
-	//Wyrmgus start
-	/*
+	bool flip = false;
 	if (type.Flip) {
 		if (frame < 0) {
-			sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
-		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+			flip = true;
+			frame = -frame - 1;
 		}
 	} else {
 		const int row = type.get_num_directions() / 2 + 1;
@@ -2449,38 +2447,15 @@ void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraph
 		} else {
 			frame = (frame / row) * type.get_num_directions() + frame % row;
 		}
-		sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 	}
-	*/
-	if (type.Flip) {
-		if (frame < 0) {
-			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player_color, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day, render_commands);
-			} else {
-				sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day, render_commands);
-			}
-		} else {
-			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day, render_commands);
-			} else {
-				sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
-			}
-		}
-	} else {
-		const int row = type.get_num_directions() / 2 + 1;
 
-		if (frame < 0) {
-			frame = ((-frame - 1) / row) * type.get_num_directions() + type.get_num_directions() - (-frame - 1) % row;
-		} else {
-			frame = (frame / row) * type.get_num_directions() + frame % row;
-		}
-		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day, render_commands);
-		} else {
-			sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
-		}
+	unsigned char opacity = 255;
+	if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+		opacity = int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value);
 	}
-	//Wyrmgus end
+
+	const color_modification color_modification(type.get_hue_rotation(), player_color, time_of_day);
+	sprite->render_frame(frame, pos, color_modification, false, flip, opacity, 100, render_commands);
 }
 
 /**
