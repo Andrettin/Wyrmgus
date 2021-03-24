@@ -36,10 +36,12 @@
 #include "map/tile_transition.h"
 #include "parameters.h"
 #include "ui/empty_image_provider.h"
+#include "ui/icon.h"
 #include "ui/icon_image_provider.h"
 #include "ui/interface_image_provider.h"
 #include "unit/unit_image_provider.h"
 #include "unit/unit_list_model.h"
+#include "unit/unit_type.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "version.h"
@@ -92,8 +94,10 @@ int main(int argc, char **argv)
 
 		qmlRegisterType<defines>();
 		qmlRegisterType<game>();
+		qmlRegisterType<icon>();
 		qmlRegisterType<parameters>();
 		qmlRegisterType<preferences>();
+		qmlRegisterType<unit_type>();
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
 		qmlRegisterType<map_grid_model>("map_grid_model", 1, 0, "MapGridModel");
