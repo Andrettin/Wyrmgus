@@ -72,10 +72,10 @@ QStringList to_qstring_list(const T &string_container)
 	return qstring_list;
 }
 
-template <typename T>
-inline std::set<typename T::value_type> to_set(const T &container)
+template <typename T, typename set_type = std::set<typename T::value_type>>
+inline set_type to_set(const T &container)
 {
-	std::set<typename T::value_type> set;
+	set_type set{};
 
 	for (const typename T::value_type &element : container) {
 		set.insert(element);

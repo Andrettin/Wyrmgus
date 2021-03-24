@@ -73,6 +73,7 @@ class icon final : public icon_base, public data_type<icon>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
+	Q_PROPERTY(double hue_rotation MEMBER hue_rotation READ get_hue_rotation)
 
 public:
 	static constexpr const char *class_identifier = "icon";
@@ -90,6 +91,11 @@ public:
 	player_color *get_conversible_player_color() const
 	{
 		return this->conversible_player_color;
+	}
+
+	double get_hue_rotation() const
+	{
+		return this->hue_rotation;
 	}
 
 	std::shared_ptr<CPlayerColorGraphic> get_graphics() const;
@@ -111,6 +117,7 @@ public:
 
 private:
 	player_color *conversible_player_color = nullptr;
+	double hue_rotation = 0;
 
 	friend int ::CclDefineIcon(lua_State *l);
 };

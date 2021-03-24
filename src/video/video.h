@@ -29,10 +29,10 @@
 
 #pragma once
 
-#include "guichan.h"
-
 #include "color.h"
+#include "guichan.h"
 #include "vec2i.h"
+#include "video/color_modification.h"
 
 #include <QOpenGLTexture>
 
@@ -328,52 +328,41 @@ public:
 		return this->has_player_color_value;
 	}
 
-	const QOpenGLTexture *get_texture(const player_color *player_color, const CColor *color_modification, const bool grayscale) const
+	const QOpenGLTexture *get_texture(const color_modification &color_modification, const bool grayscale) const
 	{
 		if (grayscale) {
 			return this->grayscale_texture.get();
-		} else if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-			if (color_modification == nullptr) {
-				return this->texture.get();
-			} else {
-				const auto find_iterator = this->color_modification_textures.find(*color_modification);
-				if (find_iterator != this->color_modification_textures.end()) {
-					return find_iterator->second.get();
-				}
+		} else if (!color_modification.is_null()) {
+			if (color_modification.get_player_color() != nullptr && (color_modification.get_player_color() == this->get_conversible_player_color() || !this->has_player_color())) {
+				const wyrmgus::color_modification modification(color_modification.get_hue_rotation(), nullptr, color_modification.get_red_change(), color_modification.get_green_change(), color_modification.get_blue_change());
+				return this->get_texture(modification, grayscale);
+			}
+
+			const auto find_iterator = this->modified_textures.find(color_modification);
+			if (find_iterator != this->modified_textures.end()) {
+				return find_iterator->second.get();
 			}
 		} else {
-			if (color_modification == nullptr) {
-				const auto find_iterator = this->player_color_textures.find(player_color);
-				if (find_iterator != this->player_color_textures.end()) {
-					return find_iterator->second.get();
-				}
-			} else {
-				const auto find_iterator = this->player_color_color_modification_textures.find(player_color);
-				if (find_iterator != this->player_color_color_modification_textures.end()) {
-					const auto sub_find_iterator = find_iterator->second.find(*color_modification);
-					if (sub_find_iterator != find_iterator->second.end()) {
-						return sub_find_iterator->second.get();
-					}
-				}
-			}
+			return this->texture.get();
 		}
 
 		return nullptr;
 	}
 
-	const QOpenGLTexture *get_or_create_texture(const player_color *player_color, const CColor *color_modification, const bool grayscale)
+	const QOpenGLTexture *get_or_create_texture(const color_modification &color_modification, const bool grayscale)
 	{
-		if (player_color != nullptr) {
-			if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-				return this->get_or_create_texture(nullptr, color_modification, grayscale);
+		if (!color_modification.is_null()) {
+			if (color_modification.get_player_color() != nullptr && (color_modification.get_player_color() == this->get_conversible_player_color() || !this->has_player_color())) {
+				const wyrmgus::color_modification modification(color_modification.get_hue_rotation(), nullptr, color_modification.get_red_change(), color_modification.get_green_change(), color_modification.get_blue_change());
+				return this->get_or_create_texture(modification, grayscale);
 			}
 		}
 
-		const QOpenGLTexture *texture = this->get_texture(player_color, color_modification, grayscale);
+		const QOpenGLTexture *texture = this->get_texture(color_modification, grayscale);
 
 		if (texture == nullptr) {
-			this->create_texture(player_color, color_modification, grayscale);
-			texture = this->get_texture(player_color, color_modification, grayscale);
+			this->create_texture(color_modification, grayscale);
+			texture = this->get_texture(color_modification, grayscale);
 		}
 
 		if (texture == nullptr) {
@@ -383,9 +372,16 @@ public:
 		return texture;
 	}
 
-	void create_texture(const player_color *player_color, const CColor *color_modification, const bool grayscale);
+	void create_texture(const color_modification &color_modification, const bool grayscale);
 
 	void render(const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void render_frame(const int frame_index, const QPoint &pixel_pos, const color_modification &color_modification, const bool grayscale, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
+
+	void render_frame(const int frame_index, const QPoint &pixel_pos, const color_modification &color_modification, std::vector<std::function<void(renderer *)>> &render_commands)
+	{
+		this->render_frame(frame_index, pixel_pos, color_modification, false, false, 255, 100, render_commands);
+	}
 
 	void render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool grayscale, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
 
@@ -413,7 +409,7 @@ public:
 
 	bool has_textures() const
 	{
-		return this->texture != nullptr || this->grayscale_texture != nullptr || !this->color_modification_textures.empty() || !this->player_color_textures.empty() || !this->player_color_color_modification_textures.empty();
+		return this->texture != nullptr || this->grayscale_texture != nullptr || !this->modified_textures.empty();
 	}
 
 	void free_textures();
@@ -446,9 +442,7 @@ public:
 private:
 	std::unique_ptr<QOpenGLTexture> texture;
 	std::unique_ptr<QOpenGLTexture> grayscale_texture;
-	std::map<CColor, std::unique_ptr<QOpenGLTexture>> color_modification_textures;
-	std::map<const player_color *, std::unique_ptr<QOpenGLTexture>> player_color_textures;
-	std::map<const player_color *, std::map<CColor, std::unique_ptr<QOpenGLTexture>>> player_color_color_modification_textures;
+	std::map<color_modification, std::unique_ptr<QOpenGLTexture>> modified_textures;
 	int custom_scale_factor = 1; //the scale factor of the loaded image, if it is a custom scaled image
 	bool has_player_color_value = false;
 	std::mutex load_mutex;

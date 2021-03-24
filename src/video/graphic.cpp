@@ -47,6 +47,7 @@
 //Wyrmgus start
 #include "unit/unit.h" //for using CPreference
 //Wyrmgus end
+#include "util/container_util.h"
 #include "util/image_util.h"
 #include "util/log_util.h"
 #include "util/point_util.h"
@@ -783,15 +784,8 @@ const wyrmgus::player_color *CGraphic::get_conversible_player_color() const
 	return defines::get()->get_conversible_player_color();
 }
 
-void CGraphic::create_texture(const player_color *player_color, const CColor *color_modification, const bool grayscale)
+void CGraphic::create_texture(const color_modification &color_modification, const bool grayscale)
 {
-	if (player_color != nullptr) {
-		if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-			this->create_texture(nullptr, color_modification, grayscale);
-			return;
-		}
-	}
-
 	QImage image = this->get_image();
 
 	if (image.format() != QImage::Format_RGBA8888) {
@@ -804,8 +798,15 @@ void CGraphic::create_texture(const player_color *player_color, const CColor *co
 		} else {
 			ApplyGrayScale(image);
 		}
-	} else if (player_color != nullptr) {
-		player_color->apply_to_image(image, this->get_conversible_player_color());
+	} else if (!color_modification.is_null()) {
+		if (color_modification.get_hue_rotation() != 0) {
+			const color_set ignored_colors = container::to_set<std::vector<QColor>, color_set>(this->get_conversible_player_color()->get_colors());
+			image::rotate_hue(image, color_modification.get_hue_rotation(), ignored_colors);
+		}
+
+		if (color_modification.get_player_color() != nullptr) {
+			color_modification.get_player_color()->apply_to_image(image, this->get_conversible_player_color());
+		}
 	}
 
 	const int scale_factor = defines::get()->get_scale_factor();
@@ -813,18 +814,22 @@ void CGraphic::create_texture(const player_color *player_color, const CColor *co
 		image = image::scale(image, scale_factor, this->get_original_frame_size());
 	}
 
-	if (color_modification != nullptr && !grayscale) {
+	if (color_modification.has_rgb_change() && !grayscale) {
 		unsigned char *image_data = image.bits();
 		const int bpp = image.depth() / 8;
+
+		const int red_change = color_modification.get_red_change();
+		const int green_change = color_modification.get_green_change();
+		const int blue_change = color_modification.get_blue_change();
 
 		for (int i = 0; i < image.sizeInBytes(); i += bpp) {
 			unsigned char &red = image_data[i];
 			unsigned char &green = image_data[i + 1];
 			unsigned char &blue = image_data[i + 2];
 
-			red = std::max<int>(0, std::min<int>(255, red + color_modification->R));
-			green = std::max<int>(0, std::min<int>(255, green + color_modification->G));
-			blue = std::max<int>(0, std::min<int>(255, blue + color_modification->B));
+			red = std::clamp<int>(red + red_change, 0, 255);
+			green = std::clamp<int>(green + green_change, 0, 255);
+			blue = std::clamp<int>(blue + blue_change, 0, 255);
 		}
 	}
 
@@ -832,48 +837,44 @@ void CGraphic::create_texture(const player_color *player_color, const CColor *co
 
 	if (grayscale) {
 		this->grayscale_texture = std::move(texture);
-	} else if (player_color != nullptr) {
-		if (color_modification != nullptr) {
-			this->player_color_color_modification_textures[player_color][*color_modification] = std::move(texture);
-		} else {
-			this->player_color_textures[player_color] = std::move(texture);
-		}
+	} else if (!color_modification.is_null()) {
+		this->modified_textures[color_modification] = std::move(texture);
 	} else {
-		if (color_modification != nullptr) {
-			this->color_modification_textures[*color_modification] = std::move(texture);
-		} else {
-			this->texture = std::move(texture);
-		}
+		this->texture = std::move(texture);
 	}
 }
 
 void CGraphic::render(const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	render_commands.push_back([this, pixel_pos](renderer *renderer) {
-		const QOpenGLTexture *texture = this->get_or_create_texture(nullptr, nullptr, false);
+		const QOpenGLTexture *texture = this->get_or_create_texture(color_modification(), false);
 
 		renderer->blit_texture(texture, pixel_pos, this->get_size(), false, 255, this->get_size());
 	});
 }
 
-void CGraphic::render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool grayscale, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
+void CGraphic::render_frame(const int frame_index, const QPoint &pixel_pos, const color_modification &color_modification, const bool grayscale, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const CColor *color_modification = nullptr;
-	if (time_of_day != nullptr && time_of_day->HasColorModification()) {
-		color_modification = &time_of_day->ColorModification;
-	}
-
-	render_commands.push_back([this, frame_index, pixel_pos, player_color, color_modification, grayscale, flip, opacity, show_percent](renderer *renderer) {
-		const QOpenGLTexture *texture = this->get_or_create_texture(player_color, color_modification, grayscale);
+	render_commands.push_back([this, frame_index, pixel_pos, color_modification, grayscale, flip, opacity, show_percent](renderer *renderer) {
+		const QOpenGLTexture *texture = this->get_or_create_texture(color_modification, grayscale);
 
 		renderer->blit_texture_frame(texture, pixel_pos, this->get_size(), frame_index, this->get_frame_size(), flip, opacity, show_percent);
 	});
 }
 
+void CGraphic::render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool grayscale, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
+{
+	const color_modification color_modification(0, player_color, time_of_day);
+
+	this->render_frame(frame_index, pixel_pos, color_modification, grayscale, flip, opacity, show_percent, render_commands);
+}
+
 void CGraphic::render_rect(const QRect &rect, const QPoint &pixel_pos, const player_color *player_color, const bool grayscale, const unsigned char opacity, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	render_commands.push_back([this, rect, pixel_pos, player_color, grayscale, opacity](renderer *renderer) {
-		const QOpenGLTexture *texture = this->get_or_create_texture(player_color, nullptr, grayscale);
+	const color_modification color_modification(0, player_color, 0, 0, 0);
+
+	render_commands.push_back([this, rect, pixel_pos, color_modification, grayscale, opacity](renderer *renderer) {
+		const QOpenGLTexture *texture = this->get_or_create_texture(color_modification, grayscale);
 
 		renderer->blit_texture_frame(texture, pixel_pos, rect.topLeft(), rect.size(), false, opacity, 100, rect.size());
 	});
@@ -883,9 +884,7 @@ void CGraphic::free_textures()
 {
 	this->texture.reset();
 	this->grayscale_texture.reset();
-	this->color_modification_textures.clear();
-	this->player_color_textures.clear();
-	this->player_color_color_modification_textures.clear();
+	this->modified_textures.clear();
 }
 
 CFiller &CFiller::operator =(const CFiller &other_filler)

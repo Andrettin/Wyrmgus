@@ -24,44 +24,20 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
+
+#include "video/color_modification.h"
+
+#include "time/time_of_day.h"
 
 namespace wyrmgus {
 
-//a class providing an OpenGL frame buffer to be used by QtQuick
-class frame_buffer_object : public QQuickFramebufferObject
+color_modification::color_modification(const double hue_rotation, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change) : hue_rotation(hue_rotation), player_color(player_color), red_change(red_change), green_change(green_change), blue_change(blue_change)
 {
-private:
-	static inline frame_buffer_object *instance = nullptr;
-	static inline std::mutex mutex;
+}
 
-public:
-	static void request_update()
-	{
-		std::lock_guard<std::mutex> lock(frame_buffer_object::mutex);
-
-		if (frame_buffer_object::instance != nullptr) {
-			QMetaObject::invokeMethod(frame_buffer_object::instance, &frame_buffer_object::update, Qt::QueuedConnection);
-		}
-	}
-
-	frame_buffer_object()
-	{
-		std::lock_guard<std::mutex> lock(frame_buffer_object::mutex);
-
-		frame_buffer_object::instance = this;
-	}
-
-	~frame_buffer_object()
-	{
-		if (frame_buffer_object::instance == this) {
-			std::lock_guard<std::mutex> lock(frame_buffer_object::mutex);
-			frame_buffer_object::instance = nullptr;
-		}
-	}
-
-public:
-	virtual QQuickFramebufferObject::Renderer *createRenderer() const override;
-};
+color_modification::color_modification(const double hue_rotation, const wyrmgus::player_color *player_color, const time_of_day *time_of_day) : color_modification(hue_rotation, player_color, time_of_day ? time_of_day->ColorModification.R : 0, time_of_day ? time_of_day->ColorModification.G : 0, time_of_day ? time_of_day->ColorModification.B : 0)
+{
+}
 
 }

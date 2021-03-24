@@ -519,6 +519,7 @@ source_group(util FILES ${util_SRCS})
 
 set(video_SRCS
 	src/video/color.cpp
+	src/video/color_modification.cpp
 	src/video/font.cpp
 	src/video/font_color.cpp
 	src/video/frame_buffer_object.cpp
@@ -1037,6 +1038,7 @@ set(wyrmgus_util_HDRS
 )
 
 set(wyrmgus_video_HDRS
+	src/video/color_modification.h
 	src/video/font.h
 	src/video/font_color.h
 	src/video/frame_buffer_object.h
