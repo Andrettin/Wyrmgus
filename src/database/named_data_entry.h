@@ -37,7 +37,7 @@ class named_data_entry : public data_entry
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString name READ get_name_qstring)
+	Q_PROPERTY(QString name READ get_name_qstring NOTIFY changed)
 
 public:
 	explicit named_data_entry(const std::string &identifier) : data_entry(identifier)

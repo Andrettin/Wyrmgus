@@ -134,6 +134,9 @@ public:
 		return false;
 	}
 
+signals:
+	void changed();
+
 private:
 	std::string identifier;
 	std::set<std::string> aliases;

@@ -26,10 +26,12 @@
 
 #include "stratagus.h"
 
+#include "civilization.h"
 #include "database/database.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "engine_interface.h"
+#include "faction.h"
 #include "game.h"
 #include "map/map_grid_model.h"
 #include "map/tile_image_provider.h"
@@ -92,7 +94,9 @@ int main(int argc, char **argv)
 
 		QQmlApplicationEngine engine;
 
+		qmlRegisterType<civilization>();
 		qmlRegisterType<defines>();
+		qmlRegisterType<faction>();
 		qmlRegisterType<game>();
 		qmlRegisterType<icon>();
 		qmlRegisterType<parameters>();
