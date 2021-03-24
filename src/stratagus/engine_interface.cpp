@@ -40,6 +40,8 @@
 #include "sound/music_type.h"
 #include "sound/sound.h"
 #include "ui/interface.h"
+#include "unit/unit_type.h"
+#include "util/container_util.h"
 #include "util/exception_util.h"
 #include "util/queue_util.h"
 
@@ -180,6 +182,21 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 		default:
 			return false;
 	}
+}
+
+QVariantList engine_interface::get_unit_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(unit_type::get_unit_encyclopedia_entries());
+}
+
+QVariantList engine_interface::get_building_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(unit_type::get_building_encyclopedia_entries());
+}
+
+QVariantList engine_interface::get_item_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(unit_type::get_item_encyclopedia_entries());
 }
 
 }

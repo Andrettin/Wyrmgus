@@ -298,6 +298,19 @@ public:
 		}
 	}
 
+	static std::vector<T *> get_encyclopedia_entries()
+	{
+		std::vector<T *> entries;
+
+		for (T *instance : T::get_all()) {
+			if (instance->has_encyclopedia_entry()) {
+				entries.push_back(instance);
+			}
+		}
+
+		return entries;
+	}
+
 private:
 	static inline bool initialize_class()
 	{

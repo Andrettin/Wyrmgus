@@ -797,6 +797,51 @@ public:
 		return unit_type;
 	}
 
+	static std::vector<unit_type *> get_unit_encyclopedia_entries()
+	{
+		std::vector<unit_type *> entries;
+
+		for (unit_type *unit_type : unit_type::get_encyclopedia_entries()) {
+			if (unit_type->BoolFlag[BUILDING_INDEX].value || unit_type->BoolFlag[ITEM_INDEX].value) {
+				continue;
+			}
+
+			entries.push_back(unit_type);
+		}
+
+		return entries;
+	}
+
+	static std::vector<unit_type *> get_building_encyclopedia_entries()
+	{
+		std::vector<unit_type *> entries;
+
+		for (unit_type *unit_type : unit_type::get_encyclopedia_entries()) {
+			if (!unit_type->BoolFlag[BUILDING_INDEX].value) {
+				continue;
+			}
+
+			entries.push_back(unit_type);
+		}
+
+		return entries;
+	}
+
+	static std::vector<unit_type *> get_item_encyclopedia_entries()
+	{
+		std::vector<unit_type *> entries;
+
+		for (unit_type *unit_type : unit_type::get_encyclopedia_entries()) {
+			if (!unit_type->BoolFlag[ITEM_INDEX].value) {
+				continue;
+			}
+
+			entries.push_back(unit_type);
+		}
+
+		return entries;
+	}
+
 	explicit unit_type(const std::string &identifier);
 	~unit_type();
 
