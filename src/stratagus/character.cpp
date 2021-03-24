@@ -709,7 +709,7 @@ const icon *character::get_icon() const
 		if (!this->get_variation().empty() && this->get_unit_type()->GetVariation(this->get_variation()) != nullptr && !this->get_unit_type()->GetVariation(this->get_variation())->Icon.Name.empty()) {
 			return this->get_unit_type()->GetVariation(this->get_variation())->Icon.Icon;
 		} else {
-			return this->get_unit_type()->Icon.Icon;
+			return this->get_unit_type()->get_icon();
 		}
 	}
 

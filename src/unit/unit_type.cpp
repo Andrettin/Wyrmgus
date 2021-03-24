@@ -521,10 +521,6 @@ void unit_type::process_sml_property(const sml_property &property)
 	if (key == "parent") {
 		const unit_type *parent_type = unit_type::get(value);
 		this->set_parent(parent_type);
-	} else if (key == "icon") {
-		this->Icon.Name = value;
-		this->Icon.Icon = nullptr;
-		this->Icon.Load();
 	} else if (key == "missile") {
 		this->Missile.Name = value;
 		this->Missile.Missile = nullptr;
@@ -881,9 +877,7 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "animations") {
 			this->animation_set = animation_set::get(value);
 		} else if (key == "icon") {
-			this->Icon.Name = value;
-			this->Icon.Icon = nullptr;
-			this->Icon.Load();
+			this->icon = icon::get(value);
 		} else if (key == "tile_width") {
 			this->tile_size.setWidth(std::stoi(value));
 		} else if (key == "tile_height") {
@@ -1578,11 +1572,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->ExperienceRequirementsString = parent_type->ExperienceRequirementsString;
 	this->BuildingRulesString = parent_type->BuildingRulesString;
 	this->Elixir = parent_type->Elixir;
-	this->Icon.Name = parent_type->Icon.Name;
-	this->Icon.Icon = nullptr;
-	if (!this->Icon.Name.empty()) {
-		this->Icon.Load();
-	}
+	this->icon = parent_type->icon;
 	this->Spells = parent_type->Spells;
 	this->autocast_spells = parent_type->autocast_spells;
 
@@ -2641,11 +2631,6 @@ void LoadUnitTypes()
 
 void LoadUnitType(unit_type *unit_type)
 {
-	// Lookup icons.
-	if (!unit_type->Icon.Name.empty()) {
-		unit_type->Icon.Load();
-	}
-
 	for (const auto &variation : unit_type->get_variations()) {
 		if (!variation->Icon.Name.empty()) {
 			variation->Icon.Load();

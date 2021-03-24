@@ -726,12 +726,12 @@ static void CalculateMaxIconSize()
 	IconWidth = 0;
 	IconHeight = 0;
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
-		const wyrmgus::unit_type *type = wyrmgus::unit_type::get(Editor.UnitTypes[i].c_str());
-		Assert(type->Icon.Icon);
-		const wyrmgus::icon &icon = *type->Icon.Icon;
+		const unit_type *type = wyrmgus::unit_type::get(Editor.UnitTypes[i].c_str());
+		Assert(type->get_icon());
+		const icon *icon = type->get_icon();
 
-		IconWidth = std::max(IconWidth, icon.get_graphics()->Width);
-		IconHeight = std::max(IconHeight, icon.get_graphics()->Height);
+		IconWidth = std::max(IconWidth, icon->get_graphics()->Width);
+		IconHeight = std::max(IconHeight, icon->get_graphics()->Height);
 	}
 }
 
@@ -882,7 +882,7 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 		}
 		//Wyrmgus start
 //		wyrmgus::icon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
-		wyrmgus::icon &icon = (i != (int) Editor.ShownUnitTypes.size()) ? *Editor.ShownUnitTypes[i]->Icon.Icon : *wyrmgus::icon::get("icon-level-up");
+		const icon *icon = (i != (int) Editor.ShownUnitTypes.size()) ? Editor.ShownUnitTypes[i]->get_icon() : icon::get("icon-level-up");
 		//Wyrmgus end
 		const PixelPos pos(x, y);
 
@@ -899,7 +899,7 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 		flag |= IconCommandButton;
 		//Wyrmgus end
 
-		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color(), render_commands);
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color(), render_commands);
 
 		//Wyrmgus start
 //		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
@@ -909,7 +909,7 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 //			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
 //									icon.G->Width - 2, icon.G->Height - 2);
 			Video.DrawRectangleClip(ColorGreen, x, y,
-									icon.get_graphics()->Width, icon.get_graphics()->Height, render_commands);
+									icon->get_graphics()->Width, icon->get_graphics()->Height, render_commands);
 			//Wyrmgus end
 		}
 		if (i == Editor.CursorUnitIndex) {
@@ -1202,7 +1202,7 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 	int y = UI.InfoPanel.Y + 5 * scale_factor;
 
 	if (Editor.StartUnit) {
-		wyrmgus::icon *icon = Editor.StartUnit->Icon.Icon;
+		const icon *icon = Editor.StartUnit->get_icon();
 		Assert(icon);
 		const PixelPos pos(x + get_start_icon_x(), y + get_start_icon_y());
 		unsigned int flag = 0;
@@ -2311,8 +2311,8 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		}
 	}
 
-	int StartUnitWidth = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->get_graphics()->Width : wyrmgus::defines::get()->get_scaled_tile_width() + 7 * scale_factor;
-	int StartUnitHeight = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->get_graphics()->Height : wyrmgus::defines::get()->get_scaled_tile_height() + 7 * scale_factor;
+	int StartUnitWidth = Editor.StartUnit ? Editor.StartUnit->get_icon()->get_graphics()->Width : wyrmgus::defines::get()->get_scaled_tile_width() + 7 * scale_factor;
+	int StartUnitHeight = Editor.StartUnit ? Editor.StartUnit->get_icon()->get_graphics()->Height : wyrmgus::defines::get()->get_scaled_tile_height() + 7 * scale_factor;
 	if (UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() < CursorScreenPos.x
 		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() + StartUnitWidth
 		&& UI.InfoPanel.Y + 5 * scale_factor + get_start_icon_y() < CursorScreenPos.y
@@ -2399,7 +2399,7 @@ void CEditor::Init()
 				continue;
 			}
 
-			if (unit_type->Icon.Name.empty() || unit_type->BoolFlag[VANISHES_INDEX].value || unit_type->BoolFlag[HIDDENINEDITOR_INDEX].value) {
+			if (unit_type->get_icon() == nullptr || unit_type->BoolFlag[VANISHES_INDEX].value || unit_type->BoolFlag[HIDDENINEDITOR_INDEX].value) {
 				continue;
 			}
 			

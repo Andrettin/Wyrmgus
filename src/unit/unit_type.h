@@ -61,6 +61,7 @@ namespace wyrmgus {
 	class construction;
 	class faction;
 	class font;
+	class icon;
 	class missile_type;
 	class name_generator;
 	class plane;
@@ -766,6 +767,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
 	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction)
 	Q_PROPERTY(wyrmgus::animation_set* animation_set MEMBER animation_set)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
 	Q_PROPERTY(QSize box_size MEMBER box_size READ get_box_size)
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
@@ -1003,6 +1005,11 @@ public:
 		return this->animation_set;
 	}
 
+	const wyrmgus::icon *get_icon() const
+	{
+		return this->icon;
+	}
+
 	int get_draw_level() const
 	{
 		return this->draw_level;
@@ -1177,7 +1184,9 @@ private:
 public:
 	int StillFrame = 0;				/// Still frame
 
-	IconConfig Icon;                /// Icon to display for this unit
+private:
+	wyrmgus::icon *icon = nullptr;                /// Icon to display for this unit
+public:
 	MissileConfig Missile;                           /// Missile weapon
 	//Wyrmgus start
 	MissileConfig FireMissile;						 /// Missile weapon if the unit has fire damage

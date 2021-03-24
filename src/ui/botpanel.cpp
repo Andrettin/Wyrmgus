@@ -1085,8 +1085,8 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 			button_icon = button_unit_type->GetVariation(Selected[0]->GetVariation()->get_identifier())->Icon.Icon;
 		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::UpgradeToClass || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
 			button_icon = button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Icon;
-		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::UpgradeToClass || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && !button_unit_type->Icon.Name.empty()) {
-			button_icon = button_unit_type->Icon.Icon;
+		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::UpgradeToClass || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && button_unit_type->get_icon() != nullptr) {
+			button_icon = button_unit_type->get_icon();
 		} else if (button->Action == ButtonCmd::Buy) {
 			button_icon = wyrmgus::unit_manager::get()->GetSlotUnit(button->Value).get_icon();
 		} else if ((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass) && button->Icon.Name.empty() && button_upgrade->get_icon()) {

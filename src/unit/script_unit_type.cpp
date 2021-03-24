@@ -965,10 +965,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Animations")) {
 			type->animation_set = wyrmgus::animation_set::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
-			type->Icon.Name = LuaToString(l, -1);
-			type->Icon.Icon = nullptr;
-			//Wyrmgus start
-			type->Icon.Load();
+			type->icon = icon::get(LuaToString(l, -1));
 			//Wyrmgus end
 		} else if (!strcmp(value, "Costs")) {
 			if (!lua_istable(l, -1)) {
@@ -2054,7 +2051,11 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, type->Icon.Name.c_str());
+		if (type->get_icon() != nullptr) {
+			lua_pushstring(l, type->get_icon()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Costs")) {
 		LuaCheckArgs(l, 3);

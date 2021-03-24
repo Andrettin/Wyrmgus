@@ -1399,9 +1399,9 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 					|| (button_action == ButtonCmd::Stop && upgrade->is_shield())
 					|| (button_action == ButtonCmd::Move && upgrade->is_boots())
 				)
-				&& upgrade->get_item()->Icon.Icon != nullptr
+				&& upgrade->get_item()->get_icon() != nullptr
 			) {
-				this->ButtonIcons[button_action] = upgrade->get_item()->Icon.Icon;
+				this->ButtonIcons[button_action] = upgrade->get_item()->get_icon();
 				return;
 			} else if (button_action == ButtonCmd::StandGround && (upgrade->is_weapon() || upgrade->is_arrows()) && upgrade->get_item()->ButtonIcons.contains(button_action)) {
 				this->ButtonIcons[button_action] = upgrade->get_item()->ButtonIcons.find(button_action)->second.Icon;
@@ -1411,23 +1411,23 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 	}
 	
 	if (button_action == ButtonCmd::Attack) {
-		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::arrows) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::arrows)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::arrows)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(item_slot::arrows) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(item_slot::arrows)->second->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(item_slot::arrows)->second->get_icon();
 			return;
 		}
 		
-		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon)->second->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon)->second->get_icon();
 			return;
 		}
 	} else if (button_action == ButtonCmd::Stop) {
-		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::shield) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::shield)->second->get_item_class() == wyrmgus::item_class::shield && this->Type->DefaultEquipment.find(wyrmgus::item_slot::shield)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::shield)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(item_slot::shield) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(item_slot::shield)->second->get_item_class() == item_class::shield && this->Type->DefaultEquipment.find(item_slot::shield)->second->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::shield)->second->get_icon();
 			return;
 		}
 	} else if (button_action == ButtonCmd::Move) {
-		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::boots) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::boots)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::boots)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(item_slot::boots) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(item_slot::boots)->second->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(item_slot::boots)->second->get_icon();
 			return;
 		}
 	} else if (button_action == ButtonCmd::StandGround) {
@@ -6731,7 +6731,7 @@ const wyrmgus::construction *CUnit::get_construction() const
 	}
 }
 
-const wyrmgus::icon *CUnit::get_icon() const
+const icon *CUnit::get_icon() const
 {
 	if (this->get_character() != nullptr && this->get_character()->get_level() >= 3 && this->get_character()->get_heroic_icon() != nullptr) {
 		return this->get_character()->get_heroic_icon();
@@ -6741,11 +6741,11 @@ const wyrmgus::icon *CUnit::get_icon() const
 		return this->get_unique()->get_icon();
 	}
 	
-	const wyrmgus::unit_type_variation *variation = this->GetVariation();
+	const unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->Icon.Icon) {
 		return variation->Icon.Icon;
 	} else {
-		return this->Type->Icon.Icon;
+		return this->Type->get_icon();
 	}
 }
 

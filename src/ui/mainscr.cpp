@@ -179,7 +179,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 		hBar = 5 * scale_factor;
 		hAll = 7 * scale_factor;
 	}
-	y += unit.Type->Icon.Icon->get_graphics()->Height;
+	y += unit.Type->get_icon()->get_graphics()->Height;
 	//Wyrmgus start
 	/*
 	Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
@@ -188,10 +188,10 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 	if (defines::get()->get_bar_frame_graphics() != nullptr) {
 		defines::get()->get_bar_frame_graphics()->DrawClip(x + (-2 - 4) * scale_factor, y + (4 - 4) * scale_factor, render_commands);
 		Video.FillRectangleClip(ColorBlack, x - 2 * scale_factor, y + 4 * scale_factor,
-			unit.Type->Icon.Icon->get_graphics()->Width + (6 - 2) * scale_factor, hBar, render_commands);
+			unit.Type->get_icon()->get_graphics()->Width + (6 - 2) * scale_factor, hBar, render_commands);
 	} else {
 		Video.FillRectangleClip(ColorBlack, x - 4 * scale_factor, y + 2 * scale_factor,
-			unit.Type->Icon.Icon->get_graphics()->Width + 8 * scale_factor, hAll, render_commands);
+			unit.Type->get_icon()->get_graphics()->Width + 8 * scale_factor, hAll, render_commands);
 	}
 	//Wyrmgus end
 
@@ -225,7 +225,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 			//Wyrmgus end
 		}
 
-		f = (f * (unit.Type->Icon.Icon->get_graphics()->Width + 6 * scale_factor)) / 100;
+		f = (f * (unit.Type->get_icon()->get_graphics()->Width + 6 * scale_factor)) / 100;
 		Video.FillRectangleClip(color, x - 2 * scale_factor, y + 4 * scale_factor,
 			f > 1 ? f - 2 : 0, hBar, render_commands);
 		//Wyrmgus start
@@ -246,8 +246,8 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 static void UiDrawManaBar(const CUnit &unit, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	// FIXME: add icon borders
-	y += unit.Type->Icon.Icon->get_graphics()->Height;
-	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->Icon.Icon->get_graphics()->Width, 4, render_commands);
+	y += unit.Type->get_icon()->get_graphics()->Height;
+	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->get_icon()->get_graphics()->Width, 4, render_commands);
 
 	//Wyrmgus start
 //	if (unit.Stats->Variables[MANA_INDEX].Max) {
@@ -257,7 +257,7 @@ static void UiDrawManaBar(const CUnit &unit, int x, int y, std::vector<std::func
 //		int f = (100 * unit.Variable[MANA_INDEX].Value) / unit.Variable[MANA_INDEX].Max;
 		int f = (100 * unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Value)) / unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max);
 		//Wyrmgus end
-		f = (f * (unit.Type->Icon.Icon->get_graphics()->Width)) / 100;
+		f = (f * (unit.Type->get_icon()->get_graphics()->Width)) / 100;
 		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2, render_commands);
 	}
 }
@@ -498,11 +498,8 @@ static void DrawUnitInfo_Training(const CUnit &unit, std::vector<std::function<v
 		}
 		if (UI.SingleTrainingButton) {
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
-			//Wyrmgus sta
-			const wyrmgus::unit_type_variation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
-//			wyrmgus::icon &icon = *order.GetUnitType().Icon.Icon;
-			wyrmgus::icon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
-			//Wyrmgus end
+			const unit_type_variation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
+			const icon *icon = (variation && variation->Icon.Icon) ? variation->Icon.Icon : order.GetUnitType().get_icon();
 			//Wyrmgus start
 //			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
 			unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
@@ -512,7 +509,7 @@ static void DrawUnitInfo_Training(const CUnit &unit, std::vector<std::function<v
 			flags |= IconCommandButton;
 			//Wyrmgus end
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
-			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.get_player_color(), render_commands);
+			icon->DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.get_player_color(), render_commands);
 		}
 	} else {
 		if (!UI.TrainingText.empty()) {
@@ -535,8 +532,8 @@ static void DrawUnitInfo_Training(const CUnit &unit, std::vector<std::function<v
 					if (j >= UI.TrainingButtons.size()) {
 						break;
 					}
-					const wyrmgus::unit_type_variation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
-					wyrmgus::icon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
+					const unit_type_variation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
+					const icon *icon = (variation && variation->Icon.Icon) ? variation->Icon.Icon : order.GetUnitType().get_icon();
 					//Wyrmgus start
 //					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
 					int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
@@ -546,7 +543,7 @@ static void DrawUnitInfo_Training(const CUnit &unit, std::vector<std::function<v
 					const PixelPos pos(UI.TrainingButtons[j].X, UI.TrainingButtons[j].Y);
 					//Wyrmgus start
 					flag |= IconCommandButton;
-					icon.DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.get_player_color(), render_commands);
+					icon->DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.get_player_color(), render_commands);
 					train_counter.push_back(1);
 					++j;
 				}
@@ -607,13 +604,13 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit, std::vector<std::fu
 				}
 				//Wyrmgus end
 
-				wyrmgus::icon &icon = *order.GetUnitType().Icon.Icon;
+				const icon *icon = order.GetUnitType().get_icon();
 				unsigned int flag = (ButtonAreaUnderCursor == ButtonAreaUpgrading
 									 && ButtonUnderCursor == 0) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0;
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
 				flag |= IconCommandButton;
-				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.get_player_color(), render_commands);
+				icon->DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.get_player_color(), render_commands);
 			}
 			return true;
 		}

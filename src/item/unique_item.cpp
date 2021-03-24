@@ -76,7 +76,7 @@ const icon *unique_item::get_icon() const
 	if (this->icon != nullptr) {
 		return this->icon;
 	} else {
-		return this->get_unit_type()->Icon.Icon;
+		return this->get_unit_type()->get_icon();
 	}
 }
 
