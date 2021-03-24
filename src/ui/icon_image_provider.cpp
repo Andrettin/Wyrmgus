@@ -51,7 +51,7 @@ QImage icon_image_provider::requestImage(const QString &id, QSize *size, const Q
 	++index;
 
 	const player_color *player_color = nullptr;
-	if ((index + 1) < id_list.size()) {
+	if (index < id_list.size()) {
 		const std::string &player_color_identifier = id_list.at(index);
 		player_color = player_color::get(player_color_identifier);
 		++index;
