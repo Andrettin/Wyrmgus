@@ -42,7 +42,6 @@
 #include "ui/icon.h"
 #include "ui/icon_image_provider.h"
 #include "ui/interface_image_provider.h"
-#include "unit/unit_image_provider.h"
 #include "unit/unit_list_model.h"
 #include "unit/unit_type.h"
 #include "util/exception_util.h"
@@ -115,7 +114,6 @@ int main(int argc, char **argv)
 		engine.addImageProvider("icon", new icon_image_provider);
 		engine.addImageProvider("interface", new interface_image_provider);
 		engine.addImageProvider("tile", new tile_image_provider);
-		engine.addImageProvider("unit", new unit_image_provider);
 
 		const QString root_path = QString::fromStdString(database::get()->get_root_path().string());
 

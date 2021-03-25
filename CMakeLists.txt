@@ -475,7 +475,6 @@ set(unit_SRCS
 	src/unit/unit_class_container.cpp
 	src/unit/unit_draw.cpp
 	src/unit/unit_find.cpp
-	src/unit/unit_image_provider.cpp
 	src/unit/unit_list_model.cpp
 	src/unit/unit_manager.cpp
 	src/unit/unit_ref.cpp
@@ -977,7 +976,6 @@ set(wyrmgus_unit_HDRS
 	src/unit/unit_class.h
 	src/unit/unit_class_container.h
 	src/unit/unit_find.h
-	src/unit/unit_image_provider.h
 	src/unit/unit_list_model.h
 	src/unit/unit_manager.h
 	src/unit/unit_ref.h
