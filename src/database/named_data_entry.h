@@ -66,6 +66,9 @@ public:
 	virtual text_processing_context get_text_processing_context() const;
 	text_processor create_text_processor() const;
 
+signals:
+	void changed();
+
 private:
 	std::string name;
 };

@@ -70,7 +70,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(QString interface READ get_interface_qstring)
-	Q_PROPERTY(wyrmgus::player_color* default_color MEMBER default_color)
+	Q_PROPERTY(wyrmgus::player_color* default_color MEMBER default_color NOTIFY changed)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 	Q_PROPERTY(wyrmgus::language* language MEMBER language)
 	Q_PROPERTY(wyrmgus::sound* help_town_sound MEMBER help_town_sound)
@@ -294,6 +294,10 @@ public:
 		this->characters.push_back(character);
 	}
 
+signals:
+	void changed();
+
+public:
 	int ID = -1;
 private:
 	civilization *parent_civilization = nullptr;
