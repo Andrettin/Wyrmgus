@@ -69,8 +69,8 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
 	Q_PROPERTY(QSize resource_icon_size MEMBER resource_icon_size READ get_resource_icon_size)
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
-	Q_PROPERTY(wyrmgus::player_color* neutral_player_color MEMBER neutral_player_color READ get_neutral_player_color)
-	Q_PROPERTY(wyrmgus::civilization* neutral_civilization MEMBER neutral_civilization READ get_neutral_civilization)
+	Q_PROPERTY(wyrmgus::player_color* neutral_player_color MEMBER neutral_player_color READ get_neutral_player_color NOTIFY changed)
+	Q_PROPERTY(wyrmgus::civilization* neutral_civilization MEMBER neutral_civilization READ get_neutral_civilization NOTIFY changed)
 	Q_PROPERTY(int minimap_color_index MEMBER minimap_color_index READ get_minimap_color_index)
 	Q_PROPERTY(int minimap_non_land_territory_alpha MEMBER minimap_non_land_territory_alpha READ get_minimap_non_land_territory_alpha)
 	Q_PROPERTY(wyrmgus::resource* time_resource MEMBER time_resource)
@@ -94,7 +94,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(int scale_factor READ get_scale_factor CONSTANT)
 	Q_PROPERTY(int scaled_tile_width READ get_scaled_tile_width CONSTANT)
 	Q_PROPERTY(int scaled_tile_height READ get_scaled_tile_height CONSTANT)
-	Q_PROPERTY(QStringList tips READ get_tips_qstring_list NOTIFY tips_changed)
+	Q_PROPERTY(QStringList tips READ get_tips_qstring_list NOTIFY changed)
 
 public:
 	~defines();
@@ -359,7 +359,7 @@ public:
 	Q_INVOKABLE void remove_tip(const std::string &tip);
 
 signals:
-	void tips_changed();
+	void changed();
 
 private:
 	font *small_font = nullptr;

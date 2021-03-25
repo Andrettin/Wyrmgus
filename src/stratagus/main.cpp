@@ -37,6 +37,7 @@
 #include "map/tile_image_provider.h"
 #include "map/tile_transition.h"
 #include "parameters.h"
+#include "player_color.h"
 #include "ui/empty_image_provider.h"
 #include "ui/icon.h"
 #include "ui/icon_image_provider.h"
@@ -100,6 +101,7 @@ int main(int argc, char **argv)
 		qmlRegisterType<game>();
 		qmlRegisterType<icon>();
 		qmlRegisterType<parameters>();
+		qmlRegisterType<player_color>();
 		qmlRegisterType<preferences>();
 		qmlRegisterType<unit_type>();
 

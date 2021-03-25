@@ -45,6 +45,7 @@ class calendar;
 class character;
 class deity;
 class language;
+class player_color;
 class quest;
 class resource;
 class site;
@@ -69,7 +70,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(QString interface READ get_interface_qstring)
-	Q_PROPERTY(QString default_color READ get_default_color_qstring)
+	Q_PROPERTY(wyrmgus::player_color* default_color MEMBER default_color)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 	Q_PROPERTY(wyrmgus::language* language MEMBER language)
 	Q_PROPERTY(wyrmgus::sound* help_town_sound MEMBER help_town_sound)
@@ -132,19 +133,9 @@ public:
 		this->interface = interface;
 	}
 
-	const std::string &get_default_color() const
+	const player_color *get_default_color() const
 	{
 		return this->default_color;
-	}
-
-	QString get_default_color_qstring() const
-	{
-		return QString::fromStdString(this->default_color);
-	}
-
-	Q_INVOKABLE void set_default_color(const std::string &default_color)
-	{
-		this->default_color = default_color;
 	}
 
 	CUpgrade *get_upgrade() const
@@ -310,7 +301,7 @@ public:
 	std::string Adjective;			/// adjective pertaining to the civilization
 private:
 	std::string interface; //the string identifier for the civilization's interface
-	std::string default_color; //name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
+	player_color *default_color = nullptr; //the civilization's default player color (used for the encyclopedia, tech tree, etc.)
 	CUpgrade *upgrade = nullptr;
 	wyrmgus::language *language = nullptr;	/// the language used by the civilization
 	wyrmgus::calendar *calendar = nullptr;	/// the calendar used by the civilization
