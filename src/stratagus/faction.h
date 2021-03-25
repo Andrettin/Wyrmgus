@@ -73,7 +73,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(wyrmgus::faction_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::faction* parent_faction MEMBER parent_faction)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
-	Q_PROPERTY(wyrmgus::player_color* color MEMBER color READ get_color)
+	Q_PROPERTY(wyrmgus::player_color* color MEMBER color READ get_color NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
 	Q_PROPERTY(wyrmgus::faction_tier min_tier MEMBER min_tier READ get_min_tier)
 	Q_PROPERTY(wyrmgus::faction_tier max_tier MEMBER max_tier READ get_max_tier)
@@ -316,6 +316,10 @@ public:
 		this->core_settlements.push_back(settlement);
 	}
 
+signals:
+	void changed();
+
+public:
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";

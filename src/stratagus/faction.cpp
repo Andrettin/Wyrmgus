@@ -153,6 +153,12 @@ void faction::process_sml_scope(const sml_data &scope)
 			this->DevelopsFrom.push_back(other_faction);
 			other_faction->DevelopsTo.push_back(this);
 		}
+	} else if (tag == "develops_to") {
+		for (const std::string &value : values) {
+			faction *other_faction = faction::get(value);
+			this->DevelopsTo.push_back(other_faction);
+			other_faction->DevelopsFrom.push_back(this);
+		}
 	} else if (tag == "title_names") {
 		faction::process_title_names(this->title_names, scope);
 	} else if (tag == "character_title_names") {
