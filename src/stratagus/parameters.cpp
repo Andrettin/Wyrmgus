@@ -102,38 +102,41 @@ void parameters::process()
 		this->luaStartFilename = filename.toStdString();
 	}
 
+	if (cmd_parser.isSet("e")) {
+	}
+
+	if (cmd_parser.isSet("E")) {
+		this->luaEditorStartFilename = cmd_parser.value("E").toStdString();
+	}
+
+	if (cmd_parser.isSet("F")) {
+	}
+
+	if (cmd_parser.isSet("G")) {
+		this->luaScriptArguments = cmd_parser.value("G").toStdString();
+	}
+
+	if (cmd_parser.isSet("N")) {
+		this->LocalPlayerName = cmd_parser.value("N").toStdString();
+	}
+
+	if (cmd_parser.isSet("u")) {
+		this->SetUserDirectory(cmd_parser.value("u").toStdString());
+	}
+
 	/**
-			case 'c':
-				parameters->luaStartFilename = optarg;
-				if (strlen(optarg) > 4 &&
-					!(strstr(optarg, ".lua") == optarg + strlen(optarg) - 4)) {
-						parameters->luaStartFilename += ".lua";
-				}
-				continue;
-			case 'd': {
-				continue;
-			}
 			case 'e':
 				Editor.Running = EditorCommandLine;
-				continue;
-			case 'E':
-				parameters->luaEditorStartFilename = optarg;
 				continue;
 			case 'F':
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 1;
-				continue;
-			case 'G':
-				parameters->luaScriptArguments = optarg;
 				continue;
 			case 'I':
 				CNetworkParameter::Instance.localHost = optarg;
 				continue;
 			case 'l':
 				CommandLogDisabled = true;
-				continue;
-			case 'N':
-				parameters->LocalPlayerName = optarg;
 				continue;
 			case 'P':
 				CNetworkParameter::Instance.localPort = atoi(optarg);
@@ -148,9 +151,6 @@ void parameters::process()
 				VideoSyncSpeed = atoi(optarg);
 				continue;
 			case 't':
-				continue;
-			case 'u':
-				parameters->SetUserDirectory(optarg);
 				continue;
 			case 'v': {
 				char *sep = strchr(optarg, 'x');
