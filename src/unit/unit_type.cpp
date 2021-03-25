@@ -546,6 +546,10 @@ void unit_type::sort_encyclopedia_entries(std::vector<unit_type *> &entries)
 				}
 			}
 
+			if (lhs->BoolFlag[PREDATOR_INDEX].value != rhs->BoolFlag[PREDATOR_INDEX].value) {
+				return !lhs->BoolFlag[PREDATOR_INDEX].value;
+			}
+
 			//worker units first
 			if (lhs->BoolFlag[HARVESTER_INDEX].value != rhs->BoolFlag[HARVESTER_INDEX].value) {
 				return lhs->BoolFlag[HARVESTER_INDEX].value;
@@ -557,8 +561,10 @@ void unit_type::sort_encyclopedia_entries(std::vector<unit_type *> &entries)
 			}
 
 			//non-coward units first
-			if (lhs->BoolFlag[COWARD_INDEX].value != rhs->BoolFlag[COWARD_INDEX].value) {
-				return !lhs->BoolFlag[COWARD_INDEX].value;
+			if (!lhs->BoolFlag[HARVESTER_INDEX].value && !rhs->BoolFlag[HARVESTER_INDEX].value) {
+				if (lhs->BoolFlag[COWARD_INDEX].value != rhs->BoolFlag[COWARD_INDEX].value) {
+					return !lhs->BoolFlag[COWARD_INDEX].value;
+				}
 			}
 
 			//non-mounted units first
@@ -576,7 +582,13 @@ void unit_type::sort_encyclopedia_entries(std::vector<unit_type *> &entries)
 			const bool lhs_is_anti_mounted = lhs->DefaultStat.Variables[BONUSAGAINSTMOUNTED_INDEX].Value > 0;
 			const bool rhs_is_anti_mounted = rhs->DefaultStat.Variables[BONUSAGAINSTMOUNTED_INDEX].Value > 0;
 			if (lhs_is_anti_mounted != rhs_is_anti_mounted) {
-				return lhs_is_anti_mounted;
+				return !lhs_is_anti_mounted;
+			}
+
+			const bool lhs_is_gunner = !lhs->WeaponClasses.empty() && lhs->WeaponClasses.front() == item_class::gun;
+			const bool rhs_is_gunner = !rhs->WeaponClasses.empty() && rhs->WeaponClasses.front() == item_class::gun;
+			if (lhs_is_gunner != rhs_is_gunner) {
+				return !lhs_is_gunner;
 			}
 
 			if (lhs->DefaultStat.Variables[LEVEL_INDEX].Value != rhs->DefaultStat.Variables[LEVEL_INDEX].Value) {
