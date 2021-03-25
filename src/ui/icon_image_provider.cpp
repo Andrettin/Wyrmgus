@@ -33,6 +33,7 @@
 #include "ui/icon.h"
 #include "util/log_util.h"
 #include "util/string_util.h"
+#include "video/color_modification.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -60,7 +61,7 @@ QImage icon_image_provider::requestImage(const QString &id, QSize *size, const Q
 	std::shared_ptr<CGraphic> graphics = icon->get_graphics();
 	graphics->Load(defines::get()->get_scale_factor());
 
-	const QImage &image = graphics->get_or_create_frame_image(icon->get_frame(), player_color);
+	const QImage &image = graphics->get_or_create_frame_image(icon->get_frame(), color_modification(icon->get_hue_rotation(), player_color));
 
 	if (image.isNull()) {
 		log::log_error("Icon image for ID \"" + id_str + "\" is null.");

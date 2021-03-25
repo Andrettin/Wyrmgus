@@ -98,7 +98,7 @@ void cursor::on_current_cursor_changed()
 			cursor->get_graphics()->Load(defines::get()->get_scale_factor());
 		}
 
-		const QPixmap pixmap = QPixmap::fromImage(cursor->get_graphics()->get_or_create_frame_image(0, nullptr));
+		const QPixmap pixmap = QPixmap::fromImage(cursor->get_graphics()->get_or_create_frame_image(0, color_modification()));
 		const QPoint hot_pos = cursor->get_hot_pos() * defines::get()->get_scale_factor();
 		const QCursor qcursor(pixmap, hot_pos.x(), hot_pos.y());
 

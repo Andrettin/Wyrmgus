@@ -240,62 +240,17 @@ public:
 		return this->image;
 	}
 
-	const QImage *get_scaled_image(const wyrmgus::player_color *player_color = nullptr) const
+	QImage create_modified_image(const color_modification &color_modification, const bool grayscale) const;
+
+	const QImage *get_frame_image(const size_t frame_index, const color_modification &color_modification = color_modification()) const
 	{
-		if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-			if (!this->scaled_image.isNull()) {
-				return &this->scaled_image;
-			}
-		} else {
-			const auto find_iterator = this->scaled_player_color_images.find(player_color);
-			if (find_iterator != this->scaled_player_color_images.end()) {
-				return &find_iterator->second;
-			}
-		}
-
-		return nullptr;
-	}
-
-	QImage create_scaled_image(const wyrmgus::player_color *player_color);
-
-	const QImage &get_or_create_scaled_image(const wyrmgus::player_color *player_color)
-	{
-		if (player_color != nullptr) {
-			if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-				return this->get_or_create_scaled_image(nullptr);
-			}
-		}
-
-		const QImage *image = this->get_scaled_image(player_color);
-
-		if (image == nullptr) {
-			QImage new_image = this->create_scaled_image(player_color);
-
-			if (player_color == nullptr) {
-				this->scaled_image = std::move(new_image);
-			} else {
-				this->scaled_player_color_images[player_color] = std::move(new_image);
-			}
-
-			image = this->get_scaled_image(player_color);
-		}
-
-		if (image == nullptr) {
-			throw std::runtime_error("Failed to get or create scaled frame.");
-		}
-
-		return *image;
-	}
-
-	const QImage *get_frame_image(const size_t frame_index, const player_color *player_color = nullptr) const
-	{
-		if (player_color == nullptr || player_color == this->get_conversible_player_color() || !this->has_player_color()) {
+		if (color_modification.is_null()) {
 			if (!this->frame_images.empty()) {
 				return &this->frame_images.at(frame_index);
 			}
 		} else {
-			const auto find_iterator = this->player_color_frame_images.find(player_color);
-			if (find_iterator != this->player_color_frame_images.end()) {
+			const auto find_iterator = this->modified_frame_images.find(color_modification);
+			if (find_iterator != this->modified_frame_images.end()) {
 				return &find_iterator->second.at(frame_index);
 			}
 		}
@@ -303,19 +258,26 @@ public:
 		return nullptr;
 	}
 
-	void create_frame_images(const wyrmgus::player_color *player_color);
+	void create_frame_images(const color_modification &color_modification);
 
-	const QImage &get_or_create_frame_image(const size_t frame_index, const player_color *player_color)
+	const QImage &get_or_create_frame_image(const size_t frame_index, const color_modification &color_modification)
 	{
-		const QImage *image = this->get_frame_image(frame_index, player_color);
+		if (!color_modification.is_null()) {
+			if (color_modification.get_player_color() != nullptr && (color_modification.get_player_color() == this->get_conversible_player_color() || !this->has_player_color())) {
+				const wyrmgus::color_modification modification(color_modification.get_hue_rotation(), nullptr, color_modification.get_red_change(), color_modification.get_green_change(), color_modification.get_blue_change());
+				return this->get_or_create_frame_image(frame_index, modification);
+			}
+		}
+
+		const QImage *image = this->get_frame_image(frame_index, color_modification);
 
 		if (image == nullptr) {
-			this->create_frame_images(player_color);
-			image = this->get_frame_image(frame_index, player_color);
+			this->create_frame_images(color_modification);
+			image = this->get_frame_image(frame_index, color_modification);
 		}
 
 		if (image == nullptr) {
-			throw std::runtime_error("Failed to get or create scaled frame.");
+			throw std::runtime_error("Failed to get or create frame image.");
 		}
 
 		return *image;
@@ -333,11 +295,6 @@ public:
 		if (grayscale) {
 			return this->grayscale_texture.get();
 		} else if (!color_modification.is_null()) {
-			if (color_modification.get_player_color() != nullptr && (color_modification.get_player_color() == this->get_conversible_player_color() || !this->has_player_color())) {
-				const wyrmgus::color_modification modification(color_modification.get_hue_rotation(), nullptr, color_modification.get_red_change(), color_modification.get_green_change(), color_modification.get_blue_change());
-				return this->get_texture(modification, grayscale);
-			}
-
 			const auto find_iterator = this->modified_textures.find(color_modification);
 			if (find_iterator != this->modified_textures.end()) {
 				return find_iterator->second.get();
@@ -420,10 +377,8 @@ public:
 	std::string HashFile;      /// Filename used in hash
 private:
 	QImage image;
-	QImage scaled_image;
-	std::map<const player_color *, QImage> scaled_player_color_images;
 	std::vector<QImage> frame_images;
-	std::map<const player_color *, std::vector<QImage>> player_color_frame_images;
+	std::map<color_modification, std::vector<QImage>> modified_frame_images;
 public:
 	std::vector<frame_pos_t> frame_map;
 	std::vector<frame_pos_t> frameFlip_map;

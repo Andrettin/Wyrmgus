@@ -63,7 +63,7 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 
 		graphics->Load(defines::get()->get_scale_factor());
 
-		const QImage &image = graphics->get_or_create_frame_image(0, nullptr);
+		const QImage &image = graphics->get_or_create_frame_image(0, color_modification());
 
 		if (image.isNull()) {
 			throw std::runtime_error("Interface image for ID \"" + id_str + "\" is null.");

@@ -713,7 +713,6 @@ void CGraphic::SetOriginalSize()
 	this->Width = this->Height = 0;
 	this->image = QImage();
 	this->frame_images.clear();
-	this->player_color_frame_images.clear();
 	this->Load();
 
 	this->Resized = false;
@@ -729,62 +728,7 @@ QPoint CGraphic::get_frame_pos(const int frame_index) const
 	return wyrmgus::point::from_index(frame_index, this->get_frames_per_row());
 }
 
-QImage CGraphic::create_scaled_image(const player_color *player_color)
-{
-	if (player_color != nullptr) {
-		if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-			return this->create_scaled_image(nullptr);
-		}
-	}
-
-	QImage image = this->get_image();
-
-	if (image.format() != QImage::Format_RGBA8888) {
-		image = image.convertToFormat(QImage::Format_RGBA8888);
-	}
-
-	if (player_color != nullptr) {
-		player_color->apply_to_image(image, this->get_conversible_player_color());
-	}
-
-	const int scale_factor = defines::get()->get_scale_factor();
-	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
-		image = image::scale(image, scale_factor, this->get_original_frame_size());
-	}
-
-	return image;
-}
-
-void CGraphic::create_frame_images(const player_color *player_color)
-{
-	if (player_color != nullptr) {
-		if (player_color == this->get_conversible_player_color() || !this->has_player_color()) {
-			this->create_frame_images(nullptr);
-			return;
-		}
-	}
-
-	QImage image = this->create_scaled_image(player_color);
-
-	std::vector<QImage> frames = image::to_frames(image, this->get_frame_size());
-
-	if (player_color == nullptr) {
-		this->frame_images = std::move(frames);
-	} else {
-		this->player_color_frame_images[player_color] = std::move(frames);
-	}
-}
-
-const wyrmgus::player_color *CGraphic::get_conversible_player_color() const
-{
-	if (this->conversible_player_color != nullptr) {
-		return this->conversible_player_color;
-	}
-
-	return defines::get()->get_conversible_player_color();
-}
-
-void CGraphic::create_texture(const color_modification &color_modification, const bool grayscale)
+QImage CGraphic::create_modified_image(const color_modification &color_modification, const bool grayscale) const
 {
 	QImage image = this->get_image();
 
@@ -832,6 +776,35 @@ void CGraphic::create_texture(const color_modification &color_modification, cons
 			blue = std::clamp<int>(blue + blue_change, 0, 255);
 		}
 	}
+
+	return image;
+}
+
+void CGraphic::create_frame_images(const color_modification &color_modification)
+{
+	QImage image = this->create_modified_image(color_modification, false);
+
+	std::vector<QImage> frames = image::to_frames(image, this->get_frame_size());
+
+	if (color_modification.is_null()) {
+		this->frame_images = std::move(frames);
+	} else {
+		this->modified_frame_images[color_modification] = std::move(frames);
+	}
+}
+
+const wyrmgus::player_color *CGraphic::get_conversible_player_color() const
+{
+	if (this->conversible_player_color != nullptr) {
+		return this->conversible_player_color;
+	}
+
+	return defines::get()->get_conversible_player_color();
+}
+
+void CGraphic::create_texture(const color_modification &color_modification, const bool grayscale)
+{
+	QImage image = this->create_modified_image(color_modification, grayscale);
 
 	auto texture = std::make_unique<QOpenGLTexture>(image);
 
