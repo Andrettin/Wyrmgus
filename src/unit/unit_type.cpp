@@ -483,6 +483,39 @@ std::string GetResourceNameById(int resource_id)
 
 namespace wyrmgus {
 
+void unit_type::sort_encyclopedia_entries(std::vector<unit_type *> &entries)
+{
+	std::sort(entries.begin(), entries.end(), [](const unit_type *lhs, const unit_type *rhs) {
+		const wyrmgus::civilization *lhs_civilization = lhs->get_civilization();
+		if (lhs_civilization == defines::get()->get_neutral_civilization()) {
+			lhs_civilization = nullptr;
+		}
+
+		const wyrmgus::civilization *rhs_civilization = rhs->get_civilization();
+		if (rhs_civilization == defines::get()->get_neutral_civilization()) {
+			rhs_civilization = nullptr;
+		}
+
+		if (lhs_civilization != rhs_civilization) {
+			if (lhs_civilization == nullptr || rhs_civilization == nullptr) {
+				return lhs_civilization == nullptr;
+			}
+
+			return lhs_civilization->get_name() < rhs_civilization->get_name();
+		}
+
+		if (lhs->get_faction() != rhs->get_faction()) {
+			if (lhs->get_faction() == nullptr || rhs->get_faction() == nullptr) {
+				return lhs->get_faction() == nullptr;
+			}
+
+			return lhs->get_faction()->get_name() < rhs->get_faction()->get_name();
+		}
+
+		return lhs->get_name() < rhs->get_name();
+	});
+}
+
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
 	//Wyrmgus start
 	item_class(item_class::none),

@@ -797,6 +797,8 @@ public:
 		return unit_type;
 	}
 
+	static void sort_encyclopedia_entries(std::vector<unit_type *> &entries);
+
 	static std::vector<unit_type *> get_unit_encyclopedia_entries()
 	{
 		std::vector<unit_type *> entries;
@@ -808,6 +810,8 @@ public:
 
 			entries.push_back(unit_type);
 		}
+
+		unit_type::sort_encyclopedia_entries(entries);
 
 		return entries;
 	}
@@ -824,6 +828,8 @@ public:
 			entries.push_back(unit_type);
 		}
 
+		unit_type::sort_encyclopedia_entries(entries);
+
 		return entries;
 	}
 
@@ -838,6 +844,8 @@ public:
 
 			entries.push_back(unit_type);
 		}
+
+		unit_type::sort_encyclopedia_entries(entries);
 
 		return entries;
 	}
