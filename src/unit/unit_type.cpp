@@ -560,6 +560,11 @@ void unit_type::sort_encyclopedia_entries(std::vector<unit_type *> &entries)
 				return lhs->BoolFlag[ORGANIC_INDEX].value;
 			}
 
+			//sort by smithing skill
+			if (lhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value != rhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value) {
+				return lhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value < rhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value;
+			}
+
 			//non-coward units first
 			if (!lhs->BoolFlag[HARVESTER_INDEX].value && !rhs->BoolFlag[HARVESTER_INDEX].value) {
 				if (lhs->BoolFlag[COWARD_INDEX].value != rhs->BoolFlag[COWARD_INDEX].value) {
