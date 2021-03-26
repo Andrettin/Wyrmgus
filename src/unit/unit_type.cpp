@@ -566,7 +566,7 @@ void unit_type::sort_encyclopedia_entries(std::vector<unit_type *> &entries)
 			}
 
 			//non-coward units first
-			if (!lhs->BoolFlag[HARVESTER_INDEX].value && !rhs->BoolFlag[HARVESTER_INDEX].value) {
+			if (!lhs->BoolFlag[HARVESTER_INDEX].value && !rhs->BoolFlag[HARVESTER_INDEX].value && !lhs->BoolFlag[FAUNA_INDEX].value && !rhs->BoolFlag[FAUNA_INDEX].value) {
 				if (lhs->BoolFlag[COWARD_INDEX].value != rhs->BoolFlag[COWARD_INDEX].value) {
 					return !lhs->BoolFlag[COWARD_INDEX].value;
 				}
