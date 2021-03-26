@@ -859,18 +859,7 @@ public:
 	virtual void initialize() override;
 	virtual void check() const override;
 
-	virtual bool has_encyclopedia_entry() const override
-	{
-		if (this->get_icon() == nullptr) {
-			return false;
-		}
-
-		if (this->is_template()) {
-			return false;
-		}
-
-		return detailed_data_entry::has_encyclopedia_entry();
-	}
+	virtual bool has_encyclopedia_entry() const override;
 
 	int get_index() const
 	{

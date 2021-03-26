@@ -519,6 +519,18 @@ void unit_type::sort_encyclopedia_entries(std::vector<unit_type *> &entries)
 			if (lhs_is_town_hall != rhs_is_town_hall) {
 				return lhs_is_town_hall;
 			}
+		} else if (lhs->BoolFlag[ITEM_INDEX].value && rhs->BoolFlag[ITEM_INDEX].value) {
+			if (lhs->get_item_class() != rhs->get_item_class()) {
+				if (lhs->get_item_class() == item_class::none || rhs->get_item_class() == item_class::none) {
+					return lhs->get_item_class() != item_class::none;
+				}
+
+				return lhs->get_item_class() < rhs->get_item_class();
+			}
+
+			if (lhs->DefaultStat.get_price() != rhs->DefaultStat.get_price()) {
+				return lhs->DefaultStat.get_price() < rhs->DefaultStat.get_price();
+			}
 		} else {
 			if (lhs->BoolFlag[FAUNA_INDEX].value != rhs->BoolFlag[FAUNA_INDEX].value) {
 				return lhs->BoolFlag[FAUNA_INDEX].value;
@@ -1500,6 +1512,23 @@ void unit_type::check() const
 	for (const auto &variation : this->get_variations()) {
 		variation->check();
 	}
+}
+
+bool unit_type::has_encyclopedia_entry() const
+{
+	if (this->get_icon() == nullptr) {
+		return false;
+	}
+
+	if (this->is_template()) {
+		return false;
+	}
+
+	if (this->BoolFlag[ITEM_INDEX].value && this->get_item_class() != item_class::none) {
+		return true;
+	}
+
+	return detailed_data_entry::has_encyclopedia_entry();
 }
 
 void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)
