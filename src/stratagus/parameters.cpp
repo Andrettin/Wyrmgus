@@ -92,43 +92,46 @@ void parameters::process()
 
 	cmd_parser.process(*QApplication::instance());
 
-	if (cmd_parser.isSet("d")) {
-		// TODO Try to make more typo-proof
-		database::get()->set_root_path(cmd_parser.value("d").toStdString());
+	QString option { "d" };
+	if (cmd_parser.isSet(option)) {
+		database::get()->set_root_path(cmd_parser.value(option).toStdString());
 	}
 
 	if (cmd_parser.isSet("t")) {
 		this->test_run = true;
 	}
 
-	if (cmd_parser.isSet("D")) {
-		Video.Depth = cmd_parser.value("D").toInt();
+	option = "D";
+	if (cmd_parser.isSet(option)) {
+		Video.Depth = cmd_parser.value(option).toInt();
 	}
 
-	if (cmd_parser.isSet("c")) {
+	option = "c";
+	if (cmd_parser.isSet(option)) {
 		// FIXME Use appropriate type for properly suffix processing
-		QString filename { cmd_parser.value("c") };
+		QString filename { cmd_parser.value(option) };
 		if (!filename.endsWith(".lua")) filename += ".lua";
 		this->luaStartFilename = filename.toStdString();
 	}
 
-	if (cmd_parser.isSet("E")) {
-		this->luaEditorStartFilename = cmd_parser.value("E").toStdString();
+	option = "E";
+	if (cmd_parser.isSet(option)) {
+		this->luaEditorStartFilename = cmd_parser.value(option).toStdString();
 	}
 
-	if (cmd_parser.isSet("F")) {
+	option = "G";
+	if (cmd_parser.isSet(option)) {
+		this->luaScriptArguments = cmd_parser.value(option).toStdString();
 	}
 
-	if (cmd_parser.isSet("G")) {
-		this->luaScriptArguments = cmd_parser.value("G").toStdString();
+	option = "N";
+	if (cmd_parser.isSet(option)) {
+		this->LocalPlayerName = cmd_parser.value(option).toStdString();
 	}
 
-	if (cmd_parser.isSet("N")) {
-		this->LocalPlayerName = cmd_parser.value("N").toStdString();
-	}
-
-	if (cmd_parser.isSet("u")) {
-		this->SetUserDirectory(cmd_parser.value("u").toStdString());
+	option = "u";
+	if (cmd_parser.isSet(option)) {
+		this->SetUserDirectory(cmd_parser.value(option).toStdString());
 	}
 	else {
 		this->SetDefaultUserDirectory();
@@ -143,28 +146,32 @@ void parameters::process()
 		Video.FullScreen = 1;
 	}
 
-	if (cmd_parser.isSet("I")) {
-		CNetworkParameter::Instance.localHost = cmd_parser.value("I").toStdString();
+	option = "I";
+	if (cmd_parser.isSet(option)) {
+		CNetworkParameter::Instance.localHost = cmd_parser.value(option).toStdString();
 	}
 
 	if (cmd_parser.isSet("l")) {
 		CommandLogDisabled = true;
 	}
 
-	if (cmd_parser.isSet("P")) {
-		CNetworkParameter::Instance.localPort = cmd_parser.value("P").toUInt();
+	option = "P";
+	if (cmd_parser.isSet(option)) {
+		CNetworkParameter::Instance.localPort = cmd_parser.value(option).toUInt();
 	}
 
 	if (cmd_parser.isSet("p")) {
 		EnableDebugPrint = true;
 	}
 
-	if (cmd_parser.isSet("s")) {
-		AiSleepCycles = cmd_parser.value("s").toInt();
+	option = "s";
+	if (cmd_parser.isSet(option)) {
+		AiSleepCycles = cmd_parser.value(option).toInt();
 	}
 
-	if (cmd_parser.isSet("S")) {
-		VideoSyncSpeed = cmd_parser.value("S").toInt();
+	option = "S";
+	if (cmd_parser.isSet(option)) {
+		VideoSyncSpeed = cmd_parser.value(option).toInt();
 	}
 
 	if (cmd_parser.isSet("W")) {
@@ -172,15 +179,13 @@ void parameters::process()
 		Video.FullScreen = 0;
 	}
 
-	if (cmd_parser.isSet("e")) {
-	}
-
+	option = "m";
 	// FIXME segfaul
 	// FIXME Inconsistent IFDEFs
-	if (cmd_parser.isSet("m")) {
+	if (cmd_parser.isSet(option)) {
 		auto app_name { QApplication::applicationName().toStdString() };
 		// TODO Use C++ toolset
-		auto otparg { cmd_parser.value("m").toStdString().c_str() };
+		auto otparg { cmd_parser.value(option).toStdString().c_str() };
 		char *sep = strchr(optarg, 'x');
 
 		if (!sep || !*(sep + 1)) {
