@@ -34,6 +34,7 @@
 #include "editor.h"
 #include "game.h"
 #include "map/map_layer.h"
+#include "religion/deity.h"
 #include "parameters.h"
 #include "results.h"
 #include "script.h"
@@ -193,6 +194,11 @@ QVariantList engine_interface::get_building_encyclopedia_entries() const
 QVariantList engine_interface::get_character_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(character::get_encyclopedia_entries());
+}
+
+QVariantList engine_interface::get_deity_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(deity::get_encyclopedia_entries());
 }
 
 QVariantList engine_interface::get_item_encyclopedia_entries() const

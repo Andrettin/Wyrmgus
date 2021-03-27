@@ -98,7 +98,7 @@ void character::sort_encyclopedia_entries(std::vector<character *> &entries)
 			return lhs->get_default_faction()->get_name() < rhs->get_default_faction()->get_name();
 		}
 
-		return lhs->get_name() < rhs->get_name();
+		return lhs->get_full_name() < rhs->get_full_name();
 	});
 }
 

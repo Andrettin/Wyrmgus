@@ -179,6 +179,7 @@ public:
 
 	Q_INVOKABLE QVariantList get_building_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;
+	Q_INVOKABLE QVariantList get_deity_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_item_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_unit_encyclopedia_entries() const;
 

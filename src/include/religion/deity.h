@@ -51,8 +51,8 @@ class deity final : public detailed_data_entry, public data_type<deity>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::pantheon* pantheon MEMBER pantheon)
-	Q_PROPERTY(wyrmgus::icon* icon READ get_icon WRITE set_icon)
+	Q_PROPERTY(wyrmgus::pantheon* pantheon MEMBER pantheon NOTIFY changed)
+	Q_PROPERTY(wyrmgus::icon* icon READ get_icon WRITE set_icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
@@ -71,10 +71,21 @@ public:
 
 	static deity *add(const std::string &identifier, const wyrmgus::data_module *data_module);
 
+	static void sort_encyclopedia_entries(std::vector<deity *> &entries);
+
 	explicit deity(const std::string &identifier);
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
+
+	virtual bool has_encyclopedia_entry() const override
+	{
+		if (this->get_icon() == nullptr) {
+			return false;
+		}
+
+		return detailed_data_entry::has_encyclopedia_entry();
+	}
 
 	const std::string &get_cultural_name(const civilization *civilization) const;
 
@@ -159,6 +170,9 @@ public:
 	{
 		return this->spells;
 	}
+
+signals:
+	void changed();
 
 private:
 	wyrmgus::pantheon *pantheon = nullptr;

@@ -56,6 +56,25 @@ deity *deity::add(const std::string &identifier, const wyrmgus::data_module *dat
 	return deity;
 }
 
+void deity::sort_encyclopedia_entries(std::vector<deity *> &entries)
+{
+	std::sort(entries.begin(), entries.end(), [](const deity *lhs, const deity *rhs) {
+		if (lhs->get_pantheon() != rhs->get_pantheon()) {
+			if (lhs->get_pantheon() == nullptr || rhs->get_pantheon() == nullptr) {
+				return lhs->get_pantheon() != nullptr;
+			}
+
+			return lhs->get_pantheon()->get_name() < rhs->get_pantheon()->get_name();
+		}
+
+		if (lhs->is_major() != rhs->is_major()) {
+			return lhs->is_major();
+		}
+
+		return lhs->get_name() < rhs->get_name();
+	});
+}
+
 deity::deity(const std::string &identifier)
 	: detailed_data_entry(identifier)
 {
