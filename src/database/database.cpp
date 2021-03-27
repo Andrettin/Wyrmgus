@@ -100,6 +100,8 @@
 #include "unit/historical_unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade_category.h"
+#include "upgrade/upgrade_category_rank.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/geocoordinate.h"
@@ -361,6 +363,10 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(unit_type::get(property.get_value()));
 		} else if (property_class_name == "CUpgrade*") {
 			new_property_value = QVariant::fromValue(CUpgrade::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::upgrade_category*") {
+			new_property_value = QVariant::fromValue(upgrade_category::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::upgrade_category_rank") {
+			new_property_value = QVariant::fromValue(string_to_upgrade_category_rank(property.get_value()));
 		} else if (property_class_name == "wyrmgus::upgrade_class*") {
 			new_property_value = QVariant::fromValue(upgrade_class::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::word*") {

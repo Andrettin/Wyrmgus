@@ -487,6 +487,7 @@ source_group(unit FILES ${unit_SRCS})
 
 set(upgrade_SRCS
 	src/upgrade/upgrade.cpp
+	src/upgrade/upgrade_category.cpp
 	src/upgrade/upgrade_class.cpp
 	src/upgrade/upgrade_container.cpp
 	src/upgrade/upgrade_modifier.cpp
@@ -988,6 +989,8 @@ set(wyrmgus_unit_HDRS
 
 set(wyrmgus_upgrade_HDRS
 	src/include/upgrade/upgrade.h
+	src/upgrade/upgrade_category.h
+	src/upgrade/upgrade_category_rank.h
 	src/upgrade/upgrade_class.h
 	src/upgrade/upgrade_container.h
 	src/include/upgrade/upgrade_modifier.h

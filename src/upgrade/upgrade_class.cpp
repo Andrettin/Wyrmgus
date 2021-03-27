@@ -29,6 +29,7 @@
 #include "upgrade/upgrade_class.h"
 
 #include "script/condition/and_condition.h"
+#include "upgrade/upgrade_category.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -58,6 +59,10 @@ void upgrade_class::process_sml_scope(const sml_data &scope)
 
 void upgrade_class::check() const
 {
+	if (this->get_category() == nullptr) {
+		throw std::runtime_error("Upgrade class \"" + this->get_identifier() + "\" has no category.");
+	}
+
 	if (this->get_preconditions() != nullptr) {
 		this->get_preconditions()->check_validity();
 	}
@@ -65,6 +70,21 @@ void upgrade_class::check() const
 	if (this->get_conditions() != nullptr) {
 		this->get_conditions()->check_validity();
 	}
+}
+
+const upgrade_category *upgrade_class::get_category(const upgrade_category_rank rank) const
+{
+	if (this->get_category() != nullptr) {
+		if (this->get_category()->get_rank() == rank) {
+			return this->get_category();
+		}
+
+		if (this->get_category()->get_rank() < rank) {
+			return this->get_category()->get_category(rank);
+		}
+	}
+
+	return nullptr;
 }
 
 bool upgrade_class::has_upgrade(CUpgrade *upgrade) const

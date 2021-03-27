@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,34 +24,28 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "database/data_type.h"
-#include "database/named_data_entry.h"
+#include "upgrade_category.h"
+
+#include "upgrade_category_rank.h"
 
 namespace wyrmgus {
 
-class language_family final : public named_data_entry, public data_type<language_family>
+upgrade_category::upgrade_category(const std::string &identifier)
+	: named_data_entry(identifier), rank(upgrade_category_rank::none)
 {
-	Q_OBJECT
+}
 
-	Q_PROPERTY(wyrmgus::language_family* family MEMBER family READ get_family)
-
-public:
-	static constexpr const char *class_identifier = "language_family";
-	static constexpr const char *database_folder = "language_families";
-
-	explicit language_family(const std::string &identifier) : named_data_entry(identifier)
-	{
+void upgrade_category::check() const
+{
+	if (this->get_rank() == upgrade_category_rank::none) {
+		throw std::runtime_error("Upgrade category \"" + this->get_identifier() + "\" has no rank.");
 	}
 
-	language_family *get_family() const
-	{
-		return this->family;
+	if (this->get_category() != nullptr && this->get_rank() >= this->get_category()->get_rank()) {
+		throw std::runtime_error("The rank of upgrade category \"" + this->get_identifier() + "\" is greater than or equal to that of its upper category.");
 	}
-
-private:
-	language_family *family = nullptr; //the upper family to which this language family belongs
-};
+}
 
 }

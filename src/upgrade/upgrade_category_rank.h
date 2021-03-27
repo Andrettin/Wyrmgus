@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,32 +26,30 @@
 
 #pragma once
 
-#include "database/data_type.h"
-#include "database/named_data_entry.h"
-
 namespace wyrmgus {
 
-class language_family final : public named_data_entry, public data_type<language_family>
-{
-	Q_OBJECT
+enum class upgrade_category_rank {
+	none,
+	subcategory,
+	category,
+	supercategory,
 
-	Q_PROPERTY(wyrmgus::language_family* family MEMBER family READ get_family)
-
-public:
-	static constexpr const char *class_identifier = "language_family";
-	static constexpr const char *database_folder = "language_families";
-
-	explicit language_family(const std::string &identifier) : named_data_entry(identifier)
-	{
-	}
-
-	language_family *get_family() const
-	{
-		return this->family;
-	}
-
-private:
-	language_family *family = nullptr; //the upper family to which this language family belongs
+	count
 };
 
+inline upgrade_category_rank string_to_upgrade_category_rank(const std::string &str)
+{
+	if (str == "subcategory") {
+		return upgrade_category_rank::subcategory;
+	} else if (str == "category") {
+		return upgrade_category_rank::category;
+	} else if (str == "supercategory") {
+		return upgrade_category_rank::supercategory;
+	}
+
+	throw std::runtime_error("Invalid upgrade category rank: \"" + str + "\".");
 }
+
+}
+
+Q_DECLARE_METATYPE(wyrmgus::upgrade_category_rank)

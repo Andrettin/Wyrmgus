@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,27 +31,51 @@
 
 namespace wyrmgus {
 
-class language_family final : public named_data_entry, public data_type<language_family>
+enum class upgrade_category_rank;
+
+class upgrade_category final : public named_data_entry, public data_type<upgrade_category>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::language_family* family MEMBER family READ get_family)
+	Q_PROPERTY(wyrmgus::upgrade_category_rank rank MEMBER rank READ get_rank)
+	Q_PROPERTY(wyrmgus::upgrade_category* category MEMBER category)
 
 public:
-	static constexpr const char *class_identifier = "language_family";
-	static constexpr const char *database_folder = "language_families";
+	static constexpr const char *class_identifier = "upgrade_category";
+	static constexpr const char *database_folder = "upgrade_categories";
 
-	explicit language_family(const std::string &identifier) : named_data_entry(identifier)
+	explicit upgrade_category(const std::string &identifier);
+
+	virtual void check() const override;
+
+	upgrade_category_rank get_rank() const
 	{
+		return this->rank;
 	}
 
-	language_family *get_family() const
+	const upgrade_category *get_category() const
 	{
-		return this->family;
+		return this->category;
+	}
+
+	const upgrade_category *get_category(const upgrade_category_rank rank) const
+	{
+		if (this->get_category() != nullptr) {
+			if (this->get_category()->get_rank() == rank) {
+				return this->get_category();
+			}
+
+			if (this->get_category()->get_rank() < rank) {
+				return this->get_category()->get_category(rank);
+			}
+		}
+
+		return nullptr;
 	}
 
 private:
-	language_family *family = nullptr; //the upper family to which this language family belongs
+	upgrade_category_rank rank;
+	upgrade_category *category = nullptr; //the upper category to which this upgrade category belongs
 };
 
 }
