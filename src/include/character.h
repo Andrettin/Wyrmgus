@@ -97,7 +97,8 @@ class character : public detailed_data_entry, public data_type<character>, publi
 
 	Q_PROPERTY(wyrmgus::dynasty* dynasty MEMBER dynasty)
 	Q_PROPERTY(QString surname READ get_surname_qstring)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon WRITE set_base_icon)
+	Q_PROPERTY(QString full_name READ get_full_name_qstring NOTIFY changed)
+	Q_PROPERTY(wyrmgus::icon* icon READ get_icon WRITE set_base_icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::icon* heroic_icon MEMBER heroic_icon)
 	Q_PROPERTY(wyrmgus::unit_type* unit_type MEMBER unit_type WRITE set_unit_type)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
@@ -262,6 +263,11 @@ public:
 	bool HasMajorDeity() const;
 	std::string get_full_name() const;
 
+	QString get_full_name_qstring() const
+	{
+		return QString::fromStdString(this->get_full_name());
+	}
+
 	const std::string &get_variation() const
 	{
 		return this->variation;
@@ -293,7 +299,7 @@ public:
 		return this->heroic_icon;
 	}
 
-	const wyrmgus::icon *get_icon() const;
+	wyrmgus::icon *get_icon() const;
 
 	void UpdateAttributes();
 

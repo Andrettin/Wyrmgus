@@ -1047,7 +1047,7 @@ public:
 		return this->animation_set;
 	}
 
-	const wyrmgus::icon *get_icon() const
+	wyrmgus::icon *get_icon() const
 	{
 		return this->icon;
 	}

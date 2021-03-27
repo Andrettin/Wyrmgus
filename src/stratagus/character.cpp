@@ -723,7 +723,7 @@ void character::set_variation(const std::string &variation)
 	this->variation = FindAndReplaceString(variation, "_", "-");
 }
 
-const icon *character::get_icon() const
+icon *character::get_icon() const
 {
 	if (this->get_level() >= 3 && this->heroic_icon != nullptr) {
 		return this->heroic_icon;
