@@ -1101,13 +1101,17 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 
 	//this has to be done at the end, so that it doesn't prevent the application from working properly, due to the map template code thinking that its own area belongs to another map template
-	if (this->IsSubtemplateArea()) {
-		const QRect map_rect(map_start_pos, map_end - Vec2i(1, 1));
+	const QRect map_rect(map_start_pos, map_end - Vec2i(1, 1));
 
+	if (this->IsSubtemplateArea()) {
 		CMap::get()->MapLayers[z]->subtemplate_areas[this] = map_rect;
 
 		//if this is the top subtemplate for a given world, set the world's map rect to this map template's map rect
 		if (this->get_world() != nullptr && this->get_world() != this->get_main_template()->get_world()) {
+			this->get_world()->get_game_data()->set_map_rect(map_rect, CMap::get()->MapLayers[z].get());
+		}
+	} else {
+		if (this->get_world() != nullptr) {
 			this->get_world()->get_game_data()->set_map_rect(map_rect, CMap::get()->MapLayers[z].get());
 		}
 	}
