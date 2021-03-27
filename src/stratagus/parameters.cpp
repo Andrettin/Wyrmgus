@@ -24,6 +24,8 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
+#include "ai.h"
+
 #include "stratagus.h"
 
 #include "parameters.h"
@@ -60,7 +62,7 @@ void parameters::process()
 		{ "s", "Number of frames for the AI to sleep before it starts.", "frames" },
 		{ "S", "Sync speed (100 = 30 frames/s).", "speed" },
 		{ "u", "Path where wyrmgus saves preferences, log and savegame", "path" },
-		// FIXME { "v", "Video mode resolution in format <xres>x<yres>.", "mode" },
+		{ "m", "Video mode resolution in format <xres>x<yres>.", "mode" },
 		{ "W", "Windowed video mode." },
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		{
@@ -83,6 +85,7 @@ void parameters::process()
 	cmd_parser.process(*QApplication::instance());
 
 	if (cmd_parser.isSet("d")) {
+		// TODO Try to make more typo-proof
 		database::get()->set_root_path(cmd_parser.value("d").toStdString());
 	}
 
@@ -92,7 +95,7 @@ void parameters::process()
 
 	// TODO
 	if (cmd_parser.isSet("D")) {
-		qDebug() << cmd_parser.value("D").toInt();
+		Video.Depth = cmd_parser.value("D").toInt();
 	}
 
 	if (cmd_parser.isSet("c")) {
@@ -100,9 +103,6 @@ void parameters::process()
 		QString filename { cmd_parser.value("c") };
 		if (!filename.endsWith(".lua")) filename += ".lua";
 		this->luaStartFilename = filename.toStdString();
-	}
-
-	if (cmd_parser.isSet("e")) {
 	}
 
 	if (cmd_parser.isSet("E")) {
@@ -123,82 +123,93 @@ void parameters::process()
 	if (cmd_parser.isSet("u")) {
 		this->SetUserDirectory(cmd_parser.value("u").toStdString());
 	}
-
-	/**
-			case 'e':
-				Editor.Running = EditorCommandLine;
-				continue;
-			case 'F':
-				VideoForceFullScreen = 1;
-				Video.FullScreen = 1;
-				continue;
-			case 'I':
-				CNetworkParameter::Instance.localHost = optarg;
-				continue;
-			case 'l':
-				CommandLogDisabled = true;
-				continue;
-			case 'P':
-				CNetworkParameter::Instance.localPort = atoi(optarg);
-				continue;
-			case 'p':
-				EnableDebugPrint = true;
-				continue;
-			case 's':
-				AiSleepCycles = atoi(optarg);
-				continue;
-			case 'S':
-				VideoSyncSpeed = atoi(optarg);
-				continue;
-			case 't':
-				continue;
-			case 'v': {
-				char *sep = strchr(optarg, 'x');
-				if (!sep || !*(sep + 1)) {
-					throw std::runtime_error(std::string(argv[0]) + ": incorrect format of video mode resolution -- '" + optarg + "'");
-				}
-				Video.Height = atoi(sep + 1);
-				*sep = 0;
-				Video.Width = atoi(optarg);
-				if (!Video.Height || !Video.Width) {
-					throw std::runtime_error(std::string(argv[0]) + ": incorrect format of video mode resolution -- '" + optarg + "x + " + (sep + 1) + "'");
-				}
-#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (ZoomNoResize) {
-					Video.ViewportHeight = Video.Height;
-					Video.ViewportWidth = Video.Width;
-					Video.Height = 0;
-					Video.Width = 0;
-				}
-#endif
-				continue;
-			}
-			case 'W':
-				VideoForceFullScreen = 1;
-				Video.FullScreen = 0;
-				continue;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			case 'Z':
-				ZoomNoResize = 1;
-				Video.ViewportHeight = Video.Height;
-				Video.ViewportWidth = Video.Width;
-				Video.Height = 0;
-				Video.Width = 0;
-				continue;
-#endif
-			case -1:
-				break;
-			case '?':
-			case 'h':
-				Usage();
-				Exit(EXIT_SUCCESS);
-				break;
-			default:
-				throw std::runtime_error("Invalid command line arguments.");
-		}
-		break;
+	else {
+		this->SetDefaultUserDirectory();
 	}
 
+	if (cmd_parser.isSet("e")) {
+		Editor.Running = EditorCommandLine;
+	}
+
+	if (cmd_parser.isSet("F")) {
+		VideoForceFullScreen = 1;
+		Video.FullScreen = 1;
+	}
+
+	if (cmd_parser.isSet("I")) {
+		CNetworkParameter::Instance.localHost = cmd_parser.value("I").toStdString();
+	}
+
+	if (cmd_parser.isSet("l")) {
+		CommandLogDisabled = true;
+	}
+
+	if (cmd_parser.isSet("P")) {
+		CNetworkParameter::Instance.localPort = cmd_parser.value("P").toUInt();
+	}
+
+	if (cmd_parser.isSet("p")) {
+		EnableDebugPrint = true;
+	}
+
+	if (cmd_parser.isSet("s")) {
+		AiSleepCycles = cmd_parser.value("s").toInt();
+	}
+
+	if (cmd_parser.isSet("S")) {
+		VideoSyncSpeed = cmd_parser.value("S").toInt();
+	}
+
+	if (cmd_parser.isSet("W")) {
+		VideoForceFullScreen = 1;
+		Video.FullScreen = 0;
+	}
+
+	if (cmd_parser.isSet("e")) {
+	}
+
+	// FIXME segfaul
+	// FIXME Inconsistent IFDEFs
+	if (cmd_parser.isSet("m")) {
+		auto app_name { QApplication::applicationName().toStdString() };
+		// TODO Use C++ toolset
+		auto otparg { cmd_parser.value("m").toStdString().c_str() };
+		char *sep = strchr(optarg, 'x');
+
+		if (!sep || !*(sep + 1)) {
+			throw std::runtime_error(std::string(app_name) + ": incorrect format of video mode resolution -- '" + optarg + "'");
+		}
+
+		Video.Height = atoi(sep + 1);
+		*sep = 0;
+
+		Video.Width = atoi(optarg);
+		if (!Video.Height || !Video.Width) {
+			throw std::runtime_error(std::string(app_name) + ": incorrect format of video mode resolution -- '" + optarg + "x + " + (sep + 1) + "'");
+		}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		if (ZoomNoResize) {
+			Video.ViewportHeight = Video.Height;
+			Video.ViewportWidth = Video.Width;
+			Video.Height = 0;
+			Video.Width = 0;
+		}
+#endif
+	}
+
+	// FIXME What is going here?
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (cmd_parser.isSet("Z")) {
+		ZoomNoResize = 1;
+		Video.ViewportHeight = Video.Height;
+		Video.ViewportWidth = Video.Width;
+		Video.Height = 0;
+		Video.Width = 0;
+	}
+#endif
+
+	/**
 	if (argc - optind > 1) {
 		throw std::runtime_error("too many map files. if you meant to pass game arguments, these go after '--'");
 	}
@@ -211,8 +222,6 @@ void parameters::process()
 		}
 	}
 */
-
-	this->SetDefaultUserDirectory();
 }
 
 void parameters::SetDefaultUserDirectory()
