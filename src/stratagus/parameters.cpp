@@ -39,6 +39,13 @@ std::string CliMapName;
 
 namespace wyrmgus {
 
+void set_retroscale() {
+	Video.ViewportHeight = Video.Height;
+	Video.ViewportWidth = Video.Width;
+	Video.Height = 0;
+	Video.Width = 0;
+}
+
 void parameters::process()
 {
 	QCommandLineParser cmd_parser;
@@ -180,44 +187,33 @@ void parameters::process()
 	}
 
 	option = "m";
-	// FIXME segfaul
-	// FIXME Inconsistent IFDEFs
 	if (cmd_parser.isSet(option)) {
 		auto app_name { QApplication::applicationName().toStdString() };
-		// TODO Use C++ toolset
-		auto otparg { cmd_parser.value(option).toStdString().c_str() };
-		char *sep = strchr(optarg, 'x');
+		auto mode { cmd_parser.value(option) };
+		const QRegularExpression vmode_regex { "^(\\d+)x(\\d+)$" };
 
-		if (!sep || !*(sep + 1)) {
-			throw std::runtime_error(std::string(app_name) + ": incorrect format of video mode resolution -- '" + optarg + "'");
+		const auto vmode_match { vmode_regex.match(mode) };
+		if (!vmode_match.hasMatch()) {
+			throw std::runtime_error(
+					app_name +
+					": incorrect format of video mode resolution -- '" +
+					mode.toStdString() + "'");
 		}
 
-		Video.Height = atoi(sep + 1);
-		*sep = 0;
-
-		Video.Width = atoi(optarg);
-		if (!Video.Height || !Video.Width) {
-			throw std::runtime_error(std::string(app_name) + ": incorrect format of video mode resolution -- '" + optarg + "x + " + (sep + 1) + "'");
-		}
+		Video.Width = vmode_match.captured(1).toInt();
+		Video.Height = vmode_match.captured(2).toInt();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		if (ZoomNoResize) {
-			Video.ViewportHeight = Video.Height;
-			Video.ViewportWidth = Video.Width;
-			Video.Height = 0;
-			Video.Width = 0;
+			set_retroscale();
 		}
 #endif
 	}
 
-	// FIXME What is going here?
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (cmd_parser.isSet("Z")) {
 		ZoomNoResize = 1;
-		Video.ViewportHeight = Video.Height;
-		Video.ViewportWidth = Video.Width;
-		Video.Height = 0;
-		Video.Width = 0;
+		set_retroscale();
 	}
 #endif
 
