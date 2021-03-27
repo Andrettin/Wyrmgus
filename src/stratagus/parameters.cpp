@@ -34,6 +34,9 @@
 
 #include <QCommandLineParser>
 
+/// Filename of the map given on the command line
+std::string CliMapName;
+
 namespace wyrmgus {
 
 void parameters::process()
@@ -77,6 +80,8 @@ void parameters::process()
 #endif
 	};
 	cmd_parser.addOptions(options);
+
+	cmd_parser.addPositionalArgument("mapfile", "A custom map file to start on.");
 
 	cmd_parser.setApplicationDescription("The free real time strategy game engine.");
 	cmd_parser.addHelpOption();
@@ -209,19 +214,15 @@ void parameters::process()
 	}
 #endif
 
-	/**
-	if (argc - optind > 1) {
-		throw std::runtime_error("too many map files. if you meant to pass game arguments, these go after '--'");
-	}
+	const auto pos_args { cmd_parser.positionalArguments() };
 
-	if (argc - optind) {
-		size_t index;
-		CliMapName = argv[optind];
-		while ((index = CliMapName.find('\\')) != std::string::npos) {
-			CliMapName[index] = '/';
-		}
+	if (pos_args.length() > 1) {
+		throw std::runtime_error("Too many map files (at most one expected).");
 	}
-*/
+	else if (pos_args.length() == 1) {
+		CliMapName = pos_args[0].toStdString();
+		std::replace(CliMapName.begin(), CliMapName.end(), '\\', '/');
+	}
 }
 
 void parameters::SetDefaultUserDirectory()
