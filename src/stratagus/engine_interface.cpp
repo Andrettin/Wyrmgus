@@ -33,6 +33,7 @@
 #include "database/preferences.h"
 #include "editor.h"
 #include "game.h"
+#include "item/unique_item.h"
 #include "map/map_layer.h"
 #include "religion/deity.h"
 #include "parameters.h"
@@ -204,6 +205,11 @@ QVariantList engine_interface::get_deity_encyclopedia_entries() const
 QVariantList engine_interface::get_item_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(unit_type::get_item_encyclopedia_entries());
+}
+
+QVariantList engine_interface::get_unique_item_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(unique_item::get_encyclopedia_entries());
 }
 
 QVariantList engine_interface::get_unit_encyclopedia_entries() const

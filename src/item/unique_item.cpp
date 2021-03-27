@@ -39,6 +39,28 @@
 
 namespace wyrmgus {
 
+void unique_item::sort_encyclopedia_entries(std::vector<unique_item *> &entries)
+{
+	std::sort(entries.begin(), entries.end(), [](const unique_item *lhs, const unique_item *rhs) {
+		const wyrmgus::unit_type *lhs_unit_type = lhs->get_unit_type();
+		const wyrmgus::unit_type *rhs_unit_type = rhs->get_unit_type();
+
+		if (lhs_unit_type != rhs_unit_type) {
+			if (lhs_unit_type->BoolFlag[ITEM_INDEX].value != rhs_unit_type->BoolFlag[ITEM_INDEX].value) {
+				return lhs_unit_type->BoolFlag[ITEM_INDEX].value;
+			}
+
+			if (lhs_unit_type->BoolFlag[BUILDING_INDEX].value != rhs_unit_type->BoolFlag[BUILDING_INDEX].value) {
+				return lhs_unit_type->BoolFlag[BUILDING_INDEX].value;
+			}
+
+			return unit_type::compare_encyclopedia_entries(lhs_unit_type, rhs_unit_type);
+		}
+
+		return lhs->get_name() < rhs->get_name();
+	});
+}
+
 bool unique_item::can_drop() const
 {
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop
@@ -71,7 +93,7 @@ bool unique_item::can_drop() const
 	return true;
 }
 
-const icon *unique_item::get_icon() const
+icon *unique_item::get_icon() const
 {
 	if (this->icon != nullptr) {
 		return this->icon;

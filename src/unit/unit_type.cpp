@@ -483,142 +483,169 @@ std::string GetResourceNameById(int resource_id)
 
 namespace wyrmgus {
 
+bool unit_type::compare_encyclopedia_entries_base(const unit_type *lhs, const unit_type *rhs)
+{
+	return lhs->get_name() < rhs->get_name();
+}
+
+bool unit_type::compare_building_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs)
+{
+	const bool lhs_is_town_hall = lhs->get_unit_class() != nullptr && lhs->get_unit_class()->is_town_hall();
+	const bool rhs_is_town_hall = rhs->get_unit_class() != nullptr && rhs->get_unit_class()->is_town_hall();
+
+	if (lhs_is_town_hall != rhs_is_town_hall) {
+		return lhs_is_town_hall;
+	}
+
+	return unit_type::compare_encyclopedia_entries_base(lhs, rhs);
+}
+
+bool unit_type::compare_item_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs)
+{
+	if (lhs->get_item_class() != rhs->get_item_class()) {
+		if (lhs->get_item_class() == item_class::none || rhs->get_item_class() == item_class::none) {
+			return lhs->get_item_class() != item_class::none;
+		}
+
+		return lhs->get_item_class() < rhs->get_item_class();
+	}
+
+	if (lhs->DefaultStat.get_price() != rhs->DefaultStat.get_price()) {
+		return lhs->DefaultStat.get_price() < rhs->DefaultStat.get_price();
+	}
+
+	return unit_type::compare_encyclopedia_entries_base(lhs, rhs);
+}
+
+bool unit_type::compare_unit_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs)
+{
+	if (lhs->BoolFlag[FAUNA_INDEX].value != rhs->BoolFlag[FAUNA_INDEX].value) {
+		return lhs->BoolFlag[FAUNA_INDEX].value;
+	}
+
+	if (lhs->UnitType != rhs->UnitType) {
+		if (lhs->UnitType == UnitTypeType::Land || rhs->UnitType == UnitTypeType::Land) {
+			return lhs->UnitType == UnitTypeType::Land;
+		}
+
+		if (lhs->UnitType == UnitTypeType::Naval || rhs->UnitType == UnitTypeType::Naval) {
+			return lhs->UnitType == UnitTypeType::Naval;
+		}
+
+		if (lhs->UnitType == UnitTypeType::FlyLow || rhs->UnitType == UnitTypeType::FlyLow) {
+			return lhs->UnitType == UnitTypeType::FlyLow;
+		}
+
+		if (lhs->UnitType == UnitTypeType::Fly || rhs->UnitType == UnitTypeType::Fly) {
+			return lhs->UnitType == UnitTypeType::Fly;
+		}
+
+		if (lhs->UnitType == UnitTypeType::Space || rhs->UnitType == UnitTypeType::Space) {
+			return lhs->UnitType == UnitTypeType::Space;
+		}
+	}
+
+	if (lhs->BoolFlag[PREDATOR_INDEX].value != rhs->BoolFlag[PREDATOR_INDEX].value) {
+		return !lhs->BoolFlag[PREDATOR_INDEX].value;
+	}
+
+	//worker units first
+	if (lhs->BoolFlag[HARVESTER_INDEX].value != rhs->BoolFlag[HARVESTER_INDEX].value) {
+		return lhs->BoolFlag[HARVESTER_INDEX].value;
+	}
+
+	//organic units first
+	if (lhs->BoolFlag[ORGANIC_INDEX].value != rhs->BoolFlag[ORGANIC_INDEX].value) {
+		return lhs->BoolFlag[ORGANIC_INDEX].value;
+	}
+
+	//sort by smithing skill
+	if (lhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value != rhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value) {
+		return lhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value < rhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value;
+	}
+
+	//non-coward units first
+	if (!lhs->BoolFlag[HARVESTER_INDEX].value && !rhs->BoolFlag[HARVESTER_INDEX].value && !lhs->BoolFlag[FAUNA_INDEX].value && !rhs->BoolFlag[FAUNA_INDEX].value) {
+		if (lhs->BoolFlag[COWARD_INDEX].value != rhs->BoolFlag[COWARD_INDEX].value) {
+			return !lhs->BoolFlag[COWARD_INDEX].value;
+		}
+	}
+
+	//non-mounted units first
+	if (lhs->BoolFlag[MOUNTED_INDEX].value != rhs->BoolFlag[MOUNTED_INDEX].value) {
+		return !lhs->BoolFlag[MOUNTED_INDEX].value;
+	}
+
+	//melee units first
+	const bool lhs_is_melee = lhs->DefaultStat.Variables[ATTACKRANGE_INDEX].Value <= 1;
+	const bool rhs_is_melee = rhs->DefaultStat.Variables[ATTACKRANGE_INDEX].Value <= 1;
+	if (lhs_is_melee != rhs_is_melee) {
+		return lhs_is_melee;
+	}
+
+	const bool lhs_is_anti_mounted = lhs->DefaultStat.Variables[BONUSAGAINSTMOUNTED_INDEX].Value > 0;
+	const bool rhs_is_anti_mounted = rhs->DefaultStat.Variables[BONUSAGAINSTMOUNTED_INDEX].Value > 0;
+	if (lhs_is_anti_mounted != rhs_is_anti_mounted) {
+		return !lhs_is_anti_mounted;
+	}
+
+	const bool lhs_is_gunner = !lhs->WeaponClasses.empty() && lhs->WeaponClasses.front() == item_class::gun;
+	const bool rhs_is_gunner = !rhs->WeaponClasses.empty() && rhs->WeaponClasses.front() == item_class::gun;
+	if (lhs_is_gunner != rhs_is_gunner) {
+		return !lhs_is_gunner;
+	}
+
+	if (lhs->DefaultStat.Variables[LEVEL_INDEX].Value != rhs->DefaultStat.Variables[LEVEL_INDEX].Value) {
+		return lhs->DefaultStat.Variables[LEVEL_INDEX].Value < rhs->DefaultStat.Variables[LEVEL_INDEX].Value;
+	}
+
+	if (lhs->DefaultStat.Variables[POINTS_INDEX].Value != rhs->DefaultStat.Variables[POINTS_INDEX].Value) {
+		return lhs->DefaultStat.Variables[POINTS_INDEX].Value < rhs->DefaultStat.Variables[POINTS_INDEX].Value;
+	}
+
+	return unit_type::compare_encyclopedia_entries_base(lhs, rhs);
+}
+
+bool unit_type::compare_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs)
+{
+	const wyrmgus::civilization *lhs_civilization = lhs->get_civilization();
+	if (lhs_civilization == defines::get()->get_neutral_civilization()) {
+		lhs_civilization = nullptr;
+	}
+
+	const wyrmgus::civilization *rhs_civilization = rhs->get_civilization();
+	if (rhs_civilization == defines::get()->get_neutral_civilization()) {
+		rhs_civilization = nullptr;
+	}
+
+	if (lhs_civilization != rhs_civilization) {
+		if (lhs_civilization == nullptr || rhs_civilization == nullptr) {
+			return lhs_civilization == nullptr;
+		}
+
+		return lhs_civilization->get_name() < rhs_civilization->get_name();
+	}
+
+	if (lhs->get_faction() != rhs->get_faction()) {
+		if (lhs->get_faction() == nullptr || rhs->get_faction() == nullptr) {
+			return lhs->get_faction() == nullptr;
+		}
+
+		return lhs->get_faction()->get_name() < rhs->get_faction()->get_name();
+	}
+
+	if (lhs->BoolFlag[BUILDING_INDEX].value && rhs->BoolFlag[BUILDING_INDEX].value) {
+		return unit_type::compare_building_encyclopedia_entries(lhs, rhs);
+	} else if (lhs->BoolFlag[ITEM_INDEX].value && rhs->BoolFlag[ITEM_INDEX].value) {
+		return unit_type::compare_item_encyclopedia_entries(lhs, rhs);
+	} else {
+		return unit_type::compare_unit_encyclopedia_entries(lhs, rhs);
+	}
+}
+
 void unit_type::sort_encyclopedia_entries(std::vector<unit_type *> &entries)
 {
-	std::sort(entries.begin(), entries.end(), [](const unit_type *lhs, const unit_type *rhs) {
-		const wyrmgus::civilization *lhs_civilization = lhs->get_civilization();
-		if (lhs_civilization == defines::get()->get_neutral_civilization()) {
-			lhs_civilization = nullptr;
-		}
-
-		const wyrmgus::civilization *rhs_civilization = rhs->get_civilization();
-		if (rhs_civilization == defines::get()->get_neutral_civilization()) {
-			rhs_civilization = nullptr;
-		}
-
-		if (lhs_civilization != rhs_civilization) {
-			if (lhs_civilization == nullptr || rhs_civilization == nullptr) {
-				return lhs_civilization == nullptr;
-			}
-
-			return lhs_civilization->get_name() < rhs_civilization->get_name();
-		}
-
-		if (lhs->get_faction() != rhs->get_faction()) {
-			if (lhs->get_faction() == nullptr || rhs->get_faction() == nullptr) {
-				return lhs->get_faction() == nullptr;
-			}
-
-			return lhs->get_faction()->get_name() < rhs->get_faction()->get_name();
-		}
-
-		if (lhs->BoolFlag[BUILDING_INDEX].value && rhs->BoolFlag[BUILDING_INDEX].value) {
-			const bool lhs_is_town_hall = lhs->get_unit_class() != nullptr && lhs->get_unit_class()->is_town_hall();
-			const bool rhs_is_town_hall = rhs->get_unit_class() != nullptr && rhs->get_unit_class()->is_town_hall();
-
-			if (lhs_is_town_hall != rhs_is_town_hall) {
-				return lhs_is_town_hall;
-			}
-		} else if (lhs->BoolFlag[ITEM_INDEX].value && rhs->BoolFlag[ITEM_INDEX].value) {
-			if (lhs->get_item_class() != rhs->get_item_class()) {
-				if (lhs->get_item_class() == item_class::none || rhs->get_item_class() == item_class::none) {
-					return lhs->get_item_class() != item_class::none;
-				}
-
-				return lhs->get_item_class() < rhs->get_item_class();
-			}
-
-			if (lhs->DefaultStat.get_price() != rhs->DefaultStat.get_price()) {
-				return lhs->DefaultStat.get_price() < rhs->DefaultStat.get_price();
-			}
-		} else {
-			if (lhs->BoolFlag[FAUNA_INDEX].value != rhs->BoolFlag[FAUNA_INDEX].value) {
-				return lhs->BoolFlag[FAUNA_INDEX].value;
-			}
-
-			if (lhs->UnitType != rhs->UnitType) {
-				if (lhs->UnitType == UnitTypeType::Land || rhs->UnitType == UnitTypeType::Land) {
-					return lhs->UnitType == UnitTypeType::Land;
-				}
-
-				if (lhs->UnitType == UnitTypeType::Naval || rhs->UnitType == UnitTypeType::Naval) {
-					return lhs->UnitType == UnitTypeType::Naval;
-				}
-
-				if (lhs->UnitType == UnitTypeType::FlyLow || rhs->UnitType == UnitTypeType::FlyLow) {
-					return lhs->UnitType == UnitTypeType::FlyLow;
-				}
-
-				if (lhs->UnitType == UnitTypeType::Fly || rhs->UnitType == UnitTypeType::Fly) {
-					return lhs->UnitType == UnitTypeType::Fly;
-				}
-
-				if (lhs->UnitType == UnitTypeType::Space || rhs->UnitType == UnitTypeType::Space) {
-					return lhs->UnitType == UnitTypeType::Space;
-				}
-			}
-
-			if (lhs->BoolFlag[PREDATOR_INDEX].value != rhs->BoolFlag[PREDATOR_INDEX].value) {
-				return !lhs->BoolFlag[PREDATOR_INDEX].value;
-			}
-
-			//worker units first
-			if (lhs->BoolFlag[HARVESTER_INDEX].value != rhs->BoolFlag[HARVESTER_INDEX].value) {
-				return lhs->BoolFlag[HARVESTER_INDEX].value;
-			}
-
-			//organic units first
-			if (lhs->BoolFlag[ORGANIC_INDEX].value != rhs->BoolFlag[ORGANIC_INDEX].value) {
-				return lhs->BoolFlag[ORGANIC_INDEX].value;
-			}
-
-			//sort by smithing skill
-			if (lhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value != rhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value) {
-				return lhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value < rhs->DefaultStat.Variables[JEWELRYGATHERINGBONUS_INDEX].Value;
-			}
-
-			//non-coward units first
-			if (!lhs->BoolFlag[HARVESTER_INDEX].value && !rhs->BoolFlag[HARVESTER_INDEX].value && !lhs->BoolFlag[FAUNA_INDEX].value && !rhs->BoolFlag[FAUNA_INDEX].value) {
-				if (lhs->BoolFlag[COWARD_INDEX].value != rhs->BoolFlag[COWARD_INDEX].value) {
-					return !lhs->BoolFlag[COWARD_INDEX].value;
-				}
-			}
-
-			//non-mounted units first
-			if (lhs->BoolFlag[MOUNTED_INDEX].value != rhs->BoolFlag[MOUNTED_INDEX].value) {
-				return !lhs->BoolFlag[MOUNTED_INDEX].value;
-			}
-
-			//melee units first
-			const bool lhs_is_melee = lhs->DefaultStat.Variables[ATTACKRANGE_INDEX].Value <= 1;
-			const bool rhs_is_melee = rhs->DefaultStat.Variables[ATTACKRANGE_INDEX].Value <= 1;
-			if (lhs_is_melee != rhs_is_melee) {
-				return lhs_is_melee;
-			}
-
-			const bool lhs_is_anti_mounted = lhs->DefaultStat.Variables[BONUSAGAINSTMOUNTED_INDEX].Value > 0;
-			const bool rhs_is_anti_mounted = rhs->DefaultStat.Variables[BONUSAGAINSTMOUNTED_INDEX].Value > 0;
-			if (lhs_is_anti_mounted != rhs_is_anti_mounted) {
-				return !lhs_is_anti_mounted;
-			}
-
-			const bool lhs_is_gunner = !lhs->WeaponClasses.empty() && lhs->WeaponClasses.front() == item_class::gun;
-			const bool rhs_is_gunner = !rhs->WeaponClasses.empty() && rhs->WeaponClasses.front() == item_class::gun;
-			if (lhs_is_gunner != rhs_is_gunner) {
-				return !lhs_is_gunner;
-			}
-
-			if (lhs->DefaultStat.Variables[LEVEL_INDEX].Value != rhs->DefaultStat.Variables[LEVEL_INDEX].Value) {
-				return lhs->DefaultStat.Variables[LEVEL_INDEX].Value < rhs->DefaultStat.Variables[LEVEL_INDEX].Value;
-			}
-
-			if (lhs->DefaultStat.Variables[POINTS_INDEX].Value != rhs->DefaultStat.Variables[POINTS_INDEX].Value) {
-				return lhs->DefaultStat.Variables[POINTS_INDEX].Value < rhs->DefaultStat.Variables[POINTS_INDEX].Value;
-			}
-		}
-
-		return lhs->get_name() < rhs->get_name();
-	});
+	std::sort(entries.begin(), entries.end(), unit_type::compare_encyclopedia_entries);
 }
 
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),

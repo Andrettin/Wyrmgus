@@ -45,7 +45,7 @@ class unique_item final : public detailed_data_entry, public data_type<unique_it
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::unit_type* unit_type MEMBER unit_type)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon NOTIFY changed)
 	Q_PROPERTY(CUpgrade* prefix MEMBER prefix)
 	Q_PROPERTY(CUpgrade* suffix MEMBER suffix)
 	Q_PROPERTY(CUpgrade* set MEMBER set)
@@ -57,6 +57,8 @@ class unique_item final : public detailed_data_entry, public data_type<unique_it
 public:
 	static constexpr const char *class_identifier = "unique_item";
 	static constexpr const char *database_folder = "unique_items";
+
+	static void sort_encyclopedia_entries(std::vector<unique_item *> &entries);
 
 	explicit unique_item(const std::string &identifier) : detailed_data_entry(identifier)
 	{
@@ -111,7 +113,10 @@ public:
 
 	bool can_drop() const;				/// Check whether this unique item can drop
 	int get_magic_level() const;			/// Get this unique item's magic level
-	const wyrmgus::icon *get_icon() const;
+	wyrmgus::icon *get_icon() const;
+
+signals:
+	void changed();
 
 private:
 	wyrmgus::unit_type *unit_type = nullptr; //unit type of the unique
