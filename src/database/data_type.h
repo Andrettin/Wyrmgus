@@ -308,7 +308,14 @@ public:
 			}
 		}
 
+		T::sort_encyclopedia_entries(entries);
+
 		return entries;
+	}
+
+	static void sort_encyclopedia_entries(std::vector<T *> &entries)
+	{
+		Q_UNUSED(entries)
 	}
 
 private:

@@ -28,6 +28,7 @@
 
 #include "engine_interface.h"
 
+#include "character.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "editor.h"
@@ -184,19 +185,24 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 	}
 }
 
-QVariantList engine_interface::get_unit_encyclopedia_entries() const
-{
-	return container::to_qvariant_list(unit_type::get_unit_encyclopedia_entries());
-}
-
 QVariantList engine_interface::get_building_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(unit_type::get_building_encyclopedia_entries());
 }
 
+QVariantList engine_interface::get_character_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(character::get_encyclopedia_entries());
+}
+
 QVariantList engine_interface::get_item_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(unit_type::get_item_encyclopedia_entries());
+}
+
+QVariantList engine_interface::get_unit_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(unit_type::get_unit_encyclopedia_entries());
 }
 
 }

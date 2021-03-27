@@ -100,8 +100,8 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon WRITE set_base_icon)
 	Q_PROPERTY(wyrmgus::icon* heroic_icon MEMBER heroic_icon)
 	Q_PROPERTY(wyrmgus::unit_type* unit_type MEMBER unit_type WRITE set_unit_type)
-	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
-	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
+	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction NOTIFY changed)
 	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
 	Q_PROPERTY(wyrmgus::site* home_settlement MEMBER home_settlement)
 	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
@@ -116,7 +116,9 @@ public:
 	static constexpr const char *database_folder = "characters";
 
 	static void clear();
-	
+
+	static void sort_encyclopedia_entries(std::vector<character *> &entries);
+
 	explicit character(const std::string &identifier);
 	~character();
 	
@@ -124,6 +126,7 @@ public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+
 	virtual data_entry_history *get_history_base() override;
 
 	character_history *get_history()
@@ -137,6 +140,19 @@ public:
 	}
 
 	virtual void reset_history() override;
+
+	virtual bool has_encyclopedia_entry() const override
+	{
+		if (!this->IsUsable()) {
+			return false;
+		}
+
+		if (this->is_deity()) {
+			return false; //already covered by the deity's encyclopedia entry
+		}
+
+		return detailed_data_entry::has_encyclopedia_entry();
+	}
 
 	const wyrmgus::dynasty *get_dynasty() const
 	{
@@ -367,6 +383,10 @@ public:
 
 	CUnit *get_unit() const;
 
+signals:
+	void changed();
+
+public:
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died

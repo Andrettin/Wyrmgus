@@ -51,7 +51,7 @@ public:
 
 	virtual bool has_encyclopedia_entry() const override
 	{
-		if (this->get_notes().empty() && this->get_description().empty() && this->get_background().empty()) {
+		if (this->get_notes().empty() && this->get_description().empty() && this->get_background().empty() && this->get_quote().empty()) {
 			return false;
 		}
 

@@ -76,6 +76,32 @@ void character::clear()
 	CustomHeroes.clear();
 }
 
+void character::sort_encyclopedia_entries(std::vector<character *> &entries)
+{
+	std::sort(entries.begin(), entries.end(), [](const character *lhs, const character *rhs) {
+		const wyrmgus::civilization *lhs_civilization = lhs->get_civilization();
+		const wyrmgus::civilization *rhs_civilization = rhs->get_civilization();
+
+		if (lhs_civilization != rhs_civilization) {
+			if (lhs_civilization == nullptr || rhs_civilization == nullptr) {
+				return lhs_civilization == nullptr;
+			}
+
+			return lhs_civilization->get_name() < rhs_civilization->get_name();
+		}
+
+		if (lhs->get_default_faction() != rhs->get_default_faction()) {
+			if (lhs->get_default_faction() == nullptr || rhs->get_default_faction() == nullptr) {
+				return lhs->get_default_faction() == nullptr;
+			}
+
+			return lhs->get_default_faction()->get_name() < rhs->get_default_faction()->get_name();
+		}
+
+		return lhs->get_name() < rhs->get_name();
+	});
+}
+
 character::character(const std::string &identifier)
 	: detailed_data_entry(identifier), CDataType(identifier), gender(gender::none)
 {
