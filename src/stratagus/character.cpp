@@ -709,12 +709,13 @@ bool character::HasMajorDeity() const
 std::string character::get_full_name() const
 {
 	std::string full_name = this->get_name();
+
 	if (!this->ExtraName.empty()) {
 		full_name += " " + this->ExtraName;
-	}
-	if (!this->get_surname().empty()) {
+	} else if (!this->get_surname().empty()) {
 		full_name += " " + this->get_surname();
 	}
+
 	return full_name;
 }
 
