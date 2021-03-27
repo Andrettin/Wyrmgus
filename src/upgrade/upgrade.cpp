@@ -80,6 +80,8 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
+#include "upgrade/upgrade_category.h"
+#include "upgrade/upgrade_category_rank.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/util.h"
@@ -179,6 +181,29 @@ void CUpgrade::sort_encyclopedia_entries(std::vector<CUpgrade *> &entries)
 			}
 
 			return lhs->get_faction()->get_name() < rhs->get_faction()->get_name();
+		}
+
+		const wyrmgus::upgrade_class *lhs_class = lhs->get_upgrade_class();
+		const wyrmgus::upgrade_class *rhs_class = rhs->get_upgrade_class();
+
+		if (lhs_class != rhs_class) {
+			if (lhs_class == nullptr || rhs_class == nullptr) {
+				return lhs_class != nullptr;
+			}
+
+			for (int i = static_cast<int>(upgrade_category_rank::none) + 1; i < static_cast<int>(upgrade_category_rank::count); ++i) {
+				const upgrade_category_rank rank = static_cast<upgrade_category_rank>(i);
+
+				const wyrmgus::upgrade_category *lhs_category = lhs_class->get_category(rank);
+				const wyrmgus::upgrade_category *rhs_category = rhs_class->get_category(rank);
+				if (lhs_category != rhs_category) {
+					if (lhs_category == nullptr || rhs_category == nullptr) {
+						return lhs_category != nullptr;
+					}
+
+					return lhs_category->get_name() < rhs_category->get_name();
+				}
+			}
 		}
 
 		if (lhs->get_item() != rhs->get_item()) {
