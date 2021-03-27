@@ -99,21 +99,7 @@ void parameters::process()
 
 	cmd_parser.process(*QApplication::instance());
 
-	QString option { "d" };
-	if (cmd_parser.isSet(option)) {
-		database::get()->set_root_path(cmd_parser.value(option).toStdString());
-	}
-
-	if (cmd_parser.isSet("t")) {
-		this->test_run = true;
-	}
-
-	option = "D";
-	if (cmd_parser.isSet(option)) {
-		Video.Depth = cmd_parser.value(option).toInt();
-	}
-
-	option = "c";
+	QString option { "c" };
 	if (cmd_parser.isSet(option)) {
 		// FIXME Use appropriate type for properly suffix processing
 		QString filename { cmd_parser.value(option) };
@@ -121,36 +107,33 @@ void parameters::process()
 		this->luaStartFilename = filename.toStdString();
 	}
 
-	option = "E";
+	option = "d" ;
 	if (cmd_parser.isSet(option)) {
-		this->luaEditorStartFilename = cmd_parser.value(option).toStdString();
+		database::get()->set_root_path(cmd_parser.value(option).toStdString());
 	}
 
-	option = "G";
+	option = "D";
 	if (cmd_parser.isSet(option)) {
-		this->luaScriptArguments = cmd_parser.value(option).toStdString();
-	}
-
-	option = "N";
-	if (cmd_parser.isSet(option)) {
-		this->LocalPlayerName = cmd_parser.value(option).toStdString();
-	}
-
-	option = "u";
-	if (cmd_parser.isSet(option)) {
-		this->SetUserDirectory(cmd_parser.value(option).toStdString());
-	}
-	else {
-		this->SetDefaultUserDirectory();
+		Video.Depth = cmd_parser.value(option).toInt();
 	}
 
 	if (cmd_parser.isSet("e")) {
 		Editor.Running = EditorCommandLine;
 	}
 
+	option = "E";
+	if (cmd_parser.isSet(option)) {
+		this->luaEditorStartFilename = cmd_parser.value(option).toStdString();
+	}
+
 	if (cmd_parser.isSet("F")) {
 		VideoForceFullScreen = 1;
 		Video.FullScreen = 1;
+	}
+
+	option = "G";
+	if (cmd_parser.isSet(option)) {
+		this->luaScriptArguments = cmd_parser.value(option).toStdString();
 	}
 
 	option = "I";
@@ -160,6 +143,11 @@ void parameters::process()
 
 	if (cmd_parser.isSet("l")) {
 		CommandLogDisabled = true;
+	}
+
+	option = "N";
+	if (cmd_parser.isSet(option)) {
+		this->LocalPlayerName = cmd_parser.value(option).toStdString();
 	}
 
 	option = "P";
@@ -181,9 +169,16 @@ void parameters::process()
 		VideoSyncSpeed = cmd_parser.value(option).toInt();
 	}
 
-	if (cmd_parser.isSet("W")) {
-		VideoForceFullScreen = 1;
-		Video.FullScreen = 0;
+	if (cmd_parser.isSet("t")) {
+		this->test_run = true;
+	}
+
+	option = "u";
+	if (cmd_parser.isSet(option)) {
+		this->SetUserDirectory(cmd_parser.value(option).toStdString());
+	}
+	else {
+		this->SetDefaultUserDirectory();
 	}
 
 	option = "m";
@@ -208,6 +203,11 @@ void parameters::process()
 			set_retroscale();
 		}
 #endif
+	}
+
+	if (cmd_parser.isSet("W")) {
+		VideoForceFullScreen = 1;
+		Video.FullScreen = 0;
 	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
