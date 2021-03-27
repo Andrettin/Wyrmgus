@@ -34,6 +34,28 @@
 
 namespace wyrmgus {
 
+int resource::get_price(const resource_map<int> &costs)
+{
+	int price = 0;
+
+	for (const auto &[resource, resource_cost] : costs) {
+		if (resource == defines::get()->get_time_resource()) {
+			continue;
+		}
+
+		if (resource_cost > 0) {
+			if (resource == defines::get()->get_wealth_resource()) {
+				price += resource_cost;
+			} else {
+				price += resource_cost * resource->get_base_price() / 100;
+			}
+		}
+
+	}
+
+	return price;
+}
+
 int resource::get_mass_multiplier(const uint64_t mass, const uint64_t base_mass)
 {
 	int mass_multiplier = 100;

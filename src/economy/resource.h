@@ -29,6 +29,7 @@
 
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
+#include "economy/resource_container.h"
 
 class CGraphic;
 struct lua_State;
@@ -93,6 +94,7 @@ public:
 	static constexpr const char *class_identifier = "resource";
 	static constexpr const char *database_folder = "resources";
 
+	static int get_price(const resource_map<int> &costs);
 	static int get_mass_multiplier(const uint64_t mass, const uint64_t base_mass);
 
 	explicit resource(const std::string &identifier) : named_data_entry(identifier)

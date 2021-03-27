@@ -144,24 +144,7 @@ int CUnitStats::get_time_cost() const
 
 int CUnitStats::get_price() const
 {
-	int price = 0;
-	
-	for (const auto &[resource, resource_cost] : this->get_costs()) {
-		if (resource == defines::get()->get_time_resource()) {
-			continue;
-		}
-
-		if (resource_cost > 0) {
-			if (resource == defines::get()->get_wealth_resource()) {
-				price += resource_cost;
-			} else {
-				price += resource_cost * resource->get_base_price() / 100;
-			}
-		}
-
-	}
-	
-	return price;
+	return resource::get_price(this->get_costs());
 }
 
 gender CUnitStats::get_gender() const
@@ -196,6 +179,18 @@ void CUpgrade::sort_encyclopedia_entries(std::vector<CUpgrade *> &entries)
 			}
 
 			return lhs->get_faction()->get_name() < rhs->get_faction()->get_name();
+		}
+
+		if (lhs->get_item() != rhs->get_item()) {
+			if (lhs->get_item() == nullptr || rhs->get_item() == nullptr) {
+				return lhs->get_item() != nullptr;
+			}
+
+			return unit_type::compare_encyclopedia_entries(lhs->get_item(), rhs->get_item());
+		}
+
+		if (lhs->get_price() != rhs->get_price()) {
+			return lhs->get_price() < rhs->get_price();
 		}
 
 		return lhs->get_name() < rhs->get_name();
@@ -428,6 +423,11 @@ void CUpgrade::add_modifier(std::unique_ptr<const wyrmgus::upgrade_modifier> &&m
 int CUpgrade::get_time_cost() const
 {
 	return this->get_cost(defines::get()->get_time_resource());
+}
+
+int CUpgrade::get_price() const
+{
+	return resource::get_price(this->get_costs());
 }
 
 /**

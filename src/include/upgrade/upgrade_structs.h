@@ -337,7 +337,11 @@ public:
 
 	virtual bool has_encyclopedia_entry() const override
 	{
-		return this->get_icon() != nullptr;
+		if (this->get_icon() == nullptr) {
+			return false;
+		}
+
+		return detailed_data_entry::has_encyclopedia_entry();
 	}
 
 	int get_index() const
@@ -509,6 +513,8 @@ public:
 	{
 		return this->scaled_cost_unit_classes;
 	}
+
+	int get_price() const;
 
 	const std::unique_ptr<wyrmgus::condition> &get_preconditions() const
 	{
