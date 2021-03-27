@@ -260,9 +260,9 @@ class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
-	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction READ get_faction)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization NOTIFY changed)
+	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction READ get_faction NOTIFY changed)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::upgrade_class* upgrade_class READ get_upgrade_class WRITE set_upgrade_class)
 	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring)
 	Q_PROPERTY(QString effects_string READ get_effects_string_qstring)
@@ -308,6 +308,25 @@ public:
 		return upgrade;
 	}
 
+	static void sort_encyclopedia_entries(std::vector<CUpgrade *> &entries);
+
+	static std::vector<CUpgrade *> get_technology_encyclopedia_entries()
+	{
+		std::vector<CUpgrade *> entries;
+
+		for (CUpgrade *upgrade : CUpgrade::get_encyclopedia_entries()) {
+			if (upgrade->get_upgrade_class() == nullptr) {
+				continue;
+			}
+
+			entries.push_back(upgrade);
+		}
+
+		CUpgrade::sort_encyclopedia_entries(entries);
+
+		return entries;
+	}
+
 	explicit CUpgrade(const std::string &identifier);
 	~CUpgrade();
 
@@ -315,6 +334,11 @@ public:
 	virtual void process_sml_scope(const wyrmgus::sml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+
+	virtual bool has_encyclopedia_entry() const override
+	{
+		return this->get_icon() != nullptr;
+	}
 
 	int get_index() const
 	{
@@ -515,6 +539,9 @@ public:
 	{
 		this->deity = deity;
 	}
+
+signals:
+	void changed();
 
 private:
 	wyrmgus::upgrade_class *upgrade_class = nullptr; //upgrade class (e.g. siege weapon projectile I)

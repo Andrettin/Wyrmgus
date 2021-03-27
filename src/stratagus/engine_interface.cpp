@@ -207,6 +207,11 @@ QVariantList engine_interface::get_item_encyclopedia_entries() const
 	return container::to_qvariant_list(unit_type::get_item_encyclopedia_entries());
 }
 
+QVariantList engine_interface::get_technology_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(CUpgrade::get_technology_encyclopedia_entries());
+}
+
 QVariantList engine_interface::get_unique_item_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(unique_item::get_encyclopedia_entries());
