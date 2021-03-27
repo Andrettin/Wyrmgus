@@ -67,8 +67,8 @@ void parameters::process()
 		{ { "l", "no-command-log" }, "Disable command log." },
 		{ { "N", "player-name" }, "Name of the player.", "name" },
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		{ { "o", "no-opengl" }, "Do not use OpenGL or OpenGL ES 1.1." },
-		{ { "O", "opengl" }, "Use OpenGL or OpenGL ES 1.1." },
+		{ { "o", "no-opengl" }, "Do not use OpenGL or OpenGL ES 1.1." }, // FIXME Not implemented
+		{ { "O", "opengl" }, "Use OpenGL or OpenGL ES 1.1." }, // FIXME Not implemented
 #endif
 		{ { "p", "print-debug" }, "Enables debug messages printing in console." },
 		{ { "P", "port" }, "Network port to use.", "port" },
@@ -99,6 +99,8 @@ void parameters::process()
 
 	cmd_parser.process(*QApplication::instance());
 
+	auto app_name { QApplication::applicationName().toStdString() };
+
 	QString option { "c" };
 	if (cmd_parser.isSet(option)) {
 		// FIXME Use appropriate type for properly suffix processing
@@ -127,6 +129,11 @@ void parameters::process()
 	}
 
 	if (cmd_parser.isSet("F")) {
+		if (cmd_parser.isSet("W")) {
+			throw std::runtime_error(
+					app_name +
+					": \"windowed\" and \"full-screen\" is mutual exclusive options.");
+		}
 		VideoForceFullScreen = 1;
 		Video.FullScreen = 1;
 	}
@@ -183,7 +190,6 @@ void parameters::process()
 
 	option = "m";
 	if (cmd_parser.isSet(option)) {
-		auto app_name { QApplication::applicationName().toStdString() };
 		auto mode { cmd_parser.value(option) };
 		const QRegularExpression vmode_regex { "^(\\d+)x(\\d+)$" };
 
