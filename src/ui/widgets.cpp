@@ -30,24 +30,25 @@
 #include "widgets.h"
 
 #include "database/defines.h"
+#include "editor.h"
 #include "engine_interface.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "script.h"
-#include "ui/cursor.h"
-#include "ui/cursor_type.h"
-#include "ui/ui.h"
-#include "video/font.h"
-#include "video/video.h"
-#include "network.h"
 #include "netconnect.h"
-#include "editor.h"
-#include "sound/sound.h"
+#include "network.h"
 #include "player_color.h"
 //Wyrmgus start
 #include "results.h"
 //Wyrmgus end
+#include "script.h"
+#include "sound/sound.h"
+#include "ui/cursor.h"
+#include "ui/cursor_type.h"
+#include "ui/ui.h"
+#include "vec2i.h"
+#include "video/font.h"
+#include "video/video.h"
 
 // Guichan stuff we need
 std::unique_ptr<gcn::Gui> Gui;         /// A Gui object - binds it all together
