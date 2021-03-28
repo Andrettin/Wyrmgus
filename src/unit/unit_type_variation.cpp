@@ -38,6 +38,7 @@
 #include "ui/button.h"
 #include "ui/button_cmd.h"
 #include "unit/construction.h"
+#include "util/util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
