@@ -40,6 +40,7 @@
 #include "script.h"
 #include "species/species.h"
 #include "unit/unit_type.h"
+#include "util/util.h"
 #include "upgrade/upgrade.h"
 #include "video/video.h"
 
