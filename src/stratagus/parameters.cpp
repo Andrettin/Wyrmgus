@@ -24,15 +24,19 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#include "ai.h"
-
 #include "stratagus.h"
 
 #include "parameters.h"
 
+#include "ai.h"
 #include "database/database.h"
+#include "editor.h"
+#include "network.h"
+#include "replay.h"
+#include "video/video.h"
 
 #include <QCommandLineParser>
+#include <QRegularExpression>
 
 /// Filename of the map given on the command line
 std::string CliMapName;

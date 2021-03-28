@@ -164,6 +164,7 @@ extern void beos_init(int argc, char **argv);
 
 #include "stratagus.h"
 
+#include "ai.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
@@ -446,6 +447,9 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 */
 void stratagusMain(int argc, char **argv)
 {
+	Q_UNUSED(argc)
+	Q_UNUSED(argv)
+
 #ifdef USE_BEOS
 	//  Parse arguments for BeOS
 	beos_init(argc, argv);
