@@ -112,6 +112,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util/log_util.h"
 #include "util/string_util.h"
+#include "util/util.h"
 #include "util/vector_util.h"
 #include "util/vector_random_util.h"
 #include "vassalage_type.h"

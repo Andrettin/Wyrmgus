@@ -73,6 +73,7 @@
 //Wyrmgus end
 #include "util/log_util.h"
 #include "util/number_util.h"
+#include "util/util.h"
 #include "video/font.h"
 
 lua_State *Lua;                       /// Structure to work with lua files.
