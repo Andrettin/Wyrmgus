@@ -59,7 +59,7 @@
 */
 int SyncRand(const int max)
 {
-	return wyrmgus::random::get()->generate(max);
+	return random::get()->generate(max);
 }
 
 /*----------------------------------------------------------------------------

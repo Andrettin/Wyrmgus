@@ -59,6 +59,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/point_util.h"
 #include "util/string_conversion_util.h"
 #include "util/util.h"
 #include "video/font.h"
@@ -877,7 +878,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	if (missile->Type->Pierce) {
 		for (int i = 0; i < (unit.GetModifiedVariable(ATTACKRANGE_INDEX) - unit.MapDistanceTo(dpos, z)); ++i) {
 			const PixelPos diff(missile->destination - missile->source);
-			missile->destination += diff * ((wyrmgus::defines::get()->get_tile_width() + wyrmgus::defines::get()->get_tile_height()) * 3) / 4 / Distance(missile->source, missile->destination);
+			missile->destination += diff * ((wyrmgus::defines::get()->get_tile_width() + wyrmgus::defines::get()->get_tile_height()) * 3) / 4 / point::distance_to(missile->source, missile->destination);
 		}
 	}
 	
@@ -1131,7 +1132,7 @@ bool MissileInitMove(Missile &missile)
 			return true;
 		}
 		// initialize
-		missile.TotalStep = Distance(missile.source, missile.destination);
+		missile.TotalStep = point::distance_to(missile.source, missile.destination);
 		missile.State++;
 		return false;
 	}
@@ -1655,7 +1656,7 @@ void Missile::MissileHit(CUnit *unit)
 			const Vec2i posIt(posmin.x + i, posmin.y + j);
 
 			if (CMap::get()->Info.IsPointOnMap(posIt, this->MapLayer)) {
-				int d = Distance(pos, posIt);
+				int d = point::distance_to(pos, posIt);
 				d *= mtype.SplashFactor;
 				if (d == 0) {
 					d = 1;
@@ -1685,9 +1686,9 @@ bool Missile::NextMissileFrame(char sign, char longAnimation)
 	}
 	if (longAnimation) {
 		// Total distance to cover.
-		const int totalx = Distance(this->destination, this->source);
+		const int totalx = point::distance_to(this->destination, this->source);
 		// Covered distance.
-		const int dx = Distance(this->position, this->source);
+		const int dx = point::distance_to(this->position, this->source);
 		// Total number of frame (for one direction).
 		const int totalf = this->Type->get_frames() / num_directions;
 		// Current frame (for one direction).

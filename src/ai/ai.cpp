@@ -169,6 +169,7 @@
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
 #include "util/enum_util.h"
+#include "util/util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
@@ -414,7 +415,7 @@ static void AiCheckUnits()
 		}
 		
 		if (potential_factions.size() > 0) {
-			AiPlayer->Player->SetFaction(potential_factions[SyncRand(potential_factions.size())]);
+			AiPlayer->Player->SetFaction(vector::get_random(potential_factions));
 		}
 		
 		if (AiPlayer->Player->get_dynasty() == nullptr) { //if the AI player has no dynasty, pick one if available

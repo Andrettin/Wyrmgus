@@ -109,6 +109,7 @@
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
 #include "util/thread_pool.h"
+#include "util/util.h"
 #include "video/font.h"
 #include "video/font_color.h"
 

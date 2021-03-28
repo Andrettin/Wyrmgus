@@ -60,6 +60,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
 

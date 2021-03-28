@@ -53,6 +53,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/point_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
@@ -561,7 +562,7 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 		return VisitResult::DeadEnd;
 	}
 	
-	if (Distance(pos, startPos) <= abs(distance - minDist)) {
+	if (point::distance_to(pos, startPos) <= abs(distance - minDist)) {
 		*resultPos = pos;
 		return VisitResult::Finished;
 	}

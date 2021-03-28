@@ -98,6 +98,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/log_util.h"
+#include "util/point_util.h"
 #include "util/size_util.h"
 //Wyrmgus start
 #include "util/util.h"
@@ -5329,7 +5330,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 //			if (UnitCanBeAt(unit, pos)) {
 			if (UnitCanBeAt(unit, pos, z)) {
 			//Wyrmgus end
-				const int n = SquareDistance(goalPos, pos);
+				const int n = point::square_distance_to(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -5343,7 +5344,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 //			if (UnitCanBeAt(unit, pos)) {
 			if (UnitCanBeAt(unit, pos, z)) {
 			//Wyrmgus end
-				const int n = SquareDistance(goalPos, pos);
+				const int n = point::square_distance_to(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -5357,7 +5358,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 //			if (UnitCanBeAt(unit, pos)) {
 			if (UnitCanBeAt(unit, pos, z)) {
 			//Wyrmgus end
-				const int n = SquareDistance(goalPos, pos);
+				const int n = point::square_distance_to(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -5371,7 +5372,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 //			if (UnitCanBeAt(unit, pos)) {
 			if (UnitCanBeAt(unit, pos, z)) {
 			//Wyrmgus end
-				const int n = SquareDistance(goalPos, pos);
+				const int n = point::square_distance_to(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -7880,7 +7881,7 @@ int ViewPointDistance(const Vec2i &pos)
 	const Vec2i vpSize(vp.MapWidth, vp.MapHeight);
 	const Vec2i middle = vp.MapPos + vpSize / 2;
 
-	return Distance(middle, pos);
+	return point::distance_to(middle, pos);
 }
 
 /**

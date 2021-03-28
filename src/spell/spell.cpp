@@ -57,6 +57,7 @@
 #include "upgrade/upgrade.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
+#include "util/vector_random_util.h"
 
 // ****************************************************************************
 // Target constructor
@@ -585,7 +586,7 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 				std::sort(table.begin(), table.end(), AutoCastPrioritySort(caster, autocast->PriorityVar, autocast->ReverseSort));
 				return NewTargetUnit(*table[0]);
 			} else { // Use the old behavior
-				return NewTargetUnit(*table[SyncRand(table.size())]);
+				return NewTargetUnit(*vector::get_random(table));
 			}
 		}
 	} else {

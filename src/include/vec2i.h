@@ -28,8 +28,6 @@
 
 #pragma once
 
-#include "util/util.h"
-
 template <typename T>
 class Vec2T final
 {
@@ -224,20 +222,6 @@ inline Vec2T<T> operator / (const Vec2T<T> &lhs, int rhs)
 
 	res /= rhs;
 	return res;
-}
-
-template <typename T>
-inline int SquareDistance(const Vec2T<T> &pos1, const Vec2T<T> &pos2)
-{
-	const Vec2T<T> diff = pos2 - pos1;
-
-	return diff.x * diff.x + diff.y * diff.y;
-}
-
-template <typename T>
-inline int Distance(const Vec2T<T> &pos1, const Vec2T<T> &pos2)
-{
-	return isqrt(SquareDistance(pos1, pos2));
 }
 
 using Vec2i = Vec2T<int>;

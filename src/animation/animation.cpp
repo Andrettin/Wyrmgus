@@ -59,6 +59,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
+#include "util/util.h"
 
 struct LabelsStruct {
 	CAnimation *Anim = nullptr;

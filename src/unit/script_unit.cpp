@@ -62,6 +62,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/exception_util.h"
+#include "util/util.h"
 
 /// Get resource by name
 extern unsigned CclGetResourceByName(lua_State *l);

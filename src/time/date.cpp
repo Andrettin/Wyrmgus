@@ -35,6 +35,7 @@
 #include "time/timeline.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
+#include "util/util.h"
 
 CDate CDate::FromString(const std::string &date_str)
 {

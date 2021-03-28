@@ -31,14 +31,15 @@
 
 #include "spell/spell_demolish.h"
 
-#include "script.h"
 #include "map/map.h"
 #include "map/tile.h"
+#include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type_type.h"
+#include "util/util.h"
 
-/* virtual */ void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);

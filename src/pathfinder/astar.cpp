@@ -39,6 +39,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type_type.h"
 #include "util/number_util.h"
+#include "util/util.h"
 #include "util/vector_util.h"
 
 #include "pathfinder.h"

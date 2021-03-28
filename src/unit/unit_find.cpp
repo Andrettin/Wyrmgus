@@ -47,6 +47,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "util/log_util.h"
+#include "util/point_util.h"
 #include "util/vector_util.h"
 
 /*----------------------------------------------------------------------------
@@ -1510,7 +1511,7 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, cons
 			if (distance) {
 				//Wyrmgus start
 //				*distance = Distance(unitPos, pos);
-				*distance = std::min(*distance, Distance(unitPos, pos));
+				*distance = std::min(*distance, point::distance_to(unitPos, pos));
 				//Wyrmgus end
 			}
 			return false;
