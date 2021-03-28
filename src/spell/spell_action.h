@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "vec2i.h"
+
 class CConfigData;
 class CUnit;
 struct lua_State;
