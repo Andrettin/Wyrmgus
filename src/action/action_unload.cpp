@@ -143,7 +143,7 @@ PixelPos COrder_Unload::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	return targetPos;
 }
 
-/* virtual */ void COrder_Unload::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Unload::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(0);
@@ -593,7 +593,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 	}
 }
 
-/* virtual */ void COrder_Unload::Execute(CUnit &unit)
+void COrder_Unload::Execute(CUnit &unit)
 {
 	const int maxSearchRange = 20;
 

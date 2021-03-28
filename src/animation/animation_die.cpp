@@ -44,7 +44,7 @@ void CAnimation_Die::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 	throw AnimationDie_Exception();
 }
 
-/* virtual */ void CAnimation_Die::Init(const char *s, lua_State *)
+void CAnimation_Die::Init(const char *s, lua_State *)
 {
 	this->DeathType = s;
 }

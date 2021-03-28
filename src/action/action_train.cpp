@@ -214,7 +214,7 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 }
 
-/* virtual */ void COrder_Train::Execute(CUnit &unit)
+void COrder_Train::Execute(CUnit &unit)
 {
 	//Wyrmgus start
 	/*

@@ -32,14 +32,14 @@
 
 #include "unit/unit.h"
 
-/* virtual */ void CAnimation_Goto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Goto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
 	unit.Anim.Anim = this->gotoLabel;
 }
 
-/* virtual */ void CAnimation_Goto::Init(const char *s, lua_State *)
+void CAnimation_Goto::Init(const char *s, lua_State *)
 {
 	FindLabelLater(&this->gotoLabel, s);
 }

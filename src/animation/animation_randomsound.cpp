@@ -48,7 +48,7 @@ void CAnimation_RandomSound::Action(CUnit &unit, int &/*move*/, int /*scale*/) c
 /*
 **  s = "Sound1 [SoundN ...]"
 */
-/* virtual */ void CAnimation_RandomSound::Init(const char *s, lua_State *)
+void CAnimation_RandomSound::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();

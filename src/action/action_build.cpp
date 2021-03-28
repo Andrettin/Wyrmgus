@@ -199,7 +199,7 @@ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos, 
 	return targetPos;
 }
 
-/* virtual */ void COrder_Build::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Build::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(this->Type->BoolFlag[BUILDEROUTSIDE_INDEX].value ? 1 : 0);
 	input.SetMaxRange(this->Range);

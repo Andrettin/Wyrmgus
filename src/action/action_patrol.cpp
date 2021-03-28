@@ -157,7 +157,7 @@ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	return pos2;
 }
 
-/* virtual */ void COrder_Patrol::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Patrol::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
@@ -165,8 +165,7 @@ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 }
 
-
-/* virtual */ void COrder_Patrol::Execute(CUnit &unit)
+void COrder_Patrol::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
 		if (!unit.Waiting) {

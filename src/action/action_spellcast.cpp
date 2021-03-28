@@ -375,8 +375,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	return false;
 }
 
-
-/* virtual */ void COrder_SpellCast::Execute(CUnit &unit)
+void COrder_SpellCast::Execute(CUnit &unit)
 {
 	COrder_SpellCast &order = *this;
 

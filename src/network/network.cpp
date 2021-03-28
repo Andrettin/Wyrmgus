@@ -210,8 +210,6 @@
 
 #include "stratagus.h"
 
-#include <stddef.h>
-
 #include "network.h"
 
 #include "actions.h"
@@ -233,31 +231,37 @@
 #include "util/random.h"
 #include "video/video.h"
 
+#include <cstddef>
+
 /**
 **  Network command input/output queue.
 */
-class CNetworkCommandQueue
+class CNetworkCommandQueue final
 {
 public:
-	CNetworkCommandQueue() : Time(0), Type(0) {}
-	void Clear() { this->Time = this->Type = 0; Data.clear(); }
+	void Clear()
+	{
+		this->Time = this->Type = 0;
+		this->Data.clear();
+	}
 
 	bool operator == (const CNetworkCommandQueue &rhs) const
 	{
 		return Time == rhs.Time && Type == rhs.Type && Data == rhs.Data;
 	}
-	bool operator != (const CNetworkCommandQueue &rhs) const { return !(*this == rhs); }
+
+	bool operator != (const CNetworkCommandQueue &rhs) const
+	{
+		return !(*this == rhs);
+	}
+
 public:
-	unsigned long Time;    /// time to execute
-	unsigned char Type;    /// Command Type
+	unsigned long Time = 0;    /// time to execute
+	unsigned char Type = 0;    /// Command Type
 	std::vector<unsigned char> Data;  /// command content (network format)
 };
 
-//----------------------------------------------------------------------------
-//  Variables
-//----------------------------------------------------------------------------
-
-/* static */ CNetworkParameter CNetworkParameter::Instance;
+CNetworkParameter CNetworkParameter::Instance;
 
 CNetworkParameter::CNetworkParameter()
 {

@@ -126,7 +126,7 @@ void COrder_Research::UpdateUnitVariables(CUnit &unit) const
 **
 **  @return true when finished.
 */
-/* virtual */ void COrder_Research::Execute(CUnit &unit)
+void COrder_Research::Execute(CUnit &unit)
 {
 	const CUpgrade &upgrade = this->GetUpgrade();
 	const wyrmgus::unit_type &type = *unit.Type;

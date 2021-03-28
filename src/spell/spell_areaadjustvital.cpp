@@ -36,7 +36,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 
-/* virtual */ void Spell_AreaAdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_AreaAdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);

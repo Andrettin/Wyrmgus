@@ -35,7 +35,7 @@
 #include "script.h"
 #include "unit/unit.h"
 
-/* virtual */ void Spell_Teleport::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_Teleport::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);

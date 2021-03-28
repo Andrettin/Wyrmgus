@@ -146,7 +146,7 @@ PixelPos COrder_Trade::Show(const CViewport &vp, const PixelPos &lastScreenPos, 
 	return targetPos;
 }
 
-/* virtual */ void COrder_Trade::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Trade::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
@@ -163,8 +163,7 @@ PixelPos COrder_Trade::Show(const CViewport &vp, const PixelPos &lastScreenPos, 
 	}
 }
 
-
-/* virtual */ void COrder_Trade::Execute(CUnit &unit)
+void COrder_Trade::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
 		if (!unit.Waiting) {

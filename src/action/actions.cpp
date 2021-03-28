@@ -107,7 +107,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	input.SetGoal(input.GetUnit()->tilePos, tileSize, input.GetUnit()->MapLayer->ID);
 }
 
-/* virtual */ void COrder::FillSeenValues(CUnit &unit) const
+void COrder::FillSeenValues(CUnit &unit) const
 {
 	unit.Seen.State = ((Action == UnitAction::UpgradeTo) << 1);
 	if (unit.CurrentAction() == UnitAction::Die) {
@@ -128,7 +128,7 @@ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 /** Called when unit is killed.
 **  warn the AI module.
 */
-/* virtual */ void COrder::AiUnitKilled(CUnit &unit)
+void COrder::AiUnitKilled(CUnit &unit)
 {
 	switch (Action) {
 		case UnitAction::Still:
@@ -146,7 +146,7 @@ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 /**
 **  Call when animation step is "attack"
 */
-/* virtual */ void COrder::OnAnimationAttack(CUnit &unit)
+void COrder::OnAnimationAttack(CUnit &unit)
 {
 	//Wyrmgus start
 //	if (unit.Type->CanAttack == false) {

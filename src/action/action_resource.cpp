@@ -431,7 +431,7 @@ PixelPos COrder_Resource::Show(const CViewport &vp, const PixelPos &lastScreenPo
 	return targetPos;
 }
 
-/* virtual */ void COrder_Resource::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Resource::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(1);

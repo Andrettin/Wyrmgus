@@ -135,7 +135,7 @@ PixelPos COrder_Move::Show(const CViewport &vp, const PixelPos &lastScreenPos, s
 	return targetPos;
 }
 
-/* virtual */ void COrder_Move::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Move::UpdatePathFinderData(PathFinderInput &input)
 {
 	const Vec2i tileSize(0, 0);
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);

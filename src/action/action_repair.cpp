@@ -184,7 +184,7 @@ PixelPos COrder_Repair::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	return targetPos;
 }
 
-/* virtual */ void COrder_Repair::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Repair::UpdatePathFinderData(PathFinderInput &input)
 {
 	const CUnit &unit = *input.GetUnit();
 

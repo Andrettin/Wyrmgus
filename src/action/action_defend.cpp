@@ -148,7 +148,7 @@ PixelPos COrder_Defend::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	return targetPos;
 }
 
-/* virtual */ void COrder_Defend::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Defend::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
@@ -165,8 +165,7 @@ PixelPos COrder_Defend::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	}
 }
 
-
-/* virtual */ void COrder_Defend::Execute(CUnit &unit)
+void COrder_Defend::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
 		if (!unit.Waiting) {

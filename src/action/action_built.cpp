@@ -381,8 +381,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	order.Finished = true;
 }
 
-
-/* virtual */ void COrder_Built::Execute(CUnit &unit)
+void COrder_Built::Execute(CUnit &unit)
 {
 	const wyrmgus::unit_type &type = *unit.Type;
 
@@ -427,7 +426,7 @@ void COrder_Built::Cancel(CUnit &unit)
 	this->IsCancelled = true;
 }
 
-/* virtual */ void COrder_Built::UpdateUnitVariables(CUnit &unit) const
+void COrder_Built::UpdateUnitVariables(CUnit &unit) const
 {
 	Assert(unit.CurrentOrder() == this);
 
@@ -440,7 +439,7 @@ void COrder_Built::Cancel(CUnit &unit)
 	unit.Variable[BUILD_INDEX].Value = std::min(unit.Variable[BUILD_INDEX].Max, unit.Variable[BUILD_INDEX].Value);
 }
 
-/* virtual */ void COrder_Built::FillSeenValues(CUnit &unit) const
+void COrder_Built::FillSeenValues(CUnit &unit) const
 {
 	unit.Seen.State = 1;
 	unit.Seen.cframe = this->get_frame();

@@ -284,7 +284,7 @@ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
 	input.SetMaxRange(distance);
 }
 
-/* virtual */ void COrder_Attack::OnAnimationAttack(CUnit &unit)
+void COrder_Attack::OnAnimationAttack(CUnit &unit)
 {
 	//Wyrmgus start
 //	Assert(unit.Type->CanAttack);
@@ -301,7 +301,7 @@ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
 	unit.reset_step_count();
 }
 
-/* virtual */ bool COrder_Attack::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
+bool COrder_Attack::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 {
 	CUnit *goal = this->get_goal();
 

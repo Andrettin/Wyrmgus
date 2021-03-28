@@ -285,7 +285,7 @@ void CContentTypeIcon::Draw(const CUnit &unit, font *, std::vector<std::function
 **
 **  @todo Color and percent value Parametrisation.
 */
-/* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, font *, std::vector<std::function<void(renderer *)>> &render_commands) const
+void CContentTypeLifeBar::Draw(const CUnit &unit, font *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start
@@ -487,7 +487,7 @@ void CContentTypeText::Parse(lua_State *l)
 	}
 }
 
-/* virtual */ void CContentTypeFormattedText::Parse(lua_State *l)
+void CContentTypeFormattedText::Parse(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
 
@@ -513,7 +513,7 @@ void CContentTypeText::Parse(lua_State *l)
 	}
 }
 
-/* virtual */ void CContentTypeFormattedText2::Parse(lua_State *l)
+void CContentTypeFormattedText2::Parse(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -588,7 +588,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 	return UnitRefItSelf;
 }
 
-/* virtual */ void CContentTypeIcon::Parse(lua_State *l)
+void CContentTypeIcon::Parse(lua_State *l)
 {
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
@@ -600,7 +600,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 	}
 }
 
-/* virtual */ void CContentTypeLifeBar::Parse(lua_State *l)
+void CContentTypeLifeBar::Parse(lua_State *l)
 {
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
@@ -646,7 +646,7 @@ static int GetColorIndexByName(const char *colorName)
 	return -1;
 }
 
-/* virtual */ void CContentTypeCompleteBar::Parse(lua_State *l)
+void CContentTypeCompleteBar::Parse(lua_State *l)
 {
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);

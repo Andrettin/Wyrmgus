@@ -32,7 +32,7 @@
 
 #include "unit/unit.h"
 
-/* virtual */ void CAnimation_Unbreakable::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Unbreakable::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	Assert(unit.Anim.Unbreakable ^ this->state);
@@ -40,7 +40,7 @@
 	unit.Anim.Unbreakable = this->state;
 }
 
-/* virtual */ void CAnimation_Unbreakable::Init(const char *s, lua_State *)
+void CAnimation_Unbreakable::Init(const char *s, lua_State *)
 {
 	if (!strcmp(s, "begin")) {
 		this->state = 1;

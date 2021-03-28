@@ -148,8 +148,7 @@ private:
 	const CUnit *attacker;
 };
 
-
-/* virtual */ void COrder_Still::OnAnimationAttack(CUnit &unit)
+void COrder_Still::OnAnimationAttack(CUnit &unit)
 {
 	if (unit.CanAttack(false) == false) {
 		return;
@@ -500,8 +499,7 @@ bool AutoAttack(CUnit &unit)
 	return true;
 }
 
-
-/* virtual */ void COrder_Still::Execute(CUnit &unit)
+void COrder_Still::Execute(CUnit &unit)
 {
 	// If unit is not bunkered and removed, wait
 	if (unit.Removed

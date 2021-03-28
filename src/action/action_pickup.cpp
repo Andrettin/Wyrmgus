@@ -164,8 +164,7 @@ void COrder_PickUp::UpdatePathFinderData(PathFinderInput &input)
 	}
 }
 
-
-/* virtual */ void COrder_PickUp::Execute(CUnit &unit)
+void COrder_PickUp::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
 		if (!unit.Waiting) {
