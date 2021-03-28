@@ -64,6 +64,8 @@ void CGraphic::free_all_textures()
 {
 	std::shared_lock<std::shared_mutex> lock(CGraphic::mutex);
 
+	std::vector<std::future<void>> futures;
+
 	std::vector<std::function<void(renderer *)>> render_commands;
 
 	for (const auto &kv_pair : CGraphic::graphics_by_filepath) {
@@ -73,9 +75,15 @@ void CGraphic::free_all_textures()
 			continue;
 		}
 
-		render_commands.push_back([graphic](renderer *) {
+		std::shared_ptr<std::promise<void>> promise = std::make_shared<std::promise<void>>();
+		std::future<void> future = promise->get_future();
+
+		render_commands.push_back([graphic, promise](renderer *) {
 			graphic->free_textures();
+			promise->set_value();
 		});
+
+		futures.push_back(std::move(future));
 	}
 
 	for (font *font : font::get_all()) {
@@ -83,6 +91,11 @@ void CGraphic::free_all_textures()
 	}
 
 	render_context::get()->set_commands(std::move(render_commands));
+
+	//wait until all textures have been freed
+	for (std::future<void> &future : futures) {
+		future.wait();
+	}
 }
 
 CGraphic::~CGraphic()
