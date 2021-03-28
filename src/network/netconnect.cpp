@@ -39,6 +39,7 @@
 #include "settings.h"
 #include "ui/interface.h"
 #include "util/random.h"
+#include "util/util.h"
 #include "version.h"
 #include "video/video.h"
 
