@@ -812,6 +812,15 @@ void WaitEventsOneFrame()
 	std::queue<std::unique_ptr<QInputEvent>> input_events = engine_interface::get()->take_stored_input_events();
 	while (!input_events.empty()) {
 		std::unique_ptr<QInputEvent> input_event = queue::take(input_events);
+
+		if (input_event->type() == QEvent::HoverMove) {
+			const QHoverEvent *hover_event = static_cast<QHoverEvent *>(input_event.get());
+			if (hover_event->pos() == CursorScreenPos) {
+				//ignore if the hover event has the same position as the cursor currently holds
+				continue;
+			}
+		}
+
 		SDL_Event sdl_event = qevent_to_sdl_event(std::move(input_event));
 		SdlDoEvent(*GetCallbacks(), sdl_event);
 	}

@@ -60,7 +60,7 @@ public:
 
 	static cursor *get_cursor_by_type(const cursor_type type)
 	{
-		auto find_iterator = cursor::cursors_by_type.find(type);
+		const auto find_iterator = cursor::cursors_by_type.find(type);
 		if (find_iterator != cursor::cursors_by_type.end()) {
 			return find_iterator->second;
 		}
