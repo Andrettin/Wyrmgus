@@ -32,6 +32,7 @@
 
 #include "config.h"
 #include "script.h"
+#include "util/util.h"
 
 #include <SDL.h>
 

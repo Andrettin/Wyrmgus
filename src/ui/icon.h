@@ -28,6 +28,7 @@
 
 #include "database/data_type.h"
 #include "ui/icon_base.h"
+#include "vec2i.h"
 
 /**
 **  @class IconConfig icon.h

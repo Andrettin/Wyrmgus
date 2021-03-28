@@ -63,7 +63,6 @@ public:
 	T y;
 };
 
-
 template <typename T, typename T2>
 inline bool operator == (const Vec2T<T> &lhs, const Vec2T<T2> &rhs)
 {

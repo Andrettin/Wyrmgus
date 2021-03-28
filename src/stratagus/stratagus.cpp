@@ -610,19 +610,19 @@ int GetDirectionFromOffset(int x, int y)
 	return -1;
 }
 
-Vec2i GetDirectionOffset(int direction)
+QPoint GetDirectionOffset(int direction)
 {
-	Vec2i offset(0, 0);
+	QPoint offset(0, 0);
 			
 	if (direction == North || direction == Northwest || direction == Northeast) {
-		offset.y = -1;
+		offset.setY(-1);
 	} else if (direction == South || direction == Southwest || direction == Southeast) {
-		offset.y = 1;
+		offset.setY(1);
 	}
 	if (direction == West || direction == Northwest || direction == Southwest) {
-		offset.x = -1;
+		offset.setX(-1);
 	} else if (direction == East || direction == Northeast || direction == Southeast) {
-		offset.x = 1;
+		offset.setX(1);
 	}
 
 	return offset;

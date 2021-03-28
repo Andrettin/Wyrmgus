@@ -227,13 +227,11 @@ enum TechLevels {
 	CivilizedGunpowderTechLevel
 };
 
-#include <vec2i.h>
-
 extern int GetReverseDirection(int direction);
 extern std::string GetDirectionNameById(int direction);
 extern int GetDirectionIdByName(const std::string &direction);
 extern int GetDirectionFromOffset(int x, int y);
-extern Vec2i GetDirectionOffset(int direction);
+extern QPoint GetDirectionOffset(int direction);
 //Wyrmgus end
 
 extern void load_database(const bool initial_definition);
