@@ -30,6 +30,7 @@
 #include <guichan/gsdl.h>
 
 #include "luacallback.h"
+#include "vec2i.h"
 
 class CGraphic;
 class CPlayerColorGraphic;

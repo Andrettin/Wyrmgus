@@ -46,7 +46,6 @@
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/ui.h"
-#include "vec2i.h"
 #include "video/font.h"
 #include "video/video.h"
 
