@@ -91,6 +91,23 @@ const upgrade_category *upgrade_class::get_category(const upgrade_category_rank 
 	return nullptr;
 }
 
+void upgrade_class::set_category(upgrade_category *category)
+{
+	if (category == this->get_category()) {
+		return;
+	}
+
+	if (this->category != nullptr) {
+		this->category->remove_upgrade_class(this);
+	}
+
+	this->category = category;
+
+	if (category != nullptr) {
+		this->category->add_upgrade_class(this);
+	}
+}
+
 bool upgrade_class::has_upgrade(CUpgrade *upgrade) const
 {
 	return vector::contains(this->upgrades, upgrade);

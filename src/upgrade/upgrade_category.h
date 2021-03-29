@@ -31,6 +31,8 @@
 
 namespace wyrmgus {
 
+class age;
+class upgrade_class;
 enum class upgrade_category_rank;
 
 class upgrade_category final : public named_data_entry, public data_type<upgrade_category>
@@ -38,7 +40,7 @@ class upgrade_category final : public named_data_entry, public data_type<upgrade
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::upgrade_category_rank rank MEMBER rank READ get_rank)
-	Q_PROPERTY(wyrmgus::upgrade_category* category MEMBER category)
+	Q_PROPERTY(wyrmgus::upgrade_category* category MEMBER category WRITE set_category)
 
 public:
 	static constexpr const char *class_identifier = "upgrade_category";
@@ -46,6 +48,7 @@ public:
 
 	explicit upgrade_category(const std::string &identifier);
 
+	virtual void initialize() override;
 	virtual void check() const override;
 
 	upgrade_category_rank get_rank() const
@@ -73,9 +76,33 @@ public:
 		return nullptr;
 	}
 
+	void set_category(upgrade_category *category);
+
+	const age *get_start_age() const
+	{
+		return this->start_age;
+	}
+
+	void add_subcategory(upgrade_category *subcategory)
+	{
+		this->subcategories.push_back(subcategory);
+	}
+
+	void remove_subcategory(upgrade_category *subcategory);
+
+	void add_upgrade_class(const upgrade_class *upgrade_class)
+	{
+		this->upgrade_classes.push_back(upgrade_class);
+	}
+
+	void remove_upgrade_class(const upgrade_class *upgrade_class);
+
 private:
 	upgrade_category_rank rank;
 	upgrade_category *category = nullptr; //the upper category to which this upgrade category belongs
+	const age *start_age = nullptr; //the starting age for this category
+	std::vector<upgrade_category *> subcategories;
+	std::vector<const upgrade_class *> upgrade_classes; //the upgrade classes which belong to this category
 };
 
 }

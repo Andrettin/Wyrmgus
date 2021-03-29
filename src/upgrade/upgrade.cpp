@@ -202,6 +202,10 @@ void CUpgrade::sort_encyclopedia_entries(std::vector<CUpgrade *> &entries)
 						return lhs_category != nullptr;
 					}
 
+					if (lhs_category->get_start_age() != rhs_category->get_start_age() && lhs_category->get_start_age()->get_priority() != rhs_category->get_start_age()->get_priority()) {
+						return lhs_category->get_start_age()->get_priority() < rhs_category->get_start_age()->get_priority();
+					}
+
 					return lhs_category->get_name() < rhs_category->get_name();
 				}
 			}

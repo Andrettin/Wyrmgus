@@ -26,15 +26,47 @@
 
 #include "stratagus.h"
 
-#include "upgrade_category.h"
+#include "upgrade/upgrade_category.h"
 
-#include "upgrade_category_rank.h"
+#include "age.h"
+#include "upgrade/upgrade_category_rank.h"
+#include "upgrade/upgrade_class.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
 
 upgrade_category::upgrade_category(const std::string &identifier)
 	: named_data_entry(identifier), rank(upgrade_category_rank::none)
 {
+}
+
+void upgrade_category::initialize()
+{
+	for (upgrade_category *subcategory : this->subcategories) {
+		if (!subcategory->is_initialized()) {
+			subcategory->initialize();
+		}
+
+		if (subcategory->get_start_age() == nullptr) {
+			continue;
+		}
+
+		if (this->start_age == nullptr || subcategory->get_start_age()->get_priority() < this->start_age->get_priority()) {
+			this->start_age = subcategory->get_start_age();
+		}
+	}
+
+	for (const upgrade_class *upgrade_class : this->upgrade_classes) {
+		if (upgrade_class->get_age() == nullptr) {
+			continue;
+		}
+
+		if (this->start_age == nullptr || upgrade_class->get_age()->get_priority() < this->start_age->get_priority()) {
+			this->start_age = upgrade_class->get_age();
+		}
+	}
+
+	data_entry::initialize();
 }
 
 void upgrade_category::check() const
@@ -46,6 +78,37 @@ void upgrade_category::check() const
 	if (this->get_category() != nullptr && this->get_rank() >= this->get_category()->get_rank()) {
 		throw std::runtime_error("The rank of upgrade category \"" + this->get_identifier() + "\" is greater than or equal to that of its upper category.");
 	}
+
+	if (this->get_start_age() == nullptr) {
+		throw std::runtime_error("Upgrade category \"" + this->get_identifier() + "\" has no start age.");
+	}
+}
+
+void upgrade_category::set_category(upgrade_category *category)
+{
+	if (category == this->get_category()) {
+		return;
+	}
+
+	if (this->category != nullptr) {
+		this->category->remove_subcategory(this);
+	}
+
+	this->category = category;
+
+	if (category != nullptr) {
+		this->category->add_subcategory(this);
+	}
+}
+
+void upgrade_category::remove_subcategory(upgrade_category *subcategory)
+{
+	vector::remove(this->subcategories, subcategory);
+}
+
+void upgrade_category::remove_upgrade_class(const upgrade_class *upgrade_class)
+{
+	vector::remove(this->upgrade_classes, upgrade_class);
 }
 
 }

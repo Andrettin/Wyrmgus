@@ -42,7 +42,7 @@ class upgrade_class final : public named_data_entry, public data_type<upgrade_cl
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::upgrade_category* category MEMBER category)
+	Q_PROPERTY(wyrmgus::upgrade_category* category MEMBER category WRITE set_category)
 	Q_PROPERTY(wyrmgus::age* age MEMBER age)
 
 public:
@@ -73,8 +73,9 @@ public:
 	}
 
 	const upgrade_category *get_category(const upgrade_category_rank rank) const;
+	void set_category(upgrade_category *category);
 
-	const age *get_age() const
+	const wyrmgus::age *get_age() const
 	{
 		return this->age;
 	}
@@ -106,7 +107,7 @@ public:
 private:
 	int index = -1;
 	upgrade_category *category = nullptr;
-	age *age = nullptr;
+	wyrmgus::age *age = nullptr;
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;
 	std::vector<CUpgrade *> upgrades;
