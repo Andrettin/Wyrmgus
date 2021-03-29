@@ -39,7 +39,7 @@ class age final : public named_data_entry, public data_type<age>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon)
-	Q_PROPERTY(int priority MEMBER priority)
+	Q_PROPERTY(int priority MEMBER priority READ get_priority)
 
 public:
 	static constexpr const char *class_identifier = "age";
@@ -61,6 +61,11 @@ public:
 	resource_icon *get_icon() const
 	{
 		return this->icon;
+	}
+
+	int get_priority() const
+	{
+		return this->priority;
 	}
 
 	const std::unique_ptr<condition> &get_preconditions() const

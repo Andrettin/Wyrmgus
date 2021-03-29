@@ -37,6 +37,7 @@
 #include "action/action_upgradeto.h"
 #include "ai/ai_local.h"
 //Wyrmgus end
+#include "age.h"
 #include "civilization.h"
 #include "commands.h"
 #include "config.h"
@@ -203,6 +204,10 @@ void CUpgrade::sort_encyclopedia_entries(std::vector<CUpgrade *> &entries)
 
 					return lhs_category->get_name() < rhs_category->get_name();
 				}
+			}
+
+			if (lhs_class->get_age() != rhs_class->get_age() && lhs_class->get_age()->get_priority() != rhs_class->get_age()->get_priority()) {
+				return lhs_class->get_age()->get_priority() < rhs_class->get_age()->get_priority();
 			}
 		}
 

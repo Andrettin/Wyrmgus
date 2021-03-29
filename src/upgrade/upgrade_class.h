@@ -33,6 +33,7 @@ class CUpgrade;
 
 namespace wyrmgus {
 
+class age;
 class condition;
 class upgrade_category;
 enum class upgrade_category_rank;
@@ -42,6 +43,7 @@ class upgrade_class final : public named_data_entry, public data_type<upgrade_cl
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::upgrade_category* category MEMBER category)
+	Q_PROPERTY(wyrmgus::age* age MEMBER age)
 
 public:
 	static constexpr const char *class_identifier = "upgrade_class";
@@ -72,6 +74,11 @@ public:
 
 	const upgrade_category *get_category(const upgrade_category_rank rank) const;
 
+	const age *get_age() const
+	{
+		return this->age;
+	}
+
 	const std::unique_ptr<condition> &get_preconditions() const
 	{
 		return this->preconditions;
@@ -99,6 +106,7 @@ public:
 private:
 	int index = -1;
 	upgrade_category *category = nullptr;
+	age *age = nullptr;
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;
 	std::vector<CUpgrade *> upgrades;

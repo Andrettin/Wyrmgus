@@ -63,6 +63,10 @@ void upgrade_class::check() const
 		throw std::runtime_error("Upgrade class \"" + this->get_identifier() + "\" has no category.");
 	}
 
+	if (this->get_age() == nullptr) {
+		throw std::runtime_error("Upgrade class \"" + this->get_identifier() + "\" has no age.");
+	}
+
 	if (this->get_preconditions() != nullptr) {
 		this->get_preconditions()->check_validity();
 	}
