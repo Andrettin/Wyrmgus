@@ -192,7 +192,7 @@ void CUpgrade::sort_encyclopedia_entries(std::vector<CUpgrade *> &entries)
 				return lhs_class != nullptr;
 			}
 
-			for (int i = static_cast<int>(upgrade_category_rank::none) + 1; i < static_cast<int>(upgrade_category_rank::count); ++i) {
+			for (int i = static_cast<int>(upgrade_category_rank::count) - 1; i > static_cast<int>(upgrade_category_rank::none); --i) {
 				const upgrade_category_rank rank = static_cast<upgrade_category_rank>(i);
 
 				const wyrmgus::upgrade_category *lhs_category = lhs_class->get_category(rank);
