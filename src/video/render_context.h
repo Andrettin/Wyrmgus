@@ -61,8 +61,12 @@ public:
 		}
 	}
 
+	void set_free_texture_commands(std::vector<std::function<void()>> &&commands);
+	void free_textures();
+
 private:
 	std::vector<std::function<void(renderer *)>> commands;
+	std::vector<std::function<void()>> free_texture_commands;
 	std::mutex mutex;
 };
 

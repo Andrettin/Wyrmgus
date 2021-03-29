@@ -30,6 +30,8 @@
 
 #include "video/frame_buffer_object.h"
 
+#include <QOpenGLTexture>
+
 namespace wyrmgus {
 
 void render_context::set_commands(std::vector<std::function<void(renderer *)>> &&commands)
@@ -40,6 +42,21 @@ void render_context::set_commands(std::vector<std::function<void(renderer *)>> &
 	}
 
 	frame_buffer_object::request_update();
+}
+
+void render_context::set_free_texture_commands(std::vector<std::function<void()>> &&commands)
+{
+	std::lock_guard<std::mutex> lock(this->mutex);
+	this->free_texture_commands = std::move(commands);
+}
+
+void render_context::free_textures()
+{
+	std::lock_guard<std::mutex> lock(this->mutex);
+	for (const std::function<void()> &command : this->free_texture_commands) {
+		command();
+	}
+	this->free_texture_commands.clear();
 }
 
 }

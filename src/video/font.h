@@ -81,7 +81,7 @@ public:
 	template<bool CLIP>
 	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands) const;
 
-	void free_textures(std::vector<std::function<void(renderer *)>> &render_commands);
+	void free_textures(std::vector<std::function<void()>> &render_commands);
 
 private:
 	void make_font_color_texture(const font_color *fc);

@@ -37,14 +37,18 @@ class frame_buffer_object;
 class renderer final : public QQuickFramebufferObject::Renderer
 {
 public:
-    explicit renderer(const frame_buffer_object *fbo) : fbo(fbo)
-    {
-        this->blitter.create();
-    }
+	explicit renderer(const frame_buffer_object *fbo) : fbo(fbo)
+	{
+		this->blitter.create();
+	}
 
-    virtual QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) override;
+	~renderer();
 
-    virtual void render() override;
+	virtual QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) override;
+
+	virtual void render() override;
+
+	void clean_up();
 
 	QSizeF get_target_sizef() const;
 
@@ -65,7 +69,7 @@ public:
 	}
 
 	void init_opengl()
-    {
+	{
 		const QSizeF target_sizef = this->get_target_sizef();
 		const QSize target_size = target_sizef.toSize();
 
@@ -262,8 +266,8 @@ public:
 	}
 
 private:
-    const frame_buffer_object *fbo = nullptr;
-    QOpenGLTextureBlitter blitter;
+	const frame_buffer_object *fbo = nullptr;
+	QOpenGLTextureBlitter blitter;
 };
 
 }
