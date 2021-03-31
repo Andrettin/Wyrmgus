@@ -207,6 +207,16 @@ QVariantList engine_interface::get_item_encyclopedia_entries() const
 	return container::to_qvariant_list(unit_type::get_item_encyclopedia_entries());
 }
 
+QVariantList engine_interface::get_magic_prefix_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(CUpgrade::get_magic_prefix_encyclopedia_entries());
+}
+
+QVariantList engine_interface::get_magic_suffix_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(CUpgrade::get_magic_suffix_encyclopedia_entries());
+}
+
 QVariantList engine_interface::get_technology_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(CUpgrade::get_technology_encyclopedia_entries());

@@ -181,6 +181,8 @@ public:
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_deity_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_item_encyclopedia_entries() const;
+	Q_INVOKABLE QVariantList get_magic_prefix_encyclopedia_entries() const;
+	Q_INVOKABLE QVariantList get_magic_suffix_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_technology_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_unique_item_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_unit_encyclopedia_entries() const;

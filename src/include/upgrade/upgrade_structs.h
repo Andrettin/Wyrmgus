@@ -310,6 +310,40 @@ public:
 
 	static void sort_encyclopedia_entries(std::vector<CUpgrade *> &entries);
 
+	static std::vector<CUpgrade *> get_magic_prefix_encyclopedia_entries()
+	{
+		std::vector<CUpgrade *> entries;
+
+		for (CUpgrade *upgrade : CUpgrade::get_all()) {
+			if (upgrade->is_magic_prefix()) {
+				entries.push_back(upgrade);
+			}
+		}
+
+		std::sort(entries.begin(), entries.end(), [](const CUpgrade *lhs, const CUpgrade *rhs) {
+			return lhs->get_name() < rhs->get_name();
+		});
+
+		return entries;
+	}
+
+	static std::vector<CUpgrade *> get_magic_suffix_encyclopedia_entries()
+	{
+		std::vector<CUpgrade *> entries;
+
+		for (CUpgrade *upgrade : CUpgrade::get_all()) {
+			if (upgrade->is_magic_suffix()) {
+				entries.push_back(upgrade);
+			}
+		}
+
+		std::sort(entries.begin(), entries.end(), [](const CUpgrade *lhs, const CUpgrade *rhs) {
+			return lhs->get_name() < rhs->get_name();
+		});
+
+		return entries;
+	}
+
 	static std::vector<CUpgrade *> get_technology_encyclopedia_entries()
 	{
 		std::vector<CUpgrade *> entries;
