@@ -155,80 +155,78 @@ gender CUnitStats::get_gender() const
 	return static_cast<gender>(this->Variables[GENDER_INDEX].Value);
 }
 
-void CUpgrade::sort_encyclopedia_entries(std::vector<CUpgrade *> &entries)
+bool CUpgrade::compare_encyclopedia_entries(const CUpgrade *lhs, const CUpgrade *rhs)
 {
-	std::sort(entries.begin(), entries.end(), [](const CUpgrade *lhs, const CUpgrade *rhs) {
-		const wyrmgus::civilization *lhs_civilization = lhs->get_civilization();
-		if (lhs_civilization == defines::get()->get_neutral_civilization()) {
-			lhs_civilization = nullptr;
+	const wyrmgus::civilization *lhs_civilization = lhs->get_civilization();
+	if (lhs_civilization == defines::get()->get_neutral_civilization()) {
+		lhs_civilization = nullptr;
+	}
+
+	const wyrmgus::civilization *rhs_civilization = rhs->get_civilization();
+	if (rhs_civilization == defines::get()->get_neutral_civilization()) {
+		rhs_civilization = nullptr;
+	}
+
+	if (lhs_civilization != rhs_civilization) {
+		if (lhs_civilization == nullptr || rhs_civilization == nullptr) {
+			return lhs_civilization == nullptr;
 		}
 
-		const wyrmgus::civilization *rhs_civilization = rhs->get_civilization();
-		if (rhs_civilization == defines::get()->get_neutral_civilization()) {
-			rhs_civilization = nullptr;
+		return lhs_civilization->get_name() < rhs_civilization->get_name();
+	}
+
+	if (lhs->get_faction() != rhs->get_faction()) {
+		if (lhs->get_faction() == nullptr || rhs->get_faction() == nullptr) {
+			return lhs->get_faction() == nullptr;
 		}
 
-		if (lhs_civilization != rhs_civilization) {
-			if (lhs_civilization == nullptr || rhs_civilization == nullptr) {
-				return lhs_civilization == nullptr;
-			}
+		return lhs->get_faction()->get_name() < rhs->get_faction()->get_name();
+	}
 
-			return lhs_civilization->get_name() < rhs_civilization->get_name();
+	const wyrmgus::upgrade_class *lhs_class = lhs->get_upgrade_class();
+	const wyrmgus::upgrade_class *rhs_class = rhs->get_upgrade_class();
+
+	if (lhs_class != rhs_class) {
+		if (lhs_class == nullptr || rhs_class == nullptr) {
+			return lhs_class != nullptr;
 		}
 
-		if (lhs->get_faction() != rhs->get_faction()) {
-			if (lhs->get_faction() == nullptr || rhs->get_faction() == nullptr) {
-				return lhs->get_faction() == nullptr;
-			}
+		for (int i = static_cast<int>(upgrade_category_rank::count) - 1; i > static_cast<int>(upgrade_category_rank::none); --i) {
+			const upgrade_category_rank rank = static_cast<upgrade_category_rank>(i);
 
-			return lhs->get_faction()->get_name() < rhs->get_faction()->get_name();
-		}
-
-		const wyrmgus::upgrade_class *lhs_class = lhs->get_upgrade_class();
-		const wyrmgus::upgrade_class *rhs_class = rhs->get_upgrade_class();
-
-		if (lhs_class != rhs_class) {
-			if (lhs_class == nullptr || rhs_class == nullptr) {
-				return lhs_class != nullptr;
-			}
-
-			for (int i = static_cast<int>(upgrade_category_rank::count) - 1; i > static_cast<int>(upgrade_category_rank::none); --i) {
-				const upgrade_category_rank rank = static_cast<upgrade_category_rank>(i);
-
-				const wyrmgus::upgrade_category *lhs_category = lhs_class->get_category(rank);
-				const wyrmgus::upgrade_category *rhs_category = rhs_class->get_category(rank);
-				if (lhs_category != rhs_category) {
-					if (lhs_category == nullptr || rhs_category == nullptr) {
-						return lhs_category != nullptr;
-					}
-
-					if (lhs_category->get_start_age() != rhs_category->get_start_age() && lhs_category->get_start_age()->get_priority() != rhs_category->get_start_age()->get_priority()) {
-						return lhs_category->get_start_age()->get_priority() < rhs_category->get_start_age()->get_priority();
-					}
-
-					return lhs_category->get_name() < rhs_category->get_name();
+			const wyrmgus::upgrade_category *lhs_category = lhs_class->get_category(rank);
+			const wyrmgus::upgrade_category *rhs_category = rhs_class->get_category(rank);
+			if (lhs_category != rhs_category) {
+				if (lhs_category == nullptr || rhs_category == nullptr) {
+					return lhs_category != nullptr;
 				}
-			}
 
-			if (lhs_class->get_age() != rhs_class->get_age() && lhs_class->get_age()->get_priority() != rhs_class->get_age()->get_priority()) {
-				return lhs_class->get_age()->get_priority() < rhs_class->get_age()->get_priority();
+				if (lhs_category->get_start_age() != rhs_category->get_start_age() && lhs_category->get_start_age()->get_priority() != rhs_category->get_start_age()->get_priority()) {
+					return lhs_category->get_start_age()->get_priority() < rhs_category->get_start_age()->get_priority();
+				}
+
+				return lhs_category->get_name() < rhs_category->get_name();
 			}
 		}
 
-		if (lhs->get_item() != rhs->get_item()) {
-			if (lhs->get_item() == nullptr || rhs->get_item() == nullptr) {
-				return lhs->get_item() != nullptr;
-			}
+		if (lhs_class->get_age() != rhs_class->get_age() && lhs_class->get_age()->get_priority() != rhs_class->get_age()->get_priority()) {
+			return lhs_class->get_age()->get_priority() < rhs_class->get_age()->get_priority();
+		}
+	}
 
-			return unit_type::compare_encyclopedia_entries(lhs->get_item(), rhs->get_item());
+	if (lhs->get_item() != rhs->get_item()) {
+		if (lhs->get_item() == nullptr || rhs->get_item() == nullptr) {
+			return lhs->get_item() != nullptr;
 		}
 
-		if (lhs->get_price() != rhs->get_price()) {
-			return lhs->get_price() < rhs->get_price();
-		}
+		return unit_type::compare_encyclopedia_entries(lhs->get_item(), rhs->get_item());
+	}
 
-		return lhs->get_name() < rhs->get_name();
-	});
+	if (lhs->get_price() != rhs->get_price()) {
+		return lhs->get_price() < rhs->get_price();
+	}
+
+	return lhs->get_name() < rhs->get_name();
 }
 
 CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifier), Work(wyrmgus::item_class::none)

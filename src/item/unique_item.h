@@ -58,7 +58,7 @@ public:
 	static constexpr const char *class_identifier = "unique_item";
 	static constexpr const char *database_folder = "unique_items";
 
-	static void sort_encyclopedia_entries(std::vector<unique_item *> &entries);
+	static bool compare_encyclopedia_entries(const unique_item *lhs, const unique_item *rhs);
 
 	explicit unique_item(const std::string &identifier) : detailed_data_entry(identifier)
 	{

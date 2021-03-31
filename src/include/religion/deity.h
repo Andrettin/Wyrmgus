@@ -71,7 +71,7 @@ public:
 
 	static deity *add(const std::string &identifier, const wyrmgus::data_module *data_module);
 
-	static void sort_encyclopedia_entries(std::vector<deity *> &entries);
+	static bool compare_encyclopedia_entries(const deity *lhs, const deity *rhs);
 
 	explicit deity(const std::string &identifier);
 	

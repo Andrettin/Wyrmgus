@@ -118,7 +118,7 @@ public:
 
 	static void clear();
 
-	static void sort_encyclopedia_entries(std::vector<character *> &entries);
+	static bool compare_encyclopedia_entries(const character *lhs, const character *rhs);
 
 	explicit character(const std::string &identifier);
 	~character();

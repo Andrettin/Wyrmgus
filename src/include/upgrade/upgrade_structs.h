@@ -308,7 +308,7 @@ public:
 		return upgrade;
 	}
 
-	static void sort_encyclopedia_entries(std::vector<CUpgrade *> &entries);
+	static bool compare_encyclopedia_entries(const CUpgrade *lhs, const CUpgrade *rhs);
 
 	static std::vector<CUpgrade *> get_magic_prefix_encyclopedia_entries()
 	{

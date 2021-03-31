@@ -802,7 +802,6 @@ public:
 	static bool compare_item_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs);
 	static bool compare_unit_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs);
 	static bool compare_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs);
-	static void sort_encyclopedia_entries(std::vector<unit_type *> &entries);
 
 	static std::vector<unit_type *> get_unit_encyclopedia_entries()
 	{

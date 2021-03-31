@@ -315,7 +315,12 @@ public:
 
 	static void sort_encyclopedia_entries(std::vector<T *> &entries)
 	{
-		Q_UNUSED(entries)
+		std::sort(entries.begin(), entries.end(), T::compare_encyclopedia_entries);
+	}
+
+	static bool compare_encyclopedia_entries(const T *lhs, const T *rhs)
+	{
+		return lhs < rhs;
 	}
 
 private:

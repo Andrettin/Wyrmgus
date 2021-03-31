@@ -643,11 +643,6 @@ bool unit_type::compare_encyclopedia_entries(const unit_type *lhs, const unit_ty
 	}
 }
 
-void unit_type::sort_encyclopedia_entries(std::vector<unit_type *> &entries)
-{
-	std::sort(entries.begin(), entries.end(), unit_type::compare_encyclopedia_entries);
-}
-
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
 	//Wyrmgus start
 	item_class(item_class::none),
