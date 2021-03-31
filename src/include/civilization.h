@@ -89,6 +89,11 @@ public:
 		return civilization;
 	}
 
+	static bool compare_encyclopedia_entries(const civilization *lhs, const civilization *rhs)
+	{
+		return lhs->get_name() < rhs->get_name();
+	}
+
 	explicit civilization(const std::string &identifier);
 	virtual ~civilization() override;
 

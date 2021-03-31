@@ -29,6 +29,7 @@
 #include "engine_interface.h"
 
 #include "character.h"
+#include "civilization.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "editor.h"
@@ -195,6 +196,11 @@ QVariantList engine_interface::get_building_encyclopedia_entries() const
 QVariantList engine_interface::get_character_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(character::get_encyclopedia_entries());
+}
+
+QVariantList engine_interface::get_civilization_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(civilization::get_encyclopedia_entries());
 }
 
 QVariantList engine_interface::get_deity_encyclopedia_entries() const
