@@ -102,6 +102,15 @@ public:
 	virtual void initialize() override;
 	virtual void check() const override;
 
+	virtual bool has_encyclopedia_entry() const override
+	{
+		if (!this->is_visible()) {
+			return false;
+		}
+
+		return detailed_data_entry::has_encyclopedia_entry();
+	}
+
 	civilization *get_parent_civilization() const
 	{
 		return this->parent_civilization;
