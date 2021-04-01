@@ -4,12 +4,10 @@ public:
 	int Width;
 	int Height;
 	int Depth;
-	bool FullScreen;
 	bool ResizeScreen(int width, int height);
 };
 
 CVideo Video;
-void ToggleFullScreen(void);
 
 class CColor {
 	CColor(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0,

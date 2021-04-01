@@ -65,22 +65,16 @@ void parameters::process()
 		},
 		{ { "d", "data-path" }, "Specify a custom data path.", "data path" },
 		{ { "t", "test-run" }, "Check startup and exit (data files must respect this flag)." },
-		{ { "F", "full-screen" }, "Full screen video mode." },
 		{ { "G", "game-options" }, "Game options passed to game scripts", "game options" },
 		{ { "I", "ip-address" }, "Network address to use", "address" },
 		{ { "l", "no-command-log" }, "Disable command log." },
 		{ { "N", "player-name" }, "Name of the player.", "name" },
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		{ { "o", "no-opengl" }, "Do not use OpenGL or OpenGL ES 1.1." }, // FIXME Not implemented
-		{ { "O", "opengl" }, "Use OpenGL or OpenGL ES 1.1." }, // FIXME Not implemented
-#endif
 		{ { "p", "print-debug" }, "Enables debug messages printing in console." },
 		{ { "P", "port" }, "Network port to use.", "port" },
 		{ { "s", "sleep" }, "Number of frames for the AI to sleep before it starts.", "frames" },
 		{ { "S", "sync-rate" }, "Sync speed (100 = 30 frames/s).", "speed" },
 		{ { "u", "user-path" }, "Path where wyrmgus saves preferences, log and savegame", "path" },
 		{ { "m", "video-mode" }, "Video mode resolution in format <xres>x<yres>.", "mode" },
-		{ { "W", "windowed" }, "Windowed video mode." },
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		{
 			{ "x", "scaling-mode" },
@@ -130,16 +124,6 @@ void parameters::process()
 	option = "E";
 	if (cmd_parser.isSet(option)) {
 		this->luaEditorStartFilename = cmd_parser.value(option).toStdString();
-	}
-
-	if (cmd_parser.isSet("F")) {
-		if (cmd_parser.isSet("W")) {
-			throw std::runtime_error(
-					app_name +
-					": \"windowed\" and \"full-screen\" is mutual exclusive options.");
-		}
-		VideoForceFullScreen = 1;
-		Video.FullScreen = 1;
 	}
 
 	option = "G";
@@ -208,24 +192,15 @@ void parameters::process()
 		Video.Width = vmode_match.captured(1).toInt();
 		Video.Height = vmode_match.captured(2).toInt();
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (ZoomNoResize) {
 			set_retroscale();
 		}
-#endif
 	}
 
-	if (cmd_parser.isSet("W")) {
-		VideoForceFullScreen = 1;
-		Video.FullScreen = 0;
-	}
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (cmd_parser.isSet("Z")) {
 		ZoomNoResize = 1;
 		set_retroscale();
 	}
-#endif
 
 	const auto pos_args { cmd_parser.positionalArguments() };
 

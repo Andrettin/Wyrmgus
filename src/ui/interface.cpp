@@ -805,17 +805,6 @@ static bool CommandKey(int key)
 			UiCenterOnSelected();
 			break;
 
-		case 'f': // ALT+F, CTRL+F toggle fullscreen
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			ToggleFullScreen();
-			//Wyrmgus start
-			CclCommand("wyr.preferences.VideoFullScreen = Video.FullScreen;");
-			//Wyrmgus end
-			SavePreferences();
-			break;
-
 		case 'g': // ALT+G, CTRL+G grab mouse pointer
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;

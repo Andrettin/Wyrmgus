@@ -76,9 +76,6 @@ void preferences::save() const
 	if (this->get_selected_campaign() != nullptr) {
 		data.add_property("selected_campaign", this->get_selected_campaign()->get_identifier());
 	}
-	if (this->is_fullscreen()) {
-		data.add_property("fullscreen", string::from_bool(this->is_fullscreen()));
-	}
 
 	try {
 		data.print_to_file(preferences_path);

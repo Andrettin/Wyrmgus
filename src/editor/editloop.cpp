@@ -1830,13 +1830,6 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		}
 	}
 	switch (key) {
-		case 'f': // ALT+F, CTRL+F toggle fullscreen
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			ToggleFullScreen();
-			break;
-
 		case 'v': // 'v' Viewport
 			if (KeyModifiers & ModifierControl) {
 				CycleViewportMode(-1);

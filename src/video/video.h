@@ -475,8 +475,6 @@ struct EventCallback
 class CVideo
 {
 public:
-	CVideo() : Width(0), Height(0), Depth(0), FullScreen(false) {}
-
 	void ClearScreen();
 	bool ResizeScreen(int width, int height);
 
@@ -550,14 +548,13 @@ public:
 
 	static QColor GetRGBA(const uint32_t c);
 
-	int Width;
-	int Height;
+	int Width = 0;
+	int Height = 0;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	int ViewportWidth;         /// Actual width of the window
 	int ViewportHeight;        /// Actual height of the window
 #endif
-	int Depth;
-	bool FullScreen;
+	int Depth = 0;
 };
 
 extern CVideo Video;
@@ -572,9 +569,6 @@ extern CVideo Video;
 extern int VideoSyncSpeed;
 
 extern int SkipFrames;
-
-/// Fullscreen or windowed set from commandline.
-extern char VideoForceFullScreen;
 
 /// Next frame ticks
 extern double NextFrameTicks;
@@ -624,9 +618,6 @@ extern void WaitEventsOneFrame();
 
 /// Poll all sdl events
 extern void PollEvents();
-
-/// Toggle full screen mode
-extern void ToggleFullScreen();
 
 /// Push current clipping.
 extern void PushClipping();

@@ -921,11 +921,3 @@ void ToggleGrabMouse(int mode)
 		SDL_WM_GrabInput(SDL_GRAB_ON);
 	}
 }
-
-/**
-**  Toggle full screen mode.
-*/
-void ToggleFullScreen()
-{
-	Video.FullScreen = !Video.FullScreen;
-}

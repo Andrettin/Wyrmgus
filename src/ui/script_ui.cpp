@@ -241,35 +241,6 @@ static int CclGetVideoResolution(lua_State *l)
 }
 
 /**
-**  Set the video fullscreen mode.
-**
-**  @param l  Lua state.
-*/
-static int CclSetVideoFullScreen(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	if (CclInConfigFile) {
-		// May have been set from the command line
-		if (!VideoForceFullScreen) {
-			Video.FullScreen = LuaToBoolean(l, 1);
-		}
-	}
-	return 0;
-}
-
-/**
-**  Get the video fullscreen mode.
-**
-**  @param l  Lua state.
-*/
-static int CclGetVideoFullScreen(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushboolean(l, Video.FullScreen);
-	return 1;
-}
-
-/**
 **  Default title screens.
 **
 **  @param l  Lua state.
@@ -1283,8 +1254,6 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "SetZoomNoResize", CclSetZoomNoResize);
 	lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
 	lua_register(Lua, "GetVideoResolution", CclGetVideoResolution);
-	lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);
-	lua_register(Lua, "GetVideoFullScreen", CclGetVideoFullScreen);
 
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
 
