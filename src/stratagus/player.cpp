@@ -4241,7 +4241,7 @@ bool CPlayer::IsTeamed(const CUnit &unit) const
 */
 bool CPlayer::HasContactWith(const CPlayer &player) const
 {
-	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::get()->MapLayers.size() && this->StartMapLayer < (int) CMap::get()->MapLayers.size() && CMap::get()->MapLayers[player.StartMapLayer]->world == CMap::get()->MapLayers[this->StartMapLayer]->world && CMap::get()->MapLayers[player.StartMapLayer]->plane == CMap::get()->MapLayers[this->StartMapLayer]->plane);
+	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::get()->MapLayers.size() && this->StartMapLayer < (int) CMap::get()->MapLayers.size() && CMap::get()->MapLayers[player.StartMapLayer]->world == CMap::get()->MapLayers[this->StartMapLayer]->world);
 }
 
 /**

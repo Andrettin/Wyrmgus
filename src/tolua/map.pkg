@@ -28,7 +28,7 @@ class CMap
 };
 
 //Wyrmgus start
-extern int GetMapLayer(const std::string plane_ident = "", const std::string world_ident = "");
+extern int GetMapLayer(const std::string world_ident = "");
 extern void ChangeCurrentMapLayer(const int z);
 extern void SetTimeOfDay(const std::string time_of_day_ident, int z = 0);
 extern void SetTimeOfDaySchedule(const std::string time_of_day_schedule_ident, const int z = 0);

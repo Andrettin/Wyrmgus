@@ -64,7 +64,6 @@
 #include "magic_domain.h"
 #include "map/map_projection.h"
 #include "map/map_template.h"
-#include "map/plane.h"
 #include "map/region.h"
 #include "map/site.h"
 #include "map/terrain_feature.h"
@@ -316,8 +315,6 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(string_to_music_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::pantheon*") {
 			new_property_value = QVariant::fromValue(pantheon::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::plane*") {
-			new_property_value = QVariant::fromValue(plane::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::player_color*") {
 			new_property_value = QVariant::fromValue(player_color::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::quest*") {

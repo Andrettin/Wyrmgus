@@ -2346,8 +2346,8 @@ static void UIHandleButtonDown_OnMap()
 					CancelBuildingMode();
 				}
 			} else {
-				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->plane != CMap::get()->MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->plane || UI.CurrentMapLayer->world != CMap::get()->MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->world)) {
-					CPlayer::GetThisPlayer()->Notify("%s", _("Cannot build in another plane or world"));
+				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && UI.CurrentMapLayer->world != CMap::get()->MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->world) {
+					CPlayer::GetThisPlayer()->Notify("%s", _("Cannot build in another world"));
 				}
 				PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 			}

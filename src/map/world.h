@@ -35,7 +35,7 @@ class CProvince;
 
 namespace wyrmgus {
 
-class plane;
+class magic_domain;
 class season_schedule;
 class site;
 class species;
@@ -47,7 +47,6 @@ class world final : public detailed_data_entry, public data_type<world>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane)
 	Q_PROPERTY(wyrmgus::time_of_day_schedule* time_of_day_schedule MEMBER time_of_day_schedule)
 	Q_PROPERTY(wyrmgus::season_schedule* season_schedule MEMBER season_schedule)
 
@@ -62,6 +61,7 @@ public:
 	explicit world(const std::string &identifier);
 	~world();
 
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 
 	void reset_game_data();
@@ -69,11 +69,6 @@ public:
 	world_game_data *get_game_data() const
 	{
 		return this->game_data.get();
-	}
-
-	wyrmgus::plane *get_plane() const
-	{
-		return this->plane;
 	}
 
 	const wyrmgus::time_of_day_schedule *get_time_of_day_schedule() const
@@ -105,13 +100,15 @@ public:
 
 	int ID = -1;
 private:
-	wyrmgus::plane *plane = nullptr;
 	wyrmgus::time_of_day_schedule *time_of_day_schedule = nullptr;		/// this world's time of day schedule
 	wyrmgus::season_schedule *season_schedule = nullptr;				/// this world's season schedule
 public:
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 private:
 	std::vector<const species *> native_species;
+public:
+	std::vector<const magic_domain *> EmpoweredMagicDomains; //magic domains empowered in this world
+private:
 	std::unique_ptr<world_game_data> game_data;
 };
 

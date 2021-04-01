@@ -86,7 +86,6 @@ namespace wyrmgus {
 	class generated_terrain;
 	class landmass;
 	class map_template;
-	class plane;
 	class site;
 	class sml_data;
 	class sml_property;
@@ -293,9 +292,7 @@ public:
 	
 	const world *calculate_pos_world(const QPoint &pos, const int z, const bool include_adjacent) const;
 
-	void SetCurrentPlane(plane *plane);
 	void SetCurrentWorld(world *world);
-	const plane *GetCurrentPlane() const;
 	const world *GetCurrentWorld() const;
 	//Wyrmgus end
 
@@ -516,7 +513,7 @@ extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z);
 extern void PreprocessMap();
 
 //Wyrmgus start
-extern int GetMapLayer(const std::string &plane_ident = "", const std::string &world_ident = "");
+extern int GetMapLayer(const std::string &world_ident = "");
 extern void ChangeToPreviousMapLayer();
 extern void ChangeCurrentMapLayer(const int z);
 extern void SetTimeOfDay(const std::string &time_of_day_ident, int z = 0);

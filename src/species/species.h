@@ -35,7 +35,6 @@ static int CclDefineSpecies(lua_State *l);
 
 namespace wyrmgus {
 
-class plane;
 class taxon;
 class terrain_type;
 class unit_type;
@@ -49,7 +48,6 @@ class species final : public taxon_base, public data_type<species>
 
 	Q_PROPERTY(QString specific_name READ get_specific_name_qstring)
 	Q_PROPERTY(wyrmgus::geological_era era MEMBER era READ get_era)
-	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
 	Q_PROPERTY(wyrmgus::world* homeworld MEMBER homeworld READ get_homeworld)
 	Q_PROPERTY(bool sapient MEMBER sapient READ is_sapient)
 	Q_PROPERTY(bool asexual MEMBER asexual READ is_asexual)
@@ -89,11 +87,6 @@ public:
 	geological_era get_era() const
 	{
 		return this->era;
-	}
-
-	plane *get_home_plane() const
-	{
-		return this->home_plane;
 	}
 
 	world *get_homeworld() const
@@ -144,7 +137,6 @@ public:
 private:
 	std::string specific_name;
 	geological_era era;
-	plane *home_plane = nullptr;
 	world *homeworld = nullptr;
 	bool sapient = false;
 	bool asexual = false;

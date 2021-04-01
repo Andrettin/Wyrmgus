@@ -28,7 +28,6 @@
 
 #include "species/species.h"
 
-#include "map/plane.h"
 #include "map/terrain_type.h"
 #include "map/world.h"
 #include "species/geological_era.h"
@@ -162,10 +161,6 @@ void species::process_sml_scope(const sml_data &scope)
 
 void species::initialize()
 {
-	if (this->get_home_plane() != nullptr) {
-		this->get_home_plane()->add_native_species(this);
-	}
-
 	if (this->get_homeworld() != nullptr) {
 		this->get_homeworld()->add_native_species(this);
 	}

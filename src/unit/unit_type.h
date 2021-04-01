@@ -64,7 +64,6 @@ namespace wyrmgus {
 	class icon;
 	class missile_type;
 	class name_generator;
-	class plane;
 	class player_color;
 	class renderer;
 	class resource;

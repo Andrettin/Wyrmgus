@@ -37,7 +37,6 @@ static int CclDefineTerrainFeature(lua_State *l);
 namespace wyrmgus {
 
 class civilization;
-class plane;
 class terrain_type;
 class world;
 

@@ -42,7 +42,6 @@
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "map/plane.h"
 #include "map/terrain_type.h"
 #include "map/world.h"
 //Wyrmgus start
@@ -3366,10 +3365,6 @@ static int CclDefineSpecies(lua_State *l)
 			species->supertaxon = genus;
 		} else if (!strcmp(value, "Species")) {
 			species->specific_name = LuaToString(l, -1);
-		} else if (!strcmp(value, "HomePlane")) {
-			const std::string plane_ident = LuaToString(l, -1);
-			wyrmgus::plane *plane = wyrmgus::plane::get(plane_ident);
-			species->home_plane = plane;
 		} else if (!strcmp(value, "Homeworld")) {
 			const std::string world_ident = LuaToString(l, -1);
 			wyrmgus::world *world = wyrmgus::world::get(world_ident);
@@ -3463,13 +3458,6 @@ static int CclGetSpeciesData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Prehistoric")) {
 		lua_pushboolean(l, species->is_prehistoric());
-		return 1;
-	} else if (!strcmp(data, "HomePlane")) {
-		if (species->get_home_plane() != nullptr) {
-			lua_pushstring(l, species->get_home_plane()->get_identifier().c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
 		return 1;
 	} else if (!strcmp(data, "Homeworld")) {
 		if (species->get_homeworld() != nullptr) {

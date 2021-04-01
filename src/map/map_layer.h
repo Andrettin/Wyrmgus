@@ -36,7 +36,6 @@ struct lua_State;
 static int CclStratagusMap(lua_State *l);
 
 namespace wyrmgus {
-	class plane;
 	class player_color;
 	class scheduled_season;
 	class scheduled_time_of_day;
@@ -228,7 +227,6 @@ private:
 	const wyrmgus::season_schedule *season_schedule = nullptr;	/// the season schedule for the map layer
 public:
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
-	const wyrmgus::plane *plane = nullptr;			/// the plane pointer (if any) for the map layer
 	const wyrmgus::world *world = nullptr;			/// the world pointer (if any) for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
 	wyrmgus::map_template_map<QRect> subtemplate_areas;

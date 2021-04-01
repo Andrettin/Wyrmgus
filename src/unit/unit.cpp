@@ -57,12 +57,12 @@
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "map/plane.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
+#include "map/world.h"
 #include "missile.h"
 #include "name_generator.h"
 #include "network.h"
@@ -6640,12 +6640,12 @@ bool CUnit::LevelCheck(const int level) const
 
 bool CUnit::is_spell_empowered(const wyrmgus::spell *spell) const
 {
-	const wyrmgus::plane *plane = this->MapLayer->plane;
+	const wyrmgus::world *world = this->MapLayer->world;
 
-	if (plane != nullptr) {
-		if (!plane->EmpoweredMagicDomains.empty()) {
-			for (const wyrmgus::magic_domain *magic_domain : spell->get_magic_domains()) {
-				if (wyrmgus::vector::contains(plane->EmpoweredMagicDomains, magic_domain)) {
+	if (world != nullptr) {
+		if (!world->EmpoweredMagicDomains.empty()) {
+			for (const magic_domain *magic_domain : spell->get_magic_domains()) {
+				if (vector::contains(world->EmpoweredMagicDomains, magic_domain)) {
 					return true;
 				}
 			}

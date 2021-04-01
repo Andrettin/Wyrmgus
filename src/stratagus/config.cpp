@@ -35,7 +35,6 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map_template.h"
-#include "map/plane.h"
 #include "map/site.h"
 #include "missile.h"
 #include "quest/campaign.h"
@@ -238,11 +237,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			wyrmgus::missile_type *missile_type = wyrmgus::missile_type::get_or_add(ident, nullptr);
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "plane") {
-			wyrmgus::plane *plane = wyrmgus::plane::get_or_add(ident, nullptr);
-			if (!define_only) {
-				plane->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "site") {
 			wyrmgus::site *site = wyrmgus::site::get_or_add(ident, nullptr);

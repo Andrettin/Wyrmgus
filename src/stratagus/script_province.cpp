@@ -33,7 +33,6 @@
 #include "civilization.h"
 #include "faction.h"
 #include "iolib.h"
-#include "map/plane.h"
 #include "map/region.h"
 #include "map/world.h"
 #include "player.h"
@@ -483,65 +482,6 @@ static int CclDefineWorldMapTile(lua_State *l)
 }
 
 /**
-**  Get plane data.
-**
-**  @param l  Lua state.
-*/
-static int CclGetPlaneData(lua_State *l)
-{
-	if (lua_gettop(l) < 2) {
-		LuaError(l, "incorrect argument");
-	}
-	std::string plane_ident = LuaToString(l, 1);
-	const wyrmgus::plane *plane = wyrmgus::plane::get(plane_ident);
-	const char *data = LuaToString(l, 2);
-
-	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, plane->get_name().c_str());
-		return 1;
-	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, plane->get_description().c_str());
-		return 1;
-	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, plane->get_background().c_str());
-		return 1;
-	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, plane->get_quote().c_str());
-		return 1;
-	} else if (!strcmp(data, "NativeSpecies")) {
-		lua_createtable(l, plane->get_native_species().size(), 0);
-		for (size_t i = 1; i <= plane->get_native_species().size(); ++i)
-		{
-			lua_pushstring(l, plane->get_native_species()[i-1]->get_identifier().c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else if (!strcmp(data, "NativeSapientSpeciesNames")) {
-		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(plane->get_native_sapient_species());
-		lua_createtable(l, species_names.size(), 0);
-		for (size_t i = 1; i <= species_names.size(); ++i)
-		{
-			lua_pushstring(l, species_names[i - 1].c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else if (!strcmp(data, "NativeFaunaSpeciesNames")) {
-		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(plane->get_native_fauna_species());
-		lua_createtable(l, species_names.size(), 0);
-		for (size_t i = 1; i <= species_names.size(); ++i)
-		{
-			lua_pushstring(l, species_names[i - 1].c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else {
-		LuaError(l, "Invalid field: %s" _C_ data);
-	}
-
-	return 0;
-}
-
-/**
 **  Get world data.
 **
 **  @param l  Lua state.
@@ -569,13 +509,6 @@ static int CclGetWorldData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
 		lua_pushstring(l, world->get_quote().c_str());
-		return 1;
-	} else if (!strcmp(data, "Plane")) {
-		if (world->get_plane()) {
-			lua_pushstring(l, world->get_plane()->Ident.c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
 		return 1;
 	} else if (!strcmp(data, "Provinces")) {
 		lua_createtable(l, world->Provinces.size(), 0);
@@ -658,17 +591,6 @@ static int CclGetProvinceData(lua_State *l)
 	return 0;
 }
 
-static int CclGetPlanes(lua_State *l)
-{
-	lua_createtable(l, wyrmgus::plane::get_all().size(), 0);
-	for (size_t i = 1; i <= wyrmgus::plane::get_all().size(); ++i)
-	{
-		lua_pushstring(l, wyrmgus::plane::get_all()[i-1]->Ident.c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
 static int CclGetWorlds(lua_State *l)
 {
 	lua_createtable(l, wyrmgus::world::get_all().size(), 0);
@@ -701,10 +623,8 @@ void ProvinceCclRegister()
 	lua_register(Lua, "DefineWorldMapTerrainType", CclDefineWorldMapTerrainType);
 	lua_register(Lua, "DefineProvince", CclDefineProvince);
 	lua_register(Lua, "DefineWorldMapTile", CclDefineWorldMapTile);
-	lua_register(Lua, "GetPlaneData", CclGetPlaneData);
 	lua_register(Lua, "GetWorldData", CclGetWorldData);
 	lua_register(Lua, "GetProvinceData", CclGetProvinceData);
-	lua_register(Lua, "GetPlanes", CclGetPlanes);
 	lua_register(Lua, "GetWorlds", CclGetWorlds);
 	lua_register(Lua, "GetProvinces", CclGetProvinces);
 }

@@ -54,8 +54,8 @@
 #include "luacallback.h"
 #include "magic_domain.h"
 #include "map/map.h"
-#include "map/plane.h"
 #include "map/site.h"
+#include "map/world.h"
 #include "player_color.h"
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"
@@ -1861,9 +1861,9 @@ static int CclDefineDeity(lua_State *l)
 			deity->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
 			deity->set_quote(LuaToString(l, -1));
-		} else if (!strcmp(value, "HomePlane")) {
-			wyrmgus::plane *plane = wyrmgus::plane::get(LuaToString(l, -1));
-			deity->home_plane = plane;
+		} else if (!strcmp(value, "Homeworld")) {
+			wyrmgus::world *world = wyrmgus::world::get(LuaToString(l, -1));
+			deity->homeworld = world;
 		} else if (!strcmp(value, "DeityUpgrade")) {
 			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
 			deity->set_upgrade(upgrade);
@@ -2913,9 +2913,9 @@ static int CclGetDeityData(lua_State *l)
 	} else if (!strcmp(data, "Major")) {
 		lua_pushboolean(l, deity->is_major());
 		return 1;
-	} else if (!strcmp(data, "HomePlane")) {
-		if (deity->get_home_plane()) {
-			lua_pushstring(l, deity->get_home_plane()->get_identifier().c_str());
+	} else if (!strcmp(data, "Homeworld")) {
+		if (deity->get_homeworld() != nullptr) {
+			lua_pushstring(l, deity->get_homeworld()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

@@ -29,6 +29,7 @@
 #include "map/world.h"
 
 #include "database/defines.h"
+#include "magic_domain.h"
 #include "map/site.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
@@ -59,6 +60,21 @@ world::~world()
 {
 	for (CProvince *province : this->Provinces) {
 		delete province;
+	}
+}
+
+void world::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "empowered_magic_domains") {
+		for (const std::string &value : values) {
+			const magic_domain *domain = magic_domain::get(value);
+			this->EmpoweredMagicDomains.push_back(domain);
+		}
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 

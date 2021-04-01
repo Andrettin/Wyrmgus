@@ -51,7 +51,6 @@ class historical_location;
 class historical_unit;
 class map_projection;
 class map_template_history;
-class plane;
 class site;
 class terrain_type;
 class tile;
@@ -103,7 +102,6 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QPoint max_subtemplate_pos MEMBER max_subtemplate_pos READ get_max_subtemplate_pos)
 	Q_PROPERTY(wyrmgus::geocoordinate min_subtemplate_geocoordinate MEMBER min_subtemplate_geocoordinate)
 	Q_PROPERTY(wyrmgus::geocoordinate max_subtemplate_geocoordinate MEMBER max_subtemplate_geocoordinate)
-	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane)
 	Q_PROPERTY(wyrmgus::world* world MEMBER world)
 	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring)
@@ -366,11 +364,6 @@ public:
 
 	//whether a position relative to the map template itself is a usable part of it
 	bool is_pos_usable(const QPoint &pos) const;
-
-	const wyrmgus::plane *get_plane() const
-	{
-		return this->plane;
-	}
 
 	const wyrmgus::world *get_world() const
 	{
@@ -786,7 +779,6 @@ public:
 	std::vector<const map_template *> EastOfTemplates; //map templates to which this one is to the east of
 private:
 	std::vector<const map_template *> dependency_templates; //the other templates on which this one depends on to be applied as a subtemplate, e.g. its adjacent templates, north of templates, etc.
-	wyrmgus::plane *plane = nullptr;
 	wyrmgus::world *world = nullptr;
 	terrain_type *base_terrain_type = nullptr;
 	terrain_type *base_overlay_terrain_type = nullptr;
@@ -805,7 +797,6 @@ public:
 	std::map<std::pair<int, int>, std::tuple<unit_type *, int, unique_item *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, unit_type *, faction *, CDate, CDate, unique_item *>> Units; /// Units; first value is the tile position, and the last ones are start date and end date
 	std::vector<std::tuple<Vec2i, character *, faction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
-	std::vector<std::tuple<Vec2i, unit_type *, wyrmgus::plane *, unique_item *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, unit_type *, wyrmgus::world *, unique_item *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 	std::vector<site *> sites;

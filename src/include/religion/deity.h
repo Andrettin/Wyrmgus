@@ -42,9 +42,9 @@ class faction;
 class icon;
 class magic_domain;
 class pantheon;
-class plane;
 class religion;
 class spell;
+class world;
 enum class gender;
 
 class deity final : public detailed_data_entry, public data_type<deity>
@@ -55,7 +55,7 @@ class deity final : public detailed_data_entry, public data_type<deity>
 	Q_PROPERTY(wyrmgus::icon* icon READ get_icon WRITE set_icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
-	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
+	Q_PROPERTY(wyrmgus::world* homeworld MEMBER homeworld READ get_homeworld)
 	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
 	Q_PROPERTY(wyrmgus::character* mother READ get_mother WRITE set_mother)
 	Q_PROPERTY(CUpgrade* upgrade READ get_upgrade WRITE set_upgrade)
@@ -110,9 +110,9 @@ public:
 		return this->major;
 	}
 
-	plane *get_home_plane() const
+	world *get_homeworld() const
 	{
-		return this->home_plane;
+		return this->homeworld;
 	}
 
 	wyrmgus::character *get_father() const;
@@ -178,7 +178,7 @@ private:
 	wyrmgus::pantheon *pantheon = nullptr;
 	wyrmgus::character *character = nullptr;
 	bool major = false;
-	plane *home_plane = nullptr;
+	world *homeworld = nullptr;
 	CUpgrade *upgrade = nullptr; //the deity's upgrade applied to a player that worships it
 	std::vector<civilization *> civilizations; //civilizations which may worship the deity
 	std::vector<religion *> religions; //religions for which this deity is available

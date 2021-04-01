@@ -47,7 +47,6 @@
 #include "map/map_layer.h"
 #include "map/map_projection.h"
 #include "map/map_template_history.h"
-#include "map/plane.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "map/site_history.h"
@@ -191,9 +190,6 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			this->set_name(value);
 		} else if (key == "circle") {
 			this->circle = string::to_bool(value);
-		} else if (key == "plane") {
-			wyrmgus::plane *plane = plane::get(value);
-			this->plane = plane;
 		} else if (key == "world") {
 			wyrmgus::world *world = world::get(value);
 			this->world = world;
@@ -318,10 +314,6 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 
 void map_template::initialize()
 {
-	if (this->plane == nullptr && this->world != nullptr) {
-		this->plane = this->world->get_plane();
-	}
-
 	if (this->get_subtemplate_top_left_pos().x() == -1 && this->get_subtemplate_top_left_pos().y() == -1 && this->get_subtemplate_center_pos().x() == -1 && this->get_subtemplate_center_pos().y() == -1) {
 		const QPoint subtemplate_offset = size::to_point(this->get_applied_size()) - QPoint(1, 1) / 2;
 		this->subtemplate_top_left_pos = this->get_subtemplate_center_pos() - subtemplate_offset;
@@ -332,9 +324,6 @@ void map_template::initialize()
 			this->get_main_template()->initialize();
 		}
 
-		if (this->get_main_template()->get_plane() != nullptr) {
-			this->plane = this->get_main_template()->plane;
-		}
 		if (this->get_main_template()->get_world() != nullptr) {
 			this->world = this->get_main_template()->world;
 		}
@@ -738,12 +727,10 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		map_layer->ID = CMap::get()->MapLayers.size();
 		CMap::get()->Info.MapWidths.push_back(map_layer->get_width());
 		CMap::get()->Info.MapHeights.push_back(map_layer->get_height());
-		map_layer->plane = this->get_plane();
 		map_layer->world = this->get_world();
 		CMap::get()->MapLayers.push_back(std::move(map_layer));
 	} else {
 		if (!this->IsSubtemplateArea()) {
-			CMap::get()->MapLayers[z]->plane = this->get_plane();
 			CMap::get()->MapLayers[z]->world = this->get_world();
 		}
 	}
@@ -752,8 +739,6 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		if (Editor.Running == EditorNotRunning) {
 			if (this->get_world() != nullptr && this->get_world()->get_season_schedule() != nullptr) {
 				CMap::get()->MapLayers[z]->set_season_schedule(this->get_world()->get_season_schedule());
-			} else if (this->get_world() == nullptr && this->get_plane() != nullptr && this->get_plane()->get_season_schedule() != nullptr) {
-				CMap::get()->MapLayers[z]->set_season_schedule(this->get_plane()->get_season_schedule());
 			} else {
 				CMap::get()->MapLayers[z]->set_season_schedule(defines::get()->get_default_season_schedule());
 			}
@@ -766,8 +751,6 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 			if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
 				if (this->get_world() != nullptr && this->get_world()->get_time_of_day_schedule() != nullptr) {
 					CMap::get()->MapLayers[z]->set_time_of_day_schedule(this->get_world()->get_time_of_day_schedule());
-				} else if (this->get_world() == nullptr && this->get_plane() != nullptr && this->get_plane()->get_time_of_day_schedule() != nullptr) {
-					CMap::get()->MapLayers[z]->set_time_of_day_schedule(this->get_plane()->get_time_of_day_schedule());
 				} else {
 					CMap::get()->MapLayers[z]->set_time_of_day_schedule(defines::get()->get_default_time_of_day_schedule());
 				}
@@ -1705,49 +1688,6 @@ void map_template::apply_population_unit(const unit_class *unit_class, const int
 
 void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
-	for (size_t i = 0; i < this->PlaneConnectors.size(); ++i) {
-		const unit_type *type = std::get<1>(this->PlaneConnectors[i]);
-		Vec2i unit_raw_pos(std::get<0>(this->PlaneConnectors[i]));
-		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
-		Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
-		if (random) {
-			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
-				continue;
-			}
-			unit_pos = CMap::get()->generate_unit_location(type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
-			unit_pos += unit_offset;
-		}
-		if (!CMap::get()->Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
-			continue;
-		}
-		
-		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::get()->Info.IsPointOnMap(unit_pos - unit_offset, z) && CMap::get()->Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
-			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
-		}
-
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, CPlayer::Players[PlayerNumNeutral], z, true);
-		if (std::get<3>(this->PlaneConnectors[i])) {
-			unit->set_unique(std::get<3>(this->PlaneConnectors[i]));
-		}
-		CMap::get()->MapLayers[z]->LayerConnectors.push_back(unit);
-		for (size_t second_z = 0; second_z < CMap::get()->MapLayers.size(); ++second_z) {
-			bool found_other_connector = false;
-			if (CMap::get()->MapLayers[second_z]->plane == std::get<2>(this->PlaneConnectors[i])) {
-				for (size_t j = 0; j < CMap::get()->MapLayers[second_z]->LayerConnectors.size(); ++j) {
-					if (CMap::get()->MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::get()->MapLayers[second_z]->LayerConnectors[j]->get_unique() == unit->get_unique() && CMap::get()->MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
-						CMap::get()->MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
-						unit->ConnectingDestination = CMap::get()->MapLayers[second_z]->LayerConnectors[j];
-						found_other_connector = true;
-						break;
-					}
-				}
-			}
-			if (found_other_connector) {
-				break;
-			}
-		}
-	}
-	
 	for (size_t i = 0; i < this->WorldConnectors.size(); ++i) {
 		const unit_type *type = std::get<1>(this->WorldConnectors[i]);
 		Vec2i unit_raw_pos(std::get<0>(this->WorldConnectors[i]));

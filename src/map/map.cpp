@@ -41,7 +41,6 @@
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/minimap.h"
-#include "map/plane.h"
 #include "map/site.h"
 #include "map/site_container.h"
 #include "map/site_game_data.h"
@@ -899,7 +898,7 @@ const QRect &CMap::get_subtemplate_rect(const wyrmgus::map_template *subtemplate
 
 	const wyrmgus::map_template *main_template = subtemplate->GetTopMapTemplate();
 	if (main_template && subtemplate != main_template) {
-		const int z = GetMapLayer(main_template->get_plane() ? main_template->get_plane()->Ident : "", main_template->get_world() ? main_template->get_world()->get_identifier() : "");
+		const int z = GetMapLayer(main_template->get_world() ? main_template->get_world()->get_identifier() : "");
 		if (z != -1) {
 			return this->MapLayers[z]->get_subtemplate_rect(subtemplate);
 		}
@@ -959,7 +958,7 @@ CMapLayer *CMap::get_subtemplate_map_layer(const wyrmgus::map_template *subtempl
 	
 	const wyrmgus::map_template *main_template = subtemplate->GetTopMapTemplate();
 	if (main_template && subtemplate != main_template) {
-		const int z = GetMapLayer(main_template->get_plane() ? main_template->get_plane()->Ident : "", main_template->get_world() ? main_template->get_world()->get_identifier() : "");
+		const int z = GetMapLayer(main_template->get_world() ? main_template->get_world()->get_identifier() : "");
 		if (z != -1) {
 			if (this->MapLayers[z]->has_subtemplate_area(subtemplate)) {
 				return this->MapLayers[z].get();
@@ -988,7 +987,7 @@ std::vector<CUnit *> CMap::get_map_template_layer_connectors(const wyrmgus::map_
 	const wyrmgus::map_template *main_template = map_template->GetTopMapTemplate();
 	if (main_template) {
 		const bool is_main_template = main_template == map_template;
-		const int z = GetMapLayer(main_template->get_plane() ? main_template->get_plane()->Ident : "", main_template->get_world() ? main_template->get_world()->get_identifier() : "");
+		const int z = GetMapLayer(main_template->get_world() ? main_template->get_world()->get_identifier() : "");
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->LayerConnectors.size(); ++i) {
 				CUnit *connector_unit = this->MapLayers[z]->LayerConnectors[i];
@@ -1128,35 +1127,6 @@ const world *CMap::calculate_pos_world(const QPoint &pos, const int z, const boo
 	return nullptr;
 }
 
-void CMap::SetCurrentPlane(wyrmgus::plane *plane)
-{
-	if (UI.CurrentMapLayer->plane == plane) {
-		return;
-	}
-	
-	int map_layer = -1;
-	
-	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		if (this->MapLayers[z]->plane == plane) {
-			map_layer = z;
-			break;
-		}
-	}
-	
-	if (map_layer == -1) {
-		for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-			if (this->MapLayers[z]->plane == plane) {
-				map_layer = z;
-				break;
-			}
-		}
-	}
-	
-	if (map_layer != -1) {
-		ChangeCurrentMapLayer(map_layer);
-	}
-}
-
 void CMap::SetCurrentWorld(wyrmgus::world *world)
 {
 	if (UI.CurrentMapLayer->world == world) {
@@ -1183,15 +1153,6 @@ void CMap::SetCurrentWorld(wyrmgus::world *world)
 	
 	if (map_layer != -1) {
 		ChangeCurrentMapLayer(map_layer);
-	}
-}
-
-const wyrmgus::plane *CMap::GetCurrentPlane() const
-{
-	if (UI.CurrentMapLayer) {
-		return UI.CurrentMapLayer->plane;
-	} else {
-		return nullptr;
 	}
 }
 
@@ -1382,13 +1343,12 @@ void PreprocessMap()
 }
 
 //Wyrmgus start
-int GetMapLayer(const std::string &plane_ident, const std::string &world_ident)
+int GetMapLayer(const std::string &world_ident)
 {
-	wyrmgus::plane *plane = wyrmgus::plane::try_get(plane_ident);
 	wyrmgus::world *world = wyrmgus::world::try_get(world_ident);
 
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
-		if (CMap::get()->MapLayers[z]->plane == plane && CMap::get()->MapLayers[z]->world == world) {
+		if (CMap::get()->MapLayers[z]->world == world) {
 			return z;
 		}
 	}
@@ -1928,7 +1888,7 @@ void CMap::save(CFile &file) const
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", \"%s\"},\n", this->MapLayers[z]->plane ? this->MapLayers[z]->plane->Ident.c_str() : "", this->MapLayers[z]->world ? this->MapLayers[z]->world->get_identifier().c_str() : "");
+		file.printf("  {\"%s\"},\n", this->MapLayers[z]->world ? this->MapLayers[z]->world->get_identifier().c_str() : "");
 	}
 	file.printf("  },\n");
 	//Wyrmgus end

@@ -581,7 +581,7 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 		return nullptr;
 	}
 	
-	if (unit && z != unit->Player->StartMapLayer && (CMap::get()->MapLayers[z]->plane != CMap::get()->MapLayers[unit->Player->StartMapLayer]->plane || CMap::get()->MapLayers[z]->world != CMap::get()->MapLayers[unit->Player->StartMapLayer]->world)) {
+	if (unit && z != unit->Player->StartMapLayer && CMap::get()->MapLayers[z]->world != CMap::get()->MapLayers[unit->Player->StartMapLayer]->world) {
 		return nullptr;
 	}
 

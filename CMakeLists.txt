@@ -227,7 +227,6 @@ set(map_SRCS
 	src/map/map_template_container.cpp
 	src/map/map_wall.cpp
 	src/map/minimap.cpp
-	src/map/plane.cpp
 	src/map/region.cpp
 	src/map/script_map.cpp
 	src/map/script_tileset.cpp
@@ -766,7 +765,6 @@ set(wyrmgus_map_HDRS
 	src/map/map_template_history.h
 	src/map/minimap.h
 	src/map/minimap_mode.h
-	src/map/plane.h
 	src/map/region.h
 	src/map/site.h
 	src/map/site_container.h

@@ -41,7 +41,6 @@
 #include "map/landmass.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
-#include "map/plane.h"
 #include "map/region.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
@@ -198,8 +197,7 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"layer-references\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						CMap::get()->MapLayers[z]->plane = wyrmgus::plane::try_get(LuaToString(l, -1, 1));
-						CMap::get()->MapLayers[z]->world = wyrmgus::world::try_get(LuaToString(l, -1, 2));
+						CMap::get()->MapLayers[z]->world = wyrmgus::world::try_get(LuaToString(l, -1, 1));
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -820,8 +818,6 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 		std::string realm = LuaToString(l, 4);
 		if (wyrmgus::world::try_get(realm)) {
 			map_template->WorldConnectors.push_back(std::make_tuple(ipos, unittype, wyrmgus::world::get(realm), unique));
-		} else if (wyrmgus::plane::try_get(realm)) {
-			map_template->PlaneConnectors.push_back(std::make_tuple(ipos, unittype, wyrmgus::plane::try_get(realm), unique));
 		} else {
 			LuaError(l, "incorrect argument");
 		}
@@ -1306,13 +1302,9 @@ static int CclDefineMapTemplate(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			map_template->set_name(LuaToString(l, -1));
-		} else if (!strcmp(value, "Plane")) {
-			wyrmgus::plane *plane = wyrmgus::plane::get(LuaToString(l, -1));
-			map_template->plane = plane;
 		} else if (!strcmp(value, "World")) {
-			wyrmgus::world *world = wyrmgus::world::get(LuaToString(l, -1));
+			wyrmgus::world *world = world::get(LuaToString(l, -1));
 			map_template->world = world;
-			map_template->plane = world->get_plane();
 		} else if (!strcmp(value, "TerrainFile")) {
 			map_template->terrain_file = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainFile")) {
