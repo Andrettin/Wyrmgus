@@ -58,6 +58,11 @@ public:
 
 	static world *add(const std::string &identifier, const wyrmgus::data_module *data_module);
 
+	static bool compare_encyclopedia_entries(const world *lhs, const world *rhs)
+	{
+		return lhs->get_name() < rhs->get_name();
+	}
+
 	explicit world(const std::string &identifier);
 	~world();
 

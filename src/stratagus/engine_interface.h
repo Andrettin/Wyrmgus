@@ -187,6 +187,7 @@ public:
 	Q_INVOKABLE QVariantList get_technology_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_unique_item_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_unit_encyclopedia_entries() const;
+	Q_INVOKABLE QVariantList get_world_encyclopedia_entries() const;
 
 signals:
 	void running_changed();
