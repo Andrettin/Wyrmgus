@@ -2680,6 +2680,15 @@ void EditorMainLoop()
 		UI.SelectedViewport = UI.Viewports;
 		TileCursorSize = 1;
 
+		game::get()->set_running(true); //should use something different instead?
+
+		engine_interface::get()->set_waiting_for_interface(true);
+		engine_interface::get()->get_map_view_created_future().wait();
+		engine_interface::get()->reset_map_view_created_promise();
+		engine_interface::get()->set_waiting_for_interface(false);
+
+		engine_interface::get()->set_loading_message("");
+
 		while (Editor.Running) {
 			engine_interface::get()->run_event_loop();
 
@@ -2711,6 +2720,9 @@ void EditorMainLoop()
 
 			WaitEventsOneFrame();
 		}
+
+		game::get()->set_running(false); //should use something different instead?
+
 		CursorBuilding = nullptr;
 		if (!Editor.MapLoaded) {
 			break;
