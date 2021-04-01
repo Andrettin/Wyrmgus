@@ -416,6 +416,9 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 	}
 	
 	for (const Vec2i &tile_pos : changed_tiles) {
+		if (CMap::get()->GetTileTerrain(tile_pos, terrain->is_overlay(), UI.CurrentMapLayer->ID) == terrain) {
+			CMap::get()->calculate_tile_solid_tile(tile_pos, terrain->is_overlay(), UI.CurrentMapLayer->ID);
+		}
 		CMap::get()->CalculateTileTransitions(tile_pos, false, UI.CurrentMapLayer->ID);
 		CMap::get()->CalculateTileTransitions(tile_pos, true, UI.CurrentMapLayer->ID);
 		UI.get_minimap()->UpdateXY(tile_pos, UI.CurrentMapLayer->ID);
