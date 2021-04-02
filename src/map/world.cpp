@@ -38,6 +38,7 @@
 #include "species/species.h"
 #include "ui/ui.h"
 #include "util/geojson_util.h"
+#include "util/string_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -92,6 +93,45 @@ void world::initialize()
 	this->reset_game_data();
 
 	data_entry::initialize();
+}
+
+std::string world::get_encyclopedia_text() const
+{
+	std::string text;
+
+	const std::vector<const species *> sapient_species = this->get_native_sapient_species();
+	if (!sapient_species.empty()) {
+		std::string species_text = "Native Sapients: ";
+		for (size_t i = 0; i < sapient_species.size(); ++i) {
+			if (i > 0) {
+				species_text += ", ";
+			}
+
+			const species *species = sapient_species[i];
+			species_text += string::get_plural_form(species->get_name());
+		}
+
+		detailed_data_entry::concatenate_encyclopedia_text(text, std::move(species_text));
+	}
+
+	const std::vector<const species *> fauna_species = this->get_native_fauna_species();
+	if (!fauna_species.empty()) {
+		std::string species_text = "Native Fauna: ";
+		for (size_t i = 0; i < fauna_species.size(); ++i) {
+			if (i > 0) {
+				species_text += ", ";
+			}
+
+			const species *species = fauna_species[i];
+			species_text += string::get_plural_form(species->get_name());
+		}
+
+		detailed_data_entry::concatenate_encyclopedia_text(text, std::move(species_text));
+	}
+
+	detailed_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
+
+	return text;
 }
 
 void world::reset_game_data()

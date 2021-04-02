@@ -39,8 +39,22 @@ class detailed_data_entry : public named_data_entry
 	Q_PROPERTY(QString description READ get_description_qstring)
 	Q_PROPERTY(QString quote READ get_quote_qstring)
 	Q_PROPERTY(QString background READ get_background_qstring)
+	Q_PROPERTY(QString encyclopedia_text READ get_encyclopedia_text_qstring NOTIFY changed)
 
 public:
+	static void concatenate_encyclopedia_text(std::string &text, std::string &&additional_text)
+	{
+		if (additional_text.empty()) {
+			return;
+		}
+
+		if (!text.empty()) {
+			text += "\n\n";
+		}
+
+		text += std::move(additional_text);
+	}
+
 	explicit detailed_data_entry(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
@@ -56,6 +70,34 @@ public:
 		}
 
 		return true;
+	}
+
+	virtual std::string get_encyclopedia_text() const
+	{
+		std::string text;
+
+		if (!this->get_description().empty()) {
+			detailed_data_entry::concatenate_encyclopedia_text(text, "Description: " + this->get_description());
+		}
+
+		if (!this->get_quote().empty()) {
+			detailed_data_entry::concatenate_encyclopedia_text(text, "Quote: " + this->get_quote());
+		}
+
+		if (!this->get_background().empty()) {
+			detailed_data_entry::concatenate_encyclopedia_text(text, "Background: " + this->get_background());
+		}
+
+		if (!this->get_notes().empty()) {
+			detailed_data_entry::concatenate_encyclopedia_text(text, "Notes: " + this->get_notes());
+		}
+
+		return text;
+	}
+
+	QString get_encyclopedia_text_qstring() const
+	{
+		return QString::fromStdString(this->get_encyclopedia_text());
 	}
 
 	const std::string &get_notes() const
@@ -117,6 +159,9 @@ public:
 	{
 		return QString::fromStdString(this->get_background());
 	}
+
+signals:
+	void changed();
 
 private:
 	std::string notes; //gameplay-related notes about the data entry

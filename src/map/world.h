@@ -69,6 +69,8 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 
+	virtual std::string get_encyclopedia_text() const override;
+
 	void reset_game_data();
 
 	world_game_data *get_game_data() const
