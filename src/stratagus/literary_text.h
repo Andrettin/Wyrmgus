@@ -29,7 +29,13 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
+struct lua_State;
+
+static int CclDefineLiteraryText(lua_State *l);
+
 namespace wyrmgus {
+
+class icon;
 
 class chapter
 {
@@ -44,17 +50,50 @@ class literary_text final : public named_data_entry, public data_type<literary_t
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
+	Q_PROPERTY(std::string author MEMBER author)
+	Q_PROPERTY(std::string text MEMBER text)
+
 public:
 	static constexpr const char *class_identifier = "literary_text";
 	static constexpr const char *database_folder = "literary_texts";
+
+	static bool compare_encyclopedia_entries(const literary_text *lhs, const literary_text *rhs)
+	{
+		return lhs->get_name() < rhs->get_name();
+	}
 
 	explicit literary_text(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 
+	virtual bool has_encyclopedia_entry() const override
+	{
+		return this->icon != nullptr;
+	}
+
+	virtual std::string get_encyclopedia_text() const override
+	{
+		std::string text;
+
+		if (!this->author.empty()) {
+			named_data_entry::concatenate_encyclopedia_text(text, "Author: " + this->author);
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, std::string(this->text));
+
+		return text;
+	}
+
 	chapter *GetChapter(const std::string &chapter_name) const;
+
+signals:
+	void changed();
 	
-	std::string Author;				/// Author of the text
+private:
+	wyrmgus::icon *icon = nullptr;
+	std::string author;
+public:
 	std::string Translator;			/// Translator of the text
 	std::string Publisher;			/// Publisher of the text
 	std::string CopyrightNotice;	/// Copyright notice explaining that this text is in the public domain, or is licensed under an open-source license
@@ -62,6 +101,10 @@ public:
 	int Year = 0;						/// Year of publication
 	int InitialPage = 1;				/// Page in which the text begins
 	std::vector<std::unique_ptr<chapter>> Chapters;	/// The chapters of the text
+private:
+	std::string text;
+
+	friend int ::CclDefineLiteraryText(lua_State *l);
 };
 
 }

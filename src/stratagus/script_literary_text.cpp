@@ -49,7 +49,7 @@ static int CclDefineLiteraryText(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			text->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Author")) {
-			text->Author = LuaToString(l, -1);
+			text->author = LuaToString(l, -1);
 		} else if (!strcmp(value, "Translator")) {
 			text->Translator = LuaToString(l, -1);
 		} else if (!strcmp(value, "Publisher")) {
@@ -100,107 +100,6 @@ static int CclDefineLiteraryText(lua_State *l)
 	return 0;
 }
 
-static int CclGetLiteraryTexts(lua_State *l)
-{
-	lua_createtable(l, wyrmgus::literary_text::get_all().size(), 0);
-	for (size_t i = 1; i <= wyrmgus::literary_text::get_all().size(); ++i)
-	{
-		lua_pushstring(l, wyrmgus::literary_text::get_all()[i-1]->get_identifier().c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
-static int CclGetLiteraryTextData(lua_State *l)
-{
-	if (lua_gettop(l) < 2) {
-		LuaError(l, "incorrect argument");
-	}
-	const std::string text_identifier = LuaToString(l, 1);
-	const wyrmgus::literary_text *text = wyrmgus::literary_text::get(text_identifier);
-	const char *data = LuaToString(l, 2);
-
-	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, text->get_name().c_str());
-		return 1;
-	} else if (!strcmp(data, "Author")) {
-		lua_pushstring(l, text->Author.c_str());
-		return 1;
-	} else if (!strcmp(data, "Translator")) {
-		lua_pushstring(l, text->Translator.c_str());
-		return 1;
-	} else if (!strcmp(data, "Publisher")) {
-		lua_pushstring(l, text->Publisher.c_str());
-		return 1;
-	} else if (!strcmp(data, "CopyrightNotice")) {
-		lua_pushstring(l, text->CopyrightNotice.c_str());
-		return 1;
-	} else if (!strcmp(data, "Notes")) {
-		lua_pushstring(l, text->Notes.c_str());
-		return 1;
-	} else if (!strcmp(data, "Year")) {
-		lua_pushnumber(l, text->Year);
-		return 1;
-	} else if (!strcmp(data, "InitialPage")) {
-		lua_pushnumber(l, text->InitialPage);
-		return 1;
-	} else if (!strcmp(data, "Chapters")) {
-		lua_createtable(l, text->Chapters.size(), 0);
-		for (size_t i = 1; i <= text->Chapters.size(); ++i)
-		{
-			lua_pushstring(l, text->Chapters[i-1]->Name.c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else if (!strcmp(data, "ChapterQuantity")) {
-		lua_pushnumber(l, text->Chapters.size());
-		return 1;
-	} else if (!strcmp(data, "ChapterIndex")) {
-		LuaCheckArgs(l, 3);
-		std::string chapter_name = LuaToString(l, 3);
-		if (text->GetChapter(chapter_name) != nullptr) {
-			lua_pushnumber(l, text->GetChapter(chapter_name)->ID);
-		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->get_name().c_str());
-		}
-		return 1;
-	} else if (!strcmp(data, "ChapterIntroduction")) {
-		LuaCheckArgs(l, 3);
-		std::string chapter_name = LuaToString(l, 3);
-		if (text->GetChapter(chapter_name) != nullptr) {
-			lua_pushboolean(l, text->GetChapter(chapter_name)->Introduction);
-		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->get_name().c_str());
-		}
-		return 1;
-	} else if (!strcmp(data, "ChapterPage")) {
-		LuaCheckArgs(l, 4);
-		
-		std::string chapter_name = LuaToString(l, 3);
-		if (text->GetChapter(chapter_name) != nullptr) {
-			int page = LuaToNumber(l, 4) - 1;
-			
-			lua_pushstring(l, text->GetChapter(chapter_name)->Pages[page].c_str());
-		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->get_name().c_str());
-		}
-		return 1;
-	} else if (!strcmp(data, "ChapterPageQuantity")) {
-		LuaCheckArgs(l, 3);
-		std::string chapter_name = LuaToString(l, 3);
-		if (text->GetChapter(chapter_name) != nullptr) {
-			lua_pushnumber(l, text->GetChapter(chapter_name)->Pages.size());
-		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->get_name().c_str());
-		}
-		return 1;
-	} else {
-		LuaError(l, "Invalid field: %s" _C_ data);
-	}
-
-	return 0;
-}
-
 // ----------------------------------------------------------------------------
 
 /**
@@ -209,6 +108,4 @@ static int CclGetLiteraryTextData(lua_State *l)
 void LiteraryTextCclRegister()
 {
 	lua_register(Lua, "DefineLiteraryText", CclDefineLiteraryText);
-	lua_register(Lua, "GetLiteraryTexts", CclGetLiteraryTexts);
-	lua_register(Lua, "GetLiteraryTextData", CclGetLiteraryTextData);
 }

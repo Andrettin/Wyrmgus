@@ -38,8 +38,22 @@ class named_data_entry : public data_entry
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY changed)
+	Q_PROPERTY(QString encyclopedia_text READ get_encyclopedia_text_qstring CONSTANT)
 
 public:
+	static void concatenate_encyclopedia_text(std::string &text, std::string &&additional_text)
+	{
+		if (additional_text.empty()) {
+			return;
+		}
+
+		if (!text.empty()) {
+			text += "\n\n";
+		}
+
+		text += std::move(additional_text);
+	}
+
 	explicit named_data_entry(const std::string &identifier) : data_entry(identifier)
 	{
 	}
@@ -47,6 +61,16 @@ public:
 	virtual ~named_data_entry() {}
 
 	virtual void process_text() override;
+
+	virtual std::string get_encyclopedia_text() const
+	{
+		return std::string();
+	}
+
+	QString get_encyclopedia_text_qstring() const
+	{
+		return QString::fromStdString(this->get_encyclopedia_text());
+	}
 
 	const std::string &get_name() const
 	{

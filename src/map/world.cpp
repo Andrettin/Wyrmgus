@@ -111,7 +111,7 @@ std::string world::get_encyclopedia_text() const
 			species_text += string::get_plural_form(species->get_name());
 		}
 
-		detailed_data_entry::concatenate_encyclopedia_text(text, std::move(species_text));
+		named_data_entry::concatenate_encyclopedia_text(text, std::move(species_text));
 	}
 
 	const std::vector<const species *> fauna_species = this->get_native_fauna_species();
@@ -126,10 +126,10 @@ std::string world::get_encyclopedia_text() const
 			species_text += string::get_plural_form(species->get_name());
 		}
 
-		detailed_data_entry::concatenate_encyclopedia_text(text, std::move(species_text));
+		named_data_entry::concatenate_encyclopedia_text(text, std::move(species_text));
 	}
 
-	detailed_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
+	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
 
 	return text;
 }

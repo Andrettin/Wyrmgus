@@ -35,6 +35,7 @@
 #include "editor.h"
 #include "game.h"
 #include "item/unique_item.h"
+#include "literary_text.h"
 #include "map/map_layer.h"
 #include "map/world.h"
 #include "religion/deity.h"
@@ -212,6 +213,11 @@ QVariantList engine_interface::get_deity_encyclopedia_entries() const
 QVariantList engine_interface::get_item_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(unit_type::get_item_encyclopedia_entries());
+}
+
+QVariantList engine_interface::get_literary_text_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(literary_text::get_encyclopedia_entries());
 }
 
 QVariantList engine_interface::get_magic_prefix_encyclopedia_entries() const
