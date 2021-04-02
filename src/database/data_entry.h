@@ -86,14 +86,7 @@ public:
 		return this->initialized;
 	}
 
-	virtual void initialize()
-	{
-		if (this->is_initialized()) {
-			throw std::runtime_error("Tried to initialize data entry \"" + this->get_identifier() + "\", even though it has already been initialized.");
-		}
-
-		this->initialized = true;
-	}
+	virtual void initialize();
 
 	virtual void process_text()
 	{

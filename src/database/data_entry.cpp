@@ -30,6 +30,7 @@
 
 #include "database/data_entry_history.h"
 #include "database/database.h"
+#include "engine_interface.h"
 #include "game.h"
 #include "quest/campaign.h"
 #include "time/calendar.h"
@@ -84,6 +85,19 @@ void data_entry::process_sml_dated_scope(const sml_data &scope, const QDateTime 
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error processing history scope \"" + scope.get_tag() + "\"."));
 	}
+}
+
+void data_entry::initialize()
+{
+	if (this->is_initialized()) {
+		throw std::runtime_error("Tried to initialize data entry \"" + this->get_identifier() + "\", even though it has already been initialized.");
+	}
+
+	if (this->parent() == nullptr) {
+		this->setParent(engine_interface::get()); //to ensure that the object isn't deleted by QML
+	}
+
+	this->initialized = true;
 }
 
 void data_entry::load_history()

@@ -190,6 +190,8 @@ public:
 	Q_INVOKABLE QVariantList get_unit_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_world_encyclopedia_entries() const;
 
+	Q_INVOKABLE QObject *get_link_target(const QString &link_str) const;
+
 signals:
 	void running_changed();
 	void loading_message_changed();

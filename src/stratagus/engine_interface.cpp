@@ -250,4 +250,31 @@ QVariantList engine_interface::get_world_encyclopedia_entries() const
 	return container::to_qvariant_list(world::get_encyclopedia_entries());
 }
 
+QObject *engine_interface::get_link_target(const QString &link_str) const
+{
+	try {
+		const QStringList link_str_list = link_str.split(':');
+
+		if (link_str_list.size() != 2) {
+			throw std::runtime_error("Invalid link string: \"" + link_str.toStdString() + "\".");
+		}
+
+		const std::string link_type = link_str_list.at(0).toStdString();
+		const std::string link_target = link_str_list.at(1).toStdString();
+
+		QObject *object = nullptr;
+
+		if (link_type == "literary_text") {
+			object = literary_text::get(link_target);
+		} else {
+			throw std::runtime_error("Invalid link type: \"" + link_type + "\".");
+		}
+
+		return object;
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		return nullptr;
+	}
+}
+
 }
