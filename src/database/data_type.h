@@ -323,6 +323,22 @@ public:
 		return lhs < rhs;
 	}
 
+	static std::string get_link_string(const T *instance, const std::string &link_text = "")
+	{
+		std::string link = "<a href='";
+		link += T::class_name;
+		link += ":";
+		link += instance->get_identifier();
+		link += "'>";
+		if (!link_text.empty()) {
+			link += link_text;
+		} else {
+			link += instance->get_name();
+		}
+		link += "</a>";
+		return link;
+	}
+
 private:
 	static inline bool initialize_class()
 	{
