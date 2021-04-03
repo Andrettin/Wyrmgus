@@ -63,6 +63,7 @@
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_modifier.h"
 #include "util/size_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
@@ -1553,6 +1554,46 @@ bool unit_type::has_encyclopedia_entry() const
 	return detailed_data_entry::has_encyclopedia_entry();
 }
 
+std::string unit_type::get_encyclopedia_text() const
+{
+	std::string text;
+
+	if (this->get_civilization() != nullptr && this->get_civilization() != defines::get()->get_neutral_civilization()) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_name());
+	}
+
+	if (this->get_faction() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Faction: " + this->get_faction()->get_name());
+	}
+
+	if (this->get_item_class() != item_class::none) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Class: " + get_item_class_name(this->get_item_class()));
+	} else if (this->get_unit_class() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Class: " + this->get_unit_class()->get_name());
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
+
+	if (this->BoolFlag[ITEM_INDEX].value) {
+		std::string item_effects_string = GetItemEffectsString(this->get_identifier());
+		if (!item_effects_string.empty()) {
+			named_data_entry::concatenate_encyclopedia_text(text, "Effects: " + std::move(item_effects_string));
+		}
+	} else {
+		std::string costs_string = this->DefaultStat.get_costs_string();
+		if (!costs_string.empty()) {
+			named_data_entry::concatenate_encyclopedia_text(text, "Costs: " + costs_string);
+		}
+
+		std::string stats_string = GetUnitTypeStatsString(this->get_identifier());
+		if (!stats_string.empty()) {
+			named_data_entry::concatenate_encyclopedia_text(text, "Stats: " + std::move(stats_string));
+		}
+	}
+
+	return text;
+}
+
 void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)
 {
 	if (unit_class == this->get_unit_class()) {
@@ -2991,3 +3032,117 @@ int GetImageLayerIdByName(const std::string &image_layer)
 	return -1;
 }
 //Wyrmgus end
+
+std::string GetItemEffectsString(const std::string &item_ident)
+{
+	const wyrmgus::unit_type *item = wyrmgus::unit_type::get(item_ident);
+
+	std::string item_effects_string;
+
+	bool first_var = true;
+	for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
+		if (
+			!(var == BASICDAMAGE_INDEX || var == PIERCINGDAMAGE_INDEX || var == THORNSDAMAGE_INDEX
+				|| var == FIREDAMAGE_INDEX || var == COLDDAMAGE_INDEX || var == ARCANEDAMAGE_INDEX || var == LIGHTNINGDAMAGE_INDEX
+				|| var == AIRDAMAGE_INDEX || var == EARTHDAMAGE_INDEX || var == WATERDAMAGE_INDEX || var == ACIDDAMAGE_INDEX
+				|| var == ARMOR_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX
+				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == ACIDRESISTANCE_INDEX
+				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
+				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == CHARGEBONUS_INDEX || var == BACKSTAB_INDEX
+				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX || var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX || var == HP_INDEX || var == MANA_INDEX
+				|| var == ATTACKRANGE_INDEX)
+			) {
+			continue;
+		}
+
+		if (var != HP_INDEX) { //only for elixirs, equippable items use the hit point bonus variable instead
+			if (item->DefaultStat.Variables[var].Enable) {
+				if (!first_var) {
+					item_effects_string += ", ";
+				} else {
+					first_var = false;
+				}
+
+				if (IsBooleanVariable(var) && item->DefaultStat.Variables[var].Value < 0) {
+					item_effects_string += "Lose ";
+				}
+
+				if (!IsBooleanVariable(var)) {
+					if (item->DefaultStat.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+						item_effects_string += "+";
+					}
+					item_effects_string += std::to_string(item->DefaultStat.Variables[var].Value);
+					if (IsPercentageVariable(var)) {
+						item_effects_string += "%";
+					}
+					item_effects_string += " ";
+				}
+
+				item_effects_string += GetVariableDisplayName(var);
+			}
+
+			if (item->DefaultStat.Variables[var].Increase != 0) {
+				if (!first_var) {
+					item_effects_string += ", ";
+				} else {
+					first_var = false;
+				}
+
+				if (item->DefaultStat.Variables[var].Increase > 0) {
+					item_effects_string += "+";
+				}
+				item_effects_string += std::to_string(item->DefaultStat.Variables[var].Increase);
+				item_effects_string += " ";
+
+				item_effects_string += GetVariableDisplayName(var, true);
+			}
+		}
+
+		if (item->Elixir) {
+			for (const auto &modifier : item->Elixir->get_modifiers()) {
+				if (modifier->Modifier.Variables[var].Value != 0) {
+					if (!first_var) {
+						item_effects_string += ", ";
+					} else {
+						first_var = false;
+					}
+
+					if (IsBooleanVariable(var) && modifier->Modifier.Variables[var].Value < 0) {
+						item_effects_string += "Lose ";
+					}
+
+					if (!IsBooleanVariable(var)) {
+						if (modifier->Modifier.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+							item_effects_string += "+";
+						}
+						item_effects_string += std::to_string(modifier->Modifier.Variables[var].Value);
+						if (IsPercentageVariable(var)) {
+							item_effects_string += "%";
+						}
+						item_effects_string += " ";
+					}
+
+					item_effects_string += GetVariableDisplayName(var);
+				}
+
+				if (modifier->Modifier.Variables[var].Increase != 0) {
+					if (!first_var) {
+						item_effects_string += ", ";
+					} else {
+						first_var = false;
+					}
+
+					if (modifier->Modifier.Variables[var].Increase > 0) {
+						item_effects_string += "+";
+					}
+					item_effects_string += std::to_string(modifier->Modifier.Variables[var].Increase);
+					item_effects_string += " ";
+
+					item_effects_string += GetVariableDisplayName(var, true);
+				}
+			}
+		}
+	}
+
+	return item_effects_string;
+}

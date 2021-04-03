@@ -144,5 +144,4 @@ private:
 
 }
 
-extern std::string GetItemEffectsString(const std::string &item_ident);
 extern void ItemCclRegister();

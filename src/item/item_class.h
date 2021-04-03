@@ -229,6 +229,68 @@ inline bool is_consumable_item_class(const item_class item_class)
 	}
 }
 
+inline std::string get_item_class_name(const item_class item_class)
+{
+	switch (item_class) {
+		case item_class::dagger:
+			return "Dagger";
+		case item_class::sword:
+			return "Sword";
+		case item_class::thrusting_sword:
+			return "Thrusting Sword";
+		case item_class::axe:
+			return "Axe";
+		case item_class::mace:
+			return "Mace";
+		case item_class::spear:
+			return "Spear";
+		case item_class::bow:
+			return "Bow";
+		case item_class::throwing_axe:
+			return "Throwing Axe";
+		case item_class::javelin:
+			return "Javelin";
+		case item_class::gun:
+			return "Gun";
+		case item_class::shield:
+			return "Shield";
+		case item_class::horn:
+			return "Horn";
+		case item_class::trinket:
+			return "Trinket";
+		case item_class::helmet:
+			return "Helmet";
+		case item_class::armor:
+			return "Armor";
+		case item_class::cloak:
+			return "Cloak";
+		case item_class::gloves:
+			return "Gloves";
+		case item_class::belt:
+			return "Belt";
+		case item_class::boots:
+			return "Boots";
+		case item_class::amulet:
+			return "Amulet";
+		case item_class::ring:
+			return "Ring";
+		case item_class::arrows:
+			return "Arrows";
+		case item_class::food:
+			return "Food";
+		case item_class::potion:
+			return "Potion";
+		case item_class::scroll:
+			return "Scroll";
+		case item_class::book:
+			return "Book";
+		default:
+			break;
+	}
+
+	throw std::runtime_error("Invalid item class: \"" + std::to_string(static_cast<int>(item_class)) + "\".");
+}
+
 }
 
 Q_DECLARE_METATYPE(wyrmgus::item_class)

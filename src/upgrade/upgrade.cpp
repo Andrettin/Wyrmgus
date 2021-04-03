@@ -145,6 +145,33 @@ int CUnitStats::get_time_cost() const
 	return this->get_cost(defines::get()->get_time_resource());
 }
 
+std::string CUnitStats::get_costs_string() const
+{
+	std::string str;
+
+	for (const auto &[resource, cost] : this->get_costs()) {
+		if (resource == defines::get()->get_time_resource()) {
+			continue;
+		}
+
+		if (!str.empty()) {
+			str += ", ";
+		}
+
+		str += std::to_string(cost) + " " + resource->get_name();
+	}
+
+	if (this->Variables[DEMAND_INDEX].Value > 0) {
+		if (!str.empty()) {
+			str += ", ";
+		}
+
+		str += std::to_string(this->Variables[DEMAND_INDEX].Value) + " Food";
+	}
+
+	return str;
+}
+
 int CUnitStats::get_price() const
 {
 	return resource::get_price(this->get_costs());

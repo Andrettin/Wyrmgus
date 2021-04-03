@@ -106,6 +106,7 @@ public:
 	}
 
 	int get_time_cost() const;
+	std::string get_costs_string() const;
 
 	const resource_map<int> &get_storing() const
 	{

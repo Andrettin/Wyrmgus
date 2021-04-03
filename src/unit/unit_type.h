@@ -863,6 +863,7 @@ public:
 	virtual void check() const override;
 
 	virtual bool has_encyclopedia_entry() const override;
+	virtual std::string get_encyclopedia_text() const override;
 
 	int get_index() const
 	{
@@ -1575,3 +1576,5 @@ extern void SetModSound(const std::string &mod_file, const std::string &ident, c
 extern std::string GetImageLayerNameById(int image_layer);
 extern int GetImageLayerIdByName(const std::string &image_layer);
 //Wyrmgus end
+
+extern std::string GetItemEffectsString(const std::string &item_ident);
