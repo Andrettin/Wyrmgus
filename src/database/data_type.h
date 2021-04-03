@@ -323,22 +323,6 @@ public:
 		return lhs < rhs;
 	}
 
-	static std::string get_link_string(const T *instance, const std::string &link_text = "")
-	{
-		std::string link = "<a href='";
-		link += T::class_name;
-		link += ":";
-		link += instance->get_identifier();
-		link += "'>";
-		if (!link_text.empty()) {
-			link += link_text;
-		} else {
-			link += instance->get_name();
-		}
-		link += "</a>";
-		return link;
-	}
-
 private:
 	static inline bool initialize_class()
 	{
@@ -354,6 +338,31 @@ private:
 	static inline std::map<std::string, T *> instances_by_alias;
 	static inline data_module_map<std::vector<sml_data>> sml_data_to_process;
 	static inline bool class_initialized = data_type::initialize_class();
+
+public:
+	std::string get_link_string(const std::string &link_text = "") const
+	{
+		const T *underlying = this->to_underlying();
+
+		std::string link = "<a href='";
+		link += T::class_identifier;
+		link += ":";
+		link += underlying->get_identifier();
+		link += "'>";
+		if (!link_text.empty()) {
+			link += link_text;
+		} else {
+			link += underlying->get_name();
+		}
+		link += "</a>";
+		return link;
+	}
+
+private:
+	const T *to_underlying() const
+	{
+		return static_cast<const T *>(this);
+	}
 };
 
 }

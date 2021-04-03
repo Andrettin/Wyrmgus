@@ -361,6 +361,49 @@ void civilization::check() const
 	data_entry::check();
 }
 
+std::string civilization::get_encyclopedia_text() const
+{
+	std::string text;
+
+	std::vector<const civilization *> develops_from = this->get_develops_from();
+	std::sort(develops_from.begin(), develops_from.end(), civilization::compare_encyclopedia_entries);
+
+	if (!develops_from.empty()) {
+		std::string develops_from_text = "Develops From: ";
+		for (size_t i = 0; i < develops_from.size(); ++i) {
+			if (i > 0) {
+				develops_from_text += ", ";
+			}
+
+			const civilization *civilization = develops_from[i];
+			develops_from_text += civilization->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, std::move(develops_from_text));
+	}
+
+	std::vector<const civilization *> develops_to = this->get_develops_to();
+	std::sort(develops_to.begin(), develops_to.end(), civilization::compare_encyclopedia_entries);
+
+	if (!develops_to.empty()) {
+		std::string develops_to_text = "Develops To: ";
+		for (size_t i = 0; i < develops_to.size(); ++i) {
+			if (i > 0) {
+				develops_to_text += ", ";
+			}
+
+			const civilization *civilization = develops_to[i];
+			develops_to_text += civilization->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, std::move(develops_to_text));
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
+
+	return text;
+}
+
 int civilization::GetUpgradePriority(const CUpgrade *upgrade) const
 {
 	if (!upgrade) {

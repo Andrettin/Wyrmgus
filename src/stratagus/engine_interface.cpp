@@ -264,7 +264,9 @@ QObject *engine_interface::get_link_target(const QString &link_str) const
 
 		QObject *object = nullptr;
 
-		if (link_type == "literary_text") {
+		if (link_type == "civilization") {
+			object = civilization::get(link_target);
+		} else if (link_type == "literary_text") {
 			object = literary_text::get(link_target);
 		} else {
 			throw std::runtime_error("Invalid link type: \"" + link_type + "\".");

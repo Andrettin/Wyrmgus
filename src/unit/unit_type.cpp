@@ -1559,7 +1559,7 @@ std::string unit_type::get_encyclopedia_text() const
 	std::string text;
 
 	if (this->get_civilization() != nullptr && this->get_civilization() != defines::get()->get_neutral_civilization()) {
-		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_name());
+		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_link_string());
 	}
 
 	if (this->get_faction() != nullptr) {

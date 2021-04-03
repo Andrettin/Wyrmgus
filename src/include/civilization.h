@@ -112,6 +112,8 @@ public:
 		return detailed_data_entry::has_encyclopedia_entry();
 	}
 
+	virtual std::string get_encyclopedia_text() const override;
+
 	civilization *get_parent_civilization() const
 	{
 		return this->parent_civilization;
@@ -229,12 +231,12 @@ public:
 		return nullptr;
 	}
 
-	const std::vector<civilization *> &get_develops_from() const
+	const std::vector<const civilization *> &get_develops_from() const
 	{
 		return this->develops_from;
 	}
 
-	const std::vector<civilization *> &get_develops_to() const
+	const std::vector<const civilization *> &get_develops_to() const
 	{
 		return this->develops_to;
 	}
@@ -350,8 +352,8 @@ private:
 	sound *research_complete_sound = nullptr;
 	sound *not_enough_food_sound = nullptr;
 	std::map<const resource *, const sound *> not_enough_resource_sounds;
-	std::vector<civilization *> develops_from; //from which civilizations this civilization develops
-	std::vector<civilization *> develops_to; //to which civilizations this civilization develops
+	std::vector<const civilization *> develops_from; //from which civilizations this civilization develops
+	std::vector<const civilization *> develops_to; //to which civilizations this civilization develops
 	std::map<cursor_type, cursor *> cursors;
 public:
 	std::vector<quest *> Quests;	/// quests belonging to this civilization
