@@ -517,6 +517,104 @@ void character::reset_history()
 	this->history = std::make_unique<character_history>(this->default_faction, default_location_site);
 }
 
+std::string character::get_encyclopedia_text() const
+{
+	std::string text;
+
+	if (this->get_civilization() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_link_string());
+	}
+
+	if (this->get_default_faction() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Faction: " + this->get_default_faction()->get_name());
+	}
+
+	if (this->get_unit_type() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Type: " + this->get_unit_type()->get_link_string());
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, this->get_encyclopedia_genealogical_text());
+
+	if (!this->Deities.empty()) {
+		std::string deities_text;
+		for (const wyrmgus::deity *deity : this->Deities) {
+			if (!deities_text.empty()) {
+				deities_text += ", ";
+			}
+
+			deities_text += deity->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Deities: " + deities_text);
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, "Level: " + std::to_string(this->get_level()));
+
+	if (!this->get_abilities().empty()) {
+		std::map<const CUpgrade *, int> ability_counts;
+
+		for (const CUpgrade *ability : this->get_abilities()) {
+			ability_counts[ability]++;
+		}
+
+		std::set<const CUpgrade *> written_abilities;
+
+		std::string abilities_text;
+		for (const CUpgrade *ability : this->get_abilities()) {
+			if (written_abilities.contains(ability)) {
+				continue;
+			}
+
+			if (!abilities_text.empty()) {
+				abilities_text += ", ";
+			}
+
+			abilities_text += ability->get_name();
+			if (ability_counts[ability] > 1) {
+				abilities_text += " (x" + std::to_string(ability_counts[ability]) + ")";
+			}
+
+			written_abilities.insert(ability);
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Acquired Abilities: " + abilities_text);
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
+
+	return text;
+}
+
+std::string character::get_encyclopedia_genealogical_text() const
+{
+	std::string text;
+
+	const wyrmgus::character *father = this->get_father();
+	if (father != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Father: " + (father->is_deity() ? father->get_deity()->get_link_string() : father->get_link_string()));
+	}
+
+	const wyrmgus::character *mother = this->get_mother();
+	if (this->get_mother() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Mother: " + (mother->is_deity() ? mother->get_deity()->get_link_string() : mother->get_link_string()));
+	}
+
+	if (!this->get_children().empty()) {
+		std::string children_text;
+		for (const wyrmgus::character *child : this->get_children()) {
+			if (!children_text.empty()) {
+				children_text += ", ";
+			}
+
+			children_text += child->is_deity() ? child->get_deity()->get_link_string() : child->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Children: " + children_text);
+	}
+
+	return text;
+}
+
 void character::GenerateMissingDates()
 {
 	if (this->DeathDate.Year == 0 && this->BirthDate.Year != 0) { //if the character is missing a death date so far, give it +60 years after the birth date

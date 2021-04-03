@@ -146,26 +146,7 @@ std::string deity::get_encyclopedia_text() const
 	}
 
 	if (this->get_character() != nullptr) {
-		const wyrmgus::character *father = this->get_character()->get_father();
-		if (father != nullptr) {
-			named_data_entry::concatenate_encyclopedia_text(text, "Father: " + (father->is_deity() ? father->get_deity()->get_link_string() : father->get_link_string()));
-		}
-
-		const wyrmgus::character *mother = this->get_character()->get_mother();
-		if (this->get_character()->get_mother() != nullptr) {
-			named_data_entry::concatenate_encyclopedia_text(text, "Mother: " + (mother->is_deity() ? mother->get_deity()->get_link_string() : mother->get_link_string()));
-		}
-
-		std::string children_text;
-		for (const wyrmgus::character *child : this->get_character()->get_children()) {
-			if (!children_text.empty()) {
-				children_text += ", ";
-			}
-
-			children_text += child->is_deity() ? child->get_deity()->get_link_string() : child->get_link_string();
-		}
-
-		named_data_entry::concatenate_encyclopedia_text(text, "Children: " + children_text);
+		named_data_entry::concatenate_encyclopedia_text(text, this->get_character()->get_encyclopedia_genealogical_text());
 	}
 
 	std::vector<civilization *> civilizations = this->get_civilizations();
