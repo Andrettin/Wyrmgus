@@ -339,16 +339,24 @@ public:
 	{
 		const T *underlying = this->to_underlying();
 
+		std::string link_name;
+		if (!link_text.empty()) {
+			link_name = link_text;
+		} else {
+			link_name = underlying->get_link_name();
+		}
+
+		if (!underlying->has_encyclopedia_entry()) {
+			//don't write a link if the entry cannot have an encyclopedia entry
+			return link_name;
+		}
+
 		std::string link = "<a href='";
 		link += T::class_identifier;
 		link += ":";
 		link += underlying->get_identifier();
 		link += "'>";
-		if (!link_text.empty()) {
-			link += link_text;
-		} else {
-			link += underlying->get_link_name();
-		}
+		link += link_name;
 		link += "</a>";
 		return link;
 	}
