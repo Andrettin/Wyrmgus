@@ -418,9 +418,27 @@ CCurrency *civilization::GetCurrency() const
 	return nullptr;
 }
 
+const std::filesystem::path &civilization::get_encyclopedia_background_file() const
+{
+	if (!this->encyclopedia_background_file.empty()) {
+		return this->encyclopedia_background_file;
+	}
+
+	if (this->get_parent_civilization() != nullptr) {
+		return this->get_parent_civilization()->get_encyclopedia_background_file();
+	}
+
+	return this->encyclopedia_background_file;
+}
+
+void civilization::set_encyclopedia_background_file(const std::filesystem::path &filepath)
+{
+	this->encyclopedia_background_file = database::get()->get_graphics_path(this->get_module()) / filepath;
+}
+
 cursor *civilization::get_cursor(const cursor_type type) const
 {
-	auto find_iterator = this->cursors.find(type);
+	const auto find_iterator = this->cursors.find(type);
 	if (find_iterator != this->cursors.end()) {
 		return find_iterator->second;
 	}

@@ -73,6 +73,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(wyrmgus::player_color* default_color MEMBER default_color NOTIFY changed)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 	Q_PROPERTY(wyrmgus::language* language MEMBER language)
+	Q_PROPERTY(QString encyclopedia_background_file READ get_encyclopedia_background_file_qstring NOTIFY changed)
 	Q_PROPERTY(wyrmgus::sound* help_town_sound MEMBER help_town_sound)
 	Q_PROPERTY(wyrmgus::sound* work_complete_sound MEMBER work_complete_sound)
 	Q_PROPERTY(wyrmgus::sound* research_complete_sound MEMBER research_complete_sound)
@@ -173,6 +174,20 @@ public:
 	bool is_playable() const
 	{
 		return this->playable;
+	}
+
+	const std::filesystem::path &get_encyclopedia_background_file() const;
+
+	QString get_encyclopedia_background_file_qstring() const
+	{
+		return QString::fromStdString(this->get_encyclopedia_background_file().string());
+	}
+
+	void set_encyclopedia_background_file(const std::filesystem::path &filepath);
+
+	Q_INVOKABLE void set_encyclopedia_background_file(const std::string &filepath)
+	{
+		this->set_encyclopedia_background_file(std::filesystem::path(filepath));
 	}
 
 	const wyrmgus::unit_sound_set *get_unit_sound_set() const
@@ -328,6 +343,7 @@ public:
 private:
 	bool visible = true; //whether the civilization is visible e.g. in the map editor
 	bool playable = true; //civilizations are playable by default
+	std::filesystem::path encyclopedia_background_file;
 	std::unique_ptr<wyrmgus::unit_sound_set> unit_sound_set;	/// sounds for unit events
 	sound *help_town_sound = nullptr;
 	sound *work_complete_sound = nullptr;

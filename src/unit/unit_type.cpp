@@ -1783,6 +1783,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	}
 	this->num_directions = parent_type->num_directions;
 	this->neutral_minimap_color = parent_type->neutral_minimap_color;
+	this->encyclopedia_background_file = parent_type->encyclopedia_background_file;
 	this->random_movement_probability = parent_type->random_movement_probability;
 	this->RandomMovementDistance = parent_type->RandomMovementDistance;
 	this->given_resource = parent_type->given_resource;
@@ -2310,6 +2311,24 @@ const name_generator *unit_type::get_name_generator(const wyrmgus::faction *fact
 bool unit_type::can_produce_a_resource() const
 {
 	return this->get_given_resource() != nullptr || !AiHelpers.get_produced_resources(this).empty();
+}
+
+const std::filesystem::path &unit_type::get_encyclopedia_background_file() const
+{
+	if (!this->encyclopedia_background_file.empty()) {
+		return this->encyclopedia_background_file;
+	}
+
+	if (this->get_civilization() != nullptr) {
+		return this->get_civilization()->get_encyclopedia_background_file();
+	}
+
+	return this->encyclopedia_background_file;
+}
+
+void unit_type::set_encyclopedia_background_file(const std::filesystem::path &filepath)
+{
+	this->encyclopedia_background_file = database::get()->get_graphics_path(this->get_module()) / filepath;
 }
 
 bool unit_type::can_gain_experience() const
