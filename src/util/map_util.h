@@ -29,6 +29,18 @@
 namespace wyrmgus::map {
 
 template <typename T>
+inline std::vector<typename T::value_type> get_values(const T &map)
+{
+	std::vector<typename T::value_type> values;
+
+	for (const auto &kv_pair : map) {
+		values.push_back(kv_pair.second);
+	}
+
+	return values;
+}
+
+template <typename T>
 inline void remove_value(T &map, const typename T::value_type &value)
 {
 	for (auto it = map.begin(); it != map.end();) {

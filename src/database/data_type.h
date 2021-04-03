@@ -318,11 +318,6 @@ public:
 		std::sort(entries.begin(), entries.end(), T::compare_encyclopedia_entries);
 	}
 
-	static bool compare_encyclopedia_entries(const T *lhs, const T *rhs)
-	{
-		return lhs < rhs;
-	}
-
 private:
 	static inline bool initialize_class()
 	{

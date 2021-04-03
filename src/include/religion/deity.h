@@ -87,6 +87,8 @@ public:
 		return detailed_data_entry::has_encyclopedia_entry();
 	}
 
+	virtual std::string get_encyclopedia_text() const override;
+
 	const std::string &get_cultural_name(const civilization *civilization) const;
 
 	const wyrmgus::pantheon *get_pantheon() const

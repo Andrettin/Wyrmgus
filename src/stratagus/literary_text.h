@@ -58,11 +58,6 @@ public:
 	static constexpr const char *class_identifier = "literary_text";
 	static constexpr const char *database_folder = "literary_texts";
 
-	static bool compare_encyclopedia_entries(const literary_text *lhs, const literary_text *rhs)
-	{
-		return lhs->get_name() < rhs->get_name();
-	}
-
 	explicit literary_text(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}

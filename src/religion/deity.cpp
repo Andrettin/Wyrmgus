@@ -33,8 +33,10 @@
 #include "faction.h"
 #include "gender.h"
 #include "magic_domain.h"
+#include "map/world.h"
 #include "player.h"
 #include "province.h"
+#include "spell/spell.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "upgrade/upgrade.h"
@@ -111,6 +113,115 @@ void deity::initialize()
 	}
 
 	data_entry::initialize();
+}
+
+std::string deity::get_encyclopedia_text() const
+{
+	std::string text;
+
+	if (this->get_pantheon() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Pantheon: " + this->get_pantheon()->get_name());
+	}
+
+	if (this->get_homeworld() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Homeworld: " + this->get_homeworld()->get_link_string());
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, "Rank: " + std::string(this->is_major() ? "Major" : "Minor"));
+
+	std::vector<magic_domain *> domains = this->get_domains();
+	std::sort(domains.begin(), domains.end(), named_data_entry::compare_encyclopedia_entries);
+
+	if (!domains.empty()) {
+		std::string domains_text;
+		for (const magic_domain *domain : domains) {
+			if (!domains_text.empty()) {
+				domains_text += ", ";
+			}
+
+			domains_text += domain->get_name();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Domains: " + domains_text);
+	}
+
+	if (this->get_character() != nullptr) {
+		const wyrmgus::character *father = this->get_character()->get_father();
+		if (father != nullptr) {
+			named_data_entry::concatenate_encyclopedia_text(text, "Father: " + (father->is_deity() ? father->get_deity()->get_link_string() : father->get_link_string()));
+		}
+
+		const wyrmgus::character *mother = this->get_character()->get_mother();
+		if (this->get_character()->get_mother() != nullptr) {
+			named_data_entry::concatenate_encyclopedia_text(text, "Mother: " + (mother->is_deity() ? mother->get_deity()->get_link_string() : mother->get_link_string()));
+		}
+
+		std::string children_text;
+		for (const wyrmgus::character *child : this->get_character()->get_children()) {
+			if (!children_text.empty()) {
+				children_text += ", ";
+			}
+
+			children_text += child->is_deity() ? child->get_deity()->get_link_string() : child->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Children: " + children_text);
+	}
+
+	std::vector<civilization *> civilizations = this->get_civilizations();
+	std::sort(civilizations.begin(), civilizations.end(), named_data_entry::compare_encyclopedia_entries);
+
+	if (!civilizations.empty()) {
+		std::string civilizations_text;
+		for (const civilization *civilization : civilizations) {
+			if (!civilizations_text.empty()) {
+				civilizations_text += ", ";
+			}
+
+			civilizations_text += civilization->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Civilizations: " + civilizations_text);
+	}
+
+	std::vector<std::string> cultural_names;
+	for (const auto &[civilization, cultural_name] : this->cultural_names) {
+		cultural_names.push_back(cultural_name + " (" + civilization->get_name() + ")");
+	}
+	std::sort(cultural_names.begin(), cultural_names.end());
+
+	if (!cultural_names.empty()) {
+		std::string cultural_names_text;
+		for (const std::string &cultural_name : cultural_names) {
+			if (!cultural_names_text.empty()) {
+				cultural_names_text += ", ";
+			}
+
+			cultural_names_text += cultural_name;
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Cultural Names: " + cultural_names_text);
+	}
+
+	std::vector<const spell *> spells = this->get_spells();
+	std::sort(spells.begin(), spells.end(), named_data_entry::compare_encyclopedia_entries);
+
+	if (!spells.empty()) {
+		std::string spells_text;
+		for (const spell *spell : spells) {
+			if (!spells_text.empty()) {
+				spells_text += ", ";
+			}
+
+			spells_text += spell->get_name();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Spells: " + spells_text);
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
+
+	return text;
 }
 
 const std::string &deity::get_cultural_name(const civilization *civilization) const

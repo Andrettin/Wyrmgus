@@ -41,6 +41,11 @@ class named_data_entry : public data_entry
 	Q_PROPERTY(QString encyclopedia_text READ get_encyclopedia_text_qstring CONSTANT)
 
 public:
+	static bool compare_encyclopedia_entries(const named_data_entry *lhs, const named_data_entry *rhs)
+	{
+		return lhs->get_name() < rhs->get_name();
+	}
+
 	static void concatenate_encyclopedia_text(std::string &text, std::string &&additional_text)
 	{
 		if (additional_text.empty()) {

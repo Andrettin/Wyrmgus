@@ -366,7 +366,7 @@ std::string civilization::get_encyclopedia_text() const
 	std::string text;
 
 	std::vector<const civilization *> develops_from = this->get_develops_from();
-	std::sort(develops_from.begin(), develops_from.end(), civilization::compare_encyclopedia_entries);
+	std::sort(develops_from.begin(), develops_from.end(), named_data_entry::compare_encyclopedia_entries);
 
 	if (!develops_from.empty()) {
 		std::string develops_from_text = "Develops From: ";
@@ -383,7 +383,7 @@ std::string civilization::get_encyclopedia_text() const
 	}
 
 	std::vector<const civilization *> develops_to = this->get_develops_to();
-	std::sort(develops_to.begin(), develops_to.end(), civilization::compare_encyclopedia_entries);
+	std::sort(develops_to.begin(), develops_to.end(), named_data_entry::compare_encyclopedia_entries);
 
 	if (!develops_to.empty()) {
 		std::string develops_to_text = "Develops To: ";
