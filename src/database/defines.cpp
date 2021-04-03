@@ -131,6 +131,11 @@ void defines::initialize()
 	}
 }
 
+void defines::set_default_menu_background_file(const std::filesystem::path &filepath)
+{
+	this->default_menu_background_file = database::get()->get_graphics_path(nullptr) / filepath;
+}
+
 QStringList defines::get_tips_qstring_list() const
 {
 	return container::to_qstring_list(this->get_tips());
