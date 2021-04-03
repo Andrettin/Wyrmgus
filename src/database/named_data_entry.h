@@ -90,6 +90,11 @@ public:
 	virtual text_processing_context get_text_processing_context() const;
 	text_processor create_text_processor() const;
 
+	virtual std::string get_link_name() const override
+	{
+		return this->get_name();
+	}
+
 signals:
 	void changed();
 

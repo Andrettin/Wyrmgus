@@ -127,6 +127,11 @@ public:
 		return false;
 	}
 
+	virtual std::string get_link_name() const
+	{
+		return this->get_identifier();
+	}
+
 signals:
 	void changed();
 

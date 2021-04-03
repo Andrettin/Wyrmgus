@@ -155,6 +155,11 @@ public:
 		return detailed_data_entry::has_encyclopedia_entry();
 	}
 
+	virtual std::string get_link_name() const override
+	{
+		return this->get_full_name();
+	}
+
 	const wyrmgus::dynasty *get_dynasty() const
 	{
 		return this->dynasty;

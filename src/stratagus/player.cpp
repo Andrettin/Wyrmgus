@@ -1928,14 +1928,14 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 		return false;
 	}
 	
-	const CUpgrade *faction_type_upgrade = wyrmgus::defines::get()->get_faction_type_upgrade(faction->get_type());
-	if (faction_type_upgrade != nullptr && !wyrmgus::check_conditions<preconditions_only>(faction_type_upgrade, this, false)) {
+	const CUpgrade *faction_type_upgrade = defines::get()->get_faction_type_upgrade(faction->get_type());
+	if (faction_type_upgrade != nullptr && !check_conditions<preconditions_only>(faction_type_upgrade, this, false)) {
 		return false;
 	}
 
 	if (!faction->FactionUpgrade.empty()) {
 		const CUpgrade *faction_upgrade = CUpgrade::get(faction->FactionUpgrade);
-		if (!wyrmgus::check_conditions<preconditions_only>(faction_upgrade, this, false)) {
+		if (!check_conditions<preconditions_only>(faction_upgrade, this, false)) {
 			return false;
 		}
 	}
@@ -1953,9 +1953,9 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 
 	if constexpr (!preconditions_only) {
 		//check if the required core settlements are owned by the player
-		if (wyrmgus::game::get()->get_current_campaign() != nullptr) { //only check for settlements in the Scenario mode
-			for (const wyrmgus::site *core_settlement : faction->get_core_settlements()) {
-				const wyrmgus::site_game_data *settlement_game_data = core_settlement->get_game_data();
+		if (game::get()->get_current_campaign() != nullptr) { //only check for settlements in the Scenario mode
+			for (const site *core_settlement : faction->get_core_settlements()) {
+				const site_game_data *settlement_game_data = core_settlement->get_game_data();
 
 				if (settlement_game_data->get_site_unit() == nullptr || settlement_game_data->get_site_unit()->Player != this || settlement_game_data->get_site_unit()->CurrentAction() == UnitAction::Built) {
 					return false;

@@ -352,7 +352,7 @@ public:
 		if (!link_text.empty()) {
 			link += link_text;
 		} else {
-			link += underlying->get_name();
+			link += underlying->get_link_name();
 		}
 		link += "</a>";
 		return link;
