@@ -136,6 +136,21 @@ void defines::set_default_menu_background_file(const std::filesystem::path &file
 	this->default_menu_background_file = database::get()->get_graphics_path(nullptr) / filepath;
 }
 
+QStringList defines::get_loading_background_files_qstring_list() const
+{
+	return container::to_qstring_list(this->loading_background_files);
+}
+
+void defines::add_loading_background_file(const std::string &filepath)
+{
+	this->loading_background_files.push_back(database::get()->get_graphics_path(nullptr) / filepath);
+}
+
+void defines::remove_loading_background_file(const std::string &filepath)
+{
+	vector::remove_one(this->loading_background_files, database::get()->get_graphics_path(nullptr) / filepath);
+}
+
 QStringList defines::get_tips_qstring_list() const
 {
 	return container::to_qstring_list(this->get_tips());

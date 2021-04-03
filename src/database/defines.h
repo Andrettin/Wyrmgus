@@ -95,6 +95,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(int scaled_tile_width READ get_scaled_tile_width CONSTANT)
 	Q_PROPERTY(int scaled_tile_height READ get_scaled_tile_height CONSTANT)
 	Q_PROPERTY(QString default_menu_background_file READ get_default_menu_background_file_qstring NOTIFY changed)
+	Q_PROPERTY(QStringList loading_background_files READ get_loading_background_files_qstring_list NOTIFY changed)
 	Q_PROPERTY(QStringList tips READ get_tips_qstring_list NOTIFY changed)
 
 public:
@@ -357,6 +358,10 @@ public:
 		this->set_default_menu_background_file(std::filesystem::path(filepath));
 	}
 
+	QStringList get_loading_background_files_qstring_list() const;
+	Q_INVOKABLE void add_loading_background_file(const std::string &filepath);
+	Q_INVOKABLE void remove_loading_background_file(const std::string &filepath);
+
 	const std::vector<std::string> &get_tips() const
 	{
 		return this->tips;
@@ -418,6 +423,7 @@ private:
 	int forest_regeneration_threshold = 0;
 	int destroyed_overlay_terrain_decay_threshold = 0;
 	std::filesystem::path default_menu_background_file;
+	std::vector<std::filesystem::path> loading_background_files;
 	std::vector<std::string> tips;
 };
 
