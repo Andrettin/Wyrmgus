@@ -1115,6 +1115,7 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/faction.h
 	src/stratagus/faction_history.h
 	src/stratagus/faction_tier.h
+	src/stratagus/faction_type.h
 	src/stratagus/fallback_name_generator.h
 	src/stratagus/gender.h
 	src/stratagus/government_type.h

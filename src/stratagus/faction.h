@@ -98,6 +98,8 @@ public:
 		return faction;
 	}
 
+	static bool compare_encyclopedia_entries(const faction *lhs, const faction *rhs);
+
 	static void process_title_names(title_name_map &title_names, const sml_data &scope);
 	static void process_title_name_scope(title_name_map &title_names, const sml_data &scope);
 	static void process_character_title_name_scope(character_title_name_map &character_title_names, const sml_data &scope);
@@ -119,6 +121,17 @@ public:
 	}
 
 	virtual void reset_history() override;
+
+	virtual bool has_encyclopedia_entry() const override
+	{
+		if (this->get_icon() == nullptr) {
+			return false;
+		}
+
+		return detailed_data_entry::has_encyclopedia_entry();
+	}
+
+	virtual std::string get_encyclopedia_text() const override;
 
 	wyrmgus::civilization *get_civilization() const
 	{

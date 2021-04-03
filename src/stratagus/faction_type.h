@@ -93,6 +93,28 @@ inline bool is_faction_type_neutral(const faction_type type)
 	}
 }
 
+inline std::string get_faction_type_name(const faction_type type)
+{
+	switch (type) {
+		case faction_type::none:
+			return "None";
+		case faction_type::tribe:
+			return "Tribe";
+		case faction_type::polity:
+			return "Polity";
+		case faction_type::mercenary_company:
+			return "Mercenary Company";
+		case faction_type::holy_order:
+			return "Holy Order";
+		case faction_type::trading_company:
+			return "Trading Company";
+		default:
+			break;
+	}
+
+	throw std::runtime_error("Invalid faction type: \"" + std::to_string(static_cast<int>(type)) + "\".");
+}
+
 }
 
 Q_DECLARE_METATYPE(wyrmgus::faction_type)

@@ -52,6 +52,26 @@
 
 namespace wyrmgus {
 
+bool faction::compare_encyclopedia_entries(const faction *lhs, const faction *rhs)
+{
+	const wyrmgus::civilization *lhs_civilization = lhs->get_civilization();
+	const wyrmgus::civilization *rhs_civilization = rhs->get_civilization();
+
+	if (lhs_civilization != rhs_civilization) {
+		if (lhs_civilization == nullptr || rhs_civilization == nullptr) {
+			return lhs_civilization == nullptr;
+		}
+
+		return lhs_civilization->get_name() < rhs_civilization->get_name();
+	}
+
+	if (lhs->get_type() != rhs->get_type()) {
+		return lhs->get_type() < rhs->get_type();
+	}
+
+	return lhs->get_name() < rhs->get_name();
+}
+
 void faction::process_title_names(title_name_map &title_names, const sml_data &scope)
 {
 	scope.for_each_child([&](const sml_data &child_scope) {
@@ -286,6 +306,26 @@ data_entry_history *faction::get_history_base()
 void faction::reset_history()
 {
 	this->history = std::make_unique<faction_history>(this->get_default_tier(), this->get_default_government_type(), this->get_default_capital());
+}
+
+std::string faction::get_encyclopedia_text() const
+{
+	std::string text;
+
+	if (this->get_civilization() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_link_string());
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, "Type: " + get_faction_type_name(this->get_type()));
+	named_data_entry::concatenate_encyclopedia_text(text, "Color: " + this->get_color()->get_name());
+
+	if (!this->FactionUpgrade.empty()) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Effects: " + CUpgrade::get(this->FactionUpgrade)->get_effects_string());
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
+
+	return text;
 }
 
 std::string_view faction::get_title_name(const wyrmgus::government_type government_type, const faction_tier tier) const
