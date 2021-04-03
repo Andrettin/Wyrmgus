@@ -178,5 +178,3 @@ extern std::string NameToIdent(const std::string &text);				/// Make the name be
 extern std::string SeparateCapitalizedStringElements(const std::string &text);	/// Make the string's capitalized elements become separated
 extern std::string GeneratePersonalName(const std::string &unit_type_ident);
 //Wyrmgus end
-
-Q_DECLARE_METATYPE(std::filesystem::path)

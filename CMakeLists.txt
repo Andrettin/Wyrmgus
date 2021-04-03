@@ -1016,6 +1016,7 @@ set(wyrmgus_util_HDRS
 	src/util/log_util.h
 	src/util/map_util.h
 	src/util/number_util.h
+	src/util/path_util.h
 	src/util/point_container.h
 	src/util/point_operators.h
 	src/util/point_util.h
