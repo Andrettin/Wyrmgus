@@ -526,7 +526,7 @@ std::string character::get_encyclopedia_text() const
 	}
 
 	if (this->get_default_faction() != nullptr) {
-		named_data_entry::concatenate_encyclopedia_text(text, "Faction: " + this->get_default_faction()->get_name());
+		named_data_entry::concatenate_encyclopedia_text(text, "Faction: " + this->get_default_faction()->get_link_string());
 	}
 
 	if (this->get_unit_type() != nullptr) {

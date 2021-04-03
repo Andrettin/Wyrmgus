@@ -69,10 +69,10 @@ class faction final : public detailed_data_entry, public data_type<faction>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::faction* parent_faction MEMBER parent_faction)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::player_color* color MEMBER color READ get_color NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
 	Q_PROPERTY(wyrmgus::faction_tier min_tier MEMBER min_tier READ get_min_tier)
