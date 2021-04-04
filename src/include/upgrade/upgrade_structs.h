@@ -379,6 +379,8 @@ public:
 		return detailed_data_entry::has_encyclopedia_entry();
 	}
 
+	virtual std::string get_encyclopedia_text() const override;
+
 	int get_index() const
 	{
 		return this->ID;
@@ -476,6 +478,11 @@ public:
 	bool is_magic_suffix() const
 	{
 		return this->magic_suffix;
+	}
+
+	bool is_magic_affix() const
+	{
+		return this->is_magic_prefix() || this->is_magic_suffix();
 	}
 
 	int get_magic_level() const

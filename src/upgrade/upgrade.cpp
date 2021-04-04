@@ -85,6 +85,7 @@
 #include "upgrade/upgrade_category_rank.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
 
@@ -396,6 +397,88 @@ void CUpgrade::check() const
 	if (this->get_conditions() != nullptr) {
 		this->get_conditions()->check_validity();
 	}
+}
+
+std::string CUpgrade::get_encyclopedia_text() const
+{
+	std::string text;
+
+	if (this->get_civilization() != nullptr && this->get_civilization() != defines::get()->get_neutral_civilization()) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_link_string());
+	}
+
+	if (this->get_faction() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Faction: " + this->get_faction()->get_link_string());
+	}
+
+	if (this->get_upgrade_class() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Class: " + this->get_upgrade_class()->get_name());
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
+
+	if (this->is_magic_affix()) {
+		const std::string effects = GetUpgradeEffectsString(this->get_identifier());
+		if (!effects.empty()) {
+			named_data_entry::concatenate_encyclopedia_text(text, "Effects: " + effects);
+		}
+
+		std::vector<std::string> applies_to;
+
+		for (const item_class item_class : this->get_affixed_item_classes()) {
+			applies_to.push_back(string::get_plural_form(get_item_class_name(item_class)));
+		}
+
+		std::vector<const unit_type *> applies_to_unit_types;
+		for (const auto &upgrade_modifier : this->get_modifiers()) {
+			for (const unit_type *unit_type : upgrade_modifier->get_unit_types()) {
+				applies_to_unit_types.push_back(unit_type);
+			}
+		}
+
+		for (const unit_type *unit_type : unit_type::get_all()) {
+			if (unit_type->is_template()) { //if is a template, continue
+				continue;
+			}
+
+			if (vector::contains(unit_type->Affixes, this)) {
+				applies_to_unit_types.push_back(unit_type);
+			}
+		}
+
+		for (const unit_type *unit_type : applies_to_unit_types) {
+			std::string unit_type_str = string::get_plural_form(unit_type->get_name());
+
+			if (unit_type->get_civilization() != nullptr && unit_type->get_civilization() != defines::get()->get_neutral_civilization()) {
+				unit_type_str += " (" + unit_type->get_civilization()->get_name();
+
+				if (unit_type->get_faction() != nullptr) {
+					unit_type_str += ": " + unit_type->get_faction()->get_name();
+				}
+
+				unit_type_str += ")";
+			}
+
+			applies_to.push_back(std::move(unit_type_str));
+		}
+
+		if (!applies_to.empty()) {
+			std::sort(applies_to.begin(), applies_to.end());
+
+			std::string applies_to_text;
+			for (const std::string &str : applies_to) {
+				if (!applies_to_text.empty()) {
+					applies_to_text += ", ";
+				}
+
+				applies_to_text += str;
+			}
+
+			named_data_entry::concatenate_encyclopedia_text(text, "Available For: " + applies_to_text);
+		}
+	}
+
+	return text;
 }
 
 void CUpgrade::set_parent(const CUpgrade *parent_upgrade)

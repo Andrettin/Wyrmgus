@@ -282,6 +282,8 @@ QObject *engine_interface::get_link_target(const QString &link_str) const
 			object = literary_text::get(link_target);
 		} else if (link_type == "unit_type") {
 			object = unit_type::get(link_target);
+		} else if (link_type == "upgrade") {
+			object = CUpgrade::get(link_target);
 		} else if (link_type == "world") {
 			object = world::get(link_target);
 		} else {
