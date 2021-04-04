@@ -196,6 +196,7 @@ public:
 signals:
 	void running_changed();
 	void loading_message_changed();
+	void encyclopediaEntryOpened(QString link);
 
 private:
 	std::queue<std::function<void()>> posted_commands;

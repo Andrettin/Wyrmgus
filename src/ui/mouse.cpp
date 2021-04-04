@@ -37,6 +37,7 @@
 //Wyrmgus end
 #include "commands.h"
 #include "database/defines.h"
+#include "engine_interface.h"
 #include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -51,6 +52,7 @@
 //Wyrmgus start
 #include "province.h"
 //Wyrmgus end
+#include "religion/deity.h"
 #include "script.h"
 #include "script/condition/condition.h"
 #include "sound/game_sound_set.h"
@@ -2520,16 +2522,36 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 					}
 					UI.SelectedViewport->Center(Selected[0]->get_scaled_map_pixel_pos_center());
 				} else if ((1 << button) == RightButton) {
-					std::string encyclopedia_ident = Selected[0]->Type->Ident;
-					std::string encyclopedia_state = "units";
+					QString encyclopedia_type;
+					QString encyclopedia_identifier;
+
 					if (Selected[0]->get_character() != nullptr && !Selected[0]->get_character()->Custom) {
-						encyclopedia_ident = Selected[0]->get_character()->Ident;
-						encyclopedia_state = "heroes";
+						if (Selected[0]->get_character()->is_deity()) {
+							encyclopedia_type = "deity";
+							encyclopedia_identifier = Selected[0]->get_character()->get_deity()->get_identifier_qstring();
+						} else {
+							encyclopedia_type = "character";
+							encyclopedia_identifier = Selected[0]->get_character()->get_identifier_qstring();
+						}
 					} else if (Selected[0]->get_unique() != nullptr) {
-						encyclopedia_ident = Selected[0]->get_unique()->get_identifier();
-						encyclopedia_state = "unique_items";
+						encyclopedia_type = "unique_item";
+						encyclopedia_identifier = Selected[0]->get_unique()->get_identifier_qstring();
+					} else {
+						encyclopedia_type = "unit_type";
+						const unit_type *unit_type = Selected[0]->Type;
+
+						while (unit_type != nullptr && !unit_type->has_encyclopedia_entry()) {
+							unit_type = unit_type->Parent;
+						}
+
+						if (unit_type != nullptr) {
+							encyclopedia_identifier = unit_type->get_identifier_qstring();
+						}
 					}
-					CclCommand("if (OpenEncyclopediaUnitEntry ~= nil) then OpenEncyclopediaUnitEntry(\"" + encyclopedia_ident + "\", \"" + encyclopedia_state + "\") end;");
+
+					if (!encyclopedia_identifier.isEmpty()) {
+						emit engine_interface::get()->encyclopediaEntryOpened(encyclopedia_type + ":" + encyclopedia_identifier);
+					}
 				} else if ((1 << button) == MiddleButton) {
 					//  clicked on info panel - single unit shown
 					if (UI.SelectedViewport->Unit == Selected[0]) {
