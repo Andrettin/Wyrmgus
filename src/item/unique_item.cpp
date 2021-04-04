@@ -59,6 +59,60 @@ bool unique_item::compare_encyclopedia_entries(const unique_item *lhs, const uni
 	return lhs->get_name() < rhs->get_name();
 }
 
+std::string unique_item::get_encyclopedia_text() const
+{
+	std::string text;
+
+	if (this->get_unit_type() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Type: " + this->get_unit_type()->get_link_string());
+	}
+
+	if (this->get_set() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Set: " + this->get_set()->get_name());
+	}
+
+	std::string description = this->get_description();
+	if (this->get_set() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(description, this->get_set()->get_description());
+	}
+	if (!description.empty()) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Description: " + description);
+	}
+
+	if (!this->get_quote().empty()) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Quote: " + this->get_quote());
+	} else if (this->get_set() != nullptr && !this->get_set()->get_quote().empty()) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Quote: " + this->get_set()->get_quote());
+	}
+
+	std::string background = this->get_background();
+	if (this->get_set() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(background, this->get_set()->get_background());
+	}
+	if (!background.empty()) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Background: " + background);
+	}
+
+	std::string notes = this->get_notes();
+	if (this->get_set() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(notes, this->get_set()->get_notes());
+	}
+	if (!notes.empty()) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Notes: " + notes);
+	}
+
+	if (this->get_magic_level() > 0) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Magic Level: " + std::to_string(this->get_magic_level()));
+	}
+
+	const std::string effects = GetUniqueItemEffectsString(this->get_identifier());
+	if (!effects.empty()) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Effects: " + effects);
+	}
+
+	return text;
+}
+
 bool unique_item::can_drop() const
 {
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop

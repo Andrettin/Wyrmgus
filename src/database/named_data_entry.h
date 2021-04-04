@@ -46,7 +46,7 @@ public:
 		return lhs->get_name() < rhs->get_name();
 	}
 
-	static void concatenate_encyclopedia_text(std::string &text, std::string &&additional_text)
+	static void concatenate_encyclopedia_text(std::string &text, const std::string &additional_text)
 	{
 		if (additional_text.empty()) {
 			return;
@@ -56,7 +56,7 @@ public:
 			text += "\n\n";
 		}
 
-		text += std::move(additional_text);
+		text += additional_text;
 	}
 
 	explicit named_data_entry(const std::string &identifier) : data_entry(identifier)

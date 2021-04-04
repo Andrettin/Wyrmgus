@@ -71,6 +71,8 @@ public:
 		}
 	}
 
+	virtual std::string get_encyclopedia_text() const override;
+
 	const wyrmgus::unit_type *get_unit_type() const
 	{
 		return this->unit_type;
