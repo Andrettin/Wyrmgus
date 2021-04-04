@@ -254,7 +254,7 @@ bool CUpgrade::compare_encyclopedia_entries(const CUpgrade *lhs, const CUpgrade 
 		return lhs->get_price() < rhs->get_price();
 	}
 
-	return lhs->get_name() < rhs->get_name();
+	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
 CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifier), Work(wyrmgus::item_class::none)

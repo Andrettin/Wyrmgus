@@ -797,7 +797,6 @@ public:
 		return unit_type;
 	}
 
-	static bool compare_encyclopedia_entries_base(const unit_type *lhs, const unit_type *rhs);
 	static bool compare_building_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs);
 	static bool compare_item_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs);
 	static bool compare_unit_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs);

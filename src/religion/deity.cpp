@@ -72,7 +72,7 @@ bool deity::compare_encyclopedia_entries(const deity *lhs, const deity *rhs)
 		return lhs->is_major();
 	}
 
-	return lhs->get_name() < rhs->get_name();
+	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
 deity::deity(const std::string &identifier)

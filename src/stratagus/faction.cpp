@@ -69,7 +69,7 @@ bool faction::compare_encyclopedia_entries(const faction *lhs, const faction *rh
 		return lhs->get_type() < rhs->get_type();
 	}
 
-	return lhs->get_name() < rhs->get_name();
+	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
 void faction::process_title_names(title_name_map &title_names, const sml_data &scope)

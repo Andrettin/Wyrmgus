@@ -321,9 +321,7 @@ public:
 			}
 		}
 
-		std::sort(entries.begin(), entries.end(), [](const CUpgrade *lhs, const CUpgrade *rhs) {
-			return lhs->get_name() < rhs->get_name();
-		});
+		std::sort(entries.begin(), entries.end(), named_data_entry::compare_encyclopedia_entries);
 
 		return entries;
 	}
@@ -338,9 +336,7 @@ public:
 			}
 		}
 
-		std::sort(entries.begin(), entries.end(), [](const CUpgrade *lhs, const CUpgrade *rhs) {
-			return lhs->get_name() < rhs->get_name();
-		});
+		std::sort(entries.begin(), entries.end(), named_data_entry::compare_encyclopedia_entries);
 
 		return entries;
 	}

@@ -46,23 +46,7 @@ static int CclDefineLiteraryText(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Name")) {
-			text->set_name(LuaToString(l, -1));
-		} else if (!strcmp(value, "Author")) {
-			text->author = LuaToString(l, -1);
-		} else if (!strcmp(value, "Translator")) {
-			text->Translator = LuaToString(l, -1);
-		} else if (!strcmp(value, "Publisher")) {
-			text->Publisher = LuaToString(l, -1);
-		} else if (!strcmp(value, "CopyrightNotice")) {
-			text->CopyrightNotice = LuaToString(l, -1);
-		} else if (!strcmp(value, "Notes")) {
-			text->Notes = LuaToString(l, -1);
-		} else if (!strcmp(value, "Year")) {
-			text->Year = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "InitialPage")) {
-			text->InitialPage = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Chapters")) {
+		if (!strcmp(value, "Chapters")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
@@ -77,8 +61,6 @@ static int CclDefineLiteraryText(lua_State *l)
 					lua_rawgeti(l, -1, k + 1);
 					if (!strcmp(value, "name")) {
 						chapter->Name = LuaToString(l, -1);
-					} else if (!strcmp(value, "introduction")) {
-						chapter->Introduction = LuaToBoolean(l, -1);
 					} else if (!strcmp(value, "text")) {
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {

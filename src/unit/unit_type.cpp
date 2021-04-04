@@ -484,11 +484,6 @@ std::string GetResourceNameById(int resource_id)
 
 namespace wyrmgus {
 
-bool unit_type::compare_encyclopedia_entries_base(const unit_type *lhs, const unit_type *rhs)
-{
-	return lhs->get_name() < rhs->get_name();
-}
-
 bool unit_type::compare_building_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs)
 {
 	const bool lhs_is_town_hall = lhs->get_unit_class() != nullptr && lhs->get_unit_class()->is_town_hall();
@@ -498,7 +493,7 @@ bool unit_type::compare_building_encyclopedia_entries(const unit_type *lhs, cons
 		return lhs_is_town_hall;
 	}
 
-	return unit_type::compare_encyclopedia_entries_base(lhs, rhs);
+	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
 bool unit_type::compare_item_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs)
@@ -515,7 +510,7 @@ bool unit_type::compare_item_encyclopedia_entries(const unit_type *lhs, const un
 		return lhs->DefaultStat.get_price() < rhs->DefaultStat.get_price();
 	}
 
-	return unit_type::compare_encyclopedia_entries_base(lhs, rhs);
+	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
 bool unit_type::compare_unit_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs)
@@ -604,7 +599,7 @@ bool unit_type::compare_unit_encyclopedia_entries(const unit_type *lhs, const un
 		return lhs->DefaultStat.Variables[POINTS_INDEX].Value < rhs->DefaultStat.Variables[POINTS_INDEX].Value;
 	}
 
-	return unit_type::compare_encyclopedia_entries_base(lhs, rhs);
+	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
 bool unit_type::compare_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs)

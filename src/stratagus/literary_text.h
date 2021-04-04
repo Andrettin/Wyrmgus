@@ -42,7 +42,6 @@ class chapter
 public:
 	std::string Name;				/// Name of the chapter
 	int ID = 0;
-	bool Introduction = false;		/// Whether this is an introductory chapter
 	std::vector<std::string> Pages;	/// Pages of text
 };
 
@@ -58,13 +57,17 @@ public:
 	static constexpr const char *class_identifier = "literary_text";
 	static constexpr const char *database_folder = "literary_texts";
 
+	static bool compare_encyclopedia_entries(const literary_text *lhs, const literary_text *rhs);
+
 	explicit literary_text(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 
+	virtual void process_sml_scope(const sml_data &scope) override;
+
 	virtual bool has_encyclopedia_entry() const override
 	{
-		return this->icon != nullptr;
+		return this->icon != nullptr && !this->text.empty();
 	}
 
 	virtual std::string get_encyclopedia_text() const override
@@ -80,8 +83,6 @@ public:
 		return text;
 	}
 
-	chapter *GetChapter(const std::string &chapter_name) const;
-
 signals:
 	void changed();
 	
@@ -89,15 +90,12 @@ private:
 	wyrmgus::icon *icon = nullptr;
 	std::string author;
 public:
-	std::string Translator;			/// Translator of the text
-	std::string Publisher;			/// Publisher of the text
-	std::string CopyrightNotice;	/// Copyright notice explaining that this text is in the public domain, or is licensed under an open-source license
-	std::string Notes;				/// Notes to appear on the cover of the text
-	int Year = 0;						/// Year of publication
-	int InitialPage = 1;				/// Page in which the text begins
 	std::vector<std::unique_ptr<chapter>> Chapters;	/// The chapters of the text
 private:
 	std::string text;
+	const literary_text *main_text = nullptr;
+	size_t chapter_index = 0;
+	std::vector<const literary_text *> chapters;
 
 	friend int ::CclDefineLiteraryText(lua_State *l);
 };

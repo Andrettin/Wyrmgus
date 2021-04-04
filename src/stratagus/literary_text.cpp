@@ -30,14 +30,36 @@
 
 namespace wyrmgus {
 
-chapter *literary_text::GetChapter(const std::string &chapter_name) const
+bool literary_text::compare_encyclopedia_entries(const literary_text *lhs, const literary_text *rhs)
 {
-	for (size_t i = 0; i < this->Chapters.size(); ++i) {
-		if (chapter_name == this->Chapters[i]->Name) {
-			return this->Chapters[i].get();
+	if (lhs->main_text != rhs->main_text) {
+		if (lhs->main_text == nullptr || rhs->main_text == nullptr) {
+			return lhs->main_text != nullptr;
 		}
+
+		return lhs->main_text->get_name() < rhs->main_text->get_name();
+	} else if (lhs->main_text != nullptr) {
+		return lhs->chapter_index < rhs->chapter_index;
 	}
-	return nullptr;
+
+	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
+}
+
+void literary_text::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "chapters") {
+		for (const std::string &value : values) {
+			literary_text *chapter = literary_text::get(value);
+			chapter->main_text = this;
+			chapter->chapter_index = this->chapters.size();
+			this->chapters.push_back(chapter);
+		}
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
 }
 
 }

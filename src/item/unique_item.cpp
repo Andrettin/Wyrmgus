@@ -56,7 +56,7 @@ bool unique_item::compare_encyclopedia_entries(const unique_item *lhs, const uni
 		return unit_type::compare_encyclopedia_entries(lhs_unit_type, rhs_unit_type);
 	}
 
-	return lhs->get_name() < rhs->get_name();
+	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
 std::string unique_item::get_encyclopedia_text() const
