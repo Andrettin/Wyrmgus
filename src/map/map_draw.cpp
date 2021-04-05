@@ -327,7 +327,8 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 				const std::shared_ptr<CPlayerColorGraphic> &terrain_graphics = terrain->get_graphics(season);
 				if (terrain_graphics != nullptr) {
 					const int frame_index = solid_tile + (terrain == mf.get_terrain() ? mf.AnimationFrame : 0);
-					terrain_graphics->DrawFrameClip(frame_index, dx, dy, time_of_day, render_commands);
+					const color_modification color_modification(terrain->get_hue_rotation(), color_set(), player_color, time_of_day);
+					terrain_graphics->render_frame(frame_index, QPoint(dx, dy), color_modification, render_commands);
 				}
 			}
 
@@ -349,7 +350,8 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 						}
 					}
 
-					transition_terrain_graphics->DrawFrameClip(transition_tiles[i].tile_frame, dx, dy, transition_time_of_day, render_commands);
+					const color_modification color_modification(transition_terrain->get_hue_rotation(), color_set(), player_color, transition_time_of_day);
+					transition_terrain_graphics->render_frame(transition_tiles[i].tile_frame, QPoint(dx, dy), color_modification, render_commands);
 				}
 			}
 
@@ -366,7 +368,9 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 				if (overlay_terrain_graphics != nullptr) {
 					const int frame_index = overlay_solid_tile + (overlay_terrain == mf.get_overlay_terrain() ? mf.OverlayAnimationFrame : 0);
 					const wyrmgus::time_of_day *overlay_time_of_day = is_overlay_space ? nullptr : time_of_day;
-					overlay_terrain_graphics->DrawPlayerColorFrameClip(player_color, frame_index, dx, dy, overlay_time_of_day, render_commands);
+
+					const color_modification color_modification(overlay_terrain->get_hue_rotation(), color_set(), player_color, overlay_time_of_day);
+					overlay_terrain_graphics->render_frame(frame_index, QPoint(dx, dy), color_modification, render_commands);
 				}
 			}
 
@@ -380,7 +384,9 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 				const std::shared_ptr<CPlayerColorGraphic> &overlay_transition_graphics = overlay_transition_terrain->get_transition_graphics(season);
 				if (overlay_transition_graphics != nullptr) {
 					const wyrmgus::time_of_day *overlay_transition_time_of_day = is_overlay_transition_space ? nullptr : time_of_day;
-					overlay_transition_graphics->DrawPlayerColorFrameClip(player_color, overlay_transition_tiles[i].tile_frame, dx, dy, overlay_transition_time_of_day, render_commands);
+
+					const color_modification color_modification(overlay_transition_terrain->get_hue_rotation(), color_set(), player_color, overlay_transition_time_of_day);
+					overlay_transition_graphics->render_frame(overlay_transition_tiles[i].tile_frame, QPoint(dx, dy), color_modification, render_commands);
 				}
 			}
 
