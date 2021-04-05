@@ -826,6 +826,10 @@ void unit_type::process_sml_scope(const sml_data &scope)
 				this->subtypes.push_back(subtype);
 			}
 		});
+	} else if (tag == "hue_ignored_colors") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			this->hue_ignored_colors.insert(child_scope.to_color());
+		});
 	} else if (tag == "costs") {
 		scope.for_each_property([&](const wyrmgus::sml_property &property) {
 			const std::string &key = property.get_key();
@@ -2676,7 +2680,7 @@ void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraph
 		opacity = int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value);
 	}
 
-	const color_modification color_modification(type.get_hue_rotation(), player_color, time_of_day);
+	const color_modification color_modification(type.get_hue_rotation(), type.get_hue_ignored_colors(), player_color, time_of_day);
 	sprite->render_frame(frame, pos, color_modification, false, flip, opacity, 100, render_commands);
 }
 

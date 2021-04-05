@@ -76,6 +76,19 @@ icon::icon(const std::string &identifier) : icon_base(identifier)
 {
 }
 
+void icon::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "hue_ignored_colors") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			this->hue_ignored_colors.insert(child_scope.to_color());
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
 void icon::initialize()
 {
 	if (!this->get_file().empty() && this->get_graphics() == nullptr) {
@@ -104,7 +117,7 @@ std::shared_ptr<CPlayerColorGraphic> icon::get_graphics() const
 */
 void icon::DrawIcon(const PixelPos &pos, const player_color *player_color, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	this->get_graphics()->render_frame(this->get_frame(), pos, color_modification(this->get_hue_rotation(), player_color), render_commands);
+	this->get_graphics()->render_frame(this->get_frame(), pos, color_modification(this->get_hue_rotation(), this->get_hue_ignored_colors(), player_color), render_commands);
 }
 
 /**
@@ -141,7 +154,7 @@ void icon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent, std::ve
 */
 void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player_color, bool transparent, bool grayscale, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	const color_modification color_modification(this->get_hue_rotation(), player_color);
+	const color_modification color_modification(this->get_hue_rotation(), this->get_hue_ignored_colors(), player_color);
 
 	ButtonStyle s(style);
 

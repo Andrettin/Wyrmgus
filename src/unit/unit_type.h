@@ -35,6 +35,7 @@
 #include "missileconfig.h"
 #include "ui/icon.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/color_container.h"
 #include "vec2i.h"
 
 #ifdef __MORPHOS__
@@ -999,6 +1000,11 @@ public:
 		return this->hue_rotation;
 	}
 
+	const color_set &get_hue_ignored_colors() const
+	{
+		return this->hue_ignored_colors;
+	}
+
 	const std::vector<const spell *> &get_autocast_spells() const
 	{
 		return this->autocast_spells;
@@ -1226,6 +1232,7 @@ private:
 	QPoint offset = QPoint(0, 0); //sprite horizontal offset
 	player_color *conversible_player_color = nullptr; //the conversible player color for the unit graphics
 	double hue_rotation = 0;
+	color_set hue_ignored_colors;
 	int draw_level = 0;                                   /// Level to Draw UnitType at
 public:
 	int ShadowWidth = 0;					/// Shadow sprite width

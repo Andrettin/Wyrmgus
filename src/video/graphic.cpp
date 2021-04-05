@@ -51,6 +51,7 @@
 #include "util/image_util.h"
 #include "util/log_util.h"
 #include "util/point_util.h"
+#include "util/set_util.h"
 #include "video/font.h"
 #include "video/render_context.h"
 #include "video/renderer.h"
@@ -744,7 +745,10 @@ QImage CGraphic::create_modified_image(const color_modification &color_modificat
 		}
 	} else if (!color_modification.is_null()) {
 		if (color_modification.get_hue_rotation() != 0) {
-			const color_set ignored_colors = container::to_set<std::vector<QColor>, color_set>(this->get_conversible_player_color()->get_colors());
+			color_set ignored_colors = container::to_set<std::vector<QColor>, color_set>(this->get_conversible_player_color()->get_colors());
+			if (!color_modification.get_hue_ignored_colors().empty()) {
+				set::merge(ignored_colors, color_modification.get_hue_ignored_colors());
+			}
 			image::rotate_hue(image, color_modification.get_hue_rotation(), ignored_colors);
 		}
 
@@ -837,7 +841,7 @@ void CGraphic::render_frame(const int frame_index, const QPoint &pixel_pos, cons
 
 void CGraphic::render_frame(const int frame_index, const QPoint &pixel_pos, const player_color *player_color, const time_of_day *time_of_day, const bool grayscale, const bool flip, const unsigned char opacity, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const color_modification color_modification(0, player_color, time_of_day);
+	const color_modification color_modification(0, color_set(), player_color, time_of_day);
 
 	this->render_frame(frame_index, pixel_pos, color_modification, grayscale, flip, opacity, show_percent, render_commands);
 }

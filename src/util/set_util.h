@@ -29,7 +29,7 @@
 namespace wyrmgus::set {
 
 template <typename T, typename U>
-void merge(std::set<T> &set, const U &other_container)
+void merge(T &set, const U &other_container)
 {
 	for (const typename U::value_type &element : other_container) {
 		set.insert(element);
@@ -37,7 +37,7 @@ void merge(std::set<T> &set, const U &other_container)
 }
 
 template <typename T, typename U>
-void merge(std::set<T> &set, U &&other_container)
+void merge(T &set, U &&other_container)
 {
 	for (typename U::value_type &element : other_container) {
 		set.insert(std::move(element));

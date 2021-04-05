@@ -28,6 +28,7 @@
 
 #include "database/data_type.h"
 #include "ui/icon_base.h"
+#include "util/color_container.h"
 #include "vec2i.h"
 
 /**
@@ -85,6 +86,7 @@ public:
 
 	explicit icon(const std::string &identifier);
 
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 
 	virtual const QSize &get_size() const override;
@@ -97,6 +99,11 @@ public:
 	double get_hue_rotation() const
 	{
 		return this->hue_rotation;
+	}
+
+	const color_set &get_hue_ignored_colors() const
+	{
+		return this->hue_ignored_colors;
 	}
 
 	std::shared_ptr<CPlayerColorGraphic> get_graphics() const;
@@ -119,6 +126,7 @@ public:
 private:
 	player_color *conversible_player_color = nullptr;
 	double hue_rotation = 0;
+	color_set hue_ignored_colors;
 
 	friend int ::CclDefineIcon(lua_State *l);
 };
@@ -126,11 +134,9 @@ private:
 }
 
 /// Icon reference (used in config tables)
-class IconConfig
+class IconConfig final
 {
 public:
-	IconConfig() : Icon(nullptr) {}
-
 	bool LoadNoLog();
 	bool Load();
 public:

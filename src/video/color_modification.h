@@ -41,18 +41,23 @@ public:
 	{
 	}
 
-	explicit color_modification(const double hue_rotation, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change);
+	explicit color_modification(const double hue_rotation, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change);
 
-	explicit color_modification(const double hue_rotation, const wyrmgus::player_color *player_color)
-		: color_modification(hue_rotation, player_color, 0, 0, 0)
+	explicit color_modification(const double hue_rotation, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color)
+		: color_modification(hue_rotation, hue_ignored_colors, player_color, 0, 0, 0)
 	{
 	}
 
-	explicit color_modification(const double hue_rotation, const wyrmgus::player_color *player_color, const time_of_day *time_of_day);
+	explicit color_modification(const double hue_rotation, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day);
 
 	double get_hue_rotation() const
 	{
 		return this->hue_rotation;
+	}
+
+	const color_set &get_hue_ignored_colors() const
+	{
+		return this->hue_ignored_colors;
 	}
 
 	const wyrmgus::player_color *get_player_color() const
@@ -89,17 +94,21 @@ public:
 		if (this->get_hue_rotation() < other.get_hue_rotation()) {
 			return true;
 		} else if (this->get_hue_rotation() == other.get_hue_rotation()) {
-			if (this->get_player_color() < other.get_player_color()) {
+			if (this->get_hue_ignored_colors() < other.get_hue_ignored_colors()) {
 				return true;
-			} else if (this->get_player_color() == other.get_player_color()) {
-				if (this->get_red_change() < other.get_red_change()) {
+			} else if (this->get_hue_ignored_colors() == other.get_hue_ignored_colors()) {
+				if (this->get_player_color() < other.get_player_color()) {
 					return true;
-				} else if (this->get_red_change() == other.get_red_change()) {
-					if (this->get_green_change() < other.get_green_change()) {
+				} else if (this->get_player_color() == other.get_player_color()) {
+					if (this->get_red_change() < other.get_red_change()) {
 						return true;
-					} else if (this->get_green_change() == other.get_green_change()) {
-						if (this->get_blue_change() < other.get_blue_change()) {
+					} else if (this->get_red_change() == other.get_red_change()) {
+						if (this->get_green_change() < other.get_green_change()) {
 							return true;
+						} else if (this->get_green_change() == other.get_green_change()) {
+							if (this->get_blue_change() < other.get_blue_change()) {
+								return true;
+							}
 						}
 					}
 				}
@@ -112,6 +121,7 @@ public:
 
 private:
 	double hue_rotation = 0; //rotation in degrees to the hue
+	color_set hue_ignored_colors; //ignored colors for the hue rotation
 
 	const wyrmgus::player_color *player_color = nullptr; //the player color to be applied to the texture
 
