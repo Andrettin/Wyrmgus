@@ -2280,7 +2280,7 @@ const name_generator *unit_type::get_name_generator(const wyrmgus::faction *fact
 {
 	const wyrmgus::species *species = this->get_species();
 
-	if (species != nullptr) {
+	if (species != nullptr && (!species->is_sapient() || this->get_civilization() == nullptr)) {
 		return species->get_specimen_name_generator(gender);
 	} else if (this->get_civilization() != nullptr) {
 		const wyrmgus::civilization *civilization = this->get_faction_civilization(faction);
