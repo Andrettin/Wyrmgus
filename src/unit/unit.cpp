@@ -6839,7 +6839,7 @@ const std::string &CUnit::get_base_type_name() const
 std::string CUnit::get_type_name() const
 {
 	const wyrmgus::civilization *civilization = this->get_civilization();
-	if (civilization != nullptr && civilization != this->Player->get_civilization() && civilization->get_name() != this->get_base_type_name()) {
+	if (civilization != nullptr && civilization != this->Player->get_civilization() && civilization->get_name() != this->get_base_type_name() && this->Type->get_species() == nullptr) {
 		return civilization->get_name() + " " + this->get_base_type_name();
 	}
 
