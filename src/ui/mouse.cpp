@@ -1339,11 +1339,19 @@ void RestrictCursorToMinimap()
 */
 static void MouseScrollMap(const PixelPos &pos)
 {
+	if (pos == CursorStartScreenPos) {
+		return;
+	}
+
+	const QPoint scroll_start_pos = cursor::get_last_scroll_pos() != QPoint(-1, -1) ? cursor::get_last_scroll_pos() : QPoint(CursorStartScreenPos);
+
 	const int speed = (KeyModifiers & ModifierControl) ? UI.MouseScrollSpeedControl : UI.MouseScrollSpeedDefault;
-	const PixelDiff diff(pos - CursorStartScreenPos);
+	const PixelDiff diff(pos - scroll_start_pos);
 
 	UI.MouseViewport->Set(UI.MouseViewport->MapPos, UI.MouseViewport->Offset + speed * diff);
+
 	UI.MouseWarpPos = CursorStartScreenPos;
+	cursor::set_last_scroll_pos(pos);
 }
 
 static void handle_mouse_move_on_map(const PixelPos &cursor_pos)

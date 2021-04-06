@@ -856,6 +856,8 @@ void WaitEventsOneFrame()
 	}
 	handleInput(nullptr);
 
+	cursor::set_last_scroll_pos(QPoint(-1, -1));
+
 	const cursor *new_cursor = cursor::get_current_cursor();
 
 	if (old_cursor != new_cursor) {
