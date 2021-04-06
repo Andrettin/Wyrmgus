@@ -327,9 +327,6 @@ extern void CleanObjectives();
 /// show/hide messages
 extern void ToggleShowMessages();
 
-/// Draw the Pie Menu
-extern void DrawPieMenu(std::vector<std::function<void(renderer *)>> &render_commands);
-
 /// Draw the button popup
 extern void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vector<std::function<void(renderer *)>> &render_commands);
 

@@ -90,15 +90,6 @@ class CButtonPanel
 	bool ShowCommandKey;
 };
 
-class CPieMenu
-{
-	int MouseButton;
-	int X[8];
-	int Y[8];
-
-	void SetRadius(int radius);
-};
-
 class CResourceInfo
 {
 	int IconX;
@@ -170,8 +161,6 @@ class CUserInterface
 	bool CompletedBarShadow;
 
 	CButtonPanel ButtonPanel;
-
-	CPieMenu PieMenu;
 
 	CViewport *MouseViewport;
 	CMapArea MapArea;

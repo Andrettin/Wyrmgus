@@ -272,8 +272,6 @@ void UpdateDisplay()
 		//Wyrmgus end
 	}
 
-	DrawPieMenu(render_commands); // draw pie menu only if needed
-
 	DrawGuichanWidgets(render_commands);
 	
 	if (CurrentCursorState != CursorState::Rectangle) {

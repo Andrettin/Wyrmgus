@@ -98,7 +98,7 @@ public:
 private:
 	static inline std::map<cursor_type, cursor *> cursors_by_type;
 	static inline cursor *current_cursor = nullptr;
-	static inline QPoint last_scroll_pos = QPoint(-1, -1); //the last scroll position in this SDL tick if the map has been scrolled via mouse move with the scroll cursor type 
+	static inline QPoint last_scroll_pos = QPoint(-1, -1); //the last scroll position in this SDL tick if the map has been scrolled via mouse move with the scroll cursor type
 
 public:
 	explicit cursor(const std::string &identifier);
@@ -185,8 +185,7 @@ private:
 enum class CursorState {
 	Point,      /// Normal cursor
 	Select,     /// Select position
-	Rectangle,  /// Rectangle selecting
-	PieMenu     /// Displaying Pie Menu
+	Rectangle  /// Rectangle selecting
 };
 
 extern CursorState CurrentCursorState;  /// current cursor state (point,...)

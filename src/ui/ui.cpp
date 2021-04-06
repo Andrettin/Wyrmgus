@@ -214,9 +214,6 @@ void CUserInterface::Load()
 	if (ButtonPanel.G) {
 		ButtonPanel.G->Load(defines::get()->get_scale_factor());
 	}
-	if (PieMenu.G) {
-		PieMenu.G->Load(defines::get()->get_scale_factor());
-	}
 
 	//  Resolve cursors
 	for (int i = 0; i < static_cast<int>(cursor_type::count); ++i) {
@@ -311,9 +308,6 @@ void CleanUserInterface()
 
 	// Button Panel
 	UI.ButtonPanel.G.reset();
-
-	// Pie Menu
-	UI.PieMenu.G.reset();
 
 	// Backgrounds
 	UI.VictoryBackgroundG.reset();

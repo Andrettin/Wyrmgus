@@ -269,32 +269,6 @@ public:
 	bool ShowCommandKey = true;
 };
 
-class CPieMenu
-{
-public:
-	CPieMenu()
-	{
-		memset(this->X, 0, sizeof(this->X));
-		memset(this->Y, 0, sizeof(this->Y));
-	}
-
-	std::shared_ptr<CGraphic> G; /// Optional background image
-	int MouseButton = NoButton; /// Which mouse button pops up the piemenu, deactivate with NoButton
-	int X[9];            /// X position of the pies
-	int Y[9];            /// Y position of the pies
-
-	void SetRadius(const int radius)
-	{
-		static constexpr std::array<int, 9> coeffX = {    0,  193, 256, 193,   0, -193, -256, -193, 0};
-		static constexpr std::array<int, 9> coeffY = { -256, -193,   0, 193, 256,  193,    0, -193, 0};
-
-		for (int i = 0; i < 9; ++i) {
-			this->X[i] = (coeffX[i] * radius) >> 8;
-			this->Y[i] = (coeffY[i] * radius) >> 8;
-		}
-	}
-};
-
 class CResourceInfo
 {
 public:
@@ -443,9 +417,6 @@ public:
 
 	// Button panel
 	CButtonPanel ButtonPanel;
-
-	// Pie Menu
-	CPieMenu PieMenu;
 
 	// Map area
 	ViewportModeType ViewportMode;      /// Current viewport mode

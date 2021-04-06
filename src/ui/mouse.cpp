@@ -99,8 +99,6 @@ bool LeaveStops;                             /// Mouse leaves windows stops scro
 
 cursor_on CursorOn = cursor_on::unknown; /// Cursor on field
 
-static void HandlePieMenuMouseSelection();
-
 CUnit *GetUnitUnderCursor()
 {
 	return UnitUnderCursor;
@@ -1496,13 +1494,6 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false);  // Reset
 	HandleMouseOn(cursorPos);
 
-	//  Make the piemenu "follow" the mouse
-	if (CurrentCursorState == CursorState::PieMenu && CursorOn == cursor_on::map) {
-		CursorStartScreenPos.x = std::clamp(CursorStartScreenPos.x, CursorScreenPos.x - UI.PieMenu.X[2], CursorScreenPos.x + UI.PieMenu.X[2]);
-		CursorStartScreenPos.y = std::clamp(CursorStartScreenPos.y, CursorScreenPos.y - UI.PieMenu.Y[4], CursorScreenPos.y + UI.PieMenu.Y[4]);
-		return;
-	}
-
 	// Restrict mouse to minimap when dragging
 	if (OldCursorOn == cursor_on::minimap && CursorOn != cursor_on::minimap && (MouseButtons & LeftButton)) {
 		const Vec2i cursor_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
@@ -2367,17 +2358,10 @@ static void UIHandleButtonDown_OnMap()
 		return;
 	}
 
-	if (MouseButtons & UI.PieMenu.MouseButton) { // enter pie menu
-		UnitUnderCursor = nullptr;
-		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false);  // Reset
-		CursorStartScreenPos = CursorScreenPos;
-		if (!Selected.empty() && Selected[0]->Player == CPlayer::GetThisPlayer() && CurrentCursorState == CursorState::Point) {
-			CurrentCursorState = CursorState::PieMenu;
-		}
 #ifdef USE_TOUCHSCREEN
-	} else if (doubleLeftButton) {
+	if (doubleLeftButton) {
 #else
-	} else if (MouseButtons & RightButton) {
+	if (MouseButtons & RightButton) {
 #endif
 		if (!GameObserve && !GamePaused && !GameEstablishing && UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 			CUnit *unit;
@@ -2773,17 +2757,6 @@ void UIHandleButtonDown(unsigned button)
 		return;
 	}
 
-	if (CurrentCursorState == CursorState::PieMenu) {
-		if (CursorOn == cursor_on::map) {
-			HandlePieMenuMouseSelection();
-			return;
-		} else {
-			// Pie Menu canceled
-			CurrentCursorState = CursorState::Point;
-			// Don't return, we might be over another button
-		}
-	}
-
 	//  Cursor is on the map area
 	if (CursorOn == cursor_on::map) {
 		UIHandleButtonDown_OnMap();
@@ -2809,18 +2782,6 @@ void UIHandleButtonUp(unsigned button)
 	if (cursor::get_current_cursor() == UI.get_cursor(cursor_type::scroll)) {
 		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false);
 		return;
-	}
-
-	//
-	//  Pie Menu
-	//
-	if (CurrentCursorState == CursorState::PieMenu) {
-		// Little threshold
-		if (1 < abs(CursorStartScreenPos.x - CursorScreenPos.x)
-			|| 1 < abs(CursorStartScreenPos.y - CursorScreenPos.y)) {
-			// there was a move, handle the selected button/pie
-			HandlePieMenuMouseSelection();
-		}
 	}
 
 	//Wyrmgus start
@@ -3106,124 +3067,5 @@ void UIHandleButtonUp(unsigned button)
 		CursorStartScreenPos.y = 0;
 		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false);
 		CurrentCursorState = CursorState::Point;
-	}
-}
-
-/**
-**  Get pie menu under the cursor
-**
-**  @return  Index of the pie menu under the cursor or -1 for none
-*/
-static int GetPieUnderCursor()
-{
-	int x = CursorScreenPos.x - (CursorStartScreenPos.x - ICON_SIZE_X / 2);
-	int y = CursorScreenPos.y - (CursorStartScreenPos.y - ICON_SIZE_Y / 2);
-	for (int i = 0; i < 9; ++i) {
-		if (x > UI.PieMenu.X[i] && x < UI.PieMenu.X[i] + ICON_SIZE_X
-			&& y > UI.PieMenu.Y[i] && y < UI.PieMenu.Y[i] + ICON_SIZE_Y) {
-			return i;
-		}
-	}
-	return -1; // no pie under cursor
-}
-
-/**
-**  Draw Pie Menu
-*/
-void DrawPieMenu(std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	char buf[2] = "?";
-
-	if (CurrentCursorState != CursorState::PieMenu) {
-		return;
-	}
-
-	if (CurrentButtons.empty()) { // no buttons
-		CurrentCursorState = CursorState::Point;
-		return;
-	}
-	const std::vector<std::unique_ptr<wyrmgus::button>> &buttons(CurrentButtons);
-	CLabel label(wyrmgus::defines::get()->get_game_font());
-	CViewport *vp = UI.SelectedViewport;
-	PushClipping();
-	vp->SetClipping();
-
-	// Draw background
-	if (UI.PieMenu.G) {
-		UI.PieMenu.G->DrawFrameClip(0,
-									CursorStartScreenPos.x - UI.PieMenu.G->Width / 2,
-									CursorStartScreenPos.y - UI.PieMenu.G->Height / 2, render_commands);
-	}
-	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 9; ++i) {
-		if (buttons[i]->get_pos() != -1) {
-			int x = CursorStartScreenPos.x - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
-			int y = CursorStartScreenPos.y - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
-			const PixelPos pos(x, y);
-
-			bool gray = false;
-			for (size_t j = 0; j != Selected.size(); ++j) {
-				if (!IsButtonAllowed(*Selected[j], *buttons[i])) {
-					gray = true;
-					break;
-				}
-			}
-			// Draw icon
-			if (gray) {
-				buttons[i]->Icon.Icon->DrawGrayscaleIcon(pos, render_commands);
-			} else {
-				buttons[i]->Icon.Icon->DrawIcon(pos, CPlayer::GetThisPlayer()->get_player_color(), render_commands);
-			}
-
-			// Tutorial show command key in icons
-			if (UI.ButtonPanel.ShowCommandKey) {
-				const char *text;
-
-				if (buttons[i]->get_key() == 27) {
-					text = "ESC";
-				} else {
-					buf[0] = toupper(buttons[i]->get_key());
-					text = (const char *)buf;
-				}
-				label.DrawClip(x + 4, y + 4, text, render_commands);
-			}
-		}
-	}
-
-	PopClipping();
-
-	int i = GetPieUnderCursor();
-	if (i != -1 && KeyState != KeyStateInput && buttons[i]->get_pos() != -1) {
-		DrawPopup(*buttons[i], CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i], render_commands);
-	}
-}
-
-/**
-**  Handle pie menu mouse selection
-*/
-static void HandlePieMenuMouseSelection()
-{
-	if (CurrentButtons.empty()) {  // no buttons
-		return;
-	}
-
-	int pie = GetPieUnderCursor();
-	if (pie != -1) {
-		const ButtonCmd action = CurrentButtons[pie]->Action;
-		UI.ButtonPanel.DoClicked(pie);
-		if (action == ButtonCmd::Button) {
-			// there is a submenu => stay in piemenu mode
-			// and recenter the piemenu around the cursor
-			CursorStartScreenPos = CursorScreenPos;
-		} else {
-			if (CurrentCursorState == CursorState::PieMenu) {
-				CurrentCursorState = CursorState::Point;
-			}
-			CursorOn = cursor_on::unknown;
-			UIHandleMouseMove(CursorScreenPos); // recompute CursorOn and company
-		}
-	} else {
-		CurrentCursorState = CursorState::Point;
-		CursorOn = cursor_on::unknown;
-		UIHandleMouseMove(CursorScreenPos); // recompute CursorOn and company
 	}
 }
