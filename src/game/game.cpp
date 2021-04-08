@@ -2226,7 +2226,6 @@ void LuaRegisterModules()
 	//Wyrmgus end
 	GroupCclRegister();
 	ItemCclRegister();
-	LiteraryTextCclRegister();
 	MapCclRegister();
 	MissileCclRegister();
 	NetworkCclRegister();

@@ -414,7 +414,6 @@ set(wyrmgus_base_SRCS
 	src/stratagus/script.cpp
 	src/stratagus/script_character.cpp
 	src/stratagus/script_grand_strategy.cpp
-	src/stratagus/script_literary_text.cpp
 	src/stratagus/script_player.cpp
 	src/stratagus/script_province.cpp
 	src/stratagus/selection.cpp

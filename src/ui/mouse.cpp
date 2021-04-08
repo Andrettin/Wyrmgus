@@ -83,7 +83,7 @@
 
 int MouseButtons;                            /// Current pressed mouse buttons
 
-int KeyModifiers;                            /// Current keyboard modifiers
+int KeyModifiers = 0;                        /// Current keyboard modifiers
 
 CUnit *UnitUnderCursor;                      /// Unit under cursor
 int ButtonAreaUnderCursor = -1;              /// Button area under cursor

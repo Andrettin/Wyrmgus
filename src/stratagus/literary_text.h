@@ -29,21 +29,9 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
-struct lua_State;
-
-static int CclDefineLiteraryText(lua_State *l);
-
 namespace wyrmgus {
 
 class icon;
-
-class chapter
-{
-public:
-	std::string Name;				/// Name of the chapter
-	int ID = 0;
-	std::vector<std::string> Pages;	/// Pages of text
-};
 
 class literary_text final : public named_data_entry, public data_type<literary_text>
 {
@@ -89,17 +77,10 @@ signals:
 private:
 	wyrmgus::icon *icon = nullptr;
 	std::string author;
-public:
-	std::vector<std::unique_ptr<chapter>> Chapters;	/// The chapters of the text
-private:
 	std::string text;
 	const literary_text *main_text = nullptr;
 	size_t chapter_index = 0;
 	std::vector<const literary_text *> chapters;
-
-	friend int ::CclDefineLiteraryText(lua_State *l);
 };
 
 }
-
-extern void LiteraryTextCclRegister();
