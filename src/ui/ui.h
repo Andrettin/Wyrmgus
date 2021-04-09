@@ -110,20 +110,6 @@ public:
 
 constexpr int MAX_NUM_VIEWPORTS = 8;         /// Number of supported viewports
 
-/**
-**  Enumeration of the different predefined viewport configurations.
-**
-**  @todo this should be later user configurable
-*/
-enum ViewportModeType {
-	VIEWPORT_SINGLE = 0,                /// Old single viewport
-	VIEWPORT_SPLIT_HORIZ,           /// Two viewports split horizontal
-	VIEWPORT_SPLIT_HORIZ3,          /// Three viewports split horiontal
-	VIEWPORT_SPLIT_VERT,            /// Two viewports split vertical
-	VIEWPORT_QUAD,                  /// Four viewports split symmetric
-	NUM_VIEWPORT_MODES             /// Number of different viewports.
-};
-
 class CMapArea final
 {
 public:
@@ -419,7 +405,6 @@ public:
 	CButtonPanel ButtonPanel;
 
 	// Map area
-	ViewportModeType ViewportMode;      /// Current viewport mode
 	CViewport *MouseViewport;           /// Viewport containing mouse
 	CViewport *SelectedViewport;        /// Current selected active viewport
 	int NumViewports;                   /// # Viewports currently used
@@ -524,12 +509,6 @@ extern void RestrictCursorToMinimap();
 
 /// Get viewport for screen pixel position
 extern CViewport *GetViewport(const PixelPos &screenPos);
-/// Cycle through all available viewport modes
-extern void CycleViewportMode(int);
-/// Select viewport mode
-extern void SetViewportMode(ViewportModeType mode);
-extern void SetNewViewportMode(ViewportModeType mode);
-extern void CheckViewportMode();
 
 /// Check if mouse scrolling is enabled
 extern bool GetMouseScroll();

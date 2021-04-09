@@ -417,9 +417,6 @@ static void DisplayLoop()
 	/* update only if screen changed */
 	ValidateOpenGLScreen();
 
-	/* update only if viewmode changed */
-	CheckViewportMode();
-
 	/*
 	 *	update only if Update flag is set
 	 *	FIXME: still not secure

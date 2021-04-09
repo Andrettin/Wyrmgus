@@ -58,9 +58,9 @@
 
 #include <SDL.h>
 
-bool RightButtonAttacks;                   /// right button attacks
+static void SetViewportModeSingle();
 
-static ViewportModeType NewViewportMode = VIEWPORT_SINGLE;
+bool RightButtonAttacks;                   /// right button attacks
 
 /**
 **  The user interface configuration
@@ -122,7 +122,7 @@ CUserInterface::CUserInterface() :
 	TrainingFont(nullptr), TrainingTextX(0), TrainingTextY(0),
 	IdleWorkerButton(nullptr), LevelUpUnitButton(nullptr),
 	CompletedBarColor(0), CompletedBarShadow(0),
-	ViewportMode(VIEWPORT_SINGLE), MouseViewport(nullptr),
+	MouseViewport(nullptr),
 	SelectedViewport(nullptr), NumViewports(0),
 	MessageFont(nullptr), MessageScrollSpeed(5),
 	CurrentMapLayer(nullptr), PreviousMapLayer(nullptr),
@@ -170,7 +170,7 @@ void InitUserInterface()
 
 	UI.SelectedViewport = UI.Viewports;
 
-	SetViewportMode(VIEWPORT_SINGLE);
+	SetViewportModeSingle();
 
 	UI.CompletedBarColor = CVideo::MapRGB(UI.CompletedBarColorRGB);
 	UI.ViewportCursorColor = ColorWhite;
@@ -248,7 +248,7 @@ bool CMapArea::Contains(const PixelPos &screenPos) const
 static void SaveViewports(CFile &file, const CUserInterface &ui)
 {
 	// FIXME: don't save the number
-	file.printf("DefineViewports(\"mode\", %d", ui.ViewportMode);
+	file.printf("DefineViewports(");
 	for (int i = 0; i < ui.NumViewports; ++i) {
 		const CViewport &vp = ui.Viewports[i];
 		file.printf(",\n  \"viewport\", {%d, %d, %d}", vp.MapPos.x, vp.MapPos.y,
@@ -446,210 +446,6 @@ static void SetViewportModeSingle()
 	ClipViewport(new_vps[0], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 1);
-}
-
-/**
-**  Compute viewport parameters for horizontally split viewport mode.
-**  This mode splits the UI::MapArea with a horizontal line to
-**  2 (approximately) equal parts.
-**
-**  The parameters include viewport's width and height expressed
-**  in pixels, its position with respect to Stratagus's window
-**  origin, and the corresponding map parameters expressed in map
-**  tiles with origin at map origin (map tile (0,0)).
-*/
-static void SetViewportModeSplitHoriz()
-{
-	CViewport new_vps[MAX_NUM_VIEWPORTS];
-
-	DebugPrint("Two horizontal viewports set\n");
-
-	new_vps[0].TopLeftPos.x = UI.MapArea.X;
-	new_vps[0].TopLeftPos.y = UI.MapArea.Y;
-	ClipViewport(new_vps[0], UI.MapArea.EndX,
-				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
-
-	new_vps[1].TopLeftPos.x = UI.MapArea.X;
-	new_vps[1].TopLeftPos.y = new_vps[0].BottomRightPos.y + 1;
-	ClipViewport(new_vps[1], UI.MapArea.EndX, UI.MapArea.EndY);
-
-	FinishViewportModeConfiguration(new_vps, 2);
-}
-
-/**
-**  Compute viewport parameters for horizontal 3-way split viewport mode.
-**  This mode splits the UI::MapArea with a horizontal line to
-**  2 (approximately) equal parts, then splits the bottom part vertically
-**  to another 2 parts.
-**
-**  The parameters include viewport's width and height expressed
-**  in pixels, its position with respect to Stratagus's window
-**  origin, and the corresponding map parameters expressed in map
-**  tiles with origin at map origin (map tile (0,0)).
-*/
-static void SetViewportModeSplitHoriz3()
-{
-	CViewport new_vps[MAX_NUM_VIEWPORTS];
-
-	DebugPrint("Horizontal 3-way viewport division set\n");
-
-	new_vps[0].TopLeftPos.x = UI.MapArea.X;
-	new_vps[0].TopLeftPos.y = UI.MapArea.Y;
-	ClipViewport(new_vps[0], UI.MapArea.EndX,
-				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
-
-	new_vps[1].TopLeftPos.x = UI.MapArea.X;
-	new_vps[1].TopLeftPos.y = new_vps[0].BottomRightPos.y + 1;
-	ClipViewport(new_vps[1],
-				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
-				 UI.MapArea.EndY);
-
-	new_vps[2].TopLeftPos.x = new_vps[1].BottomRightPos.x + 1;
-	new_vps[2].TopLeftPos.y = new_vps[0].BottomRightPos.y + 1;
-	ClipViewport(new_vps[2], UI.MapArea.EndX, UI.MapArea.EndY);
-
-	FinishViewportModeConfiguration(new_vps, 3);
-}
-
-/**
-**  Compute viewport parameters for vertically split viewport mode.
-**  This mode splits the UI::MapArea with a vertical line to
-**  2 (approximately) equal parts.
-**
-**  The parameters  include viewport's width and height expressed
-**  in pixels, its position with respect to Stratagus's window
-**  origin, and the corresponding map parameters expressed in map
-**  tiles with origin at map origin (map tile (0,0)).
-*/
-static void SetViewportModeSplitVert()
-{
-	CViewport new_vps[MAX_NUM_VIEWPORTS];
-
-	DebugPrint("Two vertical viewports set\n");
-
-	new_vps[0].TopLeftPos.x = UI.MapArea.X;
-	new_vps[0].TopLeftPos.y = UI.MapArea.Y;
-	ClipViewport(new_vps[0],
-				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
-				 UI.MapArea.EndY);
-
-	new_vps[1].TopLeftPos.x = new_vps[0].BottomRightPos.x + 1;
-	new_vps[1].TopLeftPos.y = UI.MapArea.Y;
-	ClipViewport(new_vps[1], UI.MapArea.EndX, UI.MapArea.EndY);
-
-	FinishViewportModeConfiguration(new_vps, 2);
-}
-
-/**
-**  Compute viewport parameters for 4-way split viewport mode.
-**  This mode splits the UI::MapArea vertically *and* horizontally
-**  to 4 (approximately) equal parts.
-**
-**  The parameters  include viewport's width and height expressed
-**  in pixels, its position with respect to Stratagus's window
-**  origin, and the corresponding map parameters expressed in map
-**  tiles with origin at map origin (map tile (0,0)).
-*/
-static void SetViewportModeQuad()
-{
-	CViewport new_vps[MAX_NUM_VIEWPORTS];
-
-	DebugPrint("Four viewports set\n");
-
-	new_vps[0].TopLeftPos.x = UI.MapArea.X;
-	new_vps[0].TopLeftPos.y = UI.MapArea.Y;
-	ClipViewport(new_vps[0],
-				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
-				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
-
-	new_vps[1].TopLeftPos.x = new_vps[0].BottomRightPos.x + 1;
-	new_vps[1].TopLeftPos.y = UI.MapArea.Y;
-	ClipViewport(new_vps[1],
-				 UI.MapArea.EndX,
-				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
-
-	new_vps[2].TopLeftPos.x = UI.MapArea.X;
-	new_vps[2].TopLeftPos.y = new_vps[0].BottomRightPos.y + 1;
-	ClipViewport(new_vps[2],
-				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
-				 UI.MapArea.EndY);
-
-	new_vps[3].TopLeftPos.x = new_vps[1].TopLeftPos.x;
-	new_vps[3].TopLeftPos.y = new_vps[2].TopLeftPos.y;
-	ClipViewport(new_vps[3], UI.MapArea.EndX, UI.MapArea.EndY);
-
-	FinishViewportModeConfiguration(new_vps, 4);
-}
-
-/**
-**  Sets up (calls geometry setup routines for) a new viewport mode.
-**
-**  @param new_mode  New mode's number.
-*/
-void SetViewportMode(ViewportModeType new_mode)
-{
-	switch (UI.ViewportMode = new_mode) {
-		case VIEWPORT_SINGLE:
-			SetViewportModeSingle();
-			break;
-		case VIEWPORT_SPLIT_HORIZ:
-			SetViewportModeSplitHoriz();
-			break;
-		case VIEWPORT_SPLIT_HORIZ3:
-			SetViewportModeSplitHoriz3();
-			break;
-		case VIEWPORT_SPLIT_VERT:
-			SetViewportModeSplitVert();
-			break;
-		case VIEWPORT_QUAD:
-			SetViewportModeQuad();
-			break;
-		default:
-			DebugPrint("trying to set an unknown mode!!\n");
-			break;
-	}
-}
-
-/**
-**  Sets up a new viewport mode.
-**
-**  @param new_mode  New mode's number.
-*/
-void SetNewViewportMode(ViewportModeType new_mode)
-{
-	NewViewportMode = new_mode;
-	if (NewViewportMode >= NUM_VIEWPORT_MODES) {
-		NewViewportMode = VIEWPORT_SINGLE;
-	}
-	if (NewViewportMode < 0) {
-		NewViewportMode = (ViewportModeType)(NUM_VIEWPORT_MODES - 1);
-	}
-}
-
-/**
-**  Cycles through predefined viewport modes (geometry configurations)
-**  in order defined by the ViewportMode enumerated type.
-**
-**  @param step   The size of step used for cycling. Values that
-**               make sense are mostly 1 (next viewport mode) and
-**               -1 (previous viewport mode).
-*/
-void CycleViewportMode(int step)
-{
-	NewViewportMode = (ViewportModeType)(UI.ViewportMode + step);
-	if (NewViewportMode >= NUM_VIEWPORT_MODES) {
-		NewViewportMode = VIEWPORT_SINGLE;
-	}
-	if (NewViewportMode < 0) {
-		NewViewportMode = (ViewportModeType)(NUM_VIEWPORT_MODES - 1);
-	}
-}
-
-void CheckViewportMode()
-{
-	if (NewViewportMode != UI.ViewportMode) {
-		SetViewportMode(NewViewportMode);
-	}
 }
 
 /**

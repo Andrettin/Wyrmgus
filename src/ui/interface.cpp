@@ -856,14 +856,6 @@ static bool CommandKey(int key)
 			UiTrackUnit();
 			break;
 
-		case 'v': // ALT+V, CTRL+V: Viewport
-			if (KeyModifiers & ModifierControl) {
-				CycleViewportMode(-1);
-			} else if (KeyModifiers & ModifierAlt) {
-				CycleViewportMode(1);
-			}
-			break;
-
 		//Wyrmgus start
 		case 'w': // Alt+W: select all units of the same type as the first currently selected one
 			if (!(KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {

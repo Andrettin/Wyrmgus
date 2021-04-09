@@ -1830,14 +1830,6 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		}
 	}
 	switch (key) {
-		case 'v': // 'v' Viewport
-			if (KeyModifiers & ModifierControl) {
-				CycleViewportMode(-1);
-			} else {
-				CycleViewportMode(1);
-			}
-			break;
-
 		// FIXME: move to lua
 		case 'm': // CTRL+M Mirror edit
 			if (KeyModifiers & ModifierControl)  {

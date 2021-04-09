@@ -598,9 +598,7 @@ static int CclDefineViewports(lua_State *l)
 	for (int j = 0; j < args; ++j) {
 		const char *value = LuaToString(l, j + 1);
 		++j;
-		if (!strcmp(value, "mode")) {
-			UI.ViewportMode = (ViewportModeType)LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "viewport")) {
+		if (!strcmp(value, "viewport")) {
 			if (!lua_istable(l, j + 1) && lua_rawlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}

@@ -3,14 +3,6 @@ $using namespace wyrmgus;
 
 #include "video/font.h"
 
-enum ViewportModeType {
-	VIEWPORT_SINGLE = 0,
-	VIEWPORT_SPLIT_HORIZ,
-	VIEWPORT_SPLIT_HORIZ3,
-	VIEWPORT_SPLIT_VERT,
-	VIEWPORT_QUAD
-};
-
 class LuaActionListener
 {
 	LuaActionListener(lua_State *lua, lua_Object luaref);
@@ -637,9 +629,7 @@ void UiFindIdleWorker();
 void UiFindLevelUpUnit();
 void UiFindHeroUnit(int hero_index);
 //Wyrmgus end
-void CycleViewportMode(int step);
 void UiTrackUnit();
-void SetNewViewportMode(ViewportModeType new_mode);
 
 extern bool IsMouseLeftButtonPressed();
 extern int GetCurrentButtonValue();
