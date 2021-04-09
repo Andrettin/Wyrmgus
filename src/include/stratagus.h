@@ -136,9 +136,7 @@ constexpr int UnitTypeMax = 2048;                /// How many unit types support
 constexpr int UpgradeMax = 2048;                /// How many upgrades supported
 //Wyrmgus start
 //constexpr int MAX_RACES = 8;
-constexpr int MAX_RACES = 128;
-constexpr int FactionMax = 128;	/// Maximum number of factions a civilization can have
-constexpr int PlayerColorMax = 32;			/// How many player colors are supported
+constexpr int MAX_RACES = 256;
 
 constexpr int AuraRange = 6;					/// Range of auras
 constexpr int PlayerHeroMax = 4;				/// Maximum heroes per player

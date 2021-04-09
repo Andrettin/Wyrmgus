@@ -95,7 +95,6 @@ bool GamePaused;								/// Current pause state
 bool GameObserve;								/// Observe mode
 bool GameEstablishing;							/// Game establishing mode
 char SkipGameCycle;								/// Skip the next game cycle
-char BigMapMode;								/// Show only the map
 enum interface_state current_interface_state;	/// Current interface state
 bool GodMode;									/// Invincibility cheat
 enum _key_state_ KeyState;						/// current key state
@@ -340,48 +339,6 @@ void UiTogglePause()
 		} else {
 			UI.StatusLine.Set(_("Game Resumed"));
 		}
-	}
-}
-
-/**
-**  Toggle big map mode.
-**
-**  @todo FIXME: We should try to keep the same view, if possible
-*/
-void UiToggleBigMap()
-{
-	static int mapx;
-	static int mapy;
-	static int mapex;
-	static int mapey;
-
-	BigMapMode ^= 1;
-	if (BigMapMode) {
-		mapx = UI.MapArea.X;
-		mapy = UI.MapArea.Y;
-		mapex = UI.MapArea.EndX;
-		mapey = UI.MapArea.EndY;
-
-		UI.MapArea.X = 0;
-		UI.MapArea.Y = 0;
-		UI.MapArea.EndX = Video.Width - 1;
-		UI.MapArea.EndY = Video.Height - 1;
-
-		SetViewportMode(UI.ViewportMode);
-
-		UI.StatusLine.Set(_("Big map enabled"));
-	} else {
-		UI.MapArea.X = mapx;
-		UI.MapArea.Y = mapy;
-		UI.MapArea.EndX = mapex;
-		UI.MapArea.EndY = mapey;
-
-		SetViewportMode(UI.ViewportMode);
-
-		//Wyrmgus start
-//		UI.StatusLine.Set(_("Returning to old map"));
-		UI.StatusLine.Set(_("Returning to the old map"));
-		//Wyrmgus end
 	}
 }
 
