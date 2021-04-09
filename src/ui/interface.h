@@ -140,8 +140,6 @@ extern bool GameEstablishing;
 extern char SkipGameCycle;
 /// Invincibility cheat
 extern bool GodMode;
-/// Whether the map is the only thing displayed or not
-extern char BigMapMode;
 /// Flag telling if the SDL window is visible
 extern bool IsSDLWindowVisible;
 
@@ -251,8 +249,6 @@ extern void SetHoldClickDelay(int delay);
 
 /// Toggle pause mode
 extern void UiTogglePause();
-/// Toggle big map
-extern void UiToggleBigMap();
 /// Toggle minimap mode.
 extern void UiToggleMinimapMode();
 extern void UiToggleMinimapZoom();

@@ -1042,14 +1042,6 @@ static void HandleMouseOn(const PixelPos screenPos)
 	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = -1;
 
-	// BigMapMode is the mode which show only the map (without panel, minimap)
-	if (BigMapMode) {
-		CursorOn = cursor_on::map;
-		//  Scrolling Region Handling.
-		HandleMouseScrollArea(screenPos);
-		return;
-	}
-
 	//  Handle buttons
 	if (!IsNetworkGame()) {
 		if (UI.MenuButton.X != -1) {

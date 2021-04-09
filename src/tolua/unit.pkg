@@ -10,7 +10,6 @@ class CPreference
 	bool ShowReactionRange;
 	bool ShowAttackRange;
 	bool ShowMessages;
-	bool BigScreen;
 	bool PauseOnLeave;
 	bool AiExplores;
 	bool GrayscaleIcons;

@@ -216,33 +216,27 @@ void UpdateDisplay()
 		}
 		//Wyrmgus end
 
-		if ((Preference.BigScreen && !BigMapMode) || (!Preference.BigScreen && BigMapMode)) {
-			UiToggleBigMap();
+		for (size_t i = 0; i < UI.Fillers.size(); ++i) {
+			UI.Fillers[i].G->DrawSubClip(0, 0,
+				UI.Fillers[i].G->Width,
+				UI.Fillers[i].G->Height,
+				UI.Fillers[i].X, UI.Fillers[i].Y, render_commands);
 		}
+		DrawMenuButtonArea(render_commands);
+		DrawUserDefinedButtons(render_commands);
 
-		if (!BigMapMode) {
-			for (size_t i = 0; i < UI.Fillers.size(); ++i) {
-				UI.Fillers[i].G->DrawSubClip(0, 0,
-											 UI.Fillers[i].G->Width,
-											 UI.Fillers[i].G->Height,
-											 UI.Fillers[i].X, UI.Fillers[i].Y, render_commands);
-			}
-			DrawMenuButtonArea(render_commands);
-			DrawUserDefinedButtons(render_commands);
+		UI.get_minimap()->Draw(render_commands);
+		UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport, render_commands);
 
-			UI.get_minimap()->Draw(render_commands);
-			UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport, render_commands);
+		UI.InfoPanel.Draw(render_commands);
+		DrawResources(render_commands);
+		DrawTime(render_commands);
+		DrawAge(render_commands);
+		DrawMapLayerButtons(render_commands);
+		UI.StatusLine.Draw(render_commands);
+		UI.StatusLine.DrawCosts(render_commands);
+		UI.ButtonPanel.Draw(render_commands);
 
-			UI.InfoPanel.Draw(render_commands);
-			DrawResources(render_commands);
-			DrawTime(render_commands);
-			DrawAge(render_commands);
-			DrawMapLayerButtons(render_commands);
-			UI.StatusLine.Draw(render_commands);
-			UI.StatusLine.DrawCosts(render_commands);
-			UI.ButtonPanel.Draw(render_commands);
-		}
-		
 		//Wyrmgus start
 		//draw worker icon if there are idle workers
 		if (UI.IdleWorkerButton && !CPlayer::GetThisPlayer()->FreeWorkers.empty()) {

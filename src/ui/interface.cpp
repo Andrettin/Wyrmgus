@@ -789,13 +789,6 @@ static bool CommandKey(int key)
 			UiSetDefaultGameSpeed();
 			break;
 
-		case 'b': // ALT+B, CTRL+B Toggle big map
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			UiToggleBigMap();
-			break;
-
 		case 'c': // ALT+C, CTRL+C C center on units
 			//Wyrmgus start
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {

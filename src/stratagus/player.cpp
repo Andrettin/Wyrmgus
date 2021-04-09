@@ -824,7 +824,7 @@ void CPlayer::Save(CFile &file) const
 */
 void CreatePlayer(int type)
 {
-	if (NumPlayers == PlayerMax) { // already done for bigmaps!
+	if (NumPlayers == PlayerMax) {
 		return;
 	}
 	CPlayer *player = CPlayer::Players[NumPlayers];
