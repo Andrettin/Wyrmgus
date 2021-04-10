@@ -213,34 +213,34 @@ class CButtonPanel
 public:
 	void Draw(std::vector<std::function<void(renderer *)>> &render_commands);
 	void Update();
-	void DoClicked(int button);
-	int DoKey(int key);
+	void DoClicked(int button, const Qt::KeyboardModifiers key_modifiers);
+	int DoKey(int key, const Qt::KeyboardModifiers key_modifiers);
 
 private:
 	void DoClicked_SelectTarget(int button);
 
-	void DoClicked_Unload(int button);
-	void DoClicked_SpellCast(int button);
-	void DoClicked_Repair(int button);
-	void DoClicked_Return();
+	void DoClicked_Unload(int button, const Qt::KeyboardModifiers key_modifiers);
+	void DoClicked_SpellCast(int button, const Qt::KeyboardModifiers key_modifiers);
+	void DoClicked_Repair(int button, const Qt::KeyboardModifiers key_modifiers);
+	void DoClicked_Return(const Qt::KeyboardModifiers key_modifiers);
 	void DoClicked_Stop();
-	void DoClicked_StandGround();
+	void DoClicked_StandGround(const Qt::KeyboardModifiers key_modifiers);
 	void DoClicked_Button(int button);
 	void DoClicked_CancelUpgrade();
 	void DoClicked_CancelTrain();
 	void DoClicked_CancelBuild();
 	void DoClicked_Build(const std::unique_ptr<wyrmgus::button> &button);
-	void DoClicked_Train(const std::unique_ptr<wyrmgus::button> &button);
-	void DoClicked_UpgradeTo(const std::unique_ptr<wyrmgus::button> &button);
-	void DoClicked_ExperienceUpgradeTo(int button);
-	void DoClicked_Research(const std::unique_ptr<wyrmgus::button> &button);
+	void DoClicked_Train(const std::unique_ptr<wyrmgus::button> &button, const Qt::KeyboardModifiers key_modifiers);
+	void DoClicked_UpgradeTo(const std::unique_ptr<wyrmgus::button> &button, const Qt::KeyboardModifiers key_modifiers);
+	void DoClicked_ExperienceUpgradeTo(int button, const Qt::KeyboardModifiers key_modifiers);
+	void DoClicked_Research(const std::unique_ptr<wyrmgus::button> &button, const Qt::KeyboardModifiers key_modifiers);
 	void DoClicked_CallbackAction(int button);
 	void DoClicked_LearnAbility(int button);
 	void DoClicked_Faction(int button);
 	void DoClicked_Quest(int button);
 	void DoClicked_Buy(int button);
 	void DoClicked_ProduceResource(int button);
-	void DoClicked_SellResource(int button);
+	void DoClicked_SellResource(int button, const Qt::KeyboardModifiers key_modifiers);
 	void DoClicked_BuyResource(int button);
 	void DoClicked_Salvage();
 	void DoClicked_EnterMapLayer();
@@ -496,11 +496,11 @@ extern CPopup *PopupByIdent(const std::string &ident);
 extern ButtonStyle *FindButtonStyle(const std::string &style);
 
 /// Called if the mouse is moved in Normal interface state
-extern void UIHandleMouseMove(const PixelPos &pos);
+extern void UIHandleMouseMove(const PixelPos &pos, const Qt::KeyboardModifiers key_modifiers);
 /// Called if any mouse button is pressed down
-extern void UIHandleButtonDown(unsigned button);
+extern void UIHandleButtonDown(unsigned button, const Qt::KeyboardModifiers key_modifiers);
 /// Called if any mouse button is released up
-extern void UIHandleButtonUp(unsigned button);
+extern void UIHandleButtonUp(unsigned button, const Qt::KeyboardModifiers key_modifiers);
 
 /// Restrict mouse cursor to viewport
 extern void RestrictCursorToViewport();

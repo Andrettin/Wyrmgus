@@ -523,7 +523,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 	//
 	if (!Preference.ShowOrders) {
 	} else if (Preference.ShowOrders < 0
-			   || (ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
+			   || (ShowOrdersCount >= GameCycle) || (stored_key_modifiers & Qt::ShiftModifier)) {
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			ShowOrder(*Selected[i], render_commands);
 		}

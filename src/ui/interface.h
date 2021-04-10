@@ -78,10 +78,6 @@ enum _key_state_ {
 };                        /// current keyboard state
 
 /// Key modifier
-constexpr int ModifierShift = 1;        /// any shift key pressed
-constexpr int ModifierControl = 2;      /// any control key pressed
-constexpr int ModifierAlt = 4;          /// any alt key pressed
-constexpr int ModifierSuper = 8;        /// super key (reserved for WM)
 constexpr int ModifierDoublePress = 16; /// key double pressed
 
 constexpr int MouseDoubleShift = 8;   /// shift for double click button
@@ -145,6 +141,8 @@ extern bool IsSDLWindowVisible;
 
 /// pressed mouse buttons (normal,double,dragged,long)
 extern int MouseButtons;
+/// previously active modifiers
+extern Qt::KeyboardModifiers stored_key_modifiers;
 /// current active modifiers
 extern int KeyModifiers;
 /// current interface state
@@ -193,50 +191,53 @@ extern int GetUnitUnderCursorNumber();
 // in mouse.cpp
 //
 /// Called if any mouse button is pressed down
-extern void HandleButtonDown(unsigned button);
+extern void HandleButtonDown(unsigned button, const Qt::KeyboardModifiers key_modifiers);
 /// Called if any mouse button is released up
-extern void HandleButtonUp(unsigned button);
+extern void HandleButtonUp(unsigned button, const Qt::KeyboardModifiers key_modifiers);
 /// Keep coordinates in window and update cursor position
 extern void HandleCursorMove(int *x, int *y);
 /// Called if the mouse is moved
-extern void HandleMouseMove(const PixelPos &pos);
+extern void HandleMouseMove(const PixelPos &pos, const Qt::KeyboardModifiers key_modifiers);
 /// Called if the mouse exits the game window (only for some videomodes)
 extern void HandleMouseExit();
 
 extern void Screenshot();
 
-/// Update KeyModifiers if a key is pressed
-extern int HandleKeyModifiersDown(unsigned keycode, unsigned keychar);
-/// Update KeyModifiers if a key is released
-extern int HandleKeyModifiersUp(unsigned keycode, unsigned keychar);
+// Update KeyModifiers
+extern void HandleKeyModifiers(const Qt::KeyboardModifiers key_modifiers);
+
+// Update KeyModifiers if a key is pressed
+extern bool HandleKeyModifiersDown(const unsigned keycode);
+// Update KeyModifiers if a key is released
+extern bool HandleKeyModifiersUp(const unsigned keycode);
 
 /// Called if a key is pressed
-extern void HandleKeyDown(unsigned keycode, unsigned keychar);
+extern void HandleKeyDown(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers);
 /// Called when a key is released
-extern void HandleKeyUp(unsigned keycode, unsigned keychar);
+extern void HandleKeyUp(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers);
 /// Called when a key is repeated
-extern void HandleKeyRepeat(unsigned keycode, unsigned keychar);
+extern void HandleKeyRepeat(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers);
 
 //
 // in interface.c (for link between video and mouse.c)
 //
 /// Called if any mouse button is pressed down
-extern void InputMouseButtonPress(const EventCallback &callbacks, unsigned ticks, unsigned button);
+extern void InputMouseButtonPress(const EventCallback &callbacks, unsigned ticks, unsigned button, const Qt::KeyboardModifiers key_modifiers);
 /// Called if any mouse button is released up
-extern void InputMouseButtonRelease(const EventCallback &callbacks, unsigned ticks, unsigned button);
+extern void InputMouseButtonRelease(const EventCallback &callbacks, unsigned ticks, unsigned button, const Qt::KeyboardModifiers key_modifiers);
 /// Called if the mouse is moved
-extern void InputMouseMove(const EventCallback &callbacks, unsigned ticks, int x, int y);
+extern void InputMouseMove(const EventCallback &callbacks, unsigned ticks, int x, int y, const Qt::KeyboardModifiers key_modifiers);
 /// Called if the mouse exits the game window (when supported by videomode)
 extern void InputMouseExit(const EventCallback &callbacks, unsigned ticks);
 /// Called to look for mouse timeouts
-extern void InputMouseTimeout(const EventCallback &callbacks, unsigned ticks);
+extern void InputMouseTimeout(const EventCallback &callbacks, unsigned ticks, const Qt::KeyboardModifiers key_modifiers);
 
 /// Called if any key button is pressed down
-extern void InputKeyButtonPress(const EventCallback &callbacks, unsigned ticks, unsigned ikey, unsigned ikeychar);
+extern void InputKeyButtonPress(const EventCallback &callbacks, unsigned ticks, unsigned ikey, unsigned ikeychar, const Qt::KeyboardModifiers key_modifiers);
 /// Called if any key button is released up
-extern void InputKeyButtonRelease(const EventCallback &callbacks, unsigned ticks, unsigned ikey, unsigned ikeychar);
+extern void InputKeyButtonRelease(const EventCallback &callbacks, unsigned ticks, unsigned ikey, unsigned ikeychar, const Qt::KeyboardModifiers key_modifiers);
 /// Called to look for key timeouts
-extern void InputKeyTimeout(const EventCallback &callbacks, unsigned ticks);
+extern void InputKeyTimeout(const EventCallback &callbacks, unsigned ticks, const Qt::KeyboardModifiers key_modifiers);
 
 /// Get double click delay
 extern int GetDoubleClickDelay();
@@ -273,7 +274,7 @@ extern std::string GetCurrentButtonValueStr();
 extern bool HandleCheats(const std::string &input);
 
 /// Call the lua function HandleCommandKey
-bool HandleCommandKey(int key);
+bool HandleCommandKey(int key, const Qt::KeyboardModifiers key_modifiers);
 
 //
 // Chaos pur.

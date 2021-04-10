@@ -42,7 +42,7 @@ extern std::string CliMapName;
 /**
 **  Callback for input.
 */
-static void WaitCallbackButtonPressed(unsigned)
+static void WaitCallbackButtonPressed(unsigned, const Qt::KeyboardModifiers key_modifiers)
 {
 	WaitNoEvent = false;
 }
@@ -50,14 +50,14 @@ static void WaitCallbackButtonPressed(unsigned)
 /**
 **  Callback for input.
 */
-static void WaitCallbackButtonReleased(unsigned)
+static void WaitCallbackButtonReleased(unsigned, const Qt::KeyboardModifiers key_modifiers)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKeyPressed(unsigned, unsigned)
+static void WaitCallbackKeyPressed(unsigned, unsigned, const Qt::KeyboardModifiers key_modifiers)
 {
 	WaitNoEvent = false;
 }
@@ -65,21 +65,21 @@ static void WaitCallbackKeyPressed(unsigned, unsigned)
 /**
 **  Callback for input.
 */
-static void WaitCallbackKeyReleased(unsigned, unsigned)
+static void WaitCallbackKeyReleased(unsigned, unsigned, const Qt::KeyboardModifiers key_modifiers)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKeyRepeated(unsigned, unsigned)
+static void WaitCallbackKeyRepeated(unsigned, unsigned, const Qt::KeyboardModifiers key_modifiers)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackMouse(const PixelPos &)
+static void WaitCallbackMouse(const PixelPos &, const Qt::KeyboardModifiers key_modifiers)
 {
 }
 

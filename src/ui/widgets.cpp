@@ -57,21 +57,21 @@ static EventCallback GuichanCallbacks;
 
 static std::stack<MenuScreen *> MenuStack;
 
-static void MenuHandleButtonDown(unsigned)
+static void MenuHandleButtonDown(unsigned, const Qt::KeyboardModifiers)
 {
 }
 
-static void MenuHandleButtonUp(unsigned)
+static void MenuHandleButtonUp(unsigned, const Qt::KeyboardModifiers)
 {
 }
 
-static void MenuHandleMouseMove(const PixelPos &screenPos)
+static void MenuHandleMouseMove(const PixelPos &screenPos, const Qt::KeyboardModifiers key_modifiers)
 {
 	PixelPos pos(screenPos);
 	HandleCursorMove(&pos.x, &pos.y);
 }
 
-static void MenuHandleKeyDown(unsigned key, unsigned keychar)
+static void MenuHandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	switch (key) {
 		case SDLK_SYSREQ:
@@ -83,29 +83,18 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 			break;
 	}
 
-	HandleKeyModifiersDown(key, keychar);
+	HandleKeyModifiersDown(key);
 }
 
-static void MenuHandleKeyUp(unsigned key, unsigned keychar)
+static void MenuHandleKeyUp(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
-	//Wyrmgus start
-	/*
-	if (key == 'g') { // ALT+G, CTRL+G grab mouse pointer
-		if (KeyModifiers & (ModifierAlt | ModifierControl)) {
-			UiToggleGrabMouse();
-			CclCommand("wyr.preferences.GrabMouse = GetGrabMouse();");
-			SavePreferences();
-		}
-	}
-	*/
-	//Wyrmgus end
-	HandleKeyModifiersUp(key, keychar);
+	HandleKeyModifiersUp(key);
 }
 
-static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
+static void MenuHandleKeyRepeat(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	Input->processKeyRepeat();
-	HandleKeyModifiersDown(key, keychar);
+	HandleKeyModifiersDown(key);
 }
 
 /**
@@ -2974,7 +2963,7 @@ void MenuScreen::stop(int result, bool stopAll)
 			GamePaused = false;
 			UI.StatusLine.Clear();
 			if (GameRunning) {
-				UIHandleMouseMove(CursorScreenPos);
+				UIHandleMouseMove(CursorScreenPos, stored_key_modifiers);
 			}
 		}
 	}

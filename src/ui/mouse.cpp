@@ -140,7 +140,7 @@ static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
 	return true;
 }
 
-static void DoRightButton_ForForeignUnit(CUnit *dest)
+static void DoRightButton_ForForeignUnit(CUnit *dest, const Qt::KeyboardModifiers key_modifiers)
 {
 	CUnit &unit = *Selected[0];
 
@@ -167,7 +167,7 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 	//Wyrmgus end
 		unit.Blink = 4;
 		//  Right mouse with SHIFT appends command to old commands.
-		const int flush = !(KeyModifiers & ModifierShift);
+		const int flush = !(key_modifiers & Qt::ShiftModifier);
 		SendCommandResource(*dest, unit, flush);
 	}
 }
@@ -652,7 +652,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	return false;
 }
 
-static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (dest != nullptr && unit.CurrentAction() != UnitAction::Built) {
 		if (DoRightButton_AttackUnit(unit, *dest, pos, flush, acknowledged)) {
@@ -680,7 +680,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	//Wyrmgus end
 	// empty space
-	if ((KeyModifiers & ModifierControl)) {
+	if (key_modifiers & Qt::ControlModifier) {
 		if (RightButtonAttacks) {
 			//Wyrmgus start
 //			SendCommandMove(unit, pos, flush);
@@ -830,7 +830,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	return false;
 }
 
-static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i &pos, int &acknowledged)
+static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i &pos, int &acknowledged, const Qt::KeyboardModifiers key_modifiers)
 {
 	// don't self targeting.
 	if (dest == &unit) {
@@ -842,7 +842,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	const wyrmgus::unit_type &type = *unit.Type;
 	const int action = type.MouseAction;
 	//  Right mouse with SHIFT appends command to old commands.
-	const int flush = !(KeyModifiers & ModifierShift);
+	const int flush = !(key_modifiers & Qt::ShiftModifier);
 
 	//Wyrmgus start
 	if (action == MouseActionRallyPoint) {
@@ -852,7 +852,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	//Wyrmgus end
 	
 	//  Control + alt click - ground attack
-	if ((KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
+	if ((key_modifiers & Qt::ControlModifier) && (key_modifiers & Qt::AltModifier)) {
 		if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
 			if (!acknowledged) {
 				PlayUnitSound(unit, wyrmgus::unit_sound_type::attack);
@@ -866,7 +866,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 		}
 	}
 	//  Control + right click on unit is follow anything.
-	if ((KeyModifiers & ModifierControl) && dest) {
+	if ((key_modifiers & Qt::ControlModifier) && dest) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::acknowledging);
@@ -877,7 +877,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	}
 
 	//  Alt + right click on unit is defend anything.
-	if ((KeyModifiers & ModifierAlt) && dest) {
+	if ((key_modifiers & Qt::AltModifier) && dest) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::acknowledging);
@@ -889,7 +889,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 
 	//Wyrmgus start
 	//  Ctrl + right click on an empty space moves + stand ground
-	if ((KeyModifiers & ModifierControl) && !dest) {
+	if ((key_modifiers & Qt::ControlModifier) && !dest) {
 		if (!acknowledged) {
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::acknowledging);
 			acknowledged = 1;
@@ -928,7 +928,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	
 	//  Fighters
 	if (action == MouseActionSpellCast || action == MouseActionAttack) {
-		DoRightButton_Attack(unit, dest, pos, flush, acknowledged);
+		DoRightButton_Attack(unit, dest, pos, flush, acknowledged, key_modifiers);
 		return;
 	}
 
@@ -967,7 +967,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 **
 **  @param mapPixelPos  map position in pixels.
 */
-void DoRightButton(const PixelPos &mapPixelPos)
+static void DoRightButton(const PixelPos &mapPixelPos, const Qt::KeyboardModifiers key_modifiers)
 {
 	// No unit selected
 	if (Selected.empty()) {
@@ -986,7 +986,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	//  You can't select your own units + foreign unit(s)
 	//  except if it is neutral and it is a resource.
 	if (!CanSelectMultipleUnits(*Selected[0]->Player)) {
-		DoRightButton_ForForeignUnit(dest);
+		DoRightButton_ForForeignUnit(dest, key_modifiers);
 		return;
 	}
 
@@ -1011,7 +1011,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 		Assert(Selected[i]);
 		CUnit &unit = *Selected[i];
 
-		DoRightButton_ForSelectedUnit(unit, dest, pos, acknowledged);
+		DoRightButton_ForSelectedUnit(unit, dest, pos, acknowledged, key_modifiers);
 	}
 	ShowOrdersCount = GameCycle + Preference.ShowOrders * CYCLES_PER_SECOND;
 }
@@ -1327,7 +1327,7 @@ void RestrictCursorToMinimap()
 **
 **  @param pos  Screen position.
 */
-static void MouseScrollMap(const PixelPos &pos)
+static void MouseScrollMap(const PixelPos &pos, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (pos == CursorStartScreenPos) {
 		return;
@@ -1335,7 +1335,7 @@ static void MouseScrollMap(const PixelPos &pos)
 
 	const QPoint scroll_start_pos = cursor::get_last_scroll_pos() != QPoint(-1, -1) ? cursor::get_last_scroll_pos() : QPoint(CursorStartScreenPos);
 
-	const int speed = (KeyModifiers & ModifierControl) ? UI.MouseScrollSpeedControl : UI.MouseScrollSpeedDefault;
+	const int speed = (key_modifiers & Qt::ControlModifier) ? UI.MouseScrollSpeedControl : UI.MouseScrollSpeedDefault;
 	const PixelDiff diff(pos - scroll_start_pos);
 
 	UI.MouseViewport->Set(UI.MouseViewport->MapPos, UI.MouseViewport->Offset + speed * diff);
@@ -1344,7 +1344,7 @@ static void MouseScrollMap(const PixelPos &pos)
 	cursor::set_last_scroll_pos(pos);
 }
 
-static void handle_mouse_move_on_map(const PixelPos &cursor_pos)
+static void handle_mouse_move_on_map(const PixelPos &cursor_pos, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (UI.MouseViewport == nullptr) {
 		wyrmgus::log::log_error("Mouse viewport pointer is null.");
@@ -1360,7 +1360,7 @@ static void handle_mouse_move_on_map(const PixelPos &cursor_pos)
 
 	try {
 		if (CursorBuilding && (MouseButtons & LeftButton) && Selected.at(0)
-			&& (KeyModifiers & (ModifierAlt | ModifierShift))) {
+			&& (key_modifiers & (Qt::AltModifier | Qt::ShiftModifier))) {
 			const CUnit &unit = *Selected[0];
 			const Vec2i cursor_tile_pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 			bool explored = CanBuildOnArea(*Selected[0], cursor_tile_pos);
@@ -1385,14 +1385,14 @@ static void handle_mouse_move_on_map(const PixelPos &cursor_pos)
 //				if (CanBuildUnitType(Selected[0], *CursorBuilding, cursor_tile_pos, 0) && buildable && (explored || ReplayRevealMap)) {
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, cursor_tile_pos, 0, false, UI.CurrentMapLayer->ID) && buildable && (explored || ReplayRevealMap)) {
 				//Wyrmgus end
-				const int flush = !(KeyModifiers & ModifierShift);
+				const int flush = !(key_modifiers & Qt::ShiftModifier);
 				for (size_t i = 0; i != Selected.size(); ++i) {
 					//Wyrmgus start
 //						SendCommandBuildBuilding(*Selected[i], cursor_tile_pos, *CursorBuilding, flush);
 					SendCommandBuildBuilding(*Selected[i], cursor_tile_pos, *CursorBuilding, flush, UI.CurrentMapLayer->ID);
 					//Wyrmgus end
 				}
-				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
+				if (!(key_modifiers & (Qt::AltModifier | Qt::ShiftModifier))) {
 					CancelBuildingMode();
 				}
 			}
@@ -1460,7 +1460,7 @@ static void handle_mouse_move_on_minimap(const PixelPos &cursor_pos)
 **
 **  @param cursorPos  Screen X position.
 */
-void UIHandleMouseMove(const PixelPos &cursorPos)
+void UIHandleMouseMove(const PixelPos &cursorPos, const Qt::KeyboardModifiers key_modifiers)
 {
 	cursor_on OldCursorOn;
 
@@ -1478,7 +1478,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	//  Move map.
 	if (cursor::get_current_cursor() == UI.get_cursor(cursor_type::scroll)) {
-		MouseScrollMap(cursorPos);
+		MouseScrollMap(cursorPos, key_modifiers);
 		return;
 	}
 
@@ -1518,7 +1518,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	// FIXME: This must done new, moving units, scrolling...
 	switch (CursorOn) {
 		case cursor_on::map:
-			handle_mouse_move_on_map(cursorPos);
+			handle_mouse_move_on_map(cursorPos, key_modifiers);
 			break;
 		case cursor_on::minimap:
 			handle_mouse_move_on_minimap(cursorPos);
@@ -1630,14 +1630,7 @@ static int SendRepair(const Vec2i &tilePos, int flush)
 			CUnit *unit = Selected[i];
 
 			if (unit->Type->RepairRange) {
-				//Wyrmgus start
-//				const int flush = !(KeyModifiers & ModifierShift);
-				//Wyrmgus end
-
-				//Wyrmgus start
-//				SendCommandRepair(*unit, tilePos, dest, flush);
 				SendCommandRepair(*unit, tilePos, dest, flush, UI.CurrentMapLayer->ID);
-				//Wyrmgus end
 				ret = 1;
 			} else {
 				DebugPrint("Non-worker repairs\n");
@@ -1657,17 +1650,14 @@ static int SendRepair(const Vec2i &tilePos, int flush)
 */
 //Wyrmgus start
 //static int SendMove(const Vec2i &tilePos)
-static int SendMove(const Vec2i &tilePos, int flush)
+static int SendMove(const Vec2i &tilePos, int flush, const Qt::KeyboardModifiers key_modifiers)
 //Wyrmgus end
 {
 	CUnit *goal = UnitUnderCursor;
 	int ret = 0;
-	//Wyrmgus start
-//	const int flush = !(KeyModifiers & ModifierShift);
-	//Wyrmgus end
 
 	// Alt makes unit to defend goal
-	if (goal && (KeyModifiers & ModifierAlt)) {
+	if (goal && (key_modifiers & Qt::AltModifier)) {
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
@@ -1677,7 +1667,7 @@ static int SendMove(const Vec2i &tilePos, int flush)
 		}
 	//Wyrmgus start
 	//  Ctrl + click on an empty space moves + stand ground
-	} else if (!goal && (KeyModifiers & ModifierControl)) {
+	} else if (!goal && (key_modifiers & Qt::ControlModifier)) {
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
@@ -1747,9 +1737,6 @@ static int SendMove(const Vec2i &tilePos, int flush)
 static int SendAttack(const Vec2i &tilePos, int flush)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	const int flush = !(KeyModifiers & ModifierShift);
-	//Wyrmgus end
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
@@ -1796,9 +1783,6 @@ static int SendAttack(const Vec2i &tilePos, int flush)
 static int SendAttackGround(const Vec2i &tilePos, int flush)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	const int flush = !(KeyModifiers & ModifierShift);
-	//Wyrmgus end
 	int ret = 0;
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
@@ -1833,10 +1817,6 @@ static int SendAttackGround(const Vec2i &tilePos, int flush)
 static int SendPatrol(const Vec2i &tilePos, int flush)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	const int flush = !(KeyModifiers & ModifierShift);
-	//Wyrmgus end
-
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 		//Wyrmgus start
@@ -1861,9 +1841,6 @@ static int SendResource(const Vec2i &pos, int flush)
 {
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
-	//Wyrmgus start
-//	const int flush = !(KeyModifiers & ModifierShift);
-	//Wyrmgus end
 	const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
@@ -1954,10 +1931,6 @@ static int SendResource(const Vec2i &pos, int flush)
 static int SendUnload(const Vec2i &tilePos, int flush)
 //Wyrmgus emd
 {
-	//Wyrmgus start
-//	const int flush = !(KeyModifiers & ModifierShift);
-	//Wyrmgus end
-
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		// FIXME: not only transporter selected?
 		//Wyrmgus start
@@ -2056,22 +2029,20 @@ static int SendRallyPoint(const Vec2i &tilePos)
 **
 **  @param tilePos  tile map position.
 */
-static void SendCommand(const Vec2i &tilePos)
+static void SendCommand(const Vec2i &tilePos, const Qt::KeyboardModifiers key_modifiers)
 {
 	int ret = 0;
 
 	CurrentButtonLevel = nullptr;
 	UI.ButtonPanel.Update();
 	
-	//Wyrmgus start
-	const int flush = !(KeyModifiers & ModifierShift);
-	//Wyrmgus end
+	const int flush = !(key_modifiers & Qt::ShiftModifier);
 	
 	switch (CursorAction) {
 		case ButtonCmd::Move:
 			//Wyrmgus start
 //			ret = SendMove(tilePos);
-			ret = SendMove(tilePos, flush);
+			ret = SendMove(tilePos, flush, key_modifiers);
 			//Wyrmgus end
 			break;
 		case ButtonCmd::Repair:
@@ -2168,7 +2139,7 @@ static void SendCommand(const Vec2i &tilePos)
 **  @param num     Button number.
 **  @param button  Mouse Button pressed.
 */
-static void DoSelectionButtons(int num, unsigned)
+static void DoSelectionButtons(int num, unsigned, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (GameObserve || GamePaused || GameEstablishing) {
 		return;
@@ -2183,19 +2154,19 @@ static void DoSelectionButtons(int num, unsigned)
 
 	CUnit &unit = *Selected[num];
 
-	if ((KeyModifiers & ModifierControl) || (MouseButtons & (LeftButton << MouseDoubleShift))) {
-		if (KeyModifiers & ModifierShift) {
+	if ((key_modifiers & Qt::ControlModifier) || (MouseButtons & (LeftButton << MouseDoubleShift))) {
+		if (key_modifiers & Qt::ShiftModifier) {
 			ToggleUnitsByType(unit);
 		} else {
 			SelectUnitsByType(unit);
 		}
-	} else if (KeyModifiers & ModifierAlt) {
-		if (KeyModifiers & ModifierShift) {
+	} else if (key_modifiers & Qt::AltModifier) {
+		if (key_modifiers & Qt::ShiftModifier) {
 			AddGroupFromUnitToSelection(unit);
 		} else {
 			SelectGroupFromUnit(unit);
 		}
-	} else if (KeyModifiers & ModifierShift) {
+	} else if (key_modifiers & Qt::ShiftModifier) {
 		ToggleSelectUnit(unit);
 	} else {
 		SelectSingleUnit(unit);
@@ -2216,7 +2187,7 @@ static void DoSelectionButtons(int num, unsigned)
 **
 **  @param button  Button pressed down.
 */
-static void UISelectStateButtonDown(unsigned)
+static void UISelectStateButtonDown(unsigned, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (GameObserve || GamePaused || GameEstablishing) {
 		return;
@@ -2241,7 +2212,7 @@ static void UISelectStateButtonDown(unsigned)
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*wyrmgus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
-			SendCommand(CMap::get()->map_pixel_pos_to_tile_pos(mapPixelPos));
+			SendCommand(CMap::get()->map_pixel_pos_to_tile_pos(mapPixelPos), key_modifiers);
 		}
 		return;
 	}
@@ -2265,7 +2236,7 @@ static void UISelectStateButtonDown(unsigned)
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*wyrmgus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
-			SendCommand(cursorTilePos);
+			SendCommand(cursorTilePos, key_modifiers);
 		} else {
 			UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(cursorTilePos));
 		}
@@ -2288,7 +2259,7 @@ static void UISelectStateButtonDown(unsigned)
 	UI.ButtonPanel.Update();
 }
 
-static void UIHandleButtonDown_OnMap()
+static void UIHandleButtonDown_OnMap(const Qt::KeyboardModifiers key_modifiers)
 {
 	Assert(UI.MouseViewport);
 	
@@ -2326,7 +2297,7 @@ static void UIHandleButtonDown_OnMap()
 //			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0, false, UI.CurrentMapLayer->ID) && (explored || ReplayRevealMap)) {
 			//Wyrmgus end
-				const int flush = !(KeyModifiers & ModifierShift);
+				const int flush = !(key_modifiers & Qt::ShiftModifier);
 				PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_success_sound(), MaxSampleVolume);
 				PlayUnitSound(*Selected[0], wyrmgus::unit_sound_type::build);
 				for (size_t i = 0; i != Selected.size(); ++i) {
@@ -2335,7 +2306,7 @@ static void UIHandleButtonDown_OnMap()
 					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush, UI.CurrentMapLayer->ID);
 					//Wyrmgus end
 				}
-				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
+				if (!(key_modifiers & (Qt::AltModifier | Qt::ShiftModifier))) {
 					CancelBuildingMode();
 				}
 			} else {
@@ -2372,7 +2343,7 @@ static void UIHandleButtonDown_OnMap()
 				}
 			}
 			const PixelPos mapPixelPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
-			DoRightButton(mapPixelPos);
+			DoRightButton(mapPixelPos, key_modifiers);
 		}
 	} else if (MouseButtons & LeftButton) { // enter select mode
 		CursorStartScreenPos = CursorScreenPos;
@@ -2388,7 +2359,7 @@ static void UIHandleButtonDown_OnMap()
 	}
 }
 
-static void UIHandleButtonDown_OnMinimap()
+static void UIHandleButtonDown_OnMinimap(const Qt::KeyboardModifiers key_modifiers)
 {
 	const Vec2i cursor_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 
@@ -2405,12 +2376,12 @@ static void UIHandleButtonDown_OnMinimap()
 				MakeLocalMissile(*wyrmgus::missile_type::get(ClickMissile), map_pixel_pos, map_pixel_pos, UI.CurrentMapLayer->ID);
 			}
 			const PixelPos scaled_map_pixel_pos = CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos);
-			DoRightButton(scaled_map_pixel_pos);
+			DoRightButton(scaled_map_pixel_pos, key_modifiers);
 		}
 	}
 }
 
-static void UIHandleButtonDown_OnButton()
+static void UIHandleButtonDown_OnButton(const Qt::KeyboardModifiers key_modifiers)
 {
 	// clicked on info panel - selection shown
 	//Wyrmgus start
@@ -2490,11 +2461,11 @@ static void UIHandleButtonDown_OnButton()
 }
 
 //Wyrmgus start
-static void UIHandleButtonUp_OnButton(unsigned button)
+static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
 	// clicked on info panel - selection shown
 	if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonAreaSelected) {
-		DoSelectionButtons(ButtonUnderCursor, button);
+		DoSelectionButtons(ButtonUnderCursor, button, key_modifiers);
 	} else {
 		if (ButtonAreaUnderCursor == ButtonAreaSelected) {
 			//  clicked on single unit shown
@@ -2616,7 +2587,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 						if (ButtonAreaUnderCursor == ButtonAreaTransporting
 							&& static_cast<size_t>(ButtonUnderCursor) == j) {
 								Assert(uins->Boarded);
-								const int flush = !(KeyModifiers & ModifierShift);
+								const int flush = !(key_modifiers & Qt::ShiftModifier);
 								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
 									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
 								}
@@ -2640,7 +2611,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 						if (ButtonAreaUnderCursor == ButtonAreaInventory
 							&& static_cast<size_t>(ButtonUnderCursor) == j) {
 								Assert(uins->Type->BoolFlag[ITEM_INDEX].value);
-								const int flush = !(KeyModifiers & ModifierShift);
+								const int flush = !(key_modifiers & Qt::ShiftModifier);
 								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
 									if ((1 << button) == LeftButton) {
 										if  (!uins->Bound) {
@@ -2696,7 +2667,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 **
 **  @param button  Button pressed down.
 */
-void UIHandleButtonDown(unsigned button)
+void UIHandleButtonDown(unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
 	// Detect long left selection click
 	const bool longLeftButton = (MouseButtons & ((LeftButton << MouseHoldShift))) != 0;
@@ -2745,19 +2716,19 @@ void UIHandleButtonDown(unsigned button)
 	HandleMouseOn(CursorScreenPos);
 	//  Selecting target. (Move,Attack,Patrol,... commands);
 	if (CurrentCursorState == CursorState::Select) {
-		UISelectStateButtonDown(button);
+		UISelectStateButtonDown(button, key_modifiers);
 		return;
 	}
 
 	//  Cursor is on the map area
 	if (CursorOn == cursor_on::map) {
-		UIHandleButtonDown_OnMap();
+		UIHandleButtonDown_OnMap(key_modifiers);
 	} else if (CursorOn == cursor_on::minimap) {
 		//  Cursor is on the minimap area
-		UIHandleButtonDown_OnMinimap();
+		UIHandleButtonDown_OnMinimap(key_modifiers);
 	} else if (CursorOn == cursor_on::button) {
 		//  Cursor is on the buttons: group or command
-		UIHandleButtonDown_OnButton();
+		UIHandleButtonDown_OnButton(key_modifiers);
 	}
 }
 
@@ -2766,7 +2737,7 @@ void UIHandleButtonDown(unsigned button)
 **
 **  @param button  Button released.
 */
-void UIHandleButtonUp(unsigned button)
+void UIHandleButtonUp(unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
 	//
 	//  Move map.
@@ -2886,7 +2857,7 @@ void UIHandleButtonUp(unsigned button)
 		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->has_building_access(Selected[0]))) {
 		//Wyrmgus end
 			if (OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
-				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
+				UI.ButtonPanel.DoClicked(ButtonUnderCursor, key_modifiers);
 				OldButtonUnderCursor = -1;
 				return;
 			}
@@ -2894,11 +2865,11 @@ void UIHandleButtonUp(unsigned button)
 		if (CursorOn == cursor_on::button) {
 			// FIXME: other buttons?
 			if (ButtonAreaUnderCursor == ButtonAreaButton && OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
-				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
+				UI.ButtonPanel.DoClicked(ButtonUnderCursor, key_modifiers);
 				return;
 			}
 			//Wyrmgus start
-			UIHandleButtonUp_OnButton(button);
+			UIHandleButtonUp_OnButton(button, key_modifiers);
 			//Wyrmgus end
 		}
 	}
@@ -2926,18 +2897,18 @@ void UIHandleButtonUp(unsigned button)
 			if (pos0.y > pos1.y) {
 				std::swap(pos0.y, pos1.y);
 			}
-			if (KeyModifiers & ModifierShift) {
-				if (KeyModifiers & ModifierAlt) {
+			if (key_modifiers & Qt::ShiftModifier) {
+				if (key_modifiers & Qt::AltModifier) {
 					num = AddSelectedGroundUnitsInRectangle(pos0, pos1);
-				} else if (KeyModifiers & ModifierControl) {
+				} else if (key_modifiers & Qt::ControlModifier) {
 					num = AddSelectedAirUnitsInRectangle(pos0, pos1);
 				} else {
 					num = AddSelectedUnitsInRectangle(pos0, pos1);
 				}
 			} else {
-				if (KeyModifiers & ModifierAlt) {
+				if (key_modifiers & Qt::AltModifier) {
 					num = SelectGroundUnitsInRectangle(pos0, pos1);
-				} else if (KeyModifiers & ModifierControl) {
+				} else if (key_modifiers & Qt::ControlModifier) {
 					num = SelectAirUnitsInRectangle(pos0, pos1);
 				} else {
 					num = SelectUnitsInRectangle(pos0, pos1);
@@ -2964,15 +2935,15 @@ void UIHandleButtonUp(unsigned button)
 			}
 			if (unit) {
 				// FIXME: Not nice coded, button number hardcoded!
-				if ((KeyModifiers & ModifierControl)
+				if ((key_modifiers & Qt::ControlModifier)
 					|| (button & (1 << MouseDoubleShift))) {
-					if (KeyModifiers & ModifierShift) {
+					if (key_modifiers & Qt::ShiftModifier) {
 						num = ToggleUnitsByType(*unit);
 					} else {
 						num = SelectUnitsByType(*unit);
 					}
-				} else if ((KeyModifiers & ModifierAlt) && unit->LastGroup) {
-					if (KeyModifiers & ModifierShift) {
+				} else if ((key_modifiers & Qt::AltModifier) && unit->LastGroup) {
+					if (key_modifiers & Qt::ShiftModifier) {
 						num = AddGroupFromUnitToSelection(*unit);
 					} else {
 						num = SelectGroupFromUnit(*unit);
@@ -2980,7 +2951,7 @@ void UIHandleButtonUp(unsigned button)
 
 					// Don't allow to select own and enemy units.
 					// Don't allow mixing buildings
-				} else if (KeyModifiers & ModifierShift
+				} else if (key_modifiers & Qt::ShiftModifier
 						   && (unit->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*unit))
 						   //Wyrmgus start
 //						   && !unit->Type->BoolFlag[BUILDING_INDEX].value

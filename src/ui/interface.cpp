@@ -103,9 +103,7 @@ CUnit *LastIdleWorker;							/// Last called idle worker
 CUnit *LastLevelUpUnit;							/// Last called level up unit
 //Wyrmgus end
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+Qt::KeyboardModifiers stored_key_modifiers = Qt::NoModifier;
 
 /**
 **  Show input.
@@ -612,7 +610,7 @@ std::string GetCurrentButtonValueStr()
 /**
 **  Call the lua function HandleCommandKey
 */
-bool HandleCommandKey(int key)
+bool HandleCommandKey(int key, const Qt::KeyboardModifiers key_modifiers)
 {
 	int base = lua_gettop(Lua);
 
@@ -622,9 +620,9 @@ bool HandleCommandKey(int key)
 		return false;
 	}
 	lua_pushstring(Lua, SdlKey2Str(key));
-	lua_pushboolean(Lua, (KeyModifiers & ModifierControl));
-	lua_pushboolean(Lua, (KeyModifiers & ModifierAlt));
-	lua_pushboolean(Lua, (KeyModifiers & ModifierShift));
+	lua_pushboolean(Lua, (key_modifiers & Qt::ControlModifier));
+	lua_pushboolean(Lua, (key_modifiers & Qt::AltModifier));
+	lua_pushboolean(Lua, (key_modifiers & Qt::ShiftModifier));
 	LuaCall(4, 0);
 	if (lua_gettop(Lua) - base == 1) {
 		bool ret = LuaToBoolean(Lua, base + 1);
@@ -640,23 +638,23 @@ bool HandleCommandKey(int key)
 extern void ToggleShowBuilListMessages();
 #endif
 
-static void CommandKey_Group(int group)
+static void CommandKey_Group(int group, const Qt::KeyboardModifiers key_modifiers)
 {
-	if (KeyModifiers & ModifierShift) {
-		if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
+	if (key_modifiers & Qt::ShiftModifier) {
+		if ((key_modifiers & Qt::AltModifier) && (KeyModifiers & ModifierDoublePress)) {
 			if (KeyModifiers & ModifierDoublePress) {
 				UiCenterOnGroup(group, GroupSelectionMode::SELECT_ALL);
 			} else {
 				UiSelectGroup(group, GroupSelectionMode::SELECT_ALL);
 			}
-		} else if (KeyModifiers & ModifierControl) {
+		} else if (key_modifiers & Qt::ControlModifier) {
 			UiAddToGroup(group);
 		} else {
 			UiAddGroupToSelection(group);
 		}
 	} else {
-		if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
-			if (KeyModifiers & ModifierAlt) {
+		if ((key_modifiers & Qt::AltModifier) && (KeyModifiers & ModifierDoublePress)) {
+			if (key_modifiers & Qt::AltModifier) {
 				if (KeyModifiers & ModifierDoublePress) {
 					UiCenterOnGroup(group, GroupSelectionMode::NON_SELECTABLE_BY_RECTANGLE_ONLY);
 				} else {
@@ -665,7 +663,7 @@ static void CommandKey_Group(int group)
 			} else {
 				UiCenterOnGroup(group);
 			}
-		} else if (KeyModifiers & ModifierControl) {
+		} else if (key_modifiers & Qt::ControlModifier) {
 			UiDefineGroup(group);
 		} else {
 			UiSelectGroup(group);
@@ -673,9 +671,9 @@ static void CommandKey_Group(int group)
 	}
 }
 
-static void CommandKey_MapPosition(int index)
+static void CommandKey_MapPosition(int index, const Qt::KeyboardModifiers key_modifiers)
 {
-	if (KeyModifiers & ModifierShift) {
+	if (key_modifiers & Qt::ShiftModifier) {
 		UiSaveMapPosition(index);
 	} else {
 		UiRecallMapPosition(index);
@@ -689,7 +687,7 @@ static void CommandKey_MapPosition(int index)
 **
 **  @return     True, if key is handled; otherwise false.
 */
-static bool CommandKey(int key)
+static bool CommandKey(int key, const Qt::KeyboardModifiers key_modifiers)
 {
 	const char *ptr = strchr(UiGroupKeys.c_str(), key);
 
@@ -719,13 +717,13 @@ static bool CommandKey(int key)
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
 		case '9':
-			CommandKey_Group(key - '0');
+			CommandKey_Group(key - '0', key_modifiers);
 			break;
 
 		case SDLK_F2:
 		case SDLK_F3:
 		case SDLK_F4: // Set/Goto place
-			CommandKey_MapPosition(key - SDLK_F2);
+			CommandKey_MapPosition(key - SDLK_F2, key_modifiers);
 			break;
 
 		case SDLK_SPACE: // center on last action
@@ -748,7 +746,7 @@ static bool CommandKey(int key)
 
 		case 'c': // ALT+C, CTRL+C C center on units
 			//Wyrmgus start
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+			if (!(key_modifiers & (Qt::AltModifier | Qt::ControlModifier))) {
 				break;
 			}
 			//Wyrmgus end
@@ -756,7 +754,7 @@ static bool CommandKey(int key)
 			break;
 
 		case 'g': // ALT+G, CTRL+G grab mouse pointer
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+			if (!(key_modifiers & (Qt::AltModifier | Qt::ControlModifier))) {
 				break;
 			}
 			UiToggleGrabMouse();
@@ -765,12 +763,12 @@ static bool CommandKey(int key)
 			SavePreferences();
 			//Wyrmgus end
 			//Wyrmgus start
-			HandleCommandKey(key);
+			HandleCommandKey(key, key_modifiers);
 			//Wyrmgus end
 			break;
 
 		case 'i':
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+			if (!(key_modifiers & (Qt::AltModifier | Qt::ControlModifier))) {
 				break;
 			}
 		// FALL THROUGH
@@ -779,11 +777,11 @@ static bool CommandKey(int key)
 			break;
 
 		case 'l': // CTRL+L return to previous map layer
-			if (KeyModifiers & ModifierControl) {
+			if (key_modifiers & Qt::ControlModifier) {
 				ChangeToPreviousMapLayer();
 				break;
 			} else {
-				if (HandleCommandKey(key)) {
+				if (HandleCommandKey(key, key_modifiers)) {
 					break;
 				}
 				return false;
@@ -791,12 +789,12 @@ static bool CommandKey(int key)
 			break;
 
 		case 'm': // CTRL+M Turn music on / off
-			if (KeyModifiers & ModifierControl) {
+			if (key_modifiers & Qt::ControlModifier) {
 				UiToggleMusic();
 				SavePreferences();
 				break;
 			} else {
-				if (HandleCommandKey(key)) {
+				if (HandleCommandKey(key, key_modifiers)) {
 					break;
 				}
 				return false;
@@ -804,7 +802,7 @@ static bool CommandKey(int key)
 			break;
 
 		case 'p': // CTRL+P, ALT+P Toggle pause
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+			if (!(key_modifiers & (Qt::AltModifier | Qt::ControlModifier))) {
 				break;
 			}
 		// FALL THROUGH (CTRL+P, ALT+P)
@@ -814,7 +812,7 @@ static bool CommandKey(int key)
 
 		//Wyrmgus start
 		case 'q': // Shift+Q: select all army units
-			if (!(KeyModifiers & ModifierControl) && (KeyModifiers & (ModifierAlt))) {
+			if (!(key_modifiers & Qt::ControlModifier) && (key_modifiers & Qt::AltModifier)) {
 				if (GameObserve || GamePaused || GameEstablishing) {
 					break;
 				}
@@ -827,7 +825,7 @@ static bool CommandKey(int key)
 				SelectionChanged();
 				break;
 			} else {
-				if (HandleCommandKey(key)) {
+				if (HandleCommandKey(key, key_modifiers)) {
 					break;
 				}
 				return false;
@@ -835,13 +833,13 @@ static bool CommandKey(int key)
 		//Wyrmgus end
 		
 		case 's': // CTRL+S - Turn sound on / off
-			if (KeyModifiers & ModifierControl) {
+			if (key_modifiers & Qt::ControlModifier) {
 				UiToggleSound();
 				SavePreferences();
 				break;
 			//Wyrmgus start
 			} else {
-				if (HandleCommandKey(key)) {
+				if (HandleCommandKey(key, key_modifiers)) {
 					break;
 				}
 				return false;
@@ -850,7 +848,7 @@ static bool CommandKey(int key)
 			break;
 
 		case 't': // ALT+T, CTRL+T Track unit
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+			if (!(key_modifiers & (Qt::AltModifier | Qt::ControlModifier))) {
 				break;
 			}
 			UiTrackUnit();
@@ -858,7 +856,7 @@ static bool CommandKey(int key)
 
 		//Wyrmgus start
 		case 'w': // Alt+W: select all units of the same type as the first currently selected one
-			if (!(KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
+			if (!(key_modifiers & Qt::ControlModifier) && (key_modifiers & Qt::AltModifier)) {
 				if (GameObserve || GamePaused || GameEstablishing) {
 					break;
 				}
@@ -879,7 +877,7 @@ static bool CommandKey(int key)
 				SelectionChanged();
 				break;
 			} else {
-				if (HandleCommandKey(key)) {
+				if (HandleCommandKey(key, key_modifiers)) {
 					break;
 				}
 				return false;
@@ -887,21 +885,21 @@ static bool CommandKey(int key)
 		//Wyrmgus end
 		
 		case 'e': // CTRL+E Turn messages on / off
-			if (KeyModifiers & ModifierControl) {
+			if (key_modifiers & Qt::ControlModifier) {
 				ToggleShowMessages();
 			}
 #ifdef DEBUG
-			else if (KeyModifiers & ModifierAlt) {
+			else if (key_modifiers & Qt::AltModifier) {
 				ToggleShowBuilListMessages();
 			}
 #endif
 			break;
 
 		case SDLK_TAB: // TAB toggles minimap.
-			if (KeyModifiers & ModifierAlt) {
+			if (key_modifiers & Qt::AltModifier) {
 				break;
 			}
-			if (KeyModifiers & ModifierShift) {
+			if (key_modifiers & Qt::ShiftModifier) {
 				UiToggleMinimapZoom();
 			} else {
 				UiToggleMinimapMode();
@@ -926,7 +924,7 @@ static bool CommandKey(int key)
 			break;
 
 		default:
-			if (HandleCommandKey(key)) {
+			if (HandleCommandKey(key, key_modifiers)) {
 				break;
 			}
 			return false;
@@ -1163,80 +1161,68 @@ void Screenshot()
 	SaveScreenshotPNG(filename);
 }
 
-/**
-**  Update KeyModifiers if a key is pressed.
-**
-**  @param key      Key scancode.
-**  @param keychar  Character code.
-**
-**  @return         1 if modifier found, 0 otherwise
-*/
-int HandleKeyModifiersDown(unsigned key, unsigned)
+
+void HandleKeyModifiers(const Qt::KeyboardModifiers key_modifiers)
+{
+	if (key_modifiers == stored_key_modifiers) {
+		return;
+	}
+
+	stored_key_modifiers = key_modifiers;
+}
+
+bool HandleKeyModifiersDown(unsigned key)
 {
 	switch (key) {
 		case SDLK_LSHIFT:
 		case SDLK_RSHIFT:
-			KeyModifiers |= ModifierShift;
-			return 1;
+			stored_key_modifiers |= Qt::ShiftModifier;
+			return true;
 		case SDLK_LCTRL:
 		case SDLK_RCTRL:
-			KeyModifiers |= ModifierControl;
-			return 1;
+			stored_key_modifiers |= Qt::ControlModifier;
+			return true;
 		case SDLK_LALT:
 		case SDLK_RALT:
 		case SDLK_LMETA:
 		case SDLK_RMETA:
-			KeyModifiers |= ModifierAlt;
+			stored_key_modifiers |= Qt::AltModifier;
 			// maxy: disabled
 			if (current_interface_state == interface_state::normal) {
 				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
-			return 1;
-		case SDLK_LSUPER:
-		case SDLK_RSUPER:
-			KeyModifiers |= ModifierSuper;
-			return 1;
+			return true;
 		default:
 			break;
 	}
-	return 0;
+
+	return false;
 }
 
-/**
-**  Update KeyModifiers if a key is released.
-**
-**  @param key      Key scancode.
-**  @param keychar  Character code.
-**
-**  @return         1 if modifier found, 0 otherwise
-*/
-int HandleKeyModifiersUp(unsigned key, unsigned)
+bool HandleKeyModifiersUp(unsigned key)
 {
 	switch (key) {
 		case SDLK_LSHIFT:
 		case SDLK_RSHIFT:
-			KeyModifiers &= ~ModifierShift;
-			return 1;
+			stored_key_modifiers &= ~Qt::ShiftModifier;
+			return true;
 		case SDLK_LCTRL:
 		case SDLK_RCTRL:
-			KeyModifiers &= ~ModifierControl;
-			return 1;
+			stored_key_modifiers &= ~Qt::ControlModifier;
+			return true;
 		case SDLK_LALT:
 		case SDLK_RALT:
 		case SDLK_LMETA:
 		case SDLK_RMETA:
-			KeyModifiers &= ~ModifierAlt;
+			stored_key_modifiers &= ~Qt::AltModifier;
 			// maxy: disabled
 			if (current_interface_state == interface_state::normal) {
 				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
-			return 1;
-		case SDLK_LSUPER:
-		case SDLK_RSUPER:
-			KeyModifiers &= ~ModifierSuper;
-			return 1;
+			return true;
 	}
-	return 0;
+
+	return false;
 }
 
 /**
@@ -1273,7 +1259,7 @@ static bool IsKeyPad(unsigned key, unsigned *kp)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-void HandleKeyDown(unsigned key, unsigned keychar)
+void HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	switch (key) {
 		case SDLK_SYSREQ:
@@ -1288,7 +1274,7 @@ void HandleKeyDown(unsigned key, unsigned keychar)
 			break;
 	}
 
-	if (HandleKeyModifiersDown(key, keychar)) {
+	if (HandleKeyModifiersDown(key)) {
 		return;
 	}
 
@@ -1300,14 +1286,14 @@ void HandleKeyDown(unsigned key, unsigned keychar)
 		InputKey(kp ? kp : keychar);
 	} else {
 		// If no modifier look if button bound
-		if (!(KeyModifiers & (ModifierControl | ModifierAlt | ModifierSuper))) {
+		if (!(key_modifiers & (Qt::ControlModifier | Qt::AltModifier))) {
 			if (!GameObserve && !GamePaused && !GameEstablishing) {
-				if (UI.ButtonPanel.DoKey(key)) {
+				if (UI.ButtonPanel.DoKey(key, key_modifiers)) {
 					return;
 				}
 			}
 		}
-		CommandKey(key);
+		CommandKey(key, key_modifiers);
 	}
 }
 
@@ -1317,9 +1303,9 @@ void HandleKeyDown(unsigned key, unsigned keychar)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-void HandleKeyUp(unsigned key, unsigned keychar)
+void HandleKeyUp(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
-	if (HandleKeyModifiersUp(key, keychar)) {
+	if (HandleKeyModifiersUp(key)) {
 		return;
 	}
 
@@ -1351,7 +1337,7 @@ void HandleKeyUp(unsigned key, unsigned keychar)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-void HandleKeyRepeat(unsigned, unsigned keychar)
+void HandleKeyRepeat(unsigned, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (KeyState == KeyStateInput && keychar) {
 		InputKey(keychar);
@@ -1462,11 +1448,11 @@ void HandleCursorMove(int *x, int *y)
 **
 **  @param screePos  screen pixel position.
 */
-void HandleMouseMove(const PixelPos &screenPos)
+void HandleMouseMove(const PixelPos &screenPos, const Qt::KeyboardModifiers key_modifiers)
 {
 	PixelPos pos(screenPos);
 	HandleCursorMove(&pos.x, &pos.y);
-	UIHandleMouseMove(pos);
+	UIHandleMouseMove(pos, key_modifiers);
 }
 
 /**
@@ -1474,9 +1460,9 @@ void HandleMouseMove(const PixelPos &screenPos)
 **
 **  @param button  Mouse button number (0 left, 1 middle, 2 right)
 */
-void HandleButtonDown(unsigned button)
+void HandleButtonDown(unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
-	UIHandleButtonDown(button);
+	UIHandleButtonDown(button, key_modifiers);
 }
 
 /**
@@ -1487,9 +1473,9 @@ void HandleButtonDown(unsigned button)
 **
 **  @param button  Mouse button number (0 left, 1 middle, 2 right)
 */
-void HandleButtonUp(unsigned button)
+void HandleButtonUp(unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
-	UIHandleButtonUp(button);
+	UIHandleButtonUp(button, key_modifiers);
 }
 
 /*----------------------------------------------------------------------------
@@ -1526,7 +1512,7 @@ static unsigned LastMouseTicks;		/// Ticks of last mouse event
 **  @param button     Mouse button pressed.
 */
 void InputMouseButtonPress(const EventCallback &callbacks,
-						   unsigned ticks, unsigned button)
+						   unsigned ticks, unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
 	//  Button new pressed.
 	if (!(MouseButtons & (1 << button))) {
@@ -1544,7 +1530,7 @@ void InputMouseButtonPress(const EventCallback &callbacks,
 	}
 	LastMouseTicks = ticks;
 
-	callbacks.ButtonPressed(button);
+	callbacks.ButtonPressed(button, key_modifiers);
 }
 
 /**
@@ -1555,7 +1541,7 @@ void InputMouseButtonPress(const EventCallback &callbacks,
 **  @param button     Mouse button released.
 */
 void InputMouseButtonRelease(const EventCallback &callbacks,
-							 unsigned ticks, unsigned button)
+							 unsigned ticks, unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
 	//  Same button before pressed.
 	if (button == LastMouseButton && MouseState == InitialMouseState) {
@@ -1578,7 +1564,7 @@ void InputMouseButtonRelease(const EventCallback &callbacks,
 	}
 	MouseButtons &= ~(0x01010101 << button);
 
-	callbacks.ButtonReleased(button | mask);
+	callbacks.ButtonReleased(button | mask, key_modifiers);
 }
 
 /**
@@ -1590,7 +1576,7 @@ void InputMouseButtonRelease(const EventCallback &callbacks,
 **  @param y          Y movement
 */
 void InputMouseMove(const EventCallback &callbacks,
-					unsigned ticks, int x, int y)
+					unsigned ticks, int x, int y, const Qt::KeyboardModifiers key_modifiers)
 {
 	PixelPos mousePos(x, y);
 	// Don't reset the mouse state unless we really moved
@@ -1616,7 +1602,7 @@ void InputMouseMove(const EventCallback &callbacks,
 		LastMousePos = mousePos;
 	}
 #endif
-	callbacks.MouseMoved(mousePos);
+	callbacks.MouseMoved(mousePos, key_modifiers);
 }
 
 /**
@@ -1638,7 +1624,7 @@ void InputMouseExit(const EventCallback &callbacks, unsigned /* ticks */)
 **  @param callbacks  Callback structure for events.
 **  @param ticks      Denotes time-stamp of video-system
 */
-void InputMouseTimeout(const EventCallback &callbacks, unsigned ticks)
+void InputMouseTimeout(const EventCallback &callbacks, unsigned ticks, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (MouseButtons & (1 << LastMouseButton)) {
 		if (ticks > StartMouseTicks + DoubleClickDelay) {
@@ -1647,7 +1633,7 @@ void InputMouseTimeout(const EventCallback &callbacks, unsigned ticks)
 		if (ticks > LastMouseTicks + HoldClickDelay) {
 			LastMouseTicks = ticks;
 			MouseButtons |= (1 << LastMouseButton) << MouseHoldShift;
-			callbacks.ButtonPressed(LastMouseButton | (LastMouseButton << MouseHoldShift));
+			callbacks.ButtonPressed(LastMouseButton | (LastMouseButton << MouseHoldShift), key_modifiers);
 		}
 	}
 }
@@ -1670,7 +1656,7 @@ static unsigned DoubleKey;						/// last key pressed
 **  @param ikeychar   Character code.
 */
 void InputKeyButtonPress(const EventCallback &callbacks,
-						 unsigned ticks, unsigned ikey, unsigned ikeychar)
+						 unsigned ticks, unsigned ikey, unsigned ikeychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (!LastIKey && DoubleKey == ikey && ticks < LastKeyTicks + DoubleClickDelay) {
 		KeyModifiers |= ModifierDoublePress;
@@ -1679,7 +1665,10 @@ void InputKeyButtonPress(const EventCallback &callbacks,
 	LastIKey = ikey;
 	LastIKeyChar = ikeychar;
 	LastKeyTicks = ticks;
-	callbacks.KeyPressed(ikey, ikeychar);
+
+	HandleKeyModifiers(key_modifiers);
+
+	callbacks.KeyPressed(ikey, ikeychar, key_modifiers);
 	KeyModifiers &= ~ModifierDoublePress;
 }
 
@@ -1692,13 +1681,16 @@ void InputKeyButtonPress(const EventCallback &callbacks,
 **  @param ikeychar   Character code.
 */
 void InputKeyButtonRelease(const EventCallback &callbacks,
-						   unsigned ticks, unsigned ikey, unsigned ikeychar)
+						   unsigned ticks, unsigned ikey, unsigned ikeychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (ikey == LastIKey) {
 		LastIKey = 0;
 	}
 	LastKeyTicks = ticks;
-	callbacks.KeyReleased(ikey, ikeychar);
+
+	HandleKeyModifiers(key_modifiers);
+
+	callbacks.KeyReleased(ikey, ikeychar, key_modifiers);
 }
 
 /**
@@ -1707,11 +1699,11 @@ void InputKeyButtonRelease(const EventCallback &callbacks,
 **  @param callbacks  Callback structure for events.
 **  @param ticks      Denotes time-stamp of video-system
 */
-void InputKeyTimeout(const EventCallback &callbacks, unsigned ticks)
+void InputKeyTimeout(const EventCallback &callbacks, unsigned ticks, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (LastIKey && ticks > LastKeyTicks + HoldKeyDelay) {
 		LastKeyTicks = ticks - (HoldKeyDelay - HoldKeyAdditionalDelay);
-		callbacks.KeyRepeated(LastIKey, LastIKeyChar);
+		callbacks.KeyRepeated(LastIKey, LastIKeyChar, key_modifiers);
 	}
 }
 

@@ -449,23 +449,23 @@ public:
 **  This is placed in the video part, because it depends on the video
 **  hardware driver.
 */
-struct EventCallback
+struct EventCallback final
 {
 	/// Callback for mouse button press
-	void (*ButtonPressed)(unsigned buttons) = nullptr;
+	void (*ButtonPressed)(unsigned buttons, const Qt::KeyboardModifiers key_modifiers) = nullptr;
 	/// Callback for mouse button release
-	void (*ButtonReleased)(unsigned buttons) = nullptr;
+	void (*ButtonReleased)(unsigned buttons, const Qt::KeyboardModifiers key_modifiers) = nullptr;
 	/// Callback for mouse move
-	void (*MouseMoved)(const PixelPos &screenPos) = nullptr;
+	void (*MouseMoved)(const PixelPos &screenPos, const Qt::KeyboardModifiers key_modifiers) = nullptr;
 	/// Callback for mouse exit of game window
 	void (*MouseExit)() = nullptr;
 
 	/// Callback for key press
-	void (*KeyPressed)(unsigned keycode, unsigned keychar) = nullptr;
+	void (*KeyPressed)(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers) = nullptr;
 	/// Callback for key release
-	void (*KeyReleased)(unsigned keycode, unsigned keychar) = nullptr;
+	void (*KeyReleased)(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers) = nullptr;
 	/// Callback for key repeated
-	void (*KeyRepeated)(unsigned keycode, unsigned keychar) = nullptr;
+	void (*KeyRepeated)(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers) = nullptr;
 
 	/// Callback for network event
 	void (*NetworkEvent)() = nullptr;

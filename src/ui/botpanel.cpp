@@ -1796,9 +1796,9 @@ void CButtonPanel::DoClicked_SelectTarget(int button)
 	UI.StatusLine.Set(_("Select Target"));
 }
 
-void CButtonPanel::DoClicked_Unload(int button)
+void CButtonPanel::DoClicked_Unload(int button, const Qt::KeyboardModifiers key_modifiers)
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	const int flush = !(key_modifiers & Qt::ShiftModifier);
 	//
 	//  Unload on coast, transporter standing, unload all units right now.
 	//  That or a bunker.
@@ -1813,11 +1813,11 @@ void CButtonPanel::DoClicked_Unload(int button)
 	DoClicked_SelectTarget(button);
 }
 
-void CButtonPanel::DoClicked_SpellCast(int button)
+void CButtonPanel::DoClicked_SpellCast(int button, const Qt::KeyboardModifiers key_modifiers)
 {
 	const int spell_id = CurrentButtons[button]->Value;
 	const wyrmgus::spell *spell = wyrmgus::spell::get_all()[spell_id];
-	if (KeyModifiers & ModifierControl) {
+	if (key_modifiers & Qt::ControlModifier) {
 		if (spell->get_autocast_info() == nullptr) {
 			PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 			return;
@@ -1842,7 +1842,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 	}
 
 	if (spell->is_caster_only()) {
-		const int flush = !(KeyModifiers & ModifierShift);
+		const int flush = !(key_modifiers & Qt::ShiftModifier);
 
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit &unit = *Selected[i];
@@ -1854,9 +1854,9 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 	DoClicked_SelectTarget(button);
 }
 
-void CButtonPanel::DoClicked_Repair(int button)
+void CButtonPanel::DoClicked_Repair(int button, const Qt::KeyboardModifiers key_modifiers)
 {
-	if (KeyModifiers & ModifierControl) {
+	if (key_modifiers & Qt::ControlModifier) {
 		unsigned autorepair = 0;
 		// If any selected unit doesn't have autocast on turn it on
 		// for everyone
@@ -1876,10 +1876,10 @@ void CButtonPanel::DoClicked_Repair(int button)
 	DoClicked_SelectTarget(button);
 }
 
-void CButtonPanel::DoClicked_Return()
+void CButtonPanel::DoClicked_Return(const Qt::KeyboardModifiers key_modifiers)
 {
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		SendCommandReturnGoods(*Selected[i], NoUnitP, !(KeyModifiers & ModifierShift));
+		SendCommandReturnGoods(*Selected[i], NoUnitP, !(key_modifiers & Qt::ShiftModifier));
 	}
 }
 
@@ -1890,10 +1890,10 @@ void CButtonPanel::DoClicked_Stop()
 	}
 }
 
-void CButtonPanel::DoClicked_StandGround()
+void CButtonPanel::DoClicked_StandGround(const Qt::KeyboardModifiers key_modifiers)
 {
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		SendCommandStandGround(*Selected[i], !(KeyModifiers & ModifierShift));
+		SendCommandStandGround(*Selected[i], !(key_modifiers & Qt::ShiftModifier));
 	}
 }
 
@@ -1961,7 +1961,7 @@ void CButtonPanel::DoClicked_Build(const std::unique_ptr<wyrmgus::button> &butto
 	}
 }
 
-void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &button)
+void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &button, const Qt::KeyboardModifiers key_modifiers)
 {
 	// FIXME: store pointer in button table!
 	const wyrmgus::unit_type *unit_type = button->get_value_unit_type(Selected[0]);
@@ -1997,7 +1997,7 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 	}
 	
 	int unit_count = 1;
-	if (KeyModifiers & ModifierShift) {
+	if (key_modifiers & Qt::ShiftModifier) {
 		unit_count = 5;
 	}
 	
@@ -2019,14 +2019,14 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 	//Wyrmgus end
 }
 
-void CButtonPanel::DoClicked_UpgradeTo(const std::unique_ptr<wyrmgus::button> &button)
+void CButtonPanel::DoClicked_UpgradeTo(const std::unique_ptr<wyrmgus::button> &button, const Qt::KeyboardModifiers key_modifiers)
 {
 	const wyrmgus::unit_type *unit_type = button->get_value_unit_type(Selected[0]);
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[i]->Player->CheckLimits(*unit_type) != -6 && !Selected[i]->Player->CheckUnitType(*unit_type)) {
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
-				SendCommandUpgradeTo(*Selected[i], *unit_type, !(KeyModifiers & ModifierShift));
+				SendCommandUpgradeTo(*Selected[i], *unit_type, !(key_modifiers & Qt::ShiftModifier));
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();
 			}
@@ -2036,7 +2036,7 @@ void CButtonPanel::DoClicked_UpgradeTo(const std::unique_ptr<wyrmgus::button> &b
 	}
 }
 
-void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
+void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button, const Qt::KeyboardModifiers key_modifiers)
 {
 	// FIXME: store pointer in button table!
 	wyrmgus::unit_type &type = *wyrmgus::unit_type::get_all()[CurrentButtons[button]->Value];
@@ -2054,7 +2054,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 						}
 					}
 				}
-				SendCommandTransformInto(*Selected[i], type, !(KeyModifiers & ModifierShift));
+				SendCommandTransformInto(*Selected[i], type, !(key_modifiers & Qt::ShiftModifier));
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();
 				Selected[i]->Player->UpdateLevelUpUnits();
@@ -2072,14 +2072,14 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 	}
 }
 
-void CButtonPanel::DoClicked_Research(const std::unique_ptr<wyrmgus::button> &button)
+void CButtonPanel::DoClicked_Research(const std::unique_ptr<wyrmgus::button> &button, const Qt::KeyboardModifiers key_modifiers)
 {
 	const CUpgrade *button_upgrade = button->get_value_upgrade(Selected[0]);
 
 	const resource_map<int> upgrade_costs = CPlayer::GetThisPlayer()->GetUpgradeCosts(button_upgrade);
 	if (!CPlayer::GetThisPlayer()->CheckCosts(upgrade_costs)) {
 		//PlayerSubCosts(player,Upgrades[i].Costs);
-		SendCommandResearch(*Selected[0], *button_upgrade, CPlayer::GetThisPlayer()->Index, !(KeyModifiers & ModifierShift));
+		SendCommandResearch(*Selected[0], *button_upgrade, CPlayer::GetThisPlayer()->Index, !(key_modifiers & Qt::ShiftModifier));
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		LastDrawnButtonPopup = nullptr;
@@ -2158,9 +2158,9 @@ void CButtonPanel::DoClicked_ProduceResource(int button)
 	}
 }
 
-void CButtonPanel::DoClicked_SellResource(int button)
+void CButtonPanel::DoClicked_SellResource(int button, const Qt::KeyboardModifiers key_modifiers)
 {
-	const bool toggle_autosell = (KeyModifiers & ModifierControl) != 0;
+	const bool toggle_autosell = (key_modifiers & Qt::ControlModifier) != 0;
 	const int resource = CurrentButtons[button]->Value;
 	
 	if (toggle_autosell && Selected[0]->Player == CPlayer::GetThisPlayer()) {
@@ -2227,7 +2227,7 @@ void CButtonPanel::DoClicked_CallbackAction(int button)
 **
 **  @param button  Button that was clicked.
 */
-void CButtonPanel::DoClicked(int button)
+void CButtonPanel::DoClicked(int button, const Qt::KeyboardModifiers key_modifiers)
 {
 	Assert(0 <= button && button < (int)UI.ButtonPanel.Buttons.size());
 	// no buttons
@@ -2280,9 +2280,9 @@ void CButtonPanel::DoClicked(int button)
 	
 	//  Handle action on button.
 	switch (CurrentButtons[button]->Action) {
-		case ButtonCmd::Unload: { DoClicked_Unload(button); break; }
-		case ButtonCmd::SpellCast: { DoClicked_SpellCast(button); break; }
-		case ButtonCmd::Repair: { DoClicked_Repair(button); break; }
+		case ButtonCmd::Unload: { DoClicked_Unload(button, key_modifiers); break; }
+		case ButtonCmd::SpellCast: { DoClicked_SpellCast(button, key_modifiers); break; }
+		case ButtonCmd::Repair: { DoClicked_Repair(button, key_modifiers); break; }
 		case ButtonCmd::Move:    // Follow Next
 		case ButtonCmd::Patrol:  // Follow Next
 		case ButtonCmd::Harvest: // Follow Next
@@ -2293,9 +2293,9 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonCmd::EditorUnit:
 		//Wyrmgus end
 		case ButtonCmd::AttackGround: { DoClicked_SelectTarget(button); break; }
-		case ButtonCmd::Return: { DoClicked_Return(); break; }
+		case ButtonCmd::Return: { DoClicked_Return(key_modifiers); break; }
 		case ButtonCmd::Stop: { DoClicked_Stop(); break; }
-		case ButtonCmd::StandGround: { DoClicked_StandGround(); break; }
+		case ButtonCmd::StandGround: { DoClicked_StandGround(key_modifiers); break; }
 		case ButtonCmd::Button: { DoClicked_Button(button); break; }
 		case ButtonCmd::Cancel: // Follow Next
 		case ButtonCmd::CancelUpgrade: { DoClicked_CancelUpgrade(); break; }
@@ -2307,26 +2307,26 @@ void CButtonPanel::DoClicked(int button)
 			break;
 		case ButtonCmd::Train:
 		case ButtonCmd::TrainClass:
-			DoClicked_Train(CurrentButtons[button]);
+			DoClicked_Train(CurrentButtons[button], key_modifiers);
 			break;
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::UpgradeToClass:
-			DoClicked_UpgradeTo(CurrentButtons[button]);
+			DoClicked_UpgradeTo(CurrentButtons[button], key_modifiers);
 			break;
 		case ButtonCmd::Research:
 		case ButtonCmd::ResearchClass:
 		case ButtonCmd::Dynasty:
-			DoClicked_Research(CurrentButtons[button]);
+			DoClicked_Research(CurrentButtons[button], key_modifiers);
 			break;
 		case ButtonCmd::CallbackAction: { DoClicked_CallbackAction(button); break; }
 		//Wyrmgus start
 		case ButtonCmd::LearnAbility: { DoClicked_LearnAbility(button); break; }
-		case ButtonCmd::ExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
+		case ButtonCmd::ExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button, key_modifiers); break; }
 		case ButtonCmd::Faction: { DoClicked_Faction(button); break; }
 		case ButtonCmd::Quest: { DoClicked_Quest(button); break; }
 		case ButtonCmd::Buy: { DoClicked_Buy(button); break; }
 		case ButtonCmd::ProduceResource: { DoClicked_ProduceResource(button); break; }
-		case ButtonCmd::SellResource: { DoClicked_SellResource(button); break; }
+		case ButtonCmd::SellResource: { DoClicked_SellResource(button, key_modifiers); break; }
 		case ButtonCmd::BuyResource: { DoClicked_BuyResource(button); break; }
 		case ButtonCmd::Salvage: { DoClicked_Salvage(); break; }
 		case ButtonCmd::EnterMapLayer: { DoClicked_EnterMapLayer(); break; }
@@ -2341,7 +2341,7 @@ void CButtonPanel::DoClicked(int button)
 **
 **  @return     True, if button is handled (consumed).
 */
-int CButtonPanel::DoKey(int key)
+int CButtonPanel::DoKey(int key, const Qt::KeyboardModifiers key_modifiers)
 {
 	SDL_keysym keysym;
 	memset(&keysym, 0, sizeof(keysym));
@@ -2357,7 +2357,7 @@ int CButtonPanel::DoKey(int key)
 
 		for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
 			if (CurrentButtons[i]->get_pos() != -1 && key == CurrentButtons[i]->get_key()) {
-				UI.ButtonPanel.DoClicked(i);
+				UI.ButtonPanel.DoClicked(i, key_modifiers);
 				return 1;
 			}
 		}

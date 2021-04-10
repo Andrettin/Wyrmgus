@@ -321,7 +321,7 @@ static void do_mouse_warp()
 **  @param callbacks  Callback structure for events.
 **  @param event      SDL event structure pointer.
 */
-static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
+static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Qt::KeyboardModifiers key_modifiers)
 {
 	// Scale mouse-coordinates to viewport
 	if (ZoomNoResize && (event.type & (SDL_MOUSEBUTTONUP | SDL_MOUSEBUTTONDOWN | SDL_MOUSEMOTION))) {
@@ -335,7 +335,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 
 	switch (event.type) {
 		case SDL_MOUSEBUTTONDOWN:
-			InputMouseButtonPress(callbacks, SDL_GetTicks(), event.button.button);
+			InputMouseButtonPress(callbacks, SDL_GetTicks(), event.button.button, key_modifiers);
 			if ((UI.MouseWarpPos.x != -1 || UI.MouseWarpPos.y != -1)
 				&& (event.button.x != UI.MouseWarpPos.x || event.button.y != UI.MouseWarpPos.y)) {
 				do_mouse_warp();
@@ -343,13 +343,13 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			InputMouseButtonRelease(callbacks, SDL_GetTicks(), event.button.button);
+			InputMouseButtonRelease(callbacks, SDL_GetTicks(), event.button.button, key_modifiers);
 			break;
 
 		// FIXME: check if this is only useful for the cursor
 		// FIXME: if this is the case we don't need this.
 		case SDL_MOUSEMOTION:
-			InputMouseMove(callbacks, SDL_GetTicks(), event.motion.x, event.motion.y);
+			InputMouseMove(callbacks, SDL_GetTicks(), event.motion.x, event.motion.y, key_modifiers);
 			// FIXME: Same bug fix from X11
 			if ((UI.MouseWarpPos.x != -1 || UI.MouseWarpPos.y != -1)
 				&& (event.motion.x != UI.MouseWarpPos.x || event.motion.y != UI.MouseWarpPos.y)) {
@@ -387,12 +387,12 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 
 		case SDL_KEYDOWN:
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
-								event.key.keysym.sym, event.key.keysym.unicode);
+								event.key.keysym.sym, event.key.keysym.unicode, key_modifiers);
 			break;
 
 		case SDL_KEYUP:
 			InputKeyButtonRelease(callbacks, SDL_GetTicks(),
-								  event.key.keysym.sym, event.key.keysym.unicode);
+								  event.key.keysym.sym, event.key.keysym.unicode, key_modifiers);
 			break;
 
 		case SDL_QUIT:
@@ -433,7 +433,7 @@ int PollEvent()
 {
 	SDL_Event event;
 	if (SDL_PollEvent(&event)) { // Handle SDL event
-		SdlDoEvent(*GetCallbacks(), event);
+		SdlDoEvent(*GetCallbacks(), event, 0);
 		return 1;
 	}
 
@@ -675,31 +675,31 @@ static SDLKey qt_key_to_sdl_key(const Qt::Key qt_key)
 	}
 }
 
-static SDLMod qt_key_modifier_to_sdl_key_modifier(const Qt::KeyboardModifiers qt_key_modifier)
+static SDLMod qt_key_modifier_to_sdl_key_modifier(const Qt::KeyboardModifiers qt_key_modifiers)
 {
-	int modifier = KMOD_NONE;
+	int modifiers = KMOD_NONE;
 
-	if (qt_key_modifier & Qt::ShiftModifier) {
-		modifier |= KMOD_LSHIFT;
+	if (qt_key_modifiers & Qt::ShiftModifier) {
+		modifiers |= KMOD_LSHIFT;
 	}
 
-	if (qt_key_modifier & Qt::ControlModifier) {
-		modifier |= KMOD_LCTRL;
+	if (qt_key_modifiers & Qt::ControlModifier) {
+		modifiers |= KMOD_LCTRL;
 	}
 
-	if (qt_key_modifier & Qt::AltModifier) {
-		modifier |= KMOD_LALT;
+	if (qt_key_modifiers & Qt::AltModifier) {
+		modifiers |= KMOD_LALT;
 	}
 
-	if (qt_key_modifier & Qt::MetaModifier) {
-		modifier |= KMOD_LMETA;
+	if (qt_key_modifiers & Qt::MetaModifier) {
+		modifiers |= KMOD_LMETA;
 	}
 
-	if (qt_key_modifier & Qt::KeypadModifier) {
-		modifier |= KMOD_NUM;
+	if (qt_key_modifiers & Qt::KeypadModifier) {
+		modifiers |= KMOD_NUM;
 	}
 
-	return static_cast<SDLMod>(modifier);
+	return static_cast<SDLMod>(modifiers);
 }
 
 static SDL_Event qevent_to_sdl_event(std::unique_ptr<QInputEvent> &&qevent)
@@ -805,8 +805,8 @@ void WaitEventsOneFrame()
 
 	const cursor *old_cursor = cursor::get_current_cursor();
 
-	InputMouseTimeout(*GetCallbacks(), ticks);
-	InputKeyTimeout(*GetCallbacks(), ticks);
+	InputMouseTimeout(*GetCallbacks(), ticks, stored_key_modifiers);
+	InputKeyTimeout(*GetCallbacks(), ticks, stored_key_modifiers);
 	CursorAnimate(ticks);
 
 	std::queue<std::unique_ptr<QInputEvent>> input_events = engine_interface::get()->take_stored_input_events();
@@ -822,7 +822,7 @@ void WaitEventsOneFrame()
 		}
 
 		SDL_Event sdl_event = qevent_to_sdl_event(std::move(input_event));
-		SdlDoEvent(*GetCallbacks(), sdl_event);
+		SdlDoEvent(*GetCallbacks(), sdl_event, input_event->modifiers());
 	}
 
 	int interrupts = 0;

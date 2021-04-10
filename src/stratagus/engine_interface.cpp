@@ -56,14 +56,6 @@ namespace wyrmgus {
 
 engine_interface::engine_interface()
 {
-	connect(static_cast<QGuiApplication *>(QApplication::instance()), &QGuiApplication::applicationStateChanged, this, [this](const Qt::ApplicationState state) {
-		//reset key modifiers if the application has become active or inactive (e.g. due to an Alt-Tab)
-		if (state == Qt::ApplicationActive || state == Qt::ApplicationInactive) {
-			this->post([]() {
-				KeyModifiers = 0;
-			});
-		}
-	});
 }
 
 engine_interface::~engine_interface()

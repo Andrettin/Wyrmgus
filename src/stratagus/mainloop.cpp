@@ -102,7 +102,7 @@ EventCallback EditorCallbacks; /// Editor callbacks
 **  @todo  Support dynamic acceleration of scroll speed.
 **  @todo  If the scroll key is longer pressed the area is scrolled faster.
 */
-void DoScrollArea(int state, bool fast, bool isKeyboard)
+void DoScrollArea(int state, bool fast, bool isKeyboard, const Qt::KeyboardModifiers key_modifiers)
 {
 	CViewport *vp;
 	int stepx;
@@ -164,7 +164,7 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 	vp->Set(vp->MapPos, vp->Offset + offset);
 
 	// This recalulates some values
-	HandleMouseMove(CursorScreenPos);
+	HandleMouseMove(CursorScreenPos, key_modifiers);
 }
 
 /**
@@ -429,7 +429,7 @@ static void DisplayLoop()
 	//
 	// Map scrolling
 	//
-	DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
+	DoScrollArea(MouseScrollState | KeyScrollState, (stored_key_modifiers & Qt::ControlModifier) != 0, MouseScrollState == 0 && KeyScrollState > 0, stored_key_modifiers);
 
 #ifdef REALVIDEO
 	if (FastForwardCycle > GameCycle && RealVideoSyncSpeed != VideoSyncSpeed) {

@@ -74,7 +74,7 @@
 #include "video/video.h"
 #include "widgets.h"
 
-extern void DoScrollArea(int state, bool fast, bool isKeyboard);
+extern void DoScrollArea(int state, bool fast, bool isKeyboard, const Qt::KeyboardModifiers key_modifiers);
 extern void DrawGuichanWidgets(std::vector<std::function<void(renderer *)>> &render_commands);
 extern void CleanGame();
 
@@ -212,7 +212,7 @@ static std::unique_ptr<EditorSliderListener> editorSliderListener;
 */
 //Wyrmgus start
 //static void EditTile(const Vec2i &pos, int tile)
-static void EditTile(const Vec2i &pos, const terrain_type *terrain)
+static void EditTile(const Vec2i &pos, const terrain_type *terrain, const Qt::KeyboardModifiers key_modifiers)
 //Wyrmgus end
 {
 	Assert(CMap::get()->Info.IsPointOnMap(pos, UI.CurrentMapLayer));
@@ -226,7 +226,7 @@ static void EditTile(const Vec2i &pos, const terrain_type *terrain)
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	mf.SetTerrain(terrain);
-	if (!terrain->is_overlay() && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
+	if (!terrain->is_overlay() && !(key_modifiers & Qt::ShiftModifier)) { // don't remove overlay terrains if holding shift
 		mf.RemoveOverlayTerrain();
 	}
 	mf.set_value(value);
@@ -272,7 +272,7 @@ static void EditTile(const Vec2i &pos, const terrain_type *terrain)
 */
 //Wyrmgus start
 //static void EditTilesInternal(const Vec2i &pos, int tile, int size)
-static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int size)
+static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int size, const Qt::KeyboardModifiers key_modifiers)
 //Wyrmgus end
 {
 	Vec2i minPos = pos;
@@ -295,7 +295,7 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 				continue;
 			}
 //			EditTile(itPos, tile);
-			EditTile(itPos, terrain);
+			EditTile(itPos, terrain, key_modifiers);
 			changed_tiles.push_back(itPos);
 			//Wyrmgus end
 		}
@@ -340,7 +340,7 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 								continue;
 							}
 							if (CMap::get()->Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
-								EditTile(adjacent_pos, terrain);
+								EditTile(adjacent_pos, terrain, key_modifiers);
 								changed_tiles.push_back(adjacent_pos);
 							}
 						}
@@ -477,12 +477,12 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 */
 //Wyrmgus start
 //static void EditTiles(const Vec2i &pos, int tile, int size)
-static void EditTiles(const Vec2i &pos, const terrain_type *terrain, int size)
+static void EditTiles(const Vec2i &pos, const terrain_type *terrain, int size, const Qt::KeyboardModifiers key_modifiers)
 //Wyrmgus end
 {
 	//Wyrmgus start
 //	EditTilesInternal(pos, tile, size);
-	EditTilesInternal(pos, terrain, size);
+	EditTilesInternal(pos, terrain, size, key_modifiers);
 	//Wyrmgus end
 
 	if (!MirrorEdit) {
@@ -492,14 +492,14 @@ static void EditTiles(const Vec2i &pos, const terrain_type *terrain, int size)
 	const Vec2i mirror = mpos - pos;
 	const Vec2i mirrorv(mirror.x, pos.y);
 
-	EditTilesInternal(mirrorv, terrain, size);
+	EditTilesInternal(mirrorv, terrain, size, key_modifiers);
 	if (MirrorEdit == 1) {
 		return;
 	}
 	const Vec2i mirrorh(pos.x, mirror.y);
 
-	EditTilesInternal(mirrorh, terrain, size);
-	EditTilesInternal(mirror, terrain, size);
+	EditTilesInternal(mirrorh, terrain, size, key_modifiers);
+	EditTilesInternal(mirror, terrain, size, key_modifiers);
 }
 
 /*----------------------------------------------------------------------------
@@ -1571,7 +1571,7 @@ void EditorUpdateDisplay()
 /**
 **  Callback for input.
 */
-static void EditorCallbackButtonUp(unsigned button)
+static void EditorCallbackButtonUp(unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (cursor::get_current_cursor() == UI.get_cursor(cursor_type::scroll)) {
 		// Move map.
@@ -1620,7 +1620,7 @@ static void EditorCallbackButtonUp(unsigned button)
 **
 **  @param button  Mouse button number (0 left, 1 middle, 2 right)
 */
-static void EditorCallbackButtonDown(unsigned button)
+static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (GamePaused) {
 		return;
@@ -1770,7 +1770,7 @@ static void EditorCallbackButtonDown(unsigned button)
 
 			if (Editor.State == EditorEditTile &&
 				Editor.SelectedTileIndex != -1) {
-				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize, key_modifiers);
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
@@ -1804,7 +1804,7 @@ static void EditorCallbackButtonDown(unsigned button)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
+static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	switch (key) {
 		case SDLK_SYSREQ:
@@ -1816,7 +1816,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 	}
 
-	if (HandleKeyModifiersDown(key, keychar)) {
+	if (HandleKeyModifiersDown(key)) {
 		return;
 	}
 
@@ -1832,7 +1832,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	switch (key) {
 		// FIXME: move to lua
 		case 'm': // CTRL+M Mirror edit
-			if (KeyModifiers & ModifierControl)  {
+			if (key_modifiers & Qt::ControlModifier)  {
 				++MirrorEdit;
 				if (MirrorEdit == 3) {
 					MirrorEdit = 0;
@@ -1850,24 +1850,24 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				}
 			//Wyrmgus start
 			} else {
-				HandleCommandKey(key);
+				HandleCommandKey(key, key_modifiers);
 				return;
 			//Wyrmgus end
 			}
 			break;
 		case 'x': // ALT+X, CTRL+X: Exit editor
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+			if (!(key_modifiers & (Qt::AltModifier | Qt::ControlModifier))) {
 				break;
 			}
 			Exit(0);
 
 		case 'z':
-			if (KeyModifiers & ModifierControl) {
+			if (key_modifiers & Qt::ControlModifier) {
 				EditorUndoAction();
 			}
 			break;
 		case 'y':
-			if (KeyModifiers & ModifierControl) {
+			if (key_modifiers & Qt::ControlModifier) {
 				EditorRedoAction();
 			}
 			break;
@@ -1913,7 +1913,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 
 		default:
-			HandleCommandKey(key);
+			HandleCommandKey(key, key_modifiers);
 			return;
 	}
 }
@@ -1924,9 +1924,9 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-static void EditorCallbackKeyUp(unsigned key, unsigned keychar)
+static void EditorCallbackKeyUp(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
-	if (HandleKeyModifiersUp(key, keychar)) {
+	if (HandleKeyModifiersUp(key)) {
 		return;
 	}
 
@@ -1955,16 +1955,16 @@ static void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 /**
 **  Callback for input.
 */
-static void EditorCallbackKeyRepeated(unsigned key, unsigned)
+static void EditorCallbackKeyRepeated(unsigned key, unsigned, const Qt::KeyboardModifiers key_modifiers)
 {
 	switch (key) {
 		case 'z':
-			if (KeyModifiers & ModifierControl) {
+			if (key_modifiers & Qt::ControlModifier) {
 				EditorUndoAction();
 			}
 			break;
 		case 'y':
-			if (KeyModifiers & ModifierControl) {
+			if (key_modifiers & Qt::ControlModifier) {
 				EditorRedoAction();
 			}
 			break;
@@ -2136,7 +2136,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 **
 **  @param pos  Screen position.
 */
-static void EditorCallbackMouse(const PixelPos &pos)
+static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers key_modifiers)
 {
 	static int LastMapX = 0;
 	static int LastMapY = 0;
@@ -2215,7 +2215,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
-			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize, key_modifiers);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
@@ -2695,14 +2695,14 @@ void EditorMainLoop()
 			// Map scrolling
 			//
 			if (UI.MouseScroll) {
-				DoScrollArea(MouseScrollState, 0, MouseScrollState == 0 && KeyScrollState > 0);
+				DoScrollArea(MouseScrollState, 0, MouseScrollState == 0 && KeyScrollState > 0, stored_key_modifiers);
 			}
 			if (UI.KeyScroll) {
-				DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
+				DoScrollArea(KeyScrollState, (stored_key_modifiers & Qt::ControlModifier) != 0, MouseScrollState == 0 && KeyScrollState > 0, stored_key_modifiers);
 				if (CursorOn == cursor_on::map && (MouseButtons & LeftButton) &&
 					(Editor.State == EditorEditTile ||
 					 Editor.State == EditorEditUnit)) {
-					EditorCallbackButtonDown(0);
+					EditorCallbackButtonDown(0, stored_key_modifiers);
 				}
 			}
 
