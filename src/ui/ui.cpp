@@ -485,24 +485,6 @@ void SetKeyScroll(bool enabled)
 }
 
 /**
-**  Check if mouse grabbing is enabled
-*/
-bool GetGrabMouse()
-{
-	return SdlGetGrabMouse();
-}
-
-/**
-**  Enable/disable grabbing the mouse
-**
-**  @param enabled  True to enable mouse grabbing, false to disable
-*/
-void SetGrabMouse(bool enabled)
-{
-	ToggleGrabMouse(enabled ? 1 : -1);
-}
-
-/**
 **  Check if scrolling stops when leaving the window
 */
 bool GetLeaveStops()

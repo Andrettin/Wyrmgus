@@ -631,11 +631,6 @@ extern unsigned long GetTicks();
 /// Convert a SDLKey to a string
 extern const char *SdlKey2Str(int key);
 
-/// Check if the mouse is grabbed
-extern bool SdlGetGrabMouse();
-/// Toggle mouse grab mode
-extern void ToggleGrabMouse(int mode);
-
 extern EventCallback GameCallbacks;   /// Game callbacks
 extern EventCallback EditorCallbacks; /// Editor callbacks
 

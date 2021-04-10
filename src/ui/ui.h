@@ -518,10 +518,6 @@ extern void SetMouseScroll(bool enabled);
 extern bool GetKeyScroll();
 /// Enable/disable scrolling with the keyboard
 extern void SetKeyScroll(bool enabled);
-/// Check if mouse grabbing is enabled
-extern bool GetGrabMouse();
-/// Enable/disable grabbing the mouse
-extern void SetGrabMouse(bool enabled);
 /// Check if scrolling stops when leaving the window
 extern bool GetLeaveStops();
 /// Enable/disable leaving the window stops scrolling

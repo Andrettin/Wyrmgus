@@ -181,8 +181,6 @@ extern bool GetMouseScroll(void);
 extern void SetMouseScroll(bool enabled);
 extern bool GetKeyScroll(void);
 extern void SetKeyScroll(bool enabled);
-extern bool GetGrabMouse(void);
-extern void SetGrabMouse(bool enabled);
 extern bool GetLeaveStops(void);
 extern void SetLeaveStops(bool enabled);
 extern int GetDoubleClickDelay(void);

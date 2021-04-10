@@ -554,16 +554,6 @@ void UiFindHeroUnit(int hero_index)
 //Wyrmgus end
 
 /**
-**  Toggle grab mouse on/off.
-*/
-static void UiToggleGrabMouse()
-{
-	DebugPrint("%x\n" _C_ KeyModifiers);
-	ToggleGrabMouse(0);
-	UI.StatusLine.Set(_("Grab mouse toggled."));
-}
-
-/**
 **  Track unit, the viewport follows the unit.
 */
 void UiTrackUnit()
@@ -751,20 +741,6 @@ static bool CommandKey(int key, const Qt::KeyboardModifiers key_modifiers)
 			}
 			//Wyrmgus end
 			UiCenterOnSelected();
-			break;
-
-		case 'g': // ALT+G, CTRL+G grab mouse pointer
-			if (!(key_modifiers & (Qt::AltModifier | Qt::ControlModifier))) {
-				break;
-			}
-			UiToggleGrabMouse();
-			//Wyrmgus start
-			CclCommand("wyr.preferences.GrabMouse = GetGrabMouse();");
-			SavePreferences();
-			//Wyrmgus end
-			//Wyrmgus start
-			HandleCommandKey(key, key_modifiers);
-			//Wyrmgus end
 			break;
 
 		case 'i':

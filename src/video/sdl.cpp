@@ -899,27 +899,3 @@ int Str2SdlKey(const char *str)
 	}
 	return 0;
 }
-
-/**
-**  Check if the mouse is grabbed
-*/
-bool SdlGetGrabMouse()
-{
-	return SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON;
-}
-
-/**
-**  Toggle grab mouse.
-**
-**  @param mode  Wanted mode, 1 grab, -1 not grab, 0 toggle.
-*/
-void ToggleGrabMouse(int mode)
-{
-	bool grabbed = SdlGetGrabMouse();
-
-	if (mode <= 0 && grabbed) {
-		SDL_WM_GrabInput(SDL_GRAB_OFF);
-	} else if (mode >= 0 && !grabbed) {
-		SDL_WM_GrabInput(SDL_GRAB_ON);
-	}
-}
