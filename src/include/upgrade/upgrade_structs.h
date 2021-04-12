@@ -47,6 +47,7 @@ static int CclDefineUpgrade(lua_State *l);
 namespace wyrmgus {
 	class character;
 	class civilization;
+	class civilization_group;
 	class condition;
 	class deity;
 	class dynasty;
@@ -262,6 +263,7 @@ class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization NOTIFY changed)
+	Q_PROPERTY(wyrmgus::civilization_group* civilization_group MEMBER civilization_group NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction READ get_faction NOTIFY changed)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::upgrade_class* upgrade_class READ get_upgrade_class WRITE set_upgrade_class)
@@ -399,6 +401,11 @@ public:
 	wyrmgus::civilization *get_civilization() const
 	{
 		return this->civilization;
+	}
+
+	const wyrmgus::civilization_group *get_civilization_group() const
+	{
+		return this->civilization_group;
 	}
 
 	wyrmgus::faction *get_faction() const
@@ -590,6 +597,7 @@ signals:
 private:
 	wyrmgus::upgrade_class *upgrade_class = nullptr; //upgrade class (e.g. siege weapon projectile I)
 	wyrmgus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
+	wyrmgus::civilization_group *civilization_group = nullptr; //which civilization group this upgrade belongs to
 	wyrmgus::faction *faction = nullptr; //which faction this upgrade belongs to, if any
 	std::string effects_string; //effects string of the upgrade
 	std::string requirements_string; //requirements string of the upgrade

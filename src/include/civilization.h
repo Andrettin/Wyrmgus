@@ -258,25 +258,6 @@ public:
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 	CUpgrade *get_class_upgrade(const upgrade_class *upgrade_class) const;
 
-	void set_class_upgrade(const upgrade_class *upgrade_class, CUpgrade *upgrade)
-	{
-		if (upgrade == nullptr) {
-			this->class_upgrades.erase(upgrade_class);
-			return;
-		}
-
-		this->class_upgrades[upgrade_class] = upgrade;
-	}
-
-	void remove_class_upgrade(CUpgrade *upgrade)
-	{
-		for (std::map<const upgrade_class *, CUpgrade *>::reverse_iterator iterator = this->class_upgrades.rbegin(); iterator != this->class_upgrades.rend(); ++iterator) {
-			if (iterator->second == upgrade) {
-				this->class_upgrades.erase(iterator->first);
-			}
-		}
-	}
-
 	const std::vector<CFiller> &get_ui_fillers() const
 	{
 		if (!this->ui_fillers.empty()) {
@@ -341,7 +322,6 @@ public:
 public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
-	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
 	std::vector<CFiller> ui_fillers;
 	std::vector<character *> characters;
 public:

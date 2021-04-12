@@ -186,22 +186,22 @@ gender CUnitStats::get_gender() const
 
 bool CUpgrade::compare_encyclopedia_entries(const CUpgrade *lhs, const CUpgrade *rhs)
 {
-	const wyrmgus::civilization *lhs_civilization = lhs->get_civilization();
-	if (lhs_civilization == defines::get()->get_neutral_civilization()) {
-		lhs_civilization = nullptr;
+	std::string lhs_civilization_name;
+	if (lhs->get_civilization() != nullptr && lhs->get_civilization() != defines::get()->get_neutral_civilization()) {
+		lhs_civilization_name = lhs->get_civilization()->get_name();
+	} else if (lhs->get_civilization_group() != nullptr) {
+		lhs_civilization_name = lhs->get_civilization_group()->get_name();
 	}
 
-	const wyrmgus::civilization *rhs_civilization = rhs->get_civilization();
-	if (rhs_civilization == defines::get()->get_neutral_civilization()) {
-		rhs_civilization = nullptr;
+	std::string rhs_civilization_name;
+	if (rhs->get_civilization() != nullptr && rhs->get_civilization() != defines::get()->get_neutral_civilization()) {
+		rhs_civilization_name = rhs->get_civilization()->get_name();
+	} else if (rhs->get_civilization_group() != nullptr) {
+		rhs_civilization_name = rhs->get_civilization_group()->get_name();
 	}
 
-	if (lhs_civilization != rhs_civilization) {
-		if (lhs_civilization == nullptr || rhs_civilization == nullptr) {
-			return lhs_civilization == nullptr;
-		}
-
-		return lhs_civilization->get_name() < rhs_civilization->get_name();
+	if (lhs_civilization_name != rhs_civilization_name) {
+		return lhs_civilization_name < rhs_civilization_name;
 	}
 
 	if (lhs->get_faction() != rhs->get_faction()) {
@@ -375,12 +375,18 @@ void CUpgrade::initialize()
 		}
 	}
 
+	if (this->get_civilization() != nullptr && this->get_civilization_group() != nullptr) {
+		throw std::runtime_error("Upgrade \"" + this->get_identifier() + "\" has both a civilization and a civilization group.");
+	}
+
 	if (this->get_upgrade_class() != nullptr) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		const wyrmgus::upgrade_class *upgrade_class = this->get_upgrade_class();
 		if (this->get_faction() != nullptr) {
 			this->get_faction()->set_class_upgrade(upgrade_class, this);
 		} else if (this->get_civilization() != nullptr) {
 			this->get_civilization()->set_class_upgrade(upgrade_class, this);
+		} else if (this->civilization_group != nullptr) {
+			this->civilization_group->set_class_upgrade(upgrade_class, this);
 		}
 	}
 
@@ -406,6 +412,8 @@ std::string CUpgrade::get_encyclopedia_text() const
 
 	if (this->get_civilization() != nullptr && this->get_civilization() != defines::get()->get_neutral_civilization()) {
 		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_link_string());
+	} else if (this->get_civilization_group() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Civilization Group: " + this->get_civilization_group()->get_name());
 	}
 
 	if (this->get_faction() != nullptr) {

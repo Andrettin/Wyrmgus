@@ -771,9 +771,9 @@ CUpgrade *civilization::get_class_upgrade(const upgrade_class *upgrade_class) co
 		return nullptr;
 	}
 
-	auto find_iterator = this->class_upgrades.find(upgrade_class);
-	if (find_iterator != this->class_upgrades.end()) {
-		return find_iterator->second;
+	CUpgrade *upgrade = civilization_base::get_class_upgrade(upgrade_class);
+	if (upgrade != nullptr) {
+		return upgrade;
 	}
 
 	if (this->parent_civilization != nullptr) {

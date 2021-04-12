@@ -29,6 +29,8 @@
 #include "database/detailed_data_entry.h"
 #include "unit/unit_class_container.h"
 
+class CUpgrade;
+
 namespace wyrmgus {
 
 class civilization_group;
@@ -37,6 +39,8 @@ class faction;
 class name_generator;
 class species;
 class unit_class;
+class unit_type;
+class upgrade_class;
 enum class gender;
 
 class civilization_base : public detailed_data_entry
@@ -109,6 +113,27 @@ public:
 		}
 	}
 
+	CUpgrade *get_class_upgrade(const upgrade_class *upgrade_class) const;
+
+	void set_class_upgrade(const upgrade_class *upgrade_class, CUpgrade *upgrade)
+	{
+		if (upgrade == nullptr) {
+			this->class_upgrades.erase(upgrade_class);
+			return;
+		}
+
+		this->class_upgrades[upgrade_class] = upgrade;
+	}
+
+	void remove_class_upgrade(CUpgrade *upgrade)
+	{
+		for (std::map<const upgrade_class *, CUpgrade *>::reverse_iterator iterator = this->class_upgrades.rbegin(); iterator != this->class_upgrades.rend(); ++iterator) {
+			if (iterator->second == upgrade) {
+				this->class_upgrades.erase(iterator->first);
+			}
+		}
+	}
+
 	const name_generator *get_personal_name_generator(const gender gender) const;
 	void add_personal_name(const gender gender, const std::string &name);
 
@@ -127,6 +152,7 @@ private:
 	wyrmgus::species *species = nullptr;
 	civilization_group *group = nullptr;
 	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
+	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
 	std::map<gender, std::unique_ptr<name_generator>> personal_name_generators; //personal name generators for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 	std::unique_ptr<name_generator> surname_generator;
 	unit_class_map<std::unique_ptr<name_generator>> unit_class_name_generators; //unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
