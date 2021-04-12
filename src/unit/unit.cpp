@@ -41,6 +41,7 @@
 #include "animation.h"
 #include "character.h"
 #include "civilization.h"
+#include "civilization_group.h"
 #include "commands.h"
 #include "database/defines.h"
 #include "economy/resource_storage_type.h"
@@ -6840,8 +6841,15 @@ const std::string &CUnit::get_base_type_name() const
 std::string CUnit::get_type_name() const
 {
 	const wyrmgus::civilization *civilization = this->get_civilization();
-	if (civilization != nullptr && civilization != this->Player->get_civilization() && civilization->get_name() != this->get_base_type_name() && this->Type->get_species() == nullptr) {
-		return civilization->get_name() + " " + this->get_base_type_name();
+	if (civilization != nullptr) {
+		if (civilization != this->Player->get_civilization() && civilization->get_name() != this->get_base_type_name() && this->Type->get_species() == nullptr) {
+			return civilization->get_name() + " " + this->get_base_type_name();
+		}
+	} else {
+		const civilization_group *civilization_group = this->Type->get_civilization_group();
+		if (civilization_group != nullptr && (this->Player->get_civilization() == nullptr || !this->Player->get_civilization()->is_part_of_group(civilization_group)) && civilization_group->get_name() != this->get_base_type_name() && this->Type->get_species() == nullptr) {
+			return civilization_group->get_name() + " " + this->get_base_type_name();
+		}
 	}
 
 	return this->get_base_type_name();

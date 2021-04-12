@@ -745,8 +745,6 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Currency")) {
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
 			civilization->Currency = currency;
-		} else if (!strcmp(value, "DefaultColor")) {
-			civilization->default_color = player_color::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "CivilizationUpgrade")) {
 			civilization->upgrade = CUpgrade::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DevelopsFrom")) {

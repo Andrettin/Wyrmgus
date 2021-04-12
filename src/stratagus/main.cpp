@@ -27,6 +27,7 @@
 #include "stratagus.h"
 
 #include "civilization.h"
+#include "civilization_group.h"
 #include "database/database.h"
 #include "database/defines.h"
 #include "database/preferences.h"
@@ -96,6 +97,7 @@ int main(int argc, char **argv)
 		QQmlApplicationEngine engine;
 
 		qmlRegisterType<civilization>();
+		qmlRegisterType<civilization_group>();
 		qmlRegisterType<defines>();
 		qmlRegisterType<faction>();
 		qmlRegisterType<game>();
