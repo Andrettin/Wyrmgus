@@ -67,12 +67,47 @@ public:
 		return this->species;
 	}
 
+protected:
+	void set_species(wyrmgus::species *species)
+	{
+		this->species = species;
+	}
+
+public:
 	const civilization_group *get_group() const
 	{
 		return this->group;
 	}
 
+protected:
+	void set_group(civilization_group *group)
+	{
+		this->group = group;
+	}
+
+public:
 	bool is_part_of_group(const civilization_group *group) const;
+
+	unit_type *get_class_unit_type(const unit_class *unit_class) const;
+
+	void set_class_unit_type(const unit_class *unit_class, unit_type *unit_type)
+	{
+		if (unit_type == nullptr) {
+			this->class_unit_types.erase(unit_class);
+			return;
+		}
+
+		this->class_unit_types[unit_class] = unit_type;
+	}
+
+	void remove_class_unit_type(unit_type *unit_type)
+	{
+		for (unit_class_map<wyrmgus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+			if (iterator->second == unit_type) {
+				this->class_unit_types.erase(iterator->first);
+			}
+		}
+	}
 
 	const name_generator *get_personal_name_generator(const gender gender) const;
 	void add_personal_name(const gender gender, const std::string &name);
@@ -88,20 +123,10 @@ public:
 	void add_names_from(const civilization_base *other);
 	void add_names_from(const faction *faction);
 
-protected:
-	void set_species(wyrmgus::species *species)
-	{
-		this->species = species;
-	}
-
-	void set_group(civilization_group *group)
-	{
-		this->group = group;
-	}
-
 private:
 	wyrmgus::species *species = nullptr;
 	civilization_group *group = nullptr;
+	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<gender, std::unique_ptr<name_generator>> personal_name_generators; //personal name generators for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 	std::unique_ptr<name_generator> surname_generator;
 	unit_class_map<std::unique_ptr<name_generator>> unit_class_name_generators; //unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings

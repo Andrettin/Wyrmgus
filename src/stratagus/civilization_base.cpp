@@ -161,6 +161,24 @@ bool civilization_base::is_part_of_group(const civilization_group *group) const
 	return this->get_group()->is_part_of_group(group);
 }
 
+unit_type *civilization_base::get_class_unit_type(const unit_class *unit_class) const
+{
+	if (unit_class == nullptr) {
+		return nullptr;
+	}
+
+	const auto find_iterator = this->class_unit_types.find(unit_class);
+	if (find_iterator != this->class_unit_types.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->get_group() != nullptr) {
+		return this->get_group()->get_class_unit_type(unit_class);
+	}
+
+	return nullptr;
+}
+
 const name_generator *civilization_base::get_personal_name_generator(const gender gender) const
 {
 	const auto find_iterator = this->personal_name_generators.find(gender);

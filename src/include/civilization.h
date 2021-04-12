@@ -256,26 +256,6 @@ public:
 	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &GetAiBuildingTemplates() const;
 
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
-
-	void set_class_unit_type(const unit_class *unit_class, unit_type *unit_type)
-	{
-		if (unit_type == nullptr) {
-			this->class_unit_types.erase(unit_class);
-			return;
-		}
-
-		this->class_unit_types[unit_class] = unit_type;
-	}
-
-	void remove_class_unit_type(unit_type *unit_type)
-	{
-		for (unit_class_map<wyrmgus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
-			if (iterator->second == unit_type) {
-				this->class_unit_types.erase(iterator->first);
-			}
-		}
-	}
-
 	CUpgrade *get_class_upgrade(const upgrade_class *upgrade_class) const;
 
 	void set_class_upgrade(const upgrade_class *upgrade_class, CUpgrade *upgrade)
@@ -361,7 +341,6 @@ public:
 public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
-	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
 	std::vector<CFiller> ui_fillers;
 	std::vector<character *> characters;

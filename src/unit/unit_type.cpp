@@ -1369,6 +1369,10 @@ void unit_type::initialize()
 	if (this->get_unit_class() != nullptr) {
 		//if the class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
+		for (wyrmgus::civilization_group *civilization_group : civilization_group::get_all()) {
+			civilization_group->remove_class_unit_type(this);
+		}
+
 		for (wyrmgus::civilization *civilization : civilization::get_all()) {
 			civilization->remove_class_unit_type(this);
 		}
@@ -1383,6 +1387,8 @@ void unit_type::initialize()
 				this->faction->set_class_unit_type(unit_class, this);
 			} else if (this->civilization != nullptr) {
 				this->civilization->set_class_unit_type(unit_class, this);
+			} else if (this->civilization_group != nullptr) {
+				this->civilization_group->set_class_unit_type(unit_class, this);
 			}
 		}
 	}

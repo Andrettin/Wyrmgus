@@ -753,9 +753,9 @@ unit_type *civilization::get_class_unit_type(const unit_class *unit_class) const
 		return nullptr;
 	}
 
-	auto find_iterator = this->class_unit_types.find(unit_class);
-	if (find_iterator != this->class_unit_types.end()) {
-		return find_iterator->second;
+	unit_type *unit_type = civilization_base::get_class_unit_type(unit_class);
+	if (unit_type != nullptr) {
+		return unit_type;
 	}
 
 	if (this->parent_civilization != nullptr) {
