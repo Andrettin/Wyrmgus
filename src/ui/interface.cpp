@@ -1281,6 +1281,9 @@ void HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers k
 */
 void HandleKeyUp(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
+	Q_UNUSED(keychar)
+	Q_UNUSED(key_modifiers)
+
 	if (HandleKeyModifiersUp(key)) {
 		return;
 	}
@@ -1315,6 +1318,8 @@ void HandleKeyUp(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key
 */
 void HandleKeyRepeat(unsigned, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
+	Q_UNUSED(key_modifiers)
+
 	if (KeyState == KeyStateInput && keychar) {
 		InputKey(keychar);
 	}

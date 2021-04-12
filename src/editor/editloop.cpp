@@ -1573,6 +1573,8 @@ void EditorUpdateDisplay()
 */
 static void EditorCallbackButtonUp(unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
+	Q_UNUSED(key_modifiers)
+
 	if (cursor::get_current_cursor() == UI.get_cursor(cursor_type::scroll)) {
 		// Move map.
 		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false); // Reset
@@ -1806,6 +1808,8 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 */
 static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
+	Q_UNUSED(keychar)
+
 	switch (key) {
 		case SDLK_SYSREQ:
 		case SDLK_PRINT:
@@ -1926,6 +1930,9 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::Keyb
 */
 static void EditorCallbackKeyUp(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
+	Q_UNUSED(keychar)
+	Q_UNUSED(key_modifiers)
+
 	if (HandleKeyModifiersUp(key)) {
 		return;
 	}

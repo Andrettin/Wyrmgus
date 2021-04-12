@@ -42,7 +42,7 @@ extern std::string CliMapName;
 /**
 **  Callback for input.
 */
-static void WaitCallbackButtonPressed(unsigned, const Qt::KeyboardModifiers key_modifiers)
+static void WaitCallbackButtonPressed(unsigned, const Qt::KeyboardModifiers)
 {
 	WaitNoEvent = false;
 }
@@ -50,14 +50,14 @@ static void WaitCallbackButtonPressed(unsigned, const Qt::KeyboardModifiers key_
 /**
 **  Callback for input.
 */
-static void WaitCallbackButtonReleased(unsigned, const Qt::KeyboardModifiers key_modifiers)
+static void WaitCallbackButtonReleased(unsigned, const Qt::KeyboardModifiers)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKeyPressed(unsigned, unsigned, const Qt::KeyboardModifiers key_modifiers)
+static void WaitCallbackKeyPressed(unsigned, unsigned, const Qt::KeyboardModifiers)
 {
 	WaitNoEvent = false;
 }
@@ -65,21 +65,21 @@ static void WaitCallbackKeyPressed(unsigned, unsigned, const Qt::KeyboardModifie
 /**
 **  Callback for input.
 */
-static void WaitCallbackKeyReleased(unsigned, unsigned, const Qt::KeyboardModifiers key_modifiers)
+static void WaitCallbackKeyReleased(unsigned, unsigned, const Qt::KeyboardModifiers)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKeyRepeated(unsigned, unsigned, const Qt::KeyboardModifiers key_modifiers)
+static void WaitCallbackKeyRepeated(unsigned, unsigned, const Qt::KeyboardModifiers)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackMouse(const PixelPos &, const Qt::KeyboardModifiers key_modifiers)
+static void WaitCallbackMouse(const PixelPos &, const Qt::KeyboardModifiers)
 {
 }
 

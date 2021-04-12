@@ -67,12 +67,17 @@ static void MenuHandleButtonUp(unsigned, const Qt::KeyboardModifiers)
 
 static void MenuHandleMouseMove(const PixelPos &screenPos, const Qt::KeyboardModifiers key_modifiers)
 {
+	Q_UNUSED(key_modifiers)
+
 	PixelPos pos(screenPos);
 	HandleCursorMove(&pos.x, &pos.y);
 }
 
 static void MenuHandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
+	Q_UNUSED(keychar)
+	Q_UNUSED(key_modifiers)
+
 	switch (key) {
 		case SDLK_SYSREQ:
 		case SDLK_PRINT:
@@ -88,11 +93,17 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar, const Qt::Keyboard
 
 static void MenuHandleKeyUp(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
+	Q_UNUSED(keychar)
+	Q_UNUSED(key_modifiers)
+	
 	HandleKeyModifiersUp(key);
 }
 
 static void MenuHandleKeyRepeat(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
+	Q_UNUSED(keychar)
+	Q_UNUSED(key_modifiers)
+
 	Input->processKeyRepeat();
 	HandleKeyModifiersDown(key);
 }

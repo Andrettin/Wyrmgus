@@ -2383,6 +2383,8 @@ static void UIHandleButtonDown_OnMinimap(const Qt::KeyboardModifiers key_modifie
 
 static void UIHandleButtonDown_OnButton(const Qt::KeyboardModifiers key_modifiers)
 {
+	Q_UNUSED(key_modifiers)
+
 	// clicked on info panel - selection shown
 	//Wyrmgus start
 	/*
@@ -2399,7 +2401,7 @@ static void UIHandleButtonDown_OnButton(const Qt::KeyboardModifiers key_modifier
 //				&& !GameMenuButtonClicked) {
 				&& !UI.MenuButton.Clicked) {
 				//Wyrmgus end
-				PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
+				PlayGameSound(game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				//Wyrmgus start
 //				GameMenuButtonClicked = true;
 				UI.MenuButton.Clicked = true;
@@ -2408,7 +2410,7 @@ static void UIHandleButtonDown_OnButton(const Qt::KeyboardModifiers key_modifier
 //			} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy && !GameDiplomacyButtonClicked) {
 			} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy && !UI.NetworkDiplomacyButton.Clicked) {
 			//Wyrmgus end
-				PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
+				PlayGameSound(game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				//Wyrmgus start
 //				GameDiplomacyButtonClicked = true;
 				UI.NetworkDiplomacyButton.Clicked = true;
@@ -2419,7 +2421,7 @@ static void UIHandleButtonDown_OnButton(const Qt::KeyboardModifiers key_modifier
 				CUIButton &world_button = UI.WorldButtons[i];
 
 				if (i == static_cast<size_t>(ButtonUnderCursor) && !world_button.Clicked) {
-					PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
+					PlayGameSound(game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 					world_button.Clicked = true;
 				}
 			}
@@ -2429,7 +2431,7 @@ static void UIHandleButtonDown_OnButton(const Qt::KeyboardModifiers key_modifier
 				CUIUserButton &user_button = UI.UserButtons[i];
 
 				if (i == static_cast<size_t>(ButtonUnderCursor) && !user_button.Clicked) {
-					PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
+					PlayGameSound(game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 					user_button.Clicked = true;
 				}
 			}
