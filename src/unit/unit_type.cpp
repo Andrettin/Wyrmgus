@@ -33,6 +33,7 @@
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
 #include "civilization.h"
+#include "civilization_group.h"
 #include "config.h"
 #include "database/defines.h"
 #include "editor.h" //for personal name generation
@@ -604,22 +605,22 @@ bool unit_type::compare_unit_encyclopedia_entries(const unit_type *lhs, const un
 
 bool unit_type::compare_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs)
 {
-	const wyrmgus::civilization *lhs_civilization = lhs->get_civilization();
-	if (lhs_civilization == defines::get()->get_neutral_civilization()) {
-		lhs_civilization = nullptr;
+	std::string lhs_civilization_name;
+	if (lhs->get_civilization() != nullptr && lhs->get_civilization() != defines::get()->get_neutral_civilization()) {
+		lhs_civilization_name = lhs->get_civilization()->get_name();
+	} else if (lhs->get_civilization_group() != nullptr) {
+		lhs_civilization_name = lhs->get_civilization_group()->get_name();
 	}
 
-	const wyrmgus::civilization *rhs_civilization = rhs->get_civilization();
-	if (rhs_civilization == defines::get()->get_neutral_civilization()) {
-		rhs_civilization = nullptr;
+	std::string rhs_civilization_name;
+	if (rhs->get_civilization() != nullptr && rhs->get_civilization() != defines::get()->get_neutral_civilization()) {
+		rhs_civilization_name = rhs->get_civilization()->get_name();
+	} else if (rhs->get_civilization_group() != nullptr) {
+		rhs_civilization_name = rhs->get_civilization_group()->get_name();
 	}
 
-	if (lhs_civilization != rhs_civilization) {
-		if (lhs_civilization == nullptr || rhs_civilization == nullptr) {
-			return lhs_civilization == nullptr;
-		}
-
-		return lhs_civilization->get_name() < rhs_civilization->get_name();
+	if (lhs_civilization_name != rhs_civilization_name) {
+		return lhs_civilization_name < rhs_civilization_name;
 	}
 
 	if (lhs->get_faction() != rhs->get_faction()) {
@@ -1361,7 +1362,12 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 
 void unit_type::initialize()
 {
-	if (this->get_unit_class() != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
+	if (this->get_civilization() != nullptr && this->get_civilization_group() != nullptr) {
+		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" has both a civilization and a civilization group.");
+	}
+
+	if (this->get_unit_class() != nullptr) {
+		//if the class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (wyrmgus::civilization *civilization : civilization::get_all()) {
 			civilization->remove_class_unit_type(this);
@@ -1559,6 +1565,8 @@ std::string unit_type::get_encyclopedia_text() const
 
 	if (this->get_civilization() != nullptr && this->get_civilization() != defines::get()->get_neutral_civilization()) {
 		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_link_string());
+	} else if (this->get_civilization_group() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Civilization Group: " + this->get_civilization_group()->get_name());
 	}
 
 	if (this->get_faction() != nullptr) {
@@ -1621,8 +1629,14 @@ const civilization *unit_type::get_faction_civilization(const wyrmgus::faction *
 
 	const wyrmgus::civilization *faction_civilization = faction->get_civilization();
 
-	if (civilization != nullptr && faction_civilization != nullptr && faction_civilization != civilization && this == faction->get_class_unit_type(this->get_unit_class()) && (!this->BoolFlag[ORGANIC_INDEX].value || civilization->get_species() == faction_civilization->get_species())) {
-		return faction_civilization;
+	if (faction_civilization != nullptr) {
+		if (civilization != nullptr && faction_civilization != civilization && this == faction->get_class_unit_type(this->get_unit_class()) && (!this->BoolFlag[ORGANIC_INDEX].value || civilization->get_species() == faction_civilization->get_species())) {
+			return faction_civilization;
+		}
+
+		if (civilization == nullptr && this->get_civilization_group() != nullptr && faction_civilization->is_part_of_group(this->get_civilization_group())) {
+			return faction_civilization;
+		}
 	}
 
 	return civilization;
@@ -2279,11 +2293,11 @@ bool unit_type::is_personal_name_valid(const std::string &name, const wyrmgus::f
 const name_generator *unit_type::get_name_generator(const wyrmgus::faction *faction, const gender gender) const
 {
 	const wyrmgus::species *species = this->get_species();
+	const wyrmgus::civilization *civilization = this->get_faction_civilization(faction);
 
-	if (species != nullptr && (!species->is_sapient() || this->get_civilization() == nullptr)) {
+	if (species != nullptr && (!species->is_sapient() || (this->get_civilization() == nullptr && this->get_civilization_group() == nullptr))) {
 		return species->get_specimen_name_generator(gender);
-	} else if (this->get_civilization() != nullptr) {
-		const wyrmgus::civilization *civilization = this->get_faction_civilization(faction);
+	} else if (civilization != nullptr) {
 		if (faction != nullptr && faction->get_civilization() != civilization) {
 			faction = nullptr;
 		}

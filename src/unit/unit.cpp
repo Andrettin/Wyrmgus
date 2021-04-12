@@ -3109,7 +3109,7 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 	}
 
 	//Wyrmgus start
-	// grant the unit the civilization/faction upgrades of its respective civilization/faction, so that it is able to pursue its upgrade line in experience upgrades even if it changes hands
+	//grant the unit the civilization/faction upgrades of its respective civilization/faction, so that it is able to pursue its upgrade line in experience upgrades even if it changes hands
 	if (unit->Type->get_civilization() != nullptr) {
 		const CUpgrade *civilization_upgrade = unit->Type->get_civilization()->get_upgrade();
 		if (civilization_upgrade != nullptr) {
@@ -3123,7 +3123,7 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 		}
 	}
 
-	// generate a trait for the unit, if any are available (only if the editor isn't running)
+	//generate a trait for the unit, if any are available (only if the editor isn't running)
 	if (Editor.Running == EditorNotRunning && unit->Type->Traits.size() > 0) {
 		TraitAcquire(*unit, unit->Type->Traits[SyncRand(unit->Type->Traits.size())]);
 	}
@@ -3134,7 +3134,8 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 		}
 	}
 	
-	if (unit->Type->Elixir) { //set the unit type's elixir, if any
+	//set the unit type's elixir, if any
+	if (unit->Type->Elixir) {
 		unit->SetElixir(unit->Type->Elixir);
 	}
 	

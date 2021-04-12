@@ -39,6 +39,7 @@
 //Wyrmgus end
 #include "age.h"
 #include "civilization.h"
+#include "civilization_group.h"
 #include "commands.h"
 #include "config.h"
 #include "database/defines.h"
@@ -449,8 +450,13 @@ std::string CUpgrade::get_encyclopedia_text() const
 		for (const unit_type *unit_type : applies_to_unit_types) {
 			std::string unit_type_str = string::get_plural_form(unit_type->get_name());
 
-			if (unit_type->get_civilization() != nullptr && unit_type->get_civilization() != defines::get()->get_neutral_civilization()) {
-				unit_type_str += " (" + unit_type->get_civilization()->get_name();
+			if ((unit_type->get_civilization() != nullptr && unit_type->get_civilization() != defines::get()->get_neutral_civilization()) || unit_type->get_civilization_group() != nullptr) {
+				unit_type_str += " (";
+				if (unit_type->get_civilization() != nullptr) {
+					unit_type_str += unit_type->get_civilization()->get_name();
+				} else {
+					unit_type_str += unit_type->get_civilization_group()->get_name();
+				}
 
 				if (unit_type->get_faction() != nullptr) {
 					unit_type_str += ": " + unit_type->get_faction()->get_name();

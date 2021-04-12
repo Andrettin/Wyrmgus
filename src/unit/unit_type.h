@@ -58,6 +58,7 @@ namespace wyrmgus {
 	class animation_set;
 	class button_level;
 	class civilization;
+	class civilization_group;
 	class condition;
 	class construction;
 	class faction;
@@ -765,6 +766,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::unit_class* unit_class MEMBER unit_class WRITE set_unit_class)
 	Q_PROPERTY(bool template MEMBER template_type READ is_template)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
+	Q_PROPERTY(wyrmgus::civilization_group* civilization_group MEMBER civilization_group NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction NOTIFY changed)
 	Q_PROPERTY(wyrmgus::animation_set* animation_set MEMBER animation_set)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
@@ -881,6 +883,11 @@ public:
 	bool is_template() const
 	{
 		return this->template_type;
+	}
+
+	const wyrmgus::civilization_group *get_civilization_group() const
+	{
+		return this->civilization_group;
 	}
 
 	const wyrmgus::civilization *get_civilization() const
@@ -1194,6 +1201,7 @@ public:
 private:
 	wyrmgus::unit_class *unit_class = nullptr; //unit class (e.g. infantry, archer, etc.)
 	bool template_type = false;
+	wyrmgus::civilization_group *civilization_group = nullptr;
 	wyrmgus::civilization *civilization = nullptr; //which civilization this unit belongs to, if any
 	wyrmgus::faction *faction = nullptr; //which faction this unit belongs to, if any
 	std::vector<const unit_type *> subtypes; //subtypes of this type; when a unit of this type is created, it has a subtype picked automatically instead

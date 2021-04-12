@@ -278,7 +278,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	//update personal name, potentially changing it if it has become invalid
 	if (
 		unit.get_character() == nullptr
-		&& (oldtype.get_species() != newtype.get_species() || oldtype.get_civilization() != newtype.get_civilization())
+		&& (oldtype.get_species() != newtype.get_species() || oldtype.get_civilization() != newtype.get_civilization() || oldtype.get_civilization_group() != newtype.get_civilization_group())
 	) {
 		unit.UpdatePersonalName(false);
 	}

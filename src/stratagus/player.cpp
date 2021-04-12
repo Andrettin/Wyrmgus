@@ -1382,8 +1382,10 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		CUnit &unit = this->GetUnit(i);
 
 		if (unit.Type->BoolFlag[ORGANIC_INDEX].value) {
-			if (personal_names_changed && unit.get_character() == nullptr && unit.Type->get_civilization() != nullptr && unit.Type->get_civilization()->get_species() == faction->get_civilization()->get_species() && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
-				unit.UpdatePersonalName();
+			if (personal_names_changed && unit.get_character() == nullptr && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
+				if ((unit.Type->get_civilization() != nullptr && unit.Type->get_civilization()->get_species() == faction->get_civilization()->get_species()) || (unit.Type->get_civilization_group() != nullptr && unit.Type->get_civilization_group()->get_species() == faction->get_civilization()->get_species())) {
+					unit.UpdatePersonalName();
+				}
 			}
 		} else {
 			if (unit.get_unique() == nullptr) {
