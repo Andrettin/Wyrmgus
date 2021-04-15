@@ -35,6 +35,7 @@
 #include "editor.h"
 #include "faction.h"
 #include "game.h"
+#include "game_concept.h"
 #include "item/unique_item.h"
 #include "literary_text.h"
 #include "map/map_layer.h"
@@ -208,6 +209,11 @@ QVariantList engine_interface::get_faction_encyclopedia_entries() const
 	return container::to_qvariant_list(faction::get_encyclopedia_entries());
 }
 
+QVariantList engine_interface::get_game_concept_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(game_concept::get_encyclopedia_entries());
+}
+
 QVariantList engine_interface::get_item_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(unit_type::get_item_encyclopedia_entries());
@@ -270,6 +276,8 @@ QObject *engine_interface::get_link_target(const QString &link_str) const
 			object = deity::get(link_target);
 		} else if (link_type == "faction") {
 			object = faction::get(link_target);
+		} else if (link_type == "game_concept") {
+			object = game_concept::get(link_target);
 		} else if (link_type == "literary_text") {
 			object = literary_text::get(link_target);
 		} else if (link_type == "unit_type") {

@@ -55,7 +55,6 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "item/persistent_item.h"
-#include "literary_text.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"

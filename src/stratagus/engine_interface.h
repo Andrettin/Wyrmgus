@@ -182,6 +182,7 @@ public:
 	Q_INVOKABLE QVariantList get_civilization_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_deity_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_faction_encyclopedia_entries() const;
+	Q_INVOKABLE QVariantList get_game_concept_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_item_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_literary_text_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_magic_prefix_encyclopedia_entries() const;

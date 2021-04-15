@@ -155,6 +155,9 @@ public:
 	void add_names_from(const civilization_base *other);
 	void add_names_from(const faction *faction);
 
+signals:
+	void changed();
+
 private:
 	wyrmgus::species *species = nullptr;
 	civilization_group *group = nullptr;
