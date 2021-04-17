@@ -39,7 +39,10 @@ void button_style::initialize()
 {
 	this->normal_graphics = CGraphic::New(this->normal_file.string());
 	this->pressed_graphics = CGraphic::New(this->pressed_file.string());
-	this->grayed_graphics = CGraphic::New(this->grayed_file.string());
+
+	if (!this->grayed_file.empty()) {
+		this->grayed_graphics = CGraphic::New(this->grayed_file.string());
+	}
 }
 
 void button_style::set_normal_file(const std::filesystem::path &filepath)

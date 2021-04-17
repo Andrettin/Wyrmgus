@@ -60,6 +60,18 @@ void interface_style::process_sml_scope(const sml_data &scope)
 	} else if (tag == "radio_button") {
 		this->radio_button = std::make_unique<checkbox_style>(this);
 		database::process_sml_data(this->radio_button, scope);
+	} else if (tag == "up_arrow_button") {
+		this->up_arrow_button = std::make_unique<button_style>(this);
+		database::process_sml_data(this->up_arrow_button, scope);
+	} else if (tag == "down_arrow_button") {
+		this->down_arrow_button = std::make_unique<button_style>(this);
+		database::process_sml_data(this->down_arrow_button, scope);
+	} else if (tag == "left_arrow_button") {
+		this->left_arrow_button = std::make_unique<button_style>(this);
+		database::process_sml_data(this->left_arrow_button, scope);
+	} else if (tag == "right_arrow_button") {
+		this->right_arrow_button = std::make_unique<button_style>(this);
+		database::process_sml_data(this->right_arrow_button, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -87,6 +99,22 @@ void interface_style::initialize()
 		this->radio_button->initialize();
 	}
 
+	if (this->up_arrow_button != nullptr) {
+		this->up_arrow_button->initialize();
+	}
+
+	if (this->down_arrow_button != nullptr) {
+		this->down_arrow_button->initialize();
+	}
+
+	if (this->left_arrow_button != nullptr) {
+		this->left_arrow_button->initialize();
+	}
+
+	if (this->right_arrow_button != nullptr) {
+		this->right_arrow_button->initialize();
+	}
+
 	data_entry::initialize();
 }
 
@@ -108,7 +136,11 @@ const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics
 		case interface_element_type::dropdown_bar:
 			return this->dropdown_bar_graphics;
 		case interface_element_type::large_button:
-		case interface_element_type::small_button: {
+		case interface_element_type::small_button:
+		case interface_element_type::up_arrow_button:
+		case interface_element_type::down_arrow_button:
+		case interface_element_type::left_arrow_button:
+		case interface_element_type::right_arrow_button: {
 			const button_style *button = this->get_button(type);
 			const button_state state = string_to_button_state(qualifiers.front());
 			return button->get_graphics(state);
@@ -135,6 +167,14 @@ const button_style *interface_style::get_button(const interface_element_type typ
 			return this->large_button.get();
 		case interface_element_type::small_button:
 			return this->small_button.get();
+		case interface_element_type::up_arrow_button:
+			return this->up_arrow_button.get();
+		case interface_element_type::down_arrow_button:
+			return this->down_arrow_button.get();
+		case interface_element_type::left_arrow_button:
+			return this->left_arrow_button.get();
+		case interface_element_type::right_arrow_button:
+			return this->right_arrow_button.get();
 		default:
 			throw std::runtime_error("Invalid button interface element type: \"" + std::to_string(static_cast<int>(type)) + "\".");
 	}

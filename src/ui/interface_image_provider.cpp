@@ -61,6 +61,10 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 
 		const std::shared_ptr<CGraphic> graphics = interface->get_interface_element_graphics(interface_element_type, qualifiers);
 
+		if (graphics == nullptr) {
+			throw std::runtime_error("No graphics found for interface image ID \"" + id.toStdString() + "\".");
+		}
+
 		graphics->Load(defines::get()->get_scale_factor());
 
 		const QImage &image = graphics->get_or_create_frame_image(0, color_modification());

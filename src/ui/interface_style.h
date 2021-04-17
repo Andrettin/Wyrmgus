@@ -69,6 +69,10 @@ private:
 	std::unique_ptr<button_style> large_button;
 	std::unique_ptr<button_style> small_button;
 	std::unique_ptr<checkbox_style> radio_button;
+	std::unique_ptr<button_style> up_arrow_button;
+	std::unique_ptr<button_style> down_arrow_button;
+	std::unique_ptr<button_style> left_arrow_button;
+	std::unique_ptr<button_style> right_arrow_button;
 };
 
 }

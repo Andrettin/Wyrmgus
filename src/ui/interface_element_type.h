@@ -33,6 +33,10 @@ enum class interface_element_type {
 	large_button,
 	small_button,
 	radio_button,
+	up_arrow_button,
+	down_arrow_button,
+	left_arrow_button,
+	right_arrow_button,
 	dropdown_bar,
 	icon_frame,
 	pressed_icon_frame
@@ -48,6 +52,14 @@ inline interface_element_type string_to_interface_element_type(const std::string
 		return interface_element_type::small_button;
 	} else if (str == "radio_button") {
 		return interface_element_type::radio_button;
+	} else if (str == "up_arrow_button") {
+		return interface_element_type::up_arrow_button;
+	} else if (str == "down_arrow_button") {
+		return interface_element_type::down_arrow_button;
+	} else if (str == "left_arrow_button") {
+		return interface_element_type::left_arrow_button;
+	} else if (str == "right_arrow_button") {
+		return interface_element_type::right_arrow_button;
 	} else if (str == "dropdown_bar") {
 		return interface_element_type::dropdown_bar;
 	} else if (str == "icon_frame") {
