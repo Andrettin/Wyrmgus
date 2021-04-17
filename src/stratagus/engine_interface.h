@@ -177,6 +177,8 @@ public:
 		this->stored_input_events.push(std::move(event));
 	}
 
+	Q_INVOKABLE QVariantList get_available_campaigns() const;
+
 	Q_INVOKABLE QVariantList get_building_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_civilization_encyclopedia_entries() const;

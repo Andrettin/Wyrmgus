@@ -174,7 +174,7 @@ const species *campaign::get_species() const
 	return nullptr;
 }
 
-bool campaign::IsAvailable() const
+bool campaign::is_available() const
 {
 	if (this->is_hidden()) {
 		return false;

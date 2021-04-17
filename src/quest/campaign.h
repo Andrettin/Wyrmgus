@@ -100,7 +100,7 @@ public:
 		return this->hidden;
 	}
 
-	bool IsAvailable() const;
+	bool is_available() const;
 
 	bool contains_timeline_date(const wyrmgus::timeline *timeline, const QDateTime &date) const;
 
