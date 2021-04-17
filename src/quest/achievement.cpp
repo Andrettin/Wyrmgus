@@ -85,7 +85,7 @@ bool achievement::can_obtain() const
 	}
 
 	for (const quest *required_quest : this->RequiredQuests) {
-		if (!required_quest->Completed || (this->Difficulty != -1 && required_quest->HighestCompletedDifficulty < this->Difficulty)) {
+		if (!required_quest->is_completed() || (this->Difficulty != -1 && required_quest->HighestCompletedDifficulty < this->Difficulty)) {
 			return false;
 		}
 	}
@@ -143,7 +143,7 @@ int achievement::get_progress() const
 	int progress = 0;
 
 	for (const quest *required_quest : this->RequiredQuests) {
-		if (required_quest->Completed && (this->Difficulty == -1 || required_quest->HighestCompletedDifficulty >= this->Difficulty)) {
+		if (required_quest->is_completed() && (this->Difficulty == -1 || required_quest->HighestCompletedDifficulty >= this->Difficulty)) {
 			progress++;
 		}
 	}

@@ -72,7 +72,7 @@ void SaveQuestCompletion()
 	fprintf(fd, "\n");
 	
 	for (const wyrmgus::quest *quest : wyrmgus::quest::get_all()) {
-		if (quest->Completed) {
+		if (quest->is_completed()) {
 			fprintf(fd, "SetQuestCompleted(\"%s\", %d, false)\n", quest->get_identifier().c_str(), quest->HighestCompletedDifficulty);
 		}
 	}
@@ -234,7 +234,8 @@ void SetQuestCompleted(const std::string &quest_ident, int difficulty, bool save
 		return;
 	}
 	
-	quest->Completed = true;
+	quest->set_completed(true);
+
 	if (difficulty > quest->HighestCompletedDifficulty) {
 		quest->HighestCompletedDifficulty = difficulty;
 	}

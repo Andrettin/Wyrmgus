@@ -39,7 +39,10 @@
 #include "map/tile_transition.h"
 #include "parameters.h"
 #include "player_color.h"
+#include "quest/quest.h"
 #include "religion/pantheon.h"
+#include "time/calendar.h"
+#include "time/timeline.h"
 #include "ui/empty_image_provider.h"
 #include "ui/icon.h"
 #include "ui/icon_image_provider.h"
@@ -96,6 +99,7 @@ int main(int argc, char **argv)
 
 		QQmlApplicationEngine engine;
 
+		qmlRegisterType<calendar>();
 		qmlRegisterType<civilization>();
 		qmlRegisterType<civilization_group>();
 		qmlRegisterType<defines>();
@@ -106,6 +110,8 @@ int main(int argc, char **argv)
 		qmlRegisterType<parameters>();
 		qmlRegisterType<player_color>();
 		qmlRegisterType<preferences>();
+		qmlRegisterType<quest>();
+		qmlRegisterType<timeline>();
 		qmlRegisterType<unit_type>();
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");

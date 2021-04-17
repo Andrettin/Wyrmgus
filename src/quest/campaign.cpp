@@ -181,7 +181,7 @@ bool campaign::is_available() const
 	}
 
 	for (const wyrmgus::quest *quest : this->get_required_quests()) {
-		if (!quest->IsCompleted()) {
+		if (!quest->is_completed()) {
 			return false;
 		}
 	}

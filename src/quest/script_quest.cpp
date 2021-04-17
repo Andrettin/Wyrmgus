@@ -279,7 +279,7 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushboolean(l, quest->Hidden);
 		return 1;
 	} else if (!strcmp(data, "Completed")) {
-		lua_pushboolean(l, quest->Completed);
+		lua_pushboolean(l, quest->is_completed());
 		return 1;
 	} else if (!strcmp(data, "Competitive")) {
 		lua_pushboolean(l, quest->is_competitive());

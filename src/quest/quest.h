@@ -58,6 +58,7 @@ class quest final : public detailed_data_entry, public data_type<quest>
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable READ is_unobtainable)
 	Q_PROPERTY(bool uncompleteable MEMBER uncompleteable READ is_uncompleteable)
 	Q_PROPERTY(bool unfailable MEMBER unfailable READ is_unfailable)
+	Q_PROPERTY(bool completed READ is_completed WRITE set_completed NOTIFY completed_changed)
 
 public:
 	static constexpr const char *class_identifier = "quest";
@@ -114,9 +115,19 @@ public:
 		return this->unfailable;
 	}
 
-	bool IsCompleted() const
+	bool is_completed() const
 	{
-		return this->Completed;
+		return this->completed;
+	}
+
+	void set_completed(const bool completed)
+	{
+		if (completed == this->is_completed()) {
+			return;
+		}
+
+		this->completed = completed;
+		emit completed_changed();
 	}
 
 	const and_condition *get_conditions() const
@@ -158,6 +169,10 @@ public:
 
 	bool overlaps_with(const quest *other_quest) const;
 
+signals:
+	void completed_changed();
+	void changed();
+
 private:
 	int index = -1;
 	wyrmgus::icon *icon = nullptr;
@@ -186,8 +201,8 @@ private:
 	bool unobtainable = false;			/// Whether the quest can be obtained normally (or only through triggers)
 	bool uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)
 	bool unfailable = false;			/// Whether the quest can fail normally
+	bool completed = false;				/// Whether the quest has been completed
 public:
-	bool Completed = false;				/// Whether the quest has been completed
 	bool CurrentCompleted = false;		/// Whether the quest has been completed in the current game
 	wyrmgus::dialogue *IntroductionDialogue = nullptr;
 	std::unique_ptr<LuaCallback> Conditions;

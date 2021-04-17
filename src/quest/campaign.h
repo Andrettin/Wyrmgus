@@ -52,9 +52,9 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 
 	Q_PROPERTY(QDateTime start_date MEMBER start_date READ get_start_date)
 	Q_PROPERTY(wyrmgus::calendar* start_date_calendar MEMBER start_date_calendar)
-	Q_PROPERTY(wyrmgus::timeline* timeline MEMBER timeline)
-	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction)
-	Q_PROPERTY(wyrmgus::quest* quest MEMBER quest)
+	Q_PROPERTY(wyrmgus::timeline* timeline MEMBER timeline NOTIFY changed)
+	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction NOTIFY changed)
+	Q_PROPERTY(wyrmgus::quest* quest MEMBER quest NOTIFY changed)
 	Q_PROPERTY(QVariantList map_templates READ get_map_templates_qvariant_list)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 
@@ -122,6 +122,9 @@ public:
 	}
 
 	Q_INVOKABLE void remove_map_template(map_template *map_template);
+
+signals:
+	void changed();
 
 private:
 	QDateTime start_date; //the starting date for the campaign
