@@ -43,6 +43,7 @@
 #include "script/effect/effect_list.h"
 #include "script.h"
 #include "text_processor.h"
+#include "util/string_util.h"
 #include "util/vector_util.h"
 
 wyrmgus::quest *CurrentQuest = nullptr;
@@ -250,6 +251,11 @@ void SetQuestCompleted(const std::string &quest_ident, const int difficulty_int,
 
 void SetQuestCompleted(const std::string &quest_ident, const std::string &difficulty_str, const bool save)
 {
+	if (string::is_number(difficulty_str)) {
+		SetQuestCompleted(quest_ident, std::stoi(difficulty_str), save);
+		return;
+	}
+
 	quest *quest = quest::try_get(quest_ident);
 	if (!quest) {
 		return;
