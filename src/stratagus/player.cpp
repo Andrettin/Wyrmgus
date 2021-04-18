@@ -51,6 +51,7 @@
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end
+#include "game/difficulty.h"
 #include "gender.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -2543,15 +2544,15 @@ void CPlayer::on_available_quests_changed()
 			if (!quest->get_hint().empty()) {
 				button->Description += "\n \nHint: " + quest->get_hint();
 			}
-			if (quest->HighestCompletedDifficulty > DifficultyNoDifficulty) {
+			if (quest->get_highest_completed_difficulty() > difficulty::none) {
 				std::string highest_completed_difficulty;
-				if (quest->HighestCompletedDifficulty == DifficultyEasy) {
+				if (quest->get_highest_completed_difficulty() == difficulty::easy) {
 					highest_completed_difficulty = "Easy";
-				} else if (quest->HighestCompletedDifficulty == DifficultyNormal) {
+				} else if (quest->get_highest_completed_difficulty() == difficulty::normal) {
 					highest_completed_difficulty = "Normal";
-				} else if (quest->HighestCompletedDifficulty == DifficultyHard) {
+				} else if (quest->get_highest_completed_difficulty() == difficulty::hard) {
 					highest_completed_difficulty = "Hard";
-				} else if (quest->HighestCompletedDifficulty == DifficultyBrutal) {
+				} else if (quest->get_highest_completed_difficulty() == difficulty::brutal) {
 					highest_completed_difficulty = "Brutal";
 				}
 				button->Description += "\n \nHighest Completed Difficulty: " + highest_completed_difficulty;

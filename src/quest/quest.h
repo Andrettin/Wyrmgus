@@ -44,6 +44,7 @@ class dialogue;
 class icon;
 class player_color;
 class quest_objective;
+enum class difficulty;
 
 template <typename scope_type>
 class effect_list;
@@ -167,6 +168,16 @@ public:
 		return this->hint;
 	}
 
+	difficulty get_highest_completed_difficulty() const
+	{
+		return this->highest_completed_difficulty;
+	}
+
+	void set_highest_completed_difficulty(const difficulty difficulty)
+	{
+		this->highest_completed_difficulty = difficulty;
+	}
+
 	bool overlaps_with(const quest *other_quest) const;
 
 signals:
@@ -194,7 +205,9 @@ private:
 	std::string hint;				/// Quest hint
 public:
 	wyrmgus::civilization *civilization = nullptr; //the civilization to which the quest belongs
-	int HighestCompletedDifficulty = -1;
+private:
+	difficulty highest_completed_difficulty;
+public:
 	bool Hidden = false;				/// Whether the quest is hidden
 private:
 	bool competitive = false;			/// Whether a player completing the quest causes it to fail for others
@@ -231,7 +244,8 @@ extern void SaveQuestCompletion();
 
 extern void SetCurrentQuest(const std::string &quest_ident);
 extern std::string GetCurrentQuest();
-extern void SetQuestCompleted(const std::string &quest_ident, int difficulty = 2, bool save = true);
-extern void SetQuestCompleted(const std::string &quest_ident, bool save);
+extern void SetQuestCompleted(const std::string &quest_ident, int difficulty, bool save = true);
+extern void SetQuestCompleted(const std::string &quest_ident, const std::string &difficulty_str, bool save = true);
+extern void SetQuestCompleted(const std::string &quest_ident, bool save = true);
 
 extern void QuestCclRegister();

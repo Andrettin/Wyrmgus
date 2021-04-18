@@ -40,6 +40,7 @@ class icon;
 class player_color;
 class quest;
 class unit_type;
+enum class difficulty;
 
 class achievement final : public named_data_entry, public data_type<achievement>
 {
@@ -47,6 +48,7 @@ class achievement final : public named_data_entry, public data_type<achievement>
 
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
 	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color)
+	Q_PROPERTY(wyrmgus::difficulty difficulty MEMBER difficulty)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable)
 	Q_PROPERTY(wyrmgus::character* character MEMBER character)
@@ -59,9 +61,7 @@ public:
 
 	static void check_achievements();
 
-	explicit achievement(const std::string &identifier) : named_data_entry(identifier)
-	{
-	}
+	explicit achievement(const std::string &identifier);
 
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
@@ -88,6 +88,11 @@ public:
 		return this->player_color;
 	}
 
+	wyrmgus::difficulty get_difficulty() const
+	{
+		return this->difficulty;
+	}
+
 	bool is_hidden() const
 	{
 		return this->hidden;
@@ -107,9 +112,7 @@ private:
 	wyrmgus::icon *icon = nullptr;
 	std::string description;
 	wyrmgus::player_color *player_color = nullptr; //player color used for the achievement's icon
-public:
-	int Difficulty = -1; //in which difficulty the achievement's requirements need to be done
-private:
+	wyrmgus::difficulty difficulty; //in which difficulty the achievement's requirements need to be done
 	bool hidden = false;
 	bool unobtainable = false; //whether this achievement can be obtained by checking for it or not
 	wyrmgus::character *character = nullptr; //character related to the achievement's requirements

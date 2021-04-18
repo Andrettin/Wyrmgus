@@ -285,7 +285,7 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushboolean(l, quest->is_competitive());
 		return 1;
 	} else if (!strcmp(data, "HighestCompletedDifficulty")) {
-		lua_pushnumber(l, quest->HighestCompletedDifficulty);
+		lua_pushnumber(l, static_cast<int>(quest->get_highest_completed_difficulty()));
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		if (quest->get_icon() != nullptr) {
@@ -533,7 +533,7 @@ static int CclDefineAchievement(lua_State *l)
 		} else if (!strcmp(value, "CharacterLevel")) {
 			achievement->character_level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Difficulty")) {
-			achievement->Difficulty = LuaToNumber(l, -1);
+			achievement->difficulty = static_cast<difficulty>(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
 			achievement->hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Unobtainable")) {
@@ -603,7 +603,7 @@ static int CclGetAchievementData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Difficulty")) {
-		lua_pushnumber(l, achievement->Difficulty);
+		lua_pushnumber(l, static_cast<int>(achievement->get_difficulty()));
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
 		lua_pushboolean(l, achievement->is_hidden());

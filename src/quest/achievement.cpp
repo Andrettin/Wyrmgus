@@ -29,6 +29,7 @@
 #include "quest/achievement.h"
 
 #include "character.h"
+#include "game/difficulty.h"
 #include "player.h"
 #include "player_color.h"
 #include "quest/quest.h"
@@ -50,6 +51,10 @@ void achievement::check_achievements()
 	}
 }
 
+achievement::achievement(const std::string &identifier) : named_data_entry(identifier), difficulty(difficulty::none)
+{
+}
+
 void achievement::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
@@ -57,8 +62,6 @@ void achievement::process_sml_property(const sml_property &property)
 
 	if (key == "description") {
 		this->description = value;
-	} else if (key == "difficulty") {
-		this->Difficulty = std::stoi(value);
 	} else {
 		data_entry::process_sml_property(property);
 	}
@@ -85,7 +88,7 @@ bool achievement::can_obtain() const
 	}
 
 	for (const quest *required_quest : this->RequiredQuests) {
-		if (!required_quest->is_completed() || (this->Difficulty != -1 && required_quest->HighestCompletedDifficulty < this->Difficulty)) {
+		if (!required_quest->is_completed() || (this->get_difficulty() != difficulty::none && required_quest->get_highest_completed_difficulty() < this->get_difficulty())) {
 			return false;
 		}
 	}
@@ -143,7 +146,7 @@ int achievement::get_progress() const
 	int progress = 0;
 
 	for (const quest *required_quest : this->RequiredQuests) {
-		if (required_quest->is_completed() && (this->Difficulty == -1 || required_quest->HighestCompletedDifficulty >= this->Difficulty)) {
+		if (required_quest->is_completed() && (this->get_difficulty() == difficulty::none || required_quest->get_highest_completed_difficulty() >= this->get_difficulty())) {
 			progress++;
 		}
 	}

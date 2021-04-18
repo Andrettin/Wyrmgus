@@ -732,6 +732,10 @@ set(wyrmgus_economy_HDRS
 	src/economy/resource_storage_type.h
 )
 
+set(wyrmgus_game_HDRS
+	src/game/difficulty.h
+)
+
 set(wyrmgus_item_HDRS
 	src/item/item_class.h
 	src/item/item_slot.h
@@ -1134,8 +1138,9 @@ source_group(action FILES ${wyrmgus_action_HDRS})
 source_group(ai FILES ${wyrmgus_ai_HDRS})
 source_group(animation FILES ${wyrmgus_animation_HDRS})
 source_group(database FILES ${wyrmgus_database_HDRS})
-source_group(guichan FILES ${wyrmgus_guichan_HDRS})
 source_group(economy FILES ${wyrmgus_economy_HDRS})
+source_group(game FILES ${wyrmgus_game_HDRS})
+source_group(guichan FILES ${wyrmgus_guichan_HDRS})
 source_group(item FILES ${wyrmgus_item_HDRS})
 source_group(language FILES ${wyrmgus_language_HDRS})
 source_group(map FILES ${wyrmgus_map_HDRS})
@@ -1164,6 +1169,7 @@ set(wyrmgus_HDRS
 	${wyrmgus_animation_HDRS}
 	${wyrmgus_database_HDRS}
 	${wyrmgus_economy_HDRS}
+	${wyrmgus_game_HDRS}
 	${wyrmgus_guichan_HDRS}
 	${wyrmgus_item_HDRS}
 	${wyrmgus_language_HDRS}

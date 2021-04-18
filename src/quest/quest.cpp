@@ -30,6 +30,7 @@
 
 #include "civilization.h"
 #include "game.h"
+#include "game/difficulty.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "luacallback.h"
@@ -73,7 +74,7 @@ void SaveQuestCompletion()
 	
 	for (const wyrmgus::quest *quest : wyrmgus::quest::get_all()) {
 		if (quest->is_completed()) {
-			fprintf(fd, "SetQuestCompleted(\"%s\", %d, false)\n", quest->get_identifier().c_str(), quest->HighestCompletedDifficulty);
+			fprintf(fd, "SetQuestCompleted(\"%s\", \"%s\", false)\n", quest->get_identifier().c_str(), difficulty_to_string(quest->get_highest_completed_difficulty()).c_str());
 		}
 	}
 	
@@ -82,7 +83,7 @@ void SaveQuestCompletion()
 
 namespace wyrmgus {
 
-quest::quest(const std::string &identifier) : detailed_data_entry(identifier)
+quest::quest(const std::string &identifier) : detailed_data_entry(identifier), highest_completed_difficulty(difficulty::none)
 {
 }
 
@@ -227,26 +228,48 @@ std::string GetCurrentQuest()
 	}
 }
 
-void SetQuestCompleted(const std::string &quest_ident, int difficulty, bool save)
+void SetQuestCompleted(const std::string &quest_ident, const int difficulty_int, const bool save)
 {
-	wyrmgus::quest *quest = wyrmgus::quest::try_get(quest_ident);
+	quest *quest = quest::try_get(quest_ident);
 	if (!quest) {
 		return;
 	}
 	
 	quest->set_completed(true);
 
-	if (difficulty > quest->HighestCompletedDifficulty) {
-		quest->HighestCompletedDifficulty = difficulty;
+	const difficulty difficulty = static_cast<wyrmgus::difficulty>(difficulty_int);
+	if (difficulty > quest->get_highest_completed_difficulty()) {
+		quest->set_highest_completed_difficulty(difficulty);
 	}
 	if (save) {
 		SaveQuestCompletion();
 	}
 
-	wyrmgus::achievement::check_achievements();
+	achievement::check_achievements();
 }
 
-void SetQuestCompleted(const std::string &quest_ident, bool save)
+void SetQuestCompleted(const std::string &quest_ident, const std::string &difficulty_str, const bool save)
 {
-	SetQuestCompleted(quest_ident, 2, save);
+	quest *quest = quest::try_get(quest_ident);
+	if (!quest) {
+		return;
+	}
+	
+	quest->set_completed(true);
+
+	const difficulty difficulty = string_to_difficulty(difficulty_str);
+	if (difficulty > quest->get_highest_completed_difficulty()) {
+		quest->set_highest_completed_difficulty(difficulty);
+	}
+
+	if (save) {
+		SaveQuestCompletion();
+	}
+
+	achievement::check_achievements();
+}
+
+void SetQuestCompleted(const std::string &quest_ident, const bool save)
+{
+	SetQuestCompleted(quest_ident, static_cast<int>(difficulty::normal), save);
 }

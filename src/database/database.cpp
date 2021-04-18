@@ -50,6 +50,7 @@
 #include "faction.h"
 #include "faction_tier.h"
 #include "faction_type.h"
+#include "game/difficulty.h"
 #include "gender.h"
 #include "government_type.h"
 #include "item/item_class.h"
@@ -269,6 +270,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(deity::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::dialogue*") {
 			new_property_value = QVariant::fromValue(dialogue::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::difficulty") {
+			new_property_value = QVariant::fromValue(string_to_difficulty(property.get_value()));
 		} else if (property_class_name == "wyrmgus::dynasty*") {
 			new_property_value = QVariant::fromValue(dynasty::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::faction*") {

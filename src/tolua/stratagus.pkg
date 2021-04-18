@@ -158,7 +158,8 @@ extern void SetDLCFileEquivalency(const std::string dlc_file, const std::string 
 extern void SaveQuestCompletion();
 extern void SetCurrentQuest(std::string quest_ident);
 extern std::string GetCurrentQuest();
-extern void SetQuestCompleted(std::string quest_ident, int difficulty = DifficultyNormal, bool save = true);
+extern void SetQuestCompleted(std::string quest_ident, int difficulty, bool save = true);
+extern void SetQuestCompleted(std::string quest_ident, std::string difficulty_str, bool save = true);
 extern void SetQuestCompleted(std::string quest_ident, bool save);
 extern void SetAchievementObtained(std::string achievement_ident, const bool save = true, const bool display = true);
 
