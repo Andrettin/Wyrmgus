@@ -35,10 +35,10 @@ class detailed_data_entry : public named_data_entry
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString notes READ get_notes_qstring)
-	Q_PROPERTY(QString description READ get_description_qstring)
-	Q_PROPERTY(QString quote READ get_quote_qstring)
-	Q_PROPERTY(QString background READ get_background_qstring)
+	Q_PROPERTY(QString notes READ get_notes_qstring NOTIFY changed)
+	Q_PROPERTY(QString description READ get_description_qstring NOTIFY changed)
+	Q_PROPERTY(QString quote READ get_quote_qstring NOTIFY changed)
+	Q_PROPERTY(QString background READ get_background_qstring NOTIFY changed)
 
 public:
 	explicit detailed_data_entry(const std::string &identifier) : named_data_entry(identifier)
@@ -140,6 +140,9 @@ public:
 	{
 		return QString::fromStdString(this->get_background());
 	}
+
+signals:
+	void changed();
 
 private:
 	std::string notes; //gameplay-related notes about the data entry
