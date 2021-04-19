@@ -38,7 +38,6 @@ class defines;
 class game;
 class parameters;
 class preferences;
-enum class music_type;
 
 //interface for the engine, to be used in the context of QML
 class engine_interface final : public QObject, public singleton<engine_interface>
@@ -176,6 +175,9 @@ public:
 		std::lock_guard<std::mutex> lock(this->input_event_mutex);
 		this->stored_input_events.push(std::move(event));
 	}
+
+	Q_INVOKABLE QVariantList get_difficulties() const;
+	Q_INVOKABLE QString get_difficulty_name(const int difficulty_index) const;
 
 	Q_INVOKABLE QVariantList get_available_campaigns() const;
 

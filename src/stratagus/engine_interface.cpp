@@ -35,6 +35,7 @@
 #include "editor.h"
 #include "faction.h"
 #include "game.h"
+#include "game/difficulty.h"
 #include "game_concept.h"
 #include "item/unique_item.h"
 #include "literary_text.h"
@@ -206,6 +207,23 @@ QVariantList engine_interface::get_available_campaigns() const
 	});
 
 	return container::to_qvariant_list(available_campaigns);
+}
+
+QVariantList engine_interface::get_difficulties() const
+{
+	QVariantList difficulties;
+
+	for (int i = static_cast<int>(difficulty::none) + 1; i < static_cast<int>(difficulty::count); ++i) {
+		difficulties.push_back(i);
+	}
+
+	return difficulties;
+}
+
+QString engine_interface::get_difficulty_name(const int difficulty_index) const
+{
+	const difficulty difficulty = static_cast<wyrmgus::difficulty>(difficulty_index);
+	return QString::fromStdString(wyrmgus::get_difficulty_name(difficulty));
 }
 
 QVariantList engine_interface::get_building_encyclopedia_entries() const

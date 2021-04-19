@@ -33,6 +33,7 @@ namespace wyrmgus {
 class campaign;
 class sml_data;
 class sml_property;
+enum class difficulty;
 
 class preferences final : public QObject, public singleton<preferences>
 {
@@ -40,10 +41,13 @@ class preferences final : public QObject, public singleton<preferences>
 
 	Q_PROPERTY(int scale_factor READ get_scale_factor WRITE set_scale_factor)
 	Q_PROPERTY(wyrmgus::campaign* selected_campaign READ get_selected_campaign WRITE set_selected_campaign)
+	Q_PROPERTY(wyrmgus::difficulty difficulty READ get_difficulty WRITE set_difficulty)
 
 public:
 	static std::filesystem::path get_path();
 	static std::filesystem::path get_fallback_path();
+
+	preferences();
 
 	void load();
 	Q_INVOKABLE void save() const;
@@ -55,7 +59,14 @@ public:
 		return this->scale_factor;
 	}
 
-	void set_scale_factor(const int factor);
+	void set_scale_factor(const int factor)
+	{
+		if (factor == this->get_scale_factor()) {
+			return;
+		}
+
+		this->scale_factor = factor;
+	}
 
 	campaign *get_selected_campaign() const
 	{
@@ -67,9 +78,34 @@ public:
 		this->selected_campaign = campaign;
 	}
 
+	wyrmgus::difficulty get_difficulty() const
+	{
+		return this->difficulty;
+	}
+
+	Q_INVOKABLE int get_difficulty_index() const
+	{
+		return static_cast<int>(this->get_difficulty());
+	}
+
+	void set_difficulty(const difficulty difficulty)
+	{
+		if (difficulty == this->get_difficulty()) {
+			return;
+		}
+
+		this->difficulty = difficulty;
+	}
+
+	Q_INVOKABLE void set_difficulty_index(const int difficulty_index)
+	{
+		this->set_difficulty(static_cast<wyrmgus::difficulty>(difficulty_index));
+	}
+
 private:
 	int scale_factor = 1;
 	campaign *selected_campaign = nullptr;
+	wyrmgus::difficulty difficulty;
 };
 
 }

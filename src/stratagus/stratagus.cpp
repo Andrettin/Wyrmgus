@@ -667,3 +667,13 @@ void save_preferences()
 {
 	wyrmgus::preferences::get()->save();
 }
+
+int get_difficulty_index()
+{
+	return preferences::get()->get_difficulty_index();
+}
+
+void set_difficulty_index(const int difficulty_index)
+{
+	preferences::get()->set_difficulty_index(difficulty_index);
+}

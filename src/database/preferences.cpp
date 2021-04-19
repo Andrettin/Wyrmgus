@@ -32,6 +32,7 @@
 #include "database/defines.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
+#include "game/difficulty.h"
 #include "quest/campaign.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
@@ -47,6 +48,10 @@ std::filesystem::path preferences::get_path()
 std::filesystem::path preferences::get_fallback_path()
 {
 	return database::get_documents_path() / "preferences.txt";
+}
+
+preferences::preferences() : difficulty(difficulty::normal)
+{
 }
 
 void preferences::load()
@@ -73,9 +78,12 @@ void preferences::save() const
 	sml_data data(preferences_path.filename().stem().string());
 
 	data.add_property("scale_factor", std::to_string(this->get_scale_factor()));
+
 	if (this->get_selected_campaign() != nullptr) {
 		data.add_property("selected_campaign", this->get_selected_campaign()->get_identifier());
 	}
+
+	data.add_property("difficulty", difficulty_to_string(this->get_difficulty()));
 
 	try {
 		data.print_to_file(preferences_path);
@@ -87,32 +95,17 @@ void preferences::save() const
 
 void preferences::process_sml_property(const sml_property &property)
 {
-	const std::string &key = property.get_key();
-
-	if (key == "selected_campaign") {
-		//use a try-catch for the selected campaign, as it could point to a campaign which no longer exists
-		try {
-			database::process_sml_property_for_object(this, property);
-		} catch (const std::runtime_error &exception) {
-			exception::report(exception);
-		}
-	} else {
+	//use a try-catch for the properties, as the property or its value could no longer exist
+	try {
 		database::process_sml_property_for_object(this, property);
+	} catch (const std::runtime_error &exception) {
+		exception::report(exception);
 	}
 }
 
 void preferences::process_sml_scope(const sml_data &scope)
 {
 	database::process_sml_scope_for_object(this, scope);
-}
-
-void preferences::set_scale_factor(const int factor)
-{
-	if (factor == this->get_scale_factor()) {
-		return;
-	}
-
-	this->scale_factor = factor;
 }
 
 }

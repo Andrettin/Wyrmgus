@@ -238,4 +238,7 @@ extern bool is_test_run();
 extern void initialize_database();
 extern void save_preferences();
 
+int get_difficulty_index();
+void set_difficulty_index(const int difficulty_index);
+
 using namespace wyrmgus;

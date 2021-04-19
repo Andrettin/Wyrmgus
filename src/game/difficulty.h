@@ -33,7 +33,9 @@ enum class difficulty {
 	easy,
 	normal,
 	hard,
-	brutal
+	brutal,
+
+	count
 };
 
 inline difficulty string_to_difficulty(const std::string &str)
