@@ -74,6 +74,8 @@ inline std::string difficulty_to_string(const difficulty difficulty)
 inline std::string get_difficulty_name(const difficulty difficulty)
 {
 	switch (difficulty) {
+		case difficulty::none:
+			return "None";
 		case difficulty::easy:
 			return "Easy";
 		case difficulty::normal:

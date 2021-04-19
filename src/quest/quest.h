@@ -60,6 +60,7 @@ class quest final : public detailed_data_entry, public data_type<quest>
 	Q_PROPERTY(bool uncompleteable MEMBER uncompleteable READ is_uncompleteable)
 	Q_PROPERTY(bool unfailable MEMBER unfailable READ is_unfailable)
 	Q_PROPERTY(bool completed READ is_completed WRITE set_completed NOTIFY completed_changed)
+	Q_PROPERTY(int highest_completed_difficulty_index READ get_highest_completed_difficulty_index NOTIFY highest_completed_difficulty_changed)
 
 public:
 	static constexpr const char *class_identifier = "quest";
@@ -173,15 +174,26 @@ public:
 		return this->highest_completed_difficulty;
 	}
 
+	int get_highest_completed_difficulty_index() const
+	{
+		return static_cast<int>(this->get_highest_completed_difficulty());
+	}
+
 	void set_highest_completed_difficulty(const difficulty difficulty)
 	{
+		if (difficulty == this->get_highest_completed_difficulty()) {
+			return;
+		}
+
 		this->highest_completed_difficulty = difficulty;
+		emit highest_completed_difficulty_changed();
 	}
 
 	bool overlaps_with(const quest *other_quest) const;
 
 signals:
 	void completed_changed();
+	void highest_completed_difficulty_changed();
 	void changed();
 
 private:
