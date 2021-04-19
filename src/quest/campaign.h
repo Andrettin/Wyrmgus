@@ -50,7 +50,7 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QDateTime start_date MEMBER start_date READ get_start_date)
+	Q_PROPERTY(QDateTime start_date MEMBER start_date READ get_start_date NOTIFY changed)
 	Q_PROPERTY(wyrmgus::calendar* start_date_calendar MEMBER start_date_calendar)
 	Q_PROPERTY(wyrmgus::timeline* timeline MEMBER timeline NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction NOTIFY changed)
