@@ -68,10 +68,6 @@ class Settings {
 	bool Inside;
 	int RevealMap;
 	int MapRichness;
-	//Wyrmgus start
-	bool NoRandomness;
-	bool NoTimeOfDay;
-	//Wyrmgus end
 	int TechLevel;
 	int MaxTechLevel;
 };

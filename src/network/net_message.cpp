@@ -232,7 +232,6 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 	p += serialize8(p, this->FogOfWar);
 	//Wyrmgus start
 //	p += serialize8(p, this->Inside);
-	p += serialize8(p, this->NoRandomness);
 	//Wyrmgus end
 	p += serialize8(p, this->RevealMap);
 	p += serialize8(p, this->TilesetSelection);
@@ -260,7 +259,6 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 	p += deserialize8(p, &this->FogOfWar);
 	//Wyrmgus start
 //	p += deserialize8(p, &this->Inside);
-	p += deserialize8(p, &this->NoRandomness);
 	//Wyrmgus end
 	p += deserialize8(p, &this->RevealMap);
 	p += deserialize8(p, &this->TilesetSelection);
@@ -287,7 +285,6 @@ void CServerSetup::Clear()
 	FogOfWar = 0;
 	//Wyrmgus start
 //	Inside = 0;
-	NoRandomness = 0;
 	//Wyrmgus end
 	RevealMap = 0;
 	TilesetSelection = 0;
@@ -310,7 +307,6 @@ bool CServerSetup::operator == (const CServerSetup &rhs) const
 			&& FogOfWar == rhs.FogOfWar
 			//Wyrmgus start
 //			&& Inside == rhs.Inside
-			&& NoRandomness == rhs.NoRandomness
 			//Wyrmgus end
 			&& RevealMap == rhs.RevealMap
 			&& TilesetSelection == rhs.TilesetSelection

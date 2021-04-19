@@ -20,7 +20,6 @@ class CServerSetup {
 	unsigned char FogOfWar;
 	//Wyrmgus start
 //	unsigned char Inside;
-	unsigned char NoRandomness;
 	//Wyrmgus end
 	unsigned char RevealMap;
 	unsigned char GameTypeOption;

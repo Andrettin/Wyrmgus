@@ -436,12 +436,8 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		critical_strike_chance = 100;
 	}
 	if (critical_strike_chance > 0) {
-		if (GameSettings.NoRandomness) {
-			damage_modifier += critical_strike_chance;	//if no randomness setting is used, then critical strike chance will be used as a constant damage modifier, instead of being a chance of doubling the damage
-		} else {
-			if (SyncRand(100) < critical_strike_chance) {
-				damage_modifier += 100;
-			}
+		if (SyncRand(100) < critical_strike_chance) {
+			damage_modifier += 100;
 		}
 	}
 	if (goal != nullptr) {
@@ -540,72 +536,24 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	accuracy /= 100;
 	//Wyrmgus end
 	
-	if (GameSettings.NoRandomness) {
-		if (accuracy > 0) { //if no randomness setting is used, and the attacker's accuracy and is greater than 0, then apply accuracy as a damage bonus and evasion as a damage malus
-			if (goal != nullptr) {
-				if (goal->Variable[EVASION_INDEX].Value > 0) {
-					damage += accuracy;
-					if (goal->Variable[STUN_INDEX].Value == 0) { //stunned targets cannot evade
-						damage -= goal->Variable[EVASION_INDEX].Value * evasion_modifier / 100;
-					}
-					
-					if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->BoolFlag[BUILDING_INDEX].value && goal->Type->get_num_directions() == 8) { //flanking
-						if (attacker.Direction == goal->Direction) {
-							damage += 4;
-						} else if (goal->Direction == (attacker.Direction - 32) || goal->Direction == (attacker.Direction + 32) || (attacker.Direction == 0 && goal->Direction == 224) || (attacker.Direction == 224 && goal->Direction == 0)) {
-							damage += 3;
-						} else if (goal->Direction == (attacker.Direction - 64) || goal->Direction == (attacker.Direction + 64) || (attacker.Direction == 0 && goal->Direction == 192) || (attacker.Direction == 192 && goal->Direction == 0)) {
-							damage += 2;
-						} else if (goal->Direction == (attacker.Direction - 96) || goal->Direction == (attacker.Direction + 96) || (attacker.Direction == 0 && goal->Direction == 160) || (attacker.Direction == 160 && goal->Direction == 0)) {
-							damage += 1;
-						}
-					}					
-				}
-			} else {
-				if (goal_stats.Variables[EVASION_INDEX].Value > 0) {
-					damage += accuracy;
-					damage -= goal_stats.Variables[EVASION_INDEX].Value * evasion_modifier / 100;
-				}
-			}
+	//Wyrmgus start
+	//apply hack/pierce/blunt resistances
+	if (goal != nullptr) {
+		if (attacker.Type->BoolFlag[HACKDAMAGE_INDEX].value) {
+			damage *= 100 - goal->Variable[HACKRESISTANCE_INDEX].Value;
+			damage /= 100;
+		} else if (attacker.Type->BoolFlag[PIERCEDAMAGE_INDEX].value) {
+			damage *= 100 - goal->Variable[PIERCERESISTANCE_INDEX].Value;
+			damage /= 100;
+		} else if (attacker.Type->BoolFlag[BLUNTDAMAGE_INDEX].value) {
+			damage *= 100 - goal->Variable[BLUNTRESISTANCE_INDEX].Value;
+			damage /= 100;
 		}
-		
-		//Wyrmgus start
-		//apply hack/pierce/blunt resistances
-		if (goal != nullptr) {
-			if (attacker.Type->BoolFlag[HACKDAMAGE_INDEX].value) {
-				damage *= 100 - goal->Variable[HACKRESISTANCE_INDEX].Value;
-				damage /= 100;
-			} else if (attacker.Type->BoolFlag[PIERCEDAMAGE_INDEX].value) {
-				damage *= 100 - goal->Variable[PIERCERESISTANCE_INDEX].Value;
-				damage /= 100;
-			} else if (attacker.Type->BoolFlag[BLUNTDAMAGE_INDEX].value) {
-				damage *= 100 - goal->Variable[BLUNTRESISTANCE_INDEX].Value;
-				damage /= 100;
-			}
-		}
-		//Wyrmgus end
-		
-		damage -= ((damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness
-	} else {
-		//Wyrmgus start
-		//apply hack/pierce/blunt resistances
-		if (goal != nullptr) {
-			if (attacker.Type->BoolFlag[HACKDAMAGE_INDEX].value) {
-				damage *= 100 - goal->Variable[HACKRESISTANCE_INDEX].Value;
-				damage /= 100;
-			} else if (attacker.Type->BoolFlag[PIERCEDAMAGE_INDEX].value) {
-				damage *= 100 - goal->Variable[PIERCERESISTANCE_INDEX].Value;
-				damage /= 100;
-			} else if (attacker.Type->BoolFlag[BLUNTDAMAGE_INDEX].value) {
-				damage *= 100 - goal->Variable[BLUNTRESISTANCE_INDEX].Value;
-				damage /= 100;
-			}
-		}
-		//Wyrmgus end
-		
-		damage -= SyncRand((damage + 2) / 2);
 	}
-	
+	//Wyrmgus end
+
+	damage -= SyncRand((damage + 2) / 2);
+
 	Assert(damage >= 0);
 
 	return damage;
@@ -652,10 +600,6 @@ int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *
 */
 static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal)
 {
-	if (GameSettings.NoRandomness) {
-		return true;
-	}
-	
 	if (GodMode && attacker.Player == CPlayer::GetThisPlayer() && (!goal || goal->Player != CPlayer::GetThisPlayer())) {
 		return true; //always hit if in god mode
 	}
@@ -814,11 +758,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			//apply Thorns damage if attacker is at melee range
 			if (goal && goal->Variable[THORNSDAMAGE_INDEX].Value && unit.MapDistanceTo(*goal) <= 1) {
 				int thorns_damage = std::max<int>(goal->Variable[THORNSDAMAGE_INDEX].Value - unit.Variable[ARMOR_INDEX].Value, 1);
-				if (GameSettings.NoRandomness) {
-					thorns_damage -= ((thorns_damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness
-				} else {
-					thorns_damage -= SyncRand((thorns_damage + 2) / 2);
-				}
+				thorns_damage -= SyncRand((thorns_damage + 2) / 2);
 				HitUnit(goal, unit, thorns_damage);
 			}
 		} else {
@@ -1383,11 +1323,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		//apply Thorns damage if attacker is at melee range
 		if (goal.Variable[THORNSDAMAGE_INDEX].Value && missile.get_source_unit()->MapDistanceTo(goal) <= 1) {
 			int thorns_damage = std::max<int>(goal.Variable[THORNSDAMAGE_INDEX].Value - missile.get_source_unit()->Variable[ARMOR_INDEX].Value, 1);
-			if (GameSettings.NoRandomness) {
-				thorns_damage -= ((thorns_damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness
-			} else {
-				thorns_damage -= SyncRand((thorns_damage + 2) / 2);
-			}
+			thorns_damage -= SyncRand((thorns_damage + 2) / 2);
 			HitUnit(&goal, *missile.get_source_unit(), thorns_damage);
 		}
 		//Wyrmgus end

@@ -1054,9 +1054,7 @@ static int CclAcquireTrait(lua_State *l)
 		TraitAcquire(*unit, CUpgrade::get(ident));
 	} else {
 		if (unit->Trait != nullptr) { //remove previous trait, if any
-			if (!GameSettings.NoRandomness) { // if in no randomness setting, don't apply trait modifiers
-				IndividualUpgradeLost(*unit, unit->Trait);
-			}
+			IndividualUpgradeLost(*unit, unit->Trait);
 		}
 		unit->Trait = nullptr;
 	}
@@ -2342,17 +2340,13 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 void TraitAcquire(CUnit &unit, CUpgrade *upgrade)
 {
 	if (unit.Trait != nullptr) { //remove previous trait, if any
-		if (!GameSettings.NoRandomness) { // if in no randomness setting, don't change trait modifiers
-			IndividualUpgradeLost(unit, unit.Trait);
-		}
+		IndividualUpgradeLost(unit, unit.Trait);
 	}
 
 	unit.Trait = upgrade;
 
-	if (!GameSettings.NoRandomness) { // if in no randomness setting, don't apply trait modifiers
-		IndividualUpgradeAcquire(unit, upgrade);
-	}
-	
+	IndividualUpgradeAcquire(unit, upgrade);
+
 	unit.UpdateExtraName();
 
 	//

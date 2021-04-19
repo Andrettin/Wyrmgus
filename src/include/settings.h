@@ -73,8 +73,6 @@ struct Settings {
 	int RevealMap;   /// Reveal map
 	int MapRichness; /// Map richness
 	//Wyrmgus start
-	bool NoRandomness; /// No randomness
-	bool NoTimeOfDay; /// No time of day
 	int TechLevel;
 	int MaxTechLevel;
 	//Wyrmgus end

@@ -69,7 +69,7 @@ public:
 	CServerSetup() { Clear(); }
 	size_t Serialize(unsigned char *p) const;
 	size_t Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
+	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
 	void Clear();
 
 	bool operator == (const CServerSetup &rhs) const;
@@ -80,7 +80,6 @@ public:
 	uint8_t FogOfWar;              /// Fog of war option
 	//Wyrmgus start
 //	uint8_t Inside;                /// Inside option
-	uint8_t NoRandomness;          /// No randomness option
 	//Wyrmgus end
 	uint8_t RevealMap;             /// Reveal all the map
 	uint8_t TilesetSelection;      /// Tileset select option

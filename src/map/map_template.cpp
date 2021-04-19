@@ -748,7 +748,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 			CMap::get()->MapLayers[z]->set_time_of_day_schedule(nullptr);
 			CMap::get()->MapLayers[z]->SetTimeOfDay(nullptr);
 			
-			if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
+			if (!GameSettings.Inside) {
 				if (this->get_world() != nullptr && this->get_world()->get_time_of_day_schedule() != nullptr) {
 					CMap::get()->MapLayers[z]->set_time_of_day_schedule(this->get_world()->get_time_of_day_schedule());
 				} else {

@@ -1702,7 +1702,7 @@ void CMap::Create()
 		map_layer->set_season_schedule(defines::get()->get_default_season_schedule());
 		map_layer->SetSeasonByHours(game::get()->get_current_total_hours());
 		
-		if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
+		if (!GameSettings.Inside) {
 			map_layer->set_time_of_day_schedule(defines::get()->get_default_time_of_day_schedule());
 			map_layer->SetTimeOfDayByHours(game::get()->get_current_total_hours());
 		} else {

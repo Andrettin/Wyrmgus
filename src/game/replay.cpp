@@ -137,10 +137,6 @@ public:
 	int MapRichness;
 	int GameType;
 	int Opponents;
-	//Wyrmgus start
-	bool NoRandomness = false;
-	bool NoTimeOfDay = false;
-	//Wyrmgus end
 	int TechLevel = 0;
 	int MaxTechLevel = 0;
 	int Engine[3];
@@ -213,8 +209,6 @@ static std::unique_ptr<FullReplay> StartReplay()
 	replay->MapRichness = GameSettings.MapRichness;
 	replay->Opponents = GameSettings.Opponents;
 	//Wyrmgus start
-	replay->NoRandomness = GameSettings.NoRandomness;
-	replay->NoTimeOfDay = GameSettings.NoTimeOfDay;
 	replay->TechLevel = GameSettings.TechLevel;
 	replay->MaxTechLevel = GameSettings.MaxTechLevel;
 	//Wyrmgus end
@@ -268,8 +262,6 @@ static void ApplyReplaySettings()
 	GameSettings.MapRichness = CurrentReplay->MapRichness;
 	GameSettings.Opponents = CurrentReplay->Opponents;
 	//Wyrmgus start
-	GameSettings.NoRandomness = CurrentReplay->NoRandomness;
-	GameSettings.NoTimeOfDay = CurrentReplay->NoTimeOfDay;
 	GameSettings.TechLevel = CurrentReplay->TechLevel;
 	GameSettings.MaxTechLevel = CurrentReplay->MaxTechLevel;
 	//Wyrmgus end
@@ -357,8 +349,6 @@ static void SaveFullLog(CFile &file)
 	file.printf("  Opponents = %d,\n", CurrentReplay->Opponents);
 	file.printf("  MapRichness = %d,\n", CurrentReplay->MapRichness);
 	//Wyrmgus start
-	file.printf("  NoRandomness = %s,\n", CurrentReplay->NoRandomness ? "true" : "false");
-	file.printf("  NoTimeOfDay = %s,\n", CurrentReplay->NoTimeOfDay ? "true" : "false");
 	file.printf("  TechLevel = %d,\n", CurrentReplay->TechLevel);
 	file.printf("  MaxTechLevel = %d,\n", CurrentReplay->MaxTechLevel);
 	//Wyrmgus end
@@ -658,10 +648,6 @@ static int CclReplayLog(lua_State *l)
 		} else if (!strcmp(value, "Opponents")) {
 			CurrentReplay->Opponents = LuaToNumber(l, -1);
 		//Wyrmgus start
-		} else if (!strcmp(value, "NoRandomness")) {
-			CurrentReplay->NoRandomness = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "NoTimeOfDay")) {
-			CurrentReplay->NoTimeOfDay = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "TechLevel")) {
 			CurrentReplay->TechLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxTechLevel")) {
