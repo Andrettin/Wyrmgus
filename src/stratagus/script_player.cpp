@@ -868,44 +868,6 @@ static int CclDefineCivilization(lua_State *l)
 				filler.Y = LuaToNumber(l, -1, j + 1);
 				civilization->ui_fillers.push_back(std::move(filler));
 			}
-		} else if (!strcmp(value, "UnitSounds")) {
-			if (civilization->unit_sound_set == nullptr) {
-				civilization->unit_sound_set = std::make_unique<wyrmgus::unit_sound_set>();
-			}
-
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "selected")) {
-					civilization->unit_sound_set->Selected.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "acknowledge")) {
-					civilization->unit_sound_set->Acknowledgement.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "attack")) {
-					civilization->unit_sound_set->Attack.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "idle")) {
-					civilization->unit_sound_set->Idle.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "build")) {
-					civilization->unit_sound_set->Build.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "ready")) {
-					civilization->unit_sound_set->Ready.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "repair")) {
-					civilization->unit_sound_set->Repair.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "harvest")) {
-					const std::string name = LuaToString(l, -1, k + 1);
-					++k;
-					const int resId = GetResourceIdByName(l, name.c_str());
-					civilization->unit_sound_set->Harvest[resId].Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "help")) {
-					civilization->unit_sound_set->Help.Name = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported sound tag: %s" _C_ value);
-				}
-			}
 		} else if (!strcmp(value, "PersonalNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {

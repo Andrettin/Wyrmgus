@@ -36,6 +36,7 @@
 #include "fallback_name_generator.h"
 #include "gender.h"
 #include "name_generator.h"
+#include "sound/sound.h"
 #include "unit/unit_class.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
@@ -55,7 +56,22 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "personal_names") {
+	if (tag == "unit_sounds") {
+		if (this->unit_sound_set == nullptr) {
+			this->unit_sound_set = std::make_unique<wyrmgus::unit_sound_set>();
+		}
+
+		database::process_sml_data(this->unit_sound_set, scope);
+	} else if (tag == "not_enough_resource_sounds") {
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const resource *resource = resource::get(key);
+			const sound *sound = sound::get(value);
+			this->not_enough_resource_sounds[resource] = sound;
+		});
+	} else if (tag == "personal_names") {
 		if (!values.empty()) {
 			if (this->personal_name_generators.find(gender::none) == this->personal_name_generators.end()) {
 				this->personal_name_generators[gender::none] = std::make_unique<name_generator>();
@@ -106,6 +122,10 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 
 void civilization_base::initialize()
 {
+	if (this->unit_sound_set != nullptr) {
+		this->unit_sound_set->map_sounds();
+	}
+
 	if (this->group != nullptr) {
 		if (!this->group->is_initialized()) {
 			this->group->initialize();
@@ -159,6 +179,89 @@ bool civilization_base::is_part_of_group(const civilization_group *group) const
 	}
 
 	return this->get_group()->is_part_of_group(group);
+}
+
+const wyrmgus::unit_sound_set *civilization_base::get_unit_sound_set() const
+{
+	if (this->unit_sound_set != nullptr) {
+		return this->unit_sound_set.get();
+	}
+
+	if (this->get_group() != nullptr) {
+		return this->get_group()->get_unit_sound_set();
+	}
+
+	return nullptr;
+}
+
+const sound *civilization_base::get_help_town_sound() const
+{
+	if (this->help_town_sound != nullptr) {
+		return this->help_town_sound;
+	}
+
+	if (this->get_group() != nullptr) {
+		return this->get_group()->get_help_town_sound();
+	}
+
+	return nullptr;
+}
+
+const sound *civilization_base::get_work_complete_sound() const
+{
+	if (this->work_complete_sound != nullptr) {
+		return this->work_complete_sound;
+	}
+
+	if (this->get_group() != nullptr) {
+		return this->get_group()->get_work_complete_sound();
+	}
+
+	return nullptr;
+}
+
+const sound *civilization_base::get_research_complete_sound() const
+{
+	if (this->research_complete_sound != nullptr) {
+		return this->research_complete_sound;
+	}
+
+	if (this->work_complete_sound != nullptr) {
+		return this->work_complete_sound;
+	}
+
+	if (this->get_group() != nullptr) {
+		return this->get_group()->get_research_complete_sound();
+	}
+
+	return nullptr;
+}
+
+const sound *civilization_base::get_not_enough_food_sound() const
+{
+	if (this->not_enough_food_sound != nullptr) {
+		return this->not_enough_food_sound;
+	}
+
+	if (this->get_group() != nullptr) {
+		return this->get_group()->get_not_enough_food_sound();
+	}
+
+	return nullptr;
+}
+
+const sound *civilization_base::get_not_enough_resource_sound(const resource *resource) const
+{
+	const auto find_iterator = this->not_enough_resource_sounds.find(resource);
+	if (find_iterator != this->not_enough_resource_sounds.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->get_group() != nullptr) {
+		return this->get_group()->get_not_enough_resource_sound(resource);
+	}
+
+	return nullptr;
 }
 
 unit_type *civilization_base::get_class_unit_type(const unit_class *unit_class) const

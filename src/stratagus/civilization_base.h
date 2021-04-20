@@ -38,8 +38,11 @@ class civilization_history;
 class faction;
 class name_generator;
 class player_color;
+class resource;
+class sound;
 class species;
 class unit_class;
+class unit_sound_set;
 class unit_type;
 class upgrade_class;
 enum class gender;
@@ -51,6 +54,10 @@ class civilization_base : public detailed_data_entry
 	Q_PROPERTY(wyrmgus::species* species MEMBER species)
 	Q_PROPERTY(wyrmgus::civilization_group* group MEMBER group)
 	Q_PROPERTY(wyrmgus::player_color* default_color MEMBER default_color NOTIFY changed)
+	Q_PROPERTY(wyrmgus::sound* help_town_sound MEMBER help_town_sound)
+	Q_PROPERTY(wyrmgus::sound* work_complete_sound MEMBER work_complete_sound)
+	Q_PROPERTY(wyrmgus::sound* research_complete_sound MEMBER research_complete_sound)
+	Q_PROPERTY(wyrmgus::sound* not_enough_food_sound MEMBER not_enough_food_sound)
 
 protected:
 	explicit civilization_base(const std::string &identifier);
@@ -98,6 +105,13 @@ public:
 	{
 		return this->default_color;
 	}
+
+	const wyrmgus::unit_sound_set *get_unit_sound_set() const;
+	const sound *get_help_town_sound() const;
+	const sound *get_work_complete_sound() const;
+	const sound *get_research_complete_sound() const;
+	const sound *get_not_enough_food_sound() const;
+	const sound *get_not_enough_resource_sound(const resource *resource) const;
 
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 
@@ -162,6 +176,12 @@ private:
 	wyrmgus::species *species = nullptr;
 	civilization_group *group = nullptr;
 	player_color *default_color = nullptr; //the civilization's default player color (used for the encyclopedia, tech tree, etc.)
+	std::unique_ptr<wyrmgus::unit_sound_set> unit_sound_set;	/// sounds for unit events
+	sound *help_town_sound = nullptr;
+	sound *work_complete_sound = nullptr;
+	sound *research_complete_sound = nullptr;
+	sound *not_enough_food_sound = nullptr;
+	std::map<const resource *, const sound *> not_enough_resource_sounds;
 	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
 	std::map<gender, std::unique_ptr<name_generator>> personal_name_generators; //personal name generators for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)

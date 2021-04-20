@@ -3076,6 +3076,20 @@ const wyrmgus::civilization *CUnit::get_civilization() const
 	return this->Type->get_player_civilization(this->Player);
 }
 
+const civilization_base *CUnit::get_civilization_base() const
+{
+	const civilization_base *civilization = this->get_civilization();
+	if (civilization != nullptr) {
+		return civilization;
+	}
+
+	if (this->Type->get_civilization_group() != nullptr) {
+		return this->Type->get_civilization_group();
+	}
+
+	return nullptr;
+}
+
 /**
 **  Create a new unit.
 **

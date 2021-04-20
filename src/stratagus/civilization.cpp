@@ -92,21 +92,6 @@ void civilization::process_sml_scope(const sml_data &scope)
 				throw std::runtime_error("Button action \"" + key + "\" doesn't exist.");
 			}
 		});
-	} else if (tag == "unit_sounds") {
-		if (this->unit_sound_set == nullptr) {
-			this->unit_sound_set = std::make_unique<wyrmgus::unit_sound_set>();
-		}
-
-		database::process_sml_data(this->unit_sound_set, scope);
-	} else if (tag == "not_enough_resource_sounds") {
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
-			const std::string &key = property.get_key();
-			const std::string &value = property.get_value();
-
-			const resource *resource = resource::get(key);
-			const sound *sound = sound::get(value);
-			this->not_enough_resource_sounds[resource] = sound;
-		});
 	} else if (tag == "title_names") {
 		faction::process_title_names(this->title_names, scope);
 	} else if (tag == "character_title_names") {
@@ -212,65 +197,6 @@ void civilization::initialize()
 				PlayerRaces.ButtonIcons[this->ID][iterator->first] = iterator->second;
 			}
 		}
-
-		//unit sounds
-		if (parent_civilization->unit_sound_set != nullptr) {
-			if (this->unit_sound_set == nullptr) {
-				this->unit_sound_set = std::make_unique<wyrmgus::unit_sound_set>();
-			}
-
-			if (this->unit_sound_set->Selected.Name.empty()) {
-				this->unit_sound_set->Selected = parent_civilization->unit_sound_set->Selected;
-			}
-			if (this->unit_sound_set->Acknowledgement.Name.empty()) {
-				this->unit_sound_set->Acknowledgement = parent_civilization->unit_sound_set->Acknowledgement;
-			}
-			if (this->unit_sound_set->Attack.Name.empty()) {
-				this->unit_sound_set->Attack = parent_civilization->unit_sound_set->Attack;
-			}
-			if (this->unit_sound_set->Build.Name.empty()) {
-				this->unit_sound_set->Build = parent_civilization->unit_sound_set->Build;
-			}
-			if (this->unit_sound_set->Ready.Name.empty()) {
-				this->unit_sound_set->Ready = parent_civilization->unit_sound_set->Ready;
-			}
-			if (this->unit_sound_set->Repair.Name.empty()) {
-				this->unit_sound_set->Repair = parent_civilization->unit_sound_set->Repair;
-			}
-			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				if (this->unit_sound_set->Harvest[j].Name.empty()) {
-					this->unit_sound_set->Harvest[j] = parent_civilization->unit_sound_set->Harvest[j];
-				}
-			}
-			if (this->unit_sound_set->Help.Name.empty()) {
-				this->unit_sound_set->Help = parent_civilization->unit_sound_set->Help;
-			}
-			if (this->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
-				this->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES] = parent_civilization->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES];
-			}
-		}
-
-		if (this->help_town_sound == nullptr) {
-			this->help_town_sound = parent_civilization->help_town_sound;
-		}
-
-		if (this->work_complete_sound == nullptr) {
-			this->work_complete_sound = parent_civilization->work_complete_sound;
-		}
-
-		if (this->research_complete_sound == nullptr) {
-			this->research_complete_sound = parent_civilization->research_complete_sound;
-		}
-
-		if (this->not_enough_food_sound == nullptr) {
-			this->not_enough_food_sound = parent_civilization->not_enough_food_sound;
-		}
-
-		for (const auto &kv_pair : parent_civilization->not_enough_resource_sounds) {
-			if (!this->not_enough_resource_sounds.contains(kv_pair.first)) {
-				this->not_enough_resource_sounds[kv_pair.first] = kv_pair.second;
-			}
-		}
 	}
 
 	if (PlayerRaces.ButtonIcons[this->ID].find(ButtonCmd::Move) != PlayerRaces.ButtonIcons[this->ID].end()) {
@@ -331,10 +257,6 @@ void civilization::initialize()
 		button_definition += "\tForUnit = {\"" + this->get_identifier() + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
-	}
-
-	if (this->unit_sound_set != nullptr) {
-		this->unit_sound_set->map_sounds();
 	}
 
 	civilization_base::initialize();

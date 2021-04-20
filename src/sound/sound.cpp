@@ -159,9 +159,9 @@ static const wyrmgus::sound *ChooseUnitVoiceSound(const CUnit *unit, const wyrmg
 		return sound;
 	}
 
-	const wyrmgus::civilization *civilization = unit->get_civilization();
+	const civilization_base *civilization_base = unit->get_civilization_base();
 
-	if (civilization != nullptr && civilization->get_unit_sound_set() != nullptr) {
+	if (civilization_base != nullptr && civilization_base->get_unit_sound_set() != nullptr) {
 		switch (unit_sound_type) {
 			case wyrmgus::unit_sound_type::acknowledging:
 			case wyrmgus::unit_sound_type::attack:
@@ -172,15 +172,15 @@ static const wyrmgus::sound *ChooseUnitVoiceSound(const CUnit *unit, const wyrmg
 			case wyrmgus::unit_sound_type::repairing:
 			case wyrmgus::unit_sound_type::harvesting:
 				if (unit->Type->BoolFlag[ORGANIC_INDEX].value) {
-					return civilization->get_unit_sound_set()->get_sound_for_unit(unit_sound_type, unit);
+					return civilization_base->get_unit_sound_set()->get_sound_for_unit(unit_sound_type, unit);
 				}
 				break;
 			case wyrmgus::unit_sound_type::help:
-				if (unit->Type->BoolFlag[BUILDING_INDEX].value && civilization->get_help_town_sound() != nullptr) {
-					return civilization->get_help_town_sound();
+				if (unit->Type->BoolFlag[BUILDING_INDEX].value && civilization_base->get_help_town_sound() != nullptr) {
+					return civilization_base->get_help_town_sound();
 				}
 
-				return civilization->get_unit_sound_set()->get_sound_for_unit(unit_sound_type, unit);
+				return civilization_base->get_unit_sound_set()->get_sound_for_unit(unit_sound_type, unit);
 			default:
 				break;
 		}

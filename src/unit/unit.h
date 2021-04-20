@@ -169,6 +169,7 @@ public:
 
 	const wyrmgus::species *get_species() const;
 	const wyrmgus::civilization *get_civilization() const;
+	const civilization_base *get_civilization_base() const;
 
 	/// Draw a single unit
 	void Draw(const CViewport &vp, std::vector<std::function<void(renderer *)>> &render_commands) const;

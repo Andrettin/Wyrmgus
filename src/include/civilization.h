@@ -48,17 +48,10 @@ class language;
 class quest;
 class resource;
 class site;
-class sound;
-class species;
-class unit_class;
-class unit_sound_set;
-class unit_type;
-class upgrade_class;
 enum class ai_force_type;
 enum class character_title;
 enum class faction_tier;
 enum class faction_type;
-enum class gender;
 enum class government_type;
 
 class civilization final : public civilization_base, public data_type<civilization>
@@ -72,10 +65,6 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 	Q_PROPERTY(wyrmgus::language* language MEMBER language)
 	Q_PROPERTY(QString encyclopedia_background_file READ get_encyclopedia_background_file_qstring NOTIFY changed)
-	Q_PROPERTY(wyrmgus::sound* help_town_sound MEMBER help_town_sound)
-	Q_PROPERTY(wyrmgus::sound* work_complete_sound MEMBER work_complete_sound)
-	Q_PROPERTY(wyrmgus::sound* research_complete_sound MEMBER research_complete_sound)
-	Q_PROPERTY(wyrmgus::sound* not_enough_food_sound MEMBER not_enough_food_sound)
 
 public:
 	static constexpr const char *class_identifier = "civilization";
@@ -180,45 +169,6 @@ public:
 		this->set_encyclopedia_background_file(std::filesystem::path(filepath));
 	}
 
-	const wyrmgus::unit_sound_set *get_unit_sound_set() const
-	{
-		return this->unit_sound_set.get();
-	}
-
-	const sound *get_help_town_sound() const
-	{
-		return this->help_town_sound;
-	}
-
-	const sound *get_work_complete_sound() const
-	{
-		return this->work_complete_sound;
-	}
-
-	const sound *get_research_complete_sound() const
-	{
-		if (this->research_complete_sound != nullptr) {
-			return this->research_complete_sound;
-		}
-
-		return this->get_work_complete_sound();
-	}
-
-	const sound *get_not_enough_food_sound() const
-	{
-		return this->not_enough_food_sound;
-	}
-
-	const sound *get_not_enough_resource_sound(const resource *resource) const
-	{
-		const auto find_iterator = this->not_enough_resource_sounds.find(resource);
-		if (find_iterator != this->not_enough_resource_sounds.end()) {
-			return find_iterator->second;
-		}
-
-		return nullptr;
-	}
-
 	const std::vector<const civilization *> &get_develops_from() const
 	{
 		return this->develops_from;
@@ -294,12 +244,6 @@ private:
 	bool visible = true; //whether the civilization is visible e.g. in the map editor
 	bool playable = true; //civilizations are playable by default
 	std::filesystem::path encyclopedia_background_file;
-	std::unique_ptr<wyrmgus::unit_sound_set> unit_sound_set;	/// sounds for unit events
-	sound *help_town_sound = nullptr;
-	sound *work_complete_sound = nullptr;
-	sound *research_complete_sound = nullptr;
-	sound *not_enough_food_sound = nullptr;
-	std::map<const resource *, const sound *> not_enough_resource_sounds;
 	std::vector<const civilization *> develops_from; //from which civilizations this civilization develops
 	std::vector<const civilization *> develops_to; //to which civilizations this civilization develops
 	std::map<cursor_type, cursor *> cursors;
