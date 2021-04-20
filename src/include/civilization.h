@@ -58,6 +58,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QString link_string READ get_link_qstring CONSTANT)
 	Q_PROPERTY(wyrmgus::civilization* parent_civilization MEMBER parent_civilization READ get_parent_civilization)
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
@@ -95,6 +96,11 @@ public:
 	}
 
 	virtual std::string get_encyclopedia_text() const override;
+
+	QString get_link_qstring() const
+	{
+		return QString::fromStdString(this->get_link_string());
+	}
 
 	civilization *get_parent_civilization() const
 	{

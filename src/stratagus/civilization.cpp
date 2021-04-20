@@ -40,7 +40,6 @@
 #include "government_type.h"
 #include "player.h"
 #include "script.h"
-#include "sound/sound.h"
 #include "time/calendar.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"

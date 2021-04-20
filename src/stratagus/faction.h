@@ -69,6 +69,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QString link_string READ get_link_qstring CONSTANT)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::faction* parent_faction MEMBER parent_faction)
@@ -132,6 +133,11 @@ public:
 	}
 
 	virtual std::string get_encyclopedia_text() const override;
+
+	QString get_link_qstring() const
+	{
+		return QString::fromStdString(this->get_link_string());
+	}
 
 	wyrmgus::civilization *get_civilization() const
 	{
