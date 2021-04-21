@@ -28,16 +28,8 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CFile;
 class CMap;
-
-/*----------------------------------------------------------------------------
---  Settings
-----------------------------------------------------------------------------*/
 
 struct SettingsPresets {
 	std::string AIScript;     /// AI script for computer to use
@@ -55,7 +47,15 @@ struct SettingsPresets {
 **  simplifies load/save/reinitialization, etc...
 **
 */
-struct Settings {
+struct Settings final
+{
+	Settings()
+	{
+		this->reset();
+	}
+
+	void reset();
+
 	int NetGameType;   /// Multiplayer or single player
 
 	//  Individual presets:
@@ -110,15 +110,7 @@ enum GameTypes {
 #endif
 };
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern Settings GameSettings;  /// Game settings
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Show stats
 extern void ShowStats();

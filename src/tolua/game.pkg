@@ -55,6 +55,8 @@ struct SettingsPresets {
 };
 
 class Settings {
+	void reset();
+
 	int NetGameType;
 
 	SettingsPresets Presets[PlayerMax];

@@ -1464,9 +1464,36 @@ void ResetItemsToLoad()
 }
 
 /*----------------------------------------------------------------------------
---  Game creation
+--  Settings
 ----------------------------------------------------------------------------*/
 
+void Settings::reset()
+{
+	for (int i = 0; i < PlayerMax; ++i) {
+		this->Presets[i].AIScript = "ai-passive";
+		this->Presets[i].Race = SettingsPresetMapDefault;
+		this->Presets[i].Team = SettingsPresetMapDefault;
+		this->Presets[i].Type = SettingsPresetMapDefault;
+	}
+
+	this->Resources = SettingsPresetMapDefault;
+	this->NumUnits = SettingsPresetMapDefault;
+	this->Opponents = SettingsPresetMapDefault;
+	this->Difficulty = DifficultyNormal;
+	this->GameType = SettingsPresetMapDefault;
+	this->MapRichness = SettingsPresetMapDefault;
+	this->NetGameType = SettingsSinglePlayerGame;
+
+	this->NoFogOfWar = false;
+	this->Inside = false;
+	this->RevealMap = 0;
+	this->TechLevel = NoTechLevel;
+	this->MaxTechLevel = NoTechLevel;
+}
+
+/*----------------------------------------------------------------------------
+--  Game creation
+----------------------------------------------------------------------------*/
 
 /**
 **  CreateGame.
@@ -1734,19 +1761,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 */
 void InitSettings()
 {
-	for (int i = 0; i < PlayerMax; ++i) {
-		GameSettings.Presets[i].AIScript = "ai-passive";
-		GameSettings.Presets[i].Race = SettingsPresetMapDefault;
-		GameSettings.Presets[i].Team = SettingsPresetMapDefault;
-		GameSettings.Presets[i].Type = SettingsPresetMapDefault;
-	}
-	GameSettings.Resources = SettingsPresetMapDefault;
-	GameSettings.NumUnits = SettingsPresetMapDefault;
-	GameSettings.Opponents = SettingsPresetMapDefault;
-	GameSettings.Difficulty = SettingsPresetMapDefault;
-	GameSettings.GameType = SettingsPresetMapDefault;
-	GameSettings.MapRichness = SettingsPresetMapDefault;
-	GameSettings.NetGameType = SettingsSinglePlayerGame;
+	GameSettings.reset();
 }
 
 // call the lua function: CleanGame_Lua.
