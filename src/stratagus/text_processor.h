@@ -36,6 +36,7 @@ namespace wyrmgus {
 
 class civilization;
 class faction;
+class literary_text;
 class named_data_entry;
 class site;
 class unit_class;
@@ -58,6 +59,7 @@ public:
 	std::string process_named_data_entry_tokens(const named_data_entry *data_entry, std::queue<std::string> &tokens) const;
 	std::string process_civilization_tokens(const civilization *civilization, std::queue<std::string> &tokens) const;
 	std::string process_faction_tokens(const faction *faction, std::queue<std::string> &tokens) const;
+	std::string process_literary_text_tokens(const literary_text *literary_text, std::queue<std::string> &tokens) const;
 	std::string process_player_tokens(const CPlayer *player, std::queue<std::string> &tokens) const;
 	std::string process_site_tokens(const site *site, std::queue<std::string> &tokens) const;
 	std::string process_unit_tokens(const CUnit *unit, std::queue<std::string> &tokens) const;

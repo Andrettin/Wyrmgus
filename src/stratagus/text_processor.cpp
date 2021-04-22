@@ -31,6 +31,7 @@
 #include "civilization.h"
 #include "faction.h"
 #include "language/word.h"
+#include "literary_text.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "player.h"
@@ -103,6 +104,13 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 		}
 
 		str = this->process_faction_tokens(faction, tokens);
+	} else if (front_subtoken == "literary_text") {
+		const literary_text *literary_text = nullptr;
+		if (!subtokens.empty()) {
+			literary_text = literary_text::get(queue::take(subtokens));
+		}
+
+		str = this->process_literary_text_tokens(literary_text, tokens);
 	} else if (front_subtoken == "player") {
 		str = this->process_player_tokens(this->context.script_context.current_player, tokens);
 	} else if (front_subtoken == "source_player") {
@@ -292,6 +300,33 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 		return this->process_named_data_entry_tokens(upgrade, tokens);
 	} else {
 		return this->process_named_data_entry_token(faction, front_subtoken);
+	}
+}
+
+std::string text_processor::process_literary_text_tokens(const literary_text *literary_text, std::queue<std::string> &tokens) const
+{
+	if (literary_text == nullptr) {
+		throw std::runtime_error("No literary text provided when processing literary text tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing literary text tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
+
+	if (subtokens.size() > 2) {
+		throw std::runtime_error("There can only be at most 2 subtokens.");
+	}
+
+	const std::string front_subtoken = queue::take(subtokens);
+
+	if (front_subtoken == "link") {
+		return literary_text->get_link_string();
+	} else {
+		return this->process_named_data_entry_token(literary_text, front_subtoken);
 	}
 }
 
