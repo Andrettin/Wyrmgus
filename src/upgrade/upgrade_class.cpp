@@ -140,3 +140,5 @@ int upgrade_class::get_tech_tree_y() const
 
 	return 0;
 }
+
+}
