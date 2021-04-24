@@ -209,6 +209,25 @@ QVariantList engine_interface::get_available_campaigns() const
 	return container::to_qvariant_list(available_campaigns);
 }
 
+QVariantList engine_interface::get_playable_civilizations() const
+{
+	std::vector<civilization *> playable_civilizations;
+
+	for (civilization *civilization : civilization::get_all()) {
+		if (!civilization->is_playable()) {
+			continue;
+		}
+
+		playable_civilizations.push_back(civilization);
+	}
+
+	std::sort(playable_civilizations.begin(), playable_civilizations.end(), [](const civilization *lhs, const civilization *rhs) {
+		return lhs->get_identifier() < rhs->get_identifier();
+	});
+
+	return container::to_qvariant_list(playable_civilizations);
+}
+
 QVariantList engine_interface::get_difficulties() const
 {
 	QVariantList difficulties;

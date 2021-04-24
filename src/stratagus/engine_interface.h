@@ -180,6 +180,7 @@ public:
 	Q_INVOKABLE QString get_difficulty_name(const int difficulty_index) const;
 
 	Q_INVOKABLE QVariantList get_available_campaigns() const;
+	Q_INVOKABLE QVariantList get_playable_civilizations() const;
 
 	Q_INVOKABLE QVariantList get_building_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;
