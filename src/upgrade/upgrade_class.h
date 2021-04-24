@@ -35,6 +35,7 @@ namespace wyrmgus {
 
 class age;
 class condition;
+class unit_class;
 class upgrade_category;
 enum class upgrade_category_rank;
 
@@ -44,6 +45,8 @@ class upgrade_class final : public named_data_entry, public data_type<upgrade_cl
 
 	Q_PROPERTY(wyrmgus::upgrade_category* category MEMBER category WRITE set_category)
 	Q_PROPERTY(wyrmgus::age* age MEMBER age)
+	Q_PROPERTY(int tech_tree_x READ get_tech_tree_x CONSTANT)
+	Q_PROPERTY(int tech_tree_y READ get_tech_tree_y CONSTANT)
 
 public:
 	static constexpr const char *class_identifier = "upgrade_class";
@@ -60,6 +63,7 @@ public:
 	~upgrade_class();
 
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize() override;
 	virtual void check() const override;
 
 	int get_index() const
@@ -104,6 +108,18 @@ public:
 
 	void remove_upgrade(CUpgrade *unit_type);
 
+	void add_tech_tree_child_unit_class(const unit_class *unit_class)
+	{
+		this->tech_tree_child_unit_classes.push_back(unit_class);
+	}
+
+	void add_tech_tree_child_upgrade_class(const upgrade_class *upgrade_class)
+	{
+		this->tech_tree_child_upgrade_classes.push_back(upgrade_class);
+	}
+
+	int get_tech_tree_y() const;
+
 private:
 	int index = -1;
 	upgrade_category *category = nullptr;
@@ -111,6 +127,10 @@ private:
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;
 	std::vector<CUpgrade *> upgrades;
+	unit_class *tech_tree_parent_unit_class = nullptr;
+	upgrade_class *tech_tree_parent_upgrade_class = nullptr;
+	std::vector<const unit_class *> tech_tree_child_unit_classes;
+	std::vector<const upgrade_class *> tech_tree_child_upgrade_classes;
 };
 
 }

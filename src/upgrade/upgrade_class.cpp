@@ -29,6 +29,7 @@
 #include "upgrade/upgrade_class.h"
 
 #include "script/condition/and_condition.h"
+#include "unit/unit_class.h"
 #include "upgrade/upgrade_category.h"
 #include "util/vector_util.h"
 
@@ -55,6 +56,17 @@ void upgrade_class::process_sml_scope(const sml_data &scope)
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
+}
+
+void upgrade_class::initialize()
+{
+	if (this->tech_tree_parent_unit_class != nullptr) {
+		this->tech_tree_parent_unit_class->add_tech_tree_child_upgrade_class(this);
+	} else if (this->tech_tree_parent_upgrade_class != nullptr) {
+		this->tech_tree_parent_upgrade_class->add_tech_tree_child_upgrade_class(this);
+	}
+
+	data_entry::initialize();
 }
 
 void upgrade_class::check() const
@@ -118,4 +130,13 @@ void upgrade_class::remove_upgrade(CUpgrade *upgrade)
 	vector::remove(this->upgrades, upgrade);
 }
 
+int upgrade_class::get_tech_tree_y() const
+{
+	if (this->tech_tree_parent_unit_class != nullptr) {
+		return this->tech_tree_parent_unit_class->get_tech_tree_y() + 1;
+	} else if (this->tech_tree_parent_upgrade_class != nullptr) {
+		return this->tech_tree_parent_upgrade_class->get_tech_tree_y() + 1;
+	}
+
+	return 0;
 }

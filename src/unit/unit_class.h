@@ -33,6 +33,7 @@ namespace wyrmgus {
 
 class condition;
 class unit_type;
+class upgrade_class;
 
 class unit_class final : public named_data_entry, public data_type<unit_class>
 {
@@ -40,6 +41,9 @@ class unit_class final : public named_data_entry, public data_type<unit_class>
 
 	Q_PROPERTY(bool town_hall MEMBER town_hall READ is_town_hall)
 	Q_PROPERTY(bool ship MEMBER ship READ is_ship)
+	Q_PROPERTY(wyrmgus::unit_class* tech_tree_parent_unit_class MEMBER tech_tree_parent_unit_class)
+	Q_PROPERTY(wyrmgus::upgrade_class* tech_tree_parent_upgrade_class MEMBER tech_tree_parent_upgrade_class)
+	Q_PROPERTY(int tech_tree_y READ get_tech_tree_y CONSTANT)
 
 public:
 	static constexpr const char *class_identifier = "unit_class";
@@ -65,6 +69,7 @@ public:
 	~unit_class();
 
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize() override;
 	virtual void check() const override;
 
 	int get_index() const
@@ -108,6 +113,18 @@ public:
 
 	void remove_unit_type(unit_type *unit_type);
 
+	void add_tech_tree_child_unit_class(const unit_class *unit_class)
+	{
+		this->tech_tree_child_unit_classes.push_back(unit_class);
+	}
+
+	void add_tech_tree_child_upgrade_class(const upgrade_class *upgrade_class)
+	{
+		this->tech_tree_child_upgrade_classes.push_back(upgrade_class);
+	}
+
+	int get_tech_tree_y() const;
+
 private:
 	int index = -1;
 	bool town_hall = false; //whether the building class is a settlement head building class, e.g. a town hall or fortress
@@ -115,6 +132,10 @@ private:
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;
 	std::vector<unit_type *> unit_types;
+	unit_class *tech_tree_parent_unit_class = nullptr;
+	upgrade_class *tech_tree_parent_upgrade_class = nullptr;
+	std::vector<const unit_class *> tech_tree_child_unit_classes;
+	std::vector<const upgrade_class *> tech_tree_child_upgrade_classes;
 };
 
 }

@@ -29,6 +29,7 @@
 #include "unit/unit_class.h"
 
 #include "script/condition/and_condition.h"
+#include "upgrade/upgrade_class.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -54,6 +55,17 @@ void unit_class::process_sml_scope(const sml_data &scope)
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
+}
+
+void unit_class::initialize()
+{
+	if (this->tech_tree_parent_unit_class != nullptr) {
+		this->tech_tree_parent_unit_class->add_tech_tree_child_unit_class(this);
+	} else if (this->tech_tree_parent_upgrade_class != nullptr) {
+		this->tech_tree_parent_upgrade_class->add_tech_tree_child_unit_class(this);
+	}
+
+	data_entry::initialize();
 }
 
 void unit_class::check() const
@@ -90,6 +102,17 @@ bool unit_class::has_unit_type(unit_type *unit_type) const
 void unit_class::remove_unit_type(unit_type *unit_type)
 {
 	vector::remove(this->unit_types, unit_type);
+}
+
+int unit_class::get_tech_tree_y() const
+{
+	if (this->tech_tree_parent_unit_class != nullptr) {
+		return this->tech_tree_parent_unit_class->get_tech_tree_y() + 1;
+	} else if (this->tech_tree_parent_upgrade_class != nullptr) {
+		return this->tech_tree_parent_upgrade_class->get_tech_tree_y() + 1;
+	}
+
+	return 0;
 }
 
 }
