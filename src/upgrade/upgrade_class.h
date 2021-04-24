@@ -118,6 +118,11 @@ public:
 		this->tech_tree_child_upgrade_classes.push_back(upgrade_class);
 	}
 
+	int get_tech_tree_x() const
+	{
+		return 0;
+	}
+
 	int get_tech_tree_y() const;
 
 private:

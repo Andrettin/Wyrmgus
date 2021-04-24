@@ -43,6 +43,7 @@ class unit_class final : public named_data_entry, public data_type<unit_class>
 	Q_PROPERTY(bool ship MEMBER ship READ is_ship)
 	Q_PROPERTY(wyrmgus::unit_class* tech_tree_parent_unit_class MEMBER tech_tree_parent_unit_class)
 	Q_PROPERTY(wyrmgus::upgrade_class* tech_tree_parent_upgrade_class MEMBER tech_tree_parent_upgrade_class)
+	Q_PROPERTY(int tech_tree_x READ get_tech_tree_x CONSTANT)
 	Q_PROPERTY(int tech_tree_y READ get_tech_tree_y CONSTANT)
 
 public:
@@ -121,6 +122,11 @@ public:
 	void add_tech_tree_child_upgrade_class(const upgrade_class *upgrade_class)
 	{
 		this->tech_tree_child_upgrade_classes.push_back(upgrade_class);
+	}
+
+	int get_tech_tree_x() const
+	{
+		return 0;
 	}
 
 	int get_tech_tree_y() const;
