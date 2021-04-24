@@ -2603,7 +2603,7 @@ void AiCheckBuildings()
 	wyrmgus::unit_class_map<int> want_counter;
 	wyrmgus::unit_class_map<int> have_counter;
 	wyrmgus::unit_class_map<int> have_with_requests_counter;
-	for (const wyrmgus::unit_class *unit_class : wyrmgus::unit_class::get_all()) {
+	for (const unit_class *unit_class : unit_class::get_all()) {
 		want_counter[unit_class] = 0;
 		have_counter[unit_class] = -1;
 		have_with_requests_counter[unit_class] = -1;

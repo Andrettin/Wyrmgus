@@ -230,6 +230,8 @@ public:
 		this->characters.push_back(character);
 	}
 
+	Q_INVOKABLE QVariantList get_tech_tree_entries() const;
+
 signals:
 	void changed();
 

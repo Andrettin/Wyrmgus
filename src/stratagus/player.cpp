@@ -3543,7 +3543,7 @@ resource_map<int> CPlayer::GetUpgradeCosts(const CUpgrade *upgrade) const
 			costs[resource] += scaled_cost * this->GetUnitTypeCount(unit_type);
 		}
 
-		for (const wyrmgus::unit_class *unit_class : upgrade->get_scaled_cost_unit_classes()) {
+		for (const unit_class *unit_class : upgrade->get_scaled_cost_unit_classes()) {
 			costs[resource] += scaled_cost * this->get_unit_class_count(unit_class);
 		}
 	}

@@ -46,6 +46,8 @@
 #include "ui/cursor.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade_class.h"
+#include "util/container_util.h"
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
 #include "video/video.h"
@@ -702,6 +704,37 @@ CUpgrade *civilization::get_class_upgrade(const upgrade_class *upgrade_class) co
 	}
 
 	return nullptr;
+}
+
+QVariantList civilization::get_tech_tree_entries() const
+{
+	std::vector<data_entry *> entries;
+
+	for (const unit_class *unit_class : unit_class::get_all()) {
+		unit_type *unit_type = this->get_class_unit_type(unit_class);
+
+		if (unit_type == nullptr) {
+			continue;
+		}
+
+		entries.push_back(unit_type);
+	}
+
+	for (const upgrade_class *upgrade_class : upgrade_class::get_all()) {
+		CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
+
+		if (upgrade == nullptr) {
+			continue;
+		}
+
+		entries.push_back(upgrade);
+	}
+
+	std::sort(entries.begin(), entries.end(), [](const data_entry *lhs, const data_entry *rhs) {
+		return lhs->get_identifier() < rhs->get_identifier();
+	});
+
+	return container::to_qvariant_list(entries);
 }
 
 }
