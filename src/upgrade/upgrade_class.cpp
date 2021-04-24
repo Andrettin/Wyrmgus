@@ -130,6 +130,40 @@ void upgrade_class::remove_upgrade(CUpgrade *upgrade)
 	vector::remove(this->upgrades, upgrade);
 }
 
+int upgrade_class::get_tech_tree_x() const
+{
+	if (this->tech_tree_parent_unit_class != nullptr) {
+		return this->tech_tree_parent_unit_class->get_tech_tree_x() + this->get_tech_tree_relative_x();
+	} else if (this->tech_tree_parent_upgrade_class != nullptr) {
+		return this->tech_tree_parent_upgrade_class->get_tech_tree_x() + this->get_tech_tree_relative_x();
+	}
+
+	return 0;
+}
+
+int upgrade_class::get_tech_tree_relative_x() const
+{
+	const std::vector<const unit_class *> &sibling_unit_classes = this->tech_tree_parent_unit_class ? this->tech_tree_parent_unit_class->get_tech_tree_child_unit_classes() : this->tech_tree_parent_upgrade_class->get_tech_tree_child_unit_classes();
+
+	const std::vector<const upgrade_class *> &sibling_upgrade_classes = this->tech_tree_parent_unit_class ? this->tech_tree_parent_unit_class->get_tech_tree_child_upgrade_classes() : this->tech_tree_parent_upgrade_class->get_tech_tree_child_upgrade_classes();
+
+	int relative_x = 0;
+
+	for (const unit_class *unit_class : sibling_unit_classes) {
+		relative_x += unit_class->get_tech_tree_width();
+	}
+
+	for (const upgrade_class *upgrade_class : sibling_upgrade_classes) {
+		if (upgrade_class == this) {
+			break;
+		}
+
+		relative_x += upgrade_class->get_tech_tree_width();
+	}
+
+	return relative_x;
+}
+
 int upgrade_class::get_tech_tree_y() const
 {
 	if (this->tech_tree_parent_unit_class != nullptr) {
@@ -139,6 +173,21 @@ int upgrade_class::get_tech_tree_y() const
 	}
 
 	return 0;
+}
+
+int upgrade_class::get_tech_tree_width() const
+{
+	int children_width = 0;
+
+	for (const unit_class *unit_class : this->tech_tree_child_unit_classes) {
+		children_width += unit_class->get_tech_tree_width();
+	}
+
+	for (const upgrade_class *upgrade_class : this->tech_tree_child_upgrade_classes) {
+		children_width += upgrade_class->get_tech_tree_width();
+	}
+
+	return std::max(children_width, 1);
 }
 
 }

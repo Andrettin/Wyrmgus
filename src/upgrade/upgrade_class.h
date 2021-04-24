@@ -45,8 +45,11 @@ class upgrade_class final : public named_data_entry, public data_type<upgrade_cl
 
 	Q_PROPERTY(wyrmgus::upgrade_category* category MEMBER category WRITE set_category)
 	Q_PROPERTY(wyrmgus::age* age MEMBER age)
+	Q_PROPERTY(wyrmgus::unit_class* tech_tree_parent_unit_class MEMBER tech_tree_parent_unit_class)
+	Q_PROPERTY(wyrmgus::upgrade_class* tech_tree_parent_upgrade_class MEMBER tech_tree_parent_upgrade_class)
 	Q_PROPERTY(int tech_tree_x READ get_tech_tree_x CONSTANT)
 	Q_PROPERTY(int tech_tree_y READ get_tech_tree_y CONSTANT)
+	Q_PROPERTY(int tech_tree_width READ get_tech_tree_width CONSTANT)
 
 public:
 	static constexpr const char *class_identifier = "upgrade_class";
@@ -108,9 +111,19 @@ public:
 
 	void remove_upgrade(CUpgrade *unit_type);
 
+	const std::vector<const unit_class *> &get_tech_tree_child_unit_classes() const
+	{
+		return this->tech_tree_child_unit_classes;
+	}
+
 	void add_tech_tree_child_unit_class(const unit_class *unit_class)
 	{
 		this->tech_tree_child_unit_classes.push_back(unit_class);
+	}
+
+	const std::vector<const upgrade_class *> &get_tech_tree_child_upgrade_classes() const
+	{
+		return this->tech_tree_child_upgrade_classes;
 	}
 
 	void add_tech_tree_child_upgrade_class(const upgrade_class *upgrade_class)
@@ -118,12 +131,10 @@ public:
 		this->tech_tree_child_upgrade_classes.push_back(upgrade_class);
 	}
 
-	int get_tech_tree_x() const
-	{
-		return 0;
-	}
-
+	int get_tech_tree_x() const;
+	int get_tech_tree_relative_x() const;
 	int get_tech_tree_y() const;
+	int get_tech_tree_width() const;
 
 private:
 	int index = -1;

@@ -763,7 +763,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::unit_class* unit_class MEMBER unit_class WRITE set_unit_class)
+	Q_PROPERTY(wyrmgus::unit_class* unit_class MEMBER unit_class WRITE set_unit_class NOTIFY changed)
 	Q_PROPERTY(bool template MEMBER template_type READ is_template)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
 	Q_PROPERTY(wyrmgus::civilization_group* civilization_group MEMBER civilization_group NOTIFY changed)
