@@ -711,6 +711,10 @@ QVariantList civilization::get_tech_tree_entries() const
 	std::vector<data_entry *> entries;
 
 	for (const unit_class *unit_class : unit_class::get_all()) {
+		if (!unit_class->is_on_tech_tree()) {
+			continue;
+		}
+
 		unit_type *unit_type = this->get_class_unit_type(unit_class);
 
 		if (unit_type == nullptr) {
@@ -721,6 +725,10 @@ QVariantList civilization::get_tech_tree_entries() const
 	}
 
 	for (const upgrade_class *upgrade_class : upgrade_class::get_all()) {
+		if (!upgrade_class->is_on_tech_tree()) {
+			continue;
+		}
+
 		CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
 
 		if (upgrade == nullptr) {

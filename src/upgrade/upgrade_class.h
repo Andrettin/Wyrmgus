@@ -111,6 +111,12 @@ public:
 
 	void remove_upgrade(CUpgrade *unit_type);
 
+	bool is_on_tech_tree() const
+	{
+		//only entries which either have a tech tree parent or tech tree children are displayed on the tech tree
+		return this->tech_tree_parent_unit_class != nullptr || this->tech_tree_parent_upgrade_class != nullptr || !this->get_tech_tree_child_unit_classes().empty() || !this->get_tech_tree_child_upgrade_classes().empty();
+	}
+
 	const std::vector<const unit_class *> &get_tech_tree_child_unit_classes() const
 	{
 		return this->tech_tree_child_unit_classes;
