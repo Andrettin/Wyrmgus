@@ -47,6 +47,7 @@ class upgrade_class final : public named_data_entry, public data_type<upgrade_cl
 	Q_PROPERTY(wyrmgus::age* age MEMBER age)
 	Q_PROPERTY(wyrmgus::unit_class* tech_tree_parent_unit_class MEMBER tech_tree_parent_unit_class)
 	Q_PROPERTY(wyrmgus::upgrade_class* tech_tree_parent_upgrade_class MEMBER tech_tree_parent_upgrade_class)
+	Q_PROPERTY(wyrmgus::data_entry* tech_tree_parent READ get_tech_tree_parent CONSTANT)
 	Q_PROPERTY(int tech_tree_x READ get_tech_tree_x CONSTANT)
 	Q_PROPERTY(int tech_tree_y READ get_tech_tree_y CONSTANT)
 	Q_PROPERTY(int tech_tree_width READ get_tech_tree_width CONSTANT)
@@ -111,10 +112,12 @@ public:
 
 	void remove_upgrade(CUpgrade *unit_type);
 
+	data_entry *get_tech_tree_parent() const;
+
 	bool is_on_tech_tree() const
 	{
 		//only entries which either have a tech tree parent or tech tree children are displayed on the tech tree
-		return this->tech_tree_parent_unit_class != nullptr || this->tech_tree_parent_upgrade_class != nullptr || !this->get_tech_tree_child_unit_classes().empty() || !this->get_tech_tree_child_upgrade_classes().empty();
+		return this->get_tech_tree_parent() != nullptr || !this->get_tech_tree_child_unit_classes().empty() || !this->get_tech_tree_child_upgrade_classes().empty();
 	}
 
 	const std::vector<const unit_class *> &get_tech_tree_child_unit_classes() const

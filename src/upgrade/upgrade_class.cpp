@@ -130,6 +130,17 @@ void upgrade_class::remove_upgrade(CUpgrade *upgrade)
 	vector::remove(this->upgrades, upgrade);
 }
 
+data_entry *upgrade_class::get_tech_tree_parent() const
+{
+	if (this->tech_tree_parent_unit_class != nullptr) {
+		return this->tech_tree_parent_unit_class;
+	} else if (this->tech_tree_parent_upgrade_class != nullptr) {
+		return this->tech_tree_parent_upgrade_class;
+	}
+
+	return nullptr;
+}
+
 int upgrade_class::get_tech_tree_x() const
 {
 	if (this->tech_tree_parent_unit_class != nullptr) {

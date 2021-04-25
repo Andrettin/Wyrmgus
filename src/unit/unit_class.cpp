@@ -104,6 +104,17 @@ void unit_class::remove_unit_type(unit_type *unit_type)
 	vector::remove(this->unit_types, unit_type);
 }
 
+data_entry *unit_class::get_tech_tree_parent() const
+{
+	if (this->tech_tree_parent_unit_class != nullptr) {
+		return this->tech_tree_parent_unit_class;
+	} else if (this->tech_tree_parent_upgrade_class != nullptr) {
+		return this->tech_tree_parent_upgrade_class;
+	}
+
+	return nullptr;
+}
+
 int unit_class::get_tech_tree_x() const
 {
 	if (this->tech_tree_parent_unit_class != nullptr) {
