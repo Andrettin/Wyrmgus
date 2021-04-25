@@ -118,10 +118,15 @@ public:
 
 	data_entry *get_tech_tree_parent() const;
 
+	Q_INVOKABLE bool has_tech_tree_children() const
+	{
+		return !this->get_tech_tree_child_unit_classes().empty() || !this->get_tech_tree_child_upgrade_classes().empty();
+	}
+
 	bool is_on_tech_tree() const
 	{
 		//only entries which either have a tech tree parent or tech tree children are displayed on the tech tree
-		return this->get_tech_tree_parent() != nullptr || !this->get_tech_tree_child_unit_classes().empty() || !this->get_tech_tree_child_upgrade_classes().empty();
+		return this->get_tech_tree_parent() != nullptr || this->has_tech_tree_children();;
 	}
 
 	const std::vector<const unit_class *> &get_tech_tree_child_unit_classes() const
