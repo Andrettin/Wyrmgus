@@ -116,6 +116,16 @@ public:
 
 	void remove_unit_type(unit_type *unit_type);
 
+	const unit_class *get_tech_tree_parent_unit_class() const
+	{
+		return this->tech_tree_parent_unit_class;
+	}
+
+	const upgrade_class *get_tech_tree_parent_upgrade_class() const
+	{
+		return this->tech_tree_parent_upgrade_class;
+	}
+
 	data_entry *get_tech_tree_parent() const;
 
 	Q_INVOKABLE bool has_tech_tree_children() const

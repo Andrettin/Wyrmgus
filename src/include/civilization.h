@@ -230,6 +230,9 @@ public:
 		this->characters.push_back(character);
 	}
 
+	bool is_tech_tree_entry(const unit_class *unit_class) const;
+	bool is_tech_tree_entry(const upgrade_class *upgrade_class) const;
+
 	Q_INVOKABLE QVariantList get_tech_tree_entries() const;
 
 signals:

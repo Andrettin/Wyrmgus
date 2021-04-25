@@ -706,35 +706,71 @@ CUpgrade *civilization::get_class_upgrade(const upgrade_class *upgrade_class) co
 	return nullptr;
 }
 
+bool civilization::is_tech_tree_entry(const unit_class *unit_class) const
+{
+	if (!unit_class->is_on_tech_tree()) {
+		return false;
+	}
+
+	if (unit_class->get_tech_tree_parent_unit_class() != nullptr && !this->is_tech_tree_entry(unit_class->get_tech_tree_parent_unit_class())) {
+		return false;
+	}
+
+	if (unit_class->get_tech_tree_parent_upgrade_class() != nullptr && !this->is_tech_tree_entry(unit_class->get_tech_tree_parent_upgrade_class())) {
+		return false;
+	}
+
+	const unit_type *unit_type = this->get_class_unit_type(unit_class);
+
+	if (unit_type == nullptr) {
+		return false;
+	}
+
+	return true;
+}
+
+bool civilization::is_tech_tree_entry(const upgrade_class *upgrade_class) const
+{
+	if (!upgrade_class->is_on_tech_tree()) {
+		return false;
+	}
+
+	if (upgrade_class->get_tech_tree_parent_unit_class() != nullptr && !this->is_tech_tree_entry(upgrade_class->get_tech_tree_parent_unit_class())) {
+		return false;
+	}
+
+	if (upgrade_class->get_tech_tree_parent_upgrade_class() != nullptr && !this->is_tech_tree_entry(upgrade_class->get_tech_tree_parent_upgrade_class())) {
+		return false;
+	}
+
+	const CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
+
+	if (upgrade == nullptr) {
+		return false;
+	}
+
+	return true;
+}
+
 QVariantList civilization::get_tech_tree_entries() const
 {
 	std::vector<data_entry *> entries;
 
 	for (const unit_class *unit_class : unit_class::get_all()) {
-		if (!unit_class->is_on_tech_tree()) {
+		if (!this->is_tech_tree_entry(unit_class)) {
 			continue;
 		}
 
 		unit_type *unit_type = this->get_class_unit_type(unit_class);
-
-		if (unit_type == nullptr) {
-			continue;
-		}
-
 		entries.push_back(unit_type);
 	}
 
 	for (const upgrade_class *upgrade_class : upgrade_class::get_all()) {
-		if (!upgrade_class->is_on_tech_tree()) {
+		if (!this->is_tech_tree_entry(upgrade_class)) {
 			continue;
 		}
 
 		CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
-
-		if (upgrade == nullptr) {
-			continue;
-		}
-
 		entries.push_back(upgrade);
 	}
 
