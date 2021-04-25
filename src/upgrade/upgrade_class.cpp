@@ -79,6 +79,10 @@ void upgrade_class::check() const
 		throw std::runtime_error("Upgrade class \"" + this->get_identifier() + "\" has no age.");
 	}
 
+	if (this->get_tech_tree_parent() == this) {
+		throw std::runtime_error("Upgrade class \"" + this->get_identifier() + "\" is its own tech tree parent.");
+	}
+
 	if (this->get_preconditions() != nullptr) {
 		this->get_preconditions()->check_validity();
 	}

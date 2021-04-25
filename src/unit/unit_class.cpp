@@ -70,6 +70,10 @@ void unit_class::initialize()
 
 void unit_class::check() const
 {
+	if (this->get_tech_tree_parent() == this) {
+		throw std::runtime_error("Unit class \"" + this->get_identifier() + "\" is its own tech tree parent.");
+	}
+
 	if (this->get_preconditions() != nullptr) {
 		this->get_preconditions()->check_validity();
 	}
