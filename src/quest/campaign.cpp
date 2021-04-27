@@ -166,6 +166,10 @@ void campaign::initialize()
 		this->tree_parent->add_tree_child(this);
 	}
 
+	for (const wyrmgus::quest *quest : this->get_required_quests()) {
+		connect(quest, &quest::completed_changed, this, &campaign::available_changed);
+	}
+
 	data_entry::initialize();
 }
 

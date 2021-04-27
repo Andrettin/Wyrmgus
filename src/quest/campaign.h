@@ -61,6 +61,7 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 	Q_PROPERTY(wyrmgus::quest* quest MEMBER quest NOTIFY changed)
 	Q_PROPERTY(QVariantList map_templates READ get_map_templates_qvariant_list)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
+	Q_PROPERTY(bool available READ is_available NOTIFY available_changed)
 	Q_PROPERTY(wyrmgus::campaign* tree_parent MEMBER tree_parent NOTIFY changed)
 	Q_PROPERTY(int tree_x READ get_tree_x CONSTANT)
 	Q_PROPERTY(int tree_y READ get_tree_y CONSTANT)
@@ -147,6 +148,7 @@ public:
 	int get_tree_width() const;
 
 signals:
+	void available_changed();
 	void changed();
 
 private:
