@@ -61,6 +61,11 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 	Q_PROPERTY(wyrmgus::quest* quest MEMBER quest NOTIFY changed)
 	Q_PROPERTY(QVariantList map_templates READ get_map_templates_qvariant_list)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
+	Q_PROPERTY(wyrmgus::campaign* tree_parent MEMBER tree_parent NOTIFY changed)
+	Q_PROPERTY(int tree_x READ get_tree_x CONSTANT)
+	Q_PROPERTY(int tree_y READ get_tree_y CONSTANT)
+	Q_PROPERTY(int tree_width READ get_tree_width CONSTANT)
+	Q_PROPERTY(bool tree_line_visible MEMBER tree_line_visible NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "campaign";
@@ -101,6 +106,10 @@ public:
 
 	bool is_hidden() const
 	{
+		if (this->tree_parent != nullptr && this->tree_parent->is_hidden()) {
+			return true;
+		}
+
 		return this->hidden;
 	}
 
@@ -127,6 +136,16 @@ public:
 
 	Q_INVOKABLE void remove_map_template(map_template *map_template);
 
+	void add_tree_child(const campaign *campaign)
+	{
+		this->tree_children.push_back(campaign);
+	}
+
+	int get_tree_x() const;
+	int get_tree_relative_x(const std::vector<const campaign *> &siblings) const;
+	int get_tree_y() const;
+	int get_tree_width() const;
+
 signals:
 	void changed();
 
@@ -145,6 +164,10 @@ private:
 public:
 	std::vector<Vec2i> MapSizes;				/// Map sizes
 	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
+private:
+	campaign *tree_parent = nullptr;
+	std::vector<const campaign *> tree_children;
+	bool tree_line_visible = true;
 	
 	friend int ::CclDefineCampaign(lua_State *l);
 	friend int ::CclGetCampaignData(lua_State *l);

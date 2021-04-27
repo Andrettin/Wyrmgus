@@ -162,6 +162,10 @@ void campaign::initialize()
 		this->start_date_calendar = nullptr;
 	}
 
+	if (this->tree_parent != nullptr) {
+		this->tree_parent->add_tree_child(this);
+	}
+
 	data_entry::initialize();
 }
 
@@ -208,6 +212,60 @@ QVariantList campaign::get_map_templates_qvariant_list() const
 void campaign::remove_map_template(map_template *map_template)
 {
 	vector::remove(this->map_templates, map_template);
+}
+
+int campaign::get_tree_x() const
+{
+	if (this->tree_parent != nullptr) {
+		return this->tree_parent->get_tree_x() + this->get_tree_relative_x(this->tree_parent->tree_children);
+	}
+
+	std::vector<const campaign *> siblings;
+
+	for (const campaign *campaign : campaign::get_all_visible()) {
+		if (campaign->tree_parent != nullptr) {
+			continue;
+		}
+
+		siblings.push_back(campaign);
+	}
+
+	return this->get_tree_relative_x(siblings);
+}
+
+int campaign::get_tree_relative_x(const std::vector<const campaign *> &siblings) const
+{
+	int relative_x = 0;
+
+	for (const campaign *campaign : siblings) {
+		if (campaign == this) {
+			break;
+		}
+
+		relative_x += campaign->get_tree_width();
+	}
+
+	return relative_x;
+}
+
+int campaign::get_tree_y() const
+{
+	if (this->tree_parent != nullptr) {
+		return this->tree_parent->get_tree_y() + 1;
+	}
+
+	return 0;
+}
+
+int campaign::get_tree_width() const
+{
+	int children_width = 0;
+
+	for (const campaign *campaign : this->tree_children) {
+		children_width += campaign->get_tree_width();
+	}
+
+	return std::max(children_width, 1);
 }
 
 }
