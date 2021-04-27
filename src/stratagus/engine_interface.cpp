@@ -186,27 +186,9 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 	}
 }
 
-QVariantList engine_interface::get_available_campaigns() const
+QVariantList engine_interface::get_visible_campaigns() const
 {
-	std::vector<campaign *> available_campaigns;
-
-	for (campaign *campaign : campaign::get_all()) {
-		if (!campaign->is_available()) {
-			continue;
-		}
-
-		available_campaigns.push_back(campaign);
-	}
-
-	std::sort(available_campaigns.begin(), available_campaigns.end(), [](const campaign *lhs, const campaign *rhs) {
-		if (lhs->get_start_date() != rhs->get_start_date()) {
-			return lhs->get_start_date() < rhs->get_start_date();
-		}
-
-		return lhs->get_identifier() < rhs->get_identifier();
-	});
-
-	return container::to_qvariant_list(available_campaigns);
+	return container::to_qvariant_list(campaign::get_all_visible());
 }
 
 QVariantList engine_interface::get_playable_civilizations() const

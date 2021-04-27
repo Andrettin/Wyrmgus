@@ -74,6 +74,21 @@ public:
 
 	static void initialize_all();
 
+	static std::vector<campaign *> get_all_visible()
+	{
+		std::vector<campaign *> campaigns;
+
+		for (campaign *campaign : campaign::get_all()) {
+			if (campaign->is_hidden()) {
+				continue;
+			}
+
+			campaigns.push_back(campaign);
+		}
+
+		return campaigns;
+	}
+
 public:
 	explicit campaign(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
 	{
