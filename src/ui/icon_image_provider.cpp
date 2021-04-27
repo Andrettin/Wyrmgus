@@ -58,10 +58,18 @@ QImage icon_image_provider::requestImage(const QString &id, QSize *size, const Q
 		++index;
 	}
 
+	bool grayscale = false;
+	if (index < id_list.size()) {
+		if (id_list.at(index) == "grayscale") {
+			grayscale = true;
+			++index;
+		}
+	}
+
 	std::shared_ptr<CGraphic> graphics = icon->get_graphics();
 	graphics->Load(defines::get()->get_scale_factor());
 
-	const QImage &image = graphics->get_or_create_frame_image(icon->get_frame(), color_modification(icon->get_hue_rotation(), icon->get_hue_ignored_colors(), player_color));
+	const QImage &image = graphics->get_or_create_frame_image(icon->get_frame(), color_modification(icon->get_hue_rotation(), icon->get_hue_ignored_colors(), player_color), grayscale);
 
 	if (image.isNull()) {
 		log::log_error("Icon image for ID \"" + id_str + "\" is null.");

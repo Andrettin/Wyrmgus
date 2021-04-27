@@ -714,6 +714,8 @@ void CGraphic::SetOriginalSize()
 	this->Width = this->Height = 0;
 	this->image = QImage();
 	this->frame_images.clear();
+	this->grayscale_frame_images.clear();
+	this->modified_frame_images.clear();
 	this->Load();
 
 	this->Resized = false;
@@ -784,16 +786,18 @@ QImage CGraphic::create_modified_image(const color_modification &color_modificat
 	return image;
 }
 
-void CGraphic::create_frame_images(const color_modification &color_modification)
+void CGraphic::create_frame_images(const color_modification &color_modification, const bool grayscale)
 {
-	QImage image = this->create_modified_image(color_modification, false);
+	QImage image = this->create_modified_image(color_modification, grayscale);
 
 	std::vector<QImage> frames = image::to_frames(image, this->get_frame_size());
 
-	if (color_modification.is_null()) {
-		this->frame_images = std::move(frames);
-	} else {
+	if (grayscale) {
+		this->grayscale_frame_images = std::move(frames);
+	} else if (!color_modification.is_null()) {
 		this->modified_frame_images[color_modification] = std::move(frames);
+	} else {
+		this->frame_images = std::move(frames);
 	}
 }
 

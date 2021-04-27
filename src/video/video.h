@@ -242,38 +242,42 @@ public:
 
 	QImage create_modified_image(const color_modification &color_modification, const bool grayscale) const;
 
-	const QImage *get_frame_image(const size_t frame_index, const color_modification &color_modification = color_modification()) const
+	const QImage *get_frame_image(const size_t frame_index, const color_modification &color_modification = color_modification(), const bool grayscale = false) const
 	{
-		if (color_modification.is_null()) {
-			if (!this->frame_images.empty()) {
-				return &this->frame_images.at(frame_index);
+		if (grayscale) {
+			if (!this->grayscale_frame_images.empty()) {
+				return &this->grayscale_frame_images.at(frame_index);
 			}
-		} else {
+		} else if (!color_modification.is_null()) {
 			const auto find_iterator = this->modified_frame_images.find(color_modification);
 			if (find_iterator != this->modified_frame_images.end()) {
 				return &find_iterator->second.at(frame_index);
+			}
+		} else {
+			if (!this->frame_images.empty()) {
+				return &this->frame_images.at(frame_index);
 			}
 		}
 
 		return nullptr;
 	}
 
-	void create_frame_images(const color_modification &color_modification);
+	void create_frame_images(const color_modification &color_modification, const bool grayscale);
 
-	const QImage &get_or_create_frame_image(const size_t frame_index, const color_modification &color_modification)
+	const QImage &get_or_create_frame_image(const size_t frame_index, const color_modification &color_modification, const bool grayscale)
 	{
 		if (!color_modification.is_null()) {
 			if (color_modification.get_player_color() != nullptr && (color_modification.get_player_color() == this->get_conversible_player_color() || !this->has_player_color())) {
 				const wyrmgus::color_modification modification(color_modification.get_hue_rotation(), color_modification.get_hue_ignored_colors(), nullptr, color_modification.get_red_change(), color_modification.get_green_change(), color_modification.get_blue_change());
-				return this->get_or_create_frame_image(frame_index, modification);
+				return this->get_or_create_frame_image(frame_index, modification, grayscale);
 			}
 		}
 
-		const QImage *image = this->get_frame_image(frame_index, color_modification);
+		const QImage *image = this->get_frame_image(frame_index, color_modification, grayscale);
 
 		if (image == nullptr) {
-			this->create_frame_images(color_modification);
-			image = this->get_frame_image(frame_index, color_modification);
+			this->create_frame_images(color_modification, grayscale);
+			image = this->get_frame_image(frame_index, color_modification, grayscale);
 		}
 
 		if (image == nullptr) {
@@ -378,6 +382,7 @@ public:
 private:
 	QImage image;
 	std::vector<QImage> frame_images;
+	std::vector<QImage> grayscale_frame_images;
 	std::map<color_modification, std::vector<QImage>> modified_frame_images;
 public:
 	std::vector<frame_pos_t> frame_map;
