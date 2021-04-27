@@ -41,7 +41,9 @@ namespace wyrmgus {
 
 class calendar;
 class faction;
+class icon;
 class map_template;
+class player_color;
 class quest;
 class species;
 class timeline;
@@ -50,6 +52,8 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
+	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color NOTIFY changed)
 	Q_PROPERTY(QDateTime start_date MEMBER start_date READ get_start_date NOTIFY changed)
 	Q_PROPERTY(wyrmgus::calendar* start_date_calendar MEMBER start_date_calendar)
 	Q_PROPERTY(wyrmgus::timeline* timeline MEMBER timeline NOTIFY changed)
@@ -127,6 +131,8 @@ signals:
 	void changed();
 
 private:
+	wyrmgus::icon *icon = nullptr;
+	wyrmgus::player_color *player_color = nullptr; //the player color used for the campaign's icon
 	QDateTime start_date; //the starting date for the campaign
 	calendar *start_date_calendar = nullptr; //the calendar for the start date
 	wyrmgus::timeline *timeline = nullptr; //the timeline in which the campaign is set
