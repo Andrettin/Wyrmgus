@@ -78,11 +78,6 @@ void preferences::save() const
 	sml_data data(preferences_path.filename().stem().string());
 
 	data.add_property("scale_factor", std::to_string(this->get_scale_factor()));
-
-	if (this->get_selected_campaign() != nullptr) {
-		data.add_property("selected_campaign", this->get_selected_campaign()->get_identifier());
-	}
-
 	data.add_property("difficulty", difficulty_to_string(this->get_difficulty()));
 
 	try {

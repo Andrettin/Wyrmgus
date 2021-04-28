@@ -305,21 +305,3 @@ std::string GetCurrentCampaign()
 		return current_campaign->GetIdent();
 	}
 }
-
-std::string get_selected_campaign()
-{
-	if (wyrmgus::preferences::get()->get_selected_campaign() != nullptr) {
-		return wyrmgus::preferences::get()->get_selected_campaign()->get_identifier();
-	}
-
-	return std::string();
-}
-
-void set_selected_campaign(const std::string campaign_identifier)
-{
-	if (!campaign_identifier.empty()) {
-		wyrmgus::preferences::get()->set_selected_campaign(wyrmgus::campaign::get(campaign_identifier));
-	} else {
-		wyrmgus::preferences::get()->set_selected_campaign(nullptr);
-	}
-}

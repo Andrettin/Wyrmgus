@@ -40,7 +40,6 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_OBJECT
 
 	Q_PROPERTY(int scale_factor READ get_scale_factor WRITE set_scale_factor)
-	Q_PROPERTY(wyrmgus::campaign* selected_campaign READ get_selected_campaign WRITE set_selected_campaign NOTIFY selected_campaign_changed)
 	Q_PROPERTY(wyrmgus::difficulty difficulty READ get_difficulty WRITE set_difficulty)
 
 public:
@@ -68,21 +67,6 @@ public:
 		this->scale_factor = factor;
 	}
 
-	campaign *get_selected_campaign() const
-	{
-		return this->selected_campaign;
-	}
-
-	void set_selected_campaign(campaign *campaign)
-	{
-		if (campaign == this->get_selected_campaign()) {
-			return;
-		}
-
-		this->selected_campaign = campaign;
-		emit selected_campaign_changed();
-	}
-
 	wyrmgus::difficulty get_difficulty() const
 	{
 		return this->difficulty;
@@ -107,12 +91,8 @@ public:
 		this->set_difficulty(static_cast<wyrmgus::difficulty>(difficulty_index));
 	}
 
-signals:
-	void selected_campaign_changed();
-
 private:
 	int scale_factor = 1;
-	campaign *selected_campaign = nullptr;
 	wyrmgus::difficulty difficulty;
 };
 
