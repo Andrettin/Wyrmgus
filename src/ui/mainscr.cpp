@@ -1253,6 +1253,11 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 
 						const wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
 						const CUnit *site_unit = settlement_game_data->get_site_unit();
+
+						if (site_unit == nullptr) {
+							throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has territory on the map, but has no site unit.");
+						}
+
 						const wyrmgus::tile *site_center_tile = site_unit->get_center_tile();
 
 						const bool is_same_tile_type_as_settlement = (is_tile_water == (site_center_tile->is_water() && !site_center_tile->is_river()) && is_tile_space == site_center_tile->is_space());
