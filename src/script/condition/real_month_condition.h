@@ -51,7 +51,7 @@ public:
 			return false;
 		}
 
-		const QDateTime current_date = QDateTime::currentDateTimeUtc();
+		const QDateTime current_date = QDateTime::currentDateTime();
 		const int current_month = current_date.date().month();
 
 		return static_cast<int>(this->month) == current_month;

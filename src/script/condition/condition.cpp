@@ -60,6 +60,7 @@
 #include "script/condition/quest_condition.h"
 #include "script/condition/random_condition.h"
 #include "script/condition/real_day_condition.h"
+#include "script/condition/real_day_of_the_week_condition.h"
 #include "script/condition/real_month_condition.h"
 #include "script/condition/scripted_condition_condition.h"
 #include "script/condition/season_condition.h"
@@ -113,6 +114,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<random_condition>(value);
 	} else if (key == "real_day") {
 		return std::make_unique<real_day_condition>(value);
+	} else if (key == "real_day_of_the_week") {
+		return std::make_unique<real_day_of_the_week_condition>(value);
 	} else if (key == "real_month") {
 		return std::make_unique<real_month_condition>(value);
 	} else if (key == "scripted_condition") {

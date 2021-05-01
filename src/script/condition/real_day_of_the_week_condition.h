@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,15 +28,17 @@
 
 #include "network.h"
 #include "script/condition/condition.h"
+#include "time/day_of_the_week.h"
+#include "util/locale_util.h"
 
 namespace wyrmgus {
 
-class real_day_condition final : public condition
+class real_day_of_the_week_condition final : public condition
 {
 public:
-	explicit real_day_condition(const std::string &value)
+	explicit real_day_of_the_week_condition(const std::string &value)
 	{
-		this->day = std::stoi(value);
+		this->day_of_the_week = string_to_day_of_the_week(value);
 	}
 
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
@@ -45,25 +47,25 @@ public:
 		Q_UNUSED(ignore_units)
 
 		if (IsNetworkGame()) {
-			//always false in multiplayer games, to prevent desyncs if the real day changes during a game
+			//always false in multiplayer games, to prevent desyncs if the real day of the week changes during a game
 			return false;
 		}
 
 		const QDateTime current_date = QDateTime::currentDateTime();
-		const int current_day = current_date.date().day();
+		const int current_day_of_the_week = current_date.date().dayOfWeek();
 
-		return current_day >= this->day;
+		return static_cast<int>(this->day_of_the_week) == current_day_of_the_week;
 	}
 
 	virtual std::string get_string(const size_t indent) const override
 	{
 		Q_UNUSED(indent)
 
-		return "The current real day of the month is " + string::highlight(std::to_string(this->day));
+		return "The current real day of the week is " + string::highlight(locale::english_locale.dayName(static_cast<int>(this->day_of_the_week)).toStdString());
 	}
 
 private:
-	int day = 0;
+	wyrmgus::day_of_the_week day_of_the_week;
 };
 
 }
