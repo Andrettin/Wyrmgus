@@ -353,12 +353,12 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 			}
 
 			if (overlay_terrain && (overlay_transition_tiles.size() == 0 || overlay_terrain->has_transition_mask())) {
-				const wyrmgus::season *overlay_season = UI.CurrentMapLayer->get_tile_season(sx, overlay_terrain->Flags);
-				const std::shared_ptr<CPlayerColorGraphic> &overlay_terrain_graphics = overlay_terrain->get_graphics(overlay_season);
+				const bool is_overlay_space = overlay_terrain->has_flag(tile_flag::space);
+				const std::shared_ptr<CPlayerColorGraphic> &overlay_terrain_graphics = overlay_terrain->get_graphics(season);
 
 				if (overlay_terrain_graphics != nullptr) {
 					const int frame_index = overlay_solid_tile + (overlay_terrain == mf.get_overlay_terrain() ? mf.OverlayAnimationFrame : 0);
-					const wyrmgus::time_of_day *overlay_time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(sx, overlay_terrain->Flags);
+					const wyrmgus::time_of_day *overlay_time_of_day = is_overlay_space ? nullptr : time_of_day;;
 
 					const color_modification color_modification(overlay_terrain->get_hue_rotation(), color_set(), player_color, overlay_time_of_day);
 					overlay_terrain_graphics->render_frame(frame_index, QPoint(dx, dy), color_modification, render_commands);
@@ -371,10 +371,10 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 					continue;
 				}
 
-				const wyrmgus::season *overlay_transition_season = UI.CurrentMapLayer->get_tile_season(sx, overlay_transition_terrain->Flags);
-				const std::shared_ptr<CPlayerColorGraphic> &overlay_transition_graphics = overlay_transition_terrain->get_transition_graphics(overlay_transition_season);
+				const bool is_overlay_transition_space = overlay_transition_terrain->has_flag(tile_flag::space);
+				const std::shared_ptr<CPlayerColorGraphic> &overlay_transition_graphics = overlay_transition_terrain->get_transition_graphics(season);
 				if (overlay_transition_graphics != nullptr) {
-					const wyrmgus::time_of_day *overlay_transition_time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(sx, overlay_transition_terrain->Flags);
+					const wyrmgus::time_of_day *overlay_transition_time_of_day = is_overlay_transition_space ? nullptr : time_of_day;
 
 					const color_modification color_modification(overlay_transition_terrain->get_hue_rotation(), color_set(), player_color, overlay_transition_time_of_day);
 					overlay_transition_graphics->render_frame(overlay_transition_tiles[i].tile_frame, QPoint(dx, dy), color_modification, render_commands);
