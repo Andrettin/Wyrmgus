@@ -31,6 +31,7 @@
 
 namespace wyrmgus {
 
+enum class day_of_the_week;
 enum class month;
 
 class calendar final : public named_data_entry, public data_type<calendar>
@@ -105,7 +106,7 @@ private:
 	int year_offset = 0; //the offset from the Gregorian calendar, in years
 	std::string year_label;									/// label used for years (e.g. AD)
 	std::string negative_year_label;						/// label used for "negative" years (e.g. BC)
-	std::map<int, std::string> day_of_the_week_names; //the names of the days of the week in the calendar
+	std::map<day_of_the_week, std::string> day_of_the_week_names; //the names of the days of the week in the calendar
 	std::map<month, std::string> month_names; //the months in the calendar
 };
 

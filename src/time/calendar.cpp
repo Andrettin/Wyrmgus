@@ -29,6 +29,7 @@
 #include "time/calendar.h"
 
 #include "config.h"
+#include "time/day_of_the_week.h"
 #include "time/month.h"
 
 namespace wyrmgus {
@@ -50,7 +51,7 @@ void calendar::process_sml_scope(const sml_data &scope)
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			this->day_of_the_week_names[std::stoi(key)] = value;
+			this->day_of_the_week_names[string_to_day_of_the_week(key)] = value;
 		});
 	} else if (tag == "month_names") {
 		scope.for_each_property([&](const sml_property &property) {

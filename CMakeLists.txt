@@ -936,6 +936,7 @@ set(wyrmgus_spell_HDRS
 set(wyrmgus_time_HDRS
 	src/time/calendar.h
 	src/time/date.h
+	src/time/day_of_the_week.h
 	src/time/month.h
 	src/time/season.h
 	src/time/season_schedule.h
