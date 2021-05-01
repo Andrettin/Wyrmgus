@@ -48,6 +48,7 @@ namespace wyrmgus {
 	class unit_type;
 	class unit_type_variation;
 	class world;
+	enum class tile_flag : uint32_t;
 	struct tile_transition;
 }
 
@@ -153,6 +154,7 @@ public:
 	void SetTimeOfDay(const scheduled_time_of_day *time_of_day);
 
 	const wyrmgus::time_of_day *GetTimeOfDay() const;
+	const wyrmgus::time_of_day *get_tile_time_of_day(const int tile_index, const tile_flag flags) const;
 	const wyrmgus::time_of_day *get_tile_time_of_day(const int tile_index) const;
 	const wyrmgus::time_of_day *get_tile_time_of_day(const QPoint &tile_pos) const;
 
@@ -180,6 +182,7 @@ public:
 
 	void SetSeason(const scheduled_season *season);
 	const wyrmgus::season *GetSeason() const;
+	const wyrmgus::season *get_tile_season(const int tile_index, const tile_flag flags) const;
 	const wyrmgus::season *get_tile_season(const int tile_index) const;
 	const wyrmgus::season *get_tile_season(const QPoint &tile_pos) const;
 

@@ -377,16 +377,16 @@ const wyrmgus::time_of_day *CMapLayer::GetTimeOfDay() const
 	return this->time_of_day->get_time_of_day();
 }
 
-const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const int tile_index) const
+const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const int tile_index, const tile_flag flags) const
 {
-	const wyrmgus::tile *tile = this->Field(tile_index);
+	const tile *tile = this->Field(tile_index);
 
-	if (tile->has_flag(tile_flag::space)) {
+	if ((flags & tile_flag::space) != tile_flag::none) {
 		return nullptr;
 	}
 
-	if (tile->has_flag(tile_flag::underground)) {
-		return wyrmgus::defines::get()->get_underground_time_of_day();
+	if ((flags & tile_flag::underground) != tile_flag::none) {
+		return defines::get()->get_underground_time_of_day();
 	}
 
 	const wyrmgus::world *tile_world = tile->get_world();
@@ -395,6 +395,11 @@ const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const int tile_index
 	}
 
 	return this->GetTimeOfDay();
+}
+
+const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const int tile_index) const
+{
+	return this->get_tile_time_of_day(tile_index, this->Field(tile_index)->get_flags());
 }
 
 const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const QPoint &tile_pos) const
@@ -505,15 +510,15 @@ const wyrmgus::season *CMapLayer::GetSeason() const
 	return this->season->get_season();
 }
 
-const wyrmgus::season *CMapLayer::get_tile_season(const int tile_index) const
+const wyrmgus::season *CMapLayer::get_tile_season(const int tile_index, const tile_flag flags) const
 {
-	const wyrmgus::tile *tile = this->Field(tile_index);
+	const tile *tile = this->Field(tile_index);
 
-	if (tile->has_flag(tile_flag::space)) {
+	if ((flags & tile_flag::space) != tile_flag::none) {
 		return nullptr;
 	}
 
-	if (tile->has_flag(tile_flag::underground)) {
+	if ((flags & tile_flag::underground) != tile_flag::none) {
 		return nullptr;
 	}
 
@@ -523,6 +528,11 @@ const wyrmgus::season *CMapLayer::get_tile_season(const int tile_index) const
 	}
 
 	return this->GetSeason();
+}
+
+const wyrmgus::season *CMapLayer::get_tile_season(const int tile_index) const
+{
+	return this->get_tile_season(tile_index, this->Field(tile_index)->get_flags());
 }
 
 const wyrmgus::season *CMapLayer::get_tile_season(const QPoint &tile_pos) const
