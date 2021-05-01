@@ -31,7 +31,9 @@
 
 namespace wyrmgus {
 
-class calendar : public named_data_entry, public data_type<calendar>
+enum class month;
+
+class calendar final : public named_data_entry, public data_type<calendar>
 {
 	Q_OBJECT
 
@@ -104,7 +106,7 @@ private:
 	std::string year_label;									/// label used for years (e.g. AD)
 	std::string negative_year_label;						/// label used for "negative" years (e.g. BC)
 	std::map<int, std::string> day_of_the_week_names; //the names of the days of the week in the calendar
-	std::map<int, std::string> month_names; //the months in the calendar
+	std::map<month, std::string> month_names; //the months in the calendar
 };
 
 }

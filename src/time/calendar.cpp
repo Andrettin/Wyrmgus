@@ -29,6 +29,7 @@
 #include "time/calendar.h"
 
 #include "config.h"
+#include "time/month.h"
 
 namespace wyrmgus {
 
@@ -56,7 +57,7 @@ void calendar::process_sml_scope(const sml_data &scope)
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			this->month_names[std::stoi(key)] = value;
+			this->month_names[string_to_month(key)] = value;
 		});
 	} else {
 		data_entry::process_sml_scope(scope);
