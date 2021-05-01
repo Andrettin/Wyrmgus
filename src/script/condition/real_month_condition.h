@@ -26,9 +26,9 @@
 
 #pragma once
 
-#include "month.h"
 #include "network.h"
 #include "script/condition/condition.h"
+#include "time/month.h"
 #include "util/locale_util.h"
 
 namespace wyrmgus {
