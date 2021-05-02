@@ -125,6 +125,8 @@ void quest_objective::process_sml_property(const sml_property &property)
 	} else if (key == "unit_type") {
 		this->unit_types.clear();
 		this->unit_types.push_back(unit_type::get(value));
+	} else if (key == "upgrade") {
+		this->upgrade = CUpgrade::get(value);
 	} else {
 		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
 	}
