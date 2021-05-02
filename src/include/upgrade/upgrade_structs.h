@@ -591,6 +591,15 @@ public:
 		this->deity = deity;
 	}
 
+	std::string get_research_verb_string() const
+	{
+		if (this->get_deity() != nullptr) {
+			return "Worship";
+		}
+
+		return "Research";
+	}
+
 signals:
 	void changed();
 

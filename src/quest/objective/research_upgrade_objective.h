@@ -81,13 +81,15 @@ public:
 
 	virtual std::string generate_objective_string(const CPlayer *player) const override
 	{
-		std::string objective_str = "Research ";
-
 		const CUpgrade *upgrade = this->get_player_upgrade(player);
-		
+
+		std::string objective_str;
+
 		if (upgrade != nullptr) {
+			objective_str = upgrade->get_research_verb_string() + " ";
 			objective_str += upgrade->get_name();
 		} else {
+			objective_str = "Research ";
 			objective_str += this->upgrade_class->get_name();
 		}
 
