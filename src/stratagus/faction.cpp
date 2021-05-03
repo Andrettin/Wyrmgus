@@ -374,6 +374,36 @@ std::string_view faction::get_character_title_name(const character_title title_t
 	return this->get_civilization()->get_character_title_name(title_type, this->get_type(), government_type, tier, gender);
 }
 
+bool faction::develops_from_faction(const faction *faction, const bool include_indirect) const
+{
+	for (const wyrmgus::faction *origin_faction : this->DevelopsFrom) {
+		if (origin_faction == faction) {
+			return true;
+		}
+
+		if (include_indirect && origin_faction->develops_from_faction(faction, include_indirect)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool faction::develops_to_faction(const faction *faction, const bool include_indirect) const
+{
+	for (const wyrmgus::faction *derived_faction : this->DevelopsTo) {
+		if (derived_faction == faction) {
+			return true;
+		}
+
+		if (include_indirect && derived_faction->develops_to_faction(faction, include_indirect)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 int faction::GetUpgradePriority(const CUpgrade *upgrade) const
 {
 	if (!upgrade) {

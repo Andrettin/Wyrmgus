@@ -36,6 +36,7 @@
 #include "quest/objective/destroy_hero_objective.h"
 #include "quest/objective/destroy_unique_objective.h"
 #include "quest/objective/destroy_units_objective.h"
+#include "quest/objective/found_faction_objective.h"
 #include "quest/objective/gather_resource_objective.h"
 #include "quest/objective/have_resource_objective.h"
 #include "quest/objective/hero_must_survive_objective.h"
@@ -77,6 +78,8 @@ std::unique_ptr<quest_objective> quest_objective::from_sml_property(const sml_pr
 		return std::make_unique<destroy_hero_objective>(value, quest);
 	} else if (key == "destroy_unique") {
 		return std::make_unique<destroy_unique_objective>(value, quest);
+	} else if (key == "found_faction") {
+		return std::make_unique<found_faction_objective>(value, quest);
 	} else if (key == "hero_must_survive") {
 		return std::make_unique<hero_must_survive_objective>(value, quest);
 	} else if (key == "recruit_hero") {

@@ -38,7 +38,8 @@ enum class objective_type {
 	destroy_hero,
 	hero_must_survive,
 	destroy_unique,
-	destroy_faction
+	destroy_faction,
+	found_faction
 };
 
 inline objective_type string_to_objective_type(const std::string &str)
@@ -63,6 +64,8 @@ inline objective_type string_to_objective_type(const std::string &str)
 		return objective_type::destroy_unique;
 	} else if (str == "destroy_faction") {
 		return objective_type::destroy_faction;
+	} else if (str == "found_faction") {
+		return objective_type::found_faction;
 	}
 
 	throw std::runtime_error("Invalid objective type: \"" + str + "\".");
@@ -91,6 +94,8 @@ inline std::string objective_type_to_string(const objective_type objective_type)
 			return "destroy_unique";
 		case objective_type::destroy_faction:
 			return "destroy_faction";
+		case objective_type::found_faction:
+			return "found_faction";
 		default:
 			break;
 	}

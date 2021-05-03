@@ -804,6 +804,7 @@ set(wyrmgus_quest_objective_HDRS
 	src/quest/objective/destroy_unique_objective.h
 	src/quest/objective/destroy_unit_objective_base.h
 	src/quest/objective/destroy_units_objective.h
+	src/quest/objective/found_faction_objective.h
 	src/quest/objective/gather_resource_objective.h
 	src/quest/objective/have_resource_objective.h
 	src/quest/objective/hero_must_survive_objective.h

@@ -236,6 +236,9 @@ public:
 		return this->get_titled_name(this->get_default_government_type(), this->get_default_tier());
 	}
 
+	bool develops_from_faction(const faction *faction, const bool include_indirect) const;
+	bool develops_to_faction(const faction *faction, const bool include_indirect) const;
+
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int get_force_type_weight(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<ai_force_template>> &get_ai_force_templates(const ai_force_type force_type) const;
