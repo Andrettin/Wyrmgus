@@ -245,11 +245,9 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 			unit.SetIndividualUpgrade(civilization_upgrade, 0);
 		}
 	}
-	if (oldtype.get_civilization() != nullptr && oldtype.get_faction() != nullptr && !oldtype.get_faction()->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(oldtype.get_faction()->FactionUpgrade);
-		if (faction_upgrade) {
-			unit.SetIndividualUpgrade(faction_upgrade, 0);
-		}
+	if (oldtype.get_civilization() != nullptr && oldtype.get_faction() != nullptr && oldtype.get_faction()->get_upgrade() != nullptr) {
+		const CUpgrade *faction_upgrade = oldtype.get_faction()->get_upgrade();
+		unit.SetIndividualUpgrade(faction_upgrade, 0);
 	}
 	if (newtype.get_civilization() != nullptr) {
 		CUpgrade *civilization_upgrade = newtype.get_civilization()->get_upgrade();
@@ -257,11 +255,9 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 			unit.SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (newtype.get_civilization() != nullptr && newtype.get_faction() != nullptr && !newtype.get_faction()->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(newtype.get_faction()->FactionUpgrade);
-		if (faction_upgrade) {
-			unit.SetIndividualUpgrade(faction_upgrade, 1);
-		}
+	if (newtype.get_civilization() != nullptr && newtype.get_faction() != nullptr && newtype.get_faction()->get_upgrade() != nullptr) {
+		const CUpgrade *faction_upgrade = newtype.get_faction()->get_upgrade();
+		unit.SetIndividualUpgrade(faction_upgrade, 1);
 	}
 	
 	//deequip the current equipment if they are incompatible with the new unit type

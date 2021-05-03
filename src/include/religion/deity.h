@@ -58,7 +58,7 @@ class deity final : public detailed_data_entry, public data_type<deity>
 	Q_PROPERTY(wyrmgus::world* homeworld MEMBER homeworld READ get_homeworld)
 	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
 	Q_PROPERTY(wyrmgus::character* mother READ get_mother WRITE set_mother)
-	Q_PROPERTY(CUpgrade* upgrade READ get_upgrade WRITE set_upgrade)
+	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade WRITE set_upgrade)
 	Q_PROPERTY(QVariantList civilizations READ get_civilizations_qvariant_list)
 	Q_PROPERTY(QVariantList religions READ get_religions_qvariant_list)
 	Q_PROPERTY(QVariantList domains READ get_domains_qvariant_list)
@@ -123,7 +123,7 @@ public:
 	wyrmgus::character *get_mother() const;
 	void set_mother(wyrmgus::character *character);
 
-	CUpgrade *get_upgrade() const
+	const CUpgrade *get_upgrade() const
 	{
 		return this->upgrade;
 	}

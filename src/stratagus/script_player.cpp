@@ -1532,7 +1532,7 @@ static int CclDefineFaction(lua_State *l)
 				faction->character_title_names[title][government_type][tier][gender] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "FactionUpgrade")) {
-			faction->FactionUpgrade = LuaToString(l, -1);
+			faction->upgrade = CUpgrade::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "ButtonIcons")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2144,7 +2144,11 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushboolean(l, faction->Playable);
 		return 1;
 	} else if (!strcmp(data, "FactionUpgrade")) {
-		lua_pushstring(l, faction->FactionUpgrade.c_str());
+		if (faction->get_upgrade() != nullptr) {
+			lua_pushstring(l, faction->get_upgrade()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "ParentFaction")) {
 		if (faction->get_parent_faction() != nullptr) {

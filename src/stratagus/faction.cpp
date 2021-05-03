@@ -155,8 +155,6 @@ void faction::process_sml_property(const sml_property &property)
 
 	if (key == "adjective") {
 		this->Adjective = value;
-	} else if (key == "faction_upgrade") {
-		this->FactionUpgrade = value;
 	} else {
 		data_entry::process_sml_property(property);
 	}
@@ -235,8 +233,8 @@ void faction::initialize()
 	if (this->get_parent_faction() != nullptr) {
 		const faction *parent_faction = this->get_parent_faction();
 
-		if (this->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
-			this->FactionUpgrade = parent_faction->FactionUpgrade;
+		if (this->upgrade == nullptr) { //if the faction has no faction upgrade, inherit that of its parent faction
+			this->upgrade = parent_faction->upgrade;
 		}
 
 		//inherit button icons from parent civilization, for button actions which none are specified
@@ -319,8 +317,8 @@ std::string faction::get_encyclopedia_text() const
 	named_data_entry::concatenate_encyclopedia_text(text, "Type: " + get_faction_type_name(this->get_type()));
 	named_data_entry::concatenate_encyclopedia_text(text, "Color: " + this->get_color()->get_name());
 
-	if (!this->FactionUpgrade.empty()) {
-		named_data_entry::concatenate_encyclopedia_text(text, "Effects: " + CUpgrade::get(this->FactionUpgrade)->get_effects_string());
+	if (this->get_upgrade() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Effects: " + this->get_upgrade()->get_effects_string());
 	}
 
 	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());

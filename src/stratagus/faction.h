@@ -79,6 +79,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(wyrmgus::faction_tier min_tier MEMBER min_tier READ get_min_tier)
 	Q_PROPERTY(wyrmgus::faction_tier max_tier MEMBER max_tier READ get_max_tier)
 	Q_PROPERTY(wyrmgus::government_type default_government_type MEMBER default_government_type READ get_default_government_type)
+	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade)
 	Q_PROPERTY(wyrmgus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
 	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
@@ -184,6 +185,11 @@ public:
 	player_color *get_color() const
 	{
 		return this->color;
+	}
+
+	const CUpgrade *get_upgrade() const
+	{
+		return this->upgrade;
 	}
 
 	site *get_default_capital() const
@@ -339,7 +345,6 @@ signals:
 	void changed();
 
 public:
-	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
 	int ID = -1;														/// faction ID
@@ -360,6 +365,7 @@ public:
 private:
 	deity *holy_order_deity = nullptr; //deity this faction belongs to, if it is a holy order
 	player_color *color = nullptr; /// faction color
+	CUpgrade *upgrade = nullptr; //upgrade applied when the faction is set to a player
 	site *default_capital = nullptr;
 	bool simple_name = false;
 	bool short_name = false;

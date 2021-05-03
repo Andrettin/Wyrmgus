@@ -1230,8 +1230,8 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	}
 
 	if (this->get_faction() != nullptr) {
-		if (!this->get_faction()->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::get(this->get_faction()->FactionUpgrade)->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::get(this->get_faction()->FactionUpgrade)->ID);
+		if (this->get_faction()->get_upgrade() != nullptr && this->Allow.Upgrades[this->get_faction()->get_upgrade()->ID] == 'R') {
+			UpgradeLost(*this, this->get_faction()->get_upgrade()->ID);
 		}
 
 		const CUpgrade *faction_type_upgrade = wyrmgus::defines::get()->get_faction_type_upgrade(this->get_faction()->get_type());
@@ -1356,8 +1356,8 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 			this->update_territory_tiles();
 		}
 
-		if (!this->get_faction()->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::try_get(this->get_faction()->FactionUpgrade);
+		if (this->get_faction()->get_upgrade() != nullptr) {
+			const CUpgrade *faction_upgrade = this->get_faction()->get_upgrade();
 			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
 				if (GameEstablishing) {
 					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
@@ -1936,8 +1936,8 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 		return false;
 	}
 
-	if (!faction->FactionUpgrade.empty()) {
-		const CUpgrade *faction_upgrade = CUpgrade::get(faction->FactionUpgrade);
+	if (faction->get_upgrade() != nullptr) {
+		const CUpgrade *faction_upgrade = faction->get_upgrade();
 		if (!check_conditions<preconditions_only>(faction_upgrade, this, false)) {
 			return false;
 		}

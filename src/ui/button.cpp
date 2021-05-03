@@ -479,8 +479,8 @@ void button::SetTriggerData() const
 			break;
 		case ButtonCmd::Faction:
 			TriggerData.faction = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[this->Value];
-			if (!TriggerData.faction->FactionUpgrade.empty()) {
-				TriggerData.Upgrade = CUpgrade::try_get(CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[this->Value]->FactionUpgrade);
+			if (TriggerData.faction->get_upgrade() != nullptr) {
+				TriggerData.Upgrade = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[this->Value]->get_upgrade();
 			}
 			break;
 		case ButtonCmd::Dynasty:

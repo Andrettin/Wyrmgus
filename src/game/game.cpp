@@ -600,8 +600,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (faction->get_color() != nullptr) {
 				f->printf("\tColor = \"%s\",\n", faction->get_color()->get_identifier().c_str());
 			}
-			if (!faction->FactionUpgrade.empty()) {
-				f->printf("\tFactionUpgrade = \"%s\",\n", faction->FactionUpgrade.c_str());
+			if (faction->get_upgrade() != nullptr) {
+				f->printf("\tFactionUpgrade = \"%s\",\n", faction->get_upgrade()->get_identifier().c_str());
 			}
 			f->printf("\tMod = \"%s\"\n", mod_file.c_str());
 			f->printf("})\n\n");

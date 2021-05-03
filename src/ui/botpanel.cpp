@@ -422,8 +422,8 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	const CUpgrade *upgrade = nullptr;
 	if (button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility) {
 		upgrade = button.get_value_upgrade(Selected[0]);
-	} else if (button.Action == ButtonCmd::Faction && !CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
-		upgrade = CUpgrade::get(CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button.Value]->FactionUpgrade);
+	} else if (button.Action == ButtonCmd::Faction && CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button.Value]->get_upgrade() != nullptr) {
+		upgrade = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button.Value]->get_upgrade();
 	} else if (button.Action == ButtonCmd::Dynasty && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button.Value]->get_upgrade() != nullptr) {
 		upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button.Value]->get_upgrade();
 	}

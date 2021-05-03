@@ -986,11 +986,9 @@ void CUnit::apply_character_properties()
 			this->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (this->Type->get_faction() != nullptr && !this->Type->get_faction()->FactionUpgrade.empty()) {
-		const CUpgrade *faction_upgrade = CUpgrade::try_get(this->Type->get_faction()->FactionUpgrade);
-		if (faction_upgrade != nullptr) {
-			this->SetIndividualUpgrade(faction_upgrade, 1);
-		}
+	if (this->Type->get_faction() != nullptr && this->Type->get_faction()->get_upgrade() != nullptr) {
+		const CUpgrade *faction_upgrade = this->Type->get_faction()->get_upgrade();
+		this->SetIndividualUpgrade(faction_upgrade, 1);
 	}
 
 	if (this->get_character()->get_trait() != nullptr) { //set trait
@@ -3131,11 +3129,9 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (unit->Type->get_faction() != nullptr && !unit->Type->get_faction()->FactionUpgrade.empty()) {
-		const CUpgrade *faction_upgrade = CUpgrade::try_get(unit->Type->get_faction()->FactionUpgrade);
-		if (faction_upgrade != nullptr) {
-			unit->SetIndividualUpgrade(faction_upgrade, 1);
-		}
+	if (unit->Type->get_faction() != nullptr && unit->Type->get_faction()->get_upgrade() != nullptr) {
+		const CUpgrade *faction_upgrade = unit->Type->get_faction()->get_upgrade();
+		unit->SetIndividualUpgrade(faction_upgrade, 1);
 	}
 
 	//generate a trait for the unit, if any are available (only if the editor isn't running)
@@ -4906,7 +4902,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 				&& (!modifier_upgrade->is_boots() || EquippedItems[static_cast<int>(wyrmgus::item_slot::boots)].size() == 0)
 				&& (!modifier_upgrade->is_arrows() || EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)].size() == 0)
 				&& !(newplayer.Race != -1 && modifier_upgrade == wyrmgus::civilization::get_all()[newplayer.Race]->get_upgrade())
-				&& !(newplayer.Race != -1 && newplayer.get_faction() != nullptr && modifier_upgrade->get_identifier() == newplayer.get_faction()->FactionUpgrade)
+				&& !(newplayer.Race != -1 && newplayer.get_faction() != nullptr && modifier_upgrade == newplayer.get_faction()->get_upgrade())
 			) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
