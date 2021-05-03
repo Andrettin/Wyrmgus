@@ -246,6 +246,10 @@ int campaign::get_tree_relative_x(const std::vector<const campaign *> &siblings)
 			break;
 		}
 
+		if (campaign->is_hidden()) {
+			continue;
+		}
+
 		relative_x += campaign->get_tree_width();
 	}
 
@@ -266,6 +270,10 @@ int campaign::get_tree_width() const
 	int children_width = 0;
 
 	for (const campaign *campaign : this->tree_children) {
+		if (campaign->is_hidden()) {
+			continue;
+		}
+
 		children_width += campaign->get_tree_width();
 	}
 
