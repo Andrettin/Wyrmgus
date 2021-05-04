@@ -54,6 +54,7 @@
 #include "script/condition/equipment_condition.h"
 #include "script/condition/faction_condition.h"
 #include "script/condition/location_condition.h"
+#include "script/condition/near_site_unit_condition.h"
 #include "script/condition/neutral_player_condition.h"
 #include "script/condition/not_condition.h"
 #include "script/condition/or_condition.h"
@@ -108,6 +109,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<equipment_condition>(value);
 	} else if (key == "faction") {
 		return std::make_unique<faction_condition>(value);
+	} else if (key == "near_site_unit") {
+		return std::make_unique<near_site_unit_condition>(value);
 	} else if (key == "quest") {
 		return std::make_unique<quest_condition>(value);
 	} else if (key == "random") {

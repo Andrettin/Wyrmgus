@@ -846,6 +846,7 @@ set(wyrmgus_script_condition_HDRS
 	src/script/condition/equipment_condition.h
 	src/script/condition/faction_condition.h
 	src/script/condition/location_condition.h
+	src/script/condition/near_site_unit_condition.h
 	src/script/condition/neutral_player_condition.h
 	src/script/condition/not_condition.h
 	src/script/condition/or_condition.h
