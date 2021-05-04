@@ -520,6 +520,10 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 					break;
 				default:
 					cost += mf->get_movement_cost();
+
+					if (unit.Variable[RAIL_SPEED_BONUS_INDEX].Value != 0 && mf->has_flag(tile_flag::railroad)) {
+						cost -= unit.Variable[RAIL_SPEED_BONUS_INDEX].Value;
+					}
 					break;
 			}
 
