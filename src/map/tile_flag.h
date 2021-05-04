@@ -50,7 +50,6 @@ enum class tile_flag : uint32_t {
 
 	road = 1 << 15,			/// Road (moves faster)
 	railroad = 1 << 16,		/// Railroad (moves faster)
-	no_rail = 1 << 17,		/// Marker that there's no railroad, used for rail movemasks
 	bridge = 1 << 18,		/// Bridge or raft
 
 	grass = 1 << 19,		/// Used for playing grass step sounds
@@ -106,8 +105,6 @@ inline tile_flag string_to_tile_flag(const std::string &tile_flag)
 		return tile_flag::railroad;
 	} else if (tile_flag == "road") {
 		return tile_flag::road;
-	} else if (tile_flag == "no-rail" || tile_flag == "no_rail") {
-		return tile_flag::no_rail;
 	} else if (tile_flag == "snow") {
 		return tile_flag::snow;
 	} else if (tile_flag == "stone_floor") {

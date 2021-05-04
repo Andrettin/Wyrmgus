@@ -6459,10 +6459,6 @@ bool CUnit::CanUseItem(CUnit *item) const
 			return false;
 		}
 		
-		if (this->Type->BoolFlag[RAIL_INDEX].value && !item->ConnectingDestination->HasAdjacentRailForUnitType(this->Type)) {
-			return false;
-		}
-		
 		if (this->Player == item->Player || this->Player->IsAllied(*item->Player) || item->Player->Type == PlayerNeutral) {
 			return true;
 		}

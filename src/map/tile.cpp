@@ -201,12 +201,6 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 
 	this->update_movement_cost();
 
-	if (this->has_flag(tile_flag::railroad)) {
-		this->Flags &= ~(tile_flag::no_rail);
-	} else {
-		this->Flags |= tile_flag::no_rail;
-	}
-
 	if (is_overlay && this->has_flag(tile_flag::underground) && this->has_flag(tile_flag::wall)) {
 		//underground walls are not passable by air units
 		this->Flags |= tile_flag::air_impassable;
@@ -269,12 +263,6 @@ void tile::RemoveOverlayTerrain()
 	}
 
 	this->update_movement_cost();
-
-	if (this->has_flag(tile_flag::railroad)) {
-		this->Flags &= ~(tile_flag::no_rail);
-	} else {
-		this->Flags |= tile_flag::no_rail;
-	}
 
 	if (this->get_terrain_feature() != nullptr) {
 		this->terrain_feature = nullptr;
@@ -477,9 +465,6 @@ void tile::Save(CFile &file) const
 	if (this->has_flag(tile_flag::road)) {
 		file.printf(", \"road\"");
 	}
-	if (this->has_flag(tile_flag::no_rail)) {
-		file.printf(", \"no-rail\"");
-	}
 	if (this->has_flag(tile_flag::snow)) {
 		file.printf(", \"snow\"");
 	}
@@ -677,8 +662,6 @@ void tile::parse(lua_State *l)
 			this->Flags |= tile_flag::railroad;
 		} else if (!strcmp(value, "road")) {
 			this->Flags |= tile_flag::road;
-		} else if (!strcmp(value, "no-rail")) {
-			this->Flags |= tile_flag::no_rail;
 		} else if (!strcmp(value, "snow")) {
 			this->Flags |= tile_flag::snow;
 		} else if (!strcmp(value, "stone_floor")) {

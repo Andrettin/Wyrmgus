@@ -1987,15 +1987,6 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 		}
 	}
 	
-	if (unit_type->BoolFlag[RAIL_INDEX].value) {
-		bool has_adjacent_rail = Selected[best_training_place]->HasAdjacentRailForUnitType(unit_type);
-		if (!has_adjacent_rail) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
-			PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
-			return;
-		}
-	}
-	
 	int unit_count = 1;
 	if (key_modifiers & Qt::ShiftModifier) {
 		unit_count = 5;

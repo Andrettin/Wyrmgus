@@ -284,17 +284,6 @@ void COrder_Train::Execute(CUnit &unit)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (nType.BoolFlag[RAIL_INDEX].value && !unit.HasAdjacentRailForUnitType(&nType)) {
-		if (&player == CPlayer::GetThisPlayer()) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
-			PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
-		}
-		unit.Wait = CYCLES_PER_SECOND * 10;
-		return;
-	}
-	//Wyrmgus end
-
-	//Wyrmgus start
 	int owner_player = this->Player;
 	if (this->Type->BoolFlag[ITEM_INDEX].value || this->Type->BoolFlag[POWERUP_INDEX].value) { //items and power-ups should always be owned by the neutral player
 		owner_player = PlayerNumNeutral;

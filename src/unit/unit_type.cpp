@@ -1923,10 +1923,6 @@ void unit_type::calculate_movement_mask()
 				// diminutive units can enter tiles occupied by other units and vice-versa
 				this->MovementMask |= tile_flag::land_unit | tile_flag::sea_unit;
 			}
-
-			if (this->BoolFlag[RAIL_INDEX].value) { //rail units can only move over railroads
-				this->MovementMask |= tile_flag::no_rail;
-			}
 			break;
 		case UnitTypeType::Fly:                               // in air
 			this->MovementMask = tile_flag::air_impassable | tile_flag::space_cliff | tile_flag::space | tile_flag::air_building;
