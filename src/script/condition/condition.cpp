@@ -46,6 +46,7 @@
 #include "script/condition/can_accept_quest_condition.h"
 #include "script/condition/character_condition.h"
 #include "script/condition/character_exists_condition.h"
+#include "script/condition/character_unit_condition.h"
 #include "script/condition/civilization_condition.h"
 #include "script/condition/civilization_group_condition.h"
 #include "script/condition/coastal_condition.h"
@@ -165,6 +166,8 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 		condition = std::make_unique<any_unit_of_class_condition>();
 	} else if (tag == "any_unit_of_type") {
 		condition = std::make_unique<any_unit_of_type_condition>();
+	} else if (tag == "character_unit") {
+		condition = std::make_unique<character_unit_condition>();
 	} else if (tag == "location") {
 		condition = std::make_unique<location_condition>();
 	} else if (tag == "or") {

@@ -837,6 +837,7 @@ set(wyrmgus_script_condition_HDRS
 	src/script/condition/can_accept_quest_condition.h
 	src/script/condition/character_condition.h
 	src/script/condition/character_exists_condition.h
+	src/script/condition/character_unit_condition.h
 	src/script/condition/civilization_condition.h
 	src/script/condition/civilization_group_condition.h
 	src/script/condition/coastal_condition.h
