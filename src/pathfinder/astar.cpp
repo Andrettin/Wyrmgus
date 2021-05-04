@@ -1005,7 +1005,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				  int tilesizex, int tilesizey, int minrange, int maxrange,
 				  //Wyrmgus start
 //				  std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit)
-                  std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int max_length, int z, bool allow_diagonal)
+                  std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int max_length, int z)
 				  //Wyrmgus end
 {
 	Assert(CMap::get()->Info.IsPointOnMap(startPos, z));
@@ -1015,7 +1015,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		return PF_UNREACHABLE;
 	}
 	
-	allow_diagonal = allow_diagonal && !unit.Type->BoolFlag[RAIL_INDEX].value; //rail units cannot move diagonally
+	const bool allow_diagonal = !unit.Type->BoolFlag[RAIL_INDEX].value; //rail units cannot move diagonally
 	//Wyrmgus end
 
 	AStarGoalX = goalPos.x;

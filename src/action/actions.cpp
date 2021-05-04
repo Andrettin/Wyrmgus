@@ -459,7 +459,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 					|| (unit.Variable[SWAMPSTALK_INDEX].Value > 0 && unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->has_flag(tile_flag::mud))
 				)
 				&& (unit.Variable[INVISIBLE_INDEX].Value > 0 || !unit.IsInCombat())
-			) {				
+			) {
 				std::vector<CUnit *> table;
 				SelectAroundUnit(unit, 1, table, IsEnemyWithUnit(&unit));
 				if (table.size() == 0) { //only apply the -stalk invisibility if the unit is not adjacent to an enemy unit

@@ -248,7 +248,7 @@ extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, in
 						 int tilesizex, int tilesizey, int minrange,
 						 //Wyrmgus start
 //						 int maxrange, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit);
-						 int maxrange, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int max_length, int z, bool allow_diagonal = true);
+						 int maxrange, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int max_length, int z);
 						 //Wyrmgus end
 //Wyrmgus end
 

@@ -6154,7 +6154,7 @@ bool CUnit::IsInCombat() const
 			return true;
 		}
 	}
-		
+	
 	return false;
 }
 
