@@ -521,8 +521,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				default:
 					cost += mf->get_movement_cost();
 
-					if (unit.Variable[RAIL_SPEED_BONUS_INDEX].Value != 0 && mf->has_flag(tile_flag::railroad)) {
-						cost -= unit.Variable[RAIL_SPEED_BONUS_INDEX].Value;
+					if (unit.Variable[RAIL_SPEED_BONUS_INDEX].Value != 0 && !mf->has_flag(tile_flag::railroad)) {
+						//add rail speed bonus to the cost for non-railroad tiles, as it is an implicit penalty for them
+						cost += unit.Variable[RAIL_SPEED_BONUS_INDEX].Value;
 					}
 					break;
 			}
