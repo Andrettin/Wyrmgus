@@ -959,7 +959,7 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 							   int, int, int minrange, int maxrange,
 							   //Wyrmgus start
 //							   std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit)
-							   std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int z, bool allow_diagonal)
+							   std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int z)
 							   //Wyrmgus end
 {
 	// At exact destination point already
@@ -983,7 +983,7 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 
 	//Wyrmgus start
 //	if (wyrmgus::number::fast_abs(diff.x) <= 1 && wyrmgus::number::fast_abs(diff.y) <= 1) {
-	if (minrange <= distance && wyrmgus::number::fast_abs(diff.x) <= 1 && wyrmgus::number::fast_abs(diff.y) <= 1 && (allow_diagonal || diff.x == 0 || diff.y == 0)) {
+	if (minrange <= distance && number::fast_abs(diff.x) <= 1 && number::fast_abs(diff.y) <= 1) {
 	//Wyrmgus end
 		// Move to adjacent cell
 		//Wyrmgus start
@@ -1018,8 +1018,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	if (unit.MapLayer->ID != z) {
 		return PF_UNREACHABLE;
 	}
-	
-	const bool allow_diagonal = !unit.Type->BoolFlag[RAIL_INDEX].value; //rail units cannot move diagonally
 	//Wyrmgus end
 
 	AStarGoalX = goalPos.x;
@@ -1029,7 +1027,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	int ret = AStarFindSimplePath(startPos, goalPos, gw, gh, tilesizex, tilesizey,
 								  //Wyrmgus start
 //								  minrange, maxrange, path, unit);
-								  minrange, maxrange, path, unit, z, allow_diagonal);
+								  minrange, maxrange, path, unit, z);
 								  //Wyrmgus end
 	if (ret != PF_FAILED) {
 		return ret;
@@ -1160,12 +1158,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		//Wyrmgus end
 
 		for (int i = 0; i < 8; ++i) {
-			//Wyrmgus start
-			if (!allow_diagonal && Heading2X[i] != 0 && Heading2Y[i] != 0) { //can't move diagonally
-				continue;
-			}
-			//Wyrmgus end
-			
 			endPos.x = x + Heading2X[i];
 			endPos.y = y + Heading2Y[i];
 

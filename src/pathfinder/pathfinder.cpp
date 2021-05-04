@@ -58,11 +58,6 @@ void TerrainTraversal::SetSize(unsigned int width, unsigned int height)
 	m_height = height;
 }
 
-void TerrainTraversal::SetDiagonalAllowed(const bool allowed)
-{
-	allow_diagonal = allowed;
-}
-
 void TerrainTraversal::Init()
 {
 	const unsigned int height = m_height;
@@ -99,9 +94,8 @@ void TerrainTraversal::PushNeighbor(const Vec2i &pos)
 {
 	static constexpr std::array<Vec2i, 8> offsets = { Vec2i(0, -1), Vec2i(-1, 0), Vec2i(1, 0), Vec2i(0, 1), Vec2i(-1, -1), Vec2i(1, -1), Vec2i(-1, 1), Vec2i(1, 1) };
 
-	int offsets_size = allow_diagonal ? 8 : 4;
-	for (int i = 0; i != offsets_size; ++i) {
-		const Vec2i newPos = pos + offsets[i];
+	for (const Vec2i &offset : offsets) {
+		const Vec2i newPos = pos + offset;
 
 		if (IsVisited(newPos) == false) {
 			m_queue.push(PosNode(newPos, pos));

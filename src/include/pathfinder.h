@@ -140,7 +140,6 @@ public:
 	using dataType = short int;
 
 	void SetSize(unsigned int width, unsigned int height);
-	void SetDiagonalAllowed(bool allowed);
 	void Init();
 
 	void PushPos(const Vec2i &pos);
@@ -177,7 +176,6 @@ private:
 	std::queue<PosNode> m_queue;
 	unsigned int m_extented_width;
 	unsigned int m_height;
-	bool allow_diagonal = true;
 };
 
 template <typename T>
