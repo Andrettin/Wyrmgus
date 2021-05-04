@@ -5723,17 +5723,26 @@ int CUnit::GetModifiedVariable(const int index, const VariableAttribute variable
 			const UnitTypeType unit_type_type = unit_type->UnitType;
 			if (unit_type_type != UnitTypeType::Fly && unit_type_type != UnitTypeType::FlyLow && unit_type_type != UnitTypeType::Space) {
 				int movement_cost = 0;
+				int tile_speed_bonus = 0;
 
 				for (int x = 0; x < unit_type->get_tile_width(); ++x) {
 					for (int y = 0; y < unit_type->get_tile_height(); ++y) {
-						movement_cost += map_layer->Field(this->tilePos + Vec2i(x, y))->get_movement_cost();
+						const tile *tile = map_layer->Field(this->tilePos + Vec2i(x, y));
+
+						movement_cost += tile->get_movement_cost();
+
+						if (this->Variable[RAIL_SPEED_BONUS_INDEX].Value != 0 && tile->has_flag(tile_flag::railroad)) {
+							tile_speed_bonus += this->Variable[RAIL_SPEED_BONUS_INDEX].Value;
+						}
 					}
 				}
 
 				const int tile_count = unit_type->get_tile_width() * unit_type->get_tile_height();
 				movement_cost /= tile_count;
+				tile_speed_bonus /= tile_count;
 
 				value += DefaultTileMovementCost - movement_cost;
+				value += tile_speed_bonus;
 			}
 			break;
 		}

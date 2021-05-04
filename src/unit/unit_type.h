@@ -385,7 +385,8 @@ enum {
 	TIMEEFFICIENCYBONUS_INDEX,
 	RESEARCHSPEEDBONUS_INDEX,
 	GARRISONEDRANGEBONUS_INDEX,
-	SPEEDBONUS_INDEX, // dummy variable for terrain types that increase movement speed, so that their bonus shows up correctly in the interface
+	SPEEDBONUS_INDEX, //dummy variable for terrain types that increase movement speed, so that their bonus shows up correctly in the interface
+	RAIL_SPEED_BONUS_INDEX, //speed bonus when in a rail tile
 	GATHERINGBONUS_INDEX,
 	COPPERGATHERINGBONUS_INDEX,
 	SILVERGATHERINGBONUS_INDEX,
