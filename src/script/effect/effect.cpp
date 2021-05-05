@@ -33,6 +33,7 @@
 #include "script/effect/accept_quest_effect.h"
 #include "script/effect/any_unit_of_type_effect.h"
 #include "script/effect/call_dialogue_effect.h"
+#include "script/effect/complete_quest_effect.h"
 #include "script/effect/create_unit_effect.h"
 #include "script/effect/delayed_effect.h"
 #include "script/effect/hidden_effect.h"
@@ -58,6 +59,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 	if constexpr (std::is_same_v<scope_type, CPlayer>) {
 		if (key == "accept_quest") {
 			return std::make_unique<accept_quest_effect>(value, effect_operator);
+		} else if (key == "complete_quest") {
+			return std::make_unique<complete_quest_effect>(value, effect_operator);
 		} else if (key == "create_unit") {
 			return std::make_unique<create_unit_effect>(value, effect_operator);
 		} else if (key == "remove_character") {
