@@ -861,6 +861,7 @@ set(wyrmgus_script_condition_HDRS
 	src/script/condition/scripted_condition_condition.h
 	src/script/condition/season_condition.h
 	src/script/condition/settlement_condition.h
+	src/script/condition/site_exists_condition.h
 	src/script/condition/terrain_condition.h
 	src/script/condition/time_of_day_condition.h
 	src/script/condition/trigger_condition.h
