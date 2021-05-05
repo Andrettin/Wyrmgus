@@ -33,10 +33,10 @@
 
 namespace wyrmgus {
 
-class near_site_unit_condition final : public condition
+class near_site_condition final : public condition
 {
 public:
-	explicit near_site_unit_condition(const std::string &value)
+	explicit near_site_condition(const std::string &value)
 	{
 		this->site = site::get(value);
 	}
@@ -53,17 +53,31 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
-		const CUnit *site_unit = this->site->get_game_data()->get_site_unit();
+		if (unit->MapLayer == nullptr) {
+			return false;
+		}
+		
+		const site_game_data *site_data = this->site->get_game_data();
 
-		if (site_unit == nullptr) {
+		if (!site_data->is_on_map()) {
 			return false;
 		}
-		
-		if (unit->MapLayer == nullptr || site_unit->MapLayer == nullptr || unit->MapLayer != site_unit->MapLayer) {
-			return false;
+
+		const CUnit *site_unit = site_data->get_site_unit();
+
+		if (site_unit != nullptr) {
+			if (site_unit->MapLayer == nullptr || unit->MapLayer != site_unit->MapLayer) {
+				return false;
+			}
+
+			return unit->MapDistanceTo(*site_unit) <= 1;
+		} else {
+			if (site_data->get_map_layer() == nullptr || unit->MapLayer != site_data->get_map_layer()) {
+				return false;
+			}
+
+			return unit->MapDistanceTo(site_data->get_map_pos(), site_data->get_map_layer()->ID) <= 1;
 		}
-		
-		return unit->MapDistanceTo(*site_unit) <= 1;
 	}
 
 	virtual std::string get_string(const size_t indent) const override
