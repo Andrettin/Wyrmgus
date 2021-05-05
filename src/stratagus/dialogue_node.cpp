@@ -66,6 +66,8 @@ void dialogue_node::process_sml_property(const sml_property &property)
 		this->speaker_unit_type = unit_type::get(value);
 	} else if (key == "speaker_faction") {
 		this->speaker_faction = faction::get(value);
+	} else if (key == "speaker_index") {
+		this->speaker_index = std::stoul(value);
 	} else if (key == "option") {
 		this->option_pointers.push_back(this->get_dialogue()->get_option(value));
 	} else {
@@ -147,7 +149,8 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 			FindPlayerUnitsByType(*speaker_player, *this->speaker_unit_type, potential_speaker_units);
 
 			if (!potential_speaker_units.empty()) {
-				speaker_unit = vector::get_random(potential_speaker_units);
+				const size_t index = std::min(potential_speaker_units.size() - 1, this->speaker_index);
+				speaker_unit = potential_speaker_units.at(index);
 			}
 		}
 	}

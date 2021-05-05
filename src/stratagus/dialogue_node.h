@@ -78,6 +78,7 @@ private:
 	const unit_type *speaker_unit_type = nullptr;
 	std::string speaker_name;
 	const faction *speaker_faction = nullptr; //faction of the player to whom the speaker belongs
+	size_t speaker_index = 0;
 	std::string text;
 	std::unique_ptr<const and_condition> conditions;
 public:
