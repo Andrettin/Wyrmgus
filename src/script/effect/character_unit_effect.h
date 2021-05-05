@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,64 +26,59 @@
 
 #pragma once
 
-#include "script/effect/effect.h"
-#include "script/effect/effect_list.h"
+#include "character.h"
+#include "script/effect/scope_effect.h"
 
 namespace wyrmgus {
 
-template <typename upper_scope_type, typename scope_type>
-class scope_effect_base : public effect<upper_scope_type>
+template <typename scope_type>
+class character_unit_effect final : public scope_effect<scope_type, CUnit>
 {
 public:
-	explicit scope_effect_base(const sml_operator effect_operator) : effect<upper_scope_type>(effect_operator)
+	explicit character_unit_effect(const sml_operator effect_operator) : scope_effect<scope_type, CUnit>(effect_operator)
 	{
-		if (effect_operator != sml_operator::assignment) {
-			throw std::runtime_error("Scope effects can only have the assignment operator as their operator.");
-		}
+	}
+
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "character_unit";
+		return class_identifier;
 	}
 
 	virtual void process_sml_property(const sml_property &property) override
 	{
-		this->effects.process_sml_property(property);
-	}
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
 
-	virtual void process_sml_scope(const sml_data &scope) override final
-	{
-		this->effects.process_sml_scope(scope);
+		if (key == "character") {
+			this->character = character::get(value);
+		} else {
+			scope_effect<scope_type, CUnit>::process_sml_property(property);
+		}
 	}
 
 	virtual void check() const override
 	{
-		this->effects.check();
-	}
-
-	void do_scope_effect(scope_type *scope, const context &ctx) const
-	{
-		if (scope == nullptr) {
-			return;
+		if (this->character == nullptr) {
+			throw std::runtime_error("\"character_unit\" effect has no character set for it.");
 		}
-
-		this->effects.do_effects(scope, ctx);
 	}
 
-	virtual std::string get_scope_name() const = 0;
-
-	virtual const scope_type *get_effects_string_scope(const upper_scope_type *upper_scope) const
+	virtual std::string get_scope_name() const override
+	{
+		return string::highlight(this->character->get_full_name());
+	}
+	
+	virtual CUnit *get_scope(const scope_type *upper_scope) const override
 	{
 		Q_UNUSED(upper_scope)
 
-		return nullptr;
-	}
-
-	std::string get_assignment_string(const upper_scope_type *upper_scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override final
-	{
-		std::string str = this->get_scope_name() + ":\n";
-		str += this->effects.get_effects_string(this->get_effects_string_scope(upper_scope), ctx, indent + 1, prefix);
-		return str;
+		CUnit *character_unit = this->character->get_unit();
+		return character_unit;
 	}
 
 private:
-	effect_list<scope_type> effects;
+	const wyrmgus::character *character = nullptr;
 };
 
 }
