@@ -385,6 +385,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	int earth_damage = attacker.Variable[EARTHDAMAGE_INDEX].Value;
 	int water_damage = attacker.Variable[WATERDAMAGE_INDEX].Value;
 	int acid_damage = attacker.Variable[ACIDDAMAGE_INDEX].Value;
+	int shadow_damage = attacker.Variable[SHADOW_DAMAGE_INDEX].Value;
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -435,11 +436,13 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	if (missile && missile->AlwaysCritical) {
 		critical_strike_chance = 100;
 	}
+
 	if (critical_strike_chance > 0) {
 		if (SyncRand(100) < critical_strike_chance) {
 			damage_modifier += 100;
 		}
 	}
+
 	if (goal != nullptr) {
 		// apply resistances to fire/cold damage
 		fire_damage *= 100 - goal->Variable[FIRERESISTANCE_INDEX].Value;
@@ -458,6 +461,8 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		water_damage /= 100;
 		acid_damage *= 100 - goal->Variable[ACIDRESISTANCE_INDEX].Value;
 		acid_damage /= 100;
+		shadow_damage *= 100 - goal->Variable[SHADOW_RESISTANCE_INDEX].Value;
+		shadow_damage /= 100;
 		
 		// extra backstab damage (only works against units (that are organic and non-building, and that have 8 facing directions) facing opposite to the attacker
 		if (attacker.Variable[BACKSTAB_INDEX].Value > 0 && goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->BoolFlag[BUILDING_INDEX].value && goal->Type->get_num_directions() == 8) {
@@ -510,6 +515,8 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		water_damage /= 100;
 		acid_damage *= 100 - goal_stats.Variables[ACIDRESISTANCE_INDEX].Value;
 		acid_damage /= 100;
+		shadow_damage *= 100 - goal_stats.Variables[SHADOW_RESISTANCE_INDEX].Value;
+		shadow_damage /= 100;
 	}
 	
 	basic_damage *= damage_modifier;
@@ -523,6 +530,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	piercing_damage += earth_damage;
 	piercing_damage += water_damage;
 	piercing_damage += acid_damage;
+	piercing_damage += shadow_damage;
 	piercing_damage *= damage_modifier;
 	piercing_damage /= 100;
 	//Wyrmgus end

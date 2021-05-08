@@ -56,6 +56,7 @@ private:
 	int EarthDamage = 0;
 	int WaterDamage = 0;
 	int AcidDamage = 0;
+	int ShadowDamage = 0;
 	bool HackDamage = false;
 	bool PierceDamage = false;
 	bool BluntDamage = false;
