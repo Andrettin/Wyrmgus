@@ -3580,7 +3580,7 @@ void CUnit::UpdateSettlement()
 	}
 	
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == settlement_site_unit_type) {
-		if (!this->settlement) {
+		if (this->settlement == nullptr && GameEstablishing) {
 			const wyrmgus::civilization *civilization = this->get_civilization();
 			
 			const wyrmgus::faction *faction = this->Type->get_faction();
