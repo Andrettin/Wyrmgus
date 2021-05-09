@@ -115,7 +115,11 @@ void engine_interface::post(const std::function<void()> &function)
 void engine_interface::call_lua_command(const QString &command)
 {
 	this->post([command]() {
-		CclCommand(command.toStdString());
+		try {
+			CclCommand(command.toStdString());
+		} catch (const std::exception &exception) {
+			exception::report(exception);
+		}
 	});
 }
 

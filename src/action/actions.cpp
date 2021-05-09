@@ -390,12 +390,14 @@ static bool HandleBurnAndPoison(CUnit &unit)
 		//Wyrmgus end
 		return true;
 	}
+
 	//Wyrmgus start
 	if (unit.Variable[BLEEDING_INDEX].Value || unit.Variable[DEHYDRATION_INDEX].Value) {
 		HitUnit(NoUnitP, unit, 1, nullptr, false);
 		//don't return true since we don't want to stop regeneration (positive or negative) from happening
 	}
 	//Wyrmgus end
+
 	return false;
 }
 
