@@ -31,6 +31,7 @@
 #include "character.h"
 #include "faction.h"
 #include "map/site.h"
+#include "quest/objective/bring_unit_to_site_objective.h"
 #include "quest/objective/build_units_objective.h"
 #include "quest/objective/destroy_faction_objective.h"
 #include "quest/objective/destroy_hero_objective.h"
@@ -52,7 +53,9 @@ namespace wyrmgus {
 
 std::unique_ptr<quest_objective> quest_objective::try_from_identifier(const std::string &identifier, const wyrmgus::quest *quest)
 {
-	if (identifier == "build_units") {
+	if (identifier == "bring_unit_to_site") {
+		return std::make_unique<bring_unit_to_site_objective>(quest);
+	} else if (identifier == "build_units") {
 		return std::make_unique<build_units_objective>(quest);
 	} else if (identifier == "destroy_faction") {
 		return std::make_unique<destroy_faction_objective>(quest);

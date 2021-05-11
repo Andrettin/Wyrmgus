@@ -6971,6 +6971,35 @@ wyrmgus::gender CUnit::get_gender() const
 	return static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value);
 }
 
+bool CUnit::is_near_site(const wyrmgus::site *site) const
+{
+	if (this->MapLayer == nullptr) {
+		return false;
+	}
+
+	const site_game_data *site_data = site->get_game_data();
+
+	if (!site_data->is_on_map()) {
+		return false;
+	}
+
+	const CUnit *site_unit = site_data->get_site_unit();
+
+	if (site_unit != nullptr) {
+		if (site_unit->MapLayer == nullptr || this->MapLayer != site_unit->MapLayer) {
+			return false;
+		}
+
+		return this->MapDistanceTo(*site_unit) <= 1;
+	} else {
+		if (site_data->get_map_layer() == nullptr || this->MapLayer != site_data->get_map_layer()) {
+			return false;
+		}
+
+		return this->MapDistanceTo(site_data->get_map_pos(), site_data->get_map_layer()->ID) <= 1;
+	}
+}
+
 /**
 **  Let an unit die.
 **

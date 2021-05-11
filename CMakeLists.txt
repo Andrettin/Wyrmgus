@@ -798,6 +798,7 @@ set(wyrmgus_quest_HDRS
 )
 
 set(wyrmgus_quest_objective_HDRS
+	src/quest/objective/bring_unit_to_site_objective.h
 	src/quest/objective/build_units_objective.h
 	src/quest/objective/destroy_faction_objective.h
 	src/quest/objective/destroy_hero_objective.h

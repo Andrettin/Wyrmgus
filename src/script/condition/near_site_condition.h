@@ -53,38 +53,14 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
-		if (unit->MapLayer == nullptr) {
-			return false;
-		}
-		
-		const site_game_data *site_data = this->site->get_game_data();
-
-		if (!site_data->is_on_map()) {
-			return false;
-		}
-
-		const CUnit *site_unit = site_data->get_site_unit();
-
-		if (site_unit != nullptr) {
-			if (site_unit->MapLayer == nullptr || unit->MapLayer != site_unit->MapLayer) {
-				return false;
-			}
-
-			return unit->MapDistanceTo(*site_unit) <= 1;
-		} else {
-			if (site_data->get_map_layer() == nullptr || unit->MapLayer != site_data->get_map_layer()) {
-				return false;
-			}
-
-			return unit->MapDistanceTo(site_data->get_map_pos(), site_data->get_map_layer()->ID) <= 1;
-		}
+		return unit->is_near_site(this->site);
 	}
 
 	virtual std::string get_string(const size_t indent) const override
 	{
 		Q_UNUSED(indent)
 
-		return "Near the " + string::highlight(this->site->get_game_data()->get_current_cultural_name()) + " site unit";
+		return "Near the " + string::highlight(this->site->get_game_data()->get_current_cultural_name()) + " site";
 	}
 
 private:

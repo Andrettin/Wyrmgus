@@ -676,6 +676,8 @@ public:
 		this->step_count = 0;
 	}
 
+	bool is_near_site(const wyrmgus::site *site) const;
+
 public:
 	class CUnitManagerData final
 	{
