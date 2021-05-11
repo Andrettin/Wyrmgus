@@ -32,6 +32,7 @@ class CUpgrade;
 
 namespace wyrmgus {
 
+class site;
 class upgrade_class;
 
 class civilization_history final : public data_entry_history
@@ -40,6 +41,7 @@ class civilization_history final : public data_entry_history
 
 	Q_PROPERTY(std::vector<const wyrmgus::upgrade_class *> acquired_upgrade_classes READ get_acquired_upgrade_classes)
 	Q_PROPERTY(std::vector<const CUpgrade *> acquired_upgrades READ get_acquired_upgrades)
+	Q_PROPERTY(std::vector<const wyrmgus::site *> explored_settlements READ get_explored_settlements)
 
 public:
 	const std::vector<const upgrade_class *> &get_acquired_upgrade_classes() const
@@ -66,9 +68,22 @@ public:
 
 	Q_INVOKABLE void remove_acquired_upgrade(const CUpgrade *upgrade);
 
+	const std::vector<const site *> &get_explored_settlements() const
+	{
+		return this->explored_settlements;
+	}
+
+	Q_INVOKABLE void add_explored_settlement(const site *settlement)
+	{
+		this->explored_settlements.push_back(settlement);
+	}
+
+	Q_INVOKABLE void remove_explored_settlement(const site *settlement);
+
 private:
 	std::vector<const upgrade_class *> acquired_upgrade_classes;
 	std::vector<const CUpgrade *> acquired_upgrades;
+	std::vector<const site *> explored_settlements;
 };
 
 }

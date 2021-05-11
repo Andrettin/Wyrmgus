@@ -45,4 +45,9 @@ void civilization_history::remove_acquired_upgrade(const CUpgrade *upgrade)
 	vector::remove(this->acquired_upgrades, upgrade);
 }
 
+void civilization_history::remove_explored_settlement(const site *settlement)
+{
+	vector::remove(this->explored_settlements, settlement);
+}
+
 }

@@ -866,13 +866,13 @@ unsigned char tile_player_info::TeamVisibilityState(const CPlayer &player) const
 
 bool tile_player_info::IsExplored(const CPlayer &player) const
 {
-	return Visible[player.Index] != 0;
+	return this->Visible[player.Index] != 0;
 }
 
 //Wyrmgus start
 bool tile_player_info::IsTeamExplored(const CPlayer &player) const
 {
-	return Visible[player.Index] != 0 || TeamVisibilityState(player) != 0;
+	return this->Visible[player.Index] != 0 || this->TeamVisibilityState(player) != 0;
 }
 //Wyrmgus end
 

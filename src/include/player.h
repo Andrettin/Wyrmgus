@@ -1002,6 +1002,8 @@ public:
 	void apply_history(const CDate &start_date);
 	void apply_civilization_history(const wyrmgus::civilization_base *civilization);
 
+	void add_settlement_to_explored_territory(const site *settlement);
+
 private:
 	std::vector<CUnit *> Units; /// units of this player
 	CUnit *last_created_unit = nullptr;

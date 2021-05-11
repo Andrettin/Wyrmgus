@@ -531,6 +531,9 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_name == "upgrades") {
 		CUpgrade *upgrade_value = CUpgrade::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(CUpgrade *, upgrade_value));
+	} else if (property_class_name == "std::vector<const wyrmgus::site*>") {
+		const site *site_value = site::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const site *, site_value));
 	} else if (property_class_name == "std::vector<const CUpgrade*>") {
 		const CUpgrade *upgrade_value = CUpgrade::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const CUpgrade *, upgrade_value));

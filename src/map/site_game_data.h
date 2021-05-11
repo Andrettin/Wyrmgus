@@ -97,6 +97,11 @@ public:
 		return this->get_map_layer() != nullptr && this->get_map_pos() != QPoint(-1, -1);
 	}
 
+	const QRect &get_territory_rect() const
+	{
+		return this->territory_rect;
+	}
+
 	void process_territory_tile(const tile *tile, const QPoint &tile_pos, const int z);
 
 	void add_border_tile(const QPoint &tile_pos)

@@ -69,6 +69,7 @@
 #include "map/minimap.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
+#include "map/tile.h"
 #include "map/tile_flag.h"
 #include "network.h"
 #include "netconnect.h"
@@ -1121,6 +1122,10 @@ void CPlayer::apply_history(const CDate &start_date)
 		const int quantity = kv_pair.second;
 		this->set_resource(resource, quantity, resource_storage_type::overall);
 	}
+
+	for (const site *settlement : faction_history->get_explored_settlements()) {
+		this->add_settlement_to_explored_territory(settlement);
+	}
 }
 
 void CPlayer::apply_civilization_history(const wyrmgus::civilization_base *civilization)
@@ -1148,6 +1153,45 @@ void CPlayer::apply_civilization_history(const wyrmgus::civilization_base *civil
 	for (const CUpgrade *upgrade : civilization_history->get_acquired_upgrades()) {
 		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
 			UpgradeAcquire(*this, upgrade);
+		}
+	}
+
+	for (const site *settlement : civilization_history->get_explored_settlements()) {
+		this->add_settlement_to_explored_territory(settlement);
+	}
+}
+
+void CPlayer::add_settlement_to_explored_territory(const site *settlement)
+{
+	if (!settlement->is_settlement()) {
+		return;
+	}
+
+	const site_game_data *settlement_data = settlement->get_game_data();
+
+	if (!settlement_data->is_on_map()) {
+		return;
+	}
+
+	const CUnit *settlement_unit = settlement_data->get_site_unit();
+	const CMapLayer *map_layer = settlement_unit->MapLayer;
+
+	for (int x = settlement_data->get_territory_rect().x(); x <= settlement_data->get_territory_rect().right(); ++x) {
+		for (int y = settlement_data->get_territory_rect().y(); y <= settlement_data->get_territory_rect().bottom(); ++y) {
+			const QPoint tile_pos(x, y);
+			const tile *tile = map_layer->Field(tile_pos);
+
+			if (tile->get_settlement() != settlement) {
+				continue;
+			}
+
+			const std::unique_ptr<tile_player_info> &tile_player_info = tile->player_info;
+
+			if (tile_player_info->IsExplored(*this)) {
+				continue;
+			}
+
+			tile_player_info->Visible[this->get_index()] = 1;
 		}
 	}
 }
