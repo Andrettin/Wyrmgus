@@ -29,6 +29,7 @@
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "script/condition/condition.h"
+#include "unit/unit.h"
 #include "util/string_util.h"
 
 namespace wyrmgus {
