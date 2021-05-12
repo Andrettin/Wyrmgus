@@ -224,6 +224,10 @@ void engine_interface::load_map_infos()
 		const std::vector<std::filesystem::path> map_paths = database::get()->get_maps_paths();
 
 		for (const std::filesystem::path &map_path : map_paths) {
+			if (!std::filesystem::exists(map_path)) {
+				continue;
+			}
+
 			std::filesystem::recursive_directory_iterator dir_iterator(map_path);
 
 			for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
