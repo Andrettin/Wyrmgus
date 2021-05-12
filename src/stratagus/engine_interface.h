@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "util/qunique_ptr.h"
 #include "util/singleton.h"
 
 namespace boost::asio {
@@ -36,6 +37,7 @@ namespace wyrmgus {
 
 class defines;
 class game;
+class map_info;
 class parameters;
 class preferences;
 
@@ -182,6 +184,10 @@ public:
 	Q_INVOKABLE QVariantList get_visible_campaigns() const;
 	Q_INVOKABLE QVariantList get_playable_civilizations() const;
 
+	Q_INVOKABLE void load_map_infos();
+	Q_INVOKABLE void clear_map_infos();
+	Q_INVOKABLE QVariantList get_map_infos() const;
+
 	Q_INVOKABLE QVariantList get_building_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_civilization_encyclopedia_entries() const;
@@ -214,6 +220,7 @@ private:
 	std::mutex input_event_mutex;
 	QString loading_message; //the loading message to be displayed
 	mutable std::shared_mutex loading_message_mutex;
+	std::vector<qunique_ptr<map_info>> map_infos;
 };
 
 }

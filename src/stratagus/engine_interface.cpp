@@ -39,6 +39,8 @@
 #include "game_concept.h"
 #include "item/unique_item.h"
 #include "literary_text.h"
+#include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/world.h"
 #include "quest/campaign.h"
@@ -212,6 +214,40 @@ QVariantList engine_interface::get_playable_civilizations() const
 	});
 
 	return container::to_qvariant_list(playable_civilizations);
+}
+
+void engine_interface::load_map_infos()
+{
+	const std::vector<std::filesystem::path> map_paths = database::get()->get_maps_paths();
+
+	for (const std::filesystem::path &map_path : map_paths) {
+		std::filesystem::recursive_directory_iterator dir_iterator(map_path);
+
+		for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
+			if (!dir_entry.is_regular_file() || dir_entry.path().extension() != ".smp") {
+				continue;
+			}
+
+			LuaLoadFile(dir_entry.path().string());
+			this->map_infos.push_back(CMap::get()->get_info()->duplicate());
+		}
+	}
+}
+
+void engine_interface::clear_map_infos()
+{
+	this->map_infos.clear();
+}
+
+QVariantList engine_interface::get_map_infos() const
+{
+	std::vector<map_info *> map_infos;
+
+	for (const auto &map_info : this->map_infos) {
+		map_infos.push_back(map_info.get());
+	}
+
+	return container::to_qvariant_list(map_infos);
 }
 
 QVariantList engine_interface::get_difficulties() const
