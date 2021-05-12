@@ -1175,11 +1175,14 @@ void CPlayer::add_settlement_to_explored_territory(const site *settlement)
 
 	const CUnit *settlement_unit = settlement_data->get_site_unit();
 	const CMapLayer *map_layer = settlement_unit->MapLayer;
+	const int player_index = this->get_index();
+
+	std::vector<CUnit *> units;
 
 	for (int x = settlement_data->get_territory_rect().x(); x <= settlement_data->get_territory_rect().right(); ++x) {
 		for (int y = settlement_data->get_territory_rect().y(); y <= settlement_data->get_territory_rect().bottom(); ++y) {
 			const QPoint tile_pos(x, y);
-			const tile *tile = map_layer->Field(tile_pos);
+			tile *tile = map_layer->Field(tile_pos);
 
 			if (tile->get_settlement() != settlement) {
 				continue;
@@ -1187,12 +1190,32 @@ void CPlayer::add_settlement_to_explored_territory(const site *settlement)
 
 			const std::unique_ptr<tile_player_info> &tile_player_info = tile->player_info;
 
-			if (tile_player_info->IsExplored(*this)) {
-				continue;
-			}
+			tile_player_info->Visible[player_index] = std::max<unsigned short>(1, tile_player_info->Visible[player_index]);
+			CMap::get()->MarkSeenTile(*tile);
 
-			tile_player_info->Visible[this->get_index()] = 1;
+			const CUnitCache &unit_cache = tile->UnitCache;
+
+			for (CUnit *unit : unit_cache) {
+				if (unit->Player->Type != PlayerNeutral) {
+					continue;
+				}
+
+				if (unit->CacheLock == 0) {
+					unit->CacheLock = 1;
+					units.push_back(unit);
+				}
+			}
 		}
+	}
+
+	for (CUnit *unit : units) {
+		unit->CacheLock = 0;
+
+		if (!unit->is_seen_by_player(player_index)) {
+			UnitGoesOutOfFog(*unit, *this);
+			UnitGoesUnderFog(*unit, *this);
+		}
+		UnitCountSeen(*unit);
 	}
 }
 
