@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "util/qunique_ptr.h"
 #include "vec2i.h"
 
 class CMapLayer;
@@ -53,6 +54,8 @@ public:
 	bool IsPointOnMap(const Vec2i &pos, const CMapLayer *map_layer) const;
 
 	void Clear();
+
+	qunique_ptr<map_info> duplicate() const;
 
 	const std::string &get_name() const
 	{

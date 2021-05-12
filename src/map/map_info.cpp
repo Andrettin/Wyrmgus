@@ -101,4 +101,21 @@ void map_info::Clear()
 	this->MapUID = 0;
 }
 
+qunique_ptr<map_info> map_info::duplicate() const
+{
+	auto info = make_qunique<map_info>();
+
+	info->name = this->name;
+	info->Filename = this->Filename;
+	info->MapWidth = this->MapWidth;
+	info->MapHeight = this->MapHeight;
+	info->MapWidths = this->MapWidths;
+	info->MapHeights = this->MapHeights;
+	memcpy(info->PlayerType, this->PlayerType, sizeof(info->PlayerType));
+	memcpy(info->PlayerSide, this->PlayerSide, sizeof(info->PlayerSide));
+	info->MapUID = this->MapUID;
+
+	return info;
+}
+
 }
