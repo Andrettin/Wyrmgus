@@ -45,6 +45,27 @@ class dialogue final : public data_entry, public data_type<dialogue>
 	Q_OBJECT
 
 public:
+	static bool has_sound_channel(const int channel)
+	{
+		return dialogue::sound_channels.contains(channel);
+	}
+
+	static void add_sound_channel(const int channel)
+	{
+		dialogue::sound_channels.insert(channel);
+	}
+
+	static void remove_sound_channel(const int channel)
+	{
+		dialogue::sound_channels.erase(channel);
+	}
+
+	static void stop_sound_channels();
+
+private:
+	static inline std::set<int> sound_channels; //channels currently playing dialogue node sounds
+
+public:
 	static constexpr const char *class_identifier = "dialogue";
 	static constexpr const char *database_folder = "dialogues";
 

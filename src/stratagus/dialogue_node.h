@@ -41,6 +41,7 @@ class dialogue_option;
 class faction;
 class sml_data;
 class sml_property;
+class sound;
 class unit_type;
 struct context;
 
@@ -80,6 +81,7 @@ private:
 	const faction *speaker_faction = nullptr; //faction of the player to whom the speaker belongs
 	size_t speaker_index = 0;
 	std::string text;
+	const wyrmgus::sound *sound = nullptr;
 	std::unique_ptr<const and_condition> conditions;
 public:
 	std::unique_ptr<LuaCallback> Conditions;

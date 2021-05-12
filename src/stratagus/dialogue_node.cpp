@@ -36,6 +36,7 @@
 #include "script.h"
 #include "script/condition/and_condition.h"
 #include "script/context.h"
+#include "sound/sound.h"
 #include "text_processor.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
@@ -60,6 +61,8 @@ void dialogue_node::process_sml_property(const sml_property &property)
 
 	if (key == "text") {
 		this->text = value;
+	} else if (key == "sound") {
+		this->sound = sound::get(value);
 	} else if (key == "speaker") {
 		this->speaker = character::get(value);
 	} else if (key == "speaker_unit_type") {
@@ -237,10 +240,18 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 	lua_command += ")";
 
 	CclCommand(lua_command);
+
+	if (this->sound != nullptr) {
+		const int channel = PlayGameSound(this->sound, MaxSampleVolume);
+		dialogue::add_sound_channel(channel);
+	}
 }
 
 void dialogue_node::option_effect(const int option_index, CPlayer *player, const context &ctx) const
 {
+	//stop any dialogue sounds (i.e. voice overs) if any are still playing
+	dialogue::stop_sound_channels();
+
 	if (option_index < static_cast<int>(this->option_pointers.size())) {
 		const dialogue_option *option = this->option_pointers[option_index];
 

@@ -35,8 +35,18 @@
 #include "script/context.h"
 #include "script/effect/call_dialogue_effect.h"
 #include "script/trigger.h"
+#include "sound/sound_server.h"
 
 namespace wyrmgus {
+
+void dialogue::stop_sound_channels()
+{
+	for (const int channel : dialogue::sound_channels) {
+		StopChannel(channel);
+	}
+
+	dialogue::sound_channels.clear();
+}
 
 dialogue::dialogue(const std::string &identifier) : data_entry(identifier)
 {

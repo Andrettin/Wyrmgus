@@ -32,6 +32,7 @@
 #include "sound/sound_server.h"
 
 #include "civilization.h"
+#include "dialogue.h"
 #include "faction.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -130,7 +131,11 @@ static void ChannelFinished(int channel)
 	}
 
 	Channels[channel].Unit.reset();
-	Channels[channel].Voice = wyrmgus::unit_sound_type::none;
+	Channels[channel].Voice = unit_sound_type::none;
+
+	if (dialogue::has_sound_channel(channel)) {
+		dialogue::remove_sound_channel(channel);
+	}
 }
 
 /**

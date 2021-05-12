@@ -368,14 +368,14 @@ void PlayMissileSound(const Missile &missile, wyrmgus::sound *sound)
 **  @param sound   Sound to play
 **  @param volume  Volume level to play the sound
 */
-void PlayGameSound(const wyrmgus::sound *sound, unsigned char volume, const bool always)
+int PlayGameSound(const wyrmgus::sound *sound, unsigned char volume, const bool always)
 {
 	if (!sound) {
-		return;
+		return -1;
 	}
 
 	if (!SoundEnabled()) {
-		return;
+		return -1;
 	}
 
 	Origin source = {nullptr, 0};
@@ -383,20 +383,22 @@ void PlayGameSound(const wyrmgus::sound *sound, unsigned char volume, const bool
 	wyrmgus::sample *sample = ChooseSample(sound, false, source);
 
 	if (!always && SampleIsPlaying(sample)) {
-		return;
+		return -1;
 	}
 
 	volume = CalculateVolume(true, volume, sound->get_range()) * sound->VolumePercent / 100;
 	if (volume == 0) {
-		return;
+		return -1;
 	}
 
 	int channel = PlaySample(sample);
 	if (channel == -1) {
-		return;
+		return -1;
 	}
 
 	SetChannelVolume(channel, volume);
+
+	return channel;
 }
 
 /**

@@ -169,7 +169,7 @@ extern void PlayUnitSound(const CUnit &unit, wyrmgus::sound *sound);
 /// Play a missile sound
 extern void PlayMissileSound(const Missile &missile, wyrmgus::sound *sound);
 /// Play a game sound
-extern void PlayGameSound(const wyrmgus::sound *sound, unsigned char volume, const bool always = false);
+extern int PlayGameSound(const wyrmgus::sound *sound, unsigned char volume, const bool always = false);
 
 /// Modify the range of a given sound.
 extern void SetSoundRange(wyrmgus::sound *sound, unsigned char range);
