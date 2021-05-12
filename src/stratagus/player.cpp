@@ -65,6 +65,7 @@
 //Wyrmgus end
 #include "map/landmass.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/site.h"
@@ -3750,7 +3751,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, const bool type_change)
 		this->change_resource_demand(resource, quantity);
 	}
 	
-	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && CMap::get()->Info.IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && CMap::get()->Info->IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		this->Ai->Scouts.push_back(unit);
 	}
 	
@@ -3982,7 +3983,7 @@ void SetPlayersPalette()
 */
 void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 	std::array<char, 128> temp{};
 	uint32_t color;
 	va_list va;

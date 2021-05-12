@@ -39,6 +39,7 @@
 #include "iolib.h"
 #include "item/unique_item.h"
 #include "map/landmass.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/region.h"
@@ -90,9 +91,9 @@ static int CclStratagusMap(lua_State *l)
 				fprintf(stderr, "Warning: not saved with this version.\n");
 			}
 		} else if (!strcmp(value, "uid")) {
-			CMap::get()->Info.MapUID = LuaToNumber(l, j + 1);
+			CMap::get()->Info->MapUID = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "description")) {
-			CMap::get()->Info.Description = LuaToString(l, j + 1);
+			CMap::get()->Info->name = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "the-map")) {
 			if (!lua_istable(l, j + 1)) {
 				//Wyrmgus start
@@ -112,7 +113,7 @@ static int CclStratagusMap(lua_State *l)
 					CMap::get()->NoFogOfWar = true;
 					--k;
 				} else if (!strcmp(subvalue, "filename")) {
-					CMap::get()->Info.Filename = LuaToString(l, j + 1, k + 1);
+					CMap::get()->Info->Filename = LuaToString(l, j + 1, k + 1);
 				//Wyrmgus start
 				} else if (!strcmp(subvalue, "extra-map-layers")) {
 					lua_rawgeti(l, j + 1, k + 1);
@@ -133,8 +134,8 @@ static int CclStratagusMap(lua_State *l)
 							map_layer->moveToThread(QApplication::instance()->thread());
 						}
 
-						CMap::get()->Info.MapWidths.push_back(map_layer->get_width());
-						CMap::get()->Info.MapHeights.push_back(map_layer->get_height());
+						CMap::get()->Info->MapWidths.push_back(map_layer->get_width());
+						CMap::get()->Info->MapHeights.push_back(map_layer->get_height());
 						map_layer->ID = CMap::get()->MapLayers.size();
 						CMap::get()->MapLayers.push_back(std::move(map_layer));
 						lua_pop(l, 1);
@@ -236,7 +237,7 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument");
 						}
 						const int subsubsubargs = lua_rawlen(l, -1);
-						if (subsubsubargs != CMap::get()->Info.MapWidths[z] * CMap::get()->Info.MapHeights[z]) {
+						if (subsubsubargs != CMap::get()->Info->MapWidths[z] * CMap::get()->Info->MapHeights[z]) {
 							fprintf(stderr, "Wrong tile table length: %d\n", subsubsubargs);
 						}
 						for (int i = 0; i < subsubsubargs; ++i) {
@@ -269,8 +270,8 @@ static int CclStratagusMap(lua_State *l)
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
 		CMap::get()->process_settlement_territory_tiles(z);
 
-		for (int ix = 0; ix < CMap::get()->Info.MapWidths[z]; ++ix) {
-			for (int iy = 0; iy < CMap::get()->Info.MapHeights[z]; ++iy) {
+		for (int ix = 0; ix < CMap::get()->Info->MapWidths[z]; ++ix) {
+			for (int iy = 0; iy < CMap::get()->Info->MapHeights[z]; ++iy) {
 				const QPoint tile_pos(ix, iy);
 				CMap::get()->CalculateTileOwnershipTransition(tile_pos, z); //so that the correct ownership border is shown after a loaded game
 			}
@@ -480,7 +481,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 */
 void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
 {
-	if (!CMap::get()->Info.IsPointOnMap(pos, z)) {
+	if (!CMap::get()->Info->IsPointOnMap(pos, z)) {
 		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
@@ -522,7 +523,7 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
 */
 void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int value, int z)
 {
-	if (!CMap::get()->Info.IsPointOnMap(pos, z)) {
+	if (!CMap::get()->Info->IsPointOnMap(pos, z)) {
 		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
@@ -876,26 +877,26 @@ static int CclDefinePlayerTypes(lua_State *l)
 		}
 		const char *type = LuaToString(l, i + 1);
 		if (!strcmp(type, "neutral")) {
-			CMap::get()->Info.PlayerType[i] = PlayerNeutral;
+			CMap::get()->Info->PlayerType[i] = PlayerNeutral;
 		} else if (!strcmp(type, "nobody")) {
-			CMap::get()->Info.PlayerType[i] = PlayerNobody;
+			CMap::get()->Info->PlayerType[i] = PlayerNobody;
 		} else if (!strcmp(type, "computer")) {
-			CMap::get()->Info.PlayerType[i] = PlayerComputer;
+			CMap::get()->Info->PlayerType[i] = PlayerComputer;
 		} else if (!strcmp(type, "person")) {
-			CMap::get()->Info.PlayerType[i] = PlayerPerson;
+			CMap::get()->Info->PlayerType[i] = PlayerPerson;
 		} else if (!strcmp(type, "rescue-passive")) {
-			CMap::get()->Info.PlayerType[i] = PlayerRescuePassive;
+			CMap::get()->Info->PlayerType[i] = PlayerRescuePassive;
 		} else if (!strcmp(type, "rescue-active")) {
-			CMap::get()->Info.PlayerType[i] = PlayerRescueActive;
+			CMap::get()->Info->PlayerType[i] = PlayerRescueActive;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ type);
 		}
 	}
 	for (int i = numplayers; i < PlayerMax - 1; ++i) {
-		CMap::get()->Info.PlayerType[i] = PlayerNobody;
+		CMap::get()->Info->PlayerType[i] = PlayerNobody;
 	}
 	if (numplayers < PlayerMax) {
-		CMap::get()->Info.PlayerType[PlayerMax - 1] = PlayerNeutral;
+		CMap::get()->Info->PlayerType[PlayerMax - 1] = PlayerNeutral;
 	}
 	return 0;
 }
@@ -1071,7 +1072,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	//Wyrmgus start
-	if (pos.x < 0 || pos.x >= CMap::get()->Info.MapWidths[z] || pos.y < 0 || pos.y >= CMap::get()->Info.MapHeights[z]) {
+	if (pos.x < 0 || pos.x >= CMap::get()->Info->MapWidths[z] || pos.y < 0 || pos.y >= CMap::get()->Info->MapHeights[z]) {
 		lua_pushboolean(l, 0);
 		return 1;
 	}

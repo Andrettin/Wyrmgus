@@ -32,6 +32,7 @@
 
 #include "game.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "script.h"
 #include "unit/unit.h"
 
@@ -58,7 +59,7 @@ int Spell_Teleport::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit * /*t
 	Q_UNUSED(modifier)
 	Q_UNUSED(spell)
 
-	if (CMap::get()->Info.IsPointOnMap(goalPos, z)) {
+	if (CMap::get()->Info->IsPointOnMap(goalPos, z)) {
 		unsigned int selected = caster.Selected;
 		caster.Remove(nullptr);
 		caster.tilePos = goalPos;

@@ -44,6 +44,7 @@
 #include "faction.h"
 #include "magic_domain.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile_flag.h"
 #include "script.h"
@@ -573,7 +574,7 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 			autocast->PositionAutoCast->pushIntegers(array);
 			autocast->PositionAutoCast->run(2);
 			Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
-			if (CMap::get()->Info.IsPointOnMap(resPos, map_layer)) {
+			if (CMap::get()->Info->IsPointOnMap(resPos, map_layer)) {
 				return std::make_unique<Target>(wyrmgus::spell_target_type::position, nullptr, resPos, map_layer->ID);
 			}
 		}

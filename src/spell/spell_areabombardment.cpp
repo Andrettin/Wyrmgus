@@ -33,6 +33,7 @@
 
 #include "database/defines.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "missile.h"
 #include "script.h"
 #include "unit/unit.h"
@@ -96,7 +97,7 @@ int Spell_AreaBombardment::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, 
 			// find new destination in the map
 			dpos.x = goalPos.x + SyncRand(5) - 2;
 			dpos.y = goalPos.y + SyncRand(5) - 2;
-		} while (!CMap::get()->Info.IsPointOnMap(dpos, z));
+		} while (!CMap::get()->Info->IsPointOnMap(dpos, z));
 
 		const PixelPos dest = CMap::get()->tile_pos_to_map_pixel_pos_center(dpos);
 		const PixelPos start = dest + offset;

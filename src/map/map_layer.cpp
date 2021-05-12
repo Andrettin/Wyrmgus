@@ -30,6 +30,7 @@
 
 #include "database/defines.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/minimap.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -143,7 +144,7 @@ void CMapLayer::handle_destroyed_overlay_terrain()
 
 void CMapLayer::decay_destroyed_overlay_terrain_tile(const QPoint &pos)
 {
-	if (!CMap::get()->Info.IsPointOnMap(pos, this->ID)) {
+	if (!CMap::get()->Info->IsPointOnMap(pos, this->ID)) {
 		throw std::runtime_error("Tried to decay a destroyed overlay terrain tile for an invalid tile position.");
 	}
 
@@ -179,7 +180,7 @@ void CMapLayer::regenerate_forests()
 
 void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 {
-	if (!CMap::get()->Info.IsPointOnMap(pos, this->ID)) {
+	if (!CMap::get()->Info->IsPointOnMap(pos, this->ID)) {
 		throw std::runtime_error("Tried to regenerate a tree tile for an invalid tile position.");
 	}
 	
@@ -213,7 +214,7 @@ void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 	
 	//Wyrmgus start
 //	const Vec2i offset(0, -1);
-//	wyrmgus::tile &topMf = *(&mf - this->Info.MapWidth);
+//	wyrmgus::tile &topMf = *(&mf - this->Info->MapWidth);
 
 	for (int x_offset = -1; x_offset <= 1; x_offset+=2) { //increment by 2 to avoid instances where it is 0
 		for (int y_offset = -1; y_offset <= 1; y_offset+=2) {
@@ -225,9 +226,9 @@ void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 			wyrmgus::tile &diagonalMf = *this->Field(pos + diagonalOffset);
 			
 			if (
-				CMap::get()->Info.IsPointOnMap(pos + diagonalOffset, this->ID)
-				&& CMap::get()->Info.IsPointOnMap(pos + verticalOffset, this->ID)
-				&& CMap::get()->Info.IsPointOnMap(pos + horizontalOffset, this->ID)
+				CMap::get()->Info->IsPointOnMap(pos + diagonalOffset, this->ID)
+				&& CMap::get()->Info->IsPointOnMap(pos + verticalOffset, this->ID)
+				&& CMap::get()->Info->IsPointOnMap(pos + horizontalOffset, this->ID)
 				&& ((verticalMf.is_destroyed_tree_tile() && verticalMf.get_value() >= forest_regeneration_threshold && !verticalMf.has_flag(occupied_flag)) || verticalMf.has_flag(tile_flag::tree))
 				&& ((diagonalMf.is_destroyed_tree_tile() && diagonalMf.get_value() >= forest_regeneration_threshold && !diagonalMf.has_flag(occupied_flag)) || diagonalMf.has_flag(tile_flag::tree))
 				&& ((horizontalMf.is_destroyed_tree_tile() && horizontalMf.get_value() >= forest_regeneration_threshold && !horizontalMf.has_flag(occupied_flag)) || horizontalMf.has_flag(tile_flag::tree))

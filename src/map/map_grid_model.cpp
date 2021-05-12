@@ -29,6 +29,7 @@
 #include "map/map_grid_model.h"
 
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -80,7 +81,7 @@ QVariant map_grid_model::data(const QModelIndex &index, const int role) const
 		const map_grid_model::role model_role = static_cast<map_grid_model::role>(role);
 		const QPoint tile_pos(index.column(), index.row());
 
-		if (!CMap::get()->Info.IsPointOnMap(tile_pos, this->get_map_layer())) {
+		if (!CMap::get()->Info->IsPointOnMap(tile_pos, this->get_map_layer())) {
 			throw std::runtime_error("Invalid tile position: " + point::to_string(tile_pos) + ", map layer " + std::to_string(this->get_map_layer()) + ".");
 		}
 

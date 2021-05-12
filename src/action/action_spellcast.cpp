@@ -43,6 +43,7 @@
 #include "database/defines.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
@@ -150,7 +151,7 @@ bool COrder_SpellCast::IsValid() const
 	if (this->has_goal()) {
 		return this->get_goal()->IsAliveOnMap();
 	} else {
-		return CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer);
+		return CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer);
 	}
 }
 

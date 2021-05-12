@@ -1,9 +1,11 @@
 $#include "map/map_template.h"
 $#include "map/tileset.h"
 
-class CMapInfo
+class map_info
 {
-	string Description;
+	string get_name() const;
+	void set_name(string name);
+	
 	//Wyrmgus start
 	string Filename;
 	//Wyrmgus end
@@ -20,7 +22,7 @@ class CMap
 {
 	static CMap *get();
 
-	CMapInfo Info;
+	map_info *get_info() const;
 	
 	//Wyrmgus start
 	void AdjustMap();

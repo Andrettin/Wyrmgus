@@ -36,6 +36,7 @@
 #include "commands.h"
 #include "diplomacy_state.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
@@ -327,7 +328,7 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 */
 void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -380,7 +381,7 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 */
 void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 	
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -556,7 +557,7 @@ void CommandAutoRepair(CUnit &unit, int on)
 */
 void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int z)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -610,7 +611,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 */
 void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -726,7 +727,7 @@ void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 */
 void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1275,7 +1276,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus:
 			   UnitNumber(unit) _C_ spell.get_identifier().c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
 	Assert(std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), &spell) != unit.Type->Spells.end());
 	
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1407,7 +1408,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 		}
 		*/
 		for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
-			for (int i = 0; i != CMap::get()->Info.MapWidths[z] * CMap::get()->Info.MapHeights[z]; ++i) {
+			for (int i = 0; i != CMap::get()->Info->MapWidths[z] * CMap::get()->Info->MapHeights[z]; ++i) {
 				wyrmgus::tile &mf = *CMap::get()->Field(i, z);
 				const std::unique_ptr<wyrmgus::tile_player_info> &mfp = mf.player_info;
 

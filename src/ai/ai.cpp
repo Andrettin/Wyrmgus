@@ -144,6 +144,7 @@
 //Wyrmgus end
 #include "map/landmass.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/site.h"
 #include "map/tile.h"
@@ -1316,7 +1317,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			const Vec2i pos = blocker.tilePos + Vec2i(blocker.Type->get_tile_size()) * dirs[r];
 
 			// Out of the map => no !
-			if (!CMap::get()->Info.IsPointOnMap(pos, unit.MapLayer)) {
+			if (!CMap::get()->Info->IsPointOnMap(pos, unit.MapLayer)) {
 				continue;
 			}
 			// move to blocker ? => no !

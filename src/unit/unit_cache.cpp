@@ -35,6 +35,7 @@
 #include "unit/unit_cache.h"
 
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "unit/unit.h"
@@ -94,9 +95,9 @@ void CMap::Clamp(Vec2i &pos, int z) const
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	pos.x = std::clamp<short int>(pos.x, 0, this->Info.MapWidth - 1);
-//	pos.y = std::clamp<short int>(pos.y, 0, this->Info.MapHeight - 1);
-	pos.x = std::clamp<short int>(pos.x, 0, this->Info.MapWidths[z] - 1);
-	pos.y = std::clamp<short int>(pos.y, 0, this->Info.MapHeights[z] - 1);
+//	pos.x = std::clamp<short int>(pos.x, 0, this->Info->MapWidth - 1);
+//	pos.y = std::clamp<short int>(pos.y, 0, this->Info->MapHeight - 1);
+	pos.x = std::clamp<short int>(pos.x, 0, this->Info->MapWidths[z] - 1);
+	pos.y = std::clamp<short int>(pos.y, 0, this->Info->MapHeights[z] - 1);
 	//Wyrmgus end
 }

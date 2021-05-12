@@ -34,6 +34,7 @@
 
 #include "actions.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "unit/unit.h"
@@ -83,7 +84,7 @@ void TerrainTraversal::PushPos(const Vec2i &pos)
 
 void TerrainTraversal::push_pos_if_passable(const QPoint &pos, const int z, const tile_flag passability_mask)
 {
-	if (!CMap::get()->Info.IsPointOnMap(pos, z) || !CanMoveToMask(pos, passability_mask, z)) {
+	if (!CMap::get()->Info->IsPointOnMap(pos, z) || !CanMoveToMask(pos, passability_mask, z)) {
 		return;
 	}
 
@@ -284,7 +285,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 		int temp_i = PF_FAILED;
 		for (Vec2i it = start_pos; it.y <= end_pos.y; it.y += pos_diff.y) {
 			for (it.x = start_pos.x; it.x <= end_pos.x; it.x += pos_diff.x) {
-				if (!CMap::get()->Info.IsPointOnMap(it, src.Container->MapLayer)) {
+				if (!CMap::get()->Info->IsPointOnMap(it, src.Container->MapLayer)) {
 					continue;
 				}
 
@@ -389,16 +390,16 @@ void PathFinderInput::SetUnit(CUnit &_unit)
 
 void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size, int z)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 	Assert(unit);
 	Assert(unit->IsAliveOnMap());
 	Vec2i newPos = pos;
 	// Large units may have a goal that goes outside the map, fix it here
-	if (newPos.x + unit->Type->get_tile_width() - 1 >= CMap::get()->Info.MapWidths[z]) {
-		newPos.x = CMap::get()->Info.MapWidths[z] - unit->Type->get_tile_width();
+	if (newPos.x + unit->Type->get_tile_width() - 1 >= CMap::get()->Info->MapWidths[z]) {
+		newPos.x = CMap::get()->Info->MapWidths[z] - unit->Type->get_tile_width();
 	}
-	if (newPos.y + unit->Type->get_tile_height() - 1 >= CMap::get()->Info.MapHeights[z]) {
-		newPos.y = CMap::get()->Info.MapHeights[z] - unit->Type->get_tile_height();
+	if (newPos.y + unit->Type->get_tile_height() - 1 >= CMap::get()->Info->MapHeights[z]) {
+		newPos.y = CMap::get()->Info->MapHeights[z] - unit->Type->get_tile_height();
 	}
 	//Wyrmgus end
 	//Wyrmgus start

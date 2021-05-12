@@ -32,6 +32,7 @@
 
 #include "database/defines.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "util/util.h"
 
 /**
@@ -71,7 +72,7 @@ void MissileWhirlwind::Action()
 			// find new destination in the map
 			newPos.x = center.x + SyncRand(5) - 2;
 			newPos.y = center.y + SyncRand(5) - 2;
-		} while (!CMap::get()->Info.IsPointOnMap(newPos, this->MapLayer));
+		} while (!CMap::get()->Info->IsPointOnMap(newPos, this->MapLayer));
 		this->destination = CMap::get()->tile_pos_to_map_pixel_pos_center(newPos);
 		this->source = this->position;
 		this->State = 0;

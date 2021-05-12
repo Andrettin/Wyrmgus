@@ -33,6 +33,7 @@
 #include "actions.h"
 #include "commands.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
@@ -388,8 +389,8 @@ int AiForce::PlanAttack()
 	TerrainTraversal transporterTerrainTraversal;
 
 	//Wyrmgus start
-//	transporterTerrainTraversal.SetSize(CMap::get()->Info.MapWidth, Map.Info.MapHeight);
-	transporterTerrainTraversal.SetSize(CMap::get()->Info.MapWidths[this->GoalMapLayer], CMap::get()->Info.MapHeights[this->GoalMapLayer]);
+//	transporterTerrainTraversal.SetSize(CMap::get()->Info->MapWidth, Map.Info.MapHeight);
+	transporterTerrainTraversal.SetSize(CMap::get()->Info->MapWidths[this->GoalMapLayer], CMap::get()->Info->MapHeights[this->GoalMapLayer]);
 	//Wyrmgus end
 	transporterTerrainTraversal.Init();
 
@@ -582,7 +583,7 @@ static CUnit *GetBestScout(const UnitTypeType unit_type)
 		}
 		if (unit.GroupId != 0) { //don't scout with units that are parts of forces that have a goal
 			int force = AiPlayer->Force.GetForce(unit);
-			if (force != -1 && CMap::get()->Info.IsPointOnMap(AiPlayer->Force[force].GoalPos, AiPlayer->Force[force].GoalMapLayer)) {
+			if (force != -1 && CMap::get()->Info->IsPointOnMap(AiPlayer->Force[force].GoalPos, AiPlayer->Force[force].GoalMapLayer)) {
 				continue;
 			}
 		}

@@ -42,6 +42,7 @@
 #include "economy/resource_storage_type.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
@@ -143,8 +144,8 @@ static bool FindNearestReachableTerrainType(const tile_flag movemask, const int 
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(CMap::get()->Info.MapWidth, CMap::get()->Info.MapHeight);
-	terrainTraversal.SetSize(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::get()->Info->MapWidth, CMap::get()->Info->MapHeight);
+	terrainTraversal.SetSize(CMap::get()->Info->MapWidths[z], CMap::get()->Info->MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -170,7 +171,7 @@ std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i 
 	auto order = std::make_unique<COrder_Resource>(harvester);
 	Vec2i ressourceLoc;
 
-	if (CMap::get()->Info.IsPointOnMap(pos, z) && CMap::get()->Field(pos, z)->get_resource() != nullptr) {
+	if (CMap::get()->Info->IsPointOnMap(pos, z) && CMap::get()->Field(pos, z)->get_resource() != nullptr) {
 		order->CurrentResource = CMap::get()->Field(pos, z)->get_resource()->get_index();
 		//  Find the closest resource tile next to a tile where the unit can move
 		if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, CMap::get()->Field(pos, z)->get_resource()->get_index(), 20, *harvester.Player, pos, &ressourceLoc, z)) {
@@ -479,7 +480,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	//Wyrmgus end
 
 	// Wood gone, look somewhere else.
-	if ((CMap::get()->Info.IsPointOnMap(pos, z) == false || CMap::get()->Field(pos, z)->get_resource() != resource::get_all()[this->CurrentResource])
+	if ((CMap::get()->Info->IsPointOnMap(pos, z) == false || CMap::get()->Field(pos, z)->get_resource() != resource::get_all()[this->CurrentResource])
 		&& (!unit.get_pixel_offset().x()) && (!unit.get_pixel_offset().y())) {
 		//Wyrmgus start
 //		if (!FindTerrainType(unit.Type->MovementMask, tile_flag::tree, 16, *unit.Player, this->goalPos, &pos)) {
@@ -602,7 +603,7 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 */
 int COrder_Resource::MoveToResource(CUnit &unit)
 {
-	if (CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+	if (CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer)) {
 		return MoveToResource_Terrain(unit);
 	} else {
 		return MoveToResource_Unit(unit);
@@ -656,7 +657,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		
 	//Wyrmgus start
 //	if (resinfo.TerrainHarvester) {
-	if (CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+	if (CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer)) {
 	//Wyrmgus end
 		// This shouldn't happened?
 #if 0
@@ -896,7 +897,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	//Wyrmgus start
 	bool harvest_from_outside = (this->get_goal() && this->get_goal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
 //	if (resinfo.HarvestFromOutside || resinfo.TerrainHarvester) {
-	if (harvest_from_outside || CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+	if (harvest_from_outside || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer)) {
 	//Wyrmgus end
 		AnimateActionHarvest(unit);
 	} else {
@@ -908,7 +909,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	if (this->DoneHarvesting) {
 		//Wyrmgus start
 //		Assert(resinfo.HarvestFromOutside || resinfo.TerrainHarvester);
-		Assert(harvest_from_outside || CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer));
+		Assert(harvest_from_outside || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer));
 		//Wyrmgus end
 		return !unit.Anim.Unbreakable;
 	}
@@ -916,7 +917,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	// Target gone?
 	//Wyrmgus start
 //	if (resinfo.TerrainHarvester && !CMap::get()->Field(this->goalPos)->IsTerrainResourceOnMap(this->CurrentResource)) {
-	if (CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer) && CMap::get()->Field(this->goalPos, this->MapLayer)->get_resource() != wyrmgus::resource::get_all()[this->CurrentResource]) {
+	if (CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer) && CMap::get()->Field(this->goalPos, this->MapLayer)->get_resource() != wyrmgus::resource::get_all()[this->CurrentResource]) {
 	//Wyrmgus end
 		if (!unit.Anim.Unbreakable) {
 			// Action now breakable, move to resource again.
@@ -936,7 +937,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * CPlayer::base_speed_factor / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 			int wait_at_resource = res_info->WaitAtResource;
 			int resource_harvest_speed = unit.Player->get_resource_harvest_speed(res_info->get_resource());
-			if (!CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer) && !harvest_from_outside) {
+			if (!CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer) && !harvest_from_outside) {
 				wait_at_resource = res_info->WaitAtResource * 100 / std::max(1, unit.get_resource_step(this->get_current_resource()));
 			}
 			if (this->get_goal()) {
@@ -949,7 +950,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 		}
 
 		// Calculate how much we can load.
-		if (unit.get_resource_step(this->get_current_resource()) && (harvest_from_outside || CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
+		if (unit.get_resource_step(this->get_current_resource()) && (harvest_from_outside || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer))) {
 			addload = unit.get_resource_step(this->get_current_resource());
 		} else {
 			//Wyrmgus start
@@ -969,7 +970,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 
 		//Wyrmgus start
 //		if (resinfo.TerrainHarvester) {
-		if (CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+		if (CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer)) {
 		//Wyrmgus end
 			//Wyrmgus start
 			wyrmgus::tile &mf = *CMap::get()->Field(this->goalPos, this->MapLayer);
@@ -1084,7 +1085,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 		}
 		//Wyrmgus start
 //		if (resinfo.TerrainHarvester) {
-		if (CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+		if (CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer)) {
 		//Wyrmgus end
 			if (unit.ResourcesHeld == res_info->ResourceCapacity) {
 				// Mark as complete.
@@ -1139,7 +1140,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 
 	//Wyrmgus start
 //	if (!resinfo.TerrainHarvester) {
-	if (!CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+	if (!CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer)) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (resinfo.HarvestFromOutside) {
@@ -1224,7 +1225,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 	if (!depot || !unit.ResourcesHeld || this->Finished) {
 		//Wyrmgus start
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
-		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
+		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer))) {
 		//Wyrmgus end
 			Assert(unit.Container);
 			DropOutOnSide(unit, LookingW, source);
@@ -1243,7 +1244,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 	} else {
 		//Wyrmgus start
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
-		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
+		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer))) {
 		//Wyrmgus end
 			Assert(unit.Container);
 			DropOutNearest(unit, depot->tilePos + depot->GetHalfTileSize(), source);
@@ -1529,7 +1530,7 @@ void COrder_Resource::DropResource(CUnit &unit)
 	if (unit.CurrentResource) {
 		//Wyrmgus start
 //		if (!resinfo.TerrainHarvester) {
-		if (!CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+		if (!CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer)) {
 		//Wyrmgus end
 			CUnit *mine = this->Resource.get_mine();
 			if (mine) {
@@ -1574,7 +1575,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 		if (res_info != nullptr) {
 			//Wyrmgus start
 	//		if (!resinfo.TerrainHarvester) {
-			if (!CMap::get()->Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+			if (!CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer)) {
 			//Wyrmgus end
 				//Wyrmgus start
 //				CUnit *newGoal = UnitFindResource(unit, this->Resource.get_mine() ? *this->Resource.get_mine() : unit, 8, this->CurrentResource, 1);

@@ -63,7 +63,7 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 	for (int i = 0; i != 4; ++i) {
 		const Vec2i newpos = pos + offsets[i];
 
-		if (!CMap::get()->Info.IsPointOnMap(newpos)) {
+		if (!CMap::get()->Info->IsPointOnMap(newpos)) {
 			dirFlag |= 1 << i;
 		} else {
 			const wyrmgus::tile &mf = *Map.Field(newpos);

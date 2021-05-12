@@ -31,6 +31,7 @@
 #include "ai/ai_local.h"
 #include "database/sml_data.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/site.h"
@@ -178,7 +179,7 @@ void site_game_data::update_border_tiles()
 				}
 
 				const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
-				if (!CMap::get()->Info.IsPointOnMap(adjacent_pos, z)) {
+				if (!CMap::get()->Info->IsPointOnMap(adjacent_pos, z)) {
 					continue;
 				}
 

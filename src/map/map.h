@@ -65,11 +65,12 @@
 **
 **  CMap::Info
 **
-**    Descriptive information of the map. See ::CMapInfo.
+**    Descriptive information of the map. See wyrmgus::map_info.
 */
 
 #include "color.h"
 #include "util/point_container.h"
+#include "util/qunique_ptr.h"
 #include "util/singleton.h"
 #include "vec2i.h"
 
@@ -85,6 +86,7 @@ namespace wyrmgus {
 	class faction;
 	class generated_terrain;
 	class landmass;
+	class map_info;
 	class map_template;
 	class site;
 	class sml_data;
@@ -102,40 +104,6 @@ namespace wyrmgus {
 
 constexpr int MaxMapWidth = 512; /// max map width supported
 constexpr int MaxMapHeight = 512; /// max map height supported
-
-/*----------------------------------------------------------------------------
---  Map info structure
-----------------------------------------------------------------------------*/
-
-/**
-**  Get info about a map.
-*/
-class CMapInfo
-{
-public:
-	bool IsPointOnMap(const int x, const int y, const int z) const;
-
-	bool IsPointOnMap(const Vec2i &pos, const int z) const;
-
-	bool IsPointOnMap(const int x, const int y, const CMapLayer *map_layer) const;
-
-	bool IsPointOnMap(const Vec2i &pos, const CMapLayer *map_layer) const;
-
-	void Clear();
-
-public:
-	std::string Description;    /// Map description
-	std::string Filename;       /// Map filename
-	int MapWidth;               /// Map width
-	int MapHeight;              /// Map height
-	//Wyrmgus start
-	std::vector<int> MapWidths;	/// Map width for each map layer
-	std::vector<int> MapHeights; /// Map height for each map layer
-	//Wyrmgus end
-	int PlayerType[PlayerMax];  /// Same player->Type
-	int PlayerSide[PlayerMax];  /// Same player->Side
-	unsigned int MapUID;        /// Unique Map ID (hash)
-};
 
 /*----------------------------------------------------------------------------
 --  the Map itself
@@ -179,10 +147,12 @@ public:
 	/// Clear the map layers
 	void ClearMapLayers();
 
-	QRect get_rect(const int z) const
+	map_info *get_info() const
 	{
-		return QRect(QPoint (0, 0), QPoint(this->Info.MapWidths[z] - 1, this->Info.MapHeights[z] - 1));
+		return this->Info.get();
 	}
+
+	QRect get_rect(const int z) const;
 	
 	//Wyrmgus start
 	void SetTileTerrain(const QPoint &pos, const terrain_type *terrain, int z);
@@ -313,18 +283,7 @@ public:
 	//Wyrmgus end
 
 	//Warning: we expect typical usage as xmin = x - range
-	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z)
-	{
-		minpos.x = std::max<short>(0, minpos.x);
-		minpos.y = std::max<short>(0, minpos.y);
-
-		//Wyrmgus start
-//		maxpos.x = std::min<short>(maxpos.x, Info.MapWidth - 1);
-//		maxpos.y = std::min<short>(maxpos.y, Info.MapHeight - 1);
-		maxpos.x = std::min<short>(maxpos.x, Info.MapWidths[z] - 1);
-		maxpos.y = std::min<short>(maxpos.y, Info.MapHeights[z] - 1);
-		//Wyrmgus end
-	}
+	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z);
 
 	const std::vector<std::unique_ptr<landmass>> &get_landmasses() const
 	{
@@ -373,7 +332,7 @@ public:
 	std::vector<std::unique_ptr<CMapLayer>> MapLayers;	/// the map layers composing the map
 	//Wyrmgus end
 
-	CMapInfo Info;             /// descriptive information
+	qunique_ptr<map_info> Info;             /// descriptive information
 };
 
 extern std::string CurrentMapPath; /// Path to the current map

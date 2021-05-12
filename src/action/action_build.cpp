@@ -44,6 +44,7 @@
 #include "database/defines.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/site.h"
 #include "map/tile.h"
@@ -75,7 +76,7 @@ enum {
 
 std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	auto order = std::make_unique<COrder_Build>();
 

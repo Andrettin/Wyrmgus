@@ -32,6 +32,7 @@
 
 #include "database/defines.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -113,7 +114,7 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 {
 	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);
 
-	return CMap::get()->Info.IsPointOnMap(tilePos, UI.CurrentMapLayer);
+	return CMap::get()->Info->IsPointOnMap(tilePos, UI.CurrentMapLayer);
 }
 
 // Convert viewport coordinates into map pixel coordinates
@@ -190,8 +191,8 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const PixelSize pixelSize = this->GetPixelSize();
 
-	x = std::min(x, (CMap::get()->Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info.MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (CMap::get()->Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info.MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
 	this->MapPos.x = x / wyrmgus::defines::get()->get_scaled_tile_width();
 	if (x < 0 && x % wyrmgus::defines::get()->get_scaled_tile_width()) {

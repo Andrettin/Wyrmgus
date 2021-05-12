@@ -42,6 +42,7 @@
 #include "economy/resource_storage_type.h"
 #include "game.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/minimap_mode.h"
@@ -1212,7 +1213,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 
 	if (CursorOn == cursor_on::minimap) {
 		const QPoint minimap_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
-		if (CMap::get()->Info.IsPointOnMap(minimap_tile_pos, UI.CurrentMapLayer->ID)) {
+		if (CMap::get()->Info->IsPointOnMap(minimap_tile_pos, UI.CurrentMapLayer->ID)) {
 			const wyrmgus::tile *tile = UI.CurrentMapLayer->Field(minimap_tile_pos);
 
 			if (tile->player_info->IsTeamExplored(*CPlayer::GetThisPlayer())) {
@@ -1774,7 +1775,7 @@ void ShiftMessagesEvent()
 */
 void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	char temp[256];
 	va_list va;

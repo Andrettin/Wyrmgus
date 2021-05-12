@@ -33,6 +33,7 @@
 #include "database/defines.h"
 #include "economy/resource.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
@@ -44,7 +45,7 @@
 
 static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 {
-	if (CMap::get()->Info.IsPointOnMap(pos, z) == false) {
+	if (CMap::get()->Info->IsPointOnMap(pos, z) == false) {
 		return false;
 	}
 	const wyrmgus::tile &mf = *CMap::get()->Field(pos, z);
@@ -249,15 +250,15 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const wyrmgus::unit_type &
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(CMap::get()->Info.MapWidth, CMap::get()->Info.MapHeight);
-	terrainTraversal.SetSize(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::get()->Info->MapWidth, CMap::get()->Info->MapHeight);
+	terrainTraversal.SetSize(CMap::get()->Info->MapWidths[z], CMap::get()->Info->MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
 	if (startUnit != nullptr) {
 		terrainTraversal.PushUnitPosAndNeighbor(*startUnit);
 	} else {
-		Assert(CMap::get()->Info.IsPointOnMap(startPos, z));
+		Assert(CMap::get()->Info->IsPointOnMap(startPos, z));
 		terrainTraversal.PushPos(startPos);
 	}
 
@@ -267,7 +268,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const wyrmgus::unit_type &
 	//Wyrmgus end
 
 	terrainTraversal.Run(buildingPlaceFinder);
-	return CMap::get()->Info.IsPointOnMap(*resultPos, z);
+	return CMap::get()->Info->IsPointOnMap(*resultPos, z);
 }
 
 class HallPlaceFinder final
@@ -452,12 +453,12 @@ static bool AiFindHallPlace(const CUnit &worker,
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(CMap::get()->Info.MapWidth, CMap::get()->Info.MapHeight);
-	terrainTraversal.SetSize(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::get()->Info->MapWidth, CMap::get()->Info->MapHeight);
+	terrainTraversal.SetSize(CMap::get()->Info->MapWidths[z], CMap::get()->Info->MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(CMap::get()->Info.IsPointOnMap(startPos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(startPos, z));
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -567,12 +568,12 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const wyrmgus::unit_type 
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(CMap::get()->Info.MapWidth, CMap::get()->Info.MapHeight);
-	terrainTraversal.SetSize(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
+//	terrainTraversal.SetSize(CMap::get()->Info->MapWidth, CMap::get()->Info->MapHeight);
+	terrainTraversal.SetSize(CMap::get()->Info->MapWidths[z], CMap::get()->Info->MapHeights[z]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(CMap::get()->Info.IsPointOnMap(startPos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(startPos, z));
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -631,7 +632,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, co
 	}
 	//Wyrmgus end
 
-	const Vec2i &startPos = CMap::get()->Info.IsPointOnMap(nearPos, z) ? nearPos : worker.tilePos;
+	const Vec2i &startPos = CMap::get()->Info->IsPointOnMap(nearPos, z) ? nearPos : worker.tilePos;
 	
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {

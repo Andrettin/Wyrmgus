@@ -57,6 +57,7 @@
 #include "item/unique_item.h"
 #include "luacallback.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
@@ -1093,13 +1094,13 @@ bool CUnit::CheckTerrainForVariation(const wyrmgus::unit_type_variation *variati
 {
 	//if the variation has one or more terrain types set as a precondition, then all tiles underneath the unit must match at least one of those terrains
 	if (variation->Terrains.size() > 0) {
-		if (!CMap::get()->Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
+		if (!CMap::get()->Info->IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
 		}
 
 		for (int x = 0; x < this->Type->get_tile_width(); ++x) {
 			for (int y = 0; y < this->Type->get_tile_height(); ++y) {
-				if (CMap::get()->Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
+				if (CMap::get()->Info->IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
 					if (!wyrmgus::vector::contains(variation->Terrains, CMap::get()->GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
 						return false;
 					}
@@ -1110,10 +1111,10 @@ bool CUnit::CheckTerrainForVariation(const wyrmgus::unit_type_variation *variati
 	
 	//if the variation has one or more terrains set as a forbidden precondition, then no tiles underneath the unit may match one of those terrains
 	if (variation->TerrainsForbidden.size() > 0) {
-		if (CMap::get()->Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
+		if (CMap::get()->Info->IsPointOnMap(this->tilePos, this->MapLayer)) {
 			for (int x = 0; x < this->Type->get_tile_width(); ++x) {
 				for (int y = 0; y < this->Type->get_tile_height(); ++y) {
-					if (CMap::get()->Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
+					if (CMap::get()->Info->IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
 						if (wyrmgus::vector::contains(variation->TerrainsForbidden, CMap::get()->GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
 							return false;
 						}
@@ -2535,7 +2536,7 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	if (this->UnderConstruction == 1 || !CMap::get()->Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
+	if (this->UnderConstruction == 1 || !CMap::get()->Info->IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
 		return;
 	}
 	
@@ -3839,7 +3840,7 @@ void CUnit::Place(const Vec2i &pos, const int z)
 		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
 			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->get_tile_width(); ++x) {
 				for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->get_tile_height(); ++y) {
-					if (!CMap::get()->Info.IsPointOnMap(x, y, this->MapLayer)) {
+					if (!CMap::get()->Info->IsPointOnMap(x, y, this->MapLayer)) {
 						continue;
 					}
 					const QPoint building_tile_pos(x, y);
@@ -4002,7 +4003,7 @@ void FindNearestDrop(const wyrmgus::unit_type &type, const Vec2i &goalPos, Vec2i
 		searched_any_tile_inside_map = false;
 startw:
 		for (int i = addy; i--; ++pos.y) {
-			if (CMap::get()->Info.IsPointOnMap(pos, z)) {
+			if (CMap::get()->Info->IsPointOnMap(pos, z)) {
 				searched_any_tile_inside_map = true;
 			} else {
 				continue;
@@ -4022,7 +4023,7 @@ startw:
 		++addx;
 starts:
 		for (int i = addx; i--; ++pos.x) {
-			if (CMap::get()->Info.IsPointOnMap(pos, z)) {
+			if (CMap::get()->Info->IsPointOnMap(pos, z)) {
 				searched_any_tile_inside_map = true;
 			} else {
 				continue;
@@ -4042,7 +4043,7 @@ starts:
 		++addy;
 starte:
 		for (int i = addy; i--; --pos.y) {
-			if (CMap::get()->Info.IsPointOnMap(pos, z)) {
+			if (CMap::get()->Info->IsPointOnMap(pos, z)) {
 				searched_any_tile_inside_map = true;
 			} else {
 				continue;
@@ -4062,7 +4063,7 @@ starte:
 		++addx;
 startn:
 		for (int i = addx; i--; --pos.x) {
-			if (CMap::get()->Info.IsPointOnMap(pos, z)) {
+			if (CMap::get()->Info->IsPointOnMap(pos, z)) {
 				searched_any_tile_inside_map = true;
 			} else {
 				continue;
@@ -4470,7 +4471,7 @@ void CorrectWallDirections(CUnit &unit)
 	Assert(unit.Type->get_num_directions() == 16);
 	Assert(!unit.Type->Flip);
 
-	if (!CMap::get()->Info.IsPointOnMap(unit.tilePos, unit.MapLayer)) {
+	if (!CMap::get()->Info->IsPointOnMap(unit.tilePos, unit.MapLayer)) {
 		return;
 	}
 	const struct {
@@ -4485,7 +4486,7 @@ void CorrectWallDirections(CUnit &unit)
 		const Vec2i pos = unit.tilePos + configs[i].offset;
 		const int dirFlag = configs[i].dirFlag;
 
-		if (CMap::get()->Info.IsPointOnMap(pos, unit.MapLayer) == false) {
+		if (CMap::get()->Info->IsPointOnMap(pos, unit.MapLayer) == false) {
 			flags |= dirFlag;
 		} else {
 			const CUnitCache &unitCache = CMap::get()->Field(pos, unit.MapLayer->ID)->UnitCache;
@@ -4513,7 +4514,7 @@ void CorrectWallNeighBours(CUnit &unit)
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		const Vec2i pos = unit.tilePos + offset[i];
 
-		if (CMap::get()->Info.IsPointOnMap(pos, unit.MapLayer) == false) {
+		if (CMap::get()->Info->IsPointOnMap(pos, unit.MapLayer) == false) {
 			continue;
 		}
 		CUnitCache &unitCache = unit.MapLayer->Field(pos)->UnitCache;
@@ -4730,7 +4731,7 @@ bool CUnit::IsVisibleOnMinimap() const
 		&& this->is_seen_by_player(CPlayer::GetThisPlayer())
 		&& !this->is_seen_destroyed_by_player(CPlayer::GetThisPlayer())
 		&& !Destroyed
-		&& CMap::get()->Info.IsPointOnMap(this->tilePos, this->MapLayer)
+		&& CMap::get()->Info->IsPointOnMap(this->tilePos, this->MapLayer)
 		&& this->MapLayer->Field(this->tilePos)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer());
 }
 
@@ -6698,13 +6699,13 @@ bool CUnit::HasAdjacentRailForUnitType(const wyrmgus::unit_type *type) const
 			
 	for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
 		Vec2i tile_pos(x, top_left_pos.y);
-		if (CMap::get()->Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+		if (CMap::get()->Info->IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 			has_adjacent_rail = true;
 			break;
 		}
 				
 		tile_pos.y = bottom_right_pos.y;
-		if (CMap::get()->Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+		if (CMap::get()->Info->IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 			has_adjacent_rail = true;
 			break;
 		}
@@ -6713,13 +6714,13 @@ bool CUnit::HasAdjacentRailForUnitType(const wyrmgus::unit_type *type) const
 	if (!has_adjacent_rail) {
 		for (int y = top_left_pos.y; y <= bottom_right_pos.y; ++y) {
 			Vec2i tile_pos(top_left_pos.x, y);
-			if (CMap::get()->Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+			if (CMap::get()->Info->IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 				has_adjacent_rail = true;
 				break;
 			}
 					
 			tile_pos.x = bottom_right_pos.x;
-			if (CMap::get()->Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+			if (CMap::get()->Info->IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 				has_adjacent_rail = true;
 				break;
 			}
@@ -8275,7 +8276,7 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 		return true;
 	}
 	
-	if (!goal && CMap::get()->Info.IsPointOnMap(goalPos, z) && this->MapDistanceTo(goalPos, z) > 1) {
+	if (!goal && CMap::get()->Info->IsPointOnMap(goalPos, z) && this->MapDistanceTo(goalPos, z) > 1) {
 		return true;
 	}
 	

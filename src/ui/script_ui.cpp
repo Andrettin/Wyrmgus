@@ -33,6 +33,7 @@
 
 #include "database/defines.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "menus.h"
 #include "script.h"
 #include "spell/spell.h"
@@ -1111,15 +1112,15 @@ static int CclPresentMap(lua_State *l)
 	Map.Info.MapUID = LuaToNumber(l, 5);
 	*/
 
-	CMap::get()->Info.Description = LuaToString(l, 1);
+	CMap::get()->Info->name = LuaToString(l, 1);
 	
 	if (lua_gettop(l) > 1) {
 		LuaCheckArgs(l, 5);
 		
 		// Number of players in LuaToNumber(l, 3); // Not used yet.
-		CMap::get()->Info.MapWidth = LuaToNumber(l, 3);
-		CMap::get()->Info.MapHeight = LuaToNumber(l, 4);
-		CMap::get()->Info.MapUID = LuaToNumber(l, 5);
+		CMap::get()->Info->MapWidth = LuaToNumber(l, 3);
+		CMap::get()->Info->MapHeight = LuaToNumber(l, 4);
+		CMap::get()->Info->MapUID = LuaToNumber(l, 5);
 	}
 	//Wyrmgus end
 
@@ -1134,7 +1135,7 @@ static int CclPresentMap(lua_State *l)
 static int CclDefineMapSetup(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	CMap::get()->Info.Filename = LuaToString(l, 1);
+	CMap::get()->Info->Filename = LuaToString(l, 1);
 
 	return 0;
 }

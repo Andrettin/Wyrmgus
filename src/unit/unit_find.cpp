@@ -191,7 +191,7 @@ bool FindTerrainType(const tile_flag movemask, const wyrmgus::resource *resource
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
+	terrainTraversal.SetSize(CMap::get()->Info->MapWidths[z], CMap::get()->Info->MapHeights[z]);
 	terrainTraversal.Init();
 
 	terrainTraversal.PushPos(startPos);
@@ -1495,7 +1495,7 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, cons
 			pos.y += sign.y;
 		}
 
-		if (CMap::get()->Info.IsPointOnMap(pos, z) == false) {
+		if (CMap::get()->Info->IsPointOnMap(pos, z) == false) {
 			DebugPrint("outside of map\n");
 		//Wyrmgus start
 //		} else if (Map.Field(pos)->Flags & flags) {

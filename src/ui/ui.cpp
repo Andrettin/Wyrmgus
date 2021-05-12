@@ -41,6 +41,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "menus.h"
@@ -163,9 +164,9 @@ void InitUserInterface()
 	//
 	// Calculations
 	//
-	if (CMap::get()->Info.MapWidth) {
-		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::get()->Info.MapWidth * wyrmgus::defines::get()->get_scaled_tile_width() - 1);
-		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::get()->Info.MapHeight * wyrmgus::defines::get()->get_scaled_tile_height() - 1);
+	if (CMap::get()->Info->MapWidth) {
+		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::get()->Info->MapWidth * wyrmgus::defines::get()->get_scaled_tile_width() - 1);
+		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::get()->Info->MapHeight * wyrmgus::defines::get()->get_scaled_tile_height() - 1);
 	}
 
 	UI.SelectedViewport = UI.Viewports;
@@ -415,8 +416,8 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	//Wyrmgus start
 //	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * wyrmgus::defines::get()->get_scaled_tile_width() - 1;
 //	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * wyrmgus::defines::get()->get_scaled_tile_height() - 1;
-	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::get()->Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info.MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::get()->Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info.MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - 1;
+	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - 1;
+	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary

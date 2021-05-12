@@ -38,6 +38,7 @@
 #include "database/defines.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
@@ -75,7 +76,7 @@ std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &target)
 std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	auto order = std::make_unique<COrder_Repair>();
 

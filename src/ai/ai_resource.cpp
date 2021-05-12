@@ -40,6 +40,7 @@
 #include "faction.h"
 #include "map/landmass.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
@@ -349,7 +350,7 @@ static int AiBuildBuilding(const wyrmgus::unit_type &type, const wyrmgus::unit_t
 	if (building.TerrainType || building.BoolFlag[TOWNHALL_INDEX].value) { //terrain type units and town halls have a particular place to be built, so we need to find the worker with a terrain traversal
 		TerrainTraversal terrainTraversal;
 
-		terrainTraversal.SetSize(CMap::get()->Info.MapWidths[z], CMap::get()->Info.MapHeights[z]);
+		terrainTraversal.SetSize(CMap::get()->Info->MapWidths[z], CMap::get()->Info->MapHeights[z]);
 		terrainTraversal.Init();
 
 		terrainTraversal.PushPos(nearPos);
@@ -379,7 +380,7 @@ static int AiBuildBuilding(const wyrmgus::unit_type &type, const wyrmgus::unit_t
 	CUnit &unit = near_unit ? *near_unit : ((num == 1) ? *table[0] : *table[SyncRand(num)]);
 	//Wyrmgus end
 	
-	if (!CMap::get()->Info.IsPointOnMap(nearPos, z)) {
+	if (!CMap::get()->Info->IsPointOnMap(nearPos, z)) {
 		z = unit.MapLayer->ID;
 	}
 	
@@ -2317,7 +2318,7 @@ static void AiCheckPathwayConstruction()
 			for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->get_tile_height() + 1; ++y) {
 				QPoint pathway_pos(x, y);
 
-				if (!CMap::get()->Info.IsPointOnMap(pathway_pos, unit.MapLayer)) {
+				if (!CMap::get()->Info->IsPointOnMap(pathway_pos, unit.MapLayer)) {
 					continue;
 				}
 

@@ -39,6 +39,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/terrain_type.h"
@@ -215,7 +216,7 @@ static std::unique_ptr<EditorSliderListener> editorSliderListener;
 static void EditTile(const Vec2i &pos, const terrain_type *terrain, const Qt::KeyboardModifiers key_modifiers)
 //Wyrmgus end
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, UI.CurrentMapLayer));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, UI.CurrentMapLayer));
 	
 	wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 	
@@ -317,7 +318,7 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 					if (x_offset != 0 || y_offset != 0) {
 						Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
-						if (CMap::get()->Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+						if (CMap::get()->Info->IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 							const wyrmgus::terrain_type *adjacent_terrain = CMap::get()->GetTileTerrain(adjacent_pos, tile_terrain->is_overlay(), UI.CurrentMapLayer->ID);
 							if (tile_terrain->is_overlay() && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = nullptr;
@@ -339,7 +340,7 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 							if (std::find(changed_tiles.begin(), changed_tiles.end(), adjacent_pos) != changed_tiles.end()) {
 								continue;
 							}
-							if (CMap::get()->Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+							if (CMap::get()->Info->IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 								EditTile(adjacent_pos, terrain, key_modifiers);
 								changed_tiles.push_back(adjacent_pos);
 							}
@@ -361,7 +362,7 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 						continue;
 					}
 					
-					if (CMap::get()->Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+					if (CMap::get()->Info->IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						for (int overlay = 1; overlay >= 0; --overlay) {
 							const wyrmgus::terrain_type *adjacent_terrain = CMap::get()->GetTileTerrain(adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
 							if (!adjacent_terrain || adjacent_terrain == CMap::get()->GetTileTerrain(changed_tiles[i], overlay > 0, UI.CurrentMapLayer->ID)) {
@@ -385,7 +386,7 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 									for (int sub_y_offset = -1; sub_y_offset <= 1; ++sub_y_offset) {
 										if (sub_x_offset != 0 || sub_y_offset != 0) {
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
-											if (CMap::get()->Info.IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer)) {
+											if (CMap::get()->Info->IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer)) {
 												const wyrmgus::terrain_type *sub_adjacent_terrain = CMap::get()->GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
 												if (adjacent_terrain->is_overlay() && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = nullptr;
@@ -439,7 +440,7 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 						continue;
 					}
 					
-					if (!CMap::get()->Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+					if (!CMap::get()->Info->IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						continue;
 					}
 
@@ -518,7 +519,7 @@ static void EditTiles(const Vec2i &pos, const terrain_type *terrain, int size, c
 */
 static void EditorActionPlaceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *player)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(pos, UI.CurrentMapLayer));
+	Assert(CMap::get()->Info->IsPointOnMap(pos, UI.CurrentMapLayer));
 
 	if (type.Neutral) {
 		player = CPlayer::Players[PlayerNumNeutral];
@@ -792,13 +793,13 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 		//Wyrmgus end
 			y += rectangle_size;
 		}
-		if (i == Editor.CursorPlayer && CMap::get()->Info.PlayerType[i] != PlayerNobody) {
+		if (i == Editor.CursorPlayer && CMap::get()->Info->PlayerType[i] != PlayerNobody) {
 			Video.DrawRectangle(ColorWhite, x + i % 8 * rectangle_size, y, rectangle_size, rectangle_size, render_commands);
 		}
 		Video.DrawRectangle(
-			i == Editor.CursorPlayer && CMap::get()->Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
+			i == Editor.CursorPlayer && CMap::get()->Info->PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
 			x + i % 8 * rectangle_size, y, rectangle_size - 1, rectangle_size - 1, render_commands);
-		if (CMap::get()->Info.PlayerType[i] != PlayerNobody) {
+		if (CMap::get()->Info->PlayerType[i] != PlayerNobody) {
 			Video.FillRectangle(CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2, render_commands);
 		}
 		if (i == Editor.SelectedPlayer) {
@@ -826,7 +827,7 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 		//Wyrmgus end
 		// Players[SelectedPlayer].RaceName);
 
-		switch (CMap::get()->Info.PlayerType[Editor.SelectedPlayer]) {
+		switch (CMap::get()->Info->PlayerType[Editor.SelectedPlayer]) {
 			case PlayerNeutral:
 				strcat_s(buf.data(), buf.size(), "Neutral");
 				break;
@@ -1378,7 +1379,7 @@ static void DrawStartLocations(std::vector<std::function<void(renderer *)>> &ren
 		vp->SetClipping();
 
 		for (int i = 0; i < PlayerMax; i++) {
-			if (CMap::get()->Info.PlayerType[i] != PlayerNobody && CMap::get()->Info.PlayerType[i] != PlayerNeutral && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
+			if (CMap::get()->Info->PlayerType[i] != PlayerNobody && CMap::get()->Info->PlayerType[i] != PlayerNeutral && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(CPlayer::Players[i]->StartPos);
 
 				if (type) {
@@ -1710,7 +1711,7 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
 		// Cursor on player icons
 		if (Editor.CursorPlayer != -1) {
-			if (CMap::get()->Info.PlayerType[Editor.CursorPlayer] != PlayerNobody) {
+			if (CMap::get()->Info->PlayerType[Editor.CursorPlayer] != PlayerNobody) {
 				Editor.SelectedPlayer = Editor.CursorPlayer;
 				CPlayer::SetThisPlayer(CPlayer::Players[Editor.SelectedPlayer]);
 			}
@@ -1909,7 +1910,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::Keyb
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
 		case '9':
-			if (UnitUnderCursor != nullptr && CMap::get()->Info.PlayerType[(int) key - '1'] != PlayerNobody) {
+			if (UnitUnderCursor != nullptr && CMap::get()->Info->PlayerType[(int) key - '1'] != PlayerNobody) {
 				UnitUnderCursor->ChangeOwner(*CPlayer::Players[(int) key - '1']);
 				UI.StatusLine.Set(_("Unit owner modified"));
 				UpdateMinimap = true;
@@ -2018,7 +2019,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			by += 20 * scale_factor;
 		}
 		if (bx < screenPos.x && screenPos.x < bx + 20 * scale_factor && by < screenPos.y && screenPos.y < by + 20 * scale_factor) {
-			if (CMap::get()->Info.PlayerType[i] != PlayerNobody) {
+			if (CMap::get()->Info->PlayerType[i] != PlayerNobody) {
 				std::array<char, 256> buf{};
 				//Wyrmgus start
 //				snprintf(buf.data(), buf.size(), _("Select Player #%d"), i);
@@ -2420,32 +2421,32 @@ void CEditor::Init()
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (i == PlayerNumNeutral) {
 				CreatePlayer(PlayerNeutral);
-				CMap::get()->Info.PlayerType[i] = PlayerNeutral;
+				CMap::get()->Info->PlayerType[i] = PlayerNeutral;
 				//Wyrmgus start
-//				CMap::get()->Info.PlayerSide[i] = CPlayer::Players[i]->Race = 0;
+//				CMap::get()->Info->PlayerSide[i] = CPlayer::Players[i]->Race = 0;
 				CPlayer::Players[i]->set_civilization(wyrmgus::defines::get()->get_neutral_civilization());
-				CMap::get()->Info.PlayerSide[i] = CPlayer::Players[i]->Race;
+				CMap::get()->Info->PlayerSide[i] = CPlayer::Players[i]->Race;
 				//Wyrmgus end
 			} else {
 				CreatePlayer(PlayerNobody);
-				CMap::get()->Info.PlayerType[i] = PlayerNobody;
+				CMap::get()->Info->PlayerType[i] = PlayerNobody;
 			}
 		}
 
 		//Wyrmgus start
 //		Map.Fields = new wyrmgus::tile[Map.Info.MapWidth * Map.Info.MapHeight];
 		CMap::get()->ClearMapLayers();
-		auto new_map_layer = std::make_unique<CMapLayer>(CMap::get()->Info.MapWidth, CMap::get()->Info.MapHeight);
+		auto new_map_layer = std::make_unique<CMapLayer>(CMap::get()->Info->MapWidth, CMap::get()->Info->MapHeight);
 
 		if (QApplication::instance()->thread() != QThread::currentThread()) {
 			new_map_layer->moveToThread(QApplication::instance()->thread());
 		}
 
 		new_map_layer->ID = CMap::get()->MapLayers.size();
-		CMap::get()->Info.MapWidths.clear();
-		CMap::get()->Info.MapWidths.push_back(CMap::get()->Info.MapWidth);
-		CMap::get()->Info.MapHeights.clear();
-		CMap::get()->Info.MapHeights.push_back(CMap::get()->Info.MapHeight);
+		CMap::get()->Info->MapWidths.clear();
+		CMap::get()->Info->MapWidths.push_back(CMap::get()->Info->MapWidth);
+		CMap::get()->Info->MapHeights.clear();
+		CMap::get()->Info->MapHeights.push_back(CMap::get()->Info->MapHeight);
 		CMap::get()->MapLayers.push_back(std::move(new_map_layer));
 		//Wyrmgus end
 
@@ -2484,7 +2485,7 @@ void CEditor::Init()
 
 	// Place the start points, which the loader discarded.
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (CMap::get()->Info.PlayerType[i] != PlayerNobody) {
+		if (CMap::get()->Info->PlayerType[i] != PlayerNobody) {
 			// Set SelectedPlayer to a valid player
 			if (Editor.SelectedPlayer == PlayerNumNeutral) {
 				Editor.SelectedPlayer = i;

@@ -30,6 +30,7 @@
 
 #include "map/map.h"
 
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "player.h"
@@ -118,7 +119,7 @@ void MapMarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 
 void MapMarkTileRadar(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(x, y, z));
+	Assert(CMap::get()->Info->IsPointOnMap(x, y, z));
 	MapMarkTileRadar(player, CMap::get()->get_pos_index(x, y, z), z);
 }
 
@@ -144,7 +145,7 @@ void MapUnmarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 
 void MapUnmarkTileRadar(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(x, y, z));
+	Assert(CMap::get()->Info->IsPointOnMap(x, y, z));
 	MapUnmarkTileRadar(player, CMap::get()->get_pos_index(x, y, z), z);
 }
 
@@ -171,7 +172,7 @@ void MapMarkTileRadarJammer(const CPlayer &player, const unsigned int index, int
 
 void MapMarkTileRadarJammer(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(x, y, z));
+	Assert(CMap::get()->Info->IsPointOnMap(x, y, z));
 	MapMarkTileRadarJammer(player, CMap::get()->get_pos_index(x, y, z), z);
 }
 
@@ -199,6 +200,6 @@ void MapUnmarkTileRadarJammer(const CPlayer &player, const unsigned int index, i
 
 void MapUnmarkTileRadarJammer(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(x, y, z));
+	Assert(CMap::get()->Info->IsPointOnMap(x, y, z));
 	MapUnmarkTileRadarJammer(player, CMap::get()->get_pos_index(x, y, z), z);
 }

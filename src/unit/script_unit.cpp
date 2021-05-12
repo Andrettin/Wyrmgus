@@ -41,6 +41,7 @@
 //Wyrmgus end
 #include "item/unique_item.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
@@ -832,7 +833,7 @@ static int CclCreateUnit(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	//Wyrmgus start
-	if (!CMap::get()->Info.IsPointOnMap(ipos, z)) {
+	if (!CMap::get()->Info->IsPointOnMap(ipos, z)) {
 		fprintf(stderr, "Point on map %d, %d (map layer %d) is invalid.\n", ipos.x, ipos.y, z);
 		return 0;
 	}
@@ -1070,7 +1071,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	Vec2i new_pos;
 	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true, worker->MapLayer->ID);
 	
-	if (!CMap::get()->Info.IsPointOnMap(new_pos, worker->MapLayer)) {
+	if (!CMap::get()->Info->IsPointOnMap(new_pos, worker->MapLayer)) {
 		new_pos = CPlayer::Players[playerno]->StartPos;
 	}
 	

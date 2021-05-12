@@ -30,6 +30,7 @@
 #pragma once
 
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "pathfinder.h"
 #include "unit/unit.h"
@@ -340,8 +341,8 @@ template <bool circle, typename Pred>
 inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z, Pred pred)
 //Wyrmgus end
 {
-	Assert(CMap::get()->Info.IsPointOnMap(ltPos, z));
-	Assert(CMap::get()->Info.IsPointOnMap(rbPos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(ltPos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(rbPos, z));
 	Assert(units.empty());
 	
 	wyrmgus::decimillesimal_int middle_x;
@@ -448,8 +449,8 @@ inline void SelectAroundUnit(const CUnit &unit, const int range, std::vector<CUn
 template <typename Pred>
 CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 {
-	Assert(CMap::get()->Info.IsPointOnMap(ltPos, z));
-	Assert(CMap::get()->Info.IsPointOnMap(rbPos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(ltPos, z));
+	Assert(CMap::get()->Info->IsPointOnMap(rbPos, z));
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {

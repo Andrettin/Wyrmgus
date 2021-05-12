@@ -36,6 +36,7 @@
 #include "iolib.h"
 #include "luacallback.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -1095,7 +1096,7 @@ bool MissileInitMove(Missile &missile)
 
 void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 {
-	if (CMap::get()->Info.IsPointOnMap(pos, missile.MapLayer) == false) {
+	if (CMap::get()->Info->IsPointOnMap(pos, missile.MapLayer) == false) {
 		return;
 	}
 	std::vector<CUnit *> units;
@@ -1240,11 +1241,11 @@ bool PointToPointMissile(Missile &missile)
 								(int)pos.y + missile.Type->get_frame_height() / 2);
 		const Vec2i tilePos(CMap::get()->map_pixel_pos_to_tile_pos(position));
 
-		if (CMap::get()->Info.IsPointOnMap(tilePos, missile.MapLayer) && MissileHandleBlocking(missile, position)) {
+		if (CMap::get()->Info->IsPointOnMap(tilePos, missile.MapLayer) && MissileHandleBlocking(missile, position)) {
 			return true;
 		}
 		if (missile.Type->MissileStopFlags != tile_flag::none) {
-			if (!CMap::get()->Info.IsPointOnMap(tilePos, missile.MapLayer)) { // gone outside
+			if (!CMap::get()->Info->IsPointOnMap(tilePos, missile.MapLayer)) { // gone outside
 				missile.TTL = 0;
 				return false;
 			}
@@ -1445,7 +1446,7 @@ void Missile::MissileHit(CUnit *unit)
 
 	const Vec2i pos = CMap::get()->map_pixel_pos_to_tile_pos(pixelPos);
 
-	if (!CMap::get()->Info.IsPointOnMap(pos, this->MapLayer)) {
+	if (!CMap::get()->Info->IsPointOnMap(pos, this->MapLayer)) {
 		// FIXME: this should handled by caller?
 		DebugPrint("Missile gone outside of map!\n");
 		return;  // outside the map.
@@ -1599,7 +1600,7 @@ void Missile::MissileHit(CUnit *unit)
 		for (int j = mtype.get_range() * 2; --j;) {
 			const Vec2i posIt(posmin.x + i, posmin.y + j);
 
-			if (CMap::get()->Info.IsPointOnMap(posIt, this->MapLayer)) {
+			if (CMap::get()->Info->IsPointOnMap(posIt, this->MapLayer)) {
 				int d = point::distance_to(pos, posIt);
 				d *= mtype.SplashFactor;
 				if (d == 0) {

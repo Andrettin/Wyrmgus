@@ -37,6 +37,7 @@
 #include "database/defines.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
@@ -56,8 +57,8 @@
 std::unique_ptr<COrder> COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z)
 //Wyrmgus end
 {
-	Assert(CMap::get()->Info.IsPointOnMap(currentPos, current_z));
-	Assert(CMap::get()->Info.IsPointOnMap(dest, dest_z));
+	Assert(CMap::get()->Info->IsPointOnMap(currentPos, current_z));
+	Assert(CMap::get()->Info->IsPointOnMap(dest, dest_z));
 
 	auto order = std::make_unique<COrder_Patrol>();
 

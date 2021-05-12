@@ -35,6 +35,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/map_layer.h"
 #include "netconnect.h"
 #include "network.h"
@@ -196,8 +197,8 @@ static std::unique_ptr<FullReplay> StartReplay()
 	replay->LocalPlayer = CPlayer::GetThisPlayer()->Index;
 
 	replay->Date = dateStr;
-	replay->Map = CMap::get()->Info.Description;
-	replay->MapId = CMap::get()->Info.MapUID;
+	replay->Map = CMap::get()->Info->get_name();
+	replay->MapId = CMap::get()->Info->MapUID;
 	replay->MapPath = CurrentMapPath;
 	replay->Resource = GameSettings.Resources;
 	replay->NumUnits = GameSettings.NumUnits;
