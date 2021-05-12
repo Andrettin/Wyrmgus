@@ -186,7 +186,8 @@ public:
 
 	Q_INVOKABLE void load_map_infos();
 	Q_INVOKABLE void clear_map_infos();
-	Q_INVOKABLE QVariantList get_map_infos() const;
+	Q_INVOKABLE QStringList get_map_worlds() const;
+	Q_INVOKABLE QVariantList get_map_infos(const QString &world) const;
 
 	Q_INVOKABLE QVariantList get_building_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;

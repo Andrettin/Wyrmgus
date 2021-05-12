@@ -252,11 +252,28 @@ void engine_interface::clear_map_infos()
 	this->map_infos.clear();
 }
 
-QVariantList engine_interface::get_map_infos() const
+QStringList engine_interface::get_map_worlds() const
+{
+	std::set<std::string> map_worlds;
+
+	for (const auto &map_info : this->map_infos) {
+		map_worlds.insert(map_info->MapWorld);
+	}
+
+	return container::to_qstring_list(map_worlds);
+}
+
+QVariantList engine_interface::get_map_infos(const QString &world) const
 {
 	std::vector<map_info *> map_infos;
 
+	const std::string world_str = world.toStdString();
+
 	for (const auto &map_info : this->map_infos) {
+		if (map_info->MapWorld != world_str) {
+			continue;
+		}
+
 		map_infos.push_back(map_info.get());
 	}
 
