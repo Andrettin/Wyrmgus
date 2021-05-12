@@ -220,29 +220,31 @@ void engine_interface::load_map_infos()
 {
 	this->clear_map_infos();
 
-	try {
-		const std::vector<std::filesystem::path> map_paths = database::get()->get_maps_paths();
+	this->sync([this]() { //must be synchronized as it uses Lua and alters the map singleton
+		try {
+			const std::vector<std::filesystem::path> map_paths = database::get()->get_maps_paths();
 
-		for (const std::filesystem::path &map_path : map_paths) {
-			if (!std::filesystem::exists(map_path)) {
-				continue;
-			}
-
-			std::filesystem::recursive_directory_iterator dir_iterator(map_path);
-
-			for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
-				if (!dir_entry.is_regular_file() || dir_entry.path().extension() != ".smp") {
+			for (const std::filesystem::path &map_path : map_paths) {
+				if (!std::filesystem::exists(map_path)) {
 					continue;
 				}
 
-				CMap::get()->get_info()->Clear();
-				LuaLoadFile(dir_entry.path().string());
-				this->map_infos.push_back(CMap::get()->get_info()->duplicate());
+				std::filesystem::recursive_directory_iterator dir_iterator(map_path);
+
+				for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
+					if (!dir_entry.is_regular_file() || dir_entry.path().extension() != ".smp") {
+						continue;
+					}
+
+					CMap::get()->get_info()->Clear();
+					LuaLoadFile(dir_entry.path().string());
+					this->map_infos.push_back(CMap::get()->get_info()->duplicate());
+				}
 			}
+		} catch (const std::exception &exception) {
+			exception::report(exception);
 		}
-	} catch (const std::exception &exception) {
-		exception::report(exception);
-	}
+	});
 }
 
 void engine_interface::clear_map_infos()
