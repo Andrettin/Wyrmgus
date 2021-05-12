@@ -3960,6 +3960,11 @@ void LoadStratagusMapInfo(const std::string &mapname)
 	LuaLoadFile(filename);
 }
 
+void SetMapWorld(const std::string &map_world)
+{
+	CMap::get()->get_info()->MapWorld = map_world;
+}
+
 void load_map_data(const std::string &sml_string)
 {
 	sml_parser parser;

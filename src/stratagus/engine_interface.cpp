@@ -218,19 +218,26 @@ QVariantList engine_interface::get_playable_civilizations() const
 
 void engine_interface::load_map_infos()
 {
-	const std::vector<std::filesystem::path> map_paths = database::get()->get_maps_paths();
+	this->clear_map_infos();
 
-	for (const std::filesystem::path &map_path : map_paths) {
-		std::filesystem::recursive_directory_iterator dir_iterator(map_path);
+	try {
+		const std::vector<std::filesystem::path> map_paths = database::get()->get_maps_paths();
 
-		for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
-			if (!dir_entry.is_regular_file() || dir_entry.path().extension() != ".smp") {
-				continue;
+		for (const std::filesystem::path &map_path : map_paths) {
+			std::filesystem::recursive_directory_iterator dir_iterator(map_path);
+
+			for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
+				if (!dir_entry.is_regular_file() || dir_entry.path().extension() != ".smp") {
+					continue;
+				}
+
+				CMap::get()->get_info()->Clear();
+				LuaLoadFile(dir_entry.path().string());
+				this->map_infos.push_back(CMap::get()->get_info()->duplicate());
 			}
-
-			LuaLoadFile(dir_entry.path().string());
-			this->map_infos.push_back(CMap::get()->get_info()->duplicate());
 		}
+	} catch (const std::exception &exception) {
+		exception::report(exception);
 	}
 }
 

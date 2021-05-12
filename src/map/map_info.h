@@ -85,10 +85,10 @@ public:
 	int PlayerType[PlayerMax];  /// Same player->Type
 	int PlayerSide[PlayerMax];  /// Same player->Side
 	unsigned int MapUID;        /// Unique Map ID (hash)
+	std::string MapWorld = "Custom";
 
 	friend int ::CclPresentMap(lua_State *l);
 	friend int ::CclStratagusMap(lua_State *l);
 };
-
 
 }

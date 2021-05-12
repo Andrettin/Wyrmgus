@@ -481,6 +481,8 @@ extern void SetSeason(const std::string &season_ident, int z = 0);
 extern void SetSeasonSchedule(const std::string &season_schedule_ident, int z = 0);
 //Wyrmgus end
 
+extern void SetMapWorld(const std::string &map_world);
+
 extern void load_map_data(const std::string &sml_string);
 
 // in unit.c

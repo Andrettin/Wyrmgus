@@ -99,6 +99,7 @@ void map_info::Clear()
 	memset(this->PlayerSide, 0, sizeof(this->PlayerSide));
 	memset(this->PlayerType, 0, sizeof(this->PlayerType));
 	this->MapUID = 0;
+	this->MapWorld = "Custom";
 }
 
 qunique_ptr<map_info> map_info::duplicate() const
@@ -114,6 +115,7 @@ qunique_ptr<map_info> map_info::duplicate() const
 	memcpy(info->PlayerType, this->PlayerType, sizeof(info->PlayerType));
 	memcpy(info->PlayerSide, this->PlayerSide, sizeof(info->PlayerSide));
 	info->MapUID = this->MapUID;
+	info->MapWorld = this->MapWorld;
 
 	return info;
 }
