@@ -68,6 +68,7 @@
 #include "script/condition/season_condition.h"
 #include "script/condition/settlement_condition.h"
 #include "script/condition/site_exists_condition.h"
+#include "script/condition/snowy_terrain_condition.h"
 #include "script/condition/terrain_condition.h"
 #include "script/condition/time_of_day_condition.h"
 #include "script/condition/trigger_condition.h"
@@ -131,6 +132,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<settlement_condition>(value);
 	} else if (key == "site_exists") {
 		return std::make_unique<site_exists_condition>(value);
+	} else if (key == "snowy_terrain") {
+		return std::make_unique<snowy_terrain_condition>(value);
 	} else if (key == "terrain") {
 		return std::make_unique<terrain_condition>(value);
 	} else if (key == "time_of_day") {

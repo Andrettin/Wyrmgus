@@ -57,6 +57,7 @@ class terrain_type final : public named_data_entry, public data_type<terrain_typ
 	Q_PROPERTY(bool overlay MEMBER overlay READ is_overlay)
 	Q_PROPERTY(bool buildable MEMBER buildable READ is_buildable)
 	Q_PROPERTY(bool pathway MEMBER pathway READ is_pathway)
+	Q_PROPERTY(bool snowy MEMBER snowy READ is_snowy)
 	Q_PROPERTY(bool tiled_background MEMBER tiled_background READ has_tiled_background)
 	Q_PROPERTY(bool transition_mask MEMBER transition_mask READ has_transition_mask)
 	Q_PROPERTY(bool allow_single MEMBER allow_single READ allows_single)
@@ -284,6 +285,20 @@ public:
 	bool is_wall() const;
 	bool is_constructed() const;
 
+	bool is_snowy() const
+	{
+		return this->snowy;
+	}
+
+	bool is_snowy(const season *season) const
+	{
+		if (this->is_snowy()) {
+			return true;
+		}
+
+		return this->snowy_seasons.contains(season);
+	}
+
 	bool has_tiled_background() const
 	{
 		return this->tiled_background;
@@ -420,6 +435,8 @@ private:
 	bool overlay = false;				/// Whether this terrain type belongs to the overlay layer
 	bool buildable = false;				/// Whether structures can be built upon this terrain type
 	bool pathway = false;
+	bool snowy = false;
+	std::set<const season *> snowy_seasons;
 	bool tiled_background = false;
 	bool transition_mask = false;
 	bool allow_single = false;			/// Whether this terrain type has transitions for single tiles

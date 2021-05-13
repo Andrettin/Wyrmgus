@@ -151,6 +151,10 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 
 			this->season_minimap_colors[season] = color;
 		});
+	} else if (tag == "snowy_seasons") {
+		for (const std::string &value : values) {
+			this->snowy_seasons.insert(season::get(value));
+		}
 	} else if (tag == "transition_tiles" || tag == "adjacent_transition_tiles") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &child_tag = child_scope.get_tag();
