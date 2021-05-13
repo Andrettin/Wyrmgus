@@ -260,7 +260,21 @@ QStringList engine_interface::get_map_worlds() const
 		map_worlds.insert(map_info->MapWorld);
 	}
 
-	return container::to_qstring_list(map_worlds);
+	QStringList map_world_qstring_list = container::to_qstring_list(map_worlds);
+
+	std::sort(map_world_qstring_list.begin(), map_world_qstring_list.end(), [](const QString &lhs, const QString &rhs) {
+		if (lhs == "Custom" || rhs == "Custom") {
+			return lhs != "Custom";
+		}
+
+		if (lhs == "Random" || rhs == "Random") {
+			return lhs != "Random";
+		}
+
+		return lhs < rhs;
+	});
+
+	return map_world_qstring_list;
 }
 
 QVariantList engine_interface::get_map_infos(const QString &world) const
