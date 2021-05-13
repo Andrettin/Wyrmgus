@@ -1222,9 +1222,9 @@ public:
 	std::vector<CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
 	std::vector<unit_type *> Trains;		/// Units trained by this unit
 	std::vector<unit_type *> TrainedBy;		/// Units which can train this unit
-	std::map<std::string, std::vector<unit_type *>> ModTrains;	/// Units trained by this unit (as set in a mod)
-	std::map<std::string, std::vector<unit_type *>> ModTrainedBy;	/// Units which can train this unit (as set in a mod)
-	std::map<std::string, std::vector<unit_type *>> ModAiDrops;	/// Units dropped by this unit, if it is AI-controlled (as set in a mod)
+	std::map<std::filesystem::path, std::vector<unit_type *>> ModTrains; //units trained by this unit (as set in a mod)
+	std::map<std::filesystem::path, std::vector<unit_type *>> ModTrainedBy; //units which can train this unit (as set in a mod)
+	std::map<std::filesystem::path, std::vector<unit_type *>> ModAiDrops; //units dropped by this unit, if it is AI-controlled (as set in a mod)
 	//Wyrmgus end
 	int Slot = 0;                    /// Type as number
 private:
@@ -1377,7 +1377,7 @@ public:
 	CUnitStats DefaultStat;
 	CUnitStats MapDefaultStat;
 	//Wyrmgus start
-	std::map<std::string, CUnitStats> ModDefaultStats;
+	std::map<std::filesystem::path, CUnitStats> ModDefaultStats;
 	//Wyrmgus end
 	struct BoolFlags {
 		bool value;             /// User defined flag. Used for (dis)allow target.
@@ -1406,7 +1406,7 @@ private:
 public:
 	std::unique_ptr<unit_sound_set> MapSound;			/// Sounds for events, map-specific
 	//Wyrmgus start
-	std::map<std::string, unit_sound_set> ModSounds;
+	std::map<std::filesystem::path, unit_sound_set> ModSounds;
 	//Wyrmgus end
 
 	int PoisonDrain = 0;                /// How much health is drained every second when poisoned
@@ -1430,7 +1430,7 @@ private:
 	std::unique_ptr<condition> conditions;
 	
 public:
-	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
+	std::filesystem::path Mod;							/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end
 
 	friend int ::CclDefineUnitType(lua_State *l);

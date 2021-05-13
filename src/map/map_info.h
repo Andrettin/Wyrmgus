@@ -43,6 +43,7 @@ class map_info final : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring CONSTANT)
+	Q_PROPERTY(QString presentation_filepath READ get_presentation_filepath_qstring CONSTANT)
 
 public:
 	bool IsPointOnMap(const int x, const int y, const int z) const;
@@ -64,7 +65,7 @@ public:
 
 	QString get_name_qstring() const
 	{
-		return QString::fromStdString(this->name);
+		return QString::fromStdString(this->get_name());
 	}
 
 	void set_name(const std::string &name)
@@ -72,10 +73,46 @@ public:
 		this->name = name;
 	}
 
+	const std::filesystem::path &get_presentation_filepath() const
+	{
+		return this->presentation_filepath;
+	}
+
+	std::string get_presentation_filepath_string() const
+	{
+		return this->get_presentation_filepath().string();
+	}
+
+	QString get_presentation_filepath_qstring() const
+	{
+		return QString::fromStdString(this->get_presentation_filepath().string());
+	}
+
+	void set_presentation_filepath(const std::filesystem::path &filepath)
+	{
+		this->presentation_filepath = filepath;
+	}
+
+	void set_presentation_filepath(const std::string &filepath)
+	{
+		this->presentation_filepath = filepath;
+	}
+
+	std::filesystem::path get_setup_filepath() const
+	{
+		std::filesystem::path setup_filepath = this->get_presentation_filepath();
+
+		if (!setup_filepath.empty()) {
+			setup_filepath.replace_extension(".sms");
+		}
+
+		return setup_filepath;
+	}
+
 private:
 	std::string name;
+	std::filesystem::path presentation_filepath;
 public:
-	std::string Filename;       /// Map filename
 	int MapWidth;               /// Map width
 	int MapHeight;              /// Map height
 	//Wyrmgus start

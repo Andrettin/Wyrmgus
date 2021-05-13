@@ -237,7 +237,10 @@ void engine_interface::load_map_infos()
 					}
 
 					CMap::get()->get_info()->Clear();
+
 					LuaLoadFile(dir_entry.path().string());
+					CMap::get()->get_info()->set_presentation_filepath(dir_entry.path());
+
 					this->map_infos.push_back(CMap::get()->get_info()->duplicate());
 				}
 			}

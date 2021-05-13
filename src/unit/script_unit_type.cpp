@@ -2208,7 +2208,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->ButtonHint.c_str());
 		return 1;
 	} else if (!strcmp(data, "Mod")) {
-		lua_pushstring(l, type->Mod.c_str());
+		lua_pushstring(l, type->Mod.string().c_str());
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "LandUnit")) {
@@ -2319,7 +2319,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			mod_file = LuaToString(l, 3);
 		}
 
-		std::map<std::string, std::vector<wyrmgus::unit_type *>>::const_iterator mod_find_iterator = type->ModAiDrops.find(mod_file);
+		const auto mod_find_iterator = type->ModAiDrops.find(mod_file);
 		if (is_mod && mod_find_iterator != type->ModAiDrops.end()) {
 			lua_createtable(l, mod_find_iterator->second.size(), 0);
 			for (size_t i = 1; i <= mod_find_iterator->second.size(); ++i)
@@ -2507,7 +2507,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			mod_file = LuaToString(l, 3);
 		}
 
-		std::map<std::string, std::vector<wyrmgus::unit_type *>>::const_iterator mod_find_iterator = type->ModTrains.find(mod_file);
+		const auto mod_find_iterator = type->ModTrains.find(mod_file);
 		if (is_mod && mod_find_iterator != type->ModTrains.end()) {
 			lua_createtable(l, mod_find_iterator->second.size(), 0);
 			for (size_t i = 1; i <= mod_find_iterator->second.size(); ++i)

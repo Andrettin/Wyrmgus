@@ -2144,7 +2144,8 @@ void CUnit::GenerateDrop()
 				potential_drops.push_back(this->Type->AiDrops[i]);
 			}
 		}
-		for (std::map<std::string, std::vector<wyrmgus::unit_type *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
+
+		for (auto iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
 			for (size_t i = 0; i < iterator->second.size(); ++i) {
 				if (check_conditions(iterator->second[i], this)) {
 					potential_drops.push_back(iterator->second[i]);

@@ -1128,20 +1128,6 @@ static int CclPresentMap(lua_State *l)
 }
 
 /**
-** Define the lua file that will build the map
-**
-**  @param l  Lua state.
-*/
-static int CclDefineMapSetup(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	CMap::get()->Info->Filename = LuaToString(l, 1);
-
-	return 0;
-}
-
-
-/**
 **  Define an icon.
 **
 **  @param l  Lua state.
@@ -1268,7 +1254,6 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "DefineButtonStyle", CclDefineButtonStyle);
 
 	lua_register(Lua, "PresentMap", CclPresentMap);
-	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);
 
 	//
 	// Look and feel of units

@@ -88,6 +88,15 @@ inline void replace(std::string &str, const std::string_view &find, const std::s
 	}
 }
 
+inline void replace(std::string &str, const char find, const std::string_view &replace)
+{
+	size_t pos = 0;
+	while ((pos = str.find(find, pos)) != std::string::npos) {
+		str.replace(pos, 1, replace);
+		pos += replace.length();
+	}
+}
+
 inline void replace(std::string &str, const char find, const char replace)
 {
 	size_t pos = 0;
@@ -178,6 +187,7 @@ inline std::string normalized(const std::string &str)
 inline void escape(std::string &str)
 {
 	//escape special characters
+	string::replace(str, "\\", "\\\\");
 	string::replace(str, "\n", "\\n");
 	string::replace(str, "\t", "\\t");
 	string::replace(str, "\"", "\\\"");

@@ -113,7 +113,8 @@ static int CclStratagusMap(lua_State *l)
 					CMap::get()->NoFogOfWar = true;
 					--k;
 				} else if (!strcmp(subvalue, "filename")) {
-					CMap::get()->Info->Filename = LuaToString(l, j + 1, k + 1);
+					const std::filesystem::path filepath = LuaToString(l, j + 1, k + 1);
+					CMap::get()->Info->set_presentation_filepath(filepath);
 				//Wyrmgus start
 				} else if (!strcmp(subvalue, "extra-map-layers")) {
 					lua_rawgeti(l, j + 1, k + 1);

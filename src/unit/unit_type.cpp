@@ -2409,7 +2409,7 @@ void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 {
 	if (reset) {
 		type.MapDefaultStat = type.DefaultStat;
-		for (std::map<std::string, CUnitStats>::iterator iterator = type.ModDefaultStats.begin(); iterator != type.ModDefaultStats.end(); ++iterator) {
+		for (auto iterator = type.ModDefaultStats.begin(); iterator != type.ModDefaultStats.end(); ++iterator) {
 			for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 				type.MapDefaultStat.Variables[i].Value += iterator->second.Variables[i].Value;
 				type.MapDefaultStat.Variables[i].Max += iterator->second.Variables[i].Max;
@@ -2445,7 +2445,7 @@ void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 			*type.MapSound = *type.get_sound_set();
 		}
 
-		for (std::map<std::string, wyrmgus::unit_sound_set>::iterator iterator = type.ModSounds.begin(); iterator != type.ModSounds.end(); ++iterator) {
+		for (auto iterator = type.ModSounds.begin(); iterator != type.ModSounds.end(); ++iterator) {
 			if (!iterator->second.Selected.Name.empty()) {
 				type.MapSound->Selected = iterator->second.Selected;
 			}

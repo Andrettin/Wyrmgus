@@ -6,9 +6,9 @@ class map_info
 	string get_name() const;
 	void set_name(string name);
 	
-	//Wyrmgus start
-	string Filename;
-	//Wyrmgus end
+	string get_presentation_filepath_string() const;
+	void set_presentation_filepath(string filepath);
+	
 	int MapWidth;
 	int MapHeight;
 	int PlayerType[PlayerMax];

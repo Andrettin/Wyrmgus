@@ -30,6 +30,7 @@
 #include "map/map_info.h"
 
 #include "map/map_layer.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -90,7 +91,7 @@ bool map_info::IsPointOnMap(const Vec2i &pos, const CMapLayer *map_layer) const
 void map_info::Clear()
 {
 	this->name.clear();
-	this->Filename.clear();
+	this->presentation_filepath.clear();
 	this->MapWidth = this->MapHeight = 0;
 	//Wyrmgus start
 	this->MapWidths.clear();
@@ -107,7 +108,7 @@ qunique_ptr<map_info> map_info::duplicate() const
 	auto info = make_qunique<map_info>();
 
 	info->name = this->name;
-	info->Filename = this->Filename;
+	info->presentation_filepath = this->presentation_filepath;
 	info->MapWidth = this->MapWidth;
 	info->MapHeight = this->MapHeight;
 	info->MapWidths = this->MapWidths;

@@ -128,7 +128,7 @@ int SaveGame(const std::string &filename)
 		file.printf("SetCurrentCampaign(\"%s\")\n", current_campaign->GetIdent().c_str());
 	}
 	//Wyrmgus end
-	file.printf("Load(\"%s\")\n", CMap::get()->Info->Filename.c_str());
+	file.printf("Load(\"%s\")\n", CMap::get()->Info->get_setup_filepath().string().c_str());
 	file.printf("CreateUnit = oldCreateUnit\n");
 	file.printf("SetResourcesHeld = oldSetResourcesHeld\n");
 	file.printf("SetTile = oldSetTile\n");

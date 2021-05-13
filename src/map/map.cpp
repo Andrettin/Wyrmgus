@@ -1808,7 +1808,7 @@ void CMap::save(CFile &file) const
 	file.printf("  \"description\", \"%s\",\n", this->Info->get_name().c_str());
 	file.printf("  \"the-map\", {\n");
 	file.printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
-	file.printf("  \"filename\", \"%s\",\n", this->Info->Filename.c_str());
+	file.printf("  \"filename\", \"%s\",\n", this->Info->get_presentation_filepath().string().c_str());
 	//Wyrmgus start
 	file.printf("  \"extra-map-layers\", {\n");
 	for (size_t z = 1; z < this->MapLayers.size(); ++z) {
@@ -3952,8 +3952,7 @@ void LoadStratagusMapInfo(const std::string &mapname)
 	// Set the default map setup by replacing .smp with .sms
 	size_t loc = mapname.find(".smp");
 	if (loc != std::string::npos) {
-		CMap::get()->Info->Filename = mapname;
-		CMap::get()->Info->Filename.replace(loc, 4, ".sms");
+		CMap::get()->Info->set_presentation_filepath(mapname);
 	}
 
 	const std::string filename = LibraryFileName(mapname.c_str());
