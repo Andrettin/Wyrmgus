@@ -282,23 +282,56 @@ void terrain_type::calculate_minimap_color(const season *season)
 	int green = 0;
 	int blue = 0;
 
-	for (int x = 0; x < image.width(); ++x) {
-		for (int y = 0; y < image.height(); ++y) {
-			const QPoint pixel_pos = QPoint(x, y);
-			const QColor pixel_color = image.pixelColor(pixel_pos);
+	const QSize &frame_size = graphics->get_original_frame_size();
 
-			if (pixel_color.alpha() != 255) { //transparent pixel, ignore
-				continue;
+	const std::set<int> solid_tile_set = container::to_set(this->get_solid_tiles());
+
+	for (const int solid_tile : solid_tile_set) {
+		const QPoint frame_pos = graphic->get_frame_pos(solid_tile);
+
+		const int start_x = frame_pos.x() * frame_size.width();
+		const int start_y = frame_pos.y() * frame_size.height();
+
+		for (int x = 0; x < frame_size.width(); ++x) {
+			for (int y = 0; y < frame_size.height(); ++y) {
+				const QPoint pixel_pos = QPoint(start_x + x, start_y + y);
+				const QColor pixel_color = image.pixelColor(pixel_pos);
+
+				if (pixel_color.alpha() != 255) { //transparent pixel, ignore
+					continue;
+				}
+
+				if (vector::contains(conversible_player_color->get_colors(), pixel_color)) {
+					continue;
+				}
+
+				red += pixel_color.red();
+				green += pixel_color.green();
+				blue += pixel_color.blue();
+				pixel_count++;
 			}
+		}
+	}
 
-			if (vector::contains(conversible_player_color->get_colors(), pixel_color)) {
-				continue;
+	if (pixel_count == 0) {
+		for (int x = 0; x < image.width(); ++x) {
+			for (int y = 0; y < image.height(); ++y) {
+				const QPoint pixel_pos = QPoint(x, y);
+				const QColor pixel_color = image.pixelColor(pixel_pos);
+
+				if (pixel_color.alpha() != 255) { //transparent pixel, ignore
+					continue;
+				}
+
+				if (vector::contains(conversible_player_color->get_colors(), pixel_color)) {
+					continue;
+				}
+
+				red += pixel_color.red();
+				green += pixel_color.green();
+				blue += pixel_color.blue();
+				pixel_count++;
 			}
-
-			red += pixel_color.red();
-			green += pixel_color.green();
-			blue += pixel_color.blue();
-			pixel_count++;
 		}
 	}
 
