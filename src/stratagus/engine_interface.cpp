@@ -244,6 +244,8 @@ void engine_interface::load_map_infos()
 					this->map_infos.push_back(CMap::get()->get_info()->duplicate());
 				}
 			}
+
+			CMap::get()->get_info()->Clear();
 		} catch (const std::exception &exception) {
 			exception::report(exception);
 		}
