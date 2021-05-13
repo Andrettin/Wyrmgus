@@ -44,6 +44,8 @@ class map_info final : public QObject
 
 	Q_PROPERTY(QString name READ get_name_qstring CONSTANT)
 	Q_PROPERTY(QString presentation_filepath READ get_presentation_filepath_qstring CONSTANT)
+	Q_PROPERTY(int map_width READ get_map_width CONSTANT)
+	Q_PROPERTY(int map_height READ get_map_height CONSTANT)
 
 public:
 	bool IsPointOnMap(const int x, const int y, const int z) const;
@@ -107,6 +109,16 @@ public:
 		}
 
 		return setup_filepath;
+	}
+
+	int get_map_width() const
+	{
+		return this->MapWidth;
+	}
+
+	int get_map_height() const
+	{
+		return this->MapHeight;
 	}
 
 private:
