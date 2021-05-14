@@ -64,8 +64,9 @@ public:
 		}
 
 		const season *season = unit->MapLayer->get_tile_season(unit->get_center_tile_pos());
+		const terrain_type *tile_terrain = center_tile->get_terrain();
 
-		return center_tile->get_terrain()->is_snowy(season);
+		return tile_terrain != nullptr && tile_terrain->is_snowy(season);
 	}
 
 	virtual std::string get_string(const size_t indent) const override
