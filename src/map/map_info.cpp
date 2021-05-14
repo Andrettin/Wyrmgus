@@ -30,6 +30,7 @@
 #include "map/map_info.h"
 
 #include "map/map_layer.h"
+#include "player.h" //for the player types enum
 #include "util/string_util.h"
 
 namespace wyrmgus {
@@ -120,5 +121,32 @@ qunique_ptr<map_info> map_info::duplicate() const
 
 	return info;
 }
+
+int map_info::get_player_count() const
+{
+	int count = 0;
+
+	for (const int player_type : this->PlayerType) {
+		if (player_type == PlayerPerson || player_type == PlayerComputer) {
+			++count;
+		}
+	}
+
+	return count;
+}
+
+int map_info::get_person_player_count() const
+{
+	int count = 0;
+
+	for (const int player_type : this->PlayerType) {
+		if (player_type == PlayerPerson) {
+			++count;
+		}
+	}
+
+	return count;
+}
+
 
 }

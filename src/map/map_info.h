@@ -46,6 +46,8 @@ class map_info final : public QObject
 	Q_PROPERTY(QString presentation_filepath READ get_presentation_filepath_qstring CONSTANT)
 	Q_PROPERTY(int map_width READ get_map_width CONSTANT)
 	Q_PROPERTY(int map_height READ get_map_height CONSTANT)
+	Q_PROPERTY(int player_count READ get_player_count CONSTANT)
+	Q_PROPERTY(int person_player_count READ get_person_player_count CONSTANT)
 
 public:
 	bool IsPointOnMap(const int x, const int y, const int z) const;
@@ -120,6 +122,9 @@ public:
 	{
 		return this->MapHeight;
 	}
+
+	int get_player_count() const;
+	int get_person_player_count() const;
 
 private:
 	std::string name;
