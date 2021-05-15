@@ -58,6 +58,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 {
 	Q_OBJECT
 
+	Q_PROPERTY(int index READ get_index CONSTANT)
 	Q_PROPERTY(QString link_string READ get_link_qstring CONSTANT)
 	Q_PROPERTY(wyrmgus::civilization* parent_civilization MEMBER parent_civilization READ get_parent_civilization)
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
@@ -66,6 +67,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 	Q_PROPERTY(wyrmgus::language* language MEMBER language)
 	Q_PROPERTY(QString encyclopedia_background_file READ get_encyclopedia_background_file_qstring NOTIFY changed)
+	Q_PROPERTY(int develops_from_count READ get_develops_from_count CONSTANT)
 
 public:
 	static constexpr const char *class_identifier = "civilization";
@@ -96,6 +98,11 @@ public:
 	}
 
 	virtual std::string get_encyclopedia_text() const override;
+
+	int get_index() const
+	{
+		return this->ID;
+	}
 
 	QString get_link_qstring() const
 	{
@@ -178,6 +185,11 @@ public:
 	const std::vector<const civilization *> &get_develops_from() const
 	{
 		return this->develops_from;
+	}
+
+	int get_develops_from_count() const
+	{
+		return static_cast<int>(this->get_develops_from().size());
 	}
 
 	const std::vector<const civilization *> &get_develops_to() const
