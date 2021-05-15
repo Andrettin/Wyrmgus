@@ -271,6 +271,11 @@ void game::save(CFile &file) const
 	file.printf("%s", str.c_str());
 }
 
+bool game::is_persistency_enabled() const
+{
+	return !IsNetworkGame() && !this->cheat;
+}
+
 void game::add_local_trigger(std::unique_ptr<trigger> &&local_trigger)
 {
 	this->local_triggers.push_back(std::move(local_trigger));

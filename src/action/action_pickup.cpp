@@ -34,6 +34,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "database/defines.h"
+#include "game.h"
 #include "iolib.h"
 #include "item/persistent_item.h"
 #include "luacallback.h"
@@ -199,7 +200,7 @@ void COrder_PickUp::Execute(CUnit &unit)
 			goal->TTL = 0; //remove item destruction timer when picked up
 			
 			goal->Remove(&unit);
-			if (!IsNetworkGame() && unit.get_character() != nullptr && unit.Player == CPlayer::GetThisPlayer()) { //if the unit has a persistent character, store the item for it
+			if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr && unit.Player == CPlayer::GetThisPlayer()) { //if the unit has a persistent character, store the item for it
 				auto item = std::make_unique<wyrmgus::persistent_item>(goal, unit.get_character());
 				unit.get_character()->add_item(std::move(item));
 				SaveHero(unit.get_character());

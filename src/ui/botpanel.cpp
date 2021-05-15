@@ -2036,7 +2036,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button, const Qt::KeyboardM
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
 				Selected[i]->Variable[LEVELUP_INDEX].Value -= 1;
 				Selected[i]->Variable[LEVELUP_INDEX].Max = Selected[i]->Variable[LEVELUP_INDEX].Value;
-				if (!IsNetworkGame() && Selected[i]->get_character() != nullptr) {	//save the unit-type experience upgrade for persistent characters
+				if (game::get()->is_persistency_enabled() && Selected[i]->get_character() != nullptr) {	//save the unit-type experience upgrade for persistent characters
 					if (Selected[i]->get_character()->get_unit_type()->Slot != type.Slot) {
 						if (Selected[i]->Player == CPlayer::GetThisPlayer()) {
 							Selected[i]->get_character()->set_unit_type(wyrmgus::unit_type::get_all()[CurrentButtons[button]->Value]);

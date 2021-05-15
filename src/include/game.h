@@ -132,6 +132,8 @@ public:
 		this->cheat = cheat;
 	}
 
+	bool is_persistency_enabled() const;
+
 	void add_local_trigger(std::unique_ptr<trigger> &&local_trigger);
 	void remove_local_trigger(trigger *local_trigger);
 	void clear_local_triggers();

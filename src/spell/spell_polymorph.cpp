@@ -124,7 +124,8 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 			type = new_unit_type;
 		}
 	}
-	if (target->get_character() != nullptr && target->get_character()->Custom && target->get_character()->get_civilization() && this->civilization != nullptr && this->civilization != target->get_character()->get_civilization() && target->Player == CPlayer::GetThisPlayer()) {
+
+	if (game::get()->is_persistency_enabled() && target->get_character() != nullptr && target->get_character()->Custom && target->get_character()->get_civilization() && this->civilization != nullptr && this->civilization != target->get_character()->get_civilization() && target->Player == CPlayer::GetThisPlayer()) {
 		target->get_character()->civilization = this->civilization;
 		SaveHero(target->get_character());
 	}
@@ -193,7 +194,7 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 //	UnitLost(*target);
 //	target->clear_orders();
 //	target->Release();
-	if (!IsNetworkGame() && target->get_character() != nullptr && &caster == target) { //save persistent data
+	if (game::get()->is_persistency_enabled() && target->get_character() != nullptr && &caster == target) { //save persistent data
 		if (target->Player == CPlayer::GetThisPlayer()) {
 			target->get_character()->set_unit_type(type);
 			SaveHero(target->get_character());

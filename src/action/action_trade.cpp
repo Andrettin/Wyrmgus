@@ -32,6 +32,7 @@
 #include "character.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "game.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "map/map_layer.h"
@@ -264,7 +265,7 @@ void COrder_Trade::Execute(CUnit &unit)
 					goal->Remove(nullptr);
 					LetUnitDie(*goal);
 				} else {
-					if (!IsNetworkGame() && goal->Container->get_character() != nullptr && goal->Container->Player == CPlayer::GetThisPlayer() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
+					if (game::get()->is_persistency_enabled() && goal->Container->get_character() != nullptr && goal->Container->Player == CPlayer::GetThisPlayer() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
 						wyrmgus::persistent_item *item = goal->Container->get_character()->get_item(goal);
 						goal->Container->get_character()->remove_item(item);
 						SaveHero(goal->Container->get_character());

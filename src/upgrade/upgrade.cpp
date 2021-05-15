@@ -2306,7 +2306,7 @@ void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, bool save)
 {
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
-	if (!IsNetworkGame() && unit.get_character() != nullptr && save) {
+	if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr && save) {
 		if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 			unit.get_character()->add_ability(upgrade);
 			SaveHero(unit.get_character());
@@ -2321,7 +2321,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	unit.Variable[LEVELUP_INDEX].Value += 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	unit.Variable[LEVELUP_INDEX].Enable = 1;
-	if (!IsNetworkGame() && unit.get_character() != nullptr) {
+	if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr) {
 		if (wyrmgus::vector::contains(unit.get_character()->get_abilities(), upgrade)) {
 			if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 				unit.get_character()->remove_ability(upgrade);
@@ -2375,7 +2375,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 				IndividualUpgradeAcquire(unit, domain_upgrade);
 			}
 		}
-		if (unit.get_character() != nullptr && !wyrmgus::vector::contains(unit.get_character()->Deities, upgrade_deity) && unit.Player == CPlayer::GetThisPlayer()) {
+		if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr && !wyrmgus::vector::contains(unit.get_character()->Deities, upgrade_deity) && unit.Player == CPlayer::GetThisPlayer()) {
 			unit.get_character()->Deities.push_back(upgrade_deity);
 			SaveHero(unit.get_character());
 		}
@@ -2429,8 +2429,8 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 				IndividualUpgradeLost(unit, domain_upgrade);
 			}
 		}
-		if (unit.get_character() != nullptr && unit.Player == CPlayer::GetThisPlayer()) {
-			wyrmgus::vector::remove(unit.get_character()->Deities, upgrade_deity);
+		if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr && unit.Player == CPlayer::GetThisPlayer()) {
+			vector::remove(unit.get_character()->Deities, upgrade_deity);
 			SaveHero(unit.get_character());
 		}
 	}

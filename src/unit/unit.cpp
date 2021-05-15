@@ -877,7 +877,7 @@ void CUnit::Retrain()
 	}
 
 	//save the retraining for persistent characters
-	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer()) {
+	if (game::get()->is_persistency_enabled() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer()) {
 		SaveHero(this->get_character());
 	}
 
@@ -1040,7 +1040,7 @@ void CUnit::apply_character_properties()
 			this->get_character()->remove_ability(abilities_to_remove[i]);
 		}
 
-		if (this->Player == CPlayer::GetThisPlayer()) {
+		if (game::get()->is_persistency_enabled() && this->Player == CPlayer::GetThisPlayer()) {
 			SaveHero(this->get_character());
 		}
 	}
@@ -1667,7 +1667,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		return;
 	}
 	
-	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
+	if (game::get()->is_persistency_enabled() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
 		const wyrmgus::persistent_item *persistent_item = this->get_character()->get_item(&item);
 		if (persistent_item != nullptr) {
 			if (get_character()->is_item_equipped(persistent_item)) {
@@ -1769,8 +1769,8 @@ void CUnit::ReadWork(const CUpgrade *work, bool affect_character)
 {
 	IndividualUpgradeAcquire(*this, work);
 	
-	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
-		if (!wyrmgus::vector::contains(this->get_character()->ReadWorks, work)) {
+	if (game::get()->is_persistency_enabled() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
+		if (!vector::contains(this->get_character()->ReadWorks, work)) {
 			this->get_character()->ReadWorks.push_back(work);
 			SaveHero(this->get_character());
 		}
@@ -1781,7 +1781,7 @@ void CUnit::ConsumeElixir(const CUpgrade *elixir, bool affect_character)
 {
 	IndividualUpgradeAcquire(*this, elixir);
 	
-	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
+	if (game::get()->is_persistency_enabled() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
 		if (!wyrmgus::vector::contains(this->get_character()->ConsumedElixirs, elixir)) {
 			this->get_character()->ConsumedElixirs.push_back(elixir);
 			SaveHero(this->get_character());
@@ -1861,7 +1861,7 @@ void CUnit::SetPrefix(const CUpgrade *prefix)
 		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->get_magic_level();
 		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->get_magic_level();
 	}
-	if (!IsNetworkGame() && this->Container != nullptr && this->Container->get_character() != nullptr && this->Container->Player == CPlayer::GetThisPlayer() && this->Container->get_character()->has_item(this) && this->Container->get_character()->get_item(this)->Prefix != prefix) {
+	if (game::get()->is_persistency_enabled() && this->Container != nullptr && this->Container->get_character() != nullptr && this->Container->Player == CPlayer::GetThisPlayer() && this->Container->get_character()->has_item(this) && this->Container->get_character()->get_item(this)->Prefix != prefix) {
 		//update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->Prefix = prefix;
 		SaveHero(this->Container->get_character());
@@ -1887,7 +1887,7 @@ void CUnit::SetSuffix(const CUpgrade *suffix)
 		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->get_magic_level();
 		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->get_magic_level();
 	}
-	if (!IsNetworkGame() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Suffix != suffix) {
+	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Suffix != suffix) {
 		//update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->Suffix = suffix;
 		SaveHero(this->Container->get_character());
@@ -1906,7 +1906,7 @@ void CUnit::SetSuffix(const CUpgrade *suffix)
 
 void CUnit::SetSpell(const wyrmgus::spell *spell)
 {
-	if (!IsNetworkGame() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->Spell = spell;
 		SaveHero(this->Container->get_character());
 	}
@@ -1922,7 +1922,7 @@ void CUnit::SetWork(const CUpgrade *work)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->get_magic_level();
 	}
 	
-	if (!IsNetworkGame() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->Work = work;
 		SaveHero(Container->get_character());
 	}
@@ -1944,7 +1944,7 @@ void CUnit::SetElixir(const CUpgrade *elixir)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->get_magic_level();
 	}
 	
-	if (!IsNetworkGame() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->Elixir = elixir;
 		SaveHero(Container->get_character());
 	}
@@ -2014,7 +2014,7 @@ void CUnit::set_site(const wyrmgus::site *site)
 
 void CUnit::Identify()
 {
-	if (!IsNetworkGame() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && !this->Container->get_character()->get_item(this)->is_identified()) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && !this->Container->get_character()->get_item(this)->is_identified()) { //update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->set_identified(true);
 		SaveHero(this->Container->get_character());
 	}
@@ -3697,7 +3697,7 @@ void CUnit::XPChanged()
 		this->IncreaseLevel(1);
 	}
 	
-	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer()) {
+	if (game::get()->is_persistency_enabled() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer()) {
 		if (this->Variable[LEVEL_INDEX].Value > this->get_character()->get_level()) { //save level, if the unit has a persistent character
 			this->get_character()->set_level(this->Variable[LEVEL_INDEX].Value);
 		}
