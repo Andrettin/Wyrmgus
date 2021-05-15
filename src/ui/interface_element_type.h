@@ -30,6 +30,7 @@ namespace wyrmgus {
 
 enum class interface_element_type {
 	top_bar,
+	panel,
 	large_button,
 	small_button,
 	radio_button,
@@ -46,6 +47,8 @@ inline interface_element_type string_to_interface_element_type(const std::string
 {
 	if (str == "top_bar") {
 		return interface_element_type::top_bar;
+	} else if (str == "panel") {
+		return interface_element_type::panel;
 	} else if (str == "large_button") {
 		return interface_element_type::large_button;
 	} else if (str == "small_button") {

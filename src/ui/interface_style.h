@@ -59,11 +59,24 @@ public:
 
 	const std::shared_ptr<CGraphic> &get_interface_element_graphics(const interface_element_type type, const std::vector<std::string> &qualifiers) const;
 
+	const std::shared_ptr<CGraphic> &get_panel_graphics(const int panel) const
+	{
+		const auto find_iterator = this->panel_graphics.find(panel);
+
+		if (find_iterator != this->panel_graphics.end()) {
+			return find_iterator->second;
+		}
+
+		throw std::runtime_error("No graphics found for panel " + std::to_string(panel) + " for interface style \"" + this->get_identifier() + "\".");
+	}
+
 	const button_style *get_button(const interface_element_type type) const;
 
 private:
 	std::filesystem::path top_bar_file;
 	std::shared_ptr<CGraphic> top_bar_graphics;
+	std::map<int, std::filesystem::path> panel_files;
+	std::map<int, std::shared_ptr<CGraphic>> panel_graphics;
 	std::filesystem::path dropdown_bar_file;
 	std::shared_ptr<CGraphic> dropdown_bar_graphics;
 	std::unique_ptr<button_style> large_button;
