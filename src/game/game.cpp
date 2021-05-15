@@ -107,6 +107,7 @@
 #include "upgrade/upgrade.h"
 #include "util/date_util.h"
 #include "util/random.h"
+#include "util/string_conversion_util.h"
 #include "util/string_util.h"
 //Wyrmgus start
 #include "util/util.h"
@@ -189,8 +190,13 @@ void game::do_cycle()
 void game::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
 
-	throw std::runtime_error("Invalid game data property: \"" + key + "\".");
+	if (key == "cheat") {
+		this->cheat = string::to_bool(value);
+	} else {
+		throw std::runtime_error("Invalid game data property: \"" + key + "\".");
+	}
 }
 
 void game::process_sml_scope(const sml_data &scope)
@@ -222,6 +228,10 @@ void game::process_sml_scope(const sml_data &scope)
 void game::save(CFile &file) const
 {
 	sml_data game_data;
+
+	if (this->cheat) {
+		game_data.add_property("cheat", string::from_bool(this->cheat));
+	}
 
 	if (!this->player_delayed_effects.empty()) {
 		sml_data delayed_effects_data("player_delayed_effects");
@@ -1784,7 +1794,7 @@ void CleanGame()
 
 	CleanGame_Lua();
 	trigger::ClearActiveTriggers();
-	game::get()->clear_delayed_effects();
+	game::get()->clear();
 	CleanAi();
 	CleanGroups();
 	CleanMissiles();

@@ -1021,6 +1021,7 @@ static int InputKey(int key)
 					//Wyrmgus end
 						if (HandleCheats(message_input.data())) {
 							CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, message_input.data(), -1);
+							game::get()->set_cheat(true);
 						}
 					}
 				}

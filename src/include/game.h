@@ -55,6 +55,12 @@ public:
 	game();
 	~game();
 
+	void clear()
+	{
+		this->cheat = false;
+		this->clear_delayed_effects();
+	}
+
 	bool is_running() const
 	{
 		return this->running;
@@ -121,6 +127,11 @@ public:
 
 	void save(CFile &file) const;
 
+	void set_cheat(const bool cheat)
+	{
+		this->cheat = cheat;
+	}
+
 	void add_local_trigger(std::unique_ptr<trigger> &&local_trigger);
 	void remove_local_trigger(trigger *local_trigger);
 	void clear_local_triggers();
@@ -160,6 +171,7 @@ private:
 	campaign *current_campaign = nullptr;
 	QDateTime current_date;
 	uint64_t current_total_hours = 0; //the total in-game hours
+	bool cheat = false; //whether a cheat was used in this game
 	std::vector<std::unique_ptr<trigger>> local_triggers; //triggers "local" to the current game
 	std::vector<std::unique_ptr<delayed_effect_instance<CPlayer>>> player_delayed_effects;
 	std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> unit_delayed_effects;
