@@ -48,6 +48,7 @@ class map_info final : public QObject
 	Q_PROPERTY(int map_height READ get_map_height CONSTANT)
 	Q_PROPERTY(int player_count READ get_player_count CONSTANT)
 	Q_PROPERTY(int person_player_count READ get_person_player_count CONSTANT)
+	Q_PROPERTY(int person_player_index READ get_person_player_index CONSTANT)
 
 public:
 	bool IsPointOnMap(const int x, const int y, const int z) const;
@@ -125,6 +126,7 @@ public:
 
 	int get_player_count() const;
 	int get_person_player_count() const;
+	int get_person_player_index() const;
 
 private:
 	std::string name;

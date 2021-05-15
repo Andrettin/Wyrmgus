@@ -31,6 +31,7 @@
 
 #include "map/map_layer.h"
 #include "player.h" //for the player types enum
+#include "util/log_util.h"
 #include "util/string_util.h"
 
 namespace wyrmgus {
@@ -148,5 +149,18 @@ int map_info::get_person_player_count() const
 	return count;
 }
 
+int map_info::get_person_player_index() const
+{
+	//get the index of the first person player
+	for (size_t i = 0; i < (PlayerMax - 1); ++i) {
+		if (PlayerType[i] == PlayerPerson) {
+			return i;
+		}
+	}
+
+	log::log_error("No person player found for map \"" + this->get_presentation_filepath().string() + "\".");
+
+	return -1;
+}
 
 }
