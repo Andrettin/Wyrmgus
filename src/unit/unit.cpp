@@ -854,11 +854,11 @@ void CUnit::Retrain()
 						this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 						this->Variable[LEVELUP_INDEX].Enable = 1;
 						TransformUnitIntoType(*this, *unit_type);
-						if (!IsNetworkGame() && this->get_character() != nullptr) {	//save the unit-type experience upgrade for persistent characters
+						if (game::get()->is_persistency_enabled() && this->get_character() != nullptr) {	//save the unit-type experience upgrade for persistent characters
 							if (this->get_character()->get_unit_type() != unit_type) {
 								if (this->Player == CPlayer::GetThisPlayer()) {
 									this->get_character()->set_unit_type(unit_type);
-									wyrmgus::achievement::check_achievements();
+									achievement::check_achievements();
 								}
 							}
 						}
@@ -3703,7 +3703,7 @@ void CUnit::XPChanged()
 		}
 		this->get_character()->ExperiencePercent = (this->Variable[XP_INDEX].Value * 100) / this->Variable[XPREQUIRED_INDEX].Value;
 		SaveHero(this->get_character());
-		wyrmgus::achievement::check_achievements(); // check achievements to see if any hero now has a high enough level for a particular achievement to be obtained
+		achievement::check_achievements(); // check achievements to see if any hero now has a high enough level for a particular achievement to be obtained
 	}
 }
 //Wyrmgus end

@@ -2710,8 +2710,10 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
-		SetQuestCompleted(quest->get_identifier(), GameSettings.Difficulty);
-		SaveQuestCompletion();
+		if (game::get()->is_persistency_enabled()) {
+			SetQuestCompleted(quest->get_identifier(), GameSettings.Difficulty);
+			SaveQuestCompletion();
+		}
 
 		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 		if (current_campaign != nullptr && current_campaign->get_quest() == quest) {
@@ -2894,12 +2896,12 @@ std::pair<bool, std::string> CPlayer::check_quest_failure(const wyrmgus::quest *
 
 bool CPlayer::has_quest(const wyrmgus::quest *quest) const
 {
-	return wyrmgus::vector::contains(this->current_quests, quest);
+	return vector::contains(this->current_quests, quest);
 }
 
 bool CPlayer::is_quest_completed(const wyrmgus::quest *quest) const
 {
-	return wyrmgus::vector::contains(this->completed_quests, quest);
+	return vector::contains(this->completed_quests, quest);
 }
 
 void CPlayer::on_unit_built(const CUnit *unit)
