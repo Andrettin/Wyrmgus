@@ -31,7 +31,7 @@
 /**
 **  Possible outcomes of the game.
 */
-enum GameResults {
+enum GameResults : int {
 	GameNoResult,  /// Game has no result
 	GameVictory,   /// Game was won
 	GameDefeat,    /// Game was lost
