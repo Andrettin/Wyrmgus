@@ -1933,6 +1933,11 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 		unit_type = historical_unit->get_unit_types()[SyncRand(historical_unit->get_unit_types().size())];
 	} else if (!historical_unit->get_unit_classes().empty()) {
 		const unit_class *unit_class = historical_unit->get_unit_classes()[SyncRand(historical_unit->get_unit_classes().size())];
+
+		if (unit_faction == nullptr) {
+			throw std::runtime_error("Historical unit \"" + historical_unit->get_identifier() + "\" is being applied via unit class, but it has no faction.");
+		}
+
 		unit_type = unit_faction->get_class_unit_type(unit_class);
 	} else if (historical_unit->get_unique() != nullptr) {
 		unit_type = historical_unit->get_unique()->get_unit_type();
