@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name results.h - The game results headerfile. */
-//
-//      (c) Copyright 2002-2006 by Lutz Sammer, Francois Beerten and Jimmy Salmon
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,21 +24,27 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-/**
-**  Possible outcomes of the game.
-*/
-enum GameResults {
-	GameNoResult,  /// Game has no result
-	GameVictory,   /// Game was won
-	GameDefeat,    /// Game was lost
-	GameDraw,      /// Game was draw
-	GameQuitToMenu,/// Quit to menu
-	GameRestart,   /// Restart game
-	GameExit
-};                 /// Game results
+#include "game/results_info.h"
 
-extern GameResults GameResult;   /// Outcome of the game
+#include "results.h"
 
-extern void StopGame(GameResults result);
+namespace wyrmgus {
+
+bool results_info::is_victory() const
+{
+	return this->result == GameVictory;
+}
+
+bool results_info::is_defeat() const
+{
+	return this->result == GameDefeat;
+}
+
+bool results_info::is_draw() const
+{
+	return this->result == GameDraw;
+}
+
+}

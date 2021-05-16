@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "util/qunique_ptr.h"
 #include "util/singleton.h"
 
 class CFile;
@@ -35,6 +36,7 @@ class CUnit;
 namespace wyrmgus {
 
 class campaign;
+class results_info;
 class sml_data;
 class sml_property;
 class trigger;
@@ -48,6 +50,7 @@ class game final : public QObject, public singleton<game>
 
 	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign WRITE set_current_campaign)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
+	Q_PROPERTY(wyrmgus::results_info* results READ get_results NOTIFY results_changed)
 
 public:
 	static inline const QDateTime base_date = QDateTime(QDate(-100000, 1, 1)); //100,000 BC; base date from which to calculate the current total hours from the base date
@@ -163,10 +166,20 @@ public:
 
 	void clear_delayed_effects();
 
+	results_info *get_results() const
+	{
+		return this->results.get();
+	}
+
+	void set_results(qunique_ptr<results_info> &&results);
+	void store_results();
+	void clear_results();
+
 signals:
 	void started();
 	void stopped();
 	void running_changed();
+	void results_changed();
 
 private:
 	bool running = false;
@@ -177,6 +190,7 @@ private:
 	std::vector<std::unique_ptr<trigger>> local_triggers; //triggers "local" to the current game
 	std::vector<std::unique_ptr<delayed_effect_instance<CPlayer>>> player_delayed_effects;
 	std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> unit_delayed_effects;
+	qunique_ptr<results_info> results;
 };
 
 }

@@ -109,6 +109,10 @@ qunique_ptr<map_info> map_info::duplicate() const
 {
 	auto info = make_qunique<map_info>();
 
+	if (QApplication::instance()->thread() != QThread::currentThread()) {
+		info->moveToThread(QApplication::instance()->thread());
+	}
+
 	info->name = this->name;
 	info->presentation_filepath = this->presentation_filepath;
 	info->MapWidth = this->MapWidth;

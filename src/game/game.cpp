@@ -49,6 +49,7 @@
 #include "editor.h"
 #include "faction.h"
 #include "faction_type.h"
+#include "game/results_info.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -311,6 +312,28 @@ void game::clear_delayed_effects()
 {
 	this->player_delayed_effects.clear();
 	this->unit_delayed_effects.clear();
+}
+
+void game::set_results(qunique_ptr<results_info> &&results)
+{
+	this->results = std::move(results);
+	emit results_changed();
+}
+
+void game::store_results()
+{
+	auto results = make_qunique<results_info>(GameResult);
+
+	if (QApplication::instance()->thread() != QThread::currentThread()) {
+		results->moveToThread(QApplication::instance()->thread());
+	}
+
+	this->set_results(std::move(results));
+}
+
+void game::clear_results()
+{
+	this->set_results(nullptr);
 }
 
 }

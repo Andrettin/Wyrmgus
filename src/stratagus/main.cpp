@@ -34,6 +34,7 @@
 #include "engine_interface.h"
 #include "faction.h"
 #include "game.h"
+#include "game/results_info.h"
 #include "map/map_grid_model.h"
 #include "map/tile_image_provider.h"
 #include "map/tile_transition.h"
@@ -111,6 +112,7 @@ int main(int argc, char **argv)
 		qmlRegisterType<player_color>();
 		qmlRegisterType<preferences>();
 		qmlRegisterType<quest>();
+		qmlRegisterType<results_info>();
 		qmlRegisterType<timeline>();
 		qmlRegisterType<unit_type>();
 

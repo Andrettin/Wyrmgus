@@ -405,6 +405,7 @@ void StopGame(GameResults result)
 	GameResult = result;
 	GamePaused = true;
 	GameRunning = false;
+	game::get()->store_results();
 	game::get()->set_running(false);
 }
 

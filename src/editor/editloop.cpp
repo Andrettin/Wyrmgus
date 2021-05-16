@@ -2717,6 +2717,7 @@ void EditorMainLoop()
 			WaitEventsOneFrame();
 		}
 
+		game::get()->clear_results();
 		game::get()->set_running(false); //should use something different instead?
 
 		CursorBuilding = nullptr;

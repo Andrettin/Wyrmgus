@@ -153,6 +153,7 @@ set(game_SRCS
 	src/game/game.cpp
 	src/game/loadgame.cpp
 	src/game/replay.cpp
+	src/game/results_info.cpp
 	src/game/savegame.cpp
 )
 source_group(game FILES ${game_SRCS})
@@ -735,6 +736,7 @@ set(wyrmgus_economy_HDRS
 
 set(wyrmgus_game_HDRS
 	src/game/difficulty.h
+	src/game/results_info.h
 )
 
 set(wyrmgus_item_HDRS
