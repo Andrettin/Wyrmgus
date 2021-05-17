@@ -1010,19 +1010,18 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	//Wyrmgus end
 	
 	if (this->State == AiForceAttackingState::Waiting && isDefenceForce == false) {
-		Vec2i resultPos;
-		//Wyrmgus start
-//		NewRallyPoint(goalPos, &resultPos);
+		Vec2i resultPos(-1, -1);
 		NewRallyPoint(goalPos, &resultPos, z);
-		if (resultPos.x == 0 && resultPos.y == 0) {
-			resultPos = goalPos;
+
+		if (resultPos.x != -1 && resultPos.y != -1) {
+			this->GoalPos = resultPos;
+			this->State = AiForceAttackingState::GoingToRallyPoint;
+		} else {
+			this->GoalPos = goalPos;
+			this->State = AiForceAttackingState::Attacking;
 		}
-		//Wyrmgus end
-		this->GoalPos = resultPos;
-		//Wyrmgus start
+
 		this->GoalMapLayer = z;
-		//Wyrmgus end
-		this->State = AiForceAttackingState::GoingToRallyPoint;
 	} else {
 		this->GoalPos = goalPos;
 		//Wyrmgus start
@@ -1844,30 +1843,38 @@ void AiForce::Update()
 			//Wyrmgus end
 			return;
 		} else {
-			Vec2i resultPos;
-			if (unit) {
-				NewRallyPoint(unit->tilePos, &resultPos, unit->MapLayer->ID);
-				if (resultPos.x == 0 && resultPos.y == 0) {
-					resultPos = unit->tilePos;
-				}
-				this->GoalPos = resultPos;
-				this->GoalMapLayer = unit->MapLayer->ID;
+			QPoint goal_pos(-1, -1);
+			int z = -1;
+
+			if (unit != nullptr) {
+				goal_pos = unit->tilePos;
+				z = unit->MapLayer->ID;
+
 				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
 				}
 			} else if (CMap::get()->Info->IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
-				NewRallyPoint(enemy_wall_pos, &resultPos, enemy_wall_map_layer);
-				if (resultPos.x == 0 && resultPos.y == 0) {
-					resultPos = enemy_wall_pos;
-				}
-				this->GoalPos = resultPos;
-				this->GoalMapLayer = enemy_wall_map_layer;
+				goal_pos = enemy_wall_pos;
+				z = enemy_wall_map_layer;
+
 				CPlayer *enemy_wall_owner = CMap::get()->Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
 				if (!AiPlayer->Player->IsEnemy(*enemy_wall_owner) && enemy_wall_owner->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
 				}
 			}
-			this->State = AiForceAttackingState::GoingToRallyPoint;
+
+			Vec2i result_pos(-1, -1);
+			NewRallyPoint(goal_pos, &result_pos, z);
+
+			if (result_pos.x != -1 && result_pos.y != -1) {
+				this->GoalPos = result_pos;
+				this->State = AiForceAttackingState::GoingToRallyPoint;
+			} else {
+				this->GoalPos = goal_pos;
+				this->State = AiForceAttackingState::Attacking;
+			}
+
+			this->GoalMapLayer = unit->MapLayer->ID;
 		}
 	}
 	//Wyrmgus start
