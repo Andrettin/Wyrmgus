@@ -272,6 +272,19 @@ void game::save(CFile &file) const
 	file.printf("%s", str.c_str());
 }
 
+void game::set_cheat(const bool cheat)
+{
+	if (cheat == this->cheat) {
+		return;
+	}
+
+	this->cheat = cheat;
+
+	if (cheat) {
+		CPlayer::GetThisPlayer()->Notify("%s", _("Cheat used, persistent data will no longer be updated during this game."));
+	}
+}
+
 bool game::is_persistency_enabled() const
 {
 	return !IsNetworkGame() && !this->cheat;

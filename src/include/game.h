@@ -130,10 +130,7 @@ public:
 
 	void save(CFile &file) const;
 
-	void set_cheat(const bool cheat)
-	{
-		this->cheat = cheat;
-	}
+	void set_cheat(const bool cheat);
 
 	bool is_persistency_enabled() const;
 

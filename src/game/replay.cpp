@@ -793,7 +793,7 @@ static void DoNextReplay()
 			// Replay without the 'sync info
 			CPlayer::GetThisPlayer()->Notify("%s", _("No sync info for this replay !"));
 		} else {
-			CPlayer::GetThisPlayer()->Notify(_("Replay got out of sync (%lu) !"), GameCycle);
+			CPlayer::GetThisPlayer()->Notify(_("Replay got out of sync (%lu)!"), GameCycle);
 			DebugPrint("OUT OF SYNC %u != %u\n" _C_ random::get()->get_seed() _C_ ReplayStep->SyncRandSeed);
 			DebugPrint("OUT OF SYNC GameCycle %lu \n" _C_ GameCycle);
 			Assert(0);
@@ -802,7 +802,7 @@ static void DoNextReplay()
 			// return;
 		}
 #else
-		CPlayer::GetThisPlayer()->Notify("%s", _("Replay got out of sync !"));
+		CPlayer::GetThisPlayer()->Notify("%s", _("Replay got out of sync!"));
 		ReplayStep = 0;
 		NextLogCycle = ~0UL;
 		return;
