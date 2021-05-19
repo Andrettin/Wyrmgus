@@ -81,6 +81,13 @@ public:
 		str += " to ";
 		str += this->site->get_game_data()->get_current_cultural_name();
 
+		const site_game_data *site_data = site->get_game_data();
+		const CUnit *site_unit = site_data->get_site_unit();
+
+		if (site_unit != nullptr) {
+			str += " (" + site_unit->get_type_name() + ")";
+		}
+
 		return str;
 	}
 
