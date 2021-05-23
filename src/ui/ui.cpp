@@ -252,7 +252,10 @@ static void SaveViewports(CFile &file, const CUserInterface &ui)
 	file.printf("DefineViewports(");
 	for (int i = 0; i < ui.NumViewports; ++i) {
 		const CViewport &vp = ui.Viewports[i];
-		file.printf(",\n  \"viewport\", {%d, %d, %d}", vp.MapPos.x, vp.MapPos.y,
+		if (i > 0) {
+			file.printf(",");
+		}
+		file.printf("\n  \"viewport\", {%d, %d, %d},", vp.MapPos.x, vp.MapPos.y,
 					vp.Unit ? UnitNumber(*vp.Unit) : -1);
 	}
 	file.printf(")\n\n");
