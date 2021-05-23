@@ -65,6 +65,12 @@ inline void log_qt_message(QtMsgType type, const QMessageLogContext &context, co
 
 	log_message += ": ";
 
+	static const std::string default_category_name = "default";
+	if (context.category != nullptr && context.category != default_category_name) {
+		log_message += context.category;
+		log_message += ": ";
+	}
+
 	log_message += msg.toStdString();
 
 	if (context.file != nullptr) {
