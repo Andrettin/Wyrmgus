@@ -114,6 +114,13 @@ void engine_interface::post(const std::function<void()> &function)
 	this->posted_commands.push(function);
 }
 
+QString engine_interface::get_save_path() const
+{
+	std::filesystem::path save_path = GetSaveDir();
+	save_path.make_preferred();
+	return QString::fromStdString(save_path.string());
+}
+
 void engine_interface::call_lua_command(const QString &command)
 {
 	this->post([command]() {

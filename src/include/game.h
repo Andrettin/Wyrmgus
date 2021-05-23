@@ -199,6 +199,8 @@ class CGraphic;
 
 extern void load_game_data(const std::string &sml_string);
 
+extern std::string GetSaveDir();
+
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern int SaveGame(const std::string &filename); /// Save game
 extern void DeleteSaveGame(const std::string &filename);

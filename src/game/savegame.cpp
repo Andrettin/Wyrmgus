@@ -72,19 +72,18 @@ void ExpandPath(std::string &newpath, const std::string &path)
 /**
 ** Get the save directory and create dirs if needed
 */
-static std::string GetSaveDir()
+std::string GetSaveDir()
 {
 	struct stat tmp;
-	std::string dir(parameters::get()->GetUserDirectory());
+	std::filesystem::path dir = parameters::get()->GetUserDirectory();
 	if (!GameName.empty()) {
-		dir += "/";
-		dir += GameName;
+		dir /= GameName;
 	}
-	dir += "/save";
-	if (stat(dir.c_str(), &tmp) < 0) {
-		makedir(dir.c_str(), 0777);
+	dir /= "save";
+	if (stat(dir.string().c_str(), &tmp) < 0) {
+		makedir(dir.string().c_str(), 0777);
 	}
-	return dir;
+	return dir.string();
 }
 
 /**

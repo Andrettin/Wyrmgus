@@ -51,6 +51,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(wyrmgus::preferences* preferences READ get_preferences CONSTANT)
 	Q_PROPERTY(wyrmgus::game* game READ get_game CONSTANT)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
+	Q_PROPERTY(QString save_path READ get_save_path CONSTANT)
 	Q_PROPERTY(QString loading_message READ get_loading_message NOTIFY loading_message_changed)
 
 public:
@@ -106,6 +107,8 @@ public:
 
 		emit running_changed();
 	}
+
+	QString get_save_path() const;
 
 	const QString &get_loading_message() const
 	{
