@@ -600,9 +600,14 @@ std::filesystem::path database::get_documents_path()
 
 std::filesystem::path database::get_user_data_path()
 {
-	const std::filesystem::path path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString();
+	std::filesystem::path path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString();
 	if (path.empty()) {
 		throw std::runtime_error("No user data path found.");
+	}
+
+	//ignore the organization name for the user data path, e.g. the path should be "[AppName]" and not "[OrganizationName]/[AppName]"
+	if (path.parent_path().filename().string() == QApplication::organizationName().toStdString()) {
+		path = path.parent_path().parent_path() / path.filename();
 	}
 
 	//ensure that the user data path exists

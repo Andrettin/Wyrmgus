@@ -70,6 +70,8 @@ int main(int argc, char **argv)
 		QApplication app(argc, argv);
 		app.setApplicationName(NAME);
 		app.setApplicationVersion(VERSION);
+		app.setOrganizationName("Wyrmsun");
+		app.setOrganizationDomain("andrettin.github.io");
 
 		qRegisterMetaType<std::vector<wyrmgus::tile_transition>>();
 
