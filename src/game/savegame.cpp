@@ -50,6 +50,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/date_util.h"
+#include "util/exception_util.h"
 #include "util/random.h"
 #include "version.h"
 
@@ -57,7 +58,9 @@ extern void StartMap(const std::string &filename, bool clean);
 
 void ExpandPath(std::string &newpath, const std::string &path)
 {
-	if (path[0] == '~') {
+	if (std::filesystem::path(path).is_absolute() && std::filesystem::exists(path)) {
+		newpath = path;
+	} else if (path[0] == '~') {
 		newpath = parameters::get()->GetUserDirectory();
 		if (!GameName.empty()) {
 			newpath += "/";
@@ -204,12 +207,16 @@ void DeleteSaveGame(const std::string &filename)
 
 void StartSavedGame(const std::string &filename)
 {
-	std::string path;
+	try {
+		std::string path;
 
-	SaveGameLoading = true;
-	CleanPlayers();
-	ExpandPath(path, filename);
-	LoadGame(path);
+		SaveGameLoading = true;
+		CleanPlayers();
+		ExpandPath(path, filename);
+		LoadGame(path);
 
-	StartMap(filename, false);
+		StartMap(filename, false);
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+	}
 }
