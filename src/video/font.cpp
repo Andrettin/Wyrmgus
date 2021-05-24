@@ -755,7 +755,7 @@ void font::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "file") {
-		this->filepath = database::get()->get_graphics_path(this->get_module()) / value;
+		this->filepath = database::get()->get_graphics_filepath(value);
 	} else {
 		data_entry::process_sml_property(property);
 	}

@@ -153,11 +153,6 @@ public:
 
 	const std::filesystem::path &get_base_path(const data_module *data_module) const;
 
-	std::filesystem::path get_graphics_path(const data_module *data_module) const
-	{
-		return this->get_base_path(data_module) / database::graphics_folder;
-	}
-
 	std::filesystem::path get_maps_path(const data_module *data_module) const
 	{
 		return this->get_base_path(data_module) / database::maps_folder;
@@ -243,6 +238,22 @@ public:
 		}
 
 		return paths;
+	}
+
+	std::filesystem::path get_graphics_filepath(const std::filesystem::path &relative_filepath) const
+	{
+		const std::vector<std::filesystem::path> graphics_paths = this->get_graphics_paths();
+
+		//iterate the graphics paths in reverse other, so that modules loaded later can override graphics of those loaded earlier
+		for (auto iterator = graphics_paths.rbegin(); iterator != graphics_paths.rend(); ++iterator) {
+			std::filesystem::path filepath = *iterator / relative_filepath;
+
+			if (std::filesystem::exists(filepath)) {
+				return filepath;
+			}
+		}
+
+		throw std::runtime_error("Graphics file \"" + relative_filepath.string() + "\" not found.");
 	}
 
 private:

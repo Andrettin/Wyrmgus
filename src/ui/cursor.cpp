@@ -140,7 +140,7 @@ void cursor::set_file(const std::filesystem::path &filepath)
 		return;
 	}
 
-	this->file = database::get()->get_graphics_path(this->get_module()) / filepath;
+	this->file = database::get()->get_graphics_filepath(filepath);
 }
 
 }

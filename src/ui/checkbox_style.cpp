@@ -46,22 +46,22 @@ void checkbox_style::initialize()
 
 void checkbox_style::set_checked_file(const std::filesystem::path &filepath)
 {
-	this->checked_file = database::get()->get_graphics_path(this->interface->get_module()) / filepath;
+	this->checked_file = database::get()->get_graphics_filepath(filepath);
 }
 
 void checkbox_style::set_checked_pressed_file(const std::filesystem::path &filepath)
 {
-	this->checked_pressed_file = database::get()->get_graphics_path(this->interface->get_module()) / filepath;
+	this->checked_pressed_file = database::get()->get_graphics_filepath(filepath);
 }
 
 void checkbox_style::set_unchecked_file(const std::filesystem::path &filepath)
 {
-	this->unchecked_file = database::get()->get_graphics_path(this->interface->get_module()) / filepath;
+	this->unchecked_file = database::get()->get_graphics_filepath(filepath);
 }
 
 void checkbox_style::set_unchecked_pressed_file(const std::filesystem::path &filepath)
 {
-	this->unchecked_pressed_file = database::get()->get_graphics_path(this->interface->get_module()) / filepath;
+	this->unchecked_pressed_file = database::get()->get_graphics_filepath(filepath);
 }
 
 const std::shared_ptr<CGraphic> &checkbox_style::get_graphics(const checkbox_state checkbox_state, const button_state button_state) const

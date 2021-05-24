@@ -367,7 +367,7 @@ void terrain_type::set_image_file(const std::filesystem::path &filepath)
 		return;
 	}
 
-	this->image_file = database::get()->get_graphics_path(this->get_module()) / filepath;
+	this->image_file = database::get()->get_graphics_filepath(filepath);
 }
 
 const std::shared_ptr<CPlayerColorGraphic> &terrain_type::get_graphics(const season *season) const
@@ -389,7 +389,7 @@ void terrain_type::set_transition_image_file(const std::filesystem::path &filepa
 		return;
 	}
 
-	this->transition_image_file = database::get()->get_graphics_path(this->get_module()) / filepath;
+	this->transition_image_file = database::get()->get_graphics_filepath(filepath);
 }
 
 void terrain_type::set_elevation_image_file(const std::filesystem::path &filepath)
@@ -398,7 +398,7 @@ void terrain_type::set_elevation_image_file(const std::filesystem::path &filepat
 		return;
 	}
 
-	this->elevation_image_file = database::get()->get_graphics_path(this->get_module()) / filepath;
+	this->elevation_image_file = database::get()->get_graphics_filepath(filepath);
 }
 
 bool terrain_type::has_flag(const tile_flag flag) const

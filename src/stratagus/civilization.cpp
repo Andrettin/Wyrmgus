@@ -399,7 +399,7 @@ const std::filesystem::path &civilization::get_encyclopedia_background_file() co
 
 void civilization::set_encyclopedia_background_file(const std::filesystem::path &filepath)
 {
-	this->encyclopedia_background_file = database::get()->get_graphics_path(this->get_module()) / filepath;
+	this->encyclopedia_background_file = database::get()->get_graphics_filepath(filepath);
 }
 
 cursor *civilization::get_cursor(const cursor_type type) const

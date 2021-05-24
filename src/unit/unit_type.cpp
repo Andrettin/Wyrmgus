@@ -1686,7 +1686,7 @@ void unit_type::set_image_file(const std::filesystem::path &filepath)
 		return;
 	}
 
-	this->image_file = database::get()->get_graphics_path(this->get_module()) / filepath;
+	this->image_file = database::get()->get_graphics_filepath(filepath);
 }
 
 bool unit_type::is_autocast_spell(const spell *spell) const
@@ -2343,7 +2343,7 @@ const std::filesystem::path &unit_type::get_encyclopedia_background_file() const
 
 void unit_type::set_encyclopedia_background_file(const std::filesystem::path &filepath)
 {
-	this->encyclopedia_background_file = database::get()->get_graphics_path(this->get_module()) / filepath;
+	this->encyclopedia_background_file = database::get()->get_graphics_filepath(filepath);
 }
 
 bool unit_type::can_gain_experience() const
@@ -2380,9 +2380,9 @@ void resource_info::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "image_file") {
-		this->image_file = database::get()->get_graphics_path(this->get_unit_type()->get_module()) / value;
+		this->image_file = database::get()->get_graphics_filepath(value);
 	} else if (key == "loaded_image_file") {
-		this->loaded_image_file = database::get()->get_graphics_path(this->get_unit_type()->get_module()) / value;
+		this->loaded_image_file = database::get()->get_graphics_filepath(value);
 	} else if (key == "resource_step") {
 		this->ResourceStep = std::stoi(value);
 	} else if (key == "wait_at_resource") {

@@ -47,17 +47,17 @@ void button_style::initialize()
 
 void button_style::set_normal_file(const std::filesystem::path &filepath)
 {
-	this->normal_file = database::get()->get_graphics_path(this->interface->get_module()) / filepath;
+	this->normal_file = database::get()->get_graphics_filepath(filepath);
 }
 
 void button_style::set_pressed_file(const std::filesystem::path &filepath)
 {
-	this->pressed_file = database::get()->get_graphics_path(this->interface->get_module()) / filepath;
+	this->pressed_file = database::get()->get_graphics_filepath(filepath);
 }
 
 void button_style::set_grayed_file(const std::filesystem::path &filepath)
 {
-	this->grayed_file = database::get()->get_graphics_path(this->interface->get_module()) / filepath;
+	this->grayed_file = database::get()->get_graphics_filepath(filepath);
 }
 
 const std::shared_ptr<CGraphic> &button_style::get_graphics(const button_state state) const

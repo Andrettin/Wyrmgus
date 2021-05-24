@@ -55,7 +55,7 @@ void interface_style::process_sml_scope(const sml_data &scope)
 		scope.for_each_property([&](const sml_property &property) {
 			const int panel = std::stoi(property.get_key());
 			const std::filesystem::path filepath = property.get_value();
-			this->panel_files[panel] = database::get()->get_graphics_path(this->get_module()) / filepath;
+			this->panel_files[panel] = database::get()->get_graphics_filepath(filepath);
 		});
 	} else if (tag == "large_button") {
 		this->large_button = std::make_unique<button_style>(this);
@@ -130,12 +130,12 @@ void interface_style::initialize()
 
 void interface_style::set_top_bar_file(const std::filesystem::path &filepath)
 {
-	this->top_bar_file = database::get()->get_graphics_path(this->get_module()) / filepath;
+	this->top_bar_file = database::get()->get_graphics_filepath(filepath);
 }
 
 void interface_style::set_dropdown_bar_file(const std::filesystem::path &filepath)
 {
-	this->dropdown_bar_file = database::get()->get_graphics_path(this->get_module()) / filepath;
+	this->dropdown_bar_file = database::get()->get_graphics_filepath(filepath);
 }
 
 const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics(const interface_element_type type, const std::vector<std::string> &qualifiers) const
