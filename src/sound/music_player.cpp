@@ -28,6 +28,7 @@
 
 #include "music_player.h"
 
+#include "game.h"
 #include "player.h"
 #include "script/condition/and_condition.h"
 #include "sound/music.h"
@@ -54,6 +55,10 @@ bool music_player::is_playing() const
 void music_player::play_music_type(const music_type type)
 {
 	if (type == this->current_music_type) {
+		return;
+	}
+
+	if (type == music_type::menu && game::get()->is_running()) {
 		return;
 	}
 
