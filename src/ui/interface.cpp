@@ -631,7 +631,7 @@ extern void ToggleShowBuilListMessages();
 static void CommandKey_Group(int group, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (key_modifiers & Qt::ShiftModifier) {
-		if ((key_modifiers & Qt::AltModifier) && (KeyModifiers & ModifierDoublePress)) {
+		if ((key_modifiers & Qt::AltModifier) || (KeyModifiers & ModifierDoublePress)) {
 			if (KeyModifiers & ModifierDoublePress) {
 				UiCenterOnGroup(group, GroupSelectionMode::SELECT_ALL);
 			} else {
@@ -643,7 +643,7 @@ static void CommandKey_Group(int group, const Qt::KeyboardModifiers key_modifier
 			UiAddGroupToSelection(group);
 		}
 	} else {
-		if ((key_modifiers & Qt::AltModifier) && (KeyModifiers & ModifierDoublePress)) {
+		if ((key_modifiers & Qt::AltModifier) || (KeyModifiers & ModifierDoublePress)) {
 			if (key_modifiers & Qt::AltModifier) {
 				if (KeyModifiers & ModifierDoublePress) {
 					UiCenterOnGroup(group, GroupSelectionMode::NON_SELECTABLE_BY_RECTANGLE_ONLY);
