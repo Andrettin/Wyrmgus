@@ -545,6 +545,9 @@ void GameMainLoop()
 	engine_interface::get()->reset_map_view_created_promise();
 	engine_interface::get()->set_waiting_for_interface(false);
 
+	//run the display loop once, so that the map is visible when we start
+	DisplayLoop();
+
 	engine_interface::get()->set_loading_message("");
 
 	SingleGameLoop();
