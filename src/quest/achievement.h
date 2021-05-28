@@ -46,14 +46,15 @@ class achievement final : public named_data_entry, public data_type<achievement>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
-	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
+	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color NOTIFY changed)
 	Q_PROPERTY(wyrmgus::difficulty difficulty MEMBER difficulty)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable)
 	Q_PROPERTY(wyrmgus::character* character MEMBER character)
 	Q_PROPERTY(wyrmgus::unit_type* character_type MEMBER character_type)
 	Q_PROPERTY(int character_level MEMBER character_level)
+	Q_PROPERTY(bool obtained READ is_obtained NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "achievement";
@@ -107,6 +108,9 @@ public:
 	void obtain(bool save = true, bool display = true);
 	int get_progress() const;
 	int get_progress_max() const;
+
+signals:
+	void changed();
 
 private:
 	wyrmgus::icon *icon = nullptr;

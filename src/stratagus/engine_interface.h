@@ -192,6 +192,8 @@ public:
 	Q_INVOKABLE QStringList get_map_worlds() const;
 	Q_INVOKABLE QVariantList get_map_infos(const QString &world) const;
 
+	Q_INVOKABLE QVariantList get_achievements() const;
+
 	Q_INVOKABLE QVariantList get_building_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_civilization_encyclopedia_entries() const;

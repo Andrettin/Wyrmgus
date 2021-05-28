@@ -43,6 +43,7 @@
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/world.h"
+#include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "religion/deity.h"
 #include "parameters.h"
@@ -321,6 +322,21 @@ QString engine_interface::get_difficulty_name(const int difficulty_index) const
 {
 	const difficulty difficulty = static_cast<wyrmgus::difficulty>(difficulty_index);
 	return QString::fromStdString(wyrmgus::get_difficulty_name(difficulty));
+}
+
+QVariantList engine_interface::get_achievements() const
+{
+	std::vector<achievement *> achievements;
+
+	for (achievement *achievement : achievement::get_all()) {
+		if (achievement->is_hidden()) {
+			continue;
+		}
+
+		achievements.push_back(achievement);
+	}
+
+	return container::to_qvariant_list(achievements);
 }
 
 QVariantList engine_interface::get_building_encyclopedia_entries() const
