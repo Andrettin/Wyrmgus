@@ -406,6 +406,9 @@ void StopGame(GameResults result)
 	GamePaused = true;
 	GameRunning = false;
 	game::get()->store_results();
+
+	//update the display before setting the game to stopped, to prevent the map still being shown while the UI updates
+	UpdateDisplay();
 	game::get()->set_running(false);
 }
 
