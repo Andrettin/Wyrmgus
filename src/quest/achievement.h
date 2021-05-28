@@ -47,6 +47,7 @@ class achievement final : public named_data_entry, public data_type<achievement>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
+	Q_PROPERTY(QString description READ get_description_qstring CONSTANT)
 	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color NOTIFY changed)
 	Q_PROPERTY(wyrmgus::difficulty difficulty MEMBER difficulty)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
@@ -55,6 +56,8 @@ class achievement final : public named_data_entry, public data_type<achievement>
 	Q_PROPERTY(wyrmgus::unit_type* character_type MEMBER character_type)
 	Q_PROPERTY(int character_level MEMBER character_level)
 	Q_PROPERTY(bool obtained READ is_obtained NOTIFY changed)
+	Q_PROPERTY(int progress READ get_progress NOTIFY changed)
+	Q_PROPERTY(int progress_max READ get_progress_max NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "achievement";
@@ -82,6 +85,11 @@ public:
 	const std::string &get_description() const
 	{
 		return this->description;
+	}
+
+	QString get_description_qstring() const
+	{
+		return QString::fromStdString(this->get_description());
 	}
 
 	const wyrmgus::player_color *get_player_color() const
