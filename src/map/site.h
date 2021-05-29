@@ -133,7 +133,7 @@ public:
 	virtual void check() const override;
 	virtual data_entry_history *get_history_base() override;
 
-	const site_history *get_history() const
+	site_history *get_history() const
 	{
 		return this->history.get();
 	}

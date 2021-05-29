@@ -29,10 +29,73 @@
 #include "map/region.h"
 
 #include "map/region_history.h"
+#include "map/site.h"
+#include "map/site_history.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+void region::load_history_database()
+{
+	data_type::load_history_database();
+
+	std::vector<region *> regions = region::get_all();
+
+	std::sort(regions.begin(), regions.end(), [](const region *lhs, const region *rhs) {
+		//give priority to subregions
+		if (lhs->is_part_of(rhs)) {
+			return true;
+		} else if (rhs->is_part_of(lhs)) {
+			return false;
+		}
+
+		//give priority to smaller regions
+		if (lhs->settlements.size() != rhs->settlements.size()) {
+			return lhs->settlements.size() < rhs->settlements.size();
+		}
+
+		return lhs->get_identifier() < rhs->get_identifier();
+	});
+
+	for (const region *region : regions) {
+		const region_history *region_history = region->get_history();
+		
+		int population = region_history->get_population();
+
+		if (population == 0) {
+			continue;
+		}
+
+		int unpopulated_settlement_count = 0;
+
+		//subtract the predefined population of settlements in the region from that of the region
+		for (const site *settlement : region->settlements) {
+			const site_history *settlement_history = settlement->get_history();
+
+			if (settlement_history->get_population() != 0) {
+				population -= settlement_history->get_population();
+			} else {
+				++unpopulated_settlement_count;
+			}
+		}
+
+		if (population <= 0 || unpopulated_settlement_count == 0) {
+			continue;
+		}
+
+		//apply the remaining population to settlements without a predefined population in history
+		const int population_per_settlement = population / unpopulated_settlement_count;
+
+		for (const site *settlement : region->settlements) {
+			site_history *settlement_history = settlement->get_history();
+
+			if (settlement_history->get_population() == 0) {
+				settlement_history->set_population(population_per_settlement);
+			}
+		}
+	}
+}
 
 region::region(const std::string &identifier) : data_entry(identifier)
 {
@@ -57,6 +120,12 @@ void region::initialize()
 			}
 
 			this->sites.push_back(site);
+		}
+	}
+
+	for (site *site : this->get_sites()) {
+		if (site->is_settlement()) {
+			this->settlements.push_back(site);
 		}
 	}
 
@@ -92,6 +161,21 @@ void region::remove_superregion(region *superregion)
 {
 	vector::remove(this->superregions, superregion);
 	vector::remove(superregion->subregions, this);
+}
+
+bool region::is_part_of(const region *other_region) const
+{
+	if (vector::contains(this->superregions, other_region)) {
+		return true;
+	}
+
+	for (const region *superregion : this->superregions) {
+		if (superregion->is_part_of(other_region)) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 }

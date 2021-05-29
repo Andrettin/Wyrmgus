@@ -75,6 +75,11 @@ public:
 		return this->population;
 	}
 
+	void set_population(const int population)
+	{
+		this->population = population;
+	}
+
 	const unit_class_map<int> &get_population_groups() const
 	{
 		return this->population_groups;

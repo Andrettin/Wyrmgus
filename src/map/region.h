@@ -44,7 +44,8 @@ public:
 	static constexpr const char *class_identifier = "region";
 	static constexpr const char *database_folder = "regions";
 
-public:
+	static void load_history_database();
+
 	explicit region(const std::string &identifier);
 	virtual ~region() override;
 
@@ -76,8 +77,11 @@ public:
 
 	Q_INVOKABLE void remove_superregion(region *superregion);
 
+	bool is_part_of(const region *other_region) const;
+
 private:
 	std::vector<site *> sites; //sites located in the region
+	std::vector<site *> settlements; //settlements located in the region
 	std::vector<region *> subregions; //subregions of this region
 	std::vector<region *> superregions; //regions for which this region is a subregion
 	std::unique_ptr<region_history> history;
