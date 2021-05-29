@@ -1197,7 +1197,7 @@ void CPlayer::add_settlement_to_explored_territory(const site *settlement)
 			const CUnitCache &unit_cache = tile->UnitCache;
 
 			for (CUnit *unit : unit_cache) {
-				if (unit->Player->Type != PlayerNeutral) {
+				if (!unit->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
 					continue;
 				}
 

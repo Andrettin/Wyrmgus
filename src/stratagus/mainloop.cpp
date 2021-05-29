@@ -498,9 +498,9 @@ void GameMainLoop()
 	
 	//Wyrmgus start
 	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
-		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
+		const campaign *current_campaign = game::get()->get_current_campaign();
 		if (current_campaign != nullptr) {
-			wyrmgus::game::get()->apply_player_history();
+			game::get()->apply_player_history();
 		}
 		
 		//if the person player has no faction, bring up the faction choice interface
