@@ -3839,14 +3839,14 @@ int CPlayer::get_population() const
 
 	for (const auto &kv_pair : this->UnitTypesCount) {
 		const wyrmgus::unit_type *unit_type = kv_pair.first;
-		if (!unit_type->BoolFlag[ORGANIC_INDEX].value || unit_type->BoolFlag[FAUNA_INDEX].value) {
+		if (unit_type->BoolFlag[BUILDING_INDEX].value || unit_type->BoolFlag[FAUNA_INDEX].value) {
 			continue;
 		}
 
 		people_count += kv_pair.second;
 	}
 
-	return static_cast<int>(pow(people_count, 2)) * wyrmgus::base_population_per_unit;
+	return people_count * defines::get()->get_population_per_unit();
 }
 
 /**

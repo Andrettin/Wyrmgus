@@ -145,12 +145,6 @@ constexpr int PlayerMajorDeityMax = 1;	/// Maximum major deities per player/char
 constexpr int PlayerMinorDeityMax = 1;	/// Maximum minor deities per player/character
 constexpr int PlayerDeityMax = (PlayerMajorDeityMax + PlayerMinorDeityMax);
 
-namespace wyrmgus {
-
-constexpr int base_population_per_unit = 1000;		/// Number of people a unit represents
-
-}
-
 constexpr int DEFAULT_HOURS_PER_DAY = 24;
 constexpr int DEFAULT_DAYS_PER_YEAR = 365;
 //Wyrmgus end

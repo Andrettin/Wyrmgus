@@ -129,6 +129,10 @@ void defines::initialize()
 	if (this->progress_bar_graphics != nullptr) {
 		this->progress_bar_graphics->Load(this->get_scale_factor());
 	}
+
+	if (this->get_population_per_unit() == 0) {
+		throw std::runtime_error("No population per unit set in the defines.");
+	}
 }
 
 void defines::set_default_menu_background_file(const std::filesystem::path &filepath)

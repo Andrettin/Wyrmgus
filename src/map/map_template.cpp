@@ -1640,7 +1640,8 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			if (unit_quantity > 0) {
 				const unit_type *type = std::get<2>(site->HistoricalUnits[j]);
 				if (type->BoolFlag[ORGANIC_INDEX].value) {
-					unit_quantity = std::max(1, unit_quantity / base_population_per_unit); //each organic unit represents 1,000 people
+					//each organic unit represents a certain amount of people
+					unit_quantity = unit_quantity / defines::get()->get_population_per_unit();
 				}
 
 				CPlayer *unit_player = nullptr;
@@ -1681,7 +1682,7 @@ void map_template::apply_population_unit(const unit_class *unit_class, const int
 	const QPoint unit_offset = unit_type->get_tile_center_pos_offset();
 	const QPoint unit_top_left_pos = unit_pos - unit_offset;
 
-	const int unit_quantity = std::max(1, static_cast<int>(cbrt(population / base_population_per_unit)));
+	const int unit_quantity = population / defines::get()->get_population_per_unit();
 	for (int i = 0; i < unit_quantity; ++i) {
 		CreateUnit(unit_top_left_pos, *unit_type, player, z, false, settlement);
 	}
