@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,44 +31,16 @@
 
 namespace wyrmgus {
 
-class faction;
-class site;
-class unit_class;
+class region;
 
-class site_history final : public data_entry_history
+class region_history final : public data_entry_history
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::faction* owner MEMBER owner)
-	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
-	Q_PROPERTY(wyrmgus::unit_class* pathway_class MEMBER pathway_class)
 	Q_PROPERTY(int population MEMBER population READ get_population)
 
 public:
-	explicit site_history(const site *site) : site(site)
-	{
-	}
-
 	virtual void process_sml_scope(const sml_data &scope) override;
-
-	const faction *get_owner() const
-	{
-		return this->owner;
-	}
-
-	const std::vector<unit_class *> &get_building_classes() const
-	{
-		return this->building_classes;
-	}
-
-	QVariantList get_building_classes_qvariant_list() const;
-	Q_INVOKABLE void add_building_class(unit_class *building_class);
-	Q_INVOKABLE void remove_building_class(unit_class *building_class);
-
-	const unit_class *get_pathway_class() const
-	{
-		return this->pathway_class;
-	}
 
 	int get_population() const
 	{
@@ -81,10 +53,6 @@ public:
 	}
 
 private:
-	const wyrmgus::site *site = nullptr;
-	faction *owner = nullptr;
-	std::vector<unit_class *> building_classes; //applied as buildings at scenario start
-	unit_class *pathway_class = nullptr;
 	int population = 0; //used for creating units at scenario start
 	unit_class_map<int> population_groups; //population size for unit classes
 };

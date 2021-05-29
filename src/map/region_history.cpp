@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,72 +26,25 @@
 
 #include "stratagus.h"
 
-#include "map/region.h"
-
 #include "map/region_history.h"
-#include "util/container_util.h"
-#include "util/vector_util.h"
+
+#include "database/sml_data.h"
+#include "unit/unit_class.h"
 
 namespace wyrmgus {
 
-region::region(const std::string &identifier) : data_entry(identifier)
+void region_history::process_sml_scope(const sml_data &scope)
 {
-}
+	const std::string &tag = scope.get_tag();
 
-region::~region()
-{
-}
-
-void region::initialize()
-{
-	for (region *subregion : this->subregions) {
-		//initialize subregions, so that the sites of their own subregions are added to them
-		if (!subregion->is_initialized()) {
-			subregion->initialize();
-		}
-
-		//add sites from subregions
-		for (site *site : subregion->get_sites()) {
-			if (vector::contains(this->sites, site)) {
-				continue;
-			}
-
-			this->sites.push_back(site);
-		}
+	if (tag == "population_groups") {
+		scope.for_each_property([&](const sml_property &property) {
+			const unit_class *unit_class = unit_class::get(property.get_key());
+			this->population_groups[unit_class] = std::stoi(property.get_value());
+		});
+	} else {
+		data_entry_history::process_sml_scope(scope);
 	}
-
-	data_entry::initialize();
-}
-
-data_entry_history *region::get_history_base()
-{
-	return this->history.get();
-}
-
-void region::reset_history()
-{
-	this->history = std::make_unique<region_history>();
-}
-
-void region::add_site(site *site)
-{
-	this->sites.push_back(site);
-}
-
-void region::remove_site(site *site)
-{
-	vector::remove(this->sites, site);
-}
-
-QVariantList region::get_superregions_qvariant_list() const
-{
-	return container::to_qvariant_list(this->superregions);
-}
-
-void region::remove_superregion(region *superregion)
-{
-	vector::remove(this->superregions, superregion);
-	vector::remove(superregion->subregions, this);
 }
 
 }

@@ -31,6 +31,7 @@
 
 namespace wyrmgus {
 
+class region_history;
 class site;
 
 class region final : public data_entry, public data_type<region>
@@ -44,10 +45,18 @@ public:
 	static constexpr const char *database_folder = "regions";
 
 public:
-	region(const std::string &identifier);
+	explicit region(const std::string &identifier);
 	virtual ~region() override;
 
 	virtual void initialize() override;
+	virtual data_entry_history *get_history_base() override;
+
+	const region_history *get_history() const
+	{
+		return this->history.get();
+	}
+
+	virtual void reset_history() override;
 
 	const std::vector<site *> &get_sites() const
 	{
@@ -71,6 +80,7 @@ private:
 	std::vector<site *> sites; //sites located in the region
 	std::vector<region *> subregions; //subregions of this region
 	std::vector<region *> superregions; //regions for which this region is a subregion
+	std::unique_ptr<region_history> history;
 };
 
 }

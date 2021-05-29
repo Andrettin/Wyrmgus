@@ -230,6 +230,7 @@ set(map_SRCS
 	src/map/map_wall.cpp
 	src/map/minimap.cpp
 	src/map/region.cpp
+	src/map/region_history.cpp
 	src/map/script_map.cpp
 	src/map/script_tileset.cpp
 	src/map/site.cpp
@@ -773,6 +774,7 @@ set(wyrmgus_map_HDRS
 	src/map/minimap.h
 	src/map/minimap_mode.h
 	src/map/region.h
+	src/map/region_history.h
 	src/map/site.h
 	src/map/site_container.h
 	src/map/site_game_data.h
