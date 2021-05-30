@@ -150,6 +150,7 @@ public:
 	const std::string &get_cultural_name(const civilization *civilization) const;
 
 	bool is_settlement() const;
+	bool can_have_population() const;
 
 	const wyrmgus::map_template *get_map_template() const
 	{

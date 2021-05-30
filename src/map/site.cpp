@@ -349,6 +349,23 @@ bool site::is_settlement() const
 	return this->get_base_unit_type() == settlement_site_unit_type;
 }
 
+bool site::can_have_population() const
+{
+	if (this->get_base_unit_type() == nullptr) {
+		return false;
+	}
+
+	if (this->is_settlement()) {
+		return true;
+	}
+
+	if (this->get_base_unit_type()->can_produce_a_resource()) {
+		return true;
+	}
+
+	return false;
+}
+
 QTime site::get_right_ascension() const
 {
 	const decimillesimal_int lon = this->get_astrocoordinate().get_longitude();

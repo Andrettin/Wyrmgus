@@ -504,7 +504,7 @@ unit_type *faction::get_class_unit_type(const unit_class *unit_class) const
 		return nullptr;
 	}
 
-	auto find_iterator = this->class_unit_types.find(unit_class);
+	const auto find_iterator = this->class_unit_types.find(unit_class);
 	if (find_iterator != this->class_unit_types.end()) {
 		return find_iterator->second;
 	}

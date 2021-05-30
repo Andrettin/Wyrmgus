@@ -67,31 +67,39 @@ void region::load_history_database()
 			continue;
 		}
 
-		int unpopulated_settlement_count = 0;
+		int unpopulated_site_count = 0;
 
 		//subtract the predefined population of settlements in the region from that of the region
-		for (const site *settlement : region->settlements) {
-			const site_history *settlement_history = settlement->get_history();
+		for (const site *site : region->get_sites()) {
+			if (!site->can_have_population()) {
+				continue;
+			}
 
-			if (settlement_history->get_population() != 0) {
-				population -= settlement_history->get_population();
+			const site_history *site_history = site->get_history();
+
+			if (site_history->get_population() != 0) {
+				population -= site_history->get_population();
 			} else {
-				++unpopulated_settlement_count;
+				++unpopulated_site_count;
 			}
 		}
 
-		if (population <= 0 || unpopulated_settlement_count == 0) {
+		if (population <= 0 || unpopulated_site_count == 0) {
 			continue;
 		}
 
-		//apply the remaining population to settlements without a predefined population in history
-		const int population_per_settlement = population / unpopulated_settlement_count;
+		//apply the remaining population to sites without a predefined population in history
+		const int population_per_site = population / unpopulated_site_count;
 
-		for (const site *settlement : region->settlements) {
-			site_history *settlement_history = settlement->get_history();
+		for (const site *site : region->get_sites()) {
+			if (!site->can_have_population()) {
+				continue;
+			}
 
-			if (settlement_history->get_population() == 0) {
-				settlement_history->set_population(population_per_settlement);
+			site_history *site_history = site->get_history();
+
+			if (site_history->get_population() == 0) {
+				site_history->set_population(population_per_site);
 			}
 		}
 	}
