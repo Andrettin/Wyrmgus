@@ -1627,7 +1627,16 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 	}
 
 	if (population != 0) { //remaining population after subtracting the amount of population specified to belong to particular groups
-		this->apply_population_unit(defines::get()->get_default_population_class(), population, site_pos, z, player, site->is_settlement() ? site : nullptr);
+		const unit_class *population_class = defines::get()->get_default_population_class();
+		if (base_unit_type != nullptr) {
+			if (base_unit_type->UnitType == UnitTypeType::Naval && player->get_class_unit_type(defines::get()->get_default_water_population_class()) != nullptr) {
+				population_class = defines::get()->get_default_water_population_class();
+			} else if (base_unit_type->UnitType == UnitTypeType::Space && player->get_class_unit_type(defines::get()->get_default_space_population_class()) != nullptr) {
+				population_class = defines::get()->get_default_space_population_class();
+			}
+		}
+
+		this->apply_population_unit(population_class, population, site_pos, z, player, site->is_settlement() ? site : nullptr);
 	}
 
 	for (size_t j = 0; j < site->HistoricalUnits.size(); ++j) {

@@ -86,6 +86,8 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::button_level* cancel_button_level MEMBER cancel_button_level READ get_cancel_button_level)
 	Q_PROPERTY(wyrmgus::unit_class* town_hall_class MEMBER town_hall_class READ get_town_hall_class)
 	Q_PROPERTY(wyrmgus::unit_class* default_population_class MEMBER default_population_class READ get_default_population_class)
+	Q_PROPERTY(wyrmgus::unit_class* default_water_population_class MEMBER default_water_population_class READ get_default_water_population_class)
+	Q_PROPERTY(wyrmgus::unit_class* default_space_population_class MEMBER default_space_population_class READ get_default_space_population_class)
 	Q_PROPERTY(wyrmgus::resource_icon* food_icon MEMBER food_icon READ get_food_icon)
 	Q_PROPERTY(wyrmgus::resource_icon* score_icon MEMBER score_icon READ get_score_icon)
 	Q_PROPERTY(wyrmgus::resource_icon* mana_icon MEMBER mana_icon READ get_mana_icon)
@@ -282,6 +284,16 @@ public:
 		return this->default_population_class;
 	}
 
+	unit_class *get_default_water_population_class() const
+	{
+		return this->default_water_population_class;
+	}
+
+	unit_class *get_default_space_population_class() const
+	{
+		return this->default_space_population_class;
+	}
+
 	const CUpgrade *get_faction_type_upgrade(const faction_type faction_type)
 	{
 		const auto find_iterator = this->faction_type_upgrades.find(faction_type);
@@ -416,6 +428,8 @@ private:
 	button_level *cancel_button_level = nullptr;
 	unit_class *town_hall_class = nullptr;
 	unit_class *default_population_class = nullptr;
+	unit_class *default_water_population_class = nullptr;
+	unit_class *default_space_population_class = nullptr;
 	std::map<faction_type, const CUpgrade *> faction_type_upgrades;
 	std::shared_ptr<CGraphic> icon_frame_graphics;
 	std::shared_ptr<CGraphic> pressed_icon_frame_graphics;
