@@ -285,7 +285,7 @@ static inline void IncreaseVariable(CUnit &unit, int index)
 	
 	//Wyrmgus start
 	if (index == HP_INDEX && unit.Variable[index].Increase < 0 && unit.HasInventory()) {
-		unit.HealingItemAutoUse();
+		unit.auto_use_item();
 	} else if (index == GIVERESOURCE_INDEX && !unit.Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
 		unit.ChangeResourcesHeld(unit.Variable[index].Increase);
 		unit.ResourcesHeld = std::clamp(unit.ResourcesHeld, 0, unit.GetModifiedVariable(index, VariableAttribute::Max));

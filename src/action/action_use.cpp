@@ -236,13 +236,24 @@ void COrder_Use::Execute(CUnit &unit)
 					unit.Variable[HP_INDEX].Value += hp_healed;
 					
 					if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) { //if unit is still damaged, see if there are further healing items for it to use
-						unit.HealingItemAutoUse();
+						unit.auto_use_item();
 					}
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow && unit.Type->UnitType != UnitTypeType::Space) {
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
 					}
 					HitUnit(NoUnitP, unit, goal->Variable[HITPOINTHEALING_INDEX].Value * -1);
+				} else if (goal->Variable[MANA_RESTORATION_INDEX].Value > 0) {
+					const int mana_restored = std::min(goal->Variable[MANA_RESTORATION_INDEX].Value, (unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max) - unit.Variable[MANA_INDEX].Value));
+					if (unit.Player == CPlayer::GetThisPlayer()) {
+						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s restored %d mana"), unit.GetMessageName().c_str(), mana_restored);
+					}
+					unit.Variable[MANA_INDEX].Value += mana_restored;
+
+					if (unit.HasInventory() && unit.Variable[MANA_INDEX].Value < unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max)) {
+						//if unit still isn't at full mana, see if there are further consumable items for it to use
+						unit.auto_use_item();
+					}
 				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow && unit.Type->UnitType != UnitTypeType::Space) {
 					unit.Variable[SLOW_INDEX].Value = 1000;
 					if (unit.Player == CPlayer::GetThisPlayer()) {

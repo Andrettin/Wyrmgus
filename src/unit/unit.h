@@ -220,7 +220,7 @@ public:
 	void ChangeExperience(int amount, int around_range = 0); //around_range is the range around the unit that other units of the same player will receive experience
 	void IncreaseLevel(int level_quantity, bool automatic_learning = true);
 	void Retrain();
-	void HealingItemAutoUse();
+	void auto_use_item();
 	void set_character(wyrmgus::character *character);
 	void SetCharacter(const std::string &character_identifier, const bool custom_hero = false);
 	void apply_character_properties();

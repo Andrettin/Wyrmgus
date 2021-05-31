@@ -310,15 +310,29 @@ static bool PickUpItem(CUnit &unit)
 	std::vector<CUnit *> table;
 	SelectAroundUnit(unit, unit.GetReactionRange(), table);
 
-	for (size_t i = 0; i != table.size(); ++i) {
-		if (!table[i]->Removed) {
-			if (CanPickUp(unit, *table[i])) {
-				if (table[i]->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) - unit.Variable[HP_INDEX].Value) > 0) {
-					if (UnitReachable(unit, *table[i], 1, unit.GetReactionRange() * 8)) {
-						CommandPickUp(unit, *table[i], FlushCommands);
-						return true;
-					}
-				}
+	for (CUnit *near_unit : table) {
+		if (near_unit->Removed) {
+			continue;
+		}
+
+		if (!CanPickUp(unit, *near_unit)) {
+			continue;
+		}
+
+		bool usable_item = false;
+
+		if (near_unit->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) - unit.Variable[HP_INDEX].Value) > 0) {
+			usable_item = true;
+		}
+		
+		if (!usable_item && near_unit->Variable[MANA_RESTORATION_INDEX].Value > 0 && (unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max) - unit.Variable[MANA_INDEX].Value) > 0) {
+			usable_item = true;
+		}
+
+		if (usable_item) {
+			if (UnitReachable(unit, *near_unit, 1, unit.GetReactionRange() * 8)) {
+				CommandPickUp(unit, *near_unit, FlushCommands);
+				return true;
 			}
 		}
 	}

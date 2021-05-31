@@ -231,21 +231,6 @@ void COrder_Trade::Execute(CUnit &unit)
 					}
 					unit.Player->change_resource(goal->Type->get_given_resource(), goal->ResourcesHeld, false);
 					unit.Player->change_resource_total(goal->Type->get_given_resource(), goal->ResourcesHeld * unit.Player->get_income(goal->Type->get_given_resource()) / 100);
-				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
-					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) - unit.Variable[HP_INDEX].Value));
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
-					}
-					unit.Variable[HP_INDEX].Value += hp_healed;
-					
-					if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) { //if unit is still damaged, see if there are further healing items for it to use
-						unit.HealingItemAutoUse();
-					}
-				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow && unit.Type->UnitType != UnitTypeType::Space) {
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
-					}
-					HitUnit(NoUnitP, unit, goal->Variable[HITPOINTHEALING_INDEX].Value * -1);
 				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow && unit.Type->UnitType != UnitTypeType::Space) {
 					unit.Variable[SLOW_INDEX].Value = 1000;
 					if (unit.Player == CPlayer::GetThisPlayer()) {

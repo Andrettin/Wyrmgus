@@ -886,7 +886,7 @@ void CUnit::Retrain()
 	}
 }
 
-void CUnit::HealingItemAutoUse()
+void CUnit::auto_use_item()
 {
 	if (!HasInventory()) {
 		return;
@@ -899,20 +899,33 @@ void CUnit::HealingItemAutoUse()
 			continue;
 		}
 		
-		if (!wyrmgus::is_consumable_item_class(uins->Type->get_item_class())) {
+		if (!is_consumable_item_class(uins->Type->get_item_class())) {
 			continue;
 		}
+
+		bool usable_item = false;
 		
 		if (uins->Variable[HITPOINTHEALING_INDEX].Value > 0) {
+			//use a healing item if has less than 20% health
 			if (
 				uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max) - this->Variable[HP_INDEX].Value)
-				|| (this->Variable[HP_INDEX].Value * 100 / this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) <= 20 // use a healing item if has less than 20% health
+				|| (this->Variable[HP_INDEX].Value * 100 / this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) <= 20
 			) {
-				if (this->CriticalOrder == nullptr) {
-					this->CriticalOrder = COrder::NewActionUse(*uins);
-				}
-				break;
+				usable_item = true;
 			}
+		}
+
+		if (!usable_item && uins->Variable[MANA_RESTORATION_INDEX].Value > 0) {
+			if (uins->Variable[MANA_RESTORATION_INDEX].Value <= (this->GetModifiedVariable(MANA_INDEX, VariableAttribute::Max) - this->Variable[MANA_INDEX].Value)) {
+				usable_item = true;
+			}
+		}
+
+		if (usable_item) {
+			if (this->CriticalOrder == nullptr) {
+				this->CriticalOrder = COrder::NewActionUse(*uins);
+			}
+			break;
 		}
 	}
 }
@@ -6470,7 +6483,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 		return false;
 	}
 	
-	if (item->Type->BoolFlag[ITEM_INDEX].value && !wyrmgus::is_consumable_item_class(item->Type->get_item_class())) {
+	if (item->Type->BoolFlag[ITEM_INDEX].value && !is_consumable_item_class(item->Type->get_item_class())) {
 		return false;
 	}
 	
@@ -6492,8 +6505,20 @@ bool CUnit::CanUseItem(CUnit *item) const
 		}
 	}
 	
-	if (item->Elixir == nullptr && item->Variable[HITPOINTHEALING_INDEX].Value > 0 && this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
-		return false;
+	if (item->Elixir == nullptr) {
+		if (item->Variable[HITPOINTHEALING_INDEX].Value > 0 && item->Variable[MANA_RESTORATION_INDEX].Value > 0) {
+			if (this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max) && this->Variable[MANA_INDEX].Value >= this->GetModifiedVariable(MANA_INDEX, VariableAttribute::Max)) {
+				return false;
+			}
+		} else if (item->Variable[HITPOINTHEALING_INDEX].Value > 0) {
+			if (this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
+				return false;
+			}
+		} else if (item->Variable[MANA_RESTORATION_INDEX].Value > 0) {
+			if (this->Variable[MANA_INDEX].Value >= this->GetModifiedVariable(MANA_INDEX, VariableAttribute::Max)) {
+				return false;
+			}
+		}
 	}
 	
 	return true;
@@ -7426,7 +7451,7 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 	//Wyrmgus start
 	//use a healing item if any are available
 	if (target.HasInventory()) {
-		target.HealingItemAutoUse();
+		target.auto_use_item();
 	}
 	//Wyrmgus end
 }

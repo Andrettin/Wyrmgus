@@ -2960,7 +2960,7 @@ std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == ACIDRESISTANCE_INDEX || var == SHADOW_RESISTANCE_INDEX
 				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
 				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == CHARGEBONUS_INDEX || var == BACKSTAB_INDEX
-				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX
+				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == MANA_RESTORATION_INDEX
 				|| var == SIGHTRANGE_INDEX || var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX
 				|| var == HP_INDEX || var == MANA_INDEX || var == LEADERSHIPAURA_INDEX || var == REGENERATIONAURA_INDEX || var == HYDRATINGAURA_INDEX || var == ETHEREALVISION_INDEX || var == SPEEDBONUS_INDEX || var == RAIL_SPEED_BONUS_INDEX || var == SUPPLY_INDEX || var == TIMEEFFICIENCYBONUS_INDEX || var == RESEARCHSPEEDBONUS_INDEX || var == GARRISONEDRANGEBONUS_INDEX)
 			) {
@@ -3083,7 +3083,8 @@ std::string GetItemEffectsString(const std::string &item_ident)
 				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == ACIDRESISTANCE_INDEX || var == SHADOW_RESISTANCE_INDEX
 				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
 				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == CHARGEBONUS_INDEX || var == BACKSTAB_INDEX
-				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX || var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX || var == HP_INDEX || var == MANA_INDEX
+				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == MANA_RESTORATION_INDEX
+				|| var == SIGHTRANGE_INDEX || var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX || var == HP_INDEX || var == MANA_INDEX
 				|| var == ATTACKRANGE_INDEX)
 			) {
 			continue;
@@ -3102,7 +3103,7 @@ std::string GetItemEffectsString(const std::string &item_ident)
 				}
 
 				if (!IsBooleanVariable(var)) {
-					if (item->DefaultStat.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+					if (item->DefaultStat.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX && var != MANA_RESTORATION_INDEX) {
 						item_effects_string += "+";
 					}
 					item_effects_string += std::to_string(item->DefaultStat.Variables[var].Value);
@@ -3146,7 +3147,7 @@ std::string GetItemEffectsString(const std::string &item_ident)
 					}
 
 					if (!IsBooleanVariable(var)) {
-						if (modifier->Modifier.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+						if (modifier->Modifier.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX && var != MANA_RESTORATION_INDEX) {
 							item_effects_string += "+";
 						}
 						item_effects_string += std::to_string(modifier->Modifier.Variables[var].Value);

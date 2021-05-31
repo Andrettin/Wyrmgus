@@ -616,10 +616,11 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 				if (
 					unit_type->BoolFlag[ITEM_INDEX].value
 					&& this->Index != HITPOINTHEALING_INDEX
-					&& wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Container
-					&& (wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Container->can_equip_item(&wyrmgus::unit_manager::get()->GetSlotUnit(button.Value)) || wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Work != nullptr || wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Elixir != nullptr)
+					&& this->Index != MANA_RESTORATION_INDEX
+					&& unit_manager::get()->GetSlotUnit(button.Value).Container
+					&& (unit_manager::get()->GetSlotUnit(button.Value).Container->can_equip_item(&unit_manager::get()->GetSlotUnit(button.Value)) || unit_manager::get()->GetSlotUnit(button.Value).Work != nullptr || unit_manager::get()->GetSlotUnit(button.Value).Elixir != nullptr)
 					) {
-					value = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Container->GetItemVariableChange(&wyrmgus::unit_manager::get()->GetSlotUnit(button.Value), this->Index);
+					value = unit_manager::get()->GetSlotUnit(button.Value).Container->GetItemVariableChange(&unit_manager::get()->GetSlotUnit(button.Value), this->Index);
 					if (value >= 0) {
 						x += label.Draw(x, y, "+", render_commands);
 					}

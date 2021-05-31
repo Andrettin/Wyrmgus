@@ -201,7 +201,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 					|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == ACIDRESISTANCE_INDEX || var == SHADOW_RESISTANCE_INDEX
 					|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
 					|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == CHARGEBONUS_INDEX || var == BACKSTAB_INDEX
-					|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX
+					|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == MANA_RESTORATION_INDEX || var == MANA_INDEX
 					|| var == SIGHTRANGE_INDEX || var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX
 					|| var == GIVERESOURCE_INDEX || var == TIMEEFFICIENCYBONUS_INDEX || var == RESEARCHSPEEDBONUS_INDEX || var == GARRISONEDRANGEBONUS_INDEX
 					|| var == RAIL_SPEED_BONUS_INDEX
@@ -248,7 +248,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				}
 
 				if (!IsBooleanVariable(var)) {
-					if (variable_value >= 0 && var != HITPOINTHEALING_INDEX && var != GIVERESOURCE_INDEX) {
+					if (variable_value >= 0 && var != HITPOINTHEALING_INDEX && var != MANA_RESTORATION_INDEX && var != GIVERESOURCE_INDEX) {
 						item_effects_string += "+";
 					}
 					item_effects_string += std::to_string(variable_value);
@@ -288,7 +288,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 						|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == ACIDRESISTANCE_INDEX || var == SHADOW_RESISTANCE_INDEX
 						|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
 						|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == CHARGEBONUS_INDEX || var == BACKSTAB_INDEX
-						|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX
+						|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == MANA_RESTORATION_INDEX || var == MANA_INDEX
 						|| var == SIGHTRANGE_INDEX || var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX
 						|| var == GIVERESOURCE_INDEX || var == TIMEEFFICIENCYBONUS_INDEX || var == RESEARCHSPEEDBONUS_INDEX || var == GARRISONEDRANGEBONUS_INDEX
 						|| var == RAIL_SPEED_BONUS_INDEX
@@ -320,7 +320,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 					}
 
 					if (!IsBooleanVariable(var)) {
-						if (variable_value >= 0 && var != HITPOINTHEALING_INDEX && var != GIVERESOURCE_INDEX) {
+						if (variable_value >= 0 && var != HITPOINTHEALING_INDEX && var != MANA_RESTORATION_INDEX && var != GIVERESOURCE_INDEX) {
 							item_effects_string += "+";
 						}
 						item_effects_string += std::to_string(variable_value);
