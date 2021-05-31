@@ -839,22 +839,26 @@ void ApplyMapTemplate(const std::string &map_template_ident, int template_start_
 
 void ApplyCampaignMap(const std::string &campaign_ident)
 {
-	wyrmgus::database::load_history();
+	try {
+		database::load_history();
 
-	const wyrmgus::campaign *campaign = wyrmgus::campaign::get(campaign_ident);
-	
-	for (size_t i = 0; i < campaign->get_map_templates().size(); ++i) {
-		wyrmgus::map_template *map_template = campaign->get_map_templates()[i];
-		QPoint start_pos(0, 0);
-		if (i < campaign->MapTemplateStartPos.size()) {
-			start_pos = campaign->MapTemplateStartPos[i];
-		}
+		const campaign *campaign = campaign::get(campaign_ident);
 
-		try {
-			map_template->apply(start_pos, QPoint(0, 0), i);
-		} catch (...) {
-			std::throw_with_nested(std::runtime_error("Failed to apply map template \"" + map_template->get_identifier() + "\"."));
+		for (size_t i = 0; i < campaign->get_map_templates().size(); ++i) {
+			map_template *map_template = campaign->get_map_templates()[i];
+			QPoint start_pos(0, 0);
+			if (i < campaign->MapTemplateStartPos.size()) {
+				start_pos = campaign->MapTemplateStartPos[i];
+			}
+
+			try {
+				map_template->apply(start_pos, QPoint(0, 0), i);
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to apply map template \"" + map_template->get_identifier() + "\"."));
+			}
 		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to campaign map for campaign \"" + campaign_ident + "\"."));
 	}
 }
 //Wyrmgus end
