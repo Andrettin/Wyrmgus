@@ -39,6 +39,7 @@
 #include "time/season.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
+#include "util/image_util.h"
 #include "util/string_conversion_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
@@ -274,8 +275,13 @@ void terrain_type::calculate_minimap_color(const season *season)
 
 	const std::shared_ptr<CPlayerColorGraphic> &graphic = this->get_graphics(season);
 
-	const QImage &image = graphic->get_image();
 	const player_color *conversible_player_color = graphic->get_conversible_player_color();
+
+	QImage image = graphic->get_image();
+	if (this->get_hue_rotation() != 0) {
+		const color_set ignored_colors = container::to_set<std::vector<QColor>, color_set>(conversible_player_color->get_colors());
+		image::rotate_hue(image, this->get_hue_rotation(), ignored_colors);
+	}
 
 	int pixel_count = 0;
 	int red = 0;
