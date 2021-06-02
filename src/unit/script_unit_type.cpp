@@ -1605,7 +1605,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->CostModifier = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Elixir")) {
 			const std::string elixir_ident = LuaToString(l, -1);
-			type->Elixir = CUpgrade::get_or_add(elixir_ident, nullptr); //if this elixir upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+			type->elixir = CUpgrade::get_or_add(elixir_ident, nullptr); //if this elixir upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 		} else if (!strcmp(value, "SoldUnits")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {

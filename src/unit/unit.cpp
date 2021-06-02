@@ -3161,8 +3161,8 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 	}
 	
 	//set the unit type's elixir, if any
-	if (unit->Type->Elixir) {
-		unit->SetElixir(unit->Type->Elixir);
+	if (unit->Type->get_elixir() != nullptr) {
+		unit->SetElixir(unit->Type->get_elixir());
 	}
 	
 	unit->Variable[MANA_INDEX].Value = 0; //start off with 0 mana

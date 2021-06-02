@@ -784,6 +784,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(wyrmgus::item_class item_class MEMBER item_class READ get_item_class)
 	Q_PROPERTY(wyrmgus::species* species MEMBER species)
+	Q_PROPERTY(CUpgrade* elixir MEMBER elixir)
 	Q_PROPERTY(wyrmgus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
 	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
 	Q_PROPERTY(wyrmgus::resource* given_resource MEMBER given_resource)
@@ -1077,6 +1078,11 @@ public:
 		return this->draw_level;
 	}
 
+	const CUpgrade *get_elixir() const
+	{
+		return this->elixir;
+	}
+
 	unit_type *get_corpse_type() const
 	{
 		return this->corpse_type;
@@ -1212,7 +1218,9 @@ public:
 	std::string RequirementsString;	/// Requirements string of the unit type
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type
-	const CUpgrade *Elixir = nullptr;		/// Which elixir does this (item) unit type always have
+private:
+	CUpgrade *elixir = nullptr; //which elixir does this (item) unit type always have
+public:
 	std::vector<unit_type *> SoldUnits;		/// Units which this unit can sell.
 	std::vector<unit_type *> SpawnUnits;	/// Units which this unit can spawn.
 	std::vector<unit_type *> Drops;			/// Units which can spawn upon death (i.e. items).

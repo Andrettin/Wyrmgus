@@ -1809,7 +1809,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->RequirementsString = parent_type->RequirementsString;
 	this->ExperienceRequirementsString = parent_type->ExperienceRequirementsString;
 	this->BuildingRulesString = parent_type->BuildingRulesString;
-	this->Elixir = parent_type->Elixir;
+	this->elixir = parent_type->elixir;
 	this->icon = parent_type->icon;
 	this->Spells = parent_type->Spells;
 	this->autocast_spells = parent_type->autocast_spells;
@@ -3133,8 +3133,8 @@ std::string GetItemEffectsString(const std::string &item_ident)
 			}
 		}
 
-		if (item->Elixir) {
-			for (const auto &modifier : item->Elixir->get_modifiers()) {
+		if (item->get_elixir() != nullptr) {
+			for (const auto &modifier : item->get_elixir()->get_modifiers()) {
 				if (modifier->Modifier.Variables[var].Value != 0) {
 					if (!first_var) {
 						item_effects_string += ", ";
