@@ -93,7 +93,7 @@ void spell_action_summon::Parse(lua_State *l, int startIndex, int endIndex)
 	}
 }
 
-class IsDyingAndNotABuilding
+class IsDyingAndNotABuilding final
 {
 public:
 	bool operator()(const CUnit *unit) const

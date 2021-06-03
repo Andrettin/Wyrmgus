@@ -372,14 +372,13 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 							bool has_transitions = overlay ? (UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(adjacent_pos)->TransitionTiles.size() > 0);
 							bool solid_tile = true;
 							
-							if (!overlay && std::find(adjacent_terrain->BorderTerrains.begin(), adjacent_terrain->BorderTerrains.end(), CMap::get()->GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID)) == adjacent_terrain->BorderTerrains.end()) {
-								for (size_t j = 0; j != adjacent_terrain->BorderTerrains.size(); ++j) {
-									wyrmgus::terrain_type *border_terrain = adjacent_terrain->BorderTerrains[j];
-									if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), adjacent_terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), CMap::get()->GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID)) != border_terrain->BorderTerrains.end()) { // found a terrain type that can border both terrains
-										CMap::get()->SetTileTerrain(adjacent_pos, border_terrain, UI.CurrentMapLayer->ID);
-										changed_tiles.push_back(adjacent_pos);
-										break;
-									}
+							if (!overlay && !adjacent_terrain->is_border_terrain_type(CMap::get()->GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID))) {
+								const terrain_type *intermediate_terrain = adjacent_terrain->get_intermediate_terrain_type(CMap::get()->GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID));
+
+								if (intermediate_terrain != nullptr) {
+									//found a terrain type that can border both terrains
+									CMap::get()->SetTileTerrain(adjacent_pos, intermediate_terrain, UI.CurrentMapLayer->ID);
+									changed_tiles.push_back(adjacent_pos);
 								}
 							} else if (!adjacent_terrain->allows_single()) {
 								for (int sub_x_offset = -1; sub_x_offset <= 1; ++sub_x_offset) {

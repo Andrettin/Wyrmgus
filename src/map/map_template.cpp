@@ -929,8 +929,6 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapTransitions(map_start_pos, map_end, z);
-		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
-		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->get_name().c_str());
@@ -993,8 +991,6 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapTransitions(map_start_pos, map_end, z);
-		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
-		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 
 	if (!this->get_subtemplates().empty()) {
@@ -3198,7 +3194,8 @@ bool generated_terrain::CanGenerateOnTile(const tile *tile) const
 			return false;
 		}
 		
-		if (std::find(this->TerrainType->BorderTerrains.begin(), this->TerrainType->BorderTerrains.end(), tile->get_terrain()) == this->TerrainType->BorderTerrains.end()) { //don't allow generating on the tile if it can't be a border terrain to the terrain we want to generate
+		if (!this->TerrainType->is_border_terrain_type(tile->get_terrain())) {
+			//don't allow generating on the tile if it can't be a border terrain to the terrain we want to generate
 			return false;
 		}
 	}

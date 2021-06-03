@@ -117,6 +117,14 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 			const tile_flag flag = string_to_tile_flag(value);
 			this->Flags |= flag;
 		}
+	} else if (tag == "intermediate_terrain_types") {
+		scope.for_each_property([&](const sml_property &property) {
+			terrain_type *other_terrain_type = terrain_type::get(property.get_key());
+			const terrain_type *intermediate_terrain_type = terrain_type::get(property.get_value());
+
+			this->intermediate_terrain_types[other_terrain_type] = intermediate_terrain_type;
+			other_terrain_type->intermediate_terrain_types[this] = intermediate_terrain_type;
+		});
 	} else if (tag == "solid_tiles") {
 		for (const std::string &value : values) {
 			this->solid_tiles.push_back(std::stoi(value));
@@ -216,6 +224,16 @@ void terrain_type::check() const
 {
 	if (this->movement_bonus >= DefaultTileMovementCost) {
 		throw std::runtime_error("The movement bonus for terrain type \"" + this->get_identifier() + "\" is greater than or equal to the default tile movement cost.");
+	}
+
+	for (const auto &[other_terrain_type, intermediate_terrain_type] : this->intermediate_terrain_types) {
+		if (!this->is_border_terrain_type(intermediate_terrain_type)) {
+			throw std::runtime_error("Terrain type \"" + this->get_identifier() + "\" was set to have \"" + intermediate_terrain_type->get_identifier() + "\" as an intermediate terrain type, but the latter is not set as a border terrain type of the former.");
+		}
+
+		if (this->is_border_terrain_type(other_terrain_type)) {
+			throw std::runtime_error("Terrain type \"" + this->get_identifier() + "\" was set to have an intermediate terrain type with \"" + other_terrain_type->get_identifier() + "\", but both can already border each other directly.");
+		}
 	}
 }
 
@@ -437,6 +455,11 @@ void terrain_type::remove_base_terrain_type(terrain_type *terrain_type)
 	vector::remove(this->base_terrain_types, terrain_type);
 }
 
+bool terrain_type::is_border_terrain_type(const terrain_type *terrain_type) const
+{
+	return vector::contains(this->BorderTerrains, terrain_type);
+}
+
 QVariantList terrain_type::get_outer_border_terrain_types_qvariant_list() const
 {
 	return container::to_qvariant_list(this->get_outer_border_terrain_types());
@@ -455,6 +478,30 @@ QVariantList terrain_type::get_inner_border_terrain_types_qvariant_list() const
 void terrain_type::remove_inner_border_terrain_type(terrain_type *terrain_type)
 {
 	vector::remove(this->inner_border_terrain_types, terrain_type);
+}
+
+bool terrain_type::is_inner_border_terrain_type(const terrain_type *terrain_type) const
+{
+	return vector::contains(this->get_inner_border_terrain_types(), terrain_type);
+}
+
+const terrain_type *terrain_type::get_intermediate_terrain_type(const terrain_type *other_terrain_type) const
+{
+	const auto find_iterator = this->intermediate_terrain_types.find(other_terrain_type);
+	if (find_iterator != this->intermediate_terrain_types.end()) {
+		return find_iterator->second;
+	}
+
+	for (const terrain_type *border_terrain_type : this->BorderTerrains) {
+		if (!other_terrain_type->is_border_terrain_type(border_terrain_type)) {
+			continue;
+		}
+
+		//found a terrain type that can border both terrain types
+		return border_terrain_type;
+	}
+
+	return nullptr;
 }
 
 }

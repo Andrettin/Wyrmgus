@@ -338,6 +338,8 @@ public:
 
 	Q_INVOKABLE void remove_base_terrain_type(terrain_type *terrain_type);
 
+	bool is_border_terrain_type(const terrain_type *terrain_type) const;
+
 	const std::vector<terrain_type *> &get_outer_border_terrain_types() const
 	{
 		return this->outer_border_terrain_types;
@@ -374,6 +376,10 @@ public:
 
 	Q_INVOKABLE void remove_inner_border_terrain_type(terrain_type *terrain_type);
 
+	bool is_inner_border_terrain_type(const terrain_type *terrain_type) const;
+
+	const terrain_type *get_intermediate_terrain_type(const terrain_type *other_terrain_type) const;
+
 	const std::vector<int> &get_solid_tiles() const
 	{
 		return this->solid_tiles;
@@ -393,7 +399,7 @@ public:
 	{
 		static std::vector<int> empty_vector;
 
-		auto find_iterator = this->transition_tiles.find(terrain_type);
+		const auto find_iterator = this->transition_tiles.find(terrain_type);
 		if (find_iterator != this->transition_tiles.end()) {
 			auto sub_find_iterator = find_iterator->second.find(transition_type);
 			if (sub_find_iterator != find_iterator->second.end()) {
@@ -460,6 +466,7 @@ public:
 private:
 	std::vector<terrain_type *> outer_border_terrain_types; //terrain types which this one can border, and which are "entered" by this tile type in transitions
 	std::vector<terrain_type *> inner_border_terrain_types; //terrain types which this one can border, and which "enter" this tile type in transitions
+	std::map<const terrain_type *, const terrain_type *> intermediate_terrain_types;
 	std::vector<int> solid_tiles;
 	std::vector<int> damaged_tiles;
 	std::vector<int> destroyed_tiles;
