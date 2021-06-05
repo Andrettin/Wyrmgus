@@ -29,6 +29,7 @@
 
 #include "music.h"
 
+#include "database/preferences.h"
 #include "iolib.h"
 #include "script.h"
 #include "script/condition/and_condition.h"
@@ -152,7 +153,7 @@ void CheckMusicFinished()
 
 	const bool finished = !music_player::get()->is_playing();
 
-	if (finished && SoundEnabled() && IsMusicEnabled() && CallbackMusic) {
+	if (finished && SoundEnabled() && preferences::get()->is_music_enabled() && CallbackMusic) {
 		music_player::get()->play();
 	}
 }

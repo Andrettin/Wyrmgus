@@ -66,9 +66,6 @@
 
 static bool SoundInitialized;    /// is sound initialized
 
-static bool MusicEnabled = true;
-static bool EffectsEnabled = true;
-
 /// Channels for sound effects and unit speech
 struct SoundChannel {
 	std::unique_ptr<Origin> Unit;          /// pointer to unit, who plays the sound, if any
@@ -151,7 +148,7 @@ int SetChannelVolume(int channel, int volume)
 	}
 
 	//apply the effects volume to the channel volume
-	volume *= preferences::get()->get_sound_volume();
+	volume *= preferences::get()->get_sound_effects_volume();
 	volume /= MaxVolume;
 
 	//ensure the volume is within proper bounds
@@ -273,7 +270,7 @@ int PlaySample(wyrmgus::sample *sample, Origin *origin)
 {
 	int channel = -1;
 
-	if (SoundEnabled() && EffectsEnabled && sample != nullptr) {
+	if (SoundEnabled() && preferences::get()->are_sound_effects_enabled() && sample != nullptr) {
 		try {
 			if (!sample->is_loaded()) {
 				sample->load();
@@ -284,10 +281,10 @@ int PlaySample(wyrmgus::sample *sample, Origin *origin)
 		}
 
 		channel = Mix_PlayChannel(-1, sample->get_chunk(), 0);
-		Mix_Volume(channel, preferences::get()->get_sound_volume() * MIX_MAX_VOLUME / MaxVolume);
+		Mix_Volume(channel, preferences::get()->get_sound_effects_volume() * MIX_MAX_VOLUME / MaxVolume);
 
 		Channels[channel].FinishedCallback = nullptr;
-		Channels[channel].Voice = wyrmgus::unit_sound_type::none;
+		Channels[channel].Voice = unit_sound_type::none;
 		Channels[channel].Unit.reset();
 
 		if (origin && origin->Base) {
@@ -308,7 +305,7 @@ int PlaySample(wyrmgus::sample *sample, Origin *origin)
 */
 void SetEffectsVolume(int volume)
 {
-	preferences::get()->set_sound_volume(volume);
+	preferences::get()->set_sound_effects_volume(volume);
 }
 
 /**
@@ -316,7 +313,7 @@ void SetEffectsVolume(int volume)
 */
 int GetEffectsVolume()
 {
-	return preferences::get()->get_sound_volume();
+	return preferences::get()->get_sound_effects_volume();
 }
 
 /**
@@ -324,7 +321,7 @@ int GetEffectsVolume()
 */
 void SetEffectsEnabled(bool enabled)
 {
-	EffectsEnabled = enabled;
+	preferences::get()->set_sound_effects_enabled(enabled);
 }
 
 /**
@@ -332,7 +329,7 @@ void SetEffectsEnabled(bool enabled)
 */
 bool IsEffectsEnabled()
 {
-	return EffectsEnabled;
+	return preferences::get()->are_sound_effects_enabled();
 }
 
 /*----------------------------------------------------------------------------
@@ -410,13 +407,7 @@ int GetMusicVolume()
 */
 void SetMusicEnabled(bool enabled)
 {
-	if (enabled) {
-		MusicEnabled = true;
-		wyrmgus::music_player::get()->play();
-	} else {
-		MusicEnabled = false;
-		StopMusic();
-	}
+	preferences::get()->set_music_enabled(enabled);
 }
 
 /**
@@ -424,7 +415,7 @@ void SetMusicEnabled(bool enabled)
 */
 bool IsMusicEnabled()
 {
-	return MusicEnabled;
+	return preferences::get()->is_music_enabled();
 }
 
 /**

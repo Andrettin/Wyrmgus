@@ -290,17 +290,17 @@ static void UiAddToGroup(unsigned group)
 static void UiToggleSound()
 {
 	if (SoundEnabled()) {
-		if (IsEffectsEnabled()) {
-			SetEffectsEnabled(false);
-			SetMusicEnabled(false);
+		if (preferences::get()->are_sound_effects_enabled()) {
+			preferences::get()->set_sound_effects_enabled(false);
+			preferences::get()->set_music_enabled(false);
 		} else {
-			SetEffectsEnabled(true);
-			SetMusicEnabled(true);
+			preferences::get()->set_sound_effects_enabled(true);
+			preferences::get()->set_music_enabled(true);
 		}
 	}
 
 	if (SoundEnabled()) {
-		if (IsEffectsEnabled()) {
+		if (preferences::get()->are_sound_effects_enabled()) {
 			UI.StatusLine.Set(_("Sound is on."));
 		} else {
 			UI.StatusLine.Set(_("Sound is off."));

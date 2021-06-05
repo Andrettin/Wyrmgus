@@ -70,7 +70,7 @@ void music_player::play_music_type(const music_type type)
 	//clear all loaded data when the music type changes, to prevent music from causing too much memory consumption
 	music::unload_all();
 
-	if (SoundEnabled() && IsMusicEnabled()) {
+	if (SoundEnabled() && preferences::get()->is_music_enabled()) {
 		this->play();
 	}
 }
