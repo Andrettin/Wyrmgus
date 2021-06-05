@@ -39,6 +39,8 @@ enum class interface_element_type {
 	left_arrow_button,
 	right_arrow_button,
 	dropdown_bar,
+	slider_bar,
+	slider_marker,
 	icon_frame,
 	pressed_icon_frame
 };
@@ -65,6 +67,10 @@ inline interface_element_type string_to_interface_element_type(const std::string
 		return interface_element_type::right_arrow_button;
 	} else if (str == "dropdown_bar") {
 		return interface_element_type::dropdown_bar;
+	} else if (str == "slider_bar") {
+		return interface_element_type::slider_bar;
+	} else if (str == "slider_marker") {
+		return interface_element_type::slider_marker;
 	} else if (str == "icon_frame") {
 		return interface_element_type::icon_frame;
 	} else if (str == "pressed_icon_frame") {

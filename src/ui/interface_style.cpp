@@ -97,6 +97,14 @@ void interface_style::initialize()
 		this->dropdown_bar_graphics = CGraphic::New(this->dropdown_bar_file.string());
 	}
 
+	if (!this->slider_bar_file.empty()) {
+		this->slider_bar_graphics = CGraphic::New(this->slider_bar_file.string());
+	}
+
+	if (!this->slider_marker_file.empty()) {
+		this->slider_marker_graphics = CGraphic::New(this->slider_marker_file.string());
+	}
+
 	if (this->large_button != nullptr) {
 		this->large_button->initialize();
 	}
@@ -138,6 +146,16 @@ void interface_style::set_dropdown_bar_file(const std::filesystem::path &filepat
 	this->dropdown_bar_file = database::get()->get_graphics_filepath(filepath);
 }
 
+void interface_style::set_slider_bar_file(const std::filesystem::path &filepath)
+{
+	this->slider_bar_file = database::get()->get_graphics_filepath(filepath);
+}
+
+void interface_style::set_slider_marker_file(const std::filesystem::path &filepath)
+{
+	this->slider_marker_file = database::get()->get_graphics_filepath(filepath);
+}
+
 const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics(const interface_element_type type, const std::vector<std::string> &qualifiers) const
 {
 	switch (type) {
@@ -149,6 +167,10 @@ const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics
 		}
 		case interface_element_type::dropdown_bar:
 			return this->dropdown_bar_graphics;
+		case interface_element_type::slider_bar:
+			return this->slider_bar_graphics;
+		case interface_element_type::slider_marker:
+			return this->slider_marker_graphics;
 		case interface_element_type::large_button:
 		case interface_element_type::small_button:
 		case interface_element_type::up_arrow_button:
