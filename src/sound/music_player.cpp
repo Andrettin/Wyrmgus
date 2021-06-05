@@ -28,6 +28,7 @@
 
 #include "music_player.h"
 
+#include "database/preferences.h"
 #include "game.h"
 #include "player.h"
 #include "script/condition/and_condition.h"
@@ -139,8 +140,8 @@ void music_player::play_sample(music_sample *sample)
 		return;
 	}
 
-	const int volume = Mix_VolumeMusic(GetMusicVolume() * this->current_volume_modifier / 100 * MIX_MAX_VOLUME / MaxVolume);
-	if (volume == 0 && GetMusicVolume() != 0) {
+	const int volume = Mix_VolumeMusic(preferences::get()->get_music_volume() * this->current_volume_modifier / 100 * MIX_MAX_VOLUME / MaxVolume);
+	if (volume == 0 && preferences::get()->get_music_volume() != 0) {
 		log::log_error("Failed to set volume for playing music.");
 	}
 

@@ -33,10 +33,9 @@
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
 #include "game/difficulty.h"
-#include "quest/campaign.h"
+#include "sound/sound_server.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
-#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 
@@ -79,6 +78,8 @@ void preferences::save() const
 
 	data.add_property("scale_factor", std::to_string(this->get_scale_factor()));
 	data.add_property("difficulty", difficulty_to_string(this->get_difficulty()));
+	data.add_property("sound_volume", std::to_string(this->get_sound_volume()));
+	data.add_property("music_volume", std::to_string(this->get_music_volume()));
 
 	try {
 		data.print_to_file(preferences_path);
@@ -101,6 +102,30 @@ void preferences::process_sml_property(const sml_property &property)
 void preferences::process_sml_scope(const sml_data &scope)
 {
 	database::process_sml_scope_for_object(this, scope);
+}
+
+void preferences::set_sound_volume(int volume)
+{
+	volume = std::clamp(volume, 0, MaxVolume);
+
+	if (volume == this->get_sound_volume()) {
+		return;
+	}
+
+	this->sound_volume = volume;
+	emit sound_volume_changed();
+}
+
+void preferences::set_music_volume(int volume)
+{
+	volume = std::clamp(volume, 0, MaxVolume);
+
+	if (volume == this->get_music_volume()) {
+		return;
+	}
+
+	this->music_volume = volume;
+	emit music_volume_changed();
 }
 
 }

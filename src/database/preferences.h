@@ -41,6 +41,8 @@ class preferences final : public QObject, public singleton<preferences>
 
 	Q_PROPERTY(int scale_factor READ get_scale_factor WRITE set_scale_factor)
 	Q_PROPERTY(wyrmgus::difficulty difficulty READ get_difficulty WRITE set_difficulty)
+	Q_PROPERTY(int sound_volume READ get_sound_volume WRITE set_sound_volume NOTIFY sound_volume_changed)
+	Q_PROPERTY(int music_volume READ get_music_volume WRITE set_music_volume NOTIFY music_volume_changed)
 
 public:
 	static std::filesystem::path get_path();
@@ -91,9 +93,29 @@ public:
 		this->set_difficulty(static_cast<wyrmgus::difficulty>(difficulty_index));
 	}
 
+	int get_sound_volume() const
+	{
+		return this->sound_volume;
+	}
+
+	void set_sound_volume(int volume);
+
+	int get_music_volume() const
+	{
+		return this->music_volume;
+	}
+
+	void set_music_volume(int volume);
+
+signals:
+	void sound_volume_changed();
+	void music_volume_changed();
+
 private:
 	int scale_factor = 1;
 	wyrmgus::difficulty difficulty;
+	int sound_volume = 128;
+	int music_volume = 128;
 };
 
 }

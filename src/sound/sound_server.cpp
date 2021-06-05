@@ -32,6 +32,7 @@
 #include "sound/sound_server.h"
 
 #include "civilization.h"
+#include "database/preferences.h"
 #include "dialogue.h"
 #include "faction.h"
 #include "iocompat.h"
@@ -64,9 +65,6 @@
 #include <SDL_mixer.h>
 
 static bool SoundInitialized;    /// is sound initialized
-
-static int EffectsVolume = 128;  /// effects sound volume
-static int MusicVolume = 128;    /// music volume
 
 static bool MusicEnabled = true;
 static bool EffectsEnabled = true;
@@ -153,7 +151,7 @@ int SetChannelVolume(int channel, int volume)
 	}
 
 	//apply the effects volume to the channel volume
-	volume *= GetEffectsVolume();
+	volume *= preferences::get()->get_sound_volume();
 	volume /= MaxVolume;
 
 	//ensure the volume is within proper bounds
@@ -286,7 +284,7 @@ int PlaySample(wyrmgus::sample *sample, Origin *origin)
 		}
 
 		channel = Mix_PlayChannel(-1, sample->get_chunk(), 0);
-		Mix_Volume(channel, EffectsVolume * MIX_MAX_VOLUME / MaxVolume);
+		Mix_Volume(channel, preferences::get()->get_sound_volume() * MIX_MAX_VOLUME / MaxVolume);
 
 		Channels[channel].FinishedCallback = nullptr;
 		Channels[channel].Voice = wyrmgus::unit_sound_type::none;
@@ -310,8 +308,7 @@ int PlaySample(wyrmgus::sample *sample, Origin *origin)
 */
 void SetEffectsVolume(int volume)
 {
-	volume = std::clamp(volume, 0, MaxVolume);
-	EffectsVolume = volume;
+	preferences::get()->set_sound_volume(volume);
 }
 
 /**
@@ -319,7 +316,7 @@ void SetEffectsVolume(int volume)
 */
 int GetEffectsVolume()
 {
-	return EffectsVolume;
+	return preferences::get()->get_sound_volume();
 }
 
 /**
@@ -395,10 +392,9 @@ void StopMusic()
 */
 void SetMusicVolume(int volume)
 {
-	volume = std::clamp(volume, 0, MaxVolume);
-	MusicVolume = volume;
+	preferences::get()->set_music_volume(volume);
 
-	Mix_VolumeMusic(volume * wyrmgus::music_player::get()->get_current_volume_modifier() / 100 * MIX_MAX_VOLUME / MaxVolume);
+	Mix_VolumeMusic(preferences::get()->get_music_volume() * music_player::get()->get_current_volume_modifier() / 100 * MIX_MAX_VOLUME / MaxVolume);
 }
 
 /**
@@ -406,7 +402,7 @@ void SetMusicVolume(int volume)
 */
 int GetMusicVolume()
 {
-	return MusicVolume;
+	return preferences::get()->get_music_volume();
 }
 
 /**

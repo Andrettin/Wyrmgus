@@ -33,6 +33,7 @@
 #include "ai.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end
@@ -314,12 +315,12 @@ static void UiToggleMusic()
 {
 	static int vol;
 	if (SoundEnabled()) {
-		if (GetMusicVolume()) {
-			vol = GetMusicVolume();
-			SetMusicVolume(0);
+		if (preferences::get()->get_music_volume() != 0) {
+			vol = preferences::get()->get_music_volume();
+			preferences::get()->set_music_volume(0);
 			UI.StatusLine.Set(_("Music is off."));
 		} else {
-			SetMusicVolume(vol);
+			preferences::get()->set_music_volume(vol);
 			UI.StatusLine.Set(_("Music is on."));
 		}
 	}
