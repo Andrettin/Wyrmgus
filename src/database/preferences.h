@@ -39,7 +39,7 @@ class preferences final : public QObject, public singleton<preferences>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(int scale_factor READ get_scale_factor WRITE set_scale_factor)
+	Q_PROPERTY(int scale_factor READ get_scale_factor WRITE set_scale_factor NOTIFY scale_factor_changed)
 	Q_PROPERTY(wyrmgus::difficulty difficulty READ get_difficulty WRITE set_difficulty)
 	Q_PROPERTY(bool sound_effects_enabled READ are_sound_effects_enabled WRITE set_sound_effects_enabled NOTIFY sound_effects_enabled_changed)
 	Q_PROPERTY(int sound_effects_volume READ get_sound_effects_volume WRITE set_sound_effects_volume NOTIFY sound_effects_volume_changed)
@@ -69,6 +69,7 @@ public:
 		}
 
 		this->scale_factor = factor;
+		emit scale_factor_changed();
 	}
 
 	wyrmgus::difficulty get_difficulty() const
@@ -132,6 +133,7 @@ public:
 	void set_music_volume(int volume);
 
 signals:
+	void scale_factor_changed();
 	void sound_effects_enabled_changed();
 	void sound_effects_volume_changed();
 	void music_enabled_changed();

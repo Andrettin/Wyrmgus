@@ -450,16 +450,6 @@ int get_scale_factor()
 	return wyrmgus::defines::get()->get_scale_factor();
 }
 
-int get_scale_factor_preference()
-{
-	return wyrmgus::preferences::get()->get_scale_factor();
-}
-
-void set_scale_factor(const int factor)
-{
-	wyrmgus::preferences::get()->set_scale_factor(factor);
-}
-
 void pack_image_folder(const std::string &dir_path, const int frames_per_row)
 {
 	try {
