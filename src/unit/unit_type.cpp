@@ -772,6 +772,8 @@ void unit_type::process_sml_property(const sml_property &property)
 		}
 	} else if (key == "requirements_string") {
 		this->RequirementsString = value;
+	} else if (key == "building_rules_string") {
+		this->BuildingRulesString = value;
 	} else {
 		const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
 
