@@ -194,7 +194,7 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 			const QKeyEvent *key_event = static_cast<QKeyEvent *>(event);
 			this->store_input_event(std::make_unique<QKeyEvent>(*key_event));
 
-			if (key_event->key() == Qt::Key_Tab) {
+			if (key_event->key() == Qt::Key_Tab || key_event->key() == Qt::Key_Backtab) {
 				return true; //consume tab events to prevent tab focus switching
 			}
 
