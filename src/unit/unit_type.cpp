@@ -1804,6 +1804,8 @@ void unit_type::set_parent(const unit_type *parent_type)
 	}
 	this->num_directions = parent_type->num_directions;
 	this->neutral_minimap_color = parent_type->neutral_minimap_color;
+	this->site_name_prefix = parent_type->site_name_prefix;
+	this->site_name_suffix = parent_type->site_name_suffix;
 	this->encyclopedia_background_file = parent_type->encyclopedia_background_file;
 	this->random_movement_probability = parent_type->random_movement_probability;
 	this->RandomMovementDistance = parent_type->RandomMovementDistance;

@@ -101,6 +101,31 @@ const std::string &site_game_data::get_current_cultural_name() const
 	return this->site->get_name();
 }
 
+std::string site_game_data::get_site_unit_name() const
+{
+	const CUnit *unit = this->get_site_unit();
+
+	if (unit == nullptr) {
+		throw std::runtime_error("Tried to get the the site unit name of a site which has no site unit.");
+	}
+
+	std::string name;
+
+	const unit_type *unit_type = unit->Type;
+
+	if (!unit_type->get_site_name_prefix().empty()) {
+		name += unit_type->get_site_name_prefix() + " ";
+	}
+
+	name += this->get_current_cultural_name();
+
+	if (!unit_type->get_site_name_suffix().empty()) {
+		name += " " + unit_type->get_site_name_suffix();
+	}
+
+	return name;
+}
+
 void site_game_data::set_site_unit(CUnit *unit)
 {
 	if (unit == this->get_site_unit()) {

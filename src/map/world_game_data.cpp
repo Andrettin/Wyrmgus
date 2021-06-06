@@ -103,23 +103,6 @@ sml_data world_game_data::to_sml_data() const
 
 const std::string &world_game_data::get_current_cultural_name() const
 {
-	/*
-	const CUnit *unit = this->get_site_unit();
-
-	if (unit != nullptr) {
-		const civilization *name_civilization = unit->get_civilization();
-
-		if (name_civilization == nullptr && unit->Player->get_index() == PlayerNumNeutral) {
-			const CPlayer *unit_tile_owner = unit->get_center_tile_owner();
-			if (unit_tile_owner != nullptr) {
-				name_civilization = unit_tile_owner->get_civilization();
-			}
-		}
-
-		return this->site->get_cultural_name(name_civilization);
-	}
-	*/
-
 	return this->world->get_name();
 }
 

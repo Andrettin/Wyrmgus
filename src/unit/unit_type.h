@@ -791,6 +791,8 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(int random_movement_probability MEMBER random_movement_probability READ get_random_movement_probability)
 	Q_PROPERTY(quint64 default_mass MEMBER default_mass READ get_default_mass)
 	Q_PROPERTY(QColor neutral_minimap_color MEMBER neutral_minimap_color READ get_neutral_minimap_color)
+	Q_PROPERTY(std::string site_name_prefix MEMBER site_name_prefix)
+	Q_PROPERTY(std::string site_name_suffix MEMBER site_name_suffix)
 	Q_PROPERTY(QString encyclopedia_background_file READ get_encyclopedia_background_file_qstring NOTIFY changed)
 
 public:
@@ -1165,6 +1167,16 @@ public:
 		return this->neutral_minimap_color;
 	}
 
+	const std::string &get_site_name_prefix() const
+	{
+		return this->site_name_prefix;
+	}
+
+	const std::string &get_site_name_suffix() const
+	{
+		return this->site_name_suffix;
+	}
+
 	const std::filesystem::path &get_encyclopedia_background_file() const;
 
 	QString get_encyclopedia_background_file_qstring() const
@@ -1409,6 +1421,8 @@ public:
 	std::vector<std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.
 private:
 	QColor neutral_minimap_color; //minimap color for neutral units
+	std::string site_name_prefix;
+	std::string site_name_suffix;
 	std::filesystem::path encyclopedia_background_file;
 
 	std::unique_ptr<unit_sound_set> sound_set;			/// Sounds for events

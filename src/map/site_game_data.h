@@ -51,6 +51,7 @@ public:
 	sml_data to_sml_data() const;
 
 	const std::string &get_current_cultural_name() const;
+	std::string get_site_unit_name() const;
 
 	CUnit *get_site_unit() const
 	{
