@@ -2332,6 +2332,33 @@ bool unit_type::can_produce_a_resource() const
 	return this->get_given_resource() != nullptr || !AiHelpers.get_produced_resources(this).empty();
 }
 
+const std::string &unit_type::get_site_name_prefix() const
+{
+	if (!this->site_name_prefix.empty()) {
+		return this->site_name_prefix;
+	}
+
+	if (this->get_unit_class() != nullptr) {
+		return this->get_unit_class()->get_site_name_prefix();
+	}
+
+	return this->site_name_prefix;
+}
+
+const std::string &unit_type::get_site_name_suffix() const
+{
+	if (!this->site_name_suffix.empty()) {
+		return this->site_name_suffix;
+	}
+
+	if (this->get_unit_class() != nullptr) {
+		return this->get_unit_class()->get_site_name_suffix();
+	}
+
+	return this->site_name_suffix;
+}
+
+
 const std::filesystem::path &unit_type::get_encyclopedia_background_file() const
 {
 	if (!this->encyclopedia_background_file.empty()) {

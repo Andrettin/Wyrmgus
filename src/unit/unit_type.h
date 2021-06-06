@@ -1167,15 +1167,8 @@ public:
 		return this->neutral_minimap_color;
 	}
 
-	const std::string &get_site_name_prefix() const
-	{
-		return this->site_name_prefix;
-	}
-
-	const std::string &get_site_name_suffix() const
-	{
-		return this->site_name_suffix;
-	}
+	const std::string &get_site_name_prefix() const;
+	const std::string &get_site_name_suffix() const;
 
 	const std::filesystem::path &get_encyclopedia_background_file() const;
 
