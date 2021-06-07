@@ -151,6 +151,7 @@ public:
 
 	bool is_settlement() const;
 	bool can_have_population() const;
+	bool can_use_name_for_site_unit() const;
 
 	const wyrmgus::map_template *get_map_template() const
 	{

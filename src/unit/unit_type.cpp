@@ -1804,8 +1804,6 @@ void unit_type::set_parent(const unit_type *parent_type)
 	}
 	this->num_directions = parent_type->num_directions;
 	this->neutral_minimap_color = parent_type->neutral_minimap_color;
-	this->site_name_prefix = parent_type->site_name_prefix;
-	this->site_name_suffix = parent_type->site_name_suffix;
 	this->encyclopedia_background_file = parent_type->encyclopedia_background_file;
 	this->random_movement_probability = parent_type->random_movement_probability;
 	this->RandomMovementDistance = parent_type->RandomMovementDistance;
@@ -2330,32 +2328,6 @@ const name_generator *unit_type::get_name_generator(const wyrmgus::faction *fact
 bool unit_type::can_produce_a_resource() const
 {
 	return this->get_given_resource() != nullptr || !AiHelpers.get_produced_resources(this).empty();
-}
-
-const std::string &unit_type::get_site_name_prefix() const
-{
-	if (!this->site_name_prefix.empty()) {
-		return this->site_name_prefix;
-	}
-
-	if (this->get_unit_class() != nullptr) {
-		return this->get_unit_class()->get_site_name_prefix();
-	}
-
-	return this->site_name_prefix;
-}
-
-const std::string &unit_type::get_site_name_suffix() const
-{
-	if (!this->site_name_suffix.empty()) {
-		return this->site_name_suffix;
-	}
-
-	if (this->get_unit_class() != nullptr) {
-		return this->get_unit_class()->get_site_name_suffix();
-	}
-
-	return this->site_name_suffix;
 }
 
 const std::filesystem::path &unit_type::get_encyclopedia_background_file() const

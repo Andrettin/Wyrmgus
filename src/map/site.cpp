@@ -366,6 +366,11 @@ bool site::can_have_population() const
 	return false;
 }
 
+bool site::can_use_name_for_site_unit() const
+{
+	return this->get_base_unit_type() != nullptr && this->get_base_unit_type()->BoolFlag[CELESTIAL_BODY_INDEX].value;
+}
+
 QTime site::get_right_ascension() const
 {
 	const decimillesimal_int lon = this->get_astrocoordinate().get_longitude();

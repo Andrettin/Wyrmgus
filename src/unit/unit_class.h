@@ -41,8 +41,6 @@ class unit_class final : public named_data_entry, public data_type<unit_class>
 
 	Q_PROPERTY(bool town_hall MEMBER town_hall READ is_town_hall)
 	Q_PROPERTY(bool ship MEMBER ship READ is_ship)
-	Q_PROPERTY(std::string site_name_prefix MEMBER site_name_prefix)
-	Q_PROPERTY(std::string site_name_suffix MEMBER site_name_suffix)
 	Q_PROPERTY(wyrmgus::unit_class* tech_tree_parent_unit_class MEMBER tech_tree_parent_unit_class)
 	Q_PROPERTY(wyrmgus::upgrade_class* tech_tree_parent_upgrade_class MEMBER tech_tree_parent_upgrade_class)
 	Q_PROPERTY(wyrmgus::data_entry* tech_tree_parent READ get_tech_tree_parent CONSTANT)
@@ -92,16 +90,6 @@ public:
 	bool is_ship() const
 	{
 		return this->ship;
-	}
-
-	const std::string &get_site_name_prefix() const
-	{
-		return this->site_name_prefix;
-	}
-
-	const std::string &get_site_name_suffix() const
-	{
-		return this->site_name_suffix;
 	}
 
 	const std::unique_ptr<condition> &get_preconditions() const
@@ -180,8 +168,6 @@ private:
 	int index = -1;
 	bool town_hall = false; //whether the building class is a settlement head building class, e.g. a town hall or fortress
 	bool ship = false; //whether the unit class is a ship
-	std::string site_name_prefix;
-	std::string site_name_suffix;
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;
 	std::vector<unit_type *> unit_types;

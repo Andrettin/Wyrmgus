@@ -395,7 +395,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->site_name != CONDITION_TRUE) {
-		if ((condition->site_name == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && unit_manager::get()->GetSlotUnit(button.Value).get_site() != nullptr && !unit_manager::get()->GetSlotUnit(button.Value).get_site()->is_settlement())) {
+		if ((condition->site_name == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && unit_manager::get()->GetSlotUnit(button.Value).get_site() != nullptr && !unit_manager::get()->GetSlotUnit(button.Value).get_site()->is_settlement() && !unit_manager::get()->GetSlotUnit(button.Value).get_site()->can_use_name_for_site_unit())) {
 			return false;
 		}
 	}
