@@ -1271,7 +1271,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "RepairRange")) {
 			type->RepairRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RepairHp")) {
-			type->RepairHP = LuaToNumber(l, -1);
+			type->repair_hp = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RepairCosts")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

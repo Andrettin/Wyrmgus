@@ -364,7 +364,7 @@ public:
 	bool operator()(CUnit *unit) const
 	{
 		return (unit->IsTeamed(*worker)
-				&& unit->Type->RepairHP
+				&& unit->Type->get_repair_hp() != 0
 				//Wyrmgus start
 //				&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max
 				&& unit->Variable[HP_INDEX].Value < unit->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)

@@ -450,7 +450,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 
 	// Go and repair
 	if (type.RepairRange && dest != nullptr
-		&& dest->Type->RepairHP
+		&& dest->Type->get_repair_hp() != 0
 		//Wyrmgus start
 //		&& dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
 		&& dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)
@@ -1624,7 +1624,7 @@ static int SendRepair(const Vec2i &tilePos, int flush)
 //	if (dest && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
 	if (dest && dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)
 	//Wyrmgus end
-		&& dest->Type->RepairHP
+		&& dest->Type->get_repair_hp() != 0
 		&& (dest->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsAllied(*dest))) {
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];

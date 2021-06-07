@@ -786,6 +786,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::species* species MEMBER species)
 	Q_PROPERTY(CUpgrade* elixir MEMBER elixir)
 	Q_PROPERTY(wyrmgus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
+	Q_PROPERTY(int repair_hp MEMBER repair_hp READ get_repair_hp)
 	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
 	Q_PROPERTY(wyrmgus::resource* given_resource MEMBER given_resource)
 	Q_PROPERTY(int random_movement_probability MEMBER random_movement_probability READ get_random_movement_probability)
@@ -1095,6 +1096,11 @@ public:
 		return this->construction;
 	}
 
+	int get_repair_hp() const
+	{
+		return this->repair_hp;
+	}
+
 	const resource_map<int> &get_repair_costs() const
 	{
 		return this->repair_costs;
@@ -1305,9 +1311,7 @@ private:
 
 	wyrmgus::construction *construction = nullptr;    /// What is shown in the construction phase
 
-public:
-	int RepairHP = 0;				/// Amount of HP per repair
-private:
+	int repair_hp = 0;				/// Amount of HP per repair
 	resource_map<int> repair_costs;      /// How much it costs to repair
 
 private:

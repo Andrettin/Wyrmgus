@@ -195,7 +195,7 @@ static std::vector<const wyrmgus::unit_type *> get_reparable_units()
 			continue;
 		}
 
-		if (unit_type->RepairHP > 0) {
+		if (unit_type->get_repair_hp() > 0) {
 			res.push_back(unit_type);
 		}
 	}

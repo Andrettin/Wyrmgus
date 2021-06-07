@@ -166,7 +166,7 @@
 **
 **    How many resources needed
 **
-**  unit_type::RepairHP
+**  unit_type::repair_hp
 **
 **    The HP given to a unit each cycle it's repaired.
 **    If zero, unit cannot be repaired
@@ -1779,7 +1779,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->item_class = parent_type->item_class;
 	this->MaxOnBoard = parent_type->MaxOnBoard;
 	this->RepairRange = parent_type->RepairRange;
-	this->RepairHP = parent_type->RepairHP;
+	this->repair_hp = parent_type->repair_hp;
 	this->MouseAction = parent_type->MouseAction;
 	this->CanAttack = parent_type->CanAttack;
 	this->CanTarget = parent_type->CanTarget;
@@ -2357,7 +2357,6 @@ const std::string &unit_type::get_site_name_suffix() const
 
 	return this->site_name_suffix;
 }
-
 
 const std::filesystem::path &unit_type::get_encyclopedia_background_file() const
 {

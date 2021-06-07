@@ -276,7 +276,7 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 		return true;
 	}
 
-	goal.Variable[HP_INDEX].Value += goal.Type->RepairHP;
+	goal.Variable[HP_INDEX].Value += goal.Type->get_repair_hp();
 	//Wyrmgus start
 //	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
 	if (goal.Variable[HP_INDEX].Value >= goal.GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
