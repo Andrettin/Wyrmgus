@@ -524,9 +524,8 @@ namespace gcn
 
     std::string TextBox::getText() const
     {
-        if (mTextRows.size() == 0)
-        {
-            return std::string("");
+        if (mTextRows.size() == 0) {
+            return std::string();
         }
 
         int i;

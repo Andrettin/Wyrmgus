@@ -2245,7 +2245,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 
 			while (!magic_types.empty()) {
 				const int magic_type = magic_types[SyncRand(magic_types.size())];
-				wyrmgus::vector::remove(magic_types, magic_type);
+				vector::remove(magic_types, magic_type);
 
 				switch (magic_type) {
 					case 0:

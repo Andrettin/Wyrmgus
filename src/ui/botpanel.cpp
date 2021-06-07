@@ -53,6 +53,7 @@
 #include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
 #include "map/tile.h"
 //Wyrmgus start
 #include "network.h"
@@ -393,8 +394,16 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->settlement_name && !(button.Action == ButtonCmd::Unit && wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).settlement)) {
-		return false;
+	if (condition->site_name != CONDITION_TRUE) {
+		if ((condition->site_name == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && unit_manager::get()->GetSlotUnit(button.Value).get_site() != nullptr && !unit_manager::get()->GetSlotUnit(button.Value).get_site()->is_settlement())) {
+			return false;
+		}
+	}
+
+	if (condition->settlement_name != CONDITION_TRUE) {
+		if ((condition->settlement_name == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && unit_manager::get()->GetSlotUnit(button.Value).settlement != nullptr)) {
+			return false;
+		}
 	}
 	
 	if (condition->CanActiveHarvest && !(button.Action == ButtonCmd::Unit && Selected.size() > 0 && Selected[0]->CanHarvest(&wyrmgus::unit_manager::get()->GetSlotUnit(button.Value), false))) {

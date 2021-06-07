@@ -146,6 +146,7 @@ enum EString {
 	EString_UnitSpell,			/// Unit spell
 	EString_UnitQuote,			/// Unit quote
 	EString_UnitSettlementName,	/// Unit Settlement Name
+	EString_UnitSiteName,	/// Unit Settlement Name
 	EString_UnitUniqueSet,		/// Unit Unique Item Set
 	EString_UnitUniqueSetItems,	/// Unit Unique Item Set Items
 	EString_TypeName,			/// Unit type's name
