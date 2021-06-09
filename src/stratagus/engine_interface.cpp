@@ -45,6 +45,7 @@
 #include "map/world.h"
 #include "quest/achievement.h"
 #include "quest/campaign.h"
+#include "quest/quest.h"
 #include "religion/deity.h"
 #include "parameters.h"
 #include "results.h"
@@ -342,6 +343,31 @@ QVariantList engine_interface::get_achievements() const
 	}
 
 	return container::to_qvariant_list(achievements);
+}
+
+QVariantList engine_interface::get_world_quests(const QString &world) const
+{
+	const std::string world_str = world.toStdString();
+
+	std::vector<quest *> quests;
+
+	for (quest *quest : quest::get_all()) {
+		if (quest->is_hidden()) {
+			continue;
+		}
+
+		if (quest->World != world_str) {
+			continue;
+		}
+
+		if (quest->Map.empty()) {
+			continue;
+		}
+
+		quests.push_back(quest);
+	}
+
+	return container::to_qvariant_list(quests);
 }
 
 QVariantList engine_interface::get_building_encyclopedia_entries() const

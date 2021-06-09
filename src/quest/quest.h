@@ -53,8 +53,9 @@ class quest final : public detailed_data_entry, public data_type<quest>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
-	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
+	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color NOTIFY changed)
+	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(bool competitive MEMBER competitive READ is_competitive)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable READ is_unobtainable)
 	Q_PROPERTY(bool uncompleteable MEMBER uncompleteable READ is_uncompleteable)
@@ -95,6 +96,11 @@ public:
 	const wyrmgus::player_color *get_player_color() const
 	{
 		return this->player_color;
+	}
+
+	bool is_hidden() const
+	{
+		return this->hidden;
 	}
 
 	bool is_competitive() const
@@ -219,9 +225,7 @@ public:
 	wyrmgus::civilization *civilization = nullptr; //the civilization to which the quest belongs
 private:
 	difficulty highest_completed_difficulty;
-public:
-	bool Hidden = false;				/// Whether the quest is hidden
-private:
+	bool hidden = false;				/// Whether the quest is hidden
 	bool competitive = false;			/// Whether a player completing the quest causes it to fail for others
 	bool unobtainable = false;			/// Whether the quest can be obtained normally (or only through triggers)
 	bool uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)

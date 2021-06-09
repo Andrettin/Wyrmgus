@@ -102,7 +102,7 @@ static int CclDefineQuest(lua_State *l)
 			const std::string color_name = LuaToString(l, -1);
 			quest->player_color = wyrmgus::player_color::get(color_name);
 		} else if (!strcmp(value, "Hidden")) {
-			quest->Hidden = LuaToBoolean(l, -1);
+			quest->hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Competitive")) {
 			quest->competitive = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Unobtainable")) {
@@ -276,7 +276,7 @@ static int CclGetQuestData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
-		lua_pushboolean(l, quest->Hidden);
+		lua_pushboolean(l, quest->is_hidden());
 		return 1;
 	} else if (!strcmp(data, "Completed")) {
 		lua_pushboolean(l, quest->is_completed());

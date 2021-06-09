@@ -2774,7 +2774,7 @@ void CPlayer::remove_current_quest(wyrmgus::quest *quest)
 
 bool CPlayer::can_quest_be_available(const wyrmgus::quest *quest) const
 {
-	if (quest->Hidden || quest->is_unobtainable()) {
+	if (quest->is_hidden() || quest->is_unobtainable()) {
 		return false;
 	}
 

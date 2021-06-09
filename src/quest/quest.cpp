@@ -140,7 +140,7 @@ void quest::process_sml_scope(const sml_data &scope)
 
 void quest::initialize()
 {
-	if (!this->Hidden && this->civilization != nullptr && !vector::contains(this->civilization->Quests, this)) {
+	if (!this->is_hidden() && this->civilization != nullptr && !vector::contains(this->civilization->Quests, this)) {
 		this->civilization->Quests.push_back(this);
 	}
 
