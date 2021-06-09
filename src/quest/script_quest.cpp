@@ -76,7 +76,7 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Scenario")) {
 			quest->Scenario = LuaToString(l, -1);
 		} else if (!strcmp(value, "RequiredQuest")) {
-			quest->RequiredQuest = LuaToString(l, -1);
+			quest->required_quest = quest::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "RequiredTechnology")) {
 			quest->RequiredTechnology = LuaToString(l, -1);
 		} else if (!strcmp(value, "Area")) {
@@ -238,7 +238,11 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushstring(l, quest->Scenario.c_str());
 		return 1;
 	} else if (!strcmp(data, "RequiredQuest")) {
-		lua_pushstring(l, quest->RequiredQuest.c_str());
+		if (quest->required_quest != nullptr) {
+			lua_pushstring(l, quest->required_quest->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "RequiredTechnology")) {
 		lua_pushstring(l, quest->RequiredTechnology.c_str());

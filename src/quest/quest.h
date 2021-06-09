@@ -62,6 +62,8 @@ class quest final : public detailed_data_entry, public data_type<quest>
 	Q_PROPERTY(bool unfailable MEMBER unfailable READ is_unfailable)
 	Q_PROPERTY(bool completed READ is_completed WRITE set_completed NOTIFY completed_changed)
 	Q_PROPERTY(int highest_completed_difficulty_index READ get_highest_completed_difficulty_index NOTIFY highest_completed_difficulty_changed)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
+	Q_PROPERTY(wyrmgus::quest* required_quest MEMBER required_quest NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "quest";
@@ -210,7 +212,7 @@ public:
 	std::string World;				/// Which world the quest belongs to
 	std::string Map;				/// What map the quest is played on
 	std::string Scenario;			/// Which scenario file is to be loaded for the quest
-	std::string RequiredQuest;		/// Quest required before this quest becomes available
+	quest *required_quest = nullptr; //quest required before this quest becomes available
 	std::string RequiredTechnology;	/// Technology required before this quest becomes available
 	std::string Area;				/// The area where the quest is set
 	std::string Briefing;			/// Briefing text of the quest
