@@ -60,7 +60,6 @@
 #include "util/util.h"
 #include "util/vector_util.h"
 
-wyrmgus::character *CurrentCustomHero = nullptr;
 bool LoadingPersistentHeroes = false;
 
 namespace wyrmgus {
@@ -1116,10 +1115,6 @@ void DeleteCustomHero(const std::string &identifier)
 		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", identifier.c_str());
 	}
 	
-	if (CurrentCustomHero == hero) {
-		CurrentCustomHero = nullptr;
-	}
-	
 	//delete hero save file
 	std::string path = parameters::get()->GetUserDirectory();
 	if (!GameName.empty()) {
@@ -1138,29 +1133,6 @@ void DeleteCustomHero(const std::string &identifier)
 	}
 	
 	character::remove_custom_hero(hero);
-}
-
-void SetCurrentCustomHero(const std::string &identifier)
-{
-	if (!identifier.empty()) {
-		character *hero = character::get_custom_hero(identifier);
-		if (!hero) {
-			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", identifier.c_str());
-		}
-		
-		CurrentCustomHero = hero;
-	} else {
-		CurrentCustomHero = nullptr;
-	}
-}
-
-std::string GetCurrentCustomHero()
-{
-	if (CurrentCustomHero != nullptr) {
-		return CurrentCustomHero->Ident;
-	} else {
-		return "";
-	}
 }
 
 bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name)

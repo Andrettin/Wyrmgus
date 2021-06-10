@@ -488,7 +488,6 @@ public:
 
 }
 
-extern wyrmgus::character *CurrentCustomHero;
 extern bool LoadingPersistentHeroes;
 
 extern int GetAttributeVariableIndex(int attribute);
@@ -496,8 +495,6 @@ extern void SaveHero(const wyrmgus::character *hero);
 extern void SaveHeroes();
 extern void SaveCustomHero(const std::string &identifier);
 extern void DeleteCustomHero(const std::string &identifier);
-extern void SetCurrentCustomHero(const std::string &identifier);
-extern std::string GetCurrentCustomHero();
 extern bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name);
 extern std::string GetCharacterTitleNameById(const wyrmgus::character_title title);
 extern wyrmgus::character_title GetCharacterTitleIdByName(const std::string &title);

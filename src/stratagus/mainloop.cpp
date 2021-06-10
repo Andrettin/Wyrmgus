@@ -510,13 +510,6 @@ void GameMainLoop()
 			CclCommand(buf.data());
 		}
 		
-		if (!IsNetworkGame() && CPlayer::GetThisPlayer() && CurrentCustomHero != nullptr) {
-			Vec2i resPos;
-			FindNearestDrop(*CurrentCustomHero->get_unit_type(), CPlayer::GetThisPlayer()->StartPos, resPos, LookingW, CPlayer::GetThisPlayer()->StartMapLayer);
-			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->get_unit_type(), CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->StartMapLayer);
-			custom_hero->set_character(CurrentCustomHero);	
-		}
-		
 		//update the sold units of all units before starting, to make sure they fit the current conditions
 		//make a copy of the units list, as updating the sold units can change the list
 		const std::vector<CUnit *> units = wyrmgus::unit_manager::get()->get_units();

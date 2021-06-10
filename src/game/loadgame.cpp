@@ -256,7 +256,6 @@ void LoadGame(const std::string &filename)
 {
 	//Wyrmgus start
 	CleanPlayers(); //clean players, as they may not have been cleansed after a scenario
-	CurrentCustomHero = nullptr; //otherwise the loaded game will have an extra hero for the current custom hero
 	//Wyrmgus end
 	
 	// log will be enabled if found in the save game

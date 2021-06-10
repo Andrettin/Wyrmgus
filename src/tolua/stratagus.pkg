@@ -138,8 +138,6 @@ extern std::string NameToIdent(std::string text);
 
 extern void SaveCustomHero(std::string identifier);
 extern void DeleteCustomHero(std::string identifier);
-extern void SetCurrentCustomHero(std::string identifier);
-extern std::string GetCurrentCustomHero();
 extern bool IsNameValidForCustomHero(std::string hero_name, std::string hero_family_name);
 extern std::string GeneratePersonalName(std::string unit_type_ident);
 extern std::string GetItemEffectsString(std::string item_ident);
