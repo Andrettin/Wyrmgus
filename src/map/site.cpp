@@ -47,6 +47,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "unit/unit_type_type.h"
 #include "util/astronomy_util.h"
 #include "util/container_util.h"
 #include "util/geocoordinate.h"
@@ -368,7 +369,7 @@ bool site::can_have_population() const
 
 bool site::can_use_name_for_site_unit() const
 {
-	return this->get_base_unit_type() != nullptr && this->get_base_unit_type()->BoolFlag[CELESTIAL_BODY_INDEX].value;
+	return this->get_base_unit_type() != nullptr && this->get_base_unit_type()->UnitType == UnitTypeType::Space;
 }
 
 QTime site::get_right_ascension() const
