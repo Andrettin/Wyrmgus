@@ -345,10 +345,8 @@ QVariantList engine_interface::get_achievements() const
 	return container::to_qvariant_list(achievements);
 }
 
-QVariantList engine_interface::get_world_quests(const QString &world) const
+QVariantList engine_interface::get_legacy_quests() const
 {
-	const std::string world_str = world.toStdString();
-
 	std::vector<quest *> quests;
 
 	for (quest *quest : quest::get_all()) {
@@ -356,7 +354,7 @@ QVariantList engine_interface::get_world_quests(const QString &world) const
 			continue;
 		}
 
-		if (quest->World != world_str) {
+		if (quest->World.empty()) {
 			continue;
 		}
 

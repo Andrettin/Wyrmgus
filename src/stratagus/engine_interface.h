@@ -193,7 +193,7 @@ public:
 	Q_INVOKABLE QVariantList get_map_infos(const QString &world) const;
 
 	Q_INVOKABLE QVariantList get_achievements() const;
-	Q_INVOKABLE QVariantList get_world_quests(const QString &world) const;
+	Q_INVOKABLE QVariantList get_legacy_quests() const;
 	Q_INVOKABLE QVariantList get_custom_heroes() const;
 
 	Q_INVOKABLE QVariantList get_building_encyclopedia_entries() const;
