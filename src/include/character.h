@@ -40,7 +40,6 @@ class LuaCallback;
 class Spell_Polymorph;
 struct lua_State;
 
-void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name);
 static int CclDefineCharacter(lua_State *l);
 static int CclDefineCustomHero(lua_State *l);
 
@@ -120,6 +119,28 @@ public:
 
 	static bool compare_encyclopedia_entries(const character *lhs, const character *rhs);
 
+	static const std::vector<character *> &get_custom_heroes()
+	{
+		return character::custom_heroes;
+	}
+
+	static character *get_custom_hero(const std::string &identifier)
+	{
+		const auto find_iterator = character::custom_heroes_by_identifier.find(identifier);
+		if (find_iterator != character::custom_heroes_by_identifier.end()) {
+			return find_iterator->second.get();
+		}
+
+		return nullptr;
+	}
+
+	static void remove_custom_hero(character *custom_hero);
+
+private:
+	static inline std::vector<character *> custom_heroes;
+	static inline std::map<std::string, qunique_ptr<character>> custom_heroes_by_identifier;
+
+public:
 	explicit character(const std::string &identifier);
 	~character();
 	
@@ -461,26 +482,22 @@ public:
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 
 	friend ::Spell_Polymorph;
-	friend void ::ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name);
 	friend int ::CclDefineCharacter(lua_State *l);
 	friend int ::CclDefineCustomHero(lua_State *l);
 };
 
 }
 
-extern std::map<std::string, wyrmgus::character *> CustomHeroes;
 extern wyrmgus::character *CurrentCustomHero;
 extern bool LoadingPersistentHeroes;
 
 extern int GetAttributeVariableIndex(int attribute);
-extern wyrmgus::character *GetCustomHero(const std::string &hero_ident);
 extern void SaveHero(const wyrmgus::character *hero);
 extern void SaveHeroes();
-extern void SaveCustomHero(const std::string &hero_ident);
-extern void DeleteCustomHero(const std::string &hero_ident);
-extern void SetCurrentCustomHero(const std::string &hero_ident);
+extern void SaveCustomHero(const std::string &identifier);
+extern void DeleteCustomHero(const std::string &identifier);
+extern void SetCurrentCustomHero(const std::string &identifier);
 extern std::string GetCurrentCustomHero();
-extern void ChangeCustomHeroCivilization(const std::string &hero_name, const std::string &civilization_ident, const std::string &new_hero_name, const std::string &new_hero_family_name);
 extern bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name);
 extern std::string GetCharacterTitleNameById(const wyrmgus::character_title title);
 extern wyrmgus::character_title GetCharacterTitleIdByName(const std::string &title);

@@ -102,16 +102,19 @@ bool achievement::can_obtain() const
 		}
 	} else if (this->character_type != nullptr || this->character_level > 0) {
 		bool found_hero = false;
-		for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-			if (this->character_type && iterator->second->get_unit_type() != this->character_type) {
+		for (const wyrmgus::character *hero : character::get_custom_heroes()) {
+			if (this->character_type && hero->get_unit_type() != this->character_type) {
 				continue;
 			}
-			if (this->character_level > 0 && iterator->second->get_level() < this->character_level) {
+
+			if (this->character_level > 0 && hero->get_level() < this->character_level) {
 				continue;
 			}
+
 			found_hero = true;
 			break;
 		}
+
 		if (!found_hero) {
 			return false;
 		}
@@ -157,14 +160,15 @@ int achievement::get_progress() const
 		}
 	} else if (this->character_level > 0) {
 		int highest_level = 0;
-		for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-			highest_level = std::max(highest_level, iterator->second->get_level());
+
+		for (const wyrmgus::character *hero : character::get_custom_heroes()) {
+			highest_level = std::max(highest_level, hero->get_level());
 			if (highest_level >= this->character_level) {
 				highest_level = this->character_level;
 				break;
-				continue;
 			}
 		}
+
 		progress += highest_level;
 	}
 

@@ -136,11 +136,10 @@ extern std::string CliMapName;
 extern std::string GetPluralForm(std::string name);
 extern std::string NameToIdent(std::string text);
 
-extern void SaveCustomHero(std::string hero_full_name);
-extern void DeleteCustomHero(std::string hero_full_name);
-extern void SetCurrentCustomHero(std::string hero_full_name);
+extern void SaveCustomHero(std::string identifier);
+extern void DeleteCustomHero(std::string identifier);
+extern void SetCurrentCustomHero(std::string identifier);
 extern std::string GetCurrentCustomHero();
-extern void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civilization_name, std::string new_hero_name, std::string new_hero_family_name);
 extern bool IsNameValidForCustomHero(std::string hero_name, std::string hero_family_name);
 extern std::string GeneratePersonalName(std::string unit_type_ident);
 extern std::string GetItemEffectsString(std::string item_ident);

@@ -125,8 +125,8 @@ bool unique_item::can_drop() const
 			}
 		}
 		
-		for (std::map<std::string, character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-			for (const auto &item : iterator->second->get_items()) {
+		for (const character *hero : character::get_custom_heroes()) {
+			for (const auto &item : hero->get_items()) {
 				if (item->get_unique() == this && !item->is_bound()) {
 					return false;
 				}

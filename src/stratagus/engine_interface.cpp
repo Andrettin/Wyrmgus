@@ -370,6 +370,11 @@ QVariantList engine_interface::get_world_quests(const QString &world) const
 	return container::to_qvariant_list(quests);
 }
 
+QVariantList engine_interface::get_custom_heroes() const
+{
+	return container::to_qvariant_list(character::get_custom_heroes());
+}
+
 QVariantList engine_interface::get_building_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(unit_type::get_building_encyclopedia_entries());

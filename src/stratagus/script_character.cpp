@@ -405,10 +405,13 @@ static int CclDefineCustomHero(lua_State *l)
 	}
 
 	std::string hero_ident = LuaToString(l, 1);
-	wyrmgus::character *hero = GetCustomHero(hero_ident);
-	if (!hero) {
-		hero = new wyrmgus::character(hero_ident);
-		CustomHeroes[hero_ident] = hero;
+	character *hero = character::get_custom_hero(hero_ident);
+	if (hero == nullptr) {
+		auto new_hero = make_qunique<character>(hero_ident);
+		new_hero->moveToThread(QApplication::instance()->thread());
+		hero = new_hero.get();
+		character::custom_heroes_by_identifier[hero_ident] = std::move(new_hero);
+		character::custom_heroes.push_back(hero);
 	} else {
 		fprintf(stderr, "Custom hero \"%s\" is being redefined.\n", hero_ident.c_str());
 	}
@@ -787,7 +790,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string character_name = LuaToString(l, 1);
-	wyrmgus::character *character = GetCustomHero(character_name);
+	character *character = character::get_custom_hero(character_name);
 	if (!character) {
 		LuaError(l, "Custom hero \"%s\" doesn't exist." _C_ character_name.c_str());
 	}
@@ -862,8 +865,8 @@ static int CclGetCharacters(lua_State *l)
 static int CclGetCustomHeroes(lua_State *l)
 {
 	std::vector<std::string> character_names;
-	for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-		character_names.push_back(iterator->first);
+	for (const character *hero : character::get_custom_heroes()) {
+		character_names.push_back(hero->get_identifier());
 	}
 	
 	lua_createtable(l, character_names.size(), 0);

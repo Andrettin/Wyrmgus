@@ -60,7 +60,6 @@
 #include "util/util.h"
 #include "util/vector_util.h"
 
-std::map<std::string, wyrmgus::character *> CustomHeroes;
 wyrmgus::character *CurrentCustomHero = nullptr;
 bool LoadingPersistentHeroes = false;
 
@@ -70,10 +69,8 @@ void character::clear()
 {
 	data_type::clear();
 	
-	for (const auto &kv_pair : CustomHeroes) {
-		delete kv_pair.second;
-	}
-	CustomHeroes.clear();
+	character::custom_heroes.clear();
+	character::custom_heroes_by_identifier.clear();
 }
 
 bool character::compare_encyclopedia_entries(const character *lhs, const character *rhs)
@@ -98,6 +95,12 @@ bool character::compare_encyclopedia_entries(const character *lhs, const charact
 	}
 
 	return lhs->get_full_name() < rhs->get_full_name();
+}
+
+void character::remove_custom_hero(character *custom_hero)
+{
+	vector::remove(character::custom_heroes, custom_hero);
+	character::custom_heroes_by_identifier.erase(custom_hero->get_identifier());
 }
 
 character::character(const std::string &identifier)
@@ -912,29 +915,14 @@ int GetAttributeVariableIndex(int attribute)
 	}
 }
 
-wyrmgus::character *GetCustomHero(const std::string &hero_ident)
-{
-	if (CustomHeroes.find(hero_ident) != CustomHeroes.end()) {
-		return CustomHeroes[hero_ident];
-	}
-	
-	for (const auto &kv_pair : CustomHeroes) { // for backwards compatibility
-		if (kv_pair.second->get_full_name() == hero_ident) {
-			return kv_pair.second;
-		}
-	}
-	
-	return nullptr;
-}
-
 void SaveHeroes()
 {
-	for (const wyrmgus::character *character : wyrmgus::character::get_all()) { //save characters
+	for (const character *character : character::get_all()) { //save characters
 		SaveHero(character);
 	}
 
-	for (const auto &kv_pair : CustomHeroes) { //save custom heroes
-		SaveHero(kv_pair.second);
+	for (const character *hero : character::get_custom_heroes()) { //save custom heroes
+		SaveHero(hero);
 	}
 			
 	//see if the old heroes.lua save file is present, and if so, delete it
@@ -1111,21 +1099,21 @@ void SaveHero(const wyrmgus::character *hero)
 	fclose(fd);
 }
 
-void SaveCustomHero(const std::string &hero_full_name)
+void SaveCustomHero(const std::string &identifier)
 {
-	const wyrmgus::character *hero = GetCustomHero(hero_full_name);
+	const character *hero = character::get_custom_hero(identifier);
 	if (!hero) {
-		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
+		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", identifier.c_str());
 	}
 	
 	SaveHero(hero);
 }
 
-void DeleteCustomHero(const std::string &hero_full_name)
+void DeleteCustomHero(const std::string &identifier)
 {
-	wyrmgus::character *hero = GetCustomHero(hero_full_name);
+	character *hero = character::get_custom_hero(identifier);
 	if (!hero) {
-		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
+		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", identifier.c_str());
 	}
 	
 	if (CurrentCustomHero == hero) {
@@ -1149,16 +1137,15 @@ void DeleteCustomHero(const std::string &hero_full_name)
 		std::filesystem::remove(path);
 	}
 	
-	CustomHeroes.erase(hero_full_name);
-	delete hero;
+	character::remove_custom_hero(hero);
 }
 
-void SetCurrentCustomHero(const std::string &hero_full_name)
+void SetCurrentCustomHero(const std::string &identifier)
 {
-	if (!hero_full_name.empty()) {
-		wyrmgus::character *hero = GetCustomHero(hero_full_name);
+	if (!identifier.empty()) {
+		character *hero = character::get_custom_hero(identifier);
 		if (!hero) {
-			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
+			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", identifier.c_str());
 		}
 		
 		CurrentCustomHero = hero;
@@ -1176,57 +1163,12 @@ std::string GetCurrentCustomHero()
 	}
 }
 
-void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name)
-{
-	if (!hero_full_name.empty()) {
-		wyrmgus::character *hero = GetCustomHero(hero_full_name);
-		if (!hero) {
-			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
-		}
-
-		wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
-		//delete old hero save file
-		std::string path = parameters::get()->GetUserDirectory();
-		if (!GameName.empty()) {
-			path += "/";
-			path += GameName;
-		}
-		path += "/";
-		path += "heroes/";
-		if (hero->Custom) {
-			path += "custom/";
-		}
-		path += hero->Ident;
-		path += ".lua";
-		if (std::filesystem::exists(path)) {
-			std::filesystem::remove(path);
-		}
-
-		//now, update the hero
-		hero->civilization = civilization;
-		wyrmgus::unit_type *new_unit_type = hero->civilization->get_class_unit_type(hero->get_unit_type()->get_unit_class());
-		if (new_unit_type != nullptr) {
-			hero->unit_type = new_unit_type;
-			hero->set_name(new_hero_name);
-			hero->surname = new_hero_family_name;
-			SaveHero(hero);
-
-			CustomHeroes.erase(hero_full_name);
-			CustomHeroes[hero->Ident] = hero;
-		}
-	}
-}
-
 bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name)
 {
 	std::string hero_full_name = hero_name;
 	if (!hero_family_name.empty()) {
 		hero_full_name += " ";
 		hero_full_name += hero_family_name;
-	}
-	
-	if (GetCustomHero(hero_full_name) != nullptr) {
-		return false; //name already used
 	}
 	
 	if (hero_name.empty()) {

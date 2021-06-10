@@ -958,9 +958,9 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 {
 	wyrmgus::character *character = nullptr;
 	if (!custom_hero) {
-		character = wyrmgus::character::get(character_ident);
+		character = character::get(character_ident);
 	} else {
-		character = GetCustomHero(character_ident);
+		character = character::get_custom_hero(character_ident);
 	}
 
 	this->set_character(character);
@@ -2602,8 +2602,7 @@ void CUnit::UpdateSoldUnits()
 		}
 
 		if (this->Player == CPlayer::GetThisPlayer()) {
-			for (const auto &kv_pair : CustomHeroes) {
-				wyrmgus::character *custom_hero = kv_pair.second;
+			for (wyrmgus::character *custom_hero : character::get_custom_heroes()) {
 				if (
 					(custom_hero->get_civilization() != nullptr && custom_hero->get_civilization() == civilization || custom_hero->get_unit_type() == civilization->get_class_unit_type(custom_hero->get_unit_type()->get_unit_class()))
 					&& check_conditions(custom_hero->get_unit_type(), this, true) && custom_hero->CanAppear()
