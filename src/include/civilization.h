@@ -246,6 +246,8 @@ public:
 	bool is_tech_tree_entry(const upgrade_class *upgrade_class) const;
 
 	Q_INVOKABLE QVariantList get_tech_tree_entries() const;
+	Q_INVOKABLE QString generate_male_personal_name() const;
+	Q_INVOKABLE QString generate_female_personal_name() const;
 
 signals:
 	void changed();

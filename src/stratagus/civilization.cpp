@@ -38,6 +38,7 @@
 #include "faction_type.h"
 #include "gender.h"
 #include "government_type.h"
+#include "name_generator.h"
 #include "player.h"
 #include "script.h"
 #include "time/calendar.h"
@@ -779,6 +780,28 @@ QVariantList civilization::get_tech_tree_entries() const
 	});
 
 	return container::to_qvariant_list(entries);
+}
+
+QString civilization::generate_male_personal_name() const
+{
+	const name_generator *name_generator = this->get_personal_name_generator(gender::male);
+
+	if (name_generator != nullptr) {
+		return QString::fromStdString(name_generator->generate_name());
+	}
+
+	return "";
+}
+
+QString civilization::generate_female_personal_name() const
+{
+	const name_generator *name_generator = this->get_personal_name_generator(gender::female);
+
+	if (name_generator != nullptr) {
+		return QString::fromStdString(name_generator->generate_name());
+	}
+
+	return "";
 }
 
 }
