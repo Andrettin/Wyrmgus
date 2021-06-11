@@ -885,7 +885,7 @@ static void DoNextReplay()
 		SendCommandQuest(*unit, wyrmgus::quest::get(val));
 	} else if (!strcmp(action, "buy")) {
 		SendCommandBuy(*unit, dunit, num);
-	} else if (!strcmp(action, "produce-resource")) {
+	} else if (!strcmp(action, "produce_resource")) {
 		SendCommandProduceResource(*unit, num != 0 ? wyrmgus::resource::get_all()[num] : nullptr);
 	} else if (!strcmp(action, "sell-resource")) {
 		SendCommandSellResource(*unit, arg1, num);

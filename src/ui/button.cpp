@@ -706,7 +706,7 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 		case ButtonCmd::Buy:
 			return "buy";
 		case ButtonCmd::ProduceResource:
-			return "produce-resource";
+			return "produce_resource";
 		case ButtonCmd::SellResource:
 			return "sell-resource";
 		case ButtonCmd::BuyResource:
@@ -790,7 +790,7 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::Quest;
 	} else if (button_action == "buy") {
 		return ButtonCmd::Buy;
-	} else if (button_action == "produce-resource") {
+	} else if (button_action == "produce_resource") {
 		return ButtonCmd::ProduceResource;
 	} else if (button_action == "sell-resource") {
 		return ButtonCmd::SellResource;

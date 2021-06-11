@@ -119,6 +119,14 @@ void upgrade_modifier::process_sml_scope(const sml_data &scope)
 			const resource *resource = resource::get(key);
 			this->Modifier.set_cost(resource, std::stoi(value));
 		});
+	} else if (tag == "processing_bonus") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const resource *resource = resource::get(key);
+			this->Modifier.set_improve_income(resource, std::stoi(value));
+		});
 	} else {
 		const std::string variable_name = string::snake_case_to_pascal_case(tag);
 		const int index = UnitTypeVar.VariableNameLookup[variable_name.c_str()]; // variable index
