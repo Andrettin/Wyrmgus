@@ -1077,6 +1077,9 @@ void SaveHero(const wyrmgus::character *hero)
 		if (hero->get_civilization()) {
 			fprintf(fd, "\tCivilization = \"%s\",\n", hero->get_civilization()->get_identifier().c_str());
 		}
+		if (!hero->get_description().empty()) {
+			fprintf(fd, "\tDescription = \"%s\",\n", hero->get_description().c_str());
+		}
 	}
 	if (hero->get_unit_type() != nullptr) {
 		fprintf(fd, "\tType = \"%s\",\n", hero->get_unit_type()->Ident.c_str());
