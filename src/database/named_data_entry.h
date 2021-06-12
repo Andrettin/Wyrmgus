@@ -38,7 +38,7 @@ class named_data_entry : public data_entry
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY changed)
-	Q_PROPERTY(QString encyclopedia_text READ get_encyclopedia_text_qstring CONSTANT)
+	Q_PROPERTY(QString encyclopedia_text READ get_encyclopedia_text_qstring NOTIFY encyclopedia_text_changed)
 
 public:
 	static bool compare_encyclopedia_entries(const named_data_entry *lhs, const named_data_entry *rhs)
@@ -101,6 +101,7 @@ public:
 	}
 
 signals:
+	void encyclopedia_text_changed();
 	void changed();
 
 private:

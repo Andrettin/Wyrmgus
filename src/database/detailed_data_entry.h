@@ -36,16 +36,19 @@ class detailed_data_entry : public named_data_entry
 	Q_OBJECT
 
 	Q_PROPERTY(QString notes READ get_notes_qstring NOTIFY changed)
-	Q_PROPERTY(QString description READ get_description_qstring NOTIFY changed)
+	Q_PROPERTY(QString description READ get_description_qstring WRITE set_description_qstring NOTIFY description_changed)
 	Q_PROPERTY(QString quote READ get_quote_qstring NOTIFY changed)
 	Q_PROPERTY(QString background READ get_background_qstring NOTIFY changed)
 
 public:
 	explicit detailed_data_entry(const std::string &identifier) : named_data_entry(identifier)
 	{
+		connect(this, &detailed_data_entry::description_changed, this, &named_data_entry::encyclopedia_text_changed);
 	}
 
-	virtual ~detailed_data_entry() {}
+	virtual ~detailed_data_entry()
+	{
+	}
 
 	virtual void process_text() override;
 
@@ -101,14 +104,20 @@ public:
 		return this->description;
 	}
 
-	Q_INVOKABLE void set_description(const std::string &description)
-	{
-		this->description = description;
-	}
-
 	QString get_description_qstring() const
 	{
 		return QString::fromStdString(this->get_description());
+	}
+
+	Q_INVOKABLE void set_description(const std::string &description)
+	{
+		this->description = description;
+		emit description_changed();
+	}
+
+	void set_description_qstring(const QString &description)
+	{
+		this->set_description(description.toStdString());
 	}
 
 	const std::string &get_quote() const
@@ -142,6 +151,7 @@ public:
 	}
 
 signals:
+	void description_changed();
 	void changed();
 
 private:
