@@ -30,6 +30,7 @@
 
 #include "ai/ai_force_template.h"
 #include "ai/ai_force_type.h"
+#include "ai/ai_local.h"
 #include "character.h"
 #include "civilization_group.h"
 #include "database/defines.h"
@@ -802,6 +803,42 @@ QString civilization::generate_female_personal_name() const
 	}
 
 	return "";
+}
+
+QVariantList civilization::get_custom_hero_unit_types() const
+{
+	std::vector<unit_type *> unit_types;
+
+	for (const unit_class *unit_class : unit_class::get_all()) {
+		unit_type *unit_type = this->get_class_unit_type(unit_class);
+
+		if (unit_type == nullptr) {
+			continue;
+		}
+
+		if (!unit_type->BoolFlag[ORGANIC_INDEX].value) {
+			//only organic units can be custom heroes
+			continue;
+		}
+
+		if (unit_type->DefaultStat.Variables[LEVEL_INDEX].Value != 1) {
+			//only level 1 units can be custom heroes
+			continue;
+		}
+
+		if (AiHelpers.get_trainers(unit_type).empty() && AiHelpers.get_trainer_classes(unit_class).empty()) {
+			//only allow units that can be trained
+			continue;
+		}
+
+		unit_types.push_back(unit_type);
+	}
+
+	std::sort(unit_types.begin(), unit_types.end(), [](const unit_type *lhs, const unit_type *rhs) {
+		return lhs->get_name() < rhs->get_name();
+	});
+
+	return container::to_qvariant_list(unit_types);
 }
 
 }
