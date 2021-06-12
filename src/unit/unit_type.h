@@ -785,6 +785,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::item_class item_class MEMBER item_class READ get_item_class)
 	Q_PROPERTY(wyrmgus::species* species MEMBER species)
 	Q_PROPERTY(CUpgrade* elixir MEMBER elixir)
+	Q_PROPERTY(QVariantList traits READ get_traits_qvariant_list NOTIFY changed)
 	Q_PROPERTY(wyrmgus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
 	Q_PROPERTY(int repair_hp MEMBER repair_hp READ get_repair_hp)
 	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
@@ -1083,6 +1084,19 @@ public:
 	{
 		return this->elixir;
 	}
+	const std::vector<CUpgrade *> &get_traits() const
+	{
+		return this->traits;
+	}
+
+	QVariantList get_traits_qvariant_list() const;
+
+	Q_INVOKABLE void add_trait(CUpgrade *trait)
+	{
+		this->traits.push_back(trait);
+	}
+
+	Q_INVOKABLE void remove_trait(CUpgrade *trait);
 
 	unit_type *get_corpse_type() const
 	{
@@ -1233,7 +1247,9 @@ public:
 	std::vector<unit_type *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<spell *> DropSpells;		/// Spells which can be applied to dropped items
 	std::vector<CUpgrade *> Affixes;		/// Affixes which can be generated for this unit type
-	std::vector<CUpgrade *> Traits;			/// Which traits this unit type can have
+private:
+	std::vector<CUpgrade *> traits; //which traits this unit type can have
+public:
 	std::vector<CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
 	std::vector<unit_type *> Trains;		/// Units trained by this unit
 	std::vector<unit_type *> TrainedBy;		/// Units which can train this unit

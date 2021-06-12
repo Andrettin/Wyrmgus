@@ -1644,11 +1644,11 @@ static int CclDefineUnitType(lua_State *l)
 				type->Affixes.push_back(CUpgrade::get_or_add(affix_ident, nullptr)); //if this affix doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 			}
 		} else if (!strcmp(value, "Traits")) {
-			type->Traits.clear(); // remove previously defined traits, to allow unit types to not inherit traits from their parent unit types
+			type->traits.clear(); // remove previously defined traits, to allow unit types to not inherit traits from their parent unit types
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				std::string trait_ident = LuaToString(l, -1, j + 1);
-				type->Traits.push_back(CUpgrade::get_or_add(trait_ident, nullptr)); //if this trait doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+				const std::string trait_ident = LuaToString(l, -1, j + 1);
+				type->traits.push_back(CUpgrade::get_or_add(trait_ident, nullptr)); //if this trait doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 			}
 		} else if (!strcmp(value, "StartingAbilities")) {
 			const int args = lua_rawlen(l, -1);
@@ -2370,10 +2370,10 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Traits")) {
-		lua_createtable(l, type->Traits.size(), 0);
-		for (size_t i = 1; i <= type->Traits.size(); ++i)
+		lua_createtable(l, type->get_traits().size(), 0);
+		for (size_t i = 1; i <= type->get_traits().size(); ++i)
 		{
-			lua_pushstring(l, type->Traits[i-1]->get_identifier().c_str());
+			lua_pushstring(l, type->get_traits()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

@@ -1005,8 +1005,8 @@ void CUnit::apply_character_properties()
 
 	if (this->get_character()->get_trait() != nullptr) { //set trait
 		TraitAcquire(*this, this->get_character()->get_trait());
-	} else if (Editor.Running == EditorNotRunning && this->Type->Traits.size() > 0) {
-		TraitAcquire(*this, this->Type->Traits[SyncRand(this->Type->Traits.size())]);
+	} else if (Editor.Running == EditorNotRunning && !this->Type->get_traits().empty()) {
+		TraitAcquire(*this, vector::get_random(this->Type->get_traits()));
 	}
 
 	//load worshipped deities
@@ -3147,8 +3147,8 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 	}
 
 	//generate a trait for the unit, if any are available (only if the editor isn't running)
-	if (Editor.Running == EditorNotRunning && unit->Type->Traits.size() > 0) {
-		TraitAcquire(*unit, unit->Type->Traits[SyncRand(unit->Type->Traits.size())]);
+	if (Editor.Running == EditorNotRunning && !unit->Type->get_traits().empty()) {
+		TraitAcquire(*unit, vector::get_random(unit->Type->get_traits()));
 	}
 	
 	for (const CUpgrade *starting_ability : unit->Type->StartingAbilities) {

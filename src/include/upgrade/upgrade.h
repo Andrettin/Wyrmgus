@@ -97,7 +97,7 @@ extern char UpgradeIdAllowed(const CPlayer &player, int id);
 extern char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident);
 
 //Wyrmgus start
-extern std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand_strategy = false, bool multiline = false);
+extern std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool multiline = false);
 extern bool IsPercentageVariable(int var);
 extern bool IsBonusVariable(int var);
 extern bool IsBooleanVariable(int var);

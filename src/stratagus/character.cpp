@@ -409,8 +409,8 @@ void character::initialize()
 	}
 
 	if (this->get_trait() == nullptr) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
-		if (this->get_unit_type() != nullptr && this->get_unit_type()->Traits.size() == 1) {
-			this->trait = this->get_unit_type()->Traits[0];
+		if (this->get_unit_type() != nullptr && this->get_unit_type()->get_traits().size() == 1) {
+			this->trait = this->get_unit_type()->get_traits().at(0);
 		}
 	}
 

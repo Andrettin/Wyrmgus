@@ -65,6 +65,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/container_util.h"
 #include "util/size_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
@@ -1836,7 +1837,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->AiDrops = parent_type->AiDrops;
 	this->DropSpells = parent_type->DropSpells;
 	this->Affixes = parent_type->Affixes;
-	this->Traits = parent_type->Traits;
+	this->traits = parent_type->traits;
 	this->StartingAbilities = parent_type->StartingAbilities;
 	for (size_t i = 0; i < parent_type->Trains.size(); ++i) {
 		this->Trains.push_back(parent_type->Trains[i]);
@@ -2323,6 +2324,16 @@ const name_generator *unit_type::get_name_generator(const wyrmgus::faction *fact
 	}
 	
 	return nullptr;
+}
+
+QVariantList unit_type::get_traits_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_traits());
+}
+
+void unit_type::remove_trait(CUpgrade *trait)
+{
+	vector::remove(this->traits, trait);
 }
 
 bool unit_type::can_produce_a_resource() const

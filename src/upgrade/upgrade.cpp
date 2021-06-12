@@ -38,6 +38,7 @@
 #include "ai/ai_local.h"
 //Wyrmgus end
 #include "age.h"
+#include "character.h"
 #include "civilization.h"
 #include "civilization_group.h"
 #include "commands.h"
@@ -52,9 +53,6 @@
 #include "game.h"
 //Wyrmgus end
 #include "gender.h"
-//Wyrmgus start
-#include "grand_strategy.h"
-//Wyrmgus end
 #include "iolib.h"
 #include "item/item_class.h"
 #include "magic_domain.h"
@@ -584,6 +582,11 @@ int CUpgrade::get_time_cost() const
 int CUpgrade::get_price() const
 {
 	return resource::get_price(this->get_costs());
+}
+
+QString CUpgrade::get_upgrade_effects_qstring() const
+{
+	return QString::fromStdString(GetUpgradeEffectsString(this->get_identifier()));
 }
 
 /**
@@ -2375,7 +2378,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 				IndividualUpgradeAcquire(unit, domain_upgrade);
 			}
 		}
-		if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr && !wyrmgus::vector::contains(unit.get_character()->Deities, upgrade_deity) && unit.Player == CPlayer::GetThisPlayer()) {
+		if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr && !vector::contains(unit.get_character()->Deities, upgrade_deity) && unit.Player == CPlayer::GetThisPlayer()) {
 			unit.get_character()->Deities.push_back(upgrade_deity);
 			SaveHero(unit.get_character());
 		}
@@ -2556,7 +2559,7 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 }
 
 //Wyrmgus start
-std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand_strategy, bool multiline)
+std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool multiline)
 {
 	const CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
 	
@@ -2571,10 +2574,6 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 		bool first_element = true;
 		//check if the upgrade makes modifications to any units
 		for (const auto &modifier : upgrade->get_modifiers()) {
-			if (grand_strategy) { // don't show modifiers in the grand strategy mode for now
-				continue;
-			}
-
 			if (!first_element) {
 				upgrade_effects_string += padding_string;
 			} else {
@@ -2590,15 +2589,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 				if (var == STRENGTH_INDEX || var == DEXTERITY_INDEX || var == INTELLIGENCE_INDEX || var == CHARISMA_INDEX) { // don't show attributes for now
 					continue;
 				}
-					
-				if (grand_strategy) {
-					if (
-						var == SUPPLY_INDEX // don't show supply effects in the grand strategy mode
-					) {
-						continue;
-					}
-				}
-
+				
 				if (modifier->Modifier.Variables[var].Value != 0) {
 					if (!first_var) {
 						upgrade_effects_string += padding_string;
@@ -2659,40 +2650,38 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 				}
 			}
 				
-			if (!grand_strategy) {
-				bool first_res = true;
-				for (const auto &[resource, quantity] : modifier->Modifier.get_improve_incomes()) {
-					if (!first_res) {
-						upgrade_effects_string += padding_string;
-					} else {
-						first_res = false;
+			bool first_res = true;
+			for (const auto &[resource, quantity] : modifier->Modifier.get_improve_incomes()) {
+				if (!first_res) {
+					upgrade_effects_string += padding_string;
+				} else {
+					first_res = false;
+				}
+
+				if (quantity > 0) {
+					upgrade_effects_string += "+";
+				}
+				upgrade_effects_string += std::to_string(quantity);
+				upgrade_effects_string += "%";
+				upgrade_effects_string += " ";
+				upgrade_effects_string += resource->get_name();
+				upgrade_effects_string += " Processing";
+
+				bool first_unit_type = true;
+				for (const unit_type *unit_type : unit_type::get_all()) {
+					if (unit_type->is_template()) {
+						continue;
 					}
 
-					if (quantity > 0) {
-						upgrade_effects_string += "+";
-					}
-					upgrade_effects_string += std::to_string(quantity);
-					upgrade_effects_string += "%";
-					upgrade_effects_string += " ";
-					upgrade_effects_string += resource->get_name();
-					upgrade_effects_string += " Processing";
-
-					bool first_unit_type = true;
-					for (const unit_type *unit_type : unit_type::get_all()) {
-						if (unit_type->is_template()) {
-							continue;
+					if (modifier->applies_to(unit_type)) {
+						if (!first_unit_type) {
+							upgrade_effects_string += ", ";
+						} else {
+							upgrade_effects_string += " for ";
+							first_unit_type = false;
 						}
 
-						if (modifier->applies_to(unit_type)) {
-							if (!first_unit_type) {
-								upgrade_effects_string += ", ";
-							} else {
-								upgrade_effects_string += " for ";
-								first_unit_type = false;
-							}
-
-							upgrade_effects_string += unit_type->GetNamePlural();
-						}
+						upgrade_effects_string += unit_type->GetNamePlural();
 					}
 				}
 			}

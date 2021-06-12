@@ -600,6 +600,8 @@ public:
 		return "Research";
 	}
 
+	Q_INVOKABLE QString get_upgrade_effects_qstring() const;
+
 signals:
 	void changed();
 
