@@ -2342,6 +2342,31 @@ bool unit_type::can_produce_a_resource() const
 	return this->get_given_resource() != nullptr || !AiHelpers.get_produced_resources(this).empty();
 }
 
+std::vector<unit_type_variation *> unit_type::get_custom_hero_variations() const
+{
+	std::vector<unit_type_variation *> variations;
+
+	for (const auto &variation : this->get_variations()) {
+		if (variation->get_name().empty()) {
+			//only show as available variations which have a display name
+			continue;
+		}
+
+		variations.push_back(variation.get());
+	}
+
+	std::sort(variations.begin(), variations.end(), [](const unit_type_variation *lhs, const unit_type_variation *rhs) {
+		return lhs->get_name() < rhs->get_name();
+	});
+
+	return variations;
+}
+
+QVariantList unit_type::get_custom_hero_variations_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_custom_hero_variations());
+}
+
 const std::filesystem::path &unit_type::get_encyclopedia_background_file() const
 {
 	if (!this->encyclopedia_background_file.empty()) {

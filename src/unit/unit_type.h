@@ -1180,6 +1180,9 @@ public:
 		return this->variations;
 	}
 
+	std::vector<unit_type_variation *> get_custom_hero_variations() const;
+	Q_INVOKABLE QVariantList get_custom_hero_variations_qvariant_list() const;
+
 	const QColor &get_neutral_minimap_color() const
 	{
 		return this->neutral_minimap_color;
