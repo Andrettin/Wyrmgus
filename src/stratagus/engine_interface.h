@@ -53,6 +53,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 	Q_PROPERTY(QString save_path READ get_save_path CONSTANT)
 	Q_PROPERTY(QString loading_message READ get_loading_message NOTIFY loading_message_changed)
+	Q_PROPERTY(QVariantList custom_heroes READ get_custom_heroes NOTIFY custom_heroes_changed)
 
 public:
 	engine_interface();
@@ -195,8 +196,9 @@ public:
 	Q_INVOKABLE QVariantList get_achievements() const;
 	Q_INVOKABLE QVariantList get_legacy_quests() const;
 
-	Q_INVOKABLE QVariantList get_custom_heroes() const;
+	QVariantList get_custom_heroes() const;
 	Q_INVOKABLE void create_custom_hero(const QString &name, const QString &surname, const QVariant &civilization, const QVariant &unit_type, const QVariant &trait, const QString &variation_identifier);
+	Q_INVOKABLE void delete_custom_hero(const QVariant &hero);
 
 	Q_INVOKABLE QVariantList get_building_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;
@@ -219,6 +221,7 @@ signals:
 	void running_changed();
 	void loading_message_changed();
 	void encyclopediaEntryOpened(QString link);
+	void custom_heroes_changed();
 
 private:
 	std::queue<std::function<void()>> posted_commands;

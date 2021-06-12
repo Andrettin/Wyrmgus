@@ -379,6 +379,11 @@ void engine_interface::create_custom_hero(const QString &name, const QString &su
 	character::create_custom_hero(name.toStdString(), surname.toStdString(), qvariant::to_object<wyrmgus::civilization>(civilization), qvariant::to_object<wyrmgus::unit_type>(unit_type), qvariant::to_object<CUpgrade>(trait), variation_identifier.toStdString());
 }
 
+void engine_interface::delete_custom_hero(const QVariant &hero)
+{
+	character::remove_custom_hero(qvariant::to_object<character>(hero));
+}
+
 QVariantList engine_interface::get_building_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(unit_type::get_building_encyclopedia_entries());

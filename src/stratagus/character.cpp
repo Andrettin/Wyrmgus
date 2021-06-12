@@ -32,6 +32,7 @@
 #include "character_history.h"
 #include "civilization.h"
 #include "config.h"
+#include "engine_interface.h"
 #include "faction.h"
 #include "game.h"
 #include "gender.h"
@@ -140,12 +141,22 @@ void character::create_custom_hero(const std::string &name, const std::string &s
 
 	character::custom_heroes.push_back(hero.get());
 	character::custom_heroes_by_identifier[identifier] = std::move(hero);
+
+	emit engine_interface::get()->custom_heroes_changed();
 }
 
 void character::remove_custom_hero(character *custom_hero)
 {
+	//delete hero save file
+	const std::filesystem::path filepath = custom_hero->get_save_filepath();
+	if (std::filesystem::exists(filepath)) {
+		std::filesystem::remove(filepath);
+	}
+
 	vector::remove(character::custom_heroes, custom_hero);
 	character::custom_heroes_by_identifier.erase(custom_hero->get_identifier());
+
+	emit engine_interface::get()->custom_heroes_changed();
 }
 
 character::character(const std::string &identifier)
@@ -943,6 +954,25 @@ CUnit *character::get_unit() const
 	return nullptr;
 }
 
+std::filesystem::path character::get_save_filepath() const
+{
+	std::filesystem::path filepath = parameters::get()->GetUserDirectory();
+
+	if (!GameName.empty()) {
+		filepath /= GameName;
+	}
+
+	filepath /= "heroes";
+
+	if (this->Custom) {
+		filepath /= "custom";
+	}
+
+	filepath /= this->get_identifier() + ".lua";
+
+	return filepath;
+}
+
 }
 
 int GetAttributeVariableIndex(int attribute)
@@ -987,48 +1017,31 @@ void SaveHeroes()
 
 void SaveHero(const wyrmgus::character *hero)
 {
-	struct stat tmp;
-	std::string path = parameters::get()->GetUserDirectory();
+	const std::filesystem::path filepath = hero->get_save_filepath();
 
-	if (!GameName.empty()) {
-		path += "/";
-		path += GameName;
-	}
-	path += "/";
-	path += "heroes/";
-	if (stat(path.c_str(), &tmp) < 0) {
-		makedir(path.c_str(), 0777);
-	}
-	if (hero->Custom) {
-		path += "custom/";
-		if (stat(path.c_str(), &tmp) < 0) {
-			makedir(path.c_str(), 0777);
-		}
-	}
-	std::string old_path = path;
-
-	path += hero->get_identifier();
-	path += ".lua";
+	const std::filesystem::path folder_path = filepath.parent_path();
+	database::ensure_path_exists(folder_path);
 
 	std::string old_identifier = hero->get_identifier();
 	string::replace(old_identifier, '_', '-');
-	old_path += old_identifier;
-	old_path += ".lua";
 
-	if (std::filesystem::exists(old_path)) {
-		std::filesystem::remove(old_path);
+	std::filesystem::path old_filepath = filepath;
+	old_filepath.replace_filename(old_identifier + ".lua");
+
+	if (std::filesystem::exists(old_filepath)) {
+		std::filesystem::remove(old_filepath);
 	}
 
-	FILE *fd = fopen(path.c_str(), "w");
+	FILE *fd = fopen(filepath.string().c_str(), "w");
 	if (!fd) {
-		fprintf(stderr, "Cannot open file %s for writing.\n", path.c_str());
+		fprintf(stderr, "Cannot open file %s for writing.\n", filepath.string().c_str());
 		return;
 	}
 
 	if (!hero->Custom) {
-		fprintf(fd, "DefineCharacter(\"%s\", {\n", hero->Ident.c_str());
+		fprintf(fd, "DefineCharacter(\"%s\", {\n", hero->get_identifier().c_str());
 	} else {
-		fprintf(fd, "DefineCustomHero(\"%s\", {\n", hero->Ident.c_str());
+		fprintf(fd, "DefineCustomHero(\"%s\", {\n", hero->get_identifier().c_str());
 		fprintf(fd, "\tName = \"%s\",\n", hero->get_name().c_str());
 		if (!hero->ExtraName.empty()) {
 			fprintf(fd, "\tExtraName = \"%s\",\n", hero->ExtraName.c_str());
@@ -1036,8 +1049,8 @@ void SaveHero(const wyrmgus::character *hero)
 		if (!hero->get_surname().empty()) {
 			fprintf(fd, "\tFamilyName = \"%s\",\n", hero->get_surname().c_str());
 		}
-		if (hero->get_gender() != wyrmgus::gender::none) {
-			fprintf(fd, "\tGender = \"%s\",\n", wyrmgus::gender_to_string(hero->get_gender()).c_str());
+		if (hero->get_gender() != gender::none) {
+			fprintf(fd, "\tGender = \"%s\",\n", gender_to_string(hero->get_gender()).c_str());
 		}
 		if (hero->get_civilization()) {
 			fprintf(fd, "\tCivilization = \"%s\",\n", hero->get_civilization()->get_identifier().c_str());
@@ -1147,43 +1160,6 @@ void SaveHero(const wyrmgus::character *hero)
 	fprintf(fd, "})\n\n");
 		
 	fclose(fd);
-}
-
-void SaveCustomHero(const std::string &identifier)
-{
-	const character *hero = character::get_custom_hero(identifier);
-	if (!hero) {
-		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", identifier.c_str());
-	}
-	
-	SaveHero(hero);
-}
-
-void DeleteCustomHero(const std::string &identifier)
-{
-	character *hero = character::get_custom_hero(identifier);
-	if (!hero) {
-		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", identifier.c_str());
-	}
-	
-	//delete hero save file
-	std::string path = parameters::get()->GetUserDirectory();
-	if (!GameName.empty()) {
-		path += "/";
-		path += GameName;
-	}
-	path += "/";
-	path += "heroes/";
-	if (hero->Custom) {
-		path += "custom/";
-	}
-	path += hero->get_identifier();
-	path += ".lua";	
-	if (std::filesystem::exists(path)) {
-		std::filesystem::remove(path);
-	}
-	
-	character::remove_custom_hero(hero);
 }
 
 bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name)

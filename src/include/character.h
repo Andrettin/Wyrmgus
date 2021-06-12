@@ -419,6 +419,8 @@ public:
 
 	CUnit *get_unit() const;
 
+	std::filesystem::path get_save_filepath() const;
+
 signals:
 	void changed();
 
@@ -494,8 +496,6 @@ extern bool LoadingPersistentHeroes;
 extern int GetAttributeVariableIndex(int attribute);
 extern void SaveHero(const wyrmgus::character *hero);
 extern void SaveHeroes();
-extern void SaveCustomHero(const std::string &identifier);
-extern void DeleteCustomHero(const std::string &identifier);
 extern bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name);
 extern std::string GetCharacterTitleNameById(const wyrmgus::character_title title);
 extern wyrmgus::character_title GetCharacterTitleIdByName(const std::string &title);
