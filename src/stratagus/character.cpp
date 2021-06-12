@@ -737,7 +737,7 @@ void character::save() const
 			fprintf(fd, "\tCivilization = \"%s\",\n", this->get_civilization()->get_identifier().c_str());
 		}
 		if (!this->get_description().empty()) {
-			fprintf(fd, "\tDescription = \"%s\",\n", this->get_description().c_str());
+			fprintf(fd, "\tDescription = \"%s\",\n", string::escaped(this->get_description()).c_str());
 		}
 	}
 	if (this->get_unit_type() != nullptr) {
