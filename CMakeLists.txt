@@ -1042,6 +1042,7 @@ set(wyrmgus_util_HDRS
 	src/util/point_util.h
 	src/util/queue_util.h
 	src/util/qunique_ptr.h
+	src/util/qvariant_util.h
 	src/util/random.h
 	src/util/rect_util.h
 	src/util/set_util.h

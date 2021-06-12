@@ -194,7 +194,9 @@ public:
 
 	Q_INVOKABLE QVariantList get_achievements() const;
 	Q_INVOKABLE QVariantList get_legacy_quests() const;
+
 	Q_INVOKABLE QVariantList get_custom_heroes() const;
+	Q_INVOKABLE void create_custom_hero(const QString &name, const QString &surname, const QVariant &civilization, const QVariant &unit_type, const QVariant &trait, const QString &variation_identifier);
 
 	Q_INVOKABLE QVariantList get_building_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;

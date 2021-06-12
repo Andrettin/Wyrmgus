@@ -57,6 +57,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
 
@@ -94,6 +95,51 @@ bool character::compare_encyclopedia_entries(const character *lhs, const charact
 	}
 
 	return lhs->get_full_name() < rhs->get_full_name();
+}
+
+void character::create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, CUpgrade *trait, const std::string &variation_identifier)
+{
+	std::string identifier = "custom_" + string::lowered(name);
+	if (!surname.empty()) {
+		identifier += "_" + string::lowered(surname);
+	}
+
+	std::string identifier_suffix;
+	int suffix_number = 1;
+
+	while (character::get_custom_hero(identifier + identifier_suffix) != nullptr) {
+		++suffix_number;
+		identifier_suffix = "_" + std::to_string(suffix_number);
+	}
+
+	identifier += identifier_suffix;
+
+	auto hero = make_qunique<character>(identifier);
+	hero->moveToThread(QApplication::instance()->thread());
+
+	hero->Custom = true;
+
+	hero->set_name(name);
+	hero->surname = surname;
+	hero->civilization = civilization;
+
+	hero->unit_type = unit_type;
+	hero->level = hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
+
+	hero->trait = trait;
+	hero->variation = variation_identifier;
+
+	if (hero->get_gender() == gender::none) {
+		//if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
+		if (hero->get_unit_type() != nullptr && hero->get_unit_type()->get_gender() != gender::none) {
+			hero->gender = hero->get_unit_type()->get_gender();
+		}
+	}
+
+	SaveHero(hero.get());
+
+	character::custom_heroes.push_back(hero.get());
+	character::custom_heroes_by_identifier[identifier] = std::move(hero);
 }
 
 void character::remove_custom_hero(character *custom_hero)
@@ -960,10 +1006,15 @@ void SaveHero(const wyrmgus::character *hero)
 		}
 	}
 	std::string old_path = path;
-	path += hero->Ident;
+
+	path += hero->get_identifier();
 	path += ".lua";
-	old_path += hero->get_full_name();
+
+	std::string old_identifier = hero->get_identifier();
+	string::replace(old_identifier, '_', '-');
+	old_path += old_identifier;
 	old_path += ".lua";
+
 	if (std::filesystem::exists(old_path)) {
 		std::filesystem::remove(old_path);
 	}
@@ -1126,7 +1177,7 @@ void DeleteCustomHero(const std::string &identifier)
 	if (hero->Custom) {
 		path += "custom/";
 	}
-	path += hero->Ident;
+	path += hero->get_identifier();
 	path += ".lua";	
 	if (std::filesystem::exists(path)) {
 		std::filesystem::remove(path);

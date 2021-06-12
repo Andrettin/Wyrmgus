@@ -134,6 +134,7 @@ public:
 		return nullptr;
 	}
 
+	static void create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, CUpgrade *trait, const std::string &variation_identifier);
 	static void remove_custom_hero(character *custom_hero);
 
 private:

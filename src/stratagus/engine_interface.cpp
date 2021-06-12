@@ -58,6 +58,7 @@
 #include "util/container_util.h"
 #include "util/exception_util.h"
 #include "util/queue_util.h"
+#include "util/qvariant_util.h"
 
 namespace wyrmgus {
 
@@ -371,6 +372,11 @@ QVariantList engine_interface::get_legacy_quests() const
 QVariantList engine_interface::get_custom_heroes() const
 {
 	return container::to_qvariant_list(character::get_custom_heroes());
+}
+
+void engine_interface::create_custom_hero(const QString &name, const QString &surname, const QVariant &civilization, const QVariant &unit_type, const QVariant &trait, const QString &variation_identifier)
+{
+	character::create_custom_hero(name.toStdString(), surname.toStdString(), qvariant::to_object<wyrmgus::civilization>(civilization), qvariant::to_object<wyrmgus::unit_type>(unit_type), qvariant::to_object<CUpgrade>(trait), variation_identifier.toStdString());
 }
 
 QVariantList engine_interface::get_building_encyclopedia_entries() const

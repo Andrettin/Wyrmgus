@@ -49,6 +49,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/log_util.h"
+#include "util/string_util.h"
 #include "util/vector_util.h"
 
 static int CclDefineCharacter(lua_State *l)
@@ -405,6 +406,7 @@ static int CclDefineCustomHero(lua_State *l)
 	}
 
 	std::string hero_ident = LuaToString(l, 1);
+	string::replace(hero_ident, '-', '_');
 	character *hero = character::get_custom_hero(hero_ident);
 	if (hero == nullptr) {
 		auto new_hero = make_qunique<character>(hero_ident);
