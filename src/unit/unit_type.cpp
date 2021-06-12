@@ -948,7 +948,8 @@ void unit_type::process_sml_scope(const sml_data &scope)
 
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
-			auto variation = std::make_unique<unit_type_variation>(tag, this);
+			auto variation = make_qunique<unit_type_variation>(tag, this);
+			variation->moveToThread(QApplication::instance()->thread());
 
 			database::process_sml_data(variation, child_scope);
 
@@ -2158,7 +2159,7 @@ int unit_type::get_resource_step(const resource *resource, const int player) con
 
 const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player, const int image_layer) const
 {
-	const std::vector<std::unique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
+	const std::vector<qunique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
 	for (const auto &variation : variation_list) {
 		bool upgrades_check = true;
 		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
@@ -2187,7 +2188,7 @@ const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player,
 
 unit_type_variation *unit_type::GetVariation(const std::string &variation_name, int image_layer) const
 {
-	const std::vector<std::unique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
+	const std::vector<qunique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
 	for (const auto &variation : variation_list) {
 		if (variation->get_identifier() == variation_name) {
 			return variation.get();
@@ -2200,7 +2201,7 @@ std::string unit_type::GetRandomVariationIdent(int image_layer) const
 {
 	std::vector<std::string> variation_idents;
 	
-	const std::vector<std::unique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
+	const std::vector<qunique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
 	for (const auto &variation : variation_list) {
 		variation_idents.push_back(variation->get_identifier());
 	}

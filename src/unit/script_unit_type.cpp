@@ -702,7 +702,7 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				std::unique_ptr<wyrmgus::unit_type_variation> variation;
+				qunique_ptr<unit_type_variation> variation;
 				int image_layer = -1;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for variations)");
@@ -716,7 +716,10 @@ static int CclDefineUnitType(lua_State *l)
 						image_layer = GetImageLayerIdByName(image_layer_name);
 					} else if (!strcmp(value, "variation-id")) {
 						const std::string variation_identifier = LuaToString(l, -1, k + 1);
-						variation = std::make_unique<wyrmgus::unit_type_variation>(variation_identifier, type, image_layer);
+						variation = make_qunique<unit_type_variation>(variation_identifier, type, image_layer);
+						variation->moveToThread(QApplication::instance()->thread());
+					} else if (!strcmp(value, "name")) {
+						variation->name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "type-name")) {
 						variation->type_name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "button-key")) {

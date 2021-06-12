@@ -46,16 +46,23 @@ class terrain_type;
 class unit_type;
 enum class item_class;
 
-class unit_type_variation final
+class unit_type_variation final : public QObject
 {
+	Q_OBJECT
+
+	Q_PROPERTY(QString identifier READ get_identifier_qstring CONSTANT)
+	Q_PROPERTY(QString name READ get_name_qstring NOTIFY changed)
+
 public:
 	explicit unit_type_variation(const std::string &identifier, const unit_type *unit_type, const int image_layer = -1);
 	~unit_type_variation();
 
-	std::unique_ptr<unit_type_variation> duplicate(const unit_type *unit_type) const
+	qunique_ptr<unit_type_variation> duplicate(const unit_type *unit_type) const
 	{
-		auto variation = std::make_unique<unit_type_variation>(this->identifier, unit_type, this->ImageLayer);
+		auto variation = make_qunique<unit_type_variation>(this->identifier, unit_type, this->ImageLayer);
+		variation->moveToThread(QApplication::instance()->thread());
 
+		variation->name = this->name;
 		variation->type_name = this->type_name;
 		variation->button_key = this->button_key;
 		variation->image_file = this->image_file;
@@ -98,6 +105,11 @@ public:
 		return this->identifier;
 	}
 
+	QString get_identifier_qstring() const
+	{
+		return QString::fromStdString(this->get_identifier());
+	}
+
 	int get_index() const
 	{
 		return this->index;
@@ -108,6 +120,21 @@ public:
 		return this->unit_type;
 	}
 	
+	const std::string &get_name() const
+	{
+		return this->name;
+	}
+
+	Q_INVOKABLE void set_name(const std::string &name)
+	{
+		this->name = name;
+	}
+
+	QString get_name_qstring() const
+	{
+		return QString::fromStdString(this->get_name());
+	}
+
 	const std::filesystem::path &get_image_file() const
 	{
 		return this->image_file;
@@ -143,6 +170,9 @@ public:
 		return this->conditions_ptr;
 	}
 
+signals:
+	void changed();
+
 private:
 	std::string identifier;
 	int index = -1;					//the variation's index within the appropriate variation vector of its unit type
@@ -150,6 +180,7 @@ private:
 public:
 	int ImageLayer = -1;			/// The image layer to which the variation belongs (if any)
 private:
+	std::string name;
 	std::filesystem::path image_file;
 	QSize frame_size = QSize(0, 0);
 	std::string type_name;			/// Type name.

@@ -1175,7 +1175,7 @@ public:
 		return this->default_mass;
 	}
 
-	const std::vector<std::unique_ptr<unit_type_variation>> &get_variations() const
+	const std::vector<qunique_ptr<unit_type_variation>> &get_variations() const
 	{
 		return this->variations;
 	}
@@ -1420,10 +1420,10 @@ private:
 	resource_set stored_resources;             /// Resources that we can store here.
 	resource *given_resource = nullptr; //the resource this unit gives
 	resource_map<std::unique_ptr<resource_info>> resource_infos;    /// Resource information.
-	std::vector<std::unique_ptr<unit_type_variation>> variations;
+	std::vector<qunique_ptr<unit_type_variation>> variations;
 public:
 	//Wyrmgus start
-	std::vector<std::unique_ptr<unit_type_variation>> LayerVariations[MaxImageLayers];	/// Layer variation information
+	std::vector<qunique_ptr<unit_type_variation>> LayerVariations[MaxImageLayers];	/// Layer variation information
 	//Wyrmgus end
 	std::vector<std::unique_ptr<CBuildRestriction>> BuildingRules;   /// Rules list for building a building.
 	std::vector<std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.

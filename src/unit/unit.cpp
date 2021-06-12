@@ -1276,7 +1276,7 @@ void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, const bool ignor
 	}
 	
 	std::vector<wyrmgus::unit_type_variation *> type_variations;
-	const std::vector<std::unique_ptr<wyrmgus::unit_type_variation>> &variation_list = image_layer == -1 ? (new_type != nullptr ? new_type->get_variations() : this->Type->get_variations()) : (new_type != nullptr ? new_type->LayerVariations[image_layer] : this->Type->LayerVariations[image_layer]);
+	const std::vector<qunique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? (new_type != nullptr ? new_type->get_variations() : this->Type->get_variations()) : (new_type != nullptr ? new_type->LayerVariations[image_layer] : this->Type->LayerVariations[image_layer]);
 	
 	bool found_similar = false;
 	for (const auto &variation : variation_list) {

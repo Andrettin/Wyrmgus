@@ -80,7 +80,7 @@ void unit_type_variation::process_sml_property(const sml_property &property)
 	} else if (key == "resource_max") {
 		this->ResourceMax = std::stoi(value);
 	} else {
-		throw std::runtime_error("Invalid unit type variation property: \"" + key + "\".");
+		database::process_sml_property_for_object(this, property);
 	}
 }
 
