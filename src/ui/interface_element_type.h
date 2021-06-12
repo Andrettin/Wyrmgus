@@ -33,6 +33,8 @@ enum class interface_element_type {
 	panel,
 	large_button,
 	small_button,
+	thin_button,
+	small_thin_button,
 	radio_button,
 	up_arrow_button,
 	down_arrow_button,
@@ -55,6 +57,10 @@ inline interface_element_type string_to_interface_element_type(const std::string
 		return interface_element_type::large_button;
 	} else if (str == "small_button") {
 		return interface_element_type::small_button;
+	} else if (str == "thin_button") {
+		return interface_element_type::thin_button;
+	} else if (str == "small_thin_button") {
+		return interface_element_type::small_thin_button;
 	} else if (str == "radio_button") {
 		return interface_element_type::radio_button;
 	} else if (str == "up_arrow_button") {

@@ -63,6 +63,12 @@ void interface_style::process_sml_scope(const sml_data &scope)
 	} else if (tag == "small_button") {
 		this->small_button = std::make_unique<button_style>(this);
 		database::process_sml_data(this->small_button, scope);
+	} else if (tag == "thin_button") {
+		this->thin_button = std::make_unique<button_style>(this);
+		database::process_sml_data(this->thin_button, scope);
+	} else if (tag == "small_thin_button") {
+		this->small_thin_button = std::make_unique<button_style>(this);
+		database::process_sml_data(this->small_thin_button, scope);
 	} else if (tag == "radio_button") {
 		this->radio_button = std::make_unique<checkbox_style>(this);
 		database::process_sml_data(this->radio_button, scope);
@@ -111,6 +117,14 @@ void interface_style::initialize()
 
 	if (this->small_button != nullptr) {
 		this->small_button->initialize();
+	}
+
+	if (this->thin_button != nullptr) {
+		this->thin_button->initialize();
+	}
+
+	if (this->small_thin_button != nullptr) {
+		this->small_thin_button->initialize();
 	}
 
 	if (this->radio_button != nullptr) {
@@ -173,6 +187,8 @@ const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics
 			return this->slider_marker_graphics;
 		case interface_element_type::large_button:
 		case interface_element_type::small_button:
+		case interface_element_type::thin_button:
+		case interface_element_type::small_thin_button:
 		case interface_element_type::up_arrow_button:
 		case interface_element_type::down_arrow_button:
 		case interface_element_type::left_arrow_button:
@@ -203,6 +219,10 @@ const button_style *interface_style::get_button(const interface_element_type typ
 			return this->large_button.get();
 		case interface_element_type::small_button:
 			return this->small_button.get();
+		case interface_element_type::thin_button:
+			return this->thin_button.get();
+		case interface_element_type::small_thin_button:
+			return this->small_thin_button.get();
 		case interface_element_type::up_arrow_button:
 			return this->up_arrow_button.get();
 		case interface_element_type::down_arrow_button:

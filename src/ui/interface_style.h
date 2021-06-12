@@ -89,6 +89,8 @@ private:
 	std::shared_ptr<CGraphic> slider_marker_graphics;
 	std::unique_ptr<button_style> large_button;
 	std::unique_ptr<button_style> small_button;
+	std::unique_ptr<button_style> thin_button;
+	std::unique_ptr<button_style> small_thin_button;
 	std::unique_ptr<checkbox_style> radio_button;
 	std::unique_ptr<button_style> up_arrow_button;
 	std::unique_ptr<button_style> down_arrow_button;
