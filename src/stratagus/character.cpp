@@ -137,7 +137,7 @@ void character::create_custom_hero(const std::string &name, const std::string &s
 		}
 	}
 
-	SaveHero(hero.get());
+	hero->save();
 
 	character::custom_heroes.push_back(hero.get());
 	character::custom_heroes_by_identifier[identifier] = std::move(hero);
@@ -696,6 +696,156 @@ std::string character::get_encyclopedia_genealogical_text() const
 	return text;
 }
 
+void character::save() const
+{
+	const std::filesystem::path filepath = this->get_save_filepath();
+
+	const std::filesystem::path folder_path = filepath.parent_path();
+	database::ensure_path_exists(folder_path);
+
+	std::string old_identifier = this->get_identifier();
+	string::replace(old_identifier, '_', '-');
+
+	std::filesystem::path old_filepath = filepath;
+	old_filepath.replace_filename(old_identifier + ".lua");
+
+	if (std::filesystem::exists(old_filepath)) {
+		std::filesystem::remove(old_filepath);
+	}
+
+	FILE *fd = fopen(filepath.string().c_str(), "w");
+	if (!fd) {
+		fprintf(stderr, "Cannot open file %s for writing.\n", filepath.string().c_str());
+		return;
+	}
+
+	if (!this->Custom) {
+		fprintf(fd, "DefineCharacter(\"%s\", {\n", this->get_identifier().c_str());
+	} else {
+		fprintf(fd, "DefineCustomHero(\"%s\", {\n", this->get_identifier().c_str());
+		fprintf(fd, "\tName = \"%s\",\n", this->get_name().c_str());
+		if (!this->ExtraName.empty()) {
+			fprintf(fd, "\tExtraName = \"%s\",\n", this->ExtraName.c_str());
+		}
+		if (!this->get_surname().empty()) {
+			fprintf(fd, "\tFamilyName = \"%s\",\n", this->get_surname().c_str());
+		}
+		if (this->get_gender() != gender::none) {
+			fprintf(fd, "\tGender = \"%s\",\n", gender_to_string(this->get_gender()).c_str());
+		}
+		if (this->get_civilization()) {
+			fprintf(fd, "\tCivilization = \"%s\",\n", this->get_civilization()->get_identifier().c_str());
+		}
+		if (!this->get_description().empty()) {
+			fprintf(fd, "\tDescription = \"%s\",\n", this->get_description().c_str());
+		}
+	}
+	if (this->get_unit_type() != nullptr) {
+		fprintf(fd, "\tType = \"%s\",\n", this->get_unit_type()->get_identifier().c_str());
+	}
+	if (this->Custom) {
+		if (this->get_trait() != nullptr) {
+			fprintf(fd, "\tTrait = \"%s\",\n", this->get_trait()->get_identifier().c_str());
+		}
+		if (!this->get_variation().empty()) {
+			fprintf(fd, "\tVariation = \"%s\",\n", this->get_variation().c_str());
+		}
+	}
+	if (this->get_level() != 0) {
+		fprintf(fd, "\tLevel = %d,\n", this->get_level());
+	}
+	if (this->ExperiencePercent != 0) {
+		fprintf(fd, "\tExperiencePercent = %d,\n", this->ExperiencePercent);
+	}
+	if (this->get_abilities().size() > 0) {
+		fprintf(fd, "\tAbilities = {");
+		for (size_t j = 0; j < this->get_abilities().size(); ++j) {
+			fprintf(fd, "\"%s\"", this->get_abilities()[j]->get_identifier().c_str());
+			if (j < (this->get_abilities().size() - 1)) {
+				fprintf(fd, ", ");
+			}
+		}
+		fprintf(fd, "},\n");
+	}
+	if (this->Custom && this->Deities.size() > 0) {
+		fprintf(fd, "\tDeities = {");
+		for (size_t j = 0; j < this->Deities.size(); ++j) {
+			fprintf(fd, "\"%s\"", this->Deities[j]->get_identifier().c_str());
+			if (j < (this->Deities.size() - 1)) {
+				fprintf(fd, ", ");
+			}
+		}
+		fprintf(fd, "},\n");
+	}
+	if (this->ReadWorks.size() > 0) {
+		fprintf(fd, "\tReadWorks = {");
+		for (size_t j = 0; j < this->ReadWorks.size(); ++j) {
+			fprintf(fd, "\"%s\"", this->ReadWorks[j]->get_identifier().c_str());
+			if (j < (this->ReadWorks.size() - 1)) {
+				fprintf(fd, ", ");
+			}
+		}
+		fprintf(fd, "},\n");
+	}
+	if (this->ConsumedElixirs.size() > 0) {
+		fprintf(fd, "\tConsumedElixirs = {");
+		for (size_t j = 0; j < this->ConsumedElixirs.size(); ++j) {
+			fprintf(fd, "\"%s\"", this->ConsumedElixirs[j]->get_identifier().c_str());
+			if (j < (this->ConsumedElixirs.size() - 1)) {
+				fprintf(fd, ", ");
+			}
+		}
+		fprintf(fd, "},\n");
+	}
+	if (!this->get_items().empty()) {
+		fprintf(fd, "\tItems = {");
+		for (size_t j = 0; j < this->get_items().size(); ++j) {
+			const auto &item = this->get_items()[j];
+			fprintf(fd, "\n\t\t{");
+			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", item->get_unit_type()->Ident.c_str());
+			if (item->Prefix != nullptr) {
+				fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", item->Prefix->get_identifier().c_str());
+			}
+			if (item->Suffix != nullptr) {
+				fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", item->Suffix->get_identifier().c_str());
+			}
+			if (item->Spell != nullptr) {
+				fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", item->Spell->get_identifier().c_str());
+			}
+			if (item->Work != nullptr) {
+				fprintf(fd, "\n\t\t\t\"work\", \"%s\",", item->Work->get_identifier().c_str());
+			}
+			if (item->Elixir != nullptr) {
+				fprintf(fd, "\n\t\t\t\"elixir\", \"%s\",", item->Elixir->get_identifier().c_str());
+			}
+			if (!item->get_name().empty()) {
+				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", item->get_name().c_str());
+			}
+			if (item->get_unique() != nullptr) { // affixes, name and etc. will be inherited from the unique item, but we set those previous characteristics for unique items anyway, so that if a unique item no longer exists in the game's code (i.e. if it is from a mod that has been deactivated) the character retains an item with the same affixes, name and etc., even though it will no longer be unique
+				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", item->get_unique()->get_identifier().c_str());
+			}
+			if (item->is_bound()) {
+				fprintf(fd, "\n\t\t\t\"bound\", true,");
+			}
+			if (!item->is_identified()) {
+				fprintf(fd, "\n\t\t\t\"identified\", false,");
+			}
+			if (this->is_item_equipped(item.get())) {
+				fprintf(fd, "\n\t\t\t\"equipped\", true");
+			}
+			fprintf(fd, "\n\t\t}");
+			if (j < (this->get_items().size() - 1)) {
+				fprintf(fd, ",");
+			}
+		}
+		fprintf(fd, "\n\t},\n");
+	}
+
+	fprintf(fd, "})\n\n");
+
+	fclose(fd);
+}
+
 void character::GenerateMissingDates()
 {
 	if (this->DeathDate.Year == 0 && this->BirthDate.Year != 0) { //if the character is missing a death date so far, give it +60 years after the birth date
@@ -1015,11 +1165,11 @@ int GetAttributeVariableIndex(int attribute)
 void SaveHeroes()
 {
 	for (const character *character : character::get_all()) { //save characters
-		SaveHero(character);
+		character->save();
 	}
 
 	for (const character *hero : character::get_custom_heroes()) { //save custom heroes
-		SaveHero(hero);
+		hero->save();
 	}
 			
 	//see if the old heroes.lua save file is present, and if so, delete it
@@ -1035,156 +1185,6 @@ void SaveHeroes()
 	if (std::filesystem::exists(path)) {
 		std::filesystem::remove(path);
 	}
-}
-
-void SaveHero(const wyrmgus::character *hero)
-{
-	const std::filesystem::path filepath = hero->get_save_filepath();
-
-	const std::filesystem::path folder_path = filepath.parent_path();
-	database::ensure_path_exists(folder_path);
-
-	std::string old_identifier = hero->get_identifier();
-	string::replace(old_identifier, '_', '-');
-
-	std::filesystem::path old_filepath = filepath;
-	old_filepath.replace_filename(old_identifier + ".lua");
-
-	if (std::filesystem::exists(old_filepath)) {
-		std::filesystem::remove(old_filepath);
-	}
-
-	FILE *fd = fopen(filepath.string().c_str(), "w");
-	if (!fd) {
-		fprintf(stderr, "Cannot open file %s for writing.\n", filepath.string().c_str());
-		return;
-	}
-
-	if (!hero->Custom) {
-		fprintf(fd, "DefineCharacter(\"%s\", {\n", hero->get_identifier().c_str());
-	} else {
-		fprintf(fd, "DefineCustomHero(\"%s\", {\n", hero->get_identifier().c_str());
-		fprintf(fd, "\tName = \"%s\",\n", hero->get_name().c_str());
-		if (!hero->ExtraName.empty()) {
-			fprintf(fd, "\tExtraName = \"%s\",\n", hero->ExtraName.c_str());
-		}
-		if (!hero->get_surname().empty()) {
-			fprintf(fd, "\tFamilyName = \"%s\",\n", hero->get_surname().c_str());
-		}
-		if (hero->get_gender() != gender::none) {
-			fprintf(fd, "\tGender = \"%s\",\n", gender_to_string(hero->get_gender()).c_str());
-		}
-		if (hero->get_civilization()) {
-			fprintf(fd, "\tCivilization = \"%s\",\n", hero->get_civilization()->get_identifier().c_str());
-		}
-		if (!hero->get_description().empty()) {
-			fprintf(fd, "\tDescription = \"%s\",\n", hero->get_description().c_str());
-		}
-	}
-	if (hero->get_unit_type() != nullptr) {
-		fprintf(fd, "\tType = \"%s\",\n", hero->get_unit_type()->Ident.c_str());
-	}
-	if (hero->Custom) {
-		if (hero->get_trait() != nullptr) {
-			fprintf(fd, "\tTrait = \"%s\",\n", hero->get_trait()->get_identifier().c_str());
-		}
-		if (!hero->get_variation().empty()) {
-			fprintf(fd, "\tVariation = \"%s\",\n", hero->get_variation().c_str());
-		}
-	}
-	if (hero->get_level() != 0) {
-		fprintf(fd, "\tLevel = %d,\n", hero->get_level());
-	}
-	if (hero->ExperiencePercent != 0) {
-		fprintf(fd, "\tExperiencePercent = %d,\n", hero->ExperiencePercent);
-	}
-	if (hero->get_abilities().size() > 0) {
-		fprintf(fd, "\tAbilities = {");
-		for (size_t j = 0; j < hero->get_abilities().size(); ++j) {
-			fprintf(fd, "\"%s\"", hero->get_abilities()[j]->get_identifier().c_str());
-			if (j < (hero->get_abilities().size() - 1)) {
-				fprintf(fd, ", ");
-			}
-		}
-		fprintf(fd, "},\n");
-	}
-	if (hero->Custom && hero->Deities.size() > 0) {
-		fprintf(fd, "\tDeities = {");
-		for (size_t j = 0; j < hero->Deities.size(); ++j) {
-			fprintf(fd, "\"%s\"", hero->Deities[j]->get_identifier().c_str());
-			if (j < (hero->Deities.size() - 1)) {
-				fprintf(fd, ", ");
-			}
-		}
-		fprintf(fd, "},\n");
-	}
-	if (hero->ReadWorks.size() > 0) {
-		fprintf(fd, "\tReadWorks = {");
-		for (size_t j = 0; j < hero->ReadWorks.size(); ++j) {
-			fprintf(fd, "\"%s\"", hero->ReadWorks[j]->get_identifier().c_str());
-			if (j < (hero->ReadWorks.size() - 1)) {
-				fprintf(fd, ", ");
-			}
-		}
-		fprintf(fd, "},\n");
-	}
-	if (hero->ConsumedElixirs.size() > 0) {
-		fprintf(fd, "\tConsumedElixirs = {");
-		for (size_t j = 0; j < hero->ConsumedElixirs.size(); ++j) {
-			fprintf(fd, "\"%s\"", hero->ConsumedElixirs[j]->get_identifier().c_str());
-			if (j < (hero->ConsumedElixirs.size() - 1)) {
-				fprintf(fd, ", ");
-			}
-		}
-		fprintf(fd, "},\n");
-	}
-	if (!hero->get_items().empty()) {
-		fprintf(fd, "\tItems = {");
-		for (size_t j = 0; j < hero->get_items().size(); ++j) {
-			const auto &item = hero->get_items()[j];
-			fprintf(fd, "\n\t\t{");
-			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", item->get_unit_type()->Ident.c_str());
-			if (item->Prefix != nullptr) {
-				fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", item->Prefix->get_identifier().c_str());
-			}
-			if (item->Suffix != nullptr) {
-				fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", item->Suffix->get_identifier().c_str());
-			}
-			if (item->Spell != nullptr) {
-				fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", item->Spell->get_identifier().c_str());
-			}
-			if (item->Work != nullptr) {
-				fprintf(fd, "\n\t\t\t\"work\", \"%s\",", item->Work->get_identifier().c_str());
-			}
-			if (item->Elixir != nullptr) {
-				fprintf(fd, "\n\t\t\t\"elixir\", \"%s\",", item->Elixir->get_identifier().c_str());
-			}
-			if (!item->get_name().empty()) {
-				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", item->get_name().c_str());
-			}
-			if (item->get_unique() != nullptr) { // affixes, name and etc. will be inherited from the unique item, but we set those previous characteristics for unique items anyway, so that if a unique item no longer exists in the game's code (i.e. if it is from a mod that has been deactivated) the character retains an item with the same affixes, name and etc., even though it will no longer be unique
-				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", item->get_unique()->get_identifier().c_str());
-			}
-			if (item->is_bound()) {
-				fprintf(fd, "\n\t\t\t\"bound\", true,");
-			}
-			if (!item->is_identified()) {
-				fprintf(fd, "\n\t\t\t\"identified\", false,");
-			}
-			if (hero->is_item_equipped(item.get())) {
-				fprintf(fd, "\n\t\t\t\"equipped\", true");
-			}
-			fprintf(fd, "\n\t\t}");
-			if (j < (hero->get_items().size() - 1)) {
-				fprintf(fd, ",");
-			}
-		}
-		fprintf(fd, "\n\t},\n");
-	}
-	
-	fprintf(fd, "})\n\n");
-		
-	fclose(fd);
 }
 
 std::string GetCharacterTitleNameById(const wyrmgus::character_title title)

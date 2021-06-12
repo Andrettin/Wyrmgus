@@ -203,7 +203,7 @@ void COrder_PickUp::Execute(CUnit &unit)
 			if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr && unit.Player == CPlayer::GetThisPlayer()) { //if the unit has a persistent character, store the item for it
 				auto item = std::make_unique<wyrmgus::persistent_item>(goal, unit.get_character());
 				unit.get_character()->add_item(std::move(item));
-				SaveHero(unit.get_character());
+				unit.get_character()->save();
 			}
 			
 			if (!goal->Identified) {

@@ -253,7 +253,7 @@ void COrder_Trade::Execute(CUnit &unit)
 					if (game::get()->is_persistency_enabled() && goal->Container->get_character() != nullptr && goal->Container->Player == CPlayer::GetThisPlayer() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
 						wyrmgus::persistent_item *item = goal->Container->get_character()->get_item(goal);
 						goal->Container->get_character()->remove_item(item);
-						SaveHero(goal->Container->get_character());
+						goal->Container->get_character()->save();
 					}
 					UnitLost(*goal);
 					goal->clear_orders();

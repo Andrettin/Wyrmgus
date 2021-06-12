@@ -2049,7 +2049,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button, const Qt::KeyboardM
 					if (Selected[i]->get_character()->get_unit_type()->Slot != type.Slot) {
 						if (Selected[i]->Player == CPlayer::GetThisPlayer()) {
 							Selected[i]->get_character()->set_unit_type(wyrmgus::unit_type::get_all()[CurrentButtons[button]->Value]);
-							SaveHero(Selected[i]->get_character());
+							Selected[i]->get_character()->save();
 							achievement::check_achievements();
 						}
 					}

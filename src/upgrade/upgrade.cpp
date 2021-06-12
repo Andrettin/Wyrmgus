@@ -2312,7 +2312,7 @@ void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, bool save)
 	if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr && save) {
 		if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 			unit.get_character()->add_ability(upgrade);
-			SaveHero(unit.get_character());
+			unit.get_character()->save();
 		}
 	}
 	IndividualUpgradeAcquire(unit, upgrade);
@@ -2328,7 +2328,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 		if (wyrmgus::vector::contains(unit.get_character()->get_abilities(), upgrade)) {
 			if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 				unit.get_character()->remove_ability(upgrade);
-				SaveHero(unit.get_character());
+				unit.get_character()->save();
 			}
 		}
 	}
@@ -2380,7 +2380,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 		}
 		if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr && !vector::contains(unit.get_character()->Deities, upgrade_deity) && unit.Player == CPlayer::GetThisPlayer()) {
 			unit.get_character()->Deities.push_back(upgrade_deity);
-			SaveHero(unit.get_character());
+			unit.get_character()->save();
 		}
 	}
 
@@ -2434,7 +2434,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 		}
 		if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr && unit.Player == CPlayer::GetThisPlayer()) {
 			vector::remove(unit.get_character()->Deities, upgrade_deity);
-			SaveHero(unit.get_character());
+			unit.get_character()->save();
 		}
 	}
 

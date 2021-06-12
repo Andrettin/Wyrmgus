@@ -187,6 +187,8 @@ public:
 		return this->get_full_name();
 	}
 
+	Q_INVOKABLE void save() const;
+
 	const wyrmgus::dynasty *get_dynasty() const
 	{
 		return this->dynasty;
@@ -496,7 +498,6 @@ public:
 extern bool LoadingPersistentHeroes;
 
 extern int GetAttributeVariableIndex(int attribute);
-extern void SaveHero(const wyrmgus::character *hero);
 extern void SaveHeroes();
 extern std::string GetCharacterTitleNameById(const wyrmgus::character_title title);
 extern wyrmgus::character_title GetCharacterTitleIdByName(const std::string &title);

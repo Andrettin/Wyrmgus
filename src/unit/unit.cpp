@@ -876,7 +876,7 @@ void CUnit::Retrain()
 
 	//save the retraining for persistent characters
 	if (game::get()->is_persistency_enabled() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer()) {
-		SaveHero(this->get_character());
+		this->get_character()->save();
 	}
 
 	if (this->Player == CPlayer::GetThisPlayer()) {
@@ -1052,7 +1052,7 @@ void CUnit::apply_character_properties()
 		}
 
 		if (game::get()->is_persistency_enabled() && this->Player == CPlayer::GetThisPlayer()) {
-			SaveHero(this->get_character());
+			this->get_character()->save();
 		}
 	}
 
@@ -1559,7 +1559,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		if (persistent_item != nullptr) {
 			if (!this->get_character()->is_item_equipped(persistent_item)) {
 				this->get_character()->EquippedItems[static_cast<int>(item_slot)].push_back(persistent_item);
-				SaveHero(this->get_character());
+				this->get_character()->save();
 			} else {
 				fprintf(stderr, "Item is not equipped by character \"%s\"'s unit, but is equipped by the character itself.\n", this->get_character()->get_identifier().c_str());
 			}
@@ -1683,7 +1683,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		if (persistent_item != nullptr) {
 			if (get_character()->is_item_equipped(persistent_item)) {
 				wyrmgus::vector::remove(this->get_character()->EquippedItems[static_cast<int>(item_slot)], persistent_item);
-				SaveHero(this->get_character());
+				this->get_character()->save();
 			} else {
 				fprintf(stderr, "Item is equipped by character \"%s\"'s unit, but not by the character itself.\n", this->get_character()->get_identifier().c_str());
 			}
@@ -1783,7 +1783,7 @@ void CUnit::ReadWork(const CUpgrade *work, bool affect_character)
 	if (game::get()->is_persistency_enabled() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
 		if (!vector::contains(this->get_character()->ReadWorks, work)) {
 			this->get_character()->ReadWorks.push_back(work);
-			SaveHero(this->get_character());
+			this->get_character()->save();
 		}
 	}
 }
@@ -1795,7 +1795,7 @@ void CUnit::ConsumeElixir(const CUpgrade *elixir, bool affect_character)
 	if (game::get()->is_persistency_enabled() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
 		if (!wyrmgus::vector::contains(this->get_character()->ConsumedElixirs, elixir)) {
 			this->get_character()->ConsumedElixirs.push_back(elixir);
-			SaveHero(this->get_character());
+			this->get_character()->save();
 		}
 	}
 }
@@ -1875,7 +1875,7 @@ void CUnit::SetPrefix(const CUpgrade *prefix)
 	if (game::get()->is_persistency_enabled() && this->Container != nullptr && this->Container->get_character() != nullptr && this->Container->Player == CPlayer::GetThisPlayer() && this->Container->get_character()->has_item(this) && this->Container->get_character()->get_item(this)->Prefix != prefix) {
 		//update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->Prefix = prefix;
-		SaveHero(this->Container->get_character());
+		this->Container->get_character()->save();
 	}
 	Prefix = prefix;
 	if (Prefix != nullptr) {
@@ -1901,7 +1901,7 @@ void CUnit::SetSuffix(const CUpgrade *suffix)
 	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Suffix != suffix) {
 		//update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->Suffix = suffix;
-		SaveHero(this->Container->get_character());
+		this->Container->get_character()->save();
 	}
 	Suffix = suffix;
 	if (Suffix != nullptr) {
@@ -1919,7 +1919,7 @@ void CUnit::SetSpell(const wyrmgus::spell *spell)
 {
 	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->Spell = spell;
-		SaveHero(this->Container->get_character());
+		this->Container->get_character()->save();
 	}
 	Spell = spell;
 	
@@ -1935,7 +1935,7 @@ void CUnit::SetWork(const CUpgrade *work)
 	
 	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->Work = work;
-		SaveHero(Container->get_character());
+		this->Container->get_character()->save();
 	}
 	
 	Work = work;
@@ -1957,7 +1957,7 @@ void CUnit::SetElixir(const CUpgrade *elixir)
 	
 	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->Elixir = elixir;
-		SaveHero(Container->get_character());
+		this->Container->get_character()->save();
 	}
 	
 	Elixir = elixir;
@@ -2027,7 +2027,7 @@ void CUnit::Identify()
 {
 	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && !this->Container->get_character()->get_item(this)->is_identified()) { //update the persistent item, if applicable and if it hasn't been updated yet
 		this->Container->get_character()->get_item(this)->set_identified(true);
-		SaveHero(this->Container->get_character());
+		this->Container->get_character()->save();
 	}
 	
 	this->Identified = true;
@@ -3712,7 +3712,7 @@ void CUnit::XPChanged()
 			this->get_character()->set_level(this->Variable[LEVEL_INDEX].Value);
 		}
 		this->get_character()->ExperiencePercent = (this->Variable[XP_INDEX].Value * 100) / this->Variable[XPREQUIRED_INDEX].Value;
-		SaveHero(this->get_character());
+		this->get_character()->save();
 		achievement::check_achievements(); // check achievements to see if any hero now has a high enough level for a particular achievement to be obtained
 	}
 }

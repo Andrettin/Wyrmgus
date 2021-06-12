@@ -127,7 +127,7 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 
 	if (game::get()->is_persistency_enabled() && target->get_character() != nullptr && target->get_character()->Custom && target->get_character()->get_civilization() && this->civilization != nullptr && this->civilization != target->get_character()->get_civilization() && target->Player == CPlayer::GetThisPlayer()) {
 		target->get_character()->civilization = this->civilization;
-		SaveHero(target->get_character());
+		target->get_character()->save();
 	}
 	if (type == nullptr) {
 		return 0;
@@ -197,7 +197,7 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 	if (game::get()->is_persistency_enabled() && target->get_character() != nullptr && &caster == target) { //save persistent data
 		if (target->Player == CPlayer::GetThisPlayer()) {
 			target->get_character()->set_unit_type(type);
-			SaveHero(target->get_character());
+			target->get_character()->save();
 		}
 	}
 	//Wyrmgus end
