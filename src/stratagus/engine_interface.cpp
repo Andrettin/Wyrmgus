@@ -384,6 +384,11 @@ void engine_interface::delete_custom_hero(const QVariant &hero)
 	character::remove_custom_hero(qvariant::to_object<character>(hero));
 }
 
+bool engine_interface::is_name_valid_for_custom_hero(const QString &name) const
+{
+	return character::is_name_valid_for_custom_hero(name.toStdString());
+}
+
 QVariantList engine_interface::get_building_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(unit_type::get_building_encyclopedia_entries());

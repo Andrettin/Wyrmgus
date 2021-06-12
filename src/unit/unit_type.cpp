@@ -473,17 +473,6 @@ int GetResourceIdByName(lua_State *l, const char *resourceName)
 	return res;
 }
 
-//Wyrmgus start
-std::string GetResourceNameById(int resource_id)
-{
-	if (resource_id > 0 && resource_id < MaxCosts) {
-		return DefaultResourceNames[resource_id];
-	} else {
-		return "";
-	}
-}
-//Wyrmgus end
-
 namespace wyrmgus {
 
 bool unit_type::compare_building_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs)

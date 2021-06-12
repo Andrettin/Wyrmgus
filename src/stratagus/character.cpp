@@ -159,6 +159,28 @@ void character::remove_custom_hero(character *custom_hero)
 	emit engine_interface::get()->custom_heroes_changed();
 }
 
+bool character::is_name_valid_for_custom_hero(const std::string &name)
+{
+	for (const char c : name) {
+		switch (c) {
+			case '\n':
+			case '\\':
+			case '\"':
+			case '\t':
+			case '\0':
+				return false;
+			default:
+				break;
+		}
+	}
+
+	if (name.find_first_not_of(' ') == std::string::npos) {
+		return false; //name contains only spaces
+	}
+
+	return true;
+}
+
 character::character(const std::string &identifier)
 	: detailed_data_entry(identifier), CDataType(identifier), gender(gender::none)
 {
@@ -1160,49 +1182,6 @@ void SaveHero(const wyrmgus::character *hero)
 	fprintf(fd, "})\n\n");
 		
 	fclose(fd);
-}
-
-bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name)
-{
-	std::string hero_full_name = hero_name;
-	if (!hero_family_name.empty()) {
-		hero_full_name += " ";
-		hero_full_name += hero_family_name;
-	}
-	
-	if (hero_name.empty()) {
-		return false;
-	}
-	
-	if (
-		hero_full_name.find('\n') != -1
-		|| hero_full_name.find('\\') != -1
-		|| hero_full_name.find('/') != -1
-		|| hero_full_name.find('.') != -1
-		|| hero_full_name.find('*') != -1
-		|| hero_full_name.find('[') != -1
-		|| hero_full_name.find(']') != -1
-		|| hero_full_name.find(':') != -1
-		|| hero_full_name.find(';') != -1
-		|| hero_full_name.find('=') != -1
-		|| hero_full_name.find(',') != -1
-		|| hero_full_name.find('<') != -1
-		|| hero_full_name.find('>') != -1
-		|| hero_full_name.find('?') != -1
-		|| hero_full_name.find('|') != -1
-	) {
-		return false;
-	}
-	
-	if (hero_name.find_first_not_of(' ') == std::string::npos) {
-		return false; //name contains only spaces
-	}
-	
-	if (!hero_family_name.empty() && hero_family_name.find_first_not_of(' ') == std::string::npos) {
-		return false; //family name contains only spaces
-	}
-	
-	return true;
 }
 
 std::string GetCharacterTitleNameById(const wyrmgus::character_title title)

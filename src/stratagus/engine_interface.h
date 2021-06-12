@@ -199,6 +199,7 @@ public:
 	QVariantList get_custom_heroes() const;
 	Q_INVOKABLE void create_custom_hero(const QString &name, const QString &surname, const QVariant &civilization, const QVariant &unit_type, const QVariant &trait, const QString &variation_identifier);
 	Q_INVOKABLE void delete_custom_hero(const QVariant &hero);
+	Q_INVOKABLE bool is_name_valid_for_custom_hero(const QString &name) const;
 
 	Q_INVOKABLE QVariantList get_building_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;

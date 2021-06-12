@@ -137,6 +137,8 @@ public:
 	static void create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, CUpgrade *trait, const std::string &variation_identifier);
 	static void remove_custom_hero(character *custom_hero);
 
+	static bool is_name_valid_for_custom_hero(const std::string &name);
+
 private:
 	static inline std::vector<character *> custom_heroes;
 	static inline std::map<std::string, qunique_ptr<character>> custom_heroes_by_identifier;
@@ -496,7 +498,6 @@ extern bool LoadingPersistentHeroes;
 extern int GetAttributeVariableIndex(int attribute);
 extern void SaveHero(const wyrmgus::character *hero);
 extern void SaveHeroes();
-extern bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name);
 extern std::string GetCharacterTitleNameById(const wyrmgus::character_title title);
 extern wyrmgus::character_title GetCharacterTitleIdByName(const std::string &title);
 extern bool IsMinisterialTitle(const wyrmgus::character_title title);

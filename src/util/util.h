@@ -176,5 +176,4 @@ extern std::string GetPluralForm(const std::string &name);
 extern std::string IdentToName(const std::string &text);				/// Make the ident string become a display name
 extern std::string NameToIdent(const std::string &text);				/// Make the name be formatted like an ident string
 extern std::string SeparateCapitalizedStringElements(const std::string &text);	/// Make the string's capitalized elements become separated
-extern std::string GeneratePersonalName(const std::string &unit_type_ident);
 //Wyrmgus end
