@@ -724,13 +724,15 @@ public:
 
 	const character_unit *get_character_unit(const char character) const
 	{
-		auto find_iterator = this->character_units.find(character);
+		const auto find_iterator = this->character_units.find(character);
 		if (find_iterator != this->character_units.end()) {
 			return find_iterator->second.get();
 		}
 
 		return nullptr;
 	}
+
+	void add_site(const site *site);
 	
 private:
 	std::filesystem::path terrain_file;
@@ -799,9 +801,11 @@ public:
 	std::vector<std::tuple<Vec2i, character *, faction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
 	std::vector<std::tuple<Vec2i, unit_type *, wyrmgus::world *, unique_item *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
-	std::vector<site *> sites;
-	point_map<site *> sites_by_position;
 private:
+	std::vector<const site *> sites;
+	point_map<const site *> sites_by_position;
+	std::map<geocoordinate, const site *> sites_by_geocoordinate;
+	std::map<geocoordinate, const site *> sites_by_astrocoordinate;
 	point_map<terrain_type *> tile_terrains;
 public:
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes

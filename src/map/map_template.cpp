@@ -3082,6 +3082,34 @@ void map_template::save_territory_image(const std::string &filename, const site_
 	image.save(QString::fromStdString(filename));
 }
 
+void map_template::add_site(const site *site)
+{
+	if (!site->get_geocoordinate().is_null()) {
+		const auto find_iterator = this->sites_by_geocoordinate.find(site->get_geocoordinate());
+		if (find_iterator == this->sites_by_geocoordinate.end()) {
+			this->sites_by_geocoordinate[site->get_geocoordinate()] = site;
+		} else {
+			throw std::runtime_error("Geocoordinate " + site->get_geocoordinate().to_string() + " of map template \"" + this->get_identifier() + "\" already has a site (\"" + find_iterator->second->get_identifier() + "\").");
+		}
+	} else if (!site->get_astrocoordinate().is_null()) {
+		const auto find_iterator = this->sites_by_astrocoordinate.find(site->get_geocoordinate());
+		if (find_iterator == this->sites_by_astrocoordinate.end()) {
+			this->sites_by_astrocoordinate[site->get_astrocoordinate()] = site;
+		} else {
+			throw std::runtime_error("Astrocoordinate " + site->get_astrocoordinate().to_string() + " of map template \"" + this->get_identifier() + "\" already has a site (\"" + find_iterator->second->get_identifier() + "\").");
+		}
+	} else if (site->get_pos().x() != -1 && site->get_pos().y() != -1) {
+		const auto find_iterator = this->sites_by_position.find(site->get_pos());
+		if (find_iterator == this->sites_by_position.end()) {
+			this->sites_by_position[site->get_pos()] = site;
+		} else {
+			throw std::runtime_error("Position " + point::to_string(site->get_pos()) + " of map template \"" + this->get_identifier() + "\" already has a site (\"" + find_iterator->second->get_identifier() + "\").");
+		}
+	}
+
+	this->sites.push_back(site);
+}
+
 void generated_terrain::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();

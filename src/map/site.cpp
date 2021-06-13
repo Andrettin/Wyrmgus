@@ -270,19 +270,7 @@ void site::initialize()
 	}
 
 	if (this->get_map_template() != nullptr) {
-		if (this->get_pos().x() != -1 && this->get_pos().y() != -1) {
-			auto find_iterator = this->map_template->sites_by_position.find(this->get_pos());
-			if (find_iterator == this->map_template->sites_by_position.end()) {
-				this->map_template->sites_by_position[this->get_pos()] = this;
-			} else {
-				//allow multiple celestial sites to occupy the same position, as some stars might end up in the same position
-				if (this->get_astrocoordinate().is_null()) {
-					throw std::runtime_error("Position " + point::to_string(this->get_pos()) + " of map template \"" + this->map_template->get_identifier() + "\" already has a site (\"" + find_iterator->second->get_identifier() + "\").");
-				}
-			}
-		}
-
-		this->map_template->sites.push_back(this);
+		this->map_template->add_site(this);
 	}
 
 	//create the site's game data object

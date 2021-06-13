@@ -156,6 +156,11 @@ public:
 
 	QPoint to_circle_edge_point() const;
 
+	std::string to_string() const
+	{
+		return "(" + this->get_longitude().to_string() + ", " + this->get_latitude().to_string() + ")";
+	}
+
 	constexpr bool operator ==(const geocoordinate &other) const
 	{
 		return this->get_longitude() == other.get_longitude() && this->get_latitude() == other.get_latitude();
@@ -164,6 +169,15 @@ public:
 	constexpr bool operator !=(const geocoordinate &other) const
 	{
 		return !((*this) == other);
+	}
+
+	constexpr bool operator <(const geocoordinate &other) const
+	{
+		if (this->get_longitude() != other.get_longitude()) {
+			return this->get_longitude() < other.get_longitude();
+		}
+
+		return this->get_latitude() < other.get_latitude();
 	}
 
 private:
