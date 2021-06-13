@@ -35,6 +35,7 @@
 #include "player.h"
 #include "script/effect/effect.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
 
@@ -67,6 +68,8 @@ public:
 
 		if (key == "unit_type") {
 			this->unit_type = unit_type::get(value);
+		} else if (key == "unit_class") {
+			this->unit_class = unit_class::get(value);
 		} else if (key == "character") {
 			this->character = character::get(value);
 		} else if (key == "site") {
@@ -93,8 +96,8 @@ public:
 
 	virtual void check() const override
 	{
-		if (this->unit_type == nullptr && this->character == nullptr) {
-			throw std::runtime_error("\"create_unit\" effect has neither a unit type nor a character.");
+		if (this->unit_type == nullptr && this->unit_class == nullptr && this->character == nullptr) {
+			throw std::runtime_error("\"create_unit\" effect has neither a unit type, nor a unit class nor a character.");
 		}
 
 		if (this->site != nullptr && this->map_template != nullptr) {
@@ -109,6 +112,17 @@ public:
 	virtual void do_assignment_effect(CPlayer *player) const override
 	{
 		const wyrmgus::unit_type *unit_type = this->get_unit_type();
+
+		if (unit_type == nullptr) {
+			if (this->unit_class != nullptr) {
+				unit_type = player->get_class_unit_type(this->unit_class);
+
+				if (unit_type == nullptr) {
+					return;
+				}
+			}
+		}
+
 		const QPoint unit_top_left_pos = this->get_tile_pos(player) - unit_type->get_tile_center_pos_offset();
 		const int map_layer = this->get_map_layer_index(player);
 
@@ -126,6 +140,8 @@ public:
 		std::string str = "Receive ";
 		if (this->character != nullptr) {
 			str += "the " + string::highlight(this->character->get_full_name()) + " character";
+		} else if (this->unit_class != nullptr) {
+			str += "a " + string::highlight(this->unit_class->get_name()) + " unit";
 		} else {
 			str += "a " + string::highlight(this->unit_type->get_name()) + " unit";
 		}
@@ -187,6 +203,7 @@ public:
 
 private:
 	const wyrmgus::unit_type *unit_type = nullptr; //the unit type to be created
+	const wyrmgus::unit_class *unit_class = nullptr; //the unit class to be created
 	wyrmgus::character *character = nullptr; //the character to be created
 	const wyrmgus::site *site = nullptr; //the site where the unit type is to be located, if any
 	const wyrmgus::map_template *map_template = nullptr; //the map template where the unit type is to be located, if any
