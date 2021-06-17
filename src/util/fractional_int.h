@@ -47,11 +47,12 @@ public:
 	static std::string to_rest_string(int rest)
 	{
 		std::string rest_str;
-		rest_str.resize(N);
 
 		rest = std::abs(rest);
 		if (rest > 0) {
+			rest_str.reserve(N + 1);
 			rest_str += ".";
+
 			int divisor = fractional_int::divisor;
 			for (int i = 0; i < N; ++i) {
 				if (rest == 0) {
