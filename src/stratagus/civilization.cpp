@@ -41,6 +41,7 @@
 #include "government_type.h"
 #include "name_generator.h"
 #include "player.h"
+#include "script/condition/condition.h"
 #include "script.h"
 #include "time/calendar.h"
 #include "ui/button.h"
@@ -722,9 +723,17 @@ bool civilization::is_tech_tree_entry(const unit_class *unit_class) const
 		return false;
 	}
 
+	if (unit_class->get_preconditions() != nullptr && !unit_class->get_preconditions()->check(this)) {
+		return false;
+	}
+
 	const unit_type *unit_type = this->get_class_unit_type(unit_class);
 
 	if (unit_type == nullptr) {
+		return false;
+	}
+
+	if (unit_type->get_preconditions() != nullptr && !unit_type->get_preconditions()->check(this)) {
 		return false;
 	}
 
@@ -745,9 +754,17 @@ bool civilization::is_tech_tree_entry(const upgrade_class *upgrade_class) const
 		return false;
 	}
 
+	if (upgrade_class->get_preconditions() != nullptr && !upgrade_class->get_preconditions()->check(this)) {
+		return false;
+	}
+
 	const CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
 
 	if (upgrade == nullptr) {
+		return false;
+	}
+
+	if (upgrade->get_preconditions() != nullptr && !upgrade->get_preconditions()->check(this)) {
 		return false;
 	}
 

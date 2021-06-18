@@ -44,6 +44,7 @@ public:
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void check_validity() const override;
+	virtual bool check(const civilization *civilization) const override;
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
 	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
 

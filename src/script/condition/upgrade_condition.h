@@ -45,6 +45,15 @@ public:
 
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
 
+	virtual bool check(const civilization *civilization) const override
+	{
+		if (this->upgrade->get_preconditions() != nullptr && !this->upgrade->get_preconditions()->check(civilization)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		Q_UNUSED(ignore_units)

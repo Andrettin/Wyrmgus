@@ -59,6 +59,17 @@ public:
 		}
 	}
 
+	virtual bool check(const civilization *civilization) const override
+	{
+		for (const auto &condition : this->conditions) {
+			if (condition->check(civilization)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		for (const auto &condition : this->conditions) {

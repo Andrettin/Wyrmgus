@@ -69,6 +69,25 @@ public:
 		}
 	}
 
+	virtual bool check(const civilization *civilization) const override
+	{
+		if (this->unit_class->get_preconditions() != nullptr && !this->unit_class->get_preconditions()->check(civilization)) {
+			return false;
+		}
+
+		const unit_type *unit_type = civilization->get_class_unit_type(this->unit_class);
+
+		if (unit_type == nullptr) {
+			return false;
+		}
+
+		if (unit_type->get_preconditions() != nullptr && !unit_type->get_preconditions()->check(civilization)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		if (ignore_units) {

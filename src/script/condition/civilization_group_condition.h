@@ -40,6 +40,11 @@ public:
 		this->group = civilization_group::get(value);
 	}
 
+	virtual bool check(const civilization *civilization) const override
+	{
+		return civilization->is_part_of_group(this->group);
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		Q_UNUSED(ignore_units)
@@ -48,7 +53,7 @@ public:
 			return false;
 		}
 
-		return player->get_civilization()->is_part_of_group(this->group);
+		return this->check(player->get_civilization());
 	}
 
 	virtual std::string get_string(const size_t indent) const override

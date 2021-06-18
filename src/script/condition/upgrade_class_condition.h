@@ -43,6 +43,25 @@ public:
 		this->upgrade_class = upgrade_class::get(value);
 	}
 
+	virtual bool check(const civilization *civilization) const override
+	{
+		if (this->upgrade_class->get_preconditions() != nullptr && !this->upgrade_class->get_preconditions()->check(civilization)) {
+			return false;
+		}
+
+		const CUpgrade *upgrade = civilization->get_class_upgrade(this->upgrade_class);
+
+		if (upgrade == nullptr) {
+			return false;
+		}
+
+		if (upgrade->get_preconditions() != nullptr && !upgrade->get_preconditions()->check(civilization)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		Q_UNUSED(ignore_units)

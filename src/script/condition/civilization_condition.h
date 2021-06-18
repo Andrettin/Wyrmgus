@@ -39,11 +39,16 @@ public:
 		this->civilization = civilization::get(value);
 	}
 
+	virtual bool check(const civilization *civilization) const override
+	{
+		return civilization == this->civilization;
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		Q_UNUSED(ignore_units)
 
-		return player->get_civilization() == this->civilization;
+		return this->check(player->get_civilization());
 	}
 
 	virtual std::string get_string(const size_t indent) const override

@@ -34,11 +34,9 @@ class CUpgrade;
 namespace wyrmgus {
 
 class button;
-class season;
-class site;
+class civilization;
 class sml_data;
 class sml_property;
-class trigger;
 class unit_type;
 
 class condition
@@ -86,6 +84,13 @@ public:
 
 	virtual void check_validity() const
 	{
+	}
+
+	virtual bool check(const civilization *civilization) const
+	{
+		//check whether a civilization can, in principle, fulfill the condition
+		Q_UNUSED(civilization)
+		return true;
 	}
 
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const = 0;
