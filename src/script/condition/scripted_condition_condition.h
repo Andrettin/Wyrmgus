@@ -39,6 +39,11 @@ public:
 		this->scripted_condition = scripted_condition::get(value);
 	}
 
+	virtual bool check(const civilization *civilization) const override
+	{
+		return this->scripted_condition->get_conditions()->check(civilization);
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		return this->scripted_condition->get_conditions()->check(player, ignore_units);
