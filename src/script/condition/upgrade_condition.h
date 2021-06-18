@@ -51,6 +51,10 @@ public:
 			return false;
 		}
 
+		if (this->upgrade->get_conditions() != nullptr && !this->upgrade->get_conditions()->check(civilization)) {
+			return false;
+		}
+
 		return true;
 	}
 

@@ -75,6 +75,10 @@ public:
 			return false;
 		}
 
+		if (this->unit_class->get_conditions() != nullptr && !this->unit_class->get_conditions()->check(civilization)) {
+			return false;
+		}
+
 		const unit_type *unit_type = civilization->get_class_unit_type(this->unit_class);
 
 		if (unit_type == nullptr) {
@@ -82,6 +86,10 @@ public:
 		}
 
 		if (unit_type->get_preconditions() != nullptr && !unit_type->get_preconditions()->check(civilization)) {
+			return false;
+		}
+
+		if (unit_type->get_conditions() != nullptr && !unit_type->get_conditions()->check(civilization)) {
 			return false;
 		}
 

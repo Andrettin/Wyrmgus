@@ -76,6 +76,10 @@ public:
 			return false;
 		}
 
+		if (this->unit_type->get_conditions() != nullptr && !this->unit_type->get_conditions()->check(civilization)) {
+			return false;
+		}
+
 		return true;
 	}
 

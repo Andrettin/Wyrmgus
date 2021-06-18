@@ -727,6 +727,10 @@ bool civilization::is_tech_tree_entry(const unit_class *unit_class) const
 		return false;
 	}
 
+	if (unit_class->get_conditions() != nullptr && !unit_class->get_conditions()->check(this)) {
+		return false;
+	}
+
 	const unit_type *unit_type = this->get_class_unit_type(unit_class);
 
 	if (unit_type == nullptr) {
@@ -734,6 +738,10 @@ bool civilization::is_tech_tree_entry(const unit_class *unit_class) const
 	}
 
 	if (unit_type->get_preconditions() != nullptr && !unit_type->get_preconditions()->check(this)) {
+		return false;
+	}
+
+	if (unit_type->get_conditions() != nullptr && !unit_type->get_conditions()->check(this)) {
 		return false;
 	}
 
@@ -758,6 +766,10 @@ bool civilization::is_tech_tree_entry(const upgrade_class *upgrade_class) const
 		return false;
 	}
 
+	if (upgrade_class->get_conditions() != nullptr && !upgrade_class->get_conditions()->check(this)) {
+		return false;
+	}
+
 	const CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
 
 	if (upgrade == nullptr) {
@@ -765,6 +777,10 @@ bool civilization::is_tech_tree_entry(const upgrade_class *upgrade_class) const
 	}
 
 	if (upgrade->get_preconditions() != nullptr && !upgrade->get_preconditions()->check(this)) {
+		return false;
+	}
+
+	if (upgrade->get_conditions() != nullptr && !upgrade->get_conditions()->check(this)) {
 		return false;
 	}
 

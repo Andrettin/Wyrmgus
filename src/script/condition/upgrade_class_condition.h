@@ -48,6 +48,9 @@ public:
 		if (this->upgrade_class->get_preconditions() != nullptr && !this->upgrade_class->get_preconditions()->check(civilization)) {
 			return false;
 		}
+		if (this->upgrade_class->get_conditions() != nullptr && !this->upgrade_class->get_conditions()->check(civilization)) {
+			return false;
+		}
 
 		const CUpgrade *upgrade = civilization->get_class_upgrade(this->upgrade_class);
 
@@ -56,6 +59,10 @@ public:
 		}
 
 		if (upgrade->get_preconditions() != nullptr && !upgrade->get_preconditions()->check(civilization)) {
+			return false;
+		}
+
+		if (upgrade->get_conditions() != nullptr && !upgrade->get_conditions()->check(civilization)) {
 			return false;
 		}
 
