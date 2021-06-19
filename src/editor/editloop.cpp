@@ -871,19 +871,14 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
 		const int x = UI.ButtonPanel.Buttons[j].X;
 		const int y = UI.ButtonPanel.Buttons[j].Y;
-		//Wyrmgus start
-//		if (i >= (int) Editor.ShownUnitTypes.size()) {
-		if (i >= (int) Editor.ShownUnitTypes.size() + 1) {
-		//Wyrmgus end
+		if (i >= (int) Editor.ShownUnitTypes.size()) {
 			//Wyrmgus start
 //			return;
 			break;
-			//Wyrmgus emd
+			//Wyrmgus end
 		}
-		//Wyrmgus start
-//		wyrmgus::icon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
-		const icon *icon = (i != (int) Editor.ShownUnitTypes.size()) ? Editor.ShownUnitTypes[i]->get_icon() : icon::get("icon-level-up");
-		//Wyrmgus end
+
+		const icon *icon = Editor.ShownUnitTypes[i]->get_icon();
 		const PixelPos pos(x, y);
 
 		unsigned int flag = 0;
@@ -926,16 +921,12 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 	//Wyrmgus start
 	i = Editor.UnitIndex;
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
-		if (i >= (int) Editor.ShownUnitTypes.size() + 1) {
+		if (i >= (int) Editor.ShownUnitTypes.size()) {
 			break;
 		}
 		
 		if (i == Editor.CursorUnitIndex) {
-			if (i == (int) Editor.ShownUnitTypes.size()) {
-				DrawGenericPopup("Create Unit Type", UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y, render_commands);
-			} else {
-				DrawPopup(*CurrentButtons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y, render_commands);
-			}
+			DrawPopup(*CurrentButtons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y, render_commands);
 		}
 		
 		++i;
@@ -1595,23 +1586,6 @@ static void EditorCallbackButtonUp(unsigned button, const Qt::KeyboardModifiers 
 	if ((1 << button) == LeftButton) {
 		UnitPlacedThisPress = false;
 	}
-	//Wyrmgus start
-	if (Editor.State == EditorEditUnit) {
-		if (Editor.CursorUnitIndex != -1) {
-			if (Editor.CursorUnitIndex == (int) Editor.ShownUnitTypes.size()) {
-				if ((1 << button) == LeftButton) {
-					Editor.SelectedUnitIndex = -1;
-					Editor.CursorUnitIndex = -1;
-					CursorBuilding = nullptr;
-					std::array<char, 256> buf{};
-					snprintf(buf.data(), buf.size(), "if (EditorCreateUnitType() ~= nil) then EditorCreateUnitType() end;");
-					CclCommand(buf.data());
-					return;
-				}
-			}
-		}
-	}
-	//Wyrmgus end
 }
 
 /**
@@ -1724,15 +1698,8 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 					Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
 					CursorBuilding = Editor.ShownUnitTypes[Editor.CursorUnitIndex];
 					return;
-				} else if (MouseButtons & RightButton) {
-					std::array<char, 256> buf{};
-					snprintf(buf.data(), buf.size(), "if (EditUnitTypeProperties ~= nil) then EditUnitTypeProperties(\"%s\") end;", Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
-					Editor.CursorUnitIndex = -1;
-					CclCommand(buf.data());
-					return;
 				}
 			}
-			//Wyrmgus end
 		}
 	}
 
