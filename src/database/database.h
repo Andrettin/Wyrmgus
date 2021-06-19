@@ -92,6 +92,14 @@ public:
 
 	static std::filesystem::path get_documents_path();
 	static std::filesystem::path get_user_data_path();
+
+	static std::filesystem::path get_user_maps_path()
+	{
+		std::filesystem::path path = database::get_user_data_path() / database::maps_folder;
+		database::ensure_path_exists(path);
+		return path;
+	}
+
 	static void ensure_path_exists(const std::filesystem::path &path);
 
 	static void parse_folder(const std::filesystem::path &path, std::vector<sml_data> &sml_data_list);

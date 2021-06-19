@@ -124,6 +124,13 @@ QString engine_interface::get_save_path() const
 	return QString::fromStdString(save_path.string());
 }
 
+QString engine_interface::get_user_maps_path() const
+{
+	std::filesystem::path path = database::get_user_maps_path();
+	path.make_preferred();
+	return QString::fromStdString(path.string());
+}
+
 void engine_interface::call_lua_command(const QString &command)
 {
 	this->post([command]() {
