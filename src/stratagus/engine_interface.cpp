@@ -239,6 +239,18 @@ QVariantList engine_interface::get_playable_civilizations() const
 	return container::to_qvariant_list(playable_civilizations);
 }
 
+void engine_interface::load_map_info(const std::filesystem::path &filepath)
+{
+	CMap::get()->get_info()->Clear();
+
+	LuaLoadFile(filepath.string());
+	CMap::get()->get_info()->set_presentation_filepath(filepath);
+
+	this->map_infos.push_back(CMap::get()->get_info()->duplicate());
+
+	CMap::get()->get_info()->Clear();
+}
+
 void engine_interface::load_map_infos()
 {
 	this->clear_map_infos();
@@ -259,16 +271,9 @@ void engine_interface::load_map_infos()
 						continue;
 					}
 
-					CMap::get()->get_info()->Clear();
-
-					LuaLoadFile(dir_entry.path().string());
-					CMap::get()->get_info()->set_presentation_filepath(dir_entry.path());
-
-					this->map_infos.push_back(CMap::get()->get_info()->duplicate());
+					this->load_map_info(dir_entry.path());
 				}
 			}
-
-			CMap::get()->get_info()->Clear();
 		} catch (const std::exception &exception) {
 			exception::report(exception);
 		}
@@ -312,7 +317,7 @@ QVariantList engine_interface::get_map_infos(const QString &world) const
 	const std::string world_str = world.toStdString();
 
 	for (const auto &map_info : this->map_infos) {
-		if (map_info->MapWorld != world_str) {
+		if (!world_str.empty() && map_info->MapWorld != world_str) {
 			continue;
 		}
 

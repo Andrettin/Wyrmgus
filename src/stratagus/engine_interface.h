@@ -192,10 +192,17 @@ public:
 	Q_INVOKABLE QVariantList get_visible_campaigns() const;
 	Q_INVOKABLE QVariantList get_playable_civilizations() const;
 
+	void load_map_info(const std::filesystem::path &filepath);
+
+	Q_INVOKABLE void load_map_info(const QString &filepath)
+	{
+		this->load_map_info(filepath.toStdString());
+	}
+
 	Q_INVOKABLE void load_map_infos();
 	Q_INVOKABLE void clear_map_infos();
 	Q_INVOKABLE QStringList get_map_worlds() const;
-	Q_INVOKABLE QVariantList get_map_infos(const QString &world) const;
+	Q_INVOKABLE QVariantList get_map_infos(const QString &world = "") const;
 
 	Q_INVOKABLE QVariantList get_achievements() const;
 	Q_INVOKABLE QVariantList get_legacy_quests() const;
