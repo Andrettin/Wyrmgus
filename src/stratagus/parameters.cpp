@@ -55,7 +55,6 @@ void parameters::process()
 	QCommandLineParser cmd_parser;
 
 	QList<QCommandLineOption> options {
-		{ { "e", "editor" }, "Start editor instead of game." },
 		{ { "D", "video-depth" }, "Video mode depth (pixel per point).", "depth" },
 		{ { "c", "config" }, "Configuration start file (default is 'stratagus.lua').", "config file" },
 		{
@@ -115,10 +114,6 @@ void parameters::process()
 	option = "D";
 	if (cmd_parser.isSet(option)) {
 		Video.Depth = cmd_parser.value(option).toInt();
-	}
-
-	if (cmd_parser.isSet("e")) {
-		Editor.Running = EditorCommandLine;
 	}
 
 	option = "E";

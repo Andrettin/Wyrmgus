@@ -43,7 +43,6 @@ namespace wyrmgus {
 enum EditorRunningType {
 	EditorNotRunning = 0,    /// Not Running
 	EditorStarted = 1,       /// Editor Enabled at all
-	EditorCommandLine = 2,   /// Called from Command Line
 	EditorEditing = 4        /// Editor is fully running
 };
 
