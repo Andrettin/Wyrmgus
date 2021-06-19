@@ -2521,13 +2521,18 @@ void CEditor::Init()
 */
 int EditorSaveMap(const std::string &file)
 {
-	std::string fullName;
-	fullName = wyrmgus::database::get()->get_root_path().string() + "/" + file;
-	if (SaveStratagusMap(fullName, *CMap::get(), Editor.TerrainEditable) == -1) {
+	if (SaveStratagusMap(file, *CMap::get(), Editor.TerrainEditable) == -1) {
 		fprintf(stderr, "Cannot save map\n");
 		return -1;
 	}
 	return 0;
+}
+
+std::string get_user_maps_path()
+{
+	std::filesystem::path path = database::get_user_maps_path();
+	path.make_preferred();
+	return path.string();
 }
 
 /*----------------------------------------------------------------------------

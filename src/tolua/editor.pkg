@@ -18,3 +18,4 @@ extern CEditor Editor;
 
 void StartEditor(const std::string filename);
 int EditorSaveMap(const std::string file);
+std::string get_user_maps_path();

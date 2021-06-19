@@ -116,6 +116,8 @@ extern void EditorActionRemoveUnit(CUnit &unit, bool display = true);
 /// Save a map from editor
 extern int EditorSaveMap(const std::string &file);
 
+extern std::string get_user_maps_path();
+
 /// Register ccl features
 extern void EditorCclRegister();
 

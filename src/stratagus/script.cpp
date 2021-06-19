@@ -3094,7 +3094,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask, int sortmo
 	// security: disallow all special characters
 	//Wyrmgus start
 //	if (strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) {
-	if ((strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) && (strstr(userdir, "workshop") == 0 || strstr(userdir, "content") == 0 || strstr(userdir, "370070") == 0)) { //special case for Wyrmsun's workshop folder
+	if ((strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) && (strstr(userdir, "workshop") == 0 || strstr(userdir, "content") == 0 || strstr(userdir, "370070") == 0) && strstr(userdir, get_user_maps_path().c_str()) == 0) { //special case for Wyrmsun's workshop folder
 	//Wyrmgus end
 		LuaError(l, "Forbidden directory");
 	}
