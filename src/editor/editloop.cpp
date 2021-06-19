@@ -90,9 +90,6 @@ static char TileToolDecoration;  /// Tile tool draws with decorations
 static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
 static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
 static bool UpdateMinimap = false;        /// Update units on the minimap
-//Wyrmgus start
-static bool IsMod = false;				  /// Whether the current "map" is a mod
-//Wyrmgus end
 static int MirrorEdit = 0;                /// Mirror editing enabled
 static int VisibleUnitIcons;              /// Number of icons that are visible at a time
 static int VisibleTileIcons;
@@ -2382,7 +2379,7 @@ void CEditor::Init()
 
 	//Wyrmgus start
 //	if (!*CurrentMapPath) { // new map!
-	if (CurrentMapPath.empty() || IsMod) { // new map or is a mod
+	if (CurrentMapPath.empty()) { // new map or is a mod
 	//Wyrmgus end
 		InitUnitTypes(1);
 		//
@@ -2444,10 +2441,10 @@ void CEditor::Init()
 	//Wyrmgus start
 	}
 	if (CurrentMapPath.empty()) {
-		CreateGame("", CMap::get(), IsMod);
+		CreateGame("", CMap::get());
 	//Wyrmgus end
 	} else {
-		CreateGame(CurrentMapPath, CMap::get(), IsMod);
+		CreateGame(CurrentMapPath, CMap::get());
 	}
 
 	ReplayRevealMap = 1;
@@ -2522,50 +2519,11 @@ void CEditor::Init()
 **         At least two players, one human slot, every player a startpoint
 **         ...
 */
-//Wyrmgus start
-//int EditorSaveMap(const std::string &file)
-int EditorSaveMap(const std::string &file, bool is_mod)
-//Wyrmgus end
+int EditorSaveMap(const std::string &file)
 {
 	std::string fullName;
 	fullName = wyrmgus::database::get()->get_root_path().string() + "/" + file;
-	//Wyrmgus start
-	if (is_mod) { // if is a mod, save the file in a folder of the same name as the file's name
-		std::string file_name;
-		std::string path_name;
-		int name_size = fullName.length();
-		for (int i = (name_size - 1); i >= 0; --i) {
-			if (fullName[i] == '/') {
-				file_name = fullName.substr(i + 1, (name_size - i - 1));
-				path_name = fullName.substr(0, i);
-				break;
-			}
-		}
-		std::string previous_path_name;
-		name_size = path_name.length();
-		for (int i = (name_size - 1); i >= 0; --i) {
-			if (path_name[i] == '/') {
-				previous_path_name = path_name.substr(i + 1, (name_size - i - 1));
-				break;
-			}
-		}
-		std::string file_name_without_ending = FindAndReplaceString(file_name, ".gz", "");
-		file_name_without_ending = FindAndReplaceString(file_name_without_ending, ".smp", "");
-		
-		if (previous_path_name != file_name_without_ending) {
-			struct stat tmp;
-			
-			path_name += "/" + file_name_without_ending + "/";
-			if (stat(path_name.c_str(), &tmp) < 0) {
-				makedir(path_name.c_str(), 0777);
-			}
-			fullName = path_name + file_name;
-		}
-	}
-	
-//	if (SaveStratagusMap(fullName, *CMap::get(), Editor.TerrainEditable) == -1) {
-	if (SaveStratagusMap(fullName, *CMap::get(), Editor.TerrainEditable && !is_mod, is_mod) == -1) {
-	//Wyrmgus end
+	if (SaveStratagusMap(fullName, *CMap::get(), Editor.TerrainEditable) == -1) {
 		fprintf(stderr, "Cannot save map\n");
 		return -1;
 	}
@@ -2706,10 +2664,7 @@ void EditorMainLoop()
 **
 **  @param filename  Map to load, null to create a new map
 */
-//Wyrmgus start
-//void StartEditor(const std::string &filename)
-void StartEditor(const std::string &filename, bool is_mod)
-//Wyrmgus end
+void StartEditor(const std::string &filename)
 {
 	std::string nc, rc;
 
@@ -2727,8 +2682,6 @@ void StartEditor(const std::string &filename, bool is_mod)
 	if (!TileToolRandom) {
 		TileToolRandom ^= 1;
 	}
-	
-	IsMod = is_mod;
 	//Wyrmgus end
 	
 	//Wyrmgus start

@@ -16,9 +16,5 @@ class CEditor
 
 extern CEditor Editor;
 
-//Wyrmgus start
-//void StartEditor(const std::string filename);
-//int EditorSaveMap(const std::string file);
-void StartEditor(const std::string filename, bool is_mod = false);
-int EditorSaveMap(const std::string file, bool is_mod = false);
-//Wyrmgus end
+void StartEditor(const std::string filename);
+int EditorSaveMap(const std::string file);

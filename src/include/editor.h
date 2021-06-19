@@ -102,10 +102,7 @@ extern CEditor Editor;
 extern char TileToolRandom;
 
 /// Start the editor
-//Wyrmgus start
-//extern void StartEditor(const std::string &filename);
-extern void StartEditor(const std::string &filename, const bool is_mod = false);
-//Wyrmgus end
+extern void StartEditor(const std::string &filename);
 
 /// Editor main event loop
 extern void EditorMainLoop();
@@ -117,10 +114,7 @@ extern void EditorActionRemoveUnit(CUnit &unit, bool display = true);
 //Wyrmgus end
 
 /// Save a map from editor
-//Wyrmgus start
-//extern int EditorSaveMap(const std::string &file);
-extern int EditorSaveMap(const std::string &file, bool is_mod = false);
-//Wyrmgus end
+extern int EditorSaveMap(const std::string &file);
 
 /// Register ccl features
 extern void EditorCclRegister();

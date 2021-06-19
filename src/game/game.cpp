@@ -538,10 +538,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 }
 
 // Write the map presentation file
-//Wyrmgus start
-//static int WriteMapPresentation(const std::string &mapname, CMap &map)
-static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_mod)
-//Wyrmgus end
+static int WriteMapPresentation(const std::string &mapname, CMap &map)
 {
 	static constexpr std::array<const char *, 8> type = {"", "", "neutral", "nobody", "computer", "person", "rescue-passive", "rescue-active" };
 
@@ -575,26 +572,21 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_m
 				  map.Info.MapUID + 1);
 		*/
 
-		if (!is_mod) {
-			f->printf("DefinePlayerTypes(");
-			while (topplayer > 0 && map.Info->PlayerType[topplayer] == PlayerNobody) {
-				--topplayer;
-			}
-			for (int i = 0; i <= topplayer; ++i) {
-				f->printf("%s\"%s\"", (i ? ", " : ""), type[map.Info->PlayerType[i]]);
-				if (map.Info->PlayerType[i] == PlayerPerson) {
-					++numplayers;
-				}
-			}
-			f->printf(")\n");
-
-			f->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
-					  map.Info->get_name().c_str(), numplayers, map.Info->MapWidth, map.Info->MapHeight,
-					  map.Info->MapUID + 1);
-		} else {
-			f->printf("PresentMap(\"%s\")\n", map.Info->get_name().c_str());
+		f->printf("DefinePlayerTypes(");
+		while (topplayer > 0 && map.Info->PlayerType[topplayer] == PlayerNobody) {
+			--topplayer;
 		}
-		//Wyrmgus end
+		for (int i = 0; i <= topplayer; ++i) {
+			f->printf("%s\"%s\"", (i ? ", " : ""), type[map.Info->PlayerType[i]]);
+			if (map.Info->PlayerType[i] == PlayerPerson) {
+				++numplayers;
+			}
+		}
+		f->printf(")\n");
+
+		f->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
+			map.Info->get_name().c_str(), numplayers, map.Info->MapWidth, map.Info->MapHeight,
+			map.Info->MapUID + 1);
 	} catch (const FileException &) {
 		fprintf(stderr, "ERROR: cannot write the map presentation\n");
 		return -1;
@@ -611,10 +603,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_m
 **  @param map           map to save
 **  @param writeTerrain  write the tiles map in the .sms
 */
-//Wyrmgus start
-//int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
-int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod)
-//Wyrmgus end
+int WriteMapSetup(const char *mapSetup, CMap &map, const int writeTerrain)
 {
 	std::unique_ptr<FileWriter> f;
 
@@ -860,69 +849,39 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}
 		//Wyrmgus end
 
-		//Wyrmgus start
-		/*
 		f->printf("-- player configuration\n");
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (Map.Info.PlayerType[i] == PlayerNobody) {
+			if (CMap::get()->Info->PlayerType[i] == PlayerNobody) {
 				continue;
 			}
-			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartPos.x, Players[i].StartPos.y);
+			f->printf("SetStartView(%d, %d, %d)\n", i, CPlayer::Players[i]->StartPos.x, CPlayer::Players[i]->StartPos.y);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-					  i, DefaultResourceNames[WoodCost].c_str(),
-					  Players[i].Resources[WoodCost]);
+				i, DefaultResourceNames[WoodCost].c_str(),
+				CPlayer::Players[i]->get_resource(resource::get_all()[WoodCost]));
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-					  i, DefaultResourceNames[GoldCost].c_str(),
-					  Players[i].Resources[GoldCost]);
+				i, defines::get()->get_wealth_resource()->get_identifier().c_str(),
+				CPlayer::Players[i]->get_resource(defines::get()->get_wealth_resource()));
+			if (CPlayer::Players[i]->get_resource(resource::get_all()[OilCost]) != 0) {
+				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
+					i, DefaultResourceNames[OilCost].c_str(),
+					CPlayer::Players[i]->get_resource(resource::get_all()[OilCost]));
+			}
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-					  i, DefaultResourceNames[OilCost].c_str(),
-					  Players[i].Resources[OilCost]);
+				i, DefaultResourceNames[StoneCost].c_str(),
+				CPlayer::Players[i]->get_resource(resource::get_all()[StoneCost]));
 			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-					  i, PlayerRaces.Name[Players[i].Race].c_str());
+				i, civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
+			if (CPlayer::Players[i]->Faction != -1) {
+				f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
+					i, CPlayer::Players[i]->get_faction()->get_identifier().c_str());
+			}
 			f->printf("SetAiType(%d, \"%s\")\n",
-					  i, Players[i].AiName.c_str());
+				i, CPlayer::Players[i]->AiName.c_str());
 		}
 		f->printf("\n");
 
 		f->printf("-- load tilesets\n");
 		f->printf("LoadTileModels(\"%s\")\n\n", map.TileModelsFileName.c_str());
-		*/
-		if (!is_mod) {
-			f->printf("-- player configuration\n");
-			for (int i = 0; i < PlayerMax; ++i) {
-				if (CMap::get()->Info->PlayerType[i] == PlayerNobody) {
-					continue;
-				}
-				f->printf("SetStartView(%d, %d, %d)\n", i, CPlayer::Players[i]->StartPos.x, CPlayer::Players[i]->StartPos.y);
-				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-						  i, DefaultResourceNames[WoodCost].c_str(),
-						  CPlayer::Players[i]->get_resource(resource::get_all()[WoodCost]));
-				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-						  i, defines::get()->get_wealth_resource()->get_identifier().c_str(),
-						  CPlayer::Players[i]->get_resource(defines::get()->get_wealth_resource()));
-				if (CPlayer::Players[i]->get_resource(resource::get_all()[OilCost]) != 0) {
-					f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-							  i, DefaultResourceNames[OilCost].c_str(),
-							  CPlayer::Players[i]->get_resource(resource::get_all()[OilCost]));
-				}
-				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-						  i, DefaultResourceNames[StoneCost].c_str(),
-						  CPlayer::Players[i]->get_resource(resource::get_all()[StoneCost]));
-				f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-						  i, civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
-				if (CPlayer::Players[i]->Faction != -1) {
-					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
-							  i, CPlayer::Players[i]->get_faction()->get_identifier().c_str());
-				}
-				f->printf("SetAiType(%d, \"%s\")\n",
-						  i, CPlayer::Players[i]->AiName.c_str());
-			}
-			f->printf("\n");
-
-			f->printf("-- load tilesets\n");
-			f->printf("LoadTileModels(\"%s\")\n\n", map.TileModelsFileName.c_str());
-		}
-		//Wyrmgus end
 
 		if (writeTerrain) {
 			f->printf("-- Tiles Map\n");
@@ -1052,89 +1011,58 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 		}
 		
-		//Wyrmgus start
-		/*
 		f->printf("\n-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
-		std::vector<CUnit *> teleporters;
-		for (auto it = unit_manager::get()->get_units().begin(); it != unit_manager::get()->get_units().end(); ++it) {
-			const CUnit &unit = **it;
+		std::vector<const CUnit *> teleporters;
+		for (const CUnit *unit : unit_manager::get()->get_units()) {
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
-					  unit.Type->Ident.c_str(),
-					  unit.Player->Index,
-					  unit.tilePos.x, unit.tilePos.y);
-			if (unit.Type->get_given_resource() != nullptr) {
-				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
+				unit->Type->Ident.c_str(),
+				unit->Player->Index,
+				unit->tilePos.x, unit->tilePos.y);
+			if (unit->Type->get_given_resource() != nullptr) {
+				f->printf("SetResourcesHeld(unit, %d)\n", unit->ResourcesHeld);
 			}
-			if (!unit.Active) { //Active is true by default
+			if (!unit->Active) { //Active is true by default
 				f->printf("SetUnitVariable(unit, \"Active\", false)\n");
 			}
-			if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
-				teleporters.push_back(*it);
-			}
-		}
-		f->printf("\n\n");
-		for (std::vector<CUnit *>::iterator it = teleporters.begin(); it != teleporters.end(); ++it) {
-			CUnit &unit = **it;
-			f->printf("SetTeleportDestination(%d, %d)\n", UnitNumber(unit), UnitNumber(*unit.Goal));
-		}
-		f->printf("\n\n");
-		*/
-		if (!is_mod) {
-			f->printf("\n-- place units\n");
-			f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
-			std::vector<const CUnit *> teleporters;
-			for (const CUnit *unit : unit_manager::get()->get_units()) {
-				f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
-						  unit->Type->Ident.c_str(),
-						  unit->Player->Index,
-						  unit->tilePos.x, unit->tilePos.y);
-				if (unit->Type->get_given_resource() != nullptr) {
-					f->printf("SetResourcesHeld(unit, %d)\n", unit->ResourcesHeld);
-				}
-				if (!unit->Active) { //Active is true by default
-					f->printf("SetUnitVariable(unit, \"Active\", false)\n");
-				}
-				if (unit->get_character() != nullptr) {
-					if (!unit->get_character()->Custom) {
-						f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit->get_character()->get_identifier().c_str());
-					} else {
-						f->printf("SetUnitVariable(unit, \"CustomHero\", \"%s\")\n", unit->get_character()->get_identifier().c_str());
-					}
+			if (unit->get_character() != nullptr) {
+				if (!unit->get_character()->Custom) {
+					f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit->get_character()->get_identifier().c_str());
 				} else {
-					if (!unit->Name.empty()) {
-						f->printf("SetUnitVariable(unit, \"Name\", \"%s\")\n", unit->Name.c_str());
-					}
+					f->printf("SetUnitVariable(unit, \"CustomHero\", \"%s\")\n", unit->get_character()->get_identifier().c_str());
 				}
-				if (unit->Trait != nullptr) {
-					f->printf("AcquireTrait(unit, \"%s\")\n", unit->Trait->get_identifier().c_str());
-				}
-				if (unit->Prefix != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Prefix\", \"%s\")\n", unit->Prefix->get_identifier().c_str());
-				}
-				if (unit->Suffix != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Suffix\", \"%s\")\n", unit->Suffix->get_identifier().c_str());
-				}
-				if (unit->Work != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Work\", \"%s\")\n", unit->Work->get_identifier().c_str());
-				}
-				if (unit->Elixir != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Elixir\", \"%s\")\n", unit->Elixir->get_identifier().c_str());
-				}
-				if (unit->Variable[HP_INDEX].Value != unit->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
-					f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit->Variable[HP_INDEX].Value);
-				}
-				if (unit->Type->BoolFlag[TELEPORTER_INDEX].value && unit->Goal) {
-					teleporters.push_back(unit);
+			} else {
+				if (!unit->Name.empty()) {
+					f->printf("SetUnitVariable(unit, \"Name\", \"%s\")\n", unit->Name.c_str());
 				}
 			}
-			f->printf("\n\n");
-			for (const CUnit *unit : teleporters) {
-				f->printf("SetTeleportDestination(%d, %d)\n", UnitNumber(*unit), UnitNumber(*unit->Goal));
+			if (unit->Trait != nullptr) {
+				f->printf("AcquireTrait(unit, \"%s\")\n", unit->Trait->get_identifier().c_str());
 			}
-			f->printf("\n\n");
+			if (unit->Prefix != nullptr) {
+				f->printf("SetUnitVariable(unit, \"Prefix\", \"%s\")\n", unit->Prefix->get_identifier().c_str());
+			}
+			if (unit->Suffix != nullptr) {
+				f->printf("SetUnitVariable(unit, \"Suffix\", \"%s\")\n", unit->Suffix->get_identifier().c_str());
+			}
+			if (unit->Work != nullptr) {
+				f->printf("SetUnitVariable(unit, \"Work\", \"%s\")\n", unit->Work->get_identifier().c_str());
+			}
+			if (unit->Elixir != nullptr) {
+				f->printf("SetUnitVariable(unit, \"Elixir\", \"%s\")\n", unit->Elixir->get_identifier().c_str());
+			}
+			if (unit->Variable[HP_INDEX].Value != unit->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
+				f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit->Variable[HP_INDEX].Value);
+			}
+			if (unit->Type->BoolFlag[TELEPORTER_INDEX].value && unit->Goal) {
+				teleporters.push_back(unit);
+			}
 		}
-		//Wyrmgus end
+		f->printf("\n\n");
+		for (const CUnit *unit : teleporters) {
+			f->printf("SetTeleportDestination(%d, %d)\n", UnitNumber(*unit), UnitNumber(*unit->Goal));
+		}
+		f->printf("\n\n");
 	} catch (const FileException &) {
 		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup);
 		return -1;
@@ -1152,10 +1080,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 **  @param map       map to save
 **  @param writeTerrain   write the tiles map in the .sms
 */
-//Wyrmgus start
-//int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
-int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain, bool is_mod)
-//Wyrmgus end
+int SaveStratagusMap(const std::string &mapName, CMap &map, const int writeTerrain)
 {
 	if (!map.Info->MapWidth || !map.Info->MapHeight) {
 		throw std::runtime_error(mapName + ": invalid Stratagus map");
@@ -1169,17 +1094,12 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain, bo
 	}
 
 	memcpy(setupExtension, ".sms", 4 * sizeof(char));
-	//Wyrmgus start
-//	if (WriteMapPresentation(mapName, map) == -1) {
-	if (WriteMapPresentation(mapName, map, is_mod) == -1) {
-	//Wyrmgus end
+
+	if (WriteMapPresentation(mapName, map) == -1) {
 		return -1;
 	}
 
-	//Wyrmgus start
-//	return WriteMapSetup(mapSetup, map, writeTerrain);
-	return WriteMapSetup(mapSetup, map, writeTerrain, is_mod);
-	//Wyrmgus end
+	return WriteMapSetup(mapSetup, map, writeTerrain);
 }
 
 
@@ -1189,10 +1109,7 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain, bo
 **  @param filename  map filename
 **  @param map       map loaded
 */
-//Wyrmgus start
-//static void LoadMap(const std::string &filename, CMap &map)
-static void LoadMap(const std::string &filename, CMap &map, bool is_mod)
-//Wyrmgus end
+static void LoadMap(const std::string &filename, CMap &map)
 {
 	const char *name = filename.c_str();
 	const char *tmp = strrchr(name, '.');
@@ -1222,17 +1139,8 @@ static void LoadMap(const std::string &filename, CMap &map, bool is_mod)
 				LoadStratagusMapInfo(filename);
 			}
 			Assert(!map.Info->get_setup_filepath().empty());
-			//Wyrmgus start
-//			map.Create();
-//			LoadStratagusMap(filename, map.Info.Filename);
-			if (!is_mod) {
-				map.Create();
-				LoadStratagusMap(filename, map.Info->get_setup_filepath().string());
-			} else {
-				DisableMod(LibraryFileName(map.Info->get_setup_filepath().string().c_str()));
-				LuaLoadFile(LibraryFileName(map.Info->get_setup_filepath().string().c_str()));
-			}
-			//Wyrmgus end
+			map.Create();
+			LoadStratagusMap(filename, map.Info->get_setup_filepath().string());
 			return;
 		}
 	}
@@ -1551,10 +1459,7 @@ void Settings::reset()
 **
 **  @todo FIXME: use in this function InitModules / LoadModules!!!
 */
-//Wyrmgus start
-//void CreateGame(const std::string &filename, CMap *map)
-void CreateGame(const std::string &filename, CMap *map, bool is_mod)
-//Wyrmgus end
+void CreateGame(const std::string &filename, CMap *map)
 {
 	if (SaveGameLoading) {
 		SaveGameLoading = false;
@@ -1621,13 +1526,8 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		//
 		// Load the map.
 		//
-		//Wyrmgus start
-//		InitUnitTypes(1);
-		if (!is_mod) {
-			InitUnitTypes(1);
-		}
-//		LoadMap(filename, *map);
-		LoadMap(filename, *map, is_mod);
+		InitUnitTypes(1);
+		LoadMap(filename, *map);
 		//Wyrmgus end
 		ApplyUpgrades();
 	}

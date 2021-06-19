@@ -112,12 +112,7 @@ enum GameTypes {
 
 extern Settings GameSettings;  /// Game settings
 
-/// Show stats
-extern void ShowStats();
 /// Create a game
-//Wyrmgus start
-//extern void CreateGame(const std::string &filename, CMap *map);
-extern void CreateGame(const std::string &filename, CMap *map, bool is_mod = false);
-//Wyrmgus end
+extern void CreateGame(const std::string &filename, CMap *map);
 /// Init Setting to default values
 extern void InitSettings();

@@ -452,10 +452,7 @@ extern void MapCclRegister();
 // mixed sources
 //
 /// Save a stratagus map (smp format)
-//Wyrmgus start
-//extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTerrain);
-extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTerrain, bool is_mod = false);
-//Wyrmgus end
+extern int SaveStratagusMap(const std::string &filename, CMap &map, const int writeTerrain);
 
 
 /// Load map presentation
