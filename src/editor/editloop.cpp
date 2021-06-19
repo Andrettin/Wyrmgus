@@ -2615,83 +2615,81 @@ void EditorMainLoop()
 
 	UpdateMinimap = true;
 
-	while (true) {
-		Editor.Running = EditorEditing;
+	Editor.Running = EditorEditing;
 
-		Editor.Init();
+	Editor.Init();
 
-		if (first_init) {
-			first_init = false;
-			//Wyrmgus start
+	if (first_init) {
+		first_init = false;
+		//Wyrmgus start
 //			editorUnitSlider->setSize(ButtonPanelWidth/*176*/, 16);
 //			editorSlider->setSize(ButtonPanelWidth/*176*/, 16);
-			editorUnitSlider->setSize((218 - 24 - 6) * scale_factor, 16 * scale_factor); // adapt to new UI size, should make this more scriptable
-			editorSlider->setSize((218 - 24 - 6) * scale_factor, 16 * scale_factor);
-			//Wyrmgus end
-			//Wyrmgus start
+		editorUnitSlider->setSize((218 - 24 - 6) * scale_factor, 16 * scale_factor); // adapt to new UI size, should make this more scriptable
+		editorSlider->setSize((218 - 24 - 6) * scale_factor, 16 * scale_factor);
+		//Wyrmgus end
+		//Wyrmgus start
 //			editorContainer->add(editorUnitSlider.get(), UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
 //			editorContainer->add(editorSlider.get(), UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
-			editorContainer->add(editorUnitSlider.get(), UI.InfoPanel.X + 12 * scale_factor, UI.InfoPanel.Y + (160 - 24) * scale_factor);
-			editorContainer->add(editorSlider.get(), UI.InfoPanel.X + 12 * scale_factor, UI.InfoPanel.Y + (160 - 24) * scale_factor);
-			//Wyrmgus end
-		}
-		//ProcessMenu("menu-editor-tips", 1);
-		current_interface_state = interface_state::normal;
-
-		SetVideoSync();
-
-		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
-		current_interface_state = interface_state::normal;
-		Editor.State = EditorSelecting;
-		UI.SelectedViewport = UI.Viewports;
-		TileCursorSize = 1;
-
-		game::get()->set_running(true); //should use something different instead?
-
-		engine_interface::get()->set_waiting_for_interface(true);
-		engine_interface::get()->get_map_view_created_future().wait();
-		engine_interface::get()->reset_map_view_created_promise();
-		engine_interface::get()->set_waiting_for_interface(false);
-
-		engine_interface::get()->set_loading_message("");
-
-		while (Editor.Running) {
-			engine_interface::get()->run_event_loop();
-
-			CheckMusicFinished();
-
-			if (FrameCounter % FRAMES_PER_SECOND == 0) {
-				if (UpdateMinimap) {
-					UI.get_minimap()->Update();
-					UpdateMinimap = false;
-				}
-			}
-
-			EditorUpdateDisplay();
-
-			//
-			// Map scrolling
-			//
-			if (UI.MouseScroll) {
-				DoScrollArea(MouseScrollState, 0, MouseScrollState == 0 && KeyScrollState > 0, stored_key_modifiers);
-			}
-			if (UI.KeyScroll) {
-				DoScrollArea(KeyScrollState, (stored_key_modifiers & Qt::ControlModifier) != 0, MouseScrollState == 0 && KeyScrollState > 0, stored_key_modifiers);
-				if (CursorOn == cursor_on::map && (MouseButtons & LeftButton) &&
-					(Editor.State == EditorEditTile ||
-					 Editor.State == EditorEditUnit)) {
-					EditorCallbackButtonDown(0, stored_key_modifiers);
-				}
-			}
-
-			WaitEventsOneFrame();
-		}
-
-		game::get()->clear_results();
-		game::get()->set_running(false); //should use something different instead?
-
-		CursorBuilding = nullptr;
+		editorContainer->add(editorUnitSlider.get(), UI.InfoPanel.X + 12 * scale_factor, UI.InfoPanel.Y + (160 - 24) * scale_factor);
+		editorContainer->add(editorSlider.get(), UI.InfoPanel.X + 12 * scale_factor, UI.InfoPanel.Y + (160 - 24) * scale_factor);
+		//Wyrmgus end
 	}
+	//ProcessMenu("menu-editor-tips", 1);
+	current_interface_state = interface_state::normal;
+
+	SetVideoSync();
+
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
+	current_interface_state = interface_state::normal;
+	Editor.State = EditorSelecting;
+	UI.SelectedViewport = UI.Viewports;
+	TileCursorSize = 1;
+
+	game::get()->set_running(true); //should use something different instead?
+
+	engine_interface::get()->set_waiting_for_interface(true);
+	engine_interface::get()->get_map_view_created_future().wait();
+	engine_interface::get()->reset_map_view_created_promise();
+	engine_interface::get()->set_waiting_for_interface(false);
+
+	engine_interface::get()->set_loading_message("");
+
+	while (Editor.Running) {
+		engine_interface::get()->run_event_loop();
+
+		CheckMusicFinished();
+
+		if (FrameCounter % FRAMES_PER_SECOND == 0) {
+			if (UpdateMinimap) {
+				UI.get_minimap()->Update();
+				UpdateMinimap = false;
+			}
+		}
+
+		EditorUpdateDisplay();
+
+		//
+		// Map scrolling
+		//
+		if (UI.MouseScroll) {
+			DoScrollArea(MouseScrollState, 0, MouseScrollState == 0 && KeyScrollState > 0, stored_key_modifiers);
+		}
+		if (UI.KeyScroll) {
+			DoScrollArea(KeyScrollState, (stored_key_modifiers & Qt::ControlModifier) != 0, MouseScrollState == 0 && KeyScrollState > 0, stored_key_modifiers);
+			if (CursorOn == cursor_on::map && (MouseButtons & LeftButton) &&
+				(Editor.State == EditorEditTile ||
+					Editor.State == EditorEditUnit)) {
+				EditorCallbackButtonDown(0, stored_key_modifiers);
+			}
+		}
+
+		WaitEventsOneFrame();
+	}
+
+	game::get()->clear_results();
+	game::get()->set_running(false); //should use something different instead?
+
+	CursorBuilding = nullptr;
 
 	CommandLogDisabled = OldCommandLogDisabled;
 	SetCallbacks(old_callbacks);
