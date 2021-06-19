@@ -502,4 +502,14 @@ QObject *engine_interface::get_link_target(const QString &link_str) const
 	}
 }
 
+int engine_interface::get_max_map_width() const
+{
+	return MaxMapWidth;
+}
+
+int engine_interface::get_max_map_height() const
+{
+	return MaxMapHeight;
+}
+
 }

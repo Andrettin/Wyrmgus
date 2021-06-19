@@ -54,6 +54,8 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(QString save_path READ get_save_path CONSTANT)
 	Q_PROPERTY(QString loading_message READ get_loading_message NOTIFY loading_message_changed)
 	Q_PROPERTY(QVariantList custom_heroes READ get_custom_heroes NOTIFY custom_heroes_changed)
+	Q_PROPERTY(int max_map_width READ get_max_map_width CONSTANT)
+	Q_PROPERTY(int max_map_height READ get_max_map_height CONSTANT)
 
 public:
 	engine_interface();
@@ -217,6 +219,9 @@ public:
 	Q_INVOKABLE QVariantList get_world_encyclopedia_entries() const;
 
 	Q_INVOKABLE QObject *get_link_target(const QString &link_str) const;
+
+	int get_max_map_width() const;
+	int get_max_map_height() const;
 
 signals:
 	void running_changed();
