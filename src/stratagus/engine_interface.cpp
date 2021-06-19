@@ -166,6 +166,7 @@ void engine_interface::exit()
 	this->post([]() {
 		if (Editor.Running) {
 			Editor.Running = EditorNotRunning;
+			GameResult = GameExit;
 		} else {
 			StopGame(GameExit);
 		}
