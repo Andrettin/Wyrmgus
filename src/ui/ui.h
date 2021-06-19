@@ -507,6 +507,8 @@ extern void RestrictCursorToViewport();
 /// Restrict mouse cursor to minimap
 extern void RestrictCursorToMinimap();
 
+extern void MouseScrollMap(const PixelPos &pos, const Qt::KeyboardModifiers key_modifiers);
+
 /// Get viewport for screen pixel position
 extern CViewport *GetViewport(const PixelPos &screenPos);
 

@@ -2156,35 +2156,7 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 
 	// Move map.
 	if (cursor::get_current_cursor() == UI.get_cursor(cursor_type::scroll)) {
-		Vec2i tilePos = UI.MouseViewport->MapPos;
-
-		// FIXME: Support with CTRL for faster scrolling.
-		// FIXME: code duplication, see ../ui/mouse.c
-		if (UI.MouseScrollSpeedDefault < 0) {
-			if (screenPos.x < CursorStartScreenPos.x) {
-				tilePos.x++;
-			} else if (screenPos.x > CursorStartScreenPos.x) {
-				tilePos.x--;
-			}
-			if (screenPos.y < CursorStartScreenPos.y) {
-				tilePos.y++;
-			} else if (screenPos.y > CursorStartScreenPos.y) {
-				tilePos.y--;
-			}
-		} else {
-			if (screenPos.x < CursorStartScreenPos.x) {
-				tilePos.x--;
-			} else if (screenPos.x > CursorStartScreenPos.x) {
-				tilePos.x++;
-			}
-			if (screenPos.y < CursorStartScreenPos.y) {
-				tilePos.y--;
-			} else if (screenPos.y > CursorStartScreenPos.y) {
-				tilePos.y++;
-			}
-		}
-		UI.MouseWarpPos = CursorStartScreenPos;
-		UI.MouseViewport->Set(tilePos, wyrmgus::defines::get()->get_scaled_tile_size() / 2);
+		MouseScrollMap(screenPos, key_modifiers);
 		return;
 	}
 

@@ -1327,7 +1327,7 @@ void RestrictCursorToMinimap()
 **
 **  @param pos  Screen position.
 */
-static void MouseScrollMap(const PixelPos &pos, const Qt::KeyboardModifiers key_modifiers)
+void MouseScrollMap(const PixelPos &pos, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (pos == CursorStartScreenPos) {
 		return;
