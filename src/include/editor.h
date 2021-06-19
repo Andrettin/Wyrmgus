@@ -86,7 +86,6 @@ public:
 	int CursorPlayer;            /// Player under the cursor.
 	int SelectedPlayer;          /// Player selected for draw.
 
-	bool MapLoaded = false;              /// Map loaded in editor
 	bool WriteCompressedMaps = true;    /// Use compression when saving
 
 	EditorRunningType Running;   /// Editor is running

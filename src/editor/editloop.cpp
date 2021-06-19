@@ -2616,7 +2616,6 @@ void EditorMainLoop()
 	UpdateMinimap = true;
 
 	while (true) {
-		Editor.MapLoaded = false;
 		Editor.Running = EditorEditing;
 
 		Editor.Init();
@@ -2692,20 +2691,6 @@ void EditorMainLoop()
 		game::get()->set_running(false); //should use something different instead?
 
 		CursorBuilding = nullptr;
-		if (!Editor.MapLoaded) {
-			break;
-		}
-
-		CleanModules();
-
-		LoadCcl(parameters::get()->luaStartFilename); // Reload the main config file
-
-		PreMenuSetup();
-
-		current_interface_state = interface_state::menu;
-		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
-
-		Video.ClearScreen();
 	}
 
 	CommandLogDisabled = OldCommandLogDisabled;
