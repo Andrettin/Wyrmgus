@@ -159,6 +159,11 @@ public:
 		return this->get_root_path() / "dlcs";
 	}
 
+	std::filesystem::path get_workshop_path() const
+	{
+		return this->get_root_path().parent_path().parent_path() / "workshop" / "content" / "370070";
+	}
+
 	const std::filesystem::path &get_base_path(const data_module *data_module) const;
 
 	std::filesystem::path get_maps_path(const data_module *data_module) const

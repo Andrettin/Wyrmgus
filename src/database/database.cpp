@@ -834,6 +834,10 @@ void database::process_modules()
 		this->process_modules_at_dir(database::get_documents_modules_path());
 	}
 
+	if (std::filesystem::exists(this->get_workshop_path())) {
+		this->process_modules_at_dir(this->get_workshop_path());
+	}
+
 	for (const qunique_ptr<data_module> &data_module : this->modules) {
 		const std::filesystem::path module_filepath = data_module->get_path() / "module.txt";
 
