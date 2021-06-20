@@ -86,7 +86,8 @@ void preferences::save() const
 	data.add_property("music_enabled", string::from_bool(this->is_music_enabled()));
 	data.add_property("music_volume", std::to_string(this->get_music_volume()));
 	data.add_property("hotkey_setup", hotkey_setup_to_string(this->get_hotkey_setup()));
-	data.add_property("show_tips", string::from_bool(this->show_tips));
+	data.add_property("player_color_circle", string::from_bool(this->is_player_color_circle_enabled()));
+	data.add_property("show_tips", string::from_bool(this->is_show_tips_enabled()));
 
 	try {
 		data.print_to_file(preferences_path);

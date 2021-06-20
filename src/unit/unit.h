@@ -886,7 +886,6 @@ public:
 	bool DeselectInMine = false;     /// Deselect peasants in mines
 	//Wyrmgus start
 	bool SepiaForGrayscale = false;		/// Use a sepia filter for grayscale icons
-	bool PlayerColorCircle = false;		/// Show a player color circle below each unit
 	bool ShowPathlines = false;			/// Show order pathlines
 	//Wyrmgus end
 

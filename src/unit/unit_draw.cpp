@@ -37,6 +37,7 @@
 #include "animation.h"
 //Wyrmgus end
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "editor.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -140,7 +141,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	int y = screenPos.y - type.get_box_height() * scale_factor / 2 - (frame_height - sprite_height) / 2;
 	
 	// show player color circle below unit if that is activated
-	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
+	if (preferences::get()->is_player_color_circle_enabled() && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
 		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor - 1, render_commands);
 //		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}

@@ -47,6 +47,7 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(bool music_enabled READ is_music_enabled WRITE set_music_enabled NOTIFY music_enabled_changed)
 	Q_PROPERTY(int music_volume READ get_music_volume WRITE set_music_volume NOTIFY music_volume_changed)
 	Q_PROPERTY(wyrmgus::hotkey_setup hotkey_setup READ get_hotkey_setup WRITE set_hotkey_setup)
+	Q_PROPERTY(bool player_color_circle MEMBER player_color_circle NOTIFY changed)
 	Q_PROPERTY(bool show_tips MEMBER show_tips NOTIFY changed)
 
 public:
@@ -159,6 +160,11 @@ public:
 		this->set_hotkey_setup(static_cast<wyrmgus::hotkey_setup>(hotkey_setup_index));
 	}
 
+	bool is_player_color_circle_enabled() const
+	{
+		return this->player_color_circle;
+	}
+
 	bool is_show_tips_enabled() const
 	{
 		return this->show_tips;
@@ -180,6 +186,7 @@ private:
 	bool music_enabled = true;
 	int music_volume = 128;
 	wyrmgus::hotkey_setup hotkey_setup;
+	bool player_color_circle = false;
 	bool show_tips = true;
 };
 

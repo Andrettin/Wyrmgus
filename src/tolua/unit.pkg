@@ -19,7 +19,6 @@ class CPreference
 	bool DeselectInMine;
 	//Wyrmgus start
 	bool SepiaForGrayscale;
-	bool PlayerColorCircle;
 	bool ShowPathlines;
 	//Wyrmgus end
 
