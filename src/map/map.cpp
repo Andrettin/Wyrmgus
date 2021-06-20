@@ -2764,7 +2764,7 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 	const int max_try_count = 100;
 	while (!no_irregularities_found && try_count < max_try_count) {
 		no_irregularities_found = true;
-		try_count++;
+		++try_count;
 
 		for (int x = min_pos.x; x < max_pos.x; ++x) {
 			for (int y = min_pos.y; y < max_pos.y; ++y) {
@@ -2865,9 +2865,12 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z)
 {
 	bool tile_changed = true;
+	int try_count = 0;
+	const int max_try_count = 100;
 
-	while (tile_changed) {
+	while (tile_changed && try_count < max_try_count) {
 		tile_changed = false;
+		++try_count;
 
 		for (int x = min_pos.x; x < max_pos.x; ++x) {
 			for (int y = min_pos.y; y < max_pos.y; ++y) {
