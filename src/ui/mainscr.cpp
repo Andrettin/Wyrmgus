@@ -39,6 +39,7 @@
 #endif
 #include "civilization.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "economy/resource_storage_type.h"
 #include "game.h"
 #include "map/map.h"
@@ -1391,7 +1392,7 @@ void MessagesDisplay::UpdateMessages()
 */
 void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	if (show && Preference.ShowMessages) {
+	if (show && preferences::get()->is_show_messages_enabled()) {
 		CLabel label(UI.MessageFont);
 
 		const int scale_factor = wyrmgus::defines::get()->get_scale_factor();

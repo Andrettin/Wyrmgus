@@ -621,7 +621,6 @@ end
 $]
 
 void CenterOnMessage();
-void ToggleShowMessages();
 void UiFindIdleWorker();
 //Wyrmgus start
 void UiFindLevelUpUnit();

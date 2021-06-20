@@ -47,9 +47,10 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(bool music_enabled READ is_music_enabled WRITE set_music_enabled NOTIFY music_enabled_changed)
 	Q_PROPERTY(int music_volume READ get_music_volume WRITE set_music_volume NOTIFY music_volume_changed)
 	Q_PROPERTY(wyrmgus::hotkey_setup hotkey_setup READ get_hotkey_setup WRITE set_hotkey_setup)
-	Q_PROPERTY(bool pathlines MEMBER pathlines NOTIFY changed)
-	Q_PROPERTY(bool player_color_circle MEMBER player_color_circle NOTIFY changed)
-	Q_PROPERTY(bool show_tips MEMBER show_tips NOTIFY changed)
+	Q_PROPERTY(bool pathlines READ are_pathlines_enabled  MEMBER pathlines NOTIFY changed)
+	Q_PROPERTY(bool player_color_circle READ is_player_color_circle_enabled MEMBER player_color_circle NOTIFY changed)
+	Q_PROPERTY(bool show_messages READ is_show_messages_enabled MEMBER show_messages NOTIFY changed)
+	Q_PROPERTY(bool show_tips READ is_show_tips_enabled  MEMBER show_tips NOTIFY changed)
 
 public:
 	static std::filesystem::path get_path();
@@ -171,6 +172,11 @@ public:
 		return this->player_color_circle;
 	}
 
+	bool is_show_messages_enabled() const
+	{
+		return this->show_messages;
+	}
+
 	bool is_show_tips_enabled() const
 	{
 		return this->show_tips;
@@ -194,6 +200,7 @@ private:
 	wyrmgus::hotkey_setup hotkey_setup;
 	bool pathlines = false;
 	bool player_color_circle = false;
+	bool show_messages = true;
 	bool show_tips = true;
 };
 

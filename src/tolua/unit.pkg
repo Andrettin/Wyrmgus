@@ -9,7 +9,6 @@ class CPreference
 	bool ShowSightRange;
 	bool ShowReactionRange;
 	bool ShowAttackRange;
-	bool ShowMessages;
 	bool PauseOnLeave;
 	bool AiExplores;
 	bool GrayscaleIcons;
