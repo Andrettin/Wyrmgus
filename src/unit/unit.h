@@ -890,7 +890,6 @@ public:
 	int ShowOrders = 0;			/// How many second show orders of unit on map.
 	int ShowNameDelay = 0;		/// How many cycles need to wait until unit's name popup will appear.
 	int ShowNameTime = 0;		/// How many cycles need to show unit's name popup.
-	int AutosaveMinutes = 5;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
 	std::string SF2Soundfont;/// Path to SF2 soundfont
 };
 

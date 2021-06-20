@@ -33,6 +33,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "dialogue.h"
 #include "editor.h"
 #include "engine_interface.h"
@@ -385,7 +386,8 @@ static void GameLogicLoop()
 			wyrmgus::game::get()->do_cycle();
 		}
 		
-		if (Preference.AutosaveMinutes != 0 && !IsNetworkGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_MINUTE * Preference.AutosaveMinutes)) == 0) { // autosave every X minutes, if the option is enabled
+		if (preferences::get()->is_autosave_enabled() && !IsNetworkGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_MINUTE * preferences::autosave_minutes)) == 0) {
+			//autosave every X minutes, if the option is enabled
 			UI.StatusLine.Set(_("Autosave"));
 			//Wyrmgus start
 //			SaveGame("autosave.sav");

@@ -47,12 +47,15 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(bool music_enabled READ is_music_enabled WRITE set_music_enabled NOTIFY music_enabled_changed)
 	Q_PROPERTY(int music_volume READ get_music_volume WRITE set_music_volume NOTIFY music_volume_changed)
 	Q_PROPERTY(wyrmgus::hotkey_setup hotkey_setup READ get_hotkey_setup WRITE set_hotkey_setup)
+	Q_PROPERTY(bool autosave READ is_autosave_enabled  MEMBER autosave NOTIFY changed)
 	Q_PROPERTY(bool pathlines READ are_pathlines_enabled  MEMBER pathlines NOTIFY changed)
 	Q_PROPERTY(bool player_color_circle READ is_player_color_circle_enabled MEMBER player_color_circle NOTIFY changed)
 	Q_PROPERTY(bool show_messages READ is_show_messages_enabled MEMBER show_messages NOTIFY changed)
 	Q_PROPERTY(bool show_tips READ is_show_tips_enabled  MEMBER show_tips NOTIFY changed)
 
 public:
+	static constexpr int autosave_minutes = 5;
+
 	static std::filesystem::path get_path();
 	static std::filesystem::path get_fallback_path();
 
@@ -162,6 +165,11 @@ public:
 		this->set_hotkey_setup(static_cast<wyrmgus::hotkey_setup>(hotkey_setup_index));
 	}
 
+	bool is_autosave_enabled() const
+	{
+		return this->autosave;
+	}
+
 	bool are_pathlines_enabled() const
 	{
 		return this->pathlines;
@@ -198,6 +206,7 @@ private:
 	bool music_enabled = true;
 	int music_volume = 128;
 	wyrmgus::hotkey_setup hotkey_setup;
+	bool autosave = true;
 	bool pathlines = false;
 	bool player_color_circle = false;
 	bool show_messages = true;
