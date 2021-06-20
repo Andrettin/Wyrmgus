@@ -2684,6 +2684,7 @@ static int CclDefineDecorations(lua_State *l)
 		//Wyrmgus end
 		bool ShowOpponent = false;
 		bool ShowIfCanCastAnySpell = false;
+		bool status_effect = false;
 		bool hero_symbol = false;
 		bool resource_bar = false;
 	} tmp;
@@ -2734,6 +2735,8 @@ static int CclDefineDecorations(lua_State *l)
 				tmp.ShowOpponent = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowIfCanCastAnySpell")) {
 				tmp.ShowIfCanCastAnySpell = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "StatusEffect")) {
+				tmp.status_effect = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "HeroSymbol")) {
 				tmp.hero_symbol = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ResourceBar")) {
@@ -2836,6 +2839,7 @@ static int CclDefineDecorations(lua_State *l)
 		//Wyrmgus end
 		decovar->ShowOpponent = tmp.ShowOpponent;
 		decovar->ShowIfCanCastAnySpell = tmp.ShowIfCanCastAnySpell;
+		decovar->status_effect = tmp.status_effect;
 		decovar->hero_symbol = tmp.hero_symbol;
 		decovar->resource_bar = tmp.resource_bar;
 		//Wyrmgus start

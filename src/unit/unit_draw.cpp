@@ -574,6 +574,10 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 	int x = screenPos.x;
 	int y = screenPos.y;
 
+	size_t status_effect_count = 0;
+
+	static constexpr std::array status_effect_offsets = { QPoint(0, 0), QPoint(16, 0), QPoint(0, 16), QPoint(16, 16), QPoint(32, 0), QPoint(32, 16), QPoint(0, 32), QPoint(16, 32), QPoint(32, 32), QPoint(48, 0), QPoint(48, 16), QPoint(48, 32), QPoint(0, 48), QPoint(16, 48), QPoint(32, 48), QPoint(48, 48) };
+
 	UpdateUnitVariables(const_cast<CUnit &>(unit));
 	// Now show decoration for each variable.
 	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin(); i < UnitTypeVar.DecoVar.end(); ++i) {
@@ -585,30 +589,43 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 		//Wyrmgus end
 		Assert(value <= max);
 
-		if (!((value == 0 && !var.ShowWhenNull) || (value == max && !var.ShowWhenMax)
-			  || (var.HideHalf && value != 0 && value != max)
-			  || (!var.ShowIfNotEnable && !unit.Variable[var.Index].Enable)
-			  || (var.ShowOnlySelected && !unit.Selected)
-			  || (unit.Player->Type == PlayerNeutral && var.HideNeutral)
-			  //Wyrmgus start
-			  || (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && var.HideNeutral)
-			  //Wyrmgus end
-			  || (CPlayer::GetThisPlayer()->IsEnemy(unit) && !var.ShowOpponent)
-			  || (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.Player != CPlayer::GetThisPlayer()) && var.HideAllied)
-			  //Wyrmgus start
-			  || (unit.Player == CPlayer::GetThisPlayer() && var.HideSelf)
-			  || unit.Type->BoolFlag[DECORATION_INDEX].value // don't show decorations for decoration units
-//			  || max == 0)) {
-			  || (var.ShowIfCanCastAnySpell && !unit.CanCastAnySpell())
-			  || (var.hero_symbol && !preferences::get()->is_hero_symbol_enabled())
-			  || (var.resource_bar && !preferences::get()->is_resource_bar_enabled())
-			  || max == 0 || max < var.MinValue)) {
-			  //Wyrmgus end
-			var.Draw(
-				x + var.OffsetX * defines::get()->get_scale_factor() + var.OffsetXPercent * unit.Type->get_tile_width() * defines::get()->get_scaled_tile_width() / 100,
-				y + var.OffsetY * defines::get()->get_scale_factor() + var.OffsetYPercent * unit.Type->get_tile_height() * defines::get()->get_scaled_tile_height() / 100,
-				type, unit.Variable[var.Index], render_commands);
+		if ((value == 0 && !var.ShowWhenNull) || (value == max && !var.ShowWhenMax)
+			|| (var.HideHalf && value != 0 && value != max)
+			|| (!var.ShowIfNotEnable && !unit.Variable[var.Index].Enable)
+			|| (var.ShowOnlySelected && !unit.Selected)
+			|| (unit.Player->Type == PlayerNeutral && var.HideNeutral)
+			//Wyrmgus start
+			|| (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && var.HideNeutral)
+			//Wyrmgus end
+			|| (CPlayer::GetThisPlayer()->IsEnemy(unit) && !var.ShowOpponent)
+			|| (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.Player != CPlayer::GetThisPlayer()) && var.HideAllied)
+			//Wyrmgus start
+			|| (unit.Player == CPlayer::GetThisPlayer() && var.HideSelf)
+			|| unit.Type->BoolFlag[DECORATION_INDEX].value // don't show decorations for decoration units
+//			|| max == 0)) {
+			|| (var.ShowIfCanCastAnySpell && !unit.CanCastAnySpell())
+			|| (var.hero_symbol && !preferences::get()->is_hero_symbol_enabled())
+			|| (var.resource_bar && !preferences::get()->is_resource_bar_enabled())
+			|| max == 0 || max < var.MinValue
+		) {
+			continue;
+			//Wyrmgus end
 		}
+
+		int offset_x = var.OffsetX;
+		int offset_y = var.OffsetY;
+
+		if (var.status_effect) {
+			const QPoint &status_effect_offset = status_effect_offsets.at(status_effect_count);
+			offset_x += status_effect_offset.x();
+			offset_y += status_effect_offset.y();
+			++status_effect_count;
+		}
+
+		var.Draw(
+			x + offset_x * defines::get()->get_scale_factor() + var.OffsetXPercent * unit.Type->get_tile_width() * defines::get()->get_scaled_tile_width() / 100,
+			y + offset_y * defines::get()->get_scale_factor() + var.OffsetYPercent * unit.Type->get_tile_height() * defines::get()->get_scaled_tile_height() / 100,
+			type, unit.Variable[var.Index], render_commands);
 	}
 
 	// Draw group number

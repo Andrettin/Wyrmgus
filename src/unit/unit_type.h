@@ -469,6 +469,7 @@ public:
 	
 	bool ShowIfCanCastAnySpell;   /// if true, only show if the unit can cast a spell.
 
+	bool status_effect = false;
 	bool hero_symbol = false;
 	bool resource_bar = false;
 };
