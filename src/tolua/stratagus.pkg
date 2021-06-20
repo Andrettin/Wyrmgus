@@ -5,6 +5,7 @@ $#include "ai.h"
 //Wyrmgus start
 $#include "character.h"
 //Wyrmgus end
+$#include "database/preferences.h"
 $#include "dialogue.h"
 $#include "game.h"
 //Wyrmgus start
@@ -165,3 +166,5 @@ extern void load_defines();
 extern void initialize_database();
 extern bool is_test_run();
 extern void save_preferences();
+
+bool is_show_tips_enabled();

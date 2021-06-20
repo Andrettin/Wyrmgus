@@ -86,6 +86,7 @@ void preferences::save() const
 	data.add_property("music_enabled", string::from_bool(this->is_music_enabled()));
 	data.add_property("music_volume", std::to_string(this->get_music_volume()));
 	data.add_property("hotkey_setup", hotkey_setup_to_string(this->get_hotkey_setup()));
+	data.add_property("show_tips", string::from_bool(this->show_tips));
 
 	try {
 		data.print_to_file(preferences_path);
@@ -151,4 +152,9 @@ void preferences::set_music_volume(int volume)
 	emit music_volume_changed();
 }
 
+}
+
+bool is_show_tips_enabled()
+{
+	return preferences::get()->is_show_tips_enabled();
 }
