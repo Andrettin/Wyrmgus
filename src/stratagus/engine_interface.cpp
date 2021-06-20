@@ -53,6 +53,7 @@
 #include "sound/music_player.h"
 #include "sound/music_type.h"
 #include "sound/sound.h"
+#include "ui/hotkey_setup.h"
 #include "ui/interface.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
@@ -342,6 +343,23 @@ QString engine_interface::get_difficulty_name(const int difficulty_index) const
 {
 	const difficulty difficulty = static_cast<wyrmgus::difficulty>(difficulty_index);
 	return QString::fromStdString(wyrmgus::get_difficulty_name(difficulty));
+}
+
+QVariantList engine_interface::get_hotkey_setups() const
+{
+	QVariantList hotkey_setups;
+
+	for (int i = static_cast<int>(hotkey_setup::default_setup); i < static_cast<int>(hotkey_setup::count); ++i) {
+		hotkey_setups.push_back(i);
+	}
+
+	return hotkey_setups;
+}
+
+QString engine_interface::get_hotkey_setup_name(const int hotkey_setup_index) const
+{
+	const hotkey_setup hotkey_setup = static_cast<wyrmgus::hotkey_setup>(hotkey_setup_index);
+	return QString::fromStdString(wyrmgus::get_hotkey_setup_name(hotkey_setup));
 }
 
 QVariantList engine_interface::get_achievements() const

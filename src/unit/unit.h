@@ -894,9 +894,6 @@ public:
 	int ShowNameDelay = 0;		/// How many cycles need to wait until unit's name popup will appear.
 	int ShowNameTime = 0;		/// How many cycles need to show unit's name popup.
 	int AutosaveMinutes = 5;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
-	//Wyrmgus start
-	int HotkeySetup = 0;			/// Hotkey layout (0 = default, 1 = position-based, 2 = position-based (except commands))
-	//Wyrmgus end
 	std::string SF2Soundfont;/// Path to SF2 soundfont
 };
 

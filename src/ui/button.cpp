@@ -29,6 +29,7 @@
 #include "ui/button.h"
 
 #include "config.h"
+#include "database/preferences.h"
 #include "dynasty.h"
 #include "economy/resource.h"
 #include "faction.h"
@@ -38,6 +39,7 @@
 #include "spell/spell.h"
 #include "ui/button_cmd.h"
 #include "ui/button_level.h"
+#include "ui/hotkey_setup.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
@@ -544,39 +546,42 @@ int button::get_key() const
 		return key;
 	}
 	
-	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonCmd::Build || this->Action == ButtonCmd::BuildClass || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::TrainClass || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::ResearchClass || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::UpgradeToClass || this->Action == ButtonCmd::RallyPoint || this->Action == ButtonCmd::Salvage || this->Action == ButtonCmd::EnterMapLayer))) && this->Key != 0) {
-		if (this->get_pos() == 1) {
-			return 'q';
-		} else if (this->get_pos() == 2) {
-			return 'w';
-		} else if (this->get_pos() == 3) {
-			return 'e';
-		} else if (this->get_pos() == 4) {
-			return 'r';
-		} else if (this->get_pos() == 5) {
-			return 'a';
-		} else if (this->get_pos() == 6) {
-			return 's';
-		} else if (this->get_pos() == 7) {
-			return 'd';
-		} else if (this->get_pos() == 8) {
-			return 'f';
-		} else if (this->get_pos() == 9) {
-			return 'z';
-		} else if (this->get_pos() == 10) {
-			return 'x';
-		} else if (this->get_pos() == 11) {
-			return 'c';
-		} else if (this->get_pos() == 12) {
-			return 'v';
-		} else if (this->get_pos() == 13) {
-			return 't';
-		} else if (this->get_pos() == 14) {
-			return 'g';
-		} else if (this->get_pos() == 15) {
-			return 'b';
-		} else if (this->get_pos() == 16) {
-			return 'y';
+	if (this->has_position_based_hotkey() && this->Key != 0) {
+		switch (this->get_pos()) {
+			case 1:
+				return 'q';
+			case 2:
+				return 'w';
+			case 3:
+				return 'e';
+			case 4:
+				return 'r';
+			case 5:
+				return 'a';
+			case 6:
+				return 's';
+			case 7:
+				return 'd';
+			case 8:
+				return 'f';
+			case 9:
+				return 'z';
+			case 10:
+				return 'x';
+			case 11:
+				return 'c';
+			case 12:
+				return 'v';
+			case 13:
+				return 't';
+			case 14:
+				return 'g';
+			case 15:
+				return 'b';
+			case 16:
+				return 'y';
+			default:
+				break;
 		}
 	}
 
@@ -614,7 +619,7 @@ std::string button::get_hint() const
 			}
 
 			std::string unit_type_name = unit_type->GetDefaultName(unit->Player);
-			if (show_key && Preference.HotkeySetup == 0) {
+			if (show_key && preferences::get()->get_hotkey_setup() == hotkey_setup::default_setup) {
 				button::add_button_key_to_name(unit_type_name, unit_type->get_default_button_key(unit->Player));
 			}
 			hint += unit_type_name;
@@ -622,7 +627,7 @@ std::string button::get_hint() const
 			hint = "Research ";
 
 			std::string upgrade_name = upgrade->get_name();
-			if (show_key && Preference.HotkeySetup == 0) {
+			if (show_key && preferences::get()->get_hotkey_setup() == hotkey_setup::default_setup) {
 				button::add_button_key_to_name(upgrade_name, upgrade->get_button_key());
 			}
 			hint += upgrade_name;
@@ -633,7 +638,7 @@ std::string button::get_hint() const
 		return hint;
 	}
 	
-	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonCmd::Build || this->Action == ButtonCmd::BuildClass || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::TrainClass || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::ResearchClass || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::UpgradeToClass || this->Action == ButtonCmd::RallyPoint || this->Action == ButtonCmd::Salvage || this->Action == ButtonCmd::EnterMapLayer))) && this->Key != 0 && !hint.empty()) {
+	if (this->has_position_based_hotkey() && this->Key != 0 && !hint.empty()) {
 		string::replace(hint, "~!", "");
 		hint += " (~!";
 		hint += CapitalizeString(SdlKey2Str(this->get_key()));
@@ -642,6 +647,38 @@ std::string button::get_hint() const
 	}
 	
 	return hint;
+}
+
+bool button::has_position_based_hotkey() const
+{
+	switch (preferences::get()->get_hotkey_setup()) {
+		case hotkey_setup::position_based:
+			return true;
+		case hotkey_setup::position_based_except_commands:
+			switch (this->Action) {
+				case ButtonCmd::Build:
+				case ButtonCmd::BuildClass:
+				case ButtonCmd::Train:
+				case ButtonCmd::TrainClass:
+				case ButtonCmd::Research:
+				case ButtonCmd::ResearchClass:
+				case ButtonCmd::LearnAbility:
+				case ButtonCmd::ExperienceUpgradeTo:
+				case ButtonCmd::UpgradeTo:
+				case ButtonCmd::UpgradeToClass:
+				case ButtonCmd::RallyPoint:
+				case ButtonCmd::Salvage:
+				case ButtonCmd::EnterMapLayer:
+					return true;
+				default:
+					break;
+			}
+			break;
+		default:
+			break;
+	}
+
+	return false;
 }
 
 }

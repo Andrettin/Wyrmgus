@@ -94,6 +94,7 @@
 #include "ui/button_level.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
+#include "ui/hotkey_setup.h"
 #include "ui/icon.h"
 #include "ui/resource_icon.h"
 #include "unit/construction.h"
@@ -292,6 +293,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(string_to_government_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::grammatical_gender") {
 			new_property_value = QVariant::fromValue(string_to_grammatical_gender(property.get_value()));
+		} else if (property_class_name == "wyrmgus::hotkey_setup") {
+			new_property_value = QVariant::fromValue(string_to_hotkey_setup(property.get_value()));
 		} else if (property_class_name == "wyrmgus::icon*") {
 			new_property_value = QVariant::fromValue(icon::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::item_class") {

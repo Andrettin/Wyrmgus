@@ -35,6 +35,7 @@
 #include "game/difficulty.h"
 #include "sound/music_player.h"
 #include "sound/sound_server.h"
+#include "ui/hotkey_setup.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/string_conversion_util.h"
@@ -51,7 +52,7 @@ std::filesystem::path preferences::get_fallback_path()
 	return database::get_documents_path() / "preferences.txt";
 }
 
-preferences::preferences() : difficulty(difficulty::normal)
+preferences::preferences() : difficulty(difficulty::normal), hotkey_setup(hotkey_setup::default_setup)
 {
 }
 
@@ -84,6 +85,7 @@ void preferences::save() const
 	data.add_property("sound_effects_volume", std::to_string(this->get_sound_effects_volume()));
 	data.add_property("music_enabled", string::from_bool(this->is_music_enabled()));
 	data.add_property("music_volume", std::to_string(this->get_music_volume()));
+	data.add_property("hotkey_setup", hotkey_setup_to_string(this->get_hotkey_setup()));
 
 	try {
 		data.print_to_file(preferences_path);

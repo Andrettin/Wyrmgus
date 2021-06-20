@@ -34,6 +34,7 @@ class campaign;
 class sml_data;
 class sml_property;
 enum class difficulty;
+enum class hotkey_setup;
 
 class preferences final : public QObject, public singleton<preferences>
 {
@@ -45,6 +46,7 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(int sound_effects_volume READ get_sound_effects_volume WRITE set_sound_effects_volume NOTIFY sound_effects_volume_changed)
 	Q_PROPERTY(bool music_enabled READ is_music_enabled WRITE set_music_enabled NOTIFY music_enabled_changed)
 	Q_PROPERTY(int music_volume READ get_music_volume WRITE set_music_volume NOTIFY music_volume_changed)
+	Q_PROPERTY(wyrmgus::hotkey_setup hotkey_setup READ get_hotkey_setup WRITE set_hotkey_setup)
 
 public:
 	static std::filesystem::path get_path();
@@ -132,6 +134,30 @@ public:
 
 	void set_music_volume(int volume);
 
+	wyrmgus::hotkey_setup get_hotkey_setup() const
+	{
+		return this->hotkey_setup;
+	}
+
+	Q_INVOKABLE int get_hotkey_setup_index() const
+	{
+		return static_cast<int>(this->get_hotkey_setup());
+	}
+
+	void set_hotkey_setup(const hotkey_setup hotkey_setup)
+	{
+		if (hotkey_setup == this->get_hotkey_setup()) {
+			return;
+		}
+
+		this->hotkey_setup = hotkey_setup;
+	}
+
+	Q_INVOKABLE void set_hotkey_setup_index(const int hotkey_setup_index)
+	{
+		this->set_hotkey_setup(static_cast<wyrmgus::hotkey_setup>(hotkey_setup_index));
+	}
+
 signals:
 	void scale_factor_changed();
 	void sound_effects_enabled_changed();
@@ -146,6 +172,7 @@ private:
 	int sound_effects_volume = 128;
 	bool music_enabled = true;
 	int music_volume = 128;
+	wyrmgus::hotkey_setup hotkey_setup;
 };
 
 }

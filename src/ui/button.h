@@ -138,6 +138,8 @@ public:
 		return this->unit_classes;
 	}
 
+	bool has_position_based_hotkey() const;
+
 	int pos = 0; //button position in the grid
 	button_level *level = nullptr;		/// requires button level
 private:

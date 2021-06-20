@@ -189,6 +189,9 @@ public:
 	Q_INVOKABLE QVariantList get_difficulties() const;
 	Q_INVOKABLE QString get_difficulty_name(const int difficulty_index) const;
 
+	Q_INVOKABLE QVariantList get_hotkey_setups() const;
+	Q_INVOKABLE QString get_hotkey_setup_name(const int hotkey_setup_index) const;
+
 	Q_INVOKABLE QVariantList get_visible_campaigns() const;
 	Q_INVOKABLE QVariantList get_playable_civilizations() const;
 

@@ -27,9 +27,6 @@ class CPreference
 	unsigned int ShowNameDelay;
 	unsigned int ShowNameTime;
 	unsigned int AutosaveMinutes;
-	//Wyrmgus start
-	unsigned int HotkeySetup;
-	//Wyrmgus end
 	
 	std::string SF2Soundfont;
 };

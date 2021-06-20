@@ -973,6 +973,7 @@ set(wyrmgus_ui_HDRS
 	src/ui/cursor.h
 	src/ui/cursor_type.h
 	src/ui/empty_image_provider.h
+	src/ui/hotkey_setup.h
 	src/ui/icon.h
 	src/ui/icon_base.h
 	src/ui/icon_image_provider.h
