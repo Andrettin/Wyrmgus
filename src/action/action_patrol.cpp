@@ -35,6 +35,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_info.h"
@@ -148,7 +149,7 @@ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	const PixelPos pos1 = vp.TilePosToScreen_Center(this->goalPos);
 	const PixelPos pos2 = vp.TilePosToScreen_Center(this->WayPoint);
 
-	if (Preference.ShowPathlines) {
+	if (preferences::get()->are_pathlines_enabled()) {
 		Video.DrawLineClip(ColorGreen, lastScreenPos, pos1, render_commands);
 		Video.FillCircleClip(ColorBlue, pos1, 2 * defines::get()->get_scale_factor(), render_commands);
 		Video.DrawLineClip(ColorBlue, pos1, pos2, render_commands);

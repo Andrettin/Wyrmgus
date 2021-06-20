@@ -886,7 +886,6 @@ public:
 	bool DeselectInMine = false;     /// Deselect peasants in mines
 	//Wyrmgus start
 	bool SepiaForGrayscale = false;		/// Use a sepia filter for grayscale icons
-	bool ShowPathlines = false;			/// Show order pathlines
 	//Wyrmgus end
 
 	int ShowOrders = 0;			/// How many second show orders of unit on map.

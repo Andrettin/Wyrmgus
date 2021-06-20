@@ -36,6 +36,7 @@
 //Wyrmgus end
 #include "commands.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -118,7 +119,7 @@ bool COrder_Still::IsValid() const
 
 PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	if (Preference.ShowPathlines) {
+	if (preferences::get()->are_pathlines_enabled()) {
 		if (this->Action == UnitAction::StandGround) {
 			Video.FillCircleClip(ColorBlack, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		} else {

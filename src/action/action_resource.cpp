@@ -38,6 +38,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "economy/resource.h"
 #include "economy/resource_storage_type.h"
 #include "iolib.h"
@@ -423,7 +424,7 @@ PixelPos COrder_Resource::Show(const CViewport &vp, const PixelPos &lastScreenPo
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
 
-	if (Preference.ShowPathlines) {
+	if (preferences::get()->are_pathlines_enabled()) {
 		Video.FillCircleClip(ColorYellow, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		Video.DrawLineClip(ColorYellow, lastScreenPos, targetPos, render_commands);
 		Video.FillCircleClip(ColorYellow, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);

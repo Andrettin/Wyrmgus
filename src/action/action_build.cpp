@@ -42,6 +42,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_info.h"
@@ -191,7 +192,7 @@ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos, 
 	const int h = this->GetUnitType().get_box_height() * wyrmgus::defines::get()->get_scale_factor();
 	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2, render_commands);
 
-	if (Preference.ShowPathlines) {
+	if (preferences::get()->are_pathlines_enabled()) {
 		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos, render_commands);
 		Video.FillCircleClip(ColorGreen, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
