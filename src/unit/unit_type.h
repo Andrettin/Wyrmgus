@@ -468,6 +468,9 @@ public:
 	bool ShowOpponent;      /// if true, show for opponent unit.
 	
 	bool ShowIfCanCastAnySpell;   /// if true, only show if the unit can cast a spell.
+
+	bool hero_symbol = false;
+	bool resource_bar = false;
 };
 
 class CDecoVarBar final : public CDecoVar

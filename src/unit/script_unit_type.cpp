@@ -2662,28 +2662,30 @@ static int CclDefineBoolFlags(lua_State *l)
 static int CclDefineDecorations(lua_State *l)
 {
 	struct {
-		int Index;
+		int Index = 0;
 		//Wyrmgus start
-		int MinValue;
+		int MinValue = 0;
 		//Wyrmgus end
-		int OffsetX;
-		int OffsetY;
-		int OffsetXPercent;
-		int OffsetYPercent;
-		bool IsCenteredInX;
-		bool IsCenteredInY;
-		bool ShowIfNotEnable;
-		bool ShowWhenNull;
-		bool HideHalf;
-		bool ShowWhenMax;
-		bool ShowOnlySelected;
-		bool HideNeutral;
-		bool HideAllied;
+		int OffsetX = 0;
+		int OffsetY = 0;
+		int OffsetXPercent = 0;
+		int OffsetYPercent = 0;
+		bool IsCenteredInX = false;
+		bool IsCenteredInY = false;
+		bool ShowIfNotEnable = false;
+		bool ShowWhenNull = false;
+		bool HideHalf = false;
+		bool ShowWhenMax = false;
+		bool ShowOnlySelected = false;
+		bool HideNeutral = false;
+		bool HideAllied = false;
 		//Wyrmgus start
-		bool HideSelf;
+		bool HideSelf = false;
 		//Wyrmgus end
-		bool ShowOpponent;
-		bool ShowIfCanCastAnySpell;
+		bool ShowOpponent = false;
+		bool ShowIfCanCastAnySpell = false;
+		bool hero_symbol = false;
+		bool resource_bar = false;
 	} tmp;
 
 	const int nargs = lua_gettop(l);
@@ -2732,6 +2734,10 @@ static int CclDefineDecorations(lua_State *l)
 				tmp.ShowOpponent = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowIfCanCastAnySpell")) {
 				tmp.ShowIfCanCastAnySpell = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "HeroSymbol")) {
+				tmp.hero_symbol = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "ResourceBar")) {
+				tmp.resource_bar = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "Method")) {
 				Assert(lua_istable(l, -1));
 				lua_rawgeti(l, -1, 1); // MethodName
@@ -2830,6 +2836,8 @@ static int CclDefineDecorations(lua_State *l)
 		//Wyrmgus end
 		decovar->ShowOpponent = tmp.ShowOpponent;
 		decovar->ShowIfCanCastAnySpell = tmp.ShowIfCanCastAnySpell;
+		decovar->hero_symbol = tmp.hero_symbol;
+		decovar->resource_bar = tmp.resource_bar;
 		//Wyrmgus start
 //		UnitTypeVar.DecoVar.push_back(decovar);
 		bool already_defined = false;
