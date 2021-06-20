@@ -48,8 +48,10 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(int music_volume READ get_music_volume WRITE set_music_volume NOTIFY music_volume_changed)
 	Q_PROPERTY(wyrmgus::hotkey_setup hotkey_setup READ get_hotkey_setup WRITE set_hotkey_setup)
 	Q_PROPERTY(bool autosave READ is_autosave_enabled  MEMBER autosave NOTIFY changed)
+	Q_PROPERTY(bool hero_symbol READ is_hero_symbol_enabled  MEMBER hero_symbol NOTIFY changed)
 	Q_PROPERTY(bool pathlines READ are_pathlines_enabled  MEMBER pathlines NOTIFY changed)
 	Q_PROPERTY(bool player_color_circle READ is_player_color_circle_enabled MEMBER player_color_circle NOTIFY changed)
+	Q_PROPERTY(bool resource_bar READ is_resource_bar_enabled MEMBER resource_bar NOTIFY changed)
 	Q_PROPERTY(bool show_messages READ is_show_messages_enabled MEMBER show_messages NOTIFY changed)
 	Q_PROPERTY(bool show_tips READ is_show_tips_enabled  MEMBER show_tips NOTIFY changed)
 
@@ -170,6 +172,11 @@ public:
 		return this->autosave;
 	}
 
+	bool is_hero_symbol_enabled() const
+	{
+		return this->hero_symbol;
+	}
+
 	bool are_pathlines_enabled() const
 	{
 		return this->pathlines;
@@ -178,6 +185,11 @@ public:
 	bool is_player_color_circle_enabled() const
 	{
 		return this->player_color_circle;
+	}
+
+	bool is_resource_bar_enabled() const
+	{
+		return this->resource_bar;
 	}
 
 	bool is_show_messages_enabled() const
@@ -207,8 +219,10 @@ private:
 	int music_volume = 128;
 	wyrmgus::hotkey_setup hotkey_setup;
 	bool autosave = true;
+	bool hero_symbol = false;
 	bool pathlines = false;
 	bool player_color_circle = false;
+	bool resource_bar = false;
 	bool show_messages = true;
 	bool show_tips = true;
 };
