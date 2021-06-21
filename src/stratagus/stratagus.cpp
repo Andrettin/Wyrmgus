@@ -462,7 +462,6 @@ void stratagusMain(int argc, char **argv)
 #endif
 
 	parameters *parameters = parameters::get();
-	parameters->SetLocalPlayerNameFromEnv();
 
 #ifdef REDIRECT_OUTPUT
 	RedirectOutput();

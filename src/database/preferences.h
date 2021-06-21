@@ -54,6 +54,7 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(bool resource_bar READ is_resource_bar_enabled MEMBER resource_bar NOTIFY changed)
 	Q_PROPERTY(bool show_messages READ is_show_messages_enabled MEMBER show_messages NOTIFY changed)
 	Q_PROPERTY(bool show_tips READ is_show_tips_enabled  MEMBER show_tips NOTIFY changed)
+	Q_PROPERTY(QString local_player_name READ get_local_player_name_qstring WRITE set_local_player_name_qstring NOTIFY changed)
 
 public:
 	static constexpr int autosave_minutes = 5;
@@ -67,6 +68,7 @@ public:
 	Q_INVOKABLE void save() const;
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
+	void initialize();
 
 	int get_scale_factor() const
 	{
@@ -202,6 +204,28 @@ public:
 		return this->show_tips;
 	}
 
+	const std::string &get_local_player_name() const
+	{
+		return this->local_player_name;
+	}
+
+	QString get_local_player_name_qstring() const
+	{
+		return QString::fromStdString(this->local_player_name);
+	}
+
+	Q_INVOKABLE void set_local_player_name(const std::string &name)
+	{
+		this->local_player_name = name;
+	}
+
+	void set_local_player_name_qstring(const QString &name)
+	{
+		this->set_local_player_name(name.toStdString());
+	}
+
+	void set_local_player_name_from_env();
+
 signals:
 	void scale_factor_changed();
 	void sound_effects_enabled_changed();
@@ -225,6 +249,7 @@ private:
 	bool resource_bar = false;
 	bool show_messages = true;
 	bool show_tips = true;
+	std::string local_player_name;
 };
 
 }

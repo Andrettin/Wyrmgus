@@ -214,6 +214,7 @@
 
 #include "actions.h"
 #include "commands.h"
+#include "database/preferences.h"
 #include "map/map.h"
 #include "net_lowlevel.h"
 #include "net_message.h"
@@ -453,7 +454,7 @@ void ExitNetwork1()
 */
 void NetworkOnStartGame()
 {
-	CPlayer::GetThisPlayer()->SetName(parameters::get()->LocalPlayerName);
+	CPlayer::GetThisPlayer()->SetName(preferences::get()->get_local_player_name());
 	for (int i = 0; i < HostsCount; ++i) {
 		CPlayer::Players[Hosts[i].PlyNr]->SetName(Hosts[i].PlyName);
 	}

@@ -67,7 +67,6 @@ void parameters::process()
 		{ { "G", "game-options" }, "Game options passed to game scripts", "game options" },
 		{ { "I", "ip-address" }, "Network address to use", "address" },
 		{ { "l", "no-command-log" }, "Disable command log." },
-		{ { "N", "player-name" }, "Name of the player.", "name" },
 		{ { "p", "print-debug" }, "Enables debug messages printing in console." },
 		{ { "P", "port" }, "Network port to use.", "port" },
 		{ { "s", "sleep" }, "Number of frames for the AI to sleep before it starts.", "frames" },
@@ -133,11 +132,6 @@ void parameters::process()
 
 	if (cmd_parser.isSet("l")) {
 		CommandLogDisabled = true;
-	}
-
-	option = "N";
-	if (cmd_parser.isSet(option)) {
-		this->LocalPlayerName = cmd_parser.value(option).toStdString();
 	}
 
 	option = "P";
@@ -232,28 +226,6 @@ void parameters::SetDefaultUserDirectory()
 #else
 	userDirectory += ".stratagus";
 #endif
-}
-
-static std::string GetLocalPlayerNameFromEnv()
-{
-	const char *userName = nullptr;
-
-#ifdef USE_WIN32
-	userName = getenv("USERNAME");
-#else
-	userName = getenv("USER");
-#endif
-
-	if (userName && userName[0]) {
-		return userName;
-	} else {
-		return "Anonymous";
-	}
-}
-
-void parameters::SetLocalPlayerNameFromEnv()
-{
-	LocalPlayerName = GetLocalPlayerNameFromEnv();
 }
 
 }

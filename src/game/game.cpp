@@ -1539,16 +1539,6 @@ void CreateGame(const std::string &filename, CMap *map)
 
 	if (IsNetworkGame()) { // Prepare network play
 		NetworkOnStartGame();
-	//Wyrmgus start
-	/*
-	} else {
-		const std::string &localPlayerName = parameters::get()->LocalPlayerName;
-
-		if (!localPlayerName.empty() && localPlayerName != "Anonymous") {
-			ThisPlayer->SetName(localPlayerName);
-		}
-	*/
-	//Wyrmgus end
 	}
 
 	CallbackMusicOn();
@@ -2054,30 +2044,6 @@ static int ScriptSetUseHPForXp(lua_State *l)
 }
 
 /**
-**  Set the local player name
-**
-**  @param l  Lua state.
-*/
-static int CclSetLocalPlayerName(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	parameters::get()->LocalPlayerName = LuaToString(l, 1);
-	return 0;
-}
-
-/**
-**  Get the local player name
-**
-**  @param l  Lua state.
-*/
-static int CclGetLocalPlayerName(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushstring(l, parameters::get()->LocalPlayerName.c_str());
-	return 1;
-}
-
-/**
 **  Get Stratagus Version
 */
 static int CclGetStratagusVersion(lua_State *l)
@@ -2160,8 +2126,6 @@ void LuaRegisterModules()
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 
 	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
-	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
-	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
 
 	lua_register(Lua, "SetMenuRace", CclSetMenuRace);
 

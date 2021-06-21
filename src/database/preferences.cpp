@@ -39,6 +39,7 @@
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/string_conversion_util.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -71,6 +72,7 @@ void preferences::load()
 	sml_parser parser;
 	const sml_data data = parser.parse(preferences_path);
 	database::process_sml_data(this, data);
+	this->initialize();
 }
 
 void preferences::save() const
@@ -93,6 +95,7 @@ void preferences::save() const
 	data.add_property("resource_bar", string::from_bool(this->is_resource_bar_enabled()));
 	data.add_property("show_messages", string::from_bool(this->is_show_messages_enabled()));
 	data.add_property("show_tips", string::from_bool(this->is_show_tips_enabled()));
+	data.add_property("local_player_name", "\"" + string::escaped(this->get_local_player_name()) + "\"");
 
 	try {
 		data.print_to_file(preferences_path);
@@ -115,6 +118,13 @@ void preferences::process_sml_property(const sml_property &property)
 void preferences::process_sml_scope(const sml_data &scope)
 {
 	database::process_sml_scope_for_object(this, scope);
+}
+
+void preferences::initialize()
+{
+	if (this->get_local_player_name().empty()) {
+		this->set_local_player_name_from_env();
+	}
 }
 
 void preferences::set_sound_effects_volume(int volume)
@@ -156,6 +166,23 @@ void preferences::set_music_volume(int volume)
 
 	this->music_volume = volume;
 	emit music_volume_changed();
+}
+
+void preferences::set_local_player_name_from_env()
+{
+	const char *userName = nullptr;
+
+#ifdef USE_WIN32
+	userName = getenv("USERNAME");
+#else
+	userName = getenv("USER");
+#endif
+
+	if (userName != nullptr && userName[0]) {
+		this->set_local_player_name(userName);
+	} else {
+		this->set_local_player_name("Anonymous");
+	}
 }
 
 }

@@ -39,7 +39,6 @@ class parameters final : public QObject, public singleton<parameters>
 
 public:
 	void process();
-	void SetLocalPlayerNameFromEnv();
 
 	bool is_test_run() const
 	{
@@ -56,7 +55,6 @@ public:
 	std::string luaStartFilename = "scripts/stratagus.lua";
 	std::string luaEditorStartFilename = "scripts/editor.lua";
 	std::string luaScriptArguments;
-	std::string LocalPlayerName;        /// Name of local player
 private:
 	bool test_run = false;
 	std::string userDirectory;          /// Directory containing user settings and data

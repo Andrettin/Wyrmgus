@@ -30,6 +30,7 @@
 
 #include "netconnect.h"
 
+#include "database/preferences.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "master.h"
@@ -1450,7 +1451,7 @@ void NetworkInitClientConnect()
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
-	Client.Init(parameters::get()->LocalPlayerName, &NetworkFildes, &ServerSetupState, &LocalSetupState, GetTicks());
+	Client.Init(preferences::get()->get_local_player_name(), &NetworkFildes, &ServerSetupState, &LocalSetupState, GetTicks());
 }
 
 /**
@@ -1754,10 +1755,10 @@ void NetworkInitServerConnect(int openslots)
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear(); // Unused when we are server
-	Server.Init(parameters::get()->LocalPlayerName, &NetworkFildes, &ServerSetupState);
+	Server.Init(preferences::get()->get_local_player_name(), &NetworkFildes, &ServerSetupState);
 
 	// preset the server (initially always slot 0)
-	Hosts[0].SetName(parameters::get()->LocalPlayerName.c_str());
+	Hosts[0].SetName(preferences::get()->get_local_player_name().c_str());
 
 	for (int i = openslots; i < PlayerMax - 1; ++i) {
 		ServerSetupState.CompOpt[i] = 1;
@@ -1793,7 +1794,7 @@ void NetworkGamePrepareGameSettings()
 				}
 			}
 			if (i == NetLocalPlayerNumber) {
-				printf("%s (localhost)", parameters::get()->LocalPlayerName.c_str());
+				printf("%s (localhost)", preferences::get()->get_local_player_name().c_str());
 			}
 		}
 		printf("\n");
