@@ -441,11 +441,13 @@ void SetSoundVolumePercent(wyrmgus::sound *sound, int volume_percent)
 **
 **  @todo FIXME: Must handle the errors better.
 */
-wyrmgus::sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files)
+sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files)
 {
-	wyrmgus::sound *id = wyrmgus::sound::add(identifier, nullptr);
+	sound *id = sound::add(identifier, nullptr);
 
-	id->files = files;
+	for (const std::filesystem::path &filepath : files) {
+		id->add_file(filepath);
+	}
 
 	return id;
 }
@@ -458,16 +460,16 @@ wyrmgus::sound *RegisterSound(const std::string &identifier, const std::vector<s
 **
 **  @return        the special sound unique identifier
 */
-wyrmgus::sound *RegisterTwoGroups(const std::string &identifier, wyrmgus::sound *first, wyrmgus::sound *second)
+sound *RegisterTwoGroups(const std::string &identifier, sound *first, sound *second)
 {
 	if (first == nullptr || second == nullptr) {
 		return nullptr;
 	}
-	wyrmgus::sound *id = wyrmgus::sound::add(identifier, nullptr);
+	sound *id = sound::add(identifier, nullptr);
 	id->Number = TWO_GROUPS;
 	id->first_sound = first;
 	id->second_sound = second;
-	id->range = wyrmgus::sound::max_range;
+	id->range = sound::max_range;
 	//Wyrmgus start
 	id->VolumePercent = first->VolumePercent + second->VolumePercent / 2;
 	//Wyrmgus end
@@ -514,8 +516,7 @@ void sound::initialize()
 	}
 
 	for (const std::filesystem::path &filepath : this->get_files()) {
-		const std::string filename = LibraryFileName(filepath.string().c_str());
-		auto sample = std::make_unique<wyrmgus::sample>(filename);
+		auto sample = std::make_unique<wyrmgus::sample>(filepath);
 		this->samples.push_back(std::move(sample));
 	}
 

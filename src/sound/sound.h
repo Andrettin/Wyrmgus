@@ -140,7 +140,6 @@ private:
 	sound *first_sound = nullptr; //selected sound
 	sound *second_sound = nullptr; //annoyed sound
 
-	friend sound *::RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
 	friend sound *::RegisterTwoGroups(const std::string &identifier, sound *first, sound *second);
 	friend void ::SetSoundRange(wyrmgus::sound *sound, unsigned char range);
 };
