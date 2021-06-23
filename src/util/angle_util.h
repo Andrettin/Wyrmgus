@@ -37,6 +37,7 @@ constexpr int precision = 4;
 using number_type = fractional_int<precision>;
 
 extern const number_type pi;
+extern const number_type half_pi;
 
 extern number_type degrees_to_radians(const number_type &degrees);
 extern double degrees_to_radians(const double degrees);

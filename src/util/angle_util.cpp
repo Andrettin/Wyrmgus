@@ -36,6 +36,7 @@
 namespace wyrmgus::angle {
 
 const number_type pi("3.1416");
+const number_type half_pi = pi / 2;
 
 number_type degrees_to_radians(const number_type &degrees)
 {
