@@ -33,8 +33,12 @@ inline QGeoRectangle to_qgeorectangle(const QRect &georectangle)
 	return QGeoRectangle(QGeoCoordinate(georectangle.bottom(), georectangle.x()), QGeoCoordinate(georectangle.y(), georectangle.right()));
 }
 
-extern QRect to_unsigned_georectangle(const QRect &georectangle);
+inline QRect from_qgeorectangle(const QGeoRectangle &qgeorectangle)
+{
+	const QGeoCoordinate top_left = qgeorectangle.topLeft();
+	const QGeoCoordinate bottom_right = qgeorectangle.bottomRight();
 
-extern QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle);
+	return QRect(QPoint(top_left.longitude(), bottom_right.latitude()), QPoint(bottom_right.longitude(), top_left.latitude()));
+}
 
 }

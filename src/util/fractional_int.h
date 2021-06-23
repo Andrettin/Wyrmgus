@@ -146,6 +146,31 @@ public:
 		return static_cast<int>(ret);
 	}
 
+	constexpr int to_rounded_int() const
+	{
+		int value = std::abs(this->value);
+
+		int divisor = 10;
+		for (int i = 0; i < N; ++i) {
+			const int number = value % divisor;
+			if (number > 0) {
+				if (number >= (5 * number::pow(10, i))) {
+					value += divisor;
+				}
+				value -= number;
+			}
+			divisor *= 10;
+		}
+
+		value /= fractional_int::divisor;
+
+		if (this->value < 0) {
+			value *= -1;
+		}
+
+		return value;
+	}
+
 	constexpr int64_t to_int64() const
 	{
 		const int64_t ret = this->value / fractional_int::divisor;

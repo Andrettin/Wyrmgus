@@ -504,7 +504,6 @@ set(util_SRCS
 	src/util/geocoordinate.cpp
 	src/util/geojson_util.cpp
 	src/util/geopath_util.cpp
-	src/util/georectangle_util.cpp
 	src/util/geoshape_util.cpp
 	src/util/image_util.cpp
 	src/util/number_util.cpp
@@ -771,6 +770,7 @@ set(wyrmgus_map_HDRS
 	src/map/map_template.h
 	src/map/map_template_container.h
 	src/map/map_template_history.h
+	src/map/mercator_map_projection.h
 	src/map/minimap.h
 	src/map/minimap_mode.h
 	src/map/region.h
@@ -1027,7 +1027,6 @@ set(wyrmgus_util_HDRS
 	src/util/exception_util.h
 	src/util/fractional_int.h
 	src/util/geocoordinate.h
-	src/util/geocoordinate_util.h
 	src/util/geojson_util.h
 	src/util/geopath_util.h
 	src/util/georectangle_util.h

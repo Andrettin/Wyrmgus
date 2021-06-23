@@ -28,8 +28,6 @@
 
 #include "util/point_util.h"
 
-#include "util/geocoordinate.h"
-#include "util/geocoordinate_util.h"
 #include "util/number_util.h"
 #include "util/util.h"
 

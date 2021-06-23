@@ -43,33 +43,6 @@ public:
 	static constexpr number_type min_latitude = number_type(geocoordinate::latitude_size / 2 * -1);
 	static constexpr number_type max_latitude = number_type(geocoordinate::latitude_size / 2);
 
-	static constexpr number_type unsigned_longitude_to_longitude(const number_type &unsigned_longitude)
-	{
-		return unsigned_longitude - number_type(geocoordinate::longitude_size / 2);
-	}
-
-	static constexpr number_type unsigned_latitude_to_latitude(const number_type &unsigned_latitude)
-	{
-		return (unsigned_latitude - number_type(geocoordinate::latitude_size / 2)) * -1;
-	}
-
-	static constexpr geocoordinate from_unsigned_geocoordinate(const geocoordinate &unsigned_geocoordinate)
-	{
-		const number_type lon = geocoordinate::unsigned_longitude_to_longitude(unsigned_geocoordinate.get_longitude());
-		const number_type lat = geocoordinate::unsigned_latitude_to_latitude(unsigned_geocoordinate.get_latitude());
-		return geocoordinate(lon, lat);
-	}
-
-	static constexpr number_type longitude_to_unsigned_longitude(const number_type &longitude)
-	{
-		return longitude + number_type(geocoordinate::longitude_size / 2);
-	}
-
-	static constexpr number_type latitude_to_unsigned_latitude(const number_type &latitude)
-	{
-		return latitude * -1 + number_type(geocoordinate::latitude_size / 2);
-	}
-
 	static void for_each_random_until(const std::function<bool(const geocoordinate &)> &function);
 
 	constexpr geocoordinate()
@@ -134,14 +107,6 @@ public:
 		const double latitude = this->latitude.to_double();
 		const double longitude = this->longitude.to_double();
 		return QGeoCoordinate(latitude, longitude);
-	}
-
-	geocoordinate to_unsigned_geocoordinate() const
-	{
-		//converts a geocoordinate into an unsigned one, i.e. having x values from 0 to 360, and y values from 0 to 180 (top to bottom, contrary to geocoordinates, which work south to north)
-		const number_type x = this->longitude_to_unsigned_longitude(this->get_longitude());
-		const number_type y = this->latitude_to_unsigned_latitude(this->get_latitude());
-		return geocoordinate(x, y);
 	}
 
 	constexpr QPoint to_point() const

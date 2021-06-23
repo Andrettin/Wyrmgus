@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,29 +24,17 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#include "stratagus.h"
+#pragma once
 
-#include "util/georectangle_util.h"
+#include "map/map_projection.h"
+#include "util/singleton.h"
 
-#include "util/geocoordinate.h"
-#include "util/geocoordinate_util.h"
+namespace wyrmgus {
 
-namespace wyrmgus::georectangle {
-
-QRect to_unsigned_georectangle(const QRect &georectangle)
+class mercator_map_projection final : public map_projection, public singleton<mercator_map_projection>
 {
-	const geocoordinate min_geocoordinate = geocoordinate(georectangle.topLeft()).to_unsigned_geocoordinate();
-	const geocoordinate max_geocoordinate = geocoordinate(georectangle.bottomRight()).to_unsigned_geocoordinate();
-
-	const QPoint top_left(min_geocoordinate.get_longitude().to_int(), max_geocoordinate.get_latitude().to_int());
-	const QPoint bottom_right(max_geocoordinate.get_longitude().to_int(), min_geocoordinate.get_latitude().to_int());
-
-	return QRect(top_left, bottom_right);
-}
-
-QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle)
-{
-	return QRectF(qgeocoordinate::to_unsigned_geocoordinate(georectangle.topLeft()), qgeocoordinate::to_unsigned_geocoordinate(georectangle.bottomRight()));
-}
+	virtual number_type latitude_to_scaled_latitude(const number_type &lat) const override;
+	virtual number_type scaled_latitude_to_latitude(const number_type &scaled_lat) const override;
+};
 
 }

@@ -29,6 +29,7 @@
 #include "util/geocoordinate.h"
 
 #include "map/equirectangular_map_projection.h"
+#include "map/mercator_map_projection.h"
 #include "util/georectangle_util.h"
 #include "util/point_util.h"
 
@@ -52,9 +53,8 @@ BOOST_AUTO_TEST_CASE(geocoordinate_to_circle_edge_point_test_2)
     BOOST_TEST((direction_pos == expected_result), "direction_pos " + point::to_string(direction_pos) + " does not equal " + point::to_string(expected_result));
 }
 
-BOOST_AUTO_TEST_CASE(point_to_geocoordinate_test)
+static void check_point_to_geocoordinate(const map_projection *map_projection)
 {
-    const map_projection *map_projection = equirectangular_map_projection::get();
     const QSize size(384, 192);
 
     const int min_longitude = -11;
@@ -62,13 +62,40 @@ BOOST_AUTO_TEST_CASE(point_to_geocoordinate_test)
     const int min_latitude = 45;
     const int max_latitude = 60;
     const QRect georectangle(QPoint(min_longitude, min_latitude), QPoint(max_longitude, max_latitude));
-    const QRect unsigned_georectangle = georectangle::to_unsigned_georectangle(georectangle);
 
-    geocoordinate geocoordinate = map_projection->point_to_geocoordinate(QPoint(0, 0), size, unsigned_georectangle);
-    BOOST_CHECK(geocoordinate.get_longitude() == min_longitude);
-    BOOST_CHECK(geocoordinate.get_latitude() == max_latitude);
+    geocoordinate geocoordinate = map_projection->point_to_geocoordinate(QPoint(0, 0), georectangle, size);
+    int lon_int = geocoordinate.get_longitude().to_int();
+    BOOST_CHECK(std::abs(lon_int - min_longitude) <= 1);
+    int lat_int = geocoordinate.get_latitude().to_int();
+    BOOST_CHECK(std::abs(lat_int - max_latitude) <= 1);
 
-    geocoordinate = map_projection->point_to_geocoordinate(QPoint(383, 191), size, unsigned_georectangle);
-    BOOST_CHECK(geocoordinate.get_longitude().to_int() == (max_longitude - 1));
-    BOOST_CHECK(geocoordinate.get_latitude().to_int() == min_latitude);
+    geocoordinate = map_projection->point_to_geocoordinate(QPoint(384, 192), georectangle, size);
+    lon_int = geocoordinate.get_longitude().to_int();
+    BOOST_CHECK(std::abs(lon_int - max_longitude) <= 1);
+    lat_int = geocoordinate.get_latitude().to_int();
+    BOOST_CHECK(std::abs(lat_int - min_latitude) <= 1);
+}
+
+BOOST_AUTO_TEST_CASE(equirectangular_point_to_geocoordinate_test)
+{
+    const map_projection *map_projection = equirectangular_map_projection::get();
+    check_point_to_geocoordinate(map_projection);
+}
+
+BOOST_AUTO_TEST_CASE(mercator_point_to_geocoordinate_test)
+{
+    const map_projection *map_projection = mercator_map_projection::get();
+    check_point_to_geocoordinate(map_projection);
+}
+
+BOOST_AUTO_TEST_CASE(georectangle_conversion_test)
+{
+    const int min_longitude = -11;
+    const int max_longitude = 34;
+    const int min_latitude = 45;
+    const int max_latitude = 60;
+    const QRect georectangle(QPoint(min_longitude, min_latitude), QPoint(max_longitude, max_latitude));
+    const QGeoRectangle qgeorectangle = georectangle::to_qgeorectangle(georectangle);
+    const QRect converted_georectangle = georectangle::from_qgeorectangle(qgeorectangle);
+    BOOST_CHECK(georectangle == converted_georectangle);
 }

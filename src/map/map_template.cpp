@@ -72,7 +72,6 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "util/container_util.h"
-#include "util/geocoordinate_util.h"
 #include "util/georectangle_util.h"
 #include "util/geoshape_util.h"
 #include "util/image_util.h"
@@ -2891,8 +2890,7 @@ QPoint map_template::get_geocoordinate_pos(const geocoordinate &geocoordinate) c
 
 geocoordinate map_template::get_pos_geocoordinate(const QPoint &pos) const
 {
-	const QRect unsigned_georectangle = georectangle::to_unsigned_georectangle(this->get_georectangle());
-	return this->get_map_projection()->point_to_geocoordinate(pos, this->get_size(), unsigned_georectangle);
+	return this->get_map_projection()->point_to_geocoordinate(pos, this->get_georectangle(), this->get_size());
 }
 
 void map_template::save_terrain_images() const

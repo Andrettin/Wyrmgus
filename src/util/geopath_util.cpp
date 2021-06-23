@@ -30,7 +30,6 @@
 
 #include "map/map_projection.h"
 #include "util/geocoordinate.h"
-#include "util/geocoordinate_util.h"
 #include "util/georectangle_util.h"
 #include "util/point_util.h"
 
