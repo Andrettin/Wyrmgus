@@ -53,6 +53,11 @@ number_type radians_to_degrees(const number_type &radians)
 	return radians * 180 / angle::pi;
 }
 
+double radians_to_degrees(const double radians)
+{
+	return radians * 180. / boost::math::constants::pi<double>();
+}
+
 //n is in the -pi to +pi range
 number_type gudermannian(const number_type &n)
 {
