@@ -84,9 +84,20 @@ map_projection::number_type map_projection::longitude_per_pixel(const int lon_si
 	return number_type(lon_size) / size.width();
 }
 
+map_projection::number_type map_projection::longitude_per_pixel(const QRect &georectangle, const QSize &size) const
+{
+	return this->longitude_per_pixel(georectangle.width() - 1, size);
+}
+
 map_projection::number_type map_projection::latitude_per_pixel(const int lat_size, const QSize &size) const
 {
 	return number_type(lat_size) / size.height();
+}
+
+map_projection::number_type map_projection::latitude_per_pixel(const QRect &georectangle, const QSize &size) const
+{
+	const int lat_size = this->get_latitude_size(georectangle);
+	return this->latitude_per_pixel(lat_size, size);
 }
 
 int map_projection::longitude_to_x(const number_type &longitude, const number_type &lon_per_pixel) const
@@ -122,10 +133,8 @@ QPoint map_projection::geocoordinate_to_point(const geocoordinate &geocoordinate
 
 QPoint map_projection::geocoordinate_to_point(const geocoordinate &geocoordinate, const QRect &georectangle, const QSize &area_size) const
 {
-	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle.width() - 1, area_size);
-
-	const int lat_size = this->get_latitude_size(georectangle);
-	const latitude lat_per_pixel = this->latitude_per_pixel(lat_size, area_size);
+	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle, area_size);
+	const latitude lat_per_pixel = this->latitude_per_pixel(georectangle, area_size);
 
 	const wyrmgus::geocoordinate origin_geocoordinate(georectangle.bottomLeft());
 	const wyrmgus::geocoordinate scaled_origin_geocoordinate = this->geocoordinate_to_scaled_geocoordinate(origin_geocoordinate);
@@ -144,10 +153,8 @@ geocoordinate map_projection::point_to_geocoordinate(const QPoint &point, const 
 
 geocoordinate map_projection::point_to_geocoordinate(const QPoint &point, const QRect &georectangle, const QSize &area_size) const
 {
-	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle.width() - 1, area_size);
-
-	const int lat_size = this->get_latitude_size(georectangle);
-	const latitude lat_per_pixel = this->latitude_per_pixel(lat_size, area_size);
+	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle, area_size);
+	const latitude lat_per_pixel = this->latitude_per_pixel(georectangle, area_size);
 
 	const geocoordinate origin_geocoordinate(georectangle.bottomLeft());
 	const geocoordinate scaled_origin_geocoordinate = this->geocoordinate_to_scaled_geocoordinate(origin_geocoordinate);

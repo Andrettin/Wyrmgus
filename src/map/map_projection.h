@@ -49,7 +49,9 @@ public:
 	int get_latitude_size(const QRect &georectangle) const;
 
 	number_type longitude_per_pixel(const int lon_size, const QSize &size) const;
+	number_type longitude_per_pixel(const QRect &georectangle, const QSize &size) const;
 	number_type latitude_per_pixel(const int lat_size, const QSize &size) const;
+	number_type latitude_per_pixel(const QRect &georectangle, const QSize &size) const;
 
 	int longitude_to_x(const number_type &longitude, const number_type &lon_per_pixel) const;
 	int latitude_to_y(const number_type &latitude, const number_type &lat_per_pixel) const;
@@ -61,6 +63,12 @@ public:
 
 	geocoordinate point_to_geocoordinate(const QPoint &point, const number_type &lon_per_pixel, const number_type &lat_per_pixel) const;
 	geocoordinate point_to_geocoordinate(const QPoint &point, const QRect &georectangle, const QSize &area_size) const;
+
+	virtual void validate_area(const QRect &georectangle, const QSize &area_size) const
+	{
+		Q_UNUSED(georectangle)
+		Q_UNUSED(area_size)
+	}
 };
 
 }

@@ -429,6 +429,11 @@ void map_template::check() const
 		throw std::runtime_error("Map template \"" + this->get_identifier() + "\" is set to clear terrain in its area, but also has a base terrain type and an overlay base terrain type.");
 	}
 
+	if (this->get_min_longitude() != 0 || this->get_min_latitude() != 0 || this->get_max_longitude() != 0 || this->get_max_latitude() != 0) {
+		const wyrmgus::map_projection *map_projection = this->get_map_projection();
+		map_projection->validate_area(this->get_georectangle(), this->get_size());
+	}
+
 	/*
 	if (this->get_default_astrocoordinate_reference_subtemplate() != nullptr && !this->get_default_astrocoordinate_reference_subtemplate()->is_any_subtemplate_of(this)) {
 		throw std::runtime_error("Map template \"" + this->get_identifier() + "\" has \"" + this->get_default_astrocoordinate_reference_subtemplate()->get_identifier() + "\" as its default astrocoordinate reference subtemplate, but the latter is not a subtemplate of the former, even indirectly.");
