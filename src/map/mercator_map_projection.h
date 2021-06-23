@@ -36,30 +36,7 @@ class mercator_map_projection final : public map_projection, public singleton<me
 	virtual number_type latitude_to_scaled_latitude(const number_type &lat) const override;
 	virtual number_type scaled_latitude_to_latitude(const number_type &scaled_lat) const override;
 
-
-	virtual void validate_area(const QRect &georectangle, const QSize &area_size) const override
-	{
-		const longitude lon_per_pixel = this->longitude_per_pixel(georectangle, area_size);
-		const latitude lat_per_pixel = this->latitude_per_pixel(georectangle, area_size);
-
-		if (lon_per_pixel != lat_per_pixel) {
-			const int64_t diff = std::abs(lon_per_pixel.get_value() - lat_per_pixel.get_value());
-
-			QRect changed_georectangle = georectangle;
-			changed_georectangle.setHeight(georectangle.height() - 1);
-			const latitude lat_minus_per_pixel = this->latitude_per_pixel(changed_georectangle, area_size);
-			const int64_t lat_minus_diff = std::abs(lon_per_pixel.get_value() - lat_minus_per_pixel.get_value());
-
-			changed_georectangle = georectangle;
-			changed_georectangle.setHeight(georectangle.height() + 1);
-			const latitude lat_plus_per_pixel = this->latitude_per_pixel(changed_georectangle, area_size);
-			const int64_t lat_plus_diff = std::abs(lon_per_pixel.get_value() - lat_plus_per_pixel.get_value());
-
-			if (lat_minus_diff < diff || lat_plus_diff < diff) {
-				throw std::runtime_error("The scaled longitude per pixel (" + lon_per_pixel.to_string() + ") is different than the scaled latitude per pixel (" + lat_per_pixel.to_string() + "), and it would be possible to have an integer value for the latitude which would result in a smaller discrepancy.");
-			}
-		}
-	}
+	virtual void validate_area(const QRect &georectangle, const QSize &area_size) const override;
 };
 
 }
