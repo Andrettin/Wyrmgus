@@ -92,8 +92,6 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 		end_pos.setY(image.height() - 1);
 	}
 
-	const volatile QRect area_rect(start_pos, end_pos);
-
 	int pixel_checkpoint_count = 0;
 	static constexpr int pixel_checkpoint_threshold = 32 * 32;
 
