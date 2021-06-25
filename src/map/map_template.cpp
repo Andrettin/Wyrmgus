@@ -431,7 +431,7 @@ void map_template::check() const
 
 	if (this->get_min_longitude() != 0 || this->get_min_latitude() != 0 || this->get_max_longitude() != 0 || this->get_max_latitude() != 0) {
 		const wyrmgus::map_projection *map_projection = this->get_map_projection();
-		map_projection->validate_area(this->get_georectangle(), this->get_size());
+		map_projection->validate_area(this->get_georectangle(), this->get_size(), this->IsSubtemplateArea());
 	}
 
 	/*

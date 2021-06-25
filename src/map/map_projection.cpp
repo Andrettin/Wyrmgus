@@ -186,12 +186,16 @@ mercator_map_projection::number_type mercator_map_projection::scaled_latitude_to
 	return lat;
 }
 
-void mercator_map_projection::validate_area(const QRect &georectangle, const QSize &area_size) const
+void mercator_map_projection::validate_area(const QRect &georectangle, const QSize &area_size, const bool area_changeable) const
 {
 	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle, area_size);
 	const latitude lat_per_pixel = this->latitude_per_pixel(georectangle, area_size);
 
 	if (lon_per_pixel != lat_per_pixel) {
+		if (area_changeable) {
+			throw std::runtime_error("The scaled longitude per pixel (" + lon_per_pixel.to_string() + ") is different than the scaled latitude per pixel (" + lat_per_pixel.to_string() + ").");
+		}
+
 		const int64_t diff = std::abs(lon_per_pixel.get_value() - lat_per_pixel.get_value());
 
 		QRect changed_georectangle = georectangle;

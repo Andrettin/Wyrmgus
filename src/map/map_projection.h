@@ -64,10 +64,11 @@ public:
 	geocoordinate point_to_geocoordinate(const QPoint &point, const number_type &lon_per_pixel, const number_type &lat_per_pixel) const;
 	geocoordinate point_to_geocoordinate(const QPoint &point, const QRect &georectangle, const QSize &area_size) const;
 
-	virtual void validate_area(const QRect &georectangle, const QSize &area_size) const
+	virtual void validate_area(const QRect &georectangle, const QSize &area_size, const bool area_changeable) const
 	{
 		Q_UNUSED(georectangle)
 		Q_UNUSED(area_size)
+		Q_UNUSED(area_changeable)
 	}
 };
 
