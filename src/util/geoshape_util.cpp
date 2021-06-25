@@ -67,11 +67,25 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 
 	const QRect bounding_georectangle = georectangle::from_qgeorectangle(bounding_qgeorectangle);
 
-	const longitude start_lon = longitude(bounding_georectangle.x() - 1);
-	const longitude end_lon = longitude(bounding_georectangle.right() + 1);
+	longitude start_lon = longitude(bounding_georectangle.x() - 1);
+	if (start_lon < geocoordinate::min_longitude) {
+		start_lon = geocoordinate::min_longitude;
+	}
 
-	const latitude start_lat = latitude(bounding_georectangle.bottom() + 1);
-	const latitude end_lat = latitude(bounding_georectangle.y() - 1);
+	longitude end_lon = longitude(bounding_georectangle.right() + 1);
+	if (end_lon > geocoordinate::max_longitude) {
+		end_lon = geocoordinate::max_longitude;
+	}
+
+	latitude start_lat = latitude(bounding_georectangle.bottom() + 1);
+	if (start_lat > geocoordinate::max_latitude) {
+		start_lat = geocoordinate::max_latitude;
+	}
+
+	latitude end_lat = latitude(bounding_georectangle.y() - 1);
+	if (end_lat < geocoordinate::min_latitude) {
+		end_lat = geocoordinate::min_latitude;
+	}
 
 	const geocoordinate start_geocoordinate(start_lon, start_lat);
 	const geocoordinate end_geocoordinate(end_lon, end_lat);
