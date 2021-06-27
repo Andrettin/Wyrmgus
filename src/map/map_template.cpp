@@ -933,6 +933,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapTransitions(map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->get_name().c_str());
@@ -995,6 +996,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapTransitions(map_start_pos, map_end, z);
+		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 
 	if (!this->get_subtemplates().empty()) {

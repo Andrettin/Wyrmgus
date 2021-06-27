@@ -2754,6 +2754,7 @@ void CMap::AdjustMap()
 		this->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		this->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 		this->AdjustTileMapTransitions(map_start_pos, map_end, z);
+		this->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 }
 
