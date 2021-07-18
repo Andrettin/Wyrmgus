@@ -2897,7 +2897,7 @@ int StatBoxWidget::getPercent() const
 **  MenuScreen constructor
 */
 MenuScreen::MenuScreen() :
-	Container(), runLoop(true), logiclistener(0), drawUnder(false), running(false)
+	Container()
 {
 	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	setOpaque(false);

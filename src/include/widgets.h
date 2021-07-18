@@ -524,7 +524,7 @@ private:
 	unsigned int percent; /// percent value of the widget.
 };
 
-class MenuScreen : public gcn::Container
+class MenuScreen final : public gcn::Container
 {
 public:
 	MenuScreen();
@@ -539,10 +539,10 @@ public:
 	bool getDrawMenusUnder() const { return this->drawUnder; }
 
 private:
-	bool runLoop;
+	bool runLoop = true;
 	int loopResult;
 	gcn::Widget *oldtop;
-	LuaActionListener *logiclistener;
-	bool drawUnder;
-	bool running;
+	LuaActionListener *logiclistener = nullptr;
+	bool drawUnder = false;
+	bool running = false;
 };
