@@ -38,6 +38,7 @@
 #include "map/map_grid_model.h"
 #include "map/tile_image_provider.h"
 #include "map/tile_transition.h"
+#include "network/network_manager.h"
 #include "parameters.h"
 #include "player_color.h"
 #include "quest/quest.h"
@@ -109,6 +110,7 @@ int main(int argc, char **argv)
 		qmlRegisterType<faction>();
 		qmlRegisterType<game>();
 		qmlRegisterType<icon>();
+		qmlRegisterType<network_manager>();
 		qmlRegisterType<pantheon>();
 		qmlRegisterType<parameters>();
 		qmlRegisterType<player_color>();
