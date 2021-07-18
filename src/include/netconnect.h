@@ -10,7 +10,7 @@
 //
 /**@name netconnect.h - The network connection setup header file. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer, Andreas Arens and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@
 #include "net_message.h"
 
 class CHost;
+class CInitMessage_Header;
+class CUDPSocket;
 
 /// Network protocol major version
 #define NetworkProtocolMajorVersion StratagusMajorVersion
@@ -82,8 +84,12 @@ extern int NetConnectType;              /// Network menu: Setup mode active
 extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts array of local client
 extern int NetLocalPlayerNumber;           /// Player number of local client
 
+extern std::string NetworkMapName;
+
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
 extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
+
+extern void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
 extern int FindHostIndexBy(const CHost &host);
 extern void NetworkServerStartGame();       /// Server user has finally hit the start game button
@@ -94,7 +100,6 @@ extern int GetNetworkState();
 extern void NetworkInitClientConnect();     /// Setup network connect state machine for clients
 extern void NetworkInitServerConnect(int openslots); /// Setup network connect state machine for the server
 extern int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host);  /// Parse a network connect event
-extern int NetworkSetupServerAddress(const std::string &serveraddr, int port);  /// Menu: Setup the server IP
 extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client request messages
 extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages
 extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients state to send stateinfo message

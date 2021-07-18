@@ -11,7 +11,7 @@
 /**@name ai_resource.cpp - AI resource manager. */
 //
 //      (c) Copyright 2000-2021 by Lutz Sammer, Antonis Chaniotis and 
-//      Andrettin
+//                                 Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

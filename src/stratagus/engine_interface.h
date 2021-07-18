@@ -38,6 +38,7 @@ namespace wyrmgus {
 class defines;
 class game;
 class map_info;
+class network_manager;
 class parameters;
 class preferences;
 
@@ -50,6 +51,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(wyrmgus::defines* defines READ get_defines CONSTANT)
 	Q_PROPERTY(wyrmgus::preferences* preferences READ get_preferences CONSTANT)
 	Q_PROPERTY(wyrmgus::game* game READ get_game CONSTANT)
+	Q_PROPERTY(wyrmgus::network_manager* network_manager READ get_network_manager CONSTANT)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 	Q_PROPERTY(QString save_path READ get_save_path CONSTANT)
 	Q_PROPERTY(QString user_maps_path READ get_user_maps_path CONSTANT)
@@ -95,6 +97,7 @@ public:
 	defines *get_defines() const;
 	preferences *get_preferences() const;
 	game *get_game() const;
+	network_manager *get_network_manager() const;
 
 	bool is_running() const
 	{

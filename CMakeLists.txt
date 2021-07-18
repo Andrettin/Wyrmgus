@@ -275,12 +275,15 @@ set(missile_SRCS
 source_group(missile FILES ${missile_SRCS})
 
 set(network_SRCS
+	src/network/client.cpp
 	src/network/commands.cpp
 	src/network/net_lowlevel.cpp
 	src/network/net_message.cpp
 	src/network/master.cpp
 	src/network/netconnect.cpp
 	src/network/network.cpp
+	src/network/network_manager.cpp
+	src/network/network_state.cpp
 	src/network/netsockets.cpp
 )
 source_group(network FILES ${network_SRCS})
@@ -795,6 +798,12 @@ set(wyrmgus_missile_HDRS
 	src/missile/missile_class.h
 )
 
+set(wyrmgus_network_HDRS
+	src/network/client.h
+	src/network/network_manager.h
+	src/network/network_state.h
+)
+
 set(wyrmgus_quest_HDRS
 	src/quest/achievement.h
 	src/quest/campaign.h
@@ -1163,6 +1172,7 @@ source_group(item FILES ${wyrmgus_item_HDRS})
 source_group(language FILES ${wyrmgus_language_HDRS})
 source_group(map FILES ${wyrmgus_map_HDRS})
 source_group(missile FILES ${wyrmgus_missile_HDRS})
+source_group(network FILES ${wyrmgus_network_HDRS})
 source_group(quest FILES ${wyrmgus_quest_HDRS})
 source_group(quest\\objective FILES ${wyrmgus_quest_objective_HDRS})
 source_group(religion FILES ${wyrmgus_religion_HDRS})
@@ -1193,6 +1203,7 @@ set(wyrmgus_HDRS
 	${wyrmgus_language_HDRS}
 	${wyrmgus_map_HDRS}
 	${wyrmgus_missile_HDRS}
+	${wyrmgus_network_HDRS}
 	${wyrmgus_quest_HDRS}
 	${wyrmgus_quest_objective_HDRS}
 	${wyrmgus_religion_HDRS}

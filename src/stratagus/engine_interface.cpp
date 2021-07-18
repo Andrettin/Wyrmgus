@@ -43,6 +43,7 @@
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/world.h"
+#include "network/network_manager.h"
 #include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"
@@ -89,6 +90,11 @@ preferences *engine_interface::get_preferences() const
 game *engine_interface::get_game() const
 {
 	return game::get();
+}
+
+network_manager *engine_interface::get_network_manager() const
+{
+	return network_manager::get();
 }
 
 void engine_interface::run_event_loop()

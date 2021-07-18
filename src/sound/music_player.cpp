@@ -26,7 +26,7 @@
 
 #include "stratagus.h"
 
-#include "music_player.h"
+#include "sound/music_player.h"
 
 #include "database/preferences.h"
 #include "game.h"

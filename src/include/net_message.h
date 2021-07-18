@@ -28,10 +28,6 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 /**
  * Number of bytes in the name of a network player,
  * including the terminating null character.
