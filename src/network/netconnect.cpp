@@ -109,13 +109,6 @@ static CServer Server;
 ** @param port Port of host to send to (network byte order).
 ** @param msg The message to send
 */
-template <typename T>
-static void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
-{
-	std::unique_ptr<const unsigned char[]> buf = msg.Serialize();
-	socket.Send(host, buf.get(), msg.Size());
-}
-
 void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
 {
 	auto buf = std::make_unique<unsigned char[]>(msg.Size());

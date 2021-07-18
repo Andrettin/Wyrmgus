@@ -40,6 +40,13 @@
 
 CClient Client;
 
+template <typename T>
+static void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
+{
+	std::unique_ptr<const unsigned char[]> buf = msg.Serialize();
+	socket.Send(host, buf.get(), msg.Size());
+}
+
 static const char *ncconstatenames[] = {
 	"ccs_unused",
 	"ccs_connecting",          // new client
