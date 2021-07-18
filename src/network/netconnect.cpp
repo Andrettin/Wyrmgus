@@ -693,22 +693,6 @@ void NetworkProcessServerRequest()
 }
 
 /**
-** Setup Network connect state machine for clients
-*/
-void NetworkInitClientConnect()
-{
-	NetConnectRunning = 2;
-	NetConnectType = 2;
-
-	for (int i = 0; i < PlayerMax; ++i) {
-		Hosts[i].Clear();
-	}
-	ServerSetupState.Clear();
-	LocalSetupState.Clear();
-	Client.Init(preferences::get()->get_local_player_name(), &NetworkFildes, &ServerSetupState, &LocalSetupState, GetTicks());
-}
-
-/**
 ** Server user has finally hit the start game button
 */
 void NetworkServerStartGame()

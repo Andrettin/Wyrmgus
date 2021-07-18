@@ -41,6 +41,8 @@ public:
 	{
 		return this->setup_server_address(server_address.toStdString(), port);
 	}
+
+	Q_INVOKABLE void init_client_connect();
 };
 
 }

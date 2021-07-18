@@ -29,9 +29,12 @@
 
 #include "network/network_manager.h"
 
+#include "database/preferences.h"
+#include "netconnect.h"
 #include "network/client.h"
 #include "network/netsockets.h"
 #include "network.h"
+#include "video/video.h"
 
 namespace wyrmgus {
 
@@ -50,6 +53,24 @@ bool network_manager::setup_server_address(const std::string &server_address, in
 	Client.SetServerHost(std::move(host));
 
 	return true;
+}
+
+/**
+** Setup Network connect state machine for clients
+*/
+void network_manager::init_client_connect()
+{
+	NetConnectRunning = 2;
+	NetConnectType = 2;
+
+	for (int i = 0; i < PlayerMax; ++i) {
+		Hosts[i].Clear();
+	}
+
+	ServerSetupState.Clear();
+	LocalSetupState.Clear();
+
+	Client.Init(preferences::get()->get_local_player_name(), &NetworkFildes, &ServerSetupState, &LocalSetupState, GetTicks());
 }
 
 }
