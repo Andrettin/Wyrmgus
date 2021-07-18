@@ -36,6 +36,7 @@
 #include "net_message.h"
 #include "network/netsockets.h"
 #include "network.h"
+#include "util/util.h"
 #include "version.h"
 
 CClient Client;
