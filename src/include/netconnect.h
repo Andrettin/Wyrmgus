@@ -29,6 +29,7 @@
 #pragma once
 
 #include "net_message.h"
+#include "network/netsockets.h"
 
 class CHost;
 class CInitMessage_Header;
@@ -88,6 +89,13 @@ extern std::string NetworkMapName;
 
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
 extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
+
+template <typename T>
+inline void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
+{
+	std::unique_ptr<const unsigned char[]> buf = msg.Serialize();
+	socket.Send(host, buf.get(), msg.Size());
+}
 
 extern void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
