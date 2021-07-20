@@ -32,6 +32,7 @@ enum class taxonomic_rank {
 	none,
 	species,
 	genus,
+	subtribe,
 	tribe,
 	subfamily,
 	family,
@@ -60,6 +61,8 @@ inline taxonomic_rank string_to_taxonomic_rank(const std::string &str)
 		return taxonomic_rank::species;
 	} else if (str == "genus") {
 		return taxonomic_rank::genus;
+	} else if (str == "subtribe") {
+		return taxonomic_rank::subtribe;
 	} else if (str == "tribe") {
 		return taxonomic_rank::tribe;
 	} else if (str == "subfamily") {
@@ -112,6 +115,8 @@ inline std::string taxonomic_rank_to_string(const taxonomic_rank rank)
 			return "species";
 		case taxonomic_rank::genus:
 			return "genus";
+		case taxonomic_rank::subtribe:
+			return "subtribe";
 		case taxonomic_rank::tribe:
 			return "tribe";
 		case taxonomic_rank::subfamily:
