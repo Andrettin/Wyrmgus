@@ -126,6 +126,19 @@ bool taxon_base::is_subtaxon_of(const taxon *other_taxon) const
 	return this->get_supertaxon()->is_subtaxon_of(other_taxon);
 }
 
+bool taxon_base::is_ethereal() const
+{
+	if (this->ethereal) {
+		return true;
+	}
+
+	if (this->get_supertaxon() != nullptr) {
+		return this->get_supertaxon()->is_ethereal();
+	}
+
+	return false;
+}
+
 const name_generator *taxon_base::get_specimen_name_generator(const gender gender) const
 {
 	const auto find_iterator = this->specimen_name_generators.find(gender);

@@ -49,6 +49,7 @@ class taxon_base : public detailed_data_entry
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::taxon* supertaxon MEMBER supertaxon READ get_supertaxon)
+	Q_PROPERTY(bool ethereal MEMBER ethereal)
 
 protected:
 	explicit taxon_base(const std::string &identifier);
@@ -68,6 +69,8 @@ public:
 	const taxon *get_supertaxon_of_rank(const taxonomic_rank rank) const;
 	bool is_subtaxon_of(const taxon *other_taxon) const;
 
+	bool is_ethereal() const;
+
 	const name_generator *get_specimen_name_generator(const gender gender) const;
 
 	void add_specimen_name(const gender gender, const std::string &name);
@@ -75,6 +78,7 @@ public:
 
 private:
 	taxon *supertaxon = nullptr;
+	bool ethereal = false;
 	std::map<gender, std::unique_ptr<name_generator>> specimen_name_generators; //specimen names, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 
 	friend int ::CclDefineSpecies(lua_State *l);
