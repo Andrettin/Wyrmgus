@@ -314,7 +314,15 @@ std::shared_ptr<CGraphic> CGraphic::New(const std::string &filepath, const int w
 	const auto find_iterator = CGraphic::graphics_by_filepath.find(library_filepath);
 	if (find_iterator != CGraphic::graphics_by_filepath.end()) {
 		std::shared_ptr<CGraphic> g = find_iterator->second.lock();
-		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
+
+		if (w != 0 && g->get_original_frame_size().width() != w) {
+			throw std::runtime_error("Frame width " + std::to_string(w) + " for player color graphic \"" + library_filepath + "\" is neither 0, nor is equal to the pre-existing frame width for the graphic (" + std::to_string(g->get_original_frame_size().width()) + ".");
+		}
+
+		if (h != 0 && g->get_original_frame_size().height() != h) {
+			throw std::runtime_error("Frame height " + std::to_string(h) + " for player color graphic \"" + library_filepath + "\" is neither 0, nor is equal to the pre-existing frame height for the graphic (" + std::to_string(g->get_original_frame_size().height()) + ".");
+		}
+
 		return g;
 	}
 
@@ -355,7 +363,14 @@ std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::New(const std::string 
 	const auto find_iterator = CGraphic::graphics_by_filepath.find(file);
 	if (find_iterator != CGraphic::graphics_by_filepath.end()) {
 		std::shared_ptr<CGraphic> g = find_iterator->second.lock();
-		Assert((size.width() == 0 || g->Width == size.width()) && (g->Height == size.height() || size.height() == 0));
+
+		if (size.width() != 0 && g->get_original_frame_size().width() != size.width()) {
+			throw std::runtime_error("Frame width " + std::to_string(size.width()) + " for player color graphic \"" + file + "\" is neither 0, nor is equal to the pre-existing frame width for the graphic (" + std::to_string(g->get_original_frame_size().width()) + ".");
+		}
+
+		if (size.height() != 0 && g->get_original_frame_size().height() != size.height()) {
+			throw std::runtime_error("Frame height " + std::to_string(size.height()) + " for player color graphic \"" + file + "\" is neither 0, nor is equal to the pre-existing frame height for the graphic (" + std::to_string(g->get_original_frame_size().height()) + ".");
+		}
 
 		auto pcg = std::dynamic_pointer_cast<CPlayerColorGraphic>(g);
 
