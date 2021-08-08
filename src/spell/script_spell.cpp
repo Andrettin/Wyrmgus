@@ -31,11 +31,8 @@
 #include "spell/spell.h"
 
 #include "civilization.h"
-#include "faction.h"
 #include "luacallback.h"
-//Wyrmgus start
-#include "player.h" // for making user of PlayerRaces
-//Wyrmgus end
+#include "player/faction.h"
 #include "script.h"
 #include "sound/script_sound.h"
 #include "sound/sound.h"

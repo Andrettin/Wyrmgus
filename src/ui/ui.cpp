@@ -34,7 +34,6 @@
 #include "civilization.h"
 #include "database/defines.h"
 #include "engine_interface.h"
-#include "faction.h"
 //Wyrmgus start
 #include "game.h"
 #include "grand_strategy.h"
@@ -45,6 +44,7 @@
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "menus.h"
+#include "player/faction.h"
 #include "sound/sound.h"
 #include "title.h"
 #include "translate.h"

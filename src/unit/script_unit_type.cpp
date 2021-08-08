@@ -35,7 +35,6 @@
 //Wyrmgus end
 #include "civilization.h"
 #include "editor.h"
-#include "faction.h"
 #include "gender.h"
 #include "item/item_slot.h"
 #include "item/unique_item.h"
@@ -48,6 +47,7 @@
 //Wyrmgus start
 #include "network.h" //for updating levels
 //Wyrmgus end
+#include "player/faction.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"

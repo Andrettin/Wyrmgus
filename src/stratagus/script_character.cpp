@@ -32,7 +32,6 @@
 
 #include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
-#include "faction.h"
 #include "gender.h"
 #include "grand_strategy.h"
 #include "item/persistent_item.h"
@@ -40,6 +39,7 @@
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "map/site.h"
+#include "player/faction.h"
 #include "player.h"
 #include "province.h"
 #include "religion/deity.h"

@@ -229,9 +229,11 @@ set(map_SRCS
 	src/map/map_template_container.cpp
 	src/map/map_wall.cpp
 	src/map/minimap.cpp
+	src/map/province.cpp
 	src/map/region.cpp
 	src/map/region_history.cpp
 	src/map/script_map.cpp
+	src/map/script_province.cpp
 	src/map/script_tileset.cpp
 	src/map/site.cpp
 	src/map/site_container.cpp
@@ -304,6 +306,20 @@ set(pathfinder_SRCS
 	src/pathfinder/script_pathfinder.cpp
 )
 source_group(pathfinder FILES ${pathfinder_SRCS})
+
+set(player_SRCS
+	src/player/civilization.cpp
+	src/player/civilization_base.cpp
+	src/player/civilization_group.cpp
+	src/player/civilization_history.cpp
+	src/player/dynasty.cpp
+	src/player/faction.cpp
+	src/player/faction_history.cpp
+	src/player/player.cpp
+	src/player/player_color.cpp
+	src/player/script_player.cpp
+)
+source_group(player FILES ${player_SRCS})
 
 set(quest_SRCS
 	src/quest/achievement.cpp
@@ -390,19 +406,12 @@ set(wyrmgus_base_SRCS
 	src/stratagus/age.cpp
 	src/stratagus/character.cpp
 	src/stratagus/character_history.cpp
-	src/stratagus/civilization.cpp
-	src/stratagus/civilization_base.cpp
-	src/stratagus/civilization_group.cpp
-	src/stratagus/civilization_history.cpp
 	src/stratagus/config.cpp
 	src/stratagus/currency.cpp
 	src/stratagus/dialogue.cpp
 	src/stratagus/dialogue_node.cpp
 	src/stratagus/dialogue_option.cpp
-	src/stratagus/dynasty.cpp
 	src/stratagus/engine_interface.cpp
-	src/stratagus/faction.cpp
-	src/stratagus/faction_history.cpp
 	src/stratagus/fallback_name_generator.cpp
 	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp
@@ -414,14 +423,9 @@ set(wyrmgus_base_SRCS
 	src/stratagus/mod.cpp
 	src/stratagus/name_generator.cpp
 	src/stratagus/parameters.cpp
-	src/stratagus/player.cpp
-	src/stratagus/player_color.cpp
-	src/stratagus/province.cpp
 	src/stratagus/script.cpp
 	src/stratagus/script_character.cpp
 	src/stratagus/script_grand_strategy.cpp
-	src/stratagus/script_player.cpp
-	src/stratagus/script_province.cpp
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
 	src/stratagus/text_processor.cpp
@@ -592,6 +596,7 @@ set(wyrmgus_SRCS
 	${network_SRCS}
 	${particle_SRCS}
 	${pathfinder_SRCS}
+	${player_SRCS}
 	${quest_SRCS}
 	${quest_objective_SRCS}
 	${religion_SRCS}
@@ -802,6 +807,22 @@ set(wyrmgus_network_HDRS
 	src/network/client.h
 	src/network/network_manager.h
 	src/network/network_state.h
+)
+
+set(wyrmgus_player_HDRS
+	src/player/civilization_base.h
+	src/player/civilization_history.h
+	src/player/civilization_group.h
+	src/player/civilization_group_rank.h
+	src/player/diplomacy_state.h
+	src/player/dynasty.h
+	src/player/faction.h
+	src/player/faction_history.h
+	src/player/faction_tier.h
+	src/player/faction_type.h
+	src/player/government_type.h
+	src/player/player_container.h
+	src/player/vassalage_type.h
 )
 
 set(wyrmgus_quest_HDRS
@@ -1131,33 +1152,20 @@ set(wyrmgus_generic_HDRS
 	src/include/viewport.h
 	src/include/widgets.h
 	src/include/SetupConsole_win32.h
-	src/stratagus/civilization_base.h
 	src/stratagus/character_history.h
-	src/stratagus/civilization_history.h
-	src/stratagus/civilization_group.h
-	src/stratagus/civilization_group_rank.h
 	src/stratagus/dialogue.h
 	src/stratagus/dialogue_node.h
 	src/stratagus/dialogue_option.h
-	src/stratagus/diplomacy_state.h
-	src/stratagus/dynasty.h
 	src/stratagus/engine_interface.h
-	src/stratagus/faction.h
-	src/stratagus/faction_history.h
-	src/stratagus/faction_tier.h
-	src/stratagus/faction_type.h
 	src/stratagus/fallback_name_generator.h
 	src/stratagus/game_concept.h
 	src/stratagus/gender.h
-	src/stratagus/government_type.h
 	src/stratagus/literary_text.h
 	src/stratagus/magic_domain.h
 	src/stratagus/name_generator.h
 	src/stratagus/parameters.h
-	src/stratagus/player_container.h
 	src/stratagus/text_processing_context.h
 	src/stratagus/text_processor.h
-	src/stratagus/vassalage_type.h
 )
 
 source_group(wyrmgus FILES ${wyrmgus_generic_HDRS})
@@ -1173,6 +1181,7 @@ source_group(language FILES ${wyrmgus_language_HDRS})
 source_group(map FILES ${wyrmgus_map_HDRS})
 source_group(missile FILES ${wyrmgus_missile_HDRS})
 source_group(network FILES ${wyrmgus_network_HDRS})
+source_group(player FILES ${wyrmgus_player_HDRS})
 source_group(quest FILES ${wyrmgus_quest_HDRS})
 source_group(quest\\objective FILES ${wyrmgus_quest_objective_HDRS})
 source_group(religion FILES ${wyrmgus_religion_HDRS})
@@ -1204,6 +1213,7 @@ set(wyrmgus_HDRS
 	${wyrmgus_map_HDRS}
 	${wyrmgus_missile_HDRS}
 	${wyrmgus_network_HDRS}
+	${wyrmgus_player_HDRS}
 	${wyrmgus_quest_HDRS}
 	${wyrmgus_quest_objective_HDRS}
 	${wyrmgus_religion_HDRS}
@@ -1727,6 +1737,7 @@ if(ENABLE_UNITY_BUILD)
 	set_source_files_properties(${network_SRCS} PROPERTIES UNITY_GROUP "network")
 	set_source_files_properties(${particle_SRCS} PROPERTIES UNITY_GROUP "particle")
 	set_source_files_properties(${pathfinder_SRCS} PROPERTIES UNITY_GROUP "pathfinder")
+	set_source_files_properties(${player_SRCS} PROPERTIES UNITY_GROUP "player")
 	set_source_files_properties(${quest_SRCS} ${quest_objective_SRCS} PROPERTIES UNITY_GROUP "quest")
 	set_source_files_properties(${religion_SRCS} PROPERTIES UNITY_GROUP "religion")
 	set_source_files_properties(${script_SRCS} PROPERTIES UNITY_GROUP "script")

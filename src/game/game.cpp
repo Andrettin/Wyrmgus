@@ -44,11 +44,8 @@
 #include "database/defines.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
-#include "diplomacy_state.h"
 #include "economy/resource.h"
 #include "editor.h"
-#include "faction.h"
-#include "faction_type.h"
 #include "game/results_info.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -71,6 +68,9 @@
 #include "network.h"
 #include "parameters.h"
 #include "pathfinder.h"
+#include "player/diplomacy_state.h"
+#include "player/faction.h"
+#include "player/faction_type.h"
 #include "player.h"
 #include "player_color.h"
 //Wyrmgus start

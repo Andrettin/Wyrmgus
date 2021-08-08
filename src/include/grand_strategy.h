@@ -28,10 +28,10 @@
 
 #include "character.h"
 #include "economy/resource.h"
-#include "faction_tier.h"
 #include "map/map.h"
+#include "player/faction_tier.h"
+#include "player/government_type.h"
 #include "province.h"
-#include "government_type.h"
 #include "vec2i.h"
 #include "video/video.h"
 #include "player.h"

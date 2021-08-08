@@ -30,11 +30,11 @@
 
 #include "config.h"
 #include "database/preferences.h"
-#include "dynasty.h"
 #include "economy/resource.h"
-#include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "player/dynasty.h"
+#include "player/faction.h"
 #include "script/trigger.h"
 #include "spell/spell.h"
 #include "ui/button_cmd.h"

@@ -31,14 +31,14 @@
 #include "commands.h"
 
 #include "actions.h"
-#include "diplomacy_state.h"
-#include "dynasty.h"
-#include "faction.h"
 //Wyrmgus start
 #include "map/map.h" //it contains map width and height
 //Wyrmgus end
 #include "net_message.h"
 #include "network.h"
+#include "player/diplomacy_state.h"
+#include "player/dynasty.h"
+#include "player/faction.h"
 #include "quest/quest.h"
 #include "replay.h"
 #include "spell/spell.h"

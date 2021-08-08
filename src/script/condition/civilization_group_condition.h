@@ -27,7 +27,7 @@
 #pragma once
 
 #include "civilization.h"
-#include "civilization_group.h"
+#include "player/civilization_group.h"
 #include "script/condition/condition.h"
 
 namespace wyrmgus {

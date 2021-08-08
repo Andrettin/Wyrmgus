@@ -26,8 +26,8 @@
 
 #pragma once
 
-#include "civilization_base.h"
 #include "database/data_type.h"
+#include "player/civilization_base.h"
 #include "time/date.h"
 #include "ui/ui.h"
 

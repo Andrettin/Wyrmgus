@@ -30,10 +30,10 @@
 
 #include "character.h"
 #include "civilization.h"
-#include "faction.h"
 #include "gender.h"
 #include "magic_domain.h"
 #include "map/world.h"
+#include "player/faction.h"
 #include "player.h"
 #include "province.h"
 #include "spell/spell.h"

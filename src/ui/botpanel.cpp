@@ -41,9 +41,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
-#include "dynasty.h"
 #include "economy/resource.h"
-#include "faction.h"
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -58,6 +56,8 @@
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
+#include "player/dynasty.h"
+#include "player/faction.h"
 #include "player.h"
 #include "quest/achievement.h"
 #include "script/condition/condition.h"
@@ -776,7 +776,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 {
 	CPopup *popup = PopupByIdent(button.Popup);
 	bool useCache = false;
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	if (!popup) {
 		return;
@@ -790,7 +790,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 	std::array<int, ManaResCost + 1> Costs{};
 	Costs.fill(0);
 
-	const wyrmgus::unit_type *unit_type = button.get_unit_type();
+	const unit_type *unit_type = button.get_unit_type();
 	const CUpgrade *upgrade = button.get_value_upgrade();
 
 	switch (button.Action) {
@@ -807,7 +807,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 			for (const auto &[resource, cost] : spell::get_all()[button.Value]->get_costs()) {
 				Costs[resource->get_index()] = cost;
 			}
-			Costs[ManaResCost] = wyrmgus::spell::get_all()[button.Value]->get_mana_cost();
+			Costs[ManaResCost] = spell::get_all()[button.Value]->get_mana_cost();
 			break;
 		case ButtonCmd::Build:
 		case ButtonCmd::BuildClass:
@@ -825,8 +825,8 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 			break;
 		}
 		case ButtonCmd::Buy:
-			Costs[FoodCost] = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Variable[DEMAND_INDEX].Value;
-			Costs[CopperCost] = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).GetPrice();
+			Costs[FoodCost] = unit_manager::get()->GetSlotUnit(button.Value).Variable[DEMAND_INDEX].Value;
+			Costs[CopperCost] = unit_manager::get()->GetSlotUnit(button.Value).GetPrice();
 			break;
 		default:
 			break;

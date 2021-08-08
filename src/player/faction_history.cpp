@@ -26,11 +26,11 @@
 
 #include "stratagus.h"
 
-#include "faction_history.h"
+#include "player/faction_history.h"
 
 #include "database/sml_data.h"
-#include "diplomacy_state.h"
-#include "faction.h"
+#include "player/diplomacy_state.h"
+#include "player/faction.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"

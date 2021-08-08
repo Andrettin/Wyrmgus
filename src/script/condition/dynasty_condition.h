@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "dynasty.h"
+#include "player/dynasty.h"
 #include "script/condition/condition.h"
 
 namespace wyrmgus {

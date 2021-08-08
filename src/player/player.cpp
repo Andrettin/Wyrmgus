@@ -35,19 +35,12 @@
 #include "ai.h"
 #include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
-#include "civilization_group.h"
-#include "civilization_history.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
 #include "database/defines.h"
 #include "dialogue.h"
-#include "diplomacy_state.h"
-#include "dynasty.h"
 #include "economy/resource_storage_type.h"
 #include "editor.h"
-#include "faction.h"
-#include "faction_history.h"
-#include "faction_type.h"
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end
@@ -77,6 +70,14 @@
 //Wyrmgus start
 #include "parameters.h"
 //Wyrmgus end
+#include "player/civilization_group.h"
+#include "player/civilization_history.h"
+#include "player/diplomacy_state.h"
+#include "player/dynasty.h"
+#include "player/faction.h"
+#include "player/faction_history.h"
+#include "player/faction_type.h"
+#include "player/vassalage_type.h"
 #include "player_color.h"
 #include "quest/campaign.h"
 #include "quest/objective/quest_objective.h"
@@ -118,7 +119,6 @@
 #include "util/util.h"
 #include "util/vector_util.h"
 #include "util/vector_random_util.h"
-#include "vassalage_type.h"
 #include "video/font.h"
 #include "video/video.h"
 

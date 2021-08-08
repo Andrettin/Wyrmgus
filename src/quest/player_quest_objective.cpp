@@ -28,7 +28,7 @@
 
 #include "quest/player_quest_objective.h"
 
-#include "faction.h"
+#include "player/faction.h"
 #include "player.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"

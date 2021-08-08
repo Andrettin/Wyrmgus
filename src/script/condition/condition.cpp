@@ -30,9 +30,9 @@
 #include "script/condition/condition.h"
 
 #include "config.h"
-#include "faction_type.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "player/faction_type.h"
 #include "player.h"
 #include "religion/deity.h"
 #include "script.h"

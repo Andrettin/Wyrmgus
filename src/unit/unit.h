@@ -27,8 +27,8 @@
 #pragma once
 
 #include "item/item_slot.h"
+#include "player/player_container.h"
 #include "player.h"
-#include "player_container.h"
 #include "spell/spell_container.h"
 #include "unit/unit_type.h"
 #include "unit/unit_variable.h"

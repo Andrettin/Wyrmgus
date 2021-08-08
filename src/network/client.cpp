@@ -425,14 +425,6 @@ void CClient::SetConfig(const CInitMessage_Config &msg)
 	Hosts[HostsCount].SetName(msg.hosts[msg.hostsCount - 1].PlyName);
 	++HostsCount;
 	NetPlayers = HostsCount + 1;
-#ifdef DEBUG
-	const std::string serverHostStr = serverHost.toString();
-	DebugPrint("Server %d = %s [%.*s]\n" _C_
-		msg.hosts[msg.hostsCount - 1].PlyNr _C_
-		serverHostStr.c_str() _C_
-		static_cast<int>(sizeof(msg.hosts[msg.hostsCount - 1].PlyName)) _C_
-		msg.hosts[msg.hostsCount - 1].PlyName);
-#endif
 }
 
 bool CClient::Parse(const std::array<unsigned char, 1024> &buf)

@@ -30,7 +30,6 @@
 
 #include "actions.h"
 #include "commands.h"
-#include "diplomacy_state.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -40,6 +39,7 @@
 #include "netconnect.h"
 #include "network.h"
 #include "parameters.h"
+#include "player/diplomacy_state.h"
 #include "player.h"
 //Wyrmgus start
 #include "quest/quest.h"

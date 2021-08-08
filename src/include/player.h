@@ -28,7 +28,7 @@
 
 #include "economy/resource_container.h"
 #include "map/landmass_container.h"
-#include "player_container.h"
+#include "player/player_container.h"
 #include "ui/icon.h"
 #include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"

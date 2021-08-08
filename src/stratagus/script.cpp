@@ -41,8 +41,6 @@
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
-#include "faction.h"
-#include "faction_type.h"
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -57,6 +55,8 @@
 #include "map/tile.h"
 #include "map/world.h"
 #include "parameters.h"
+#include "player/faction.h"
+#include "player/faction_type.h"
 #include "player.h"
 #include "script/trigger.h"
 #include "spell/spell.h"

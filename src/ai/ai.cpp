@@ -136,7 +136,6 @@
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
-#include "faction.h"
 #include "grand_strategy.h"
 #include "iolib.h"
 //Wyrmgus start
@@ -152,6 +151,7 @@
 #include "network.h"
 //Wyrmgus end
 #include "pathfinder.h"
+#include "player/faction.h"
 #include "player.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"

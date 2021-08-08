@@ -26,26 +26,28 @@
 
 #include "stratagus.h"
 
-#include "civilization_group.h"
+#include "player/civilization_history.h"
 
-#include "civilization_group_rank.h"
+#include "upgrade/upgrade_class.h"
+#include "upgrade/upgrade_structs.h"
+#include "util/container_util.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
 
-civilization_group::civilization_group(const std::string &identifier)
-	: civilization_base(identifier), rank(civilization_group_rank::none)
+void civilization_history::remove_acquired_upgrade_class(const upgrade_class *upgrade_class)
 {
+	vector::remove(this->acquired_upgrade_classes, upgrade_class);
 }
 
-void civilization_group::check() const
+void civilization_history::remove_acquired_upgrade(const CUpgrade *upgrade)
 {
-	if (this->get_rank() == civilization_group_rank::none) {
-		throw std::runtime_error("Civilization group \"" + this->get_identifier() + "\" has no rank.");
-	}
+	vector::remove(this->acquired_upgrades, upgrade);
+}
 
-	if (this->get_group() != nullptr && this->get_rank() >= this->get_group()->get_rank()) {
-		throw std::runtime_error("The rank of civilization group \"" + this->get_identifier() + "\" is greater than or equal to that of its upper group.");
-	}
+void civilization_history::remove_explored_settlement(const site *settlement)
+{
+	vector::remove(this->explored_settlements, settlement);
 }
 
 }

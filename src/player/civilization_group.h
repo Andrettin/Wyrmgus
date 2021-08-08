@@ -26,7 +26,6 @@
 
 #pragma once
 
-#include "civilization_base.h"
 #include "database/data_type.h"
 
 namespace wyrmgus {

@@ -26,74 +26,26 @@
 
 #include "stratagus.h"
 
-#include "dynasty.h"
+#include "player/civilization_group.h"
 
-#include "faction.h"
-#include "script/condition/and_condition.h"
-#include "upgrade/upgrade_structs.h"
-#include "util/container_util.h"
-#include "util/vector_util.h"
+#include "player/civilization_group_rank.h"
 
 namespace wyrmgus {
 
-dynasty::dynasty(const std::string &identifier) : detailed_data_entry(identifier)
+civilization_group::civilization_group(const std::string &identifier)
+	: civilization_base(identifier), rank(civilization_group_rank::none)
 {
 }
 
-dynasty::~dynasty()
+void civilization_group::check() const
 {
-}
-
-void dynasty::process_sml_scope(const sml_data &scope)
-{
-	const std::string &tag = scope.get_tag();
-
-	if (tag == "preconditions") {
-		this->preconditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->preconditions, scope);
-	} else if (tag == "conditions") {
-		this->conditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->conditions, scope);
-	} else {
-		data_entry::process_sml_scope(scope);
-	}
-}
-
-void dynasty::check() const
-{
-	if (this->get_preconditions() != nullptr) {
-		this->get_preconditions()->check_validity();
+	if (this->get_rank() == civilization_group_rank::none) {
+		throw std::runtime_error("Civilization group \"" + this->get_identifier() + "\" has no rank.");
 	}
 
-	if (this->get_conditions() != nullptr) {
-		this->get_conditions()->check_validity();
+	if (this->get_group() != nullptr && this->get_rank() >= this->get_group()->get_rank()) {
+		throw std::runtime_error("The rank of civilization group \"" + this->get_identifier() + "\" is greater than or equal to that of its upper group.");
 	}
-}
-
-void dynasty::set_upgrade(CUpgrade *upgrade)
-{
-	if (upgrade == this->get_upgrade()) {
-		return;
-	}
-
-	this->upgrade = upgrade;
-	upgrade->set_dynasty(this);
-}
-
-QVariantList dynasty::get_factions_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_factions());
-}
-
-void dynasty::add_faction(faction *faction)
-{
-	this->factions.push_back(faction);
-	faction->add_dynasty(this);
-}
-
-void dynasty::remove_faction(faction *faction)
-{
-	vector::remove(this->factions, faction);
 }
 
 }

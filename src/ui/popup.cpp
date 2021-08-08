@@ -31,8 +31,8 @@
 #include "ui/popup.h"
 
 #include "database/defines.h"
-#include "faction.h"
 #include "item/item_class.h"
+#include "player/faction.h"
 #include "player.h"
 #include "script.h"
 #include "script/condition/condition.h"

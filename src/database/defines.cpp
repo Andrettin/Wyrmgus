@@ -32,7 +32,7 @@
 #include "database/preferences.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
-#include "faction_type.h"
+#include "player/faction_type.h"
 #include "sound/game_sound_set.h"
 #include "sound/music.h"
 #include "upgrade/upgrade_structs.h"

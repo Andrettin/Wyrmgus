@@ -26,28 +26,74 @@
 
 #include "stratagus.h"
 
-#include "civilization_history.h"
+#include "player/dynasty.h"
 
-#include "upgrade/upgrade_class.h"
+#include "player/faction.h"
+#include "script/condition/and_condition.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
 
-void civilization_history::remove_acquired_upgrade_class(const upgrade_class *upgrade_class)
+dynasty::dynasty(const std::string &identifier) : detailed_data_entry(identifier)
 {
-	vector::remove(this->acquired_upgrade_classes, upgrade_class);
 }
 
-void civilization_history::remove_acquired_upgrade(const CUpgrade *upgrade)
+dynasty::~dynasty()
 {
-	vector::remove(this->acquired_upgrades, upgrade);
 }
 
-void civilization_history::remove_explored_settlement(const site *settlement)
+void dynasty::process_sml_scope(const sml_data &scope)
 {
-	vector::remove(this->explored_settlements, settlement);
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "preconditions") {
+		this->preconditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->preconditions, scope);
+	} else if (tag == "conditions") {
+		this->conditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->conditions, scope);
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
+void dynasty::check() const
+{
+	if (this->get_preconditions() != nullptr) {
+		this->get_preconditions()->check_validity();
+	}
+
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
+	}
+}
+
+void dynasty::set_upgrade(CUpgrade *upgrade)
+{
+	if (upgrade == this->get_upgrade()) {
+		return;
+	}
+
+	this->upgrade = upgrade;
+	upgrade->set_dynasty(this);
+}
+
+QVariantList dynasty::get_factions_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_factions());
+}
+
+void dynasty::add_faction(faction *faction)
+{
+	this->factions.push_back(faction);
+	faction->add_dynasty(this);
+}
+
+void dynasty::remove_faction(faction *faction)
+{
+	vector::remove(this->factions, faction);
 }
 
 }

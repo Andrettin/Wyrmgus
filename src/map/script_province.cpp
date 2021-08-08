@@ -31,10 +31,10 @@
 #include "province.h"
 
 #include "civilization.h"
-#include "faction.h"
 #include "iolib.h"
 #include "map/region.h"
 #include "map/world.h"
+#include "player/faction.h"
 #include "player.h"
 #include "script.h"
 #include "species/species.h"

@@ -37,7 +37,6 @@
 #include "dialogue.h"
 #include "editor.h"
 #include "engine_interface.h"
-#include "faction.h"
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -50,6 +49,7 @@
 #include "missile.h"
 #include "network.h"
 #include "particle.h"
+#include "player/faction.h"
 #include "quest/campaign.h"
 //Wyrmgus start
 #include "quest/quest.h"

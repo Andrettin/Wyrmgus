@@ -29,8 +29,8 @@
 #include "quest/objective/quest_objective.h"
 
 #include "character.h"
-#include "faction.h"
 #include "map/site.h"
+#include "player/faction.h"
 #include "quest/objective/bring_unit_to_site_objective.h"
 #include "quest/objective/build_units_objective.h"
 #include "quest/objective/destroy_faction_objective.h"

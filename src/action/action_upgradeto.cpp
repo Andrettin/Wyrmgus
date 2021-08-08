@@ -34,7 +34,6 @@
 #include "animation.h"
 #include "civilization.h"
 #include "economy/resource_storage_type.h"
-#include "faction.h"
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end
@@ -42,6 +41,7 @@
 #include "item/item_slot.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "player/faction.h"
 #include "player.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"

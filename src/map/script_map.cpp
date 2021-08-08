@@ -34,7 +34,6 @@
 #include "civilization.h"
 #include "database/defines.h"
 #include "editor.h"
-#include "faction.h"
 #include "game.h"
 #include "iolib.h"
 #include "item/unique_item.h"
@@ -51,6 +50,7 @@
 #include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "map/world.h"
+#include "player/faction.h"
 //Wyrmgus start
 #include "province.h"
 //Wyrmgus end

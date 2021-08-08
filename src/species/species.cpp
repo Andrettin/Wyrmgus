@@ -174,6 +174,12 @@ void species::check() const
 		throw std::runtime_error("Species \"" + this->get_identifier() + "\" has no supertaxon.");
 	}
 
+	/*
+	if (this->get_era() == geological_era::none && !this->is_ethereal()) {
+		throw std::runtime_error("Non-ethereal species \"" + this->get_identifier() + "\" has no era.");
+	}
+	*/
+
 	for (const species *pre_evolution : this->get_pre_evolutions()) {
 		if (this->get_era() != geological_era::none && pre_evolution->get_era() != geological_era::none && this->get_era() <= pre_evolution->get_era()) {
 			throw std::runtime_error("Species \"" + this->get_identifier() + "\" is set to evolve from \"" + pre_evolution->get_identifier() + "\", but is from the same or an earlier era than the latter.");

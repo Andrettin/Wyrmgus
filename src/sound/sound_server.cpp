@@ -34,13 +34,9 @@
 #include "civilization.h"
 #include "database/preferences.h"
 #include "dialogue.h"
-#include "faction.h"
 #include "iocompat.h"
 #include "iolib.h"
-//Wyrmgus start
-#include "grand_strategy.h" //for playing faction music
-#include "player.h" //for playing faction music
-//Wyrmgus end
+#include "player/faction.h"
 #include "sound/music.h"
 #include "sound/music_player.h"
 #include "sound/music_type.h"

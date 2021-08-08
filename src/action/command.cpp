@@ -34,13 +34,14 @@
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
 #include "commands.h"
-#include "diplomacy_state.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "pathfinder.h"
+#include "player/diplomacy_state.h"
+#include "player/vassalage_type.h"
 #include "player.h"
 #include "script.h"
 #include "spell/spell.h"
@@ -54,7 +55,6 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
-#include "vassalage_type.h"
 
 /**
 **  Release all orders of a unit.

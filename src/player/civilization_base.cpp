@@ -26,16 +26,16 @@
 
 #include "stratagus.h"
 
-#include "civilization_base.h"
+#include "player/civilization_base.h"
 
-#include "civilization_group.h"
-#include "civilization_history.h"
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
-#include "faction.h"
 #include "fallback_name_generator.h"
 #include "gender.h"
 #include "name_generator.h"
+#include "player/civilization_group.h"
+#include "player/civilization_history.h"
+#include "player/faction.h"
 #include "sound/sound.h"
 #include "unit/unit_class.h"
 #include "util/container_util.h"

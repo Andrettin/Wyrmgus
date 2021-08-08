@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "faction.h"
+#include "player/faction.h"
 #include "script/condition/condition.h"
 
 namespace wyrmgus {
