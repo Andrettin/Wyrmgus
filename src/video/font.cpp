@@ -242,6 +242,10 @@ int font::Width(const std::string &text)
 	size_t pos = 0;
 
 	while (GetUTF8(text, pos, utf8)) {
+		if (utf8 == 0) {
+			break;
+		}
+
 		if (utf8 == '~') {
 			if (text[pos] == '|') {
 				++pos;
@@ -402,7 +406,10 @@ int CLabel::DoDrawText(int x, int y, const char *const text, const size_t len, c
 
 	while (GetUTF8(text, len, pos, utf8)) {
 		tab = false;
-		if (utf8 == '\t') {
+
+		if (utf8 == 0) {
+			break;
+		} else if (utf8 == '\t') {
 			tab = true;
 		} else if (utf8 == '~') {
 			switch (text[pos]) {
@@ -464,6 +471,7 @@ int CLabel::DoDrawText(int x, int y, const char *const text, const size_t len, c
 				}
 			}
 		}
+
 		if (tab) {
 			for (int tabs = 0; tabs < tabSize; ++tabs) {
 				widths += font->DrawChar<CLIP>(*g, ' ', x + widths, y, render_commands);
