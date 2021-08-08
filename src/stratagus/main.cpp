@@ -135,7 +135,11 @@ int main(int argc, char **argv)
 
 		app.setWindowIcon(QIcon(root_path + "/graphics/interface/icons/wyrmsun_icon_32.png"));
 
+#ifdef DEBUG
+		engine.addImportPath(root_path + "/libraries_debug/qml");
+#else
 		engine.addImportPath(root_path + "/libraries/qml");
+#endif
 
 		QUrl url = QDir(root_path + "/interface/").absoluteFilePath("Main.qml");
 		url.setScheme("file");
