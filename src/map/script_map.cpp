@@ -67,6 +67,8 @@
 #include "unit/historical_unit.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
+#include "util/exception_util.h"
+#include "util/log_util.h"
 #include "util/point_util.h"
 #include "util/util.h"
 #include "video/video.h"
@@ -857,8 +859,10 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 				std::throw_with_nested(std::runtime_error("Failed to apply map template \"" + map_template->get_identifier() + "\"."));
 			}
 		}
-	} catch (...) {
-		std::throw_with_nested(std::runtime_error("Failed to campaign map for campaign \"" + campaign_ident + "\"."));
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		log::log_error("Failed to apply campaign map for campaign \"" + campaign_ident + "\".");
+		Exit(EXIT_FAILURE);
 	}
 }
 //Wyrmgus end
