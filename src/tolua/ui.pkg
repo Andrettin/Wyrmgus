@@ -457,12 +457,6 @@ class MultiLineLabel : public Widget
 	};
 };
 
-// FIXME Combine with ScrollArea in our own widget
-//class TextBox : public Widget
-//{
-//	TextBox(const std::string text);
-//};
-
 class TextField : public Widget
 {
 	TextField(const std::string text);

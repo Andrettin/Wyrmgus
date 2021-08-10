@@ -66,8 +66,7 @@ namespace gcn
      * of the Widget that fits the ScrollArea and make it possible to scroll
      * to the other areas of the Widget.
      *
-     * NOTE: A TextBox or a ListBox looks really ugly unless they exist in a
-     *       ScrollArea.
+     * NOTE: A ListBox looks really ugly unless they exist in a ScrollArea.
      */
     class GCN_CORE_DECLSPEC ScrollArea:
         public BasicContainer,
