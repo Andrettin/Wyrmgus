@@ -133,57 +133,6 @@ static bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
 	return true;
 }
 
-/**
-**  Get the next utf8 character from an array of chars
-*/
-static bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
-{
-	// end of string
-	if (pos >= len) {
-		return false;
-	}
-
-	int count;
-	char c = text[pos++];
-
-	// ascii
-	if (!(c & 0x80)) {
-		utf8 = c;
-		return true;
-	}
-
-	if ((c & 0xE0) == 0xC0) {
-		utf8 = (c & 0x1F);
-		count = 1;
-	} else if ((c & 0xF0) == 0xE0) {
-		utf8 = (c & 0x0F);
-		count = 2;
-	} else if ((c & 0xF8) == 0xF0) {
-		utf8 = (c & 0x07);
-		count = 3;
-	} else if ((c & 0xFC) == 0xF8) {
-		utf8 = (c & 0x03);
-		count = 4;
-	} else if ((c & 0xFE) == 0xFC) {
-		utf8 = (c & 0x01);
-		count = 5;
-	} else {
-		DebugPrint("Invalid utf8 I %c <%s> [%lu]\n" _C_ c _C_ text _C_(long) pos);
-		return false;
-	}
-
-	while (count--) {
-		c = text[pos++];
-		if ((c & 0xC0) != 0x80) {
-			DebugPrint("Invalid utf8 II\n");
-			return false;
-		}
-		utf8 <<= 6;
-		utf8 |= (c & 0x3F);
-	}
-	return true;
-}
-
 namespace wyrmgus {
 
 int font::Height()
@@ -209,15 +158,11 @@ int font::Width(const int number)
 	}
 
 	int width = 0;
-#if 0
-	bool isformat = false;
-#endif
 	int utf8;
 	size_t pos = 0;
 	std::string text = FormatNumber(number);
-	const int len = text.length();
 
-	while (GetUTF8(text.c_str(), len, pos, utf8)) {
+	while (GetUTF8(text, pos, utf8)) {
 		width += this->char_width[utf8 - 32] + 1;
 	}
 	return width;
@@ -390,7 +335,7 @@ CGraphic *font::get_font_color_graphic(const wyrmgus::font_color *font_color)
 **  @return      The length of the printed text.
 */
 template <const bool CLIP>
-int CLabel::DoDrawText(int x, int y, const char *const text, const size_t len, const font_color *fc, std::vector<std::function<void(renderer *)>> &render_commands) const
+int CLabel::DoDrawText(int x, int y, const std::string &text, const font_color *fc, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	int widths = 0;
 	int utf8;
@@ -404,7 +349,7 @@ int CLabel::DoDrawText(int x, int y, const char *const text, const size_t len, c
 	CGraphic *g = this->font->get_font_color_graphic(fc);
 	//Wyrmgus end
 
-	while (GetUTF8(text, len, pos, utf8)) {
+	while (GetUTF8(text, pos, utf8)) {
 		tab = false;
 
 		if (utf8 == 0) {
@@ -448,7 +393,7 @@ int CLabel::DoDrawText(int x, int y, const char *const text, const size_t len, c
 					continue;
 
 				default: {
-					const char *p = text + pos;
+					const char *p = text.c_str() + pos;
 					while (*p && *p != '~') {
 						++p;
 					}
@@ -458,15 +403,16 @@ int CLabel::DoDrawText(int x, int y, const char *const text, const size_t len, c
 					}
 					std::string color;
 
-					color.insert(0, text + pos, p - (text + pos));
-					pos = p - text + 1;
+					color.insert(0, text.c_str() + pos, p - (text.c_str() + pos));
+					pos = p - text.c_str() + 1;
 					LastTextColor = fc;
-					const wyrmgus::font_color *fc_tmp = wyrmgus::font_color::get(color);
+					const font_color *fc_tmp = font_color::get(color);
 					if (fc_tmp) {
 						isColor = true;
 						fc = fc_tmp;
 						g = font->get_font_color_graphic(fc);
 					}
+
 					continue;
 				}
 			}
@@ -509,39 +455,29 @@ void CLabel::SetNormalColor(const wyrmgus::font_color *nc)
 }
 
 /// Draw text/number unclipped
-int CLabel::Draw(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const
-{
-	return DoDrawText<false>(x, y, text, strlen(text), normal, render_commands);
-}
-
 int CLabel::Draw(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	return DoDrawText<false>(x, y, text.c_str(), text.size(), normal, render_commands);
+	return DoDrawText<false>(x, y, text, normal, render_commands);
 }
 
 int CLabel::Draw(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	std::string str = FormatNumber(number);
-	return DoDrawText<false>(x, y, str.c_str(), str.length(), normal, render_commands);
+	const std::string str = FormatNumber(number);
+	return DoDrawText<false>(x, y, str, normal, render_commands);
 }
 
 /// Draw text/number clipped
-int CLabel::DrawClip(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const
-{
-	return DoDrawText<true>(x, y, text, strlen(text), normal, render_commands);
-}
-
 //Wyrmgus start
 //int CLabel::DrawClip(int x, int y, const std::string &text) const
-int CLabel::DrawClip(int x, int y, const std::string &text, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands) const
+int CLabel::DrawClip(int x, int y, const std::string &text, const bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands) const
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
+//	return DoDrawText<true>(x, y, text, normal);
 	if (is_normal) {
-		return DoDrawText<true>(x, y, text.c_str(), text.size(), normal, render_commands);
+		return DoDrawText<true>(x, y, text, normal, render_commands);
 	} else {
-		return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse, render_commands);
+		return DoDrawText<true>(x, y, text, reverse, render_commands);
 	}
 	//Wyrmgus end
 }
@@ -549,55 +485,44 @@ int CLabel::DrawClip(int x, int y, const std::string &text, bool is_normal, std:
 int CLabel::DrawClip(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	std::string str = FormatNumber(number);
-	return DoDrawText<true>(x, y, str.c_str(), str.length(), normal, render_commands);
+	return DoDrawText<true>(x, y, str, normal, render_commands);
 }
-
 
 /// Draw reverse text/number unclipped
-int CLabel::DrawReverse(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const
-{
-	return DoDrawText<false>(x, y, text, strlen(text), reverse, render_commands);
-}
-
 int CLabel::DrawReverse(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	return DoDrawText<false>(x, y, text.c_str(), text.size(), reverse, render_commands);
+	return DoDrawText<false>(x, y, text, reverse, render_commands);
 }
 
 int CLabel::DrawReverse(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	std::string str = FormatNumber(number);
-	return DoDrawText<false>(x, y, str.c_str(), str.length(), reverse, render_commands);
+	return DoDrawText<false>(x, y, str, reverse, render_commands);
 }
 
 /// Draw reverse text/number clipped
-int CLabel::DrawReverseClip(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const
-{
-	return DoDrawText<true>(x, y, text, strlen(text), reverse, render_commands);
-}
-
 int CLabel::DrawReverseClip(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse, render_commands);
+	return DoDrawText<true>(x, y, text, reverse, render_commands);
 }
 
 int CLabel::DrawReverseClip(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	std::string str = FormatNumber(number);
-	return DoDrawText<true>(x, y, str.c_str(), str.length(), reverse, render_commands);
+	return DoDrawText<true>(x, y, str, reverse, render_commands);
 }
 
 int CLabel::DrawCentered(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	int dx = font->Width(text);
-	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), normal, render_commands);
+	DoDrawText<false>(x - dx / 2, y, text, normal, render_commands);
 	return dx / 2;
 }
 
 int CLabel::DrawReverseCentered(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	int dx = font->Width(text);
-	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), reverse, render_commands);
+	DoDrawText<false>(x - dx / 2, y, text, reverse, render_commands);
 	return dx / 2;
 }
 

@@ -119,11 +119,8 @@ public:
 	void SetNormalColor(const wyrmgus::font_color *nc);
 
 	/// Draw text/number unclipped
-	int Draw(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	int Draw(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	int Draw(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const;
-	/// Draw text/number clipped
-	int DrawClip(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	//Wyrmgus start
 //	int DrawClip(int x, int y, const std::string &text) const;
 	int DrawClip(int x, int y, const std::string &text, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands) const;
@@ -136,11 +133,9 @@ public:
 
 	int DrawClip(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	/// Draw reverse text/number unclipped
-	int DrawReverse(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	int DrawReverse(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	int DrawReverse(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	/// Draw reverse text/number clipped
-	int DrawReverseClip(int x, int y, const char *const text, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	int DrawReverseClip(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	int DrawReverseClip(int x, int y, int number, std::vector<std::function<void(renderer *)>> &render_commands) const;
 
@@ -148,7 +143,7 @@ public:
 	int DrawReverseCentered(int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands) const;
 private:
 	template <const bool CLIP>
-	int DoDrawText(int x, int y, const char *const text, const size_t len, const font_color *fc, std::vector<std::function<void(renderer *)>> &render_commands) const;
+	int DoDrawText(int x, int y, const std::string &text, const font_color *fc, std::vector<std::function<void(renderer *)>> &render_commands) const;
 private:
 	const wyrmgus::font_color *normal;
 	const wyrmgus::font_color *reverse;
