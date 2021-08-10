@@ -502,7 +502,7 @@ static int CclDefinePanelContents(lua_State *l)
 			} else if (!strcmp(key, "Pos")) {
 				CclGetPos(l, &infopanel->PosX, &infopanel->PosY);
 			} else if (!strcmp(key, "DefaultFont")) {
-				infopanel->DefaultFont = wyrmgus::font::get(LuaToString(l, -1));
+				infopanel->DefaultFont = font::get(LuaToString(l, -1));
 			} else if (!strcmp(key, "Condition")) {
 				infopanel->Condition = ParseConditionPanel(l);
 			} else if (!strcmp(key, "Contents")) {
@@ -554,7 +554,7 @@ static int CclDefinePopup(lua_State *l)
 		if (!strcmp(key, "Ident")) {
 			popup->Ident = LuaToString(l, -1);
 		} else if (!strcmp(key, "DefaultFont")) {
-			popup->DefaultFont = wyrmgus::font::get(LuaToString(l, -1));
+			popup->DefaultFont = font::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "BackgroundColor")) {
 			popup->BackgroundColor = LuaToUnsignedNumber(l, -1);
 		} else if (!strcmp(key, "BorderColor")) {

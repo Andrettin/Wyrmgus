@@ -169,7 +169,6 @@ set(guichan_SRCS
 	src/guichan/gui.cpp
 	src/guichan/guichan.cpp
 	src/guichan/image.cpp
-	src/guichan/imagefont.cpp
 	src/guichan/key.cpp
 	src/guichan/keyinput.cpp
 	src/guichan/mouseinput.cpp
@@ -631,7 +630,6 @@ set(wyrmgus_guichan_HDRS
 	src/guichan/include/guichan/gsdl.h
 	src/guichan/include/guichan/gui.h
 	src/guichan/include/guichan.h
-	src/guichan/include/guichan/imagefont.h
 	src/guichan/include/guichan/image.h
 	src/guichan/include/guichan/imageloader.h
 	src/guichan/include/guichan/input.h

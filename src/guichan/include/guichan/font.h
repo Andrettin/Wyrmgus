@@ -62,8 +62,6 @@ namespace gcn
     /**
      * Holder of a font. Fonts should inherit from this class and
      * implements it's functions.
-     *
-     * @see ImageFont
      */
     class GCN_CORE_DECLSPEC Font
     {

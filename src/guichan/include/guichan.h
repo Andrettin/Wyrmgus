@@ -62,7 +62,6 @@
 #include <guichan/font.h>
 #include <guichan/gui.h>
 #include <guichan/image.h>
-#include <guichan/imagefont.h>
 #include <guichan/imageloader.h>
 #include <guichan/input.h>
 #include <guichan/key.h>
