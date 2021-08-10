@@ -312,22 +312,6 @@ private:
 	bool finished;            /// True while scrolling ends.
 };
 
-class Windows : public gcn::Window
-{
-public:
-	Windows(const std::string &text, int width, int height);
-	void add(gcn::Widget *widget, int x, int y);
-private:
-	virtual void mouseMotion(int x, int y) override;
-	virtual void setBackgroundColor(const gcn::Color &color) override;
-	virtual void setBaseColor(const gcn::Color &color) override;
-private:
-	gcn::ScrollArea scroll;   /// To use scroll bar.
-	gcn::Container container; /// data container.
-	bool blockwholewindow;    /// Manage condition limit of moveable windows. @see mouseMotion.
-	/// @todo Method to set this variable. Maybe set the variable static.
-};
-
 class ImageTextField : public gcn::TextField
 {
 	

@@ -190,7 +190,6 @@ set(guichan_SRCS
 	src/guichan/widgets/scrollarea.cpp
 	src/guichan/widgets/slider.cpp
 	src/guichan/widgets/textfield.cpp
-	src/guichan/widgets/window.cpp
 )
 source_group(guichan FILES ${guichan_SRCS})
 
@@ -653,7 +652,6 @@ set(wyrmgus_guichan_HDRS
 	src/guichan/include/guichan/widgets/scrollarea.h
 	src/guichan/include/guichan/widgets/slider.h
 	src/guichan/include/guichan/widgets/textfield.h
-	src/guichan/include/guichan/widgets/window.h
 	src/guichan/include/guichan/x.h
 )
 

@@ -86,7 +86,6 @@
 #include <guichan/widgets/slider.h>
 #include <guichan/widgets/radiobutton.h>
 #include <guichan/widgets/textfield.h>
-#include <guichan/widgets/window.h>
 
 #include "guichan/platform.h"
 
