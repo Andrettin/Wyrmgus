@@ -1125,6 +1125,12 @@ const world *CMap::calculate_pos_world(const QPoint &pos, const int z, const boo
 		return subtemplate->get_world();
 	}
 
+	const CMapLayer *map_layer = this->MapLayers[z].get();
+
+	if (map_layer->world != nullptr) {
+		return map_layer->world;
+	}
+
 	return nullptr;
 }
 
