@@ -341,33 +341,6 @@ class PlayerColorImageButton : public Button
 	void setGrayscale(bool grayscale);
 };
 
-class RadioButton : public Widget
-{
-	RadioButton();
-	RadioButton(const std::string caption, const std::string group, bool marked = false);
-
-	virtual bool isMarked();
-	virtual void setMarked(bool marked);
-	virtual const std::string &getCaption() const;
-	virtual void setCaption(const std::string caption);
-	virtual void setGroup(const std::string group);
-	virtual const std::string &getGroup() const;
-	virtual void adjustSize();
-};
-
-class ImageRadioButton : public RadioButton
-{
-	ImageRadioButton();
-	ImageRadioButton(const std::string caption, const std::string group, bool marked = false);
-
-	void setUncheckedNormalImage(const std::string image_path);
-	void setUncheckedPressedImage(const std::string image_path);
-	void setUncheckedDisabledImage(const std::string image_path);
-	void setCheckedNormalImage(const std::string image_path);
-	void setCheckedPressedImage(const std::string image_path);
-	void setCheckedDisabledImage(const std::string image_path);
-};
-
 class CheckBox : public Widget
 {
 	CheckBox();

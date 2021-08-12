@@ -180,37 +180,6 @@ public:
 	bool grayscale = false;
 };
 
-class ImageRadioButton : public gcn::RadioButton
-{
-public:
-	ImageRadioButton();
-	ImageRadioButton(const std::string &caption, const std::string &group,
-					 bool marked);
-
-	virtual void drawBox(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
-	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
-
-	virtual void mousePress(int x, int y, int button) override;
-	virtual void mouseRelease(int button) override;
-	virtual void mouseClick(int x, int y, int button, int count) override;
-	virtual void adjustSize() override;
-
-	void setUncheckedNormalImage(const std::string &image_path);
-	void setUncheckedPressedImage(const std::string &image_path);
-	void setUncheckedDisabledImage(const std::string &image_path);
-	void setCheckedNormalImage(const std::string &image_path);
-	void setCheckedPressedImage(const std::string &image_path);
-	void setCheckedDisabledImage(const std::string &image_path);
-
-	std::shared_ptr<CGraphic> uncheckedNormalImage;
-	std::shared_ptr<CGraphic> uncheckedPressedImage;
-	std::shared_ptr<CGraphic> uncheckedDisabledImage;
-	std::shared_ptr<CGraphic> checkedNormalImage;
-	std::shared_ptr<CGraphic> checkedPressedImage;
-	std::shared_ptr<CGraphic> checkedDisabledImage;
-	bool mMouseDown = false;
-};
-
 class ImageCheckBox : public gcn::CheckBox
 {
 public:

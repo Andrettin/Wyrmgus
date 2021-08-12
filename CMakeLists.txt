@@ -186,7 +186,6 @@ set(guichan_SRCS
 	src/guichan/widgets/gcn_icon.cpp
 	src/guichan/widgets/label.cpp
 	src/guichan/widgets/listbox.cpp
-	src/guichan/widgets/radiobutton.cpp
 	src/guichan/widgets/scrollarea.cpp
 	src/guichan/widgets/slider.cpp
 	src/guichan/widgets/textfield.cpp
@@ -648,7 +647,6 @@ set(wyrmgus_guichan_HDRS
 	src/guichan/include/guichan/widgets/icon.h
 	src/guichan/include/guichan/widgets/label.h
 	src/guichan/include/guichan/widgets/listbox.h
-	src/guichan/include/guichan/widgets/radiobutton.h
 	src/guichan/include/guichan/widgets/scrollarea.h
 	src/guichan/include/guichan/widgets/slider.h
 	src/guichan/include/guichan/widgets/textfield.h

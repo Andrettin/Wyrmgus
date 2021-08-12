@@ -84,7 +84,6 @@
 #include <guichan/widgets/listbox.h>
 #include <guichan/widgets/scrollarea.h>
 #include <guichan/widgets/slider.h>
-#include <guichan/widgets/radiobutton.h>
 #include <guichan/widgets/textfield.h>
 
 #include "guichan/platform.h"
