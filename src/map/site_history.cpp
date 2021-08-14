@@ -79,9 +79,13 @@ void site_history::add_building_class(unit_class *building_class)
 
 void site_history::remove_building_class(unit_class *building_class)
 {
-	if (vector::contains(this->building_classes, building_class)) {
-		vector::remove_one(this->building_classes, building_class);
+	if (building_class->is_town_hall()) {
+		if (!vector::contains(this->building_classes, building_class)) {
+			return;
+		}
 	}
+
+	vector::remove_one(this->building_classes, building_class);
 }
 
 }
