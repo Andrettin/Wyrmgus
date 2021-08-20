@@ -2063,13 +2063,6 @@ static int CclGetStratagusHomepage(lua_State *l)
 	return 1;
 }
 
-static int CclSetMenuRace(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	MenuRace = LuaToString(l, 1);
-	return 0;
-}
-
 /**
 **  Load the SavedGameInfo Header
 **
@@ -2126,8 +2119,6 @@ void LuaRegisterModules()
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 
 	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
-
-	lua_register(Lua, "SetMenuRace", CclSetMenuRace);
 
 	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
 	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);

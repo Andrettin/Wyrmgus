@@ -225,8 +225,6 @@ unsigned long __stack = 1000000;
 __attribute__ ((section(".text"))) UBYTE VString[] = "$VER: Wyrmsun " VERSION "\r\n";
 #endif
 
-std::string MenuRace;
-
 bool EnableDebugPrint;				/// if enabled, print the debug messages
 
 /*============================================================================

@@ -65,8 +65,6 @@
 #include "video/video.h"
 #include "widgets.h"
 
-#include <QWindow>
-
 static std::map<int, std::string> Key2Str;
 static std::map<std::string, int> Str2Key;
 

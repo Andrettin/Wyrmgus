@@ -173,7 +173,6 @@ namespace wyrmgus {
 	class renderer;
 }
 
-extern std::string MenuRace;
 //Wyrmgus start
 extern std::string PlayerFaction;
 //Wyrmgus end
