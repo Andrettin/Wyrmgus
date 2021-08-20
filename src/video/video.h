@@ -242,7 +242,7 @@ public:
 
 	QImage create_modified_image(const color_modification &color_modification, const bool grayscale) const;
 
-	const QImage *get_frame_image(const size_t frame_index, const color_modification &color_modification = color_modification(), const bool grayscale = false) const
+	const QImage *get_frame_image(const size_t frame_index, const color_modification &color_modification = {}, const bool grayscale = false) const
 	{
 		if (grayscale) {
 			if (!this->grayscale_frame_images.empty()) {
