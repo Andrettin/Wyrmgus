@@ -10,8 +10,8 @@ RUN apt-get -y install \
   libboost-dev \
   libbz2-dev \
   liblua5.1-dev \
-  libsdl-mixer1.2-dev \
-  libsdl1.2-dev \
+  libsdl2-mixer-dev \
+  libsdl2-dev \
   libsqlite3-dev \
   libtolua++5.1-dev \
   qtbase5-dev \
