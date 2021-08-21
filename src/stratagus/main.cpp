@@ -103,22 +103,22 @@ int main(int argc, char **argv)
 
 		QQmlApplicationEngine engine;
 
-		qmlRegisterType<calendar>();
-		qmlRegisterType<civilization>();
-		qmlRegisterType<civilization_group>();
-		qmlRegisterType<defines>();
-		qmlRegisterType<faction>();
-		qmlRegisterType<game>();
-		qmlRegisterType<icon>();
-		qmlRegisterType<network_manager>();
-		qmlRegisterType<pantheon>();
-		qmlRegisterType<parameters>();
-		qmlRegisterType<player_color>();
-		qmlRegisterType<preferences>();
-		qmlRegisterType<quest>();
-		qmlRegisterType<results_info>();
-		qmlRegisterType<timeline>();
-		qmlRegisterType<unit_type>();
+		qmlRegisterAnonymousType<calendar>("", 1);
+		qmlRegisterAnonymousType<civilization>("", 1);
+		qmlRegisterAnonymousType<civilization_group>("", 1);
+		qmlRegisterAnonymousType<defines>("", 1);
+		qmlRegisterAnonymousType<faction>("", 1);
+		qmlRegisterAnonymousType<game>("", 1);
+		qmlRegisterAnonymousType<icon>("", 1);
+		qmlRegisterAnonymousType<network_manager>("", 1);
+		qmlRegisterAnonymousType<pantheon>("", 1);
+		qmlRegisterAnonymousType<parameters>("", 1);
+		qmlRegisterAnonymousType<player_color>("", 1);
+		qmlRegisterAnonymousType<preferences>("", 1);
+		qmlRegisterAnonymousType<quest>("", 1);
+		qmlRegisterAnonymousType<results_info>("", 1);
+		qmlRegisterAnonymousType<timeline>("", 1);
+		qmlRegisterAnonymousType<unit_type>("", 1);
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
 		qmlRegisterType<map_grid_model>("map_grid_model", 1, 0, "MapGridModel");
