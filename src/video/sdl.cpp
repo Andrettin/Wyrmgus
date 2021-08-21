@@ -129,7 +129,7 @@ static void CleanExit(int)
 #endif
 
 /**
-**  Initialize SDLKey to string map
+**  Initialize SDL_Keycode to string map
 */
 static void InitKey2Str()
 {
@@ -190,8 +190,8 @@ static void InitKey2Str()
 
 	Key2Str[SDLK_DELETE] = "delete";
 
-	for (i = SDLK_KP0; i <= SDLK_KP9; ++i) {
-		snprintf(str.data(), sizeof(str), "kp_%d", i - SDLK_KP0);
+	for (i = SDLK_KP_0; i <= SDLK_KP_9; ++i) {
+		snprintf(str.data(), sizeof(str), "kp_%d", i - SDLK_KP_0);
 		Key2Str[i] = str.data();
 	}
 
@@ -220,12 +220,11 @@ static void InitKey2Str()
 	}
 
 	Key2Str[SDLK_HELP] = "help";
-	Key2Str[SDLK_PRINT] = "print";
+	Key2Str[SDLK_PRINTSCREEN] = "print";
 	Key2Str[SDLK_SYSREQ] = "sysreq";
-	Key2Str[SDLK_BREAK] = "break";
+	Key2Str[SDLK_PAUSE] = "break";
 	Key2Str[SDLK_MENU] = "menu";
 	Key2Str[SDLK_POWER] = "power";
-	Key2Str[SDLK_EURO] = "euro";
 	Key2Str[SDLK_UNDO] = "undo";
 }
 
@@ -235,16 +234,11 @@ static void InitKey2Str()
 void InitVideoSdl()
 {
 	if (SDL_WasInit(SDL_INIT_AUDIO) == 0) {
-//Wyrmgus start
-//#ifndef USE_WIN32
-//Wyrmgus end
 		// Fix tablet input in full-screen mode
 		#ifndef __MORPHOS__
-		SDL_putenv(strdup("SDL_MOUSE_RELATIVE=0"));
+		SDL_setenv(strdup("SDL_MOUSE_RELATIVE"), "0", 1);
 		#endif
-//Wyrmgus start
-//#endif
-//Wyrmgus end
+
 		int res = SDL_Init(
 #ifdef DEBUG
 					  SDL_INIT_NOPARACHUTE |
@@ -279,9 +273,6 @@ void InitVideoSdl()
 		Video.ViewportWidth = Video.Width;
 		Video.ViewportHeight = Video.Height;
 	}
-
-	// Make default character translation easier
-	SDL_EnableUNICODE(1);
 
 	InitKey2Str();
 
@@ -355,42 +346,47 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Q
 			}
 			break;
 
-		case SDL_ACTIVEEVENT:
-			if (event.active.state & SDL_APPMOUSEFOCUS) {
-				static bool InMainWindow = true;
+		case SDL_WINDOWEVENT:
+			switch (event.window.event) {
+				case SDL_WINDOWEVENT_ENTER:
+				case SDL_WINDOWEVENT_LEAVE: {
+					static bool InMainWindow = true;
 
-				if (InMainWindow && !event.active.gain) {
-					InputMouseExit(callbacks, SDL_GetTicks());
+					if (InMainWindow && event.window.event == SDL_WINDOWEVENT_LEAVE) {
+						InputMouseExit(callbacks, SDL_GetTicks());
+					}
+					InMainWindow = (event.window.event == SDL_WINDOWEVENT_ENTER);
+					break;
 				}
-				InMainWindow = (event.active.gain != 0);
-			}
-			if (!IsNetworkGame() && Preference.PauseOnLeave && (event.active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE)) {
-				static bool DoTogglePause = false;
+				case SDL_WINDOWEVENT_FOCUS_GAINED:
+				case SDL_WINDOWEVENT_FOCUS_LOST: {
+					if (!IsNetworkGame() && Preference.PauseOnLeave) {
+						static bool DoTogglePause = false;
 
-				if (IsSDLWindowVisible && !event.active.gain) {
-					IsSDLWindowVisible = false;
-					if (!GamePaused) {
-						DoTogglePause = true;
-						UiTogglePause();
+						if (IsSDLWindowVisible && event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
+							IsSDLWindowVisible = false;
+							if (!GamePaused) {
+								DoTogglePause = true;
+								UiTogglePause();
+							}
+						} else if (!IsSDLWindowVisible && event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
+							IsSDLWindowVisible = true;
+							if (GamePaused && DoTogglePause) {
+								DoTogglePause = false;
+								UiTogglePause();
+							}
+						}
 					}
-				} else if (!IsSDLWindowVisible && event.active.gain) {
-					IsSDLWindowVisible = true;
-					if (GamePaused && DoTogglePause) {
-						DoTogglePause = false;
-						UiTogglePause();
-					}
+					break;
 				}
 			}
-			break;
 
 		case SDL_KEYDOWN:
-			InputKeyButtonPress(callbacks, SDL_GetTicks(),
-								event.key.keysym.sym, event.key.keysym.unicode, key_modifiers);
+			InputKeyButtonPress(callbacks, SDL_GetTicks(), event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0, key_modifiers);
 			break;
 
 		case SDL_KEYUP:
-			InputKeyButtonRelease(callbacks, SDL_GetTicks(),
-								  event.key.keysym.sym, event.key.keysym.unicode, key_modifiers);
+			InputKeyButtonRelease(callbacks, SDL_GetTicks(), event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0, key_modifiers);
 			break;
 
 		case SDL_QUIT:
@@ -445,7 +441,7 @@ void PollEvents()
 	while (PollEvent()) { }
 }
 
-static SDLKey qt_key_to_sdl_key(const Qt::Key qt_key)
+static SDL_Keycode qt_key_to_sdl_key(const Qt::Key qt_key)
 {
 	switch (qt_key) {
 		case Qt::Key_Escape:
@@ -465,7 +461,7 @@ static SDLKey qt_key_to_sdl_key(const Qt::Key qt_key)
 		case Qt::Key_Pause:
 			return SDLK_PAUSE;
 		case Qt::Key_Print:
-			return SDLK_PRINT;
+			return SDLK_PRINTSCREEN;
 		case Qt::Key_SysReq:
 			return SDLK_SYSREQ;
 		case Qt::Key_Clear:
@@ -491,7 +487,7 @@ static SDLKey qt_key_to_sdl_key(const Qt::Key qt_key)
 		case Qt::Key_Control:
 			return SDLK_LCTRL;
 		case Qt::Key_Meta:
-			return SDLK_LMETA;
+			return SDLK_LGUI;
 		case Qt::Key_Alt:
 			return SDLK_LALT;
 		case Qt::Key_AltGr:
@@ -499,9 +495,9 @@ static SDLKey qt_key_to_sdl_key(const Qt::Key qt_key)
 		case Qt::Key_CapsLock:
 			return SDLK_CAPSLOCK;
 		case Qt::Key_NumLock:
-			return SDLK_NUMLOCK;
+			return SDLK_NUMLOCKCLEAR;
 		case Qt::Key_ScrollLock:
-			return SDLK_SCROLLOCK;
+			return SDLK_SCROLLLOCK;
 		case Qt::Key_F1:
 			return SDLK_F1;
 		case Qt::Key_F2:
@@ -533,9 +529,9 @@ static SDLKey qt_key_to_sdl_key(const Qt::Key qt_key)
 		case Qt::Key_F15:
 			return SDLK_F15;
 		case Qt::Key_Super_L:
-			return SDLK_LSUPER;
+			return SDLK_LGUI;
 		case Qt::Key_Super_R:
-			return SDLK_RSUPER;
+			return SDLK_RGUI;
 		case Qt::Key_Menu:
 			return SDLK_MENU;
 		case Qt::Key_Help:
@@ -673,7 +669,7 @@ static SDLKey qt_key_to_sdl_key(const Qt::Key qt_key)
 	}
 }
 
-static SDLMod qt_key_modifier_to_sdl_key_modifier(const Qt::KeyboardModifiers qt_key_modifiers)
+static SDL_Keymod qt_key_modifier_to_sdl_key_modifier(const Qt::KeyboardModifiers qt_key_modifiers)
 {
 	int modifiers = KMOD_NONE;
 
@@ -690,14 +686,14 @@ static SDLMod qt_key_modifier_to_sdl_key_modifier(const Qt::KeyboardModifiers qt
 	}
 
 	if (qt_key_modifiers & Qt::MetaModifier) {
-		modifiers |= KMOD_LMETA;
+		modifiers |= KMOD_LGUI;
 	}
 
 	if (qt_key_modifiers & Qt::KeypadModifier) {
 		modifiers |= KMOD_NUM;
 	}
 
-	return static_cast<SDLMod>(modifiers);
+	return static_cast<SDL_Keymod>(modifiers);
 }
 
 static SDL_Event qevent_to_sdl_event(std::unique_ptr<QInputEvent> &&qevent)
@@ -745,9 +741,8 @@ static SDL_Event qevent_to_sdl_event(std::unique_ptr<QInputEvent> &&qevent)
 		}
 		case QEvent::HoverEnter:
 		case QEvent::HoverLeave: {
-			sdl_event.active.type = SDL_ACTIVEEVENT;
-			sdl_event.active.gain = qevent->type() == QEvent::HoverEnter ? 1 : 0;
-			sdl_event.active.state = SDL_APPMOUSEFOCUS;
+			sdl_event.window.type = SDL_WINDOWEVENT;
+			sdl_event.window.event = qevent->type() == QEvent::HoverEnter ? SDL_WINDOWEVENT_FOCUS_GAINED : SDL_WINDOWEVENT_FOCUS_LOST;
 			break;
 		}
 		case QEvent::HoverMove: {
@@ -771,7 +766,6 @@ static SDL_Event qevent_to_sdl_event(std::unique_ptr<QInputEvent> &&qevent)
 			}
 
 			sdl_event.key.keysym.sym = qt_key_to_sdl_key(static_cast<Qt::Key>(key_event->key()));
-			sdl_event.key.keysym.unicode = qt_key_to_sdl_key(static_cast<Qt::Key>(key_event->key()));
 			sdl_event.key.keysym.mod = qt_key_modifier_to_sdl_key_modifier(key_event->modifiers());
 			break;
 		}
@@ -869,7 +863,7 @@ void WaitEventsOneFrame()
 }
 
 /**
-**  Convert a SDLKey to a string
+**  Convert a SDL_Keycode to a string
 */
 const char *SdlKey2Str(int key)
 {

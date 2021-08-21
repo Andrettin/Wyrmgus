@@ -110,7 +110,7 @@ namespace gcn
          * @param key an SDL keysym
          * @return a Key object.
          */
-        static Key convertKeyCharacter(SDL_keysym key);
+        static Key convertKeyCharacter(SDL_Keysym key);
 
     protected:
         /**

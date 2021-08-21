@@ -80,7 +80,7 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar, const Qt::Keyboard
 
 	switch (key) {
 		case SDLK_SYSREQ:
-		case SDLK_PRINT:
+		case SDLK_PRINTSCREEN:
 		case SDLK_F11:
 			Screenshot();
 			return;

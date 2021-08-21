@@ -630,7 +630,7 @@ extern void PopClipping();
 /// Returns the ticks in ms since start
 extern unsigned long GetTicks();
 
-/// Convert a SDLKey to a string
+/// Convert a SDL_Keycode to a string
 extern const char *SdlKey2Str(int key);
 
 extern EventCallback GameCallbacks;   /// Game callbacks

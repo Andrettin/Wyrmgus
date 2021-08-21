@@ -1776,7 +1776,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::Keyb
 
 	switch (key) {
 		case SDLK_SYSREQ:
-		case SDLK_PRINT:
+		case SDLK_PRINTSCREEN:
 		case SDLK_F11:
 			Screenshot();
 			return;
@@ -1848,19 +1848,19 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::Keyb
 			break;
 
 		case SDLK_UP: // Keyboard scrolling
-		case SDLK_KP8:
+		case SDLK_KP_8:
 			KeyScrollState |= ScrollUp;
 			break;
 		case SDLK_DOWN:
-		case SDLK_KP2:
+		case SDLK_KP_2:
 			KeyScrollState |= ScrollDown;
 			break;
 		case SDLK_LEFT:
-		case SDLK_KP4:
+		case SDLK_KP_4:
 			KeyScrollState |= ScrollLeft;
 			break;
 		case SDLK_RIGHT:
-		case SDLK_KP6:
+		case SDLK_KP_6:
 			KeyScrollState |= ScrollRight;
 			break;
 		case '0':
@@ -1903,19 +1903,19 @@ static void EditorCallbackKeyUp(unsigned key, unsigned keychar, const Qt::Keyboa
 
 	switch (key) {
 		case SDLK_UP: // Keyboard scrolling
-		case SDLK_KP8:
+		case SDLK_KP_8:
 			KeyScrollState &= ~ScrollUp;
 			break;
 		case SDLK_DOWN:
-		case SDLK_KP2:
+		case SDLK_KP_2:
 			KeyScrollState &= ~ScrollDown;
 			break;
 		case SDLK_LEFT:
-		case SDLK_KP4:
+		case SDLK_KP_4:
 			KeyScrollState &= ~ScrollLeft;
 			break;
 		case SDLK_RIGHT:
-		case SDLK_KP6:
+		case SDLK_KP_6:
 			KeyScrollState &= ~ScrollRight;
 			break;
 		default:

@@ -172,9 +172,6 @@ set(guichan_SRCS
 	src/guichan/key.cpp
 	src/guichan/keyinput.cpp
 	src/guichan/mouseinput.cpp
-#	src/guichan/opengl/opengl.cpp
-#	src/guichan/opengl/openglgraphics.cpp
-#	src/guichan/opengl/openglimageloader.cpp
 	src/guichan/rectangle.cpp
 	src/guichan/sdl/gsdl.cpp
 	src/guichan/sdl/sdlinput.cpp
@@ -1295,8 +1292,8 @@ find_package(Qt5 5.12 COMPONENTS Qml REQUIRED) #licensed under the GPL 2.0 (as w
 find_package(Qt5 5.12 COMPONENTS Quick REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 
 find_package(Lua51 REQUIRED)
-find_package(SDL REQUIRED)
-find_package(SDL_mixer REQUIRED)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_mixer REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -1387,8 +1384,8 @@ endif()
 add_definitions(-DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
 include_directories(
 	${LUA_INCLUDE_DIR}
-	${SDL_INCLUDE_DIR}
-	${SDL_MIXER_INCLUDE_DIR}
+	${SDL2_INCLUDE_DIR}
+	${SDL2_MIXER_INCLUDE_DIR}
 	${TOLUA++_INCLUDE_DIR}
 	${ZLIB_INCLUDE_DIRS}
 )
@@ -1410,8 +1407,8 @@ endif()
 
 set(wyrmgus_LIBS
 	${LUA_LIBRARIES}
-	${SDL_LIBRARY}
-	${SDL_MIXER_LIBRARY}
+	${SDL2_LIBRARY}
+	${SDL2_MIXER_LIBRARY}
 	${TOLUA++_LIBRARY}
 	${ZLIB_LIBRARIES}
 	${QT_LIBRARIES}
@@ -1464,7 +1461,7 @@ endif()
 
 if(APPLE)
 	add_definitions(-DUSE_MAC)
-	set(SDL_LIBRARY ${SDL_LIBRARY} SDLmain)	
+	set(SDL2_LIBRARY ${SDL2_LIBRARY} SDL2main)	
 endif()
 
 if(BSD)
@@ -1767,7 +1764,7 @@ if(WIN32 AND MINGW AND ENABLE_STATIC)
 endif()
 
 if(APPLE)
-	set_target_properties(wyrmgus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDLmain")
+	set_target_properties(wyrmgus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDL2main")
 endif()
 
 target_link_libraries(wyrmgus ${wyrmgus_LIBS})
@@ -1818,7 +1815,7 @@ endif()
 
 if(ENABLE_METASERVER)
 	add_executable(metaserver ${metaserver_SRCS} ${metaserver_HDRS})
-	target_link_libraries(metaserver ${SDL_LIBRARY} ${SQLITE_LIBRARIES})
+	target_link_libraries(metaserver ${SDL2_LIBRARY} ${SQLITE_LIBRARIES})
 	
 	if(WIN32)
 		target_link_libraries(metaserver winmm ws2_32)

@@ -2343,9 +2343,9 @@ void CButtonPanel::DoClicked(int button, const Qt::KeyboardModifiers key_modifie
 */
 int CButtonPanel::DoKey(int key, const Qt::KeyboardModifiers key_modifiers)
 {
-	SDL_keysym keysym;
+	SDL_Keysym keysym;
 	memset(&keysym, 0, sizeof(keysym));
-	keysym.sym = (SDLKey)key;
+	keysym.sym = (SDL_Keycode) key;
 	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
 	key = k.getValue();
 

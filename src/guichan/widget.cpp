@@ -65,13 +65,14 @@
 
 #include "guichan/sdl/sdlinput.h"
 #include <SDL.h>
+
 extern int Str2SdlKey(const char *str);
 
 int convertKey(const char *key)
 {
-	SDL_keysym keysym;
+	SDL_Keysym keysym;
 	memset(&keysym, 0, sizeof(keysym));
-	keysym.sym = (SDLKey)Str2SdlKey(key);
+	keysym.sym = (SDL_Keycode) Str2SdlKey(key);
 	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
 	return k.getValue();
 }

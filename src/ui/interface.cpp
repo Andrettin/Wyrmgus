@@ -884,19 +884,19 @@ static bool CommandKey(int key, const Qt::KeyboardModifiers key_modifiers)
 			break;
 
 		case SDLK_UP:
-		case SDLK_KP8:
+		case SDLK_KP_8:
 			KeyScrollState |= ScrollUp;
 			break;
 		case SDLK_DOWN:
-		case SDLK_KP2:
+		case SDLK_KP_2:
 			KeyScrollState |= ScrollDown;
 			break;
 		case SDLK_LEFT:
-		case SDLK_KP4:
+		case SDLK_KP_4:
 			KeyScrollState |= ScrollLeft;
 			break;
 		case SDLK_RIGHT:
-		case SDLK_KP6:
+		case SDLK_KP_6:
 			KeyScrollState |= ScrollRight;
 			break;
 
@@ -1162,8 +1162,6 @@ bool HandleKeyModifiersDown(unsigned key)
 			return true;
 		case SDLK_LALT:
 		case SDLK_RALT:
-		case SDLK_LMETA:
-		case SDLK_RMETA:
 			stored_key_modifiers |= Qt::AltModifier;
 			// maxy: disabled
 			if (current_interface_state == interface_state::normal) {
@@ -1190,8 +1188,6 @@ bool HandleKeyModifiersUp(unsigned key)
 			return true;
 		case SDLK_LALT:
 		case SDLK_RALT:
-		case SDLK_LMETA:
-		case SDLK_RMETA:
 			stored_key_modifiers &= ~Qt::AltModifier;
 			// maxy: disabled
 			if (current_interface_state == interface_state::normal) {
@@ -1208,8 +1204,8 @@ bool HandleKeyModifiersUp(unsigned key)
 */
 static bool IsKeyPad(unsigned key, unsigned *kp)
 {
-	if (key >= SDLK_KP0 && key <= SDLK_KP9) {
-		*kp = SDLK_0 + (key - SDLK_KP0);
+	if (key >= SDLK_KP_0 && key <= SDLK_KP_9) {
+		*kp = SDLK_0 + (key - SDLK_KP_0);
 	} else if (key == SDLK_KP_PERIOD) {
 		*kp = SDLK_PERIOD;
 	} else if (key == SDLK_KP_DIVIDE) {
@@ -1241,7 +1237,7 @@ void HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers k
 {
 	switch (key) {
 		case SDLK_SYSREQ:
-		case SDLK_PRINT:
+		case SDLK_PRINTSCREEN:
 		case SDLK_F11:
 			Screenshot();
 			if (GameRunning) {
@@ -1292,19 +1288,19 @@ void HandleKeyUp(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key
 
 	switch (key) {
 		case SDLK_UP:
-		case SDLK_KP8:
+		case SDLK_KP_8:
 			KeyScrollState &= ~ScrollUp;
 			break;
 		case SDLK_DOWN:
-		case SDLK_KP2:
+		case SDLK_KP_2:
 			KeyScrollState &= ~ScrollDown;
 			break;
 		case SDLK_LEFT:
-		case SDLK_KP4:
+		case SDLK_KP_4:
 			KeyScrollState &= ~ScrollLeft;
 			break;
 		case SDLK_RIGHT:
-		case SDLK_KP6:
+		case SDLK_KP_6:
 			KeyScrollState &= ~ScrollRight;
 			break;
 		default:
