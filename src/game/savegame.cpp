@@ -68,7 +68,7 @@ void ExpandPath(std::string &newpath, const std::string &path)
 		}
 		newpath += "/" + path.substr(1);
 	} else {
-		newpath = wyrmgus::database::get()->get_root_path().string() + "/" + path;
+		newpath = database::get()->get_root_path().string() + "/" + path;
 	}
 }
 

@@ -34,14 +34,6 @@
 #include "script.h"
 #include "util/util.h"
 
-#include <SDL.h>
-
-CColor::operator SDL_Color() const
-{
-	SDL_Color c = { static_cast<unsigned char>(R), static_cast<unsigned char>(G), static_cast<unsigned char>(B), static_cast<unsigned char>(A) };
-	return c;
-}
-
 CColor CColor::FromString(const std::string &str)
 {
 	CColor color;

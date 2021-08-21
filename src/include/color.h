@@ -30,7 +30,6 @@
 
 class CConfigData;
 struct lua_State;
-struct SDL_Color;
 
 /// platform independent color
 class CColor
@@ -45,9 +44,6 @@ public:
 
 	void ProcessConfigData(const CConfigData *config_data);
 	void Parse(lua_State *l, int index = -1);
-
-	/// Cast to a SDL_Color
-	operator SDL_Color() const;
 
 	bool operator <(const CColor &rhs) const {
 		if (this->R < rhs.R) {

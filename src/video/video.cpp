@@ -121,52 +121,9 @@ struct Clip {
 	int Y2;                             /// pushed clipping bottom right
 };
 
-class ColorIndexRange
-{
-public:
-	ColorIndexRange(unsigned int begin, unsigned int end) :
-		begin(begin), end(end)
-	{}
-public:
-	unsigned int begin;
-	unsigned int end;
-};
-
-class CColorCycling
-{
-private:
-	static void CreateInstanceIfNeeded()
-	{
-		if (s_instance == nullptr) {
-			s_instance = std::make_unique<CColorCycling>();
-		}
-	}
-
-public:
-	static CColorCycling &GetInstance()
-	{
-		CreateInstanceIfNeeded();
-		return *s_instance;
-	}
-
-	static void ReleaseInstance()
-	{
-		s_instance.reset();
-	}
-
-public:
-	std::vector<SDL_Surface *> PaletteList;        /// List of all used palettes.
-	std::vector<ColorIndexRange> ColorIndexRanges; /// List of range of color index for cycling.
-	bool ColorCycleAll = false;                    /// Flag Color Cycle with all palettes
-	unsigned int cycleCount = 0;
-private:
-	static std::unique_ptr<CColorCycling> s_instance;
-};
-
 extern void InitVideoSdl();         /// Init SDL video hardware driver
 
 CVideo Video;
-std::unique_ptr<CColorCycling> CColorCycling::s_instance;
 
 //Wyrmgus start
 //bool ZoomNoResize;
@@ -329,7 +286,6 @@ void InitVideo()
 
 void DeInitVideo()
 {
-	CColorCycling::ReleaseInstance();
 }
 
 /**
@@ -348,102 +304,6 @@ void VideoCclRegister()
 {
 	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
 }
-
-#if 1 // color cycling
-
-
-/**
-**  Add a surface to the palette list, used for color cycling
-**
-**  @param surface  The SDL surface to add to the list to cycle.
-*/
-void VideoPaletteListAdd(SDL_Surface *surface)
-{
-	if (surface == nullptr || surface->format == nullptr || surface->format->BytesPerPixel != 1) {
-		return;
-	}
-
-	CColorCycling &colorCycling = CColorCycling::GetInstance();
-	std::vector<SDL_Surface *>::iterator it = std::find(colorCycling.PaletteList.begin(), colorCycling.PaletteList.end(), surface);
-
-	if (it != colorCycling.PaletteList.end()) {
-		return ;
-	}
-	colorCycling.PaletteList.push_back(surface);
-}
-
-/**
-**  Remove a surface to the palette list, used for color cycling
-**
-**  @param surface  The SDL surface to add to the list to cycle.
-*/
-void VideoPaletteListRemove(SDL_Surface *surface)
-{
-	CColorCycling &colorCycling = CColorCycling::GetInstance();
-	std::vector<SDL_Surface *>::iterator it = std::find(colorCycling.PaletteList.begin(), colorCycling.PaletteList.end(), surface);
-
-	if (it != colorCycling.PaletteList.end()) {
-		colorCycling.PaletteList.erase(it);
-	}
-}
-
-void ClearAllColorCyclingRange()
-{
-	CColorCycling::GetInstance().ColorIndexRanges.clear();
-}
-
-void AddColorCyclingRange(unsigned int begin, unsigned int end)
-{
-	CColorCycling::GetInstance().ColorIndexRanges.push_back(ColorIndexRange(begin, end));
-}
-
-void SetColorCycleAll(bool value)
-{
-	CColorCycling::GetInstance().ColorCycleAll = value;
-}
-
-/**
-**  Color Cycle for particular surface
-*/
-static void ColorCycleSurface(SDL_Surface &surface)
-{
-	SDL_Color *palcolors = surface.format->palette->colors;
-	std::array<SDL_Color, 256> colors{};
-	CColorCycling &colorCycling = CColorCycling::GetInstance();
-
-	memcpy(colors.data(), palcolors, sizeof(colors));
-	for (std::vector<ColorIndexRange>::const_iterator it = colorCycling.ColorIndexRanges.begin(); it != colorCycling.ColorIndexRanges.end(); ++it) {
-		const ColorIndexRange &range = *it;
-
-		memcpy(colors.data() + range.begin, palcolors + range.begin + 1, (range.end - range.begin) * sizeof(SDL_Color));
-		colors[range.end] = palcolors[range.begin];
-	}
-	SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors.data(), 0, 256);
-}
-
-/**
-**  Undo Color Cycle for particular surface
-**  @note function may be optimized.
-*/
-static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
-{
-	for (unsigned int i = 0; i != count; ++i) {
-		SDL_Color *palcolors = surface.format->palette->colors;
-		std::array<SDL_Color, 256> colors{};
-		CColorCycling &colorCycling = CColorCycling::GetInstance();
-
-		memcpy(colors.data(), palcolors, sizeof(colors));
-		for (std::vector<ColorIndexRange>::const_iterator it = colorCycling.ColorIndexRanges.begin(); it != colorCycling.ColorIndexRanges.end(); ++it) {
-			const ColorIndexRange &range = *it;
-
-			memcpy(colors.data() + range.begin + 1, palcolors + range.begin, (range.end - range.begin) * sizeof(SDL_Color));
-			colors[range.begin] = palcolors[range.end];
-		}
-		SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors.data(), 0, 256);
-	}
-}
-
-#endif
 
 int get_scale_factor()
 {

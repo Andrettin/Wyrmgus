@@ -36,9 +36,6 @@
 
 #include <QOpenGLTexture>
 
-struct SDL_Cursor;
-struct SDL_Surface;
-
 namespace wyrmgus {
 	class font;
 	class map_template;
@@ -651,14 +648,6 @@ extern uint32_t ColorDarkGray;
 extern uint32_t ColorRed;
 extern uint32_t ColorGreen;
 extern uint32_t ColorYellow;
-
-//  Color Cycling stuff
-
-extern void VideoPaletteListAdd(SDL_Surface *surface);
-extern void VideoPaletteListRemove(SDL_Surface *surface);
-extern void ClearAllColorCyclingRange();
-extern void AddColorCyclingRange(unsigned int begin, unsigned int end);
-extern void SetColorCycleAll(bool value);
 
 //called by tolua++
 extern int get_scale_factor();

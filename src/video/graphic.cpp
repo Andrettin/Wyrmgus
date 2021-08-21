@@ -538,68 +538,6 @@ static void ApplySepiaScale(QImage &image)
 	}
 }
 
-/*
-static std::string map_terrains[8192][4096];
-
-static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
-{
-	SDL_LockSurface(Surface);
-	const SDL_PixelFormat *f = Surface->format;
-	const int bpp = Surface->format->BytesPerPixel;
-	uint8_t r, g, b;
-
-	for (int j = 0; j < Height; ++j) {
-		for (int i = 0; i < Width; ++i) {
-			uint32_t c = *reinterpret_cast<uint32_t *>(&reinterpret_cast<uint8_t *>(Surface->pixels)[i * 4 + j * Surface->pitch]);
-			uint8_t a;
-
-			CVideo::GetRGBA(c, Surface->format, &r, &g, &b, &a);
-			if (a >= 128) {
-				if (r == 235 && g == 235 && b == 235) {
-					map_terrains[i][j] = "s";
-				} else if (r == 138 && g == 11 && b == 26) {
-					map_terrains[i][j] = "r";
-				} else if (r == 69 && g == 91 && b == 186) {
-					map_terrains[i][j] = "w";
-				} else if (r == 178 && g == 34 && b == 34) {
-					map_terrains[i][j] = "m";
-				} else if (r == 0 && g == 255 && b == 255) {
-					map_terrains[i][j] = "e";
-				} else {
-					map_terrains[i][j] = "d";
-				}
-			} else {
-				map_terrains[i][j] = "0";
-			}
-		}
-	}
-	SDL_UnlockSurface(Surface);
-	
-	FileWriter *fw = nullptr;
-	std::string map_filename = "scripts/map_templates/new.map";
-
-	try {
-		fw = CreateFileWriter(map_filename);
-
-		for (int y = 0; y < Height; ++y) {
-			for (int x = 0; x < Width; ++x) {
-				fw->printf("%s", map_terrains[x][y].c_str());
-			}
-			fw->printf("\n");
-		}
-			
-		fw->printf("\n");
-	} catch (const FileException &) {
-		fprintf(stderr, "Couldn't write the map setup: \"%s\"\n", map_filename.c_str());
-		delete fw;
-		return;
-	}
-	
-	delete fw;
-}
-*/
-//Wyrmgus end
-
 /**
 **  Load a graphic
 **

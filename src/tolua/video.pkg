@@ -19,10 +19,6 @@ class CColor {
 	unsigned char A;
 };
 
-void SetColorCycleAll(bool value);
-void ClearAllColorCyclingRange();
-void AddColorCyclingRange(unsigned int startColorIndex, unsigned int endColorIndex);
-
 int get_scale_factor();
 void pack_image_folder(const std::string dir_path, const int frames_per_row = 5);
 void index_image_to_image_palette(const std::string &image_path, const std::string &other_image_path);

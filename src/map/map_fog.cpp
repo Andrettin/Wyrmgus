@@ -71,8 +71,6 @@ static constexpr std::array<int, 16> FogTable = {
 static std::vector<std::vector<unsigned short>> VisibleTable;
 //Wyrmgus end
 
-static SDL_Surface *OnlyFogSurface = nullptr;
-
 class _filter_flags
 {
 public:
