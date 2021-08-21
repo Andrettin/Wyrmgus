@@ -43,7 +43,6 @@ extern std::string PlayerFaction;
 //Wyrmgus end
 
 extern unsigned long GameCycle;
-extern unsigned long FastForwardCycle;
 
 $#include "settings.h"
 

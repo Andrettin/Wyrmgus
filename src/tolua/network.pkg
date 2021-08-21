@@ -45,4 +45,3 @@ string NetworkMapName;
 
 $void NetworkGamePrepareGameSettings(void);
 void NetworkGamePrepareGameSettings(void);
-

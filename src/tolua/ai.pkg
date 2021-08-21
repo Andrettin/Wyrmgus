@@ -1,10 +1,2 @@
-
-/// Attack with force at position
-//Wyrmgus start
-//extern void AiAttackWithForceAt(unsigned int force, unsigned int x, unsigned int y);
-extern void AiAttackWithForceAt(unsigned int force, unsigned int x, unsigned int y, int z = 0);
-//Wyrmgus end
-
 /// Attack with force
 extern void AiAttackWithForce(unsigned int force);
-
