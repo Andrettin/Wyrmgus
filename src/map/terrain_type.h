@@ -50,9 +50,9 @@ class terrain_type final : public named_data_entry, public data_type<terrain_typ
 
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
 	Q_PROPERTY(QColor minimap_color MEMBER minimap_color READ get_minimap_color)
-	Q_PROPERTY(QString image_file READ get_image_file_qstring)
-	Q_PROPERTY(QString transition_image_file READ get_transition_image_file_qstring)
-	Q_PROPERTY(QString elevation_image_file READ get_elevation_image_file_qstring)
+	Q_PROPERTY(std::filesystem::path image_file MEMBER image_file WRITE set_image_file)
+	Q_PROPERTY(std::filesystem::path transition_image_file MEMBER transition_image_file WRITE set_transition_image_file)
+	Q_PROPERTY(std::filesystem::path elevation_image_file MEMBER elevation_image_file WRITE set_elevation_image_file)
 	Q_PROPERTY(double hue_rotation MEMBER hue_rotation READ get_hue_rotation)
 	Q_PROPERTY(bool overlay MEMBER overlay READ is_overlay)
 	Q_PROPERTY(bool buildable MEMBER buildable READ is_buildable)
@@ -194,16 +194,6 @@ public:
 
 	void set_image_file(const std::filesystem::path &filepath);
 
-	QString get_image_file_qstring() const
-	{
-		return QString::fromStdString(this->get_image_file().string());
-	}
-
-	Q_INVOKABLE void set_image_file(const std::string &filepath)
-	{
-		this->set_image_file(std::filesystem::path(filepath));
-	}
-
 	const std::shared_ptr<CPlayerColorGraphic> &get_graphics(const season *season = nullptr) const;
 
 	const std::filesystem::path &get_transition_image_file() const
@@ -212,16 +202,6 @@ public:
 	}
 
 	void set_transition_image_file(const std::filesystem::path &filepath);
-
-	QString get_transition_image_file_qstring() const
-	{
-		return QString::fromStdString(this->get_transition_image_file().string());
-	}
-
-	Q_INVOKABLE void set_transition_image_file(const std::string &filepath)
-	{
-		this->set_transition_image_file(std::filesystem::path(filepath));
-	}
 
 	const std::shared_ptr<CPlayerColorGraphic> &get_transition_graphics(const season *season) const
 	{
@@ -243,16 +223,6 @@ public:
 	}
 
 	void set_elevation_image_file(const std::filesystem::path &filepath);
-
-	QString get_elevation_image_file_qstring() const
-	{
-		return QString::fromStdString(this->get_elevation_image_file().string());
-	}
-
-	Q_INVOKABLE void set_elevation_image_file(const std::string &filepath)
-	{
-		this->set_elevation_image_file(std::filesystem::path(filepath));
-	}
 
 	const std::shared_ptr<CGraphic> &get_elevation_graphics() const
 	{

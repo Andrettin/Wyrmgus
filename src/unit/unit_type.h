@@ -779,7 +779,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
 	Q_PROPERTY(QSize box_size MEMBER box_size READ get_box_size)
-	Q_PROPERTY(QString image_file READ get_image_file_qstring)
+	Q_PROPERTY(std::filesystem::path image_file MEMBER image_file WRITE set_image_file)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(QPoint offset MEMBER offset READ get_offset)
 	Q_PROPERTY(int num_directions MEMBER num_directions READ get_num_directions)
@@ -971,16 +971,6 @@ public:
 	}
 
 	void set_image_file(const std::filesystem::path &filepath);
-
-	QString get_image_file_qstring() const
-	{
-		return QString::fromStdString(this->get_image_file().string());
-	}
-
-	Q_INVOKABLE void set_image_file(const std::string &filepath)
-	{
-		this->set_image_file(std::filesystem::path(filepath));
-	}
 
 	const QSize &get_frame_size() const
 	{

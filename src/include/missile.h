@@ -306,7 +306,7 @@ class missile_type final : public data_entry, public data_type<missile_type>, pu
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::missile_class missile_class MEMBER missile_class READ get_missile_class)
-	Q_PROPERTY(QString image_file READ get_image_file_qstring)
+	Q_PROPERTY(std::filesystem::path image_file MEMBER image_file WRITE set_image_file)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(int frames MEMBER frames READ get_frames)
@@ -345,16 +345,6 @@ public:
 	}
 
 	void set_image_file(const std::filesystem::path &filepath);
-
-	QString get_image_file_qstring() const
-	{
-		return QString::fromStdString(this->get_image_file().string());
-	}
-
-	Q_INVOKABLE void set_image_file(const std::string &filepath)
-	{
-		this->set_image_file(std::filesystem::path(filepath));
-	}
 
 	const QSize &get_frame_size() const
 	{

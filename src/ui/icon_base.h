@@ -36,7 +36,7 @@ class icon_base : public data_entry
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString file READ get_file_qstring)
+	Q_PROPERTY(std::filesystem::path file MEMBER file WRITE set_file)
 	Q_PROPERTY(int frame MEMBER frame READ get_frame)
 
 public:
@@ -66,16 +66,6 @@ public:
 	}
 
 	void set_file(const std::filesystem::path &filepath);
-
-	QString get_file_qstring() const
-	{
-		return QString::fromStdString(this->get_file().string());
-	}
-
-	Q_INVOKABLE void set_file(const std::string &filepath)
-	{
-		this->set_file(std::filesystem::path(filepath));
-	}
 
 	const std::shared_ptr<CGraphic> &get_graphics() const
 	{

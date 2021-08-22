@@ -47,7 +47,7 @@ class cursor final : public data_entry, public data_type<cursor>
 
 	Q_PROPERTY(wyrmgus::cursor_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
-	Q_PROPERTY(QString file READ get_file_qstring)
+	Q_PROPERTY(std::filesystem::path file MEMBER file WRITE set_file)
 	Q_PROPERTY(QPoint hot_pos MEMBER hot_pos READ get_hot_pos)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(int frame_rate MEMBER frame_rate READ get_frame_rate)
@@ -122,16 +122,6 @@ public:
 	}
 
 	void set_file(const std::filesystem::path &filepath);
-
-	QString get_file_qstring() const
-	{
-		return QString::fromStdString(this->get_file().string());
-	}
-
-	Q_INVOKABLE void set_file(const std::string &filepath)
-	{
-		this->set_file(std::filesystem::path(filepath));
-	}
 
 	const std::shared_ptr<CGraphic> &get_graphics() const
 	{

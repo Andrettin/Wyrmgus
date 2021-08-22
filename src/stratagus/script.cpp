@@ -3068,7 +3068,7 @@ static void AliasRegister()
 */
 static int CclStratagusLibraryPath(lua_State *l)
 {
-	lua_pushstring(l, wyrmgus::database::get()->get_root_path().string().c_str());
+	lua_pushstring(l, database::get()->get_root_path().string().c_str());
 	return 1;
 }
 

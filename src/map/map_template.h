@@ -104,12 +104,12 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(wyrmgus::geocoordinate max_subtemplate_geocoordinate MEMBER max_subtemplate_geocoordinate)
 	Q_PROPERTY(wyrmgus::world* world MEMBER world)
 	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
-	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring)
-	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring)
-	Q_PROPERTY(QString terrain_image_file READ get_terrain_image_file_qstring)
-	Q_PROPERTY(QString overlay_terrain_image_file READ get_overlay_terrain_image_file_qstring)
-	Q_PROPERTY(QString trade_route_image_file READ get_trade_route_image_file_qstring)
-	Q_PROPERTY(QString territory_image_file READ get_territory_image_file_qstring)
+	Q_PROPERTY(std::filesystem::path terrain_file MEMBER terrain_file WRITE set_terrain_file)
+	Q_PROPERTY(std::filesystem::path overlay_terrain_file MEMBER overlay_terrain_file WRITE set_overlay_terrain_file)
+	Q_PROPERTY(std::filesystem::path terrain_image_file MEMBER terrain_image_file WRITE set_terrain_image_file)
+	Q_PROPERTY(std::filesystem::path overlay_terrain_image_file MEMBER overlay_terrain_image_file WRITE set_overlay_terrain_image_file)
+	Q_PROPERTY(std::filesystem::path trade_route_image_file MEMBER trade_route_image_file WRITE set_trade_route_image_file)
+	Q_PROPERTY(std::filesystem::path territory_image_file MEMBER territory_image_file WRITE set_territory_image_file)
 	Q_PROPERTY(wyrmgus::terrain_type* base_terrain_type MEMBER base_terrain_type READ get_base_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* base_overlay_terrain_type MEMBER base_overlay_terrain_type READ get_base_overlay_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
@@ -424,32 +424,12 @@ public:
 
 	void set_terrain_file(const std::filesystem::path &filepath);
 
-	QString get_terrain_file_qstring() const
-	{
-		return QString::fromStdString(this->get_terrain_file().string());
-	}
-
-	Q_INVOKABLE void set_terrain_file(const std::string &filepath)
-	{
-		this->set_terrain_file(std::filesystem::path(filepath));
-	}
-
 	const std::filesystem::path &get_overlay_terrain_file() const
 	{
 		return this->overlay_terrain_file;
 	}
 
 	void set_overlay_terrain_file(const std::filesystem::path &filepath);
-
-	QString get_overlay_terrain_file_qstring() const
-	{
-		return QString::fromStdString(this->get_overlay_terrain_file().string());
-	}
-
-	Q_INVOKABLE void set_overlay_terrain_file(const std::string &filepath)
-	{
-		this->set_overlay_terrain_file(std::filesystem::path(filepath));
-	}
 
 	void load_terrain_character_map(const bool overlay);
 
@@ -468,16 +448,6 @@ public:
 
 	void set_terrain_image_file(const std::filesystem::path &filepath);
 
-	QString get_terrain_image_file_qstring() const
-	{
-		return QString::fromStdString(this->get_terrain_image_file().string());
-	}
-
-	Q_INVOKABLE void set_terrain_image_file(const std::string &filepath)
-	{
-		this->set_terrain_image_file(std::filesystem::path(filepath));
-	}
-
 	const std::filesystem::path &get_overlay_terrain_image_file() const
 	{
 		return this->overlay_terrain_image_file;
@@ -485,32 +455,12 @@ public:
 
 	void set_overlay_terrain_image_file(const std::filesystem::path &filepath);
 
-	QString get_overlay_terrain_image_file_qstring() const
-	{
-		return QString::fromStdString(this->get_overlay_terrain_image_file().string());
-	}
-
-	Q_INVOKABLE void set_overlay_terrain_image_file(const std::string &filepath)
-	{
-		this->set_overlay_terrain_image_file(std::filesystem::path(filepath));
-	}
-
 	const std::filesystem::path &get_trade_route_image_file() const
 	{
 		return this->trade_route_image_file;
 	}
 
 	void set_trade_route_image_file(const std::filesystem::path &filepath);
-
-	QString get_trade_route_image_file_qstring() const
-	{
-		return QString::fromStdString(this->get_trade_route_image_file().string());
-	}
-
-	Q_INVOKABLE void set_trade_route_image_file(const std::string &filepath)
-	{
-		this->set_trade_route_image_file(std::filesystem::path(filepath));
-	}
 
 	QImage load_terrain_image_file(const std::filesystem::path &filepath);
 	void load_terrain_image(const bool overlay);
@@ -527,16 +477,6 @@ public:
 	}
 
 	void set_territory_image_file(const std::filesystem::path &filepath);
-
-	QString get_territory_image_file_qstring() const
-	{
-		return QString::fromStdString(this->get_territory_image_file().string());
-	}
-
-	Q_INVOKABLE void set_territory_image_file(const std::string &filepath)
-	{
-		this->set_territory_image_file(std::filesystem::path(filepath));
-	}
 
 	const QPoint &get_subtemplate_top_left_pos() const
 	{

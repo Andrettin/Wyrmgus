@@ -550,7 +550,7 @@ static void LibraryFileName(const char *file, std::array<char, PATH_MAX> &buffer
 		return;
 	}
 
-	const std::string root_path_str = wyrmgus::database::get()->get_root_path().string();
+	const std::string root_path_str = database::get()->get_root_path().string();
 
 	// Try in map directory
 	if (!CurrentMapPath.empty()) {
