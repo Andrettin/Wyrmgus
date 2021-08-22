@@ -30,6 +30,7 @@
 
 #include "util/angle_util.h"
 #include "util/container_util.h"
+#include "util/path_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
 #include "util/thread_pool.h"
@@ -220,7 +221,7 @@ void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_
 
 	for (const std::filesystem::path &frame_image_path : frame_image_paths) {
 		try {
-			const QImage frame_image(QString::fromStdString(frame_image_path.string()));
+			const QImage frame_image(path::to_qstring(frame_image_path));
 
 			if (frame_image.isNull()) {
 				continue;
@@ -247,7 +248,7 @@ void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_
 	int frame_index = 0;
 	for (const std::filesystem::path &frame_image_path : frame_image_paths) {
 		try {
-			QImage frame_image(QString::fromStdString(frame_image_path.string()));
+			QImage frame_image(path::to_qstring(frame_image_path));
 
 			if (frame_image.isNull()) {
 				continue;
@@ -271,7 +272,7 @@ void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_
 		}
 	}
 
-	image.save(QString::fromStdString(dir_path.string() + ".png"));
+	image.save(path::to_qstring(dir_path) + ".png");
 }
 
 void index_to_palette(QImage &image, const color_set &palette)

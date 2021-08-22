@@ -59,6 +59,7 @@
 #include "unit/unit_type.h"
 #include "util/container_util.h"
 #include "util/exception_util.h"
+#include "util/path_util.h"
 #include "util/queue_util.h"
 #include "util/qvariant_util.h"
 
@@ -128,14 +129,14 @@ QString engine_interface::get_save_path() const
 {
 	std::filesystem::path save_path = GetSaveDir();
 	save_path.make_preferred();
-	return QString::fromStdString(save_path.string());
+	return path::to_qstring(save_path);
 }
 
 QString engine_interface::get_user_maps_path() const
 {
 	std::filesystem::path path = database::get_user_maps_path();
 	path.make_preferred();
-	return QString::fromStdString(path.string());
+	return path::to_qstring(path);
 }
 
 void engine_interface::call_lua_command(const QString &command)

@@ -88,10 +88,7 @@ public:
 		return this->get_presentation_filepath().string();
 	}
 
-	QString get_presentation_filepath_qstring() const
-	{
-		return QString::fromStdString(this->get_presentation_filepath().string());
-	}
+	QString get_presentation_filepath_qstring() const;
 
 	void set_presentation_filepath(const std::filesystem::path &filepath)
 	{

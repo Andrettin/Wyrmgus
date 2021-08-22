@@ -30,6 +30,7 @@
 
 #include "iolib.h"
 #include "iocompat.h"
+#include "util/path_util.h"
 #include "video/video.h"
 
 #include <QPixmap>
@@ -61,7 +62,7 @@ int LoadGraphicPNG(CGraphic *g, const int scale_factor)
 	}
 
 	g->set_filepath(filepath);
-	g->image = QImage(QString::fromStdString(filepath.string()));
+	g->image = QImage(path::to_qstring(filepath));
 	if (g->get_image().isNull()) {
 		throw std::runtime_error("Failed to load the \"" + filepath.string() + "\" image file.");
 	}

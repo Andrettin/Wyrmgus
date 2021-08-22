@@ -32,6 +32,7 @@
 #include "database/defines.h"
 #include "intern_video.h"
 #include "util/image_util.h"
+#include "util/path_util.h"
 #include "util/point_util.h"
 #include "util/util.h"
 #include "video/font_color.h"
@@ -612,7 +613,7 @@ namespace wyrmgus {
 */
 void font::MeasureWidths()
 {
-	const QImage image(QString::fromStdString(this->G->get_filepath().string()));
+	const QImage image(path::to_qstring(this->G->get_filepath()));
 	const QSize &frame_size = G->get_original_frame_size();
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 

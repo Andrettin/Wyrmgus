@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/path_util.h"
+
 namespace wyrmgus::container {
 
 template <typename T, typename U>
@@ -49,7 +51,7 @@ inline QVariantList to_qvariant_list(const T &container)
 
 	for (const typename T::value_type &element : container) {
 		if constexpr (std::is_same_v<typename T::value_type, std::filesystem::path>) {
-			list.append(QVariant::fromValue(QString::fromStdString(element.string())));
+			list.append(QVariant::fromValue(path::to_qstring(element)));
 		} else if constexpr (std::is_same_v<typename T::value_type, std::string>) {
 			list.append(QVariant::fromValue(QString::fromStdString(element)));
 		} else {
@@ -69,7 +71,7 @@ QStringList to_qstring_list(const T &string_container)
 
 	if constexpr (std::is_same_v<typename T::value_type, std::filesystem::path>) {
 		for (const std::filesystem::path &path : string_container) {
-			qstring_list.push_back(QString::fromStdString(path.string()));
+			qstring_list.push_back(path::to_qstring(path));
 		}
 	} else {
 		for (const std::string &str : string_container) {

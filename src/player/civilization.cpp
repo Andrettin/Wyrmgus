@@ -51,6 +51,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "util/container_util.h"
+#include "util/path_util.h"
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
 #include "video/video.h"
@@ -398,6 +399,11 @@ const std::filesystem::path &civilization::get_encyclopedia_background_file() co
 	}
 
 	return this->encyclopedia_background_file;
+}
+
+QString civilization::get_encyclopedia_background_file_qstring() const
+{
+	return path::to_qstring(this->get_encyclopedia_background_file());
 }
 
 void civilization::set_encyclopedia_background_file(const std::filesystem::path &filepath)

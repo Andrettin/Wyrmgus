@@ -32,6 +32,7 @@
 #include "map/map_layer.h"
 #include "player.h" //for the player types enum
 #include "util/log_util.h"
+#include "util/path_util.h"
 #include "util/string_util.h"
 
 namespace wyrmgus {
@@ -125,6 +126,11 @@ qunique_ptr<map_info> map_info::duplicate() const
 	info->MapWorld = this->MapWorld;
 
 	return info;
+}
+
+QString map_info::get_presentation_filepath_qstring() const
+{
+	return path::to_qstring(this->get_presentation_filepath());
 }
 
 int map_info::get_player_count() const

@@ -609,7 +609,7 @@ std::filesystem::path database::get_user_data_path()
 	}
 
 	//ignore the organization name for the user data path, e.g. the path should be "[AppName]" and not "[OrganizationName]/[AppName]"
-	if (path.parent_path().filename().string() == QApplication::organizationName().toStdString()) {
+	if (path::to_string(path.parent_path().filename()) == QApplication::organizationName().toStdString()) {
 		path = path.parent_path().parent_path() / path.filename();
 	}
 

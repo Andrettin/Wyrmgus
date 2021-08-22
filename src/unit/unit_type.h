@@ -1183,11 +1183,7 @@ public:
 	}
 
 	const std::filesystem::path &get_encyclopedia_background_file() const;
-
-	QString get_encyclopedia_background_file_qstring() const
-	{
-		return QString::fromStdString(this->get_encyclopedia_background_file().string());
-	}
+	QString get_encyclopedia_background_file_qstring() const;
 
 	void set_encyclopedia_background_file(const std::filesystem::path &filepath);
 

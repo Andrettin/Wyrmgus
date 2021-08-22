@@ -364,11 +364,7 @@ public:
 		return this->population_per_unit;
 	}
 
-	QString get_default_menu_background_file_qstring() const
-	{
-		return QString::fromStdString(this->default_menu_background_file.string());
-	}
-
+	QString get_default_menu_background_file_qstring() const;
 	void set_default_menu_background_file(const std::filesystem::path &filepath);
 
 	Q_INVOKABLE void set_default_menu_background_file(const std::string &filepath)

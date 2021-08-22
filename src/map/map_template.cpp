@@ -76,6 +76,7 @@
 #include "util/geoshape_util.h"
 #include "util/image_util.h"
 #include "util/number_util.h"
+#include "util/path_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
 #include "util/string_conversion_util.h"
@@ -640,19 +641,17 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 
 void map_template::apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const
 {
-	const std::filesystem::path territory_file = this->get_territory_image_file();
+	const std::filesystem::path territory_filepath = this->get_territory_image_file();
 	
-	if (territory_file.empty()) {
+	if (territory_filepath.empty()) {
 		return;
 	}
 	
-	const std::string territory_filename = LibraryFileName(territory_file.string().c_str());
-		
-	if (!CanAccessFile(territory_filename.c_str())) {
-		fprintf(stderr, "File \"%s\" not found.\n", territory_filename.c_str());
+	if (!std::filesystem::exists(territory_filepath)) {
+		throw std::runtime_error("File \"" + territory_filepath.string() + "\" not found.");
 	}
-	
-	const QImage territory_image(territory_filename.c_str());
+
+	const QImage territory_image(path::to_qstring(territory_filepath));
 	
 	for (int y = 0; y < territory_image.height(); ++y) {
 		if (y < template_start_pos.y()) {
@@ -2221,20 +2220,18 @@ void map_template::load_terrain_character_map(const bool overlay)
 		return;
 	}
 
-	std::filesystem::path terrain_file;
+	std::filesystem::path terrain_filepath;
 	if (overlay) {
-		terrain_file = this->get_overlay_terrain_file();
+		terrain_filepath = this->get_overlay_terrain_file();
 	} else {
-		terrain_file = this->get_terrain_file();
+		terrain_filepath = this->get_terrain_file();
 	}
 
-	const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
-
-	if (!CanAccessFile(terrain_filename.c_str())) {
-		throw std::runtime_error("File \"" + terrain_filename + "\" not found.");
+	if (!std::filesystem::exists(terrain_filepath)) {
+		throw std::runtime_error("File \"" + terrain_filepath.string() + "\" not found.");
 	}
 
-	std::ifstream is_map(terrain_filename);
+	std::ifstream is_map(terrain_filepath);
 
 	std::string line_str;
 	while (std::getline(is_map, line_str)) {
@@ -2245,7 +2242,7 @@ void map_template::load_terrain_character_map(const bool overlay)
 				const char terrain_character = line_str.at(i);
 				line_chars.push_back(terrain_character);
 			} catch (...) {
-				std::throw_with_nested(std::runtime_error("Failed to parse character " + std::to_string(i) + " of line for terrain file \"" + terrain_filename + "\": \"" + line_str + "\"."));
+				std::throw_with_nested(std::runtime_error("Failed to parse character " + std::to_string(i) + " of line for terrain file \"" + terrain_filepath.string() + "\": \"" + line_str + "\"."));
 			}
 		}
 
@@ -2298,13 +2295,11 @@ void map_template::set_trade_route_image_file(const std::filesystem::path &filep
 
 QImage map_template::load_terrain_image_file(const std::filesystem::path &filepath)
 {
-	const std::string terrain_filename = LibraryFileName(filepath.string().c_str());
-
-	if (!CanAccessFile(terrain_filename.c_str())) {
-		throw std::runtime_error("The terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
+	if (!std::filesystem::exists(filepath)) {
+		throw std::runtime_error("The terrain image file \"" + filepath.string() + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
 	}
 
-	QImage terrain_image(terrain_filename.c_str());
+	QImage terrain_image(path::to_qstring(filepath));
 
 	if (terrain_image.size() != this->get_size()) {
 		throw std::runtime_error("The terrain image for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(this->get_size()) + ".");
@@ -2972,7 +2967,7 @@ void map_template::save_terrain_image(const std::string &filename, const std::fi
 	QImage image;
 
 	if (!image_filepath.empty()) {
-		image = QImage(QString::fromStdString(image_filepath.string()));
+		image = QImage(path::to_qstring(image_filepath));
 
 		if (image.size() != this->get_size()) {
 			throw std::runtime_error("Invalid terrain image size for map template \"" + this->get_identifier() + "\".");
@@ -2995,13 +2990,11 @@ void map_template::save_terrain_image(const std::string &filename, const std::fi
 
 void map_template::create_terrain_image_from_file(QImage &image, const std::filesystem::path &filepath) const
 {
-	const std::string terrain_filename = LibraryFileName(filepath.string().c_str());
-
-	if (!CanAccessFile(terrain_filename.c_str())) {
-		throw std::runtime_error("File \"" + terrain_filename + "\" not found.");
+	if (!std::filesystem::exists(filepath)) {
+		throw std::runtime_error("File \"" + filepath.string() + "\" not found.");
 	}
 
-	std::ifstream is_map(terrain_filename);
+	std::ifstream is_map(filepath);
 
 	std::string line_str;
 	int y = 0;
@@ -3062,11 +3055,11 @@ void map_template::create_terrain_image_from_map(QImage &image, const point_map<
 
 void map_template::save_territory_image(const std::string &filename, const site_map<std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const
 {
-	const std::filesystem::path territory_image = this->get_territory_image_file();
+	const std::filesystem::path territory_image_filepath = this->get_territory_image_file();
 
 	QImage image;
-	if (!territory_image.empty()) {
-		image = QImage(QString::fromStdString(territory_image.string()));
+	if (!territory_image_filepath.empty()) {
+		image = QImage(path::to_qstring(territory_image_filepath));
 
 		if (image.size() != this->get_size()) {
 			throw std::runtime_error("Invalid territory image size for map template \"" + this->get_identifier() + "\".");

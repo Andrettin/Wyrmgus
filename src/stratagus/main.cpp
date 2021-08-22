@@ -53,6 +53,7 @@
 #include "unit/unit_type.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
+#include "util/path_util.h"
 #include "version.h"
 #include "video/frame_buffer_object.h"
 
@@ -131,7 +132,7 @@ int main(int argc, char **argv)
 		engine.addImageProvider("interface", new interface_image_provider);
 		engine.addImageProvider("tile", new tile_image_provider);
 
-		const QString root_path = QString::fromStdString(database::get()->get_root_path().string());
+		const QString root_path = path::to_qstring(database::get()->get_root_path());
 
 		app.setWindowIcon(QIcon(root_path + "/graphics/interface/icons/wyrmsun_icon_32.png"));
 

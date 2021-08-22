@@ -37,6 +37,7 @@
 #include "sound/music.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
+#include "util/path_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
 
@@ -133,6 +134,11 @@ void defines::initialize()
 	if (this->get_population_per_unit() == 0) {
 		throw std::runtime_error("No population per unit set in the defines.");
 	}
+}
+
+QString defines::get_default_menu_background_file_qstring() const
+{
+	return path::to_qstring(this->default_menu_background_file);
 }
 
 void defines::set_default_menu_background_file(const std::filesystem::path &filepath)

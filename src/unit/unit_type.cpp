@@ -66,6 +66,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/container_util.h"
+#include "util/path_util.h"
 #include "util/size_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
@@ -2367,6 +2368,11 @@ const std::filesystem::path &unit_type::get_encyclopedia_background_file() const
 	}
 
 	return this->encyclopedia_background_file;
+}
+
+QString unit_type::get_encyclopedia_background_file_qstring() const
+{
+	return path::to_qstring(this->get_encyclopedia_background_file());
 }
 
 void unit_type::set_encyclopedia_background_file(const std::filesystem::path &filepath)
