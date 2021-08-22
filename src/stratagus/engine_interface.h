@@ -238,6 +238,9 @@ public:
 	int get_max_map_width() const;
 	int get_max_map_height() const;
 
+	Q_INVOKABLE void load_game(const QString &filepath);
+	void load_game_deferred(const std::string &filepath);
+
 signals:
 	void running_changed();
 	void loading_message_changed();

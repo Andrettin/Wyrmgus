@@ -460,6 +460,11 @@ static void SingleGameLoop()
 		DisplayLoop();
 		GameLogicLoop();
 	}
+
+	if (!load_game_file.empty()) {
+		engine_interface::get()->load_game_deferred(load_game_file);
+		load_game_file.clear();
+	}
 }
 
 /**

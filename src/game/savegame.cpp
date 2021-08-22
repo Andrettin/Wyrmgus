@@ -41,9 +41,12 @@
 #include "parameters.h"
 #include "player.h"
 #include "quest/campaign.h"
+#include "quest/quest.h"
 #include "replay.h"
+#include "results.h"
 #include "script.h"
 #include "script/trigger.h"
+#include "settings.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
@@ -55,6 +58,8 @@
 #include "version.h"
 
 extern void StartMap(const std::string &filename, bool clean);
+
+std::string load_game_file;
 
 void ExpandPath(std::string &newpath, const std::string &path)
 {
@@ -207,16 +212,36 @@ void DeleteSaveGame(const std::string &filename)
 
 void StartSavedGame(const std::string &filename)
 {
-	try {
-		std::string path;
+	std::string path;
 
-		SaveGameLoading = true;
-		CleanPlayers();
-		ExpandPath(path, filename);
-		LoadGame(path);
+	SaveGameLoading = true;
+	CleanPlayers();
+	ExpandPath(path, filename);
+	LoadGame(path);
 
-		StartMap(filename, false);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	StartMap(filename, false);
+}
+
+void load_game(const std::string &filename)
+{
+	CclCommand("ClearPlayerDataObjectives();");
+
+	while (true) {
+		CclCommand("InitGameVariables(); LoadedGame = true;");
+		StartSavedGame(filename);
+
+		if (GameResult != GameRestart) {
+			break;
+		}
 	}
+
+	game::get()->set_current_campaign(nullptr);
+	CurrentQuest = nullptr;
+
+	GameSettings.reset();
+}
+
+void set_load_game_file(const std::string &filename)
+{
+	load_game_file = filename;
 }

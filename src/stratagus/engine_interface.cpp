@@ -550,4 +550,20 @@ int engine_interface::get_max_map_height() const
 	return MaxMapHeight;
 }
 
+void engine_interface::load_game(const QString &filepath)
+{
+	this->load_game_deferred(filepath.toStdString());
+}
+
+void engine_interface::load_game_deferred(const std::string &filepath)
+{
+	this->post([filepath]() {
+		try {
+			::load_game(filepath);
+		} catch (const std::exception &exception) {
+			exception::report(exception);
+		}
+	});
+}
+
 }

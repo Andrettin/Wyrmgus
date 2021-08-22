@@ -204,6 +204,10 @@ extern std::string GetSaveDir();
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern int SaveGame(const std::string &filename); /// Save game
 extern void DeleteSaveGame(const std::string &filename);
+extern void StartSavedGame(const std::string &filename);
+extern void load_game(const std::string &filename);
+extern void set_load_game_file(const std::string &filename);
+extern std::string load_game_file;
 extern bool SaveGameLoading;                 /// Save game is in progress of loading
 
 extern void InitModules();              /// Initialize all modules
