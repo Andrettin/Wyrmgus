@@ -1145,7 +1145,7 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "random_movement_probability") {
 			this->random_movement_probability = std::stoi(value);
 		} else if (key == "random_movement_distance") {
-			this->RandomMovementDistance = std::stoi(value);
+			this->random_movement_distance = std::stoi(value);
 		} else if (key == "can_cast_spell") {
 			spell *spell = spell::get(value);
 			this->Spells.push_back(spell);
@@ -1798,7 +1798,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->neutral_minimap_color = parent_type->neutral_minimap_color;
 	this->encyclopedia_background_file = parent_type->encyclopedia_background_file;
 	this->random_movement_probability = parent_type->random_movement_probability;
-	this->RandomMovementDistance = parent_type->RandomMovementDistance;
+	this->random_movement_distance = parent_type->random_movement_distance;
 	this->given_resource = parent_type->given_resource;
 	this->RequirementsString = parent_type->RequirementsString;
 	this->ExperienceRequirementsString = parent_type->ExperienceRequirementsString;

@@ -1336,7 +1336,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "RandomMovementProbability")) {
 			type->random_movement_probability = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RandomMovementDistance")) {
-			type->RandomMovementDistance = LuaToNumber(l, -1);
+			type->random_movement_distance = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ClicksToExplode")) {
 			type->ClicksToExplode = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "CanTransport")) {

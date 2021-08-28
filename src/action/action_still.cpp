@@ -192,8 +192,8 @@ static bool MoveRandomly(CUnit &unit)
 	// pick random location
 	Vec2i pos = unit.tilePos;
 
-	pos.x += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
-	pos.y += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
+	pos.x += SyncRand(unit.Type->get_random_movement_distance() * 2 + 1) - unit.Type->get_random_movement_distance();
+	pos.y += SyncRand(unit.Type->get_random_movement_distance() * 2 + 1) - unit.Type->get_random_movement_distance();
 
 	//restrict to map
 	CMap::get()->Clamp(pos, unit.MapLayer->ID);
@@ -221,11 +221,11 @@ static bool MoveRandomly(CUnit &unit)
 				}
 
 				std::vector<CUnit *> table;
-				SelectAroundUnit(unit, std::max(6, unit.Type->RandomMovementDistance), table, HasNotSamePlayerAs(*unit.Player));
+				SelectAroundUnit(unit, std::max(6, unit.Type->get_random_movement_distance()), table, HasNotSamePlayerAs(*unit.Player));
 
 				if (table.empty()) { //only avoid going near a settled area if isn't already surrounded by civilizations' units
 					//don't go near settled areas
-					const QPoint offset(std::max(6, unit.Type->RandomMovementDistance), std::max(6, unit.Type->RandomMovementDistance));
+					const QPoint offset(std::max(6, unit.Type->get_random_movement_distance()), std::max(6, unit.Type->get_random_movement_distance()));
 					const QPoint minpos = pos - offset;
 					const QPoint maxpos = pos + offset;
 
