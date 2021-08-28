@@ -251,7 +251,7 @@ static void bzseek(BZFILE *file, unsigned offset, int)
 
 int CFile::PImpl::open(const char *name, long openflags)
 {
-	char buf[512];
+	std::array<char, 512> buf{};
 	const char *openstring;
 
 	if ((openflags & CL_OPEN_READ) && (openflags & CL_OPEN_WRITE)) {
@@ -271,13 +271,13 @@ int CFile::PImpl::open(const char *name, long openflags)
 	if (openflags & CL_OPEN_WRITE) {
 #ifdef USE_BZ2LIB
 		if ((openflags & CL_WRITE_BZ2)
-			&& (cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), openstring))) {
+			&& (cl_bz = BZ2_bzopen(strcat(strcpy(buf.data(), name), ".bz2"), openstring))) {
 			cl_type = CLF_TYPE_BZIP2;
 		} else
 #endif
 #ifdef USE_ZLIB
 			if ((openflags & CL_WRITE_GZ)
-				&& (cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), openstring))) {
+				&& (cl_gz = gzopen(strcat(strcpy(buf.data(), name), ".gz"), openstring))) {
 				cl_type = CLF_TYPE_GZIP;
 			} else
 #endif
@@ -287,12 +287,12 @@ int CFile::PImpl::open(const char *name, long openflags)
 	} else {
 		if (!(cl_plain = fopen(name, openstring))) { // try plain first
 #ifdef USE_ZLIB
-			if ((cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), "rb"))) {
+			if ((cl_gz = gzopen(strcat(strcpy(buf.data(), name), ".gz"), "rb"))) {
 				cl_type = CLF_TYPE_GZIP;
 			} else
 #endif
 #ifdef USE_BZ2LIB
-				if ((cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), "rb"))) {
+				if ((cl_bz = BZ2_bzopen(strcat(strcpy(buf.data(), name), ".bz2"), "rb"))) {
 					cl_type = CLF_TYPE_BZIP2;
 				} else
 #endif
@@ -301,7 +301,7 @@ int CFile::PImpl::open(const char *name, long openflags)
 		} else {
 			cl_type = CLF_TYPE_PLAIN;
 			// Hmm, plain worked, but nevertheless the file may be compressed!
-			if (fread(buf, 2, 1, cl_plain) == 1) {
+			if (fread(buf.data(), 2, 1, cl_plain) == 1) {
 #ifdef USE_BZ2LIB
 				if (buf[0] == 'B' && buf[1] == 'Z') {
 					fclose(cl_plain);
