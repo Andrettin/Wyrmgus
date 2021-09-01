@@ -250,6 +250,8 @@ public:
 			path /= database::maps_folder;
 		}
 
+		paths.push_back(database::get_user_maps_path());
+
 		return paths;
 	}
 

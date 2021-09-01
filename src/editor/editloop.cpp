@@ -316,11 +316,11 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 					if (x_offset != 0 || y_offset != 0) {
 						Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
 						if (CMap::get()->Info->IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
-							const wyrmgus::terrain_type *adjacent_terrain = CMap::get()->GetTileTerrain(adjacent_pos, tile_terrain->is_overlay(), UI.CurrentMapLayer->ID);
+							const terrain_type *adjacent_terrain = CMap::get()->GetTileTerrain(adjacent_pos, tile_terrain->is_overlay(), UI.CurrentMapLayer->ID);
 							if (tile_terrain->is_overlay() && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = nullptr;
 							}
-							if (tile_terrain != adjacent_terrain && !wyrmgus::vector::contains(tile_terrain->get_outer_border_terrain_types(), adjacent_terrain)) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+							if (tile_terrain != adjacent_terrain && !vector::contains(tile_terrain->get_outer_border_terrain_types(), adjacent_terrain)) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
 								solid_tile = false;
 								break;
 							}
@@ -383,11 +383,11 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 										if (sub_x_offset != 0 || sub_y_offset != 0) {
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
 											if (CMap::get()->Info->IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer)) {
-												const wyrmgus::terrain_type *sub_adjacent_terrain = CMap::get()->GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
+												const terrain_type *sub_adjacent_terrain = CMap::get()->GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
 												if (adjacent_terrain->is_overlay() && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = nullptr;
 												}
-												if (adjacent_terrain != sub_adjacent_terrain && !wyrmgus::vector::contains(adjacent_terrain->get_outer_border_terrain_types(), sub_adjacent_terrain)) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+												if (adjacent_terrain != sub_adjacent_terrain && !vector::contains(adjacent_terrain->get_outer_border_terrain_types(), sub_adjacent_terrain)) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
 													solid_tile = false;
 													break;
 												}
