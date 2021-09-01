@@ -2666,7 +2666,7 @@ void MenuScreen::stop(int result, bool stopAll)
 		}
 		if (MenuStack.empty()) {
 			//InterfaceState = IfaceStateNormal;
-			if (!Editor.Running) {
+			if (!CEditor::get()->is_running()) {
 				SetCallbacks(&GameCallbacks);
 			} else {
 				SetCallbacks(&EditorCallbacks);

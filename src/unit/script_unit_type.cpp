@@ -2068,7 +2068,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		const std::string res = LuaToString(l, 3);
 		const resource *resource = resource::get(res);
-		if (!GameRunning && Editor.Running != EditorEditing) {
+		if (!GameRunning && !CEditor::get()->is_running()) {
 			lua_pushnumber(l, type->DefaultStat.get_cost(resource));
 		} else {
 			lua_pushnumber(l, type->MapDefaultStat.get_cost(resource));
@@ -2078,7 +2078,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		const std::string res = LuaToString(l, 3);
 		const resource *resource = resource::get(res);
-		if (!GameRunning && Editor.Running != EditorEditing) {
+		if (!GameRunning && !CEditor::get()->is_running()) {
 			lua_pushnumber(l, type->DefaultStat.get_improve_income(resource));
 		} else {
 			lua_pushnumber(l, type->MapDefaultStat.get_improve_income(resource));
@@ -2088,7 +2088,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "UnitStock")) {
 		LuaCheckArgs(l, 3);
 		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, 3));
-		if (!GameRunning && Editor.Running != EditorEditing) {
+		if (!GameRunning && !CEditor::get()->is_running()) {
 			lua_pushnumber(l, type->DefaultStat.get_unit_stock(unit_type));
 		} else {
 			lua_pushnumber(l, type->MapDefaultStat.get_unit_stock(unit_type));
@@ -2154,14 +2154,14 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->MinAttackRange);
 		return 1;
 	} else if (!strcmp(data, "MaxAttackRange")) {
-		if (!GameRunning && Editor.Running != EditorEditing) {
+		if (!GameRunning && !CEditor::get()->is_running()) {
 			lua_pushnumber(l, type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value);
 		} else {
 			lua_pushnumber(l, type->MapDefaultStat.Variables[ATTACKRANGE_INDEX].Value);
 		}
 		return 1;
 	} else if (!strcmp(data, "Priority")) {
-		if (!GameRunning && Editor.Running != EditorEditing) {
+		if (!GameRunning && !CEditor::get()->is_running()) {
 			lua_pushnumber(l, type->DefaultStat.Variables[PRIORITY_INDEX].Value);
 		} else {
 			lua_pushnumber(l, type->MapDefaultStat.Variables[PRIORITY_INDEX].Value);
@@ -2232,7 +2232,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		const std::string sound_type = LuaToString(l, 3);
 
 		const wyrmgus::unit_sound_set *sound_set = nullptr;
-		if (!GameRunning && Editor.Running != EditorEditing) {
+		if (!GameRunning && !CEditor::get()->is_running()) {
 			sound_set = type->get_sound_set();
 		} else {
 			sound_set = type->MapSound.get();
@@ -2534,7 +2534,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[data];
 		if (index != -1) { // valid index
-			if (!GameRunning && Editor.Running != EditorEditing) {
+			if (!GameRunning && !CEditor::get()->is_running()) {
 				lua_pushnumber(l, type->DefaultStat.Variables[index].Value);
 			} else {
 				lua_pushnumber(l, type->MapDefaultStat.Variables[index].Value);
@@ -3592,7 +3592,7 @@ void SetModStat(const std::string &mod_file, const std::string &ident, const std
 	
 	if (variable_key == "Costs") {
 		const resource *resource = resource::get(variable_type);
-		if (GameRunning || Editor.Running == EditorEditing) {
+		if (GameRunning || CEditor::get()->is_running()) {
 			type->MapDefaultStat.change_cost(resource, -type->ModDefaultStats[mod_file].get_cost(resource));
 			for (int player = 0; player < PlayerMax; ++player) {
 				type->Stats[player].change_cost(resource, -type->ModDefaultStats[mod_file].get_cost(resource));
@@ -3600,7 +3600,7 @@ void SetModStat(const std::string &mod_file, const std::string &ident, const std
 		}
 
 		type->ModDefaultStats[mod_file].set_cost(resource, value);
-		if (GameRunning || Editor.Running == EditorEditing) {
+		if (GameRunning || CEditor::get()->is_running()) {
 			type->MapDefaultStat.change_cost(resource, type->ModDefaultStats[mod_file].get_cost(resource));
 			for (int player = 0; player < PlayerMax; ++player) {
 				type->Stats[player].change_cost(resource, type->ModDefaultStats[mod_file].get_cost(resource));
@@ -3608,14 +3608,14 @@ void SetModStat(const std::string &mod_file, const std::string &ident, const std
 		}
 	} else if (variable_key == "ImproveProduction") {
 		const resource *resource = resource::get(variable_type);
-		if (GameRunning || Editor.Running == EditorEditing) {
+		if (GameRunning || CEditor::get()->is_running()) {
 			type->MapDefaultStat.change_improve_income(resource, -type->ModDefaultStats[mod_file].get_improve_income(resource));
 			for (int player = 0; player < PlayerMax; ++player) {
 				type->Stats[player].change_improve_income(resource, -type->ModDefaultStats[mod_file].get_improve_income(resource));
 			}
 		}
 		type->ModDefaultStats[mod_file].set_improve_income(resource, value);
-		if (GameRunning || Editor.Running == EditorEditing) {
+		if (GameRunning || CEditor::get()->is_running()) {
 			type->MapDefaultStat.change_improve_income(resource, type->ModDefaultStats[mod_file].get_improve_income(resource));
 			for (int player = 0; player < PlayerMax; ++player) {
 				type->Stats[player].change_improve_income(resource, type->ModDefaultStats[mod_file].get_improve_income(resource));
@@ -3623,14 +3623,14 @@ void SetModStat(const std::string &mod_file, const std::string &ident, const std
 		}
 	} else if (variable_key == "UnitStock") {
 		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(variable_type);
-		if (GameRunning || Editor.Running == EditorEditing) {
+		if (GameRunning || CEditor::get()->is_running()) {
 			type->MapDefaultStat.change_unit_stock(unit_type, - type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
 			for (int player = 0; player < PlayerMax; ++player) {
 				type->Stats[player].change_unit_stock(unit_type, - type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
 			}
 		}
 		type->ModDefaultStats[mod_file].set_unit_stock(unit_type, value);
-		if (GameRunning || Editor.Running == EditorEditing) {
+		if (GameRunning || CEditor::get()->is_running()) {
 			type->MapDefaultStat.change_unit_stock(unit_type, type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
 			for (int player = 0; player < PlayerMax; ++player) {
 				type->Stats[player].change_unit_stock(unit_type, type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
@@ -3640,42 +3640,42 @@ void SetModStat(const std::string &mod_file, const std::string &ident, const std
 		int variable_index = UnitTypeVar.VariableNameLookup[variable_key.c_str()];
 		if (variable_index != -1) { // valid index
 			if (variable_type == "Value") {
-				if (GameRunning || Editor.Running == EditorEditing) {
+				if (GameRunning || CEditor::get()->is_running()) {
 					type->MapDefaultStat.Variables[variable_index].Value -= type->ModDefaultStats[mod_file].Variables[variable_index].Value;
 					for (int player = 0; player < PlayerMax; ++player) {
 						type->Stats[player].Variables[variable_index].Value -= type->ModDefaultStats[mod_file].Variables[variable_index].Value;
 					}
 				}
 				type->ModDefaultStats[mod_file].Variables[variable_index].Value = value;
-				if (GameRunning || Editor.Running == EditorEditing) {
+				if (GameRunning || CEditor::get()->is_running()) {
 					type->MapDefaultStat.Variables[variable_index].Value += type->ModDefaultStats[mod_file].Variables[variable_index].Value;
 					for (int player = 0; player < PlayerMax; ++player) {
 						type->Stats[player].Variables[variable_index].Value += type->ModDefaultStats[mod_file].Variables[variable_index].Value;
 					}
 				}
 			} else if (variable_type == "Max") {
-				if (GameRunning || Editor.Running == EditorEditing) {
+				if (GameRunning || CEditor::get()->is_running()) {
 					type->MapDefaultStat.Variables[variable_index].Max -= type->ModDefaultStats[mod_file].Variables[variable_index].Max;
 					for (int player = 0; player < PlayerMax; ++player) {
 						type->Stats[player].Variables[variable_index].Max -= type->ModDefaultStats[mod_file].Variables[variable_index].Max;
 					}
 				}
 				type->ModDefaultStats[mod_file].Variables[variable_index].Max = value;
-				if (GameRunning || Editor.Running == EditorEditing) {
+				if (GameRunning || CEditor::get()->is_running()) {
 					type->MapDefaultStat.Variables[variable_index].Max += type->ModDefaultStats[mod_file].Variables[variable_index].Max;
 					for (int player = 0; player < PlayerMax; ++player) {
 						type->Stats[player].Variables[variable_index].Max += type->ModDefaultStats[mod_file].Variables[variable_index].Max;
 					}
 				}
 			} else if (variable_type == "Increase") {
-				if (GameRunning || Editor.Running == EditorEditing) {
+				if (GameRunning || CEditor::get()->is_running()) {
 					type->MapDefaultStat.Variables[variable_index].Increase -= type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
 					for (int player = 0; player < PlayerMax; ++player) {
 						type->Stats[player].Variables[variable_index].Increase -= type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
 					}
 				}
 				type->ModDefaultStats[mod_file].Variables[variable_index].Increase = value;
-				if (GameRunning || Editor.Running == EditorEditing) {
+				if (GameRunning || CEditor::get()->is_running()) {
 					type->MapDefaultStat.Variables[variable_index].Increase += type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
 					for (int player = 0; player < PlayerMax; ++player) {
 						type->Stats[player].Variables[variable_index].Increase += type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
@@ -3683,7 +3683,7 @@ void SetModStat(const std::string &mod_file, const std::string &ident, const std
 				}
 			} else if (variable_type == "Enable") {
 				type->ModDefaultStats[mod_file].Variables[variable_index].Enable = value;
-				if (GameRunning || Editor.Running == EditorEditing) {
+				if (GameRunning || CEditor::get()->is_running()) {
 					type->MapDefaultStat.Variables[variable_index].Enable = type->ModDefaultStats[mod_file].Variables[variable_index].Enable;
 					for (int player = 0; player < PlayerMax; ++player) {
 						type->Stats[player].Variables[variable_index].Enable = type->ModDefaultStats[mod_file].Variables[variable_index].Enable;
@@ -3770,7 +3770,7 @@ void SetModSound(const std::string &mod_file, const std::string &ident, const st
 		}
 	}
 	
-	if (GameRunning || Editor.Running == EditorEditing) {
+	if (GameRunning || CEditor::get()->is_running()) {
 		if (sound_type == "selected") {
 			type->MapSound->Selected.Name = sound;
 		} else if (sound_type == "acknowledge") {

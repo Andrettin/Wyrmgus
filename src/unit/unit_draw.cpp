@@ -149,7 +149,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	
 	// FIXME: make these colors customizable with scripts.
 
-	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorSelecting) {
+	if (CEditor::get()->is_running() && UnitUnderCursor == &unit && CEditor::get()->State == EditorSelecting) {
 		color = ColorWhite;
 	} else if (unit.Selected || unit.TeamSelected || (unit.Blink & 1)) {
 		if (unit.Player->Index == PlayerNumNeutral) {

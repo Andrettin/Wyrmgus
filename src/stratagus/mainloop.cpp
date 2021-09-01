@@ -200,7 +200,7 @@ void UpdateDisplay()
 {
 	std::vector<std::function<void(renderer *)>> render_commands;
 
-	if (GameRunning || Editor.Running == EditorEditing) {
+	if (GameRunning || CEditor::get()->is_running()) {
 		//to prevent empty spaces in the UI
 		Video.FillRectangleClip(ColorBlack, 0, 0, Video.ViewportWidth, Video.ViewportHeight, render_commands);
 

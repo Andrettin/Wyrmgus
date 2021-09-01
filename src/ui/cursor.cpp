@@ -298,7 +298,7 @@ void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_com
 		}
 	} else {
 		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, z)) != nullptr);
-		if (!Editor.Running || ontop == (CUnit *)1) {
+		if (!CEditor::get()->is_running() || ontop == (CUnit *)1) {
 			ontop = nullptr;
 		}
 	}

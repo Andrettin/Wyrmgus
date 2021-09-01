@@ -164,7 +164,7 @@ void ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_comma
 	SetVideoSync();
 
 	for (const TitleScreen &title_screen : TitleScreens) {
-		if ((Editor.Running && !title_screen.Editor) || (!Editor.Running && title_screen.Editor)) {
+		if ((CEditor::get()->is_running() && !title_screen.Editor) || (!CEditor::get()->is_running() && title_screen.Editor)) {
 			continue;
 		}
 

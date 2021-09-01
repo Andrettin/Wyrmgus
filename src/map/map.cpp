@@ -1639,7 +1639,7 @@ void CMap::Create()
 	this->Info->MapWidths.push_back(this->Info->MapWidth);
 	this->Info->MapHeights.push_back(this->Info->MapHeight);
 	
-	if (Editor.Running == EditorNotRunning) {
+	if (!CEditor::get()->is_running()) {
 		map_layer->set_season_schedule(defines::get()->get_default_season_schedule());
 		map_layer->SetSeasonByHours(game::get()->get_current_total_hours());
 		
@@ -2040,7 +2040,7 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 			Select(pos, pos, table, z);
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
-					if (Editor.Running == EditorNotRunning) {
+					if (!CEditor::get()->is_running()) {
 						LetUnitDie(*table[i]);
 					} else {
 						EditorActionRemoveUnit(*table[i], false);
@@ -2091,7 +2091,7 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 
 					wyrmgus::tile *adjacent_tile = map_layer->Field(adjacent_pos);
 
-					if (terrain->is_overlay() && adjacent_tile->get_overlay_terrain() != terrain && adjacent_tile->get_overlay_terrain() != old_terrain && Editor.Running == EditorNotRunning) {
+					if (terrain->is_overlay() && adjacent_tile->get_overlay_terrain() != terrain && adjacent_tile->get_overlay_terrain() != old_terrain && !CEditor::get()->is_running()) {
 						continue;
 					}
 
@@ -2641,7 +2641,7 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 		return;
 	}
 	
-	if (Editor.Running != EditorNotRunning) { //no need to assign landmasses while in the editor
+	if (CEditor::get()->is_running()) { //no need to assign landmasses while in the editor
 		return;
 	}
 	
@@ -2713,7 +2713,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 		return;
 	}
 	
-	if (Editor.Running != EditorNotRunning) { //no need to assign ownership transitions while in the editor
+	if (CEditor::get()->is_running()) { //no need to assign ownership transitions while in the editor
 		return;
 	}
 	
@@ -3556,7 +3556,7 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 
 void CMap::expand_terrain_features_to_same_terrain(const int z)
 {
-	if (Editor.Running != EditorNotRunning) { //no need to assign terrain features while in the editor
+	if (CEditor::get()->is_running()) { //no need to assign terrain features while in the editor
 		return;
 	}
 
@@ -3856,7 +3856,7 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 	Select(pos, pos, table, z);
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
-			if (Editor.Running == EditorNotRunning) {
+			if (!CEditor::get()->is_running()) {
 				LetUnitDie(*table[i]);			
 			} else {
 				EditorActionRemoveUnit(*table[i], false);

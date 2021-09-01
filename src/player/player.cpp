@@ -1419,7 +1419,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 
 		this->player_color = player_color;
 
-		if (Editor.Running == EditorNotRunning) {
+		if (!CEditor::get()->is_running()) {
 			//update the territory on the minimap for the new color
 			this->update_territory_tiles();
 		}

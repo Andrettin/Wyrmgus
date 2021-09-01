@@ -32,8 +32,6 @@
 
 #include "script.h"
 
-CEditor Editor;
-
 /**
 **  Set the editor's select icon
 **
@@ -42,7 +40,7 @@ CEditor Editor;
 static int CclSetEditorSelectIcon(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	Editor.Select.Name = LuaToString(l, 1);
+	CEditor::get()->Select.Name = LuaToString(l, 1);
 	return 0;
 }
 
@@ -54,7 +52,7 @@ static int CclSetEditorSelectIcon(lua_State *l)
 static int CclSetEditorUnitsIcon(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	Editor.Units.Name = LuaToString(l, 1);
+	CEditor::get()->Units.Name = LuaToString(l, 1);
 	return 0;
 }
 
@@ -66,7 +64,7 @@ static int CclSetEditorUnitsIcon(lua_State *l)
 static int CclSetEditorStartUnit(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	Editor.StartUnitName = LuaToString(l, 1);
+	CEditor::get()->StartUnitName = LuaToString(l, 1);
 	return 0;
 }
 

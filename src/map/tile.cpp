@@ -164,7 +164,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 		}
 	}
 
-	if (Editor.Running == EditorNotRunning && terrain_type != nullptr && terrain_type->SolidAnimationFrames > 0) {
+	if (!CEditor::get()->is_running() && terrain_type != nullptr && terrain_type->SolidAnimationFrames > 0) {
 		if (is_overlay) {
 			this->OverlayAnimationFrame = SyncRand(terrain_type->SolidAnimationFrames);
 		} else {

@@ -2510,7 +2510,7 @@ static int CclSetPlayerData(lua_State *l)
 	
 	//Wyrmgus start
 	//if player is unused, return
-	if (p->Type == PlayerNobody && Editor.Running == EditorNotRunning) {
+	if (p->Type == PlayerNobody && !CEditor::get()->is_running()) {
 		return 0;
 	}
 	//Wyrmgus end

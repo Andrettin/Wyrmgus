@@ -29,6 +29,8 @@
 #include "util/qunique_ptr.h"
 #include "util/singleton.h"
 
+class CEditor;
+
 namespace boost::asio {
 	class io_context;
 }
@@ -51,6 +53,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(wyrmgus::defines* defines READ get_defines CONSTANT)
 	Q_PROPERTY(wyrmgus::preferences* preferences READ get_preferences CONSTANT)
 	Q_PROPERTY(wyrmgus::game* game READ get_game CONSTANT)
+	Q_PROPERTY(CEditor* map_editor READ get_map_editor CONSTANT)
 	Q_PROPERTY(wyrmgus::network_manager* network_manager READ get_network_manager CONSTANT)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 	Q_PROPERTY(QString save_path READ get_save_path CONSTANT)
@@ -97,6 +100,7 @@ public:
 	defines *get_defines() const;
 	preferences *get_preferences() const;
 	game *get_game() const;
+	CEditor *get_map_editor() const;
 	network_manager *get_network_manager() const;
 
 	bool is_running() const

@@ -1,20 +1,14 @@
 $#include "editor.h"
 
-enum EditorRunningType {
-	EditorNotRunning = 0,	/// Not Running
-	EditorStarted = 1,		/// Editor Enabled at all
-	EditorEditing = 4,		/// Editor is fully running
-};
-
 class CEditor
 {
-	vector<string> UnitTypes;
-	bool TerrainEditable;
-	bool WriteCompressedMaps;
-	EditorRunningType Running;
-};
+	static CEditor *get();
 
-extern CEditor Editor;
+	bool is_running();
+	void set_running(bool running);
+	
+	vector<string> UnitTypes;
+};
 
 void StartEditor(const std::string filename);
 int EditorSaveMap(const std::string file);

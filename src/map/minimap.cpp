@@ -379,7 +379,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 
 const unit_type *minimap::get_unit_minimap_type(const CUnit *unit) const
 {
-	if (Editor.Running || ReplayRevealMap || unit->IsVisible(*CPlayer::GetThisPlayer())) {
+	if (CEditor::get()->is_running() || ReplayRevealMap || unit->IsVisible(*CPlayer::GetThisPlayer())) {
 		return unit->Type;
 	}
 
@@ -395,7 +395,7 @@ uint32_t minimap::get_unit_minimap_color(const CUnit *unit, const unit_type *typ
 {
 	if (unit->GetDisplayPlayer() == PlayerNumNeutral) {
 		return CVideo::MapRGB(type->get_neutral_minimap_color());
-	} else if (unit->Player == CPlayer::GetThisPlayer() && !Editor.Running) {
+	} else if (unit->Player == CPlayer::GetThisPlayer() && !CEditor::get()->is_running()) {
 		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 			(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
 			return ColorRed;

@@ -74,6 +74,7 @@
 #include "util/log_util.h"
 #include "util/number_util.h"
 #include "util/util.h"
+#include "util/vector_util.h"
 #include "video/font.h"
 
 lua_State *Lua;                       /// Structure to work with lua files.
@@ -3567,7 +3568,7 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 {
 	wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
 	
-	if (Editor.Running == EditorEditing) {
+	if (CEditor::get()->is_running()) {
 		std::vector<CUnit *> units_to_remove;
 
 		for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
@@ -3579,7 +3580,7 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 		for (size_t i = 0; i < units_to_remove.size(); ++i) {
 			EditorActionRemoveUnit(*units_to_remove[i], false);
 		}
-		Editor.UnitTypes.erase(std::remove(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), unit_type->Ident), Editor.UnitTypes.end());
+		vector::remove(CEditor::get()->UnitTypes, unit_type->Ident);
 		RecalculateShownUnits();
 	}
 	for (wyrmgus::civilization *civilization : wyrmgus::civilization::get_all()) {

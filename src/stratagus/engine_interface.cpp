@@ -93,6 +93,11 @@ game *engine_interface::get_game() const
 	return game::get();
 }
 
+CEditor *engine_interface::get_map_editor() const
+{
+	return CEditor::get();
+}
+
 network_manager *engine_interface::get_network_manager() const
 {
 	return network_manager::get();
@@ -179,8 +184,8 @@ void engine_interface::play_music(const QString &type_str)
 void engine_interface::exit()
 {
 	this->post([]() {
-		if (Editor.Running) {
-			Editor.Running = EditorNotRunning;
+		if (CEditor::get()->is_running()) {
+			CEditor::get()->set_running(false);
 			GameResult = GameExit;
 		} else {
 			StopGame(GameExit);

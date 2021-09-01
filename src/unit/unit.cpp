@@ -1005,7 +1005,7 @@ void CUnit::apply_character_properties()
 
 	if (this->get_character()->get_trait() != nullptr) { //set trait
 		TraitAcquire(*this, this->get_character()->get_trait());
-	} else if (Editor.Running == EditorNotRunning && !this->Type->get_traits().empty()) {
+	} else if (!CEditor::get()->is_running() && !this->Type->get_traits().empty()) {
 		TraitAcquire(*this, vector::get_random(this->Type->get_traits()));
 	}
 
@@ -2548,7 +2548,7 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	if (this->UnderConstruction == 1 || !CMap::get()->Info->IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
+	if (this->UnderConstruction == 1 || !CMap::get()->Info->IsPointOnMap(this->tilePos, this->MapLayer) || CEditor::get()->is_running()) {
 		return;
 	}
 	
@@ -3147,7 +3147,7 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 	}
 
 	//generate a trait for the unit, if any are available (only if the editor isn't running)
-	if (Editor.Running == EditorNotRunning && !unit->Type->get_traits().empty()) {
+	if (!CEditor::get()->is_running() && !unit->Type->get_traits().empty()) {
 		TraitAcquire(*unit, vector::get_random(unit->Type->get_traits()));
 	}
 	
@@ -3583,7 +3583,7 @@ void CUnit::UpdateExtraName()
 
 void CUnit::UpdateSettlement()
 {
-	if (this->Removed || Editor.Running != EditorNotRunning) {
+	if (this->Removed || CEditor::get()->is_running()) {
 		return;
 	}
 	
@@ -3671,7 +3671,7 @@ void CUnit::UpdateSettlement()
 
 void CUnit::UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settlement)
 {
-	if (Editor.Running != EditorNotRunning) {
+	if (CEditor::get()->is_running()) {
 		return;
 	}
 	
@@ -3864,7 +3864,7 @@ void CUnit::Place(const Vec2i &pos, const int z)
 					Select(building_tile_pos, building_tile_pos, table, this->MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
 						if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
-							if (Editor.Running == EditorNotRunning) {
+							if (!CEditor::get()->is_running()) {
 								LetUnitDie(*table[i]);			
 							} else {
 								EditorActionRemoveUnit(*table[i], false);
@@ -4186,7 +4186,7 @@ void UnitLost(CUnit &unit)
 	Assert(&player);  // Next code didn't support no player!
 
 	//  Call back to AI, for killed or lost units.
-	if (Editor.Running == EditorNotRunning) {
+	if (!CEditor::get()->is_running()) {
 		if (player.AiEnabled) {
 			AiUnitKilled(unit);
 		} else {

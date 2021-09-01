@@ -1407,17 +1407,17 @@ void unit_type::initialize()
 		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\": right-attack is set, but can-attack is not.");
 	}
 	this->UpdateDefaultBoolFlags();
-	if (GameRunning || Editor.Running == EditorEditing) {
+	if (GameRunning || CEditor::get()->is_running()) {
 		InitUnitType(*this);
 		LoadUnitType(this);
 	}
 
-	if (!CclInConfigFile || GameRunning || Editor.Running == EditorEditing) {
+	if (!CclInConfigFile || GameRunning || CEditor::get()->is_running()) {
 		UpdateUnitStats(*this, 1);
 	}
 
-	if (Editor.Running == EditorEditing && std::find(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), this->Ident) == Editor.UnitTypes.end()) {
-		Editor.UnitTypes.push_back(this->Ident);
+	if (CEditor::get()->is_running() && std::find(CEditor::get()->UnitTypes.begin(), CEditor::get()->UnitTypes.end(), this->Ident) == CEditor::get()->UnitTypes.end()) {
+		CEditor::get()->UnitTypes.push_back(this->Ident);
 		RecalculateShownUnits();
 	}
 
@@ -2258,7 +2258,7 @@ std::string unit_type::GetNamePlural() const
 
 std::string unit_type::generate_personal_name(const wyrmgus::faction *faction, const gender gender) const
 {
-	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
+	if (CEditor::get()->is_running()) { // don't set the personal name if in the editor
 		return "";
 	}
 	

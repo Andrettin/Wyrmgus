@@ -164,13 +164,13 @@ public:
 	{
 		const int iconsPerStep = VisibleUnitIcons;
 		//Wyrmgus start
-//		const int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
-		const int steps = (Editor.ShownUnitTypes.size() + 1 + iconsPerStep - 1) / iconsPerStep; // + 1 because of the button to create a new unit
+//		const int steps = (CEditor::get()->ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
+		const int steps = (CEditor::get()->ShownUnitTypes.size() + 1 + iconsPerStep - 1) / iconsPerStep; // + 1 because of the button to create a new unit
 		//Wyrmgus end
 		const double value = editorUnitSlider->getValue();
 		for (int i = 1; i <= steps; ++i) {
 			if (value <= (double)i / steps) {
-				Editor.UnitIndex = iconsPerStep * (i - 1);
+				CEditor::get()->UnitIndex = iconsPerStep * (i - 1);
 				break;
 			}
 		}
@@ -185,11 +185,11 @@ public:
 	virtual void action(const std::string &)
 	{
 		const int iconsPerStep = VisibleTileIcons;
-		const int steps = (Editor.ShownTileTypes.size() + iconsPerStep - 1) / iconsPerStep;
+		const int steps = (CEditor::get()->ShownTileTypes.size() + iconsPerStep - 1) / iconsPerStep;
 		const double value = editorSlider->getValue();
 		for (int i = 1; i <= steps; ++i) {
 			if (value <= (double)i / steps) {
-				Editor.TileIndex = iconsPerStep * (i - 1);
+				CEditor::get()->TileIndex = iconsPerStep * (i - 1);
 				break;
 			}
 		}
@@ -725,8 +725,8 @@ static void CalculateMaxIconSize()
 {
 	IconWidth = 0;
 	IconHeight = 0;
-	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
-		const unit_type *type = wyrmgus::unit_type::get(Editor.UnitTypes[i].c_str());
+	for (unsigned int i = 0; i < CEditor::get()->UnitTypes.size(); ++i) {
+		const unit_type *type = wyrmgus::unit_type::get(CEditor::get()->UnitTypes[i]);
 		Assert(type->get_icon());
 		const icon *icon = type->get_icon();
 
@@ -743,19 +743,19 @@ static void CalculateMaxIconSize()
 void RecalculateShownUnits()
 //Wyrmgus end
 {
-	Editor.ShownUnitTypes.clear();
+	CEditor::get()->ShownUnitTypes.clear();
 
-	for (size_t i = 0; i != Editor.UnitTypes.size(); ++i) {
-		const wyrmgus::unit_type *type = wyrmgus::unit_type::get(Editor.UnitTypes[i].c_str());
-		Editor.ShownUnitTypes.push_back(type);
+	for (size_t i = 0; i != CEditor::get()->UnitTypes.size(); ++i) {
+		const wyrmgus::unit_type *type = wyrmgus::unit_type::get(CEditor::get()->UnitTypes[i]);
+		CEditor::get()->ShownUnitTypes.push_back(type);
 	}
 
-	if (Editor.UnitIndex >= (int)Editor.ShownUnitTypes.size()) {
-		Editor.UnitIndex = Editor.ShownUnitTypes.size() / VisibleUnitIcons * VisibleUnitIcons;
+	if (CEditor::get()->UnitIndex >= (int) CEditor::get()->ShownUnitTypes.size()) {
+		CEditor::get()->UnitIndex = CEditor::get()->ShownUnitTypes.size() / VisibleUnitIcons * VisibleUnitIcons;
 	}
 	// Quick & dirty make them invalid
-	Editor.CursorUnitIndex = -1;
-	Editor.SelectedUnitIndex = -1;
+	CEditor::get()->CursorUnitIndex = -1;
+	CEditor::get()->SelectedUnitIndex = -1;
 }
 
 /*----------------------------------------------------------------------------
@@ -789,16 +789,16 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 		//Wyrmgus end
 			y += rectangle_size;
 		}
-		if (i == Editor.CursorPlayer && CMap::get()->Info->PlayerType[i] != PlayerNobody) {
+		if (i == CEditor::get()->CursorPlayer && CMap::get()->Info->PlayerType[i] != PlayerNobody) {
 			Video.DrawRectangle(ColorWhite, x + i % 8 * rectangle_size, y, rectangle_size, rectangle_size, render_commands);
 		}
 		Video.DrawRectangle(
-			i == Editor.CursorPlayer && CMap::get()->Info->PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
+			i == CEditor::get()->CursorPlayer && CMap::get()->Info->PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
 			x + i % 8 * rectangle_size, y, rectangle_size - 1, rectangle_size - 1, render_commands);
 		if (CMap::get()->Info->PlayerType[i] != PlayerNobody) {
 			Video.FillRectangle(CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2, render_commands);
 		}
-		if (i == Editor.SelectedPlayer) {
+		if (i == CEditor::get()->SelectedPlayer) {
 			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2, render_commands);
 		}
 		//Wyrmgus start
@@ -813,17 +813,17 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 	x = UI.InfoPanel.X + 22 * scale_factor;
 	//Wyrmgus end
 	y += (18 * 1 + 4) * scale_factor;
-	if (Editor.SelectedPlayer != -1) {
+	if (CEditor::get()->SelectedPlayer != -1) {
 		//Wyrmgus start
-//		snprintf(buf.data(), buf.size(), "Plyr %d %s ", Editor.SelectedPlayer,
-//				 PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str());
-		std::string civ_str = wyrmgus::civilization::get_all()[CPlayer::Players[Editor.SelectedPlayer]->Race]->get_identifier().c_str();
+//		snprintf(buf.data(), buf.size(), "Plyr %d %s ", CEditor::get()->SelectedPlayer,
+//				 PlayerRaces.Name[Players[CEditor::get()->SelectedPlayer].Race].c_str());
+		std::string civ_str = civilization::get_all()[CPlayer::Players[CEditor::get()->SelectedPlayer]->Race]->get_identifier().c_str();
 		civ_str[0] = toupper(civ_str[0]);
-		snprintf(buf.data(), buf.size(), "Player %d %s ", (Editor.SelectedPlayer == PlayerNumNeutral) ? 16 : Editor.SelectedPlayer + 1, civ_str.c_str());
+		snprintf(buf.data(), buf.size(), "Player %d %s ", (CEditor::get()->SelectedPlayer == PlayerNumNeutral) ? 16 : CEditor::get()->SelectedPlayer + 1, civ_str.c_str());
 		//Wyrmgus end
 		// Players[SelectedPlayer].RaceName);
 
-		switch (CMap::get()->Info->PlayerType[Editor.SelectedPlayer]) {
+		switch (CMap::get()->Info->PlayerType[CEditor::get()->SelectedPlayer]) {
 			case PlayerNeutral:
 				strcat_s(buf.data(), buf.size(), "Neutral");
 				break;
@@ -845,44 +845,28 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 	}
 }
 
-#if 0
-extern void DrawPopupUnitInfo(const wyrmgus::unit_type *type,
-							  int player_index, wyrmgus::font *font,
-							  uint32_t backgroundColor, int buttonX, int buttonY);
-
-static void DrawPopup()
-{
-	if (Editor.State == EditorEditUnit && Editor.CursorUnitIndex != -1) {
-		DrawPopupUnitInfo(Editor.ShownUnitTypes[Editor.CursorUnitIndex],
-						  Editor.SelectedPlayer, GetSmallFont(),
-						  CVideo::MapRGB(38, 38, 78),
-						  Editor.PopUpX, Editor.PopUpY);
-	}
-}
-#endif
-
 /**
 **  Draw unit icons.
 */
 static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	int i = Editor.UnitIndex;
+	int i = CEditor::get()->UnitIndex;
 
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
 		const int x = UI.ButtonPanel.Buttons[j].X;
 		const int y = UI.ButtonPanel.Buttons[j].Y;
-		if (i >= (int) Editor.ShownUnitTypes.size()) {
+		if (i >= (int) CEditor::get()->ShownUnitTypes.size()) {
 			//Wyrmgus start
 //			return;
 			break;
 			//Wyrmgus end
 		}
 
-		const icon *icon = Editor.ShownUnitTypes[i]->get_icon();
+		const icon *icon = CEditor::get()->ShownUnitTypes[i]->get_icon();
 		const PixelPos pos(x, y);
 
 		unsigned int flag = 0;
-		if (i == Editor.CursorUnitIndex) {
+		if (i == CEditor::get()->CursorUnitIndex) {
 			flag = IconActive;
 			if (MouseButtons & LeftButton) {
 				// Overwrite IconActive.
@@ -894,12 +878,12 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 		flag |= IconCommandButton;
 		//Wyrmgus end
 
-		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color(), render_commands);
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[CEditor::get()->SelectedPlayer]->get_player_color(), render_commands);
 
 		//Wyrmgus start
 //		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
 		//Wyrmgus end
-		if (i == Editor.SelectedUnitIndex) {
+		if (i == CEditor::get()->SelectedUnitIndex) {
 			//Wyrmgus start
 //			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
 //									icon.G->Width - 2, icon.G->Height - 2);
@@ -907,25 +891,25 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 									icon->get_graphics()->Width, icon->get_graphics()->Height, render_commands);
 			//Wyrmgus end
 		}
-		if (i == Editor.CursorUnitIndex) {
+		if (i == CEditor::get()->CursorUnitIndex) {
 			//Wyrmgus start
 //			Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
 //									icon.G->Width + 2, icon.G->Height + 2);
 			//Wyrmgus end
-			Editor.PopUpX = x;
-			Editor.PopUpY = y;
+			CEditor::get()->PopUpX = x;
+			CEditor::get()->PopUpY = y;
 		}
 		++i;
 	}
 	
 	//Wyrmgus start
-	i = Editor.UnitIndex;
+	i = CEditor::get()->UnitIndex;
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
-		if (i >= (int) Editor.ShownUnitTypes.size()) {
+		if (i >= (int) CEditor::get()->ShownUnitTypes.size()) {
 			break;
 		}
 		
-		if (i == Editor.CursorUnitIndex) {
+		if (i == CEditor::get()->CursorUnitIndex) {
 			DrawPopup(*CurrentButtons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y, render_commands);
 		}
 		
@@ -1082,11 +1066,11 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 	//Wyrmgus end
 	y += 20 * scale_factor;
 
-	int i = Editor.TileIndex;
-	Assert(Editor.TileIndex != -1);
+	int i = CEditor::get()->TileIndex;
+	Assert(CEditor::get()->TileIndex != -1);
 	y = UI.ButtonPanel.Y + 24 * scale_factor;
 	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - wyrmgus::defines::get()->get_scaled_tile_height()) {
-		if (i >= (int)Editor.ShownTileTypes.size()) {
+		if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
 			break;
 		}
 		//Wyrmgus start
@@ -1094,15 +1078,15 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 		x = UI.ButtonPanel.X + (10 + 6) * scale_factor;
 		//Wyrmgus end
 		while (x < UI.ButtonPanel.X + ButtonPanelWidth - wyrmgus::defines::get()->get_scaled_tile_width()) {
-			if (i >= (int) Editor.ShownTileTypes.size()) {
+			if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
 				break;
 			}
 			//Wyrmgus start
-//			const unsigned int tile = Editor.ShownTileTypes[i];
+//			const unsigned int tile = CEditor::get()->ShownTileTypes[i];
 
 //			Map.TileGraphic->DrawFrameClip(tile, x, y);
 
-			const wyrmgus::terrain_type *terrain = Editor.ShownTileTypes[i];
+			const wyrmgus::terrain_type *terrain = CEditor::get()->ShownTileTypes[i];
 
 			if (terrain->get_graphics() && terrain->get_solid_tiles().size() > 0) {
 				terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles()[0], x, y, render_commands);
@@ -1110,15 +1094,15 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 			//Wyrmgus end
 			Video.DrawRectangleClip(ColorGray, x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height(), render_commands);
 
-			if (i == Editor.SelectedTileIndex) {
+			if (i == CEditor::get()->SelectedTileIndex) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
 					wyrmgus::defines::get()->get_scaled_tile_width() - 2, wyrmgus::defines::get()->get_scaled_tile_height() - 2, render_commands);
 			}
-			if (i == Editor.CursorTileIndex) {
+			if (i == CEditor::get()->CursorTileIndex) {
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
 					wyrmgus::defines::get()->get_scaled_tile_width() + 2, wyrmgus::defines::get()->get_scaled_tile_height() + 2, render_commands);
-				Editor.PopUpX = x;
-				Editor.PopUpY = y;
+				CEditor::get()->PopUpX = x;
+				CEditor::get()->PopUpY = y;
 			}
 
 			//Wyrmgus start
@@ -1142,7 +1126,7 @@ static void DrawEditorPanel_SelectIcon(std::vector<std::function<void(renderer *
 //	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
 	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor, UI.InfoPanel.Y + 7 * scale_factor);
 	//Wyrmgus end
-	wyrmgus::icon *icon = Editor.Select.Icon;
+	wyrmgus::icon *icon = CEditor::get()->Select.Icon;
 	Assert(icon);
 	unsigned int flag = 0;
 	if (ButtonUnderCursor == SelectButton) {
@@ -1158,7 +1142,7 @@ static void DrawEditorPanel_SelectIcon(std::vector<std::function<void(renderer *
 	//Wyrmgus end
 		
 	// FIXME: wrong button style
-	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color(), render_commands);
+	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[CEditor::get()->SelectedPlayer]->get_player_color(), render_commands);
 }
 
 static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)>> &render_commands)
@@ -1166,7 +1150,7 @@ static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x(), UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y());
-	wyrmgus::icon *icon = Editor.Units.Icon;
+	wyrmgus::icon *icon = CEditor::get()->Units.Icon;
 	Assert(icon);
 	unsigned int flag = 0;
 	if (ButtonUnderCursor == UnitButton) {
@@ -1182,7 +1166,7 @@ static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)
 	//Wyrmgus end
 		
 	// FIXME: wrong button style
-	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color(), render_commands);
+	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[CEditor::get()->SelectedPlayer]->get_player_color(), render_commands);
 }
 
 static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)>> &render_commands)
@@ -1192,8 +1176,8 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 	int x = UI.InfoPanel.X + 11 * scale_factor;
 	int y = UI.InfoPanel.Y + 5 * scale_factor;
 
-	if (Editor.StartUnit) {
-		const icon *icon = Editor.StartUnit->get_icon();
+	if (CEditor::get()->StartUnit) {
+		const icon *icon = CEditor::get()->StartUnit->get_icon();
 		Assert(icon);
 		const PixelPos pos(x + get_start_icon_x(), y + get_start_icon_y());
 		unsigned int flag = 0;
@@ -1209,7 +1193,7 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 		flag |= IconCommandButton;
 		//Wyrmgus end
 		
-		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[Editor.SelectedPlayer]->get_player_color(), render_commands);
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", CPlayer::Players[CEditor::get()->SelectedPlayer]->get_player_color(), render_commands);
 	} else {
 		//  No unit specified : draw a cross.
 		//  Todo : FIXME Should we just warn user to define Start unit ?
@@ -1225,7 +1209,7 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 		const PixelPos lb(x, y + IconHeight - 3 * scale_factor);
 		const PixelPos rt(x + IconHeight - 3 * scale_factor, y);
 		const PixelPos rb(x + IconHeight - 2 * scale_factor, y + IconHeight - 2 * scale_factor);
-		const uint32_t color = CVideo::MapRGB(CPlayer::Players[Editor.SelectedPlayer]->get_minimap_color());
+		const uint32_t color = CVideo::MapRGB(CPlayer::Players[CEditor::get()->SelectedPlayer]->get_minimap_color());
 
 		Video.DrawLineClip(color, lt, rb, render_commands);
 		Video.DrawLineClip(color, rt, lb, render_commands);
@@ -1243,17 +1227,17 @@ static void DrawEditorPanel(std::vector<std::function<void(renderer *)>> &render
 	DrawEditorPanel_SelectIcon(render_commands);
 	DrawEditorPanel_UnitsIcon(render_commands);
 
-	if (Editor.TerrainEditable) {
+	if (CEditor::get()->TerrainEditable) {
 		const int x = UI.InfoPanel.X + get_tile_icon_x() + 11 * scale_factor;
 		const int y = UI.InfoPanel.Y + get_tile_icon_y() + 4 * scale_factor;
 
-		DrawTileIcon(Editor.ShownTileTypes[0], x, y,
+		DrawTileIcon(CEditor::get()->ShownTileTypes[0], x, y,
 					 (ButtonUnderCursor == TileButton ? IconActive : 0) |
-					 (Editor.State == EditorEditTile ? IconSelected : 0), render_commands);
+					 (CEditor::get()->State == EditorEditTile ? IconSelected : 0), render_commands);
 	}
 	DrawEditorPanel_StartIcon(render_commands);
 
-	switch (Editor.State) {
+	switch (CEditor::get()->State) {
 		case EditorSelecting:
 			break;
 		case EditorEditTile:
@@ -1279,18 +1263,18 @@ static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_c
 	//  Affect CursorBuilding if necessary.
 	//  (Menu reset CursorBuilding)
 	if (!CursorBuilding) {
-		switch (Editor.State) {
+		switch (CEditor::get()->State) {
 			case EditorSelecting:
 			case EditorEditTile:
 				break;
 			case EditorEditUnit:
-				if (Editor.SelectedUnitIndex != -1) {
-					CursorBuilding = Editor.ShownUnitTypes[Editor.SelectedUnitIndex];
+				if (CEditor::get()->SelectedUnitIndex != -1) {
+					CursorBuilding = CEditor::get()->ShownUnitTypes[CEditor::get()->SelectedUnitIndex];
 				}
 				break;
 			case EditorSetStartLocation:
-				if (Editor.StartUnit) {
-					CursorBuilding = Editor.StartUnit;
+				if (CEditor::get()->StartUnit) {
+					CursorBuilding = CEditor::get()->StartUnit;
 				}
 				break;
 		}
@@ -1301,10 +1285,10 @@ static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_c
 		const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 		const PixelPos screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
 
-		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
+		if (CEditor::get()->State == EditorEditTile && CEditor::get()->SelectedTileIndex != -1) {
 			//Wyrmgus start
-//			const unsigned short tile = Editor.ShownTileTypes[Editor.SelectedTileIndex];
-			const wyrmgus::terrain_type *terrain = Editor.ShownTileTypes[Editor.SelectedTileIndex];
+//			const unsigned short tile = CEditor::get()->ShownTileTypes[CEditor::get()->SelectedTileIndex];
+			const wyrmgus::terrain_type *terrain = CEditor::get()->ShownTileTypes[CEditor::get()->SelectedTileIndex];
 			//Wyrmgus end
 			PushClipping();
 			UI.MouseViewport->SetClipping();
@@ -1360,7 +1344,7 @@ static void DrawCross(const PixelPos &topleft_pos, const QSize &size, uint32_t c
 */
 static void DrawStartLocations(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const wyrmgus::unit_type *type = Editor.StartUnit;
+	const wyrmgus::unit_type *type = CEditor::get()->StartUnit;
 	for (const CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		PushClipping();
 		vp->SetClipping();
@@ -1628,26 +1612,26 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 		CursorBuilding = nullptr;
 		switch (ButtonUnderCursor) {
 			case SelectButton :
-				Editor.State = EditorSelecting;
+				CEditor::get()->State = EditorSelecting;
 				editorUnitSlider->setVisible(false);
 				editorSlider->setVisible(false);
 				return;
 			case UnitButton:
-				Editor.State = EditorEditUnit;
-				if (VisibleUnitIcons < (int)Editor.ShownUnitTypes.size()) {
+				CEditor::get()->State = EditorEditUnit;
+				if (VisibleUnitIcons < (int) CEditor::get()->ShownUnitTypes.size()) {
 					editorUnitSlider->setVisible(true);
 				}
 				editorSlider->setVisible(false);
 				return;
 			case TileButton :
-				Editor.State = EditorEditTile;
+				CEditor::get()->State = EditorEditTile;
 				editorUnitSlider->setVisible(false);
-				if (VisibleTileIcons < (int)Editor.ShownTileTypes.size()) {
+				if (VisibleTileIcons < (int) CEditor::get()->ShownTileTypes.size()) {
 					editorSlider->setVisible(true);
 				}
 				return;
 			case StartButton:
-				Editor.State = EditorSetStartLocation;
+				CEditor::get()->State = EditorSetStartLocation;
 				editorUnitSlider->setVisible(false);
 				editorSlider->setVisible(false);
 				return;
@@ -1656,7 +1640,7 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 		}
 	}
 	// Click on tile area
-	if (Editor.State == EditorEditTile) {
+	if (CEditor::get()->State == EditorEditTile) {
 		if (CursorOn == cursor_on::button && ButtonUnderCursor >= 100) {
 			switch (ButtonUnderCursor) {
 				case 300: TileCursorSize = 1; return;
@@ -1671,32 +1655,32 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 				//Wyrmgus end
 			}
 		}
-		if (Editor.CursorTileIndex != -1) {
-			Editor.SelectedTileIndex = Editor.CursorTileIndex;
+		if (CEditor::get()->CursorTileIndex != -1) {
+			CEditor::get()->SelectedTileIndex = CEditor::get()->CursorTileIndex;
 			return;
 		}
 	}
 
 	// Click on player area
-	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
+	if (CEditor::get()->State == EditorEditUnit || CEditor::get()->State == EditorSetStartLocation) {
 		// Cursor on player icons
-		if (Editor.CursorPlayer != -1) {
-			if (CMap::get()->Info->PlayerType[Editor.CursorPlayer] != PlayerNobody) {
-				Editor.SelectedPlayer = Editor.CursorPlayer;
-				CPlayer::SetThisPlayer(CPlayer::Players[Editor.SelectedPlayer]);
+		if (CEditor::get()->CursorPlayer != -1) {
+			if (CMap::get()->Info->PlayerType[CEditor::get()->CursorPlayer] != PlayerNobody) {
+				CEditor::get()->SelectedPlayer = CEditor::get()->CursorPlayer;
+				CPlayer::SetThisPlayer(CPlayer::Players[CEditor::get()->SelectedPlayer]);
 			}
 			return;
 		}
 	}
 
 	// Click on unit area
-	if (Editor.State == EditorEditUnit) {
+	if (CEditor::get()->State == EditorEditUnit) {
 		// Cursor on unit icons
-		if (Editor.CursorUnitIndex != -1) {
-			if (Editor.CursorUnitIndex != (int) Editor.ShownUnitTypes.size()) {
+		if (CEditor::get()->CursorUnitIndex != -1) {
+			if (CEditor::get()->CursorUnitIndex != (int) CEditor::get()->ShownUnitTypes.size()) {
 				if (MouseButtons & LeftButton) {
-					Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
-					CursorBuilding = Editor.ShownUnitTypes[Editor.CursorUnitIndex];
+					CEditor::get()->SelectedUnitIndex = CEditor::get()->CursorUnitIndex;
+					CursorBuilding = CEditor::get()->ShownUnitTypes[CEditor::get()->CursorUnitIndex];
 					return;
 				}
 			}
@@ -1704,7 +1688,7 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 	}
 
 	// Right click on a resource
-	if (Editor.State == EditorSelecting) {
+	if (CEditor::get()->State == EditorSelecting) {
 		if ((MouseButtons & RightButton) && UnitUnderCursor != nullptr) {
 			CclCommand("if (EditUnitProperties ~= nil) then EditUnitProperties() end;");
 			return;
@@ -1714,12 +1698,12 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 	// Click on map area
 	if (CursorOn == cursor_on::map) {
 		if (MouseButtons & RightButton) {
-			if (Editor.State == EditorEditUnit && Editor.SelectedUnitIndex != -1) {
-				Editor.SelectedUnitIndex = -1;
+			if (CEditor::get()->State == EditorEditUnit && CEditor::get()->SelectedUnitIndex != -1) {
+				CEditor::get()->SelectedUnitIndex = -1;
 				CursorBuilding = nullptr;
 				return;
-			} else if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
-				Editor.SelectedTileIndex = -1;
+			} else if (CEditor::get()->State == EditorEditTile && CEditor::get()->SelectedTileIndex != -1) {
+				CEditor::get()->SelectedTileIndex = -1;
 				CursorBuilding = nullptr;
 				return;
 			}
@@ -1734,14 +1718,14 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 		if (MouseButtons & LeftButton) {
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (Editor.State == EditorEditTile &&
-				Editor.SelectedTileIndex != -1) {
-				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize, key_modifiers);
-			} else if (Editor.State == EditorEditUnit) {
+			if (CEditor::get()->State == EditorEditTile &&
+				CEditor::get()->SelectedTileIndex != -1) {
+				EditTiles(tilePos, CEditor::get()->ShownTileTypes[CEditor::get()->SelectedTileIndex], TileCursorSize, key_modifiers);
+			} else if (CEditor::get()->State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
 						PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_success_sound(), MaxSampleVolume);
-						EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[Editor.SelectedPlayer]);
+						EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[CEditor::get()->SelectedPlayer]);
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
@@ -1749,9 +1733,9 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 						PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 					}
 				}
-			} else if (Editor.State == EditorSetStartLocation) {
-				CPlayer::Players[Editor.SelectedPlayer]->StartPos = tilePos;
-				CPlayer::Players[Editor.SelectedPlayer]->StartMapLayer = UI.CurrentMapLayer->ID;
+			} else if (CEditor::get()->State == EditorSetStartLocation) {
+				CPlayer::Players[CEditor::get()->SelectedPlayer]->StartPos = tilePos;
+				CPlayer::Players[CEditor::get()->SelectedPlayer]->StartMapLayer = UI.CurrentMapLayer->ID;
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
@@ -1944,7 +1928,7 @@ static void EditorCallbackKeyRepeated(unsigned key, unsigned, const Qt::Keyboard
 
 static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 {
-	Assert(Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation);
+	Assert(CEditor::get()->State == EditorEditUnit || CEditor::get()->State == EditorSetStartLocation);
 	
 	//Wyrmgus start
 	LastDrawnButtonPopup = nullptr;
@@ -1992,7 +1976,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			} else {
 				UI.StatusLine.Clear();
 			}
-			Editor.CursorPlayer = i;
+			CEditor::get()->CursorPlayer = i;
 #if 0
 			ButtonUnderCursor = i + 100;
 			CursorOn = cursor_on::button;
@@ -2002,34 +1986,34 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		bx += 20 * scale_factor;
 	}
 
-	int i = Editor.UnitIndex;
+	int i = CEditor::get()->UnitIndex;
 	by = UI.ButtonPanel.Y + 24 * scale_factor;
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
 		const int x = UI.ButtonPanel.Buttons[j].X;
 		const int y = UI.ButtonPanel.Buttons[j].Y;
 		//Wyrmgus start
-//		if (i >= (int) Editor.ShownUnitTypes.size()) {
-		if (i >= (int) Editor.ShownUnitTypes.size() + 1) {
+//		if (i >= (int) CEditor::get()->ShownUnitTypes.size()) {
+		if (i >= (int) CEditor::get()->ShownUnitTypes.size() + 1) {
 		//Wyrmgus end
 			break;
 		}
 		//Wyrmgus start
-		if (i < (int) Editor.ShownUnitTypes.size()) {
+		if (i < (int) CEditor::get()->ShownUnitTypes.size()) {
 			if (j >= CurrentButtons.size()) {
 				CurrentButtons.push_back(std::make_unique<wyrmgus::button>());
 			}
-			CurrentButtons[j]->Hint = Editor.ShownUnitTypes[i]->get_name();
+			CurrentButtons[j]->Hint = CEditor::get()->ShownUnitTypes[i]->get_name();
 			CurrentButtons[j]->pos = j;
 			CurrentButtons[j]->level = nullptr;
 			CurrentButtons[j]->Action = ButtonCmd::EditorUnit;
-			CurrentButtons[j]->ValueStr = Editor.ShownUnitTypes[i]->Ident;
-			CurrentButtons[j]->Value = Editor.ShownUnitTypes[i]->Slot;
+			CurrentButtons[j]->ValueStr = CEditor::get()->ShownUnitTypes[i]->Ident;
+			CurrentButtons[j]->Value = CEditor::get()->ShownUnitTypes[i]->Slot;
 			CurrentButtons[j]->Popup = "popup_unit";
 		}
 		//Wyrmgus end
 		if (x < screenPos.x && screenPos.x < x + IconWidth
 			&& y < screenPos.y && screenPos.y < y + IconHeight) {
-			Editor.CursorUnitIndex = i;
+			CEditor::get()->CursorUnitIndex = i;
 			return true;
 		}
 		++i;
@@ -2062,10 +2046,10 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 		//Wyrmgus end
 	}
 
-	int i = Editor.TileIndex;
+	int i = CEditor::get()->TileIndex;
 	by = UI.ButtonPanel.Y + 24 * scale_factor;
 	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - wyrmgus::defines::get()->get_scaled_tile_height()) {
-		if (i >= (int)Editor.ShownTileTypes.size()) {
+		if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
 			break;
 		}
 		//Wyrmgus start
@@ -2073,19 +2057,19 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 		bx = UI.ButtonPanel.X + (10 + 6) * scale_factor;
 		//Wyrmgus end
 		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - wyrmgus::defines::get()->get_scaled_tile_width()) {
-			if (i >= (int)Editor.ShownTileTypes.size()) {
+			if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
 				break;
 			}
 			if (bx < screenPos.x && screenPos.x < bx + wyrmgus::defines::get()->get_scaled_tile_width()
 				&& by < screenPos.y && screenPos.y < by + wyrmgus::defines::get()->get_scaled_tile_height()) {
 				//Wyrmgus start
-//				const int tile = Editor.ShownTileTypes[i];
+//				const int tile = CEditor::get()->ShownTileTypes[i];
 //				const int tileindex = Map.Tileset->findTileIndexByTile(tile);
 //				const int base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
 //				UI.StatusLine.Set(Map.Tileset->getTerrainName(base));
-				UI.StatusLine.Set(Editor.ShownTileTypes[i]->get_name());
+				UI.StatusLine.Set(CEditor::get()->ShownTileTypes[i]->get_name());
 				//Wyrmgus end
-				Editor.CursorTileIndex = i;
+				CEditor::get()->CursorTileIndex = i;
 				return true;
 			}
 			//Wyrmgus start
@@ -2134,7 +2118,7 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 	}
 	// Drawing tiles on map.
 	if (CursorOn == cursor_on::map && (MouseButtons & LeftButton)
-		&& (Editor.State == EditorEditTile || Editor.State == EditorEditUnit)) {
+		&& (CEditor::get()->State == EditorEditTile || CEditor::get()->State == EditorEditUnit)) {
 		Vec2i vpTilePos = UI.SelectedViewport->MapPos;
 		// Scroll the map
 		if (CursorScreenPos.x <= UI.SelectedViewport->GetTopLeftPos().x) {
@@ -2157,12 +2141,12 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		RestrictCursorToViewport();
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
-		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
-			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize, key_modifiers);
-		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
+		if (CEditor::get()->State == EditorEditTile && CEditor::get()->SelectedTileIndex != -1) {
+			EditTiles(tilePos, CEditor::get()->ShownTileTypes[CEditor::get()->SelectedTileIndex], TileCursorSize, key_modifiers);
+		} else if (CEditor::get()->State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
-					EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[Editor.SelectedPlayer]);
+					EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[CEditor::get()->SelectedPlayer]);
 					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
 				}
@@ -2183,9 +2167,9 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 	MouseScrollState = ScrollNone;
 	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false);
 	CursorOn = cursor_on::unknown;
-	Editor.CursorPlayer = -1;
-	Editor.CursorUnitIndex = -1;
-	Editor.CursorTileIndex = -1;
+	CEditor::get()->CursorPlayer = -1;
+	CEditor::get()->CursorUnitIndex = -1;
+	CEditor::get()->CursorTileIndex = -1;
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 
@@ -2194,14 +2178,14 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		CursorOn = cursor_on::minimap;
 	}
 	// Handle edit unit area
-	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
+	if (CEditor::get()->State == EditorEditUnit || CEditor::get()->State == EditorSetStartLocation) {
 		if (EditorCallbackMouse_EditUnitArea(screenPos) == true) {
 			return;
 		}
 	}
 
 	// Handle tile area
-	if (Editor.State == EditorEditTile) {
+	if (CEditor::get()->State == EditorEditTile) {
 		if (EditorCallbackMouse_EditTileArea(screenPos) == true) {
 			return;
 		}
@@ -2209,9 +2193,9 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 
 	// Handle buttons
 	if (UI.InfoPanel.X + 11 * scale_factor < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + Editor.Select.Icon->get_graphics()->Width
+		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + CEditor::get()->Select.Icon->get_graphics()->Width
 		&& UI.InfoPanel.Y + 7 * scale_factor < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + Editor.Select.Icon->get_graphics()->Height) {
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + CEditor::get()->Select.Icon->get_graphics()->Height) {
 		// FIXME: what is this button?
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
@@ -2220,16 +2204,16 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		return;
 	}
 	if (UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x() < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x() + Editor.Units.Icon->get_graphics()->Width
+		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x() + CEditor::get()->Units.Icon->get_graphics()->Width
 		&& UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y() < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y() + Editor.Units.Icon->get_graphics()->Height) {
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y() + CEditor::get()->Units.Icon->get_graphics()->Height) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = cursor_on::button;
 		UI.StatusLine.Set(_("Unit Mode"));
 		return;
 	}
-	if (Editor.TerrainEditable) {
+	if (CEditor::get()->TerrainEditable) {
 		if (UI.InfoPanel.X + 11 * scale_factor + get_tile_icon_x() < CursorScreenPos.x
 			&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_tile_icon_x() + wyrmgus::defines::get()->get_scaled_tile_width() + 7 * scale_factor
 			&& UI.InfoPanel.Y + 4 * scale_factor + get_tile_icon_y() < CursorScreenPos.y
@@ -2242,8 +2226,8 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		}
 	}
 
-	int StartUnitWidth = Editor.StartUnit ? Editor.StartUnit->get_icon()->get_graphics()->Width : wyrmgus::defines::get()->get_scaled_tile_width() + 7 * scale_factor;
-	int StartUnitHeight = Editor.StartUnit ? Editor.StartUnit->get_icon()->get_graphics()->Height : wyrmgus::defines::get()->get_scaled_tile_height() + 7 * scale_factor;
+	int StartUnitWidth = CEditor::get()->StartUnit ? CEditor::get()->StartUnit->get_icon()->get_graphics()->Width : wyrmgus::defines::get()->get_scaled_tile_width() + 7 * scale_factor;
+	int StartUnitHeight = CEditor::get()->StartUnit ? CEditor::get()->StartUnit->get_icon()->get_graphics()->Height : wyrmgus::defines::get()->get_scaled_tile_height() + 7 * scale_factor;
 	if (UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() < CursorScreenPos.x
 		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() + StartUnitWidth
 		&& UI.InfoPanel.Y + 5 * scale_factor + get_start_icon_y() < CursorScreenPos.y
@@ -2416,14 +2400,14 @@ void CEditor::Init()
 
 	ReplayRevealMap = 1;
 	FlagRevealMap = 0;
-	Editor.SelectedPlayer = PlayerNumNeutral;
+	CEditor::get()->SelectedPlayer = PlayerNumNeutral;
 
 	// Place the start points, which the loader discarded.
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (CMap::get()->Info->PlayerType[i] != PlayerNobody) {
 			// Set SelectedPlayer to a valid player
-			if (Editor.SelectedPlayer == PlayerNumNeutral) {
-				Editor.SelectedPlayer = i;
+			if (CEditor::get()->SelectedPlayer == PlayerNumNeutral) {
+				CEditor::get()->SelectedPlayer = i;
 				break;
 			}
 		}
@@ -2449,11 +2433,11 @@ void CEditor::Init()
 	Units.Load();
 
 	//Wyrmgus start
-//	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
-	Editor.ShownTileTypes.clear();
+//	Map.Tileset->fillSolidTiles(&CEditor::get()->ShownTileTypes);
+	CEditor::get()->ShownTileTypes.clear();
 	for (wyrmgus::terrain_type *terrain_type : wyrmgus::terrain_type::get_all()) {
 		if (!terrain_type->is_hidden()) {
-			Editor.ShownTileTypes.push_back(terrain_type);
+			CEditor::get()->ShownTileTypes.push_back(terrain_type);
 		}
 	}
 	//Wyrmgus end
@@ -2488,7 +2472,7 @@ void CEditor::Init()
 */
 int EditorSaveMap(const std::string &file)
 {
-	if (SaveStratagusMap(file, *CMap::get(), Editor.TerrainEditable) == -1) {
+	if (SaveStratagusMap(file, *CMap::get(), CEditor::get()->TerrainEditable) == -1) {
 		fprintf(stderr, "Cannot save map\n");
 		return -1;
 	}
@@ -2545,9 +2529,9 @@ void EditorMainLoop()
 
 	UpdateMinimap = true;
 
-	Editor.Running = EditorEditing;
+	CEditor::get()->set_running(true);
 
-	Editor.Init();
+	CEditor::get()->Init();
 
 	if (first_init) {
 		first_init = false;
@@ -2571,7 +2555,7 @@ void EditorMainLoop()
 
 	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 	current_interface_state = interface_state::normal;
-	Editor.State = EditorSelecting;
+	CEditor::get()->State = EditorSelecting;
 	UI.SelectedViewport = UI.Viewports;
 	TileCursorSize = 1;
 
@@ -2584,7 +2568,7 @@ void EditorMainLoop()
 
 	engine_interface::get()->set_loading_message("");
 
-	while (Editor.Running) {
+	while (CEditor::get()->is_running()) {
 		engine_interface::get()->run_event_loop();
 
 		CheckMusicFinished();
@@ -2607,8 +2591,8 @@ void EditorMainLoop()
 		if (UI.KeyScroll) {
 			DoScrollArea(KeyScrollState, (stored_key_modifiers & Qt::ControlModifier) != 0, MouseScrollState == 0 && KeyScrollState > 0, stored_key_modifiers);
 			if (CursorOn == cursor_on::map && (MouseButtons & LeftButton) &&
-				(Editor.State == EditorEditTile ||
-					Editor.State == EditorEditUnit)) {
+				(CEditor::get()->State == EditorEditTile ||
+					CEditor::get()->State == EditorEditUnit)) {
 				EditorCallbackButtonDown(0, stored_key_modifiers);
 			}
 		}
@@ -2666,9 +2650,9 @@ void StartEditor(const std::string &filename)
 	// Clear screen
 	Video.ClearScreen();
 
-	Editor.TerrainEditable = true;
+	CEditor::get()->TerrainEditable = true;
 
-	Editor.ShownTileTypes.clear();
+	CEditor::get()->ShownTileTypes.clear();
 	CleanGame();
 	CleanPlayers();
 }
