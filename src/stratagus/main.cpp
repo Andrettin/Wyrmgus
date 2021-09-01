@@ -30,6 +30,7 @@
 #include "database/database.h"
 #include "database/defines.h"
 #include "database/preferences.h"
+#include "editor.h"
 #include "engine_interface.h"
 #include "game.h"
 #include "game/results_info.h"
@@ -105,6 +106,7 @@ int main(int argc, char **argv)
 		QQmlApplicationEngine engine;
 
 		qmlRegisterType<calendar>();
+		qmlRegisterType<CEditor>();
 		qmlRegisterType<civilization>();
 		qmlRegisterType<civilization_group>();
 		qmlRegisterType<defines>();
