@@ -69,6 +69,9 @@ void interface_style::process_sml_scope(const sml_data &scope)
 	} else if (tag == "small_thin_button") {
 		this->small_thin_button = std::make_unique<button_style>(this);
 		database::process_sml_data(this->small_thin_button, scope);
+	} else if (tag == "thinnest_button") {
+		this->thinnest_button = std::make_unique<button_style>(this);
+		database::process_sml_data(this->thinnest_button, scope);
 	} else if (tag == "radio_button") {
 		this->radio_button = std::make_unique<checkbox_style>(this);
 		database::process_sml_data(this->radio_button, scope);
@@ -125,6 +128,10 @@ void interface_style::initialize()
 
 	if (this->small_thin_button != nullptr) {
 		this->small_thin_button->initialize();
+	}
+
+	if (this->thinnest_button != nullptr) {
+		this->thinnest_button->initialize();
 	}
 
 	if (this->radio_button != nullptr) {
@@ -189,6 +196,7 @@ const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics
 		case interface_element_type::small_button:
 		case interface_element_type::thin_button:
 		case interface_element_type::small_thin_button:
+		case interface_element_type::thinnest_button:
 		case interface_element_type::up_arrow_button:
 		case interface_element_type::down_arrow_button:
 		case interface_element_type::left_arrow_button:
@@ -223,6 +231,8 @@ const button_style *interface_style::get_button(const interface_element_type typ
 			return this->thin_button.get();
 		case interface_element_type::small_thin_button:
 			return this->small_thin_button.get();
+		case interface_element_type::thinnest_button:
+			return this->thinnest_button.get();
 		case interface_element_type::up_arrow_button:
 			return this->up_arrow_button.get();
 		case interface_element_type::down_arrow_button:
