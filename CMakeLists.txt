@@ -359,6 +359,8 @@ set(sound_SRCS
 	src/sound/game_sound_set.cpp
 	src/sound/music.cpp
 	src/sound/music_player.cpp
+	src/sound/music_sample.cpp
+	src/sound/sample.cpp
 	src/sound/script_sound.cpp
 	src/sound/sound.cpp
 	src/sound/sound_id.cpp

@@ -8,8 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 1998-2021 by Lutz Sammer, Fabrice Rossi,
-//                                 Jimmy Salmon and Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,73 +24,20 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include <SDL_mixer.h>
+#include "sound/music_sample.h"
+
+#include "util/path_util.h"
 
 namespace wyrmgus {
 
-/**
-**  RAW samples.
-*/
-class sample final
+void music_sample::load()
 {
-public:
-	explicit sample(const std::filesystem::path &filepath) : filepath(filepath)
-	{
-		if (!std::filesystem::exists(filepath)) {
-			throw std::runtime_error("Sound file \"" + filepath.string() + "\" does not exist.");
-		}
+	this->data = Mix_LoadMUS(path::to_string(this->filepath).c_str());
+	if (this->data == nullptr) {
+		throw std::runtime_error("Failed to decode music file \"" + this->filepath.string() + "\": " + std::string(Mix_GetError()));
 	}
-
-	~sample()
-	{
-		this->unload();
-	}
-
-	bool is_loaded() const
-	{
-		return this->chunk != nullptr;
-	}
-
-	void load();
-
-	void unload()
-	{
-		if (!this->is_loaded()) {
-			return;
-		}
-
-		Mix_FreeChunk(this->chunk);
-		this->chunk = nullptr;
-	}
-
-	virtual int Read(void *buf, int len)
-	{
-		Q_UNUSED(buf)
-		Q_UNUSED(len)
-
-		return 0;
-	}
-
-	const uint8_t *get_buffer() const
-	{
-		return this->chunk->abuf;
-	}
-
-	int get_length() const
-	{
-		return static_cast<int>(this->chunk->alen);
-	}
-
-	Mix_Chunk *get_chunk() const
-	{
-		return this->chunk;
-	}
-
-private:
-	std::filesystem::path filepath;
-	Mix_Chunk *chunk = nullptr; //sample buffer
-};
+}
 
 }

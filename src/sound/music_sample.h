@@ -52,13 +52,7 @@ public:
 		return this->data != nullptr;
 	}
 
-	void load()
-	{
-		this->data = Mix_LoadMUS(this->filepath.string().c_str());
-		if (this->data == nullptr) {
-			throw std::runtime_error("Failed to decode music file \"" + this->filepath.string() + "\": " + std::string(Mix_GetError()));
-		}
-	}
+	void load();
 
 	void unload()
 	{

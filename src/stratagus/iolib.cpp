@@ -738,12 +738,12 @@ void FileWriter::printf(const char *format, ...)
 }
 
 
-class RawFileWriter : public FileWriter
+class RawFileWriter final : public FileWriter
 {
 	FILE *file;
 
 public:
-	RawFileWriter(const std::string &filename)
+	explicit RawFileWriter(const std::string &filename)
 	{
 		file = fopen(filename.c_str(), "wb");
 		if (!file) {
@@ -763,12 +763,12 @@ public:
 	}
 };
 
-class GzFileWriter : public FileWriter
+class GzFileWriter final : public FileWriter
 {
 	gzFile file;
 
 public:
-	GzFileWriter(const std::string &filename)
+	explicit GzFileWriter(const std::string &filename)
 	{
 		file = gzopen(filename.c_str(), "wb9");
 		if (!file) {
