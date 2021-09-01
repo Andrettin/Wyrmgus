@@ -44,6 +44,7 @@ public:
 	static constexpr const char *graphics_folder = "graphics";
 	static constexpr const char *maps_folder = "maps";
 	static constexpr const char *music_folder = "music";
+	static constexpr const char *save_folder = "save";
 	static constexpr const char *sounds_folder = "sounds";
 
 	template <typename T>
@@ -96,6 +97,13 @@ public:
 	static std::filesystem::path get_user_maps_path()
 	{
 		std::filesystem::path path = database::get_user_data_path() / database::maps_folder;
+		database::ensure_path_exists(path);
+		return path;
+	}
+
+	static std::filesystem::path get_save_path()
+	{
+		std::filesystem::path path = database::get_user_data_path() / database::save_folder;
 		database::ensure_path_exists(path);
 		return path;
 	}

@@ -54,6 +54,7 @@
 #include "upgrade/upgrade.h"
 #include "util/date_util.h"
 #include "util/exception_util.h"
+#include "util/path_util.h"
 #include "util/random.h"
 #include "version.h"
 
@@ -78,23 +79,6 @@ void ExpandPath(std::string &newpath, const std::string &path)
 }
 
 /**
-** Get the save directory and create dirs if needed
-*/
-std::string GetSaveDir()
-{
-	struct stat tmp;
-	std::filesystem::path dir = parameters::get()->GetUserDirectory();
-	if (!GameName.empty()) {
-		dir /= GameName;
-	}
-	dir /= "save";
-	if (stat(dir.string().c_str(), &tmp) < 0) {
-		makedir(dir.string().c_str(), 0777);
-	}
-	return dir.string();
-}
-
-/**
 **  Save a game to file.
 **
 **  @param filename  File name to be stored.
@@ -105,11 +89,9 @@ std::string GetSaveDir()
 int SaveGame(const std::string &filename)
 {
 	CFile file;
-	std::string fullpath(GetSaveDir());
+	const std::filesystem::path fullpath = database::get_save_path() / filename;
 
-	fullpath += "/";
-	fullpath += filename;
-	if (file.open(fullpath.c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
+	if (file.open(path::to_string(fullpath).c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
 		fprintf(stderr, "Can't save to '%s'\n", filename.c_str());
 		return -1;
 	}
@@ -204,9 +186,10 @@ void DeleteSaveGame(const std::string &filename)
 		return;
 	}
 
-	std::string fullpath = GetSaveDir() + "/" + filename;
+	const std::filesystem::path fullpath = database::get_save_path() / filename;
+
 	if (!std::filesystem::remove(fullpath)) {
-		fprintf(stderr, "delete failed for %s", fullpath.c_str());
+		fprintf(stderr, "delete failed for %s", fullpath.string().c_str());
 	}
 }
 

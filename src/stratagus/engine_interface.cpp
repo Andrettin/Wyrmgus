@@ -127,7 +127,7 @@ void engine_interface::post(const std::function<void()> &function)
 
 QString engine_interface::get_save_path() const
 {
-	std::filesystem::path save_path = GetSaveDir();
+	std::filesystem::path save_path = database::get_save_path();
 	save_path.make_preferred();
 	return path::to_qstring(save_path);
 }
