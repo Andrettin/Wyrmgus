@@ -161,14 +161,6 @@ extern int ButtonAreaUnderCursor;
 extern int ButtonUnderCursor;
 /// oldbutton number under the cursor
 extern int OldButtonUnderCursor;
-//Wyrmgus start
-/*
-/// menu button was clicked down
-extern bool GameMenuButtonClicked;
-/// diplomacy button was clicked down
-extern bool GameDiplomacyButtonClicked;
-*/
-//Wyrmgus end
 /// Mouse leaves windows stops scroll
 extern bool LeaveStops;
 /// current CursorOn field
@@ -282,8 +274,6 @@ bool HandleCommandKey(int key, const Qt::KeyboardModifiers key_modifiers);
 /// Cancel the building input mode
 extern void CancelBuildingMode();
 
-/// Draw menu button area
-extern void DrawMenuButtonArea(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw user defined buttons
 extern void DrawUserDefinedButtons(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Update messages

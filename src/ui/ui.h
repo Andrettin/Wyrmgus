@@ -416,13 +416,6 @@ public:
 	CMapLayer *CurrentMapLayer;
 	CMapLayer *PreviousMapLayer;
 
-	// Menu buttons
-	CUIButton MenuButton;               /// menu button
-	//Wyrmgus start
-//	CUIButton NetworkMenuButton;        /// network menu button
-	//Wyrmgus end
-	CUIButton NetworkDiplomacyButton;   /// network diplomacy button
-	
 	//Wyrmgus start
 	std::vector<CUIButton> WorldButtons;	/// Button info for world map layer buttons
 	//Wyrmgus end

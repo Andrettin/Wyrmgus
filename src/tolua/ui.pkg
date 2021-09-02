@@ -160,12 +160,6 @@ class CUserInterface
 	font *MessageFont;
 	int MessageScrollSpeed;
 
-	CUIButton MenuButton;
-	//Wyrmgus start
-//	CUIButton NetworkMenuButton;
-	//Wyrmgus end
-	CUIButton NetworkDiplomacyButton;
-	
 	//Wyrmgus start
 	vector<CUIButton> WorldButtons;
 	//Wyrmgus end

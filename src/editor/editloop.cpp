@@ -1495,15 +1495,6 @@ void EditorUpdateDisplay()
 	// Menu button
 	const int flag_active = ButtonAreaUnderCursor == ButtonAreaMenu
 							&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0;
-	//Wyrmgus start
-//	const int flag_clicked = GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0;
-	const int flag_clicked = UI.MenuButton.Clicked ? MI_FLAGS_CLICKED : 0;
-	//Wyrmgus end
-	DrawUIButton(UI.MenuButton.Style,
-				 flag_active | flag_clicked,
-				 UI.MenuButton.X, UI.MenuButton.Y,
-				 UI.MenuButton.Text, render_commands);
-
 
 	// Minimap
 	if (UI.SelectedViewport) {
@@ -1553,20 +1544,6 @@ static void EditorCallbackButtonUp(unsigned button, const Qt::KeyboardModifiers 
 		return;
 	}
 
-	//Wyrmgus start
-//	if ((1 << button) == LeftButton && GameMenuButtonClicked) {
-	if ((1 << button) == LeftButton && UI.MenuButton.Clicked) {
-	//Wyrmgus end
-		//Wyrmgus start
-//		GameMenuButtonClicked = false;
-		UI.MenuButton.Clicked = false;
-		//Wyrmgus end
-		if (ButtonUnderCursor == ButtonUnderMenu) {
-			if (UI.MenuButton.Callback) {
-				UI.MenuButton.Callback->action("");
-			}
-		}
-	}
 	if ((1 << button) == LeftButton) {
 		UnitPlacedThisPress = false;
 	}
@@ -1586,19 +1563,7 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 		// Ignore repeated events when holding down a button
 		return;
 	}
-	// Click on menu button
-	if (CursorOn == cursor_on::button && ButtonAreaUnderCursor == ButtonAreaMenu &&
-		//Wyrmgus start
-//		(MouseButtons & LeftButton) && !GameMenuButtonClicked) {
-		(MouseButtons & LeftButton) && !UI.MenuButton.Clicked) {
-		//Wyrmgus end
-		PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
-		//Wyrmgus start
-//		GameMenuButtonClicked = true;
-		UI.MenuButton.Clicked = true;
-		//Wyrmgus end
-		return;
-	}
+
 	// Click on minimap
 	if (CursorOn == cursor_on::minimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
@@ -1607,6 +1572,7 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 		}
 		return;
 	}
+
 	// Click on mode area
 	if (CursorOn == cursor_on::button) {
 		CursorBuilding = nullptr;
@@ -2236,12 +2202,6 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		ButtonUnderCursor = StartButton;
 		CursorOn = cursor_on::button;
 		UI.StatusLine.Set(_("Set Start Location"));
-		return;
-	}
-	if (UI.MenuButton.X != -1 && UI.MenuButton.Contains(screenPos)) {
-		ButtonAreaUnderCursor = ButtonAreaMenu;
-		ButtonUnderCursor = ButtonUnderMenu;
-		CursorOn = cursor_on::button;
 		return;
 	}
 

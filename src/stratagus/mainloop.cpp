@@ -223,7 +223,7 @@ void UpdateDisplay()
 				UI.Fillers[i].G->Height,
 				UI.Fillers[i].X, UI.Fillers[i].Y, render_commands);
 		}
-		DrawMenuButtonArea(render_commands);
+
 		DrawUserDefinedButtons(render_commands);
 
 		UI.get_minimap()->Draw(render_commands);
