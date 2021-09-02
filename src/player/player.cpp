@@ -1549,14 +1549,14 @@ void CPlayer::set_dynasty(const wyrmgus::dynasty *dynasty)
 	}
 }
 
-const std::string &CPlayer::get_interface() const
+interface_style *CPlayer::get_interface_style() const
 {
 	const wyrmgus::civilization *civilization = this->get_civilization();
 	if (civilization != nullptr) {
-		return civilization->get_interface();
+		return civilization->get_interface_style();
 	}
 
-	return wyrmgus::string::empty_str;
+	return nullptr;
 }
 
 /**

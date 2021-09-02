@@ -96,6 +96,7 @@
 #include "ui/cursor_type.h"
 #include "ui/hotkey_setup.h"
 #include "ui/icon.h"
+#include "ui/interface_style.h"
 #include "ui/resource_icon.h"
 #include "unit/construction.h"
 #include "unit/historical_unit.h"
@@ -297,6 +298,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(string_to_hotkey_setup(property.get_value()));
 		} else if (property_class_name == "wyrmgus::icon*") {
 			new_property_value = QVariant::fromValue(icon::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::interface_style*") {
+			new_property_value = QVariant::fromValue(interface_style::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::item_class") {
 			new_property_value = QVariant::fromValue(string_to_item_class(property.get_value()));
 		} else if (property_class_name == "wyrmgus::item_slot") {

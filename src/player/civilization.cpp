@@ -188,8 +188,8 @@ void civilization::initialize()
 		const civilization *parent_civilization = this->get_parent_civilization();
 		const int parent_civilization_id = parent_civilization->ID;
 
-		if (this->get_interface().empty()) {
-			this->interface = parent_civilization->interface;
+		if (this->interface_style == nullptr) {
+			this->interface_style = parent_civilization->interface_style;
 		}
 
 		if (this->upgrade == nullptr && parent_civilization->get_upgrade() != nullptr) { //if the civilization has no civilization upgrade, inherit that of its parent civilization

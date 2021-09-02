@@ -44,6 +44,7 @@ class ai_force_template;
 class calendar;
 class character;
 class deity;
+class interface_style;
 class language;
 class quest;
 class resource;
@@ -63,7 +64,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(wyrmgus::civilization* parent_civilization MEMBER parent_civilization READ get_parent_civilization)
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
-	Q_PROPERTY(QString interface READ get_interface_qstring)
+	Q_PROPERTY(wyrmgus::interface_style* interface_style MEMBER interface_style READ get_interface_style)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 	Q_PROPERTY(wyrmgus::language* language MEMBER language)
 	Q_PROPERTY(QString encyclopedia_background_file READ get_encyclopedia_background_file_qstring NOTIFY changed)
@@ -130,19 +131,9 @@ public:
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int get_force_type_weight(const ai_force_type force_type) const;
 
-	const std::string &get_interface() const
+	interface_style *get_interface_style() const
 	{
-		return this->interface;
-	}
-
-	QString get_interface_qstring() const
-	{
-		return QString::fromStdString(this->interface);
-	}
-
-	Q_INVOKABLE void set_interface(const std::string &interface)
-	{
-		this->interface = interface;
+		return this->interface_style;
 	}
 
 	CUpgrade *get_upgrade() const
@@ -256,7 +247,7 @@ private:
 public:
 	std::string Adjective;			/// adjective pertaining to the civilization
 private:
-	std::string interface; //the string identifier for the civilization's interface
+	wyrmgus::interface_style *interface_style = nullptr; //the civilization's interface style
 	CUpgrade *upgrade = nullptr;
 	wyrmgus::language *language = nullptr;	/// the language used by the civilization
 	wyrmgus::calendar *calendar = nullptr;	/// the calendar used by the civilization

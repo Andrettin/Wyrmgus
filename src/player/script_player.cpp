@@ -69,6 +69,7 @@
 #include "time/calendar.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"
+#include "ui/interface_style.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
@@ -724,7 +725,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Adjective")) {
 			civilization->Adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Interface")) {
-			civilization->interface = LuaToString(l, -1);
+			civilization->interface_style = interface_style::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Visible")) {
 			civilization->visible = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
@@ -1235,7 +1236,11 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Interface")) {
-		lua_pushstring(l, civilization->get_interface().c_str());
+		if (civilization->get_interface_style() != nullptr) {
+			lua_pushstring(l, civilization->get_interface_style()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, civilization->is_playable());

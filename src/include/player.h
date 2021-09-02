@@ -59,6 +59,7 @@ namespace wyrmgus {
 	class deity;
 	class dynasty;
 	class faction;
+	class interface_style;
 	class language;
 	class player_color;
 	class player_quest_objective;
@@ -153,7 +154,7 @@ public:
 
 	void set_dynasty(const wyrmgus::dynasty *dynasty);
 
-	const std::string &get_interface() const;
+	interface_style *get_interface_style() const;
 
 	const wyrmgus::age *get_age() const
 	{
