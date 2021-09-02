@@ -39,6 +39,7 @@ namespace wyrmgus {
 
 class defines;
 class game;
+class interface_style;
 class map_info;
 class network_manager;
 class parameters;
@@ -62,6 +63,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(QVariantList custom_heroes READ get_custom_heroes NOTIFY custom_heroes_changed)
 	Q_PROPERTY(int max_map_width READ get_max_map_width CONSTANT)
 	Q_PROPERTY(int max_map_height READ get_max_map_height CONSTANT)
+	Q_PROPERTY(wyrmgus::interface_style* current_interface_style READ get_current_interface_style NOTIFY current_interface_style_changed)
 
 public:
 	engine_interface();
@@ -242,6 +244,22 @@ public:
 	int get_max_map_width() const;
 	int get_max_map_height() const;
 
+	interface_style *get_current_interface_style() const
+	{
+		return this->current_interface_style;
+	}
+
+	void set_current_interface_style(interface_style *interface_style)
+	{
+		if (interface_style == this->get_current_interface_style()) {
+			return;
+		}
+
+		this->current_interface_style = interface_style;
+
+		emit current_interface_style_changed();
+	}
+
 	Q_INVOKABLE void load_game(const QString &filepath);
 	void load_game_deferred(const std::string &filepath);
 
@@ -250,6 +268,7 @@ signals:
 	void loading_message_changed();
 	void encyclopediaEntryOpened(QString link);
 	void custom_heroes_changed();
+	void current_interface_style_changed();
 
 private:
 	std::queue<std::function<void()>> posted_commands;
@@ -260,6 +279,7 @@ private:
 	std::queue<std::unique_ptr<QInputEvent>> stored_input_events;
 	std::mutex input_event_mutex;
 	QString loading_message; //the loading message to be displayed
+	interface_style *current_interface_style = nullptr;
 	mutable std::shared_mutex loading_message_mutex;
 	std::vector<qunique_ptr<map_info>> map_infos;
 };

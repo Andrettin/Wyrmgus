@@ -41,6 +41,7 @@
 #include "dialogue.h"
 #include "economy/resource_storage_type.h"
 #include "editor.h"
+#include "engine_interface.h"
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end
@@ -495,6 +496,13 @@ void CPlayer::SetThisPlayer(CPlayer *player)
 	}
 
 	CPlayer::ThisPlayer = player;
+
+	interface_style *interface_style = nullptr;
+	if (player != nullptr) {
+		interface_style = player->get_interface_style();
+	}
+
+	engine_interface::get()->set_current_interface_style(interface_style);
 }
 
 CPlayer *CPlayer::GetThisPlayer()
@@ -1273,6 +1281,11 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 		if (civilization_upgrade != nullptr && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
 			UpgradeAcquire(*this, civilization_upgrade);
 		}
+	}
+
+	if (this == CPlayer::GetThisPlayer()) {
+		//update the current interface style if it changed
+		engine_interface::get()->set_current_interface_style(this->get_interface_style());
 	}
 }
 
