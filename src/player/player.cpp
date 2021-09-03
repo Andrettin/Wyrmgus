@@ -502,7 +502,9 @@ void CPlayer::SetThisPlayer(CPlayer *player)
 		interface_style = player->get_interface_style();
 	}
 
-	engine_interface::get()->set_current_interface_style(interface_style);
+	QMetaObject::invokeMethod(QApplication::instance(), [interface_style] {
+		engine_interface::get()->set_current_interface_style(interface_style);
+	}, Qt::QueuedConnection);
 }
 
 CPlayer *CPlayer::GetThisPlayer()
@@ -1285,7 +1287,9 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 
 	if (this == CPlayer::GetThisPlayer()) {
 		//update the current interface style if it changed
-		engine_interface::get()->set_current_interface_style(this->get_interface_style());
+		QMetaObject::invokeMethod(QApplication::instance(), [interface_style = this->get_interface_style()] {
+			engine_interface::get()->set_current_interface_style(interface_style);
+		}, Qt::QueuedConnection);
 	}
 }
 
