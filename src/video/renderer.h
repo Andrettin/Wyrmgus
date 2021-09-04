@@ -48,8 +48,6 @@ public:
 
 	virtual void render() override;
 
-	void clean_up();
-
 	QSizeF get_target_sizef() const;
 
 	QSize get_target_size() const
@@ -195,8 +193,6 @@ public:
 
 	void fill_rect(const QRect &rect, const QColor &color)
 	{
-		const QSize target_size = this->get_target_size();
-
 		glDisable(GL_TEXTURE_2D);
 		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
 
