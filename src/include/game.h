@@ -172,6 +172,14 @@ public:
 	void store_results();
 	void clear_results();
 
+	Q_INVOKABLE void on_modal_dialog_opened();
+	Q_INVOKABLE void on_modal_dialog_closed();
+
+	bool are_tooltips_enabled() const
+	{
+		return this->tooltips_enabled;
+	}
+
 signals:
 	void started();
 	void stopped();
@@ -188,6 +196,7 @@ private:
 	std::vector<std::unique_ptr<delayed_effect_instance<CPlayer>>> player_delayed_effects;
 	std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> unit_delayed_effects;
 	qunique_ptr<results_info> results;
+	bool tooltips_enabled = true;
 };
 
 }

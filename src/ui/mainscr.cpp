@@ -909,6 +909,10 @@ static std::unique_ptr<wyrmgus::button> get_territory_tooltip_button(const CPlay
 */
 void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 {
+	if (!game::get()->are_tooltips_enabled()) {
+		return;
+	}
+
 	//
 	// Draw unit under the cursor's name popup
 	//
