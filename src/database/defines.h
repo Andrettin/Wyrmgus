@@ -38,6 +38,7 @@ class civilization;
 class dialogue;
 class font;
 class font_color;
+class interface_style;
 class map_projection;
 class music;
 class player_color;
@@ -57,6 +58,7 @@ class defines final : public QObject, public singleton<defines>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::interface_style* default_interface_style MEMBER default_interface_style READ get_default_interface_style)
 	Q_PROPERTY(wyrmgus::font* small_font MEMBER small_font)
 	Q_PROPERTY(wyrmgus::font* game_font MEMBER game_font)
 	Q_PROPERTY(wyrmgus::font_color* default_font_color MEMBER default_font_color READ get_default_font_color)
@@ -108,6 +110,11 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 	void initialize();
+
+	interface_style *get_default_interface_style() const
+	{
+		return this->default_interface_style;
+	}
 
 	font *get_small_font() const
 	{
@@ -394,6 +401,7 @@ signals:
 	void changed();
 
 private:
+	interface_style *default_interface_style = nullptr;
 	font *small_font = nullptr;
 	font *game_font = nullptr;
 	font_color *default_font_color = nullptr;

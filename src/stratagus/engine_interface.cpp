@@ -559,6 +559,22 @@ int engine_interface::get_max_map_height() const
 	return MaxMapHeight;
 }
 
+void engine_interface::set_current_interface_style(interface_style *interface_style)
+{
+	if (interface_style == nullptr) {
+		this->set_current_interface_style(defines::get()->get_default_interface_style());
+		return;
+	}
+
+	if (interface_style == this->get_current_interface_style()) {
+		return;
+	}
+
+	this->current_interface_style = interface_style;
+
+	emit current_interface_style_changed();
+}
+
 void engine_interface::load_game(const QString &filepath)
 {
 	this->load_game_deferred(filepath.toStdString());

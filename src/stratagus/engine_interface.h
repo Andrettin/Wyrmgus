@@ -249,16 +249,7 @@ public:
 		return this->current_interface_style;
 	}
 
-	void set_current_interface_style(interface_style *interface_style)
-	{
-		if (interface_style == this->get_current_interface_style()) {
-			return;
-		}
-
-		this->current_interface_style = interface_style;
-
-		emit current_interface_style_changed();
-	}
+	void set_current_interface_style(interface_style *interface_style);
 
 	Q_INVOKABLE void load_game(const QString &filepath);
 	void load_game_deferred(const std::string &filepath);
