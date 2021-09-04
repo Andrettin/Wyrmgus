@@ -778,7 +778,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	
 	bool has_base_map = !this->get_terrain_file().empty() || !this->get_terrain_image_file().empty();
 	
-	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->get_name().c_str());
+	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain..."), this->get_name().c_str());
 	
 	if (this->get_base_terrain_type() != nullptr || this->get_border_terrain_type() != nullptr || this->clear_terrain) {
 		for (int x = map_start_pos.x(); x < map_end.x(); ++x) {
@@ -929,19 +929,19 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	
 	if (!this->get_subtemplates().empty()) {
-		ShowLoadProgress(_("Applying \"%s\" Subtemplates"), this->get_name().c_str());
+		ShowLoadProgress(_("Applying \"%s\" Subtemplates..."), this->get_name().c_str());
 		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false, false);
 	}
 	
 	if (!this->IsSubtemplateArea()) {
-		ShowLoadProgress(_("Adjusting \"%s\" Map Template Terrain"), this->get_name().c_str());
+		ShowLoadProgress(_("Adjusting \"%s\" Map Template Terrain..."), this->get_name().c_str());
 		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapTransitions(map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 	
-	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->get_name().c_str());
+	ShowLoadProgress(_("Applying \"%s\" Map Template Units..."), this->get_name().c_str());
 
 	for (std::map<std::pair<int, int>, std::tuple<unit_type *, int, unique_item *>>::const_iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
 		Vec2i unit_raw_pos(iterator->first.first, iterator->first.second);
@@ -983,7 +983,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	this->ApplyUnits(template_start_pos, map_start_pos, map_end, z);
 
 	if (!this->get_subtemplates().empty()) {
-		ShowLoadProgress(_("Applying \"%s\" Random Subtemplates"), this->get_name().c_str());
+		ShowLoadProgress(_("Applying \"%s\" Random Subtemplates..."), this->get_name().c_str());
 		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true, false);
 	}
 
@@ -991,13 +991,13 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		CMap::get()->generate_missing_terrain(QRect(map_start_pos, map_end - QPoint(1, 1)), z);
 	}
 
-	ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
+	ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain..."), this->get_name().c_str());
 	for (const auto &generated_terrain : this->generated_terrains) {
 		CMap::get()->GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
 	}
 
 	if (!this->IsSubtemplateArea()) {
-		ShowLoadProgress(_("Readjusting \"%s\" Map Template Terrain"), this->get_name().c_str());
+		ShowLoadProgress(_("Readjusting \"%s\" Map Template Terrain..."), this->get_name().c_str());
 		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapTransitions(map_start_pos, map_end, z);
@@ -1005,12 +1005,12 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 
 	if (!this->get_subtemplates().empty()) {
-		ShowLoadProgress(_("Applying \"%s\" Constructed Subtemplates"), this->get_name().c_str());
+		ShowLoadProgress(_("Applying \"%s\" Constructed Subtemplates..."), this->get_name().c_str());
 		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false, true);
 		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true, true);
 	}
 
-	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->get_name().c_str());
+	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units..."), this->get_name().c_str());
 
 	// now, generate the units and heroes that were set to be generated at a random position (by having their position set to {-1, -1})
 	if (current_campaign != nullptr) {

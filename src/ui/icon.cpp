@@ -58,7 +58,7 @@ void icon::load_all()
 	const int to_load_count = icon::get_to_load_count();
 
 	if (to_load_count > 0) {
-		ShowLoadProgress("%s", _("Loading Icons (0%)"));
+		ShowLoadProgress("%s", _("Loading Icons... (0%)"));
 	}
 
 	for (icon *icon : icon::get_all()) {
@@ -66,7 +66,7 @@ void icon::load_all()
 			icon->load();
 			++loaded_count;
 			IncItemsLoaded();
-			ShowLoadProgress(_("Loading Icons (%d%%)"), (loaded_count + 1) * 100 / to_load_count);
+			ShowLoadProgress(_("Loading Icons... (%d%%)"), (loaded_count + 1) * 100 / to_load_count);
 		}
 	}
 }

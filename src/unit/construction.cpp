@@ -123,7 +123,7 @@ int GetConstructionsCount()
 */
 void LoadConstructions()
 {
-	ShowLoadProgress("%s", _("Loading Construction Graphics"));
+	ShowLoadProgress("%s", _("Loading Construction Graphics..."));
 		
 	for (wyrmgus::construction *construction : wyrmgus::construction::get_all()) {
 		construction->load();

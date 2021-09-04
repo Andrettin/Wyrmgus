@@ -156,7 +156,7 @@ CPopup *PopupByIdent(const std::string &ident)
 */
 void InitUserInterface()
 {
-	ShowLoadProgress("%s", _("Loading User Interface"));
+	ShowLoadProgress("%s", _("Loading User Interface..."));
 	
 	UI.Offset640X = (Video.Width - 640) / 2;
 	UI.Offset480Y = (Video.Height - 480) / 2;

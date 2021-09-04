@@ -208,7 +208,7 @@ void StartSavedGame(const std::string &filename)
 
 void load_game(const std::string &filename)
 {
-	engine_interface::get()->set_loading_message("Loading saved game...");
+	engine_interface::get()->set_loading_message("Loading Saved Game...");
 
 	if (game::get()->is_running()) {
 		set_load_game_file(filename);

@@ -3676,7 +3676,7 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 		throw std::runtime_error("Maybe you need to specify another gamepath with '-d /path/to/datadir'?");
 	}
 
-	ShowLoadProgress(_("Loading Script \"%s\"\n"), name.c_str());
+	ShowLoadProgress(_("Loading Script \"%s\"..."), name.c_str());
 	LuaLoadFile(name, luaArgStr);
 	CclInConfigFile = 0;
 	LuaGarbageCollect();

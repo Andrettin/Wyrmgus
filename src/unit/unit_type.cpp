@@ -2910,7 +2910,7 @@ int GetUnitTypesCount()
 void LoadUnitTypes()
 {
 	for (unit_type *unit_type : unit_type::get_all()) {
-		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (unit_type->get_index() + 1) * 100 / unit_type::get_all().size());
+		ShowLoadProgress(_("Loading Unit Types... (%d%%)"), (unit_type->get_index() + 1) * 100 / unit_type::get_all().size());
 		LoadUnitType(unit_type);
 	}
 }

@@ -1245,7 +1245,7 @@ bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z)
 void PreprocessMap()
 {
 	try {
-		ShowLoadProgress("%s", _("Initializing Map"));
+		ShowLoadProgress("%s", _("Initializing Map..."));
 
 		//Wyrmgus start
 		/*

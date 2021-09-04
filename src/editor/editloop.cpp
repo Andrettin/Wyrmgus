@@ -2262,7 +2262,7 @@ void CEditor::Init()
 		throw std::runtime_error("Editor configuration file \"" + parameters::get()->luaEditorStartFilename  + "\" was not found, specify another with '-E file.lua'");
 	}
 
-	ShowLoadProgress(_("Loading Script \"%s\""), filename.c_str());
+	ShowLoadProgress(_("Loading Script \"%s\"..."), filename.c_str());
 	LuaLoadFile(filename);
 	LuaGarbageCollect();
 	
