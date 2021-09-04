@@ -33,6 +33,7 @@
 #include "ai.h"
 #include "character.h"
 #include "database/database.h"
+#include "engine_interface.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"
@@ -207,6 +208,8 @@ void StartSavedGame(const std::string &filename)
 
 void load_game(const std::string &filename)
 {
+	engine_interface::get()->set_loading_message("Loading saved game...");
+
 	if (game::get()->is_running()) {
 		set_load_game_file(filename);
 		StopGame(GameNoResult);
