@@ -207,6 +207,12 @@ void StartSavedGame(const std::string &filename)
 
 void load_game(const std::string &filename)
 {
+	if (game::get()->is_running()) {
+		set_load_game_file(filename);
+		StopGame(GameNoResult);
+		return;
+	}
+
 	CclCommand("ClearPlayerDataObjectives();");
 
 	while (true) {

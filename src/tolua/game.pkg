@@ -6,8 +6,6 @@ $void StartMap(const string &str, bool clean = true);
 void StartMap(const string str, bool clean = true);
 $void StartReplay(const string &str, bool reveal = false);
 void StartReplay(const string str, bool reveal = false);
-$void set_load_game_file(const string &str);
-void set_load_game_file(const string str);
 
 $int SaveReplay(const std::string &filename);
 int SaveReplay(const std::string filename);
