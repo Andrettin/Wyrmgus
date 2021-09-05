@@ -51,7 +51,7 @@ class CEditor final : public QObject, public singleton<CEditor>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
+	Q_PROPERTY(bool running READ is_running WRITE set_running_async NOTIFY running_changed)
 
 public:
 	CEditor();
@@ -74,6 +74,8 @@ public:
 		emit running_changed();
 	}
 
+	void set_running_async(const bool running);
+
 signals:
 	void running_changed();
 
@@ -91,15 +93,15 @@ public:
 	std::string StartUnitName;   /// name of the Unit used to display the start location.
 	const wyrmgus::unit_type *StartUnit = nullptr;  /// Unit used to display the start location.
 
-	int UnitIndex;               /// Unit icon draw index.
-	int CursorUnitIndex;         /// Unit icon under cursor.
-	int SelectedUnitIndex;       /// Unit type to draw.
+	int UnitIndex = 0;               /// Unit icon draw index.
+	int CursorUnitIndex = -1;         /// Unit icon under cursor.
+	int SelectedUnitIndex = -1;       /// Unit type to draw.
 
-	int TileIndex;              /// tile icon draw index.
-	int CursorTileIndex;		/// tile icon under cursor.
-	int SelectedTileIndex;       /// tile type to draw.
+	int TileIndex = 0;              /// tile icon draw index.
+	int CursorTileIndex = -1;		/// tile icon under cursor.
+	int SelectedTileIndex = -1;       /// tile type to draw.
 
-	int CursorPlayer;            /// Player under the cursor.
+	int CursorPlayer = -1;            /// Player under the cursor.
 	int SelectedPlayer;          /// Player selected for draw.
 
 	bool WriteCompressedMaps = true;    /// Use compression when saving
@@ -110,8 +112,8 @@ private:
 public:
 	EditorStateType State;       /// Current editor state
 
-	int PopUpX;
-	int PopUpY;
+	int PopUpX = -1;
+	int PopUpY = -1;
 };
 
 extern char TileToolRandom;

@@ -52,11 +52,16 @@
 
 #include "editor.h"
 
+#include "engine_interface.h"
 #include "player.h"
 
-CEditor::CEditor() :
-	UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
-	TileIndex(0), CursorTileIndex(-1), SelectedTileIndex(-1),
-	CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
-	PopUpX(-1), PopUpY(-1)
-{}
+CEditor::CEditor() : SelectedPlayer(PlayerNumNeutral)
+{
+}
+
+void CEditor::set_running_async(const bool running)
+{
+	engine_interface::get()->post([this, running]() {
+		this->set_running(running);
+	});
+}
