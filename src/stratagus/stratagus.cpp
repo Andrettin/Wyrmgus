@@ -280,9 +280,6 @@ static void PrintHeader()
 #ifdef USE_ZLIB
 		"ZLIB "
 #endif
-#ifdef USE_BZ2LIB
-		"BZ2LIB "
-#endif
 #ifdef USE_OPENGL
 		"OPENGL "
 #endif

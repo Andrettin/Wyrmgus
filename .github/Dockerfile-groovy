@@ -9,7 +9,6 @@ RUN apt-get -y install \
   g++-9 \
   git \
   libboost-dev \
-  libbz2-dev \
   liblua5.1-dev \
   libsdl2-mixer-dev \
   libsdl2-dev \

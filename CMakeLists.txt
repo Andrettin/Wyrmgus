@@ -1299,8 +1299,6 @@ find_package(SDL2_mixer REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
 
-find_package(BZip2)
-
 find_package(X11)
 find_package(OpenGL)
 find_package(OpenGLES)
@@ -1333,8 +1331,6 @@ endif()
 
 option(ENABLE_METASERVER "Build Stratagus metaserver (requires Sqlite3)" OFF)
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
-
-option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
 
@@ -1422,12 +1418,6 @@ endif()
 
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
-if(WITH_BZIP2 AND BZIP2_FOUND)
-	add_definitions(-DUSE_BZ2LIB ${BZIP2_DEFINITIONS})
-	include_directories(${BZIP2_INCLUDE_DIR})
-	set(wyrmgus_LIBS ${wyrmgus_LIBS} ${BZIP2_LIBRARIES})
 endif()
 
 if(WITH_X11 AND X11_FOUND)
@@ -1668,7 +1658,6 @@ else()
 	message("Upx packer: No (Enable by param -DENABLE_UPX=ON)")
 endif()
 
-log_package("Bzip2" "BZIP2")
 log_package("X11" "X11")
 
 if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)

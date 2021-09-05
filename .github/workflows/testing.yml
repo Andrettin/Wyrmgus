@@ -10,7 +10,6 @@ env:
   CMAKE_FLAGS: >-
     -DENABLE_STATIC=OFF
     -DOpenGL_GL_PREFERENCE=GLVND
-    -DWITH_BZIP2=OFF
     -DWITH_GEOJSON=OFF
     -DWITH_X11=ON
   WYRMSUN_URL: https://github.com/Andrettin/Wyrmsun

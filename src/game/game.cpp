@@ -1135,18 +1135,10 @@ static void LoadMap(const std::string &filename, CMap &map)
 			}
 		}
 #endif
-#ifdef USE_BZ2LIB
-		if (!strcmp(tmp, ".bz2")) {
-			while (tmp - 1 > name && *--tmp != '.') {
-			}
-		}
-#endif
+
 		if (!strcmp(tmp, ".smp")
 #ifdef USE_ZLIB
 			|| !strcmp(tmp, ".smp.gz")
-#endif
-#ifdef USE_BZ2LIB
-			|| !strcmp(tmp, ".smp.bz2")
 #endif
 		   ) {
 			if (map.Info->get_setup_filepath().empty()) {

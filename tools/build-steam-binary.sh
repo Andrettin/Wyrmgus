@@ -14,7 +14,6 @@ binname=wyrmsun$archsuffix
 
 cmake \
       -DENABLE_STATIC=OFF \
-      -DWITH_BZIP2=OFF \
       -DWITH_X11=ON \
       -DWITH_GEOJSON=OFF \
       $@

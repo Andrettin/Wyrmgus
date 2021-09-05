@@ -45,10 +45,6 @@
 #include <zlib.h>
 #endif
 
-#ifdef USE_BZ2LIB
-#include <bzlib.h>
-#endif
-
 #ifdef __MORPHOS__
 #undef tell
 #endif
@@ -77,9 +73,6 @@ private:
 #ifdef USE_ZLIB
 	gzFile cl_gz;    /// gzip file pointer
 #endif // !USE_ZLIB
-#ifdef USE_BZ2LIB
-	BZFILE *cl_bz;   /// bzip2 file pointer
-#endif // !USE_BZ2LIB
 };
 
 CFile::CFile() : pimpl(std::make_unique<CFile::PImpl>())
@@ -227,28 +220,6 @@ static int gzseek(CFile *file, unsigned offset, int whence)
 
 #endif // USE_ZLIB
 
-#ifdef USE_BZ2LIB
-
-/**
-**  Seek on compressed input. (I hope newer libs support it directly)
-**
-**  @param file    File handle
-**  @param offset  Seek position
-**  @param whence  How to seek
-*/
-static void bzseek(BZFILE *file, unsigned offset, int)
-{
-	char buf[32];
-
-	while (offset > sizeof(buf)) {
-		BZ2_bzread(file, buf, sizeof(buf));
-		offset -= sizeof(buf);
-	}
-	BZ2_bzread(file, buf, offset);
-}
-
-#endif // USE_BZ2LIB
-
 int CFile::PImpl::open(const std::string &filepath_str, const long openflags)
 {
 	std::array<char, 512> buf{};
@@ -272,12 +243,6 @@ int CFile::PImpl::open(const std::string &filepath_str, const long openflags)
 	const std::string gz_filepath_str = filepath_str.ends_with(".gz") ? filepath_str : filepath_str + ".gz";
 
 	if (openflags & CL_OPEN_WRITE) {
-#ifdef USE_BZ2LIB
-		if ((openflags & CL_WRITE_BZ2)
-			&& (cl_bz = BZ2_bzopen(strcat(strcpy(buf.data(), name), ".bz2"), openstring))) {
-			cl_type = CLF_TYPE_BZIP2;
-		} else
-#endif
 #ifdef USE_ZLIB
 			if ((openflags & CL_WRITE_GZ)
 				&& (cl_gz = gzopen(gz_filepath_str.c_str(), openstring))) {
@@ -294,28 +259,11 @@ int CFile::PImpl::open(const std::string &filepath_str, const long openflags)
 				cl_type = CLF_TYPE_GZIP;
 			} else
 #endif
-#ifdef USE_BZ2LIB
-				if ((cl_bz = BZ2_bzopen(strcat(strcpy(buf.data(), name), ".bz2"), "rb"))) {
-					cl_type = CLF_TYPE_BZIP2;
-				} else
-#endif
 				{ }
 		} else {
 			cl_type = CLF_TYPE_PLAIN;
 			// Hmm, plain worked, but nevertheless the file may be compressed!
 			if (fread(buf.data(), 2, 1, cl_plain) == 1) {
-#ifdef USE_BZ2LIB
-				if (buf[0] == 'B' && buf[1] == 'Z') {
-					fclose(cl_plain);
-					if ((cl_bz = BZ2_bzopen(name, "rb"))) {
-						cl_type = CLF_TYPE_BZIP2;
-					} else {
-						if (!(cl_plain = fopen(name, "rb"))) {
-							cl_type = CLF_TYPE_INVALID;
-						}
-					}
-				}
-#endif // USE_BZ2LIB
 #ifdef USE_ZLIB
 				if (buf[0] == 0x1f) { // don't check for buf[1] == 0x8b, so that old compress also works!
 					fclose(cl_plain);
@@ -357,12 +305,6 @@ int CFile::PImpl::close()
 			ret = gzclose(cl_gz);
 		}
 #endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
-			BZ2_bzclose(cl_bz);
-			ret = 0;
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -383,11 +325,6 @@ int CFile::PImpl::read(void *buf, size_t len)
 			ret = gzread(cl_gz, buf, len);
 		}
 #endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (cl_type == CLF_TYPE_BZIP2) {
-			ret = BZ2_bzread(cl_bz, buf, len);
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -405,11 +342,6 @@ void CFile::PImpl::flush()
 			gzflush(cl_gz, Z_SYNC_FLUSH);
 		}
 #endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (cl_type == CLF_TYPE_BZIP2) {
-			BZ2_bzflush(cl_bz);
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -429,11 +361,6 @@ int CFile::PImpl::write(const void *buf, size_t size)
 			ret = gzwrite(cl_gz, buf, size);
 		}
 #endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
-			ret = BZ2_bzwrite(cl_bz, const_cast<void *>(buf), size);
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -454,12 +381,6 @@ int CFile::PImpl::seek(long offset, int whence)
 			ret = gzseek(cl_gz, offset, whence);
 		}
 #endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
-			bzseek(cl_bz, offset, whence);
-			ret = 0;
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -480,12 +401,6 @@ long CFile::PImpl::tell()
 			ret = gztell(cl_gz);
 		}
 #endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
-			// FIXME: need to implement this
-			ret = -1;
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -494,7 +409,7 @@ long CFile::PImpl::tell()
 
 
 /**
-**  Find a file with its correct extension ("", ".gz" or ".bz2")
+**  Find a file with its correct extension ("" or ".gz")
 **
 **  @param file      The string with the file path. Upon success, the string
 **                   is replaced by the full filename with the correct extension.
@@ -510,22 +425,12 @@ static bool FindFileWithExtension(std::array<char, PATH_MAX> &file)
 		return true;
 	}
 
-#ifdef USE_ZLIB // gzip or bzip2 in global shared directory
+#ifdef USE_ZLIB // gzip in global shared directory
 	std::filesystem::path filepath_gz = filepath;
 	filepath_gz += ".gz";
 
 	if (std::filesystem::exists(filepath_gz)) {
 		strcpy_s(file.data(), PATH_MAX, filepath_gz.string().c_str());
-		return true;
-	}
-#endif
-
-#ifdef USE_BZ2LIB
-	std::filesystem::path filepath_bz2 = filepath;
-	filepath_bz2 += ".bz2";
-
-	if (std::filesystem::exists(filepath_bz2)) {
-		strcpy_s(file.data(), PATH_MAX, filepath_bz2.string().c_str());
 		return true;
 	}
 #endif
@@ -537,7 +442,7 @@ static bool FindFileWithExtension(std::array<char, PATH_MAX> &file)
 **  Generate a filename into library.
 **
 **  Try current directory, user home directory, global directory.
-**  This supports .gz, .bz2 and .zip.
+**  This supports .gz and .zip.
 **
 **  @param file        Filename to open.
 **  @param buffer      Allocated buffer for generated filename.

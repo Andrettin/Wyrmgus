@@ -114,14 +114,12 @@ private:
 enum {
 	CLF_TYPE_INVALID,  /// invalid file handle
 	CLF_TYPE_PLAIN,    /// plain text file handle
-	CLF_TYPE_GZIP,     /// gzip file handle
-	CLF_TYPE_BZIP2    /// bzip2 file handle
+	CLF_TYPE_GZIP
 };
 
 #define CL_OPEN_READ 0x1
 #define CL_OPEN_WRITE 0x2
 #define CL_WRITE_GZ 0x4
-#define CL_WRITE_BZ2 0x8
 
 /// Build library path name
 extern std::string LibraryFileName(const char *file);
