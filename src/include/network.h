@@ -70,7 +70,6 @@ extern void InitNetwork1();  /// Initialise network
 extern void ExitNetwork1();  /// Cleanup network (port)
 extern void NetworkOnStartGame();  /// Initialise network data for ingame communication
 extern void NetworkEvent();  /// Handle network events
-extern void NetworkSync();   /// Hold in sync
 extern void NetworkQuitGame();  /// Quit game: warn other users
 extern void NetworkRecover();   /// Recover network
 extern void NetworkCommands();  /// Get all network commands

@@ -941,6 +941,7 @@ static int CclDefineTileset(lua_State *l)
 	CMap::get()->TileGraphic->Load(defines::get()->get_scale_factor());
 	return 0;
 }
+
 /**
 ** Build tileset tables like humanWallTable or mixedLookupTable
 **

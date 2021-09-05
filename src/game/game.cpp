@@ -288,7 +288,7 @@ void game::set_cheat(const bool cheat)
 
 bool game::is_persistency_enabled() const
 {
-	return !IsNetworkGame() && !this->cheat;
+	return !this->is_multiplayer() && !this->cheat;
 }
 
 void game::add_local_trigger(std::unique_ptr<trigger> &&local_trigger)

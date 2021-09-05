@@ -215,6 +215,7 @@
 #include "actions.h"
 #include "commands.h"
 #include "database/preferences.h"
+#include "game.h"
 #include "map/map.h"
 #include "net_lowlevel.h"
 #include "net_message.h"
@@ -405,6 +406,9 @@ void InitNetwork1()
 		NetExit(); // machine dependent network exit
 		return;
 	}
+
+	game::get()->set_multiplayer(true);
+
 #ifdef DEBUG
 	const std::string hostStr = host.toString();
 	DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
@@ -447,6 +451,8 @@ void ExitNetwork1()
 	NetworkInSync = true;
 	NetPlayers = 0;
 	HostsCount = 0;
+
+	game::get()->set_multiplayer(false);
 }
 
 /**

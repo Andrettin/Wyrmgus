@@ -50,6 +50,7 @@ class game final : public QObject, public singleton<game>
 
 	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign WRITE set_current_campaign)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
+	Q_PROPERTY(bool multiplayer READ is_multiplayer NOTIFY multiplayer_changed)
 	Q_PROPERTY(wyrmgus::results_info* results READ get_results NOTIFY results_changed)
 
 public:
@@ -84,6 +85,22 @@ public:
 		}
 
 		emit running_changed();
+	}
+
+	bool is_multiplayer() const
+	{
+		return this->multiplayer;
+	}
+
+	void set_multiplayer(const bool multiplayer)
+	{
+		if (multiplayer == this->is_multiplayer()) {
+			return;
+		}
+
+		this->multiplayer = multiplayer;
+
+		emit multiplayer_changed();
 	}
 
 	campaign *get_current_campaign() const
@@ -184,10 +201,12 @@ signals:
 	void started();
 	void stopped();
 	void running_changed();
+	void multiplayer_changed();
 	void results_changed();
 
 private:
 	bool running = false;
+	bool multiplayer = false;
 	campaign *current_campaign = nullptr;
 	QDateTime current_date;
 	uint64_t current_total_hours = 0; //the total in-game hours
