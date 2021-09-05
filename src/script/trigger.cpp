@@ -29,6 +29,7 @@
 #include "script/trigger.h"
 
 #include "config.h"
+#include "engine_interface.h"
 #include "game.h"
 #include "iolib.h"
 //Wyrmgus start
@@ -402,6 +403,10 @@ int GetNumOpponents(int player)
 */
 void StopGame(GameResults result)
 {
+	if (result == GameRestart) {
+		engine_interface::get()->set_loading_message("Restarting Game...");
+	}
+
 	GameResult = result;
 	GamePaused = true;
 	GameRunning = false;
