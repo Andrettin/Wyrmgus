@@ -35,6 +35,13 @@ inline std::string to_string(const std::filesystem::path &path)
 	return std::string(u8str.begin(), u8str.end());
 }
 
+inline std::filesystem::path from_string(const std::string &path_str)
+{
+	//converta UTF-8 encoded string to a path
+	const std::u8string u8str(path_str.begin(), path_str.end());
+	return std::filesystem::path(u8str);
+}
+
 inline QString to_qstring(const std::filesystem::path &path)
 {
 	return QString::fromStdString(path::to_string(path));

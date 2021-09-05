@@ -87,13 +87,12 @@ void ExpandPath(std::string &newpath, const std::string &path)
 **
 **  @note  Later we want to store in a more compact binary format.
 */
-int SaveGame(const std::string &filename)
+int SaveGame(const std::string &filepath_str)
 {
 	CFile file;
-	const std::filesystem::path fullpath = database::get_save_path() / filename;
 
-	if (file.open(path::to_string(fullpath).c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
-		fprintf(stderr, "Can't save to '%s'\n", filename.c_str());
+	if (file.open(filepath_str.c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
+		fprintf(stderr, "Can't save to '%s'\n", filepath_str.c_str());
 		return -1;
 	}
 
@@ -137,7 +136,7 @@ int SaveGame(const std::string &filename)
 	file.printf("  SyncHash = %d, \n", SyncHash);
 	file.printf("  SyncRandSeed = %d, \n", wyrmgus::random::get()->get_seed());
 	file.printf("  SaveFile = \"%s\"\n", CurrentMapPath.c_str());
-	file.printf("\n---  \"preview\", \"%s.pam\",\n", filename.c_str());
+	file.printf("\n---  \"preview\", \"%s.pam\",\n", filepath_str.c_str());
 	file.printf("} )\n\n");
 
 	// FIXME: probably not the right place for this
@@ -173,25 +172,6 @@ int SaveGame(const std::string &filename)
 	SaveTriggers(file); //Triggers are saved in SaveGlobal, so load it after Global
 	file.close();
 	return 0;
-}
-
-/**
-**  Delete save game
-**
-**  @param filename  Name of file to delete
-*/
-void DeleteSaveGame(const std::string &filename)
-{
-	// Security check
-	if (filename.find_first_of("/\\") != std::string::npos) {
-		return;
-	}
-
-	const std::filesystem::path fullpath = database::get_save_path() / filename;
-
-	if (!std::filesystem::remove(fullpath)) {
-		fprintf(stderr, "delete failed for %s", fullpath.string().c_str());
-	}
 }
 
 void StartSavedGame(const std::string &filename)
