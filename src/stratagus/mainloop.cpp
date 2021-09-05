@@ -78,6 +78,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "util/path_util.h"
+#include "util/string_util.h"
 #include "video/font.h"
 #include "video/render_context.h"
 #include "video/video.h"
@@ -393,7 +394,7 @@ static void GameLogicLoop()
 			const std::filesystem::path filepath = database::get_save_path() / "autosave.sav";
 			//Wyrmgus start
 //			SaveGame(path::to_string(filepath));
-			CclCommand("if (RunSaveGame ~= nil) then RunSaveGame(\""+ path::to_string(filepath) + "\") end;");
+			CclCommand("if (RunSaveGame ~= nil) then RunSaveGame(\""+ string::escaped(path::to_string(filepath)) + "\") end;");
 			//Wyrmgus end
 		}
 	}
