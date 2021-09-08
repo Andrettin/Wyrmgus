@@ -585,9 +585,6 @@ extern unsigned long SlowFrameCounter;
 /// (bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette();
 
-/// register lua function
-extern void VideoCclRegister();
-
 /// initialize the video part
 extern void InitVideo();
 

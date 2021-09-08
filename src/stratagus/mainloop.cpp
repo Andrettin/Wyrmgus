@@ -412,11 +412,6 @@ static void GameLogicLoop()
 	}
 }
 
-//#define REALVIDEO
-#ifdef REALVIDEO
-static	int RealVideoSyncSpeed;
-#endif
-
 static void DisplayLoop()
 {
 	/* update only if screen changed */
@@ -436,23 +431,12 @@ static void DisplayLoop()
 	//
 	DoScrollArea(MouseScrollState | KeyScrollState, (stored_key_modifiers & Qt::ControlModifier) != 0, MouseScrollState == 0 && KeyScrollState > 0, stored_key_modifiers);
 
-#ifdef REALVIDEO
-	if (FastForwardCycle > GameCycle && RealVideoSyncSpeed != VideoSyncSpeed) {
-		RealVideoSyncSpeed = VideoSyncSpeed;
-		VideoSyncSpeed = 3000;
-	}
-#endif
 	if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & 0x3f)) {
 		//FIXME: this might be better placed somewhere at front of the
 		// program, as we now still have a game on the background and
 		// need to go through the game-menu or supply a map file
 		UpdateDisplay();
 	}
-#ifdef REALVIDEO
-	if (FastForwardCycle == GameCycle) {
-		VideoSyncSpeed = RealVideoSyncSpeed;
-	}
-#endif
 }
 
 static void SingleGameLoop()
@@ -497,10 +481,6 @@ void GameMainLoop()
 	GameRunning = true;
 
 	CParticleManager::init();
-
-#ifdef REALVIDEO
-	RealVideoSyncSpeed = VideoSyncSpeed;
-#endif
 
 	CclCommand("if (GameStarting ~= nil) then GameStarting() end");
 
@@ -555,11 +535,6 @@ void GameMainLoop()
 
 	SingleGameLoop();
 
-#ifdef REALVIDEO
-	if (FastForwardCycle > GameCycle) {
-		VideoSyncSpeed = RealVideoSyncSpeed;
-	}
-#endif
 	NetworkQuitGame();
 	EndReplayLog();
 

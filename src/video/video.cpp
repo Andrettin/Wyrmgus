@@ -288,26 +288,9 @@ void DeInitVideo()
 {
 }
 
-/**
-**  Set the video sync speed
-**
-**  @param l  Lua state.
-*/
-static int CclSetVideoSyncSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	VideoSyncSpeed = LuaToNumber(l, 1);
-	return 0;
-}
-
-void VideoCclRegister()
-{
-	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
-}
-
 int get_scale_factor()
 {
-	return wyrmgus::defines::get()->get_scale_factor();
+	return defines::get()->get_scale_factor();
 }
 
 void pack_image_folder(const std::string &dir_path, const int frames_per_row)

@@ -70,7 +70,6 @@ void parameters::process()
 		{ { "p", "print-debug" }, "Enables debug messages printing in console." },
 		{ { "P", "port" }, "Network port to use.", "port" },
 		{ { "s", "sleep" }, "Number of frames for the AI to sleep before it starts.", "frames" },
-		{ { "S", "sync-rate" }, "Sync speed (100 = 30 frames/s).", "speed" },
 		{ { "u", "user-path" }, "Path where wyrmgus saves preferences, log and savegame", "path" },
 		{ { "m", "video-mode" }, "Video mode resolution in format <xres>x<yres>.", "mode" },
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -146,11 +145,6 @@ void parameters::process()
 	option = "s";
 	if (cmd_parser.isSet(option)) {
 		AiSleepCycles = cmd_parser.value(option).toInt();
-	}
-
-	option = "S";
-	if (cmd_parser.isSet(option)) {
-		VideoSyncSpeed = cmd_parser.value(option).toInt();
 	}
 
 	if (cmd_parser.isSet("t")) {

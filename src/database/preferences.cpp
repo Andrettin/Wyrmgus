@@ -40,6 +40,7 @@
 #include "util/log_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
+#include "video/video.h"
 
 namespace wyrmgus {
 
@@ -82,6 +83,7 @@ void preferences::save() const
 	sml_data data(preferences_path.filename().stem().string());
 
 	data.add_property("scale_factor", std::to_string(this->get_scale_factor()));
+	data.add_property("game_speed", std::to_string(this->get_game_speed()));
 	data.add_property("difficulty", difficulty_to_string(this->get_difficulty()));
 	data.add_property("sound_effects_enabled", string::from_bool(this->are_sound_effects_enabled()));
 	data.add_property("sound_effects_volume", std::to_string(this->get_sound_effects_volume()));
@@ -125,6 +127,14 @@ void preferences::initialize()
 	if (this->get_local_player_name().empty()) {
 		this->set_local_player_name_from_env();
 	}
+
+	this->update_video_sync_speed();
+}
+
+void preferences::update_video_sync_speed()
+{
+	VideoSyncSpeed = this->get_game_speed() * 100 / CYCLES_PER_SECOND;
+	SetVideoSync();
 }
 
 void preferences::set_sound_effects_volume(int volume)

@@ -30,9 +30,6 @@ extern bool GameRunning;
 extern void SetGamePaused(bool paused);
 extern bool GetGamePaused();
 extern tolua_property__s bool GamePaused;
-extern void SetGameSpeed(int speed);
-extern int GetGameSpeed();
-extern tolua_property__s int GameSpeed;
 extern bool GameObserve;
 extern bool GameEstablishing;
 

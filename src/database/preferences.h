@@ -41,6 +41,7 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_OBJECT
 
 	Q_PROPERTY(int scale_factor READ get_scale_factor WRITE set_scale_factor NOTIFY scale_factor_changed)
+	Q_PROPERTY(int game_speed READ get_game_speed WRITE set_game_speed NOTIFY game_speed_changed)
 	Q_PROPERTY(wyrmgus::difficulty difficulty READ get_difficulty WRITE set_difficulty)
 	Q_PROPERTY(bool sound_effects_enabled READ are_sound_effects_enabled WRITE set_sound_effects_enabled NOTIFY sound_effects_enabled_changed)
 	Q_PROPERTY(int sound_effects_volume READ get_sound_effects_volume WRITE set_sound_effects_volume NOTIFY sound_effects_volume_changed)
@@ -57,6 +58,8 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(QString local_player_name READ get_local_player_name_qstring WRITE set_local_player_name_qstring NOTIFY changed)
 
 public:
+	static constexpr int default_game_speed = 30;
+	static constexpr int min_game_speed = 1;
 	static constexpr int autosave_minutes = 5;
 
 	static std::filesystem::path get_path();
@@ -84,6 +87,38 @@ public:
 		this->scale_factor = factor;
 		emit scale_factor_changed();
 	}
+
+	int get_game_speed() const
+	{
+		return this->game_speed;
+	}
+
+	void set_game_speed(int speed)
+	{
+		speed = std::max(speed, preferences::min_game_speed);
+
+		if (speed == this->get_game_speed()) {
+			return;
+		}
+
+		this->game_speed = speed;
+
+		this->update_video_sync_speed();
+
+		emit game_speed_changed();
+	}
+
+	void change_game_speed(const int change)
+	{
+		this->set_game_speed(this->get_game_speed() + change);
+	}
+
+	void reset_game_speed()
+	{
+		this->set_game_speed(preferences::default_game_speed);
+	}
+
+	void update_video_sync_speed();
 
 	wyrmgus::difficulty get_difficulty() const
 	{
@@ -228,6 +263,7 @@ public:
 
 signals:
 	void scale_factor_changed();
+	void game_speed_changed();
 	void sound_effects_enabled_changed();
 	void sound_effects_volume_changed();
 	void music_enabled_changed();
@@ -236,6 +272,7 @@ signals:
 
 private:
 	int scale_factor = 1;
+	int game_speed = preferences::default_game_speed;
 	wyrmgus::difficulty difficulty;
 	bool sound_effects_enabled = true;
 	int sound_effects_volume = 128;

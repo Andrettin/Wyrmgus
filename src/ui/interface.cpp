@@ -349,14 +349,10 @@ static void UiIncreaseGameSpeed()
 	if (FastForwardCycle >= GameCycle) {
 		return;
 	}
-	VideoSyncSpeed += 10;
-	SetVideoSync();
-	//Wyrmgus start
-//	UI.StatusLine.Set(_("Faster"));
-	char buf[256];
-	snprintf(buf, sizeof(buf), _("Game speed increased to %d"), CYCLES_PER_SECOND * VideoSyncSpeed / 100);
-	UI.StatusLine.Set(buf);
-	//Wyrmgus end
+
+	preferences::get()->change_game_speed(1);
+
+	UI.StatusLine.Set("Game speed increased to " + std::to_string(preferences::get()->get_game_speed()));
 }
 
 /**
@@ -367,20 +363,14 @@ static void UiDecreaseGameSpeed()
 	if (FastForwardCycle >= GameCycle) {
 		return;
 	}
-	if (VideoSyncSpeed <= 10) {
-		if (VideoSyncSpeed > 1) {
-			--VideoSyncSpeed;
-		}
-	} else {
-		VideoSyncSpeed -= 10;
+
+	const int old_speed = preferences::get()->get_game_speed();
+	preferences::get()->change_game_speed(-1);
+	const int new_speed = preferences::get()->get_game_speed();
+
+	if (old_speed != new_speed) {
+		UI.StatusLine.Set("Game speed decreased to " + std::to_string(preferences::get()->get_game_speed()));
 	}
-	SetVideoSync();
-	//Wyrmgus start
-//	UI.StatusLine.Set(_("Slower"));
-	char buf[256];
-	snprintf(buf, sizeof(buf), _("Game speed decreased to %d"), CYCLES_PER_SECOND * VideoSyncSpeed / 100);
-	UI.StatusLine.Set(buf);
-	//Wyrmgus end
 }
 
 /**
@@ -391,12 +381,10 @@ static void UiSetDefaultGameSpeed()
 	if (FastForwardCycle >= GameCycle) {
 		return;
 	}
-	VideoSyncSpeed = 100;
-	SetVideoSync();
-	//Wyrmgus start
-//	UI.StatusLine.Set(_("Set default game speed"));
+
+	preferences::get()->reset_game_speed();
+
 	UI.StatusLine.Set(_("Default game speed set"));
-	//Wyrmgus end
 }
 
 /**

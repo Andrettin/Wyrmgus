@@ -1179,29 +1179,6 @@ bool GetGamePaused()
 	return GamePaused;
 }
 
-/**
-**  Set the game speed
-**
-**  @param speed  New game speed.
-*/
-void SetGameSpeed(int speed)
-{
-	if (GameCycle == 0 || FastForwardCycle < GameCycle) {
-		VideoSyncSpeed = speed * 100 / CYCLES_PER_SECOND;
-		SetVideoSync();
-	}
-}
-
-/**
-**  Get the game speed
-**
-**  @return  Game speed
-*/
-int GetGameSpeed()
-{
-	return CYCLES_PER_SECOND * VideoSyncSpeed / 100;
-}
-
 /*----------------------------------------------------------------------------
 --  Game types
 ----------------------------------------------------------------------------*/
@@ -2162,5 +2139,4 @@ void LuaRegisterModules()
 	UnitTypeCclRegister();
 	UpgradesCclRegister();
 	UserInterfaceCclRegister();
-	VideoCclRegister();
 }

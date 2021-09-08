@@ -402,7 +402,3 @@ extern void SelectedUnitChanged();
 extern void SetGamePaused(bool paused);
 /// Get the game paused or unpaused
 extern bool GetGamePaused();
-/// Set the game speed
-extern void SetGameSpeed(int speed);
-/// Get the game speed
-extern int GetGameSpeed();
