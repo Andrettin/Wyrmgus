@@ -37,6 +37,7 @@
 //Wyrmgus end
 #include "commands.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "engine_interface.h"
 #include "item/unique_item.h"
 #include "map/map.h"
@@ -1296,7 +1297,12 @@ void MouseScrollMap(const PixelPos &pos, const Qt::KeyboardModifiers key_modifie
 
 	const QPoint scroll_start_pos = cursor::get_last_scroll_pos() != QPoint(-1, -1) ? cursor::get_last_scroll_pos() : QPoint(CursorStartScreenPos);
 
-	const int speed = (key_modifiers & Qt::ControlModifier) ? UI.MouseScrollSpeedControl : UI.MouseScrollSpeedDefault;
+	int speed = (key_modifiers & Qt::ControlModifier) ? UI.MouseScrollSpeedControl : UI.MouseScrollSpeedDefault;
+
+	if (preferences::get()->is_reverse_mousewheel_scrolling_enabled()) {
+		speed *= -1;
+	}
+
 	const PixelDiff diff(pos - scroll_start_pos);
 
 	UI.MouseViewport->Set(UI.MouseViewport->MapPos, UI.MouseViewport->Offset + speed * diff);

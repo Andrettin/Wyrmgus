@@ -95,8 +95,10 @@ void preferences::save() const
 	data.add_property("pathlines", string::from_bool(this->are_pathlines_enabled()));
 	data.add_property("player_color_circle", string::from_bool(this->is_player_color_circle_enabled()));
 	data.add_property("resource_bar", string::from_bool(this->is_resource_bar_enabled()));
+	data.add_property("show_hotkeys", string::from_bool(this->is_show_hotkeys_enabled()));
 	data.add_property("show_messages", string::from_bool(this->is_show_messages_enabled()));
 	data.add_property("show_tips", string::from_bool(this->is_show_tips_enabled()));
+	data.add_property("reverse_mousewheel_scrolling", string::from_bool(this->is_reverse_mousewheel_scrolling_enabled()));
 	data.add_property("local_player_name", "\"" + string::escaped(this->get_local_player_name()) + "\"");
 
 	try {

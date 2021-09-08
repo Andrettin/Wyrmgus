@@ -41,6 +41,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "economy/resource.h"
 #include "game.h"
 //Wyrmgus start
@@ -1060,7 +1061,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 		//
 		//  Tutorial show command key in icons
 		//
-		if (ShowCommandKey) {
+		if (preferences::get()->is_show_hotkeys_enabled()) {
 			const int key = button->get_key();
 			if (key == gcn::Key::K_ESCAPE) {
 				str = "Esc";

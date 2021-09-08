@@ -113,22 +113,7 @@ CUnitInfoPanel::~CUnitInfoPanel()
 {
 }
 
-CUserInterface::CUserInterface() :
-	MouseScroll(false), KeyScroll(false), KeyScrollSpeed(1),
-	MouseScrollSpeed(1), MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
-	SingleSelectedButton(nullptr),
-	MaxSelectedFont(nullptr), MaxSelectedTextX(0), MaxSelectedTextY(0),
-	SingleTrainingButton(nullptr),
-	SingleTrainingFont(nullptr), SingleTrainingTextX(0), SingleTrainingTextY(0),
-	TrainingFont(nullptr), TrainingTextX(0), TrainingTextY(0),
-	IdleWorkerButton(nullptr), LevelUpUnitButton(nullptr),
-	CompletedBarColor(0), CompletedBarShadow(0),
-	MouseViewport(nullptr),
-	SelectedViewport(nullptr), NumViewports(0),
-	MessageFont(nullptr), MessageScrollSpeed(5),
-	CurrentMapLayer(nullptr), PreviousMapLayer(nullptr),
-	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
-	VictoryBackgroundG(nullptr), DefeatBackgroundG(nullptr)
+CUserInterface::CUserInterface()
 {
 	this->minimap = std::make_unique<wyrmgus::minimap>();
 	MouseWarpPos.x = MouseWarpPos.y = -1;
@@ -158,9 +143,6 @@ void InitUserInterface()
 {
 	ShowLoadProgress("%s", _("Loading User Interface..."));
 	
-	UI.Offset640X = (Video.Width - 640) / 2;
-	UI.Offset480Y = (Video.Height - 480) / 2;
-
 	//
 	// Calculations
 	//

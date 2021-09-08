@@ -252,7 +252,6 @@ public:
 	int Y = 0;
 	std::vector<CUIButton> Buttons;
 	CColor AutoCastBorderColorRGB;
-	bool ShowCommandKey = true;
 };
 
 class CResourceInfo
@@ -340,16 +339,16 @@ public:
 		return CYCLES_PER_SECOND;
 	}
 
-	bool MouseScroll;                   /// Enable mouse scrolling
-	bool KeyScroll;                     /// Enable keyboard scrolling
+	bool MouseScroll = false;                   /// Enable mouse scrolling
+	bool KeyScroll = false;                     /// Enable keyboard scrolling
 	/// Key Scroll Speed
-	int KeyScrollSpeed;
+	int KeyScrollSpeed = 1;
 	/// Mouse Scroll Speed (screenpixels per mousepixel)
-	int MouseScrollSpeed;
+	int MouseScrollSpeed = 1;
 	/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
-	int MouseScrollSpeedDefault;
+	int MouseScrollSpeedDefault = 0;
 	/// Middle-Mouse Scroll Speed with Control pressed
-	int MouseScrollSpeedControl;
+	int MouseScrollSpeedControl = 0;
 
 	PixelPos MouseWarpPos;				/// Cursor warp screen position
 
@@ -366,55 +365,55 @@ public:
 
 	std::vector<std::unique_ptr<CPopup>> ButtonPopups;	/// Popup windows for buttons
 
-	CUIButton *SingleSelectedButton;	/// Button for single selected unit
+	CUIButton *SingleSelectedButton = nullptr;	/// Button for single selected unit
 
 	std::vector<CUIButton> SelectedButtons;	/// Selected buttons
 	wyrmgus::font *MaxSelectedFont = nullptr; /// Font type to use
-	int MaxSelectedTextX;				/// position to place '+#' text
-	int MaxSelectedTextY;				/// if > maximum units selected
+	int MaxSelectedTextX = 0;				/// position to place '+#' text
+	int MaxSelectedTextY = 0;				/// if > maximum units selected
 
-	CUIButton *SingleTrainingButton;	/// Button for single training
+	CUIButton *SingleTrainingButton = nullptr;	/// Button for single training
 	std::string SingleTrainingText;		/// Text for single training
 	wyrmgus::font *SingleTrainingFont = nullptr; /// Font for single traning
-	int SingleTrainingTextX;			/// X text position single training
-	int SingleTrainingTextY;			/// Y text position single training
+	int SingleTrainingTextX = 0;			/// X text position single training
+	int SingleTrainingTextY = 0;			/// Y text position single training
 
 	std::vector<CUIButton> TrainingButtons;/// Training buttons
 	std::string TrainingText;           /// Multiple Training Text
 	wyrmgus::font *TrainingFont = nullptr; /// Multiple Training Font
-	int TrainingTextX;                  /// Multiple Training X Text position
-	int TrainingTextY;                  /// Multiple Training Y Text position
+	int TrainingTextX = 0;                  /// Multiple Training X Text position
+	int TrainingTextY = 0;                  /// Multiple Training Y Text position
 
-	CUIButton *UpgradingButton;         /// Button info for upgrade
+	CUIButton *UpgradingButton = nullptr;         /// Button info for upgrade
 
-	CUIButton *ResearchingButton;       /// Button info for researching
+	CUIButton *ResearchingButton = nullptr;       /// Button info for researching
 
 	std::vector<CUIButton> TransportingButtons;/// Button info for transporting
 
-	CUIButton *IdleWorkerButton;		/// Button for the idle worker notification
-	CUIButton *LevelUpUnitButton;		/// Button for the level up unit notification
+	CUIButton *IdleWorkerButton = nullptr;		/// Button for the idle worker notification
+	CUIButton *LevelUpUnitButton = nullptr;		/// Button for the level up unit notification
 	std::vector<CUIButton> HeroUnitButtons;	/// Button for the hero units
 	std::vector<CUIButton> InventoryButtons;	/// Button info for inventory items
 	
 	// Completed bar
 	CColor CompletedBarColorRGB;     /// color for completed bar
-	IntColor CompletedBarColor;      /// color for completed bar
-	bool CompletedBarShadow;         /// should complete bar have shadow
+	IntColor CompletedBarColor = 0;      /// color for completed bar
+	bool CompletedBarShadow = 0;         /// should complete bar have shadow
 
 	// Button panel
 	CButtonPanel ButtonPanel;
 
 	// Map area
-	CViewport *MouseViewport;           /// Viewport containing mouse
-	CViewport *SelectedViewport;        /// Current selected active viewport
-	int NumViewports;                   /// # Viewports currently used
+	CViewport *MouseViewport = nullptr;           /// Viewport containing mouse
+	CViewport *SelectedViewport = nullptr;        /// Current selected active viewport
+	int NumViewports = 0;                   /// # Viewports currently used
 	CViewport Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
 	CMapArea MapArea;                   /// geometry of the whole map area
 	wyrmgus::font *MessageFont = nullptr; /// Font used for messages
-	int MessageScrollSpeed;             /// Scroll speed in seconds for messages
+	int MessageScrollSpeed = 5;             /// Scroll speed in seconds for messages
 	
-	CMapLayer *CurrentMapLayer;
-	CMapLayer *PreviousMapLayer;
+	CMapLayer *CurrentMapLayer = nullptr;
+	CMapLayer *PreviousMapLayer = nullptr;
 
 	//Wyrmgus start
 	std::vector<CUIButton> WorldButtons;	/// Button info for world map layer buttons
@@ -426,14 +425,10 @@ public:
 private:
 	std::unique_ptr<wyrmgus::minimap> minimap;
 public:
-	IntColor ViewportCursorColor;       /// minimap cursor color
+	IntColor ViewportCursorColor = 0;       /// minimap cursor color
 
 	// The status line
 	CStatusLine StatusLine;             /// status line
-
-	// Offsets for 640x480 center used by menus
-	int Offset640X;                     /// Offset for 640x480 X position
-	int Offset480Y;                     /// Offset for 640x480 Y position
 
 	//
 	//  Cursors used.
