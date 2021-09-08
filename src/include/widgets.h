@@ -210,24 +210,6 @@ public:
 	bool mMouseDown = false;
 };
 
-class ImageSlider : public gcn::Slider
-{
-public:
-	explicit ImageSlider(double scaleEnd = 1.0);
-	ImageSlider(double scaleStart, double scaleEnd);
-
-	virtual void drawMarker(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
-	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
-
-	void setMarkerImage(const std::string &image_path);
-	void setBackgroundImage(const std::string &image_path);
-	void setDisabledBackgroundImage(const std::string &image_path);
-
-	std::shared_ptr<CGraphic> markerImage;
-	std::shared_ptr<CGraphic> backgroundImage;
-	std::shared_ptr<CGraphic> disabledBackgroundImage;
-};
-
 class MultiLineLabel final : public gcn::Widget
 {
 public:

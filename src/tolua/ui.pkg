@@ -359,36 +359,6 @@ class ImageCheckBox : public CheckBox
 	void setCheckedDisabledImage(const std::string image_path);
 };
 
-class Slider : public Widget
-{
-	Slider(double scaleEnd = 1.0);
-	Slider(double scaleStart, double scaleEnd);
-	virtual void setScale(double scaleStart, double scaleEnd);
-	virtual double getScaleStart() const;
-	virtual void setScaleStart(double scaleStart);
-	virtual double getScaleEnd() const;
-	virtual void setScaleEnd(double scaleEnd);
-	virtual double getValue();
-	virtual void setValue(double value);
-	virtual void setMarkerLength(int length);
-	virtual int getMarkerLength() const;
-	virtual void setOrientation(unsigned int orientation);
-	virtual unsigned int getOrientation() const;
-	virtual void setStepLength(double length);
-	virtual double getStepLength() const;
-
-	enum { HORIZONTAL = 0, VERTICAL };
-};
-
-class ImageSlider : public Slider
-{
-	ImageSlider(double scaleEnd = 1.0);
-	ImageSlider(double scaleStart, double scaleEnd);
-	void setMarkerImage(const std::string image_path);
-	void setBackgroundImage(const std::string image_path);
-	void setDisabledBackgroundImage(const std::string image_path);
-};
-
 class Label : public Widget
 {
 	Label(const std::string caption);
@@ -430,14 +400,6 @@ class TextField : public Widget
 	virtual std::string &getText();
 };
 
-class ListBox : public Widget
-{
-};
-
-class ImageListBox : public ListBox
-{
-};
-
 class ListBoxWidget : public ScrollArea
 {
 	ListBoxWidget(unsigned int width, unsigned int height);
@@ -459,10 +421,6 @@ class DropDown : public BasicContainer
 {
 	virtual int getSelected();
 	virtual void setSelected(int selected);
-	virtual void setScrollArea(ScrollArea* scrollArea);
-	virtual ScrollArea *getScrollArea();
-	virtual void setListBox(ListBox* listBox);
-	virtual ListBox *getListBox();
 	//Wyrmgus start
 	virtual const std::string &getTooltip() const;
 	//Wyrmgus end
@@ -472,7 +430,6 @@ class DropDownWidget : public DropDown
 {
 	DropDownWidget();
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual ListBox *getListBox();
 	virtual void setSize(int width, int height);
 };
 
@@ -480,7 +437,6 @@ class ImageDropDownWidget : public DropDown
 {
 	ImageDropDownWidget();
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual ListBox *getListBox();
 	virtual void setSize(int width, int height);
 	void setItemImage(const std::string image_path);
 	void setDownNormalImage(const std::string image_path);
