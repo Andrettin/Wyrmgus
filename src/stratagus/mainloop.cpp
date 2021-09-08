@@ -113,7 +113,7 @@ void DoScrollArea(int state, bool fast, bool isKeyboard, const Qt::KeyboardModif
 	static int remx = 0; // FIXME: docu
 	static int remy = 0; // FIXME: docu
 
-	int speed = isKeyboard ? UI.KeyScrollSpeed : UI.MouseScrollSpeed;
+	const int speed = isKeyboard ? preferences::get()->get_key_scroll_speed() : preferences::get()->get_mouse_scroll_speed();
 	
 	if (state == ScrollNone) {
 		return;

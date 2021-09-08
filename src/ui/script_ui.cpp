@@ -66,54 +66,6 @@ static int HandleCount = 1;		/// Lua handler count
 CPreference Preference;
 
 /**
-**  Set speed of key scroll
-**
-**  @param l  Lua state.
-*/
-static int CclSetKeyScrollSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	UI.KeyScrollSpeed = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Get speed of key scroll
-**
-**  @param l  Lua state.
-*/
-static int CclGetKeyScrollSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, UI.KeyScrollSpeed);
-	return 1;
-}
-
-/**
-**  Set speed of mouse scroll
-**
-**  @param l  Lua state.
-*/
-static int CclSetMouseScrollSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	UI.MouseScrollSpeed = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Get speed of mouse scroll
-**
-**  @param l  Lua state.
-*/
-static int CclGetMouseScrollSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, UI.MouseScrollSpeed);
-	return 1;
-}
-
-/**
 **  Set speed of middle-mouse scroll
 **
 **  @param l  Lua state.
@@ -1224,10 +1176,6 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "ClearObjectives", CclClearObjectives);
 	//Wyrmgus end
 
-	lua_register(Lua, "SetKeyScrollSpeed", CclSetKeyScrollSpeed);
-	lua_register(Lua, "GetKeyScrollSpeed", CclGetKeyScrollSpeed);
-	lua_register(Lua, "SetMouseScrollSpeed", CclSetMouseScrollSpeed);
-	lua_register(Lua, "GetMouseScrollSpeed", CclGetMouseScrollSpeed);
 	lua_register(Lua, "SetMouseScrollSpeedDefault", CclSetMouseScrollSpeedDefault);
 	lua_register(Lua, "GetMouseScrollSpeedDefault", CclGetMouseScrollSpeedDefault);
 	lua_register(Lua, "SetMouseScrollSpeedControl", CclSetMouseScrollSpeedControl);

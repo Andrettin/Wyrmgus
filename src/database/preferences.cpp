@@ -98,6 +98,8 @@ void preferences::save() const
 	data.add_property("show_hotkeys", string::from_bool(this->is_show_hotkeys_enabled()));
 	data.add_property("show_messages", string::from_bool(this->is_show_messages_enabled()));
 	data.add_property("show_tips", string::from_bool(this->is_show_tips_enabled()));
+	data.add_property("key_scroll_speed", std::to_string(this->get_key_scroll_speed()));
+	data.add_property("mouse_scroll_speed", std::to_string(this->get_mouse_scroll_speed()));
 	data.add_property("reverse_mousewheel_scrolling", string::from_bool(this->is_reverse_mousewheel_scrolling_enabled()));
 	data.add_property("local_player_name", "\"" + string::escaped(this->get_local_player_name()) + "\"");
 

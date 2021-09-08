@@ -341,10 +341,6 @@ public:
 
 	bool MouseScroll = false;                   /// Enable mouse scrolling
 	bool KeyScroll = false;                     /// Enable keyboard scrolling
-	/// Key Scroll Speed
-	int KeyScrollSpeed = 1;
-	/// Mouse Scroll Speed (screenpixels per mousepixel)
-	int MouseScrollSpeed = 1;
 	/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
 	int MouseScrollSpeedDefault = 0;
 	/// Middle-Mouse Scroll Speed with Control pressed
