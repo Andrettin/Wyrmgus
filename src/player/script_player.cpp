@@ -2334,6 +2334,9 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "AiEnabled")) {
 		lua_pushboolean(l, p->AiEnabled);
 		return 1;
+	} else if (!strcmp(data, "AiName")) {
+		lua_pushstring(l, p->AiName.c_str());
+		return 1;
 	} else if (!strcmp(data, "TotalNumUnits")) {
 		lua_pushnumber(l, p->GetUnitCount());
 		return 1;
@@ -2653,6 +2656,8 @@ static int CclSetPlayerData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "AiEnabled")) {
 		p->AiEnabled = LuaToBoolean(l, 3);
+	} else if (!strcmp(data, "AiName")) {
+		p->AiName = LuaToString(l, 3);
 	} else if (!strcmp(data, "Team")) {
 		p->Team = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "AcceptQuest")) {
