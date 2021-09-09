@@ -2193,7 +2193,9 @@ static int CclGetPlayerData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, p->Name.c_str());
 		return 1;
-	//Wyrmgus start
+	} else if (!strcmp(data, "RaceName")) {
+		lua_pushstring(l, p->get_civilization()->get_identifier().c_str());
+		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (p->get_faction() != nullptr) {
 			lua_pushstring(l, p->get_faction()->get_identifier().c_str());
@@ -2201,18 +2203,14 @@ static int CclGetPlayerData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
-	//Wyrmgus end
-	} else if (!strcmp(data, "RaceName")) {
-		lua_pushstring(l, wyrmgus::civilization::get_all()[p->Race]->get_identifier().c_str());
-		return 1;
-	//Wyrmgus start
+	} else if (!strcmp(data, "Type")) {
+		lua_pushnumber(l, p->Type);
 	} else if (!strcmp(data, "Color")) {
 		if (p->get_player_color() == nullptr) {
 			LuaError(l, "Player %d has no color." _C_ p->Index);
 		}
 		lua_pushstring(l, p->get_player_color()->get_identifier().c_str());
 		return 1;
-	//Wyrmgus end
 	} else if (!strcmp(data, "StartPosX")) {
 		lua_pushnumber(l, p->StartPos.x);
 	} else if (!strcmp(data, "StartPosY")) {
