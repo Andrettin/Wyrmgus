@@ -1226,6 +1226,8 @@ bool CPlayer::is_neutral_player() const
 void CPlayer::SetName(const std::string &name)
 {
 	this->Name = name;
+
+	emit name_changed();
 }
 
 const wyrmgus::civilization *CPlayer::get_civilization() const

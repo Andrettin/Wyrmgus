@@ -44,6 +44,7 @@
 #include "map/world.h"
 #include "network/network_manager.h"
 #include "player/faction.h"
+#include "player.h"
 #include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"
@@ -557,6 +558,11 @@ int engine_interface::get_max_map_width() const
 int engine_interface::get_max_map_height() const
 {
 	return MaxMapHeight;
+}
+
+QVariantList engine_interface::get_non_neutral_players() const
+{
+	return container::to_qvariant_list(CPlayer::get_non_neutral_players());
 }
 
 void engine_interface::set_current_interface_style(interface_style *interface_style)

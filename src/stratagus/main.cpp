@@ -41,6 +41,7 @@
 #include "parameters.h"
 #include "player/civilization_group.h"
 #include "player/faction.h"
+#include "player.h"
 #include "player_color.h"
 #include "quest/quest.h"
 #include "religion/pantheon.h"
@@ -109,6 +110,7 @@ int main(int argc, char **argv)
 		qmlRegisterType<CEditor>();
 		qmlRegisterType<civilization>();
 		qmlRegisterType<civilization_group>();
+		qmlRegisterType<CPlayer>();
 		qmlRegisterType<defines>();
 		qmlRegisterType<faction>();
 		qmlRegisterType<game>();

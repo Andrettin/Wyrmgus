@@ -86,6 +86,8 @@ class CPlayer final : public QObject
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QString name READ get_name_qstring NOTIFY name_changed)
+
 public:
 	static constexpr int max_quest_pool = 4;
 	static constexpr size_t max_current_quests = 4;
@@ -127,6 +129,11 @@ public:
 	}
 
 	bool is_neutral_player() const;
+
+	QString get_name_qstring() const
+	{
+		return QString::fromStdString(this->Name);
+	}
 
 	/// Change player name
 	void SetName(const std::string &name);
@@ -1020,6 +1027,9 @@ public:
 	void apply_civilization_history(const wyrmgus::civilization_base *civilization);
 
 	void add_settlement_to_explored_territory(const site *settlement);
+
+signals:
+	void name_changed();
 
 private:
 	std::vector<CUnit *> Units; /// units of this player
