@@ -471,7 +471,11 @@ void stratagusMain(int argc, char **argv)
 	LuaRegisterModules();
 
 	for (size_t p = CPlayer::Players.size(); p < PlayerMax; ++p) {
-		CPlayer::Players.push_back(make_qunique<CPlayer>(static_cast<int>(p)));
+		auto player = make_qunique<CPlayer>(static_cast<int>(p));
+
+		player->moveToThread(QApplication::instance()->thread());
+
+		CPlayer::Players.push_back(std::move(player));
 	}
 
 	// Initialise AI module
