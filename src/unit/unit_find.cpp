@@ -422,7 +422,7 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, const int range, const r
 		}
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		const CPlayer *other_player = CPlayer::Players[i];
+		const CPlayer *other_player = CPlayer::Players[i].get();
 		if (other_player->IsAllied(p) && p.IsAllied(*other_player)) {
 			for (const auto &kv_pair : other_player->get_units_by_type()) {
 				const wyrmgus::unit_type *unit_type = kv_pair.first;
@@ -552,7 +552,7 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 	//Wyrmgus start
 	if (only_unsettled_area) {
 		std::vector<CUnit *> table;
-		SelectAroundUnit(mine, 8, table, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+		SelectAroundUnit(mine, 8, table, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
 		if (table.size() > 0) {
 			return false;
 		}
@@ -732,7 +732,7 @@ CUnit *FindDeposit(const CUnit &unit, const int range, const resource *resource)
 		}
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		const CPlayer *other_player = CPlayer::Players[i];
+		const CPlayer *other_player = CPlayer::Players[i].get();
 		if (other_player->IsAllied(*unit.Player) && unit.Player->IsAllied(*other_player)) {
 			for (const auto &kv_pair : other_player->get_units_by_type()) {
 				const wyrmgus::unit_type *unit_type = kv_pair.first;
@@ -1551,7 +1551,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pre
 		std::vector<CUnit *> table;
 		SelectAroundUnit<circle>(*firstContainer, missile_range, table,
 			//Wyrmgus start
-//			MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), pred));
+//			MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::get_neutral_player()), pred));
 			pred);
 			//Wyrmgus end
 
@@ -1569,7 +1569,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pre
 
 		SelectAroundUnit<circle>(*firstContainer, range, table,
 			//Wyrmgus start
-//			MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), pred));
+//			MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::get_neutral_player()), pred));
 			pred);
 			//Wyrmgus end
 

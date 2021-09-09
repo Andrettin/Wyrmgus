@@ -83,8 +83,8 @@ int Spell_SpawnPortal::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, cons
 	} else {
 		portal = MakeUnitAndPlace(goalPos, *this->PortalType,
 								  //Wyrmgus start
-//								  CurrentPlayer ? caster.Player : CPlayer::Players[PlayerNumNeutral]);
-								  CurrentPlayer ? caster.Player : CPlayer::Players[PlayerNumNeutral], z);
+//								  CurrentPlayer ? caster.Player : CPlayer::get_neutral_player());
+								  CurrentPlayer ? caster.Player : CPlayer::get_neutral_player(), z);
 								  //Wyrmgus end
 		portal->Summoned = 1;
 	}

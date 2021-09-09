@@ -142,7 +142,7 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 	if (this->speaker != nullptr) {
 		speaker_unit = this->speaker->get_unit();
 	} else if (this->speaker_unit_type != nullptr) {
-		const CPlayer *speaker_player = CPlayer::Players[PlayerNumNeutral];
+		const CPlayer *speaker_player = CPlayer::get_neutral_player();
 		if (this->speaker_faction != nullptr) {
 			speaker_player = GetFactionPlayer(this->speaker_faction);
 		}

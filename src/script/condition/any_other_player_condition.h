@@ -36,9 +36,9 @@ class any_other_player_condition final : public scope_condition_base<CPlayer>
 public:
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
-		for (const CPlayer *scope_player : CPlayer::Players) {
-			if (scope_player != player && scope_player->is_alive() && !scope_player->is_neutral_player()) {
-				if (this->check_scope(scope_player, ignore_units)) {
+		for (const qunique_ptr<CPlayer> &scope_player : CPlayer::Players) {
+			if (scope_player.get() != player && scope_player->is_alive() && !scope_player->is_neutral_player()) {
+				if (this->check_scope(scope_player.get(), ignore_units)) {
 					return true;
 				}
 			}

@@ -84,7 +84,7 @@ void character_unit::create_at(const QPoint &pos, const int z) const
 		return;
 	}
 
-	CUnit *unit = CreateUnit(pos - unit_type->get_tile_center_pos_offset(), *unit_type, CPlayer::Players[PlayerNumNeutral], z);
+	CUnit *unit = CreateUnit(pos - unit_type->get_tile_center_pos_offset(), *unit_type, CPlayer::get_neutral_player(), z);
 	unit->Active = this->ai_active;
 }
 

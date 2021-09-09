@@ -1020,30 +1020,32 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	this->ApplyUnits(template_start_pos, map_start_pos, map_end, z, true);
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer && CPlayer::Players[i]->Type != PlayerRescueActive) {
+		CPlayer *player = CPlayer::Players[i].get();
+
+		if (player->Type != PlayerPerson && player->Type != PlayerComputer && player->Type != PlayerRescueActive) {
 			continue;
 		}
-		if (CMap::get()->is_point_in_a_subtemplate_area(CPlayer::Players[i]->StartPos, z)) {
+		if (CMap::get()->is_point_in_a_subtemplate_area(player->StartPos, z)) {
 			continue;
 		}
-		if (CPlayer::Players[i]->StartPos.x < map_start_pos.x() || CPlayer::Players[i]->StartPos.y < map_start_pos.y() || CPlayer::Players[i]->StartPos.x >= map_end.x() || CPlayer::Players[i]->StartPos.y >= map_end.y() || CPlayer::Players[i]->StartMapLayer != z) {
+		if (player->StartPos.x < map_start_pos.x() || player->StartPos.y < map_start_pos.y() || player->StartPos.x >= map_end.x() || player->StartPos.y >= map_end.y() || player->StartMapLayer != z) {
 			continue;
 		}
-		if (CPlayer::Players[i]->StartPos.x == 0 && CPlayer::Players[i]->StartPos.y == 0) {
+		if (player->StartPos.x == 0 && player->StartPos.y == 0) {
 			continue;
 		}
 
 		// add five workers at the player's starting location
-		if (CPlayer::Players[i]->NumTownHalls > 0) {
-			const unit_type *worker_type = CPlayer::Players[i]->get_faction()->get_class_unit_type(unit_class::get("worker"));
-			if (worker_type != nullptr && CPlayer::Players[i]->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
+		if (player->NumTownHalls > 0) {
+			const unit_type *worker_type = player->get_faction()->get_class_unit_type(unit_class::get("worker"));
+			if (worker_type != nullptr && player->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
 				const Vec2i worker_unit_offset((worker_type->get_tile_size() - QSize(1, 1)) / 2);
 				
-				Vec2i worker_pos(CPlayer::Players[i]->StartPos);
+				Vec2i worker_pos(player->StartPos);
 
 				const CUnit *worker_town_hall = nullptr;
 				std::vector<CUnit *> table;
-				Select(worker_pos - Vec2i(4, 4), worker_pos + Vec2i(4, 4), table, z, HasSamePlayerAs(*CPlayer::Players[i]));
+				Select(worker_pos - Vec2i(4, 4), worker_pos + Vec2i(4, 4), table, z, HasSamePlayerAs(*player));
 				for (size_t j = 0; j < table.size(); ++j) {
 					if (table[j]->Type->BoolFlag[TOWNHALL_INDEX].value) {
 						worker_town_hall = table[j];
@@ -1053,8 +1055,8 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				
 				if (worker_town_hall == nullptr) {
 					//if the start pos doesn't have a town hall, create the workers in the position of a town hall the player has
-					for (int j = 0; j < CPlayer::Players[i]->GetUnitCount(); ++j) {
-						CUnit *town_hall_unit = &CPlayer::Players[i]->GetUnit(j);
+					for (int j = 0; j < player->GetUnitCount(); ++j) {
+						CUnit *town_hall_unit = &player->GetUnit(j);
 
 						if (!town_hall_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
 							continue;
@@ -1070,14 +1072,14 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				}
 				
 				for (int j = 0; j < 5; ++j) {
-					CreateUnit(worker_pos - worker_unit_offset, *worker_type, CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer, false, worker_town_hall->settlement);
+					CreateUnit(worker_pos - worker_unit_offset, *worker_type, player, player->StartMapLayer, false, worker_town_hall->settlement);
 				}
 			}
 		}
 		
-		if (CPlayer::Players[i]->NumTownHalls > 0 || CPlayer::Players[i]->Index == CPlayer::GetThisPlayer()->Index) {
+		if (player->NumTownHalls > 0 || player == CPlayer::GetThisPlayer()) {
 			for (size_t j = 0; j < this->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
-				CMap::get()->generate_neutral_units(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, CPlayer::Players[i]->StartPos - QPoint(8, 8), CPlayer::Players[i]->StartPos + QPoint(8, 8), true, z);
+				CMap::get()->generate_neutral_units(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, player->StartPos - QPoint(8, 8), player->StartPos + QPoint(8, 8), true, z);
 			}
 		}
 	}
@@ -1326,7 +1328,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
 			fprintf(stderr, "The site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
 		}
-		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::Players[PlayerNumNeutral], z, true, site->is_settlement() ? site : nullptr);
+		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::get_neutral_player(), z, true, site->is_settlement() ? site : nullptr);
 		unit->set_site(site);
 
 		if (site->is_settlement()) {
@@ -1726,7 +1728,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, CPlayer::Players[PlayerNumNeutral], z, true);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, CPlayer::get_neutral_player(), z, true);
 		if (std::get<3>(this->WorldConnectors[i])) {
 			unit->set_unique(std::get<3>(this->WorldConnectors[i]));
 		}
@@ -1794,7 +1796,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 					player->SetStartView(unit_pos, z);
 				}
 			} else {
-				player = CPlayer::Players[PlayerNumNeutral];
+				player = CPlayer::get_neutral_player();
 			}
 
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z, type->BoolFlag[BUILDING_INDEX].value && type->get_tile_width() > 1 && type->get_tile_height() > 1);
@@ -1839,7 +1841,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 					player->SetStartView(unit_pos, z);
 				}
 			} else {
-				player = CPlayer::Players[PlayerNumNeutral];
+				player = CPlayer::get_neutral_player();
 			}
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->get_unit_type(), player, z);
 			unit->set_character(hero);
@@ -1929,7 +1931,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				hero_player->SetStartView(hero_pos, z);
 			}
 		} else {
-			hero_player = CPlayer::Players[PlayerNumNeutral];
+			hero_player = CPlayer::get_neutral_player();
 		}
 		CUnit *unit = CreateUnit(hero_pos - character->get_unit_type()->get_tile_center_pos_offset(), *character->get_unit_type(), hero_player, z);
 		unit->set_character(character);
@@ -2019,7 +2021,7 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 			unit_player->SetStartView(unit_pos, z);
 		}
 	} else {
-		unit_player = CPlayer::Players[PlayerNumNeutral];
+		unit_player = CPlayer::get_neutral_player();
 	}
 
 	for (int i = 0; i < historical_unit->get_quantity(); ++i) {
@@ -2029,7 +2031,7 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 		}
 
 		//item units only use factions to generate special properties for them
-		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z, false, settlement);
+		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::get_neutral_player() : unit_player, z, false, settlement);
 
 		if (historical_unit->get_unique() != nullptr) {
 			unit->set_unique(historical_unit->get_unique());
@@ -2117,10 +2119,10 @@ void map_template::apply_character(character *character, const QPoint &template_
 			unit_player->SetStartView(unit_pos, z);
 		}
 	} else {
-		unit_player = CPlayer::Players[PlayerNumNeutral];
+		unit_player = CPlayer::get_neutral_player();
 	}
 
-	CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
+	CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::get_neutral_player() : unit_player, z);
 	unit->set_character(character);
 	if (!character->is_ai_active()) {
 		unit->Active = 0;

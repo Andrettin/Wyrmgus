@@ -149,7 +149,7 @@ void CallDialogue(const std::string &dialogue_ident, int player_index)
 {
 	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 
-	CPlayer *player = CPlayer::Players.at(player_index);
+	CPlayer *player = CPlayer::Players.at(player_index).get();
 	wyrmgus::context ctx;
 	ctx.current_player = player;
 
@@ -160,7 +160,7 @@ void CallDialogueNode(const std::string &dialogue_ident, int node, int player_in
 {
 	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 
-	CPlayer *player = CPlayer::Players.at(player_index);
+	CPlayer *player = CPlayer::Players.at(player_index).get();
 	wyrmgus::context ctx;
 	ctx.current_player = player;
 
@@ -171,7 +171,7 @@ void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, i
 {
 	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 
-	CPlayer *player = CPlayer::Players.at(player_index);
+	CPlayer *player = CPlayer::Players.at(player_index).get();
 	wyrmgus::context ctx;
 	ctx.current_player = player;
 

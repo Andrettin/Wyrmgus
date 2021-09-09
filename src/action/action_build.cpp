@@ -299,7 +299,7 @@ static bool CheckLimit(const CUnit &unit, const wyrmgus::unit_type &type, const 
 					  //Wyrmgus start
 					  unit.MapLayer->ID,
 //					  _("Not enough resources to build %s"), type.Name.c_str());
-					  _("Not enough resources to build %s"), type.GetDefaultName(CPlayer::Players[player.Index]).c_str());
+					  _("Not enough resources to build %s"), type.GetDefaultName(&player).c_str());
 					  //Wyrmgus end
 		isOk = false;
 	}
@@ -310,7 +310,7 @@ static bool CheckLimit(const CUnit &unit, const wyrmgus::unit_type &type, const 
 					  //Wyrmgus start
 					  unit.MapLayer->ID,
 //					  _("Can't build more units %s"), type.Name.c_str());
-					  _("Can't build more units %s"), type.GetDefaultName(CPlayer::Players[player.Index]).c_str());
+					  _("Can't build more units %s"), type.GetDefaultName(&player).c_str());
 					  //Wyrmgus end
 		isOk = false;
 	}

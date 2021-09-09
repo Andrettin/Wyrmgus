@@ -624,7 +624,7 @@ void SendCommandResearch(CUnit &unit, const CUpgrade &what, int player, int flus
 {
 	if (!IsNetworkGame()) {
 		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what.get_identifier().c_str(), player);
-		CommandResearch(unit, what, CPlayer::Players[player], flush);
+		CommandResearch(unit, what, CPlayer::Players[player].get(), flush);
 	} else {
 		NetworkSendCommand(MessageCommandResearch, unit,
 						   what.ID, player, NoUnitP, nullptr, flush);
@@ -1020,7 +1020,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 					   //Wyrmgus end
 			//Wyrmgus start
 //			CommandResearch(unit, *CUpgrade::get_all()[arg1], status);
-			CommandResearch(unit, *CUpgrade::get_all()[arg1], CPlayer::Players[arg2], status);
+			CommandResearch(unit, *CUpgrade::get_all()[arg1], CPlayer::Players[arg2].get(), status);
 			//Wyrmgus end
 			break;
 		case MessageCommandCancelResearch:

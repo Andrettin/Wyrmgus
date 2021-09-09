@@ -1115,7 +1115,7 @@ text_processing_context character::get_text_processing_context() const
 
 CUnit *character::get_unit() const
 {
-	for (const CPlayer *player : CPlayer::Players) {
+	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
 		for (CUnit *character_unit : player->Heroes) {
 			if (character_unit->get_character() == this) {
 				return character_unit;

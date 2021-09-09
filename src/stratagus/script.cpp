@@ -820,7 +820,7 @@ static std::string CallLuaStringFunction(unsigned int handler)
 */
 static int GetPlayerData(const int player_index, const char *prop, const char *arg)
 {
-	const CPlayer *player = CPlayer::Players[player_index];
+	const CPlayer *player = CPlayer::Players[player_index].get();
 
 	if (!strcmp(prop, "RaceName")) {
 		return player->Race;

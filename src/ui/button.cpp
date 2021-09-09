@@ -490,7 +490,7 @@ void button::SetTriggerData() const
 			TriggerData.Upgrade = TriggerData.dynasty->get_upgrade();
 			break;
 		case ButtonCmd::Player:
-			TriggerData.player = CPlayer::Players.at(this->Value);
+			TriggerData.player = CPlayer::Players.at(this->Value).get();
 			break;
 		case ButtonCmd::Tile:
 			TriggerData.tile = CMap::get()->Field(this->Value, UI.CurrentMapLayer->ID);

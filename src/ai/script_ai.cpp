@@ -1521,7 +1521,7 @@ static int CclDefineAiPlayer(lua_State *l)
 
 	CPlayer::Players[playerIdx]->Ai = std::make_unique<PlayerAi>();
 	PlayerAi *ai = CPlayer::Players[playerIdx]->Ai.get();
-	ai->Player = CPlayer::Players[playerIdx];
+	ai->Player = CPlayer::Players[playerIdx].get();
 
 	// Parse the list: (still everything could be changed!)
 	const int args = lua_gettop(l);

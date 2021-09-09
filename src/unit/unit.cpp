@@ -1068,7 +1068,7 @@ void CUnit::apply_character_properties()
 
 	//load items
 	for (const auto &persistent_item : this->get_character()->get_items()) {
-		CUnit *item = MakeUnitAndPlace(this->tilePos, *persistent_item->get_unit_type(), CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+		CUnit *item = MakeUnitAndPlace(this->tilePos, *persistent_item->get_unit_type(), CPlayer::get_neutral_player(), this->MapLayer->ID);
 		if (persistent_item->Prefix != nullptr) {
 			item->SetPrefix(persistent_item->Prefix);
 		}
@@ -1819,7 +1819,7 @@ void CUnit::ApplyAura(int aura_index)
 	}
 	
 	table.clear();
-	SelectAroundUnit<true>(*this, aura_range, table, MakeOrPredicate(MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), HasSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
+	SelectAroundUnit<true>(*this, aura_range, table, MakeOrPredicate(MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), HasSamePlayerAs(*CPlayer::get_neutral_player())));
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->UnitInside) {
 			CUnit *uins = table[i]->UnitInside;
@@ -2173,9 +2173,9 @@ void CUnit::GenerateDrop()
 		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && this->MapLayer->Field(drop_pos)->has_flag(tile_flag::item)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
 			Vec2i resPos;
 			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer->ID);
-			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, CPlayer::get_neutral_player(), this->MapLayer->ID);
 		} else {
-			droppedUnit = MakeUnitAndPlace(drop_pos, *chosen_drop, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+			droppedUnit = MakeUnitAndPlace(drop_pos, *chosen_drop, CPlayer::get_neutral_player(), this->MapLayer->ID);
 		}
 			
 		if (droppedUnit != nullptr) {
@@ -2632,11 +2632,11 @@ void CUnit::UpdateSoldUnits()
 		CUnit *new_unit = nullptr;
 		if (!potential_heroes.empty()) {
 			wyrmgus::character *chosen_hero = wyrmgus::vector::take_random(potential_heroes);
-			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->get_unit_type(), CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->get_unit_type(), CPlayer::get_neutral_player(), this->MapLayer->ID);
 			new_unit->set_character(chosen_hero);
 		} else {
 			const wyrmgus::unit_type *chosen_unit_type = wyrmgus::vector::get_random(potential_items);
-			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::get_neutral_player(), this->MapLayer->ID);
 			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
 			new_unit->Identified = true;
 			if (new_unit->get_unique() != nullptr && this->Player == CPlayer::GetThisPlayer()) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
@@ -3679,7 +3679,7 @@ void CUnit::UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settleme
 		return;
 	}
 		
-	for (const CPlayer *player : CPlayer::Players) {
+	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
 		if (!player->has_neutral_faction_type() && this->Player->Index != player->Index) {
 			continue;
 		}
@@ -3958,7 +3958,7 @@ CUnit *CreateUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *pla
 
 CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int z, bool allow_unique)
 {
-	CUnit *unit = CreateUnit(pos, type, CPlayer::Players[PlayerNumNeutral], z, true);
+	CUnit *unit = CreateUnit(pos, type, CPlayer::get_neutral_player(), z, true);
 	unit->GenerateSpecialProperties(nullptr, nullptr, allow_unique);
 			
 	// create metal rocks near metal resources
@@ -3977,7 +3977,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int 
 	if (metal_rock_type) {
 		const Vec2i metal_rock_offset((type.get_tile_size() - QSize(1, 1)) / 2);
 		for (int i = 0; i < 9; ++i) {
-			CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, CPlayer::Players[PlayerNumNeutral], z);
+			CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, CPlayer::get_neutral_player(), z);
 		}
 	}
 			
@@ -4327,7 +4327,7 @@ void UnitLost(CUnit &unit)
 	//Wyrmgus end
 	if (b != nullptr) {
 		if (b->ReplaceOnDie && (type.get_given_resource() == nullptr || unit.ResourcesHeld != 0) && unit.MapLayer != nullptr) {
-			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
+			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, CPlayer::get_neutral_player(), unit.MapLayer->ID);
 			if (temp == nullptr) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
@@ -4636,12 +4636,12 @@ void UnitCountSeen(CUnit &unit)
 				wyrmgus::tile *mf = unit.MapLayer->Field(index);
 				int x = width;
 				do {
-					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != CPlayer::Players[p]) {
+					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != CPlayer::Players[p].get()) {
 						if (mf->player_info->VisCloak[p]) {
 							newv++;
 						}
 					//Wyrmgus start
-					} else if (unit.Type->BoolFlag[ETHEREAL_INDEX].value && unit.Player != CPlayer::Players[p]) {
+					} else if (unit.Type->BoolFlag[ETHEREAL_INDEX].value && unit.Player != CPlayer::Players[p].get()) {
 						if (mf->player_info->VisEthereal[p]) {
 							newv++;
 						}
@@ -5033,7 +5033,7 @@ void RescueUnits()
 	NoRescueCheck = true;
 
 	//  Look if player could be rescued.
-	for (CPlayer *p : CPlayer::Players) {
+	for (const qunique_ptr<CPlayer> &p : CPlayer::Players) {
 		if (p->Type != PlayerRescuePassive && p->Type != PlayerRescueActive) {
 			continue;
 		}

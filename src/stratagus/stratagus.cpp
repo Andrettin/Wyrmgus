@@ -370,7 +370,9 @@ void Exit(int err)
 
 	fprintf(stdout, "%s", _("Thanks for playing " NAME ".\n"));
 
-	QMetaObject::invokeMethod(QApplication::instance(), [err] { QApplication::exit(err); }, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(QApplication::instance(), [err] { 
+		QApplication::exit(err); 
+	}, Qt::QueuedConnection);
 }
 
 #ifdef REDIRECT_OUTPUT
@@ -469,7 +471,7 @@ void stratagusMain(int argc, char **argv)
 	LuaRegisterModules();
 
 	for (size_t p = CPlayer::Players.size(); p < PlayerMax; ++p) {
-		CPlayer::Players.push_back(new CPlayer);
+		CPlayer::Players.push_back(make_qunique<CPlayer>());
 	}
 
 	// Initialise AI module

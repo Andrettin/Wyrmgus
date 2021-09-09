@@ -173,8 +173,8 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 	//Wyrmgus end
 	if (this->PlayerNeutral == 1) {
 		//Wyrmgus start
-//		MakeUnitAndPlace(resPos, type, CPlayer::[PlayerNumNeutral]);
-		target->ChangeOwner(*CPlayer::Players[PlayerNumNeutral]);
+//		MakeUnitAndPlace(resPos, type, CPlayer::get_neutral_player());
+		target->ChangeOwner(*CPlayer::get_neutral_player());
 		//Wyrmgus end
 	} else if (this->PlayerNeutral == 2) {
 		//Wyrmgus start

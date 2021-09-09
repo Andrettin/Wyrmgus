@@ -362,7 +362,7 @@
 int NumPlayers; //how many player slots used
 
 CPlayer *CPlayer::ThisPlayer = nullptr;
-std::vector<CPlayer *> CPlayer::Players; //all players in play
+std::vector<qunique_ptr<CPlayer>> CPlayer::Players; //all players in play
 
 PlayerRace PlayerRaces; //player races
 
@@ -510,21 +510,6 @@ void CPlayer::SetThisPlayer(CPlayer *player)
 CPlayer *CPlayer::GetThisPlayer()
 {
 	return CPlayer::ThisPlayer;
-}
-
-CPlayer *CPlayer::GetPlayer(const int index)
-{
-	if (index < 0) {
-		fprintf(stderr, "Cannot get player for index %d: the index is negative.\n", index);
-		return nullptr;
-	}
-
-	if (index >= PlayerMax) {
-		fprintf(stderr, "Cannot get player for index %d: the maximum value is %d.\n", index, PlayerMax);
-		return nullptr;
-	}
-
-	return CPlayer::Players[index];
 }
 
 const QColor &CPlayer::get_minimap_color() const
@@ -840,7 +825,8 @@ void CreatePlayer(int type)
 	if (NumPlayers == PlayerMax) {
 		return;
 	}
-	CPlayer *player = CPlayer::Players[NumPlayers];
+
+	const qunique_ptr<CPlayer> &player = CPlayer::Players[NumPlayers];
 	player->Index = NumPlayers;
 
 	player->Init(type);
@@ -852,9 +838,9 @@ CPlayer *GetFactionPlayer(const wyrmgus::faction *faction)
 		return nullptr;
 	}
 	
-	for (CPlayer *player : CPlayer::Players) {
+	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
 		if (player->get_faction() == faction) {
-			return player;
+			return player.get();
 		}
 	}
 	
@@ -871,7 +857,7 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 	// no player belonging to this faction, so let's make an unused player slot be created for it
 	
 	for (int i = 0; i < NumPlayers; ++i) {
-		CPlayer *player = CPlayer::Players[i];
+		const qunique_ptr<CPlayer> &player = CPlayer::Players[i];
 		if (player->Type == PlayerNobody) {
 			player->Type = PlayerComputer;
 			player->set_civilization(faction->get_civilization());
@@ -882,7 +868,8 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 			player->set_resource(defines::get()->get_wealth_resource(), 2500); // give the new player enough resources to start up
 			player->set_resource(resource::get_all()[WoodCost], 2500);
 			player->set_resource(resource::get_all()[StoneCost], 2500);
-			return player;
+
+			return player.get();
 		}
 	}
 	
@@ -905,7 +892,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 		}
 	}
 	if (NetPlayers && NumPlayers == NetLocalPlayerNumber) {
-		CPlayer::SetThisPlayer(CPlayer::Players[NetLocalPlayerNumber]);
+		CPlayer::SetThisPlayer(CPlayer::Players[NetLocalPlayerNumber].get());
 	}
 
 	if (NumPlayers == PlayerMax) {
@@ -962,7 +949,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	//  Calculate enemy/allied mask.
 	for (int i = 0; i < NumPlayers; ++i) {
-		CPlayer *other_player = CPlayer::Players[i];
+		const qunique_ptr<CPlayer> &other_player = CPlayer::Players[i];
 		switch (type) {
 			case PlayerNeutral:
 			case PlayerNobody:
@@ -3009,7 +2996,7 @@ void CPlayer::RemoveModifier(CUpgrade *modifier)
 bool CPlayer::at_war() const
 {
 	for (int i = 0; i < PlayerNumNeutral; ++i) {
-		const CPlayer *other_player = CPlayer::Players[i];
+		const CPlayer *other_player = CPlayer::Players[i].get();
 
 		if (other_player == this) {
 			continue;
@@ -3884,7 +3871,7 @@ void PlayersInitAi()
 void PlayersEachCycle()
 {
 	for (int player = 0; player < NumPlayers; ++player) {
-		CPlayer *p = CPlayer::Players[player];
+		const qunique_ptr<CPlayer> &p = CPlayer::Players[player];
 		
 		if (p->LostTownHallTimer && !p->is_revealed() && p->LostTownHallTimer < ((int) GameCycle) && CPlayer::GetThisPlayer()->HasContactWith(*p)) {
 			p->set_revealed(true);
@@ -3922,7 +3909,7 @@ void PlayersEachCycle()
 */
 void PlayersEachSecond(int playerIdx)
 {
-	CPlayer *player = CPlayer::Players[playerIdx];
+	const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
 
 	if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
 		for (const resource *resource : resource::get_all()) {
@@ -3951,7 +3938,7 @@ void PlayersEachSecond(int playerIdx)
 */
 void PlayersEachHalfMinute(int playerIdx)
 {
-	CPlayer *player = CPlayer::Players[playerIdx];
+	const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
 
 	if (player->AiEnabled) {
 		AiEachHalfMinute(*player);
@@ -3965,7 +3952,7 @@ void PlayersEachHalfMinute(int playerIdx)
 */
 void PlayersEachMinute(int playerIdx)
 {
-	CPlayer *player = CPlayer::Players[playerIdx];
+	const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
 
 	if (player->AiEnabled) {
 		AiEachMinute(*player);
@@ -3983,11 +3970,11 @@ void SetPlayersPalette()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (CPlayer::Players[i]->Faction == -1) {
-			CPlayer::Players[i]->player_color = wyrmgus::player_color::get_all()[SyncRand(wyrmgus::player_color::get_all().size())];
+			CPlayer::Players[i]->player_color = vector::get_random(player_color::get_all());
 		}
 	}
 
-	CPlayer::Players[PlayerNumNeutral]->player_color = wyrmgus::defines::get()->get_neutral_player_color();
+	CPlayer::get_neutral_player()->player_color = defines::get()->get_neutral_player_color();
 }
 
 /**

@@ -779,7 +779,7 @@ const player_color *tile::get_player_color() const
 		return this->get_owner()->get_player_color();
 	}
 
-	return CPlayer::Players[PlayerNumNeutral]->get_player_color();
+	return CPlayer::get_neutral_player()->get_player_color();
 }
 
 const world *tile::get_world() const

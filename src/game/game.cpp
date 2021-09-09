@@ -156,7 +156,7 @@ void game::apply_player_history()
 {
 	const CDate start_date = this->get_current_campaign()->get_start_date();
 
-	for (CPlayer *player : CPlayer::Players) {
+	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
 		if (player->Type == PlayerNobody || player->get_civilization() == nullptr || player->get_faction() == nullptr) {
 			continue;
 		}

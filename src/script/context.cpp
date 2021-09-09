@@ -44,10 +44,10 @@ void context_base<read_only>::process_sml_property(const sml_property &property)
 
 	if (key == "source_player") {
 		const int index = std::stoi(value);
-		this->source_player = CPlayer::Players[index];
+		this->source_player = CPlayer::Players[index].get();
 	} else if (key == "current_player") {
 		const int index = std::stoi(value);
-		this->current_player = CPlayer::Players[index];
+		this->current_player = CPlayer::Players[index].get();
 	} else if (key == "source_unit") {
 		const int slot = std::stoi(value);
 		this->source_unit = unit_manager::get()->GetSlotUnit(slot).acquire_ref();

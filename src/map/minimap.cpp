@@ -325,8 +325,8 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		const bool is_tile_water = mf.is_water() && !mf.is_river();
 		const bool is_tile_space = mf.is_space();
 
-		const CPlayer *player = CPlayer::Players[PlayerNumNeutral];
-		const CPlayer *realm_player = CPlayer::Players[PlayerNumNeutral];
+		const CPlayer *player = CPlayer::get_neutral_player();
+		const CPlayer *realm_player = CPlayer::get_neutral_player();
 
 		if (mf.get_owner() != nullptr) {
 			player = mf.get_owner();
@@ -339,12 +339,12 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 			realm_color = realm_player->get_minimap_color();
 			realm_with_non_land_color = realm_color;
 		} else {
-			if (player != CPlayer::Players[PlayerNumNeutral]) {
+			if (player != CPlayer::get_neutral_player()) {
 				with_non_land_color = player->get_minimap_color();
 				with_non_land_color.setAlpha(non_land_territory_alpha);
 			}
 
-			if (realm_player != CPlayer::Players[PlayerNumNeutral]) {
+			if (realm_player != CPlayer::get_neutral_player()) {
 				realm_with_non_land_color = realm_player->get_minimap_color();
 				realm_with_non_land_color.setAlpha(non_land_territory_alpha);
 			}
@@ -425,7 +425,7 @@ uint32_t minimap::get_terrain_unit_minimap_color(const CUnit *unit, const unit_t
 			if (center_tile->get_owner() != nullptr) {
 				color = center_tile->get_owner()->get_minimap_color();
 			} else {
-				color = CPlayer::Players[PlayerNumNeutral]->get_minimap_color();
+				color = CPlayer::get_neutral_player()->get_minimap_color();
 			}
 			break;
 		case minimap_mode::realms:
@@ -433,7 +433,7 @@ uint32_t minimap::get_terrain_unit_minimap_color(const CUnit *unit, const unit_t
 			if (center_tile->get_realm_owner() != nullptr) {
 				color = center_tile->get_realm_owner()->get_minimap_color();
 			} else {
-				color = CPlayer::Players[PlayerNumNeutral]->get_minimap_color();
+				color = CPlayer::get_neutral_player()->get_minimap_color();
 			}
 			break;
 		case minimap_mode::settlements:
@@ -796,7 +796,7 @@ bool minimap::is_mode_valid(const minimap_mode mode) const
 	switch (mode) {
 		case minimap_mode::realms:
 		case minimap_mode::realms_with_non_land:
-			for (const CPlayer *player : CPlayer::Players) {
+			for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
 				if (!player->is_alive()) {
 					continue;
 				}

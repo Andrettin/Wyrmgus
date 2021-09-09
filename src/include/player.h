@@ -33,6 +33,7 @@
 #include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/qunique_ptr.h"
 #include "vec2i.h"
 
 constexpr int DefaultTradeCost = 30;
@@ -79,8 +80,12 @@ namespace wyrmgus {
 	enum class vassalage_type;
 }
 
-class CPlayer
+constexpr int PlayerNumNeutral = PlayerMax - 1;  /// this is the neutral player slot
+
+class CPlayer final : public QObject
 {
+	Q_OBJECT
+
 public:
 	static constexpr int max_quest_pool = 4;
 	static constexpr size_t max_current_quests = 4;
@@ -88,9 +93,13 @@ public:
 
 	static void SetThisPlayer(CPlayer *player);
 	static CPlayer *GetThisPlayer();
-	static CPlayer *GetPlayer(const int index);
 
-	static std::vector<CPlayer *> Players;	//all players
+	static std::vector<qunique_ptr<CPlayer>> Players;	//all players
+
+	static CPlayer *get_neutral_player()
+	{
+		return CPlayer::Players[PlayerNumNeutral].get();
+	}
 
 	static const std::vector<const CPlayer *> &get_revealed_players()
 	{
@@ -870,7 +879,7 @@ public:
 	bool IsAllied(const CUnit &unit) const;
 	bool IsVisionSharing() const;
 
-	const wyrmgus::player_index_set &get_shared_vision() const
+	const player_index_set &get_shared_vision() const
 	{
 		return this->shared_vision;
 	}
@@ -1121,8 +1130,6 @@ enum PlayerTypes {
 	PlayerRescuePassive = 6,  /// rescued passive
 	PlayerRescueActive = 7    /// rescued  active
 };
-
-constexpr int PlayerNumNeutral = PlayerMax - 1;  /// this is the neutral player slot
 
 /**
 **  Notify types. Noties are send to the player.

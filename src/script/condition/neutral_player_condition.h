@@ -38,7 +38,7 @@ public:
 	{
 		Q_UNUSED(player)
 
-		return CPlayer::Players[PlayerNumNeutral];
+		return CPlayer::get_neutral_player();
 	}
 
 	virtual std::string get_scope_name() const override

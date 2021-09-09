@@ -92,7 +92,7 @@ bool COrder_Research::ParseSpecificData(lua_State *l, int &j, const char *value,
 	//Wyrmgus start
 	} else if (!strcmp(value, "player")) {
 		++j;
-		this->Player = CPlayer::Players[LuaToNumber(l, -1, j + 1)];
+		this->Player = CPlayer::Players[LuaToNumber(l, -1, j + 1)].get();
 	//Wyrmgus end
 	} else {
 		return false;

@@ -81,7 +81,7 @@ void delayed_effect_instance<scope_type>::process_sml_property(const sml_propert
 	} else if (key == "scope") {
 		const int scope_index = std::stoi(value);
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {
-			this->scope = CPlayer::Players[scope_index];
+			this->scope = CPlayer::Players[scope_index].get();
 		} else {
 			this->scope = unit_manager::get()->GetSlotUnit(scope_index).acquire_ref();
 		}

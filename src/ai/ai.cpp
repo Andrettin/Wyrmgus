@@ -339,11 +339,14 @@ static void AiCheckUnits()
 			if (i == AiPlayer->Player->Index) {
 				continue;
 			}
-			if (CPlayer::Players[i]->Type != PlayerComputer || !AiPlayer->Player->has_building_access(CPlayer::Players[i])) {
+
+			const CPlayer *other_player = CPlayer::Players[i].get();
+
+			if (other_player->Type != PlayerComputer || !AiPlayer->Player->has_building_access(other_player)) {
 				continue;
 			}
-			for (int j = 0; j < CPlayer::Players[i]->GetUnitCount(); ++j) {
-				CUnit *mercenary_building = &CPlayer::Players[i]->GetUnit(j);
+			for (int j = 0; j < other_player->GetUnitCount(); ++j) {
+				CUnit *mercenary_building = &other_player->GetUnit(j);
 				if (!mercenary_building || !mercenary_building->IsAliveOnMap() || !mercenary_building->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_building->IsVisible(*AiPlayer->Player)) {
 					continue;
 				}
@@ -371,10 +374,10 @@ static void AiCheckUnits()
 					if (
 						unit_stock > 0
 						&& !mercenary_type->BoolFlag[ITEM_INDEX].value
-						&& check_conditions(mercenary_type, CPlayer::Players[i])
+						&& check_conditions(mercenary_type, other_player)
 						&& AiPlayer->Player->CheckLimits(*mercenary_type) >= 1
 						&& !AiPlayer->Player->CheckUnitType(*mercenary_type, true)
-						&& (mercenary_type->get_unit_class() == nullptr || CPlayer::Players[i]->is_class_unit_type(mercenary_type))
+						&& (mercenary_type->get_unit_class() == nullptr || other_player->is_class_unit_type(mercenary_type))
 					) {
 						//see if there are any unit type requests for units of the same class as the mercenary
 						for (size_t k = 0; k < AiPlayer->UnitTypeBuilt.size(); ++k) {

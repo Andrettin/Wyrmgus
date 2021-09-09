@@ -226,7 +226,7 @@ void CMap::Reveal(bool only_person_players)
 		//  Reveal neutral buildings. Gold mines:)
 		if (unit->Player->Type == PlayerNeutral) {
 			for (int p = 0; p < PlayerMax; ++p) {
-				const CPlayer *player = CPlayer::Players[p];
+				const CPlayer *player = CPlayer::Players[p].get();
 				if (player->Type != PlayerNobody && (player->Type == PlayerPerson || !only_person_players) && !unit->is_seen_by_player(p)) {
 					UnitGoesOutOfFog(*unit, *player);
 					UnitGoesUnderFog(*unit, *player);
@@ -370,16 +370,16 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 		
 		std::vector<CUnit *> table;
 		if (player != nullptr) {
-			Select(random_pos - QPoint(32, 32), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
+			Select(random_pos - QPoint(32, 32), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::get_neutral_player())));
 		} else if (unit_type->get_given_resource() == nullptr) {
 			if (unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::Space))) {
-				Select(random_pos - QPoint(16, 16), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(16, 16), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+				Select(random_pos - QPoint(16, 16), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(16, 16), table, z, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
 			} else {
-				Select(random_pos - QPoint(8, 8), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+				Select(random_pos - QPoint(8, 8), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
 			}
 		} else if (unit_type->get_given_resource() != nullptr && !unit_type->BoolFlag[BUILDING_INDEX].value) {
 			//for non-building resources (i.e. wood piles), place them within a certain distance of player units, to prevent them from blocking the way
-			Select(random_pos - QPoint(4, 4), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+			Select(random_pos - QPoint(4, 4), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
 		}
 		
 		if (!table.empty()) {
@@ -3693,7 +3693,7 @@ void CMap::generate_settlement_territories(const int z)
 	this->process_settlement_territory_tiles(z);
 
 	//update the settlement of all buildings, as settlement territories have changed
-	for (const CPlayer *player : CPlayer::Players) {
+	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
 		if (!player->is_alive() || player->Index == PlayerNumNeutral) {
 			continue;
 		}
@@ -3834,7 +3834,7 @@ void CMap::generate_neutral_units(const wyrmgus::unit_type *unit_type, const int
 		if (unit_type->get_given_resource() != nullptr) {
 			CreateResourceUnit(unit_pos, *unit_type, z);
 		} else {
-			CreateUnit(unit_pos, *unit_type, CPlayer::Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->get_tile_width() > 1 && unit_type->get_tile_height() > 1);
+			CreateUnit(unit_pos, *unit_type, CPlayer::get_neutral_player(), z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->get_tile_width() > 1 && unit_type->get_tile_height() > 1);
 		}
 	}
 }

@@ -1849,7 +1849,7 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 		std::vector<const CPlayer *> listed_players;
 
 		for (int i = 0; i < PlayerMax - 1; ++i) {
-			const CPlayer *player = CPlayer::Players[i];
+			const CPlayer *player = CPlayer::Players[i].get();
 			if (player->Type != PlayerNobody && !player->has_neutral_faction_type() && CPlayer::GetThisPlayer()->HasContactWith(*player) && player->GetUnitCount() > 0) {
 				listed_players.push_back(player);
 			}

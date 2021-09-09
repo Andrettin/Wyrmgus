@@ -155,7 +155,7 @@ extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const w
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const bool on);
 /// Prepare diplomacy command
-extern void CommandDiplomacy(const int player, const wyrmgus::diplomacy_state state, const int other_player);
+extern void CommandDiplomacy(const int player_index, const diplomacy_state state, const int other_player_index);
 /// Prepare shared vision command
 extern void CommandSharedVision(int player, bool state, int opponent);
 

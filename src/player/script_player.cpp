@@ -95,7 +95,7 @@ extern CUnit *CclGetUnitFromRef(lua_State *l);
 */
 static CPlayer *CclGetPlayer(lua_State *l)
 {
-	return CPlayer::Players[LuaToNumber(l, -1)];
+	return CPlayer::Players[LuaToNumber(l, -1)].get();
 }
 
 /**
@@ -209,8 +209,8 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "overlord")) {
 			const int overlord_id = LuaToNumber(l, j + 1);
 			++j;
-			const wyrmgus::vassalage_type vassalage_type = wyrmgus::string_to_vassalage_type(LuaToString(l, j + 1));
-			this->set_overlord(CPlayer::Players[overlord_id], vassalage_type);
+			const wyrmgus::vassalage_type vassalage_type = string_to_vassalage_type(LuaToString(l, j + 1));
+			this->set_overlord(CPlayer::Players[overlord_id].get(), vassalage_type);
 		//Wyrmgus end
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {
@@ -560,7 +560,7 @@ static int CclSetThisPlayer(lua_State *l)
 	LuaCheckArgs(l, 1);
 	int plynr = LuaToNumber(l, 1);
 
-	CPlayer::SetThisPlayer(CPlayer::Players[plynr]);
+	CPlayer::SetThisPlayer(CPlayer::Players[plynr].get());
 	
 	//Wyrmgus start
 	UI.Load();

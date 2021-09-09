@@ -54,7 +54,7 @@ public:
 	{
 		Q_UNUSED(upper_scope)
 
-		return CPlayer::Players[PlayerNumNeutral];
+		return CPlayer::get_neutral_player();
 	}
 };
 

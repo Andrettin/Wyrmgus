@@ -544,15 +544,15 @@ void TriggersEachCycle()
 			bool triggered = false;
 			
 			if (current_trigger->Type == wyrmgus::trigger::TriggerType::GlobalTrigger) {
-				if (check_conditions(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
+				if (check_conditions(current_trigger, CPlayer::get_neutral_player())) {
 					triggered = true;
 					wyrmgus::context ctx;
-					ctx.current_player = CPlayer::Players[PlayerNumNeutral];
-					current_trigger->get_effects()->do_effects(CPlayer::Players[PlayerNumNeutral], ctx);
+					ctx.current_player = CPlayer::get_neutral_player();
+					current_trigger->get_effects()->do_effects(CPlayer::get_neutral_player(), ctx);
 				}
 			} else if (current_trigger->Type == wyrmgus::trigger::TriggerType::PlayerTrigger) {
 				for (int i = 0; i < PlayerNumNeutral; ++i) {
-					CPlayer *player = CPlayer::Players[i];
+					CPlayer *player = CPlayer::Players[i].get();
 					if (player->Type == PlayerNobody) {
 						continue;
 					}

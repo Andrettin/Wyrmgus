@@ -513,12 +513,12 @@ static void EditTiles(const Vec2i &pos, const terrain_type *terrain, int size, c
 **  @todo  FIXME: Check if the player has already a start-point.
 **  @bug   This function does not support mirror editing!
 */
-static void EditorActionPlaceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *player)
+static void EditorActionPlaceUnit(const Vec2i &pos, const unit_type &type, CPlayer *player)
 {
 	Assert(CMap::get()->Info->IsPointOnMap(pos, UI.CurrentMapLayer));
 
 	if (type.Neutral) {
-		player = CPlayer::Players[PlayerNumNeutral];
+		player = CPlayer::get_neutral_player();
 	}
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
@@ -1633,7 +1633,7 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 		if (CEditor::get()->CursorPlayer != -1) {
 			if (CMap::get()->Info->PlayerType[CEditor::get()->CursorPlayer] != PlayerNobody) {
 				CEditor::get()->SelectedPlayer = CEditor::get()->CursorPlayer;
-				CPlayer::SetThisPlayer(CPlayer::Players[CEditor::get()->SelectedPlayer]);
+				CPlayer::SetThisPlayer(CPlayer::Players[CEditor::get()->SelectedPlayer].get());
 			}
 			return;
 		}
@@ -1691,7 +1691,7 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
 						PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_success_sound(), MaxSampleVolume);
-						EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[CEditor::get()->SelectedPlayer]);
+						EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[CEditor::get()->SelectedPlayer].get());
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
@@ -1815,7 +1815,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::Keyb
 			break;
 		case '0':
 			if (UnitUnderCursor != nullptr) {
-				UnitUnderCursor->ChangeOwner(*CPlayer::Players[PlayerNumNeutral]);
+				UnitUnderCursor->ChangeOwner(*CPlayer::get_neutral_player());
 				UI.StatusLine.Set(_("Unit owner modified"));
 			}
 			break;
@@ -2112,7 +2112,7 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		} else if (CEditor::get()->State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
-					EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[CEditor::get()->SelectedPlayer]);
+					EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[CEditor::get()->SelectedPlayer].get());
 					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
 				}
@@ -2283,7 +2283,7 @@ void CEditor::Init()
 	}
 	//Wyrmgus end
 
-	CPlayer::SetThisPlayer(CPlayer::Players[0]);
+	CPlayer::SetThisPlayer(CPlayer::Players[0].get());
 
 	FlagRevealMap = 1; // editor without fog and all visible
 	CMap::get()->NoFogOfWar = true;

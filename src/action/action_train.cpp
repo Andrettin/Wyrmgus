@@ -356,7 +356,7 @@ void COrder_Train::Execute(CUnit &unit)
 		
 		//Wyrmgus start
 //		CUnit *newUnit = MakeUnit(nType, &player);
-		CUnit *newUnit = MakeUnit(nType, CPlayer::Players[owner_player]);
+		CUnit *newUnit = MakeUnit(nType, CPlayer::Players[owner_player].get());
 		//Wyrmgus end
 
 		if (newUnit == nullptr) { // No more memory :/

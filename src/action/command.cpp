@@ -1323,32 +1323,35 @@ void CommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const bool o
 **  @param state     New diplomacy state.
 **  @param opponent  Opponent.
 */
-void CommandDiplomacy(const int player, const wyrmgus::diplomacy_state state, const int other_player)
+void CommandDiplomacy(const int player_index, const wyrmgus::diplomacy_state state, const int other_player_index)
 {
+	CPlayer *player = CPlayer::Players[player_index].get();
+	CPlayer *other_player = CPlayer::Players[other_player_index].get();
+
 	switch (state) {
-		case wyrmgus::diplomacy_state::neutral:
-			CPlayer::Players[player]->SetDiplomacyNeutralWith(*CPlayer::Players[other_player]);
+		case diplomacy_state::neutral:
+			player->SetDiplomacyNeutralWith(*other_player);
 			break;
-		case wyrmgus::diplomacy_state::allied:
-			CPlayer::Players[player]->SetDiplomacyAlliedWith(*CPlayer::Players[other_player]);
+		case diplomacy_state::allied:
+			player->SetDiplomacyAlliedWith(*other_player);
 			break;
-		case wyrmgus::diplomacy_state::enemy:
-			CPlayer::Players[player]->SetDiplomacyEnemyWith(*CPlayer::Players[other_player]);
+		case diplomacy_state::enemy:
+			player->SetDiplomacyEnemyWith(*other_player);
 			break;
-		case wyrmgus::diplomacy_state::overlord:
-			CPlayer::Players[other_player]->set_overlord(CPlayer::Players[player], wyrmgus::vassalage_type::vassalage);
+		case diplomacy_state::overlord:
+			other_player->set_overlord(player, vassalage_type::vassalage);
 			break;
-		case wyrmgus::diplomacy_state::personal_union_overlord:
-			CPlayer::Players[other_player]->set_overlord(CPlayer::Players[player], wyrmgus::vassalage_type::personal_union);
+		case diplomacy_state::personal_union_overlord:
+			other_player->set_overlord(player, vassalage_type::personal_union);
 			break;
-		case wyrmgus::diplomacy_state::vassal:
-			CPlayer::Players[player]->set_overlord(CPlayer::Players[other_player], wyrmgus::vassalage_type::vassalage);
+		case diplomacy_state::vassal:
+			player->set_overlord(other_player, vassalage_type::vassalage);
 			break;
-		case wyrmgus::diplomacy_state::personal_union_vassal:
-			CPlayer::Players[player]->set_overlord(CPlayer::Players[other_player], wyrmgus::vassalage_type::personal_union);
+		case diplomacy_state::personal_union_vassal:
+			player->set_overlord(other_player, vassalage_type::personal_union);
 			break;
-		case wyrmgus::diplomacy_state::crazy:
-			CPlayer::Players[player]->SetDiplomacyCrazyWith(*CPlayer::Players[other_player]);
+		case diplomacy_state::crazy:
+			player->SetDiplomacyCrazyWith(*other_player);
 			break;
 	}
 }
@@ -1363,7 +1366,7 @@ void CommandDiplomacy(const int player, const wyrmgus::diplomacy_state state, co
 void CommandSharedVision(int player, bool state, int opponent)
 {
 	// Do a real hardcore seen recount. First we unmark EVERYTHING.
-	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+	for (CUnit *unit : unit_manager::get()->get_units()) {
 		if (!unit->Destroyed) {
 			MapUnmarkUnitSight(*unit);
 		}
@@ -1430,7 +1433,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 	}
 
 	// Do a real hardcore seen recount. Now we remark EVERYTHING
-	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+	for (CUnit *unit : unit_manager::get()->get_units()) {
 		if (!unit->Destroyed) {
 			MapMarkUnitSight(*unit);
 		}

@@ -640,7 +640,7 @@ static int CclCheckDependency(lua_State *l)
 	if (plynr == -1) {
 		LuaError(l, "bad player: %i" _C_ plynr);
 	}
-	const CPlayer *player = CPlayer::Players[plynr];
+	const CPlayer *player = CPlayer::Players[plynr].get();
 	
 	if (!strncmp(object, "unit", 4)) {
 		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(object);

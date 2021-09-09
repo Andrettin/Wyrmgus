@@ -132,7 +132,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	std::vector<CUnit *> table;
 	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
 	Vec2i maxpos = pos + Vec2i(unit.Type->get_tile_size() - QSize(1, 1) + QSize(attackrange, attackrange));
-	Select(minpos, maxpos, table, unit.MapLayer->ID, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+	Select(minpos, maxpos, table, unit.MapLayer->ID, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit *dest = table[i];
 		const wyrmgus::unit_type &dtype = *dest->Type;
@@ -208,7 +208,7 @@ public:
 		if constexpr (FIND_TYPE == AIATTACK_RANGE) {
 			//Wyrmgus start
 //			*enemy = AttackUnitsInReactRange(*unit);
-			*enemy = AttackUnitsInReactRange(*unit, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), IncludeNeutral);
+			*enemy = AttackUnitsInReactRange(*unit, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), IncludeNeutral);
 			//Wyrmgus end
 		//Wyrmgus start
 		} else {
@@ -230,12 +230,12 @@ public:
 		/*
 		} else if (FIND_TYPE == AIATTACK_ALLMAP) {
 //			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), false, IncludeNeutral);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), false, IncludeNeutral);
 			//Wyrmgus end
 		} else if (FIND_TYPE == AIATTACK_BUILDING) {
 			//Wyrmgus start
 //			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), IsBuildingType()), false, IncludeNeutral);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::get_neutral_player()), IsBuildingType()), false, IncludeNeutral);
 			//Wyrmgus end
 			//Wyrmgus start
 			//why make sure the enemy is null?
@@ -244,13 +244,13 @@ public:
 			if (*enemy == nullptr || !(*enemy)->Type->BoolFlag[BUILDING_INDEX].value) {
 				//Wyrmgus start
 //				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), false, IncludeNeutral);
+				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), false, IncludeNeutral);
 				//Wyrmgus end
 			}
 		} else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
 			//Wyrmgus start
 //			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), IsAggresiveUnit()), false, IncludeNeutral);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::get_neutral_player()), IsAggresiveUnit()), false, IncludeNeutral);
 			//Wyrmgus end
 			//Wyrmgus start
 			//why ask that the enemy be null?
@@ -259,7 +259,7 @@ public:
 			if (*enemy == nullptr) {
 				//Wyrmgus start
 //				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), false, IncludeNeutral);
+				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), false, IncludeNeutral);
 				//Wyrmgus end
 			}
 		*/
