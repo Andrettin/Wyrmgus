@@ -2542,9 +2542,11 @@ static int CclSetPlayerData(lua_State *l)
 		} else {
 			p->SetFaction(wyrmgus::faction::try_get(faction_name));
 		}
+	} else if (!strcmp(data, "Type")) {
+		p->Type = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "Dynasty")) {
 		const std::string dynasty_ident = LuaToString(l, 3);
-		p->set_dynasty(wyrmgus::dynasty::get(dynasty_ident));
+		p->set_dynasty(dynasty::get(dynasty_ident));
 	//Wyrmgus end
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 4);
