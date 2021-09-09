@@ -440,7 +440,6 @@ std::string PlayerRace::TranslateName(const std::string &name, const wyrmgus::la
 void InitPlayers()
 {
 	for (int p = 0; p < PlayerMax; ++p) {
-		CPlayer::Players[p]->Index = p;
 		if (!CPlayer::Players[p]->Type) {
 			CPlayer::Players[p]->Type = PlayerNobody;
 		}
@@ -481,8 +480,11 @@ void SavePlayers(CFile &file)
 	file.printf("SetThisPlayer(%d)\n\n", CPlayer::GetThisPlayer()->Index);
 }
 
-CPlayer::CPlayer()
+CPlayer::CPlayer(const int index) : Index(index)
 {
+	if (index != PlayerNumNeutral) {
+		CPlayer::non_neutral_players.push_back(this);
+	}
 }
 
 CPlayer::~CPlayer()
@@ -827,7 +829,6 @@ void CreatePlayer(int type)
 	}
 
 	const qunique_ptr<CPlayer> &player = CPlayer::Players[NumPlayers];
-	player->Index = NumPlayers;
 
 	player->Init(type);
 }
@@ -2262,7 +2263,6 @@ std::vector<const CUpgrade *> CPlayer::GetResearchableUpgrades()
 */
 void CPlayer::Clear()
 {
-	this->Index = 0;
 	this->Name.clear();
 	this->Type = 0;
 	this->Race = wyrmgus::defines::get()->get_neutral_civilization()->ID;

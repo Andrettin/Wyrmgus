@@ -108,7 +108,6 @@ static int CclPlayer(lua_State *l)
 	int i = LuaToNumber(l, 1);
 
 	CPlayer &player = *CPlayer::Players[i];
-	player.Index = i;
 
 	if (NumPlayers <= i) {
 		NumPlayers = i + 1;

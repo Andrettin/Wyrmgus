@@ -101,6 +101,12 @@ public:
 		return CPlayer::Players[PlayerNumNeutral].get();
 	}
 
+	static const std::vector<CPlayer *> &get_non_neutral_players()
+	{
+		//get the players other than the neutral player
+		return CPlayer::non_neutral_players;
+	}
+
 	static const std::vector<const CPlayer *> &get_revealed_players()
 	{
 		return CPlayer::revealed_players;
@@ -108,10 +114,11 @@ public:
 
 private:
 	static CPlayer *ThisPlayer; //player on local computer
+	static inline std::vector<CPlayer *> non_neutral_players;
 	static inline std::vector<const CPlayer *> revealed_players;
 
 public:
-	CPlayer();
+	explicit CPlayer(const int index);
 	~CPlayer();
 
 	int get_index() const
