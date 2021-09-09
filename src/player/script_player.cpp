@@ -2213,6 +2213,10 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushstring(l, p->get_player_color()->get_identifier().c_str());
 		return 1;
 	//Wyrmgus end
+	} else if (!strcmp(data, "StartPosX")) {
+		lua_pushnumber(l, p->StartPos.x);
+	} else if (!strcmp(data, "StartPosY")) {
+		lua_pushnumber(l, p->StartPos.y);
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 3);
 
