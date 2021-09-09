@@ -2453,6 +2453,21 @@ static int CclGetPlayerData(lua_State *l)
 		}
 		return 1;
 	//Wyrmgus start
+	} else if (!strcmp(data, "IsAllied")) {
+		LuaCheckArgs(l, 3);
+		int second_player = LuaToNumber(l, 3);
+		lua_pushboolean(l, p->IsAllied(second_player));
+		return 1;
+	} else if (!strcmp(data, "IsEnemy")) {
+		LuaCheckArgs(l, 3);
+		int second_player = LuaToNumber(l, 3);
+		lua_pushboolean(l, p->IsEnemy(second_player));
+		return 1;
+	} else if (!strcmp(data, "HasSharedVisionWith")) {
+		LuaCheckArgs(l, 3);
+		int second_player = LuaToNumber(l, 3);
+		lua_pushboolean(l, p->has_shared_vision_with(second_player));
+		return 1;
 	} else if (!strcmp(data, "HasContactWith")) {
 		LuaCheckArgs(l, 3);
 		int second_player = LuaToNumber(l, 3);
