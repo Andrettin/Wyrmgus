@@ -38,6 +38,7 @@
 #include "map/tile_flag.h"
 #include "missile.h"
 #include "pathfinder.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "script.h"
 #include "spell/spell.h"
@@ -1043,7 +1044,7 @@ private:
 		if (
 			(
 				!attacker->IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player == dest->Player)
+				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->get_type() == player_type::neutral || attacker->Player == dest->Player)
 			)
 		//Wyrmgus end
 			|| !dest->IsVisibleAsGoal(player)
@@ -1221,7 +1222,7 @@ public:
 //			if (!player.IsEnemy(*dest)) { // a friend or neutral
 			if (
 				!attacker->IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player == dest->Player)
+				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->get_type() == player_type::neutral || attacker->Player == dest->Player)
 			) {
 			//Wyrmgus end
 				dest->CacheLock = 1;

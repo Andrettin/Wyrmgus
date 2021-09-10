@@ -78,6 +78,7 @@
 #include "player/faction.h"
 #include "player/faction_history.h"
 #include "player/faction_type.h"
+#include "player/player_type.h"
 #include "player/vassalage_type.h"
 #include "player_color.h"
 #include "quest/campaign.h"
@@ -149,14 +150,6 @@
 **
 **    Name of the player used for displays and network game.
 **    It is restricted to 15 characters plus final zero.
-**
-**  CPlayer::Type
-**
-**    Type of the player. This field is setup from the level (map).
-**    We support currently #PlayerNeutral,
-**    #PlayerNobody, #PlayerComputer, #PlayerPerson,
-**    #PlayerRescuePassive and #PlayerRescueActive.
-**    @see #PlayerTypes.
 **
 **  CPlayer::RaceName
 **
@@ -440,8 +433,8 @@ std::string PlayerRace::TranslateName(const std::string &name, const wyrmgus::la
 void InitPlayers()
 {
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (!CPlayer::Players[p]->Type) {
-			CPlayer::Players[p]->Type = PlayerNobody;
+		if (CPlayer::Players[p]->get_type() == player_type::none) {
+			CPlayer::Players[p]->set_type(player_type::nobody);
 		}
 	}
 }
@@ -480,7 +473,7 @@ void SavePlayers(CFile &file)
 	file.printf("SetThisPlayer(%d)\n\n", CPlayer::GetThisPlayer()->get_index());
 }
 
-CPlayer::CPlayer(const int index) : index(index)
+CPlayer::CPlayer(const int index) : index(index), type(player_type::none)
 {
 	if (index != PlayerNumNeutral) {
 		CPlayer::non_neutral_players.push_back(this);
@@ -541,7 +534,7 @@ void CPlayer::Save(CFile &file) const
 	const CPlayer &p = *this;
 	file.printf("Player(%d,\n", this->get_index());
 	//Wyrmgus start
-	file.printf(" \"race\", \"%s\",", wyrmgus::civilization::get_all()[p.Race]->get_identifier().c_str());
+	file.printf(" \"race\", \"%s\",", p.get_civilization()->get_identifier().c_str());
 	if (p.Faction != -1) {
 		file.printf(" \"faction\", %d,", p.Faction);
 	}
@@ -562,16 +555,7 @@ void CPlayer::Save(CFile &file) const
 	}
 	//Wyrmgus end
 	file.printf("  \"name\", \"%s\",\n", p.get_name().c_str());
-	file.printf("  \"type\", ");
-	switch (p.Type) {
-		case PlayerNeutral:       file.printf("\"neutral\",");         break;
-		case PlayerNobody:        file.printf("\"nobody\",");          break;
-		case PlayerComputer:      file.printf("\"computer\",");        break;
-		case PlayerPerson:        file.printf("\"person\",");          break;
-		case PlayerRescuePassive: file.printf("\"rescue-passive\","); break;
-		case PlayerRescueActive:  file.printf("\"rescue-active\","); break;
-		default:                  file.printf("%d,", p.Type); break;
-	}
+	file.printf("  \"type\", \"%s\",", player_type_to_string(p.get_type()).c_str());
 	//Wyrmgus start
 //	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
 	//Wyrmgus end
@@ -824,7 +808,7 @@ void CPlayer::Save(CFile &file) const
 **
 **  @param type  Player type (Computer,Human,...).
 */
-void CreatePlayer(int type)
+void CreatePlayer(const player_type type)
 {
 	if (NumPlayers == PlayerMax) {
 		return;
@@ -861,8 +845,8 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 	
 	for (int i = 0; i < NumPlayers; ++i) {
 		const qunique_ptr<CPlayer> &player = CPlayer::Players[i];
-		if (player->Type == PlayerNobody) {
-			player->Type = PlayerComputer;
+		if (player->get_type() == player_type::nobody) {
+			player->set_type(player_type::computer);
 			player->set_civilization(faction->get_civilization());
 			player->SetFaction(faction);
 			player->AiEnabled = true;
@@ -879,7 +863,7 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 	throw std::runtime_error("Cannot add player for faction \"" + faction->get_identifier() + "\": no player slots available.");
 }
 
-void CPlayer::Init(/* PlayerTypes */ int type)
+void CPlayer::Init(player_type type)
 {
 	std::vector<CUnit *>().swap(this->Units);
 	std::vector<CUnit *>().swap(this->FreeWorkers);
@@ -887,11 +871,11 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	//  Take first slot for person on this computer,
 	//  fill other with computer players.
-	if (type == PlayerPerson && !NetPlayers) {
+	if (type == player_type::person && !NetPlayers) {
 		if (!CPlayer::GetThisPlayer()) {
 			CPlayer::SetThisPlayer(this);
 		} else {
-			type = PlayerComputer;
+			type = player_type::computer;
 		}
 	}
 	if (NetPlayers && NumPlayers == NetLocalPlayerNumber) {
@@ -912,22 +896,22 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	//  All person players are enemies.
 	int team;
 	switch (type) {
-		case PlayerNeutral:
-		case PlayerNobody:
+		case player_type::neutral:
+		case player_type::nobody:
 		default:
 			team = 0;
 			this->set_name("Neutral");
 			break;
-		case PlayerComputer:
+		case player_type::computer:
 			team = 1;
 			this->set_name("Computer");
 			break;
-		case PlayerPerson:
+		case player_type::person:
 			team = 2 + NumPlayers;
 			this->set_name("Person");
 			break;
-		case PlayerRescuePassive:
-		case PlayerRescueActive:
+		case player_type::rescue_passive:
+		case player_type::rescue_active:
 			// FIXME: correct for multiplayer games?
 			this->set_name("Computer");
 			team = 2 + NumPlayers;
@@ -935,7 +919,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	}
 	DebugPrint("CreatePlayer name %s\n" _C_ this->get_name().c_str());
 
-	this->Type = type;
+	this->set_type(type);
 	this->Race = wyrmgus::defines::get()->get_neutral_civilization()->ID;
 	this->Faction = -1;
 	this->faction_tier = wyrmgus::faction_tier::none;
@@ -954,41 +938,41 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	for (int i = 0; i < NumPlayers; ++i) {
 		const qunique_ptr<CPlayer> &other_player = CPlayer::Players[i];
 		switch (type) {
-			case PlayerNeutral:
-			case PlayerNobody:
+			case player_type::neutral:
+			case player_type::nobody:
 			default:
 				break;
-			case PlayerComputer:
+			case player_type::computer:
 				// Computer allied with computer and enemy of all persons.
 				// make computer players be hostile to each other by default
-				if (other_player->Type == PlayerComputer || other_player->Type == PlayerPerson || other_player->Type == PlayerRescueActive) {
+				if (other_player->get_type() == player_type::computer || other_player->get_type() == player_type::person || other_player->get_type() == player_type::rescue_active) {
 					this->enemies.insert(i);
 					other_player->enemies.insert(NumPlayers);
 				}
 				break;
-			case PlayerPerson:
+			case player_type::person:
 				// Humans are enemy of all?
-				if (other_player->Type == PlayerComputer || other_player->Type == PlayerPerson) {
+				if (other_player->get_type() == player_type::computer || other_player->get_type() == player_type::person) {
 					this->enemies.insert(i);
 					other_player->enemies.insert(NumPlayers);
-				} else if (other_player->Type == PlayerRescueActive || other_player->Type == PlayerRescuePassive) {
+				} else if (other_player->get_type() == player_type::rescue_active || other_player->get_type() == player_type::rescue_passive) {
 					this->allies.insert(i);
 					other_player->allies.insert(NumPlayers);
 				}
 				break;
-			case PlayerRescuePassive:
+			case player_type::rescue_passive:
 				// Rescue passive are allied with persons
-				if (other_player->Type == PlayerPerson) {
+				if (other_player->get_type() == player_type::person) {
 					this->allies.insert(i);
 					other_player->allies.insert(NumPlayers);
 				}
 				break;
-			case PlayerRescueActive:
+			case player_type::rescue_active:
 				// Rescue active are allied with persons and enemies of computer
-				if (other_player->Type == PlayerComputer) {
+				if (other_player->get_type() == player_type::computer) {
 					this->enemies.insert(i);
 					other_player->enemies.insert(NumPlayers);
-				} else if (other_player->Type == PlayerPerson) {
+				} else if (other_player->get_type() == player_type::person) {
 					this->allies.insert(i);
 					other_player->allies.insert(NumPlayers);
 				}
@@ -1033,7 +1017,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->HeroCooldownTimer = 0;
 	//Wyrmgus end
 
-	if (CPlayer::Players[NumPlayers]->Type == PlayerComputer || CPlayer::Players[NumPlayers]->Type == PlayerRescueActive) {
+	if (CPlayer::Players[NumPlayers]->get_type() == player_type::computer || CPlayer::Players[NumPlayers]->get_type() == player_type::rescue_active) {
 		this->AiEnabled = true;
 	} else {
 		this->AiEnabled = false;
@@ -1218,6 +1202,11 @@ void CPlayer::add_settlement_to_explored_territory(const site *settlement)
 		}
 		UnitCountSeen(*unit);
 	}
+}
+
+bool CPlayer::is_active() const
+{
+	return this->get_type() != player_type::nobody;
 }
 
 bool CPlayer::is_neutral_player() const
@@ -1694,7 +1683,7 @@ int CPlayer::get_player_color_usage_count(const wyrmgus::player_color *player_co
 	int count = 0;
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->get_index() != i && CPlayer::Players[i]->Faction != -1 && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->get_player_color() == player_color) {
+		if (this->get_index() != i && CPlayer::Players[i]->Faction != -1 && CPlayer::Players[i]->get_type() != player_type::nobody && CPlayer::Players[i]->get_player_color() == player_color) {
 			count++;
 		}		
 	}
@@ -2027,7 +2016,7 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->get_index() != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->get_civilization()->ID && CPlayer::Players[i]->Faction == faction->ID) {
+		if (this->get_index() != i && CPlayer::Players[i]->get_type() != player_type::nobody && CPlayer::Players[i]->Race == faction->get_civilization()->ID && CPlayer::Players[i]->Faction == faction->ID) {
 			// faction is already in use
 			return false;
 		}
@@ -2274,7 +2263,7 @@ std::vector<const CUpgrade *> CPlayer::GetResearchableUpgrades()
 void CPlayer::Clear()
 {
 	this->name.clear();
-	this->Type = 0;
+	this->set_type(player_type::none);
 	this->Race = wyrmgus::defines::get()->get_neutral_civilization()->ID;
 	this->Faction = -1;
 	this->faction_tier = wyrmgus::faction_tier::none;
@@ -3886,7 +3875,7 @@ void PlayersEachCycle()
 		if (p->LostTownHallTimer && !p->is_revealed() && p->LostTownHallTimer < ((int) GameCycle) && CPlayer::GetThisPlayer()->HasContactWith(*p)) {
 			p->set_revealed(true);
 			for (int j = 0; j < NumPlayers; ++j) {
-				if (player != j && CPlayer::Players[j]->Type != PlayerNobody) {
+				if (player != j && CPlayer::Players[j]->get_type() != player_type::nobody) {
 					CPlayer::Players[j]->Notify(_("%s's units have been revealed!"), p->get_name().c_str());
 				} else {
 					CPlayer::Players[j]->Notify("%s", _("Your units have been revealed!"));
@@ -4239,16 +4228,16 @@ bool CPlayer::IsEnemy(const CPlayer &player) const
 bool CPlayer::IsEnemy(const CUnit &unit) const
 {
 	if (
-		unit.Player->Type == PlayerNeutral
+		unit.Player->get_type() == player_type::neutral
 		&& (unit.Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit.Type->BoolFlag[PREDATOR_INDEX].value)
-		&& this->Type != PlayerNeutral
+		&& this->get_type() != player_type::neutral
 	) {
 		return true;
 	}
 	
 	if (
 		this != unit.Player
-		&& this->Type != PlayerNeutral
+		&& this->get_type() != player_type::neutral
 		&& unit.CurrentAction() == UnitAction::Attack
 		&& unit.CurrentOrder()->has_goal()
 		&& unit.CurrentOrder()->get_goal()->Player == this
@@ -4257,7 +4246,7 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 		return true;
 	}
 	
-	if (unit.Player != this && this->Type != PlayerNeutral && unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive() && !this->has_neutral_faction_type()) {
+	if (unit.Player != this && this->get_type() != player_type::neutral && unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive() && !this->has_neutral_faction_type()) {
 		return true;
 	}
 	
@@ -4356,7 +4345,7 @@ bool CPlayer::has_building_access(const CPlayer *player, const ButtonCmd button_
 		return false;
 	}
 
-	if (player->Type == PlayerNeutral) {
+	if (player->get_type() == player_type::neutral) {
 		return true;
 	}
 

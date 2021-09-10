@@ -51,6 +51,7 @@
 #include "map/tileset.h"
 #include "map/world.h"
 #include "player/faction.h"
+#include "player/player_type.h"
 //Wyrmgus start
 #include "province.h"
 //Wyrmgus end
@@ -884,28 +885,14 @@ static int CclDefinePlayerTypes(lua_State *l)
 			numplayers = i;
 			break;
 		}
-		const char *type = LuaToString(l, i + 1);
-		if (!strcmp(type, "neutral")) {
-			CMap::get()->Info->PlayerType[i] = PlayerNeutral;
-		} else if (!strcmp(type, "nobody")) {
-			CMap::get()->Info->PlayerType[i] = PlayerNobody;
-		} else if (!strcmp(type, "computer")) {
-			CMap::get()->Info->PlayerType[i] = PlayerComputer;
-		} else if (!strcmp(type, "person")) {
-			CMap::get()->Info->PlayerType[i] = PlayerPerson;
-		} else if (!strcmp(type, "rescue-passive")) {
-			CMap::get()->Info->PlayerType[i] = PlayerRescuePassive;
-		} else if (!strcmp(type, "rescue-active")) {
-			CMap::get()->Info->PlayerType[i] = PlayerRescueActive;
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ type);
-		}
+		const std::string type = LuaToString(l, i + 1);
+		CMap::get()->Info->player_types[i] = string_to_player_type(type);
 	}
 	for (int i = numplayers; i < PlayerMax - 1; ++i) {
-		CMap::get()->Info->PlayerType[i] = PlayerNobody;
+		CMap::get()->Info->player_types[i] = player_type::nobody;
 	}
 	if (numplayers < PlayerMax) {
-		CMap::get()->Info->PlayerType[PlayerMax - 1] = PlayerNeutral;
+		CMap::get()->Info->player_types[PlayerMax - 1] = player_type::neutral;
 	}
 	return 0;
 }

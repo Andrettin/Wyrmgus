@@ -52,6 +52,7 @@
 #include "map/tileset.h"
 #include "map/world.h"
 #include "map/world_game_data.h"
+#include "player/player_type.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -199,7 +200,7 @@ void CMap::Reveal(bool only_person_players)
 		for (int p = 0; p < PlayerMax; ++p) {
 			//Wyrmgus start
 //			playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
-			if (Players[p].Type == PlayerPerson || !only_person_players) {
+			if (Players[p].Type == player_type::person || !only_person_players) {
 				playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
 			}
 			//Wyrmgus end
@@ -212,7 +213,7 @@ void CMap::Reveal(bool only_person_players)
 			wyrmgus::tile &mf = *this->Field(i, z);
 			const std::unique_ptr<wyrmgus::tile_player_info> &player_info = mf.player_info;
 			for (int p = 0; p < PlayerMax; ++p) {
-				if (CPlayer::Players[p]->Type == PlayerPerson || !only_person_players) {
+				if (CPlayer::Players[p]->get_type() == player_type::person || !only_person_players) {
 					player_info->Visible[p] = std::max<unsigned short>(1, player_info->Visible[p]);
 				}
 			}
@@ -224,10 +225,10 @@ void CMap::Reveal(bool only_person_players)
 	//  Global seen recount. Simple and effective.
 	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
 		//  Reveal neutral buildings. Gold mines:)
-		if (unit->Player->Type == PlayerNeutral) {
+		if (unit->Player->get_type() == player_type::neutral) {
 			for (int p = 0; p < PlayerMax; ++p) {
 				const CPlayer *player = CPlayer::Players[p].get();
-				if (player->Type != PlayerNobody && (player->Type == PlayerPerson || !only_person_players) && !unit->is_seen_by_player(p)) {
+				if (player->get_type() != player_type::nobody && (player->get_type() == player_type::person || !only_person_players) && !unit->is_seen_by_player(p)) {
 					UnitGoesOutOfFog(*unit, *player);
 					UnitGoesUnderFog(*unit, *player);
 				}

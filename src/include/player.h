@@ -76,6 +76,7 @@ namespace wyrmgus {
 	enum class faction_tier;
 	enum class government_type;
 	enum class gender;
+	enum class player_type;
 	enum class resource_storage_type;
 	enum class vassalage_type;
 }
@@ -128,6 +129,23 @@ public:
 		return this->index;
 	}
 
+	player_type get_type() const
+	{
+		return this->type;
+	}
+
+	void set_type(const player_type type)
+	{
+		if (type == this->get_type()) {
+			return;
+		}
+
+		this->type = type;
+
+		emit type_changed();
+	}
+
+	bool is_active() const;
 	bool is_neutral_player() const;
 
 	const std::string &get_name() const
@@ -316,9 +334,8 @@ public:
 private:
 	const int index = 0;          /// player as number
 	std::string name;
-
+	player_type type; //type of the player (human, computer, ...)
 public:
-	int Type = 0; //type of the player (human, computer, ...)
 	int Race = 0; //race of the player (orc, human, ...)
 	int Faction = -1; //faction of the player
 private:
@@ -1028,7 +1045,7 @@ public:
 		return this->vassals;
 	}
 
-	void Init(/* PlayerTypes */ int type);
+	void Init(player_type type);
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
 
@@ -1039,6 +1056,7 @@ public:
 
 signals:
 	void name_changed();
+	void type_changed();
 
 private:
 	std::vector<CUnit *> Units; /// units of this player
@@ -1112,53 +1130,6 @@ public:
 };
 
 /**
-**  Types for the player
-**
-**  #PlayerNeutral
-**
-**    This player is controlled by the computer doing nothing.
-**
-**  #PlayerNobody
-**
-**    This player is unused. Nobody controls this player.
-**
-**  #PlayerComputer
-**
-**    This player is controlled by the computer. CPlayer::AiNum
-**    selects the AI strategy.
-**
-**  #PlayerPerson
-**
-**    This player is contolled by a person. This can be the player
-**    sitting on the local computer or player playing over the
-**    network.
-**
-**  #PlayerRescuePassive
-**
-**    This player does nothing, the game pieces just sit in the game
-**    (being passive)... when a person player moves next to a
-**    PassiveRescue unit/building, then it is "rescued" and becomes
-**    part of that persons team. If the city center is rescued, than
-**    all units of this player are rescued.
-**
-**  #PlayerRescueActive
-**
-**    This player is controlled by the computer. CPlayer::AiNum
-**    selects the AI strategy. Until it is rescued it plays like
-**    an ally. The first person which reaches units of this player,
-**    can rescue them. If the city center is rescued, than all units
-**    of this player are rescued.
-*/
-enum PlayerTypes {
-	PlayerNeutral = 2,        /// neutral
-	PlayerNobody  = 3,        /// unused slot
-	PlayerComputer = 4,       /// computer player
-	PlayerPerson = 5,         /// human player
-	PlayerRescuePassive = 6,  /// rescued passive
-	PlayerRescueActive = 7    /// rescued  active
-};
-
-/**
 **  Notify types. Noties are send to the player.
 */
 enum NotifyType {
@@ -1180,7 +1151,7 @@ extern void CleanPlayers();
 extern void SavePlayers(CFile &file);
 
 /// Create a new player
-extern void CreatePlayer(int type);
+extern void CreatePlayer(const player_type type);
 
 //Wyrmgus start
 extern CPlayer *GetFactionPlayer(const wyrmgus::faction *faction);
@@ -1212,3 +1183,13 @@ inline bool CanSelectMultipleUnits(const CPlayer &player)
 //Wyrmgus start
 extern void NetworkSetFaction(int player, const std::string &faction_name);
 extern bool IsNameValidForWord(const std::string &word_name);
+
+//for tolua++
+enum PlayerTypes {
+	PlayerNeutral = 2,
+	PlayerNobody = 3,
+	PlayerComputer = 4,
+	PlayerPerson = 5,
+	PlayerRescuePassive = 6,
+	PlayerRescueActive = 7,
+};

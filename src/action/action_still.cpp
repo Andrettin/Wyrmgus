@@ -46,6 +46,7 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "missile.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "script.h"
 #include "settings.h"
@@ -266,10 +267,10 @@ static bool LeaveShelter(CUnit &unit)
 	if (
 		!unit.Container
 		|| (unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)
-		|| (!unit.Player->AiEnabled && !(unit.Type->BoolFlag[FAUNA_INDEX].value && unit.Player->Type == PlayerNeutral))
+		|| (!unit.Player->AiEnabled && !(unit.Type->BoolFlag[FAUNA_INDEX].value && unit.Player->get_type() == player_type::neutral))
 		|| unit.Container->CanMove() //is a transporter, not a shelter
 		|| !unit.Container->Type->CanTransport() //is not a garrisonable building
-		|| (unit.Container->Type->BoolFlag[RECRUITHEROES_INDEX].value && unit.get_character() != nullptr && unit.Player->Type == PlayerNeutral) //if is a hireable hero in a hero recruitment building, don't leave it
+		|| (unit.Container->Type->BoolFlag[RECRUITHEROES_INDEX].value && unit.get_character() != nullptr && unit.Player->get_type() == player_type::neutral) //if is a hireable hero in a hero recruitment building, don't leave it
 	) {
 		return false;
 	}

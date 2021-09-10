@@ -39,6 +39,7 @@
 #include "network/network_state.h"
 #include "network.h"
 #include "parameters.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "script.h"
 #include "settings.h"
@@ -700,7 +701,7 @@ void NetworkServerStartGame()
 	std::array<int, PlayerMax> rev{};
 	int h = 0;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (CMap::get()->Info->PlayerType[i] == PlayerPerson) {
+		if (CMap::get()->Info->player_types[i] == player_type::person) {
 			rev[i] = h;
 			num[h++] = i;
 			DebugPrint("Slot %d is available for an interactive player (%d)\n" _C_ i _C_ rev[i]);
@@ -709,17 +710,17 @@ void NetworkServerStartGame()
 	// Make a list of the available computer slots.
 	int n = h;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (CMap::get()->Info->PlayerType[i] == PlayerComputer) {
+		if (CMap::get()->Info->player_types[i] == player_type::computer) {
 			rev[i] = n++;
 			DebugPrint("Slot %d is available for an ai computer player (%d)\n" _C_ i _C_ rev[i]);
 		}
 	}
 	// Make a list of the remaining slots.
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (CMap::get()->Info->PlayerType[i] != PlayerPerson
-			&& CMap::get()->Info->PlayerType[i] != PlayerComputer) {
+		if (CMap::get()->Info->player_types[i] != player_type::person
+			&& CMap::get()->Info->player_types[i] != player_type::computer) {
 			rev[i] = n++;
-			// PlayerNobody - not available to anything..
+			// player_type::nobody - not available to anything..
 		}
 	}
 
@@ -798,7 +799,7 @@ void NetworkServerStartGame()
 
 	if (NoRandomPlacementMultiplayer == 1) {
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (CMap::get()->Info->PlayerType[i] != PlayerComputer) {
+			if (CMap::get()->Info->player_types[i] != player_type::computer) {
 				org[i] = Hosts[i].PlyNr;
 			}
 		}
@@ -1014,10 +1015,10 @@ void NetworkGamePrepareGameSettings()
 	int c = 0;
 	int h = 0;
 	for (int i = 0; i < PlayerMax; i++) {
-		if (CMap::get()->Info->PlayerType[i] == PlayerPerson) {
+		if (CMap::get()->Info->player_types[i] == player_type::person) {
 			num[h++] = i;
 		}
-		if (CMap::get()->Info->PlayerType[i] == PlayerComputer) {
+		if (CMap::get()->Info->player_types[i] == player_type::computer) {
 			comp[c++] = i; // available computer player slots
 		}
 	}
@@ -1025,30 +1026,30 @@ void NetworkGamePrepareGameSettings()
 		GameSettings.Presets[num[i]].Race = ServerSetupState.Race[num[i]];
 		switch (ServerSetupState.CompOpt[num[i]]) {
 			case 0: {
-				GameSettings.Presets[num[i]].Type = PlayerPerson;
+				GameSettings.Presets[num[i]].Type = player_type::person;
 				break;
 			}
 			case 1:
-				GameSettings.Presets[num[i]].Type = PlayerComputer;
+				GameSettings.Presets[num[i]].Type = player_type::computer;
 				break;
 			case 2:
-				GameSettings.Presets[num[i]].Type = PlayerNobody;
+				GameSettings.Presets[num[i]].Type = player_type::nobody;
 			default:
 				break;
 		}
 	}
 	for (int i = 0; i < c; i++) {
 		if (ServerSetupState.CompOpt[comp[i]] == 2) { // closed..
-			GameSettings.Presets[comp[i]].Type = PlayerNobody;
+			GameSettings.Presets[comp[i]].Type = player_type::nobody;
 			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp[i]);
 		}
 	}
 
 #ifdef DEBUG
 	for (int i = 0; i != HostsCount; ++i) {
-		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == PlayerPerson);
+		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == player_type::person);
 	}
-	Assert(GameSettings.Presets[NetLocalPlayerNumber].Type == PlayerPerson);
+	Assert(GameSettings.Presets[NetLocalPlayerNumber].Type == player_type::person);
 #endif
 }
 

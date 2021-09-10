@@ -49,6 +49,7 @@
 #include "map/tile_flag.h"
 #include "missile.h"
 #include "pathfinder.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "script.h"
 #include "settings.h"
@@ -117,7 +118,7 @@ std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, CUnit &ta
 		order->MinRange = attacker.get_best_attack_range();
 	}
 
-	if (!attacker.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.IsEnemy(attacker) && (target.Player->Type == PlayerComputer) && (attacker.Player->Type == PlayerComputer || attacker.Player->Type == PlayerPerson)) {
+	if (!attacker.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.IsEnemy(attacker) && (target.Player->get_type() == player_type::computer) && (attacker.Player->get_type() == player_type::computer || attacker.Player->get_type() == player_type::person)) {
 		attacker.Player->SetDiplomacyEnemyWith(*target.Player);
 	}
 

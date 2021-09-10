@@ -356,7 +356,7 @@ public:
 			return false;
 		}
 		//Wyrmgus start
-//		if ((player.Type == PlayerComputer && !this->Type->BoolFlag[PERMANENTCLOAK_INDEX].value)
+//		if ((player.get_type() == player_type::computer && !this->Type->BoolFlag[PERMANENTCLOAK_INDEX].value)
 		if (
 		//Wyrmgus end
 			//Wyrmgus start

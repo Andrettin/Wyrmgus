@@ -1,7 +1,6 @@
 $bool IsReplayGame();
 bool IsReplayGame();
 
-
 $void StartMap(const string &str, bool clean = true);
 void StartMap(const string str, bool clean = true);
 $void StartReplay(const string &str, bool reveal = false);
@@ -42,10 +41,7 @@ extern unsigned long GameCycle;
 $#include "settings.h"
 
 struct SettingsPresets {
-	string AIScript;
 	int Race;
-	int Team;
-	int Type;
 };
 
 class Settings {

@@ -30,7 +30,8 @@
 #include "map/map_info.h"
 
 #include "map/map_layer.h"
-#include "player.h" //for the player types enum
+#include "player/player_type.h"
+#include "player.h" //for the PlayerNumNeutral constexpr
 #include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/string_util.h"
@@ -101,7 +102,7 @@ void map_info::Clear()
 	this->MapHeights.clear();
 	//Wyrmgus end
 	memset(this->PlayerSide, 0, sizeof(this->PlayerSide));
-	memset(this->PlayerType, 0, sizeof(this->PlayerType));
+	memset(this->player_types, 0, sizeof(this->player_types));
 	this->MapUID = 0;
 	this->MapWorld = "Custom";
 }
@@ -120,7 +121,7 @@ qunique_ptr<map_info> map_info::duplicate() const
 	info->MapHeight = this->MapHeight;
 	info->MapWidths = this->MapWidths;
 	info->MapHeights = this->MapHeights;
-	memcpy(info->PlayerType, this->PlayerType, sizeof(info->PlayerType));
+	memcpy(info->player_types, this->player_types, sizeof(info->player_types));
 	memcpy(info->PlayerSide, this->PlayerSide, sizeof(info->PlayerSide));
 	info->MapUID = this->MapUID;
 	info->MapWorld = this->MapWorld;
@@ -137,8 +138,8 @@ int map_info::get_player_count() const
 {
 	int count = 0;
 
-	for (const int player_type : this->PlayerType) {
-		if (player_type == PlayerPerson || player_type == PlayerComputer) {
+	for (const player_type player_type : this->player_types) {
+		if (player_type == player_type::person || player_type == player_type::computer) {
 			++count;
 		}
 	}
@@ -150,8 +151,8 @@ int map_info::get_person_player_count() const
 {
 	int count = 0;
 
-	for (const int player_type : this->PlayerType) {
-		if (player_type == PlayerPerson) {
+	for (const player_type player_type : this->player_types) {
+		if (player_type == player_type::person) {
 			++count;
 		}
 	}
@@ -162,8 +163,8 @@ int map_info::get_person_player_count() const
 int map_info::get_person_player_index() const
 {
 	//get the index of the first person player
-	for (size_t i = 0; i < (PlayerMax - 1); ++i) {
-		if (PlayerType[i] == PlayerPerson) {
+	for (size_t i = 0; i < PlayerNumNeutral; ++i) {
+		if (this->player_types[i] == player_type::person) {
 			return i;
 		}
 	}

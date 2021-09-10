@@ -40,6 +40,7 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "pathfinder.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "script.h"
 #include "ui/ui.h"
@@ -205,7 +206,7 @@ bool COrder_Board::WaitForTransporter(CUnit &unit)
 
 	//Wyrmgus start
 //	if (!trans->IsVisibleAsGoal(*unit.Player)) {
-	if (!trans->IsVisibleAsGoal(*unit.Player) && unit.Player->Type != PlayerNeutral) { // neutral units continue waiting for the transporter even if it is not visible
+	if (!trans->IsVisibleAsGoal(*unit.Player) && unit.Player->get_type() != player_type::neutral) { // neutral units continue waiting for the transporter even if it is not visible
 	//Wyrmgus end
 		DebugPrint("Transporter Gone\n");
 		this->clear_goal();

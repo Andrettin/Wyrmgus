@@ -46,6 +46,7 @@
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "pathfinder.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "script.h"
 #include "script/trigger.h"
@@ -847,7 +848,7 @@ static int CclCreateUnit(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
+	if (CPlayer::Players[playerno]->get_type() == player_type::nobody) {
 		printf("CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
@@ -933,7 +934,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
+	if (CPlayer::Players[playerno]->get_type() == player_type::nobody) {
 		printf("CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
@@ -1007,7 +1008,7 @@ static int CclCreateUnitOnTop(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
+	if (CPlayer::Players[playerno]->get_type() == player_type::nobody) {
 		printf("CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
@@ -1063,7 +1064,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-	if (CPlayer::Players[playerno]->Type == PlayerNobody) {
+	if (CPlayer::Players[playerno]->get_type() == player_type::nobody) {
 		printf("CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
@@ -1782,7 +1783,7 @@ static int CclGetUnitVariable(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(value, "PlayerType")) {
-		lua_pushinteger(l, unit->Player->Type);
+		lua_pushinteger(l, static_cast<int>(unit->Player->get_type()));
 	} else if (!strcmp(value, "IndividualUpgrade")) {
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);

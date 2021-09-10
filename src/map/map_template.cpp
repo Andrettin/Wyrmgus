@@ -57,6 +57,7 @@
 #include "map/world_game_data.h"
 #include "player/faction.h"
 #include "player/faction_history.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "quest/campaign.h"
 #include "settings.h"
@@ -1022,7 +1023,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	for (int i = 0; i < PlayerMax; ++i) {
 		CPlayer *player = CPlayer::Players[i].get();
 
-		if (player->Type != PlayerPerson && player->Type != PlayerComputer && player->Type != PlayerRescueActive) {
+		if (player->get_type() != player_type::person && player->get_type() != player_type::computer && player->get_type() != player_type::rescue_active) {
 			continue;
 		}
 		if (CMap::get()->is_point_in_a_subtemplate_area(player->StartPos, z)) {

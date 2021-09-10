@@ -43,6 +43,7 @@
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "script.h"
 #include "sound/sound.h"
@@ -593,7 +594,7 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 			|| (var.HideHalf && value != 0 && value != max)
 			|| (!var.ShowIfNotEnable && !unit.Variable[var.Index].Enable)
 			|| (var.ShowOnlySelected && !unit.Selected)
-			|| (unit.Player->Type == PlayerNeutral && var.HideNeutral)
+			|| (unit.Player->get_type() == player_type::neutral && var.HideNeutral)
 			//Wyrmgus start
 			|| (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && var.HideNeutral)
 			//Wyrmgus end

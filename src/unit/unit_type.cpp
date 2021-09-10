@@ -48,6 +48,7 @@
 #include "name_generator.h"
 #include "player/civilization_group.h"
 #include "player/faction.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "script.h"
 #include "script/condition/and_condition.h"
@@ -2671,7 +2672,7 @@ void SaveUnitTypes(CFile &file)
 		bool somethingSaved = false;
 
 		for (int j = 0; j < PlayerMax; ++j) {
-			if (CPlayer::Players[j]->Type != PlayerNobody) {
+			if (CPlayer::Players[j]->get_type() != player_type::nobody) {
 				somethingSaved |= SaveUnitStats(unit_type->Stats[j], *unit_type, j, file);
 			}
 		}

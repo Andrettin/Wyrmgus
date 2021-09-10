@@ -72,6 +72,7 @@
 #include "player/diplomacy_state.h"
 #include "player/faction.h"
 #include "player/faction_type.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "player_color.h"
 //Wyrmgus start
@@ -157,7 +158,7 @@ void game::apply_player_history()
 	const CDate start_date = this->get_current_campaign()->get_start_date();
 
 	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
-		if (player->Type == PlayerNobody || player->get_civilization() == nullptr || player->get_faction() == nullptr) {
+		if (player->get_type() == player_type::nobody || player->get_civilization() == nullptr || player->get_faction() == nullptr) {
 			continue;
 		}
 
@@ -555,8 +556,6 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 // Write the map presentation file
 static int WriteMapPresentation(const std::string &mapname, CMap &map)
 {
-	static constexpr std::array<const char *, 8> type = {"", "", "neutral", "nobody", "computer", "person", "rescue-passive", "rescue-active" };
-
 	std::unique_ptr<FileWriter> f;
 
 	int numplayers = 0;
@@ -571,12 +570,12 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map)
 		//Wyrmgus start
 		/*
 		f->printf("DefinePlayerTypes(");
-		while (topplayer > 0 && map.Info.PlayerType[topplayer] == PlayerNobody) {
+		while (topplayer > 0 && map.Info.PlayerType[topplayer] == player_type::nobody) {
 			--topplayer;
 		}
 		for (int i = 0; i <= topplayer; ++i) {
 			f->printf("%s\"%s\"", (i ? ", " : ""), type[map.Info.PlayerType[i]]);
-			if (map.Info.PlayerType[i] == PlayerPerson) {
+			if (map.Info.PlayerType[i] == player_type::person) {
 				++numplayers;
 			}
 		}
@@ -588,12 +587,12 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map)
 		*/
 
 		f->printf("DefinePlayerTypes(");
-		while (topplayer > 0 && map.Info->PlayerType[topplayer] == PlayerNobody) {
+		while (topplayer > 0 && map.Info->player_types[topplayer] == player_type::nobody) {
 			--topplayer;
 		}
 		for (int i = 0; i <= topplayer; ++i) {
-			f->printf("%s\"%s\"", (i ? ", " : ""), type[map.Info->PlayerType[i]]);
-			if (map.Info->PlayerType[i] == PlayerPerson) {
+			f->printf("%s\"%s\"", (i ? ", " : ""), player_type_to_string(map.Info->player_types[i]).c_str());
+			if (map.Info->player_types[i] == player_type::person) {
 				++numplayers;
 			}
 		}
@@ -866,7 +865,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, const int writeTerrain)
 
 		f->printf("-- player configuration\n");
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (CMap::get()->Info->PlayerType[i] == PlayerNobody) {
+			if (CMap::get()->Info->player_types[i] == player_type::nobody) {
 				continue;
 			}
 			f->printf("SetStartView(%d, %d, %d)\n", i, CPlayer::Players[i]->StartPos.x, CPlayer::Players[i]->StartPos.y);
@@ -1199,7 +1198,7 @@ static void GameTypeMelee()
 				continue;
 			}
 
-			if (CPlayer::Players[i]->Type == PlayerComputer && CPlayer::Players[j]->Type == PlayerComputer) {
+			if (CPlayer::Players[i]->get_type() == player_type::computer && CPlayer::Players[j]->get_type() == player_type::computer) {
 				CommandDiplomacy(i, diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				CommandDiplomacy(j, diplomacy_state::allied, i);
@@ -1308,7 +1307,7 @@ static void GameTypeLeftVsRight()
 static void GameTypeManVsMachine()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer) {
+		if (CPlayer::Players[i]->get_type() != player_type::person && CPlayer::Players[i]->get_type() != player_type::computer) {
 			continue;
 		}
 		if (CPlayer::Players[i]->has_neutral_faction_type()) {
@@ -1316,14 +1315,14 @@ static void GameTypeManVsMachine()
 		}
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (CPlayer::Players[j]->Type != PlayerPerson && CPlayer::Players[j]->Type != PlayerComputer) {
+			if (CPlayer::Players[j]->get_type() != player_type::person && CPlayer::Players[j]->get_type() != player_type::computer) {
 				continue;
 			}
 			if (CPlayer::Players[j]->has_neutral_faction_type()) {
 				continue;
 			}
 
-			if (CPlayer::Players[i]->Type == CPlayer::Players[j]->Type) {
+			if (CPlayer::Players[i]->get_type() == CPlayer::Players[j]->get_type()) {
 				CommandDiplomacy(i, diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				CommandDiplomacy(j, diplomacy_state::allied, i);
@@ -1342,7 +1341,7 @@ static void GameTypeManVsMachine()
 static void GameTypeManTeamVsMachine()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer) {
+		if (CPlayer::Players[i]->get_type() != player_type::person && CPlayer::Players[i]->get_type() != player_type::computer) {
 			continue;
 		}
 		if (CPlayer::Players[i]->has_neutral_faction_type()) {
@@ -1355,7 +1354,7 @@ static void GameTypeManTeamVsMachine()
 			}
 
 			if (i != j) {
-				if (CPlayer::Players[i]->Type == CPlayer::Players[j]->Type) {
+				if (CPlayer::Players[i]->get_type() == CPlayer::Players[j]->get_type()) {
 					CommandDiplomacy(i, diplomacy_state::allied, j);
 					CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				} else {
@@ -1363,7 +1362,7 @@ static void GameTypeManTeamVsMachine()
 				}
 			}
 		}
-		if (CPlayer::Players[i]->Type == PlayerPerson) {
+		if (CPlayer::Players[i]->get_type() == player_type::person) {
 			CPlayer::Players[i]->Team = 2;
 		} else {
 			CPlayer::Players[i]->Team = 1;
@@ -1411,7 +1410,7 @@ void Settings::reset()
 		this->Presets[i].AIScript = "ai-passive";
 		this->Presets[i].Race = SettingsPresetMapDefault;
 		this->Presets[i].Team = SettingsPresetMapDefault;
-		this->Presets[i].Type = SettingsPresetMapDefault;
+		this->Presets[i].Type = player_type::none;
 	}
 
 	this->Resources = SettingsPresetMapDefault;
@@ -1490,9 +1489,9 @@ void CreateGame(const std::string &filename, CMap *map)
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		int playertype = (PlayerTypes) CMap::get()->Info->PlayerType[i];
+		player_type playertype = CMap::get()->Info->player_types[i];
 		// Network games only:
-		if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
+		if (GameSettings.Presets[i].Type != player_type::none) {
 			playertype = GameSettings.Presets[i].Type;
 		}
 		CreatePlayer(playertype);

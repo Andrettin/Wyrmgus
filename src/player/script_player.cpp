@@ -56,6 +56,7 @@
 #include "player/faction.h"
 #include "player/faction_type.h"
 #include "player/government_type.h"
+#include "player/player_type.h"
 #include "player/vassalage_type.h"
 #include "player_color.h"
 #include "quest/player_quest_objective.h"
@@ -136,21 +137,7 @@ void CPlayer::Load(lua_State *l)
 			this->set_name(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "type")) {
 			value = LuaToString(l, j + 1);
-			if (!strcmp(value, "neutral")) {
-				this->Type = PlayerNeutral;
-			} else if (!strcmp(value, "nobody")) {
-				this->Type = PlayerNobody;
-			} else if (!strcmp(value, "computer")) {
-				this->Type = PlayerComputer;
-			} else if (!strcmp(value, "person")) {
-				this->Type = PlayerPerson;
-			} else if (!strcmp(value, "rescue-passive")) {
-				this->Type = PlayerRescuePassive;
-			} else if (!strcmp(value, "rescue-active")) {
-				this->Type = PlayerRescueActive;
-			} else {
-				LuaError(l, "Unsupported tag: %s" _C_ value);
-			}
+			this->set_type(string_to_player_type(value));
 		} else if (!strcmp(value, "race")) {
 			const char *civilization_ident = LuaToString(l, j + 1);
 			wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
@@ -2203,7 +2190,7 @@ static int CclGetPlayerData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		lua_pushnumber(l, p->Type);
+		lua_pushnumber(l, static_cast<int>(p->get_type()));
 	} else if (!strcmp(data, "Color")) {
 		if (p->get_player_color() == nullptr) {
 			LuaError(l, "Player %d has no color." _C_ p->get_index());
@@ -2536,7 +2523,7 @@ static int CclSetPlayerData(lua_State *l)
 	
 	//Wyrmgus start
 	//if player is unused, return
-	if (p->Type == PlayerNobody && !CEditor::get()->is_running()) {
+	if (p->get_type() == player_type::nobody && !CEditor::get()->is_running()) {
 		return 0;
 	}
 	//Wyrmgus end
@@ -2560,7 +2547,7 @@ static int CclSetPlayerData(lua_State *l)
 			p->SetFaction(wyrmgus::faction::try_get(faction_name));
 		}
 	} else if (!strcmp(data, "Type")) {
-		p->Type = LuaToNumber(l, 3);
+		p->set_type(static_cast<player_type>(LuaToNumber(l, 3)));
 	} else if (!strcmp(data, "Dynasty")) {
 		const std::string dynasty_ident = LuaToString(l, 3);
 		p->set_dynasty(dynasty::get(dynasty_ident));

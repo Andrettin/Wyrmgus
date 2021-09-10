@@ -54,6 +54,7 @@
 #include "map/world.h"
 #include "menus.h"
 #include "network.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/player_quest_objective.h"
@@ -235,7 +236,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 		return true;
 	}
 	if ((condition->ShowOnlySelected && !unit.Selected)
-		|| (unit.Player->Type == PlayerNeutral && condition->HideNeutral)
+		|| (unit.Player->get_type() == player_type::neutral && condition->HideNeutral)
 		|| (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && condition->HideNeutral)
 		|| (CPlayer::GetThisPlayer()->IsEnemy(unit) && !condition->ShowOpponent)
 		|| (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.Player != CPlayer::GetThisPlayer()) && condition->HideAllied)
@@ -1850,7 +1851,7 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			const CPlayer *player = CPlayer::Players[i].get();
-			if (player->Type != PlayerNobody && !player->has_neutral_faction_type() && CPlayer::GetThisPlayer()->HasContactWith(*player) && player->GetUnitCount() > 0) {
+			if (player->get_type() != player_type::nobody && !player->has_neutral_faction_type() && CPlayer::GetThisPlayer()->HasContactWith(*player) && player->GetUnitCount() > 0) {
 				listed_players.push_back(player);
 			}
 		}
@@ -1918,7 +1919,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 		&& (unit.CurrentAction() != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().get_time_cost() == 0)
 		&& unit.CurrentAction() != UnitAction::Built
 		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
-		&& (unit.Player->Type != PlayerNeutral || unit.Type->get_given_resource() != nullptr)
+		&& (unit.Player->get_type() != player_type::neutral || unit.Type->get_given_resource() != nullptr)
 	) {
 		defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - 4 * defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * defines::get()->get_scale_factor(), render_commands);
 	}

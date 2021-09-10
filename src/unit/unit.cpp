@@ -69,6 +69,7 @@
 #include "pathfinder.h"
 #include "player/civilization_group.h"
 #include "player/faction.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "player_color.h"
 #include "quest/achievement.h"
@@ -4304,7 +4305,7 @@ void UnitLost(CUnit &unit)
 			if (lost_town_hall && CPlayer::GetThisPlayer()->HasContactWith(player)) {
 				player.LostTownHallTimer = GameCycle + (30 * CYCLES_PER_SECOND); //30 seconds until being revealed
 				for (int j = 0; j < NumPlayers; ++j) {
-					if (player.get_index() != j && CPlayer::Players[j]->Type != PlayerNobody) {
+					if (player.get_index() != j && CPlayer::Players[j]->get_type() != player_type::nobody) {
 						CPlayer::Players[j]->Notify(_("%s has lost their last town hall, and will be revealed in thirty seconds!"), player.get_name().c_str());
 					} else {
 						CPlayer::Players[j]->Notify("%s", _("You have lost your last town hall, and will be revealed in thirty seconds!"));
@@ -4418,7 +4419,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 		player.LostTownHallTimer = 0;
 		player.set_revealed(false);
 		for (int j = 0; j < NumPlayers; ++j) {
-			if (player.get_index() != j && CPlayer::Players[j]->Type != PlayerNobody) {
+			if (player.get_index() != j && CPlayer::Players[j]->get_type() != player_type::nobody) {
 				CPlayer::Players[j]->Notify(_("%s has rebuilt a town hall, and will no longer be revealed!"), player.get_name().c_str());
 			} else {
 				CPlayer::Players[j]->Notify("%s", _("You have rebuilt a town hall, and will no longer be revealed!"));
@@ -4547,7 +4548,7 @@ void CorrectWallNeighBours(CUnit &unit)
 void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 {
 	if (unit.Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
-		if (player.Type == PlayerPerson && !unit.Destroyed) {
+		if (player.get_type() == player_type::person && !unit.Destroyed) {
 			wyrmgus::unit_manager::get()->add_unit_seen_under_fog(&unit);
 		}
 
@@ -4592,8 +4593,8 @@ void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 		return;
 	}
 	if (unit.is_seen_by_player(&player)) {
-		if (player.Type == PlayerPerson && !unit.is_seen_destroyed_by_player(&player)) {
-			wyrmgus::unit_manager::get()->remove_unit_seen_under_fog(&unit);
+		if (player.get_type() == player_type::person && !unit.is_seen_destroyed_by_player(&player)) {
+			unit_manager::get()->remove_unit_seen_under_fog(&unit);
 		}
 	} else {
 		unit.Seen.by_player.insert(player.get_index());
@@ -4618,7 +4619,7 @@ void UnitCountSeen(CUnit &unit)
 	//  unit before this calc.
 	std::array<int, PlayerMax> oldv{};
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (CPlayer::Players[p]->Type != PlayerNobody) {
+		if (CPlayer::Players[p]->get_type() != player_type::nobody) {
 			oldv[p] = unit.IsVisible(*CPlayer::Players[p]);
 		}
 	}
@@ -4628,7 +4629,7 @@ void UnitCountSeen(CUnit &unit)
 	const int width = unit.Type->get_tile_width();
 
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (CPlayer::Players[p]->Type != PlayerNobody) {
+		if (CPlayer::Players[p]->get_type() != player_type::nobody) {
 			int newv = 0;
 			int y = height;
 			unsigned int index = unit.Offset;
@@ -4664,7 +4665,7 @@ void UnitCountSeen(CUnit &unit)
 	// for players. Hopefully this works with shared vision just great.
 	//
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (CPlayer::Players[p]->Type != PlayerNobody) {
+		if (CPlayer::Players[p]->get_type() != player_type::nobody) {
 			int newv = unit.IsVisible(*CPlayer::Players[p]);
 			if (!oldv[p] && newv) {
 				// Might have revealed a destroyed unit which caused it to
@@ -4843,7 +4844,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 //	}
 
 	//only rescue units inside if the player is actually a rescuable player (to avoid, for example, unintended worker owner changes when a depot changes hands)
-	if (oldplayer->Type == PlayerRescueActive || oldplayer->Type == PlayerRescuePassive) {
+	if (oldplayer->get_type() == player_type::rescue_active || oldplayer->get_type() == player_type::rescue_passive) {
 		CUnit *uins = UnitInside;
 		for (int i = InsideCount; i; --i, uins = uins->NextContained) {
 			uins->ChangeOwner(newplayer);
@@ -5034,7 +5035,7 @@ void RescueUnits()
 
 	//  Look if player could be rescued.
 	for (const qunique_ptr<CPlayer> &p : CPlayer::Players) {
-		if (p->Type != PlayerRescuePassive && p->Type != PlayerRescueActive) {
+		if (p->get_type() != player_type::rescue_passive && p->get_type() != player_type::rescue_active) {
 			continue;
 		}
 		if (p->GetUnitCount() != 0) {
@@ -5057,8 +5058,8 @@ void RescueUnits()
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
 					//Wyrmgus start
-//					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerRescuePassive && around[i]->Player->Type != PlayerRescueActive) {
-					if (around[i]->CanAttack() && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerRescuePassive && around[i]->Player->Type != PlayerRescueActive) {
+//					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->Player->get_type() != player_type::rescue_passive && around[i]->Player->get_type() != player_type::rescue_active) {
+					if (around[i]->CanAttack() && unit.IsAllied(*around[i]) && around[i]->Player->get_type() != player_type::rescue_passive && around[i]->Player->get_type() != player_type::rescue_active) {
 					//Wyrmgus end
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
@@ -5510,7 +5511,7 @@ CUnit *UnitOnScreen(int x, int y)
 			}
 
 			if (candidate != nullptr && !is_candidate_selected) {
-				if (unit->Player->Type == PlayerNeutral && candidate->Player->Type != PlayerNeutral) {
+				if (unit->Player->get_type() == player_type::neutral && candidate->Player->get_type() != player_type::neutral) {
 					//prefer selecting a non-neutral unit over a neutral one
 					continue;
 				}
@@ -5520,7 +5521,7 @@ CUnit *UnitOnScreen(int x, int y)
 					continue;
 				}
 
-				if ((unit->Player->Type == PlayerNeutral) == (candidate->Player->Type == PlayerNeutral) && (unit->Type->BoolFlag[ITEM_INDEX].value == candidate->Type->BoolFlag[ITEM_INDEX].value)) {
+				if ((unit->Player->get_type() == player_type::neutral) == (candidate->Player->get_type() == player_type::neutral) && (unit->Type->BoolFlag[ITEM_INDEX].value == candidate->Type->BoolFlag[ITEM_INDEX].value)) {
 					continue; //no difference
 				}
 			}
@@ -5533,7 +5534,7 @@ CUnit *UnitOnScreen(int x, int y)
 			candidate = unit;
 			is_candidate_selected = IsOnlySelected(*candidate);
 
-			if (is_candidate_selected || candidate->Player->Type == PlayerNeutral || candidate->Type->BoolFlag[ITEM_INDEX].value) {
+			if (is_candidate_selected || candidate->Player->get_type() == player_type::neutral || candidate->Type->BoolFlag[ITEM_INDEX].value) {
 				//check if there are other units in this place
 				continue;
 			} else {
@@ -5779,7 +5780,7 @@ int CUnit::GetReactionRange() const
 {
 	int reaction_range = this->CurrentSightRange;
 
-	if (this->Player->Type == PlayerComputer) {
+	if (this->Player->get_type() == player_type::computer) {
 		reaction_range += 2; //+2 reaction range bonus for computer players
 	}
 	
@@ -6154,7 +6155,7 @@ bool CUnit::CanAttack(bool count_inside) const
 		}
 
 		//if a neutral unit is inside a container representing a recruitable hero, then it shouldn't attack from it
-		if (this->Player->Type == PlayerNeutral && this->Container->Type->BoolFlag[RECRUITHEROES_INDEX].value) {
+		if (this->Player->get_type() == player_type::neutral && this->Container->Type->BoolFlag[RECRUITHEROES_INDEX].value) {
 			return false;
 		}
 	}
@@ -6471,7 +6472,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 			return false;
 		}
 		
-		if (this->Player == item->Player || this->Player->IsAllied(*item->Player) || item->Player->Type == PlayerNeutral) {
+		if (this->Player == item->Player || this->Player->IsAllied(*item->Player) || item->Player->get_type() == player_type::neutral) {
 			return true;
 		}
 	}
@@ -7440,7 +7441,7 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 	//distribute experience between nearby units belonging to the same player
 
 //	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
-	if (UseHPForXp && attacker && (target.IsEnemy(*attacker) || target.Player->Type == PlayerNeutral) && !target.Type->BoolFlag[BUILDING_INDEX].value) {
+	if (UseHPForXp && attacker && (target.IsEnemy(*attacker) || target.Player->get_type() == player_type::neutral) && !target.Type->BoolFlag[BUILDING_INDEX].value) {
 		attacker->ChangeExperience(damage, ExperienceRange);
 	}
 	//Wyrmgus end
@@ -7606,7 +7607,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 
 	std::unique_ptr<COrder> saved_order;
 
-	if (target.Player == CPlayer::GetThisPlayer() && target.Player->Type != PlayerNeutral) { // allow neutral units to strike back
+	if (target.Player == CPlayer::GetThisPlayer() && target.Player->get_type() != player_type::neutral) { // allow neutral units to strike back
 		if (target.CurrentAction() == UnitAction::Attack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
 			if (order.IsWeakTargetSelected() == false) {
@@ -7648,7 +7649,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	}
 	//Wyrmgus start
 //	if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
-	if (best && best != oldgoal && (best->Player != target.Player || target.Player->Type == PlayerNeutral) && best->IsAllied(target) == false) {
+	if (best && best != oldgoal && (best->Player != target.Player || target.Player->get_type() == player_type::neutral) && best->IsAllied(target) == false) {
 	//Wyrmgus end
 		CommandAttack(target, best->tilePos, best, FlushCommands, best->MapLayer->ID);
 		// Set threshold value only for aggressive units
@@ -7771,7 +7772,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 			}
 		}
 		if (destroyer) {
-			if (target.IsEnemy(*destroyer) || target.Player->Type == PlayerNeutral) {
+			if (target.IsEnemy(*destroyer) || target.Player->get_type() == player_type::neutral) {
 				HitUnit_IncreaseScoreForKill(*destroyer, target);
 			}
 		}
@@ -8057,7 +8058,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	// FIXME : should be parametrable.
 	//Wyrmgus start
 //	if (!transporter.IsTeamed(unit)) {
-	if (!transporter.IsTeamed(unit) && !transporter.IsAllied(unit) && transporter.Player->Type != PlayerNeutral && unit.Player->Type != PlayerNeutral) {
+	if (!transporter.IsTeamed(unit) && !transporter.IsAllied(unit) && transporter.Player->get_type() != player_type::neutral && unit.Player->get_type() != player_type::neutral) {
 	//Wyrmgus end
 		return 0;
 	}
@@ -8111,14 +8112,14 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 
 bool CUnit::IsEnemy(const CPlayer &player) const
 {
-	if (this->Player->Type == PlayerNeutral) {
-		if (this->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value && player.Type != PlayerNeutral) {
+	if (this->Player->get_type() == player_type::neutral) {
+		if (this->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value && player.get_type() != player_type::neutral) {
 			return true;
 		}
 	}
 
 	//Wyrmgus start
-	if (this->Player != &player && player.Type != PlayerNeutral && !this->Player->has_building_access(&player) && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
+	if (this->Player != &player && player.get_type() != player_type::neutral && !this->Player->has_building_access(&player) && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
 		return true;
 	}
 	//Wyrmgus end
@@ -8128,14 +8129,14 @@ bool CUnit::IsEnemy(const CPlayer &player) const
 
 bool CUnit::IsEnemy(const CUnit &unit) const
 {
-	switch (this->Player->Type) {
-		case PlayerNeutral:
+	switch (this->Player->get_type()) {
+		case player_type::neutral:
 			if (
 				this->Type->BoolFlag[FAUNA_INDEX].value
 				&& this->Type->BoolFlag[ORGANIC_INDEX].value
 				&& unit.Type->BoolFlag[ORGANIC_INDEX].value
 				&& this->Type->Slot != unit.Type->Slot
-				&& (!unit.Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit.Player->Type != PlayerNeutral)
+				&& (!unit.Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit.Player->get_type() != player_type::neutral)
 			) {
 				if (
 					this->Type->BoolFlag[PREDATOR_INDEX].value
@@ -8146,7 +8147,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 				} else if (
 					this->Type->BoolFlag[PEOPLEAVERSION_INDEX].value
 					&& !unit.Type->BoolFlag[FAUNA_INDEX].value
-					&& unit.Player->Type != PlayerNeutral
+					&& unit.Player->get_type() != player_type::neutral
 					&& this->MapDistanceTo(unit) <= 1
 				) {
 					return true;
@@ -8156,7 +8157,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 		default:
 			if (this->Player != unit.Player) {
 				if (
-					unit.Player->Type == PlayerNeutral
+					unit.Player->get_type() == player_type::neutral
 					&& (unit.Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit.Type->BoolFlag[PREDATOR_INDEX].value)
 				) {
 					return true;
@@ -8172,7 +8173,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 				}
 
 				if (
-					unit.Player->Type != PlayerNeutral && !this->Player->has_building_access(unit.Player) && !this->Player->has_neutral_faction_type()
+					unit.Player->get_type() != player_type::neutral && !this->Player->has_building_access(unit.Player) && !this->Player->has_neutral_faction_type()
 					&& ((this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) || (unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()))
 				) {
 					return true;

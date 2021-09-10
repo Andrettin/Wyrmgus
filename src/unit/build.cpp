@@ -660,7 +660,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const
 	CPlayer *player = nullptr;
 
 	//Wyrmgus start
-//	if (unit && unit->Player->Type == PlayerPerson) {
+//	if (unit && unit->Player->get_type() == player_type::person) {
 	if (unit) {
 	//Wyrmgus end
 		player = unit->Player;

@@ -41,6 +41,7 @@
 #include "map/tile_flag.h"
 #include "pathfinder.h"
 #include "player/diplomacy_state.h"
+#include "player/player_type.h"
 #include "player/vassalage_type.h"
 #include "player.h"
 #include "script.h"
@@ -1449,7 +1450,7 @@ void CommandQuit(int player)
 {
 	// Set player to neutral, remove allied/enemy/shared vision status
 	// If the player doesn't have any units then this is pointless?
-	CPlayer::Players[player]->Type = PlayerNeutral;
+	CPlayer::Players[player]->set_type(player_type::neutral);
 	for (int i = 0; i < NumPlayers; ++i) {
 		if (i != player && CPlayer::Players[i]->Team != CPlayer::Players[player]->Team) {
 			CPlayer::Players[i]->SetDiplomacyNeutralWith(*CPlayer::Players[player]);

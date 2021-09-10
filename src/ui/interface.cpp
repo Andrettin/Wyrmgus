@@ -43,6 +43,7 @@
 #include "map/minimap.h"
 #include "map/minimap_mode.h"
 #include "network.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "player_color.h"
 #include "replay.h"
@@ -918,14 +919,14 @@ bool HandleCheats(const std::string &input)
 			// we'll be using the wrong ref counts.
 #if 0
 			ThisPlayer->AiEnabled = false;
-			ThisPlayer->Type = PlayerPerson;
+			ThisPlayer->set_type(player_type::person);
 			SetMessage("AI is off, Normal Player");
 #else
 			SetMessage("Cannot disable 'ai me' cheat");
 #endif
 		} else {
 			CPlayer::GetThisPlayer()->AiEnabled = true;
-			CPlayer::GetThisPlayer()->Type = PlayerComputer;
+			CPlayer::GetThisPlayer()->get_type() = player_type::computer;
 			if (!CPlayer::GetThisPlayer()->Ai) {
 				AiInit(*CPlayer::GetThisPlayer());
 			}
@@ -1068,7 +1069,7 @@ static int InputKey(int key)
 				return 1;
 			}
 			for (int i = 0; i < PlayerMax; ++i) {
-				if (CPlayer::Players[i]->Type != PlayerPerson) {
+				if (CPlayer::Players[i]->get_type() != player_type::person) {
 					continue;
 				}
 				if (!strncasecmp(namestart, CPlayer::Players[i]->get_name().c_str(), strlen(namestart))) {

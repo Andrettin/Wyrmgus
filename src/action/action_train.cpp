@@ -39,6 +39,7 @@
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "script.h"
 #include "sound/game_sound_set.h"
@@ -394,7 +395,7 @@ void COrder_Train::Execute(CUnit &unit)
 		}
 
 		//Wyrmgus start
-		if (this->Player != unit.Player->get_index() && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->has_building_access(unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
+		if (this->Player != unit.Player->get_index() && unit.Player->get_type() != player_type::neutral && CPlayer::Players[this->Player]->has_building_access(unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
 			unit.Player->change_resource(defines::get()->get_wealth_resource(), newUnit->GetPrice(), true);
 		}
 		//Wyrmgus end

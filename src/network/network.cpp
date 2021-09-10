@@ -221,6 +221,7 @@
 #include "net_message.h"
 #include "netconnect.h"
 #include "parameters.h"
+#include "player/player_type.h"
 #include "player.h"
 #include "replay.h"
 #include "sound/game_sound_set.h"
@@ -726,7 +727,7 @@ static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index, con
 	const CUnit *unit = slot < wyrmgus::unit_manager::get()->GetUsedSlotCount() ? &wyrmgus::unit_manager::get()->GetSlotUnit(slot) : nullptr;
 
 	if (unit && (unit->Player->get_index() == player
-				 || CPlayer::Players[player]->IsTeamed(*unit) || unit->Player->Type == PlayerNeutral)) {
+				 || CPlayer::Players[player]->IsTeamed(*unit) || unit->Player->get_type() == player_type::neutral)) {
 		return true;
 	} else {
 		return false;

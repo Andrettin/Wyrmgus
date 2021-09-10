@@ -40,6 +40,7 @@
 #include "network.h"
 #include "parameters.h"
 #include "player/diplomacy_state.h"
+#include "player/player_type.h"
 #include "player.h"
 //Wyrmgus start
 #include "quest/quest.h"
@@ -80,22 +81,17 @@ public:
 /**
 **  Multiplayer Player definition
 */
-class MPPlayer
+class MPPlayer final
 {
 public:
-	//Wyrmgus start
-//	MPPlayer() : Race(0), Team(0), Type(0) {}
-	MPPlayer() : Race(0), Faction(-1), Team(0), Type(0) {}
-	//Wyrmgus end
-
 	std::string Name;
 	std::string AIScript;
-	int Race;
+	int Race = 0;
 	//Wyrmgus start
-	int Faction;
+	int Faction = -1;
 	//Wyrmgus end
-	int Team;
-	int Type;
+	int Team = 0;
+	player_type Type = player_type::none;
 };
 
 /**
@@ -624,7 +620,7 @@ static int CclReplayLog(lua_State *l)
 					} else if (!strcmp(value, "Team")) {
 						CurrentReplay->Players[j].Team = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Type")) {
-						CurrentReplay->Players[j].Type = LuaToNumber(l, -1);
+						CurrentReplay->Players[j].Type = static_cast<player_type>(LuaToNumber(l, -1));
 					} else {
 						LuaError(l, "Unsupported key: %s" _C_ value);
 					}

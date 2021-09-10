@@ -38,6 +38,8 @@ static int CclStratagusMap(lua_State *l);
 
 namespace wyrmgus {
 
+enum class player_type;
+
 class map_info final : public QObject
 {
 	Q_OBJECT
@@ -135,7 +137,7 @@ public:
 	std::vector<int> MapWidths;	/// Map width for each map layer
 	std::vector<int> MapHeights; /// Map height for each map layer
 	//Wyrmgus end
-	int PlayerType[PlayerMax];  /// Same player->Type
+	player_type player_types[PlayerMax];  /// Same player->Type
 	int PlayerSide[PlayerMax];  /// Same player->Side
 	unsigned int MapUID;        /// Unique Map ID (hash)
 	std::string MapWorld = "Custom";

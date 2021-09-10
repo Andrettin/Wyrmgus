@@ -31,11 +31,15 @@
 class CFile;
 class CMap;
 
+namespace wyrmgus {
+	enum class player_type;
+}
+
 struct SettingsPresets {
 	std::string AIScript;     /// AI script for computer to use
 	int Race;                 /// Race of the player
 	int Team;                 /// Team of player
-	int Type;                 /// Type of player (for network games)
+	player_type Type;                 /// Type of player (for network games)
 };
 
 /**

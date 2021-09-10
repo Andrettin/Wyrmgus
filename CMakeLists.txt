@@ -812,6 +812,7 @@ set(wyrmgus_player_HDRS
 	src/player/faction_type.h
 	src/player/government_type.h
 	src/player/player_container.h
+	src/player/player_type.h
 	src/player/vassalage_type.h
 )
 

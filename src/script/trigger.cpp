@@ -37,6 +37,7 @@
 //Wyrmgus end
 #include "map/map.h"
 #include "map/map_info.h"
+#include "player/player_type.h"
 #include "player.h"
 //Wyrmgus start
 #include "quest/quest.h" // for saving quests
@@ -218,7 +219,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 			// Check the player
 			//Wyrmgus start
 //			if (plynr == -1 || plynr == unit.Player->get_index()) {
-			if (plynr == -1 || plynr == unit.Player->get_index() || (plynr == -2 && unit.Player->Type != PlayerNeutral)) { // -2 can be used for the player field to mean any non-neutral player
+			if (plynr == -1 || plynr == unit.Player->get_index() || (plynr == -2 && unit.Player->get_type() != player_type::neutral)) { // -2 can be used for the player field to mean any non-neutral player
 			//Wyrmgus end
 				if (unit.IsAlive()) {
 					++s;
@@ -553,7 +554,7 @@ void TriggersEachCycle()
 			} else if (current_trigger->Type == wyrmgus::trigger::TriggerType::PlayerTrigger) {
 				for (int i = 0; i < PlayerNumNeutral; ++i) {
 					CPlayer *player = CPlayer::Players[i].get();
-					if (player->Type == PlayerNobody) {
+					if (player->get_type() == player_type::nobody) {
 						continue;
 					}
 					if (!check_conditions(current_trigger, player)) {

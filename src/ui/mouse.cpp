@@ -49,6 +49,7 @@
 #include "menus.h"
 #include "missile.h"
 #include "network.h"
+#include "player/player_type.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -909,7 +910,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 
 	//  Handle resource workers.
 //	if (action == MouseActionHarvest) {
-	if (action == MouseActionHarvest && (!dest || !dest->Type->CanTransport() || dest->Player == CPlayer::GetThisPlayer() || dest->Player->Type != PlayerNeutral)) { //don't harvest neutral garrisonable units (i.e. tree stumps) by right-clicking
+	if (action == MouseActionHarvest && (!dest || !dest->Type->CanTransport() || dest->Player == CPlayer::GetThisPlayer() || dest->Player->get_type() != player_type::neutral)) { //don't harvest neutral garrisonable units (i.e. tree stumps) by right-clicking
 	//Wyrmgus end
 		DoRightButton_Worker(unit, dest, pos, flush, acknowledged);
 		return;
