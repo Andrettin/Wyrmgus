@@ -507,6 +507,8 @@ void CPlayer::SetThisPlayer(CPlayer *player)
 	QMetaObject::invokeMethod(QApplication::instance(), [interface_style] {
 		engine_interface::get()->set_current_interface_style(interface_style);
 	}, Qt::QueuedConnection);
+
+	emit engine_interface::get()->this_player_changed();
 }
 
 CPlayer *CPlayer::GetThisPlayer()

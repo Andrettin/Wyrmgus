@@ -560,6 +560,11 @@ int engine_interface::get_max_map_height() const
 	return MaxMapHeight;
 }
 
+CPlayer *engine_interface::get_this_player() const
+{
+	return CPlayer::GetThisPlayer();
+}
+
 QVariantList engine_interface::get_non_neutral_players() const
 {
 	return container::to_qvariant_list(CPlayer::get_non_neutral_players());
