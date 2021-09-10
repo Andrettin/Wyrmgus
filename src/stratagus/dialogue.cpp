@@ -132,7 +132,7 @@ void dialogue::call_node_option_effect(const int node_index, const int option_in
 		return;
 	}
 
-	CclCommand("trigger_player = " + std::to_string(player->Index) + ";");
+	CclCommand("trigger_player = " + std::to_string(player->get_index()) + ";");
 	this->nodes[node_index]->option_effect(option_index, player, ctx);
 }
 

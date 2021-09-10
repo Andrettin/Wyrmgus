@@ -642,7 +642,7 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 				}
 				break;
 			default:
-				value = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
+				value = unit_type->Stats[CPlayer::GetThisPlayer()->get_index()].Variables[this->Index].Value;
 				if (value >= 0 && IsBonusVariable(this->Index)) {
 					x += label.Draw(x, y, "+", render_commands);
 				}

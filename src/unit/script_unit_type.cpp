@@ -3159,7 +3159,7 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[ISALIVE_INDEX].Max = 1;
 
 	// Player
-	unit.Variable[PLAYER_INDEX].Value = unit.Player->Index;
+	unit.Variable[PLAYER_INDEX].Value = unit.Player->get_index();
 	unit.Variable[PLAYER_INDEX].Max = PlayerMax;
 	
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values

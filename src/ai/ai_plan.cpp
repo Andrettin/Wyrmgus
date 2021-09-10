@@ -383,8 +383,8 @@ int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
 int AiForce::PlanAttack()
 {
 	CPlayer &player = *AiPlayer->Player;
-	DebugPrint("%d: Planning for force #%lu of player #%d\n" _C_ player.Index
-			   _C_(long unsigned int)(this - & (AiPlayer->Force[0])) _C_ player.Index);
+	DebugPrint("%d: Planning for force #%lu of player #%d\n" _C_ player.get_index()
+			   _C_(long unsigned int)(this - & (AiPlayer->Force[0])) _C_ player.get_index());
 
 	TerrainTraversal transporterTerrainTraversal;
 
@@ -402,7 +402,7 @@ int AiForce::PlanAttack()
 	}
 
 	if (transporter != nullptr) {
-		DebugPrint("%d: Transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));
+		DebugPrint("%d: Transporter #%d\n" _C_ player.get_index() _C_ UnitNumber(*transporter));
 		MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 	} else {
 		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), is_a_free_transporter);
@@ -410,7 +410,7 @@ int AiForce::PlanAttack()
 			transporter = *it;
 			MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 		} else {
-			DebugPrint("%d: No transporter available\n" _C_ player.Index);
+			DebugPrint("%d: No transporter available\n" _C_ player.get_index());
 			return 0;
 		}
 	}
@@ -419,7 +419,7 @@ int AiForce::PlanAttack()
 	// FIXME: if force is split over different places -> broken
 	const auto land_unit_it = std::find_if(this->get_units().begin(), this->get_units().end(), CUnitTypeFinder(UnitTypeType::Land));
 	if (land_unit_it == this->get_units().end()) {
-		DebugPrint("%d: No land unit in force\n" _C_ player.Index);
+		DebugPrint("%d: No land unit in force\n" _C_ player.get_index());
 		return 0;
 	}
 
@@ -431,7 +431,7 @@ int AiForce::PlanAttack()
 		const unsigned int forceIndex = AiPlayer->Force.getIndex(this) + 1;
 
 		if (transporter->GroupId != forceIndex) {
-			DebugPrint("%d: Assign any transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));
+			DebugPrint("%d: Assign any transporter #%d\n" _C_ player.get_index() _C_ UnitNumber(*transporter));
 
 			if (transporter->GroupId) {
 				transporter->Player->Ai->Force[transporter->GroupId - 1].Remove(transporter);
@@ -457,7 +457,7 @@ int AiForce::PlanAttack()
 				CUnit &unit = player.GetUnit(i);
 
 				if (is_a_free_transporter(&unit) && unit.GroupId == 0 && unit.IsIdle()) {
-					DebugPrint("%d: Assign any transporter #%d\n" _C_ player.Index _C_ UnitNumber(unit));
+					DebugPrint("%d: Assign any transporter #%d\n" _C_ player.get_index() _C_ UnitNumber(unit));
 					this->Insert(&unit);
 					unit.GroupId = forceIndex;
 					totalBoardCapacity += unit.Type->MaxOnBoard - unit.BoardCount;
@@ -467,7 +467,7 @@ int AiForce::PlanAttack()
 				}
 			}
 		}
-		DebugPrint("%d: Can attack\n" _C_ player.Index);
+		DebugPrint("%d: Can attack\n" _C_ player.get_index());
 		GoalPos = pos;
 		State = AiForceAttackingState::Boarding;
 		return 1;
@@ -681,7 +681,7 @@ void AiSendExplorers()
 	bool space_scout = false;
 	for (size_t i = 0; i != AiPlayer->Scouts.size(); ++i) {
 		if (AiPlayer->Scouts[i] == nullptr) {
-			fprintf(stderr, "AI Player #%d's scout %d is null.\n", AiPlayer->Player->Index, (int) i);
+			fprintf(stderr, "AI Player #%d's scout %d is null.\n", AiPlayer->Player->get_index(), (int) i);
 			return;
 		}
 		if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Space) {

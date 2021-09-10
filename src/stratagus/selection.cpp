@@ -195,18 +195,18 @@ static void ChangeSelectedUnits(CUnit * const *units, unsigned int count)
 void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 {
 	// UnSelectAllTeam(player);
-	while (!TeamSelected[player.Index].empty()) {
-		CUnit *unit = TeamSelected[player.Index].back();
-		TeamSelected[player.Index].pop_back();
-		unit->TeamSelected &= ~(1 << player.Index);
+	while (!TeamSelected[player.get_index()].empty()) {
+		CUnit *unit = TeamSelected[player.get_index()].back();
+		TeamSelected[player.get_index()].pop_back();
+		unit->TeamSelected &= ~(1 << player.get_index());
 	}
 	// Add to selection
 	for (size_t i = 0; i != units.size(); ++i) {
 		CUnit &unit = *units[i];
 		Assert(!unit.Removed);
 		if (!unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
-			TeamSelected[player.Index].push_back(&unit);
-			unit.TeamSelected |= 1 << player.Index;
+			TeamSelected[player.get_index()].push_back(&unit);
+			unit.TeamSelected |= 1 << player.get_index();
 		}
 	}
 	Assert(TeamSelected[player.Index].size() <= MaxSelectable);

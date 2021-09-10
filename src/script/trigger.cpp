@@ -84,7 +84,7 @@ int TriggerGetPlayer(lua_State *l)
 	if (!strcmp(player, "any")) {
 		return -1;
 	} else if (!strcmp(player, "this")) {
-		return CPlayer::GetThisPlayer()->Index;
+		return CPlayer::GetThisPlayer()->get_index();
 	}
 	LuaError(l, "bad player: %s" _C_ player);
 	return 0;
@@ -217,8 +217,8 @@ static int CclGetNumUnitsAt(lua_State *l)
 
 			// Check the player
 			//Wyrmgus start
-//			if (plynr == -1 || plynr == unit.Player->Index) {
-			if (plynr == -1 || plynr == unit.Player->Index || (plynr == -2 && unit.Player->Type != PlayerNeutral)) { // -2 can be used for the player field to mean any non-neutral player
+//			if (plynr == -1 || plynr == unit.Player->get_index()) {
+			if (plynr == -1 || plynr == unit.Player->get_index() || (plynr == -2 && unit.Player->Type != PlayerNeutral)) { // -2 can be used for the player field to mean any non-neutral player
 			//Wyrmgus end
 				if (unit.IsAlive()) {
 					++s;
@@ -274,7 +274,7 @@ static int CclIfNearUnit(lua_State *l)
 	for (size_t i = 0; i != unitsOfType.size(); ++i) {
 		const CUnit &centerUnit = *unitsOfType[i];
 
-		if (other_plynr != -1 && other_plynr != centerUnit.Player->Index) {
+		if (other_plynr != -1 && other_plynr != centerUnit.Player->get_index()) {
 			continue;
 		}
 				
@@ -293,7 +293,7 @@ static int CclIfNearUnit(lua_State *l)
 				|| (unittype == unit.Type)) {
 
 				// Check the player
-				if (plynr == -1 || plynr == unit.Player->Index) {
+				if (plynr == -1 || plynr == unit.Player->get_index()) {
 					++s;
 				}
 			}
@@ -354,7 +354,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 					|| (unittype == unit.Type)) {
 
 					// Check the player
-					if (plynr == -1 || plynr == unit.Player->Index) {
+					if (plynr == -1 || plynr == unit.Player->get_index()) {
 						++s;
 					}
 				}

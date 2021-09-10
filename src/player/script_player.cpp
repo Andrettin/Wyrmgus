@@ -133,7 +133,7 @@ void CPlayer::Load(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "name")) {
-			this->SetName(LuaToString(l, j + 1));
+			this->set_name(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "type")) {
 			value = LuaToString(l, j + 1);
 			if (!strcmp(value, "neutral")) {
@@ -542,7 +542,7 @@ static int CclGetThisPlayer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	if (CPlayer::GetThisPlayer()) {
-		lua_pushnumber(l, CPlayer::GetThisPlayer()->Index);
+		lua_pushnumber(l, CPlayer::GetThisPlayer()->get_index());
 	} else {
 		lua_pushnumber(l, 0);
 	}
@@ -656,7 +656,7 @@ static int CclSetDiplomacy(lua_State *l)
 */
 static int CclDiplomacy(lua_State *l)
 {
-	lua_pushnumber(l, CPlayer::GetThisPlayer()->Index);
+	lua_pushnumber(l, CPlayer::GetThisPlayer()->get_index());
 	lua_insert(l, 1);
 	return CclSetDiplomacy(l);
 }
@@ -688,7 +688,7 @@ static int CclSetSharedVision(lua_State *l)
 */
 static int CclSharedVision(lua_State *l)
 {
-	lua_pushnumber(l, CPlayer::GetThisPlayer()->Index);
+	lua_pushnumber(l, CPlayer::GetThisPlayer()->get_index());
 	lua_insert(l, 1);
 	return CclSetSharedVision(l);
 }
@@ -2190,7 +2190,7 @@ static int CclGetPlayerData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, p->Name.c_str());
+		lua_pushstring(l, p->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "RaceName")) {
 		lua_pushstring(l, p->get_civilization()->get_identifier().c_str());
@@ -2206,7 +2206,7 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushnumber(l, p->Type);
 	} else if (!strcmp(data, "Color")) {
 		if (p->get_player_color() == nullptr) {
-			LuaError(l, "Player %d has no color." _C_ p->Index);
+			LuaError(l, "Player %d has no color." _C_ p->get_index());
 		}
 		lua_pushstring(l, p->get_player_color()->get_identifier().c_str());
 		return 1;
@@ -2437,17 +2437,17 @@ static int CclGetPlayerData(lua_State *l)
 		const char *ident = LuaToString(l, 3);
 		if (!strncmp(ident, "unit", 4)) {
 			int id = UnitTypeIdByIdent(ident);
-			if (UnitIdAllowed(*CPlayer::Players[p->Index], id) > 0) {
+			if (UnitIdAllowed(*p, id) > 0) {
 				lua_pushstring(l, "A");
-			} else if (UnitIdAllowed(*CPlayer::Players[p->Index], id) == 0) {
+			} else if (UnitIdAllowed(*p, id) == 0) {
 				lua_pushstring(l, "F");
 			}
 		} else if (!strncmp(ident, "upgrade", 7)) {
-			if (UpgradeIdentAllowed(*CPlayer::Players[p->Index], ident) == 'A') {
+			if (UpgradeIdentAllowed(*p, ident) == 'A') {
 				lua_pushstring(l, "A");
-			} else if (UpgradeIdentAllowed(*CPlayer::Players[p->Index], ident) == 'R') {
+			} else if (UpgradeIdentAllowed(*p, ident) == 'R') {
 				lua_pushstring(l, "R");
-			} else if (UpgradeIdentAllowed(*CPlayer::Players[p->Index], ident) == 'F') {
+			} else if (UpgradeIdentAllowed(*p, ident) == 'F') {
 				lua_pushstring(l, "F");
 			}
 		} else {
@@ -2542,7 +2542,7 @@ static int CclSetPlayerData(lua_State *l)
 	//Wyrmgus end
 
 	if (!strcmp(data, "Name")) {
-		p->SetName(LuaToString(l, 3));
+		p->set_name(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
 		if (GameRunning) {
 			p->SetFaction(nullptr);

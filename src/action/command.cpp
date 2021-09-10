@@ -880,7 +880,7 @@ void CommandDismiss(CUnit &unit, bool salvage)
 					&& table[i]->CurrentOrder()->has_goal()
 					&& table[i]->CurrentOrder()->get_goal() == &unit
 				) {
-					if (unit.Player->Index == CPlayer::GetThisPlayer()->Index) {
+					if (unit.Player == CPlayer::GetThisPlayer()) {
 						CPlayer::GetThisPlayer()->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, "%s", _("Cannot salvage if enemies are attacking it."));
 					}
 					return;
@@ -1031,23 +1031,23 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 //	if (unit.Player->CheckLimits(type) < 0
 //		|| unit.Player->CheckUnitType(type)) {
 	if (CPlayer::Players[player]->CheckLimits(type) < 0
-		|| CPlayer::Players[player]->CheckUnitType(type, unit.Type->Stats[unit.Player->Index].get_unit_stock(&type) != 0)) {
+		|| CPlayer::Players[player]->CheckUnitType(type, unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&type) != 0)) {
 	//Wyrmgus end
 		return;
 	}
 	//Wyrmgus start
-	if (unit.Type->Stats[unit.Player->Index].get_unit_stock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
-		if (player == CPlayer::GetThisPlayer()->Index) {
+	if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
+		if (player == CPlayer::GetThisPlayer()->get_index()) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
 		}
 		return;
 	}
 	
-	if (unit.Player->Index != player) { //if the player "training" the unit isn't the same one that owns the trainer building, then make the former share some technological progress with the latter
+	if (unit.Player->get_index() != player) { //if the player "training" the unit isn't the same one that owns the trainer building, then make the former share some technological progress with the latter
 		CPlayer::Players[player]->ShareUpgradeProgress(*unit.Player, unit);
 	}
 
-	if (unit.Type->Stats[unit.Player->Index].get_unit_stock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
+	if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
 		if (unit.CriticalOrder != nullptr && unit.CriticalOrder->Action == UnitAction::Train) {
 			return;
 		}
@@ -1395,7 +1395,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 			if (mfp.Visible[player] && !mfp.Visible[opponent] && !CPlayer::Players[player]->Revealed) {
 			//Wyrmgus end
 				mfp.Visible[opponent] = 1;
-				if (opponent == ThisPlayer->Index) {
+				if (opponent == ThisPlayer->get_index()) {
 					Map.MarkSeenTile(mf);
 				}
 			}
@@ -1404,7 +1404,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 			if (mfp.Visible[opponent] && !mfp.Visible[player] && !CPlayer::Players[opponent]->Revealed) {
 			//Wyrmgus end
 				mfp.Visible[player] = 1;
-				if (player == ThisPlayer->Index) {
+				if (player == ThisPlayer->get_index()) {
 					Map.MarkSeenTile(mf);
 				}
 			}
@@ -1417,13 +1417,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 
 				if (mfp->Visible[player] && !mfp->Visible[opponent] && !CPlayer::Players[player]->is_revealed()) {
 					mfp->Visible[opponent] = 1;
-					if (opponent == CPlayer::GetThisPlayer()->Index) {
+					if (opponent == CPlayer::GetThisPlayer()->get_index()) {
 						CMap::get()->MarkSeenTile(mf);
 					}
 				}
 				if (mfp->Visible[opponent] && !mfp->Visible[player] && !CPlayer::Players[opponent]->is_revealed()) {
 					mfp->Visible[player] = 1;
-					if (player == CPlayer::GetThisPlayer()->Index) {
+					if (player == CPlayer::GetThisPlayer()->get_index()) {
 						CMap::get()->MarkSeenTile(mf);
 					}
 				}
@@ -1465,8 +1465,8 @@ void CommandQuit(int player)
 	}
 
 	if (CPlayer::Players[player]->GetUnitCount() != 0) {
-		SetMessage(_("Player \"%s\" has left the game"), CPlayer::Players[player]->Name.c_str());
+		SetMessage(_("Player \"%s\" has left the game"), CPlayer::Players[player]->get_name().c_str());
 	} else {
-		SetMessage(_("Player \"%s\" has been killed"), CPlayer::Players[player]->Name.c_str());
+		SetMessage(_("Player \"%s\" has been killed"), CPlayer::Players[player]->get_name().c_str());
 	}
 }

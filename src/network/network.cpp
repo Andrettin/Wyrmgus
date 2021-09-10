@@ -370,7 +370,7 @@ static void NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommand
 	// Build packet of up to MaxNetworkCommands messages.
 	int numcommands = 0;
 	packet.Header.Cycle = ncq[0].Time & 0xFF;
-	packet.Header.OrigPlayer = CPlayer::GetThisPlayer()->Index;
+	packet.Header.OrigPlayer = CPlayer::GetThisPlayer()->get_index();
 	int i;
 	for (i = 0; i < MaxNetworkCommands && ncq[i].Type != MessageNone; ++i) {
 		packet.Header.Type[i] = ncq[i].Type;
@@ -460,9 +460,9 @@ void ExitNetwork1()
 */
 void NetworkOnStartGame()
 {
-	CPlayer::GetThisPlayer()->SetName(preferences::get()->get_local_player_name());
+	CPlayer::GetThisPlayer()->set_name(preferences::get()->get_local_player_name());
 	for (int i = 0; i < HostsCount; ++i) {
-		CPlayer::Players[Hosts[i].PlyNr]->SetName(Hosts[i].PlyName);
+		CPlayer::Players[Hosts[i].PlyNr]->set_name(Hosts[i].PlyName);
 	}
 	DebugPrint("Updates %d, Lag %d, Hosts %d\n" _C_
 			   CNetworkParameter::Instance.gameCyclesPerUpdate _C_
@@ -693,11 +693,11 @@ static void ParseResendCommand(const CNetworkPacket &packet)
 	const unsigned long gameNetCycle = n;
 	// FIXME: not necessary to send this packet multiple times!!!!
 	// other side sends re-send until it gets an answer.
-	if (n != NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->Index][0].Time) {
+	if (n != NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->get_index()][0].Time) {
 		// Asking for a cycle we haven't gotten to yet, ignore for now
 		return;
 	}
-	NetworkSendPacket(NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->Index]);
+	NetworkSendPacket(NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->get_index()]);
 	// Check if a player quit this cycle
 	for (int j = 0; j < HostsCount; ++j) {
 		for (int c = 0; c < MaxNetworkCommands; ++c) {
@@ -725,7 +725,7 @@ static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index, con
 	const unsigned int slot = nc.Unit;
 	const CUnit *unit = slot < wyrmgus::unit_manager::get()->GetUsedSlotCount() ? &wyrmgus::unit_manager::get()->GetSlotUnit(slot) : nullptr;
 
-	if (unit && (unit->Player->Index == player
+	if (unit && (unit->Player->get_index() == player
 				 || CPlayer::Players[player]->IsTeamed(*unit) || unit->Player->Type == PlayerNeutral)) {
 		return true;
 	} else {
@@ -821,8 +821,8 @@ static void NetworkParseInGameEvent(const std::array<unsigned char, 1024> &buf, 
 			NetworkIn[packet.Header.Cycle][player][i].Type = packet.Header.Type[i];
 			NetworkIn[packet.Header.Cycle][player][i].Data = packet.Command[i];
 		} else {
-			SetMessage(_("%s sent bad command"), CPlayer::Players[player]->Name.c_str());
-			DebugPrint("%s sent bad command: 0x%x\n" _C_ CPlayer::Players[player]->Name.c_str()
+			SetMessage(_("%s sent bad command"), CPlayer::Players[player]->get_name().c_str());
+			DebugPrint("%s sent bad command: 0x%x\n" _C_ CPlayer::Players[player]->get_name().c_str()
 					   _C_ packet.Header.Type[i] & 0x7F);
 		}
 	}
@@ -884,9 +884,9 @@ void NetworkQuitGame()
 	const int gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 	const int NetworkLag = CNetworkParameter::Instance.NetworkLag;
 	const int n = (GameCycle + gameCyclesPerUpdate) / gameCyclesPerUpdate * gameCyclesPerUpdate + NetworkLag;
-	CNetworkCommandQueue(&ncqs)[MaxNetworkCommands] = NetworkIn[n & 0xFF][CPlayer::GetThisPlayer()->Index];
+	CNetworkCommandQueue(&ncqs)[MaxNetworkCommands] = NetworkIn[n & 0xFF][CPlayer::GetThisPlayer()->get_index()];
 	CNetworkCommandQuit nc;
-	nc.player = CPlayer::GetThisPlayer()->Index;
+	nc.player = CPlayer::GetThisPlayer()->get_index();
 	ncqs[0].Type = MessageQuit;
 	ncqs[0].Time = n;
 	ncqs[0].Data.resize(nc.Size());
@@ -1007,7 +1007,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 {
 	// No command available, send sync.
 	int numcommands = 0;
-	CNetworkCommandQueue(&ncq)[MaxNetworkCommands] = NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->Index];
+	CNetworkCommandQueue(&ncq)[MaxNetworkCommands] = NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->get_index()];
 	ncq[0].Clear();
 	if (CommandsIn.empty() && MsgCommandsIn.empty()) {
 		CNetworkCommandSync nc;

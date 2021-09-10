@@ -39,11 +39,11 @@
 
 static inline unsigned char IsTileRadarVisible(const CPlayer &pradar, const CPlayer &punit, const wyrmgus::tile_player_info &mfp)
 {
-	if (mfp.RadarJammer[punit.Index]) {
+	if (mfp.RadarJammer[punit.get_index()]) {
 		return 0;
 	}
 
-	const int p = pradar.Index;
+	const int p = pradar.get_index();
 	if (pradar.IsVisionSharing()) {
 		const std::array<unsigned char, PlayerMax> &radar = mfp.Radar;
 		const std::array<unsigned char, PlayerMax> &jamming = mfp.RadarJammer;
@@ -56,7 +56,7 @@ static inline unsigned char IsTileRadarVisible(const CPlayer &pradar, const CPla
 			}
 
 			if (jamming[i] > 0) {
-				if (CPlayer::Players[i]->has_shared_vision_with(punit.Index)) { //if the shared vision is mutual
+				if (CPlayer::Players[i]->has_shared_vision_with(punit.get_index())) { //if the shared vision is mutual
 					// We are jammed, return nothing
 					return 0;
 				}
@@ -113,8 +113,8 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 */
 void MapMarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 {
-	Assert(CMap::get()->Field(index, z)->player_info->Radar[player.Index] != 255);
-	CMap::get()->Field(index, z)->player_info->Radar[player.Index]++;
+	Assert(CMap::get()->Field(index, z)->player_info->Radar[player.get_index()] != 255);
+	CMap::get()->Field(index, z)->player_info->Radar[player.get_index()]++;
 }
 
 void MapMarkTileRadar(const CPlayer &player, int x, int y, int z)
@@ -135,8 +135,8 @@ void MapUnmarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 {
 	// Reduce radar coverage if it exists.
 	//Wyrmgus start
-//	unsigned char *v = &(CMap::get()->Field(index)->player_info->Radar[player.Index]);
-	unsigned char *v = &(CMap::get()->Field(index, z)->player_info->Radar[player.Index]);
+//	unsigned char *v = &(CMap::get()->Field(index)->player_info->Radar[player.get_index()]);
+	unsigned char *v = &(CMap::get()->Field(index, z)->player_info->Radar[player.get_index()]);
 	//Wyrmgus end
 	if (*v) {
 		--*v;
@@ -165,8 +165,8 @@ void MapMarkTileRadarJammer(const CPlayer &player, const unsigned int index, int
 	//Wyrmgus start
 //	Assert(CMap::get()->Field(index)->player_info->RadarJammer[player.Index] != 255);
 //	CMap::get()->Field(index)->player_info->RadarJammer[player.Index]++;
-	Assert(CMap::get()->Field(index, z)->player_info->RadarJammer[player.Index] != 255);
-	CMap::get()->Field(index, z)->player_info->RadarJammer[player.Index]++;
+	Assert(CMap::get()->Field(index, z)->player_info->RadarJammer[player.get_index()] != 255);
+	CMap::get()->Field(index, z)->player_info->RadarJammer[player.get_index()]++;
 	//Wyrmgus end
 }
 
@@ -190,8 +190,8 @@ void MapUnmarkTileRadarJammer(const CPlayer &player, const unsigned int index, i
 {
 	// Reduce radar coverage if it exists.
 	//Wyrmgus start
-//	unsigned char *v = &(CMap::get()->Field(index)->player_info->RadarJammer[player.Index]);
-	unsigned char *v = &(CMap::get()->Field(index, z)->player_info->RadarJammer[player.Index]);
+//	unsigned char *v = &(CMap::get()->Field(index)->player_info->RadarJammer[player.get_index()]);
+	unsigned char *v = &(CMap::get()->Field(index, z)->player_info->RadarJammer[player.get_index()]);
 	//Wyrmgus end
 	if (*v) {
 		--*v;

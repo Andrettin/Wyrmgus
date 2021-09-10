@@ -1030,7 +1030,7 @@ static int InputKey(int key)
 				char chatMessage[message_input.size() + 40];
 				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
 					CPlayer::GetThisPlayer()->get_player_color()->get_identifier().c_str(),
-					CPlayer::GetThisPlayer()->Name.c_str(), message_input.data());
+					CPlayer::GetThisPlayer()->get_name().c_str(), message_input.data());
 				// FIXME: only to selected players ...
 				NetworkSendChatMessage(chatMessage);
 			}
@@ -1071,9 +1071,9 @@ static int InputKey(int key)
 				if (CPlayer::Players[i]->Type != PlayerPerson) {
 					continue;
 				}
-				if (!strncasecmp(namestart, CPlayer::Players[i]->Name.c_str(), strlen(namestart))) {
-					InputIndex += strlen(CPlayer::Players[i]->Name.c_str()) - strlen(namestart);
-					strcpy_s(namestart, message_input.size() - (namestart - message_input.data()), CPlayer::Players[i]->Name.c_str());
+				if (!strncasecmp(namestart, CPlayer::Players[i]->get_name().c_str(), strlen(namestart))) {
+					InputIndex += strlen(CPlayer::Players[i]->get_name().c_str()) - strlen(namestart);
+					strcpy_s(namestart, message_input.size() - (namestart - message_input.data()), CPlayer::Players[i]->get_name().c_str());
 					if (namestart == message_input.data()) {
 						InputIndex += 2;
 						strcat_s(namestart, message_input.size() - (namestart - message_input.data()), ": ");

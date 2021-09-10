@@ -136,22 +136,22 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	if (!unit.UnderConstruction) {
 		player.DecreaseCountsForUnit(&unit, true);
 		
-		player.Demand += newtype.Stats[player.Index].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.Index].Variables[DEMAND_INDEX].Value;
-		player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
+		player.Demand += newtype.Stats[player.get_index()].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.get_index()].Variables[DEMAND_INDEX].Value;
+		player.Supply += newtype.Stats[player.get_index()].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.get_index()].Variables[SUPPLY_INDEX].Value;
 
 		// Change resource limit
 		for (const resource *resource : resource::get_all()) {
 			if (player.get_max_resource(resource) != -1) {
-				player.change_max_resource(resource, newtype.Stats[player.Index].get_storing(resource) - oldtype.Stats[player.Index].get_storing(resource));
+				player.change_max_resource(resource, newtype.Stats[player.get_index()].get_storing(resource) - oldtype.Stats[player.get_index()].get_storing(resource));
 				player.set_resource(resource, player.get_stored_resource(resource), resource_storage_type::building);
 			}
 		}
 	}
 
 	//  adjust Variables with percent.
-	const CUnitStats &newstats = newtype.Stats[player.Index];
+	const CUnitStats &newstats = newtype.Stats[player.get_index()];
 	//Wyrmgus start
-	const CUnitStats &oldstats = oldtype.Stats[player.Index];
+	const CUnitStats &oldstats = oldtype.Stats[player.get_index()];
 	//Wyrmgus end
 	
 	//if the old unit type had a starting ability that the new one doesn't have, remove it; and apply it if the reverse happens
@@ -235,7 +235,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	//Wyrmgus end
 	
 	unit.Type = &newtype;
-	unit.Stats = &unit.Type->Stats[player.Index];
+	unit.Stats = &unit.Type->Stats[player.get_index()];
 	
 	//Wyrmgus start
 	//change the civilization/faction upgrade markers for those of the new type
@@ -477,7 +477,7 @@ void COrder_UpgradeTo::Execute(CUnit &unit)
 	}
 	CPlayer &player = *unit.Player;
 	const wyrmgus::unit_type &newtype = *this->Type;
-	const CUnitStats &newstats = newtype.Stats[player.Index];
+	const CUnitStats &newstats = newtype.Stats[player.get_index()];
 
 	//Wyrmgus start
 //	this->Ticks += std::max(1, player.SpeedUpgrade / CPlayer::base_speed_factor);
@@ -535,14 +535,14 @@ void COrder_UpgradeTo::UpdateUnitVariables(CUnit &unit) const
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[UPGRADINGTO_INDEX].Value = this->Ticks;
-	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].get_time_cost();
+	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->get_index()].get_time_cost();
 }
 
 void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
 {
 	const CPlayer &player = *unit.Player;
-	const int oldCost = this->Type->Stats[player.Index].get_time_cost();
-	const int newCost = newType.Stats[player.Index].get_time_cost();
+	const int oldCost = this->Type->Stats[player.get_index()].get_time_cost();
+	const int newCost = newType.Stats[player.get_index()].get_time_cost();
 
 	// Must Adjust Ticks to the fraction that was upgraded
 	this->Ticks = this->Ticks * newCost / oldCost;

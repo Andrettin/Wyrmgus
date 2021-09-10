@@ -3694,7 +3694,7 @@ void CMap::generate_settlement_territories(const int z)
 
 	//update the settlement of all buildings, as settlement territories have changed
 	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
-		if (!player->is_alive() || player->Index == PlayerNumNeutral) {
+		if (!player->is_alive() || player->get_index() == PlayerNumNeutral) {
 			continue;
 		}
 

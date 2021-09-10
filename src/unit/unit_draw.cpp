@@ -141,7 +141,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	int y = screenPos.y - type.get_box_height() * scale_factor / 2 - (frame_height - sprite_height) / 2;
 	
 	// show player color circle below unit if that is activated
-	if (preferences::get()->is_player_color_circle_enabled() && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
+	if (preferences::get()->is_player_color_circle_enabled() && unit.Player->get_index() != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
 		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor - 1, render_commands);
 //		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
@@ -152,7 +152,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	if (CEditor::get()->is_running() && UnitUnderCursor == &unit && CEditor::get()->State == EditorSelecting) {
 		color = ColorWhite;
 	} else if (unit.Selected || unit.TeamSelected || (unit.Blink & 1)) {
-		if (unit.Player->Index == PlayerNumNeutral) {
+		if (unit.Player->get_index() == PlayerNumNeutral) {
 			color = ColorYellow;
 		} else if ((unit.Selected || (unit.Blink & 1))
 				   && (unit.Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
@@ -1022,7 +1022,7 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 	Assert(ReplayRevealMap || this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value || IsVisible);
 
 	//Wyrmgus start
-//	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
+//	int player = this->RescuedFrom ? this->RescuedFrom->get_index() : this->Player->get_index();
 	int player = this->GetDisplayPlayer();
 	//Wyrmgus end
 	const UnitAction action = this->CurrentAction();

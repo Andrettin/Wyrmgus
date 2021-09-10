@@ -144,7 +144,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		if (
 			(
 				!unit.IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player->Index == dest->Player->Index || unit.Player->has_building_access(dest->Player))
+				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player == dest->Player || unit.Player->has_building_access(dest->Player))
 			)
 			|| !CanTarget(*unit.Type, dtype)
 		) {
@@ -290,8 +290,7 @@ public:
 	explicit IsAnAlliedUnitOf(const CPlayer &_player) : player(&_player) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*player) && (unit->Player->Index == player->Index
-												  || unit->IsAllied(*player));
+		return unit->IsVisibleAsGoal(*player) && (unit->Player == player || unit->IsAllied(*player));
 	}
 private:
 	const CPlayer *player;
@@ -980,9 +979,9 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	//Wyrmgus end
 
 	if (CMap::get()->Info->IsPointOnMap(goalPos, z) == false || isTransporter) {
-		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
+		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->get_index());
 		if (State == AiForceAttackingState::Waiting && !PlanAttack()) {
-			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
+			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->get_index());
 			Attacking = false;
 		}
 		return;
@@ -1540,7 +1539,7 @@ void AiForce::Update()
 		Attacking = false;
 		if (!Defending && State > AiForceAttackingState::Waiting) {
 			DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
-					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+					   _C_ AiPlayer->Player->get_index() _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
 			Reset(true);
 		}
 		return;
@@ -1589,7 +1588,7 @@ void AiForce::Update()
 	if (Attacking == false) {
 		if (!Defending && State > AiForceAttackingState::Waiting) {
 			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
-					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+					   _C_ AiPlayer->Player->get_index() _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
 			Reset(true);
 		}
 		return ;
@@ -1628,7 +1627,7 @@ void AiForce::Update()
 		if (transporters.empty()) {
 			// Our transporters have been destroyed
 			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
-				_C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+				_C_ AiPlayer->Player->get_index() _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
 			Reset(true);
 		} else if (emptyTrans) {
 			// We have emptied our transporters, go go go
@@ -1730,7 +1729,7 @@ void AiForce::Update()
 					// No enemy found, give up
 					// FIXME: should the force go home or keep trying to attack?
 					DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-							   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
+							   _C_ AiPlayer->Player->get_index() _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 					Attacking = false;
 					State = AiForceAttackingState::Waiting;
 					*/
@@ -1830,7 +1829,7 @@ void AiForce::Update()
 			// No enemy found, give up
 			// FIXME: should the force go home or keep trying to attack?
 			DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
+					   _C_ AiPlayer->Player->get_index() _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 			Attacking = false;
 			State = AiForceAttackingState::Waiting;
 			*/

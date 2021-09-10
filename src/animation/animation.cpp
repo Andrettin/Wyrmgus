@@ -101,7 +101,7 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 static int ParseAnimPlayer(const CUnit &unit, const std::string &parseint)
 {
 	if (parseint == "this") {
-		return unit.Player->Index;
+		return unit.Player->get_index();
 	}
 	return ParseAnimInt(unit, parseint);
 }

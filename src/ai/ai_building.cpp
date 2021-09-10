@@ -617,8 +617,8 @@ bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, co
 {
 	// Find a good place for a new hall
 	//Wyrmgus start
-//	DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->Index
-	DebugPrint("%d: Want to build a %s(%s)\n" _C_ worker.Player->Index
+//	DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->get_index()
+	DebugPrint("%d: Want to build a %s(%s)\n" _C_ worker.Player->get_index()
    //Wyrmgus end
 			   //Wyrmgus start
 //			   _C_ type.Ident.c_str() _C_ type.Name.c_str());

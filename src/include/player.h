@@ -125,18 +125,25 @@ public:
 
 	int get_index() const
 	{
-		return this->Index;
+		return this->index;
 	}
 
 	bool is_neutral_player() const;
 
-	QString get_name_qstring() const
+	const std::string &get_name() const
 	{
-		return QString::fromStdString(this->Name);
+		return this->name;
 	}
 
-	/// Change player name
-	void SetName(const std::string &name);
+	QString get_name_qstring() const
+	{
+		//we only need to lock here and not in the get_name() function because the only possible contention is between a write from the Wyrmgus thread and a read from the Qt one; besides, get_name() returns a reference, which would make a lock there pointless
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return QString::fromStdString(this->get_name());
+	}
+
+	void set_name(const std::string &name);
 
 	//Wyrmgus start
 	const wyrmgus::civilization *get_civilization() const;
@@ -306,9 +313,11 @@ public:
 
 	bool at_war() const;
 
-	int Index = 0;          /// player as number
-	std::string Name;   /// name of non computer
+private:
+	const int index = 0;          /// player as number
+	std::string name;
 
+public:
 	int Type = 0; //type of the player (human, computer, ...)
 	int Race = 0; //race of the player (orc, human, ...)
 	int Faction = -1; //faction of the player
@@ -878,7 +887,7 @@ public:
 	*/
 	bool IsEnemy(const int index) const
 	{
-		return this->Index != index && this->enemies.contains(index);
+		return this->get_index() != index && this->enemies.contains(index);
 	}
 
 	bool IsEnemy(const CPlayer &player) const;
@@ -886,7 +895,7 @@ public:
 
 	bool IsAllied(const int index) const
 	{
-		return this->Index != index && this->allies.contains(index);
+		return this->get_index() != index && this->allies.contains(index);
 	}
 
 	bool IsAllied(const CPlayer &player) const;
@@ -1034,9 +1043,10 @@ signals:
 private:
 	std::vector<CUnit *> Units; /// units of this player
 	CUnit *last_created_unit = nullptr;
-	wyrmgus::player_index_set enemies; //enemies for this player
-	wyrmgus::player_index_set allies; //allies for this player
-	wyrmgus::player_index_set shared_vision; //set of player indexes that this player has shared vision with
+	player_index_set enemies; //enemies for this player
+	player_index_set allies; //allies for this player
+	player_index_set shared_vision; //set of player indexes that this player has shared vision with
+	mutable std::shared_mutex mutex; //mutex for protecting player data which is written from the Wyrmgus thread, but which can be read from the Qt thread
 
 	friend void CleanPlayers();
 	friend void SetPlayersPalette();

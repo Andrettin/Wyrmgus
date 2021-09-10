@@ -765,7 +765,7 @@ void SendCommandSetDynasty(CPlayer *player, const wyrmgus::dynasty *dynasty)
 		//FIXME: should add log of dynasty change here
 		player->set_dynasty(dynasty);
 	} else {
-		NetworkSendExtendedCommand(ExtendedMessageSetDynasty, -1, player->Index, dynasty ? dynasty->get_index() : -1, 0, 0);
+		NetworkSendExtendedCommand(ExtendedMessageSetDynasty, -1, player->get_index(), dynasty ? dynasty->get_index() : -1, 0, 0);
 	}
 }
 

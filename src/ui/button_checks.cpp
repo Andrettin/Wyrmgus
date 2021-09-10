@@ -340,8 +340,8 @@ bool ButtonCheckNoWork(const CUnit &unit, const wyrmgus::button &)
 //		   && action != UnitAction::UpgradeTo
 //		   && action != UnitAction::Research;
 	//don't stop showing the button for a quick moment if the time cost is 0
-	return (action != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0)
-		   && (action != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0)
+	return (action != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->get_index()].get_time_cost() == 0)
+		   && (action != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->get_index()].get_time_cost() == 0)
 		   && (action != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().get_time_cost() == 0);
 	//Wyrmgus end
 }

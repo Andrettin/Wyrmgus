@@ -178,7 +178,7 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 	string::replace(text, "\n", "\\n");
 
 	lua_command += "\"" + std::move(text) + "\", ";
-	lua_command += std::to_string(player->Index) + ", ";
+	lua_command += std::to_string(player->get_index()) + ", ";
 
 	lua_command += "{";
 	if (!this->option_pointers.empty() && !this->option_pointers.front()->get_name().empty()) {
@@ -206,12 +206,12 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 				first = false;
 			}
 			lua_command += "function(s) ";
-			lua_command += "CallDialogueNodeOptionEffect(\"" + this->get_dialogue()->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(i) + ", " + std::to_string(player->Index) + ");";
+			lua_command += "CallDialogueNodeOptionEffect(\"" + this->get_dialogue()->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(i) + ", " + std::to_string(player->get_index()) + ");";
 			lua_command += " end";
 		}
 	} else {
 		lua_command += "function(s) ";
-		lua_command += "CallDialogueNodeOptionEffect(\"" + this->get_dialogue()->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(0) + ", " + std::to_string(player->Index) + ");";
+		lua_command += "CallDialogueNodeOptionEffect(\"" + this->get_dialogue()->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(0) + ", " + std::to_string(player->get_index()) + ");";
 		lua_command += " end";
 	}
 	lua_command += "}, ";

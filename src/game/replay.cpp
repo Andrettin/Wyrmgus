@@ -184,7 +184,7 @@ static std::unique_ptr<FullReplay> StartReplay()
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		replay->Players[i].Name = CPlayer::Players[i]->Name;
+		replay->Players[i].Name = CPlayer::Players[i]->get_name();
 		replay->Players[i].AIScript = GameSettings.Presets[i].AIScript;
 		replay->Players[i].Race = GameSettings.Presets[i].Race;
 		//Wyrmgus start
@@ -194,7 +194,7 @@ static std::unique_ptr<FullReplay> StartReplay()
 		replay->Players[i].Type = GameSettings.Presets[i].Type;
 	}
 
-	replay->LocalPlayer = CPlayer::GetThisPlayer()->Index;
+	replay->LocalPlayer = CPlayer::GetThisPlayer()->get_index();
 
 	replay->Date = dateStr;
 	replay->Map = CMap::get()->Info->get_name();
@@ -425,7 +425,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		}
 
 		path += "/log_of_stratagus_";
-		path += std::to_string(CPlayer::GetThisPlayer()->Index);
+		path += std::to_string(CPlayer::GetThisPlayer()->get_index());
 		path += ".log";
 
 		LogFile = std::make_unique<CFile>();
@@ -929,7 +929,7 @@ static void ReplayEachCycle()
 	if (InitReplay) {
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (!CurrentReplay->Players[i].Name.empty()) {
-				CPlayer::Players[i]->SetName(CurrentReplay->Players[i].Name);
+				CPlayer::Players[i]->set_name(CurrentReplay->Players[i].Name);
 			}
 		}
 		ReplayStep = CurrentReplay->Commands.get();
@@ -999,7 +999,7 @@ int SaveReplay(const std::string &filename)
 
 	destination = parameters::get()->GetUserDirectory() + "/" + GameName + "/logs/" + filename;
 
-	logfile << parameters::get()->GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << CPlayer::GetThisPlayer()->Index << ".log";
+	logfile << parameters::get()->GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << CPlayer::GetThisPlayer()->get_index() << ".log";
 
 	if (stat(logfile.str().c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");

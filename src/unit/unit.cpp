@@ -531,7 +531,7 @@ void CUnit::Release(const bool final)
 
 	// First release, remove from lists/tables.
 	if (!Destroyed) {
-		DebugPrint("%d: First release %d\n" _C_ Player->Index _C_ UnitNumber(*this));
+		DebugPrint("%d: First release %d\n" _C_ this->Player->get_index() _C_ UnitNumber(*this));
 
 		// Are more references remaining?
 		this->Destroyed = 1; // mark as destroyed
@@ -696,8 +696,8 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 {
 	while (level_quantity > 0) {
 		this->Variable[LEVEL_INDEX].Value += 1;
-		if (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value < this->Variable[LEVEL_INDEX].Value) {
-			if (GetAvailableLevelUpUpgrades(true) == 0 || (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value) > 1) {
+		if (this->Type->Stats[this->Player->get_index()].Variables[LEVEL_INDEX].Value < this->Variable[LEVEL_INDEX].Value) {
+			if (GetAvailableLevelUpUpgrades(true) == 0 || (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->get_index()].Variables[LEVEL_INDEX].Value) > 1) {
 				this->Variable[POINTS_INDEX].Max += 5 * (this->Variable[LEVEL_INDEX].Value + 1);
 				this->Variable[POINTS_INDEX].Value += 5 * (this->Variable[LEVEL_INDEX].Value + 1);
 			}
@@ -735,7 +735,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 								continue;
 							}
 
-							unsigned int gathering_rate = experience_upgrade_type->get_resource_step(this->get_current_resource(), this->Player->Index);
+							unsigned int gathering_rate = experience_upgrade_type->get_resource_step(this->get_current_resource(), this->Player->get_index());
 							if (gathering_rate >= best_gathering_rate) {
 								if (gathering_rate > best_gathering_rate) {
 									best_gathering_rate = gathering_rate;
@@ -835,7 +835,7 @@ void CUnit::Retrain()
 	}
 	
 	//now, revert the unit's type to the base level one
-	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > base_level) {
+	while (this->Type->Stats[this->Player->get_index()].Variables[LEVEL_INDEX].Value > base_level) {
 		bool found_previous_unit_type = false;
 		for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 			if (unit_type->is_template()) {
@@ -983,7 +983,7 @@ void CUnit::apply_character_properties()
 			TransformUnitIntoType(*this, *this->get_character()->get_unit_type());
 		}
 
-		this->Variable = this->get_character()->get_unit_type()->Stats[this->Player->Index].Variables;
+		this->Variable = this->get_character()->get_unit_type()->Stats[this->Player->get_index()].Variables;
 	} else {
 		fprintf(stderr, "Character \"%s\" has no unit type.\n", character->get_identifier().c_str());
 		return;
@@ -2994,7 +2994,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		
 		player.IncreaseCountsForUnit(this);
 
-		player.Demand += type.Stats[player.Index].Variables[DEMAND_INDEX].Value; // food needed
+		player.Demand += type.Stats[player.get_index()].Variables[DEMAND_INDEX].Value; // food needed
 	}
 
 	// Don't Add the building if it's dying, used to load a save game
@@ -3017,7 +3017,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		//Wyrmgus end
 	}
 	Player = &player;
-	Stats = &type.Stats[Player->Index];
+	Stats = &type.Stats[Player->get_index()];
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.GetNumberVariable()) {
 			Assert(!Stats->Variables.empty());
@@ -3044,7 +3044,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 
 		if (this->site != nullptr && this->site->get_game_data()->get_site_unit() == this && !this->UnderConstruction) {
 			//update site ownership
-			if (player.Index != PlayerNumNeutral) {
+			if (player.get_index() != PlayerNumNeutral) {
 				this->site->get_game_data()->set_owner(&player);
 			} else {
 				this->site->get_game_data()->set_owner(nullptr);
@@ -3507,8 +3507,8 @@ void CUnit::UpdateXPRequired()
 		return;
 	}
 	
-	this->Variable[XPREQUIRED_INDEX].Value = this->Type->Stats[this->Player->Index].Variables[POINTS_INDEX].Value * 4 * this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value;
-	int extra_levels = this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value;
+	this->Variable[XPREQUIRED_INDEX].Value = this->Type->Stats[this->Player->get_index()].Variables[POINTS_INDEX].Value * 4 * this->Type->Stats[this->Player->get_index()].Variables[LEVEL_INDEX].Value;
+	int extra_levels = this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->get_index()].Variables[LEVEL_INDEX].Value;
 	for (int i = 1; i <= extra_levels; ++i) {
 		this->Variable[XPREQUIRED_INDEX].Value += 50 * 4 * i;
 	}
@@ -3655,7 +3655,7 @@ void CUnit::UpdateSettlement()
 			this->UpdateBuildingSettlementAssignment();
 		}
 	} else {
-		if (this->Player->Index == PlayerNumNeutral) {
+		if (this->Player->get_index() == PlayerNumNeutral) {
 			return;
 		}
 
@@ -3675,12 +3675,12 @@ void CUnit::UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settleme
 		return;
 	}
 	
-	if (this->Player->Index == PlayerNumNeutral) {
+	if (this->Player->get_index() == PlayerNumNeutral) {
 		return;
 	}
 		
 	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
-		if (!player->has_neutral_faction_type() && this->Player->Index != player->Index) {
+		if (!player->has_neutral_faction_type() && this->Player != player.get()) {
 			continue;
 		}
 
@@ -4243,15 +4243,15 @@ void UnitLost(CUnit &unit)
 	}
 
 	//  Handle unit demand. (Currently only food supported.)
-	player.Demand -= type.Stats[player.Index].Variables[DEMAND_INDEX].Value;
+	player.Demand -= type.Stats[player.get_index()].Variables[DEMAND_INDEX].Value;
 
 	//  Update information.
 	if (unit.CurrentAction() != UnitAction::Built) {
 		player.Supply -= unit.Variable[SUPPLY_INDEX].Value;
 		// Decrease resource limit
 		for (const resource *resource : resource::get_all()) {
-			if (player.get_max_resource(resource) != -1 && type.Stats[player.Index].get_storing(resource) != 0) {
-				const int new_max_value = player.get_max_resource(resource) - type.Stats[player.Index].get_storing(resource);
+			if (player.get_max_resource(resource) != -1 && type.Stats[player.get_index()].get_storing(resource) != 0) {
+				const int new_max_value = player.get_max_resource(resource) - type.Stats[player.get_index()].get_storing(resource);
 
 				player.set_max_resource(resource, std::max(0, new_max_value));
 				player.set_resource(resource, player.get_stored_resource(resource), resource_storage_type::building);
@@ -4266,7 +4266,7 @@ void UnitLost(CUnit &unit)
 				continue;
 			}
 
-			if (player.get_income(resource) != 0 && type.Stats[player.Index].get_improve_income(resource) == player.get_income(resource)) {
+			if (player.get_income(resource) != 0 && type.Stats[player.get_index()].get_improve_income(resource) == player.get_income(resource)) {
 				int m = resource->get_default_income();
 
 				for (int j = 0; j < player.GetUnitCount(); ++j) {
@@ -4275,19 +4275,19 @@ void UnitLost(CUnit &unit)
 						continue;
 					}
 
-					m = std::max(m, player_unit.Type->Stats[player.Index].get_improve_income(resource));
+					m = std::max(m, player_unit.Type->Stats[player.get_index()].get_improve_income(resource));
 				}
 
 				player.set_income(resource, m);
 			}
 		}
 
-		if (type.Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {
+		if (type.Stats[player.get_index()].Variables[TRADECOST_INDEX].Enable) {
 			int m = DefaultTradeCost;
 
 			for (int j = 0; j < player.GetUnitCount(); ++j) {
-				if (player.GetUnit(j).Type->Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {
-					m = std::min(m, player.GetUnit(j).Type->Stats[player.Index].Variables[TRADECOST_INDEX].Value);
+				if (player.GetUnit(j).Type->Stats[player.get_index()].Variables[TRADECOST_INDEX].Enable) {
+					m = std::min(m, player.GetUnit(j).Type->Stats[player.get_index()].Variables[TRADECOST_INDEX].Value);
 				}
 			}
 			player.TradeCost = m;
@@ -4304,8 +4304,8 @@ void UnitLost(CUnit &unit)
 			if (lost_town_hall && CPlayer::GetThisPlayer()->HasContactWith(player)) {
 				player.LostTownHallTimer = GameCycle + (30 * CYCLES_PER_SECOND); //30 seconds until being revealed
 				for (int j = 0; j < NumPlayers; ++j) {
-					if (player.Index != j && CPlayer::Players[j]->Type != PlayerNobody) {
-						CPlayer::Players[j]->Notify(_("%s has lost their last town hall, and will be revealed in thirty seconds!"), player.Name.c_str());
+					if (player.get_index() != j && CPlayer::Players[j]->Type != PlayerNobody) {
+						CPlayer::Players[j]->Notify(_("%s has lost their last town hall, and will be revealed in thirty seconds!"), player.get_name().c_str());
 					} else {
 						CPlayer::Players[j]->Notify("%s", _("You have lost your last town hall, and will be revealed in thirty seconds!"));
 					}
@@ -4318,7 +4318,7 @@ void UnitLost(CUnit &unit)
 	//  Handle order cancels.
 	unit.CurrentOrder()->Cancel(unit);
 
-	DebugPrint("%d: Lost %s(%d)\n" _C_ player.Index _C_ type.Ident.c_str() _C_ UnitNumber(unit));
+	DebugPrint("%d: Lost %s(%d)\n" _C_ player.get_index() _C_ type.Ident.c_str() _C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
 	//Wyrmgus start
@@ -4394,8 +4394,8 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	if (!upgrade) {
 		player.Supply += unit.Variable[SUPPLY_INDEX].Value;
 		for (const resource *resource : resource::get_all()) {
-			if (player.get_max_resource(resource) != -1 && type.Stats[player.Index].get_storing(resource) != 0) {
-				player.change_max_resource(resource, type.Stats[player.Index].get_storing(resource));
+			if (player.get_max_resource(resource) != -1 && type.Stats[player.get_index()].get_storing(resource) != 0) {
+				player.change_max_resource(resource, type.Stats[player.get_index()].get_storing(resource));
 			}
 		}
 	}
@@ -4406,11 +4406,11 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 			continue;
 		}
 
-		player.set_income(resource, std::max(player.get_income(resource), type.Stats[player.Index].get_improve_income(resource)));
+		player.set_income(resource, std::max(player.get_income(resource), type.Stats[player.get_index()].get_improve_income(resource)));
 	}
 	
-	if (type.Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {
-		player.TradeCost = std::min(player.TradeCost, type.Stats[player.Index].Variables[TRADECOST_INDEX].Value);
+	if (type.Stats[player.get_index()].Variables[TRADECOST_INDEX].Enable) {
+		player.TradeCost = std::min(player.TradeCost, type.Stats[player.get_index()].Variables[TRADECOST_INDEX].Value);
 	}
 	
 	//Wyrmgus start
@@ -4418,8 +4418,8 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 		player.LostTownHallTimer = 0;
 		player.set_revealed(false);
 		for (int j = 0; j < NumPlayers; ++j) {
-			if (player.Index != j && CPlayer::Players[j]->Type != PlayerNobody) {
-				CPlayer::Players[j]->Notify(_("%s has rebuilt a town hall, and will no longer be revealed!"), player.Name.c_str());
+			if (player.get_index() != j && CPlayer::Players[j]->Type != PlayerNobody) {
+				CPlayer::Players[j]->Notify(_("%s has rebuilt a town hall, and will no longer be revealed!"), player.get_name().c_str());
 			} else {
 				CPlayer::Players[j]->Notify("%s", _("You have rebuilt a town hall, and will no longer be revealed!"));
 			}
@@ -4565,7 +4565,7 @@ void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 		// it's sort of the whole point of this tracking.
 		//
 		if (unit.Destroyed) {
-			unit.Seen.destroyed.insert(player.Index);
+			unit.Seen.destroyed.insert(player.get_index());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			UnitFillSeenValues(unit);
@@ -4596,7 +4596,7 @@ void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 			wyrmgus::unit_manager::get()->remove_unit_seen_under_fog(&unit);
 		}
 	} else {
-		unit.Seen.by_player.insert(player.Index);
+		unit.Seen.by_player.insert(player.get_index());
 	}
 }
 
@@ -4691,7 +4691,7 @@ void UnitCountSeen(CUnit &unit)
 */
 bool CUnit::IsVisible(const CPlayer &player) const
 {
-	const int player_index = player.Index;
+	const int player_index = player.get_index();
 	if (this->VisCount[player_index]) {
 		return true;
 	}
@@ -4705,7 +4705,7 @@ bool CUnit::IsVisible(const CPlayer &player) const
 	}
 
 	for (const CPlayer *other_player : CPlayer::get_revealed_players()) {
-		if (this->VisCount[other_player->Index]) {
+		if (this->VisCount[other_player->get_index()]) {
 			return true;
 		}
 	}
@@ -4870,7 +4870,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 
 	MapUnmarkUnitSight(*this);
 	newplayer.AddUnit(*this);
-	Stats = &Type->Stats[newplayer.Index];
+	Stats = &Type->Stats[newplayer.get_index()];
 
 	//  Must change food/gold and other.
 	//Wyrmgus start
@@ -4879,13 +4879,13 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus end
 		DebugPrint("Resource transfer not supported\n");
 	}
-	newplayer.Demand += Type->Stats[newplayer.Index].Variables[DEMAND_INDEX].Value;
+	newplayer.Demand += Type->Stats[newplayer.get_index()].Variables[DEMAND_INDEX].Value;
 	newplayer.Supply += this->Variable[SUPPLY_INDEX].Value;
 
 	// Increase resource limit
 	for (const resource *resource : resource::get_all()) {
-		if (newplayer.get_max_resource(resource) != -1 && Type->Stats[newplayer.Index].get_storing(resource) != 0) {
-			newplayer.change_max_resource(resource, Type->Stats[newplayer.Index].get_storing(resource));
+		if (newplayer.get_max_resource(resource) != -1 && Type->Stats[newplayer.get_index()].get_storing(resource) != 0) {
+			newplayer.change_max_resource(resource, Type->Stats[newplayer.get_index()].get_storing(resource));
 		}
 	}
 
@@ -4933,7 +4933,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	MapMarkUnitSight(*this);
 	
 	//Wyrmgus start
-	if (newplayer.Index == CPlayer::GetThisPlayer()->Index && show_change) {
+	if (&newplayer == CPlayer::GetThisPlayer() && show_change) {
 		this->Blink = 5;
 		PlayGameSound(wyrmgus::game_sound_set::get()->get_rescue_sound(), MaxSampleVolume);
 	}
@@ -4960,7 +4960,7 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 
 #if 0
 	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n"
-			   _C_ this->Player->Index _C_ this->Slot
+			   _C_ this->Player->get_index() _C_ this->Slot
 			   _C_ mine.Type->Name.c_str()
 			   _C_ mine.Slot
 			   _C_ mine.Data.Resource.Assigned);
@@ -4977,7 +4977,7 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 
 #if 0
 	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
-			   _C_ this->Player->Index _C_ this->Slot
+			   _C_ this->Player->get_index() _C_ this->Slot
 			   _C_ mine.Type->Name.c_str()
 			   _C_ mine.Slot
 			   _C_ mine.CurrentOrder()->Data.Resource.Assigned);
@@ -5967,13 +5967,13 @@ int CUnit::GetDisplayPlayer() const
 	if (this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->Player != CPlayer::GetThisPlayer()) {
 		return PlayerNumNeutral;
 	} else {
-		return this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
+		return this->RescuedFrom ? this->RescuedFrom->get_index() : this->Player->get_index();
 	}
 }
 
 int CUnit::GetPrice() const
 {
-	int cost = this->Type->Stats[this->Player->Index].get_price();
+	int cost = this->Type->Stats[this->Player->get_index()].get_price();
 	
 	if (this->Prefix != nullptr) {
 		cost += this->Prefix->get_magic_level() * 1000;
@@ -5995,7 +5995,7 @@ int CUnit::GetPrice() const
 		cost += this->Elixir->get_magic_level() * 1000;
 	}
 	if (this->get_character() != nullptr) {
-		cost += (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value) * 250;
+		cost += (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->get_index()].Variables[LEVEL_INDEX].Value) * 250;
 	}
 	
 	return cost;
@@ -6213,7 +6213,7 @@ bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
 			return false;
 		}
 	} else {
-		if (dest->Player != this->Player && !(dest->Player->IsAllied(*this->Player) && this->Player->IsAllied(*dest->Player)) && dest->Player->Index != PlayerNumNeutral) {
+		if (dest->Player != this->Player && !(dest->Player->IsAllied(*this->Player) && this->Player->IsAllied(*dest->Player)) && dest->Player->get_index() != PlayerNumNeutral) {
 			return false;
 		}
 	}
@@ -6945,12 +6945,12 @@ const CPlayer *CUnit::get_center_tile_owner() const
 
 bool CUnit::is_seen_by_player(const CPlayer *player) const
 {
-	return this->is_seen_by_player(player->Index);
+	return this->is_seen_by_player(player->get_index());
 }
 
 bool CUnit::is_seen_destroyed_by_player(const CPlayer *player) const
 {
-	return this->is_seen_destroyed_by_player(player->Index);
+	return this->is_seen_destroyed_by_player(player->get_index());
 }
 
 bool CUnit::is_in_tile_rect(const QRect &tile_rect, const int z) const
@@ -7169,7 +7169,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		unit.pixel_offset.setX((type->get_corpse_type()->get_frame_width() - type->get_corpse_type()->Sprite->get_original_frame_size().width()) / 2);
 		unit.pixel_offset.setY((type->get_corpse_type()->get_frame_height() - type->get_corpse_type()->Sprite->get_original_frame_size().height()) / 2);
 
-		unit.CurrentSightRange = type->get_corpse_type()->Stats[unit.Player->Index].Variables[SIGHTRANGE_INDEX].Max;
+		unit.CurrentSightRange = type->get_corpse_type()->Stats[unit.Player->get_index()].Variables[SIGHTRANGE_INDEX].Max;
 	} else {
 		unit.CurrentSightRange = 0;
 	}
@@ -7329,7 +7329,7 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 		return;
 	}
 	
-	if (attacker->Player == target.Player || attacker->Player->Index == PlayerNumNeutral || target.Player->Index == PlayerNumNeutral) {
+	if (attacker->Player == target.Player || attacker->Player->get_index() == PlayerNumNeutral || target.Player->get_index() == PlayerNumNeutral) {
 		return;
 	}
 	
@@ -7358,7 +7358,7 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 		return;
 	}
 	
-	for (const auto &[resource, cost] : target.Type->Stats[target.Player->Index].get_costs()) {
+	for (const auto &[resource, cost] : target.Type->Stats[target.Player->get_index()].get_costs()) {
 		if (cost < 0) {
 			continue;
 		}
@@ -8118,7 +8118,7 @@ bool CUnit::IsEnemy(const CPlayer &player) const
 	}
 
 	//Wyrmgus start
-	if (this->Player->Index != player.Index && player.Type != PlayerNeutral && !this->Player->has_building_access(&player) && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
+	if (this->Player != &player && player.Type != PlayerNeutral && !this->Player->has_building_access(&player) && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
 		return true;
 	}
 	//Wyrmgus end

@@ -1031,8 +1031,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, const int writeTerrain)
 		std::vector<const CUnit *> teleporters;
 		for (const CUnit *unit : unit_manager::get()->get_units()) {
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
-				unit->Type->Ident.c_str(),
-				unit->Player->Index,
+				unit->Type->get_identifier().c_str(),
+				unit->Player->get_index(),
 				unit->tilePos.x, unit->tilePos.y);
 			if (unit->Type->get_given_resource() != nullptr) {
 				f->printf("SetResourcesHeld(unit, %d)\n", unit->ResourcesHeld);

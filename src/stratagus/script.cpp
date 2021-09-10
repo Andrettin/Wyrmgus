@@ -907,12 +907,12 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		return player->get_population();
 	} else if (!strcmp(prop, "Overlord")) {
 		if (player->get_overlord() != nullptr) {
-			return player->get_overlord()->Index;
+			return player->get_overlord()->get_index();
 		}
 		return -1;
 	} else if (!strcmp(prop, "TopOverlord")) {
 		if (player->get_overlord() != nullptr) {
-			return player->get_top_overlord()->Index;
+			return player->get_top_overlord()->get_index();
 		}
 		return -1;
 	} else {
@@ -1478,7 +1478,7 @@ int EvalNumber(const NumberDesc *number)
 		//Wyrmgus end
 		case ENumber_ButtonPlayer: // name of the unit type's class
 			if (number->D.player != nullptr) {
-				return (**number->D.player).Index;
+				return (**number->D.player).get_index();
 			} else { // ERROR.
 				return 0;
 			}
@@ -1714,7 +1714,7 @@ std::string EvalString(const StringDesc *s)
 			if (type != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
-				for (const auto &[loop_resource, quantity] : (**type).Stats[CPlayer::GetThisPlayer()->Index].get_improve_incomes()) {
+				for (const auto &[loop_resource, quantity] : (**type).Stats[CPlayer::GetThisPlayer()->get_index()].get_improve_incomes()) {
 					if (loop_resource->get_index() == TimeCost) {
 						continue;
 					}
@@ -1740,7 +1740,7 @@ std::string EvalString(const StringDesc *s)
 			if (type != nullptr) {
 				std::string luxury_demand;
 				bool first = true;
-				for (const auto &[loop_resource, quantity] : (**type).Stats[CPlayer::GetThisPlayer()->Index].get_resource_demands()) {
+				for (const auto &[loop_resource, quantity] : (**type).Stats[CPlayer::GetThisPlayer()->get_index()].get_resource_demands()) {
 					if (loop_resource->get_index() == TimeCost) {
 						continue;
 					}
@@ -1967,7 +1967,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_PlayerName: // player name
 			player_index = EvalNumber(s->D.PlayerName.get());
 			try {
-				return CPlayer::Players.at(player_index)->Name;
+				return CPlayer::Players.at(player_index)->get_name();
 			} catch (...) {
 				std::throw_with_nested(std::runtime_error("Error getting the player name for index " + std::to_string(player_index) + "."));
 			}

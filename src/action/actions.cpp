@@ -138,7 +138,7 @@ void COrder::AiUnitKilled(CUnit &unit)
 			break;
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
-					   unit.Player->Index _C_ UnitNumber(unit) _C_
+					   unit.Player->get_index() _C_ UnitNumber(unit) _C_
 					   unit.Type->Ident.c_str() _C_ Action);
 			break;
 	}
@@ -330,7 +330,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 
 	unit.decrement_spell_cooldown_timers();
 
-	for (const auto &[unit_type, unit_stock] : unit.Type->Stats[unit.Player->Index].get_unit_stocks()) {
+	for (const auto &[unit_type, unit_stock] : unit.Type->Stats[unit.Player->get_index()].get_unit_stocks()) {
 		if (unit_stock <= 0) {
 			continue;
 		}
@@ -344,7 +344,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 
 		//if the unit still has less stock than its max, re-init the unit stock timer
 		if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock && check_conditions(unit_type, unit.Player)) {
-			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->Index].get_time_cost() * 50);
+			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->get_index()].get_time_cost() * 50);
 		}
 	}
 	
@@ -653,7 +653,7 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		
 		for (size_t i = 0; i < unit.Type->SpawnUnits.size(); ++i) {
 			wyrmgus::unit_type *spawned_type = unit.Type->SpawnUnits[i];
-			int spawned_type_demand = spawned_type->Stats[unit.Player->Index].Variables[DEMAND_INDEX].Value;
+			int spawned_type_demand = spawned_type->Stats[unit.Player->get_index()].Variables[DEMAND_INDEX].Value;
 			if ((GameCycle % (CYCLES_PER_MINUTE * spawned_type_demand)) == 0) { //the quantity of minutes it takes to spawn the unit depends on the unit's supply demand
 				if ((unit.Player->GetUnitTypeCount(spawned_type) * spawned_type_demand) >= (unit.Player->GetUnitTypeCount(unit.Type) * 5)) { //max limit reached
 					continue;

@@ -216,7 +216,7 @@ void COrder_Build::UpdatePathFinderData(PathFinderInput &input)
 void COrder_Build::AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_
+			   unit.Player->get_index() _C_ UnitNumber(unit) _C_
 			   unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
 	if (this->BuildingUnit == nullptr) {
 		//Wyrmgus start
@@ -385,10 +385,10 @@ void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
 	if (unit.CurrentOrder() == this) {
 		  DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
 		  //Wyrmgus start
-//		  _C_ unit.Player->Index _C_ unit.Slot
+//		  _C_ unit.Player->get_index() _C_ unit.Slot
 //		  _C_ building->Type->Name.c_str()
 //		  _C_ building->Slot);
-		  _C_ unit.Player->Index _C_ UnitNumber(unit)
+		  _C_ unit.Player->get_index() _C_ UnitNumber(unit)
 		  _C_ building.Type->GetDefaultName(unit.Player).c_str()
 		  _C_ UnitNumber(building));
 		  //Wyrmgus end

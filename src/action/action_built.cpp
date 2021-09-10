@@ -179,7 +179,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	const wyrmgus::unit_type &type = *unit.Type;
 	CPlayer &player = *unit.Player;
 
-	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.GetDefaultName(&player).c_str());
+	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.get_index() _C_ type.Ident.c_str() _C_ type.GetDefaultName(&player).c_str());
 
 	// HACK: the building is ready now
 	//Wyrmgus start
@@ -196,7 +196,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		wyrmgus::site_game_data *site_game_data = unit.get_site()->get_game_data();
 
 		if (site_game_data->get_site_unit() == &unit) {
-			if (player.Index != PlayerNumNeutral) {
+			if (player.get_index() != PlayerNumNeutral) {
 				site_game_data->set_owner(&player);
 			} else {
 				site_game_data->set_owner(nullptr);
@@ -235,7 +235,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 	
 	//give builders experience for the construction of the structure
-	int xp_gained = type.Stats[unit.Player->Index].get_time_cost() / 10;
+	int xp_gained = type.Stats[unit.Player->get_index()].get_time_cost() / 10;
 	//Wyrmgus end
 
 	if (worker != nullptr) {
@@ -403,15 +403,15 @@ void COrder_Built::Execute(CUnit &unit)
 	// Check if construction should be canceled...
 	if (this->IsCancelled || this->ProgressCounter < 0) {
 		//Wyrmgus start
-//		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
-		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.get_type_name().c_str());
+//		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->get_index() _C_ unit.Type->Name.c_str());
+		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->get_index() _C_ unit.get_type_name().c_str());
 		//Wyrmgus end
 
 		CancelBuilt(*this, unit);
 		return ;
 	}
 
-	const int maxProgress = type.Stats[unit.Player->Index].get_time_cost() * 600;
+	const int maxProgress = type.Stats[unit.Player->get_index()].get_time_cost() * 600;
 
 	// Check if building ready. Note we can both build and repair.
 	if (!unit.Anim.Unbreakable && this->ProgressCounter >= maxProgress) {
@@ -431,7 +431,7 @@ void COrder_Built::UpdateUnitVariables(CUnit &unit) const
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[BUILD_INDEX].Value = this->ProgressCounter;
-	unit.Variable[BUILD_INDEX].Max = unit.Type->Stats[unit.Player->Index].get_time_cost() * 600;
+	unit.Variable[BUILD_INDEX].Max = unit.Type->Stats[unit.Player->get_index()].get_time_cost() * 600;
 
 	// This should happen when building unit with several peons
 	// Maybe also with only one.
@@ -451,7 +451,7 @@ void COrder_Built::FillSeenValues(CUnit &unit) const
 void COrder_Built::AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
+			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->get_identifier().c_str());
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
 	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, CMap::get()->get_tile_landmass(unit.tilePos, unit.MapLayer->ID), unit.settlement);
@@ -480,7 +480,7 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
 	const wyrmgus::unit_type &type = *unit.Type;
 
-	const int time_cost = type.Stats[unit.Player->Index].get_time_cost();
+	const int time_cost = type.Stats[unit.Player->get_index()].get_time_cost();
 
 	if (time_cost == 0) {
 		wyrmgus::log::log_error("Error in COrder_Built::UpdateConstructionFrame(): the unit's time cost is 0.");

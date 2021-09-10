@@ -815,7 +815,7 @@ static int CclAiDebugPlayer(lua_State *l)
 				if (!CPlayer::GetThisPlayer()) {
 					continue;
 				}
-				playerid = CPlayer::GetThisPlayer()->Index;
+				playerid = CPlayer::GetThisPlayer()->get_index();
 			} else {
 				playerid = LuaToNumber(l, j + 1);
 			}
@@ -1291,7 +1291,7 @@ static int CclAiUpgradeTo(lua_State *l)
 static int CclAiPlayer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, AiPlayer->Player->Index);
+	lua_pushnumber(l, AiPlayer->Player->get_index());
 	return 1;
 }
 
@@ -1386,7 +1386,7 @@ static int CclAiDump(lua_State *l)
 					   aip.get_resource(resource), aip.get_stored_resource(resource), aip.get_max_resource(resource));
 			}
 			printf("\n");
-			printf("Player %d:", aip.Index);
+			printf("Player %d:", aip.get_index());
 #if 0
 			gh_display(gh_car(AiPlayer->Script));
 #endif

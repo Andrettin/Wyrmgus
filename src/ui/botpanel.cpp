@@ -339,7 +339,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 
 	if (condition->ImproveIncome != -1) {
 		const resource *resource = resource::get_all()[condition->ImproveIncome];
-		if (!type || type->Stats[CPlayer::GetThisPlayer()->Index].get_improve_income(resource) <= resource->get_default_income()) {
+		if (!type || type->Stats[CPlayer::GetThisPlayer()->get_index()].get_improve_income(resource) <= resource->get_default_income()) {
 			return false;
 		}
 	}
@@ -367,7 +367,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			if (!type) {
 				return false;
 			}
-			for (const auto &[resource, quantity] : type->Stats[CPlayer::GetThisPlayer()->Index].get_improve_incomes()) {
+			for (const auto &[resource, quantity] : type->Stats[CPlayer::GetThisPlayer()->get_index()].get_improve_incomes()) {
 				if (resource->get_index() == TimeCost) {
 					continue;
 				}
@@ -531,7 +531,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	//Wyrmgus end
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
-				if ((condition->Variables[i] == CONDITION_ONLY) ^ type->Stats[CPlayer::GetThisPlayer()->Index].Variables[i].Enable) {
+				if ((condition->Variables[i] == CONDITION_ONLY) ^ type->Stats[CPlayer::GetThisPlayer()->get_index()].Variables[i].Enable) {
 					return false;
 				}
 			}
@@ -816,13 +816,13 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::UpgradeToClass: {
-			const resource_map<int> type_costs = CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(unit_type) != 0);
+			const resource_map<int> type_costs = CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(unit_type) != 0);
 
 			for (const auto &[resource, cost] : type_costs) {
 				Costs[resource->get_index()] = cost;
 			}
 
-			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
+			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->get_index()].Variables[DEMAND_INDEX].Value;
 			break;
 		}
 		case ButtonCmd::Buy:
@@ -1139,12 +1139,12 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 												   pos, str, player_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], *button), render_commands);
 												   
 				if (
-					((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(button_unit_type) != 0)
+					((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(button_unit_type) != 0)
 					|| button->Action == ButtonCmd::SellResource || button->Action == ButtonCmd::BuyResource
 				) {
 					std::string number_string;
-					if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(button_unit_type) != 0) { //draw the quantity in stock for unit "training" cases which have it
-						number_string = std::to_string(Selected[0]->GetUnitStock(button_unit_type)) + "/" + std::to_string(Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(button_unit_type));
+					if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(button_unit_type) != 0) { //draw the quantity in stock for unit "training" cases which have it
+						number_string = std::to_string(Selected[0]->GetUnitStock(button_unit_type)) + "/" + std::to_string(Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(button_unit_type));
 					} else if (button->Action == ButtonCmd::SellResource) {
 						number_string = std::to_string(Selected[0]->Player->get_effective_resource_sell_price(button->get_value_resource()));
 					} else if (button->Action == ButtonCmd::BuyResource) {
@@ -1335,14 +1335,14 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 //			res = unit.CurrentAction() == UnitAction::UpgradeTo
 //				  || unit.CurrentAction() == UnitAction::Research;
 			//don't show the cancel button for a quick moment if the time cost is 0
-			res = (unit.CurrentAction() == UnitAction::UpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() > 0)
+			res = (unit.CurrentAction() == UnitAction::UpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->get_index()].get_time_cost() > 0)
 				|| (unit.CurrentAction() == UnitAction::Research && static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().get_time_cost() > 0);
 			//Wyrmgus end
 			break;
 		case ButtonCmd::CancelTrain:
 			//Wyrmgus start
 //			res = unit.CurrentAction() == UnitAction::Train;
-			res = unit.CurrentAction() == UnitAction::Train && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() > 0; //don't show the cancel button for a quick moment if the time cost is 0
+			res = unit.CurrentAction() == UnitAction::Train && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->get_index()].get_time_cost() > 0; //don't show the cancel button for a quick moment if the time cost is 0
 			//Wyrmgus end
 			break;
 		case ButtonCmd::CancelBuild:
@@ -2006,8 +2006,8 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 		if (Selected[best_training_place]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("Unit training queue is full"));
 			return;
-		} else if (CPlayer::GetThisPlayer()->CheckLimits(*unit_type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].get_unit_stock(unit_type) != 0)) {
-			SendCommandTrainUnit(*Selected[best_training_place], *unit_type, CPlayer::GetThisPlayer()->Index, FlushCommands);
+		} else if (CPlayer::GetThisPlayer()->CheckLimits(*unit_type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->get_index()].get_unit_stock(unit_type) != 0)) {
+			SendCommandTrainUnit(*Selected[best_training_place], *unit_type, CPlayer::GetThisPlayer()->get_index(), FlushCommands);
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
 		} else if (CPlayer::GetThisPlayer()->CheckLimits(*unit_type) == -3) {
@@ -2080,7 +2080,7 @@ void CButtonPanel::DoClicked_Research(const std::unique_ptr<wyrmgus::button> &bu
 	const resource_map<int> upgrade_costs = CPlayer::GetThisPlayer()->GetUpgradeCosts(button_upgrade);
 	if (!CPlayer::GetThisPlayer()->CheckCosts(upgrade_costs)) {
 		//PlayerSubCosts(player,Upgrades[i].Costs);
-		SendCommandResearch(*Selected[0], *button_upgrade, CPlayer::GetThisPlayer()->Index, !(key_modifiers & Qt::ShiftModifier));
+		SendCommandResearch(*Selected[0], *button_upgrade, CPlayer::GetThisPlayer()->get_index(), !(key_modifiers & Qt::ShiftModifier));
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		LastDrawnButtonPopup = nullptr;
@@ -2107,7 +2107,7 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 void CButtonPanel::DoClicked_Faction(int button)
 {
 	const int index = CurrentButtons[button]->Value;
-	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[index]->ID);
+	SendCommandSetFaction(CPlayer::GetThisPlayer()->get_index(), CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[index]->ID);
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;
@@ -2134,7 +2134,7 @@ void CButtonPanel::DoClicked_Buy(int button)
 	buy_costs[defines::get()->get_wealth_resource()] = unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).GetPrice();
 
 	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->CheckLimits(*wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type) >= 0) {
-		SendCommandBuy(*Selected[0], &wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value), CPlayer::GetThisPlayer()->Index);
+		SendCommandBuy(*Selected[0], &wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value), CPlayer::GetThisPlayer()->get_index());
 		ButtonUnderCursor = -1;
 		OldButtonUnderCursor = -1;
 		LastDrawnButtonPopup = nullptr;
@@ -2165,12 +2165,12 @@ void CButtonPanel::DoClicked_SellResource(int button, const Qt::KeyboardModifier
 	const int resource = CurrentButtons[button]->Value;
 	
 	if (toggle_autosell && Selected[0]->Player == CPlayer::GetThisPlayer()) {
-		SendCommandAutosellResource(CPlayer::GetThisPlayer()->Index, resource);
+		SendCommandAutosellResource(CPlayer::GetThisPlayer()->get_index(), resource);
 	} else {
 		resource_map<int> sell_resource_costs;
 		sell_resource_costs[resource::get_all()[resource]] = 100;
 		if (!CPlayer::GetThisPlayer()->CheckCosts(sell_resource_costs)) {
-			SendCommandSellResource(*Selected[0], resource, CPlayer::GetThisPlayer()->Index);
+			SendCommandSellResource(*Selected[0], resource, CPlayer::GetThisPlayer()->get_index());
 		}
 	}
 }
@@ -2181,7 +2181,7 @@ void CButtonPanel::DoClicked_BuyResource(int button)
 	resource_map<int> buy_resource_costs;
 	buy_resource_costs[defines::get()->get_wealth_resource()] = Selected[0]->Player->get_effective_resource_buy_price(resource);
 	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_resource_costs)) {
-		SendCommandBuyResource(*Selected[0], resource->get_index(), CPlayer::GetThisPlayer()->Index);
+		SendCommandBuyResource(*Selected[0], resource->get_index(), CPlayer::GetThisPlayer()->get_index());
 	}
 }
 

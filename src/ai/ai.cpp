@@ -327,7 +327,7 @@ static void AiCheckUnits()
 					buy_costs[defines::get()->get_wealth_resource()] = hero->GetPrice();
 
 					if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*hero->Type) >= 1) {
-						CommandBuy(*hero_recruiter, hero, AiPlayer->Player->Index);
+						CommandBuy(*hero_recruiter, hero, AiPlayer->Player->get_index());
 						break;
 					}
 				}
@@ -336,7 +336,7 @@ static void AiCheckUnits()
 		
 		//check if can hire any mercenaries
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (i == AiPlayer->Player->Index) {
+			if (i == AiPlayer->Player->get_index()) {
 				continue;
 			}
 
@@ -361,7 +361,7 @@ static void AiCheckUnits()
 						buy_costs[defines::get()->get_wealth_resource()] = mercenary_hero->GetPrice();
 
 						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*mercenary_hero->Type) >= 1) {
-							CommandBuy(*mercenary_building, mercenary_hero, AiPlayer->Player->Index);
+							CommandBuy(*mercenary_building, mercenary_hero, AiPlayer->Player->get_index());
 							break;
 						}
 					}
@@ -389,7 +389,7 @@ static void AiCheckUnits()
 								&& (!queue.settlement || queue.settlement == mercenary_building->settlement)
 							) {
 								queue.Made++;
-								CommandTrainUnit(*mercenary_building, *mercenary_type, AiPlayer->Player->Index, FlushCommands);
+								CommandTrainUnit(*mercenary_building, *mercenary_type, AiPlayer->Player->get_index(), FlushCommands);
 								mercenary_recruited = true;
 								break;
 							}
@@ -666,7 +666,7 @@ void AiInit(CPlayer &player)
 
 	pai->Player = &player;
 
-	DebugPrint("%d - looking for class %s\n" _C_ player.Index _C_ player.AiName.c_str());
+	DebugPrint("%d - looking for class %s\n" _C_ player.get_index() _C_ player.AiName.c_str());
 	//MAPTODO print the player name (player->Name) instead of the pointer
 
 	//  Search correct AI type.
@@ -904,13 +904,13 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, const la
 void AiHelpMe(CUnit *attacker, CUnit &defender)
 {
 	/* Friendly Fire - typical splash */
-	if (!attacker || attacker->Player->Index == defender.Player->Index) {
+	if (!attacker || attacker->Player == defender.Player) {
 		//FIXME - try react somehow
 		return;
 	}
 
 	DebugPrint("%d: %d(%s) attacked at %d,%d\n" _C_
-			   defender.Player->Index _C_ UnitNumber(defender) _C_
+			   defender.Player->get_index() _C_ UnitNumber(defender) _C_
 			   defender.Type->Ident.c_str() _C_ defender.tilePos.x _C_ defender.tilePos.y);
 
 	//  Don't send help to scouts (zeppelin,eye of vision).
@@ -997,7 +997,7 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 		}
 		if (!aiForce.Defending && aiForce.State > 0) {
 			DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
-					   defender.Player->Index _C_ UnitNumber(defender) _C_ defender.Type->Ident.c_str());
+					   defender.Player->get_index() _C_ UnitNumber(defender) _C_ defender.Type->Ident.c_str());
 			// unit belongs to an attacking force,
 			// so don't send others force in such case.
 			// FIXME: there may be other attacking the same place force who can help
@@ -1073,7 +1073,7 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 			}
 			if (!aiForce.Defending && aiForce.State > 0) {
 				DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
-						   defender.Player->Index _C_ UnitNumber(defender) _C_ defender.Type->Ident.c_str());
+						   defender.Player->get_index() _C_ UnitNumber(defender) _C_ defender.Type->Ident.c_str());
 				// unit belongs to an attacking force,
 				// so don't send others force in such case.
 				// FIXME: there may be other attacking the same place force who can help
@@ -1152,7 +1152,7 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 void AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
+			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
 
 	Assert(unit.Player->Type != PlayerPerson);
 
@@ -1164,7 +1164,7 @@ void AiUnitKilled(CUnit &unit)
 			force.Attacking = false;
 			if (!force.Defending && force.State > AiForceAttackingState::Waiting) {
 				DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
-						   _C_ unit.Player->Index _C_(long unsigned int)(&force  - & (unit.Player->Ai->Force[0])));
+						   _C_ unit.Player->get_index() _C_(long unsigned int)(&force  - & (unit.Player->Ai->Force[0])));
 				force.Reset(true);
 			}
 		}
@@ -1183,11 +1183,11 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 {
 	if (unit) {
 		DebugPrint("%d: %d(%s) build %s at %d,%d completed\n" _C_
-				   what.Player->Index _C_ UnitNumber(*unit) _C_ unit->Type->Ident.c_str() _C_
+				   what.Player->get_index() _C_ UnitNumber(*unit) _C_ unit->Type->Ident.c_str() _C_
 				   what.Type->Ident.c_str() _C_ unit->tilePos.x _C_ unit->tilePos.y);
 	} else {
 		DebugPrint("%d: building %s at %d,%d completed\n" _C_
-				   what.Player->Index _C_ what.Type->Ident.c_str() _C_ what.tilePos.x _C_ what.tilePos.y);
+				   what.Player->get_index() _C_ what.Type->Ident.c_str() _C_ what.tilePos.x _C_ what.tilePos.y);
 	}
 
 	Assert(what.Player->Type != PlayerPerson);
@@ -1206,7 +1206,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 void AiCanNotBuild(const CUnit &unit, const wyrmgus::unit_type &what, const landmass *landmass, const wyrmgus::site *settlement)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
+			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
 			   what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
 	Assert(unit.Player->Type != PlayerPerson);
@@ -1403,8 +1403,8 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 {
 	DebugPrint("%d: %d(%s) training %s at %d,%d completed\n" _C_
 			   //Wyrmgus start
-//			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
-			   what.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
+//			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
+			   what.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
 			   //Wyrmgus end
 			   what.Type->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
@@ -1447,7 +1447,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 void AiUpgradeToComplete(CUnit &unit, const wyrmgus::unit_type &what)
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
+			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
 			   what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
 	Assert(unit.Player->Type != PlayerPerson);
@@ -1462,7 +1462,7 @@ void AiUpgradeToComplete(CUnit &unit, const wyrmgus::unit_type &what)
 void AiResearchComplete(CUnit &unit, const CUpgrade *what)
 {
 	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->get_identifier().c_str() _C_
+			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->get_identifier().c_str() _C_
 			   what->get_identifier().c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
 	Assert(unit.Player->Type != PlayerPerson);

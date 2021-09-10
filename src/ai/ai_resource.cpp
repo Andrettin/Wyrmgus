@@ -141,13 +141,13 @@ static int AiCheckSupply(const PlayerAi &pai, const wyrmgus::unit_type &type)
 	int remaining = 0;
 	for (unsigned int i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
 		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
-		if (queue.Type->Stats[pai.Player->Index].Variables[SUPPLY_INDEX].Value) {
-			remaining += queue.Made * queue.Type->Stats[pai.Player->Index].Variables[SUPPLY_INDEX].Value;
+		if (queue.Type->Stats[pai.Player->get_index()].Variables[SUPPLY_INDEX].Value) {
+			remaining += queue.Made * queue.Type->Stats[pai.Player->get_index()].Variables[SUPPLY_INDEX].Value;
 		}
 	}
 
 	// We are already out of food.
-	remaining += pai.Player->Supply - pai.Player->Demand - type.Stats[pai.Player->Index].Variables[DEMAND_INDEX].Value;
+	remaining += pai.Player->Supply - pai.Player->Demand - type.Stats[pai.Player->get_index()].Variables[DEMAND_INDEX].Value;
 	if (remaining < 0) {
 		return 0;
 	}
@@ -159,7 +159,7 @@ static int AiCheckSupply(const PlayerAi &pai, const wyrmgus::unit_type &type)
 			continue;
 		}
 
-		remaining -= queue.Made * queue.Type->Stats[pai.Player->Index].Variables[DEMAND_INDEX].Value;
+		remaining -= queue.Made * queue.Type->Stats[pai.Player->get_index()].Variables[DEMAND_INDEX].Value;
 		if (remaining < 0) {
 			return 0;
 		}
@@ -529,7 +529,7 @@ void AiNewDepotRequest(CUnit &worker)
 {
 #if 0
 	DebugPrint("%d: Worker %d report: Resource [%d] too far from depot, returning time [%d].\n"
-			   _C_ worker->Player->Index _C_ worker->Slot
+			   _C_ worker->Player->get_index() _C_ worker->Slot
 			   _C_ worker->CurrentResource
 			   _C_ worker->Data.Move.Cycles);
 #endif
@@ -608,7 +608,7 @@ void AiNewDepotRequest(CUnit &worker)
 		worker.Player->Ai->UnitTypeBuilt.push_back(queue);
 
 		DebugPrint("%d: Worker %d report: Requesting new depot near [%d,%d].\n"
-				   _C_ worker.Player->Index _C_ UnitNumber(worker)
+				   _C_ worker.Player->get_index() _C_ UnitNumber(worker)
 				   _C_ queue.Pos.x _C_ queue.Pos.y);
 		/*
 		} else {
@@ -886,7 +886,7 @@ static bool AiRequestSupply()
 		if (counter[type.Slot]) { // Already ordered.
 #if defined(DEBUG) && defined(DebugRequestSupply)
 			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n"
-					   _C_ AiPlayer->Player->Index _C_ type->Name.c_str());
+					   _C_ AiPlayer->Player->get_index() _C_ type->Name.c_str());
 #endif
 			return false;
 		}
@@ -914,8 +914,8 @@ static bool AiRequestSupply()
 			cache[j].unit_cost += cost;
 		}
 
-		cache[j].unit_cost += type.Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value - 1;
-		cache[j].unit_cost /= type.Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value;
+		cache[j].unit_cost += type.Stats[AiPlayer->Player->get_index()].Variables[SUPPLY_INDEX].Value - 1;
+		cache[j].unit_cost /= type.Stats[AiPlayer->Player->get_index()].Variables[SUPPLY_INDEX].Value;
 		cache[j++].type = &type;
 		Assert(j < 16);
 	}
@@ -939,7 +939,7 @@ static bool AiRequestSupply()
 					AiPlayer->UnitTypeBuilt.begin(), newqueue);
 #if defined( DEBUG) && defined( DebugRequestSupply )
 				DebugPrint("%d: AiRequestSupply: build Supply in %s\n"
-						   _C_ AiPlayer->Player->Index _C_ type->Name.c_str());
+						   _C_ AiPlayer->Player->get_index() _C_ type->Name.c_str());
 #endif
 				return false;
 			}
@@ -983,7 +983,7 @@ static bool AiRequestSupply()
 		}
 	}
 	DebugPrint("%d: AiRequestSupply: needed build %s with %s resource\n"
-			   _C_ AiPlayer->Player->Index _C_ cache[0].type->Name.c_str() _C_ needed.c_str());
+			   _C_ AiPlayer->Player->get_index() _C_ cache[0].type->Name.c_str() _C_ needed.c_str());
 #endif
 	return true;
 }
@@ -1019,7 +1019,7 @@ static bool AiTrainUnit(const unit_type &type, unit_type &what, const landmass *
 		if (unit.IsIdle()) {
 			//Wyrmgus start
 //			CommandTrainUnit(unit, what, FlushCommands);
-			CommandTrainUnit(unit, what, AiPlayer->Player->Index, FlushCommands);
+			CommandTrainUnit(unit, what, AiPlayer->Player->get_index(), FlushCommands);
 			//Wyrmgus end
 			return true;
 		}
@@ -1211,7 +1211,7 @@ void AiAddUpgradeToRequest(wyrmgus::unit_type &type)
 
 	if (unit_type_upgradees.empty() && unit_class_upgradees.empty()) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
+				   _C_ AiPlayer->Player->get_index() _C_ type.Ident.c_str());
 		return;
 	}
 
@@ -1247,7 +1247,7 @@ static void AiCheckingWork()
 {
 	// Supply has the highest priority
 	if (AiPlayer->NeedSupply) {
-		if (AiPlayer->UnitTypeBuilt.empty() || AiPlayer->UnitTypeBuilt[0].Type->Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value == 0) {
+		if (AiPlayer->UnitTypeBuilt.empty() || AiPlayer->UnitTypeBuilt[0].Type->Stats[AiPlayer->Player->get_index()].Variables[SUPPLY_INDEX].Value == 0) {
 			AiPlayer->NeedSupply = false;
 			AiRequestSupply();
 		}
@@ -1267,7 +1267,7 @@ static void AiCheckingWork()
 
 			if (
 				(!type.BoolFlag[TOWNHALL_INDEX].value && settlement_game_data->get_site_unit()->Player != AiPlayer->Player)
-				|| (type.BoolFlag[TOWNHALL_INDEX].value && settlement_game_data->get_site_unit()->Player->Index != PlayerNumNeutral)
+				|| (type.BoolFlag[TOWNHALL_INDEX].value && settlement_game_data->get_site_unit()->Player->get_index() != PlayerNumNeutral)
 			) {
 				AiPlayer->UnitTypeBuilt.erase(AiPlayer->UnitTypeBuilt.begin() + (AiPlayer->UnitTypeBuilt.size() - sz + i));
 				continue;
@@ -1278,7 +1278,7 @@ static void AiCheckingWork()
 		// Buildings can be destroyed.
 
 		// Check if we have enough food.
-		if (type.Stats[AiPlayer->Player->Index].Variables[DEMAND_INDEX].Value && !AiCheckSupply(*AiPlayer, type)) {
+		if (type.Stats[AiPlayer->Player->get_index()].Variables[DEMAND_INDEX].Value && !AiCheckSupply(*AiPlayer, type)) {
 			AiPlayer->NeedSupply = true;
 			AiRequestSupply();
 			// AiRequestSupply can change UnitTypeBuilt so recalculate queuep
@@ -1859,7 +1859,7 @@ static void AiCollectResources()
 					
 					if (market_table.size() > 0) {
 						CUnit &market_unit = *market_table[SyncRand(market_table.size())];
-						CommandBuyResource(market_unit, c, AiPlayer->Player->Index);
+						CommandBuyResource(market_unit, c, AiPlayer->Player->get_index());
 						break;
 					}
 				}
@@ -1897,7 +1897,7 @@ static void AiCollectResources()
 
 					if (market_table.size() > 0) {
 						CUnit &market_unit = *market_table[SyncRand(market_table.size())];
-						CommandSellResource(market_unit, c, AiPlayer->Player->Index);
+						CommandSellResource(market_unit, c, AiPlayer->Player->get_index());
 						break;
 					}
 				}
@@ -2009,13 +2009,13 @@ static int AiRepairUnit(CUnit &unit)
 	const wyrmgus::unit_type &type = *unit.Type;
 	if (type.Slot >= n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
+				   _C_ AiPlayer->Player->get_index() _C_ type.Ident.c_str());
 		return 0;
 	}
 	std::vector<const wyrmgus::unit_type *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit II: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
+				   _C_ AiPlayer->Player->get_index() _C_ type.Ident.c_str());
 		return 0;
 	}
 
@@ -2403,7 +2403,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		if (settlement_unit->Player->Index != PlayerNumNeutral) {
+		if (settlement_unit->Player->get_index() != PlayerNumNeutral) {
 			continue;
 		}
 		
@@ -2853,7 +2853,7 @@ void AiResourceManager()
 
 	// Collect resources.
 	if ((GameCycle / CYCLES_PER_SECOND) % COLLECT_RESOURCES_INTERVAL ==
-		(unsigned long)AiPlayer->Player->Index % COLLECT_RESOURCES_INTERVAL) {
+		(unsigned long)AiPlayer->Player->get_index() % COLLECT_RESOURCES_INTERVAL) {
 		//Wyrmgus start
 		AiProduceResources(); //handle building resource production choice
 		//Wyrmgus end

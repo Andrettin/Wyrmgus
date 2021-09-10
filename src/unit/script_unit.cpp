@@ -1260,7 +1260,7 @@ static int CclOrderUnit(lua_State *l)
 			|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
 			|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
 			|| unittype == unit.Type) {
-			if (plynr == -1 || plynr == unit.Player->Index) {
+			if (plynr == -1 || plynr == unit.Player->get_index()) {
 				if (!strcmp(order, "move")) {
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1, d_z);
 				} else if (!strcmp(order, "attack")) {
@@ -1381,7 +1381,7 @@ static int CclKillUnitAt(lua_State *l)
 			|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
 			|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
 			|| unittype == unit.Type) {
-			if ((plynr == -1 || plynr == unit.Player->Index) && unit.IsAlive()) {
+			if ((plynr == -1 || plynr == unit.Player->get_index()) && unit.IsAlive()) {
 				LetUnitDie(unit);
 				++s;
 			}
@@ -1591,8 +1591,8 @@ static int CclGetPlayersAroundUnit(lua_State *l)
 	SelectAroundUnit(unit, range, table, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::get_neutral_player()), HasNotSamePlayerAs(*unit.Player)));
 	std::vector<int> players_around;
 	for (size_t i = 0; i < table.size(); ++i) {
-		if (table[i]->IsAliveOnMap() && std::find(players_around.begin(), players_around.end(), table[i]->Player->Index) == players_around.end()) {
-			players_around.push_back(table[i]->Player->Index);
+		if (table[i]->IsAliveOnMap() && std::find(players_around.begin(), players_around.end(), table[i]->Player->get_index()) == players_around.end()) {
+			players_around.push_back(table[i]->Player->get_index());
 		}
 	}
 	size_t n = 0;
@@ -1914,7 +1914,7 @@ static int CclSetUnitVariable(lua_State *l)
 			} else {
 				unit->Player->ChangeUnitTypeAiActiveCount(unit->Type, -1);
 				if (unit->Player->GetUnitTypeAiActiveCount(unit->Type) < 0) { // if unit AI active count is negative, something wrong happened
-					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->Index, unit->Type->Ident.c_str(), unit->Player->GetUnitTypeAiActiveCount(unit->Type));
+					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->get_index(), unit->Type->Ident.c_str(), unit->Player->GetUnitTypeAiActiveCount(unit->Type));
 				}
 			}
 		}

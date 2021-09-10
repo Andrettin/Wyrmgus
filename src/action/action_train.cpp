@@ -66,7 +66,7 @@ std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, const wyrmgus::un
 	//Wyrmgus start
 	order->Player = player;
 //	trainer.Player->SubUnitType(type);
-	CPlayer::Players[player]->SubUnitType(type, trainer.Type->Stats[trainer.Player->Index].get_unit_stock(&type) != 0);
+	CPlayer::Players[player]->SubUnitType(type, trainer.Type->Stats[trainer.Player->get_index()].get_unit_stock(&type) != 0);
 	//Wyrmgus end
 
 	return order;
@@ -132,7 +132,7 @@ void COrder_Train::Cancel(CUnit &unit)
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelTrainingCostsFactor);
+//	player.AddCostsFactor(this->Type->Stats[player.get_index()].Costs, CancelTrainingCostsFactor);
 	const resource_map<int> type_costs = player.GetUnitTypeCosts(this->Type);
 	player.AddCostsFactor(type_costs, CancelTrainingCostsFactor);
 	//Wyrmgus end
@@ -144,7 +144,7 @@ void COrder_Train::UpdateUnitVariables(CUnit &unit) const
 
 	unit.Variable[TRAINING_INDEX].Value = this->Ticks;
 	//Wyrmgus start
-//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->Index].get_time_cost();
+//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->get_index()].get_time_cost();
 	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[this->Player].get_time_cost();
 	//Wyrmgus end
 }
@@ -157,8 +157,8 @@ void COrder_Train::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newTyp
 //	const CPlayer &player = *unit.Player;
 	const CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
-	const int oldCost = this->Type->Stats[player.Index].get_time_cost();
-	const int newCost = newType.Stats[player.Index].get_time_cost();
+	const int oldCost = this->Type->Stats[player.get_index()].get_time_cost();
+	const int newCost = newType.Stats[player.get_index()].get_time_cost();
 
 	// Must Adjust Ticks to the fraction that was trained
 	this->Ticks = this->Ticks * newCost / oldCost;
@@ -238,7 +238,7 @@ void COrder_Train::Execute(CUnit &unit)
 	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
 	const wyrmgus::unit_type &nType = *this->Type;
-	const int cost = nType.Stats[player.Index].get_time_cost();
+	const int cost = nType.Stats[player.get_index()].get_time_cost();
 	
 	//Wyrmgus start
 	// Check if enough supply available.
@@ -257,7 +257,7 @@ void COrder_Train::Execute(CUnit &unit)
 //	this->Ticks += std::max(1, player.SpeedTrain / CPlayer::base_speed_factor);
 	this->Ticks += std::max(1, (player.SpeedTrain + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / CPlayer::base_speed_factor);
 	
-	if (unit.Type->Stats[unit.Player->Index].get_unit_stock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
+	if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
 		this->Ticks = cost;
 	}
 	//Wyrmgus end
@@ -346,7 +346,7 @@ void COrder_Train::Execute(CUnit &unit)
 	}
 	*/
 	for (int i = 0; i < (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1); ++i) {
-		if (unit.Type->Stats[unit.Player->Index].get_unit_stock(&nType) != 0) {
+		if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&nType) != 0) {
 			if (unit.GetUnitStock(&nType) > 0) {
 				unit.ChangeUnitStock(&nType, -1);
 			} else {
@@ -394,7 +394,7 @@ void COrder_Train::Execute(CUnit &unit)
 		}
 
 		//Wyrmgus start
-		if (this->Player != unit.Player->Index && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->has_building_access(unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
+		if (this->Player != unit.Player->get_index() && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->has_building_access(unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
 			unit.Player->change_resource(defines::get()->get_wealth_resource(), newUnit->GetPrice(), true);
 		}
 		//Wyrmgus end
@@ -438,7 +438,7 @@ void COrder_Train::Execute(CUnit &unit)
 				} else if (newUnit->CanHarvest(table[j])) { // see if can harvest
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
-				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->get_given_resource() != nullptr && newUnit->Type->get_resource_info(table[j]->Type->get_given_resource()) != nullptr && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
+				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->get_given_resource() != nullptr && newUnit->Type->get_resource_info(table[j]->Type->get_given_resource()) != nullptr && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->get_index() == PlayerNumNeutral)) { // see if can build mine on top of deposit
 					for (const wyrmgus::unit_type *other_unit_type : wyrmgus::unit_type::get_all()) {
 						if (other_unit_type->is_template()) {
 							continue;

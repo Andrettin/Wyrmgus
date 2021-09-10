@@ -835,7 +835,7 @@ unsigned char tile_player_info::TeamVisibilityState(const CPlayer &player) const
 		maxVision = 1;
 	}
 
-	const int player_index = player.Index;
+	const int player_index = player.get_index();
 	for (const int i : player.get_shared_vision()) {
 		if (CPlayer::Players[i]->has_shared_vision_with(player_index)) { //if the shared vision is mutual
 			maxVision = std::max<unsigned char>(maxVision, this->Visible[i]);
@@ -846,7 +846,7 @@ unsigned char tile_player_info::TeamVisibilityState(const CPlayer &player) const
 	}
 
 	for (const CPlayer *other_player : CPlayer::get_revealed_players()) {
-		const int other_player_index = other_player->Index;
+		const int other_player_index = other_player->get_index();
 		if (this->Visible[other_player_index] < 2) { //don't show a revealed player's explored tiles, only the currently visible ones
 			continue;
 		}
@@ -866,20 +866,20 @@ unsigned char tile_player_info::TeamVisibilityState(const CPlayer &player) const
 
 bool tile_player_info::IsExplored(const CPlayer &player) const
 {
-	return this->Visible[player.Index] != 0;
+	return this->Visible[player.get_index()] != 0;
 }
 
 //Wyrmgus start
 bool tile_player_info::IsTeamExplored(const CPlayer &player) const
 {
-	return this->Visible[player.Index] != 0 || this->TeamVisibilityState(player) != 0;
+	return this->Visible[player.get_index()] != 0 || this->TeamVisibilityState(player) != 0;
 }
 //Wyrmgus end
 
 bool tile_player_info::IsVisible(const CPlayer &player) const
 {
 	const bool fogOfWar = !CMap::get()->NoFogOfWar;
-	return Visible[player.Index] >= 2 || (!fogOfWar && IsExplored(player));
+	return Visible[player.get_index()] >= 2 || (!fogOfWar && IsExplored(player));
 }
 
 bool tile_player_info::IsTeamVisible(const CPlayer &player) const

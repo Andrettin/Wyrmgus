@@ -477,10 +477,10 @@ void SavePlayers(CFile &file)
 		CPlayer::Players[i]->Save(file);
 	}
 
-	file.printf("SetThisPlayer(%d)\n\n", CPlayer::GetThisPlayer()->Index);
+	file.printf("SetThisPlayer(%d)\n\n", CPlayer::GetThisPlayer()->get_index());
 }
 
-CPlayer::CPlayer(const int index) : Index(index)
+CPlayer::CPlayer(const int index) : index(index)
 {
 	if (index != PlayerNumNeutral) {
 		CPlayer::non_neutral_players.push_back(this);
@@ -537,7 +537,7 @@ void CPlayer::set_revealed(const bool revealed)
 void CPlayer::Save(CFile &file) const
 {
 	const CPlayer &p = *this;
-	file.printf("Player(%d,\n", this->Index);
+	file.printf("Player(%d,\n", this->get_index());
 	//Wyrmgus start
 	file.printf(" \"race\", \"%s\",", wyrmgus::civilization::get_all()[p.Race]->get_identifier().c_str());
 	if (p.Faction != -1) {
@@ -559,7 +559,7 @@ void CPlayer::Save(CFile &file) const
 		file.printf(" \"player-color\", \"%s\",", p.get_player_color()->get_identifier().c_str());
 	}
 	//Wyrmgus end
-	file.printf("  \"name\", \"%s\",\n", p.Name.c_str());
+	file.printf("  \"name\", \"%s\",\n", p.get_name().c_str());
 	file.printf("  \"type\", ");
 	switch (p.Type) {
 		case PlayerNeutral:       file.printf("\"neutral\",");         break;
@@ -593,7 +593,7 @@ void CPlayer::Save(CFile &file) const
 	file.printf("  \"start-map-layer\", %d,\n", p.StartMapLayer);
 	//Wyrmgus end
 	if (p.get_overlord() != nullptr) {
-		file.printf("  \"overlord\", %d, \"%s\",\n", p.get_overlord()->Index, wyrmgus::vassalage_type_to_string(p.vassalage_type).c_str());
+		file.printf("  \"overlord\", %d, \"%s\",\n", p.get_overlord()->get_index(), vassalage_type_to_string(p.vassalage_type).c_str());
 	}
 
 	// Resources
@@ -914,24 +914,24 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 		case PlayerNobody:
 		default:
 			team = 0;
-			this->SetName("Neutral");
+			this->set_name("Neutral");
 			break;
 		case PlayerComputer:
 			team = 1;
-			this->SetName("Computer");
+			this->set_name("Computer");
 			break;
 		case PlayerPerson:
 			team = 2 + NumPlayers;
-			this->SetName("Person");
+			this->set_name("Person");
 			break;
 		case PlayerRescuePassive:
 		case PlayerRescueActive:
 			// FIXME: correct for multiplayer games?
-			this->SetName("Computer");
+			this->set_name("Computer");
 			team = 2 + NumPlayers;
 			break;
 	}
-	DebugPrint("CreatePlayer name %s\n" _C_ this->Name.c_str());
+	DebugPrint("CreatePlayer name %s\n" _C_ this->get_name().c_str());
 
 	this->Type = type;
 	this->Race = wyrmgus::defines::get()->get_neutral_civilization()->ID;
@@ -1075,11 +1075,11 @@ void CPlayer::apply_history(const CDate &start_date)
 		if (kv_pair.first.first.Year == 0 || start_date.ContainsDate(kv_pair.first.first)) {
 			CPlayer *diplomacy_state_player = GetFactionPlayer(kv_pair.first.second);
 			if (diplomacy_state_player) {
-				CommandDiplomacy(this->Index, kv_pair.second, diplomacy_state_player->Index);
-				CommandDiplomacy(diplomacy_state_player->Index, kv_pair.second, this->Index);
+				CommandDiplomacy(this->get_index(), kv_pair.second, diplomacy_state_player->get_index());
+				CommandDiplomacy(diplomacy_state_player->get_index(), kv_pair.second, this->get_index());
 				if (kv_pair.second == wyrmgus::diplomacy_state::allied) {
-					CommandSharedVision(this->Index, true, diplomacy_state_player->Index);
-					CommandSharedVision(diplomacy_state_player->Index, true, this->Index);
+					CommandSharedVision(this->get_index(), true, diplomacy_state_player->get_index());
+					CommandSharedVision(diplomacy_state_player->get_index(), true, this->get_index());
 				}
 			}
 		}
@@ -1096,15 +1096,15 @@ void CPlayer::apply_history(const CDate &start_date)
 				case wyrmgus::diplomacy_state::personal_union_overlord:
 				case wyrmgus::diplomacy_state::vassal:
 				case wyrmgus::diplomacy_state::personal_union_vassal:
-					CommandDiplomacy(this->Index, state, diplomacy_state_player->Index);
+					CommandDiplomacy(this->get_index(), state, diplomacy_state_player->get_index());
 					break;
 				case wyrmgus::diplomacy_state::allied:
-					CommandSharedVision(this->Index, true, diplomacy_state_player->Index);
-					CommandSharedVision(diplomacy_state_player->Index, true, this->Index);
+					CommandSharedVision(this->get_index(), true, diplomacy_state_player->get_index());
+					CommandSharedVision(diplomacy_state_player->get_index(), true, this->get_index());
 					//fallthrough
 				default:
-					CommandDiplomacy(this->Index, state, diplomacy_state_player->Index);
-					CommandDiplomacy(diplomacy_state_player->Index, state, this->Index);
+					CommandDiplomacy(this->get_index(), state, diplomacy_state_player->get_index());
+					CommandDiplomacy(diplomacy_state_player->get_index(), state, this->get_index());
 					break;
 			}
 		}
@@ -1223,9 +1223,15 @@ bool CPlayer::is_neutral_player() const
 	return this->get_index() == PlayerNumNeutral;
 }
 
-void CPlayer::SetName(const std::string &name)
+void CPlayer::set_name(const std::string &name)
 {
-	this->Name = name;
+	if (name == this->get_name()) {
+		return;
+	}
+
+	std::unique_lock<std::shared_mutex> lock(this->mutex);
+
+	this->name = name;
 
 	emit name_changed();
 }
@@ -1259,7 +1265,7 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 
 	if (this->get_civilization() != nullptr) {
 		//if the civilization of the person player changed, update the UI
-		if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Index == this->Index) || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
+		if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer() == this) || (!CPlayer::GetThisPlayer() && this->get_index() == 0)) {
 			//load proper UI
 			std::array<char, 256> buf{};
 			snprintf(buf.data(), sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", this->get_civilization()->get_identifier().c_str());
@@ -1341,7 +1347,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	
 	this->Faction = faction_id;
 
-	if (this->Index == CPlayer::GetThisPlayer()->Index) {
+	if (this == CPlayer::GetThisPlayer()) {
 		UI.Load();
 	}
 	
@@ -1350,7 +1356,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	}
 	
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
-		this->SetName(this->get_faction()->get_name());
+		this->set_name(this->get_faction()->get_name());
 	}
 	if (this->get_faction() != nullptr) {
 		const wyrmgus::player_color *player_color = nullptr;
@@ -1421,7 +1427,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		}
 		
 		if (player_color == nullptr) {
-			throw std::runtime_error("No player color chosen for player \"" + this->Name + "\" (" + std::to_string(this->Index) + ").");
+			throw std::runtime_error("No player color chosen for player \"" + this->get_name() + "\" (" + std::to_string(this->get_index()) + ").");
 		}
 
 		this->player_color = player_color;
@@ -1451,7 +1457,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 			}
 		}
 	} else {
-		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->get_name().c_str(), this->Index, this->get_civilization()->get_identifier().c_str());
+		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->get_name().c_str(), this->get_index(), this->get_civilization()->get_identifier().c_str());
 	}
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
@@ -1665,7 +1671,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		const CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
 		
 		if (!chosen_upgrade->get_name().empty()) {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->get_name().c_str(), this->Name.c_str());
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->get_name().c_str(), this->get_name().c_str());
 		}
 		if (&player == CPlayer::GetThisPlayer() && player.get_civilization() != nullptr) {
 			const wyrmgus::sound *sound = player.get_civilization()->get_research_complete_sound();
@@ -1686,7 +1692,7 @@ int CPlayer::get_player_color_usage_count(const wyrmgus::player_color *player_co
 	int count = 0;
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && CPlayer::Players[i]->Faction != -1 && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->get_player_color() == player_color) {
+		if (this->get_index() != i && CPlayer::Players[i]->Faction != -1 && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->get_player_color() == player_color) {
 			count++;
 		}		
 	}
@@ -2019,7 +2025,7 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->get_civilization()->ID && CPlayer::Players[i]->Faction == faction->ID) {
+		if (this->get_index() != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->get_civilization()->ID && CPlayer::Players[i]->Faction == faction->ID) {
 			// faction is already in use
 			return false;
 		}
@@ -2094,7 +2100,7 @@ bool CPlayer::is_character_available_for_recruitment(const wyrmgus::character *c
 	}
 	
 	if (character->Conditions) {
-		CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
+		CclCommand("trigger_player = " + std::to_string(this->get_index()) + ";");
 		character->Conditions->pushPreamble();
 		character->Conditions->run(1);
 		if (character->Conditions->popBoolean() == false) {
@@ -2156,7 +2162,7 @@ std::string CPlayer::get_full_name() const
 		}
 	}
 
-	return this->Name;
+	return this->get_name();
 }
 
 std::string_view CPlayer::get_faction_title_name() const
@@ -2265,7 +2271,7 @@ std::vector<const CUpgrade *> CPlayer::GetResearchableUpgrades()
 */
 void CPlayer::Clear()
 {
-	this->Name.clear();
+	this->name.clear();
 	this->Type = 0;
 	this->Race = wyrmgus::defines::get()->get_neutral_civilization()->ID;
 	this->Faction = -1;
@@ -2431,7 +2437,7 @@ void CPlayer::PerformResourceTrade()
 		const resource *res = resource::get_all()[this->AutosellResources[i]];
 		
 		if ((this->get_resource(res) + this->get_stored_resource(res)) >= 100) { //sell 100 per second, as long as there is enough of the resource stored
-			market_unit->sell_resource(res, this->Index);
+			market_unit->sell_resource(res, this->get_index());
 		}
 		
 		//increase price due to domestic demand
@@ -2446,7 +2452,7 @@ void CPlayer::PerformResourceTrade()
 		const resource *res = resource::get_all()[LuxuryResources[i]];
 		
 		while ((this->get_resource(res) + this->get_stored_resource(res)) >= 100) {
-			market_unit->sell_resource(res, this->Index);
+			market_unit->sell_resource(res, this->get_index());
 		}
 		
 		//increase price due to domestic demand
@@ -2671,7 +2677,7 @@ void CPlayer::accept_quest(wyrmgus::quest *quest)
 		this->quest_objectives.push_back(std::move(objective));
 	}
 	
-	CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
+	CclCommand("trigger_player = " + std::to_string(this->get_index()) + ";");
 	
 	if (quest->AcceptEffects) {
 		quest->AcceptEffects->pushPreamble();
@@ -2702,7 +2708,7 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 		quest->CurrentCompleted = true;
 	}
 	
-	CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
+	CclCommand("trigger_player = " + std::to_string(this->get_index()) + ";");
 	
 	if (quest->CompletionEffects) {
 		quest->CompletionEffects->pushPreamble();
@@ -2742,7 +2748,7 @@ void CPlayer::fail_quest(wyrmgus::quest *quest, const std::string &fail_reason)
 {
 	this->remove_current_quest(quest);
 	
-	CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
+	CclCommand("trigger_player = " + std::to_string(this->get_index()) + ";");
 	
 	if (quest->FailEffects) {
 		quest->FailEffects->pushPreamble();
@@ -2833,7 +2839,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 	}
 
 	if (quest->Conditions != nullptr) {
-		CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
+		CclCommand("trigger_player = " + std::to_string(this->get_index()) + ";");
 		quest->Conditions->pushPreamble();
 		quest->Conditions->run(1);
 		return quest->Conditions->popBoolean();
@@ -3345,7 +3351,7 @@ int CPlayer::GetUnitTotalCount(const wyrmgus::unit_type &type) const
 	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
 		//Wyrmgus start
 		if (*it == nullptr) {
-			fprintf(stderr, "Error in CPlayer::GetUnitTotalCount: unit of player %d is null.\n", this->Index);
+			fprintf(stderr, "Error in CPlayer::GetUnitTotalCount: unit of player %d is null.\n", this->get_index());
 			continue;
 		}
 		//Wyrmgus end
@@ -3382,8 +3388,8 @@ int CPlayer::CheckLimits(const wyrmgus::unit_type &type) const
 		return -2;
 	}
 	//Wyrmgus start
-//	if (this->Demand + type.Stats[this->Index].Variables[DEMAND_INDEX].Value > this->Supply && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
-	if (this->Demand + (type.Stats[this->Index].Variables[DEMAND_INDEX].Value * (type.TrainQuantity ? type.TrainQuantity : 1)) > this->Supply && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
+//	if (this->Demand + type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value > this->Supply && type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value) {
+	if (this->Demand + (type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value * (type.TrainQuantity ? type.TrainQuantity : 1)) > this->Supply && type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		Notify("%s", _("Insufficient Supply, increase Supply."));
@@ -3458,7 +3464,7 @@ int CPlayer::CheckCosts(const resource_map<int> &costs, const bool notify) const
 int CPlayer::CheckUnitType(const wyrmgus::unit_type &type, bool hire) const
 {
 	//Wyrmgus start
-//	return this->CheckCosts(type.Stats[this->Index].Costs);
+//	return this->CheckCosts(type.Stats[this->get_index()].Costs);
 	const resource_map<int> type_costs = this->GetUnitTypeCosts(&type, hire);
 	return this->CheckCosts(type_costs);
 	//Wyrmgus end
@@ -3484,7 +3490,7 @@ void CPlayer::AddCosts(const int *costs)
 void CPlayer::AddUnitType(const wyrmgus::unit_type &type, bool hire)
 {
 	//Wyrmgus start
-//	AddCosts(type.Stats[this->Index].Costs);
+//	AddCosts(type.Stats[this->get_index()].Costs);
 	const resource_map<int> type_costs = this->GetUnitTypeCosts(&type, hire);
 	AddCostsFactor(type_costs, 100);
 	//Wyrmgus end
@@ -3530,7 +3536,7 @@ void CPlayer::subtract_costs(const resource_map<int> &costs)
 void CPlayer::SubUnitType(const wyrmgus::unit_type &type, bool hire)
 {
 	//Wyrmgus start
-//	this->SubCosts(type.Stats[this->Index].Costs);
+//	this->SubCosts(type.Stats[this->get_index()].Costs);
 	const resource_map<int> type_costs = this->GetUnitTypeCosts(&type, hire);
 	this->SubCostsFactor(type_costs, 100);
 	//Wyrmgus end
@@ -3562,9 +3568,9 @@ resource_map<int> CPlayer::GetUnitTypeCosts(const unit_type *type, const bool hi
 	resource_map<int> costs;
 
 	if (hire) {
-		costs[defines::get()->get_wealth_resource()] = type->Stats[this->Index].get_price();
+		costs[defines::get()->get_wealth_resource()] = type->Stats[this->get_index()].get_price();
 	} else {
-		costs = type->Stats[this->Index].get_costs();
+		costs = type->Stats[this->get_index()].get_costs();
 	}
 
 	for (auto &[resource, cost] : costs) {
@@ -3755,7 +3761,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, const bool type_change)
 		this->NumTownHalls++;
 	}
 	
-	for (const auto &[resource, quantity] : type->Stats[this->Index].get_resource_demands()) {
+	for (const auto &[resource, quantity] : type->Stats[this->get_index()].get_resource_demands()) {
 		this->change_resource_demand(resource, quantity);
 	}
 	
@@ -3808,7 +3814,7 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, const bool type_change)
 		this->NumTownHalls--;
 	}
 	
-	for (const auto &[resource, quantity] : type->Stats[this->Index].get_resource_demands()) {
+	for (const auto &[resource, quantity] : type->Stats[this->get_index()].get_resource_demands()) {
 		this->change_resource_demand(resource, -quantity);
 	}
 	
@@ -3879,7 +3885,7 @@ void PlayersEachCycle()
 			p->set_revealed(true);
 			for (int j = 0; j < NumPlayers; ++j) {
 				if (player != j && CPlayer::Players[j]->Type != PlayerNobody) {
-					CPlayer::Players[j]->Notify(_("%s's units have been revealed!"), p->Name.c_str());
+					CPlayer::Players[j]->Notify(_("%s's units have been revealed!"), p->get_name().c_str());
 				} else {
 					CPlayer::Players[j]->Notify("%s", _("Your units have been revealed!"));
 				}
@@ -4027,8 +4033,8 @@ void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) co
 		//Wyrmgus end
 	} else {
 		//Wyrmgus start
-//		SetMessageEvent(pos, "(%s): %s", Name.c_str(), temp.data());
-		SetMessageEvent(pos, z, "(%s): %s", Name.c_str(), temp.data());
+//		SetMessageEvent(pos, "(%s): %s", this->get_name().c_str(), temp.data());
+		SetMessageEvent(pos, z, "(%s): %s", this->get_name().c_str(), temp.data());
 		//Wyrmgus end
 	}
 }
@@ -4059,47 +4065,47 @@ void CPlayer::Notify(const char *fmt, ...) const
 	if (this == CPlayer::GetThisPlayer()) {
 		SetMessage("%s", temp.data());
 	} else {
-		SetMessage("(%s): %s", Name.c_str(), temp.data());
+		SetMessage("(%s): %s", this->get_name().c_str(), temp.data());
 	}
 }
 
 void CPlayer::SetDiplomacyNeutralWith(const CPlayer &player)
 {
-	this->enemies.erase(player.Index);
-	this->allies.erase(player.Index);
+	this->enemies.erase(player.get_index());
+	this->allies.erase(player.get_index());
 
 	//Wyrmgus start
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
-		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Neutral"), _(this->Name.c_str()));
+	if (GameCycle > 0 && &player == CPlayer::GetThisPlayer()) {
+		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Neutral"), _(this->get_name().c_str()));
 	}
 	//Wyrmgus end
 }
 
 void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
 {
-	this->enemies.erase(player.Index);
-	this->allies.insert(player.Index);
+	this->enemies.erase(player.get_index());
+	this->allies.insert(player.get_index());
 	
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
-		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Ally"), _(this->Name.c_str()));
+	if (GameCycle > 0 && &player == CPlayer::GetThisPlayer()) {
+		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Ally"), _(this->get_name().c_str()));
 	}
 }
 
 void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 {
-	this->enemies.insert(player.Index);
-	this->allies.erase(player.Index);
+	this->enemies.insert(player.get_index());
+	this->allies.erase(player.get_index());
 	
 	if (GameCycle > 0) {
-		if (player.Index == CPlayer::GetThisPlayer()->Index) {
-			CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->Name.c_str()));
-		} else if (this->Index == CPlayer::GetThisPlayer()->Index) {
-			CPlayer::GetThisPlayer()->Notify(_("We have changed our diplomatic stance with %s to Enemy"), _(player.Name.c_str()));
+		if (&player == CPlayer::GetThisPlayer()) {
+			CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->get_name().c_str()));
+		} else if (this == CPlayer::GetThisPlayer()) {
+			CPlayer::GetThisPlayer()->Notify(_("We have changed our diplomatic stance with %s to Enemy"), _(player.get_name().c_str()));
 		}
 	}
 
 	if (this->has_shared_vision_with(player)) {
-		CommandSharedVision(this->Index, false, player.Index);
+		CommandSharedVision(this->get_index(), false, player.get_index());
 	}
 
 	// if either player is the overlord of another (indirect or otherwise), break the vassalage bond after the declaration of war
@@ -4117,29 +4123,29 @@ void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 
 void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 {
-	this->enemies.insert(player.Index);
-	this->allies.insert(player.Index);
+	this->enemies.insert(player.get_index());
+	this->allies.insert(player.get_index());
 	
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
-		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Crazy"), _(this->Name.c_str()));
+	if (GameCycle > 0 && &player == CPlayer::GetThisPlayer()) {
+		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Crazy"), _(this->get_name().c_str()));
 	}
 }
 
 void CPlayer::ShareVisionWith(const CPlayer &player)
 {
-	this->shared_vision.insert(player.Index);
+	this->shared_vision.insert(player.get_index());
 	
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
-		CPlayer::GetThisPlayer()->Notify(_("%s is now sharing vision with us"), _(this->Name.c_str()));
+	if (GameCycle > 0 && &player == CPlayer::GetThisPlayer()) {
+		CPlayer::GetThisPlayer()->Notify(_("%s is now sharing vision with us"), _(this->get_name().c_str()));
 	}
 }
 
 void CPlayer::UnshareVisionWith(const CPlayer &player)
 {
-	this->shared_vision.erase(player.Index);
+	this->shared_vision.erase(player.get_index());
 	
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
-		CPlayer::GetThisPlayer()->Notify(_("%s is no longer sharing vision with us"), _(this->Name.c_str()));
+	if (GameCycle > 0 && &player == CPlayer::GetThisPlayer()) {
+		CPlayer::GetThisPlayer()->Notify(_("%s is no longer sharing vision with us"), _(this->get_name().c_str()));
 	}
 }
 
@@ -4150,7 +4156,7 @@ void CPlayer::set_overlord(CPlayer *overlord, const wyrmgus::vassalage_type)
 	}
 
 	if (overlord != nullptr && overlord->get_overlord() == this) {
-		throw std::runtime_error("Cannot set player \"" + overlord->Name + "\" as the overlord of \"" + this->Name + "\", as the former is a vassal of the latter, and a vassal can't be the overlord of its own overlord.");
+		throw std::runtime_error("Cannot set player \"" + overlord->get_name() + "\" as the overlord of \"" + this->get_name() + "\", as the former is a vassal of the latter, and a vassal can't be the overlord of its own overlord.");
 	}
 
 	CPlayer *old_overlord = this->get_overlord();
@@ -4188,8 +4194,8 @@ void CPlayer::establish_overlordship_alliance(CPlayer *overlord)
 {
 	this->SetDiplomacyAlliedWith(*overlord);
 	overlord->SetDiplomacyAlliedWith(*this);
-	CommandSharedVision(this->Index, true, overlord->Index);
-	CommandSharedVision(overlord->Index, true, this->Index);
+	CommandSharedVision(this->get_index(), true, overlord->get_index());
+	CommandSharedVision(overlord->get_index(), true, this->get_index());
 
 	//vassals should also be allied with overlords higher up in the hierarchy
 	for (CPlayer *vassal : this->get_vassals()) {
@@ -4203,8 +4209,8 @@ void CPlayer::break_overlordship_alliance(CPlayer *overlord)
 		this->SetDiplomacyNeutralWith(*overlord);
 		overlord->SetDiplomacyNeutralWith(*this);
 	}
-	CommandSharedVision(this->Index, false, overlord->Index);
-	CommandSharedVision(overlord->Index, false, this->Index);
+	CommandSharedVision(this->get_index(), false, overlord->get_index());
+	CommandSharedVision(overlord->get_index(), false, this->get_index());
 
 	//vassals should also have their alliances with overlords higher up in the hierarchy broken
 	for (CPlayer *vassal : this->get_vassals()) {
@@ -4222,7 +4228,7 @@ bool CPlayer::IsEnemy(const CPlayer &player) const
 	}
 
 	//be hostile to the other player if they are hostile, even if the diplomatic stance hasn't been changed
-	return this->IsEnemy(player.Index) || player.IsEnemy(this->Index);
+	return this->IsEnemy(player.get_index()) || player.IsEnemy(this->get_index());
 }
 
 /**
@@ -4249,7 +4255,7 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 		return true;
 	}
 	
-	if (unit.Player->Index != this->Index && this->Type != PlayerNeutral && unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive() && !this->has_neutral_faction_type()) {
+	if (unit.Player != this && this->Type != PlayerNeutral && unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive() && !this->has_neutral_faction_type()) {
 		return true;
 	}
 	
@@ -4262,7 +4268,7 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 bool CPlayer::IsAllied(const CPlayer &player) const
 {
 	//only consider yourself to be the ally of another player if they have the allied stance with you as well
-	return this->IsAllied(player.Index) && player.IsAllied(this->Index);
+	return this->IsAllied(player.get_index()) && player.IsAllied(this->get_index());
 }
 
 /**
@@ -4280,7 +4286,7 @@ bool CPlayer::IsVisionSharing() const
 
 bool CPlayer::has_shared_vision_with(const CPlayer &player) const
 {
-	return this->has_shared_vision_with(player.Index);
+	return this->has_shared_vision_with(player.get_index());
 }
 
 bool CPlayer::has_shared_vision_with(const CUnit &unit) const
@@ -4290,7 +4296,7 @@ bool CPlayer::has_shared_vision_with(const CUnit &unit) const
 
 bool CPlayer::has_mutual_shared_vision_with(const CPlayer &player) const
 {
-	return this->shared_vision.contains(player.Index) && player.shared_vision.contains(this->Index);
+	return this->shared_vision.contains(player.get_index()) && player.shared_vision.contains(this->get_index());
 }
 
 bool CPlayer::has_mutual_shared_vision_with(const CUnit &unit) const

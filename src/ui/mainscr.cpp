@@ -386,17 +386,17 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, const int index, const Vari
 
 	switch (t) {
 		case 0: // Unit:
-			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];
+			var = &type.Stats[CPlayer::GetThisPlayer()->get_index()].Variables[index];
 			break;
 		case 1: // Type:
 			var = &type.MapDefaultStat.Variables[index];
 			break;
 		case 2: // Stats:
-			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];
+			var = &type.Stats[CPlayer::GetThisPlayer()->get_index()].Variables[index];
 			break;
 		default:
 			DebugPrint("Bad value for GetComponent: t = %d" _C_ t);
-			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];
+			var = &type.Stats[CPlayer::GetThisPlayer()->get_index()].Variables[index];
 			break;
 	}
 
@@ -545,7 +545,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit, std::vector<std::fu
 		case UnitAction::Train: { //  Building training units.
 			//Wyrmgus start
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
-			if (order.GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0) { //don't show the training button for a quick moment if the time cost is 0
+			if (order.GetUnitType().Stats[unit.Player->get_index()].get_time_cost() == 0) { //don't show the training button for a quick moment if the time cost is 0
 				return false;
 			}
 			//Wyrmgus end
@@ -557,7 +557,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit, std::vector<std::fu
 				const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
 				
 				//Wyrmgus start
-				if (order.GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0) { //don't show the upgrading button for a quick moment if the time cost is 0
+				if (order.GetUnitType().Stats[unit.Player->get_index()].get_time_cost() == 0) { //don't show the upgrading button for a quick moment if the time cost is 0
 					return false;
 				}
 				//Wyrmgus end
@@ -899,7 +899,7 @@ static std::unique_ptr<wyrmgus::button> get_territory_tooltip_button(const CPlay
 	button->Hint = player->get_full_name();
 	button->Action = ButtonCmd::Player;
 	button->Popup = "popup_territory";
-	button->Value = player->Index;
+	button->Value = player->get_index();
 	return button;
 }
 
@@ -939,8 +939,8 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 					} else {
 						unit_name = UnitUnderCursor->get_type_name();
 					}
-					if (UnitUnderCursor->Player->Index != PlayerNumNeutral && !UnitUnderCursor->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
-						unit_name += " (" + UnitUnderCursor->Player->Name + ")";
+					if (UnitUnderCursor->Player->get_index() != PlayerNumNeutral && !UnitUnderCursor->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
+						unit_name += " (" + UnitUnderCursor->Player->get_name() + ")";
 					}
 					//hackish way to make the popup appear correctly for the unit under cursor
 					wyrmgus::button ba;
@@ -1913,8 +1913,8 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 	//draw icon panel frame, if any
 	if (
 		wyrmgus::defines::get()->get_infopanel_frame_graphics() != nullptr
-		&& (unit.CurrentAction() != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
-		&& (unit.CurrentAction() != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0)
+		&& (unit.CurrentAction() != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->get_index()].get_time_cost() == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
+		&& (unit.CurrentAction() != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->get_index()].get_time_cost() == 0)
 		&& (unit.CurrentAction() != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().get_time_cost() == 0)
 		&& unit.CurrentAction() != UnitAction::Built
 		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())

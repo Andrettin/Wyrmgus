@@ -564,7 +564,7 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 			//Wyrmgus start
 		   && !mine.IsUnusable(false)
 //		   && (resinfo.HarvestFromOutside
-//			   || mine.Player->Index == PlayerMax - 1
+//			   || mine.Player->get_index() == PlayerMax - 1
 //			   || mine.Player == worker.Player
 //			   || (worker.IsAllied(mine) && mine.IsAllied(worker)));
 		   && worker.CanHarvest(&mine, only_harvestable);
@@ -1043,7 +1043,7 @@ private:
 		if (
 			(
 				!attacker->IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player->Index == dest->Player->Index)
+				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player == dest->Player)
 			)
 		//Wyrmgus end
 			|| !dest->IsVisibleAsGoal(player)
@@ -1221,7 +1221,7 @@ public:
 //			if (!player.IsEnemy(*dest)) { // a friend or neutral
 			if (
 				!attacker->IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player->Index == dest->Player->Index)
+				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->Type == PlayerNeutral || attacker->Player == dest->Player)
 			) {
 			//Wyrmgus end
 				dest->CacheLock = 1;

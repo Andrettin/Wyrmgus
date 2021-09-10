@@ -112,7 +112,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"seen-type\", \"%s\", ", unit.Seen.Type->Ident.c_str());
 	}
 
-	file.printf("\"player\", %d,\n  ", unit.Player->Index);
+	file.printf("\"player\", %d,\n  ", unit.Player->get_index());
 
 	if (unit.MapLayer) {
 		file.printf("\"map-layer\", %d, ", unit.MapLayer->ID);
@@ -134,7 +134,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"stats\", \"S%08X\",\n  ", (int)unit.Stats);
 	}
 #else
-	file.printf("\"stats\", %d,\n  ", unit.Player->Index);
+	file.printf("\"stats\", %d,\n  ", unit.Player->get_index());
 #endif
 	file.printf("\"pixel\", {%d, %d}, ", unit.get_pixel_offset().x(), unit.get_pixel_offset().y());
 	file.printf("\"seen-pixel\", {%d, %d}, ", unit.Seen.pixel_offset.x(), unit.Seen.pixel_offset.y());
@@ -221,7 +221,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"mine-low\",");
 	}
 	if (unit.RescuedFrom) {
-		file.printf(" \"rescued-from\", %d,", unit.RescuedFrom->Index);
+		file.printf(" \"rescued-from\", %d,", unit.RescuedFrom->get_index());
 	}
 	
 	//Wyrmgus start
@@ -401,7 +401,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		}
 	}
 
-	for (const auto &kv_pair : unit.Type->Stats[unit.Player->Index].get_unit_stocks()) {
+	for (const auto &kv_pair : unit.Type->Stats[unit.Player->get_index()].get_unit_stocks()) {
 		const unit_type *unit_type = kv_pair.first;
 
 		if (unit.GetUnitStock(unit_type) != 0) {

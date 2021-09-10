@@ -1447,7 +1447,7 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 */
 static void ShowUnitInfo(const CUnit &unit)
 {
-	std::string str = "#" + std::to_string(UnitNumber(unit)) + " '" + unit.get_type_name() + "' Player: #" + std::to_string((unit.Player->Index == PlayerNumNeutral) ? 16 : unit.Player->Index + 1) + " " + (unit.Active ? "active" : "passive");
+	std::string str = "#" + std::to_string(UnitNumber(unit)) + " '" + unit.get_type_name() + "' Player: #" + std::to_string((unit.Player->get_index() == PlayerNumNeutral) ? 16 : unit.Player->get_index() + 1) + " " + (unit.Active ? "active" : "passive");
 
 	if (unit.Type->get_given_resource() != nullptr) {
 		str += " Amount " + std::to_string(unit.ResourcesHeld);

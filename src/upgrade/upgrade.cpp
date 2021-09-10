@@ -1393,7 +1393,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const wyrmgus::unit_type &src, wy
 
 		//Wyrmgus start
 		if (&unit == nullptr) {
-			fprintf(stderr, "Error in ConvertUnitTypeTo: unit %d, of player %d is null.\n", i, player.Index);
+			fprintf(stderr, "Error in ConvertUnitTypeTo: unit %d, of player %d is null.\n", i, player.get_index());
 			continue;
 		}
 		//Wyrmgus end
@@ -1463,7 +1463,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 {
 	Assert(um);
 
-	int pn = player.Index;
+	int pn = player.get_index();
 
 	//Wyrmgus start
 	if (um->SpeedResearch != 0) {
@@ -1535,7 +1535,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
+					if (unit.Player->get_index() == pn && unit.IsAlive()) {
 						unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
 					}
 				}
@@ -1548,7 +1548,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
+					if (unit.Player->get_index() == pn && unit.IsAlive()) {
 						unit.Player->Demand += um->Modifier.Variables[DEMAND_INDEX].Value;
 					}
 				}
@@ -1639,7 +1639,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 //				FindUnitsByType(*UnitTypes[z], unitupgrade, true);
 				//Wyrmgus end
 				for (CUnit *unit : unitupgrade) {
-					if (unit->Player->Index != player.Index) {
+					if (unit->Player != &player) {
 						continue;
 					}
 					
@@ -1707,7 +1707,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 			for (size_t j = 0; j != unitupgrade.size(); ++j) {
 				CUnit &unit = *unitupgrade[j];
 
-				if (unit.Player->Index != player.Index) {
+				if (unit.Player != &player) {
 					continue;
 				}
 				
@@ -1759,7 +1759,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 {
 	Assert(um);
 
-	int pn = player.Index;
+	int pn = player.get_index();
 
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch -= um->SpeedResearch;
@@ -1811,7 +1811,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
+					if (unit.Player->get_index() == pn && unit.IsAlive()) {
 						unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
 					}
 				}
@@ -1824,7 +1824,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 				FindUnitsByType(*unit_type, unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
+					if (unit.Player->get_index() == pn && unit.IsAlive()) {
 						unit.Player->Demand -= um->Modifier.Variables[DEMAND_INDEX].Value;
 					}
 				}
@@ -1852,7 +1852,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 							continue;
 						}
 
-						m = std::max(m, player_unit.Type->Stats[player.Index].get_improve_income(resource));
+						m = std::max(m, player_unit.Type->Stats[player.get_index()].get_improve_income(resource));
 					}
 
 					player.set_income(resource, m);
@@ -1902,7 +1902,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 
 				for (int k = 0; k < player.GetUnitCount(); ++k) {
 					if (player.GetUnit(k).Type != nullptr) {
-						m = std::min(m, player.GetUnit(k).Type->Stats[player.Index].Variables[TRADECOST_INDEX].Value);
+						m = std::min(m, player.GetUnit(k).Type->Stats[player.get_index()].Variables[TRADECOST_INDEX].Value);
 					}
 				}
 				player.TradeCost = m;
@@ -1924,7 +1924,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 				*/
 				//Wyrmgus end
 				for (CUnit *unit : unitupgrade) {
-					if (unit->Player->Index != player.Index) {
+					if (unit->Player != &player) {
 						continue;
 					}
 					
@@ -1989,7 +1989,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 			for (size_t j = 0; j != unitupgrade.size(); ++j) {
 				CUnit &unit = *unitupgrade[j];
 
-				if (unit.Player->Index != player.Index) {
+				if (unit.Player != &player) {
 					continue;
 				}
 				

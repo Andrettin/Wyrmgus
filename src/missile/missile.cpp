@@ -1478,7 +1478,7 @@ void Missile::MissileHit(CUnit *unit)
 		if (this->get_target_unit() && (mtype.FriendlyFire == true
 		//Wyrmgus end
 								//Wyrmgus start
-//								 || this->get_target_unit()->Player->Index != this->get_source_unit()->Player->Index)) {
+//								 || this->get_target_unit()->Player != this->get_source_unit()->Player)) {
 								 || this->get_target_unit()->IsEnemy(*this->get_source_unit()))) {
 								//Wyrmgus end
 			//
@@ -1530,7 +1530,7 @@ void Missile::MissileHit(CUnit *unit)
 			//
 			if (CanTarget(*this->get_source_unit()->Type, *goal.Type)
 				//Wyrmgus start
-//				&& (mtype.FriendlyFire == false || goal.Player->Index != this->get_source_unit()->Player->Index)) {
+//				&& (mtype.FriendlyFire == false || goal.Player != this->get_source_unit()->Player)) {
 				&& (mtype.FriendlyFire == true || goal.IsEnemy(*this->get_source_unit()))) {
 				//Wyrmgus end
 				bool shouldHit = true;
