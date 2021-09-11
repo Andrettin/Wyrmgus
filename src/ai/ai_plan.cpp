@@ -39,6 +39,7 @@
 #include "map/tile_flag.h"
 #include "missile.h"
 #include "pathfinder.h"
+#include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
@@ -405,7 +406,7 @@ int AiForce::PlanAttack()
 		DebugPrint("%d: Transporter #%d\n" _C_ player.get_index() _C_ UnitNumber(*transporter));
 		MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 	} else {
-		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), is_a_free_transporter);
+		std::vector<CUnit *>::const_iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), is_a_free_transporter);
 		if (it != player.UnitEnd()) {
 			transporter = *it;
 			MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);

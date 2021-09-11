@@ -88,7 +88,8 @@ class CPlayer final : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY name_changed)
-	Q_PROPERTY(bool active READ is_active NOTIFY type_changed)
+	Q_PROPERTY(bool active READ is_active_sync NOTIFY type_changed)
+	Q_PROPERTY(bool alive READ is_alive_sync NOTIFY alive_changed)
 
 public:
 	static constexpr int max_quest_pool = 4;
@@ -141,12 +142,22 @@ public:
 			return;
 		}
 
+		std::unique_lock<std::shared_mutex> lock(this->mutex);
+
 		this->type = type;
 
 		emit type_changed();
 	}
 
 	bool is_active() const;
+
+	bool is_active_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->is_active();
+	}
+
 	bool is_neutral_player() const;
 
 	const std::string &get_name() const
@@ -216,16 +227,34 @@ public:
 
 	bool is_alive() const
 	{
-		return this->GetUnitCount() > 0;
+		return this->alive;
+	}
+
+	bool is_alive_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->is_alive();
+	}
+
+	void set_alive(const bool alive)
+	{
+		if (alive == this->is_alive()) {
+			return;
+		}
+
+		std::unique_lock<std::shared_mutex> lock(this->mutex);
+
+		this->alive = alive;
+
+		emit alive_changed();
 	}
 
 	/// Clear turn related player data
 	void Clear();
 
 	std::vector<CUnit *>::const_iterator UnitBegin() const;
-	std::vector<CUnit *>::iterator UnitBegin();
 	std::vector<CUnit *>::const_iterator UnitEnd() const;
-	std::vector<CUnit *>::iterator UnitEnd();
 
 	const wyrmgus::player_color *get_player_color() const
 	{
@@ -947,6 +976,10 @@ private:
 public:
 	std::string AiName; //AI for computer
 
+private:
+	bool alive = false; //whether the player has any units
+
+public:
 	// friend enemy detection
 	int Team = 0;          /// team of player
 
@@ -1057,6 +1090,7 @@ public:
 signals:
 	void name_changed();
 	void type_changed();
+	void alive_changed();
 
 private:
 	std::vector<CUnit *> Units; /// units of this player

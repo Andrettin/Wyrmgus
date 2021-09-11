@@ -761,7 +761,7 @@ CUnit *FindHomeMarket(const CUnit &unit, int range)
 {
 	BestHomeMarketFinder<false> finder(unit, range);
 	std::vector<CUnit *> table;
-	for (std::vector<CUnit *>::iterator it = unit.Player->UnitBegin(); it != unit.Player->UnitEnd(); ++it) {
+	for (std::vector<CUnit *>::const_iterator it = unit.Player->UnitBegin(); it != unit.Player->UnitEnd(); ++it) {
 		table.push_back(*it);
 	}
 	return finder.Find(table.begin(), table.end());

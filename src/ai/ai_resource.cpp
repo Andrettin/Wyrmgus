@@ -657,7 +657,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	std::vector<CUnit *> depots;
 	const Vec2i offset(MaxMapWidth, MaxMapHeight);
 
-	for (std::vector<CUnit *>::iterator it = worker.Player->UnitBegin(); it != worker.Player->UnitEnd(); ++it) {
+	for (std::vector<CUnit *>::const_iterator it = worker.Player->UnitBegin(); it != worker.Player->UnitEnd(); ++it) {
 		CUnit &unit = **it;
 
 		//Wyrmgus start

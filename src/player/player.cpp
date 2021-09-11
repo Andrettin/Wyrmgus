@@ -2273,6 +2273,7 @@ void CPlayer::Clear()
 	this->vassalage_type = wyrmgus::vassalage_type::none;
 	this->vassals.clear();
 	this->AiName.clear();
+	this->set_alive(false);
 	this->Team = 0;
 	this->enemies.clear();
 	this->allies.clear();
@@ -2315,10 +2316,10 @@ void CPlayer::Clear()
 	this->AiEnabled = false;
 	this->revealed = false;
 	this->Ai = 0;
-	this->Units.resize(0);
-	this->FreeWorkers.resize(0);
+	this->Units.clear();
+	this->FreeWorkers.clear();
 	//Wyrmgus start
-	this->LevelUpUnits.resize(0);
+	this->LevelUpUnits.clear();
 	//Wyrmgus end
 	this->NumBuildings = 0;
 	//Wyrmgus start
@@ -2366,6 +2367,10 @@ void CPlayer::AddUnit(CUnit &unit)
 	this->Units.push_back(&unit);
 	unit.Player = this;
 	Assert(this->Units[unit.PlayerSlot] == &unit);
+
+	if (this->Units.size() == 1) {
+		this->set_alive(true);
+	}
 }
 
 void CPlayer::RemoveUnit(CUnit &unit)
@@ -2387,6 +2392,10 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	this->Units.pop_back();
 	unit.PlayerSlot = static_cast<size_t>(-1);
 	Assert(last == &unit || this->Units[last->PlayerSlot] == last);
+
+	if (this->Units.empty()) {
+		this->set_alive(false);
+	}
 }
 
 void CPlayer::UpdateFreeWorkers()
@@ -2516,12 +2525,12 @@ void CPlayer::AutosellResource(const int resource)
 
 void CPlayer::UpdateLevelUpUnits()
 {
-	LevelUpUnits.clear();
-	if (LevelUpUnits.capacity() != 0) {
+	this->LevelUpUnits.clear();
+	if (this->LevelUpUnits.capacity() != 0) {
 		// Just calling LevelUpUnits.clear() is not always appropriate.
 		// Certain paths may leave LevelUpUnits in an invalid state, so
 		// it's safer to re-initialize.
-		std::vector<CUnit*>().swap(LevelUpUnits);
+		std::vector<CUnit*>().swap(this->LevelUpUnits);
 	}
 	const int nunits = this->GetUnitCount();
 
@@ -3021,17 +3030,7 @@ std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const
 	return Units.begin();
 }
 
-std::vector<CUnit *>::iterator CPlayer::UnitBegin()
-{
-	return Units.begin();
-}
-
 std::vector<CUnit *>::const_iterator CPlayer::UnitEnd() const
-{
-	return Units.end();
-}
-
-std::vector<CUnit *>::iterator CPlayer::UnitEnd()
 {
 	return Units.end();
 }
