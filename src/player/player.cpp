@@ -4172,6 +4172,8 @@ void CPlayer::set_shared_vision_with(const CPlayer *player, const bool shared_vi
 		return;
 	}
 
+	std::unique_lock<std::shared_mutex> lock(this->mutex);
+
 	if (shared_vision) {
 		this->shared_vision.insert(player->get_index());
 
@@ -4187,6 +4189,16 @@ void CPlayer::set_shared_vision_with(const CPlayer *player, const bool shared_vi
 	}
 
 	emit shared_vision_changed();
+}
+
+void CPlayer::set_shared_vision_with_async(CPlayer *player, const bool shared_vision)
+{
+	const int index = this->get_index();
+	const int other_index = player->get_index();
+
+	engine_interface::get()->post([index, other_index, shared_vision]() {
+		SendCommandSharedVision(index, shared_vision, other_index);
+	});
 }
 
 void CPlayer::set_overlord(CPlayer *overlord, const wyrmgus::vassalage_type)

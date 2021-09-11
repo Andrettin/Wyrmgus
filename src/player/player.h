@@ -810,7 +810,7 @@ public:
 		return this->enemies.contains(index);
 	}
 
-	Q_INVOKABLE bool has_enemy_stance_with(CPlayer *other_player) const
+	Q_INVOKABLE bool has_enemy_stance_with_sync(CPlayer *other_player) const
 	{
 		std::shared_lock<std::shared_mutex> lock(this->mutex);
 
@@ -825,7 +825,7 @@ public:
 		return this->allies.contains(index);
 	}
 
-	Q_INVOKABLE bool has_allied_stance_with(CPlayer *other_player) const
+	Q_INVOKABLE bool has_allied_stance_with_sync(CPlayer *other_player) const
 	{
 		std::shared_lock<std::shared_mutex> lock(this->mutex);
 
@@ -847,6 +847,14 @@ public:
 
 	bool has_shared_vision_with(const CPlayer *player) const;
 	bool has_shared_vision_with(const CUnit &unit) const;
+
+	Q_INVOKABLE bool has_shared_vision_with_sync(CPlayer *other_player) const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->has_shared_vision_with(other_player);
+	}
+
 	bool has_mutual_shared_vision_with(const CPlayer *player) const;
 	bool has_mutual_shared_vision_with(const CUnit &unit) const;
 	bool is_vision_sharing() const;
@@ -911,6 +919,7 @@ public:
 	void SetDiplomacyCrazyWith(const CPlayer &player);
 
 	void set_shared_vision_with(const CPlayer *player, const bool shared_vision);
+	Q_INVOKABLE void set_shared_vision_with_async(CPlayer *player, const bool shared_vision);
 
 	CPlayer *get_realm_player()
 	{
