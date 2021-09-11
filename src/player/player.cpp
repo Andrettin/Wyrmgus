@@ -4076,8 +4076,11 @@ void CPlayer::set_neutral_diplomatic_stance_with(const CPlayer *player)
 
 void CPlayer::set_neutral_diplomatic_stance_with_async(CPlayer *player)
 {
-	engine_interface::get()->post([this, player]() {
-		this->set_neutral_diplomatic_stance_with(player);
+	const int index = this->get_index();
+	const int other_index = player->get_index();
+
+	engine_interface::get()->post([index, other_index]() {
+		SendCommandDiplomacy(index, diplomacy_state::neutral, other_index);
 	});
 }
 
@@ -4097,8 +4100,11 @@ void CPlayer::set_allied_diplomatic_stance_with(const CPlayer *player)
 
 void CPlayer::set_allied_diplomatic_stance_with_async(CPlayer *player)
 {
-	engine_interface::get()->post([this, player]() {
-		this->set_allied_diplomatic_stance_with(player);
+	const int index = this->get_index();
+	const int other_index = player->get_index();
+
+	engine_interface::get()->post([index, other_index]() {
+		SendCommandDiplomacy(index, diplomacy_state::allied, other_index);
 	});
 }
 
@@ -4140,8 +4146,11 @@ void CPlayer::set_enemy_diplomatic_stance_with(CPlayer *player)
 
 void CPlayer::set_enemy_diplomatic_stance_with_async(CPlayer *player)
 {
-	engine_interface::get()->post([this, player]() {
-		this->set_enemy_diplomatic_stance_with(player);
+	const int index = this->get_index();
+	const int other_index = player->get_index();
+
+	engine_interface::get()->post([index, other_index]() {
+		SendCommandDiplomacy(index, diplomacy_state::enemy, other_index);
 	});
 }
 
