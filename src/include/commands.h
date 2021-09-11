@@ -157,7 +157,7 @@ extern void CommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const
 /// Prepare diplomacy command
 extern void CommandDiplomacy(const int player_index, const diplomacy_state state, const int other_player_index);
 /// Prepare shared vision command
-extern void CommandSharedVision(int player, bool state, int opponent);
+extern void CommandSharedVision(const int player_index, const bool state, const int other_player_index);
 
 /*
 **  The send command functions sends a command, if needed over the
@@ -275,7 +275,7 @@ extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int
 /// Send auto spell cast command
 extern void SendCommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const bool on);
 /// Send diplomacy command
-extern void SendCommandDiplomacy(const int player, const wyrmgus::diplomacy_state state, const int opponent);
+extern void SendCommandDiplomacy(const int player, const diplomacy_state state, const int opponent);
 /// Send shared vision command
 extern void SendCommandSharedVision(int player, bool state, int opponent);
 extern void SendCommandSetFaction(int player, int faction);

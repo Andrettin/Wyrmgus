@@ -393,9 +393,9 @@ public:
 	bool is_enemy_of(const CUnit &unit) const;
 	bool is_allied_with(const CPlayer &player) const;
 	bool is_allied_with(const CUnit &unit) const;
-	bool has_shared_vision_with(const CPlayer &player) const;
+	bool has_shared_vision_with(const CPlayer *player) const;
 	bool has_shared_vision_with(const CUnit &unit) const;
-	bool has_mutual_shared_vision_with(const CPlayer &player) const;
+	bool has_mutual_shared_vision_with(const CPlayer *player) const;
 	bool has_mutual_shared_vision_with(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;

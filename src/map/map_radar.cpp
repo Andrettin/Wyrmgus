@@ -44,7 +44,7 @@ static inline unsigned char IsTileRadarVisible(const CPlayer &pradar, const CPla
 	}
 
 	const int p = pradar.get_index();
-	if (pradar.IsVisionSharing()) {
+	if (pradar.is_vision_sharing()) {
 		const std::array<unsigned char, PlayerMax> &radar = mfp.Radar;
 		const std::array<unsigned char, PlayerMax> &jamming = mfp.RadarJammer;
 		unsigned char radarvision = 0;
@@ -56,7 +56,7 @@ static inline unsigned char IsTileRadarVisible(const CPlayer &pradar, const CPla
 			}
 
 			if (jamming[i] > 0) {
-				if (CPlayer::Players[i]->has_shared_vision_with(punit.get_index())) { //if the shared vision is mutual
+				if (CPlayer::Players[i]->has_shared_vision_with(&punit)) { //if the shared vision is mutual
 					// We are jammed, return nothing
 					return 0;
 				}

@@ -1364,79 +1364,57 @@ void CommandDiplomacy(const int player_index, const wyrmgus::diplomacy_state sta
 **  @param state     New shared vision state.
 **  @param opponent  Opponent.
 */
-void CommandSharedVision(int player, bool state, int opponent)
+void CommandSharedVision(const int player_index, const bool state, const int other_player_index)
 {
-	// Do a real hardcore seen recount. First we unmark EVERYTHING.
-	for (CUnit *unit : unit_manager::get()->get_units()) {
-		if (!unit->Destroyed) {
-			MapUnmarkUnitSight(*unit);
+	CPlayer *player = CPlayer::Players[player_index].get();
+	const CPlayer *other_player = CPlayer::Players[other_player_index].get();
+
+	const bool mutual_vision_change = (state && !player->has_shared_vision_with(other_player) && other_player->has_shared_vision_with(player)) || (!state && player->has_mutual_shared_vision_with(other_player));
+
+	if (mutual_vision_change) {
+		// Do a real hardcore seen recount. First we unmark EVERYTHING.
+		for (CUnit *unit : unit_manager::get()->get_units()) {
+			if (!unit->Destroyed) {
+				MapUnmarkUnitSight(*unit);
+			}
 		}
 	}
 
 	// Compute Before and after.
-	const int before = CPlayer::Players[player]->has_mutual_shared_vision_with(*CPlayer::Players[opponent]);
-	if (state == false) {
-		CPlayer::Players[player]->UnshareVisionWith(*CPlayer::Players[opponent]);
-	} else {
-		CPlayer::Players[player]->ShareVisionWith(*CPlayer::Players[opponent]);
-	}
-	const int after = CPlayer::Players[player]->has_mutual_shared_vision_with(*CPlayer::Players[opponent]);
+	const bool before = player->has_mutual_shared_vision_with(other_player);
+	player->set_shared_vision_with(other_player, state);
+	const bool after = player->has_mutual_shared_vision_with(other_player);
 
-	if (before && !after) {
-		// Don't share vision anymore. Give each other explored terrain for good-bye.
+	if (mutual_vision_change) {
+		if (before && !after) {
+			// Don't share vision anymore. Give each others' explored terrain goodbye.
 
-		//Wyrmgus start
-		/*
-		for (int i = 0; i != Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			wyrmgus::tile &mf = *Map.Field(i);
-			wyrmgus::tile_player_info &mfp = mf.playerInfo;
+			for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+				for (int i = 0; i != CMap::get()->Info->MapWidths[z] * CMap::get()->Info->MapHeights[z]; ++i) {
+					wyrmgus::tile &mf = *CMap::get()->Field(i, z);
+					const std::unique_ptr<wyrmgus::tile_player_info> &mfp = mf.player_info;
 
-			//Wyrmgus start
-//			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
-			if (mfp.Visible[player] && !mfp.Visible[opponent] && !CPlayer::Players[player]->Revealed) {
-			//Wyrmgus end
-				mfp.Visible[opponent] = 1;
-				if (opponent == ThisPlayer->get_index()) {
-					Map.MarkSeenTile(mf);
-				}
-			}
-			//Wyrmgus start
-//			if (mfp.Visible[opponent] && !mfp.Visible[player]) {
-			if (mfp.Visible[opponent] && !mfp.Visible[player] && !CPlayer::Players[opponent]->Revealed) {
-			//Wyrmgus end
-				mfp.Visible[player] = 1;
-				if (player == ThisPlayer->get_index()) {
-					Map.MarkSeenTile(mf);
-				}
-			}
-		}
-		*/
-		for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
-			for (int i = 0; i != CMap::get()->Info->MapWidths[z] * CMap::get()->Info->MapHeights[z]; ++i) {
-				wyrmgus::tile &mf = *CMap::get()->Field(i, z);
-				const std::unique_ptr<wyrmgus::tile_player_info> &mfp = mf.player_info;
-
-				if (mfp->Visible[player] && !mfp->Visible[opponent] && !CPlayer::Players[player]->is_revealed()) {
-					mfp->Visible[opponent] = 1;
-					if (opponent == CPlayer::GetThisPlayer()->get_index()) {
-						CMap::get()->MarkSeenTile(mf);
+					if (mfp->Visible[player_index] && !mfp->Visible[other_player_index] && !player->is_revealed()) {
+						mfp->Visible[other_player_index] = 1;
+						if (other_player == CPlayer::GetThisPlayer()) {
+							CMap::get()->MarkSeenTile(mf);
+						}
 					}
-				}
-				if (mfp->Visible[opponent] && !mfp->Visible[player] && !CPlayer::Players[opponent]->is_revealed()) {
-					mfp->Visible[player] = 1;
-					if (player == CPlayer::GetThisPlayer()->get_index()) {
-						CMap::get()->MarkSeenTile(mf);
+					if (mfp->Visible[other_player_index] && !mfp->Visible[player_index] && !other_player->is_revealed()) {
+						mfp->Visible[player_index] = 1;
+						if (player == CPlayer::GetThisPlayer()) {
+							CMap::get()->MarkSeenTile(mf);
+						}
 					}
 				}
 			}
 		}
-		//Wyrmgus end
-	}
 
-	// Do a real hardcore seen recount. Now we remark EVERYTHING
-	for (CUnit *unit : unit_manager::get()->get_units()) {
-		if (!unit->Destroyed) {
-			MapMarkUnitSight(*unit);
+		// Do a real hardcore seen recount. Now we remark EVERYTHING
+		for (CUnit *unit : unit_manager::get()->get_units()) {
+			if (!unit->Destroyed) {
+				MapMarkUnitSight(*unit);
+			}
 		}
 	}
 }

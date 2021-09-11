@@ -1378,7 +1378,7 @@ static void handle_mouse_move_on_map(const PixelPos &cursor_pos, const Qt::Keybo
 		const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(tilePos);
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (mf.player_info->IsTeamExplored(*CPlayer::Players[i])
-				&& (i == CPlayer::GetThisPlayer()->get_index() || CPlayer::Players[i]->has_mutual_shared_vision_with(*CPlayer::GetThisPlayer()) || CPlayer::Players[i]->is_revealed())) {
+				&& (i == CPlayer::GetThisPlayer()->get_index() || CPlayer::Players[i]->has_mutual_shared_vision_with(CPlayer::GetThisPlayer()) || CPlayer::Players[i]->is_revealed())) {
 				show = true;
 				break;
 			}

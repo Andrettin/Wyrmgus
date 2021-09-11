@@ -711,7 +711,7 @@ void SendCommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const bo
 ** @param state      New diplomacy state.
 ** @param opponent   Opponent.
 */
-void SendCommandDiplomacy(const int player, const wyrmgus::diplomacy_state state, const int opponent)
+void SendCommandDiplomacy(const int player, const diplomacy_state state, const int opponent)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("diplomacy", NoUnitP, 0, player, opponent, NoUnitP, wyrmgus::diplomacy_state_to_string(state).c_str(), -1);

@@ -494,6 +494,7 @@ void CPlayer::Load(lua_State *l)
 	}
 
 	emit diplomatic_stances_changed();
+	emit shared_vision_changed();
 }
 
 /**

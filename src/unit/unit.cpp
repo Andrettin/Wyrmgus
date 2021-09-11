@@ -3288,14 +3288,11 @@ void MapUnmarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit?
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapUnmarkRadar(*unit.Player, unit.tilePos, unit.Type->get_tile_width(),
-						   unit.Type->get_tile_height(), unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer->ID);
+			MapUnmarkRadar(*unit.Player, unit.tilePos, unit.Type->get_tile_width(), unit.Type->get_tile_height(), unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer->ID);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapUnmarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->get_tile_width(),
-								 unit.Type->get_tile_height(), unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
+			MapUnmarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->get_tile_width(), unit.Type->get_tile_height(), unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer->ID);
 		}
-		
 	}
 }
 
@@ -4717,7 +4714,7 @@ bool CUnit::IsVisible(const CPlayer &player) const
 bool CUnit::is_invisible(const CPlayer &player) const
 {
 	return (&player != this->Player && !!Variable[INVISIBLE_INDEX].Value
-		&& !player.has_mutual_shared_vision_with(*this->Player));
+		&& !player.has_mutual_shared_vision_with(this->Player));
 }
 
 /**
@@ -8216,7 +8213,7 @@ bool CUnit::is_allied_with(const CUnit &unit) const
 **
 **  @param x  Player to check
 */
-bool CUnit::has_shared_vision_with(const CPlayer &player) const
+bool CUnit::has_shared_vision_with(const CPlayer *player) const
 {
 	return this->Player->has_shared_vision_with(player);
 }
@@ -8228,7 +8225,7 @@ bool CUnit::has_shared_vision_with(const CPlayer &player) const
 */
 bool CUnit::has_shared_vision_with(const CUnit &unit) const
 {
-	return this->has_shared_vision_with(*unit.Player);
+	return this->has_shared_vision_with(unit.Player);
 }
 
 /**
@@ -8236,7 +8233,7 @@ bool CUnit::has_shared_vision_with(const CUnit &unit) const
 **
 **  @param x  Player to check
 */
-bool CUnit::has_mutual_shared_vision_with(const CPlayer &player) const
+bool CUnit::has_mutual_shared_vision_with(const CPlayer *player) const
 {
 	return this->Player->has_mutual_shared_vision_with(player);
 }
@@ -8248,7 +8245,7 @@ bool CUnit::has_mutual_shared_vision_with(const CPlayer &player) const
 */
 bool CUnit::has_mutual_shared_vision_with(const CUnit &unit) const
 {
-	return this->has_mutual_shared_vision_with(*unit.Player);
+	return this->has_mutual_shared_vision_with(unit.Player);
 }
 
 /**

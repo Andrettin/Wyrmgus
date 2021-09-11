@@ -2360,6 +2360,7 @@ void CPlayer::Clear()
 	this->SpeedResearch = CPlayer::base_speed_factor;
 
 	emit diplomatic_stances_changed();
+	emit shared_vision_changed();
 }
 
 
@@ -4120,7 +4121,7 @@ void CPlayer::set_enemy_diplomatic_stance_with(CPlayer *player)
 		}
 	}
 
-	if (this->has_shared_vision_with(*player)) {
+	if (this->has_shared_vision_with(player)) {
 		CommandSharedVision(this->get_index(), false, player->get_index());
 	}
 
@@ -4156,22 +4157,27 @@ void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 	}
 }
 
-void CPlayer::ShareVisionWith(const CPlayer &player)
+void CPlayer::set_shared_vision_with(const CPlayer *player, const bool shared_vision)
 {
-	this->shared_vision.insert(player.get_index());
-	
-	if (GameCycle > 0 && &player == CPlayer::GetThisPlayer()) {
-		CPlayer::GetThisPlayer()->Notify(_("%s is now sharing vision with us"), _(this->get_name().c_str()));
+	if (shared_vision == this->has_shared_vision_with(player)) {
+		return;
 	}
-}
 
-void CPlayer::UnshareVisionWith(const CPlayer &player)
-{
-	this->shared_vision.erase(player.get_index());
-	
-	if (GameCycle > 0 && &player == CPlayer::GetThisPlayer()) {
-		CPlayer::GetThisPlayer()->Notify(_("%s is no longer sharing vision with us"), _(this->get_name().c_str()));
+	if (shared_vision) {
+		this->shared_vision.insert(player->get_index());
+
+		if (GameCycle > 0 && player == CPlayer::GetThisPlayer()) {
+			CPlayer::GetThisPlayer()->Notify(_("%s is now sharing vision with us"), _(this->get_name().c_str()));
+		}
+	} else {
+		this->shared_vision.erase(player->get_index());
+
+		if (GameCycle > 0 && player == CPlayer::GetThisPlayer()) {
+			CPlayer::GetThisPlayer()->Notify(_("%s is no longer sharing vision with us"), _(this->get_name().c_str()));
+		}
 	}
+
+	emit shared_vision_changed();
 }
 
 void CPlayer::set_overlord(CPlayer *overlord, const wyrmgus::vassalage_type)
@@ -4312,29 +4318,29 @@ bool CPlayer::is_allied_with(const CUnit &unit) const
 	return this->is_allied_with(*unit.Player);
 }
 
-bool CPlayer::IsVisionSharing() const
+bool CPlayer::has_shared_vision_with(const CPlayer *player) const
 {
-	return !this->shared_vision.empty();
-}
-
-bool CPlayer::has_shared_vision_with(const CPlayer &player) const
-{
-	return this->has_shared_vision_with(player.get_index());
+	return this->has_shared_vision_with(player->get_index());
 }
 
 bool CPlayer::has_shared_vision_with(const CUnit &unit) const
 {
-	return this->has_shared_vision_with(*unit.Player);
+	return this->has_shared_vision_with(unit.Player);
 }
 
-bool CPlayer::has_mutual_shared_vision_with(const CPlayer &player) const
+bool CPlayer::is_vision_sharing() const
 {
-	return this->shared_vision.contains(player.get_index()) && player.shared_vision.contains(this->get_index());
+	return !this->get_shared_vision().empty();
+}
+
+bool CPlayer::has_mutual_shared_vision_with(const CPlayer *player) const
+{
+	return this->has_shared_vision_with(player) && player->has_shared_vision_with(this);
 }
 
 bool CPlayer::has_mutual_shared_vision_with(const CUnit &unit) const
 {
-	return this->has_mutual_shared_vision_with(*unit.Player);
+	return this->has_mutual_shared_vision_with(unit.Player);
 }
 
 /**

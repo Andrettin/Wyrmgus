@@ -834,7 +834,6 @@ public:
 
 	bool is_allied_with(const CPlayer &player) const;
 	bool is_allied_with(const CUnit &unit) const;
-	bool IsVisionSharing() const;
 
 	const player_index_set &get_shared_vision() const
 	{
@@ -846,10 +845,12 @@ public:
 		return this->shared_vision.contains(player_index);
 	}
 
-	bool has_shared_vision_with(const CPlayer &player) const;
+	bool has_shared_vision_with(const CPlayer *player) const;
 	bool has_shared_vision_with(const CUnit &unit) const;
-	bool has_mutual_shared_vision_with(const CPlayer &player) const;
+	bool has_mutual_shared_vision_with(const CPlayer *player) const;
 	bool has_mutual_shared_vision_with(const CUnit &unit) const;
+	bool is_vision_sharing() const;
+
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
 
@@ -909,8 +910,7 @@ public:
 	Q_INVOKABLE void set_enemy_diplomatic_stance_with_async(CPlayer *player);
 	void SetDiplomacyCrazyWith(const CPlayer &player);
 
-	void ShareVisionWith(const CPlayer &player);
-	void UnshareVisionWith(const CPlayer &player);
+	void set_shared_vision_with(const CPlayer *player, const bool shared_vision);
 
 	CPlayer *get_realm_player()
 	{
@@ -979,6 +979,7 @@ signals:
 	void type_changed();
 	void alive_changed();
 	void diplomatic_stances_changed();
+	void shared_vision_changed();
 
 private:
 	const int index = 0;          /// player as number
