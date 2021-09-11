@@ -332,37 +332,6 @@ public:
 
 	bool at_war() const;
 
-private:
-	const int index = 0;          /// player as number
-	std::string name;
-	player_type type; //type of the player (human, computer, ...)
-public:
-	int Race = 0; //race of the player (orc, human, ...)
-	int Faction = -1; //faction of the player
-private:
-	wyrmgus::faction_tier faction_tier;
-	wyrmgus::government_type government_type;
-	wyrmgus::religion *religion = nullptr; //religion of the player
-	const wyrmgus::dynasty *dynasty = nullptr; //ruling dynasty of the player
-	const wyrmgus::age *age = nullptr; //the current age the player/faction is in
-public:
-	std::string AiName; //AI for computer
-
-	// friend enemy detection
-	int Team = 0;          /// team of player
-
-	Vec2i StartPos = Vec2i(0, 0);  /// map tile start position
-	//Wyrmgus start
-	int StartMapLayer = 0;  /// map tile start map layer
-	//Wyrmgus end
-
-private:
-	CPlayer *overlord = nullptr;	/// overlord of this player
-	wyrmgus::vassalage_type vassalage_type;
-
-	std::vector<CPlayer *> vassals;	/// vassals of this player
-
-public:
 	//Wyrmgus start
 //	void SetStartView(const Vec2i &pos) { StartPos = pos; }
 	void SetStartView(const Vec2i &pos, int z) { StartPos = pos; StartMapLayer = z; }
@@ -708,99 +677,6 @@ public:
 		this->set_resource_total(resource, this->get_resource_total(resource) + quantity);
 	}
 
-private:
-	resource_map<int> resources;      /// resources in overall store
-	resource_map<int> max_resources;   /// max resources can be stored
-	resource_map<int> stored_resources;/// resources in store buildings (can't exceed MaxResources)
-	resource_map<int> last_resources;  /// last values for revenue
-	resource_map<int> incomes;        /// income of the resources
-	resource_map<int> revenues;       /// income rate of the resources
-	//Wyrmgus start
-	resource_map<int> prices;		  /// price of each resource
-	resource_map<int> resource_demands; /// demand for the resources
-	resource_map<int> stored_resource_demands; /// stored demand for the resources (converted into a trade action when reaches 100)
-	
-public:
-	int TradeCost;					/// cost of trading
-	//Wyrmgus end
-
-private:
-	resource_map<int> resource_harvest_speeds; /// speed factor for harvesting resources
-	resource_map<int> resource_return_speeds;  /// speed factor for returning resources
-public:
-	int SpeedBuild;                  /// speed factor for building
-	int SpeedTrain;                  /// speed factor for training
-	int SpeedUpgrade;                /// speed factor for upgrading
-	int SpeedResearch;               /// speed factor for researching
-
-	wyrmgus::unit_type_map<int> UnitTypesCount;  						/// total units of unit-type
-	wyrmgus::unit_type_map<int> UnitTypesUnderConstructionCount;  		/// total under construction units of unit-type
-	wyrmgus::unit_type_map<int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
-private:
-	wyrmgus::unit_type_map<std::vector<CUnit *>> units_by_type; //units owned by this player for each type
-	wyrmgus::unit_class_map<std::vector<CUnit *>> units_by_class;
-public:
-	wyrmgus::unit_type_map<std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
-	std::vector<CUnit *> Heroes;							/// hero units owned by this player
-	std::vector<const wyrmgus::deity *> Deities;			/// deities chosen by this player
-private:
-	std::vector<wyrmgus::quest *> available_quests;			/// quests available to this player
-	std::vector<wyrmgus::quest *> current_quests;			/// quests being pursued by this player
-	std::vector<const wyrmgus::quest *> completed_quests;	/// quests completed by this player
-	std::vector<std::unique_ptr<wyrmgus::player_quest_objective>> quest_objectives; //objectives of the player's current quests
-public:
-	std::vector<std::pair<CUpgrade *, int>> Modifiers;						/// Modifiers affecting the player, and until which cycle it should last
-	std::vector<int> AutosellResources;
-	//Wyrmgus end
-
-	bool AiEnabled = false; //handle AI on local computer
-private:
-	bool revealed = false; //whether the player has been revealed (i.e. after losing the last town hall)
-public:
-	std::unique_ptr<PlayerAi> Ai;          /// Ai structure pointer
-
-	int NumBuildings = 0;   /// # buildings
-	//Wyrmgus start
-	int NumBuildingsUnderConstruction = 0; /// # buildings under construction
-	int NumTownHalls = 0;
-	//Wyrmgus end
-	int Supply = 0;         /// supply available/produced
-	int Demand = 0;         /// demand of player
-
-	int UnitLimit;       /// # food units allowed
-	int BuildingLimit;   /// # buildings allowed
-	int TotalUnitLimit;  /// # total unit number allowed
-
-	int Score = 0;           /// Player score points
-	int TotalUnits = 0;
-	int TotalBuildings = 0;
-private:
-	resource_map<int> resource_totals;
-public:
-	int TotalRazings = 0;
-	int TotalKills = 0;      /// How many units killed
-	//Wyrmgus start
-	int UnitTypeKills[UnitTypeMax];  /// total killed units of each unit type
-	//Wyrmgus end
-
-	//Wyrmgus start
-	int LostTownHallTimer = 0;	/// The timer for when the player lost the last town hall (to make the player's units be revealed)
-	int HeroCooldownTimer = 0;	/// The cooldown timer for recruiting heroes
-	//Wyrmgus end
-	
-private:
-	const wyrmgus::player_color *player_color = nullptr; /// player color for units and portraits
-
-public:
-	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
-	//Wyrmgus start
-	std::vector<CUnit *> LevelUpUnits;	/// Container for units with available level up upgrades
-	//Wyrmgus end
-
-	// Upgrades/Allows:
-	CAllow Allow;                 /// Allowed for player
-	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
-
 	/// Get a resource of the player
 	int get_resource(const wyrmgus::resource *resource, const resource_storage_type type) const;
 	/// Adds/subtracts some resources to/from the player store
@@ -820,7 +696,7 @@ public:
 	int get_resource_price(const resource *resource) const;
 	/// Get the effective resource demand for the player, given the current prices
 	int get_effective_resource_demand(const resource *resource) const;
-	
+
 	int get_effective_resource_sell_price(const resource *resource, const int traded_quantity = 100) const;
 	int get_effective_resource_buy_price(const resource *resource, const int traded_quantity = 100) const;
 
@@ -831,7 +707,7 @@ public:
 	//Wyrmgus end
 
 	void pay_overlord_tax(const wyrmgus::resource *resource, const int taxable_quantity);
-	
+
 	/// Returns count of specified unittype
 	int GetUnitTotalCount(const wyrmgus::unit_type &type) const;
 	/// Check if the unit-type didn't break any unit limits and supply/demand
@@ -854,21 +730,21 @@ public:
 	void SubUnitType(const wyrmgus::unit_type &type, bool hire = false);
 	/// Remove a factor of costs from the resources
 	void SubCostsFactor(const resource_map<int> &costs, const int factor);
-	
+
 	//Wyrmgus start
 	resource_map<int> GetUnitTypeCosts(const unit_type *type, const bool hire = false, const bool ignore_one = false) const;
 	int GetUnitTypeCostsMask(const wyrmgus::unit_type *type, bool hire = false) const;
 	resource_map<int> GetUpgradeCosts(const CUpgrade *upgrade) const;
 	int GetUpgradeCostsMask(const CUpgrade *upgrade) const;
-	
+
 	void SetUnitTypeCount(const wyrmgus::unit_type *type, int quantity);
 	void ChangeUnitTypeCount(const wyrmgus::unit_type *type, int quantity);
 	int GetUnitTypeCount(const wyrmgus::unit_type *type) const;
-	
+
 	void SetUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type, int quantity);
 	void ChangeUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type, int quantity);
 	int GetUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type) const;
-	
+
 	void SetUnitTypeAiActiveCount(const wyrmgus::unit_type *type, int quantity);
 	void ChangeUnitTypeAiActiveCount(const wyrmgus::unit_type *type, int quantity);
 	int GetUnitTypeAiActiveCount(const wyrmgus::unit_type *type) const;
@@ -879,7 +755,7 @@ public:
 		if (find_iterator != this->units_by_class.end()) {
 			return static_cast<int>(find_iterator->second.size());
 		}
-		
+
 		return 0;
 	}
 
@@ -1001,7 +877,7 @@ public:
 
 		return this;
 	}
-	
+
 	CPlayer *get_overlord() const
 	{
 		return this->overlord;
@@ -1054,6 +930,129 @@ public:
 	void apply_civilization_history(const wyrmgus::civilization_base *civilization);
 
 	void add_settlement_to_explored_territory(const site *settlement);
+
+private:
+	const int index = 0;          /// player as number
+	std::string name;
+	player_type type; //type of the player (human, computer, ...)
+public:
+	int Race = 0; //race of the player (orc, human, ...)
+	int Faction = -1; //faction of the player
+private:
+	wyrmgus::faction_tier faction_tier;
+	wyrmgus::government_type government_type;
+	wyrmgus::religion *religion = nullptr; //religion of the player
+	const wyrmgus::dynasty *dynasty = nullptr; //ruling dynasty of the player
+	const wyrmgus::age *age = nullptr; //the current age the player/faction is in
+public:
+	std::string AiName; //AI for computer
+
+	// friend enemy detection
+	int Team = 0;          /// team of player
+
+	Vec2i StartPos = Vec2i(0, 0);  /// map tile start position
+	//Wyrmgus start
+	int StartMapLayer = 0;  /// map tile start map layer
+	//Wyrmgus end
+
+private:
+	CPlayer *overlord = nullptr;	/// overlord of this player
+	wyrmgus::vassalage_type vassalage_type;
+
+	std::vector<CPlayer *> vassals;	/// vassals of this player
+
+private:
+	resource_map<int> resources;      /// resources in overall store
+	resource_map<int> max_resources;   /// max resources can be stored
+	resource_map<int> stored_resources;/// resources in store buildings (can't exceed MaxResources)
+	resource_map<int> last_resources;  /// last values for revenue
+	resource_map<int> incomes;        /// income of the resources
+	resource_map<int> revenues;       /// income rate of the resources
+	//Wyrmgus start
+	resource_map<int> prices;		  /// price of each resource
+	resource_map<int> resource_demands; /// demand for the resources
+	resource_map<int> stored_resource_demands; /// stored demand for the resources (converted into a trade action when reaches 100)
+	
+public:
+	int TradeCost;					/// cost of trading
+	//Wyrmgus end
+
+private:
+	resource_map<int> resource_harvest_speeds; /// speed factor for harvesting resources
+	resource_map<int> resource_return_speeds;  /// speed factor for returning resources
+public:
+	int SpeedBuild;                  /// speed factor for building
+	int SpeedTrain;                  /// speed factor for training
+	int SpeedUpgrade;                /// speed factor for upgrading
+	int SpeedResearch;               /// speed factor for researching
+
+	wyrmgus::unit_type_map<int> UnitTypesCount;  						/// total units of unit-type
+	wyrmgus::unit_type_map<int> UnitTypesUnderConstructionCount;  		/// total under construction units of unit-type
+	wyrmgus::unit_type_map<int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
+private:
+	wyrmgus::unit_type_map<std::vector<CUnit *>> units_by_type; //units owned by this player for each type
+	wyrmgus::unit_class_map<std::vector<CUnit *>> units_by_class;
+public:
+	wyrmgus::unit_type_map<std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
+	std::vector<CUnit *> Heroes;							/// hero units owned by this player
+	std::vector<const wyrmgus::deity *> Deities;			/// deities chosen by this player
+private:
+	std::vector<wyrmgus::quest *> available_quests;			/// quests available to this player
+	std::vector<wyrmgus::quest *> current_quests;			/// quests being pursued by this player
+	std::vector<const wyrmgus::quest *> completed_quests;	/// quests completed by this player
+	std::vector<std::unique_ptr<wyrmgus::player_quest_objective>> quest_objectives; //objectives of the player's current quests
+public:
+	std::vector<std::pair<CUpgrade *, int>> Modifiers;						/// Modifiers affecting the player, and until which cycle it should last
+	std::vector<int> AutosellResources;
+	//Wyrmgus end
+
+	bool AiEnabled = false; //handle AI on local computer
+private:
+	bool revealed = false; //whether the player has been revealed (i.e. after losing the last town hall)
+public:
+	std::unique_ptr<PlayerAi> Ai;          /// Ai structure pointer
+
+	int NumBuildings = 0;   /// # buildings
+	//Wyrmgus start
+	int NumBuildingsUnderConstruction = 0; /// # buildings under construction
+	int NumTownHalls = 0;
+	//Wyrmgus end
+	int Supply = 0;         /// supply available/produced
+	int Demand = 0;         /// demand of player
+
+	int UnitLimit;       /// # food units allowed
+	int BuildingLimit;   /// # buildings allowed
+	int TotalUnitLimit;  /// # total unit number allowed
+
+	int Score = 0;           /// Player score points
+	int TotalUnits = 0;
+	int TotalBuildings = 0;
+private:
+	resource_map<int> resource_totals;
+public:
+	int TotalRazings = 0;
+	int TotalKills = 0;      /// How many units killed
+	//Wyrmgus start
+	int UnitTypeKills[UnitTypeMax];  /// total killed units of each unit type
+	//Wyrmgus end
+
+	//Wyrmgus start
+	int LostTownHallTimer = 0;	/// The timer for when the player lost the last town hall (to make the player's units be revealed)
+	int HeroCooldownTimer = 0;	/// The cooldown timer for recruiting heroes
+	//Wyrmgus end
+	
+private:
+	const wyrmgus::player_color *player_color = nullptr; /// player color for units and portraits
+
+public:
+	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
+	//Wyrmgus start
+	std::vector<CUnit *> LevelUpUnits;	/// Container for units with available level up upgrades
+	//Wyrmgus end
+
+	// Upgrades/Allows:
+	CAllow Allow;                 /// Allowed for player
+	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
 
 signals:
 	void name_changed();
