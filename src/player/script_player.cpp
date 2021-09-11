@@ -635,7 +635,7 @@ static int CclSetDiplomacy(lua_State *l)
 	const int plynr = LuaToNumber(l, 3);
 	const char *state = LuaToString(l, 2);
 
-	SendCommandDiplomacy(base, wyrmgus::string_to_diplomacy_state(state), plynr);
+	SendCommandDiplomacy(base, string_to_diplomacy_state(state), plynr);
 	return 0;
 }
 

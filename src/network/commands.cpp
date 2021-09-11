@@ -717,8 +717,7 @@ void SendCommandDiplomacy(const int player, const wyrmgus::diplomacy_state state
 		CommandLog("diplomacy", NoUnitP, 0, player, opponent, NoUnitP, wyrmgus::diplomacy_state_to_string(state).c_str(), -1);
 		CommandDiplomacy(player, state, opponent);
 	} else {
-		NetworkSendExtendedCommand(ExtendedMessageDiplomacy,
-								   -1, player, static_cast<int>(state), opponent, 0);
+		NetworkSendExtendedCommand(ExtendedMessageDiplomacy, -1, player, static_cast<int>(state), opponent, 0);
 	}
 }
 
@@ -1110,7 +1109,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 
 	switch (type) {
 		case ExtendedMessageDiplomacy: {
-			const wyrmgus::diplomacy_state state = static_cast<wyrmgus::diplomacy_state>(arg3);
+			const diplomacy_state state = static_cast<diplomacy_state>(arg3);
 			const char *diplomacyName = GetDiplomacyName(state);
 			CommandLog("diplomacy", NoUnitP, 0, arg2, arg4, NoUnitP, diplomacyName, -1);
 			CommandDiplomacy(arg2, state, arg4);
