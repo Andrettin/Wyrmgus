@@ -68,7 +68,7 @@ public:
 				return false;
 			}
 
-			if (this->enemy && !faction_player->IsEnemy(*player)) {
+			if (this->enemy && !faction_player->is_enemy_of(*player)) {
 				return false;
 			}
 

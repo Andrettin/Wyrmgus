@@ -46,6 +46,7 @@
 #include "network.h"
 #include "pathfinder.h"
 #include "player/faction.h"
+#include "player/player.h"
 #include "player/player_type.h"
 #include "quest/campaign.h"
 #include "script/condition/condition.h"
@@ -109,8 +110,8 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		if (
 			tile_owner != nullptr
 			&& (
-				unit.IsEnemy(*tile_owner)
-				|| (include_neutral && !unit.IsAllied(*tile_owner) && unit.Player != tile_owner && !unit.Player->has_building_access(tile_owner))
+				unit.is_enemy_of(*tile_owner)
+				|| (include_neutral && !unit.is_allied_with(*tile_owner) && unit.Player != tile_owner && !unit.Player->has_building_access(tile_owner))
 			)
 		) {
 			*result_enemy_wall_pos = pos;
@@ -144,8 +145,8 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		
 		if (
 			(
-				!unit.IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player == dest->Player || unit.Player->has_building_access(dest->Player))
+				!unit.is_enemy_of(*dest) // a friend or neutral
+				&& (!include_neutral || unit.is_allied_with(*dest) || unit.Player == dest->Player || unit.Player->has_building_access(dest->Player))
 			)
 			|| !CanTarget(*unit.Type, dtype)
 		) {
@@ -291,7 +292,7 @@ public:
 	explicit IsAnAlliedUnitOf(const CPlayer &_player) : player(&_player) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*player) && (unit->Player == player || unit->IsAllied(*player));
+		return unit->IsVisibleAsGoal(*player) && (unit->Player == player || unit->is_allied_with(*player));
 	}
 private:
 	const CPlayer *player;
@@ -948,7 +949,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			goalPos = enemy->tilePos;
 			//Wyrmgus start
 			z = enemy->MapLayer->ID;
-			if (!AiPlayer->Player->IsEnemy(*enemy->Player) && enemy->Player->get_type() != player_type::neutral) {
+			if (!AiPlayer->Player->is_enemy_of(*enemy->Player) && enemy->Player->get_type() != player_type::neutral) {
 				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy->Player);
 			}
 			//Wyrmgus end
@@ -957,7 +958,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			goalPos = enemy_wall_pos;
 			z = enemy_wall_map_layer;
 			CPlayer *enemy_wall_owner = CMap::get()->Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
-			if (!AiPlayer->Player->IsEnemy(*enemy_wall_owner) && enemy_wall_owner->get_type() != player_type::neutral) {
+			if (!AiPlayer->Player->is_enemy_of(*enemy_wall_owner) && enemy_wall_owner->get_type() != player_type::neutral) {
 				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
 			}
 		} else {
@@ -1747,14 +1748,14 @@ void AiForce::Update()
 			if (unit) {
 				this->GoalPos = unit->tilePos;
 				this->GoalMapLayer = unit->MapLayer->ID;
-				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->get_type() != player_type::neutral) {
+				if (!AiPlayer->Player->is_enemy_of(*unit->Player) && unit->Player->get_type() != player_type::neutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
 				}
 			} else if (CMap::get()->Info->IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 				this->GoalPos = enemy_wall_pos;
 				this->GoalMapLayer = enemy_wall_map_layer;
 				CPlayer *enemy_wall_owner = CMap::get()->Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
-				if (!AiPlayer->Player->IsEnemy(*enemy_wall_owner) && enemy_wall_owner->get_type() != player_type::neutral) {
+				if (!AiPlayer->Player->is_enemy_of(*enemy_wall_owner) && enemy_wall_owner->get_type() != player_type::neutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
 				}
 			}
@@ -1850,7 +1851,7 @@ void AiForce::Update()
 				goal_pos = unit->tilePos;
 				z = unit->MapLayer->ID;
 
-				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->get_type() != player_type::neutral) {
+				if (!AiPlayer->Player->is_enemy_of(*unit->Player) && unit->Player->get_type() != player_type::neutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
 				}
 			} else if (CMap::get()->Info->IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
@@ -1858,7 +1859,7 @@ void AiForce::Update()
 				z = enemy_wall_map_layer;
 
 				CPlayer *enemy_wall_owner = CMap::get()->Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
-				if (!AiPlayer->Player->IsEnemy(*enemy_wall_owner) && enemy_wall_owner->get_type() != player_type::neutral) {
+				if (!AiPlayer->Player->is_enemy_of(*enemy_wall_owner) && enemy_wall_owner->get_type() != player_type::neutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
 				}
 			}

@@ -185,7 +185,7 @@ int Spell_Demolish::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, const V
 //				&& unit.MapDistanceTo(goalPos) <= this->Range) {
 				// Don't hit flying units!
 //				HitUnit(&caster, unit, this->Damage);
-				&& unit.MapDistanceTo(caster) <= this->Range && (UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) && (caster.IsEnemy(unit) || this->DamageFriendly)) {
+				&& unit.MapDistanceTo(caster) <= this->Range && (UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) && (caster.is_enemy_of(unit) || this->DamageFriendly)) {
 
 				int damage = 0;
 				if (this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage || this->ArcaneDamage || this->LightningDamage || this->AirDamage || this->EarthDamage || this->WaterDamage || this->AcidDamage || this->ShadowDamage) {

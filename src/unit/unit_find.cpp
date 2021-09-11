@@ -424,7 +424,7 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, const int range, const r
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		const CPlayer *other_player = CPlayer::Players[i].get();
-		if (other_player->IsAllied(p) && p.IsAllied(*other_player)) {
+		if (other_player->is_allied_with(p) && p.is_allied_with(*other_player)) {
 			for (const auto &kv_pair : other_player->get_units_by_type()) {
 				const wyrmgus::unit_type *unit_type = kv_pair.first;
 				if (unit_type->can_store(resource)) {
@@ -567,7 +567,7 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 //		   && (resinfo.HarvestFromOutside
 //			   || mine.Player->get_index() == PlayerMax - 1
 //			   || mine.Player == worker.Player
-//			   || (worker.IsAllied(mine) && mine.IsAllied(worker)));
+//			   || (worker.is_allied_with(mine) && mine.is_allied_with(worker)));
 		   && worker.CanHarvest(&mine, only_harvestable);
 			//Wyrmgus end
 }
@@ -734,7 +734,7 @@ CUnit *FindDeposit(const CUnit &unit, const int range, const resource *resource)
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		const CPlayer *other_player = CPlayer::Players[i].get();
-		if (other_player->IsAllied(*unit.Player) && unit.Player->IsAllied(*other_player)) {
+		if (other_player->is_allied_with(*unit.Player) && unit.Player->is_allied_with(*other_player)) {
 			for (const auto &kv_pair : other_player->get_units_by_type()) {
 				const wyrmgus::unit_type *unit_type = kv_pair.first;
 				if (unit_type->can_store(resource)) {
@@ -1040,11 +1040,11 @@ private:
 		int attackrange = attacker->get_best_attack_range();
 
 		//Wyrmgus start
-//		if (!player.IsEnemy(*dest) // a friend or neutral
+//		if (!player.is_enemy_of(*dest) // a friend or neutral
 		if (
 			(
-				!attacker->IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->get_type() == player_type::neutral || attacker->Player == dest->Player)
+				!attacker->is_enemy_of(*dest) // a friend or neutral
+				&& (!include_neutral || attacker->is_allied_with(*dest) || dest->Player->get_type() == player_type::neutral || attacker->Player == dest->Player)
 			)
 		//Wyrmgus end
 			|| !dest->IsVisibleAsGoal(player)
@@ -1219,10 +1219,10 @@ public:
 									 + attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 			}
 			//Wyrmgus start
-//			if (!player.IsEnemy(*dest)) { // a friend or neutral
+//			if (!player.is_enemy_of(*dest)) { // a friend or neutral
 			if (
-				!attacker->IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->IsAllied(*dest) || dest->Player->get_type() == player_type::neutral || attacker->Player == dest->Player)
+				!attacker->is_enemy_of(*dest) // a friend or neutral
+				&& (!include_neutral || attacker->is_allied_with(*dest) || dest->Player->get_type() == player_type::neutral || attacker->Player == dest->Player)
 			) {
 			//Wyrmgus end
 				dest->CacheLock = 1;

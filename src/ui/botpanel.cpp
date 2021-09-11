@@ -688,12 +688,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 		
 		if (!(button.Action == ButtonCmd::Buy && unit.get_character()) && condition->Opponent != CONDITION_TRUE) {
-			if ((condition->Opponent == CONDITION_ONLY) ^ CPlayer::GetThisPlayer()->IsEnemy(unit)) {
+			if ((condition->Opponent == CONDITION_ONLY) ^ CPlayer::GetThisPlayer()->is_enemy_of(unit)) {
 				return false;
 			}
 		}
 		if (!(button.Action == ButtonCmd::Buy && unit.get_character()) && condition->Neutral != CONDITION_TRUE) {
-			if ((condition->Neutral == CONDITION_ONLY) ^ (!CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && CPlayer::GetThisPlayer() != unit.Player && (unit.Container == nullptr || (!CPlayer::GetThisPlayer()->IsEnemy(*unit.Container) && !CPlayer::GetThisPlayer()->IsAllied(*unit.Container) && CPlayer::GetThisPlayer() != unit.Container->Player)))) {
+			if ((condition->Neutral == CONDITION_ONLY) ^ (!CPlayer::GetThisPlayer()->is_enemy_of(unit) && !CPlayer::GetThisPlayer()->is_allied_with(unit) && CPlayer::GetThisPlayer() != unit.Player && (unit.Container == nullptr || (!CPlayer::GetThisPlayer()->is_enemy_of(*unit.Container) && !CPlayer::GetThisPlayer()->is_allied_with(*unit.Container) && CPlayer::GetThisPlayer() != unit.Container->Player)))) {
 				return false;
 			}
 		}

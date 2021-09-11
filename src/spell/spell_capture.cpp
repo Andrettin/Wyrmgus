@@ -32,6 +32,7 @@
 #include "ai/ai_local.h"
 #include "commands.h"
 #include "game.h"
+#include "player/player.h"
 #include "script.h"
 #include "spell/spell.h"
 #include "unit/unit.h"
@@ -93,7 +94,7 @@ int Spell_Capture::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *targe
 		}
 	}
 	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
-	if (caster.IsEnemy(*target)) {
+	if (caster.is_enemy_of(*target)) {
 		if (target->Type->BoolFlag[BUILDING_INDEX].value) {
 			caster.Player->TotalRazings++;
 		} else {

@@ -1279,7 +1279,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		if (!blocker.CanMove() || blocker.Moving) {
 			continue;
 		}
-		if (blocker.Player != unit.Player && blocker.Player->IsAllied(*unit.Player) == false) {
+		if (blocker.Player != unit.Player && blocker.Player->is_allied_with(*unit.Player) == false) {
 			continue;
 		}
 		//Wyrmgus start

@@ -203,7 +203,7 @@ public:
 	explicit IsAEnemyUnitOf(const CPlayer &_player) : player(&_player) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*player) && unit->IsEnemy(*player);
+		return unit->IsVisibleAsGoal(*player) && unit->is_enemy_of(*player);
 	}
 private:
 	const CPlayer *player;
@@ -217,9 +217,7 @@ public:
 	{}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*player)
-			   && unit->IsEnemy(*player)
-			   && CanTarget(*unit->Type, *type);
+		return unit->IsVisibleAsGoal(*player) && unit->is_enemy_of(*player) && CanTarget(*unit->Type, *type);
 	}
 private:
 	const CPlayer *player;

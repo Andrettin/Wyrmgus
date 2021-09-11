@@ -1108,7 +1108,7 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 		CUnit &unit = **it;
 
 		if (unit.IsAliveOnMap()
-			&& (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.get_source_unit()))
+			&& (missile.Type->FriendlyFire == true || unit.is_enemy_of(*missile.get_source_unit()))
 			&& missile.get_source_unit() != &unit //don't hit the source unit, otherwise it will be hit by pierce as soon as it fires the missile
 			&& (!missile.Type->PierceOnce || !IsPiercedUnit(missile, unit))
 			&& CanTarget(*missile.get_source_unit()->Type, *unit.Type)
@@ -1142,7 +1142,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 				if (!missile.Type->IgnoreWalls && missile.get_source_unit()->Type->UnitType == UnitTypeType::Land) {
 					if (!missile.get_target_unit() || missile.get_target_unit()->Type->UnitType == UnitTypeType::Land) {
 						if (&unit != missile.get_source_unit() && unit.Type->BoolFlag[WALL_INDEX].value
-							&& unit.Player != missile.get_source_unit()->Player && unit.IsAllied(*missile.get_source_unit()) == false) {
+							&& unit.Player != missile.get_source_unit()->Player && unit.is_allied_with(*missile.get_source_unit()) == false) {
 							if (missile.get_target_unit()) {
 								missile.TargetUnit = unit.acquire_ref();
 								if (unit.Type->get_tile_width() == 1 || unit.Type->get_tile_height() == 1) {
@@ -1163,8 +1163,8 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 						continue;
 					}
 					//Wyrmgus start
-//					if (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.get_source_unit()->Player)) {
-					if (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.get_source_unit())) {
+//					if (missile.Type->FriendlyFire == false || unit.is_enemy_of(*missile.get_source_unit()->Player)) {
+					if (missile.Type->FriendlyFire == true || unit.is_enemy_of(*missile.get_source_unit())) {
 					//Wyrmgus end
 						missile.TargetUnit = unit.acquire_ref();
 						if (unit.Type->get_tile_width() == 1 || unit.Type->get_tile_height() == 1) {
@@ -1479,7 +1479,7 @@ void Missile::MissileHit(CUnit *unit)
 		//Wyrmgus end
 								//Wyrmgus start
 //								 || this->get_target_unit()->Player != this->get_source_unit()->Player)) {
-								 || this->get_target_unit()->IsEnemy(*this->get_source_unit()))) {
+								 || this->get_target_unit()->is_enemy_of(*this->get_source_unit()))) {
 								//Wyrmgus end
 			//
 			// Missiles without range only hits the goal always.
@@ -1531,7 +1531,7 @@ void Missile::MissileHit(CUnit *unit)
 			if (CanTarget(*this->get_source_unit()->Type, *goal.Type)
 				//Wyrmgus start
 //				&& (mtype.FriendlyFire == false || goal.Player != this->get_source_unit()->Player)) {
-				&& (mtype.FriendlyFire == true || goal.IsEnemy(*this->get_source_unit()))) {
+				&& (mtype.FriendlyFire == true || goal.is_enemy_of(*this->get_source_unit()))) {
 				//Wyrmgus end
 				bool shouldHit = true;
 

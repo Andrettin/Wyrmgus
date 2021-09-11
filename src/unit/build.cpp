@@ -165,10 +165,10 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const wyrmgus::unit_
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
 			(this->RestrictTypeOwner.size() == 0 ||
 			 (!this->RestrictTypeOwner.compare("self") && player == table[i]->Player) ||
-			 (!this->RestrictTypeOwner.compare("allied") && (player == table[i]->Player || player->IsAllied(*table[i]->Player))) ||
+			 (!this->RestrictTypeOwner.compare("allied") && (player == table[i]->Player || player->is_allied_with(*table[i]->Player))) ||
 			 //Wyrmgus start
-//			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*table[i]->Player)))) {
-			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*table[i])))) {
+//			 (!this->RestrictTypeOwner.compare("enemy") && player->is_enemy_of(*table[i]->Player)))) {
+			 (!this->RestrictTypeOwner.compare("enemy") && player->is_enemy_of(*table[i])))) {
 			 //Wyrmgus end
 
 			switch (this->DistanceType) {
@@ -225,13 +225,13 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const wyrmgus::unit_t
 	} else if (!this->RestrictTypeOwner.compare("allied")) {
 		count = player->GetUnitTotalCount(*this->RestrictType);
 		for (int i = 0; i < NumPlayers; i++) {
-			if (player->IsAllied(*CPlayer::Players[i])) {
+			if (player->is_allied_with(*CPlayer::Players[i])) {
 				count += CPlayer::Players[i]->GetUnitTotalCount(*this->RestrictType);
 			}
 		}
 	} else if (!this->RestrictTypeOwner.compare("enemy")) {
 		for (int i = 0; i < NumPlayers; i++) {
-			if (player->IsEnemy(*CPlayer::Players[i])) {
+			if (player->is_enemy_of(*CPlayer::Players[i])) {
 				count += CPlayer::Players[i]->GetUnitTotalCount(*this->RestrictType);
 			}
 		}
@@ -297,10 +297,10 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const wyrmgus::u
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
 			(this->RestrictTypeOwner.size() == 0 ||
 				(!this->RestrictTypeOwner.compare("self") && builder->Player == table[i]->Player) ||
-				(!this->RestrictTypeOwner.compare("allied") && (builder->Player == table[i]->Player || builder->Player->IsAllied(*table[i]->Player))) ||
+				(!this->RestrictTypeOwner.compare("allied") && (builder->Player == table[i]->Player || builder->Player->is_allied_with(*table[i]->Player))) ||
 				//Wyrmgus start
-//				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*table[i]->Player)))) {
-				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*table[i])))) {
+//				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->is_enemy_of(*table[i]->Player)))) {
+				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->is_enemy_of(*table[i])))) {
 				//Wyrmgus end
 
 			switch (this->DistanceType) {

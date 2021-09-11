@@ -194,13 +194,13 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 	if (condition->Alliance != CONDITION_TRUE) {
 		if ((condition->Alliance == CONDITION_ONLY) ^
 			// own units could be not allied ?
-			(caster.IsAllied(*target) || target->Player == caster.Player)) {
+			(caster.is_allied_with(*target) || target->Player == caster.Player)) {
 			return false;
 		}
 	}
 	if (condition->Opponent != CONDITION_TRUE) {
 		if ((condition->Opponent == CONDITION_ONLY) ^
-			(caster.IsEnemy(*target))) {
+			(caster.is_enemy_of(*target))) {
 			return false;
 		}
 	}
@@ -443,7 +443,7 @@ bool spell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, 
 
 	if (this->get_target() == spell_target_type::unit) {
 		//if caster is terrified, don't target enemy units
-		if (caster.Variable[TERROR_INDEX].Value > 0 && caster.IsEnemy(*target)) {
+		if (caster.Variable[TERROR_INDEX].Value > 0 && caster.is_enemy_of(*target)) {
 			return false;
 		}
 	}

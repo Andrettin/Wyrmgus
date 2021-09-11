@@ -805,24 +805,21 @@ public:
 	/// Notify player about a problem
 	void Notify(const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
 
-	/**
-	**  Check if the player index is an enemy
-	*/
-	bool IsEnemy(const int index) const
+	bool has_enemy_stance_with(const int index) const
 	{
-		return this->get_index() != index && this->enemies.contains(index);
+		return this->enemies.contains(index);
 	}
 
-	bool IsEnemy(const CPlayer &player) const;
-	bool IsEnemy(const CUnit &unit) const;
+	bool is_enemy_of(const CPlayer &player) const;
+	bool is_enemy_of(const CUnit &unit) const;
 
-	bool IsAllied(const int index) const
+	bool has_allied_stance_with(const int index) const
 	{
-		return this->get_index() != index && this->allies.contains(index);
+		return this->allies.contains(index);
 	}
 
-	bool IsAllied(const CPlayer &player) const;
-	bool IsAllied(const CUnit &unit) const;
+	bool is_allied_with(const CPlayer &player) const;
+	bool is_allied_with(const CUnit &unit) const;
 	bool IsVisionSharing() const;
 
 	const player_index_set &get_shared_vision() const

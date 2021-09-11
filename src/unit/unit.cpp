@@ -1825,7 +1825,7 @@ void CUnit::ApplyAura(int aura_index)
 		if (table[i]->UnitInside) {
 			CUnit *uins = table[i]->UnitInside;
 			for (int j = 0; j < table[i]->InsideCount; ++j, uins = uins->NextContained) {
-				if (uins->Player == this->Player || uins->IsAllied(*this->Player)) {
+				if (uins->Player == this->Player || uins->is_allied_with(*this->Player)) {
 					uins->ApplyAuraEffect(aura_index);
 				}
 			}
@@ -5064,8 +5064,8 @@ void RescueUnits()
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
 					//Wyrmgus start
-//					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->Player->get_type() != player_type::rescue_passive && around[i]->Player->get_type() != player_type::rescue_active) {
-					if (around[i]->CanAttack() && unit.IsAllied(*around[i]) && around[i]->Player->get_type() != player_type::rescue_passive && around[i]->Player->get_type() != player_type::rescue_active) {
+//					if (around[i]->Type->CanAttack && unit.is_allied_with(*around[i]) && around[i]->Player->get_type() != player_type::rescue_passive && around[i]->Player->get_type() != player_type::rescue_active) {
+					if (around[i]->CanAttack() && unit.is_allied_with(*around[i]) && around[i]->Player->get_type() != player_type::rescue_passive && around[i]->Player->get_type() != player_type::rescue_active) {
 					//Wyrmgus end
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
@@ -6220,7 +6220,7 @@ bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
 			return false;
 		}
 	} else {
-		if (dest->Player != this->Player && !(dest->Player->IsAllied(*this->Player) && this->Player->IsAllied(*dest->Player)) && dest->Player->get_index() != PlayerNumNeutral) {
+		if (dest->Player != this->Player && !(dest->Player->is_allied_with(*this->Player) && this->Player->is_allied_with(*dest->Player)) && dest->Player->get_index() != PlayerNumNeutral) {
 			return false;
 		}
 	}
@@ -6262,7 +6262,7 @@ bool CUnit::can_return_goods_to(const CUnit *dest, const resource *resource) con
 			return false;
 		}
 	} else {
-		if (dest->Player != this->Player && !(dest->Player->IsAllied(*this->Player) && this->Player->IsAllied(*dest->Player))) {
+		if (dest->Player != this->Player && !(dest->Player->is_allied_with(*this->Player) && this->Player->is_allied_with(*dest->Player))) {
 			return false;
 		}
 	}
@@ -6478,7 +6478,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 			return false;
 		}
 		
-		if (this->Player == item->Player || this->Player->IsAllied(*item->Player) || item->Player->get_type() == player_type::neutral) {
+		if (this->Player == item->Player || this->Player->is_allied_with(*item->Player) || item->Player->get_type() == player_type::neutral) {
 			return true;
 		}
 	}
@@ -7446,8 +7446,8 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 	//Wyrmgus start
 	//distribute experience between nearby units belonging to the same player
 
-//	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
-	if (UseHPForXp && attacker && (target.IsEnemy(*attacker) || target.Player->get_type() == player_type::neutral) && !target.Type->BoolFlag[BUILDING_INDEX].value) {
+//	if (UseHPForXp && attacker && target.is_enemy_of(*attacker)) {
+	if (UseHPForXp && attacker && (target.is_enemy_of(*attacker) || target.Player->get_type() == player_type::neutral) && !target.Type->BoolFlag[BUILDING_INDEX].value) {
 		attacker->ChangeExperience(damage, ExperienceRange);
 	}
 	//Wyrmgus end
@@ -7468,7 +7468,7 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, int damage)
 	// Still possible to destroy building if not careful (too many attackers)
 	if (EnableBuildingCapture && attacker
 		&& target.Type->BoolFlag[BUILDING_INDEX].value && target.Variable[HP_INDEX].Value <= damage * 3
-		&& attacker->IsEnemy(target)
+		&& attacker->is_enemy_of(target)
 		&& attacker->Type->RepairRange) {
 		target.ChangeOwner(*attacker->Player);
 		CommandStopUnit(*attacker); // Attacker shouldn't continue attack!
@@ -7654,8 +7654,8 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		best = &attacker;
 	}
 	//Wyrmgus start
-//	if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
-	if (best && best != oldgoal && (best->Player != target.Player || target.Player->get_type() == player_type::neutral) && best->IsAllied(target) == false) {
+//	if (best && best != oldgoal && best->Player != target.Player && best->is_allied_with(target) == false) {
+	if (best && best != oldgoal && (best->Player != target.Player || target.Player->get_type() == player_type::neutral) && best->is_allied_with(target) == false) {
 	//Wyrmgus end
 		CommandAttack(target, best->tilePos, best, FlushCommands, best->MapLayer->ID);
 		// Set threshold value only for aggressive units
@@ -7778,7 +7778,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 			}
 		}
 		if (destroyer) {
-			if (target.IsEnemy(*destroyer) || target.Player->get_type() == player_type::neutral) {
+			if (target.is_enemy_of(*destroyer) || target.Player->get_type() == player_type::neutral) {
 				HitUnit_IncreaseScoreForKill(*destroyer, target);
 			}
 		}
@@ -8064,7 +8064,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	// FIXME : should be parametrable.
 	//Wyrmgus start
 //	if (!transporter.IsTeamed(unit)) {
-	if (!transporter.IsTeamed(unit) && !transporter.IsAllied(unit) && transporter.Player->get_type() != player_type::neutral && unit.Player->get_type() != player_type::neutral) {
+	if (!transporter.IsTeamed(unit) && !transporter.is_allied_with(unit) && transporter.Player->get_type() != player_type::neutral && unit.Player->get_type() != player_type::neutral) {
 	//Wyrmgus end
 		return 0;
 	}
@@ -8116,7 +8116,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 }
 //Wyrmgus end
 
-bool CUnit::IsEnemy(const CPlayer &player) const
+bool CUnit::is_enemy_of(const CPlayer &player) const
 {
 	if (this->Player->get_type() == player_type::neutral) {
 		if (this->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value && player.get_type() != player_type::neutral) {
@@ -8130,10 +8130,10 @@ bool CUnit::IsEnemy(const CPlayer &player) const
 	}
 	//Wyrmgus end
 	
-	return this->Player->IsEnemy(player);
+	return this->Player->is_enemy_of(player);
 }
 
-bool CUnit::IsEnemy(const CUnit &unit) const
+bool CUnit::is_enemy_of(const CUnit &unit) const
 {
 	switch (this->Player->get_type()) {
 		case player_type::neutral:
@@ -8188,7 +8188,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 			break;
 	}
 		
-	return this->IsEnemy(*unit.Player);
+	return this->is_enemy_of(*unit.Player);
 }
 
 /**
@@ -8196,9 +8196,9 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 **
 **  @param player  Player to check
 */
-bool CUnit::IsAllied(const CPlayer &player) const
+bool CUnit::is_allied_with(const CPlayer &player) const
 {
-	return this->Player->IsAllied(player);
+	return this->Player->is_allied_with(player);
 }
 
 /**
@@ -8206,9 +8206,9 @@ bool CUnit::IsAllied(const CPlayer &player) const
 **
 **  @param x  Unit to check
 */
-bool CUnit::IsAllied(const CUnit &unit) const
+bool CUnit::is_allied_with(const CUnit &unit) const
 {
-	return IsAllied(*unit.Player);
+	return this->is_allied_with(*unit.Player);
 }
 
 /**

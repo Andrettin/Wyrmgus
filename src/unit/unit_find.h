@@ -105,16 +105,20 @@ private:
 	const CPlayer *player;
 };
 
-class IsAlliedWith : public CUnitFilter
+class IsAlliedWith final : public CUnitFilter
 {
 public:
-	explicit IsAlliedWith(const CPlayer &_player) : player(&_player) {}
+	explicit IsAlliedWith(const CPlayer &_player) : player(&_player)
+	{
+	}
+
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsAllied(*player);
+		return unit->is_allied_with(*player);
 	}
+
 private:
-	const CPlayer *player;
+	const CPlayer *player = nullptr;
 };
 
 class IsEnemyWithPlayer final : public CUnitFilter
@@ -126,7 +130,7 @@ public:
 
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsEnemy(*player);
+		return unit->is_enemy_of(*player);
 	}
 
 private:
@@ -142,7 +146,7 @@ public:
 
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsEnemy(*this->unit);
+		return unit->is_enemy_of(*this->unit);
 	}
 private:
 	const CUnit *unit = nullptr;

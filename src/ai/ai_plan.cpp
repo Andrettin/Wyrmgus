@@ -77,8 +77,8 @@ public:
 			return;
 		}
 		//Wyrmgus start
-//		if (!source->Player->IsEnemy(*unit)) { // a friend or neutral
-		if (!source->IsEnemy(*unit)) { // a friend or neutral
+//		if (!source->Player->is_enemy_of(*unit)) { // a friend or neutral
+		if (!source->is_enemy_of(*unit)) { // a friend or neutral
 		//Wyrmgus end
 			return;
 		}

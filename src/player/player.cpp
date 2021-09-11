@@ -3016,7 +3016,7 @@ bool CPlayer::at_war() const
 			continue;
 		}
 
-		if (this->IsEnemy(*other_player)) {
+		if (this->is_enemy_of(*other_player)) {
 			return true;
 		}
 	}
@@ -4191,7 +4191,7 @@ void CPlayer::establish_overlordship_alliance(CPlayer *overlord)
 
 void CPlayer::break_overlordship_alliance(CPlayer *overlord)
 {
-	if (this->IsAllied(*overlord)) {
+	if (this->is_allied_with(*overlord)) {
 		this->SetDiplomacyNeutralWith(*overlord);
 		overlord->SetDiplomacyNeutralWith(*this);
 	}
@@ -4207,20 +4207,24 @@ void CPlayer::break_overlordship_alliance(CPlayer *overlord)
 /**
 **  Check if the player is an enemy
 */
-bool CPlayer::IsEnemy(const CPlayer &player) const
+bool CPlayer::is_enemy_of(const CPlayer &player) const
 {
-	if (this->get_overlord() != nullptr && this->get_overlord()->IsEnemy(player)) {
+	if (this->get_overlord() != nullptr && this->get_overlord()->is_enemy_of(player)) {
 		return true;
 	}
 
+	if (&player == this) {
+		return false;
+	}
+
 	//be hostile to the other player if they are hostile, even if the diplomatic stance hasn't been changed
-	return this->IsEnemy(player.get_index()) || player.IsEnemy(this->get_index());
+	return this->has_enemy_stance_with(player.get_index()) || player.has_enemy_stance_with(this->get_index());
 }
 
 /**
 **  Check if the unit is an enemy
 */
-bool CPlayer::IsEnemy(const CUnit &unit) const
+bool CPlayer::is_enemy_of(const CUnit &unit) const
 {
 	if (
 		unit.Player->get_type() == player_type::neutral
@@ -4245,24 +4249,28 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 		return true;
 	}
 	
-	return IsEnemy(*unit.Player);
+	return this->is_enemy_of(*unit.Player);
 }
 
 /**
 **  Check if the player is an ally
 */
-bool CPlayer::IsAllied(const CPlayer &player) const
+bool CPlayer::is_allied_with(const CPlayer &player) const
 {
+	if (&player == this) {
+		return false;
+	}
+
 	//only consider yourself to be the ally of another player if they have the allied stance with you as well
-	return this->IsAllied(player.get_index()) && player.IsAllied(this->get_index());
+	return this->has_allied_stance_with(player.get_index()) && player.has_allied_stance_with(this->get_index());
 }
 
 /**
 **  Check if the unit is an ally
 */
-bool CPlayer::IsAllied(const CUnit &unit) const
+bool CPlayer::is_allied_with(const CUnit &unit) const
 {
-	return IsAllied(*unit.Player);
+	return this->is_allied_with(*unit.Player);
 }
 
 bool CPlayer::IsVisionSharing() const
@@ -4336,7 +4344,7 @@ bool CPlayer::has_neutral_faction_type() const
 */
 bool CPlayer::has_building_access(const CPlayer *player, const ButtonCmd button_action) const
 {
-	if (player->IsEnemy(*this)) {
+	if (player->is_enemy_of(*this)) {
 		return false;
 	}
 
@@ -4350,7 +4358,7 @@ bool CPlayer::has_building_access(const CPlayer *player, const ButtonCmd button_
 
 	if (
 		player->has_neutral_faction_type()
-		&& (player->get_overlord() == nullptr || this->is_any_overlord_of(player) || player->get_overlord()->IsAllied(*this))
+		&& (player->get_overlord() == nullptr || this->is_any_overlord_of(player) || player->get_overlord()->is_allied_with(*this))
 	) {
 		if (player->get_faction()->get_type() != wyrmgus::faction_type::holy_order || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || wyrmgus::vector::contains(this->Deities, player->get_faction()->get_holy_order_deity())) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
@@ -4367,7 +4375,7 @@ bool CPlayer::has_building_access(const CPlayer *player) const
 
 bool CPlayer::has_building_access(const CUnit *unit, const ButtonCmd button_action) const
 {
-	if (unit->IsEnemy(*this)) {
+	if (unit->is_enemy_of(*this)) {
 		return false;
 	}
 

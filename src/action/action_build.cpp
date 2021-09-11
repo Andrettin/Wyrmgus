@@ -330,7 +330,7 @@ public:
 	bool operator()(const CUnit *const unit) const
 	{
 		return (!unit->Destroyed && unit->Type == type
-				&& (worker->Player == unit->Player || worker->IsAllied(*unit)));
+				&& (worker->Player == unit->Player || worker->is_allied_with(*unit)));
 	}
 	CUnit *Find(const wyrmgus::tile *const mf) const
 	{

@@ -330,8 +330,8 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 		const CUnit &unit = *units[j];
 		// Enemy near mine
 		//Wyrmgus start
-//		if (AiPlayer->Player->IsEnemy(*unit.Player)) {
-		if (worker.Player->IsEnemy(*unit.Player)) {
+//		if (AiPlayer->Player->is_enemy_of(*unit.Player)) {
+		if (worker.Player->is_enemy_of(*unit.Player)) {
 		//Wyrmgus end
 			return false;
 		}

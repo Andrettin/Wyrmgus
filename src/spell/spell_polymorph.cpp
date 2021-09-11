@@ -139,7 +139,7 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 	//Wyrmgus start
 //	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
 	//Wyrmgus end
-	if (caster.IsEnemy(*target)) {
+	if (caster.is_enemy_of(*target)) {
 		//Wyrmgus start
 		caster.Player->Score += target->Variable[POINTS_INDEX].Value;
 		//Wyrmgus end

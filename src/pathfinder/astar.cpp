@@ -478,7 +478,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 					if (&unit != goal) {
 						//Wyrmgus start
 						/*
-//						if (goal->Player->IsEnemy(unit) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)
+//						if (goal->Player->is_enemy_of(unit) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)
 						//Wyrmgus end
 							&& goal->Variable[UNHOLYARMOR_INDEX].Value == 0 && goal->IsVisibleAsGoal(*unit.Player)) {
 								cost += 2 * AStarMovingUnitCrossingCost;

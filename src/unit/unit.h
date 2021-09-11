@@ -389,10 +389,10 @@ public:
 	/// Returns true if unit is visible in a viewport. Only for ThisPlayer.
 	bool IsVisibleInViewport(const CViewport &vp) const;
 
-	bool IsEnemy(const CPlayer &player) const;
-	bool IsEnemy(const CUnit &unit) const;
-	bool IsAllied(const CPlayer &player) const;
-	bool IsAllied(const CUnit &unit) const;
+	bool is_enemy_of(const CPlayer &player) const;
+	bool is_enemy_of(const CUnit &unit) const;
+	bool is_allied_with(const CPlayer &player) const;
+	bool is_allied_with(const CUnit &unit) const;
 	bool has_shared_vision_with(const CPlayer &player) const;
 	bool has_shared_vision_with(const CUnit &unit) const;
 	bool has_mutual_shared_vision_with(const CPlayer &player) const;

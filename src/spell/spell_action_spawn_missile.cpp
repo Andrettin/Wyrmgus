@@ -217,7 +217,7 @@ int spell_action_spawn_missile::Cast(CUnit &caster, const spell &, CUnit *target
 		for (std::vector<CUnit *>::iterator it = table.begin(); it != table.end(); ++it) {
 			CUnit &unit = **it;
 
-			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.IsEnemy(caster)) {
+			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.is_enemy_of(caster)) {
 				table[count++] = &unit;
 			}
 		}

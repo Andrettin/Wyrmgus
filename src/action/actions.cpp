@@ -490,7 +490,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		std::vector<CUnit *> table;
 		SelectAroundUnit<true>(unit, unit.CurrentSightRange, table, IsAggresiveUnit());
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (unit.IsEnemy(*table[i])) {
+			if (unit.is_enemy_of(*table[i])) {
 				HitUnit_RunAway(unit, *table[i]);
 				break;
 			}

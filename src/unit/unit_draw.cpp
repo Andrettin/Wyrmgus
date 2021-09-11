@@ -158,7 +158,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 		} else if ((unit.Selected || (unit.Blink & 1))
 				   && (unit.Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
 			color = ColorGreen;
-		} else if (CPlayer::GetThisPlayer()->IsEnemy(unit)) {
+		} else if (CPlayer::GetThisPlayer()->is_enemy_of(unit)) {
 			color = ColorRed;
 		} else {
 			color = CVideo::MapRGB(unit.Player->get_minimap_color());
@@ -596,10 +596,10 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 			|| (var.ShowOnlySelected && !unit.Selected)
 			|| (unit.Player->get_type() == player_type::neutral && var.HideNeutral)
 			//Wyrmgus start
-			|| (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && var.HideNeutral)
+			|| (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->is_enemy_of(unit) && !CPlayer::GetThisPlayer()->is_allied_with(unit) && var.HideNeutral)
 			//Wyrmgus end
-			|| (CPlayer::GetThisPlayer()->IsEnemy(unit) && !var.ShowOpponent)
-			|| (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.Player != CPlayer::GetThisPlayer()) && var.HideAllied)
+			|| (CPlayer::GetThisPlayer()->is_enemy_of(unit) && !var.ShowOpponent)
+			|| (CPlayer::GetThisPlayer()->is_allied_with(unit) && (unit.Player != CPlayer::GetThisPlayer()) && var.HideAllied)
 			//Wyrmgus start
 			|| (unit.Player == CPlayer::GetThisPlayer() && var.HideSelf)
 			|| unit.Type->BoolFlag[DECORATION_INDEX].value // don't show decorations for decoration units
@@ -788,7 +788,7 @@ void ShowOrder(const CUnit &unit, std::vector<std::function<void(renderer *)>> &
 		return;
 	}
 #ifndef DEBUG
-	if (!CPlayer::GetThisPlayer()->IsAllied(unit) && unit.Player != CPlayer::GetThisPlayer()) {
+	if (!CPlayer::GetThisPlayer()->is_allied_with(unit) && unit.Player != CPlayer::GetThisPlayer()) {
 		return;
 	}
 #endif

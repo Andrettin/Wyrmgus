@@ -277,7 +277,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	//Wyrmgus start
 //		&& dest.Type->CanStore[unit.CurrentResource]
 //		&& (dest.Player == unit.Player
-//			|| (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)))) {
+//			|| (dest.Player->is_allied_with(*unit.Player) && unit.Player->is_allied_with(*dest.Player)))) {
 		&& unit.can_return_goods_to(&dest)) {
 	//Wyrmgus end
 		dest.Blink = 4;
@@ -451,7 +451,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 //		&& dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
 		&& dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)
 		//Wyrmgus end
-		&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
+		&& (dest->Player == unit.Player || unit.is_allied_with(*dest))) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::repairing);
@@ -523,8 +523,8 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	// Follow another unit
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit
 		//Wyrmgus start
-//		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->get_index() == PlayerNumNeutral)) {
-		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || (dest->Player->get_index() == PlayerNumNeutral && !unit.IsEnemy(*dest) && !dest->Type->BoolFlag[OBSTACLE_INDEX].value))) {
+//		&& (dest->Player == unit.Player || unit.is_allied_with(*dest) || dest->Player->get_index() == PlayerNumNeutral)) {
+		&& (dest->Player == unit.Player || unit.is_allied_with(*dest) || (dest->Player->get_index() == PlayerNumNeutral && !unit.is_enemy_of(*dest) && !dest->Type->BoolFlag[OBSTACLE_INDEX].value))) {
 		//Wyrmgus end
 		dest->Blink = 4;
 		if (!acknowledged) {
@@ -546,7 +546,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	//Wyrmgus start
 	// make workers attack enemy units if those are right-clicked upon
-	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && unit.CurrentAction() != UnitAction::Built && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && unit.CurrentAction() != UnitAction::Built && (unit.is_enemy_of(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::attack);
@@ -584,8 +584,8 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	const int action = type.MouseAction;
 
 	//Wyrmgus start
-//	if (action == MouseActionSpellCast || unit.IsEnemy(dest)) {
-	if (action == MouseActionSpellCast || unit.IsEnemy(dest) || dest.Type->BoolFlag[OBSTACLE_INDEX].value) {
+//	if (action == MouseActionSpellCast || unit.is_enemy_of(dest)) {
+	if (action == MouseActionSpellCast || unit.is_enemy_of(dest) || dest.Type->BoolFlag[OBSTACLE_INDEX].value) {
 	//Wyrmgus end
 		dest.Blink = 4;
 		if (!acknowledged) {
@@ -629,7 +629,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 		return true;
 	}
 	//Wyrmgus end
-	if ((dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->get_index() == PlayerNumNeutral) && &dest != &unit) {
+	if ((dest.Player == unit.Player || unit.is_allied_with(dest) || dest.Player->get_index() == PlayerNumNeutral) && &dest != &unit) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::acknowledging);
@@ -668,7 +668,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	*/
-	if (CMap::get()->WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->get_owner() == nullptr || CPlayer::GetThisPlayer()->IsEnemy(*UI.CurrentMapLayer->Field(pos)->get_owner()))) {
+	if (CMap::get()->WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->get_owner() == nullptr || CPlayer::GetThisPlayer()->is_enemy_of(*UI.CurrentMapLayer->Field(pos)->get_owner()))) {
 		if (!UI.CurrentMapLayer->Field(pos)->get_overlay_terrain()->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 			SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
 			return;
@@ -746,7 +746,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 		return true;
 	}
 	//Wyrmgus end
-	if (dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->get_index() == PlayerNumNeutral) {
+	if (dest.Player == unit.Player || unit.is_allied_with(dest) || dest.Player->get_index() == PlayerNumNeutral) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::acknowledging);
@@ -1500,11 +1500,11 @@ void UIHandleMouseMove(const PixelPos &cursorPos, const Qt::KeyboardModifiers ke
 			cursor::set_current_cursor(UI.get_cursor(cursor_type::yellow_hair), false);
 			if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				if (UnitUnderCursor->Player == CPlayer::GetThisPlayer() ||
-					CPlayer::GetThisPlayer()->IsAllied(*UnitUnderCursor)) {
+					CPlayer::GetThisPlayer()->is_allied_with(*UnitUnderCursor)) {
 					cursor::set_current_cursor(UI.get_cursor(cursor_type::green_hair), false);
 				//Wyrmgus start
 //				} else if (UnitUnderCursor->Player->get_index() != PlayerNumNeutral) {
-				} else if (CPlayer::GetThisPlayer()->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
+				} else if (CPlayer::GetThisPlayer()->is_enemy_of(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
 				//Wyrmgus end
 					cursor::set_current_cursor(UI.get_cursor(cursor_type::red_hair), false);
 				}
@@ -1528,7 +1528,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos, const Qt::KeyboardModifiers ke
 //			cursor::set_current_cursor(UI.Glass.Cursor);
 			if (
 				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() && UnitUnderCursor->Player != CPlayer::GetThisPlayer()
-				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value)
+				&& (Selected[0]->is_enemy_of(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value)
 			) {
 				cursor::set_current_cursor(UI.get_cursor(cursor_type::red_hair), false);
 			} else if (
@@ -1586,7 +1586,7 @@ static int SendRepair(const Vec2i &tilePos, int flush)
 	if (dest && dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)
 	//Wyrmgus end
 		&& dest->Type->get_repair_hp() != 0
-		&& (dest->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsAllied(*dest))) {
+		&& (dest->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->is_allied_with(*dest))) {
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
@@ -2516,7 +2516,7 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 			//  for transporter
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->IsAllied(*Selected[0]) || CPlayer::GetThisPlayer()->has_building_access(Selected[0]))) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->is_allied_with(*Selected[0]) || CPlayer::GetThisPlayer()->has_building_access(Selected[0]))) {
 			//Wyrmgus end
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;

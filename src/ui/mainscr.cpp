@@ -237,9 +237,9 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	}
 	if ((condition->ShowOnlySelected && !unit.Selected)
 		|| (unit.Player->get_type() == player_type::neutral && condition->HideNeutral)
-		|| (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && condition->HideNeutral)
-		|| (CPlayer::GetThisPlayer()->IsEnemy(unit) && !condition->ShowOpponent)
-		|| (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.Player != CPlayer::GetThisPlayer()) && condition->HideAllied)
+		|| (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->is_enemy_of(unit) && !CPlayer::GetThisPlayer()->is_allied_with(unit) && condition->HideNeutral)
+		|| (CPlayer::GetThisPlayer()->is_enemy_of(unit) && !condition->ShowOpponent)
+		|| (CPlayer::GetThisPlayer()->is_allied_with(unit) && (unit.Player != CPlayer::GetThisPlayer()) && condition->HideAllied)
 		|| (condition->ShowIfCanCastAnySpell && !unit.CanCastAnySpell())
 	) {
 		return false;
@@ -686,8 +686,8 @@ static void DrawUnitInfo(CUnit &unit, std::vector<std::function<void(renderer *)
 	DrawUnitInfo_portrait(unit, render_commands);
 
 	//Wyrmgus start
-//	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*unit.Player)) {
-	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*unit.Player) && !CPlayer::GetThisPlayer()->has_building_access(&unit)) {
+//	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->is_allied_with(*unit.Player)) {
+	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->is_allied_with(*unit.Player) && !CPlayer::GetThisPlayer()->has_building_access(&unit)) {
 	//Wyrmgus end
 		return;
 	}
@@ -987,7 +987,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 			LastDrawnButtonPopup = nullptr;
 		}
 		
-		if (!(Selected[0]->Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*Selected[0]->Player) && !CPlayer::GetThisPlayer()->has_building_access(Selected[0])) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == wyrmgus::defines::get()->get_inventory_button_level()) {
+		if (!(Selected[0]->Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->is_allied_with(*Selected[0]->Player) && !CPlayer::GetThisPlayer()->has_building_access(Selected[0])) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == wyrmgus::defines::get()->get_inventory_button_level()) {
 		CUnit *uins = Selected[0]->UnitInside;
 		size_t j = 0;
 
@@ -1862,9 +1862,9 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 		});
 
 		for (const CPlayer *player : listed_players) {
-			if (player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsAllied(*player)) {
+			if (player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->is_allied_with(*player)) {
 				label.SetNormalColor(wyrmgus::defines::get()->get_ally_font_color());
-			} else if (CPlayer::GetThisPlayer()->IsEnemy(*player)) {
+			} else if (CPlayer::GetThisPlayer()->is_enemy_of(*player)) {
 				label.SetNormalColor(wyrmgus::defines::get()->get_enemy_font_color());
 			} else {
 				label.SetNormalColor(wyrmgus::defines::get()->get_default_font_color());
@@ -1891,7 +1891,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 	// FIXME: not correct for enemy's units
 	if (unit.Player == CPlayer::GetThisPlayer()
 		|| CPlayer::GetThisPlayer()->IsTeamed(unit)
-		|| CPlayer::GetThisPlayer()->IsAllied(unit)
+		|| CPlayer::GetThisPlayer()->is_allied_with(unit)
 		|| ReplayRevealMap) {
 		if (unit.Orders[0]->Action == UnitAction::Built
 			|| unit.Orders[0]->Action == UnitAction::Research
@@ -1918,7 +1918,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 		&& (unit.CurrentAction() != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->get_index()].get_time_cost() == 0)
 		&& (unit.CurrentAction() != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().get_time_cost() == 0)
 		&& unit.CurrentAction() != UnitAction::Built
-		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
+		&& !unit.is_enemy_of(*CPlayer::GetThisPlayer())
 		&& (unit.Player->get_type() != player_type::neutral || unit.Type->get_given_resource() != nullptr)
 	) {
 		defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - 4 * defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * defines::get()->get_scale_factor(), render_commands);

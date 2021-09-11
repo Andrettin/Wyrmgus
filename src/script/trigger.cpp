@@ -382,7 +382,7 @@ int GetNumOpponents(int player)
 		const int unitCount = CPlayer::Players[i]->GetUnitCount();
 
 		// This player is our enemy and has units left.
-		if ((CPlayer::Players[player]->IsEnemy(*CPlayer::Players[i])) || (CPlayer::Players[i]->IsEnemy(*CPlayer::Players[player]))) {
+		if ((CPlayer::Players[player]->is_enemy_of(*CPlayer::Players[i])) || (CPlayer::Players[i]->is_enemy_of(*CPlayer::Players[player]))) {
 			// Don't count walls
 			for (int j = 0; j < unitCount; ++j) {
 				if (CPlayer::Players[i]->GetUnit(j).Type->BoolFlag[WALL_INDEX].value == false) {
