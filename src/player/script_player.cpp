@@ -492,6 +492,8 @@ void CPlayer::Load(lua_State *l)
 			this->set_resource(resource, this->get_resource(resource) + this->get_stored_resource(resource), resource_storage_type::both);
 		}
 	}
+
+	emit diplomatic_stances_changed();
 }
 
 /**

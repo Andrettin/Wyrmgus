@@ -119,7 +119,7 @@ std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, CUnit &ta
 	}
 
 	if (!attacker.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.is_enemy_of(attacker) && (target.Player->get_type() == player_type::computer) && (attacker.Player->get_type() == player_type::computer || attacker.Player->get_type() == player_type::person)) {
-		attacker.Player->SetDiplomacyEnemyWith(*target.Player);
+		attacker.Player->set_enemy_diplomatic_stance_with(target.Player);
 	}
 
 	return order;

@@ -950,7 +950,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			//Wyrmgus start
 			z = enemy->MapLayer->ID;
 			if (!AiPlayer->Player->is_enemy_of(*enemy->Player) && enemy->Player->get_type() != player_type::neutral) {
-				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy->Player);
+				AiPlayer->Player->set_enemy_diplomatic_stance_with(enemy->Player);
 			}
 			//Wyrmgus end
 		//Wyrmgus start
@@ -959,7 +959,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			z = enemy_wall_map_layer;
 			CPlayer *enemy_wall_owner = CMap::get()->Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
 			if (!AiPlayer->Player->is_enemy_of(*enemy_wall_owner) && enemy_wall_owner->get_type() != player_type::neutral) {
-				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
+				AiPlayer->Player->set_enemy_diplomatic_stance_with(enemy_wall_owner);
 			}
 		} else {
 			AiPlayer->Scouting = true;			
@@ -1749,14 +1749,14 @@ void AiForce::Update()
 				this->GoalPos = unit->tilePos;
 				this->GoalMapLayer = unit->MapLayer->ID;
 				if (!AiPlayer->Player->is_enemy_of(*unit->Player) && unit->Player->get_type() != player_type::neutral) {
-					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
+					AiPlayer->Player->set_enemy_diplomatic_stance_with(unit->Player);
 				}
 			} else if (CMap::get()->Info->IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 				this->GoalPos = enemy_wall_pos;
 				this->GoalMapLayer = enemy_wall_map_layer;
 				CPlayer *enemy_wall_owner = CMap::get()->Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
 				if (!AiPlayer->Player->is_enemy_of(*enemy_wall_owner) && enemy_wall_owner->get_type() != player_type::neutral) {
-					AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
+					AiPlayer->Player->set_enemy_diplomatic_stance_with(enemy_wall_owner);
 				}
 			}
 			
@@ -1852,7 +1852,7 @@ void AiForce::Update()
 				z = unit->MapLayer->ID;
 
 				if (!AiPlayer->Player->is_enemy_of(*unit->Player) && unit->Player->get_type() != player_type::neutral) {
-					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
+					AiPlayer->Player->set_enemy_diplomatic_stance_with(unit->Player);
 				}
 			} else if (CMap::get()->Info->IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 				goal_pos = enemy_wall_pos;
@@ -1860,7 +1860,7 @@ void AiForce::Update()
 
 				CPlayer *enemy_wall_owner = CMap::get()->Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
 				if (!AiPlayer->Player->is_enemy_of(*enemy_wall_owner) && enemy_wall_owner->get_type() != player_type::neutral) {
-					AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
+					AiPlayer->Player->set_enemy_diplomatic_stance_with(enemy_wall_owner);
 				}
 			}
 

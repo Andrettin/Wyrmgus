@@ -1331,13 +1331,13 @@ void CommandDiplomacy(const int player_index, const wyrmgus::diplomacy_state sta
 
 	switch (state) {
 		case diplomacy_state::neutral:
-			player->SetDiplomacyNeutralWith(*other_player);
+			player->set_neutral_diplomatic_stance_with(other_player);
 			break;
 		case diplomacy_state::allied:
-			player->SetDiplomacyAlliedWith(*other_player);
+			player->set_allied_diplomatic_stance_with(other_player);
 			break;
 		case diplomacy_state::enemy:
-			player->SetDiplomacyEnemyWith(*other_player);
+			player->set_enemy_diplomatic_stance_with(other_player);
 			break;
 		case diplomacy_state::overlord:
 			other_player->set_overlord(player, vassalage_type::vassalage);
@@ -1453,8 +1453,8 @@ void CommandQuit(int player)
 	CPlayer::Players[player]->set_type(player_type::neutral);
 	for (int i = 0; i < NumPlayers; ++i) {
 		if (i != player && CPlayer::Players[i]->Team != CPlayer::Players[player]->Team) {
-			CPlayer::Players[i]->SetDiplomacyNeutralWith(*CPlayer::Players[player]);
-			CPlayer::Players[player]->SetDiplomacyNeutralWith(*CPlayer::Players[i]);
+			CPlayer::Players[i]->set_neutral_diplomatic_stance_with(CPlayer::Players[player].get());
+			CPlayer::Players[player]->set_neutral_diplomatic_stance_with(CPlayer::Players[i].get());
 			//  We clear Shared vision by sending fake shared vision commands.
 			//  We do this because Shared vision is a bit complex.
 			CommandSharedVision(i, 0, player);

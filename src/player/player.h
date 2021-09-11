@@ -810,12 +810,26 @@ public:
 		return this->enemies.contains(index);
 	}
 
+	Q_INVOKABLE bool has_enemy_stance_with(CPlayer *other_player) const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->has_enemy_stance_with(other_player->get_index());
+	}
+
 	bool is_enemy_of(const CPlayer &player) const;
 	bool is_enemy_of(const CUnit &unit) const;
 
 	bool has_allied_stance_with(const int index) const
 	{
 		return this->allies.contains(index);
+	}
+
+	Q_INVOKABLE bool has_allied_stance_with(CPlayer *other_player) const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->has_allied_stance_with(other_player->get_index());
 	}
 
 	bool is_allied_with(const CPlayer &player) const;
@@ -887,9 +901,12 @@ public:
 	bool HasHero(const wyrmgus::character *hero) const;
 	//Wyrmgus end
 
-	void SetDiplomacyNeutralWith(const CPlayer &player);
-	void SetDiplomacyAlliedWith(const CPlayer &player);
-	void SetDiplomacyEnemyWith(CPlayer &player);
+	void set_neutral_diplomatic_stance_with(const CPlayer *player);
+	Q_INVOKABLE void set_neutral_diplomatic_stance_with_async(CPlayer *player);
+	void set_allied_diplomatic_stance_with(const CPlayer *player);
+	Q_INVOKABLE void set_allied_diplomatic_stance_with_async(CPlayer *player);
+	void set_enemy_diplomatic_stance_with(CPlayer *player);
+	Q_INVOKABLE void set_enemy_diplomatic_stance_with_async(CPlayer *player);
 	void SetDiplomacyCrazyWith(const CPlayer &player);
 
 	void ShareVisionWith(const CPlayer &player);
@@ -956,6 +973,12 @@ public:
 	void apply_civilization_history(const wyrmgus::civilization_base *civilization);
 
 	void add_settlement_to_explored_territory(const site *settlement);
+
+signals:
+	void name_changed();
+	void type_changed();
+	void alive_changed();
+	void diplomatic_stances_changed();
 
 private:
 	const int index = 0;          /// player as number
@@ -1083,11 +1106,6 @@ public:
 	// Upgrades/Allows:
 	CAllow Allow;                 /// Allowed for player
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
-
-signals:
-	void name_changed();
-	void type_changed();
-	void alive_changed();
 
 private:
 	std::vector<CUnit *> Units; /// units of this player

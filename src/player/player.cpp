@@ -1022,6 +1022,8 @@ void CPlayer::Init(player_type type)
 	}
 	this->revealed = false;
 	++NumPlayers;
+
+	emit diplomatic_stances_changed();
 }
 
 void CPlayer::apply_history(const CDate &start_date)
@@ -2356,6 +2358,8 @@ void CPlayer::Clear()
 	this->SpeedTrain = CPlayer::base_speed_factor;
 	this->SpeedUpgrade = CPlayer::base_speed_factor;
 	this->SpeedResearch = CPlayer::base_speed_factor;
+
+	emit diplomatic_stances_changed();
 }
 
 
@@ -4055,56 +4059,89 @@ void CPlayer::Notify(const char *fmt, ...) const
 	}
 }
 
-void CPlayer::SetDiplomacyNeutralWith(const CPlayer &player)
+void CPlayer::set_neutral_diplomatic_stance_with(const CPlayer *player)
 {
-	this->enemies.erase(player.get_index());
-	this->allies.erase(player.get_index());
+	std::unique_lock<std::shared_mutex> lock(this->mutex);
 
-	//Wyrmgus start
-	if (GameCycle > 0 && &player == CPlayer::GetThisPlayer()) {
-		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Neutral"), _(this->get_name().c_str()));
-	}
-	//Wyrmgus end
-}
+	this->enemies.erase(player->get_index());
+	this->allies.erase(player->get_index());
 
-void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
-{
-	this->enemies.erase(player.get_index());
-	this->allies.insert(player.get_index());
-	
-	if (GameCycle > 0 && &player == CPlayer::GetThisPlayer()) {
-		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Ally"), _(this->get_name().c_str()));
+	emit diplomatic_stances_changed();
+
+	if (GameCycle > 0 && player == CPlayer::GetThisPlayer()) {
+		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to neutral"), _(this->get_name().c_str()));
 	}
 }
 
-void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
+void CPlayer::set_neutral_diplomatic_stance_with_async(CPlayer *player)
 {
-	this->enemies.insert(player.get_index());
-	this->allies.erase(player.get_index());
-	
+	engine_interface::get()->post([this, player]() {
+		this->set_neutral_diplomatic_stance_with(player);
+	});
+}
+
+void CPlayer::set_allied_diplomatic_stance_with(const CPlayer *player)
+{
+	std::unique_lock<std::shared_mutex> lock(this->mutex);
+
+	this->enemies.erase(player->get_index());
+	this->allies.insert(player->get_index());
+
+	emit diplomatic_stances_changed();
+
+	if (GameCycle > 0 && player == CPlayer::GetThisPlayer()) {
+		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to allied"), _(this->get_name().c_str()));
+	}
+}
+
+void CPlayer::set_allied_diplomatic_stance_with_async(CPlayer *player)
+{
+	engine_interface::get()->post([this, player]() {
+		this->set_allied_diplomatic_stance_with(player);
+	});
+}
+
+void CPlayer::set_enemy_diplomatic_stance_with(CPlayer *player)
+{
+	{
+		std::unique_lock<std::shared_mutex> lock(this->mutex);
+
+		this->enemies.insert(player->get_index());
+		this->allies.erase(player->get_index());
+
+		emit diplomatic_stances_changed();
+	}
+
 	if (GameCycle > 0) {
-		if (&player == CPlayer::GetThisPlayer()) {
-			CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->get_name().c_str()));
+		if (player == CPlayer::GetThisPlayer()) {
+			CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to enemy"), _(this->get_name().c_str()));
 		} else if (this == CPlayer::GetThisPlayer()) {
-			CPlayer::GetThisPlayer()->Notify(_("We have changed our diplomatic stance with %s to Enemy"), _(player.get_name().c_str()));
+			CPlayer::GetThisPlayer()->Notify(_("We have changed our diplomatic stance with %s to enemy"), _(player->get_name().c_str()));
 		}
 	}
 
-	if (this->has_shared_vision_with(player)) {
-		CommandSharedVision(this->get_index(), false, player.get_index());
+	if (this->has_shared_vision_with(*player)) {
+		CommandSharedVision(this->get_index(), false, player->get_index());
 	}
 
 	// if either player is the overlord of another (indirect or otherwise), break the vassalage bond after the declaration of war
-	if (this->is_overlord_of(&player)) {
-		player.set_overlord(nullptr, wyrmgus::vassalage_type::none);
-	} else if (player.is_overlord_of(this)) {
-		this->set_overlord(nullptr, wyrmgus::vassalage_type::none);
+	if (this->is_overlord_of(player)) {
+		player->set_overlord(nullptr, vassalage_type::none);
+	} else if (player->is_overlord_of(this)) {
+		this->set_overlord(nullptr, vassalage_type::none);
 	}
 
 	//if the other player has an overlord, then we must also go to war with them
-	if (player.get_overlord() != nullptr) {
-		this->SetDiplomacyEnemyWith(*player.get_overlord());
+	if (player->get_overlord() != nullptr) {
+		this->set_enemy_diplomatic_stance_with(player->get_overlord());
 	}
+}
+
+void CPlayer::set_enemy_diplomatic_stance_with_async(CPlayer *player)
+{
+	engine_interface::get()->post([this, player]() {
+		this->set_enemy_diplomatic_stance_with(player);
+	});
 }
 
 void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
@@ -4112,6 +4149,8 @@ void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 	this->enemies.insert(player.get_index());
 	this->allies.insert(player.get_index());
 	
+	emit diplomatic_stances_changed();
+
 	if (GameCycle > 0 && &player == CPlayer::GetThisPlayer()) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Crazy"), _(this->get_name().c_str()));
 	}
@@ -4178,8 +4217,8 @@ void CPlayer::set_overlord(CPlayer *overlord, const wyrmgus::vassalage_type)
 
 void CPlayer::establish_overlordship_alliance(CPlayer *overlord)
 {
-	this->SetDiplomacyAlliedWith(*overlord);
-	overlord->SetDiplomacyAlliedWith(*this);
+	this->set_allied_diplomatic_stance_with(overlord);
+	overlord->set_allied_diplomatic_stance_with(this);
 	CommandSharedVision(this->get_index(), true, overlord->get_index());
 	CommandSharedVision(overlord->get_index(), true, this->get_index());
 
@@ -4192,8 +4231,8 @@ void CPlayer::establish_overlordship_alliance(CPlayer *overlord)
 void CPlayer::break_overlordship_alliance(CPlayer *overlord)
 {
 	if (this->is_allied_with(*overlord)) {
-		this->SetDiplomacyNeutralWith(*overlord);
-		overlord->SetDiplomacyNeutralWith(*this);
+		this->set_neutral_diplomatic_stance_with(overlord);
+		overlord->set_neutral_diplomatic_stance_with(this);
 	}
 	CommandSharedVision(this->get_index(), false, overlord->get_index());
 	CommandSharedVision(overlord->get_index(), false, this->get_index());
