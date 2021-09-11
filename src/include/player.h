@@ -88,6 +88,7 @@ class CPlayer final : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY name_changed)
+	Q_PROPERTY(bool active READ is_active NOTIFY type_changed)
 
 public:
 	static constexpr int max_quest_pool = 4;
