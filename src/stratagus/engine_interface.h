@@ -64,7 +64,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(QVariantList custom_heroes READ get_custom_heroes NOTIFY custom_heroes_changed)
 	Q_PROPERTY(int max_map_width READ get_max_map_width CONSTANT)
 	Q_PROPERTY(int max_map_height READ get_max_map_height CONSTANT)
-	Q_PROPERTY(CPlayer this_player READ get_this_player NOTIFY this_player_changed)
+	Q_PROPERTY(CPlayer* this_player READ get_this_player NOTIFY this_player_changed)
 	Q_PROPERTY(QVariantList non_neutral_players READ get_non_neutral_players CONSTANT)
 	Q_PROPERTY(wyrmgus::interface_style* current_interface_style READ get_current_interface_style NOTIFY current_interface_style_changed)
 
