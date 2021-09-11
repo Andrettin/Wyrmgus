@@ -30,14 +30,10 @@
 
 #include "sound/sound.h"
 
-#include "civilization.h"
-#include "player.h"
+#include "player/civilization.h"
+#include "player/player.h"
 #include "script.h"
 #include "sound/sound_server.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Glue between c and scheme. Ask the sound system to associate a

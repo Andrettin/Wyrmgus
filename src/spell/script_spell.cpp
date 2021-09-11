@@ -30,8 +30,8 @@
 
 #include "spell/spell.h"
 
-#include "civilization.h"
 #include "luacallback.h"
+#include "player/civilization.h"
 #include "player/faction.h"
 #include "script.h"
 #include "sound/script_sound.h"

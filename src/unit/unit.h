@@ -28,7 +28,6 @@
 
 #include "item/item_slot.h"
 #include "player/player_container.h"
-#include "player.h"
 #include "spell/spell_container.h"
 #include "unit/unit_type.h"
 #include "unit/unit_variable.h"
@@ -55,6 +54,7 @@ static int CclUnit(lua_State *l);
 namespace wyrmgus {
 	class animation_set;
 	class character;
+	class civilization_base;
 	class construction;
 	class construction_frame;
 	class map_template;
@@ -313,11 +313,7 @@ public:
 	/// Returns true, if unit is directly seen by an allied unit.
 	bool IsVisible(const CPlayer &player) const;
 
-	bool IsInvisibile(const CPlayer &player) const
-	{
-		return (&player != Player && !!Variable[INVISIBLE_INDEX].Value
-				&& !player.has_mutual_shared_vision_with(*Player));
-	}
+	bool is_invisible(const CPlayer &player) const;
 
 	/**
 	**  Returns true if unit is alive.
@@ -348,7 +344,7 @@ public:
 	bool IsVisibleAsGoal(const CPlayer &player) const
 	{
 		// Invisibility
-		if (IsInvisibile(player)) {
+		if (this->is_invisible(player)) {
 			return false;
 		}
 		// Don't attack revealers
@@ -381,7 +377,7 @@ public:
 	*/
 	bool IsVisibleOnMap(const CPlayer &player) const
 	{
-		return IsAliveOnMap() && !IsInvisibile(player) && IsVisible(player);
+		return IsAliveOnMap() && !this->is_invisible(player) && IsVisible(player);
 	}
 
 	/// Returns true if unit is visible on minimap. Only for ThisPlayer.

@@ -39,7 +39,6 @@
 //Wyrmgus end
 #include "age.h"
 #include "character.h"
-#include "civilization.h"
 #include "commands.h"
 #include "config.h"
 #include "database/defines.h"
@@ -55,10 +54,11 @@
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
+#include "player/civilization.h"
 #include "player/civilization_group.h"
 #include "player/dynasty.h"
 #include "player/faction.h"
-#include "player.h"
+#include "player/player.h"
 #include "religion/deity.h"
 #include "script.h"
 #include "script/condition/and_condition.h"

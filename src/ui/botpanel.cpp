@@ -38,7 +38,6 @@
 #include "action/action_upgradeto.h"
 #include "character.h"
 //Wyrmgus end
-#include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
 #include "database/preferences.h"
@@ -57,9 +56,10 @@
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
+#include "player/civilization.h"
 #include "player/dynasty.h"
 #include "player/faction.h"
-#include "player.h"
+#include "player/player.h"
 #include "quest/achievement.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"

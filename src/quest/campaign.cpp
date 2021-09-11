@@ -28,13 +28,13 @@
 
 #include "quest/campaign.h"
 
-#include "civilization.h"
 #include "config.h"
 #include "database/preferences.h"
 #include "game.h"
 #include "map/map_template.h"
+#include "player/civilization.h"
 #include "player/faction.h"
-#include "player.h"
+#include "player/player.h"
 #include "quest/quest.h"
 #include "species/species.h"
 #include "time/calendar.h"

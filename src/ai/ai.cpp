@@ -130,7 +130,6 @@
 
 #include "actions.h"
 #include "action/action_attack.h"
-#include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
 //Wyrmgus start
@@ -151,9 +150,10 @@
 #include "network.h"
 //Wyrmgus end
 #include "pathfinder.h"
+#include "player/civilization.h"
 #include "player/faction.h"
+#include "player/player.h"
 #include "player/player_type.h"
-#include "player.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"

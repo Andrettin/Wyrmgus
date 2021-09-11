@@ -34,7 +34,6 @@
 #include "province.h"
 #include "vec2i.h"
 #include "video/video.h"
-#include "player.h"
 #include "upgrade/upgrade_structs.h"
 
 constexpr int BasePopulationGrowthPermyriad = 12; /// Base population growth per 10,000
@@ -75,13 +74,7 @@ public:
 class CGrandStrategyProvince : public CProvince
 {
 public:
-	CGrandStrategyProvince() : CProvince(),
-		civilization(-1),
-		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
-		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
-		Movement(false),
-		Owner(nullptr),
-		Governor(nullptr)
+	CGrandStrategyProvince()
 	{
 		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
 		memset(Units, 0, sizeof(Units));
@@ -98,10 +91,6 @@ public:
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
 	void SetPopulation(int quantity);
 	void SetHero(std::string hero_full_name, int value);
-	void AllocateLabor();
-	void AllocateLaborToResource(int resource);
-	void DeallocateLabor();
-	void ReallocateLabor();
 	void AddFactionClaim(int civilization_id, int faction_id);
 	void RemoveFactionClaim(int civilization_id, int faction_id);
 	bool HasBuildingClass(std::string building_class_name);
@@ -117,18 +106,18 @@ public:
 	std::string GenerateWorkName();
 	CGrandStrategyHero *GetRandomAuthor();
 	
-	int civilization;													/// Civilization of the province (-1 = no one).
-	int TotalUnits;														/// Total quantity of units in the province
-	int TotalWorkers;													/// Total quantity of workers in the province
-	int PopulationGrowthProgress;										/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
-	int FoodConsumption;												/// How much food the people in the province consume
-	int Labor;															/// How much labor available this province has
-	int MilitaryScore;													/// Military score of the forces in the province (including fortifications and militia)
-	int OffensiveMilitaryScore;											/// Military score of the forces in the province which can attack other provinces
-	int AttackingMilitaryScore;											/// Military score of the forces attacking the province
-	bool Movement;														/// Whether a unit or hero is currently moving to the province
-	CGrandStrategyFaction *Owner;										/// Owner of the province
-	CGrandStrategyHero *Governor;										/// Governor of this province
+	int civilization = -1;												/// Civilization of the province (-1 = no one).
+	int TotalUnits = 0;													/// Total quantity of units in the province
+	int TotalWorkers = 0;												/// Total quantity of workers in the province
+	int PopulationGrowthProgress = 0;									/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
+	int FoodConsumption = 0;											/// How much food the people in the province consume
+	int Labor = 0;														/// How much labor available this province has
+	int MilitaryScore = 0;												/// Military score of the forces in the province (including fortifications and militia)
+	int OffensiveMilitaryScore = 0;										/// Military score of the forces in the province which can attack other provinces
+	int AttackingMilitaryScore = 0;										/// Military score of the forces attacking the province
+	bool Movement = false;												/// Whether a unit or hero is currently moving to the province
+	CGrandStrategyFaction *Owner = nullptr;								/// Owner of the province
+	CGrandStrategyHero *Governor = nullptr;								/// Governor of this province
 	bool SettlementBuildings[UnitTypeMax];								/// Buildings in the province; 0 = not constructed, 1 = under construction, 2 = constructed
 	int Units[UnitTypeMax];												/// Quantity of units of a particular unit type in the province
 	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province

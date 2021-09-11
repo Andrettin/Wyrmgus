@@ -27,14 +27,13 @@
 
 #include "stratagus.h"
 
-#include "player.h"
+#include "player/player.h"
 
 #include "action/action_upgradeto.h"
 #include "actions.h"
 #include "age.h"
 #include "ai.h"
 #include "ai/ai_local.h" //for using AiHelpers
-#include "civilization.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
 #include "database/defines.h"
@@ -71,6 +70,7 @@
 //Wyrmgus start
 #include "parameters.h"
 //Wyrmgus end
+#include "player/civilization.h"
 #include "player/civilization_group.h"
 #include "player/civilization_history.h"
 #include "player/diplomacy_state.h"
@@ -78,9 +78,9 @@
 #include "player/faction.h"
 #include "player/faction_history.h"
 #include "player/faction_type.h"
+#include "player/player_color.h"
 #include "player/player_type.h"
 #include "player/vassalage_type.h"
-#include "player_color.h"
 #include "quest/campaign.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
@@ -125,9 +125,7 @@
 #include "video/video.h"
 
 /**
-**  @class CPlayer player.h
-**
-**  \#include "player.h"
+**  @class CPlayer
 **
 **  This structure contains all information about a player in game.
 **
@@ -525,7 +523,7 @@ void CPlayer::set_revealed(const bool revealed)
 	if (revealed) {
 		CPlayer::revealed_players.push_back(this);
 	} else {
-		wyrmgus::vector::remove(CPlayer::revealed_players, this);
+		vector::remove(CPlayer::revealed_players, this);
 	}
 }
 
@@ -2660,7 +2658,7 @@ void CPlayer::accept_quest(wyrmgus::quest *quest)
 		return;
 	}
 	
-	wyrmgus::vector::remove(this->available_quests, quest);
+	vector::remove(this->available_quests, quest);
 	this->current_quests.push_back(quest);
 	
 	for (const auto &quest_objective : quest->get_objectives()) {
@@ -2766,11 +2764,11 @@ void CPlayer::fail_quest(wyrmgus::quest *quest, const std::string &fail_reason)
 
 void CPlayer::remove_current_quest(wyrmgus::quest *quest)
 {
-	wyrmgus::vector::remove(this->current_quests, quest);
+	vector::remove(this->current_quests, quest);
 	
 	for (int i = (this->quest_objectives.size()  - 1); i >= 0; --i) {
 		if (this->quest_objectives[i]->get_quest_objective()->get_quest() == quest) {
-			wyrmgus::vector::remove(this->quest_objectives, this->quest_objectives[i]);
+			vector::remove(this->quest_objectives, this->quest_objectives[i]);
 		}
 	}
 }
@@ -3047,8 +3045,6 @@ int CPlayer::GetUnitCount() const
 {
 	return static_cast<int>(Units.size());
 }
-
-
 
 /*----------------------------------------------------------------------------
 --  Resource management
@@ -3777,14 +3773,14 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, const bool type_change)
 
 	this->ChangeUnitTypeCount(type, -1);
 	
-	wyrmgus::vector::remove(this->units_by_type[type], unit);
+	vector::remove(this->units_by_type[type], unit);
 
 	if (this->units_by_type[type].empty()) {
 		this->units_by_type.erase(type);
 	}
 
 	if (type->get_unit_class() != nullptr) {
-		wyrmgus::vector::remove(this->units_by_class[type->get_unit_class()], unit);
+		vector::remove(this->units_by_class[type->get_unit_class()], unit);
 
 		if (this->units_by_class[type->get_unit_class()].empty()) {
 			this->units_by_class.erase(type->get_unit_class());
@@ -3794,7 +3790,7 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, const bool type_change)
 	if (unit->Active) {
 		this->ChangeUnitTypeAiActiveCount(type, -1);
 		
-		wyrmgus::vector::remove(this->AiActiveUnitsByType[type], unit);
+		vector::remove(this->AiActiveUnitsByType[type], unit);
 		
 		if (this->AiActiveUnitsByType[type].empty()) {
 			this->AiActiveUnitsByType.erase(type);
@@ -4152,7 +4148,7 @@ void CPlayer::set_overlord(CPlayer *overlord, const wyrmgus::vassalage_type)
 
 	CPlayer *old_overlord = this->get_overlord();
 	if (old_overlord != nullptr) {
-		wyrmgus::vector::remove(old_overlord->vassals, this);
+		vector::remove(old_overlord->vassals, this);
 
 		//remove alliance and shared vision with the old overlord, and any upper overlords
 		if (!SaveGameLoading) {

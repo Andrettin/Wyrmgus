@@ -32,9 +32,9 @@
 
 #include "map/terrain_type.h"
 #include "map/tile.h"
-#include "ui/ui.h"
-#include "player.h"
+#include "player/player.h"
 #include "settings.h"
+#include "ui/ui.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 

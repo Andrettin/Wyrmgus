@@ -40,7 +40,6 @@
 //Wyrmgus end
 #include "animation.h"
 #include "character.h"
-#include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
 #include "economy/resource_storage_type.h"
@@ -67,11 +66,12 @@
 #include "name_generator.h"
 #include "network.h"
 #include "pathfinder.h"
+#include "player/civilization.h"
 #include "player/civilization_group.h"
 #include "player/faction.h"
+#include "player/player.h"
+#include "player/player_color.h"
 #include "player/player_type.h"
-#include "player.h"
-#include "player_color.h"
 #include "quest/achievement.h"
 #include "quest/quest.h"
 #include "religion/deity.h"
@@ -4714,6 +4714,12 @@ bool CUnit::IsVisible(const CPlayer &player) const
 	return false;
 }
 
+bool CUnit::is_invisible(const CPlayer &player) const
+{
+	return (&player != this->Player && !!Variable[INVISIBLE_INDEX].Value
+		&& !player.has_mutual_shared_vision_with(*this->Player));
+}
+
 /**
 **  Returns true, if unit is shown on minimap.
 **
@@ -4731,7 +4737,7 @@ bool CUnit::IsVisibleOnMinimap() const
 	//Wyrmgus end
 
 	// Invisible units.
-	if (this->IsInvisibile(*CPlayer::GetThisPlayer())) {
+	if (this->is_invisible(*CPlayer::GetThisPlayer())) {
 		return false;
 	}
 
@@ -4796,7 +4802,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	}
 
 	// Those are never ever visible.
-	if (IsInvisibile(*CPlayer::GetThisPlayer())) {
+	if (this->is_invisible(*CPlayer::GetThisPlayer())) {
 		return false;
 	}
 

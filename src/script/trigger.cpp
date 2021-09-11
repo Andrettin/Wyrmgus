@@ -37,8 +37,8 @@
 //Wyrmgus end
 #include "map/map.h"
 #include "map/map_info.h"
+#include "player/player.h"
 #include "player/player_type.h"
-#include "player.h"
 //Wyrmgus start
 #include "quest/quest.h" // for saving quests
 //Wyrmgus end

@@ -26,7 +26,6 @@
 
 #include "stratagus.h"
 
-#include "civilization.h"
 #include "database/database.h"
 #include "database/defines.h"
 #include "database/preferences.h"
@@ -39,10 +38,11 @@
 #include "map/tile_transition.h"
 #include "network/network_manager.h"
 #include "parameters.h"
+#include "player/civilization.h"
 #include "player/civilization_group.h"
 #include "player/faction.h"
-#include "player.h"
-#include "player_color.h"
+#include "player/player.h"
+#include "player/player_color.h"
 #include "quest/quest.h"
 #include "religion/pantheon.h"
 #include "time/calendar.h"

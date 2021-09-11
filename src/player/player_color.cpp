@@ -26,7 +26,7 @@
 
 #include "stratagus.h"
 
-#include "player_color.h"
+#include "player/player_color.h"
 
 #include "database/defines.h"
 #include "util/container_util.h"

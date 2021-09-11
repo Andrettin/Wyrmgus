@@ -37,7 +37,6 @@
 #ifdef DEBUG
 #include "ai/ai_local.h"
 #endif
-#include "civilization.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "economy/resource_storage_type.h"
@@ -54,8 +53,9 @@
 #include "map/world.h"
 #include "menus.h"
 #include "network.h"
+#include "player/civilization.h"
+#include "player/player.h"
 #include "player/player_type.h"
-#include "player.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"

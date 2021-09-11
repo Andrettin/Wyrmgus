@@ -29,7 +29,7 @@
 #include "ui/icon_image_provider.h"
 
 #include "database/defines.h"
-#include "player_color.h"
+#include "player/player_color.h"
 #include "ui/icon.h"
 #include "util/log_util.h"
 #include "util/string_util.h"

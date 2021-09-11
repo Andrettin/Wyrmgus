@@ -30,7 +30,6 @@
 
 #include "actions.h"
 #include "character.h"
-#include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
 #include "database/preferences.h"
@@ -49,6 +48,7 @@
 #include "missile.h"
 #include "network.h"
 #include "particle.h"
+#include "player/civilization.h"
 #include "player/faction.h"
 #include "quest/campaign.h"
 //Wyrmgus start

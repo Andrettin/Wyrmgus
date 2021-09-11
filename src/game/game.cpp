@@ -38,7 +38,6 @@
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
-#include "civilization.h"
 #include "commands.h"
 #include "database/database.h"
 #include "database/defines.h"
@@ -69,12 +68,13 @@
 #include "network.h"
 #include "parameters.h"
 #include "pathfinder.h"
+#include "player/civilization.h"
 #include "player/diplomacy_state.h"
 #include "player/faction.h"
 #include "player/faction_type.h"
+#include "player/player.h"
+#include "player/player_color.h"
 #include "player/player_type.h"
-#include "player.h"
-#include "player_color.h"
 //Wyrmgus start
 #include "province.h"
 //Wyrmgus end

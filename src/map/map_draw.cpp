@@ -42,7 +42,7 @@
 #include "missile.h"
 #include "particle.h"
 #include "pathfinder.h"
-#include "player.h"
+#include "player/player.h"
 #include "translate.h"
 #include "ui/cursor.h"
 #include "ui/ui.h"

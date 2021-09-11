@@ -800,6 +800,7 @@ set(wyrmgus_network_HDRS
 )
 
 set(wyrmgus_player_HDRS
+	src/player/civilization.h
 	src/player/civilization_base.h
 	src/player/civilization_history.h
 	src/player/civilization_group.h
@@ -811,6 +812,8 @@ set(wyrmgus_player_HDRS
 	src/player/faction_tier.h
 	src/player/faction_type.h
 	src/player/government_type.h
+	src/player/player.h
+	src/player/player_color.h
 	src/player/player_container.h
 	src/player/player_type.h
 	src/player/vassalage_type.h
@@ -1103,7 +1106,6 @@ set(wyrmgus_generic_HDRS
 	src/include/ai.h
 	src/include/animation.h
 	src/include/character.h
-	src/include/civilization.h
 	src/include/color.h
 	src/include/commands.h
 	src/include/config.h
@@ -1128,8 +1130,6 @@ set(wyrmgus_generic_HDRS
 	src/include/network/netsockets.h
 	src/include/particle.h
 	src/include/pathfinder.h
-	src/include/player.h
-	src/include/player_color.h
 	src/include/province.h
 	src/include/replay.h
 	src/include/results.h

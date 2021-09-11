@@ -31,7 +31,7 @@
 #include "item/unique_item.h"
 #include "map/historical_location.h"
 #include "map/site.h"
-#include "player.h"
+#include "player/player.h"
 #include "unit/historical_unit_history.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"

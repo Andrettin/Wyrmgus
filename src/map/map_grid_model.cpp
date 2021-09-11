@@ -33,7 +33,7 @@
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
-#include "player_color.h"
+#include "player/player_color.h"
 #include "util/exception_util.h"
 #include "util/point_util.h"
 #include "video/video.h"

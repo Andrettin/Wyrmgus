@@ -29,7 +29,7 @@
 #include "script/context.h"
 
 #include "database/sml_data.h"
-#include "player.h"
+#include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_ref.h"

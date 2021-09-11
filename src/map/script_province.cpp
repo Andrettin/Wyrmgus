@@ -30,12 +30,12 @@
 
 #include "province.h"
 
-#include "civilization.h"
 #include "iolib.h"
 #include "map/region.h"
 #include "map/world.h"
+#include "player/civilization.h"
 #include "player/faction.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "species/species.h"
 #include "unit/unit_type.h"

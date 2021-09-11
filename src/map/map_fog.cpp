@@ -37,7 +37,7 @@
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "player.h"
+#include "player/player.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 //Wyrmgus start

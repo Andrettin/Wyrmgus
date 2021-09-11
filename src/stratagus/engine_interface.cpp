@@ -29,7 +29,6 @@
 #include "engine_interface.h"
 
 #include "character.h"
-#include "civilization.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "editor.h"
@@ -43,8 +42,9 @@
 #include "map/map_layer.h"
 #include "map/world.h"
 #include "network/network_manager.h"
+#include "player/civilization.h"
 #include "player/faction.h"
-#include "player.h"
+#include "player/player.h"
 #include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"

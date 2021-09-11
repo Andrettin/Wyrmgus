@@ -50,7 +50,7 @@
 #include "map/tile_flag.h"
 #include "missile.h"
 #include "pathfinder.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "sound/sound.h"
 #include "spell/spell.h"

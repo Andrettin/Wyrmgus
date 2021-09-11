@@ -32,7 +32,7 @@
 
 #include "database/defines.h"
 #include "menus.h"
-#include "player.h"
+#include "player/player.h"
 #include "video/font.h"
 #include "video/video.h"
 

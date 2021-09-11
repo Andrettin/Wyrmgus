@@ -27,7 +27,7 @@
 #pragma once
 
 #include "map/site.h"
-#include "player.h"
+#include "player/player.h"
 #include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

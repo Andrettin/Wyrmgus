@@ -31,11 +31,11 @@
 
 #include "sound/sound_server.h"
 
-#include "civilization.h"
 #include "database/preferences.h"
 #include "dialogue.h"
 #include "iocompat.h"
 #include "iolib.h"
+#include "player/civilization.h"
 #include "player/faction.h"
 #include "sound/music.h"
 #include "sound/music_player.h"

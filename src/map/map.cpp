@@ -52,8 +52,8 @@
 #include "map/tileset.h"
 #include "map/world.h"
 #include "map/world_game_data.h"
+#include "player/player.h"
 #include "player/player_type.h"
-#include "player.h"
 //Wyrmgus start
 #include "province.h"
 //Wyrmgus end

@@ -31,7 +31,6 @@
 
 #include "ui/ui.h"
 
-#include "civilization.h"
 #include "database/defines.h"
 #include "engine_interface.h"
 //Wyrmgus start
@@ -44,7 +43,9 @@
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "menus.h"
+#include "player/civilization.h"
 #include "player/faction.h"
+#include "player/player.h"
 #include "sound/sound.h"
 #include "title.h"
 #include "translate.h"

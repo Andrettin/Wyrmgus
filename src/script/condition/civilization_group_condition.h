@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "civilization.h"
+#include "player/civilization.h"
 #include "player/civilization_group.h"
 #include "script/condition/condition.h"
 

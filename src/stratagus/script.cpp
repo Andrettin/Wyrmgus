@@ -35,7 +35,6 @@
 //Wyrmgus start
 #include "actions.h"
 //Wyrmgus end
-#include "civilization.h"
 #include "config.h"
 #include "economy/resource_storage_type.h"
 //Wyrmgus start
@@ -55,9 +54,10 @@
 #include "map/tile.h"
 #include "map/world.h"
 #include "parameters.h"
+#include "player/civilization.h"
 #include "player/faction.h"
 #include "player/faction_type.h"
-#include "player.h"
+#include "player/player.h"
 #include "script/trigger.h"
 #include "spell/spell.h"
 #include "time/timeline.h"

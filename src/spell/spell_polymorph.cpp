@@ -33,13 +33,14 @@
 #include "action/action_upgradeto.h"
 #include "character.h"
 //Wyrmgus end
-#include "civilization.h"
 #include "game.h"
 #include "map/map.h"
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
+#include "player/civilization.h"
 #include "player/faction.h"
+#include "player/player.h"
 #include "script.h"
 #include "spell/spell.h"
 #include "unit/unit.h"

@@ -36,7 +36,7 @@
 #include "action/action_upgradeto.h"
 //Wyrmgus end
 #include "network.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "script/condition/condition.h"
 #include "ui/button.h"

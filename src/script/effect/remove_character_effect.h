@@ -27,7 +27,7 @@
 #pragma once
 
 #include "character.h"
-#include "player.h"
+#include "player/player.h"
 #include "script/effect/effect.h"
 #include "unit/unit.h"
 #include "util/string_util.h"

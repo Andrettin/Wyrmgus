@@ -179,7 +179,7 @@ extern void beos_init(int argc, char **argv);
 #include "netconnect.h"
 #include "network.h"
 #include "parameters.h"
-#include "player.h"
+#include "player/player.h"
 #include "replay.h"
 #include "results.h"
 #include "script.h"

@@ -53,7 +53,7 @@
 #include "editor.h"
 
 #include "engine_interface.h"
-#include "player.h"
+#include "player/player.h"
 
 CEditor::CEditor() : SelectedPlayer(PlayerNumNeutral)
 {

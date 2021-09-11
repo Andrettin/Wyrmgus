@@ -28,8 +28,8 @@
 
 #include "map/terrain_feature.h"
 
-#include "civilization.h"
 #include "map/terrain_type.h"
+#include "player/civilization.h"
 
 namespace wyrmgus {
 

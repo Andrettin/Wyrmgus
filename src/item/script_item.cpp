@@ -29,7 +29,7 @@
 #include "stratagus.h"
 
 #include "item/unique_item.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "spell/spell.h"
 #include "unit/unit_type.h"

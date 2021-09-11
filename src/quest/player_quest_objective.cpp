@@ -29,7 +29,7 @@
 #include "quest/player_quest_objective.h"
 
 #include "player/faction.h"
-#include "player.h"
+#include "player/player.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "unit/unit.h"

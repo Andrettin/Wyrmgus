@@ -28,7 +28,6 @@
 
 #include "map/site.h"
 
-#include "civilization.h"
 #include "config.h"
 #include "database/defines.h"
 #include "item/unique_item.h"
@@ -40,8 +39,9 @@
 #include "map/site_game_data.h"
 #include "map/site_history.h"
 #include "map/tile.h"
+#include "player/civilization.h"
 #include "player/faction.h"
-#include "player_color.h"
+#include "player/player_color.h"
 #include "region.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"

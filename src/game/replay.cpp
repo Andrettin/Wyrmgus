@@ -40,8 +40,8 @@
 #include "network.h"
 #include "parameters.h"
 #include "player/diplomacy_state.h"
+#include "player/player.h"
 #include "player/player_type.h"
-#include "player.h"
 //Wyrmgus start
 #include "quest/quest.h"
 //Wyrmgus end

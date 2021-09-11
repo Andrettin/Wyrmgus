@@ -31,7 +31,6 @@
 #include "map/map.h"
 
 #include "character.h"
-#include "civilization.h"
 #include "database/defines.h"
 #include "editor.h"
 #include "game.h"
@@ -50,7 +49,9 @@
 #include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "map/world.h"
+#include "player/civilization.h"
 #include "player/faction.h"
+#include "player/player.h"
 #include "player/player_type.h"
 //Wyrmgus start
 #include "province.h"

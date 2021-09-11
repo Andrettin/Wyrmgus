@@ -31,7 +31,7 @@
 #include "database/defines.h"
 #include "engine_interface.h"
 #include "map/terrain_type.h"
-#include "player_color.h"
+#include "player/player_color.h"
 #include "time/season.h"
 #include "util/log_util.h"
 #include "util/string_util.h"

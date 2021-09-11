@@ -30,7 +30,7 @@
 
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "player_color.h"
+#include "player/player_color.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"

@@ -39,6 +39,7 @@
 #include "player/diplomacy_state.h"
 #include "player/dynasty.h"
 #include "player/faction.h"
+#include "player/player.h"
 #include "quest/quest.h"
 #include "replay.h"
 #include "spell/spell.h"

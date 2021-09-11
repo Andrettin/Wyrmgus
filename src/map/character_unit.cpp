@@ -30,6 +30,7 @@
 
 #include "database/sml_data.h"
 #include "database/sml_property.h"
+#include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "util/string_conversion_util.h"

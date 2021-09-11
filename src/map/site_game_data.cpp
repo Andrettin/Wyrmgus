@@ -36,7 +36,7 @@
 #include "map/minimap.h"
 #include "map/site.h"
 #include "map/tile.h"
-#include "player.h"
+#include "player/player.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/vector_util.h"

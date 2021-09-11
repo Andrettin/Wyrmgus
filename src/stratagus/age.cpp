@@ -32,7 +32,7 @@
 #include "database/defines.h"
 #include "game.h"
 #include "mod.h"
-#include "player.h"
+#include "player/player.h"
 #include "script/condition/and_condition.h"
 #include "time/calendar.h"
 #include "unit/unit_type.h"

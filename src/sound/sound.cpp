@@ -30,10 +30,10 @@
 #include "sound/sound.h"
 
 #include "character.h"
-#include "civilization.h"
 #include "database/defines.h"
 #include "iolib.h"
 #include "missile.h"
+#include "player/civilization.h"
 #include "sound/sample.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"

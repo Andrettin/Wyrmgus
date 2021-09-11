@@ -28,13 +28,13 @@
 
 #include "quest/quest.h"
 
-#include "civilization.h"
 #include "game.h"
 #include "game/difficulty.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "parameters.h"
+#include "player/civilization.h"
 #include "quest/achievement.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"

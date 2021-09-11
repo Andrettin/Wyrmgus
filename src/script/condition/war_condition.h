@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "player.h"
+#include "player/player.h"
 #include "script/condition/condition.h"
 #include "util/string_conversion_util.h"
 

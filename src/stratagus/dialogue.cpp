@@ -30,7 +30,7 @@
 
 #include "dialogue_node.h"
 #include "dialogue_option.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "script/context.h"
 #include "script/effect/call_dialogue_effect.h"

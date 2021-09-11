@@ -30,8 +30,8 @@
 #include "map/map_info.h"
 
 #include "map/map_layer.h"
+#include "player/player.h" //for the PlayerNumNeutral constexpr
 #include "player/player_type.h"
-#include "player.h" //for the PlayerNumNeutral constexpr
 #include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/string_util.h"

@@ -26,7 +26,7 @@
 
 #include "stratagus.h"
 
-#include "civilization.h"
+#include "player/civilization.h"
 
 #include "ai/ai_force_template.h"
 #include "ai/ai_force_type.h"
@@ -40,7 +40,7 @@
 #include "player/faction_tier.h"
 #include "player/faction_type.h"
 #include "player/government_type.h"
-#include "player.h"
+#include "player/player.h"
 #include "script/condition/condition.h"
 #include "script.h"
 #include "time/calendar.h"

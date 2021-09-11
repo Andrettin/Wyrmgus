@@ -28,13 +28,13 @@
 
 #include "text_processor.h"
 
-#include "civilization.h"
 #include "language/word.h"
 #include "literary_text.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
+#include "player/civilization.h"
 #include "player/faction.h"
-#include "player.h"
+#include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_ref.h"

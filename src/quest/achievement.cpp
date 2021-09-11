@@ -30,8 +30,8 @@
 
 #include "character.h"
 #include "game/difficulty.h"
-#include "player.h"
-#include "player_color.h"
+#include "player/player.h"
+#include "player/player_color.h"
 #include "quest/quest.h"
 #include "script.h"
 #include "unit/unit_type.h"

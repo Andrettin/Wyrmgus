@@ -33,7 +33,6 @@
 #include "ai.h"
 #include "ai/ai_local.h"
 #include "animation.h"
-#include "civilization.h"
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
@@ -48,7 +47,8 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "pathfinder.h"
-#include "player.h"
+#include "player/civilization.h"
+#include "player/player.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
 #include "script.h"

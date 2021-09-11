@@ -49,8 +49,8 @@
 #include "menus.h"
 #include "missile.h"
 #include "network.h"
+#include "player/player.h"
 #include "player/player_type.h"
-#include "player.h"
 //Wyrmgus start
 #include "province.h"
 //Wyrmgus end

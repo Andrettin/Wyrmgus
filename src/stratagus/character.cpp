@@ -30,7 +30,6 @@
 
 #include "ai/ai_local.h" //for using AiHelpers
 #include "character_history.h"
-#include "civilization.h"
 #include "config.h"
 #include "engine_interface.h"
 #include "game.h"
@@ -43,8 +42,9 @@
 #include "map/map_template.h"
 #include "map/site.h"
 #include "parameters.h"
+#include "player/civilization.h"
 #include "player/faction.h"
-#include "player.h"
+#include "player/player.h"
 #include "province.h"
 #include "religion/deity.h"
 #include "script/condition/and_condition.h"

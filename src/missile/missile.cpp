@@ -43,7 +43,7 @@
 #include "map/tile_flag.h"
 #include "missile/missile_class.h"
 #include "mod.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "script/trigger.h"
 //Wyrmgus start

@@ -40,7 +40,7 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "player.h"
+#include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"

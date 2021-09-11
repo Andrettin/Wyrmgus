@@ -30,7 +30,6 @@
 
 #include "editor.h"
 
-#include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
 #include "engine_interface.h"
@@ -49,8 +48,9 @@
 #include "menus.h"
 #include "network.h"
 #include "parameters.h"
+#include "player/civilization.h"
+#include "player/player.h"
 #include "player/player_type.h"
-#include "player.h"
 #include "replay.h"
 #include "script.h"
 #include "settings.h"

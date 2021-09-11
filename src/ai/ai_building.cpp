@@ -38,7 +38,7 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "pathfinder.h"
-#include "player.h"
+#include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"

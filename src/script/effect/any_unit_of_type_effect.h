@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "player.h"
+#include "player/player.h"
 #include "script/effect/scope_effect_base.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

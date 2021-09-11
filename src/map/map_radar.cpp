@@ -33,7 +33,7 @@
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
-#include "player.h"
+#include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 

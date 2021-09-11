@@ -33,7 +33,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "player/faction_type.h"
-#include "player.h"
+#include "player/player.h"
 #include "religion/deity.h"
 #include "script.h"
 #include "script/condition/age_condition.h"

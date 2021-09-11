@@ -53,7 +53,7 @@
 #include "actions.h"
 #include "config.h"
 #include "iolib.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "spell/spell.h"
 #include "unit/unit.h"

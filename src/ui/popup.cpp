@@ -33,7 +33,7 @@
 #include "database/defines.h"
 #include "item/item_class.h"
 #include "player/faction.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"

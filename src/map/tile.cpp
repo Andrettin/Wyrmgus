@@ -41,7 +41,7 @@
 #include "map/terrain_type.h"
 #include "map/tile_flag.h"
 #include "map/tileset.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"

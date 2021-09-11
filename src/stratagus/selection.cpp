@@ -41,7 +41,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "network.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "ui/interface.h"
 #include "ui/ui.h"

@@ -28,9 +28,9 @@
 
 #include "time/date.h"
 
-#include "civilization.h"
 #include "game.h"
-#include "player.h"
+#include "player/civilization.h"
+#include "player/player.h"
 #include "time/calendar.h"
 #include "time/timeline.h"
 #include "util/string_conversion_util.h"

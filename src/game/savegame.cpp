@@ -40,7 +40,7 @@
 #include "map/map_info.h"
 #include "missile.h"
 #include "parameters.h"
-#include "player.h"
+#include "player/player.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"
 #include "replay.h"

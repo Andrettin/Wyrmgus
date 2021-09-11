@@ -51,7 +51,7 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "pathfinder.h"
-#include "player.h"
+#include "player/player.h"
 #include "script.h"
 #include "translate.h"
 #include "ui/ui.h"

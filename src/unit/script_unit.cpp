@@ -46,8 +46,8 @@
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "pathfinder.h"
+#include "player/player.h"
 #include "player/player_type.h"
-#include "player.h"
 #include "script.h"
 #include "script/trigger.h"
 //Wyrmgus start

@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "player.h"
+#include "player/player.h"
 #include "script/effect/scope_effect.h"
 
 namespace wyrmgus {

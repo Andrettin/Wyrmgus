@@ -37,7 +37,7 @@
 //Wyrmgus end
 #include "netconnect.h"
 #include "network.h"
-#include "player_color.h"
+#include "player/player_color.h"
 //Wyrmgus start
 #include "results.h"
 //Wyrmgus end

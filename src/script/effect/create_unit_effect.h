@@ -32,7 +32,7 @@
 #include "map/map_template.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
-#include "player.h"
+#include "player/player.h"
 #include "script/effect/effect.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"

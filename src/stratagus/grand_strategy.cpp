@@ -29,16 +29,16 @@
 #include "grand_strategy.h"
 
 #include "character.h"
-#include "civilization.h"
 #include "database/defines.h"
-#include "game.h"	// for loading screen elements
+#include "game.h" //for loading screen elements
 #include "gender.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "menus.h"
+#include "player/civilization.h"
 #include "player/faction.h"
 #include "player/faction_type.h"
-#include "player.h"
+#include "player/player.h"
 #include "results.h"
 #include "script.h"
 #include "sound/sound_server.h"

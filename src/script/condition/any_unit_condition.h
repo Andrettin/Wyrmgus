@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "player.h"
+#include "player/player.h"
 #include "script/condition/scope_condition_base.h"
 #include "unit/unit.h"
 

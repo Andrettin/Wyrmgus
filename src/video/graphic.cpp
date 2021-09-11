@@ -37,8 +37,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map_layer.h"
-#include "player.h"
-#include "player_color.h"
+#include "player/player_color.h"
 //Wyrmgus start
 #include "results.h"
 //Wyrmgus end

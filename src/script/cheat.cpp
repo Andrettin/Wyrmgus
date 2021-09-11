@@ -28,7 +28,7 @@
 
 #include "script/cheat.h"
 
-#include "player.h"
+#include "player/player.h"
 #include "script/context.h"
 #include "script/effect/effect_list.h"
 

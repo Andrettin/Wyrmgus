@@ -27,7 +27,7 @@
 #pragma once
 
 #include "age.h"
-#include "player.h"
+#include "player/player.h"
 #include "script/condition/condition.h"
 
 namespace wyrmgus {
