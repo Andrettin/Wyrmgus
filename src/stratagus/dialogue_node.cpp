@@ -33,6 +33,7 @@
 #include "dialogue_option.h"
 #include "luacallback.h"
 #include "player/faction.h"
+#include "player/player.h"
 #include "script.h"
 #include "script/condition/and_condition.h"
 #include "script/context.h"

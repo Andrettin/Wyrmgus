@@ -1057,6 +1057,7 @@ set(wyrmgus_util_HDRS
 	src/util/geoshape_util.h
 	src/util/image_util.h
 	src/util/list_util.h
+	src/util/locale_util.h
 	src/util/log_util.h
 	src/util/map_util.h
 	src/util/number_util.h
@@ -1157,6 +1158,7 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/parameters.h
 	src/stratagus/text_processing_context.h
 	src/stratagus/text_processor.h
+	src/pch.h
 )
 
 source_group(wyrmgus FILES ${wyrmgus_generic_HDRS})
