@@ -351,20 +351,6 @@ void game::clear_results()
 	this->set_results(nullptr);
 }
 
-void game::on_modal_dialog_opened()
-{
-	engine_interface::get()->post([this]() {
-		this->tooltips_enabled = false;
-	});
-}
-
-void game::on_modal_dialog_closed()
-{
-	engine_interface::get()->post([this]() {
-		this->tooltips_enabled = true;
-	});
-}
-
 }
 
 void load_game_data(const std::string &sml_string)

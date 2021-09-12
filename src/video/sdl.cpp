@@ -805,6 +805,22 @@ void WaitEventsOneFrame()
 	while (!input_events.empty()) {
 		std::unique_ptr<QInputEvent> input_event = queue::take(input_events);
 
+		switch (input_event->type()) {
+			case QEvent::MouseButtonPress:
+			case QEvent::MouseButtonRelease:
+			case QEvent::MouseMove:
+			case QEvent::HoverEnter:
+			case QEvent::HoverLeave:
+			case QEvent::HoverMove:
+				if (engine_interface::get()->is_modal_dialog_open()) {
+					//ignore mouse events if a modal dialog is opened
+					continue;
+				}
+				break;
+			default:
+				break;
+		}
+
 		if (input_event->type() == QEvent::HoverMove) {
 			const QHoverEvent *hover_event = static_cast<QHoverEvent *>(input_event.get());
 			if (hover_event->pos() == CursorScreenPos) {

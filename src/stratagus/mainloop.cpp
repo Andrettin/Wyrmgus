@@ -50,6 +50,7 @@
 #include "particle.h"
 #include "player/civilization.h"
 #include "player/faction.h"
+#include "player/player.h"
 #include "quest/campaign.h"
 //Wyrmgus start
 #include "quest/quest.h"

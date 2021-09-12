@@ -67,6 +67,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(CPlayer* this_player READ get_this_player NOTIFY this_player_changed)
 	Q_PROPERTY(QVariantList non_neutral_players READ get_non_neutral_players CONSTANT)
 	Q_PROPERTY(wyrmgus::interface_style* current_interface_style READ get_current_interface_style NOTIFY current_interface_style_changed)
+	Q_PROPERTY(bool modal_dialog_open READ is_modal_dialog_open WRITE set_modal_dialog_open_async)
 
 public:
 	engine_interface();
@@ -257,6 +258,13 @@ public:
 
 	void set_current_interface_style(interface_style *interface_style);
 
+	bool is_modal_dialog_open() const
+	{
+		return this->modal_dialog_open;
+	}
+
+	void set_modal_dialog_open_async(const bool value);
+
 	Q_INVOKABLE void load_game(const QString &filepath);
 	void load_game_deferred(const std::string &filepath);
 
@@ -278,6 +286,7 @@ private:
 	std::mutex input_event_mutex;
 	QString loading_message; //the loading message to be displayed
 	interface_style *current_interface_style = nullptr;
+	bool modal_dialog_open = false;
 	mutable std::shared_mutex loading_message_mutex;
 	std::vector<qunique_ptr<map_info>> map_infos;
 };

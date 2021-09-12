@@ -55,6 +55,8 @@
 #include "sound/music_player.h"
 #include "sound/music_type.h"
 #include "sound/sound.h"
+#include "ui/cursor.h"
+#include "ui/cursor_type.h"
 #include "ui/hotkey_setup.h"
 #include "ui/interface.h"
 #include "unit/unit_type.h"
@@ -584,6 +586,14 @@ void engine_interface::set_current_interface_style(interface_style *interface_st
 	this->current_interface_style = interface_style;
 
 	emit current_interface_style_changed();
+}
+
+void engine_interface::set_modal_dialog_open_async(const bool value)
+{
+	this->post([this, value]() {
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
+		this->modal_dialog_open = value;
+	});
 }
 
 void engine_interface::load_game(const QString &filepath)

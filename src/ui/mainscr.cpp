@@ -40,6 +40,7 @@
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "economy/resource_storage_type.h"
+#include "engine_interface.h"
 #include "game.h"
 #include "map/map.h"
 #include "map/map_info.h"
@@ -910,7 +911,7 @@ static std::unique_ptr<wyrmgus::button> get_territory_tooltip_button(const CPlay
 */
 void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	if (!game::get()->are_tooltips_enabled()) {
+	if (engine_interface::get()->is_modal_dialog_open()) {
 		return;
 	}
 
