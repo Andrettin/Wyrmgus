@@ -1053,7 +1053,7 @@ set(wyrmgus_util_HDRS
 	src/util/geocoordinate.h
 	src/util/geojson_util.h
 	src/util/geopath_util.h
-	src/util/georectangle_util.h
+	src/util/georectangle.h
 	src/util/geoshape_util.h
 	src/util/image_util.h
 	src/util/list_util.h

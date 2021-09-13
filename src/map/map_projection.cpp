@@ -33,6 +33,7 @@
 
 #include "util/angle_util.h"
 #include "util/geocoordinate.h"
+#include "util/georectangle.h"
 #include "util/point_util.h"
 
 #include <boost/math/constants/constants.hpp>
@@ -72,31 +73,31 @@ geocoordinate map_projection::scaled_geocoordinate_to_geocoordinate(const geocoo
 	return geocoordinate(scaled_geocoordinate.get_longitude(), this->scaled_latitude_to_latitude(scaled_geocoordinate.get_latitude()));
 }
 
-int map_projection::get_latitude_size(const QRect &georectangle) const
+map_projection::number_type map_projection::get_latitude_size(const georectangle &georectangle) const
 {
-	const latitude top_lat = this->latitude_to_scaled_latitude(latitude(georectangle.top()));
-	const latitude bottom_lat = this->latitude_to_scaled_latitude(latitude(georectangle.bottom()));
-	return std::abs((top_lat - bottom_lat).to_int());
+	const latitude top_lat = this->latitude_to_scaled_latitude(latitude(georectangle.get_min_latitude()));
+	const latitude bottom_lat = this->latitude_to_scaled_latitude(latitude(georectangle.get_max_latitude()));
+	return (top_lat - bottom_lat).abs();
 }
 
-map_projection::number_type map_projection::longitude_per_pixel(const int lon_size, const QSize &size) const
+map_projection::number_type map_projection::longitude_per_pixel(const number_type &lon_size, const QSize &size) const
 {
-	return number_type(lon_size) / size.width();
+	return lon_size / size.width();
 }
 
-map_projection::number_type map_projection::longitude_per_pixel(const QRect &georectangle, const QSize &size) const
+map_projection::number_type map_projection::longitude_per_pixel(const georectangle &georectangle, const QSize &size) const
 {
-	return this->longitude_per_pixel(georectangle.width() - 1, size);
+	return this->longitude_per_pixel(georectangle.get_width(), size);
 }
 
-map_projection::number_type map_projection::latitude_per_pixel(const int lat_size, const QSize &size) const
+map_projection::number_type map_projection::latitude_per_pixel(const number_type &lat_size, const QSize &size) const
 {
-	return number_type(lat_size) / size.height();
+	return lat_size / size.height();
 }
 
-map_projection::number_type map_projection::latitude_per_pixel(const QRect &georectangle, const QSize &size) const
+map_projection::number_type map_projection::latitude_per_pixel(const georectangle &georectangle, const QSize &size) const
 {
-	const int lat_size = this->get_latitude_size(georectangle);
+	const number_type lat_size = this->get_latitude_size(georectangle);
 	return this->latitude_per_pixel(lat_size, size);
 }
 
@@ -131,12 +132,12 @@ QPoint map_projection::geocoordinate_to_point(const geocoordinate &geocoordinate
 	return QPoint(x, y);
 }
 
-QPoint map_projection::geocoordinate_to_point(const geocoordinate &geocoordinate, const QRect &georectangle, const QSize &area_size) const
+QPoint map_projection::geocoordinate_to_point(const geocoordinate &geocoordinate, const georectangle &georectangle, const QSize &area_size) const
 {
 	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle, area_size);
 	const latitude lat_per_pixel = this->latitude_per_pixel(georectangle, area_size);
 
-	const wyrmgus::geocoordinate origin_geocoordinate(georectangle.bottomLeft());
+	const wyrmgus::geocoordinate origin_geocoordinate(georectangle.get_min_longitude(), georectangle.get_max_latitude());
 	const wyrmgus::geocoordinate scaled_origin_geocoordinate = this->geocoordinate_to_scaled_geocoordinate(origin_geocoordinate);
 	const QPoint geocoordinate_offset = this->geocoordinate_to_point(scaled_origin_geocoordinate, lon_per_pixel, lat_per_pixel);
 
@@ -151,12 +152,12 @@ geocoordinate map_projection::point_to_geocoordinate(const QPoint &point, const 
 	return geocoordinate(std::move(lon), std::move(lat));
 }
 
-geocoordinate map_projection::point_to_geocoordinate(const QPoint &point, const QRect &georectangle, const QSize &area_size) const
+geocoordinate map_projection::point_to_geocoordinate(const QPoint &point, const georectangle &georectangle, const QSize &area_size) const
 {
 	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle, area_size);
 	const latitude lat_per_pixel = this->latitude_per_pixel(georectangle, area_size);
 
-	const geocoordinate origin_geocoordinate(georectangle.bottomLeft());
+	const geocoordinate origin_geocoordinate(georectangle.get_min_longitude(), georectangle.get_max_latitude());
 	const geocoordinate scaled_origin_geocoordinate = this->geocoordinate_to_scaled_geocoordinate(origin_geocoordinate);
 	const QPoint geocoordinate_offset = this->geocoordinate_to_point(scaled_origin_geocoordinate, lon_per_pixel, lat_per_pixel);
 
@@ -186,31 +187,13 @@ mercator_map_projection::number_type mercator_map_projection::scaled_latitude_to
 	return lat;
 }
 
-void mercator_map_projection::validate_area(const QRect &georectangle, const QSize &area_size, const bool area_changeable) const
+void mercator_map_projection::validate_area(const georectangle &georectangle, const QSize &area_size) const
 {
 	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle, area_size);
 	const latitude lat_per_pixel = this->latitude_per_pixel(georectangle, area_size);
 
 	if (lon_per_pixel != lat_per_pixel) {
-		if (area_changeable) {
-			throw std::runtime_error("The scaled longitude per pixel (" + lon_per_pixel.to_string() + ") is different than the scaled latitude per pixel (" + lat_per_pixel.to_string() + ").");
-		}
-
-		const int64_t diff = std::abs(lon_per_pixel.get_value() - lat_per_pixel.get_value());
-
-		QRect changed_georectangle = georectangle;
-		changed_georectangle.setHeight(georectangle.height() - 1);
-		const latitude lat_minus_per_pixel = this->latitude_per_pixel(changed_georectangle, area_size);
-		const int64_t lat_minus_diff = std::abs(lon_per_pixel.get_value() - lat_minus_per_pixel.get_value());
-
-		changed_georectangle = georectangle;
-		changed_georectangle.setHeight(georectangle.height() + 1);
-		const latitude lat_plus_per_pixel = this->latitude_per_pixel(changed_georectangle, area_size);
-		const int64_t lat_plus_diff = std::abs(lon_per_pixel.get_value() - lat_plus_per_pixel.get_value());
-
-		if (lat_minus_diff < diff || lat_plus_diff < diff) {
-			throw std::runtime_error("The scaled longitude per pixel (" + lon_per_pixel.to_string() + ") is different than the scaled latitude per pixel (" + lat_per_pixel.to_string() + "), and it would be possible to have an integer value for the latitude which would result in a smaller discrepancy.");
-		}
+		throw std::runtime_error("The scaled longitude per pixel (" + lon_per_pixel.to_string() + ") is different than the scaled latitude per pixel (" + lat_per_pixel.to_string() + ").");
 	}
 }
 

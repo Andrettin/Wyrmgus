@@ -31,14 +31,14 @@
 #include "map/map_projection.h"
 #include "util/geocoordinate.h"
 #include "util/geopath_util.h"
-#include "util/georectangle_util.h"
+#include "util/georectangle.h"
 #include "util/point_util.h"
 
 namespace wyrmgus::geoshape {
 
-void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const QRect &georectangle, const map_projection *map_projection, const std::string &image_checkpoint_save_filename)
+void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const georectangle &georectangle, const map_projection *map_projection, const std::string &image_checkpoint_save_filename)
 {
-	const QGeoRectangle qgeorectangle = georectangle::to_qgeorectangle(georectangle);
+	const QGeoRectangle qgeorectangle = georectangle.to_qgeorectangle();
 	QGeoRectangle bounding_qgeorectangle = geoshape.boundingGeoRectangle();
 
 	if (!bounding_qgeorectangle.intersects(qgeorectangle)) {
@@ -65,24 +65,24 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 		bounding_qgeorectangle.setTopRight(top_right);
 	}
 
-	const QRect bounding_georectangle = georectangle::from_qgeorectangle(bounding_qgeorectangle);
+	const wyrmgus::georectangle bounding_georectangle = georectangle::from_qgeorectangle(bounding_qgeorectangle);
 
-	longitude start_lon = longitude(bounding_georectangle.x() - 1);
+	longitude start_lon = bounding_georectangle.get_min_longitude() - 1;
 	if (start_lon < geocoordinate::min_longitude) {
 		start_lon = geocoordinate::min_longitude;
 	}
 
-	longitude end_lon = longitude(bounding_georectangle.right() + 1);
+	longitude end_lon = bounding_georectangle.get_max_longitude() + 1;
 	if (end_lon > geocoordinate::max_longitude) {
 		end_lon = geocoordinate::max_longitude;
 	}
 
-	latitude start_lat = latitude(bounding_georectangle.bottom() + 1);
+	latitude start_lat = bounding_georectangle.get_max_latitude() + 1;
 	if (start_lat > geocoordinate::max_latitude) {
 		start_lat = geocoordinate::max_latitude;
 	}
 
-	latitude end_lat = latitude(bounding_georectangle.y() - 1);
+	latitude end_lat = bounding_georectangle.get_min_latitude() - 1;
 	if (end_lat < geocoordinate::min_latitude) {
 		end_lat = geocoordinate::min_latitude;
 	}

@@ -27,12 +27,13 @@
 #pragma once
 
 namespace wyrmgus {
+	class georectangle;
 	class map_projection;
 }
 
 namespace wyrmgus::geopath {
 
-extern void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const QRect &georectangle, const map_projection *map_projection);
+extern void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const georectangle &georectangle, const map_projection *map_projection);
 
 inline void write_pixel_to_image(const QPoint &pixel_pos, const QColor &color, QImage &image)
 {

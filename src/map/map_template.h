@@ -33,6 +33,7 @@
 #include "map/terrain_geodata_map.h"
 #include "time/date.h"
 #include "util/geocoordinate.h"
+#include "util/georectangle.h"
 #include "util/point_container.h"
 #include "vec2i.h"
 
@@ -122,10 +123,10 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
 	Q_PROPERTY(bool output_territory_image MEMBER output_territory_image READ outputs_territory_image)
 	Q_PROPERTY(wyrmgus::map_projection* map_projection MEMBER map_projection)
-	Q_PROPERTY(int min_longitude MEMBER min_longitude READ get_min_longitude)
-	Q_PROPERTY(int max_longitude MEMBER max_longitude READ get_max_longitude)
-	Q_PROPERTY(int min_latitude MEMBER min_latitude READ get_min_latitude)
-	Q_PROPERTY(int max_latitude MEMBER max_latitude READ get_max_latitude)
+	Q_PROPERTY(wyrmgus::decimillesimal_int min_longitude READ get_min_longitude WRITE set_min_longitude)
+	Q_PROPERTY(wyrmgus::decimillesimal_int max_longitude READ get_max_longitude WRITE set_max_longitude)
+	Q_PROPERTY(wyrmgus::decimillesimal_int min_latitude READ get_min_latitude WRITE set_min_latitude)
+	Q_PROPERTY(wyrmgus::decimillesimal_int max_latitude READ get_max_latitude WRITE set_max_latitude)
 	Q_PROPERTY(int astrodistance_multiplier MEMBER astrodistance_multiplier READ get_astrodistance_multiplier)
 	Q_PROPERTY(int astrodistance_additive_modifier MEMBER astrodistance_additive_modifier READ get_astrodistance_additive_modifier)
 	Q_PROPERTY(wyrmgus::map_template* default_astrocoordinate_reference_subtemplate MEMBER default_astrocoordinate_reference_subtemplate)
@@ -596,24 +597,44 @@ public:
 
 	const wyrmgus::map_projection *get_map_projection() const;
 
-	int get_min_longitude() const
+	const decimillesimal_int &get_min_longitude() const
 	{
-		return this->min_longitude;
+		return this->get_georectangle().get_min_longitude();
 	}
 
-	int get_max_longitude() const
+	void set_min_longitude(const decimillesimal_int &lon)
 	{
-		return this->max_longitude;
+		this->georectangle.set_min_longitude(lon);
 	}
 
-	int get_min_latitude() const
+	const decimillesimal_int &get_max_longitude() const
 	{
-		return this->min_latitude;
+		return this->get_georectangle().get_max_longitude();
 	}
 
-	int get_max_latitude() const
+	void set_max_longitude(const decimillesimal_int &lon)
 	{
-		return this->max_latitude;
+		this->georectangle.set_max_longitude(lon);
+	}
+
+	const decimillesimal_int &get_min_latitude() const
+	{
+		return this->get_georectangle().get_min_latitude();
+	}
+
+	void set_min_latitude(const decimillesimal_int &lat)
+	{
+		this->georectangle.set_min_latitude(lat);
+	}
+
+	const decimillesimal_int &get_max_latitude() const
+	{
+		return this->get_georectangle().get_max_latitude();
+	}
+
+	void set_max_latitude(const decimillesimal_int &lat)
+	{
+		this->georectangle.set_max_latitude(lat);
 	}
 
 	int get_astrodistance_multiplier() const
@@ -631,11 +652,9 @@ public:
 		return this->default_astrocoordinate_reference_subtemplate;
 	}
 
-	QRect get_georectangle() const
+	const georectangle &get_georectangle() const
 	{
-		const QPoint top_left(this->get_min_longitude(), this->get_min_latitude());
-		const QPoint bottom_right(this->get_max_longitude(), this->get_max_latitude());
-		return QRect(top_left, bottom_right);
+		return this->georectangle;
 	}
 
 	QPoint get_geocoordinate_pos(const geocoordinate &geocoordinate) const;
@@ -751,10 +770,7 @@ public:
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
 private:
 	wyrmgus::map_projection *map_projection = nullptr;
-	int min_longitude = 0;
-	int max_longitude = 0;
-	int min_latitude = 0;
-	int max_latitude = 0;
+	georectangle georectangle;
 	int astrodistance_multiplier = 1;
 	int astrodistance_additive_modifier = 0;
 	map_template *default_astrocoordinate_reference_subtemplate = nullptr;

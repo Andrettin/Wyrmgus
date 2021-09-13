@@ -73,7 +73,6 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "util/container_util.h"
-#include "util/georectangle_util.h"
 #include "util/geoshape_util.h"
 #include "util/image_util.h"
 #include "util/number_util.h"
@@ -90,8 +89,7 @@ namespace wyrmgus {
 
 map_template::map_template(const std::string &identifier)
 	: named_data_entry(identifier), CDataType(identifier),
-	min_longitude(geocoordinate::min_longitude.to_int()), max_longitude(geocoordinate::max_longitude.to_int()),
-	min_latitude(geocoordinate::min_latitude.to_int()), max_latitude(geocoordinate::max_latitude.to_int())
+	georectangle(geocoordinate(geocoordinate::min_longitude, geocoordinate::min_latitude), geocoordinate(geocoordinate::max_longitude, geocoordinate::max_latitude))
 {
 }
 
@@ -439,7 +437,7 @@ void map_template::check() const
 				area_changeable = true;
 			}
 		}
-		map_projection->validate_area(this->get_georectangle(), this->get_size(), area_changeable);
+		map_projection->validate_area(this->get_georectangle(), this->get_size());
 	}
 
 	/*
@@ -3025,7 +3023,7 @@ void map_template::create_terrain_image_from_file(QImage &image, const std::file
 
 void map_template::create_terrain_image_from_geodata(QImage &image, const terrain_geodata_ptr_map &terrain_data, const std::string &image_checkpoint_save_filename) const
 {
-	const QRect georectangle = this->get_georectangle();
+	const wyrmgus::georectangle &georectangle = this->get_georectangle();
 
 	for (const auto &kv_pair : terrain_data) {
 		const terrain_type *terrain = nullptr;
@@ -3072,7 +3070,7 @@ void map_template::save_territory_image(const std::string &filename, const site_
 		image.fill(Qt::transparent);
 	}
 
-	const QRect georectangle = this->get_georectangle();
+	const wyrmgus::georectangle georectangle = this->get_georectangle();
 
 	for (const auto &kv_pair : territory_data) {
 		const site *settlement = kv_pair.first;

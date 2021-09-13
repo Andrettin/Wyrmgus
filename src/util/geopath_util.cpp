@@ -30,15 +30,13 @@
 
 #include "map/map_projection.h"
 #include "util/geocoordinate.h"
-#include "util/georectangle_util.h"
+#include "util/georectangle.h"
 #include "util/point_util.h"
 
 namespace wyrmgus::geopath {
 
-void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const QRect &georectangle, const map_projection *map_projection)
+void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const georectangle &georectangle, const map_projection *map_projection)
 {
-	const QGeoRectangle qgeorectangle = georectangle::to_qgeorectangle(georectangle);
-
 	QPoint previous_pixel_pos(-1, -1);
 	for (const QGeoCoordinate &geocoordinate : geopath.path()) {
 		const QPoint pixel_pos = map_projection->geocoordinate_to_point(wyrmgus::geocoordinate(geocoordinate), georectangle, image.size());
