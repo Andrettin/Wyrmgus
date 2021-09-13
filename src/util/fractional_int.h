@@ -53,7 +53,7 @@ public:
 			rest_str.reserve(N + 1);
 			rest_str += ".";
 
-			int divisor = fractional_int::divisor;
+			int divisor = fractional_int::divisor / 10;
 			for (int i = 0; i < N; ++i) {
 				if (rest == 0) {
 					break;
