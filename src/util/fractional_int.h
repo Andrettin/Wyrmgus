@@ -140,6 +140,11 @@ public:
 		return this->value;
 	}
 
+	fractional_int abs() const
+	{
+		return fractional_int::from_value(std::abs(this->get_value()));
+	}
+
 	constexpr int to_int() const
 	{
 		const int64_t ret = this->to_int64();
@@ -246,6 +251,11 @@ public:
 	constexpr bool operator <=(const fractional_int<N> &other) const
 	{
 		return this->value <= other.value;
+	}
+
+	constexpr bool operator <=(const int other) const
+	{
+		return *this < other || *this == other;
 	}
 
 	constexpr bool operator >(const fractional_int<N> &other) const
