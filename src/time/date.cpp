@@ -28,7 +28,7 @@
 
 #include "time/date.h"
 
-#include "game.h"
+#include "game/game.h"
 #include "player/civilization.h"
 #include "player/player.h"
 #include "time/calendar.h"

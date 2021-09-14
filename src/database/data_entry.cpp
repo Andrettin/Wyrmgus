@@ -31,7 +31,7 @@
 #include "database/data_entry_history.h"
 #include "database/database.h"
 #include "engine_interface.h"
-#include "game.h"
+#include "game/game.h"
 #include "quest/campaign.h"
 #include "time/calendar.h"
 #include "time/timeline.h"

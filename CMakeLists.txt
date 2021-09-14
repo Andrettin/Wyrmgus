@@ -734,6 +734,7 @@ set(wyrmgus_economy_HDRS
 
 set(wyrmgus_game_HDRS
 	src/game/difficulty.h
+	src/game/game.h
 	src/game/results_info.h
 )
 
@@ -1113,7 +1114,6 @@ set(wyrmgus_generic_HDRS
 	src/include/currency.h
 	src/include/data_type.h
 	src/include/editor.h
-	src/include/game.h
 	src/include/grand_strategy.h
 	src/include/iocompat.h
 	src/include/iolib.h

@@ -30,7 +30,7 @@
 
 #include "config.h"
 #include "database/preferences.h"
-#include "game.h"
+#include "game/game.h"
 #include "map/map_template.h"
 #include "player/civilization.h"
 #include "player/faction.h"

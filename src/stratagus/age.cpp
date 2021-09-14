@@ -30,7 +30,7 @@
 
 #include "config.h"
 #include "database/defines.h"
-#include "game.h"
+#include "game/game.h"
 #include "mod.h"
 #include "player/player.h"
 #include "script/condition/and_condition.h"

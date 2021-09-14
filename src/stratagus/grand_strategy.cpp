@@ -30,7 +30,7 @@
 
 #include "character.h"
 #include "database/defines.h"
-#include "game.h" //for loading screen elements
+#include "game/game.h" //for loading screen elements
 #include "gender.h"
 #include "iolib.h"
 #include "luacallback.h"

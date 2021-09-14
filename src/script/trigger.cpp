@@ -30,7 +30,7 @@
 
 #include "config.h"
 #include "engine_interface.h"
-#include "game.h"
+#include "game/game.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "luacallback.h"

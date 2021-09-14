@@ -42,7 +42,7 @@
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "economy/resource.h"
-#include "game.h"
+#include "game/game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end

@@ -27,7 +27,7 @@
 #pragma once
 
 #include "dialogue.h"
-#include "game.h"
+#include "game/game.h"
 #include "script/effect/delayed_effect_instance.h"
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"

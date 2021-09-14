@@ -36,7 +36,7 @@
 #include "ai/ai_force_template.h"
 #include "ai/ai_force_type.h"
 #include "commands.h"
-#include "game.h"
+#include "game/game.h"
 #include "map/landmass.h"
 #include "map/map.h"
 #include "map/map_info.h"

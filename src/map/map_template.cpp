@@ -33,7 +33,7 @@
 #include "config.h"
 #include "database/defines.h"
 #include "editor.h"
-#include "game.h"
+#include "game/game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "item/unique_item.h"

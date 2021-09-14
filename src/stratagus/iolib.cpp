@@ -32,7 +32,7 @@
 #include "iolib.h"
 
 #include "database/database.h"
-#include "game.h"
+#include "game/game.h"
 #include "iocompat.h"
 #include "map/map.h"
 #include "parameters.h"

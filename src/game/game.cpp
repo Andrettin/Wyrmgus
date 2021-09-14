@@ -29,7 +29,7 @@
 
 #include "stratagus.h"
 
-#include "game.h"
+#include "game/game.h"
 
 #include "actions.h"
 #include "age.h"

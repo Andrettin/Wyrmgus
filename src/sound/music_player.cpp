@@ -29,7 +29,7 @@
 #include "sound/music_player.h"
 
 #include "database/preferences.h"
-#include "game.h"
+#include "game/game.h"
 #include "player/player.h"
 #include "script/condition/and_condition.h"
 #include "sound/music.h"

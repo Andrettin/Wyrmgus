@@ -28,8 +28,8 @@
 
 #include "quest/quest.h"
 
-#include "game.h"
 #include "game/difficulty.h"
+#include "game/game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "luacallback.h"

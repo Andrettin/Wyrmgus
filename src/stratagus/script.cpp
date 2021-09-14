@@ -40,7 +40,7 @@
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
-#include "game.h"
+#include "game/game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end

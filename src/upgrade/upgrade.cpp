@@ -44,7 +44,7 @@
 #include "database/defines.h"
 //Wyrmgus start
 #include "editor.h"
-#include "game.h"
+#include "game/game.h"
 //Wyrmgus end
 #include "gender.h"
 #include "iolib.h"

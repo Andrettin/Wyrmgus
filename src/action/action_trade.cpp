@@ -33,7 +33,7 @@
 #include "commands.h"
 #include "database/defines.h"
 #include "database/preferences.h"
-#include "game.h"
+#include "game/game.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "map/map_layer.h"

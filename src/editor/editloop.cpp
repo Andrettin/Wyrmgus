@@ -33,7 +33,7 @@
 #include "commands.h"
 #include "database/defines.h"
 #include "engine_interface.h"
-#include "game.h"
+#include "game/game.h"
 #include "guichan.h"
 #include "iocompat.h"
 #include "iolib.h"

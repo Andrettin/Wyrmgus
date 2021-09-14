@@ -30,7 +30,7 @@
 
 #include "actions.h"
 #include "commands.h"
-#include "game.h"
+#include "game/game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"

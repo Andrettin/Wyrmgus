@@ -35,7 +35,7 @@
 //Wyrmgus end
 #include "database/defines.h"
 #include "database/preferences.h"
-#include "game.h"
+#include "game/game.h"
 #include "iolib.h"
 #include "item/persistent_item.h"
 #include "luacallback.h"

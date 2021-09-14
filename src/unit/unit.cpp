@@ -43,7 +43,7 @@
 #include "commands.h"
 #include "database/defines.h"
 #include "economy/resource_storage_type.h"
-#include "game.h"
+#include "game/game.h"
 #include "gender.h"
 #include "editor.h"
 //Wyrmgus start

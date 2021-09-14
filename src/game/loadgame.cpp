@@ -32,7 +32,7 @@
 #include "currency.h"
 #include "database/database.h"
 #include "dialogue.h"
-#include "game.h"
+#include "game/game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end

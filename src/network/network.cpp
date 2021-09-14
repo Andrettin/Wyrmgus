@@ -215,7 +215,7 @@
 #include "actions.h"
 #include "commands.h"
 #include "database/preferences.h"
-#include "game.h"
+#include "game/game.h"
 #include "map/map.h"
 #include "net_lowlevel.h"
 #include "net_message.h"

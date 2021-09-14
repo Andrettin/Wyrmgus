@@ -31,7 +31,7 @@
 
 #include "ai/ai_local.h"
 #include "commands.h"
-#include "game.h"
+#include "game/game.h"
 #include "player/player.h"
 #include "script.h"
 #include "spell/spell.h"

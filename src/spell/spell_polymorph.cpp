@@ -33,7 +33,7 @@
 #include "action/action_upgradeto.h"
 #include "character.h"
 //Wyrmgus end
-#include "game.h"
+#include "game/game.h"
 #include "map/map.h"
 //Wyrmgus start
 #include "network.h"

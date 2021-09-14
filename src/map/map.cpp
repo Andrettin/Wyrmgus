@@ -34,7 +34,7 @@
 #include "database/sml_parser.h"
 //Wyrmgus start
 #include "editor.h"
-#include "game.h" // for the SaveGameLoading variable
+#include "game/game.h" // for the SaveGameLoading variable
 //Wyrmgus end
 #include "iolib.h"
 #include "map/landmass.h"

@@ -35,7 +35,7 @@
 #include "database/defines.h"
 #include "database/preferences.h"
 //Wyrmgus start
-#include "game.h"
+#include "game/game.h"
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"

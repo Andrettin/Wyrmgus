@@ -32,7 +32,7 @@
 #include "character_history.h"
 #include "config.h"
 #include "engine_interface.h"
-#include "game.h"
+#include "game/game.h"
 #include "gender.h"
 #include "iocompat.h"
 #include "iolib.h"

@@ -31,7 +31,7 @@
 #include "animation.h"
 #include "character.h"
 #include "currency.h"
-#include "game.h"
+#include "game/game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map_template.h"

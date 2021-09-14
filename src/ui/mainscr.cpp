@@ -41,7 +41,7 @@
 #include "database/preferences.h"
 #include "economy/resource_storage_type.h"
 #include "engine_interface.h"
-#include "game.h"
+#include "game/game.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"

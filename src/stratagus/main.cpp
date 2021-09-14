@@ -31,7 +31,7 @@
 #include "database/preferences.h"
 #include "editor.h"
 #include "engine_interface.h"
-#include "game.h"
+#include "game/game.h"
 #include "game/results_info.h"
 #include "map/map_grid_model.h"
 #include "map/tile_image_provider.h"

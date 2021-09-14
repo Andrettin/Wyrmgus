@@ -42,7 +42,7 @@
 #include "editor.h"
 #include "engine_interface.h"
 //Wyrmgus start
-#include "game.h"
+#include "game/game.h"
 //Wyrmgus end
 #include "game/difficulty.h"
 #include "gender.h"

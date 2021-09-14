@@ -34,7 +34,7 @@
 #include "animation.h"
 #include "economy/resource_storage_type.h"
 //Wyrmgus start
-#include "game.h"
+#include "game/game.h"
 //Wyrmgus end
 #include "iolib.h"
 #include "item/item_slot.h"

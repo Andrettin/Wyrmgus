@@ -171,7 +171,7 @@ extern void beos_init(int argc, char **argv);
 #include "database/database.h"
 #include "database/preferences.h"
 #include "editor.h"
-#include "game.h"
+#include "game/game.h"
 #include "guichan.h"
 #include "iocompat.h"
 #include "iolib.h"
