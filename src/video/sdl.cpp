@@ -427,7 +427,7 @@ int PollEvent()
 {
 	SDL_Event event;
 	if (SDL_PollEvent(&event)) { // Handle SDL event
-		SdlDoEvent(*GetCallbacks(), event, 0);
+		SdlDoEvent(*GetCallbacks(), event, Qt::KeyboardModifiers());
 		return 1;
 	}
 

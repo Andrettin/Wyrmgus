@@ -54,7 +54,12 @@ class game final : public QObject, public singleton<game>
 	Q_PROPERTY(wyrmgus::results_info* results READ get_results NOTIFY results_changed)
 
 public:
-	static inline const QDateTime base_date = QDateTime(QDate(-100000, 1, 1)); //100,000 BC; base date from which to calculate the current total hours from the base date
+	//100,000 BC; base date from which to calculate the current total hours from the base date
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	static inline const QDateTime base_date = QDateTime(QDate(-100000, 1, 1).startOfDay(Qt::UTC));
+#else
+	static inline const QDateTime base_date = QDateTime(QDate(-100000, 1, 1));
+#endif
 
 	game();
 	~game();
