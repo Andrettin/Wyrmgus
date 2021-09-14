@@ -34,6 +34,7 @@
 #include "commands.h"
 #include "database/defines.h"
 #include "database/preferences.h"
+#include "engine_interface.h"
 //Wyrmgus start
 #include "game/game.h"
 //Wyrmgus end
@@ -1245,7 +1246,9 @@ void HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers k
 	// Command line input: for message or cheat
 	unsigned kp = 0;
 	if (game::get()->is_console_active() && (keychar || IsKeyPad(key, &kp))) {
-		InputKey(kp ? kp : keychar);
+		if (!engine_interface::get()->is_modal_dialog_open()) {
+			InputKey(kp ? kp : keychar);
+		}
 	} else {
 		// If no modifier look if button bound
 		if (!(key_modifiers & (Qt::ControlModifier | Qt::AltModifier))) {
@@ -1255,6 +1258,7 @@ void HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers k
 				}
 			}
 		}
+
 		CommandKey(key, key_modifiers);
 	}
 }
