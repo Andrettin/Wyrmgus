@@ -51,6 +51,7 @@ class game final : public QObject, public singleton<game>
 	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign WRITE set_current_campaign)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 	Q_PROPERTY(bool multiplayer READ is_multiplayer NOTIFY multiplayer_changed)
+	Q_PROPERTY(bool console_active READ is_console_active_sync NOTIFY console_active_changed)
 	Q_PROPERTY(wyrmgus::results_info* results READ get_results NOTIFY results_changed)
 
 public:
@@ -190,6 +191,31 @@ public:
 		return this->results.get();
 	}
 
+	bool is_console_active() const
+	{
+		return this->console_active;
+	}
+
+	bool is_console_active_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->is_console_active();
+	}
+
+	void set_console_active(const bool active)
+	{
+		if (active == this->is_console_active()) {
+			return;
+		}
+
+		std::unique_lock<std::shared_mutex> lock(this->mutex);
+
+		this->console_active = active;
+
+		emit console_active_changed();
+	}
+
 	void set_results(qunique_ptr<results_info> &&results);
 	void store_results();
 	void clear_results();
@@ -199,6 +225,7 @@ signals:
 	void stopped();
 	void running_changed();
 	void multiplayer_changed();
+	void console_active_changed();
 	void results_changed();
 
 private:
@@ -211,7 +238,9 @@ private:
 	std::vector<std::unique_ptr<trigger>> local_triggers; //triggers "local" to the current game
 	std::vector<std::unique_ptr<delayed_effect_instance<CPlayer>>> player_delayed_effects;
 	std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> unit_delayed_effects;
+	bool console_active = false;
 	qunique_ptr<results_info> results;
+	mutable std::shared_mutex mutex;
 };
 
 }

@@ -44,10 +44,10 @@ public:
 
 	void Draw(std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawCosts(std::vector<std::function<void(renderer *)>> &render_commands);
-	void Set(const std::string &status);
+	void Set(const std::string &status, const bool is_input = false);
 	void SetCosts(int mana, int food, const int *costs);
 	const std::string &Get() const { return this->StatusLine; }
-	void Clear();
+	void Clear(const bool is_input = false);
 	void ClearCosts();
 
 public:

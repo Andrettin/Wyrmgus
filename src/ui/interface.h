@@ -71,12 +71,6 @@ enum class interface_state {
 	menu     /// Menu active
 };
 
-/// current key state
-enum _key_state_ {
-	KeyStateCommand = 0,  /// keys -> commands
-	KeyStateInput         /// keys -> line editor
-};                        /// current keyboard state
-
 /// Key modifier
 constexpr int ModifierDoublePress = 16; /// key double pressed
 
@@ -152,7 +146,6 @@ extern int KeyScrollState;
 /// current scroll state of mouse
 extern int MouseScrollState;
 /// current key state
-extern enum _key_state_ KeyState;
 /// shared pointer to unit under the cursor
 extern CUnit *UnitUnderCursor;
 /// button area under the cursor

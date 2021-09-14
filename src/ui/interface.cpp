@@ -99,7 +99,6 @@ bool GameEstablishing;							/// Game establishing mode
 char SkipGameCycle;								/// Skip the next game cycle
 enum interface_state current_interface_state;	/// Current interface state
 bool GodMode;									/// Invincibility cheat
-enum _key_state_ KeyState;						/// current key state
 CUnit *LastIdleWorker;							/// Last called idle worker
 //Wyrmgus start
 CUnit *LastLevelUpUnit;							/// Last called level up unit
@@ -118,10 +117,9 @@ static void ShowInput()
 	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {
 		++input;
 	}
-	KeyState = KeyStateCommand;
-	UI.StatusLine.Clear();
-	UI.StatusLine.Set(input);
-	KeyState = KeyStateInput;
+
+	UI.StatusLine.Clear(true);
+	UI.StatusLine.Set(input, true);
 }
 
 /**
@@ -129,7 +127,8 @@ static void ShowInput()
 */
 static void UiBeginInput()
 {
-	KeyState = KeyStateInput;
+	game::get()->set_console_active(true);
+
 	message_input[0] = '\0';
 	InputIndex = 0;
 	UI.StatusLine.ClearCosts();
@@ -1038,7 +1037,7 @@ static int InputKey(int key)
 		}
 	// FALL THROUGH
 		case SDLK_ESCAPE:
-			KeyState = KeyStateCommand;
+			game::get()->set_console_active(false);
 			UI.StatusLine.Clear();
 			return 1;
 
@@ -1245,7 +1244,7 @@ void HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers k
 
 	// Command line input: for message or cheat
 	unsigned kp = 0;
-	if (KeyState == KeyStateInput && (keychar || IsKeyPad(key, &kp))) {
+	if (game::get()->is_console_active() && (keychar || IsKeyPad(key, &kp))) {
 		InputKey(kp ? kp : keychar);
 	} else {
 		// If no modifier look if button bound
@@ -1307,7 +1306,7 @@ void HandleKeyRepeat(unsigned, unsigned keychar, const Qt::KeyboardModifiers key
 {
 	Q_UNUSED(key_modifiers)
 
-	if (KeyState == KeyStateInput && keychar) {
+	if (game::get()->is_console_active() && keychar) {
 		InputKey(keychar);
 	}
 }

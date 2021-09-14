@@ -31,6 +31,7 @@
 #include "ui/statusline.h"
 
 #include "database/defines.h"
+#include "game/game.h"
 #include "ui/interface.h"
 #include "ui/resource_icon.h"
 #include "ui/ui.h"
@@ -53,11 +54,13 @@ void CStatusLine::Draw(std::vector<std::function<void(renderer *)>> &render_comm
 **
 **  @param status  New status line information.
 */
-void CStatusLine::Set(const std::string &status)
+void CStatusLine::Set(const std::string &status, const bool is_input)
 {
-	if (KeyState != KeyStateInput) {
-		this->StatusLine = status;
+	if (game::get()->is_console_active() && !is_input) {
+		return;
 	}
+
+	this->StatusLine = status;
 }
 
 /**
@@ -133,9 +136,11 @@ void CStatusLine::DrawCosts(std::vector<std::function<void(renderer *)>> &render
 	}
 }
 
-void CStatusLine::Clear()
+void CStatusLine::Clear(const bool is_input)
 {
-	if (KeyState != KeyStateInput) {
-		this->StatusLine.clear();
+	if (game::get()->is_console_active() && !is_input) {
+		return;
 	}
+
+	this->StatusLine.clear();
 }

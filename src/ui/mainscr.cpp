@@ -1040,8 +1040,8 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
 			if (ButtonAreaUnderCursor == ButtonAreaButton &&
 				//Wyrmgus start
-	//			ButtonUnderCursor == i && KeyState != KeyStateInput) {
-				ButtonUnderCursor == i && KeyState != KeyStateInput
+	//			ButtonUnderCursor == i && !game::get()->is_console_active()) {
+				ButtonUnderCursor == i && !game::get()->is_console_active()
 				&& CurrentButtons[i]->get_level() == CurrentButtonLevel && IsButtonAllowed(*Selected[0], *CurrentButtons[i])) {
 				//Wyrmgus end
 					DrawPopup(*CurrentButtons[i], UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y, render_commands);
