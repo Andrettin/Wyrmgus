@@ -128,9 +128,6 @@ extern int SyncRand(int max);
 extern bool CanAccessFile(const char *filename);
 void Exit(int err);
 
-$extern std::string CliMapName;
-extern std::string CliMapName;
-
 //Wyrmgus start
 extern std::string GetPluralForm(std::string name);
 extern std::string NameToIdent(std::string text);

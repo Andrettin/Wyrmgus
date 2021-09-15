@@ -46,6 +46,7 @@
 #include "missile.h"
 #include "particle.h"
 #include "pathfinder.h"
+#include "player/player.h"
 #include "quest/quest.h"
 #include "replay.h"
 #include "script.h"
@@ -69,6 +70,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/log_util.h"
+#include "util/path_util.h"
 #include "util/random.h"
 #include "video/font.h"
 #include "video/video.h"
@@ -253,7 +255,7 @@ static void PlaceUnits()
 **
 **  @param filename  File name to be loaded.
 */
-void LoadGame(const std::string &filename)
+void LoadGame(const std::filesystem::path &filepath)
 {
 	//Wyrmgus start
 	CleanPlayers(); //clean players, as they may not have been cleansed after a scenario
@@ -272,7 +274,7 @@ void LoadGame(const std::string &filename)
 	//Wyrmgus start
 	CalculateItemsToLoad();
 	//Wyrmgus end
-	LuaLoadFile(filename);
+	LuaLoadFile(path::to_string(filepath));
 	LuaGarbageCollect();
 
 	//clear the base reference for destroyed units

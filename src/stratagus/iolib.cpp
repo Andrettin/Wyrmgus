@@ -39,6 +39,7 @@
 //Wyrmgus start
 #include "script.h"
 //Wyrmgus end
+#include "util/path_util.h"
 #include "util/util.h"
 
 #ifdef USE_ZLIB
@@ -462,8 +463,10 @@ static void LibraryFileName(const char *file, std::array<char, PATH_MAX> &buffer
 
 	// Try in map directory
 	if (!CurrentMapPath.empty()) {
-		if (CurrentMapPath.front() == '.' || CurrentMapPath.front() == '/') {
-			strcpy_s(buffer.data(), PATH_MAX, CurrentMapPath.c_str());
+		const std::string current_map_path_str = path::to_string(CurrentMapPath);
+
+		if (current_map_path_str.front() == '.' || current_map_path_str.front() == '/') {
+			strcpy_s(buffer.data(), PATH_MAX, current_map_path_str.c_str());
 			char *s = strrchr(buffer.data(), '/');
 			if (s) {
 				s[1] = '\0';
@@ -474,7 +477,7 @@ static void LibraryFileName(const char *file, std::array<char, PATH_MAX> &buffer
 			if (buffer.front() != 0) {
 				strcat_s(buffer.data(), PATH_MAX, "/");
 			}
-			strcat_s(buffer.data(), PATH_MAX, CurrentMapPath.c_str());
+			strcat_s(buffer.data(), PATH_MAX, current_map_path_str.c_str());
 			char *s = strrchr(buffer.data(), '/');
 			if (s) {
 				s[1] = '\0';

@@ -91,6 +91,8 @@
 #include "script/effect/delayed_effect_instance.h"
 #include "script/trigger.h"
 #include "settings.h"
+#include "sound/music_player.h"
+#include "sound/music_type.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "spell/spell.h"
@@ -109,6 +111,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/date_util.h"
+#include "util/path_util.h"
 #include "util/random.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
@@ -121,8 +124,6 @@
 #include "video/font.h"
 #include "video/video.h"
 #include "widgets.h"
-
-extern void CleanGame();
 
 Settings GameSettings;					/// Game Settings
 static int LcmPreventRecurse;			/// prevent recursion through LoadGameMap
@@ -151,6 +152,35 @@ game::game()
 
 game::~game()
 {
+}
+
+void game::run_map(const std::filesystem::path &filepath)
+{
+	CclCommand("if (LoadedGame == false) then ClearPlayerDataObjectives(); SetDefaultPlayerDataObjectives(); end");
+
+	while (true) {
+		music_player::get()->play_music_type(music_type::loading);
+
+		CclCommand("InitGameVariables();");
+
+		StartMap(filepath, true);
+
+		if (GameResult != GameRestart) {
+			break;
+		}
+	}
+
+	GameSettings.reset();
+
+	this->set_current_campaign(nullptr);
+	CurrentQuest = nullptr;
+}
+
+void game::run_map_async(const QString &filepath)
+{
+	engine_interface::get()->post([this, filepath]() {
+		this->run_map(path::from_qstring(filepath));
+	});
 }
 
 void game::apply_player_history()
@@ -387,7 +417,12 @@ void SaveGameSettings(CFile &file)
 	file.printf("\n");
 }
 
-void StartMap(const std::string &filename, bool clean)
+void RunMap(const std::string &filepath)
+{
+	game::get()->run_map(path::from_string(filepath));
+}
+
+void StartMap(const std::filesystem::path &filepath, const bool clean)
 {
 	try {
 		std::string nc, rc;
@@ -406,7 +441,7 @@ void StartMap(const std::string &filename, bool clean)
 		current_interface_state = interface_state::normal;
 
 		//  Create the game.
-		DebugPrint("Creating game with map: %s\n" _C_ filename.c_str());
+		DebugPrint("Creating game with map: %s\n" _C_ path::to_string(filepath).c_str());
 		if (clean) {
 			CleanPlayers();
 		}
@@ -414,14 +449,10 @@ void StartMap(const std::string &filename, bool clean)
 		//Wyrmgus start
 		GameEstablishing = true;
 		//Wyrmgus end
-		CreateGame(filename, CMap::get());
+		CreateGame(filepath, CMap::get());
 
 		//Wyrmgus start
 	//	UI.StatusLine.Set(NameLine);
-		//Wyrmgus end
-		//Wyrmgus start
-		//commented this out because it seemed superfluous
-	//	SetMessage("%s", _("Do it! Do it now!"));
 		//Wyrmgus end
 
 		//update the quest pool for all players
@@ -448,7 +479,7 @@ void StartMap(const std::string &filename, bool clean)
 		Gui->setTop(oldTop);
 		vector::remove(Containers, container);
 	} catch (...) {
-		std::throw_with_nested(std::runtime_error("Error running map."));
+		std::throw_with_nested(std::runtime_error("Error running map \"" + path::to_string(filepath) + "\"."));
 	}
 }
 
@@ -468,50 +499,9 @@ void FreeAllContainers()
 **  @param mapname  map filename
 **  @param map      map loaded
 */
-static void LoadStratagusMap(const std::string &smpname, const std::string &mapname)
+static void LoadStratagusMap(const std::filesystem::path &smp_path, const std::filesystem::path &map_path)
 {
-	char mapfull[PATH_MAX];
 	CFile file;
-
-	// Try the same directory as the smp file first
-	strcpy_s(mapfull, sizeof(mapfull), smpname.c_str());
-	char *p = strrchr(mapfull, '/');
-	if (!p) {
-		p = mapfull;
-	} else {
-		++p;
-	}
-	strcpy_s(p, sizeof(mapfull) - (p - mapfull), mapname.c_str());
-
-	if (file.open(mapfull, CL_OPEN_READ) == -1) {
-		// Not found, try the root path and the smp's dir
-		strcpy_s(mapfull, sizeof(mapfull), database::get()->get_root_path().string().c_str());
-		strcat_s(mapfull, sizeof(mapfull), "/");
-		strcat_s(mapfull, sizeof(mapfull), smpname.c_str());
-		char *p2 = strrchr(mapfull, '/');
-		if (!p2) {
-			p2 = mapfull;
-		} else {
-			++p2;
-		}
-		strcpy_s(p2, sizeof(mapfull) - (p2 - mapfull), mapname.c_str());
-		if (file.open(mapfull, CL_OPEN_READ) == -1) {
-			// Not found again, try the root path
-			strcpy_s(mapfull, sizeof(mapfull), database::get()->get_root_path().string().c_str());
-			strcat_s(mapfull, sizeof(mapfull), "/");
-			strcat_s(mapfull, sizeof(mapfull), mapname.c_str());
-			if (file.open(mapfull, CL_OPEN_READ) == -1) {
-				// Not found, try mapname by itself as a last resort
-				strcpy_s(mapfull, sizeof(mapfull), mapname.c_str());
-			} else {
-				file.close();
-			}
-		} else {
-			file.close();
-		}
-	} else {
-		file.close();
-	}
 
 	if (LcmPreventRecurse) {
 		throw std::runtime_error("Recursive use of load map!");
@@ -520,8 +510,8 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 	InitPlayers();
 
 	LcmPreventRecurse = 1;
-	if (LuaLoadFile(mapfull) == -1) {
-		throw std::runtime_error("Can't load lua file: " + std::string(mapfull));
+	if (LuaLoadFile(map_path.string().c_str()) == -1) {
+		throw std::runtime_error("Can't load lua file: \"" + path::to_string(map_path) + "\".");
 	}
 	LcmPreventRecurse = 0;
 
@@ -533,10 +523,10 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 #endif
 
 	if (!CMap::get()->Info->MapWidth || !CMap::get()->Info->MapHeight) {
-		throw std::runtime_error(mapname + ": invalid map");
+		throw std::runtime_error(path::to_string(map_path) + ": invalid map");
 	}
 
-	CMap::get()->Info->set_presentation_filepath(smpname);
+	CMap::get()->Info->set_presentation_filepath(smp_path);
 }
 
 // Write the map presentation file
@@ -1109,32 +1099,21 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, const int writeTerra
 **  @param filename  map filename
 **  @param map       map loaded
 */
-static void LoadMap(const std::string &filename, CMap &map)
+static void LoadMap(const std::filesystem::path &filepath, CMap &map)
 {
-	const char *name = filename.c_str();
-	const char *tmp = strrchr(name, '.');
-	if (tmp) {
+	if (filepath.extension() == ".smp"
 #ifdef USE_ZLIB
-		if (!strcmp(tmp, ".gz")) {
-			while (tmp - 1 > name && *--tmp != '.') {
-			}
-		}
+		|| filepath.string().ends_with(".smp.gz")
 #endif
-
-		if (!strcmp(tmp, ".smp")
-#ifdef USE_ZLIB
-			|| !strcmp(tmp, ".smp.gz")
-#endif
-		   ) {
-			if (map.Info->get_setup_filepath().empty()) {
-				// The map info hasn't been loaded yet => do it now
-				LoadStratagusMapInfo(filename);
-			}
-			Assert(!map.Info->get_setup_filepath().empty());
-			map.Create();
-			LoadStratagusMap(filename, map.Info->get_setup_filepath().string());
-			return;
+	) {
+		if (map.Info->get_setup_filepath().empty()) {
+			// The map info hasn't been loaded yet => do it now
+			LoadStratagusMapInfo(filepath);
 		}
+		Assert(!map.Info->get_setup_filepath().empty());
+		map.Create();
+		LoadStratagusMap(filepath, map.Info->get_setup_filepath());
+		return;
 	}
 
 	throw std::runtime_error("Unrecognized map format.");
@@ -1428,7 +1407,7 @@ void Settings::reset()
 **
 **  @todo FIXME: use in this function InitModules / LoadModules!!!
 */
-void CreateGame(const std::string &filename, CMap *map)
+void CreateGame(const std::filesystem::path &filepath, CMap *map)
 {
 	if (SaveGameLoading) {
 		SaveGameLoading = false;
@@ -1466,10 +1445,10 @@ void CreateGame(const std::string &filename, CMap *map)
 	age::current_age = nullptr;
 	//Wyrmgus end
 
-	if (CMap::get()->Info->get_presentation_filepath().empty() && !filename.empty()) {
-		const std::string path = LibraryFileName(filename.c_str());
+	if (CMap::get()->Info->get_presentation_filepath().empty() && !filepath.empty()) {
+		const std::string path = LibraryFileName(path::to_string(filepath).c_str());
 
-		if (strcasestr(filename.c_str(), ".smp")) {
+		if (filepath.extension() == ".smp") {
 			LuaLoadFile(path);
 		}
 	}
@@ -1487,16 +1466,16 @@ void CreateGame(const std::string &filename, CMap *map)
 	CalculateItemsToLoad();
 	//Wyrmgus end
 
-	if (!filename.empty()) {
-		if (CurrentMapPath != filename) {
-			CurrentMapPath = filename;
+	if (!filepath.empty()) {
+		if (CurrentMapPath != filepath) {
+			CurrentMapPath = filepath;
 		}
 
 		//
 		// Load the map.
 		//
 		InitUnitTypes(1);
-		LoadMap(filename, *map);
+		LoadMap(filepath, *map);
 		//Wyrmgus end
 		ApplyUpgrades();
 	}
@@ -2049,10 +2028,9 @@ static int CclSavedGameInfo(lua_State *l)
 
 		if (!strcmp(value, "SaveFile")) {
 			CurrentMapPath = LuaToString(l, -1);
-			std::string buf = database::get()->get_root_path().string();
-			buf += "/";
-			buf += LuaToString(l, -1);
-			if (LuaLoadFile(buf) == -1) {
+			std::filesystem::path path = database::get()->get_root_path();
+			path /= LuaToString(l, -1);
+			if (LuaLoadFile(path::to_string(path)) == -1) {
 				DebugPrint("Load failed: %s\n" _C_ value);
 			}
 		} else if (!strcmp(value, "SyncHash")) {

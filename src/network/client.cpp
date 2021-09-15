@@ -549,8 +549,8 @@ void CClient::Parse_Map(const unsigned char *buf)
 		return;
 	}
 	NetworkMapName = std::string(msg.MapPath, sizeof(msg.MapPath));
-	const std::string mappath = database::get()->get_root_path().string() + "/" + NetworkMapName;
-	LoadStratagusMapInfo(mappath);
+	const std::filesystem::path map_path = database::get()->get_root_path() / NetworkMapName;
+	LoadStratagusMapInfo(map_path);
 	if (msg.MapUID != CMap::get()->Info->MapUID) {
 		networkState.State = ccs_badmap;
 		fprintf(stderr, "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",

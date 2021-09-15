@@ -117,6 +117,6 @@ enum GameTypes {
 extern Settings GameSettings;  /// Game settings
 
 /// Create a game
-extern void CreateGame(const std::string &filename, CMap *map);
+extern void CreateGame(const std::filesystem::path &filepath, CMap *map);
 /// Init Setting to default values
 extern void InitSettings();

@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name editor.h - The editor file. */
-//
-//      (c) Copyright 2002-2006 by Lutz Sammer
+//      (c) Copyright 2002-2021 by Lutz Sammer and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -55,6 +53,10 @@ class CEditor final : public QObject, public singleton<CEditor>
 
 public:
 	CEditor();
+
+	void start(const std::filesystem::path &filepath);
+
+	Q_INVOKABLE void start_async(const QString &filepath);
 
 	void Init();
 
@@ -117,9 +119,6 @@ public:
 };
 
 extern char TileToolRandom;
-
-/// Start the editor
-extern void StartEditor(const std::string &filename);
 
 /// Editor main event loop
 extern void EditorMainLoop();

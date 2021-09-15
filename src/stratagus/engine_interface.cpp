@@ -150,11 +150,7 @@ QString engine_interface::get_user_maps_path() const
 void engine_interface::call_lua_command(const QString &command)
 {
 	this->post([command]() {
-		try {
-			CclCommand(command.toStdString());
-		} catch (const std::exception &exception) {
-			exception::report(exception);
-		}
+		CclCommand(command.toStdString());
 	});
 }
 
@@ -598,17 +594,13 @@ void engine_interface::set_modal_dialog_open_async(const bool value)
 
 void engine_interface::load_game(const QString &filepath)
 {
-	this->load_game_deferred(filepath.toStdString());
+	this->load_game_deferred(path::from_qstring(filepath));
 }
 
-void engine_interface::load_game_deferred(const std::string &filepath)
+void engine_interface::load_game_deferred(const std::filesystem::path &filepath)
 {
 	this->post([filepath]() {
-		try {
-			::load_game(filepath);
-		} catch (const std::exception &exception) {
-			exception::report(exception);
-		}
+		::load_game(filepath);
 	});
 }
 

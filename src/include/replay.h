@@ -28,10 +28,6 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 enum ReplayType {
 	ReplayNone,          /// No replay
 	ReplaySinglePlayer,  /// Single player replay
@@ -41,16 +37,8 @@ enum ReplayType {
 class CFile;
 class CUnit;
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern bool CommandLogDisabled;    /// True, if command log is off
 extern ReplayType ReplayGameType;  /// Replay game type
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Log commands into file
 extern void CommandLog(const char *action, const CUnit *unit, int flush,
@@ -60,12 +48,15 @@ extern void SinglePlayerReplayEachCycle();
 /// Replay user commands from log each cycle, multiplayer games
 extern void MultiPlayerReplayEachCycle();
 /// Load replay
-extern int LoadReplay(const std::string &name);
+extern int LoadReplay(const std::filesystem::path &filepath);
 /// End logging
 extern void EndReplayLog();
 /// Clean replay
 extern void CleanReplayLog();
 /// Save the replay list to file
 extern void SaveReplayList(CFile &file);
+
+extern void StartReplay(const std::filesystem::path &filepath, const bool reveal);
+
 /// Register ccl functions related to network
 extern void ReplayCclRegister();

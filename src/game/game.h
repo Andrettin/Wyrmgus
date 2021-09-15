@@ -144,6 +144,9 @@ public:
 		++this->current_total_hours;
 	}
 
+	void run_map(const std::filesystem::path &filepath);
+	Q_INVOKABLE void run_map_async(const QString &filepath);
+
 	void apply_player_history();
 
 	void do_cycle();
@@ -252,12 +255,12 @@ class CGraphic;
 
 extern void load_game_data(const std::string &sml_string);
 
-extern void LoadGame(const std::string &filename); /// Load saved game
+extern void LoadGame(const std::filesystem::path &filepath); /// Load saved game
 extern int SaveGame(const std::string &filepath_str); /// Save game
-extern void StartSavedGame(const std::string &filename);
-extern void load_game(const std::string &filename);
-extern void set_load_game_file(const std::string &filename);
-extern std::string load_game_file;
+extern void StartSavedGame(const std::filesystem::path &filepath);
+extern void load_game(const std::filesystem::path &filepath);
+extern void set_load_game_file(const std::filesystem::path &filepath);
+extern std::filesystem::path load_game_file;
 extern bool SaveGameLoading;                 /// Save game is in progress of loading
 
 extern void InitModules();              /// Initialize all modules
@@ -269,6 +272,9 @@ extern void FreeAllContainers();
 
 extern void SaveGameSettings(CFile &file);             /// Save game settings
 
+extern void RunMap(const std::string &filepath);
+extern void StartMap(const std::filesystem::path &filepath, const bool clean);
+
 extern std::string GameName;                /// Name of the game
 extern std::string FullGameName;            /// Full Name of the game
 
@@ -277,3 +283,5 @@ extern bool UseHPForXp;                     /// true if gain XP by dealing damag
 //Wyrmgus start
 extern bool DefiningData;
 //Wyrmgus end
+
+extern void CleanGame();

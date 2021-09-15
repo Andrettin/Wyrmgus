@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name editor.cpp - Editor functions. */
-//
-//      (c) Copyright 2002-2005 by Lutz Sammer
+//      (c) Copyright 2002-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,10 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-
-//----------------------------------------------------------------------------
-//  Documentation
-//----------------------------------------------------------------------------
 
 /**
 **  @page EditorModule Module - Editor
@@ -53,10 +47,63 @@
 #include "editor.h"
 
 #include "engine_interface.h"
+#include "game/game.h"
+#include "map/map.h"
 #include "player/player.h"
+#include "util/path_util.h"
+#include "video/video.h"
 
 CEditor::CEditor() : SelectedPlayer(PlayerNumNeutral)
 {
+}
+
+/**
+**  Start the editor
+**
+**  @param filename  Map to load, null to create a new map
+*/
+void CEditor::start(const std::filesystem::path &filepath)
+{
+	std::string nc, rc;
+
+	if (!filepath.empty()) {
+		CurrentMapPath = filepath;
+	} else {
+		// new map, choose some default values
+		CurrentMapPath.clear();
+		// Map.Info.Description.clear();
+		// Map.Info.MapWidth = 64;
+		// Map.Info.MapHeight = 64;
+	}
+
+	//Wyrmgus start
+	if (!TileToolRandom) {
+		TileToolRandom ^= 1;
+	}
+	//Wyrmgus end
+
+	//Wyrmgus start
+	CleanPlayers(); //clean players, as they could not have been cleansed after a scenario
+	//Wyrmgus end
+
+	// Run the editor.
+	EditorMainLoop();
+
+	// Clear screen
+	Video.ClearScreen();
+
+	CEditor::get()->TerrainEditable = true;
+
+	CEditor::get()->ShownTileTypes.clear();
+	CleanGame();
+	CleanPlayers();
+}
+
+void CEditor::start_async(const QString &filepath)
+{
+	engine_interface::get()->post([this, filepath]() {
+		this->start(path::from_qstring(filepath));
+	});
 }
 
 void CEditor::set_running_async(const bool running)

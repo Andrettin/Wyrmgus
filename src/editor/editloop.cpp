@@ -78,7 +78,6 @@
 
 extern void DoScrollArea(int state, bool fast, bool isKeyboard, const Qt::KeyboardModifiers key_modifiers);
 extern void DrawGuichanWidgets(std::vector<std::function<void(renderer *)>> &render_commands);
-extern void CleanGame();
 
 static int IconWidth;                       /// Icon width in panels
 static int IconHeight;                      /// Icon height in panels
@@ -2574,46 +2573,4 @@ void EditorMainLoop()
 	editorSliderListener.reset();
 	editorUnitSlider.reset();
 	editorSlider.reset();
-}
-
-/**
-**  Start the editor
-**
-**  @param filename  Map to load, null to create a new map
-*/
-void StartEditor(const std::string &filename)
-{
-	std::string nc, rc;
-
-	if (!filename.empty()) {
-		CurrentMapPath = filename;
-	} else {
-		// new map, choose some default values
-		CurrentMapPath.clear();
-		// Map.Info.Description.clear();
-		// Map.Info.MapWidth = 64;
-		// Map.Info.MapHeight = 64;
-	}
-
-	//Wyrmgus start
-	if (!TileToolRandom) {
-		TileToolRandom ^= 1;
-	}
-	//Wyrmgus end
-	
-	//Wyrmgus start
-	CleanPlayers(); //clean players, as they could not have been cleansed after a scenario
-	//Wyrmgus end
-	
-	// Run the editor.
-	EditorMainLoop();
-
-	// Clear screen
-	Video.ClearScreen();
-
-	CEditor::get()->TerrainEditable = true;
-
-	CEditor::get()->ShownTileTypes.clear();
-	CleanGame();
-	CleanPlayers();
 }

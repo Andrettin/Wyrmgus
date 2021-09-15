@@ -37,7 +37,6 @@
 
 std::vector<TitleScreen> TitleScreens;			/// Title screens to show at startup
 static bool WaitNoEvent;			/// Flag got an event
-extern std::string CliMapName;
 
 /**
 **  Callback for input.
@@ -157,7 +156,7 @@ void TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &r
 */
 void ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	if (TitleScreens.empty() || !CliMapName.empty()) {
+	if (TitleScreens.empty()) {
 		return;
 	}
 

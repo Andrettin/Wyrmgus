@@ -94,7 +94,7 @@
 
 int FlagRevealMap; //flag must reveal the map
 int ReplayRevealMap; //reveal Map is replay
-std::string CurrentMapPath; //path of the current map
+std::filesystem::path CurrentMapPath; //path of the current map
 
 /*----------------------------------------------------------------------------
 --  Visible and explored handling
@@ -3962,15 +3962,14 @@ void CMap::FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z)
 **
 **  @param mapname  map filename
 */
-void LoadStratagusMapInfo(const std::string &mapname)
+void LoadStratagusMapInfo(const std::filesystem::path &map_path)
 {
 	// Set the default map setup by replacing .smp with .sms
-	size_t loc = mapname.find(".smp");
-	if (loc != std::string::npos) {
-		CMap::get()->Info->set_presentation_filepath(mapname);
+	if (map_path.string().find(".smp") != std::string::npos) {
+		CMap::get()->Info->set_presentation_filepath(map_path);
 	}
 
-	const std::string filename = LibraryFileName(mapname.c_str());
+	const std::string filename = LibraryFileName(map_path.string().c_str());
 	LuaLoadFile(filename);
 }
 

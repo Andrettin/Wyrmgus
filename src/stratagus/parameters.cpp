@@ -38,9 +38,6 @@
 #include <QCommandLineParser>
 #include <QRegularExpression>
 
-/// Filename of the map given on the command line
-std::string CliMapName;
-
 namespace wyrmgus {
 
 void set_retroscale() {
@@ -183,16 +180,6 @@ void parameters::process()
 	if (cmd_parser.isSet("Z")) {
 		ZoomNoResize = 1;
 		set_retroscale();
-	}
-
-	const auto pos_args { cmd_parser.positionalArguments() };
-
-	if (pos_args.length() > 1) {
-		throw std::runtime_error("Too many map files (at most one expected).");
-	}
-	else if (pos_args.length() == 1) {
-		CliMapName = pos_args[0].toStdString();
-		std::replace(CliMapName.begin(), CliMapName.end(), '\\', '/');
 	}
 }
 

@@ -97,11 +97,6 @@ public:
 		this->presentation_filepath = filepath;
 	}
 
-	void set_presentation_filepath(const std::string &filepath)
-	{
-		this->presentation_filepath = filepath;
-	}
-
 	std::filesystem::path get_setup_filepath() const
 	{
 		std::filesystem::path setup_filepath = this->get_presentation_filepath();

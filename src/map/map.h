@@ -335,7 +335,7 @@ public:
 	qunique_ptr<map_info> Info;             /// descriptive information
 };
 
-extern std::string CurrentMapPath; /// Path to the current map
+extern std::filesystem::path CurrentMapPath; /// Path to the current map
 
 /// Contrast of fog of war
 extern int FogOfWarOpacity;
@@ -456,7 +456,7 @@ extern int SaveStratagusMap(const std::string &filename, CMap &map, const int wr
 
 
 /// Load map presentation
-extern void LoadStratagusMapInfo(const std::string &mapname);
+extern void LoadStratagusMapInfo(const std::filesystem::path &map_path);
 
 /// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, const tile_flag mask, const int z);

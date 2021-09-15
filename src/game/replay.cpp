@@ -55,11 +55,9 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/path_util.h"
 #include "util/random.h"
 #include "version.h"
-
-extern void ExpandPath(std::string &newpath, const std::string &path);
-extern void StartMap(const std::string &filename, bool clean);
 
 class LogEntry
 {
@@ -114,7 +112,7 @@ public:
 	std::string Comment3;
 	std::string Date;
 	std::string Map;
-	std::string MapPath;
+	std::filesystem::path MapPath;
 	unsigned MapId;
 
 	int Type;
@@ -705,12 +703,12 @@ void SaveReplayList(CFile &file)
 **
 **  @param name  name of file to load.
 */
-int LoadReplay(const std::string &name)
+int LoadReplay(const std::filesystem::path &filepath)
 {
 	CleanReplayLog();
 	ReplayGameType = ReplaySinglePlayer;
 
-	LuaLoadFile(name);
+	LuaLoadFile(path::to_string(filepath));
 
 	NextLogCycle = ~0UL;
 	if (!CommandLogDisabled) {
@@ -1024,13 +1022,10 @@ int SaveReplay(const std::string &filename)
 	return 0;
 }
 
-void StartReplay(const std::string &filename, bool reveal)
+void StartReplay(const std::filesystem::path &filepath, const bool reveal)
 {
-	std::string replay;
-
 	CleanPlayers();
-	ExpandPath(replay, filename);
-	LoadReplay(replay);
+	LoadReplay(filepath);
 
 	ReplayRevealMap = reveal;
 

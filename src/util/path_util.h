@@ -37,14 +37,20 @@ inline std::string to_string(const std::filesystem::path &path)
 
 inline std::filesystem::path from_string(const std::string &path_str)
 {
-	//converta UTF-8 encoded string to a path
+	//convert a UTF-8 encoded string to a path
 	const std::u8string u8str(path_str.begin(), path_str.end());
 	return std::filesystem::path(u8str);
 }
 
 inline QString to_qstring(const std::filesystem::path &path)
 {
-	return QString::fromStdString(path::to_string(path));
+	const std::u8string u8str = path.u8string();
+	return QString::fromUtf8(reinterpret_cast<const char *>(u8str.c_str()));
+}
+
+inline std::filesystem::path from_qstring(const QString &path_str)
+{
+	return std::filesystem::path(path_str.toStdU16String());
 }
 
 }

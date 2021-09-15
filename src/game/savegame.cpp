@@ -59,25 +59,7 @@
 #include "util/random.h"
 #include "version.h"
 
-extern void StartMap(const std::string &filename, bool clean);
-
-std::string load_game_file;
-
-void ExpandPath(std::string &newpath, const std::string &path)
-{
-	if (std::filesystem::path(path).is_absolute() && std::filesystem::exists(path)) {
-		newpath = path;
-	} else if (path[0] == '~') {
-		newpath = parameters::get()->GetUserDirectory();
-		if (!GameName.empty()) {
-			newpath += "/";
-			newpath += GameName;
-		}
-		newpath += "/" + path.substr(1);
-	} else {
-		newpath = database::get()->get_root_path().string() + "/" + path;
-	}
-}
+std::filesystem::path load_game_file;
 
 /**
 **  Save a game to file.
@@ -134,8 +116,8 @@ int SaveGame(const std::string &filepath_str)
 	file.printf("---  \"engine\",  {%d, %d, %d},\n",
 				StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
 	file.printf("  SyncHash = %d, \n", SyncHash);
-	file.printf("  SyncRandSeed = %d, \n", wyrmgus::random::get()->get_seed());
-	file.printf("  SaveFile = \"%s\"\n", CurrentMapPath.c_str());
+	file.printf("  SyncRandSeed = %d, \n", random::get()->get_seed());
+	file.printf("  SaveFile = \"%s\"\n", path::to_string(CurrentMapPath).c_str());
 	file.printf("\n---  \"preview\", \"%s.pam\",\n", filepath_str.c_str());
 	file.printf("} )\n\n");
 
@@ -174,24 +156,21 @@ int SaveGame(const std::string &filepath_str)
 	return 0;
 }
 
-void StartSavedGame(const std::string &filename)
+void StartSavedGame(const std::filesystem::path &filepath)
 {
-	std::string path;
-
 	SaveGameLoading = true;
 	CleanPlayers();
-	ExpandPath(path, filename);
-	LoadGame(path);
+	LoadGame(filepath);
 
-	StartMap(filename, false);
+	StartMap(filepath, false);
 }
 
-void load_game(const std::string &filename)
+void load_game(const std::filesystem::path &filepath)
 {
 	engine_interface::get()->set_loading_message("Loading Saved Game...");
 
 	if (game::get()->is_running()) {
-		set_load_game_file(filename);
+		set_load_game_file(filepath);
 		StopGame(GameNoResult);
 		return;
 	}
@@ -200,7 +179,7 @@ void load_game(const std::string &filename)
 
 	while (true) {
 		CclCommand("InitGameVariables(); LoadedGame = true;");
-		StartSavedGame(filename);
+		StartSavedGame(filepath);
 
 		if (GameResult != GameRestart) {
 			break;
@@ -213,7 +192,7 @@ void load_game(const std::string &filename)
 	GameSettings.reset();
 }
 
-void set_load_game_file(const std::string &filename)
+void set_load_game_file(const std::filesystem::path &filepath)
 {
-	load_game_file = filename;
+	load_game_file = filepath;
 }

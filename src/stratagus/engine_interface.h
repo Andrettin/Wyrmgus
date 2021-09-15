@@ -266,7 +266,7 @@ public:
 	void set_modal_dialog_open_async(const bool value);
 
 	Q_INVOKABLE void load_game(const QString &filepath);
-	void load_game_deferred(const std::string &filepath);
+	void load_game_deferred(const std::filesystem::path &filepath);
 
 signals:
 	void running_changed();

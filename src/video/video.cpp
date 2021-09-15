@@ -307,6 +307,6 @@ void index_image_to_image_palette(const std::string &image_path, const std::stri
 	const QString image_path_qstring = QString::fromStdString(image_path);
 	QImage image(image_path_qstring);
 	const QImage other_image(QString::fromStdString(other_image_path));
-	wyrmgus::image::index_to_image_palette(image, other_image);
+	image::index_to_image_palette(image, other_image);
 	image.save(image_path_qstring);
 }
