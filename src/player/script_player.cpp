@@ -2203,10 +2203,13 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "StartPosX")) {
 		lua_pushnumber(l, p->StartPos.x);
+		return 1;
 	} else if (!strcmp(data, "StartPosY")) {
 		lua_pushnumber(l, p->StartPos.y);
+		return 1;
 	} else if (!strcmp(data, "StartMapLayer")) {
 		lua_pushnumber(l, p->StartMapLayer);
+		return 1;
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 3);
 

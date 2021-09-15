@@ -382,9 +382,15 @@ CUnit *CclGetUnitFromRef(lua_State *l);
 template <typename T>
 static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 {
-	if (!lua_istable(l, offset) || lua_rawlen(l, offset) != 2) {
-		LuaError(l, "incorrect argument");
+	if (!lua_istable(l, offset)) {
+		LuaError(l, "incorrect argument (table expected)");
 	}
+
+	const size_t raw_len = lua_rawlen(l, offset);
+	if (raw_len != 2) {
+		LuaError(l, "incorrect argument (table with size 2 expected)");
+	}
+
 	*x = LuaToNumber(l, offset, 1);
 	*y = LuaToNumber(l, offset, 2);
 }
