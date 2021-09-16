@@ -2488,7 +2488,16 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 		}
 	}
 
+	int try_count = 0;
+
 	while (!potential_positions.empty()) {
+		// for the sake of performance, put a limit on optional subtemplate placement tries, instead of checking all possibilities
+		if (subtemplate->is_optional() && try_count >= 100) {
+			break;
+		}
+
+		++try_count;
+
 		const QPoint subtemplate_pos = vector::take_random(potential_positions);
 
 		//include the offsets relevant for the templates dependent on this one's position (e.g. templates that have to be to the north of this one), so that there is enough space for them to be generated there
