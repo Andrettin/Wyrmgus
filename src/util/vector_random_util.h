@@ -67,4 +67,16 @@ inline void process_randomly(const std::vector<T> &vector, const function_type &
 	vector::process_randomly(vector_copy, function);
 }
 
+template <typename T>
+inline void shuffle(std::vector<T> &vector)
+{
+	std::vector<T> shuffled_vector;
+
+	vector::process_randomly(vector, [&shuffled_vector](T &&element) {
+		shuffled_vector.push_back(std::move(element));
+	});
+
+	vector = std::move(shuffled_vector);
+}
+
 }

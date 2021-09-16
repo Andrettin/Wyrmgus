@@ -1121,6 +1121,9 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 */
 void map_template::apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random, bool constructed) const
 {
+	std::vector<map_template *> subtemplates;
+	std::vector<map_template *> optional_subtemplates;
+
 	for (map_template *subtemplate : this->get_subtemplates()) {
 		if (!subtemplate->history->is_active()) {
 			continue;
@@ -1134,6 +1137,18 @@ void map_template::apply_subtemplates(const QPoint &template_start_pos, const QP
 			continue;
 		}
 
+		if (subtemplate->is_optional()) {
+			optional_subtemplates.push_back(subtemplate);
+		} else {
+			subtemplates.push_back(subtemplate);
+		}
+	}
+
+	//make it so optional subtemplates are processed in random order, so that we get different ones applied on different playthroughs
+	vector::shuffle(optional_subtemplates);
+	vector::merge(subtemplates, std::move(optional_subtemplates));
+
+	for (map_template *subtemplate : subtemplates) {
 		this->apply_subtemplate(subtemplate, template_start_pos, map_start_pos, map_end, z, random);
 	}
 }
