@@ -2507,7 +2507,7 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 
 	while (!potential_positions.empty()) {
 		// for the sake of performance, put a limit on optional subtemplate placement tries, instead of checking all possibilities
-		if (subtemplate->is_optional() && try_count >= 100) {
+		if (subtemplate->is_optional() && try_count >= 1000) {
 			break;
 		}
 
