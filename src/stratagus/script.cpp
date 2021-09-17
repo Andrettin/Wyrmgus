@@ -3545,7 +3545,7 @@ void SavePreferences()
 
 		FILE *fd = fopen(path.c_str(), "w");
 		if (!fd) {
-			DebugPrint("Cannot open file %s for writing\n" _C_ path.c_str());
+			log::log_error("Cannot open file \"" + path + "\" for writing.");
 			return;
 		}
 

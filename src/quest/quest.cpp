@@ -28,6 +28,7 @@
 
 #include "quest/quest.h"
 
+#include "database/database.h"
 #include "game/difficulty.h"
 #include "game/game.h"
 #include "iocompat.h"
@@ -43,6 +44,8 @@
 #include "script/effect/effect_list.h"
 #include "script.h"
 #include "text_processor.h"
+#include "util/log_util.h"
+#include "util/path_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
@@ -50,18 +53,19 @@ wyrmgus::quest *CurrentQuest = nullptr;
 
 void SaveQuestCompletion()
 {
-	std::string path = parameters::get()->GetUserDirectory();
+	std::filesystem::path path = database::get()->get_root_path();
 
 	if (!GameName.empty()) {
-		path += "/";
-		path += GameName;
+		path /= GameName;
 	}
-	path += "/";
-	path += "quests.lua";
 
-	FILE *fd = fopen(path.c_str(), "w");
+	path /= "quests.lua";
+
+	path.make_preferred();
+
+	FILE *fd = fopen(path::to_string(path).c_str(), "w");
 	if (!fd) {
-		fprintf(stderr, "Cannot open file %s for writing.\n", path.c_str());
+		log::log_error("Cannot open file \"" + path::to_string(path) + "\" for writing.");
 		return;
 	}
 

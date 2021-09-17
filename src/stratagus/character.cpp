@@ -58,6 +58,8 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/log_util.h"
+#include "util/path_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
@@ -715,7 +717,7 @@ void character::save() const
 
 	FILE *fd = fopen(filepath.string().c_str(), "w");
 	if (!fd) {
-		fprintf(stderr, "Cannot open file %s for writing.\n", filepath.string().c_str());
+		log::log_error("Cannot open file \"" + path::to_string(filepath) + "\" for writing.");
 		return;
 	}
 

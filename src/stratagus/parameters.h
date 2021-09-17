@@ -45,8 +45,15 @@ public:
 		return this->test_run;
 	}
 
-	void SetUserDirectory(const std::string &path) { userDirectory = path; }
-	const std::string &GetUserDirectory() const { return userDirectory; }
+	void SetUserDirectory(const std::string &path)
+	{
+		this->userDirectory = path;
+	}
+
+	const std::string &GetUserDirectory() const
+	{
+		return this->userDirectory;
+	}
 
 private:
 	void SetDefaultUserDirectory();

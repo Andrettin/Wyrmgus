@@ -186,7 +186,7 @@ void parameters::process()
 void parameters::SetDefaultUserDirectory()
 {
 #ifdef USE_GAME_DIR
-	userDirectory = database::get()->get_root_path().string();
+	this->userDirectory = database::get()->get_root_path().string();
 #elif USE_WIN32
 	userDirectory = getenv("APPDATA");
 #elif __MORPHOS__
@@ -195,8 +195,8 @@ void parameters::SetDefaultUserDirectory()
 	userDirectory = getenv("HOME");
 #endif
 
-	if (!userDirectory.empty()) {
-		userDirectory += "/";
+	if (!this->userDirectory.empty()) {
+		this->userDirectory += "/";
 	}
 
 #ifdef USE_GAME_DIR
