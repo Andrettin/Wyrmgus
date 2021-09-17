@@ -715,7 +715,7 @@ void character::save() const
 		std::filesystem::remove(old_filepath);
 	}
 
-	FILE *fd = fopen(filepath.string().c_str(), "w");
+	FILE *fd = fopen(path::to_string(filepath).c_str(), "w");
 	if (!fd) {
 		log::log_error("Cannot open file \"" + path::to_string(filepath) + "\" for writing.");
 		return;
@@ -1143,6 +1143,8 @@ std::filesystem::path character::get_save_filepath() const
 	}
 
 	filepath /= this->get_identifier() + ".lua";
+
+	filepath.make_preferred();
 
 	return filepath;
 }
