@@ -156,6 +156,8 @@ game::~game()
 
 void game::run_map(const std::filesystem::path &filepath)
 {
+	engine_interface::get()->set_loading_message("Starting Game...");
+
 	CclCommand("if (LoadedGame == false) then ClearPlayerDataObjectives(); SetDefaultPlayerDataObjectives(); end");
 
 	while (true) {
