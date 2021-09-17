@@ -2195,6 +2195,7 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Type")) {
 		lua_pushnumber(l, static_cast<int>(p->get_type()));
+		return 1;
 	} else if (!strcmp(data, "Color")) {
 		if (p->get_player_color() == nullptr) {
 			LuaError(l, "Player %d has no color." _C_ p->get_index());
