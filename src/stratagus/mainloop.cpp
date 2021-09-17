@@ -391,12 +391,14 @@ static void GameLogicLoop()
 		
 		if (preferences::get()->is_autosave_enabled() && !IsNetworkGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_MINUTE * preferences::autosave_minutes)) == 0) {
 			//autosave every X minutes, if the option is enabled
-			UI.StatusLine.Set(_("Autosave"));
 			const std::filesystem::path filepath = database::get_save_path() / "autosave.sav";
+
 			//Wyrmgus start
 //			SaveGame(path::to_string(filepath));
 			CclCommand("if (RunSaveGame ~= nil) then RunSaveGame(\""+ string::escaped(path::to_string(filepath)) + "\") end;");
 			//Wyrmgus end
+
+			UI.StatusLine.Set(_("Autosave"));
 		}
 	}
 
