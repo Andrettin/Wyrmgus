@@ -1744,6 +1744,24 @@ void CMap::process_sml_scope(const sml_data &scope)
 		this->Info->MapHeights.clear();
 		this->Info->MapHeights.push_back(this->Info->MapHeight);
 		this->MapLayers.push_back(std::move(map_layer));
+	} else if (tag == "extra_map_layers") {
+		scope.for_each_child([&](const sml_data &map_layer_data) {
+			//must process the size here already, as it is required for the map layer's constructor
+			const QSize size = map_layer_data.get_child("size").to_size();
+
+			auto map_layer = std::make_unique<CMapLayer>(size);
+
+			if (QApplication::instance()->thread() != QThread::currentThread()) {
+				map_layer->moveToThread(QApplication::instance()->thread());
+			}
+
+			database::process_sml_data(map_layer, map_layer_data);
+
+			this->Info->MapWidths.push_back(map_layer->get_width());
+			this->Info->MapHeights.push_back(map_layer->get_height());
+			map_layer->ID = this->MapLayers.size();
+			this->MapLayers.push_back(std::move(map_layer));
+		});
 	} else if (tag == "landmasses") {
 		//first, create all landmasses, as when they are processed they refer to each other
 		for (int i = 0; i < scope.get_children_count(); ++i) {
@@ -1776,6 +1794,15 @@ void CMap::save(CFile &file) const
 	sml_data map_data;
 
 	map_data.add_child(sml_data::from_size(this->MapLayers.front()->get_size(), "size"));
+
+	if (this->MapLayers.size() > 1) {
+		sml_data extra_map_layers_data("extra_map_layers");
+		for (size_t i = 1; i < this->MapLayers.size(); ++i) {
+			const CMapLayer *map_layer = this->MapLayers.at(i).get();
+			extra_map_layers_data.add_child(map_layer->to_sml_data());
+		}
+		map_data.add_child(std::move(extra_map_layers_data));
+	}
 
 	if (!this->get_landmasses().empty()) {
 		sml_data landmasses_data("landmasses");
@@ -1817,11 +1844,6 @@ void CMap::save(CFile &file) const
 	file.printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
 	file.printf("  \"filename\", \"%s\",\n", this->Info->get_presentation_filepath().string().c_str());
 	//Wyrmgus start
-	file.printf("  \"extra-map-layers\", {\n");
-	for (size_t z = 1; z < this->MapLayers.size(); ++z) {
-		file.printf("  {%d, %d},\n", this->Info->MapWidths[z], this->Info->MapHeights[z]);
-	}
-	file.printf("  },\n");
 	file.printf("  \"time-of-day\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		file.printf("  {\"%s\", %zu, %d},\n", this->MapLayers[z]->get_time_of_day_schedule() ? this->MapLayers[z]->get_time_of_day_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_time_of_day() ? this->MapLayers[z]->get_scheduled_time_of_day()->get_index() : 0, this->MapLayers[z]->RemainingTimeOfDayHours);

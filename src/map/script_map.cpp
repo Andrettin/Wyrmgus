@@ -120,32 +120,6 @@ static int CclStratagusMap(lua_State *l)
 					const std::filesystem::path filepath = LuaToString(l, j + 1, k + 1);
 					CMap::get()->Info->set_presentation_filepath(filepath);
 				//Wyrmgus start
-				} else if (!strcmp(subvalue, "extra-map-layers")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument for \"extra-map-layers\"");
-					}
-					const int subsubargs = lua_rawlen(l, -1);
-					for (int z = 0; z < subsubargs; ++z) {
-						lua_rawgeti(l, -1, z + 1);
-						if (!lua_istable(l, -1)) {
-							LuaError(l, "incorrect argument");
-						}
-						const int width = LuaToNumber(l, -1, 1);
-						const int height = LuaToNumber(l, -1, 2);
-						auto map_layer = std::make_unique<CMapLayer>(width, height);
-
-						if (QApplication::instance()->thread() != QThread::currentThread()) {
-							map_layer->moveToThread(QApplication::instance()->thread());
-						}
-
-						CMap::get()->Info->MapWidths.push_back(map_layer->get_width());
-						CMap::get()->Info->MapHeights.push_back(map_layer->get_height());
-						map_layer->ID = CMap::get()->MapLayers.size();
-						CMap::get()->MapLayers.push_back(std::move(map_layer));
-						lua_pop(l, 1);
-					}
-					lua_pop(l, 1);
 				} else if (!strcmp(subvalue, "time-of-day")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {

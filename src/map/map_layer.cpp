@@ -71,6 +71,33 @@ CMapLayer::~CMapLayer()
 {
 }
 
+void CMapLayer::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+
+	throw std::runtime_error("Invalid map layer property: \"" + key + "\".");
+}
+
+void CMapLayer::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "size") {
+		//already processed
+	} else {
+		throw std::runtime_error("Invalid map layer scope: \"" + scope.get_tag() + "\".");
+	}
+}
+
+sml_data CMapLayer::to_sml_data() const
+{
+	sml_data data;
+
+	data.add_child(sml_data::from_size(this->get_size(), "size"));
+
+	return data;
+}
+
 /**
 **	@brief	Get the map field at a given location
 **

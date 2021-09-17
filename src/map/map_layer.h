@@ -41,6 +41,8 @@ namespace wyrmgus {
 	class scheduled_time_of_day;
 	class season;
 	class season_schedule;
+	class sml_data;
+	class sml_property;
 	class terrain_type;
 	class tile;
 	class time_of_day;
@@ -65,6 +67,11 @@ public:
 
 	~CMapLayer();
 	
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	sml_data to_sml_data() const;
+
 	/**
 	**	@brief	Get the map field at a given location
 	**
