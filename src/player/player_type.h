@@ -86,9 +86,9 @@ inline player_type string_to_player_type(const std::string &str)
 		return player_type::computer;
 	} else if (str == "person") {
 		return player_type::person;
-	} else if (str == "rescue_passive") {
+	} else if (str == "rescue_passive" || str == "rescue-passive") {
 		return player_type::rescue_passive;
-	} else if (str == "rescue_active") {
+	} else if (str == "rescue_active" || str == "rescue-active") {
 		return player_type::rescue_active;
 	}
 
