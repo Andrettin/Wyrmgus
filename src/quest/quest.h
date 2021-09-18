@@ -204,6 +204,8 @@ public:
 
 	bool overlaps_with(const quest *other_quest) const;
 
+	void on_completed(const difficulty difficulty);
+
 signals:
 	void completed_changed();
 	void highest_completed_difficulty_changed();

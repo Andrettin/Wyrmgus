@@ -2726,8 +2726,8 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 	
 	if (this == CPlayer::GetThisPlayer()) {
 		if (game::get()->is_persistency_enabled()) {
-			SetQuestCompleted(quest->get_identifier(), GameSettings.Difficulty);
-			SaveQuestCompletion();
+			const difficulty difficulty = static_cast<wyrmgus::difficulty>(GameSettings.Difficulty);
+			quest->on_completed(difficulty);
 		}
 
 		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();

@@ -262,6 +262,23 @@ bool quest::overlaps_with(const quest *other_quest) const
 	return false;
 }
 
+void quest::on_completed(const difficulty difficulty)
+{
+	if (this->is_completed() && difficulty <= this->get_highest_completed_difficulty()) {
+		return;
+	}
+
+	this->set_completed(true);
+
+	if (difficulty > this->get_highest_completed_difficulty()) {
+		this->set_highest_completed_difficulty(difficulty);
+	}
+
+	quest::save_quest_completion();
+
+	achievement::check_achievements();
+}
+
 }
 
 void SaveQuestCompletion()
@@ -300,8 +317,9 @@ void SetQuestCompleted(const std::string &quest_ident, const int difficulty_int,
 	if (difficulty > quest->get_highest_completed_difficulty()) {
 		quest->set_highest_completed_difficulty(difficulty);
 	}
+
 	if (save) {
-		SaveQuestCompletion();
+		quest::save_quest_completion();
 	}
 
 	achievement::check_achievements();
@@ -327,7 +345,7 @@ void SetQuestCompleted(const std::string &quest_ident, const std::string &diffic
 	}
 
 	if (save) {
-		SaveQuestCompletion();
+		quest::save_quest_completion();
 	}
 
 	achievement::check_achievements();
