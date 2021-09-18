@@ -160,6 +160,8 @@ void game::run_map(const std::filesystem::path &filepath)
 
 	CclCommand("if (LoadedGame == false) then ClearPlayerDataObjectives(); SetDefaultPlayerDataObjectives(); end");
 
+	CleanPlayers();
+
 	while (true) {
 		music_player::get()->play_music_type(music_type::loading);
 
