@@ -137,14 +137,24 @@ public:
 	std::vector<std::filesystem::path> get_module_paths() const;
 	std::vector<std::pair<std::filesystem::path, const data_module *>> get_module_paths_with_module() const;
 
+	const std::vector<qunique_ptr<data_module>> &get_modules() const
+	{
+		return this->modules;
+	}
+
 	data_module *get_module(const std::string &identifier) const
 	{
-		auto find_iterator = this->modules_by_identifier.find(identifier);
+		const auto find_iterator = this->modules_by_identifier.find(identifier);
 		if (find_iterator != this->modules_by_identifier.end()) {
 			return find_iterator->second;
 		}
 
 		throw std::runtime_error("No module found with identifier \"" + identifier + "\".");
+	}
+
+	bool has_module(const std::string &identifier) const
+	{
+		return this->modules_by_identifier.contains(identifier);
 	}
 
 	const std::filesystem::path &get_root_path() const

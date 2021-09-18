@@ -79,6 +79,7 @@ public:
 	static std::filesystem::path get_quest_completion_filepath();
 
 	static void load_quest_completion();
+	static void load_quest_completion_scope(const sml_data &scope);
 	static void save_quest_completion();
 
 	explicit quest(const std::string &identifier);

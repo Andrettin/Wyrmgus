@@ -28,6 +28,7 @@
 
 #include "quest/quest.h"
 
+#include "database/data_module.h"
 #include "database/database.h"
 #include "database/sml_parser.h"
 #include "game/difficulty.h"
@@ -71,7 +72,20 @@ void quest::load_quest_completion()
 	sml_parser parser;
 	const sml_data data = parser.parse(quests_filepath);
 
-	data.for_each_property([&](const sml_property &property) {
+	quest::load_quest_completion_scope(data);
+
+	data.for_each_child([&](const sml_data &scope) {
+		if (!database::get()->has_module(scope.get_tag())) {
+			return;
+		}
+
+		quest::load_quest_completion_scope(scope);
+	});
+}
+
+void quest::load_quest_completion_scope(const sml_data &scope)
+{
+	scope.for_each_property([&](const sml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
 
@@ -96,11 +110,36 @@ void quest::save_quest_completion()
 	//save quests
 	const std::filesystem::path quests_filepath = quest::get_quest_completion_filepath();
 
-	sml_data data;
+	sml_parser parser;
+	sml_data data = parser.parse(quests_filepath);
+
+	//keep scopes for non-loaded modules unchanged; otherwise, clear data for re-saving
+	data.clear_properties();
+
+	for (const qunique_ptr<wyrmgus::data_module> &data_module : database::get()->get_modules()) {
+		if (data.has_child(data_module->get_identifier())) {
+			data.remove_child(data_module->get_identifier());
+		}
+	}
+
+	//save quest completion
+	std::map<const wyrmgus::data_module *, std::vector<const quest *>> completed_quests;
 
 	for (const quest *quest : quest::get_all()) {
 		if (quest->is_completed()) {
-			data.add_property(quest->get_identifier(), difficulty_to_string(quest->get_highest_completed_difficulty()));
+			completed_quests[quest->get_module()].push_back(quest);
+		}
+	}
+
+	for (const auto &[data_module, quests] : completed_quests) {
+		sml_data *quest_scope = &data;
+
+		if (data_module != nullptr) {
+			quest_scope = &data.add_child(sml_data(data_module->get_identifier()));
+		}
+
+		for (const quest *quest : quests) {
+			quest_scope->add_property(quest->get_identifier(), difficulty_to_string(quest->get_highest_completed_difficulty()));
 		}
 	}
 
@@ -110,31 +149,6 @@ void quest::save_quest_completion()
 		exception::report(exception);
 		log::log_error("Failed to save quest completion file.");
 	}
-
-	//save achievements to the old quests.lua file
-	std::filesystem::path path = database::get()->get_root_path();
-
-	if (!GameName.empty()) {
-		path /= GameName;
-	}
-
-	path /= "quests.lua";
-
-	path.make_preferred();
-
-	FILE *fd = fopen(path::to_string(path).c_str(), "w");
-	if (!fd) {
-		log::log_error("Cannot open file \"" + path::to_string(path) + "\" for writing.");
-		return;
-	}
-
-	for (const achievement *achievement : achievement::get_all()) {
-		if (achievement->is_obtained()) {
-			fprintf(fd, "SetAchievementObtained(\"%s\", false, false)\n", achievement->get_identifier().c_str());
-		}
-	}
-
-	fclose(fd);
 }
 
 quest::quest(const std::string &identifier) : detailed_data_entry(identifier), highest_completed_difficulty(difficulty::none)

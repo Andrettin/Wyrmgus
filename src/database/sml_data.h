@@ -157,21 +157,40 @@ public:
 		return false;
 	}
 
-	sml_data &add_child()
+	sml_data &add_child(sml_data &&child)
 	{
-		this->elements.push_back(sml_data());
+		this->elements.emplace_back(std::move(child));
 		return std::get<sml_data>(this->elements.back());
 	}
 
-	void add_child(sml_data &&child)
+	sml_data &add_child()
 	{
-		this->elements.emplace_back(std::move(child));
+		return this->add_child(sml_data());
 	}
 
 	sml_data &add_child(std::string &&tag, const sml_operator sml_operator)
 	{
 		this->elements.push_back(sml_data(std::move(tag), sml_operator));
 		return std::get<sml_data>(this->elements.back());
+	}
+
+	void remove_child(const std::string &tag)
+	{
+		for (size_t i = 0; i < this->elements.size(); ++i) {
+			const auto &element = this->elements.at(i);
+
+			if (!std::holds_alternative<sml_data>(element)) {
+				continue;
+			}
+
+			const sml_data &child = std::get<sml_data>(element);
+			if (child.get_tag() == tag) {
+				this->elements.erase(this->elements.begin() + i);
+				return;
+			}
+		}
+
+		throw std::runtime_error("No child with tag \"" + tag + "\" found for SML data.");
 	}
 
 	template <typename function_type>
@@ -221,6 +240,20 @@ public:
 		const sml_property_visitor visitor(function);
 		for (const auto &element : this->get_elements()) {
 			std::visit(visitor, element);
+		}
+	}
+
+	void clear_properties()
+	{
+		//remove all property elements
+		for (size_t i = 0; i < this->elements.size();) {
+			const auto &element = this->elements.at(i);
+
+			if (std::holds_alternative<sml_property>(element)) {
+				this->elements.erase(this->elements.begin() + i);
+			} else {
+				++i;
+			}
 		}
 	}
 
