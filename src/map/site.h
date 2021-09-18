@@ -255,9 +255,9 @@ public:
 		return this->get_connection_destination() != nullptr;
 	}
 
-	bool can_be_randomly_generated() const
+	bool can_be_randomly_generated_settlement() const
 	{
-		return !this->get_name().empty() && !this->is_connector();
+		return this->is_settlement() && !this->get_name().empty() && !this->is_connector();
 	}
 
 	const std::vector<faction *> &get_cores() const
