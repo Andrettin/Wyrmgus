@@ -149,7 +149,10 @@ extern std::string GetCurrentQuest();
 extern void SetQuestCompleted(std::string quest_ident, int difficulty, bool save = true);
 extern void SetQuestCompleted(std::string quest_ident, std::string difficulty_str, bool save = true);
 extern void SetQuestCompleted(std::string quest_ident, bool save);
+
 extern void SetAchievementObtained(std::string achievement_ident, const bool save = true, const bool display = true);
+extern void save_achievements();
+extern void check_achievements();
 
 extern void CallDialogue(std::string dialogue_ident, int player);
 extern void CallDialogueNode(std::string dialogue_ident, int node, int player);

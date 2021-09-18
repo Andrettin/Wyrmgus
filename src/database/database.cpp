@@ -73,6 +73,7 @@
 #include "player/faction_type.h"
 #include "player/government_type.h"
 #include "player/player_color.h"
+#include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"
 #include "religion/deity.h"
@@ -808,8 +809,8 @@ void database::initialize()
 		}
 	}
 
-	//load quest completion data
 	quest::load_quest_completion();
+	achievement::load_achievements();
 
 	engine_interface::get()->set_running(true);
 }

@@ -63,6 +63,9 @@ public:
 	static constexpr const char *class_identifier = "achievement";
 	static constexpr const char *database_folder = "achievements";
 
+	static std::filesystem::path get_achievements_filepath();
+	static void load_achievements();
+	static void save_achievements();
 	static void check_achievements();
 
 	explicit achievement(const std::string &identifier);
@@ -141,3 +144,6 @@ private:
 }
 
 extern void SetAchievementObtained(const std::string &achievement_ident, const bool save = true, const bool display = true);
+
+extern void check_achievements();
+extern void save_achievements();

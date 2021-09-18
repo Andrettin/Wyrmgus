@@ -30,24 +30,112 @@
 
 #include "character.h"
 #include "game/difficulty.h"
+#include "game/game.h" //for the GameName variable
 #include "player/player.h"
 #include "player/player_color.h"
 #include "quest/quest.h"
 #include "script.h"
 #include "unit/unit_type.h"
+#include "util/exception_util.h"
+#include "util/log_util.h"
+#include "util/path_util.h"
+#include "util/string_conversion_util.h"
+
+#include <QSettings>
 
 namespace wyrmgus {
 
+std::filesystem::path achievement::get_achievements_filepath()
+{
+	std::filesystem::path filepath = database::get_user_data_path() / "achievements.txt";
+	filepath.make_preferred();
+	return filepath;
+}
+
+void achievement::load_achievements()
+{
+	const std::filesystem::path achievements_filepath = achievement::get_achievements_filepath();
+
+	if (!std::filesystem::exists(achievements_filepath)) {
+		return;
+	}
+
+	const QSettings data(path::to_qstring(achievements_filepath), QSettings::IniFormat);
+
+	for (const QString &key : data.childKeys()) {
+		try {
+			achievement *achievement = achievement::get(key.toStdString());
+			achievement->obtain(false, false);
+		} catch (const std::exception &exception) {
+			exception::report(exception);
+			log::log_error("Failed to load data for achievement \"" + key.toStdString() + "\".");
+		}
+	}
+}
+
+void achievement::save_achievements()
+{
+	//save achievements
+	const std::filesystem::path achievements_filepath = achievement::get_achievements_filepath();
+
+	sml_data data;
+
+	for (const achievement *achievement : achievement::get_all()) {
+		if (achievement->is_obtained()) {
+			data.add_property(achievement->get_identifier(), string::from_bool(true));
+		}
+	}
+
+	try {
+		data.print_to_file(achievements_filepath);
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		log::log_error("Failed to save achievements file.");
+	}
+
+	//save achievements to the legacy quests.lua file as well
+	std::filesystem::path path = database::get()->get_root_path();
+
+	if (!GameName.empty()) {
+		path /= GameName;
+	}
+
+	path /= "quests.lua";
+
+	path.make_preferred();
+
+	FILE *fd = fopen(path::to_string(path).c_str(), "w");
+	if (!fd) {
+		log::log_error("Cannot open file \"" + path::to_string(path) + "\" for writing.");
+		return;
+	}
+
+	for (const achievement *achievement : achievement::get_all()) {
+		if (achievement->is_obtained()) {
+			fprintf(fd, "SetAchievementObtained(\"%s\", false, false)\n", achievement->get_identifier().c_str());
+		}
+	}
+
+	fclose(fd);
+}
+
 void achievement::check_achievements()
 {
+	bool changed = false;
+
 	for (achievement *achievement : achievement::get_all()) {
 		if (achievement->is_obtained()) {
 			continue;
 		}
 
 		if (achievement->can_obtain()) {
-			achievement->obtain();
+			achievement->obtain(false, true);
+			changed = true;
 		}
+	}
+
+	if (changed) {
+		achievement::save_achievements();
 	}
 }
 
@@ -132,7 +220,7 @@ void achievement::obtain(const bool save, const bool display)
 	this->obtained = true;
 
 	if (save) {
-		SaveQuestCompletion();
+		achievement::save_achievements();
 	}
 
 	if (display) {
@@ -192,10 +280,21 @@ int achievement::get_progress_max() const
 
 void SetAchievementObtained(const std::string &achievement_ident, const bool save, const bool display)
 {
-	wyrmgus::achievement *achievement = wyrmgus::achievement::get(achievement_ident);
-	if (!achievement) {
+	achievement *achievement = achievement::try_get(achievement_ident);
+
+	if (achievement == nullptr) {
 		return;
 	}
 
 	achievement->obtain(save, display);
+}
+
+void save_achievements()
+{
+	achievement::save_achievements();
+}
+
+void check_achievements()
+{
+	achievement::check_achievements();
 }
