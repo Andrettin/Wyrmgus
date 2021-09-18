@@ -808,6 +808,9 @@ void database::initialize()
 		}
 	}
 
+	//load quest completion data
+	quest::load_quest_completion();
+
 	engine_interface::get()->set_running(true);
 }
 

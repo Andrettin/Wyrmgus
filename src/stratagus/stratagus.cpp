@@ -642,8 +642,8 @@ void load_defines()
 {
 	try {
 		//load the preferences before the defines, as the latter depend on the preferences
-		wyrmgus::preferences::get()->load();
-		wyrmgus::database::get()->load_defines();
+		preferences::get()->load();
+		database::get()->load_defines();
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error loading defines."));
 	}

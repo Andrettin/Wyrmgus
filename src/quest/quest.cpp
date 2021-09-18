@@ -29,6 +29,7 @@
 #include "quest/quest.h"
 
 #include "database/database.h"
+#include "database/sml_parser.h"
 #include "game/difficulty.h"
 #include "game/game.h"
 #include "iocompat.h"
@@ -44,6 +45,7 @@
 #include "script/effect/effect_list.h"
 #include "script.h"
 #include "text_processor.h"
+#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/string_util.h"
@@ -51,8 +53,65 @@
 
 wyrmgus::quest *CurrentQuest = nullptr;
 
-void SaveQuestCompletion()
+namespace wyrmgus {
+
+std::filesystem::path quest::get_quest_completion_filepath()
 {
+	return database::get_user_data_path() / "quests.txt";
+}
+
+void quest::load_quest_completion()
+{
+	const std::filesystem::path quests_filepath = quest::get_quest_completion_filepath();
+
+	if (!std::filesystem::exists(quests_filepath)) {
+		return;
+	}
+
+	sml_parser parser;
+	const sml_data data = parser.parse(quests_filepath);
+
+	data.for_each_property([&](const sml_property &property) {
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+
+		try {
+			quest *quest = quest::get(key);
+			const difficulty difficulty = string_to_difficulty(value);
+
+			quest->set_completed(true);
+
+			if (difficulty > quest->get_highest_completed_difficulty()) {
+				quest->set_highest_completed_difficulty(difficulty);
+			}
+		} catch (const std::exception &exception) {
+			exception::report(exception);
+			log::log_error("Failed to load completion data for quest \"" + key + "\".");
+		}
+	});
+}
+
+void quest::save_quest_completion()
+{
+	//save quests
+	const std::filesystem::path quests_filepath = quest::get_quest_completion_filepath();
+
+	sml_data data;
+
+	for (const quest *quest : quest::get_all()) {
+		if (quest->is_completed()) {
+			data.add_property(quest->get_identifier(), difficulty_to_string(quest->get_highest_completed_difficulty()));
+		}
+	}
+
+	try {
+		data.print_to_file(quests_filepath);
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		log::log_error("Failed to save quest completion file.");
+	}
+
+	//save achievements to the old quests.lua file
 	std::filesystem::path path = database::get()->get_root_path();
 
 	if (!GameName.empty()) {
@@ -69,24 +128,14 @@ void SaveQuestCompletion()
 		return;
 	}
 
-	for (const wyrmgus::achievement *achievement : wyrmgus::achievement::get_all()) {
+	for (const achievement *achievement : achievement::get_all()) {
 		if (achievement->is_obtained()) {
 			fprintf(fd, "SetAchievementObtained(\"%s\", false, false)\n", achievement->get_identifier().c_str());
 		}
 	}
-	
-	fprintf(fd, "\n");
-	
-	for (const wyrmgus::quest *quest : wyrmgus::quest::get_all()) {
-		if (quest->is_completed()) {
-			fprintf(fd, "SetQuestCompleted(\"%s\", \"%s\", false)\n", quest->get_identifier().c_str(), difficulty_to_string(quest->get_highest_completed_difficulty()).c_str());
-		}
-	}
-	
+
 	fclose(fd);
 }
-
-namespace wyrmgus {
 
 quest::quest(const std::string &identifier) : detailed_data_entry(identifier), highest_completed_difficulty(difficulty::none)
 {
@@ -213,6 +262,11 @@ bool quest::overlaps_with(const quest *other_quest) const
 	return false;
 }
 
+}
+
+void SaveQuestCompletion()
+{
+	quest::save_quest_completion();
 }
 
 void SetCurrentQuest(const std::string &quest_ident)
