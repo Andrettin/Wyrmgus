@@ -341,6 +341,7 @@ public:
 	bool is_on_trade_route() const;
 
 	void bump_incompatible_units();
+	void remove_incompatible_units();
 
 public:
 	tile_flag Flags;      /// field flags

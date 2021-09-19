@@ -223,7 +223,11 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 		}
 	}
 
-	this->bump_incompatible_units();
+	if (CEditor::get()->is_running()) {
+		this->remove_incompatible_units();
+	} else {
+		this->bump_incompatible_units();
+	}
 }
 
 void tile::RemoveOverlayTerrain()
@@ -818,6 +822,31 @@ void tile::bump_incompatible_units()
 		const QPoint tile_pos = unit->tilePos;
 		unit->Remove(nullptr);
 		DropOutNearest(*unit, unit->tilePos, nullptr);
+	}
+}
+
+void tile::remove_incompatible_units()
+{
+	//remove units incompatible with the tile's flags to the nearest valid position for them
+	std::vector<CUnit *> units_to_remove;
+
+	const CUnitCache &cache = this->UnitCache;
+	for (size_t i = 0; i != cache.size(); ++i) {
+		CUnit *unit = cache[i];
+		if (!unit->IsAliveOnMap()) {
+			continue;
+		}
+
+		const tile_flag movement_mask = unit->Type->MovementMask & ~(unit->Type->FieldFlags);
+		if (this->has_flag(movement_mask)) {
+			units_to_remove.push_back(unit);
+		}
+	}
+
+	for (CUnit *unit : units_to_remove) {
+		const QPoint tile_pos = unit->tilePos;
+		unit->Remove(nullptr);
+		LetUnitDie(*unit);
 	}
 }
 
