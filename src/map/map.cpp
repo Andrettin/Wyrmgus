@@ -1274,8 +1274,10 @@ void PreprocessMap()
 
 			CMap::get()->expand_terrain_features_to_same_terrain(z);
 
-			//settlement territories need to be generated after tile transitions are calculated, so that the coast map field has been set
-			CMap::get()->generate_settlement_territories(z);
+			if (!CEditor::get()->is_running()) {
+				//settlement territories need to be generated after tile transitions are calculated, so that the coast map field has been set
+				CMap::get()->generate_settlement_territories(z);
+			}
 
 			for (int ix = 0; ix < CMap::get()->Info->MapWidths[z]; ++ix) {
 				for (int iy = 0; iy < CMap::get()->Info->MapHeights[z]; ++iy) {
