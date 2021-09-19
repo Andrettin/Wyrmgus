@@ -2479,7 +2479,17 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 	}
 
 	if (terrain_type == nullptr) {
-		throw std::runtime_error("Failed to calculate solid tile for tile " + point::to_string(pos) + ", map layer " + std::to_string(z) + ": " + (overlay ? "overlay " : "") + "terrain is null.");
+		const std::vector<const map_template *> pos_subtemplates = get_pos_subtemplates(pos, z);
+
+		std::string error_message = "Failed to calculate solid tile for tile " + point::to_string(pos) + ", map layer " + std::to_string(z);
+
+		if (!pos_subtemplates.empty()) {
+			error_message += ", subtemplate area \"" + pos_subtemplates.front()->get_identifier() + "\"";
+		}
+
+		error_message += ": " + std::string(overlay ? "overlay " : "") + "terrain is null.";
+
+		throw std::runtime_error(error_message);
 	}
 
 	if (terrain_type->has_tiled_background()) {
@@ -2930,7 +2940,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 							&& tile_top_terrain != mf.get_overlay_terrain()
 							&& !vector::contains(tile_terrain->get_outer_border_terrain_types(), mf.get_terrain())
 							&& !vector::contains(tile_top_terrain->get_base_terrain_types(), mf.get_terrain())
-							) {
+						) {
 							mf.SetTerrain(tile_terrain);
 							tile_changed = true;
 						}
