@@ -123,14 +123,14 @@ void CMapLayer::DoPerCycleLoop()
 				wyrmgus::tile &mf = *this->Field(i);
 				
 				if (mf.get_terrain() != nullptr && mf.get_terrain()->SolidAnimationFrames > 0) {
-					mf.AnimationFrame += 1;
+					++mf.AnimationFrame;
 					if (mf.AnimationFrame >= mf.get_terrain()->SolidAnimationFrames) {
 						mf.AnimationFrame = 0;
 					}
 				}
 				
 				if (mf.get_overlay_terrain() != nullptr && mf.get_overlay_terrain()->SolidAnimationFrames > 0) {
-					mf.OverlayAnimationFrame += 1;
+					++mf.OverlayAnimationFrame;
 					if (mf.OverlayAnimationFrame >= mf.get_overlay_terrain()->SolidAnimationFrames) {
 						mf.OverlayAnimationFrame = 0;
 					}
@@ -151,7 +151,7 @@ void CMapLayer::DoPerHourLoop()
 
 void CMapLayer::handle_destroyed_overlay_terrain()
 {
-	if (wyrmgus::defines::get()->get_destroyed_overlay_terrain_decay_threshold() == 0) {
+	if (defines::get()->get_destroyed_overlay_terrain_decay_threshold() == 0) {
 		return;
 	}
 
@@ -189,7 +189,7 @@ void CMapLayer::decay_destroyed_overlay_terrain_tile(const QPoint &pos)
 
 void CMapLayer::regenerate_forests()
 {
-	if (wyrmgus::defines::get()->get_forest_regeneration_threshold() == 0) {
+	if (defines::get()->get_forest_regeneration_threshold() == 0) {
 		return;
 	}
 

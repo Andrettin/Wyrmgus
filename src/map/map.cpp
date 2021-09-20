@@ -1901,6 +1901,13 @@ void CMap::save(CFile &file) const
 	file.printf("}})\n");
 }
 
+void CMap::do_per_cycle_loop()
+{
+	for (const std::unique_ptr<CMapLayer> &map_layer : CMap::get()->MapLayers) {
+		map_layer->DoPerCycleLoop();
+	}
+}
+
 /*----------------------------------------------------------------------------
 -- Map Tile Update Functions
 ----------------------------------------------------------------------------*/
@@ -4006,6 +4013,7 @@ void CMap::handle_destroyed_overlay_terrain()
 {
 	for (const std::unique_ptr<CMapLayer> &map_layer : this->MapLayers) {
 		map_layer->handle_destroyed_overlay_terrain();
+		map_layer->regenerate_forests();
 	}
 }
 

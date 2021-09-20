@@ -153,6 +153,14 @@ public:
 	}
 
 	QRect get_rect(const int z) const;
+
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	//save the map.
+	void save(CFile &file) const;
+
+	void do_per_cycle_loop();
 	
 	//Wyrmgus start
 	void SetTileTerrain(const QPoint &pos, const terrain_type *terrain, int z);
@@ -212,12 +220,6 @@ public:
 //	void Reveal();
 	void Reveal(bool only_person_players = false);
 	//Wyrmgus end
-
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
-
-	//save the map.
-	void save(CFile &file) const;
 
 	//
 	// Wall

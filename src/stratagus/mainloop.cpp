@@ -310,9 +310,7 @@ static void GameLogicLoop()
 		MissileActions();   // handle missiles
 		PlayersEachCycle(); // handle players
 
-		for (const std::unique_ptr<CMapLayer> &map_layer : CMap::get()->MapLayers) {
-			map_layer->DoPerCycleLoop();
-		}
+		CMap::get()->do_per_cycle_loop();
 		
 		//
 		// Work todo each second.
