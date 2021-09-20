@@ -1692,6 +1692,7 @@ void CMap::Clean()
 	this->ClearMapLayers();
 	this->settlement_units.clear();
 	//Wyrmgus end
+	this->animated_tiles.clear();
 
 	// Tileset freed by Tileset?
 
@@ -1903,8 +1904,25 @@ void CMap::save(CFile &file) const
 
 void CMap::do_per_cycle_loop()
 {
-	for (const std::unique_ptr<CMapLayer> &map_layer : CMap::get()->MapLayers) {
-		map_layer->DoPerCycleLoop();
+	if (GameCycle > 0) {
+		//do tile animation
+		if (GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
+			for (tile *tile : this->animated_tiles) {
+				if (tile->get_terrain() != nullptr && tile->get_terrain()->SolidAnimationFrames > 0) {
+					++tile->AnimationFrame;
+					if (tile->AnimationFrame >= tile->get_terrain()->SolidAnimationFrames) {
+						tile->AnimationFrame = 0;
+					}
+				}
+
+				if (tile->get_overlay_terrain() != nullptr && tile->get_overlay_terrain()->SolidAnimationFrames > 0) {
+					++tile->OverlayAnimationFrame;
+					if (tile->OverlayAnimationFrame >= tile->get_overlay_terrain()->SolidAnimationFrames) {
+						tile->OverlayAnimationFrame = 0;
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -4038,6 +4056,11 @@ void CMap::FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z)
 	maxpos.x = std::min<short>(maxpos.x, Info->MapWidths[z] - 1);
 	maxpos.y = std::min<short>(maxpos.y, Info->MapHeights[z] - 1);
 	//Wyrmgus end
+}
+
+void CMap::remove_animated_tile(tile *tile)
+{
+	vector::remove(this->animated_tiles, tile);
 }
 
 /**

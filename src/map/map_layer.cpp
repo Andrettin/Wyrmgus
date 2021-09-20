@@ -111,36 +111,6 @@ wyrmgus::tile *CMapLayer::Field(const unsigned int index) const
 }
 
 /**
-**	@brief	Perform the map layer's per-cycle loop
-*/
-void CMapLayer::DoPerCycleLoop()
-{
-	if (GameCycle > 0) {
-		//do tile animation
-		if (GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
-			const int max_tile_index = this->get_width() * this->get_height();
-			for (int i = 0; i < max_tile_index; ++i) {
-				wyrmgus::tile &mf = *this->Field(i);
-				
-				if (mf.get_terrain() != nullptr && mf.get_terrain()->SolidAnimationFrames > 0) {
-					++mf.AnimationFrame;
-					if (mf.AnimationFrame >= mf.get_terrain()->SolidAnimationFrames) {
-						mf.AnimationFrame = 0;
-					}
-				}
-				
-				if (mf.get_overlay_terrain() != nullptr && mf.get_overlay_terrain()->SolidAnimationFrames > 0) {
-					++mf.OverlayAnimationFrame;
-					if (mf.OverlayAnimationFrame >= mf.get_overlay_terrain()->SolidAnimationFrames) {
-						mf.OverlayAnimationFrame = 0;
-					}
-				}
-			}
-		}
-	}
-}
-
-/**
 **	@brief	Perform the map layer's per-hour loop
 */
 void CMapLayer::DoPerHourLoop()

@@ -292,6 +292,8 @@ public:
 //	void setGraphicTile(unsigned int tile) { this->tile = tile; }
 	//Wyrmgus end
 
+	bool is_animated() const;
+
 	CPlayer *get_owner() const;
 	CPlayer *get_realm_owner() const;
 

@@ -129,7 +129,6 @@ public:
 		return this->get_size().height();
 	}
 	
-	void DoPerCycleLoop();
 	void DoPerHourLoop();
 	void handle_destroyed_overlay_terrain();
 	void decay_destroyed_overlay_terrain_tile(const QPoint &pos);

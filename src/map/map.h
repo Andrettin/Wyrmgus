@@ -320,6 +320,14 @@ private:
 	//Wyrmgus end
 
 public:
+	void add_animated_tile(tile *tile)
+	{
+		this->animated_tiles.push_back(tile);
+	}
+
+	void remove_animated_tile(tile *tile);
+
+public:
 	bool NoFogOfWar = false;           /// fog of war disabled
 
 	std::unique_ptr<CTileset> Tileset;          /// tileset data
@@ -335,6 +343,9 @@ public:
 	//Wyrmgus end
 
 	qunique_ptr<map_info> Info;             /// descriptive information
+
+private:
+	std::vector<tile *> animated_tiles;
 };
 
 extern std::filesystem::path CurrentMapPath; /// Path to the current map

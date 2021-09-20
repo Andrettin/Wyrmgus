@@ -106,6 +106,8 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 {
 	const bool is_overlay = terrain_type != nullptr && terrain_type->is_overlay();
 
+	const bool old_animated = this->is_animated();
+
 	//remove the flags of the old terrain type
 	if (is_overlay) {
 		if (this->get_overlay_terrain() == terrain_type) {
@@ -228,6 +230,16 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 	} else {
 		this->bump_incompatible_units();
 	}
+
+	const bool animated = this->is_animated();
+
+	if (old_animated != animated) {
+		if (animated) {
+			CMap::get()->add_animated_tile(this);
+		} else {
+			CMap::get()->remove_animated_tile(this);
+		}
+	}
 }
 
 void tile::RemoveOverlayTerrain()
@@ -235,6 +247,8 @@ void tile::RemoveOverlayTerrain()
 	if (this->get_overlay_terrain() == nullptr) {
 		return;
 	}
+
+	const bool old_animated = this->is_animated();
 
 	if (this->get_resource() != nullptr && this->get_settlement() != nullptr) {
 		//decrement the resource tile count for the tile's settlement
@@ -254,6 +268,7 @@ void tile::RemoveOverlayTerrain()
 	this->OverlayTerrainDestroyed = false;
 	this->OverlayTerrainDamaged = false;
 	this->OverlayTransitionTiles.clear();
+	this->OverlayAnimationFrame = 0;
 
 	this->Flags |= this->get_terrain()->Flags;
 	// restore tile_flag::air_impassable related to units (i.e. doors)
@@ -270,6 +285,16 @@ void tile::RemoveOverlayTerrain()
 
 	if (this->get_terrain_feature() != nullptr) {
 		this->terrain_feature = nullptr;
+	}
+
+	const bool animated = this->is_animated();
+
+	if (old_animated != animated) {
+		if (animated) {
+			CMap::get()->add_animated_tile(this);
+		} else {
+			CMap::get()->remove_animated_tile(this);
+		}
 	}
 }
 
@@ -757,6 +782,11 @@ void tile::update_movement_cost()
 	if (top_terrain != nullptr) {
 		this->movement_cost -= top_terrain->get_movement_bonus();
 	}
+}
+
+bool tile::is_animated() const
+{
+	return (this->get_terrain() != nullptr && this->get_terrain()->SolidAnimationFrames > 0) || (this->get_overlay_terrain() != nullptr && this->get_overlay_terrain()->SolidAnimationFrames > 0);
 }
 
 CPlayer *tile::get_owner() const
