@@ -2531,7 +2531,7 @@ static int CclSetPlayerData(lua_State *l)
 	
 	//Wyrmgus start
 	//if player is unused, return
-	if (p->get_type() == player_type::nobody && !CEditor::get()->is_running()) {
+	if (p->get_type() == player_type::nobody && !CEditor::get()->is_running() && strcmp(data, "Type") != 0) {
 		return 0;
 	}
 	//Wyrmgus end
