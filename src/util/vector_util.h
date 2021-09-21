@@ -117,15 +117,6 @@ T take_back(std::vector<T> &vector)
 	return vector::take(vector, vector.size() - 1);
 }
 
-template <typename T, typename U>
-void fill(std::vector<T> &vector, const U &value)
-{
-	//set all values in the vector to the desired value
-	for (T &element : vector) {
-		element = value;
-	}
-}
-
 template <typename T>
 std::vector<T> subvector(const std::vector<T> &vector, const size_t pos, const size_t size)
 {

@@ -217,8 +217,8 @@ static void AStarPrepare(int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	wyrmgus::vector::fill(AStarMatrix, Node());
-	wyrmgus::vector::fill(AStarMatrix[z], Node());
+//	std::fill(AStarMatrix.begin(), AStarMatrix.end(), Node());
+	std::fill(AStarMatrix[z].begin(), AStarMatrix[z].end(), Node());
 	//Wyrmgus end
 }
 
@@ -248,10 +248,10 @@ static void AStarCleanUp(int z)
 
 //Wyrmgus start
 //static void CostMoveToCacheCleanUp()
-static void CostMoveToCacheCleanUp(int z)
+static void CostMoveToCacheCleanUp(const int z)
 //Wyrmgus end
 {
-	wyrmgus::vector::fill(CostMoveToCache[z], CacheNotSet);
+	std::fill(CostMoveToCache[z].begin(), CostMoveToCache[z].end(), CacheNotSet);
 }
 
 /**
