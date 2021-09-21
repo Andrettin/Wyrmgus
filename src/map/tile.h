@@ -109,6 +109,7 @@
 */
 
 #include "map/tile_transition.h"
+#include "player/player_container.h"
 #include "unit/unit_cache.h"
 #include "vec2i.h"
 
@@ -135,14 +136,26 @@ class tile_player_info final
 {
 public:
 	/// Check if a field for the user is explored.
-	bool IsExplored(const CPlayer &player) const;
+	bool is_explored(const int player_index) const
+	{
+		return this->Visible[player_index] != 0;
+	}
+
+	bool is_explored(const CPlayer &player) const;
+
 	//Wyrmgus start
 	bool IsTeamExplored(const CPlayer &player) const;
 	//Wyrmgus end
 
 	/// @note Manage CMap::get()->NoFogOfWar
-	bool IsVisible(const CPlayer &player) const;
+	bool is_visible(const int player_index, const bool fog_of_war) const
+	{
+		return this->Visible[player_index] >= 2 || (!fog_of_war && this->is_explored(player_index));
+	}
+
+	bool is_visible(const CPlayer &player) const;
 	bool IsTeamVisible(const CPlayer &player) const;
+
 	/**
 	**  Find out how a field is seen (By player, or by shared vision)
 	**
@@ -151,7 +164,40 @@ public:
 	**
 	**  @return        0 unexplored, 1 explored, 2 visible.
 	*/
-	unsigned char TeamVisibilityState(const CPlayer &player) const;
+	unsigned char get_team_visibility_state(const int player_index, const player_index_set &mutual_shared_vision, const std::vector<int> &revealed_player_indexes, const bool fog_of_war) const
+	{
+		unsigned char max_vision = this->Visible[player_index];
+
+		if (max_vision >= 2) {
+			return 2;
+		}
+
+		for (const int p : mutual_shared_vision) {
+			max_vision = std::max<unsigned char>(max_vision, this->Visible[p]);
+			if (max_vision >= 2) {
+				return 2;
+			}
+		}
+
+		for (const int p : revealed_player_indexes) {
+			if (this->Visible[p] < 2) { //don't show a revealed player's explored tiles, only the currently visible ones
+				continue;
+			}
+
+			max_vision = std::max<unsigned char>(max_vision, this->Visible[p]);
+			if (max_vision >= 2) {
+				return 2;
+			}
+		}
+
+		if (max_vision == 1 && !fog_of_war) {
+			return 2;
+		}
+
+		return max_vision;
+	}
+
+	unsigned char get_team_visibility_state(const CPlayer &player) const;
 
 public:
 	//Wyrmgus start

@@ -688,7 +688,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const
 				break;
 			}
 			//Wyrmgus start
-//			if (player && !mf.player_info->IsExplored(*player)) {
+//			if (player && !mf.player_info->is_explored(*player)) {
 			if (player && !ignore_exploration && !tile->player_info->IsTeamExplored(*player)) {
 			//Wyrmgus end
 				ontop = nullptr;

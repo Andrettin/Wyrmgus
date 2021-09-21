@@ -4645,7 +4645,7 @@ void UnitCountSeen(CUnit &unit)
 						}
 					//Wyrmgus end
 					} else {
-						if (mf->player_info->IsVisible(*CPlayer::Players[p])) {
+						if (mf->player_info->is_visible(*CPlayer::Players[p])) {
 							newv++;
 						}
 					}
@@ -4702,8 +4702,8 @@ bool CUnit::IsVisible(const CPlayer &player) const
 		}
 	}
 
-	for (const CPlayer *other_player : CPlayer::get_revealed_players()) {
-		if (this->VisCount[other_player->get_index()]) {
+	for (const int p : CPlayer::get_revealed_player_indexes()) {
+		if (this->VisCount[p]) {
 			return true;
 		}
 	}

@@ -188,6 +188,15 @@ void CPlayer::Load(lua_State *l)
 					this->shared_vision.insert(i);
 				}
 			}
+		} else if (!strcmp(value, "mutual-shared-vision")) {
+			value = LuaToString(l, j + 1);
+			for (int i = 0; i < PlayerMax && *value; ++i, ++value) {
+				if (*value == '-' || *value == '_' || *value == ' ') {
+					this->mutual_shared_vision.erase(i);
+				} else {
+					this->mutual_shared_vision.insert(i);
+				}
+			}
 		} else if (!strcmp(value, "start")) {
 			CclGetPos(l, &this->StartPos.x, &this->StartPos.y, j + 1);
 		//Wyrmgus start

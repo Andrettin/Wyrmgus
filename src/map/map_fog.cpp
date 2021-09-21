@@ -613,7 +613,7 @@ void UpdateFogOfWarChange()
 		const unsigned int w = Map.Info.MapHeight * Map.Info.MapWidth;
 		for (unsigned int index = 0; index != w; ++index) {
 			wyrmgus::tile &mf = *Map.Field(index);
-			if (mf.player_info->IsExplored(*ThisPlayer)) {
+			if (mf.player_info->is_explored(*ThisPlayer)) {
 				Map.MarkSeenTile(mf);
 			}
 		}
@@ -622,7 +622,7 @@ void UpdateFogOfWarChange()
 			const unsigned int w = CMap::get()->Info->MapHeights[z] * CMap::get()->Info->MapWidths[z];
 			for (unsigned int index = 0; index != w; ++index) {
 				wyrmgus::tile &mf = *CMap::get()->Field(index, z);
-				if (mf.player_info->IsExplored(*CPlayer::GetThisPlayer())) {
+				if (mf.player_info->is_explored(*CPlayer::GetThisPlayer())) {
 					CMap::get()->MarkSeenTile(mf);
 				}
 			}
@@ -921,7 +921,7 @@ void CViewport::DrawMapFogOfWar(std::vector<std::function<void(renderer *)>> &re
 		for (int mx = sx; mx < ex; ++mx) {
 			//Wyrmgus start
 //			VisibleTable[my_index + mx] = CMap::get()->Field(mx + my_index)->player_info->TeamVisibilityState(*ThisPlayer);
-			VisibleTable[UI.CurrentMapLayer->ID][my_index + mx] = CMap::get()->Field(mx + my_index, UI.CurrentMapLayer->ID)->player_info->TeamVisibilityState(*CPlayer::GetThisPlayer());
+			VisibleTable[UI.CurrentMapLayer->ID][my_index + mx] = CMap::get()->Field(mx + my_index, UI.CurrentMapLayer->ID)->player_info->get_team_visibility_state(*CPlayer::GetThisPlayer());
 			//Wyrmgus end
 		}
 		my_index += UI.CurrentMapLayer->get_width();

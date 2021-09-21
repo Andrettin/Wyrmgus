@@ -443,7 +443,7 @@ void InitPlayers()
 void CleanPlayers()
 {
 	CPlayer::SetThisPlayer(nullptr);
-	CPlayer::revealed_players.clear();
+	CPlayer::revealed_player_indexes.clear();
 	for (unsigned int i = 0; i < PlayerMax; ++i) {
 		CPlayer::Players[i]->Clear();
 	}
@@ -521,9 +521,9 @@ void CPlayer::set_revealed(const bool revealed)
 	this->revealed = revealed;
 
 	if (revealed) {
-		CPlayer::revealed_players.push_back(this);
+		CPlayer::revealed_player_indexes.push_back(this->get_index());
 	} else {
-		vector::remove(CPlayer::revealed_players, this);
+		vector::remove(CPlayer::revealed_player_indexes, this->get_index());
 	}
 }
 
@@ -571,6 +571,10 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\", \"shared-vision\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
 		file.printf("%c", p.shared_vision.contains(j) ? 'X' : '_');
+	}
+	file.printf("\", \"mutual-shared-vision\", \"");
+	for (int j = 0; j < PlayerMax; ++j) {
+		file.printf("%c", p.mutual_shared_vision.contains(j) ? 'X' : '_');
 	}
 	file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
 	//Wyrmgus start
@@ -4166,7 +4170,7 @@ void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 	}
 }
 
-void CPlayer::set_shared_vision_with(const CPlayer *player, const bool shared_vision)
+void CPlayer::set_shared_vision_with(CPlayer *player, const bool shared_vision)
 {
 	if (shared_vision == this->has_shared_vision_with(player)) {
 		return;
@@ -4177,11 +4181,21 @@ void CPlayer::set_shared_vision_with(const CPlayer *player, const bool shared_vi
 	if (shared_vision) {
 		this->shared_vision.insert(player->get_index());
 
+		if (player->has_shared_vision_with(this)) {
+			this->mutual_shared_vision.insert(player->get_index());
+			player->mutual_shared_vision.insert(this->get_index());
+		}
+
 		if (GameCycle > 0 && player == CPlayer::GetThisPlayer()) {
 			CPlayer::GetThisPlayer()->Notify(_("%s is now sharing vision with us"), _(this->get_name().c_str()));
 		}
 	} else {
 		this->shared_vision.erase(player->get_index());
+
+		if (player->has_shared_vision_with(this)) {
+			this->mutual_shared_vision.erase(player->get_index());
+			player->mutual_shared_vision.erase(this->get_index());
+		}
 
 		if (GameCycle > 0 && player == CPlayer::GetThisPlayer()) {
 			CPlayer::GetThisPlayer()->Notify(_("%s is no longer sharing vision with us"), _(this->get_name().c_str()));
@@ -4356,7 +4370,7 @@ bool CPlayer::is_vision_sharing() const
 
 bool CPlayer::has_mutual_shared_vision_with(const CPlayer *player) const
 {
-	return this->has_shared_vision_with(player) && player->has_shared_vision_with(this);
+	return this->has_mutual_shared_vision_with(player->get_index());
 }
 
 bool CPlayer::has_mutual_shared_vision_with(const CUnit &unit) const

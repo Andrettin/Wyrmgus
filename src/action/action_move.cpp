@@ -44,6 +44,7 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "pathfinder.h"
+#include "player/player.h"
 #include "script.h"
 #include "settings.h"
 #include "sound/sound.h"
@@ -276,19 +277,23 @@ int DoActionMove(CUnit &unit)
 		// Remove unit from the current selection
 		//Wyrmgus start
 //		if (unit.Selected && !Map.Field(pos)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		if (unit.Selected && !unit.MapLayer->Field(pos)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+		if (unit.Selected) {
 		//Wyrmgus end
-			if (IsOnlySelected(unit)) { //  Remove building cursor
-				CancelBuildingMode();
-			}
-			if (!ReplayRevealMap) {
-				UnSelectUnit(unit);
-				SelectionChanged();
+			const tile *target_tile = unit.MapLayer->Field(pos);
+
+			if (!target_tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+				if (IsOnlySelected(unit)) { //  Remove building cursor
+					CancelBuildingMode();
+				}
+				if (!ReplayRevealMap) {
+					UnSelectUnit(unit);
+					SelectionChanged();
+				}
 			}
 		}
 
-		unit.pixel_offset.setX(-posd.x * wyrmgus::defines::get()->get_tile_width());
-		unit.pixel_offset.setY(-posd.y * wyrmgus::defines::get()->get_tile_height());
+		unit.pixel_offset.setX(-posd.x * defines::get()->get_tile_width());
+		unit.pixel_offset.setY(-posd.y * defines::get()->get_tile_height());
 		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
@@ -315,7 +320,7 @@ int DoActionMove(CUnit &unit)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (abs(unit.get_pixel_offset().x()) > (wyrmgus::defines::get()->get_tile_width() * 2) || abs(unit.get_pixel_offset().y()) > (wyrmgus::defines::get()->get_tile_height() * 2)) {
+	if (abs(unit.get_pixel_offset().x()) > (defines::get()->get_tile_width() * 2) || abs(unit.get_pixel_offset().y()) > (defines::get()->get_tile_height() * 2)) {
 		unit.pixel_offset = QPoint(0, 0);
 #ifdef DEBUG
 		log::log_error("Error in DoActionMove: unit's pixel movement was too big.");

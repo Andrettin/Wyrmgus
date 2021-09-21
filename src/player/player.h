@@ -112,15 +112,15 @@ public:
 		return CPlayer::non_neutral_players;
 	}
 
-	static const std::vector<const CPlayer *> &get_revealed_players()
+	static const std::vector<int> &get_revealed_player_indexes()
 	{
-		return CPlayer::revealed_players;
+		return CPlayer::revealed_player_indexes;
 	}
 
 private:
 	static CPlayer *ThisPlayer; //player on local computer
 	static inline std::vector<CPlayer *> non_neutral_players;
-	static inline std::vector<const CPlayer *> revealed_players;
+	static inline std::vector<int> revealed_player_indexes;
 
 public:
 	explicit CPlayer(const int index);
@@ -855,6 +855,16 @@ public:
 		return this->has_shared_vision_with(other_player);
 	}
 
+	const player_index_set &get_mutual_shared_vision() const
+	{
+		return this->mutual_shared_vision;
+	}
+
+	bool has_mutual_shared_vision_with(const int player_index) const
+	{
+		return this->mutual_shared_vision.contains(player_index);
+	}
+
 	bool has_mutual_shared_vision_with(const CPlayer *player) const;
 	bool has_mutual_shared_vision_with(const CUnit &unit) const;
 	bool is_vision_sharing() const;
@@ -918,7 +928,7 @@ public:
 	Q_INVOKABLE void set_enemy_diplomatic_stance_with_async(CPlayer *player);
 	void SetDiplomacyCrazyWith(const CPlayer &player);
 
-	void set_shared_vision_with(const CPlayer *player, const bool shared_vision);
+	void set_shared_vision_with(CPlayer *player, const bool shared_vision);
 	Q_INVOKABLE void set_shared_vision_with_async(CPlayer *player, const bool shared_vision);
 
 	CPlayer *get_realm_player()
@@ -1123,6 +1133,7 @@ private:
 	player_index_set enemies; //enemies for this player
 	player_index_set allies; //allies for this player
 	player_index_set shared_vision; //set of player indexes that this player has shared vision with
+	player_index_set mutual_shared_vision; //set of player indexes that this player has mutual shared vision with
 	mutable std::shared_mutex mutex; //mutex for protecting player data which is written from the Wyrmgus thread, but which can be read from the Qt thread
 
 	friend void CleanPlayers();

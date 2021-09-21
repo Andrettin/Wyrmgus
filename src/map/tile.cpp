@@ -882,68 +882,35 @@ void tile::remove_incompatible_units()
 
 //  tile_player_info
 
-unsigned char tile_player_info::TeamVisibilityState(const CPlayer &player) const
+unsigned char tile_player_info::get_team_visibility_state(const CPlayer &player) const
 {
-	if (this->IsVisible(player)) {
-		return 2;
-	}
-
-	unsigned char maxVision = 0;
-
-	if (this->IsExplored(player)) {
-		maxVision = 1;
-	}
-
 	const int player_index = player.get_index();
-	for (const int i : player.get_shared_vision()) {
-		if (CPlayer::Players[i]->has_shared_vision_with(player_index)) { //if the shared vision is mutual
-			maxVision = std::max<unsigned char>(maxVision, this->Visible[i]);
-			if (maxVision >= 2) {
-				return 2;
-			}
-		}
-	}
-
-	for (const CPlayer *other_player : CPlayer::get_revealed_players()) {
-		const int other_player_index = other_player->get_index();
-		if (this->Visible[other_player_index] < 2) { //don't show a revealed player's explored tiles, only the currently visible ones
-			continue;
-		}
-
-		maxVision = std::max<unsigned char>(maxVision, Visible[other_player_index]);
-		if (maxVision >= 2) {
-			return 2;
-		}
-	}
-
-	if (maxVision == 1 && CMap::get()->NoFogOfWar) {
-		return 2;
-	}
-
-	return maxVision;
+	const player_index_set &mutual_shared_vision = player.get_mutual_shared_vision();
+	const bool fog_of_war = !CMap::get()->NoFogOfWar;
+	return this->get_team_visibility_state(player_index, mutual_shared_vision, CPlayer::get_revealed_player_indexes(), fog_of_war);
 }
 
-bool tile_player_info::IsExplored(const CPlayer &player) const
+bool tile_player_info::is_explored(const CPlayer &player) const
 {
-	return this->Visible[player.get_index()] != 0;
+	return this->is_explored(player.get_index());
 }
 
 //Wyrmgus start
 bool tile_player_info::IsTeamExplored(const CPlayer &player) const
 {
-	return this->Visible[player.get_index()] != 0 || this->TeamVisibilityState(player) != 0;
+	return this->Visible[player.get_index()] != 0 || this->get_team_visibility_state(player) != 0;
 }
 //Wyrmgus end
 
-bool tile_player_info::IsVisible(const CPlayer &player) const
+bool tile_player_info::is_visible(const CPlayer &player) const
 {
-	const bool fogOfWar = !CMap::get()->NoFogOfWar;
-	return Visible[player.get_index()] >= 2 || (!fogOfWar && IsExplored(player));
+	const bool fog_of_war = !CMap::get()->NoFogOfWar;
+	return this->is_visible(player.get_index(), fog_of_war);
 }
 
 bool tile_player_info::IsTeamVisible(const CPlayer &player) const
 {
-	return TeamVisibilityState(player) == 2;
+	return this->get_team_visibility_state(player) == 2;
 }
 
 }

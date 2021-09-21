@@ -539,6 +539,12 @@ void minimap::Update()
 
 	const uint32_t unexplored_color = CVideo::MapRGB(0, 0, 0);
 	const uint32_t explored_color = CVideo::MapRGBA(0, 0, 0, 128); //explored but not visible
+
+	const int this_player_index = CPlayer::GetThisPlayer()->get_index();
+	const player_index_set &mutual_shared_vision = CPlayer::GetThisPlayer()->get_mutual_shared_vision();
+	const std::vector<int> &revealed_player_indexes = CPlayer::get_revealed_player_indexes();
+	const bool fog_of_war = !CMap::get()->NoFogOfWar;
+
 	for (int my = 0; my < texture_height; ++my) {
 		for (int mx = 0; mx < texture_width; ++mx) {
 			if (mx < XOffset[z] || mx >= texture_width - XOffset[z] || my < YOffset[z] || my >= texture_height - YOffset[z]) {
@@ -552,7 +558,7 @@ void minimap::Update()
 				visiontype = 2;
 			} else {
 				const Vec2i tilePos(Minimap2MapX[z][mx], Minimap2MapY[z][my] / UI.CurrentMapLayer->get_width());
-				visiontype = CMap::get()->Field(tilePos, z)->player_info->TeamVisibilityState(*CPlayer::GetThisPlayer());
+				visiontype = CMap::get()->Field(tilePos, z)->player_info->get_team_visibility_state(this_player_index, mutual_shared_vision, revealed_player_indexes, fog_of_war);
 			}
 
 			switch (visiontype) {

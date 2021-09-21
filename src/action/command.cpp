@@ -1367,7 +1367,7 @@ void CommandDiplomacy(const int player_index, const wyrmgus::diplomacy_state sta
 void CommandSharedVision(const int player_index, const bool state, const int other_player_index)
 {
 	CPlayer *player = CPlayer::Players[player_index].get();
-	const CPlayer *other_player = CPlayer::Players[other_player_index].get();
+	CPlayer *other_player = CPlayer::Players[other_player_index].get();
 
 	const bool mutual_vision_change = (state && !player->has_shared_vision_with(other_player) && other_player->has_shared_vision_with(player)) || (!state && player->has_mutual_shared_vision_with(other_player));
 

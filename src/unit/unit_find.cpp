@@ -612,7 +612,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 	const wyrmgus::tile *tile = worker.MapLayer->Field(pos);
 
 	//Wyrmgus start
-//	if (!worker.Player->AiEnabled && !tile->player_info->IsExplored(*worker.Player)) {
+//	if (!worker.Player->AiEnabled && !tile->player_info->is_explored(*worker.Player)) {
 	if (!tile->player_info->IsTeamExplored(*worker.Player) && !ignore_exploration) {
 	//Wyrmgus end
 		return VisitResult::DeadEnd;

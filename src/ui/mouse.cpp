@@ -1833,7 +1833,7 @@ static int SendResource(const Vec2i &pos, int flush)
 					if (unit.Type->get_resource_info(resource) != nullptr
 						//Wyrmgus start
 //						&& unit.Type->ResInfo[res]->TerrainHarvester
-//						&& mf.player_info->IsExplored(*unit.Player)
+//						&& mf.player_info->is_explored(*unit.Player)
 						&& mf.player_info->IsTeamExplored(*unit.Player)
 						//Wyrmgus end
 						&& mf.get_resource() == resource

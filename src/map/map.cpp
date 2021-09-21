@@ -2024,8 +2024,8 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		}
 	}
 
-	//maybe isExplored
-	if (mf.player_info->IsExplored(*ThisPlayer)) {
+	//maybe is_explored
+	if (mf.player_info->is_explored(*ThisPlayer)) {
 		UI.get_minimap()->UpdateSeenXY(pos);
 		if (!seen) {
 			MarkSeenTile(mf);
@@ -3999,8 +3999,8 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 	UI.get_minimap()->UpdateXY(pos);
 	FixNeighbors(tile_flag::tree, 0, pos);
 
-	//maybe isExplored
-	if (mf.player_info->IsExplored(*ThisPlayer)) {
+	//maybe is_explored
+	if (mf.player_info->is_explored(*ThisPlayer)) {
 		UI.get_minimap()->UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}
@@ -4018,8 +4018,8 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	UI.get_minimap()->UpdateXY(pos);
 	FixNeighbors(tile_flag::rock, 0, pos);
 
-	//maybe isExplored
-	if (mf.player_info->IsExplored(*ThisPlayer)) {
+	//maybe is_explored
+	if (mf.player_info->is_explored(*ThisPlayer)) {
 		UI.get_minimap()->UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}
