@@ -380,6 +380,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Q
 					break;
 				}
 			}
+			break;
 
 		case SDL_KEYDOWN:
 			InputKeyButtonPress(callbacks, SDL_GetTicks(), event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0, key_modifiers);
