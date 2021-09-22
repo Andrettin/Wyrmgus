@@ -54,7 +54,9 @@
 #include <random>
 #include <set>
 #include <shared_mutex>
+#ifndef __clang__
 #include <source_location>
+#endif
 #include <sstream>
 #include <stack>
 #include <stdexcept>
@@ -65,6 +67,7 @@
 #include <typeinfo>
 #include <variant>
 #include <vector>
+
 #include <QApplication>
 #include <QColor>
 #include <QDateTime>
@@ -87,5 +90,6 @@
 #include <QTime>
 #include <QVariant>
 #include <QVariantList>
+
 #include "util/point_operators.h" //to ensure the / operator with an int as RHS is used instead of the Qt one with qreal (which uses rounding)
 #include "util/size_operators.h" //as above
