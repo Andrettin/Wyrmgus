@@ -119,6 +119,8 @@ public:
 	int get_pos_index(const int x, const int y, const int z) const;
 	int get_pos_index(const QPoint &pos, const int z) const;
 	
+	QPoint get_index_pos(const int index, const int z) const;
+	
 	tile *Field(const unsigned int index, const int z) const;
 	/// Get the map field at location x, y
 	tile *Field(const int x, const int y, const int z) const;

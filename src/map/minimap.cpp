@@ -147,6 +147,14 @@ void minimap::Create()
 		terrain_image.fill(Qt::transparent);
 		this->terrain_images.push_back(std::move(terrain_image));
 
+		QImage unexplored_image(MinimapTextureWidth[z], MinimapTextureHeight[z], QImage::Format_RGBA8888);
+		unexplored_image.fill(Qt::transparent);
+		this->unexplored_images.push_back(std::move(unexplored_image));
+
+		QImage fog_of_war_image(MinimapTextureWidth[z], MinimapTextureHeight[z], QImage::Format_RGBA8888);
+		fog_of_war_image.fill(Qt::transparent);
+		this->fog_of_war_images.push_back(std::move(fog_of_war_image));
+
 		for (int i = 0; i < static_cast<int>(minimap_mode::count); ++i) {
 			const minimap_mode mode = static_cast<minimap_mode>(i);
 			if (minimap_mode_has_overlay(mode)) {
@@ -162,6 +170,7 @@ void minimap::Create()
 
 		this->UpdateTerrain(z);
 		this->update_territories(z);
+		this->update_exploration(z);
 	}
 
 	NumMinimapEvents = 0;
@@ -172,15 +181,6 @@ void minimap::Create()
 */
 void minimap::UpdateTerrain(int z)
 {
-	int scalex = MinimapScaleX[z] * SCALE_PRECISION / MINIMAP_FAC;
-	if (!scalex) {
-		scalex = 1;
-	}
-	int scaley = MinimapScaleY[z] * SCALE_PRECISION / MINIMAP_FAC;
-	if (!scaley) {
-		scaley = 1;
-	}
-	
 	const CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
 	const int texture_width = this->get_texture_width(z);
 	const int texture_height = this->get_texture_height(z);
@@ -210,6 +210,29 @@ void minimap::update_territories(const int z)
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
 		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
 			this->update_territory_pixel(mx, my, z);
+		}
+	}
+}
+
+void minimap::update_exploration(const int z)
+{
+	const int texture_width = this->get_texture_width(z);
+	const int texture_height = this->get_texture_height(z);
+	const CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
+	const int this_player_index = CPlayer::GetThisPlayer()->get_index();
+
+	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
+		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
+			unsigned short visibility_state;
+
+			if (ReplayRevealMap) {
+				visibility_state = 2;
+			} else {
+				const tile *tile = map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
+				visibility_state = tile->player_info->get_team_visibility_state(*CPlayer::GetThisPlayer());
+			}
+
+			this->update_exploration_pixel(mx, my, z, visibility_state);
 		}
 	}
 }
@@ -281,7 +304,6 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 
 	const int ty = pos.y() * CMap::get()->Info->MapWidths[z];
 	const int tx = pos.x();
-	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
 
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
 		const int y = Minimap2MapY[z][my];
@@ -313,7 +335,6 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
 	const int minimap_color_index = defines::get()->get_minimap_color_index();
 
-	const int pixel_index = (mx + my * MinimapTextureWidth[z]) * 4;
 	QColor color(Qt::transparent);
 	QColor with_non_land_color(Qt::transparent);
 	QColor realm_color(Qt::transparent);
@@ -375,6 +396,74 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 	this->mode_overlay_images[minimap_mode::territories_with_non_land][z].setPixelColor(mx, my, with_non_land_color);
 	this->mode_overlay_images[minimap_mode::realms][z].setPixelColor(mx, my, realm_color);
 	this->mode_overlay_images[minimap_mode::realms_with_non_land][z].setPixelColor(mx, my, realm_with_non_land_color);
+}
+
+void minimap::update_exploration_index(const int index, const int z)
+{
+	const QPoint pos = CMap::get()->get_index_pos(index, z);
+	this->update_exploration_xy(pos, z);
+}
+
+void minimap::update_exploration_xy(const QPoint &pos, const int z)
+{
+	const int texture_width = this->get_texture_width(z);
+	const int texture_height = this->get_texture_height(z);
+
+	const int ty = pos.y() * CMap::get()->Info->MapWidths[z];
+	const int tx = pos.x();
+
+	unsigned short visibility_state;
+
+	if (ReplayRevealMap) {
+		visibility_state = 2;
+	} else {
+		const CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
+		const int this_player_index = CPlayer::GetThisPlayer()->get_index();
+		const tile *tile = map_layer->Field(pos);
+		visibility_state = tile->player_info->get_team_visibility_state(*CPlayer::GetThisPlayer());
+	}
+
+	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
+		const int y = Minimap2MapY[z][my];
+		if (y < ty) {
+			continue;
+		}
+		if (y > ty) {
+			break;
+		}
+
+		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
+			const int x = Minimap2MapX[z][mx];
+
+			if (x < tx) {
+				continue;
+			}
+			if (x > tx) {
+				break;
+			}
+
+			this->update_exploration_pixel(mx, my, z, visibility_state);
+		}
+	}
+}
+
+void minimap::update_exploration_pixel(const int mx, const int my, const int z, const unsigned short visibility_state)
+{
+	static const QColor transparent_color(Qt::transparent);
+
+	switch (visibility_state) {
+		case 0:
+			this->unexplored_images[z].setPixelColor(mx, my, minimap::unexplored_color);
+			break;
+		case 1:
+			this->unexplored_images[z].setPixelColor(mx, my, transparent_color);
+			this->fog_of_war_images[z].setPixelColor(mx, my, minimap::fog_of_war_color);
+			break;
+		default:
+			this->unexplored_images[z].setPixelColor(mx, my, transparent_color);
+			this->fog_of_war_images[z].setPixelColor(mx, my, transparent_color);
+			break;
+	}
 }
 
 const unit_type *minimap::get_unit_minimap_type(const CUnit *unit) const
@@ -525,7 +614,7 @@ void minimap::Update()
 	const int z = UI.CurrentMapLayer->ID;
 
 	//clear Minimap background if not transparent
-	if (!Transparent) {
+	if (!this->Transparent) {
 		this->overlay_images[z].fill(Qt::transparent);
 	}
 
@@ -537,44 +626,10 @@ void minimap::Update()
 	const int texture_height = this->get_texture_height(z);
 	unsigned char *overlay_image_buffer = this->overlay_images[z].bits();
 
-	const uint32_t unexplored_color = CVideo::MapRGB(0, 0, 0);
-	const uint32_t explored_color = CVideo::MapRGBA(0, 0, 0, 128); //explored but not visible
-
-	const int this_player_index = CPlayer::GetThisPlayer()->get_index();
-	const player_index_set &mutual_shared_vision = CPlayer::GetThisPlayer()->get_mutual_shared_vision();
-	const std::vector<int> &revealed_player_indexes = CPlayer::get_revealed_player_indexes();
-	const bool fog_of_war = !CMap::get()->NoFogOfWar;
-
 	for (int my = 0; my < texture_height; ++my) {
 		for (int mx = 0; mx < texture_width; ++mx) {
 			if (mx < XOffset[z] || mx >= texture_width - XOffset[z] || my < YOffset[z] || my >= texture_height - YOffset[z]) {
 				*(uint32_t *) &(overlay_image_buffer[(mx + my * MinimapTextureWidth[z]) * 4]) = CVideo::MapRGB(0, 0, 0);
-				continue;
-			}
-			
-			int visiontype; // 0 unexplored, 1 explored, >1 visible.
-
-			if (ReplayRevealMap) {
-				visiontype = 2;
-			} else {
-				const Vec2i tilePos(Minimap2MapX[z][mx], Minimap2MapY[z][my] / UI.CurrentMapLayer->get_width());
-				visiontype = CMap::get()->Field(tilePos, z)->player_info->get_team_visibility_state(this_player_index, mutual_shared_vision, revealed_player_indexes, fog_of_war);
-			}
-
-			switch (visiontype) {
-				case 0:
-					*(uint32_t *) &(overlay_image_buffer[(mx + my * MinimapTextureWidth[z]) * 4]) = unexplored_color;
-					break;
-				case 1:
-					if (this->is_fog_of_war_visible()) {
-						uint32_t *c = (uint32_t *) &(overlay_image_buffer[(mx + my * MinimapTextureWidth[z]) * 4]);
-						if (*c == 0) {
-							*c = explored_color;
-						}
-					}
-					break;
-				default:
-					break;
 			}
 		}
 	}
@@ -633,10 +688,16 @@ void minimap::Draw(std::vector<std::function<void(renderer *)>> &render_commands
 	const int z = UI.CurrentMapLayer->ID;
 
 	if (this->is_terrain_visible()) {
-		this->draw_image(this->terrain_images[z], z, render_commands);
+		this->draw_image(this->terrain_images.at(z), z, render_commands);
 	}
 
-	this->draw_image(this->overlay_images[z], z, render_commands);
+	if (this->is_fog_of_war_visible()) {
+		this->draw_image(this->fog_of_war_images.at(z), z, render_commands);
+	}
+
+	this->draw_image(this->overlay_images.at(z), z, render_commands);
+	this->draw_image(this->unexplored_images.at(z), z, render_commands);
+
 	this->draw_events(render_commands);
 }
 
@@ -727,6 +788,8 @@ void minimap::Destroy()
 	this->terrain_images.clear();
 	this->overlay_images.clear();
 	this->mode_overlay_images.clear();
+	this->unexplored_images.clear();
+	this->fog_of_war_images.clear();
 
 	Minimap2MapX.clear();
 	Minimap2MapY.clear();

@@ -35,6 +35,7 @@
 #include "database/defines.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
+#include "map/minimap.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "player/player.h"
@@ -253,23 +254,32 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 //	wyrmgus::tile &mf = *CMap::get()->Field(index);
 	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	//Wyrmgus end
-	unsigned short &v = mf.player_info->Visible[player.get_index()];
-	if (v == 0 || v == 1) { // Unexplored or unseen
-		// When there is no fog only unexplored tiles are marked.
-		if (!CMap::get()->NoFogOfWar || v == 0) {
-			//Wyrmgus start
-//			UnitsOnTileMarkSeen(player, mf, 0);
-			UnitsOnTileMarkSeen(player, mf, 0, 0);
-			//Wyrmgus end
-		}
-		v = 2;
-		if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			CMap::get()->MarkSeenTile(mf);
-		}
-		return;
+
+	unsigned short &v = mf.player_info->get_visibility_state_ref(player.get_index());
+
+	switch (v) {
+		case 0:
+		case 1:
+			// Unexplored or unseen
+			// When there is no fog only unexplored tiles are marked.
+			if (!CMap::get()->NoFogOfWar || v == 0) {
+				UnitsOnTileMarkSeen(player, mf, 0, 0);
+			}
+
+			v = 2;
+
+			if (GameRunning) {
+				if (CPlayer::GetThisPlayer() == &player || player.shares_visibility_with(CPlayer::GetThisPlayer())) {
+					CMap::get()->MarkSeenTile(mf);
+					UI.get_minimap()->update_exploration_index(index, z);
+				}
+			}
+			break;
+		default:
+			assert_throw(v != 65535);
+			++v;
+			break;
 	}
-	assert_throw(v != 65535);
-	++v;
 }
 
 //Wyrmgus start
@@ -296,7 +306,8 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 //	wyrmgus::tile &mf = *CMap::get()->Field(index);
 	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	//Wyrmgus end
-	unsigned short &v = mf.player_info->Visible[player.get_index()];
+	unsigned short &v = mf.player_info->get_visibility_state_ref(player.get_index());
+
 	switch (v) {
 		case 0:  // Unexplored
 		case 1:
@@ -316,7 +327,15 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 				CMap::get()->MarkSeenTile(mf);
 			}
 
-			//fallthrough
+			--v;
+
+			if (GameRunning) {
+				if (CPlayer::GetThisPlayer() == &player || player.shares_visibility_with(CPlayer::GetThisPlayer())) {
+					UI.get_minimap()->update_exploration_index(index, z);
+				}
+			}
+
+			break;
 		default:  // seen -> seen
 			--v;
 			break;
@@ -633,9 +652,14 @@ void UpdateFogOfWarChange()
 		}
 		//Wyrmgus end
 	}
+
 	//  Global seen recount.
 	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
 		UnitCountSeen(*unit);
+	}
+
+	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+		UI.get_minimap()->update_exploration(z);
 	}
 }
 

@@ -869,6 +869,12 @@ public:
 	bool has_mutual_shared_vision_with(const CUnit &unit) const;
 	bool is_vision_sharing() const;
 
+	//whether what is visible for this player is visible for the other player (but not necessarily the other way around)
+	bool shares_visibility_with(const CPlayer *other_player) const
+	{
+		return this->has_mutual_shared_vision_with(other_player) || this->is_revealed();
+	}
+
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
 

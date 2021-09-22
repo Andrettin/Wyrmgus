@@ -1587,6 +1587,10 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 		}
 	}
 
+	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+		UI.get_minimap()->update_exploration(z);
+	}
+
 	//
 	// Sound part
 	//

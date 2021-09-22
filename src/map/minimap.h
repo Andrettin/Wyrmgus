@@ -42,17 +42,24 @@ enum class minimap_mode;
 class minimap final
 {
 public:
+	static inline const QColor unexplored_color = QColor(0, 0, 0);
+	static inline const QColor fog_of_war_color = QColor(0, 0, 0, 128);
+
 	minimap();
 
 private:
 	void UpdateTerrain(int z);
 	void update_territories(const int z);
-
 public:
+	void update_exploration(const int z);
+
 	void UpdateXY(const Vec2i &pos, const int z);
 	void UpdateSeenXY(const Vec2i &) {}
 	void update_territory_xy(const QPoint &pos, const int z);
 	void update_territory_pixel(const int mx, const int my, const int z);
+	void update_exploration_index(const int index, const int z);
+	void update_exploration_xy(const QPoint &pos, const int z);
+	void update_exploration_pixel(const int mx, const int my, const int z, const unsigned short visibility_state);
 	void Update();
 	void Create();
 	void Destroy();
@@ -148,7 +155,13 @@ private:
 	bool zoomed = false; //whether the minimap texture is being shown at full resolution
 	std::vector<QImage> terrain_images;
 
-	//image for the overlay with units and unexplored terrain
+	//image for unexplored tiles
+	std::vector<QImage> unexplored_images;
+
+	//image for tiles under fog of war
+	std::vector<QImage> fog_of_war_images;
+
+	//image for the overlay with units
 	std::vector<QImage> overlay_images;
 
 	std::map<minimap_mode, std::vector<QImage>> mode_overlay_images;

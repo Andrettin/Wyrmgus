@@ -33,7 +33,7 @@
 **    This is the tile number, that the player sitting on the computer
 **    currently knows. Idea: Can be uses for illusions.
 **
-**  tile_player_info::Visible[]
+**  tile_player_info::visibility_states[]
 **
 **    Counter how many units of the player can see this field. 0 the
 **    field is not explored, 1 explored, n-1 unit see it. Currently
@@ -135,26 +135,15 @@ enum class tile_flag : uint32_t;
 class tile_player_info final
 {
 public:
-	/// Check if a field for the user is explored.
-	bool is_explored(const int player_index) const
+	unsigned short get_visibility_state(const int player_index) const
 	{
-		return this->Visible[player_index] != 0;
+		return this->visibility_states[player_index];
 	}
 
-	bool is_explored(const CPlayer &player) const;
-
-	//Wyrmgus start
-	bool IsTeamExplored(const CPlayer &player) const;
-	//Wyrmgus end
-
-	/// @note Manage CMap::get()->NoFogOfWar
-	bool is_visible(const int player_index, const bool fog_of_war) const
+	unsigned short &get_visibility_state_ref(const int player_index)
 	{
-		return this->Visible[player_index] >= 2 || (!fog_of_war && this->is_explored(player_index));
+		return this->visibility_states[player_index];
 	}
-
-	bool is_visible(const CPlayer &player) const;
-	bool IsTeamVisible(const CPlayer &player) const;
 
 	/**
 	**  Find out how a field is seen (By player, or by shared vision)
@@ -166,25 +155,25 @@ public:
 	*/
 	unsigned char get_team_visibility_state(const int player_index, const player_index_set &mutual_shared_vision, const std::vector<int> &revealed_player_indexes, const bool fog_of_war) const
 	{
-		unsigned char max_vision = this->Visible[player_index];
+		unsigned short max_vision = this->get_visibility_state(player_index);
 
 		if (max_vision >= 2) {
 			return 2;
 		}
 
 		for (const int p : mutual_shared_vision) {
-			max_vision = std::max<unsigned char>(max_vision, this->Visible[p]);
+			max_vision = std::max<unsigned char>(max_vision, this->get_visibility_state(p));
 			if (max_vision >= 2) {
 				return 2;
 			}
 		}
 
 		for (const int p : revealed_player_indexes) {
-			if (this->Visible[p] < 2) { //don't show a revealed player's explored tiles, only the currently visible ones
+			if (this->get_visibility_state(p) < 2) { //don't show a revealed player's explored tiles, only the currently visible ones
 				continue;
 			}
 
-			max_vision = std::max<unsigned char>(max_vision, this->Visible[p]);
+			max_vision = std::max<unsigned char>(max_vision, this->get_visibility_state(p));
 			if (max_vision >= 2) {
 				return 2;
 			}
@@ -199,9 +188,41 @@ public:
 
 	unsigned char get_team_visibility_state(const CPlayer &player) const;
 
+	/// Check if a field for the user is explored.
+	bool is_explored(const int player_index) const
+	{
+		return this->get_visibility_state(player_index) != 0;
+	}
+
+	bool is_explored(const CPlayer &player) const;
+
+	//Wyrmgus start
+	bool IsTeamExplored(const CPlayer &player) const;
+	//Wyrmgus end
+
+	/// @note Manage CMap::get()->NoFogOfWar
+	bool is_visible(const int player_index, const bool fog_of_war) const
+	{
+		return this->get_visibility_state(player_index) >= 2 || (!fog_of_war && this->is_explored(player_index));
+	}
+
+	bool is_visible(const CPlayer &player) const;
+	bool IsTeamVisible(const CPlayer &player) const;
+
 	void reset_visibility()
 	{
-		this->Visible.fill(0);
+		//reset visibility, but not exploration
+		for (unsigned short &v : this->visibility_states) {
+			switch (v) {
+				case 0:
+				case 1:
+					break;
+				default:
+					v = 1;
+					break;
+			}
+		}
+
 		this->VisCloak.fill(0);
 		this->VisEthereal.fill(0);
 		this->Radar.fill(0);
@@ -218,7 +239,9 @@ public:
 	std::vector<tile_transition> SeenTransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
 	std::vector<tile_transition> SeenOverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
-	std::array<unsigned short, PlayerMax> Visible = {};    /// Seen counter 0 unexplored
+private:
+	std::array<unsigned short, PlayerMax> visibility_states = {};    /// Seen counter 0 unexplored
+public:
 	std::array<unsigned char, PlayerMax> VisCloak = {};    /// Visiblity for cloaking.
 	std::array<unsigned char, PlayerMax> VisEthereal = {};    /// Visiblity for ethereal.
 	std::array<unsigned char, PlayerMax> Radar = {};       /// Visiblity for radar.

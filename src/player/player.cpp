@@ -1165,6 +1165,7 @@ void CPlayer::add_settlement_to_explored_territory(const site *settlement)
 
 	const CUnit *settlement_unit = settlement_data->get_site_unit();
 	const CMapLayer *map_layer = settlement_unit->MapLayer;
+	const int z = map_layer->ID;
 	const int player_index = this->get_index();
 
 	std::vector<CUnit *> units;
@@ -1180,7 +1181,16 @@ void CPlayer::add_settlement_to_explored_territory(const site *settlement)
 
 			const std::unique_ptr<tile_player_info> &tile_player_info = tile->player_info;
 
-			tile_player_info->Visible[player_index] = std::max<unsigned short>(1, tile_player_info->Visible[player_index]);
+			if (tile_player_info->get_visibility_state(player_index) == 0) {
+				tile_player_info->get_visibility_state_ref(player_index) = 1;
+
+				if (this == CPlayer::GetThisPlayer()) {
+					if (GameRunning) {
+						UI.get_minimap()->update_exploration_xy(tile_pos, z);
+					}
+				}
+			}
+
 			CMap::get()->MarkSeenTile(*tile);
 
 			const CUnitCache &unit_cache = tile->UnitCache;

@@ -37,6 +37,7 @@
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
+#include "map/minimap.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "pathfinder.h"
@@ -1391,23 +1392,27 @@ void CommandSharedVision(const int player_index, const bool state, const int oth
 
 	if (mutual_vision_change) {
 		if (before && !after) {
-			// Don't share vision anymore. Give each others' explored terrain goodbye.
+			// Don't share vision anymore. Give each others' visible terrain goodbye.
 
 			for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
 				for (int i = 0; i != CMap::get()->Info->MapWidths[z] * CMap::get()->Info->MapHeights[z]; ++i) {
 					wyrmgus::tile &mf = *CMap::get()->Field(i, z);
 					const std::unique_ptr<wyrmgus::tile_player_info> &mfp = mf.player_info;
 
-					if (mfp->Visible[player_index] && !mfp->Visible[other_player_index] && !player->is_revealed()) {
-						mfp->Visible[other_player_index] = 1;
+					if (mfp->get_visibility_state(player_index) != 0 && mfp->get_visibility_state(other_player_index) == 0 && !player->is_revealed()) {
+						mfp->get_visibility_state_ref(other_player_index) = 1;
+
 						if (other_player == CPlayer::GetThisPlayer()) {
 							CMap::get()->MarkSeenTile(mf);
+							UI.get_minimap()->update_exploration_index(i, z);
 						}
 					}
-					if (mfp->Visible[other_player_index] && !mfp->Visible[player_index] && !other_player->is_revealed()) {
-						mfp->Visible[player_index] = 1;
+					if (mfp->get_visibility_state(other_player_index) != 0 && mfp->get_visibility_state(player_index) == 0 && !other_player->is_revealed()) {
+						mfp->get_visibility_state_ref(player_index) = 1;
+
 						if (player == CPlayer::GetThisPlayer()) {
 							CMap::get()->MarkSeenTile(mf);
+							UI.get_minimap()->update_exploration_index(i, z);
 						}
 					}
 				}

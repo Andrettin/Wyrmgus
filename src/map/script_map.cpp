@@ -370,6 +370,7 @@ static int CclSetFogOfWar(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	CMap::get()->NoFogOfWar = !LuaToBoolean(l, 1);
+
 	//Wyrmgus start
 //	if (!CclInConfigFile && CMap::get()->Fields) {
 	if (!CclInConfigFile && CMap::get()->MapLayers.size() > 0) {
@@ -378,6 +379,7 @@ static int CclSetFogOfWar(lua_State *l)
 		// FIXME: save setting in replay log
 		//CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow off", -1);
 	}
+
 	return 0;
 }
 

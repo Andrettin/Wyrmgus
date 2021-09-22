@@ -105,7 +105,9 @@ std::filesystem::path CurrentMapPath; //path of the current map
 void CMap::reset_tile_visibility()
 {
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		for (int i = 0; i != this->Info->MapWidths[z] * this->Info->MapHeights[z]; ++i) {
+		const int tile_count = this->Info->MapWidths[z] * this->Info->MapHeights[z];
+
+		for (int i = 0; i != tile_count; ++i) {
 			tile *tile = this->Field(i, z);
 			tile->player_info->reset_visibility();
 		}
@@ -211,31 +213,41 @@ void CMap::Reveal(bool only_person_players)
 		wyrmgus::tile_player_info &playerInfo = mf.playerInfo;
 		for (int p = 0; p < PlayerMax; ++p) {
 			//Wyrmgus start
-//			playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
+//			playerInfo.get_visibility_state_ref(p) = std::max<unsigned short>(1, playerInfo.get_visibility_state(p));
 			if (Players[p].Type == player_type::person || !only_person_players) {
-				playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
+				playerInfo.get_visibility_state_ref(p) = std::max<unsigned short>(1, playerInfo.get_visibility_state(p));
 			}
 			//Wyrmgus end
 		}
 		MarkSeenTile(mf);
 	}
 	*/
+
+	const int this_player_index = CPlayer::GetThisPlayer()->get_index();
+
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		for (int i = 0; i != this->Info->MapWidths[z] * this->Info->MapHeights[z]; ++i) {
 			wyrmgus::tile &mf = *this->Field(i, z);
 			const std::unique_ptr<wyrmgus::tile_player_info> &player_info = mf.player_info;
 			for (int p = 0; p < PlayerMax; ++p) {
 				if (CPlayer::Players[p]->get_type() == player_type::person || !only_person_players) {
-					player_info->Visible[p] = std::max<unsigned short>(1, player_info->Visible[p]);
+					if (player_info->get_visibility_state(p) >= 1) {
+						continue;
+					}
+
+					player_info->get_visibility_state_ref(p) = 1;
 				}
 			}
+
 			MarkSeenTile(mf);
 		}
+
+		UI.get_minimap()->update_exploration(z);
 	}
 	//Wyrmgus end
 
-	//  Global seen recount. Simple and effective.
-	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+	// Global seen recount. Simple and effective.
+	for (CUnit *unit : unit_manager::get()->get_units()) {
 		//  Reveal neutral buildings. Gold mines:)
 		if (unit->Player->get_type() == player_type::neutral) {
 			for (int p = 0; p < PlayerMax; ++p) {
@@ -246,6 +258,7 @@ void CMap::Reveal(bool only_person_players)
 				}
 			}
 		}
+
 		UnitCountSeen(*unit);
 	}
 }
@@ -1303,6 +1316,7 @@ void PreprocessMap()
 					mf.UpdateSeenTile();
 					UI.get_minimap()->UpdateXY(tile_pos, z);
 					UI.get_minimap()->update_territory_xy(tile_pos, z);
+
 					if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						CMap::get()->MarkSeenTile(mf);
 					}
@@ -1610,6 +1624,11 @@ int CMap::get_pos_index(const int x, const int y, const int z) const
 int CMap::get_pos_index(const QPoint &pos, const int z) const
 {
 	return point::to_index(pos, this->Info->MapWidths[z]);
+}
+
+QPoint CMap::get_index_pos(const int index, const int z) const
+{
+	return point::from_index(index, this->Info->MapWidths[z]);
 }
 
 /**

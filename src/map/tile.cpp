@@ -415,7 +415,7 @@ void tile::Save(CFile &file) const
 	exploration_str.resize(PlayerMax);
 	int last_explored_index = -1;
 	for (int i = 0; i != PlayerMax; ++i) {
-		if (player_info->Visible[i] == 1) {
+		if (player_info->get_visibility_state(i) == 1) {
 			exploration_str[i] = '1';
 			last_explored_index = i;
 		} else {
@@ -638,7 +638,7 @@ void tile::parse(lua_State *l)
 
 			for (size_t p = 0; p < exploration_str.size(); ++p) {
 				if (exploration_str[p] == '1') {
-					this->player_info->Visible[p] = 1;
+					this->player_info->get_visibility_state_ref(p) = 1;
 				}
 			}
 		} else if (!strcmp(value, "land")) {
@@ -898,7 +898,7 @@ bool tile_player_info::is_explored(const CPlayer &player) const
 //Wyrmgus start
 bool tile_player_info::IsTeamExplored(const CPlayer &player) const
 {
-	return this->Visible[player.get_index()] != 0 || this->get_team_visibility_state(player) != 0;
+	return this->get_visibility_state(player.get_index()) != 0 || this->get_team_visibility_state(player) != 0;
 }
 //Wyrmgus end
 
