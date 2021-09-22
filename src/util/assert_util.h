@@ -28,13 +28,24 @@
 
 namespace wyrmgus {
 
+inline std::string get_source_relative_filepath_string(const std::string &filepath)
+{
+	size_t pos = filepath.find("src");
+	if (pos != std::string::npos) {
+		pos += 4;
+		return filepath.substr(pos, filepath.size() - pos);
+	}
+
+	return filepath;
+}
+
 inline void assert_throw(const bool check, const std::source_location &location = std::source_location::current())
 {
 	if (check) {
 		return;
 	}
 
-	throw std::runtime_error("Assert failed at " + std::string(location.file_name()) + ": " + std::to_string(location.line()) + ", " + location.function_name() + ".");
+	throw std::runtime_error("Assert failed at " + get_source_relative_filepath_string(location.file_name()) + ": " + std::to_string(location.line()) + ", " + location.function_name() + ".");
 }
 
 }
