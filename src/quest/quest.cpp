@@ -110,15 +110,19 @@ void quest::save_quest_completion()
 	//save quests
 	const std::filesystem::path quests_filepath = quest::get_quest_completion_filepath();
 
-	sml_parser parser;
-	sml_data data = parser.parse(quests_filepath);
+	sml_data data;
 
-	//keep scopes for non-loaded modules unchanged; otherwise, clear data for re-saving
-	data.clear_properties();
+	if (std::filesystem::exists(quests_filepath)) {
+		sml_parser parser;
+		data = parser.parse(quests_filepath);
 
-	for (const qunique_ptr<wyrmgus::data_module> &data_module : database::get()->get_modules()) {
-		if (data.has_child(data_module->get_identifier())) {
-			data.remove_child(data_module->get_identifier());
+		//keep scopes for non-loaded modules unchanged; otherwise, clear data for re-saving
+		data.clear_properties();
+
+		for (const qunique_ptr<wyrmgus::data_module> &data_module : database::get()->get_modules()) {
+			if (data.has_child(data_module->get_identifier())) {
+				data.remove_child(data_module->get_identifier());
+			}
 		}
 	}
 
