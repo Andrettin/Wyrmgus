@@ -32,6 +32,7 @@
 #include "database/sml_data.h"
 #include "database/sml_property.h"
 #include "dialogue.h"
+#include "player/player.h"
 #include "script/effect/scripted_effect.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"

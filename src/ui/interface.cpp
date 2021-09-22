@@ -926,7 +926,7 @@ bool HandleCheats(const std::string &input)
 #endif
 		} else {
 			CPlayer::GetThisPlayer()->AiEnabled = true;
-			CPlayer::GetThisPlayer()->get_type() = player_type::computer;
+			CPlayer::GetThisPlayer()->set_type(player_type::computer);
 			if (!CPlayer::GetThisPlayer()->Ai) {
 				AiInit(*CPlayer::GetThisPlayer());
 			}
