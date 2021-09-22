@@ -35,6 +35,7 @@
 #include "map/map_layer.h"
 #include "player/dynasty.h"
 #include "player/faction.h"
+#include "player/player.h"
 #include "script/trigger.h"
 #include "spell/spell.h"
 #include "ui/button_cmd.h"

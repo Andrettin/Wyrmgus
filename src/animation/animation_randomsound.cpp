@@ -31,6 +31,7 @@
 #include "animation/animation_randomsound.h"
 
 #include "map/map.h"
+#include "player/player.h"
 #include "sound/sound.h"
 #include "unit/unit.h"
 #include "util/util.h"

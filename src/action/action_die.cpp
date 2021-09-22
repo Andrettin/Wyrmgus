@@ -31,6 +31,7 @@
 #include "animation.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 

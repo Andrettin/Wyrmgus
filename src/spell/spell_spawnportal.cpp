@@ -31,6 +31,7 @@
 
 #include "spell/spell_spawnportal.h"
 
+#include "player/player.h"
 #include "script.h"
 #include "unit/unit.h"
 

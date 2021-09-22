@@ -34,6 +34,7 @@
 #include "ai/ai_local.h"
 #include "commands.h"
 #include "map/map_layer.h"
+#include "player/player.h"
 #include "script.h"
 #include "spell/spell.h"
 #include "unit/unit.h"

@@ -31,6 +31,7 @@
 #include "ai_local.h"
 
 #include "actions.h"
+#include "player/player.h"
 #include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"

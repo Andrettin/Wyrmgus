@@ -32,6 +32,7 @@
 #include "unit/unit.h"
 
 #include "iolib.h"
+#include "player/player.h"
 #include "script.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"

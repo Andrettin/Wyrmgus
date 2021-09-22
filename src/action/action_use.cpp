@@ -42,6 +42,7 @@
 #include "missile.h"
 #include "network.h"
 #include "pathfinder.h"
+#include "player/player.h"
 #include "script.h"
 #include "sound/sound.h"
 #include "sound/unit_sound_type.h"
