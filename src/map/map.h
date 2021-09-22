@@ -102,8 +102,8 @@ namespace wyrmgus {
 --  Map
 ----------------------------------------------------------------------------*/
 
-constexpr int MaxMapWidth = 512; /// max map width supported
-constexpr int MaxMapHeight = 512; /// max map height supported
+constexpr int MaxMapWidth = 1024; /// max map width supported
+constexpr int MaxMapHeight = 1024; /// max map height supported
 
 /*----------------------------------------------------------------------------
 --  the Map itself
