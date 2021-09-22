@@ -1043,6 +1043,7 @@ set(wyrmgus_upgrade_HDRS
 
 set(wyrmgus_util_HDRS
 	src/util/angle_util.h
+	src/util/assert_util.h
 	src/util/astronomy_util.h
 	src/util/char_util.h
 	src/util/color_container.h
