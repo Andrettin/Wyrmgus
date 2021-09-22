@@ -209,7 +209,7 @@ void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 			unit.TeamSelected |= 1 << player.get_index();
 		}
 	}
-	Assert(TeamSelected[player.Index].size() <= MaxSelectable);
+	Assert(TeamSelected[player.get_index()].size() <= MaxSelectable);
 }
 
 /**

@@ -62,32 +62,6 @@ static const char *ncconstatenames[] = {
 	"ccs_incompatiblenetwork", // incompatible network version
 };
 
-static const char *icmsgsubtypenames[] = {
-	"Hello",                   // Client Request
-	"Config",                  // Setup message configure clients
-
-	"EngineMismatch",          // Stratagus engine version doesn't match
-	"ProtocolMismatch",        // Network protocol version doesn't match
-	"EngineConfMismatch",      // Engine configuration isn't identical
-	"MapUidMismatch",          // MAP UID doesn't match
-
-	"GameFull",                // No player slots available
-	"Welcome",                 // Acknowledge for new client connections
-
-	"Waiting",                 // Client has received Welcome and is waiting for Map/State
-	"Map",                     // MapInfo (and Mapinfo Ack)
-	"State",                   // StateInfo
-	"Resync",                  // Ack StateInfo change
-
-	"ServerQuit",              // Server has quit game
-	"GoodBye",                 // Client wants to leave game
-	"SeeYou",                  // Client has left game
-
-	"Go",                      // Client is ready to run
-	"AreYouThere",             // Server asks are you there
-	"IAmHere",                 // Client answers I am here
-};
-
 /**
 ** Send a message to the server, but only if the last packet was a while ago
 **

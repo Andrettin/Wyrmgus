@@ -420,7 +420,7 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, const int index, const Vari
 			val.i = var->Max - var->Value;
 			break;
 		case VariableAttribute::Percent:
-			Assert(type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index].Max != 0);
+			Assert(type.Stats[CPlayer::GetThisPlayer()->get_index()].Variables[index].Max != 0);
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
