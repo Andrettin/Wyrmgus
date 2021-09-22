@@ -31,10 +31,11 @@
 #include "animation/animation_label.h"
 
 #include "unit/unit.h"
+#include "util/assert_util.h"
 
 void CAnimation_Label::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
+	assert_throw(unit.Anim.Anim == this);
 }
 
 void CAnimation_Label::Init(const char *s, lua_State *)

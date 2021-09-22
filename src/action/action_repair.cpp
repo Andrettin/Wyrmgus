@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_repair.cpp - The repair action. */
-//
 //      (c) Copyright 1999-2021 by Vladi Shabanski, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -56,6 +54,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "video/video.h"
 
 std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &target)
@@ -77,7 +76,7 @@ std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &target)
 std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	auto order = std::make_unique<COrder_Repair>();
 
@@ -271,7 +270,7 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 		return true;
 	}
 
-	Assert(goal.Stats->Variables[HP_INDEX].Max);
+	assert_throw(goal.Stats->Variables[HP_INDEX].Max > 0);
 
 	if (SubRepairCosts(unit, player, goal)) {
 		return true;
@@ -303,7 +302,7 @@ static void AnimateActionRepair(CUnit &unit)
 
 void COrder_Repair::Execute(CUnit &unit)
 {
-	Assert(this->get_reparable_target() == this->get_goal());
+	assert_throw(this->get_reparable_target() == this->get_goal());
 
 	switch (this->State) {
 		case 0:

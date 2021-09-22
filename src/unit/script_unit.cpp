@@ -63,6 +63,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/assert_util.h"
 #include "util/exception_util.h"
 #include "util/util.h"
 
@@ -162,7 +163,7 @@ CUnit *CclGetUnitFromRef(lua_State *l)
 {
 	const char *const value = LuaToString(l, -1);
 	unsigned int slot = strtol(value + 1, nullptr, 16);
-	Assert(slot < wyrmgus::unit_manager::get()->GetUsedSlotCount());
+	assert_throw(slot < wyrmgus::unit_manager::get()->GetUsedSlotCount());
 	return &wyrmgus::unit_manager::get()->GetSlotUnit(slot);
 }
 
@@ -313,13 +314,13 @@ static int CclUnit(lua_State *l)
 			// characterized by
 			// unit->CurrentAction()==UnitAction::Die so we have to wait
 			// until we parsed at least Unit::Orders[].
-			Assert(type);
+			assert_throw(type != nullptr);
 			unit = &wyrmgus::unit_manager::get()->GetSlotUnit(slot);
 			unit->Init(*type, true);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
 			unit->Removed = 0;
-			Assert(UnitNumber(*unit) == slot);
+			assert_throw(UnitNumber(*unit) == slot);
 		//Wyrmgus start
 		} else if (!strcmp(value, "personal-name")) {
 			unit->Name = LuaToString(l, 2, j + 1);
@@ -596,7 +597,7 @@ static int CclUnit(lua_State *l)
 				CUnit *u = CclGetUnitFromRef(l);
 				lua_pop(l, 1);
 
-				Assert(u != nullptr);
+				assert_throw(u != nullptr);
 
 				unit->Resource.Workers.push_back(u->acquire_ref());
 			}
@@ -621,8 +622,8 @@ static int CclUnit(lua_State *l)
 				CUnit *u = CclGetUnitFromRef(l);
 				lua_pop(l, 1);
 				//Wyrmgus start
-				Assert(u != nullptr);
-				Assert(unit != nullptr);
+				assert_throw(u != nullptr);
+				assert_throw(unit != nullptr);
 				//Wyrmgus end
 				u->AddInContainer(*unit);
 			}
@@ -633,7 +634,7 @@ static int CclUnit(lua_State *l)
 			CclParseOrders(l, *unit);
 			lua_pop(l, 1);
 			// now we know unit's action so we can assign it to a player
-			Assert(player != nullptr);
+			assert_throw(player != nullptr);
 			unit->AssignToPlayer(*player);
 			if (unit->CurrentAction() == UnitAction::Built) {
 				DebugPrint("HACK: the building is not ready yet\n");
@@ -736,7 +737,7 @@ static int CclUnit(lua_State *l)
 	// have orders for those units.  They should appear here as if
 	// they were just created.
 	if (!unit->Player) {
-		Assert(player);
+		assert_throw(player != nullptr);
 		unit->AssignToPlayer(*player);
 		UpdateForNewUnit(*unit, 0);
 	}
@@ -1683,7 +1684,7 @@ static int CclGetUnitBoolFlag(lua_State *l)
 static int CclGetUnitVariable(lua_State *l)
 {
 	const int nargs = lua_gettop(l);
-	Assert(nargs == 2 || nargs == 3);
+	assert_throw(nargs == 2 || nargs == 3);
 
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
@@ -1870,8 +1871,8 @@ static int CclSetUnitVariable(lua_State *l)
 {
 	const int nargs = lua_gettop(l);
 	//Wyrmgus start
-//	Assert(nargs >= 3 && nargs <= 5);
-	Assert(nargs >= 2 && nargs <= 5);
+//	assert_throw(nargs >= 3 && nargs <= 5);
+	assert_throw(nargs >= 2 && nargs <= 5);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -2076,7 +2077,7 @@ static int CclSlotUsage(lua_State *l)
 static int CclSelectSingleUnit(lua_State *l)
 {
 	const int nargs = lua_gettop(l);
-	Assert(nargs == 1);
+	assert_throw(nargs == 1);
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);

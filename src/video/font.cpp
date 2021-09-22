@@ -31,6 +31,7 @@
 
 #include "database/defines.h"
 #include "intern_video.h"
+#include "util/assert_util.h"
 #include "util/image_util.h"
 #include "util/path_util.h"
 #include "util/point_util.h"
@@ -282,7 +283,7 @@ template<bool CLIP>
 unsigned int font::DrawChar(CGraphic &g, int utf8, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	int c = utf8 - 32;
-	Assert(c >= 0);
+	assert_throw(c >= 0);
 	const int ipr = this->G->GraphicWidth / this->G->Width;
 
 	if (c < 0 || ipr * this->G->GraphicHeight / this->G->Height <= c) {
@@ -586,7 +587,7 @@ std::string GetLineFont(unsigned int line, const std::string &s, unsigned int ma
 	unsigned int res;
 	std::string s1 = s;
 
-	Assert(0 < line);
+	assert_throw(0 < line);
 
 	for (unsigned int i = 1; i < line; ++i) {
 		res = strchrlen(s1, '\n', maxlen, font);

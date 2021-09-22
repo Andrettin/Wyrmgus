@@ -977,50 +977,10 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
-	//Wyrmgus start
-	/*
-	const wyrmgus::tile &mf = *Map.Field(pos);
-	const CTileset &tileset = *Map.Tileset;
-	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
-	Assert(index != -1);
-	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
-
-	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
-	*/
 	lua_pushstring(l, CMap::get()->GetTileTopTerrain(pos, false, z)->get_identifier().c_str());
-	//Wyrmgus end
+
 	return 1;
 }
-
-/**
-**  Get the name of the mixed terrain of the tile.
-**
-**  @param l  Lua state.
-**
-**  @return   The name of the terrain of the tile.
-*/
-//Wyrmgus start
-/*
-static int CclGetTileTerrainMixedName(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-
-	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
-
-	const wyrmgus::tile &mf = *Map.Field(pos);
-	const CTileset &tileset = *Map.Tileset;
-	//Wyrmgus start
-//	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
-	const int index = mf.getTileIndex();
-	//Wyrmgus end
-	Assert(index != -1);
-	const int mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
-
-	lua_pushstring(l, mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "");
-	return 1;
-}
-*/
-//Wyrmgus end
 
 /**
 **  Check if the tile's terrain has a particular flag.
@@ -1776,9 +1736,6 @@ void MapCclRegister()
 	lua_register(Lua, "GetCurrentTileset", CclGetCurrentTileset);
 	//Wyrmgus end
 	lua_register(Lua, "GetTileTerrainName", CclGetTileTerrainName);
-	//Wyrmgus start
-//	lua_register(Lua, "GetTileTerrainMixedName", CclGetTileTerrainMixedName);
-	//Wyrmgus end
 	lua_register(Lua, "GetTileTerrainHasFlag", CclGetTileTerrainHasFlag);
 	
 	//Wyrmgus start

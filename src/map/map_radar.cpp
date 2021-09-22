@@ -36,6 +36,7 @@
 #include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 
 static inline unsigned char IsTileRadarVisible(const CPlayer &pradar, const CPlayer &punit, const wyrmgus::tile_player_info &mfp)
 {
@@ -113,13 +114,13 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 */
 void MapMarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 {
-	Assert(CMap::get()->Field(index, z)->player_info->Radar[player.get_index()] != 255);
+	assert_throw(CMap::get()->Field(index, z)->player_info->Radar[player.get_index()] != 255);
 	CMap::get()->Field(index, z)->player_info->Radar[player.get_index()]++;
 }
 
 void MapMarkTileRadar(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(x, y, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(x, y, z));
 	MapMarkTileRadar(player, CMap::get()->get_pos_index(x, y, z), z);
 }
 
@@ -145,7 +146,7 @@ void MapUnmarkTileRadar(const CPlayer &player, const unsigned int index, int z)
 
 void MapUnmarkTileRadar(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(x, y, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(x, y, z));
 	MapUnmarkTileRadar(player, CMap::get()->get_pos_index(x, y, z), z);
 }
 
@@ -163,16 +164,16 @@ void MapMarkTileRadarJammer(const CPlayer &player, const unsigned int index, int
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	Assert(CMap::get()->Field(index)->player_info->RadarJammer[player.Index] != 255);
+//	assert_throw(CMap::get()->Field(index)->player_info->RadarJammer[player.Index] != 255);
 //	CMap::get()->Field(index)->player_info->RadarJammer[player.Index]++;
-	Assert(CMap::get()->Field(index, z)->player_info->RadarJammer[player.get_index()] != 255);
+	assert_throw(CMap::get()->Field(index, z)->player_info->RadarJammer[player.get_index()] != 255);
 	CMap::get()->Field(index, z)->player_info->RadarJammer[player.get_index()]++;
 	//Wyrmgus end
 }
 
 void MapMarkTileRadarJammer(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(x, y, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(x, y, z));
 	MapMarkTileRadarJammer(player, CMap::get()->get_pos_index(x, y, z), z);
 }
 
@@ -200,6 +201,6 @@ void MapUnmarkTileRadarJammer(const CPlayer &player, const unsigned int index, i
 
 void MapUnmarkTileRadarJammer(const CPlayer &player, int x, int y, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(x, y, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(x, y, z));
 	MapUnmarkTileRadarJammer(player, CMap::get()->get_pos_index(x, y, z), z);
 }

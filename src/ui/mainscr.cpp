@@ -81,6 +81,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
+#include "util/assert_util.h"
 #include "util/point_util.h"
 #include "util/util.h"
 #include "upgrade/upgrade.h"
@@ -292,7 +293,7 @@ UStrInt GetComponent(const CUnit &unit, const int index, const VariableAttribute
 	UStrInt val{};
 	const wyrmgus::unit_variable *var = nullptr;
 
-	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
+	assert_throw(static_cast<unsigned int>(index) < UnitTypeVar.GetNumberVariable());
 	
 	switch (t) {
 		case 0: // Unit:
@@ -328,7 +329,7 @@ UStrInt GetComponent(const CUnit &unit, const int index, const VariableAttribute
 			val.i = var->Max - var->Value;
 			break;
 		case VariableAttribute::Percent:
-			Assert(unit.Variable[index].Max != 0);
+			assert_throw(unit.Variable[index].Max != 0);
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
@@ -384,7 +385,7 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, const int index, const Vari
 	UStrInt val{};
 	const wyrmgus::unit_variable *var = nullptr;
 
-	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
+	assert_throw(static_cast<unsigned int>(index) < UnitTypeVar.GetNumberVariable());
 
 	switch (t) {
 		case 0: // Unit:
@@ -420,7 +421,7 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, const int index, const Vari
 			val.i = var->Max - var->Value;
 			break;
 		case VariableAttribute::Percent:
-			Assert(type.Stats[CPlayer::GetThisPlayer()->get_index()].Variables[index].Max != 0);
+			assert_throw(type.Stats[CPlayer::GetThisPlayer()->get_index()].Variables[index].Max != 0);
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
@@ -680,8 +681,8 @@ static void DrawUnitInfo(CUnit &unit, std::vector<std::function<void(renderer *)
 		}
 	}
 
+	assert_throw(unit.Type != nullptr);
 	const wyrmgus::unit_type &type = *unit.Type;
-	Assert(&type);
 
 	// Draw IconUnit
 	DrawUnitInfo_portrait(unit, render_commands);
@@ -1738,7 +1739,7 @@ void ShiftMessagesEvent()
 */
 void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	char temp[256];
 	va_list va;

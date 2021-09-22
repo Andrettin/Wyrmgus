@@ -66,6 +66,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/assert_util.h"
 #include "util/container_util.h"
 #include "util/path_util.h"
 #include "util/size_util.h"
@@ -2580,7 +2581,7 @@ void UpdateStats(int reset)
 static bool SaveUnitStats(const CUnitStats &stats, const wyrmgus::unit_type &type, int plynr,
 						  CFile &file)
 {
-	Assert(plynr < PlayerMax);
+	assert_throw(plynr < PlayerMax);
 
 	if (stats == type.DefaultStat) {
 		return false;

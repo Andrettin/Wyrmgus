@@ -58,6 +58,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
+#include "util/assert_util.h"
 #include "util/size_util.h"
 #include "video/font.h"
 #include "video/video.h"
@@ -315,7 +316,7 @@ void DrawSelectionCorners(IntColor color, int x1, int y1, int x2, int y2, std::v
 */
 int GetSpriteIndex(const char *SpriteName)
 {
-	Assert(SpriteName);
+	assert_throw(SpriteName != nullptr);
 	for (unsigned int i = 0; i < DecoSprite.Name.size(); ++i) {
 		if (!strcmp(SpriteName, DecoSprite.Name[i].c_str())) {
 			return i;
@@ -427,7 +428,7 @@ void CleanDecorations()
 */
 void CDecoVarBar::Draw(int x, int y, const unit_type &type, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	Assert(var.Max);
+	assert_throw(var.Max > 0);
 
 	int height = this->Height;
 	if (height == 0) { // Default value
@@ -507,8 +508,8 @@ void CDecoVarText::Draw(int x, int y, const unit_type &/*type*/, const unit_vari
 */
 void CDecoVarSpriteBar::Draw(int x, int y, const unit_type &/*type*/, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	Assert(var.Max);
-	Assert(this->NSprite != -1);
+	assert_throw(var.Max > 0);
+	assert_throw(this->NSprite != -1);
 
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
@@ -588,7 +589,7 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 //		const int max = unit.Variable[var.Index].Max;
 		const int max = unit.GetModifiedVariable(var.Index, VariableAttribute::Max);
 		//Wyrmgus end
-		Assert(value <= max);
+		assert_throw(value <= max);
 
 		if ((value == 0 && !var.ShowWhenNull) || (value == max && !var.ShowWhenMax)
 			|| (var.HideHalf && value != 0 && value != max)
@@ -1020,7 +1021,7 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 	bool IsVisible = this->IsVisible(*CPlayer::GetThisPlayer());
 
 	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
-	Assert(ReplayRevealMap || this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value || IsVisible);
+	assert_throw(ReplayRevealMap || this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value || IsVisible);
 
 	//Wyrmgus start
 //	int player = this->RescuedFrom ? this->RescuedFrom->get_index() : this->Player->get_index();
@@ -1366,7 +1367,7 @@ int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table)
 			table.pop_back();
 		}
 	}
-	Assert(n == table.size());
+	assert_throw(n == table.size());
 	std::sort(table.begin(), table.begin() + n, DrawLevelCompare);
 	return n;
 }

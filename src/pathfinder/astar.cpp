@@ -39,6 +39,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "util/number_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
@@ -134,7 +135,7 @@ void InitAStar()
 	//Wyrmgus start
 	/*
 	// Should only be called once
-	Assert(!AStarMatrix);
+	assert_throw(!AStarMatrix);
 
 	AStarMapWidth = mapWidth;
 	AStarMapHeight = mapHeight;
@@ -157,7 +158,7 @@ void InitAStar()
 
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
 		// Should only be called once
-		Assert(AStarMatrix.size() <= z);
+		assert_throw(AStarMatrix.size() <= z);
 	
 		AStarMapWidth.push_back(CMap::get()->Info->MapWidths[z]);
 		AStarMapHeight.push_back(CMap::get()->Info->MapHeights[z]);
@@ -275,8 +276,8 @@ static void AStarRemoveMinimum(int pos, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	Assert(pos == OpenSetSize - 1);
-	Assert(pos == static_cast<int>(OpenSet[z].size()) - 1);
+//	assert_throw(pos == OpenSetSize - 1);
+	assert_throw(pos == static_cast<int>(OpenSet[z].size()) - 1);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -432,7 +433,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 		Vec2i pos;
 		pos.y = index / CMap::get()->Info->MapWidths[z];
 		pos.x = index - pos.y * CMap::get()->Info->MapWidths[z];
-		Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+		assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 	}
 #endif
 	int cost = 0;
@@ -464,7 +465,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				CUnit *goal = mf->UnitCache.find(unit_finder);
 				if (!goal) {
 					// Shouldn't happen, mask says there is something on this tile
-					Assert(0);
+					assert_throw(false);
 					return -1;
 				}
 				//Wyrmgus start
@@ -1014,7 +1015,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
                   std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int max_length, int z)
 				  //Wyrmgus end
 {
-	Assert(CMap::get()->Info->IsPointOnMap(startPos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(startPos, z));
 	
 	//Wyrmgus start
 	if (unit.MapLayer->ID != z) {

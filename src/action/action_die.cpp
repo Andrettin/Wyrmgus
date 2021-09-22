@@ -34,6 +34,7 @@
 #include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 
 std::unique_ptr<COrder> COrder::NewActionDie()
 {
@@ -113,7 +114,7 @@ void COrder_Die::Execute(CUnit &unit)
 	}
 
 	const wyrmgus::unit_type *corpse_type = type.get_corpse_type();
-	Assert(type.get_tile_width() >= corpse_type->get_tile_width() && type.get_tile_height() >= corpse_type->get_tile_height());
+	assert_throw(type.get_tile_width() >= corpse_type->get_tile_width() && type.get_tile_height() >= corpse_type->get_tile_height());
 
 	// Update sight for new corpse
 	// We have to unmark BEFORE changing the type.

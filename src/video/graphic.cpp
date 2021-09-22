@@ -46,6 +46,7 @@
 //Wyrmgus start
 #include "unit/unit.h" //for using CPreference
 //Wyrmgus end
+#include "util/assert_util.h"
 #include "util/container_util.h"
 #include "util/image_util.h"
 #include "util/log_util.h"
@@ -422,12 +423,10 @@ CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 
 void CGraphic::GenFramesMap()
 {
-	Assert(NumFrames != 0);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	Assert(GraphicWidth != 0);
-#endif
-	Assert(Width != 0);
-	Assert(Height != 0);
+	assert_throw(NumFrames != 0);
+	assert_throw(GraphicWidth != 0);
+	assert_throw(Width != 0);
+	assert_throw(Height != 0);
 
 	frame_map.resize(NumFrames);
 
@@ -571,7 +570,7 @@ void CGraphic::Load(const int scale_factor)
 		this->original_frame_size.setHeight(Height);
 	}
 
-	Assert(Width <= GraphicWidth && Height <= GraphicHeight);
+	assert_throw(Width <= GraphicWidth && Height <= GraphicHeight);
 
 	if ((GraphicWidth / Width) * Width != GraphicWidth ||
 		(GraphicHeight / Height) * Height != GraphicHeight) {
@@ -619,7 +618,7 @@ void CGraphic::Load(const int scale_factor)
 */
 void CGraphic::Resize(int w, int h)
 {
-	Assert(this->IsLoaded()); // can't resize before it's been loaded
+	assert_throw(this->IsLoaded()); // can't resize before it's been loaded
 
 	if (this->GraphicWidth == w && this->GraphicHeight == h) {
 		return;
@@ -655,7 +654,7 @@ void CGraphic::Resize(int w, int h)
 */
 void CGraphic::SetOriginalSize()
 {
-	Assert(this->IsLoaded()); // can't resize before it's been loaded
+	assert_throw(this->IsLoaded()); // can't resize before it's been loaded
 
 	if (!Resized) {
 		return;

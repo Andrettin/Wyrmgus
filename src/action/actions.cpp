@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name actions.cpp - The actions. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Russell Smith, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -74,6 +72,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/random.h"
 
 unsigned SyncHash; /// Hash calculated to find sync failures
@@ -99,7 +98,7 @@ void COrder::clear_goal()
 
 void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 {
-	Assert(false); // should not be called.
+	assert_throw(false); // should not be called.
 
 	// Don't move
 	input.SetMinRange(0);

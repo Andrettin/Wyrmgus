@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_spellcast.cpp - The spell cast action. */
-//
 //      (c) Copyright 2000-2021 by Vladi Belperchinov-Shabanski, Jimmy Salmon
 //      and Andrettin
 //
@@ -63,6 +61,7 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "video/video.h"
 
 std::unique_ptr<COrder> COrder::NewActionSpellCast(const wyrmgus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
@@ -148,7 +147,7 @@ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value
 
 bool COrder_SpellCast::IsValid() const
 {
-	Assert(Action == UnitAction::SpellCast);
+	assert_throw(Action == UnitAction::SpellCast);
 	if (this->has_goal()) {
 		return this->get_goal()->IsAliveOnMap();
 	} else {

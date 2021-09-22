@@ -33,6 +33,7 @@
 #include "script.h"
 #include "unit/unit_manager.h"
 #include "unit/unit.h"
+#include "util/assert_util.h"
 #include "util/exception_util.h"
 #include "util/list_util.h"
 
@@ -263,7 +264,7 @@ void unit_manager::Load(lua_State *l)
 				LuaError(l, "Wrong key %s" _C_ key);
 			}
 		}
-		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));
+		assert_throw(unit_index != -1 && cycle != static_cast<unsigned long>(-1));
 		this->unit_slots[unit_index]->Destroyed = 1;
 		this->ReleaseUnit(this->unit_slots[unit_index].get());
 		this->unit_slots[unit_index]->ReleaseCycle = cycle;

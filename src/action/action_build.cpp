@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_build.cpp - The build building action. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon,
 //      Russell Smith and Andrettin
 //
@@ -62,6 +60,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "video/video.h"
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, const landmass *landmass, const wyrmgus::site *settlement);
@@ -77,7 +76,7 @@ enum {
 
 std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	auto order = std::make_unique<COrder_Build>();
 
@@ -438,7 +437,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 //		const CBuildRestrictionOnTop *b = OnTopDetails(*build, ontop.Type));
 		const CBuildRestrictionOnTop *b = OnTopDetails(*build->Type, ontop.Type);
 		//Wyrmgus end
-		Assert(b);
+		assert_throw(b != nullptr);
 		if (b->ReplaceOnBuild) {
 			build->ReplaceOnTop(ontop);
 		}

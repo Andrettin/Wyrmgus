@@ -56,6 +56,8 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
+#include "util/assert_util.h"
+#include "util/vector_util.h"
 
 /**
 **  Release all orders of a unit.
@@ -64,7 +66,7 @@
 */
 static void ReleaseOrders(CUnit &unit)
 {
-	Assert(unit.Orders.empty() == false);
+	assert_throw(unit.Orders.empty() == false);
 
 	// Order 0 must be stopped in the action loop.
 	for (const std::unique_ptr<COrder> &order : unit.Orders) {
@@ -123,7 +125,7 @@ static std::unique_ptr<COrder> *GetNextOrder(CUnit &unit, int flush)
 */
 static void RemoveOrder(CUnit &unit, unsigned int order)
 {
-	Assert(order < unit.Orders.size());
+	assert_throw(order < unit.Orders.size());
 
 	unit.Orders.erase(unit.Orders.begin() + order);
 	if (unit.Orders.empty()) {
@@ -227,8 +229,8 @@ void CommandStopUnit(CUnit &unit)
 {
 	// Ignore that the unit could be removed.
 	std::unique_ptr<COrder> *order = GetNextOrder(unit, FlushCommands); // Flush them.
-	Assert(order);
-	Assert(*order == nullptr);
+	assert_throw(order != nullptr);
+	assert_throw(*order == nullptr);
 	*order = COrder::NewActionStill();
 
 	ClearSavedAction(unit);
@@ -329,7 +331,7 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 */
 void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -382,7 +384,7 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 */
 void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 	
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -558,7 +560,7 @@ void CommandAutoRepair(CUnit &unit, int on)
 */
 void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -612,7 +614,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 */
 void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -728,7 +730,7 @@ void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 */
 void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1052,7 +1054,8 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 		if (unit.CriticalOrder != nullptr && unit.CriticalOrder->Action == UnitAction::Train) {
 			return;
 		}
-		Assert(unit.CriticalOrder == nullptr);
+
+		assert_throw(unit.CriticalOrder == nullptr);
 		
 		unit.CriticalOrder = COrder::NewActionTrain(unit, type, player);
 		return;
@@ -1163,7 +1166,8 @@ void CommandTransformIntoType(CUnit &unit, wyrmgus::unit_type &type)
 	if (unit.CriticalOrder != nullptr && unit.CriticalOrder->Action == UnitAction::TransformInto) {
 		return;
 	}
-	Assert(unit.CriticalOrder == nullptr);
+
+	assert_throw(unit.CriticalOrder == nullptr);
 
 	unit.CriticalOrder = COrder::NewActionTransformInto(type);
 }
@@ -1275,9 +1279,9 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus:
 {
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
 			   UnitNumber(unit) _C_ spell.get_identifier().c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
-	Assert(std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), &spell) != unit.Type->Spells.end());
+	assert_throw(vector::contains(unit.Type->Spells, &spell));
 	
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;

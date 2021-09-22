@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_save.cpp - Save unit. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -46,13 +44,14 @@
 #include "spell/spell.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 
 /**
 **  Generate a unit reference, a printable unique string for unit.
 */
 std::string UnitReference(const CUnit *unit)
 {
-	Assert(unit != nullptr);
+	assert_throw(unit != nullptr);
 
 	std::ostringstream ss;
 	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase
@@ -335,7 +334,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		}
 		file.printf("},\n  ");
 	} else {
-		Assert(unit.Resource.Active == 0);
+		assert_throw(unit.Resource.Active == 0);
 	}
 	file.printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 
@@ -354,7 +353,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("},\n  ");
 	}
 	file.printf("\"orders\", {\n");
-	Assert(unit.Orders.empty() == false);
+	assert_throw(unit.Orders.empty() == false);
 	unit.Orders[0]->Save(file, unit);
 	for (size_t i = 1; i != unit.Orders.size(); ++i) {
 		file.printf(",\n ");

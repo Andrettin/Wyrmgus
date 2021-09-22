@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_build.cpp - The build building action. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon,
 //      Russell Smith and Andrettin
 //
@@ -56,6 +54,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
@@ -158,7 +157,7 @@ PixelPos COrder_Built::Show(const CViewport &, const PixelPos &lastScreenPos, st
 
 static void CancelBuilt(COrder_Built &order, CUnit &unit)
 {
-	Assert(unit.CurrentOrder() == &order);
+	assert_throw(unit.CurrentOrder() == &order);
 	CUnit *worker = order.get_worker();
 
 	// Drop out unit
@@ -428,7 +427,7 @@ void COrder_Built::Cancel(CUnit &unit)
 
 void COrder_Built::UpdateUnitVariables(CUnit &unit) const
 {
-	Assert(unit.CurrentOrder() == this);
+	assert_throw(unit.CurrentOrder() == this);
 
 	unit.Variable[BUILD_INDEX].Value = this->ProgressCounter;
 	unit.Variable[BUILD_INDEX].Max = unit.Type->Stats[unit.Player->get_index()].get_time_cost() * 600;
@@ -492,7 +491,7 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 
 	const wyrmgus::construction_frame *cframe = FindCFramePercent(unit.get_construction()->get_initial_frame(), percent);
 
-	Assert(cframe != nullptr);
+	assert_throw(cframe != nullptr);
 
 	if (cframe != this->get_frame()) {
 		this->frame = cframe;
@@ -538,7 +537,7 @@ CUnit *COrder_Built::get_worker() const
 
 void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 {
-	Assert(building.CurrentOrder() == this);
+	assert_throw(building.CurrentOrder() == this);
 
 	const int time_cost = building.Stats->get_time_cost();
 	if (time_cost == 0) {

@@ -79,6 +79,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
+#include "util/assert_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
@@ -2309,19 +2310,19 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "UnitTypesCount")) {
 		LuaCheckArgs(l, 3);
 		wyrmgus::unit_type *type = CclGetUnitType(l);
-		Assert(type);
+		assert_throw(type != nullptr);
 		lua_pushnumber(l, p->GetUnitTypeCount(type));
 		return 1;
 	} else if (!strcmp(data, "UnitTypesUnderConstructionCount")) {
 		LuaCheckArgs(l, 3);
 		wyrmgus::unit_type *type = CclGetUnitType(l);
-		Assert(type);
+		assert_throw(type != nullptr);
 		lua_pushnumber(l, p->GetUnitTypeUnderConstructionCount(type));
 		return 1;
 	} else if (!strcmp(data, "UnitTypesAiActiveCount")) {
 		LuaCheckArgs(l, 3);
 		wyrmgus::unit_type *type = CclGetUnitType(l);
-		Assert(type);
+		assert_throw(type != nullptr);
 		lua_pushnumber(l, p->GetUnitTypeAiActiveCount(type));
 		return 1;
 	//Wyrmgus start
@@ -2406,7 +2407,7 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "UnitTypeKills")) {
 		LuaCheckArgs(l, 3);
 		wyrmgus::unit_type *type = CclGetUnitType(l);
-		Assert(type);
+		assert_throw(type != nullptr);
 		lua_pushnumber(l, p->UnitTypeKills[type->Slot]);
 		return 1;
 	//Wyrmgus end

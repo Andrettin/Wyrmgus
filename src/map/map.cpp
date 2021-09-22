@@ -81,6 +81,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/assert_util.h"
 #include "util/container_util.h"
 #include "util/point_util.h"
 #include "util/rect_util.h"
@@ -422,7 +423,7 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 */
 bool CMap::WallOnMap(const Vec2i &pos, int z) const
 {
-	Assert(this->Info->IsPointOnMap(pos, z));
+	assert_throw(this->Info->IsPointOnMap(pos, z));
 	return Field(pos, z)->isAWall();
 }
 
@@ -1230,10 +1231,12 @@ bool UnitTypeCanBeAt(const wyrmgus::unit_type &type, const Vec2i &pos, int z)
 bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(unit.Type);
+	assert_throw(unit.Type != nullptr);
+
 	if (unit.Type->BoolFlag[NONSOLID_INDEX].value) {
 		return true;
 	}
+
 	//Wyrmgus start
 //	return UnitTypeCanBeAt(*unit.Type, pos);
 	return UnitTypeCanBeAt(*unit.Type, pos, z);
@@ -1630,7 +1633,7 @@ wyrmgus::tile *CMap::Field(const int x, const int y, const int z) const
 */
 void CMap::Create()
 {
-	Assert(this->MapLayers.size() == 0);
+	assert_throw(this->MapLayers.empty());
 
 	auto map_layer = std::make_unique<CMapLayer>(this->Info->MapWidth, this->Info->MapHeight);
 
@@ -1941,7 +1944,7 @@ void CMap::do_per_cycle_loop()
 /*
 void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 {
-	Assert(type == tile_flag::tree || type == tile_flag::rock);
+	assert_throw(type == tile_flag::tree || type == tile_flag::rock);
 
 	//  Outside of map or no wood.
 	if (!Info.IsPointOnMap(pos)) {

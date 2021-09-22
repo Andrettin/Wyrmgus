@@ -40,6 +40,7 @@
 #include "map/tile.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 
 /**
 **  Insert new unit into cache.
@@ -48,7 +49,7 @@
 */
 void CMap::Insert(CUnit &unit)
 {
-	Assert(!unit.Removed);
+	assert_throw(!unit.Removed);
 	unsigned int index = unit.Offset;
 	const int w = unit.Type->get_tile_width();
 	const int h = unit.Type->get_tile_height();
@@ -72,7 +73,7 @@ void CMap::Insert(CUnit &unit)
 */
 void CMap::Remove(CUnit &unit)
 {
-	Assert(!unit.Removed);
+	assert_throw(!unit.Removed);
 	unsigned int index = unit.Offset;
 	const int w = unit.Type->get_tile_width();
 	const int h = unit.Type->get_tile_height();

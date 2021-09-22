@@ -44,6 +44,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
+#include "util/assert_util.h"
 
 /**
 **  Find the building restriction that gives me this unit built on top
@@ -403,7 +404,7 @@ void CBuildRestrictionOnTop::Init()
 
 bool CBuildRestrictionOnTop::Check(const CUnit *builder, const wyrmgus::unit_type &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	ontoptarget = nullptr;
 
@@ -452,7 +453,7 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const wyrmgus::unit_t
 {
 	Q_UNUSED(builder)
 
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	for (int x = pos.x; x < pos.x + type.get_tile_width(); ++x) {
 		for (int y = pos.y; y < pos.y + type.get_tile_height(); ++y) {

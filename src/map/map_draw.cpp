@@ -48,6 +48,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/size_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
@@ -99,7 +100,7 @@ void CViewport::SetClipping() const
 */
 bool CViewport::AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const
 {
-	Assert(boxmin.x <= boxmax.x && boxmin.y <= boxmax.y);
+	assert_throw(boxmin.x <= boxmax.x && boxmin.y <= boxmax.y);
 
 	if (boxmax.x < this->MapPos.x
 		|| boxmax.y < this->MapPos.y

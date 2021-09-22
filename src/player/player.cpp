@@ -116,6 +116,7 @@
 //Wyrmgus end
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
@@ -2370,12 +2371,12 @@ void CPlayer::Clear()
 
 void CPlayer::AddUnit(CUnit &unit)
 {
-	Assert(unit.Player != this);
-	Assert(unit.PlayerSlot == static_cast<size_t>(-1));
+	assert_throw(unit.Player != this);
+	assert_throw(unit.PlayerSlot == static_cast<size_t>(-1));
 	unit.PlayerSlot = this->Units.size();
 	this->Units.push_back(&unit);
 	unit.Player = this;
-	Assert(this->Units[unit.PlayerSlot] == &unit);
+	assert_throw(this->Units[unit.PlayerSlot] == &unit);
 
 	if (this->Units.size() == 1) {
 		this->set_alive(true);
@@ -2384,14 +2385,14 @@ void CPlayer::AddUnit(CUnit &unit)
 
 void CPlayer::RemoveUnit(CUnit &unit)
 {
-	Assert(unit.Player == this);
+	assert_throw(unit.Player == this);
 	//Wyrmgus start
 	if (unit.PlayerSlot == -1 || this->Units[unit.PlayerSlot] != &unit) {
 		log::log_error("Error in CPlayer::RemoveUnit: the unit's PlayerSlot doesn't match its position in the player's units array; Unit's PlayerSlot: " + std::to_string(unit.PlayerSlot) + ", Unit Type: \"" + (unit.Type ? unit.Type->Ident : "") + "\".");
 		return;
 	}
 	//Wyrmgus end
-	Assert(this->Units[unit.PlayerSlot] == &unit);
+	assert_throw(this->Units[unit.PlayerSlot] == &unit);
 
 	//	unit.Player = nullptr; // we can remove dying unit...
 	CUnit *last = this->Units.back();
@@ -2400,7 +2401,7 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	last->PlayerSlot = unit.PlayerSlot;
 	this->Units.pop_back();
 	unit.PlayerSlot = static_cast<size_t>(-1);
-	Assert(last == &unit || this->Units[last->PlayerSlot] == last);
+	assert_throw(last == &unit || this->Units[last->PlayerSlot] == last);
 
 	if (this->Units.empty()) {
 		this->set_alive(false);
@@ -3992,7 +3993,7 @@ void SetPlayersPalette()
 */
 void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 	std::array<char, 128> temp{};
 	uint32_t color;
 	va_list va;

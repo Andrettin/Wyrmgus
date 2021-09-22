@@ -39,6 +39,7 @@
 #include "map/tile.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/size_util.h"
 
 //astar.cpp
@@ -316,7 +317,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 			i = 1;
 			break;
 		case PF_WAIT:
-			Assert(0);
+			assert_throw(false);
 			i = 0;
 			break;
 		case PF_MOVE:
@@ -390,9 +391,9 @@ void PathFinderInput::SetUnit(CUnit &_unit)
 
 void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
-	Assert(unit);
-	Assert(unit->IsAliveOnMap());
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(unit != nullptr);
+	assert_throw(unit->IsAliveOnMap());
 	Vec2i newPos = pos;
 	// Large units may have a goal that goes outside the map, fix it here
 	if (newPos.x + unit->Type->get_tile_width() - 1 >= CMap::get()->Info->MapWidths[z]) {

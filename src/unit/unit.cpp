@@ -98,6 +98,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
@@ -526,9 +527,9 @@ void CUnit::Release(const bool final)
 		log::log_error("Unit to be released has more than 1 order; Unit Type: \"" + this->Type->get_identifier() + "\", Orders: " + std::to_string(this->Orders.size()) + ", First Order Type: " + std::to_string(static_cast<int>(this->CurrentAction())) + ".");
 	}
 
-	Assert(Orders.size() == 1);
+	assert_throw(Orders.size() == 1);
 	// Must be removed before here
-	Assert(Removed);
+	assert_throw(Removed);
 
 	// First release, remove from lists/tables.
 	if (!Destroyed) {
@@ -2844,7 +2845,7 @@ void CUnit::Init(const wyrmgus::unit_type &type, const bool loading_saved_unit)
 	Frame = type.StillFrame;
 
 	if (UnitTypeVar.GetNumberVariable()) {
-		Assert(Variable.empty());
+		assert_throw(Variable.empty());
 		this->Variable = type.MapDefaultStat.Variables;
 	} else {
 		this->Variable.clear();
@@ -2878,15 +2879,15 @@ void CUnit::Init(const wyrmgus::unit_type &type, const bool loading_saved_unit)
 	}
 	//Wyrmgus end
 
-	Assert(Orders.empty());
+	assert_throw(Orders.empty());
 
 	Orders.push_back(COrder::NewActionStill());
 
-	Assert(NewOrder == nullptr);
+	assert_throw(NewOrder == nullptr);
 	NewOrder = nullptr;
-	Assert(SavedOrder == nullptr);
+	assert_throw(SavedOrder == nullptr);
 	SavedOrder = nullptr;
-	Assert(CriticalOrder == nullptr);
+	assert_throw(CriticalOrder == nullptr);
 	CriticalOrder = nullptr;
 }
 
@@ -2934,7 +2935,7 @@ bool CUnit::RestoreOrder()
 */
 bool CUnit::CanStoreOrder(COrder *order)
 {
-	Assert(order);
+	assert_throw(order != nullptr);
 
 	if ((order && order->Finished == true) || order->IsValid() == false) {
 		return false;
@@ -3021,7 +3022,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	Stats = &type.Stats[Player->get_index()];
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.GetNumberVariable()) {
-			Assert(!Stats->Variables.empty());
+			assert_throw(!Stats->Variables.empty());
 			this->Variable = Stats->Variables;
 		}
 	}
@@ -3253,7 +3254,7 @@ CUnit *CUnit::GetFirstContainer() const
 void MapMarkUnitSight(CUnit &unit)
 {
 	CUnit *container = unit.GetFirstContainer(); //first container of the unit.
-	Assert(container->Type);
+	assert_throw(container->Type != nullptr);
 
 	MapMarkUnitSightRec<MapMarkTileSight, MapMarkTileDetectCloak, MapMarkTileDetectEthereal>(unit, container->tilePos, container->Type->get_tile_width(), container->Type->get_tile_height());
 
@@ -3279,10 +3280,10 @@ void MapMarkUnitSight(CUnit &unit)
 */
 void MapUnmarkUnitSight(CUnit &unit)
 {
-	Assert(unit.Type);
+	assert_throw(unit.Type != nullptr);
 
 	CUnit *container = unit.GetFirstContainer();
-	Assert(container->Type);
+	assert_throw(container->Type != nullptr);
 	MapMarkUnitSightRec<MapUnmarkTileSight, MapUnmarkTileDetectCloak, MapUnmarkTileDetectEthereal>(unit, container->tilePos, container->Type->get_tile_width(), container->Type->get_tile_height());
 
 	// Never mark radar, except if the top unit?
@@ -3317,7 +3318,7 @@ void UpdateUnitSightRange(CUnit &unit)
 		return ;
 	}
 #else
-	Assert(!SaveGameLoading);
+	assert_throw(!SaveGameLoading);
 #endif
 */
 //Wyrmgus end
@@ -3434,7 +3435,7 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 */
 void CUnit::AddInContainer(CUnit &host)
 {
-	Assert(Container == nullptr);
+	assert_throw(Container == nullptr);
 	Container = &host;
 	if (host.InsideCount == 0) {
 		NextContained = PrevContained = this;
@@ -3461,8 +3462,8 @@ void CUnit::AddInContainer(CUnit &host)
 static void RemoveUnitFromContainer(CUnit &unit)
 {
 	CUnit *host = unit.Container; // transporter which contain unit.
-	Assert(unit.Container);
-	Assert(unit.Container->InsideCount > 0);
+	assert_throw(unit.Container != nullptr);
+	assert_throw(unit.Container->InsideCount > 0);
 	
 	host->InsideCount--;
 	unit.NextContained->PrevContained = unit.PrevContained;
@@ -3766,8 +3767,8 @@ void CUnit::MoveToXY(const Vec2i &pos, const int z)
 	UnmarkUnitFieldFlags(*this);
 
 	//Wyrmgus start
-//	Assert(UnitCanBeAt(*this, pos));
-	Assert(UnitCanBeAt(*this, pos, z));
+//	assert_throw(UnitCanBeAt(*this, pos));
+	assert_throw(UnitCanBeAt(*this, pos, z));
 	//Wyrmgus end
 	// Move the unit.
 	//Wyrmgus start
@@ -3810,7 +3811,7 @@ void CUnit::MoveToXY(const Vec2i &pos, const int z)
 */
 void CUnit::Place(const Vec2i &pos, const int z)
 {
-	Assert(Removed);
+	assert_throw(Removed);
 	
 	const CMapLayer *old_map_layer = this->MapLayer;
 
@@ -4179,9 +4180,9 @@ void CUnit::Remove(CUnit *host)
 */
 void UnitLost(CUnit &unit)
 {
-	CPlayer &player = *unit.Player;
+	assert_throw(unit.Player != nullptr);  //the following code doesn't support null player!
 
-	Assert(&player);  // Next code didn't support no player!
+	CPlayer &player = *unit.Player;
 
 	//  Call back to AI, for killed or lost units.
 	if (!CEditor::get()->is_running()) {
@@ -4476,9 +4477,9 @@ enum {
 */
 void CorrectWallDirections(CUnit &unit)
 {
-	Assert(unit.Type->BoolFlag[WALL_INDEX].value);
-	Assert(unit.Type->get_num_directions() == 16);
-	Assert(!unit.Type->Flip);
+	assert_throw(unit.Type->BoolFlag[WALL_INDEX].value);
+	assert_throw(unit.Type->get_num_directions() == 16);
+	assert_throw(!unit.Type->Flip);
 
 	if (!CMap::get()->Info->IsPointOnMap(unit.tilePos, unit.MapLayer)) {
 		return;
@@ -4516,7 +4517,7 @@ void CorrectWallDirections(CUnit &unit)
 */
 void CorrectWallNeighBours(CUnit &unit)
 {
-	Assert(unit.Type->BoolFlag[WALL_INDEX].value);
+	assert_throw(unit.Type->BoolFlag[WALL_INDEX].value);
 
 	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
 
@@ -4607,7 +4608,7 @@ void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 */
 void UnitCountSeen(CUnit &unit)
 {
-	Assert(unit.Type);
+	assert_throw(unit.Type != nullptr);
 
 	// FIXME: optimize, only work on certain players?
 	// This is for instance good for updating shared vision...
@@ -5339,7 +5340,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 	//Wyrmgus end
 
 	if (container) {
-		Assert(unit.Removed);
+		assert_throw(unit.Removed);
 		pos = container->tilePos;
 		pos -= Vec2i(unit.Type->get_tile_size() - QSize(1, 1));
 		addx = container->Type->get_tile_width() + unit.Type->get_tile_width() - 1;
@@ -7694,7 +7695,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		return;
 	}
 
-	Assert(damage != 0 && target.CurrentAction() != UnitAction::Die && !target.Type->BoolFlag[VANISHES_INDEX].value);
+	assert_throw(damage != 0 && target.CurrentAction() != UnitAction::Die && !target.Type->BoolFlag[VANISHES_INDEX].value);
 
 	//Wyrmgus start
 	if (

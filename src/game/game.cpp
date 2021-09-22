@@ -110,6 +110,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/assert_util.h"
 #include "util/date_util.h"
 #include "util/path_util.h"
 #include "util/random.h"
@@ -1114,7 +1115,7 @@ static void LoadMap(const std::filesystem::path &filepath, CMap &map)
 			// The map info hasn't been loaded yet => do it now
 			LoadStratagusMapInfo(filepath);
 		}
-		Assert(!map.Info->get_setup_filepath().empty());
+		assert_throw(!map.Info->get_setup_filepath().empty());
 		map.Create();
 		LoadStratagusMap(filepath, map.Info->get_setup_filepath());
 		return;

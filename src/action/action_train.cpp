@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_train.cpp - The building train action. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -54,6 +52,7 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 
 /// How many resources the player gets back if canceling training
 static constexpr int CancelTrainingCostsFactor = 100;
@@ -141,7 +140,7 @@ void COrder_Train::Cancel(CUnit &unit)
 
 void COrder_Train::UpdateUnitVariables(CUnit &unit) const
 {
-	Assert(unit.CurrentOrder() == this);
+	assert_throw(unit.CurrentOrder() == this);
 
 	unit.Variable[TRAINING_INDEX].Value = this->Ticks;
 	//Wyrmgus start

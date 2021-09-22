@@ -85,6 +85,8 @@ namespace gcn
     void DefaultFont::drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal, std::vector<std::function<void(renderer *)>> &render_commands)
 	//Wyrmgus end
     {
+        Q_UNUSED(is_normal)
+
         unsigned int i;
 
         for (i = 0; i< text.size(); ++i)

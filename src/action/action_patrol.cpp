@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //           Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_patrol.cpp - The patrol action. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -51,6 +49,7 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "video/video.h"
 
 //Wyrmgus start
@@ -58,8 +57,8 @@
 std::unique_ptr<COrder> COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z)
 //Wyrmgus end
 {
-	Assert(CMap::get()->Info->IsPointOnMap(currentPos, current_z));
-	Assert(CMap::get()->Info->IsPointOnMap(dest, dest_z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(currentPos, current_z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(dest, dest_z));
 
 	auto order = std::make_unique<COrder_Patrol>();
 

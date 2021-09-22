@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_board.cpp - The board action. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -50,6 +48,7 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "video/video.h"
 
 std::unique_ptr<COrder> COrder::NewActionBoard(CUnit &unit)
@@ -243,7 +242,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 {
 	CUnit *transporter = order.get_goal();
 
-	Assert(transporter != nullptr);
+	assert_throw(transporter != nullptr);
 
 	if (!transporter->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Transporter gone\n");

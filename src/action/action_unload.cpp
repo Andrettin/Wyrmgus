@@ -50,6 +50,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "util/point_util.h"
 #include "video/video.h"
 
@@ -292,7 +293,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, const landmass *landmass)
 		target_unload_pos = transporter.get_rally_point_pos();
 	}
 
-	Assert(unit.Removed);
+	assert_throw(unit.Removed);
 	//Wyrmgus start
 //	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, max_range, &pos)) {
 	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, max_range, &pos, transporter.MapLayer->ID, landmass, target_unload_pos)) {
@@ -531,7 +532,7 @@ static int MoveToDropZone(CUnit &unit)
 			return 0;
 	}
 
-	Assert(unit.CurrentAction() == UnitAction::Unload);
+	assert_throw(unit.CurrentAction() == UnitAction::Unload);
 	return 1;
 }
 

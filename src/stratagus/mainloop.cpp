@@ -78,6 +78,7 @@
 #include "unit/unit_manager.h"
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/assert_util.h"
 #include "util/path_util.h"
 #include "util/string_util.h"
 #include "video/font.h"
@@ -351,7 +352,7 @@ static void GameLogicLoop()
 			default: {
 				// FIXME: assume that NumPlayers < (CYCLES_PER_SECOND - 7)
 				int player = (GameCycle % CYCLES_PER_SECOND) - 7;
-				Assert(player >= 0);
+				assert_throw(player >= 0);
 				if (player < NumPlayers) {
 					PlayersEachSecond(player);
 				}
@@ -362,7 +363,7 @@ static void GameLogicLoop()
 		
 		//Wyrmgus start
 		int player = (GameCycle - 1) % CYCLES_PER_SECOND;
-		Assert(player >= 0);
+		assert_throw(player >= 0);
 		if (player < NumPlayers) {
 			PlayersEachSecond(player);
 			if ((player + CYCLES_PER_SECOND) < NumPlayers) {
@@ -371,13 +372,13 @@ static void GameLogicLoop()
 		}
 		
 		player = (GameCycle - 1) % (CYCLES_PER_MINUTE / 2);
-		Assert(player >= 0);
+		assert_throw(player >= 0);
 		if (player < NumPlayers) {
 			PlayersEachHalfMinute(player);
 		}
 
 		player = (GameCycle - 1) % CYCLES_PER_MINUTE;
-		Assert(player >= 0);
+		assert_throw(player >= 0);
 		if (player < NumPlayers) {
 			PlayersEachMinute(player);
 		}

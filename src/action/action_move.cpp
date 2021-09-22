@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_move.cpp - The move action. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -55,6 +53,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "util/log_util.h"
 #include "video/video.h"
 
@@ -63,7 +62,7 @@
 std::unique_ptr<COrder> COrder::NewActionMove(const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	auto order = std::make_unique<COrder_Move>();
 
@@ -192,10 +191,10 @@ int DoActionMove(CUnit &unit)
 	Vec2i posd; // movement in tile.
 	int d;
 
-	Assert(unit.CanMove());
+	assert_throw(unit.CanMove());
 
 	if (!unit.Moving && (unit.get_animation_set()->Move.get() != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
-		Assert(!unit.Anim.Unbreakable);
+		assert_throw(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
 		unit.pixel_offset = QPoint(0, 0);
@@ -350,7 +349,7 @@ int DoActionMove(CUnit &unit)
 
 void COrder_Move::Execute(CUnit &unit)
 {
-	Assert(unit.CanMove());
+	assert_throw(unit.CanMove());
 
 	if (unit.Wait) {
 		if (!unit.Waiting) {

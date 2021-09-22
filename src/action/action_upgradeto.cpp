@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_upgradeto.cpp - The unit upgrading to new action. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -57,6 +55,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/assert_util.h"
 #include "util/vector_util.h"
 
 /// How many resources the player gets back if canceling upgrade
@@ -532,7 +531,7 @@ void COrder_UpgradeTo::Cancel(CUnit &unit)
 
 void COrder_UpgradeTo::UpdateUnitVariables(CUnit &unit) const
 {
-	Assert(unit.CurrentOrder() == this);
+	assert_throw(unit.CurrentOrder() == this);
 
 	unit.Variable[UPGRADINGTO_INDEX].Value = this->Ticks;
 	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->get_index()].get_time_cost();

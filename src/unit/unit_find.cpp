@@ -47,6 +47,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/point_util.h"
 #include "util/vector_util.h"
@@ -1312,7 +1313,7 @@ public:
 			const int x = abs(dest->tilePos.x - attacker->tilePos.x) + (size / 2);
 			const int y = abs(dest->tilePos.y - attacker->tilePos.y) + (size / 2);
 			//Wyrmgus end
-			Assert(x >= 0 && y >= 0);
+			assert_throw(x >= 0 && y >= 0);
 
 			// Mark the good/bad array...
 			for (int yy = 0; yy < dtype.get_tile_height(); ++yy) {
@@ -1400,7 +1401,7 @@ private:
 		x = abs(dest->tilePos.x - attacker->tilePos.x) + (size / 2);
 		y = abs(dest->tilePos.y - attacker->tilePos.y) + (size / 2);
 		//Wyrmgus end
-		Assert(x >= 0 && y >= 0);
+		assert_throw(x >= 0 && y >= 0);
 		
 		// calculate the costs:
 		// costs are the full costs at the target and the splash-factor
@@ -1545,7 +1546,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pre
 
 		const int missile_range = unit.GetMissile().Missile->get_range() + range - 1;
 
-		Assert(2 * missile_range + 1 < 32);
+		assert_throw(2 * missile_range + 1 < 32);
 
 		// If unit is removed, use containers x and y
 		const CUnit *firstContainer = unit.GetFirstContainer();
@@ -1611,7 +1612,7 @@ template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, const int range, 
 */
 CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred)
 {
-	Assert(unit.CanAttack());
+	assert_throw(unit.CanAttack());
 	return AttackUnitsInDistance(unit, unit.get_best_attack_range(), pred);
 }
 
@@ -1632,7 +1633,7 @@ CUnit *AttackUnitsInRange(const CUnit &unit)
 CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, const bool include_neutral)
 //Wyrmgus end
 {
-	Assert(unit.CanAttack());
+	assert_throw(unit.CanAttack());
 	const int range = unit.GetReactionRange();
 	//Wyrmgus start
 //	return AttackUnitsInDistance<true>(unit, range, pred);

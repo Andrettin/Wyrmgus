@@ -233,6 +233,8 @@ void MyOpenGLGraphics::_endDraw()
 
 void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const color_modification &color_modification, unsigned int transparency, bool grayscale, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
+	Q_UNUSED(transparency)
+
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
 	int bottom = std::min<int>(r.y + r.height - 1, Video.Height - 1);

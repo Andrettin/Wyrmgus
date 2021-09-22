@@ -31,11 +31,12 @@
 #include "animation/animation_move.h"
 
 #include "unit/unit.h"
+#include "util/assert_util.h"
 
 void CAnimation_Move::Action(CUnit &unit, int &move, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
-	Assert(!move);
+	assert_throw(unit.Anim.Anim == this);
+	assert_throw(!move);
 
 	move = this->move;
 }

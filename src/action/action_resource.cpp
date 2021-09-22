@@ -64,6 +64,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "video/video.h"
 
 static constexpr int SUB_START_RESOURCE = 0;
@@ -151,8 +152,8 @@ static bool FindNearestReachableTerrainType(const tile_flag movemask, const int 
 	terrainTraversal.Init();
 
 	//Wyrmgus start
-//	Assert(CMap::get()->Field(startPos)->CheckMask(resmask));
-	Assert(CMap::get()->Field(startPos, z)->get_resource() == wyrmgus::resource::get_all()[resource]);
+//	assert_throw(CMap::get()->Field(startPos)->CheckMask(resmask));
+	assert_throw(CMap::get()->Field(startPos, z)->get_resource() == wyrmgus::resource::get_all()[resource]);
 	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
@@ -292,7 +293,7 @@ COrder_Resource::~COrder_Resource()
 		if (this->State == SUB_GATHER_RESOURCE) {
 
 			goal->Resource.Active--;
-			Assert(goal->Resource.Active >= 0);
+			assert_throw(goal->Resource.Active >= 0);
 		}
 	}
 }
@@ -313,7 +314,7 @@ void COrder_Resource::Save(CFile &file, const CUnit &unit) const
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
 	//Wyrmgus end
 
-	Assert(this->get_worker() != nullptr && this->get_worker()->IsAlive());
+	assert_throw(this->get_worker() != nullptr && this->get_worker()->IsAlive());
 	file.printf(" \"worker\", \"%s\",", UnitReference(this->get_worker()).c_str());
 	file.printf(" \"current-res\", %d,", this->CurrentResource);
 
@@ -554,7 +555,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 {
 	const CUnit *goal = this->get_goal();
-	Assert(goal);
+	assert_throw(goal != nullptr);
 
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
@@ -636,8 +637,8 @@ int COrder_Resource::StartGathering(CUnit &unit)
 {
 	CUnit *goal;
 	const resource_info *res_info = unit.Type->get_resource_info(this->get_current_resource());
-	Assert(!unit.get_pixel_offset().x());
-	Assert(!unit.get_pixel_offset().y());
+	assert_throw(!unit.get_pixel_offset().x());
+	assert_throw(!unit.get_pixel_offset().y());
 
 	//Wyrmgus start
 	const resource *input_resource = wyrmgus::resource::get_all()[this->CurrentResource]->get_input_resource();
@@ -706,7 +707,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	}
 
 	// FIXME: 0 can happen, if to near placed by map designer.
-	Assert(unit.MapDistanceTo(*goal) <= 1);
+	assert_throw(unit.MapDistanceTo(*goal) <= 1);
 
 	// Update the heading of a harvesting unit to looks straight at the resource.
 	//Wyrmgus start
@@ -785,7 +786,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 static void AnimateActionHarvest(CUnit &unit)
 {
 	const CAnimation *animation = unit.get_animation_set()->get_harvest_animation(resource::get_all()[unit.CurrentResource]);
-	Assert(animation != nullptr);
+	assert_throw(animation != nullptr);
 	UnitShowAnimation(unit, animation);
 }
 
@@ -804,9 +805,9 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	//Wyrmgus start
 	const wyrmgus::unit_type &source_type = *source.Type;
 	
-//	Assert((unit.Container == &source && !resinfo.HarvestFromOutside)
+//	assert_throw((unit.Container == &source && !resinfo.HarvestFromOutside)
 //		   || (!unit.Container && resinfo.HarvestFromOutside));
-	Assert((unit.Container == &source && !source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value)
+	assert_throw((unit.Container == &source && !source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value)
 		   || (!unit.Container && source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value));
 	//Wyrmgus end
 
@@ -856,8 +857,8 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	// Dump the unit outside and look for something to do.
 	if (unit.Container) {
 		//Wyrmgus start
-//		Assert(!resinfo.HarvestFromOutside);
-		Assert(!source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
+//		assert_throw(!resinfo.HarvestFromOutside);
+		assert_throw(!source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
 		//Wyrmgus end
 		DropOutOnSide(unit, LookingW, &source);
 	}
@@ -909,8 +910,8 @@ int COrder_Resource::GatherResource(CUnit &unit)
 
 	if (this->DoneHarvesting) {
 		//Wyrmgus start
-//		Assert(resinfo.HarvestFromOutside || resinfo.TerrainHarvester);
-		Assert(harvest_from_outside || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer));
+//		assert_throw(resinfo.HarvestFromOutside || resinfo.TerrainHarvester);
+		assert_throw(harvest_from_outside || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer));
 		//Wyrmgus end
 		return !unit.Anim.Unbreakable;
 	}
@@ -1004,8 +1005,8 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				source = unit.Container;
 			}
 
-			Assert(source);
-			Assert(source->ResourcesHeld <= 655350);
+			assert_throw(source != nullptr);
+			assert_throw(source->ResourcesHeld <= 655350);
 			//Wyrmgus start
 			UpdateUnitVariables(*source); //update resource source's variables
 			//Wyrmgus end
@@ -1117,7 +1118,7 @@ int GetNumWaitingWorkers(const CUnit &mine)
 
 	for (const std::shared_ptr<wyrmgus::unit_ref> &worker_ref : mine.Resource.Workers) {
 		const CUnit *worker = worker_ref->get();
-		Assert(worker->CurrentAction() == UnitAction::Resource);
+		assert_throw(worker->CurrentAction() == UnitAction::Resource);
 		COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 
 		if (order.IsGatheringWaiting()) {
@@ -1158,7 +1159,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 
 		if (source != nullptr) {
 			source->Resource.Active--;
-			Assert(source->Resource.Active >= 0);
+			assert_throw(source->Resource.Active >= 0);
 			//Store resource position.
 			this->Resource.Mine = source->acquire_ref();
 
@@ -1180,7 +1181,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 				CUnit *next = nullptr;
 				for (const std::shared_ptr<wyrmgus::unit_ref> &worker_ref : source->Resource.Workers) {
 					CUnit *worker = worker_ref->get();
-					Assert(worker->CurrentAction() == UnitAction::Resource);
+					assert_throw(worker->CurrentAction() == UnitAction::Resource);
 					COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 					if (worker != &unit && order.IsGatheringWaiting()) {
 						count++;
@@ -1203,7 +1204,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 					}
 					next->Wait = 0;
 					//source->Data.Resource.Waiting = count - 1;
-					//Assert(source->Data.Resource.Assigned >= source->Data.Resource.Waiting);
+					//assert_throw(source->Data.Resource.Assigned >= source->Data.Resource.Waiting);
 					//StartGathering(next);
 				}
 			}
@@ -1212,7 +1213,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 		// Store resource position.
 		this->Resource.Pos = unit.tilePos;
 		this->Resource.MapLayer = unit.MapLayer->ID;
-		Assert(this->Resource.Mine == nullptr);
+		assert_throw(this->Resource.Mine == nullptr);
 	}
 
 #ifdef DEBUG
@@ -1228,7 +1229,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
 		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer))) {
 		//Wyrmgus end
-			Assert(unit.Container);
+			assert_throw(unit.Container != nullptr);
 			DropOutOnSide(unit, LookingW, source);
 		}
 		CUnit *mine = this->Resource.get_mine();
@@ -1247,7 +1248,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
 		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer))) {
 		//Wyrmgus end
-			Assert(unit.Container);
+			assert_throw(unit.Container != nullptr);
 			DropOutNearest(unit, depot->tilePos + depot->GetHalfTileSize(), source);
 		}
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
@@ -1270,9 +1271,11 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 int COrder_Resource::MoveToDepot(CUnit &unit)
 {
 	const resource_info *res_info = unit.Type->get_resource_info(this->get_current_resource());
+
+	assert_throw(this->get_goal() != nullptr);
+
 	CUnit &goal = *this->get_goal();
 	CPlayer &player = *unit.Player;
-	Assert(&goal);
 
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
@@ -1416,7 +1419,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	const resource_info *res_info = unit.Type->get_resource_info(this->get_current_resource());
 	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, res_info->get_resource()->get_index(), unit.MapLayer->ID);
 
-	//Assert(depot);
+	//assert_throw(depot);
 
 	// Range hardcoded. don't stray too far though
 	//Wyrmgus start
@@ -1622,7 +1625,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 */
 bool COrder_Resource::ActionResourceInit(CUnit &unit)
 {
-	Assert(this->State == SUB_START_RESOURCE);
+	assert_throw(this->State == SUB_START_RESOURCE);
 
 	this->Range = 0;
 	CUnit *goal = this->get_goal();
@@ -1698,7 +1701,7 @@ void COrder_Resource::Execute(CUnit &unit)
 			case 0: // Move along.
 				return;
 			default: {
-				Assert(0);
+				assert_throw(false);
 				break;
 			}
 		}
@@ -1757,7 +1760,7 @@ void COrder_Resource::Execute(CUnit &unit)
 			case 0: // Move along.
 				return;
 			default: {
-				Assert(0);
+				assert_throw(false);
 				return;
 			}
 		}

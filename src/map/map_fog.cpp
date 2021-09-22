@@ -44,6 +44,7 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_manager.h"
+#include "util/assert_util.h"
 #include "util/util.h"
 #include "video/intern_video.h"
 #include "video/renderer.h"
@@ -76,7 +77,7 @@ class _filter_flags
 public:
 	explicit _filter_flags(const CPlayer &p, tile_flag *fogmask) : player(&p), fogmask(fogmask)
 	{
-		Assert(fogmask != nullptr);
+		assert_throw(fogmask != nullptr);
 	}
 
 	void operator()(const CUnit *const unit) const
@@ -172,7 +173,7 @@ public:
 				return;
 			}
 
-			Assert(unit->VisCount[p]);
+			assert_throw(unit->VisCount[p] > 0);
 			unit->VisCount[p]--;
 			//  If the unit goes under of fog, this can happen for any player that
 			//  this player shares vision to. First of all, before unmarking,
@@ -267,7 +268,7 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 		}
 		return;
 	}
-	Assert(v != 65535);
+	assert_throw(v != 65535);
 	++v;
 }
 
@@ -276,7 +277,7 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 void MapMarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 	MapMarkTileSight(player, CMap::get()->get_pos_index(pos, z), z);
 }
 
@@ -324,7 +325,7 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 	MapUnmarkTileSight(player, CMap::get()->get_pos_index(pos, z), z);
 }
 
@@ -350,7 +351,7 @@ void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index, int
 		UnitsOnTileMarkSeen(player, mf, 1, 0);
 		//Wyrmgus end
 	}
-	Assert(v != 255);
+	assert_throw(v != 255);
 	++v;
 }
 
@@ -381,7 +382,7 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index, i
 	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	//Wyrmgus end
 	unsigned char &v = mf.player_info->VisCloak[player.get_index()];
-	Assert(v != 0);
+	assert_throw(v != 0);
 	if (v == 1) {
 		//Wyrmgus start
 //		UnitsOnTileUnmarkSeen(player, mf, 1);
@@ -416,7 +417,7 @@ void MapMarkTileDetectEthereal(const CPlayer &player, const unsigned int index, 
 	if (v == 0) {
 		UnitsOnTileMarkSeen(player, mf, 0, 1);
 	}
-	Assert(v != 255);
+	assert_throw(v != 255);
 	++v;
 }
 
@@ -435,7 +436,7 @@ void MapUnmarkTileDetectEthereal(const CPlayer &player, const unsigned int index
 {
 	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	unsigned char &v = mf.player_info->VisEthereal[player.get_index()];
-	Assert(v != 0);
+	assert_throw(v != 0);
 	if (v == 1) {
 		UnitsOnTileUnmarkSeen(player, mf, 0, 1);
 	}

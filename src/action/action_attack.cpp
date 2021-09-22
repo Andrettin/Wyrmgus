@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_attack.cpp - The attack action source file. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -60,6 +58,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/assert_util.h"
 #include "video/video.h"
 
 static constexpr int WEAK_TARGET = 2; //weak target, could be changed
@@ -127,7 +126,7 @@ std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, CUnit &ta
 
 std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(dest, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(dest, z));
 
 	auto order = std::make_unique<COrder_Attack>(false);
 
@@ -167,7 +166,7 @@ void COrder_Attack::Save(CFile &file, const CUnit &unit) const
 {
 	Q_UNUSED(unit)
 
-	Assert(Action == UnitAction::Attack || Action == UnitAction::AttackGround);
+	assert_throw(Action == UnitAction::Attack || Action == UnitAction::AttackGround);
 
 	if (Action == UnitAction::Attack) {
 		file.printf("{\"action-attack\",");
@@ -230,7 +229,7 @@ bool COrder_Attack::IsValid() const
 			return CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer);
 		}
 	} else {
-		Assert(Action == UnitAction::AttackGround);
+		assert_throw(Action == UnitAction::AttackGround);
 		return CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer);
 	}
 }
@@ -290,7 +289,7 @@ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
 void COrder_Attack::OnAnimationAttack(CUnit &unit)
 {
 	//Wyrmgus start
-//	Assert(unit.Type->CanAttack);
+//	assert_throw(unit.Type->CanAttack);
 	if (!unit.CanAttack(false)) {
 		return;
 	}
@@ -444,7 +443,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		}
 	}
 
-	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
+	assert_throw(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	return false;
 }
 
@@ -455,10 +454,10 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 */
 void COrder_Attack::MoveToTarget(CUnit &unit)
 {
-	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
-	Assert(unit.CurrentOrder() == this);
-	Assert(unit.CanMove());
-	Assert(this->has_goal() || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer));
+	assert_throw(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
+	assert_throw(unit.CurrentOrder() == this);
+	assert_throw(unit.CanMove());
+	assert_throw(this->has_goal() || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer));
 
 	//Wyrmgus start
 	//if is on a moving raft and target is now within range, stop the raft
@@ -595,7 +594,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 */
 void COrder_Attack::AttackTarget(CUnit &unit)
 {
-	Assert(this->has_goal() || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer));
+	assert_throw(this->has_goal() || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer));
 
 	AnimateActionAttack(unit, *this);
 	if (unit.Anim.Unbreakable) {
@@ -738,7 +737,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 */
 void COrder_Attack::Execute(CUnit &unit)
 {
-	Assert(this->has_goal() || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer));
+	assert_throw(this->has_goal() || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer));
 
 	if (unit.Wait) {
 		if (!unit.Waiting) {
