@@ -123,6 +123,7 @@ class CUnit final
 {
 public:
 	static constexpr unsigned char max_step_count = 10;
+	static constexpr int max_sight_range = 16;
 
 	CUnit();
 	~CUnit();

@@ -222,6 +222,7 @@ set(map_SRCS
 	src/map/map_template_container.cpp
 	src/map/map_wall.cpp
 	src/map/minimap.cpp
+	src/map/nearby_sight_unmarker.cpp
 	src/map/province.cpp
 	src/map/region.cpp
 	src/map/region_history.cpp
@@ -772,6 +773,7 @@ set(wyrmgus_map_HDRS
 	src/map/mercator_map_projection.h
 	src/map/minimap.h
 	src/map/minimap_mode.h
+	src/map/nearby_sight_unmarker.h
 	src/map/region.h
 	src/map/region_history.h
 	src/map/site.h

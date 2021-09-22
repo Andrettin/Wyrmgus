@@ -42,6 +42,7 @@
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/minimap.h"
+#include "map/nearby_sight_unmarker.h"
 #include "map/site.h"
 #include "map/site_container.h"
 #include "map/site_game_data.h"
@@ -100,6 +101,16 @@ std::filesystem::path CurrentMapPath; //path of the current map
 /*----------------------------------------------------------------------------
 --  Visible and explored handling
 ----------------------------------------------------------------------------*/
+
+void CMap::reset_tile_visibility()
+{
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
+		for (int i = 0; i != this->Info->MapWidths[z] * this->Info->MapHeights[z]; ++i) {
+			tile *tile = this->Field(i, z);
+			tile->player_info->reset_visibility();
+		}
+	}
+}
 
 /**
 **  Marks seen tile -- used mainly for the Fog Of War
@@ -2240,7 +2251,7 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 	try {
 		CMapLayer *map_layer = this->MapLayers[z].get();
 
-		if (!map_layer) {
+		if (map_layer == nullptr) {
 			return;
 		}
 
@@ -2252,6 +2263,14 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 
 		const short old_overlay_solid_tile = tile->OverlaySolidTile;
 		const size_t old_overlay_transition_count = tile->OverlayTransitionTiles.size();
+
+		const bool affects_sight = tile->get_overlay_terrain()->has_flag(tile_flag::air_impassable);
+
+		std::unique_ptr<nearby_sight_unmarker> sight_unmarker;
+
+		if (affects_sight) {
+			sight_unmarker = std::make_unique<nearby_sight_unmarker>(pos, z);
+		}
 
 		tile->SetOverlayTerrainDestroyed(destroyed);
 

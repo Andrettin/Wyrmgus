@@ -199,6 +199,15 @@ public:
 
 	unsigned char get_team_visibility_state(const CPlayer &player) const;
 
+	void reset_visibility()
+	{
+		this->Visible.fill(0);
+		this->VisCloak.fill(0);
+		this->VisEthereal.fill(0);
+		this->Radar.fill(0);
+		this->RadarJammer.fill(0);
+	}
+
 public:
 	//Wyrmgus start
 //	unsigned short SeenTile = 0;              /// last seen tile (FOW)

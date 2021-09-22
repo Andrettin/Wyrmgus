@@ -303,17 +303,20 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 			// This happens when we unmark everything in CommandSharedVision
 			break;
 		case 2:
-			// When there is NoFogOfWar units never get unmarked.
+			//when there is NoFogOfWar units never get unmarked.
 			if (!CMap::get()->NoFogOfWar) {
 				//Wyrmgus start
 //				UnitsOnTileUnmarkSeen(player, mf, 0);
 				UnitsOnTileUnmarkSeen(player, mf, 0, 0);
 				//Wyrmgus end
 			}
-			// Check visible Tile, then deduct...
+
+			//check visible tile, then deduct...
 			if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 				CMap::get()->MarkSeenTile(mf);
 			}
+
+			//fallthrough
 		default:  // seen -> seen
 			--v;
 			break;

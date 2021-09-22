@@ -349,22 +349,22 @@ inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUni
 	Assert(CMap::get()->Info->IsPointOnMap(rbPos, z));
 	Assert(units.empty());
 	
-	wyrmgus::decimillesimal_int middle_x;
-	wyrmgus::decimillesimal_int middle_y;
-	wyrmgus::decimillesimal_int radius;
+	decimillesimal_int middle_x;
+	decimillesimal_int middle_y;
+	decimillesimal_int radius;
 
 	if constexpr (circle) {
-		middle_x = wyrmgus::decimillesimal_int(rbPos.x + ltPos.x) / 2;
-		middle_y = wyrmgus::decimillesimal_int(rbPos.y + ltPos.y) / 2;
+		middle_x = decimillesimal_int(rbPos.x + ltPos.x) / 2;
+		middle_y = decimillesimal_int(rbPos.y + ltPos.y) / 2;
 		radius = ((middle_x - ltPos.x) + (middle_y - ltPos.y)) / 2;
 	}
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
 			if constexpr (circle) {
-				const wyrmgus::decimillesimal_int rel_x = posIt.x - middle_x;
-				const wyrmgus::decimillesimal_int rel_y = posIt.y - middle_y;
-				const wyrmgus::decimillesimal_int my = radius * radius - rel_x * rel_x;
+				const decimillesimal_int rel_x = posIt.x - middle_x;
+				const decimillesimal_int rel_y = posIt.y - middle_y;
+				const decimillesimal_int my = radius * radius - rel_x * rel_x;
 				if ((rel_y * rel_y) > my) {
 					continue;
 				}

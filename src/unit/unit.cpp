@@ -56,6 +56,7 @@
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
+#include "map/nearby_sight_unmarker.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "map/terrain_type.h"
@@ -3367,8 +3368,17 @@ void MarkUnitFieldFlags(const CUnit &unit)
 //	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
 	if (unit.Type->BoolFlag[VANISHES_INDEX].value || unit.CurrentAction() == UnitAction::Die) {
 	//Wyrmgus end
-		return ;
+		return;
 	}
+
+	const bool affects_sight = (unit.Type->FieldFlags & tile_flag::air_impassable) != tile_flag::none;
+
+	std::unique_ptr<nearby_sight_unmarker> sight_unmarker;
+
+	if (affects_sight) {
+		sight_unmarker = std::make_unique<nearby_sight_unmarker>(&unit);
+	}
+
 	do {
 		wyrmgus::tile *mf = unit.MapLayer->Field(index);
 		int w = width;
@@ -3380,11 +3390,12 @@ void MarkUnitFieldFlags(const CUnit &unit)
 	} while (--h);
 }
 
-class _UnmarkUnitFieldFlags
+class _UnmarkUnitFieldFlags final
 {
 public:
-	_UnmarkUnitFieldFlags(const CUnit &unit, wyrmgus::tile *mf) : main(&unit), mf(mf)
-	{}
+	explicit _UnmarkUnitFieldFlags(const CUnit &unit, wyrmgus::tile *mf) : main(&unit), mf(mf)
+	{
+	}
 
 	void operator()(CUnit *const unit) const
 	{
@@ -3411,8 +3422,17 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 	unsigned int index = unit.Offset;
 
 	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
-		return ;
+		return;
 	}
+
+	const bool affects_sight = (unit.Type->FieldFlags & tile_flag::air_impassable) != tile_flag::none;
+
+	std::unique_ptr<nearby_sight_unmarker> sight_unmarker;
+
+	if (affects_sight) {
+		sight_unmarker = std::make_unique<nearby_sight_unmarker>(&unit);
+	}
+
 	do {
 		wyrmgus::tile *mf = unit.MapLayer->Field(index);
 

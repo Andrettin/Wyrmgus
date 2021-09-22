@@ -210,6 +210,8 @@ public:
 	QPoint generate_unit_location(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const QPoint &min_pos, const QPoint &max_pos, const int z) const;
 	//Wyrmgus end
 
+	void reset_tile_visibility();
+
 	/// Mark a tile as seen by the player.
 	void MarkSeenTile(wyrmgus::tile &mf);
 

@@ -1577,16 +1577,15 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 		std::throw_with_nested(std::runtime_error("Failed to preprocess map."));
 	}
 
-	//Wyrmgus start
-	//update the sight of all units
+	map->reset_tile_visibility();
+
+	//update the sight of all units, and mark tiles as visible
 	for (CUnit *unit : unit_manager::get()->get_units()) {
 		if (!unit->Destroyed) {
-			MapUnmarkUnitSight(*unit);
 			UpdateUnitSightRange(*unit);
 			MapMarkUnitSight(*unit);
 		}
 	}
-	//Wyrmgus end
 
 	//
 	// Sound part

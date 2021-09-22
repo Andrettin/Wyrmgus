@@ -189,7 +189,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 	for (size_t i = 0; i != cache.size(); ++i) {
 		CUnit &unit = *cache[i];
 		if (unit.IsAliveOnMap()) {
-			if (unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) { // restore tile_flag::air_impassable related to units (i.e. doors)
+			if (unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) { // restore tile_flag::air_impassable related to units (e.g. doors)
 				this->Flags |= tile_flag::impassable;
 				this->Flags |= tile_flag::air_impassable;
 			}
