@@ -866,9 +866,15 @@ void FindPlayerUnitsByType(const CPlayer &player, const wyrmgus::unit_type &type
 **
 **  @return      Returns first found unit on tile.
 */
-static CUnit *UnitOnMapTile(const unsigned int index, const std::set<UnitTypeType> &type_set, const int z)
+//Wyrmgus start
+//static CUnit *UnitOnMapTile(const unsigned int index, const UnitTypeType type)
+static CUnit *UnitOnMapTile(const unsigned int index, const UnitTypeType type, const int z)
+//Wyrmgus end
 {
-	return CMap::get()->Field(index, z)->UnitCache.find(CUnitTypeFinder(type_set));
+	//Wyrmgus start
+//	return CMap::get()->Field(index)->UnitCache.find(CUnitTypeFinder(type));
+	return CMap::get()->Field(index, z)->UnitCache.find(CUnitTypeFinder(type));
+	//Wyrmgus end
 }
 
 /**
@@ -879,9 +885,15 @@ static CUnit *UnitOnMapTile(const unsigned int index, const std::set<UnitTypeTyp
 **
 **  @return      Returns first found unit on tile.
 */
-CUnit *UnitOnMapTile(const Vec2i &pos, const std::set<UnitTypeType> &type_set, int z)
+//Wyrmgus start
+//CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type)
+CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type, int z)
+//Wyrmgus end
 {
-	return UnitOnMapTile(CMap::get()->get_pos_index(pos, z), type_set, z);
+	//Wyrmgus start
+//	return UnitOnMapTile(CMap::get()->get_pos_index(pos), type);
+	return UnitOnMapTile(CMap::get()->get_pos_index(pos, z), type, z);
+	//Wyrmgus end
 }
 
 /**

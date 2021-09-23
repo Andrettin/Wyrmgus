@@ -425,26 +425,6 @@ static void AStarAddToClose(int node, int z)
 #define GetIndex(x, y, z) (x) + (y) * AStarMapWidth[(z)]
 //Wyrmgus end
 
-static const std::set<UnitTypeType> &get_pathfinding_unit_type_type_set(const UnitTypeType unit_type_type)
-{
-	static const std::set<UnitTypeType> land_set = { UnitTypeType::Land, UnitTypeType::FlyLow };
-	static const std::set<UnitTypeType> naval_set = { UnitTypeType::Naval };
-	static const std::set<UnitTypeType> air_set = { UnitTypeType::Fly, UnitTypeType::Space };
-
-	switch (unit_type_type) {
-		case UnitTypeType::Land:
-		case UnitTypeType::FlyLow:
-			return land_set;
-		case UnitTypeType::Naval:
-			return naval_set;
-		case UnitTypeType::Fly:
-		case UnitTypeType::Space:
-			return air_set;
-		default:
-			return { unit_type_type };
-	}
-}
-
 /* build-in costmoveto code */
 static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int z)
 {
@@ -456,12 +436,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 		assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 	}
 #endif
-
 	int cost = 0;
 	const tile_flag mask = unit.Type->MovementMask;
-
-	const std::set<UnitTypeType> unit_type_type_set = get_pathfinding_unit_type_type_set(unit.Type->UnitType);
-	const CUnitTypeFinder unit_finder(unit_type_type_set);
+	const CUnitTypeFinder unit_finder(unit.Type->UnitType);
 
 	// verify each tile of the unit.
 	int h = unit.Type->get_tile_height();
@@ -485,14 +462,12 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 					// we can't cross fixed units and other unpassable things
 					return -1;
 				}
-
 				CUnit *goal = mf->UnitCache.find(unit_finder);
 				if (!goal) {
 					// Shouldn't happen, mask says there is something on this tile
 					assert_throw(false);
 					return -1;
 				}
-
 				//Wyrmgus start
 //				if (goal->Moving)  {
 				if (&unit != goal && goal->Moving)  {

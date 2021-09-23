@@ -1418,7 +1418,7 @@ static void handle_mouse_move_on_minimap(const PixelPos &cursor_pos)
 
 	if (UI.get_minimap()->are_units_visible()) {
 		if (UI.CurrentMapLayer->Field(tile_pos)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
-			UnitUnderCursor = UnitOnMapTile(tile_pos, {}, UI.CurrentMapLayer->ID);
+			UnitUnderCursor = UnitOnMapTile(tile_pos, UnitTypeType::None, UI.CurrentMapLayer->ID);
 		}
 	}
 }
@@ -2293,7 +2293,7 @@ static void UIHandleButtonDown_OnMap(const Qt::KeyboardModifiers key_modifiers)
 			// FIXME: Johns: Perhaps we should use a pixel map coordinates
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, {}, UI.CurrentMapLayer->ID))
+			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, UnitTypeType::None, UI.CurrentMapLayer->ID))
 				&& !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross
