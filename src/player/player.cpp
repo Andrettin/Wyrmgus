@@ -105,12 +105,10 @@
 #include "ui/button_cmd.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
-//Wyrmgus start
 #include "unit/unit_class.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-//Wyrmgus end
-#include "unit/unit_type_type.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end

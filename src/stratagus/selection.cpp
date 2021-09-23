@@ -46,10 +46,10 @@
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 
 unsigned int MaxSelectable;								/// Maximum number of selected units
 
@@ -860,7 +860,7 @@ int SelectArmy()
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeType::Naval || unit.Type->UnitType == UnitTypeType::Fly || unit.Type->UnitType == UnitTypeType::Space) {
+		if (unit.Type->get_domain() == unit_domain::water || unit.Type->get_domain() == unit_domain::air || unit.Type->get_domain() == unit_domain::space) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else on team has this unit
@@ -972,7 +972,7 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeType::Fly || unit.Type->UnitType == UnitTypeType::Space) {
+		if (unit.Type->get_domain() == unit_domain::air || unit.Type->get_domain() == unit_domain::space) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -1023,7 +1023,7 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType != UnitTypeType::Fly) {
+		if (unit.Type->get_domain() != unit_domain::air) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -1095,7 +1095,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType == UnitTypeType::Fly || unit.Type->UnitType == UnitTypeType::Space) {
+		if (unit.Type->get_domain() == unit_domain::air || unit.Type->get_domain() == unit_domain::space) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -1166,7 +1166,7 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit.Type->UnitType != UnitTypeType::Fly) {
+		if (unit.Type->get_domain() != unit_domain::air) {
 			continue;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit

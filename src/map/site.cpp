@@ -45,8 +45,8 @@
 #include "region.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "util/astronomy_util.h"
 #include "util/container_util.h"
 #include "util/geocoordinate.h"
@@ -355,7 +355,7 @@ bool site::can_have_population() const
 
 bool site::can_use_name_for_site_unit() const
 {
-	return this->get_base_unit_type() != nullptr && this->get_base_unit_type()->UnitType == UnitTypeType::Space;
+	return this->get_base_unit_type() != nullptr && this->get_base_unit_type()->get_domain() == unit_domain::space;
 }
 
 QTime site::get_right_ascension() const

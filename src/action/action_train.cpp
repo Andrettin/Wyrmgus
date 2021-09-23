@@ -47,11 +47,11 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "util/assert_util.h"
 
 /// How many resources the player gets back if canceling training
@@ -178,6 +178,7 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 	if (order == nullptr) {
 		return false;
 	}
+
 	if (order->Action == UnitAction::Resource) {
 		//  Check if new unit can harvest.
 		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
@@ -193,15 +194,18 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 		}
 		return true;
 	}
+
 	//Wyrmgus start
 //	if (order->Action == UnitAction::Attack && !unit.Type->CanAttack) {
 	if (order->Action == UnitAction::Attack && !unit.CanAttack(true)) {
 	//Wyrmgus end
 		return false;
 	}
-	if (order->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeType::Land) {
+
+	if (order->Action == UnitAction::Board && unit.Type->get_domain() != unit_domain::land) {
 		return false;
 	}
+
 	return true;
 }
 

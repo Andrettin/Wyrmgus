@@ -56,11 +56,11 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "util/assert_util.h"
 #include "video/video.h"
 
@@ -356,7 +356,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
 		//Wyrmgus start
 		//if is unreachable and is on a raft, see if the raft can move closer to the target
-		if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+		if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {

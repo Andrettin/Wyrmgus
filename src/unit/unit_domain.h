@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_type_type.h - The unit type type header file. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -28,11 +26,55 @@
 
 #pragma once
 
-enum class UnitTypeType {
-	None = -1,
-	Land, //can only move on land
-	Fly, //can move on land and water, and over non-passable terrain like rocks or trees
-	FlyLow, //flying unit, but it flies low, so that it can be attacked by melee land units and cannot fly over rocks or trees
-	Naval, //can only move on water
-	Space  //can move in space, as well as over any other kind of terrain that flying units can
+namespace wyrmgus {
+
+enum class unit_domain {
+	none = -1,
+	land, //can only move on land
+	water, //can only move on water
+	air, //can move on land and water, and over non-passable terrain like rocks or trees
+	air_low, //flying unit, but it flies low, so that it can be attacked by melee land units and cannot fly over rocks or trees
+	space  //can move in space, as well as over any other kind of terrain that flying units can
 };
+
+
+inline unit_domain string_to_unit_domain(const std::string &str)
+{
+	if (str == "land") {
+		return unit_domain::land;
+	} else if (str == "water") {
+		return unit_domain::water;
+	} else if (str == "air") {
+		return unit_domain::air;
+	} else if (str == "air_low") {
+		return unit_domain::air_low;
+	} else if (str == "space") {
+		return unit_domain::space;
+	}
+
+	throw std::runtime_error("Invalid unit domain: \"" + str + "\".");
+}
+
+inline std::string unit_domain_to_string(const unit_domain domain)
+{
+	switch (domain) {
+		case unit_domain::land:
+			return "land";
+		case unit_domain::water:
+			return "water";
+		case unit_domain::air:
+			return "air";
+		case unit_domain::air_low:
+			return "air_low";
+		case unit_domain::space:
+			return "space";
+		default:
+			break;
+	}
+
+	throw std::runtime_error("Invalid unit domain: \"" + std::to_string(static_cast<int>(domain)) + "\".");
+}
+
+}
+
+Q_DECLARE_METATYPE(wyrmgus::unit_domain)

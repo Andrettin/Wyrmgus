@@ -50,9 +50,9 @@
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "util/assert_util.h"
 #include "util/log_util.h"
 #include "video/video.h"
@@ -163,7 +163,7 @@ int DoActionMove(CUnit &unit)
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
+			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
 				if (table[i]->Moving) {
 					unit.Wait = 1;
 					unit.Moving = 0;
@@ -172,7 +172,7 @@ int DoActionMove(CUnit &unit)
 				}
 			}
 		}
-	} else if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) { //if the unit is a land unit over a raft, don't move if the raft is still moving
+	} else if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) { //if the unit is a land unit over a raft, don't move if the raft is still moving
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -203,7 +203,7 @@ int DoActionMove(CUnit &unit)
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
+				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
 					table[i]->pixel_offset = QPoint(0, 0);
 				}
 			}
@@ -235,7 +235,7 @@ int DoActionMove(CUnit &unit)
 				break;
 		}
 		
-		if (unit.Type->UnitType == UnitTypeType::Naval) { // Boat (un)docking?
+		if (unit.Type->get_domain() == unit_domain::water) { //boat (un)docking?
 			//Wyrmgus start
 //			const wyrmgus::tile &mf_cur = *Map.Field(unit.Offset);
 //			const wyrmgus::tile &mf_next = *Map.Field(unit.tilePos + posd);
@@ -255,7 +255,7 @@ int DoActionMove(CUnit &unit)
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
+				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
 					table[i]->MoveToXY(pos, table[i]->MapLayer->ID);
 					table[i]->pixel_offset.setX(-posd.x * wyrmgus::defines::get()->get_tile_width());
 					table[i]->pixel_offset.setY(-posd.y * wyrmgus::defines::get()->get_tile_height());
@@ -311,7 +311,7 @@ int DoActionMove(CUnit &unit)
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
+			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
 				table[i]->pixel_offset += QPoint(posd.x * move, posd.y * move);
 			}
 		}
@@ -329,7 +329,7 @@ int DoActionMove(CUnit &unit)
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
+				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
 					table[i]->pixel_offset = QPoint(0, 0);
 				}
 			}
@@ -374,7 +374,7 @@ void COrder_Move::Execute(CUnit &unit)
 		case PF_REACHED:
 			//Wyrmgus start
 			if (this->Range >= 1) {
-				if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) { //if the unit is a land unit over a raft
+				if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) { //if the unit is a land unit over a raft
 					std::vector<CUnit *> table;
 					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
@@ -390,7 +390,7 @@ void COrder_Move::Execute(CUnit &unit)
 					std::vector<CUnit *> table;
 					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
-						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land && table[i]->CanMove()) {
+						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land && table[i]->CanMove()) {
 							if (table[i]->CurrentAction() == UnitAction::Still) {
 								CommandStopUnit(*table[i]);
 								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);

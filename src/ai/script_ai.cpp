@@ -45,9 +45,9 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "util/log_util.h"
@@ -333,10 +333,11 @@ static std::vector<const wyrmgus::unit_type *> get_naval_transporter_units()
 			continue;
 		}
 
-		if (unit_type->CanTransport() && (unit_type->UnitType == UnitTypeType::Naval || unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::FlyLow || unit_type->UnitType == UnitTypeType::Space)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
+		if (unit_type->CanTransport() && (unit_type->get_domain() == unit_domain::water || unit_type->get_domain() == unit_domain::air || unit_type->get_domain() == unit_domain::air_low || unit_type->get_domain() == unit_domain::space)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
 			res.push_back(unit_type);
 		}
 	}
+
 	return res;
 }
 //Wyrmgus end

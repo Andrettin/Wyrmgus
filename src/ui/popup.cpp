@@ -49,6 +49,7 @@
 #include "unit/unit.h"
 //Wyrmgus end
 #include "unit/unit_class.h"
+#include "unit/unit_domain.h"
 //Wyrmgus start
 #include "unit/unit_manager.h"
 //Wyrmgus end
@@ -59,7 +60,8 @@
 #include "video/font_color.h"
 #include "video/video.h"
 
-PopupConditionPanel::PopupConditionPanel() : ButtonAction(ButtonCmd::None), item_class(wyrmgus::item_class::none)
+PopupConditionPanel::PopupConditionPanel() 
+	: ButtonAction(ButtonCmd::None), item_class(item_class::none), unit_domain(unit_domain::none)
 {
 }
 
@@ -768,21 +770,8 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 			condition->Bound = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Identified")) {
 			condition->Identified = Ccl2Condition(l, LuaToString(l, -1));
-		} else if (!strcmp(key, "UnitTypeType")) {
-			const char *unit_type_type = LuaToString(l, -1);
-			if (!strcmp(unit_type_type, "land")) {
-				condition->UnitTypeType = UnitTypeType::Land;
-			} else if (!strcmp(unit_type_type, "fly")) {
-				condition->UnitTypeType = UnitTypeType::Fly;
-			} else if (!strcmp(unit_type_type, "fly-low")) {
-				condition->UnitTypeType = UnitTypeType::FlyLow;
-			} else if (!strcmp(unit_type_type, "naval")) {
-				condition->UnitTypeType = UnitTypeType::Naval;
-			} else if (!strcmp(unit_type_type, "space")) {
-				condition->UnitTypeType = UnitTypeType::Space;
-			} else {
-				LuaError(l, "Unsupported Type: %s" _C_ unit_type_type);
-			}
+		} else if (!strcmp(key, "UnitDomain")) {
+			condition->unit_domain = string_to_unit_domain(LuaToString(l, -1));
 		} else if (!strcmp(key, "UnitTypeClass")) {
 			condition->unit_class = wyrmgus::unit_class::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "ItemClass")) {

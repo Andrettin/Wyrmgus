@@ -1022,6 +1022,7 @@ set(wyrmgus_unit_HDRS
 	src/unit/unit_cache.h
 	src/unit/unit_class.h
 	src/unit/unit_class_container.h
+	src/unit/unit_domain.h
 	src/unit/unit_find.h
 	src/unit/unit_list_model.h
 	src/unit/unit_manager.h
@@ -1029,7 +1030,6 @@ set(wyrmgus_unit_HDRS
 	src/unit/unit_type_variation.h
 	src/unit/unit_type.h
 	src/unit/unit_type_container.h
-	src/unit/unit_type_type.h
 	src/unit/unit_variable.h
 )
 

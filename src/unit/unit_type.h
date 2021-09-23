@@ -47,7 +47,6 @@ class CPlayer;
 class CPlayerColorGraphic;
 class LuaCallback;
 enum class ButtonCmd;
-enum class UnitTypeType;
 struct lua_State;
 
 static int CclDefineDependency(lua_State *l);
@@ -82,6 +81,7 @@ namespace wyrmgus {
 	enum class item_class;
 	enum class item_slot;
 	enum class tile_flag : uint32_t;
+	enum class unit_domain;
 }
 
 constexpr int UnitSides = 8;
@@ -772,6 +772,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 
 	Q_PROPERTY(wyrmgus::unit_class* unit_class MEMBER unit_class WRITE set_unit_class NOTIFY changed)
 	Q_PROPERTY(bool template MEMBER template_type READ is_template)
+	Q_PROPERTY(wyrmgus::unit_domain domain MEMBER domain READ get_domain NOTIFY changed)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
 	Q_PROPERTY(wyrmgus::civilization_group* civilization_group MEMBER civilization_group NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction NOTIFY changed)
@@ -883,7 +884,7 @@ public:
 	{
 		return this->Slot;
 	}
-	
+
 	const wyrmgus::unit_class *get_unit_class() const
 	{
 		return this->unit_class;
@@ -895,6 +896,15 @@ public:
 	{
 		return this->template_type;
 	}
+
+	unit_domain get_domain() const
+	{
+		return this->domain;
+	}
+
+	bool is_land_unit() const;
+	bool is_water_unit() const;
+	bool is_air_unit() const;
 
 	const wyrmgus::civilization_group *get_civilization_group() const
 	{
@@ -1366,10 +1376,9 @@ private:
 	std::string button_key;			/// Hotkey of this unit's button
 //	int starting_resources = 0;          /// Amount of Resources on build
 	std::vector<int> starting_resources;          /// Amount of Resources on build
+	unit_domain domain; //whether the unit is a land, water or etc. unit
 public:
 	//Wyrmgus end
-	/// originally only visual effect, we do more with this!
-	UnitTypeType UnitType;          /// Land / fly / naval
 	int DecayRate = 0;				/// Decay rate in 1/6 seconds
 	// TODO: not used
 	int AnnoyComputerFactor = 0;	/// How much this annoys the computer
@@ -1391,9 +1400,6 @@ public:
 #define CanTargetAir  4             /// Can attack air units
 
 	unsigned Flip : 1;              /// Flip image when facing left
-	unsigned LandUnit : 1;          /// Land animated
-	unsigned AirUnit : 1;           /// Air animated
-	unsigned SeaUnit : 1;           /// Sea animated
 	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
 	unsigned CanAttack : 1;         /// Unit can attack.
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor

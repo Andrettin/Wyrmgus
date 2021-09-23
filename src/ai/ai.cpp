@@ -162,13 +162,13 @@
 #include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
+#include "unit/unit_domain.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
 #include "util/enum_util.h"
 #include "util/util.h"
@@ -915,10 +915,7 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 			   defender.Type->Ident.c_str() _C_ defender.tilePos.x _C_ defender.tilePos.y);
 
 	//  Don't send help to scouts (zeppelin,eye of vision).
-	//Wyrmgus start
-//	if (!defender.Type->CanAttack && defender.Type->UnitType == UnitTypeType::Fly) {
-	if (!defender.CanAttack() && defender.Type->UnitType == UnitTypeType::Fly) {
-	//Wyrmgus end
+	if (!defender.CanAttack() && defender.Type->get_domain() == unit_domain::air) {
 		return;
 	}
 	// Summoned unit, don't help
@@ -1296,7 +1293,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		//Wyrmgus end
 		const wyrmgus::unit_type &blockertype = *blocker.Type;
 
-		if (blockertype.UnitType != unittype.UnitType) {
+		if (blockertype.get_domain() != unittype.get_domain()) {
 			continue;
 		}
 
@@ -1428,7 +1425,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	what.Player->Ai->Force.Assign(what, -1);
 	
 	if (what.Player->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
-		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeType::Naval || what.Type->UnitType == UnitTypeType::Fly || what.Type->UnitType == UnitTypeType::FlyLow || what.Type->UnitType == UnitTypeType::Space)) {
+		if (what.Type->CanTransport() && what.CanMove() && (what.Type->get_domain() == unit_domain::water || what.Type->get_domain() == unit_domain::air || what.Type->get_domain() == unit_domain::air_low || what.Type->get_domain() == unit_domain::space)) {
 			const landmass *landmass = CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID);
 			
 			if (landmass != nullptr) {

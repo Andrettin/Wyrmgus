@@ -34,9 +34,9 @@
 #include "map/map.h"
 #include "map/tile.h"
 #include "unit/unit.h"
-#include "unit/unit_type_type.h"
+#include "unit/unit_domain.h"
 
-struct LandMineTargetFinder {
+struct LandMineTargetFinder final {
 	const CUnit *const source;
 	int CanHitOwner;
 
@@ -46,8 +46,8 @@ struct LandMineTargetFinder {
 	bool operator()(const CUnit *const unit) const
 	{
 		return (!(unit == source && !CanHitOwner)
-				&& unit->Type->UnitType != UnitTypeType::Fly
-				&& unit->Type->UnitType != UnitTypeType::Space
+				&& unit->Type->get_domain() != unit_domain::air
+				&& unit->Type->get_domain() != unit_domain::space
 				&& unit->CurrentAction() != UnitAction::Die);
 	}
 

@@ -54,12 +54,12 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "util/assert_util.h"
 #include "video/video.h"
 
@@ -89,7 +89,7 @@ std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i
 		order->Range = builder.Type->RepairRange;
 	} else {
 		// If building inside, but be next to stop
-		if (building.BoolFlag[SHOREBUILDING_INDEX].value && builder.Type->UnitType == UnitTypeType::Land) {
+		if (building.BoolFlag[SHOREBUILDING_INDEX].value && builder.Type->get_domain() == unit_domain::land) {
 			// Peon won't dive :-)
 			order->Range = 1;
 		}
@@ -242,7 +242,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE: {
 			//Wyrmgus start
-			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {

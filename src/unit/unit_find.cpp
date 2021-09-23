@@ -43,10 +43,10 @@
 #include "script.h"
 #include "spell/spell.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/point_util.h"
@@ -862,38 +862,26 @@ void FindPlayerUnitsByType(const CPlayer &player, const wyrmgus::unit_type &type
 **  Unit on map tile.
 **
 **  @param index flat index position on map, tile-based.
-**  @param type  UnitTypeType, (unsigned)-1 for any type.
+**  @param type  unit_domain, (unsigned)-1 for any type.
 **
 **  @return      Returns first found unit on tile.
 */
-//Wyrmgus start
-//static CUnit *UnitOnMapTile(const unsigned int index, const UnitTypeType type)
-static CUnit *UnitOnMapTile(const unsigned int index, const UnitTypeType type, const int z)
-//Wyrmgus end
+static CUnit *UnitOnMapTile(const unsigned int index, const unit_domain domain, const int z)
 {
-	//Wyrmgus start
-//	return CMap::get()->Field(index)->UnitCache.find(CUnitTypeFinder(type));
-	return CMap::get()->Field(index, z)->UnitCache.find(CUnitTypeFinder(type));
-	//Wyrmgus end
+	return CMap::get()->Field(index, z)->UnitCache.find(CUnitTypeFinder(domain));
 }
 
 /**
 **  Unit on map tile.
 **
 **  @param pos   position on map, tile-based.
-**  @param type  UnitTypeType, (unsigned)-1 for any type.
+**  @param type  unit_domain, (unsigned)-1 for any type.
 **
 **  @return      Returns first found unit on tile.
 */
-//Wyrmgus start
-//CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type)
-CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type, int z)
-//Wyrmgus end
+CUnit *UnitOnMapTile(const Vec2i &pos, const unit_domain domain, const int z)
 {
-	//Wyrmgus start
-//	return UnitOnMapTile(CMap::get()->get_pos_index(pos), type);
-	return UnitOnMapTile(CMap::get()->get_pos_index(pos, z), type, z);
-	//Wyrmgus end
+	return UnitOnMapTile(CMap::get()->get_pos_index(pos, z), domain, z);
 }
 
 /**
@@ -1075,7 +1063,7 @@ private:
 			return INT_MAX;
 		}
 
-		if (dtype.UnitType == UnitTypeType::Fly && dest->IsAgressive() == false) {
+		if (dtype.get_domain() == unit_domain::air && dest->IsAgressive() == false) {
 			return INT_MAX / 2;
 		}
 

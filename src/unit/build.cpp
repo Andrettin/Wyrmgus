@@ -430,7 +430,8 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const wyrmgus::unit_typ
 				continue;
 			}
 			//Wyrmgus end
-			if (found.Type->UnitType == (*it2)->Type->UnitType) {
+
+			if (found.Type->get_domain() == (*it2)->Type->get_domain()) {
 				return false;
 			}
 		}

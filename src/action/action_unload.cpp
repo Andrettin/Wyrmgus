@@ -48,8 +48,8 @@
 #include "script.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "util/assert_util.h"
 #include "util/point_util.h"
 #include "video/video.h"
@@ -313,7 +313,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, const landmass *landmass)
 	
 	//Wyrmgus start
 	//if this is a naval transporter and the unit has a disembarkment bonus, apply it
-	if (transporter.Type->UnitType == UnitTypeType::Naval && unit.Variable[DISEMBARKMENTBONUS_INDEX].Value > 0 && unit.Variable[INSPIRE_INDEX].Value < 1000) {
+	if (transporter.Type->get_domain() == unit_domain::water && unit.Variable[DISEMBARKMENTBONUS_INDEX].Value > 0 && unit.Variable[INSPIRE_INDEX].Value < 1000) {
 		unit.Variable[INSPIRE_INDEX].Enable = 1;
 		unit.Variable[INSPIRE_INDEX].Value = 1000;
 		unit.Variable[INSPIRE_INDEX].Max = 1000;

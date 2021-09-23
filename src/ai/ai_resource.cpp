@@ -1404,19 +1404,19 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, const wyrmgus::resource *resou
 		const wyrmgus::unit_type *type = UnitTypes[i];
 
 		if (type && type->GivesResource == resource) {
-			switch (type->UnitType) {
-				case UnitTypeType::Land:
+			switch (Type->get_domain()) {
+				case unit_domain::land:
 					exploremask |= tile_flag::land_unit;
 					break;
-				case UnitTypeType::Fly:
+				case unit_domain::air:
 					exploremask |= tile_flag::air_unit;
 					break;
 				//Wyrmgus start
-				case UnitTypeType::FlyLow:
+				case unit_domain::air_low:
 					exploremask |= tile_flag::land_unit;
 					break;
 				//Wyrmgus end
-				case UnitTypeType::Naval:
+				case unit_domain::water:
 					exploremask |= tile_flag::sea_unit;
 					break;
 				default:

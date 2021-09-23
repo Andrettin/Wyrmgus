@@ -52,10 +52,10 @@
 #include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "util/point_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
@@ -824,23 +824,23 @@ void AiForce::Reset(const bool types)
 	//Wyrmgus end
 }
 
-wyrmgus::ai_force_type AiForce::get_force_type() const
+ai_force_type AiForce::get_force_type() const
 {
 	if (this->get_units().empty()) {
-		return wyrmgus::ai_force_type::land;
+		return ai_force_type::land;
 	}
 	
-	wyrmgus::ai_force_type force_type = wyrmgus::ai_force_type::space;
-	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+	ai_force_type force_type = ai_force_type::space;
+	for (const std::shared_ptr<unit_ref> &unit_ref : this->get_units()) {
 		CUnit *unit = unit_ref->get();
-		if (unit->Type->UnitType == UnitTypeType::Naval && unit->CanAttack() && !unit->Type->CanTransport()) { //one naval unit that can attack makes this a naval force
+		if (unit->Type->get_domain() == unit_domain::water && unit->CanAttack() && !unit->Type->CanTransport()) { //one naval unit that can attack makes this a naval force
 			return wyrmgus::ai_force_type::naval;
 		}
 		
-		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::Space) { //all units must be of UnitTypeType::Fly for it to be considered an air force
-			force_type = wyrmgus::ai_force_type::land;
-		} else if (unit->Type->UnitType != UnitTypeType::Space) {
-			force_type = wyrmgus::ai_force_type::air;
+		if (unit->Type->get_domain() != unit_domain::air && unit->Type->get_domain() != unit_domain::space) { //all units must be of unit_domain::air for it to be considered an air force
+			force_type = ai_force_type::land;
+		} else if (unit->Type->get_domain() != unit_domain::space) {
+			force_type = ai_force_type::air;
 		}
 	}
 	
@@ -994,7 +994,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		bool needs_transport = false;
 		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
 			CUnit *unit = unit_ref->get();
-			if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && CMap::get()->get_tile_landmass(unit->tilePos, unit->MapLayer->ID) != CMap::get()->get_tile_landmass(goalPos, z)) {
+			if (unit->Type->get_domain() != unit_domain::air && unit->Type->get_domain() != unit_domain::air_low && unit->Type->get_domain() != unit_domain::space && CMap::get()->get_tile_landmass(unit->tilePos, unit->MapLayer->ID) != CMap::get()->get_tile_landmass(goalPos, z)) {
 				needs_transport = true;
 				break;
 			}
@@ -1656,7 +1656,7 @@ void AiForce::Update()
 	bool needs_transport = false;
 	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
 		CUnit *unit = unit_ref->get();
-		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && unit->Type->UnitType != UnitTypeType::Naval && CMap::get()->get_tile_landmass(unit->tilePos, unit->MapLayer->ID) != CMap::get()->get_tile_landmass(this->GoalPos, this->GoalMapLayer)) {
+		if (unit->Type->get_domain() != unit_domain::air && unit->Type->get_domain() != unit_domain::air_low && unit->Type->get_domain() != unit_domain::space && unit->Type->get_domain() != unit_domain::water && CMap::get()->get_tile_landmass(unit->tilePos, unit->MapLayer->ID) != CMap::get()->get_tile_landmass(this->GoalPos, this->GoalMapLayer)) {
 			needs_transport = true;
 			break;
 		}

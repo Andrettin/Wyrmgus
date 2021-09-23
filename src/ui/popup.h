@@ -27,7 +27,6 @@
 #pragma once
 
 #include "color.h"
-#include "unit/unit_type_type.h"
 #include "vec2i.h"
 
 class CPopup;
@@ -42,6 +41,7 @@ namespace wyrmgus {
 	class unit_class;
 	class upgrade_class;
 	enum class item_class;
+	enum class unit_domain;
 }
 
 constexpr int MARGIN_X = 4;
@@ -66,7 +66,7 @@ public:
 	//Wyrmgus end
 	ButtonCmd ButtonAction;	/// action type of button
 	//Wyrmgus start
-	::UnitTypeType UnitTypeType = UnitTypeType::None;	/// unit type type (i.e. land, fly, etc.) of the button's unit type
+	wyrmgus::unit_domain unit_domain; //unit domain (i.e. land, air, etc.) of the button's unit type
 	const wyrmgus::unit_class *unit_class = nullptr; /// unit type class of the button's unit type
 	wyrmgus::item_class item_class;				/// item class of the button's item
 	int CanStore = -1;			/// whether the button's unit type can store a particular resource

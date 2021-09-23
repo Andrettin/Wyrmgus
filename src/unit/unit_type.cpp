@@ -62,7 +62,7 @@
 #include "ui/button_level.h"
 #include "ui/ui.h"
 #include "unit/unit_class.h"
-#include "unit/unit_type_type.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
@@ -513,25 +513,25 @@ bool unit_type::compare_unit_encyclopedia_entries(const unit_type *lhs, const un
 		return lhs->BoolFlag[FAUNA_INDEX].value;
 	}
 
-	if (lhs->UnitType != rhs->UnitType) {
-		if (lhs->UnitType == UnitTypeType::Land || rhs->UnitType == UnitTypeType::Land) {
-			return lhs->UnitType == UnitTypeType::Land;
+	if (lhs->get_domain() != rhs->get_domain()) {
+		if (lhs->get_domain() == unit_domain::land || rhs->get_domain() == unit_domain::land) {
+			return lhs->get_domain() == unit_domain::land;
 		}
 
-		if (lhs->UnitType == UnitTypeType::Naval || rhs->UnitType == UnitTypeType::Naval) {
-			return lhs->UnitType == UnitTypeType::Naval;
+		if (lhs->get_domain() == unit_domain::water || rhs->get_domain() == unit_domain::water) {
+			return lhs->get_domain() == unit_domain::water;
 		}
 
-		if (lhs->UnitType == UnitTypeType::FlyLow || rhs->UnitType == UnitTypeType::FlyLow) {
-			return lhs->UnitType == UnitTypeType::FlyLow;
+		if (lhs->get_domain() == unit_domain::air_low || rhs->get_domain() == unit_domain::air_low) {
+			return lhs->get_domain() == unit_domain::air_low;
 		}
 
-		if (lhs->UnitType == UnitTypeType::Fly || rhs->UnitType == UnitTypeType::Fly) {
-			return lhs->UnitType == UnitTypeType::Fly;
+		if (lhs->get_domain() == unit_domain::air || rhs->get_domain() == unit_domain::air) {
+			return lhs->get_domain() == unit_domain::air;
 		}
 
-		if (lhs->UnitType == UnitTypeType::Space || rhs->UnitType == UnitTypeType::Space) {
-			return lhs->UnitType == UnitTypeType::Space;
+		if (lhs->get_domain() == unit_domain::space || rhs->get_domain() == unit_domain::space) {
+			return lhs->get_domain() == unit_domain::space;
 		}
 	}
 
@@ -634,14 +634,11 @@ bool unit_type::compare_encyclopedia_entries(const unit_type *lhs, const unit_ty
 }
 
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
-	//Wyrmgus start
 	item_class(item_class::none),
-//	StartingResources(0),
-	//Wyrmgus end
-	UnitType(UnitTypeType::Land),
+	domain(unit_domain::land),
 	FieldFlags(tile_flag::none),
 	MovementMask(tile_flag::none),
-	Flip(1), LandUnit(0), AirUnit(0), SeaUnit(0),
+	Flip(1),
 	ExplodeWhenKilled(0),
 	CanAttack(0),
 	Neutral(0)
@@ -691,25 +688,6 @@ void unit_type::process_sml_property(const sml_property &property)
 		this->button_key = value;
 	} else if (key == "button_hint") {
 		this->ButtonHint = value;
-	} else if (key == "type") {
-		if (value == "land") {
-			this->UnitType = UnitTypeType::Land;
-			this->LandUnit = true;
-		} else if (value == "fly") {
-			this->UnitType = UnitTypeType::Fly;
-			this->AirUnit = true;
-		} else if (value == "fly_low") {
-			this->UnitType = UnitTypeType::FlyLow;
-			this->AirUnit = true;
-		} else if (value == "naval") {
-			this->UnitType = UnitTypeType::Naval;
-			this->SeaUnit = true;
-		} else if (value == "space") {
-			this->UnitType = UnitTypeType::Space;
-			this->AirUnit = true;
-		} else {
-			throw std::runtime_error("Invalid unit type type: \"" + value + "\"");
-		}
 	} else if (key == "max_attack_range") {
 		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = std::stoi(value);
 		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = std::stoi(value);
@@ -1045,25 +1023,8 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->box_size.setHeight(std::stoi(value));
 		} else if (key == "draw_level") {
 			this->draw_level = std::stoi(value);
-		} else if (key == "type") {
-			if (value == "land") {
-				this->UnitType = UnitTypeType::Land;
-				this->LandUnit = true;
-			} else if (value == "fly") {
-				this->UnitType = UnitTypeType::Fly;
-				this->AirUnit = true;
-			} else if (value == "fly_low") {
-				this->UnitType = UnitTypeType::FlyLow;
-				this->AirUnit = true;
-			} else if (value == "naval") {
-				this->UnitType = UnitTypeType::Naval;
-				this->SeaUnit = true;
-			} else if (value == "space") {
-				this->UnitType = UnitTypeType::Space;
-				this->AirUnit = true;
-			} else {
-				fprintf(stderr, "Invalid unit type type: \"%s\".\n", value.c_str());
-			}
+		} else if (key == "domain") {
+			this->domain = string_to_unit_domain(value);
 		} else if (key == "priority") {
 			this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
 			this->DefaultStat.Variables[PRIORITY_INDEX].Max  = std::stoi(value);
@@ -1483,7 +1444,7 @@ void unit_type::initialize()
 		CclCommand(button_definition);
 	}
 
-	if (this->CanMove() && ((!this->BoolFlag[COWARD_INDEX].value && this->CanAttack) || this->UnitType == UnitTypeType::Fly || this->UnitType == UnitTypeType::Space)) {
+	if (this->CanMove() && ((!this->BoolFlag[COWARD_INDEX].value && this->CanAttack) || this->get_domain() == unit_domain::air || this->get_domain() == unit_domain::space)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
 		button_definition += "\tAction = \"patrol\",\n";
@@ -1620,6 +1581,28 @@ void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)
 	}
 }
 
+bool unit_type::is_land_unit() const
+{
+	return this->get_domain() == unit_domain::land;
+}
+
+bool unit_type::is_water_unit() const
+{
+	return this->get_domain() == unit_domain::water;
+}
+
+bool unit_type::is_air_unit() const
+{
+	switch (this->get_domain()) {
+		case unit_domain::air:
+		case unit_domain::air_low:
+		case unit_domain::space:
+			return true;
+		default:
+			return false;
+	}
+}
+
 const civilization *unit_type::get_faction_civilization(const wyrmgus::faction *faction) const
 {
 	//get the civilization the unit type would have for a given faction
@@ -1753,7 +1736,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->BoxOffsetX = parent_type->BoxOffsetX;
 	this->BoxOffsetY = parent_type->BoxOffsetY;
 	this->construction = parent_type->construction;
-	this->UnitType = parent_type->UnitType;
+	this->domain = parent_type->domain;
 	this->Missile.Name = parent_type->Missile.Name;
 	this->Missile.Missile = nullptr;
 	this->FireMissile.Name = parent_type->FireMissile.Name;
@@ -1777,9 +1760,6 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->MouseAction = parent_type->MouseAction;
 	this->CanAttack = parent_type->CanAttack;
 	this->CanTarget = parent_type->CanTarget;
-	this->LandUnit = parent_type->LandUnit;
-	this->SeaUnit = parent_type->SeaUnit;
-	this->AirUnit = parent_type->AirUnit;
 	this->BoardSize = parent_type->BoardSize;
 	this->ButtonLevelForTransporter = parent_type->ButtonLevelForTransporter;
 	this->ButtonPos = parent_type->ButtonPos;
@@ -1872,9 +1852,9 @@ void unit_type::UpdateDefaultBoolFlags()
 {
 	// BoolFlag
 	this->BoolFlag[FLIP_INDEX].value = this->Flip;
-	this->BoolFlag[LANDUNIT_INDEX].value = this->LandUnit;
-	this->BoolFlag[AIRUNIT_INDEX].value = this->AirUnit;
-	this->BoolFlag[SEAUNIT_INDEX].value = this->SeaUnit;
+	this->BoolFlag[LANDUNIT_INDEX].value = this->is_land_unit();
+	this->BoolFlag[SEAUNIT_INDEX].value = this->is_water_unit();
+	this->BoolFlag[AIRUNIT_INDEX].value = this->is_air_unit();
 	this->BoolFlag[EXPLODEWHENKILLED_INDEX].value = this->ExplodeWhenKilled;
 	this->BoolFlag[CANATTACK_INDEX].value = this->CanAttack;
 }
@@ -1905,8 +1885,8 @@ void unit_type::calculate_movement_mask()
 		return;
 	}
 
-	switch (this->UnitType) {
-		case UnitTypeType::Land:                              // on land
+	switch (this->get_domain()) {
+		case unit_domain::land:
 			this->MovementMask =
 				tile_flag::building | // already occuppied
 				tile_flag::coast_allowed |
@@ -1920,14 +1900,14 @@ void unit_type::calculate_movement_mask()
 				this->MovementMask |= tile_flag::land_unit | tile_flag::sea_unit;
 			}
 			break;
-		case UnitTypeType::Fly:                               // in air
+		case unit_domain::air:
 			this->MovementMask = tile_flag::air_impassable | tile_flag::space_cliff | tile_flag::space | tile_flag::air_building;
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
 				this->MovementMask |= tile_flag::air_unit; // already occuppied
 			}
 			break;
-		case UnitTypeType::FlyLow:                               // in low air
+		case unit_domain::air_low: //in low air
 			this->MovementMask =
 				tile_flag::building |
 				tile_flag::impassable |
@@ -1939,7 +1919,7 @@ void unit_type::calculate_movement_mask()
 				this->MovementMask |= tile_flag::land_unit | tile_flag::sea_unit;
 			}
 			break;
-		case UnitTypeType::Naval: // on water
+		case unit_domain::water:
 			this->MovementMask =
 				tile_flag::building | // already occuppied
 				tile_flag::bridge |
@@ -1956,7 +1936,7 @@ void unit_type::calculate_movement_mask()
 				this->MovementMask |= tile_flag::land_unit | tile_flag::sea_unit;
 			}
 			break;
-		case UnitTypeType::Space:
+		case unit_domain::space:
 			this->MovementMask = tile_flag::air_impassable | tile_flag::air_building;
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
@@ -2000,7 +1980,7 @@ void unit_type::calculate_movement_mask()
 		//
 		if (this->MapDefaultStat.Variables[HP_INDEX].Max) {
 			this->FieldFlags = tile_flag::building;
-			if (this->UnitType == UnitTypeType::Fly || this->UnitType == UnitTypeType::Space) {
+			if (this->get_domain() == unit_domain::air || this->get_domain() == unit_domain::space) {
 				this->FieldFlags |= tile_flag::air_building;
 			}
 		} else {
@@ -2027,22 +2007,22 @@ void unit_type::calculate_movement_mask()
 			tile_flag::bridge;
 		this->FieldFlags = tile_flag::bridge;
 	} else if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
-		switch (this->UnitType) {
-			case UnitTypeType::Land: // on land
+		switch (this->get_domain()) {
+			case unit_domain::land: // on land
 				this->FieldFlags = tile_flag::land_unit;
 
 				if (this->BoolFlag[GRAVEL_INDEX].value) {
 					this->FieldFlags |= tile_flag::gravel;
 				}
 				break;
-			case UnitTypeType::Fly: // in air
-			case UnitTypeType::Space:
+			case unit_domain::air:
+			case unit_domain::space:
 				this->FieldFlags = tile_flag::air_unit;
 				break;
-			case UnitTypeType::FlyLow: // in low air
+			case unit_domain::air_low: //in low air
 				this->FieldFlags = tile_flag::land_unit;
 				break;
-			case UnitTypeType::Naval: // on water
+			case unit_domain::water:
 				this->FieldFlags = tile_flag::sea_unit;
 				break;
 			default:

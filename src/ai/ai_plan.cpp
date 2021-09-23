@@ -41,10 +41,10 @@
 #include "pathfinder.h"
 #include "player/player.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 
 class _EnemyOnMapTile
 {
@@ -66,7 +66,7 @@ public:
 			|| unit->CurrentAction() == UnitAction::Die) {
 			return;
 		}
-		if (unit->Type->UnitType == UnitTypeType::Fly && unit->IsAgressive() == false) {
+		if (unit->Type->get_domain() == unit_domain::air && unit->IsAgressive() == false) {
 			return;
 		}
 		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.get_tile_width()
@@ -202,7 +202,7 @@ int AiFindWall(AiForce *force)
 	CUnit *unit = *force->get_units()[0];
 	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : force->get_units()) {
 		CUnit *ai_unit = unit_ref->get();
-		if (ai_unit->Type->UnitType == UnitTypeType::Land) {
+		if (ai_unit->Type->get_domain() == unit_domain::land) {
 			unit = ai_unit;
 			if (ai_unit->GetMissile().Missile->get_range() == 1) {
 				break;
@@ -378,7 +378,7 @@ int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
 **
 **  @todo         Perfect planning.
 **                Only works for water transporter!
-**  @todo transporter are more selective now (flag with UnitTypeType::Land).
+**  @todo transporter are more selective now (flag with unit_domain::land).
 **         We must manage it.
 */
 int AiForce::PlanAttack()
@@ -418,7 +418,7 @@ int AiForce::PlanAttack()
 
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
-	const auto land_unit_it = std::find_if(this->get_units().begin(), this->get_units().end(), CUnitTypeFinder(UnitTypeType::Land));
+	const auto land_unit_it = std::find_if(this->get_units().begin(), this->get_units().end(), CUnitTypeFinder(unit_domain::land));
 	if (land_unit_it == this->get_units().end()) {
 		DebugPrint("%d: No land unit in force\n" _C_ player.get_index());
 		return 0;
@@ -529,19 +529,19 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 		//Wyrmgus end
 		const wyrmgus::unit_type &type = *unit.Type;
 
-		if (type.UnitType != UnitTypeType::Fly) {
+		if (type.UnitType != unit_domain::air) {
 			if (flyeronly) {
 				continue;
 			}
 			//Wyrmgus start
-//			if ((request.Mask & tile_flag::land_unit) && type.UnitType != UnitTypeType::Land) {
-			if ((request.Mask & tile_flag::land_unit) && type.UnitType != UnitTypeType::Land && type.UnitType != UnitTypeType::FlyLow) {
+//			if ((request.Mask & tile_flag::land_unit) && type.UnitType != unit_domain::land) {
+			if ((request.Mask & tile_flag::land_unit) && type.UnitType != unit_domain::land && type.UnitType != unit_domain::air_low) {
 			//Wyrmgus end
 				continue;
 			}
 			//Wyrmgus start
-//			if ((request.Mask & tile_flag::sea_unit) && type.UnitType != UnitTypeType::Naval) {
-			if ((request.Mask & tile_flag::sea_unit) && type.UnitType != UnitTypeType::Naval && type.UnitType != UnitTypeType::FlyLow) {
+//			if ((request.Mask & tile_flag::sea_unit) && type.UnitType != unit_domain::water) {
+			if ((request.Mask & tile_flag::sea_unit) && type.UnitType != unit_domain::water && type.UnitType != unit_domain::air_low) {
 			//Wyrmgus end
 				continue;
 			}
@@ -551,7 +551,7 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 
 		const int sqDistance = SquareDistance(unit.tilePos, *pos);
 		if (bestSquareDistance == -1 || sqDistance <= bestSquareDistance
-			|| (bestunit->Type->UnitType != UnitTypeType::Fly && type.UnitType == UnitTypeType::Fly)) {
+			|| (bestunit->Type->get_domain() != unit_domain::air && type.UnitType == unit_domain::air)) {
 			bestSquareDistance = sqDistance;
 			bestunit = &unit;
 		}
@@ -562,12 +562,12 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 //Wyrmgus end
 
 //Wyrmgus start
-static CUnit *GetBestScout(const UnitTypeType unit_type)
+static CUnit *GetBestScout(const unit_domain domain)
 {
 	CUnit *bestunit = nullptr;
 
-	bool space_only = (unit_type == UnitTypeType::Space);
-	bool flier_only = (unit_type == UnitTypeType::Fly) || space_only;
+	bool space_only = (domain == unit_domain::space);
+	bool flier_only = (domain == unit_domain::air) || space_only;
 	
 	int best_score = 0;
 	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
@@ -601,7 +601,7 @@ static CUnit *GetBestScout(const UnitTypeType unit_type)
 			continue;
 		}
 
-		if (type.UnitType != UnitTypeType::Space) {
+		if (type.get_domain() != unit_domain::space) {
 			if (space_only) {
 				continue;
 			}
@@ -609,14 +609,14 @@ static CUnit *GetBestScout(const UnitTypeType unit_type)
 			space_only = true;
 		}
 
-		if (type.UnitType != UnitTypeType::Fly && type.UnitType != UnitTypeType::Space) {
+		if (type.get_domain() != unit_domain::air && type.get_domain() != unit_domain::space) {
 			if (flier_only) {
 				continue;
 			}
-			if (unit_type == UnitTypeType::Land && type.UnitType != UnitTypeType::Land && type.UnitType != UnitTypeType::FlyLow) {
+			if (domain == unit_domain::land && type.get_domain() != unit_domain::land && type.get_domain() != unit_domain::air_low) {
 				continue;
 			}
-			if (unit_type == UnitTypeType::Naval && type.UnitType != UnitTypeType::Naval && type.UnitType != UnitTypeType::FlyLow) {
+			if (domain == unit_domain::water && type.get_domain() != unit_domain::water && type.get_domain() != unit_domain::air_low) {
 				continue;
 			}
 		} else {
@@ -633,7 +633,7 @@ static CUnit *GetBestScout(const UnitTypeType unit_type)
 		if (
 			bestunit == nullptr
 			|| score > best_score
-			|| (bestunit->Type->UnitType != UnitTypeType::Fly && type.UnitType == UnitTypeType::Fly)
+			|| (bestunit->Type->get_domain() != unit_domain::air && type.get_domain() == unit_domain::air)
 		) {
 			best_score = score;
 			bestunit = &unit;
@@ -685,30 +685,30 @@ void AiSendExplorers()
 			fprintf(stderr, "AI Player #%d's scout %d is null.\n", AiPlayer->Player->get_index(), (int) i);
 			return;
 		}
-		if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Space) {
+		if (AiPlayer->Scouts[i]->Type->get_domain() == unit_domain::space) {
 			land_scout = true;
 			naval_scout = true;
 			air_scout = true;
 			space_scout = true;
 			break;
-		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Fly) {
+		} else if (AiPlayer->Scouts[i]->Type->get_domain() == unit_domain::air) {
 			land_scout = true;
 			naval_scout = true;
 			air_scout = true;
 			break;
-		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::FlyLow) {
+		} else if (AiPlayer->Scouts[i]->Type->get_domain() == unit_domain::air_low) {
 			land_scout = true;
 			naval_scout = true;
-		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Land) {
+		} else if (AiPlayer->Scouts[i]->Type->get_domain() == unit_domain::land) {
 			land_scout = true;
-		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeType::Naval) {
+		} else if (AiPlayer->Scouts[i]->Type->get_domain() == unit_domain::water) {
 			naval_scout = true;
 		}
 	}
 		
 	//if no scouts are already present for a particular type, then choose a suitable unit to scout
 	if (!space_scout) { 
-		CUnit *bestunit = GetBestScout(UnitTypeType::Space);
+		CUnit *bestunit = GetBestScout(unit_domain::space);
 		if (bestunit != nullptr) {
 			AiPlayer->Scouts.push_back(bestunit);
 			CommandStopUnit(*bestunit);
@@ -718,7 +718,7 @@ void AiSendExplorers()
 		}
 	}
 	if (!air_scout) { 
-		CUnit *bestunit = GetBestScout(UnitTypeType::Fly);
+		CUnit *bestunit = GetBestScout(unit_domain::air);
 		if (bestunit != nullptr) {
 			AiPlayer->Scouts.push_back(bestunit);
 			CommandStopUnit(*bestunit);
@@ -727,17 +727,17 @@ void AiSendExplorers()
 		}
 	}
 	if (!land_scout) { 
-		CUnit *bestunit = GetBestScout(UnitTypeType::Land);
+		CUnit *bestunit = GetBestScout(unit_domain::land);
 		if (bestunit != nullptr) {
 			AiPlayer->Scouts.push_back(bestunit);
 			CommandStopUnit(*bestunit);
-			if (bestunit->Type->UnitType == UnitTypeType::FlyLow) {
+			if (bestunit->Type->get_domain() == unit_domain::air_low) {
 				naval_scout = true;
 			}
 		}
 	}
 	if (!naval_scout) { 
-		CUnit *bestunit = GetBestScout(UnitTypeType::Naval);
+		CUnit *bestunit = GetBestScout(unit_domain::water);
 		if (bestunit != nullptr) {
 			AiPlayer->Scouts.push_back(bestunit);
 			CommandStopUnit(*bestunit);
@@ -781,7 +781,7 @@ void AiCheckTransporters()
 		if (!unit.Type->CanTransport()) {
 			continue;
 		}
-		if (unit.Type->UnitType != UnitTypeType::Naval && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow && unit.Type->UnitType != UnitTypeType::Space) {
+		if (unit.Type->get_domain() != unit_domain::water && unit.Type->get_domain() != unit_domain::air && unit.Type->get_domain() != unit_domain::air_low && unit.Type->get_domain() != unit_domain::space) {
 			continue;
 		}
 		if (unit.CanMove() == false) {
@@ -823,7 +823,7 @@ int AiGetRequestedTransportCapacity(const landmass *water_landmass)
 	
 	for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
 		const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
-		if (queue.landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeType::Naval || queue.Type->UnitType == UnitTypeType::Fly || queue.Type->UnitType == UnitTypeType::FlyLow || queue.Type->UnitType == UnitTypeType::Space)) {
+		if (queue.landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->get_domain() == unit_domain::water || queue.Type->get_domain() == unit_domain::air || queue.Type->get_domain() == unit_domain::air_low || queue.Type->get_domain() == unit_domain::space)) {
 			transport_capacity += queue.Want * queue.Type->MaxOnBoard;
 		}
 	}

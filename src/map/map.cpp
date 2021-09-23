@@ -74,11 +74,11 @@
 //Wyrmgus end
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_manager.h"
-#include "unit/unit_type_type.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
@@ -398,7 +398,7 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 		if (player != nullptr) {
 			Select(random_pos - QPoint(32, 32), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::get_neutral_player())));
 		} else if (unit_type->get_given_resource() == nullptr) {
-			if (unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::Space))) {
+			if (unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->get_domain() == unit_domain::air || unit_type->get_domain() == unit_domain::space))) {
 				Select(random_pos - QPoint(16, 16), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(16, 16), table, z, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
 			} else {
 				Select(random_pos - QPoint(8, 8), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
@@ -2122,7 +2122,7 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 			std::vector<CUnit *> table;
 			Select(pos, pos, table, z);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+				if (table[i] && table[i]->IsAlive() && table[i]->Type->get_domain() == unit_domain::land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
 					if (!CEditor::get()->is_running()) {
 						LetUnitDie(*table[i]);
 					} else {
@@ -3997,7 +3997,7 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 	std::vector<CUnit *> table;
 	Select(pos, pos, table, z);
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+		if (table[i]->Type->get_domain() == unit_domain::land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
 			if (!CEditor::get()->is_running()) {
 				LetUnitDie(*table[i]);			
 			} else {

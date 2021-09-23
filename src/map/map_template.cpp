@@ -69,9 +69,9 @@
 #include "unit/historical_unit_history.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "util/container_util.h"
 #include "util/geoshape_util.h"
 #include "util/image_util.h"
@@ -1294,7 +1294,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			}
 
 			//as a special case for fixed space sites (e.g. stars), don't apply them if they would be applied on a pre-existing subtemplate area, so that e.g. if stars would be applied where the Nidavellir terrain circle is, they don't get applied, instead of being applied on the nearest available space (which would leave Nidavellir encircled with stars)
-			if (base_unit_type != nullptr && base_unit_type->UnitType == UnitTypeType::Space) {
+			if (base_unit_type != nullptr && base_unit_type->get_domain() == unit_domain::space) {
 				const QPoint top_left_pos = site_pos - unit_offset;
 				const QPoint bottom_right_pos = top_left_pos + size::to_point(base_unit_type->get_tile_size()) - QPoint(1, 1);
 				if (CMap::get()->is_rect_in_a_subtemplate_area(QRect(top_left_pos, bottom_right_pos), z)) {
@@ -1652,9 +1652,9 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 	if (population != 0) { //remaining population after subtracting the amount of population specified to belong to particular groups
 		const unit_class *population_class = defines::get()->get_default_population_class();
 		if (base_unit_type != nullptr) {
-			if (base_unit_type->UnitType == UnitTypeType::Naval && player->get_class_unit_type(defines::get()->get_default_water_population_class()) != nullptr) {
+			if (base_unit_type->get_domain() == unit_domain::water && player->get_class_unit_type(defines::get()->get_default_water_population_class()) != nullptr) {
 				population_class = defines::get()->get_default_water_population_class();
-			} else if (base_unit_type->UnitType == UnitTypeType::Space && player->get_class_unit_type(defines::get()->get_default_space_population_class()) != nullptr) {
+			} else if (base_unit_type->get_domain() == unit_domain::space && player->get_class_unit_type(defines::get()->get_default_space_population_class()) != nullptr) {
 				population_class = defines::get()->get_default_space_population_class();
 			}
 		}
@@ -2818,7 +2818,7 @@ QPoint map_template::generate_site_orbit_position(const site *site, const int z,
 				continue;
 			}
 
-			if (unit_type->UnitType == UnitTypeType::Space) {
+			if (unit_type->get_domain() == unit_domain::space) {
 				//ensure that the generated unit will not be created on space transition
 				bool on_space_border = false;
 				for (int x = top_left_pos.x() - 1; x < top_left_pos.x() + unit_type->get_tile_width() + 1; ++x) {

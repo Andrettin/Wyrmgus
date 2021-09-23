@@ -639,7 +639,7 @@ static void EditorUndoAction()
 
 	switch (action.Type) {
 		case EditorActionTypePlaceUnit: {
-			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType, UI.CurrentMapLayer->ID);
+			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->get_domain(), UI.CurrentMapLayer->ID);
 
 			EditorActionRemoveUnit(*unit);
 			break;
@@ -666,7 +666,7 @@ static void EditorRedoAction()
 			break;
 
 		case EditorActionTypeRemoveUnit: {
-			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType, UI.CurrentMapLayer->ID);
+			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->get_domain(), UI.CurrentMapLayer->ID);
 
 			EditorActionRemoveUnit(*unit);
 			break;

@@ -50,9 +50,9 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
 #include "video/video.h"
 
@@ -240,7 +240,7 @@ void COrder_Use::Execute(CUnit &unit)
 					if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) { //if unit is still damaged, see if there are further healing items for it to use
 						unit.auto_use_item();
 					}
-				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow && unit.Type->UnitType != UnitTypeType::Space) {
+				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->get_domain() != unit_domain::air && unit.Type->get_domain() != unit_domain::air_low && unit.Type->get_domain() != unit_domain::space) {
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
 					}
@@ -256,7 +256,7 @@ void COrder_Use::Execute(CUnit &unit)
 						//if unit still isn't at full mana, see if there are further consumable items for it to use
 						unit.auto_use_item();
 					}
-				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow && unit.Type->UnitType != UnitTypeType::Space) {
+				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->get_domain() != unit_domain::air && unit.Type->get_domain() != unit_domain::air_low && unit.Type->get_domain() != unit_domain::space) {
 					unit.Variable[SLOW_INDEX].Value = 1000;
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s has been slowed"), unit.GetMessageName().c_str());
@@ -295,7 +295,7 @@ void COrder_Use::Execute(CUnit &unit)
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -358,7 +358,7 @@ void COrder_Use::Execute(CUnit &unit)
 				if (dest.NewOrder == nullptr
 					|| (dest.NewOrder->Action == UnitAction::Resource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
 					|| (dest.NewOrder->Action == UnitAction::Attack && !unit.CanAttack(true))
-					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeType::Land)) {
+					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->get_domain() != unit_domain::land)) {
 					this->Finished = true;
 					return ;
 				} else {

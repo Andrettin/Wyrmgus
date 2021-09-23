@@ -91,11 +91,11 @@
 #include "ui/button_cmd.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
@@ -3808,7 +3808,7 @@ void CUnit::MoveToXY(const Vec2i &pos, const int z)
 
 	//Wyrmgus start
 	// if there is a trap in the new tile, trigger it
-	if ((this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow && this->Type->UnitType != UnitTypeType::Space) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
+	if ((this->Type->get_domain() != unit_domain::air && this->Type->get_domain() != unit_domain::air_low && this->Type->get_domain() != unit_domain::space) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
 		const CUnitCache &cache = CMap::get()->Field(pos, z)->UnitCache;
 		for (size_t i = 0; i != cache.size(); ++i) {
 			if (!cache[i]) {
@@ -3882,7 +3882,7 @@ void CUnit::Place(const Vec2i &pos, const int z)
 					std::vector<CUnit *> table;
 					Select(building_tile_pos, building_tile_pos, table, this->MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {
-						if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeType::Land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+						if (table[i] && table[i]->IsAlive() && table[i]->Type->get_domain() == unit_domain::land && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
 							if (!CEditor::get()->is_running()) {
 								LetUnitDie(*table[i]);			
 							} else {
@@ -5757,8 +5757,8 @@ int CUnit::GetModifiedVariable(const int index, const VariableAttribute variable
 				break;
 			}
 
-			const UnitTypeType unit_type_type = unit_type->UnitType;
-			if (unit_type_type != UnitTypeType::Fly && unit_type_type != UnitTypeType::FlyLow && unit_type_type != UnitTypeType::Space) {
+			const unit_domain domain = unit_type->get_domain();
+			if (domain != unit_domain::air && domain != unit_domain::air_low && domain != unit_domain::space) {
 				int movement_cost = 0;
 				int tile_speed_bonus = 0;
 
@@ -6231,10 +6231,10 @@ bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
 			return false;
 		}
 		
-		if (this->Type->UnitType != UnitTypeType::Naval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can trade with docks
+		if (this->Type->get_domain() != unit_domain::water && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can trade with docks
 			return false;
 		}
-		if (this->Type->UnitType == UnitTypeType::Naval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->UnitType != UnitTypeType::Naval) { //ships cannot trade with land markets
+		if (this->Type->get_domain() == unit_domain::water && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->get_domain() != unit_domain::water) { //ships cannot trade with land markets
 			return false;
 		}
 	} else {
@@ -6273,10 +6273,10 @@ bool CUnit::can_return_goods_to(const CUnit *dest, const resource *resource) con
 			return false;
 		}
 		
-		if (this->Type->UnitType != UnitTypeType::Naval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can return trade to docks
+		if (this->Type->get_domain() != unit_domain::water && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can return trade to docks
 			return false;
 		}
-		if (this->Type->UnitType == UnitTypeType::Naval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->UnitType != UnitTypeType::Naval) { //ships cannot return trade to land markets
+		if (this->Type->get_domain() == unit_domain::water && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->get_domain() != unit_domain::water) { //ships cannot return trade to land markets
 			return false;
 		}
 	} else {
@@ -7144,7 +7144,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i]->IsAliveOnMap() && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
+			if (table[i]->IsAliveOnMap() && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
 				table[i]->Variable[HP_INDEX].Value = std::min<int>(0, unit.Variable[HP_INDEX].Value);
 				table[i]->Moving = 0;
 				table[i]->TTL = 0;
@@ -8023,21 +8023,21 @@ int CanTarget(const wyrmgus::unit_type &source, const wyrmgus::unit_type &dest)
 			}
 		}
 	}
-	if (dest.UnitType == UnitTypeType::Land) {
+	if (dest.get_domain() == unit_domain::land) {
 		if (dest.BoolFlag[SHOREBUILDING_INDEX].value) {
 			return source.CanTarget & (CanTargetLand | CanTargetSea);
 		}
 		return source.CanTarget & CanTargetLand;
 	}
-	if (dest.UnitType == UnitTypeType::Fly || dest.UnitType == UnitTypeType::Space) {
+	if (dest.get_domain() == unit_domain::air || dest.get_domain() == unit_domain::space) {
 		return source.CanTarget & CanTargetAir;
 	}
 	//Wyrmgus start
-	if (dest.UnitType == UnitTypeType::FlyLow) {
+	if (dest.get_domain() == unit_domain::air_low) {
 		return source.CanTarget & (CanTargetLand | CanTargetAir | CanTargetSea);
 	}
 	//Wyrmgus end
-	if (dest.UnitType == UnitTypeType::Naval) {
+	if (dest.get_domain() == unit_domain::water) {
 		return source.CanTarget & CanTargetSea;
 	}
 	return 0;
@@ -8314,8 +8314,8 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 		return true;
 	}
 	
-	const bool is_flying = this->Type->UnitType == UnitTypeType::Fly || this->Type->UnitType == UnitTypeType::Space;
-	const bool is_goal_flying = goal->Type->UnitType == UnitTypeType::Fly || goal->Type->UnitType == UnitTypeType::Space;
+	const bool is_flying = this->Type->get_domain() == unit_domain::air || this->Type->get_domain() == unit_domain::space;
+	const bool is_goal_flying = goal->Type->get_domain() == unit_domain::air || goal->Type->get_domain() == unit_domain::space;
 	if (
 		goal
 		&& goal->IsAliveOnMap()

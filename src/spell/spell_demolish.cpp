@@ -35,8 +35,8 @@
 #include "map/tile.h"
 #include "script.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
-#include "unit/unit_type_type.h"
 #include "util/util.h"
 
 void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex)
@@ -180,7 +180,7 @@ int Spell_Demolish::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, const V
 		//Wyrmgus end
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
-			if (unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::Space && unit.IsAlive()
+			if (unit.Type->get_domain() != unit_domain::air && unit.Type->get_domain() != unit_domain::space && unit.IsAlive()
 				//Wyrmgus start
 //				&& unit.MapDistanceTo(goalPos) <= this->Range) {
 				// Don't hit flying units!

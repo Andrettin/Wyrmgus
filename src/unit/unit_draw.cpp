@@ -54,9 +54,9 @@
 #include "ui/ui.h"
 #include "unit/construction.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 #include "util/assert_util.h"
 #include "util/size_util.h"
@@ -191,7 +191,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	//Wyrmgus start
 	int box_width = type.get_box_width();
 	int box_height = type.get_box_height();
-	if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land && !unit.Moving) { //if is on a raft, use the raft's box size instead
+	if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land && !unit.Moving) { //if is on a raft, use the raft's box size instead
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {

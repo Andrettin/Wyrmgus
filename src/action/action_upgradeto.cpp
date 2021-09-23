@@ -50,8 +50,8 @@
 #include "translate.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end

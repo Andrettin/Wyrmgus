@@ -102,6 +102,7 @@
 #include "unit/construction.h"
 #include "unit/historical_unit.h"
 #include "unit/unit_class.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_category.h"
 #include "upgrade/upgrade_category_rank.h"
@@ -367,6 +368,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(unique_item::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::unit_class*") {
 			new_property_value = QVariant::fromValue(unit_class::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::unit_domain") {
+			new_property_value = QVariant::fromValue(string_to_unit_domain(property.get_value()));
 		} else if (property_class_name == "wyrmgus::unit_type*") {
 			new_property_value = QVariant::fromValue(unit_type::get(property.get_value()));
 		} else if (property_class_name == "CUpgrade*") {

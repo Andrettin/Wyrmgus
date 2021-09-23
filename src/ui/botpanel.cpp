@@ -78,6 +78,7 @@
 #include "ui/resource_icon.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
+#include "unit/unit_domain.h"
 //Wyrmgus start
 #include "unit/unit_manager.h"
 //Wyrmgus end
@@ -325,8 +326,8 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 
-	if (condition->UnitTypeType != UnitTypeType::None) {
-		if (!type || condition->UnitTypeType != type->UnitType) {
+	if (condition->unit_domain != unit_domain::none) {
+		if (!type || condition->unit_domain != type->get_domain()) {
 			return false;
 		}
 	}
@@ -1815,7 +1816,7 @@ void CButtonPanel::DoClicked_Unload(int button, const Qt::KeyboardModifiers key_
 	//  Unload on coast valid only for sea units
 	//
 	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitAction::Still
-		 && Selected[0]->Type->UnitType == UnitTypeType::Naval && Selected[0]->MapLayer->Field(Selected[0]->tilePos)->CoastOnMap())
+		 && Selected[0]->Type->get_domain() == unit_domain::water && Selected[0]->MapLayer->Field(Selected[0]->tilePos)->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
 		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush, Selected[0]->MapLayer->ID);
 		return ;

@@ -56,10 +56,10 @@
 #include "spell/spell_target_type.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
-#include "unit/unit_type_type.h"
 #include "util/point_util.h"
 #include "util/string_conversion_util.h"
 #include "util/util.h"
@@ -1125,7 +1125,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 	const wyrmgus::missile_type &mtype = *missile.Type;
 	if (missile.get_source_unit() != nullptr) {
 		bool shouldHit = false;
-		if (missile.get_target_unit() && missile.get_source_unit()->Type->UnitType == missile.get_target_unit()->Type->UnitType) {
+		if (missile.get_target_unit() && missile.get_source_unit()->Type->get_domain() == missile.get_target_unit()->Type->get_domain()) {
 			shouldHit = true;
 		}
 		if (mtype.get_range() && mtype.CorrectSphashDamage) {
@@ -1139,8 +1139,8 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 			for (std::vector<CUnit *>::iterator it = blockingUnits.begin();	it != blockingUnits.end(); ++it) {
 				CUnit &unit = **it;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
-				if (!missile.Type->IgnoreWalls && missile.get_source_unit()->Type->UnitType == UnitTypeType::Land) {
-					if (!missile.get_target_unit() || missile.get_target_unit()->Type->UnitType == UnitTypeType::Land) {
+				if (!missile.Type->IgnoreWalls && missile.get_source_unit()->Type->get_domain() == unit_domain::land) {
+					if (!missile.get_target_unit() || missile.get_target_unit()->Type->get_domain() == unit_domain::land) {
 						if (&unit != missile.get_source_unit() && unit.Type->BoolFlag[WALL_INDEX].value
 							&& unit.Player != missile.get_source_unit()->Player && unit.is_allied_with(*missile.get_source_unit()) == false) {
 							if (missile.get_target_unit()) {
@@ -1556,11 +1556,11 @@ void Missile::MissileHit(CUnit *unit)
 						}
 					}
 					if (isPosition || this->get_source_unit()->CurrentAction() == UnitAction::AttackGround) {
-						if (goal.Type->UnitType != this->get_source_unit()->Type->UnitType) {
+						if (goal.Type->get_domain() != this->get_source_unit()->Type->get_domain()) {
 							shouldHit = false;
 						}
 					} else {
-						if (this->get_target_unit() == nullptr || goal.Type->UnitType != this->get_target_unit()->Type->UnitType) {
+						if (this->get_target_unit() == nullptr || goal.Type->get_domain() != this->get_target_unit()->Type->get_domain()) {
 							shouldHit = false;
 						}
 					}

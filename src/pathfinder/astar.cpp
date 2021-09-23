@@ -37,8 +37,8 @@
 #include "settings.h"
 #include "time/time_of_day.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_find.h"
-#include "unit/unit_type_type.h"
 #include "util/assert_util.h"
 #include "util/number_util.h"
 #include "util/util.h"
@@ -438,7 +438,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 #endif
 	int cost = 0;
 	const tile_flag mask = unit.Type->MovementMask;
-	const CUnitTypeFinder unit_finder(unit.Type->UnitType);
+	const CUnitTypeFinder unit_finder(unit.Type->get_domain());
 
 	// verify each tile of the unit.
 	int h = unit.Type->get_tile_height();
@@ -513,11 +513,11 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			}
 			//Wyrmgus end
 			
-			// Add tile movement cost
-			switch (unit.Type->UnitType) {
-				case UnitTypeType::Fly:
-				case UnitTypeType::FlyLow:
-				case UnitTypeType::Space:
+			//add tile movement cost
+			switch (unit.Type->get_domain()) {
+				case unit_domain::air:
+				case unit_domain::air_low:
+				case unit_domain::space:
 					cost += DefaultTileMovementCost;
 					break;
 				default:

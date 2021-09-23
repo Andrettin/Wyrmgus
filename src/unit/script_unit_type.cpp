@@ -68,8 +68,8 @@
 #include "unit/construction.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_manager.h"
-#include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
@@ -1179,26 +1179,9 @@ static int CclDefineUnitType(lua_State *l)
 			type->OnEachSecond = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "OnInit")) {
 			type->OnInit = std::make_unique<LuaCallback>(l, -1);
-		} else if (!strcmp(value, "Type")) {
+		} else if (!strcmp(value, "Domain")) {
 			value = LuaToString(l, -1);
-			if (!strcmp(value, "land")) {
-				type->UnitType = UnitTypeType::Land;
-				type->LandUnit = true;
-			} else if (!strcmp(value, "fly")) {
-				type->UnitType = UnitTypeType::Fly;
-				type->AirUnit = true;
-			} else if (!strcmp(value, "fly-low")) {
-				type->UnitType = UnitTypeType::FlyLow;
-				type->AirUnit = true;
-			} else if (!strcmp(value, "naval")) {
-				type->UnitType = UnitTypeType::Naval;
-				type->SeaUnit = true;
-			} else if (!strcmp(value, "space")) {
-				type->UnitType = UnitTypeType::Space;
-				type->AirUnit = true;
-			} else {
-				LuaError(l, "Unsupported Type: %s" _C_ value);
-			}
+			type->domain = string_to_unit_domain(value);
 		} else if (!strcmp(value, "MissileOffsets")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2167,25 +2150,9 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_pushnumber(l, type->MapDefaultStat.Variables[PRIORITY_INDEX].Value);
 		}
 		return 1;
-	} else if (!strcmp(data, "Type")) {
-		if (type->UnitType == UnitTypeType::Land) {
-			lua_pushstring(l, "land");
-			return 1;
-		} else if (type->UnitType == UnitTypeType::Fly) {
-			lua_pushstring(l, "fly");
-			return 1;
-		//Wyrmgus start
-		} else if (type->UnitType == UnitTypeType::FlyLow) {
-			lua_pushstring(l, "fly-low");
-			return 1;
-		//Wyrmgus end
-		} else if (type->UnitType == UnitTypeType::Naval) {
-			lua_pushstring(l, "naval");
-			return 1;
-		} else if (type->UnitType == UnitTypeType::Space) {
-			lua_pushstring(l, "space");
-			return 1;
-		}
+	} else if (!strcmp(data, "Domain")) {
+		lua_pushstring(l, unit_domain_to_string(type->get_domain()).c_str());
+		return 1;
 	} else if (!strcmp(data, "Corpse")) {
 		if (type->get_corpse_type() != nullptr) {
 			lua_pushstring(l, type->get_corpse_type()->get_identifier().c_str());
@@ -2216,9 +2183,6 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->Mod.string().c_str());
 		return 1;
 	//Wyrmgus end
-	} else if (!strcmp(data, "LandUnit")) {
-		lua_pushboolean(l, type->LandUnit);
-		return 1;
 	} else if (!strcmp(data, "GivesResource")) {
 		if (type->get_given_resource() != nullptr) {
 			lua_pushstring(l, type->get_given_resource()->get_identifier().c_str());
