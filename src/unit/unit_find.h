@@ -285,39 +285,6 @@ template <typename Pred1, typename Pred2>
 OrPredicate<Pred1, Pred2> MakeOrPredicate(Pred1 pred1, Pred2 pred2) { return OrPredicate<Pred1, Pred2>(pred1, pred2); }
 //Wyrmgus end
 
-//unit_find
-class CUnitTypeFinder final
-{
-public:
-	explicit CUnitTypeFinder(const unit_domain domain) : domain(domain)
-	{
-	}
-
-	bool operator()(const CUnit *const unit) const
-	{
-		if (!unit) {
-			fprintf(stderr, "CUnitTypeFinder Error: Unit is null.\n");
-			return false;
-		}
-
-		if (!unit->Type) {
-			fprintf(stderr, "CUnitTypeFinder Error: Unit's type is null.\n");
-			return false;
-		}
-
-		const wyrmgus::unit_type &type = *unit->Type;
-		if (type.BoolFlag[VANISHES_INDEX].value || (this->domain != unit_domain::none && type.get_domain() != this->domain)) {
-			return false;
-		}
-		return true;
-	}
-
-	bool operator()(const std::shared_ptr<unit_ref> &unit_ref);
-
-private:
-	const unit_domain domain;
-};
-
 class UnitFinder final
 {
 public:

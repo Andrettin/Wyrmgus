@@ -1023,6 +1023,7 @@ set(wyrmgus_unit_HDRS
 	src/unit/unit_class.h
 	src/unit/unit_class_container.h
 	src/unit/unit_domain.h
+	src/unit/unit_domain_finder.h
 	src/unit/unit_find.h
 	src/unit/unit_list_model.h
 	src/unit/unit_manager.h

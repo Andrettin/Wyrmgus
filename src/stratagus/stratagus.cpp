@@ -350,6 +350,10 @@ void Exit(int err)
 		return;
 	}
 	
+	QMetaObject::invokeMethod(QApplication::instance(), [err] {
+		QApplication::exit(err);
+	}, Qt::QueuedConnection);
+
 	StopMusic();
 	QuitSound();
 	NetworkQuitGame();
@@ -369,10 +373,6 @@ void Exit(int err)
 	DeInitVideo();
 
 	fprintf(stdout, "%s", _("Thanks for playing " NAME ".\n"));
-
-	QMetaObject::invokeMethod(QApplication::instance(), [err] { 
-		QApplication::exit(err); 
-	}, Qt::QueuedConnection);
 }
 
 #ifdef REDIRECT_OUTPUT

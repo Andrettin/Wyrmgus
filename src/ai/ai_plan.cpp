@@ -42,6 +42,7 @@
 #include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"
+#include "unit/unit_domain_finder.h"
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
@@ -418,7 +419,7 @@ int AiForce::PlanAttack()
 
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
-	const auto land_unit_it = std::find_if(this->get_units().begin(), this->get_units().end(), CUnitTypeFinder(unit_domain::land));
+	const auto land_unit_it = std::find_if(this->get_units().begin(), this->get_units().end(), unit_domain_finder(unit_domain::land));
 	if (land_unit_it == this->get_units().end()) {
 		DebugPrint("%d: No land unit in force\n" _C_ player.get_index());
 		return 0;

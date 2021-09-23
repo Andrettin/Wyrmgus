@@ -112,6 +112,7 @@
 #include "upgrade/upgrade.h"
 #include "util/assert_util.h"
 #include "util/date_util.h"
+#include "util/exception_util.h"
 #include "util/path_util.h"
 #include "util/random.h"
 #include "util/string_conversion_util.h"
@@ -424,7 +425,12 @@ void SaveGameSettings(CFile &file)
 
 void RunMap(const std::string &filepath)
 {
-	game::get()->run_map(path::from_string(filepath));
+	try {
+		game::get()->run_map(path::from_string(filepath));
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		Exit(EXIT_FAILURE);
+	}
 }
 
 void StartMap(const std::filesystem::path &filepath, const bool clean)

@@ -44,6 +44,7 @@
 #include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"
+#include "unit/unit_domain_finder.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
@@ -59,11 +60,6 @@
 bool IsBuiltUnit::operator()(const CUnit *unit) const
 {
 	return unit->CurrentAction() != UnitAction::Built;
-}
-
-bool CUnitTypeFinder::operator()(const std::shared_ptr<wyrmgus::unit_ref> &unit_ref)
-{
-	return (*this)(unit_ref->get());
 }
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
@@ -868,7 +864,7 @@ void FindPlayerUnitsByType(const CPlayer &player, const wyrmgus::unit_type &type
 */
 static CUnit *UnitOnMapTile(const unsigned int index, const unit_domain domain, const int z)
 {
-	return CMap::get()->Field(index, z)->UnitCache.find(CUnitTypeFinder(domain));
+	return CMap::get()->Field(index, z)->UnitCache.find(unit_domain_finder(domain));
 }
 
 /**
