@@ -288,7 +288,11 @@ OrPredicate<Pred1, Pred2> MakeOrPredicate(Pred1 pred1, Pred2 pred2) { return OrP
 class CUnitTypeFinder final
 {
 public:
-	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t)
+	explicit CUnitTypeFinder(const UnitTypeType t) : unit_type_type_set({ t })
+	{
+	}
+
+	explicit CUnitTypeFinder(const std::set<UnitTypeType> &set) : unit_type_type_set(set)
 	{
 	}
 
@@ -305,7 +309,7 @@ public:
 		}
 
 		const wyrmgus::unit_type &type = *unit->Type;
-		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
+		if (type.BoolFlag[VANISHES_INDEX].value || (!unit_type_type_set.empty() && !unit_type_type_set.contains(type.UnitType))) {
 			return false;
 		}
 		return true;
@@ -314,7 +318,7 @@ public:
 	bool operator()(const std::shared_ptr<wyrmgus::unit_ref> &unit_ref);
 
 private:
-	const UnitTypeType unitTypeType;
+	const std::set<UnitTypeType> unit_type_type_set;
 };
 
 class UnitFinder final
@@ -505,10 +509,7 @@ extern void FindUnitsByType(const wyrmgus::unit_type &type, std::vector<CUnit *>
 extern void FindPlayerUnitsByType(const CPlayer &player, const wyrmgus::unit_type &type, std::vector<CUnit *> &units, bool ai_active_only = false);
 
 /// Return any unit on that map tile
-//Wyrmgus start
-//extern CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type);// = -1);
-extern CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type, int z);// = -1);
-//Wyrmgus end
+extern CUnit *UnitOnMapTile(const Vec2i &pos, const std::set<UnitTypeType> &type_set, int z);// = -1);
 /// Return possible attack target on that map area
 extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos2, int z);
 
