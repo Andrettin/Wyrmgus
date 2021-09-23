@@ -38,7 +38,7 @@
 #include "time/time_of_day.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"
-#include "unit/unit_domain_finder.h"
+#include "unit/unit_domain_blocker_finder.h"
 #include "unit/unit_find.h"
 #include "util/assert_util.h"
 #include "util/number_util.h"
@@ -439,7 +439,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 #endif
 	int cost = 0;
 	const tile_flag mask = unit.Type->MovementMask;
-	const unit_domain_finder unit_finder(unit.Type->get_domain());
+	const unit_domain_blocker_finder unit_finder(unit.Type->get_domain());
 
 	// verify each tile of the unit.
 	int h = unit.Type->get_tile_height();
