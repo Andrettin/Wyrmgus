@@ -1845,7 +1845,7 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 		//Wyrmgus start
 //		label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 		label.Draw(x + 110 * scale_factor, y, _("Speed:"), render_commands);
-		label.Draw(x + (110 + 53) * scale_factor, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100, render_commands);
+		label.Draw(x + (110 + 53) * scale_factor, y, preferences::get()->get_game_speed(), render_commands);
 		//Wyrmgus end
 		y += 20 * scale_factor;
 
