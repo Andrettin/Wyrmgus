@@ -44,6 +44,7 @@ static int CclDefineMapTemplate(lua_State *l);
 
 namespace wyrmgus {
 
+class campaign;
 class character;
 class character_substitution;
 class character_unit;
@@ -313,6 +314,8 @@ public:
 	{
 		return this->optional;
 	}
+
+	bool is_optional_for_campaign(const campaign *campaign) const;
 
 	bool is_constructed_only() const
 	{

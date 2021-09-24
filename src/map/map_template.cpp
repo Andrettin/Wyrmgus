@@ -1137,7 +1137,8 @@ void map_template::apply_subtemplates(const QPoint &template_start_pos, const QP
 			continue;
 		}
 
-		if (subtemplate->is_optional()) {
+		const bool optional = subtemplate->is_optional_for_campaign(game::get()->get_current_campaign());
+		if (optional) {
 			optional_subtemplates.push_back(subtemplate);
 		} else {
 			subtemplates.push_back(subtemplate);
@@ -1172,6 +1173,8 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 		}
 	}
 
+	const bool optional = subtemplate->is_optional_for_campaign(game::get()->get_current_campaign());
+
 	if (!found_location) {
 		if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
 			if (!random) {
@@ -1193,7 +1196,7 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 			}
 
 			if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
-				if (!subtemplate->is_optional()) {
+				if (!optional) {
 					throw std::runtime_error("No location available for map template \"" + subtemplate->get_identifier() + "\" to be applied to.");
 				}
 			} else {
@@ -1245,7 +1248,7 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 		//data could have been loaded for the purpose of finding an appropriate location for the subtemplate, e.g. terrain image data
 		subtemplate->clear_application_data();
 
-		if (!subtemplate->is_optional()) {
+		if (!optional) {
 			throw std::runtime_error("Failed to find a location for map subtemplate \"" + subtemplate->get_identifier() + "\".");
 		}
 	}
@@ -2187,6 +2190,11 @@ QSize map_template::get_applied_size() const
 	return applied_size;
 }
 
+bool map_template::is_optional_for_campaign(const campaign *campaign) const
+{
+	return this->is_optional() || campaign->is_required_map_template(this);
+}
+
 bool map_template::is_pos_usable(const QPoint &pos) const
 {
 	if (this->is_circle()) {
@@ -2505,9 +2513,11 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 
 	int try_count = 0;
 
+	const bool optional = subtemplate->is_optional_for_campaign(game::get()->get_current_campaign());
+
 	while (!potential_positions.empty()) {
 		// for the sake of performance, put a limit on optional subtemplate placement tries, instead of checking all possibilities
-		if (subtemplate->is_optional() && try_count >= 1000) {
+		if (optional && try_count >= 1000) {
 			break;
 		}
 

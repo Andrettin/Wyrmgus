@@ -152,6 +152,11 @@ public:
 
 	Q_INVOKABLE void remove_map_template(map_template *map_template);
 
+	bool is_required_map_template(const map_template *map_template) const
+	{
+		return this->required_map_templates.contains(map_template);
+	}
+
 	void add_tree_child(const campaign *campaign)
 	{
 		this->tree_children.push_back(campaign);
@@ -178,6 +183,7 @@ private:
 	wyrmgus::faction *faction = nullptr;	//which faction the player plays as in the campaign
 	wyrmgus::quest *quest = nullptr; //the quest which is acquired when the campaign starts, and which when completed means that the campaign has been completed as well
 	std::vector<map_template *> map_templates; //map templates used by the campaign
+	std::set<const map_template *> required_map_templates; //required map subtemplates for the campaign
 public:
 	std::vector<Vec2i> MapSizes;				/// Map sizes
 	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on

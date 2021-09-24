@@ -146,6 +146,10 @@ void campaign::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->required_quests.push_back(quest::get(value));
 		}
+	} else if (tag == "required_map_templates") {
+		for (const std::string &value : values) {
+			this->required_map_templates.insert(map_template::get(value));
+		}
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
