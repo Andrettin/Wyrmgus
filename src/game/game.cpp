@@ -1506,10 +1506,6 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 	GamePaused = true;
 #endif
 
-	if (FlagRevealMap) {
-		CMap::get()->Reveal();
-	}
-
 	//
 	// Setup game types
 	//
@@ -1591,6 +1587,10 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 			UpdateUnitSightRange(*unit);
 			MapMarkUnitSight(*unit);
 		}
+	}
+
+	if (FlagRevealMap) {
+		CMap::get()->Reveal();
 	}
 
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
