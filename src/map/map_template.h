@@ -127,7 +127,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(wyrmgus::decimillesimal_int max_longitude READ get_max_longitude WRITE set_max_longitude)
 	Q_PROPERTY(wyrmgus::decimillesimal_int min_latitude READ get_min_latitude WRITE set_min_latitude)
 	Q_PROPERTY(wyrmgus::decimillesimal_int max_latitude READ get_max_latitude WRITE set_max_latitude)
-	Q_PROPERTY(int astrodistance_multiplier MEMBER astrodistance_multiplier READ get_astrodistance_multiplier)
+	Q_PROPERTY(wyrmgus::decimillesimal_int astrodistance_multiplier MEMBER astrodistance_multiplier READ get_astrodistance_multiplier)
 	Q_PROPERTY(int astrodistance_additive_modifier MEMBER astrodistance_additive_modifier READ get_astrodistance_additive_modifier)
 	Q_PROPERTY(wyrmgus::map_template* default_astrocoordinate_reference_subtemplate MEMBER default_astrocoordinate_reference_subtemplate)
 
@@ -637,7 +637,7 @@ public:
 		this->georectangle.set_max_latitude(lat);
 	}
 
-	int get_astrodistance_multiplier() const
+	const decimillesimal_int &get_astrodistance_multiplier() const
 	{
 		return this->astrodistance_multiplier;
 	}
@@ -771,7 +771,7 @@ public:
 private:
 	wyrmgus::map_projection *map_projection = nullptr;
 	georectangle georectangle;
-	int astrodistance_multiplier = 1;
+	decimillesimal_int astrodistance_multiplier = decimillesimal_int(1);
 	int astrodistance_additive_modifier = 0;
 	map_template *default_astrocoordinate_reference_subtemplate = nullptr;
 	std::map<char, std::unique_ptr<character_unit>> character_units;

@@ -413,7 +413,7 @@ QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astro
 	QPoint direction_pos = astrocoordinate.to_circle_edge_point();
 	int64_t astrodistance_value = this->get_astrodistance().to_int();
 	astrodistance_value = isqrt(astrodistance_value);
-	astrodistance_value *= this->get_map_template()->get_astrodistance_multiplier();
+	astrodistance_value = (astrodistance_value * this->get_map_template()->get_astrodistance_multiplier()).to_int();
 
 	//the size of the reference subtemplate serves as a minimum distance in tiles
 	astrodistance_value += std::max(reference_subtemplate_applied_size.width(), reference_subtemplate_applied_size.height()) / 2;
