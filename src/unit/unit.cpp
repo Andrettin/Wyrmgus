@@ -5488,14 +5488,21 @@ CUnit *UnitOnScreen(int x, int y)
 	CUnit *candidate = nullptr;
 	bool is_candidate_selected = false;
 
-	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
-		if (unit->MapLayer != UI.CurrentMapLayer) {
-			continue;
-		}
+	const CViewport *vp = UI.SelectedViewport;
+
+	std::vector<CUnit *> screen_units;
+
+	//here we assume that no unit has a box size which would lead it to visually fully contain a tile which it is not on
+	const QPoint min_map_pos = vp->MapPos - QPoint(1, 1);
+	const QPoint max_map_pos = vp->MapPos + QPoint(vp->MapWidth, vp->MapHeight);
+	Select(min_map_pos, max_map_pos, screen_units, UI.CurrentMapLayer->ID);
+
+	for (CUnit *unit : screen_units) {
 		if (!ReplayRevealMap && !unit->IsVisibleAsGoal(*CPlayer::GetThisPlayer())) {
 			continue;
 		}
-		const wyrmgus::unit_type &type = *unit->Type;
+
+		const unit_type &type = *unit->Type;
 		if (!type.Sprite) {
 			continue;
 		}
@@ -5503,28 +5510,17 @@ CUnit *UnitOnScreen(int x, int y)
 		//
 		// Check if mouse is over the unit.
 		//
-		PixelPos unitSpritePos = unit->get_scaled_map_pixel_pos_center();
-		const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
-		//Wyrmgus start
-//		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-//						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
-//		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-//						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
-		const wyrmgus::unit_type_variation *variation = unit->GetVariation();
-		if (variation != nullptr && variation->get_frame_size() != QSize(0, 0) && !variation->get_image_file().empty()) {
-			unitSpritePos.x = unitSpritePos.x - type.get_box_width() * scale_factor / 2 -
-							  (variation->get_frame_size().width() * scale_factor - variation->Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
-			unitSpritePos.y = unitSpritePos.y - type.get_box_height() * scale_factor / 2 -
-							  (variation->get_frame_size().height() * scale_factor - variation->Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
-		} else {
-			unitSpritePos.x = unitSpritePos.x - type.get_box_width() * scale_factor / 2 -
-							  (type.get_frame_width() * scale_factor - type.Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
-			unitSpritePos.y = unitSpritePos.y - type.get_box_height() * scale_factor / 2 -
-							  (type.get_frame_height() * scale_factor - type.Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
-		}
-		//Wyrmgus end
-		if (x >= unitSpritePos.x && x < (unitSpritePos.x + type.get_box_width() * scale_factor)
-			&& y >= unitSpritePos.y  && y < (unitSpritePos.y + type.get_box_height() * scale_factor)) {
+		PixelPos unit_sprite_pos = unit->get_scaled_map_pixel_pos_center();
+		const int scale_factor = defines::get()->get_scale_factor();
+
+		unit_sprite_pos.x -= type.get_box_width() * scale_factor / 2;
+		unit_sprite_pos.x += type.BoxOffsetX * scale_factor;
+
+		unit_sprite_pos.y -= type.get_box_height() * scale_factor / 2;
+		unit_sprite_pos.y += type.BoxOffsetY * scale_factor;
+
+		if (x >= unit_sprite_pos.x && x < (unit_sprite_pos.x + type.get_box_width() * scale_factor)
+			&& y >= unit_sprite_pos.y  && y < (unit_sprite_pos.y + type.get_box_height() * scale_factor)) {
 			if (unit->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 				continue;
 			}
@@ -5568,12 +5564,13 @@ CUnit *UnitOnScreen(int x, int y)
 			continue;
 		}
 	}
+
 	return candidate;
 }
 
 PixelPos CUnit::get_map_pixel_pos_top_left() const
 {
-	const PixelPos pos(tilePos.x * wyrmgus::defines::get()->get_tile_width() + this->get_pixel_offset().x(), tilePos.y * wyrmgus::defines::get()->get_tile_height() + this->get_pixel_offset().y());
+	const PixelPos pos(tilePos.x * defines::get()->get_tile_width() + this->get_pixel_offset().x(), tilePos.y * defines::get()->get_tile_height() + this->get_pixel_offset().y());
 	return pos;
 }
 

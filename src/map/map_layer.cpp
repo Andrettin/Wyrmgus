@@ -98,14 +98,7 @@ sml_data CMapLayer::to_sml_data() const
 	return data;
 }
 
-/**
-**	@brief	Get the map field at a given location
-**
-**	@param	index	The index of the map field
-**
-**	@return	The map field
-*/
-wyrmgus::tile *CMapLayer::Field(const unsigned int index) const
+tile *CMapLayer::Field(const unsigned int index) const
 {
 	return &this->Fields[index];
 }

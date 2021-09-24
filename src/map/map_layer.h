@@ -72,41 +72,19 @@ public:
 
 	sml_data to_sml_data() const;
 
-	/**
-	**	@brief	Get the map field at a given location
-	**
-	**	@param	index	The index of the map field
-	**
-	**	@return	The map field
-	*/
-	wyrmgus::tile *Field(const unsigned int index) const;
+	tile *Field(const unsigned int index) const;
 	
-	/**
-	**	@brief	Get the map field at a given location
-	**
-	**	@param	x	The x coordinate of the map field
-	**	@param	y	The y coordinate of the map field
-	**
-	**	@return	The map field
-	*/
-	wyrmgus::tile *Field(const int x, const int y) const
+	tile *Field(const int x, const int y) const
 	{
 		return this->Field(x + y * this->get_width());
 	}
 	
-	/**
-	**	@brief	Get the map field at a given location
-	**
-	**	@param	pos	The coordinates of the map field
-	**
-	**	@return	The map field
-	*/
-	wyrmgus::tile *Field(const Vec2i &pos) const
+	tile *Field(const Vec2i &pos) const
 	{
 		return this->Field(pos.x, pos.y);
 	}
 	
-	Vec2i GetPosFromIndex(unsigned int index) const
+	Vec2i GetPosFromIndex(const unsigned int index) const
 	{
 		Vec2i pos;
 		pos.x = index % this->get_width();
