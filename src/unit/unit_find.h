@@ -308,10 +308,7 @@ private:
 };
 
 template <bool circle, typename Pred>
-//Wyrmgus start
-//inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
 inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z, Pred pred)
-//Wyrmgus end
 {
 	Assert(CMap::get()->Info->IsPointOnMap(ltPos, z));
 	Assert(CMap::get()->Info->IsPointOnMap(rbPos, z));
@@ -319,12 +316,13 @@ inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUni
 	
 	decimillesimal_int middle_x;
 	decimillesimal_int middle_y;
-	decimillesimal_int radius;
+	decimillesimal_int radius_squared;
 
 	if constexpr (circle) {
 		middle_x = decimillesimal_int(rbPos.x + ltPos.x) / 2;
 		middle_y = decimillesimal_int(rbPos.y + ltPos.y) / 2;
-		radius = ((middle_x - ltPos.x) + (middle_y - ltPos.y)) / 2;
+		const decimillesimal_int radius = ((middle_x - ltPos.x) + (middle_y - ltPos.y)) / 2;
+		radius_squared = radius * radius;
 	}
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
@@ -332,15 +330,16 @@ inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUni
 			if constexpr (circle) {
 				const decimillesimal_int rel_x = posIt.x - middle_x;
 				const decimillesimal_int rel_y = posIt.y - middle_y;
-				const decimillesimal_int my = radius * radius - rel_x * rel_x;
+				const decimillesimal_int my = radius_squared - rel_x * rel_x;
 				if ((rel_y * rel_y) > my) {
 					continue;
 				}
 			}
 
 			const CUnitCache &cache = CMap::get()->get_tile_unit_cache(posIt, z);
+			const std::vector<CUnit *> &cache_units = cache.get_units();
 
-			for (CUnit *unit : cache) {
+			for (CUnit *unit : cache_units) {
 				if (unit->CacheLock == 0 && pred(unit)) {
 					unit->CacheLock = 1;
 					units.push_back(unit);

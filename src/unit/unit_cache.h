@@ -44,9 +44,15 @@ public:
 	using const_iterator = std::vector<CUnit *>::const_iterator;
 
 public:
-	CUnitCache() : Units() {}
+	const std::vector<CUnit *> &get_units() const
+	{
+		return this->Units;
+	}
 
-	size_t size() const { return Units.size(); }
+	size_t size() const
+	{
+		return Units.size();
+	}
 
 	void clear() { Units.clear(); }
 
