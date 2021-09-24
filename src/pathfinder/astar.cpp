@@ -114,10 +114,7 @@ static int AStarGoalY;
 */
 
 /// The set of Open nodes
-//Wyrmgus start
-//static std::vector<Open> OpenSet;
 static std::vector<std::vector<Open>> OpenSet;
-//Wyrmgus end
 
 //Wyrmgus start
 //static std::vector<int> CostMoveToCache;
@@ -133,30 +130,6 @@ static constexpr int CacheNotSet = -5;
 void InitAStar()
 //Wyrmgus end
 {
-	//Wyrmgus start
-	/*
-	// Should only be called once
-	assert_throw(!AStarMatrix);
-
-	AStarMapWidth = mapWidth;
-	AStarMapHeight = mapHeight;
-
-	AStarMatrix = new Node[AStarMapWidth * AStarMapHeight];
-	memset(AStarMatrix, 0, AStarMapWidth * AStarMapHeight);
-
-	Threshold = AStarMapWidth * AStarMapHeight / MAX_CLOSE_SET_RATIO;
-	CloseSet = new int[Threshold];
-
-	OpenSetMaxSize = AStarMapWidth * AStarMapHeight / MAX_OPEN_SET_RATIO;
-	OpenSet = new Open[OpenSetMaxSize];
-
-	CostMoveToCache = new int[AStarMapWidth * AStarMapHeight];
-
-	for (int i = 0; i < 9; ++i) {
-		Heading2O[i] = Heading2Y[i] * AStarMapWidth;
-	}
-	*/
-
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
 		// Should only be called once
 		assert_throw(AStarMatrix.size() <= z);
@@ -181,7 +154,6 @@ void InitAStar()
 			Heading2O[i].push_back(Heading2Y[i] * AStarMapWidth[z]);
 		}
 	}
-	//Wyrmgus end
 }
 
 /**
@@ -189,15 +161,8 @@ void InitAStar()
 */
 void FreeAStar()
 {
-	//Wyrmgus start
 	AStarMapWidth.clear();
 	AStarMapHeight.clear();
-	//Wyrmgus end
-	//Wyrmgus start
-	/*
-	delete[] AStarMatrix;
-	AStarMatrix = nullptr;
-	*/
 	AStarMatrix.clear();
 	Threshold.clear();
 	CloseSet.clear();
@@ -207,7 +172,6 @@ void FreeAStar()
 	for (int i = 0; i < 9; ++i) {
 		Heading2O[i].clear();
 	}
-	//Wyrmgus end
 }
 
 /**
@@ -260,31 +224,19 @@ static void CostMoveToCacheCleanUp(const int z)
 **  Find the best node in the current open node set
 **  Returns the position of this node in the open node set
 */
-//Wyrmgus start
-//#define AStarFindMinimum() (OpenSetSize - 1)
 static int AStarFindMinimum(const int z)
 {
 	return static_cast<int>(OpenSet[z].size()) - 1;
 }
-//Wyrmgus end
 
 /**
 **  Remove the minimum from the open node set
 */
-//Wyrmgus start
-//static void AStarRemoveMinimum(int pos)
-static void AStarRemoveMinimum(int pos, int z)
-//Wyrmgus end
+static void AStarRemoveMinimum(const int pos, const int z)
 {
-	//Wyrmgus start
-//	assert_throw(pos == OpenSetSize - 1);
 	assert_throw(pos == static_cast<int>(OpenSet[z].size()) - 1);
-	//Wyrmgus end
 
-	//Wyrmgus start
-//	OpenSetSize--;
 	OpenSet[z].pop_back();
-	//Wyrmgus end
 }
 
 /**
@@ -298,35 +250,23 @@ static inline int AStarAddNode(const Vec2i &pos, const int o, const int costs, c
 //Wyrmgus end
 {
 	int bigi = 0;
-	//Wyrmgus start
-//	int smalli = OpenSetSize;
 	int smalli = static_cast<int>(OpenSet[z].size());
-	//Wyrmgus end
 	int midcost;
 	int midi;
 	int midCostToGoal;
 	int midDist;
 
-	//Wyrmgus start
-//	const int costToGoal = AStarMatrix[o].CostToGoal;
 	const int costToGoal = AStarMatrix[z][o].CostToGoal;
-	//Wyrmgus end
-	const int dist = wyrmgus::number::fast_abs(pos.x - AStarGoalX) + wyrmgus::number::fast_abs(pos.y - AStarGoalY);
+	const int dist = number::fast_abs(pos.x - AStarGoalX) + number::fast_abs(pos.y - AStarGoalY);
 
 	// find where we should insert this node.
 	// binary search where to insert the new node
 	while (bigi < smalli) {
 		midi = (smalli + bigi) >> 1;
-		//Wyrmgus start
-//		const Open &open = OpenSet[midi];
 		const Open &open = OpenSet[z][midi];
-		//Wyrmgus end
 		midcost = open.Costs;
-		//Wyrmgus start
-//		midCostToGoal = AStarMatrix[open.O].CostToGoal;
 		midCostToGoal = AStarMatrix[z][open.O].CostToGoal;
-		//Wyrmgus end
-		midDist = wyrmgus::number::fast_abs(open.pos.x - AStarGoalX) + wyrmgus::number::fast_abs(open.pos.y - AStarGoalY);
+		midDist = number::fast_abs(open.pos.x - AStarGoalX) + number::fast_abs(open.pos.y - AStarGoalY);
 		if (costs > midcost || (costs == midcost
 								&& (costToGoal > midCostToGoal || (costToGoal == midCostToGoal
 																   && dist > midDist)))) {
@@ -350,10 +290,7 @@ static inline int AStarAddNode(const Vec2i &pos, const int o, const int costs, c
 	node.pos = pos;
 	node.O = o;
 	node.Costs = costs;
-	//Wyrmgus start
-//	OpenSet.insert(OpenSet.begin() + bigi, std::move(node));
 	OpenSet[z].insert(OpenSet[z].begin() + bigi, std::move(node));
-	//Wyrmgus end
 
 	return 0;
 }
@@ -363,18 +300,12 @@ static inline int AStarAddNode(const Vec2i &pos, const int o, const int costs, c
 **  Can be further optimised knowing that the new cost MUST BE LOWER
 **  than the old one.
 */
-//Wyrmgus start
-//static void AStarReplaceNode(int pos)
-static void AStarReplaceNode(int pos, int z)
-//Wyrmgus end
+static void AStarReplaceNode(const int pos, const int z)
 {
-	Open node = wyrmgus::vector::take(OpenSet[z], static_cast<size_t>(pos));
+	Open node = vector::take(OpenSet[z], static_cast<size_t>(pos));
 
 	// Re-add the node with the new cost
-	//Wyrmgus start
-//	AStarAddNode(node.pos, node.O, node.Costs);
 	AStarAddNode(node.pos, node.O, node.Costs, z);
-	//Wyrmgus end
 }
 
 /**
@@ -382,19 +313,10 @@ static void AStarReplaceNode(int pos, int z)
 **
 **  @return  -1 if not found and the position of the node in the table if found.
 */
-//Wyrmgus start
-//static int AStarFindNode(int eo)
-static int AStarFindNode(int eo, int z)
-//Wyrmgus end
+static int AStarFindNode(const int eo, const int z)
 {
-	//Wyrmgus start
-//	for (size_t i = 0; i < OpenSet.size(); ++i) {
 	for (size_t i = 0; i < OpenSet[z].size(); ++i) {
-	//Wyrmgus end
-		//Wyrmgus start
-//		if (OpenSet[i].O == eo) {
 		if (OpenSet[z][i].O == eo) {
-		//Wyrmgus end
 			return static_cast<int>(i);
 		}
 	}
@@ -552,10 +474,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 **                0 -> no induced cost, except move
 **               >0 -> costly tile
 */
-//Wyrmgus start
-//static inline int CostMoveTo(unsigned int index, const CUnit &unit)
 static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
-//Wyrmgus end
 {
 	//Wyrmgus start
 	if (!&unit) {
@@ -563,17 +482,15 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
 		return -1;
 	}
 	//Wyrmgus end
-	//Wyrmgus start
-//	int c = CostMoveToCache[index];
+
 	int c = CostMoveToCache[z][index];
-	//Wyrmgus end
+
 	if (c != CacheNotSet) {
 		return c;
 	}
-	//Wyrmgus start
-//	c = CostMoveToCallBack_Default(index, unit);
+
 	c = CostMoveToCallBack_Default(index, unit, z);
-	//Wyrmgus end
+
 	return c;
 }
 
@@ -585,19 +502,10 @@ public:
 	{
 	}
 
-	//Wyrmgus start
-//	void operator()(int offset) const
 	void operator()(int offset, int z) const
-	//Wyrmgus end
 	{
-		//Wyrmgus start
-//		if (CostMoveTo(offset, unit) >= 0) {
 		if (CostMoveTo(offset, unit, z) >= 0) {
-		//Wyrmgus end
-			//Wyrmgus start
-//			AStarMatrix[offset].InGoal = 1;
 			AStarMatrix[z][offset].InGoal = 1;
-			//Wyrmgus end
 			goal_reachable = true;
 		}
 		//Wyrmgus start
@@ -849,16 +757,10 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 		//Wyrmgus end
 			return 0;
 		}
-		//Wyrmgus start
-//		unsigned int offset = GetIndex(goal.x, goal.y);
-//		if (CostMoveTo(offset, unit) >= 0) {
+
 		unsigned int offset = GetIndex(goal.x, goal.y, z);
 		if (CostMoveTo(offset, unit, z) >= 0) {
-		//Wyrmgus end
-			//Wyrmgus start
-//			AStarMatrix[offset].InGoal = 1;
 			AStarMatrix[z][offset].InGoal = 1;
-			//Wyrmgus end
 			return 1;
 		} else {
 			return 0;
@@ -985,20 +887,18 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 	}
 
 	//Wyrmgus start
-//	if (wyrmgus::number::fast_abs(diff.x) <= 1 && wyrmgus::number::fast_abs(diff.y) <= 1) {
+//	if (number::fast_abs(diff.x) <= 1 && number::fast_abs(diff.y) <= 1) {
 	if (minrange <= distance && number::fast_abs(diff.x) <= 1 && number::fast_abs(diff.y) <= 1) {
 	//Wyrmgus end
 		// Move to adjacent cell
-		//Wyrmgus start
-//		if (CostMoveTo(GetIndex(goal.x, goal.y), unit) == -1) {
 		if (CostMoveTo(GetIndex(goal.x, goal.y, z), unit, z) == -1) {
-		//Wyrmgus end
 			return PF_UNREACHABLE;
 		}
 
 		if (path != nullptr) {
 			(*path)[0] = XY2Heading[diff.x + 1][diff.y + 1];
 		}
+
 		return 1;
 	}
 
@@ -1037,19 +937,11 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	}
 
 	//  Initialize
-	//Wyrmgus start
-//	AStarCleanUp();
-//	CostMoveToCacheCleanUp();
 	AStarCleanUp(z);
 	CostMoveToCacheCleanUp(z);
-	//Wyrmgus end
 
-	//Wyrmgus start
-//	OpenSet.clear();
-//	CloseSet.clear();
 	OpenSet[z].clear();
 	CloseSet[z].clear();
-	//Wyrmgus end
 
 	//Wyrmgus start
 //	if (!AStarMarkGoal(goalPos, gw, gh, tilesizex, tilesizey, minrange, maxrange, unit)) {
@@ -1087,12 +979,8 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		ret = PF_FAILED;
 		return ret;
 	}
-	//Wyrmgus start
-//	AStarAddToClose(OpenSet[0].O);
-//	if (AStarMatrix[eo].InGoal) {
 	AStarAddToClose(OpenSet[z][0].O, z);
 	if (AStarMatrix[z][eo].InGoal) {
-	//Wyrmgus end
 		ret = PF_REACHED;
 		return ret;
 	}
@@ -1103,7 +991,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	//Wyrmgus end
 
 	//  Begin search
-	while (1) {
+	while (true) {
 		//Wyrmgus start
 		if (max_length != 0 && length > max_length) {
 			ret = PF_FAILED;
@@ -1112,27 +1000,15 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		//Wyrmgus end
 		
 		// Find the best node of from the open set
-		//Wyrmgus start
-//		const int shortest = AStarFindMinimum();
-//		const int x = OpenSet[shortest].pos.x;
-//		const int y = OpenSet[shortest].pos.y;
-//		const int o = OpenSet[shortest].O;
 		const int shortest = AStarFindMinimum(z);
 		const int x = OpenSet[z][shortest].pos.x;
 		const int y = OpenSet[z][shortest].pos.y;
 		const int o = OpenSet[z][shortest].O;
-		//Wyrmgus end
 
-		//Wyrmgus start
-//		AStarRemoveMinimum(shortest);
 		AStarRemoveMinimum(shortest, z);
-		//Wyrmgus end
 
 		// If we have reached the goal, then exit.
-		//Wyrmgus start
-//		if (AStarMatrix[o].InGoal == 1) {
 		if (AStarMatrix[z][o].InGoal == 1) {
-		//Wyrmgus end
 			endPos.x = x;
 			endPos.y = y;
 			break;
@@ -1153,12 +1029,8 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		// Generate successors of this node.
 
 		// Node that this node was generated from.
-		//Wyrmgus start
-//		const int px = x - Heading2X[(int)AStarMatrix[o].Direction];
-//		const int py = y - Heading2Y[(int)AStarMatrix[o].Direction];
 		const int px = x - Heading2X[(int)AStarMatrix[z][o].Direction];
 		const int py = y - Heading2Y[(int)AStarMatrix[z][o].Direction];
-		//Wyrmgus end
 
 		for (int i = 0; i < 8; ++i) {
 			endPos.x = x + Heading2X[i];
@@ -1172,10 +1044,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 			}
 
 			// Outside the map or can't be entered.
-			//Wyrmgus start
-//			if (endPos.x < 0 || endPos.x + tilesizex - 1 >= AStarMapWidth
 			if (endPos.x < 0 || endPos.x + tilesizex - 1 >= AStarMapWidth[z]
-			//Wyrmgus end
 				//Wyrmgus start
 //				|| endPos.y < 0 || endPos.y + tilesizey - 1 >= AStarMapHeight) {
 				|| endPos.y < 0 || endPos.y + tilesizey - 1 >= AStarMapHeight[z]
@@ -1185,18 +1054,12 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 			}
 
 			//eo = GetIndex(ex, ey);
-			//Wyrmgus start
-//			eo = endPos.x + (o - x) + Heading2O[i];
 			eo = endPos.x + (o - x) + Heading2O[i][z];
-			//Wyrmgus end
 
 			// if the point is "move to"-able and
 			// if we have not reached this point before,
 			// or if we have a better path to it, we add it to open set
-			//Wyrmgus start
-//			int new_cost = CostMoveTo(eo, unit);
 			int new_cost = CostMoveTo(eo, unit, z);
-			//Wyrmgus end
 			if (new_cost == -1) {
 				// uncrossable tile
 				continue;
@@ -1211,12 +1074,8 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 			if (AStarMatrix[z][eo].CostFromStart == 0) {
 			//Wyrmgus end
 				// we are sure the current node has not been already visited
-				//Wyrmgus start
-//				AStarMatrix[eo].CostFromStart = new_cost;
-//				AStarMatrix[eo].Direction = i;
 				AStarMatrix[z][eo].CostFromStart = new_cost;
 				AStarMatrix[z][eo].Direction = i;
-				//Wyrmgus end
 				costToGoal = AStarCosts(endPos, goalPos);
 				//Wyrmgus start
 //				AStarMatrix[eo].CostToGoal = costToGoal;
@@ -1228,27 +1087,15 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 					return ret;
 				}
 				// we add the point to the close set
-				//Wyrmgus start
-//				AStarAddToClose(eo);
 				AStarAddToClose(eo, z);
-				//Wyrmgus end
-			//Wyrmgus start
-//			} else if (new_cost < AStarMatrix[eo].CostFromStart) {
 			} else if (new_cost < AStarMatrix[z][eo].CostFromStart) {
-			//Wyrmgus end
 				// Already visited node, but we have here a better path
 				// I know, it's redundant (but simpler like this)
-				//Wyrmgus start
-//				AStarMatrix[eo].CostFromStart = new_cost;
-//				AStarMatrix[eo].Direction = i;
 				AStarMatrix[z][eo].CostFromStart = new_cost;
 				AStarMatrix[z][eo].Direction = i;
-				//Wyrmgus end
+
 				// this point might be already in the OpenSet
-				//Wyrmgus start
-//				const int j = AStarFindNode(eo);
 				const int j = AStarFindNode(eo, z);
-				//Wyrmgus end
 				if (j == -1) {
 					costToGoal = AStarCosts(endPos, goalPos);
 					//Wyrmgus start
@@ -1272,17 +1119,13 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				// we don't have to add this point to the close set
 			}
 		}
-		//Wyrmgus start
-//		if (OpenSet.size() <= 0) { // no new nodes generated
+
 		if (OpenSet[z].size() <= 0) { // no new nodes generated
-		//Wyrmgus end
 			ret = PF_UNREACHABLE;
 			return ret;
 		}
 		
-		//Wyrmgus start
-		length += 1;
-		//Wyrmgus end
+		++length;
 	}
 
 	//Wyrmgus start
