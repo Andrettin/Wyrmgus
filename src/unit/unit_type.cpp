@@ -1480,6 +1480,22 @@ void unit_type::initialize()
 
 void unit_type::check() const
 {
+	const QSize tile_pixel_size = this->get_tile_pixel_size();
+
+	const int box_width_pixel_overflow = (this->get_box_width() - tile_pixel_size.width()) / 2;
+	const int box_width_tile_overflow = box_width_pixel_overflow / defines::get()->get_tile_width();
+
+	if (box_width_tile_overflow > 0) {
+		throw std::runtime_error("The box width of unit type \"" + this->get_identifier() + "\" (" + std::to_string(this->get_box_width()) + ") would overflow to encompass an entire extra tile.");
+	}
+
+	const int box_height_pixel_overflow = (this->get_box_height() - tile_pixel_size.height()) / 2;
+	const int box_height_tile_overflow = box_height_pixel_overflow / defines::get()->get_tile_height();
+
+	if (box_height_tile_overflow > 0) {
+		throw std::runtime_error("The box height of unit type \"" + this->get_identifier() + "\" (" + std::to_string(this->get_box_height()) + ") would overflow to encompass an entire extra tile.");
+	}
+
 	for (const spell *spell : this->get_autocast_spells()) {
 		if (spell->get_autocast_info() == nullptr) {
 			throw std::runtime_error("The spell \"" + spell->get_identifier() + "\" is set to be autocast by default for unit type \"" + this->get_identifier() + "\", but has no defined autocast method.");
