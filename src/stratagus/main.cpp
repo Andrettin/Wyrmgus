@@ -107,6 +107,26 @@ int main(int argc, char **argv)
 
 		QQmlApplicationEngine engine;
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+		qmlRegisterAnonymousType<calendar>("", 1);
+		qmlRegisterAnonymousType<CEditor>("", 1);
+		qmlRegisterAnonymousType<civilization>("", 1);
+		qmlRegisterAnonymousType<civilization_group>("", 1);
+		qmlRegisterAnonymousType<CPlayer>("", 1);
+		qmlRegisterAnonymousType<defines>("", 1);
+		qmlRegisterAnonymousType<faction>("", 1);
+		qmlRegisterAnonymousType<game>("", 1);
+		qmlRegisterAnonymousType<icon>("", 1);
+		qmlRegisterAnonymousType<network_manager>("", 1);
+		qmlRegisterAnonymousType<pantheon>("", 1);
+		qmlRegisterAnonymousType<parameters>("", 1);
+		qmlRegisterAnonymousType<player_color>("", 1);
+		qmlRegisterAnonymousType<preferences>("", 1);
+		qmlRegisterAnonymousType<quest>("", 1);
+		qmlRegisterAnonymousType<results_info>("", 1);
+		qmlRegisterAnonymousType<timeline>("", 1);
+		qmlRegisterAnonymousType<unit_type>("", 1);
+#else
 		qmlRegisterType<calendar>();
 		qmlRegisterType<CEditor>();
 		qmlRegisterType<civilization>();
@@ -125,6 +145,7 @@ int main(int argc, char **argv)
 		qmlRegisterType<results_info>();
 		qmlRegisterType<timeline>();
 		qmlRegisterType<unit_type>();
+#endif
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
 		qmlRegisterType<map_grid_model>("map_grid_model", 1, 0, "MapGridModel");

@@ -1555,7 +1555,6 @@ if(ENABLE_MULTIBUILD)
 	endif()
 endif()
 
-
 if(ENABLE_UNITY_BUILD)
 	set(CMAKE_UNITY_BUILD ON)
 endif()
