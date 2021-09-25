@@ -208,21 +208,25 @@ void game::apply_player_history()
 
 void game::do_cycle()
 {
-	if (GameCycle % CYCLES_PER_IN_GAME_HOUR == 0) {
-		game::get()->increment_current_total_hours();
+	try {
+		if (GameCycle % CYCLES_PER_IN_GAME_HOUR == 0) {
+			game::get()->increment_current_total_hours();
 
-		this->current_date = this->current_date.addSecs(1 * 60 * 60 * DEFAULT_DAY_MULTIPLIER_PER_YEAR);
+			this->current_date = this->current_date.addSecs(1 * 60 * 60 * DEFAULT_DAY_MULTIPLIER_PER_YEAR);
 
-		for (const std::unique_ptr<CMapLayer> &map_layer : CMap::get()->MapLayers) {
-			map_layer->DoPerHourLoop();
-		}
+			for (const std::unique_ptr<CMapLayer> &map_layer : CMap::get()->MapLayers) {
+				map_layer->DoPerHourLoop();
+			}
 
-		for (const world *world : world::get_all()) {
-			world_game_data *game_data = world->get_game_data();
-			if (game_data->is_on_map()) {
-				game_data->do_per_in_game_hour_loop();
+			for (const world *world : world::get_all()) {
+				world_game_data *game_data = world->get_game_data();
+				if (game_data->is_on_map()) {
+					game_data->do_per_in_game_hour_loop();
+				}
 			}
 		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error executing the per cycle actions for the game."));
 	}
 }
 

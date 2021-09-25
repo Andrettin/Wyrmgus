@@ -385,7 +385,7 @@ static void GameLogicLoop()
 		//Wyrmgus end
 		
 		if (GameCycle > 0) {
-			wyrmgus::game::get()->do_cycle();
+			game::get()->do_cycle();
 		}
 		
 		if (preferences::get()->is_autosave_enabled() && !IsNetworkGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_MINUTE * preferences::autosave_minutes)) == 0) {

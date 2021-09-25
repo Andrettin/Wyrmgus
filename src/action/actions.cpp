@@ -670,25 +670,29 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 */
 void UnitActions()
 {
-	const bool isASecondCycle = !(GameCycle % CYCLES_PER_SECOND);
+	try {
+		const bool isASecondCycle = !(GameCycle % CYCLES_PER_SECOND);
 
-	//unit list may be modified during loop... so make a copy
-	std::vector<CUnit *> table = wyrmgus::unit_manager::get()->get_units();
+		//unit list may be modified during loop... so make a copy
+		std::vector<CUnit *> table = unit_manager::get()->get_units();
 
-	//check for things that only happen every second
-	if (isASecondCycle) {
-		UnitActionsEachSecond(table.begin(), table.end());
+		//check for things that only happen every second
+		if (isASecondCycle) {
+			UnitActionsEachSecond(table.begin(), table.end());
+		}
+
+		if ((GameCycle % (CYCLES_PER_SECOND * 5)) == 0) {
+			UnitActionsEachFiveSeconds(table.begin(), table.end());
+		}
+		// Do all actions
+		UnitActionsEachCycle(table.begin(), table.end());
+
+		//Wyrmgus start
+		if ((GameCycle % CYCLES_PER_MINUTE) == 0) {
+			UnitActionsEachMinute(table.begin(), table.end());
+		}
+		//Wyrmgus end
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error executing actions for units."));
 	}
-	
-	if ((GameCycle % (CYCLES_PER_SECOND * 5)) == 0) {
-		UnitActionsEachFiveSeconds(table.begin(), table.end());
-	}
-	// Do all actions
-	UnitActionsEachCycle(table.begin(), table.end());
-	
-	//Wyrmgus start
-	if ((GameCycle % CYCLES_PER_MINUTE) == 0) {
-		UnitActionsEachMinute(table.begin(), table.end());
-	}
-	//Wyrmgus end
 }

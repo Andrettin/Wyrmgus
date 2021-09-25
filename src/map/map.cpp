@@ -1937,25 +1937,29 @@ void CMap::save(CFile &file) const
 
 void CMap::do_per_cycle_loop()
 {
-	if (GameCycle > 0) {
-		//do tile animation
-		if (GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
-			for (tile *tile : this->animated_tiles) {
-				if (tile->get_terrain() != nullptr && tile->get_terrain()->SolidAnimationFrames > 0) {
-					++tile->AnimationFrame;
-					if (tile->AnimationFrame >= tile->get_terrain()->SolidAnimationFrames) {
-						tile->AnimationFrame = 0;
+	try {
+		if (GameCycle > 0) {
+			//do tile animation
+			if (GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
+				for (tile *tile : this->animated_tiles) {
+					if (tile->get_terrain() != nullptr && tile->get_terrain()->SolidAnimationFrames > 0) {
+						++tile->AnimationFrame;
+						if (tile->AnimationFrame >= tile->get_terrain()->SolidAnimationFrames) {
+							tile->AnimationFrame = 0;
+						}
 					}
-				}
 
-				if (tile->get_overlay_terrain() != nullptr && tile->get_overlay_terrain()->SolidAnimationFrames > 0) {
-					++tile->OverlayAnimationFrame;
-					if (tile->OverlayAnimationFrame >= tile->get_overlay_terrain()->SolidAnimationFrames) {
-						tile->OverlayAnimationFrame = 0;
+					if (tile->get_overlay_terrain() != nullptr && tile->get_overlay_terrain()->SolidAnimationFrames > 0) {
+						++tile->OverlayAnimationFrame;
+						if (tile->OverlayAnimationFrame >= tile->get_overlay_terrain()->SolidAnimationFrames) {
+							tile->OverlayAnimationFrame = 0;
+						}
 					}
 				}
 			}
 		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error executing the per cycle actions for the map."));
 	}
 }
 
@@ -4070,9 +4074,13 @@ void CMap::ClearRockTile(const Vec2i &pos)
 
 void CMap::handle_destroyed_overlay_terrain()
 {
-	for (const std::unique_ptr<CMapLayer> &map_layer : this->MapLayers) {
-		map_layer->handle_destroyed_overlay_terrain();
-		map_layer->regenerate_forests();
+	try {
+		for (const std::unique_ptr<CMapLayer> &map_layer : this->MapLayers) {
+			map_layer->handle_destroyed_overlay_terrain();
+			map_layer->regenerate_forests();
+		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error when handling destroyed overlay terrain for the map."));
 	}
 }
 

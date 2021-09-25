@@ -1737,8 +1737,12 @@ static void MissilesActionLoop(std::vector<std::unique_ptr<Missile>> &missiles)
 */
 void MissileActions()
 {
-	MissilesActionLoop(GlobalMissiles);
-	MissilesActionLoop(LocalMissiles);
+	try {
+		MissilesActionLoop(GlobalMissiles);
+		MissilesActionLoop(LocalMissiles);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error executing actions for missiles."));
+	}
 }
 
 /**

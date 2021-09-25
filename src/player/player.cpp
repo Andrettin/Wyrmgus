@@ -3883,33 +3883,37 @@ void PlayersInitAi()
 void PlayersEachCycle()
 {
 	for (int player = 0; player < NumPlayers; ++player) {
-		const qunique_ptr<CPlayer> &p = CPlayer::Players[player];
-		
-		if (p->LostTownHallTimer && !p->is_revealed() && p->LostTownHallTimer < ((int) GameCycle) && CPlayer::GetThisPlayer()->HasContactWith(*p)) {
-			p->set_revealed(true);
-			for (int j = 0; j < NumPlayers; ++j) {
-				if (player != j && CPlayer::Players[j]->get_type() != player_type::nobody) {
-					CPlayer::Players[j]->Notify(_("%s's units have been revealed!"), p->get_name().c_str());
-				} else {
-					CPlayer::Players[j]->Notify("%s", _("Your units have been revealed!"));
+		try {
+			const qunique_ptr<CPlayer> &p = CPlayer::Players[player];
+
+			if (p->LostTownHallTimer && !p->is_revealed() && p->LostTownHallTimer < ((int) GameCycle) && CPlayer::GetThisPlayer()->HasContactWith(*p)) {
+				p->set_revealed(true);
+				for (int j = 0; j < NumPlayers; ++j) {
+					if (player != j && CPlayer::Players[j]->get_type() != player_type::nobody) {
+						CPlayer::Players[j]->Notify(_("%s's units have been revealed!"), p->get_name().c_str());
+					} else {
+						CPlayer::Players[j]->Notify("%s", _("Your units have been revealed!"));
+					}
 				}
 			}
-		}
-		
-		
-		for (size_t i = 0; i < p->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
-			if ((unsigned long) p->Modifiers[i].second < GameCycle) {
-				p->RemoveModifier(p->Modifiers[i].first); //only remove one modifier per cycle, to prevent too many upgrade changes from happening at the same cycle (for performance reasons)
-				break;
-			}
-		}
-		
-		if (p->HeroCooldownTimer) {
-			p->HeroCooldownTimer--;
-		}
 
-		if (p->AiEnabled) {
-			AiEachCycle(*p);
+
+			for (size_t i = 0; i < p->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
+				if ((unsigned long) p->Modifiers[i].second < GameCycle) {
+					p->RemoveModifier(p->Modifiers[i].first); //only remove one modifier per cycle, to prevent too many upgrade changes from happening at the same cycle (for performance reasons)
+					break;
+				}
+			}
+
+			if (p->HeroCooldownTimer) {
+				p->HeroCooldownTimer--;
+			}
+
+			if (p->AiEnabled) {
+				AiEachCycle(*p);
+			}
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Error executing the per cycle actions for player " + std::to_string(player) + "."));
 		}
 	}
 }
@@ -3919,28 +3923,33 @@ void PlayersEachCycle()
 **
 **  @param playerIdx  the player to update AI
 */
-void PlayersEachSecond(int playerIdx)
+void PlayersEachSecond(const int playerIdx)
 {
-	const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
+	try {
+		const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
 
-	if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
-		for (const resource *resource : resource::get_all()) {
-			int revenue = player->get_resource(resource) + player->get_stored_resource(resource) - player->get_last_resource(resource);
-			//estimate per minute
-			revenue *= 6;
-			player->set_revenue(resource, revenue);
-			player->set_last_resource(resource, player->get_resource(resource) + player->get_stored_resource(resource));
+		if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
+			for (const resource *resource : resource::get_all()) {
+				int revenue = player->get_resource(resource) + player->get_stored_resource(resource) - player->get_last_resource(resource);
+				//estimate per minute
+				revenue *= 6;
+				player->set_revenue(resource, revenue);
+				player->set_last_resource(resource, player->get_resource(resource) + player->get_stored_resource(resource));
+			}
 		}
-	}
-	if (player->AiEnabled) {
-		AiEachSecond(*player);
-	}
 
-	player->UpdateFreeWorkers();
-	//Wyrmgus start
-	player->PerformResourceTrade();
-	//Wyrmgus end
-	player->update_current_quests();
+		if (player->AiEnabled) {
+			AiEachSecond(*player);
+		}
+
+		player->UpdateFreeWorkers();
+		//Wyrmgus start
+		player->PerformResourceTrade();
+		//Wyrmgus end
+		player->update_current_quests();
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error executing the per second actions for player " + std::to_string(playerIdx) + "."));
+	}
 }
 
 /**
@@ -3948,12 +3957,16 @@ void PlayersEachSecond(int playerIdx)
 **
 **  @param playerIdx  the player to update AI
 */
-void PlayersEachHalfMinute(int playerIdx)
+void PlayersEachHalfMinute(const int playerIdx)
 {
-	const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
+	try {
+		const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
 
-	if (player->AiEnabled) {
-		AiEachHalfMinute(*player);
+		if (player->AiEnabled) {
+			AiEachHalfMinute(*player);
+		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error executing the per half minute actions for player " + std::to_string(playerIdx) + "."));
 	}
 }
 
@@ -3962,15 +3975,19 @@ void PlayersEachHalfMinute(int playerIdx)
 **
 **  @param playerIdx  the player to update AI
 */
-void PlayersEachMinute(int playerIdx)
+void PlayersEachMinute(const int playerIdx)
 {
-	const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
+	try {
+		const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
 
-	if (player->AiEnabled) {
-		AiEachMinute(*player);
+		if (player->AiEnabled) {
+			AiEachMinute(*player);
+		}
+
+		player->update_quest_pool();
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error executing the per minute actions for player " + std::to_string(playerIdx) + "."));
 	}
-
-	player->update_quest_pool();
 }
 
 /**

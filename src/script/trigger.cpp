@@ -503,88 +503,92 @@ static int CclSetDeactivatedTriggers(lua_State *l)
 */
 void TriggersEachCycle()
 {
-	if (wyrmgus::trigger::CurrentTriggerId >= wyrmgus::trigger::ActiveTriggers.size()) {
-		wyrmgus::trigger::CurrentTriggerId = 0;
-	}
+	try {
+		if (trigger::CurrentTriggerId >= trigger::ActiveTriggers.size()) {
+			trigger::CurrentTriggerId = 0;
+		}
 
-	if (GamePaused) {
-		return;
-	}
+		if (GamePaused) {
+			return;
+		}
 
-	wyrmgus::game::get()->process_delayed_effects();
+		game::get()->process_delayed_effects();
 
-	// go to the next trigger
-	if (wyrmgus::trigger::CurrentTriggerId < wyrmgus::trigger::ActiveTriggers.size()) {
-		wyrmgus::trigger *current_trigger = wyrmgus::trigger::ActiveTriggers[wyrmgus::trigger::CurrentTriggerId];
+		// go to the next trigger
+		if (trigger::CurrentTriggerId < trigger::ActiveTriggers.size()) {
+			trigger *current_trigger = trigger::ActiveTriggers[trigger::CurrentTriggerId];
 
-		bool removed_trigger = false;
-		
-		//old Lua conditions/effects for triggers
-		if (current_trigger->Conditions != nullptr && current_trigger->Effects != nullptr) {
-			try {
-				current_trigger->Conditions->pushPreamble();
-				current_trigger->Conditions->run(1);
-				if (current_trigger->Conditions->popBoolean()) {
-					current_trigger->Effects->pushPreamble();
-					current_trigger->Effects->run(1);
-					if (current_trigger->Effects->popBoolean() == false) {
-						wyrmgus::trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
-						wyrmgus::trigger::ActiveTriggers.erase(wyrmgus::trigger::ActiveTriggers.begin() + wyrmgus::trigger::CurrentTriggerId);
-						removed_trigger = true;
-						if (current_trigger->Local) {
-							wyrmgus::game::get()->remove_local_trigger(current_trigger);
+			bool removed_trigger = false;
+
+			//old Lua conditions/effects for triggers
+			if (current_trigger->Conditions != nullptr && current_trigger->Effects != nullptr) {
+				try {
+					current_trigger->Conditions->pushPreamble();
+					current_trigger->Conditions->run(1);
+					if (current_trigger->Conditions->popBoolean()) {
+						current_trigger->Effects->pushPreamble();
+						current_trigger->Effects->run(1);
+						if (current_trigger->Effects->popBoolean() == false) {
+							trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
+							trigger::ActiveTriggers.erase(trigger::ActiveTriggers.begin() + trigger::CurrentTriggerId);
+							removed_trigger = true;
+							if (current_trigger->Local) {
+								game::get()->remove_local_trigger(current_trigger);
+							}
+						}
+					}
+				} catch (...) {
+					std::throw_with_nested(std::runtime_error("Lua error for trigger \"" + current_trigger->get_identifier() + "\"."));
+				}
+			}
+
+			if (!removed_trigger && current_trigger->get_effects() != nullptr) {
+				bool triggered = false;
+
+				if (current_trigger->Type == trigger::TriggerType::GlobalTrigger) {
+					if (check_conditions(current_trigger, CPlayer::get_neutral_player())) {
+						triggered = true;
+						context ctx;
+						ctx.current_player = CPlayer::get_neutral_player();
+						current_trigger->get_effects()->do_effects(CPlayer::get_neutral_player(), ctx);
+					}
+				} else if (current_trigger->Type == trigger::TriggerType::PlayerTrigger) {
+					for (int i = 0; i < PlayerNumNeutral; ++i) {
+						CPlayer *player = CPlayer::Players[i].get();
+						if (player->get_type() == player_type::nobody) {
+							continue;
+						}
+						if (!check_conditions(current_trigger, player)) {
+							continue;
+						}
+						triggered = true;
+						context ctx;
+						ctx.current_player = player;
+						current_trigger->get_effects()->do_effects(player, ctx);
+						if (current_trigger->fires_only_once()) {
+							break;
 						}
 					}
 				}
-			} catch (...) {
-				std::throw_with_nested(std::runtime_error("Lua error for trigger \"" + current_trigger->get_identifier() + "\"."));
-			}
-		}
-		
-		if (!removed_trigger && current_trigger->get_effects() != nullptr) {
-			bool triggered = false;
-			
-			if (current_trigger->Type == wyrmgus::trigger::TriggerType::GlobalTrigger) {
-				if (check_conditions(current_trigger, CPlayer::get_neutral_player())) {
-					triggered = true;
-					wyrmgus::context ctx;
-					ctx.current_player = CPlayer::get_neutral_player();
-					current_trigger->get_effects()->do_effects(CPlayer::get_neutral_player(), ctx);
-				}
-			} else if (current_trigger->Type == wyrmgus::trigger::TriggerType::PlayerTrigger) {
-				for (int i = 0; i < PlayerNumNeutral; ++i) {
-					CPlayer *player = CPlayer::Players[i].get();
-					if (player->get_type() == player_type::nobody) {
-						continue;
-					}
-					if (!check_conditions(current_trigger, player)) {
-						continue;
-					}
-					triggered = true;
-					wyrmgus::context ctx;
-					ctx.current_player = player;
-					current_trigger->get_effects()->do_effects(player, ctx);
-					if (current_trigger->fires_only_once()) {
-						break;
+
+				if (triggered && current_trigger->fires_only_once()) {
+					trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
+					trigger::ActiveTriggers.erase(trigger::ActiveTriggers.begin() + trigger::CurrentTriggerId);
+					removed_trigger = true;
+					if (current_trigger->Local) {
+						game::get()->remove_local_trigger(current_trigger);
 					}
 				}
 			}
-			
-			if (triggered && current_trigger->fires_only_once()) {
-				wyrmgus::trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
-				wyrmgus::trigger::ActiveTriggers.erase(wyrmgus::trigger::ActiveTriggers.begin() + wyrmgus::trigger::CurrentTriggerId);
-				removed_trigger = true;
-				if (current_trigger->Local) {
-					wyrmgus::game::get()->remove_local_trigger(current_trigger);
-				}
+
+			if (!removed_trigger) {
+				trigger::CurrentTriggerId++;
 			}
+		} else {
+			trigger::CurrentTriggerId = 0;
 		}
-		
-		if (!removed_trigger) {
-			wyrmgus::trigger::CurrentTriggerId++;
-		}
-	} else {
-		wyrmgus::trigger::CurrentTriggerId = 0;
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error executing the per cycle actions for triggers."));
 	}
 }
 
