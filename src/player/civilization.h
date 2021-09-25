@@ -131,7 +131,7 @@ public:
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int get_force_type_weight(const ai_force_type force_type) const;
 
-	interface_style *get_interface_style() const
+	wyrmgus::interface_style *get_interface_style() const
 	{
 		return this->interface_style;
 	}

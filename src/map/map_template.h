@@ -655,7 +655,7 @@ public:
 		return this->default_astrocoordinate_reference_subtemplate;
 	}
 
-	const georectangle &get_georectangle() const
+	const wyrmgus::georectangle &get_georectangle() const
 	{
 		return this->georectangle;
 	}
@@ -773,7 +773,7 @@ public:
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
 private:
 	wyrmgus::map_projection *map_projection = nullptr;
-	georectangle georectangle;
+	wyrmgus::georectangle georectangle;
 	decimillesimal_int astrodistance_multiplier = decimillesimal_int(1);
 	int astrodistance_additive_modifier = 0;
 	map_template *default_astrocoordinate_reference_subtemplate = nullptr;
