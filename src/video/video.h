@@ -63,7 +63,7 @@ protected:
 	static inline std::shared_mutex mutex;
 
 public:
-	explicit CGraphic(const std::filesystem::path &filepath, const wyrmgus::player_color *conversible_player_color = nullptr)
+	explicit CGraphic(const std::filesystem::path &filepath, const player_color *conversible_player_color = nullptr)
 		: filepath(filepath), conversible_player_color(conversible_player_color)
 	{
 		if (filepath.empty()) {
@@ -411,14 +411,14 @@ private:
 class CPlayerColorGraphic final : public CGraphic
 {
 public:
-	explicit CPlayerColorGraphic(const std::filesystem::path &filepath, const wyrmgus::player_color *conversible_player_color)
+	explicit CPlayerColorGraphic(const std::filesystem::path &filepath, const player_color *conversible_player_color)
 		: CGraphic(filepath, conversible_player_color)
 	{
 	}
 
 	void DrawPlayerColorSub(const color_modification &color_modification, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawPlayerColorSubClip(const color_modification &color_modification, int gx, int gy, int w, int h, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawPlayerColorFrameClipX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands);
+	void DrawPlayerColorFrameClipX(const player_color *player_color, unsigned frame, int x, int y, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void DrawPlayerColorFrameClip(const player_color *player_color, const unsigned frame, const int x, const int y, const time_of_day *time_of_day, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands);
 
@@ -435,9 +435,9 @@ public:
 		this->DrawPlayerColorFrameClipTrans(player_color, frame, x, y, alpha, time_of_day, 100, render_commands);
 	}
 
-	static std::shared_ptr<CPlayerColorGraphic> New(const std::string &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color);
+	static std::shared_ptr<CPlayerColorGraphic> New(const std::string &filepath, const QSize &size, const player_color *conversible_player_color);
 
-	static std::shared_ptr<CPlayerColorGraphic> New(const std::filesystem::path &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color)
+	static std::shared_ptr<CPlayerColorGraphic> New(const std::filesystem::path &filepath, const QSize &size, const player_color *conversible_player_color)
 	{
 		return CPlayerColorGraphic::New(filepath.string(), size, conversible_player_color);
 	}

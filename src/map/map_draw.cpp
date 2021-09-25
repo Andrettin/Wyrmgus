@@ -121,7 +121,7 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 // Convert viewport coordinates into map pixel coordinates
 PixelPos CViewport::screen_to_map_pixel_pos(const PixelPos &screenPixelPos) const
 {
-	return this->screen_to_scaled_map_pixel_pos(screenPixelPos) / wyrmgus::defines::get()->get_scale_factor();
+	return this->screen_to_scaled_map_pixel_pos(screenPixelPos) / defines::get()->get_scale_factor();
 }
 
 PixelPos CViewport::screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPos) const
@@ -135,7 +135,7 @@ PixelPos CViewport::screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPo
 // Convert map pixel coordinates into viewport coordinates
 PixelPos CViewport::map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const
 {
-	return this->scaled_map_to_screen_pixel_pos(mapPixelPos * wyrmgus::defines::get()->get_scale_factor());
+	return this->scaled_map_to_screen_pixel_pos(mapPixelPos * defines::get()->get_scale_factor());
 }
 
 PixelPos CViewport::scaled_map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const
@@ -167,7 +167,7 @@ PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 {
 	const PixelPos topLeft = TilePosToScreen_TopLeft(tilePos);
 
-	return topLeft + wyrmgus::size::to_point(wyrmgus::defines::get()->get_scaled_tile_size()) / 2;
+	return topLeft + size::to_point(defines::get()->get_scaled_tile_size()) / 2;
 }
 
 /// convert tilepos coordonates into screen (take the center of the tile)
@@ -192,27 +192,27 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const PixelSize pixelSize = this->GetPixelSize();
 
-	x = std::min(x, (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * defines::get()->get_scaled_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * defines::get()->get_scaled_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
-	this->MapPos.x = x / wyrmgus::defines::get()->get_scaled_tile_width();
-	if (x < 0 && x % wyrmgus::defines::get()->get_scaled_tile_width()) {
+	this->MapPos.x = x / defines::get()->get_scaled_tile_width();
+	if (x < 0 && x % defines::get()->get_scaled_tile_width()) {
 		this->MapPos.x--;
 	}
-	this->MapPos.y = y / wyrmgus::defines::get()->get_scaled_tile_height();
-	if (y < 0 && y % wyrmgus::defines::get()->get_scaled_tile_height()) {
+	this->MapPos.y = y / defines::get()->get_scaled_tile_height();
+	if (y < 0 && y % defines::get()->get_scaled_tile_height()) {
 		this->MapPos.y--;
 	}
-	this->Offset.x = x % wyrmgus::defines::get()->get_scaled_tile_width();
+	this->Offset.x = x % defines::get()->get_scaled_tile_width();
 	if (this->Offset.x < 0) {
-		this->Offset.x += wyrmgus::defines::get()->get_scaled_tile_width();
+		this->Offset.x += defines::get()->get_scaled_tile_width();
 	}
-	this->Offset.y = y % wyrmgus::defines::get()->get_scaled_tile_height();
+	this->Offset.y = y % defines::get()->get_scaled_tile_height();
 	if (this->Offset.y < 0) {
-		this->Offset.y += wyrmgus::defines::get()->get_scaled_tile_height();
+		this->Offset.y += defines::get()->get_scaled_tile_height();
 	}
-	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / wyrmgus::defines::get()->get_scaled_tile_width() + 1;
-	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / wyrmgus::defines::get()->get_scaled_tile_height() + 1;
+	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / defines::get()->get_scaled_tile_width() + 1;
+	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / defines::get()->get_scaled_tile_height() + 1;
 }
 
 /**
@@ -311,7 +311,7 @@ void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(rende
 			const bool is_unpassable = overlay_terrain && overlay_terrain->has_flag(tile_flag::impassable) && !vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
 			const bool is_space = terrain != nullptr && terrain->has_flag(tile_flag::space);
 
-			const wyrmgus::time_of_day *time_of_day = nullptr;
+			const time_of_day *time_of_day = nullptr;
 			if (!is_space) {
 				const bool is_underground = terrain != nullptr && terrain->has_flag(tile_flag::underground);
 				if (is_underground) {

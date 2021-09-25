@@ -110,7 +110,7 @@ enum EditorActionType {
 struct EditorAction {
 	EditorActionType Type;
 	Vec2i tilePos;
-	const wyrmgus::unit_type *UnitType;
+	const unit_type *UnitType;
 	CPlayer *Player;
 };
 
@@ -120,7 +120,7 @@ static std::deque<EditorAction> EditorRedoActions;
 /// Unit mode icon
 static int get_unit_icon_x()
 {
-	return IconWidth + 7 * wyrmgus::defines::get()->get_scale_factor();
+	return IconWidth + 7 * defines::get()->get_scale_factor();
 }
 
 static int get_unit_icon_y()
@@ -131,23 +131,23 @@ static int get_unit_icon_y()
 /// Tile mode icon
 static int get_tile_icon_x()
 {
-	return IconWidth * 2 + 16 * wyrmgus::defines::get()->get_scale_factor();
+	return IconWidth * 2 + 16 * defines::get()->get_scale_factor();
 }
 
 static int get_tile_icon_y()
 {
-	return 2 * wyrmgus::defines::get()->get_scale_factor();
+	return 2 * defines::get()->get_scale_factor();
 }
 
 /// Start mode icon
 static int get_start_icon_x()
 {
-	return IconWidth * 3 + 16 * wyrmgus::defines::get()->get_scale_factor();
+	return IconWidth * 3 + 16 * defines::get()->get_scale_factor();
 }
 
 static int get_start_icon_y()
 {
-	return 2 * wyrmgus::defines::get()->get_scale_factor();
+	return 2 * defines::get()->get_scale_factor();
 }
 
 static void EditorUndoAction();
@@ -216,7 +216,7 @@ static void EditTile(const Vec2i &pos, const terrain_type *terrain, const Qt::Ke
 {
 	assert_throw(CMap::get()->Info->IsPointOnMap(pos, UI.CurrentMapLayer));
 	
-	wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
+	tile &mf = *UI.CurrentMapLayer->Field(pos);
 	
 	//Wyrmgus start
 	int value = 0;
@@ -362,7 +362,7 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 					
 					if (CMap::get()->Info->IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						for (int overlay = 1; overlay >= 0; --overlay) {
-							const wyrmgus::terrain_type *adjacent_terrain = CMap::get()->GetTileTerrain(adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
+							const terrain_type *adjacent_terrain = CMap::get()->GetTileTerrain(adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
 							if (!adjacent_terrain || adjacent_terrain == CMap::get()->GetTileTerrain(changed_tiles[i], overlay > 0, UI.CurrentMapLayer->ID)) {
 								continue;
 							}
@@ -580,7 +580,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const unit_type &type, CPlay
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
 */
-static void EditorPlaceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *player)
+static void EditorPlaceUnit(const Vec2i &pos, const unit_type &type, CPlayer *player)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypePlaceUnit;
@@ -698,8 +698,8 @@ static int CalculateVisibleIcons(bool tiles = false)
 	int h;
 
 	if (tiles) {
-		w = wyrmgus::defines::get()->get_scaled_tile_width();//+2,
-		h = wyrmgus::defines::get()->get_scaled_tile_height();//+2
+		w = defines::get()->get_scaled_tile_width();//+2,
+		h = defines::get()->get_scaled_tile_height();//+2
 	} else {
 		w = IconWidth;
 		h = IconHeight;
@@ -727,7 +727,7 @@ static void CalculateMaxIconSize()
 	IconWidth = 0;
 	IconHeight = 0;
 	for (unsigned int i = 0; i < CEditor::get()->UnitTypes.size(); ++i) {
-		const unit_type *type = wyrmgus::unit_type::get(CEditor::get()->UnitTypes[i]);
+		const unit_type *type = unit_type::get(CEditor::get()->UnitTypes[i]);
 		assert_throw(type->get_icon() != nullptr);
 		const icon *icon = type->get_icon();
 
@@ -747,7 +747,7 @@ void RecalculateShownUnits()
 	CEditor::get()->ShownUnitTypes.clear();
 
 	for (size_t i = 0; i != CEditor::get()->UnitTypes.size(); ++i) {
-		const wyrmgus::unit_type *type = wyrmgus::unit_type::get(CEditor::get()->UnitTypes[i]);
+		const unit_type *type = unit_type::get(CEditor::get()->UnitTypes[i]);
 		CEditor::get()->ShownUnitTypes.push_back(type);
 	}
 
@@ -768,9 +768,9 @@ void RecalculateShownUnits()
 */
 static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 	std::array<char, 256> buf{};
-	CLabel label(wyrmgus::defines::get()->get_small_font());
+	CLabel label(defines::get()->get_small_font());
 
 	//Wyrmgus start
 //	int x = UI.InfoPanel.X + 8;
@@ -841,7 +841,7 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 				strcat_s(buf.data(), buf.size(), "Computer");
 				break;
 		}
-		label.SetFont(wyrmgus::defines::get()->get_game_font());
+		label.SetFont(defines::get()->get_game_font());
 		label.Draw(x, y, buf.data(), render_commands);
 	}
 }
@@ -927,59 +927,37 @@ static void DrawUnitIcons(std::vector<std::function<void(renderer *)>> &render_c
 **  @param y        Y display position
 **  @param flags    State of the icon (::IconActive,::IconClicked,...)
 */
-static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsigned y, unsigned flags, std::vector<std::function<void(renderer *)>> &render_commands)
+static void DrawTileIcon(const terrain_type *terrain, unsigned x, unsigned y, unsigned flags, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	//Wyrmgus start
-	/*
-	uint32_t color = (flags & IconActive) ? ColorGray : ColorBlack;
-
-	Video.DrawRectangleClip(color, x, y, wyrmgus::defines::get()->get_scaled_tile_width() + 7, wyrmgus::defines::get()->get_scaled_tile_height() + 7);
-	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, wyrmgus::defines::get()->get_scaled_tile_width() + 5, wyrmgus::defines::get()->get_scaled_tile_height() + 5);
-
-	Video.DrawVLine(ColorGray, x + wyrmgus::defines::get()->get_scaled_tile_width() + 4, y + 5, wyrmgus::defines::get()->get_scaled_tile_height() - 1); // _|
-	Video.DrawVLine(ColorGray, x + wyrmgus::defines::get()->get_scaled_tile_width() + 5, y + 5, wyrmgus::defines::get()->get_scaled_tile_height() - 1);
-	Video.DrawHLine(ColorGray, x + 5, y + wyrmgus::defines::get()->get_scaled_tile_height() + 4, wyrmgus::defines::get()->get_scaled_tile_width() + 1);
-	Video.DrawHLine(ColorGray, x + 5, y + wyrmgus::defines::get()->get_scaled_tile_height() + 5, wyrmgus::defines::get()->get_scaled_tile_width() + 1);
-
-	color = (flags & IconClicked) ? ColorGray : ColorWhite;
-	Video.DrawHLine(color, x + 5, y + 3, wyrmgus::defines::get()->get_scaled_tile_width() + 1);
-	Video.DrawHLine(color, x + 5, y + 4, wyrmgus::defines::get()->get_scaled_tile_width() + 1);
-	Video.DrawVLine(color, x + 3, y + 3, wyrmgus::defines::get()->get_scaled_tile_height() + 3);
-	Video.DrawVLine(color, x + 4, y + 3, wyrmgus::defines::get()->get_scaled_tile_height() + 3);
-	*/
-	Video.DrawVLine(ColorGray, x + wyrmgus::defines::get()->get_scaled_tile_width() + 4 - 1, y + 5 - 1, wyrmgus::defines::get()->get_scaled_tile_height() - 1 - 1, render_commands); // _|
-	Video.DrawVLine(ColorGray, x + wyrmgus::defines::get()->get_scaled_tile_width() + 5 - 1, y + 5 - 1, wyrmgus::defines::get()->get_scaled_tile_height() - 1 - 1, render_commands);
-	Video.DrawHLine(ColorGray, x + 5 - 1, y + defines::get()->get_scaled_tile_height() + 4 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
-	Video.DrawHLine(ColorGray, x + 5 - 1, y + wyrmgus::defines::get()->get_scaled_tile_height() + 5 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
+	Video.DrawVLine(ColorGray, x + defines::get()->get_scaled_tile_width() + 4 - 1, y + 5 - 1, defines::get()->get_scaled_tile_height() - 1 - 1, render_commands); // _|
+	Video.DrawVLine(ColorGray, x + defines::get()->get_scaled_tile_width() + 5 - 1, y + 5 - 1, defines::get()->get_scaled_tile_height() - 1 - 1, render_commands);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + defines::get()->get_scaled_tile_height() + 4 - 1, defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + defines::get()->get_scaled_tile_height() + 5 - 1, defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
 
 	uint32_t color = (flags & IconClicked) ? ColorGray : ColorWhite;
-	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
-	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
-	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_height() + 3 - 1, render_commands);
-	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_height() + 3 - 1, render_commands);
+	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
+	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, defines::get()->get_scaled_tile_width() + 1 - 1, render_commands);
+	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, defines::get()->get_scaled_tile_height() + 3 - 1, render_commands);
+	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, defines::get()->get_scaled_tile_height() + 3 - 1, render_commands);
 	
 	color = (flags & IconActive) ? ColorGray : ColorBlack;
 
-	Video.DrawRectangleClip(color, x, y, wyrmgus::defines::get()->get_scaled_tile_width() + 7, wyrmgus::defines::get()->get_scaled_tile_height() + 7, render_commands);
-	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, wyrmgus::defines::get()->get_scaled_tile_width() + 5, wyrmgus::defines::get()->get_scaled_tile_height() + 5, render_commands);
-	//Wyrmgus end
+	Video.DrawRectangleClip(color, x, y, defines::get()->get_scaled_tile_width() + 7, defines::get()->get_scaled_tile_height() + 7, render_commands);
+	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, defines::get()->get_scaled_tile_width() + 5, defines::get()->get_scaled_tile_height() + 5, render_commands);
 
 	if (flags & IconClicked) {
 		++x;
 		++y;
 	}
 
-	x += 4;
-	y += 4;
-	//Wyrmgus start
-	x -= 1;
-	y -= 1;
-//	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
-	terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles().front(), x, y, render_commands);
-	//Wyrmgus end
+	x += 3;
+	y += 3;
+
+	const color_modification color_modification(terrain->get_hue_rotation(), color_set(), nullptr, nullptr);
+	terrain->get_graphics()->render_frame(terrain->get_solid_tiles().front(), QPoint(x, y), color_modification, render_commands);
 
 	if (flags & IconSelected) {
-		Video.DrawRectangleClip(ColorGreen, x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height(), render_commands);
+		Video.DrawRectangleClip(ColorGreen, x, y, defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height(), render_commands);
 	}
 }
 
@@ -992,8 +970,8 @@ static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsig
 */
 static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	CLabel label(wyrmgus::defines::get()->get_game_font());
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	CLabel label(defines::get()->get_game_font());
+	const int scale_factor = defines::get()->get_scale_factor();
 	int x = UI.InfoPanel.X + 46 * scale_factor;
 	int y = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 11 * scale_factor;
 
@@ -1070,64 +1048,55 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 	int i = CEditor::get()->TileIndex;
 	assert_throw(CEditor::get()->TileIndex != -1);
 	y = UI.ButtonPanel.Y + 24 * scale_factor;
-	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - wyrmgus::defines::get()->get_scaled_tile_height()) {
+	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - defines::get()->get_scaled_tile_height()) {
 		if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
 			break;
 		}
-		//Wyrmgus start
-//		x = UI.ButtonPanel.X + 10 * scale_factor;
-		x = UI.ButtonPanel.X + (10 + 6) * scale_factor;
-		//Wyrmgus end
-		while (x < UI.ButtonPanel.X + ButtonPanelWidth - wyrmgus::defines::get()->get_scaled_tile_width()) {
+
+		x = UI.ButtonPanel.X + 16 * scale_factor;
+
+		while (x < UI.ButtonPanel.X + ButtonPanelWidth - defines::get()->get_scaled_tile_width()) {
 			if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
 				break;
 			}
-			//Wyrmgus start
-//			const unsigned int tile = CEditor::get()->ShownTileTypes[i];
 
-//			Map.TileGraphic->DrawFrameClip(tile, x, y);
+			const terrain_type *terrain = CEditor::get()->ShownTileTypes[i];
 
-			const wyrmgus::terrain_type *terrain = CEditor::get()->ShownTileTypes[i];
-
-			if (terrain->get_graphics() && terrain->get_solid_tiles().size() > 0) {
-				terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles()[0], x, y, render_commands);
+			if (terrain->get_graphics() != nullptr && !terrain->get_solid_tiles().empty()) {
+				const color_modification color_modification(terrain->get_hue_rotation(), color_set(), nullptr, nullptr);
+				terrain->get_graphics()->render_frame(terrain->get_solid_tiles().front(), QPoint(x, y), color_modification, render_commands);
 			}
-			//Wyrmgus end
-			Video.DrawRectangleClip(ColorGray, x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height(), render_commands);
+
+			Video.DrawRectangleClip(ColorGray, x, y, defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height(), render_commands);
 
 			if (i == CEditor::get()->SelectedTileIndex) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-					wyrmgus::defines::get()->get_scaled_tile_width() - 2, wyrmgus::defines::get()->get_scaled_tile_height() - 2, render_commands);
+					defines::get()->get_scaled_tile_width() - 2, defines::get()->get_scaled_tile_height() - 2, render_commands);
 			}
 			if (i == CEditor::get()->CursorTileIndex) {
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-					wyrmgus::defines::get()->get_scaled_tile_width() + 2, wyrmgus::defines::get()->get_scaled_tile_height() + 2, render_commands);
+					defines::get()->get_scaled_tile_width() + 2, defines::get()->get_scaled_tile_height() + 2, render_commands);
 				CEditor::get()->PopUpX = x;
 				CEditor::get()->PopUpY = y;
 			}
 
-			//Wyrmgus start
-//			x += wyrmgus::defines::get()->get_scaled_tile_width() + 8 * scale_factor;
-			x += wyrmgus::defines::get()->get_scaled_tile_width() + 30 * scale_factor; // to allow 5 tile types per row with the new UI
-			//Wyrmgus end
+			x += defines::get()->get_scaled_tile_width() + 30 * scale_factor;
 			++i;
 		}
-		//Wyrmgus start
-//		y += wyrmgus::defines::get()->get_scaled_tile_height() + 2 * scale_factor;
-		y += wyrmgus::defines::get()->get_scaled_tile_height() + 18 * scale_factor; // make this space a little larger (as large as the space between the top of the panel and the first icon, minus the parts of the panel which are "lower" so to speak)
-		//Wyrmgus end
+
+		y += defines::get()->get_scaled_tile_height() + 18 * scale_factor;
 	}
 }
 
 static void DrawEditorPanel_SelectIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 //	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
 	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor, UI.InfoPanel.Y + 7 * scale_factor);
 	//Wyrmgus end
-	wyrmgus::icon *icon = CEditor::get()->Select.Icon;
+	icon *icon = CEditor::get()->Select.Icon;
 	assert_throw(icon != nullptr);
 	unsigned int flag = 0;
 	if (ButtonUnderCursor == SelectButton) {
@@ -1148,10 +1117,10 @@ static void DrawEditorPanel_SelectIcon(std::vector<std::function<void(renderer *
 
 static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x(), UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y());
-	wyrmgus::icon *icon = CEditor::get()->Units.Icon;
+	icon *icon = CEditor::get()->Units.Icon;
 	assert_throw(icon != nullptr);
 	unsigned int flag = 0;
 	if (ButtonUnderCursor == UnitButton) {
@@ -1172,7 +1141,7 @@ static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)
 
 static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	int x = UI.InfoPanel.X + 11 * scale_factor;
 	int y = UI.InfoPanel.Y + 5 * scale_factor;
@@ -1223,7 +1192,7 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 */
 static void DrawEditorPanel(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	DrawEditorPanel_SelectIcon(render_commands);
 	DrawEditorPanel_UnitsIcon(render_commands);
@@ -1236,6 +1205,7 @@ static void DrawEditorPanel(std::vector<std::function<void(renderer *)>> &render
 					 (ButtonUnderCursor == TileButton ? IconActive : 0) |
 					 (CEditor::get()->State == EditorEditTile ? IconSelected : 0), render_commands);
 	}
+
 	DrawEditorPanel_StartIcon(render_commands);
 
 	switch (CEditor::get()->State) {
@@ -1287,21 +1257,19 @@ static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_c
 		const PixelPos screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
 
 		if (CEditor::get()->State == EditorEditTile && CEditor::get()->SelectedTileIndex != -1) {
-			//Wyrmgus start
-//			const unsigned short tile = CEditor::get()->ShownTileTypes[CEditor::get()->SelectedTileIndex];
-			const wyrmgus::terrain_type *terrain = CEditor::get()->ShownTileTypes[CEditor::get()->SelectedTileIndex];
-			//Wyrmgus end
+			const terrain_type *terrain = CEditor::get()->ShownTileTypes[CEditor::get()->SelectedTileIndex];
+
 			PushClipping();
 			UI.MouseViewport->SetClipping();
 
 			PixelPos screenPosIt;
 			for (int j = 0; j < TileCursorSize; ++j) {
-				screenPosIt.y = screenPos.y + j * wyrmgus::defines::get()->get_scaled_tile_height();
+				screenPosIt.y = screenPos.y + j * defines::get()->get_scaled_tile_height();
 				if (screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y) {
 					break;
 				}
 				for (int i = 0; i < TileCursorSize; ++i) {
-					screenPosIt.x = screenPos.x + i * wyrmgus::defines::get()->get_scaled_tile_width();
+					screenPosIt.x = screenPos.x + i * defines::get()->get_scaled_tile_width();
 					if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x) {
 						break;
 					}
@@ -1314,7 +1282,7 @@ static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_c
 					//Wyrmgus end
 				}
 			}
-			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, wyrmgus::defines::get()->get_scaled_tile_width() * TileCursorSize, wyrmgus::defines::get()->get_scaled_tile_height() * TileCursorSize, render_commands);
+			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, defines::get()->get_scaled_tile_width() * TileCursorSize, defines::get()->get_scaled_tile_height() * TileCursorSize, render_commands);
 			PopClipping();
 		} else {
 			// If there is an unit under the cursor, it's selection thing
@@ -1322,7 +1290,7 @@ static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_c
 			if (UnitUnderCursor != nullptr) {
 				PushClipping();
 				UI.MouseViewport->SetClipping();
-				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height(), render_commands);
+				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height(), render_commands);
 				PopClipping();
 			}
 		}
@@ -1345,7 +1313,7 @@ static void DrawCross(const PixelPos &topleft_pos, const QSize &size, uint32_t c
 */
 static void DrawStartLocations(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const wyrmgus::unit_type *type = CEditor::get()->StartUnit;
+	const unit_type *type = CEditor::get()->StartUnit;
 	for (const CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		PushClipping();
 		vp->SetClipping();
@@ -1379,12 +1347,12 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 		pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 	}
 
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	std::array<char, 256> buf{};
 	snprintf(buf.data(), buf.size(), _("Editor (%d %d)"), pos.x, pos.y);
-	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 2 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data(), render_commands);
-	const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
+	CLabel(defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 2 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data(), render_commands);
+	const tile &mf = *UI.CurrentMapLayer->Field(pos);
 	//
 	// Flags info
 	//
@@ -1434,10 +1402,8 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 	}
 	snprintf(buf.data(), buf.size(), "%s", terrain_name.c_str());
 	//Wyrmgus end
-	//Wyrmgus start
-//	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
-	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 298 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data(), render_commands);
-	//Wyrmgus end
+
+	CLabel(defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 298 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data(), render_commands);
 #endif
 }
 
@@ -1691,13 +1657,13 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 			} else if (CEditor::get()->State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
-						PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_success_sound(), MaxSampleVolume);
+						PlayGameSound(game_sound_set::get()->get_placement_success_sound(), MaxSampleVolume);
 						EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[CEditor::get()->SelectedPlayer].get());
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
 						UI.StatusLine.Set(_("Unit cannot be placed here."));
-						PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
+						PlayGameSound(game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 					}
 				}
 			} else if (CEditor::get()->State == EditorSetStartLocation) {
@@ -1901,7 +1867,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	LastDrawnButtonPopup = nullptr;
 	//Wyrmgus end
 
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	// Scrollbar
 	if (UI.ButtonPanel.X + 4 * scale_factor < CursorScreenPos.x
@@ -1967,7 +1933,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		//Wyrmgus start
 		if (i < (int) CEditor::get()->ShownUnitTypes.size()) {
 			if (j >= CurrentButtons.size()) {
-				CurrentButtons.push_back(std::make_unique<wyrmgus::button>());
+				CurrentButtons.push_back(std::make_unique<button>());
 			}
 			CurrentButtons[j]->Hint = CEditor::get()->ShownUnitTypes[i]->get_name();
 			CurrentButtons[j]->pos = j;
@@ -1990,7 +1956,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 {
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 //	int bx = UI.InfoPanel.X + 4;
@@ -2015,7 +1981,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 
 	int i = CEditor::get()->TileIndex;
 	by = UI.ButtonPanel.Y + 24 * scale_factor;
-	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - wyrmgus::defines::get()->get_scaled_tile_height()) {
+	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - defines::get()->get_scaled_tile_height()) {
 		if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
 			break;
 		}
@@ -2023,12 +1989,12 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 //		bx = UI.ButtonPanel.X + 10;
 		bx = UI.ButtonPanel.X + (10 + 6) * scale_factor;
 		//Wyrmgus end
-		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - wyrmgus::defines::get()->get_scaled_tile_width()) {
+		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - defines::get()->get_scaled_tile_width()) {
 			if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
 				break;
 			}
-			if (bx < screenPos.x && screenPos.x < bx + wyrmgus::defines::get()->get_scaled_tile_width()
-				&& by < screenPos.y && screenPos.y < by + wyrmgus::defines::get()->get_scaled_tile_height()) {
+			if (bx < screenPos.x && screenPos.x < bx + defines::get()->get_scaled_tile_width()
+				&& by < screenPos.y && screenPos.y < by + defines::get()->get_scaled_tile_height()) {
 				//Wyrmgus start
 //				const int tile = CEditor::get()->ShownTileTypes[i];
 //				const int tileindex = Map.Tileset->findTileIndexByTile(tile);
@@ -2039,16 +2005,12 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 				CEditor::get()->CursorTileIndex = i;
 				return true;
 			}
-			//Wyrmgus start
-//			bx += wyrmgus::defines::get()->get_scaled_tile_width() + 8;
-			bx += wyrmgus::defines::get()->get_scaled_tile_width() + 30 * scale_factor;
-			//Wyrmgus end
+
+			bx += defines::get()->get_scaled_tile_width() + 30 * scale_factor;
 			i++;
 		}
-		//Wyrmgus start
-//		by += wyrmgus::defines::get()->get_scaled_tile_height() + 2;
-		by += wyrmgus::defines::get()->get_scaled_tile_height() + 18 * scale_factor;
-		//Wyrmgus end
+
+		by += defines::get()->get_scaled_tile_height() + 18 * scale_factor;
 	}
 	return false;
 }
@@ -2063,7 +2025,7 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 	static int LastMapX = 0;
 	static int LastMapY = 0;
 
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	PixelPos restrictPos = pos;
 	HandleCursorMove(&restrictPos.x, &restrictPos.y); // Reduce to screen
@@ -2090,18 +2052,18 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		// Scroll the map
 		if (CursorScreenPos.x <= UI.SelectedViewport->GetTopLeftPos().x) {
 			vpTilePos.x--;
-			UI.SelectedViewport->Set(vpTilePos, wyrmgus::defines::get()->get_scaled_tile_size() / 2);
+			UI.SelectedViewport->Set(vpTilePos, defines::get()->get_scaled_tile_size() / 2);
 		} else if (CursorScreenPos.x >= UI.SelectedViewport->GetBottomRightPos().x) {
 			vpTilePos.x++;
-			UI.SelectedViewport->Set(vpTilePos, wyrmgus::defines::get()->get_scaled_tile_size() / 2);
+			UI.SelectedViewport->Set(vpTilePos, defines::get()->get_scaled_tile_size() / 2);
 		}
 
 		if (CursorScreenPos.y <= UI.SelectedViewport->GetTopLeftPos().y) {
 			vpTilePos.y--;
-			UI.SelectedViewport->Set(vpTilePos, wyrmgus::defines::get()->get_scaled_tile_size() / 2);
+			UI.SelectedViewport->Set(vpTilePos, defines::get()->get_scaled_tile_size() / 2);
 		} else if (CursorScreenPos.y >= UI.SelectedViewport->GetBottomRightPos().y) {
 			vpTilePos.y++;
-			UI.SelectedViewport->Set(vpTilePos, wyrmgus::defines::get()->get_scaled_tile_size() / 2);
+			UI.SelectedViewport->Set(vpTilePos, defines::get()->get_scaled_tile_size() / 2);
 		}
 
 		// Scroll the map, if cursor moves outside the viewport.
@@ -2182,9 +2144,9 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 	}
 	if (CEditor::get()->TerrainEditable) {
 		if (UI.InfoPanel.X + 11 * scale_factor + get_tile_icon_x() < CursorScreenPos.x
-			&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_tile_icon_x() + wyrmgus::defines::get()->get_scaled_tile_width() + 7 * scale_factor
+			&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_tile_icon_x() + defines::get()->get_scaled_tile_width() + 7 * scale_factor
 			&& UI.InfoPanel.Y + 4 * scale_factor + get_tile_icon_y() < CursorScreenPos.y
-			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 * scale_factor + get_tile_icon_y() + wyrmgus::defines::get()->get_scaled_tile_height() + 7 * scale_factor) {
+			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 * scale_factor + get_tile_icon_y() + defines::get()->get_scaled_tile_height() + 7 * scale_factor) {
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = cursor_on::button;
@@ -2193,8 +2155,8 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		}
 	}
 
-	int StartUnitWidth = CEditor::get()->StartUnit ? CEditor::get()->StartUnit->get_icon()->get_graphics()->Width : wyrmgus::defines::get()->get_scaled_tile_width() + 7 * scale_factor;
-	int StartUnitHeight = CEditor::get()->StartUnit ? CEditor::get()->StartUnit->get_icon()->get_graphics()->Height : wyrmgus::defines::get()->get_scaled_tile_height() + 7 * scale_factor;
+	int StartUnitWidth = CEditor::get()->StartUnit ? CEditor::get()->StartUnit->get_icon()->get_graphics()->Width : defines::get()->get_scaled_tile_width() + 7 * scale_factor;
+	int StartUnitHeight = CEditor::get()->StartUnit ? CEditor::get()->StartUnit->get_icon()->get_graphics()->Height : defines::get()->get_scaled_tile_height() + 7 * scale_factor;
 	if (UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() < CursorScreenPos.x
 		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() + StartUnitWidth
 		&& UI.InfoPanel.Y + 5 * scale_factor + get_start_icon_y() < CursorScreenPos.y
@@ -2270,7 +2232,7 @@ void CEditor::Init()
 	//Wyrmgus start
 	if (this->UnitTypes.size() == 0) {
 		//if editor's unit types vector is still empty after loading the editor's lua file, then fill it automatically
-		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		for (const unit_type *unit_type : unit_type::get_all()) {
 			if (unit_type->is_template()) {
 				continue;
 			}
@@ -2304,7 +2266,7 @@ void CEditor::Init()
 				CMap::get()->Info->player_types[i] = player_type::neutral;
 				//Wyrmgus start
 //				CMap::get()->Info->PlayerSide[i] = CPlayer::Players[i]->Race = 0;
-				CPlayer::Players[i]->set_civilization(wyrmgus::defines::get()->get_neutral_civilization());
+				CPlayer::Players[i]->set_civilization(defines::get()->get_neutral_civilization());
 				CMap::get()->Info->PlayerSide[i] = CPlayer::Players[i]->Race;
 				//Wyrmgus end
 			} else {
@@ -2314,7 +2276,7 @@ void CEditor::Init()
 		}
 
 		//Wyrmgus start
-//		Map.Fields = new wyrmgus::tile[Map.Info.MapWidth * Map.Info.MapHeight];
+//		Map.Fields = new tile[Map.Info.MapWidth * Map.Info.MapHeight];
 		CMap::get()->ClearMapLayers();
 		auto new_map_layer = std::make_unique<CMapLayer>(CMap::get()->Info->MapWidth, CMap::get()->Info->MapHeight);
 
@@ -2377,7 +2339,7 @@ void CEditor::Init()
 //	ButtonPanelWidth = 170;//200;
 //	ButtonPanelHeight = 160 + (Video.Height - 480);
 	// adapt to new UI size, should make this more scriptable
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 	ButtonPanelWidth = 243 * scale_factor;
 	ButtonPanelHeight = 186 * scale_factor;
 	//Wyrmgus end
@@ -2386,7 +2348,7 @@ void CEditor::Init()
 	VisibleUnitIcons = CalculateVisibleIcons();
 
 	if (!StartUnitName.empty()) {
-		StartUnit = wyrmgus::unit_type::get(StartUnitName);
+		StartUnit = unit_type::get(StartUnitName);
 	}
 	Select.Icon = nullptr;
 	Select.Load();
@@ -2396,7 +2358,7 @@ void CEditor::Init()
 	//Wyrmgus start
 //	Map.Tileset->fillSolidTiles(&CEditor::get()->ShownTileTypes);
 	CEditor::get()->ShownTileTypes.clear();
-	for (wyrmgus::terrain_type *terrain_type : wyrmgus::terrain_type::get_all()) {
+	for (terrain_type *terrain_type : terrain_type::get_all()) {
 		if (!terrain_type->is_hidden()) {
 			CEditor::get()->ShownTileTypes.push_back(terrain_type);
 		}
@@ -2456,7 +2418,7 @@ std::string get_user_maps_path()
 */
 void EditorMainLoop()
 {
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const int scale_factor = defines::get()->get_scale_factor();
 
 	bool OldCommandLogDisabled = CommandLogDisabled;
 	const EventCallback *old_callbacks = GetCallbacks();
