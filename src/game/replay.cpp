@@ -331,7 +331,7 @@ static void SaveFullLog(CFile &file)
 		file.printf(" Faction = %d,", CurrentReplay->Players[i].Faction);
 		//Wyrmgus end
 		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
-		file.printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
+		file.printf(" Type = %d }%s", static_cast<int>(CurrentReplay->Players[i].Type),
 					i != PlayerMax - 1 ? ",\n" : "\n");
 	}
 	file.printf("  },\n");

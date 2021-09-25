@@ -411,7 +411,7 @@ void SaveGameSettings(CFile &file)
 		file.printf("GameSettings.Presets[%d].AIScript = \"%s\"\n", i, GameSettings.Presets[i].AIScript.c_str());
 		file.printf("GameSettings.Presets[%d].Race = %d\n", i, GameSettings.Presets[i].Race);
 		file.printf("GameSettings.Presets[%d].Team = %d\n", i, GameSettings.Presets[i].Team);
-		file.printf("GameSettings.Presets[%d].Type = %d\n", i, GameSettings.Presets[i].Type);
+		file.printf("GameSettings.Presets[%d].Type = %d\n", i, static_cast<int>(GameSettings.Presets[i].Type));
 	}
 	file.printf("GameSettings.Resources = %d\n", GameSettings.Resources);
 	file.printf("GameSettings.Difficulty = %d\n", GameSettings.Difficulty);
