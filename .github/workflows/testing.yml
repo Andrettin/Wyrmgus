@@ -24,8 +24,8 @@ jobs:
       matrix:
         container:
           - bergentroll/wyrmgus:bullseye
-          - bergentroll/wyrmgus:focal
           - bergentroll/wyrmgus:groovy
+          - andrettin/wyrmgus:focal
     container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v2

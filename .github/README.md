@@ -17,5 +17,5 @@ Read [doc/install.html](../doc/install.html) for Stratagus installation instruct
 
 Read [doc/changelog.html](../doc/changelog.html) for the Stratagus changelog.
 
-Look at [.github/README_ACTIONS.md](./README_ACTIONS.md) for Wyrmsung GitHub
+Look at [.github/README_ACTIONS.md](./README_ACTIONS.md) for Wyrmsun GitHub
 Actions starting point.
