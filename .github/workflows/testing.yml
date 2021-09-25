@@ -23,9 +23,9 @@ jobs:
       fail-fast: false
       matrix:
         container:
-          - bergentroll/wyrmgus:bullseye
-          - bergentroll/wyrmgus:groovy
+          - andrettin/wyrmgus:bullseye
           - andrettin/wyrmgus:focal
+          - andrettin/wyrmgus:groovy
     container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v2
