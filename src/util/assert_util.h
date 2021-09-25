@@ -39,20 +39,20 @@ inline std::string get_source_relative_filepath_string(const std::string &filepa
 	return filepath;
 }
 
-#ifdef __clang__
-inline void assert_throw(const bool check)
-#else
+#ifdef __cpp_lib_source_location
 inline void assert_throw(const bool check, const std::source_location &location = std::source_location::current())
+#else
+inline void assert_throw(const bool check)
 #endif
 {
 	if (check) {
 		return;
 	}
 
-#ifdef __clang__
-	throw std::runtime_error("Assert failed.");
-#else
+#ifdef __cpp_lib_source_location
 	throw std::runtime_error("Assert failed at " + get_source_relative_filepath_string(location.file_name()) + ": " + std::to_string(location.line()) + ", " + location.function_name() + ".");
+#else
+	throw std::runtime_error("Assert failed.");
 #endif
 }
 

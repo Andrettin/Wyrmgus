@@ -54,7 +54,7 @@
 #include <random>
 #include <set>
 #include <shared_mutex>
-#ifndef __clang__
+#ifdef __cpp_lib_source_location
 #include <source_location>
 #endif
 #include <sstream>
