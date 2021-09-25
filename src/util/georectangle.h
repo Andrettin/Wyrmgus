@@ -48,57 +48,57 @@ public:
 	{
 	}
 
-	const geocoordinate &get_min_geocoordinate() const
+	constexpr const geocoordinate &get_min_geocoordinate() const
 	{
 		return this->min_geocoordinate;
 	}
 
-	const geocoordinate &get_max_geocoordinate() const
+	constexpr const geocoordinate &get_max_geocoordinate() const
 	{
 		return this->max_geocoordinate;
 	}
 
-	const decimillesimal_int &get_min_longitude() const
+	constexpr const decimillesimal_int &get_min_longitude() const
 	{
 		return this->get_min_geocoordinate().get_longitude();
 	}
 
-	void set_min_longitude(const decimillesimal_int &lon)
+	constexpr void set_min_longitude(const decimillesimal_int &lon)
 	{
 		this->min_geocoordinate.set_longitude(lon);
 	}
 
-	const decimillesimal_int &get_max_longitude() const
+	constexpr const decimillesimal_int &get_max_longitude() const
 	{
 		return this->get_max_geocoordinate().get_longitude();
 	}
 
-	void set_max_longitude(const decimillesimal_int &lon)
+	constexpr void set_max_longitude(const decimillesimal_int &lon)
 	{
 		this->max_geocoordinate.set_longitude(lon);
 	}
 
-	const decimillesimal_int &get_min_latitude() const
+	constexpr const decimillesimal_int &get_min_latitude() const
 	{
 		return this->get_min_geocoordinate().get_latitude();
 	}
 
-	void set_min_latitude(const decimillesimal_int &lat)
+	constexpr void set_min_latitude(const decimillesimal_int &lat)
 	{
 		this->min_geocoordinate.set_latitude(lat);
 	}
 
-	const decimillesimal_int &get_max_latitude() const
+	constexpr const decimillesimal_int &get_max_latitude() const
 	{
 		return this->get_max_geocoordinate().get_latitude();
 	}
 
-	void set_max_latitude(const decimillesimal_int &lat)
+	constexpr void set_max_latitude(const decimillesimal_int &lat)
 	{
 		this->max_geocoordinate.set_latitude(lat);
 	}
 
-	number_type get_width() const
+	constexpr number_type get_width() const
 	{
 		return this->get_max_geocoordinate().get_longitude() - this->get_min_geocoordinate().get_longitude();
 	}
