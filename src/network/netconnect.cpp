@@ -44,6 +44,7 @@
 #include "script.h"
 #include "settings.h"
 #include "ui/interface.h"
+#include "util/assert_util.h"
 #include "util/random.h"
 #include "util/util.h"
 #include "version.h"
@@ -617,7 +618,7 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 */
 int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host)
 {
-	Assert(NetConnectRunning != 0);
+	assert_throw(NetConnectRunning != 0);
 
 	CInitMessage_Header header;
 	header.Deserialize(buf.data());
@@ -691,7 +692,7 @@ void NetworkProcessServerRequest()
 */
 void NetworkServerStartGame()
 {
-	Assert(ServerSetupState.CompOpt[0] == 0);
+	assert_throw(ServerSetupState.CompOpt[0] == 0);
 
 	// save it first..
 	LocalSetupState = ServerSetupState;
@@ -806,7 +807,7 @@ void NetworkServerStartGame()
 	} else {
 		int j = h;
 		for (int i = 0; i < NetPlayers; ++i) {
-			Assert(j > 0);
+			assert_throw(j > 0);
 			int chosen = random::get()->generate_async(j);
 
 			n = num[chosen];
@@ -1047,9 +1048,9 @@ void NetworkGamePrepareGameSettings()
 
 #ifdef DEBUG
 	for (int i = 0; i != HostsCount; ++i) {
-		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == player_type::person);
+		assert_throw(GameSettings.Presets[Hosts[i].PlyNr].Type == player_type::person);
 	}
-	Assert(GameSettings.Presets[NetLocalPlayerNumber].Type == player_type::person);
+	assert_throw(GameSettings.Presets[NetLocalPlayerNumber].Type == player_type::person);
 #endif
 }
 

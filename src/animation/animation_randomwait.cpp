@@ -32,11 +32,12 @@
 
 #include "unit/unit.h"
 #include "util/string_util.h"
+#include "util/assert_util.h"
 #include "util/util.h"
 
 void CAnimation_RandomWait::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
+	assert_throw(unit.Anim.Anim == this);
 
 	const int arg1 = this->min_wait;
 	const int arg2 = this->max_wait;

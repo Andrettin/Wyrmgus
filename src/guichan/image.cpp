@@ -82,8 +82,7 @@ namespace gcn
     {
         if (mImageLoader == nullptr)
         {
-        	assert(!"I have no ImageLoader!");
-            //throw GCN_EXCEPTION("I have no ImageLoader!");
+            throw std::runtime_error("I have no ImageLoader!");
         }
 
         mLoadedWithImageLoader = true;

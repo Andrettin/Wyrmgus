@@ -33,6 +33,7 @@
 #include "database/defines.h"
 #include "map/map.h"
 #include "map/map_info.h"
+#include "util/assert_util.h"
 #include "util/util.h"
 
 /**
@@ -58,7 +59,7 @@ void MissileWhirlwind::Action()
 	const Vec2i center = CMap::get()->map_pixel_pos_to_tile_pos(pixelCenter + centerOffset);
 
 	//Wyrmgus start
-	Assert(this->Type->AttackSpeed);
+	assert_throw(this->Type->AttackSpeed != 0);
 //	if (!(this->TTL % CYCLES_PER_SECOND / 10)) {
 	if (!(this->TTL % CYCLES_PER_SECOND / this->Type->AttackSpeed)) { //AttackSpeed is by default 10
 	//Wyrmgus end

@@ -55,6 +55,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/path_util.h"
 #include "util/random.h"
 #include "version.h"
@@ -495,7 +496,7 @@ static int CclLog(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	Assert(CurrentReplay);
+	assert_throw(CurrentReplay != nullptr);
 
 	auto log = std::make_unique<LogEntry>();
 	log->UnitNumber = -1;
@@ -559,7 +560,7 @@ static int CclReplayLog(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	Assert(CurrentReplay == nullptr);
+	assert_throw(CurrentReplay == nullptr);
 
 	CurrentReplay = std::make_unique<FullReplay>();
 
@@ -760,7 +761,7 @@ void CleanReplayLog()
 */
 static void DoNextReplay()
 {
-	Assert(ReplayStep != 0);
+	assert_throw(ReplayStep != 0);
 
 	NextLogCycle = ReplayStep->GameCycle;
 
@@ -779,7 +780,7 @@ static void DoNextReplay()
 	const char *val = ReplayStep->Value.c_str();
 	const int num = ReplayStep->Num;
 
-	Assert(unitSlot == -1 || ReplayStep->UnitIdent == unit->Type->Ident);
+	assert_throw(unitSlot == -1 || ReplayStep->UnitIdent == unit->Type->Ident);
 
 	if (wyrmgus::random::get()->get_seed() != ReplayStep->SyncRandSeed) {
 #ifdef DEBUG
@@ -790,7 +791,7 @@ static void DoNextReplay()
 			CPlayer::GetThisPlayer()->Notify(_("Replay got out of sync (%lu)!"), GameCycle);
 			DebugPrint("OUT OF SYNC %u != %u\n" _C_ random::get()->get_seed() _C_ ReplayStep->SyncRandSeed);
 			DebugPrint("OUT OF SYNC GameCycle %lu \n" _C_ GameCycle);
-			Assert(0);
+			assert_throw(false);
 			// ReplayStep = 0;
 			// NextLogCycle = ~0UL;
 			// return;

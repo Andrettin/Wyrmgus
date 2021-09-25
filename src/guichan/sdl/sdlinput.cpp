@@ -83,8 +83,7 @@ namespace gcn
 
         if (mKeyInputQueue.empty())
         {
-        	assert(!"The queue is empty.");
-            //throw GCN_EXCEPTION("The queue is empty.");
+            throw std::runtime_error("The queue is empty.");
         }
 
         keyInput = mKeyInputQueue.front();
@@ -104,8 +103,7 @@ namespace gcn
 
         if (mMouseInputQueue.empty())
         {
-        	assert(!"The queue is empty.");
-            //throw GCN_EXCEPTION("The queue is empty.");
+            throw std::runtime_error("The queue is empty.");
         }
 
         mouseInput = mMouseInputQueue.front();

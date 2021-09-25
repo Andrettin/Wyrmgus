@@ -36,6 +36,7 @@
 #include "script.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 
 /**
 **  How many groups supported
@@ -74,10 +75,7 @@ public:
 	{
 		std::vector<CUnit *>::iterator it = find(units.begin(), units.end(), &unit);
 
-		//Wyrmgus start
-//		Assert(it == units.end());
-		Assert(it != units.end());
-		//Wyrmgus end
+		assert_throw(it != units.end());
 		*it = units.back();
 		units.pop_back();
 
@@ -136,7 +134,7 @@ void CleanGroups()
 
 bool IsGroupTainted(int num)
 {
-	Assert(num < NUM_GROUPS);
+	assert_throw(num < NUM_GROUPS);
 	return Groups[num].isTainted();
 }
 
@@ -149,7 +147,7 @@ bool IsGroupTainted(int num)
 */
 const std::vector<CUnit *> &GetUnitsOfGroup(int num)
 {
-	Assert(num < NUM_GROUPS);
+	assert_throw(num < NUM_GROUPS);
 	return Groups[num].getUnits();
 }
 
@@ -160,13 +158,13 @@ const std::vector<CUnit *> &GetUnitsOfGroup(int num)
 */
 void ClearGroup(int num)
 {
-	Assert(num < NUM_GROUPS);
+	assert_throw(num < NUM_GROUPS);
 	CUnitGroup &group = Groups[num];
 
 	for (size_t i = 0; i != group.getUnits().size(); ++i) {
 		CUnit &unit = *group.getUnits()[i];
 		unit.GroupId &= ~(1 << num);
-		Assert(!unit.Destroyed);
+		assert_throw(!unit.Destroyed);
 	}
 	group.init();
 }
@@ -180,7 +178,7 @@ void ClearGroup(int num)
 */
 void AddToGroup(CUnit **units, unsigned int nunits, int num)
 {
-	Assert(num <= NUM_GROUPS);
+	assert_throw(num <= NUM_GROUPS);
 
 	CUnitGroup &group = Groups[num];
 	for (size_t i = 0; group.getUnits().size() < MaxSelectable && i < nunits; ++i) {
@@ -203,7 +201,7 @@ void AddToGroup(CUnit **units, unsigned int nunits, int num)
 */
 void SetGroup(CUnit **units, unsigned int nunits, int num)
 {
-	Assert(num <= NUM_GROUPS && nunits <= MaxSelectable);
+	assert_throw(num <= NUM_GROUPS && nunits <= MaxSelectable);
 
 	ClearGroup(num);
 	AddToGroup(units, nunits, num);
@@ -216,7 +214,7 @@ void SetGroup(CUnit **units, unsigned int nunits, int num)
 */
 void RemoveUnitFromGroups(CUnit &unit)
 {
-	Assert(unit.GroupId != 0);  // unit doesn't belong to a group
+	assert_throw(unit.GroupId != 0);  // unit doesn't belong to a group
 
 	for (int num = 0; unit.GroupId; ++num, unit.GroupId >>= 1) {
 		if ((unit.GroupId & 1) != 1) {
@@ -236,7 +234,7 @@ void RemoveUnitFromGroups(CUnit &unit)
 */
 void RemoveUnitFromNonSingleGroups(CUnit &unit)
 {
-	Assert(unit.GroupId != 0);  // unit doesn't belong to a group
+	assert_throw(unit.GroupId != 0);  // unit doesn't belong to a group
 
 	for (int num = 0; num < NUM_GROUPS; ++num) {
 		CUnitGroup &group = Groups[num];
@@ -244,7 +242,7 @@ void RemoveUnitFromNonSingleGroups(CUnit &unit)
 		if (group.getUnits().size() > 1) {
 			for (size_t i = 0; i != group.getUnits().size(); ++i) {
 				if (group.getUnits()[i] == &unit) {
-					Assert(!unit.Destroyed);
+					assert_throw(!unit.Destroyed);
 					unit.GroupId &= ~(1 << num);
 					group.remove(unit);
 					break;

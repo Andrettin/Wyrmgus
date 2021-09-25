@@ -37,6 +37,7 @@
 #include "unit/unit_cache.h"
 #include "unit/unit_domain.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/fractional_int.h"
 
 class CPlayer;
@@ -310,9 +311,9 @@ private:
 template <bool circle, typename Pred>
 inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z, Pred pred)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(ltPos, z));
-	Assert(CMap::get()->Info->IsPointOnMap(rbPos, z));
-	Assert(units.empty());
+	assert_throw(CMap::get()->Info->IsPointOnMap(ltPos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(rbPos, z));
+	assert_throw(units.empty());
 	
 	decimillesimal_int middle_x;
 	decimillesimal_int middle_y;
@@ -420,8 +421,8 @@ inline void SelectAroundUnit(const CUnit &unit, const int range, std::vector<CUn
 template <typename Pred>
 CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(ltPos, z));
-	Assert(CMap::get()->Info->IsPointOnMap(rbPos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(ltPos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(rbPos, z));
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {

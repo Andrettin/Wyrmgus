@@ -34,11 +34,12 @@
 #include "player/player.h"
 #include "sound/sound.h"
 #include "unit/unit.h"
+#include "util/assert_util.h"
 #include "util/util.h"
 
 void CAnimation_RandomSound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
+	assert_throw(unit.Anim.Anim == this);
 
 	if (unit.IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
 		const size_t index = SyncRand(this->sounds.size());

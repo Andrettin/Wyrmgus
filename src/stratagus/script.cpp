@@ -71,6 +71,7 @@
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
 //Wyrmgus end
+#include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/number_util.h"
 #include "util/util.h"
@@ -439,10 +440,10 @@ void LuaGarbageCollect()
 */
 static void ParseBinOp(lua_State *l, BinOp *binop)
 {
-	Assert(l);
-	Assert(binop);
-	Assert(lua_istable(l, -1));
-	Assert(lua_rawlen(l, -1) == 2);
+	assert_throw(l != nullptr);
+	assert_throw(binop != nullptr);
+	assert_throw(lua_istable(l, -1));
+	assert_throw(lua_rawlen(l, -1) == 2);
 
 	lua_rawgeti(l, -1, 1); // left
 	binop->Left = CclParseNumberDesc(l);
@@ -465,8 +466,8 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 {
 	CUnit **res; // Result.
 
-	Assert(l);
-	Assert(s);
+	assert_throw(l != nullptr);
+	assert_throw(s != nullptr);
 	res = nullptr;
 	if (!strcmp(s, "Attacker")) {
 		res = &TriggerData.Attacker;
@@ -481,7 +482,7 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 	} else {
 		LuaError(l, "Invalid unit reference '%s'\n" _C_ s);
 	}
-	Assert(res); // Must check for error.
+	assert_throw(res != nullptr); // Must check for error.
 	return res;
 }
 
@@ -499,13 +500,13 @@ static const wyrmgus::unit_type **Str2TypeRef(lua_State *l, const char *s)
 {
 	const wyrmgus::unit_type **res = nullptr; // Result.
 
-	Assert(l);
+	assert_throw(l != nullptr);
 	if (!strcmp(s, "Type")) {
 		res = &TriggerData.Type;
 	} else {
 		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
 	}
-	Assert(res); // Must check for error.
+	assert_throw(res != nullptr); // Must check for error.
 	return res;
 }
 
@@ -524,13 +525,13 @@ static const CUpgrade **Str2UpgradeRef(lua_State *l, const char *s)
 {
 	const CUpgrade **res = nullptr; // Result.
 
-	Assert(l);
+	assert_throw(l != nullptr);
 	if (!strcmp(s, "Upgrade")) {
 		res = &TriggerData.Upgrade;
 	} else {
 		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
 	}
-	Assert(res); // Must check for error.
+	assert_throw(res != nullptr); // Must check for error.
 	return res;
 }
 
@@ -548,13 +549,13 @@ static const wyrmgus::resource **Str2ResourceRef(lua_State *l, const char *s)
 {
 	const wyrmgus::resource **res = nullptr; // Result.
 
-	Assert(l);
+	assert_throw(l != nullptr);
 	if (!strcmp(s, "Resource")) {
 		res = &TriggerData.resource;
 	} else {
 		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
 	}
-	Assert(res); // Must check for error.
+	assert_throw(res != nullptr); // Must check for error.
 	return res;
 }
 
@@ -572,13 +573,13 @@ static const wyrmgus::faction **Str2FactionRef(lua_State *l, const char *s)
 {
 	const wyrmgus::faction **res = nullptr; // Result.
 
-	Assert(l);
+	assert_throw(l != nullptr);
 	if (!strcmp(s, "Faction")) {
 		res = &TriggerData.faction;
 	} else {
 		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
 	}
-	Assert(res); // Must check for error.
+	assert_throw(res != nullptr); // Must check for error.
 	return res;
 }
 //Wyrmgus end
@@ -587,13 +588,13 @@ static const CPlayer **Str2PlayerRef(lua_State *l, const char *s)
 {
 	const CPlayer **res = nullptr; // Result.
 
-	Assert(l);
+	assert_throw(l != nullptr);
 	if (!strcmp(s, "Player")) {
 		res = &TriggerData.player;
 	} else {
 		LuaError(l, "Invalid player reference '%s'\n" _C_ s);
 	}
-	Assert(res); // Must check for error.
+	assert_throw(res != nullptr); // Must check for error.
 	return res;
 }
 
@@ -601,13 +602,13 @@ static const tile **Str2TileRef(lua_State *l, const char *s)
 {
 	const tile **res = nullptr; //result.
 
-	Assert(l);
+	assert_throw(l != nullptr);
 	if (!strcmp(s, "Tile")) {
 		res = &TriggerData.tile;
 	} else {
 		LuaError(l, "Invalid tile reference '%s'\n" _C_ s);
 	}
-	Assert(res); //check for error.
+	assert_throw(res != nullptr); //check for error.
 	return res;
 }
 
@@ -986,7 +987,7 @@ std::unique_ptr<NumberDesc> CclParseNumberDesc(lua_State *l)
 			res->e = ENumber_NEq;
 			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "UnitVar")) {
-			Assert(lua_istable(l, -1));
+			assert_throw(lua_istable(l, -1));
 
 			res->e = ENumber_UnitStat;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -1013,7 +1014,7 @@ std::unique_ptr<NumberDesc> CclParseNumberDesc(lua_State *l)
 			}
 			lua_pop(l, 1); // pop the table.
 		} else if (!strcmp(key, "TypeVar")) {
-			Assert(lua_istable(l, -1));
+			assert_throw(lua_istable(l, -1));
 
 			res->e = ENumber_TypeStat;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -1040,7 +1041,7 @@ std::unique_ptr<NumberDesc> CclParseNumberDesc(lua_State *l)
 			}
 			lua_pop(l, 1); // pop the table.
 		} else if (!strcmp(key, "VideoTextLength")) {
-			Assert(lua_istable(l, -1));
+			assert_throw(lua_istable(l, -1));
 			res->e = ENumber_VideoTextLength;
 
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -1059,7 +1060,7 @@ std::unique_ptr<NumberDesc> CclParseNumberDesc(lua_State *l)
 			}
 			lua_pop(l, 1); // pop the table.
 		} else if (!strcmp(key, "StringFind")) {
-			Assert(lua_istable(l, -1));
+			assert_throw(lua_istable(l, -1));
 			res->e = ENumber_StringFind;
 			if (lua_rawlen(l, -1) != 2) {
 				LuaError(l, "Bad param for StringFind");
@@ -1342,7 +1343,7 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 */
 CUnit *EvalUnit(const UnitDesc *unitdesc)
 {
-	Assert(unitdesc);
+	assert_throw(unitdesc != nullptr);
 
 	if (!Selected.empty()) {
 		TriggerData.Active = Selected[0];
@@ -1373,7 +1374,7 @@ int EvalNumber(const NumberDesc *number)
 	int a;
 	int b;
 
-	Assert(number);
+	assert_throw(number != nullptr);
 	switch (number->e) {
 		case ENumber_Lua :     // a lua function.
 			return CallLuaNumberFunction(number->D.Index);
@@ -1519,7 +1520,7 @@ std::string EvalString(const StringDesc *s)
 	//Wyrmgus end
 	int player_index;
 
-	Assert(s);
+	assert_throw(s != nullptr);
 	switch (s->e) {
 		case EString_Lua :     // a lua function.
 			return CallLuaStringFunction(s->D.Index);
@@ -2019,7 +2020,7 @@ std::string EvalString(const StringDesc *s)
 */
 static int AliasTypeVar(lua_State *l, const char *s)
 {
-	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 3);
+	assert_throw(0 < lua_gettop(l) && lua_gettop(l) <= 3);
 	int nargs = lua_gettop(l); // number of args in lua.
 	lua_newtable(l);
 	lua_pushnumber(l, 1);
@@ -2081,7 +2082,7 @@ static int AliasUnitVar(lua_State *l, const char *s)
 {
 	int nargs; // number of args in lua.
 
-	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 3);
+	assert_throw(0 < lua_gettop(l) && lua_gettop(l) <= 3);
 	nargs = lua_gettop(l);
 	lua_newtable(l);
 	lua_pushnumber(l, 1);
@@ -2223,7 +2224,7 @@ static int CclUnitVar(lua_State *l)
 static int Alias(lua_State *l, const char *s)
 {
 	const int narg = lua_gettop(l);
-	Assert(narg);
+	assert_throw(narg > 0);
 	lua_newtable(l);
 	lua_pushnumber(l, 1);
 	lua_pushstring(l, s);
@@ -3174,7 +3175,7 @@ static int CclListDirsInDirectory(lua_State *l)
 */
 static int CclSetDamageFormula(lua_State *l)
 {
-	Assert(l);
+	assert_throw(l != nullptr);
 	Damage = CclParseNumberDesc(l);
 	return 0;
 }
@@ -3446,7 +3447,7 @@ static bool LuaValueToString(lua_State *l, std::string &value)
 */
 static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::string> &blockTableNames)
 {
-	//Assert(!is_root || !lua_gettop(l));
+	//assert_throw(!is_root || !lua_gettop(l));
 	if (is_root) {
 		lua_getglobal(l, "_G");// global table in lua.
 	}
@@ -3456,7 +3457,7 @@ static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::strin
 	if (blockTableNames.empty() == false) {
 		res = "if (" + tablesName + " == nil) then " + tablesName + " = {} end\n";
 	}
-	Assert(lua_istable(l, -1));
+	assert_throw(lua_istable(l, -1));
 
 	lua_pushnil(l);
 	while (lua_next(l, -2)) {
@@ -3503,7 +3504,7 @@ static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::strin
 		lua_pop(l, 1); /* pop the value */
 	}
 	lua_pop(l, 1); // pop the table
-	//Assert(!is_root || !lua_gettop(l));
+	//assert_throw(!is_root || !lua_gettop(l));
 	return res;
 }
 

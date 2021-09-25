@@ -32,11 +32,12 @@
 
 #include "animation/animation_rotate.h"
 #include "unit/unit.h"
+#include "util/assert_util.h"
 #include "util/util.h"
 
 void CAnimation_RandomRotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
+	assert_throw(unit.Anim.Anim == this);
 
 	if (SyncRand(2)) {
 		UnitRotate(unit, -this->rotate);

@@ -31,12 +31,13 @@
 #include "animation/animation_randomgoto.h"
 
 #include "unit/unit.h"
+#include "util/assert_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
 
 void CAnimation_RandomGoto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
+	assert_throw(unit.Anim.Anim == this);
 
 	if (SyncRand(100) < this->random) {
 		unit.Anim.Anim = this->gotoLabel;

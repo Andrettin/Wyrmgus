@@ -30,6 +30,7 @@
 
 #include "particle.h"
 
+#include "util/assert_util.h"
 #include "util/random.h"
 #include "util/util.h"
 
@@ -37,12 +38,9 @@
 //CRadialParticle::CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel) :
 CRadialParticle::CRadialParticle(CPosition position, int z, GraphicAnimation *animation, int maxSpeed, int drawlevel) :
 //Wyrmgus end
-	//Wyrmgus start
-//	CParticle(position, drawlevel)
 	CParticle(position, z, drawlevel)
-	//Wyrmgus end
 {
-	Assert(animation);
+	assert_throw(animation != nullptr);
 	this->animation = animation->clone();
 
 	const int speedReduction = 10;

@@ -36,6 +36,7 @@
 #include "net_message.h"
 #include "network/netsockets.h"
 #include "network.h"
+#include "util/assert_util.h"
 #include "util/util.h"
 #include "version.h"
 
@@ -131,7 +132,7 @@ void CClient::DetachFromServer()
 
 bool CClient::Update_disconnected()
 {
-	Assert(networkState.State == ccs_disconnected);
+	assert_throw(networkState.State == ccs_disconnected);
 	const CInitMessage_Header message(MessageInit_FromClient, ICMSeeYou);
 
 	// Spew out 5 and trust in God that they arrive
@@ -144,7 +145,7 @@ bool CClient::Update_disconnected()
 
 bool CClient::Update_detaching(unsigned long tick)
 {
-	Assert(networkState.State == ccs_detaching);
+	assert_throw(networkState.State == ccs_detaching);
 
 	if (networkState.MsgCnt < 10) { // 10 retries = 1 second
 		Send_GoodBye(tick);
@@ -158,7 +159,7 @@ bool CClient::Update_detaching(unsigned long tick)
 
 bool CClient::Update_connecting(unsigned long tick)
 {
-	Assert(networkState.State == ccs_connecting);
+	assert_throw(networkState.State == ccs_connecting);
 
 	if (networkState.MsgCnt < 48) { // 48 retries = 24 seconds
 		Send_Hello(tick);
@@ -172,7 +173,7 @@ bool CClient::Update_connecting(unsigned long tick)
 
 bool CClient::Update_connected(unsigned long tick)
 {
-	Assert(networkState.State == ccs_connected);
+	assert_throw(networkState.State == ccs_connected);
 
 	if (networkState.MsgCnt < 20) { // 20 retries
 		Send_Waiting(tick, 650);
@@ -192,7 +193,7 @@ static bool IsLocalSetupInSync(const CServerSetup &state1, const CServerSetup &s
 
 bool CClient::Update_synced(unsigned long tick)
 {
-	Assert(networkState.State == ccs_synced);
+	assert_throw(networkState.State == ccs_synced);
 
 	if (IsLocalSetupInSync(*serverSetup, *localSetup, NetLocalHostsSlot) == false) {
 		networkState.State = ccs_changed;
@@ -205,7 +206,7 @@ bool CClient::Update_synced(unsigned long tick)
 
 bool CClient::Update_changed(unsigned long tick)
 {
-	Assert(networkState.State == ccs_changed);
+	assert_throw(networkState.State == ccs_changed);
 
 	if (networkState.MsgCnt < 20) { // 20 retries
 		Send_State(tick);
@@ -219,7 +220,7 @@ bool CClient::Update_changed(unsigned long tick)
 
 bool CClient::Update_async(unsigned long tick)
 {
-	Assert(networkState.State == ccs_async);
+	assert_throw(networkState.State == ccs_async);
 
 	if (networkState.MsgCnt < 20) { // 20 retries
 		Send_Resync(tick);
@@ -233,7 +234,7 @@ bool CClient::Update_async(unsigned long tick)
 
 bool CClient::Update_mapinfo(unsigned long tick)
 {
-	Assert(networkState.State == ccs_mapinfo);
+	assert_throw(networkState.State == ccs_mapinfo);
 
 	if (networkState.MsgCnt < 20) { // 20 retries
 		// ICMMapAck..
@@ -248,7 +249,7 @@ bool CClient::Update_mapinfo(unsigned long tick)
 
 bool CClient::Update_badmap(unsigned long tick)
 {
-	Assert(networkState.State == ccs_badmap);
+	assert_throw(networkState.State == ccs_badmap);
 
 	if (networkState.MsgCnt < 20) { // 20 retries
 		Send_MapUidMismatch(tick);
@@ -262,7 +263,7 @@ bool CClient::Update_badmap(unsigned long tick)
 
 bool CClient::Update_goahead(unsigned long tick)
 {
-	Assert(networkState.State == ccs_goahead);
+	assert_throw(networkState.State == ccs_goahead);
 
 	if (networkState.MsgCnt < 50) { // 50 retries
 		Send_Config(tick);
@@ -276,7 +277,7 @@ bool CClient::Update_goahead(unsigned long tick)
 
 bool CClient::Update_started(unsigned long tick)
 {
-	Assert(networkState.State == ccs_started);
+	assert_throw(networkState.State == ccs_started);
 
 	if (networkState.MsgCnt < 20) { // 20 retries
 		Send_Go(tick);
@@ -409,7 +410,7 @@ bool CClient::Parse(const std::array<unsigned char, 1024> &buf)
 	if (header.GetType() != MessageInit_FromServer) {
 		return true;
 	}
-	// Assert(host == this->serverHost);
+	//assert_throw(host == this->serverHost);
 	const unsigned char msgsubtype = header.GetSubType();
 
 	DebugPrint("Received %s in state %s\n" _C_ icmsgsubtypenames[msgsubtype]

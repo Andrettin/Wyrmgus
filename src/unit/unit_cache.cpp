@@ -42,6 +42,18 @@
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
 
+CUnit *CUnitCache::Remove(const unsigned int index)
+{
+	const size_t size = Units.size();
+	assert_throw(index < size);
+	CUnit *tmp = Units[index];
+	if (size > 1) {
+		Units[index] = Units[size - 1];
+	}
+	Units.pop_back();
+	return tmp;
+}
+
 /**
 **  Insert new unit into cache.
 **

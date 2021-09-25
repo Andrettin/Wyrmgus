@@ -127,8 +127,7 @@ namespace gcn
     {
         if (!mTop)
         {
-        	assert(!"No top widget set");
-            //throw GCN_EXCEPTION("No top widget set");
+            throw std::runtime_error("No top widget set.");
         }
 
         if (mInput)
@@ -246,13 +245,11 @@ namespace gcn
     {
         if (!top)
         {
-        	assert(!"No top widget set");
-            //throw GCN_EXCEPTION("No top widget set");
+            throw std::runtime_error("No top widget set.");
         }
         if (!mGraphics)
         {
-        	assert(!"No graphics set");
-            //throw GCN_EXCEPTION("No graphics set");
+            throw std::runtime_error("No graphics set.");
         }
 
         if (!mUseDirtyDrawing || top->getDirty())

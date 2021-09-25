@@ -30,6 +30,8 @@
 
 #include "net_lowlevel.h"
 
+#include "util/assert_util.h"
+
 #include <fcntl.h>
 
 #ifdef USE_WIN32
@@ -207,7 +209,7 @@ unsigned long NetResolveHost(const std::string &host)
 			#endif
 			if (he) {
 				addr = 0;
-				Assert(he->h_length == 4);
+				assert_throw(he->h_length == 4);
 				memcpy(&addr, he->h_addr, he->h_length);
 			}
 		}

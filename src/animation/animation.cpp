@@ -58,6 +58,7 @@
 #include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
 
@@ -194,7 +195,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 			}
 			return goal->Type->BoolFlag[index].value;
 		} else if (parseint[0] == 's') { //spell type detected
-			Assert(goal->CurrentAction() == UnitAction::SpellCast);
+			assert_throw(goal->CurrentAction() == UnitAction::SpellCast);
 			const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
 			const wyrmgus::spell &spell = order.GetSpell();
 			if (spell.get_identifier() == cur) {
@@ -221,7 +222,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 	}
 
 	//check if we are trying to parse a number
-	Assert(isdigit(parseint[0]) || parseint[0] == '-');
+	assert_throw(isdigit(parseint[0]) || parseint[0] == '-');
 	return std::stoi(parseint);
 }
 
@@ -287,7 +288,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 	// Changing animations
 	if (anim && unit.Anim.CurrAnim != anim) {
 		// Assert fails when transforming unit (upgrade-to).
-		Assert(!unit.Anim.Unbreakable || unit.Waiting);
+		assert_throw(!unit.Anim.Unbreakable || unit.Waiting);
 		unit.Anim.Anim = unit.Anim.CurrAnim = anim;
 		unit.Anim.Wait = 0;
 	}

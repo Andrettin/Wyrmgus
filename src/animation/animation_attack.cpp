@@ -32,10 +32,11 @@
 
 #include "actions.h"
 #include "unit/unit.h"
+#include "util/assert_util.h"
 
 void CAnimation_Attack::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
+	assert_throw(unit.Anim.Anim == this);
 	unit.CurrentOrder()->OnAnimationAttack(unit);
 }
 

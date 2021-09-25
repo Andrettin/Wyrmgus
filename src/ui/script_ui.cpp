@@ -51,6 +51,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "video/font.h"
 #include "video/font_color.h"
 #include "video/video.h"
@@ -320,7 +321,7 @@ VariableAttribute Str2VariableAttribute(lua_State *l, const char *s)
 */
 static std::unique_ptr<ConditionPanel> ParseConditionPanel(lua_State *l)
 {
-	Assert(lua_istable(l, -1));
+	assert_throw(lua_istable(l, -1));
 
 	auto condition = std::make_unique<ConditionPanel>();
 
@@ -373,7 +374,7 @@ static std::unique_ptr<ConditionPanel> ParseConditionPanel(lua_State *l)
 
 static std::unique_ptr<CContentType> CclParseContent(lua_State *l)
 {
-	Assert(lua_istable(l, -1));
+	assert_throw(lua_istable(l, -1));
 
 	std::unique_ptr<CContentType> content;
 	std::unique_ptr<ConditionPanel> condition;
@@ -396,7 +397,7 @@ static std::unique_ptr<CContentType> CclParseContent(lua_State *l)
 			highColor = LuaToString(l, -1);
 		//Wyrmgus end
 		} else if (!strcmp(key, "More")) {
-			Assert(lua_istable(l, -1));
+			assert_throw(lua_istable(l, -1));
 			lua_rawgeti(l, -1, 1); // Method name
 			lua_rawgeti(l, -2, 2); // Method data
 			key = LuaToString(l, -2);
@@ -443,7 +444,7 @@ static int CclDefinePanelContents(lua_State *l)
 	const int nargs = lua_gettop(l);
 
 	for (int i = 0; i < nargs; i++) {
-		Assert(lua_istable(l, i + 1));
+		assert_throw(lua_istable(l, i + 1));
 		auto infopanel = std::make_unique<CUnitInfoPanel>();
 
 		for (lua_pushnil(l); lua_next(l, i + 1); lua_pop(l, 1)) {
@@ -458,7 +459,7 @@ static int CclDefinePanelContents(lua_State *l)
 			} else if (!strcmp(key, "Condition")) {
 				infopanel->Condition = ParseConditionPanel(l);
 			} else if (!strcmp(key, "Contents")) {
-				Assert(lua_istable(l, -1));
+				assert_throw(lua_istable(l, -1));
 				for (size_t j = 0; j < lua_rawlen(l, -1); j++, lua_pop(l, 1)) {
 					lua_rawgeti(l, -1, j + 1);
 					infopanel->Contents.push_back(CclParseContent(l));
@@ -496,7 +497,7 @@ static int CclDefinePanelContents(lua_State *l)
 */
 static int CclDefinePopup(lua_State *l)
 {
-	Assert(lua_istable(l, 1));
+	assert_throw(lua_istable(l, 1));
 
 	auto popup = std::make_unique<CPopup>();
 
@@ -518,7 +519,7 @@ static int CclDefinePopup(lua_State *l)
 		} else if (!strcmp(key, "MinHeight")) {
 			popup->MinHeight = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Contents")) {
-			Assert(lua_istable(l, -1));
+			assert_throw(lua_istable(l, -1));
 			for (size_t j = 0; j < lua_rawlen(l, -1); j++, lua_pop(l, 1)) {
 				lua_rawgeti(l, -1, j + 1);
 				popup->Contents.push_back(CPopupContentType::ParsePopupContent(l));

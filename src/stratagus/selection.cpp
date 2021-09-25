@@ -50,6 +50,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 
 unsigned int MaxSelectable;								/// Maximum number of selected units
 
@@ -127,7 +128,7 @@ static void HandleSuicideClick(CUnit &unit)
 {
 	static int NumClicks = 0;
 
-	Assert(unit.Type->ClicksToExplode);
+	assert_throw(unit.Type->ClicksToExplode > 0);
 	if (GameObserve || GameEstablishing) {
 		return;
 	}
@@ -150,7 +151,7 @@ static void HandleSuicideClick(CUnit &unit)
 */
 static void ChangeSelectedUnits(CUnit * const *units, unsigned int count)
 {
-	Assert(count <= MaxSelectable);
+	assert_throw(count <= MaxSelectable);
 
 	if (count == 1 && units[0]->Type->ClicksToExplode &&
 		!units[0]->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
@@ -203,13 +204,13 @@ void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 	// Add to selection
 	for (size_t i = 0; i != units.size(); ++i) {
 		CUnit &unit = *units[i];
-		Assert(!unit.Removed);
+		assert_throw(!unit.Removed);
 		if (!unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
 			TeamSelected[player.get_index()].push_back(&unit);
 			unit.TeamSelected |= 1 << player.get_index();
 		}
 	}
-	Assert(TeamSelected[player.get_index()].size() <= MaxSelectable);
+	assert_throw(TeamSelected[player.get_index()].size() <= MaxSelectable);
 }
 
 /**
@@ -285,7 +286,7 @@ void UnSelectUnit(CUnit &unit)
 				for (j = 0; TeamSelected[i][j] != &unit; ++i) {
 					// Empty
 				}
-				Assert(j < TeamSelected[i].size());
+				assert_throw(j < TeamSelected[i].size());
 
 				std::swap(TeamSelected[i][j], TeamSelected[i].back());
 				TeamSelected[i].pop_back();
@@ -300,7 +301,7 @@ void UnSelectUnit(CUnit &unit)
 		return;
 	}
 	std::vector<CUnit *>::iterator it = std::find(Selected.begin(), Selected.end(), &unit);
-	Assert(it != Selected.end());
+	assert_throw(it != Selected.end());
 
 	*it = Selected.back();
 	Selected.pop_back();
@@ -375,7 +376,7 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 	const wyrmgus::unit_type &type = *base.Type;
 	const CViewport *vp = UI.MouseViewport;
 
-	Assert(UI.MouseViewport);
+	assert_throw(UI.MouseViewport != nullptr);
 
 	if (type.ClicksToExplode) {
 		HandleSuicideClick(base);

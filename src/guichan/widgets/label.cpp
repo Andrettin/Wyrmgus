@@ -114,8 +114,7 @@ namespace gcn
               textX = getWidth();
               break;
           default:
-              //throw GCN_EXCEPTION("Unknown alignment.");
-              assert(!"Unknown alignment.");
+              throw std::runtime_error("Unknown alignment.");
         }
 
         graphics->setFont(getFont());

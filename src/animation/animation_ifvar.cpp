@@ -31,6 +31,7 @@
 #include "animation/animation_ifvar.h"
 
 #include "unit/unit.h"
+#include "util/assert_util.h"
 #include "util/string_util.h"
 
 //IfVar compare types
@@ -68,7 +69,7 @@ static bool returnFalse(int, int) { return false; }
 
 void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
+	assert_throw(unit.Anim.Anim == this);
 
 	const int lop = ParseAnimInt(unit, this->leftVar);
 	const int rop = ParseAnimInt(unit, this->rightVar);

@@ -107,17 +107,6 @@ extern void AbortAt(const char *file, int line, const char *funcName, const char
 extern void PrintOnStdOut(const char *format, ...);
 
 /**
-**  Assert a condition. If cond is not true abort with file,line.
-*/
-#ifndef NDEBUG
-#define Assert(cond) \
-	do { if (!(cond)) { AbortAt(__FILE__, __LINE__, __func__, #cond); }} while (0)
-#else
-#define Assert(cond) \
-	do {} while (0)
-#endif
-
-/**
 **  Print debug information with function name.
 */
 #define DebugPrint(args) \

@@ -74,9 +74,8 @@ namespace gcn
 		if ((c & 0xF0) == 0xE0) {
 			return curpos + 3;
 		}
-		assert(!"Invalid UTF8.");
-		//throw GCN_EXCEPTION("Invalid UTF8.");
-		return 0;
+
+        throw std::runtime_error("Invalid UTF8.");
 	}
 
     int Font::getStringIndexAt(const std::string& text, int x)

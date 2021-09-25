@@ -30,6 +30,7 @@
 
 #include "particle.h"
 
+#include "util/assert_util.h"
 #include "video/video.h"
 
 //Wyrmgus start
@@ -37,12 +38,9 @@
 CSmokeParticle::CSmokeParticle(CPosition position, int z, GraphicAnimation *smoke,
 //Wyrmgus end
 							   float speedx, float speedy, int drawlevel) :
-	//Wyrmgus start
-//	CParticle(position, drawlevel)
 	CParticle(position, z, drawlevel)
-	//Wyrmgus end
 {
-	Assert(smoke);
+	assert_throw(smoke != nullptr);
 	this->puff = smoke->clone();
 
 	speedVector.x = speedx;

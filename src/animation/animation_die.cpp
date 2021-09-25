@@ -31,16 +31,20 @@
 #include "animation/animation_die.h"
 
 #include "unit/unit.h"
+#include "util/assert_util.h"
 
 void CAnimation_Die::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
+	assert_throw(unit.Anim.Anim == this);
+
 	if (unit.Anim.Unbreakable) {
 		throw std::runtime_error("Can't call \"die\" action in unbreakable section.");
 	}
+
 	if (this->DeathType.empty() == false) {
 		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());
 	}
+
 	throw AnimationDie_Exception();
 }
 

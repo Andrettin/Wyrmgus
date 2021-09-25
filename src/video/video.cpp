@@ -86,6 +86,7 @@
 #include "script.h"
 #include "ui/cursor.h"
 #include "ui/ui.h"
+#include "util/assert_util.h"
 #include "util/image_util.h"
 #include "video/font.h"
 
@@ -167,7 +168,7 @@ uint32_t ColorYellow;
 */
 void SetClipping(int left, int top, int right, int bottom)
 {
-	Assert(left <= right && top <= bottom && left >= 0 && left < Video.Width
+	assert_throw(left <= right && top <= bottom && left >= 0 && left < Video.Width
 		   && top >= 0 && top < Video.Height && right >= 0
 		   && right < Video.Width && bottom >= 0 && bottom < Video.Height);
 

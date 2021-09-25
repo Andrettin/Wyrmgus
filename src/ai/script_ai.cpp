@@ -50,6 +50,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
+#include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/vector_util.h"
 
@@ -171,7 +172,7 @@ static std::vector<const wyrmgus::unit_type *> get_unit_type_from_string(const s
 			begin = end + 1;
 			end = list.find(",", begin);
 			if (!unitName.empty()) {
-				Assert(unitName[0] != ',');
+				assert_throw(unitName[0] != ',');
 				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(unitName);
 				if (unit_type != nullptr) {
 					res.push_back(unit_type);
@@ -971,7 +972,7 @@ static int CclAiForce(lua_State *l)
 {
 	bool resetForce = false;
 	const int arg = lua_gettop(l);
-	Assert(0 < arg && arg <= 3);
+	assert_throw(0 < arg && arg <= 3);
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
@@ -1128,7 +1129,7 @@ static int CclAiWaitForce(lua_State *l)
 #if 0
 	// Debuging
 	AiRemoveDeadUnitInForces();
-	Assert(!AiPlayer->Force.getScriptForce(f).Completed);
+	assert_throw(!AiPlayer->Force.getScriptForce(f).Completed);
 #endif
 	lua_pushboolean(l, 1);
 	return 1;
@@ -1515,10 +1516,10 @@ static int CclDefineAiPlayer(lua_State *l)
 {
 	const unsigned int playerIdx = LuaToNumber(l, 0 + 1);
 
-	Assert(playerIdx <= PlayerMax);
+	assert_throw(playerIdx <= PlayerMax);
 	DebugPrint("%p %d\n" _C_(void *)CPlayer::Players[playerIdx]->Ai.get() _C_ CPlayer::Players[playerIdx]->AiEnabled);
 	// FIXME: lose this:
-	// Assert(!Players[playerIdx].Ai && Players[playerIdx].AiEnabled);
+	// assert_throw(!Players[playerIdx].Ai && Players[playerIdx].AiEnabled);
 
 	CPlayer::Players[playerIdx]->Ai = std::make_unique<PlayerAi>();
 	PlayerAi *ai = CPlayer::Players[playerIdx]->Ai.get();

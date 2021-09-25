@@ -223,8 +223,7 @@ namespace gcn
             if (mCaretPosition > 0) {
                 mCaretPosition = UTF8GetPrev(mText, mCaretPosition);
                 if (mCaretPosition < 0) {
-                    //throw GCN_EXCEPTION("Invalid UTF8.");
-                    assert(!"Invalid UTF8.");
+                    throw std::runtime_error("Invalid UTF8.");
                 }
 
                 if (key.isShiftPressed()) {
@@ -245,8 +244,7 @@ namespace gcn
             if (mCaretPosition < (int)mText.size()) {
                 mCaretPosition = UTF8GetNext(mText, mCaretPosition);
                 if (mCaretPosition > (int)mText.size()) {
-                    //throw GCN_EXCEPTION("Invalid UTF8.");
-                    assert(!"Invalid UTF8.");
+                    throw std::runtime_error("Invalid UTF8.");
                 }
 
                 if (key.isShiftPressed()) {
@@ -273,8 +271,7 @@ namespace gcn
 			} else if (mCaretPosition < (int)mText.size()) {
 				int newpos = UTF8GetNext(mText, mCaretPosition);
 				if (mCaretPosition > (int)mText.size()) {
-					//throw GCN_EXCEPTION("Invalid UTF8.");
-					assert(!"Invalid UTF8.");
+                    throw std::runtime_error("Invalid UTF8.");
 				}
 				mText.erase(mCaretPosition, newpos - mCaretPosition);
 				ret = true;
@@ -291,8 +288,7 @@ namespace gcn
 			} else if (mCaretPosition > 0) {
 				int newpos = UTF8GetPrev(mText, mCaretPosition);
 				if (mCaretPosition < 0) {
-					//throw GCN_EXCEPTION("Invalid UTF8.");
-					assert(!"Invalid UTF8.");
+                    throw std::runtime_error("Invalid UTF8.");
 				}
 				mText.erase(newpos, mCaretPosition - newpos);
 				mCaretPosition = newpos;
@@ -367,8 +363,7 @@ namespace gcn
             mText.insert(mCaretPosition,key.toString());
             mCaretPosition = UTF8GetNext(mText, mCaretPosition);
             if (mCaretPosition > (int)mText.size()) {
-                //throw GCN_EXCEPTION("Invalid UTF8.");
-                assert(!"Invalid UTF8.");
+                throw std::runtime_error("Invalid UTF8.");
             }
 			mSelectStart = mCaretPosition;
 			mSelectEndOffset = 0;

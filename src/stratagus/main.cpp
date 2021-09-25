@@ -53,6 +53,7 @@
 #include "ui/interface_image_provider.h"
 #include "unit/unit_list_model.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
@@ -89,7 +90,7 @@ int main(int argc, char **argv)
 			CFSTR(MAC_BUNDLE_DATADIR), nullptr, nullptr);
 		CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef, kCFURLPOSIXPathStyle);
 		const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
-		Assert(pathPtr);
+		assert_throw(pathPtr);
 		database::get()->set_root_path(pathPtr);
 #endif
 

@@ -56,6 +56,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/point_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
@@ -179,7 +180,7 @@ public:
 	explicit AiForceEnemyFinder(const int force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
 	//Wyrmgus end
 	{
-		Assert(enemy != nullptr);
+		assert_throw(enemy != nullptr);
 		*enemy = nullptr;
 		wyrmgus::vector::for_each_unless(AiPlayer->Force[force].get_units(), *this);
 	}
@@ -189,7 +190,7 @@ public:
 	explicit AiForceEnemyFinder(AiForce &force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
 	//Wyrmgus end
 	{
-		Assert(enemy != nullptr);
+		assert_throw(enemy != nullptr);
 		*enemy = nullptr;
 		wyrmgus::vector::for_each_unless(force.get_units(), *this);
 	}
@@ -241,7 +242,7 @@ public:
 			//Wyrmgus end
 			//Wyrmgus start
 			//why make sure the enemy is null?
-//			Assert(!*enemy);
+//			assert_throw(!*enemy);
 			//Wyrmgus end
 			if (*enemy == nullptr || !(*enemy)->Type->BoolFlag[BUILDING_INDEX].value) {
 				//Wyrmgus start
@@ -256,7 +257,7 @@ public:
 			//Wyrmgus end
 			//Wyrmgus start
 			//why ask that the enemy be null?
-//			Assert(!*enemy || (*enemy)->IsAgressive());
+//			assert_throw(!*enemy || (*enemy)->IsAgressive());
 			//Wyrmgus end
 			if (*enemy == nullptr) {
 				//Wyrmgus start
@@ -608,7 +609,7 @@ AiForce::~AiForce()
 bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 //Wyrmgus end
 {
-	Assert(!this->get_units().empty());
+	assert_throw(!this->get_units().empty());
 	const CUnit &leader = **(this->get_units().front());
 	//Wyrmgus start
 //	const int distance = leader.MapDistanceTo(startPos);
@@ -625,7 +626,7 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(CMap::get()->Info->IsPointOnMap(startPos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(startPos, z));
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -1464,7 +1465,7 @@ void AiAttackWithForces(const std::array<int, AI_MAX_FORCE_INTERNAL + 1> &forces
 */
 static void AiGroupAttackerForTransport(AiForce &aiForce)
 {
-	Assert(aiForce.State == AiForceAttackingState::Boarding);
+	assert_throw(aiForce.State == AiForceAttackingState::Boarding);
 
 	unsigned int nbToTransport = 0;
 	unsigned int transporterIndex = 0;
@@ -1536,7 +1537,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 */
 void AiForce::Update()
 {
-	Assert(Defending == false);
+	assert_throw(Defending == false);
 	if (Size() == 0) {
 		Attacking = false;
 		if (!Defending && State > AiForceAttackingState::Waiting) {
@@ -1682,7 +1683,7 @@ void AiForce::Update()
 //	const int thresholdDist = 5; // Hard coded value
 	const int thresholdDist = std::max(5, static_cast<int>(this->get_units().size()) / 8);
 	//Wyrmgus end
-	Assert(CMap::get()->Info->IsPointOnMap(GoalPos, GoalMapLayer));
+	assert_throw(CMap::get()->Info->IsPointOnMap(GoalPos, GoalMapLayer));
 
 	const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 	const wyrmgus::quest *current_quest = current_campaign ? current_campaign->get_quest() : nullptr;

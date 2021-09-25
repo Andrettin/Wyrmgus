@@ -280,8 +280,7 @@ namespace gcn
         }
         else
         {
-            //throw GCN_EXCEPTION("Width should be greater then 0.");
-            assert(!"Width should be greater then 0.");
+            throw std::runtime_error("Width should be greater than 0.");
         }
     }
 
@@ -872,8 +871,7 @@ namespace gcn
         }
         else
         {
-            //throw GCN_EXCEPTION("Only a ScrollArea's content may be moved to top.");
-            assert(!"Only a ScrollArea's content may be moved to top.");
+            throw std::runtime_error("Only a ScrollArea's content may be moved to top.");
         }
     }
 
@@ -888,8 +886,7 @@ namespace gcn
         }
         else
         {
-            //throw GCN_EXCEPTION("Only a ScrollArea's content may be moved to bottom.");
-            assert(!"Only a ScrollArea's content may be moved to bottom.");
+            throw std::runtime_error("Only a ScrollArea's content may be moved to bottom.");
         }
     }
 
@@ -902,8 +899,7 @@ namespace gcn
         }
         else
         {
-            //throw GCN_EXCEPTION("Called by not-child.");
-            assert(!"Called by not-child.");
+            throw std::runtime_error("Called by not-child.");
         }
     }
 
@@ -916,8 +912,7 @@ namespace gcn
         }
         else
         {
-            //throw GCN_EXCEPTION("Widget not in scrollarea.");
-            assert(!"Widget not in scrollarea.");
+            throw std::runtime_error("Widget not in scrollarea.");
         }
     }
 
@@ -996,8 +991,7 @@ namespace gcn
               break;
 
           default:
-              //throw GCN_EXCEPTION("Horizontal scroll policy invalid.");
-              assert(!"Horizontal scroll policy invalid.");
+              throw std::runtime_error("Horizontal scroll policy invalid.");
         }
 
         switch (mVPolicy)
@@ -1021,8 +1015,7 @@ namespace gcn
               }
               break;
           default:
-              //throw GCN_EXCEPTION("Vertical scroll policy invalid.");
-              assert(!"Vertical scroll policy invalid.");
+              throw std::runtime_error("Vertical scroll policy invalid.");
         }
     }
 

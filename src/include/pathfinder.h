@@ -34,6 +34,7 @@
 #define AstarDebugPrint(x)
 #endif
 
+#include "util/assert_util.h"
 #include "vec2i.h"
 
 class CUnit;
@@ -190,7 +191,7 @@ bool TerrainTraversal::Run(T &context)
 			case VisitResult::Ok: PushNeighbor(posNode.pos); break;
 			case VisitResult::Cancel: return false;
 		}
-		Assert(IsVisited(posNode.pos));
+		assert_throw(IsVisited(posNode.pos));
 	}
 	return false;
 }

@@ -67,6 +67,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/enum_util.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
@@ -213,7 +214,7 @@ static std::unique_ptr<EditorSliderListener> editorSliderListener;
 static void EditTile(const Vec2i &pos, const terrain_type *terrain, const Qt::KeyboardModifiers key_modifiers)
 //Wyrmgus end
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, UI.CurrentMapLayer));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, UI.CurrentMapLayer));
 	
 	wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 	
@@ -515,7 +516,7 @@ static void EditTiles(const Vec2i &pos, const terrain_type *terrain, int size, c
 */
 static void EditorActionPlaceUnit(const Vec2i &pos, const unit_type &type, CPlayer *player)
 {
-	Assert(CMap::get()->Info->IsPointOnMap(pos, UI.CurrentMapLayer));
+	assert_throw(CMap::get()->Info->IsPointOnMap(pos, UI.CurrentMapLayer));
 
 	if (type.Neutral) {
 		player = CPlayer::get_neutral_player();
@@ -727,7 +728,7 @@ static void CalculateMaxIconSize()
 	IconHeight = 0;
 	for (unsigned int i = 0; i < CEditor::get()->UnitTypes.size(); ++i) {
 		const unit_type *type = wyrmgus::unit_type::get(CEditor::get()->UnitTypes[i]);
-		Assert(type->get_icon());
+		assert_throw(type->get_icon() != nullptr);
 		const icon *icon = type->get_icon();
 
 		IconWidth = std::max(IconWidth, icon->get_graphics()->Width);
@@ -1067,7 +1068,7 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 	y += 20 * scale_factor;
 
 	int i = CEditor::get()->TileIndex;
-	Assert(CEditor::get()->TileIndex != -1);
+	assert_throw(CEditor::get()->TileIndex != -1);
 	y = UI.ButtonPanel.Y + 24 * scale_factor;
 	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - wyrmgus::defines::get()->get_scaled_tile_height()) {
 		if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
@@ -1127,7 +1128,7 @@ static void DrawEditorPanel_SelectIcon(std::vector<std::function<void(renderer *
 	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor, UI.InfoPanel.Y + 7 * scale_factor);
 	//Wyrmgus end
 	wyrmgus::icon *icon = CEditor::get()->Select.Icon;
-	Assert(icon);
+	assert_throw(icon != nullptr);
 	unsigned int flag = 0;
 	if (ButtonUnderCursor == SelectButton) {
 		flag = IconActive;
@@ -1151,7 +1152,7 @@ static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)
 
 	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x(), UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y());
 	wyrmgus::icon *icon = CEditor::get()->Units.Icon;
-	Assert(icon);
+	assert_throw(icon != nullptr);
 	unsigned int flag = 0;
 	if (ButtonUnderCursor == UnitButton) {
 		flag = IconActive;
@@ -1178,7 +1179,7 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 
 	if (CEditor::get()->StartUnit) {
 		const icon *icon = CEditor::get()->StartUnit->get_icon();
-		Assert(icon);
+		assert_throw(icon != nullptr);
 		const PixelPos pos(x + get_start_icon_x(), y + get_start_icon_y());
 		unsigned int flag = 0;
 		if (ButtonUnderCursor == StartButton) {
@@ -1413,7 +1414,7 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 
 	//Wyrmgus start
 //	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
-//	Assert(index != -1);
+//	assert_throw(index != -1);
 	//Wyrmgus end
 	//Wyrmgus start
 	/*
@@ -1676,7 +1677,7 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 		}
 
 		CViewport *vp = GetViewport(CursorScreenPos);
-		Assert(vp);
+		assert_throw(vp != nullptr);
 		if ((MouseButtons & LeftButton) && UI.SelectedViewport != vp) {
 			// viewport changed
 			UI.SelectedViewport = vp;
@@ -1894,7 +1895,7 @@ static void EditorCallbackKeyRepeated(unsigned key, unsigned, const Qt::Keyboard
 
 static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 {
-	Assert(CEditor::get()->State == EditorEditUnit || CEditor::get()->State == EditorSetStartLocation);
+	assert_throw(CEditor::get()->State == EditorEditUnit || CEditor::get()->State == EditorSetStartLocation);
 	
 	//Wyrmgus start
 	LastDrawnButtonPopup = nullptr;
@@ -2215,7 +2216,7 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 	UnitUnderCursor = nullptr;
 	if (UI.MapArea.Contains(screenPos)) {
 		CViewport *vp = GetViewport(screenPos);
-		Assert(vp);
+		assert_throw(vp != nullptr);
 		if (UI.MouseViewport != vp) { // viewport changed
 			UI.MouseViewport = vp;
 			DebugPrint("active viewport changed to %ld.\n" _C_

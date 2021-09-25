@@ -46,6 +46,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 
 /**
 ** Send command: Unit stop.
@@ -813,7 +814,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		DebugPrint(" destroyed unit skipping %d\n" _C_ UnitNumber(unit));
 		return;
 	}
-	Assert(unit.Type);
+	assert_throw(unit.Type != nullptr);
 
 	const int status = (msgnr & 0x80) >> 7;
 	// Note: destroyed destination unit is handled by the action routines.
@@ -837,7 +838,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandDefend: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				assert_throw(dest.Type != nullptr);
 				CommandLog("defend", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandDefend(unit, dest, status);
 			}
@@ -846,7 +847,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandFollow: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				assert_throw(dest.Type != nullptr);
 				CommandLog("follow", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandFollow(unit, dest, status);
 			}
@@ -869,7 +870,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandPickUp: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				assert_throw(dest.Type != nullptr);
 				CommandLog("pick-up", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandPickUp(unit, dest, status);
 			}
@@ -880,7 +881,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest && dest->Type);
+				assert_throw(dest && dest->Type);
 			}
 			CommandLog("repair", &unit, status, pos.x, pos.y, dest, nullptr, -1);
 			CommandRepair(unit, pos, dest, status);
@@ -894,7 +895,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest && dest->Type);
+				assert_throw(dest && dest->Type);
 			}
 			CommandLog("attack", &unit, status, pos.x, pos.y, dest, nullptr, -1);
 			CommandAttack(unit, pos, dest, status);
@@ -908,7 +909,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandUse: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				assert_throw(dest.Type != nullptr);
 				CommandLog("use", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandUse(unit, dest, status);
 			}
@@ -917,7 +918,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandTrade: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				assert_throw(dest.Type != nullptr);
 				CommandLog("trade", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandTrade(unit, dest, status);
 			}
@@ -931,7 +932,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandBoard: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				assert_throw(dest.Type != nullptr);
 				CommandLog("board", &unit, status, arg1, arg2, &dest, nullptr, -1);
 				CommandBoard(unit, dest, status);
 			}
@@ -941,7 +942,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CUnit *dest = nullptr;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest && dest->Type);
+				assert_throw(dest && dest->Type);
 			}
 			CommandLog("unload", &unit, status, pos.x, pos.y, dest, nullptr, -1);
 			CommandUnload(unit, pos, dest, status);
@@ -962,7 +963,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandResource: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				assert_throw(dest.Type != nullptr);
 				CommandLog("resource", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandResource(unit, dest, status);
 			}
@@ -1041,7 +1042,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandBuy: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-				Assert(dest.Type);
+				assert_throw(dest.Type != nullptr);
 				CommandLog("buy", &unit, 0, -1, -1, &dest, nullptr, arg1);
 				CommandBuy(unit, &dest, arg1);
 			}
@@ -1069,7 +1070,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				CUnit *dest = nullptr;
 				if (dstnr != (unsigned short)0xFFFF) {
 					dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
-					Assert(dest && dest->Type);
+					assert_throw(dest && dest->Type);
 				}
 				CommandLog("spell-cast", &unit, status, pos.x, pos.y, dest, nullptr, id);
 				CommandSpellCast(unit, pos, dest, *wyrmgus::spell::get_all()[id], status);
@@ -1086,7 +1087,7 @@ static const char *GetDiplomacyName(const wyrmgus::diplomacy_state e)
 {
 	static constexpr std::array<const char *, 4> diplomacy_names = { "allied", "neutral", "enemy", "crazy" };
 
-	Assert(static_cast<size_t>(e) < diplomacy_names.size());
+	assert_throw(static_cast<size_t>(e) < diplomacy_names.size());
 
 	return diplomacy_names[static_cast<size_t>(e)];
 }

@@ -30,16 +30,15 @@
 
 #include "particle.h"
 
+#include "util/assert_util.h"
+
 //Wyrmgus start
 //StaticParticle::StaticParticle(CPosition position, GraphicAnimation *animation, int drawlevel) :
 StaticParticle::StaticParticle(CPosition position, int z, const GraphicAnimation *animation, int drawlevel) :
 //Wyrmgus end
-	//Wyrmgus start
-//	CParticle(position, drawlevel)
 	CParticle(position, z, drawlevel)
-	//Wyrmgus end
 {
-	Assert(animation);
+	assert_throw(animation != nullptr);
 	this->animation = animation->clone();
 }
 

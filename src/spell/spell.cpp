@@ -57,6 +57,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "upgrade/upgrade.h"
+#include "util/assert_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 #include "util/vector_random_util.h"
@@ -543,7 +544,7 @@ bool spell::is_caster_only() const
 static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const wyrmgus::spell &spell)
 {
 	const AutoCastInfo *autocast = spell.get_autocast_info(caster.Player->AiEnabled);
-	Assert(autocast);
+	assert_throw(autocast != nullptr);
 	
 	if (!spell.CheckAutoCastGenericConditions(caster, autocast)) {
 		return nullptr;
@@ -592,10 +593,8 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 			}
 		}
 	} else {
-		// Something is wrong
-		DebugPrint("Spell is screwed up, unknown target type\n");
-		Assert(0);
-		return nullptr;
+		//something is wrong
+		throw std::runtime_error("Spell is screwed up, unknown target type.");
 	}
 
 	return nullptr; // cannot autocast the spell

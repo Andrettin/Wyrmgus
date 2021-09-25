@@ -42,6 +42,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 
 static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 {
@@ -258,7 +259,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const wyrmgus::unit_type &
 	if (startUnit != nullptr) {
 		terrainTraversal.PushUnitPosAndNeighbor(*startUnit);
 	} else {
-		Assert(CMap::get()->Info->IsPointOnMap(startPos, z));
+		assert_throw(CMap::get()->Info->IsPointOnMap(startPos, z));
 		terrainTraversal.PushPos(startPos);
 	}
 
@@ -458,7 +459,7 @@ static bool AiFindHallPlace(const CUnit &worker,
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(CMap::get()->Info->IsPointOnMap(startPos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(startPos, z));
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -573,7 +574,7 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const wyrmgus::unit_type 
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(CMap::get()->Info->IsPointOnMap(startPos, z));
+	assert_throw(CMap::get()->Info->IsPointOnMap(startPos, z));
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start

@@ -31,11 +31,12 @@
 #include "animation/animation_unbreakable.h"
 
 #include "unit/unit.h"
+#include "util/assert_util.h"
 
 void CAnimation_Unbreakable::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
-	Assert(unit.Anim.Unbreakable ^ this->state);
+	assert_throw(unit.Anim.Anim == this);
+	assert_throw(unit.Anim.Unbreakable ^ this->state);
 
 	unit.Anim.Unbreakable = this->state;
 }

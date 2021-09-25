@@ -36,12 +36,13 @@
 #include "map/tile.h"
 #include "player/player.h"
 #include "ui/ui.h"
+#include "util/assert_util.h"
 #include "video/video.h"
 
 GraphicAnimation::GraphicAnimation(CGraphic *g, int ticksPerFrame) :
 	g(g), ticksPerFrame(ticksPerFrame)
 {
-	Assert(g);
+	assert_throw(g != nullptr);
 }
 
 

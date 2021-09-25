@@ -37,6 +37,7 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "util/assert_util.h"
 #include "video/font.h"
 #include "video/video.h"
 
@@ -65,8 +66,8 @@ void CContentTypeText::Draw(const CUnit &unit, font *defaultfont, std::vector<st
 	int y = this->Pos.y;
 	wyrmgus::font *font = this->Font ? this->Font : defaultfont;
 
-	Assert(font);
-	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
+	assert_throw(font != nullptr);
+	assert_throw(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
 	//Wyrmgus start
 //	CLabel label(font);
@@ -108,7 +109,7 @@ void CContentTypeText::Draw(const CUnit &unit, font *defaultfont, std::vector<st
 					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).s, render_commands);
 					break;
 				default:
-					Assert(0);
+					assert_throw(false);
 			}
 		} else {
 			int value = unit.Type->MapDefaultStat.Variables[this->Index].Value;
@@ -145,14 +146,14 @@ void CContentTypeFormattedText::Draw(const CUnit &unit, font *defaultfont, std::
 	UStrInt usi1;
 
 	wyrmgus::font *font = this->Font ? this->Font : defaultfont;
-	Assert(font);
+	assert_throw(font != nullptr);
 
 	//Wyrmgus start
 //	CLabel label(font);
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	//Wyrmgus end
 
-	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
+	assert_throw((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	usi1 = GetComponent(unit, this->Index, this->Component, 0);
 	if (usi1.type == USTRINT_STR) {
 		snprintf(buf, sizeof(buf), this->Format.c_str(), _(usi1.s));
@@ -191,7 +192,7 @@ void CContentTypeFormattedText2::Draw(const CUnit &unit, font *defaultfont, std:
 	UStrInt usi1, usi2;
 
 	wyrmgus::font *font = this->Font ? this->Font : defaultfont;
-	Assert(font);
+	assert_throw(font != nullptr);
 	//Wyrmgus start
 //	CLabel label(font);
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -255,8 +256,9 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		case UnitRefGoal:
 			return unit.Goal;
 		default:
-			Assert(0);
+			assert_throw(false);
 	}
+
 	return nullptr;
 }
 
@@ -287,7 +289,7 @@ void CContentTypeIcon::Draw(const CUnit &unit, font *, std::vector<std::function
 */
 void CContentTypeLifeBar::Draw(const CUnit &unit, font *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
+	assert_throw((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start
 	int max = 0;
 	if (this->Index == XP_INDEX) {
@@ -402,7 +404,7 @@ void CContentTypeLifeBar::Draw(const CUnit &unit, font *, std::vector<std::funct
 */
 void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	Assert((unsigned int) this->varIndex < UnitTypeVar.GetNumberVariable());
+	assert_throw((unsigned int) this->varIndex < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start
 //	if (!unit.Variable[this->varIndex].Max) {
 	if (!unit.GetModifiedVariable(this->varIndex, VariableAttribute::Max)) {
@@ -416,8 +418,8 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 	int y = this->Pos.y;
 	int w = this->width * scale_factor;
 	int h = this->height * scale_factor;
-	Assert(w > 0);
-	Assert(h > 4);
+	assert_throw(w > 0);
+	assert_throw(h > 4);
 	const std::array<uint32_t, 12> colors = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
 							 ColorGray, ColorDarkGray, ColorWhite, ColorOrange,
 							 ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack
@@ -453,7 +455,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 
 void CContentTypeText::Parse(lua_State *l)
 {
-	Assert(lua_istable(l, -1) || lua_isstring(l, -1));
+	assert_throw(lua_istable(l, -1) || lua_isstring(l, -1));
 
 	if (lua_isstring(l, -1)) {
 		this->Text = CclParseStringDesc(l);
@@ -489,7 +491,7 @@ void CContentTypeText::Parse(lua_State *l)
 
 void CContentTypeFormattedText::Parse(lua_State *l)
 {
-	Assert(lua_istable(l, -1));
+	assert_throw(lua_istable(l, -1));
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
@@ -515,7 +517,7 @@ void CContentTypeFormattedText::Parse(lua_State *l)
 
 void CContentTypeFormattedText2::Parse(lua_State *l)
 {
-	Assert(lua_istable(l, -1));
+	assert_throw(lua_istable(l, -1));
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Format")) {

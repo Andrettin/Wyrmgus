@@ -170,6 +170,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/assert_util.h"
 #include "util/enum_util.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
@@ -764,7 +765,7 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const wyrmgus::unit_type &type, con
 	std::vector<AiBuildQueue>::iterator i;
 
 	for (i = pai->UnitTypeBuilt.begin(); i != pai->UnitTypeBuilt.end(); ++i) {
-		Assert((*i).Want);
+		assert_throw((*i).Want > 0);
 		//Wyrmgus start
 //		if (&type == (*i).Type && (*i).Made) {
 		if (
@@ -1152,7 +1153,7 @@ void AiUnitKilled(CUnit &unit)
 	DebugPrint("%d: %d(%s) killed\n" _C_
 			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
 
-	Assert(unit.Player->get_type() != player_type::person);
+	assert_throw(unit.Player->get_type() != player_type::person);
 
 	if (unit.GroupId) {
 		AiForce &force = unit.Player->Ai->Force[unit.GroupId - 1];
@@ -1188,7 +1189,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 				   what.Player->get_index() _C_ what.Type->Ident.c_str() _C_ what.tilePos.x _C_ what.tilePos.y);
 	}
 
-	Assert(what.Player->get_type() != player_type::person);
+	assert_throw(what.Player->get_type() != player_type::person);
 	//Wyrmgus start
 //	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
 	AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
@@ -1207,7 +1208,7 @@ void AiCanNotBuild(const CUnit &unit, const wyrmgus::unit_type &what, const land
 			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
 			   what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
-	Assert(unit.Player->get_type() != player_type::person);
+	assert_throw(unit.Player->get_type() != player_type::person);
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, what);
 	AiReduceMadeInBuilt(*unit.Player->Ai, what, landmass, settlement);
@@ -1222,7 +1223,7 @@ void AiCanNotBuild(const CUnit &unit, const wyrmgus::unit_type &what, const land
 */
 void AiCanNotReach(CUnit &unit, const wyrmgus::unit_type &what, const landmass *landmass, const wyrmgus::site *settlement)
 {
-	Assert(unit.Player->get_type() != player_type::person);
+	assert_throw(unit.Player->get_type() != player_type::person);
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, what);
 	AiReduceMadeInBuilt(*unit.Player->Ai, what, landmass, settlement);
@@ -1387,7 +1388,7 @@ void AiCanNotMove(CUnit &unit)
 */
 void AiNeedMoreSupply(const CPlayer &player)
 {
-	Assert(player.get_type() != player_type::person);
+	assert_throw(player.get_type() != player_type::person);
 	player.Ai->NeedSupply = true;
 }
 
@@ -1406,7 +1407,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 			   //Wyrmgus end
 			   what.Type->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
-	Assert(what.Player->get_type() != player_type::person);
+	assert_throw(what.Player->get_type() != player_type::person);
 
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
@@ -1448,7 +1449,7 @@ void AiUpgradeToComplete(CUnit &unit, const wyrmgus::unit_type &what)
 			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
 			   what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
-	Assert(unit.Player->get_type() != player_type::person);
+	assert_throw(unit.Player->get_type() != player_type::person);
 }
 
 /**
@@ -1463,7 +1464,7 @@ void AiResearchComplete(CUnit &unit, const CUpgrade *what)
 			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->get_identifier().c_str() _C_
 			   what->get_identifier().c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
-	Assert(unit.Player->get_type() != player_type::person);
+	assert_throw(unit.Player->get_type() != player_type::person);
 
 	// FIXME: upgrading knights -> paladins, must rebuild lists!
 }

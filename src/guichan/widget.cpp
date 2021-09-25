@@ -254,8 +254,7 @@ namespace gcn
     {
         if (mFocusHandler == nullptr)
         {
-            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
-            assert(!"No focushandler set (did you add the widget to the gui?).");
+            throw std::runtime_error("No focushandler set (did you add the widget to the gui?).");
         }
 
         if (isFocusable())
@@ -403,8 +402,7 @@ namespace gcn
     {
         if (mFocusHandler == nullptr)
         {
-            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
-            assert(!"No focushandler set (did you add the widget to the gui?).");
+            throw std::runtime_error("No focushandler set (did you add the widget to the gui?).");
         }
 
         if (!mEnabled || (mFocusHandler->getModalFocused() != nullptr &&
@@ -522,8 +520,7 @@ namespace gcn
     {
         if (mFocusHandler == nullptr)
         {
-            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
-            assert(!"No focushandler set (did you add the widget to the gui?).");
+            throw std::runtime_error("No focushandler set (did you add the widget to the gui?).");
         }
 
         if (!mEnabled || (mFocusHandler->getModalFocused() != nullptr &&
@@ -671,8 +668,7 @@ namespace gcn
 			mHotKey = ::convertKey(key);
             if (mHotKey == 0)
             {
-                //throw GCN_EXCEPTION("Could not parse hot key");
-                assert(!"Could not parse hot key");
+                throw std::runtime_error("Could not parse hot key");
             }
         }
     }
@@ -733,8 +729,7 @@ namespace gcn
     {
         if (mFocusHandler == nullptr)
         {
-        	assert(!"No focushandler set (did you add the widget to the gui?).");
-            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+            throw std::runtime_error("No focushandler set (did you add the widget to the gui?).");
         }
 
         return mFocusHandler->isDragged(this);
@@ -744,8 +739,7 @@ namespace gcn
     {
         if (mFocusHandler == nullptr)
         {
-        	assert(!"No focushandler set (did you add the widget to the gui?).");
-            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+            throw std::runtime_error("No focushandler set (did you add the widget to the gui?).");
         }
 
         mFocusHandler->requestModalFocus(this);
@@ -765,8 +759,7 @@ namespace gcn
     {
         if (mFocusHandler == nullptr)
         {
-            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
-            assert(!"No focushandler set (did you add the widget to the gui?).");
+            throw std::runtime_error("No focushandler set (did you add the widget to the gui?).");
         }
 
         if (getParent() != nullptr)

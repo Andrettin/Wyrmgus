@@ -35,6 +35,7 @@
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "util/assert_util.h"
 
 /**
 **  Death-Coil class. Damages organic units and gives to the caster.
@@ -50,7 +51,7 @@ void MissileDeathCoil::Action()
 	if (this->NextMissileFrame(1, 0) == false) {
 		return;
 	}
-	Assert(this->get_source_unit() != nullptr);
+	assert_throw(this->get_source_unit() != nullptr);
 	CUnit &source = *this->get_source_unit();
 
 	if (source.Destroyed) {

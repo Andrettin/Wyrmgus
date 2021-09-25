@@ -56,6 +56,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
+#include "util/assert_util.h"
 #include "video/font.h"
 #include "video/font_color.h"
 #include "video/video.h"
@@ -165,7 +166,7 @@ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const 
 
 void CPopupContentTypeButtonInfo::Parse(lua_State *l)
 {
-	Assert(lua_istable(l, -1));
+	assert_throw(lua_istable(l, -1));
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
@@ -289,7 +290,7 @@ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsign
 
 void CPopupContentTypeText::Parse(lua_State *l)
 {
-	Assert(lua_istable(l, -1));
+	assert_throw(lua_istable(l, -1));
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
@@ -472,7 +473,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 
 void CPopupContentTypeCosts::Parse(lua_State *l)
 {
-	Assert(lua_istable(l, -1) || lua_isnil(l, -1));
+	assert_throw(lua_istable(l, -1) || lua_isnil(l, -1));
 
 	if (!lua_isnil(l, -1)) {
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -519,7 +520,7 @@ void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsign
 
 void CPopupContentTypeLine::Parse(lua_State *l)
 {
-	Assert(lua_istable(l, -1) || lua_isnil(l, -1));
+	assert_throw(lua_istable(l, -1) || lua_isnil(l, -1));
 
 	if (!lua_isnil(l, -1)) {
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -570,7 +571,7 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font(); // Font to use.
 
-	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
+	assert_throw(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
 	CLabel label(font, this->TextColor, this->HighlightColor);
 
@@ -661,7 +662,7 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 
 void CPopupContentTypeVariable::Parse(lua_State *l)
 {
-	Assert(lua_istable(l, -1) || lua_isstring(l, -1));
+	assert_throw(lua_istable(l, -1) || lua_isstring(l, -1));
 
 	if (lua_isstring(l, -1)) {
 		this->Text = CclParseStringDesc(l);
@@ -696,7 +697,7 @@ void CPopupContentTypeVariable::Parse(lua_State *l)
 */
 static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 {
-	Assert(lua_istable(l, -1));
+	assert_throw(lua_istable(l, -1));
 
 	auto condition = std::make_unique<PopupConditionPanel>();
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -854,7 +855,7 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 
 std::unique_ptr<CPopupContentType> CPopupContentType::ParsePopupContent(lua_State *l)
 {
-	Assert(lua_istable(l, -1));
+	assert_throw(lua_istable(l, -1));
 
 	bool wrap = true;
 	int marginX = MARGIN_X * wyrmgus::defines::get()->get_scale_factor();
@@ -882,7 +883,7 @@ std::unique_ptr<CPopupContentType> CPopupContentType::ParsePopupContent(lua_Stat
 		} else if (!strcmp(key, "MinHeight")) {
 			minHeight = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "More")) {
-			Assert(lua_istable(l, -1));
+			assert_throw(lua_istable(l, -1));
 			key = LuaToString(l, -1, 1); // Method name
 			lua_rawgeti(l, -1, 2); // Method data
 			if (!strcmp(key, "ButtonInfo")) {

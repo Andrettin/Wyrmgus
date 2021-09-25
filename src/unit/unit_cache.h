@@ -37,7 +37,7 @@ class CUnit;
 /**
 **  Unit cache
 */
-class CUnitCache
+class CUnitCache final
 {
 public:
 	using iterator = std::vector<CUnit *>::iterator;
@@ -63,12 +63,12 @@ public:
 
 	CUnit *operator[](const unsigned int index) const
 	{
-		//Assert(index < Units.size());
+		//assert_throw(index < Units.size());
 		return Units[index];
 	}
 	CUnit *operator[](const unsigned int index)
 	{
-		//Assert(index < Units.size());
+		//assert_throw(index < Units.size());
 		return Units[index];
 	}
 
@@ -133,17 +133,7 @@ public:
 	**  @param index  Unit index to remove from container.
 	**  @return pointer to removed element.
 	*/
-	CUnit *Remove(const unsigned int index)
-	{
-		const size_t size = Units.size();
-		Assert(index < size);
-		CUnit *tmp = Units[index];
-		if (size > 1) {
-			Units[index] = Units[size - 1];
-		}
-		Units.pop_back();
-		return tmp;
-	}
+	CUnit *Remove(const unsigned int index);
 
 	/**
 	**  Remove unit from unit cache.

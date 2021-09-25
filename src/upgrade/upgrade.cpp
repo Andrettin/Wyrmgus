@@ -82,6 +82,7 @@
 #include "upgrade/upgrade_category_rank.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/assert_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
@@ -1321,9 +1322,8 @@ int UnitTypeIdByIdent(const std::string &ident)
 	if (type) {
 		return type->Slot;
 	}
-	DebugPrint(" fix this %s\n" _C_ ident.c_str());
-	Assert(0);
-	return -1;
+
+	throw std::runtime_error("Fix this " + ident + ".");
 }
 
 /**
@@ -1461,7 +1461,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const wyrmgus::unit_type &src, wy
 */
 static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifier *um)
 {
-	Assert(um);
+	assert_throw(um != nullptr);
 
 	int pn = player.get_index();
 
@@ -1757,7 +1757,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 */
 static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifier *um)
 {
-	Assert(um);
+	assert_throw(um != nullptr);
 
 	int pn = player.get_index();
 
@@ -2036,7 +2036,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 */
 void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier *um)
 {
-	Assert(um);
+	assert_throw(um != nullptr);
 
 	for (size_t i = 0; i < um->RemoveUpgrades.size(); ++i) {
 		if (unit.GetIndividualUpgrade(um->RemoveUpgrades[i])) {
@@ -2122,7 +2122,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 
 void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier *um)
 {
-	Assert(um);
+	assert_throw(um != nullptr);
 
 	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 		if (unit.IsAlive()) {
@@ -2503,7 +2503,7 @@ void AllowUnitId(CPlayer &player, int id, int units)
 */
 void AllowUpgradeId(CPlayer &player, int id, char af)
 {
-	Assert(af == 'A' || af == 'F' || af == 'R');
+	assert_throw(af == 'A' || af == 'F' || af == 'R');
 	player.Allow.Upgrades[id] = af;
 }
 
@@ -2517,7 +2517,7 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 */
 int UnitIdAllowed(const CPlayer &player, int id)
 {
-	Assert(id >= 0 && id < UnitTypeMax);
+	assert_throw(id >= 0 && id < UnitTypeMax);
 	return player.Allow.Units[id];
 }
 
@@ -2531,7 +2531,7 @@ int UnitIdAllowed(const CPlayer &player, int id)
 */
 char UpgradeIdAllowed(const CPlayer &player, int id)
 {
-	Assert(id >= 0 && id < UpgradeMax);
+	assert_throw(id >= 0 && id < UpgradeMax);
 	return player.Allow.Upgrades[id];
 }
 

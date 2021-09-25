@@ -31,10 +31,11 @@
 #include "animation/animation_goto.h"
 
 #include "unit/unit.h"
+#include "util/assert_util.h"
 
 void CAnimation_Goto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	Assert(unit.Anim.Anim == this);
+	assert_throw(unit.Anim.Anim == this);
 
 	unit.Anim.Anim = this->gotoLabel;
 }

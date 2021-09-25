@@ -234,9 +234,7 @@ int CFile::PImpl::open(const std::string &filepath_str, const long openflags)
 	} else if (openflags & CL_OPEN_WRITE) {
 		openstring = "wb";
 	} else {
-		DebugPrint("Bad CLopen flags");
-		Assert(0);
-		return -1;
+		throw std::runtime_error("Bad CLopen flags.");
 	}
 
 	cl_type = CLF_TYPE_INVALID;

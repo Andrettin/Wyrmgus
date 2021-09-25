@@ -173,6 +173,7 @@
 #include "map/tileset.h"
 
 #include "map/tile_flag.h"
+#include "util/assert_util.h"
 #include "util/random.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
@@ -445,7 +446,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 		}
 		if (type1 == type2) { // Oooh a solid tile.
 			const int res = findTileIndex(type1);
-			Assert(res != -1);
+			assert_throw(res != -1);
 			return res;
 		}
 	} else {
@@ -483,7 +484,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	if (findTilePath(type1, type2, 0, marks, &tileIndex) == INT_MAX) {
 		DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
 		const int res = findTileIndex(type1);
-		Assert(res != -1);
+		assert_throw(res != -1);
 		return res;
 	}
 	if (type1 == tiles[tileIndex].tileinfo.MixTerrain) {
@@ -565,7 +566,7 @@ int CTileset::getTileBySurrounding(const tile_flag type,
 	*/
 	//Wyrmgus end
 
-	Assert(type == tile_flag::tree || type == tile_flag::rock);
+	assert_throw(type == tile_flag::tree || type == tile_flag::rock);
 	const std::array<int, 20> &lookuptable = (type == tile_flag::tree) ? woodTable : rockTable;
 	tile = lookuptable[tile];
 
@@ -590,7 +591,7 @@ int CTileset::getTileBySurrounding(const tile_flag type,
 bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2, int tile_index) const
 //Wyrmgus end
 {
-	//Assert(type == tile_flag::tree || type == tile_flag::rock);
+	//assert_throw(type == tile_flag::tree || type == tile_flag::rock);
 
 	//Wyrmgus start
 //	return mixedLookupTable[tile1] == mixedLookupTable[tile2];
@@ -641,7 +642,7 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 			while (++i < 16 && !tiles[tile + i].tile) {
 			}
 		} while (i < 16 && n--);
-		Assert(i != 16);
+		assert_throw(i != 16);
 		return tile + i;
 	}
 	if (filler) {
@@ -680,7 +681,7 @@ unsigned CTileset::getQuadFromTile(unsigned int tileIndex) const
 	//Wyrmgus start
 //	const int tileIndex = findTileIndexByTile(tile);
 	//Wyrmgus end
-	Assert(tileIndex != -1);
+	assert_throw(tileIndex != -1);
 
 	const unsigned base = tiles[tileIndex].tileinfo.BaseTerrain;
 	const unsigned mix = tiles[tileIndex].tileinfo.MixTerrain;
@@ -705,7 +706,7 @@ unsigned CTileset::getQuadFromTile(unsigned int tileIndex) const
 		case 12: return (base << 24) | (mix << 16) | (base << 8) | base;
 		case 13: return (mix << 24) | (base << 16) | (base << 8) | base;
 	}
-	Assert(0);
+	assert_throw(false);
 	return base | (base << 8) | (base << 16) | (base << 24);
 }
 

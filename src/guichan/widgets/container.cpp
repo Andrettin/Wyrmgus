@@ -194,8 +194,8 @@ namespace gcn
 				return;
 			}
 		}
-		assert(!"There is no such widget in this container.");
-		//throw GCN_EXCEPTION("There is no such widget in this container.");
+
+		throw std::runtime_error("There is no such widget in this container.");
 	}
 
 	void Container::moveToBottom(Widget* widget)
@@ -210,8 +210,8 @@ namespace gcn
 				return;
 			}
 		}
-		assert(!"There is no such widget in this container.");
-		//throw GCN_EXCEPTION("There is no such widget in this container.");
+
+		throw std::runtime_error("There is no such widget in this container.");
 	}
 
 	void Container::_announceDeath(Widget *widget)
@@ -230,8 +230,8 @@ namespace gcn
 				return;
 			}
 		}
-		assert(!"There is no such widget in this container.");
-		//throw GCN_EXCEPTION("There is no such widget in this container.");
+
+		throw std::runtime_error("There is no such widget in this container.");
 	}
 
 	void Container::getDrawSize(int& width, int& height, Widget* widget)
@@ -288,8 +288,7 @@ namespace gcn
 		}
 		else
 		{
-			assert(!"Widget not in container.");
-			//throw GCN_EXCEPTION("Widget not in container.");
+			throw std::runtime_error("Widget not in container.");
 		}
 	}
 
@@ -324,8 +323,7 @@ namespace gcn
 				return;
 			}
 		}
-		assert(!"There is no such widget in this container.");
-		//throw GCN_EXCEPTION("There is no such widget in this container.");
+		throw std::runtime_error("There is no such widget in this container.");
 	}
 
 	void Container::clear()

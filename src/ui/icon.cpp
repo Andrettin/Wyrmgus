@@ -35,6 +35,7 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "util/assert_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -279,7 +280,7 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos
 */
 bool IconConfig::LoadNoLog()
 {
-	Assert(!this->Name.empty());
+	assert_throw(!this->Name.empty());
 
 	Icon = wyrmgus::icon::try_get(this->Name);
 	return Icon != nullptr;

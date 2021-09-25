@@ -231,6 +231,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/random.h"
 #include "video/video.h"
 
@@ -536,7 +537,7 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 	nc.Unit = UnitNumber(unit);
 	nc.X = x;
 	nc.Y = y;
-	Assert(!dest || !type); // Both together isn't allowed
+	assert_throw(!dest || !type); // Both together isn't allowed
 	if (dest) {
 		nc.Dest = UnitNumber(*dest);
 	} else if (type) {
@@ -901,7 +902,7 @@ void NetworkQuitGame()
 
 static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 {
-	Assert((ncq.Type & 0x7F) == MessageSync);
+	assert_throw((ncq.Type & 0x7F) == MessageSync);
 
 	CNetworkCommandSync nc;
 	nc.Deserialize(&ncq.Data[0]);
@@ -923,7 +924,7 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 
 static void NetworkExecCommand_Selection(const CNetworkCommandQueue &ncq)
 {
-	Assert((ncq.Type & 0x7F) == MessageSelection);
+	assert_throw((ncq.Type & 0x7F) == MessageSelection);
 
 	CNetworkSelection ns;
 
@@ -941,7 +942,7 @@ static void NetworkExecCommand_Selection(const CNetworkCommandQueue &ncq)
 
 static void NetworkExecCommand_Chat(const CNetworkCommandQueue &ncq)
 {
-	Assert((ncq.Type & 0x7F) == MessageChat);
+	assert_throw((ncq.Type & 0x7F) == MessageChat);
 
 	CNetworkChat nc;
 	nc.Deserialize(&ncq.Data[0]);
@@ -953,7 +954,7 @@ static void NetworkExecCommand_Chat(const CNetworkCommandQueue &ncq)
 
 static void NetworkExecCommand_Quit(const CNetworkCommandQueue &ncq)
 {
-	Assert((ncq.Type & 0x7F) == MessageQuit);
+	assert_throw((ncq.Type & 0x7F) == MessageQuit);
 	CNetworkCommandQuit nc;
 
 	nc.Deserialize(&ncq.Data[0]);
@@ -964,7 +965,7 @@ static void NetworkExecCommand_Quit(const CNetworkCommandQueue &ncq)
 
 static void NetworkExecCommand_ExtendedCommand(const CNetworkCommandQueue &ncq)
 {
-	Assert((ncq.Type & 0x7F) == MessageExtendedCommand);
+	assert_throw((ncq.Type & 0x7F) == MessageExtendedCommand);
 	CNetworkExtendedCommand nec;
 
 	nec.Deserialize(&ncq.Data[0]);
@@ -995,7 +996,7 @@ static void NetworkExecCommand(const CNetworkCommandQueue &ncq)
 		case MessageExtendedCommand: NetworkExecCommand_ExtendedCommand(ncq); break;
 		case MessageNone:
 			// Nothing to Do, This Message Should Never be Executed
-			Assert(0);
+			assert_throw(false);
 			break;
 		default: NetworkExecCommand_Command(ncq); break;
 	}

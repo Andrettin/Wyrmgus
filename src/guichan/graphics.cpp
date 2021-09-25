@@ -102,8 +102,7 @@ namespace gcn
 
         if (mClipStack.empty())
         {
-        	assert(!"Tried to pop clip area from empty stack.");
-            //throw GCN_EXCEPTION("Tried to pop clip area from empty stack.");
+            throw std::runtime_error("Tried to pop clip area from empty stack.");
         }
 
         mClipStack.pop();
@@ -113,8 +112,7 @@ namespace gcn
     {
         if (mClipStack.empty())
         {
-        	assert(!"The clip area stack is empty.");
-            //throw GCN_EXCEPTION("The clip area stack is empty.");
+            throw std::runtime_error("The clip area stack is empty.");
         }
 
         return mClipStack.top();
@@ -146,8 +144,7 @@ namespace gcn
     {
         if (mFont == nullptr)
         {
-        	assert(!"No font set.");
-            //throw GCN_EXCEPTION("No font set.");
+            throw std::runtime_error("No font set.");
         }
 
         switch (alignment)
@@ -171,8 +168,7 @@ namespace gcn
 			  //Wyrmgus end
               break;
           default:
-          	assert(!"Unknown alignment.");
-              //throw GCN_EXCEPTION("Unknown alignment.");
+              throw std::runtime_error("Unknown alignment.");
         }
     }
 }

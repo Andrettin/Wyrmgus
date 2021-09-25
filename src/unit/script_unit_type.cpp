@@ -74,6 +74,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util/assert_util.h"
 #include "video/font.h"
 #include "video/video.h"
 
@@ -438,7 +439,7 @@ int ExtraDeathIndex(const char *death)
 static void ParseBuildingRules(lua_State *l, std::vector<std::unique_ptr<CBuildRestriction>> &blist)
 {
 	const int args = lua_rawlen(l, -1);
-	Assert(!(args & 1)); // must be even
+	assert_throw(!(args & 1)); // must be even
 
 	for (int i = 0; i < args; ++i) {
 		const char *value = LuaToString(l, -1, i + 1);
@@ -828,7 +829,7 @@ static int CclDefineUnitType(lua_State *l)
 					type->variations.push_back(std::move(variation));
 				}
 
-				// Assert(variation->VariationId);
+				// assert_throw(variation->VariationId);
 				lua_pop(l, 1);
 			}
 			
@@ -1709,7 +1710,7 @@ static int CclDefineUnitStats(lua_State *l)
 	wyrmgus::unit_type *type = wyrmgus::unit_type::get(LuaToString(l, 1));
 	const int playerId = LuaToNumber(l, 2);
 
-	Assert(playerId < PlayerMax);
+	assert_throw(playerId < PlayerMax);
 
 	CUnitStats *stats = &type->Stats[playerId];
 	if (stats->Variables.empty()) {
@@ -2655,7 +2656,7 @@ static int CclDefineDecorations(lua_State *l)
 
 	const int nargs = lua_gettop(l);
 	for (int i = 0; i < nargs; i++) {
-		Assert(lua_istable(l, i + 1));
+		assert_throw(lua_istable(l, i + 1));
 		CDecoVar *decovar = nullptr;
 		memset(&tmp, 0, sizeof(tmp));
 		lua_pushnil(l);
@@ -2664,7 +2665,7 @@ static int CclDefineDecorations(lua_State *l)
 			if (!strcmp(key, "Index")) {
 				const char *const value = LuaToString(l, -1);
 				tmp.Index = UnitTypeVar.VariableNameLookup[value];// User variables
-				Assert(tmp.Index != -1);
+				assert_throw(tmp.Index != -1);
 			//Wyrmgus start
 			} else if (!strcmp(key, "MinValue")) {
 				tmp.MinValue = LuaToNumber(l, -1);
@@ -2706,10 +2707,10 @@ static int CclDefineDecorations(lua_State *l)
 			} else if (!strcmp(key, "ResourceBar")) {
 				tmp.resource_bar = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "Method")) {
-				Assert(lua_istable(l, -1));
+				assert_throw(lua_istable(l, -1));
 				lua_rawgeti(l, -1, 1); // MethodName
 				lua_rawgeti(l, -2, 2); // Data
-				Assert(lua_istable(l, -1));
+				assert_throw(lua_istable(l, -1));
 				key = LuaToString(l, -2);
 				if (!strcmp(key, "bar")) {
 					CDecoVarBar *decovarbar = new CDecoVarBar;
@@ -2821,7 +2822,7 @@ static int CclDefineDecorations(lua_State *l)
 		}
 		//Wyrmgus end
 	}
-	Assert(lua_gettop(l));
+	assert_throw(lua_gettop(l) != 0);
 	return 0;
 }
 

@@ -74,6 +74,7 @@
 #include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
@@ -594,7 +595,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 		}
 		if (action == MouseActionSpellCast && unit.Type->Spells.size() > 0) {
 			// This is for demolition squads and such
-			Assert(unit.Type->Spells.size() > 0);
+			assert_throw(unit.Type->Spells.size() > 0);
 			int spellnum = type.Spells[0]->Slot;
 			SendCommandSpellCast(unit, pos, &dest, spellnum, flush, UI.CurrentMapLayer->ID);
 		} else {
@@ -1004,7 +1005,7 @@ static void DoRightButton(const PixelPos &mapPixelPos, const Qt::KeyboardModifie
 
 	int acknowledged = 0; // to play sound
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		Assert(Selected[i]);
+		assert_throw(Selected[i] != nullptr);
 		CUnit &unit = *Selected[i];
 
 		DoRightButton_ForSelectedUnit(unit, dest, pos, acknowledged, key_modifiers);
@@ -1021,7 +1022,7 @@ static void DoRightButton(const PixelPos &mapPixelPos, const Qt::KeyboardModifie
 */
 bool CUIButton::Contains(const PixelPos &screenPos) const
 {
-	Assert(this->Style);
+	assert_throw(this->Style != nullptr);
 
 	return this->X <= screenPos.x && screenPos.x < this->X + this->Style->Width
 		   && this->Y <= screenPos.y && screenPos.y < this->Y + this->Style->Height;
@@ -1220,7 +1221,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	//  Map
 	if (!on_ui && UI.MapArea.Contains(screenPos)) {
 		CViewport *vp = GetViewport(screenPos);
-		Assert(vp);
+		assert_throw(vp != nullptr);
 		// viewport changed
 		if (UI.MouseViewport != vp) {
 			UI.MouseViewport = vp;
@@ -2222,7 +2223,7 @@ static void UISelectStateButtonDown(unsigned, const Qt::KeyboardModifiers key_mo
 
 static void UIHandleButtonDown_OnMap(const Qt::KeyboardModifiers key_modifiers)
 {
-	Assert(UI.MouseViewport);
+	assert_throw(UI.MouseViewport != nullptr);
 	
 	if (!UI.MouseViewport) {
 		return;
@@ -2526,13 +2527,12 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
 							continue;
 						}
-						if (ButtonAreaUnderCursor == ButtonAreaTransporting
-							&& static_cast<size_t>(ButtonUnderCursor) == j) {
-								Assert(uins->Boarded);
-								const int flush = !(key_modifiers & Qt::ShiftModifier);
-								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
-									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
-								}
+						if (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) {
+							assert_throw(uins->Boarded);
+							const int flush = !(key_modifiers & Qt::ShiftModifier);
+							if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
+								SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
+							}
 						}
 						++j;
 					}
@@ -2550,27 +2550,26 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 						if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
 							continue;
 						}
-						if (ButtonAreaUnderCursor == ButtonAreaInventory
-							&& static_cast<size_t>(ButtonUnderCursor) == j) {
-								Assert(uins->Type->BoolFlag[ITEM_INDEX].value);
-								const int flush = !(key_modifiers & Qt::ShiftModifier);
-								if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
-									if ((1 << button) == LeftButton) {
-										if  (!uins->Bound) {
-											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
-										} else {
-											if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
-												std::string item_name = uins->GetMessageName();
-												if (uins->get_unique() == nullptr) {
-													item_name = "the " + item_name;
-												}
-												Selected[0]->Player->Notify(NotifyRed, Selected[0]->tilePos, Selected[0]->MapLayer->ID, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());
+						if (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) {
+							assert_throw(uins->Type->BoolFlag[ITEM_INDEX].value);
+							const int flush = !(key_modifiers & Qt::ShiftModifier);
+							if (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || uins->Player == CPlayer::GetThisPlayer()) {
+								if ((1 << button) == LeftButton) {
+									if  (!uins->Bound) {
+										SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
+									} else {
+										if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
+											std::string item_name = uins->GetMessageName();
+											if (uins->get_unique() == nullptr) {
+												item_name = "the " + item_name;
 											}
+											Selected[0]->Player->Notify(NotifyRed, Selected[0]->tilePos, Selected[0]->MapLayer->ID, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());
 										}
-									} else if ((1 << button) == RightButton) {
-										SendCommandUse(*Selected[0], *uins, flush);
 									}
+								} else if ((1 << button) == RightButton) {
+									SendCommandUse(*Selected[0], *uins, flush);
 								}
+							}
 						}
 						++j;
 					}

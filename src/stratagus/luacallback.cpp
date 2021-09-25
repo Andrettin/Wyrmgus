@@ -44,7 +44,7 @@ LuaCallback::LuaCallback(lua_State *l, lua_Object f) :
 {
 	if (!lua_isfunction(l, f)) {
 		LuaError(l, "Argument isn't a function");
-		Assert(0);
+		throw std::runtime_error("Argument isn't a function.");
 	}
 	lua_pushvalue(l, f);
 	luaref = luaL_ref(l, LUA_REGISTRYINDEX);

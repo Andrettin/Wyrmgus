@@ -57,6 +57,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/assert_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
 
@@ -531,7 +532,8 @@ void AiNewDepotRequest(CUnit &worker)
 			   _C_ worker->CurrentResource
 			   _C_ worker->Data.Move.Cycles);
 #endif
-	Assert(worker.CurrentAction() == UnitAction::Resource);
+
+	assert_throw(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const resource *resource = order.get_current_resource();
 
@@ -649,7 +651,7 @@ private:
 */
 CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit)
 {
-	Assert(worker.CurrentAction() == UnitAction::Resource);
+	assert_throw(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const resource *resource = order.get_current_resource();
 	std::vector<CUnit *> depots;
@@ -915,7 +917,7 @@ static bool AiRequestSupply()
 		cache[j].unit_cost += type.Stats[AiPlayer->Player->get_index()].Variables[SUPPLY_INDEX].Value - 1;
 		cache[j].unit_cost /= type.Stats[AiPlayer->Player->get_index()].Variables[SUPPLY_INDEX].Value;
 		cache[j++].type = &type;
-		Assert(j < 16);
+		assert_throw(j < 16);
 	}
 
 	if (j > 1) {
@@ -1420,7 +1422,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, const wyrmgus::resource *resou
 					exploremask |= tile_flag::sea_unit;
 					break;
 				default:
-					Assert(0);
+					assert_throw(false);
 			}
 		}
 	}
@@ -1786,7 +1788,7 @@ static void AiCollectResources()
 					}
 					//Wyrmgus end
 
-					Assert(unit->CurrentAction() == UnitAction::Resource);
+					assert_throw(unit->CurrentAction() == UnitAction::Resource);
 					COrder_Resource &order = *static_cast<COrder_Resource *>(unit->CurrentOrder());
 
 					if (order.IsGatheringFinished()) {

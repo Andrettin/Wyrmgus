@@ -481,7 +481,7 @@ int AiForce::PlanAttack()
 /*
 static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 {
-	Assert(pos != nullptr);
+	assert_throw(pos != nullptr);
 
 	int ray = 3;
 	const int maxTryCount = 8;

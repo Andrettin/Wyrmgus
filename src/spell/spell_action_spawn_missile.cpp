@@ -36,6 +36,7 @@
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "util/assert_util.h"
 #include "util/string_conversion_util.h"
 #include "util/util.h"
 
@@ -65,7 +66,7 @@ struct CompareUnitDistance {
 */
 static void CclSpellMissileLocation(lua_State *l, wyrmgus::spell_action_spawn_missile::missile_location *location)
 {
-	Assert(location != nullptr);
+	assert_throw(location != nullptr);
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");

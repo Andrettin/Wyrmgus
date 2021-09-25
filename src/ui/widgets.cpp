@@ -46,6 +46,7 @@
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/ui.h"
+#include "util/assert_util.h"
 #include "video/font.h"
 #include "video/video.h"
 
@@ -512,8 +513,7 @@ void ImageButton::draw(gcn::Graphics *graphics, std::vector<std::function<void(r
 			break;
 		default:
 			textX = 0;
-			Assert(!"Unknown alignment.");
-			//throw GCN_EXCEPTION("Unknown alignment.");
+			throw std::runtime_error("Unknown alignment.");
 	}
 
 	graphics->setFont(getFont());
@@ -738,8 +738,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics, std::vector<std::func
 			break;
 		default:
 			textX = 0;
-			Assert(!"Unknown alignment.");
-			//throw GCN_EXCEPTION("Unknown alignment.");
+			throw std::runtime_error("Unknown alignment.");
 	}
 
 	graphics->setFont(getFont());
@@ -1130,8 +1129,7 @@ void MultiLineLabel::draw(gcn::Graphics *graphics, std::vector<std::function<voi
 			break;
 		default:
 			textX = 0;
-			Assert(!"Unknown alignment.");
-			//throw GCN_EXCEPTION("Unknown alignment.");
+			throw std::runtime_error("Unknown alignment.");
 	}
 	switch (this->getVerticalAlignment()) {
 		case TOP:
@@ -1145,8 +1143,7 @@ void MultiLineLabel::draw(gcn::Graphics *graphics, std::vector<std::function<voi
 			break;
 		default:
 			textY = 0;
-			Assert(!"Unknown alignment.");
-			//throw GCN_EXCEPTION("Unknown alignment.");
+			throw std::runtime_error("Unknown alignment.");
 	}
 
 	for (int i = 0; i < (int)this->mTextRows.size(); ++i) {
@@ -1715,7 +1712,7 @@ void ListBoxWidget::adjustSize()
 	gcn::ListModel *listmodel;
 
 	width = listbox.getWidth();
-	Assert(listbox.getListModel());
+	assert_throw(listbox.getListModel() != nullptr);
 	listmodel = listbox.getListModel();
 	for (i = 0; i < listmodel->getNumberOfElements(); ++i) {
 		if (width < listbox.getFont()->getWidth(listmodel->getElementAt(i))) {
@@ -1739,7 +1736,7 @@ void ImageListBoxWidget::adjustSize()
 	gcn::ListModel *listmodel;
 
 	width = listbox.getWidth();
-	Assert(listbox.getListModel());
+	assert_throw(listbox.getListModel() != nullptr);
 	listmodel = listbox.getListModel();
 	for (i = 0; i < listmodel->getNumberOfElements(); ++i) {
 		if (width < listbox.getFont()->getWidth(listmodel->getElementAt(i))) {
@@ -2156,7 +2153,7 @@ void DropDownWidget::setSize(int width, int height)
 
 void ImageDropDownWidget::setListModel(LuaListModel *listModel)
 {
-	Assert(mScrollArea && mScrollArea->getContent() != nullptr);
+	assert_throw(mScrollArea && mScrollArea->getContent() != nullptr);
 
 	mListBox.setListModel(listModel);
 
@@ -2203,7 +2200,7 @@ void ImageDropDownWidget::setDownPressedImage(const std::string &image_path)
 
 void ImageDropDownWidget::draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	Assert(mScrollArea && mScrollArea->getContent() != nullptr);
+	assert_throw(mScrollArea && mScrollArea->getContent() != nullptr);
 	int h;
 
 	if (mDroppedDown)
@@ -2332,14 +2329,14 @@ void ImageDropDownWidget::drawButton(gcn::Graphics *graphics, std::vector<std::f
 
 int ImageDropDownWidget::getSelected()
 {
-	Assert(mScrollArea && mScrollArea->getContent() != nullptr);
+	assert_throw(mScrollArea && mScrollArea->getContent() != nullptr);
 
 	return mListBox.getSelected();
 }
 
 void ImageDropDownWidget::setSelected(int selected)
 {
-	Assert(mScrollArea && mScrollArea->getContent() != nullptr);
+	assert_throw(mScrollArea && mScrollArea->getContent() != nullptr);
 
 	if (selected >= 0)
 	{
@@ -2349,7 +2346,7 @@ void ImageDropDownWidget::setSelected(int selected)
 
 void ImageDropDownWidget::adjustHeight()
 {
-	Assert(mScrollArea && mScrollArea->getContent() != nullptr);
+	assert_throw(mScrollArea && mScrollArea->getContent() != nullptr);
 
 	int listBoxHeight = mListBox.getHeight();
 	int h2 = mOldH ? mOldH : getFont()->getHeight();
@@ -2412,7 +2409,7 @@ void ImageDropDownWidget::_mouseInputMessage(const gcn::MouseInput &mouseInput)
 
 	if (mDroppedDown)
 	{
-		Assert(mScrollArea && mScrollArea->getContent() != nullptr);
+		assert_throw(mScrollArea && mScrollArea->getContent() != nullptr);
 
 		if (mouseInput.y >= mOldH)
 		{
@@ -2585,7 +2582,7 @@ void MenuScreen::stop(int result, bool stopAll)
 
 	if (!this->runLoop) {
 		Gui->setTop(this->oldtop);
-		Assert(MenuStack.top() == this);
+		assert_throw(MenuStack.top() == this);
 		MenuStack.pop();
 		if (stopAll) {
 			while (!MenuStack.empty()) {

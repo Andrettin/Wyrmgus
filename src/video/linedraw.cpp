@@ -28,10 +28,12 @@
 //      02111-1307, USA.
 
 #include "stratagus.h"
+
 #include "video/video.h"
 
 #include "intern_video.h"
 
+#include "util/assert_util.h"
 #include "video/renderer.h"
 
 /**
@@ -425,7 +427,7 @@ void DrawLineClip(uint32_t color, int x1, int y1, int x2, int y2, std::vector<st
 	//        direction vector might be slightly off. Somehow, the sub-pixel
 	//        position(s) on the clipped retangle should be denoted to the line
 	//        drawing routine..
-	Assert(x1 >= ClipX1 && x2 >= ClipX1 && x1 <= ClipX2 && x2 <= ClipX2 &&
+	assert_throw(x1 >= ClipX1 && x2 >= ClipX1 && x1 <= ClipX2 && x2 <= ClipX2 &&
 		   y1 >= ClipY1 && y2 >= ClipY1 && y1 <= ClipY2 && y2 <= ClipY2);
 	DrawLine(color, x1, y1, x2, y2, render_commands);
 }
@@ -699,13 +701,13 @@ void DrawCircle(uint32_t color, int x, int y, int radius, std::vector<std::funct
 			DrawPixel(color, x + cy, y, render_commands);
 			DrawPixel(color, x - cy, y, render_commands);
 		} else if (cx == cy) {
-			Assert(cx != 0 && cy != 0);
+			assert_throw(cx != 0 && cy != 0);
 			DrawPixel(color, x + cx, y + cy, render_commands);
 			DrawPixel(color, x - cx, y + cy, render_commands);
 			DrawPixel(color, x + cx, y - cy, render_commands);
 			DrawPixel(color, x - cx, y - cy, render_commands);
 		} else if (cx < cy) {
-			Assert(cx != 0 && cy != 0);
+			assert_throw(cx != 0 && cy != 0);
 			DrawPixel(color, x + cx, y + cy, render_commands);
 			DrawPixel(color, x + cx, y - cy, render_commands);
 			DrawPixel(color, x + cy, y + cx, render_commands);
@@ -752,13 +754,13 @@ void DrawCircleClip(uint32_t color, int x, int y, int radius, std::vector<std::f
 			DrawPixelClip(color, x + cy, y, render_commands);
 			DrawPixelClip(color, x - cy, y, render_commands);
 		} else if (cx == cy) {
-			Assert(cx != 0 && cy != 0);
+			assert_throw(cx != 0 && cy != 0);
 			DrawPixelClip(color, x + cx, y + cy, render_commands);
 			DrawPixelClip(color, x - cx, y + cy, render_commands);
 			DrawPixelClip(color, x + cx, y - cy, render_commands);
 			DrawPixelClip(color, x - cx, y - cy, render_commands);
 		} else if (cx < cy) {
-			Assert(cx != 0 && cy != 0);
+			assert_throw(cx != 0 && cy != 0);
 			DrawPixelClip(color, x + cx, y + cy, render_commands);
 			DrawPixelClip(color, x + cx, y - cy, render_commands);
 			DrawPixelClip(color, x + cy, y + cx, render_commands);

@@ -33,6 +33,7 @@
 #include "luacallback.h"
 #include "map/map.h"
 #include "unit/unit_find.h"
+#include "util/assert_util.h"
 
 /**
 **  Calculate parabolic trajectories.
@@ -55,15 +56,15 @@ static bool ParabolicMissile(Missile &missile)
 	if (missile.TotalStep == 0) {
 		return true;
 	}
-	Assert(missile.Type != nullptr);
+	assert_throw(missile.Type != nullptr);
 	const PixelPos orig_pos = missile.position;
-	Assert(missile.TotalStep != 0);
+	assert_throw(missile.TotalStep != 0);
 	const PixelPos diff = (missile.destination - missile.source);
 	const PixelPrecise sign(diff.x >= 0 ? 1 : -1, diff.y >= 0 ? 1 : -1); // Remember sign to move into correct direction
 	PixelPrecise pos(missile.position.x, missile.position.y); // Remember old position
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
-	Assert(k != 0);
+	assert_throw(k != 0);
 	z = (double)missile.CurrentStep * (missile.TotalStep - missile.CurrentStep) / k;
 	// Until Z is used for drawing, modify X and Y.
 	missile.position.x += (int)(z * zprojToX / 64.0);

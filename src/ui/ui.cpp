@@ -55,6 +55,7 @@
 #include "ui/interface.h"
 #include "ui/popup.h"
 #include "unit/unit.h"
+#include "util/assert_util.h"
 #include "video/font.h"
 #include "video/video.h"
 
@@ -410,8 +411,8 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	vp.BottomRightPos.x = std::min<int>(vp.BottomRightPos.x, ClipX);
 	vp.BottomRightPos.y = std::min<int>(vp.BottomRightPos.y, ClipY);
 
-	Assert(vp.BottomRightPos.x <= UI.MapArea.EndX);
-	Assert(vp.BottomRightPos.y <= UI.MapArea.EndY);
+	assert_throw(vp.BottomRightPos.x <= UI.MapArea.EndX);
+	assert_throw(vp.BottomRightPos.y <= UI.MapArea.EndY);
 }
 
 /**

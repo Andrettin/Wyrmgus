@@ -34,6 +34,7 @@
 #include "map/map.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "util/assert_util.h"
 
 /**
 **  Handle tracer missile.
@@ -49,8 +50,8 @@ static bool TracerMissile(Missile &missile)
 		return true;
 	}
 
-	Assert(missile.Type != nullptr);
-	Assert(missile.TotalStep != 0);
+	assert_throw(missile.Type != nullptr);
+	assert_throw(missile.TotalStep != 0);
 	if (missile.get_target_unit()) {
 		missile.destination = missile.get_target_unit()->get_map_pixel_pos_top_left();
 	}

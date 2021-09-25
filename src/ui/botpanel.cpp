@@ -86,6 +86,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
+#include "util/assert_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
@@ -1020,7 +1021,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 	}
 	const std::vector<std::unique_ptr<wyrmgus::button>> &buttons(CurrentButtons);
 
-	Assert(!Selected.empty());
+	assert_throw(!Selected.empty());
 	std::string str;
 
 	//  Draw all buttons.
@@ -1031,7 +1032,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 			continue;
 		}
 
-		Assert(button->get_pos() == static_cast<int>(i + 1));
+		assert_throw(button->get_pos() == static_cast<int>(i + 1));
 
 		//Wyrmgus start
 		//for neutral units, don't draw buttons that aren't training buttons (in other words, only draw buttons which are usable by neutral buildings)
@@ -1054,7 +1055,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 				break;
 			} else if (button->Action == ButtonCmd::SpellCast
 				&& (*Selected[j]).get_spell_cooldown_timer(wyrmgus::spell::get_all()[button->Value]) > 0) {
-				Assert(wyrmgus::spell::get_all()[button->Value]->get_cooldown() > 0);
+				assert_throw(spell::get_all()[button->Value]->get_cooldown() > 0);
 				cooldownSpell = true;
 				maxCooldown = std::max(maxCooldown, (*Selected[j]).get_spell_cooldown_timer(wyrmgus::spell::get_all()[button->Value]));
 			}
@@ -1584,8 +1585,8 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<wyr
 			}
 		}
 
-		Assert(1 <= button->get_pos());
-		Assert(button->get_pos() <= (int)UI.ButtonPanel.Buttons.size());
+		assert_throw(1 <= button->get_pos());
+		assert_throw(button->get_pos() <= (int)UI.ButtonPanel.Buttons.size());
 
 		// is button allowed after all?
 		if (allow) {
@@ -1630,7 +1631,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 		only_cancel_allowed = false;
 	}
 	for (const wyrmgus::button *button : wyrmgus::button::get_all()) {
-		Assert(0 < button->get_pos() && button->get_pos() <= (int)UI.ButtonPanel.Buttons.size());
+		assert_throw(0 < button->get_pos() && button->get_pos() <= (int)UI.ButtonPanel.Buttons.size());
 
 		// Same level
 		if (button->get_level() != CurrentButtonLevel) {
@@ -1940,7 +1941,7 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 
 void CButtonPanel::DoClicked_CancelTrain()
 {
-	Assert(Selected[0]->CurrentAction() == UnitAction::Train);
+	assert_throw(Selected[0]->CurrentAction() == UnitAction::Train);
 	SendCommandCancelTraining(*Selected[0], -1, nullptr);
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
@@ -1949,7 +1950,7 @@ void CButtonPanel::DoClicked_CancelTrain()
 void CButtonPanel::DoClicked_CancelBuild()
 {
 	// FIXME: johns is this not sure, only building should have this?
-	Assert(Selected[0]->CurrentAction() == UnitAction::Built);
+	assert_throw(Selected[0]->CurrentAction() == UnitAction::Built);
 	if (Selected.size() == 1) {
 		SendCommandDismiss(*Selected[0]);
 	}
@@ -2231,7 +2232,7 @@ void CButtonPanel::DoClicked_CallbackAction(int button)
 */
 void CButtonPanel::DoClicked(int button, const Qt::KeyboardModifiers key_modifiers)
 {
-	Assert(0 <= button && button < (int)UI.ButtonPanel.Buttons.size());
+	assert_throw(0 <= button && button < (int)UI.ButtonPanel.Buttons.size());
 	// no buttons
 	if (CurrentButtons.empty()) {
 		return;

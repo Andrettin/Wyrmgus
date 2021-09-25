@@ -38,6 +38,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -218,7 +219,7 @@ static int CclMissile(lua_State *l)
 			z = LuaToNumber(l, j + 1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "local")) {
-			Assert(type);
+			assert_throw(type != nullptr);
 			//Wyrmgus start
 //			missile = MakeLocalMissile(*type, position, destination);
 			missile = MakeLocalMissile(*type, position, destination, z);
@@ -226,7 +227,7 @@ static int CclMissile(lua_State *l)
 			missile->Local = 1;
 			--j;
 		} else if (!strcmp(value, "global")) {
-			Assert(type);
+			assert_throw(type != nullptr);
 			//Wyrmgus start
 //			missile = MakeMissile(*type, position, destination);
 			missile = MakeMissile(*type, position, destination, z);
@@ -240,45 +241,45 @@ static int CclMissile(lua_State *l)
 			missile->Local = 0;
 			--j;
 		} else if (!strcmp(value, "frame")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			missile->SpriteFrame = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "state")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			missile->State = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "anim-wait")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			missile->AnimWait = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "wait")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			missile->Wait = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "delay")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			missile->Delay = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "source")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			lua_pushvalue(l, j + 1);
 			missile->SourceUnit = CclGetUnitFromRef(l)->acquire_ref();
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "target")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			lua_pushvalue(l, j + 1);
 			missile->TargetUnit = CclGetUnitFromRef(l)->acquire_ref();
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "damage")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			missile->Damage = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "lightning-damage")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			missile->LightningDamage = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "ttl")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			missile->TTL = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "hidden")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			missile->Hidden = 1;
 			--j;
 		} else if (!strcmp(value, "step")) {
-			Assert(missile);
+			assert_throw(missile != nullptr);
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}

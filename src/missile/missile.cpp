@@ -60,6 +60,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/point_util.h"
 #include "util/string_conversion_util.h"
 #include "util/util.h"
@@ -171,7 +172,7 @@ void missile_type::LoadMissileSprite()
 		this->G->Load(defines::get()->get_scale_factor());
 
 		// Correct the number of frames in graphic
-		Assert(this->G->NumFrames >= this->get_frames());
+		assert_throw(this->G->NumFrames >= this->get_frames());
 		this->G->NumFrames = this->get_frames();
 		// FIXME: Don't use NumFrames as number of frames.
 	}
@@ -563,7 +564,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 
 	damage -= SyncRand((damage + 2) / 2);
 
-	Assert(damage >= 0);
+	assert_throw(damage >= 0);
 
 	return damage;
 }
@@ -589,7 +590,7 @@ int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *
 		return CalculateDamageStats(attacker, *goal.Stats, &goal, missile);
 		//Wyrmgus end
 	}
-	Assert(formula);
+	assert_throw(formula != nullptr);
 
 	UpdateUnitVariables(const_cast<CUnit &>(attacker));
 	UpdateUnitVariables(const_cast<CUnit &>(goal));
@@ -690,7 +691,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	//Wyrmgus end
 	// Goal dead?
 	if (goal) {
-		Assert(!unit.GetMissile().Missile->AlwaysFire || unit.GetMissile().Missile->get_range());
+		assert_throw(!unit.GetMissile().Missile->AlwaysFire || unit.GetMissile().Missile->get_range());
 		if (goal->Destroyed) {
 			DebugPrint("destroyed unit\n");
 			return;
@@ -785,7 +786,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 
 	Vec2i dpos;
 	if (goal) {
-		Assert(goal->Type);  // Target invalid?
+		assert_throw(goal->Type != nullptr);  // Target invalid?
 		// Moved out of attack range?
 
 		if (unit.MapDistanceTo(*goal) < unit.Type->MinAttackRange) {
@@ -941,7 +942,7 @@ void missile_type::DrawMissileType(int frame, const PixelPos &pos, std::vector<s
 */
 void Missile::DrawMissile(const CViewport &vp, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	Assert(this->Type);
+	assert_throw(this->Type != nullptr);
 	CUnit *sunit = this->get_source_unit();
 	// FIXME: I should copy SourcePlayer for second level missiles.
 	if (sunit && sunit->Player) {
@@ -1034,7 +1035,7 @@ void Missile::MissileNewHeadingFromXY(const PixelPos &delta)
 	this->SpriteFrame *= this->Type->get_num_directions() / 2 + 1;
 
 	const int nextdir = 256 / this->Type->get_num_directions();
-	Assert(nextdir != 0);
+	assert_throw(nextdir != 0);
 	const int dir = ((DirectionToHeading(delta) + nextdir / 2) & 0xFF) / nextdir;
 	if (dir <= LookingS / nextdir) { // north->east->south
 		this->SpriteFrame += dir;
@@ -1085,7 +1086,7 @@ bool MissileInitMove(Missile &missile)
 		missile.State++;
 		return false;
 	}
-	Assert(missile.TotalStep != 0);
+	assert_throw(missile.TotalStep != 0);
 	missile.CurrentStep += missile.Type->get_speed();
 	if (missile.CurrentStep >= missile.TotalStep) {
 		missile.CurrentStep = missile.TotalStep;
@@ -1193,8 +1194,8 @@ bool PointToPointMissile(Missile &missile)
 	if (missile.TotalStep == 0) {
 		return true;
 	}
-	Assert(missile.Type != nullptr);
-	Assert(missile.TotalStep != 0);
+	assert_throw(missile.Type != nullptr);
+	assert_throw(missile.TotalStep != 0);
 
 	const PixelPos diff = (missile.destination - missile.source);
 	const PixelPrecise sign(diff.x >= 0 ? 1.0 : -1.0, diff.y >= 0 ? 1.0 : -1.0); // Remember sign to move into correct direction
@@ -1300,7 +1301,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		int damage;
 
 		if (missile.Type->Damage) {   // custom formula
-			Assert(missile.get_source_unit() != nullptr);
+			assert_throw(missile.get_source_unit() != nullptr);
 			//Wyrmgus start
 //			damage = CalculateDamage(*missile.get_source_unit(), goal, missile.Type->Damage) / splash;
 			damage = CalculateDamage(*missile.get_source_unit(), goal, missile.Type->Damage.get(), &missile) / splash;
@@ -1309,7 +1310,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 			damage = missile.Damage / splash;
 			damage += missile.LightningDamage * (100 - goal.Variable[LIGHTNINGRESISTANCE_INDEX].Value) / 100 / splash;
 		} else {
-			Assert(missile.get_source_unit() != nullptr);
+			assert_throw(missile.get_source_unit() != nullptr);
 			//Wyrmgus start
 //			damage = CalculateDamage(*missile.get_source_unit(), goal, Damage) / splash;
 			damage = CalculateDamage(*missile.get_source_unit(), goal, Damage.get(), &missile) / splash;
@@ -1368,7 +1369,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 		return;
 	}
 
-	Assert(missile.get_source_unit() != nullptr);
+	assert_throw(missile.get_source_unit() != nullptr);
 
 	//Wyrmgus start
 	if (!missile.AlwaysHits && CalculateHit(*missile.get_source_unit(), *stats, nullptr) == false) {
@@ -1520,7 +1521,7 @@ void Missile::MissileHit(CUnit *unit)
 //		Select(pos - range, pos + range, table);
 		Select(pos - range, pos + range, table, this->MapLayer);
 		//Wyrmgus end
-		Assert(this->get_source_unit() != nullptr);
+		assert_throw(this->get_source_unit() != nullptr);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &goal = *table[i];
 			//
@@ -1717,7 +1718,7 @@ static void MissilesActionLoop(std::vector<std::unique_ptr<Missile>> &missiles)
 			missiles.erase(missiles.begin() + i);
 			continue;
 		}
-		Assert(missile.Wait);
+		assert_throw(missile.Wait != 0);
 		if (--missile.Wait) {  // wait until time is over
 			++i;
 			continue;
