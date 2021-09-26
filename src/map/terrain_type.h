@@ -86,7 +86,7 @@ public:
 
 	static terrain_type *try_get_by_character(const char character)
 	{
-		auto find_iterator = terrain_type::terrain_types_by_character.find(character);
+		const auto find_iterator = terrain_type::terrain_types_by_character.find(character);
 		if (find_iterator != terrain_type::terrain_types_by_character.end()) {
 			return find_iterator->second;
 		}
@@ -107,7 +107,7 @@ public:
 
 	static terrain_type *try_get_by_color(const QColor &color)
 	{
-		auto find_iterator = terrain_type::terrain_types_by_color.find(color);
+		const auto find_iterator = terrain_type::terrain_types_by_color.find(color);
 		if (find_iterator != terrain_type::terrain_types_by_color.end()) {
 			return find_iterator->second;
 		}
@@ -128,12 +128,41 @@ public:
 
 	static terrain_type *try_get_by_tile_number(const int tile_number)
 	{
-		auto find_iterator = terrain_type::terrain_types_by_tile_number.find(tile_number);
+		const auto find_iterator = terrain_type::terrain_types_by_tile_number.find(tile_number);
 		if (find_iterator != terrain_type::terrain_types_by_tile_number.end()) {
 			return find_iterator->second;
 		}
 
 		return nullptr;
+	}
+
+	static terrain_type *get_by_wesnoth_string(const std::string &str)
+	{
+		const auto find_iterator = terrain_type::terrain_types_by_wesnoth_string.find(str);
+		if (find_iterator != terrain_type::terrain_types_by_wesnoth_string.end()) {
+			return find_iterator->second;
+		}
+
+		throw std::runtime_error("No terrain type found for string: \"" + str + "\".");
+	}
+
+	static terrain_type *try_get_by_wesnoth_string(const std::string &str)
+	{
+		const auto find_iterator = terrain_type::terrain_types_by_wesnoth_string.find(str);
+		if (find_iterator != terrain_type::terrain_types_by_wesnoth_string.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+
+	static void map_to_wesnoth_string(terrain_type *terrain, const std::string &str)
+	{
+		if (terrain_type::try_get_by_wesnoth_string(str) != nullptr) {
+			throw std::runtime_error("String \"" + str + "\" is already used by another terrain type.");
+		}
+
+		terrain_type::terrain_types_by_wesnoth_string[str] = terrain;
 	}
 
 	static terrain_type *add(const std::string &identifier, const wyrmgus::data_module *data_module)
@@ -150,6 +179,7 @@ public:
 		terrain_type::terrain_types_by_character.clear();
 		terrain_type::terrain_types_by_color.clear();
 		terrain_type::terrain_types_by_tile_number.clear();
+		terrain_type::terrain_types_by_wesnoth_string.clear();
 	}
 
 	explicit terrain_type(const std::string &identifier);
@@ -161,6 +191,7 @@ private:
 	static inline std::map<char, terrain_type *> terrain_types_by_character;
 	static inline color_map<terrain_type *> terrain_types_by_color;
 	static inline std::map<int, terrain_type *> terrain_types_by_tile_number;
+	static inline std::map<std::string, terrain_type *> terrain_types_by_wesnoth_string;
 
 public:
 	virtual void process_sml_property(const sml_property &property) override;
@@ -186,6 +217,7 @@ public:
 	void calculate_minimap_color(const season *season = nullptr);
 
 	void map_to_tile_number(const int tile_number);
+	void map_to_wesnoth_string(const std::string &str);
 
 	const std::filesystem::path &get_image_file() const
 	{

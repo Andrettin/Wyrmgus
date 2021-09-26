@@ -32,6 +32,7 @@
 #include "database/preferences.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
+#include "map/terrain_type.h"
 #include "player/faction_type.h"
 #include "sound/game_sound_set.h"
 #include "sound/music.h"
@@ -90,6 +91,7 @@ void defines::process_sml_property(const sml_property &property)
 void defines::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "game_sound_set") {
 		database::process_sml_data(game_sound_set::get(), scope);
@@ -100,6 +102,10 @@ void defines::process_sml_scope(const sml_data &scope)
 
 			this->faction_type_upgrades[faction_type] = upgrade;
 		});
+	} else if (tag == "ignored_wesnoth_terrain_strings") {
+		for (const std::string &value : values) {
+			terrain_type::map_to_wesnoth_string(nullptr, value);
+		}
 	} else {
 		database::process_sml_scope_for_object(this, scope);
 	}

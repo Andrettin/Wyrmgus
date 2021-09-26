@@ -453,6 +453,7 @@ public:
 	void set_trade_route_file(const std::filesystem::path &filepath);
 
 	void load_terrain_file(const bool overlay);
+	void load_wesnoth_terrain_file();
 	QImage load_terrain_image_file(const std::filesystem::path &filepath);
 	void load_terrain_image(const bool overlay);
 

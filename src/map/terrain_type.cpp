@@ -112,6 +112,10 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->map_to_tile_number(std::stoi(value));
 		}
+	} else if (tag == "wesnoth_strings") {
+		for (const std::string &value : values) {
+			this->map_to_wesnoth_string(value);
+		}
 	} else if (tag == "flags") {
 		for (const std::string &value : values) {
 			const tile_flag flag = string_to_tile_flag(value);
@@ -383,6 +387,11 @@ void terrain_type::map_to_tile_number(const int tile_number)
 	}
 
 	terrain_type::terrain_types_by_tile_number[tile_number] = this;
+}
+
+void terrain_type::map_to_wesnoth_string(const std::string &str)
+{
+	terrain_type::map_to_wesnoth_string(this, str);
 }
 
 void terrain_type::set_image_file(const std::filesystem::path &filepath)

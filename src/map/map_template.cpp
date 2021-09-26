@@ -79,6 +79,7 @@
 #include "util/path_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
+#include "util/string_util.h"
 #include "util/string_conversion_util.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
@@ -470,30 +471,35 @@ void map_template::apply_terrain(const bool overlay, const QPoint &template_star
 {
 	const std::filesystem::path &terrain_filepath = overlay ? this->get_overlay_terrain_file() : this->get_terrain_file();
 
-	if (terrain_filepath.empty()) {
-		return;
+	if (!terrain_filepath.empty()) {
+		if (!std::filesystem::exists(terrain_filepath)) {
+			throw std::runtime_error("File \"" + terrain_filepath.string() + "\" not found.");
+		}
+
+		if (terrain_filepath.extension() == ".png") {
+			this->load_terrain_image(overlay);
+		} else if (terrain_filepath.extension() == ".map") {
+			this->load_terrain_file(overlay);
+		} else if (terrain_filepath.extension() == ".wes" && !overlay) {
+			this->load_wesnoth_terrain_file();
+		} else {
+			throw std::runtime_error("Invalid terrain file extension: \"" + terrain_filepath.extension().string() + "\".");
+		}
 	}
 
-	if (!std::filesystem::exists(terrain_filepath)) {
-		throw std::runtime_error("File \"" + terrain_filepath.string() + "\" not found.");
+	const QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
+	if (!terrain_image.isNull()) {
+		this->apply_terrain_image(overlay, template_start_pos, map_start_pos, z);
 	}
-
-	if (terrain_filepath.extension() == ".png") {
-		this->load_terrain_image(overlay);
-	} else if (terrain_filepath.extension() == ".map") {
-		this->load_terrain_file(overlay);
-	} else if (terrain_filepath.extension() == ".wes") {
-		this->load_wesnoth_terrain_file();
-	} else {
-		throw std::runtime_error("Invalid terrain file extension: \"" + terrain_filepath.extension().string() + "\".");
-	}
-
-	this->apply_terrain_image(overlay, template_start_pos, map_start_pos, z);
 }
 
 void map_template::apply_terrain_image(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
 	const QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
+
+	if (terrain_image.size() != this->get_size()) {
+		throw std::runtime_error("The terrain data for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(this->get_size()) + ".");
+	}
 
 	for (int y = 0; y < terrain_image.height(); ++y) {
 		if (y < template_start_pos.y() || y >= (template_start_pos.y() + CMap::get()->Info->MapHeights[z])) {
@@ -1925,7 +1931,7 @@ void map_template::apply_character_map_units(const QPoint &template_start_pos, c
 					character_unit->create_at(real_pos, z);
 				}
 			} catch (...) {
-				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x) + " of line " + std::to_string(y) + " when applying character map units."));
+				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x + 1) + " of line " + std::to_string(y + 1) + " when applying character map units."));
 			}
 		}
 	}
@@ -2222,7 +2228,7 @@ void map_template::load_terrain_character_map(const bool overlay)
 				const char terrain_character = line_str.at(i);
 				line_chars.push_back(terrain_character);
 			} catch (...) {
-				std::throw_with_nested(std::runtime_error("Failed to parse character " + std::to_string(i) + " of line for terrain file \"" + terrain_filepath.string() + "\": \"" + line_str + "\"."));
+				std::throw_with_nested(std::runtime_error("Failed to parse character " + std::to_string(i + 1) + " of line for terrain file \"" + terrain_filepath.string() + "\": \"" + line_str + "\"."));
 			}
 		}
 
@@ -2344,7 +2350,88 @@ void map_template::load_terrain_file(const bool overlay)
 
 				terrain_image.setPixelColor(x, y, color);
 			} catch (...) {
-				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x) + " of line " + std::to_string(y) + " for terrain file \"" + terrain_file.string() + "\"."));
+				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x + 1) + " of line " + std::to_string(y + 1) + " for terrain file \"" + terrain_file.string() + "\"."));
+			}
+		}
+	}
+}
+
+void map_template::load_wesnoth_terrain_file()
+{
+	const std::filesystem::path &terrain_filepath = this->get_terrain_file();
+
+	std::vector<std::vector<std::string>> terrain_strings;
+
+	std::ifstream is_map(terrain_filepath);
+
+	std::string line_str;
+	while (std::getline(is_map, line_str)) {
+		string::replace(line_str, " ", "");
+		string::replace(line_str, "\r", "");
+		string::replace(line_str, "1", "");
+		string::replace(line_str, "2", "");
+		string::replace(line_str, "3", "");
+
+		std::vector<std::string> line_terrain_strings = string::split(line_str, ',');
+		terrain_strings.push_back(std::move(line_terrain_strings));
+	}
+
+	const size_t height = terrain_strings.size();
+	if (height == 0) {
+		throw std::runtime_error("Terrain data is empty.");
+	}
+
+	const size_t width = terrain_strings.front().size();
+
+	this->terrain_image = QImage(width, height, QImage::Format_RGBA8888);
+	this->terrain_image.fill(Qt::transparent);
+
+	this->overlay_terrain_image = QImage(width, height, QImage::Format_RGBA8888);
+	this->overlay_terrain_image.fill(Qt::transparent);
+
+	for (size_t y = 0; y < terrain_strings.size(); ++y) {
+		const std::vector<std::string> &row = terrain_strings.at(y);
+
+		for (size_t x = 0; x < row.size(); ++x) {
+			try {
+				const std::string &terrain_string = row.at(x);
+
+				const terrain_type *terrain = nullptr;
+				const terrain_type *overlay_terrain = nullptr;
+
+				const size_t circumflex_pos = terrain_string.find('^');
+				if (circumflex_pos != std::string::npos) {
+					//the terrain string contains an overlay terrain
+					const std::string base_terrain_string = terrain_string.substr(0, circumflex_pos);
+					terrain = terrain_type::get_by_wesnoth_string(base_terrain_string);
+
+					const std::string overlay_terrain_string = terrain_string.substr(circumflex_pos + 1, terrain_string.size() - circumflex_pos - 1);
+					overlay_terrain = terrain_type::get_by_wesnoth_string(overlay_terrain_string);
+				} else {
+					terrain = terrain_type::get_by_wesnoth_string(terrain_string);
+				}
+
+				if (terrain != nullptr) {
+					const QColor &color = terrain->get_color();
+
+					if (!color.isValid()) {
+						throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
+					}
+
+					this->terrain_image.setPixelColor(x, y, color);
+				}
+
+				if (overlay_terrain != nullptr) {
+					const QColor &overlay_color = overlay_terrain->get_color();
+
+					if (!overlay_color.isValid()) {
+						throw std::runtime_error("Terrain \"" + overlay_terrain->get_identifier() + "\" has no color.");
+					}
+
+					this->overlay_terrain_image.setPixelColor(x, y, overlay_color);
+				}
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to process terrain string " + std::to_string(x + 1) + " of line " + std::to_string(y + 1) + " for terrain file \"" + terrain_filepath.string() + "\"."));
 			}
 		}
 	}
@@ -2700,7 +2787,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(map_t
 					return false;
 				}
 			} catch (...) {
-				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x) + " of line " + std::to_string(y) + " for terrain file \"" + this->overlay_terrain_file.string() + "\"."));
+				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x + 1) + " of line " + std::to_string(y + 1) + " for terrain file \"" + this->overlay_terrain_file.string() + "\"."));
 			}
 		}
 	}
