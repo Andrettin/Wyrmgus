@@ -153,7 +153,6 @@ public:
 
 	void apply_terrain(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 	void apply_terrain(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
-	void apply_terrain_file(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 	void apply_terrain_image(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 	void apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const;
 	void apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
@@ -164,6 +163,7 @@ public:
 	void apply_population_unit(const unit_class *unit_class, const int population, const QPoint &unit_pos, const int z, CPlayer *player, const site *settlement) const;
 	void ApplyConnectors(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void ApplyUnits(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
+	void apply_character_map_units(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const;
 	void apply_historical_unit(const historical_unit *historical_unit, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const;
 	void apply_character(character *character, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const;
 
@@ -452,6 +452,7 @@ public:
 
 	void set_trade_route_file(const std::filesystem::path &filepath);
 
+	void load_terrain_file(const bool overlay);
 	QImage load_terrain_image_file(const std::filesystem::path &filepath);
 	void load_terrain_image(const bool overlay);
 

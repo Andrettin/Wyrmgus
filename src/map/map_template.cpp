@@ -474,116 +474,25 @@ void map_template::apply_terrain(const bool overlay, const QPoint &template_star
 		return;
 	}
 
+	if (!std::filesystem::exists(terrain_filepath)) {
+		throw std::runtime_error("File \"" + terrain_filepath.string() + "\" not found.");
+	}
+
 	if (terrain_filepath.extension() == ".png") {
-		this->apply_terrain_image(overlay, template_start_pos, map_start_pos, z);
+		this->load_terrain_image(overlay);
 	} else if (terrain_filepath.extension() == ".map") {
-		this->apply_terrain_file(overlay, template_start_pos, map_start_pos, z);
+		this->load_terrain_file(overlay);
+	} else if (terrain_filepath.extension() == ".wes") {
+		this->load_wesnoth_terrain_file();
 	} else {
 		throw std::runtime_error("Invalid terrain file extension: \"" + terrain_filepath.extension().string() + "\".");
 	}
-}
 
-void map_template::apply_terrain_file(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
-{
-	using namespace std::string_literals;
-
-	std::filesystem::path terrain_file;
-	if (overlay) {
-		terrain_file = this->get_overlay_terrain_file();
-	} else {
-		terrain_file = this->get_terrain_file();
-	}
-	
-	if (terrain_file.empty()) {
-		return;
-	}
-	
-	this->load_terrain_character_map(overlay);
-
-	const terrain_character_map_type &terrain_character_map = overlay ? this->overlay_terrain_character_map : this->terrain_character_map;
-
-	for (int y = template_start_pos.y(); y < static_cast<int>(terrain_character_map.size()); ++y) {
-		if (y >= (template_start_pos.y() + CMap::get()->Info->MapHeights[z])) {
-			break;
-		}
-
-		if (this->get_end_pos().y() != -1 && y > this->get_end_pos().y()) {
-			break;
-		}
-
-		const std::vector<char> &row = terrain_character_map[y];
-
-		for (int x = template_start_pos.x(); x < static_cast<int>(row.size()); ++x) {
-			try {
-				if (x >= (template_start_pos.x() + CMap::get()->Info->MapWidths[z])) {
-					break;
-				}
-
-				if (this->get_end_pos().x() != -1 && x > this->get_end_pos().x()) {
-					break;
-				}
-
-				const char terrain_character = row.at(x);
-
-				const QPoint real_pos(map_start_pos.x() + x - template_start_pos.x(), map_start_pos.y() + y - template_start_pos.y());
-
-				if (!this->is_map_pos_usable(real_pos)) {
-					continue;
-				}
-
-				if (terrain_character == '=') {
-					continue;
-				}
-
-				tile *tile = CMap::get()->Field(real_pos, z);
-
-				if (terrain_character == '0') {
-					if (overlay) { //"0" in an overlay terrain file means no overlay, while "=" means no change
-						if (tile->get_overlay_terrain() != nullptr) {
-							tile->RemoveOverlayTerrain();
-						}
-					} else {
-						throw std::runtime_error("\"0\" cannot be used for non-overlay terrain files.");
-					}
-
-					continue;
-				}
-
-				const character_unit *character_unit = this->get_character_unit(terrain_character);
-				if (character_unit != nullptr) {
-					if (!overlay) {
-						throw std::runtime_error("Tried to use a character unit (character \""s + terrain_character + "\") in a non-overlay terrain map.");
-					}
-
-					character_unit->create_at(real_pos, z);
-					continue;
-				}
-
-				const terrain_type *terrain = terrain_type::get_by_character(terrain_character);
-
-				if (this->is_constructed_only() && !terrain->is_constructed()) {
-					throw std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + this->get_identifier() + "\", as character \"" + terrain_character + "\".");
-				}
-
-				tile->SetTerrain(terrain);
-			} catch (...) {
-				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x) + " of line " + std::to_string(y) + " for terrain file \"" + terrain_file.string() + "."));
-			}
-		}
-	}
+	this->apply_terrain_image(overlay, template_start_pos, map_start_pos, z);
 }
 
 void map_template::apply_terrain_image(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
-	std::filesystem::path terrain_file;
-	if (overlay) {
-		terrain_file = this->get_overlay_terrain_file();
-	} else {
-		terrain_file = this->get_terrain_file();
-	}
-	
-	this->load_terrain_image(overlay);
-	
 	const QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
 
 	for (int y = 0; y < terrain_image.height(); ++y) {
@@ -1784,6 +1693,10 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 
 void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
+	if (!random) {
+		this->apply_character_map_units(template_start_pos, map_start_pos, z);
+	}
+
 	const campaign *current_campaign = game::get()->get_current_campaign();
 	CDate start_date;
 	if (current_campaign) {
@@ -1967,6 +1880,54 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		unit->set_character(character);
 		unit->Active = 0;
 		hero_player->ChangeUnitTypeAiActiveCount(character->get_unit_type(), -1);
+	}
+}
+
+void map_template::apply_character_map_units(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const
+{
+	const terrain_character_map_type &terrain_character_map = this->overlay_terrain_character_map;
+
+	if (terrain_character_map.empty()) {
+		return;
+	}
+
+	for (int y = template_start_pos.y(); y < static_cast<int>(terrain_character_map.size()); ++y) {
+		if (y >= (template_start_pos.y() + CMap::get()->Info->MapHeights[z])) {
+			break;
+		}
+
+		if (this->get_end_pos().y() != -1 && y > this->get_end_pos().y()) {
+			break;
+		}
+
+		const std::vector<char> &row = terrain_character_map[y];
+
+		for (int x = template_start_pos.x(); x < static_cast<int>(row.size()); ++x) {
+			try {
+				if (x >= (template_start_pos.x() + CMap::get()->Info->MapWidths[z])) {
+					break;
+				}
+
+				if (this->get_end_pos().x() != -1 && x > this->get_end_pos().x()) {
+					break;
+				}
+
+				const char terrain_character = row.at(x);
+
+				const QPoint real_pos(map_start_pos.x() + x - template_start_pos.x(), map_start_pos.y() + y - template_start_pos.y());
+
+				if (!this->is_map_pos_usable(real_pos)) {
+					continue;
+				}
+
+				const character_unit *character_unit = this->get_character_unit(terrain_character);
+				if (character_unit != nullptr) {
+					character_unit->create_at(real_pos, z);
+				}
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x) + " of line " + std::to_string(y) + " when applying character map units."));
+			}
+		}
 	}
 }
 
@@ -2310,6 +2271,83 @@ void map_template::set_trade_route_file(const std::filesystem::path &filepath)
 	}
 
 	this->trade_route_file = database::get()->get_maps_path(this->get_module()) / filepath;
+}
+
+void map_template::load_terrain_file(const bool overlay)
+{
+	using namespace std::string_literals;
+
+	std::filesystem::path terrain_file;
+	if (overlay) {
+		terrain_file = this->get_overlay_terrain_file();
+	} else {
+		terrain_file = this->get_terrain_file();
+	}
+
+	this->load_terrain_character_map(overlay);
+
+	const terrain_character_map_type &terrain_character_map = overlay ? this->overlay_terrain_character_map : this->terrain_character_map;
+
+	const size_t height = terrain_character_map.size();
+
+	if (height == 0) {
+		throw std::runtime_error("Terrain character map is empty.");
+	}
+
+	const size_t width = terrain_character_map.front().size();
+
+	QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
+	terrain_image = QImage(width, height, QImage::Format_RGBA8888);
+	terrain_image.fill(Qt::transparent);
+
+	for (size_t y = 0; y < terrain_character_map.size(); ++y) {
+		const std::vector<char> &row = terrain_character_map.at(y);
+
+		for (size_t x = 0; x < row.size(); ++x) {
+			try {
+				const char terrain_character = row.at(x);
+
+				if (terrain_character == '=') {
+					continue;
+				}
+
+				if (terrain_character == '0') {
+					if (overlay) { //"0" in an overlay terrain file means no overlay, while "=" means no change
+						terrain_image.setPixelColor(x, y, terrain_type::none_color);
+					} else {
+						throw std::runtime_error("\"0\" cannot be used for non-overlay terrain files.");
+					}
+
+					continue;
+				}
+
+				const character_unit *character_unit = this->get_character_unit(terrain_character);
+				if (character_unit != nullptr) {
+					if (!overlay) {
+						throw std::runtime_error("Tried to use a character unit (character \""s + terrain_character + "\") in a non-overlay terrain map.");
+					}
+
+					continue;
+				}
+
+				const terrain_type *terrain = terrain_type::get_by_character(terrain_character);
+
+				if (this->is_constructed_only() && !terrain->is_constructed()) {
+					throw std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + this->get_identifier() + "\", as character \"" + terrain_character + "\".");
+				}
+
+				const QColor &color = terrain->get_color();
+
+				if (!color.isValid()) {
+					throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
+				}
+
+				terrain_image.setPixelColor(x, y, color);
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x) + " of line " + std::to_string(y) + " for terrain file \"" + terrain_file.string() + "\"."));
+			}
+		}
+	}
 }
 
 QImage map_template::load_terrain_image_file(const std::filesystem::path &filepath)
@@ -2662,7 +2700,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(map_t
 					return false;
 				}
 			} catch (...) {
-				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x) + " of line " + std::to_string(y) + " for terrain file \"" + terrain_file.string() + "."));
+				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x) + " of line " + std::to_string(y) + " for terrain file \"" + this->overlay_terrain_file.string() + "\"."));
 			}
 		}
 	}
