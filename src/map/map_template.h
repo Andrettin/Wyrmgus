@@ -108,10 +108,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(std::filesystem::path terrain_file MEMBER terrain_file WRITE set_terrain_file)
 	Q_PROPERTY(std::filesystem::path overlay_terrain_file MEMBER overlay_terrain_file WRITE set_overlay_terrain_file)
-	Q_PROPERTY(std::filesystem::path terrain_image_file MEMBER terrain_image_file WRITE set_terrain_image_file)
-	Q_PROPERTY(std::filesystem::path overlay_terrain_image_file MEMBER overlay_terrain_image_file WRITE set_overlay_terrain_image_file)
-	Q_PROPERTY(std::filesystem::path trade_route_image_file MEMBER trade_route_image_file WRITE set_trade_route_image_file)
-	Q_PROPERTY(std::filesystem::path territory_image_file MEMBER territory_image_file WRITE set_territory_image_file)
+	Q_PROPERTY(std::filesystem::path trade_route_file MEMBER trade_route_file WRITE set_trade_route_file)
+	Q_PROPERTY(std::filesystem::path territory_file MEMBER territory_file WRITE set_territory_file)
 	Q_PROPERTY(wyrmgus::terrain_type* base_terrain_type MEMBER base_terrain_type READ get_base_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* base_overlay_terrain_type MEMBER base_overlay_terrain_type READ get_base_overlay_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
@@ -153,7 +151,9 @@ public:
 	virtual void reset_history() override;
 	void reset_game_data();
 
-	void apply_terrain_file(bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, int z);
+	void apply_terrain(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
+	void apply_terrain(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
+	void apply_terrain_file(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 	void apply_terrain_image(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 	void apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const;
 	void apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
@@ -386,7 +386,7 @@ public:
 		}
 
 		this->main_template = map_template;
-		main_template->subtemplates.push_back(this);
+		this->main_template->subtemplates.push_back(this);
 	}
 
 	const std::vector<map_template *> &get_subtemplates() const
@@ -421,6 +421,16 @@ public:
 		}
 	}
 
+	void load_terrain_character_map(const bool overlay);
+
+	void clear_terrain_character_maps()
+	{
+		this->terrain_character_map.clear();
+		this->overlay_terrain_character_map.clear();
+	}
+
+	void do_character_substitutions(const bool overlay);
+
 	const std::filesystem::path &get_terrain_file() const
 	{
 		return this->terrain_file;
@@ -435,36 +445,12 @@ public:
 
 	void set_overlay_terrain_file(const std::filesystem::path &filepath);
 
-	void load_terrain_character_map(const bool overlay);
-
-	void clear_terrain_character_maps()
+	const std::filesystem::path &get_trade_route_file() const
 	{
-		this->terrain_character_map.clear();
-		this->overlay_terrain_character_map.clear();
+		return this->trade_route_file;
 	}
 
-	void do_character_substitutions(const bool overlay);
-
-	const std::filesystem::path &get_terrain_image_file() const
-	{
-		return this->terrain_image_file;
-	}
-
-	void set_terrain_image_file(const std::filesystem::path &filepath);
-
-	const std::filesystem::path &get_overlay_terrain_image_file() const
-	{
-		return this->overlay_terrain_image_file;
-	}
-
-	void set_overlay_terrain_image_file(const std::filesystem::path &filepath);
-
-	const std::filesystem::path &get_trade_route_image_file() const
-	{
-		return this->trade_route_image_file;
-	}
-
-	void set_trade_route_image_file(const std::filesystem::path &filepath);
+	void set_trade_route_file(const std::filesystem::path &filepath);
 
 	QImage load_terrain_image_file(const std::filesystem::path &filepath);
 	void load_terrain_image(const bool overlay);
@@ -475,12 +461,12 @@ public:
 		this->overlay_terrain_image = QImage();
 	}
 
-	const std::filesystem::path &get_territory_image_file() const
+	const std::filesystem::path &get_territory_file() const
 	{
-		return this->territory_image_file;
+		return this->territory_file;
 	}
 
-	void set_territory_image_file(const std::filesystem::path &filepath);
+	void set_territory_file(const std::filesystem::path &filepath);
 
 	const QPoint &get_subtemplate_top_left_pos() const
 	{
@@ -697,16 +683,14 @@ public:
 	void add_site(const site *site);
 	
 private:
-	std::filesystem::path terrain_file;
 	terrain_character_map_type terrain_character_map;
-	std::filesystem::path overlay_terrain_file;
 	terrain_character_map_type overlay_terrain_character_map;
-	std::filesystem::path terrain_image_file;
+	std::filesystem::path terrain_file;
 	QImage terrain_image;
-	std::filesystem::path overlay_terrain_image_file;
+	std::filesystem::path overlay_terrain_file;
 	QImage overlay_terrain_image;
-	std::filesystem::path trade_route_image_file;
-	std::filesystem::path territory_image_file;
+	std::filesystem::path trade_route_file;
+	std::filesystem::path territory_file;
 	QSize size = QSize(0, 0);
 public:
 	int Priority = 100; //the priority of this map template, for the order of application of subtemplates

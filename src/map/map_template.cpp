@@ -197,10 +197,6 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			this->terrain_file = value;
 		} else if (key == "overlay_terrain_file") {
 			this->overlay_terrain_file = value;
-		} else if (key == "terrain_image_file") {
-			this->terrain_image_file = value;
-		} else if (key == "overlay_terrain_image_file") {
-			this->overlay_terrain_image_file = value;
 		} else if (key == "width") {
 			this->size.setWidth(std::stoi(value));
 		} else if (key == "height") {
@@ -464,6 +460,29 @@ void map_template::reset_game_data()
 	this->current_start_pos = QPoint(0, 0);
 }
 
+void map_template::apply_terrain(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
+{
+	this->apply_terrain(false, template_start_pos, map_start_pos, z);
+	this->apply_terrain(true, template_start_pos, map_start_pos, z);
+}
+
+void map_template::apply_terrain(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
+{
+	const std::filesystem::path &terrain_filepath = overlay ? this->get_overlay_terrain_file() : this->get_terrain_file();
+
+	if (terrain_filepath.empty()) {
+		return;
+	}
+
+	if (terrain_filepath.extension() == ".png") {
+		this->apply_terrain_image(overlay, template_start_pos, map_start_pos, z);
+	} else if (terrain_filepath.extension() == ".map") {
+		this->apply_terrain_file(overlay, template_start_pos, map_start_pos, z);
+	} else {
+		throw std::runtime_error("Invalid terrain file extension: \"" + terrain_filepath.extension().string() + "\".");
+	}
+}
+
 void map_template::apply_terrain_file(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
 	using namespace std::string_literals;
@@ -558,16 +577,11 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 {
 	std::filesystem::path terrain_file;
 	if (overlay) {
-		terrain_file = this->get_overlay_terrain_image_file();
+		terrain_file = this->get_overlay_terrain_file();
 	} else {
-		terrain_file = this->get_terrain_image_file();
+		terrain_file = this->get_terrain_file();
 	}
 	
-	if (terrain_file.empty()) {
-		this->apply_terrain_file(overlay, template_start_pos, map_start_pos, z);
-		return;
-	}
-
 	this->load_terrain_image(overlay);
 	
 	const QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
@@ -640,7 +654,7 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 
 void map_template::apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const
 {
-	const std::filesystem::path territory_filepath = this->get_territory_image_file();
+	const std::filesystem::path &territory_filepath = this->get_territory_file();
 	
 	if (territory_filepath.empty()) {
 		return;
@@ -775,7 +789,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		return;
 	}
 	
-	bool has_base_map = !this->get_terrain_file().empty() || !this->get_terrain_image_file().empty();
+	const bool has_base_map = !this->get_terrain_file().empty();
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain..."), this->get_name().c_str());
 	
@@ -837,10 +851,9 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	
 	try {
-		this->apply_terrain_image(false, template_start_pos, map_start_pos, z);
-		this->apply_terrain_image(true, template_start_pos, map_start_pos, z);
+		this->apply_terrain(template_start_pos, map_start_pos, z);
 	} catch (...) {
-		std::throw_with_nested(std::runtime_error("Failed to apply terrain file for map template \"" + this->get_identifier() + "\"."));
+		std::throw_with_nested(std::runtime_error("Failed to apply terrain for map template \"" + this->get_identifier() + "\"."));
 	}
 	
 	for (const auto &kv_pair : this->get_tile_terrains()) {
@@ -971,7 +984,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 	}
 
-	if (!this->get_territory_image_file().empty()) {
+	if (!this->get_territory_file().empty()) {
 		this->apply_territory_image(template_start_pos, map_start_pos, z);
 	}
 
@@ -2216,24 +2229,6 @@ bool map_template::is_pos_usable(const QPoint &pos) const
 	return true;
 }
 
-void map_template::set_terrain_file(const std::filesystem::path &filepath)
-{
-	if (filepath == this->get_terrain_file()) {
-		return;
-	}
-
-	this->terrain_file = database::get()->get_maps_path(this->get_module()) / filepath;
-}
-
-void map_template::set_overlay_terrain_file(const std::filesystem::path &filepath)
-{
-	if (filepath == this->get_overlay_terrain_file()) {
-		return;
-	}
-
-	this->overlay_terrain_file = database::get()->get_maps_path(this->get_module()) / filepath;
-}
-
 void map_template::load_terrain_character_map(const bool overlay)
 {
 	using namespace std::string_literals;
@@ -2290,31 +2285,31 @@ void map_template::do_character_substitutions(const bool overlay)
 	}
 }
 
-void map_template::set_terrain_image_file(const std::filesystem::path &filepath)
+void map_template::set_terrain_file(const std::filesystem::path &filepath)
 {
-	if (filepath == this->get_terrain_image_file()) {
+	if (filepath == this->get_terrain_file()) {
 		return;
 	}
 
-	this->terrain_image_file = database::get()->get_maps_path(this->get_module()) / filepath;
+	this->terrain_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
-void map_template::set_overlay_terrain_image_file(const std::filesystem::path &filepath)
+void map_template::set_overlay_terrain_file(const std::filesystem::path &filepath)
 {
-	if (filepath == this->get_overlay_terrain_image_file()) {
+	if (filepath == this->get_overlay_terrain_file()) {
 		return;
 	}
 
-	this->overlay_terrain_image_file = database::get()->get_maps_path(this->get_module()) / filepath;
+	this->overlay_terrain_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
-void map_template::set_trade_route_image_file(const std::filesystem::path &filepath)
+void map_template::set_trade_route_file(const std::filesystem::path &filepath)
 {
-	if (filepath == this->get_trade_route_image_file()) {
+	if (filepath == this->get_trade_route_file()) {
 		return;
 	}
 
-	this->trade_route_image_file = database::get()->get_maps_path(this->get_module()) / filepath;
+	this->trade_route_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
 QImage map_template::load_terrain_image_file(const std::filesystem::path &filepath)
@@ -2342,15 +2337,15 @@ void map_template::load_terrain_image(const bool overlay)
 
 	std::filesystem::path terrain_file;
 	if (overlay) {
-		terrain_file = this->get_overlay_terrain_image_file();
+		terrain_file = this->get_overlay_terrain_file();
 	} else {
-		terrain_file = this->get_terrain_image_file();
+		terrain_file = this->get_terrain_file();
 	}
 
 	terrain_image = this->load_terrain_image_file(terrain_file);
 
-	if (overlay && !this->get_trade_route_image_file().empty()) {
-		const QImage trade_route_image = this->load_terrain_image_file(this->get_trade_route_image_file());
+	if (overlay && !this->get_trade_route_file().empty()) {
+		const QImage trade_route_image = this->load_terrain_image_file(this->get_trade_route_file());
 
 		image::for_each_pixel_pos(trade_route_image, [&trade_route_image, &terrain_image](const int x, const int y) {
 			const QColor color = trade_route_image.pixelColor(x, y);
@@ -2390,13 +2385,13 @@ void map_template::load_terrain_image(const bool overlay)
 	}
 }
 
-void map_template::set_territory_image_file(const std::filesystem::path &filepath)
+void map_template::set_territory_file(const std::filesystem::path &filepath)
 {
-	if (filepath == this->get_territory_image_file()) {
+	if (filepath == this->get_territory_file()) {
 		return;
 	}
 
-	this->territory_image_file = database::get()->get_maps_path(this->get_module()) / filepath;
+	this->territory_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
 bool map_template::is_dependent_on(const map_template *other_template) const
@@ -2595,7 +2590,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain(map_templa
 {
 	if (!subtemplate->get_overlay_terrain_file().empty()) {
 		return this->is_constructed_subtemplate_compatible_with_terrain_file(subtemplate, map_start_pos, z);
-	} else if (!subtemplate->get_overlay_terrain_image_file().empty()) {
+	} else if (!subtemplate->get_overlay_terrain_file().empty()) {
 		return this->is_constructed_subtemplate_compatible_with_terrain_image(subtemplate, map_start_pos, z);
 	}
 
@@ -2992,9 +2987,9 @@ void map_template::save_terrain_images() const
 	const std::string overlay_filename = this->get_identifier() + "_overlay.png";
 	const std::string trade_route_filename = this->get_identifier() + "_trade_routes.png";
 
-	this->save_terrain_image(filename, this->get_terrain_image_file(), this->get_terrain_file(), base_terrain_data, base_terrain_map);
-	this->save_terrain_image(overlay_filename, this->get_overlay_terrain_image_file(), this->get_overlay_terrain_file(), overlay_terrain_data, overlay_terrain_map);
-	this->save_terrain_image(trade_route_filename, this->get_trade_route_image_file(), std::filesystem::path(), trade_route_terrain_data, point_map<const terrain_type *>());
+	this->save_terrain_image(filename, this->get_terrain_file(), this->get_terrain_file(), base_terrain_data, base_terrain_map);
+	this->save_terrain_image(overlay_filename, this->get_overlay_terrain_file(), this->get_overlay_terrain_file(), overlay_terrain_data, overlay_terrain_map);
+	this->save_terrain_image(trade_route_filename, this->get_trade_route_file(), std::filesystem::path(), trade_route_terrain_data, point_map<const terrain_type *>());
 }
 
 void map_template::save_terrain_image(const std::string &filename, const std::filesystem::path &image_filepath, const std::filesystem::path &terrain_filepath, const terrain_geodata_ptr_map &terrain_data, const point_map<const terrain_type *> &terrain_map) const
@@ -3090,11 +3085,11 @@ void map_template::create_terrain_image_from_map(QImage &image, const point_map<
 
 void map_template::save_territory_image(const std::string &filename, const site_map<std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const
 {
-	const std::filesystem::path territory_image_filepath = this->get_territory_image_file();
+	const std::filesystem::path &territory_filepath = this->get_territory_file();
 
 	QImage image;
-	if (!territory_image_filepath.empty()) {
-		image = QImage(path::to_qstring(territory_image_filepath));
+	if (!territory_filepath.empty()) {
+		image = QImage(path::to_qstring(territory_filepath));
 
 		if (image.size() != this->get_size()) {
 			throw std::runtime_error("Invalid territory image size for map template \"" + this->get_identifier() + "\".");

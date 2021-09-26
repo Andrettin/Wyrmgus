@@ -1244,9 +1244,9 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else if (!strcmp(value, "OverlayTerrainFile")) {
 			map_template->overlay_terrain_file = LuaToString(l, -1);
 		} else if (!strcmp(value, "TerrainImage")) {
-			map_template->terrain_image_file = LuaToString(l, -1);
+			map_template->terrain_file = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainImage")) {
-			map_template->overlay_terrain_image_file = LuaToString(l, -1);
+			map_template->overlay_terrain_file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Width")) {
 			map_template->size.setWidth(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "Height")) {
