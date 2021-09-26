@@ -652,7 +652,7 @@ public:
 	geocoordinate get_pos_geocoordinate(const QPoint &pos) const;
 
 	void save_terrain_images() const;
-	void save_terrain_image(const std::string &filename, const std::filesystem::path &image_filepath, const std::filesystem::path &terrain_filepath, const terrain_geodata_ptr_map &terrain_data, const point_map<const terrain_type *> &terrain_map) const;
+	void save_terrain_image(const std::string &filename, const std::filesystem::path &terrain_filepath, const terrain_geodata_ptr_map &terrain_data, const point_map<const terrain_type *> &terrain_map) const;
 	void create_terrain_image_from_file(QImage &image, const std::filesystem::path &filepath) const;
 	void create_terrain_image_from_geodata(QImage &image, const terrain_geodata_ptr_map &terrain_data, const std::string &image_checkpoint_save_filename) const;
 	void create_terrain_image_from_map(QImage &image, const point_map<const terrain_type *> &terrain_map) const;

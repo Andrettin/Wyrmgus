@@ -3112,17 +3112,17 @@ void map_template::save_terrain_images() const
 	const std::string overlay_filename = this->get_identifier() + "_overlay.png";
 	const std::string trade_route_filename = this->get_identifier() + "_trade_routes.png";
 
-	this->save_terrain_image(filename, this->get_terrain_file(), this->get_terrain_file(), base_terrain_data, base_terrain_map);
-	this->save_terrain_image(overlay_filename, this->get_overlay_terrain_file(), this->get_overlay_terrain_file(), overlay_terrain_data, overlay_terrain_map);
-	this->save_terrain_image(trade_route_filename, this->get_trade_route_file(), std::filesystem::path(), trade_route_terrain_data, point_map<const terrain_type *>());
+	this->save_terrain_image(filename, this->get_terrain_file(), base_terrain_data, base_terrain_map);
+	this->save_terrain_image(overlay_filename, this->get_overlay_terrain_file(), overlay_terrain_data, overlay_terrain_map);
+	this->save_terrain_image(trade_route_filename, this->get_trade_route_file(), trade_route_terrain_data, point_map<const terrain_type *>());
 }
 
-void map_template::save_terrain_image(const std::string &filename, const std::filesystem::path &image_filepath, const std::filesystem::path &terrain_filepath, const terrain_geodata_ptr_map &terrain_data, const point_map<const terrain_type *> &terrain_map) const
+void map_template::save_terrain_image(const std::string &filename, const std::filesystem::path &terrain_filepath, const terrain_geodata_ptr_map &terrain_data, const point_map<const terrain_type *> &terrain_map) const
 {
 	QImage image;
 
-	if (!image_filepath.empty()) {
-		image = QImage(path::to_qstring(image_filepath));
+	if (!terrain_filepath.empty() && terrain_filepath.extension() == ".png") {
+		image = QImage(path::to_qstring(terrain_filepath));
 
 		if (image.size() != this->get_size()) {
 			throw std::runtime_error("Invalid terrain image size for map template \"" + this->get_identifier() + "\".");
@@ -3132,7 +3132,7 @@ void map_template::save_terrain_image(const std::string &filename, const std::fi
 		image.fill(Qt::transparent);
 	}
 
-	if (!terrain_filepath.empty()) {
+	if (!terrain_filepath.empty() && terrain_filepath.extension() == ".map") {
 		this->create_terrain_image_from_file(image, terrain_filepath);
 	} else if (!terrain_data.empty()) {
 		this->create_terrain_image_from_geodata(image, terrain_data, filename);
