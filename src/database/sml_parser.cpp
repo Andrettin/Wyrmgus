@@ -105,7 +105,7 @@ void sml_parser::parse_line(const std::string &line)
 			if (c == '\"') {
 				opened_quotation_marks = !opened_quotation_marks;
 				continue;
-			} else if (c == '\\') {
+			} else if (c == '\\' && opened_quotation_marks) {
 				escaped = true; //escape character, so that e.g. newlines can be properly added to text
 				continue;
 			}
