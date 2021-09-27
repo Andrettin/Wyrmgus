@@ -153,6 +153,16 @@ void map_template::process_sml_scope(const sml_data &scope)
 				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			}
 		});
+	} else if (tag == "terrain_substitutions") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const terrain_type *terrain = terrain_type::get(key);
+			const terrain_type *other_terrain = terrain_type::get(value);
+
+			this->terrain_substitutions[terrain] = other_terrain;
+		});
 	} else if (tag == "character_units") {
 		scope.for_each_element([&](const sml_property &property) {
 			const std::string &key = property.get_key();
@@ -526,7 +536,15 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 				terrain = terrain_feature->get_terrain_type();
 			} else {
 				terrain = terrain_type::try_get_by_color(color);
+
+				if (!this->terrain_substitutions.empty()) {
+					const auto find_iterator = this->terrain_substitutions.find(terrain);
+					if (find_iterator != this->terrain_substitutions.end()) {
+						terrain = find_iterator->second;
+					}
+				}
 			}
+
 			const Vec2i real_pos(map_start_pos.x() + (x - template_start_pos.x()), map_start_pos.y() + (y - template_start_pos.y()));
 
 			if (!CMap::get()->Info->IsPointOnMap(real_pos, z)) {
@@ -3136,7 +3154,12 @@ void map_template::save_terrain_images()
 	this->save_terrain_image(filename, this->terrain_image, base_terrain_data, base_terrain_map);
 	this->save_terrain_image(overlay_filename, this->overlay_terrain_image, overlay_terrain_data, overlay_terrain_map);
 
-	const QImage trade_route_image(path::to_qstring(this->get_trade_route_file()));
+	QImage trade_route_image;
+
+	if (!this->get_trade_route_file().empty()) {
+		trade_route_image = QImage(path::to_qstring(this->get_trade_route_file()));
+	}
+
 	this->save_terrain_image(trade_route_filename, trade_route_image, trade_route_terrain_data, point_map<const terrain_type *>());
 
 	this->clear_application_data();

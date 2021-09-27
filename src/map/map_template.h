@@ -763,6 +763,7 @@ private:
 	decimillesimal_int astrodistance_multiplier = decimillesimal_int(1);
 	int astrodistance_additive_modifier = 0;
 	map_template *default_astrocoordinate_reference_subtemplate = nullptr;
+	std::map<const terrain_type *, const terrain_type *> terrain_substitutions;
 	std::map<char, std::unique_ptr<character_unit>> character_units;
 	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
 	std::unique_ptr<map_template_history> history;
