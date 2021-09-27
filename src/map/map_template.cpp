@@ -480,23 +480,7 @@ void map_template::apply_terrain(const QPoint &template_start_pos, const QPoint 
 
 void map_template::apply_terrain(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
-	const std::filesystem::path &terrain_filepath = overlay ? this->get_overlay_terrain_file() : this->get_terrain_file();
-
-	if (!terrain_filepath.empty()) {
-		if (!std::filesystem::exists(terrain_filepath)) {
-			throw std::runtime_error("File \"" + terrain_filepath.string() + "\" not found.");
-		}
-
-		if (terrain_filepath.extension() == ".png") {
-			this->load_terrain_image(overlay);
-		} else if (terrain_filepath.extension() == ".map") {
-			this->load_terrain_file(overlay);
-		} else if (terrain_filepath.extension() == ".wes" && !overlay) {
-			this->load_wesnoth_terrain_file();
-		} else {
-			throw std::runtime_error("Invalid terrain file extension: \"" + terrain_filepath.extension().string() + "\".");
-		}
-	}
+	this->load_terrain(overlay);
 
 	const QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
 	if (!terrain_image.isNull()) {
@@ -2290,6 +2274,29 @@ void map_template::set_trade_route_file(const std::filesystem::path &filepath)
 	this->trade_route_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
+void map_template::load_terrain(const bool overlay)
+{
+	const std::filesystem::path &terrain_filepath = overlay ? this->get_overlay_terrain_file() : this->get_terrain_file();
+
+	if (terrain_filepath.empty()) {
+		return;
+	}
+
+	if (!std::filesystem::exists(terrain_filepath)) {
+		throw std::runtime_error("File \"" + terrain_filepath.string() + "\" not found.");
+	}
+
+	if (terrain_filepath.extension() == ".png") {
+		this->load_terrain_image(overlay);
+	} else if (terrain_filepath.extension() == ".map") {
+		this->load_terrain_file(overlay);
+	} else if (terrain_filepath.extension() == ".wes" && !overlay) {
+		this->load_wesnoth_terrain_file();
+	} else {
+		throw std::runtime_error("Invalid terrain file extension: \"" + terrain_filepath.extension().string() + "\".");
+	}
+}
+
 void map_template::load_terrain_file(const bool overlay)
 {
 	using namespace std::string_literals;
@@ -3067,8 +3074,11 @@ geocoordinate map_template::get_pos_geocoordinate(const QPoint &pos) const
 	return this->get_map_projection()->point_to_geocoordinate(pos, this->get_georectangle(), this->get_size());
 }
 
-void map_template::save_terrain_images() const
+void map_template::save_terrain_images()
 {
+	this->load_terrain(false);
+	this->load_terrain(true);
+
 	terrain_geodata_map terrain_data;
 
 	if (this->get_world() != nullptr) {
@@ -3123,17 +3133,21 @@ void map_template::save_terrain_images() const
 	const std::string overlay_filename = this->get_identifier() + "_overlay.png";
 	const std::string trade_route_filename = this->get_identifier() + "_trade_routes.png";
 
-	this->save_terrain_image(filename, this->get_terrain_file(), base_terrain_data, base_terrain_map);
-	this->save_terrain_image(overlay_filename, this->get_overlay_terrain_file(), overlay_terrain_data, overlay_terrain_map);
-	this->save_terrain_image(trade_route_filename, this->get_trade_route_file(), trade_route_terrain_data, point_map<const terrain_type *>());
+	this->save_terrain_image(filename, this->terrain_image, base_terrain_data, base_terrain_map);
+	this->save_terrain_image(overlay_filename, this->overlay_terrain_image, overlay_terrain_data, overlay_terrain_map);
+
+	const QImage trade_route_image(path::to_qstring(this->get_trade_route_file()));
+	this->save_terrain_image(trade_route_filename, trade_route_image, trade_route_terrain_data, point_map<const terrain_type *>());
+
+	this->clear_application_data();
 }
 
-void map_template::save_terrain_image(const std::string &filename, const std::filesystem::path &terrain_filepath, const terrain_geodata_ptr_map &terrain_data, const point_map<const terrain_type *> &terrain_map) const
+void map_template::save_terrain_image(const std::string &filename, const QImage &loaded_terrain_image, const terrain_geodata_ptr_map &terrain_data, const point_map<const terrain_type *> &terrain_map) const
 {
 	QImage image;
 
-	if (!terrain_filepath.empty() && terrain_filepath.extension() == ".png") {
-		image = QImage(path::to_qstring(terrain_filepath));
+	if (!loaded_terrain_image.isNull()) {
+		image = loaded_terrain_image;
 
 		if (image.size() != this->get_size()) {
 			throw std::runtime_error("Invalid terrain image size for map template \"" + this->get_identifier() + "\".");
@@ -3143,47 +3157,16 @@ void map_template::save_terrain_image(const std::string &filename, const std::fi
 		image.fill(Qt::transparent);
 	}
 
-	if (!terrain_filepath.empty() && terrain_filepath.extension() == ".map") {
-		this->create_terrain_image_from_file(image, terrain_filepath);
-	} else if (!terrain_data.empty()) {
+	if (!terrain_data.empty()) {
 		this->create_terrain_image_from_geodata(image, terrain_data, filename);
-	} else {
+	} else if (!terrain_map.empty()) {
 		this->create_terrain_image_from_map(image, terrain_map);
+	} else if (loaded_terrain_image.isNull()) {
+		//nothing to save
+		return;
 	}
 
 	image.save(QString::fromStdString(filename));
-}
-
-void map_template::create_terrain_image_from_file(QImage &image, const std::filesystem::path &filepath) const
-{
-	if (!std::filesystem::exists(filepath)) {
-		throw std::runtime_error("File \"" + filepath.string() + "\" not found.");
-	}
-
-	std::ifstream is_map(filepath);
-
-	std::string line_str;
-	int y = 0;
-	while (std::getline(is_map, line_str))
-	{
-		int x = 0;
-
-		for (unsigned int i = 0; i < line_str.length(); ++i) {
-			const char terrain_character = line_str.at(i);
-			const terrain_type *terrain = terrain_type::try_get_by_character(terrain_character);
-
-			QColor color(0, 0, 0);
-			if (terrain != nullptr) {
-				color = terrain->get_color();
-			}
-
-			image.setPixelColor(x, y, color);
-
-			++x;
-		}
-
-		++y;
-	}
 }
 
 void map_template::create_terrain_image_from_geodata(QImage &image, const terrain_geodata_ptr_map &terrain_data, const std::string &image_checkpoint_save_filename) const
