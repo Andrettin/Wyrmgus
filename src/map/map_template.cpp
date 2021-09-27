@@ -153,6 +153,24 @@ void map_template::process_sml_scope(const sml_data &scope)
 				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			}
 		});
+	} else if (tag == "tile_terrains" || tag == "overlay_tile_terrains") {
+		point_map<const terrain_type *> &tile_terrains = (tag == "overlay_tile_terrains") ? this->overlay_tile_terrains : this->tile_terrains;
+
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const std::string &tag = child_scope.get_tag();
+
+			const int x = std::stoi(tag);
+
+			child_scope.for_each_property([&](const sml_property &property) {
+				const std::string &key = property.get_key();
+				const std::string &value = property.get_value();
+
+				const int y = std::stoi(key);
+				const terrain_type *terrain = terrain_type::get(value);
+
+				tile_terrains[QPoint(x, y)] = terrain;
+			});
+		});
 	} else if (tag == "terrain_substitutions") {
 		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
@@ -486,6 +504,9 @@ void map_template::apply_terrain(const QPoint &template_start_pos, const QPoint 
 {
 	this->apply_terrain(false, template_start_pos, map_start_pos, z);
 	this->apply_terrain(true, template_start_pos, map_start_pos, z);
+
+	this->apply_tile_terrains(false, template_start_pos, map_start_pos, z);
+	this->apply_tile_terrains(true, template_start_pos, map_start_pos, z);
 }
 
 void map_template::apply_terrain(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
@@ -784,23 +805,6 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		std::throw_with_nested(std::runtime_error("Failed to apply terrain for map template \"" + this->get_identifier() + "\"."));
 	}
 	
-	for (const auto &kv_pair : this->get_tile_terrains()) {
-		const QPoint &tile_pos = kv_pair.first;
-
-		if (!this->contains_pos(tile_pos)) {
-			continue;
-		}
-
-		terrain_type *terrain = kv_pair.second;
-		const QPoint tile_map_pos = map_start_pos + tile_pos - template_start_pos;
-
-		if (!this->contains_map_pos(tile_map_pos)) {
-			continue;
-		}
-
-		CMap::get()->Field(tile_map_pos, z)->SetTerrain(terrain);
-	}
-
 	if (current_campaign) {
 		for (size_t i = 0; i < HistoricalTerrains.size(); ++i) {
 			Vec2i history_pos = std::get<0>(HistoricalTerrains[i]);
@@ -3073,6 +3077,43 @@ QPoint map_template::get_location_map_position(const historical_location *histor
 	return QPoint(-1, -1);
 }
 
+void map_template::set_tile_terrain(const QPoint &tile_pos, const terrain_type *terrain)
+{
+	if (terrain->is_overlay()) {
+		this->overlay_tile_terrains[tile_pos] = terrain;
+	} else {
+		this->tile_terrains[tile_pos] = terrain;
+	}
+}
+
+void map_template::apply_tile_terrains(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
+{
+	const point_map<const terrain_type *> &tile_terrains = overlay ? this->get_overlay_tile_terrains() : this->get_tile_terrains();
+
+	for (const auto &kv_pair : tile_terrains) {
+		const QPoint &tile_pos = kv_pair.first;
+
+		if (!this->contains_pos(tile_pos)) {
+			continue;
+		}
+
+		const terrain_type *terrain = kv_pair.second;
+		const QPoint tile_map_pos = map_start_pos + tile_pos - template_start_pos;
+
+		if (!this->contains_map_pos(tile_map_pos)) {
+			continue;
+		}
+
+		tile *tile = CMap::get()->Field(tile_map_pos, z);
+
+		if (terrain == nullptr && overlay) {
+			tile->RemoveOverlayTerrain();
+		} else {
+			tile->SetTerrain(terrain);
+		}
+	}
+}
+
 const map_projection *map_template::get_map_projection() const
 {
 	if (this->map_projection != nullptr) {
@@ -3133,26 +3174,12 @@ void map_template::save_terrain_images()
 		}
 	}
 
-	point_map<const terrain_type *> base_terrain_map;
-	point_map<const terrain_type *> overlay_terrain_map;
-
-	for (const auto &kv_pair : this->get_tile_terrains()) {
-		const QPoint &tile_pos = kv_pair.first;
-		const terrain_type *terrain = kv_pair.second;
-
-		if (terrain->is_overlay()) {
-			overlay_terrain_map[tile_pos] = terrain;
-		} else {
-			base_terrain_map[tile_pos] = terrain;
-		}
-	}
-
 	const std::string filename = this->get_identifier() + ".png";
 	const std::string overlay_filename = this->get_identifier() + "_overlay.png";
 	const std::string trade_route_filename = this->get_identifier() + "_trade_routes.png";
 
-	this->save_terrain_image(filename, this->terrain_image, base_terrain_data, base_terrain_map);
-	this->save_terrain_image(overlay_filename, this->overlay_terrain_image, overlay_terrain_data, overlay_terrain_map);
+	this->save_terrain_image(filename, this->terrain_image, base_terrain_data, this->get_tile_terrains());
+	this->save_terrain_image(overlay_filename, this->overlay_terrain_image, overlay_terrain_data, this->get_overlay_tile_terrains());
 
 	QImage trade_route_image;
 
@@ -3221,7 +3248,12 @@ void map_template::create_terrain_image_from_map(QImage &image, const point_map<
 	for (const auto &kv_pair : terrain_map) {
 		const QPoint &tile_pos = kv_pair.first;
 		const terrain_type *terrain = kv_pair.second;
-		image.setPixelColor(tile_pos, terrain->get_color());
+
+		if (terrain != nullptr) {
+			image.setPixelColor(tile_pos, terrain->get_color());
+		} else {
+			image.setPixelColor(tile_pos, terrain_type::none_color);
+		}
 	}
 }
 

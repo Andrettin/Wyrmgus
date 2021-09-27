@@ -577,15 +577,18 @@ public:
 		return this->output_territory_image;
 	}
 
-	const point_map<terrain_type *> &get_tile_terrains() const
+	const point_map<const terrain_type *> &get_tile_terrains() const
 	{
 		return this->tile_terrains;
 	}
 
-	void set_tile_terrain(const QPoint &tile_pos, terrain_type *terrain)
+	const point_map<const terrain_type *> &get_overlay_tile_terrains() const
 	{
-		this->tile_terrains[tile_pos] = terrain;
+		return this->overlay_tile_terrains;
 	}
+
+	void set_tile_terrain(const QPoint &tile_pos, const terrain_type *terrain);
+	void apply_tile_terrains(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 
 	const wyrmgus::map_projection *get_map_projection() const;
 
@@ -754,7 +757,8 @@ private:
 	point_map<const site *> sites_by_position;
 	std::map<geocoordinate, const site *> sites_by_geocoordinate;
 	std::map<geocoordinate, const site *> sites_by_astrocoordinate;
-	point_map<terrain_type *> tile_terrains;
+	point_map<const terrain_type *> tile_terrains;
+	point_map<const terrain_type *> overlay_tile_terrains;
 public:
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
 private:
