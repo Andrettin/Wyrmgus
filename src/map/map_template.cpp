@@ -124,6 +124,14 @@ void map_template::process_sml_property(const sml_property &property)
 		const map_template *east_of_template = map_template::get(value);
 		this->EastOfTemplates.push_back(east_of_template);
 		this->add_dependency_template(east_of_template);
+	} else if (key == "min_subtemplate_x") {
+		this->min_subtemplate_pos.setX(std::stoi(value));
+	} else if (key == "min_subtemplate_y") {
+		this->min_subtemplate_pos.setY(std::stoi(value));
+	} else if (key == "max_subtemplate_x") {
+		this->max_subtemplate_pos.setX(std::stoi(value));
+	} else if (key == "max_subtemplate_y") {
+		this->max_subtemplate_pos.setY(std::stoi(value));
 	} else {
 		data_entry::process_sml_property(property);
 	}
