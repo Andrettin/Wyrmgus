@@ -429,12 +429,23 @@ void map_template::check() const
 	if (this->get_min_longitude() != 0 || this->get_min_latitude() != 0 || this->get_max_longitude() != 0 || this->get_max_latitude() != 0) {
 		const wyrmgus::map_projection *map_projection = this->get_map_projection();
 		bool area_changeable = false;
+
 		if (this->IsSubtemplateArea()) {
 			if (this->get_world() == this->get_main_template()->get_world()) {
 				area_changeable = true;
 			}
 		}
+
 		map_projection->validate_area(this->get_georectangle(), this->get_size());
+	}
+
+	if (this->get_main_template() != nullptr) {
+		const QSize applied_size = this->get_applied_size();
+		const QSize main_template_applied_size = this->get_main_template()->get_applied_size();
+
+		if (applied_size.width() > main_template_applied_size.width() || applied_size.height() > main_template_applied_size.height()) {
+			throw std::runtime_error("Map template \"" + this->get_identifier() + "\" is greater in size than its main template (\"" + this->get_main_template()->get_identifier() + "\").");
+		}
 	}
 
 	/*
