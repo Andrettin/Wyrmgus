@@ -100,6 +100,10 @@ inline bool is_cardinally_adjacent_to(const QPoint &point, const QPoint &other_p
 
 inline QPoint get_circle_point(const QPoint &point, const int64_t source_radius, const int64_t target_radius)
 {
+	if (source_radius == 0) {
+		throw std::runtime_error("Source radius is zero.");
+	}
+
 	const int64_t x = point.x() * target_radius / source_radius;
 	const int64_t y = point.y() * target_radius / source_radius;
 	return QPoint(static_cast<int>(x), static_cast<int>(y));
