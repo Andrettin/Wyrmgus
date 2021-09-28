@@ -822,12 +822,26 @@ void WaitEventsOneFrame()
 				break;
 		}
 
-		if (input_event->type() == QEvent::HoverMove) {
-			const QHoverEvent *hover_event = static_cast<QHoverEvent *>(input_event.get());
-			if (hover_event->pos() == CursorScreenPos) {
-				//ignore if the hover event has the same position as the cursor currently holds
-				continue;
+		switch (input_event->type()) {
+			case QEvent::HoverMove: {
+				const QHoverEvent *hover_event = static_cast<QHoverEvent *>(input_event.get());
+				if (hover_event->pos() == CursorScreenPos) {
+					//ignore if the hover event has the same position as the cursor currently holds
+					continue;
+				}
+				break;
 			}
+			case QEvent::KeyPress:
+			case QEvent::KeyRelease: {
+				const QKeyEvent *key_event = static_cast<QKeyEvent *>(input_event.get());
+				if (key_event->key() == 0) {
+					//can happen, but is not relevant for the engine in this case; the documentation of QKeyEvent::key() says that a value of 0 can occur as a compose sequence, keyboard macro or key event compression
+					continue;
+				}
+				break;
+			}
+			default:
+				break;
 		}
 
 		SDL_Event sdl_event = qevent_to_sdl_event(std::move(input_event));
