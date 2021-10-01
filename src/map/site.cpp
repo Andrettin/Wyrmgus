@@ -411,18 +411,24 @@ void site::set_distance_from_orbit_center_au(const centesimal_int &distance_au)
 QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astrocoordinate, const QSize &reference_subtemplate_applied_size) const
 {
 	QPoint direction_pos = astrocoordinate.to_circle_edge_point();
-	int64_t astrodistance_value = this->get_astrodistance().to_int();
-	astrodistance_value = isqrt(astrodistance_value);
-	astrodistance_value = (astrodistance_value * this->get_map_template()->get_astrodistance_multiplier()).to_int();
+
+	int64_t astrodistance_value = 0;
+
+	if (!this->orbits_map_template()) {
+		astrodistance_value = this->get_astrodistance().to_int();
+		astrodistance_value = isqrt(astrodistance_value);
+		astrodistance_value = (astrodistance_value * this->get_map_template()->get_astrodistance_multiplier()).to_int();
+	}
 
 	//the size of the reference subtemplate serves as a minimum distance in tiles
 	astrodistance_value += std::max(reference_subtemplate_applied_size.width(), reference_subtemplate_applied_size.height()) / 2;
 
 	astrodistance_value += site::base_astrodistance_additive_modifier;
-	astrodistance_value += this->get_map_template()->get_astrodistance_additive_modifier();
 	astrodistance_value += this->get_astrodistance_additive_modifier();
 	if (this->orbits_map_template()) {
 		astrodistance_value += number::cbrt(this->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
+	} else {
+		astrodistance_value += this->get_map_template()->get_astrodistance_additive_modifier();
 	}
 	const int64_t x = direction_pos.x() * astrodistance_value / geocoordinate::number_type::divisor;
 	const int64_t y = direction_pos.y() * astrodistance_value / geocoordinate::number_type::divisor;
