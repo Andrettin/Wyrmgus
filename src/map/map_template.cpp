@@ -1109,6 +1109,11 @@ void map_template::apply_subtemplates(const QPoint &template_start_pos, const QP
 
 void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
+	if (CMap::get()->get_subtemplate_pos(subtemplate) != QPoint(-1, -1)) {
+		//already applied
+		return;
+	}
+
 	QPoint subtemplate_pos = subtemplate->get_subtemplate_top_left_pos();
 	bool found_location = false;
 
