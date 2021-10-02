@@ -184,6 +184,11 @@ public:
 
 	const std::filesystem::path &get_base_path(const data_module *data_module) const;
 
+	std::filesystem::path get_graphics_path(const data_module *data_module) const
+	{
+		return this->get_base_path(data_module) / database::graphics_folder;
+	}
+
 	std::filesystem::path get_maps_path(const data_module *data_module) const
 	{
 		return this->get_base_path(data_module) / database::maps_folder;
@@ -275,6 +280,14 @@ public:
 
 	std::filesystem::path get_graphics_filepath(const std::filesystem::path &relative_filepath) const
 	{
+		const data_module *preferred_module = this->get_current_module();
+
+		const std::filesystem::path preferred_path = this->get_graphics_path(preferred_module) / relative_filepath;
+
+		if (std::filesystem::exists(preferred_path)) {
+			return preferred_path;
+		}
+
 		const std::vector<std::filesystem::path> graphics_paths = this->get_graphics_paths();
 
 		//iterate the graphics paths in reverse other, so that modules loaded later can override graphics of those loaded earlier
@@ -289,11 +302,22 @@ public:
 		throw std::runtime_error("Graphics file \"" + relative_filepath.string() + "\" not found.");
 	}
 
+	const data_module *get_current_module() const
+	{
+		return this->current_module;
+	}
+
+	void set_current_module(const data_module *data_module)
+	{
+		this->current_module = data_module;
+	}
+
 private:
 	std::filesystem::path root_path = std::filesystem::current_path();
 	std::vector<std::unique_ptr<data_type_metadata>> metadata;
 	std::vector<qunique_ptr<data_module>> modules;
 	std::map<std::string, data_module *> modules_by_identifier;
+	const data_module *current_module = nullptr; //the module currently being processed
 	bool initialized = false;
 };
 

@@ -203,6 +203,9 @@ public:
 
 		for (const auto &kv_pair : data_type::sml_data_to_process) {
 			const data_module *data_module = kv_pair.first;
+
+			database::get()->set_current_module(data_module);
+
 			const std::vector<sml_data> &sml_data_list = kv_pair.second;
 			for (const sml_data &data : sml_data_list) {
 				data.for_each_child([&](const sml_data &data_entry) {
@@ -236,6 +239,8 @@ public:
 				});
 			}
 		}
+
+		database::get()->set_current_module(nullptr);
 
 		if (!definition) {
 			data_type::sml_data_to_process.clear();
