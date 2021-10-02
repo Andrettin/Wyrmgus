@@ -37,6 +37,7 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "player/civilization.h"
+#include "player/civilization_group.h"
 #include "player/player.h"
 #include "translate.h"
 #include "ui/cursor_type.h"
@@ -128,6 +129,8 @@ void cursor::initialize()
 
 	if (this->civilization != nullptr) {
 		this->civilization->set_cursor(this->get_type(), this);
+	} else if (this->civilization_group != nullptr) {
+		this->civilization_group->set_cursor(this->get_type(), this);
 	} else {
 		cursor::map_cursor(this->get_type(), this);
 	}

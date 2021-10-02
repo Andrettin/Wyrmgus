@@ -37,6 +37,7 @@
 #include "player/civilization_history.h"
 #include "player/faction.h"
 #include "sound/sound.h"
+#include "ui/cursor.h"
 #include "unit/unit_class.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
@@ -259,6 +260,20 @@ const sound *civilization_base::get_not_enough_resource_sound(const resource *re
 
 	if (this->get_group() != nullptr) {
 		return this->get_group()->get_not_enough_resource_sound(resource);
+	}
+
+	return nullptr;
+}
+
+cursor *civilization_base::get_cursor(const cursor_type type) const
+{
+	const auto find_iterator = this->cursors.find(type);
+	if (find_iterator != this->cursors.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->get_group() != nullptr) {
+		return this->get_group()->get_cursor(type);
 	}
 
 	return nullptr;

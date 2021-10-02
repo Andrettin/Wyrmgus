@@ -411,20 +411,6 @@ void civilization::set_encyclopedia_background_file(const std::filesystem::path 
 	this->encyclopedia_background_file = database::get()->get_graphics_filepath(filepath);
 }
 
-cursor *civilization::get_cursor(const cursor_type type) const
-{
-	const auto find_iterator = this->cursors.find(type);
-	if (find_iterator != this->cursors.end()) {
-		return find_iterator->second;
-	}
-
-	if (this->get_parent_civilization() != nullptr) {
-		return this->get_parent_civilization()->get_cursor(type);
-	}
-
-	return cursor::get_cursor_by_type(type);
-}
-
 std::string_view civilization::get_title_name(const government_type government_type, const faction_tier tier) const
 {
 	auto find_iterator = this->title_names.find(government_type);
@@ -677,6 +663,20 @@ const std::vector<std::unique_ptr<CAiBuildingTemplate>> &civilization::GetAiBuil
 	}
 	
 	return this->AiBuildingTemplates;
+}
+
+cursor *civilization::get_cursor(const cursor_type type) const
+{
+	cursor *cursor = civilization_base::get_cursor(type);
+	if (cursor != nullptr) {
+		return cursor;
+	}
+
+	if (this->get_parent_civilization() != nullptr) {
+		return this->get_parent_civilization()->get_cursor(type);
+	}
+
+	return cursor::get_cursor_by_type(type);
 }
 
 unit_type *civilization::get_class_unit_type(const unit_class *unit_class) const

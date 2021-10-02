@@ -35,6 +35,7 @@ namespace wyrmgus {
 
 class civilization_group;
 class civilization_history;
+class cursor;
 class faction;
 class name_generator;
 class player_color;
@@ -45,6 +46,7 @@ class unit_class;
 class unit_sound_set;
 class unit_type;
 class upgrade_class;
+enum class cursor_type;
 enum class gender;
 
 class civilization_base : public detailed_data_entry
@@ -112,6 +114,17 @@ public:
 	const sound *get_research_complete_sound() const;
 	const sound *get_not_enough_food_sound() const;
 	const sound *get_not_enough_resource_sound(const resource *resource) const;
+
+	cursor *get_cursor(const cursor_type type) const;
+
+	void set_cursor(const cursor_type type, cursor *cursor)
+	{
+		if (this->cursors.contains(type)) {
+			throw std::runtime_error("Another cursor is already registered for type \"" + std::to_string(static_cast<int>(type)) + "\".");
+		}
+
+		this->cursors[type] = cursor;
+	}
 
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 
@@ -182,6 +195,7 @@ private:
 	sound *research_complete_sound = nullptr;
 	sound *not_enough_food_sound = nullptr;
 	std::map<const resource *, const sound *> not_enough_resource_sounds;
+	std::map<cursor_type, cursor *> cursors;
 	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
 	std::map<gender, std::unique_ptr<name_generator>> personal_name_generators; //personal name generators for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)

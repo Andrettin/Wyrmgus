@@ -36,6 +36,7 @@ enum class ButtonCmd;
 namespace wyrmgus {
 
 class civilization;
+class civilization_group;
 class renderer;
 class unit_type;
 enum class cursor_type;
@@ -47,6 +48,7 @@ class cursor final : public data_entry, public data_type<cursor>
 
 	Q_PROPERTY(wyrmgus::cursor_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
+	Q_PROPERTY(wyrmgus::civilization_group* civilization_group MEMBER civilization_group)
 	Q_PROPERTY(std::filesystem::path file MEMBER file WRITE set_file)
 	Q_PROPERTY(QPoint hot_pos MEMBER hot_pos READ get_hot_pos)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
@@ -116,6 +118,11 @@ public:
 		return this->civilization;
 	}
 
+	const wyrmgus::civilization_group *get_civilization_group() const
+	{
+		return this->civilization_group;
+	}
+
 	const std::filesystem::path &get_file() const
 	{
 		return this->file;
@@ -161,6 +168,7 @@ public:
 private:
 	cursor_type type;
 	wyrmgus::civilization *civilization = nullptr;
+	wyrmgus::civilization_group *civilization_group = nullptr;
 	std::filesystem::path file;
 	std::shared_ptr<CGraphic> graphics; /// Cursor sprite image
 	QPoint hot_pos = QPoint(0, 0);     /// Hot point

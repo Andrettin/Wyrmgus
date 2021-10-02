@@ -184,17 +184,6 @@ public:
 		return this->develops_to;
 	}
 
-	cursor *get_cursor(const cursor_type type) const;
-
-	void set_cursor(const cursor_type type, cursor *cursor)
-	{
-		if (this->cursors.contains(type)) {
-			throw std::runtime_error("Another cursor is already registered for type \"" + std::to_string(static_cast<int>(type)) + "\".");
-		}
-
-		this->cursors[type] = cursor;
-	}
-
 	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;
 	std::string_view get_character_title_name(const character_title title_type, const faction_type faction_type, const government_type government_type, const faction_tier tier, const gender gender) const;
 	void process_character_title_name_scope(const sml_data &scope);
@@ -202,6 +191,8 @@ public:
 
 	const std::vector<std::unique_ptr<ai_force_template>> &get_ai_force_templates(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &GetAiBuildingTemplates() const;
+
+	cursor *get_cursor(const cursor_type type) const;
 
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 	CUpgrade *get_class_upgrade(const upgrade_class *upgrade_class) const;
@@ -259,7 +250,6 @@ private:
 	std::filesystem::path encyclopedia_background_file;
 	std::vector<const civilization *> develops_from; //from which civilizations this civilization develops
 	std::vector<const civilization *> develops_to; //to which civilizations this civilization develops
-	std::map<cursor_type, cursor *> cursors;
 public:
 	std::vector<quest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
