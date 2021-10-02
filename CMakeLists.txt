@@ -459,6 +459,7 @@ set(ui_SRCS
 	src/ui/uibuttons_proc.cpp
 	src/ui/mouse.cpp
 	src/ui/popup.cpp
+	src/ui/resource_icon_image_provider.cpp
 	src/ui/script_ui.cpp
 	src/ui/statusline.cpp
 	src/ui/ui.cpp
@@ -1010,6 +1011,7 @@ set(wyrmgus_ui_HDRS
 	src/ui/interface_style.h
 	src/ui/popup.h
 	src/ui/resource_icon.h
+	src/ui/resource_icon_image_provider.h
 	src/ui/statusline.h
 	src/ui/ui.h
 )

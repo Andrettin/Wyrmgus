@@ -51,6 +51,7 @@
 #include "ui/icon.h"
 #include "ui/icon_image_provider.h"
 #include "ui/interface_image_provider.h"
+#include "ui/resource_icon_image_provider.h"
 #include "unit/unit_list_model.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
@@ -156,6 +157,7 @@ int main(int argc, char **argv)
 		engine.addImageProvider("empty", new empty_image_provider);
 		engine.addImageProvider("icon", new icon_image_provider);
 		engine.addImageProvider("interface", new interface_image_provider);
+		engine.addImageProvider("resource_icon", new resource_icon_image_provider);
 		engine.addImageProvider("tile", new tile_image_provider);
 
 		const QString root_path = path::to_qstring(database::get()->get_root_path());
