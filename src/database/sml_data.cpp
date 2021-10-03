@@ -24,11 +24,17 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
+#include "stratagus.h"
+
 #include "database/sml_data.h"
 
 #include "database/sml_operator.h"
 #include "database/sml_property_visitor.h"
 #include "util/geocoordinate.h"
+#include "util/path_util.h"
+
+#include <boost/interprocess/sync/file_lock.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 
 namespace wyrmgus {
 
@@ -56,6 +62,29 @@ geocoordinate sml_data::to_geocoordinate() const
 	geocoordinate::number_type longitude = geocoordinate::number_type(this->get_values()[0]);
 	geocoordinate::number_type latitude = geocoordinate::number_type(this->get_values()[1]);
 	return geocoordinate(std::move(longitude), std::move(latitude));
+}
+
+void sml_data::print_to_file(const std::filesystem::path &filepath, const bool sync) const
+{
+	std::ofstream ofstream(filepath);
+
+	if (!ofstream) {
+		throw std::runtime_error("Failed to open file \"" + filepath.string() + "\" for printing SML data to.");
+	}
+
+	{
+		std::unique_ptr<boost::interprocess::file_lock> file_lock;
+		std::unique_ptr<boost::interprocess::scoped_lock<boost::interprocess::file_lock>> lock;
+
+		if (sync && std::filesystem::exists(filepath)) {
+			file_lock = std::make_unique<boost::interprocess::file_lock>(path::to_string(filepath).c_str());
+			lock = std::make_unique<boost::interprocess::scoped_lock<boost::interprocess::file_lock>>(*file_lock);
+		}
+
+		this->print_components(ofstream);
+
+		ofstream.flush();
+	}
 }
 
 void sml_data::print(std::ostream &ostream, const size_t indentation, const bool new_line) const

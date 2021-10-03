@@ -352,16 +352,7 @@ public:
 		return QRect(QPoint(min_x, min_y), QPoint(max_x, max_y));
 	}
 
-	void print_to_file(const std::filesystem::path &filepath) const
-	{
-		std::ofstream ofstream(filepath);
-
-		if (!ofstream) {
-			throw std::runtime_error("Failed to open file \"" + filepath.string() + "\" for printing SML data to.");
-		}
-
-		this->print_components(ofstream);
-	}
+	void print_to_file(const std::filesystem::path &filepath, const bool sync = false) const;
 
 	void print_to_dir(const std::filesystem::path &directory) const
 	{
