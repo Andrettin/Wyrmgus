@@ -408,7 +408,8 @@ public:
 class ImageDropDownWidget : public DropDownWidget
 {
 public:
-	ImageDropDownWidget() {
+	ImageDropDownWidget()
+	{
 		mListBox.addActionListener(this);
 		setListModel(&listmodel);
 		mScrollArea->setContent(&mListBox);

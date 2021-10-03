@@ -43,6 +43,10 @@
 
 #include <QSettings>
 
+#include <boost/interprocess/sync/file_lock.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
+#include <boost/interprocess/sync/sharable_lock.hpp>
+
 namespace wyrmgus {
 
 std::filesystem::path achievement::get_achievements_filepath()
@@ -59,6 +63,9 @@ void achievement::load_achievements()
 	if (!std::filesystem::exists(achievements_filepath)) {
 		return;
 	}
+
+	boost::interprocess::file_lock file_lock(path::to_string(achievements_filepath).c_str());
+	boost::interprocess::sharable_lock<boost::interprocess::file_lock> lock(file_lock);
 
 	const QSettings data(path::to_qstring(achievements_filepath), QSettings::IniFormat);
 
@@ -87,6 +94,14 @@ void achievement::save_achievements()
 	}
 
 	try {
+		std::unique_ptr<boost::interprocess::file_lock> file_lock;
+		std::unique_ptr<boost::interprocess::scoped_lock<boost::interprocess::file_lock>> lock;
+
+		if (std::filesystem::exists(achievements_filepath)) {
+			file_lock = std::make_unique<boost::interprocess::file_lock>(path::to_string(achievements_filepath).c_str());
+			lock = std::make_unique<boost::interprocess::scoped_lock<boost::interprocess::file_lock>>(*file_lock);
+		}
+
 		data.print_to_file(achievements_filepath);
 	} catch (const std::exception &exception) {
 		exception::report(exception);

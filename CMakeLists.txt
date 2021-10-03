@@ -1428,6 +1428,7 @@ endif()
 
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
+	add_definitions(-DBOOST_DATE_TIME_NO_LIB)
 endif()
 
 if(WITH_X11 AND X11_FOUND)
