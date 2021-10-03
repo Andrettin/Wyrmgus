@@ -172,12 +172,12 @@ int main(int argc, char **argv)
 
 		QUrl url = QDir(root_path + "/interface/").absoluteFilePath("Main.qml");
 		url.setScheme("file");
-		QObject::connect(
-				&engine, &QQmlApplicationEngine::objectCreated, &app,
-				[url](QObject *obj, const QUrl &objUrl) {
-					if (!obj && url == objUrl) QCoreApplication::exit(-1);
-				},
-				Qt::QueuedConnection);
+		QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app,
+			[url](QObject *obj, const QUrl &objUrl) {
+				if (!obj && url == objUrl) {
+					QCoreApplication::exit(-1);
+				}
+			}, Qt::QueuedConnection);
 		engine.load(url);
 
 		const int result = app.exec();
