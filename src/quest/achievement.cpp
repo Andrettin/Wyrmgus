@@ -43,9 +43,6 @@
 
 #include <QSettings>
 
-#include <boost/interprocess/sync/file_lock.hpp>
-#include <boost/interprocess/sync/sharable_lock.hpp>
-
 namespace wyrmgus {
 
 std::filesystem::path achievement::get_achievements_filepath()
@@ -62,9 +59,6 @@ void achievement::load_achievements()
 	if (!std::filesystem::exists(achievements_filepath)) {
 		return;
 	}
-
-	boost::interprocess::file_lock file_lock(path::to_string(achievements_filepath).c_str());
-	boost::interprocess::sharable_lock<boost::interprocess::file_lock> lock(file_lock);
 
 	const QSettings data(path::to_qstring(achievements_filepath), QSettings::IniFormat);
 

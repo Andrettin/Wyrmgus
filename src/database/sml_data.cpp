@@ -33,9 +33,6 @@
 #include "util/geocoordinate.h"
 #include "util/path_util.h"
 
-#include <boost/interprocess/sync/file_lock.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
-
 namespace wyrmgus {
 
 sml_data::sml_data(std::string &&tag)
@@ -72,19 +69,7 @@ void sml_data::print_to_file(const std::filesystem::path &filepath, const bool s
 		throw std::runtime_error("Failed to open file \"" + filepath.string() + "\" for printing SML data to.");
 	}
 
-	{
-		std::unique_ptr<boost::interprocess::file_lock> file_lock;
-		std::unique_ptr<boost::interprocess::scoped_lock<boost::interprocess::file_lock>> lock;
-
-		if (sync && std::filesystem::exists(filepath)) {
-			file_lock = std::make_unique<boost::interprocess::file_lock>(path::to_string(filepath).c_str());
-			lock = std::make_unique<boost::interprocess::scoped_lock<boost::interprocess::file_lock>>(*file_lock);
-		}
-
-		this->print_components(ofstream);
-
-		ofstream.flush();
-	}
+	this->print_components(ofstream);
 }
 
 void sml_data::print(std::ostream &ostream, const size_t indentation, const bool new_line) const
