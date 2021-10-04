@@ -358,11 +358,6 @@ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value,
 		lua_rawgeti(l, -1, j + 1);
 		this->Resource.Mine = CclGetUnitFromRef(l)->acquire_ref();
 		lua_pop(l, 1);
-		//Wyrmgus start
-		if (this->Resource.get_mine()->Type == nullptr) {
-			this->Resource.Mine.reset();
-		}
-		//Wyrmgus end
 	} else if (!strcmp(value, "res-pos")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
