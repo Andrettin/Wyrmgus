@@ -92,31 +92,6 @@ void achievement::save_achievements()
 		exception::report(exception);
 		log::log_error("Failed to save achievements file.");
 	}
-
-	//save achievements to the legacy quests.lua file as well
-	std::filesystem::path path = database::get()->get_root_path();
-
-	if (!GameName.empty()) {
-		path /= GameName;
-	}
-
-	path /= "quests.lua";
-
-	path.make_preferred();
-
-	FILE *fd = fopen(path::to_string(path).c_str(), "w");
-	if (!fd) {
-		log::log_error("Cannot open file \"" + path::to_string(path) + "\" for writing.");
-		return;
-	}
-
-	for (const achievement *achievement : achievement::get_all()) {
-		if (achievement->is_obtained()) {
-			fprintf(fd, "SetAchievementObtained(\"%s\", false, false)\n", achievement->get_identifier().c_str());
-		}
-	}
-
-	fclose(fd);
 }
 
 void achievement::check_achievements()
