@@ -48,7 +48,6 @@ class game final : public QObject, public singleton<game>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign WRITE set_current_campaign)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 	Q_PROPERTY(bool multiplayer READ is_multiplayer NOTIFY multiplayer_changed)
 	Q_PROPERTY(bool console_active READ is_console_active_sync NOTIFY console_active_changed)

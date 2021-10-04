@@ -94,10 +94,6 @@ int SaveGame(const std::string &filepath_str)
 	//Wyrmgus start
 //	file.printf("function SetTile() end\n");
 	file.printf("function SetTileTerrain() end\n");
-	wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
-	if (current_campaign != nullptr) {
-		file.printf("SetCurrentCampaign(\"%s\")\n", current_campaign->GetIdent().c_str());
-	}
 	//Wyrmgus end
 	file.printf("Load(\"%s\")\n", CMap::get()->Info->get_setup_filepath().string().c_str());
 	file.printf("CreateUnit = oldCreateUnit\n");

@@ -235,7 +235,9 @@ void game::process_sml_property(const sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "cheat") {
+	if (key == "current_campaign") {
+		this->current_campaign = campaign::get(value);
+	} else if (key == "cheat") {
 		this->cheat = string::to_bool(value);
 	} else {
 		throw std::runtime_error("Invalid game data property: \"" + key + "\".");
@@ -271,6 +273,10 @@ void game::process_sml_scope(const sml_data &scope)
 void game::save(CFile &file) const
 {
 	sml_data game_data;
+
+	if (this->get_current_campaign() != nullptr) {
+		game_data.add_property("current_campaign", this->get_current_campaign()->get_identifier());
+	}
 
 	if (this->cheat) {
 		game_data.add_property("cheat", string::from_bool(this->cheat));
