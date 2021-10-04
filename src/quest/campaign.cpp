@@ -286,27 +286,6 @@ int campaign::get_tree_width() const
 
 }
 
-/**
-**	@brief	Set the current campaign
-**
-**	@param	campaign_ident	The campaign's string identifier
-*/
-void SetCurrentCampaign(const std::string &campaign_ident)
-{
-	if (campaign_ident.empty()) {
-		game::get()->set_current_campaign(nullptr);
-		return;
-	}
-	
-	campaign *campaign = campaign::get(campaign_ident);
-	game::get()->set_current_campaign(campaign);
-}
-
-/**
-**	@brief	Get the current campaign
-**
-**	@return	The string identifier of the current campaign
-*/
 std::string GetCurrentCampaign()
 {
 	const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();

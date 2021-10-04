@@ -198,5 +198,4 @@ private:
 
 }
 
-extern void SetCurrentCampaign(const std::string &campaign_ident);
 extern std::string GetCurrentCampaign();
