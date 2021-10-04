@@ -279,6 +279,13 @@ void engine_interface::load_map_infos()
 				std::filesystem::recursive_directory_iterator dir_iterator(map_path);
 
 				for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
+					if (dir_entry.is_directory()) {
+						if (dir_entry.path().filename() == "campaign" || dir_entry.path().filename() == "hidden") {
+							dir_iterator.disable_recursion_pending();
+							continue;
+						}
+					}
+
 					if (!dir_entry.is_regular_file() || dir_entry.path().extension() != ".smp") {
 						continue;
 					}
