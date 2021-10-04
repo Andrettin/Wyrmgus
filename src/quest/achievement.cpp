@@ -87,7 +87,7 @@ void achievement::save_achievements()
 	}
 
 	try {
-		data.print_to_file(achievements_filepath, true);
+		data.print_to_file(achievements_filepath);
 	} catch (const std::exception &exception) {
 		exception::report(exception);
 		log::log_error("Failed to save achievements file.");

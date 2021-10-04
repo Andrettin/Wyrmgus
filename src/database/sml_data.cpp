@@ -61,7 +61,7 @@ geocoordinate sml_data::to_geocoordinate() const
 	return geocoordinate(std::move(longitude), std::move(latitude));
 }
 
-void sml_data::print_to_file(const std::filesystem::path &filepath, const bool sync) const
+void sml_data::print_to_file(const std::filesystem::path &filepath) const
 {
 	std::ofstream ofstream(filepath);
 
