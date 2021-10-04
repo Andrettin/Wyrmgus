@@ -145,6 +145,7 @@ public:
 
 	void run_map(const std::filesystem::path &filepath);
 	Q_INVOKABLE void run_map_async(const QString &filepath);
+	Q_INVOKABLE void run_campaign_async(wyrmgus::campaign *campaign);
 
 	void apply_player_history();
 

@@ -189,6 +189,14 @@ void game::run_map_async(const QString &filepath)
 	});
 }
 
+void game::run_campaign_async(campaign *campaign)
+{
+	engine_interface::get()->post([this, campaign]() {
+		this->set_current_campaign(campaign);
+		this->run_map(database::get()->get_campaign_map_filepath());
+	});
+}
+
 void game::apply_player_history()
 {
 	const CDate start_date = this->get_current_campaign()->get_start_date();

@@ -40,6 +40,8 @@ class data_type_metadata;
 class database final : public singleton<database>
 {
 public:
+	static constexpr const char *campaign_folder = "campaign";
+	static constexpr const char *campaign_map_filename = "campaign.smp";
 	static constexpr const char *data_folder = "data";
 	static constexpr const char *graphics_folder = "graphics";
 	static constexpr const char *maps_folder = "maps";
@@ -192,6 +194,18 @@ public:
 	std::filesystem::path get_maps_path(const data_module *data_module) const
 	{
 		return this->get_base_path(data_module) / database::maps_folder;
+	}
+
+	std::filesystem::path get_campaign_maps_path() const
+	{
+		return this->get_maps_path(nullptr) / database::campaign_folder;
+	}
+
+	std::filesystem::path get_campaign_map_filepath() const
+	{
+		std::filesystem::path filepath = this->get_campaign_maps_path() / campaign_map_filename;
+		filepath.make_preferred();
+		return filepath;
 	}
 
 	std::filesystem::path get_music_path(const data_module *data_module)

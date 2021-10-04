@@ -43,6 +43,7 @@
 #include "player/faction.h"
 #include "player/player.h"
 #include "player/player_color.h"
+#include "quest/campaign.h"
 #include "quest/quest.h"
 #include "religion/pantheon.h"
 #include "time/calendar.h"
@@ -110,6 +111,7 @@ int main(int argc, char **argv)
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
 		qmlRegisterAnonymousType<calendar>("", 1);
+		qmlRegisterAnonymousType<campaign>("", 1);
 		qmlRegisterAnonymousType<CEditor>("", 1);
 		qmlRegisterAnonymousType<civilization>("", 1);
 		qmlRegisterAnonymousType<civilization_group>("", 1);
@@ -129,6 +131,7 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<unit_type>("", 1);
 #else
 		qmlRegisterType<calendar>();
+		qmlRegisterType<campaign>();
 		qmlRegisterType<CEditor>();
 		qmlRegisterType<civilization>();
 		qmlRegisterType<civilization_group>();
