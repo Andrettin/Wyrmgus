@@ -147,13 +147,14 @@
 ** @see editor.h @see editor.cpp
 */
 
+#include "stratagus.h"
+
 #ifdef USE_BEOS
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
 extern void beos_init(int argc, char **argv);
-
 #endif
 
 #ifdef MAC_BUNDLE
@@ -162,14 +163,13 @@ extern void beos_init(int argc, char **argv);
 #undef Button
 #endif
 
-#include "stratagus.h"
-
 #include "ai.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
 #include "database/database.h"
 #include "database/preferences.h"
+#include "direction.h"
 #include "editor.h"
 #include "game/game.h"
 #include "guichan.h"
@@ -202,6 +202,7 @@ extern void beos_init(int argc, char **argv);
 #include "widgets.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
+#include "util/point_util.h"
 #include "util/util.h"
 
 #include "missile.h" //for FreeBurningBuildingFrames
@@ -520,112 +521,27 @@ void stratagusMain(int argc, char **argv)
 }
 
 //Wyrmgus start
-int GetReverseDirection(int direction)
-{
-	if (direction == North) {
-		return South;
-	} else if (direction == Northeast) {
-		return Southwest;
-	} else if (direction == East) {
-		return West;
-	} else if (direction == Southeast) {
-		return Northwest;
-	} else if (direction == South) {
-		return North;
-	} else if (direction == Southwest) {
-		return Northeast;
-	} else if (direction == West) {
-		return East;
-	} else if (direction == Northwest) {
-		return Southeast;
-	}
-	return -1;
-}
-
-std::string GetDirectionNameById(int direction)
-{
-	if (direction == North) {
-		return "north";
-	} else if (direction == Northeast) {
-		return "northeast";
-	} else if (direction == East) {
-		return "east";
-	} else if (direction == Southeast) {
-		return "southeast";
-	} else if (direction == South) {
-		return "south";
-	} else if (direction == Southwest) {
-		return "southwest";
-	} else if (direction == West) {
-		return "west";
-	} else if (direction == Northwest) {
-		return "northwest";
-	}
-	return "";
-}
-
-int GetDirectionIdByName(const std::string &direction)
-{
-	if (direction == "north") {
-		return North;
-	} else if (direction == "northeast") {
-		return Northeast;
-	} else if (direction == "east") {
-		return East;
-	} else if (direction == "southeast") {
-		return Southeast;
-	} else if (direction == "south") {
-		return South;
-	} else if (direction == "southwest") {
-		return Southwest;
-	} else if (direction == "west") {
-		return West;
-	} else if (direction == "northwest") {
-		return Northwest;
-	} else {
-		return -1;
-	}
-}
-
-int GetDirectionFromOffset(int x, int y)
+direction GetDirectionFromOffset(const int x, const int y)
 {
 	if (x < 0 && y == 0) {
-		return West;
+		return direction::west;
 	} else if (x > 0 && y == 0) {
-		return East;
+		return direction::east;
 	} else if (y < 0 && x == 0) {
-		return North;
+		return direction::north;
 	} else if (y > 0 && x == 0) {
-		return South;
+		return direction::south;
 	} else if (x < 0 && y < 0) {
-		return Northwest;
+		return direction::northwest;
 	} else if (x > 0 && y < 0) {
-		return Northeast;
+		return direction::northeast;
 	} else if (x < 0 && y > 0) {
-		return Southwest;
+		return direction::southwest;
 	} else if (x > 0 && y > 0) {
-		return Southeast;
+		return direction::southeast;
 	}
 
-	return -1;
-}
-
-QPoint GetDirectionOffset(int direction)
-{
-	QPoint offset(0, 0);
-			
-	if (direction == North || direction == Northwest || direction == Northeast) {
-		offset.setY(-1);
-	} else if (direction == South || direction == Southwest || direction == Southeast) {
-		offset.setY(1);
-	}
-	if (direction == West || direction == Northwest || direction == Southwest) {
-		offset.setX(-1);
-	} else if (direction == East || direction == Northeast || direction == Southeast) {
-		offset.setX(1);
-	}
-
-	return offset;
+	throw std::runtime_error("No direction for point " + point::to_string(QPoint(x, y)) + ".");
 }
 //Wyrmgus end
 

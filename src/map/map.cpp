@@ -32,6 +32,7 @@
 #include "ai/ai_local.h"
 #include "database/defines.h"
 #include "database/sml_parser.h"
+#include "direction.h"
 //Wyrmgus start
 #include "editor.h"
 #include "game/game.h" // for the SaveGameLoading variable
@@ -471,7 +472,7 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, const bool overlay, const int
 		return true;
 	}
 
-	std::vector<int> transition_directions;
+	std::vector<direction> transition_directions;
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -490,9 +491,9 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, const bool overlay, const int
 		}
 	}
 	
-	if (std::find(transition_directions.begin(), transition_directions.end(), North) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), South) != transition_directions.end()) {
+	if (vector::contains(transition_directions, direction::north) && vector::contains(transition_directions, direction::south)) {
 		return false;
-	} else if (std::find(transition_directions.begin(), transition_directions.end(), West) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) != transition_directions.end()) {
+	} else if (vector::contains(transition_directions, direction::west) && vector::contains(transition_directions, direction::east)) {
 		return false;
 	}
 
@@ -2432,7 +2433,7 @@ void CMap::SetOverlayTerrainDamaged(const QPoint &pos, const bool damaged, const
 	}
 }
 
-static tile_transition_type GetTransitionType(std::vector<int> &adjacent_directions, const bool allow_single = false)
+static tile_transition_type GetTransitionType(const std::vector<direction> &adjacent_directions, const bool allow_single = false)
 {
 	if (adjacent_directions.size() == 0) {
 		return tile_transition_type::none;
@@ -2440,97 +2441,97 @@ static tile_transition_type GetTransitionType(std::vector<int> &adjacent_directi
 	
 	tile_transition_type transition_type = tile_transition_type::none;
 
-	if (allow_single && vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East)) {
+	if (allow_single && vector::contains(adjacent_directions, direction::north) && vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::west) && vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::single;
-	} else if (allow_single && vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::west) && vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::north_single;
-	} else if (allow_single && !vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::north) && vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::west) && vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::south_single;
-	} else if (allow_single && vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::north) && vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::west_single;
-	} else if (allow_single && vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::north) && vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::east_single;
-	} else if (allow_single && vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::north) && vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::north_south;
-	} else if (allow_single && vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::west) && vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south)) {
 		transition_type = tile_transition_type::west_east;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Southwest) && vector::contains(adjacent_directions, Southeast)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::southwest) && vector::contains(adjacent_directions, direction::southeast)) {
 		transition_type = tile_transition_type::north_southwest_inner_southeast_inner;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Southwest)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::southwest)) {
 		transition_type = tile_transition_type::north_southwest_inner;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Southeast)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::southeast)) {
 		transition_type = tile_transition_type::north_southeast_inner;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Northeast)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::northwest) && vector::contains(adjacent_directions, direction::northeast)) {
 		transition_type = tile_transition_type::south_northwest_inner_northeast_inner;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northwest)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::northwest)) {
 		transition_type = tile_transition_type::south_northwest_inner;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northeast)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::northeast)) {
 		transition_type = tile_transition_type::south_northeast_inner;
-	} else if (allow_single && vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northeast) && vector::contains(adjacent_directions, Southeast)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::northeast) && vector::contains(adjacent_directions, direction::southeast)) {
 		transition_type = tile_transition_type::west_northeast_inner_southeast_inner;
-	} else if (allow_single && vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northeast)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::northeast)) {
 		transition_type = tile_transition_type::west_northeast_inner;
-	} else if (allow_single && vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Southeast)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::southeast)) {
 		transition_type = tile_transition_type::west_southeast_inner;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Southwest)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::northwest) && vector::contains(adjacent_directions, direction::southwest)) {
 		transition_type = tile_transition_type::east_northwest_inner_southwest_inner;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northwest)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::northwest)) {
 		transition_type = tile_transition_type::east_northwest_inner;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Southwest)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::southwest)) {
 		transition_type = tile_transition_type::east_southwest_inner;
-	} else if (allow_single && vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Southeast)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::southeast)) {
 		transition_type = tile_transition_type::northwest_outer_southeast_inner;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East) && vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Southwest)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && vector::contains(adjacent_directions, direction::east) && vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::southwest)) {
 		transition_type = tile_transition_type::northeast_outer_southwest_inner;
-	} else if (allow_single && vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northeast)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::northeast)) {
 		transition_type = tile_transition_type::southwest_outer_northeast_inner;
-	} else if (allow_single && !vector::contains(adjacent_directions, West) && vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, North) && vector::contains(adjacent_directions, South) && vector::contains(adjacent_directions, Northwest)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::west) && vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::north) && vector::contains(adjacent_directions, direction::south) && vector::contains(adjacent_directions, direction::northwest)) {
 		transition_type = tile_transition_type::southeast_outer_northwest_inner;
-	} else if (vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::southeast) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::north;
-	} else if (vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, North) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::northwest) && !vector::contains(adjacent_directions, direction::northeast) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::south;
-	} else if (vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South)) {
+	} else if (vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::northeast) && !vector::contains(adjacent_directions, direction::southeast) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south)) {
 		transition_type = tile_transition_type::west;
-	} else if (vector::contains(adjacent_directions, East) && !vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South)) {
+	} else if (vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::northwest) && !vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south)) {
 		transition_type = tile_transition_type::east;
-	} else if ((vector::contains(adjacent_directions, North) || vector::contains(adjacent_directions, West)) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end()) {
+	} else if ((vector::contains(adjacent_directions, direction::north) || vector::contains(adjacent_directions, direction::west)) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::southeast)) {
 		transition_type = tile_transition_type::northwest_outer;
-	} else if ((vector::contains(adjacent_directions, North) || vector::contains(adjacent_directions, East)) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end()) {
+	} else if ((vector::contains(adjacent_directions, direction::north) || vector::contains(adjacent_directions, direction::east)) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::southwest)) {
 		transition_type = tile_transition_type::northeast_outer;
-	} else if ((vector::contains(adjacent_directions, South) || vector::contains(adjacent_directions, West)) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, East) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end()) {
+	} else if ((vector::contains(adjacent_directions, direction::south) || vector::contains(adjacent_directions, direction::west)) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::east) && !vector::contains(adjacent_directions, direction::northeast)) {
 		transition_type = tile_transition_type::southwest_outer;
-	} else if ((vector::contains(adjacent_directions, South) || vector::contains(adjacent_directions, East)) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, West) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end()) {
+	} else if ((vector::contains(adjacent_directions, direction::south) || vector::contains(adjacent_directions, direction::east)) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::northwest)) {
 		transition_type = tile_transition_type::southeast_outer;
-	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Southeast) && vector::contains(adjacent_directions, Northeast) && vector::contains(adjacent_directions, Southwest) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::northwest) && vector::contains(adjacent_directions, direction::southeast) && vector::contains(adjacent_directions, direction::northeast) && vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northwest_northeast_southwest_southeast_inner;
-	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && vector::contains(adjacent_directions, Northeast) && vector::contains(adjacent_directions, Southwest) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::northwest) && !vector::contains(adjacent_directions, direction::southeast) && vector::contains(adjacent_directions, direction::northeast) && vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northwest_northeast_southwest_inner;
-	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Southeast) && vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::northwest) && vector::contains(adjacent_directions, direction::southeast) && vector::contains(adjacent_directions, direction::northeast) && !vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northwest_northeast_southeast_inner;
-	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && vector::contains(adjacent_directions, Southwest) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::northwest) && vector::contains(adjacent_directions, direction::southeast) && !vector::contains(adjacent_directions, direction::northeast) && vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northwest_southwest_southeast_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && vector::contains(adjacent_directions, Southeast) && vector::contains(adjacent_directions, Northeast) && vector::contains(adjacent_directions, Southwest) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::northwest) && vector::contains(adjacent_directions, direction::southeast) && vector::contains(adjacent_directions, direction::northeast) && vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northeast_southwest_southeast_inner;
-	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::northwest) && !vector::contains(adjacent_directions, direction::southeast) && vector::contains(adjacent_directions, direction::northeast) && !vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northwest_northeast_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && vector::contains(adjacent_directions, Southwest) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::northwest) && vector::contains(adjacent_directions, direction::southeast) && !vector::contains(adjacent_directions, direction::northeast) && vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::southwest_southeast_inner;
-	} else if (allow_single && vector::contains(adjacent_directions, Northwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && vector::contains(adjacent_directions, Southwest) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && vector::contains(adjacent_directions, direction::northwest) && !vector::contains(adjacent_directions, direction::southeast) && !vector::contains(adjacent_directions, direction::northeast) && vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northwest_southwest_inner;
-	} else if (allow_single && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && vector::contains(adjacent_directions, Southeast) && vector::contains(adjacent_directions, Northeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (allow_single && !vector::contains(adjacent_directions, direction::northwest) && vector::contains(adjacent_directions, direction::southeast) && vector::contains(adjacent_directions, direction::northeast) && !vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northeast_southeast_inner;
-	} else if (vector::contains(adjacent_directions, Northwest) && vector::contains(adjacent_directions, Southeast) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northeast) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southwest) == adjacent_directions.end() && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (vector::contains(adjacent_directions, direction::northwest) && vector::contains(adjacent_directions, direction::southeast) && !vector::contains(adjacent_directions, direction::northeast) && !vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northwest_southeast_inner;
-	} else if (vector::contains(adjacent_directions, Northeast) && vector::contains(adjacent_directions, Southwest) && std::find(adjacent_directions.begin(), adjacent_directions.end(), Northwest) == adjacent_directions.end() && std::find(adjacent_directions.begin(), adjacent_directions.end(), Southeast) == adjacent_directions.end() && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (vector::contains(adjacent_directions, direction::northeast) && vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::northwest) && !vector::contains(adjacent_directions, direction::southeast) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northeast_southwest_inner;
-	} else if (vector::contains(adjacent_directions, Northwest) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (vector::contains(adjacent_directions, direction::northwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northwest_inner;
-	} else if (vector::contains(adjacent_directions, Northeast) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (vector::contains(adjacent_directions, direction::northeast) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::northeast_inner;
-	} else if (vector::contains(adjacent_directions, Southwest) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (vector::contains(adjacent_directions, direction::southwest) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::southwest_inner;
-	} else if (vector::contains(adjacent_directions, Southeast) && !vector::contains(adjacent_directions, North) && !vector::contains(adjacent_directions, South) && !vector::contains(adjacent_directions, West) && !vector::contains(adjacent_directions, East)) {
+	} else if (vector::contains(adjacent_directions, direction::southeast) && !vector::contains(adjacent_directions, direction::north) && !vector::contains(adjacent_directions, direction::south) && !vector::contains(adjacent_directions, direction::west) && !vector::contains(adjacent_directions, direction::east)) {
 		transition_type = tile_transition_type::southeast_inner;
 	}
 
@@ -2598,7 +2599,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		return;
 	}
 	
-	std::map<int, std::vector<int>> adjacent_terrain_directions;
+	std::map<int, std::vector<direction>> adjacent_terrain_directions;
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -2630,10 +2631,9 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		}
 	}
 	
-	for (std::map<int, std::vector<int>>::iterator iterator = adjacent_terrain_directions.begin(); iterator != adjacent_terrain_directions.end(); ++iterator) {
-		int adjacent_terrain_id = iterator->first;
+	for (const auto &[adjacent_terrain_id, adjacent_directions] : adjacent_terrain_directions) {
 		terrain_type *adjacent_terrain = adjacent_terrain_id < (int) terrain_type::get_all().size() ? terrain_type::get_all()[adjacent_terrain_id] : nullptr;
-		const tile_transition_type transition_type = GetTransitionType(iterator->second, terrain->allows_single());
+		const tile_transition_type transition_type = GetTransitionType(adjacent_directions, terrain->allows_single());
 		
 		if (transition_type != tile_transition_type::none) {
 			bool found_transition = false;
@@ -2703,8 +2703,8 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			}
 			
 			if (adjacent_terrain && found_transition) {
-				for (size_t i = 0; i != iterator->second.size(); ++i) {
-					vector::remove(adjacent_terrain_directions[terrain_type::get_all().size()], iterator->second[i]);
+				for (size_t i = 0; i != adjacent_directions.size(); ++i) {
+					vector::remove(adjacent_terrain_directions[terrain_type::get_all().size()], adjacent_directions[i]);
 				}
 			}
 		}
@@ -2830,7 +2830,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 		return;
 	}
 	
-	std::vector<int> adjacent_directions;
+	std::vector<direction> adjacent_directions;
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {

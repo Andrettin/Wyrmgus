@@ -51,26 +51,6 @@ namespace wyrmgus {
 	enum class diplomacy_state;
 }
 
-class GrandStrategyWorldMapTile : public WorldMapTile
-{
-public:
-	GrandStrategyWorldMapTile() : WorldMapTile(),
-		Port(false),
-		Province(nullptr), BaseTile(nullptr), GraphicTile(nullptr), ResourceBuildingGraphics(nullptr), ResourceBuildingGraphicsPlayerColor(nullptr)
-	{
-		memset(Borders, 0, sizeof(Borders));
-	}
-
-	bool Port;								/// Whether the tile has a port
-	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
-	CGrandStrategyProvince *Province;		/// Province to which the tile belongs
-	CGraphic *BaseTile;
-	CGraphic *GraphicTile;					/// The tile image used by this tile
-	CGraphic *ResourceBuildingGraphics;
-	CPlayerColorGraphic *ResourceBuildingGraphicsPlayerColor;
-	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
-};
-
 class CGrandStrategyProvince : public CProvince
 {
 public:

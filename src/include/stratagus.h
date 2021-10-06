@@ -160,6 +160,7 @@ constexpr int DefaultTileMovementCost = 8;
 
 namespace wyrmgus {
 	class renderer;
+	enum class direction;
 }
 
 //Wyrmgus start
@@ -177,19 +178,6 @@ extern void GameMainLoop();             /// Game main loop
 extern void stratagusMain(int argc, char **argv); /// main entry
 
 //Wyrmgus start
-enum Directions {
-	North,
-	Northeast,
-	East,
-	Southeast,
-	South,
-	Southwest,
-	West,
-	Northwest,
-	
-	MaxDirections
-};
-
 enum Difficulties {
 	DifficultyNoDifficulty = 0,
 	DifficultyEasy,
@@ -207,11 +195,7 @@ enum TechLevels {
 	CivilizedGunpowderTechLevel
 };
 
-extern int GetReverseDirection(int direction);
-extern std::string GetDirectionNameById(int direction);
-extern int GetDirectionIdByName(const std::string &direction);
-extern int GetDirectionFromOffset(int x, int y);
-extern QPoint GetDirectionOffset(int direction);
+extern wyrmgus::direction GetDirectionFromOffset(const int x, const int y);
 //Wyrmgus end
 
 extern void load_database(const bool initial_definition);
