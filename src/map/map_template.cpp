@@ -2576,6 +2576,10 @@ bool map_template::is_dependent_on(const map_template *other_template) const
 {
 	//get whether this map template is dependent on another (i.e. needs it to establish its position)
 
+	if (this->is_optional() || other_template->is_optional()) {
+		return false;
+	}
+
 	for (const map_template *map_template : this->dependency_templates) {
 		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
 			return true;
@@ -2643,11 +2647,15 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 		}
 	}
 
+	const bool optional = subtemplate->is_optional_for_campaign(game::get()->get_current_campaign());
+
 	//bound the minimum and maximum positions depending on whether this template should be to the north, south, west or east of other ones
 	for (const map_template *other_template : subtemplate->NorthOfTemplates) {
 		const QPoint other_template_pos = CMap::get()->get_subtemplate_pos(other_template);
 		if (!CMap::get()->Info->IsPointOnMap(other_template_pos, z)) {
-			fprintf(stderr, "Could not apply \"north of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+			if (!optional) {
+				throw std::runtime_error("Could not apply \"north of\" restriction for map template \"" + subtemplate->get_identifier() + "\", as the other template (\"" + other_template->get_identifier() + "\") has not been applied (yet).");
+			}
 			continue;
 		}
 		max_pos.setY(std::min<short>(max_pos.y(), other_template_pos.y() - (subtemplate_applied_size.height() / 2)));
@@ -2655,7 +2663,9 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 	for (const map_template *other_template : subtemplate->SouthOfTemplates) {
 		const QPoint other_template_pos = CMap::get()->get_subtemplate_pos(other_template);
 		if (!CMap::get()->Info->IsPointOnMap(other_template_pos, z)) {
-			fprintf(stderr, "Could not apply \"south of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+			if (!optional) {
+				throw std::runtime_error("Could not apply \"south of\" restriction for map template \"" + subtemplate->get_identifier() + "\", as the other template (\"" + other_template->get_identifier() + "\") has not been applied (yet).");
+			}
 			continue;
 		}
 		min_pos.setY(std::max<short>(min_pos.y(), other_template_pos.y() + other_template->get_applied_height() - (subtemplate_applied_size.height() / 2)));
@@ -2663,7 +2673,9 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 	for (const map_template *other_template : subtemplate->WestOfTemplates) {
 		const QPoint other_template_pos = CMap::get()->get_subtemplate_pos(other_template);
 		if (!CMap::get()->Info->IsPointOnMap(other_template_pos, z)) {
-			fprintf(stderr, "Could not apply \"west of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+			if (!optional) {
+				throw std::runtime_error("Could not apply \"west of\" restriction for map template \"" + subtemplate->get_identifier() + "\", as the other template (\"" + other_template->get_identifier() + "\") has not been applied (yet).");
+			}
 			continue;
 		}
 		max_pos.setX(std::min<short>(max_pos.x(), other_template_pos.x() - (subtemplate_applied_size.width() / 2)));
@@ -2671,7 +2683,9 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 	for (const map_template *other_template : subtemplate->EastOfTemplates) {
 		const QPoint other_template_pos = CMap::get()->get_subtemplate_pos(other_template);
 		if (!CMap::get()->Info->IsPointOnMap(other_template_pos, z)) {
-			fprintf(stderr, "Could not apply \"east of\" restriction for map template \"%s\", as the other template (\"%s\") has not been applied (yet).\n", subtemplate->Ident.c_str(), other_template->Ident.c_str());
+			if (!optional) {
+				throw std::runtime_error("Could not apply \"east of\" restriction for map template \"" + subtemplate->get_identifier() + "\", as the other template (\"" + other_template->get_identifier() + "\") has not been applied (yet).");
+			}
 			continue;
 		}
 		min_pos.setX(std::max<short>(min_pos.x(), other_template_pos.x() + other_template->get_applied_width() - (subtemplate_applied_size.width() / 2)));
@@ -2684,9 +2698,13 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 		}
 	}
 
-	int try_count = 0;
+	//include the offsets relevant for the templates dependent on this one's position (e.g. templates that have to be to the north of this one), so that there is enough space for them to be generated there
+	const int north_offset = optional ? 0 : subtemplate->GetDependentTemplatesNorthOffset();
+	const int south_offset = optional ? 0 : subtemplate->GetDependentTemplatesSouthOffset();
+	const int west_offset = optional ? 0 : subtemplate->GetDependentTemplatesWestOffset();
+	const int east_offset = optional ? 0 : subtemplate->GetDependentTemplatesEastOffset();
 
-	const bool optional = subtemplate->is_optional_for_campaign(game::get()->get_current_campaign());
+	int try_count = 0;
 
 	while (!potential_positions.empty()) {
 		// for the sake of performance, put a limit on optional subtemplate placement tries, instead of checking all possibilities
@@ -2698,11 +2716,6 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 
 		const QPoint subtemplate_pos = vector::take_random(potential_positions);
 
-		//include the offsets relevant for the templates dependent on this one's position (e.g. templates that have to be to the north of this one), so that there is enough space for them to be generated there
-		const int north_offset = subtemplate->GetDependentTemplatesNorthOffset();
-		const int south_offset = subtemplate->GetDependentTemplatesSouthOffset();
-		const int west_offset = subtemplate->GetDependentTemplatesWestOffset();
-		const int east_offset = subtemplate->GetDependentTemplatesEastOffset();
 		const bool top_left_on_map = this->contains_map_pos(subtemplate_pos - QPoint(west_offset, north_offset));
 		const bool bottom_right_on_map = this->contains_map_pos(QPoint(subtemplate_pos.x() + subtemplate_applied_size.width() + east_offset - 1, subtemplate_pos.y() + subtemplate_applied_size.height() + south_offset - 1));
 		const bool on_map = top_left_on_map && bottom_right_on_map;

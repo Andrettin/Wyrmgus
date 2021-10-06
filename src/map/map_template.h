@@ -230,7 +230,9 @@ public:
 	QSize get_applied_size_with_dependent_template_offsets() const
 	{
 		QSize applied_size = this->get_applied_size();
-		applied_size += QSize(this->GetDependentTemplatesWestOffset() + this->GetDependentTemplatesEastOffset(), this->GetDependentTemplatesNorthOffset() + this->GetDependentTemplatesSouthOffset());
+		if (!this->is_optional()) {
+			applied_size += QSize(this->GetDependentTemplatesWestOffset() + this->GetDependentTemplatesEastOffset(), this->GetDependentTemplatesNorthOffset() + this->GetDependentTemplatesSouthOffset());
+		}
 		return applied_size;
 	}
 
