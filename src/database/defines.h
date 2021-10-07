@@ -29,6 +29,7 @@
 #include "util/singleton.h"
 
 class CGraphic;
+class CPlayerColorGraphic;
 class CUpgrade;
 
 namespace wyrmgus {
@@ -53,6 +54,7 @@ class time_of_day;
 class time_of_day_schedule;
 class unit_class;
 enum class faction_type;
+enum class tile_transition_type;
 
 class defines final : public QObject, public singleton<defines>
 {
@@ -81,7 +83,8 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::time_of_day_schedule* default_time_of_day_schedule MEMBER default_time_of_day_schedule)
 	Q_PROPERTY(wyrmgus::season_schedule* default_season_schedule MEMBER default_season_schedule)
 	Q_PROPERTY(wyrmgus::map_projection* default_map_projection MEMBER default_map_projection)
-	Q_PROPERTY(wyrmgus::terrain_type* border_terrain_type MEMBER border_terrain_type)
+	Q_PROPERTY(std::filesystem::path border_image_file MEMBER border_image_file WRITE set_border_image_file)
+	Q_PROPERTY(QSize border_frame_size MEMBER border_frame_size READ get_border_frame_size)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
 	Q_PROPERTY(wyrmgus::button_level* inventory_button_level MEMBER inventory_button_level READ get_inventory_button_level)
@@ -256,9 +259,28 @@ public:
 		return this->default_map_projection;
 	}
 
-	const terrain_type *get_border_terrain_type() const
+	void set_border_image_file(const std::filesystem::path &filepath);
+
+	const std::shared_ptr<CPlayerColorGraphic> &get_border_graphics() const
 	{
-		return this->border_terrain_type;
+		return this->border_graphics;
+	}
+
+	const QSize &get_border_frame_size() const
+	{
+		return this->border_frame_size;
+	}
+
+	const std::vector<int> &get_border_transition_tiles(const tile_transition_type transition_type) const
+	{
+		static std::vector<int> empty_vector;
+
+		const auto find_iterator = this->border_transition_tiles.find(transition_type);
+		if (find_iterator != this->border_transition_tiles.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
 	}
 
 	dialogue *get_campaign_victory_dialogue() const
@@ -419,7 +441,10 @@ private:
 	civilization *neutral_civilization = nullptr;
 	int minimap_color_index = 0;
 	int minimap_non_land_territory_alpha = 64;
-	terrain_type *border_terrain_type = nullptr;
+	std::filesystem::path border_image_file;
+	std::shared_ptr<CPlayerColorGraphic> border_graphics;
+	QSize border_frame_size;
+	std::map<tile_transition_type, std::vector<int>> border_transition_tiles;
 	resource *time_resource = nullptr;
 	resource *wealth_resource = nullptr;
 	time_of_day *underground_time_of_day = nullptr;

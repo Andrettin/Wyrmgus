@@ -33,12 +33,14 @@
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
 #include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "player/faction_type.h"
 #include "sound/game_sound_set.h"
 #include "sound/music.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
 #include "util/path_util.h"
+#include "util/string_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
 
@@ -95,6 +97,19 @@ void defines::process_sml_scope(const sml_data &scope)
 
 	if (tag == "game_sound_set") {
 		database::process_sml_data(game_sound_set::get(), scope);
+	} else if (tag == "border_transition_tiles") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			std::string transition_type_str = child_scope.get_tag();
+			string::replace(transition_type_str, "_", "-");
+			const tile_transition_type transition_type = GetTransitionTypeIdByName(transition_type_str);
+			std::vector<int> tiles;
+
+			for (const std::string &value : child_scope.get_values()) {
+				const int tile = std::stoi(value);
+
+				this->border_transition_tiles[transition_type].push_back(tile);
+			}
+		});
 	} else if (tag == "faction_type_upgrades") {
 		scope.for_each_property([&](const sml_property &property) {
 			const faction_type faction_type = string_to_faction_type(property.get_key());
@@ -113,6 +128,11 @@ void defines::process_sml_scope(const sml_data &scope)
 
 void defines::initialize()
 {
+	if (!this->border_image_file.empty()) {
+		this->border_graphics = CPlayerColorGraphic::New(this->border_image_file, this->get_border_frame_size(), this->get_conversible_player_color());
+		this->border_graphics->Load(this->get_scale_factor());
+	}
+
 	if (this->icon_frame_graphics != nullptr) {
 		this->icon_frame_graphics->Load(this->get_scale_factor());
 	}
@@ -140,6 +160,15 @@ void defines::initialize()
 	if (this->get_population_per_unit() == 0) {
 		throw std::runtime_error("No population per unit set in the defines.");
 	}
+}
+
+void defines::set_border_image_file(const std::filesystem::path &filepath)
+{
+	if (filepath == this->border_image_file) {
+		return;
+	}
+
+	this->border_image_file = database::get()->get_graphics_filepath(filepath);
 }
 
 QString defines::get_default_menu_background_file_qstring() const

@@ -291,10 +291,6 @@ const QColor &terrain_type::get_minimap_color(const season *season) const
 
 void terrain_type::calculate_minimap_color(const season *season)
 {
-	if (this == defines::get()->get_border_terrain_type()) {
-		return;
-	}
-
 	const std::shared_ptr<CPlayerColorGraphic> &graphic = this->get_graphics(season);
 
 	const player_color *conversible_player_color = graphic->get_conversible_player_color();

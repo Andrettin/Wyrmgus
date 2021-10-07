@@ -2846,12 +2846,12 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 		}
 	}
 	
-	const wyrmgus::tile_transition_type transition_type = GetTransitionType(adjacent_directions, true);
+	const tile_transition_type transition_type = GetTransitionType(adjacent_directions, true);
 
-	if (transition_type != wyrmgus::tile_transition_type::none) {
-		const std::vector<int> &transition_tiles = wyrmgus::defines::get()->get_border_terrain_type()->get_transition_tiles(nullptr, transition_type);
+	if (transition_type != tile_transition_type::none) {
+		const std::vector<int> &transition_tiles = defines::get()->get_border_transition_tiles(transition_type);
 		if (!transition_tiles.empty()) {
-			mf.set_ownership_border_tile(wyrmgus::vector::get_random(transition_tiles));
+			mf.set_ownership_border_tile(vector::get_random(transition_tiles));
 		}
 	}
 }
