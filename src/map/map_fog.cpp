@@ -929,7 +929,7 @@ static void DrawFogOfWarTile(const int sx, const int sy, const int dx, const int
 /**
 **  Draw the map fog of war.
 */
-void CViewport::DrawMapFogOfWar(std::vector<std::function<void(renderer *)>> &render_commands) const
+void CViewport::draw_map_fog_of_war(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	// flags must redraw or not
 	if (ReplayRevealMap) {

@@ -238,6 +238,156 @@ void CViewport::Center(const PixelPos &mapPixelPos)
 	this->Set(mapPixelPos - this->GetPixelSize() / 2);
 }
 
+template <typename function_type>
+void CViewport::for_each_map_tile(const function_type &function) const
+{
+	const int ex = this->BottomRightPos.x;
+	const int ey = this->BottomRightPos.y;
+	int sy = this->MapPos.y;
+	int dy = this->TopLeftPos.y - this->Offset.y;
+	const int map_max = UI.CurrentMapLayer->get_width() * UI.CurrentMapLayer->get_height();
+
+	while (sy < 0) {
+		sy++;
+		dy += defines::get()->get_scaled_tile_height();
+	}
+	sy *= UI.CurrentMapLayer->get_width();
+
+	while (dy <= ey && sy < map_max) {
+		int sx = this->MapPos.x + sy;
+		int dx = this->TopLeftPos.x - this->Offset.x;
+		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->get_width())) {
+			if (sx - sy < 0) {
+				++sx;
+				dx += defines::get()->get_scaled_tile_width();
+				continue;
+			}
+
+			const tile *tile = UI.CurrentMapLayer->Field(sx);
+			const QPoint pixel_pos(dx, dy);
+
+			function(tile, pixel_pos);
+
+			++sx;
+			dx += defines::get()->get_scaled_tile_width();
+		}
+
+		sy += UI.CurrentMapLayer->get_width();
+		dy += defines::get()->get_scaled_tile_height();
+	}
+}
+
+void CViewport::draw_map_tile(const tile *tile, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands) const
+{
+	const terrain_type *terrain = nullptr;
+	const terrain_type *overlay_terrain = nullptr;
+	int solid_tile = 0;
+	int overlay_solid_tile = 0;
+
+	if (ReplayRevealMap) {
+		terrain = tile->get_terrain();
+		overlay_terrain = tile->get_overlay_terrain();
+		solid_tile = tile->SolidTile;
+		overlay_solid_tile = tile->OverlaySolidTile;
+	} else {
+		terrain = tile->player_info->SeenTerrain;
+		overlay_terrain = tile->player_info->SeenOverlayTerrain;
+		solid_tile = tile->player_info->SeenSolidTile;
+		overlay_solid_tile = tile->player_info->SeenOverlaySolidTile;
+	}
+
+	const std::vector<tile_transition> &transition_tiles = ReplayRevealMap ? tile->TransitionTiles : tile->player_info->SeenTransitionTiles;
+	const std::vector<tile_transition> &overlay_transition_tiles = ReplayRevealMap ? tile->OverlayTransitionTiles : tile->player_info->SeenOverlayTransitionTiles;
+
+	const bool is_unpassable = overlay_terrain && overlay_terrain->has_flag(tile_flag::impassable) && !vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
+	const bool is_space = terrain != nullptr && terrain->has_flag(tile_flag::space);
+
+	const wyrmgus::time_of_day *time_of_day = nullptr;
+	if (!is_space) {
+		const bool is_underground = terrain != nullptr && terrain->has_flag(tile_flag::underground);
+		if (is_underground) {
+			time_of_day = defines::get()->get_underground_time_of_day();
+		} else {
+			time_of_day = tile->get_world() ? tile->get_world()->get_game_data()->get_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+		}
+	}
+
+	const season *season = UI.CurrentMapLayer->get_tile_season(tile);
+
+	const wyrmgus::player_color *player_color = tile->get_player_color();
+
+	if (terrain != nullptr) {
+		const std::shared_ptr<CPlayerColorGraphic> &terrain_graphics = terrain->get_graphics(season);
+		if (terrain_graphics != nullptr) {
+			const int frame_index = solid_tile + (terrain == tile->get_terrain() ? tile->AnimationFrame : 0);
+			const color_modification color_modification(terrain->get_hue_rotation(), color_set(), player_color, time_of_day);
+			terrain_graphics->render_frame(frame_index, pixel_pos, color_modification, render_commands);
+		}
+	}
+
+	for (size_t i = 0; i != transition_tiles.size(); ++i) {
+		const terrain_type *transition_terrain = transition_tiles[i].terrain;
+		const wyrmgus::season *transition_season = UI.CurrentMapLayer->get_tile_season(tile, transition_terrain->Flags);
+		const std::shared_ptr<CPlayerColorGraphic> &transition_terrain_graphics = transition_terrain->get_graphics(transition_season);
+
+		if (transition_terrain_graphics != nullptr) {
+			const wyrmgus::time_of_day *transition_time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile, transition_terrain->Flags);
+
+			const color_modification color_modification(transition_terrain->get_hue_rotation(), color_set(), player_color, transition_time_of_day);
+			transition_terrain_graphics->render_frame(transition_tiles[i].tile_frame, pixel_pos, color_modification, render_commands);
+		}
+	}
+
+	if (tile->get_owner() != nullptr && tile->get_ownership_border_tile() != -1 && defines::get()->get_border_graphics() != nullptr && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+		const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_graphics();
+		const color_modification color_modification(0, color_set(), player_color, nullptr);
+		border_graphics->render_frame(tile->get_ownership_border_tile(), pixel_pos + defines::get()->get_border_offset(), color_modification, render_commands);
+	}
+
+	if (overlay_terrain && (overlay_transition_tiles.size() == 0 || overlay_terrain->has_transition_mask())) {
+		const bool is_overlay_space = overlay_terrain->has_flag(tile_flag::space);
+		const std::shared_ptr<CPlayerColorGraphic> &overlay_terrain_graphics = overlay_terrain->get_graphics(season);
+
+		if (overlay_terrain_graphics != nullptr) {
+			const int frame_index = overlay_solid_tile + (overlay_terrain == tile->get_overlay_terrain() ? tile->OverlayAnimationFrame : 0);
+			const wyrmgus::time_of_day *overlay_time_of_day = is_overlay_space ? nullptr : time_of_day;;
+
+			const color_modification color_modification(overlay_terrain->get_hue_rotation(), color_set(), player_color, overlay_time_of_day);
+			overlay_terrain_graphics->render_frame(frame_index, pixel_pos, color_modification, render_commands);
+		}
+	}
+
+	for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
+		const terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
+		if (overlay_transition_terrain->has_transition_mask()) {
+			continue;
+		}
+
+		const bool is_overlay_transition_space = overlay_transition_terrain->has_flag(tile_flag::space);
+		const std::shared_ptr<CPlayerColorGraphic> &overlay_transition_graphics = overlay_transition_terrain->get_transition_graphics(season);
+		if (overlay_transition_graphics != nullptr) {
+			const wyrmgus::time_of_day *overlay_transition_time_of_day = is_overlay_transition_space ? nullptr : time_of_day;
+
+			const color_modification color_modification(overlay_transition_terrain->get_hue_rotation(), color_set(), player_color, overlay_transition_time_of_day);
+			overlay_transition_graphics->render_frame(overlay_transition_tiles[i].tile_frame, pixel_pos, color_modification, render_commands);
+		}
+	}
+
+	//if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+	if (tile->get_owner() != nullptr && tile->get_ownership_border_tile() != -1 && defines::get()->get_border_graphics() != nullptr && !is_unpassable) {
+		const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_graphics();
+		const color_modification color_modification(0, color_set(), player_color, nullptr);
+		border_graphics->render_frame(tile->get_ownership_border_tile(), pixel_pos + defines::get()->get_border_offset(), color_modification, render_commands);
+	}
+
+	for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
+		const terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
+		if (overlay_transition_terrain->get_elevation_graphics()) {
+			overlay_transition_terrain->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].tile_frame, pixel_pos.x(), pixel_pos.y(), time_of_day, render_commands);
+		}
+	}
+}
+
 /**
 **  Draw the map backgrounds.
 **
@@ -263,150 +413,11 @@ void CViewport::Center(const PixelPos &mapPixelPos)
 ** (in pixels)
 ** </PRE>
 */
-void CViewport::DrawMapBackgroundInViewport(std::vector<std::function<void(renderer *)>> &render_commands) const
+void CViewport::draw_map(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	int ex = this->BottomRightPos.x;
-	int ey = this->BottomRightPos.y;
-	int sy = this->MapPos.y;
-	int dy = this->TopLeftPos.y - this->Offset.y;
-	const int map_max = UI.CurrentMapLayer->get_width() * UI.CurrentMapLayer->get_height();
-
-	while (sy  < 0) {
-		sy++;
-		dy += defines::get()->get_scaled_tile_height();
-	}
-	sy *=  UI.CurrentMapLayer->get_width();
-
-	const QPoint border_offset = size::to_point((defines::get()->get_tile_size() - defines::get()->get_border_frame_size()) * defines::get()->get_scale_factor() / 2);
-
-	while (dy <= ey && sy  < map_max) {
-		int sx = this->MapPos.x + sy;
-		int dx = this->TopLeftPos.x - this->Offset.x;
-		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->get_width())) {
-			if (sx - sy < 0) {
-				++sx;
-				dx += defines::get()->get_scaled_tile_width();
-				continue;
-			}
-
-			const QPoint pixel_pos(dx, dy);
-
-			const tile &mf = *UI.CurrentMapLayer->Field(sx);
-
-			const terrain_type *terrain = nullptr;
-			const terrain_type *overlay_terrain = nullptr;
-			int solid_tile = 0;
-			int overlay_solid_tile = 0;
-
-			if (ReplayRevealMap) {
-				terrain = mf.get_terrain();
-				overlay_terrain = mf.get_overlay_terrain();
-				solid_tile = mf.SolidTile;
-				overlay_solid_tile = mf.OverlaySolidTile;
-			} else {
-				terrain = mf.player_info->SeenTerrain;
-				overlay_terrain = mf.player_info->SeenOverlayTerrain;
-				solid_tile = mf.player_info->SeenSolidTile;
-				overlay_solid_tile = mf.player_info->SeenOverlaySolidTile;
-			}
-
-			const std::vector<tile_transition> &transition_tiles = ReplayRevealMap ? mf.TransitionTiles : mf.player_info->SeenTransitionTiles;
-			const std::vector<tile_transition> &overlay_transition_tiles = ReplayRevealMap ? mf.OverlayTransitionTiles : mf.player_info->SeenOverlayTransitionTiles;
-
-			const bool is_unpassable = overlay_terrain && overlay_terrain->has_flag(tile_flag::impassable) && !vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
-			const bool is_space = terrain != nullptr && terrain->has_flag(tile_flag::space);
-
-			const time_of_day *time_of_day = nullptr;
-			if (!is_space) {
-				const bool is_underground = terrain != nullptr && terrain->has_flag(tile_flag::underground);
-				if (is_underground) {
-					time_of_day = defines::get()->get_underground_time_of_day();
-				} else {
-					time_of_day = mf.get_world() ? mf.get_world()->get_game_data()->get_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
-				}
-			}
-
-			const season *season = UI.CurrentMapLayer->get_tile_season(sx);
-
-			const player_color *player_color = mf.get_player_color();
-
-			if (terrain != nullptr) {
-				const std::shared_ptr<CPlayerColorGraphic> &terrain_graphics = terrain->get_graphics(season);
-				if (terrain_graphics != nullptr) {
-					const int frame_index = solid_tile + (terrain == mf.get_terrain() ? mf.AnimationFrame : 0);
-					const color_modification color_modification(terrain->get_hue_rotation(), color_set(), player_color, time_of_day);
-					terrain_graphics->render_frame(frame_index, pixel_pos, color_modification, render_commands);
-				}
-			}
-
-			for (size_t i = 0; i != transition_tiles.size(); ++i) {
-				const terrain_type *transition_terrain = transition_tiles[i].terrain;
-				const wyrmgus::season *transition_season = UI.CurrentMapLayer->get_tile_season(sx, transition_terrain->Flags);
-				const std::shared_ptr<CPlayerColorGraphic> &transition_terrain_graphics = transition_terrain->get_graphics(transition_season);
-
-				if (transition_terrain_graphics != nullptr) {
-					const wyrmgus::time_of_day *transition_time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(sx, transition_terrain->Flags);
-
-					const color_modification color_modification(transition_terrain->get_hue_rotation(), color_set(), player_color, transition_time_of_day);
-					transition_terrain_graphics->render_frame(transition_tiles[i].tile_frame, pixel_pos, color_modification, render_commands);
-				}
-			}
-
-			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && defines::get()->get_border_graphics() != nullptr && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_graphics();
-				const color_modification color_modification(0, color_set(), player_color, nullptr);
-				border_graphics->render_frame(mf.get_ownership_border_tile(), pixel_pos + border_offset, color_modification, render_commands);
-			}
-
-			if (overlay_terrain && (overlay_transition_tiles.size() == 0 || overlay_terrain->has_transition_mask())) {
-				const bool is_overlay_space = overlay_terrain->has_flag(tile_flag::space);
-				const std::shared_ptr<CPlayerColorGraphic> &overlay_terrain_graphics = overlay_terrain->get_graphics(season);
-
-				if (overlay_terrain_graphics != nullptr) {
-					const int frame_index = overlay_solid_tile + (overlay_terrain == mf.get_overlay_terrain() ? mf.OverlayAnimationFrame : 0);
-					const wyrmgus::time_of_day *overlay_time_of_day = is_overlay_space ? nullptr : time_of_day;;
-
-					const color_modification color_modification(overlay_terrain->get_hue_rotation(), color_set(), player_color, overlay_time_of_day);
-					overlay_terrain_graphics->render_frame(frame_index, pixel_pos, color_modification, render_commands);
-				}
-			}
-
-			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				const terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
-				if (overlay_transition_terrain->has_transition_mask()) {
-					continue;
-				}
-
-				const bool is_overlay_transition_space = overlay_transition_terrain->has_flag(tile_flag::space);
-				const std::shared_ptr<CPlayerColorGraphic> &overlay_transition_graphics = overlay_transition_terrain->get_transition_graphics(season);
-				if (overlay_transition_graphics != nullptr) {
-					const wyrmgus::time_of_day *overlay_transition_time_of_day = is_overlay_transition_space ? nullptr : time_of_day;
-
-					const color_modification color_modification(overlay_transition_terrain->get_hue_rotation(), color_set(), player_color, overlay_transition_time_of_day);
-					overlay_transition_graphics->render_frame(overlay_transition_tiles[i].tile_frame, pixel_pos, color_modification, render_commands);
-				}
-			}
-
-			//if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && defines::get()->get_border_graphics() != nullptr && !is_unpassable) {
-				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_graphics();
-				const color_modification color_modification(0, color_set(), player_color, nullptr);
-				border_graphics->render_frame(mf.get_ownership_border_tile(), pixel_pos + border_offset, color_modification, render_commands);
-			}
-
-			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				const terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].terrain;
-				if (overlay_transition_terrain->get_elevation_graphics()) {
-					overlay_transition_terrain->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].tile_frame, dx, dy, time_of_day, render_commands);
-				}
-			}
-
-			++sx;
-			dx += defines::get()->get_scaled_tile_width();
-		}
-		sy += UI.CurrentMapLayer->get_width();
-		dy += defines::get()->get_scaled_tile_height();
-	}
+	this->for_each_map_tile([this, &render_commands](const tile *tile, const QPoint &pixel_pos) {
+		this->draw_map_tile(tile, pixel_pos, render_commands);
+	});
 }
 
 /**
@@ -418,7 +429,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 	this->SetClipping();
 
 	/* this may take while */
-	this->DrawMapBackgroundInViewport(render_commands);
+	this->draw_map(render_commands);
 
 	CurrentViewport = this;
 	{
@@ -496,10 +507,9 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 		}
 		ParticleManager.endDraw();
 
-		//Wyrmgus start
-		//draw fog of war below the "click missile"
-		this->DrawMapFogOfWar(render_commands);
+		this->draw_map_fog_of_war(render_commands);
 
+		//Wyrmgus start
 		j = 0;
 		for (; j < nmissiles; ++j) {
 			if (!ClickMissile.empty() && ClickMissile == missiletable[j]->Type->Ident) {
@@ -508,10 +518,6 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 		}
 		//Wyrmgus end
 	}
-
-	//Wyrmgus start
-//	this->DrawMapFogOfWar();
-	//Wyrmgus end
 
 	//
 	// Draw orders of selected units.

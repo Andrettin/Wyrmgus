@@ -84,7 +84,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::season_schedule* default_season_schedule MEMBER default_season_schedule)
 	Q_PROPERTY(wyrmgus::map_projection* default_map_projection MEMBER default_map_projection)
 	Q_PROPERTY(std::filesystem::path border_image_file MEMBER border_image_file WRITE set_border_image_file)
-	Q_PROPERTY(QSize border_frame_size MEMBER border_frame_size READ get_border_frame_size)
+	Q_PROPERTY(QSize border_frame_size MEMBER border_frame_size)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
 	Q_PROPERTY(wyrmgus::button_level* inventory_button_level MEMBER inventory_button_level READ get_inventory_button_level)
@@ -266,10 +266,7 @@ public:
 		return this->border_graphics;
 	}
 
-	const QSize &get_border_frame_size() const
-	{
-		return this->border_frame_size;
-	}
+	QPoint get_border_offset() const;
 
 	const std::vector<int> &get_border_transition_tiles(const tile_transition_type transition_type) const
 	{

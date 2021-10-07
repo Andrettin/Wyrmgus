@@ -34,6 +34,7 @@ class CUnit;
 
 namespace wyrmgus {
 	class renderer;
+	class tile;
 }
 
 /**
@@ -108,10 +109,13 @@ public:
 private:
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const PixelPos &mapPixelPos);
-	/// Draw the map background
-	void DrawMapBackgroundInViewport(std::vector<std::function<void(renderer *)>> &render_commands) const;
-	/// Draw the map fog of war
-	void DrawMapFogOfWar(std::vector<std::function<void(renderer *)>> &render_commands) const;
+
+	template <typename function_type>
+	void for_each_map_tile(const function_type &function) const;
+
+	void draw_map_tile(const tile *tile, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands) const;
+	void draw_map(std::vector<std::function<void(renderer *)>> &render_commands) const;
+	void draw_map_fog_of_war(std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 public:
 	PixelPos TopLeftPos;      /// Screen pixel top-left corner

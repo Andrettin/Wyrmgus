@@ -40,6 +40,7 @@
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
 #include "util/path_util.h"
+#include "util/size_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
@@ -129,7 +130,7 @@ void defines::process_sml_scope(const sml_data &scope)
 void defines::initialize()
 {
 	if (!this->border_image_file.empty()) {
-		this->border_graphics = CPlayerColorGraphic::New(this->border_image_file, this->get_border_frame_size(), this->get_conversible_player_color());
+		this->border_graphics = CPlayerColorGraphic::New(this->border_image_file, this->border_frame_size, this->get_conversible_player_color());
 		this->border_graphics->Load(this->get_scale_factor());
 	}
 
@@ -169,6 +170,11 @@ void defines::set_border_image_file(const std::filesystem::path &filepath)
 	}
 
 	this->border_image_file = database::get()->get_graphics_filepath(filepath);
+}
+
+QPoint defines::get_border_offset() const
+{
+	return size::to_point((this->get_tile_size() - this->border_frame_size) * this->get_scale_factor() / 2);
 }
 
 QString defines::get_default_menu_background_file_qstring() const
