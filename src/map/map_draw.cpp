@@ -280,24 +280,11 @@ void CViewport::for_each_map_tile(const function_type &function) const
 void CViewport::draw_map_tile(const tile *tile, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const terrain_type *terrain = ReplayRevealMap ? tile->get_terrain() : tile->player_info->SeenTerrain;
-
-	const terrain_type *overlay_terrain = nullptr;
-	int solid_tile = 0;
-	int overlay_solid_tile = 0;
-
-	if (ReplayRevealMap) {
-		overlay_terrain = tile->get_overlay_terrain();
-		solid_tile = tile->SolidTile;
-		overlay_solid_tile = tile->OverlaySolidTile;
-	} else {
-		overlay_terrain = tile->player_info->SeenOverlayTerrain;
-		solid_tile = tile->player_info->SeenSolidTile;
-		overlay_solid_tile = tile->player_info->SeenOverlaySolidTile;
-	}
+	const terrain_type *overlay_terrain = ReplayRevealMap ? tile->get_overlay_terrain() : tile->player_info->SeenOverlayTerrain;
+	const int solid_tile = ReplayRevealMap ? tile->SolidTile : tile->player_info->SeenSolidTile;
+	const int overlay_solid_tile = ReplayRevealMap ? tile->OverlaySolidTile : tile->player_info->SeenOverlaySolidTile;
 
 	const std::vector<tile_transition> &transition_tiles = ReplayRevealMap ? tile->TransitionTiles : tile->player_info->SeenTransitionTiles;
-
-	const bool is_unpassable = overlay_terrain && overlay_terrain->has_flag(tile_flag::impassable) && !vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
 
 	const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile, terrain->get_flags());
 	const season *season = UI.CurrentMapLayer->get_tile_season(tile);
@@ -326,17 +313,28 @@ void CViewport::draw_map_tile(const tile *tile, const QPoint &pixel_pos, std::ve
 		}
 	}
 
-	//if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-	if (is_unpassable) {
-		this->draw_map_tile_border(tile, pixel_pos, render_commands);
-	}
-
-	this->draw_map_tile_overlay_terrain(tile, pixel_pos, render_commands);
+	const bool is_impassable = overlay_terrain && overlay_terrain->has_flag(tile_flag::impassable) && !vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
 
 	//if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-	if (!is_unpassable) {
-		this->draw_map_tile_border(tile, pixel_pos, render_commands);
+	if (!is_impassable) {
+		this->draw_map_tile_overlay_terrain(tile, pixel_pos, render_commands);
 	}
+}
+
+void CViewport::draw_map_tile_top(const tile *tile, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands) const
+{
+	const terrain_type *terrain = ReplayRevealMap ? tile->get_terrain() : tile->player_info->SeenTerrain;
+	const terrain_type *overlay_terrain = ReplayRevealMap ? tile->get_overlay_terrain() : tile->player_info->SeenOverlayTerrain;
+	const int overlay_solid_tile = ReplayRevealMap ? tile->OverlaySolidTile : tile->player_info->SeenOverlaySolidTile;
+
+	const bool is_impassable = overlay_terrain && overlay_terrain->has_flag(tile_flag::impassable) && !vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
+
+	//if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+	if (is_impassable) {
+		this->draw_map_tile_overlay_terrain(tile, pixel_pos, render_commands);
+	}
+
+	const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile, terrain->get_flags());
 
 	const std::vector<tile_transition> &overlay_transition_tiles = ReplayRevealMap ? tile->OverlayTransitionTiles : tile->player_info->SeenOverlayTransitionTiles;
 
@@ -351,17 +349,8 @@ void CViewport::draw_map_tile(const tile *tile, const QPoint &pixel_pos, std::ve
 void CViewport::draw_map_tile_overlay_terrain(const tile *tile, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const terrain_type *terrain = ReplayRevealMap ? tile->get_terrain() : tile->player_info->SeenTerrain;
-
-	const terrain_type *overlay_terrain = nullptr;
-	int overlay_solid_tile = 0;
-
-	if (ReplayRevealMap) {
-		overlay_terrain = tile->get_overlay_terrain();
-		overlay_solid_tile = tile->OverlaySolidTile;
-	} else {
-		overlay_terrain = tile->player_info->SeenOverlayTerrain;
-		overlay_solid_tile = tile->player_info->SeenOverlaySolidTile;
-	}
+	const terrain_type *overlay_terrain = ReplayRevealMap ? tile->get_overlay_terrain() : tile->player_info->SeenOverlayTerrain;
+	const int overlay_solid_tile = ReplayRevealMap ? tile->OverlaySolidTile : tile->player_info->SeenOverlaySolidTile;
 
 	const wyrmgus::player_color *player_color = tile->get_player_color();
 	const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile, terrain->get_flags());
@@ -439,6 +428,14 @@ void CViewport::draw_map(std::vector<std::function<void(renderer *)>> &render_co
 {
 	this->for_each_map_tile([this, &render_commands](const tile *tile, const QPoint &pixel_pos) {
 		this->draw_map_tile(tile, pixel_pos, render_commands);
+	});
+
+	this->for_each_map_tile([this, &render_commands](const tile *tile, const QPoint &pixel_pos) {
+		this->draw_map_tile_border(tile, pixel_pos, render_commands);
+	});
+
+	this->for_each_map_tile([this, &render_commands](const tile *tile, const QPoint &pixel_pos) {
+		this->draw_map_tile_top(tile, pixel_pos, render_commands);
 	});
 }
 
