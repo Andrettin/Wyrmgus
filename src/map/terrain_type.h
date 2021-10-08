@@ -271,6 +271,11 @@ public:
 		return this->overlay;
 	}
 
+	tile_flag get_flags() const
+	{
+		return this->Flags;
+	}
+
 	bool has_flag(const tile_flag flag) const;
 
 	bool is_buildable() const
