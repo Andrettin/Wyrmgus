@@ -115,6 +115,7 @@ private:
 
 	void draw_map_tile(const tile *tile, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	void draw_map_tile_overlay_terrain(const tile *tile, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands) const;
+	void draw_map_tile_border(const tile *tile, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands) const;
 	void draw_map(std::vector<std::function<void(renderer *)>> &render_commands) const;
 	void draw_map_fog_of_war(std::vector<std::function<void(renderer *)>> &render_commands) const;
 

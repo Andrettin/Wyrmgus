@@ -326,19 +326,16 @@ void CViewport::draw_map_tile(const tile *tile, const QPoint &pixel_pos, std::ve
 		}
 	}
 
-	if (tile->get_owner() != nullptr && tile->get_ownership_border_tile() != -1 && defines::get()->get_border_graphics() != nullptr && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-		const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_graphics();
-		const color_modification color_modification(0, color_set(), player_color, nullptr);
-		border_graphics->render_frame(tile->get_ownership_border_tile(), pixel_pos + defines::get()->get_border_offset(), color_modification, render_commands);
+	//if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+	if (is_unpassable) {
+		this->draw_map_tile_border(tile, pixel_pos, render_commands);
 	}
 
 	this->draw_map_tile_overlay_terrain(tile, pixel_pos, render_commands);
 
 	//if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-	if (tile->get_owner() != nullptr && tile->get_ownership_border_tile() != -1 && defines::get()->get_border_graphics() != nullptr && !is_unpassable) {
-		const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_graphics();
-		const color_modification color_modification(0, color_set(), player_color, nullptr);
-		border_graphics->render_frame(tile->get_ownership_border_tile(), pixel_pos + defines::get()->get_border_offset(), color_modification, render_commands);
+	if (!is_unpassable) {
+		this->draw_map_tile_border(tile, pixel_pos, render_commands);
 	}
 
 	const std::vector<tile_transition> &overlay_transition_tiles = ReplayRevealMap ? tile->OverlayTransitionTiles : tile->player_info->SeenOverlayTransitionTiles;
@@ -399,6 +396,17 @@ void CViewport::draw_map_tile_overlay_terrain(const tile *tile, const QPoint &pi
 			const color_modification color_modification(overlay_transition_terrain->get_hue_rotation(), color_set(), player_color, overlay_transition_time_of_day);
 			overlay_transition_graphics->render_frame(overlay_transition_tiles[i].tile_frame, pixel_pos, color_modification, render_commands);
 		}
+	}
+}
+
+void CViewport::draw_map_tile_border(const tile *tile, const QPoint &pixel_pos, std::vector<std::function<void(renderer *)>> &render_commands) const
+{
+	const wyrmgus::player_color *player_color = tile->get_player_color();
+
+	if (tile->get_owner() != nullptr && tile->get_ownership_border_tile() != -1 && defines::get()->get_border_graphics() != nullptr) {
+		const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_graphics();
+		const color_modification color_modification(0, color_set(), player_color, nullptr);
+		border_graphics->render_frame(tile->get_ownership_border_tile(), pixel_pos + defines::get()->get_border_offset(), color_modification, render_commands);
 	}
 }
 
