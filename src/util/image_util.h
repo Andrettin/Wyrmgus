@@ -28,6 +28,13 @@
 
 #include "util/color_container.h"
 
+namespace wyrmgus {
+	template <int N>
+	class fractional_int;
+
+	using decimal_int = fractional_int<1>;
+}
+
 namespace wyrmgus::image {
 
 enum class frame_order {
@@ -42,10 +49,10 @@ inline QImage get_frame(const QImage &image, const int frame_x, const int frame_
 	return image.copy(pixel_x, pixel_y, frame_size.width(), frame_size.height());
 }
 
-extern QImage scale(const QImage &src_image, const int scale_factor);
-extern QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_frame_size);
+extern QImage scale(const QImage &src_image, const decimal_int &scale_factor);
+extern QImage scale(const QImage &src_image, const decimal_int &scale_factor, const QSize &old_frame_size);
 
-inline QImage scale_frame(const QImage &image, const int frame_x, const int frame_y, const int scale_factor, const QSize &old_frame_size)
+inline QImage scale_frame(const QImage &image, const int frame_x, const int frame_y, const decimal_int &scale_factor, const QSize &old_frame_size)
 {
 	const QImage frame_image = image::get_frame(image, frame_x, frame_y, old_frame_size);
 

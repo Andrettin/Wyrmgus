@@ -30,6 +30,7 @@
 
 #include "util/angle_util.h"
 #include "util/container_util.h"
+#include "util/fractional_int.h"
 #include "util/path_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
@@ -56,23 +57,33 @@ static void copy_frame_data(const uint32_t *src_frame_data, uint32_t *dst_data, 
 	}
 }
 
-QImage scale(const QImage &src_image, const int scale_factor)
+QImage scale(const QImage &src_image, const decimal_int &scale_factor)
 {
 	if (src_image.format() != QImage::Format_RGBA8888) {
 		const QImage reformatted_src_image = src_image.convertToFormat(QImage::Format_RGBA8888);
 		return image::scale(reformatted_src_image, scale_factor);
 	}
 
-	QImage result_image(src_image.size() * scale_factor, QImage::Format_RGBA8888);
+	int scale_multiplier = scale_factor.to_int();
+	if (scale_factor.get_fractional_value() != 0) {
+		scale_multiplier += 1;
+	}
+
+	QImage result_image(src_image.size() * scale_multiplier, QImage::Format_RGBA8888);
 
 	const unsigned char *src_data = src_image.constBits();
 	unsigned char *dst_data = result_image.bits();
-	xbrz::scale(scale_factor, reinterpret_cast<const uint32_t *>(src_data), reinterpret_cast<uint32_t *>(dst_data), src_image.width(), src_image.height());
+	xbrz::scale(scale_multiplier, reinterpret_cast<const uint32_t *>(src_data), reinterpret_cast<uint32_t *>(dst_data), src_image.width(), src_image.height());
+
+	if (scale_factor.get_fractional_value() != 0) {
+		const QSize scaled_size = src_image.size() * scale_factor;
+		result_image = result_image.scaled(scaled_size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	}
 
 	return result_image;
 }
 
-QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_frame_size)
+QImage scale(const QImage &src_image, const decimal_int &scale_factor, const QSize &old_frame_size)
 {
 	if (src_image.format() != QImage::Format_RGBA8888) {
 		const QImage reformatted_src_image = src_image.convertToFormat(QImage::Format_RGBA8888);

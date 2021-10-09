@@ -140,6 +140,11 @@ public:
 		return this->value;
 	}
 
+	constexpr int64_t get_fractional_value() const
+	{
+		return this->get_value() % fractional_int::divisor;
+	}
+
 	fractional_int abs() const
 	{
 		return fractional_int::from_value(std::abs(this->get_value()));
@@ -196,7 +201,7 @@ public:
 	constexpr QTime to_time() const
 	{
 		const int hours = this->to_int();
-		int64_t rest = this->get_value() % fractional_int::divisor;
+		int64_t rest = this->get_fractional_value();
 		const int minutes = rest * 60 / fractional_int::divisor;
 		rest -= minutes * fractional_int::divisor / 60;
 		const int seconds = rest * 60 * 60 / fractional_int::divisor;
@@ -209,7 +214,7 @@ public:
 	std::string to_string() const
 	{
 		std::string number_str = std::to_string(this->value / fractional_int::divisor);
-		number_str += fractional_int::to_rest_string(this->value % fractional_int::divisor);
+		number_str += fractional_int::to_rest_string(this->get_fractional_value());
 		return number_str;
 	}
 
@@ -230,7 +235,7 @@ public:
 
 	constexpr bool operator ==(const int other) const
 	{
-		return (this->value / fractional_int::divisor) == other && (this->value % fractional_int::divisor) == 0;
+		return (this->value / fractional_int::divisor) == other && this->get_fractional_value() == 0;
 	}
 
 	constexpr bool operator !=(const fractional_int<N> &other) const
@@ -271,7 +276,7 @@ public:
 	constexpr bool operator >(const int other) const
 	{
 		const int int_value = this->to_int();
-		return int_value > other || (int_value == other && (this->value % fractional_int::divisor) > 0);
+		return int_value > other || (int_value == other && this->get_fractional_value() > 0);
 	}
 
 	constexpr bool operator >=(const fractional_int<N> &other) const
@@ -393,6 +398,11 @@ public:
 		return res;
 	}
 
+	constexpr QSize operator *(const QSize &rhs) const
+	{
+		return rhs * this->get_value() / fractional_int::divisor;
+	}
+
 	template <int N2>
 	constexpr fractional_int<N> operator /(const fractional_int<N2> &other) const
 	{
@@ -434,6 +444,11 @@ public:
 		fractional_int res(rhs);
 		res *= lhs;
 		return res;
+	}
+
+	friend constexpr QSize operator *(const QSize &lhs, const fractional_int<N> &rhs)
+	{
+		return rhs * lhs;
 	}
 
 private:
