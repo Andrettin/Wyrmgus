@@ -263,6 +263,11 @@ void engine_interface::load_map_info(const std::filesystem::path &filepath)
 	CMap::get()->get_info()->Clear();
 }
 
+void engine_interface::load_map_info(const QUrl &file_url)
+{
+	this->load_map_info(path::from_qstring(file_url.toLocalFile()));
+}
+
 void engine_interface::load_map_infos()
 {
 	this->clear_map_infos();
@@ -599,9 +604,9 @@ void engine_interface::set_modal_dialog_open_async(const bool value)
 	});
 }
 
-void engine_interface::load_game(const QString &filepath)
+void engine_interface::load_game(const QUrl &file_url)
 {
-	this->load_game_deferred(path::from_qstring(filepath));
+	this->load_game_deferred(path::from_qstring(file_url.toLocalFile()));
 }
 
 void engine_interface::load_game_deferred(const std::filesystem::path &filepath)

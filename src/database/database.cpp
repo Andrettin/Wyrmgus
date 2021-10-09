@@ -610,7 +610,7 @@ std::filesystem::path database::get_documents_path()
 
 std::filesystem::path database::get_user_data_path()
 {
-	std::filesystem::path path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString();
+	std::filesystem::path path = path::from_qstring(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 	if (path.empty()) {
 		throw std::runtime_error("No user data path found.");
 	}

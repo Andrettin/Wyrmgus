@@ -69,8 +69,12 @@ std::filesystem::path load_game_file;
 **
 **  @note  Later we want to store in a more compact binary format.
 */
-int SaveGame(const std::string &filepath_str)
+int SaveGame(const std::string &file_url_str)
 {
+	const QUrl file_url = QString::fromStdString(file_url_str);
+	const QString filepath_qstr = file_url.toLocalFile();
+	const std::string filepath_str = filepath_qstr.toStdString();
+
 	CFile file;
 
 	if (file.open(filepath_str.c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
