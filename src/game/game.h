@@ -154,7 +154,8 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
-	void save(CFile &file) const;
+	void save(const std::filesystem::path &filepath) const;
+	void save_game_data(CFile &file) const;
 
 	void set_cheat(const bool cheat);
 

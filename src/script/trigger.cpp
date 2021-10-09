@@ -768,7 +768,7 @@ void SaveTriggers(CFile &file)
 	file.printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
 	file.printf("\n");
 
-	game::get()->save(file);
+	game::get()->save_game_data(file);
 	
 	//Wyrmgus start
 	if (CurrentQuest != nullptr) {
