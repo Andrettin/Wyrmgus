@@ -134,7 +134,7 @@ void TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &r
 	SetCallbacks(&callbacks);
 
 	std::shared_ptr<CGraphic> g = CGraphic::New(this->File);
-	g->Load();
+	g->Load(decimal_int(1));
 	if (this->StretchImage) {
 		g->Resize(Video.Width, Video.Height);
 	}

@@ -277,7 +277,7 @@ Vec2i CMap::map_pixel_pos_to_tile_pos(const PixelPos &mapPos) const
 
 Vec2i CMap::scaled_map_pixel_pos_to_tile_pos(const PixelPos &mapPos) const
 {
-	return this->map_pixel_pos_to_tile_pos(mapPos / wyrmgus::defines::get()->get_scale_factor());
+	return this->map_pixel_pos_to_tile_pos(mapPos / defines::get()->get_scale_factor());
 }
 
 PixelPos CMap::tile_pos_to_map_pixel_pos_top_left(const Vec2i &tilePos) const
@@ -289,7 +289,7 @@ PixelPos CMap::tile_pos_to_map_pixel_pos_top_left(const Vec2i &tilePos) const
 
 PixelPos CMap::tile_pos_to_scaled_map_pixel_pos_top_left(const Vec2i &tilePos) const
 {
-	return this->tile_pos_to_map_pixel_pos_top_left(tilePos) * wyrmgus::defines::get()->get_scale_factor();
+	return QPoint(this->tile_pos_to_map_pixel_pos_top_left(tilePos)) * defines::get()->get_scale_factor();
 }
 
 PixelPos CMap::tile_pos_to_map_pixel_pos_center(const Vec2i &tilePos) const

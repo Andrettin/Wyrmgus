@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "util/fractional_int.h"
 #include "util/singleton.h"
 
 class CGraphic;
@@ -98,7 +99,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::resource_icon* mana_icon MEMBER mana_icon READ get_mana_icon)
 	Q_PROPERTY(int forest_regeneration_threshold MEMBER forest_regeneration_threshold READ get_forest_regeneration_threshold)
 	Q_PROPERTY(int destroyed_overlay_terrain_decay_threshold MEMBER destroyed_overlay_terrain_decay_threshold READ get_destroyed_overlay_terrain_decay_threshold)
-	Q_PROPERTY(int scale_factor READ get_scale_factor CONSTANT)
+	Q_PROPERTY(double scale_factor READ get_scale_factor_double CONSTANT)
 	Q_PROPERTY(int scaled_tile_width READ get_scaled_tile_width CONSTANT)
 	Q_PROPERTY(int scaled_tile_height READ get_scaled_tile_height CONSTANT)
 	Q_PROPERTY(int population_per_unit MEMBER population_per_unit READ get_population_per_unit)
@@ -184,9 +185,14 @@ public:
 		return this->resource_icon_size;
 	}
 
-	int get_scale_factor() const
+	const decimal_int &get_scale_factor() const
 	{
 		return this->scale_factor;
+	}
+
+	double get_scale_factor_double() const
+	{
+		return this->scale_factor.to_double();
 	}
 
 	QSize get_scaled_tile_size() const
@@ -196,12 +202,12 @@ public:
 
 	int get_scaled_tile_width() const
 	{
-		return this->get_tile_width() * this->get_scale_factor();
+		return (this->get_tile_width() * this->get_scale_factor()).to_int();
 	}
 
 	int get_scaled_tile_height() const
 	{
-		return this->get_tile_height() * this->get_scale_factor();
+		return (this->get_tile_height() * this->get_scale_factor()).to_int();
 	}
 
 	player_color *get_conversible_player_color() const
@@ -432,7 +438,7 @@ private:
 	QSize tile_size;
 	QSize icon_size;
 	QSize resource_icon_size;
-	int scale_factor = 1;
+	decimal_int scale_factor = decimal_int(1);
 	player_color *conversible_player_color = nullptr;
 	player_color *neutral_player_color = nullptr;
 	civilization *neutral_civilization = nullptr;

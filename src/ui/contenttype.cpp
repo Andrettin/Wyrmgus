@@ -369,27 +369,24 @@ void CContentTypeLifeBar::Draw(const CUnit &unit, font *, std::vector<std::funct
 	}
 	//Wyrmgus end
 
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	// Border
 	//Wyrmgus start
 //	Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
 //							this->Width + 3, this->Height + 3);
 	if (defines::get()->get_bar_frame_graphics() != nullptr) {
-		defines::get()->get_bar_frame_graphics()->DrawClip(this->Pos.x + (-1 - 4) * scale_factor, this->Pos.y + (-1 - 4) * scale_factor, render_commands);
-		Video.FillRectangleClip(ColorBlack, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
-								this->Width * scale_factor, this->Height * scale_factor, render_commands);
+		defines::get()->get_bar_frame_graphics()->DrawClip(this->Pos.x + ((-1 - 4) * scale_factor).to_int(), this->Pos.y + ((-1 - 4) * scale_factor).to_int(), render_commands);
+		Video.FillRectangleClip(ColorBlack, this->Pos.x - (1 * scale_factor).to_int(), this->Pos.y - (1 * scale_factor).to_int(), (this->Width * scale_factor).to_int(), (this->Height * scale_factor).to_int(), render_commands);
 	} else {
-		Video.FillRectangleClip(ColorBlack, this->Pos.x - 3 * scale_factor, this->Pos.y - 3 * scale_factor,
-								(this->Width + 4) * scale_factor, (this->Height + 4) * scale_factor, render_commands);
+		Video.FillRectangleClip(ColorBlack, this->Pos.x - (3 * scale_factor).to_int(), this->Pos.y - (3 * scale_factor).to_int(), ((this->Width + 4) * scale_factor).to_int(), ((this->Height + 4) * scale_factor).to_int(), render_commands);
 	}
 	//Wyrmgus end
 
-	Video.FillRectangleClip(color, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
-							(this->Width * scale_factor * f) / 100, this->Height * scale_factor, render_commands);
+	Video.FillRectangleClip(color, this->Pos.x - (1 * scale_factor).to_int(), this->Pos.y - (1 * scale_factor).to_int(),
+							((this->Width * scale_factor).to_int() * f) / 100, (this->Height * scale_factor).to_int(), render_commands);
 	//Wyrmgus start
-	Video.FillRectangleClip(lighter_color, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
-							(this->Width * scale_factor * f) / 100, 1 * scale_factor, render_commands);
+	Video.FillRectangleClip(lighter_color, this->Pos.x - (1 * scale_factor).to_int(), this->Pos.y - (1 * scale_factor).to_int(), ((this->Width * scale_factor).to_int() * f) / 100, (1 * scale_factor).to_int(), render_commands);
 	//Wyrmgus end
 }
 
@@ -412,12 +409,12 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 		return;
 	}
 
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	int x = this->Pos.x;
 	int y = this->Pos.y;
-	int w = this->width * scale_factor;
-	int h = this->height * scale_factor;
+	int w = (this->width * scale_factor).to_int();
+	int h = (this->height * scale_factor).to_int();
 	assert_throw(w > 0);
 	assert_throw(h > 4);
 	const std::array<uint32_t, 12> colors = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
@@ -433,7 +430,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 	if (!this->hasBorder) {
 		//Wyrmgus start
 		if (defines::get()->get_progress_bar_graphics() != nullptr) {
-			defines::get()->get_progress_bar_graphics()->DrawClip(this->Pos.x - 4 * scale_factor, this->Pos.y - 5 * scale_factor, render_commands);
+			defines::get()->get_progress_bar_graphics()->DrawClip(this->Pos.x - (4 * scale_factor).to_int(), this->Pos.y - (5 * scale_factor).to_int(), render_commands);
 		}
 		//Wyrmgus end
 		Video.FillRectangleClip(color, x, y, f * w / 100, h, render_commands);
@@ -447,9 +444,9 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 			Video.DrawHLine(ColorWhite, x, y, f * w / 100, render_commands);
 		}
 	} else {
-		Video.DrawRectangleClip(ColorWhite, x, y, w + 4 * scale_factor, h, render_commands);
-		Video.DrawRectangleClip(ColorBlack, x + 1 * scale_factor, y + 1 * scale_factor, w + 2 * scale_factor, h - 2 * scale_factor, render_commands);
-		Video.FillRectangleClip(color, x + 2 * scale_factor, y + 2 * scale_factor, f * w / 100, h - 4 * scale_factor, render_commands);
+		Video.DrawRectangleClip(ColorWhite, x, y, w + (4 * scale_factor).to_int(), h, render_commands);
+		Video.DrawRectangleClip(ColorBlack, x + (1 * scale_factor).to_int(), y + (1 * scale_factor).to_int(), w + (2 * scale_factor).to_int(), h - (2 * scale_factor).to_int(), render_commands);
+		Video.FillRectangleClip(color, x + (2 * scale_factor).to_int(), y + (2 * scale_factor).to_int(), f * w / 100, h - (4 * scale_factor).to_int(), render_commands);
 	}
 }
 

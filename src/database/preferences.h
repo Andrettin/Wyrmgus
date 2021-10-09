@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "util/fractional_int.h"
 #include "util/singleton.h"
 
 namespace wyrmgus {
@@ -40,7 +41,8 @@ class preferences final : public QObject, public singleton<preferences>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(int scale_factor READ get_scale_factor WRITE set_scale_factor NOTIFY scale_factor_changed)
+	Q_PROPERTY(wyrmgus::decimal_int scale_factor READ get_scale_factor WRITE set_scale_factor NOTIFY scale_factor_changed)
+	Q_PROPERTY(QString scale_factor_string READ get_scale_factor_qstring WRITE set_scale_factor_qstring NOTIFY scale_factor_changed)
 	Q_PROPERTY(int game_speed READ get_game_speed WRITE set_game_speed NOTIFY game_speed_changed)
 	Q_PROPERTY(wyrmgus::difficulty difficulty READ get_difficulty WRITE set_difficulty)
 	Q_PROPERTY(bool sound_effects_enabled READ are_sound_effects_enabled WRITE set_sound_effects_enabled NOTIFY sound_effects_enabled_changed)
@@ -77,12 +79,12 @@ public:
 	void process_sml_scope(const sml_data &scope);
 	void initialize();
 
-	int get_scale_factor() const
+	const decimal_int &get_scale_factor() const
 	{
 		return this->scale_factor;
 	}
 
-	void set_scale_factor(const int factor)
+	void set_scale_factor(const decimal_int &factor)
 	{
 		if (factor == this->get_scale_factor()) {
 			return;
@@ -90,6 +92,16 @@ public:
 
 		this->scale_factor = factor;
 		emit scale_factor_changed();
+	}
+
+	QString get_scale_factor_qstring() const
+	{
+		return QString::fromStdString(this->scale_factor.to_string());
+	}
+
+	void set_scale_factor_qstring(const QString &factor_str)
+	{
+		this->set_scale_factor(decimal_int(factor_str.toStdString()));
 	}
 
 	int get_game_speed() const
@@ -295,7 +307,7 @@ signals:
 	void changed();
 
 private:
-	int scale_factor = 1;
+	decimal_int scale_factor = decimal_int(1);
 	int game_speed = preferences::default_game_speed;
 	wyrmgus::difficulty difficulty;
 	bool sound_effects_enabled = true;

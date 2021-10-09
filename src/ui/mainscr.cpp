@@ -125,20 +125,20 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 {
 	// FIXME: add icon borders
 	int hBar, hAll;
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 	//Wyrmgus start
 	if (Preference.IconsShift && wyrmgus::defines::get()->get_icon_frame_graphics() != nullptr && wyrmgus::defines::get()->get_pressed_icon_frame_graphics() != nullptr) {
 //	if (Preference.IconsShift) {
-		hBar = 4 * scale_factor;
-		hAll = 8 * scale_factor;
-		y += 2 * scale_factor;
+		hBar = (4 * scale_factor).to_int();
+		hAll = (8 * scale_factor).to_int();
+		y += (2 * scale_factor).to_int();
 	} else if (Preference.IconsShift) {
 	//Wyrmgus end
-		hBar = 6 * scale_factor;
-		hAll = 10 * scale_factor;
+		hBar = (6 * scale_factor).to_int();
+		hAll = (10 * scale_factor).to_int();
 	} else {
-		hBar = 5 * scale_factor;
-		hAll = 7 * scale_factor;
+		hBar = (5 * scale_factor).to_int();
+		hAll = (7 * scale_factor).to_int();
 	}
 	y += unit.Type->get_icon()->get_graphics()->Height;
 	//Wyrmgus start
@@ -147,12 +147,12 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 		unit.Type->Icon.Icon->G->Width + 8, hAll);
 	*/
 	if (defines::get()->get_bar_frame_graphics() != nullptr) {
-		defines::get()->get_bar_frame_graphics()->DrawClip(x + (-2 - 4) * scale_factor, y + (4 - 4) * scale_factor, render_commands);
-		Video.FillRectangleClip(ColorBlack, x - 2 * scale_factor, y + 4 * scale_factor,
-			unit.Type->get_icon()->get_graphics()->Width + (6 - 2) * scale_factor, hBar, render_commands);
+		defines::get()->get_bar_frame_graphics()->DrawClip(x + ((-2 - 4) * scale_factor).to_int(), y + ((4 - 4) * scale_factor).to_int(), render_commands);
+		Video.FillRectangleClip(ColorBlack, x - (2 * scale_factor).to_int(), y + (4 * scale_factor).to_int(),
+			unit.Type->get_icon()->get_graphics()->Width + ((6 - 2) * scale_factor).to_int(), hBar, render_commands);
 	} else {
-		Video.FillRectangleClip(ColorBlack, x - 4 * scale_factor, y + 2 * scale_factor,
-			unit.Type->get_icon()->get_graphics()->Width + 8 * scale_factor, hAll, render_commands);
+		Video.FillRectangleClip(ColorBlack, x - (4 * scale_factor).to_int(), y + (2 * scale_factor).to_int(),
+			unit.Type->get_icon()->get_graphics()->Width + (8 * scale_factor).to_int(), hAll, render_commands);
 	}
 	//Wyrmgus end
 
@@ -186,11 +186,11 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 			//Wyrmgus end
 		}
 
-		f = (f * (unit.Type->get_icon()->get_graphics()->Width + 6 * scale_factor)) / 100;
-		Video.FillRectangleClip(color, x - 2 * scale_factor, y + 4 * scale_factor,
+		f = (f * (unit.Type->get_icon()->get_graphics()->Width + (6 * scale_factor).to_int())) / 100;
+		Video.FillRectangleClip(color, x - (2 * scale_factor).to_int(), y + (4 * scale_factor).to_int(),
 			f > 1 ? f - 2 : 0, hBar, render_commands);
 		//Wyrmgus start
-		Video.FillRectangleClip(lighter_color, x - 2 * scale_factor, y + 4 * scale_factor,
+		Video.FillRectangleClip(lighter_color, x - (2 * scale_factor).to_int(), y + (4 * scale_factor).to_int(),
 			f > 1 ? f - 2 : 0, 1, render_commands);
 		//Wyrmgus end
 	}
@@ -516,7 +516,7 @@ static void DrawUnitInfo_Training(const CUnit &unit, std::vector<std::function<v
 					CLabel label(wyrmgus::defines::get()->get_game_font());
 
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
-					label.Draw(pos.x + 46 * defines::get()->get_scale_factor() - defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string, render_commands);
+					label.Draw(pos.x + (46 * defines::get()->get_scale_factor()).to_int() - defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string, render_commands);
 				}
 			}
 		}
@@ -779,7 +779,7 @@ void DrawResources(std::vector<std::function<void(renderer *)>> &render_commands
 				resource_info.Font = wyrmgus::defines::get()->get_small_font();
 				label.SetFont(resource_info.Font);
 
-				label.Draw(resource_info.TextX, resource_info.TextY + 3 * defines::get()->get_scale_factor(), tmp, render_commands);
+				label.Draw(resource_info.TextX, resource_info.TextY + (3 * defines::get()->get_scale_factor()).to_int(), tmp, render_commands);
 			} else {
 				const int resource_amount = CPlayer::GetThisPlayer()->get_resource(resource);
 				resource_info.Text = FormatNumber(resource_amount);
@@ -1092,7 +1092,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 			ba->Value = index;
 			ba->ValueStr = resource->get_identifier();
 			ba->Popup = "popup_resource";
-			DrawPopup(*ba, UI.Resources[index].IconX, UI.Resources[index].IconY + 16 * defines::get()->get_scale_factor() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false, render_commands);
+			DrawPopup(*ba, UI.Resources[index].IconX, UI.Resources[index].IconY + (16 * defines::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false, render_commands);
 			LastDrawnButtonPopup = nullptr;
 		}
 	}
@@ -1104,13 +1104,13 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		ba.Hint = _("Food");
 		ba.Action = ButtonCmd::None;
 		ba.Popup = "popup_food";
-		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * defines::get()->get_scale_factor() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false, render_commands);
+		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + (16 * defines::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false, render_commands);
 		LastDrawnButtonPopup = nullptr;
 	}
 	
 	const wyrmgus::resource_icon *score_icon = wyrmgus::defines::get()->get_score_icon();
 	if (score_icon != nullptr && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + score_icon->get_graphics()->get_frame_height())) {
-		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
+		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + (16 * defines::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
 	}
 	
 	const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
@@ -1129,7 +1129,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		&& CursorScreenPos.y >= UI.TimeOfDayPanel.IconY
 		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + time_of_day_icon_graphics->get_frame_height())
 	) {
-		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
+		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + (16 * defines::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
 	}
 	
 	const wyrmgus::season *season = UI.CurrentMapLayer->get_tile_season(tile_pos);
@@ -1147,7 +1147,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
 		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + season_icon_graphics->get_frame_height())
 	) {
-		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
+		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + (16 * defines::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
 	}
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text
@@ -1340,7 +1340,7 @@ void MessagesDisplay::UpdateMessages()
 	const unsigned long ticks = GetTicks();
 	if (MessagesFrameTimeout < ticks) {
 		++MessagesScrollY;
-		if (MessagesScrollY == UI.MessageFont->Height() + 1 * wyrmgus::defines::get()->get_scale_factor()) {
+		if (MessagesScrollY == UI.MessageFont->Height() + (1 * defines::get()->get_scale_factor()).to_int()) {
 			MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 			MessagesScrollY = 0;
 			ShiftMessages();
@@ -1358,10 +1358,10 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 	if (show && preferences::get()->is_show_messages_enabled()) {
 		CLabel label(UI.MessageFont);
 
-		const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+		const decimal_int &scale_factor = defines::get()->get_scale_factor();
 		// background so the text is easier to read
 		if (MessagesCount) {
-			int textHeight = MessagesCount * (UI.MessageFont->Height() + 1 * scale_factor);
+			int textHeight = MessagesCount * (UI.MessageFont->Height() + (1 * scale_factor).to_int());
 			uint32_t color = CVideo::MapRGB(38, 38, 78);
 			//Wyrmgus start
 			/*
@@ -1373,13 +1373,13 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 								UI.MapArea.EndX - UI.MapArea.X - 15,
 								textHeight - MessagesScrollY + 2);
 			*/
-			Video.FillTransRectangleClip(color, UI.MapArea.X + 6 * scale_factor + 1, UI.MapArea.EndY + (-16 - 2) * scale_factor + 1 - textHeight + MessagesScrollY,
-				UI.MapArea.EndX - UI.MapArea.X - 16 * scale_factor,
-				textHeight + 1 * scale_factor, 0x80, render_commands);
+			Video.FillTransRectangleClip(color, UI.MapArea.X + (6 * scale_factor).to_int() + 1, UI.MapArea.EndY + ((-16 - 2) * scale_factor).to_int() + 1 - textHeight + MessagesScrollY,
+				UI.MapArea.EndX - UI.MapArea.X - (16 * scale_factor).to_int(),
+				textHeight + (1 * scale_factor).to_int(), 0x80, render_commands);
 
-			Video.DrawRectangle(color, UI.MapArea.X + 6 * scale_factor, UI.MapArea.EndY + (-16 - 2) * scale_factor - textHeight + MessagesScrollY,
-				UI.MapArea.EndX - UI.MapArea.X - 15 * scale_factor,
-				textHeight + 2 * scale_factor, render_commands);
+			Video.DrawRectangle(color, UI.MapArea.X + (6 * scale_factor).to_int(), UI.MapArea.EndY + ((-16 - 2) * scale_factor).to_int() - textHeight + MessagesScrollY,
+				UI.MapArea.EndX - UI.MapArea.X - (15 * scale_factor).to_int(),
+				textHeight + (2 * scale_factor).to_int(), render_commands);
 			//Wyrmgus end
 		}
 
@@ -1390,7 +1390,7 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 				//Wyrmgus start
 //					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
 //								Video.Height - 1);
-				SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, UI.MapArea.EndY - 16 * scale_factor);
+				SetClipping(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int(), Video.Width - 1, UI.MapArea.EndY - (16 * scale_factor).to_int());
 				//Wyrmgus end
 			}
 			/*
@@ -1398,12 +1398,12 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 			 * std::string(Messages[z]) creation because
 			 * char * pointer may change during text drawing.
 			 */
-			label.DrawClip(UI.MapArea.X + 8 * scale_factor,
+			label.DrawClip(UI.MapArea.X + (8 * scale_factor).to_int(),
 				//Wyrmgus start
 //							   UI.MapArea.Y + 8 +
 //							   z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
-UI.MapArea.EndY - 16 * scale_factor - (UI.MessageFont->Height() + 1 * scale_factor) +
-(z * -1) * (UI.MessageFont->Height() + 1 * scale_factor) + MessagesScrollY,
+UI.MapArea.EndY - (16 * scale_factor).to_int() - (UI.MessageFont->Height() + (1 * scale_factor).to_int()) +
+(z * -1) * (UI.MessageFont->Height() + (1 * scale_factor).to_int()) + MessagesScrollY,
 //Wyrmgus end
 std::string(Messages[z]), render_commands);
 			if (z == 0) {
@@ -1418,14 +1418,14 @@ std::string(Messages[z]), render_commands);
 		for (int i = 0; i < ObjectivesCount; ++i, ++z) {
 			if (z == 0) {
 				PushClipping();
-				SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);
+				SetClipping(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int(), Video.Width - 1, Video.Height - 1);
 			}
 			/*
 			 * Due parallel drawing we have to force message copy due temp
 			 * std::string(Objectives[i]) creation because
 			 * char * pointer may change during text drawing.
 			 */
-			label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(Objectives[i])), render_commands);
+			label.DrawClip(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), std::string(_(Objectives[i])), render_commands);
 			if (z == 0) {
 				PopClipping();
 			}
@@ -1434,9 +1434,9 @@ std::string(Messages[z]), render_commands);
 		for (const wyrmgus::quest *quest : CPlayer::GetThisPlayer()->get_current_quests()) {
 			if (z == 0) {
 				PushClipping();
-				SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);
+				SetClipping(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int(), Video.Width - 1, Video.Height - 1);
 			}
-			label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(quest->get_name().c_str())), render_commands);
+			label.DrawClip(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), std::string(_(quest->get_name().c_str())), render_commands);
 			if (z == 0) {
 				PopClipping();
 			}
@@ -1459,11 +1459,11 @@ std::string(Messages[z]), render_commands);
 					objective_string += " (" + std::to_string(objective->get_counter()) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
 				}
 
-				label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), objective_string, render_commands);
+				label.DrawClip(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), objective_string, render_commands);
 				++z;
 			}
 			for (const std::string &objective_string : quest->get_objective_strings()) {
-				label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), "- " + std::string(_(objective_string.c_str())), render_commands);
+				label.DrawClip(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), "- " + std::string(_(objective_string.c_str())), render_commands);
 				++z;
 			}
 		}
@@ -1826,7 +1826,7 @@ static void DrawInfoPanelBackground(unsigned frame, std::vector<std::function<vo
 
 static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	DrawInfoPanelBackground(0, render_commands);
 	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer())
@@ -1835,19 +1835,19 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 		DrawUnitInfo(*UnitUnderCursor, render_commands);
 	} else {
 		// FIXME: need some cool ideas for this.
-		int x = UI.InfoPanel.X + 16 * scale_factor;
-		int y = UI.InfoPanel.Y + 8 * scale_factor;
+		int x = UI.InfoPanel.X + (16 * scale_factor).to_int();
+		int y = UI.InfoPanel.Y + (8 * scale_factor).to_int();
 
-		CLabel label(wyrmgus::defines::get()->get_game_font());
-		y += 16 * scale_factor;
+		CLabel label(defines::get()->get_game_font());
+		y += (16 * scale_factor).to_int();
 		label.Draw(x, y,  _("Cycle:"), render_commands);
-		label.Draw(x + 48 * scale_factor, y, GameCycle, render_commands);
+		label.Draw(x + (48 * scale_factor).to_int(), y, GameCycle, render_commands);
 		//Wyrmgus start
 //		label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
-		label.Draw(x + 110 * scale_factor, y, _("Speed:"), render_commands);
-		label.Draw(x + (110 + 53) * scale_factor, y, preferences::get()->get_game_speed(), render_commands);
+		label.Draw(x + (110 * scale_factor).to_int(), y, _("Speed:"), render_commands);
+		label.Draw(x + ((110 + 53) * scale_factor).to_int(), y, preferences::get()->get_game_speed(), render_commands);
 		//Wyrmgus end
-		y += 20 * scale_factor;
+		y += (20 * scale_factor).to_int();
 
 		std::vector<const CPlayer *> listed_players;
 
@@ -1872,13 +1872,13 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 				label.SetNormalColor(wyrmgus::defines::get()->get_default_font_color());
 			}
 
-			Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor, render_commands);
-			Video.FillRectangleClip(CVideo::MapRGB(player->get_minimap_color()), x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2, render_commands);
+			Video.DrawRectangleClip(ColorWhite, x, y, (12 * scale_factor).to_int(), (12 * scale_factor).to_int(), render_commands);
+			Video.FillRectangleClip(CVideo::MapRGB(player->get_minimap_color()), x + 1, y + 1, (12 * scale_factor).to_int() - 2, (12 * scale_factor).to_int() - 2, render_commands);
 
-			label.Draw(x + 15 * scale_factor, y, _(player->get_full_name().c_str()), render_commands);
-			y += 14 * scale_factor;
+			label.Draw(x + (15 * scale_factor).to_int(), y, _(player->get_full_name().c_str()), render_commands);
+			y += (14 * scale_factor).to_int();
 
-			if ((y + 12 * scale_factor) > Video.Height) { // if the square would overflow the screen, don't draw the player
+			if ((y + (12 * scale_factor).to_int()) > Video.Height) { // if the square would overflow the screen, don't draw the player
 				break;
 			}
 		}
@@ -1923,7 +1923,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 		&& !unit.is_enemy_of(*CPlayer::GetThisPlayer())
 		&& (unit.Player->get_type() != player_type::neutral || unit.Type->get_given_resource() != nullptr)
 	) {
-		defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - 4 * defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * defines::get()->get_scale_factor(), render_commands);
+		defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - (4 * defines::get()->get_scale_factor()).to_int(), UI.InfoPanel.Y + (93 * defines::get()->get_scale_factor()).to_int(), render_commands);
 	}
 	//Wyrmgus end	
 	DrawUnitInfo(unit, render_commands);

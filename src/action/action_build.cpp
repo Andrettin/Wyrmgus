@@ -187,14 +187,14 @@ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos, 
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	targetPos += PixelPos(this->GetUnitType().get_tile_size() - QSize(1, 1)) * wyrmgus::defines::get()->get_scaled_tile_size() / 2;
 
-	const int w = this->GetUnitType().get_box_width() * wyrmgus::defines::get()->get_scale_factor();
-	const int h = this->GetUnitType().get_box_height() * wyrmgus::defines::get()->get_scale_factor();
+	const int w = (this->GetUnitType().get_box_width() * defines::get()->get_scale_factor()).to_int();
+	const int h = (this->GetUnitType().get_box_height() * defines::get()->get_scale_factor()).to_int();
 	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2, render_commands);
 
 	if (preferences::get()->are_pathlines_enabled()) {
-		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
+		Video.FillCircleClip(ColorGreen, lastScreenPos, (2 * defines::get()->get_scale_factor()).to_int(), render_commands);
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos, render_commands);
-		Video.FillCircleClip(ColorGreen, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
+		Video.FillCircleClip(ColorGreen, targetPos, (3 * defines::get()->get_scale_factor()).to_int(), render_commands);
 	}
 
 	return targetPos;

@@ -542,7 +542,7 @@ static void ApplySepiaScale(QImage &image)
 **
 **  @param grayscale  Make a grayscale surface
 */
-void CGraphic::Load(const int scale_factor)
+void CGraphic::Load(const decimal_int &scale_factor)
 {
 	std::lock_guard lock(this->load_mutex);
 
@@ -557,8 +557,8 @@ void CGraphic::Load(const int scale_factor)
 
 	if (this->custom_scale_factor != 1) {
 		//update the frame size for the custom scale factor of the loaded image
-		this->Width *= this->custom_scale_factor;
-		this->Height *= this->custom_scale_factor;
+		this->Width = (this->Width * this->custom_scale_factor).to_int();
+		this->Height = (this->Height * this->custom_scale_factor).to_int();
 		this->original_frame_size = QSize(this->Width, this->Height);
 	}
 
@@ -607,7 +607,7 @@ void CGraphic::Load(const int scale_factor)
 	GenFramesMap();
 
 	if (scale_factor != this->custom_scale_factor) {
-		this->Resize(this->GraphicWidth * scale_factor / this->custom_scale_factor, this->GraphicHeight * scale_factor / this->custom_scale_factor);
+		this->Resize((this->GraphicWidth * scale_factor / this->custom_scale_factor).to_int(), (this->GraphicHeight * scale_factor / this->custom_scale_factor).to_int());
 	}
 }
 
@@ -668,7 +668,7 @@ void CGraphic::SetOriginalSize()
 	this->frame_images.clear();
 	this->grayscale_frame_images.clear();
 	this->modified_frame_images.clear();
-	this->Load();
+	this->Load(decimal_int(1));
 
 	this->Resized = false;
 }
@@ -711,7 +711,7 @@ QImage CGraphic::create_modified_image(const color_modification &color_modificat
 		}
 	}
 
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
 		image = image::scale(image, decimal_int(scale_factor), this->get_original_frame_size());
 	}
@@ -837,8 +837,8 @@ void CFiller::Load()
 		this->G->Load(defines::get()->get_scale_factor());
 	}
 
-	this->X *= defines::get()->get_scale_factor();
-	this->Y *= defines::get()->get_scale_factor();
+	this->X = (this->X * defines::get()->get_scale_factor()).to_int();
+	this->Y = (this->Y * defines::get()->get_scale_factor()).to_int();
 
 	if (this->X < 0) {
 		this->X = Video.Width + this->X;
@@ -855,9 +855,9 @@ bool CFiller::OnGraphic(int x, int y) const
 {
 	x -= X;
 	y -= Y;
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 	if (x >= 0 && y >= 0 && x < this->G->get_width() && y < this->G->get_height()) {
-		return this->G->get_image().pixelColor(x / scale_factor, y / scale_factor).alpha() != 0;
+		return this->G->get_image().pixelColor((x / scale_factor).to_int(), (y / scale_factor).to_int()).alpha() != 0;
 	}
 	return false;
 }

@@ -616,12 +616,12 @@ void font::MeasureWidths()
 {
 	const QImage image(path::to_qstring(this->G->get_filepath()));
 	const QSize &frame_size = G->get_original_frame_size();
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	const int maxy = image.width() / frame_size.width() * image.height() / frame_size.height();
 
 	this->char_width = std::vector<char>(maxy, 0);
-	this->char_width[0] = frame_size.width() / 2 * scale_factor;  // a reasonable value for SPACE
+	this->char_width[0] = frame_size.width() / (2 * scale_factor).to_int();  // a reasonable value for SPACE
 	const int ipr = image.width() / frame_size.width(); // images per row
 
 	for (int y = 1; y < maxy; ++y) {
@@ -639,7 +639,7 @@ void font::MeasureWidths()
 
 			for (; sp < lp; --lp) {
 				if (*lp != 0 && *lp != 7) {
-					this->char_width[y] = std::max<char>(this->char_width[y], (lp - sp) * scale_factor);
+					this->char_width[y] = std::max<char>(this->char_width[y], ((lp - sp) * scale_factor).to_int());
 				}
 			}
 			sp += image.bytesPerLine();

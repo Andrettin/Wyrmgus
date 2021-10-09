@@ -142,9 +142,9 @@ PixelPos COrder_Trade::Show(const CViewport &vp, const PixelPos &lastScreenPos, 
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
 	if (preferences::get()->are_pathlines_enabled()) {
-		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
+		Video.FillCircleClip(ColorGreen, lastScreenPos, (2 * defines::get()->get_scale_factor()).to_int(), render_commands);
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos, render_commands);
-		Video.FillCircleClip(ColorGreen, targetPos, 3 * defines::get()->get_scale_factor(), render_commands);
+		Video.FillCircleClip(ColorGreen, targetPos, (3 * defines::get()->get_scale_factor()).to_int(), render_commands);
 	}
 	return targetPos;
 }

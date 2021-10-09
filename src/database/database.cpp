@@ -268,6 +268,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(cursor::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::cursor_type") {
 			new_property_value = QVariant::fromValue(string_to_cursor_type(property.get_value()));
+		} else if (property_class_name == "wyrmgus::decimal_int") {
+			new_property_value = QVariant::fromValue(decimal_int(property.get_value()));
 		} else if (property_class_name == "wyrmgus::decimillesimal_int") {
 			new_property_value = QVariant::fromValue(decimillesimal_int(property.get_value()));
 		} else if (property_class_name == "wyrmgus::deity*") {

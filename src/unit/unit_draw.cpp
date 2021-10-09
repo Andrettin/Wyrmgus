@@ -127,24 +127,22 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	//Wyrmgus start
 	const wyrmgus::unit_type &type = *unit.Type;
 	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
-	int frame_width = type.get_frame_width() * scale_factor;
-	int frame_height = type.get_frame_height() * scale_factor;
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	QSize frame_size = type.get_frame_size() * scale_factor;
 	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
 	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
 	const wyrmgus::unit_type_variation *variation = unit.GetVariation();
 	if (variation != nullptr && variation->get_frame_size() != QSize(0, 0)) {
-		frame_width = variation->get_frame_size().width() * scale_factor;
-		frame_height = variation->get_frame_size().height() * scale_factor;
+		frame_size = variation->get_frame_size() * scale_factor;
 		sprite_width = (variation->Sprite ? variation->Sprite->Width : 0);
 		sprite_height = (variation->Sprite ? variation->Sprite->Height : 0);
 	}
-	int x = screenPos.x - type.get_box_width() * scale_factor / 2 - (frame_width - sprite_width) / 2;
-	int y = screenPos.y - type.get_box_height() * scale_factor / 2 - (frame_height - sprite_height) / 2;
+	int x = screenPos.x - (type.get_box_width() * scale_factor).to_int() / 2 - (frame_size.width() - sprite_width) / 2;
+	int y = screenPos.y - (type.get_box_height() * scale_factor).to_int() / 2 - (frame_size.height() - sprite_height) / 2;
 	
 	// show player color circle below unit if that is activated
 	if (preferences::get()->is_player_color_circle_enabled() && unit.Player->get_index() != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
-		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor - 1, render_commands);
+		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), x + (type.BoxOffsetX * scale_factor).to_int() + 1, y + (type.BoxOffsetY * scale_factor).to_int() + 1, x + (type.get_box_width() * scale_factor).to_int() + (type.BoxOffsetX * scale_factor).to_int() - 1, y + (type.get_box_height() * scale_factor).to_int() + (type.BoxOffsetY * scale_factor).to_int() - 1, render_commands);
 //		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
 	//Wyrmgus end
@@ -189,26 +187,23 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	//Wyrmgus end
 
 	//Wyrmgus start
-	int box_width = type.get_box_width();
-	int box_height = type.get_box_height();
+	QSize box_size = type.get_box_size();
 	if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land && !unit.Moving) { //if is on a raft, use the raft's box size instead
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->Type->get_box_width() > box_width && table[i]->Type->get_box_height() > box_height) {
-				box_width = table[i]->Type->get_box_width();
-				box_height = table[i]->Type->get_box_height();
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->Type->get_box_width() > box_size.width() && table[i]->Type->get_box_height() > box_size.height()) {
+				box_size = table[i]->Type->get_box_size();
 			}
 		}
 	}
 
-	box_width *= scale_factor;
-	box_height *= scale_factor;
-	x = screenPos.x - box_width / 2 - (frame_width - sprite_width) / 2;
-	y = screenPos.y - box_height / 2 - (frame_height - sprite_height) / 2;
+	box_size *= scale_factor;
+	x = screenPos.x - box_size.width() / 2 - (frame_size.width() - sprite_width) / 2;
+	y = screenPos.y - box_size.height() / 2 - (frame_size.height() - sprite_height) / 2;
 	
 //	DrawSelection(color, x + type.BoxOffsetX * scale_factor, y + type.BoxOffsetY * scale_factor, x + type.BoxWidth * scale_factor + type.BoxOffsetX * scale_factor, y + type.BoxHeight * scale_factor + type.BoxOffsetY * scale_factor);
-	DrawSelection(color, x + type.BoxOffsetX * scale_factor, y + type.BoxOffsetY * scale_factor, x + box_width + type.BoxOffsetX * scale_factor, y + box_height + type.BoxOffsetY * scale_factor, render_commands);
+	DrawSelection(color, x + (type.BoxOffsetX * scale_factor).to_int(), y + (type.BoxOffsetY * scale_factor).to_int(), x + box_size.width() + (type.BoxOffsetX * scale_factor).to_int(), y + box_size.height() + (type.BoxOffsetY * scale_factor).to_int(), render_commands);
 	//Wyrmgus end
 }
 
@@ -625,8 +620,8 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 		}
 
 		var.Draw(
-			x + offset_x * defines::get()->get_scale_factor() + var.OffsetXPercent * unit.Type->get_tile_width() * defines::get()->get_scaled_tile_width() / 100,
-			y + offset_y * defines::get()->get_scale_factor() + var.OffsetYPercent * unit.Type->get_tile_height() * defines::get()->get_scaled_tile_height() / 100,
+			x + (offset_x * defines::get()->get_scale_factor()).to_int() + var.OffsetXPercent * unit.Type->get_tile_width() * defines::get()->get_scaled_tile_width() / 100,
+			y + (offset_y * defines::get()->get_scale_factor()).to_int() + var.OffsetYPercent * unit.Type->get_tile_height() * defines::get()->get_scaled_tile_height() / 100,
 			type, unit.Variable[var.Index], render_commands);
 	}
 
@@ -645,9 +640,9 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 			}
 		}
 		const int width = wyrmgus::defines::get()->get_game_font()->Width(groupId);
-		x += (unit.Type->get_tile_width() * defines::get()->get_scaled_tile_width() + unit.Type->get_box_width() * defines::get()->get_scale_factor()) / 2 - width;
+		x += (unit.Type->get_tile_width() * defines::get()->get_scaled_tile_width() + (unit.Type->get_box_width() * defines::get()->get_scale_factor()).to_int()) / 2 - width;
 		const int height = wyrmgus::defines::get()->get_game_font()->Height();
-		y += (unit.Type->get_tile_height() * defines::get()->get_scaled_tile_height() + unit.Type->get_box_height() * defines::get()->get_scale_factor()) / 2 - height;
+		y += (unit.Type->get_tile_height() * defines::get()->get_scaled_tile_height() + (unit.Type->get_box_height() * defines::get()->get_scale_factor()).to_int()) / 2 - height;
 		CLabel(defines::get()->get_game_font()).DrawClip(x, y, groupId, render_commands);
 	}
 }
@@ -672,8 +667,8 @@ void DrawShadow(const unit_type &type, const std::shared_ptr<CGraphic> &sprite, 
 	}
 	PixelPos pos = screenPos;
 	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += (type.get_offset().x() + type.ShadowOffsetX) * defines::get()->get_scale_factor();
-	pos.y += (type.get_offset().y() + type.ShadowOffsetY) * defines::get()->get_scale_factor();
+	pos.x += ((type.get_offset().x() + type.ShadowOffsetX) * defines::get()->get_scale_factor()).to_int();
+	pos.y += ((type.get_offset().y() + type.ShadowOffsetY) * defines::get()->get_scale_factor()).to_int();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -707,8 +702,8 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_pt
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.get_offset().x() * defines::get()->get_scale_factor();
-	pos.y += type.get_offset().y() * defines::get()->get_scale_factor();
+	pos.x += (type.get_offset().x() * defines::get()->get_scale_factor()).to_int();
+	pos.y += (type.get_offset().y() * defines::get()->get_scale_factor()).to_int();
 
 	bool flip = false;
 
@@ -744,8 +739,8 @@ void DrawOverlay(const unit_type &type, const std::shared_ptr<CGraphic> &sprite,
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.get_offset().x() * wyrmgus::defines::get()->get_scale_factor();
-	pos.y += type.get_offset().y() * wyrmgus::defines::get()->get_scale_factor();
+	pos.x += (type.get_offset().x() * defines::get()->get_scale_factor()).to_int();
+	pos.y += (type.get_offset().y() * defines::get()->get_scale_factor()).to_int();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -819,7 +814,7 @@ void ShowOrder(const CUnit &unit, std::vector<std::function<void(renderer *)>> &
 	//Wyrmgus start
 	//if unit has rally point, show it
 	if (unit.get_rally_point_pos().x() != -1 && unit.get_rally_point_pos().y() != -1 && unit.get_rally_point_map_layer() != nullptr && unit.get_rally_point_map_layer() == UI.CurrentMapLayer) {
-		Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(unit.get_rally_point_pos()), 3 * defines::get()->get_scale_factor(), render_commands);
+		Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(unit.get_rally_point_pos()), (3 * defines::get()->get_scale_factor()).to_int(), render_commands);
 	}
 	//Wyrmgus end
 }
@@ -907,13 +902,13 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 static void DrawConstructionShadow(const CUnit &unit, const unit_type &type, const construction_frame *cframe, int frame, const PixelPos &screenPos, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	PixelPos pos = screenPos;
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 	const unit_type_variation *variation = unit.GetVariation();
 	if (cframe->get_image_type() != construction_image_type::construction) {
 		if (variation && variation->ShadowSprite) {
 			pos -= PixelPos((variation->ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
-			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
-			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
+			pos.x += ((type.ShadowOffsetX + type.get_offset().x()) * scale_factor).to_int();
+			pos.y += ((type.ShadowOffsetY + type.get_offset().y()) * scale_factor).to_int();
 			if (frame < 0) {
 				variation->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, render_commands);
 			} else {
@@ -921,8 +916,8 @@ static void DrawConstructionShadow(const CUnit &unit, const unit_type &type, con
 			}
 		} else if (type.ShadowSprite) {
 			pos -= PixelPos((type.ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
-			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
-			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
+			pos.x += ((type.ShadowOffsetX + type.get_offset().x()) * scale_factor).to_int();
+			pos.y += ((type.ShadowOffsetY + type.get_offset().y()) * scale_factor).to_int();
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, render_commands);
 			} else {
@@ -945,15 +940,15 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 							 const CUnit &unit, const unit_type &type, int frame, const PixelPos &screenPos, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	PixelPos pos = screenPos;
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 	const player_color *player_color = CPlayer::Players[player]->get_player_color();
 
 	if (cframe->get_image_type() == construction_image_type::construction) {
 		const unit_type_variation *variation = unit.GetVariation();
 		if (variation != nullptr && variation->get_construction() != nullptr) {
 			const construction *construction = variation->get_construction();
-			pos.x -= construction->get_frame_width() * scale_factor / 2;
-			pos.y -= construction->get_frame_height() * scale_factor / 2;
+			pos.x -= (construction->get_frame_width() * scale_factor).to_int() / 2;
+			pos.y -= (construction->get_frame_height() * scale_factor).to_int() / 2;
 			if (frame < 0) {
 				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day, render_commands);
 			} else {
@@ -961,8 +956,8 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 			}
 		} else {
 			const construction *construction = type.get_construction();
-			pos.x -= construction->get_frame_width() * scale_factor / 2;
-			pos.y -= construction->get_frame_height() * scale_factor / 2;
+			pos.x -= (construction->get_frame_width() * scale_factor).to_int() / 2;
+			pos.y -= (construction->get_frame_height() * scale_factor).to_int() / 2;
 			if (frame < 0) {
 				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day, render_commands);
 			} else {
@@ -973,17 +968,14 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 		//Wyrmgus start
 //		pos.x += type.get_offset().x() - type.Width / 2;
 //		pos.y += type.get_offset().y() - type.Height / 2;
-		int frame_width = type.get_frame_width();
-		int frame_height = type.get_frame_height();
+		QSize frame_size = type.get_frame_size();
 		const wyrmgus::unit_type_variation *variation = unit.GetVariation();
 		if (variation != nullptr && variation->get_frame_size() != QSize(0, 0)) {
-			frame_width = variation->get_frame_size().width();
-			frame_height = variation->get_frame_size().height();
+			frame_size = variation->get_frame_size();
 		}
-		frame_width *= scale_factor;
-		frame_height *= scale_factor;
-		pos.x += type.get_offset().x() * scale_factor - frame_width / 2;
-		pos.y += type.get_offset().y() * scale_factor - frame_height / 2;
+		frame_size *= scale_factor;
+		pos.x += (type.get_offset().x() * scale_factor).to_int() - frame_size.width() / 2;
+		pos.y += (type.get_offset().y() * scale_factor).to_int() - frame_size.height() / 2;
 		//Wyrmgus end
 		if (frame < 0) {
 			frame = -frame - 1;
@@ -1052,8 +1044,8 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 	} else {
 		screenPos = vp.TilePosToScreen_TopLeft(this->Seen.tilePos);
 
-		screenPos.x += this->Seen.pixel_offset.x() * defines::get()->get_scale_factor();
-		screenPos.y += this->Seen.pixel_offset.y() * defines::get()->get_scale_factor();
+		screenPos.x += (this->Seen.pixel_offset.x() * defines::get()->get_scale_factor()).to_int();
+		screenPos.y += (this->Seen.pixel_offset.y() * defines::get()->get_scale_factor()).to_int();
 		frame = this->Seen.Frame;
 		type = this->Seen.Type;
 		under_construction = this->Seen.UnderConstruction;

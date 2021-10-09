@@ -120,7 +120,7 @@ static std::deque<EditorAction> EditorRedoActions;
 /// Unit mode icon
 static int get_unit_icon_x()
 {
-	return IconWidth + 7 * defines::get()->get_scale_factor();
+	return IconWidth + (7 * defines::get()->get_scale_factor()).to_int();
 }
 
 static int get_unit_icon_y()
@@ -131,23 +131,23 @@ static int get_unit_icon_y()
 /// Tile mode icon
 static int get_tile_icon_x()
 {
-	return IconWidth * 2 + 16 * defines::get()->get_scale_factor();
+	return IconWidth * 2 + (16 * defines::get()->get_scale_factor()).to_int();
 }
 
 static int get_tile_icon_y()
 {
-	return 2 * defines::get()->get_scale_factor();
+	return (2 * defines::get()->get_scale_factor()).to_int();
 }
 
 /// Start mode icon
 static int get_start_icon_x()
 {
-	return IconWidth * 3 + 16 * defines::get()->get_scale_factor();
+	return IconWidth * 3 + (16 * defines::get()->get_scale_factor()).to_int();
 }
 
 static int get_start_icon_y()
 {
-	return 2 * defines::get()->get_scale_factor();
+	return (2 * defines::get()->get_scale_factor()).to_int();
 }
 
 static void EditorUndoAction();
@@ -768,17 +768,17 @@ void RecalculateShownUnits()
 */
 static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 	std::array<char, 256> buf{};
 	CLabel label(defines::get()->get_small_font());
 
 	//Wyrmgus start
 //	int x = UI.InfoPanel.X + 8;
-	int x = UI.InfoPanel.X + 26 * scale_factor;
+	int x = UI.InfoPanel.X + (26 * scale_factor).to_int();
 	//Wyrmgus end
-	int y = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 10 * scale_factor;
+	int y = UI.InfoPanel.Y + (4 * scale_factor).to_int() + IconHeight + (10 * scale_factor).to_int();
 
-	const int rectangle_size = 20 * scale_factor;
+	const int rectangle_size = (20 * scale_factor).to_int();
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		//Wyrmgus start
@@ -806,14 +806,14 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 //		sprintf(buf, "%d", i);
 		sprintf(buf.data(), "%d", (i == PlayerNumNeutral) ? 16 : i + 1);
 		//Wyrmgus end
-		label.DrawCentered(x + i % 8 * rectangle_size + 10 * scale_factor, y + 7 * scale_factor, buf.data(), render_commands);
+		label.DrawCentered(x + i % 8 * rectangle_size + (10 * scale_factor).to_int(), y + (7 * scale_factor).to_int(), buf.data(), render_commands);
 	}
 
 	//Wyrmgus start
 //	x = UI.InfoPanel.X + 4;
-	x = UI.InfoPanel.X + 22 * scale_factor;
+	x = UI.InfoPanel.X + (22 * scale_factor).to_int();
 	//Wyrmgus end
-	y += (18 * 1 + 4) * scale_factor;
+	y += ((18 * 1 + 4) * scale_factor).to_int();
 	if (CEditor::get()->SelectedPlayer != -1) {
 		//Wyrmgus start
 //		snprintf(buf.data(), buf.size(), "Plyr %d %s ", CEditor::get()->SelectedPlayer,
@@ -971,17 +971,17 @@ static void DrawTileIcon(const terrain_type *terrain, unsigned x, unsigned y, un
 static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	CLabel label(defines::get()->get_game_font());
-	const int scale_factor = defines::get()->get_scale_factor();
-	int x = UI.InfoPanel.X + 46 * scale_factor;
-	int y = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 11 * scale_factor;
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	int x = UI.InfoPanel.X + (46 * scale_factor).to_int();
+	int y = UI.InfoPanel.Y + (4 * scale_factor).to_int() + IconHeight + (11 * scale_factor).to_int();
 
 	if (CursorOn == cursor_on::button && 300 <= ButtonUnderCursor && ButtonUnderCursor < 306) {
 		//Wyrmgus start
 //		Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
 		if (ButtonUnderCursor <= 303) {
-			Video.DrawRectangle(ColorGray, x - 42 * scale_factor, y - 3 * scale_factor + (ButtonUnderCursor - 300) * 20 * scale_factor, 100 * scale_factor, 20 * scale_factor, render_commands);
+			Video.DrawRectangle(ColorGray, x - (42 * scale_factor).to_int(), y - (3 * scale_factor).to_int() + (ButtonUnderCursor - 300) * (20 * scale_factor).to_int(), (100 * scale_factor).to_int(), (20 * scale_factor).to_int(), render_commands);
 		} else {
-			Video.DrawRectangle(ColorGray, x + (-42 + 100) * scale_factor, y - 3 * scale_factor + (ButtonUnderCursor - 304) * 20 * scale_factor, 100 * scale_factor, 20 * scale_factor, render_commands);
+			Video.DrawRectangle(ColorGray, x + ((-42 + 100) * scale_factor).to_int(), y - (3 * scale_factor).to_int() + (ButtonUnderCursor - 304) * (20 * scale_factor).to_int(), (100 * scale_factor).to_int(), (20 * scale_factor).to_int(), render_commands);
 		}
 		//Wyrmgus end
 	}
@@ -991,19 +991,19 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 	} else {
 		label.DrawCentered(x, y, "1x1", render_commands);
 	}
-	y += 20 * scale_factor;
+	y += (20 * scale_factor).to_int();
 	if (TileCursorSize == 2) {
 		label.DrawReverseCentered(x, y, "2x2", render_commands);
 	} else {
 		label.DrawCentered(x, y, "2x2", render_commands);
 	}
-	y += 20 * scale_factor;
+	y += (20 * scale_factor).to_int();
 	if (TileCursorSize == 3) {
 		label.DrawReverseCentered(x, y, "3x3", render_commands);
 	} else {
 		label.DrawCentered(x, y, "3x3", render_commands);
 	}
-	y += 20 * scale_factor;
+	y += (20 * scale_factor).to_int();
 	if (TileCursorSize == 4) {
 		label.DrawReverseCentered(x, y, "4x4", render_commands);
 	} else {
@@ -1011,8 +1011,8 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 	}
 	//Wyrmgus start
 //	y += 20 * scale_factor;
-	x += 100 * scale_factor;
-	y -= 20 * 3 * scale_factor;
+	x += (100 * scale_factor).to_int();
+	y -= (20 * 3 * scale_factor).to_int();
 	//Wyrmgus end
 	//Wyrmgus start
 	/*
@@ -1028,7 +1028,7 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 		label.DrawCentered(x, y, "5x5", render_commands);
 	}
 	//Wyrmgus end
-	y += 20 * scale_factor;
+	y += (20 * scale_factor).to_int();
 	//Wyrmgus start
 	/*
 	if (TileToolDecoration) {
@@ -1043,17 +1043,17 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 		label.DrawCentered(x, y, "10x10", render_commands);
 	}
 	//Wyrmgus end
-	y += 20 * scale_factor;
+	y += (20 * scale_factor).to_int();
 
 	int i = CEditor::get()->TileIndex;
 	assert_throw(CEditor::get()->TileIndex != -1);
-	y = UI.ButtonPanel.Y + 24 * scale_factor;
+	y = UI.ButtonPanel.Y + (24 * scale_factor).to_int();
 	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - defines::get()->get_scaled_tile_height()) {
 		if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
 			break;
 		}
 
-		x = UI.ButtonPanel.X + 16 * scale_factor;
+		x = UI.ButtonPanel.X + (16 * scale_factor).to_int();
 
 		while (x < UI.ButtonPanel.X + ButtonPanelWidth - defines::get()->get_scaled_tile_width()) {
 			if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
@@ -1080,21 +1080,21 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 				CEditor::get()->PopUpY = y;
 			}
 
-			x += defines::get()->get_scaled_tile_width() + 30 * scale_factor;
+			x += defines::get()->get_scaled_tile_width() + (30 * scale_factor).to_int();
 			++i;
 		}
 
-		y += defines::get()->get_scaled_tile_height() + 18 * scale_factor;
+		y += defines::get()->get_scaled_tile_height() + (18 * scale_factor).to_int();
 	}
 }
 
 static void DrawEditorPanel_SelectIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 //	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
-	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor, UI.InfoPanel.Y + 7 * scale_factor);
+	const PixelPos pos(UI.InfoPanel.X + (11 * scale_factor).to_int(), UI.InfoPanel.Y + (7 * scale_factor).to_int());
 	//Wyrmgus end
 	icon *icon = CEditor::get()->Select.Icon;
 	assert_throw(icon != nullptr);
@@ -1117,9 +1117,9 @@ static void DrawEditorPanel_SelectIcon(std::vector<std::function<void(renderer *
 
 static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
-	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x(), UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y());
+	const PixelPos pos(UI.InfoPanel.X + (11 * scale_factor).to_int() + get_unit_icon_x(), UI.InfoPanel.Y + (7 * scale_factor).to_int() + get_unit_icon_y());
 	icon *icon = CEditor::get()->Units.Icon;
 	assert_throw(icon != nullptr);
 	unsigned int flag = 0;
@@ -1141,10 +1141,10 @@ static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)
 
 static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
-	int x = UI.InfoPanel.X + 11 * scale_factor;
-	int y = UI.InfoPanel.Y + 5 * scale_factor;
+	int x = UI.InfoPanel.X + (11 * scale_factor).to_int();
+	int y = UI.InfoPanel.Y + (5 * scale_factor).to_int();
 
 	if (CEditor::get()->StartUnit) {
 		const icon *icon = CEditor::get()->StartUnit->get_icon();
@@ -1168,17 +1168,17 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 		//  No unit specified : draw a cross.
 		//  Todo : FIXME Should we just warn user to define Start unit ?
 		PushClipping();
-		x += get_start_icon_x() + 1 * scale_factor;
-		y += get_start_icon_y() + 1 * scale_factor;
+		x += get_start_icon_x() + (1 * scale_factor).to_int();
+		y += get_start_icon_y() + (1 * scale_factor).to_int();
 		if (ButtonUnderCursor == StartButton) {
-			Video.DrawRectangleClip(ColorGray, x - 1 * scale_factor, y - 1 * scale_factor, IconHeight, IconHeight, render_commands);
+			Video.DrawRectangleClip(ColorGray, x - (1 * scale_factor).to_int(), y - (1 * scale_factor).to_int(), IconHeight, IconHeight, render_commands);
 		}
-		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2 * scale_factor, IconHeight - 2 * scale_factor, render_commands);
+		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - (2 * scale_factor).to_int(), IconHeight - (2 * scale_factor).to_int(), render_commands);
 
 		const PixelPos lt(x, y);
-		const PixelPos lb(x, y + IconHeight - 3 * scale_factor);
-		const PixelPos rt(x + IconHeight - 3 * scale_factor, y);
-		const PixelPos rb(x + IconHeight - 2 * scale_factor, y + IconHeight - 2 * scale_factor);
+		const PixelPos lb(x, y + IconHeight - (3 * scale_factor).to_int());
+		const PixelPos rt(x + IconHeight - (3 * scale_factor).to_int(), y);
+		const PixelPos rb(x + IconHeight - (2 * scale_factor).to_int(), y + IconHeight - (2 * scale_factor).to_int());
 		const uint32_t color = CVideo::MapRGB(CPlayer::Players[CEditor::get()->SelectedPlayer]->get_minimap_color());
 
 		Video.DrawLineClip(color, lt, rb, render_commands);
@@ -1192,14 +1192,14 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 */
 static void DrawEditorPanel(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	DrawEditorPanel_SelectIcon(render_commands);
 	DrawEditorPanel_UnitsIcon(render_commands);
 
 	if (CEditor::get()->TerrainEditable) {
-		const int x = UI.InfoPanel.X + get_tile_icon_x() + 11 * scale_factor;
-		const int y = UI.InfoPanel.Y + get_tile_icon_y() + 4 * scale_factor;
+		const int x = UI.InfoPanel.X + get_tile_icon_x() + (11 * scale_factor).to_int();
+		const int y = UI.InfoPanel.Y + get_tile_icon_y() + (4 * scale_factor).to_int();
 
 		DrawTileIcon(CEditor::get()->ShownTileTypes[0], x, y,
 					 (ButtonUnderCursor == TileButton ? IconActive : 0) |
@@ -1340,18 +1340,17 @@ static void DrawStartLocations(std::vector<std::function<void(renderer *)>> &ren
 */
 static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-#if 1
 	Vec2i pos(0, 0);
 
 	if (UI.MouseViewport) {
 		pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 	}
 
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	std::array<char, 256> buf{};
 	snprintf(buf.data(), buf.size(), _("Editor (%d %d)"), pos.x, pos.y);
-	CLabel(defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 2 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data(), render_commands);
+	CLabel(defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + (2 * scale_factor).to_int(), UI.StatusLine.TextY - (12 * scale_factor).to_int(), buf.data(), render_commands);
 	const tile &mf = *UI.CurrentMapLayer->Field(pos);
 	//
 	// Flags info
@@ -1378,7 +1377,7 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 			mf.has_flag(tile_flag::bridge) ? 'B' : '-',
 			mf.has_flag(tile_flag::space) ? 'S' : '-');
 
-	CLabel(defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 118 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data(), render_commands);
+	CLabel(defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + (118 * scale_factor).to_int(), UI.StatusLine.TextY - (12 * scale_factor).to_int(), buf.data(), render_commands);
 
 	//Wyrmgus start
 //	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
@@ -1403,8 +1402,7 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 	snprintf(buf.data(), buf.size(), "%s", terrain_name.c_str());
 	//Wyrmgus end
 
-	CLabel(defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 298 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data(), render_commands);
-#endif
+	CLabel(defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + (298 * scale_factor).to_int(), UI.StatusLine.TextY - (12 * scale_factor).to_int(), buf.data(), render_commands);
 }
 
 /**
@@ -1867,12 +1865,12 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	LastDrawnButtonPopup = nullptr;
 	//Wyrmgus end
 
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	// Scrollbar
-	if (UI.ButtonPanel.X + 4 * scale_factor < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.ButtonPanel.X + (176 - 4) * scale_factor
-		&& UI.ButtonPanel.Y + 4 * scale_factor < CursorScreenPos.y
+	if (UI.ButtonPanel.X + (4 * scale_factor).to_int() < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.ButtonPanel.X + ((176 - 4) * scale_factor).to_int()
+		&& UI.ButtonPanel.Y + (4 * scale_factor).to_int() < CursorScreenPos.y
 		//Wyrmgus start
 //		&& CursorScreenPos.y < UI.ButtonPanel.Y + 24) {
 		&& CursorScreenPos.y < UI.ButtonPanel.Y) {
@@ -1881,9 +1879,9 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	}
 	//Wyrmgus start
 //	int bx = UI.InfoPanel.X + 8;
-	int bx = UI.InfoPanel.X + 26 * scale_factor;
+	int bx = UI.InfoPanel.X + (26 * scale_factor).to_int();
 	//Wyrmgus end
-	int by = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 10 * scale_factor;
+	int by = UI.InfoPanel.Y + (4 * scale_factor).to_int() + IconHeight + (10 * scale_factor).to_int();
 	for (int i = 0; i < PlayerMax; ++i) {
 		//Wyrmgus start
 		if (i >= 15 && i < PlayerNumNeutral) {
@@ -1894,11 +1892,11 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		//Wyrmgus end
 			//Wyrmgus start
 //			bx = UI.InfoPanel.X + 8;
-			bx = UI.InfoPanel.X + 26 * scale_factor;
+			bx = UI.InfoPanel.X + (26 * scale_factor).to_int();
 			//Wyrmgus end
-			by += 20 * scale_factor;
+			by += (20 * scale_factor).to_int();
 		}
-		if (bx < screenPos.x && screenPos.x < bx + 20 * scale_factor && by < screenPos.y && screenPos.y < by + 20 * scale_factor) {
+		if (bx < screenPos.x && screenPos.x < bx + (20 * scale_factor).to_int() && by < screenPos.y && screenPos.y < by + (20 * scale_factor).to_int()) {
 			if (CMap::get()->Info->player_types[i] != player_type::nobody) {
 				std::array<char, 256> buf{};
 				//Wyrmgus start
@@ -1916,11 +1914,11 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 #endif
 			return true;
 		}
-		bx += 20 * scale_factor;
+		bx += (20 * scale_factor).to_int();
 	}
 
 	int i = CEditor::get()->UnitIndex;
-	by = UI.ButtonPanel.Y + 24 * scale_factor;
+	by = UI.ButtonPanel.Y + (24 * scale_factor).to_int();
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
 		const int x = UI.ButtonPanel.Buttons[j].X;
 		const int y = UI.ButtonPanel.Buttons[j].Y;
@@ -1956,38 +1954,38 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 {
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 //	int bx = UI.InfoPanel.X + 4;
-	int bx = UI.InfoPanel.X + 11 * scale_factor;
+	int bx = UI.InfoPanel.X + (11 * scale_factor).to_int();
 	//Wyrmgus end
-	int by = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 10 * scale_factor;
+	int by = UI.InfoPanel.Y + (4 * scale_factor).to_int() + IconHeight + (10 * scale_factor).to_int();
 
 	for (int i = 0; i < 6; ++i) {
-		if (bx < screenPos.x && screenPos.x < bx + 100 * scale_factor && by < screenPos.y && screenPos.y < by + 18 * scale_factor) {
+		if (bx < screenPos.x && screenPos.x < bx + (100 * scale_factor).to_int() && by < screenPos.y && screenPos.y < by + (18 * scale_factor).to_int()) {
 			ButtonUnderCursor = i + 300;
 			CursorOn = cursor_on::button;
 			return true;
 		}
-		by += 20 * scale_factor;
+		by += (20 * scale_factor).to_int();
 		//Wyrmgus start
 		if (i == 3) {
-			by = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 10 * scale_factor;
-			bx += 100 * scale_factor;
+			by = UI.InfoPanel.Y + (4 * scale_factor).to_int() + IconHeight + (10 * scale_factor).to_int();
+			bx += (100 * scale_factor).to_int();
 		}
 		//Wyrmgus end
 	}
 
 	int i = CEditor::get()->TileIndex;
-	by = UI.ButtonPanel.Y + 24 * scale_factor;
+	by = UI.ButtonPanel.Y + (24 * scale_factor).to_int();
 	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - defines::get()->get_scaled_tile_height()) {
 		if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
 			break;
 		}
 		//Wyrmgus start
 //		bx = UI.ButtonPanel.X + 10;
-		bx = UI.ButtonPanel.X + (10 + 6) * scale_factor;
+		bx = UI.ButtonPanel.X + ((10 + 6) * scale_factor).to_int();
 		//Wyrmgus end
 		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - defines::get()->get_scaled_tile_width()) {
 			if (i >= (int) CEditor::get()->ShownTileTypes.size()) {
@@ -2006,11 +2004,11 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 				return true;
 			}
 
-			bx += defines::get()->get_scaled_tile_width() + 30 * scale_factor;
+			bx += defines::get()->get_scaled_tile_width() + (30 * scale_factor).to_int();
 			i++;
 		}
 
-		by += defines::get()->get_scaled_tile_height() + 18 * scale_factor;
+		by += defines::get()->get_scaled_tile_height() + (18 * scale_factor).to_int();
 	}
 	return false;
 }
@@ -2025,7 +2023,7 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 	static int LastMapX = 0;
 	static int LastMapY = 0;
 
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	PixelPos restrictPos = pos;
 	HandleCursorMove(&restrictPos.x, &restrictPos.y); // Reduce to screen
@@ -2121,10 +2119,10 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 	}
 
 	// Handle buttons
-	if (UI.InfoPanel.X + 11 * scale_factor < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + CEditor::get()->Select.Icon->get_graphics()->Width
-		&& UI.InfoPanel.Y + 7 * scale_factor < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + CEditor::get()->Select.Icon->get_graphics()->Height) {
+	if (UI.InfoPanel.X + (11 * scale_factor).to_int() < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + (11 * scale_factor).to_int() + CEditor::get()->Select.Icon->get_graphics()->Width
+		&& UI.InfoPanel.Y + (7 * scale_factor).to_int() < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + (7 * scale_factor).to_int() + CEditor::get()->Select.Icon->get_graphics()->Height) {
 		// FIXME: what is this button?
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
@@ -2132,10 +2130,10 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		UI.StatusLine.Set(_("Select Mode"));
 		return;
 	}
-	if (UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x() < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x() + CEditor::get()->Units.Icon->get_graphics()->Width
-		&& UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y() < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y() + CEditor::get()->Units.Icon->get_graphics()->Height) {
+	if (UI.InfoPanel.X + (11 * scale_factor).to_int() + get_unit_icon_x() < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + (11 * scale_factor).to_int() + get_unit_icon_x() + CEditor::get()->Units.Icon->get_graphics()->Width
+		&& UI.InfoPanel.Y + (7 * scale_factor).to_int() + get_unit_icon_y() < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + (7 * scale_factor).to_int() + get_unit_icon_y() + CEditor::get()->Units.Icon->get_graphics()->Height) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = cursor_on::button;
@@ -2143,10 +2141,10 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		return;
 	}
 	if (CEditor::get()->TerrainEditable) {
-		if (UI.InfoPanel.X + 11 * scale_factor + get_tile_icon_x() < CursorScreenPos.x
-			&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_tile_icon_x() + defines::get()->get_scaled_tile_width() + 7 * scale_factor
-			&& UI.InfoPanel.Y + 4 * scale_factor + get_tile_icon_y() < CursorScreenPos.y
-			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 * scale_factor + get_tile_icon_y() + defines::get()->get_scaled_tile_height() + 7 * scale_factor) {
+		if (UI.InfoPanel.X + (11 * scale_factor).to_int() + get_tile_icon_x() < CursorScreenPos.x
+			&& CursorScreenPos.x < UI.InfoPanel.X + (11 * scale_factor).to_int() + get_tile_icon_x() + defines::get()->get_scaled_tile_width() + (7 * scale_factor).to_int()
+			&& UI.InfoPanel.Y + (4 * scale_factor).to_int() + get_tile_icon_y() < CursorScreenPos.y
+			&& CursorScreenPos.y < UI.InfoPanel.Y + (4 * scale_factor).to_int() + get_tile_icon_y() + defines::get()->get_scaled_tile_height() + (7 * scale_factor).to_int()) {
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = cursor_on::button;
@@ -2155,12 +2153,12 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		}
 	}
 
-	int StartUnitWidth = CEditor::get()->StartUnit ? CEditor::get()->StartUnit->get_icon()->get_graphics()->Width : defines::get()->get_scaled_tile_width() + 7 * scale_factor;
-	int StartUnitHeight = CEditor::get()->StartUnit ? CEditor::get()->StartUnit->get_icon()->get_graphics()->Height : defines::get()->get_scaled_tile_height() + 7 * scale_factor;
-	if (UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() + StartUnitWidth
-		&& UI.InfoPanel.Y + 5 * scale_factor + get_start_icon_y() < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 5 * scale_factor + get_start_icon_y() + StartUnitHeight) {
+	int StartUnitWidth = CEditor::get()->StartUnit ? CEditor::get()->StartUnit->get_icon()->get_graphics()->Width : defines::get()->get_scaled_tile_width() + (7 * scale_factor).to_int();
+	int StartUnitHeight = CEditor::get()->StartUnit ? CEditor::get()->StartUnit->get_icon()->get_graphics()->Height : defines::get()->get_scaled_tile_height() + (7 * scale_factor).to_int();
+	if (UI.InfoPanel.X + (11 * scale_factor).to_int() + get_start_icon_x() < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + (11 * scale_factor).to_int() + get_start_icon_x() + StartUnitWidth
+		&& UI.InfoPanel.Y + (5 * scale_factor).to_int() + get_start_icon_y() < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + (5 * scale_factor).to_int() + get_start_icon_y() + StartUnitHeight) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = cursor_on::button;
@@ -2339,9 +2337,9 @@ void CEditor::Init()
 //	ButtonPanelWidth = 170;//200;
 //	ButtonPanelHeight = 160 + (Video.Height - 480);
 	// adapt to new UI size, should make this more scriptable
-	const int scale_factor = defines::get()->get_scale_factor();
-	ButtonPanelWidth = 243 * scale_factor;
-	ButtonPanelHeight = 186 * scale_factor;
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	ButtonPanelWidth = (243 * scale_factor).to_int();
+	ButtonPanelHeight = (186 * scale_factor).to_int();
 	//Wyrmgus end
 
 	CalculateMaxIconSize();
@@ -2418,7 +2416,7 @@ std::string get_user_maps_path()
 */
 void EditorMainLoop()
 {
-	const int scale_factor = defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	bool OldCommandLogDisabled = CommandLogDisabled;
 	const EventCallback *old_callbacks = GetCallbacks();
@@ -2461,14 +2459,14 @@ void EditorMainLoop()
 		//Wyrmgus start
 //			editorUnitSlider->setSize(ButtonPanelWidth/*176*/, 16);
 //			editorSlider->setSize(ButtonPanelWidth/*176*/, 16);
-		editorUnitSlider->setSize((218 - 24 - 6) * scale_factor, 16 * scale_factor); // adapt to new UI size, should make this more scriptable
-		editorSlider->setSize((218 - 24 - 6) * scale_factor, 16 * scale_factor);
+		editorUnitSlider->setSize(((218 - 24 - 6) * scale_factor).to_int(), (16 * scale_factor).to_int()); // adapt to new UI size, should make this more scriptable
+		editorSlider->setSize(((218 - 24 - 6) * scale_factor).to_int(), (16 * scale_factor).to_int());
 		//Wyrmgus end
 		//Wyrmgus start
 //			editorContainer->add(editorUnitSlider.get(), UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
 //			editorContainer->add(editorSlider.get(), UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
-		editorContainer->add(editorUnitSlider.get(), UI.InfoPanel.X + 12 * scale_factor, UI.InfoPanel.Y + (160 - 24) * scale_factor);
-		editorContainer->add(editorSlider.get(), UI.InfoPanel.X + 12 * scale_factor, UI.InfoPanel.Y + (160 - 24) * scale_factor);
+		editorContainer->add(editorUnitSlider.get(), UI.InfoPanel.X + (12 * scale_factor).to_int(), UI.InfoPanel.Y + ((160 - 24) * scale_factor).to_int());
+		editorContainer->add(editorSlider.get(), UI.InfoPanel.X + (12 * scale_factor).to_int(), UI.InfoPanel.Y + ((160 - 24) * scale_factor).to_int());
 		//Wyrmgus end
 	}
 	//ProcessMenu("menu-editor-tips", 1);

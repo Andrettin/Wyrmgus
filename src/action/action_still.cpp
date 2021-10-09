@@ -122,9 +122,9 @@ PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos, st
 {
 	if (preferences::get()->are_pathlines_enabled()) {
 		if (this->Action == UnitAction::StandGround) {
-			Video.FillCircleClip(ColorBlack, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
+			Video.FillCircleClip(ColorBlack, lastScreenPos, (2 * defines::get()->get_scale_factor()).to_int(), render_commands);
 		} else {
-			Video.FillCircleClip(ColorGray, lastScreenPos, 2 * defines::get()->get_scale_factor(), render_commands);
+			Video.FillCircleClip(ColorGray, lastScreenPos, (2 * defines::get()->get_scale_factor()).to_int(), render_commands);
 		}
 	}
 

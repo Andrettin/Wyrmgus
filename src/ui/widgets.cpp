@@ -333,13 +333,18 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle, std::vecto
 #endif
 
 ImageWidget::ImageWidget(const std::string &image_path, const int scale_factor, const int image_width, const int image_height)
-	: ImageWidget(CGraphic::New(image_path), scale_factor, image_width, image_height)
+	: ImageWidget(CGraphic::New(image_path), decimal_int(scale_factor), image_width, image_height)
 {
 }
 
-ImageWidget::ImageWidget(const std::shared_ptr<CGraphic> &graphic, const int scale_factor, const int image_width, const int image_height) : gcn::Icon(graphic.get()), graphic(graphic)
+ImageWidget::ImageWidget(const std::string &image_path)
+	: ImageWidget(CGraphic::New(image_path), defines::get()->get_scale_factor(), -1, -1)
 {
-	this->graphic->Load(scale_factor);
+}
+
+ImageWidget::ImageWidget(const std::shared_ptr<CGraphic> &graphic, const decimal_int &scale_factor, const int image_width, const int image_height) : gcn::Icon(graphic.get()), graphic(graphic)
+{
+	this->graphic->Load(decimal_int(scale_factor));
 
 	if (image_width != -1 && image_height != -1) {
 		this->graphic->Resize(image_width, image_height);

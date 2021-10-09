@@ -135,7 +135,7 @@ PixelPos CViewport::screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPo
 // Convert map pixel coordinates into viewport coordinates
 PixelPos CViewport::map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const
 {
-	return this->scaled_map_to_screen_pixel_pos(mapPixelPos * defines::get()->get_scale_factor());
+	return this->scaled_map_to_screen_pixel_pos(QPoint(mapPixelPos) * defines::get()->get_scale_factor());
 }
 
 PixelPos CViewport::scaled_map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const

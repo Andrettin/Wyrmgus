@@ -108,7 +108,7 @@ int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *)
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	std::string draw;
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -125,7 +125,7 @@ int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *)
 	if (draw.length()) {
 		int i = 1;
 		while ((GetLineFont(i++, draw, this->MaxWidth, font)).length()) {
-			height += font->Height() + 2 * scale_factor;
+			height += font->Height() + (2 * scale_factor).to_int();
 		}
 	}
 	return height;
@@ -136,7 +136,7 @@ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const 
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string draw("");
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -158,7 +158,7 @@ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const 
 							 : 0;
 		while ((sub = GetLineFont(++i, draw, width, font)).length()) {
 			label.Draw(x, y_off, sub, render_commands);
-			y_off += font->Height() + 2 * scale_factor;
+			y_off += font->Height() + (2 * scale_factor).to_int();
 		}
 		return;
 	}
@@ -232,7 +232,7 @@ int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
 int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	button.SetTriggerData();
@@ -249,7 +249,7 @@ int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 //	while ((GetLineFont(i++, this->Text, this->MaxWidth, &font)).length()) {
 	while ((GetLineFont(i++, text, this->MaxWidth, font)).length()) {
 	//Wyrmgus end
-		height += font->Height() + 2 * scale_factor;
+		height += font->Height() + (2 * scale_factor).to_int();
 	}
 	return height;
 }
@@ -261,7 +261,7 @@ CPopupContentTypeText::~CPopupContentTypeText()
 void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	button.SetTriggerData();
@@ -284,7 +284,7 @@ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsign
 	while ((sub = GetLineFont(++i, text, width, font)).length()) {
 	//Wyrmgus end
 		label.Draw(x, y_off, sub, render_commands);
-		y_off += font->Height() + 2 * scale_factor;
+		y_off += font->Height() + (2 * scale_factor).to_int();
 	}
 }
 
@@ -314,12 +314,12 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 {
 	int popupWidth = 0;
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			if (UI.Resources[i].IconWidth != -1)	{
-				popupWidth += (UI.Resources[i].IconWidth + 5 * scale_factor);
+				popupWidth += (UI.Resources[i].IconWidth + (5 * scale_factor).to_int());
 			} else {
 				const wyrmgus::resource_icon *icon = nullptr;
 				if (i >= MaxCosts) {
@@ -342,10 +342,10 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 				}
 
 				if (icon != nullptr) {
-					popupWidth += (icon->get_graphics()->Width + 5 * scale_factor);
+					popupWidth += (icon->get_graphics()->Width + (5 * scale_factor).to_int());
 				}
 			}
-			popupWidth += (font->Width(Costs[i]) + 5 * scale_factor);
+			popupWidth += (font->Width(Costs[i]) + (5 * scale_factor).to_int());
 		}
 	}
 
@@ -356,18 +356,18 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 		if (spell->get_mana_cost()) {
 			popupWidth = 10;
 			if (UI.Resources[ManaResCost].IconWidth != -1) {
-				popupWidth += (UI.Resources[ManaResCost].IconWidth + 5 * scale_factor);
+				popupWidth += (UI.Resources[ManaResCost].IconWidth + (5 * scale_factor).to_int());
 			} else {
 				if (icon != nullptr) {
-					popupWidth += (icon->get_graphics()->Width + 5 * scale_factor);
+					popupWidth += (icon->get_graphics()->Width + (5 * scale_factor).to_int());
 				}
 			}
 			popupWidth += font->Width(spell->get_mana_cost());
-			popupWidth = std::max<int>(popupWidth, font->Width(spell->get_name()) + 10 * scale_factor);
+			popupWidth = std::max<int>(popupWidth, font->Width(spell->get_name()) + (10 * scale_factor).to_int());
 		} else {
-			popupWidth = font->Width(button.get_hint()) + 10 * scale_factor;
+			popupWidth = font->Width(button.get_hint()) + (10 * scale_factor).to_int();
 		}
-		popupWidth = std::max<int>(popupWidth, 100 * scale_factor);
+		popupWidth = std::max<int>(popupWidth, (100 * scale_factor).to_int());
 	}
 	return popupWidth;
 }
@@ -411,7 +411,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
@@ -441,13 +441,13 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 				int x_offset = UI.Resources[i].IconWidth;
 				const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
 				icon_graphics->DrawFrameClip(icon->get_frame(),	x , y, render_commands);
-				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + 5 * scale_factor);
+				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + (5 * scale_factor).to_int());
 				y_offset = icon_graphics->Height;
 				y_offset -= label.Height();
 				y_offset /= 2;
 			}
 			x += label.Draw(x, y + y_offset, Costs[i], render_commands);
-			x += 5 * scale_factor;
+			x += (5 * scale_factor).to_int();
 		}
 	}
 
@@ -458,10 +458,10 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 			int y_offset = 0;
 			if (icon != nullptr) {
 				int x_offset =  UI.Resources[ManaResCost].IconWidth;
-				x += 5 * scale_factor;
+				x += (5 * scale_factor).to_int();
 				const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
 				icon_graphics->DrawFrameClip(icon->get_frame(), x, y, render_commands);
-				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + 5 * scale_factor);
+				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + (5 * scale_factor).to_int());
 				y_offset = icon_graphics->Height;
 				y_offset -= font->Height();
 				y_offset /= 2;
@@ -858,8 +858,8 @@ std::unique_ptr<CPopupContentType> CPopupContentType::ParsePopupContent(lua_Stat
 	assert_throw(lua_istable(l, -1));
 
 	bool wrap = true;
-	int marginX = MARGIN_X * wyrmgus::defines::get()->get_scale_factor();
-	int marginY = MARGIN_Y * wyrmgus::defines::get()->get_scale_factor();
+	int marginX = (MARGIN_X * defines::get()->get_scale_factor()).to_int();
+	int marginY = (MARGIN_Y * defines::get()->get_scale_factor()).to_int();
 	int minWidth = 0;
 	int minHeight = 0;
 	std::string textColor("white");
@@ -919,7 +919,7 @@ std::unique_ptr<CPopupContentType> CPopupContentType::ParsePopupContent(lua_Stat
 }
 
 CPopup::CPopup() :
-	MarginX(MARGIN_X * wyrmgus::defines::get()->get_scale_factor()), MarginY(MARGIN_Y * wyrmgus::defines::get()->get_scale_factor()),
+	MarginX((MARGIN_X * defines::get()->get_scale_factor()).to_int()), MarginY((MARGIN_Y * defines::get()->get_scale_factor()).to_int()),
 	BackgroundColor(ColorBlue), BorderColor(ColorWhite)
 {}
 

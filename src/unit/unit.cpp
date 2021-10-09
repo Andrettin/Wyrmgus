@@ -4784,20 +4784,16 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
 
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
-	int frame_width = this->Type->get_frame_width();
-	int frame_height = this->Type->get_frame_height();
+	QSize frame_size = this->Type->get_frame_size();
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (variation != nullptr && variation->get_frame_size() != QSize(0, 0)) {
-		frame_width = variation->get_frame_size().width();
-		frame_height = variation->get_frame_size().height();
+		frame_size = variation->get_frame_size();
 	}
-	frame_width *= scale_factor;
-	frame_height *= scale_factor;
+	frame_size *= scale_factor;
 
-	int x = tilePos.x * wyrmgus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width()) / 2 + this->Type->get_offset().x() * scale_factor;
-	int y = tilePos.y * wyrmgus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->get_tile_height() * wyrmgus::defines::get()->get_scaled_tile_height()) / 2 + this->Type->get_offset().y() * scale_factor;
+	const QPoint pos = this->tilePos * defines::get()->get_scaled_tile_size() + this->get_scaled_pixel_offset() - size::to_point(frame_size - this->Type->get_tile_size() * defines::get()->get_scaled_tile_width()) / 2 + this->Type->get_offset() * scale_factor;
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(vp.MapPos) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
@@ -4805,8 +4801,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	//Wyrmgus start
 //	if (x + Type->Width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x
 //		|| y + Type->Height < vpTopLeftMapPos.y || y > vpBottomRightMapPos.y) {
-	if (x + frame_width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x
-		|| y + frame_height < vpTopLeftMapPos.y || y > vpBottomRightMapPos.y) {
+	if (pos.x() + frame_size.width() < vpTopLeftMapPos.x || pos.x() > vpBottomRightMapPos.x
+		|| pos.y() + frame_size.height() < vpTopLeftMapPos.y || pos.y() > vpBottomRightMapPos.y) {
 	//Wyrmgus end
 		return false;
 	}
@@ -5510,17 +5506,14 @@ CUnit *UnitOnScreen(int x, int y)
 		//
 		// Check if mouse is over the unit.
 		//
-		PixelPos unit_sprite_pos = unit->get_scaled_map_pixel_pos_center();
-		const int scale_factor = defines::get()->get_scale_factor();
+		QPoint unit_sprite_pos = unit->get_scaled_map_pixel_pos_center();
+		const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
-		unit_sprite_pos.x -= type.get_box_width() * scale_factor / 2;
-		unit_sprite_pos.x += type.BoxOffsetX * scale_factor;
+		unit_sprite_pos -= size::to_point(type.get_box_size()) * scale_factor / 2;
+		unit_sprite_pos += QPoint(type.BoxOffsetX, type.BoxOffsetY) * scale_factor;
 
-		unit_sprite_pos.y -= type.get_box_height() * scale_factor / 2;
-		unit_sprite_pos.y += type.BoxOffsetY * scale_factor;
-
-		if (x >= unit_sprite_pos.x && x < (unit_sprite_pos.x + type.get_box_width() * scale_factor)
-			&& y >= unit_sprite_pos.y  && y < (unit_sprite_pos.y + type.get_box_height() * scale_factor)) {
+		if (x >= unit_sprite_pos.x() && x < (unit_sprite_pos.x() + (type.get_box_width() * scale_factor).to_int())
+			&& y >= unit_sprite_pos.y() && y < (unit_sprite_pos.y() + (type.get_box_height() * scale_factor).to_int())) {
 			if (unit->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 				continue;
 			}
@@ -5576,7 +5569,7 @@ PixelPos CUnit::get_map_pixel_pos_top_left() const
 
 PixelPos CUnit::get_scaled_map_pixel_pos_top_left() const
 {
-	return this->get_map_pixel_pos_top_left() * wyrmgus::defines::get()->get_scale_factor();
+	return QPoint(this->get_map_pixel_pos_top_left()) * defines::get()->get_scale_factor();
 }
 
 PixelPos CUnit::get_map_pixel_pos_center() const
@@ -5607,7 +5600,7 @@ PixelSize CUnit::get_tile_pixel_size() const
 
 PixelSize CUnit::get_scaled_tile_pixel_size() const
 {
-	return this->get_tile_pixel_size() * defines::get()->get_scale_factor();
+	return QSize(this->get_tile_pixel_size()) * defines::get()->get_scale_factor();
 }
 
 PixelSize CUnit::get_half_tile_pixel_size() const
@@ -5617,7 +5610,7 @@ PixelSize CUnit::get_half_tile_pixel_size() const
 
 PixelSize CUnit::get_scaled_half_tile_pixel_size() const
 {
-	return this->get_half_tile_pixel_size() * defines::get()->get_scale_factor();
+	return QPoint(this->get_half_tile_pixel_size()) * defines::get()->get_scale_factor();
 }
 
 QPoint CUnit::get_bottom_right_tile_pos() const

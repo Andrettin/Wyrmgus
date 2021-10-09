@@ -42,6 +42,13 @@ void initGuichan();
 void freeGuichan();
 void handleInput(const SDL_Event *event);
 
+namespace wyrmgus {
+	template <int N>
+	class fractional_int;
+
+	using decimal_int = fractional_int<1>;
+}
+
 class LuaActionListener : public gcn::ActionListener
 {
 	LuaCallback callback;
@@ -83,8 +90,9 @@ private:
 class ImageWidget final : public gcn::Icon
 {
 public:
-	explicit ImageWidget(const std::string &image_path, const int scale_factor = 1, const int image_width = -1, const int image_height = -1);
-	explicit ImageWidget(const std::shared_ptr<CGraphic> &graphic, const int scale_factor = 1, const int image_width = -1, const int image_height = -1);
+	explicit ImageWidget(const std::string &image_path, const int scale_factor, const int image_width, const int image_height);
+	explicit ImageWidget(const std::string &image_path);
+	explicit ImageWidget(const std::shared_ptr<CGraphic> &graphic, const decimal_int &scale_factor, const int image_width, const int image_height);
 
 private:
 	std::shared_ptr<CGraphic> graphic;

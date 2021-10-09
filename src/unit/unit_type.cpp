@@ -1666,7 +1666,7 @@ PixelSize unit_type::get_tile_pixel_size() const
 
 PixelSize unit_type::get_scaled_tile_pixel_size() const
 {
-	return this->get_tile_pixel_size() * defines::get()->get_scale_factor();
+	return QSize(this->get_tile_pixel_size()) * defines::get()->get_scale_factor();
 }
 
 QPoint unit_type::get_tile_center_pos_offset() const
@@ -2701,11 +2701,10 @@ void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraph
 	
 	const player_color *player_color = CPlayer::Players[player]->get_player_color();
 
-	PixelPos pos = screenPos;
+	QPoint pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.get_offset().x() * defines::get()->get_scale_factor();
-	pos.y += type.get_offset().y() * defines::get()->get_scale_factor();
+	pos -= size::to_point(sprite->get_frame_size() - type.get_tile_size() * defines::get()->get_scaled_tile_size()) / 2;
+	pos += type.get_offset() * defines::get()->get_scale_factor();
 
 	bool flip = false;
 	if (type.Flip) {

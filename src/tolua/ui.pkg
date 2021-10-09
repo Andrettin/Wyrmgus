@@ -278,7 +278,8 @@ class ScrollArea : public BasicContainer
 
 class ImageWidget : public Widget
 {
-	ImageWidget(const std::string image_path, int scale_factor = 1, int image_width = -1, int image_height = -1);
+	ImageWidget(const std::string image_path, int scale_factor, int image_width, int image_height);
+	ImageWidget(const std::string image_path);
 };
 
 //Wyrmgus start

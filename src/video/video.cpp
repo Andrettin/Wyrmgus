@@ -289,9 +289,9 @@ void DeInitVideo()
 {
 }
 
-int get_scale_factor()
+double get_scale_factor()
 {
-	return defines::get()->get_scale_factor();
+	return defines::get()->get_scale_factor().to_double();
 }
 
 void pack_image_folder(const std::string &dir_path, const int frames_per_row)

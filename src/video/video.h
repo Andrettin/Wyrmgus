@@ -32,6 +32,7 @@
 #include "color.h"
 #include "guichan.h"
 #include "vec2i.h"
+#include "util/fractional_int.h"
 #include "video/color_modification.h"
 
 #include <QOpenGLTexture>
@@ -147,7 +148,7 @@ public:
 		return CGraphic::New(filepath.string(), size);
 	}
 
-	void Load(const int scale_factor = 1);
+	void Load(const decimal_int &scale_factor);
 	void Resize(int w, int h);
 	void SetOriginalSize();
 
@@ -400,12 +401,12 @@ private:
 	std::unique_ptr<QOpenGLTexture> texture;
 	std::unique_ptr<QOpenGLTexture> grayscale_texture;
 	std::map<color_modification, std::unique_ptr<QOpenGLTexture>> modified_textures;
-	int custom_scale_factor = 1; //the scale factor of the loaded image, if it is a custom scaled image
+	decimal_int custom_scale_factor = decimal_int(1); //the scale factor of the loaded image, if it is a custom scaled image
 	bool has_player_color_value = false;
 	std::mutex load_mutex;
 
 	friend wyrmgus::font;
-	friend int LoadGraphicPNG(CGraphic *g, const int scale_factor);
+	friend int LoadGraphicPNG(CGraphic *g, const decimal_int &scale_factor);
 };
 
 class CPlayerColorGraphic final : public CGraphic
@@ -592,7 +593,7 @@ extern void InitVideo();
 void DeInitVideo();
 
 /// Load graphic from PNG file
-extern int LoadGraphicPNG(CGraphic *g, const int scale_factor);
+extern int LoadGraphicPNG(CGraphic *g, const decimal_int &scale_factor);
 
 /// Regenerate Window screen if needed
 extern void ValidateOpenGLScreen();
@@ -647,6 +648,6 @@ extern uint32_t ColorGreen;
 extern uint32_t ColorYellow;
 
 //called by tolua++
-extern int get_scale_factor();
+extern double get_scale_factor();
 extern void pack_image_folder(const std::string &dir_path, const int frames_per_row = 5);
 extern void index_image_to_image_palette(const std::string &image_path, const std::string &other_image_path);

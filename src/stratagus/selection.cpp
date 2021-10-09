@@ -51,6 +51,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
+#include "util/size_util.h"
 
 unsigned int MaxSelectable;								/// Maximum number of selected units
 
@@ -726,19 +727,18 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 										 std::vector<CUnit *> &table)
 {
 	int n = 0;
-	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 		const wyrmgus::unit_type &type = *unit.Type;
-		PixelPos spritePos = unit.get_scaled_map_pixel_pos_center();
+		QPoint sprite_pos = unit.get_scaled_map_pixel_pos_center();
+		sprite_pos += type.get_offset() * scale_factor - (size::to_point(type.get_box_size() * scale_factor) + QPoint(type.BoxOffsetX, type.BoxOffsetY) * scale_factor) / 2;
 
-		spritePos.x += type.get_offset().x() * scale_factor - (type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor) / 2;
-		spritePos.y += type.get_offset().y() * scale_factor - (type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor) / 2;
-		if (spritePos.x + type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor < corner_topleft.x
-			|| spritePos.x > corner_bottomright.x
-			|| spritePos.y + type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor < corner_topleft.y
-			|| spritePos.y > corner_bottomright.y) {
+		if (sprite_pos.x() + (type.get_box_width() * scale_factor).to_int() + (type.BoxOffsetX * scale_factor).to_int() < corner_topleft.x
+			|| sprite_pos.x() > corner_bottomright.x
+			|| sprite_pos.y() + (type.get_box_height() * scale_factor).to_int() + (type.BoxOffsetY * scale_factor).to_int() < corner_topleft.y
+			|| sprite_pos.y() > corner_bottomright.y) {
 			continue;
 		}
 		table[n++] = &unit;

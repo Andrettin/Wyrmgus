@@ -398,6 +398,11 @@ public:
 		return res;
 	}
 
+	constexpr QPoint operator *(const QPoint &rhs) const
+	{
+		return rhs * this->get_value() / fractional_int::divisor;
+	}
+
 	constexpr QSize operator *(const QSize &rhs) const
 	{
 		return rhs * this->get_value() / fractional_int::divisor;
@@ -425,11 +430,10 @@ public:
 		return res;
 	}
 
-	friend constexpr const fractional_int<N> &operator *=(int &lhs, const fractional_int<N> &rhs)
+	friend constexpr const QSize &operator *=(QSize &lhs, const fractional_int<N> &rhs)
 	{
-		fractional_int res(rhs);
-		res *= lhs;
-		return res;
+		lhs = rhs * lhs;
+		return lhs;
 	}
 
 	friend constexpr fractional_int<N> operator -(const int lhs, const fractional_int<N> &rhs)
@@ -446,9 +450,26 @@ public:
 		return res;
 	}
 
+	friend constexpr QPoint operator *(const QPoint &lhs, const fractional_int<N> &rhs)
+	{
+		return rhs * lhs;
+	}
+
 	friend constexpr QSize operator *(const QSize &lhs, const fractional_int<N> &rhs)
 	{
 		return rhs * lhs;
+	}
+
+	friend constexpr fractional_int<N> operator /(const int lhs, const fractional_int<N> &rhs)
+	{
+		fractional_int res(lhs);
+		res /= rhs;
+		return res;
+	}
+
+	friend constexpr QPoint operator /(const QPoint &lhs, const fractional_int<N> &rhs)
+	{
+		return lhs * fractional_int<N>::divisor / rhs.get_value();
 	}
 
 private:
@@ -462,5 +483,6 @@ using decimillesimal_int = fractional_int<4>;
 
 }
 
+Q_DECLARE_METATYPE(wyrmgus::decimal_int)
 Q_DECLARE_METATYPE(wyrmgus::centesimal_int)
 Q_DECLARE_METATYPE(wyrmgus::decimillesimal_int)

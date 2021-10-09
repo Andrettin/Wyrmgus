@@ -150,9 +150,9 @@ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 
 	if (preferences::get()->are_pathlines_enabled()) {
 		Video.DrawLineClip(ColorGreen, lastScreenPos, pos1, render_commands);
-		Video.FillCircleClip(ColorBlue, pos1, 2 * defines::get()->get_scale_factor(), render_commands);
+		Video.FillCircleClip(ColorBlue, pos1, (2 * defines::get()->get_scale_factor()).to_int(), render_commands);
 		Video.DrawLineClip(ColorBlue, pos1, pos2, render_commands);
-		Video.FillCircleClip(ColorBlue, pos2, 3 * defines::get()->get_scale_factor(), render_commands);
+		Video.FillCircleClip(ColorBlue, pos2, (3 * defines::get()->get_scale_factor()).to_int(), render_commands);
 	}
 
 	return pos2;
