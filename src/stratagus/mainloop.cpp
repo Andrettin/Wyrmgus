@@ -394,7 +394,7 @@ static void GameLogicLoop()
 
 			//Wyrmgus start
 //			SaveGame(path::to_string(filepath));
-			CclCommand("if (RunSaveGame ~= nil) then RunSaveGame(\""+ string::escaped(path::to_string(filepath)) + "\") end;");
+			CclCommand("if (RunSaveGame ~= nil) then RunSaveGame(\""+ string::escaped("file:" + path::to_string(filepath)) + "\") end;");
 			//Wyrmgus end
 
 			UI.StatusLine.Set(_("Autosave"));
