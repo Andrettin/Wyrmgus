@@ -55,6 +55,7 @@ class CGraphic : public gcn::Image
 	};
 
 public:
+	static void unload_all();
 	static void free_all_textures();
 
 	static std::map<std::string, std::weak_ptr<CGraphic>> graphics_by_filepath;
@@ -149,6 +150,7 @@ public:
 	}
 
 	void Load(const centesimal_int &scale_factor);
+	void unload();
 	void Resize(int w, int h);
 	void SetOriginalSize();
 

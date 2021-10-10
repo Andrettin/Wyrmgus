@@ -733,4 +733,13 @@ void font::free_textures(std::vector<std::function<void()>> &render_commands)
 	}
 }
 
+void font::unload_graphics()
+{
+	for (const auto &kv_pair : this->font_color_graphics) {
+		std::shared_ptr<CGraphic> graphic = kv_pair.second;
+
+		graphic->unload();
+	}
+}
+
 }

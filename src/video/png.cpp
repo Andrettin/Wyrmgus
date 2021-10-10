@@ -66,7 +66,6 @@ int LoadGraphicPNG(CGraphic *g, const centesimal_int &scale_factor)
 		}
 	}
 
-	g->set_filepath(filepath);
 	g->image = QImage(path::to_qstring(filepath));
 	if (g->get_image().isNull()) {
 		throw std::runtime_error("Failed to load the \"" + filepath.string() + "\" image file.");

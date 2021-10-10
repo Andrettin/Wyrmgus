@@ -62,6 +62,23 @@
 std::map<std::string, std::weak_ptr<CGraphic>> CGraphic::graphics_by_filepath;
 std::list<CGraphic *> CGraphic::graphics;
 
+void CGraphic::unload_all()
+{
+	CGraphic::free_all_textures();
+
+	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
+
+	for (const auto &kv_pair : CGraphic::graphics_by_filepath) {
+		std::shared_ptr<CGraphic> graphic = kv_pair.second.lock();
+
+		graphic->unload();
+	}
+
+	for (font *font : font::get_all()) {
+		font->unload_graphics();
+	}
+}
+
 void CGraphic::free_all_textures()
 {
 	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
@@ -611,6 +628,25 @@ void CGraphic::Load(const centesimal_int &scale_factor)
 	}
 }
 
+void CGraphic::unload()
+{
+	std::lock_guard lock(this->load_mutex);
+
+	if (!this->IsLoaded()) {
+		return;
+	}
+
+	this->frame_map.clear();
+	this->Width = 0;
+	this->Height = 0;
+	this->image = QImage();
+	this->frame_images.clear();
+	this->grayscale_frame_images.clear();
+	this->modified_frame_images.clear();
+	this->custom_scale_factor = centesimal_int(1);
+	this->Resized = false;
+}
+
 /**
 **  Resize a graphic
 **
@@ -661,13 +697,7 @@ void CGraphic::SetOriginalSize()
 		return;
 	}
 	
-	this->frame_map.clear();
-
-	this->Width = this->Height = 0;
-	this->image = QImage();
-	this->frame_images.clear();
-	this->grayscale_frame_images.clear();
-	this->modified_frame_images.clear();
+	this->unload();
 	this->Load(centesimal_int(1));
 
 	this->Resized = false;
