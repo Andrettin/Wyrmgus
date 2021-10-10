@@ -99,7 +99,6 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::resource_icon* mana_icon MEMBER mana_icon READ get_mana_icon)
 	Q_PROPERTY(int forest_regeneration_threshold MEMBER forest_regeneration_threshold READ get_forest_regeneration_threshold)
 	Q_PROPERTY(int destroyed_overlay_terrain_decay_threshold MEMBER destroyed_overlay_terrain_decay_threshold READ get_destroyed_overlay_terrain_decay_threshold)
-	Q_PROPERTY(double scale_factor READ get_scale_factor_double NOTIFY scale_factor_changed)
 	Q_PROPERTY(int scaled_tile_width READ get_scaled_tile_width CONSTANT)
 	Q_PROPERTY(int scaled_tile_height READ get_scaled_tile_height CONSTANT)
 	Q_PROPERTY(int population_per_unit MEMBER population_per_unit READ get_population_per_unit)
@@ -108,9 +107,6 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(QStringList tips READ get_tips_qstring_list NOTIFY changed)
 
 public:
-	defines();
-	~defines();
-
 	void load(const std::filesystem::path &base_path);
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
@@ -187,11 +183,6 @@ public:
 	}
 
 	const centesimal_int &get_scale_factor() const;
-
-	double get_scale_factor_double() const
-	{
-		return this->get_scale_factor().to_double();
-	}
 
 	QSize get_scaled_tile_size() const
 	{
@@ -422,7 +413,6 @@ public:
 
 signals:
 	void changed();
-	void scale_factor_changed();
 
 private:
 	interface_style *default_interface_style = nullptr;

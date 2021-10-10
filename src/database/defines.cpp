@@ -47,15 +47,6 @@
 
 namespace wyrmgus {
 
-defines::defines()
-{
-	connect(preferences::get(), &preferences::scale_factor_changed, this, &defines::scale_factor_changed);
-}
-
-defines::~defines()
-{
-}
-
 void defines::load(const std::filesystem::path &data_path)
 {
 	std::filesystem::path defines_path(data_path / "defines.txt");
