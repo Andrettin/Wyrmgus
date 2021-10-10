@@ -436,6 +436,13 @@ public:
 		return lhs;
 	}
 
+	friend constexpr const QSize &operator /=(QSize &lhs, const fractional_int<N> &rhs)
+	{
+		lhs *= fractional_int<N>::divisor;
+		lhs /= rhs.get_value();
+		return lhs;
+	}
+
 	friend constexpr fractional_int<N> operator -(const int lhs, const fractional_int<N> &rhs)
 	{
 		fractional_int res(lhs);
@@ -468,6 +475,11 @@ public:
 	}
 
 	friend constexpr QPoint operator /(const QPoint &lhs, const fractional_int<N> &rhs)
+	{
+		return lhs * fractional_int<N>::divisor / rhs.get_value();
+	}
+
+	friend constexpr QSize operator /(const QSize &lhs, const fractional_int<N> &rhs)
 	{
 		return lhs * fractional_int<N>::divisor / rhs.get_value();
 	}

@@ -217,6 +217,11 @@ public:
 		return this->original_frame_size;
 	}
 
+	const QSize &get_loaded_frame_size() const
+	{
+		return this->loaded_frame_size;
+	}
+
 	int get_frames_per_row() const
 	{
 		return this->get_width() / this->get_frame_width();
@@ -392,6 +397,7 @@ public:
 	int Height = 0;					/// Height of a frame
 	QSize original_size = QSize(0, 0); //the unscaled size
 	QSize original_frame_size = QSize(0, 0); //the unscaled frame size
+	QSize loaded_frame_size = QSize(0, 0); //the size of the image as loaded, before being scaled
 	int NumFrames = 1;				/// Number of frames
 	int GraphicWidth = 0;			/// Original graphic width
 	int GraphicHeight = 0;			/// Original graphic height

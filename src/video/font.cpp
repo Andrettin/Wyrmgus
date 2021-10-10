@@ -622,7 +622,7 @@ void font::MeasureWidths()
 	const int maxy = image.width() / frame_size.width() * image.height() / frame_size.height();
 
 	this->char_width = std::vector<char>(maxy, 0);
-	this->char_width[0] = frame_size.width() / (2 * scale_factor).to_int();  // a reasonable value for SPACE
+	this->char_width[0] = frame_size.width() / (2 * scale_factor).to_int(); // a reasonable value for SPACE
 	const int ipr = image.width() / frame_size.width(); // images per row
 
 	for (int y = 1; y < maxy; ++y) {
@@ -671,6 +671,7 @@ void font::make_font_color_texture(const wyrmgus::font_color *fc)
 	newg->image = g.get_image();
 	newg->original_size = g.get_original_size();
 	newg->original_frame_size = g.get_original_frame_size();
+	newg->loaded_frame_size = g.get_loaded_frame_size();
 
 	for (int j = 0; j < newg->image.colorCount(); ++j) {
 		if (static_cast<size_t>(j) >= fc->get_colors().size()) {

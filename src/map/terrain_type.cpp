@@ -307,7 +307,7 @@ void terrain_type::calculate_minimap_color(const season *season)
 	int green = 0;
 	int blue = 0;
 
-	const QSize &frame_size = graphics->get_original_frame_size();
+	const QSize &frame_size = graphics->get_loaded_frame_size();
 
 	const std::set<int> solid_tile_set = container::to_set(this->get_solid_tiles());
 

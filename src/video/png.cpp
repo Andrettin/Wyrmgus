@@ -48,6 +48,10 @@ int LoadGraphicPNG(CGraphic *g, const centesimal_int &scale_factor)
 {
 	std::filesystem::path filepath = LibraryFileName(g->get_filepath().string().c_str());
 
+	//load the image without scaling to get the original size
+	g->image = QImage(path::to_qstring(filepath));
+	g->original_size = g->get_image().size();
+
 	//if the scale factor is greater than 1, see if there is a file in the same folder with e.g. the "_2x" suffix for the 2x scale factor, and if so, use that
 	centesimal_int suffix_scale_factor = scale_factor;
 
@@ -71,7 +75,10 @@ int LoadGraphicPNG(CGraphic *g, const centesimal_int &scale_factor)
 		}
 	}
 
-	g->image = QImage(path::to_qstring(filepath));
+	if (g->custom_scale_factor != 1) {
+		g->image = QImage(path::to_qstring(filepath));
+	}
+
 	if (g->get_image().isNull()) {
 		throw std::runtime_error("Failed to load the \"" + filepath.string() + "\" image file.");
 	}
@@ -93,7 +100,6 @@ int LoadGraphicPNG(CGraphic *g, const centesimal_int &scale_factor)
 
 	g->GraphicWidth = g->get_image().width();
 	g->GraphicHeight = g->get_image().height();
-	g->original_size = g->get_image().size();
 
 	return 0;
 }

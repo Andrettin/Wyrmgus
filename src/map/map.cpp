@@ -278,7 +278,7 @@ Vec2i CMap::map_pixel_pos_to_tile_pos(const PixelPos &mapPos) const
 
 Vec2i CMap::scaled_map_pixel_pos_to_tile_pos(const PixelPos &mapPos) const
 {
-	return this->map_pixel_pos_to_tile_pos(mapPos / preferences::get()->get_scale_factor());
+	return this->map_pixel_pos_to_tile_pos(QPoint(mapPos) / preferences::get()->get_scale_factor());
 }
 
 PixelPos CMap::tile_pos_to_map_pixel_pos_top_left(const Vec2i &tilePos) const

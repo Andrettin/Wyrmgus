@@ -577,17 +577,20 @@ void CGraphic::Load(const centesimal_int &scale_factor)
 		//update the frame size for the custom scale factor of the loaded image
 		this->Width = (this->Width * this->custom_scale_factor).to_int();
 		this->Height = (this->Height * this->custom_scale_factor).to_int();
-		this->original_frame_size = QSize(this->Width, this->Height);
 	}
 
 	if (!Width) {
 		Width = GraphicWidth;
-		this->original_frame_size.setWidth(Width);
 	}
 	if (!Height) {
 		Height = GraphicHeight;
-		this->original_frame_size.setHeight(Height);
 	}
+
+	if (this->original_frame_size == QSize(0, 0)) {
+		this->original_frame_size = this->get_original_size();
+	}
+
+	this->loaded_frame_size = QSize(this->Width, this->Height);
 
 	assert_throw(Width <= GraphicWidth && Height <= GraphicHeight);
 
@@ -638,8 +641,8 @@ void CGraphic::unload()
 	}
 
 	this->frame_map.clear();
-	this->Width = 0;
-	this->Height = 0;
+	this->Width = this->original_frame_size.width();
+	this->Height = this->original_frame_size.height();
 	this->image = QImage();
 	this->frame_images.clear();
 	this->grayscale_frame_images.clear();
@@ -744,7 +747,7 @@ QImage CGraphic::create_modified_image(const color_modification &color_modificat
 
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
-		image = image::scale(image, scale_factor / this->custom_scale_factor, this->get_original_frame_size());
+		image = image::scale(image, scale_factor / this->custom_scale_factor, this->get_loaded_frame_size());
 	}
 
 	if (color_modification.has_rgb_change() && !grayscale) {
@@ -795,6 +798,10 @@ const wyrmgus::player_color *CGraphic::get_conversible_player_color() const
 
 void CGraphic::create_texture(const color_modification &color_modification, const bool grayscale)
 {
+	if (!this->IsLoaded()) {
+		this->Load(preferences::get()->get_scale_factor());
+	}
+
 	QImage image = this->create_modified_image(color_modification, grayscale);
 
 	auto texture = std::make_unique<QOpenGLTexture>(image);
