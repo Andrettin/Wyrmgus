@@ -46,7 +46,7 @@ namespace wyrmgus {
 	template <int N>
 	class fractional_int;
 
-	using decimal_int = fractional_int<1>;
+	using centesimal_int = fractional_int<2>;
 }
 
 class LuaActionListener : public gcn::ActionListener
@@ -92,7 +92,7 @@ class ImageWidget final : public gcn::Icon
 public:
 	explicit ImageWidget(const std::string &image_path, const int scale_factor, const int image_width, const int image_height);
 	explicit ImageWidget(const std::string &image_path);
-	explicit ImageWidget(const std::shared_ptr<CGraphic> &graphic, const decimal_int &scale_factor, const int image_width, const int image_height);
+	explicit ImageWidget(const std::shared_ptr<CGraphic> &graphic, const centesimal_int &scale_factor, const int image_width, const int image_height);
 
 private:
 	std::shared_ptr<CGraphic> graphic;

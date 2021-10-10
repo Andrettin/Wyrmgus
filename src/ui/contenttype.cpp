@@ -369,7 +369,7 @@ void CContentTypeLifeBar::Draw(const CUnit &unit, font *, std::vector<std::funct
 	}
 	//Wyrmgus end
 
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	// Border
 	//Wyrmgus start
@@ -409,7 +409,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 		return;
 	}
 
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	int x = this->Pos.x;
 	int y = this->Pos.y;

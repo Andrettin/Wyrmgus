@@ -127,7 +127,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	//Wyrmgus start
 	const wyrmgus::unit_type &type = *unit.Type;
 	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 	QSize frame_size = type.get_frame_size() * scale_factor;
 	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
 	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
@@ -902,7 +902,7 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 static void DrawConstructionShadow(const CUnit &unit, const unit_type &type, const construction_frame *cframe, int frame, const PixelPos &screenPos, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	PixelPos pos = screenPos;
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 	const unit_type_variation *variation = unit.GetVariation();
 	if (cframe->get_image_type() != construction_image_type::construction) {
 		if (variation && variation->ShadowSprite) {
@@ -940,7 +940,7 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 							 const CUnit &unit, const unit_type &type, int frame, const PixelPos &screenPos, const time_of_day *time_of_day, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	PixelPos pos = screenPos;
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 	const player_color *player_color = CPlayer::Players[player]->get_player_color();
 
 	if (cframe->get_image_type() == construction_image_type::construction) {

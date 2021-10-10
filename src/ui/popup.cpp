@@ -108,7 +108,7 @@ int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *)
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	std::string draw;
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -136,7 +136,7 @@ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const 
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string draw("");
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -232,7 +232,7 @@ int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
 int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	button.SetTriggerData();
@@ -261,7 +261,7 @@ CPopupContentTypeText::~CPopupContentTypeText()
 void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	button.SetTriggerData();
@@ -314,7 +314,7 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 {
 	int popupWidth = 0;
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
@@ -411,7 +411,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 {
 	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {

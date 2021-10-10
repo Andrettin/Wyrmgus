@@ -57,7 +57,7 @@ static void copy_frame_data(const uint32_t *src_frame_data, uint32_t *dst_data, 
 	}
 }
 
-QImage scale(const QImage &src_image, const decimal_int &scale_factor)
+QImage scale(const QImage &src_image, const centesimal_int &scale_factor)
 {
 	if (src_image.format() != QImage::Format_RGBA8888) {
 		const QImage reformatted_src_image = src_image.convertToFormat(QImage::Format_RGBA8888);
@@ -89,7 +89,7 @@ QImage scale(const QImage &src_image, const decimal_int &scale_factor)
 	return result_image;
 }
 
-QImage scale(const QImage &src_image, const decimal_int &scale_factor, const QSize &old_frame_size)
+QImage scale(const QImage &src_image, const centesimal_int &scale_factor, const QSize &old_frame_size)
 {
 	if (src_image.format() != QImage::Format_RGBA8888) {
 		const QImage reformatted_src_image = src_image.convertToFormat(QImage::Format_RGBA8888);

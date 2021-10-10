@@ -542,7 +542,7 @@ static void ApplySepiaScale(QImage &image)
 **
 **  @param grayscale  Make a grayscale surface
 */
-void CGraphic::Load(const decimal_int &scale_factor)
+void CGraphic::Load(const centesimal_int &scale_factor)
 {
 	std::lock_guard lock(this->load_mutex);
 
@@ -668,7 +668,7 @@ void CGraphic::SetOriginalSize()
 	this->frame_images.clear();
 	this->grayscale_frame_images.clear();
 	this->modified_frame_images.clear();
-	this->Load(decimal_int(1));
+	this->Load(centesimal_int(1));
 
 	this->Resized = false;
 }
@@ -711,7 +711,7 @@ QImage CGraphic::create_modified_image(const color_modification &color_modificat
 		}
 	}
 
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
 		image = image::scale(image, scale_factor / this->custom_scale_factor, this->get_original_frame_size());
 	}
@@ -855,7 +855,7 @@ bool CFiller::OnGraphic(int x, int y) const
 {
 	x -= X;
 	y -= Y;
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 	if (x >= 0 && y >= 0 && x < this->G->get_width() && y < this->G->get_height()) {
 		return this->G->get_image().pixelColor((x / scale_factor).to_int(), (y / scale_factor).to_int()).alpha() != 0;
 	}

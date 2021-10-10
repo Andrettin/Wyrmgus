@@ -616,7 +616,7 @@ void font::MeasureWidths()
 {
 	const QImage image(path::to_qstring(this->G->get_filepath()));
 	const QSize &frame_size = G->get_original_frame_size();
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	const int maxy = image.width() / frame_size.width() * image.height() / frame_size.height();
 

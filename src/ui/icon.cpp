@@ -175,7 +175,7 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos
 	}
 	//Wyrmgus end
 
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	if (Preference.IconsShift && defines::get()->get_icon_frame_graphics() != nullptr && defines::get()->get_pressed_icon_frame_graphics() != nullptr) {

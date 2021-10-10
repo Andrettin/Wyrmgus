@@ -125,7 +125,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 {
 	// FIXME: add icon borders
 	int hBar, hAll;
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 	//Wyrmgus start
 	if (Preference.IconsShift && wyrmgus::defines::get()->get_icon_frame_graphics() != nullptr && wyrmgus::defines::get()->get_pressed_icon_frame_graphics() != nullptr) {
 //	if (Preference.IconsShift) {
@@ -1358,7 +1358,7 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 	if (show && preferences::get()->is_show_messages_enabled()) {
 		CLabel label(UI.MessageFont);
 
-		const decimal_int &scale_factor = defines::get()->get_scale_factor();
+		const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 		// background so the text is easier to read
 		if (MessagesCount) {
 			int textHeight = MessagesCount * (UI.MessageFont->Height() + (1 * scale_factor).to_int());
@@ -1826,7 +1826,7 @@ static void DrawInfoPanelBackground(unsigned frame, std::vector<std::function<vo
 
 static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	DrawInfoPanelBackground(0, render_commands);
 	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer())

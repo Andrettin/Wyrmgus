@@ -148,7 +148,7 @@ public:
 		return CGraphic::New(filepath.string(), size);
 	}
 
-	void Load(const decimal_int &scale_factor);
+	void Load(const centesimal_int &scale_factor);
 	void Resize(int w, int h);
 	void SetOriginalSize();
 
@@ -401,12 +401,12 @@ private:
 	std::unique_ptr<QOpenGLTexture> texture;
 	std::unique_ptr<QOpenGLTexture> grayscale_texture;
 	std::map<color_modification, std::unique_ptr<QOpenGLTexture>> modified_textures;
-	decimal_int custom_scale_factor = decimal_int(1); //the scale factor of the loaded image, if it is a custom scaled image
+	centesimal_int custom_scale_factor = centesimal_int(1); //the scale factor of the loaded image, if it is a custom scaled image
 	bool has_player_color_value = false;
 	std::mutex load_mutex;
 
 	friend wyrmgus::font;
-	friend int LoadGraphicPNG(CGraphic *g, const decimal_int &scale_factor);
+	friend int LoadGraphicPNG(CGraphic *g, const centesimal_int &scale_factor);
 };
 
 class CPlayerColorGraphic final : public CGraphic
@@ -593,7 +593,7 @@ extern void InitVideo();
 void DeInitVideo();
 
 /// Load graphic from PNG file
-extern int LoadGraphicPNG(CGraphic *g, const decimal_int &scale_factor);
+extern int LoadGraphicPNG(CGraphic *g, const centesimal_int &scale_factor);
 
 /// Regenerate Window screen if needed
 extern void ValidateOpenGLScreen();

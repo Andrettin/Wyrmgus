@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(scale_image_test)
 	image.fill(Qt::black);
 
 	for (int scale_factor = 2; scale_factor <= 5; ++scale_factor) {
-		const QImage scaled_image = image::scale(image, decimal_int(scale_factor));
+		const QImage scaled_image = image::scale(image, centesimal_int(scale_factor));
 
 		BOOST_CHECK(scaled_image.width() == image.width() * scale_factor);
 		BOOST_CHECK(scaled_image.height() == image.height() * scale_factor);
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(scale_frame_image_test)
 	const QSize frame_size(72, 72);
 
 	for (int scale_factor = 2; scale_factor <= 5; ++scale_factor) {
-		const QImage scaled_image = image::scale(image, decimal_int(scale_factor), frame_size);
+		const QImage scaled_image = image::scale(image, centesimal_int(scale_factor), frame_size);
 
 		BOOST_CHECK(scaled_image.width() == image.width() * scale_factor);
 		BOOST_CHECK(scaled_image.height() == image.height() * scale_factor);

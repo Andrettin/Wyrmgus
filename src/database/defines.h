@@ -185,7 +185,7 @@ public:
 		return this->resource_icon_size;
 	}
 
-	const decimal_int &get_scale_factor() const
+	const centesimal_int &get_scale_factor() const
 	{
 		return this->scale_factor;
 	}
@@ -438,7 +438,7 @@ private:
 	QSize tile_size;
 	QSize icon_size;
 	QSize resource_icon_size;
-	decimal_int scale_factor = decimal_int(1);
+	centesimal_int scale_factor = centesimal_int(1);
 	player_color *conversible_player_color = nullptr;
 	player_color *neutral_player_color = nullptr;
 	civilization *neutral_civilization = nullptr;

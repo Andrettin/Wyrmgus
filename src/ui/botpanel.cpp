@@ -779,7 +779,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 {
 	CPopup *popup = PopupByIdent(button.Popup);
 	bool useCache = false;
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	if (!popup) {
 		return;
@@ -875,7 +875,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const font_co
 {
 	wyrmgus::font *font = wyrmgus::defines::get()->get_game_font();
 	
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 	int MaxWidth = std::max((512 * scale_factor).to_int(), Video.Width / 5);
 
 	int i;

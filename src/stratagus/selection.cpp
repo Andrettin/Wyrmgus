@@ -727,7 +727,7 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 										 std::vector<CUnit *> &table)
 {
 	int n = 0;
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];

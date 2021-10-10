@@ -4784,7 +4784,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
 
-	const decimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 	QSize frame_size = this->Type->get_frame_size();
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
@@ -5507,7 +5507,7 @@ CUnit *UnitOnScreen(int x, int y)
 		// Check if mouse is over the unit.
 		//
 		QPoint unit_sprite_pos = unit->get_scaled_map_pixel_pos_center();
-		const decimal_int &scale_factor = defines::get()->get_scale_factor();
+		const centesimal_int &scale_factor = defines::get()->get_scale_factor();
 
 		unit_sprite_pos -= size::to_point(type.get_box_size()) * scale_factor / 2;
 		unit_sprite_pos += QPoint(type.BoxOffsetX, type.BoxOffsetY) * scale_factor;
