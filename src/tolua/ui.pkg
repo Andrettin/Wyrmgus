@@ -32,18 +32,7 @@ $]
 
 class CMapArea
 {
-	int X;
-	int Y;
-	int EndX;
-	int EndY;
-	int ScrollPaddingLeft;
-	int ScrollPaddingRight;
-	int ScrollPaddingTop;
-	int ScrollPaddingBottom;
-};
-
-class CViewport
-{
+	int get_bottom() const;
 };
 
 class vector
@@ -153,7 +142,6 @@ class CUserInterface
 
 	CButtonPanel ButtonPanel;
 
-	CViewport *MouseViewport;
 	CMapArea MapArea;
 
 	font *MessageFont;

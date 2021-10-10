@@ -78,6 +78,8 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::civilization* neutral_civilization MEMBER neutral_civilization READ get_neutral_civilization NOTIFY changed)
 	Q_PROPERTY(int minimap_color_index MEMBER minimap_color_index READ get_minimap_color_index)
 	Q_PROPERTY(int minimap_non_land_territory_alpha MEMBER minimap_non_land_territory_alpha READ get_minimap_non_land_territory_alpha)
+	Q_PROPERTY(int map_area_top_margin MEMBER map_area_top_margin READ get_map_area_top_margin)
+	Q_PROPERTY(int map_area_bottom_margin MEMBER map_area_bottom_margin READ get_map_area_bottom_margin)
 	Q_PROPERTY(wyrmgus::resource* time_resource MEMBER time_resource)
 	Q_PROPERTY(wyrmgus::resource* wealth_resource MEMBER wealth_resource)
 	Q_PROPERTY(wyrmgus::time_of_day* underground_time_of_day MEMBER underground_time_of_day)
@@ -222,6 +224,16 @@ public:
 	int get_minimap_non_land_territory_alpha() const
 	{
 		return this->minimap_non_land_territory_alpha;
+	}
+
+	int get_map_area_top_margin() const
+	{
+		return this->map_area_top_margin;
+	}
+
+	int get_map_area_bottom_margin() const
+	{
+		return this->map_area_bottom_margin;
 	}
 
 	const resource *get_time_resource() const
@@ -432,6 +444,8 @@ private:
 	civilization *neutral_civilization = nullptr;
 	int minimap_color_index = 0;
 	int minimap_non_land_territory_alpha = 64;
+	int map_area_top_margin = 0;
+	int map_area_bottom_margin = 0;
 	std::filesystem::path border_image_file;
 	std::shared_ptr<CPlayerColorGraphic> border_graphics;
 	QSize border_frame_size;

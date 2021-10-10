@@ -113,21 +113,33 @@ constexpr int MAX_NUM_VIEWPORTS = 8;         /// Number of supported viewports
 class CMapArea final
 {
 public:
-	CMapArea() : X(0), Y(0), EndX(0), EndY(0),
-		ScrollPaddingLeft(0), ScrollPaddingRight(0),
-		ScrollPaddingTop(0), ScrollPaddingBottom(0) {}
+	CMapArea()
+	{
+	}
 
-	bool Contains(const PixelPos &screenPos) const;
+	explicit CMapArea(const QRect &rect) : rect(rect)
+	{
+	}
 
+	bool contains(const QPoint &screen_pos) const;
+
+	const QRect &get_rect() const
+	{
+		return this->rect;
+	}
+
+	int get_bottom() const
+	{
+		return this->get_rect().bottom();
+	}
+
+private:
+	QRect rect;
 public:
-	int X;                          /// Screen pixel left corner x coordinate
-	int Y;                          /// Screen pixel upper corner y coordinate
-	int EndX;                       /// Screen pixel right x coordinate
-	int EndY;                       /// Screen pixel bottom y coordinate
-	int ScrollPaddingLeft;          /// Scrollable area past the left of map
-	int ScrollPaddingRight;         /// Scrollable area past the right of map
-	int ScrollPaddingTop;           /// Scrollable area past the top of map
-	int ScrollPaddingBottom;        /// Scrollable area past the bottom of map
+	int ScrollPaddingLeft = 0;          /// Scrollable area past the left of map
+	int ScrollPaddingRight = 0;         /// Scrollable area past the right of map
+	int ScrollPaddingTop = 0;           /// Scrollable area past the top of map
+	int ScrollPaddingBottom = 0;        /// Scrollable area past the bottom of map
 };
 
 /**

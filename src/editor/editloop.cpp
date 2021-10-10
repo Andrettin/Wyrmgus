@@ -70,6 +70,8 @@
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
 #include "util/enum_util.h"
+#include "util/log_util.h"
+#include "util/point_util.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
@@ -2175,9 +2177,13 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 
 	// Map
 	UnitUnderCursor = nullptr;
-	if (UI.MapArea.Contains(screenPos)) {
+	if (UI.MapArea.contains(screenPos)) {
 		CViewport *vp = GetViewport(screenPos);
-		assert_throw(vp != nullptr);
+
+		if (vp == nullptr) {
+			log::log_error("Screen position " + point::to_string(screenPos) + " is contained in the map area, but has no viewport.");
+		}
+
 		if (UI.MouseViewport != vp) { // viewport changed
 			UI.MouseViewport = vp;
 			DebugPrint("active viewport changed to %ld.\n" _C_

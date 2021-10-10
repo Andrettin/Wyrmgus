@@ -1325,12 +1325,13 @@ void HandleKeyRepeat(unsigned, unsigned keychar, const Qt::KeyboardModifiers key
 bool HandleMouseScrollArea(const PixelPos &mousePos)
 {
 	//Wyrmgus start
-	if (!UI.MapArea.EndX || !UI.MapArea.EndY || !UI.SelectedViewport) {
+	if (UI.MapArea.get_rect().isNull() || !UI.SelectedViewport) {
 		return false;
 	}
-	const PixelPos top_left_pos(UI.MapArea.X, UI.MapArea.Y);
+
+	const PixelPos top_left_pos = UI.MapArea.get_rect().topLeft();
 	const PixelPos top_left_map_pos = UI.SelectedViewport->screen_to_scaled_map_pixel_pos(top_left_pos);
-	const PixelPos bottom_right_pos(UI.MapArea.EndX, UI.MapArea.EndY);
+	const PixelPos bottom_right_pos = UI.MapArea.get_rect().bottomRight();
 	const PixelPos bottom_right_map_pos = UI.SelectedViewport->screen_to_scaled_map_pixel_pos(bottom_right_pos);
 //	if (mousePos.x < SCROLL_LEFT) {
 	if (mousePos.x < SCROLL_LEFT && top_left_map_pos.x > 0) {

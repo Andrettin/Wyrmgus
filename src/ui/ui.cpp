@@ -146,13 +146,27 @@ void InitUserInterface()
 {
 	ShowLoadProgress("%s", _("Loading User Interface..."));
 	
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
+	const int scaled_map_area_top_margin = (defines::get()->get_map_area_top_margin() * scale_factor).to_int();
+	const int scaled_map_area_bottom_margin = (defines::get()->get_map_area_bottom_margin() * scale_factor).to_int();
+	QRect map_area_rect(0, scaled_map_area_top_margin, Video.Width, Video.Height - scaled_map_area_top_margin - scaled_map_area_bottom_margin);
+
 	//
 	// Calculations
 	//
 	if (CMap::get()->Info->MapWidth) {
-		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::get()->Info->MapWidth * defines::get()->get_scaled_tile_width() - 1);
-		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::get()->Info->MapHeight * defines::get()->get_scaled_tile_height() - 1);
+		const QSize map_pixel_size(CMap::get()->Info->MapWidth * defines::get()->get_scaled_tile_width(), CMap::get()->Info->MapHeight * defines::get()->get_scaled_tile_height());
+
+		if (map_pixel_size.width() < map_area_rect.width()) {
+			map_area_rect.setWidth(map_pixel_size.width());
+		}
+
+		if (map_pixel_size.height() < map_area_rect.height()) {
+			map_area_rect.setHeight(map_pixel_size.height());
+		}
 	}
+
+	UI.MapArea = CMapArea(map_area_rect);
 
 	UI.SelectedViewport = UI.Viewports;
 
@@ -219,10 +233,9 @@ void CUserInterface::Load()
 }
 
 
-bool CMapArea::Contains(const PixelPos &screenPos) const
+bool CMapArea::contains(const QPoint &screen_pos) const
 {
-	return this->X <= screenPos.x && screenPos.x <= this->EndX
-		   && this->Y <= screenPos.y && screenPos.y <= this->EndY;
+	return this->rect.contains(screen_pos);
 }
 
 /**
@@ -412,8 +425,8 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	vp.BottomRightPos.x = std::min<int>(vp.BottomRightPos.x, ClipX);
 	vp.BottomRightPos.y = std::min<int>(vp.BottomRightPos.y, ClipY);
 
-	assert_throw(vp.BottomRightPos.x <= UI.MapArea.EndX);
-	assert_throw(vp.BottomRightPos.y <= UI.MapArea.EndY);
+	assert_throw(vp.BottomRightPos.x <= UI.MapArea.get_rect().right());
+	assert_throw(vp.BottomRightPos.y <= UI.MapArea.get_rect().bottom());
 }
 
 /**
@@ -430,9 +443,8 @@ static void SetViewportModeSingle()
 
 	DebugPrint("Single viewport set\n");
 
-	new_vps[0].TopLeftPos.x = UI.MapArea.X;
-	new_vps[0].TopLeftPos.y = UI.MapArea.Y;
-	ClipViewport(new_vps[0], UI.MapArea.EndX, UI.MapArea.EndY);
+	new_vps[0].TopLeftPos = UI.MapArea.get_rect().topLeft();
+	ClipViewport(new_vps[0], UI.MapArea.get_rect().right(), UI.MapArea.get_rect().bottom());
 
 	FinishViewportModeConfiguration(new_vps, 1);
 }

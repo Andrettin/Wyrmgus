@@ -74,7 +74,6 @@ bool CViewport::Contains(const PixelPos &screenPos) const
 		   && this->GetTopLeftPos().y <= screenPos.y && screenPos.y <= this->GetBottomRightPos().y;
 }
 
-
 void CViewport::Restrict(int &screenPosX, int &screenPosY) const
 {
 	screenPosX = std::clamp(screenPosX, this->GetTopLeftPos().x, this->GetBottomRightPos().x - 1);

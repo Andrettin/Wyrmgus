@@ -1220,7 +1220,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	}
 
 	//  Map
-	if (!on_ui && UI.MapArea.Contains(screenPos)) {
+	if (!on_ui && UI.MapArea.contains(screenPos)) {
 		CViewport *vp = GetViewport(screenPos);
 
 		if (vp == nullptr) {

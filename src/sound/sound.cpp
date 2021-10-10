@@ -486,8 +486,8 @@ void InitSoundClient()
 		return;
 	}
 
-	const int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + wyrmgus::defines::get()->get_scaled_tile_width()) / wyrmgus::defines::get()->get_scaled_tile_width();
-	const int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + wyrmgus::defines::get()->get_scaled_tile_height()) / wyrmgus::defines::get()->get_scaled_tile_height();
+	const int MapWidth = (UI.MapArea.get_rect().width() + defines::get()->get_scaled_tile_width()) / defines::get()->get_scaled_tile_width();
+	const int MapHeight = (UI.MapArea.get_rect().height() + defines::get()->get_scaled_tile_height()) / defines::get()->get_scaled_tile_height();
 	DistanceSilent = 3 * std::max<int>(MapWidth, MapHeight);
 	ViewPointOffset = std::max<int>(MapWidth / 2, MapHeight / 2);
 }

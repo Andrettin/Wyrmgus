@@ -1365,20 +1365,20 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 			uint32_t color = CVideo::MapRGB(38, 38, 78);
 			//Wyrmgus start
 			/*
-			Video.FillTransRectangleClip(color, UI.MapArea.X + 7, UI.MapArea.Y + 7,
-										 UI.MapArea.EndX - UI.MapArea.X - 16,
+			Video.FillTransRectangleClip(color, UI.MapArea.get_rect().x() + 7, UI.MapArea.get_rect().y() + 7,
+										 UI.MapArea.EndX - UI.MapArea.get_rect().x() - 16,
 										 textHeight - MessagesScrollY + 1, 0x80);
 
-			Video.DrawRectangle(color, UI.MapArea.X + 6, UI.MapArea.Y + 6,
-								UI.MapArea.EndX - UI.MapArea.X - 15,
+			Video.DrawRectangle(color, UI.MapArea.get_rect().x() + 6, UI.MapArea.get_rect().y() + 6,
+								UI.MapArea.EndX - UI.MapArea.get_rect().x() - 15,
 								textHeight - MessagesScrollY + 2);
 			*/
-			Video.FillTransRectangleClip(color, UI.MapArea.X + (6 * scale_factor).to_int() + 1, UI.MapArea.EndY + ((-16 - 2) * scale_factor).to_int() + 1 - textHeight + MessagesScrollY,
-				UI.MapArea.EndX - UI.MapArea.X - (16 * scale_factor).to_int(),
+			Video.FillTransRectangleClip(color, UI.MapArea.get_rect().x() + (6 * scale_factor).to_int() + 1, UI.MapArea.get_rect().bottom() + ((-16 - 2) * scale_factor).to_int() + 1 - textHeight + MessagesScrollY,
+				UI.MapArea.get_rect().right() - UI.MapArea.get_rect().x() - (16 * scale_factor).to_int(),
 				textHeight + (1 * scale_factor).to_int(), 0x80, render_commands);
 
-			Video.DrawRectangle(color, UI.MapArea.X + (6 * scale_factor).to_int(), UI.MapArea.EndY + ((-16 - 2) * scale_factor).to_int() - textHeight + MessagesScrollY,
-				UI.MapArea.EndX - UI.MapArea.X - (15 * scale_factor).to_int(),
+			Video.DrawRectangle(color, UI.MapArea.get_rect().x() + (6 * scale_factor).to_int(), UI.MapArea.get_rect().bottom() + ((-16 - 2) * scale_factor).to_int() - textHeight + MessagesScrollY,
+				UI.MapArea.get_rect().right() - UI.MapArea.get_rect().x() - (15 * scale_factor).to_int(),
 				textHeight + (2 * scale_factor).to_int(), render_commands);
 			//Wyrmgus end
 		}
@@ -1388,9 +1388,9 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 			if (z == 0) {
 				PushClipping();
 				//Wyrmgus start
-//					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
+//					SetClipping(UI.MapArea.get_rect().x() + 8, UI.MapArea.get_rect().y() + 8, Video.Width - 1,
 //								Video.Height - 1);
-				SetClipping(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int(), Video.Width - 1, UI.MapArea.EndY - (16 * scale_factor).to_int());
+				SetClipping(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int(), Video.Width - 1, UI.MapArea.get_rect().bottom() - (16 * scale_factor).to_int());
 				//Wyrmgus end
 			}
 			/*
@@ -1398,11 +1398,11 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 			 * std::string(Messages[z]) creation because
 			 * char * pointer may change during text drawing.
 			 */
-			label.DrawClip(UI.MapArea.X + (8 * scale_factor).to_int(),
+			label.DrawClip(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(),
 				//Wyrmgus start
-//							   UI.MapArea.Y + 8 +
+//							   UI.MapArea.get_rect().y() + 8 +
 //							   z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
-UI.MapArea.EndY - (16 * scale_factor).to_int() - (UI.MessageFont->Height() + (1 * scale_factor).to_int()) +
+UI.MapArea.get_rect().bottom() - (16 * scale_factor).to_int() - (UI.MessageFont->Height() + (1 * scale_factor).to_int()) +
 (z * -1) * (UI.MessageFont->Height() + (1 * scale_factor).to_int()) + MessagesScrollY,
 //Wyrmgus end
 std::string(Messages[z]), render_commands);
@@ -1418,14 +1418,14 @@ std::string(Messages[z]), render_commands);
 		for (int i = 0; i < ObjectivesCount; ++i, ++z) {
 			if (z == 0) {
 				PushClipping();
-				SetClipping(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int(), Video.Width - 1, Video.Height - 1);
+				SetClipping(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int(), Video.Width - 1, Video.Height - 1);
 			}
 			/*
 			 * Due parallel drawing we have to force message copy due temp
 			 * std::string(Objectives[i]) creation because
 			 * char * pointer may change during text drawing.
 			 */
-			label.DrawClip(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), std::string(_(Objectives[i])), render_commands);
+			label.DrawClip(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), std::string(_(Objectives[i])), render_commands);
 			if (z == 0) {
 				PopClipping();
 			}
@@ -1434,9 +1434,9 @@ std::string(Messages[z]), render_commands);
 		for (const wyrmgus::quest *quest : CPlayer::GetThisPlayer()->get_current_quests()) {
 			if (z == 0) {
 				PushClipping();
-				SetClipping(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int(), Video.Width - 1, Video.Height - 1);
+				SetClipping(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int(), Video.Width - 1, Video.Height - 1);
 			}
-			label.DrawClip(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), std::string(_(quest->get_name().c_str())), render_commands);
+			label.DrawClip(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), std::string(_(quest->get_name().c_str())), render_commands);
 			if (z == 0) {
 				PopClipping();
 			}
@@ -1459,11 +1459,11 @@ std::string(Messages[z]), render_commands);
 					objective_string += " (" + std::to_string(objective->get_counter()) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
 				}
 
-				label.DrawClip(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), objective_string, render_commands);
+				label.DrawClip(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), objective_string, render_commands);
 				++z;
 			}
 			for (const std::string &objective_string : quest->get_objective_strings()) {
-				label.DrawClip(UI.MapArea.X + (8 * scale_factor).to_int(), UI.MapArea.Y + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), "- " + std::string(_(objective_string.c_str())), render_commands);
+				label.DrawClip(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), "- " + std::string(_(objective_string.c_str())), render_commands);
 				++z;
 			}
 		}
@@ -1515,7 +1515,7 @@ void MessagesDisplay::AddMessage(const char *msg)
 		next = ptr = message + strlen(message);
 	}
 
-	while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
+	while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.get_rect().width()) {
 		while (1) {
 			--ptr;
 			if (*ptr == ' ') {
@@ -1529,7 +1529,7 @@ void MessagesDisplay::AddMessage(const char *msg)
 		// No space found, wrap in the middle of a word
 		if (ptr == message) {
 			ptr = next - 1;
-			while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
+			while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.get_rect().width()) {
 				*--ptr = '\0';
 			}
 			next = ptr + 1;
@@ -1595,7 +1595,7 @@ void MessagesDisplay::AddObjective(const char *msg)
 		next = ptr = message + strlen(message);
 	}
 
-	while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
+	while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.get_rect().width()) {
 		while (1) {
 			--ptr;
 			if (*ptr == ' ') {
@@ -1609,7 +1609,7 @@ void MessagesDisplay::AddObjective(const char *msg)
 		// No space found, wrap in the middle of a word
 		if (ptr == message) {
 			ptr = next - 1;
-			while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
+			while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.get_rect().width()) {
 				*--ptr = '\0';
 			}
 			next = ptr + 1;
