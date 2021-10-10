@@ -69,11 +69,17 @@ QImage scale(const QImage &src_image, const decimal_int &scale_factor)
 		scale_multiplier += 1;
 	}
 
-	QImage result_image(src_image.size() * scale_multiplier, QImage::Format_RGBA8888);
+	QImage result_image;
 
-	const unsigned char *src_data = src_image.constBits();
-	unsigned char *dst_data = result_image.bits();
-	xbrz::scale(scale_multiplier, reinterpret_cast<const uint32_t *>(src_data), reinterpret_cast<uint32_t *>(dst_data), src_image.width(), src_image.height());
+	if (scale_multiplier > 1) {
+		result_image = QImage(src_image.size() * scale_multiplier, QImage::Format_RGBA8888);
+		const unsigned char *src_data = src_image.constBits();
+		unsigned char *dst_data = result_image.bits();
+
+		xbrz::scale(scale_multiplier, reinterpret_cast<const uint32_t *>(src_data), reinterpret_cast<uint32_t *>(dst_data), src_image.width(), src_image.height());
+	} else {
+		result_image = src_image;
+	}
 
 	if (scale_factor.get_fractional_value() != 0) {
 		const QSize scaled_size = src_image.size() * scale_factor;

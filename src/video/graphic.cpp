@@ -713,7 +713,7 @@ QImage CGraphic::create_modified_image(const color_modification &color_modificat
 
 	const decimal_int &scale_factor = defines::get()->get_scale_factor();
 	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
-		image = image::scale(image, decimal_int(scale_factor), this->get_original_frame_size());
+		image = image::scale(image, scale_factor / this->custom_scale_factor, this->get_original_frame_size());
 	}
 
 	if (color_modification.has_rgb_change() && !grayscale) {

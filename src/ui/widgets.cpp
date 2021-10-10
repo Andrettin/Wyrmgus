@@ -344,7 +344,7 @@ ImageWidget::ImageWidget(const std::string &image_path)
 
 ImageWidget::ImageWidget(const std::shared_ptr<CGraphic> &graphic, const decimal_int &scale_factor, const int image_width, const int image_height) : gcn::Icon(graphic.get()), graphic(graphic)
 {
-	this->graphic->Load(decimal_int(scale_factor));
+	this->graphic->Load(scale_factor);
 
 	if (image_width != -1 && image_height != -1) {
 		this->graphic->Resize(image_width, image_height);
