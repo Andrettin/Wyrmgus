@@ -99,7 +99,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::resource_icon* mana_icon MEMBER mana_icon READ get_mana_icon)
 	Q_PROPERTY(int forest_regeneration_threshold MEMBER forest_regeneration_threshold READ get_forest_regeneration_threshold)
 	Q_PROPERTY(int destroyed_overlay_terrain_decay_threshold MEMBER destroyed_overlay_terrain_decay_threshold READ get_destroyed_overlay_terrain_decay_threshold)
-	Q_PROPERTY(double scale_factor READ get_scale_factor_double CONSTANT)
+	Q_PROPERTY(double scale_factor READ get_scale_factor_double NOTIFY scale_factor_changed)
 	Q_PROPERTY(int scaled_tile_width READ get_scaled_tile_width CONSTANT)
 	Q_PROPERTY(int scaled_tile_height READ get_scaled_tile_height CONSTANT)
 	Q_PROPERTY(int population_per_unit MEMBER population_per_unit READ get_population_per_unit)
@@ -108,6 +108,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(QStringList tips READ get_tips_qstring_list NOTIFY changed)
 
 public:
+	defines();
 	~defines();
 
 	void load(const std::filesystem::path &base_path);
@@ -185,14 +186,11 @@ public:
 		return this->resource_icon_size;
 	}
 
-	const centesimal_int &get_scale_factor() const
-	{
-		return this->scale_factor;
-	}
+	const centesimal_int &get_scale_factor() const;
 
 	double get_scale_factor_double() const
 	{
-		return this->scale_factor.to_double();
+		return this->get_scale_factor().to_double();
 	}
 
 	QSize get_scaled_tile_size() const
@@ -424,6 +422,7 @@ public:
 
 signals:
 	void changed();
+	void scale_factor_changed();
 
 private:
 	interface_style *default_interface_style = nullptr;
@@ -438,7 +437,6 @@ private:
 	QSize tile_size;
 	QSize icon_size;
 	QSize resource_icon_size;
-	centesimal_int scale_factor = centesimal_int(1);
 	player_color *conversible_player_color = nullptr;
 	player_color *neutral_player_color = nullptr;
 	civilization *neutral_civilization = nullptr;

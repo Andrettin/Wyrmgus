@@ -70,6 +70,7 @@ namespace wyrmgus {
 
 engine_interface::engine_interface()
 {
+	connect(preferences::get(), &preferences::scale_factor_changed, this, &engine_interface::scale_factor_changed);
 }
 
 engine_interface::~engine_interface()
@@ -131,6 +132,11 @@ void engine_interface::post(const std::function<void()> &function)
 {
 	std::lock_guard lock(this->command_mutex);
 	this->posted_commands.push(function);
+}
+
+double engine_interface::get_scale_factor() const
+{
+	return preferences::get()->get_scale_factor().to_double();
 }
 
 QString engine_interface::get_save_path() const

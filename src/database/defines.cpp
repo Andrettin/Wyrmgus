@@ -47,17 +47,17 @@
 
 namespace wyrmgus {
 
+defines::defines()
+{
+	connect(preferences::get(), &preferences::scale_factor_changed, this, &defines::scale_factor_changed);
+}
+
 defines::~defines()
 {
 }
 
 void defines::load(const std::filesystem::path &data_path)
 {
-	//set the scale factor to that of the preferences on load
-	if (preferences::get()->get_scale_factor() != this->get_scale_factor()) {
-		this->scale_factor = preferences::get()->get_scale_factor();
-	}
-
 	std::filesystem::path defines_path(data_path / "defines.txt");
 
 	if (!std::filesystem::exists(defines_path)) {
@@ -161,6 +161,11 @@ void defines::initialize()
 	if (this->get_population_per_unit() == 0) {
 		throw std::runtime_error("No population per unit set in the defines.");
 	}
+}
+
+const centesimal_int &defines::get_scale_factor() const
+{
+	return preferences::get()->get_scale_factor();
 }
 
 void defines::set_border_image_file(const std::filesystem::path &filepath)

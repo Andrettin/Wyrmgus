@@ -35,6 +35,7 @@
 #include "game/difficulty.h"
 #include "sound/music_player.h"
 #include "sound/sound_server.h"
+#include "ui/cursor.h"
 #include "ui/hotkey_setup.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
@@ -133,6 +134,20 @@ void preferences::initialize()
 	}
 
 	this->update_video_sync_speed();
+}
+
+void preferences::set_scale_factor(const centesimal_int &factor)
+{
+	if (factor == this->get_scale_factor()) {
+		return;
+	}
+
+	this->scale_factor = factor;
+
+	CGraphic::unload_all();
+	cursor::on_current_cursor_changed();
+
+	emit scale_factor_changed();
 }
 
 void preferences::update_video_sync_speed()

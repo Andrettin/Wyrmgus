@@ -84,15 +84,7 @@ public:
 		return this->scale_factor;
 	}
 
-	void set_scale_factor(const centesimal_int &factor)
-	{
-		if (factor == this->get_scale_factor()) {
-			return;
-		}
-
-		this->scale_factor = factor;
-		emit scale_factor_changed();
-	}
+	void set_scale_factor(const centesimal_int &factor);
 
 	QString get_scale_factor_qstring() const
 	{

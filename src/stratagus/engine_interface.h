@@ -58,6 +58,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(CEditor* map_editor READ get_map_editor CONSTANT)
 	Q_PROPERTY(wyrmgus::network_manager* network_manager READ get_network_manager CONSTANT)
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
+	Q_PROPERTY(double scale_factor READ get_scale_factor NOTIFY scale_factor_changed)
 	Q_PROPERTY(QString save_path READ get_save_path CONSTANT)
 	Q_PROPERTY(QString user_maps_path READ get_user_maps_path CONSTANT)
 	Q_PROPERTY(QString loading_message READ get_loading_message NOTIFY loading_message_changed)
@@ -124,6 +125,8 @@ public:
 
 		emit running_changed();
 	}
+
+	double get_scale_factor() const;
 
 	QString get_save_path() const;
 	QString get_user_maps_path() const;
@@ -265,6 +268,7 @@ public:
 
 signals:
 	void running_changed();
+	void scale_factor_changed();
 	void loading_message_changed();
 	void encyclopediaEntryOpened(QString link);
 	void custom_heroes_changed();
