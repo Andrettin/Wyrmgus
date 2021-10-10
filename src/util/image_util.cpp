@@ -83,7 +83,7 @@ QImage scale(const QImage &src_image, const centesimal_int &scale_factor)
 
 	if (scale_factor.get_fractional_value() != 0) {
 		const QSize scaled_size = src_image.size() * scale_factor;
-		result_image = result_image.scaled(scaled_size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		result_image = result_image.scaled(scaled_size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation).convertToFormat(QImage::Format_RGBA8888);
 	}
 
 	return result_image;
