@@ -66,7 +66,11 @@ QImage scale(const QImage &src_image, const centesimal_int &scale_factor)
 
 	int scale_multiplier = scale_factor.to_int();
 	if (scale_factor.get_fractional_value() != 0) {
-		scale_multiplier += 1;
+		if (scale_factor.get_fractional_value() == 50) {
+			scale_multiplier = (scale_factor * 2).to_int();
+		} else {
+			scale_multiplier += 1;
+		}
 	}
 
 	QImage result_image;

@@ -50,6 +50,11 @@ int LoadGraphicPNG(CGraphic *g, const centesimal_int &scale_factor)
 
 	//if the scale factor is greater than 1, see if there is a file in the same folder with e.g. the "_2x" suffix for the 2x scale factor, and if so, use that
 	centesimal_int suffix_scale_factor = scale_factor;
+
+	if (suffix_scale_factor.get_fractional_value() == 50) {
+		suffix_scale_factor *= 2;
+	}
+
 	while (suffix_scale_factor > 1) {
 		std::filesystem::path scale_suffix_filepath = filepath;
 		scale_suffix_filepath.replace_filename(filepath.stem().string() + "_" + suffix_scale_factor.to_string() + "x" + filepath.extension().string());
@@ -59,7 +64,7 @@ int LoadGraphicPNG(CGraphic *g, const centesimal_int &scale_factor)
 			break;
 		}
 
-		if (suffix_scale_factor.get_fractional_value() != 0) {
+		if (suffix_scale_factor.get_fractional_value() != 0 && scale_factor.get_fractional_value() != 50) {
 			suffix_scale_factor = centesimal_int(suffix_scale_factor.to_int() + 1);
 		} else {
 			suffix_scale_factor /= 2;
