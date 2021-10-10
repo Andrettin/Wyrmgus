@@ -76,6 +76,7 @@
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
 #include "util/log_util.h"
+#include "util/point_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
 #include "video/video.h"
@@ -1221,7 +1222,11 @@ static void HandleMouseOn(const PixelPos screenPos)
 	//  Map
 	if (!on_ui && UI.MapArea.Contains(screenPos)) {
 		CViewport *vp = GetViewport(screenPos);
-		assert_throw(vp != nullptr);
+
+		if (vp == nullptr) {
+			log::log_error("Screen position " + point::to_string(screenPos) + " is contained in the map area, but has no viewport.");
+		}
+
 		// viewport changed
 		if (UI.MouseViewport != vp) {
 			UI.MouseViewport = vp;
@@ -1316,7 +1321,7 @@ void MouseScrollMap(const PixelPos &pos, const Qt::KeyboardModifiers key_modifie
 static void handle_mouse_move_on_map(const PixelPos &cursor_pos, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (UI.MouseViewport == nullptr) {
-		wyrmgus::log::log_error("Mouse viewport pointer is null.");
+		log::log_error("Mouse viewport pointer is null.");
 		return;
 	}
 
