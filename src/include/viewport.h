@@ -99,13 +99,48 @@ public:
 	/// Check if any part of an area is visible in viewport
 	bool AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const;
 
-	bool Contains(const PixelPos &screenPos) const;
+	bool contains(const QPoint &screen_pos) const
+	{
+		return this->rect.contains(screen_pos);
+	}
 
 	void Restrict(int &screenPosX, int &screenPosY) const;
 
-	PixelSize GetPixelSize() const;
-	const PixelPos &GetTopLeftPos() const { return TopLeftPos;}
-	const PixelPos &GetBottomRightPos() const { return BottomRightPos;}
+	const QRect &get_rect() const
+	{
+		return this->rect;
+	}
+
+	void set_rect(const QRect &rect)
+	{
+		this->rect = rect;
+	}
+
+	QSize get_pixel_size() const
+	{
+		return this->rect.size();
+	}
+
+	QPoint get_top_left_pos() const
+	{
+		return this->rect.topLeft();
+	}
+
+	void set_top_left_pos(const QPoint &top_left_pos)
+	{
+		this->rect.setTopLeft(top_left_pos);
+	}
+
+	QPoint get_bottom_right_pos() const
+	{
+		return this->rect.bottomRight();
+	}
+
+	void set_bottom_right_pos(const QPoint &bottom_right_pos)
+	{
+		this->rect.setBottomRight(bottom_right_pos);
+	}
+
 private:
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const PixelPos &mapPixelPos);
@@ -120,9 +155,8 @@ private:
 	void draw_map(std::vector<std::function<void(renderer *)>> &render_commands) const;
 	void draw_map_fog_of_war(std::vector<std::function<void(renderer *)>> &render_commands) const;
 
-public:
-	PixelPos TopLeftPos;      /// Screen pixel top-left corner
-	PixelPos BottomRightPos;  /// Screen pixel bottom-right corner
+private:
+	QRect rect; //screen rectangle area, in pixels
 
 public:
 	Vec2i MapPos;             /// Map tile left-upper corner

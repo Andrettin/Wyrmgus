@@ -955,14 +955,14 @@ void CViewport::draw_map_fog_of_war(std::vector<std::function<void(renderer *)>>
 		}
 		my_index += UI.CurrentMapLayer->get_width();
 	}
-	ex = this->BottomRightPos.x;
+	ex = this->get_bottom_right_pos().x();
 	int sy = MapPos.y * UI.CurrentMapLayer->get_width();
-	int dy = this->TopLeftPos.y - Offset.y;
-	ey = this->BottomRightPos.y;
+	int dy = this->get_top_left_pos().y() - Offset.y;
+	ey = this->get_bottom_right_pos().y();
 
 	while (dy <= ey) {
 		sx = MapPos.x + sy;
-		int dx = this->TopLeftPos.x - Offset.x;
+		int dx = this->get_top_left_pos().x() - Offset.x;
 		while (dx <= ex) {
 			//Wyrmgus start
 //			if (VisibleTable[sx]) {

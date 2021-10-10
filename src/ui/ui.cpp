@@ -343,7 +343,7 @@ void FreeButtonStyles()
 CViewport *GetViewport(const PixelPos &screenPos)
 {
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
-		if (vp->Contains(screenPos)) {
+		if (vp->contains(screenPos)) {
 			return vp;
 		}
 	}
@@ -367,9 +367,9 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 	for (int i = 0; i < num_vps; ++i) {
 		new_vps[i].MapPos.x = 0;
 		new_vps[i].MapPos.y = 0;
-		const CViewport *vp = GetViewport(new_vps[i].GetTopLeftPos());
+		const CViewport *vp = GetViewport(new_vps[i].get_top_left_pos());
 		if (vp) {
-			const PixelDiff relDiff = new_vps[i].GetTopLeftPos() - vp->GetTopLeftPos();
+			const PixelDiff relDiff = new_vps[i].get_top_left_pos() - vp->get_top_left_pos();
 
 			new_vps[i].Offset = relDiff + CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(vp->MapPos) + vp->Offset;
 		} else {
@@ -382,10 +382,10 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 	for (int i = 0; i < num_vps; ++i) {
 		CViewport &vp = UI.Viewports[i];
 
-		vp.TopLeftPos = new_vps[i].TopLeftPos;
-		vp.BottomRightPos = new_vps[i].BottomRightPos;
+		vp.set_rect(new_vps[i].get_rect());
 		vp.Set(new_vps[i].MapPos, new_vps[i].Offset);
 	}
+
 	UI.NumViewports = num_vps;
 
 	//
@@ -417,16 +417,18 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	//Wyrmgus start
 //	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * defines::get()->get_scaled_tile_width() - 1;
 //	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * defines::get()->get_scaled_tile_height() - 1;
-	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * defines::get()->get_scaled_tile_width() - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * defines::get()->get_scaled_tile_height() - 1;
+	int right = vp.get_top_left_pos().x() + (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * defines::get()->get_scaled_tile_width() - 1;
+	int bottom = vp.get_top_left_pos().y() + (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * defines::get()->get_scaled_tile_height() - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary
-	vp.BottomRightPos.x = std::min<int>(vp.BottomRightPos.x, ClipX);
-	vp.BottomRightPos.y = std::min<int>(vp.BottomRightPos.y, ClipY);
+	right = std::min<int>(right, ClipX);
+	bottom = std::min<int>(bottom, ClipY);
 
-	assert_throw(vp.BottomRightPos.x <= UI.MapArea.get_rect().right());
-	assert_throw(vp.BottomRightPos.y <= UI.MapArea.get_rect().bottom());
+	assert_throw(right <= UI.MapArea.get_rect().right());
+	assert_throw(bottom <= UI.MapArea.get_rect().bottom());
+
+	vp.set_bottom_right_pos(QPoint(right, bottom));
 }
 
 /**
@@ -443,7 +445,7 @@ static void SetViewportModeSingle()
 
 	DebugPrint("Single viewport set\n");
 
-	new_vps[0].TopLeftPos = UI.MapArea.get_rect().topLeft();
+	new_vps[0].set_top_left_pos(UI.MapArea.get_rect().topLeft());
 	ClipViewport(new_vps[0], UI.MapArea.get_rect().right(), UI.MapArea.get_rect().bottom());
 
 	FinishViewportModeConfiguration(new_vps, 1);

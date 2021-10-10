@@ -4795,9 +4795,9 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	frame_size *= scale_factor;
 
 	const QPoint pos = this->tilePos * defines::get()->get_scaled_tile_size() + this->get_scaled_pixel_offset() - size::to_point(frame_size - this->Type->get_tile_size() * defines::get()->get_scaled_tile_width()) / 2 + this->Type->get_offset() * scale_factor;
-	const PixelSize vpSize = vp.GetPixelSize();
+	const QSize vp_size = vp.get_pixel_size();
 	const PixelPos vpTopLeftMapPos = CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(vp.MapPos) + vp.Offset;
-	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
+	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vp_size;
 
 	//Wyrmgus start
 //	if (x + Type->Width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x

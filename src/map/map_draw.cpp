@@ -58,8 +58,6 @@
 
 CViewport::CViewport()
 {
-	this->TopLeftPos.x = this->TopLeftPos.y = 0;
-	this->BottomRightPos.x = this->BottomRightPos.y = 0;
 	this->MapPos.x = this->MapPos.y = 0;
 	this->Offset.x = this->Offset.y = 0;
 }
@@ -68,26 +66,15 @@ CViewport::~CViewport()
 {
 }
 
-bool CViewport::Contains(const PixelPos &screenPos) const
-{
-	return this->GetTopLeftPos().x <= screenPos.x && screenPos.x <= this->GetBottomRightPos().x
-		   && this->GetTopLeftPos().y <= screenPos.y && screenPos.y <= this->GetBottomRightPos().y;
-}
-
 void CViewport::Restrict(int &screenPosX, int &screenPosY) const
 {
-	screenPosX = std::clamp(screenPosX, this->GetTopLeftPos().x, this->GetBottomRightPos().x - 1);
-	screenPosY = std::clamp(screenPosY, this->GetTopLeftPos().y, this->GetBottomRightPos().y - 1);
-}
-
-PixelSize CViewport::GetPixelSize() const
-{
-	return this->BottomRightPos - this->TopLeftPos;
+	screenPosX = std::clamp(screenPosX, this->get_top_left_pos().x(), this->get_bottom_right_pos().x() - 1);
+	screenPosY = std::clamp(screenPosY, this->get_top_left_pos().y(), this->get_bottom_right_pos().y() - 1);
 }
 
 void CViewport::SetClipping() const
 {
-	::SetClipping(this->TopLeftPos.x, this->TopLeftPos.y, this->BottomRightPos.x, this->BottomRightPos.y);
+	::SetClipping(this->get_top_left_pos().x(), this->get_top_left_pos().y(), this->get_bottom_right_pos().x(), this->get_bottom_right_pos().y());
 }
 
 /**
@@ -126,7 +113,7 @@ PixelPos CViewport::screen_to_map_pixel_pos(const PixelPos &screenPixelPos) cons
 
 PixelPos CViewport::screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPos) const
 {
-	const PixelDiff relPos = screenPixelPos - this->TopLeftPos + this->Offset;
+	const PixelDiff relPos = screenPixelPos - this->get_top_left_pos() + this->Offset;
 	const PixelPos mapPixelPos = relPos + CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(this->MapPos);
 
 	return mapPixelPos;
@@ -142,7 +129,7 @@ PixelPos CViewport::scaled_map_to_screen_pixel_pos(const PixelPos &mapPixelPos) 
 {
 	const PixelDiff relPos = mapPixelPos - CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(this->MapPos);
 
-	return this->TopLeftPos + relPos - this->Offset;
+	return this->get_top_left_pos() + relPos - this->Offset;
 }
 
 /// convert screen coordinate into tilepos
@@ -173,7 +160,7 @@ PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 /// convert tilepos coordonates into screen (take the center of the tile)
 QPoint CViewport::screen_center_to_tile_pos() const
 {
-	return this->ScreenToTilePos(this->TopLeftPos + this->GetPixelSize() / 2);
+	return this->ScreenToTilePos(this->get_top_left_pos() + size::to_point(this->get_pixel_size()) / 2);
 }
 
 /**
@@ -190,10 +177,10 @@ void CViewport::Set(const PixelPos &mapPos)
 	x = std::max(x, -UI.MapArea.ScrollPaddingLeft);
 	y = std::max(y, -UI.MapArea.ScrollPaddingTop);
 
-	const PixelSize pixelSize = this->GetPixelSize();
+	const QSize pixel_size = this->get_pixel_size();
 
-	x = std::min(x, (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * defines::get()->get_scaled_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * defines::get()->get_scaled_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * defines::get()->get_scaled_tile_width() - (pixel_size.width()) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * defines::get()->get_scaled_tile_height() - (pixel_size.height()) - 1 + UI.MapArea.ScrollPaddingBottom);
 
 	this->MapPos.x = x / defines::get()->get_scaled_tile_width();
 	if (x < 0 && x % defines::get()->get_scaled_tile_width()) {
@@ -211,8 +198,8 @@ void CViewport::Set(const PixelPos &mapPos)
 	if (this->Offset.y < 0) {
 		this->Offset.y += defines::get()->get_scaled_tile_height();
 	}
-	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / defines::get()->get_scaled_tile_width() + 1;
-	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / defines::get()->get_scaled_tile_height() + 1;
+	this->MapWidth = (pixel_size.width() + this->Offset.x - 1) / defines::get()->get_scaled_tile_width() + 1;
+	this->MapHeight = (pixel_size.height() + this->Offset.y - 1) / defines::get()->get_scaled_tile_height() + 1;
 }
 
 /**
@@ -235,16 +222,16 @@ void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
 */
 void CViewport::Center(const PixelPos &mapPixelPos)
 {
-	this->Set(mapPixelPos - this->GetPixelSize() / 2);
+	this->Set(mapPixelPos - this->get_pixel_size() / 2);
 }
 
 template <typename function_type>
 void CViewport::for_each_map_tile(const function_type &function) const
 {
-	const int ex = this->BottomRightPos.x;
-	const int ey = this->BottomRightPos.y;
+	const int ex = this->get_bottom_right_pos().x();
+	const int ey = this->get_bottom_right_pos().y();
 	int sy = this->MapPos.y;
-	int dy = this->TopLeftPos.y - this->Offset.y;
+	int dy = this->get_top_left_pos().y() - this->Offset.y;
 	const int map_max = UI.CurrentMapLayer->get_width() * UI.CurrentMapLayer->get_height();
 
 	while (sy < 0) {
@@ -255,7 +242,7 @@ void CViewport::for_each_map_tile(const function_type &function) const
 
 	while (dy <= ey && sy < map_max) {
 		int sx = this->MapPos.x + sy;
-		int dx = this->TopLeftPos.x - this->Offset.x;
+		int dx = this->get_top_left_pos().x() - this->Offset.x;
 		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->get_width())) {
 			if (sx - sy < 0) {
 				++sx;
@@ -581,6 +568,6 @@ void CViewport::DrawBorder(std::vector<std::function<void(renderer *)>> &render_
 		color = ColorOrange;
 	}
 
-	const PixelSize pixelSize = this->GetPixelSize();
-	Video.DrawRectangle(color, this->TopLeftPos.x, this->TopLeftPos.y, pixelSize.x + 1, pixelSize.y + 1, render_commands);
+	const QSize pixel_size = this->get_pixel_size();
+	Video.DrawRectangle(color, this->get_top_left_pos().x(), this->get_top_left_pos().y(), pixel_size.width() + 1, pixel_size.height() + 1, render_commands);
 }

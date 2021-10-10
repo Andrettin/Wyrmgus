@@ -1268,12 +1268,12 @@ static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_c
 			PixelPos screenPosIt;
 			for (int j = 0; j < TileCursorSize; ++j) {
 				screenPosIt.y = screenPos.y + j * defines::get()->get_scaled_tile_height();
-				if (screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y) {
+				if (screenPosIt.y >= UI.MouseViewport->get_bottom_right_pos().y()) {
 					break;
 				}
 				for (int i = 0; i < TileCursorSize; ++i) {
 					screenPosIt.x = screenPos.x + i * defines::get()->get_scaled_tile_width();
-					if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x) {
+					if (screenPosIt.x >= UI.MouseViewport->get_bottom_right_pos().x()) {
 						break;
 					}
 					//Wyrmgus start
@@ -2051,18 +2051,18 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 		&& (CEditor::get()->State == EditorEditTile || CEditor::get()->State == EditorEditUnit)) {
 		Vec2i vpTilePos = UI.SelectedViewport->MapPos;
 		// Scroll the map
-		if (CursorScreenPos.x <= UI.SelectedViewport->GetTopLeftPos().x) {
+		if (CursorScreenPos.x <= UI.SelectedViewport->get_top_left_pos().x()) {
 			vpTilePos.x--;
 			UI.SelectedViewport->Set(vpTilePos, defines::get()->get_scaled_tile_size() / 2);
-		} else if (CursorScreenPos.x >= UI.SelectedViewport->GetBottomRightPos().x) {
+		} else if (CursorScreenPos.x >= UI.SelectedViewport->get_bottom_right_pos().x()) {
 			vpTilePos.x++;
 			UI.SelectedViewport->Set(vpTilePos, defines::get()->get_scaled_tile_size() / 2);
 		}
 
-		if (CursorScreenPos.y <= UI.SelectedViewport->GetTopLeftPos().y) {
+		if (CursorScreenPos.y <= UI.SelectedViewport->get_top_left_pos().y()) {
 			vpTilePos.y--;
 			UI.SelectedViewport->Set(vpTilePos, defines::get()->get_scaled_tile_size() / 2);
-		} else if (CursorScreenPos.y >= UI.SelectedViewport->GetBottomRightPos().y) {
+		} else if (CursorScreenPos.y >= UI.SelectedViewport->get_bottom_right_pos().y()) {
 			vpTilePos.y++;
 			UI.SelectedViewport->Set(vpTilePos, defines::get()->get_scaled_tile_size() / 2);
 		}
