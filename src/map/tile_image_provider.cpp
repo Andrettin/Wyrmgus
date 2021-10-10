@@ -28,7 +28,7 @@
 
 #include "map/tile_image_provider.h"
 
-#include "database/defines.h"
+#include "database/preferences.h"
 #include "engine_interface.h"
 #include "map/terrain_type.h"
 #include "player/player_color.h"
@@ -87,7 +87,7 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 		graphics = terrain->get_graphics(season);
 	}
 
-	graphics->Load(defines::get()->get_scale_factor());
+	graphics->Load(preferences::get()->get_scale_factor());
 
 	const QImage &image = graphics->get_or_create_frame_image(frame_index, color_modification(0, color_set(), player_color), false);
 

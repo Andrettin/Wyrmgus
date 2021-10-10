@@ -57,7 +57,7 @@
  */
 #include "stratagus.h"
 
-#include "database/defines.h"
+#include "database/preferences.h"
 #include "guichan/exception.h"
 #include "guichan/widgets/scrollarea.h"
 
@@ -69,7 +69,7 @@ namespace gcn
         mHScroll = 0;
         mHPolicy = SHOW_AUTO;
         mVPolicy = SHOW_AUTO;
-        mScrollbarWidth = (12 * defines::get()->get_scale_factor()).to_int();
+        mScrollbarWidth = (12 * preferences::get()->get_scale_factor()).to_int();
         mContent = nullptr;
         mUpButtonPressed = false;
         mDownButtonPressed = false;
@@ -89,7 +89,7 @@ namespace gcn
         mHScroll = 0;
         mHPolicy = SHOW_AUTO;
         mVPolicy = SHOW_AUTO;
-        mScrollbarWidth = (12 * defines::get()->get_scale_factor()).to_int();
+        mScrollbarWidth = (12 * preferences::get()->get_scale_factor()).to_int();
         mContent = nullptr;
         mUpButtonPressed = false;
         mDownButtonPressed = false;
@@ -110,7 +110,7 @@ namespace gcn
         mHScroll = 0;
         mHPolicy = hPolicy;
         mVPolicy = vPolicy;
-        mScrollbarWidth = (12 * defines::get()->get_scale_factor()).to_int();
+        mScrollbarWidth = (12 * preferences::get()->get_scale_factor()).to_int();
         mContent = nullptr;
         mUpButtonPressed = false;
         mDownButtonPressed = false;

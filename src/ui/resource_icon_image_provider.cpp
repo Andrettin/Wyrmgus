@@ -28,7 +28,7 @@
 
 #include "ui/resource_icon_image_provider.h"
 
-#include "database/defines.h"
+#include "database/preferences.h"
 #include "ui/resource_icon.h"
 #include "util/exception_util.h"
 #include "util/string_util.h"
@@ -46,7 +46,7 @@ QImage resource_icon_image_provider::requestImage(const QString &id, QSize *size
 		const resource_icon *resource_icon = resource_icon::get(id_str);
 
 		std::shared_ptr<CGraphic> graphics = resource_icon->get_graphics();
-		graphics->Load(defines::get()->get_scale_factor());
+		graphics->Load(preferences::get()->get_scale_factor());
 
 		const QImage &image = graphics->get_or_create_frame_image(resource_icon->get_frame(), color_modification(), false);
 

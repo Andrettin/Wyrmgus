@@ -29,7 +29,7 @@
 #include "ui/icon_base.h"
 
 #include "database/database.h"
-#include "database/defines.h"
+#include "database/preferences.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -63,7 +63,7 @@ void icon_base::load() const
 		return;
 	}
 
-	this->graphics->Load(defines::get()->get_scale_factor());
+	this->graphics->Load(preferences::get()->get_scale_factor());
 
 	if (this->get_frame() >= this->graphics->NumFrames) {
 		throw std::runtime_error("Invalid icon frame: \"" + this->get_identifier() + "\" - " + std::to_string(this->get_frame()));

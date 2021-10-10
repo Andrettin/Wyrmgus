@@ -31,6 +31,7 @@
 
 #include "ai/ai_local.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "database/sml_parser.h"
 #include "direction.h"
 //Wyrmgus start
@@ -270,36 +271,36 @@ void CMap::Reveal(bool only_person_players)
 
 Vec2i CMap::map_pixel_pos_to_tile_pos(const PixelPos &mapPos) const
 {
-	const Vec2i tilePos(mapPos.x / wyrmgus::defines::get()->get_tile_width(), mapPos.y / wyrmgus::defines::get()->get_tile_height());
+	const Vec2i tilePos(mapPos.x / defines::get()->get_tile_width(), mapPos.y / defines::get()->get_tile_height());
 
 	return tilePos;
 }
 
 Vec2i CMap::scaled_map_pixel_pos_to_tile_pos(const PixelPos &mapPos) const
 {
-	return this->map_pixel_pos_to_tile_pos(mapPos / defines::get()->get_scale_factor());
+	return this->map_pixel_pos_to_tile_pos(mapPos / preferences::get()->get_scale_factor());
 }
 
 PixelPos CMap::tile_pos_to_map_pixel_pos_top_left(const Vec2i &tilePos) const
 {
-	PixelPos mapPixelPos(tilePos.x * wyrmgus::defines::get()->get_tile_width(), tilePos.y * wyrmgus::defines::get()->get_tile_height());
+	PixelPos mapPixelPos(tilePos.x * defines::get()->get_tile_width(), tilePos.y * defines::get()->get_tile_height());
 
 	return mapPixelPos;
 }
 
 PixelPos CMap::tile_pos_to_scaled_map_pixel_pos_top_left(const Vec2i &tilePos) const
 {
-	return QPoint(this->tile_pos_to_map_pixel_pos_top_left(tilePos)) * defines::get()->get_scale_factor();
+	return QPoint(this->tile_pos_to_map_pixel_pos_top_left(tilePos)) * preferences::get()->get_scale_factor();
 }
 
 PixelPos CMap::tile_pos_to_map_pixel_pos_center(const Vec2i &tilePos) const
 {
-	return this->tile_pos_to_map_pixel_pos_top_left(tilePos) + wyrmgus::size::to_point(wyrmgus::defines::get()->get_tile_size()) / 2;
+	return this->tile_pos_to_map_pixel_pos_top_left(tilePos) + size::to_point(defines::get()->get_tile_size()) / 2;
 }
 
 PixelPos CMap::tile_pos_to_scaled_map_pixel_pos_center(const Vec2i &tilePos) const
 {
-	return this->tile_pos_to_scaled_map_pixel_pos_top_left(tilePos) + wyrmgus::size::to_point(wyrmgus::defines::get()->get_scaled_tile_size()) / 2;
+	return this->tile_pos_to_scaled_map_pixel_pos_top_left(tilePos) + size::to_point(defines::get()->get_scaled_tile_size()) / 2;
 }
 
 //Wyrmgus start
@@ -1423,7 +1424,7 @@ void ChangeCurrentMapLayer(const int z)
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
 	UI.CurrentMapLayer = CMap::get()->MapLayers[z].get();
 	UI.get_minimap()->UpdateCache = true;
-	UI.SelectedViewport->Set(new_viewport_map_pos, wyrmgus::size::to_point(wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
+	UI.SelectedViewport->Set(new_viewport_map_pos, size::to_point(defines::get()->get_scaled_tile_size()) / 2);
 }
 
 /**

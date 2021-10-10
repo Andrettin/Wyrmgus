@@ -31,6 +31,7 @@
 #include "ui/ui.h"
 
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "menus.h"
 #include "player/player.h"
 #include "video/font.h"
@@ -75,7 +76,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 		}
 	}
 	if (pimage->Sprite) {
-		pimage->Sprite->Load(defines::get()->get_scale_factor());
+		pimage->Sprite->Load(preferences::get()->get_scale_factor());
 	}
 	if (pimage->Sprite) {
 		auto colorGraphic = std::dynamic_pointer_cast<CPlayerColorGraphic>(pimage->Sprite);
@@ -96,9 +97,9 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 	if (!text.empty()) {
 		CLabel label(style->Font,
 					 (p->TextNormalColor != nullptr ? p->TextNormalColor :
-					  style->TextNormalColor != nullptr ? style->TextNormalColor : wyrmgus::defines::get()->get_default_font_color()),
+					  style->TextNormalColor != nullptr ? style->TextNormalColor : defines::get()->get_default_font_color()),
 					 (p->TextReverseColor != nullptr ? p->TextReverseColor :
-					  style->TextReverseColor != nullptr ? style->TextReverseColor : wyrmgus::defines::get()->get_default_highlight_font_color()));
+					  style->TextReverseColor != nullptr ? style->TextReverseColor : defines::get()->get_default_highlight_font_color()));
 
 		if (p->TextAlign == TextAlignment::Center || p->TextAlign == TextAlignment::Undefined) {
 			label.DrawCentered(x + p->TextPos.x, y + p->TextPos.y, text, render_commands);

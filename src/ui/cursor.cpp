@@ -31,6 +31,7 @@
 #include "video/intern_video.h"
 
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "editor.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -97,11 +98,11 @@ void cursor::on_current_cursor_changed()
 
 	if (cursor != nullptr) {
 		if (!cursor->get_graphics()->IsLoaded()) {
-			cursor->get_graphics()->Load(defines::get()->get_scale_factor());
+			cursor->get_graphics()->Load(preferences::get()->get_scale_factor());
 		}
 
 		const QPixmap pixmap = QPixmap::fromImage(cursor->get_graphics()->get_or_create_frame_image(0, color_modification(), false));
-		const QPoint hot_pos = cursor->get_hot_pos() * defines::get()->get_scale_factor();
+		const QPoint hot_pos = cursor->get_hot_pos() * preferences::get()->get_scale_factor();
 		const QCursor qcursor(pixmap, hot_pos.x(), hot_pos.y());
 
 		QMetaObject::invokeMethod(QApplication::instance(), [qcursor] {
@@ -285,7 +286,7 @@ void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_com
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		const PixelPos center(screenPos + CursorBuilding->get_scaled_half_tile_pixel_size());
-		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->get_tile_width() - 1)) * wyrmgus::defines::get()->get_scaled_tile_width() + 1;
+		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->get_tile_width() - 1)) * defines::get()->get_scaled_tile_width() + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius, render_commands);
 	}
 

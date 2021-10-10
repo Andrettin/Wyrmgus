@@ -125,7 +125,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 {
 	// FIXME: add icon borders
 	int hBar, hAll;
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	//Wyrmgus start
 	if (Preference.IconsShift && wyrmgus::defines::get()->get_icon_frame_graphics() != nullptr && wyrmgus::defines::get()->get_pressed_icon_frame_graphics() != nullptr) {
 //	if (Preference.IconsShift) {
@@ -516,7 +516,7 @@ static void DrawUnitInfo_Training(const CUnit &unit, std::vector<std::function<v
 					CLabel label(wyrmgus::defines::get()->get_game_font());
 
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
-					label.Draw(pos.x + (46 * defines::get()->get_scale_factor()).to_int() - defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string, render_commands);
+					label.Draw(pos.x + (46 * preferences::get()->get_scale_factor()).to_int() - defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string, render_commands);
 				}
 			}
 		}
@@ -779,7 +779,7 @@ void DrawResources(std::vector<std::function<void(renderer *)>> &render_commands
 				resource_info.Font = wyrmgus::defines::get()->get_small_font();
 				label.SetFont(resource_info.Font);
 
-				label.Draw(resource_info.TextX, resource_info.TextY + (3 * defines::get()->get_scale_factor()).to_int(), tmp, render_commands);
+				label.Draw(resource_info.TextX, resource_info.TextY + (3 * preferences::get()->get_scale_factor()).to_int(), tmp, render_commands);
 			} else {
 				const int resource_amount = CPlayer::GetThisPlayer()->get_resource(resource);
 				resource_info.Text = FormatNumber(resource_amount);
@@ -1092,7 +1092,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 			ba->Value = index;
 			ba->ValueStr = resource->get_identifier();
 			ba->Popup = "popup_resource";
-			DrawPopup(*ba, UI.Resources[index].IconX, UI.Resources[index].IconY + (16 * defines::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false, render_commands);
+			DrawPopup(*ba, UI.Resources[index].IconX, UI.Resources[index].IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false, render_commands);
 			LastDrawnButtonPopup = nullptr;
 		}
 	}
@@ -1104,13 +1104,13 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		ba.Hint = _("Food");
 		ba.Action = ButtonCmd::None;
 		ba.Popup = "popup_food";
-		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + (16 * defines::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false, render_commands);
+		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false, render_commands);
 		LastDrawnButtonPopup = nullptr;
 	}
 	
 	const wyrmgus::resource_icon *score_icon = wyrmgus::defines::get()->get_score_icon();
 	if (score_icon != nullptr && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + score_icon->get_graphics()->get_frame_height())) {
-		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + (16 * defines::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
+		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
 	}
 	
 	const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
@@ -1129,7 +1129,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		&& CursorScreenPos.y >= UI.TimeOfDayPanel.IconY
 		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + time_of_day_icon_graphics->get_frame_height())
 	) {
-		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + (16 * defines::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
+		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
 	}
 	
 	const wyrmgus::season *season = UI.CurrentMapLayer->get_tile_season(tile_pos);
@@ -1147,7 +1147,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
 		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + season_icon_graphics->get_frame_height())
 	) {
-		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + (16 * defines::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
+		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
 	}
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text
@@ -1167,7 +1167,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		&& CursorScreenPos.y >= UI.AgePanel.TextY
 		&& CursorScreenPos.y < (UI.AgePanel.TextY + UI.AgePanel.Font->Height())
 	) {
-		DrawGenericPopup(_(age->get_name().c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 * wyrmgus::defines::get()->get_scale_factor() + cursor::get_current_cursor()->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(age->get_name().c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 * wyrmgus::preferences::get()->get_scale_factor() + cursor::get_current_cursor()->G->getHeight() / 2, "", "", false);
 	}
 	*/
 	
@@ -1340,7 +1340,7 @@ void MessagesDisplay::UpdateMessages()
 	const unsigned long ticks = GetTicks();
 	if (MessagesFrameTimeout < ticks) {
 		++MessagesScrollY;
-		if (MessagesScrollY == UI.MessageFont->Height() + (1 * defines::get()->get_scale_factor()).to_int()) {
+		if (MessagesScrollY == UI.MessageFont->Height() + (1 * preferences::get()->get_scale_factor()).to_int()) {
 			MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 			MessagesScrollY = 0;
 			ShiftMessages();
@@ -1358,7 +1358,7 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 	if (show && preferences::get()->is_show_messages_enabled()) {
 		CLabel label(UI.MessageFont);
 
-		const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+		const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 		// background so the text is easier to read
 		if (MessagesCount) {
 			int textHeight = MessagesCount * (UI.MessageFont->Height() + (1 * scale_factor).to_int());
@@ -1826,7 +1826,7 @@ static void DrawInfoPanelBackground(unsigned frame, std::vector<std::function<vo
 
 static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	DrawInfoPanelBackground(0, render_commands);
 	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer())
@@ -1923,7 +1923,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 		&& !unit.is_enemy_of(*CPlayer::GetThisPlayer())
 		&& (unit.Player->get_type() != player_type::neutral || unit.Type->get_given_resource() != nullptr)
 	) {
-		defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - (4 * defines::get()->get_scale_factor()).to_int(), UI.InfoPanel.Y + (93 * defines::get()->get_scale_factor()).to_int(), render_commands);
+		defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - (4 * preferences::get()->get_scale_factor()).to_int(), UI.InfoPanel.Y + (93 * preferences::get()->get_scale_factor()).to_int(), render_commands);
 	}
 	//Wyrmgus end	
 	DrawUnitInfo(unit, render_commands);

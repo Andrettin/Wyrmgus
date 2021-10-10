@@ -29,6 +29,7 @@
 #include "ui/icon.h"
 
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "menus.h"
 #include "mod.h"
 #include "player/player.h"
@@ -175,7 +176,7 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos
 	}
 	//Wyrmgus end
 
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	//Wyrmgus start
 	if (Preference.IconsShift && defines::get()->get_icon_frame_graphics() != nullptr && defines::get()->get_pressed_icon_frame_graphics() != nullptr) {

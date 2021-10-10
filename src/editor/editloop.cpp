@@ -32,6 +32,7 @@
 
 #include "commands.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "engine_interface.h"
 #include "game/game.h"
 #include "guichan.h"
@@ -120,7 +121,7 @@ static std::deque<EditorAction> EditorRedoActions;
 /// Unit mode icon
 static int get_unit_icon_x()
 {
-	return IconWidth + (7 * defines::get()->get_scale_factor()).to_int();
+	return IconWidth + (7 * preferences::get()->get_scale_factor()).to_int();
 }
 
 static int get_unit_icon_y()
@@ -131,23 +132,23 @@ static int get_unit_icon_y()
 /// Tile mode icon
 static int get_tile_icon_x()
 {
-	return IconWidth * 2 + (16 * defines::get()->get_scale_factor()).to_int();
+	return IconWidth * 2 + (16 * preferences::get()->get_scale_factor()).to_int();
 }
 
 static int get_tile_icon_y()
 {
-	return (2 * defines::get()->get_scale_factor()).to_int();
+	return (2 * preferences::get()->get_scale_factor()).to_int();
 }
 
 /// Start mode icon
 static int get_start_icon_x()
 {
-	return IconWidth * 3 + (16 * defines::get()->get_scale_factor()).to_int();
+	return IconWidth * 3 + (16 * preferences::get()->get_scale_factor()).to_int();
 }
 
 static int get_start_icon_y()
 {
-	return (2 * defines::get()->get_scale_factor()).to_int();
+	return (2 * preferences::get()->get_scale_factor()).to_int();
 }
 
 static void EditorUndoAction();
@@ -768,7 +769,7 @@ void RecalculateShownUnits()
 */
 static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	std::array<char, 256> buf{};
 	CLabel label(defines::get()->get_small_font());
 
@@ -971,7 +972,7 @@ static void DrawTileIcon(const terrain_type *terrain, unsigned x, unsigned y, un
 static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	CLabel label(defines::get()->get_game_font());
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	int x = UI.InfoPanel.X + (46 * scale_factor).to_int();
 	int y = UI.InfoPanel.Y + (4 * scale_factor).to_int() + IconHeight + (11 * scale_factor).to_int();
 
@@ -1090,7 +1091,7 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 
 static void DrawEditorPanel_SelectIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	//Wyrmgus start
 //	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
@@ -1117,7 +1118,7 @@ static void DrawEditorPanel_SelectIcon(std::vector<std::function<void(renderer *
 
 static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	const PixelPos pos(UI.InfoPanel.X + (11 * scale_factor).to_int() + get_unit_icon_x(), UI.InfoPanel.Y + (7 * scale_factor).to_int() + get_unit_icon_y());
 	icon *icon = CEditor::get()->Units.Icon;
@@ -1141,7 +1142,7 @@ static void DrawEditorPanel_UnitsIcon(std::vector<std::function<void(renderer *)
 
 static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	int x = UI.InfoPanel.X + (11 * scale_factor).to_int();
 	int y = UI.InfoPanel.Y + (5 * scale_factor).to_int();
@@ -1192,7 +1193,7 @@ static void DrawEditorPanel_StartIcon(std::vector<std::function<void(renderer *)
 */
 static void DrawEditorPanel(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	DrawEditorPanel_SelectIcon(render_commands);
 	DrawEditorPanel_UnitsIcon(render_commands);
@@ -1346,7 +1347,7 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 		pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 	}
 
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	std::array<char, 256> buf{};
 	snprintf(buf.data(), buf.size(), _("Editor (%d %d)"), pos.x, pos.y);
@@ -1865,7 +1866,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	LastDrawnButtonPopup = nullptr;
 	//Wyrmgus end
 
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	// Scrollbar
 	if (UI.ButtonPanel.X + (4 * scale_factor).to_int() < CursorScreenPos.x
@@ -1954,7 +1955,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 {
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	//Wyrmgus start
 //	int bx = UI.InfoPanel.X + 4;
@@ -2023,7 +2024,7 @@ static void EditorCallbackMouse(const PixelPos &pos, const Qt::KeyboardModifiers
 	static int LastMapX = 0;
 	static int LastMapY = 0;
 
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	PixelPos restrictPos = pos;
 	HandleCursorMove(&restrictPos.x, &restrictPos.y); // Reduce to screen
@@ -2337,7 +2338,7 @@ void CEditor::Init()
 //	ButtonPanelWidth = 170;//200;
 //	ButtonPanelHeight = 160 + (Video.Height - 480);
 	// adapt to new UI size, should make this more scriptable
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	ButtonPanelWidth = (243 * scale_factor).to_int();
 	ButtonPanelHeight = (186 * scale_factor).to_int();
 	//Wyrmgus end
@@ -2416,7 +2417,7 @@ std::string get_user_maps_path()
 */
 void EditorMainLoop()
 {
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	bool OldCommandLogDisabled = CommandLogDisabled;
 	const EventCallback *old_callbacks = GetCallbacks();

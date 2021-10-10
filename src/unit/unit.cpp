@@ -42,6 +42,7 @@
 #include "character.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "economy/resource_storage_type.h"
 #include "game/game.h"
 #include "gender.h"
@@ -4784,7 +4785,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
 
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	QSize frame_size = this->Type->get_frame_size();
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
@@ -5507,7 +5508,7 @@ CUnit *UnitOnScreen(int x, int y)
 		// Check if mouse is over the unit.
 		//
 		QPoint unit_sprite_pos = unit->get_scaled_map_pixel_pos_center();
-		const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+		const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 		unit_sprite_pos -= size::to_point(type.get_box_size()) * scale_factor / 2;
 		unit_sprite_pos += QPoint(type.BoxOffsetX, type.BoxOffsetY) * scale_factor;
@@ -5569,7 +5570,7 @@ PixelPos CUnit::get_map_pixel_pos_top_left() const
 
 PixelPos CUnit::get_scaled_map_pixel_pos_top_left() const
 {
-	return QPoint(this->get_map_pixel_pos_top_left()) * defines::get()->get_scale_factor();
+	return QPoint(this->get_map_pixel_pos_top_left()) * preferences::get()->get_scale_factor();
 }
 
 PixelPos CUnit::get_map_pixel_pos_center() const
@@ -5600,7 +5601,7 @@ PixelSize CUnit::get_tile_pixel_size() const
 
 PixelSize CUnit::get_scaled_tile_pixel_size() const
 {
-	return QSize(this->get_tile_pixel_size()) * defines::get()->get_scale_factor();
+	return QSize(this->get_tile_pixel_size()) * preferences::get()->get_scale_factor();
 }
 
 PixelSize CUnit::get_half_tile_pixel_size() const
@@ -5610,7 +5611,7 @@ PixelSize CUnit::get_half_tile_pixel_size() const
 
 PixelSize CUnit::get_scaled_half_tile_pixel_size() const
 {
-	return QPoint(this->get_half_tile_pixel_size()) * defines::get()->get_scale_factor();
+	return QPoint(this->get_half_tile_pixel_size()) * preferences::get()->get_scale_factor();
 }
 
 QPoint CUnit::get_bottom_right_tile_pos() const
@@ -5632,7 +5633,7 @@ const tile *CUnit::get_center_tile() const
 
 QPoint CUnit::get_scaled_pixel_offset() const
 {
-	return this->get_pixel_offset() * defines::get()->get_scale_factor();
+	return this->get_pixel_offset() * preferences::get()->get_scale_factor();
 }
 
 const resource *CUnit::get_given_resource() const

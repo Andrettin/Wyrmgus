@@ -28,7 +28,7 @@
 
 #include "ui/interface_image_provider.h"
 
-#include "database/defines.h"
+#include "database/preferences.h"
 #include "engine_interface.h"
 #include "ui/interface_element_type.h"
 #include "ui/interface_style.h"
@@ -65,7 +65,7 @@ QImage interface_image_provider::requestImage(const QString &id, QSize *size, co
 			throw std::runtime_error("No graphics found for interface image ID \"" + id.toStdString() + "\".");
 		}
 
-		graphics->Load(defines::get()->get_scale_factor());
+		graphics->Load(preferences::get()->get_scale_factor());
 
 		const QImage &image = graphics->get_or_create_frame_image(0, color_modification(), false);
 

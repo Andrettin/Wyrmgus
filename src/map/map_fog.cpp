@@ -33,6 +33,7 @@
 
 #include "actions.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -990,7 +991,7 @@ void CMap::InitFogOfWar()
 	//calculate this once from the settings and store it
 	FogOfWarColorSDL = CVideo::MapRGB(FogOfWarColor);
 
-	fog_graphic->Load(defines::get()->get_scale_factor());
+	fog_graphic->Load(preferences::get()->get_scale_factor());
 
 	//Wyrmgus start
 //	VisibleTable.clear();

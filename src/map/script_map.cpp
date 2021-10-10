@@ -32,6 +32,7 @@
 
 #include "character.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "editor.h"
 #include "game/game.h"
 #include "iolib.h"
@@ -448,7 +449,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
 	
-	CMap::FogGraphics = CGraphic::New(FogGraphicFile, wyrmgus::defines::get()->get_tile_size());
+	CMap::FogGraphics = CGraphic::New(FogGraphicFile, defines::get()->get_tile_size());
 
 	return 0;
 }
@@ -901,8 +902,8 @@ static int CclDefineTileset(lua_State *l)
 {
 	CMap::get()->Tileset->parse(l);
 
-	CMap::get()->TileGraphic = CGraphic::New(CMap::get()->Tileset->ImageFile, wyrmgus::defines::get()->get_tile_size());
-	CMap::get()->TileGraphic->Load(defines::get()->get_scale_factor());
+	CMap::get()->TileGraphic = CGraphic::New(CMap::get()->Tileset->ImageFile, defines::get()->get_tile_size());
+	CMap::get()->TileGraphic->Load(preferences::get()->get_scale_factor());
 	return 0;
 }
 
@@ -1206,10 +1207,10 @@ static int CclDefineTerrainType(lua_State *l)
 	}
 	
 	if (!graphics_file.empty()) {
-		terrain->graphics = CPlayerColorGraphic::New(graphics_file, wyrmgus::defines::get()->get_tile_size(), nullptr);
+		terrain->graphics = CPlayerColorGraphic::New(graphics_file, defines::get()->get_tile_size(), nullptr);
 	}
 	if (!elevation_graphics_file.empty()) {
-		terrain->elevation_graphics = CGraphic::New(elevation_graphics_file, wyrmgus::defines::get()->get_tile_size());
+		terrain->elevation_graphics = CGraphic::New(elevation_graphics_file, defines::get()->get_tile_size());
 	}
 	
 	return 0;

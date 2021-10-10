@@ -30,6 +30,7 @@
 #include "stratagus.h"
 
 #include "database/defines.h"
+#include "database/preferences.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -741,7 +742,7 @@ QImage CGraphic::create_modified_image(const color_modification &color_modificat
 		}
 	}
 
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
 		image = image::scale(image, scale_factor / this->custom_scale_factor, this->get_original_frame_size());
 	}
@@ -864,11 +865,11 @@ CFiller &CFiller::operator =(const CFiller &other_filler)
 void CFiller::Load()
 {
 	if (this->G != nullptr) {
-		this->G->Load(defines::get()->get_scale_factor());
+		this->G->Load(preferences::get()->get_scale_factor());
 	}
 
-	this->X = (this->X * defines::get()->get_scale_factor()).to_int();
-	this->Y = (this->Y * defines::get()->get_scale_factor()).to_int();
+	this->X = (this->X * preferences::get()->get_scale_factor()).to_int();
+	this->Y = (this->Y * preferences::get()->get_scale_factor()).to_int();
 
 	if (this->X < 0) {
 		this->X = Video.Width + this->X;
@@ -885,7 +886,7 @@ bool CFiller::OnGraphic(int x, int y) const
 {
 	x -= X;
 	y -= Y;
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	if (x >= 0 && y >= 0 && x < this->G->get_width() && y < this->G->get_height()) {
 		return this->G->get_image().pixelColor((x / scale_factor).to_int(), (y / scale_factor).to_int()).alpha() != 0;
 	}

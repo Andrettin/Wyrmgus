@@ -28,7 +28,7 @@
 
 #include "ui/icon_image_provider.h"
 
-#include "database/defines.h"
+#include "database/preferences.h"
 #include "player/player_color.h"
 #include "ui/icon.h"
 #include "util/log_util.h"
@@ -67,7 +67,7 @@ QImage icon_image_provider::requestImage(const QString &id, QSize *size, const Q
 	}
 
 	std::shared_ptr<CGraphic> graphics = icon->get_graphics();
-	graphics->Load(defines::get()->get_scale_factor());
+	graphics->Load(preferences::get()->get_scale_factor());
 
 	const QImage &image = graphics->get_or_create_frame_image(icon->get_frame(), color_modification(icon->get_hue_rotation(), icon->get_hue_ignored_colors(), player_color), grayscale);
 

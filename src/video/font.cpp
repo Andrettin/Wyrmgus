@@ -30,6 +30,7 @@
 #include "video/font.h"
 
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "intern_video.h"
 #include "util/assert_util.h"
 #include "util/image_util.h"
@@ -447,7 +448,7 @@ CLabel::CLabel(wyrmgus::font *f, const wyrmgus::font_color *nc, const wyrmgus::f
 }
 
 CLabel::CLabel(wyrmgus::font *f)
-	: CLabel(f, wyrmgus::defines::get()->get_default_font_color(), wyrmgus::defines::get()->get_default_highlight_font_color())
+	: CLabel(f, defines::get()->get_default_font_color(), defines::get()->get_default_highlight_font_color())
 {
 }
 
@@ -616,7 +617,7 @@ void font::MeasureWidths()
 {
 	const QImage image(path::to_qstring(this->G->get_filepath()));
 	const QSize &frame_size = G->get_original_frame_size();
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	const int maxy = image.width() / frame_size.width() * image.height() / frame_size.height();
 
@@ -714,7 +715,7 @@ void font::load()
 		return;
 	}
 
-	this->G->Load(defines::get()->get_scale_factor());
+	this->G->Load(preferences::get()->get_scale_factor());
 	this->MeasureWidths();
 }
 

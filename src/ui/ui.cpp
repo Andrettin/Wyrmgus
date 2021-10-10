@@ -32,6 +32,7 @@
 #include "ui/ui.h"
 
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "engine_interface.h"
 //Wyrmgus start
 #include "game/game.h"
@@ -149,8 +150,8 @@ void InitUserInterface()
 	// Calculations
 	//
 	if (CMap::get()->Info->MapWidth) {
-		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::get()->Info->MapWidth * wyrmgus::defines::get()->get_scaled_tile_width() - 1);
-		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::get()->Info->MapHeight * wyrmgus::defines::get()->get_scaled_tile_height() - 1);
+		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::get()->Info->MapWidth * defines::get()->get_scaled_tile_width() - 1);
+		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::get()->Info->MapHeight * defines::get()->get_scaled_tile_height() - 1);
 	}
 
 	UI.SelectedViewport = UI.Viewports;
@@ -194,10 +195,10 @@ void CUserInterface::Load()
 	}
 
 	if (InfoPanel.G) {
-		InfoPanel.G->Load(defines::get()->get_scale_factor());
+		InfoPanel.G->Load(preferences::get()->get_scale_factor());
 	}
 	if (ButtonPanel.G) {
-		ButtonPanel.G->Load(defines::get()->get_scale_factor());
+		ButtonPanel.G->Load(preferences::get()->get_scale_factor());
 	}
 
 	//  Resolve cursors
@@ -401,10 +402,10 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
 	//Wyrmgus start
-//	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * wyrmgus::defines::get()->get_scaled_tile_width() - 1;
-//	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * wyrmgus::defines::get()->get_scaled_tile_height() - 1;
-	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - 1;
+//	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * defines::get()->get_scaled_tile_width() - 1;
+//	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * defines::get()->get_scaled_tile_height() - 1;
+	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * defines::get()->get_scaled_tile_width() - 1;
+	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * defines::get()->get_scaled_tile_height() - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary

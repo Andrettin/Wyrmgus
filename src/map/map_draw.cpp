@@ -31,6 +31,7 @@
 #include "viewport.h"
 
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
@@ -121,7 +122,7 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 // Convert viewport coordinates into map pixel coordinates
 PixelPos CViewport::screen_to_map_pixel_pos(const PixelPos &screenPixelPos) const
 {
-	return this->screen_to_scaled_map_pixel_pos(screenPixelPos) / defines::get()->get_scale_factor();
+	return this->screen_to_scaled_map_pixel_pos(screenPixelPos) / preferences::get()->get_scale_factor();
 }
 
 PixelPos CViewport::screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPos) const
@@ -135,7 +136,7 @@ PixelPos CViewport::screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPo
 // Convert map pixel coordinates into viewport coordinates
 PixelPos CViewport::map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const
 {
-	return this->scaled_map_to_screen_pixel_pos(QPoint(mapPixelPos) * defines::get()->get_scale_factor());
+	return this->scaled_map_to_screen_pixel_pos(QPoint(mapPixelPos) * preferences::get()->get_scale_factor());
 }
 
 PixelPos CViewport::scaled_map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const

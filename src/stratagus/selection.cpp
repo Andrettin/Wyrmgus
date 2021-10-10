@@ -33,7 +33,7 @@
 #include "ai/ai_local.h" // for AiHelpers
 //Wyrmgus end
 #include "commands.h"
-#include "database/defines.h"
+#include "database/preferences.h"
 //Wyrmgus start
 #include "game/game.h"
 //Wyrmgus end
@@ -727,7 +727,7 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 										 std::vector<CUnit *> &table)
 {
 	int n = 0;
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];

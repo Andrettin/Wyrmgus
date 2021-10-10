@@ -31,7 +31,7 @@
 
 #include "ui/ui.h"
 
-#include "database/defines.h"
+#include "database/preferences.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "menus.h"
@@ -388,7 +388,7 @@ static std::unique_ptr<CContentType> CclParseContent(lua_State *l)
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Pos")) {
 			CclGetPos(l, &pos.x, &pos.y);
-			pos = QPoint(pos) * defines::get()->get_scale_factor();
+			pos = QPoint(pos) * preferences::get()->get_scale_factor();
 		//Wyrmgus start
 		} else if (!strcmp(key, "TextColor")) {
 			textColor = LuaToString(l, -1);

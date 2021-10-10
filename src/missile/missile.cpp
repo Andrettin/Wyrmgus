@@ -33,6 +33,7 @@
 #include "animation.h"
 #include "config.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -169,7 +170,7 @@ void missile_type::set_image_file(const std::filesystem::path &filepath)
 void missile_type::LoadMissileSprite()
 {
 	if (this->G && !this->G->IsLoaded()) {
-		this->G->Load(defines::get()->get_scale_factor());
+		this->G->Load(preferences::get()->get_scale_factor());
 
 		// Correct the number of frames in graphic
 		assert_throw(this->G->NumFrames >= this->get_frames());
@@ -828,7 +829,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	if (missile->Type->Pierce) {
 		for (int i = 0; i < (unit.GetModifiedVariable(ATTACKRANGE_INDEX) - unit.MapDistanceTo(dpos, z)); ++i) {
 			const PixelPos diff(missile->destination - missile->source);
-			missile->destination += diff * ((wyrmgus::defines::get()->get_tile_width() + wyrmgus::defines::get()->get_tile_height()) * 3) / 4 / point::distance_to(missile->source, missile->destination);
+			missile->destination += diff * ((defines::get()->get_tile_width() + defines::get()->get_tile_height()) * 3) / 4 / point::distance_to(missile->source, missile->destination);
 		}
 	}
 	
@@ -847,7 +848,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxMax)
 {
 	PixelSize missileSize(missile.Type->get_frame_size());
-	PixelDiff margin(wyrmgus::defines::get()->get_tile_width() - 1, wyrmgus::defines::get()->get_tile_height() - 1);
+	PixelDiff margin(defines::get()->get_tile_width() - 1, defines::get()->get_tile_height() - 1);
 	boxMin = CMap::get()->map_pixel_pos_to_tile_pos(missile.position);
 	boxMax = CMap::get()->map_pixel_pos_to_tile_pos(missile.position + missileSize + margin);
 	//Wyrmgus start

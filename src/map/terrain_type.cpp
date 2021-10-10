@@ -30,6 +30,7 @@
 
 #include "config.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "economy/resource.h"
 #include "iolib.h"
 #include "map/terrain_feature.h"
@@ -51,7 +52,7 @@ void terrain_type::LoadTerrainTypeGraphics()
 {
 	for (terrain_type *terrain_type : terrain_type::get_all()) {
 		if (terrain_type->graphics != nullptr) {
-			terrain_type->graphics->Load(defines::get()->get_scale_factor());
+			terrain_type->graphics->Load(preferences::get()->get_scale_factor());
 
 			if (!terrain_type->minimap_color.isValid()) {
 				terrain_type->calculate_minimap_color();
@@ -59,12 +60,12 @@ void terrain_type::LoadTerrainTypeGraphics()
 		}
 
 		if (terrain_type->transition_graphics != nullptr) {
-			terrain_type->transition_graphics->Load(defines::get()->get_scale_factor());
+			terrain_type->transition_graphics->Load(preferences::get()->get_scale_factor());
 		}
 
 		for (const auto &kv_pair : terrain_type->season_graphics) {
 			const season *season = kv_pair.first;
-			kv_pair.second->Load(defines::get()->get_scale_factor());
+			kv_pair.second->Load(preferences::get()->get_scale_factor());
 
 			if (!terrain_type->season_minimap_colors[season].isValid()) {
 				terrain_type->calculate_minimap_color(season);
@@ -72,7 +73,7 @@ void terrain_type::LoadTerrainTypeGraphics()
 		}
 
 		if (terrain_type->elevation_graphics != nullptr) {
-			terrain_type->elevation_graphics->Load(defines::get()->get_scale_factor());
+			terrain_type->elevation_graphics->Load(preferences::get()->get_scale_factor());
 		}
 	}
 }

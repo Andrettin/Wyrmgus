@@ -28,7 +28,7 @@
 
 #include "unit/construction.h"
 
-#include "database/defines.h"
+#include "database/preferences.h"
 #include "script.h"
 #include "translate.h"
 #include "ui/ui.h"
@@ -96,7 +96,7 @@ void construction::load()
 {
 	if (!this->image_file.empty()) {
 		this->graphics = CPlayerColorGraphic::New(this->image_file, this->get_frame_size(), nullptr);
-		this->graphics->Load(defines::get()->get_scale_factor());
+		this->graphics->Load(preferences::get()->get_scale_factor());
 		IncItemsLoaded();
 	}
 }

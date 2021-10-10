@@ -33,6 +33,7 @@
 #include "actions.h"
 #include "action/action_built.h"
 #include "database/defines.h"
+#include "database/preferences.h"
 #include "script.h"
 #include "translate.h"
 #include "ui/ui.h"
@@ -369,7 +370,7 @@ void CContentTypeLifeBar::Draw(const CUnit &unit, font *, std::vector<std::funct
 	}
 	//Wyrmgus end
 
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	// Border
 	//Wyrmgus start
@@ -409,7 +410,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, font *, std::vector<std::f
 		return;
 	}
 
-	const centesimal_int &scale_factor = defines::get()->get_scale_factor();
+	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 	int x = this->Pos.x;
 	int y = this->Pos.y;

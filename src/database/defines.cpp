@@ -122,31 +122,31 @@ void defines::initialize()
 {
 	if (!this->border_image_file.empty()) {
 		this->border_graphics = CPlayerColorGraphic::New(this->border_image_file, this->border_frame_size, this->get_conversible_player_color());
-		this->border_graphics->Load(this->get_scale_factor());
+		this->border_graphics->Load(preferences::get()->get_scale_factor());
 	}
 
 	if (this->icon_frame_graphics != nullptr) {
-		this->icon_frame_graphics->Load(this->get_scale_factor());
+		this->icon_frame_graphics->Load(preferences::get()->get_scale_factor());
 	}
 
 	if (this->pressed_icon_frame_graphics != nullptr) {
-		this->pressed_icon_frame_graphics->Load(this->get_scale_factor());
+		this->pressed_icon_frame_graphics->Load(preferences::get()->get_scale_factor());
 	}
 
 	if (this->command_button_frame_graphics != nullptr) {
-		this->command_button_frame_graphics->Load(this->get_scale_factor());
+		this->command_button_frame_graphics->Load(preferences::get()->get_scale_factor());
 	}
 
 	if (this->bar_frame_graphics != nullptr) {
-		this->bar_frame_graphics->Load(this->get_scale_factor());
+		this->bar_frame_graphics->Load(preferences::get()->get_scale_factor());
 	}
 
 	if (this->infopanel_frame_graphics != nullptr) {
-		this->infopanel_frame_graphics->Load(this->get_scale_factor());
+		this->infopanel_frame_graphics->Load(preferences::get()->get_scale_factor());
 	}
 
 	if (this->progress_bar_graphics != nullptr) {
-		this->progress_bar_graphics->Load(this->get_scale_factor());
+		this->progress_bar_graphics->Load(preferences::get()->get_scale_factor());
 	}
 
 	if (this->get_population_per_unit() == 0) {
@@ -170,7 +170,7 @@ void defines::set_border_image_file(const std::filesystem::path &filepath)
 
 QPoint defines::get_border_offset() const
 {
-	return size::to_point((this->get_tile_size() - this->border_frame_size) * this->get_scale_factor() / 2);
+	return size::to_point((this->get_tile_size() - this->border_frame_size) * preferences::get()->get_scale_factor() / 2);
 }
 
 QString defines::get_default_menu_background_file_qstring() const
