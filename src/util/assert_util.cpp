@@ -42,7 +42,11 @@ void assert_log(const bool check)
 		return;
 	}
 
+#ifdef __cpp_lib_source_location
 	log::log_error(get_assert_message(location));
+#else
+	log::log_error("Assert failed.");
+#endif
 }
 
 }
