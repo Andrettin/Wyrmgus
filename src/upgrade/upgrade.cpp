@@ -2051,6 +2051,19 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 	}
 
 	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
+		switch (j) {
+			case SIGHTRANGE_INDEX:
+			case DAYSIGHTRANGEBONUS_INDEX:
+			case NIGHTSIGHTRANGEBONUS_INDEX:
+			case ETHEREALVISION_INDEX:
+				if (!unit.Removed && !SaveGameLoading) {
+					MapUnmarkUnitSight(unit);
+				}
+				break;
+			default:
+				break;
+		}
+
 		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
 		if (um->ModifyPercent[j]) {
 			if (j != MANA_INDEX || um->ModifyPercent[j] < 0) {
@@ -2063,26 +2076,39 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 			}
 			unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
 		}
+
 		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
 		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 		if (unit.Variable[j].Max > 0) {
 			unit.Variable[j].Value = std::clamp(unit.Variable[j].Value, 0, unit.Variable[j].Max);
 		}
-		//Wyrmgus start
-		if (j == ATTACKRANGE_INDEX && unit.Container && !SaveGameLoading) {
-			unit.Container->UpdateContainerAttackRange();
-		} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
-			unit.UpdateXPRequired();
-		} else if (IsKnowledgeVariable(j)) {
+
+		if (IsKnowledgeVariable(j)) {
 			unit.CheckKnowledgeChange(j, um->Modifier.Variables[j].Value);
-		} else if (j == SIGHTRANGE_INDEX || j == DAYSIGHTRANGEBONUS_INDEX || j == NIGHTSIGHTRANGEBONUS_INDEX) {
-			if (!unit.Removed && !SaveGameLoading) {
-				MapUnmarkUnitSight(unit);
-				UpdateUnitSightRange(unit);
-				MapMarkUnitSight(unit);
-			}
 		}
-		//Wyrmgus end
+
+		switch (j) {
+			case ATTACKRANGE_INDEX:
+				if (unit.Container && !SaveGameLoading) {
+					unit.Container->UpdateContainerAttackRange();
+				}
+				break;
+			case LEVEL_INDEX:
+			case POINTS_INDEX:
+				unit.UpdateXPRequired();
+				break;
+			case SIGHTRANGE_INDEX:
+			case DAYSIGHTRANGEBONUS_INDEX:
+			case NIGHTSIGHTRANGEBONUS_INDEX:
+			case ETHEREALVISION_INDEX:
+				if (!unit.Removed && !SaveGameLoading) {
+					UpdateUnitSightRange(unit);
+					MapMarkUnitSight(unit);
+				}
+				break;
+			default:
+				break;
+		}
 	}
 	
 	for (const auto &[unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
@@ -2107,6 +2133,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 			}
 		}
 	}
+
 	unit.UpdateButtonIcons();
 	//Wyrmgus end
 	
