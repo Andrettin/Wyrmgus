@@ -334,7 +334,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		}
 		file.printf("},\n  ");
 	} else {
-		assert_throw(unit.Resource.Active == 0);
+		assert_log(unit.Resource.Active == 0);
 	}
 	file.printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 
