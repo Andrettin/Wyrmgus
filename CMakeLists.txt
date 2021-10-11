@@ -501,6 +501,7 @@ source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
 	src/util/angle_util.cpp
+	src/util/assert_util.cpp
 	src/util/astronomy_util.cpp
 	src/util/color_container.cpp
 	src/util/date_util.cpp
