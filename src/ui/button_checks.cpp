@@ -417,6 +417,10 @@ bool ButtonCheckResearch(const CUnit &unit, const wyrmgus::button &button)
 
 	const CUpgrade *upgrade = button.get_value_upgrade(&unit);
 
+	if (upgrade == nullptr) {
+		return false;
+	}
+
 	// check if allowed
 	if (!check_conditions<true>(upgrade, unit.Player, false)) {
 		return false;
@@ -426,6 +430,7 @@ bool ButtonCheckResearch(const CUnit &unit, const wyrmgus::button &button)
 		&& UpgradeIdAllowed(*unit.Player, upgrade->ID) != 'A' && UpgradeIdAllowed(*unit.Player, upgrade->ID) != 'R') {
 		return false;
 	}
+
 	return true;
 }
 
@@ -440,10 +445,16 @@ bool ButtonCheckResearch(const CUnit &unit, const wyrmgus::button &button)
 */
 bool ButtonCheckSingleResearch(const CUnit &unit, const wyrmgus::button &button)
 {
+	const CUpgrade *upgrade = button.get_value_upgrade();
+
+	if (upgrade == nullptr) {
+		return false;
+	}
+
 	if (ButtonCheckResearch(unit, button)
 		//Wyrmgus start
 //		&& !unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)]) {
-		&& (!unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)] || unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)] == CUpgrade::get(button.ValueStr)->get_time_cost())
+		&& (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->get_time_cost())
 	) {
 		//Wyrmgus end
 		return true;
