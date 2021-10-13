@@ -321,7 +321,6 @@ void game::save(const std::filesystem::path &filepath) const
 	file.printf("  SyncHash = %d, \n", SyncHash);
 	file.printf("  SyncRandSeed = %d, \n", random::get()->get_seed());
 	file.printf("  SaveFile = \"%s\"\n", path::to_string(CurrentMapPath).c_str());
-	file.printf("\n---  \"preview\", \"%s.pam\",\n", filepath_str.c_str());
 	file.printf("} )\n\n");
 
 	// FIXME: probably not the right place for this
