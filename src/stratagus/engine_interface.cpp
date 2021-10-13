@@ -62,6 +62,7 @@
 #include "unit/unit_type.h"
 #include "util/container_util.h"
 #include "util/exception_util.h"
+#include "util/image_util.h"
 #include "util/path_util.h"
 #include "util/queue_util.h"
 #include "util/qvariant_util.h"
@@ -620,6 +621,17 @@ void engine_interface::load_game_deferred(const std::filesystem::path &filepath)
 	this->post([filepath]() {
 		::load_game(filepath);
 	});
+}
+
+void engine_interface::crop_image_frames(const QString &filepath, const QSize &src_frame_size, const QSize &min_size) const
+{
+	try {
+		QImage image(filepath);
+		image = image::crop_frames(image, src_frame_size, min_size);
+		image.save(filepath);
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+	}
 }
 
 }

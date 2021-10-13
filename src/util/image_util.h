@@ -92,6 +92,7 @@ inline std::vector<QImage> to_frames(const QImage &image, const QSize &frame_siz
 }
 
 extern void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_order, const int frames_per_row);
+extern QImage crop_frames(const QImage &src_image, const QSize &src_frame_size, const QSize &min_size);
 
 extern void index_to_palette(QImage &image, const color_set &palette);
 

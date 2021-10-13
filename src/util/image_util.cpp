@@ -296,6 +296,120 @@ void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_
 	image.save(path::to_qstring(dir_path) + ".png");
 }
 
+QImage crop_frames(const QImage &src_image, const QSize &src_frame_size, const QSize &min_frame_size)
+{
+	if (src_image.format() != QImage::Format_RGBA8888) {
+		const QImage reformatted_src_image = src_image.convertToFormat(QImage::Format_RGBA8888);
+		return image::crop_frames(reformatted_src_image, src_frame_size, min_frame_size);
+	}
+
+	const int bpp = src_image.depth() / 8;
+
+	if (bpp != 4) {
+		throw std::runtime_error("BPP must be 4 when cropping the frames of an image.");
+	}
+
+	//crop empty space in the image's frames
+	const int horizontal_frame_count = src_image.width() / src_frame_size.width();
+	const int vertical_frame_count = src_image.height() / src_frame_size.height();
+
+	QPoint min_pos(-1, -1);
+	QPoint max_pos(-1, -1);
+
+	const int frame_width = src_frame_size.width();
+	const int frame_height = src_frame_size.height();
+
+	int src_filled_pixel_count = 0;
+
+	//scale each frame individually
+	for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
+		for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
+			const QImage frame_image = image::get_frame(src_image, frame_x, frame_y, src_frame_size);
+
+			for (int x = 0; x < frame_width; ++x) {
+				for (int y = 0; y < frame_height; ++y) {
+					if (frame_image.pixelColor(x, y).alpha() == 0) {
+						//empty pixel
+						continue;
+					}
+
+					++src_filled_pixel_count;
+
+					if (min_pos.x() == -1 || x < min_pos.x()) {
+						min_pos.setX(x);
+					}
+
+					if (min_pos.y() == -1 || y < min_pos.y()) {
+						min_pos.setY(y);
+					}
+
+					if (max_pos.x() == -1 || x > max_pos.x()) {
+						max_pos.setX(x);
+					}
+
+					if (max_pos.y() == -1 || y > max_pos.y()) {
+						max_pos.setY(y);
+					}
+				}
+			}
+		}
+	}
+
+	const int left_margin = min_pos.x();
+	const int right_margin = frame_width - 1 - max_pos.x();
+	const int top_margin = min_pos.y();
+	const int bottom_margin = frame_height - 1 - max_pos.y();
+
+	const int margin = std::min(std::min(left_margin, right_margin), std::min(top_margin, bottom_margin));
+
+	if (margin == 0) {
+		//nothing to do
+		return src_image;
+	}
+
+	const int new_frame_width = std::max(src_frame_size.width() - margin * 2, min_frame_size.width());
+	const int new_frame_height = std::max(src_frame_size.height() - margin * 2, min_frame_size.height());
+	const QSize new_frame_size(new_frame_width, new_frame_height);
+
+	const QSize result_size = src_image.size() * new_frame_size / src_frame_size;
+	QImage result_image(result_size, QImage::Format_RGBA8888);
+
+	if (result_image.isNull()) {
+		throw std::runtime_error("Failed to allocate result image for frame cropping.");
+	}
+
+	uint32_t *dst_data = reinterpret_cast<uint32_t *>(result_image.bits());
+	const int result_width = result_size.width();
+
+	//scale each frame individually
+	for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
+		for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
+			const QImage frame_image = image::get_frame(src_image, frame_x, frame_y, src_frame_size);
+			const QImage result_frame_image = frame_image.copy(margin, margin, new_frame_size.width(), new_frame_size.height());
+
+			const uint32_t *frame_data = reinterpret_cast<const uint32_t *>(result_frame_image.constBits());
+			image::copy_frame_data(frame_data, dst_data, new_frame_size, frame_x, frame_y, result_width);
+		}
+	}
+
+	int result_filled_pixel_count = 0;
+
+	image::for_each_pixel_pos(result_image, [&result_image, &result_filled_pixel_count](const int x, const int y) {
+		if (result_image.pixelColor(x, y).alpha() == 0) {
+			//empty pixel
+			return;
+		}
+
+		++result_filled_pixel_count;
+	});
+
+	if (src_filled_pixel_count != result_filled_pixel_count) {
+		throw std::runtime_error("The amount of filled pixels in the source image (" + std::to_string(src_filled_pixel_count) + ") is different than that in the result image (" + std::to_string(result_filled_pixel_count) + ") when cropping frames.");
+	}
+
+	return result_image;
+}
+
 void index_to_palette(QImage &image, const color_set &palette)
 {
 	for (int x = 0; x < image.width(); ++x) {

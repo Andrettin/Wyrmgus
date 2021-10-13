@@ -266,6 +266,8 @@ public:
 	Q_INVOKABLE void load_game(const QUrl &file_url);
 	void load_game_deferred(const std::filesystem::path &filepath);
 
+	Q_INVOKABLE void crop_image_frames(const QString &filepath, const QSize &src_frame_size, const QSize &min_size) const;
+
 signals:
 	void running_changed();
 	void scale_factor_changed();
