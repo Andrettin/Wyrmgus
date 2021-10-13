@@ -298,6 +298,10 @@ void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_
 
 QImage crop_frames(const QImage &src_image, const QSize &src_frame_size, const QSize &min_frame_size)
 {
+	if (min_frame_size.width() > src_frame_size.width() || min_frame_size.height() > src_frame_size.height()) {
+		throw std::runtime_error("The minimum frame size cannot be greater than the source frame size when cropping images.");
+	}
+
 	if (src_image.format() != QImage::Format_RGBA8888) {
 		const QImage reformatted_src_image = src_image.convertToFormat(QImage::Format_RGBA8888);
 		return image::crop_frames(reformatted_src_image, src_frame_size, min_frame_size);
@@ -371,6 +375,8 @@ QImage crop_frames(const QImage &src_image, const QSize &src_frame_size, const Q
 	const int new_frame_height = std::max(src_frame_size.height() - margin * 2, min_frame_size.height());
 	const QSize new_frame_size(new_frame_width, new_frame_height);
 
+	const int new_margin = (src_frame_size.width() - new_frame_width) / 2;
+
 	const QSize result_size = src_image.size() * new_frame_size / src_frame_size;
 	QImage result_image(result_size, QImage::Format_RGBA8888);
 
@@ -385,7 +391,7 @@ QImage crop_frames(const QImage &src_image, const QSize &src_frame_size, const Q
 	for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
 		for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
 			const QImage frame_image = image::get_frame(src_image, frame_x, frame_y, src_frame_size);
-			const QImage result_frame_image = frame_image.copy(margin, margin, new_frame_size.width(), new_frame_size.height());
+			const QImage result_frame_image = frame_image.copy(new_margin, new_margin, new_frame_size.width(), new_frame_size.height());
 
 			const uint32_t *frame_data = reinterpret_cast<const uint32_t *>(result_frame_image.constBits());
 			image::copy_frame_data(frame_data, dst_data, new_frame_size, frame_x, frame_y, result_width);
