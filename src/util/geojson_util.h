@@ -44,4 +44,21 @@ inline void process_features(const std::vector<QVariantList> &geojson_data_list,
 	}
 }
 
+template <typename function_type>
+inline void process_feature_data(const QVariantMap &feature_data, const function_type &processing_function)
+{
+	const QString type_str = feature_data.value("type").toString();
+
+	if (type_str == "MultiLineString" || type_str == "MultiPolygon" || type_str == "MultiPoint") {
+		for (const QVariant &subfeature_variant : feature_data.value("data").toList()) {
+			const QVariantMap subfeature = subfeature_variant.toMap();
+			geojson::process_feature_data(subfeature, processing_function);
+		}
+	} else if (type_str == "LineString" || type_str == "Polygon" || type_str == "Point") {
+		processing_function(feature_data);
+	} else {
+		throw std::runtime_error("Invalid GeoJSON feature type string: \"" + type_str.toStdString() + "\".");
+	}
+}
+
 }

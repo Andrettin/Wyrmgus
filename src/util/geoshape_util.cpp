@@ -140,7 +140,7 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 			}
 
 			image.setPixelColor(pixel_pos, color);
-			pixel_checkpoint_count++;
+			++pixel_checkpoint_count;
 
 			if (pixel_checkpoint_count >= pixel_checkpoint_threshold) {
 				image.save(QString::fromStdString(image_checkpoint_save_filename));

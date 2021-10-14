@@ -177,13 +177,13 @@ terrain_geodata_map world::parse_terrain_geojson_folder() const
 			terrain = terrain_type::get(terrain_type_identifier.toStdString());
 		}
 
-		const QString type_str = feature.value("type").toString();
-		for (const QVariant &subfeature_variant : feature.value("data").toList()) {
-			const QVariantMap subfeature_map = subfeature_variant.toMap();
+		geojson::process_feature_data(feature, [&](const QVariantMap &feature_data) {
+			const QString type_str = feature_data.value("type").toString();
+
 			std::unique_ptr<QGeoShape> geoshape;
 
-			if (type_str == "MultiLineString") {
-				const QGeoPath geopath = subfeature_map.value("data").value<QGeoPath>();
+			if (type_str == "LineString") {
+				const QGeoPath geopath = feature_data.value("data").value<QGeoPath>();
 				auto geopath_copy = std::make_unique<QGeoPath>(geopath);
 
 				if (terrain_feature != nullptr && terrain_feature->get_geopath_width() != 0) {
@@ -191,9 +191,14 @@ terrain_geodata_map world::parse_terrain_geojson_folder() const
 				}
 
 				geoshape = std::move(geopath_copy);
-			} else { //MultiPolygon
-				const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
+			} else if (type_str == "Polygon") {
+				const QGeoPolygon geopolygon = feature_data.value("data").value<QGeoPolygon>();
 				geoshape = std::make_unique<QGeoPolygon>(geopolygon);
+			} else if (type_str == "Point") {
+				const QGeoCircle geocircle = feature_data.value("data").value<QGeoCircle>();
+				geoshape = std::make_unique<QGeoCircle>(geocircle);
+			} else {
+				throw std::runtime_error("Invalid GeoJSON feature type string: \"" + type_str.toStdString() + "\".");
 			}
 
 			if (terrain_feature != nullptr) {
@@ -201,7 +206,7 @@ terrain_geodata_map world::parse_terrain_geojson_folder() const
 			} else {
 				terrain_data[terrain].push_back(std::move(geoshape));
 			}
-		}
+		});
 	});
 
 	return terrain_data;
