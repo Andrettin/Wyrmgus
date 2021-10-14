@@ -520,7 +520,9 @@ void map_template::apply_terrain(const QPoint &template_start_pos, const QPoint 
 void map_template::apply_terrain(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
 	this->load_terrain(overlay);
-	this->load_trade_route_image();
+	if (overlay) {
+		this->load_trade_route_image();
+	}
 
 	const QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
 	if (!terrain_image.isNull()) {
