@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ namespace wyrmgus {
 	class map_projection;
 }
 
-namespace wyrmgus::geopath {
+namespace wyrmgus::geocircle {
 
-extern void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const georectangle &georectangle, const map_projection *map_projection);
+extern void write_to_image(const QGeoCircle &geocircle, QImage &image, const QColor &color, const georectangle &georectangle, const map_projection *map_projection);
 
 }

@@ -31,6 +31,7 @@
 #include "map/map_projection.h"
 #include "util/geocoordinate.h"
 #include "util/georectangle.h"
+#include "util/geoshape_util.h"
 #include "util/point_util.h"
 
 namespace wyrmgus::geopath {
@@ -43,7 +44,7 @@ void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color,
 
 		if (pixel_pos.x() >= 0 && pixel_pos.y() >= 0 && pixel_pos.x() < image.width() && pixel_pos.y() < image.height()) {
 			//only write to the image if the position is actually in it, but take the position into account either way for the purpose of getting the previous pixel pos, so that map templates fit together well
-			geopath::write_pixel_to_image(pixel_pos, color, image);
+			geoshape::write_pixel_to_image(pixel_pos, color, image);
 		}
 
 		if (previous_pixel_pos != QPoint(-1, -1) && !point::is_cardinally_adjacent_to(pixel_pos, previous_pixel_pos)) {
@@ -71,7 +72,7 @@ void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color,
 				}
 
 				if (previous_pixel_pos.x() >= 0 && previous_pixel_pos.y() >= 0 && previous_pixel_pos.x() < image.width() && previous_pixel_pos.y() < image.height()) {
-					geopath::write_pixel_to_image(previous_pixel_pos, color, image);
+					geoshape::write_pixel_to_image(previous_pixel_pos, color, image);
 				}
 			}
 		}

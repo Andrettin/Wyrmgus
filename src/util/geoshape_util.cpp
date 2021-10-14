@@ -30,6 +30,7 @@
 
 #include "map/map_projection.h"
 #include "util/geocoordinate.h"
+#include "util/geocircle_util.h"
 #include "util/geopath_util.h"
 #include "util/georectangle.h"
 #include "util/point_util.h"
@@ -45,24 +46,38 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 		return;
 	}
 
-	if (geoshape.type() == QGeoShape::PathType) {
-		const QGeoPath &geopath = static_cast<const QGeoPath &>(geoshape);
-		geopath::write_to_image(geopath, image, color, georectangle, map_projection);
+	switch (geoshape.type()) {
+		case QGeoShape::PathType: {
+			const QGeoPath &geopath = static_cast<const QGeoPath &>(geoshape);
+			geopath::write_to_image(geopath, image, color, georectangle, map_projection);
 
-		//if the geopath's width is 0, there is nothing further to do here, but otherwise, use the normal method of geoshape writing as well
-		if (geopath.width() == 0) {
-			return;
+			//if the geopath's width is 0, there is nothing further to do here, but otherwise, use the normal method of geoshape writing as well
+			if (geopath.width() == 0) {
+				return;
+			}
+
+			//increase the bounding rectangle of geopaths slightly, as otherwise a part of the path's width is cut off
+			QGeoCoordinate bottom_left = bounding_qgeorectangle.bottomLeft();
+			QGeoCoordinate top_right = bounding_qgeorectangle.topRight();
+			bottom_left.setLatitude(bottom_left.latitude() - 0.1);
+			bottom_left.setLongitude(bottom_left.longitude() - 0.1);
+			top_right.setLatitude(top_right.latitude() + 0.1);
+			top_right.setLongitude(top_right.longitude() + 0.1);
+			bounding_qgeorectangle.setBottomLeft(bottom_left);
+			bounding_qgeorectangle.setTopRight(top_right);
+			break;
 		}
+		case QGeoShape::CircleType: {
+			const QGeoCircle &geocircle = static_cast<const QGeoCircle &>(geoshape);
+			geocircle::write_to_image(geocircle, image, color, georectangle, map_projection);
 
-		//increase the bounding rectangle of geopaths slightly, as otherwise a part of the path's width is cut off
-		QGeoCoordinate bottom_left = bounding_qgeorectangle.bottomLeft();
-		QGeoCoordinate top_right = bounding_qgeorectangle.topRight();
-		bottom_left.setLatitude(bottom_left.latitude() - 0.1);
-		bottom_left.setLongitude(bottom_left.longitude() - 0.1);
-		top_right.setLatitude(top_right.latitude() + 0.1);
-		top_right.setLongitude(top_right.longitude() + 0.1);
-		bounding_qgeorectangle.setBottomLeft(bottom_left);
-		bounding_qgeorectangle.setTopRight(top_right);
+			if (geocircle.radius() == -1) {
+				return;
+			}
+			break;
+		}
+		default:
+			break;
 	}
 
 	const wyrmgus::georectangle bounding_georectangle = georectangle::from_qgeorectangle(bounding_qgeorectangle);

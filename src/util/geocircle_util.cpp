@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,15 +24,25 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-namespace wyrmgus {
-	class georectangle;
-	class map_projection;
+#include "util/geocircle_util.h"
+
+#include "map/map_projection.h"
+#include "util/geocoordinate.h"
+#include "util/geoshape_util.h"
+
+namespace wyrmgus::geocircle {
+
+void write_to_image(const QGeoCircle &geocircle, QImage &image, const QColor &color, const georectangle &georectangle, const map_projection *map_projection)
+{
+	const QGeoCoordinate geocoordinate = geocircle.center();
+
+	const QPoint pixel_pos = map_projection->geocoordinate_to_point(wyrmgus::geocoordinate(geocoordinate), georectangle, image.size());
+
+	if (pixel_pos.x() >= 0 && pixel_pos.y() >= 0 && pixel_pos.x() < image.width() && pixel_pos.y() < image.height()) {
+		geoshape::write_pixel_to_image(pixel_pos, color, image);
+	}
 }
-
-namespace wyrmgus::geopath {
-
-extern void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const georectangle &georectangle, const map_projection *map_projection);
 
 }

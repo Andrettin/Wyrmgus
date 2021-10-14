@@ -506,6 +506,7 @@ set(util_SRCS
 	src/util/color_container.cpp
 	src/util/date_util.cpp
 	src/util/exception_util.cpp
+	src/util/geocircle_util.cpp
 	src/util/geocoordinate.cpp
 	src/util/geojson_util.cpp
 	src/util/geopath_util.cpp
@@ -1059,6 +1060,7 @@ set(wyrmgus_util_HDRS
 	src/util/enum_util.h
 	src/util/exception_util.h
 	src/util/fractional_int.h
+	src/util/geocircle_util.h
 	src/util/geocoordinate.h
 	src/util/geojson_util.h
 	src/util/geopath_util.h
