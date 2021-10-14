@@ -520,6 +520,7 @@ void map_template::apply_terrain(const QPoint &template_start_pos, const QPoint 
 void map_template::apply_terrain(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
 	this->load_terrain(overlay);
+	this->load_trade_route_image();
 
 	const QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
 	if (!terrain_image.isNull()) {
@@ -2521,46 +2522,58 @@ void map_template::load_terrain_image(const bool overlay)
 	}
 
 	terrain_image = this->load_terrain_image_file(terrain_file);
+}
 
-	if (overlay && !this->get_trade_route_file().empty()) {
-		const QImage trade_route_image = this->load_terrain_image_file(this->get_trade_route_file());
-
-		image::for_each_pixel_pos(trade_route_image, [&trade_route_image, &terrain_image](const int x, const int y) {
-			const QColor color = trade_route_image.pixelColor(x, y);
-
-			if (color.alpha() == 0) {
-				//ignore fully transparent pixels
-				return;
-			}
-
-			if (color == terrain_type::none_color) {
-				//ignore black pixels in the trade route image, as they are there only to prevent trade route pixels from being generated in certain positions
-				return;
-			}
-
-			const QColor old_color = terrain_image.pixelColor(x, y);
-
-			if (old_color.alpha() != 0) {
-				const terrain_type *terrain = nullptr;
-				const terrain_feature *terrain_feature = terrain_feature::try_get_by_color(old_color);
-				if (terrain_feature != nullptr) {
-					terrain = terrain_feature->get_terrain_type();
-				} else {
-					terrain = terrain_type::try_get_by_color(old_color);
-				}
-
-				if (terrain != nullptr && terrain->is_water()) {
-					if (terrain_feature == nullptr || !terrain_feature->is_river()) {
-						//do not replace non-river water pixels with trade route ones
-						return;
-					}
-				}
-			}
-
-			//apply the trade route pixel to the overlay image
-			terrain_image.setPixelColor(x, y, color);
-		});
+void map_template::load_trade_route_image()
+{
+	if (this->get_trade_route_file().empty()) {
+		return;
 	}
+
+	QImage &terrain_image = this->overlay_terrain_image;
+
+	const QImage trade_route_image = this->load_terrain_image_file(this->get_trade_route_file());
+
+	if (terrain_image.isNull()) {
+		terrain_image = trade_route_image;
+		return;
+	}
+
+	image::for_each_pixel_pos(trade_route_image, [&trade_route_image, &terrain_image](const int x, const int y) {
+		const QColor color = trade_route_image.pixelColor(x, y);
+
+		if (color.alpha() == 0) {
+			//ignore fully transparent pixels
+			return;
+		}
+
+		if (color == terrain_type::none_color) {
+			//ignore black pixels in the trade route image, as they are there only to prevent trade route pixels from being generated in certain positions
+			return;
+		}
+
+		const QColor old_color = terrain_image.pixelColor(x, y);
+
+		if (old_color.alpha() != 0) {
+			const terrain_type *terrain = nullptr;
+			const terrain_feature *terrain_feature = terrain_feature::try_get_by_color(old_color);
+			if (terrain_feature != nullptr) {
+				terrain = terrain_feature->get_terrain_type();
+			} else {
+				terrain = terrain_type::try_get_by_color(old_color);
+			}
+
+			if (terrain != nullptr && terrain->is_water()) {
+				if (terrain_feature == nullptr || !terrain_feature->is_river()) {
+					//do not replace non-river water pixels with trade route ones
+					return;
+				}
+			}
+		}
+
+		//apply the trade route pixel to the overlay image
+		terrain_image.setPixelColor(x, y, color);
+	});
 }
 
 void map_template::set_territory_file(const std::filesystem::path &filepath)
