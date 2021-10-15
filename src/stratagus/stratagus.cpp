@@ -344,9 +344,9 @@ void PrintLicense()
 **
 **  @param err  Error code to pass to shell.
 */
-void Exit(int err)
+void Exit(const int err)
 {
-	if (GameRunning) {
+	if (GameRunning && err != EXIT_FAILURE) {
 		StopGame(GameExit);
 		return;
 	}
