@@ -49,6 +49,7 @@ class terrain_feature final : public named_data_entry, public data_type<terrain_
 	Q_PROPERTY(bool trade_route MEMBER trade_route READ is_trade_route)
 	Q_PROPERTY(bool major_river MEMBER major_river READ is_major_river)
 	Q_PROPERTY(bool minor_river MEMBER minor_river READ is_minor_river)
+	Q_PROPERTY(bool terrain_generation_seed MEMBER terrain_generation_seed READ is_terrain_generation_seed)
 
 public:
 	static constexpr const char *class_identifier = "terrain_feature";
@@ -153,12 +154,18 @@ public:
 		return 0;
 	}
 
+	bool is_terrain_generation_seed() const
+	{
+		return this->terrain_generation_seed;
+	}
+
 private:
 	QColor color;
 	wyrmgus::terrain_type *terrain_type = nullptr;
 	bool trade_route = false;
 	bool major_river = false;
 	bool minor_river = false;
+	bool terrain_generation_seed = false;
 	std::map<const civilization *, std::string> cultural_names; //names for the terrain feature for each different culture/civilization
 
 	friend int ::CclDefineTerrainFeature(lua_State *l);

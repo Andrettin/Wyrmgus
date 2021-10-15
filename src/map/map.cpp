@@ -3135,6 +3135,10 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 				if (this->is_point_in_a_subtemplate_area(tile_pos, z)) {
 					continue;
 				}
+
+				if (tile->get_terrain_feature() != nullptr && !tile->get_terrain_feature()->is_terrain_generation_seed()) {
+					continue;
+				}
 				
 				seeds.push_back(tile_pos);
 			}
