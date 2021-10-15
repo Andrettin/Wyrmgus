@@ -39,6 +39,7 @@
 #include "item/unique_item.h"
 #include "map/character_substitution.h"
 #include "map/character_unit.h"
+#include "map/generated_terrain.h"
 #include "map/historical_location.h"
 #include "map/map.h"
 #include "map/map_info.h"
@@ -334,7 +335,7 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			
 			generated_terrain->ProcessConfigData(child_config_data);
 				
-			if (!generated_terrain->TerrainType) {
+			if (generated_terrain->get_terrain_type() == nullptr) {
 				continue;
 			}
 			
@@ -948,7 +949,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 
 	ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain..."), this->get_name().c_str());
 	for (const auto &generated_terrain : this->generated_terrains) {
-		CMap::get()->GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
+		CMap::get()->generate_terrain(generated_terrain.get(), map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
 	}
 
 	if (!this->IsSubtemplateArea()) {
@@ -3357,169 +3358,6 @@ void map_template::add_site(const site *site)
 	}
 
 	this->sites.push_back(site);
-}
-
-void generated_terrain::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "seed_count") {
-		this->SeedCount = std::stoi(value);
-	} else if (key == "expansion_chance") {
-		this->ExpansionChance = std::stoi(value);
-	} else if (key == "max_percent") {
-		this->MaxPercent = std::stoi(value);
-	} else if (key == "use_existing_as_seeds") {
-		this->UseExistingAsSeeds = string::to_bool(value);
-	} else if (key == "use_subtemplate_borders_as_seeds") {
-		this->UseSubtemplateBordersAsSeeds = string::to_bool(value);
-	} else if (key == "target_terrain_type") {
-		const terrain_type *target_terrain_type = terrain_type::get(value);
-		this->TargetTerrainTypes.push_back(target_terrain_type);
-	} else {
-		throw std::runtime_error("Invalid generated terrain property: \"" + key + "\".");
-	}
-}
-
-void generated_terrain::process_sml_scope(const sml_data &scope)
-{
-	const std::string &tag = scope.get_tag();
-
-	throw std::runtime_error("Invalid generated terrain scope: \"" + tag + "\".");
-}
-
-void generated_terrain::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "terrain_type") {
-			this->TerrainType = terrain_type::get(value);
-		} else if (key == "seed_count") {
-			this->SeedCount = std::stoi(value);
-		} else if (key == "expansion_chance") {
-			this->ExpansionChance = std::stoi(value);
-		} else if (key == "max_percent") {
-			this->MaxPercent = std::stoi(value);
-		} else if (key == "use_existing_as_seeds") {
-			this->UseExistingAsSeeds = string::to_bool(value);
-		} else if (key == "use_subtemplate_borders_as_seeds") {
-			this->UseSubtemplateBordersAsSeeds = string::to_bool(value);
-		} else if (key == "target_terrain_type") {
-			const terrain_type *target_terrain_type = terrain_type::get(value);
-			this->TargetTerrainTypes.push_back(target_terrain_type);
-		} else {
-			fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	if (!this->TerrainType) {
-		fprintf(stderr, "Generated terrain has no terrain type.\n");
-	}
-}
-
-/**
-**	@brief	Get whether the terrain generation can use the given tile as a seed
-**
-**	@param	tile	The tile
-**
-**	@return	True if the tile can be used as a seed, or false otherwise
-*/
-bool generated_terrain::CanUseTileAsSeed(const tile *tile) const
-{
-	const terrain_type *top_terrain = tile->get_top_terrain();
-	
-	if (top_terrain == this->TerrainType) { //top terrain is the same as the one for the generation, so the tile can be used as a seed
-		return true;
-	}
-	
-	if (this->TerrainType == tile->get_terrain() && std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), top_terrain) == this->TargetTerrainTypes.end()) { //the tile's base terrain is the same as the one for the generation, and its overlay terrain is not a target for the generation
-		return true;
-	}
-	
-	return false;
-}
-
-/**
-**	@brief	Get whether the terrain can be generated on the given tile
-**
-**	@param	tile	The tile
-**
-**	@return	True if the terrain can be generated on the tile, or false otherwise
-*/
-bool generated_terrain::CanGenerateOnTile(const tile *tile) const
-{
-	if (this->TerrainType->is_overlay()) {
-		if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->get_top_terrain()) == this->TargetTerrainTypes.end()) { //disallow generating over terrains that aren't a target for the generation
-			return false;
-		}
-	} else {
-		if (
-			std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->get_top_terrain()) == this->TargetTerrainTypes.end()
-			&& std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->get_terrain()) == this->TargetTerrainTypes.end()
-		) {
-			return false;
-		}
-		
-		if ( //don't allow generating the terrain on the tile if it is a base terrain, and putting it there would destroy an overlay terrain that isn't a target of the generation
-			tile->get_overlay_terrain() != nullptr
-			&& !this->CanRemoveTileOverlayTerrain(tile)
-			&& !vector::contains(tile->get_overlay_terrain()->get_base_terrain_types(), this->TerrainType)
-		) {
-			return false;
-		}
-		
-		if (!this->TerrainType->is_border_terrain_type(tile->get_terrain())) {
-			//don't allow generating on the tile if it can't be a border terrain to the terrain we want to generate
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-/**
-**	@brief	Get whether the tile can be a part of an expansion
-**
-**	@param	tile	The tile
-**
-**	@return	True if the tile can be part of an expansion, or false otherwise
-*/
-bool generated_terrain::CanTileBePartOfExpansion(const tile *tile) const
-{
-	if (this->CanGenerateOnTile(tile)) {
-		return true;
-	}
-	
-	if (this->TerrainType == tile->get_top_terrain()) {
-		return true;
-	}
-	
-	if (!this->TerrainType->is_overlay()) {
-		if (this->TerrainType == tile->get_terrain()) {
-			return true;
-		}
-	}
-	
-	return false;
-}
-
-/**
-**	@brief	Get whether the terrain generation can remove the tile's overlay terrain
-**
-**	@param	tile	The tile
-**
-**	@return	True if the terrain generation can remove the tile's overlay terrain, or false otherwise
-*/
-bool generated_terrain::CanRemoveTileOverlayTerrain(const tile *tile) const
-{
-	if (!vector::contains(this->TargetTerrainTypes, tile->get_overlay_terrain())) {
-		return false;
-	}
-	
-	return true;
 }
 
 }

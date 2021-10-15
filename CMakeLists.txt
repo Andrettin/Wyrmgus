@@ -207,6 +207,7 @@ source_group(language FILES ${language_SRCS})
 set(map_SRCS
 	src/map/character_substitution.cpp
 	src/map/character_unit.cpp
+	src/map/generated_terrain.cpp
 	src/map/historical_location.cpp
 	src/map/landmass.cpp
 	src/map/landmass_container.cpp
@@ -762,6 +763,7 @@ set(wyrmgus_map_HDRS
 	src/map/character_substitution.h
 	src/map/character_unit.h
 	src/map/equirectangular_map_projection.h
+	src/map/generated_terrain.h
 	src/map/historical_location.h
 	src/map/landmass.h
 	src/map/landmass_container.h

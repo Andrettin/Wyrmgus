@@ -177,7 +177,7 @@ public:
 	void AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void adjust_territory_irregularities(const QPoint &min_pos, const QPoint &max_pos, const int z);
-	void GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
+	void generate_terrain(const generated_terrain *generated_terrain, const QPoint &min_pos, const QPoint &max_pos, const bool preserve_coastline, const int z);
 	bool CanTileBePartOfMissingTerrainGeneration(const wyrmgus::tile *tile, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type) const;
 	void generate_missing_terrain(const QRect &rect, const int z);
 	void expand_terrain_features_to_same_terrain(const int z);

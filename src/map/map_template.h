@@ -49,6 +49,7 @@ class character;
 class character_substitution;
 class character_unit;
 class faction;
+class generated_terrain;
 class historical_location;
 class historical_unit;
 class map_projection;
@@ -60,33 +61,6 @@ class unique_item;
 class unit_class;
 class unit_type;
 class world;
-
-class generated_terrain final
-{
-public:
-	generated_terrain() {}
-
-	explicit generated_terrain(terrain_type *terrain_type) : TerrainType(terrain_type)
-	{
-	}
-
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
-	void ProcessConfigData(const CConfigData *config_data);
-	
-	bool CanUseTileAsSeed(const tile *tile) const;
-	bool CanGenerateOnTile(const tile *tile) const;
-	bool CanTileBePartOfExpansion(const tile *tile) const;
-	bool CanRemoveTileOverlayTerrain(const tile *tile) const;
-
-	terrain_type *TerrainType = nullptr;
-	int SeedCount = 0;
-	int ExpansionChance = 50; //50% chance to expand to a tile by default
-	int MaxPercent = 0; //the maximum percentage of tiles in the map subtemplate that should have the generated terrain type as their top tile
-	bool UseExistingAsSeeds = false; //whether to use existing tiles of the given terrain in the map layer as seeds for this terrain generation
-	bool UseSubtemplateBordersAsSeeds = false; //whether to use the border tiles of subtemplates that have the given terrain as seeds for this terrain generation
-	std::vector<const terrain_type *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
-};
 
 class map_template final : public named_data_entry, public data_type<map_template>, public CDataType
 {

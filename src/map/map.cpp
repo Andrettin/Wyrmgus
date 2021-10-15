@@ -39,6 +39,7 @@
 #include "game/game.h" // for the SaveGameLoading variable
 //Wyrmgus end
 #include "iolib.h"
+#include "map/generated_terrain.h"
 #include "map/landmass.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
@@ -3093,42 +3094,33 @@ void CMap::adjust_territory_irregularities(const QPoint &min_pos, const QPoint &
 	}
 }
 
-/**
-**	@brief	Generate a given terrain on the map
-**
-**	@param	generated_terrain	The terrain generation characteristics
-**	@param	min_pos				The minimum position in the map to generate the terrain on
-**	@param	max_pos				The maximum position in the map to generate the terrain on
-**	@param	preserve_coastline	Whether to avoid changing the coastline during terrain generation
-**	@param	z					The map layer to generate the terrain on
-*/
-void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z)
+void CMap::generate_terrain(const generated_terrain *generated_terrain, const QPoint &min_pos, const QPoint &max_pos, const bool preserve_coastline, const int z)
 {
 	if (SaveGameLoading) {
 		return;
 	}
 	
-	wyrmgus::terrain_type *terrain_type = generated_terrain->TerrainType;
-	const int seed_count = generated_terrain->SeedCount;
-	const int max_tile_quantity = (max_pos.x + 1 - min_pos.x) * (max_pos.y + 1 - min_pos.y) * generated_terrain->MaxPercent / 100;
+	const wyrmgus::terrain_type *terrain_type = generated_terrain->get_terrain_type();
+	const int seed_count = generated_terrain->get_seed_count();
+	const int max_tile_quantity = (max_pos.x() + 1 - min_pos.x()) * (max_pos.y() + 1 - min_pos.y()) * generated_terrain->get_max_percent() / 100;
 	int tile_quantity = 0;
 	
-	Vec2i random_pos(0, 0);
+	QPoint random_pos(0, 0);
 	int count = seed_count;
 	
-	std::vector<Vec2i> seeds;
+	std::vector<QPoint> seeds;
 	
-	if (generated_terrain->UseExistingAsSeeds) { //use existing tiles of the given terrain as seeds for the terrain generation
-		for (int x = min_pos.x; x <= max_pos.x; ++x) {
-			for (int y = min_pos.y; y <= max_pos.y; ++y) {
-				const Vec2i tile_pos(x, y);
+	if (generated_terrain->uses_existing_as_seeds()) { //use existing tiles of the given terrain as seeds for the terrain generation
+		for (int x = min_pos.x(); x <= max_pos.x(); ++x) {
+			for (int y = min_pos.y(); y <= max_pos.y(); ++y) {
+				const QPoint tile_pos(x, y);
 				const wyrmgus::tile *tile = this->Field(x, y, z);
 				
 				if (max_tile_quantity != 0 && tile->get_top_terrain() == terrain_type) {
 					tile_quantity++;
 				}
 				
-				if (!generated_terrain->CanUseTileAsSeed(tile)) {
+				if (!generated_terrain->can_use_tile_as_seed(tile)) {
 					continue;
 				}
 				
@@ -3145,7 +3137,7 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 		}
 	}
 	
-	if (generated_terrain->UseSubtemplateBordersAsSeeds) {
+	if (generated_terrain->uses_subtemplate_borders_as_seeds()) {
 		for (const auto &kv_pair : this->MapLayers[z]->subtemplate_areas) {
 			const QRect &subtemplate_rect = kv_pair.second;
 
@@ -3154,10 +3146,10 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 			
 			for (int x = subtemplate_min_pos.x(); x <= subtemplate_max_pos.x(); ++x) {
 				for (int y = subtemplate_min_pos.y(); y <= subtemplate_max_pos.y(); ++y) {
-					const Vec2i tile_pos(x, y);
+					const QPoint tile_pos(x, y);
 					const wyrmgus::tile *tile = this->Field(x, y, z);
 					
-					if (!generated_terrain->CanUseTileAsSeed(tile)) {
+					if (!generated_terrain->can_use_tile_as_seed(tile)) {
 						continue;
 					}
 					
@@ -3171,10 +3163,13 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 		}
 	}
 	
-	std::vector<Vec2i> potential_positions;
-	for (int x = min_pos.x; x <= max_pos.x; ++x) {
-		for (int y = min_pos.y; y <= max_pos.y; ++y) {
-			potential_positions.push_back(Vec2i(x, y));
+	std::vector<QPoint> potential_positions;
+
+	if (seed_count > 0) {
+		for (int x = min_pos.x(); x <= max_pos.x(); ++x) {
+			for (int y = min_pos.y(); y <= max_pos.y(); ++y) {
+				potential_positions.push_back(QPoint(x, y));
+			}
 		}
 	}
 	
@@ -3192,7 +3187,7 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 		
 		const wyrmgus::terrain_type *tile_terrain = this->GetTileTerrain(random_pos, false, z);
 		
-		if (!generated_terrain->CanGenerateOnTile(this->Field(random_pos, z))) {
+		if (!generated_terrain->can_generate_on_tile(this->Field(random_pos, z))) {
 			continue;
 		}
 		
@@ -3212,12 +3207,12 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 			&& !this->TileHasUnitsIncompatibleWithTerrain(random_pos, terrain_type, z)
 			&& (!terrain_type->has_flag(tile_flag::impassable) || !this->TileBordersUnit(random_pos, z)) // if the terrain is unpassable, don't expand to spots adjacent to units
 		) {
-			std::vector<Vec2i> adjacent_positions;
+			std::vector<QPoint> adjacent_positions;
 			for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
 				for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
-					Vec2i diagonal_pos(random_pos.x + sub_x, random_pos.y + sub_y);
-					Vec2i vertical_pos(random_pos.x, random_pos.y + sub_y);
-					Vec2i horizontal_pos(random_pos.x + sub_x, random_pos.y);
+					QPoint diagonal_pos(random_pos.x() + sub_x, random_pos.y() + sub_y);
+					QPoint vertical_pos(random_pos.x(), random_pos.y() + sub_y);
+					QPoint horizontal_pos(random_pos.x() + sub_x, random_pos.y());
 					if (!this->Info->IsPointOnMap(diagonal_pos, z)) {
 						continue;
 					}
@@ -3227,9 +3222,9 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 					const wyrmgus::terrain_type *horizontal_tile_terrain = this->GetTileTerrain(horizontal_pos, false, z);
 					
 					if (
-						!generated_terrain->CanGenerateOnTile(this->Field(diagonal_pos, z))
-						|| !generated_terrain->CanGenerateOnTile(this->Field(vertical_pos, z))
-						|| !generated_terrain->CanGenerateOnTile(this->Field(horizontal_pos, z))
+						!generated_terrain->can_generate_on_tile(this->Field(diagonal_pos, z))
+						|| !generated_terrain->can_generate_on_tile(this->Field(vertical_pos, z))
+						|| !generated_terrain->can_generate_on_tile(this->Field(horizontal_pos, z))
 					) {
 						continue;
 					}
@@ -3261,30 +3256,30 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 			}
 			
 			if (adjacent_positions.size() > 0) {
-				Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
+				QPoint adjacent_pos = vector::get_random(adjacent_positions);
 				if (!terrain_type->is_overlay()) {
-					if (generated_terrain->CanRemoveTileOverlayTerrain(this->Field(random_pos, z))) {
+					if (generated_terrain->can_remove_tile_overlay_terrain(this->Field(random_pos, z))) {
 						this->Field(random_pos, z)->RemoveOverlayTerrain();
 					}
-					if (generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z))) {
+					if (generated_terrain->can_remove_tile_overlay_terrain(this->Field(adjacent_pos, z))) {
 						this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
 					}
-					if (generated_terrain->CanRemoveTileOverlayTerrain(this->Field(Vec2i(random_pos.x, adjacent_pos.y), z))) {
-						this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->RemoveOverlayTerrain();
+					if (generated_terrain->can_remove_tile_overlay_terrain(this->Field(random_pos.x(), adjacent_pos.y(), z))) {
+						this->Field(random_pos.x(), adjacent_pos.y(), z)->RemoveOverlayTerrain();
 					}
-					if (generated_terrain->CanRemoveTileOverlayTerrain(this->Field(Vec2i(adjacent_pos.x, random_pos.y), z))) {
-						this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->RemoveOverlayTerrain();
+					if (generated_terrain->can_remove_tile_overlay_terrain(this->Field(adjacent_pos.x(), random_pos.y(), z))) {
+						this->Field(adjacent_pos.x(), random_pos.y(), z)->RemoveOverlayTerrain();
 					}
 				}
 				this->Field(random_pos, z)->SetTerrain(terrain_type);
 				this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
-				this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->SetTerrain(terrain_type);
-				this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->SetTerrain(terrain_type);
+				this->Field(random_pos.x(), adjacent_pos.y(), z)->SetTerrain(terrain_type);
+				this->Field(adjacent_pos.x(), random_pos.y(), z)->SetTerrain(terrain_type);
 				count -= 1;
 				seeds.push_back(random_pos);
 				seeds.push_back(adjacent_pos);
-				seeds.push_back(Vec2i(random_pos.x, adjacent_pos.y));
-				seeds.push_back(Vec2i(adjacent_pos.x, random_pos.y));
+				seeds.push_back(QPoint(random_pos.x(), adjacent_pos.y()));
+				seeds.push_back(QPoint(adjacent_pos.x(), random_pos.y()));
 				
 				tile_quantity += 4;
 			}
@@ -3293,31 +3288,32 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 	
 	//expand seeds
 	for (size_t i = 0; i < seeds.size(); ++i) {
-		Vec2i seed_pos = seeds[i];
+		QPoint seed_pos = seeds[i];
 		
 		if (max_tile_quantity != 0 && tile_quantity >= max_tile_quantity) {
 			break;
 		}
 		
-		const int random_number = SyncRand(100);
-		if (random_number >= generated_terrain->ExpansionChance) {
+		const int random_number = random::get()->generate(100);
+		if (random_number >= generated_terrain->get_expansion_chance()) {
 			continue;
 		}
 		
-		std::vector<Vec2i> adjacent_positions;
+		std::vector<QPoint> adjacent_positions;
 		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
 			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
-				Vec2i diagonal_pos(seed_pos.x + sub_x, seed_pos.y + sub_y);
-				Vec2i vertical_pos(seed_pos.x, seed_pos.y + sub_y);
-				Vec2i horizontal_pos(seed_pos.x + sub_x, seed_pos.y);
-				if (!this->Info->IsPointOnMap(diagonal_pos, z) || diagonal_pos.x < min_pos.x || diagonal_pos.y < min_pos.y || diagonal_pos.x > max_pos.x || diagonal_pos.y > max_pos.y) {
+				QPoint diagonal_pos(seed_pos.x() + sub_x, seed_pos.y() + sub_y);
+				QPoint vertical_pos(seed_pos.x(), seed_pos.y() + sub_y);
+				QPoint horizontal_pos(seed_pos.x() + sub_x, seed_pos.y());
+				if (!this->Info->IsPointOnMap(diagonal_pos, z) || diagonal_pos.x() < min_pos.x() || diagonal_pos.y() < min_pos.y() || diagonal_pos.x() > max_pos.x() || diagonal_pos.y() > max_pos.y()) {
 					continue;
 				}
 
-				if ( //must either be able to generate on the tiles, or they must already have the generated terrain type
-					!generated_terrain->CanTileBePartOfExpansion(this->Field(diagonal_pos, z))
-					|| !generated_terrain->CanTileBePartOfExpansion(this->Field(vertical_pos, z))
-					|| !generated_terrain->CanTileBePartOfExpansion(this->Field(horizontal_pos, z))
+				if (
+					//must either be able to generate on the tiles, or they must already have the generated terrain type
+					!generated_terrain->can_tile_be_part_of_expansion(this->Field(diagonal_pos, z))
+					|| !generated_terrain->can_tile_be_part_of_expansion(this->Field(vertical_pos, z))
+					|| !generated_terrain->can_tile_be_part_of_expansion(this->Field(horizontal_pos, z))
 				) {
 					continue;
 				}
@@ -3357,9 +3353,9 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 				
 				//tiles within a subtemplate area can only be used as seeds, they cannot be modified themselves
 				if (
-					(this->is_point_in_a_subtemplate_area(diagonal_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(diagonal_pos, z)))
-					|| (this->is_point_in_a_subtemplate_area(vertical_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(vertical_pos, z)))
-					|| (this->is_point_in_a_subtemplate_area(horizontal_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(horizontal_pos, z)))
+					(this->is_point_in_a_subtemplate_area(diagonal_pos, z) && !generated_terrain->can_use_tile_as_seed(this->Field(diagonal_pos, z)))
+					|| (this->is_point_in_a_subtemplate_area(vertical_pos, z) && !generated_terrain->can_use_tile_as_seed(this->Field(vertical_pos, z)))
+					|| (this->is_point_in_a_subtemplate_area(horizontal_pos, z) && !generated_terrain->can_use_tile_as_seed(this->Field(horizontal_pos, z)))
 				) {
 					continue;
 				}
@@ -3395,12 +3391,12 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 		}
 		
 		if (adjacent_positions.size() > 0) {
-			Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
-			Vec2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
-			Vec2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
+			QPoint adjacent_pos = vector::get_random(adjacent_positions);
+			QPoint adjacent_pos_horizontal(adjacent_pos.x(), seed_pos.y());
+			QPoint adjacent_pos_vertical(seed_pos.x(), adjacent_pos.y());
 			
-			if (!this->is_point_in_a_subtemplate_area(adjacent_pos, z) && this->GetTileTopTerrain(adjacent_pos, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos, terrain_type->is_overlay(), z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z)))) {
-				if (!terrain_type->is_overlay() && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z))) {
+			if (!this->is_point_in_a_subtemplate_area(adjacent_pos, z) && this->GetTileTopTerrain(adjacent_pos, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos, terrain_type->is_overlay(), z) != terrain_type || generated_terrain->can_remove_tile_overlay_terrain(this->Field(adjacent_pos, z)))) {
+				if (!terrain_type->is_overlay() && generated_terrain->can_remove_tile_overlay_terrain(this->Field(adjacent_pos, z))) {
 					this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
 				}
 
@@ -3415,8 +3411,8 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 				}
 			}
 			
-			if (!this->is_point_in_a_subtemplate_area(adjacent_pos_horizontal, z) && this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->is_overlay(), z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z)))) {
-				if (!terrain_type->is_overlay() && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z))) {
+			if (!this->is_point_in_a_subtemplate_area(adjacent_pos_horizontal, z) && this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->is_overlay(), z) != terrain_type || generated_terrain->can_remove_tile_overlay_terrain(this->Field(adjacent_pos_horizontal, z)))) {
+				if (!terrain_type->is_overlay() && generated_terrain->can_remove_tile_overlay_terrain(this->Field(adjacent_pos_horizontal, z))) {
 					this->Field(adjacent_pos_horizontal, z)->RemoveOverlayTerrain();
 				}
 				
@@ -3431,8 +3427,8 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 				}
 			}
 			
-			if (!this->is_point_in_a_subtemplate_area(adjacent_pos_vertical, z) && this->GetTileTopTerrain(adjacent_pos_vertical, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->is_overlay(), z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z)))) {
-				if (!terrain_type->is_overlay() && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z))) {
+			if (!this->is_point_in_a_subtemplate_area(adjacent_pos_vertical, z) && this->GetTileTopTerrain(adjacent_pos_vertical, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->is_overlay(), z) != terrain_type || generated_terrain->can_remove_tile_overlay_terrain(this->Field(adjacent_pos_vertical, z)))) {
+				if (!terrain_type->is_overlay() && generated_terrain->can_remove_tile_overlay_terrain(this->Field(adjacent_pos_vertical, z))) {
 					this->Field(adjacent_pos_vertical, z)->RemoveOverlayTerrain();
 				}
 				
@@ -3909,7 +3905,7 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 				seeds.push_back(seed_pos); //push the seed back again for another try, since it may be able to generate further terrain in the future
 			}
 
-			QPoint adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
+			QPoint adjacent_pos = vector::get_random(adjacent_positions);
 			QPoint adjacent_pos_horizontal(adjacent_pos.x(), seed_pos.y());
 			QPoint adjacent_pos_vertical(seed_pos.x(), adjacent_pos.y());
 
