@@ -42,7 +42,7 @@ public:
 	{
 	}
 
-	explicit generated_terrain(terrain_type *terrain_type) : terrain_type(terrain_type)
+	explicit generated_terrain(wyrmgus::terrain_type *terrain_type) : terrain_type(terrain_type)
 	{
 	}
 
