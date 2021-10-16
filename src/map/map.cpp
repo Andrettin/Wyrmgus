@@ -3765,6 +3765,11 @@ void CMap::generate_settlement_territories(const int z)
 		return true;
 	});
 
+	if (seeds.empty()) {
+		//cannot generate
+		return;
+	}
+
 	seeds = this->expand_settlement_territories(container::to_vector(seeds), z, (tile_flag::impassable | tile_flag::coast_allowed | tile_flag::space | tile_flag::space_cliff), tile_flag::water_allowed | tile_flag::underground);
 	seeds = this->expand_settlement_territories(container::to_vector(seeds), z, (tile_flag::coast_allowed | tile_flag::space), tile_flag::water_allowed | tile_flag::underground);
 	seeds = this->expand_settlement_territories(container::to_vector(seeds), z, tile_flag::space, tile_flag::underground);
