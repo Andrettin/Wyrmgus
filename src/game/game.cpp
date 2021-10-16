@@ -1691,10 +1691,6 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 		CMap::get()->Reveal();
 	}
 
-	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
-		UI.get_minimap()->update_exploration(z);
-	}
-
 	//
 	// Sound part
 	//
@@ -1723,11 +1719,16 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 	//
 	trigger::InitActiveTriggers();
 	
+	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+		UI.get_minimap()->update_exploration(z);
+	}
+
 #if 0
 	if (!UI.SelectedViewport) {
 		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
+
 	if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::get()->MapLayers.size())) {
 		UI.CurrentMapLayer = CMap::get()->MapLayers[CPlayer::GetThisPlayer()->StartMapLayer].get();
 	}
