@@ -3196,6 +3196,11 @@ void map_template::save_terrain_images()
 
 		if (std::holds_alternative<const wyrmgus::terrain_feature *>(kv_pair.first)) {
 			terrain_feature = std::get<const wyrmgus::terrain_feature *>(kv_pair.first);
+
+			if (terrain_feature->is_hidden()) {
+				continue;
+			}
+
 			terrain = terrain_feature->get_terrain_type();
 		} else {
 			terrain = std::get<const terrain_type *>(kv_pair.first);
