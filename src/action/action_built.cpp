@@ -335,11 +335,13 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		try {
 			//Wyrmgus start
 	//		CMap::get()->SetWall(unit.tilePos, &type == UnitTypeHumanWall);
-			if (type.TerrainType->is_overlay() && CMap::get()->GetTileTerrain(unit.tilePos, type.TerrainType->is_overlay(), unit.MapLayer->ID) != nullptr) {
-				//remove an existent overlay terrain if present, e.g. so that if a destroyed wall of the same type is present here, the new wall can be properly placed without still being destroyed
+			if (type.TerrainType->is_overlay() && CMap::get()->GetTileTerrain(unit.tilePos, type.TerrainType->is_overlay(), unit.MapLayer->ID) != nullptr && unit.MapLayer->Field(unit.tilePos)->OverlayTerrainDestroyed) {
+				//remove an existent and destroyed overlay terrain if present, so that e.g. if a destroyed wall of the same type is present here, the new wall can be properly placed without still being destroyed
 				CMap::get()->RemoveTileOverlayTerrain(unit.tilePos, unit.MapLayer->ID);
 			}
+
 			CMap::get()->SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer->ID);
+
 			//Wyrmgus end
 			unit.Remove(nullptr);
 			UnitLost(unit);
