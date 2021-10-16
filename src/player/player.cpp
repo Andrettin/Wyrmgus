@@ -2293,6 +2293,7 @@ void CPlayer::Clear()
 	this->enemies.clear();
 	this->allies.clear();
 	this->shared_vision.clear();
+	this->mutual_shared_vision.clear();
 	this->StartPos.x = 0;
 	this->StartPos.y = 0;
 	//Wyrmgus start
