@@ -873,9 +873,9 @@ static int CclCreateUnit(lua_State *l)
 		} else {
 			const int heading = SyncRand(256);
 
-			Vec2i res_pos;
+			QPoint res_pos;
 			try {
-				FindNearestDrop(*unit->Type, ipos, res_pos, heading, z, unit->Type->BoolFlag[BUILDING_INDEX].value && GameCycle > 0, GameCycle == 0); //place buildings with a certain distance of each other, if the game cycle is greater than 0 (so if they weren't intentionally placed side-by-side for a map)
+				res_pos = FindNearestDrop(*unit->Type, ipos, heading, z, unit->Type->BoolFlag[BUILDING_INDEX].value && GameCycle > 0, GameCycle == 0); //place buildings with a certain distance of each other, if the game cycle is greater than 0 (so if they weren't intentionally placed side-by-side for a map)
 			} catch (const std::exception &exception) {
 				wyrmgus::exception::report(exception);
 

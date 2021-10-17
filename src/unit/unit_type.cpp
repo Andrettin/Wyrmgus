@@ -62,6 +62,7 @@
 #include "ui/button_cmd.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
+#include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_domain.h"
 #include "unit/unit_type_variation.h"
@@ -2405,6 +2406,23 @@ std::string unit_type::get_destroy_verb_string() const
 	} else {
 		return "Destroy";
 	}
+}
+
+bool unit_type::can_be_dropped_on_pos(const QPoint &pos, const int z, const bool no_bordering_building, const bool ignore_ontop, const site *settlement) const
+{
+	if (!UnitTypeCanBeAt(*this, pos, z) && (!this->BoolFlag[BUILDING_INDEX].value || !OnTopDetails(*this, nullptr) || ignore_ontop)) {
+		return false;
+	}
+
+	if (this->BoolFlag[BUILDING_INDEX].value && !ignore_ontop && CanBuildUnitType(nullptr, *this, pos, 1, true, z, no_bordering_building) == nullptr) {
+		return false;
+	}
+
+	if (settlement != nullptr && !CMap::get()->is_rect_in_settlement(QRect(pos, this->get_tile_size()), z, settlement)) {
+		return false;
+	}
+
+	return true;
 }
 
 void resource_info::process_sml_property(const sml_property &property)

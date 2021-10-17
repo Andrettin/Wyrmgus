@@ -2175,9 +2175,8 @@ void CUnit::GenerateDrop()
 	if (chosen_drop != nullptr) {
 		const CBuildRestrictionOnTop *ontop_b = OnTopDetails(*this->Type, nullptr);
 		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && this->MapLayer->Field(drop_pos)->has_flag(tile_flag::item)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
-			Vec2i resPos;
-			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer->ID);
-			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, CPlayer::get_neutral_player(), this->MapLayer->ID);
+			const QPoint res_pos = FindNearestDrop(*chosen_drop, drop_pos, LookingW, this->MapLayer->ID);
+			droppedUnit = MakeUnitAndPlace(res_pos, *chosen_drop, CPlayer::get_neutral_player(), this->MapLayer->ID);
 		} else {
 			droppedUnit = MakeUnitAndPlace(drop_pos, *chosen_drop, CPlayer::get_neutral_player(), this->MapLayer->ID);
 		}
@@ -3946,16 +3945,15 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const wyrmgus::unit_type &type, CPlaye
 **
 **  @return        Pointer to created unit.
 */
-CUnit *CreateUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *player, int z, bool no_bordering_building, const wyrmgus::site *settlement)
+CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, const int z, const bool no_bordering_building, const site *settlement)
 {
 	CUnit *unit = MakeUnit(type, player);
 
 	if (unit != nullptr) {
 		unit->MapLayer = CMap::get()->MapLayers[z].get();
 
-		Vec2i res_pos;
 		const int heading = SyncRand(256);
-		FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building, false, settlement);
+		const QPoint res_pos = FindNearestDrop(type, pos, heading, z, no_bordering_building, false, settlement);
 		
 		if (type.BoolFlag[BUILDING_INDEX].value) {
 			const CBuildRestrictionOnTop *b = OnTopDetails(type, nullptr);
@@ -4013,11 +4011,11 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int 
 **  @param resPos   Holds the nearest point.
 **  @param heading  preferense side to drop out of.
 */
-void FindNearestDrop(const wyrmgus::unit_type &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building, bool ignore_construction_requirements, const wyrmgus::site *settlement)
+QPoint FindNearestDrop(const unit_type &type, const QPoint &goal_pos, const int heading, const int z, const bool no_bordering_building, const bool ignore_ontop, const site *settlement)
 {
 	int addx = 0;
 	int addy = 0;
-	Vec2i pos = goalPos;
+	Vec2i pos = goal_pos;
 	bool searched_any_tile_inside_map = true;
 
 	if (heading < LookingNE || heading > LookingNW) {
@@ -4042,13 +4040,9 @@ startw:
 
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
-				&& (settlement == nullptr || CMap::get()->is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
-			) {
+			if (type.can_be_dropped_on_pos(pos, z, no_bordering_building, ignore_ontop, settlement)) {
 			//Wyrmgus end
-				goto found;
+				return pos;
 			}
 		}
 		++addx;
@@ -4062,13 +4056,9 @@ starts:
 
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
-				&& (settlement == nullptr || CMap::get()->is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
-			) {
+			if (type.can_be_dropped_on_pos(pos, z, no_bordering_building, ignore_ontop, settlement)) {
 			//Wyrmgus end
-				goto found;
+				return pos;
 			}
 		}
 		++addy;
@@ -4082,13 +4072,9 @@ starte:
 
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
-				&& (settlement == nullptr || CMap::get()->is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
-			) {
+			if (type.can_be_dropped_on_pos(pos, z, no_bordering_building, ignore_ontop, settlement)) {
 			//Wyrmgus end
-				goto found;
+				return pos;
 			}
 		}
 		++addx;
@@ -4102,13 +4088,9 @@ startn:
 
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
-				&& (settlement == nullptr || CMap::get()->is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
-			) {
+			if (type.can_be_dropped_on_pos(pos, z, no_bordering_building, ignore_ontop, settlement)) {
 			//Wyrmgus end
-				goto found;
+				return pos;
 			}
 		}
 		++addy;
@@ -4118,9 +4100,6 @@ startn:
 			throw std::runtime_error("Failed to find position for unit of type \"" + type.get_identifier() + "\" in FindNearestDrop().");
 		}
 	}
-
-found:
-	resPos = pos;
 }
 
 /**
