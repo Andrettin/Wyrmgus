@@ -58,6 +58,7 @@
 #include "player/civilization.h"
 #include "player/faction.h"
 #include "player/faction_history.h"
+#include "player/faction_type.h"
 #include "player/player.h"
 #include "player/player_type.h"
 #include "quest/campaign.h"
@@ -1298,6 +1299,8 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 	site_game_data->set_map_pos(site_pos);
 	site_game_data->set_map_layer(CMap::get()->MapLayers[z].get());
 
+	const wyrmgus::site *settlement = site->is_settlement() ? site : CMap::get()->Field(site_pos, z)->get_settlement();
+
 	//it is acceptable sites with geocoordinate to have their positions shifted, e.g. if it was coastal to shift it enough inland to give space for the building to be placed
 	const bool is_position_shift_acceptable = !site->get_geocoordinate().is_null() || !site->get_astrocoordinate().is_null();
 
@@ -1307,7 +1310,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
 			fprintf(stderr, "The site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
 		}
-		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::get_neutral_player(), z, true, site->is_settlement() ? site : nullptr);
+		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::get_neutral_player(), z, true, settlement);
 		unit->set_site(site);
 
 		if (site->is_settlement()) {
@@ -1429,6 +1432,14 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		return;
 	}
 
+	if (site != settlement && settlement != nullptr) {
+		const faction *settlement_owner = settlement->get_history()->get_owner();
+		if (settlement_owner != nullptr && site_owner != settlement_owner && !is_faction_type_neutral(site_owner->get_type())) {
+			//if the site owner is different from the settlement owner, the latter is non-null, and the site owner is not a neutral faction, then override the site owner with the settlement owner
+			site_owner = settlement_owner;
+		}
+	}
+
 	CPlayer *player = GetOrAddFactionPlayer(site_owner);
 
 	if (player == nullptr) {
@@ -1493,7 +1504,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			}
 		}
 
-		CUnit *unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, site->is_settlement() ? site : nullptr);
+		CUnit *unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, settlement);
 
 		if (first_building) {
 			if (!site->is_settlement() && !site->get_name().empty()) { //if one building is representing a non-settlement site, make it have the site's name
@@ -1565,9 +1576,9 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 				if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
 					building_player->SetStartView(site_pos - building_unit_offset, z);
 				}
-				unit = CreateUnit(site_pos - building_unit_offset, *unit_type, building_player, z, true, site->is_settlement() ? site : nullptr);
+				unit = CreateUnit(site_pos - building_unit_offset, *unit_type, building_player, z, true, settlement);
 			} else {
-				unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, site->is_settlement() ? site : nullptr);
+				unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, settlement);
 			}
 			if (std::get<3>(site->HistoricalBuildings[j])) {
 				unit->set_unique(std::get<3>(site->HistoricalBuildings[j]));
@@ -1610,7 +1621,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		const unit_class *unit_class = kv_pair.first;
 		const int group_population = kv_pair.second;
 
-		this->apply_population_unit(unit_class, group_population, site_pos, z, player, site->is_settlement() ? site : nullptr);
+		this->apply_population_unit(unit_class, group_population, site_pos, z, player, settlement);
 		population -= group_population;
 	}
 
@@ -1624,7 +1635,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			}
 		}
 
-		this->apply_population_unit(population_class, population, site_pos, z, player, site->is_settlement() ? site : nullptr);
+		this->apply_population_unit(population_class, population, site_pos, z, player, settlement);
 	}
 
 	for (size_t j = 0; j < site->HistoricalUnits.size(); ++j) {
@@ -1657,7 +1668,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 				const Vec2i historical_unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 
 				for (int k = 0; k < unit_quantity; ++k) {
-					CUnit *unit = CreateUnit(site_pos - historical_unit_offset, *type, unit_player, z, false, site->is_settlement() ? site : nullptr);
+					CUnit *unit = CreateUnit(site_pos - historical_unit_offset, *type, unit_player, z, false, settlement);
 					if (!type->BoolFlag[HARVESTER_INDEX].value) { // make non-worker units not have an active AI
 						unit->Active = 0;
 						unit_player->ChangeUnitTypeAiActiveCount(type, -1);
