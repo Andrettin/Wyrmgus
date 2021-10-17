@@ -510,7 +510,7 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 
 				const tile *tile = CMap::get()->Field(tile_pos, z);
 
-				if (tile->has_flag(tile_flag::building)) {
+				if (tile->has_flag(tile_flag::building) || tile->has_flag(tile_flag::rock) || tile->has_flag(tile_flag::tree)) {
 					return nullptr;
 				}
 
