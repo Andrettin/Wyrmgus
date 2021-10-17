@@ -2408,13 +2408,13 @@ std::string unit_type::get_destroy_verb_string() const
 	}
 }
 
-bool unit_type::can_be_dropped_on_pos(const QPoint &pos, const int z, const bool no_bordering_building, const bool ignore_ontop, const site *settlement) const
+bool unit_type::can_be_dropped_on_pos(const QPoint &pos, const int z, const bool no_building_bordering_impassable, const bool ignore_ontop, const site *settlement) const
 {
 	if (!UnitTypeCanBeAt(*this, pos, z) && (!this->BoolFlag[BUILDING_INDEX].value || !OnTopDetails(*this, nullptr) || ignore_ontop)) {
 		return false;
 	}
 
-	if (this->BoolFlag[BUILDING_INDEX].value && !ignore_ontop && CanBuildUnitType(nullptr, *this, pos, 1, true, z, no_bordering_building) == nullptr) {
+	if (this->BoolFlag[BUILDING_INDEX].value && !ignore_ontop && CanBuildUnitType(nullptr, *this, pos, 1, true, z, no_building_bordering_impassable) == nullptr) {
 		return false;
 	}
 

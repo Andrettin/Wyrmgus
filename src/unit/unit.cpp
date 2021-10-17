@@ -3945,7 +3945,7 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const wyrmgus::unit_type &type, CPlaye
 **
 **  @return        Pointer to created unit.
 */
-CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, const int z, const bool no_bordering_building, const site *settlement)
+CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, const int z, const bool no_building_bordering_impassable, const site *settlement)
 {
 	CUnit *unit = MakeUnit(type, player);
 
@@ -3953,7 +3953,7 @@ CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, cons
 		unit->MapLayer = CMap::get()->MapLayers[z].get();
 
 		const int heading = SyncRand(256);
-		const QPoint res_pos = FindNearestDrop(type, pos, heading, z, no_bordering_building, false, settlement);
+		const QPoint res_pos = FindNearestDrop(type, pos, heading, z, no_building_bordering_impassable, false, settlement);
 		
 		if (type.BoolFlag[BUILDING_INDEX].value) {
 			const CBuildRestrictionOnTop *b = OnTopDetails(type, nullptr);
@@ -4011,7 +4011,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int 
 **  @param resPos   Holds the nearest point.
 **  @param heading  preferense side to drop out of.
 */
-QPoint FindNearestDrop(const unit_type &type, const QPoint &goal_pos, const int heading, const int z, const bool no_bordering_building, const bool ignore_ontop, const site *settlement)
+QPoint FindNearestDrop(const unit_type &type, const QPoint &goal_pos, const int heading, const int z, const bool no_building_bordering_impassable, const bool ignore_ontop, const site *settlement)
 {
 	int addx = 0;
 	int addy = 0;
@@ -4040,7 +4040,7 @@ startw:
 
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (type.can_be_dropped_on_pos(pos, z, no_bordering_building, ignore_ontop, settlement)) {
+			if (type.can_be_dropped_on_pos(pos, z, no_building_bordering_impassable, ignore_ontop, settlement)) {
 			//Wyrmgus end
 				return pos;
 			}
@@ -4056,7 +4056,7 @@ starts:
 
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (type.can_be_dropped_on_pos(pos, z, no_bordering_building, ignore_ontop, settlement)) {
+			if (type.can_be_dropped_on_pos(pos, z, no_building_bordering_impassable, ignore_ontop, settlement)) {
 			//Wyrmgus end
 				return pos;
 			}
@@ -4072,7 +4072,7 @@ starte:
 
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (type.can_be_dropped_on_pos(pos, z, no_bordering_building, ignore_ontop, settlement)) {
+			if (type.can_be_dropped_on_pos(pos, z, no_building_bordering_impassable, ignore_ontop, settlement)) {
 			//Wyrmgus end
 				return pos;
 			}
@@ -4088,7 +4088,7 @@ startn:
 
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (type.can_be_dropped_on_pos(pos, z, no_bordering_building, ignore_ontop, settlement)) {
+			if (type.can_be_dropped_on_pos(pos, z, no_building_bordering_impassable, ignore_ontop, settlement)) {
 			//Wyrmgus end
 				return pos;
 			}

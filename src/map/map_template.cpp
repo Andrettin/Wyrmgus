@@ -1310,7 +1310,10 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
 			fprintf(stderr, "The site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
 		}
-		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::get_neutral_player(), z, true, settlement);
+
+		const bool no_bordering_impassable = is_position_shift_acceptable;
+
+		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::get_neutral_player(), z, no_bordering_impassable, settlement);
 		unit->set_site(site);
 
 		if (site->is_settlement()) {

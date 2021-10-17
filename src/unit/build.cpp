@@ -484,7 +484,7 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const wyrmgus::unit_t
 **
 **  @return      OnTop, parent unit, builder on true or 1 if unit==nullptr, null false.
 */
-CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int z, const bool no_bordering_building)
+CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int z, const bool no_bordering_impassable)
 {
 	//  Can't build outside the map
 	if (!CMap::get()->Info->IsPointOnMap(pos, z)) {
@@ -498,12 +498,35 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 		return nullptr;
 	}
 	
-	if (no_bordering_building && !OnTopDetails(type, nullptr)) { // if a game is starting, only place buildings with a certain space from other buildings
+	if (no_bordering_impassable && !OnTopDetails(type, nullptr)) {
+		//if a game is starting, only place buildings with a certain space from non-passable tiles
 		for (int x = pos.x() - 1; x < pos.x() + type.get_tile_width() + 1; ++x) {
 			for (int y = pos.y() - 1; y < pos.y() + type.get_tile_height() + 1; ++y) {
 				const QPoint tile_pos(x, y);
-				if (CMap::get()->Info->IsPointOnMap(tile_pos, z) && CMap::get()->Field(tile_pos, z)->has_flag(tile_flag::building)) {
+
+				if (!CMap::get()->Info->IsPointOnMap(tile_pos, z)) {
+					continue;
+				}
+
+				const tile *tile = CMap::get()->Field(tile_pos, z);
+
+				if (tile->has_flag(tile_flag::building)) {
 					return nullptr;
+				}
+
+				switch (type.get_domain()) {
+					case unit_domain::land:
+						if (!type.BoolFlag[SHOREBUILDING_INDEX].value && !tile->has_flag(tile_flag::land_allowed)) {
+							return nullptr;
+						}
+						break;
+					case unit_domain::water:
+						if (!tile->has_flag(tile_flag::water_allowed) && !tile->has_flag(tile_flag::coast_allowed)) {
+							return nullptr;
+						}
+						break;
+					default:
+						break;
 				}
 			}
 		}
@@ -643,10 +666,10 @@ bool CanBuildOn(const QPoint &pos, const tile_flag mask, const int z, const CPla
 **  @return      OnTop, parent unit, builder on true, null false.
 **
 */
-CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int real, const bool ignore_exploration, const int z, const bool no_bordering_building)
+CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int real, const bool ignore_exploration, const int z, const bool no_bordering_impassable)
 {
 	// Terrain Flags don't matter if building on top of a unit.
-	CUnit *ontop = CanBuildHere(unit, type, pos, z, no_bordering_building);
+	CUnit *ontop = CanBuildHere(unit, type, pos, z, no_bordering_impassable);
 	if (ontop == nullptr) {
 		return nullptr;
 	}

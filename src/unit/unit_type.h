@@ -1231,7 +1231,7 @@ public:
 	std::string get_build_verb_string() const;
 	std::string get_destroy_verb_string() const;
 
-	bool can_be_dropped_on_pos(const QPoint &pos, const int z, const bool no_bordering_building, const bool ignore_ontop, const site *settlement) const;
+	bool can_be_dropped_on_pos(const QPoint &pos, const int z, const bool no_building_bordering_impassable, const bool ignore_ontop, const site *settlement) const;
 
 signals:
 	void changed();
