@@ -409,23 +409,25 @@ int AiFindAvailableUnitTypeEquiv(const wyrmgus::unit_type &unittype, int *usable
 class AiForceCounter final
 {
 public:
-	explicit AiForceCounter(const std::vector<std::shared_ptr<wyrmgus::unit_ref>> &units, unsigned int *d, const size_t len) : data(d)
+	explicit AiForceCounter(const std::vector<std::shared_ptr<unit_ref>> &units, unsigned int *d, const size_t len) : data(d)
 	{
 		memset(data, 0, len);
-		for (const std::shared_ptr<wyrmgus::unit_ref> &unit : units) {
+		for (const std::shared_ptr<unit_ref> &unit : units) {
 			(*this)(*unit);
 		}
 	}
 
 	void operator()(const CUnit *const unit) const
 	{
-		this->data[UnitTypeEquivs[unit->Type->Slot]]++;
+		++this->data[UnitTypeEquivs[unit->Type->Slot]];
 		
 		const wyrmgus::unit_class *unit_class = unit->Type->get_unit_class();
+
 		if (unit_class != nullptr) {
 			for (const wyrmgus::unit_type *class_unit_type : unit_class->get_unit_types()) {
 				if (class_unit_type != unit->Type) {
-					this->data[UnitTypeEquivs[class_unit_type->Slot]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
+					++this->data[UnitTypeEquivs[class_unit_type->Slot]];
+					//also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
 				}
 			}
 		}
@@ -453,7 +455,7 @@ bool AiForce::can_be_assigned_to(const wyrmgus::unit_type &type)
 	unsigned int counter[UnitTypeMax + 1];
 
 	// Count units in force.
-	CountTypes(counter, sizeof(counter));
+	this->CountTypes(counter, sizeof(counter));
 
 	// Look what should be in the force.
 	this->Completed = true;
@@ -464,8 +466,9 @@ bool AiForce::can_be_assigned_to(const wyrmgus::unit_type &type)
 		if (counter[slot] < aitype.Want) { //the counter includes other units of the same class
 			if (UnitTypeEquivs[type.Slot] == slot || type.get_unit_class() == aitype.Type->get_unit_class()) {
 				if (counter[slot] < aitype.Want - 1) {
-					Completed = false;
+					this->Completed = false;
 				}
+
 				flag = true;
 			} else {
 				this->Completed = false;
