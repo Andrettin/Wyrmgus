@@ -2076,7 +2076,7 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 		}
 
 		//item units only use factions to generate special properties for them
-		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::get_neutral_player() : unit_player, z, false, settlement);
+		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::get_neutral_player() : unit_player, z, true, settlement);
 
 		if (historical_unit->get_unique() != nullptr) {
 			unit->set_unique(historical_unit->get_unique());

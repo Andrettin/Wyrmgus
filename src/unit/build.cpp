@@ -473,6 +473,57 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const wyrmgus::unit_t
 }
 //Wyrmgus end
 
+static bool is_tile_impassable(const QPoint &pos, const int z, const unit_type &unit_type)
+{
+	if (!CMap::get()->Info->IsPointOnMap(pos, z)) {
+		return false;
+	}
+
+	const tile *tile = CMap::get()->Field(pos, z);
+
+	if (tile->has_flag(tile_flag::rock) || tile->has_flag(tile_flag::tree)) {
+		return true;
+	}
+
+	switch (unit_type.get_domain()) {
+		case unit_domain::land:
+			if (!unit_type.BoolFlag[SHOREBUILDING_INDEX].value && !tile->has_flag(tile_flag::land_allowed)) {
+				return true;
+			}
+			break;
+		case unit_domain::water:
+			if (!tile->has_flag(tile_flag::water_allowed) && !tile->has_flag(tile_flag::coast_allowed)) {
+				return true;
+			}
+			break;
+		default:
+			break;
+	}
+
+	return false;
+}
+
+bool check_tile_passable_blocks(const QPoint &pos, const int z, const unit_type &unit_type, bool &current_impassable, int &passable_block_count)
+{
+	const bool impassable = is_tile_impassable(pos, z, unit_type);
+
+	if (impassable == current_impassable) {
+		return true;
+	}
+
+	if (!impassable == false) {
+		++passable_block_count;
+
+		if (passable_block_count > 1) {
+			return false;
+		}
+	}
+
+	current_impassable = impassable;
+
+	return true;
+}
+
 /**
 **  Can build unit here.
 **  Hall too near to goldmine.
@@ -499,7 +550,7 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 	}
 	
 	if (no_bordering_impassable && !OnTopDetails(type, nullptr)) {
-		//if a game is starting, only place buildings with a certain space from non-passable tiles
+		//if a game is starting, only place buildings with a certain space from other buildings
 		for (int x = pos.x() - 1; x < pos.x() + type.get_tile_width() + 1; ++x) {
 			for (int y = pos.y() - 1; y < pos.y() + type.get_tile_height() + 1; ++y) {
 				const QPoint tile_pos(x, y);
@@ -510,24 +561,45 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 
 				const tile *tile = CMap::get()->Field(tile_pos, z);
 
-				if (tile->has_flag(tile_flag::building) || tile->has_flag(tile_flag::rock) || tile->has_flag(tile_flag::tree)) {
+				if (tile->has_flag(tile_flag::building)) {
 					return nullptr;
 				}
+			}
+		}
 
-				switch (type.get_domain()) {
-					case unit_domain::land:
-						if (!type.BoolFlag[SHOREBUILDING_INDEX].value && !tile->has_flag(tile_flag::land_allowed)) {
-							return nullptr;
-						}
-						break;
-					case unit_domain::water:
-						if (!tile->has_flag(tile_flag::water_allowed) && !tile->has_flag(tile_flag::coast_allowed)) {
-							return nullptr;
-						}
-						break;
-					default:
-						break;
-				}
+		//additionally, the building's adjacent tiles cannot contain more than one block of passable tiles which cannot be traversed between one another
+		bool impassable = true;
+		int passable_block_count = 0;
+
+		for (int x = pos.x() - 1; x < pos.x() + type.get_tile_width() + 1; ++x) {
+			const int y = pos.y() - 1;
+			const QPoint tile_pos(x, y);
+			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count)) {
+				return nullptr;
+			}
+		}
+
+		for (int y = pos.y() - 1; y < pos.y() + type.get_tile_height() + 1; ++y) {
+			const int x = pos.x() + type.get_tile_width();
+			const QPoint tile_pos(x, y);
+			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count)) {
+				return nullptr;
+			}
+		}
+
+		for (int x = pos.x() + type.get_tile_width(); x >= pos.x() - 1; --x) {
+			const int y = pos.y() + type.get_tile_height();
+			const QPoint tile_pos(x, y);
+			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count)) {
+				return nullptr;
+			}
+		}
+
+		for (int y = pos.y() + type.get_tile_height(); y >= pos.y() - 1; --y) {
+			const int x = pos.x() - 1;
+			const QPoint tile_pos(x, y);
+			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count)) {
+				return nullptr;
 			}
 		}
 	}
