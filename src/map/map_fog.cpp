@@ -405,13 +405,19 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index, i
 	wyrmgus::tile &mf = *CMap::get()->Field(index, z);
 	//Wyrmgus end
 	unsigned char &v = mf.player_info->VisCloak[player.get_index()];
-	assert_throw(v != 0);
+
+	if (v == 0) {
+		assert_log(false);
+		return;
+	}
+
 	if (v == 1) {
 		//Wyrmgus start
 //		UnitsOnTileUnmarkSeen(player, mf, 1);
 		UnitsOnTileUnmarkSeen(player, mf, 1, 0);
 		//Wyrmgus end
 	}
+
 	--v;
 }
 
