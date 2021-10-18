@@ -950,7 +950,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			goalPos = enemy->tilePos;
 			//Wyrmgus start
 			z = enemy->MapLayer->ID;
-			if (!AiPlayer->Player->is_enemy_of(*enemy->Player) && enemy->Player->get_type() != player_type::neutral) {
+			if (!AiPlayer->Player->is_enemy_of(*enemy->Player) && enemy->Player->get_type() != player_type::neutral && !enemy->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
 				AiPlayer->Player->set_enemy_diplomatic_stance_with(enemy->Player);
 			}
 			//Wyrmgus end
@@ -1749,7 +1749,7 @@ void AiForce::Update()
 			if (unit) {
 				this->GoalPos = unit->tilePos;
 				this->GoalMapLayer = unit->MapLayer->ID;
-				if (!AiPlayer->Player->is_enemy_of(*unit->Player) && unit->Player->get_type() != player_type::neutral) {
+				if (!AiPlayer->Player->is_enemy_of(*unit->Player) && unit->Player->get_type() != player_type::neutral && !unit->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
 					AiPlayer->Player->set_enemy_diplomatic_stance_with(unit->Player);
 				}
 			} else if (CMap::get()->Info->IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
@@ -1852,7 +1852,7 @@ void AiForce::Update()
 				goal_pos = unit->tilePos;
 				z = unit->MapLayer->ID;
 
-				if (!AiPlayer->Player->is_enemy_of(*unit->Player) && unit->Player->get_type() != player_type::neutral) {
+				if (!AiPlayer->Player->is_enemy_of(*unit->Player) && unit->Player->get_type() != player_type::neutral && !unit->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
 					AiPlayer->Player->set_enemy_diplomatic_stance_with(unit->Player);
 				}
 			} else if (CMap::get()->Info->IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
