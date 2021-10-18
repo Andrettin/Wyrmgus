@@ -447,7 +447,7 @@ void AiForce::CountTypes(unsigned int *counter, const size_t len)
 **
 **  @return       True if it fits, false otherwise.
 */
-bool AiForce::IsBelongsTo(const wyrmgus::unit_type &type)
+bool AiForce::can_be_assigned_to(const wyrmgus::unit_type &type)
 {
 	bool flag = false;
 	unsigned int counter[UnitTypeMax + 1];
@@ -456,9 +456,9 @@ bool AiForce::IsBelongsTo(const wyrmgus::unit_type &type)
 	CountTypes(counter, sizeof(counter));
 
 	// Look what should be in the force.
-	Completed = true;
-	for (unsigned int i = 0; i < UnitTypes.size(); ++i) {
-		const AiUnitType &aitype = UnitTypes[i];
+	this->Completed = true;
+
+	for (const AiUnitType &aitype : this->UnitTypes) {
 		const int slot = aitype.Type->Slot;
 
 		if (counter[slot] < aitype.Want) { //the counter includes other units of the same class
@@ -468,10 +468,11 @@ bool AiForce::IsBelongsTo(const wyrmgus::unit_type &type)
 				}
 				flag = true;
 			} else {
-				Completed = false;
+				this->Completed = false;
 			}
 		}
 	}
+
 	return flag;
 }
 
@@ -588,16 +589,8 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 	//Wyrmgus end
 }
 
-AiForce::AiForce() :
-	Completed(false), Defending(false), Attacking(false),
-	//Wyrmgus start
-	HomeMapLayer(0),
-	GoalMapLayer(0),
-	//Wyrmgus end
-	Role(AiForceRole::Default), FormerForce(-1), State(AiForceAttackingState::Free),
-	WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
+AiForce::AiForce() : Role(AiForceRole::Default), State(AiForceAttackingState::Free), WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
 {
-	HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
 }
 
 AiForce::~AiForce()
@@ -1192,8 +1185,8 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool hero)
 	if (force != -1) {
 		AiForce &f = forces[force];
 		//Wyrmgus start
-//		if (f.IsBelongsTo(*unit.Type)) {
-		if (f.IsBelongsTo(*unit.Type) || hero) {
+//		if (f.can_be_assigned_to(*unit.Type)) {
+		if (f.can_be_assigned_to(*unit.Type) || hero) {
 		//Wyrmgus end
 			if (hero && !f.get_units().empty()) {
 				//make heroes move to where the rest of the force is

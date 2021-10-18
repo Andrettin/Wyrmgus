@@ -168,16 +168,16 @@ public:
 
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
-	bool IsBelongsTo(const wyrmgus::unit_type &type);
+	bool can_be_assigned_to(const unit_type &type);
 
 	void Update();
 
 	static void InternalRemoveUnit(CUnit *unit);
 
 public:
-	bool Completed;    /// Flag saying force is complete build
-	bool Defending;    /// Flag saying force is defending
-	bool Attacking;    /// Flag saying force is attacking
+	bool Completed = false;    /// Flag saying force is complete build
+	bool Defending = false;    /// Flag saying force is defending
+	bool Attacking = false;    /// Flag saying force is attacking
 	AiForceRole Role;  /// Role of the force
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
@@ -186,13 +186,13 @@ private:
 
 public:
 	// If attacking
-	int FormerForce;             /// Original force number
+	int FormerForce = -1;             /// Original force number
 	AiForceAttackingState State; /// Attack state
-	Vec2i GoalPos; /// Attack point tile map position
-	Vec2i HomePos; /// Return after attack tile map position
+	Vec2i GoalPos = Vec2i(-1, -1); /// Attack point tile map position
+	Vec2i HomePos = Vec2i(-1, -1); /// Return after attack tile map position
 	//Wyrmgus start
-	int GoalMapLayer;
-	int HomeMapLayer;
+	int GoalMapLayer = 0;
+	int HomeMapLayer = 0;
 	//Wyrmgus end
 	int WaitOnRallyPoint; /// Counter for waiting on rally point
 
