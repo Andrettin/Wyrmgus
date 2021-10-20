@@ -503,7 +503,7 @@ static bool is_tile_impassable(const QPoint &pos, const int z, const unit_type &
 	return false;
 }
 
-bool check_tile_passable_blocks(const QPoint &pos, const int z, const unit_type &unit_type, bool &current_impassable, int &passable_block_count)
+bool check_tile_passable_blocks(const QPoint &pos, const int z, const unit_type &unit_type, bool &current_impassable, int &passable_block_count, const bool diagonal_edge)
 {
 	const bool impassable = is_tile_impassable(pos, z, unit_type);
 
@@ -511,11 +511,17 @@ bool check_tile_passable_blocks(const QPoint &pos, const int z, const unit_type 
 		return true;
 	}
 
-	if (!impassable == false) {
+	if (impassable == false) {
 		++passable_block_count;
 
-		if (passable_block_count > 1) {
+		//the maximum allowed number is 2 to account for an impassable tile in the middle of the border, but which wouldn't prevent the rest of the tiles from being passable between themselves
+		if (passable_block_count > 2) {
 			return false;
+		}
+	} else {
+		if (diagonal_edge) {
+			//ignore impassability (but not passability) for diagonal edges
+			return true;
 		}
 	}
 
@@ -568,13 +574,15 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 		}
 
 		//additionally, the building's adjacent tiles cannot contain more than one block of passable tiles which cannot be traversed between one another
-		bool impassable = true;
-		int passable_block_count = 0;
+		//ignore the tiles at the diagonal ends of the rectangle around the building; since units can move diagonally, they are not relevant for passability
+		bool impassable = false;
+		int passable_block_count = 1;
 
 		for (int x = pos.x() - 1; x < pos.x() + type.get_tile_width() + 1; ++x) {
 			const int y = pos.y() - 1;
 			const QPoint tile_pos(x, y);
-			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count)) {
+			const bool diagonal_edge = (x == pos.x() - 1) || (x == pos.x() + type.get_tile_width());
+			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count, diagonal_edge)) {
 				return nullptr;
 			}
 		}
@@ -582,7 +590,8 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 		for (int y = pos.y() - 1; y < pos.y() + type.get_tile_height() + 1; ++y) {
 			const int x = pos.x() + type.get_tile_width();
 			const QPoint tile_pos(x, y);
-			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count)) {
+			const bool diagonal_edge = (y == pos.y() - 1) || (y == pos.y() + type.get_tile_height());
+			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count, diagonal_edge)) {
 				return nullptr;
 			}
 		}
@@ -590,7 +599,8 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 		for (int x = pos.x() + type.get_tile_width(); x >= pos.x() - 1; --x) {
 			const int y = pos.y() + type.get_tile_height();
 			const QPoint tile_pos(x, y);
-			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count)) {
+			const bool diagonal_edge = (x == pos.x() - 1) || (x == pos.x() + type.get_tile_width());
+			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count, diagonal_edge)) {
 				return nullptr;
 			}
 		}
@@ -598,7 +608,8 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 		for (int y = pos.y() + type.get_tile_height(); y >= pos.y() - 1; --y) {
 			const int x = pos.x() - 1;
 			const QPoint tile_pos(x, y);
-			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count)) {
+			const bool diagonal_edge = (y == pos.y() - 1) || (y == pos.y() + type.get_tile_height());
+			if (!check_tile_passable_blocks(tile_pos, z, type, impassable, passable_block_count, diagonal_edge)) {
 				return nullptr;
 			}
 		}
