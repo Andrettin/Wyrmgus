@@ -1247,6 +1247,11 @@ set(economy_test_SRCS
 )
 source_group(economy FILES ${economy_test_SRCS})
 
+set(game_test_SRCS
+	test/game/game_test.cpp
+)
+source_group(game FILES ${game_test_SRCS})
+
 set(util_test_SRCS
 	test/util/angle_test.cpp
 	test/util/astronomy_test.cpp
@@ -1260,6 +1265,7 @@ source_group(util FILES ${util_test_SRCS})
 
 set(wyrmgus_test_SRCS
 	${economy_test_SRCS}
+	${game_test_SRCS}
 	${util_test_SRCS}
 	test/main.cpp
 )
@@ -1753,6 +1759,7 @@ if(ENABLE_UNITY_BUILD)
 	if(WITH_TEST)
 		set_target_properties(wyrmgus_test PROPERTIES UNITY_BUILD_MODE GROUP)
 		set_source_files_properties(${economy_test_SRCS} PROPERTIES UNITY_GROUP "economy_test")
+		set_source_files_properties(${game_test_SRCS} PROPERTIES UNITY_GROUP "game_test")
 		set_source_files_properties(${util_test_SRCS} PROPERTIES UNITY_GROUP "util_test")
 	endif()
 endif()

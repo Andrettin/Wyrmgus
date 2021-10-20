@@ -71,15 +71,7 @@ std::filesystem::path load_game_file;
 */
 int SaveGame(const std::string &file_url_str)
 {
-	const QUrl file_url = QString::fromStdString(file_url_str);
-	QString filepath_qstr = file_url.toLocalFile();
-
-	//correct issue where the QML mistakenly sends us a ".gz" file ending instead of ".sav.gz"
-	if (filepath_qstr.endsWith(".gz") && !filepath_qstr.endsWith(".sav.gz")) {
-		filepath_qstr = filepath_qstr.left(filepath_qstr.size() - 3) + ".sav.gz";
-	}
-
-	const std::filesystem::path filepath = path::from_qstring(filepath_qstr);
+	const std::filesystem::path filepath = game::save_file_url_string_to_save_filepath(file_url_str);
 
 	try {
 		game::get()->save(filepath);

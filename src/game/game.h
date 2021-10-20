@@ -61,6 +61,8 @@ public:
 	static inline const QDateTime base_date = QDateTime(QDate(-100000, 1, 1));
 #endif
 
+	static std::filesystem::path save_file_url_string_to_save_filepath(const std::string &file_url_str);
+
 	game();
 	~game();
 

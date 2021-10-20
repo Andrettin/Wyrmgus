@@ -148,6 +148,23 @@ static std::vector<std::unique_ptr<gcn::Container>> Containers;
 
 namespace wyrmgus {
 
+std::filesystem::path game::save_file_url_string_to_save_filepath(const std::string &file_url_str)
+{
+	const QUrl file_url = QString::fromStdString(file_url_str);
+	QString filepath_qstr = file_url.toLocalFile();
+
+	//correct issue where the QML mistakenly sends us a ".gz" file ending instead of ".sav.gz", or if it sends a file with no extension at all
+	if (!filepath_qstr.endsWith(".sav.gz")) {
+		if (filepath_qstr.endsWith(".gz")) {
+			filepath_qstr = filepath_qstr.left(filepath_qstr.size() - 3);
+		}
+
+		filepath_qstr += ".sav.gz";
+	}
+
+	return path::from_qstring(filepath_qstr);
+}
+
 game::game()
 {
 }
