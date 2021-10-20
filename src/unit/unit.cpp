@@ -3853,13 +3853,6 @@ void CUnit::Place(const Vec2i &pos, const int z)
 	// Vision
 	MapMarkUnitSight(*this);
 
-	// Correct directions for wall units
-	if (this->Type->BoolFlag[WALL_INDEX].value && this->CurrentAction() != UnitAction::Built) {
-		CorrectWallDirections(*this);
-		UnitUpdateHeading(*this, false);
-		CorrectWallNeighBours(*this);
-	}
-
 	//Wyrmgus start
 	if (this->IsAlive()) {
 		if (this->Type->BoolFlag[BUILDING_INDEX].value) {
@@ -4136,12 +4129,7 @@ void CUnit::Remove(CUnit *host)
 		MapMarkUnitSight(*this);
 	}
 
-	Removed = 1;
-
-	// Correct surrounding walls directions
-	if (this->Type->BoolFlag[WALL_INDEX].value) {
-		CorrectWallNeighBours(*this);
-	}
+	this->Removed = 1;
 
 	//  Remove unit from the current selection
 	if (this->Selected) {
@@ -4469,73 +4457,6 @@ enum {
 	W_SOUTH = 0x40,
 	W_EAST = 0x80
 };
-
-/**
-**  Correct direction for placed wall.
-**
-**  @param unit    The wall unit.
-*/
-void CorrectWallDirections(CUnit &unit)
-{
-	assert_throw(unit.Type->BoolFlag[WALL_INDEX].value);
-	assert_throw(unit.Type->get_num_directions() == 16);
-	assert_throw(!unit.Type->Flip);
-
-	if (!CMap::get()->Info->IsPointOnMap(unit.tilePos, unit.MapLayer)) {
-		return;
-	}
-	const struct {
-		Vec2i offset;
-		const int dirFlag;
-	} configs[] = {{Vec2i(0, -1), W_NORTH}, {Vec2i(1, 0), W_EAST},
-		{Vec2i(0, 1), W_SOUTH}, {Vec2i(-1, 0), W_WEST}
-	};
-	int flags = 0;
-
-	for (int i = 0; i != sizeof(configs) / sizeof(*configs); ++i) {
-		const Vec2i pos = unit.tilePos + configs[i].offset;
-		const int dirFlag = configs[i].dirFlag;
-
-		if (CMap::get()->Info->IsPointOnMap(pos, unit.MapLayer) == false) {
-			flags |= dirFlag;
-		} else {
-			const CUnitCache &unitCache = CMap::get()->Field(pos, unit.MapLayer->ID)->UnitCache;
-			const CUnit *neighbor = unitCache.find(HasSamePlayerAndTypeAs(unit));
-
-			if (neighbor != nullptr) {
-				flags |= dirFlag;
-			}
-		}
-	}
-	unit.Direction = flags;
-}
-
-/**
-** Correct the surrounding walls.
-**
-** @param unit The wall unit.
-*/
-void CorrectWallNeighBours(CUnit &unit)
-{
-	assert_throw(unit.Type->BoolFlag[WALL_INDEX].value);
-
-	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
-
-	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
-		const Vec2i pos = unit.tilePos + offset[i];
-
-		if (CMap::get()->Info->IsPointOnMap(pos, unit.MapLayer) == false) {
-			continue;
-		}
-		CUnitCache &unitCache = unit.MapLayer->Field(pos)->UnitCache;
-		CUnit *neighbor = unitCache.find(HasSamePlayerAndTypeAs(unit));
-
-		if (neighbor != nullptr) {
-			CorrectWallDirections(*neighbor);
-			UnitUpdateHeading(*neighbor);
-		}
-	}
-}
 
 /**
 **  This function should get called when a unit goes under fog of war.

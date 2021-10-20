@@ -357,12 +357,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	// Set the direction of the building if it supports them
 	if (type.get_num_directions() > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false) {
-		if (type.BoolFlag[WALL_INDEX].value) { // Special logic for walls
-			CorrectWallDirections(unit);
-			CorrectWallNeighBours(unit);
-		} else {
-			unit.Direction = wyrmgus::random::get()->generate(256); // random heading
-		}
+		unit.Direction = random::get()->generate(256); // random heading
 		UnitUpdateHeading(unit);
 	}
 

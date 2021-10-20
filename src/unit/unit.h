@@ -944,11 +944,6 @@ extern void RescueUnits();
 /// Convert direction (dx,dy) to heading (0-255)
 extern int DirectionToHeading(const Vec2i &dir);
 
-///Correct directions for placed wall.
-extern void CorrectWallDirections(CUnit &unit);
-/// Correct the surrounding walls.
-extern void CorrectWallNeighBours(CUnit &unit);
-
 /// Update frame from heading
 extern void UnitUpdateHeading(CUnit &unit, const bool notify = true);
 /// Heading and frame from delta direction
