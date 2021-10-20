@@ -512,6 +512,10 @@ void map_template::reset_game_data()
 
 void map_template::apply_terrain(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
+	this->load_terrain(false);
+	this->load_terrain(true);
+	this->load_trade_route_image();
+
 	this->apply_terrain(false, template_start_pos, map_start_pos, z);
 	this->apply_terrain(true, template_start_pos, map_start_pos, z);
 
@@ -521,11 +525,6 @@ void map_template::apply_terrain(const QPoint &template_start_pos, const QPoint 
 
 void map_template::apply_terrain(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
-	this->load_terrain(overlay);
-	if (overlay) {
-		this->load_trade_route_image();
-	}
-
 	const QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
 	if (!terrain_image.isNull()) {
 		this->apply_terrain_image(overlay, template_start_pos, map_start_pos, z);
@@ -2547,7 +2546,8 @@ void map_template::load_trade_route_image()
 		return;
 	}
 
-	QImage &terrain_image = this->overlay_terrain_image;
+	QImage &terrain_image = this->terrain_image;
+	QImage &overlay_terrain_image = this->overlay_terrain_image;
 
 	const QImage trade_route_image = this->load_terrain_image_file(this->get_trade_route_file());
 
@@ -2556,7 +2556,7 @@ void map_template::load_trade_route_image()
 		return;
 	}
 
-	image::for_each_pixel_pos(trade_route_image, [&trade_route_image, &terrain_image](const int x, const int y) {
+	image::for_each_pixel_pos(trade_route_image, [&trade_route_image, &terrain_image, &overlay_terrain_image](const int x, const int y) {
 		const QColor color = trade_route_image.pixelColor(x, y);
 
 		if (color.alpha() == 0) {
@@ -2569,7 +2569,7 @@ void map_template::load_trade_route_image()
 			return;
 		}
 
-		const QColor old_color = terrain_image.pixelColor(x, y);
+		const QColor old_color = overlay_terrain_image.pixelColor(x, y);
 
 		if (old_color.alpha() != 0) {
 			const terrain_type *terrain = nullptr;
@@ -2581,15 +2581,36 @@ void map_template::load_trade_route_image()
 			}
 
 			if (terrain != nullptr && terrain->is_water()) {
-				if (terrain_feature == nullptr || !terrain_feature->is_river()) {
-					//do not replace non-river water pixels with trade route ones
-					return;
+				//replace river water pixels with ford ones, and do nothing for non-river water pixels
+				if (terrain_feature != nullptr && terrain_feature->is_river()) {
+					for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+						for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+							const QPoint offset_pixel_pos(x + x_offset, y + y_offset);
+
+							if (!terrain_image.rect().contains(offset_pixel_pos)) {
+								continue;
+							}
+
+							const QColor offset_old_color = overlay_terrain_image.pixelColor(offset_pixel_pos);
+							const wyrmgus::terrain_feature *offset_terrain_feature = terrain_feature::try_get_by_color(offset_old_color);
+
+							if (offset_terrain_feature == nullptr || !offset_terrain_feature->is_river()) {
+								continue;
+							}
+
+							terrain_image.setPixelColor(offset_pixel_pos, defines::get()->get_ford_terrain_type()->get_color());
+						}
+					}
+
+					overlay_terrain_image.setPixelColor(x, y, terrain_type::none_color);
 				}
+
+				return;
 			}
 		}
 
 		//apply the trade route pixel to the overlay image
-		terrain_image.setPixelColor(x, y, color);
+		overlay_terrain_image.setPixelColor(x, y, color);
 	});
 }
 

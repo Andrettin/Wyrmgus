@@ -86,6 +86,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::time_of_day_schedule* default_time_of_day_schedule MEMBER default_time_of_day_schedule)
 	Q_PROPERTY(wyrmgus::season_schedule* default_season_schedule MEMBER default_season_schedule)
 	Q_PROPERTY(wyrmgus::map_projection* default_map_projection MEMBER default_map_projection)
+	Q_PROPERTY(wyrmgus::terrain_type* ford_terrain_type MEMBER ford_terrain_type)
 	Q_PROPERTY(std::filesystem::path border_image_file MEMBER border_image_file WRITE set_border_image_file)
 	Q_PROPERTY(QSize border_frame_size MEMBER border_frame_size)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
@@ -261,9 +262,14 @@ public:
 		return this->default_season_schedule;
 	}
 
-	map_projection *get_default_map_projection() const
+	const map_projection *get_default_map_projection() const
 	{
 		return this->default_map_projection;
+	}
+
+	const terrain_type *get_ford_terrain_type() const
+	{
+		return this->ford_terrain_type;
 	}
 
 	void set_border_image_file(const std::filesystem::path &filepath);
@@ -456,6 +462,7 @@ private:
 	time_of_day_schedule *default_time_of_day_schedule = nullptr;
 	season_schedule *default_season_schedule = nullptr;
 	map_projection *default_map_projection = nullptr;
+	terrain_type *ford_terrain_type = nullptr;
 	dialogue *campaign_victory_dialogue = nullptr;
 	dialogue *campaign_defeat_dialogue = nullptr;
 	button_level *inventory_button_level = nullptr;
