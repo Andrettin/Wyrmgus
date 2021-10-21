@@ -1881,7 +1881,7 @@ void CMap::save(CFile &file) const
 	file.printf("  \"description\", \"%s\",\n", this->Info->get_name().c_str());
 	file.printf("  \"the-map\", {\n");
 	file.printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
-	file.printf("  \"filename\", \"%s\",\n", this->Info->get_presentation_filepath().string().c_str());
+	file.printf("  \"filename\", \"%s\",\n", string::escaped(path::to_string(this->Info->get_presentation_filepath())).c_str());
 	//Wyrmgus start
 	file.printf("  \"time-of-day\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {

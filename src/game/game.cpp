@@ -337,7 +337,7 @@ void game::save(const std::filesystem::path &filepath) const
 		StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
 	file.printf("  SyncHash = %d, \n", SyncHash);
 	file.printf("  SyncRandSeed = %d, \n", random::get()->get_seed());
-	file.printf("  SaveFile = \"%s\"\n", path::to_string(CurrentMapPath).c_str());
+	file.printf("  SaveFile = \"%s\"\n", string::escaped(path::to_string(CurrentMapPath)).c_str());
 	file.printf("} )\n\n");
 
 	// FIXME: probably not the right place for this
