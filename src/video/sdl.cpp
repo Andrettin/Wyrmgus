@@ -65,6 +65,8 @@
 #include "video/video.h"
 #include "widgets.h"
 
+#include <QWindow>
+
 static std::map<int, std::string> Key2Str;
 static std::map<std::string, int> Str2Key;
 
@@ -300,7 +302,17 @@ static void do_mouse_warp()
 	UI.MouseWarpPos.y = -1;
 
 	QMetaObject::invokeMethod(QApplication::instance(), [xw, yw] {
-		QCursor::setPos(QPoint(xw, yw));
+		const QWindowList windows = QApplication::topLevelWindows();
+
+		if (windows.empty()) {
+			return;
+		}
+
+		const QWindow *window = windows.at(0);
+
+		const QPoint global_pos = window->mapToGlobal(QPoint(xw, yw));
+
+		QCursor::setPos(global_pos);
 	}, Qt::QueuedConnection);
 }
 
