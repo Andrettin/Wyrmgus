@@ -43,6 +43,10 @@ class preferences final : public QObject, public singleton<preferences>
 
 	Q_PROPERTY(wyrmgus::centesimal_int scale_factor READ get_scale_factor WRITE set_scale_factor NOTIFY scale_factor_changed)
 	Q_PROPERTY(QString scale_factor_string READ get_scale_factor_qstring WRITE set_scale_factor_qstring NOTIFY scale_factor_changed)
+	Q_PROPERTY(bool fullscreen READ is_fullscreen WRITE set_fullscreen NOTIFY fullscreen_changed)
+	Q_PROPERTY(QSize window_size READ get_window_size WRITE set_window_size NOTIFY window_size_changed)
+	Q_PROPERTY(int window_width READ get_window_width WRITE set_window_width NOTIFY window_size_changed)
+	Q_PROPERTY(int window_height READ get_window_height WRITE set_window_height NOTIFY window_size_changed)
 	Q_PROPERTY(int game_speed READ get_game_speed WRITE set_game_speed NOTIFY game_speed_changed)
 	Q_PROPERTY(wyrmgus::difficulty difficulty READ get_difficulty WRITE set_difficulty)
 	Q_PROPERTY(bool sound_effects_enabled READ are_sound_effects_enabled WRITE set_sound_effects_enabled NOTIFY sound_effects_enabled_changed)
@@ -94,6 +98,70 @@ public:
 	void set_scale_factor_qstring(const QString &factor_str)
 	{
 		this->set_scale_factor(centesimal_int(factor_str.toStdString()));
+	}
+
+	bool is_fullscreen() const
+	{
+		return this->fullscreen;
+	}
+
+	void set_fullscreen(const bool fullscreen)
+	{
+		if (fullscreen == this->is_fullscreen()) {
+			return;
+		}
+
+		this->fullscreen = fullscreen;
+
+		emit fullscreen_changed();
+	}
+
+	const QSize &get_window_size() const
+	{
+		return this->window_size;
+	}
+
+	void set_window_size(const QSize &window_size)
+	{
+		if (window_size == this->get_window_size()) {
+			return;
+		}
+
+		this->window_size = window_size;
+
+		emit window_size_changed();
+	}
+
+	int get_window_width() const
+	{
+		return this->get_window_size().width();
+	}
+
+	void set_window_width(const int window_width)
+	{
+		if (window_width == this->get_window_width()) {
+			return;
+		}
+
+		this->window_size.setWidth(window_width);
+
+		emit window_size_changed();
+	}
+
+	int get_window_height() const
+	{
+		return this->get_window_size().height();
+	}
+
+	void set_window_height(const int window_height)
+	{
+		if (window_height == this->get_window_height()) {
+			return;
+		}
+
+		this->window_size.setHeight(window_height);
+
+		emit window_size_changed();
 	}
 
 	int get_game_speed() const
@@ -291,6 +359,8 @@ public:
 
 signals:
 	void scale_factor_changed();
+	void fullscreen_changed();
+	void window_size_changed();
 	void game_speed_changed();
 	void sound_effects_enabled_changed();
 	void sound_effects_volume_changed();
@@ -300,6 +370,8 @@ signals:
 
 private:
 	centesimal_int scale_factor = centesimal_int(1);
+	bool fullscreen = true;
+	QSize window_size = QSize(1066, 600);
 	int game_speed = preferences::default_game_speed;
 	wyrmgus::difficulty difficulty;
 	bool sound_effects_enabled = true;

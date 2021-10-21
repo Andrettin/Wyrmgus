@@ -84,6 +84,8 @@ void preferences::save() const
 	sml_data data(preferences_path.filename().stem().string());
 
 	data.add_property("scale_factor", this->get_scale_factor().to_string());
+	data.add_property("fullscreen", string::from_bool(this->is_fullscreen()));
+	data.add_child(sml_data::from_size(this->get_window_size(), "window_size"));
 	data.add_property("game_speed", std::to_string(this->get_game_speed()));
 	data.add_property("difficulty", difficulty_to_string(this->get_difficulty()));
 	data.add_property("sound_effects_enabled", string::from_bool(this->are_sound_effects_enabled()));
@@ -124,7 +126,11 @@ void preferences::process_sml_property(const sml_property &property)
 
 void preferences::process_sml_scope(const sml_data &scope)
 {
-	database::process_sml_scope_for_object(this, scope);
+	try {
+		database::process_sml_scope_for_object(this, scope);
+	} catch (const std::runtime_error &exception) {
+		exception::report(exception);
+	}
 }
 
 void preferences::initialize()

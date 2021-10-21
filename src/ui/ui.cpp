@@ -144,7 +144,9 @@ CPopup *PopupByIdent(const std::string &ident)
 */
 void InitUserInterface()
 {
-	ShowLoadProgress("%s", _("Loading User Interface..."));
+	if (!GameRunning) {
+		ShowLoadProgress("%s", _("Loading User Interface..."));
+	}
 	
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	const int scaled_map_area_top_margin = (defines::get()->get_map_area_top_margin() * scale_factor).to_int();
