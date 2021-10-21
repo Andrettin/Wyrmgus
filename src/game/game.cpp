@@ -319,7 +319,7 @@ void game::save(const std::filesystem::path &filepath) const
 	file.printf("function CreateUnit() end\n");
 	file.printf("function SetResourcesHeld() end\n");
 	file.printf("function SetTileTerrain() end\n");
-	file.printf("Load(\"%s\")\n", CMap::get()->Info->get_setup_filepath().string().c_str());
+	file.printf("Load(\"%s\")\n", string::escaped(path::to_string(CMap::get()->Info->get_setup_filepath())).c_str());
 	file.printf("CreateUnit = oldCreateUnit\n");
 	file.printf("SetResourcesHeld = oldSetResourcesHeld\n");
 	file.printf("SetTile = oldSetTile\n");
