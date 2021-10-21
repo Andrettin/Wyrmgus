@@ -821,6 +821,10 @@ void ApplyMapTemplate(const std::string &map_template_ident, int template_start_
 void ApplyCampaignMap(const std::string &campaign_ident)
 {
 	try {
+		if (SaveGameLoading) {
+			return;
+		}
+
 		database::load_history();
 
 		const campaign *campaign = campaign::get(campaign_ident);
