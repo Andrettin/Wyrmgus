@@ -47,7 +47,7 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(QSize window_size READ get_window_size WRITE set_window_size NOTIFY window_size_changed)
 	Q_PROPERTY(int window_width READ get_window_width WRITE set_window_width NOTIFY window_size_changed)
 	Q_PROPERTY(int window_height READ get_window_height WRITE set_window_height NOTIFY window_size_changed)
-	Q_PROPERTY(bool window_maximized MEMBER window_maximized)
+	Q_PROPERTY(bool window_maximized READ is_window_maximized WRITE set_window_maximized NOTIFY window_maximized_changed)
 	Q_PROPERTY(int game_speed READ get_game_speed WRITE set_game_speed NOTIFY game_speed_changed)
 	Q_PROPERTY(wyrmgus::difficulty difficulty READ get_difficulty WRITE set_difficulty)
 	Q_PROPERTY(bool sound_effects_enabled READ are_sound_effects_enabled WRITE set_sound_effects_enabled NOTIFY sound_effects_enabled_changed)
@@ -163,6 +163,22 @@ public:
 		this->window_size.setHeight(window_height);
 
 		emit window_size_changed();
+	}
+
+	bool is_window_maximized() const
+	{
+		return this->window_maximized;
+	}
+
+	void set_window_maximized(const bool window_maximized)
+	{
+		if (window_maximized == this->is_window_maximized()) {
+			return;
+		}
+
+		this->window_maximized = window_maximized;
+
+		emit window_maximized_changed();
 	}
 
 	int get_game_speed() const
@@ -362,6 +378,7 @@ signals:
 	void scale_factor_changed();
 	void fullscreen_changed();
 	void window_size_changed();
+	void window_maximized_changed();
 	void game_speed_changed();
 	void sound_effects_enabled_changed();
 	void sound_effects_volume_changed();
