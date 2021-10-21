@@ -47,6 +47,7 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(QSize window_size READ get_window_size WRITE set_window_size NOTIFY window_size_changed)
 	Q_PROPERTY(int window_width READ get_window_width WRITE set_window_width NOTIFY window_size_changed)
 	Q_PROPERTY(int window_height READ get_window_height WRITE set_window_height NOTIFY window_size_changed)
+	Q_PROPERTY(bool window_maximized MEMBER window_maximized)
 	Q_PROPERTY(int game_speed READ get_game_speed WRITE set_game_speed NOTIFY game_speed_changed)
 	Q_PROPERTY(wyrmgus::difficulty difficulty READ get_difficulty WRITE set_difficulty)
 	Q_PROPERTY(bool sound_effects_enabled READ are_sound_effects_enabled WRITE set_sound_effects_enabled NOTIFY sound_effects_enabled_changed)
@@ -372,6 +373,7 @@ private:
 	centesimal_int scale_factor = centesimal_int(1);
 	bool fullscreen = true;
 	QSize window_size = QSize(1066, 600);
+	bool window_maximized = false;
 	int game_speed = preferences::default_game_speed;
 	wyrmgus::difficulty difficulty;
 	bool sound_effects_enabled = true;

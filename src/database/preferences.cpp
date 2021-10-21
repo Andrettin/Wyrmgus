@@ -86,6 +86,7 @@ void preferences::save() const
 	data.add_property("scale_factor", this->get_scale_factor().to_string());
 	data.add_property("fullscreen", string::from_bool(this->is_fullscreen()));
 	data.add_child(sml_data::from_size(this->get_window_size(), "window_size"));
+	data.add_property("window_maximized", string::from_bool(this->window_maximized));
 	data.add_property("game_speed", std::to_string(this->get_game_speed()));
 	data.add_property("difficulty", difficulty_to_string(this->get_difficulty()));
 	data.add_property("sound_effects_enabled", string::from_bool(this->are_sound_effects_enabled()));
