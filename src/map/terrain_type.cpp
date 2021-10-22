@@ -151,6 +151,10 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->destroyed_tiles.push_back(std::stoi(value));
 		}
+	} else if (tag == "decoration_tiles") {
+		for (const std::string &value : values) {
+			this->decoration_tiles.push_back(std::stoi(value));
+		}
 	} else if (tag == "season_image_files") {
 		scope.for_each_property([&](const sml_property &property) {
 			const season *season = season::get(property.get_key());
@@ -239,6 +243,10 @@ void terrain_type::check() const
 		if (this->is_border_terrain_type(other_terrain_type)) {
 			throw std::runtime_error("Terrain type \"" + this->get_identifier() + "\" was set to have an intermediate terrain type with \"" + other_terrain_type->get_identifier() + "\", but both can already border each other directly.");
 		}
+	}
+
+	if (this->get_solid_tiles().empty() && !this->get_decoration_tiles().empty()) {
+		throw std::runtime_error("Terrain type \"" + this->get_identifier() + "\" has decoration tiles, but no solid tiles.");
 	}
 }
 
@@ -508,6 +516,11 @@ const terrain_type *terrain_type::get_intermediate_terrain_type(const terrain_ty
 	}
 
 	return nullptr;
+}
+
+bool terrain_type::is_decoration_tile(const int tile) const
+{
+	return vector::contains(this->get_decoration_tiles(), tile);
 }
 
 }

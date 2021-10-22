@@ -72,6 +72,7 @@ public:
 	static constexpr const char *class_identifier = "terrain_type";
 	static constexpr const char *database_folder = "terrain_types";
 	static inline const QColor none_color = QColor(0, 0, 0);
+	static constexpr int decoration_tile_inverse_weight = 256; //decoration tiles have a chance of 1 in [the value of this variable] to be picked as solid tiles for a given tile
 
 	static terrain_type *get_by_character(const char character)
 	{
@@ -402,6 +403,13 @@ public:
 		return this->destroyed_tiles;
 	}
 
+	const std::vector<int> &get_decoration_tiles() const
+	{
+		return this->decoration_tiles;
+	}
+
+	bool is_decoration_tile(const int tile) const;
+
 	const std::vector<int> &get_transition_tiles(const terrain_type *terrain_type, const tile_transition_type transition_type) const
 	{
 		static std::vector<int> empty_vector;
@@ -477,6 +485,7 @@ private:
 	std::vector<int> solid_tiles;
 	std::vector<int> damaged_tiles;
 	std::vector<int> destroyed_tiles;
+	std::vector<int> decoration_tiles;
 	std::map<const terrain_type *, std::map<tile_transition_type, std::vector<int>>> transition_tiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 	std::map<const terrain_type *, std::map<tile_transition_type, std::vector<int>>> adjacent_transition_tiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 

@@ -2573,7 +2573,9 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 		const int solid_tile_frame_y = pos.y() % terrain_graphics->get_frames_per_column();
 		solid_tile = terrain_graphics->get_frame_index(QPoint(solid_tile_frame_x, solid_tile_frame_y));
 	} else {
-		if (!terrain_type->get_solid_tiles().empty()) {
+		if (!terrain_type->get_decoration_tiles().empty() && tile->TransitionTiles.empty() && tile->OverlayTransitionTiles.empty() && random::get()->generate(terrain_type::decoration_tile_inverse_weight) == 0) {
+			solid_tile = vector::get_random(terrain_type->get_decoration_tiles());
+		} else if (!terrain_type->get_solid_tiles().empty()) {
 			solid_tile = vector::get_random(terrain_type->get_solid_tiles());
 		}
 	}
@@ -2735,6 +2737,13 @@ void CMap::calculate_tile_transitions(const QPoint &pos, const bool overlay, con
 					swapped = true;
 				}
 			}
+		}
+	}
+
+	if (!tile_transition_tiles.empty()) {
+		//recalculate the solid tile if there are transitions over a decoration tile
+		if (tile->get_terrain() != nullptr && tile->get_terrain()->is_decoration_tile(tile->SolidTile)) {
+			this->calculate_tile_solid_tile(pos, false, z);
 		}
 	}
 }
