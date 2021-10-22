@@ -39,6 +39,7 @@
 //Wyrmgus start
 #include "script.h"
 //Wyrmgus end
+#include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/util.h"
 
@@ -656,7 +657,7 @@ public:
 	{
 		file = fopen(filename.c_str(), "wb");
 		if (!file) {
-			fprintf(stderr, "Can't open file '%s' for writing\n", filename.c_str());
+			log::log_error("Can't open file \"" + filename + "\" for writing.");
 			throw FileException();
 		}
 	}
@@ -681,7 +682,7 @@ public:
 	{
 		file = gzopen(filename.c_str(), "wb9");
 		if (!file) {
-			fprintf(stderr, "Can't open file '%s' for writing\n", filename.c_str());
+			log::log_error("Can't open file \"" + filename + "\" for writing.");
 			throw FileException();
 		}
 	}
