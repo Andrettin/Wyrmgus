@@ -170,7 +170,7 @@ public:
 	void SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, const int z);
 	void SetOverlayTerrainDamaged(const QPoint &pos, const bool damaged, const int z);
 	void calculate_tile_solid_tile(const QPoint &pos, const bool overlay, const int z);
-	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
+	void calculate_tile_transitions(const QPoint &pos, const bool overlay, const int z);
 	void CalculateTileLandmass(const Vec2i &pos, int z);
 	void CalculateTileOwnershipTransition(const Vec2i &pos, int z);
 	void AdjustMap();

@@ -308,8 +308,8 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
 		const terrain_type *tile_terrain = CMap::get()->GetTileTerrain(changed_tiles[i], terrain->is_overlay(), UI.CurrentMapLayer->ID);
 		
-		CMap::get()->CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
-		CMap::get()->CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
+		CMap::get()->calculate_tile_transitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
+		CMap::get()->calculate_tile_transitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
 
 		bool has_transitions = terrain->is_overlay() ? (UI.CurrentMapLayer->Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(changed_tiles[i])->TransitionTiles.size() > 0);
 		bool solid_tile = true;
@@ -369,7 +369,7 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 							if (!adjacent_terrain || adjacent_terrain == CMap::get()->GetTileTerrain(changed_tiles[i], overlay > 0, UI.CurrentMapLayer->ID)) {
 								continue;
 							}
-							CMap::get()->CalculateTileTransitions(adjacent_pos, overlay == 1, UI.CurrentMapLayer->ID);
+							CMap::get()->calculate_tile_transitions(adjacent_pos, overlay == 1, UI.CurrentMapLayer->ID);
 							bool has_transitions = overlay ? (UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(adjacent_pos)->TransitionTiles.size() > 0);
 							bool solid_tile = true;
 							
@@ -420,8 +420,8 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 		if (CMap::get()->GetTileTerrain(tile_pos, terrain->is_overlay(), UI.CurrentMapLayer->ID) == terrain) {
 			CMap::get()->calculate_tile_solid_tile(tile_pos, terrain->is_overlay(), UI.CurrentMapLayer->ID);
 		}
-		CMap::get()->CalculateTileTransitions(tile_pos, false, UI.CurrentMapLayer->ID);
-		CMap::get()->CalculateTileTransitions(tile_pos, true, UI.CurrentMapLayer->ID);
+		CMap::get()->calculate_tile_transitions(tile_pos, false, UI.CurrentMapLayer->ID);
+		CMap::get()->calculate_tile_transitions(tile_pos, true, UI.CurrentMapLayer->ID);
 		UI.get_minimap()->UpdateXY(tile_pos, UI.CurrentMapLayer->ID);
 
 		const tile *tile = UI.CurrentMapLayer->Field(tile_pos);
@@ -449,8 +449,8 @@ static void EditTilesInternal(const Vec2i &pos, const terrain_type *terrain, int
 					const size_t old_adjacent_base_transition_count = adjacent_tile->TransitionTiles.size();
 					const size_t old_adjacent_overlay_transition_count = adjacent_tile->OverlayTransitionTiles.size();
 
-					CMap::get()->CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
-					CMap::get()->CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
+					CMap::get()->calculate_tile_transitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
+					CMap::get()->calculate_tile_transitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
 					UI.get_minimap()->UpdateXY(adjacent_pos, UI.CurrentMapLayer->ID);
 
 					const wyrmgus::player_color *adjacent_player_color = adjacent_tile->get_player_color();
@@ -1279,8 +1279,8 @@ static void DrawMapCursor(std::vector<std::function<void(renderer *)>> &render_c
 					//Wyrmgus start
 //					Map.TileGraphic->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
 
-					if (terrain->get_graphics() && terrain->get_solid_tiles().size() > 0) {
-						terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles()[0], screenPosIt.x, screenPosIt.y, render_commands);
+					if (terrain->get_graphics() && !terrain->get_solid_tiles().empty()) {
+						terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles().front(), screenPosIt.x, screenPosIt.y, render_commands);
 					}
 					//Wyrmgus end
 				}

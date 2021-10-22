@@ -1297,8 +1297,8 @@ void PreprocessMap()
 					if (mf.get_overlay_terrain() != nullptr) {
 						CMap::get()->calculate_tile_solid_tile(tile_pos, true, z);
 					}
-					CMap::get()->CalculateTileTransitions(tile_pos, false, z);
-					CMap::get()->CalculateTileTransitions(tile_pos, true, z);
+					CMap::get()->calculate_tile_transitions(tile_pos, false, z);
+					CMap::get()->calculate_tile_transitions(tile_pos, true, z);
 				}
 			}
 
@@ -2144,8 +2144,8 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 		if (tile->get_overlay_terrain() != nullptr) {
 			this->calculate_tile_solid_tile(pos, true, z);
 		}
-		this->CalculateTileTransitions(pos, false, z);
-		this->CalculateTileTransitions(pos, true, z);
+		this->calculate_tile_transitions(pos, false, z);
+		this->calculate_tile_transitions(pos, true, z);
 
 		if (tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			MarkSeenTile(*tile);
@@ -2188,8 +2188,8 @@ void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const 
 					const size_t old_adjacent_base_transition_count = adjacent_tile->TransitionTiles.size();
 					const size_t old_adjacent_overlay_transition_count = adjacent_tile->OverlayTransitionTiles.size();
 
-					this->CalculateTileTransitions(adjacent_pos, false, z);
-					this->CalculateTileTransitions(adjacent_pos, true, z);
+					this->calculate_tile_transitions(adjacent_pos, false, z);
+					this->calculate_tile_transitions(adjacent_pos, true, z);
 
 					if (adjacent_tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(*adjacent_tile);
@@ -2227,7 +2227,7 @@ void CMap::RemoveTileOverlayTerrain(const QPoint &pos, const int z)
 
 	tile->RemoveOverlayTerrain();
 	
-	this->CalculateTileTransitions(pos, true, z);
+	this->calculate_tile_transitions(pos, true, z);
 	
 	if (tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(*tile);
@@ -2255,7 +2255,7 @@ void CMap::RemoveTileOverlayTerrain(const QPoint &pos, const int z)
 
 				const size_t old_adjacent_overlay_transition_count = adjacent_tile->OverlayTransitionTiles.size();
 
-				this->CalculateTileTransitions(adjacent_pos, true, z);
+				this->calculate_tile_transitions(adjacent_pos, true, z);
 
 				if (adjacent_tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 					MarkSeenTile(*adjacent_tile);
@@ -2337,7 +2337,7 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 			this->calculate_tile_solid_tile(pos, true, z);
 		}
 
-		this->CalculateTileTransitions(pos, true, z);
+		this->calculate_tile_transitions(pos, true, z);
 
 		if (tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			MarkSeenTile(*tile);
@@ -2370,7 +2370,7 @@ void CMap::SetOverlayTerrainDestroyed(const QPoint &pos, const bool destroyed, c
 
 					const size_t old_adjacent_overlay_transition_count = adjacent_tile->OverlayTransitionTiles.size();
 
-					this->CalculateTileTransitions(adjacent_pos, true, z);
+					this->calculate_tile_transitions(adjacent_pos, true, z);
 
 					if (adjacent_tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(*adjacent_tile);
@@ -2414,7 +2414,7 @@ void CMap::SetOverlayTerrainDamaged(const QPoint &pos, const bool damaged, const
 			this->calculate_tile_solid_tile(pos, true, z);
 		}
 
-		this->CalculateTileTransitions(pos, true, z);
+		this->calculate_tile_transitions(pos, true, z);
 
 		if (tile->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			MarkSeenTile(*tile);
@@ -2554,7 +2554,7 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 	}
 
 	if (terrain_type == nullptr) {
-		const std::vector<const map_template *> pos_subtemplates = get_pos_subtemplates(pos, z);
+		const std::vector<const map_template *> pos_subtemplates = this->get_pos_subtemplates(pos, z);
 
 		std::string error_message = "Failed to calculate solid tile for tile " + point::to_string(pos) + ", map layer " + std::to_string(z);
 
@@ -2585,19 +2585,16 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 	}
 }
 
-void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
+void CMap::calculate_tile_transitions(const QPoint &pos, const bool overlay, const int z)
 {
-	tile &mf = *this->Field(pos, z);
-	const terrain_type *terrain = nullptr;
-	if (overlay) {
-		terrain = mf.get_overlay_terrain();
-		mf.OverlayTransitionTiles.clear();
-	} else {
-		terrain = mf.get_terrain();
-		mf.TransitionTiles.clear();
-	}
-	
-	if (!terrain || (overlay && mf.OverlayTerrainDestroyed)) {
+	tile *tile = this->Field(pos, z);
+
+	const terrain_type *terrain = overlay ? tile->get_overlay_terrain() : tile->get_terrain();
+	std::vector<tile_transition> &tile_transition_tiles = overlay ? tile->OverlayTransitionTiles : tile->TransitionTiles;
+
+	tile_transition_tiles.clear();
+
+	if (terrain == nullptr || (overlay && tile->OverlayTerrainDestroyed)) {
 		return;
 	}
 	
@@ -2606,7 +2603,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				const QPoint adjacent_pos(pos.x() + x_offset, pos.y() + y_offset);
 				if (this->Info->IsPointOnMap(adjacent_pos, z)) {
 					const terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
@@ -2644,17 +2641,17 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				if (adjacent_terrain != nullptr) {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(adjacent_terrain, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.TransitionTiles.emplace_back(terrain, vector::get_random(transition_tiles));
+						tile_transition_tiles.emplace_back(terrain, vector::get_random(transition_tiles));
 						found_transition = true;
 					} else {
 						const std::vector<int> &adjacent_transition_tiles = adjacent_terrain->get_adjacent_transition_tiles(terrain, transition_type);
 						if (!adjacent_transition_tiles.empty()) {
-							mf.TransitionTiles.emplace_back(adjacent_terrain, vector::get_random(adjacent_transition_tiles));
+							tile_transition_tiles.emplace_back(adjacent_terrain, vector::get_random(adjacent_transition_tiles));
 							found_transition = true;
 						} else {
 							const std::vector<int> &sub_adjacent_transition_tiles = adjacent_terrain->get_adjacent_transition_tiles(nullptr, transition_type);
 							if (!sub_adjacent_transition_tiles.empty()) {
-								mf.TransitionTiles.emplace_back(adjacent_terrain, vector::get_random(sub_adjacent_transition_tiles));
+								tile_transition_tiles.emplace_back(adjacent_terrain, vector::get_random(sub_adjacent_transition_tiles));
 								found_transition = true;
 							}
 						}
@@ -2662,24 +2659,24 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				} else {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(nullptr, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.TransitionTiles.emplace_back(terrain, vector::get_random(transition_tiles));
+						tile_transition_tiles.emplace_back(terrain, vector::get_random(transition_tiles));
 					}
 				}
 			} else {
 				if (adjacent_terrain != nullptr) {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(adjacent_terrain, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.OverlayTransitionTiles.emplace_back(terrain, vector::get_random(transition_tiles));
+						tile_transition_tiles.emplace_back(terrain, vector::get_random(transition_tiles));
 						found_transition = true;
 					} else {
 						const std::vector<int> &adjacent_transition_tiles = adjacent_terrain->get_transition_tiles(terrain, transition_type);
 						if (!adjacent_transition_tiles.empty()) {
-							mf.OverlayTransitionTiles.emplace_back(adjacent_terrain, vector::get_random(adjacent_transition_tiles));
+							tile_transition_tiles.emplace_back(adjacent_terrain, vector::get_random(adjacent_transition_tiles));
 							found_transition = true;
 						} else {
 							const std::vector<int> &sub_adjacent_transition_tiles = adjacent_terrain->get_transition_tiles(nullptr, transition_type);
 							if (!sub_adjacent_transition_tiles.empty()) {
-								mf.OverlayTransitionTiles.emplace_back(adjacent_terrain, vector::get_random(sub_adjacent_transition_tiles));
+								tile_transition_tiles.emplace_back(adjacent_terrain, vector::get_random(sub_adjacent_transition_tiles));
 								found_transition = true;
 							}
 						}
@@ -2687,20 +2684,20 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				} else {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(nullptr, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.OverlayTransitionTiles.emplace_back(terrain, vector::get_random(transition_tiles));
+						tile_transition_tiles.emplace_back(terrain, vector::get_random(transition_tiles));
 					}
 				}
 				
-				if (mf.has_flag(tile_flag::water_allowed) && (!adjacent_terrain || !adjacent_terrain->has_flag(tile_flag::water_allowed))) {
+				if (tile->has_flag(tile_flag::water_allowed) && (!adjacent_terrain || !adjacent_terrain->has_flag(tile_flag::water_allowed))) {
 					//if this is a water tile adjacent to a non-water tile, replace the water flag with a coast one
-					mf.Flags &= ~(tile_flag::water_allowed);
-					mf.Flags |= tile_flag::coast_allowed;
+					tile->Flags &= ~(tile_flag::water_allowed);
+					tile->Flags |= tile_flag::coast_allowed;
 				}
 				
-				if (mf.has_flag(tile_flag::space) && (!adjacent_terrain || !adjacent_terrain->has_flag(tile_flag::space))) {
+				if (tile->has_flag(tile_flag::space) && (!adjacent_terrain || !adjacent_terrain->has_flag(tile_flag::space))) {
 					//if this is a space tile adjacent to a non-space tile, replace the space flag with a cliff one
-					mf.Flags &= ~(tile_flag::space);
-					mf.Flags |= tile_flag::space_cliff;
+					tile->Flags &= ~(tile_flag::space);
+					tile->Flags |= tile_flag::space_cliff;
 				}
 			}
 			
@@ -2715,26 +2712,26 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 	//sort the transitions so that they will be displayed in the correct order
 	if (overlay) {
 		bool swapped = true;
-		for (int passes = 0; passes < (int) mf.OverlayTransitionTiles.size() && swapped; ++passes) {
+		for (size_t passes = 0; passes < tile_transition_tiles.size() && swapped; ++passes) {
 			swapped = false;
-			for (int i = 0; i < ((int) mf.OverlayTransitionTiles.size()) - 1; ++i) {
-				if (vector::contains(mf.OverlayTransitionTiles[i + 1].terrain->get_inner_border_terrain_types(), mf.OverlayTransitionTiles[i].terrain)) {
-					tile_transition temp_transition = mf.OverlayTransitionTiles[i];
-					mf.OverlayTransitionTiles[i] = mf.OverlayTransitionTiles[i + 1];
-					mf.OverlayTransitionTiles[i + 1] = temp_transition;
+			for (int i = 0; i < static_cast<int>(tile_transition_tiles.size()) - 1; ++i) {
+				if (vector::contains(tile_transition_tiles[i + 1].terrain->get_inner_border_terrain_types(), tile_transition_tiles[i].terrain)) {
+					tile_transition temp_transition = tile_transition_tiles[i];
+					tile_transition_tiles[i] = tile_transition_tiles[i + 1];
+					tile_transition_tiles[i + 1] = temp_transition;
 					swapped = true;
 				}
 			}
 		}
 	} else {
 		bool swapped = true;
-		for (int passes = 0; passes < (int) mf.TransitionTiles.size() && swapped; ++passes) {
+		for (size_t passes = 0; passes < tile_transition_tiles.size() && swapped; ++passes) {
 			swapped = false;
-			for (int i = 0; i < ((int) mf.TransitionTiles.size()) - 1; ++i) {
-				if (vector::contains(mf.TransitionTiles[i + 1].terrain->get_inner_border_terrain_types(), mf.TransitionTiles[i].terrain)) {
-					tile_transition temp_transition = mf.TransitionTiles[i];
-					mf.TransitionTiles[i] = mf.TransitionTiles[i + 1];
-					mf.TransitionTiles[i + 1] = temp_transition;
+			for (int i = 0; i < static_cast<int>(tile_transition_tiles.size()) - 1; ++i) {
+				if (vector::contains(tile_transition_tiles[i + 1].terrain->get_inner_border_terrain_types(), tile_transition_tiles[i].terrain)) {
+					tile_transition temp_transition = tile_transition_tiles[i];
+					tile_transition_tiles[i] = tile_transition_tiles[i + 1];
+					tile_transition_tiles[i + 1] = temp_transition;
 					swapped = true;
 				}
 			}
