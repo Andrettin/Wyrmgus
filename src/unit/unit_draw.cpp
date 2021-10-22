@@ -286,19 +286,21 @@ void DrawSelectionRectangleWithTrans(IntColor color, int x1, int y1, int x2, int
 */
 void DrawSelectionCorners(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const int CORNER_PIXELS = 6;
+	static constexpr int base_corner_pixels = 6;
 
-	Video.DrawVLineClip(color, x1, y1, CORNER_PIXELS, render_commands);
-	Video.DrawHLineClip(color, x1 + 1, y1, CORNER_PIXELS - 1, render_commands);
+	const int corner_pixels = (base_corner_pixels * preferences::get()->get_scale_factor()).to_int();
 
-	Video.DrawVLineClip(color, x2, y1, CORNER_PIXELS, render_commands);
-	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y1, CORNER_PIXELS - 1, render_commands);
+	Video.DrawVLineClip(color, x1, y1, corner_pixels, render_commands);
+	Video.DrawHLineClip(color, x1 + 1, y1 - 1, corner_pixels - 1, render_commands);
 
-	Video.DrawVLineClip(color, x1, y2 - CORNER_PIXELS, CORNER_PIXELS, render_commands);
-	Video.DrawHLineClip(color, x1, y2, CORNER_PIXELS - 1, render_commands);
+	Video.DrawVLineClip(color, x2, y1, corner_pixels, render_commands);
+	Video.DrawHLineClip(color, x2 - corner_pixels + 1, y1 - 1, corner_pixels - 1, render_commands);
 
-	Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS, CORNER_PIXELS, render_commands);
-	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1, render_commands);
+	Video.DrawVLineClip(color, x1, y2 - corner_pixels, corner_pixels, render_commands);
+	Video.DrawHLineClip(color, x1, y2, corner_pixels - 1, render_commands);
+
+	Video.DrawVLineClip(color, x2, y2 - corner_pixels, corner_pixels, render_commands);
+	Video.DrawHLineClip(color, x2 - corner_pixels + 1, y2, corner_pixels - 1, render_commands);
 }
 
 
