@@ -683,7 +683,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	//Wyrmgus start
 //	if (!goal || goal->IsVisibleAsGoal(*unit.Player) == false) {
 	//the goal could also have changed its given resource
-	if (!goal || goal->IsVisibleAsGoal(*unit.Player) == false || goal->GivesResource != this->CurrentResource) {
+	if (!goal || !goal->IsVisibleAsGoal(*unit.Player) || goal->GivesResource != this->CurrentResource) {
 	//Wyrmgus end
 		// Find an alternative, but don't look too far.
 		this->goalPos.x = -1;
@@ -1445,7 +1445,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	} else {
 		static constexpr unsigned int too_many_workers = 15;
 		CUnit *mine = this->Resource.get_mine();
-		const int range = 15;
+		static constexpr int range = 15;
 		CUnit *newdepot = nullptr;
 		CUnit *goal = nullptr;
 		const bool longWay = unit.pathFinderData->output.Cycles > 500;

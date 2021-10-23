@@ -677,7 +677,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 		CUnit &unit = **it;
 
 		static constexpr unsigned int too_many_workers = 15;
-		const int range = 15;
+		static constexpr int range = 15;
 
 		if (&oldDepot == &unit) {
 			continue;
@@ -1361,7 +1361,7 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, const wyrmgus::resource *re
 */
 //Wyrmgus start
 //static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
-static int AiAssignHarvesterFromUnit(CUnit &unit, const wyrmgus::resource *resource, int resource_range)
+static int AiAssignHarvesterFromUnit(CUnit &unit, const wyrmgus::resource *resource, const int resource_range)
 //Wyrmgus end
 {
 	// Try to find the nearest depot first.
