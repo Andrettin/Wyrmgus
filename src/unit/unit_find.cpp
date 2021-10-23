@@ -615,10 +615,9 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 		return VisitResult::DeadEnd;
 	}
 
-	//Wyrmgus start
-//	CUnit *mine = tile->UnitCache.find(res_finder);
 	CUnit *mine = tile->UnitCache.find(res_finder);
 
+	//Wyrmgus start
 	const CPlayer *tile_owner = tile->get_owner();
 	
 	if (tile_owner != nullptr && tile_owner != worker.Player && !tile_owner->has_neutral_faction_type() && !worker.Player->has_neutral_faction_type() && (mine == nullptr || mine->Type->get_given_resource() == nullptr || mine->Type->get_given_resource()->get_index() != TradeCost)) {

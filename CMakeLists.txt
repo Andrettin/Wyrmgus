@@ -139,6 +139,7 @@ source_group(database FILES ${database_SRCS})
 set(economy_SRCS
 	src/economy/resource.cpp
 	src/economy/resource_container.cpp
+	src/economy/resource_finder.cpp
 )
 source_group(economy FILES ${economy_SRCS})
 
@@ -734,6 +735,7 @@ set(wyrmgus_database_HDRS
 set(wyrmgus_economy_HDRS
 	src/economy/resource.h
 	src/economy/resource_container.h
+	src/economy/resource_finder.h
 	src/economy/resource_storage_type.h
 )
 

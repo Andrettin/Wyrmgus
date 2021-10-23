@@ -454,6 +454,11 @@ extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, int r
 							   const resource *resource, bool check_usage = false, const CUnit *deposit = nullptr, bool only_harvestable = true, bool ignore_exploration = false, bool only_unsettled_area = false, bool include_luxury = false, bool only_same = false);
 								//Wyrmgus end
 
+//Wyrmgus start
+//extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, const resource *resource);
+extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, const resource *resource, int z);
+//Wyrmgus end
+
 /// Find nearest deposit
 extern CUnit *FindDeposit(const CUnit &unit, const int range, const resource *resource);
 //Wyrmgus start

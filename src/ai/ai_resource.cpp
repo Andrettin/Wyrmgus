@@ -519,11 +519,6 @@ int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax])
 	return size;
 }
 
-//Wyrmgus start
-//extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, const resource *resource);
-extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, const resource *resource, int z);
-//Wyrmgus end
-
 void AiNewDepotRequest(CUnit &worker)
 {
 #if 0
