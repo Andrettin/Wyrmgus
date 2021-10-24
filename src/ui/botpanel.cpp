@@ -409,7 +409,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
-	if (condition->CanActiveHarvest && !(button.Action == ButtonCmd::Unit && Selected.size() > 0 && Selected[0]->CanHarvest(&wyrmgus::unit_manager::get()->GetSlotUnit(button.Value), false))) {
+	if (condition->CanActiveHarvest && !(button.Action == ButtonCmd::Unit && Selected.size() > 0 && Selected[0]->can_harvest(&unit_manager::get()->GetSlotUnit(button.Value), false))) {
 		return false;
 	}
 

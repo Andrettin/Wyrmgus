@@ -6095,17 +6095,35 @@ bool CUnit::IsInCombat() const
 	return false;
 }
 
-bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
+bool CUnit::can_harvest(const resource *resource) const
 {
-	if (!dest) {
+	if (resource == nullptr) {
+		return false;
+	}
+
+	if (!this->Type->get_resource_info(resource)) {
+		return false;
+	}
+
+	if (!this->Type->BoolFlag[HARVESTER_INDEX].value) {
+		return false;
+	}
+
+	if (this->BoardCount > 0) {
+		//cannot harvest if carrying units
+		return false;
+	}
+
+	return true;
+}
+
+bool CUnit::can_harvest(const CUnit *dest, const bool only_harvestable) const
+{
+	if (dest == nullptr) {
 		return false;
 	}
 	
-	if (dest->get_given_resource() == nullptr) {
-		return false;
-	}
-	
-	if (!this->Type->get_resource_info(dest->get_given_resource())) {
+	if (!this->can_harvest(dest->get_given_resource())) {
 		return false;
 	}
 	
@@ -6113,29 +6131,31 @@ bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
 		return false;
 	}
 	
-	if (!this->Type->BoolFlag[HARVESTER_INDEX].value) {
-		return false;
-	}
-	
 	if (dest->GivesResource == TradeCost) {
 		if (dest->Player == this->Player) { //can only trade with markets owned by other players
 			return false;
 		}
-		
-		if (this->Type->get_domain() != unit_domain::water && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can trade with docks
-			return false;
-		}
-		if (this->Type->get_domain() == unit_domain::water && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->get_domain() != unit_domain::water) { //ships cannot trade with land markets
-			return false;
+
+		switch (this->Type->get_domain()) {
+			case unit_domain::water:
+				if (!dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->get_domain() != unit_domain::water) {
+					//ships cannot trade with land markets
+					return false;
+				}
+
+				break;
+			default:
+				if (dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) {
+					//only ships can trade with docks
+					return false;
+				}
+
+				break;
 		}
 	} else {
 		if (dest->Player != this->Player && !(dest->Player->is_allied_with(*this->Player) && this->Player->is_allied_with(*dest->Player)) && dest->Player->get_index() != PlayerNumNeutral) {
 			return false;
 		}
-	}
-	
-	if (this->BoardCount) { //cannot harvest if carrying units
-		return false;
 	}
 	
 	return true;

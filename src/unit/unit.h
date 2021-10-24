@@ -544,7 +544,8 @@ public:
 	int GetTotalInsideCount(const CPlayer *player = nullptr, const bool ignore_items = true, const bool ignore_saved_cargo = false, const wyrmgus::unit_type *type = nullptr) const;
 	bool CanAttack(bool count_inside = true) const;
 	bool IsInCombat() const;
-	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;
+	bool can_harvest(const resource *resource) const;
+	bool can_harvest(const CUnit *dest, const bool only_harvestable = true) const;
 	bool can_return_goods_to(const CUnit *dest, const resource *resource = nullptr) const;
 	bool CanCastSpell(const wyrmgus::spell *spell, const bool ignore_mana_and_cooldown) const;
 	bool CanCastAnySpell() const;

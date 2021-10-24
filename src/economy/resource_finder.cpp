@@ -28,7 +28,7 @@
 
 #include "economy/resource_finder.h"
 
-#include "actions.h""
+#include "actions.h"
 #include "economy/resource.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
@@ -41,21 +41,46 @@ namespace wyrmgus {
 struct find_resource_cost final
 {
 public:
+	int calculate_modified_distance(int distance, const resource *resource, const CPlayer *worker_player) const
+	{
+		//apply modifiers to distance
+
+		//apply conversion rate modifier
+		distance *= 100;
+		distance /= resource->get_final_resource_conversion_rate();
+
+		//alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
+		int price_modifier = worker_player->get_resource_price(resource->get_final_resource()) * resource->get_final_resource_conversion_rate() / 100;
+		if (resource->get_input_resource() != nullptr) {
+			price_modifier -= worker_player->get_resource_price(resource->get_input_resource());
+		}
+		price_modifier = std::max(price_modifier, 1);
+
+		distance *= 100;
+		distance /= price_modifier;
+
+		return distance;
+	}
+
+	void set_from(const tile *tile, const QPoint &tile_pos, const int z, const CUnit *depot, const CUnit *worker)
+	{
+		const resource *resource = tile->get_resource();
+
+		this->distance = depot ? depot->MapDistanceTo(tile_pos, z) : 0;
+
+		this->distance = this->calculate_modified_distance(this->distance, resource, worker->Player);
+
+		this->assigned = 0;
+		this->waiting = 0;
+	}
+
 	void set_from(const CUnit *mine, const CUnit *depot, const CUnit *worker, const bool check_usage)
 	{
 		const resource *resource = mine->get_given_resource();
 
 		this->distance = depot ? mine->MapDistanceTo(*depot) : 0;
 
-		this->distance = this->distance * 100 / resource->get_final_resource_conversion_rate();
-
-		//alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
-		int price_modifier = worker->Player->get_resource_price(resource->get_final_resource()) * resource->get_final_resource_conversion_rate() / 100;
-		if (resource->get_input_resource() != nullptr) {
-			price_modifier -= worker->Player->get_resource_price(resource->get_input_resource());
-		}
-		price_modifier = std::max(price_modifier, 1);
-		this->distance = this->distance * 100 / price_modifier;
+		this->distance = this->calculate_modified_distance(this->distance, resource, worker->Player);
 
 		if (!mine->Type->BoolFlag[CANHARVEST_INDEX].value) {
 			// if it is a deposit rather than a readily-harvestable resource, multiply the distance score
@@ -121,15 +146,34 @@ struct find_resource_context final
 
 		const CPlayer *tile_owner = tile->get_owner();
 
-		CUnit *mine = tile->UnitCache.find([this](const CUnit *unit) {
-			return this->is_valid_mine(unit);
-		});
-
 		if (tile_owner != nullptr && tile_owner != worker->Player && !tile_owner->has_neutral_faction_type() && !worker->Player->has_neutral_faction_type()) {
-			if (mine == nullptr || mine->Type->get_given_resource() == nullptr || mine->Type->get_given_resource()->get_index() != TradeCost) {
+			if (this->resource->get_index() != TradeCost || tile_owner->is_enemy_of(*worker->Player)) {
 				return VisitResult::DeadEnd;
 			}
 		}
+
+		const int z = worker->MapLayer->ID;
+
+		if (this->is_valid_resource_tile(tile)) {
+			find_resource_cost cost;
+
+			cost.set_from(tile, pos, z, this->depot, worker);
+
+			if (cost < this->best_cost) {
+				this->result.resource_pos = pos;
+				this->result.resource_unit = nullptr;
+
+				if (cost.is_min()) {
+					return VisitResult::Finished;
+				}
+
+				this->best_cost = cost;
+			}
+		}
+
+		CUnit *mine = tile->UnitCache.find([this](const CUnit *unit) {
+			return this->is_valid_resource_unit(unit);
+		});
 
 		if (
 			mine != nullptr && mine != result.resource_unit
@@ -140,7 +184,8 @@ struct find_resource_context final
 			cost.set_from(mine, this->depot, worker, this->check_usage);
 
 			if (cost < this->best_cost) {
-				result.resource_unit = mine;
+				this->result.resource_unit = mine;
+				this->result.resource_pos = QPoint(-1, -1);
 
 				if (cost.is_min()) {
 					return VisitResult::Finished;
@@ -150,15 +195,14 @@ struct find_resource_context final
 			}
 		}
 
-		const int z = worker->MapLayer->ID;
-
 		if (CanMoveToMask(pos, this->movemask, z)) { // reachable
 			if (terrain_traversal.Get(pos) < this->max_range) {
 				return VisitResult::Ok;
 			} else {
 				return VisitResult::DeadEnd;
 			}
-		} else { // unreachable
+		} else {
+			//unreachable
 			return VisitResult::DeadEnd;
 		}
 	}
@@ -174,13 +218,18 @@ struct find_resource_context final
 			|| (this->include_luxury_resources && resource->LuxuryResource);
 	}
 
-	bool is_valid_mine(const CUnit *unit) const
+	bool is_valid_resource_tile(const tile *tile) const
 	{
-		const unit_type *unit_type = unit->Type;
+		const wyrmgus::resource *tile_resource = tile->get_resource();
 
+		return this->is_valid_resource(tile_resource) && tile->get_value() > 0 && this->worker->can_harvest(tile_resource);
+	}
+
+	bool is_valid_resource_unit(const CUnit *unit) const
+	{
 		return this->is_valid_resource(unit->get_given_resource())
 			&& unit->ResourcesHeld > 0
-			&& this->worker->CanHarvest(unit, this->only_harvestable)
+			&& this->worker->can_harvest(unit, this->only_harvestable)
 			&& !unit->IsUnusable(false);
 	}
 

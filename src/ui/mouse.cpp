@@ -159,7 +159,7 @@ static void DoRightButton_ForForeignUnit(CUnit *dest, const Qt::KeyboardModifier
 //		&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
 //		&& unit.Type->BoolFlag[CANHARVEST_INDEX].value) {
 	if (
-		dest->CanHarvest(&unit)
+		dest->can_harvest(&unit)
 		&& dest->ResourcesHeld < dest->Type->get_resource_info(res)->ResourceCapacity
 	) {
 	//Wyrmgus end
@@ -299,7 +299,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	//Wyrmgus start
 //	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
 //		&& (dest.Player == unit.Player || dest.Player->get_index() == PlayerNumNeutral)) {
-	if (unit.CanHarvest(&dest)) {
+	if (unit.can_harvest(&dest)) {
 	//Wyrmgus end
 			//Wyrmgus start
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
@@ -787,7 +787,7 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 	// tell to go and harvest from a building
 	const resource *res = unit.get_given_resource();
 
-	if (dest.CanHarvest(&unit) && dest.ResourcesHeld < dest.Type->get_resource_info(res)->ResourceCapacity && dest.Player == unit.Player) {
+	if (dest.can_harvest(&unit) && dest.ResourcesHeld < dest.Type->get_resource_info(res)->ResourceCapacity && dest.Player == unit.Player) {
 		unit.Blink = 4;
 		SendCommandResource(dest, unit, flush);
 		return true;
@@ -802,7 +802,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	//Wyrmgus start
 //	if (dest != nullptr && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
 //		&& (dest->Player == unit.Player || dest->Player->get_index() == PlayerNumNeutral)) {
-	if (unit.CanHarvest(dest)) {
+	if (unit.can_harvest(dest)) {
 		//Wyrmgus end
 		dest->Blink = 4;
 		if (!acknowledged) {
@@ -1540,7 +1540,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos, const Qt::KeyboardModifiers ke
 			} else if (
 				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() &&
 				(
-					Selected[0]->CanHarvest(UnitUnderCursor, false)
+					Selected[0]->can_harvest(UnitUnderCursor, false)
 					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->can_store(Selected[0]->get_current_resource()) || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->Player != CPlayer::GetThisPlayer()))
 				)
 			) {
@@ -1821,7 +1821,7 @@ static int SendResource(const Vec2i &pos, int flush)
 				//Wyrmgus end
 				//Wyrmgus start
 //				&& unit.Type->ResInfo[res]
-				&& unit.CanHarvest(dest)
+				&& unit.can_harvest(dest)
 				//Wyrmgus end
 				&& unit.ResourcesHeld < unit.Type->get_resource_info(dest->get_given_resource())->ResourceCapacity
 				//Wyrmgus start

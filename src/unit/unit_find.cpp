@@ -565,7 +565,7 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 //			   || mine.Player->get_index() == PlayerMax - 1
 //			   || mine.Player == worker.Player
 //			   || (worker.is_allied_with(mine) && mine.is_allied_with(worker)));
-		   && worker.CanHarvest(&mine, only_harvestable);
+		   && worker.can_harvest(&mine, only_harvestable);
 			//Wyrmgus end
 }
 

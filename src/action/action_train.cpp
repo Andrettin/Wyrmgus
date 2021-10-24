@@ -439,7 +439,7 @@ void COrder_Train::Execute(CUnit &unit)
 				if (newUnit->Type->RepairRange && table[j]->Type->get_repair_hp() != 0 && table[j]->Variable[HP_INDEX].Value < table[j]->GetModifiedVariable(HP_INDEX, VariableAttribute::Max) && (table[j]->Player == newUnit->Player || newUnit->is_allied_with(*table[j]))) { //see if can repair
 					CommandRepair(*newUnit, unit.get_rally_point_pos(), table[j], FlushCommands, unit.get_rally_point_map_layer()->ID);
 					command_found = true;
-				} else if (newUnit->CanHarvest(table[j])) { // see if can harvest
+				} else if (newUnit->can_harvest(table[j])) { // see if can harvest
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
 				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->get_given_resource() != nullptr && newUnit->Type->get_resource_info(table[j]->Type->get_given_resource()) != nullptr && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->get_index() == PlayerNumNeutral)) { // see if can build mine on top of deposit
