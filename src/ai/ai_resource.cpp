@@ -36,6 +36,7 @@
 #include "action/action_resource.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "economy/resource_finder.h"
 #include "economy/resource_storage_type.h"
 #include "map/landmass.h"
 #include "map/map.h"
@@ -1314,171 +1315,67 @@ static void AiCheckingWork()
 ----------------------------------------------------------------------------*/
 
 /**
-**  Assign worker to gather a certain resource from terrain.
-**
-**  @param unit      pointer to the unit.
-**  @param resource  resource identification.
-**
-**  @return          1 if the worker was assigned, 0 otherwise.
-*/
-//Wyrmgus start
-//static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
-static int AiAssignHarvesterFromTerrain(CUnit &unit, const wyrmgus::resource *resource, int resource_range)
-//Wyrmgus end
-{
-	// TODO : hardcoded forest
-	Vec2i forestPos;
-	//Wyrmgus start
-	Vec2i rockPos;
-	//Wyrmgus end
-
-	// Code for terrain harvesters. Search for piece of terrain to mine.
-	if (FindTerrainType(unit.Type->MovementMask, resource, resource_range, *unit.Player, unit.tilePos, &forestPos, unit.MapLayer->ID)) {
-		CommandResourceLoc(unit, forestPos, FlushCommands, unit.MapLayer->ID);
-		return 1;
-	}
-	// Ask the AI to explore...
-	//Wyrmgus start
-//	AiExplore(unit.tilePos, tile_flag::land_unit);
-	//Wyrmgus end
-
-	// Failed.
-	return 0;
-}
-
-/**
-**  Assign worker to gather a certain resource from Unit.
-**
-**  @param unit      pointer to the unit.
-**  @param resource  resource identification.
-**
-**  @return          1 if the worker was assigned, 0 otherwise.
-*/
-//Wyrmgus start
-//static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
-static int AiAssignHarvesterFromUnit(CUnit &unit, const wyrmgus::resource *resource, const int resource_range)
-//Wyrmgus end
-{
-	// Try to find the nearest depot first.
-	CUnit *depot = FindDeposit(unit, 1000, resource);
-	
-	// Find a resource to harvest from.
-	//Wyrmgus start
-//	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, nullptr, false, false, false, resource->get_index() == CopperCost && AiPlayer->Player->HasMarketUnit());
-	//Wyrmgus end
-
-	if (mine) {
-		//Wyrmgus start
-//		CommandResource(unit, *mine, FlushCommands);
-//		return 1;
-		if (mine->Type->BoolFlag[CANHARVEST_INDEX].value) {
-			CommandResource(unit, *mine, FlushCommands);
-			return 1;
-		} else { // if the resource isn't readily harvestable (but is a deposit), build a mine there
-			const int n = AiHelpers.Mines[mine->GivesResource].size();
-
-			for (int i = 0; i < n; ++i) {
-				const wyrmgus::unit_type &type = *AiHelpers.Mines[mine->GivesResource][i];
-
-				if (
-					(wyrmgus::vector::contains(AiHelpers.get_builders(&type), unit.Type) || wyrmgus::vector::contains(AiHelpers.get_builder_classes(type.get_unit_class()), unit.Type->get_unit_class()))
-					&& CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer->ID)
-				) {
-					CommandBuildBuilding(unit, mine->tilePos, type, FlushCommands, mine->MapLayer->ID);
-					return 1;
-				}
-			}
-		}
-		//Wyrmgus end
-	}
-	
-	//Wyrmgus start
-	/*
-	int exploremask = 0;
-
-	for (size_t i = 0; i != UnitTypes.size(); ++i) {
-		const wyrmgus::unit_type *type = UnitTypes[i];
-
-		if (type && type->GivesResource == resource) {
-			switch (Type->get_domain()) {
-				case unit_domain::land:
-					exploremask |= tile_flag::land_unit;
-					break;
-				case unit_domain::air:
-					exploremask |= tile_flag::air_unit;
-					break;
-				//Wyrmgus start
-				case unit_domain::air_low:
-					exploremask |= tile_flag::land_unit;
-					break;
-				//Wyrmgus end
-				case unit_domain::water:
-					exploremask |= tile_flag::sea_unit;
-					break;
-				default:
-					assert_throw(false);
-			}
-		}
-	}
-	// Ask the AI to explore
-	AiExplore(unit.tilePos, exploremask);
-	*/
-	//Wyrmgus end
-	// Failed.
-	return 0;
-}
-/**
 **  Assign worker to gather a certain resource.
 **
 **  @param unit      pointer to the unit.
 **  @param resource  resource identification.
 **
-**  @return          1 if the worker was assigned, 0 otherwise.
+**  @return          true if the worker was assigned, false otherwise.
 */
-static int AiAssignHarvester(CUnit &unit, const wyrmgus::resource *resource)
+static bool AiAssignHarvester(CUnit &unit, const resource *resource)
 {
-	// It can't.
-	//Wyrmgus start
-//	if (unit.Removed) {
-	if (unit.Removed || unit.CurrentAction() == UnitAction::Build) { //prevent units building from outside to being assigned to gather a resource, and then leaving the construction unbuilt forever and ever
-	//Wyrmgus end
-		return 0;
+	if (unit.Removed || unit.CurrentAction() == UnitAction::Build) {
+		//prevent units building from outside to being assigned to gather a resource, and then leaving the construction unbuilt forever and ever
+		return false;
 	}
 	
-	if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), &unit) != AiPlayer->Scouts.end()) { //if a scouting unit was assigned to harvest, remove it from the scouts vector
-		AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), &unit), AiPlayer->Scouts.end());
+	if (vector::contains(AiPlayer->Scouts, &unit)) {
+		//if a scouting unit was assigned to harvest, remove it from the scouts vector
+		vector::remove(AiPlayer->Scouts, &unit);
+	}
+
+	//try to find the nearest depot first
+	const CUnit *depot = FindDeposit(unit, 1000, resource);
+
+	//find a resource to harvest from
+	resource_finder finder(&unit, depot ? depot : &unit, 1000, resource, depot);
+	finder.set_check_usage(true);
+	finder.set_only_harvestable(false);
+	finder.set_include_luxury_resources(resource->get_index() == CopperCost && AiPlayer->Player->HasMarketUnit());
+
+	const find_resource_result result = finder.find();
+
+	if (result.resource_unit != nullptr) {
+		if (result.resource_unit->Type->BoolFlag[CANHARVEST_INDEX].value) {
+			CommandResource(unit, *result.resource_unit, FlushCommands);
+			return true;
+		} else { // if the resource isn't readily harvestable (but is a deposit), build a mine there
+			const int n = AiHelpers.Mines[result.resource_unit->GivesResource].size();
+
+			for (int i = 0; i < n; ++i) {
+				const unit_type &type = *AiHelpers.Mines[result.resource_unit->GivesResource][i];
+
+				if (
+					(vector::contains(AiHelpers.get_builders(&type), unit.Type) || vector::contains(AiHelpers.get_builder_classes(type.get_unit_class()), unit.Type->get_unit_class()))
+					&& CanBuildUnitType(&unit, type, result.resource_unit->tilePos, 1, true, result.resource_unit->MapLayer->ID)
+				) {
+					CommandBuildBuilding(unit, result.resource_unit->tilePos, type, FlushCommands, result.resource_unit->MapLayer->ID);
+					return true;
+				}
+			}
+		}
+	} else if (result.resource_pos != QPoint(-1, -1)) {
+		CommandResourceLoc(unit, result.resource_pos, FlushCommands, unit.MapLayer->ID);
+		return true;
 	}
 
 	//Wyrmgus start
-	/*
-	if (resinfo.TerrainHarvester) {
-		return AiAssignHarvesterFromTerrain(unit, resource);
-	} else {
-		return AiAssignHarvesterFromUnit(unit, resource);
-	}
-	*/
-	int ret = 0;
-	int resource_range = 0;
-	for (int i = 0; i < 3; ++i) { //search for resources first in a 16 tile radius, then in a 32 tile radius, and then in the whole map
-		resource_range += 16;
-		if (i == 2) {
-			resource_range = 1000;
-		}
-		
-		ret = AiAssignHarvesterFromUnit(unit, resource, resource_range);
-		
-		if (ret == 0) {
-			ret = AiAssignHarvesterFromTerrain(unit, resource, resource_range);
-		}
-		
-		if (ret != 0) {
-			return ret;
-		}
-	}
-	
-	return ret;
+	//ask the AI to explore
+	//AiExplore(unit.tilePos, exploremask);
 	//Wyrmgus end
+
+	//failed
+	return false;
 }
 
 static bool CmpWorkers(const CUnit *lhs, const CUnit *rhs)
