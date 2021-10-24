@@ -204,7 +204,7 @@ bool FindTerrainType(const tile_flag movemask, const wyrmgus::resource *resource
 
 
 template <const bool NEARLOCATION>
-class BestDepotFinder
+class BestDepotFinder final
 {
 	void operator()(CUnit *const dest)
 	{
@@ -300,14 +300,16 @@ public:
 	CUnit *Find(CUnitCache &cache)
 	{
 		cache.for_each(*this);
-		return best_depot;
+		return this->best_depot;
 	}
+
 private:
 	struct {
 		const CUnit *worker;
 		Vec2i loc;
 		int layer;
 	} u_near;
+
 	const wyrmgus::resource *resource = nullptr;
 	const int range;
 	int best_dist = INT_MAX;

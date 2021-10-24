@@ -224,10 +224,10 @@ extern int NextPathElement(CUnit &unit, int &xdp, int &ydp);
 extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range, int max_length = 0, bool from_outside_container = false);
 //Wyrmgus end
 /// Can the unit 'src' reach the place x,y
-extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
+extern int PlaceReachable(const CUnit &src, const Vec2i &pos, const int w, const int h,
 						  //Wyrmgus start
 //						  int minrange, int maxrange);
-						  int minrange, int maxrange, int max_length, int z, bool from_outside_container = false);
+						  const int minrange, const int maxrange, const int max_length, const int z, const bool from_outside_container = false);
 						  //Wyrmgus end
 
 // in astar.cpp

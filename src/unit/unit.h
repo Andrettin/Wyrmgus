@@ -57,6 +57,7 @@ namespace wyrmgus {
 	class civilization_base;
 	class construction;
 	class construction_frame;
+	class landmass;
 	class map_template;
 	class player_color;
 	class renderer;
@@ -69,6 +70,7 @@ namespace wyrmgus {
 	class unit_ref;
 	class unit_type;
 	class unit_type_variation;
+	class world;
 	enum class gender;
 	enum class item_class;
 	enum class item_slot;
@@ -638,6 +640,8 @@ public:
 	const wyrmgus::time_of_day *get_center_tile_time_of_day() const;
 	const wyrmgus::site *get_center_tile_settlement() const;
 	const CPlayer *get_center_tile_owner() const;
+	const landmass *get_center_tile_landmass() const;
+	const world *get_center_tile_world() const;
 
 	bool is_seen_by_player(const CPlayer *player) const;
 

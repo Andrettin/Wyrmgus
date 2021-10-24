@@ -6879,6 +6879,26 @@ const CPlayer *CUnit::get_center_tile_owner() const
 	return this->get_center_tile()->get_owner();
 }
 
+const landmass *CUnit::get_center_tile_landmass() const
+{
+	if (this->MapLayer == nullptr) {
+		return nullptr;
+	}
+
+	//get the landmass for the unit's center tile
+	return this->get_center_tile()->get_landmass();
+}
+
+const world *CUnit::get_center_tile_world() const
+{
+	if (this->MapLayer == nullptr) {
+		return nullptr;
+	}
+
+	//get the world for the unit's center tile
+	return this->get_center_tile()->get_world();
+}
+
 bool CUnit::is_seen_by_player(const CPlayer *player) const
 {
 	return this->is_seen_by_player(player->get_index());

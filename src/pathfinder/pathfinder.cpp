@@ -33,11 +33,13 @@
 #include "pathfinder.h"
 
 #include "actions.h"
+#include "map/landmass.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "unit/unit.h"
+#include "unit/unit_domain.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
 #include "util/size_util.h"
@@ -262,7 +264,7 @@ void FreePathfinder()
 */
 //Wyrmgus start
 //int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
-int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range, int max_length, int z, bool from_outside_container)
+int PlaceReachable(const CUnit &src, const Vec2i &goalPos, const int w, const int h, const int minrange, const int range, const int max_length, const int z, const bool from_outside_container)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -270,6 +272,35 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 		return 0;
 	}
 	//Wyrmgus end
+
+	if (range <= 1) {
+		const tile *dst_tile = CMap::get()->Field(goalPos, z);
+
+		switch (src.Type->get_domain()) {
+			case unit_domain::land:
+			case unit_domain::water: {
+				const landmass *src_landmass = src.get_center_tile_landmass();
+				const landmass *dst_landmass = dst_tile->get_landmass();
+
+				//the landmasses must be the same or border one another (e.g. shore buildings are in a water landmass, but are reachable from neighboring land landmasses)
+				if (src_landmass != dst_landmass && (src_landmass == nullptr || dst_landmass == nullptr || !src_landmass->borders_landmass(dst_landmass))) {
+					return 0;
+				}
+			}
+			case unit_domain::air:
+			case unit_domain::air_low: {
+				const world *src_world = src.get_center_tile_world();
+				const world *dst_world = dst_tile->get_world();
+
+				if (src_world != dst_world && src_world != nullptr && dst_world != nullptr) {
+					//air units cannot travel through space to different worlds
+					return 0;
+				}
+			}
+			default:
+				break;
+		}
+	}
 	
 	int i = PF_FAILED;
 	if (!src.Container || !from_outside_container) {
@@ -325,6 +356,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 		default:
 			break;
 	}
+
 	return i;
 }
 
@@ -346,6 +378,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 	if (src.Type->BoolFlag[BUILDING_INDEX].value) {
 		return 0;
 	}
+
 	const int depth = PlaceReachable(src, dst.tilePos,
 									 //Wyrmgus start
 //									 dst.Type->get_tile_width(), dst.Type->get_tile_height(), 0, range);
@@ -354,6 +387,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 	if (depth <= 0) {
 		return 0;
 	}
+
 	return depth;
 }
 
