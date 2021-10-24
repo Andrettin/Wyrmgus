@@ -279,13 +279,22 @@ public:
 		u_near.layer = z;
 	}
 
-	template <typename ITERATOR>
-	CUnit *Find(ITERATOR begin, ITERATOR end)
+	CUnit *find(std::vector<CUnit *> &units)
 	{
-		for (ITERATOR it = begin; it != end; ++it) {
-			this->operator()(*it);
+		if constexpr (!NEARLOCATION) {
+			//sort by distance as a performance improvement, so that we don't call UnitReachable() unnecessarily
+			const CUnit *first_container = this->u_near.worker->GetFirstContainer();
+
+			std::sort(units.begin(), units.end(), [first_container](const CUnit *lhs, const CUnit *rhs) {
+				return first_container->MapDistanceTo(*lhs) < first_container->MapDistanceTo(*rhs);
+			});
 		}
-		return best_depot;
+
+		for (CUnit *unit : units) {
+			this->operator()(unit);
+		}
+
+		return this->best_depot;
 	}
 
 	CUnit *Find(CUnitCache &cache)
@@ -433,7 +442,8 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, const int range, const r
 			}
 		}
 	}
-	return finder.Find(table.begin(), table.end());
+
+	return finder.find(table);
 }
 
 class CResourceFinder final
@@ -746,7 +756,8 @@ CUnit *FindDeposit(const CUnit &unit, const int range, const resource *resource)
 			}
 		}
 	}
-	return finder.Find(table.begin(), table.end());
+
+	return finder.find(table);
 }
 
 //Wyrmgus start
