@@ -412,20 +412,23 @@ public:
 CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, const int range, const resource *resource, const int z)
 {
 	BestDepotFinder<true> finder(pos, resource, range, z);
+
 	std::vector<CUnit *> table;
+
 	for (const auto &kv_pair : p.get_units_by_type()) {
-		const wyrmgus::unit_type *unit_type = kv_pair.first;
+		const unit_type *unit_type = kv_pair.first;
 		if (unit_type->can_store(resource)) {
-			wyrmgus::vector::merge(table, kv_pair.second);
+			vector::merge(table, kv_pair.second);
 		}
 	}
+
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		const CPlayer *other_player = CPlayer::Players[i].get();
 		if (other_player->is_allied_with(p) && p.is_allied_with(*other_player)) {
 			for (const auto &kv_pair : other_player->get_units_by_type()) {
 				const wyrmgus::unit_type *unit_type = kv_pair.first;
 				if (unit_type->can_store(resource)) {
-					wyrmgus::vector::merge(table, kv_pair.second);
+					vector::merge(table, kv_pair.second);
 				}
 			}
 		}
@@ -721,16 +724,20 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, const int ra
 CUnit *FindDeposit(const CUnit &unit, const int range, const resource *resource)
 {
 	BestDepotFinder<false> finder(unit, resource, range);
+
 	std::vector<CUnit *> table;
+
 	for (const auto &kv_pair : unit.Player->get_units_by_type()) {
 		const wyrmgus::unit_type *unit_type = kv_pair.first;
 		if (unit_type->can_store(resource)) {
-			wyrmgus::vector::merge(table, kv_pair.second);
+			vector::merge(table, kv_pair.second);
 		}
 	}
+
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		const CPlayer *other_player = CPlayer::Players[i].get();
-		if (other_player->is_allied_with(*unit.Player) && unit.Player->is_allied_with(*other_player)) {
+
+		if (unit.Player->is_allied_with(*other_player)) {
 			for (const auto &kv_pair : other_player->get_units_by_type()) {
 				const wyrmgus::unit_type *unit_type = kv_pair.first;
 				if (unit_type->can_store(resource)) {
