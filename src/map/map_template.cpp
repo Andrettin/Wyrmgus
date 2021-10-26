@@ -191,6 +191,16 @@ void map_template::process_sml_scope(const sml_data &scope)
 
 			this->terrain_substitutions[terrain] = other_terrain;
 		});
+	} else if (tag == "default_base_terrains") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const terrain_type *overlay_terrain = terrain_type::get(key);
+			const terrain_type *base_terrain = terrain_type::get(value);
+
+			this->default_base_terrains[overlay_terrain] = base_terrain;
+		});
 	} else if (tag == "character_units") {
 		scope.for_each_element([&](const sml_property &property) {
 			const std::string &key = property.get_key();
@@ -594,6 +604,14 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 				//if we are setting base terrain and the tile already has an overlay terrain set to it, remove it, so that when subtemplates are applied on top of base terrain they remove overlays (e.g. space terrain)
 				if (!overlay && tile->get_overlay_terrain() != nullptr) {
 					tile->RemoveOverlayTerrain();
+				}
+
+				if (terrain->is_overlay() && tile->get_terrain() == nullptr) {
+					//if we are applying an overlay terrain type, and the tile has no base terrain, check if we have a default base terrain type defined for it for this map template
+					const terrain_type *base_terrain = this->get_default_base_terrain(terrain);
+					if (base_terrain != nullptr) {
+						tile->SetTerrain(base_terrain);
+					}
 				}
 
 				tile->SetTerrain(terrain);

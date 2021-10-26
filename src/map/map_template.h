@@ -663,6 +663,16 @@ public:
 	}
 
 	void add_site(const site *site);
+
+	const terrain_type *get_default_base_terrain(const terrain_type *overlay_terrain) const
+	{
+		const auto find_iterator = this->default_base_terrains.find(overlay_terrain);
+		if (find_iterator != this->default_base_terrains.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
 	
 private:
 	terrain_character_map_type terrain_character_map;
@@ -745,6 +755,7 @@ private:
 	int astrodistance_additive_modifier = 0;
 	map_template *default_astrocoordinate_reference_subtemplate = nullptr;
 	std::map<const terrain_type *, const terrain_type *> terrain_substitutions;
+	std::map<const terrain_type *, const terrain_type *> default_base_terrains;
 	std::map<char, std::unique_ptr<character_unit>> character_units;
 	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
 	std::unique_ptr<map_template_history> history;
