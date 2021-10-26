@@ -65,6 +65,7 @@
 #include "upgrade/upgrade.h"
 #include "util/assert_util.h"
 #include "util/exception_util.h"
+#include "util/log_util.h"
 #include "util/util.h"
 
 /// Get resource by name
@@ -826,11 +827,14 @@ static int CclCreateUnit(lua_State *l)
 	//Wyrmgus end
 
 	lua_pushvalue(l, 1);
-	wyrmgus::unit_type *unittype = CclGetUnitType(l);
-	if (unittype == nullptr) {
-		LuaError(l, "Bad unittype");
-	}
+	const unit_type *unittype = CclGetUnitType(l);
 	lua_pop(l, 1);
+
+	if (unittype == nullptr) {
+		log::log_error("Failed to create unit: invalid unit type.");
+		return 0;
+	}
+
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
@@ -1877,6 +1881,7 @@ static int CclSetUnitVariable(lua_State *l)
 
 	//Wyrmgus start
 	if (lua_isnil(l, 1)) {
+		log::log_error("Failed to set unit variable: unit is null.");
 		return 0;
 	}
 	//Wyrmgus end
@@ -1944,21 +1949,23 @@ static int CclSetUnitVariable(lua_State *l)
 		} else {
 			LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
 		}
-	} else if (!strcmp(name, "Prefix")) { //add an item prefix to the unit
+	} else if (!strcmp(name, "Prefix")) {
+		//add an item prefix to the unit
 		LuaCheckArgs(l, 3);
-		std::string upgrade_ident = LuaToString(l, 3);
+		const std::string upgrade_ident = LuaToString(l, 3);
 		if (upgrade_ident.empty()) {
 			unit->SetPrefix(nullptr);
 		} else {
-			unit->SetPrefix(CUpgrade::get(upgrade_ident));
+			unit->SetPrefix(CUpgrade::try_get(upgrade_ident));
 		}
-	} else if (!strcmp(name, "Suffix")) { //add an item suffix to the unit
+	} else if (!strcmp(name, "Suffix")) {
+		//add an item suffix to the unit
 		LuaCheckArgs(l, 3);
-		std::string upgrade_ident = LuaToString(l, 3);
+		const std::string upgrade_ident = LuaToString(l, 3);
 		if (upgrade_ident.empty()) {
 			unit->SetSuffix(nullptr);
 		} else {
-			unit->SetSuffix(CUpgrade::get(upgrade_ident));
+			unit->SetSuffix(CUpgrade::try_get(upgrade_ident));
 		}
 	} else if (!strcmp(name, "Spell")) { //add a spell to the item unit
 		LuaCheckArgs(l, 3);

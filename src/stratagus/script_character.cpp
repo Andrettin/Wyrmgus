@@ -630,8 +630,16 @@ static int CclGetCharacterData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string character_name = LuaToString(l, 1);
-	wyrmgus::character *character = wyrmgus::character::get(character_name);
+
+	const std::string identifier = LuaToString(l, 1);
+	const character *character = character::try_get(identifier);
+
+	if (character == nullptr) {
+		log::log_error("Failed to get character data: \"" + identifier + "\" is not a valid character.");
+		lua_pushnil(l);
+		return 0;
+	}
+
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {

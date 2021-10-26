@@ -1839,7 +1839,7 @@ wyrmgus::unit_type *CclGetUnitType(lua_State *l)
 	// Be kind allow also strings or symbols
 	if (lua_isstring(l, -1)) {
 		const char *str = LuaToString(l, -1);
-		return wyrmgus::unit_type::get(str);
+		return wyrmgus::unit_type::try_get(str);
 	} else if (lua_isuserdata(l, -1)) {
 		LuaUserData *data = (LuaUserData *)lua_touserdata(l, -1);
 		if (data->Type == LuaUnitType) {
