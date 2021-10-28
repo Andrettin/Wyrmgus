@@ -225,14 +225,15 @@ void COrder_Train::Execute(CUnit &unit)
 	AnimateActionTrain(unit);
 	if (unit.Wait) {
 		unit.Wait--;
-		return ;
+		return;
 	}
 	*/
+
 	if (unit.CriticalOrder.get() != this) {
 		AnimateActionTrain(unit);
 		if (unit.Wait) {
 			unit.Wait--;
-			return ;
+			return;
 		}
 	}
 	//Wyrmgus end
@@ -253,7 +254,7 @@ void COrder_Train::Execute(CUnit &unit)
 		}
 		this->Ticks = 0;
 		unit.Wait = CYCLES_PER_SECOND / 6;
-		return ;
+		return;
 	}
 	//Wyrmgus end
 	
@@ -268,7 +269,7 @@ void COrder_Train::Execute(CUnit &unit)
 
 	if (this->Ticks < cost) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
-		return ;
+		return;
 	}
 	this->Ticks = std::min(this->Ticks, cost);
 
@@ -282,7 +283,7 @@ void COrder_Train::Execute(CUnit &unit)
 			AiNeedMoreSupply(*unit.Player);
 		}
 		unit.Wait = CYCLES_PER_SECOND / 6;
-		return ;
+		return;
 	}
 	*/
 	//Wyrmgus end
@@ -302,7 +303,7 @@ void COrder_Train::Execute(CUnit &unit)
 		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.GetDefaultName(player).c_str());
 		//Wyrmgus end
 		unit.Wait = CYCLES_PER_SECOND / 6;
-		return ;
+		return;
 	}
 
 	// New unit might supply food
@@ -369,7 +370,7 @@ void COrder_Train::Execute(CUnit &unit)
 			player.Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 			unit.Wait = CYCLES_PER_SECOND / 6;
-			return ;
+			return;
 		}
 
 		// New unit might supply food

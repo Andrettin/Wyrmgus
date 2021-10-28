@@ -527,11 +527,9 @@ void tile::Save(CFile &file) const
 	if (this->has_flag(tile_flag::item)) {
 		file.printf(", \"item\"");
 	}
-	if (this->has_flag(tile_flag::bridge)) {
-		file.printf(", \"bridge\"");
-	}
 	//Wyrmgus end
 #endif
+
 	file.printf("}");
 }
 
@@ -671,8 +669,6 @@ void tile::parse(lua_State *l)
 			this->Flags |= tile_flag::air_building;
 		} else if (!strcmp(value, "item")) {
 			this->Flags |= tile_flag::item;
-		} else if (!strcmp(value, "bridge")) {
-			this->Flags |= tile_flag::bridge;
 		} else if (!strcmp(value, "air-unpassable")) {
 			this->Flags |= tile_flag::air_impassable;
 		} else if (!strcmp(value, "desert")) {
@@ -710,15 +706,7 @@ void tile::parse(lua_State *l)
 /// Check if a field flags.
 bool tile::CheckMask(const tile_flag mask) const
 {
-	//Wyrmgus start
-	//for purposes of this check, don't count tile_flag::water_allowed and tile_flag::coast_allowed if there is a bridge present
-	tile_flag check_flags = this->Flags;
-	if ((check_flags & tile_flag::bridge) != tile_flag::none) {
-		check_flags &= ~(tile_flag::water_allowed | tile_flag::coast_allowed);
-	}
-	//	return (this->Flags & mask) != 0;
-	return (check_flags & mask) != tile_flag::none;
-	//Wyrmgus end
+	return (this->get_flags() & mask) != tile_flag::none;
 }
 
 bool tile::is_water() const

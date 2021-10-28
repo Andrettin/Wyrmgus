@@ -660,7 +660,7 @@ class BurningBuildingFrame final
 public:
 	int Percent = 0;  /// HP percent
 	const wyrmgus::missile_type *Missile = nullptr;  /// Missile to draw
-} ;
+};
 
 extern std::vector<std::unique_ptr<BurningBuildingFrame>> BurningBuildingFrames;  /// Burning building frames
 

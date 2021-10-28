@@ -370,26 +370,21 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 		const wyrmgus::tile *mf = CMap::get()->Field(index, z);
 		int i = w;
 		do {
-			//Wyrmgus start
-//			const int flag = mf->Flags & mask;
-			//for purposes of this check, don't count tile_flag::water_allowed and tile_flag::coast_allowed if there is a bridge present
-			tile_flag check_flags = mf->get_flags();
-			if ((check_flags & tile_flag::bridge) != tile_flag::none) {
-				check_flags &= ~(tile_flag::water_allowed | tile_flag::coast_allowed);
-			}
-			const tile_flag flag = check_flags & mask;
-			//Wyrmgus end
+			const tile_flag tile_flags = mf->get_flags();
+			const tile_flag flags = tile_flags & mask;
 			
-			if (flag != tile_flag::none && (AStarKnowUnseenTerrain || mf->player_info->IsTeamExplored(*unit.Player))) {
-				if ((flag & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)) != tile_flag::none) {
-					// we can't cross fixed units and other unpassable things
+			if (flags != tile_flag::none && (AStarKnowUnseenTerrain || mf->player_info->IsTeamExplored(*unit.Player))) {
+				if ((flags & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)) != tile_flag::none) {
+					//we can't cross fixed units and other unpassable things
 					return -1;
 				}
+
 				CUnit *goal = mf->UnitCache.find(unit_finder);
 				if (!goal) {
-					// Shouldn't happen, mask says there is something on this tile
+					//shouldn't happen, mask says there is something on this tile
 					assert_throw(false);
 				}
+
 				//Wyrmgus start
 //				if (goal->Moving)  {
 				if (&unit != goal && goal->Moving)  {
@@ -416,6 +411,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 					}
 				}
 			}
+
 			// Add cost of crossing unknown tiles if required
 			if (!AStarKnowUnseenTerrain && !mf->player_info->IsTeamExplored(*unit.Player)) {
 				// Tend against unknown tiles.
@@ -454,11 +450,13 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 
 			++mf;
 		} while (--i);
+
 		//Wyrmgus start
 //		index += AStarMapWidth;
 		index += AStarMapWidth[z];
 		//Wyrmgus end
 	} while (--h);
+
 	return cost;
 }
 

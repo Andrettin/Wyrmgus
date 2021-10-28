@@ -50,7 +50,6 @@ enum class tile_flag : uint32_t {
 
 	road = 1 << 15,			/// Road (moves faster)
 	railroad = 1 << 16,		/// Railroad (moves faster)
-	bridge = 1 << 18,		/// Bridge or raft
 
 	grass = 1 << 19,		/// Used for playing grass step sounds
 	mud = 1 << 20,			/// Used for playing mud step sounds
@@ -129,8 +128,6 @@ inline tile_flag string_to_tile_flag(const std::string &tile_flag)
 		return tile_flag::air_building;
 	} else if (tile_flag == "item") {
 		return tile_flag::item;
-	} else if (tile_flag == "bridge") {
-		return tile_flag::bridge;
 	} else {
 		throw std::runtime_error("Invalid tile flag: \"" + tile_flag + "\".");
 	}

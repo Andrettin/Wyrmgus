@@ -404,7 +404,7 @@ void COrder_Built::Execute(CUnit &unit)
 		//Wyrmgus end
 
 		CancelBuilt(*this, unit);
-		return ;
+		return;
 	}
 
 	const int maxProgress = type.Stats[unit.Player->get_index()].get_time_cost() * 600;

@@ -533,10 +533,8 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
-		//Wyrmgus start
-//		if (dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) {
-		if ((dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) || dest->Type->BoolFlag[BRIDGE_INDEX].value) {
-		//Wyrmgus end
+
+		if (dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) {
 			//Wyrmgus start
 //			SendCommandMove(unit, pos, flush);
 			SendCommandMove(unit, pos, flush, UI.CurrentMapLayer->ID);
@@ -637,14 +635,13 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
-		//Wyrmgus start
-//		if (!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
-		if ((!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) || dest.Type->BoolFlag[BRIDGE_INDEX].value) {
-		//Wyrmgus end
+
+		if (!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
 			SendCommandMove(unit, pos, flush, UI.CurrentMapLayer->ID);
 		} else {
 			SendCommandFollow(unit, dest, flush);
 		}
+
 		return true;
 	}
 	return false;
@@ -754,10 +751,8 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
-		//Wyrmgus start
-//		if (dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
-		if ((dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) || dest.Type->BoolFlag[BRIDGE_INDEX].value) {
-		//Wyrmgus end
+
+		if (dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
 			//Wyrmgus start
 //			SendCommandMove(unit, dest.tilePos, flush);
 			SendCommandMove(unit, dest.tilePos, flush, UI.CurrentMapLayer->ID);
@@ -765,6 +760,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 		} else {
 			SendCommandFollow(unit, dest, flush);
 		}
+
 		return true;
 	}
 	return false;

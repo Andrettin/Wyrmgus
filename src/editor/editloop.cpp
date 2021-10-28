@@ -1359,7 +1359,7 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 	// Flags info
 	//
 	const tile_flag flag = mf.get_flags();
-	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 			mf.get_value(), enumeration::to_underlying(flag),
 			mf.has_flag(tile_flag::impassable) ? 'u' : '-',
 			mf.has_flag(tile_flag::air_impassable) ? 'A' : '-',
@@ -1377,7 +1377,6 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 			mf.has_flag(tile_flag::air_building) ? 'I' : '-',
 			mf.has_flag(tile_flag::item) ? 'i' : '-',
 			mf.has_flag(tile_flag::stumps) ? 't' : '-',
-			mf.has_flag(tile_flag::bridge) ? 'B' : '-',
 			mf.has_flag(tile_flag::space) ? 'S' : '-');
 
 	CLabel(defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + (118 * scale_factor).to_int(), UI.StatusLine.TextY - (12 * scale_factor).to_int(), buf.data(), render_commands);

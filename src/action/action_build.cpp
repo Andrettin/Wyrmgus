@@ -241,21 +241,6 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE: {
-			//Wyrmgus start
-			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-						if (table[i]->CurrentAction() == UnitAction::Still) {
-							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
-						}
-						return false;
-					}
-				}
-			}
-			//Wyrmgus end
 			// Some tries to reach the goal
 			if (this->State++ < State_MoveToLocationMax) {
 				// To keep the load low, retry each 1/4 second.
@@ -495,8 +480,9 @@ static void AnimateActionBuild(CUnit &unit)
 	const wyrmgus::animation_set *animations = unit.get_animation_set();
 
 	if (animations == nullptr) {
-		return ;
+		return;
 	}
+
 	if (animations->Build) {
 		UnitShowAnimation(unit, animations->Build.get());
 	} else if (animations->Repair) {
@@ -559,7 +545,7 @@ void COrder_Build::Execute(CUnit &unit)
 		/*
 		if (CheckLimit(unit, type) == false) {
 			this->Finished = true;
-			return ;
+			return;
 		}
 		*/
 		//Wyrmgus end
@@ -606,8 +592,9 @@ void COrder_Build::Execute(CUnit &unit)
 			//Wyrmgus end
 		}
 		this->Finished = true;
-		return ;
+		return;
 	}
+
 	if (this->State == State_BuildFromOutside) {
 		//Wyrmgus start
 //		if (this->BuildFromOutside(unit)) {

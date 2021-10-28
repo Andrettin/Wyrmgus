@@ -158,20 +158,6 @@ static bool IsUnitValidForNetwork(const CUnit &unit)
 }
 
 //Wyrmgus start
-static void StopRaft(CUnit &unit)
-{
-	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
-	if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
-			}
-		}
-	}
-}
-
 static std::vector<CUnit *> GetLayerConnectorPath(CUnit &unit, int old_z, int new_z, std::vector<CUnit *> &checked_connectors)
 {
 	for (size_t i = 0; i != CMap::get()->MapLayers[old_z]->LayerConnectors.size(); ++i) {
@@ -271,12 +257,13 @@ void CommandStandGround(CUnit &unit, int flush)
 void CommandDefend(CUnit &unit, CUnit &dest, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
@@ -302,12 +289,13 @@ void CommandDefend(CUnit &unit, CUnit &dest, int flush)
 void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
@@ -335,27 +323,10 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
-	wyrmgus::tile &new_mf = *CMap::get()->Field(pos, z);
-	//if the unit is a land unit over a raft, move the raft instead of the unit
-	if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
-				if (new_mf.has_flag(tile_flag::water_allowed) || new_mf.has_flag(tile_flag::coast_allowed) || mf.has_flag(tile_flag::water_allowed)) { // if is standing on water, tell the raft to go to the nearest coast, even if the ultimate goal is on land
-					CommandStopUnit(unit);
-					CommandMove(*table[i], pos, flush, z);
-					return;
-				}
-			}
-		}
-	}
-	
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
 	std::unique_ptr<COrder> *order;
@@ -388,8 +359,9 @@ void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 	
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	unit.set_rally_point(pos, CMap::get()->MapLayers[z].get());
 }
 
@@ -403,12 +375,13 @@ void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
@@ -433,8 +406,9 @@ void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
 void CommandQuest(CUnit &unit, wyrmgus::quest *quest)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	unit.Player->accept_quest(quest);
 }
 
@@ -447,8 +421,9 @@ void CommandQuest(CUnit &unit, wyrmgus::quest *quest)
 void CommandBuy(CUnit &unit, CUnit *sold_unit, int player)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	unit.SellUnit(sold_unit, player);
 }
 
@@ -509,12 +484,13 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
@@ -546,8 +522,9 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
 void CommandAutoRepair(CUnit &unit, int on)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	unit.AutoRepair = on;
 }
 
@@ -564,20 +541,10 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
-	}
-	//Wyrmgus start
-	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
-	if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
-			}
-		}
+		return;
 	}
 
+	//Wyrmgus start
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
 
@@ -618,12 +585,13 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
 	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	//Wyrmgus start
@@ -656,14 +624,15 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
 void CommandUse(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	if (reach_layer) {
 		ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	}
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
@@ -689,7 +658,7 @@ void CommandUse(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
 
 	CUnit *home_market = FindHomeMarket(unit, 1000);
@@ -698,7 +667,6 @@ void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 		return; // no home market, cannot trade
 	}
 	
-	StopRaft(unit);
 	if (reach_layer) {
 		ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	}
@@ -734,12 +702,13 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
 	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
@@ -769,15 +738,16 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
 void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
 	if (dest.Destroyed) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
@@ -807,7 +777,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
 	
 	//Wyrmgus start
@@ -837,12 +807,13 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const wyrmgus::unit_type &what, int flush, int z, const wyrmgus::site *settlement)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	//Wyrmgus start
@@ -912,16 +883,17 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
 	if (!unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.Type->BoolFlag[HARVESTER_INDEX].value) {
 		ClearSavedAction(unit);
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
@@ -952,17 +924,20 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return;
 	}
+
 	if (dest.Destroyed) {
 		return;
 	}
+
 	if (!unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.Type->BoolFlag[HARVESTER_INDEX].value) {
 		ClearSavedAction(unit);
 		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
+
 	std::unique_ptr<COrder> *order;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
@@ -988,12 +963,13 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	if ((unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.ResourcesHeld == 0)
 		|| (!unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.Type->BoolFlag[HARVESTER_INDEX].value)) {
 		ClearSavedAction(unit);
-		return ;
+		return;
 	}
 	
 	//Wyrmgus start
@@ -1027,8 +1003,9 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, int)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	// Check if enough resources remains? (NETWORK!)
 	// FIXME: wrong if append to message queue!!!
 	//Wyrmgus start
@@ -1201,7 +1178,7 @@ void CommandCancelUpgradeTo(CUnit &unit)
 void CommandResearch(CUnit &unit, const CUpgrade &what, CPlayer *player, const int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
 	
 	//Wyrmgus start
@@ -1256,7 +1233,7 @@ void CommandCancelResearch(CUnit &unit)
 void CommandLearnAbility(CUnit &unit, CUpgrade &what)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
 	
 	if (what.is_ability()) {
@@ -1285,10 +1262,10 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus:
 	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
-	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
 	
@@ -1312,7 +1289,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus:
 void CommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const bool on)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
 
 	if (on) {

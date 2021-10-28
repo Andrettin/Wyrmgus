@@ -526,8 +526,9 @@ void COrder_Still::Execute(CUnit &unit)
 				LeaveShelter(unit); // leave shelter if surrounded
 			}
 		//Wyrmgus end
-		return ;
+		return;
 	}
+
 	this->Finished = false;
 
 	switch (this->State) {

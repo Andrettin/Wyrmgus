@@ -3316,13 +3316,14 @@ void UpdateUnitSightRange(CUnit &unit)
 /*
 #if 0 // which is the better ? caller check ?
 	if (SaveGameLoading) {
-		return ;
+		return;
 	}
 #else
 	assert_throw(!SaveGameLoading);
 #endif
 */
 //Wyrmgus end
+
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
 	const wyrmgus::time_of_day *time_of_day = unit.get_center_tile_time_of_day();
 	if (time_of_day != nullptr) {
@@ -4925,7 +4926,7 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 static void ChangePlayerOwner(CPlayer &oldplayer, CPlayer &newplayer)
 {
 	if (&oldplayer == &newplayer) {
-		return ;
+		return;
 	}
 
 	for (int i = 0; i != oldplayer.GetUnitCount(); ++i) {
@@ -7070,27 +7071,6 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	}
 	
 	//Wyrmgus start
-	//if is a raft or bridge, destroy all land units on it
-	if (unit.Type->BoolFlag[BRIDGE_INDEX].value) {
-		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i]->IsAliveOnMap() && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
-				table[i]->Variable[HP_INDEX].Value = std::min<int>(0, unit.Variable[HP_INDEX].Value);
-				table[i]->Moving = 0;
-				table[i]->TTL = 0;
-				table[i]->Anim.Unbreakable = 0;
-				PlayUnitSound(*table[i], wyrmgus::unit_sound_type::dying);
-				table[i]->Remove(nullptr);
-				UnitLost(*table[i]);
-				table[i]->clear_orders();
-				table[i]->Release();
-			}
-		}
-	}
-	//Wyrmgus end
-
-	//Wyrmgus start
 	//drop items upon death
 	if (!suicide && unit.CurrentAction() != UnitAction::Built && (unit.get_character() != nullptr || unit.Type->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
 		unit.GenerateDrop();
@@ -7772,7 +7752,6 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		&& target.CanMove()
 		&& (target.CurrentAction() == UnitAction::Still || target.Variable[TERROR_INDEX].Value > 0)
 		&& !target.BoardCount
-		&& !target.Type->BoolFlag[BRIDGE_INDEX].value
 	) {
 	//Wyrmgus end
 		HitUnit_RunAway(target, *attacker);

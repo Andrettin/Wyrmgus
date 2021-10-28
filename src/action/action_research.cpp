@@ -134,13 +134,15 @@ void COrder_Research::Execute(CUnit &unit)
 	UnitShowAnimation(unit, unit.get_animation_set()->Research ? unit.get_animation_set()->Research.get() : unit.get_animation_set()->Still.get());
 	if (unit.Wait) {
 		unit.Wait--;
-		return ;
+		return;
 	}
+
 #if 0
 	if (unit.Anim.Unbreakable) {
-		return ;
+		return;
 	}
 #endif
+
 	//Wyrmgus start
 //	CPlayer &player = *unit.Player;
 	CPlayer &player = *this->Player;
@@ -172,8 +174,9 @@ void COrder_Research::Execute(CUnit &unit)
 		}
 		UpgradeAcquire(player, &upgrade);
 		this->Finished = true;
-		return ;
+		return;
 	}
+
 	unit.Wait = CYCLES_PER_SECOND / 6;
 }
 

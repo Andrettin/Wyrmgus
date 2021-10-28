@@ -147,8 +147,9 @@ public:
 //		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value) {
 		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value || ethereal != (int)unit->Type->BoolFlag[ETHEREAL_INDEX].value) {
 		//Wyrmgus end
-			return ;
+			return;
 		}
+
 		const int p = player->get_index();
 		if constexpr (MARK) {
 			//  If the unit goes out of fog, this can happen for any player that

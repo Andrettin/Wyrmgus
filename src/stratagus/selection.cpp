@@ -159,9 +159,10 @@ static void ChangeSelectedUnits(CUnit * const *units, unsigned int count)
 		HandleSuicideClick(*units[0]);
 		if (!units[0]->IsAlive()) {
 			NetworkSendSelection(units, count);
-			return ;
+			return;
 		}
 	}
+
 	//Wyrmgus start
 	bool suitable_selectee = false;
 	for (unsigned int i = 0; i < count; ++i) {

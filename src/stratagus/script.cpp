@@ -2053,9 +2053,10 @@ static int AliasTypeVar(lua_State *l, const char *s)
 		for (i = 0; sloc[i] != nullptr; i++) {
 			if (!strcmp(key, sloc[i])) {
 				lua_pushnumber(l, i);
-				break ;
+				break;
 			}
 		}
+
 		if (sloc[i] == nullptr) {
 			LuaError(l, "Bad loc :'%s'" _C_ key);
 		}
@@ -2115,7 +2116,7 @@ static int AliasUnitVar(lua_State *l, const char *s)
 		for (i = 0; sloc[i] != nullptr; i++) {
 			if (!strcmp(key, sloc[i])) {
 				lua_pushnumber(l, i);
-				break ;
+				break;
 			}
 		}
 		if (sloc[i] == nullptr) {
@@ -3428,7 +3429,7 @@ static bool LuaValueToString(lua_State *l, std::string &value)
 		case LUA_TTHREAD:
 		case LUA_TLIGHTUSERDATA:
 		case LUA_TNONE:
-		default : // no other cases
+		default: // no other cases
 			value = "";
 			return false;
 	}

@@ -472,8 +472,9 @@ void COrder_UpgradeTo::Execute(CUnit &unit)
 	AnimateActionUpgradeTo(unit);
 	if (unit.Wait) {
 		unit.Wait--;
-		return ;
+		return;
 	}
+
 	CPlayer &player = *unit.Player;
 	const wyrmgus::unit_type &newtype = *this->Type;
 	const CUnitStats &newstats = newtype.Stats[player.get_index()];
@@ -484,12 +485,12 @@ void COrder_UpgradeTo::Execute(CUnit &unit)
 	//Wyrmgus end
 	if (this->Ticks < newstats.get_time_cost()) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
-		return ;
+		return;
 	}
 
 	if (unit.Anim.Unbreakable) {
 		this->Ticks = newstats.get_time_cost();
-		return ;
+		return;
 	}
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
@@ -498,8 +499,9 @@ void COrder_UpgradeTo::Execute(CUnit &unit)
 //		player.Notify(NotifyYellow, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
 		//Wyrmgus end
 		this->Finished = true;
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
 	//I think it is too much to notify the player whenever an individual upgrade is completed
 //	player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s complete"), unit.Type->Name.c_str());

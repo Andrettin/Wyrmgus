@@ -187,18 +187,8 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	//Wyrmgus end
 
 	//Wyrmgus start
-	QSize box_size = type.get_box_size();
-	if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land && !unit.Moving) { //if is on a raft, use the raft's box size instead
-		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->Type->get_box_width() > box_size.width() && table[i]->Type->get_box_height() > box_size.height()) {
-				box_size = table[i]->Type->get_box_size();
-			}
-		}
-	}
+	const QSize box_size = type.get_box_size() * scale_factor;
 
-	box_size *= scale_factor;
 	x = screenPos.x - box_size.width() / 2 - (frame_size.width() - sprite_width) / 2;
 	y = screenPos.y - box_size.height() / 2 - (frame_size.height() - sprite_height) / 2;
 	

@@ -634,7 +634,7 @@ void COrder_Unload::Execute(CUnit &unit)
 				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos, this->MapLayer, this->landmass, this->get_goal())) {
 				//Wyrmgus end
 					this->Finished = true;
-					return ;
+					return;
 				}
 				this->goalPos = pos;
 			}
@@ -654,7 +654,7 @@ void COrder_Unload::Execute(CUnit &unit)
 					if (moveResult == PF_REACHED) {
 						if (++this->State == 1) {
 							this->Finished = true;
-							return ;
+							return;
 						}
 					} else if (moveResult == PF_UNREACHABLE) {
 						unit.Wait = 30;
@@ -664,17 +664,18 @@ void COrder_Unload::Execute(CUnit &unit)
 						this->State = 2;
 					}
 				}
-				return ;
+				return;
 			}
 		case 2: { // Leave the transporter
 			// FIXME: show still animations ?
 			if (LeaveTransporter(unit)) {
 				this->Finished = true;
-				return ;
+				return;
 			}
-			return ;
+
+			return;
 		}
 		default:
-			return ;
+			return;
 	}
 }

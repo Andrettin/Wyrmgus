@@ -354,22 +354,6 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		this->State++; // cast the spell
 		return false;
 	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
-		//Wyrmgus start
-		//if is unreachable and is on a raft, see if the raft can move closer to the target
-		if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-					if (table[i]->CurrentAction() == UnitAction::Still) {
-						CommandStopUnit(*table[i]);
-						CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
-					}
-					return false;
-				}
-			}
-		}
-		//Wyrmgus end
 		// goal/spot unreachable and out of range -- give up
 		return true;
 	}
@@ -449,11 +433,13 @@ void COrder_SpellCast::Execute(CUnit &unit)
 				if (!unit.RestoreOrder()) {
 					this->Finished = true;
 				}
-				return ;
+				return;
 			}
+
 			if (CheckForDeadGoal(unit)) {
 				return;
 			}
+
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
 			unit.ReCast = 0; // repeat spell on next pass? (defaults to `no')
 			this->State = 1;
@@ -467,9 +453,11 @@ void COrder_SpellCast::Execute(CUnit &unit)
 					if (!unit.RestoreOrder()) {
 						this->Finished = true;
 					}
-					return ;
+
+					return;
 				}
-				return ;
+
+				return;
 			} else {
 				this->State = 2;
 			}
@@ -478,7 +466,7 @@ void COrder_SpellCast::Execute(CUnit &unit)
 			if (!spell.is_caster_only() || spell.forces_use_animation()) {
 				AnimateActionSpellCast(unit, *this);
 				if (unit.Anim.Unbreakable) {
-					return ;
+					return;
 				}
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
@@ -512,19 +500,21 @@ void COrder_SpellCast::Execute(CUnit &unit)
 						order.goalPos = order.get_goal()->tilePos;
 						order.MapLayer = order.get_goal()->MapLayer->ID;
 					}
+
 					if (unit.Player->AiEnabled) {
 						if (!unit.RestoreOrder()) {
 							this->Finished = true;
 						}
-						return ;
+						return;
 					}
 				}
 			}
+
 			if (!unit.ReCast && unit.CurrentAction() != UnitAction::Die) {
 				if (!unit.RestoreOrder()) {
 					this->Finished = true;
 				}
-				return ;
+				return;
 			}
 			break;
 

@@ -344,26 +344,8 @@ void COrder_Repair::Execute(CUnit &unit)
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
-					//Wyrmgus start
-					//if is unreachable and is on a raft, see if the raft can move closer
-					if (err == PF_UNREACHABLE) {
-						if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-							std::vector<CUnit *> table;
-							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-							for (size_t i = 0; i != table.size(); ++i) {
-								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-									if (table[i]->CurrentAction() == UnitAction::Still) {
-										CommandStopUnit(*table[i]);
-										CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
-									}
-									return;
-								}
-							}
-						}
-					}
-					//Wyrmgus end
 					this->Finished = true;
-					return ;
+					return;
 				}
 			}
 			break;
@@ -372,8 +354,9 @@ void COrder_Repair::Execute(CUnit &unit)
 			AnimateActionRepair(unit);
 			this->RepairCycle++;
 			if (unit.Anim.Unbreakable) {
-				return ;
+				return;
 			}
+
 			CUnit *goal = this->get_goal();
 
 			if (goal) {
@@ -391,7 +374,7 @@ void COrder_Repair::Execute(CUnit &unit)
 					if (dist <= unit.Type->RepairRange) {
 						if (RepairUnit(unit, *goal)) {
 							this->Finished = true;
-							return ;
+							return;
 						}
 					} else if (dist > unit.Type->RepairRange) {
 						// If goal has move, chase after it
@@ -405,7 +388,7 @@ void COrder_Repair::Execute(CUnit &unit)
 			if (!goal || goal->Variable[HP_INDEX].Value >= goal->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
 			//Wyrmgus end
 				this->Finished = true;
-				return ;
+				return;
 			}
 			// FIXME: automatic repair
 		}

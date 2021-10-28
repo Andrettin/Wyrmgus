@@ -1888,7 +1888,6 @@ void unit_type::calculate_movement_mask()
 				tile_flag::sea_unit |
 				tile_flag::building |
 				tile_flag::item |
-				tile_flag::bridge |
 				tile_flag::coast_allowed |
 				tile_flag::water_allowed |
 				tile_flag::no_building |
@@ -1940,7 +1939,6 @@ void unit_type::calculate_movement_mask()
 		case unit_domain::water:
 			this->MovementMask =
 				tile_flag::building | // already occuppied
-				tile_flag::bridge |
 				tile_flag::land_allowed | // can't move on this
 				tile_flag::impassable |
 				tile_flag::space |
@@ -1979,7 +1977,6 @@ void unit_type::calculate_movement_mask()
 				tile_flag::land_unit |
 				tile_flag::sea_unit |
 				tile_flag::building | // already occuppied
-				tile_flag::bridge |
 				tile_flag::land_allowed | // can't build on this
 				tile_flag::space;
 		}
@@ -2015,15 +2012,6 @@ void unit_type::calculate_movement_mask()
 			tile_flag::space_cliff |
 			tile_flag::item;
 		this->FieldFlags = tile_flag::item;
-	} else if (this->BoolFlag[BRIDGE_INDEX].value) {
-		this->MovementMask = tile_flag::sea_unit |
-			tile_flag::building |
-			tile_flag::land_allowed |
-			tile_flag::impassable |
-			tile_flag::space |
-			tile_flag::space_cliff |
-			tile_flag::bridge;
-		this->FieldFlags = tile_flag::bridge;
 	} else if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
 		switch (this->get_domain()) {
 			case unit_domain::land: // on land

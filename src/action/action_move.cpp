@@ -157,37 +157,6 @@ void COrder_Move::UpdatePathFinderData(PathFinderInput &input)
 */
 int DoActionMove(CUnit &unit)
 {
-	//Wyrmgus start
-	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
-	if (unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.CanMove()) { // if is a raft, don't move if any unit over it is still moving
-		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
-				if (table[i]->Moving) {
-					unit.Wait = 1;
-					unit.Moving = 0;
-					unit.reset_step_count();
-					return PF_WAIT;
-				}
-			}
-		}
-	} else if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) { //if the unit is a land unit over a raft, don't move if the raft is still moving
-		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-				if (table[i]->Moving) {
-					unit.Wait = 1;
-					unit.Moving = 0;
-					unit.reset_step_count();
-					return PF_WAIT;
-				}
-			}
-		}
-	}
-	//Wyrmgus end
-		
 	Vec2i posd; // movement in tile.
 	int d;
 
@@ -198,17 +167,6 @@ int DoActionMove(CUnit &unit)
 
 		// FIXME: So units flying up and down are not affected.
 		unit.pixel_offset = QPoint(0, 0);
-		//Wyrmgus start
-		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
-			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
-					table[i]->pixel_offset = QPoint(0, 0);
-				}
-			}
-		}
-		//Wyrmgus end
 
 		UnmarkUnitFieldFlags(unit);
 		d = NextPathElement(unit, posd.x, posd.y);
@@ -250,20 +208,7 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 		Vec2i pos = unit.tilePos + posd;
-		//Wyrmgus start
-		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
-			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
-					table[i]->MoveToXY(pos, table[i]->MapLayer->ID);
-					table[i]->pixel_offset.setX(-posd.x * wyrmgus::defines::get()->get_tile_width());
-					table[i]->pixel_offset.setY(-posd.y * wyrmgus::defines::get()->get_tile_height());
-					UnitHeadingFromDeltaXY(*table[i], posd);
-				}
-			}
-		}
-		//Wyrmgus end
+
 		//Wyrmgus start
 //		unit.MoveToXY(pos);
 		unit.MoveToXY(pos, unit.MapLayer->ID);
@@ -307,33 +252,11 @@ int DoActionMove(CUnit &unit)
 	unit.pixel_offset += QPoint(posd.x * move, posd.y * move);
 	
 	//Wyrmgus start
-	if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
-		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
-				table[i]->pixel_offset += QPoint(posd.x * move, posd.y * move);
-			}
-		}
-	}
-	//Wyrmgus end
-	
-	//Wyrmgus start
 	if (abs(unit.get_pixel_offset().x()) > (defines::get()->get_tile_width() * 2) || abs(unit.get_pixel_offset().y()) > (defines::get()->get_tile_height() * 2)) {
 		unit.pixel_offset = QPoint(0, 0);
 #ifdef DEBUG
 		log::log_error("Error in DoActionMove: unit's pixel movement was too big.");
 #endif
-		
-		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
-			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land) {
-					table[i]->pixel_offset = QPoint(0, 0);
-				}
-			}
-		}
 	}
 	//Wyrmgus end
 
@@ -372,35 +295,6 @@ void COrder_Move::Execute(CUnit &unit)
 			this->Range++;
 			break;
 		case PF_REACHED:
-			//Wyrmgus start
-			if (this->Range >= 1) {
-				if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) { //if the unit is a land unit over a raft
-					std::vector<CUnit *> table;
-					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-					for (size_t i = 0; i != table.size(); ++i) {
-						if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-							if (table[i]->CurrentAction() == UnitAction::Still) {
-								CommandStopUnit(*table[i]);
-								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
-							}
-							return;
-						}
-					}
-				} else if (unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.CanMove()) { // if is a raft
-					std::vector<CUnit *> table;
-					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-					for (size_t i = 0; i != table.size(); ++i) {
-						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->get_domain() == unit_domain::land && table[i]->CanMove()) {
-							if (table[i]->CurrentAction() == UnitAction::Still) {
-								CommandStopUnit(*table[i]);
-								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
-							}
-							return;
-						}
-					}
-				}
-			}
-			//Wyrmgus end
 			this->Finished = true;
 			break;
 		default:

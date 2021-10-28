@@ -1820,8 +1820,9 @@ void CButtonPanel::DoClicked_Unload(int button, const Qt::KeyboardModifiers key_
 		 && Selected[0]->Type->get_domain() == unit_domain::water && Selected[0]->MapLayer->Field(Selected[0]->tilePos)->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
 		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush, Selected[0]->MapLayer->ID);
-		return ;
+		return;
 	}
+
 	DoClicked_SelectTarget(button);
 }
 

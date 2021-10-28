@@ -1321,7 +1321,7 @@ void AiAttackWithForceAt(unsigned int force, int x, int y, int z)
 
 	if (!(force < AI_MAX_FORCE_INTERNAL)) {
 		DebugPrint("Force out of range: %d" _C_ force);
-		return ;
+		return;
 	}
 
 	if (!CMap::get()->Info->IsPointOnMap(pos, z)) {
@@ -1330,8 +1330,9 @@ void AiAttackWithForceAt(unsigned int force, int x, int y, int z)
 //				   _C_ CMap::get()->Info->MapWidth _C_ CMap::get()->Info->MapHeight);
 				   _C_ CMap::get()->Info->MapWidths[z] _C_ CMap::get()->Info->MapHeights[z]);
 				   //Wyrmgus end
-		return ;
+		return;
 	}
+
 	//Wyrmgus start
 //	AiPlayer->Force[force].Attack(pos);
 	AiPlayer->Force[force].Attack(pos, z);
@@ -1347,7 +1348,7 @@ void AiAttackWithForce(unsigned int force)
 {
 	if (!(force < AI_MAX_FORCE_INTERNAL)) {
 		DebugPrint("Force out of range: %d" _C_ force);
-		return ;
+		return;
 	}
 
 	unsigned int intForce = AiPlayer->Force.getScriptForce(force);
@@ -1515,11 +1516,11 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 
 						if (nextTransporter->Type->CanTransport()) {
 							nbToTransport = nextTransporter->Type->MaxOnBoard - nextTransporter->BoardCount;
-							break ;
+							break;
 						}
 					}
 					if (transporterIndex == aiForce.Size()) { // No more transporter.
-						break ;
+						break;
 					}
 				}
 		}
@@ -1590,24 +1591,27 @@ void AiForce::Update()
 					   _C_ AiPlayer->Player->get_index() _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
 			Reset(true);
 		}
-		return ;
+		return;
 	}
+
 #if 0
 	if (State == AiForceAttackingState::Waiting) {
 		if (!this->PlanAttack()) {
 			DebugPrint("Can't transport, look for walls\n");
 			if (!AiFindWall(this)) {
 				Attacking = false;
-				return ;
+				return;
 			}
 		}
 		State = AiForceAttackingState::Boarding;
 	}
 #endif
+
 	if (State == AiForceAttackingState::Boarding) {
 		AiGroupAttackerForTransport(*this);
-		return ;
+		return;
 	}
+
 	if (State == AiForceAttackingState::AttackingWithTransporter) {
 		// Move transporters to goalpos
 		std::vector<CUnit *> transporters;

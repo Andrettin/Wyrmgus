@@ -101,7 +101,7 @@ void parameters::process()
 		this->luaStartFilename = filename.toStdString();
 	}
 
-	option = "d" ;
+	option = "d";
 	if (cmd_parser.isSet(option)) {
 		database::get()->set_root_path(cmd_parser.value(option).toStdString());
 	}

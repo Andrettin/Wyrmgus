@@ -186,7 +186,7 @@ void COrder_Use::Execute(CUnit &unit)
 		if (!goal || (!goal->IsVisibleAsGoal(*unit.Player) && goal->Container != &unit)) {
 			DebugPrint("Goal gone\n");
 			this->Finished = true;
-			return ;
+			return;
 		}
 
 		if (goal && (goal->Type->BoolFlag[ITEM_INDEX].value || goal->Type->BoolFlag[POWERUP_INDEX].value || goal->ConnectingDestination != nullptr)) {
@@ -295,26 +295,14 @@ void COrder_Use::Execute(CUnit &unit)
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-						if (table[i]->CurrentAction() == UnitAction::Still) {
-							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
-						}
-						return;
-					}
-				}
-			}
 			this->Finished = true;
-			return ;
+			return;
 		case PF_REACHED: {
 			if (!goal) { // goal has died
 				this->Finished = true;
-				return ;
+				return;
 			}
+
 			// Handle Teleporter Units
 			// FIXME: BAD HACK
 			// goal shouldn't be busy and portal should be alive
@@ -360,17 +348,18 @@ void COrder_Use::Execute(CUnit &unit)
 					|| (dest.NewOrder->Action == UnitAction::Attack && !unit.CanAttack(true))
 					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->get_domain() != unit_domain::land)) {
 					this->Finished = true;
-					return ;
+					return;
 				} else {
 					if (dest.NewOrder->has_goal()) {
 						if (dest.NewOrder->get_goal()->Destroyed) {
 							dest.NewOrder.reset();
 							this->Finished = true;
-							return ;
+							return;
 						}
+
 						unit.Orders.insert(unit.Orders.begin() + 1, dest.NewOrder->Clone());
 						this->Finished = true;
-						return ;
+						return;
 					}
 				}
 			}
@@ -393,6 +382,6 @@ void COrder_Use::Execute(CUnit &unit)
 	}
 
 	if (unit.Anim.Unbreakable) {
-		return ;
+		return;
 	}
 }

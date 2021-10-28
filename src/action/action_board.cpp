@@ -283,7 +283,7 @@ void COrder_Board::Execute(CUnit &unit)
 		case board_state::enter_transporter: {
 			EnterTransporter(unit, *this);
 			this->Finished = true;
-			return ;
+			return;
 		}
 		case board_state::init:
 			if (unit.Wait) {
@@ -298,22 +298,6 @@ void COrder_Board::Execute(CUnit &unit)
 				// FIXME: if near transporter wait for enter
 				if (pathRet) {
 					if (pathRet == PF_UNREACHABLE) {
-						//Wyrmgus start
-						//if is unreachable and is on a raft, see if the raft can move closer to the "transporter"
-						if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-							std::vector<CUnit *> table;
-							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-							for (size_t i = 0; i != table.size(); ++i) {
-								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-									if (table[i]->CurrentAction() == UnitAction::Still) {
-										CommandStopUnit(*table[i]);
-										CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
-									}
-									return;
-								}
-							}
-						}
-						//Wyrmgus end
 						if (++this->state == board_state::move_to_transporter_max) {
 							this->Finished = true;
 							return;

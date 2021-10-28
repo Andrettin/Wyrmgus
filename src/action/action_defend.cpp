@@ -204,22 +204,6 @@ void COrder_Defend::Execute(CUnit &unit)
 
 	switch (DoActionMove(unit)) {
 		case PF_UNREACHABLE:
-			//Wyrmgus start
-			//if is unreachable and is on a raft, see if the raft can move closer to the enemy
-			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-						if (table[i]->CurrentAction() == UnitAction::Still) {
-							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
-						}
-						return;
-					}
-				}
-			}
-			//Wyrmgus end
 			// Some tries to reach the goal
 			this->Range++;
 			break;

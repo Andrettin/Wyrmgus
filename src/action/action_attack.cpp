@@ -459,25 +459,6 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	assert_throw(unit.CanMove());
 	assert_throw(this->has_goal() || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer));
 
-	//Wyrmgus start
-	//if is on a moving raft and target is now within range, stop the raft
-	if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-				if (table[i]->CurrentAction() == UnitAction::Move) {
-					if ((this->get_goal() && unit.MapDistanceTo(*this->get_goal()) <= unit.get_best_attack_range()) || (!this->has_goal() && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.get_best_attack_range())) {
-						if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, tile_flag::air_impassable, MapLayer)) {
-							CommandStopUnit(*table[i]);
-						}
-					}
-				}
-			}
-		}
-	}
-	//Wyrmgus end
-				
 	int err = DoActionMove(unit);
 
 	if (unit.Anim.Unbreakable) {
@@ -555,22 +536,6 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	// Unreachable.
 
 	if (err == PF_UNREACHABLE) {
-		//Wyrmgus start
-		//if is unreachable and is on a raft, see if the raft can move closer to the enemy
-		if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-					if (table[i]->CurrentAction() == UnitAction::Still) {
-						CommandStopUnit(*table[i]);
-						CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
-					}
-					return;
-				}
-			}
-		}
-		//Wyrmgus end
 		if (!this->has_goal()) {
 			// When attack-moving we have to allow a bigger range
 			this->Range++;

@@ -187,21 +187,6 @@ void COrder_Patrol::Execute(CUnit &unit)
 			this->WaitingCycle = 0;
 			break;
 		case PF_UNREACHABLE:
-			//Wyrmgus start
-			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->get_domain() == unit_domain::land) {
-				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-						if (table[i]->CurrentAction() == UnitAction::Still) {
-							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
-						}
-						return;
-					}
-				}
-			}
-			//Wyrmgus end
 			// Increase range and try again
 			this->WaitingCycle = 1;
 			this->Range++;
