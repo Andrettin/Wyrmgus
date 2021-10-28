@@ -37,6 +37,7 @@
 #include "sound/sample.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"
+#include "spell/status_effect.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/container_util.h"
@@ -259,7 +260,8 @@ void PlayUnitSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_
 		return;
 	}
 	
-	if (unit.Variable[STUN_INDEX].Value > 0 && wyrmgus::is_voice_unit_sound_type(unit_sound_type)) { //don't speak if stunned
+	if (unit.has_status_effect(status_effect::stun) && is_voice_unit_sound_type(unit_sound_type)) {
+		//don't speak if stunned
 		return;
 	}
 	

@@ -54,6 +54,7 @@
 #include "spell/spell_action_adjust_variable.h"
 #include "spell/spell_action_spawn_missile.h"
 #include "spell/spell_target_type.h"
+#include "spell/status_effect.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "upgrade/upgrade.h"
@@ -190,6 +191,12 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 
 	if (!target) {
 		return true;
+	}
+
+	for (const auto &[status_effect, value] : condition->status_effect_values) {
+		if (target->get_status_effect_timer(status_effect) != value) {
+			return false;
+		}
 	}
 
 	if (condition->Alliance != CONDITION_TRUE) {
@@ -444,7 +451,7 @@ bool spell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, 
 
 	if (this->get_target() == spell_target_type::unit) {
 		//if caster is terrified, don't target enemy units
-		if (caster.Variable[TERROR_INDEX].Value > 0 && caster.is_enemy_of(*target)) {
+		if (caster.has_status_effect(status_effect::terror) && caster.is_enemy_of(*target)) {
 			return false;
 		}
 	}
@@ -675,7 +682,7 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 	Vec2i pos = goalPos;
 	int z = map_layer ? map_layer->ID : 0;
 
-	caster.Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable
+	caster.remove_status_effect(status_effect::invisible); // unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
 		pos = target->tilePos;
 		map_layer = target->MapLayer;
@@ -782,7 +789,7 @@ ConditionInfo::ConditionInfo()
 void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
 {
 	const std::string &key = property.get_key();
-	const wyrmgus::sml_operator &property_operator = property.get_operator();
+	const sml_operator &property_operator = property.get_operator();
 	const std::string &value = property.get_value();
 
 	if (key == "alliance") {
@@ -796,11 +803,11 @@ void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
 	} else if (key == "faction_unit") {
 		this->FactionUnit = StringToCondition(value);
 	} else if (key == "civilization_equivalent") {
-		this->civilization_equivalent = wyrmgus::civilization::get(value);
+		this->civilization_equivalent = civilization::get(value);
 	} else if (key == "faction_equivalent") {
-		this->FactionEquivalent = wyrmgus::faction::get(value);
+		this->FactionEquivalent = faction::get(value);
 	} else {
-		const std::string pascal_case_key = wyrmgus::string::snake_case_to_pascal_case(key);
+		const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
 
 		int index = UnitTypeVar.VariableNameLookup[pascal_case_key.c_str()];
 		if (index != -1) {
@@ -829,40 +836,58 @@ void ConditionInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	const std::string pascal_case_tag = wyrmgus::string::snake_case_to_pascal_case(tag);
-
-	const int index = UnitTypeVar.VariableNameLookup[pascal_case_tag.c_str()];
-	if (index != -1) {
-		this->Variable[index].Check = true;
-
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+	if (tag == "status_effects") {
+		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
+			const sml_operator &property_operator = property.get_operator();
 			const std::string &value = property.get_value();
 
-			if (key == "enable") {
-				this->Variable[index].Enable = StringToCondition(value);
-			} else if (key == "exact_value") {
-				this->Variable[index].ExactValue = std::stoi(value);
-			} else if (key == "except_value") {
-				this->Variable[index].ExceptValue = std::stoi(value);
-			} else if (key == "min_value") {
-				this->Variable[index].MinValue = std::stoi(value);
-			} else if (key == "max_value") {
-				this->Variable[index].MaxValue = std::stoi(value);
-			} else if (key == "min_max") {
-				this->Variable[index].MinMax = std::stoi(value);
-			} else if (key == "min_value_percent") {
-				this->Variable[index].MinValuePercent = std::stoi(value);
-			} else if (key == "max_value_percent") {
-				this->Variable[index].MaxValuePercent = std::stoi(value);
-			} else if (key == "condition_apply_on_caster") {
-				this->Variable[index].ConditionApplyOnCaster = wyrmgus::string::to_bool(value);
-			} else {
-				throw std::runtime_error("Invalid adjust variable spell action variable property: \"" + key + "\".");
+			const status_effect status_effect = string_to_status_effect(key);
+
+			switch (property_operator) {
+				case sml_operator::equality:
+					this->status_effect_values[status_effect] = std::stoi(value);
+					break;
+				default:
+					throw std::runtime_error("Invalid operator for status effect spell condition property: \"" + std::to_string(static_cast<int>(property_operator)) + "\".");
 			}
 		});
 	} else {
-		throw std::runtime_error("Invalid spell condition scope: \"" + tag + "\".");
+		const std::string pascal_case_tag = wyrmgus::string::snake_case_to_pascal_case(tag);
+
+		const int index = UnitTypeVar.VariableNameLookup[pascal_case_tag.c_str()];
+		if (index != -1) {
+			this->Variable[index].Check = true;
+
+			scope.for_each_property([&](const wyrmgus::sml_property &property) {
+				const std::string &key = property.get_key();
+				const std::string &value = property.get_value();
+
+				if (key == "enable") {
+					this->Variable[index].Enable = StringToCondition(value);
+				} else if (key == "exact_value") {
+					this->Variable[index].ExactValue = std::stoi(value);
+				} else if (key == "except_value") {
+					this->Variable[index].ExceptValue = std::stoi(value);
+				} else if (key == "min_value") {
+					this->Variable[index].MinValue = std::stoi(value);
+				} else if (key == "max_value") {
+					this->Variable[index].MaxValue = std::stoi(value);
+				} else if (key == "min_max") {
+					this->Variable[index].MinMax = std::stoi(value);
+				} else if (key == "min_value_percent") {
+					this->Variable[index].MinValuePercent = std::stoi(value);
+				} else if (key == "max_value_percent") {
+					this->Variable[index].MaxValuePercent = std::stoi(value);
+				} else if (key == "condition_apply_on_caster") {
+					this->Variable[index].ConditionApplyOnCaster = wyrmgus::string::to_bool(value);
+				} else {
+					throw std::runtime_error("Invalid adjust variable spell action variable property: \"" + key + "\".");
+				}
+			});
+		} else {
+			throw std::runtime_error("Invalid spell condition scope: \"" + tag + "\".");
+		}
 	}
 }
 
@@ -919,7 +944,8 @@ void AutoCastInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 		if (!this->cast_conditions) {
 			this->cast_conditions = std::make_unique<ConditionInfo>();
 		}
-		wyrmgus::database::process_sml_data(this->cast_conditions, scope);
+
+		database::process_sml_data(this->cast_conditions, scope);
 	} else {
 		throw std::runtime_error("Invalid autocast info scope: \"" + tag + "\".");
 	}

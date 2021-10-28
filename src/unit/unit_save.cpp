@@ -42,6 +42,7 @@
 #include "pathfinder.h"
 #include "player/player.h"
 #include "spell/spell.h"
+#include "spell/status_effect.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
@@ -379,6 +380,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
 		file.printf(",\n  \"auto-cast\", \"%s\"", spell->get_identifier().c_str());
 	}
+
 	if (!unit.get_spell_cooldown_timers().empty()) {
 		file.printf(",\n  \"spell-cooldown\", {");
 		bool first = true;
@@ -392,6 +394,21 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		}
 		file.printf("}");
 	}
+
+	if (!unit.get_status_effect_timers().empty()) {
+		file.printf(",\n  \"status-effects\", {");
+		bool first = true;
+		for (const auto &[status_effect, cycles] : unit.get_status_effect_timers()) {
+			if (first) {
+				first = false;
+			} else {
+				file.printf(" ,");
+			}
+			file.printf("\"%s\", %d", status_effect_to_string(status_effect).c_str(), cycles);
+		}
+		file.printf("}");
+	}
+
 	//Wyrmgus start
 	file.printf(",\n  \"variation\", %d", unit.Variation);
 	for (int i = 0; i < MaxImageLayers; ++i) {

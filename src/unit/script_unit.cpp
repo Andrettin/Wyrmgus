@@ -54,6 +54,7 @@
 #include "sound/sound.h"
 //Wyrmgus end
 #include "spell/spell.h"
+#include "spell/status_effect.h"
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
@@ -675,6 +676,19 @@ static int CclUnit(lua_State *l)
 				if (cooldown > 0) {
 					unit->set_spell_cooldown_timer(spell, cooldown);
 				}
+			}
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "status-effects")) {
+			lua_rawgeti(l, 2, j + 1);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const size_t subargs = lua_rawlen(l, -1);
+			for (size_t k = 0; k < subargs; ++k) {
+				const status_effect status_effect = string_to_status_effect(LuaToString(l, -1, k + 1));
+				++k;
+				const int cycles = LuaToNumber(l, -1, k + 1);
+				unit->set_status_effect_timer(status_effect, cycles);
 			}
 			lua_pop(l, 1);
 		//Wyrmgus start
@@ -2054,8 +2068,6 @@ static int CclSetUnitVariable(lua_State *l)
 			unit->UpdateXPRequired();
 		} else if (index == XP_INDEX) {
 			unit->XPChanged();
-		} else if (index == STUN_INDEX && unit->Variable[index].Value > 0) { //if unit has become stunned, stop it
-			CommandStopUnit(*unit);
 		} else if (index == KNOWLEDGEMAGIC_INDEX) {
 			unit->CheckIdentification();
 		}

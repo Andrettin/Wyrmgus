@@ -50,6 +50,7 @@
 #include "player/player_type.h"
 #include "quest/campaign.h"
 #include "script/condition/condition.h"
+#include "spell/status_effect.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_domain.h"
@@ -155,7 +156,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		}
 
 		// Don't attack invulnerable units
-		if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+		if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->has_status_effect(status_effect::unholy_armor)) {
 			continue;
 		}
 		

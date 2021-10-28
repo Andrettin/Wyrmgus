@@ -571,16 +571,20 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 	// Now show decoration for each variable.
 	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin(); i < UnitTypeVar.DecoVar.end(); ++i) {
 		const CDecoVar &var = *(*i);
-		const int value = unit.Variable[var.Index].Value;
+		const bool is_status_effect = var.status_effect.has_value();
+		const int value = is_status_effect ? unit.get_status_effect_timer(var.status_effect.value()) : unit.Variable[var.Index].Value;
 		//Wyrmgus start
 //		const int max = unit.Variable[var.Index].Max;
-		const int max = unit.GetModifiedVariable(var.Index, VariableAttribute::Max);
+		const int max = is_status_effect ? value : unit.GetModifiedVariable(var.Index, VariableAttribute::Max);
 		//Wyrmgus end
+
+		const bool enable = is_status_effect ? (value > 0) : (unit.Variable[var.Index].Enable != 0);
+
 		assert_throw(value <= max);
 
 		if ((value == 0 && !var.ShowWhenNull) || (value == max && !var.ShowWhenMax)
 			|| (var.HideHalf && value != 0 && value != max)
-			|| (!var.ShowIfNotEnable && !unit.Variable[var.Index].Enable)
+			|| (!var.ShowIfNotEnable && !enable)
 			|| (var.ShowOnlySelected && !unit.Selected)
 			|| (unit.Player->get_type() == player_type::neutral && var.HideNeutral)
 			//Wyrmgus start
@@ -604,7 +608,7 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 		int offset_x = var.OffsetX;
 		int offset_y = var.OffsetY;
 
-		if (var.status_effect) {
+		if (is_status_effect || var.show_as_status_effect) {
 			const QPoint &status_effect_offset = status_effect_offsets.at(status_effect_count);
 			offset_x += status_effect_offset.x();
 			offset_y += status_effect_offset.y();

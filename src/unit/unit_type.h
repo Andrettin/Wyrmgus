@@ -81,6 +81,7 @@ namespace wyrmgus {
 	enum class gender;
 	enum class item_class;
 	enum class item_slot;
+	enum class status_effect;
 	enum class tile_flag : uint32_t;
 	enum class unit_domain;
 }
@@ -325,16 +326,10 @@ enum {
 	RADAR_INDEX,
 	RADARJAMMER_INDEX,
 	AUTOREPAIRRANGE_INDEX,
-	BLOODLUST_INDEX,
-	HASTE_INDEX,
-	SLOW_INDEX,
-	INVISIBLE_INDEX,
-	UNHOLYARMOR_INDEX,
 	SLOT_INDEX,
 	SHIELD_INDEX,
 	POINTS_INDEX,
 	MAXHARVESTERS_INDEX,
-	POISON_INDEX,
 	SHIELDPERMEABILITY_INDEX,
 	SHIELDPIERCING_INDEX,
 	ISALIVE_INDEX,
@@ -371,19 +366,6 @@ enum {
 	TRANSPARENCY_INDEX,
 	GENDER_INDEX,
 	BIRTHCYCLE_INDEX,
-	STUN_INDEX,
-	BLEEDING_INDEX,
-	LEADERSHIP_INDEX,
-	BLESSING_INDEX,
-	INSPIRE_INDEX,
-	PRECISION_INDEX,
-	REGENERATION_INDEX,
-	BARKSKIN_INDEX,
-	INFUSION_INDEX,
-	TERROR_INDEX,
-	WITHER_INDEX,
-	DEHYDRATION_INDEX,
-	HYDRATING_INDEX,
 	TIMEEFFICIENCYBONUS_INDEX,
 	RESEARCHSPEEDBONUS_INDEX,
 	GARRISONEDRANGEBONUS_INDEX,
@@ -469,7 +451,8 @@ public:
 	
 	bool ShowIfCanCastAnySpell;   /// if true, only show if the unit can cast a spell.
 
-	bool status_effect = false;
+	std::optional<status_effect> status_effect;
+	bool show_as_status_effect = false;
 	bool hero_symbol = false;
 	bool resource_bar = false;
 };

@@ -8,9 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_wait.cpp - The animation Wait. */
-//
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 1999-2021 by Vladi Belperchinov-Shabanski,
+//                                 Joris Dauphin, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,35 +25,29 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#include "stratagus.h"
+#pragma once
 
-#include "animation/animation_wait.h"
+#include "spell/spell_action.h"
 
-#include "spell/status_effect.h"
-#include "unit/unit.h"
-#include "util/assert_util.h"
+namespace wyrmgus {
 
-void CAnimation_Wait::Action(CUnit &unit, int &/*move*/, int scale) const
+enum class status_effect;
+
+class apply_status_effects_spell_action final : public spell_action
 {
-	assert_throw(unit.Anim.Anim == this);
-	unit.Anim.Wait = this->wait << scale >> 8;
-
-	if (unit.has_status_effect(status_effect::slow)) {
-		//unit is slowed down
-		unit.Anim.Wait <<= 1;
+public:
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string identifier = "apply_status_effects";
+		return identifier;
 	}
 
-	if (unit.has_status_effect(status_effect::haste) && unit.Anim.Wait > 1) {
-		//unit is accelerated
-		unit.Anim.Wait >>= 1;
-	}
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual int Cast(CUnit &caster, const spell &spell, CUnit *target, const Vec2i &goal_pos, int z, int modifier) override;
 
-	if (unit.Anim.Wait <= 0) {
-		unit.Anim.Wait = 1;
-	}
+private:
+	std::map<status_effect, int> status_effect_cycles;
+};
+
 }
 
-void CAnimation_Wait::Init(const char *s, lua_State *)
-{
-	this->wait = std::stoi(s);
-}

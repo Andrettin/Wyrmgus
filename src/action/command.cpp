@@ -47,6 +47,7 @@
 #include "player/vassalage_type.h"
 #include "script.h"
 #include "spell/spell.h"
+#include "spell/status_effect.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -82,9 +83,10 @@ static void ReleaseOrders(CUnit &unit)
 		}
 	}
 	unit.Orders.resize(1);
+
 	//Wyrmgus start
 //	unit.Orders[0]->Finished = true;
-	if (unit.Variable[STUN_INDEX].Value == 0 || unit.Orders[0]->Action != UnitAction::Still) { //if the unit is stunned, don't end its current "still" order
+	if (!unit.has_status_effect(status_effect::stun) || unit.Orders[0]->Action != UnitAction::Still) { //if the unit is stunned, don't end its current "still" order
 		unit.Orders[0]->Finished = true;
 	}
 	//Wyrmgus end

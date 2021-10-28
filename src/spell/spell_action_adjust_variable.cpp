@@ -271,8 +271,6 @@ int spell_action_adjust_variable::Cast(CUnit &caster, const spell &, CUnit *targ
 			unit->UpdateXPRequired();
 		} else if (i == XP_INDEX) {
 			unit->XPChanged();
-		} else if (i == STUN_INDEX && unit->Variable[i].Value > 0) { //if target has become stunned, stop it
-			CommandStopUnit(*unit);
 		} else if (i == KNOWLEDGEMAGIC_INDEX) {
 			unit->CheckIdentification();
 		}

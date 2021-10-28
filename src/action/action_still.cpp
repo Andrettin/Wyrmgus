@@ -56,6 +56,7 @@
 #include "sound/unit_sound_type.h"
 #include "species/species.h"
 #include "spell/spell.h"
+#include "spell/status_effect.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
@@ -172,7 +173,7 @@ void COrder_Still::OnAnimationAttack(CUnit &unit)
 
 void UnHideUnit(CUnit &unit)
 {
-	unit.Variable[INVISIBLE_INDEX].Value = 0;
+	unit.remove_status_effect(status_effect::invisible);
 }
 
 /**
@@ -533,7 +534,7 @@ void COrder_Still::Execute(CUnit &unit)
 
 	switch (this->State) {
 		case SUB_STILL_STANDBY:
-			if (unit.Variable[STUN_INDEX].Value == 0) { //only show the idle animation when still if the unit is not stunned
+			if (!unit.has_status_effect(status_effect::stun)) { //only show the idle animation when still if the unit is not stunned
 				UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 			}
 			if (SyncRand(100000) == 0) {
@@ -548,11 +549,14 @@ void COrder_Still::Execute(CUnit &unit)
 	if (unit.Anim.Unbreakable) { // animation can't be aborted here
 		return;
 	}
+
 	//Wyrmgus start
-	if (unit.Variable[STUN_INDEX].Value > 0) { //if unit is stunned, remain still
+	if (unit.has_status_effect(status_effect::stun)) {
+		//if unit is stunned, remain still
 		return;
 	}
 	//Wyrmgus end
+
 	this->State = SUB_STILL_STANDBY;
 	this->Finished = (this->Action == UnitAction::Still);
 	if (this->Action == UnitAction::StandGround || unit.Removed || unit.CanMove() == false) {

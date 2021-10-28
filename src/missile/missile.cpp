@@ -55,6 +55,7 @@
 #include "sound/unit_sound_type.h"
 #include "spell/spell.h"
 #include "spell/spell_target_type.h"
+#include "spell/status_effect.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"
@@ -379,7 +380,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	int cold_damage = attacker.Variable[COLDDAMAGE_INDEX].Value;
 	
 	int arcane_damage = attacker.Variable[ARCANEDAMAGE_INDEX].Value;
-	if (attacker.Variable[INFUSION_INDEX].Value > 0) {
+	if (attacker.has_status_effect(status_effect::infusion)) {
 		arcane_damage += 4; //+4 arcane damage bonus from Infusion
 	}
 	
@@ -400,13 +401,13 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	*/
 	//apply damage modifiers, but don't stack the effects of Blessing, Inspire, Bloodlust and Leadership
 	int damage_modifier = 100;
-	if (attacker.Variable[BLOODLUST_INDEX].Value > 0) {
+	if (attacker.has_status_effect(status_effect::bloodlust)) {
 		damage_modifier += 100;
-	} else if (attacker.Variable[INSPIRE_INDEX].Value > 0 || attacker.Variable[BLESSING_INDEX].Value > 0) {
+	} else if (attacker.has_status_effect(status_effect::inspire) || attacker.has_status_effect(status_effect::blessing)) {
 		damage_modifier += 50;
-	} else if (attacker.Variable[LEADERSHIP_INDEX].Value > 0) {
+	} else if (attacker.has_status_effect(status_effect::leadership)) {
 		damage_modifier += 10;
-	} else if (attacker.Variable[WITHER_INDEX].Value > 0) {
+	} else if (attacker.has_status_effect(status_effect::wither)) {
 		damage_modifier -= 50;
 	}
 	
@@ -414,21 +415,11 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		damage_modifier += attacker.Variable[CHARGEBONUS_INDEX].Value * attacker.get_step_count();
 	}
 	
-	int accuracy_modifier = 100;
-	if (attacker.Variable[PRECISION_INDEX].Value > 0) {
-		accuracy_modifier += 100;
-	}
-	
-	int evasion_modifier = 100;
-	if (goal && goal->Variable[BLESSING_INDEX].Value > 0) {
-		evasion_modifier += 50;
-	}
-	
 	int armor = 0;
 	if (goal != nullptr) {
 		armor = goal->Variable[ARMOR_INDEX].Value;
 		
-		if (goal->Variable[BARKSKIN_INDEX].Value > 0) {
+		if (goal->has_status_effect(status_effect::barkskin)) {
 			armor += 4; //+4 armor bonus from Barkskin
 		}
 	} else {
@@ -542,12 +533,6 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	damage += piercing_damage;
 	
 	//Wyrmgus start
-	int accuracy = attacker.Variable[ACCURACY_INDEX].Value;
-	accuracy *= accuracy_modifier;
-	accuracy /= 100;
-	//Wyrmgus end
-	
-	//Wyrmgus start
 	//apply hack/pierce/blunt resistances
 	if (goal != nullptr) {
 		if (attacker.Type->BoolFlag[HACKDAMAGE_INDEX].value) {
@@ -620,12 +605,12 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 	}
 	
 	int accuracy_modifier = 100;
-	if (attacker.Variable[PRECISION_INDEX].Value > 0) {
+	if (attacker.has_status_effect(status_effect::precision)) {
 		accuracy_modifier += 100;
 	}
 	
 	int evasion_modifier = 100;
-	if (goal && goal->Variable[BLESSING_INDEX].Value > 0) {
+	if (goal && goal->has_status_effect(status_effect::blessing)) {
 		evasion_modifier += 50;
 	}
 	
@@ -638,7 +623,8 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 	} else {
 		int evasion = 0;
 		if (goal != nullptr) {
-			if (goal->Variable[EVASION_INDEX].Value && goal->Variable[STUN_INDEX].Value == 0) { //stunned targets cannot evade
+			if (goal->Variable[EVASION_INDEX].Value && !goal->has_status_effect(status_effect::stun)) {
+				//stunned targets cannot evade
 				evasion = goal->Variable[EVASION_INDEX].Value;
 			}
 			if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->BoolFlag[BUILDING_INDEX].value && goal->Type->get_num_directions() == 8) { //flanking

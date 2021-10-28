@@ -40,6 +40,7 @@
 #include "missile.h"
 #include "pathfinder.h"
 #include "player/player.h"
+#include "spell/status_effect.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"
 #include "unit/unit_domain_finder.h"
@@ -62,7 +63,7 @@ public:
 		// if (unit->IsUnusable()) can't attack constructions
 		// FIXME: did SelectUnitsOnTile already filter this?
 		// Invisible and not Visible
-		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value
+		if (unit->Removed || unit->has_status_effect(status_effect::invisible)
 			// || (!UnitVisible(unit, source->Player))
 			|| unit->CurrentAction() == UnitAction::Die) {
 			return;

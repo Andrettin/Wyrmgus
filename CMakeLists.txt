@@ -381,6 +381,7 @@ set(species_SRCS
 source_group(species FILES ${species_SRCS})
 
 set(spell_SRCS
+	src/spell/apply_status_effects_spell_action.cpp
 	src/spell/script_spell.cpp
 	src/spell/spell.cpp
 	src/spell/spell_action.cpp
@@ -964,6 +965,7 @@ set(wyrmgus_species_HDRS
 )
 
 set(wyrmgus_spell_HDRS
+	src/spell/apply_status_effects_spell_action.h
 	src/spell/spell.h
 	src/spell/spell_action.h
 	src/spell/spell_action_adjust_variable.h
@@ -980,6 +982,7 @@ set(wyrmgus_spell_HDRS
 	src/spell/spell_spawnportal.h
 	src/spell/spell_target_type.h
 	src/spell/spell_teleport.h
+	src/spell/status_effect.h
 )
 
 set(wyrmgus_time_HDRS

@@ -60,6 +60,7 @@
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
 #include "spell/spell.h"
+#include "spell/status_effect.h"
 #include "time/season.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"
@@ -216,16 +217,10 @@ static const char TARGETPOSY_KEY[] = "TargetPosY";
 static const char RADARRANGE_KEY[] = "RadarRange";
 static const char RADARJAMMERRANGE_KEY[] = "RadarJammerRange";
 static const char AUTOREPAIRRANGE_KEY[] = "AutoRepairRange";
-static const char BLOODLUST_KEY[] = "Bloodlust";
-static const char HASTE_KEY[] = "Haste";
-static const char SLOW_KEY[] = "Slow";
-static const char INVISIBLE_KEY[] = "Invisible";
-static const char UNHOLYARMOR_KEY[] = "UnholyArmor";
 static const char SLOT_KEY[] = "Slot";
 static const char SHIELD_KEY[] = "ShieldPoints";
 static const char POINTS_KEY[] = "Points";
 static const char MAXHARVESTERS_KEY[] = "MaxHarvesters";
-static const char POISON_KEY[] = "Poison";
 static const char SHIELDPERMEABILITY_KEY[] = "ShieldPermeability";
 static const char SHIELDPIERCING_KEY[] = "ShieldPiercing";
 static const char ISALIVE_KEY[] = "IsAlive";
@@ -262,19 +257,6 @@ static const char MAGICLEVEL_KEY[] = "MagicLevel";
 static const char TRANSPARENCY_KEY[] = "Transparency";
 static const char GENDER_KEY[] = "Gender";
 static const char BIRTHCYCLE_KEY[] = "BirthCycle";
-static const char STUN_KEY[] = "Stun";
-static const char BLEEDING_KEY[] = "Bleeding";
-static const char LEADERSHIP_KEY[] = "Leadership";
-static const char BLESSING_KEY[] = "Blessing";
-static const char INSPIRE_KEY[] = "Inspire";
-static const char PRECISION_KEY[] = "Precision";
-static const char REGENERATION_KEY[] = "Regeneration";
-static const char BARKSKIN_KEY[] = "Barkskin";
-static const char INFUSION_KEY[] = "Infusion";
-static const char TERROR_KEY[] = "Terror";
-static const char WITHER_KEY[] = "Wither";
-static const char DEHYDRATION_KEY[] = "Dehydration";
-static const char HYDRATING_KEY[] = "Hydrating";
 static const char TIMEEFFICIENCYBONUS_KEY[] = "TimeEfficiencyBonus";
 static const char RESEARCHSPEEDBONUS_KEY[] = "ResearchSpeedBonus";
 static const char GARRISONEDRANGEBONUS_KEY[] = "GarrisonedRangeBonus";
@@ -366,9 +348,8 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 		HACKRESISTANCE_KEY, PIERCERESISTANCE_KEY, BLUNTRESISTANCE_KEY, DEHYDRATIONIMMUNITY_KEY,
 		POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
 		//Wyrmgus end
-		RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
-		SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
-		MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY,
+		RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
+		MAXHARVESTERS_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY,
 		//Wyrmgus
 //		PRIORITY_KEY
 		PRIORITY_KEY,
@@ -380,7 +361,6 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 		DAYSIGHTRANGEBONUS_KEY, NIGHTSIGHTRANGEBONUS_KEY,
 		KNOWLEDGEMAGIC_KEY, KNOWLEDGEWARFARE_KEY, KNOWLEDGEMINING_KEY,
 		MAGICLEVEL_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY,
-		STUN_KEY, BLEEDING_KEY, LEADERSHIP_KEY, BLESSING_KEY, INSPIRE_KEY, PRECISION_KEY, REGENERATION_KEY, BARKSKIN_KEY, INFUSION_KEY, TERROR_KEY, WITHER_KEY, DEHYDRATION_KEY, HYDRATING_KEY,
 		TIMEEFFICIENCYBONUS_KEY, RESEARCHSPEEDBONUS_KEY, GARRISONEDRANGEBONUS_KEY, SPEEDBONUS_KEY, RAIL_SPEED_BONUS_KEY,
 		GATHERINGBONUS_KEY, COPPERGATHERINGBONUS_KEY, SILVERGATHERINGBONUS_KEY, GOLDGATHERINGBONUS_KEY, IRONGATHERINGBONUS_KEY, MITHRILGATHERINGBONUS_KEY, LUMBERGATHERINGBONUS_KEY, STONEGATHERINGBONUS_KEY, COALGATHERINGBONUS_KEY, JEWELRYGATHERINGBONUS_KEY, FURNITUREGATHERINGBONUS_KEY, LEATHERGATHERINGBONUS_KEY, GEMSGATHERINGBONUS_KEY,
 		DISEMBARKMENTBONUS_KEY, TRADECOST_KEY, SALVAGEFACTOR_KEY, MUGGING_KEY, RAIDING_KEY,
@@ -394,6 +374,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 		buildin[i].keylen = strlen(tmp[i]);
 		buildin[i].key = tmp[i];
 	}
+
 	Init();
 }
 
@@ -2648,7 +2629,8 @@ static int CclDefineDecorations(lua_State *l)
 		//Wyrmgus end
 		bool ShowOpponent = false;
 		bool ShowIfCanCastAnySpell = false;
-		bool status_effect = false;
+		std::optional<status_effect> status_effect;
+		bool show_as_status_effect = false;
 		bool hero_symbol = false;
 		bool resource_bar = false;
 	} tmp;
@@ -2700,7 +2682,9 @@ static int CclDefineDecorations(lua_State *l)
 			} else if (!strcmp(key, "ShowIfCanCastAnySpell")) {
 				tmp.ShowIfCanCastAnySpell = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "StatusEffect")) {
-				tmp.status_effect = LuaToBoolean(l, -1);
+				tmp.status_effect = string_to_status_effect(LuaToString(l, -1));
+			} else if (!strcmp(key, "ShowAsStatusEffect")) {
+				tmp.show_as_status_effect = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "HeroSymbol")) {
 				tmp.hero_symbol = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ResourceBar")) {
@@ -2781,6 +2765,7 @@ static int CclDefineDecorations(lua_State *l)
 			}
 			lua_pop(l, 1); // Pop the value
 		}
+
 		decovar->Index = tmp.Index;
 		//Wyrmgus start
 		decovar->MinValue = tmp.MinValue;
@@ -2804,23 +2789,28 @@ static int CclDefineDecorations(lua_State *l)
 		decovar->ShowOpponent = tmp.ShowOpponent;
 		decovar->ShowIfCanCastAnySpell = tmp.ShowIfCanCastAnySpell;
 		decovar->status_effect = tmp.status_effect;
+		decovar->show_as_status_effect = tmp.show_as_status_effect;
 		decovar->hero_symbol = tmp.hero_symbol;
 		decovar->resource_bar = tmp.resource_bar;
+
 		//Wyrmgus start
 //		UnitTypeVar.DecoVar.push_back(decovar);
 		bool already_defined = false;
 		for (std::vector<CDecoVar *>::iterator it = UnitTypeVar.DecoVar.begin();
 			 it != UnitTypeVar.DecoVar.end(); ++it) {
-			if (static_cast<int>((*it)->Index) == tmp.Index) { // replace other decorations which use the same variable
+			if (static_cast<int>((*it)->Index) == tmp.Index && (*it)->status_effect == tmp.status_effect) {
+				//replace other decorations which use the same variable
 				*it = decovar;
 				already_defined = true;
 			}
 		}
+
 		if (!already_defined) {
 			UnitTypeVar.DecoVar.push_back(decovar);
 		}
 		//Wyrmgus end
 	}
+
 	assert_throw(lua_gettop(l) != 0);
 	return 0;
 }
@@ -2938,16 +2928,10 @@ void UpdateUnitVariables(CUnit &unit)
 			case XP_INDEX:
 			case GIVERESOURCE_INDEX:
 			case AUTOREPAIRRANGE_INDEX:
-			case BLOODLUST_INDEX:
-			case HASTE_INDEX:
-			case SLOW_INDEX:
-			case INVISIBLE_INDEX:
-			case UNHOLYARMOR_INDEX:
 			case HP_INDEX:
 			case SHIELD_INDEX:
 			case POINTS_INDEX:
 			case MAXHARVESTERS_INDEX:
-			case POISON_INDEX:
 			case SHIELDPERMEABILITY_INDEX:
 			case SHIELDPIERCING_INDEX:
 			case ISALIVE_INDEX:
@@ -2985,19 +2969,6 @@ void UpdateUnitVariables(CUnit &unit)
 			case TRANSPARENCY_INDEX:
 			case GENDER_INDEX:
 			case BIRTHCYCLE_INDEX:
-			case STUN_INDEX:
-			case BLEEDING_INDEX:
-			case LEADERSHIP_INDEX:
-			case BLESSING_INDEX:
-			case INSPIRE_INDEX:
-			case PRECISION_INDEX:
-			case REGENERATION_INDEX:
-			case BARKSKIN_INDEX:
-			case INFUSION_INDEX:
-			case TERROR_INDEX:
-			case WITHER_INDEX:
-			case DEHYDRATION_INDEX:
-			case HYDRATING_INDEX:
 			case TIMEEFFICIENCYBONUS_INDEX:
 			case RESEARCHSPEEDBONUS_INDEX:
 			case GARRISONEDRANGEBONUS_INDEX:

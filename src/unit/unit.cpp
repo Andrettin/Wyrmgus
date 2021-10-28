@@ -86,6 +86,7 @@
 #include "sound/unit_sound_type.h"
 #include "species/species.h"
 #include "spell/spell.h"
+#include "spell/status_effect.h"
 #include "time/time_of_day.h"
 #include "translate.h"
 #include "ui/button.h"
@@ -1836,35 +1837,39 @@ void CUnit::ApplyAura(int aura_index)
 	}
 }
 
-void CUnit::ApplyAuraEffect(int aura_index)
+void CUnit::ApplyAuraEffect(const int aura_index)
 {
-	int effect_index = -1;
-	if (aura_index == LEADERSHIPAURA_INDEX) {
-		if (this->Type->BoolFlag[BUILDING_INDEX].value) {
+	status_effect status_effect;
+
+	switch (aura_index) {
+		case LEADERSHIPAURA_INDEX:
+			if (this->Type->BoolFlag[BUILDING_INDEX].value) {
+				return;
+			}
+
+			status_effect = status_effect::leadership;
+			break;
+		case REGENERATIONAURA_INDEX:
+			if (!this->Type->BoolFlag[ORGANIC_INDEX].value || this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
+				return;
+			}
+
+			status_effect = status_effect::regeneration;
+			break;
+		case HYDRATINGAURA_INDEX:
+			if (!this->Type->BoolFlag[ORGANIC_INDEX].value) {
+				return;
+			}
+
+			this->remove_status_effect(status_effect::dehydration);
+
+			status_effect = status_effect::hydrating;
+			break;
+		default:
 			return;
-		}
-		effect_index = LEADERSHIP_INDEX;
-	} else if (aura_index == REGENERATIONAURA_INDEX) {
-		if (!this->Type->BoolFlag[ORGANIC_INDEX].value || this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
-			return;
-		}
-		effect_index = REGENERATION_INDEX;
-	} else if (aura_index == HYDRATINGAURA_INDEX) {
-		if (!this->Type->BoolFlag[ORGANIC_INDEX].value) {
-			return;
-		}
-		effect_index = HYDRATING_INDEX;
-		this->Variable[DEHYDRATION_INDEX].Max = 0;
-		this->Variable[DEHYDRATION_INDEX].Value = 0;
 	}
-	
-	if (effect_index == -1) {
-		return;
-	}
-	
-	this->Variable[effect_index].Enable = 1;
-	this->Variable[effect_index].Max = std::max(CYCLES_PER_SECOND + 1, this->Variable[effect_index].Max);
-	this->Variable[effect_index].Value = std::max(CYCLES_PER_SECOND + 1, this->Variable[effect_index].Value);
+
+	this->apply_status_effect(status_effect, CYCLES_PER_SECOND + 1);
 }
 
 void CUnit::SetPrefix(const CUpgrade *prefix)
@@ -2807,7 +2812,7 @@ bool CUnit::IsIdle() const
 {
 	//Wyrmgus start
 //	return Orders.size() == 1 && CurrentAction() == UnitAction::Still;
-	return Orders.size() == 1 && CurrentAction() == UnitAction::Still && this->Variable[STUN_INDEX].Value == 0;
+	return Orders.size() == 1 && CurrentAction() == UnitAction::Still && !this->has_status_effect(status_effect::stun);
 	//Wyrmgus end
 }
 
@@ -4602,6 +4607,15 @@ void UnitCountSeen(CUnit &unit)
 	}
 }
 
+bool CUnit::IsAgressive() const
+{
+	//Wyrmgus start
+//		return (Type->BoolFlag[CANATTACK_INDEX].value && !Type->BoolFlag[COWARD_INDEX].value
+	return (CanAttack() && !Type->BoolFlag[COWARD_INDEX].value && !this->has_status_effect(status_effect::terror)
+		//Wyrmgus end
+		&& !this->has_status_effect(status_effect::invisible));
+}
+
 /**
 **  Returns true, if the unit is visible. It check the Viscount of
 **  the player and everyone who shares vision with him.
@@ -4636,7 +4650,7 @@ bool CUnit::IsVisible(const CPlayer &player) const
 
 bool CUnit::is_invisible(const CPlayer &player) const
 {
-	return (&player != this->Player && !!Variable[INVISIBLE_INDEX].Value
+	return (&player != this->Player && this->has_status_effect(status_effect::invisible)
 		&& !player.has_mutual_shared_vision_with(this->Player));
 }
 
@@ -7172,7 +7186,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	int cost = 0;
 
 	// Buildings, non-aggressive and invincible units have the lowest priority
-	if (dest.IsAgressive() == false || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
+	if (dest.IsAgressive() == false || dest.has_status_effect(status_effect::unholy_armor)
 		|| dest.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 		if (dest.Type->CanMove() == false) {
 			return INT_MAX;
@@ -7458,8 +7472,6 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 		target.UpdateXPRequired();
 	} else if (var == XP_INDEX) {
 		target.XPChanged();
-	} else if (var == STUN_INDEX && target.Variable[var].Value > 0) { //if unit has become stunned, stop it
-		CommandStopUnit(target);
 	} else if (var == KNOWLEDGEMAGIC_INDEX) {
 		target.CheckIdentification();
 	}
@@ -7500,19 +7512,16 @@ void HitUnit_NormalHitSpecialDamageEffects(CUnit &attacker, CUnit &target)
 
 void HitUnit_SpecialDamageEffect(CUnit &target, int dmg_var)
 {
-	if (dmg_var == COLDDAMAGE_INDEX && target.Variable[COLDRESISTANCE_INDEX].Value < 100 && target.Type->BoolFlag[ORGANIC_INDEX].value) { //if resistance to cold is 100%, the effect has no chance of being applied
-		int rand_max = 100 * 100 / (100 - target.Variable[COLDRESISTANCE_INDEX].Value);
+	if (dmg_var == COLDDAMAGE_INDEX && target.Variable[COLDRESISTANCE_INDEX].Value < 100 && target.Type->BoolFlag[ORGANIC_INDEX].value) {
+		//if resistance to cold is 100%, the effect has no chance of being applied
+		const int rand_max = 100 * 100 / (100 - target.Variable[COLDRESISTANCE_INDEX].Value);
 		if (SyncRand(rand_max) == 0) {
-			target.Variable[SLOW_INDEX].Enable = 1;
-			target.Variable[SLOW_INDEX].Value = std::max(200, target.Variable[SLOW_INDEX].Value);
-			target.Variable[SLOW_INDEX].Max = 1000;
+			target.apply_status_effect(status_effect::slow, 200);
 		}
 	} else if (dmg_var == LIGHTNINGDAMAGE_INDEX && target.Variable[LIGHTNINGRESISTANCE_INDEX].Value < 100 && target.Type->BoolFlag[ORGANIC_INDEX].value) {
 		int rand_max = 100 * 100 / (100 - target.Variable[LIGHTNINGRESISTANCE_INDEX].Value);
 		if (SyncRand(rand_max) == 0) {
-			target.Variable[STUN_INDEX].Enable = 1;
-			target.Variable[STUN_INDEX].Value = std::max(50, target.Variable[STUN_INDEX].Value);
-			target.Variable[STUN_INDEX].Max = 1000;
+			target.apply_status_effect(status_effect::stun, 50);
 		}
 	}
 }
@@ -7617,7 +7626,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		return;
 	}
 
-	if (target.Variable[UNHOLYARMOR_INDEX].Value > 0 || target.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
+	if (target.has_status_effect(status_effect::unholy_armor) || target.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 		// vladi: units with active UnholyArmour are invulnerable
 		return;
 	}
@@ -7750,7 +7759,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	if (
 		(!target.IsAgressive() || attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value)
 		&& target.CanMove()
-		&& (target.CurrentAction() == UnitAction::Still || target.Variable[TERROR_INDEX].Value > 0)
+		&& (target.CurrentAction() == UnitAction::Still || target.has_status_effect(status_effect::terror))
 		&& !target.BoardCount
 	) {
 	//Wyrmgus end

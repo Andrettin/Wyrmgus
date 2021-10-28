@@ -87,8 +87,6 @@ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 		goal->UpdateXPRequired();
 	} else if (index == XP_INDEX) {
 		goal->XPChanged();
-	} else if (index == STUN_INDEX && goal->Variable[index].Value > 0) { //if unit has become stunned, stop it
-		CommandStopUnit(*goal);
 	} else if (index == KNOWLEDGEMAGIC_INDEX) {
 		goal->CheckIdentification();
 	}

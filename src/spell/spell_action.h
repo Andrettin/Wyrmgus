@@ -61,7 +61,15 @@ public:
 	virtual void process_sml_scope(const sml_data &scope);
 	virtual void check() const {}
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
-	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
+
+	virtual void Parse(lua_State *l, int startIndex, int endIndex)
+	{
+		Q_UNUSED(l)
+		Q_UNUSED(startIndex)
+		Q_UNUSED(endIndex)
+
+		throw std::runtime_error("Lua definition not supported for \"" + this->get_class_identifier() + "\" spell action.");
+	}
 
 	const bool ModifyManaCaster;
 };

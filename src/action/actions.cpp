@@ -65,6 +65,7 @@
 #include "script.h"
 #include "script/condition/condition.h"
 #include "spell/spell.h"
+#include "spell/status_effect.h"
 #include "time/time_of_day.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
@@ -347,16 +348,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 	}
 	
-	static constexpr std::array SpellEffects = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, BLESSING_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, BARKSKIN_INDEX, INFUSION_INDEX, TERROR_INDEX, WITHER_INDEX, DEHYDRATION_INDEX, HYDRATING_INDEX};
-	//  decrease spells effects time.
-	for (const auto spell_effect : SpellEffects) {
-		if (unit.get_variable_value(spell_effect) <= 0) {
-			continue;
-		}
-
-		unit.Variable[spell_effect].Increase = -1;
-		IncreaseVariable(unit, spell_effect);
-	}
+	unit.decrement_status_effect_timers();
 }
 
 /**
@@ -383,16 +375,14 @@ static bool HandleBurnAndPoison(CUnit &unit)
 		//Wyrmgus end
 		return true;
 	}
-	if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
-		//Wyrmgus start
-//		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
-		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain, nullptr, false); //a bit too repetitive to show damage every single time the poison effect is applied
-		//Wyrmgus end
+
+	if (unit.has_status_effect(status_effect::poison) && unit.Type->PoisonDrain) {
+		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain, nullptr, false);
 		return true;
 	}
 
 	//Wyrmgus start
-	if (unit.Variable[BLEEDING_INDEX].Value || unit.Variable[DEHYDRATION_INDEX].Value) {
+	if (unit.has_status_effect(status_effect::bleeding) || unit.has_status_effect(status_effect::dehydration)) {
 		HitUnit(NoUnitP, unit, 1, nullptr, false);
 		//don't return true since we don't want to stop regeneration (positive or negative) from happening
 	}
@@ -416,19 +406,19 @@ static void HandleBuffsEachSecond(CUnit &unit)
 	
 	// User defined variables
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
-		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == BLESSING_INDEX || i == INSPIRE_INDEX || i == PRECISION_INDEX || i == REGENERATION_INDEX || i == BARKSKIN_INDEX || i == INFUSION_INDEX || i == TERROR_INDEX || i == WITHER_INDEX || i == DEHYDRATION_INDEX || i == HYDRATING_INDEX) {
-			continue;
+		if (i == HP_INDEX) {
+			if (HandleBurnAndPoison(unit)) {
+				continue;
+			}
+
+			//Wyrmgus start
+			if (unit.has_status_effect(status_effect::regeneration)) {
+				unit.Variable[i].Value += 1;
+				unit.Variable[i].Value = std::clamp(unit.Variable[i].Value, 0, unit.GetModifiedVariable(i, VariableAttribute::Max));
+			}
+			//Wyrmgus end
 		}
-		if (i == HP_INDEX && HandleBurnAndPoison(unit)) {
-			continue;
-		}
-		//Wyrmgus start
-		if (i == HP_INDEX && unit.Variable[REGENERATION_INDEX].Value > 0) {
-			unit.Variable[i].Value += 1;
-			unit.Variable[i].Value = std::clamp(unit.Variable[i].Value, 0, unit.GetModifiedVariable(i, VariableAttribute::Max));
-		}
-		//Wyrmgus end
+
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
 			IncreaseVariable(unit, i);
 		}
@@ -455,37 +445,36 @@ static void HandleBuffsEachSecond(CUnit &unit)
 					|| (unit.Variable[FORESTSTALK_INDEX].Value > 0 && CMap::get()->TileBordersFlag(unit.tilePos, unit.MapLayer->ID, tile_flag::tree))
 					|| (unit.Variable[SWAMPSTALK_INDEX].Value > 0 && unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->has_flag(tile_flag::mud))
 				)
-				&& (unit.Variable[INVISIBLE_INDEX].Value > 0 || !unit.IsInCombat())
+				&& (unit.has_status_effect(status_effect::invisible) || !unit.IsInCombat())
 			) {
 				std::vector<CUnit *> table;
 				SelectAroundUnit(unit, 1, table, IsEnemyWithUnit(&unit));
-				if (table.size() == 0) { //only apply the -stalk invisibility if the unit is not adjacent to an enemy unit
-					unit.Variable[INVISIBLE_INDEX].Enable = 1;
-					unit.Variable[INVISIBLE_INDEX].Max = std::max(CYCLES_PER_SECOND + 1, unit.Variable[INVISIBLE_INDEX].Max);
-					unit.Variable[INVISIBLE_INDEX].Value = std::max(CYCLES_PER_SECOND + 1, unit.Variable[INVISIBLE_INDEX].Value);
+				if (table.size() == 0) {
+					//only apply the -stalk invisibility if the unit is not adjacent to an enemy unit
+					unit.apply_status_effect(status_effect::invisible, CYCLES_PER_SECOND + 1);
 				}
 			}
 		}
 		
-		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
+		if (
+			//apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
 			unit.Type->BoolFlag[ORGANIC_INDEX].value
 			&& CMap::get()->Info->IsPointOnMap(unit.tilePos, unit.MapLayer)
 			&& unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::desert)
 			&& unit.MapLayer->Field(unit.tilePos)->get_owner() != unit.Player
 			&& unit.get_center_tile_time_of_day() != nullptr
 			&& unit.get_center_tile_time_of_day()->is_day()
-			&& unit.Variable[HYDRATING_INDEX].Value <= 0
+			&& !unit.has_status_effect(status_effect::hydrating)
 			&& unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0
 		) {
-			unit.Variable[DEHYDRATION_INDEX].Enable = 1;
-			unit.Variable[DEHYDRATION_INDEX].Max = std::max(CYCLES_PER_SECOND + 1, unit.Variable[DEHYDRATION_INDEX].Max);
-			unit.Variable[DEHYDRATION_INDEX].Value = std::max(CYCLES_PER_SECOND + 1, unit.Variable[DEHYDRATION_INDEX].Value);
+			unit.apply_status_effect(status_effect::dehydration, CYCLES_PER_SECOND + 1);
 		}
 	}
 	//Wyrmgus end
 
 	//Wyrmgus start
-	if (unit.Variable[TERROR_INDEX].Value > 0) { // if unit is terrified, flee at the sight of enemies
+	if (unit.has_status_effect(status_effect::terror)) {
+		//if the unit is terrified, flee at the sight of enemies
 		std::vector<CUnit *> table;
 		SelectAroundUnit<true>(unit, unit.CurrentSightRange, table, IsAggresiveUnit());
 		for (size_t i = 0; i != table.size(); ++i) {

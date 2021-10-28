@@ -74,6 +74,7 @@ namespace wyrmgus {
 	enum class gender;
 	enum class item_class;
 	enum class item_slot;
+	enum class status_effect;
 }
 
 /*
@@ -241,7 +242,7 @@ public:
 	void ReadWork(const CUpgrade *work, bool affect_character = true);
 	void ConsumeElixir(const CUpgrade *elixir, bool affect_character = true);
 	void ApplyAura(int aura_index);
-	void ApplyAuraEffect(int aura_index);
+	void ApplyAuraEffect(const int aura_index);
 	void SetPrefix(const CUpgrade *prefix);
 	void SetSuffix(const CUpgrade *suffix);
 	void SetSpell(const wyrmgus::spell *spell);
@@ -304,14 +305,7 @@ public:
 	}
 
 	// Cowards and invisible units don't attack unless ordered.
-	bool IsAgressive() const
-	{
-		//Wyrmgus start
-//		return (Type->BoolFlag[CANATTACK_INDEX].value && !Type->BoolFlag[COWARD_INDEX].value
-		return (CanAttack() && !Type->BoolFlag[COWARD_INDEX].value && Variable[TERROR_INDEX].Value == 0
-		//Wyrmgus end
-				&& Variable[INVISIBLE_INDEX].Value == 0);
-	}
+	bool IsAgressive() const;
 
 	/// Returns true, if unit is directly seen by an allied unit.
 	bool IsVisible(const CPlayer &player) const;
@@ -584,6 +578,10 @@ public:
 
 	void decrement_spell_cooldown_timers()
 	{
+		if (this->spell_cooldown_timers.empty()) {
+			return;
+		}
+
 		std::vector<const wyrmgus::spell *> spells_to_remove;
 
 		for (auto &kv_pair : this->spell_cooldown_timers) {
@@ -597,6 +595,68 @@ public:
 
 		for (const wyrmgus::spell *spell : spells_to_remove) {
 			this->spell_cooldown_timers.erase(spell);
+		}
+	}
+
+	bool has_status_effect(const status_effect status_effect) const
+	{
+		return this->status_effect_timers.contains(status_effect);
+	}
+
+	void apply_status_effect(const status_effect status_effect, const int cycles)
+	{
+		this->set_status_effect_timer(status_effect, std::max(cycles, this->get_status_effect_timer(status_effect)));
+	}
+
+	void remove_status_effect(const status_effect status_effect)
+	{
+		this->set_status_effect_timer(status_effect, 0);
+	}
+
+	const std::map<status_effect, int> &get_status_effect_timers() const
+	{
+		return this->status_effect_timers;
+	}
+
+	int get_status_effect_timer(const status_effect status_effect) const
+	{
+		const auto find_iterator = this->status_effect_timers.find(status_effect);
+		if (find_iterator != this->status_effect_timers.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_status_effect_timer(const status_effect status_effect, const int cycles)
+	{
+		if (cycles <= 0) {
+			if (this->status_effect_timers.contains(status_effect)) {
+				this->status_effect_timers.erase(status_effect);
+			}
+		} else {
+			this->status_effect_timers[status_effect] = cycles;
+		}
+	}
+
+	void decrement_status_effect_timers()
+	{
+		if (this->status_effect_timers.empty()) {
+			return;
+		}
+
+		std::vector<status_effect> effects_to_remove;
+
+		for (auto &[status_effect, cycles] : this->status_effect_timers) {
+			--cycles;
+
+			if (cycles <= 0) {
+				effects_to_remove.push_back(status_effect);
+			}
+		}
+
+		for (const status_effect status_effect : effects_to_remove) {
+			this->status_effect_timers.erase(status_effect);
 		}
 	}
 
@@ -851,7 +911,8 @@ public:
 
 private:
 	std::vector<const wyrmgus::spell *> autocast_spells; //the list of autocast spells
-	wyrmgus::spell_map<int> spell_cooldown_timers;   /// how much time unit need to wait before spell will be ready
+	spell_map<int> spell_cooldown_timers; //how many cycles the unit needs to wait before spell will be ready
+	std::map<status_effect, int> status_effect_timers; //how many cycles need to pass until a status effect wears off
 
 public:
 	CUnit *Goal; /// Generic/Teleporter goal pointer

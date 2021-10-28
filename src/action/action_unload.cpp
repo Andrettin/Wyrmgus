@@ -46,6 +46,7 @@
 #include "pathfinder.h"
 #include "player/player.h"
 #include "script.h"
+#include "spell/status_effect.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"
@@ -313,10 +314,8 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, const landmass *landmass)
 	
 	//Wyrmgus start
 	//if this is a naval transporter and the unit has a disembarkment bonus, apply it
-	if (transporter.Type->get_domain() == unit_domain::water && unit.Variable[DISEMBARKMENTBONUS_INDEX].Value > 0 && unit.Variable[INSPIRE_INDEX].Value < 1000) {
-		unit.Variable[INSPIRE_INDEX].Enable = 1;
-		unit.Variable[INSPIRE_INDEX].Value = 1000;
-		unit.Variable[INSPIRE_INDEX].Max = 1000;
+	if (transporter.Type->get_domain() == unit_domain::water && unit.Variable[DISEMBARKMENTBONUS_INDEX].Value > 0) {
+		unit.apply_status_effect(status_effect::inspire, 1000);
 	}
 	//Wyrmgus end
 	

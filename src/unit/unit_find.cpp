@@ -42,6 +42,7 @@
 #include "player/player_type.h"
 #include "script.h"
 #include "spell/spell.h"
+#include "spell/status_effect.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"
 #include "unit/unit_domain_finder.h"
@@ -1056,7 +1057,7 @@ private:
 			return INT_MAX;
 		}
 		// Don't attack invulnerable units
-		if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+		if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->has_status_effect(status_effect::unholy_armor)) {
 			return INT_MAX;
 		}
 
@@ -1206,7 +1207,7 @@ public:
 				return;
 			}
 			// Don't attack invulnerable units
-			if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+			if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->has_status_effect(status_effect::unholy_armor)) {
 				dest->CacheLock = 1;
 				return;
 			}

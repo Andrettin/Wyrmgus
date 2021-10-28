@@ -59,6 +59,7 @@ namespace wyrmgus {
 	class spell_action;
 	class unit_type;
 	enum class spell_target_type;
+	enum class status_effect;
 }
 
 /*
@@ -85,7 +86,7 @@ public:
 ** *******************
 */
 
-class ConditionInfoVariable
+class ConditionInfoVariable final
 {
 public:
 	char Enable = 0;                /// Target is 'user defined variable'.
@@ -135,6 +136,8 @@ public:
 	std::unique_ptr<char[]> BoolFlag;         /// User defined boolean flag.
 
 	std::unique_ptr<ConditionInfoVariable[]> Variable;
+
+	std::map<status_effect, int> status_effect_values;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells

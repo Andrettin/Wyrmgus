@@ -31,6 +31,7 @@
 
 #include "database/database.h"
 #include "database/sml_data.h"
+#include "spell/apply_status_effects_spell_action.h"
 #include "spell/spell_action_adjust_variable.h"
 #include "spell/spell_action_adjust_vitals.h"
 #include "spell/spell_action_spawn_missile.h"
@@ -47,6 +48,8 @@ std::unique_ptr<spell_action> spell_action::from_sml_scope(const sml_data &scope
 		action = std::make_unique<spell_action_adjust_variable>();
 	} else if (action_identifier == "adjust_vitals") {
 		action = std::make_unique<spell_action_adjust_vitals>();
+	} else if (action_identifier == "apply_status_effects") {
+		action = std::make_unique<apply_status_effects_spell_action>();
 	} else if (action_identifier == "spawn_missile") {
 		action = std::make_unique<spell_action_spawn_missile>();
 	} else if (action_identifier == "summon") {
@@ -63,12 +66,12 @@ std::unique_ptr<spell_action> spell_action::from_sml_scope(const sml_data &scope
 
 void spell_action::process_sml_property(const sml_property &property)
 {
-	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\".");
+	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" spell action: \"" + property.get_key() + "\".");
 }
 
 void spell_action::process_sml_scope(const sml_data &scope)
 {
-	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\".");
+	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" spell action: \"" + scope.get_tag() + "\".");
 }
 
 }

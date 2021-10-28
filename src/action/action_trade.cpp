@@ -233,11 +233,6 @@ void COrder_Trade::Execute(CUnit &unit)
 					}
 					unit.Player->change_resource(goal->Type->get_given_resource(), goal->ResourcesHeld, false);
 					unit.Player->change_resource_total(goal->Type->get_given_resource(), goal->ResourcesHeld * unit.Player->get_income(goal->Type->get_given_resource()) / 100);
-				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->get_domain() != unit_domain::air && unit.Type->get_domain() != unit_domain::air_low && unit.Type->get_domain() != unit_domain::space) {
-					unit.Variable[SLOW_INDEX].Value = 1000;
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s has been slowed"), unit.GetMessageName().c_str());
-					}
 				}
 			} else { //cannot use
 				if (unit.Player == CPlayer::GetThisPlayer()) {

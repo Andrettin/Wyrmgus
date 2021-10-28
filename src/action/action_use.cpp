@@ -257,7 +257,8 @@ void COrder_Use::Execute(CUnit &unit)
 						unit.auto_use_item();
 					}
 				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->get_domain() != unit_domain::air && unit.Type->get_domain() != unit_domain::air_low && unit.Type->get_domain() != unit_domain::space) {
-					unit.Variable[SLOW_INDEX].Value = 1000;
+					unit.apply_status_effect(status_effect::slow, 1000);
+
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s has been slowed"), unit.GetMessageName().c_str());
 					}

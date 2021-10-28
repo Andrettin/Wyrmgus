@@ -8,9 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_wait.cpp - The animation Wait. */
-//
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 1998-2021 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,33 +27,54 @@
 
 #include "stratagus.h"
 
-#include "animation/animation_wait.h"
+#include "spell/apply_status_effects_spell_action.h"
 
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "spell/status_effect.h"
 #include "unit/unit.h"
-#include "util/assert_util.h"
+#include "util/string_conversion_util.h"
+#include "util/string_util.h"
 
-void CAnimation_Wait::Action(CUnit &unit, int &/*move*/, int scale) const
+namespace wyrmgus {
+
+void apply_status_effects_spell_action::process_sml_property(const sml_property &property)
 {
-	assert_throw(unit.Anim.Anim == this);
-	unit.Anim.Wait = this->wait << scale >> 8;
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
 
-	if (unit.has_status_effect(status_effect::slow)) {
-		//unit is slowed down
-		unit.Anim.Wait <<= 1;
-	}
+	const status_effect status_effect = string_to_status_effect(key);
 
-	if (unit.has_status_effect(status_effect::haste) && unit.Anim.Wait > 1) {
-		//unit is accelerated
-		unit.Anim.Wait >>= 1;
-	}
-
-	if (unit.Anim.Wait <= 0) {
-		unit.Anim.Wait = 1;
-	}
+	this->status_effect_cycles[status_effect] = std::stoi(value);
 }
 
-void CAnimation_Wait::Init(const char *s, lua_State *)
+int apply_status_effects_spell_action::Cast(CUnit &caster, const spell &, CUnit *target, const Vec2i &goal_pos, int z, int modifier)
 {
-	this->wait = std::stoi(s);
+	Q_UNUSED(caster)
+	Q_UNUSED(goal_pos)
+	Q_UNUSED(z)
+
+	if (target == nullptr) {
+		return 1;
+	}
+
+	for (const auto &[status_effect, cycles] : this->status_effect_cycles) {
+		if (cycles == 0) {
+			//remove status effect
+			target->remove_status_effect(status_effect);
+			continue;
+		}
+
+		target->apply_status_effect(status_effect, cycles * modifier / 100);
+
+		if (status_effect == status_effect::stun) {
+			//if the target has become stunned, stop it
+			CommandStopUnit(*target);
+		}
+	}
+
+	return 1;
+}
+
 }
