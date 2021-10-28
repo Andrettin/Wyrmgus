@@ -451,7 +451,7 @@ public:
 	
 	bool ShowIfCanCastAnySpell;   /// if true, only show if the unit can cast a spell.
 
-	std::optional<status_effect> status_effect;
+	std::optional<wyrmgus::status_effect> status_effect;
 	bool show_as_status_effect = false;
 	bool hero_symbol = false;
 	bool resource_bar = false;
