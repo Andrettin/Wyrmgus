@@ -117,7 +117,7 @@ std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, CUnit &ta
 		order->MinRange = attacker.get_best_attack_range();
 	}
 
-	if (!attacker.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !attacker.Player->has_enemy_stance_with(attacker.Player->get_index()) && target.Player->get_type() == player_type::computer && (attacker.Player->get_type() == player_type::computer || attacker.Player->get_type() == player_type::person)) {
+	if (!attacker.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !attacker.Player->has_enemy_stance_with(target.Player->get_index()) && target.Player->get_type() == player_type::computer && (attacker.Player->get_type() == player_type::computer || attacker.Player->get_type() == player_type::person)) {
 		attacker.Player->set_enemy_diplomatic_stance_with(target.Player);
 	}
 
