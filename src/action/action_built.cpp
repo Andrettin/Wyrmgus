@@ -189,7 +189,6 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus end
 
 	player.IncreaseCountsForUnit(&unit);
-	player.on_unit_built(&unit);
 
 	if (unit.get_site() != nullptr) {
 		wyrmgus::site_game_data *site_game_data = unit.get_site()->get_game_data();
@@ -375,6 +374,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	unit.UpdateSoldUnits();
 	//Wyrmgus end
 	order.Finished = true;
+
+	player.on_unit_built(&unit);
 }
 
 void COrder_Built::Execute(CUnit &unit)
