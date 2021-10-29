@@ -2600,7 +2600,8 @@ void map_template::load_trade_route_image()
 
 			if (terrain != nullptr && terrain->is_water()) {
 				//replace river water pixels with ford ones, and do nothing for non-river water pixels
-				if (terrain_feature != nullptr && terrain_feature->is_major_river()) {
+				if (terrain_feature != nullptr && terrain_feature->is_river()) {
+					/*
 					for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 						for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 							const QPoint offset_pixel_pos(x + x_offset, y + y_offset);
@@ -2619,6 +2620,7 @@ void map_template::load_trade_route_image()
 							terrain_image.setPixelColor(offset_pixel_pos, defines::get()->get_ford_terrain_type()->get_color());
 						}
 					}
+					*/
 
 					overlay_terrain_image.setPixelColor(x, y, color);
 				}
