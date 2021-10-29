@@ -442,6 +442,9 @@ void tile::Save(CFile &file) const
 	if (this->has_flag(tile_flag::water_allowed)) {
 		file.printf(", \"water\"");
 	}
+	if (this->has_flag(tile_flag::ford)) {
+		file.printf(", \"ford\"");
+	}
 	if (this->has_flag(tile_flag::space)) {
 		file.printf(", \"space\"");
 	}
@@ -645,6 +648,8 @@ void tile::parse(lua_State *l)
 			this->Flags |= tile_flag::coast_allowed;
 		} else if (!strcmp(value, "water")) {
 			this->Flags |= tile_flag::water_allowed;
+		} else if (!strcmp(value, "ford")) {
+			this->Flags |= tile_flag::ford;
 		} else if (!strcmp(value, "no-building")) {
 			this->Flags |= tile_flag::no_building;
 		} else if (!strcmp(value, "block")) {

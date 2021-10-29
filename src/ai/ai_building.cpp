@@ -58,7 +58,7 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 	if ((mf.get_flags() & blocked_flag) != tile_flag::none) {
 		return false;
 	}
-	const tile_flag passable_flag = (tile_flag::water_allowed | tile_flag::coast_allowed | tile_flag::land_allowed | tile_flag::space);
+	const tile_flag passable_flag = (tile_flag::water_allowed | tile_flag::coast_allowed | tile_flag::land_allowed | tile_flag::ford | tile_flag::space);
 	return ((mf.get_flags() & passable_flag) != tile_flag::none);
 }
 

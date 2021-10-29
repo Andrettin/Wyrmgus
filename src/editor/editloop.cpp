@@ -1359,7 +1359,7 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 	// Flags info
 	//
 	const tile_flag flag = mf.get_flags();
-	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 			mf.get_value(), enumeration::to_underlying(flag),
 			mf.has_flag(tile_flag::impassable) ? 'u' : '-',
 			mf.has_flag(tile_flag::air_impassable) ? 'A' : '-',
@@ -1370,6 +1370,7 @@ static void DrawEditorInfo(std::vector<std::function<void(renderer *)>> &render_
 			mf.has_flag(tile_flag::land_allowed) ? 'L' : '-',
 			mf.has_flag(tile_flag::coast_allowed) ? 'C' : '-',
 			mf.has_flag(tile_flag::water_allowed) ? 'W' : '-',
+			mf.has_flag(tile_flag::ford) ? 'F' : '-',
 			mf.has_flag(tile_flag::land_unit) ? 'l' : '-',
 			mf.has_flag(tile_flag::air_unit) ? 'a' : '-',
 			mf.has_flag(tile_flag::sea_unit) ? 's' : '-',

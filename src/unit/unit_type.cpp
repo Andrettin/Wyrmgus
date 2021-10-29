@@ -1961,7 +1961,7 @@ void unit_type::calculate_movement_mask()
 
 			if (this->BoolFlag[BUILDING_INDEX].value) {
 				//space buildings must be on space itself, they cannot be on land or water
-				this->MovementMask |= tile_flag::land_allowed | tile_flag::coast_allowed | tile_flag::water_allowed | tile_flag::space_cliff;
+				this->MovementMask |= tile_flag::land_allowed | tile_flag::coast_allowed | tile_flag::water_allowed | tile_flag::ford | tile_flag::space_cliff;
 			}
 			break;
 		default:

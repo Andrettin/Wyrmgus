@@ -637,7 +637,8 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 					success = true;
 				}
 				//Wyrmgus start
-				if (GameCycle == 0 && mf->WaterOnMap() && CMap::get()->TileBordersFlag(pos, z, tile_flag::water_allowed, true)) { // if the game hasn't started, it is possible that coast map fields haven't been applied yet, so we have to check if the tile is a water tile with an adjacent non-water tile (which is what a coastal tile is)
+				if (GameCycle == 0 && mf->WaterOnMap() && CMap::get()->TileBordersFlag(pos, z, tile_flag::water_allowed, true)) {
+					//if the game hasn't started, it is possible that coast map fields haven't been applied yet, so we have to check if the tile is a water tile with an adjacent non-water tile (which is what a coastal tile is)
 					success = true;
 				}
 				//Wyrmgus end

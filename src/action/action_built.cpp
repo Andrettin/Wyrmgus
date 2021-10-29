@@ -287,6 +287,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		if (!type.get_starting_resources().empty()) {
 			unit.SetResourcesHeld(vector::get_random(type.get_starting_resources()));
 		}
+
 		unit.GivesResource = type.get_given_resource()->get_index();
 		//Wyrmgus end
 	}
@@ -297,25 +298,24 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus end
 	if (&player == CPlayer::GetThisPlayer()) {
 		if (type.MapSound->Ready.Sound) {
-			PlayUnitSound(unit, wyrmgus::unit_sound_type::ready);
+			PlayUnitSound(unit, unit_sound_type::ready);
 		}
-		if (worker) {
+
+		if (worker != nullptr) {
 			if (!type.TerrainType || worker->Orders.size() == 1 || worker->Orders[1]->Action != UnitAction::Build) {
-				PlayUnitSound(*worker, wyrmgus::unit_sound_type::work_completed);
+				PlayUnitSound(*worker, unit_sound_type::work_completed);
 			}
 		} else {
-			//Wyrmgus start
-			// why play the under-construction sound if the building has just been completed?
-//			PlayUnitSound(unit, wyrmgus::unit_sound_type::construction);
-			for (size_t i = 0; i != table.size(); ++i) { // see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is null
+			for (size_t i = 0; i != table.size(); ++i) {
+				// see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is null
 				if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->get_goal() == &unit) {
-					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitAction::Build) { //don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
-						PlayUnitSound(*table[i], wyrmgus::unit_sound_type::work_completed);
+					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitAction::Build) {
+						//don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
+						PlayUnitSound(*table[i], unit_sound_type::work_completed);
 						break;
 					}
 				}
 			}
-			//Wyrmgus end
 		}
 	}
 

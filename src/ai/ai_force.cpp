@@ -126,7 +126,8 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 			tile_flag water_movemask = movemask;
 			water_movemask &= ~(tile_flag::water_allowed | tile_flag::coast_allowed);
 			if (CanMoveToMask(pos, water_movemask, unit.MapLayer->ID)) {
-				return VisitResult::Ok; //if movement through water is allowed (with transport ships), then don't make water tiles a dead end, but don't look for units in them either
+				//if movement through water is allowed (with transport ships), then don't make water tiles a dead end, but don't look for units in them either
+				return VisitResult::Ok;
 			}
 		}
 		

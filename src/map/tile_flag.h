@@ -51,6 +51,8 @@ enum class tile_flag : uint32_t {
 	road = 1 << 15,			/// Road (moves faster)
 	railroad = 1 << 16,		/// Railroad (moves faster)
 
+	ford = 1 << 17, //passable for both land and water units
+
 	grass = 1 << 19,		/// Used for playing grass step sounds
 	mud = 1 << 20,			/// Used for playing mud step sounds
 	stone_floor = 1 << 21,	/// Used for playing stone step sounds
@@ -76,6 +78,8 @@ inline tile_flag string_to_tile_flag(const std::string &tile_flag)
 		return tile_flag::coast_allowed;
 	} else if (tile_flag == "water") {
 		return tile_flag::water_allowed;
+	} else if (tile_flag == "ford") {
+		return tile_flag::ford;
 	} else if (tile_flag == "no-building" || tile_flag == "no_building") {
 		return tile_flag::no_building;
 	} else if (tile_flag == "unpassable" || tile_flag == "impassable") {
