@@ -67,11 +67,6 @@
 #include "util/vector_util.h"
 #include "video/video.h"
 
-enum {
-	SUB_STILL_STANDBY = 0,
-	SUB_STILL_ATTACK
-};
-
 std::unique_ptr<COrder> COrder::NewActionStandGround()
 {
 	return std::make_unique<COrder_Still>(true);
@@ -95,8 +90,8 @@ void COrder_Still::Save(CFile &file, const CUnit &unit) const
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	if (this->State != 0) { // useless to write default value
-		file.printf("\"state\", %d", this->State);
+	if (this->current_state != state::standby) { //useless to write default value
+		file.printf("\"state\", %d", static_cast<int>(this->current_state));
 	}
 	file.printf("}");
 }
@@ -107,7 +102,7 @@ bool COrder_Still::ParseSpecificData(lua_State *l, int &j, const char *value, co
 
 	if (!strcmp("state", value)) {
 		++j;
-		this->State = LuaToNumber(l, -1, j + 1);
+		this->current_state = static_cast<state>(LuaToNumber(l, -1, j + 1));
 	} else {
 		return false;
 	}
@@ -456,7 +451,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	if (unit.get_best_attack_range() > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, tile_flag::air_impassable, autoAttackUnit->MapLayer->ID) == false) {
 		return false;
 	}
-	this->State = SUB_STILL_ATTACK; // Mark attacking.
+	this->current_state = state::attack; // Mark attacking.
 	this->set_goal(autoAttackUnit);
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
@@ -532,17 +527,18 @@ void COrder_Still::Execute(CUnit &unit)
 
 	this->Finished = false;
 
-	switch (this->State) {
-		case SUB_STILL_STANDBY:
-			if (!unit.has_status_effect(status_effect::stun)) { //only show the idle animation when still if the unit is not stunned
+	switch (this->current_state) {
+		case state::standby:
+			if (!unit.has_status_effect(status_effect::stun)) {
+				//only show the idle animation when still if the unit is not stunned
 				UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 			}
 			if (SyncRand(100000) == 0) {
-				PlayUnitSound(unit, wyrmgus::unit_sound_type::idle);
+				PlayUnitSound(unit, unit_sound_type::idle);
 			}
 			unit.reset_step_count();
 			break;
-		case SUB_STILL_ATTACK: // attacking unit in attack range.
+		case state::attack: // attacking unit in attack range.
 			AnimateActionAttack(unit, *this);
 			break;
 	}
@@ -557,7 +553,7 @@ void COrder_Still::Execute(CUnit &unit)
 	}
 	//Wyrmgus end
 
-	this->State = SUB_STILL_STANDBY;
+	this->current_state = state::standby;
 	this->Finished = (this->Action == UnitAction::Still);
 	if (this->Action == UnitAction::StandGround || unit.Removed || unit.CanMove() == false) {
 		if (!unit.get_autocast_spells().empty()) {

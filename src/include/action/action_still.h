@@ -30,28 +30,43 @@
 
 #include "actions.h"
 
-class COrder_Still : public COrder
+class COrder_Still final : public COrder
 {
+private:
+	enum class state
+	{
+		standby,
+		attack
+	};
+
 public:
-	explicit COrder_Still(bool stand) : COrder(stand ? UnitAction::StandGround : UnitAction::Still), State(0) {}
+	explicit COrder_Still(const bool stand) : COrder(stand ? UnitAction::StandGround : UnitAction::Still)
+	{
+	}
 
 	virtual std::unique_ptr<COrder> Clone() const override
 	{
 		return std::make_unique<COrder_Still>(*this);
 	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual void OnAnimationAttack(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
+	virtual void Execute(CUnit &unit) override;
+	virtual void OnAnimationAttack(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
+
+	virtual void UpdatePathFinderData(PathFinderInput &input) override
+	{
+		this->UpdatePathFinderData_NotCalled(input);
+	}
+
 private:
 	bool AutoAttackStand(CUnit &unit);
 	bool AutoCastStand(CUnit &unit);
+
 private:
-	int State;
+	state current_state = state::standby;
 };
