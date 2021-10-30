@@ -542,19 +542,22 @@ void COrder_Still::Execute(CUnit &unit)
 			AnimateActionAttack(unit, *this);
 			break;
 	}
-	if (unit.Anim.Unbreakable) { // animation can't be aborted here
+
+	if (unit.Anim.Unbreakable) {
+		//animation can't be aborted here
 		return;
 	}
 
 	//Wyrmgus start
 	if (unit.has_status_effect(status_effect::stun)) {
-		//if unit is stunned, remain still
+		//if the unit is stunned, remain still
 		return;
 	}
 	//Wyrmgus end
 
 	this->current_state = state::standby;
 	this->Finished = (this->Action == UnitAction::Still);
+
 	if (this->Action == UnitAction::StandGround || unit.Removed || unit.CanMove() == false) {
 		if (!unit.get_autocast_spells().empty()) {
 			this->AutoCastStand(unit);
