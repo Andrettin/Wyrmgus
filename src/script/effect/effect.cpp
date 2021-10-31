@@ -48,6 +48,7 @@
 #include "script/effect/remove_unit_effect.h"
 #include "script/effect/resource_effect.h"
 #include "script/effect/scripted_effect_effect.h"
+#include "script/effect/unique_effect.h"
 
 namespace wyrmgus {
 
@@ -73,6 +74,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 	} else if constexpr (std::is_same_v<scope_type, CUnit>) {
 		if (key == "remove_unit") {
 			return std::make_unique<remove_unit_effect>(value, effect_operator);
+		} else if (key == "unique") {
+			return std::make_unique<unique_effect>(value, effect_operator);
 		}
 	}
 
