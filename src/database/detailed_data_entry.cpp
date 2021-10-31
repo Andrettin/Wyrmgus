@@ -38,15 +38,15 @@ void detailed_data_entry::process_text()
 
 	//process the description text for the detailed data entry
 	if (!this->description.empty()) {
-		this->description = text_processor.process_text(std::move(this->description));
+		this->description = text_processor.process_text(std::move(this->description), false);
 	}
 
 	if (!this->quote.empty()) {
-		this->quote = text_processor.process_text(std::move(this->quote));
+		this->quote = text_processor.process_text(std::move(this->quote), false);
 	}
 
 	if (!this->background.empty()) {
-		this->background = text_processor.process_text(std::move(this->background));
+		this->background = text_processor.process_text(std::move(this->background), false);
 	}
 
 	named_data_entry::process_text();

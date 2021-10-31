@@ -170,7 +170,7 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 
 	std::string text;
 	try {
-		text = text_processor.process_text(this->text);
+		text = text_processor.process_text(this->text, true);
 	} catch (const std::exception &exception) {
 		exception::report(exception);
 		text = this->text;

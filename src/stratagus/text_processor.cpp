@@ -46,7 +46,7 @@
 
 namespace wyrmgus {
 
-std::string text_processor::process_text(std::string &&text) const
+std::string text_processor::process_text(std::string &&text, const bool process_in_game_data) const
 {
 	size_t find_pos = 0;
 	while ((find_pos = text.find('[', find_pos)) != std::string::npos) {
@@ -57,8 +57,13 @@ std::string text_processor::process_text(std::string &&text) const
 
 		const std::string substring = text.substr(find_pos + 1, end_pos - (find_pos + 1));
 		std::queue<std::string> tokens = string::split_to_queue(substring, '.');
-		const std::string replacement_str = this->process_tokens(std::move(tokens));
-		text.replace(find_pos, end_pos + 1 - find_pos, replacement_str);
+
+		bool processed = true;
+		const std::string replacement_str = this->process_tokens(std::move(tokens), process_in_game_data, processed);
+
+		if (processed) {
+			text.replace(find_pos, end_pos + 1 - find_pos, replacement_str);
+		}
 
 		++find_pos;
 	}
@@ -66,14 +71,16 @@ std::string text_processor::process_text(std::string &&text) const
 	return text;
 }
 
-std::string text_processor::process_text(const std::string &text) const
+std::string text_processor::process_text(const std::string &text, const bool process_in_game_data) const
 {
 	std::string result = text;
-	return this->process_text(std::move(result));
+	return this->process_text(std::move(result), process_in_game_data);
 }
 
-std::string text_processor::process_tokens(std::queue<std::string> &&tokens) const
+std::string text_processor::process_tokens(std::queue<std::string> &&tokens, const bool process_in_game_data, bool &processed) const
 {
+	processed = true;
+
 	if (tokens.empty()) {
 		return std::string();
 	}
@@ -112,12 +119,39 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 
 		str = this->process_literary_text_tokens(literary_text, tokens);
 	} else if (front_subtoken == "player") {
+		if (!process_in_game_data) {
+			processed = false;
+			return std::string();
+		}
+
 		str = this->process_player_tokens(this->context.script_context.current_player, tokens);
+	} else if (front_subtoken == "site") {
+		const site *site = nullptr;
+		if (!subtokens.empty()) {
+			site = site::get(queue::take(subtokens));
+		}
+
+		str = this->process_site_tokens(site, tokens, process_in_game_data, processed);
 	} else if (front_subtoken == "source_player") {
+		if (!process_in_game_data) {
+			processed = false;
+			return std::string();
+		}
+
 		str = this->process_player_tokens(this->context.script_context.source_player, tokens);
 	} else if (front_subtoken == "source_unit") {
+		if (!process_in_game_data) {
+			processed = false;
+			return std::string();
+		}
+
 		str = this->process_unit_tokens(this->context.script_context.source_unit->get(), tokens);
 	} else if (front_subtoken == "unit") {
+		if (!process_in_game_data) {
+			processed = false;
+			return std::string();
+		}
+
 		str = this->process_unit_tokens(this->context.script_context.current_unit->get(), tokens);
 	} else if (front_subtoken == "unit_class") {
 		const wyrmgus::unit_class *unit_class = nullptr;
@@ -350,14 +384,23 @@ std::string text_processor::process_player_tokens(const CPlayer *player, std::qu
 
 	const std::string front_subtoken = queue::take(subtokens);
 
-	if (front_subtoken == "last_created_unit") {
+	if (front_subtoken == "class_unit_type") {
+		if (subtokens.empty()) {
+			throw std::runtime_error("No unit class specified for the player \"class_unit_type\" token.");
+		}
+
+		const unit_class *unit_class = unit_class::get(queue::take(subtokens));
+		const unit_type *unit_type = player->get_class_unit_type(unit_class);
+
+		return this->process_named_data_entry_tokens(unit_type, tokens);
+	} else if (front_subtoken == "last_created_unit") {
 		return this->process_unit_tokens(player->get_last_created_unit(), tokens);
 	}
 
 	throw std::runtime_error("Failed to process player token \"" + front_subtoken + "\".");
 }
 
-std::string text_processor::process_site_tokens(const wyrmgus::site *site, std::queue<std::string> &tokens) const
+std::string text_processor::process_site_tokens(const wyrmgus::site *site, std::queue<std::string> &tokens, const bool process_in_game_data, bool &processed) const
 {
 	if (site == nullptr) {
 		throw std::runtime_error("No site provided when processing site tokens.");
@@ -378,6 +421,11 @@ std::string text_processor::process_site_tokens(const wyrmgus::site *site, std::
 	const std::string front_subtoken = queue::take(subtokens);
 
 	if (front_subtoken == "current_cultural_name") {
+		if (!process_in_game_data) {
+			processed = false;
+			return std::string();
+		}
+
 		return site->get_game_data()->get_current_cultural_name();
 	} else {
 		return this->process_named_data_entry_token(site, front_subtoken);
@@ -410,7 +458,9 @@ std::string text_processor::process_unit_tokens(const CUnit *unit, std::queue<st
 		if (settlement == nullptr) {
 			settlement = unit->get_center_tile_settlement();
 		}
-		return this->process_site_tokens(settlement, tokens);
+
+		bool processed = true;
+		return this->process_site_tokens(settlement, tokens, true, processed);
 	}
 
 	throw std::runtime_error("Failed to process unit token \"" + front_subtoken + "\".");

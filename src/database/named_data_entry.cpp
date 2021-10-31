@@ -37,7 +37,7 @@ void named_data_entry::process_text()
 	//process the name for the named data entry
 	if (!this->name.empty()) {
 		const text_processor text_processor = this->create_text_processor();
-		this->name = text_processor.process_text(std::move(this->name));
+		this->name = text_processor.process_text(std::move(this->name), false);
 	}
 
 	data_entry::process_text();

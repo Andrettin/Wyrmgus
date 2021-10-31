@@ -98,6 +98,7 @@
 #include "settings.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
+#include "text_processor.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
@@ -2615,14 +2616,24 @@ void CPlayer::update_quest_pool()
 void CPlayer::on_available_quests_changed()
 {
 	if (this == CPlayer::GetThisPlayer()) {
-		for (wyrmgus::button *button : wyrmgus::button::get_all()) {
+		read_only_context script_ctx;
+		script_ctx.source_player = this;
+		script_ctx.current_player = this;
+
+		text_processing_context text_processing_ctx(script_ctx);
+		const text_processor text_processor(std::move(text_processing_ctx));
+
+		for (button *button : button::get_all()) {
 			if (button->Action != ButtonCmd::Quest || button->Value >= static_cast<int>(this->available_quests.size())) {
 				continue;
 			}
 			
-			const wyrmgus::quest *quest = this->available_quests[button->Value];
+			const quest *quest = this->available_quests[button->Value];
 			button->Hint = "Quest: " + quest->get_name();
-			button->Description = quest->get_description() + "\n \nObjectives:";
+
+			button->Description = text_processor.process_text(quest->get_description(), true);
+
+			button->Description += "\n \nObjectives:";
 			for (const auto &objective : quest->get_objectives()) {
 				button->Description += "\n- ";
 				if (!objective->get_objective_string().empty()) {
@@ -2638,9 +2649,11 @@ void CPlayer::on_available_quests_changed()
 			if (!rewards_string.empty()) {
 				button->Description += "\n \nRewards:\n" + rewards_string;
 			}
+
 			if (!quest->get_hint().empty()) {
-				button->Description += "\n \nHint: " + quest->get_hint();
+				button->Description += "\n \nHint: " + text_processor.process_text(quest->get_hint(), true);
 			}
+
 			if (quest->get_highest_completed_difficulty() > difficulty::none) {
 				std::string highest_completed_difficulty;
 				if (quest->get_highest_completed_difficulty() == difficulty::easy) {

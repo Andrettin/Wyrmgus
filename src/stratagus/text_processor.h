@@ -51,9 +51,9 @@ public:
 	{
 	}
 
-	std::string process_text(std::string &&text) const;
-	std::string process_text(const std::string &text) const;
-	std::string process_tokens(std::queue<std::string> &&tokens) const;
+	std::string process_text(std::string &&text, const bool process_in_game_data) const;
+	std::string process_text(const std::string &text, const bool process_in_game_data) const;
+	std::string process_tokens(std::queue<std::string> &&tokens, const bool process_in_game_data, bool &processed) const;
 	std::string process_string_tokens(std::string &&str, std::queue<std::string> &&tokens) const;
 	std::string process_named_data_entry_token(const named_data_entry *data_entry, const std::string &token) const;
 	std::string process_named_data_entry_tokens(const named_data_entry *data_entry, std::queue<std::string> &tokens) const;
@@ -61,7 +61,7 @@ public:
 	std::string process_faction_tokens(const faction *faction, std::queue<std::string> &tokens) const;
 	std::string process_literary_text_tokens(const literary_text *literary_text, std::queue<std::string> &tokens) const;
 	std::string process_player_tokens(const CPlayer *player, std::queue<std::string> &tokens) const;
-	std::string process_site_tokens(const site *site, std::queue<std::string> &tokens) const;
+	std::string process_site_tokens(const site *site, std::queue<std::string> &tokens, const bool process_in_game_data, bool &processed) const;
 	std::string process_unit_tokens(const CUnit *unit, std::queue<std::string> &tokens) const;
 	std::string process_word_tokens(const word *word, std::queue<std::string> &tokens) const;
 	std::string process_word_meaning_tokens(const word *word, std::queue<std::string> &tokens) const;
