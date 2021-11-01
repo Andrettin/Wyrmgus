@@ -1260,9 +1260,6 @@ inline bool CanSelectMultipleUnits(const CPlayer &player)
 }
 
 //Wyrmgus start
-extern void NetworkSetFaction(int player, const std::string &faction_name);
-extern bool IsNameValidForWord(const std::string &word_name);
-
 //for tolua++
 enum PlayerTypes {
 	PlayerNeutral = 2,

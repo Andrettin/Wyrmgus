@@ -9,6 +9,4 @@ enum PlayerTypes {
 
 //Wyrmgus start
 extern void CleanPlayers();
-extern void NetworkSetFaction(int player, std::string faction_name);
-extern bool IsNameValidForWord(std::string word_name);
 //Wyrmgus end

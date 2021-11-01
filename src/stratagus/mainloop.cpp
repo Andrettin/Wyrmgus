@@ -532,10 +532,6 @@ void GameMainLoop()
 	if (GameCycle == 0) {
 		//if the person player has no faction, bring up the faction choice interface
 		if (CPlayer::GetThisPlayer() != nullptr && CPlayer::GetThisPlayer()->get_faction() == nullptr) {
-			std::array<char, 256> buf{};
-			snprintf(buf.data(), sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str() : "", "");
-			CclCommand(buf.data());
-
 			std::vector<faction *> potential_factions = CPlayer::GetThisPlayer()->get_potential_factions();
 
 			if (!potential_factions.empty()) {

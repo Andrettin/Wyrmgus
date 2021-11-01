@@ -4549,42 +4549,4 @@ bool CPlayer::HasHero(const wyrmgus::character *hero) const
 	
 	return false;
 }
-
-void NetworkSetFaction(int player, const std::string &faction_name)
-{
-	SendCommandSetFaction(CPlayer::Players[player].get(), faction::try_get(faction_name));
-}
-
-bool IsNameValidForWord(const std::string &word_name)
-{
-	if (word_name.empty()) {
-		return false;
-	}
-	
-	if (
-		word_name.find('\n') != -1
-		|| word_name.find('\\') != -1
-		|| word_name.find('/') != -1
-		|| word_name.find('.') != -1
-		|| word_name.find('*') != -1
-		|| word_name.find('[') != -1
-		|| word_name.find(']') != -1
-		|| word_name.find(':') != -1
-		|| word_name.find(';') != -1
-		|| word_name.find('=') != -1
-		|| word_name.find(',') != -1
-		|| word_name.find('<') != -1
-		|| word_name.find('>') != -1
-		|| word_name.find('?') != -1
-		|| word_name.find('|') != -1
-	) {
-		return false;
-	}
-	
-	if (word_name.find_first_not_of(' ') == std::string::npos) {
-		return false; //name contains only spaces
-	}
-	
-	return true;
-}
 //Wyrmgus end
