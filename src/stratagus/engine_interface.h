@@ -272,10 +272,11 @@ signals:
 	void running_changed();
 	void scale_factor_changed();
 	void loading_message_changed();
-	void encyclopediaEntryOpened(QString link);
 	void custom_heroes_changed();
 	void this_player_changed();
 	void current_interface_style_changed();
+	void encyclopediaEntryOpened(QString link);
+	void factionChoiceDialogOpened(const QVariantList &factions);
 
 private:
 	std::queue<std::function<void()>> posted_commands;

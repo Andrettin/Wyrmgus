@@ -79,6 +79,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "util/assert_util.h"
+#include "util/container_util.h"
 #include "util/path_util.h"
 #include "util/string_util.h"
 #include "video/font.h"
@@ -495,13 +496,6 @@ void GameMainLoop()
 			game::get()->apply_player_history();
 		}
 		
-		//if the person player has no faction, bring up the faction choice interface
-		if (CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction == -1) {
-			std::array<char, 256> buf{};
-			snprintf(buf.data(), sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str() : "", "");
-			CclCommand(buf.data());
-		}
-		
 		//update the sold units of all units before starting, to make sure they fit the current conditions
 		//make a copy of the units list, as updating the sold units can change the list
 		const std::vector<CUnit *> units = wyrmgus::unit_manager::get()->get_units();
@@ -534,6 +528,25 @@ void GameMainLoop()
 	DisplayLoop();
 
 	engine_interface::get()->set_loading_message("");
+
+	if (GameCycle == 0) {
+		//if the person player has no faction, bring up the faction choice interface
+		if (CPlayer::GetThisPlayer() != nullptr && CPlayer::GetThisPlayer()->get_faction() == nullptr) {
+			std::array<char, 256> buf{};
+			snprintf(buf.data(), sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str() : "", "");
+			CclCommand(buf.data());
+
+			std::vector<faction *> potential_factions = CPlayer::GetThisPlayer()->get_potential_factions();
+
+			if (!potential_factions.empty()) {
+				std::sort(potential_factions.begin(), potential_factions.end(), [](const faction *lhs, const faction *rhs) {
+					return lhs->get_name() < rhs->get_name();
+				});
+
+				emit engine_interface::get()->factionChoiceDialogOpened(container::to_qvariant_list(potential_factions));
+			}
+		}
+	}
 
 	SingleGameLoop();
 

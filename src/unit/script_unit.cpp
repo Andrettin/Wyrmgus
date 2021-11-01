@@ -67,6 +67,7 @@
 #include "util/assert_util.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
+#include "util/point_util.h"
 #include "util/util.h"
 
 /// Get resource by name
@@ -854,7 +855,7 @@ static int CclCreateUnit(lua_State *l)
 
 	//Wyrmgus start
 	if (!CMap::get()->Info->IsPointOnMap(ipos, z)) {
-		fprintf(stderr, "Point on map %d, %d (map layer %d) is invalid.\n", ipos.x, ipos.y, z);
+		log::log_error("Point on map " + point::to_string(ipos) + " (map layer " + std::to_string(z) + ") is invalid.");
 		return 0;
 	}
 	//Wyrmgus end
