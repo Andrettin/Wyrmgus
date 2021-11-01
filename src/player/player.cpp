@@ -1999,14 +1999,10 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 		}
 	}
 
-	//in multiplayer factions can be chosen multiple times by different (human) players, but otherwise factions can only appear for one given player
-	if (!game::get()->is_multiplayer() || this->get_type() != player_type::person) {
-		for (const qunique_ptr<CPlayer> &other_player : CPlayer::Players) {
-
-			if (other_player.get() != this && other_player->get_type() != player_type::nobody && other_player->get_faction() == faction) {
-				//faction is already in use
-				return false;
-			}
+	for (const qunique_ptr<CPlayer> &other_player : CPlayer::Players) {
+		if (other_player.get() != this && other_player->get_type() != player_type::nobody && other_player->get_faction() == faction) {
+			//faction is already in use
+			return false;
 		}
 	}
 
@@ -2054,14 +2050,29 @@ std::vector<faction *> CPlayer::get_potential_factions() const
 				continue;
 			}
 
-			if (!this->can_found_faction(faction)) {
-				continue;
+			const CUpgrade *polity_upgrade = defines::get()->get_faction_type_upgrade(faction_type::polity);
+			const bool can_be_polity = (polity_upgrade != nullptr && check_conditions<false>(polity_upgrade, this, false));
+
+			switch (faction->get_type()) {
+				case faction_type::tribe:
+					if (can_be_polity) {
+						//don't put tribal factions in the list if the player already has access to polity factions
+						continue;
+					}
+					break;
+				case faction_type::polity:
+					if (!can_be_polity) {
+						continue;
+					}
+					break;
+				default:
+					break;
 			}
 
-			if (faction->get_type() == faction_type::tribe) {
-				const CUpgrade *polity_upgrade = defines::get()->get_faction_type_upgrade(faction_type::polity);
-				if (polity_upgrade != nullptr && check_conditions<false>(polity_upgrade, this, false)) {
-					//don't put tribal factions in the list if the player already has access to polity factions
+			//in multiplayer factions can be chosen multiple times by different (human) players, but otherwise factions can only appear for one given player
+			if (!game::get()->is_multiplayer() || this->get_type() != player_type::person) {
+				const CPlayer *faction_player = GetFactionPlayer(faction);
+				if (faction_player != nullptr && faction_player != this) {
 					continue;
 				}
 			}
