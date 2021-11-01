@@ -79,6 +79,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(wyrmgus::faction_tier min_tier MEMBER min_tier READ get_min_tier)
 	Q_PROPERTY(wyrmgus::faction_tier max_tier MEMBER max_tier READ get_max_tier)
 	Q_PROPERTY(wyrmgus::government_type default_government_type MEMBER default_government_type READ get_default_government_type)
+	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade)
 	Q_PROPERTY(wyrmgus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
@@ -180,6 +181,11 @@ public:
 	government_type get_default_government_type() const
 	{
 		return this->default_government_type;
+	}
+
+	bool is_playable() const
+	{
+		return this->playable;
 	}
 
 	player_color *get_color() const
@@ -359,9 +365,7 @@ private:
 	faction_tier min_tier;
 	faction_tier max_tier;
 	government_type default_government_type;
-public:
-	bool Playable = true;												/// faction playability
-private:
+	bool playable = true;
 	wyrmgus::icon *icon = nullptr;
 public:
 	CCurrency *Currency = nullptr;										/// The faction's currency

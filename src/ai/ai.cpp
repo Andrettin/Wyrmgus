@@ -1487,18 +1487,13 @@ void AiEachCycle(CPlayer &player)
 void AiEachSecond(CPlayer &player)
 {
 	AiPlayer = player.Ai.get();
-#ifdef DEBUG
-	if (!AiPlayer) {
-		return;
-	}
-#endif
 
-	//Wyrmgus start
-	//if doesn't have a faction, set a random one for the AI
-	if (player.Faction == -1) {
-		player.SetRandomFaction();
+	assert_throw(AiPlayer != nullptr);
+
+	//if the AI player doesn't have a faction, set a random one for it
+	if (player.get_faction() == nullptr) {
+		player.set_random_faction();
 	}
-	//Wyrmgus end
 
 	//  Advance script
 	AiExecuteScript();

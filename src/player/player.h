@@ -180,7 +180,7 @@ public:
 	void set_civilization(const wyrmgus::civilization *civilization);
 	wyrmgus::faction *get_faction() const;
 	void SetFaction(const wyrmgus::faction *faction);
-	void SetRandomFaction();
+	void set_random_faction();
 
 	wyrmgus::faction_tier get_faction_tier() const
 	{
@@ -290,6 +290,8 @@ public:
 
 	template <bool preconditions_only = false>
 	bool can_found_faction(const wyrmgus::faction *faction) const;
+
+	std::vector<faction *> get_potential_factions() const;
 
 	template <bool preconditions_only = false>
 	bool can_choose_dynasty(const wyrmgus::dynasty *dynasty) const;

@@ -1488,43 +1488,13 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	}
 }
 
-/**
-**  Change player faction to a randomly chosen one.
-**
-**  @param faction    New faction.
-*/
-void CPlayer::SetRandomFaction()
+void CPlayer::set_random_faction()
 {
 	// set random one from the civilization's factions
-	std::vector<wyrmgus::faction *> local_factions;
+	std::vector<faction *> potential_factions = this->get_potential_factions();
 	
-	for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
-		if (faction->get_civilization() != this->get_civilization()) {
-			continue;
-		}
-
-		if (!faction->Playable) {
-			continue;
-		}
-
-		if (!this->can_found_faction(faction)) {
-			continue;
-		}
-
-		const wyrmgus::faction_type faction_type = faction->get_type();
-		const bool has_writing = this->has_upgrade_class(wyrmgus::upgrade_class::get("writing"));
-		if (
-			!(faction_type == wyrmgus::faction_type::tribe && !has_writing)
-			&& !(faction_type == wyrmgus::faction_type::polity && has_writing)
-		) {
-			continue;
-		}
-
-		local_factions.push_back(faction);
-	}
-	
-	if (local_factions.size() > 0) {
-		wyrmgus::faction *chosen_faction = local_factions[SyncRand(local_factions.size())];
+	if (!potential_factions.empty()) {
+		const faction *chosen_faction = vector::get_random(potential_factions);
 		this->SetFaction(chosen_faction);
 	} else {
 		this->SetFaction(nullptr);
@@ -2029,10 +1999,14 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 		}
 	}
 
-	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->get_index() != i && CPlayer::Players[i]->get_type() != player_type::nobody && CPlayer::Players[i]->Race == faction->get_civilization()->ID && CPlayer::Players[i]->Faction == faction->ID) {
-			// faction is already in use
-			return false;
+	//in multiplayer factions can be chosen multiple times by different (human) players, but otherwise factions can only appear for one given player
+	if (!game::get()->is_multiplayer() || this->get_type() != player_type::person) {
+		for (const qunique_ptr<CPlayer> &other_player : CPlayer::Players) {
+
+			if (other_player.get() != this && other_player->get_type() != player_type::nobody && other_player->get_faction() == faction) {
+				//faction is already in use
+				return false;
+			}
 		}
 	}
 
@@ -2062,6 +2036,42 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 
 template bool CPlayer::can_found_faction<false>(const wyrmgus::faction *faction) const;
 template bool CPlayer::can_found_faction<true>(const wyrmgus::faction *faction) const;
+
+std::vector<faction *> CPlayer::get_potential_factions() const
+{
+	std::vector<faction *> faction_list;
+
+	const civilization *civilization = this->get_civilization();
+
+	if (civilization != nullptr) {
+		for (faction *faction : civilization->get_factions()) {
+			if (!faction->is_playable()) {
+				continue;
+			}
+
+			if (faction->get_type() != faction_type::tribe && faction->get_type() != faction_type::polity) {
+				//trading companies, mercenary squads and etc. are not playable
+				continue;
+			}
+
+			if (!this->can_found_faction(faction)) {
+				continue;
+			}
+
+			if (faction->get_type() == faction_type::tribe) {
+				const CUpgrade *polity_upgrade = defines::get()->get_faction_type_upgrade(faction_type::polity);
+				if (polity_upgrade != nullptr && check_conditions<false>(polity_upgrade, this, false)) {
+					//don't put tribal factions in the list if the player already has access to polity factions
+					continue;
+				}
+			}
+
+			faction_list.push_back(faction);
+		}
+	}
+
+	return faction_list;
+}
 
 template <bool preconditions_only>
 bool CPlayer::can_choose_dynasty(const wyrmgus::dynasty *dynasty) const

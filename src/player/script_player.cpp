@@ -1478,7 +1478,7 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "ParentFaction")) {
 			faction->parent_faction = wyrmgus::faction::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Playable")) {
-			faction->Playable = LuaToBoolean(l, -1);
+			faction->playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DefiniteArticle")) {
 			faction->definite_article = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
@@ -2144,7 +2144,7 @@ static int CclGetFactionData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
-		lua_pushboolean(l, faction->Playable);
+		lua_pushboolean(l, faction->is_playable());
 		return 1;
 	} else if (!strcmp(data, "FactionUpgrade")) {
 		if (faction->get_upgrade() != nullptr) {
@@ -2558,9 +2558,9 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "Faction")) {
 		std::string faction_name = LuaToString(l, 3);
 		if (faction_name == "random") {
-			p->SetRandomFaction();
+			p->set_random_faction();
 		} else {
-			p->SetFaction(wyrmgus::faction::try_get(faction_name));
+			p->SetFaction(faction::try_get(faction_name));
 		}
 	} else if (!strcmp(data, "Type")) {
 		p->set_type(static_cast<player_type>(LuaToNumber(l, 3)));

@@ -215,7 +215,8 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 		return;
 	}
 
-	if (!province->Owner->HasTechnologyClass("writing")) { // only factions which have knowledge of writing can produce literary works
+	if (!province->Owner->HasTechnologyClass("writing")) {
+		//only factions which have knowledge of writing can produce literary works
 		return;
 	}
 
