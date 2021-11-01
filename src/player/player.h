@@ -180,6 +180,7 @@ public:
 	void set_civilization(const wyrmgus::civilization *civilization);
 	wyrmgus::faction *get_faction() const;
 	void SetFaction(const wyrmgus::faction *faction);
+	Q_INVOKABLE void set_faction_async(wyrmgus::faction *faction);
 	void set_random_faction();
 
 	wyrmgus::faction_tier get_faction_tier() const

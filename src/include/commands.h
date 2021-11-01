@@ -35,6 +35,7 @@ class CUpgrade;
 
 namespace wyrmgus {
 	class dynasty;
+	class faction;
 	class landmass;
 	class quest;
 	class resource;
@@ -278,7 +279,7 @@ extern void SendCommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, c
 extern void SendCommandDiplomacy(const int player, const diplomacy_state state, const int opponent);
 /// Send shared vision command
 extern void SendCommandSharedVision(int player, bool state, int opponent);
-extern void SendCommandSetFaction(int player, int faction);
+extern void SendCommandSetFaction(CPlayer *player, const faction *faction);
 extern void SendCommandSetDynasty(CPlayer *player, const wyrmgus::dynasty *dynasty);
 extern void SendCommandAutosellResource(int player, int resource);
 

@@ -55,6 +55,7 @@
 #include "ui/resource_icon_image_provider.h"
 #include "unit/unit_list_model.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade_structs.h"
 #include "util/assert_util.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
@@ -116,6 +117,7 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<civilization>("", 1);
 		qmlRegisterAnonymousType<civilization_group>("", 1);
 		qmlRegisterAnonymousType<CPlayer>("", 1);
+		qmlRegisterAnonymousType<CUpgrade>("", 1);
 		qmlRegisterAnonymousType<defines>("", 1);
 		qmlRegisterAnonymousType<faction>("", 1);
 		qmlRegisterAnonymousType<game>("", 1);
@@ -136,6 +138,7 @@ int main(int argc, char **argv)
 		qmlRegisterType<civilization>();
 		qmlRegisterType<civilization_group>();
 		qmlRegisterType<CPlayer>();
+		qmlRegisterType<CUpgrade>();
 		qmlRegisterType<defines>();
 		qmlRegisterType<faction>();
 		qmlRegisterType<game>();

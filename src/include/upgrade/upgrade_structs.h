@@ -268,7 +268,7 @@ class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::upgrade_class* upgrade_class READ get_upgrade_class WRITE set_upgrade_class NOTIFY changed)
 	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring)
-	Q_PROPERTY(QString effects_string READ get_effects_string_qstring)
+	Q_PROPERTY(QString effects_string READ get_effects_string_qstring NOTIFY changed)
 	Q_PROPERTY(bool ability MEMBER ability READ is_ability)
 	Q_PROPERTY(bool weapon MEMBER weapon READ is_weapon)
 	Q_PROPERTY(bool shield MEMBER shield READ is_shield)

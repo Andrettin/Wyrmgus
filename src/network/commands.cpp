@@ -746,17 +746,14 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 	}
 }
 
-void SendCommandSetFaction(const int player, const int faction)
+void SendCommandSetFaction(CPlayer *player, const faction *faction)
 {
 	if (!IsNetworkGame()) {
-		//FIXME: should add log of faction change here
-		if (faction != -1) {
-			CPlayer::Players[player]->SetFaction(wyrmgus::faction::get_all()[faction]);
-		} else {
-			CPlayer::Players[player]->SetFaction(nullptr);
-		}
+		player->SetFaction(faction);
 	} else {
-		NetworkSendExtendedCommand(ExtendedMessageSetFaction, -1, player, faction, 0, 0);
+		const int player_index = player != nullptr ? player->get_index() : -1;
+		const int faction_index = faction != nullptr ? faction->ID : -1;
+		NetworkSendExtendedCommand(ExtendedMessageSetFaction, -1, player_index, faction_index, 0, 0);
 	}
 }
 

@@ -1488,6 +1488,13 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	}
 }
 
+void CPlayer::set_faction_async(wyrmgus::faction *faction)
+{
+	engine_interface::get()->post([this, faction]() {
+		SendCommandSetFaction(this, faction);
+	});
+}
+
 void CPlayer::set_random_faction()
 {
 	// set random one from the civilization's factions
@@ -4545,9 +4552,7 @@ bool CPlayer::HasHero(const wyrmgus::character *hero) const
 
 void NetworkSetFaction(int player, const std::string &faction_name)
 {
-	const wyrmgus::faction *faction = wyrmgus::faction::try_get(faction_name);
-	int faction_id = faction ? faction->ID : -1;
-	SendCommandSetFaction(player, faction_id);
+	SendCommandSetFaction(CPlayer::Players[player].get(), faction::try_get(faction_name));
 }
 
 bool IsNameValidForWord(const std::string &word_name)

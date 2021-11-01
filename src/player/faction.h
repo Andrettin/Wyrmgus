@@ -80,7 +80,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(wyrmgus::faction_tier max_tier MEMBER max_tier READ get_max_tier)
 	Q_PROPERTY(wyrmgus::government_type default_government_type MEMBER default_government_type READ get_default_government_type)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
-	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade)
+	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade NOTIFY changed)
 	Q_PROPERTY(wyrmgus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
 	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
