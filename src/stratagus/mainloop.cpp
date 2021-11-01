@@ -539,6 +539,11 @@ void GameMainLoop()
 					return lhs->get_name() < rhs->get_name();
 				});
 
+				if (!game::get()->is_multiplayer()) {
+					//pause so that the game loop won't start before the player has chosen a faction
+					SetGamePaused(true);
+				}
+
 				emit engine_interface::get()->factionChoiceDialogOpened(container::to_qvariant_list(potential_factions));
 			}
 		}
