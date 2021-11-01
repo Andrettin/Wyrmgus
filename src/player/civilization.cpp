@@ -413,9 +413,9 @@ void civilization::set_encyclopedia_background_file(const std::filesystem::path 
 
 std::string_view civilization::get_title_name(const government_type government_type, const faction_tier tier) const
 {
-	auto find_iterator = this->title_names.find(government_type);
+	const auto find_iterator = this->title_names.find(government_type);
 	if (find_iterator != this->title_names.end()) {
-		auto sub_find_iterator = find_iterator->second.find(tier);
+		const auto sub_find_iterator = find_iterator->second.find(tier);
 		if (sub_find_iterator != find_iterator->second.end()) {
 			return sub_find_iterator->second;
 		}

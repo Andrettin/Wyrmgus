@@ -216,6 +216,10 @@ void faction::process_sml_scope(const sml_data &scope)
 
 void faction::initialize()
 {
+	if (this->civilization != nullptr) {
+		this->civilization->add_faction(this);
+	}
+
 	if (this->get_type() == faction_type::tribe) {
 		this->definite_article = true;
 	}

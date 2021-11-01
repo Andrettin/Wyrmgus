@@ -44,6 +44,7 @@ class ai_force_template;
 class calendar;
 class character;
 class deity;
+class faction;
 class interface_style;
 class language;
 class quest;
@@ -210,6 +211,16 @@ public:
 		return this->ui_fillers;
 	}
 
+	const std::vector<faction *> &get_factions() const
+	{
+		return this->factions;
+	}
+
+	void add_faction(faction *faction)
+	{
+		this->factions.push_back(faction);
+	}
+
 	const std::vector<character *> &get_characters() const
 	{
 		return this->characters;
@@ -262,6 +273,7 @@ public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
 	std::vector<CFiller> ui_fillers;
+	std::vector<faction *> factions;
 	std::vector<character *> characters;
 public:
 	std::vector<deity *> Deities;
