@@ -532,15 +532,15 @@ void CPlayer::Save(CFile &file) const
 	const CPlayer &p = *this;
 	file.printf("Player(%d,\n", this->get_index());
 	//Wyrmgus start
-	file.printf(" \"race\", \"%s\",", p.get_civilization()->get_identifier().c_str());
-	if (p.Faction != -1) {
-		file.printf(" \"faction\", %d,", p.Faction);
+	file.printf(" \"civilization\", \"%s\",", p.get_civilization()->get_identifier().c_str());
+	if (p.get_faction() != nullptr) {
+		file.printf(" \"faction\", \"%s\",", p.get_faction());
 	}
-	if (p.get_faction_tier() != wyrmgus::faction_tier::none) {
-		file.printf(" \"faction-tier\", \"%s\",", wyrmgus::faction_tier_to_string(this->get_faction_tier()).c_str());
+	if (p.get_faction_tier() != faction_tier::none) {
+		file.printf(" \"faction-tier\", \"%s\",", faction_tier_to_string(this->get_faction_tier()).c_str());
 	}
-	if (p.get_government_type() != wyrmgus::government_type::none) {
-		file.printf(" \"government-type\", \"%s\",", wyrmgus::government_type_to_string(this->get_government_type()).c_str());
+	if (p.get_government_type() != government_type::none) {
+		file.printf(" \"government-type\", \"%s\",", government_type_to_string(this->get_government_type()).c_str());
 	}
 	if (p.get_dynasty() != nullptr) {
 		file.printf(" \"dynasty\", \"%s\",", p.get_dynasty()->get_identifier().c_str());
@@ -686,9 +686,9 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"total-kills\", %d,", p.TotalKills);
 	//Wyrmgus start
 	file.printf("\n  \"unit-type-kills\", {");
-	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+	for (const unit_type *unit_type : unit_type::get_all()) {
 		if (p.UnitTypeKills[unit_type->Slot] != 0) {
-			file.printf("\"%s\", %d, ", unit_type->Ident.c_str(), p.UnitTypeKills[unit_type->Slot]);
+			file.printf("\"%s\", %d, ", unit_type->get_identifier().c_str(), p.UnitTypeKills[unit_type->Slot]);
 		}
 	}
 	file.printf("},");

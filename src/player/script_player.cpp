@@ -140,24 +140,22 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "type")) {
 			value = LuaToString(l, j + 1);
 			this->set_type(string_to_player_type(value));
-		} else if (!strcmp(value, "race")) {
+		} else if (!strcmp(value, "civilization")) {
 			const char *civilization_ident = LuaToString(l, j + 1);
-			wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
+			civilization *civilization = civilization::get(civilization_ident);
 			this->Race = civilization->ID;
-		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
-			this->Faction = LuaToNumber(l, j + 1);
+			this->Faction = faction::get(LuaToString(l, j + 1))->ID;
 		} else if (!strcmp(value, "faction-tier")) {
-			this->faction_tier = wyrmgus::string_to_faction_tier(LuaToString(l, j + 1));
+			this->faction_tier = string_to_faction_tier(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "government-type")) {
-			this->government_type = wyrmgus::string_to_government_type(LuaToString(l, j + 1));
+			this->government_type = string_to_government_type(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "dynasty")) {
-			this->dynasty = wyrmgus::dynasty::get(LuaToString(l, j + 1));
+			this->dynasty = dynasty::get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "age")) {
-			this->age = wyrmgus::age::get(LuaToString(l, j + 1));
+			this->age = age::get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "player-color")) {
-			this->player_color = wyrmgus::player_color::get(LuaToString(l, j + 1));
-		//Wyrmgus end
+			this->player_color = player_color::get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "ai-name")) {
 			this->AiName = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "team")) {
