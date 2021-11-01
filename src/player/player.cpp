@@ -923,7 +923,7 @@ void CPlayer::Init(player_type type)
 
 	this->set_type(type);
 	this->Race = wyrmgus::defines::get()->get_neutral_civilization()->ID;
-	this->Faction = -1;
+	this->faction = nullptr;
 	this->faction_tier = wyrmgus::faction_tier::none;
 	this->government_type = wyrmgus::government_type::none;
 	this->religion = nullptr;
@@ -1263,7 +1263,7 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 	if (GameRunning) {
 		this->SetFaction(nullptr);
 	} else {
-		this->Faction = -1;
+		this->faction = nullptr;
 	}
 
 	this->Race = civilization->ID;
@@ -1294,15 +1294,6 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 	}
 }
 
-wyrmgus::faction *CPlayer::get_faction() const
-{
-	if (this->Faction != -1) {
-		return wyrmgus::faction::get_all()[this->Faction];
-	}
-
-	return nullptr;
-}
-
 void CPlayer::SetFaction(const wyrmgus::faction *faction)
 {
 	if (faction == this->get_faction()) {
@@ -1326,8 +1317,6 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		}
 	}
 
-	const int faction_id = faction ? faction->ID : -1;
-	
 	if (old_faction != nullptr && faction != nullptr) {
 		for (const wyrmgus::upgrade_class *upgrade_class : wyrmgus::upgrade_class::get_all()) {
 			const CUpgrade *old_faction_class_upgrade = old_faction->get_class_upgrade(upgrade_class);
@@ -1350,7 +1339,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		personal_names_changed = false;
 	}
 	
-	this->Faction = faction_id;
+	this->faction = faction;
 
 	if (this == CPlayer::GetThisPlayer()) {
 		UI.Load();
@@ -1498,10 +1487,10 @@ void CPlayer::set_faction_async(wyrmgus::faction *faction)
 void CPlayer::set_random_faction()
 {
 	// set random one from the civilization's factions
-	std::vector<faction *> potential_factions = this->get_potential_factions();
+	std::vector<wyrmgus::faction *> potential_factions = this->get_potential_factions();
 	
 	if (!potential_factions.empty()) {
-		const faction *chosen_faction = vector::get_random(potential_factions);
+		const wyrmgus::faction *chosen_faction = vector::get_random(potential_factions);
 		this->SetFaction(chosen_faction);
 	} else {
 		this->SetFaction(nullptr);
@@ -1629,7 +1618,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			continue;
 		}
 
-		if (player.Faction == -1) {
+		if (player.get_faction() == nullptr) {
 			continue;
 		}
 		
@@ -1674,7 +1663,7 @@ int CPlayer::get_player_color_usage_count(const wyrmgus::player_color *player_co
 	int count = 0;
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->get_index() != i && CPlayer::Players[i]->Faction != -1 && CPlayer::Players[i]->get_type() != player_type::nobody && CPlayer::Players[i]->get_player_color() == player_color) {
+		if (this->get_index() != i && CPlayer::Players[i]->get_faction() != nullptr && CPlayer::Players[i]->get_type() != player_type::nobody && CPlayer::Players[i]->get_player_color() == player_color) {
 			count++;
 		}		
 	}
@@ -1703,7 +1692,7 @@ void CPlayer::update_territory_tiles()
 
 unit_type *CPlayer::get_class_unit_type(const unit_class *unit_class) const
 {
-	const faction *faction = this->get_faction();
+	const wyrmgus::faction *faction = this->get_faction();
 	if (faction == nullptr) {
 		return nullptr;
 	}
@@ -1713,7 +1702,7 @@ unit_type *CPlayer::get_class_unit_type(const unit_class *unit_class) const
 
 bool CPlayer::is_class_unit_type(const unit_type *unit_type) const
 {
-	const faction *faction = this->get_faction();
+	const wyrmgus::faction *faction = this->get_faction();
 	if (faction == nullptr) {
 		return false;
 	}
@@ -2042,12 +2031,12 @@ template bool CPlayer::can_found_faction<true>(const wyrmgus::faction *faction) 
 
 std::vector<faction *> CPlayer::get_potential_factions() const
 {
-	std::vector<faction *> faction_list;
+	std::vector<wyrmgus::faction *> faction_list;
 
 	const civilization *civilization = this->get_civilization();
 
 	if (civilization != nullptr) {
-		for (faction *faction : civilization->get_factions()) {
+		for (wyrmgus::faction *faction : civilization->get_factions()) {
 			if (!faction->is_playable()) {
 				continue;
 			}
@@ -2306,15 +2295,15 @@ void CPlayer::Clear()
 {
 	this->name.clear();
 	this->set_type(player_type::none);
-	this->Race = wyrmgus::defines::get()->get_neutral_civilization()->ID;
-	this->Faction = -1;
-	this->faction_tier = wyrmgus::faction_tier::none;
-	this->government_type = wyrmgus::government_type::none;
+	this->Race = defines::get()->get_neutral_civilization()->ID;
+	this->faction = nullptr;
+	this->faction_tier = faction_tier::none;
+	this->government_type = government_type::none;
 	this->religion = nullptr;
 	this->dynasty = nullptr;
 	this->age = nullptr;
 	this->overlord = nullptr;
-	this->vassalage_type = wyrmgus::vassalage_type::none;
+	this->vassalage_type = vassalage_type::none;
 	this->vassals.clear();
 	this->AiName.clear();
 	this->set_alive(false);
@@ -4040,7 +4029,7 @@ void PlayersEachMinute(const int playerIdx)
 void SetPlayersPalette()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->Faction == -1) {
+		if (CPlayer::Players[i]->get_faction() == nullptr) {
 			CPlayer::Players[i]->player_color = vector::get_random(player_color::get_all());
 		}
 	}

@@ -242,7 +242,7 @@ void faction::initialize()
 		}
 
 		//inherit button icons from parent civilization, for button actions which none are specified
-		for (std::map<ButtonCmd, IconConfig>::const_iterator iterator = parent_faction->ButtonIcons.begin(); iterator != parent_faction->ButtonIcons.end(); ++iterator) {
+		for (auto iterator = parent_faction->ButtonIcons.begin(); iterator != parent_faction->ButtonIcons.end(); ++iterator) {
 			if (this->ButtonIcons.find(iterator->first) == this->ButtonIcons.end()) {
 				this->ButtonIcons[iterator->first] = iterator->second;
 			}

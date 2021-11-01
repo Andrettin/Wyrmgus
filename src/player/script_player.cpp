@@ -145,7 +145,7 @@ void CPlayer::Load(lua_State *l)
 			civilization *civilization = civilization::get(civilization_ident);
 			this->Race = civilization->ID;
 		} else if (!strcmp(value, "faction")) {
-			this->Faction = faction::get(LuaToString(l, j + 1))->ID;
+			this->faction = faction::get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "faction-tier")) {
 			this->faction_tier = string_to_faction_tier(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "government-type")) {
@@ -1546,9 +1546,7 @@ static int CclDefineFaction(lua_State *l)
 				const ButtonCmd button_action = GetButtonActionIdByName(button_action_name);
 				if (button_action != ButtonCmd::None) {
 					++j;
-					faction->ButtonIcons[button_action].Name = LuaToString(l, -1, j + 1);
-					faction->ButtonIcons[button_action].Icon = nullptr;
-					faction->ButtonIcons[button_action].Load();
+					faction->ButtonIcons[button_action] = icon::get(LuaToString(l, -1, j + 1));
 				} else {
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
 				}

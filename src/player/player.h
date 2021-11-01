@@ -178,7 +178,12 @@ public:
 	//Wyrmgus start
 	const wyrmgus::civilization *get_civilization() const;
 	void set_civilization(const wyrmgus::civilization *civilization);
-	wyrmgus::faction *get_faction() const;
+
+	const wyrmgus::faction *get_faction() const
+	{
+		return this->faction;
+	}
+
 	void SetFaction(const wyrmgus::faction *faction);
 	Q_INVOKABLE void set_faction_async(wyrmgus::faction *faction);
 	void set_random_faction();
@@ -292,7 +297,7 @@ public:
 	template <bool preconditions_only = false>
 	bool can_found_faction(const wyrmgus::faction *faction) const;
 
-	std::vector<faction *> get_potential_factions() const;
+	std::vector<wyrmgus::faction *> get_potential_factions() const;
 
 	template <bool preconditions_only = false>
 	bool can_choose_dynasty(const wyrmgus::dynasty *dynasty) const;
@@ -1015,8 +1020,8 @@ private:
 	player_type type; //type of the player (human, computer, ...)
 public:
 	int Race = 0; //race of the player (orc, human, ...)
-	int Faction = -1; //faction of the player
 private:
+	const wyrmgus::faction *faction = nullptr;
 	wyrmgus::faction_tier faction_tier;
 	wyrmgus::government_type government_type;
 	wyrmgus::religion *religion = nullptr; //religion of the player

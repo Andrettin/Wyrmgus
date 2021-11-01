@@ -71,7 +71,7 @@ void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex)
 			this->civilization = civilization;
 		} else if (!strcmp(value, "faction")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Faction = wyrmgus::faction::get(value)->ID;
+			this->Faction = faction::get(value)->ID;
 		} else if (!strcmp(value, "detachment")) {
 			this->Detachment = true;
 			--j;

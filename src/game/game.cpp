@@ -987,7 +987,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, const int writeTerrain)
 				CPlayer::Players[i]->get_resource(resource::get_all()[StoneCost]));
 			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
 				i, civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
-			if (CPlayer::Players[i]->Faction != -1) {
+			if (CPlayer::Players[i]->get_faction() != nullptr) {
 				f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
 					i, CPlayer::Players[i]->get_faction()->get_identifier().c_str());
 			}

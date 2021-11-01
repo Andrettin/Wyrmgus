@@ -699,7 +699,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 //Wyrmgus start
 void AiTransportCapacityRequest(const int capacity_needed, const landmass *landmass)
 {
-	if (AiPlayer->Player->Faction == -1) {
+	if (AiPlayer->Player->get_faction() == nullptr) {
 		return;
 	}
 
@@ -765,7 +765,7 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 			}
 		}
 
-		if (!has_builder && AiPlayer->Player->Faction != -1) {
+		if (!has_builder && AiPlayer->Player->get_faction() != nullptr) {
 			for (const wyrmgus::unit_class *builder_class : AiHelpers.get_trainer_classes(best_type->get_unit_class())) {
 				const wyrmgus::unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
@@ -2332,7 +2332,7 @@ void AiCheckSettlementConstruction()
 			}
 		}
 
-		if (!requested_settlement && AiPlayer->Player->Faction != -1) {
+		if (!requested_settlement && AiPlayer->Player->get_faction() != nullptr) {
 			for (const wyrmgus::unit_class *builder_class : AiHelpers.get_builder_classes(town_hall_type->get_unit_class())) {
 				const wyrmgus::unit_type *builder_type = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
@@ -2477,7 +2477,7 @@ void AiCheckUpgrades()
 
 void AiCheckBuildings()
 {
-	if (AiPlayer->Player->Race == -1 || AiPlayer->Player->Faction == -1) {
+	if (AiPlayer->Player->Race == -1 || AiPlayer->Player->get_faction() == nullptr) {
 		return;
 	}
 
@@ -2667,7 +2667,7 @@ static void AiCheckMinecartSalvaging()
 	
 void AiCheckWorkers()
 {
-	if (AiPlayer->Player->Race == -1 || AiPlayer->Player->Faction == -1) {
+	if (AiPlayer->Player->Race == -1 || AiPlayer->Player->get_faction() == nullptr) {
 		return;
 	}
 

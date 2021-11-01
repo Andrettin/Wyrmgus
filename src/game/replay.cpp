@@ -40,6 +40,7 @@
 #include "network.h"
 #include "parameters.h"
 #include "player/diplomacy_state.h"
+#include "player/faction.h"
 #include "player/player.h"
 #include "player/player_type.h"
 //Wyrmgus start
@@ -87,7 +88,7 @@ public:
 	std::string AIScript;
 	int Race = 0;
 	//Wyrmgus start
-	int Faction = -1;
+	const faction *Faction = nullptr;
 	//Wyrmgus end
 	int Team = 0;
 	player_type Type = player_type::none;
@@ -183,7 +184,7 @@ static std::unique_ptr<FullReplay> StartReplay()
 		replay->Players[i].AIScript = GameSettings.Presets[i].AIScript;
 		replay->Players[i].Race = GameSettings.Presets[i].Race;
 		//Wyrmgus start
-		replay->Players[i].Faction = CPlayer::Players[i]->Faction;
+		replay->Players[i].Faction = CPlayer::Players[i]->get_faction();
 		//Wyrmgus end
 		replay->Players[i].Team = GameSettings.Presets[i].Team;
 		replay->Players[i].Type = GameSettings.Presets[i].Type;
@@ -241,7 +242,7 @@ static void ApplyReplaySettings()
 		GameSettings.Presets[i].AIScript = CurrentReplay->Players[i].AIScript;
 		GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
 		//Wyrmgus start
-		CPlayer::Players[i]->Faction = CurrentReplay->Players[i].Faction; // should use a game settings preset instead
+		CPlayer::Players[i]->SetFaction(CurrentReplay->Players[i].Faction); // should use a game settings preset instead
 		//Wyrmgus end
 		GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
 		GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
@@ -328,7 +329,9 @@ static void SaveFullLog(CFile &file)
 		file.printf(" AIScript = \"%s\",", CurrentReplay->Players[i].AIScript.c_str());
 		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
 		//Wyrmgus start
-		file.printf(" Faction = %d,", CurrentReplay->Players[i].Faction);
+		if (CurrentReplay->Players[i].Faction != nullptr) {
+			file.printf(" Faction = \"%s\",", CurrentReplay->Players[i].Faction->get_identifier().c_str());
+		}
 		//Wyrmgus end
 		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
 		file.printf(" Type = %d }%s", static_cast<int>(CurrentReplay->Players[i].Type),
@@ -614,7 +617,7 @@ static int CclReplayLog(lua_State *l)
 						CurrentReplay->Players[j].Race = LuaToNumber(l, -1);
 					//Wyrmgus start
 					} else if (!strcmp(value, "Faction")) {
-						CurrentReplay->Players[j].Faction = LuaToNumber(l, -1);
+						CurrentReplay->Players[j].Faction = faction::get(LuaToString(l, -1));
 					//Wyrmgus end
 					} else if (!strcmp(value, "Team")) {
 						CurrentReplay->Players[j].Team = LuaToNumber(l, -1);

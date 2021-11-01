@@ -385,7 +385,7 @@ private:
 	character_title_name_map character_title_names;
 public:
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
-	std::map<ButtonCmd, IconConfig> ButtonIcons;						/// icons for button actions
+	std::map<ButtonCmd, const wyrmgus::icon *> ButtonIcons;				/// icons for button actions
 private:
 	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the faction
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the faction

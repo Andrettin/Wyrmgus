@@ -1473,7 +1473,7 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 		}
 		
 		if (faction != nullptr && faction->ButtonIcons.find(button_action) != faction->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = faction->ButtonIcons.find(button_action)->second.Icon;
+			this->ButtonIcons[button_action] = faction->ButtonIcons.find(button_action)->second;
 			return;
 		} else if (PlayerRaces.ButtonIcons[civilization->ID].find(button_action) != PlayerRaces.ButtonIcons[civilization->ID].end()) {
 			this->ButtonIcons[button_action] = PlayerRaces.ButtonIcons[civilization->ID][button_action].Icon;
@@ -6744,11 +6744,19 @@ const icon *CUnit::get_icon() const
 
 const wyrmgus::icon *CUnit::GetButtonIcon(const ButtonCmd button_action) const
 {
-	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
-		return this->ButtonIcons.find(button_action)->second;
-	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->get_faction() != nullptr && CPlayer::GetThisPlayer()->get_faction()->ButtonIcons.find(button_action) != CPlayer::GetThisPlayer()->get_faction()->ButtonIcons.end()) {
-		return CPlayer::GetThisPlayer()->get_faction()->ButtonIcons[button_action].Icon;
-	} else if (this->Player == CPlayer::GetThisPlayer() && PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].find(button_action) != PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].end()) {
+	auto find_iterator = this->ButtonIcons.find(button_action);
+	if (find_iterator != this->ButtonIcons.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->get_faction() != nullptr) {
+		find_iterator = CPlayer::GetThisPlayer()->get_faction()->ButtonIcons.find(button_action);
+		if (find_iterator != CPlayer::GetThisPlayer()->get_faction()->ButtonIcons.end()) {
+			return find_iterator->second;
+		}
+	}
+
+	if (this->Player == CPlayer::GetThisPlayer() && PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].find(button_action) != PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].end()) {
 		return PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race][button_action].Icon;
 	}
 	
