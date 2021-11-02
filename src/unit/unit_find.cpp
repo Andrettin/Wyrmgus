@@ -922,7 +922,8 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2, in
 		if (!unit.IsVisibleAsGoal(*source.Player)) {
 			continue;
 		}
-		if (!CanTarget(*source.Type, *unit.Type)) {
+
+		if (!source.Type->can_target(unit.Type)) {
 			continue;
 		}
 
@@ -1053,7 +1054,7 @@ private:
 			)
 		//Wyrmgus end
 			|| !dest->IsVisibleAsGoal(player)
-			|| !CanTarget(type, dtype)) {
+			|| !type.can_target(&dtype)) {
 			return INT_MAX;
 		}
 		// Don't attack invulnerable units
@@ -1119,7 +1120,7 @@ private:
 		}
 
 		// Unit can attack back.
-		if (CanTarget(dtype, type)) {
+		if (dtype.can_target(&type)) {
 			cost -= CANATTACK_BONUS;
 		}
 		return cost;
@@ -1201,11 +1202,13 @@ public:
 
 			const wyrmgus::unit_type &type =  *attacker->Type;
 			const wyrmgus::unit_type &dtype = *dest->Type;
+
 			// won't be a target...
-			if (!CanTarget(type, dtype)) { // can't be attacked.
+			if (!type.can_target(&dtype)) { // can't be attacked.
 				dest->CacheLock = 1;
 				return;
 			}
+
 			// Don't attack invulnerable units
 			if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->has_status_effect(status_effect::unholy_armor)) {
 				dest->CacheLock = 1;
@@ -1277,7 +1280,7 @@ public:
 				cost += -effective_hp * HEALTH_FACTOR;
 
 				//  Unit can attack back.
-				if (CanTarget(dtype, type)) {
+				if (dtype.can_target(&type)) {
 					cost += CANATTACK_BONUS;
 				}
 

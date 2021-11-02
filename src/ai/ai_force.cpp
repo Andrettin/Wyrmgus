@@ -151,7 +151,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 				!unit.is_enemy_of(*dest) // a friend or neutral
 				&& (!include_neutral || unit.is_allied_with(*dest) || unit.Player == dest->Player || unit.Player->has_building_access(dest->Player))
 			)
-			|| !CanTarget(*unit.Type, dtype)
+			|| !unit.Type->can_target(&dtype)
 		) {
 			continue;
 		}

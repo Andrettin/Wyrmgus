@@ -66,6 +66,7 @@
 #include "ui/button_cmd.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
+#include "unit/can_target_flag.h"
 #include "unit/construction.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
@@ -1253,21 +1254,21 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "CanTargetLand")) {
 			if (LuaToBoolean(l, -1)) {
-				type->CanTarget |= CanTargetLand;
+				type->can_target_flags |= can_target_flag::land;
 			} else {
-				type->CanTarget &= ~CanTargetLand;
+				type->can_target_flags &= ~can_target_flag::land;
 			}
 		} else if (!strcmp(value, "CanTargetSea")) {
 			if (LuaToBoolean(l, -1)) {
-				type->CanTarget |= CanTargetSea;
+				type->can_target_flags |= can_target_flag::water;
 			} else {
-				type->CanTarget &= ~CanTargetSea;
+				type->can_target_flags &= ~can_target_flag::water;
 			}
 		} else if (!strcmp(value, "CanTargetAir")) {
 			if (LuaToBoolean(l, -1)) {
-				type->CanTarget |= CanTargetAir;
+				type->can_target_flags |= can_target_flag::air;
 			} else {
-				type->CanTarget &= ~CanTargetAir;
+				type->can_target_flags &= ~can_target_flag::air;
 			}
 		} else if (!strcmp(value, "BuildingRules")) {
 			if (!lua_istable(l, -1)) {

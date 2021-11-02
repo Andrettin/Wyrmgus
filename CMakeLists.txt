@@ -472,6 +472,7 @@ source_group(ui FILES ${ui_SRCS})
 
 set(unit_SRCS
 	src/unit/build.cpp
+	src/unit/can_target_flag.cpp
 	src/unit/construction.cpp
 	src/unit/historical_unit.cpp
 	src/unit/historical_unit_history.cpp
@@ -1027,6 +1028,7 @@ set(wyrmgus_ui_HDRS
 )
 
 set(wyrmgus_unit_HDRS
+	src/unit/can_target_flag.h
 	src/unit/construction.h
 	src/unit/historical_unit.h
 	src/unit/historical_unit_history.h

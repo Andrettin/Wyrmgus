@@ -62,6 +62,7 @@
 #include "ui/button_cmd.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
+#include "unit/can_target_flag.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_domain.h"
@@ -241,10 +242,6 @@
 **  unit_type::Points
 **
 **    How many points you get for unit. Used in the final score table.
-**
-**  unit_type::CanTarget
-**
-**    Which units can it attack
 **
 **  unit_type::LandUnit
 **
@@ -640,6 +637,7 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	domain(unit_domain::land),
 	FieldFlags(tile_flag::none),
 	MovementMask(tile_flag::none),
+	can_target_flags(can_target_flag::none),
 	Flip(1),
 	ExplodeWhenKilled(0),
 	CanAttack(0),
@@ -705,23 +703,23 @@ void unit_type::process_sml_property(const sml_property &property)
 	} else if (key == "can_target_land") {
 		const bool can_target_land = string::to_bool(value);
 		if (can_target_land) {
-			this->CanTarget |= CanTargetLand;
+			this->can_target_flags |= can_target_flag::land;
 		} else {
-			this->CanTarget &= ~CanTargetLand;
+			this->can_target_flags &= ~can_target_flag::land;
 		}
-	} else if (key == "can_target_sea") {
+	} else if (key == "can_target_water") {
 		const bool can_target_sea = string::to_bool(value);
 		if (can_target_sea) {
-			this->CanTarget |= CanTargetSea;
+			this->can_target_flags |= can_target_flag::water;
 		} else {
-			this->CanTarget &= ~CanTargetSea;
+			this->can_target_flags &= ~can_target_flag::water;
 		}
 	} else if (key == "can_target_air") {
 		const bool can_target_air = string::to_bool(value);
 		if (can_target_air) {
-			this->CanTarget |= CanTargetAir;
+			this->can_target_flags |= can_target_flag::air;
 		} else {
-			this->CanTarget &= ~CanTargetAir;
+			this->can_target_flags &= ~can_target_flag::air;
 		}
 	} else if (key == "right_mouse_action") {
 		if (value == "none") {
@@ -1089,23 +1087,23 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "can_target_land") {
 			const bool can_target_land = string::to_bool(value);
 			if (can_target_land) {
-				this->CanTarget |= CanTargetLand;
+				this->can_target_flags |= can_target_flag::land;
 			} else {
-				this->CanTarget &= ~CanTargetLand;
+				this->can_target_flags &= ~can_target_flag::land;
 			}
-		} else if (key == "can_target_sea") {
+		} else if (key == "can_target_water") {
 			const bool can_target_sea = string::to_bool(value);
 			if (can_target_sea) {
-				this->CanTarget |= CanTargetSea;
+				this->can_target_flags |= can_target_flag::water;
 			} else {
-				this->CanTarget &= ~CanTargetSea;
+				this->can_target_flags &= ~can_target_flag::water;
 			}
 		} else if (key == "can_target_air") {
 			const bool can_target_air = string::to_bool(value);
 			if (can_target_air) {
-				this->CanTarget |= CanTargetAir;
+				this->can_target_flags |= can_target_flag::air;
 			} else {
-				this->CanTarget &= ~CanTargetAir;
+				this->can_target_flags &= ~can_target_flag::air;
 			}
 		} else if (key == "random_movement_probability") {
 			this->random_movement_probability = std::stoi(value);
@@ -1727,6 +1725,38 @@ bool unit_type::CanSelect(GroupSelectionMode mode) const
 	return false;
 }
 
+bool unit_type::can_target(const unit_type *other_unit_type) const
+{
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
+		if (this->BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {
+			if ((this->BoolFlag[i].CanTargetFlag == CONDITION_ONLY) ^
+				(other_unit_type->BoolFlag[i].value)) {
+				return false;
+			}
+		}
+	}
+
+	switch (other_unit_type->get_domain()) {
+		case unit_domain::land:
+			if (other_unit_type->BoolFlag[SHOREBUILDING_INDEX].value) {
+				return (this->can_target_flags & (can_target_flag::land | can_target_flag::water)) != can_target_flag::none;
+			}
+
+			return (this->can_target_flags & can_target_flag::land) != can_target_flag::none;
+		case unit_domain::water:
+			return (this->can_target_flags & can_target_flag::water) != can_target_flag::none;
+		case unit_domain::air_low:
+			return (this->can_target_flags & (can_target_flag::land | can_target_flag::water | can_target_flag::air)) != can_target_flag::none;
+		case unit_domain::air:
+		case unit_domain::space:
+			return (this->can_target_flags & can_target_flag::air) != can_target_flag::none;
+		default:
+			break;
+	}
+
+	return false;
+}
+
 void unit_type::set_parent(const unit_type *parent_type)
 {
 	if (!parent_type->is_defined()) {
@@ -1777,7 +1807,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->repair_hp = parent_type->repair_hp;
 	this->MouseAction = parent_type->MouseAction;
 	this->CanAttack = parent_type->CanAttack;
-	this->CanTarget = parent_type->CanTarget;
+	this->can_target_flags = parent_type->can_target_flags;
 	this->BoardSize = parent_type->BoardSize;
 	this->ButtonLevelForTransporter = parent_type->ButtonLevelForTransporter;
 	this->ButtonPos = parent_type->ButtonPos;

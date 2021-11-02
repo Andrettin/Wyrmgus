@@ -6102,7 +6102,7 @@ bool CUnit::IsInCombat() const
 	for (size_t i = 0; i < table.size(); ++i) {
 		const CUnit &target = *table[i];
 
-		if (target.IsVisibleAsGoal(*this->Player) && (CanTarget(*this->Type, *target.Type) || CanTarget(*target.Type, *this->Type))) {
+		if (target.IsVisibleAsGoal(*this->Player) && (this->Type->can_target(target.Type) || target.Type->can_target(this->Type))) {
 			return true;
 		}
 	}
@@ -7232,7 +7232,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	}
 
 	// Unit can attack back.
-	if (CanTarget(dtype, type)) {
+	if (dtype.can_target(&type)) {
 		cost -= CANATTACK_BONUS;
 	}
 	return cost;
@@ -7578,7 +7578,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	CUnit *oldgoal = target.CurrentOrder()->get_goal();
 	CUnit *goal, *best = oldgoal;
 
-	if (RevealAttacker && CanTarget(*target.Type, *attacker.Type)) {
+	if (RevealAttacker && target.Type->can_target(attacker.Type)) {
 		// Reveal Unit that is attacking
 		goal = &attacker;
 	} else {
@@ -7594,11 +7594,13 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	if (!best || (goal && (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best)))) {
 		best = goal;
 	}
-	if (CanTarget(*target.Type, *attacker.Type)
+
+	if (target.Type->can_target(attacker.Type)
 		&& (!best || (goal != &attacker
 					  && (ThreatCalculate(target, attacker) < ThreatCalculate(target, *best))))) {
 		best = &attacker;
 	}
+
 	//Wyrmgus start
 //	if (best && best != oldgoal && best->Player != target.Player && best->is_allied_with(target) == false) {
 	if (best && best != oldgoal && (best->Player != target.Player || target.Player->get_type() == player_type::neutral) && best->is_allied_with(target) == false) {
@@ -7930,44 +7932,6 @@ int ViewPointDistanceToUnit(const CUnit &dest)
 //	return dest.MapDistanceTo(midPos);
 	return dest.MapDistanceTo(midPos, UI.CurrentMapLayer->ID);
 	//Wyrmgus end
-}
-
-/**
-**  Can the source unit attack the destination unit.
-**
-**  @param source  Unit type pointer of the attacker.
-**  @param dest    Unit type pointer of the target.
-**
-**  @return        0 if attacker can't target the unit, else a positive number.
-*/
-int CanTarget(const wyrmgus::unit_type &source, const wyrmgus::unit_type &dest)
-{
-	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
-		if (source.BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {
-			if ((source.BoolFlag[i].CanTargetFlag == CONDITION_ONLY) ^
-				(dest.BoolFlag[i].value)) {
-				return 0;
-			}
-		}
-	}
-	if (dest.get_domain() == unit_domain::land) {
-		if (dest.BoolFlag[SHOREBUILDING_INDEX].value) {
-			return source.CanTarget & (CanTargetLand | CanTargetSea);
-		}
-		return source.CanTarget & CanTargetLand;
-	}
-	if (dest.get_domain() == unit_domain::air || dest.get_domain() == unit_domain::space) {
-		return source.CanTarget & CanTargetAir;
-	}
-	//Wyrmgus start
-	if (dest.get_domain() == unit_domain::air_low) {
-		return source.CanTarget & (CanTargetLand | CanTargetAir | CanTargetSea);
-	}
-	//Wyrmgus end
-	if (dest.get_domain() == unit_domain::water) {
-		return source.CanTarget & CanTargetSea;
-	}
-	return 0;
 }
 
 /**

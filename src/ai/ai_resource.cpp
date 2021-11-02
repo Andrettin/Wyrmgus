@@ -214,13 +214,16 @@ private:
 class IsAEnemyUnitWhichCanCounterAttackOf
 {
 public:
-	explicit IsAEnemyUnitWhichCanCounterAttackOf(const CPlayer &_player, const wyrmgus::unit_type &_type) :
+	explicit IsAEnemyUnitWhichCanCounterAttackOf(const CPlayer &_player, const unit_type &_type) :
 		player(&_player), type(&_type)
-	{}
+	{
+	}
+
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*player) && unit->is_enemy_of(*player) && CanTarget(*unit->Type, *type);
+		return unit->IsVisibleAsGoal(*player) && unit->is_enemy_of(*player) && unit->Type->can_target(type);
 	}
+
 private:
 	const CPlayer *player;
 	const wyrmgus::unit_type *type;

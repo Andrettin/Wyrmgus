@@ -59,6 +59,7 @@ public:
 	void operator()(CUnit *const unit) const
 	{
 		const wyrmgus::unit_type &type = *unit->Type;
+
 		// unusable unit ?
 		// if (unit->IsUnusable()) can't attack constructions
 		// FIXME: did SelectUnitsOnTile already filter this?
@@ -68,22 +69,27 @@ public:
 			|| unit->CurrentAction() == UnitAction::Die) {
 			return;
 		}
+
 		if (unit->Type->get_domain() == unit_domain::air && unit->IsAgressive() == false) {
 			return;
 		}
+
 		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.get_tile_width()
 			|| pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type.get_tile_height()) {
 			return;
 		}
-		if (!CanTarget(*source->Type, type)) {
+
+		if (!source->Type->can_target(&type)) {
 			return;
 		}
+
 		//Wyrmgus start
 //		if (!source->Player->is_enemy_of(*unit)) { // a friend or neutral
 		if (!source->is_enemy_of(*unit)) { // a friend or neutral
 		//Wyrmgus end
 			return;
 		}
+
 		// Choose the best target.
 		if (!*best || (*best)->Variable[PRIORITY_INDEX].Value < unit->Variable[PRIORITY_INDEX].Value) {
 			*best = unit;

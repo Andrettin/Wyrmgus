@@ -1099,7 +1099,7 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 			&& (missile.Type->FriendlyFire == true || unit.is_enemy_of(*missile.get_source_unit()))
 			&& missile.get_source_unit() != &unit //don't hit the source unit, otherwise it will be hit by pierce as soon as it fires the missile
 			&& (!missile.Type->PierceOnce || !IsPiercedUnit(missile, unit))
-			&& CanTarget(*missile.get_source_unit()->Type, *unit.Type)
+			&& missile.get_source_unit()->Type->can_target(unit.Type)
 			&& !unit.Type->BoolFlag[DECORATION_INDEX].value
 			&& (!missile.Type->PierceIgnoreBeforeGoal || !missile.get_target_unit() || IsPiercedUnit(missile, *missile.get_target_unit()) || missile.get_target_unit() == &unit)
 		) {
@@ -1516,7 +1516,7 @@ void Missile::MissileHit(CUnit *unit)
 			// NOTE: perhaps this should be come a property of the missile.
 			// Also check CorrectSphashDamage so land explosions can't hit the air units
 			//
-			if (CanTarget(*this->get_source_unit()->Type, *goal.Type)
+			if (this->get_source_unit()->Type->can_target(goal.Type)
 				//Wyrmgus start
 //				&& (mtype.FriendlyFire == false || goal.Player != this->get_source_unit()->Player)) {
 				&& (mtype.FriendlyFire == true || goal.is_enemy_of(*this->get_source_unit()))) {

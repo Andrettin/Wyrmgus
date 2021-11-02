@@ -954,7 +954,7 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 			// if brother is idle or attack no-agressive target and
 			// can attack our attacker then ask for help
 			// FIXME ad support for help from Coward type units
-			if (aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
+			if (aiunit.IsAgressive() && aiunit.Type->can_target(attacker->Type)
 				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
@@ -1044,7 +1044,7 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 				// if unit is idle or attacking a non-agressive target and
 				// can attack our attacker then ask for help
 				// FIXME ad support for help from Coward type units
-				if (aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
+				if (aiunit.IsAgressive() && aiunit.Type->can_target(attacker->Type)
 					&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 					bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
@@ -1116,7 +1116,7 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 			// if brother is idle or attack no-agressive target and
 			// can attack our attacker then ask for help
 			// FIXME ad support for help from Coward type units
-			if (aiunit.Active && aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
+			if (aiunit.Active && aiunit.IsAgressive() && aiunit.Type->can_target(attacker->Type)
 				&& aiunit.CurrentOrder()->get_goal() != attacker) {
 				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 

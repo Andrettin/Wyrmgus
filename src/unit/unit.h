@@ -1057,8 +1057,6 @@ extern int ViewPointDistance(const Vec2i &pos);
 /// Calculate the distance from current view point to unit
 extern int ViewPointDistanceToUnit(const CUnit &dest);
 
-/// Can this unit-type attack the other (destination)
-extern int CanTarget(const wyrmgus::unit_type &type, const wyrmgus::unit_type &dest);
 /// Can transporter transport the other unit
 extern int CanTransport(const CUnit &transporter, const CUnit &unit);
 //Wyrmgus start

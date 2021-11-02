@@ -78,6 +78,7 @@ namespace wyrmgus {
 	class unit_type;
 	class unit_type_variation;
 	class world;
+	enum class can_target_flag;
 	enum class gender;
 	enum class item_class;
 	enum class item_slot;
@@ -1015,13 +1016,20 @@ public:
 	void add_autocast_spell(const spell *spell);
 
 	bool CheckUserBoolFlags(const char *BoolFlags) const;
+
 	//Wyrmgus start
 //	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
-	bool CanTransport() const { return MaxOnBoard > 0; }
+	bool CanTransport() const
+	{
+		return this->MaxOnBoard > 0;
+	}
 	//Wyrmgus end
+
 	bool CanMove() const;
 
 	bool CanSelect(GroupSelectionMode mode = GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY) const;
+
+	bool can_target(const unit_type *other_unit_type) const;
 	
 	void set_parent(const unit_type *parent_type);
 	void RemoveButtons(const ButtonCmd button_action, const std::string &mod_file = "");
@@ -1379,11 +1387,11 @@ public:
 #define MouseActionRallyPoint 7		/// Rally point
 #define MouseActionTrade      8		/// Trade
 //Wyrmgus end
-	int CanTarget = 0;                  /// Which units can it attack
-#define CanTargetLand 1             /// Can attack land units
-#define CanTargetSea  2             /// Can attack sea units
-#define CanTargetAir  4             /// Can attack air units
 
+private:
+	can_target_flag can_target_flags; //which units can it attack
+
+public:
 	unsigned Flip : 1;              /// Flip image when facing left
 	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
 	unsigned CanAttack : 1;         /// Unit can attack.

@@ -552,7 +552,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::attack);
 			acknowledged = 1;
 		}
-		if (CanTarget(type, *dest->Type)) {
+		if (type.can_target(dest->Type)) {
 			//Wyrmgus start
 //			SendCommandAttack(unit, pos, dest, flush);
 			SendCommandAttack(unit, pos, dest, flush, UI.CurrentMapLayer->ID);
@@ -598,7 +598,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 			int spellnum = type.Spells[0]->Slot;
 			SendCommandSpellCast(unit, pos, &dest, spellnum, flush, UI.CurrentMapLayer->ID);
 		} else {
-			if (CanTarget(type, *dest.Type)) {
+			if (type.can_target(dest.Type)) {
 				SendCommandAttack(unit, pos, &dest, flush, UI.CurrentMapLayer->ID);
 			} else { // No valid target
 				SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
@@ -1713,7 +1713,7 @@ static int SendAttack(const Vec2i &tilePos, int flush)
 //		if (unit.Type->CanAttack) {
 		if (unit.CanAttack(true)) {
 		//Wyrmgus end
-			if (!dest || (dest != &unit && CanTarget(*unit.Type, *dest->Type))) {
+			if (!dest || (dest != &unit && unit.Type->can_target(dest->Type))) {
 				if (dest) {
 					dest->Blink = 4;
 				}
