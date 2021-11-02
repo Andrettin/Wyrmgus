@@ -350,12 +350,17 @@ bool COrder_Attack::IsWeakTargetSelected() const
 **
 **  @return      true if order have changed, false else.
 */
-bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
+bool COrder_Attack::check_for_invalid_goal(CUnit &unit)
 {
 	CUnit *goal = this->get_goal();
 
-	// Position or valid target, it is ok.
-	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
+	//position
+	if (goal == nullptr) {
+		return false;
+	}
+
+	//valid target
+	if (goal->IsVisibleAsGoal(*unit.Player) && unit.Type->can_target(goal)) {
 		return false;
 	}
 
@@ -371,6 +376,7 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 	if (unit.RestoreOrder()) {
 		return true;
 	}
+
 	return false;
 }
 
@@ -384,7 +390,7 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 {
 	// Target is dead?
-	if (CheckForDeadGoal(unit)) {
+	if (this->check_for_invalid_goal(unit)) {
 		return true;
 	}
 	
@@ -574,9 +580,10 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	}
 
 	// Target is dead ? Change order ?
-	if (CheckForDeadGoal(unit)) {
+	if (this->check_for_invalid_goal(unit)) {
 		return;
 	}
+
 	CUnit *goal = this->get_goal();
 
 	// No target choose one.
@@ -719,7 +726,8 @@ void COrder_Attack::Execute(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	if (!unit.CanAttack(true) && !this->has_goal()) { //if unit is a transporter that can't attack, return false if the original target no longer exists
+	if (!unit.CanAttack(true) && !this->has_goal()) {
+		//if unit is a transporter that can't attack, return false if the original target no longer exists
 		this->Finished = true;
 		return;
 	}

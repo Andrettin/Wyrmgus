@@ -66,7 +66,7 @@ public:
 	bool IsWeakTargetSelected() const;
 
 private:
-	bool CheckForDeadGoal(CUnit &unit);
+	bool check_for_invalid_goal(CUnit &unit);
 	bool CheckForTargetInRange(CUnit &unit);
 	void MoveToTarget(CUnit &unit);
 	void AttackTarget(CUnit &unit);
