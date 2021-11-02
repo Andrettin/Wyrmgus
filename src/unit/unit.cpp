@@ -5648,7 +5648,9 @@ int CUnit::GetModifiedVariable(const int index, const VariableAttribute variable
 			if (this->Container != nullptr && this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Enable && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) {
 				value += this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Value; //treat the container's attack range as a bonus to the unit's attack range
 			}
-			value = std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
+
+			//if the unit's current sight range is smaller than its attack range, use it instead
+			value = std::min<int>(this->CurrentSightRange, value); 
 			break;
 		case SPEED_INDEX: {
 			const wyrmgus::unit_type *unit_type = this->Type;
@@ -6102,7 +6104,7 @@ bool CUnit::IsInCombat() const
 	for (size_t i = 0; i < table.size(); ++i) {
 		const CUnit &target = *table[i];
 
-		if (target.IsVisibleAsGoal(*this->Player) && (this->Type->can_target(target.Type) || target.Type->can_target(this->Type))) {
+		if (target.IsVisibleAsGoal(*this->Player) && (this->Type->can_target(&target) || target.Type->can_target(this))) {
 			return true;
 		}
 	}
@@ -7232,9 +7234,10 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	}
 
 	// Unit can attack back.
-	if (dtype.can_target(&type)) {
+	if (dtype.can_target(&unit)) {
 		cost -= CANATTACK_BONUS;
 	}
+
 	return cost;
 }
 
@@ -7578,7 +7581,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	CUnit *oldgoal = target.CurrentOrder()->get_goal();
 	CUnit *goal, *best = oldgoal;
 
-	if (RevealAttacker && target.Type->can_target(attacker.Type)) {
+	if (RevealAttacker && target.Type->can_target(&attacker)) {
 		// Reveal Unit that is attacking
 		goal = &attacker;
 	} else {
@@ -7595,7 +7598,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		best = goal;
 	}
 
-	if (target.Type->can_target(attacker.Type)
+	if (target.Type->can_target(&attacker)
 		&& (!best || (goal != &attacker
 					  && (ThreatCalculate(target, attacker) < ThreatCalculate(target, *best))))) {
 		best = &attacker;

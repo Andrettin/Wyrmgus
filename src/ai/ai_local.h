@@ -40,9 +40,9 @@
 #endif
 
 class AiHelper;
+class CPlayer;
 class CUnit;
 class CUpgrade;
-class CPlayer;
 
 static void InitAiHelper(AiHelper &aiHelper);
 
@@ -798,10 +798,10 @@ extern bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool incl
 /// Check if the costs for an unit-type are available for the AI
 extern int AiCheckUnitTypeCosts(const wyrmgus::unit_type &type);
 /// Enemy units in distance
-extern int AiEnemyUnitsInDistance(const CPlayer &player, const wyrmgus::unit_type *type,
+extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnit *unit,
 								  //Wyrmgus start
-//								  const Vec2i &pos, unsigned range);
-								  const Vec2i &pos, unsigned range, int z);
+//								  const QPoint &pos, const unsigned range);
+								  const QPoint &pos, const unsigned range, const int z);
 								  //Wyrmgus end
 
 //

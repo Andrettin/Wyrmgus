@@ -79,7 +79,7 @@ public:
 			return;
 		}
 
-		if (!source->Type->can_target(&type)) {
+		if (!source->Type->can_target(unit)) {
 			return;
 		}
 

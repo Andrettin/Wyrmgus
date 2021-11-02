@@ -28,6 +28,7 @@
 
 #include "unit/unit_type.h"
 
+#include "actions.h"
 #include "ai/ai_local.h" //for using AiHelpers
 #include "animation.h"
 #include "animation/animation_exactframe.h"
@@ -1725,8 +1726,10 @@ bool unit_type::CanSelect(GroupSelectionMode mode) const
 	return false;
 }
 
-bool unit_type::can_target(const unit_type *other_unit_type) const
+bool unit_type::can_target(const CUnit *unit) const
 {
+	const unit_type *other_unit_type = unit->Type;
+
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
 		if (this->BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {
 			if ((this->BoolFlag[i].CanTargetFlag == CONDITION_ONLY) ^
@@ -1749,6 +1752,14 @@ bool unit_type::can_target(const unit_type *other_unit_type) const
 			return (this->can_target_flags & (can_target_flag::land | can_target_flag::water | can_target_flag::air)) != can_target_flag::none;
 		case unit_domain::air:
 		case unit_domain::space:
+			//air units which are melee attacking a land/water unit can also be targeted as if they were on land/water
+			if (unit->CurrentAction() == UnitAction::Attack && unit->GetModifiedVariable(ATTACKRANGE_INDEX) <= 1) {
+				const CUnit *goal = unit->CurrentOrder()->get_goal();
+				if (goal != nullptr && (goal->Type->get_domain() == unit_domain::land || goal->Type->get_domain() == unit_domain::water)) {
+					return (this->can_target_flags & (can_target_flag::land | can_target_flag::water | can_target_flag::air)) != can_target_flag::none;
+				}
+			}
+
 			return (this->can_target_flags & can_target_flag::air) != can_target_flag::none;
 		default:
 			break;

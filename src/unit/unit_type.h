@@ -45,6 +45,7 @@
 class CFile;
 class CPlayer;
 class CPlayerColorGraphic;
+class CUnit;
 class LuaCallback;
 enum class ButtonCmd;
 struct lua_State;
@@ -1029,7 +1030,7 @@ public:
 
 	bool CanSelect(GroupSelectionMode mode = GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY) const;
 
-	bool can_target(const unit_type *other_unit_type) const;
+	bool can_target(const CUnit *unit) const;
 	
 	void set_parent(const unit_type *parent_type);
 	void RemoveButtons(const ButtonCmd button_action, const std::string &mod_file = "");

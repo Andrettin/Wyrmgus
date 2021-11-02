@@ -211,22 +211,21 @@ private:
 	const CPlayer *player;
 };
 
-class IsAEnemyUnitWhichCanCounterAttackOf
+class IsAEnemyUnitWhichCanCounterAttackOf final
 {
 public:
-	explicit IsAEnemyUnitWhichCanCounterAttackOf(const CPlayer &_player, const unit_type &_type) :
-		player(&_player), type(&_type)
+	explicit IsAEnemyUnitWhichCanCounterAttackOf(const CPlayer *player, const CUnit *unit) : player(player), unit(unit)
 	{
 	}
 
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*player) && unit->is_enemy_of(*player) && unit->Type->can_target(type);
+		return unit->IsVisibleAsGoal(*this->player) && unit->is_enemy_of(*this->player) && unit->Type->can_target(this->unit);
 	}
 
 private:
-	const CPlayer *player;
-	const wyrmgus::unit_type *type;
+	const CPlayer *player = nullptr;
+	const CUnit *unit = nullptr;
 };
 
 /**
@@ -239,26 +238,27 @@ private:
 **
 **  @return       Number of enemy units.
 */
-int AiEnemyUnitsInDistance(const CPlayer &player,
-						   const wyrmgus::unit_type *type, const Vec2i &pos, unsigned range, int z)
+int AiEnemyUnitsInDistance(const CPlayer &player, const CUnit *unit, const QPoint &pos, const unsigned range, const int z)
 {
 	const Vec2i offset(range, range);
 	std::vector<CUnit *> units;
 
-	if (type == nullptr) {
+	if (unit == nullptr) {
 		//Wyrmgus start
 //		Select(pos - offset, pos + offset, units, IsAEnemyUnitOf(player));
 		Select(pos - offset, pos + offset, units, z, IsAEnemyUnitOf(player));
 		//Wyrmgus end
 		return static_cast<int>(units.size());
 	} else {
+		const unit_type *type = unit->Type;
 		const Vec2i typeSize(type->get_tile_size() - QSize(1, 1));
-		const IsAEnemyUnitWhichCanCounterAttackOf pred(player, *type);
+		const IsAEnemyUnitWhichCanCounterAttackOf pred(&player, unit);
 
 		//Wyrmgus start
 //		Select(pos - offset, pos + typeSize + offset, units, pred);
 		Select(pos - offset, pos + typeSize + offset, units, z, pred);
 		//Wyrmgus end
+
 		return static_cast<int>(units.size());
 	}
 }
@@ -277,8 +277,8 @@ int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	return AiEnemyUnitsInDistance(*unit.Player, unit.Type, unit.tilePos, range);
-	return AiEnemyUnitsInDistance(*unit.Player, unit.Type, unit.tilePos, range, z);
+//	return AiEnemyUnitsInDistance(*unit.Player, &unit, unit.tilePos, range);
+	return AiEnemyUnitsInDistance(*unit.Player, &unit, unit.tilePos, range, z);
 	//Wyrmgus end
 }
 
