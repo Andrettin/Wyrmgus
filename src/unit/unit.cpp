@@ -2332,9 +2332,12 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 			continue;
 		}
 
-		if (this->Prefix == nullptr || !affix->IncompatibleAffixes[this->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-			potential_suffixes.push_back(affix);
+		if (this->Prefix != nullptr && affix->is_incompatible_affix(this->Prefix)) {
+			//don't allow a suffix incompatible with the prefix to appear
+			continue;
 		}
+
+		potential_suffixes.push_back(affix);
 	}
 
 	if (dropper_player != nullptr) {
@@ -2357,7 +2360,8 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 				}
 			}
 
-			if (this->Prefix != nullptr && upgrade->IncompatibleAffixes[this->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+			if (this->Prefix != nullptr && upgrade->is_incompatible_affix(this->Prefix)) {
+				//don't allow a suffix incompatible with the prefix to appear
 				continue;
 			}
 

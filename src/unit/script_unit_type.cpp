@@ -1608,15 +1608,15 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Affixes")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				std::string affix_ident = LuaToString(l, -1, j + 1);
-				type->Affixes.push_back(CUpgrade::get_or_add(affix_ident, nullptr)); //if this affix doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+				const std::string affix_ident = LuaToString(l, -1, j + 1);
+				type->Affixes.push_back(CUpgrade::get(affix_ident));
 			}
 		} else if (!strcmp(value, "Traits")) {
 			type->traits.clear(); // remove previously defined traits, to allow unit types to not inherit traits from their parent unit types
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				const std::string trait_ident = LuaToString(l, -1, j + 1);
-				type->traits.push_back(CUpgrade::get_or_add(trait_ident, nullptr)); //if this trait doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+				type->traits.push_back(CUpgrade::get(trait_ident));
 			}
 		} else if (!strcmp(value, "StartingAbilities")) {
 			const int args = lua_rawlen(l, -1);

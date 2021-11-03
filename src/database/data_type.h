@@ -213,7 +213,8 @@ public:
 
 					T *instance = nullptr;
 					if (definition) {
-						if (data_entry.get_operator() != sml_operator::addition) { //addition operators for data entry scopes mean modifying already-defined entries
+						if (data_entry.get_operator() != sml_operator::addition) {
+							//addition operators for data entry scopes mean modifying already-defined entries
 							instance = T::add(identifier, data_module);
 						} else {
 							instance = T::get(identifier);

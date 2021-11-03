@@ -255,18 +255,15 @@ bool CUpgrade::compare_encyclopedia_entries(const CUpgrade *lhs, const CUpgrade 
 	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
-CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifier), Work(wyrmgus::item_class::none)
+CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifier), Work(item_class::none)
 {
-	//Wyrmgus start
-	memset(this->IncompatibleAffixes, 0, sizeof(this->IncompatibleAffixes));
-	//Wyrmgus end
 }
 
 CUpgrade::~CUpgrade()
 {
 }
 
-void CUpgrade::process_sml_property(const wyrmgus::sml_property &property)
+void CUpgrade::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -281,61 +278,69 @@ void CUpgrade::process_sml_property(const wyrmgus::sml_property &property)
 	}
 }
 
-void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
+void CUpgrade::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "costs") {
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			const wyrmgus::resource *resource = wyrmgus::resource::get(key);
+			const resource *resource = resource::get(key);
 			this->costs[resource] = std::stoi(value);
 		});
 	} else if (tag == "scaled_costs") {
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			const wyrmgus::resource *resource = wyrmgus::resource::get(key);
+			const resource *resource = resource::get(key);
 			this->scaled_costs[resource] = std::stoi(value);
 		});
 	} else if (tag == "scaled_cost_unit_types") {
 		for (const std::string &value : values) {
-			this->scaled_cost_unit_types.push_back(wyrmgus::unit_type::get(value));
+			this->scaled_cost_unit_types.push_back(unit_type::get(value));
 		}
 	} else if (tag == "scaled_cost_unit_classes") {
 		for (const std::string &value : values) {
-			this->scaled_cost_unit_classes.push_back(wyrmgus::unit_class::get(value));
+			this->scaled_cost_unit_classes.push_back(unit_class::get(value));
 		}
 	} else if (tag == "civilization_priorities") {
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			wyrmgus::civilization *priority_civilization = wyrmgus::civilization::get(key);
+			wyrmgus::civilization *priority_civilization = civilization::get(key);
 			const int priority = std::stoi(value);
 			priority_civilization->UpgradePriorities[this] = priority;
 		});
 	} else if (tag == "modifier") {
-		auto modifier = std::make_unique<wyrmgus::upgrade_modifier>();
+		auto modifier = std::make_unique<upgrade_modifier>();
 		modifier->UpgradeId = this->ID;
 
-		wyrmgus::database::process_sml_data(modifier, scope);
+		database::process_sml_data(modifier, scope);
 
-		wyrmgus::upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
+		upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
 		this->modifiers.push_back(std::move(modifier));
 	} else if (tag == "preconditions") {
-		this->preconditions = std::make_unique<wyrmgus::and_condition>();
-		wyrmgus::database::process_sml_data(this->preconditions, scope);
+		this->preconditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
-		this->conditions = std::make_unique<wyrmgus::and_condition>();
-		wyrmgus::database::process_sml_data(this->conditions, scope);
+		this->conditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->conditions, scope);
 	} else if (tag == "affixed_item_classes") {
 		for (const std::string &value : values) {
-			this->affixed_item_classes.insert(wyrmgus::string_to_item_class(value));
+			this->affixed_item_classes.insert(string_to_item_class(value));
+		}
+	} else if (tag == "incompatible_affixes") {
+		for (const std::string &value : values) {
+			CUpgrade *other_upgrade = CUpgrade::get(value);
+			this->incompatible_affixes.insert(other_upgrade);
+
+			//add the upgrade to the incompatible affix's counterpart list here
+			other_upgrade->incompatible_affixes.insert(this);
 		}
 	}
 }
@@ -363,12 +368,6 @@ void CUpgrade::initialize()
 			if (this->get_quote().empty()) {
 				this->set_quote(this->magic_domain->get_quote());
 			}
-		}
-	}
-
-	for (CUpgrade *other_upgrade : CUpgrade::get_all()) { //add the upgrade to the incompatible affix's counterpart list here
-		if (this->IncompatibleAffixes[other_upgrade->ID]) {
-			other_upgrade->IncompatibleAffixes[this->ID] = true;
 		}
 	}
 
@@ -783,12 +782,10 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int affix_id = UpgradeIdByIdent(LuaToString(l, -1, j + 1));
-				if (affix_id == -1) {
-					LuaError(l, "Upgrade doesn't exist.");
-				}
+				CUpgrade *affix = CUpgrade::get(LuaToString(l, -1, j + 1));
+				upgrade->incompatible_affixes.insert(affix);
 
-				upgrade->IncompatibleAffixes[affix_id] = true;
+				affix->incompatible_affixes.insert(upgrade);
 			}
 		} else if (!strcmp(value, "ScaledCostUnits")) {
 			if (!lua_istable(l, -1)) {
