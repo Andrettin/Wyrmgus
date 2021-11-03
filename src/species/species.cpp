@@ -30,6 +30,7 @@
 
 #include "map/terrain_type.h"
 #include "map/world.h"
+#include "species/ecological_niche.h"
 #include "species/geological_era.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
@@ -134,7 +135,8 @@ std::vector<std::string> species::get_name_list(const std::vector<const species 
 	return species_names;
 }
 
-species::species(const std::string &identifier) : taxon_base(identifier), era(geological_era::none)
+species::species(const std::string &identifier)
+	: taxon_base(identifier), era(geological_era::none), ecological_niche(ecological_niche::none)
 {
 }
 
@@ -172,6 +174,16 @@ void species::check() const
 {
 	if (this->get_supertaxon() == nullptr) {
 		throw std::runtime_error("Species \"" + this->get_identifier() + "\" has no supertaxon.");
+	}
+
+	if ( this->get_unit_type() != nullptr) {
+		if (!this->is_sapient() && this->get_ecological_niche() == ecological_niche::none) {
+			//throw std::runtime_error("Non-sapient species \"" + this->get_identifier() + "\" has a unit type, but no ecological niche.");
+		}
+
+		if (this->get_native_terrain_types().empty()) {
+			throw std::runtime_error("Species \"" + this->get_identifier() + "\" has a unit type, but no native terrain types.");
+		}
 	}
 
 	/*

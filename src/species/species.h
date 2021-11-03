@@ -39,6 +39,7 @@ class taxon;
 class terrain_type;
 class unit_type;
 class world;
+enum class ecological_niche;
 enum class geological_era;
 enum class taxonomic_rank;
 
@@ -51,6 +52,7 @@ class species final : public taxon_base, public data_type<species>
 	Q_PROPERTY(wyrmgus::world* homeworld MEMBER homeworld READ get_homeworld)
 	Q_PROPERTY(bool sapient MEMBER sapient READ is_sapient)
 	Q_PROPERTY(bool asexual MEMBER asexual READ is_asexual)
+	Q_PROPERTY(wyrmgus::ecological_niche ecological_niche MEMBER ecological_niche READ get_ecological_niche)
 
 public:
 	static constexpr const char *class_identifier = "species";
@@ -106,6 +108,11 @@ public:
 		return this->asexual;
 	}
 
+	wyrmgus::ecological_niche get_ecological_niche() const
+	{
+		return this->ecological_niche;
+	}
+
 	const wyrmgus::unit_type *get_unit_type() const
 	{
 		return this->unit_type;
@@ -140,6 +147,7 @@ private:
 	world *homeworld = nullptr;
 	bool sapient = false;
 	bool asexual = false;
+	wyrmgus::ecological_niche ecological_niche;
 	const wyrmgus::unit_type *unit_type = nullptr;
 	std::vector<const terrain_type *> native_terrain_types; //in which terrains does this species live
 	std::vector<const species *> pre_evolutions; //species from which this one can evolve

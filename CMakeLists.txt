@@ -959,6 +959,7 @@ set(wyrmgus_sound_HDRS
 )
 
 set(wyrmgus_species_HDRS
+	src/species/ecological_niche.h
 	src/species/geological_era.h
 	src/species/species.h
 	src/species/taxon.h
