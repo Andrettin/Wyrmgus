@@ -227,6 +227,17 @@ public:
 
 							const std::string &alias = alias_property->get_value();
 							T::add_instance_alias(instance, alias);
+
+							//for backwards compatibility, change instances of "_" in the identifier with "-" and add that as a further alias, and do the opposite as well
+							if (alias.find("_") != std::string::npos) {
+								std::string other_alias = alias;
+								std::replace(other_alias.begin(), other_alias.end(), '_', '-');
+								T::add_instance_alias(instance, other_alias);
+							} else if (alias.find("-") != std::string::npos) {
+								std::string other_alias = alias;
+								std::replace(other_alias.begin(), other_alias.end(), '-', '_');
+								T::add_instance_alias(instance, other_alias);
+							}
 						}
 					} else {
 						try {
