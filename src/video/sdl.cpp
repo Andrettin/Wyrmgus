@@ -214,10 +214,17 @@ static void InitKey2Str()
 	Key2Str[SDLK_PAGEUP] = "pageup";
 	Key2Str[SDLK_PAGEDOWN] = "pagedown";
 
-	for (i = SDLK_F1; i <= SDLK_F15; ++i) {
+	for (i = SDLK_F1; i <= SDLK_F12; ++i) {
 		snprintf(str.data(), sizeof(str), "f%d", i - SDLK_F1 + 1);
 		Key2Str[i] = str.data();
 		snprintf(str.data(), sizeof(str), "F%d", i - SDLK_F1 + 1);
+		Str2Key[str.data()] = i;
+	}
+
+	for (i = SDLK_F13; i <= SDLK_F24; ++i) {
+		snprintf(str.data(), sizeof(str), "f%d", i - SDLK_F13 + 13);
+		Key2Str[i] = str.data();
+		snprintf(str.data(), sizeof(str), "F%d", i - SDLK_F13 + 13);
 		Str2Key[str.data()] = i;
 	}
 
