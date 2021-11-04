@@ -1578,6 +1578,7 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 
 	uint64_t total_hours = static_cast<uint64_t>(std::abs(game::base_date.date().year() - start_date.date().year())) * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY;
 	total_hours += QDate(1, 1, 1).daysTo(QDate(1, start_date.date().month(), start_date.date().day())) * DEFAULT_HOURS_PER_DAY;
+	total_hours += start_date.time().hour();
 
 	game::get()->set_current_total_hours(total_hours);
 
