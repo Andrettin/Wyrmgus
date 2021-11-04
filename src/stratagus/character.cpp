@@ -982,7 +982,8 @@ bool character::IsUsable() const
 	}
 
 	if (this->get_unit_type()->get_gender() != gender::none && this->get_gender() != this->get_unit_type()->get_gender()) {
-		return false; // hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
+		//hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
+		return false;
 	}
 	
 	return true;

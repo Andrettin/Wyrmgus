@@ -103,9 +103,11 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction NOTIFY changed)
 	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
-	Q_PROPERTY(wyrmgus::site* home_settlement MEMBER home_settlement)
 	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
 	Q_PROPERTY(wyrmgus::character* mother READ get_mother WRITE set_mother)
+	Q_PROPERTY(wyrmgus::site* home_settlement MEMBER home_settlement)
+	Q_PROPERTY(int start_year MEMBER start_year READ get_start_year)
+	Q_PROPERTY(int end_year MEMBER end_year READ get_end_year)
 	Q_PROPERTY(QString variation READ get_variation_qstring)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 	Q_PROPERTY(CUpgrade* trait MEMBER trait READ get_trait)
@@ -377,6 +379,16 @@ public:
 
 	void add_child(character *child);
 
+	int get_start_year() const
+	{
+		return this->start_year;
+	}
+
+	int get_end_year() const
+	{
+		return this->end_year;
+	}
+
 	int get_base_level() const
 	{
 		return this->base_level;
@@ -454,6 +466,9 @@ private:
 	character *father = nullptr;
 	character *mother = nullptr;
 	std::vector<character *> children;
+	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
+	int start_year = 0;
+	int end_year = 0;
 public:
 	std::unique_ptr<LuaCallback> Conditions;
 private:
@@ -461,7 +476,6 @@ private:
 public:
 	std::vector<const persistent_item *> EquippedItems[static_cast<int>(wyrmgus::item_slot::count)]; //equipped items of the character, per slot
 private:
-	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
 	bool ai_active = true; //whether the character's AI is active
 public:
 	std::vector<const wyrmgus::deity *> Deities; //deities chosen by this character to worship

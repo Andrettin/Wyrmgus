@@ -2102,7 +2102,7 @@ template bool CPlayer::can_choose_dynasty<false>(const wyrmgus::dynasty *dynasty
 template bool CPlayer::can_choose_dynasty<true>(const wyrmgus::dynasty *dynasty) const;
 
 
-bool CPlayer::is_character_available_for_recruitment(const wyrmgus::character *character, bool ignore_neutral) const
+bool CPlayer::is_character_available_for_recruitment(const character *character, bool ignore_neutral) const
 {
 	if (character->is_deity()) {
 		return false;
@@ -2129,6 +2129,19 @@ bool CPlayer::is_character_available_for_recruitment(const wyrmgus::character *c
 			return false;
 		}
 	}
+
+	if (game::get()->get_current_campaign() != nullptr) {
+		//for campaigns, take the character's start and end year into consideration for whether they can be recruited
+		const int current_year = game::get()->get_current_year();
+
+		if (character->get_start_year() != 0 && current_year < character->get_start_year()) {
+			return false;
+		}
+
+		if (character->get_end_year() != 0 && current_year > character->get_end_year()) {
+			return false;
+		}
+	}
 	
 	if (!character->CanAppear(ignore_neutral)) {
 		return false;
@@ -2137,11 +2150,11 @@ bool CPlayer::is_character_available_for_recruitment(const wyrmgus::character *c
 	return true;
 }
 
-std::vector<wyrmgus::character *> CPlayer::get_recruitable_heroes_from_list(const std::vector<wyrmgus::character *> &heroes)
+std::vector<character *> CPlayer::get_recruitable_heroes_from_list(const std::vector<character *> &heroes)
 {
-	std::vector<wyrmgus::character *> recruitable_heroes;
+	std::vector<character *> recruitable_heroes;
 
-	for (wyrmgus::character *hero : heroes) {
+	for (character *hero : heroes) {
 		if (this->is_character_available_for_recruitment(hero)) {
 			recruitable_heroes.push_back(hero);
 		}

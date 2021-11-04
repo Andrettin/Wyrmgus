@@ -2564,17 +2564,17 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	for (size_t i = 0; i < this->SoldUnits.size(); ++i) {
-		DestroyAllInside(*this->SoldUnits[i]);
-		LetUnitDie(*this->SoldUnits[i]);
+	for (CUnit *sold_unit : this->SoldUnits) {
+		DestroyAllInside(*sold_unit);
+		LetUnitDie(*sold_unit);
 	}
 	this->SoldUnits.clear();
 	
-	std::vector<const wyrmgus::unit_type *> potential_items;
+	std::vector<const unit_type *> potential_items;
 	std::vector<wyrmgus::character *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
-		const wyrmgus::civilization *civilization = this->get_civilization();
-		const wyrmgus::faction *faction = this->Player->get_faction();
+		const civilization *civilization = this->get_civilization();
+		const faction *faction = this->Player->get_faction();
 		
 		if (CurrentQuest == nullptr) {
 			//give priority to heroes with the building's settlement as their home settlement
@@ -2587,9 +2587,9 @@ void CUnit::UpdateSoldUnits()
 				std::vector<wyrmgus::character *> potential_faction_heroes = this->Player->get_recruitable_heroes_from_list(faction->get_characters());
 
 				while (!potential_faction_heroes.empty() && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
-					wyrmgus::character *hero = wyrmgus::vector::take_random(potential_faction_heroes);
+					wyrmgus::character *hero = vector::take_random(potential_faction_heroes);
 
-					if (wyrmgus::vector::contains(potential_heroes, hero)) {
+					if (vector::contains(potential_heroes, hero)) {
 						continue;
 					}
 
@@ -2602,9 +2602,9 @@ void CUnit::UpdateSoldUnits()
 				std::vector<wyrmgus::character *> potential_civilization_heroes = this->Player->get_recruitable_heroes_from_list(civilization->get_characters());
 
 				while (!potential_civilization_heroes.empty() && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
-					wyrmgus::character *hero = wyrmgus::vector::take_random(potential_civilization_heroes);
+					wyrmgus::character *hero = vector::take_random(potential_civilization_heroes);
 
-					if (wyrmgus::vector::contains(potential_heroes, hero)) {
+					if (vector::contains(potential_heroes, hero)) {
 						continue;
 					}
 
@@ -2624,7 +2624,7 @@ void CUnit::UpdateSoldUnits()
 			}
 		}
 	} else {
-		for (const wyrmgus::unit_type *sold_unit_type : this->Type->SoldUnits) {
+		for (const unit_type *sold_unit_type : this->Type->SoldUnits) {
 			if (check_conditions(sold_unit_type, this)) {
 				potential_items.push_back(sold_unit_type);
 			}
@@ -2643,11 +2643,11 @@ void CUnit::UpdateSoldUnits()
 	for (int i = 0; i < sold_unit_max; ++i) {
 		CUnit *new_unit = nullptr;
 		if (!potential_heroes.empty()) {
-			wyrmgus::character *chosen_hero = wyrmgus::vector::take_random(potential_heroes);
+			wyrmgus::character *chosen_hero = vector::take_random(potential_heroes);
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->get_unit_type(), CPlayer::get_neutral_player(), this->MapLayer->ID);
 			new_unit->set_character(chosen_hero);
 		} else {
-			const wyrmgus::unit_type *chosen_unit_type = wyrmgus::vector::get_random(potential_items);
+			const unit_type *chosen_unit_type = vector::get_random(potential_items);
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::get_neutral_player(), this->MapLayer->ID);
 			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
 			new_unit->Identified = true;
