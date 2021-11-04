@@ -142,17 +142,6 @@ std::string CDate::ToDisplayString(const wyrmgus::calendar *calendar, const bool
 }
 
 /**
-**	@brief	Set the current date for a particular calendar
-**
-**	@param	calendar_ident	The calendar's string identifier
-**	@param	date_string		The date's string representation
-*/
-void SetCurrentDate(const std::string &date_string)
-{
-	game::get()->set_current_date(string::to_date(date_string));
-}
-
-/**
 **	@brief	Set the current total in-game hours
 **
 **	@param	hours	The amount of hours

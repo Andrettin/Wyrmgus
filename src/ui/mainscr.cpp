@@ -82,6 +82,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "util/assert_util.h"
+#include "util/date_util.h"
 #include "util/point_util.h"
 #include "util/util.h"
 #include "upgrade/upgrade.h"
@@ -843,14 +844,13 @@ void DrawTime(std::vector<std::function<void(renderer *)>> &render_commands)
 		}
 	}
 	
-	if (CPlayer::GetThisPlayer() != nullptr) {
-		wyrmgus::calendar *calendar = wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_calendar();
-		
+	if (game::get()->get_current_campaign() != nullptr) {
 		if (UI.DatePanel.TextX != -1) {
-			std::string date_string = CDate(wyrmgus::game::get()->get_current_date()).ToDisplayString(calendar, true);
+			const int year = game::get()->get_current_year();
+			const std::string year_string = date::year_to_labeled_string(year);
 
-			CLabel label(wyrmgus::defines::get()->get_game_font());
-			label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, date_string, render_commands);
+			const CLabel label(defines::get()->get_game_font());
+			label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, year_string, render_commands);
 		}
 	}
 }

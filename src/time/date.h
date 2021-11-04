@@ -177,5 +177,4 @@ public:
 	}
 };
 
-extern void SetCurrentDate(const std::string &date_string);
 extern void SetCurrentTotalHours(const unsigned long long hours);

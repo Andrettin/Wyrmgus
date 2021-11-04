@@ -61,6 +61,8 @@ public:
 	static inline const QDateTime base_date = QDateTime(QDate(-100000, 1, 1));
 #endif
 
+	static const int cycles_per_year;
+
 	static std::filesystem::path save_file_url_string_to_save_filepath(const std::string &file_url_str);
 
 	game();
@@ -120,14 +122,14 @@ public:
 		this->current_campaign = campaign;
 	}
 
-	const QDateTime &get_current_date() const
+	int get_current_year() const
 	{
-		return this->current_date;
+		return this->current_year;
 	}
 
-	void set_current_date(const QDateTime &date)
+	void set_current_year(const int year)
 	{
-		this->current_date = date;
+		this->current_year = year;
 	}
 
 	uint64_t get_current_total_hours() const
@@ -238,7 +240,7 @@ private:
 	bool running = false;
 	bool multiplayer = false;
 	campaign *current_campaign = nullptr;
-	QDateTime current_date;
+	int current_year = 0;
 	uint64_t current_total_hours = 0; //the total in-game hours
 	bool cheat = false; //whether a cheat was used in this game
 	std::vector<std::unique_ptr<trigger>> local_triggers; //triggers "local" to the current game

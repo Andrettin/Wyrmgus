@@ -148,6 +148,8 @@ static std::vector<std::unique_ptr<gcn::Container>> Containers;
 
 namespace wyrmgus {
 
+const int game::cycles_per_year = CYCLES_PER_SECOND * 60; //1 year per minute
+
 std::filesystem::path game::save_file_url_string_to_save_filepath(const std::string &file_url_str)
 {
 	const QUrl file_url = QString::fromStdString(file_url_str);
@@ -234,10 +236,16 @@ void game::apply_player_history()
 void game::do_cycle()
 {
 	try {
+		if (GameCycle % game::cycles_per_year == 0) {
+			++this->current_year;
+
+			if (this->current_year == 0) {
+				++this->current_year;
+			}
+		}
+
 		if (GameCycle % CYCLES_PER_IN_GAME_HOUR == 0) {
 			game::get()->increment_current_total_hours();
-
-			this->current_date = this->current_date.addSecs(1 * 60 * 60 * DEFAULT_DAY_MULTIPLIER_PER_YEAR);
 
 			for (const std::unique_ptr<CMapLayer> &map_layer : CMap::get()->MapLayers) {
 				map_layer->DoPerHourLoop();
@@ -262,6 +270,8 @@ void game::process_sml_property(const sml_property &property)
 
 	if (key == "current_campaign") {
 		this->current_campaign = campaign::get(value);
+	} else if (key == "current_year") {
+		this->current_year = std::stoi(value);
 	} else if (key == "cheat") {
 		this->cheat = string::to_bool(value);
 	} else {
@@ -343,10 +353,7 @@ void game::save(const std::filesystem::path &filepath) const
 	// FIXME: probably not the right place for this
 	file.printf("GameCycle = %lu\n", GameCycle);
 	file.printf("SetCurrentTotalHours(%" PRIu64 ")\n", this->get_current_total_hours());
-	const QDateTime &current_date = this->get_current_date();
-	if (current_date.isValid()) {
-		file.printf("SetCurrentDate(\"%s\")\n", date::to_string(current_date).c_str());
-	}
+
 	if (age::current_age != nullptr) {
 		file.printf("SetCurrentAge(\"%s\")\n", age::current_age->get_identifier().c_str());
 	}
@@ -382,6 +389,8 @@ void game::save_game_data(CFile &file) const
 	if (this->get_current_campaign() != nullptr) {
 		game_data.add_property("current_campaign", this->get_current_campaign()->get_identifier());
 	}
+
+	game_data.add_property("current_year", std::to_string(this->get_current_year()));
 
 	if (this->cheat) {
 		game_data.add_property("cheat", string::from_bool(this->cheat));
@@ -1551,20 +1560,24 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 	}
 	
 	const campaign *current_campaign = game::get()->get_current_campaign();
-	if (current_campaign) {
-		game::get()->set_current_date(current_campaign->get_start_date());
+
+	QDateTime start_date;
+
+	if (current_campaign != nullptr) {
+		start_date = current_campaign->get_start_date();
 	} else {
 		const int year = 1;
 		const int month = random::get()->generate(date::months_per_year) + 1;
 		const int day = random::get()->generate(date::get_days_in_month(month, year)) + 1;
 		const int hour = random::get()->generate(date::hours_per_day);
-		QDate date(year, month, day);
-		QDateTime date_time(date, QTime(hour, 0));
-		game::get()->set_current_date(date_time);
+		const QDate date(year, month, day);
+		start_date = QDateTime(date, QTime(hour, 0));
 	}
-	
-	uint64_t total_hours = static_cast<uint64_t>(std::abs(game::base_date.date().year() - game::get()->get_current_date().date().year())) * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY;
-	total_hours += QDate(1, 1, 1).daysTo(QDate(1, game::get()->get_current_date().date().month(), game::get()->get_current_date().date().day())) * DEFAULT_HOURS_PER_DAY;
+
+	game::get()->set_current_year(start_date.date().year());
+
+	uint64_t total_hours = static_cast<uint64_t>(std::abs(game::base_date.date().year() - start_date.date().year())) * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY;
+	total_hours += QDate(1, 1, 1).daysTo(QDate(1, start_date.date().month(), start_date.date().day())) * DEFAULT_HOURS_PER_DAY;
 
 	game::get()->set_current_total_hours(total_hours);
 
