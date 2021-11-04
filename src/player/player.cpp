@@ -534,7 +534,7 @@ void CPlayer::Save(CFile &file) const
 	//Wyrmgus start
 	file.printf(" \"civilization\", \"%s\",", p.get_civilization()->get_identifier().c_str());
 	if (p.get_faction() != nullptr) {
-		file.printf(" \"faction\", \"%s\",", p.get_faction());
+		file.printf(" \"faction\", \"%s\",", p.get_faction()->get_identifier().c_str());
 	}
 	if (p.get_faction_tier() != faction_tier::none) {
 		file.printf(" \"faction-tier\", \"%s\",", faction_tier_to_string(this->get_faction_tier()).c_str());
