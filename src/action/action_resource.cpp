@@ -671,7 +671,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	}
 
 	// FIXME: 0 can happen, if to near placed by map designer.
-	assert_throw(unit.MapDistanceTo(*goal) <= 1);
+	assert_log(unit.MapDistanceTo(*goal) <= 1);
 
 	// Update the heading of a harvesting unit to looks straight at the resource.
 	//Wyrmgus start
