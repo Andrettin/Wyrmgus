@@ -157,11 +157,15 @@ std::filesystem::path game::save_file_url_string_to_save_filepath(const std::str
 
 	//correct issue where the QML mistakenly sends us a ".gz" file ending instead of ".sav.gz", or if it sends a file with no extension at all
 	if (!filepath_qstr.endsWith(".sav.gz")) {
-		if (filepath_qstr.endsWith(".gz")) {
-			filepath_qstr = filepath_qstr.left(filepath_qstr.size() - 3);
-		}
+		if (filepath_qstr.endsWith(".sav")) {
+			filepath_qstr += ".gz";
+		} else {
+			if (filepath_qstr.endsWith(".gz")) {
+				filepath_qstr = filepath_qstr.left(filepath_qstr.size() - 3);
+			}
 
-		filepath_qstr += ".sav.gz";
+			filepath_qstr += ".sav.gz";
+		}
 	}
 
 	return path::from_qstring(filepath_qstr);
