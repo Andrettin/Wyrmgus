@@ -447,7 +447,7 @@ void animation_set::LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.Anim.Anim = Advance(unit.Anim.CurrAnim, animIndex);
 		} else if (!strcmp(value, "unbreakable")) {
-			unit.Anim.Unbreakable = 1;
+			unit.Anim.Unbreakable = true;
 			--j;
 		} else {
 			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value);
@@ -475,7 +475,7 @@ void animation_set::LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.WaitBackup.Anim = Advance(unit.WaitBackup.CurrAnim, animIndex);
 		} else if (!strcmp(value, "unbreakable")) {
-			unit.WaitBackup.Unbreakable = 1;
+			unit.WaitBackup.Unbreakable = true;
 			--j;
 		} else {
 			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value);

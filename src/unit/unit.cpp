@@ -7019,7 +7019,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	unit.Variable[HP_INDEX].Value = std::min<int>(0, unit.Variable[HP_INDEX].Value);
 	unit.Moving = 0;
 	unit.TTL = 0;
-	unit.Anim.Unbreakable = 0;
+	unit.Anim.Unbreakable = false;
 
 	const wyrmgus::unit_type *type = unit.Type;
 

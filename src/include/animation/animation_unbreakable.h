@@ -39,5 +39,5 @@ public:
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	int state;
+	bool state = false;
 };

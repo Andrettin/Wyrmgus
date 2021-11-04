@@ -900,8 +900,8 @@ public:
 	struct _unit_anim_ {
 		const CAnimation *Anim = nullptr;      /// Anim
 		const CAnimation *CurrAnim = nullptr;  /// CurrAnim
-		int Wait;                    /// Wait
-		int Unbreakable;             /// Unbreakable
+		int Wait = 0;                    /// Wait
+		bool Unbreakable = false;             /// Unbreakable
 	} Anim, WaitBackup;
 
 	std::vector<std::unique_ptr<COrder>> Orders; /// orders to process

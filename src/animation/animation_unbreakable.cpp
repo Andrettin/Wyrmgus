@@ -36,7 +36,7 @@
 void CAnimation_Unbreakable::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	assert_throw(unit.Anim.Anim == this);
-	assert_throw(unit.Anim.Unbreakable ^ this->state);
+	assert_throw(unit.Anim.Unbreakable != this->state);
 
 	unit.Anim.Unbreakable = this->state;
 }
@@ -44,9 +44,9 @@ void CAnimation_Unbreakable::Action(CUnit &unit, int &/*move*/, int /*scale*/) c
 void CAnimation_Unbreakable::Init(const char *s, lua_State *)
 {
 	if (!strcmp(s, "begin")) {
-		this->state = 1;
+		this->state = true;
 	} else if (!strcmp(s, "end")) {
-		this->state = 0;
+		this->state = false;
 	} else {
 		//LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s" _C_ op2);
 	}
