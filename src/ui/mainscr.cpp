@@ -830,15 +830,15 @@ void DrawTime(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (UI.CurrentMapLayer != nullptr) {
 		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
-		const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
+		const time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
 		if (time_of_day != nullptr) {
-			const wyrmgus::resource_icon *icon = time_of_day->get_icon();
+			const resource_icon *icon = time_of_day->get_icon();
 			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY, render_commands);
 		}
 
-		const wyrmgus::season *season = UI.CurrentMapLayer->get_tile_season(tile_pos);
+		const season *season = UI.CurrentMapLayer->get_tile_season(tile_pos);
 		if (season != nullptr) {
-			const wyrmgus::resource_icon *icon = season->get_icon();
+			const resource_icon *icon = season->get_icon();
 			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY, render_commands);
 		}
 	}
@@ -857,18 +857,18 @@ void DrawTime(std::vector<std::function<void(renderer *)>> &render_commands)
 
 void DrawAge(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	const wyrmgus::age *age = nullptr;
+	const age *age = nullptr;
 	if (CPlayer::GetThisPlayer() != nullptr) {
 		age = CPlayer::GetThisPlayer()->get_age();
 	} else {
-		age = wyrmgus::age::current_age;
+		age = age::current_age;
 	}
 
-	const wyrmgus::resource_icon *icon = age->get_icon();
+	const resource_icon *icon = age->get_icon();
 	icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.AgePanel.IconX, UI.AgePanel.IconY, render_commands);
 	
 	if (UI.AgePanel.TextX != -1) {
-		UI.AgePanel.Font = wyrmgus::defines::get()->get_game_font();
+		UI.AgePanel.Font = defines::get()->get_game_font();
 		
 		CLabel label(UI.AgePanel.Font);
 		label.Draw(UI.AgePanel.TextX, UI.AgePanel.TextY, age->get_name(), render_commands);
