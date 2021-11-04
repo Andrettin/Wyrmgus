@@ -499,6 +499,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 					AiCanNotMove(unit);
 				}
 			}
+
 			//Wyrmgus start
 //			if (FindTerrainType(unit.Type->MovementMask, tile_flag::tree, 9999, *unit.Player, unit.tilePos, &pos)) {
 			if (FindTerrainType(unit.Type->MovementMask, wyrmgus::resource::get_all()[this->CurrentResource], 9999, *unit.Player, unit.tilePos, &pos, z)) {
@@ -598,7 +599,7 @@ void COrder_Resource::UnitGotoGoal(CUnit &unit, CUnit *const goal, int state)
 */
 int COrder_Resource::StartGathering(CUnit &unit)
 {
-	CUnit *goal;
+	CUnit *goal = nullptr;
 	const resource_info *res_info = unit.Type->get_resource_info(this->get_current_resource());
 	assert_throw(!unit.get_pixel_offset().x());
 	assert_throw(!unit.get_pixel_offset().y());
@@ -1563,7 +1564,6 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 	}
 	return false;
 }
-
 
 /**
 **  Initialize

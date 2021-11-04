@@ -34,6 +34,19 @@ static constexpr int hours_per_day = 24;
 
 extern std::string year_to_string(const int year);
 
+inline std::string year_to_labeled_string(const int year)
+{
+	std::string str = date::year_to_string(year) + " ";
+
+	if (year < 0) {
+		str += "BC";
+	} else {
+		str += "AD";
+	}
+
+	return str;
+}
+
 inline std::string to_string(const QDate &date)
 {
 	if (!date.isValid()) {
