@@ -1461,7 +1461,7 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 		case ButtonCmd::Buy:
 			res = true;
 			if (wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value).get_character() != nullptr) {
-				res = CPlayer::GetThisPlayer()->Heroes.size() < PlayerHeroMax;
+				res = CPlayer::GetThisPlayer()->Heroes.size() < CPlayer::max_heroes;
 			}
 			break;
 		case ButtonCmd::Unload:
@@ -2261,7 +2261,7 @@ void CButtonPanel::DoClicked(int button, const Qt::KeyboardModifiers key_modifie
 			|| (CurrentButtons[button]->Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(button_upgrade) == button_upgrade->MaxLimit)
 		) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The upgrade has already been acquired"));
-		} else if (CurrentButtons[button]->Action == ButtonCmd::Buy && CPlayer::GetThisPlayer()->Heroes.size() >= PlayerHeroMax && CurrentButtons[button]->Value != -1 && wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).get_character() != nullptr) {
+		} else if (CurrentButtons[button]->Action == ButtonCmd::Buy && CPlayer::GetThisPlayer()->Heroes.size() >= CPlayer::max_heroes && CurrentButtons[button]->Value != -1 && unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).get_character() != nullptr) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The hero limit has been reached"));
 		} else {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The requirements have not been fulfilled"));

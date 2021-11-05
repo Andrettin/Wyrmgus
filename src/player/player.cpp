@@ -2882,7 +2882,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 		}
 	}
 	
-	if (recruit_heroes_quantity > 0 && (this->Heroes.size() + recruit_heroes_quantity) > PlayerHeroMax) {
+	if (recruit_heroes_quantity > 0 && (this->Heroes.size() + recruit_heroes_quantity) > CPlayer::max_heroes) {
 		return false;
 	}
 

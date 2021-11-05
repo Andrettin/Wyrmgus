@@ -92,6 +92,7 @@ class CPlayer final : public QObject
 	Q_PROPERTY(bool alive READ is_alive_sync NOTIFY alive_changed)
 
 public:
+	static constexpr int max_heroes = 4; //maximum heroes per player
 	static constexpr int max_quest_pool = 4;
 	static constexpr size_t max_current_quests = 4;
 	static constexpr int base_speed_factor = 100;

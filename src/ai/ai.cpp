@@ -313,7 +313,7 @@ static void AiCheckUnits()
 	//Wyrmgus start
 	if (AiPlayer->Player->NumTownHalls > 0 && !AiPlayer->Player->has_neutral_faction_type()) {
 		//check if can hire any heroes
-		if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && !IsNetworkGame() && CurrentQuest == nullptr) {
+		if (AiPlayer->Player->Heroes.size() < CPlayer::max_heroes && AiPlayer->Player->HeroCooldownTimer == 0 && !IsNetworkGame() && CurrentQuest == nullptr) {
 			for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
 				CUnit *hero_recruiter = &AiPlayer->Player->GetUnit(i);
 				if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->Type->BoolFlag[RECRUITHEROES_INDEX].value || hero_recruiter->CurrentAction() == UnitAction::Built) {
@@ -353,7 +353,7 @@ static void AiCheckUnits()
 					continue;
 				}
 
-				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && mercenary_building->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == nullptr) { //check if can hire any heroes at the mercenary camp
+				if (AiPlayer->Player->Heroes.size() < CPlayer::max_heroes && AiPlayer->Player->HeroCooldownTimer == 0 && mercenary_building->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == nullptr) { //check if can hire any heroes at the mercenary camp
 					for (CUnit *mercenary_hero : mercenary_building->SoldUnits) {
 						if (!mercenary_building->Player->is_character_available_for_recruitment(mercenary_hero->get_character(), true)) {
 							continue;
