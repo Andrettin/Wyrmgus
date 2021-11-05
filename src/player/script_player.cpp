@@ -34,6 +34,7 @@
 #include "ai/ai_force_template.h"
 #include "ai/ai_force_type.h"
 #include "character.h"
+#include "character_title.h"
 #include "commands.h"
 #include "currency.h"
 #include "economy/resource_storage_type.h"
@@ -911,7 +912,7 @@ static int CclDefineCivilization(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				const wyrmgus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
+				const wyrmgus::character_title title = string_to_character_title(LuaToString(l, -1, k + 1));
 				++k;
 				const wyrmgus::gender gender = wyrmgus::string_to_gender(LuaToString(l, -1, k + 1));
 				++k;
@@ -1524,7 +1525,7 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				const wyrmgus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
+				const wyrmgus::character_title title = string_to_character_title(LuaToString(l, -1, k + 1));
 				++k;
 				const wyrmgus::gender gender = wyrmgus::string_to_gender(LuaToString(l, -1, k + 1));
 				++k;
@@ -2493,7 +2494,7 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 4);
 		std::string title_type_ident = LuaToString(l, 3);
 		std::string gender_ident = LuaToString(l, 4);
-		const wyrmgus::character_title title_type_id = GetCharacterTitleIdByName(title_type_ident);
+		const wyrmgus::character_title title_type_id = string_to_character_title(title_type_ident);
 		const wyrmgus::gender gender = wyrmgus::string_to_gender(gender_ident);
 		
 		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender).data());

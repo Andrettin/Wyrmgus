@@ -60,6 +60,7 @@ namespace wyrmgus {
 	class site;
 	class unit_sound_set;
 	class unit_type;
+	enum class character_title;
 	enum class gender;
 }
 
@@ -73,22 +74,6 @@ enum Attributes {
 };
 
 namespace wyrmgus {
-
-enum class character_title {
-	none = -1,
-	head_of_state, // also used for titulars to aristocratic titles which were formal only; for example: the French duke of Orléans did not rule over Orléans, but here we consider the "head of state" title to also encompass such cases
-	head_of_government,
-	education_minister,
-	finance_minister,
-	foreign_minister,
-	intelligence_minister,
-	interior_minister,
-	justice_minister,
-	war_minister,
-	
-	governor,
-	mayor
-};
 
 class character : public detailed_data_entry, public data_type<character>, public CDataType
 {
@@ -513,7 +498,4 @@ extern bool LoadingPersistentHeroes;
 
 extern int GetAttributeVariableIndex(int attribute);
 extern void SaveHeroes();
-extern std::string GetCharacterTitleNameById(const wyrmgus::character_title title);
-extern wyrmgus::character_title GetCharacterTitleIdByName(const std::string &title);
-extern bool IsMinisterialTitle(const wyrmgus::character_title title);
 extern void CharacterCclRegister();

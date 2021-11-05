@@ -31,6 +31,7 @@
 #include "ai/ai_force_template.h"
 #include "ai/ai_force_type.h"
 #include "character.h"
+#include "character_title.h"
 #include "fallback_name_generator.h"
 #include "gender.h"
 #include "luacallback.h"
@@ -102,7 +103,7 @@ void faction::process_title_name_scope(title_name_map &title_names, const sml_da
 void faction::process_character_title_name_scope(character_title_name_map &character_title_names, const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const character_title title_type = GetCharacterTitleIdByName(tag);
+	const character_title title_type = string_to_character_title(tag);
 
 	scope.for_each_child([&](const sml_data &child_scope) {
 		faction::process_character_title_name_scope(character_title_names[title_type], child_scope);

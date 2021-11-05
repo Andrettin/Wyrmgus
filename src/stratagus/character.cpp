@@ -30,6 +30,7 @@
 
 #include "ai/ai_local.h" //for using AiHelpers
 #include "character_history.h"
+#include "character_title.h"
 #include "config.h"
 #include "engine_interface.h"
 #include "game/game.h"
@@ -371,11 +372,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "title") {
-					value = FindAndReplaceString(value, "_", "-");
-					title = GetCharacterTitleIdByName(value);
-					if (title == character_title::none) {
-						fprintf(stderr, "Character title \"%s\" does not exist.\n", value.c_str());
-					}
+					title = string_to_character_title(value);
 				} else if (key == "start_date") {
 					value = FindAndReplaceString(value, "_", "-");
 					start_date = CDate::FromString(value);
@@ -399,7 +396,8 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			if (start_date.Year != 0 && end_date.Year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
+			//don't put in the faction's historical data if a blank year was given
+			if (start_date.Year != 0 && end_date.Year != 0) {
 				title_faction->HistoricalMinisters[std::make_tuple(start_date, end_date, title)] = this;
 			}
 				
@@ -1190,67 +1188,4 @@ void SaveHeroes()
 	if (std::filesystem::exists(path)) {
 		std::filesystem::remove(path);
 	}
-}
-
-std::string GetCharacterTitleNameById(const wyrmgus::character_title title)
-{
-	if (title == wyrmgus::character_title::head_of_state) {
-		return "head-of-state";
-	} else if (title == wyrmgus::character_title::head_of_government) {
-		return "head-of-government";
-	} else if (title == wyrmgus::character_title::education_minister) {
-		return "education-minister";
-	} else if (title == wyrmgus::character_title::finance_minister) {
-		return "finance-minister";
-	} else if (title == wyrmgus::character_title::foreign_minister) {
-		return "foreign-minister";
-	} else if (title == wyrmgus::character_title::intelligence_minister) {
-		return "intelligence-minister";
-	} else if (title == wyrmgus::character_title::interior_minister) {
-		return "interior-minister";
-	} else if (title == wyrmgus::character_title::justice_minister) {
-		return "justice-minister";
-	} else if (title == wyrmgus::character_title::war_minister) {
-		return "war-minister";
-	} else if (title == wyrmgus::character_title::governor) {
-		return "governor";
-	} else if (title == wyrmgus::character_title::mayor) {
-		return "mayor";
-	}
-
-	return "";
-}
-
-wyrmgus::character_title GetCharacterTitleIdByName(const std::string &title)
-{
-	if (title == "head-of-state") {
-		return wyrmgus::character_title::head_of_state;
-	} else if (title == "head-of-government") {
-		return wyrmgus::character_title::head_of_government;
-	} else if (title == "education-minister") {
-		return wyrmgus::character_title::education_minister;
-	} else if (title == "finance-minister") {
-		return wyrmgus::character_title::finance_minister;
-	} else if (title == "foreign-minister") {
-		return wyrmgus::character_title::foreign_minister;
-	} else if (title == "intelligence-minister") {
-		return wyrmgus::character_title::intelligence_minister;
-	} else if (title == "interior-minister") {
-		return wyrmgus::character_title::interior_minister;
-	} else if (title == "justice-minister") {
-		return wyrmgus::character_title::justice_minister;
-	} else if (title == "war-minister") {
-		return wyrmgus::character_title::war_minister;
-	} else if (title == "governor") {
-		return wyrmgus::character_title::governor;
-	} else if (title == "mayor") {
-		return wyrmgus::character_title::mayor;
-	}
-
-	return wyrmgus::character_title::none;
-}
-
-bool IsMinisterialTitle(const wyrmgus::character_title title)
-{
-	return (title == wyrmgus::character_title::head_of_state || title == wyrmgus::character_title::head_of_government || title == wyrmgus::character_title::education_minister || title == wyrmgus::character_title::finance_minister || title == wyrmgus::character_title::foreign_minister || title == wyrmgus::character_title::intelligence_minister || title == wyrmgus::character_title::interior_minister || title == wyrmgus::character_title::justice_minister || title == wyrmgus::character_title::war_minister);
 }

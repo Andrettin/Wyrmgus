@@ -31,6 +31,7 @@
 #include "character.h"
 
 #include "ai/ai_local.h" //for using AiHelpers
+#include "character_title.h"
 #include "gender.h"
 #include "grand_strategy.h"
 #include "item/persistent_item.h"
@@ -366,7 +367,7 @@ static int CclDefineCharacter(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const wyrmgus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, j + 1));
+				const wyrmgus::character_title title = string_to_character_title(LuaToString(l, -1, j + 1));
 				if (title == wyrmgus::character_title::none) {
 					LuaError(l, "Character title doesn't exist.");
 				}
@@ -385,7 +386,7 @@ static int CclDefineCharacter(lua_State *l)
 				std::string title_faction_name = LuaToString(l, -1, j + 1);
 				wyrmgus::faction *title_faction = wyrmgus::faction::get(title_faction_name);
 
-				if (start_date.Year != 0 && end_date.Year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
+				if (start_date.Year != 0 && end_date.Year != 0) { // don't put in the faction's historical data if a blank year was given
 					title_faction->HistoricalMinisters[std::make_tuple(start_date, end_date, title)] = character;
 				}
 				character->HistoricalTitles.push_back(std::make_tuple(start_date, end_date, title_faction, title));

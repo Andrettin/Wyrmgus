@@ -29,6 +29,7 @@
 #include "grand_strategy.h"
 
 #include "character.h"
+#include "character_title.h"
 #include "database/defines.h"
 #include "game/game.h" //for loading screen elements
 #include "gender.h"
@@ -590,8 +591,8 @@ std::string CGrandStrategyProvince::GenerateWorkName()
 	std::string work_name;
 	
 	std::vector<CGrandStrategyHero *> potential_heroes;
-	for (size_t i = 0; i < this->Owner->HistoricalMinisters[wyrmgus::character_title::head_of_state].size(); ++i) {
-		potential_heroes.push_back(this->Owner->HistoricalMinisters[wyrmgus::character_title::head_of_state][i]);
+	for (size_t i = 0; i < this->Owner->HistoricalMinisters[wyrmgus::character_title::ruler].size(); ++i) {
+		potential_heroes.push_back(this->Owner->HistoricalMinisters[wyrmgus::character_title::ruler][i]);
 	}
 	
 	if (potential_heroes.size() > 0 && SyncRand(10) != 0) { // 9 chances out of 10 that a literary work will use a hero's name as a basis
@@ -693,13 +694,13 @@ void CGrandStrategyFaction::SetMinister(const wyrmgus::character_title title, st
 			if (this->IsAlive()) {
 				int titles_size = hero->Titles.size();
 				for (int i = (titles_size - 1); i >= 0; --i) {
-					if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != wyrmgus::character_title::head_of_state) { // a character can only have multiple head of state titles, but not others
+					if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != wyrmgus::character_title::ruler) { // a character can only have multiple head of state titles, but not others
 						hero->Titles[i].second->SetMinister(hero->Titles[i].first, "");
 					}
 				}
 			}
 		} else {
-			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), GetCharacterTitleNameById(title).c_str(), this->get_full_name().c_str());
+			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), character_title_to_string(title).c_str(), this->get_full_name().c_str());
 		}
 		
 		if (this == GrandStrategyGame.PlayerFaction) {
@@ -707,7 +708,7 @@ void CGrandStrategyFaction::SetMinister(const wyrmgus::character_title title, st
 //			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->get_full_name();
 			new_minister_message += "\", \"";
 //			new_minister_message += "A new " + FullyDecapitalizeString(this->GetCharacterTitle(title, this->Ministers[title]->Gender));
-			if (title == wyrmgus::character_title::head_of_state) {
+			if (title == wyrmgus::character_title::ruler) {
 				new_minister_message += " has come to power in our realm, ";
 			} else {
 				new_minister_message += " has been appointed, ";
@@ -733,7 +734,7 @@ void CGrandStrategyFaction::MinisterSuccession(const wyrmgus::character_title ti
 	if (
 		this->Ministers[title] != nullptr
 		&& (wyrmgus::faction::get_all()[this->Faction]->get_type() == wyrmgus::faction_type::tribe || this->government_type == wyrmgus::government_type::monarchy)
-		&& title == wyrmgus::character_title::head_of_state
+		&& title == wyrmgus::character_title::ruler
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
 			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->get_gender() == wyrmgus::gender::male) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
@@ -761,7 +762,7 @@ void CGrandStrategyFaction::MinisterSuccession(const wyrmgus::character_title ti
 		}
 		
 		// if no family successor was found, the title becomes extinct if it is only a titular one (an aristocratic title whose corresponding faction does not actually hold territory)
-		if (!this->CanHaveSuccession(title, false) || title != wyrmgus::character_title::head_of_state) {
+		if (!this->CanHaveSuccession(title, false) || title != wyrmgus::character_title::ruler) {
 			this->Ministers[title] = nullptr;
 			return;
 		}
@@ -818,7 +819,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 
 bool CGrandStrategyFaction::CanHaveSuccession(const wyrmgus::character_title title, bool family_inheritance)
 {
-	if (!this->IsAlive() && (title != wyrmgus::character_title::head_of_state || !family_inheritance || wyrmgus::faction::get_all()[this->Faction]->get_type() == wyrmgus::faction_type::tribe || this->government_type != wyrmgus::government_type::monarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
+	if (!this->IsAlive() && (title != wyrmgus::character_title::ruler || !family_inheritance || wyrmgus::faction::get_all()[this->Faction]->get_type() == wyrmgus::faction_type::tribe || this->government_type != wyrmgus::government_type::monarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
@@ -840,12 +841,12 @@ int CGrandStrategyFaction::GetTroopCostModifier()
 {
 	int modifier = 0;
 	
-	if (this->Ministers[wyrmgus::character_title::head_of_state] != nullptr) {
-		modifier += this->Ministers[wyrmgus::character_title::head_of_state]->GetTroopCostModifier();
+	if (this->Ministers[wyrmgus::character_title::ruler] != nullptr) {
+		modifier += this->Ministers[wyrmgus::character_title::ruler]->GetTroopCostModifier();
 	}
 	
-	if (this->Ministers[wyrmgus::character_title::war_minister] != nullptr) {
-		modifier += this->Ministers[wyrmgus::character_title::war_minister]->GetTroopCostModifier();
+	if (this->Ministers[wyrmgus::character_title::marshal] != nullptr) {
+		modifier += this->Ministers[wyrmgus::character_title::marshal]->GetTroopCostModifier();
 	}
 	
 	return modifier;
@@ -932,24 +933,22 @@ bool CGrandStrategyHero::IsGenerated()
 
 bool CGrandStrategyHero::IsEligibleForTitle(const wyrmgus::character_title title)
 {
-	if (this->GetFaction()->government_type == wyrmgus::government_type::monarchy && title == wyrmgus::character_title::head_of_state && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() == "worker") { // commoners cannot become monarchs
+	if (this->GetFaction()->government_type == wyrmgus::government_type::monarchy && title == wyrmgus::character_title::ruler && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() == "worker") { // commoners cannot become monarchs
 		return false;
-	} else if (this->GetFaction()->government_type == wyrmgus::government_type::theocracy && title == wyrmgus::character_title::head_of_state && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() != "priest") { // non-priests cannot rule theocracies
+	} else if (this->GetFaction()->government_type == wyrmgus::government_type::theocracy && title == wyrmgus::character_title::ruler && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() != "priest") { // non-priests cannot rule theocracies
 		return false;
 	}
 	
 	for (size_t i = 0; i < this->Titles.size(); ++i) {
-		if (this->Titles[i].first == wyrmgus::character_title::head_of_state && this->Titles[i].second->IsAlive() && title != wyrmgus::character_title::head_of_state) { // if it is not a head of state title, and this character is already the head of state of a living faction, return false
+		if (this->Titles[i].first == wyrmgus::character_title::ruler && this->Titles[i].second->IsAlive() && title != wyrmgus::character_title::ruler) { // if it is not a head of state title, and this character is already the head of state of a living faction, return false
 			return false;
-		} else if (this->Titles[i].first == wyrmgus::character_title::head_of_government && title != wyrmgus::character_title::head_of_state) { // if is already a head of government, don't accept ministerial titles of lower rank (that is, any but the title of head of state)
-			return false;
-		} else if (this->Titles[i].first != wyrmgus::character_title::head_of_state && this->Titles[i].first != wyrmgus::character_title::head_of_government && title != wyrmgus::character_title::head_of_state && title != wyrmgus::character_title::head_of_government) { // if is already a minister, don't accept another ministerial title of equal rank
+		} else if (this->Titles[i].first != wyrmgus::character_title::ruler && title != wyrmgus::character_title::ruler) { // if is already a minister, don't accept another ministerial title of equal rank
 			return false;
 		}
 	}
 	
 	for (size_t i = 0; i < this->ProvinceTitles.size(); ++i) {
-		if (this->ProvinceTitles[i].first != wyrmgus::character_title::head_of_state && this->ProvinceTitles[i].first != wyrmgus::character_title::head_of_government && title != wyrmgus::character_title::head_of_state && title != wyrmgus::character_title::head_of_government) { // if already has a government position, don't accept another ministerial title of equal rank
+		if (this->ProvinceTitles[i].first != wyrmgus::character_title::ruler && title != wyrmgus::character_title::ruler) { // if already has a government position, don't accept another ministerial title of equal rank
 			return false;
 		}
 	}
@@ -966,30 +965,15 @@ int CGrandStrategyHero::GetTroopCostModifier()
 	return modifier;
 }
 
-int CGrandStrategyHero::GetTitleScore(const wyrmgus::character_title title, CGrandStrategyProvince *province)
+int CGrandStrategyHero::GetTitleScore(const wyrmgus::character_title title)
 {
 	int score = 0;
-	if (title == wyrmgus::character_title::head_of_state) {
+	if (title == wyrmgus::character_title::ruler) {
 		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3) + 1;
-	} else if (title == wyrmgus::character_title::head_of_government) {
-		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3) + 1;
-	} else if (title == wyrmgus::character_title::education_minister) {
-		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == wyrmgus::character_title::finance_minister) {
-		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == wyrmgus::character_title::war_minister) {
+	} else if (title == wyrmgus::character_title::marshal) {
 		score = (this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2;
-	} else if (title == wyrmgus::character_title::interior_minister) {
-		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == wyrmgus::character_title::justice_minister) {
-		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == wyrmgus::character_title::foreign_minister) {
+	} else if (title == wyrmgus::character_title::chancellor) {
 		score = (this->Attributes[CharismaAttribute] + this->Attributes[IntelligenceAttribute]) / 2;
-	} else if (title == wyrmgus::character_title::governor) {
-		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3);
-		if (province != nullptr && (province == this->Province || province == this->ProvinceOfOrigin)) {
-			score += 1;
-		}
 	}
 	
 	if (this->get_civilization()->ID != this->GetFaction()->civilization) {
@@ -1005,7 +989,7 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(const wyrmgus::characte
 	
 	bool first = true;
 	
-	if (title == wyrmgus::character_title::head_of_state || title == wyrmgus::character_title::war_minister) {
+	if (title == wyrmgus::character_title::ruler || title == wyrmgus::character_title::marshal) {
 		int modifier = this->GetTroopCostModifier();
 		if (modifier != 0) {
 			if (!first) {
@@ -1416,7 +1400,7 @@ void SetFactionMinister(std::string civilization_name, std::string faction_name,
 	if (civilization) {
 		faction = wyrmgus::faction::get(faction_name)->ID;
 	}
-	const wyrmgus::character_title title = GetCharacterTitleIdByName(title_name);
+	const wyrmgus::character_title title = string_to_character_title(title_name);
 	
 	if (faction == -1 || title == wyrmgus::character_title::none) {
 		return;
@@ -1432,7 +1416,7 @@ std::string GetFactionMinister(std::string civilization_name, std::string factio
 	if (civilization) {
 		faction = wyrmgus::faction::get(faction_name)->ID;
 	}
-	const wyrmgus::character_title title = GetCharacterTitleIdByName(title_name);
+	const wyrmgus::character_title title = string_to_character_title(title_name);
 	
 	if (faction == -1 || title == wyrmgus::character_title::none) {
 		return "";

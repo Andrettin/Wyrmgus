@@ -32,6 +32,7 @@
 #include "ai/ai_force_type.h"
 #include "ai/ai_local.h"
 #include "character.h"
+#include "character_title.h"
 #include "database/defines.h"
 #include "gender.h"
 #include "name_generator.h"
@@ -491,7 +492,7 @@ std::string_view civilization::get_character_title_name(const character_title ti
 	}
 
 	switch (title_type) {
-		case character_title::head_of_state:
+		case character_title::ruler:
 			switch (faction_type) {
 				case faction_type::tribe:
 					if (gender == gender::female) {
@@ -571,33 +572,12 @@ std::string_view civilization::get_character_title_name(const character_title ti
 					break;
 			}
 			break;
-		case character_title::head_of_government:
-			return "Prime Minister";
-		case character_title::education_minister:
-			//return "Education Minister"; //education minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
-			return "Master Educator";
-		case character_title::finance_minister:
-			//return "Finance Minister"; //finance minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
-			return "Treasurer";
-		case character_title::foreign_minister:
-			//return "Foreign Minister"; //foreign minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		case character_title::chancellor:
 			return "Chancellor";
-		case character_title::intelligence_minister:
-			//return "Intelligence Minister"; //intelligence minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
-			return "Spymaster";
-		case character_title::interior_minister:
-			//return "Interior Minister"; //interior minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
-			return "High Constable";
-		case character_title::justice_minister:
-			//return "Justice Minister"; //justice minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
-			return "Master of Laws";
-		case character_title::war_minister:
-			//return "War Minister"; //war minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		case character_title::marshal:
 			return "Marshal";
-		case wyrmgus::character_title::governor:
-			return "Governor";
-		case character_title::mayor:
-			return "Mayor";
+		case character_title::treasurer:
+			return "Treasurer";
 		default:
 			break;
 	}
@@ -608,7 +588,7 @@ std::string_view civilization::get_character_title_name(const character_title ti
 void civilization::process_character_title_name_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const wyrmgus::character_title title_type = GetCharacterTitleIdByName(tag);
+	const character_title title_type = string_to_character_title(tag);
 
 	scope.for_each_child([&](const sml_data &child_scope) {
 		this->process_character_title_name_scope(title_type, child_scope);

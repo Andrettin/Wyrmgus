@@ -31,6 +31,7 @@
 #include "age.h"
 #include "animation.h"
 #include "character.h"
+#include "character_title.h"
 #include "database/data_module.h"
 #include "database/data_module_container.h"
 #include "database/data_type_metadata.h"
@@ -257,6 +258,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(centesimal_int(property.get_value()));
 		} else if (property_class_name == "wyrmgus::character*") {
 			new_property_value = QVariant::fromValue(character::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::character_title") {
+			new_property_value = QVariant::fromValue(string_to_character_title(property.get_value()));
 		} else if (property_class_name == "wyrmgus::civilization*") {
 			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::civilization_group*") {

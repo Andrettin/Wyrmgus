@@ -34,6 +34,7 @@
 #include "age.h"
 #include "ai.h"
 #include "ai/ai_local.h" //for using AiHelpers
+#include "character_title.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
 #include "database/defines.h"
@@ -2215,7 +2216,7 @@ std::string_view CPlayer::get_faction_title_name() const
 
 std::string_view CPlayer::GetCharacterTitleName(const character_title title_type, const wyrmgus::gender gender) const
 {
-	if (this->get_faction() == nullptr || title_type == wyrmgus::character_title::none || gender == wyrmgus::gender::none) {
+	if (this->get_faction() == nullptr || title_type == character_title::none || gender == gender::none) {
 		return wyrmgus::string::empty_str;
 	}
 	

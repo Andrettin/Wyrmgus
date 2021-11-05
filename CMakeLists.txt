@@ -1166,6 +1166,7 @@ set(wyrmgus_generic_HDRS
 	src/include/widgets.h
 	src/include/SetupConsole_win32.h
 	src/stratagus/character_history.h
+	src/stratagus/character_title.h
 	src/stratagus/dialogue.h
 	src/stratagus/dialogue_node.h
 	src/stratagus/dialogue_option.h

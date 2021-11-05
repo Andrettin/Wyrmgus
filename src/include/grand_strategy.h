@@ -172,7 +172,7 @@ public:
 	bool IsGenerated();
 	bool IsEligibleForTitle(const wyrmgus::character_title title);
 	int GetTroopCostModifier();
-	int GetTitleScore(const wyrmgus::character_title title, CGrandStrategyProvince *province = nullptr);
+	int GetTitleScore(const wyrmgus::character_title title);
 	std::string GetMinisterEffectsString(const wyrmgus::character_title title);
 	std::string GetBestDisplayTitle();
 	CGrandStrategyFaction *GetFaction();
