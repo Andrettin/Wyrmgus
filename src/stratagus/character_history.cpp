@@ -28,6 +28,7 @@
 
 #include "character_history.h"
 
+#include "character_title.h"
 #include "database/sml_data.h"
 #include "database/sml_property.h"
 #include "map/historical_location.h"
@@ -36,7 +37,7 @@
 namespace wyrmgus {
 
 character_history::character_history(wyrmgus::faction *default_faction, const site *default_location_site)
-	: faction(default_faction)
+	: faction(default_faction), title(character_title::none)
 {
 	if (default_location_site != nullptr) {
 		this->location = std::make_unique<historical_location>(default_location_site);

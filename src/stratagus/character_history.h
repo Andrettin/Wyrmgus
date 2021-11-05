@@ -33,6 +33,7 @@ namespace wyrmgus {
 class faction;
 class historical_location;
 class site;
+enum class character_title;
 
 class character_history final : public data_entry_history
 {
@@ -40,6 +41,7 @@ class character_history final : public data_entry_history
 
 	Q_PROPERTY(bool active MEMBER active READ is_active)
 	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction)
+	Q_PROPERTY(wyrmgus::character_title title MEMBER title READ get_title)
 
 public:
 	explicit character_history(wyrmgus::faction *default_faction, const site *default_location_site);
@@ -63,10 +65,16 @@ public:
 		return this->location.get();
 	}
 
+	character_title get_title() const
+	{
+		return this->title;
+	}
+
 private:
 	bool active = false; //whether the character is active, i.e. should be applied to the map
 	wyrmgus::faction *faction = nullptr;
 	std::unique_ptr<historical_location> location; //the character's location
+	character_title title;
 };
 
 }
