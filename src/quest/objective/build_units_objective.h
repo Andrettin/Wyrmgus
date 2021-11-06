@@ -30,7 +30,7 @@
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
