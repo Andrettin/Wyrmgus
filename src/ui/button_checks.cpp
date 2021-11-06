@@ -38,7 +38,7 @@
 #include "network.h"
 #include "player/player.h"
 #include "script.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"
 #include "ui/interface.h"

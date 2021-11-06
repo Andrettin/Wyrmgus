@@ -523,11 +523,14 @@ static int CclDefineDependency(lua_State *l)
 		conditions.clear();
 	}
 	
-	std::unique_ptr<wyrmgus::condition> condition;
+	std::unique_ptr<and_condition> condition;
 	if (or_flag) {
-		condition = std::make_unique<wyrmgus::or_condition>(std::move(and_conditions));
+		auto or_condition = std::make_unique<wyrmgus::or_condition>(std::move(and_conditions));
+		std::vector<std::unique_ptr<const wyrmgus::condition>> or_condition_vector;
+		or_condition_vector.push_back(std::move(or_condition));
+		condition = std::make_unique<and_condition>(std::move(or_condition_vector));
 	} else {
-		condition = std::make_unique<wyrmgus::and_condition>(std::move(and_conditions));
+		condition = std::make_unique<and_condition>(std::move(and_conditions));
 	}
 	
 	if (!strncmp(target, "unit", 4)) {
@@ -602,11 +605,14 @@ static int CclDefinePredependency(lua_State *l)
 		conditions.clear();
 	}
 	
-	std::unique_ptr<wyrmgus::condition> condition;
+	std::unique_ptr<and_condition> condition;
 	if (or_flag) {
-		condition = std::make_unique<wyrmgus::or_condition>(std::move(and_conditions));
+		auto or_condition = std::make_unique<wyrmgus::or_condition>(std::move(and_conditions));
+		std::vector<std::unique_ptr<const wyrmgus::condition>> or_condition_vector;
+		or_condition_vector.push_back(std::move(or_condition));
+		condition = std::make_unique<and_condition>(std::move(or_condition_vector));
 	} else {
-		condition = std::make_unique<wyrmgus::and_condition>(std::move(and_conditions));
+		condition = std::make_unique<and_condition>(std::move(and_conditions));
 	}
 	
 	if (!strncmp(target, "unit", 4)) {

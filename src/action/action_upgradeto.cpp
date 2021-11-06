@@ -44,7 +44,7 @@
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
 #include "script.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "species/species.h"
 #include "spell/spell.h"
 #include "translate.h"
@@ -156,9 +156,9 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	//if the old unit type had a starting ability that the new one doesn't have, remove it; and apply it if the reverse happens
 	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
 		if (upgrade->is_ability()) {
-			if (unit.GetIndividualUpgrade(upgrade) > 0 && wyrmgus::vector::contains(oldtype.StartingAbilities, upgrade) && !wyrmgus::vector::contains(newtype.StartingAbilities, upgrade)) {
+			if (unit.GetIndividualUpgrade(upgrade) > 0 && vector::contains(oldtype.StartingAbilities, upgrade) && !vector::contains(newtype.StartingAbilities, upgrade)) {
 				IndividualUpgradeLost(unit, upgrade);
-			} else if (unit.GetIndividualUpgrade(upgrade) == 0 && wyrmgus::vector::contains(newtype.StartingAbilities, upgrade) && check_conditions(upgrade, &unit)) {
+			} else if (unit.GetIndividualUpgrade(upgrade) == 0 && vector::contains(newtype.StartingAbilities, upgrade) && check_conditions(upgrade, &unit)) {
 				IndividualUpgradeAcquire(unit, upgrade);
 			}
 		}

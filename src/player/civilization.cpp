@@ -42,7 +42,7 @@
 #include "player/faction_type.h"
 #include "player/government_type.h"
 #include "player/player.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "script.h"
 #include "time/calendar.h"
 #include "ui/button.h"

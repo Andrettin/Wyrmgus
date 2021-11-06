@@ -45,10 +45,10 @@ static int CclDefinePredependency(lua_State *l);
 static int CclDefineUpgrade(lua_State *l);
 
 namespace wyrmgus {
+	class and_condition;
 	class character;
 	class civilization;
 	class civilization_group;
-	class condition;
 	class deity;
 	class dynasty;
 	class faction;
@@ -566,14 +566,14 @@ public:
 
 	int get_price() const;
 
-	const std::unique_ptr<wyrmgus::condition> &get_preconditions() const
+	const and_condition *get_preconditions() const
 	{
-		return this->preconditions;
+		return this->preconditions.get();
 	}
 
-	const std::unique_ptr<wyrmgus::condition> &get_conditions() const
+	const and_condition *get_conditions() const
 	{
-		return this->conditions;
+		return this->conditions.get();
 	}
 
 	const wyrmgus::dynasty *get_dynasty() const
@@ -664,8 +664,8 @@ public:
 	//Wyrmgus end
 	// TODO: not used by buttons
 private:
-	std::unique_ptr<wyrmgus::condition> preconditions;
-	std::unique_ptr<wyrmgus::condition> conditions;
+	std::unique_ptr<and_condition> preconditions;
+	std::unique_ptr<and_condition> conditions;
 	const wyrmgus::dynasty *dynasty = nullptr; //the dynasty to which the upgrade pertains, if this is a dynasty upgrade
 	const wyrmgus::deity *deity = nullptr; //the deity to which the upgrade pertains, if this is a deity upgrade
 	const wyrmgus::magic_domain *magic_domain = nullptr; //the magic domain to which the upgrade pertains, if this is a magic domain upgrade

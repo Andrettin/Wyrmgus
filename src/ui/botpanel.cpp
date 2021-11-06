@@ -61,7 +61,7 @@
 #include "player/faction.h"
 #include "player/player.h"
 #include "quest/achievement.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "script/trigger.h"
 #include "sound/game_sound_set.h"
 #include "sound/sound.h"
