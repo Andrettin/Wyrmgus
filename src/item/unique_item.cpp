@@ -117,7 +117,7 @@ bool unique_item::can_drop() const
 {
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop
 	if (!IsNetworkGame()) {
-		for (character *character : character::get_all()) {
+		for (const character *character : character::get_all()) {
 			for (const auto &item : character->get_items()) {
 				if (item->get_unique() == this && !item->is_bound()) {
 					return false;

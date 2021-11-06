@@ -278,12 +278,12 @@ public:
 	void CheckKnowledgeChange(int variable, int change);
 	void UpdateItemName();
 	void GenerateDrop();
-	void GenerateSpecialProperties(CUnit *dropper = nullptr, CPlayer *dropper_player = nullptr, bool allow_unique = true, bool sold_item = false, bool always_magic = false);
-	void GeneratePrefix(CUnit *dropper, CPlayer *dropper_player);
-	void GenerateSuffix(CUnit *dropper, CPlayer *dropper_player);
-	void GenerateSpell(CUnit *dropper, CPlayer *dropper_player);
-	void GenerateWork(CUnit *dropper, CPlayer *dropper_player);
-	void GenerateUnique(CUnit *dropper, CPlayer *dropper_player);
+	void generate_special_properties(const CUnit *dropper, const CPlayer *dropper_player, const bool allow_unique, const bool sold_item, const bool always_magic);
+	void generate_prefix(const CUnit *dropper, const CPlayer *dropper_player);
+	void generate_suffix(const CUnit *dropper, const CPlayer *dropper_player);
+	void generate_spell(const CUnit *dropper, const CPlayer *dropper_player);
+	void generate_work(const CUnit *dropper, const CPlayer *dropper_player);
+	void generate_unique(const CUnit *dropper, const CPlayer *dropper_player);
 	void UpdateSoldUnits();
 	void SellUnit(CUnit *sold_unit, int player);
 	void ProduceResource(const resource *resource);

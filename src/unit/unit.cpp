@@ -2191,7 +2191,7 @@ void CUnit::GenerateDrop()
 				droppedUnit->Name = droppedUnit->Type->generate_personal_name(nullptr, droppedUnit->get_gender());
 			}
 			
-			droppedUnit->GenerateSpecialProperties(this, this->Player);
+			droppedUnit->generate_special_properties(this, this->Player, true, false, false);
 			
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && droppedUnit->get_unique() == nullptr) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 				int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
@@ -2204,7 +2204,7 @@ void CUnit::GenerateDrop()
 	}
 }
 
-void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, bool allow_unique, bool sold_item, bool always_magic)
+void CUnit::generate_special_properties(const CUnit *dropper, const CPlayer *dropper_player, const bool allow_unique, const bool sold_item, const bool always_magic)
 {
 	int magic_affix_chance = 10; //10% chance of the unit having a magic prefix or suffix
 	int unique_chance = 5; //0.5% chance of the unit being unique
@@ -2238,35 +2238,49 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 	if (allow_unique) {
 		const bool is_unique = SyncRand(1000) >= (1000 - unique_chance);
 		if (is_unique) {
-			this->GenerateUnique(dropper, dropper_player);
+			this->generate_unique(dropper, dropper_player);
 		}
 	}
 
 	if (this->get_unique() == nullptr) {
-		if (this->Type->get_item_class() == item_class::scroll || this->Type->get_item_class() == item_class::book || this->Type->get_item_class() == item_class::ring || this->Type->get_item_class() == item_class::amulet || this->Type->get_item_class() == item_class::horn || this->Type->get_item_class() == item_class::trinket || always_magic) { //scrolls, books, jewelry, horns and trinkets must always have a property
-			magic_affix_chance = 100;
+		bool must_be_magic = false;
+
+		switch (this->Type->get_item_class()) {
+			case item_class::scroll:
+			case item_class::book:
+			case item_class::ring:
+			case item_class::amulet:
+			case item_class::horn:
+			case item_class::trinket:
+				//scrolls, books, jewelry, horns and trinkets must always have a property
+				must_be_magic = true;
+				break;
+			default:
+				if (always_magic) {
+					must_be_magic = true;
+				}
+				break;
 		}
 
-		const bool is_magic = SyncRand(100) >= (100 - magic_affix_chance);
+		const bool is_magic = must_be_magic || (SyncRand(100) >= (100 - magic_affix_chance));
 		if (is_magic) {
 			std::vector<int> magic_types{0, 1, 2, 3};
 
 			while (!magic_types.empty()) {
-				const int magic_type = magic_types[SyncRand(magic_types.size())];
-				vector::remove(magic_types, magic_type);
+				const int magic_type = vector::take_random(magic_types);
 
 				switch (magic_type) {
 					case 0:
-						this->GenerateWork(dropper, dropper_player);
+						this->generate_work(dropper, dropper_player);
 						break;
 					case 1:
-						this->GeneratePrefix(dropper, dropper_player);
+						this->generate_prefix(dropper, dropper_player);
 						break;
 					case 2:
-						this->GenerateSuffix(dropper, dropper_player);
+						this->generate_suffix(dropper, dropper_player);
 						break;
 					case 3:
-						this->GenerateSpell(dropper, dropper_player);
+						this->generate_spell(dropper, dropper_player);
 						break;
 				}
 
@@ -2281,8 +2295,8 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 		this->Identified = false;
 	}
 }
-			
-void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
+
+void CUnit::generate_prefix(const CUnit *dropper, const CPlayer *dropper_player)
 {
 	std::vector<CUpgrade *> potential_prefixes;
 
@@ -2300,7 +2314,7 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 				continue;
 			}
 
-			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->has_affixed_item_class(Type->get_item_class())) {
+			if (this->Type->get_item_class() == item_class::none || !upgrade->has_affixed_item_class(Type->get_item_class())) {
 				continue;
 			}
 
@@ -2318,16 +2332,16 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 		}
 	}
 	
-	if (potential_prefixes.size() > 0) {
-		this->SetPrefix(potential_prefixes[SyncRand(potential_prefixes.size())]);
+	if (!potential_prefixes.empty()) {
+		this->SetPrefix(vector::get_random(potential_prefixes));
 	}
 }
 
-void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
+void CUnit::generate_suffix(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<CUpgrade *> potential_suffixes;
+	std::vector<const CUpgrade *> potential_suffixes;
 
-	for (CUpgrade *affix : this->Type->Affixes) {
+	for (const CUpgrade *affix : this->Type->Affixes) {
 		if (!affix->is_magic_suffix()) {
 			continue;
 		}
@@ -2341,12 +2355,12 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 	}
 
 	if (dropper_player != nullptr) {
-		for (CUpgrade *upgrade : CUpgrade::get_all()) {
+		for (const CUpgrade *upgrade : CUpgrade::get_all()) {
 			if (!upgrade->is_magic_suffix()) {
 				continue;
 			}
 
-			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->has_affixed_item_class(this->Type->get_item_class())) {
+			if (this->Type->get_item_class() == item_class::none || !upgrade->has_affixed_item_class(this->Type->get_item_class())) {
 				continue;
 			}
 
@@ -2369,40 +2383,40 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 		}
 	}
 	
-	if (potential_suffixes.size() > 0) {
-		this->SetSuffix(potential_suffixes[SyncRand(potential_suffixes.size())]);
+	if (!potential_suffixes.empty()) {
+		this->SetSuffix(vector::get_random(potential_suffixes));
 	}
 }
 
-void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
+void CUnit::generate_spell(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<wyrmgus::spell *> potential_spells;
+	std::vector<const spell *> potential_spells;
 	if (dropper != nullptr) {
-		for (wyrmgus::spell *spell : dropper->Type->DropSpells) {
-			if (this->Type->get_item_class() != wyrmgus::item_class::none && spell->ItemSpell[static_cast<int>(Type->get_item_class())]) {
+		for (const spell *spell : dropper->Type->DropSpells) {
+			if (this->Type->get_item_class() != item_class::none && spell->ItemSpell[static_cast<int>(Type->get_item_class())]) {
 				potential_spells.push_back(spell);
 			}
 		}
 	}
 	
-	if (potential_spells.size() > 0) {
-		SetSpell(potential_spells[SyncRand(potential_spells.size())]);
+	if (!potential_spells.empty()) {
+		this->SetSpell(vector::get_random(potential_spells));
 	}
 }
 
-void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
+void CUnit::generate_work(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<CUpgrade *> potential_works;
+	std::vector<const CUpgrade *> potential_works;
 
-	for (CUpgrade *affix : this->Type->Affixes) {
-		if (this->Type->get_item_class() != wyrmgus::item_class::none && affix->Work == this->Type->get_item_class() && !affix->UniqueOnly) {
+	for (const CUpgrade *affix : this->Type->Affixes) {
+		if (this->Type->get_item_class() != item_class::none && affix->Work == this->Type->get_item_class() && !affix->UniqueOnly) {
 			potential_works.push_back(affix);
 		}
 	}
 
 	if (dropper_player != nullptr) {
-		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->get_item_class() == wyrmgus::item_class::none || upgrade->Work != this->Type->get_item_class() || upgrade->UniqueOnly) {
+		for (const CUpgrade *upgrade : CUpgrade::get_all()) {
+			if (this->Type->get_item_class() == item_class::none || upgrade->Work != this->Type->get_item_class() || upgrade->UniqueOnly) {
 				continue;
 			}
 
@@ -2420,23 +2434,23 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 		}
 	}
 	
-	if (potential_works.size() > 0) {
-		this->SetWork(potential_works[SyncRand(potential_works.size())]);
+	if (!potential_works.empty()) {
+		this->SetWork(vector::get_random(potential_works));
 	}
 }
 
-void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
+void CUnit::generate_unique(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<const wyrmgus::unique_item *> potential_uniques;
+	std::vector<const unique_item *> potential_uniques;
 
-	for (const wyrmgus::unique_item *unique : wyrmgus::unique_item::get_all()) {
+	for (const unique_item *unique : unique_item::get_all()) {
 		if (this->Type != unique->get_unit_type()) {
 			continue;
 		}
 
 		if (unique->get_prefix() != nullptr) {
 			//the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit type must be capable of generating it on its own
-			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->get_prefix()) == this->Type->Affixes.end()) {
+			if (!vector::contains(this->Type->Affixes, unique->get_prefix())) {
 				if (dropper_player == nullptr) {
 					continue;
 				}
@@ -2455,7 +2469,7 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 
 		if (unique->get_suffix() != nullptr) {
 			//the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit type must be capable of generating it on its own
-			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->get_suffix()) == this->Type->Affixes.end()) {
+			if (!vector::contains(this->Type->Affixes, unique->get_suffix())) {
 				if (dropper_player == nullptr) {
 					continue;
 				}
@@ -2495,14 +2509,14 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 				continue;
 			}
 
-			if (std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), unique->get_spell()) == dropper->Type->DropSpells.end()) {
+			if (!vector::contains(dropper->Type->DropSpells, unique->get_spell())) {
 				continue;
 			}
 		}
 
 		if (unique->get_work() != nullptr) {
 			//the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit type must be capable of generating it on its own
-			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->get_work()) == this->Type->Affixes.end()) {
+			if (!vector::contains(this->Type->Affixes, unique->get_work())) {
 				if (dropper_player == nullptr) {
 					continue;
 				}
@@ -2521,7 +2535,7 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 
 		if (unique->get_elixir() != nullptr) {
 			//the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit type must be capable of generating it on its own
-			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->get_elixir()) == this->Type->Affixes.end()) {
+			if (!vector::contains(this->Type->Affixes, unique->get_elixir())) {
 				if (dropper_player == nullptr) {
 					continue;
 				}
@@ -2545,8 +2559,8 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 		potential_uniques.push_back(unique);
 	}
 	
-	if (potential_uniques.size() > 0) {
-		const wyrmgus::unique_item *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
+	if (!potential_uniques.empty()) {
+		const unique_item *chosen_unique = vector::get_random(potential_uniques);
 		this->set_unique(chosen_unique);
 	}
 }
@@ -2649,7 +2663,7 @@ void CUnit::UpdateSoldUnits()
 		} else {
 			const unit_type *chosen_unit_type = vector::get_random(potential_items);
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::get_neutral_player(), this->MapLayer->ID);
-			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
+			new_unit->generate_special_properties(this, this->Player, true, true, false);
 			new_unit->Identified = true;
 			if (new_unit->get_unique() != nullptr && this->Player == CPlayer::GetThisPlayer()) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
 				this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, "%s", _("Unique item available for sale"));
@@ -3980,7 +3994,7 @@ CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, cons
 CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int z, bool allow_unique)
 {
 	CUnit *unit = CreateUnit(pos, type, CPlayer::get_neutral_player(), z, true);
-	unit->GenerateSpecialProperties(nullptr, nullptr, allow_unique);
+	unit->generate_special_properties(nullptr, nullptr, allow_unique, false, false);
 			
 	// create metal rocks near metal resources
 	const wyrmgus::unit_type *metal_rock_type = nullptr;

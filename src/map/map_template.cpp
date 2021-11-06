@@ -2098,7 +2098,7 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 		if (historical_unit->get_unique() != nullptr) {
 			unit->set_unique(historical_unit->get_unique());
 		} else if (unit_type->BoolFlag[ITEM_INDEX].value) {
-			unit->GenerateSpecialProperties(nullptr, unit_player, false);
+			unit->generate_special_properties(nullptr, unit_player, false, false, false);
 		}
 
 		if (historical_unit->get_resources_held() != 0) {

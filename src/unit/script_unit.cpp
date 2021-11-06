@@ -2024,7 +2024,7 @@ static int CclSetUnitVariable(lua_State *l)
 		if (nargs >= 4) {
 			always_magic = LuaToBoolean(l, 4);
 		}
-		unit->GenerateSpecialProperties(nullptr, dropper_player, true, false, always_magic);
+		unit->generate_special_properties(nullptr, dropper_player, true, false, always_magic);
 	} else if (!strcmp(name, "TTL")) {
 		unit->TTL = GameCycle + LuaToNumber(l, 3);
 	} else if (!strcmp(name, "Identified")) {
