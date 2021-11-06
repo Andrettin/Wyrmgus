@@ -497,6 +497,15 @@ std::string CUpgrade::get_encyclopedia_text() const
 	return text;
 }
 
+std::string CUpgrade::get_link_string(const std::string &link_text, const bool highlight_as_fallback) const
+{
+	if (this->get_deity() != nullptr) {
+		return this->get_deity()->get_link_string(link_text, highlight_as_fallback);
+	}
+
+	return data_type::get_link_string(link_text, highlight_as_fallback);
+}
+
 void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 {
 	if (!parent_upgrade->is_defined()) {

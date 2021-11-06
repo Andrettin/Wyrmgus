@@ -352,7 +352,7 @@ private:
 	static inline bool class_initialized = data_type::initialize_class();
 
 public:
-	std::string get_link_string(const std::string &link_text = "") const
+	virtual std::string get_link_string(const std::string &link_text = "", const bool highlight_as_fallback = false) const
 	{
 		const T *underlying = this->to_underlying();
 
@@ -365,7 +365,11 @@ public:
 
 		if (!underlying->has_encyclopedia_entry()) {
 			//don't write a link if the entry cannot have an encyclopedia entry
-			return link_name;
+			if (highlight_as_fallback) {
+				return "~<" + link_name + "~>";
+			} else {
+				return link_name;
+			}
 		}
 
 		std::string link = "<a href='";

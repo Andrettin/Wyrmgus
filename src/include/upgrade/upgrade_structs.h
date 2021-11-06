@@ -379,6 +379,8 @@ public:
 
 	virtual std::string get_encyclopedia_text() const override;
 
+	virtual std::string get_link_string(const std::string &link_text = "", const bool highlight_as_fallback = false) const override;
+
 	int get_index() const
 	{
 		return this->ID;

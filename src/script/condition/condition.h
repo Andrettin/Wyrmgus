@@ -79,8 +79,8 @@ public:
 	template <typename T>
 	static std::string get_object_string(const T *object, const bool links_allowed, const std::string &name_string = "")
 	{
-		if (links_allowed && object->has_encyclopedia_entry()) {
-			return object->get_link_string(name_string);
+		if (links_allowed) {
+			return object->get_link_string(name_string, true);
 		} else {
 			return condition::get_object_highlighted_name(object, name_string);
 		}
