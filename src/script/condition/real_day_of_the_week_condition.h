@@ -57,9 +57,10 @@ public:
 		return static_cast<int>(this->day_of_the_week) == current_day_of_the_week;
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
 		return "The current real day of the week is " + string::highlight(locale::english_locale.dayName(static_cast<int>(this->day_of_the_week)).toStdString());
 	}

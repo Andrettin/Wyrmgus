@@ -95,10 +95,10 @@ public:
 		return true;
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		std::string str = "None of these must be true:\n";
-		str += condition::get_conditions_string(this->conditions, indent + 1);
+		str += condition::get_conditions_string(this->conditions, indent + 1, links_allowed);
 		return str;
 	}
 

@@ -29,6 +29,7 @@
 #include "age.h"
 #include "player/player.h"
 #include "script/condition/condition.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -47,11 +48,12 @@ public:
 		return player->get_age() == this->age;
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
-		return this->age->get_name();
+		return "Is in the " + string::highlight(this->age->get_name()) + " age";
 	}
 
 private:

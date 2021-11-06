@@ -35,6 +35,7 @@ namespace wyrmgus {
 
 class button;
 class civilization;
+class named_data_entry;
 class sml_data;
 class sml_property;
 class unit_type;
@@ -45,7 +46,7 @@ public:
 	static std::unique_ptr<const condition> from_sml_property(const sml_property &property);
 	static std::unique_ptr<const condition> from_sml_scope(const sml_data &scope);
 
-	static std::string get_conditions_string(const std::vector<std::unique_ptr<const condition>> &conditions, const size_t indent)
+	static std::string get_conditions_string(const std::vector<std::unique_ptr<const condition>> &conditions, const size_t indent, const bool links_allowed)
 	{
 		std::string conditions_string;
 		bool first = true;
@@ -54,7 +55,7 @@ public:
 				continue;
 			}
 
-			const std::string condition_string = condition->get_string(indent);
+			const std::string condition_string = condition->get_string(indent, links_allowed);
 			if (condition_string.empty()) {
 				continue;
 			}
@@ -74,7 +75,22 @@ public:
 		return conditions_string;
 	}
 
-	virtual ~condition() {}
+	//get the string for the object of a condition, e.g. the unit type for a unit type condition
+	template <typename T>
+	static std::string get_object_string(const T *object, const bool links_allowed, const std::string &name_string = "")
+	{
+		if (links_allowed && object->has_encyclopedia_entry()) {
+			return object->get_link_string(name_string);
+		} else {
+			return condition::get_object_highlighted_name(object, name_string);
+		}
+	}
+
+	static std::string get_object_highlighted_name(const named_data_entry *object, const std::string &name_string);
+
+	virtual ~condition()
+	{
+	}
 
 	void ProcessConfigData(const CConfigData *config_data);
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property);
@@ -97,7 +113,7 @@ public:
 	virtual bool check(const CUnit *unit, bool ignore_units = false) const;
 
 	//get the condition as a string
-	virtual std::string get_string(const size_t indent) const = 0;
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const = 0;
 
 	virtual bool is_hidden() const
 	{

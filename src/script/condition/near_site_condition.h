@@ -57,11 +57,14 @@ public:
 		return unit->is_near_site(this->site);
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
-		return "Near the " + string::highlight(this->site->get_game_data()->get_current_cultural_name()) + " site";
+		const std::string site_name = this->site->get_game_data()->get_current_cultural_name();
+
+		return "Near the " + string::highlight(site_name) + " site";
 	}
 
 private:

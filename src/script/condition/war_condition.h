@@ -47,9 +47,10 @@ public:
 		return player->at_war() == this->war;
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
 		return "At war";
 	}

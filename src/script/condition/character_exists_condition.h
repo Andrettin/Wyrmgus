@@ -47,11 +47,11 @@ public:
 		return this->character->get_unit() != nullptr;
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
 
-		return this->character->get_full_name() + " exists";
+		return "Character " + condition::get_object_string(this->character, links_allowed, this->character->get_full_name()) + " exists";
 	}
 
 private:

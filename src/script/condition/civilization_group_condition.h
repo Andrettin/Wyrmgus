@@ -56,11 +56,12 @@ public:
 		return this->check(player->get_civilization());
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
-		return this->group->get_name() + " Civilization Group";
+		return "Belongs to the " + string::highlight(this->group->get_name()) + " civilization group";
 	}
 
 private:

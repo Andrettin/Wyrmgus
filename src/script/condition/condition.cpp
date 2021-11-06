@@ -81,6 +81,7 @@
 #include "ui/button.h"
 #include "ui/interface.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/string_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -195,6 +196,15 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 	database::process_sml_data(condition, scope);
 
 	return condition;
+}
+
+std::string condition::get_object_highlighted_name(const named_data_entry *object, const std::string &name_string)
+{
+	if (!name_string.empty()) {
+		return string::highlight(name_string);
+	} else {
+		return string::highlight(object->get_name());
+	}
 }
 
 void condition::ProcessConfigData(const CConfigData *config_data)
@@ -439,12 +449,12 @@ std::string PrintConditions(const wyrmgus::button &button)
 	if (!strncmp(button.ValueStr.c_str(), "unit", 4)) {
 		// target string refers to unit-XXX
 		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(button.ValueStr);
-		rules = unit_type->get_conditions()->get_string(0);
+		rules = unit_type->get_conditions()->get_string(0, false);
 	} else if (!strncmp(button.ValueStr.c_str(), "upgrade", 7)) {
 		// target string refers to upgrade-XXX
 		const CUpgrade *upgrade = CUpgrade::get(button.ValueStr);
 		if (upgrade->get_conditions()) {
-			rules = upgrade->get_conditions()->get_string(0);
+			rules = upgrade->get_conditions()->get_string(0, false);
 		}
 	} else {
 		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ button.ValueStr.c_str());

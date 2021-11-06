@@ -54,11 +54,11 @@ public:
 		return unit->get_character() == this->character;
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
 
-		return this->character->get_full_name();
+		return "Has the " + condition::get_object_string(this->character, links_allowed, this->character->get_full_name()) + " character";
 	}
 
 private:

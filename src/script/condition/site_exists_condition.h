@@ -48,11 +48,12 @@ public:
 		return this->site->get_game_data()->is_on_map();
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
-		return this->site->get_game_data()->get_current_cultural_name() + " is on the map";
+		return "Site " + string::highlight(this->site->get_game_data()->get_current_cultural_name()) + " is on the map";
 	}
 
 private:

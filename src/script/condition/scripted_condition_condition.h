@@ -54,9 +54,9 @@ public:
 		return this->scripted_condition->get_conditions()->check(unit, ignore_units);
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
-		return this->scripted_condition->get_conditions()->get_string(indent);
+		return this->scripted_condition->get_conditions()->get_string(indent, links_allowed);
 	}
 
 private:

@@ -114,11 +114,11 @@ public:
 		}
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
 
-		std::string str = string::highlight(this->unit_type->get_name());
+		std::string str = condition::get_object_string(this->unit_type, links_allowed);
 
 		if (this->count > 1) {
 			str += '(' + std::to_string(this->count) + ')';

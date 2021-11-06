@@ -133,9 +133,10 @@ public:
 		}
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
 		std::string str = string::highlight(this->unit_class->get_name());
 
@@ -144,7 +145,7 @@ public:
 		}
 
 		if (this->settlement != nullptr) {
-			str += " in " + settlement->get_name();
+			str += " in " + this->settlement->get_name();
 		}
 
 		return str;

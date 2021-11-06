@@ -93,9 +93,10 @@ public:
 		return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(upgrade);
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
 		return "Has an upgrade of the " + string::highlight(this->upgrade_class->get_name()) + " upgrade class";
 	}

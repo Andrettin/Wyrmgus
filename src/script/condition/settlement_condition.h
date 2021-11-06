@@ -78,11 +78,12 @@ public:
 		return player->has_settlement(this->settlement);
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
-		return this->settlement->get_name() + " settlement";
+		return "Has the " + string::highlight(this->settlement->get_name()) + " settlement";
 	}
 
 private:

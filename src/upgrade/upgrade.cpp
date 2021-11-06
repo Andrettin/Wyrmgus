@@ -491,7 +491,7 @@ std::string CUpgrade::get_encyclopedia_text() const
 	}
 
 	if (this->get_conditions() != nullptr && this->is_magic_affix()) {
-		named_data_entry::concatenate_encyclopedia_text(text, "Conditions:\n" + this->get_conditions()->get_conditions_string(1));
+		named_data_entry::concatenate_encyclopedia_text(text, "Conditions:\n" + this->get_conditions()->get_conditions_string(1, true));
 	}
 
 	return text;

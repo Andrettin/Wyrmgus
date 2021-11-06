@@ -57,9 +57,10 @@ public:
 		return static_cast<int>(this->month) == current_month;
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
 		return "The current real month is " + string::highlight(locale::english_locale.standaloneMonthName(static_cast<int>(this->month)).toStdString());
 	}

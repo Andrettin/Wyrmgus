@@ -111,9 +111,10 @@ public:
 		return unit->is_in_tile_rect(QRect(min_map_pos, max_map_pos), unit->MapLayer->ID);
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(links_allowed)
 
 		std::string str = "Is in ";
 

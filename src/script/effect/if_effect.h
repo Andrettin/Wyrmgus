@@ -74,7 +74,7 @@ public:
 	virtual std::string get_assignment_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override
 	{
 		std::string str = "If:\n";
-		str += this->conditions.get_conditions_string(indent + 1);
+		str += this->conditions.get_conditions_string(indent + 1, false);
 		str += "\n" + std::string(indent, '\t') + "Then:\n";
 		return str + this->effects.get_effects_string(scope, ctx, indent + 1, prefix);
 	}

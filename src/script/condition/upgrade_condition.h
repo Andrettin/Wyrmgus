@@ -70,11 +70,11 @@ public:
 		return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->upgrade);
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
 
-		return "Has the " + this->upgrade->get_name() + " upgrade";
+		return "Has the " + condition::get_object_string(this->upgrade, links_allowed) + " upgrade";
 	}
 
 private:

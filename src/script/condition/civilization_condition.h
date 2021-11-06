@@ -51,11 +51,11 @@ public:
 		return this->check(player->get_civilization());
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
 
-		return this->civilization->get_name() + " Civilization";
+		return "Belongs to the " + condition::get_object_string(this->civilization, links_allowed) + " civilization";
 	}
 
 private:

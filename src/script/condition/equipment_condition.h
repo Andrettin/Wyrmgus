@@ -56,11 +56,11 @@ public:
 		return unit->is_item_type_equipped(this->equipment_type);
 	}
 
-	virtual std::string get_string(const size_t indent) const override
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
 
-		return string::highlight(this->equipment_type->get_name()) + " is equipped";
+		return condition::get_object_string(this->equipment_type, links_allowed) + " is equipped";
 	}
 
 private:
