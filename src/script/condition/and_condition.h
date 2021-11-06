@@ -50,6 +50,10 @@ public:
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
+		if (this->conditions.size() == 1) {
+			return this->conditions.front()->get_string(indent, links_allowed);
+		}
+
 		std::string str = "All of these must be true:\n";
 		str += this->get_conditions_string(indent + 1, links_allowed);
 		return str;

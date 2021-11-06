@@ -33,7 +33,9 @@ namespace wyrmgus {
 class or_condition final : public condition
 {
 public:
-	or_condition() {}
+	or_condition()
+	{
+	}
 
 	explicit or_condition(std::vector<std::unique_ptr<const condition>> &&conditions)
 		: conditions(std::move(conditions))
@@ -94,6 +96,10 @@ public:
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
+		if (this->conditions.size() == 1) {
+			return this->conditions.front()->get_string(indent, links_allowed);
+		}
+
 		std::string str = "One of these must be true:\n";
 		str += condition::get_conditions_string(this->conditions, indent + 1, links_allowed);
 		return str;
