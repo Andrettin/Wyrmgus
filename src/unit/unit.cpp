@@ -2213,7 +2213,8 @@ void CUnit::generate_special_properties(const CUnit *dropper, const CPlayer *dro
 			//if the dropper is a character, multiply the chances of the item being magic or unique by the character's level
 			magic_affix_chance *= dropper->get_character()->get_level();
 			unique_chance *= dropper->get_character()->get_level();
-		} else if (dropper->Type->BoolFlag[BUILDING_INDEX].value) { //if the dropper is a building, multiply the chances of the drop being magic or unique by a factor according to whether the building itself is magic/unique
+		} else if (dropper->Type->BoolFlag[BUILDING_INDEX].value) {
+			//if the dropper is a building, multiply the chances of the drop being magic or unique by a factor according to whether the building itself is magic/unique
 			int chance_multiplier = 2;
 			if (dropper->get_unique() != nullptr) {
 				chance_multiplier += 8;
@@ -2275,9 +2276,19 @@ void CUnit::generate_special_properties(const CUnit *dropper, const CPlayer *dro
 						break;
 					case 1:
 						this->generate_prefix(dropper, dropper_player);
+
+						//chance for a suffix to also be generated
+						if (SyncRand(100) >= (100 - magic_affix_chance)) {
+							this->generate_suffix(dropper, dropper_player);
+						}
 						break;
 					case 2:
 						this->generate_suffix(dropper, dropper_player);
+
+						//chance for a prefix to also be generated
+						if (SyncRand(100) >= (100 - magic_affix_chance)) {
+							this->generate_prefix(dropper, dropper_player);
+						}
 						break;
 					case 3:
 						this->generate_spell(dropper, dropper_player);
