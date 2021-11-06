@@ -38,8 +38,8 @@ magic_domain *magic_domain::add(const std::string &identifier, const wyrmgus::da
 	magic_domain *domain = data_type::add(identifier, data_module);
 
 	//add an upgrade with an identifier based on that of the magic domain for it
-	CUpgrade *upgrade = CUpgrade::add("upgrade_magic_domain_" + identifier, data_module, domain);
-	domain->upgrade = upgrade;
+	CUpgrade *upgrade = CUpgrade::add("upgrade_deity_domain_" + identifier, data_module, domain);
+	domain->deity_domain_upgrade = upgrade;
 
 	return domain;
 }
@@ -48,8 +48,8 @@ void magic_domain::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	if (tag == "upgrade") {
-		database::process_sml_data(this->upgrade, scope);
+	if (tag == "deity_domain_upgrade") {
+		database::process_sml_data(this->deity_domain_upgrade, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}

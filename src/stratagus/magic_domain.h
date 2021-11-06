@@ -53,9 +53,9 @@ public:
 
 	virtual void process_sml_scope(const sml_data &scope) override;
 
-	const CUpgrade *get_upgrade() const
+	const CUpgrade *get_deity_domain_upgrade() const
 	{
-		return this->upgrade;
+		return this->deity_domain_upgrade;
 	}
 
 	const std::vector<const spell *> &get_spells() const
@@ -69,7 +69,7 @@ public:
 	}
 
 private:
-	CUpgrade *upgrade = nullptr; //the upgrade corresponding to the domain
+	CUpgrade *deity_domain_upgrade = nullptr; //the upgrade corresponding to the domain as a deity domain
 	std::vector<const spell *> spells; //spells which belong to this domain
 };
 
