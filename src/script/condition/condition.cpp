@@ -529,7 +529,11 @@ static int CclDefineDependency(lua_State *l)
 			or_flag = true;
 		}
 		
-		and_conditions.push_back(std::make_unique<wyrmgus::and_condition>(std::move(conditions)));
+		if (conditions.size() == 1) {
+			and_conditions.push_back(std::move(conditions.front()));
+		} else {
+			and_conditions.push_back(std::make_unique<wyrmgus::and_condition>(std::move(conditions)));
+		}
 		conditions.clear();
 	}
 	
@@ -611,7 +615,11 @@ static int CclDefinePredependency(lua_State *l)
 			or_flag = true;
 		}
 		
-		and_conditions.push_back(std::make_unique<wyrmgus::and_condition>(std::move(conditions)));
+		if (conditions.size() == 1) {
+			and_conditions.push_back(std::move(conditions.front()));
+		} else {
+			and_conditions.push_back(std::make_unique<wyrmgus::and_condition>(std::move(conditions)));
+		}
 		conditions.clear();
 	}
 	
