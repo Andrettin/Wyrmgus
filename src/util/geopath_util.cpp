@@ -48,31 +48,11 @@ void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color,
 		}
 
 		if (previous_pixel_pos != QPoint(-1, -1) && !point::is_cardinally_adjacent_to(pixel_pos, previous_pixel_pos)) {
-			int horizontal_move_count = 0;
-			int vertical_move_count = 0;
-			const int horizontal_diff = std::abs(pixel_pos.x() - previous_pixel_pos.x());
-			const int vertical_diff = std::abs(pixel_pos.y() - previous_pixel_pos.y());
-			while (previous_pixel_pos != pixel_pos) {
-				const int horizontal_progress = horizontal_diff != 0 ? (horizontal_move_count * 100 / horizontal_diff) : 100;
-				const int vertical_progress = vertical_diff != 0 ? (vertical_move_count * 100 / vertical_diff) : 100;
-				if (previous_pixel_pos.x() != pixel_pos.x() && horizontal_progress <= vertical_progress) {
-					if (pixel_pos.x() < previous_pixel_pos.x()) {
-						previous_pixel_pos.setX(previous_pixel_pos.x() - 1);
-					} else {
-						previous_pixel_pos.setX(previous_pixel_pos.x() + 1);
-					}
-					horizontal_move_count++;
-				} else if (previous_pixel_pos.y() != pixel_pos.y()) {
-					if (pixel_pos.y() < previous_pixel_pos.y()) {
-						previous_pixel_pos.setY(previous_pixel_pos.y() - 1);
-					} else {
-						previous_pixel_pos.setY(previous_pixel_pos.y() + 1);
-					}
-					vertical_move_count++;
-				}
+			const std::vector<QPoint> straight_pixel_path = point::get_straight_path_to(previous_pixel_pos, pixel_pos);
 
-				if (previous_pixel_pos.x() >= 0 && previous_pixel_pos.y() >= 0 && previous_pixel_pos.x() < image.width() && previous_pixel_pos.y() < image.height()) {
-					geoshape::write_pixel_to_image(previous_pixel_pos, color, image);
+			for (const QPoint &straight_path_pos : straight_pixel_path) {
+				if (straight_path_pos.x() >= 0 && straight_path_pos.y() >= 0 && straight_path_pos.x() < image.width() && straight_path_pos.y() < image.height()) {
+					geoshape::write_pixel_to_image(straight_path_pos, color, image);
 				}
 			}
 		}
