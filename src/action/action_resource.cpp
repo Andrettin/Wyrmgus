@@ -1123,7 +1123,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 
 		if (source != nullptr) {
 			source->Resource.Active--;
-			assert_throw(source->Resource.Active >= 0);
+			assert_log(source->Resource.Active >= 0);
 			//Store resource position.
 			this->Resource.Mine = source->acquire_ref();
 

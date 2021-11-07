@@ -1985,7 +1985,7 @@ void CUnit::set_unique(const wyrmgus::unique_item *unique)
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->get_unique()->get_set()->get_magic_level();
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->get_unique()->get_set()->get_magic_level();
 	}
-		
+	
 	if (unique != nullptr) {
 		SetPrefix(unique->get_prefix());
 		SetSuffix(unique->get_suffix());

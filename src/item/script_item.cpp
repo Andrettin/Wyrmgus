@@ -144,6 +144,7 @@ static int CclGetUniqueItemData(lua_State *l)
 	}
 
 	const std::string identifier = LuaToString(l, 1);
+
 	const unique_item *unique = unique_item::try_get(identifier);
 
 	if (unique == nullptr) {
