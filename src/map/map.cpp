@@ -3792,11 +3792,43 @@ void CMap::clear_paths_between_subtemplates(const int z)
 		});
 	}
 
-	for (const auto &[subtemplate, path_start_points] : subtemplate_path_start_points) {
-		for (const auto &[other_subtemplate, other_path_start_points] : subtemplate_path_start_points) {
+	map_template_map<map_template_set> subtemplate_cleared_paths;
+
+	for (const auto &kv_pair : subtemplate_path_start_points) {
+		const map_template *subtemplate = kv_pair.first;
+
+		for (const auto &other_kv_pair : subtemplate_path_start_points) {
+			const map_template *other_subtemplate = other_kv_pair.first;
+
 			if (other_subtemplate == subtemplate) {
 				continue;
 			}
+
+			if (subtemplate_cleared_paths[subtemplate].contains(other_subtemplate)) {
+				continue;
+			}
+
+			const QRect &subtemplate_rect = map_layer->get_subtemplate_rect(subtemplate);
+			const QRect &other_subtemplate_rect = map_layer->get_subtemplate_rect(other_subtemplate);
+
+			std::vector<QPoint> path_start_points = kv_pair.second;
+
+			//shuffle, so that the earlier points in the list don't get unduly prioritized
+			vector::shuffle(path_start_points);
+
+			std::sort(path_start_points.begin(), path_start_points.end(), [&](const QPoint &lhs, const QPoint &rhs) {
+				return point::distance_to(lhs, other_subtemplate_rect) < point::distance_to(rhs, other_subtemplate_rect);
+			});
+
+			std::vector<QPoint> other_path_start_points = other_kv_pair.second;
+
+			vector::shuffle(other_path_start_points);
+
+			std::sort(other_path_start_points.begin(), other_path_start_points.end(), [&](const QPoint &lhs, const QPoint &rhs) {
+				return point::distance_to(lhs, subtemplate_rect) < point::distance_to(rhs, subtemplate_rect);
+			});
+
+			bool cleared_path = false;
 
 			for (const QPoint &tile_pos : path_start_points) {
 				for (const QPoint &other_tile_pos : other_path_start_points) {
@@ -3830,7 +3862,19 @@ void CMap::clear_paths_between_subtemplates(const int z)
 							path_tile->RemoveOverlayTerrain();
 						}
 					}
+
+					cleared_path = true;
+					break;
 				}
+
+				if (cleared_path) {
+					break;
+				}
+			}
+
+			if (cleared_path) {
+				subtemplate_cleared_paths[subtemplate].insert(other_subtemplate);
+				subtemplate_cleared_paths[other_subtemplate].insert(subtemplate);
 			}
 		}
 	}
