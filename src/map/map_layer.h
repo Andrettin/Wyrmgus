@@ -181,7 +181,7 @@ public:
 	{
 		static QRect empty_rect;
 
-		auto find_iterator = this->subtemplate_areas.find(map_template);
+		const auto find_iterator = this->subtemplate_areas.find(map_template);
 		if (find_iterator != this->subtemplate_areas.end()) {
 			return find_iterator->second;
 		}

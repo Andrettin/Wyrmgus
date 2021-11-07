@@ -71,6 +71,7 @@ inline int square_distance_to(const QPoint &point, const QPoint &other_point)
 }
 
 extern int distance_to(const QPoint &point, const QPoint &other_point);
+extern int distance_to(const QPoint &point, const QRect &rect);
 
 inline bool is_horizontally_adjacent_to(const QPoint &point, const QPoint &other_point)
 {

@@ -30,6 +30,8 @@
 
 namespace wyrmgus::rect {
 
+extern int distance_to(const QRect &rect, const QRect &other_rect);
+
 template <typename function_type>
 inline void for_each_point(const QRect &rect, const function_type &function)
 {

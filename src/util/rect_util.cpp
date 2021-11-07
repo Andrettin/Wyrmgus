@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,24 +26,34 @@
 
 #include "stratagus.h"
 
-#include "util/point_util.h"
-
-#include "util/number_util.h"
 #include "util/rect_util.h"
+
+#include "util/point_util.h"
 #include "util/util.h"
 
-namespace wyrmgus::point {
+namespace wyrmgus::rect {
 
-int distance_to(const QPoint &point, const QPoint &other_point)
+int distance_to(const QRect &rect, const QRect &other_rect)
 {
-	return isqrt(point::square_distance_to(point, other_point));
-}
+	const QPoint &top_left_pos = rect.topLeft();
+	const QPoint &other_top_left_pos = other_rect.topLeft();
 
-int distance_to(const QPoint &point, const QRect &rect)
-{
-	const QRect point_rect(point, QSize(1, 1));
+	int dx;
+	int dy;
 
-	return rect::distance_to(point_rect, rect);
+	if (top_left_pos.x() + rect.width() <= other_top_left_pos.x()) {
+		dx = std::max<int>(0, other_top_left_pos.x() - top_left_pos.x() - rect.width() + 1);
+	} else {
+		dx = std::max<int>(0, top_left_pos.x() - other_top_left_pos.x() - other_rect.width() + 1);
+	}
+
+	if (top_left_pos.y() + rect.height() <= other_top_left_pos.y()) {
+		dy = other_top_left_pos.y() - top_left_pos.y() - rect.height() + 1;
+	} else {
+		dy = std::max<int>(0, top_left_pos.y() - other_top_left_pos.y() - other_rect.height() + 1);
+	}
+
+	return isqrt(dy * dy + dx * dx);
 }
 
 }

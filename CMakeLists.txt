@@ -520,6 +520,7 @@ set(util_SRCS
 	src/util/point_container.cpp
 	src/util/point_util.cpp
 	src/util/random.cpp
+	src/util/rect_util.cpp
 	src/util/string_conversion_util.cpp
 	src/util/string_util.cpp
 	src/util/thread_pool.cpp
