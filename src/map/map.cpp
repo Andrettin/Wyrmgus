@@ -3685,6 +3685,8 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 			remaining_positions.erase(remaining_positions.begin() + i);
 		}
 	}
+
+	this->clear_paths_between_subtemplates(z);
 }
 
 void CMap::expand_terrain_features_to_same_terrain(const int z)
@@ -3712,7 +3714,7 @@ void CMap::expand_terrain_features_to_same_terrain(const int z)
 	});
 
 	//expand seeds
-	wyrmgus::vector::process_randomly(seeds, [&](const QPoint &seed_pos) {
+	vector::process_randomly(seeds, [&](const QPoint &seed_pos) {
 		const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
 
 		const wyrmgus::terrain_feature *terrain_feature = seed_tile->get_terrain_feature();
@@ -3746,6 +3748,92 @@ void CMap::expand_terrain_features_to_same_terrain(const int z)
 			seeds.push_back(std::move(adjacent_pos));
 		}
 	});
+}
+
+void CMap::clear_paths_between_subtemplates(const int z)
+{
+	//clear a path through rocks and trees between clear subtemplate edge points, so that e.g. cave subtemplate entrance tiles are accessible
+
+	map_template_map<std::vector<QPoint>> subtemplate_path_start_points;
+
+	const CMapLayer *map_layer = this->MapLayers[z].get();
+
+	for (const auto &[subtemplate, subtemplate_rect] : map_layer->subtemplate_areas) {
+		const QPoint min_pos = subtemplate_rect.topLeft();
+		const QPoint max_pos = subtemplate_rect.bottomRight();
+
+		rect::for_each_edge_point(subtemplate_rect, [&](const QPoint &tile_pos) {
+			const tile *tile = map_layer->Field(tile_pos);
+			const terrain_type *overlay_terrain = tile->get_overlay_terrain();
+			if (overlay_terrain != nullptr) {
+				if (overlay_terrain->has_flag(tile_flag::impassable) || overlay_terrain->has_flag(tile_flag::water_allowed) || overlay_terrain->has_flag(tile_flag::space)) {
+					return;
+				}
+			}
+
+			//start the path with a point adjacent to the subtemplate clear edge point, just outside the subtemplate
+			QPoint adjacent_pos = tile_pos;
+
+			if (tile_pos.x() == min_pos.x()) {
+				adjacent_pos.setX(tile_pos.x() - 1);
+			} else if (tile_pos.x() == max_pos.x()) {
+				adjacent_pos.setX(tile_pos.x() + 1);
+			} else if (tile_pos.y() == min_pos.y()) {
+				adjacent_pos.setY(tile_pos.y() - 1);
+			} else if (tile_pos.y() == max_pos.y()) {
+				adjacent_pos.setY(tile_pos.y() + 1);
+			}
+
+			if (!this->Info->IsPointOnMap(adjacent_pos, z)) {
+				return;
+			}
+
+			subtemplate_path_start_points[subtemplate].push_back(std::move(adjacent_pos));
+		});
+	}
+
+	for (const auto &[subtemplate, path_start_points] : subtemplate_path_start_points) {
+		for (const auto &[other_subtemplate, other_path_start_points] : subtemplate_path_start_points) {
+			if (other_subtemplate == subtemplate) {
+				continue;
+			}
+
+			for (const QPoint &tile_pos : path_start_points) {
+				for (const QPoint &other_tile_pos : other_path_start_points) {
+					const tile *tile = map_layer->Field(tile_pos);
+					const wyrmgus::tile *other_tile = map_layer->Field(other_tile_pos);
+
+					if (tile->get_landmass() != other_tile->get_landmass()) {
+						continue;
+					}
+
+					const std::vector<QPoint> path = point::get_straight_path_to(tile_pos, other_tile_pos);
+
+					bool path_valid = true;
+					for (const QPoint &path_pos : path) {
+						if (this->is_point_in_a_subtemplate_area(path_pos, z)) {
+							path_valid = false;
+							break;
+						}
+					}
+
+					if (!path_valid) {
+						continue;
+					}
+
+					for (const QPoint &path_pos : path) {
+						wyrmgus::tile *path_tile = map_layer->Field(path_pos);
+
+						const terrain_type *overlay_terrain = path_tile->get_overlay_terrain();
+						if (overlay_terrain != nullptr && overlay_terrain->has_flag(tile_flag::impassable)) {
+							//only remove impassable overlay terrain, but not water, space or roads
+							path_tile->RemoveOverlayTerrain();
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void CMap::generate_settlement_territories(const int z)

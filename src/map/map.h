@@ -181,6 +181,7 @@ public:
 	bool CanTileBePartOfMissingTerrainGeneration(const wyrmgus::tile *tile, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type) const;
 	void generate_missing_terrain(const QRect &rect, const int z);
 	void expand_terrain_features_to_same_terrain(const int z);
+	void clear_paths_between_subtemplates(const int z);
 	void generate_settlement_territories(const int z);
 	wyrmgus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const tile_flag block_flags, const tile_flag same_flags);
 	void process_settlement_territory_tiles(const int z);
