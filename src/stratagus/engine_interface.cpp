@@ -550,6 +550,8 @@ QObject *engine_interface::get_link_target(const QString &link_str) const
 			object = game_concept::get(link_target);
 		} else if (link_type == "literary_text") {
 			object = literary_text::get(link_target);
+		} else if (link_type == "unique_item") {
+			object = unique_item::get(link_target);
 		} else if (link_type == "unit_type") {
 			object = unit_type::get(link_target);
 		} else if (link_type == "upgrade") {
