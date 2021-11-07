@@ -702,12 +702,13 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map)
 		*/
 
 		f->printf("DefinePlayerTypes(");
-		while (topplayer > 0 && map.Info->player_types[topplayer] == player_type::nobody) {
+		while (topplayer > 0 && CPlayer::Players[topplayer]->get_type() == player_type::nobody) {
 			--topplayer;
 		}
 		for (int i = 0; i <= topplayer; ++i) {
-			f->printf("%s\"%s\"", (i ? ", " : ""), player_type_to_string(map.Info->player_types[i]).c_str());
-			if (map.Info->player_types[i] == player_type::person) {
+			const player_type player_type = CPlayer::Players[topplayer]->get_type();
+			f->printf("%s\"%s\"", (i ? ", " : ""), player_type_to_string(player_type).c_str());
+			if (player_type == player_type::person) {
 				++numplayers;
 			}
 		}
@@ -980,7 +981,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, const int writeTerrain)
 
 		f->printf("-- player configuration\n");
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (CMap::get()->Info->player_types[i] == player_type::nobody) {
+			if (CPlayer::Players[i]->get_type() == player_type::nobody) {
 				continue;
 			}
 			f->printf("SetStartView(%d, %d, %d)\n", i, CPlayer::Players[i]->StartPos.x, CPlayer::Players[i]->StartPos.y);

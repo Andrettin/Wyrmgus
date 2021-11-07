@@ -793,13 +793,16 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 		//Wyrmgus end
 			y += rectangle_size;
 		}
-		if (i == CEditor::get()->CursorPlayer && CMap::get()->Info->player_types[i] != player_type::nobody) {
+
+		const player_type player_type = CPlayer::Players[i]->get_type();
+
+		if (i == CEditor::get()->CursorPlayer && player_type != player_type::nobody) {
 			Video.DrawRectangle(ColorWhite, x + i % 8 * rectangle_size, y, rectangle_size, rectangle_size, render_commands);
 		}
 		Video.DrawRectangle(
-			i == CEditor::get()->CursorPlayer && CMap::get()->Info->player_types[i] != player_type::nobody ? ColorWhite : ColorGray,
+			i == CEditor::get()->CursorPlayer && player_type != player_type::nobody ? ColorWhite : ColorGray,
 			x + i % 8 * rectangle_size, y, rectangle_size - 1, rectangle_size - 1, render_commands);
-		if (CMap::get()->Info->player_types[i] != player_type::nobody) {
+		if (player_type != player_type::nobody) {
 			Video.FillRectangle(CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2, render_commands);
 		}
 		if (i == CEditor::get()->SelectedPlayer) {
@@ -827,7 +830,7 @@ static void DrawPlayers(std::vector<std::function<void(renderer *)>> &render_com
 		//Wyrmgus end
 		// Players[SelectedPlayer].RaceName);
 
-		switch (CMap::get()->Info->player_types[CEditor::get()->SelectedPlayer]) {
+		switch (CPlayer::Players[CEditor::get()->SelectedPlayer]->get_type()) {
 			case player_type::neutral:
 				strcat_s(buf.data(), buf.size(), "Neutral");
 				break;
@@ -1322,7 +1325,9 @@ static void DrawStartLocations(std::vector<std::function<void(renderer *)>> &ren
 		vp->SetClipping();
 
 		for (int i = 0; i < PlayerMax; i++) {
-			if (CMap::get()->Info->player_types[i] != player_type::nobody && CMap::get()->Info->player_types[i] != player_type::neutral && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
+			const player_type player_type = CPlayer::Players[i]->get_type();
+
+			if (player_type != player_type::nobody && player_type != player_type::neutral && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(CPlayer::Players[i]->StartPos);
 
 				if (type) {
@@ -1599,7 +1604,9 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 	if (CEditor::get()->State == EditorEditUnit || CEditor::get()->State == EditorSetStartLocation) {
 		// Cursor on player icons
 		if (CEditor::get()->CursorPlayer != -1) {
-			if (CMap::get()->Info->player_types[CEditor::get()->CursorPlayer] != player_type::nobody) {
+			const player_type player_type = CPlayer::Players[CEditor::get()->CursorPlayer]->get_type();
+
+			if (player_type != player_type::nobody) {
 				CEditor::get()->SelectedPlayer = CEditor::get()->CursorPlayer;
 				CPlayer::SetThisPlayer(CPlayer::Players[CEditor::get()->SelectedPlayer].get());
 			}
@@ -1790,14 +1797,17 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::Keyb
 		case '1': case '2':
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
-		case '9':
-			if (UnitUnderCursor != nullptr && CMap::get()->Info->player_types[(int) key - '1'] != player_type::nobody) {
-				UnitUnderCursor->ChangeOwner(*CPlayer::Players[(int) key - '1']);
+		case '9': {
+			CPlayer *player = CPlayer::Players[key - '1'].get();
+			const player_type player_type = player->get_type();
+
+			if (UnitUnderCursor != nullptr && player_type != player_type::nobody) {
+				UnitUnderCursor->ChangeOwner(*player);
 				UI.StatusLine.Set(_("Unit owner modified"));
 				UpdateMinimap = true;
 			}
 			break;
-
+		}
 		default:
 			HandleCommandKey(key, key_modifiers);
 			return;
@@ -1900,7 +1910,8 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			by += (20 * scale_factor).to_int();
 		}
 		if (bx < screenPos.x && screenPos.x < bx + (20 * scale_factor).to_int() && by < screenPos.y && screenPos.y < by + (20 * scale_factor).to_int()) {
-			if (CMap::get()->Info->player_types[i] != player_type::nobody) {
+			const player_type player_type = CPlayer::Players[i]->get_type();
+			if (player_type != player_type::nobody) {
 				std::array<char, 256> buf{};
 				//Wyrmgus start
 //				snprintf(buf.data(), buf.size(), _("Select Player #%d"), i);
@@ -2268,15 +2279,11 @@ void CEditor::Init()
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (i == PlayerNumNeutral) {
 				CreatePlayer(player_type::neutral);
-				CMap::get()->Info->player_types[i] = player_type::neutral;
-				//Wyrmgus start
-//				CMap::get()->Info->PlayerSide[i] = CPlayer::Players[i]->Race = 0;
+				CPlayer::Players[i]->set_type(player_type::neutral);
 				CPlayer::Players[i]->set_civilization(defines::get()->get_neutral_civilization());
-				CMap::get()->Info->PlayerSide[i] = CPlayer::Players[i]->Race;
-				//Wyrmgus end
 			} else {
 				CreatePlayer(player_type::nobody);
-				CMap::get()->Info->player_types[i] = player_type::nobody;
+				CPlayer::Players[i]->set_type(player_type::nobody);
 			}
 		}
 
@@ -2332,7 +2339,8 @@ void CEditor::Init()
 
 	// Place the start points, which the loader discarded.
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (CMap::get()->Info->player_types[i] != player_type::nobody) {
+		const player_type player_type = CPlayer::Players[i]->get_type();
+		if (player_type != player_type::nobody) {
 			// Set SelectedPlayer to a valid player
 			if (CEditor::get()->SelectedPlayer == PlayerNumNeutral) {
 				CEditor::get()->SelectedPlayer = i;
