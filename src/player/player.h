@@ -282,6 +282,8 @@ public:
 	unit_type *get_class_unit_type(const wyrmgus::unit_class *unit_class) const;
 	bool is_class_unit_type(const unit_type *unit_type) const;
 	CUpgrade *get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const;
+
+	bool has_upgrade(const CUpgrade *upgrade) const;
 	bool has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) const;
 
 	std::vector<CUnit *> get_town_hall_units() const;

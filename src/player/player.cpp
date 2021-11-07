@@ -1721,6 +1721,13 @@ CUpgrade *CPlayer::get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class
 	return faction->get_class_upgrade(upgrade_class);
 }
 
+bool CPlayer::has_upgrade(const CUpgrade *upgrade) const
+{
+	assert_throw(upgrade != nullptr);
+
+	return this->Allow.Upgrades[upgrade->ID] == 'R';
+}
+
 bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) const
 {
 	if (this->get_civilization() == nullptr || upgrade_class == nullptr) {
@@ -1735,7 +1742,7 @@ bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) con
 		upgrade = this->get_civilization()->get_class_upgrade(upgrade_class);
 	}
 	
-	if (upgrade != nullptr && this->Allow.Upgrades[upgrade->ID] == 'R') {
+	if (upgrade != nullptr && this->has_upgrade(upgrade)) {
 		return true;
 	}
 
@@ -1985,7 +1992,7 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 	}
 	
 	const CUpgrade *faction_type_upgrade = defines::get()->get_faction_type_upgrade(faction->get_type());
-	if (faction_type_upgrade != nullptr && !check_conditions<preconditions_only>(faction_type_upgrade, this, false)) {
+	if (faction_type_upgrade != nullptr && !this->has_upgrade(faction_type_upgrade) && !check_conditions<preconditions_only>(faction_type_upgrade, this, false)) {
 		return false;
 	}
 
