@@ -194,6 +194,50 @@ inline std::vector<QPoint> get_diagonally_adjacent_if(const QPoint &point, const
 	return adjacent_points;
 }
 
+inline std::vector<QPoint> get_straight_path_to(const QPoint &point, const QPoint &other_point)
+{
+	std::vector<QPoint> path;
+
+	path.push_back(point);
+
+	if (point::is_cardinally_adjacent_to(point, other_point)) {
+		path.push_back(other_point);
+		return path;
+	}
+
+	int horizontal_move_count = 0;
+	int vertical_move_count = 0;
+	const int horizontal_diff = std::abs(point.x() - other_point.x());
+	const int vertical_diff = std::abs(point.y() - other_point.y());
+
+	QPoint current_point = point;
+	while (current_point != other_point) {
+		const int horizontal_progress = horizontal_diff != 0 ? (horizontal_move_count * 100 / horizontal_diff) : 100;
+		const int vertical_progress = vertical_diff != 0 ? (vertical_move_count * 100 / vertical_diff) : 100;
+		if (current_point.x() != other_point.x() && horizontal_progress <= vertical_progress) {
+			if (other_point.x() < current_point.x()) {
+				current_point.setX(current_point.x() - 1);
+			} else {
+				current_point.setX(current_point.x() + 1);
+			}
+			horizontal_move_count++;
+		} else if (current_point.y() != other_point.y()) {
+			if (other_point.y() < current_point.y()) {
+				current_point.setY(current_point.y() - 1);
+			} else {
+				current_point.setY(current_point.y() + 1);
+			}
+			vertical_move_count++;
+		}
+
+		path.push_back(current_point);
+	}
+
+	path.push_back(other_point);
+
+	return path;
+}
+
 inline std::string to_string(const QPoint &point)
 {
 	return "(" + std::to_string(point.x()) + ", " + std::to_string(point.y()) + ")";
