@@ -3797,6 +3797,10 @@ void CMap::clear_paths_between_subtemplates(const int z)
 	for (const auto &kv_pair : subtemplate_path_start_points) {
 		const map_template *subtemplate = kv_pair.first;
 
+		if (!subtemplate->clears_path_to_other_subtemplates()) {
+			continue;
+		}
+
 		for (const auto &other_kv_pair : subtemplate_path_start_points) {
 			const map_template *other_subtemplate = other_kv_pair.first;
 

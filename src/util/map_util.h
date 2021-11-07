@@ -29,6 +29,18 @@
 namespace wyrmgus::map {
 
 template <typename T>
+inline std::vector<typename T::key_type> get_keys(const T &map)
+{
+	std::vector<typename T::key_type> keys;
+
+	for (const auto &kv_pair : map) {
+		keys.push_back(kv_pair.first);
+	}
+
+	return keys;
+}
+
+template <typename T>
 inline std::vector<typename T::value_type> get_values(const T &map)
 {
 	std::vector<typename T::value_type> values;
