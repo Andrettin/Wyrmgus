@@ -59,6 +59,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/date_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/string_util.h"
@@ -96,6 +97,14 @@ bool character::compare_encyclopedia_entries(const character *lhs, const charact
 		}
 
 		return lhs->get_default_faction()->get_name() < rhs->get_default_faction()->get_name();
+	}
+
+	if (lhs->get_start_year() != rhs->get_start_year()) {
+		if (lhs->get_start_year() == 0 || rhs->get_start_year() == 0) {
+			return lhs->get_start_year() == 0;
+		}
+
+		return lhs->get_start_year() < rhs->get_start_year();
 	}
 
 	return lhs->get_full_name() < rhs->get_full_name();
@@ -580,6 +589,20 @@ void character::check() const
 		throw std::runtime_error("Character \"" + this->get_mother()->get_identifier() + "\" is set to be the biological mother of \"" + this->get_identifier() + "\", but isn't female.");
 	}
 
+	if (this->get_start_year() != 0) {
+		if (this->get_end_year() != 0 && this->get_end_year() < this->get_start_year()) {
+			throw std::runtime_error("Character \"" + this->get_identifier() + "\" has an end year that is earlier than their start year.");
+		}
+
+		if (this->get_father() != nullptr && this->get_father()->get_start_year() != 0 && this->get_father()->get_start_year() > this->get_start_year()) {
+			throw std::runtime_error("Character \"" + this->get_identifier() + "\" has a start year that is earlier than their father's.");
+		}
+
+		if (this->get_mother() != nullptr && this->get_mother()->get_start_year() != 0 && this->get_mother()->get_start_year() > this->get_start_year()) {
+			throw std::runtime_error("Character \"" + this->get_identifier() + "\" has a start year that is earlier than their mother's.");
+		}
+	}
+
 	if (this->get_conditions() != nullptr) {
 		this->get_conditions()->check_validity();
 	}
@@ -659,6 +682,14 @@ std::string character::get_encyclopedia_text() const
 		}
 
 		named_data_entry::concatenate_encyclopedia_text(text, "Acquired Abilities: " + abilities_text);
+	}
+
+	if (this->get_start_year() != 0) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Start Year: " + date::year_to_labeled_string(this->get_start_year()));
+	}
+
+	if (this->get_end_year() != 0) {
+		named_data_entry::concatenate_encyclopedia_text(text, "End Year: " + date::year_to_labeled_string(this->get_end_year()));
 	}
 
 	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
