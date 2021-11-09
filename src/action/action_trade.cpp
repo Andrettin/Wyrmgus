@@ -215,18 +215,6 @@ void COrder_Trade::Execute(CUnit &unit)
 						UI.SelectedViewport->Center(unit.get_scaled_map_pixel_pos_center());
 					}
 					PlayUnitSound(*goal->ConnectingDestination, wyrmgus::unit_sound_type::used);
-				} else if (goal->Spell != nullptr) {
-					CommandSpellCast(unit, unit.tilePos, nullptr, *goal->Spell, FlushCommands, unit.MapLayer->ID);
-				} else if (goal->Work != nullptr) {
-					unit.ReadWork(goal->Work);
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->get_identifier()).c_str());
-					}
-				} else if (goal->Elixir != nullptr) {
-					unit.ConsumeElixir(goal->Elixir);
-					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->get_identifier()).c_str());
-					}
 				} else if (goal->Type->get_given_resource() != nullptr && goal->ResourcesHeld > 0) {
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->get_given_resource()->get_index()].c_str());
