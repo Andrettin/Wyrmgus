@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -34,10 +34,10 @@
 
 namespace wyrmgus {
 
-class remove_character_effect final : public effect<CPlayer>
+class kill_character_effect final : public effect<CPlayer>
 {
 public:
-	explicit remove_character_effect(const std::string &character_identifier, const sml_operator effect_operator)
+	explicit kill_character_effect(const std::string &character_identifier, const sml_operator effect_operator)
 		: effect(effect_operator)
 	{
 		this->character = character::get(character_identifier);
@@ -45,7 +45,7 @@ public:
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static const std::string class_identifier = "remove_character";
+		static const std::string class_identifier = "kill_character";
 		return class_identifier;
 	}
 
@@ -56,19 +56,18 @@ public:
 		CUnit *character_unit = this->character->get_unit();
 
 		if (character_unit != nullptr) {
-			character_unit->Remove(nullptr);
 			LetUnitDie(*character_unit);
 		}
 	}
 
 	virtual std::string get_assignment_string() const override
 	{
-		std::string str = string::highlight(this->character->get_full_name()) + "is removed";
+		std::string str = string::highlight(this->character->get_full_name()) + "dies";
 		return str;
 	}
 
 private:
-	const wyrmgus::character *character = nullptr; //the character to be removed
+	const wyrmgus::character *character = nullptr; //the character to be killed
 };
 
 }

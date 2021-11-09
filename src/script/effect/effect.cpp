@@ -39,6 +39,7 @@
 #include "script/effect/delayed_effect.h"
 #include "script/effect/hidden_effect.h"
 #include "script/effect/if_effect.h"
+#include "script/effect/kill_character_effect.h"
 #include "script/effect/last_created_unit_effect.h"
 #include "script/effect/level_check_effect.h"
 #include "script/effect/neutral_player_effect.h"
@@ -66,6 +67,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 			return std::make_unique<complete_quest_effect>(value, effect_operator);
 		} else if (key == "create_unit") {
 			return std::make_unique<create_unit_effect>(value, effect_operator);
+		} else if (key == "kill_character") {
+			return std::make_unique<kill_character_effect>(value, effect_operator);
 		} else if (key == "remove_character") {
 			return std::make_unique<remove_character_effect>(value, effect_operator);
 		} else if (resource::try_get(key) != nullptr) {
