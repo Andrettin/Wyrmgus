@@ -131,7 +131,7 @@ public:
 			unit->set_character(this->character);
 		}
 		if (this->ttl != 0) {
-			unit->TTL = this->ttl;
+			unit->TTL = GameCycle + this->ttl;
 		}
 	}
 
