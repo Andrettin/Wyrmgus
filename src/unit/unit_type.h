@@ -1031,6 +1031,11 @@ public:
 	bool CanSelect(GroupSelectionMode mode = GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY) const;
 
 	bool can_target(const CUnit *unit) const;
+
+	bool can_repair() const
+	{
+		return this->RepairRange > 0;
+	}
 	
 	void set_parent(const unit_type *parent_type);
 	void RemoveButtons(const ButtonCmd button_action, const std::string &mod_file = "");

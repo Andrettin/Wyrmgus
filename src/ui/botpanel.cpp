@@ -1251,7 +1251,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = true;
 			break;
 		case ButtonCmd::Repair:
-			res = unit.Type->RepairRange > 0;
+			res = unit.can_repair();
 			break;
 		case ButtonCmd::Patrol:
 			res = unit.CanMove();

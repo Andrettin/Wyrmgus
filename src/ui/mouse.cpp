@@ -447,7 +447,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	const wyrmgus::unit_type &type = *unit.Type;
 
 	// Go and repair
-	if (type.RepairRange && dest != nullptr
+	if (type.can_repair() && dest != nullptr
 		&& dest->Type->get_repair_hp() != 0
 		//Wyrmgus start
 //		&& dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
@@ -1592,7 +1592,7 @@ static int SendRepair(const Vec2i &tilePos, int flush)
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
-			if (unit->Type->RepairRange) {
+			if (unit->can_repair()) {
 				SendCommandRepair(*unit, tilePos, dest, flush, UI.CurrentMapLayer->ID);
 				ret = 1;
 			} else {

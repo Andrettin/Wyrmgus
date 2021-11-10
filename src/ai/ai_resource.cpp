@@ -1848,7 +1848,7 @@ static bool IsReadyToRepair(const CUnit &unit)
 */
 static bool AiRepairBuilding(const CPlayer &player, const wyrmgus::unit_type &type, CUnit &building)
 {
-	if (type.RepairRange == 0) {
+	if (!type.can_repair()) {
 		return false;
 	}
 

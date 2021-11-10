@@ -437,7 +437,7 @@ void COrder_Train::Execute(CUnit &unit)
 				if (!table[j]->IsAliveOnMap() || table[j]->Type->BoolFlag[DECORATION_INDEX].value) {
 					continue;
 				}
-				if (newUnit->Type->RepairRange && table[j]->Type->get_repair_hp() != 0 && table[j]->Variable[HP_INDEX].Value < table[j]->GetModifiedVariable(HP_INDEX, VariableAttribute::Max) && (table[j]->Player == newUnit->Player || newUnit->is_allied_with(*table[j]))) { //see if can repair
+				if (newUnit->can_repair() && table[j]->Type->get_repair_hp() != 0 && table[j]->Variable[HP_INDEX].Value < table[j]->GetModifiedVariable(HP_INDEX, VariableAttribute::Max) && (table[j]->Player == newUnit->Player || newUnit->is_allied_with(*table[j]))) { //see if can repair
 					CommandRepair(*newUnit, unit.get_rally_point_pos(), table[j], FlushCommands, unit.get_rally_point_map_layer()->ID);
 					command_found = true;
 				} else if (newUnit->can_harvest(table[j])) { // see if can harvest

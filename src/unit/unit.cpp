@@ -6245,6 +6245,11 @@ bool CUnit::can_return_goods_to(const CUnit *dest, const resource *resource) con
 	return true;
 }
 
+bool CUnit::can_repair() const
+{
+	return this->Type->can_repair();
+}
+
 /**
 **	@brief	Get whether a unit can cast a given spell
 **
@@ -7452,7 +7457,7 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, int damage)
 	if (EnableBuildingCapture && attacker
 		&& target.Type->BoolFlag[BUILDING_INDEX].value && target.Variable[HP_INDEX].Value <= damage * 3
 		&& attacker->is_enemy_of(target)
-		&& attacker->Type->RepairRange) {
+		&& attacker->can_repair()) {
 		target.ChangeOwner(*attacker->Player);
 		CommandStopUnit(*attacker); // Attacker shouldn't continue attack!
 	}
