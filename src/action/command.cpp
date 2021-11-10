@@ -489,6 +489,9 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
 		return;
 	}
 
+	assert_throw(unit.can_repair());
+	assert_throw(unit.CanMove());
+
 	//Wyrmgus start
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end

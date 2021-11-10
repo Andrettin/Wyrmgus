@@ -303,6 +303,8 @@ static void AnimateActionRepair(CUnit &unit)
 void COrder_Repair::Execute(CUnit &unit)
 {
 	assert_throw(this->get_reparable_target() == this->get_goal());
+	assert_throw(unit.CanMove());
+	assert_throw(unit.can_repair());
 
 	switch (this->State) {
 		case 0:

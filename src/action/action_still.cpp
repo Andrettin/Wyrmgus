@@ -399,14 +399,18 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 bool AutoRepair(CUnit &unit)
 {
 	//Wyrmgus start
-//	const int repairRange = unit.Type->DefaultStat.Variables[AUTOREPAIRRANGE_INDEX].Value;
-	const int repairRange = unit.Variable[AUTOREPAIRRANGE_INDEX].Value;
+//	const int auto_repair_range = unit.Type->DefaultStat.Variables[AUTOREPAIRRANGE_INDEX].Value;
+	const int auto_repair_range = unit.Variable[AUTOREPAIRRANGE_INDEX].Value;
 	//Wyrmgus end
 
-	if (unit.AutoRepair == false || repairRange == 0) {
+	if (unit.AutoRepair == false || auto_repair_range == 0) {
 		return false;
 	}
-	CUnit *repairedUnit = UnitToRepairInRange(unit, repairRange);
+
+	assert_throw(unit.can_repair());
+	assert_throw(unit.CanMove());
+
+	CUnit *repairedUnit = UnitToRepairInRange(unit, auto_repair_range);
 
 	if (repairedUnit == nullptr) {
 		return false;
@@ -422,6 +426,7 @@ bool AutoRepair(CUnit &unit)
 	if (saved_order != nullptr) {
 		unit.SavedOrder = std::move(saved_order);
 	}
+
 	return true;
 }
 

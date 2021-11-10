@@ -377,6 +377,9 @@ void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
 		  _C_ UnitNumber(building));
 		  //Wyrmgus end
 
+		assert_throw(unit.can_repair());
+		assert_throw(unit.CanMove());
+
 		//insert a repair order right after the current order
 		unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionRepair(building));
 		return;
