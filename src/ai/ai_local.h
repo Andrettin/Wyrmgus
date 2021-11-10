@@ -714,7 +714,7 @@ extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
 extern void AiAddUnitTypeRequest(const wyrmgus::unit_type &type, const int count, const landmass *landmass = nullptr, const site *settlement = nullptr, const Vec2i &pos = Vec2i(-1, -1), const int z = 0);
 /// Add upgrade-to request to resource manager
-extern void AiAddUpgradeToRequest(wyrmgus::unit_type &type);
+extern void AiAddUpgradeToRequest(const unit_type &type);
 /// Add research request to resource manager
 extern void AiAddResearchRequest(const CUpgrade *upgrade);
 /// Periodic called resource manager handler

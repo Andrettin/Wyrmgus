@@ -64,7 +64,7 @@
 
 static constexpr int COLLECT_RESOURCES_INTERVAL = 4;
 
-static int AiMakeUnit(const wyrmgus::unit_type &type, const Vec2i &nearPos, int z, const landmass *landmass = nullptr, const wyrmgus::site *settlement = nullptr);
+static int AiMakeUnit(const unit_type &type, const Vec2i &nearPos, int z, const landmass *landmass = nullptr, const site *settlement = nullptr);
 
 /**
 **  Check if the costs are available for the AI.
@@ -137,7 +137,7 @@ static int AiCheckCosts(const resource_map<int> &costs)
 **  @todo  The number of food currently trained can be stored global
 **         for faster use.
 */
-static int AiCheckSupply(const PlayerAi &pai, const wyrmgus::unit_type &type)
+static int AiCheckSupply(const PlayerAi &pai, const unit_type &type)
 {
 	// Count food supplies under construction.
 	int remaining = 0;
@@ -312,7 +312,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-static int AiBuildBuilding(const wyrmgus::unit_type &type, const wyrmgus::unit_type &building, const Vec2i &nearPos, int z, const landmass *landmass = nullptr, const site *settlement = nullptr)
+static int AiBuildBuilding(const unit_type &type, const unit_type &building, const Vec2i &nearPos, int z, const landmass *landmass = nullptr, const site *settlement = nullptr)
 {
 	std::vector<CUnit *> table;
 
@@ -425,14 +425,14 @@ static int AiBuildBuilding(const wyrmgus::unit_type &type, const wyrmgus::unit_t
 	return 0;
 }
 
-bool AiRequestedTypeAllowed(const CPlayer &player, const wyrmgus::unit_type &type, bool allow_can_build_builder, bool include_upgrade)
+bool AiRequestedTypeAllowed(const CPlayer &player, const unit_type &type, bool allow_can_build_builder, bool include_upgrade)
 {
 	if (!check_conditions(&type, &player)) {
 		return false;
 	}
 
-	const std::vector<const wyrmgus::unit_type *> *builders = nullptr;
-	const std::vector<const wyrmgus::unit_class *> *builder_classes = nullptr;
+	const std::vector<const unit_type *> *builders = nullptr;
+	const std::vector<const unit_class *> *builder_classes = nullptr;
 
 	if (type.BoolFlag[BUILDING_INDEX].value) {
 		if (
@@ -452,15 +452,15 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const wyrmgus::unit_type &typ
 	}
 
 	if (builders != nullptr) {
-		for (const wyrmgus::unit_type *builder : *builders) {
+		for (const unit_type *builder : *builders) {
 			if (player.GetUnitTypeAiActiveCount(builder) > 0 || (allow_can_build_builder && AiRequestedTypeAllowed(player, *builder))) {
 				return true;
 			}
 		}
 
 		if (type.get_unit_class() != nullptr && player.get_faction() != nullptr) {
-			for (const wyrmgus::unit_class *builder_class : *builder_classes) {
-				const wyrmgus::unit_type *builder = player.get_faction()->get_class_unit_type(builder_class);
+			for (const unit_class *builder_class : *builder_classes) {
+				const unit_type *builder = player.get_faction()->get_class_unit_type(builder_class);
 
 				if (builder == nullptr) {
 					continue;
@@ -484,14 +484,14 @@ static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upg
 		return false;
 	}
 
-	for (const wyrmgus::unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
+	for (const unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
 		if ((player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && check_conditions(upgrade, &player)) {
 			return true;
 		}
 	}
 
-	for (const wyrmgus::unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
-		const wyrmgus::unit_type *researcher_type = AiPlayer->Player->get_class_unit_type(researcher_class);
+	for (const unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
+		const unit_type *researcher_type = AiPlayer->Player->get_class_unit_type(researcher_class);
 		if (researcher_type != nullptr && (player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && check_conditions(upgrade, &player)) {
 			return true;
 		}
@@ -503,7 +503,7 @@ static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upg
 struct cnode {
 	int unit_cost = 0;
 	int needmask = 0;
-	const wyrmgus::unit_type *type = nullptr;
+	const unit_type *type = nullptr;
 };
 
 static bool cnode_cmp(const cnode &lhs, const cnode &rhs)
@@ -549,7 +549,7 @@ void AiNewDepotRequest(CUnit &worker)
 		 */
 		return;
 	}
-	const wyrmgus::unit_type *best_type = nullptr;
+	const unit_type *best_type = nullptr;
 	int best_cost = 0;
 	//int best_mask = 0;
 	// Count the already made build requests.
@@ -560,9 +560,9 @@ void AiNewDepotRequest(CUnit &worker)
 	const int n = AiHelpers.Depots[resource->get_index()].size();
 
 	for (int i = 0; i < n; ++i) {
-		const wyrmgus::unit_type &type = *AiHelpers.Depots[resource->get_index()][i];
+		const unit_type &type = *AiHelpers.Depots[resource->get_index()][i];
 
-		if (worker.Player->get_faction() != nullptr && !worker.Player->get_faction()->is_class_unit_type(&type)) {
+		if (worker.Player->get_faction() != nullptr && !worker.Player->is_class_unit_type(&type)) {
 			continue;
 		}
 
@@ -706,15 +706,15 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 		return;
 	}
 
-	const wyrmgus::unit_type *best_type = nullptr;
+	const unit_type *best_type = nullptr;
 	int best_cost = 0;
 
 	const int n = AiHelpers.NavalTransporters.size();
 
 	for (int i = 0; i < n; ++i) {
-		const wyrmgus::unit_type *type = AiHelpers.NavalTransporters[i];
+		const unit_type *type = AiHelpers.NavalTransporters[i];
 
-		if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->get_faction()->is_class_unit_type(type)) {
+		if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->is_class_unit_type(type)) {
 			continue;
 		}
 
@@ -748,7 +748,7 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 		count_requested = std::max(count_requested, 1);
 
 		bool has_builder = false;
-		for (const wyrmgus::unit_type *builder : AiHelpers.get_trainers(best_type)) {
+		for (const unit_type *builder : AiHelpers.get_trainers(best_type)) {
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder) > 0) {
 				std::vector<CUnit *> builder_table;
 
@@ -769,8 +769,8 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 		}
 
 		if (!has_builder && AiPlayer->Player->get_faction() != nullptr) {
-			for (const wyrmgus::unit_class *builder_class : AiHelpers.get_trainer_classes(best_type->get_unit_class())) {
-				const wyrmgus::unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
+			for (const unit_class *builder_class : AiHelpers.get_trainer_classes(best_type->get_unit_class())) {
+				const unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
 				if (builder == nullptr) {
 					continue;
@@ -803,7 +803,7 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 					continue;
 				}
 				
-				if (wyrmgus::vector::contains(AiHelpers.get_trainers(best_type), queue.Type) || wyrmgus::vector::contains(AiHelpers.get_trainer_classes(best_type->get_unit_class()), queue.Type->get_unit_class())) {
+				if (vector::contains(AiHelpers.get_trainers(best_type), queue.Type) || vector::contains(AiHelpers.get_trainer_classes(best_type->get_unit_class()), queue.Type->get_unit_class())) {
 					has_builder = true;
 					break;
 				}
@@ -812,8 +812,8 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 		
 		if (!has_builder) { // if doesn't have a builder, request one
 			bool requested_builder = false;
-			for (const wyrmgus::unit_type *builder : AiHelpers.get_trainers(best_type)) {
-				if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->get_faction()->is_class_unit_type(builder)) {
+			for (const unit_type *builder : AiHelpers.get_trainers(best_type)) {
+				if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->is_class_unit_type(builder)) {
 					continue;
 				}
 
@@ -827,8 +827,8 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 			}
 
 			if (!requested_builder && AiPlayer->Player->get_faction() != nullptr) {
-				for (const wyrmgus::unit_class *builder_class : AiHelpers.get_trainer_classes(best_type->get_unit_class())) {
-					const wyrmgus::unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
+				for (const unit_class *builder_class : AiHelpers.get_trainer_classes(best_type->get_unit_class())) {
+					const unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
 					if (builder == nullptr) {
 						continue;
@@ -881,7 +881,7 @@ static bool AiRequestSupply()
 	const int n = AiHelpers.UnitLimit.size();
 
 	for (int i = 0; i < n; ++i) {
-		const wyrmgus::unit_type &type = *AiHelpers.UnitLimit[i];
+		const unit_type &type = *AiHelpers.UnitLimit[i];
 		if (counter[type.Slot]) { // Already ordered.
 #if defined(DEBUG) && defined(DebugRequestSupply)
 			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n"
@@ -890,7 +890,7 @@ static bool AiRequestSupply()
 			return false;
 		}
 
-		if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->get_faction()->is_class_unit_type(&type)) {
+		if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->is_class_unit_type(&type)) {
 			continue;
 		}
 
@@ -924,7 +924,7 @@ static bool AiRequestSupply()
 	}
 	if (j) {
 		if (!cache[0].needmask) {
-			const wyrmgus::unit_type &type = *cache[0].type;
+			const unit_type &type = *cache[0].type;
 			Vec2i invalidPos(-1, -1);
 			//Wyrmgus start
 //			if (AiMakeUnit(type, invalidPos)) {
@@ -997,7 +997,7 @@ static bool AiRequestSupply()
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiTrainUnit(const unit_type &type, unit_type &what, const landmass *landmass = nullptr, const site *settlement = nullptr)
+static bool AiTrainUnit(const unit_type &type, const unit_type &what, const landmass *landmass = nullptr, const site *settlement = nullptr)
 {
 	std::vector<CUnit *> table;
 
@@ -1043,10 +1043,10 @@ static int AiMakeUnit(const unit_type &typeToMake, const Vec2i &nearPos, const i
 
 	// Iterate them
 	for (int currentType = 0; currentType < usableTypesCount; ++currentType) {
-		wyrmgus::unit_type &type = *wyrmgus::unit_type::get_all()[usableTypes[currentType]];
+		const unit_type &type = *unit_type::get_all()[usableTypes[currentType]];
 
-		const std::vector<const wyrmgus::unit_type *> *builders = nullptr;
-		const std::vector<const wyrmgus::unit_class *> *builder_classes = nullptr;
+		const std::vector<const unit_type *> *builders = nullptr;
+		const std::vector<const unit_class *> *builder_classes = nullptr;
 
 		//
 		// Check if we have a place for building or a unit to build.
@@ -1059,7 +1059,7 @@ static int AiMakeUnit(const unit_type &typeToMake, const Vec2i &nearPos, const i
 			builder_classes = &AiHelpers.get_trainer_classes(type.get_unit_class());
 		}
 
-		for (const wyrmgus::unit_type *builder : *builders) {
+		for (const unit_type *builder : *builders) {
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder)) {
 				if (type.BoolFlag[BUILDING_INDEX].value) {
 					if (AiBuildBuilding(*builder, type, nearPos, z, landmass, settlement)) {
@@ -1074,8 +1074,8 @@ static int AiMakeUnit(const unit_type &typeToMake, const Vec2i &nearPos, const i
 		}
 
 		if (AiPlayer->Player->get_faction() != nullptr) {
-			for (const wyrmgus::unit_class *builder_class : *builder_classes) {
-				const wyrmgus::unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
+			for (const unit_class *builder_class : *builder_classes) {
+				const unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
 				if (builder == nullptr) {
 					continue;
@@ -1109,7 +1109,7 @@ static int AiMakeUnit(const unit_type &typeToMake, const Vec2i &nearPos, const i
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiResearchUpgrade(const wyrmgus::unit_type &type, const CUpgrade &what)
+static bool AiResearchUpgrade(const unit_type &type, const CUpgrade &what)
 {
 	std::vector<CUnit *> table;
 
@@ -1142,7 +1142,7 @@ void AiAddResearchRequest(const CUpgrade *upgrade)
 	//
 	// Check if we have a place for the upgrade to research
 	//
-	for (const wyrmgus::unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
+	for (const unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
 		// The type is available
 		if (AiPlayer->Player->GetUnitTypeAiActiveCount(researcher_type)
 			&& AiResearchUpgrade(*researcher_type, *upgrade)) {
@@ -1150,8 +1150,8 @@ void AiAddResearchRequest(const CUpgrade *upgrade)
 		}
 	}
 
-	for (const wyrmgus::unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
-		const wyrmgus::unit_type *researcher_type = AiPlayer->Player->get_class_unit_type(researcher_class);
+	for (const unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
+		const unit_type *researcher_type = AiPlayer->Player->get_class_unit_type(researcher_class);
 		if (researcher_type != nullptr && AiPlayer->Player->GetUnitTypeAiActiveCount(researcher_type)
 			&& AiResearchUpgrade(*researcher_type, *upgrade)) {
 			return;
@@ -1169,7 +1169,7 @@ void AiAddResearchRequest(const CUpgrade *upgrade)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiUpgradeTo(const wyrmgus::unit_type &type, wyrmgus::unit_type &what)
+static bool AiUpgradeTo(const unit_type &type, const unit_type &what)
 {
 	std::vector<CUnit *> table;
 
@@ -1191,7 +1191,7 @@ static bool AiUpgradeTo(const wyrmgus::unit_type &type, wyrmgus::unit_type &what
 **
 **  @param type  FIXME: docu
 */
-void AiAddUpgradeToRequest(wyrmgus::unit_type &type)
+void AiAddUpgradeToRequest(const unit_type &type)
 {
 	// Check if resources are available.
 	const int resourceNeeded = AiCheckUnitTypeCosts(type);
@@ -1205,8 +1205,8 @@ void AiAddUpgradeToRequest(wyrmgus::unit_type &type)
 	//
 	// Check if we have a place for the upgrade to.
 	//
-	const std::vector<const wyrmgus::unit_type *> &unit_type_upgradees = AiHelpers.get_unit_type_upgradees(&type);
-	const std::vector<const wyrmgus::unit_class *> &unit_class_upgradees = AiHelpers.get_unit_class_upgradees(type.get_unit_class());
+	const std::vector<const unit_type *> &unit_type_upgradees = AiHelpers.get_unit_type_upgradees(&type);
+	const std::vector<const unit_class *> &unit_class_upgradees = AiHelpers.get_unit_class_upgradees(type.get_unit_class());
 
 	if (unit_type_upgradees.empty() && unit_class_upgradees.empty()) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest: Nothing known about '%s'\n"
@@ -1214,7 +1214,7 @@ void AiAddUpgradeToRequest(wyrmgus::unit_type &type)
 		return;
 	}
 
-	for (const wyrmgus::unit_type *unit_type_upgradee : unit_type_upgradees) {
+	for (const unit_type *unit_type_upgradee : unit_type_upgradees) {
 		if (AiPlayer->Player->GetUnitTypeAiActiveCount(unit_type_upgradee)) {
 			if (AiUpgradeTo(*unit_type_upgradee, type)) {
 				return;
@@ -1223,8 +1223,8 @@ void AiAddUpgradeToRequest(wyrmgus::unit_type &type)
 	}
 
 	if (AiPlayer->Player->get_faction() != nullptr) {
-		for (const wyrmgus::unit_class *unit_class_upgradee : unit_class_upgradees) {
-			const wyrmgus::unit_type *unit_type_upgradee = AiPlayer->Player->get_faction()->get_class_unit_type(unit_class_upgradee);
+		for (const unit_class *unit_class_upgradee : unit_class_upgradees) {
+			const unit_type *unit_type_upgradee = AiPlayer->Player->get_faction()->get_class_unit_type(unit_class_upgradee);
 
 			if (unit_type_upgradee == nullptr) {
 				continue;
@@ -1255,14 +1255,14 @@ static void AiCheckingWork()
 	const int sz = AiPlayer->UnitTypeBuilt.size();
 	for (int i = 0; i < sz; ++i) {
 		AiBuildQueue *queuep = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-		const wyrmgus::unit_type &type = *queuep->Type;
+		const unit_type &type = *queuep->Type;
 
-		const wyrmgus::site *settlement = queuep->settlement;
+		const site *settlement = queuep->settlement;
 		
 		if (settlement != nullptr) {
 			//if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
 
-			const wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
+			const site_game_data *settlement_game_data = settlement->get_game_data();
 
 			if (
 				(!type.BoolFlag[TOWNHALL_INDEX].value && settlement_game_data->get_site_unit()->Player != AiPlayer->Player)
@@ -1407,7 +1407,7 @@ static void AiProduceResources()
 	const int n = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		const std::vector<const wyrmgus::resource *> &produced_resources = AiHelpers.get_produced_resources(unit.Type);
+		const std::vector<const resource *> &produced_resources = AiHelpers.get_produced_resources(unit.Type);
 		if (produced_resources.empty() || !unit.Active) {
 			continue;
 		}
@@ -1416,9 +1416,9 @@ static void AiProduceResources()
 			continue;
 		}
 
-		const wyrmgus::resource *chosen_resource = nullptr;
+		const resource *chosen_resource = nullptr;
 		int best_value = 0;
-		for (const wyrmgus::resource *resource : produced_resources) {
+		for (const resource *resource : produced_resources) {
 			if (!resource->LuxuryResource && AiCanSellResource(resource)) {
 				continue;
 			}
@@ -1493,7 +1493,7 @@ static void AiCollectResources()
 			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 			//Wyrmgus start
 //			const int c = order.GetCurrentResource();
-			const wyrmgus::resource *cost_resource = wyrmgus::resource::get_all()[order.GetCurrentResource()]->get_final_resource();
+			const resource *cost_resource = resource::get_all()[order.GetCurrentResource()]->get_final_resource();
 			if (cost_resource->LuxuryResource) {
 				num_units_assigned[cost_resource->get_index()]++;
 				cost_resource = defines::get()->get_wealth_resource();
@@ -1568,7 +1568,7 @@ static void AiCollectResources()
 	}
 
 	// Initialise priority & mapping
-	for (size_t c = 0; c < wyrmgus::resource::get_all().size(); ++c) {
+	for (size_t c = 0; c < resource::get_all().size(); ++c) {
 		priority_resource[c] = c;
 		priority_needed[c] = wanted[c] - num_units_assigned[c] - num_units_with_resource[c];
 
@@ -1579,8 +1579,8 @@ static void AiCollectResources()
 	}
 	CUnit *unit;
 	// sort resources by priority
-	for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
-		for (size_t j = i + 1; j < wyrmgus::resource::get_all().size(); ++j) {
+	for (size_t i = 0; i < resource::get_all().size(); ++i) {
+		for (size_t j = i + 1; j < resource::get_all().size(); ++j) {
 			if (priority_needed[j] > priority_needed[i]) {
 				std::swap(priority_needed[i], priority_needed[j]);
 				std::swap(priority_resource[i], priority_resource[j]);
@@ -1590,7 +1590,7 @@ static void AiCollectResources()
 	unit = nullptr;
 
 	// Try to complete each resource in the priority order
-	for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
+	for (size_t i = 0; i < resource::get_all().size(); ++i) {
 		int c = priority_resource[i];
 			
 		//Wyrmgus start
@@ -1603,7 +1603,7 @@ static void AiCollectResources()
 		if (num_units_unassigned[c]) {
 			CUnit *unassigned_unit = units_unassigned[c][SyncRand(units_unassigned[c].size())]; //only try to assign one unit (randomly, so it isn't always the first unit) per time, to lessen the strain on performance
 			// Take the unit.
-			if (AiAssignHarvester(*unassigned_unit, wyrmgus::resource::get_all()[c])) {
+			if (AiAssignHarvester(*unassigned_unit, resource::get_all()[c])) {
 				// unit is assigned
 				unit = unassigned_unit;
 					
@@ -1631,7 +1631,7 @@ static void AiCollectResources()
 		// Else : Take from already assigned worker with lower priority.
 		if (!unit) {
 			// Take from lower priority only (i+1).
-			for (size_t j = i + 1; j < wyrmgus::resource::get_all().size() && !unit; ++j) {
+			for (size_t j = i + 1; j < resource::get_all().size() && !unit; ++j) {
 				// Try to move worker from src_c to c
 				const int src_c = priority_resource[j];
 
@@ -1746,7 +1746,7 @@ static void AiCollectResources()
 			const int n_m = AiHelpers.BuyMarkets[c - 1].size();
 
 			for (int i = 0; i < n_m; ++i) {
-				const wyrmgus::unit_type &market_type = *AiHelpers.BuyMarkets[c - 1][i];
+				const unit_type &market_type = *AiHelpers.BuyMarkets[c - 1][i];
 
 				if (AiPlayer->Player->GetUnitTypeAiActiveCount(&market_type)) {
 					std::vector<CUnit *> market_table;
@@ -1768,7 +1768,7 @@ static void AiCollectResources()
 		) {
 			bool is_luxury_input = false;
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (wyrmgus::resource::get_all()[i]->LuxuryResource && wyrmgus::resource::get_all()[i]->get_input_resource() != nullptr && wyrmgus::resource::get_all()[i]->get_input_resource() == resource && num_units_assigned[i] > 0) {
+				if (resource::get_all()[i]->LuxuryResource && resource::get_all()[i]->get_input_resource() != nullptr && resource::get_all()[i]->get_input_resource() == resource && num_units_assigned[i] > 0) {
 					is_luxury_input = true;
 					break;
 				}
@@ -1784,7 +1784,7 @@ static void AiCollectResources()
 			const int n_m = AiHelpers.SellMarkets[c - 1].size();
 
 			for (int i = 0; i < n_m; ++i) {
-				const wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[c - 1][i];
+				const unit_type &market_type = *AiHelpers.SellMarkets[c - 1][i];
 
 				if (AiPlayer->Player->GetUnitTypeAiActiveCount(&market_type)) {
 					std::vector<CUnit *> market_table;
@@ -1846,7 +1846,7 @@ static bool IsReadyToRepair(const CUnit &unit)
 **
 **  @return          True if can repair, false if can't repair..
 */
-static bool AiRepairBuilding(const CPlayer &player, const wyrmgus::unit_type &type, CUnit &building)
+static bool AiRepairBuilding(const CPlayer &player, const unit_type &type, CUnit &building)
 {
 	if (!type.can_repair()) {
 		return false;
@@ -1900,14 +1900,14 @@ static bool AiRepairBuilding(const CPlayer &player, const wyrmgus::unit_type &ty
 static int AiRepairUnit(CUnit &unit)
 {
 	int n = AiHelpers.Repair.size();
-	std::vector<std::vector<const wyrmgus::unit_type *>> &tablep = AiHelpers.Repair;
-	const wyrmgus::unit_type &type = *unit.Type;
+	std::vector<std::vector<const unit_type *>> &tablep = AiHelpers.Repair;
+	const unit_type &type = *unit.Type;
 	if (type.Slot >= n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->get_index() _C_ type.Ident.c_str());
 		return 0;
 	}
-	std::vector<const wyrmgus::unit_type *> &table = tablep[type.Slot];
+	std::vector<const unit_type *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->get_index() _C_ type.Ident.c_str());
@@ -2050,12 +2050,12 @@ static void AiCheckRepair()
 }
 
 //Wyrmgus start
-static bool build_pathway_for_pos(const QPoint &pathway_pos, const CMapLayer *map_layer, std::vector<const wyrmgus::unit_type *> &pathway_types, const bool rail_allowed)
+static bool build_pathway_for_pos(const QPoint &pathway_pos, const CMapLayer *map_layer, std::vector<const unit_type *> &pathway_types, const bool rail_allowed)
 {
-	const wyrmgus::tile &mf = *map_layer->Field(pathway_pos);
+	const tile &mf = *map_layer->Field(pathway_pos);
 
 	for (size_t p = 0; p < pathway_types.size(); ++p) {
-		const wyrmgus::unit_type *pathway_type = pathway_types[p];
+		const unit_type *pathway_type = pathway_types[p];
 
 		if (pathway_type->TerrainType->has_flag(tile_flag::railroad) && !rail_allowed) {
 			//build roads around buildings, not railroads (except for mines)
@@ -2072,7 +2072,7 @@ static bool build_pathway_for_pos(const QPoint &pathway_pos, const CMapLayer *ma
 
 		const int resource_needed = AiCheckUnitTypeCosts(*pathway_type);
 		if (resource_needed != 0) { //if no longer has the resource, or if the resource is already needed, don't build this pathway type
-			wyrmgus::vector::remove(pathway_types, pathway_type);
+			vector::remove(pathway_types, pathway_type);
 
 			--p;
 			continue;
@@ -2081,7 +2081,7 @@ static bool build_pathway_for_pos(const QPoint &pathway_pos, const CMapLayer *ma
 		//
 		// Find a free worker, who can build pathways for this building
 		//
-		for (const wyrmgus::unit_type *builder_type : AiHelpers.get_builders(pathway_type)) {
+		for (const unit_type *builder_type : AiHelpers.get_builders(pathway_type)) {
 			//
 			// The type is available
 			//
@@ -2093,8 +2093,8 @@ static bool build_pathway_for_pos(const QPoint &pathway_pos, const CMapLayer *ma
 		}
 
 		if (AiPlayer->Player->get_faction() != nullptr) {
-			for (const wyrmgus::unit_class *builder_class : AiHelpers.get_builder_classes(pathway_type->get_unit_class())) {
-				const wyrmgus::unit_type *builder_type = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
+			for (const unit_class *builder_class : AiHelpers.get_builder_classes(pathway_type->get_unit_class())) {
+				const unit_type *builder_type = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
 				if (builder_type == nullptr) {
 					continue;
@@ -2125,14 +2125,14 @@ static void AiCheckPathwayConstruction()
 		return;
 	}
 
-	std::vector<const wyrmgus::unit_type *> pathway_types;
+	std::vector<const unit_type *> pathway_types;
 	
-	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) { //assumes the pathways are listed in order of speed bonus
+	for (const unit_type *unit_type : unit_type::get_all()) {
 		if (unit_type->is_template()) {
 			continue;
 		}
 
-		if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->get_faction()->is_class_unit_type(unit_type)) {
+		if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->is_class_unit_type(unit_type)) {
 			continue;
 		}
 
@@ -2155,8 +2155,8 @@ static void AiCheckPathwayConstruction()
 	}
 
 	//give priority to pathways that improve movement more, and then to railroad ones
-	std::sort(pathway_types.begin(), pathway_types.end(), [](const wyrmgus::unit_type *type, const wyrmgus::unit_type *other_type) {
-		const wyrmgus::terrain_type *terrain_type = type->TerrainType;
+	std::sort(pathway_types.begin(), pathway_types.end(), [](const unit_type *type, const unit_type *other_type) {
+		const terrain_type *terrain_type = type->TerrainType;
 		const wyrmgus::terrain_type *other_terrain_type = other_type->TerrainType;
 
 		if (terrain_type->get_movement_bonus() != other_terrain_type->get_movement_bonus()) {
@@ -2217,7 +2217,7 @@ static void AiCheckPathwayConstruction()
 					continue;
 				}
 
-				const wyrmgus::tile *tile = unit.MapLayer->Field(pathway_pos);
+				const tile *tile = unit.MapLayer->Field(pathway_pos);
 				if (tile->has_flag(tile_flag::building)) { //this is a tile where the building itself is located, continue
 					continue;
 				}
@@ -2227,7 +2227,7 @@ static void AiCheckPathwayConstruction()
 		}
 
 		static constexpr int pathway_construction_range = 8;
-		const wyrmgus::site *settlement = unit.get_center_tile()->get_settlement();
+		const site *settlement = unit.get_center_tile()->get_settlement();
 		if (settlement != nullptr) {
 			for (const QPoint &pathway_pos : settlement->get_game_data()->get_trade_route_tiles()) {
 				if (unit.MapDistanceTo(pathway_pos, unit.MapLayer->ID) <= pathway_construction_range) {
@@ -2243,7 +2243,7 @@ static void AiCheckPathwayConstruction()
 		bool built_pathway_for_building = false;
 
 		for (const QPoint &pathway_pos : pathway_tiles) {
-			const bool built_pathway = build_pathway_for_pos(pathway_pos, unit.MapLayer, pathway_types, (unit.GivesResource != -1 && wyrmgus::resource::get_all()[unit.GivesResource]->IsMineResource()));
+			const bool built_pathway = build_pathway_for_pos(pathway_pos, unit.MapLayer, pathway_types, (unit.GivesResource != -1 && resource::get_all()[unit.GivesResource]->IsMineResource()));
 
 			if (pathway_types.empty()) {
 				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
@@ -2280,7 +2280,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
-	const wyrmgus::unit_type *town_hall_type = AiPlayer->Player->get_faction()->get_class_unit_type(wyrmgus::defines::get()->get_town_hall_class());
+	const unit_type *town_hall_type = AiPlayer->Player->get_faction()->get_class_unit_type(defines::get()->get_town_hall_class());
 	if (town_hall_type == nullptr) {
 		return;
 	}
@@ -2324,7 +2324,7 @@ void AiCheckSettlementConstruction()
 		//
 		// Find a free worker who can build a settlement on this site
 		//
-		for (const wyrmgus::unit_type *builder_type : AiHelpers.get_builders(town_hall_type)) {
+		for (const unit_type *builder_type : AiHelpers.get_builders(town_hall_type)) {
 			//
 			// The type is available
 			//
@@ -2336,8 +2336,8 @@ void AiCheckSettlementConstruction()
 		}
 
 		if (!requested_settlement && AiPlayer->Player->get_faction() != nullptr) {
-			for (const wyrmgus::unit_class *builder_class : AiHelpers.get_builder_classes(town_hall_type->get_unit_class())) {
-				const wyrmgus::unit_type *builder_type = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
+			for (const unit_class *builder_class : AiHelpers.get_builder_classes(town_hall_type->get_unit_class())) {
+				const unit_type *builder_type = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
 				if (builder_type == nullptr) {
 					continue;
@@ -2374,7 +2374,7 @@ void AiCheckDockConstruction()
 		return;
 	}
 
-	const wyrmgus::unit_type *dock_type = AiPlayer->Player->get_faction()->get_class_unit_type(wyrmgus::unit_class::get("dock"));
+	const unit_type *dock_type = AiPlayer->Player->get_faction()->get_class_unit_type(unit_class::get("dock"));
 	if (dock_type == nullptr) {
 		return;
 	}
@@ -2496,9 +2496,9 @@ void AiCheckBuildings()
 	std::vector<const CAiBuildingTemplate *> potential_building_templates;
 	
 	int priority = 0;
-	wyrmgus::unit_class_map<int> want_counter;
-	wyrmgus::unit_class_map<int> have_counter;
-	wyrmgus::unit_class_map<int> have_with_requests_counter;
+	unit_class_map<int> want_counter;
+	unit_class_map<int> have_counter;
+	unit_class_map<int> have_with_requests_counter;
 	for (const unit_class *unit_class : unit_class::get_all()) {
 		want_counter[unit_class] = 0;
 		have_counter[unit_class] = -1;
@@ -2509,7 +2509,7 @@ void AiCheckBuildings()
 			break; //building templates are ordered by priority, so there is no need to go further
 		}
 		
-		const wyrmgus::unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(building_template->get_unit_class());
+		const unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(building_template->get_unit_class());
 		if (unit_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type, false, true)) {
 			continue;
 		}
@@ -2545,7 +2545,7 @@ void AiCheckBuildings()
 	
 	const CAiBuildingTemplate *building_template = potential_building_templates[SyncRand(potential_building_templates.size())];
 	
-	wyrmgus::unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(building_template->get_unit_class());
+	unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(building_template->get_unit_class());
 	
 	if (!AiHelpers.get_builders(unit_type).empty() || !AiHelpers.get_builder_classes(unit_type->get_unit_class()).empty()) { //constructed by worker
 		AiAddUnitTypeRequest(*unit_type, 1);
@@ -2558,7 +2558,7 @@ void AiCheckBuildings()
 
 static void AiCheckMinecartConstruction()
 {
-	const wyrmgus::unit_type *minecart_type = AiPlayer->Player->get_faction()->get_class_unit_type(wyrmgus::unit_class::get("minecart"));
+	const unit_type *minecart_type = AiPlayer->Player->get_faction()->get_class_unit_type(unit_class::get("minecart"));
 	if (minecart_type == nullptr) {
 		return;
 	}
@@ -2574,7 +2574,7 @@ static void AiCheckMinecartConstruction()
 		return;
 	}
 	
-	std::vector<const wyrmgus::site *> potential_settlements;
+	std::vector<const site *> potential_settlements;
 		
 	for (const resource *resource : resource::get_all()) {
 		const int res_index = resource->get_index();
@@ -2587,14 +2587,14 @@ static void AiCheckMinecartConstruction()
 		}
 				
 		for (size_t i = 0; i < AiHelpers.Mines[res_index].size(); ++i) {
-			const wyrmgus::unit_type &mine_type = *AiHelpers.Mines[res_index][i];
+			const unit_type &mine_type = *AiHelpers.Mines[res_index][i];
 					
 			std::vector<CUnit *> mine_table;
 			FindPlayerUnitsByType(*AiPlayer->Player, mine_type, mine_table, true);
 					
 			for (size_t j = 0; j < mine_table.size(); ++j) {
 				const CUnit *mine_unit = mine_table[j];
-				const wyrmgus::site *mine_settlement = mine_unit->settlement;
+				const site *mine_settlement = mine_unit->settlement;
 						
 				if (mine_settlement == nullptr) {
 					continue;
@@ -2631,7 +2631,7 @@ static void AiCheckMinecartConstruction()
 
 static void AiCheckMinecartSalvaging()
 {
-	const wyrmgus::unit_type *minecart_type = AiPlayer->Player->get_faction()->get_class_unit_type(wyrmgus::unit_class::get("minecart"));
+	const unit_type *minecart_type = AiPlayer->Player->get_faction()->get_class_unit_type(unit_class::get("minecart"));
 	if (minecart_type == nullptr) {
 		return;
 	}
@@ -2696,7 +2696,7 @@ void AiCheckWorkers()
 **
 **  @todo         FIXME: should store the end of list and not search it.
 */
-void AiAddUnitTypeRequest(const wyrmgus::unit_type &type, const int count, const landmass *landmass, const site *settlement, const Vec2i &pos, const int z)
+void AiAddUnitTypeRequest(const unit_type &type, const int count, const landmass *landmass, const site *settlement, const Vec2i &pos, const int z)
 {
 	AiBuildQueue queue;
 
