@@ -1045,6 +1045,10 @@ static int AiMakeUnit(const unit_type &typeToMake, const Vec2i &nearPos, const i
 	for (int currentType = 0; currentType < usableTypesCount; ++currentType) {
 		const unit_type &type = *unit_type::get_all()[usableTypes[currentType]];
 
+		if (!AiPlayer->Player->is_class_unit_type(&type)) {
+			continue;
+		}
+
 		const std::vector<const unit_type *> *builders = nullptr;
 		const std::vector<const unit_class *> *builder_classes = nullptr;
 
