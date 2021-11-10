@@ -1509,6 +1509,10 @@ void unit_type::check() const
 		}
 	}
 
+	if (!this->can_repair() && this->DefaultStat.Variables[AUTOREPAIRRANGE_INDEX].Value > 0) {
+		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" has an auto-repair range greater than 0, but is not able to repair.");
+	}
+
 	if (this->get_preconditions() != nullptr) {
 		this->get_preconditions()->check_validity();
 	}
