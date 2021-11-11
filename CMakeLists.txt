@@ -313,6 +313,7 @@ set(player_SRCS
 	src/player/faction_history.cpp
 	src/player/player.cpp
 	src/player/player_color.cpp
+	src/player/player_container.cpp
 	src/player/script_player.cpp
 )
 source_group(player FILES ${player_SRCS})

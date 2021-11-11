@@ -2309,9 +2309,9 @@ void CUnit::generate_special_properties(const CUnit *dropper, const CPlayer *dro
 
 void CUnit::generate_prefix(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<CUpgrade *> potential_prefixes;
+	std::vector<const CUpgrade *> potential_prefixes;
 
-	for (CUpgrade *affix : this->Type->Affixes) {
+	for (const CUpgrade *affix : this->Type->Affixes) {
 		if (!affix->is_magic_prefix()) {
 			continue;
 		}
@@ -2320,7 +2320,7 @@ void CUnit::generate_prefix(const CUnit *dropper, const CPlayer *dropper_player)
 	}
 
 	if (dropper_player != nullptr) {
-		for (CUpgrade *upgrade : CUpgrade::get_all()) {
+		for (const CUpgrade *upgrade : CUpgrade::get_all()) {
 			if (!upgrade->is_magic_prefix()) {
 				continue;
 			}
@@ -2329,14 +2329,8 @@ void CUnit::generate_prefix(const CUnit *dropper, const CPlayer *dropper_player)
 				continue;
 			}
 
-			if (dropper != nullptr) {
-				if (!check_conditions(upgrade, dropper)) {
-					continue;
-				}
-			} else {
-				if (!check_conditions(upgrade, dropper_player)) {
-					continue;
-				}
+			if (!upgrade->check_drop_conditions(dropper, dropper_player)) {
+				continue;
 			}
 
 			potential_prefixes.push_back(upgrade);
@@ -2375,14 +2369,8 @@ void CUnit::generate_suffix(const CUnit *dropper, const CPlayer *dropper_player)
 				continue;
 			}
 
-			if (dropper != nullptr) {
-				if (!check_conditions(upgrade, dropper)) {
-					continue;
-				}
-			} else {
-				if (!check_conditions(upgrade, dropper_player)) {
-					continue;
-				}
+			if (!upgrade->check_drop_conditions(dropper, dropper_player)) {
+				continue;
 			}
 
 			if (this->Prefix != nullptr && upgrade->is_incompatible_affix(this->Prefix)) {
@@ -2431,14 +2419,8 @@ void CUnit::generate_work(const CUnit *dropper, const CPlayer *dropper_player)
 				continue;
 			}
 
-			if (dropper != nullptr) {
-				if (!check_conditions(upgrade, dropper)) {
-					continue;
-				}
-			} else {
-				if (!check_conditions(upgrade, dropper_player)) {
-					continue;
-				}
+			if (!upgrade->check_drop_conditions(dropper, dropper_player)) {
+				continue;
 			}
 
 			potential_works.push_back(upgrade);
@@ -2466,14 +2448,8 @@ void CUnit::generate_unique(const CUnit *dropper, const CPlayer *dropper_player)
 					continue;
 				}
 
-				if (dropper != nullptr) {
-					if (!check_conditions(unique->get_prefix(), dropper)) {
-						continue;
-					}
-				} else {
-					if (!check_conditions(unique->get_prefix(), dropper_player)) {
-						continue;
-					}
+				if (!unique->get_prefix()->check_drop_conditions(dropper, dropper_player)) {
+					continue;
 				}
 			}
 		}
@@ -2485,14 +2461,8 @@ void CUnit::generate_unique(const CUnit *dropper, const CPlayer *dropper_player)
 					continue;
 				}
 
-				if (dropper != nullptr) {
-					if (!check_conditions(unique->get_suffix(), dropper)) {
-						continue;
-					}
-				} else {
-					if (!check_conditions(unique->get_suffix(), dropper_player)) {
-						continue;
-					}
+				if (!unique->get_suffix()->check_drop_conditions(dropper, dropper_player)) {
+					continue;
 				}
 			}
 		}
@@ -2503,14 +2473,8 @@ void CUnit::generate_unique(const CUnit *dropper, const CPlayer *dropper_player)
 				continue;
 			}
 
-			if (dropper != nullptr) {
-				if (!check_conditions(unique->get_set(), dropper)) {
-					continue;
-				}
-			} else {
-				if (!check_conditions(unique->get_set(), dropper_player)) {
-					continue;
-				}
+			if (!unique->get_set()->check_drop_conditions(dropper, dropper_player)) {
+				continue;
 			}
 		}
 
@@ -2532,14 +2496,8 @@ void CUnit::generate_unique(const CUnit *dropper, const CPlayer *dropper_player)
 					continue;
 				}
 
-				if (dropper != nullptr) {
-					if (!check_conditions(unique->get_work(), dropper)) {
-						continue;
-					}
-				} else {
-					if (!check_conditions(unique->get_work(), dropper_player)) {
-						continue;
-					}
+				if (!unique->get_work()->check_drop_conditions(dropper, dropper_player)) {
+					continue;
 				}
 			}
 		}
@@ -2551,14 +2509,8 @@ void CUnit::generate_unique(const CUnit *dropper, const CPlayer *dropper_player)
 					continue;
 				}
 
-				if (dropper != nullptr) {
-					if (!check_conditions(unique->get_elixir(), dropper)) {
-						continue;
-					}
-				} else {
-					if (!check_conditions(unique->get_elixir(), dropper_player)) {
-						continue;
-					}
+				if (!unique->get_elixir()->check_drop_conditions(dropper, dropper_player)) {
+					continue;
 				}
 			}
 		}
@@ -2597,7 +2549,9 @@ void CUnit::UpdateSoldUnits()
 	
 	std::vector<const unit_type *> potential_items;
 	std::vector<wyrmgus::character *> potential_heroes;
-	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
+
+	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) {
+		//allow heroes to be recruited at town halls
 		const civilization *civilization = this->get_civilization();
 		const faction *faction = this->Player->get_faction();
 		
@@ -2652,6 +2606,28 @@ void CUnit::UpdateSoldUnits()
 		for (const unit_type *sold_unit_type : this->Type->SoldUnits) {
 			if (check_conditions(sold_unit_type, this)) {
 				potential_items.push_back(sold_unit_type);
+			}
+		}
+
+		if (this->Type->BoolFlag[MARKET_INDEX].value) {
+			for (const CPlayer *trade_partner : this->Player->get_recent_trade_partners()) {
+				const unit_type *market_type = trade_partner->get_class_unit_type(this->Type->get_unit_class());
+
+				if (market_type == nullptr) {
+					continue;
+				}
+
+				for (const unit_type *sold_unit_type : market_type->SoldUnits) {
+					if (!check_conditions(sold_unit_type, trade_partner)) {
+						continue;
+					}
+
+					if (vector::contains(potential_items, sold_unit_type)) {
+						continue;
+					}
+
+					potential_items.push_back(sold_unit_type);
+				}
 			}
 		}
 	}

@@ -236,10 +236,8 @@ const resource *COrder_Resource::get_current_resource() const
 
 Vec2i COrder_Resource::GetHarvestLocation() const
 {
-	//Wyrmgus start
-//	if (this->Resource.get_mine() != nullptr) {
-	if (this->Resource.get_mine() != nullptr && this->Resource.get_mine()->Type != nullptr) {
-	//Wyrmgus end
+	if (this->Resource.get_mine() != nullptr) {
+		assert_throw(this->Resource.get_mine()->Type != nullptr);
 		return this->Resource.get_mine()->tilePos;
 	} else {
 		return this->Resource.Pos;
@@ -924,6 +922,8 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			if (this->CurrentResource == TradeCost) { // the load added when trading depends on the price difference between the two players
 				addload = unit.Player->ConvergePricesWith(*unit.Container->Player, res_info->ResourceCapacity);
 				addload = std::max(10, addload);
+
+				this->trade_partner = unit.Container->Player;
 			} else {
 				addload = std::min(100, res_info->ResourceCapacity);
 			}
@@ -1330,6 +1330,12 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	int xp_gained = unit.ResourcesHeld;
 	xp_gained /= 20;
 	unit.ChangeExperience(xp_gained);
+
+	if (this->CurrentResource == TradeCost && this->trade_partner != nullptr) {
+		if (this->trade_partner != unit.Player && !this->trade_partner->is_neutral_player()) {
+			player.add_recent_trade_partner(this->trade_partner);
+		}
+	}
 	
 	//update quests
 	player.on_resource_gathered(final_resource, final_resource_change);

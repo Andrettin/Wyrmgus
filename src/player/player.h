@@ -1001,6 +1001,21 @@ public:
 		return this->vassals;
 	}
 
+	const player_set &get_recent_trade_partners() const
+	{
+		return this->recent_trade_partners;
+	}
+
+	void add_recent_trade_partner(CPlayer *other_player)
+	{
+		this->recent_trade_partners.insert(other_player);
+	}
+
+	void clear_recent_trade_partners()
+	{
+		this->recent_trade_partners.clear();
+	}
+
 	void Init(player_type type);
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
@@ -1151,6 +1166,7 @@ private:
 	player_index_set allies; //allies for this player
 	player_index_set shared_vision; //set of player indexes that this player has shared vision with
 	player_index_set mutual_shared_vision; //set of player indexes that this player has mutual shared vision with
+	player_set recent_trade_partners;
 	mutable std::shared_mutex mutex; //mutex for protecting player data which is written from the Wyrmgus thread, but which can be read from the Qt thread
 
 	friend void CleanPlayers();

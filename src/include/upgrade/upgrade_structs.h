@@ -38,6 +38,8 @@
 #include "unit/unit_type_container.h"
 #include "unit/unit_variable.h"
 
+class CPlayer;
+class CUnit;
 struct lua_State;
 
 static int CclDefineDependency(lua_State *l);
@@ -577,6 +579,8 @@ public:
 	{
 		return this->conditions.get();
 	}
+
+	bool check_drop_conditions(const CUnit *dropper, const CPlayer *dropper_player) const;
 
 	const wyrmgus::dynasty *get_dynasty() const
 	{

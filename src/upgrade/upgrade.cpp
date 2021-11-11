@@ -597,6 +597,29 @@ int CUpgrade::get_price() const
 	return resource::get_price(this->get_costs());
 }
 
+bool CUpgrade::check_drop_conditions(const CUnit *dropper, const CPlayer *dropper_player) const
+{
+	if (dropper != nullptr) {
+		if (check_conditions(this, dropper)) {
+			return true;
+		}
+
+		if (dropper->Type->BoolFlag[MARKET_INDEX].value && dropper_player != nullptr && !dropper_player->is_neutral_player()) {
+			for (const CPlayer *trade_partner : dropper_player->get_recent_trade_partners()) {
+				if (check_conditions(this, trade_partner)) {
+					return true;
+				}
+			}
+		}
+	} else {
+		if (check_conditions(this, dropper_player)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 QString CUpgrade::get_upgrade_effects_qstring() const
 {
 	return QString::fromStdString(GetUpgradeEffectsString(this->get_identifier()));

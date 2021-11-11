@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,18 +24,17 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-class CPlayer;
+#include "player/player_container.h"
+
+#include "player/player.h"
 
 namespace wyrmgus {
 
-struct player_compare
+bool player_compare::operator()(const CPlayer *lhs, const CPlayer *rhs) const
 {
-	bool operator()(const CPlayer *lhs, const CPlayer *rhs) const;
-};
-
-using player_set = std::set<CPlayer *, player_compare>;
-using player_index_set = std::set<unsigned char>;
+	return lhs->get_index() < rhs->get_index();
+}
 
 }

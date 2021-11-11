@@ -4037,6 +4037,8 @@ void PlayersEachMinute(const int playerIdx)
 		}
 
 		player->update_quest_pool();
+
+		player->clear_recent_trade_partners();
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error executing the per minute actions for player " + std::to_string(playerIdx) + "."));
 	}

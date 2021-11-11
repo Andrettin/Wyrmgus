@@ -86,7 +86,7 @@ private:
 private:
 	std::shared_ptr<wyrmgus::unit_ref> worker; /// unit that own this order.
 	unsigned char CurrentResource = 0;
-	struct Resource {
+	struct Resource final {
 		CUnit *get_mine() const;
 
 		Vec2i Pos = Vec2i(-1, -1); /// position for terrain resource.
@@ -105,6 +105,9 @@ private:
 	//Wyrmgus start
 	int MapLayer = 0;
 	//Wyrmgus end
+
+private:
+	CPlayer *trade_partner = nullptr; //used in trade, so that we know the player we are trading with
 
 	//Wyrmgus start
 //	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
