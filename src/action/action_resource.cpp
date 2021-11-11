@@ -924,6 +924,9 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				addload = std::max(10, addload);
 
 				this->trade_partner = unit.Container->Player;
+
+				//the owner of the market we arrived at now can get our items and affixes at their markets
+				this->trade_partner->add_recent_trade_partner(unit.Player);
 			} else {
 				addload = std::min(100, res_info->ResourceCapacity);
 			}
