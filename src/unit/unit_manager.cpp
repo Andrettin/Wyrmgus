@@ -172,7 +172,7 @@ void unit_manager::ReleaseUnit(CUnit *unit)
 
 CUnit &unit_manager::GetSlotUnit(const int index) const
 {
-	return *this->unit_slots[index];
+	return *this->unit_slots.at(index);
 }
 
 unsigned int unit_manager::GetUsedSlotCount() const
