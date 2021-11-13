@@ -41,6 +41,7 @@
 #include "unit/unit_domain_blocker_finder.h"
 #include "unit/unit_find.h"
 #include "util/assert_util.h"
+#include "util/log_util.h"
 #include "util/number_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
@@ -476,7 +477,7 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
 {
 	//Wyrmgus start
 	if (!&unit) {
-		fprintf(stderr, "Error in CostMoveTo(unsigned int index, const CUnit &unit): Unit is null.\n");
+		log::log_error("Error in CostMoveTo(unsigned int index, const CUnit &unit): Unit is null.");
 		return -1;
 	}
 	//Wyrmgus end
@@ -1152,7 +1153,7 @@ struct StatsNode {
 void SetAStarFixedUnitCrossingCost(int cost)
 {
 	if (cost <= 3) {
-		fprintf(stderr, "AStarFixedUnitCrossingCost must be greater than 3\n");
+		log::log_error("AStarFixedUnitCrossingCost must be greater than 3.");
 	}
 }
 int GetAStarFixedUnitCrossingCost()
@@ -1164,7 +1165,7 @@ int GetAStarFixedUnitCrossingCost()
 void SetAStarMovingUnitCrossingCost(int cost)
 {
 	if (cost <= 3) {
-		fprintf(stderr, "AStarMovingUnitCrossingCost must be greater than 3\n");
+		log::log_error("AStarMovingUnitCrossingCost must be greater than 3.");
 	}
 }
 int GetAStarMovingUnitCrossingCost()
@@ -1176,7 +1177,7 @@ int GetAStarMovingUnitCrossingCost()
 void SetAStarUnknownTerrainCost(int cost)
 {
 	if (cost < 0) {
-		fprintf(stderr, "AStarUnknownTerrainCost must be non-negative\n");
+		log::log_error("AStarUnknownTerrainCost must be non-negative.");
 		return;
 	}
 	AStarUnknownTerrainCost = cost;

@@ -52,6 +52,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "util/container_util.h"
+#include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
@@ -334,8 +335,8 @@ std::string civilization::get_encyclopedia_text() const
 
 int civilization::GetUpgradePriority(const CUpgrade *upgrade) const
 {
-	if (!upgrade) {
-		fprintf(stderr, "Error in civilization::GetUpgradePriority: the upgrade is null.\n");
+	if (upgrade == nullptr) {
+		log::log_error("Error in civilization::GetUpgradePriority: the upgrade is null.");
 	}
 	
 	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {

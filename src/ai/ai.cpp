@@ -172,6 +172,7 @@
 #include "upgrade/upgrade.h"
 #include "util/assert_util.h"
 #include "util/enum_util.h"
+#include "util/log_util.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
@@ -822,7 +823,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const wyrmgus::unit_type &type, con
 		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
-	fprintf(stderr, "Can't remove %s from build list.\n", type.Ident.c_str());
+	log::log_error("Can't remove \"" + type.get_identifier() + "\" from build list.");
 }
 
 /**
@@ -890,7 +891,8 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, const la
 		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
-	fprintf(stderr, "Can't reduce made for %s from build list.\n", type.Ident.c_str());
+
+	log::log_error("Can't reduce made for \"" + type.get_identifier() + "\" from build list.");
 }
 
 /*----------------------------------------------------------------------------

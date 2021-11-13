@@ -432,7 +432,7 @@ int UTF8GetPrev(const std::string &text, int curpos)
 		--curpos;
 	}
 	if (curpos < 0) {
-		fprintf(stderr, "Invalid UTF8.\n");
+		log::log_error("Invalid UTF8.");
 	}
 	return 0;
 }
@@ -452,7 +452,7 @@ int UTF8GetNext(const std::string &text, int curpos)
 	if ((c & 0xF0) == 0xE0) {
 		return curpos + 3;
 	}
-	fprintf(stderr, "Invalid UTF8.\n");
+	log::log_error("Invalid UTF8.");
 	return text.size();
 }
 

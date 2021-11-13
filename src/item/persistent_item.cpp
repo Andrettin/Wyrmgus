@@ -37,6 +37,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/log_util.h"
 #include "util/string_conversion_util.h"
 
 namespace wyrmgus {
@@ -78,42 +79,42 @@ void persistent_item::process_sml_property(const sml_property &property)
 		if (upgrade != nullptr) {
 			this->Prefix = upgrade;
 		} else {
-			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			log::log_error("Upgrade \"" + value + "\" doesn't exist.");
 		}
 	} else if (key == "suffix") {
 		CUpgrade *upgrade = CUpgrade::try_get(value);
 		if (upgrade != nullptr) {
 			this->Suffix = upgrade;
 		} else {
-			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			log::log_error("Upgrade \"" + value + "\" doesn't exist.");
 		}
 	} else if (key == "spell") {
 		spell *spell = spell::try_get(value);
 		if (spell != nullptr) {
 			this->Spell = spell;
 		} else {
-			fprintf(stderr, "Spell \"%s\" doesn't exist.\n", value.c_str());
+			log::log_error("Spell \"" + value + "\" doesn't exist.");
 		}
 	} else if (key == "work") {
 		CUpgrade *upgrade = CUpgrade::try_get(value);
 		if (upgrade != nullptr) {
 			this->Work = upgrade;
 		} else {
-			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			log::log_error("Upgrade \"" + value + "\" doesn't exist.");
 		}
 	} else if (key == "elixir") {
 		CUpgrade *upgrade = CUpgrade::try_get(value);
 		if (upgrade != nullptr) {
 			this->Elixir = upgrade;
 		} else {
-			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			log::log_error("Upgrade \"" + value + "\" doesn't exist.");
 		}
 	} else if (key == "unique") {
 		const unique_item *unique_item = unique_item::try_get(value);
 		if (unique_item != nullptr) {
 			this->unique = unique_item;
 		} else {
-			fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.c_str());
+			log::log_error("Unique item \"" + value + "\" doesn't exist.");
 		}
 	} else if (key == "bound") {
 		this->bound = string::to_bool(value);
@@ -147,14 +148,14 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 			if (upgrade) {
 				this->Prefix = upgrade;
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				log::log_error("Upgrade \"" + value + "\" doesn't exist.");
 			}
 		} else if (key == "suffix") {
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Suffix = upgrade;
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				log::log_error("Upgrade \"" + value + "\" doesn't exist.");
 			}
 		} else if (key == "spell") {
 			spell *spell = spell::get(value);
@@ -164,21 +165,21 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 			if (upgrade) {
 				this->Work = upgrade;
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				log::log_error("Upgrade \"" + value + "\" doesn't exist.");
 			}
 		} else if (key == "elixir") {
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Elixir = upgrade;
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				log::log_error("Upgrade \"" + value + "\" doesn't exist.");
 			}
 		} else if (key == "unique") {
 			unique_item *unique_item = unique_item::try_get(value);
 			if (unique_item != nullptr) {
 				this->unique = unique_item;
 			} else {
-				fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.c_str());
+				log::log_error("Unique item \"" + value + "\" doesn't exist.");
 			}
 		} else if (key == "bound") {
 			this->bound = string::to_bool(value);
@@ -187,7 +188,7 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "equipped") {
 			this->equipped = true;
 		} else {
-			fprintf(stderr, "Invalid item property: \"%s\".\n", key.c_str());
+			log::log_error("Invalid item property: \"" + key + "\".");
 		}
 	}
 }

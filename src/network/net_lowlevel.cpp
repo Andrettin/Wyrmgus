@@ -31,6 +31,7 @@
 #include "net_lowlevel.h"
 
 #include "util/assert_util.h"
+#include "util/log_util.h"
 
 #include <fcntl.h>
 
@@ -86,7 +87,7 @@ int NetInit()
 
 	// Start up the windows networking
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData)) {
-		fprintf(stderr, "Couldn't initialize Winsock 2\n");
+		log::log_error("Couldn't initialize Winsock 2.");
 		return -1;
 	}
 	return 0;
@@ -376,7 +377,7 @@ Socket NetOpenUDP(unsigned long ip, int port)
 		sock_addr.sin_port = port;
 		// Bind the socket for listening
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
-			fprintf(stderr, "Couldn't bind to local port\n");
+			log::log_error("Couldn't bind to local port.");
 			NetCloseUDP(sockfd);
 			return static_cast<Socket>(-1);
 		}
@@ -419,7 +420,7 @@ Socket NetOpenTCP(const char *addr, int port)
 		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (setsockopttype)&opt, sizeof(opt));
 
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
-			fprintf(stderr, "Couldn't bind to local port\n");
+			log::log_error("Couldn't bind to local port.");
 			NetCloseTCP(sockfd);
 			return static_cast<Socket>(-1);
 		}

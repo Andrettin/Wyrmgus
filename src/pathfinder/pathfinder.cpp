@@ -42,6 +42,7 @@
 #include "unit/unit_domain.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
+#include "util/log_util.h"
 #include "util/size_util.h"
 
 //astar.cpp
@@ -170,7 +171,7 @@ void TerrainTraversal::PushUnitPosAndNeighbor(const CUnit &unit)
 
 	//Wyrmgus start
 	if (start_unit == nullptr) {
-		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit is null.\n");
+		log::log_error("TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit is null.");
 	} else if (start_unit->Type == nullptr) {
 		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is null.\n", start_unit->Name.c_str(), UnitNumber(*start_unit), start_unit->tilePos.x, start_unit->tilePos.y);
 	}
@@ -189,7 +190,7 @@ void TerrainTraversal::push_unit_pos_and_neighbor_if_passable(const CUnit &unit,
 	const CUnit *start_unit = unit.GetFirstContainer();
 
 	if (start_unit == nullptr) {
-		fprintf(stderr, "TerrainTraversal::push_unit_pos_and_passable_neighbor() error: startUnit is null.\n");
+		log::log_error("TerrainTraversal::push_unit_pos_and_passable_neighbor() error: startUnit is null.");
 	} else if (start_unit->Type == nullptr) {
 		fprintf(stderr, "TerrainTraversal::push_unit_pos_and_passable_neighbor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is null.\n", start_unit->Name.c_str(), UnitNumber(*start_unit), start_unit->tilePos.x, start_unit->tilePos.y);
 	}

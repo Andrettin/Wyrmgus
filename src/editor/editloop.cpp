@@ -2409,7 +2409,7 @@ void CEditor::Init()
 int EditorSaveMap(const std::string &file)
 {
 	if (SaveStratagusMap(file, *CMap::get(), CEditor::get()->TerrainEditable) == -1) {
-		fprintf(stderr, "Cannot save map\n");
+		log::log_error("Cannot save map.");
 		return -1;
 	}
 	return 0;

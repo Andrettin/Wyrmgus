@@ -37,6 +37,7 @@
 #include "network/netsockets.h"
 #include "network.h"
 #include "util/assert_util.h"
+#include "util/log_util.h"
 #include "util/util.h"
 #include "version.h"
 
@@ -519,7 +520,7 @@ void CClient::Parse_Map(const unsigned char *buf)
 
 	msg.Deserialize(buf);
 	if (!IsSafeMapName(msg.MapPath)) {
-		fprintf(stderr, "Insecure map name!\n");
+		log::log_error("Insecure map name!");
 		networkState.State = ccs_badmap;
 		return;
 	}

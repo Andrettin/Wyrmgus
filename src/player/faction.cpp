@@ -48,6 +48,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
+#include "util/log_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
@@ -411,8 +412,8 @@ bool faction::develops_to_faction(const faction *faction, const bool include_ind
 
 int faction::GetUpgradePriority(const CUpgrade *upgrade) const
 {
-	if (!upgrade) {
-		fprintf(stderr, "Error in faction::GetUpgradePriority: the upgrade is null.\n");
+	if (upgrade == nullptr) {
+		log::log_error("Error in faction::GetUpgradePriority: the upgrade is null.");
 	}
 	
 	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {

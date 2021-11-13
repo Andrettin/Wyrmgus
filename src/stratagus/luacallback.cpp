@@ -32,6 +32,7 @@
 
 #include "script.h"
 #include "util/exception_util.h"
+#include "util/log_util.h"
 
 /**
 **  LuaCallback constructor
@@ -168,7 +169,7 @@ void LuaCallback::run(int results)
 LuaCallback::~LuaCallback()
 {
 	if (rescount) {
-		fprintf(stderr, "There are still some results that weren't popped from stack\n");
+		log::log_error("There are still some results that weren't popped from stack.");
 	}
 	luaL_unref(luastate, LUA_REGISTRYINDEX, luaref);
 }

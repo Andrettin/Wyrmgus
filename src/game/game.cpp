@@ -113,6 +113,7 @@
 #include "util/assert_util.h"
 #include "util/date_util.h"
 #include "util/exception_util.h"
+#include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/random.h"
 #include "util/string_conversion_util.h"
@@ -718,7 +719,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map)
 			map.Info->get_name().c_str(), numplayers, map.Info->MapWidth, map.Info->MapHeight,
 			map.Info->MapUID + 1);
 	} catch (const FileException &) {
-		fprintf(stderr, "ERROR: cannot write the map presentation\n");
+		log::log_error("Cannot write the map presentation.");
 		return -1;
 	}
 
@@ -1194,7 +1195,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, const int writeTerrain)
 		}
 		f->printf("\n\n");
 	} catch (const FileException &) {
-		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup);
+		log::log_error("Can't save map setup: \"" + std::string(mapSetup) + "\".");
 		return -1;
 	}
 

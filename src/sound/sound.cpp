@@ -41,6 +41,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/container_util.h"
+#include "util/log_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
 
@@ -305,7 +306,7 @@ void PlayUnitSound(const CUnit &unit, wyrmgus::sound *sound)
 {
 	//Wyrmgus start
 	if (!&unit) {
-		fprintf(stderr, "Error in PlayUnitSound: unit is null.\n");
+		log::log_error("Error in PlayUnitSound: unit is null.");
 		return;
 	}
 	
