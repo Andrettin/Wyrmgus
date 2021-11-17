@@ -61,8 +61,6 @@ public:
 	static inline const QDateTime base_date = QDateTime(QDate(-100000, 1, 1));
 #endif
 
-	static const int cycles_per_year;
-
 	static std::filesystem::path save_file_url_string_to_save_filepath(const std::string &file_url_str);
 
 	game();
@@ -131,6 +129,8 @@ public:
 	{
 		this->current_year = year;
 	}
+
+	int get_cycles_per_year() const;
 
 	uint64_t get_current_total_hours() const
 	{

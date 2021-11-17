@@ -109,6 +109,13 @@ void defines::process_sml_scope(const sml_data &scope)
 
 			this->faction_type_upgrades[faction_type] = upgrade;
 		});
+	} else if (tag == "cycles_per_year_after") {
+		scope.for_each_property([&](const sml_property &property) {
+			const int threshold = std::stoi(property.get_key());
+			const int seconds = std::stoi(property.get_value());
+
+			this->cycles_per_year_after[threshold] = seconds;
+		});
 	} else if (tag == "ignored_wesnoth_terrain_strings") {
 		for (const std::string &value : values) {
 			terrain_type::map_to_wesnoth_string(nullptr, value);
@@ -171,6 +178,19 @@ void defines::set_border_image_file(const std::filesystem::path &filepath)
 QPoint defines::get_border_offset() const
 {
 	return size::to_point((this->get_tile_size() - this->border_frame_size) * preferences::get()->get_scale_factor() / 2);
+}
+
+int defines::get_cycles_per_year(const int current_year) const
+{
+	auto find_iterator = this->cycles_per_year_after.upper_bound(current_year);
+	if (find_iterator != this->cycles_per_year_after.end()) {
+		if (find_iterator != this->cycles_per_year_after.begin()) {
+			--find_iterator; //get the one just before
+			return find_iterator->second;
+		}
+	}
+
+	return this->default_cycles_per_year;
 }
 
 QString defines::get_default_menu_background_file_qstring() const

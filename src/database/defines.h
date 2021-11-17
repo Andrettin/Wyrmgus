@@ -100,6 +100,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::resource_icon* food_icon MEMBER food_icon READ get_food_icon)
 	Q_PROPERTY(wyrmgus::resource_icon* score_icon MEMBER score_icon READ get_score_icon)
 	Q_PROPERTY(wyrmgus::resource_icon* mana_icon MEMBER mana_icon READ get_mana_icon)
+	Q_PROPERTY(int default_cycles_per_year MEMBER default_cycles_per_year)
 	Q_PROPERTY(int forest_regeneration_threshold MEMBER forest_regeneration_threshold READ get_forest_regeneration_threshold)
 	Q_PROPERTY(int destroyed_overlay_terrain_decay_threshold MEMBER destroyed_overlay_terrain_decay_threshold READ get_destroyed_overlay_terrain_decay_threshold)
 	Q_PROPERTY(int scaled_tile_width READ get_scaled_tile_width CONSTANT)
@@ -388,6 +389,8 @@ public:
 		return this->mana_icon;
 	}
 
+	int get_cycles_per_year(const int current_year) const;
+
 	int get_forest_regeneration_threshold() const
 	{
 		return this->forest_regeneration_threshold;
@@ -481,6 +484,8 @@ private:
 	resource_icon *food_icon = nullptr;
 	resource_icon *score_icon = nullptr;
 	resource_icon *mana_icon = nullptr;
+	int default_cycles_per_year = 60;
+	std::map<int, int> cycles_per_year_after;
 	int forest_regeneration_threshold = 0;
 	int destroyed_overlay_terrain_decay_threshold = 0;
 	int population_per_unit = 0; //the number of people a unit represents

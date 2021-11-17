@@ -149,8 +149,6 @@ static std::vector<std::unique_ptr<gcn::Container>> Containers;
 
 namespace wyrmgus {
 
-const int game::cycles_per_year = CYCLES_PER_SECOND * 60; //1 year per minute
-
 std::filesystem::path game::save_file_url_string_to_save_filepath(const std::string &file_url_str)
 {
 	const QUrl file_url = QString::fromStdString(file_url_str);
@@ -178,6 +176,11 @@ game::game()
 
 game::~game()
 {
+}
+
+int game::get_cycles_per_year() const
+{
+	return defines::get()->get_cycles_per_year(this->get_current_year());
 }
 
 void game::run_map(const std::filesystem::path &filepath)
@@ -241,7 +244,7 @@ void game::apply_player_history()
 void game::do_cycle()
 {
 	try {
-		if (GameCycle % game::cycles_per_year == 0) {
+		if (GameCycle % this->get_cycles_per_year() == 0) {
 			++this->current_year;
 
 			if (this->current_year == 0) {
