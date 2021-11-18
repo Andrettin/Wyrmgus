@@ -369,7 +369,7 @@ bool CBuildRestrictionAddOn::Check(const CUnit *, const wyrmgus::unit_type &, co
 /**
 **  Check OnTop Restriction
 */
-inline bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
+bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
 {
 	if (unit->tilePos == pos
 		&& !unit->Destroyed && unit->Orders[0]->Action != UnitAction::Die) {

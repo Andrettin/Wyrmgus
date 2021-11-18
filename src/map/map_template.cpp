@@ -1502,6 +1502,8 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		}
 	}
 
+	bool built_ontop = false;
+
 	for (const unit_class *building_class : site_history->get_building_classes()) {
 		const unit_type *unit_type = site_owner->get_class_unit_type(building_class);
 
@@ -1517,9 +1519,22 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a town hall, but isn't set as a settlement one.");
 		}
 
+		const CBuildRestrictionOnTop *ontop = OnTopDetails(*unit_type, nullptr);
+		if (ontop != nullptr && ontop->Parent != nullptr) {
+			if (ontop->Parent != base_unit_type) {
+				throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a building (\"" + unit_type->get_identifier() + "\") which requires being built over a \"" + ontop->Parent->get_identifier() + "\", but the site does not have that as its base unit type.");
+			}
+
+			if (built_ontop) {
+				throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a building (\"" + unit_type->get_identifier() + "\") which requires being built over a \"" + ontop->Parent->get_identifier() + "\", but the site has already been built upon.");
+			}
+
+			built_ontop = true;
+		}
+
 		const QPoint building_unit_offset = unit_type->get_tile_center_pos_offset();
 		if (!is_position_shift_acceptable && first_building) {
-			if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
+			if (ontop == nullptr && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
 				throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on " + point::to_string(site->get_pos()) + ", but it cannot be there.");
 			}
 		}
@@ -1527,7 +1542,8 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		CUnit *unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, settlement);
 
 		if (first_building) {
-			if (!site->is_settlement() && !site->get_name().empty()) { //if one building is representing a non-settlement site, make it have the site's name
+			if (base_unit_type == nullptr && !site->get_name().empty()) {
+				//if one building is representing a site with no base unit type, make it have the site's name
 				unit->Name = site->get_cultural_name(site_owner->get_civilization());
 			}
 			first_building = false;
@@ -1604,7 +1620,8 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 				unit->set_unique(std::get<3>(site->HistoricalBuildings[j]));
 			}
 			if (first_building) {
-				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && unit->get_unique() == nullptr && (!building_owner || building_owner == site_owner)) { //if one building is representing a minor site, make it have the site's name
+				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && unit->get_unique() == nullptr && (!building_owner || building_owner == site_owner)) {
+					//if one building is representing a minor site, make it have the site's name
 					unit->Name = site->get_cultural_name(site_owner->get_civilization());
 				}
 				first_building = false;

@@ -484,7 +484,7 @@ private:
 	resource_icon *food_icon = nullptr;
 	resource_icon *score_icon = nullptr;
 	resource_icon *mana_icon = nullptr;
-	int default_cycles_per_year = 60;
+	int default_cycles_per_year = 1800;
 	std::map<int, int> cycles_per_year_after;
 	int forest_regeneration_threshold = 0;
 	int destroyed_overlay_terrain_decay_threshold = 0;

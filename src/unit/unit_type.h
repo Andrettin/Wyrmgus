@@ -613,16 +613,20 @@ public:
 
 class CBuildRestrictionOnTop final : public CBuildRestriction
 {
-	class functor
+	class functor final
 	{
 	public:
-		functor(const wyrmgus::unit_type *type, const Vec2i &_pos): ontop(0), Parent(type), pos(_pos) {}
-		inline bool operator()(CUnit *const unit);
-		CUnit *ontop;   /// building that is unit is an addon too.
+		explicit functor(const wyrmgus::unit_type *type, const Vec2i &_pos): Parent(type), pos(_pos)
+		{
+		}
+
+		bool operator()(CUnit *const unit);
+		CUnit *ontop = nullptr;   /// building that is unit is an addon too.
 	private:
-		const wyrmgus::unit_type *const Parent;  /// building that is unit is an addon too.
+		const unit_type *const Parent = nullptr;  /// building that is unit is an addon too.
 		const Vec2i pos;  //functor work position
 	};
+
 public:
 	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
 	{
@@ -638,7 +642,7 @@ public:
 	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 
 	std::string ParentName;  /// building that is unit is an addon too.
-	wyrmgus::unit_type *Parent = nullptr;       /// building that is unit is an addon too.
+	const unit_type *Parent = nullptr;       /// building that is unit is an addon too.
 	int ReplaceOnDie = 0;     /// recreate the parent on destruction
 	int ReplaceOnBuild = 0;   /// remove the parent, or just build over it.
 };
