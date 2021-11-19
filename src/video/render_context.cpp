@@ -50,12 +50,13 @@ void render_context::set_free_texture_commands(std::vector<std::function<void()>
 	this->free_texture_commands = std::move(commands);
 }
 
-void render_context::free_textures()
+void render_context::run_free_texture_commands()
 {
 	std::lock_guard<std::mutex> lock(this->mutex);
 	for (const std::function<void()> &command : this->free_texture_commands) {
 		command();
 	}
+
 	this->free_texture_commands.clear();
 }
 

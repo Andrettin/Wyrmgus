@@ -40,7 +40,7 @@ namespace wyrmgus {
 renderer::~renderer()
 {
 	//run the OpenGL commands one more time, so that free texture commands are run
-	render_context::get()->free_textures();
+	render_context::get()->run_free_texture_commands();
 }
 
 QOpenGLFramebufferObject *renderer::createFramebufferObject(const QSize &size)

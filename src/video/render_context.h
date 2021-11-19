@@ -59,10 +59,12 @@ public:
 				this->commands = std::move(commands);
 			}
 		}
+
+		this->run_free_texture_commands();
 	}
 
 	void set_free_texture_commands(std::vector<std::function<void()>> &&commands);
-	void free_textures();
+	void run_free_texture_commands();
 
 private:
 	std::vector<std::function<void(renderer *)>> commands;
