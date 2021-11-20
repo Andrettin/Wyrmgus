@@ -1749,6 +1749,26 @@ bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) con
 	return false;
 }
 
+const unit_class *CPlayer::get_default_population_class(const unit_domain domain) const
+{
+	switch (domain) {
+		case unit_domain::water:
+			if (this->get_class_unit_type(defines::get()->get_default_water_population_class()) != nullptr) {
+				return defines::get()->get_default_water_population_class();
+			}
+			break;
+		case unit_domain::space:
+			if (this->get_class_unit_type(defines::get()->get_default_space_population_class()) != nullptr) {
+				return defines::get()->get_default_space_population_class();
+			}
+			break;
+		default:
+			break;
+	}
+
+	return defines::get()->get_default_population_class();
+}
+
 std::vector<CUnit *> CPlayer::get_town_hall_units() const
 {
 	std::vector<CUnit *> town_hall_units;

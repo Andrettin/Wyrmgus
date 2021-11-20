@@ -78,6 +78,7 @@ namespace wyrmgus {
 	enum class gender;
 	enum class player_type;
 	enum class resource_storage_type;
+	enum class unit_domain;
 	enum class vassalage_type;
 }
 
@@ -285,6 +286,8 @@ public:
 
 	bool has_upgrade(const CUpgrade *upgrade) const;
 	bool has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) const;
+
+	const unit_class *get_default_population_class(const unit_domain domain) const;
 
 	std::vector<CUnit *> get_town_hall_units() const;
 	std::vector<const wyrmgus::site *> get_settlements() const;
