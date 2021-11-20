@@ -1385,6 +1385,14 @@ void unit_type::initialize()
 		RecalculateShownUnits();
 	}
 
+	if (this->BoolFlag[BUILDING_INDEX].value) {
+		const CBuildRestrictionOnTop *ontop = OnTopDetails(*this, nullptr);
+
+		if (ontop != nullptr && ontop->Parent != nullptr) {
+			ontop->Parent->ontop_buildings.push_back(this);
+		}
+	}
+
 	for (size_t i = 0; i < this->Trains.size(); ++i) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = " + std::to_string(this->Trains[i]->ButtonPos) + ",\n";

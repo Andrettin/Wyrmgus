@@ -350,6 +350,10 @@ bool site::can_have_population() const
 		return true;
 	}
 
+	if (this->get_base_unit_type()->has_ontop_buildings()) {
+		return true;
+	}
+
 	return false;
 }
 

@@ -642,7 +642,7 @@ public:
 	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 
 	std::string ParentName;  /// building that is unit is an addon too.
-	const unit_type *Parent = nullptr;       /// building that is unit is an addon too.
+	unit_type *Parent = nullptr;       /// building that is unit is an addon too.
 	int ReplaceOnDie = 0;     /// recreate the parent on destruction
 	int ReplaceOnBuild = 0;   /// remove the parent, or just build over it.
 };
@@ -1194,6 +1194,11 @@ public:
 	std::vector<unit_type_variation *> get_custom_hero_variations() const;
 	Q_INVOKABLE QVariantList get_custom_hero_variations_qvariant_list() const;
 
+	bool has_ontop_buildings() const
+	{
+		return !this->ontop_buildings.empty();
+	}
+
 	const QColor &get_neutral_minimap_color() const
 	{
 		return this->neutral_minimap_color;
@@ -1436,6 +1441,7 @@ public:
 	std::vector<std::unique_ptr<CBuildRestriction>> BuildingRules;   /// Rules list for building a building.
 	std::vector<std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.
 private:
+	std::vector<const unit_type *> ontop_buildings; //buildings which can be built on top of this one
 	QColor neutral_minimap_color; //minimap color for neutral units
 	std::filesystem::path encyclopedia_background_file;
 
