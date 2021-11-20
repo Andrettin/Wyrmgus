@@ -90,6 +90,9 @@
 
 namespace wyrmgus {
 
+//map templates must be initialized after sites, as sites add themselves to the map template site list in their initialization function, and during map template initialization the sites are then sorted
+const std::set<std::string> map_template::database_dependencies = { site::class_identifier };
+
 map_template::map_template(const std::string &identifier)
 	: named_data_entry(identifier), CDataType(identifier),
 	georectangle(geocoordinate(geocoordinate::min_longitude, geocoordinate::min_latitude), geocoordinate(geocoordinate::max_longitude, geocoordinate::max_latitude))

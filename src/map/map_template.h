@@ -114,6 +114,8 @@ public:
 	static constexpr QPoint max_adjacent_template_distance = QPoint(16, 16);
 	static constexpr QPoint min_constructed_adjacent_template_distance = QPoint(1, 1);
 
+	static const std::set<std::string> database_dependencies;
+
 	explicit map_template(const std::string &identifier);
 	~map_template();
 
