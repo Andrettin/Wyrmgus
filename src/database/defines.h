@@ -89,6 +89,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::terrain_type* ford_terrain_type MEMBER ford_terrain_type)
 	Q_PROPERTY(std::filesystem::path border_image_file MEMBER border_image_file WRITE set_border_image_file)
 	Q_PROPERTY(QSize border_frame_size MEMBER border_frame_size)
+	Q_PROPERTY(unsigned char border_opacity MEMBER border_opacity READ get_border_opacity)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
 	Q_PROPERTY(wyrmgus::button_level* inventory_button_level MEMBER inventory_button_level READ get_inventory_button_level)
@@ -282,6 +283,11 @@ public:
 
 	QPoint get_border_offset() const;
 
+	unsigned char get_border_opacity() const
+	{
+		return this->border_opacity;
+	}
+
 	const std::vector<int> &get_border_transition_tiles(const tile_transition_type transition_type) const
 	{
 		static std::vector<int> empty_vector;
@@ -458,6 +464,7 @@ private:
 	std::filesystem::path border_image_file;
 	std::shared_ptr<CPlayerColorGraphic> border_graphics;
 	QSize border_frame_size;
+	unsigned char border_opacity = 255;
 	std::map<tile_transition_type, std::vector<int>> border_transition_tiles;
 	resource *time_resource = nullptr;
 	resource *wealth_resource = nullptr;

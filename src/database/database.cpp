@@ -183,6 +183,16 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 		}
 
 		new_property_value = string::to_bool(property.get_value());
+	} else if (static_cast<QMetaType::Type>(property_type) == QMetaType::UChar) {
+		unsigned value = std::stoul(property.get_value());
+
+		if (property.get_operator() == sml_operator::addition) {
+			value = object->property(property_name).toUInt() + value;
+		} else if (property.get_operator() == sml_operator::subtraction) {
+			value = object->property(property_name).toUInt() - value;
+		}
+
+		new_property_value = static_cast<unsigned char>(value);
 	} else if (property_type == QVariant::Int) {
 		int value = std::stoi(property.get_value());
 
