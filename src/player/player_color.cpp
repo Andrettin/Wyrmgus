@@ -46,4 +46,9 @@ QVariantList player_color::get_colors_qvariant_list() const
 	return container::to_qvariant_list(this->get_colors());
 }
 
+const QColor &player_color::get_minimap_color() const
+{
+	return this->get_colors().at(defines::get()->get_minimap_color_index());
+}
+
 }

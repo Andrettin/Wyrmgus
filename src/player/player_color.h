@@ -65,6 +65,8 @@ public:
 		this->colors.push_back(color);
 	}
 
+	const QColor &get_minimap_color() const;
+
 	void apply_to_image(QImage &image, const player_color *conversible_player_color) const
 	{
 		const int bpp = image.depth() / 8;

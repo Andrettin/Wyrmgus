@@ -510,7 +510,7 @@ CPlayer *CPlayer::GetThisPlayer()
 
 const QColor &CPlayer::get_minimap_color() const
 {
-	return this->get_player_color()->get_colors().at(wyrmgus::defines::get()->get_minimap_color_index());
+	return this->get_player_color()->get_minimap_color();
 }
 
 void CPlayer::set_revealed(const bool revealed)
