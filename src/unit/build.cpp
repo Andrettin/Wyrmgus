@@ -123,8 +123,13 @@ bool CBuildRestrictionOr::Check(const CUnit *builder, const wyrmgus::unit_type &
 */
 void CBuildRestrictionDistance::Init()
 {
-	this->RestrictType = wyrmgus::unit_type::try_get(this->RestrictTypeName);
-	this->restrict_class = wyrmgus::unit_class::try_get(this->restrict_class_name);
+	if (!this->RestrictTypeName.empty()) {
+		this->RestrictType = unit_type::get(this->RestrictTypeName);
+	}
+
+	if (!this->restrict_class_name.empty()) {
+		this->restrict_class = unit_class::get(this->restrict_class_name);
+	}
 }
 
 /**
@@ -205,7 +210,7 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const wyrmgus::unit_
 
 void CBuildRestrictionHasUnit::Init()
 {
-	this->RestrictType = wyrmgus::unit_type::get(this->RestrictTypeName);
+	this->RestrictType = unit_type::get(this->RestrictTypeName);
 }
 
 /**
@@ -255,7 +260,7 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const wyrmgus::unit_t
 
 void CBuildRestrictionSurroundedBy::Init()
 {
-	this->RestrictType = wyrmgus::unit_type::get(this->RestrictTypeName);
+	this->RestrictType = unit_type::get(this->RestrictTypeName);
 }
 
 /**
@@ -347,7 +352,7 @@ inline bool CBuildRestrictionAddOn::functor::operator()(const CUnit *const unit)
 
 void CBuildRestrictionAddOn::Init()
 {
-	this->Parent = wyrmgus::unit_type::get(this->ParentName);
+	this->Parent = unit_type::get(this->ParentName);
 }
 
 /**
@@ -399,7 +404,7 @@ private:
 
 void CBuildRestrictionOnTop::Init()
 {
-	this->Parent = wyrmgus::unit_type::get(this->ParentName);
+	this->Parent = unit_type::get(this->ParentName);
 }
 
 bool CBuildRestrictionOnTop::Check(const CUnit *builder, const wyrmgus::unit_type &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
@@ -444,7 +449,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const wyrmgus::unit_typ
 //Wyrmgus start
 void CBuildRestrictionTerrain::Init()
 {
-	this->RestrictTerrainType = wyrmgus::terrain_type::get(this->RestrictTerrainTypeName);
+	this->RestrictTerrainType = terrain_type::get(this->RestrictTerrainTypeName);
 }
 
 /**

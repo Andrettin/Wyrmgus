@@ -1385,14 +1385,6 @@ void unit_type::initialize()
 		RecalculateShownUnits();
 	}
 
-	if (this->BoolFlag[BUILDING_INDEX].value) {
-		const CBuildRestrictionOnTop *ontop = OnTopDetails(*this, nullptr);
-
-		if (ontop != nullptr && ontop->Parent != nullptr) {
-			ontop->Parent->ontop_buildings.push_back(this);
-		}
-	}
-
 	for (size_t i = 0; i < this->Trains.size(); ++i) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = " + std::to_string(this->Trains[i]->ButtonPos) + ",\n";
@@ -1483,6 +1475,24 @@ void unit_type::initialize()
 	}
 
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->get_identifier() + "\")) then table.insert(Units, \"" + this->get_identifier() + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
+
+	// Lookup BuildingTypes
+	for (const auto &b : this->BuildingRules) {
+		b->Init();
+	}
+
+	// Lookup AiBuildingTypes
+	for (const auto &b : this->AiBuildingRules) {
+		b->Init();
+	}
+
+	if (this->BoolFlag[BUILDING_INDEX].value) {
+		const CBuildRestrictionOnTop *ontop = OnTopDetails(*this, nullptr);
+
+		if (ontop != nullptr && ontop->Parent != nullptr) {
+			ontop->Parent->ontop_buildings.push_back(this);
+		}
+	}
 
 	data_entry::initialize();
 }
@@ -2840,16 +2850,6 @@ void InitUnitType(wyrmgus::unit_type &type)
 {
 	// Determine still frame
 	type.StillFrame = GetStillFrame(type);
-
-	// Lookup BuildingTypes
-	for (const auto &b : type.BuildingRules) {
-		b->Init();
-	}
-
-	// Lookup AiBuildingTypes
-	for (const auto &b : type.AiBuildingRules) {
-		b->Init();
-	}
 }
 //Wyrmgus end
 
