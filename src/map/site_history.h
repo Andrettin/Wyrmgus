@@ -80,9 +80,34 @@ public:
 		this->population = population;
 	}
 
-	const unit_class_map<int> &get_population_groups() const
+	void change_population(const int change)
+	{
+		this->population += change;
+	}
+
+	unit_class_map<int> &get_population_groups()
 	{
 		return this->population_groups;
+	}
+
+	int get_group_population(const unit_class *unit_class) const
+	{
+		const auto find_iterator = this->population_groups.find(unit_class);
+		if (find_iterator != this->population_groups.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_group_population(const unit_class *unit_class, const int population)
+	{
+		this->population_groups[unit_class] = population;
+	}
+
+	void change_group_population(const unit_class *unit_class, const int change)
+	{
+		this->set_group_population(unit_class, this->get_group_population(unit_class) + change);
 	}
 
 private:
