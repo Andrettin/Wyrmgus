@@ -38,4 +38,7 @@ struct player_compare
 using player_set = std::set<CPlayer *, player_compare>;
 using player_index_set = std::set<unsigned char>;
 
+template <typename T>
+using player_map = std::map<CPlayer *, T, player_compare>;
+
 }
