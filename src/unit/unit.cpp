@@ -7444,10 +7444,10 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 	const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();
 
 	if ((target.IsVisibleOnMap(*CPlayer::GetThisPlayer()) || ReplayRevealMap) && !DamageMissile.empty()) {
-		const wyrmgus::missile_type *mtype = wyrmgus::missile_type::get(DamageMissile);
-		const PixelDiff offset(3, -mtype->get_range());
+		const missile_type *mtype = missile_type::get(DamageMissile);
+		const QPoint pixel_offset(3, -mtype->get_range());
 
-		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset, target.MapLayer->ID)->Damage = -damage;
+		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + pixel_offset, target.MapLayer->ID)->Damage = -damage;
 	}
 }
 
