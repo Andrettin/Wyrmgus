@@ -680,6 +680,7 @@ public:
 	bool can_learn_ability(const CUpgrade *ability) const;
 
 	bool CanEat(const CUnit &unit) const;
+	int level_check_score(const int level) const;
 	bool LevelCheck(const int level) const;
 	bool is_spell_empowered(const wyrmgus::spell *spell) const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;

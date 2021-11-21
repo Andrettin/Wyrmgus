@@ -51,7 +51,6 @@ void apply_status_effects_spell_action::process_sml_property(const sml_property 
 
 int apply_status_effects_spell_action::Cast(CUnit &caster, const spell &, CUnit *target, const Vec2i &goal_pos, int z, int modifier)
 {
-	Q_UNUSED(caster)
 	Q_UNUSED(goal_pos)
 	Q_UNUSED(z)
 
@@ -66,7 +65,19 @@ int apply_status_effects_spell_action::Cast(CUnit &caster, const spell &, CUnit 
 			continue;
 		}
 
-		target->apply_status_effect(status_effect, cycles * modifier / 100);
+		int modified_cycles = cycles * modifier / 100;
+
+		//if a status effect is harmful, reduce the duration semi-randomly depending on the levels of the caster and the target
+		if (is_status_effect_harmful(status_effect) && caster.Variable[LEVEL_INDEX].Value > 0) {
+			const int level_check_score = target->level_check_score(caster.Variable[LEVEL_INDEX].Value);
+			if (level_check_score > 0) {
+				const int duration_reduction = level_check_score * 10;
+				modified_cycles *= std::max(100 - duration_reduction, 10);
+				modified_cycles /= 100;
+			}
+		}
+
+		target->apply_status_effect(status_effect, modified_cycles);
 
 		if (status_effect == status_effect::stun) {
 			//if the target has become stunned, stop it

@@ -6633,13 +6633,22 @@ bool CUnit::CanEat(const CUnit &unit) const
 	return false;
 }
 
+int CUnit::level_check_score(const int level) const
+{
+	if (this->Variable[LEVEL_INDEX].Value == 0) {
+		return 0;
+	}
+
+	return SyncRand((this->Variable[LEVEL_INDEX].Value * 2) + 1) - level;
+}
+
 bool CUnit::LevelCheck(const int level) const
 {
 	if (this->Variable[LEVEL_INDEX].Value == 0) {
 		return false;
 	}
 	
-	return SyncRand((this->Variable[LEVEL_INDEX].Value * 2) + 1) >= level;
+	return this->level_check_score(level) >= 0;
 }
 
 bool CUnit::is_spell_empowered(const wyrmgus::spell *spell) const

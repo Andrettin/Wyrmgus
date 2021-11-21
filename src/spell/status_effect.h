@@ -143,6 +143,22 @@ inline std::string status_effect_to_string(const status_effect status_effect)
 	throw std::runtime_error("Invalid status effect: \"" + std::to_string(static_cast<int>(status_effect)) + "\".");
 }
 
+inline bool is_status_effect_harmful(const status_effect status_effect)
+{
+	switch (status_effect) {
+		case status_effect::slow:
+		case status_effect::poison:
+		case status_effect::stun:
+		case status_effect::bleeding:
+		case status_effect::terror:
+		case status_effect::wither:
+		case status_effect::dehydration:
+			return true;
+		default:
+			return false;
+	}
+}
+
 }
 
 Q_DECLARE_METATYPE(wyrmgus::status_effect)
