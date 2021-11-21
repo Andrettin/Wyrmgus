@@ -742,6 +742,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			DebugPrint("Missile-none hits no unit, shouldn't happen!\n");
 			return;
 		}
+
 		//Wyrmgus start
 //		HitUnit(&unit, *goal, CalculateDamage(unit, *goal, Damage));
 		if (CalculateHit(unit, *goal->Stats, goal) == true) {
@@ -750,7 +751,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			if (goal->IsAlive()) {
 				HitUnit_NormalHitSpecialDamageEffects(unit, *goal);
 			}
-			PlayUnitSound(unit, wyrmgus::unit_sound_type::hit);
+			PlayUnitSound(unit, unit_sound_type::hit);
 			
 			//apply Thorns damage if attacker is at melee range
 			if (goal && goal->Variable[THORNSDAMAGE_INDEX].Value && unit.MapDistanceTo(*goal) <= 1) {
@@ -759,7 +760,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 				HitUnit(goal, unit, thorns_damage);
 			}
 		} else {
-			PlayUnitSound(unit, wyrmgus::unit_sound_type::miss);
+			PlayUnitSound(unit, unit_sound_type::miss);
 		}
 		//Wyrmgus end
 		return;
@@ -1280,7 +1281,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 			if (splash == 1 && missile.Type->SplashFactor <= 0) {
 				return;
 			} else if (splash == 1 && missile.Type->SplashFactor > 0) {
-				splash = missile.Type->SplashFactor; // if missile has splash but missed, apply splash damage
+				splash = missile.Type->SplashFactor; //if missile has splash but missed, apply splash damage
 			}
 		}
 		//Wyrmgus end
