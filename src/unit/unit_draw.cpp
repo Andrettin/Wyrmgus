@@ -870,7 +870,7 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 		if (unit.IsAlive() && unit.CurrentAction() != UnitAction::Built) {
 			//show aura range if the unit has an aura
 			if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0 || unit.Variable[REGENERATIONAURA_INDEX].Value > 0 || unit.Variable[HYDRATINGAURA_INDEX].Value > 0) {
-				const int value = AuraRange - (unit.Type->get_tile_width() - 1);
+				const int value = unit.get_aura_range();
 				const int radius = value * defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {

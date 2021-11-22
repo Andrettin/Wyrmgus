@@ -127,7 +127,6 @@ constexpr int UpgradeMax = 2048;                /// How many upgrades supported
 //constexpr int MAX_RACES = 8;
 constexpr int MAX_RACES = 256;
 
-constexpr int AuraRange = 6;					/// Range of auras
 constexpr int PlayerMajorDeityMax = 1;	/// Maximum major deities per player/character
 //constexpr int PlayerMinorDeityMax = 3;	/// Maximum minor deities per player/character
 constexpr int PlayerMinorDeityMax = 1;	/// Maximum minor deities per player/character

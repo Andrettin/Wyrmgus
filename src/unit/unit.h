@@ -127,6 +127,7 @@ class CUnit final
 public:
 	static constexpr unsigned char max_step_count = 10;
 	static constexpr int max_sight_range = 16;
+	static constexpr int aura_range = 6;
 
 	CUnit();
 	~CUnit();
@@ -241,7 +242,8 @@ public:
 	void DeequipItem(CUnit &item, bool affect_character = true);
 	void ReadWork(const CUpgrade *work, bool affect_character = true);
 	void ConsumeElixir(const CUpgrade *elixir, bool affect_character = true);
-	void ApplyAura(int aura_index);
+	int get_aura_range() const;
+	void ApplyAura(const int aura_index);
 	void ApplyAuraEffect(const int aura_index);
 	void SetPrefix(const CUpgrade *prefix);
 	void SetSuffix(const CUpgrade *suffix);

@@ -1805,7 +1805,14 @@ void CUnit::ConsumeElixir(const CUpgrade *elixir, bool affect_character)
 	}
 }
 
-void CUnit::ApplyAura(int aura_index)
+int CUnit::get_aura_range() const
+{
+	int aura_range = CUnit::aura_range + this->Variable[AURA_RANGE_BONUS_INDEX].Value;
+	aura_range -= this->Type->get_tile_width() - 1;
+	return std::max(aura_range, 1);
+}
+
+void CUnit::ApplyAura(const int aura_index)
 {
 	if (aura_index == LEADERSHIPAURA_INDEX) {
 		if (!this->IsInCombat()) {
@@ -1814,21 +1821,25 @@ void CUnit::ApplyAura(int aura_index)
 	}
 	
 	this->ApplyAuraEffect(aura_index);
-			
+	
 	//apply aura to all appropriate nearby units
-	int aura_range = AuraRange - (this->Type->get_tile_width() - 1);
+	const int aura_range = this->get_aura_range();
+
 	std::vector<CUnit *> table;
 	SelectAroundUnit<true>(*this, aura_range, table, MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)));
-	for (size_t i = 0; i != table.size(); ++i) {
-		table[i]->ApplyAuraEffect(aura_index);
+
+	for (CUnit *nearby_unit : table) {
+		nearby_unit->ApplyAuraEffect(aura_index);
 	}
 	
 	table.clear();
+
 	SelectAroundUnit<true>(*this, aura_range, table, MakeOrPredicate(MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), HasSamePlayerAs(*CPlayer::get_neutral_player())));
-	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->UnitInside) {
-			CUnit *uins = table[i]->UnitInside;
-			for (int j = 0; j < table[i]->InsideCount; ++j, uins = uins->NextContained) {
+
+	for (CUnit *nearby_unit : table) {
+		if (nearby_unit->UnitInside) {
+			CUnit *uins = nearby_unit->UnitInside;
+			for (int j = 0; j < nearby_unit->InsideCount; ++j, uins = uins->NextContained) {
 				if (uins->Player == this->Player || uins->is_allied_with(*this->Player)) {
 					uins->ApplyAuraEffect(aura_index);
 				}
