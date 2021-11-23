@@ -379,11 +379,21 @@ void CViewport::draw_map_tile_border(const tile *tile, const QPoint &pixel_pos, 
 {
 	const wyrmgus::player_color *player_color = tile->get_player_color();
 
-	if (tile->get_owner() != nullptr && tile->get_ownership_border_tile() != -1 && defines::get()->get_border_graphics() != nullptr) {
-		const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_graphics();
-		const color_modification color_modification(0, color_set(), player_color, nullptr);
-		border_graphics->render_frame(tile->get_ownership_border_tile(), pixel_pos + defines::get()->get_border_offset(), color_modification, false, false, defines::get()->get_border_opacity(), 100, render_commands);
+	if (tile->get_owner() == nullptr) {
+		return;
 	}
+
+	if (tile->get_ownership_border_tile() == -1) {
+		return;
+	}
+
+	if (defines::get()->get_border_graphics() == nullptr) {
+		return;
+	}
+
+	const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_graphics();
+	const color_modification color_modification(0, color_set(), player_color, nullptr);
+	border_graphics->render_frame(tile->get_ownership_border_tile(), pixel_pos + defines::get()->get_border_offset(), color_modification, false, false, defines::get()->get_border_opacity(), 100, render_commands);
 }
 
 /**

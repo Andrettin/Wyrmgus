@@ -2826,31 +2826,38 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 		return;
 	}
 	
-	if (CEditor::get()->is_running()) { //no need to assign ownership transitions while in the editor
+	if (CEditor::get()->is_running()) {
+		//no need to assign ownership transitions while in the editor
 		return;
 	}
 	
-	wyrmgus::tile &mf = *this->Field(pos, z);
+	tile *tile = this->Field(pos, z);
 	
-	mf.set_ownership_border_tile(-1);
+	tile->set_ownership_border_tile(-1);
 
-	if (mf.get_owner() == nullptr) {
+	if (tile->get_owner() == nullptr) {
 		return;
 	}
-	
+
 	std::vector<direction> adjacent_directions;
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (this->Info->IsPointOnMap(adjacent_pos, z)) {
-					wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
-					if (adjacent_mf.get_owner() != mf.get_owner()) {
-						adjacent_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
-					}
-				}
+			if (x_offset == 0 && y_offset == 0) {
+				continue;
 			}
+
+			const QPoint adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+			if (!this->Info->IsPointOnMap(adjacent_pos, z)) {
+				continue;
+			}
+
+			const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
+			if (adjacent_tile->get_owner() == tile->get_owner()) {
+				continue;
+			}
+
+			adjacent_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
 		}
 	}
 	
@@ -2859,7 +2866,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 	if (transition_type != tile_transition_type::none) {
 		const std::vector<int> &transition_tiles = defines::get()->get_border_transition_tiles(transition_type);
 		if (!transition_tiles.empty()) {
-			mf.set_ownership_border_tile(vector::get_random(transition_tiles));
+			tile->set_ownership_border_tile(vector::get_random(transition_tiles));
 		}
 	}
 }
