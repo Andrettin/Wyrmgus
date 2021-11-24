@@ -80,6 +80,7 @@
 
 #include "database/defines.h"
 #include "database/preferences.h"
+#include "game/game.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/minimap.h"
