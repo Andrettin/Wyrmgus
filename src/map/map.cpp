@@ -2839,6 +2839,10 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 		return;
 	}
 
+	if (tile->is_water()) {
+		return;
+	}
+
 	std::vector<direction> adjacent_directions;
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -2853,7 +2857,12 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 			}
 
 			const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
+
 			if (adjacent_tile->get_owner() == tile->get_owner()) {
+				continue;
+			}
+
+			if (adjacent_tile->is_water()) {
 				continue;
 			}
 
