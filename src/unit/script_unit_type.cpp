@@ -34,6 +34,7 @@
 #include "character.h" //for updating levels
 //Wyrmgus end
 #include "editor.h"
+#include "game/game.h"
 #include "gender.h"
 #include "item/item_slot.h"
 #include "item/unique_item.h"
