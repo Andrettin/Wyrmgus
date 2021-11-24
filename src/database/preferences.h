@@ -66,6 +66,7 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(int key_scroll_speed MEMBER key_scroll_speed READ get_key_scroll_speed NOTIFY changed)
 	Q_PROPERTY(int mouse_scroll_speed MEMBER mouse_scroll_speed READ get_mouse_scroll_speed NOTIFY changed)
 	Q_PROPERTY(bool reverse_mousewheel_scrolling MEMBER reverse_mousewheel_scrolling READ is_reverse_mousewheel_scrolling_enabled NOTIFY changed)
+	Q_PROPERTY(bool show_water_borders MEMBER show_water_borders READ is_show_water_borders_enabled NOTIFY changed)
 	Q_PROPERTY(QString local_player_name READ get_local_player_name_qstring WRITE set_local_player_name_qstring NOTIFY changed)
 
 public:
@@ -352,6 +353,11 @@ public:
 		return this->reverse_mousewheel_scrolling;
 	}
 
+	bool is_show_water_borders_enabled() const
+	{
+		return this->show_water_borders;
+	}
+
 	const std::string &get_local_player_name() const
 	{
 		return this->local_player_name;
@@ -409,6 +415,7 @@ private:
 	int key_scroll_speed = 1;
 	int mouse_scroll_speed = 1; //mouse scroll speed (screenpixels per mousepixel)
 	bool reverse_mousewheel_scrolling = false;
+	bool show_water_borders = false;
 	std::string local_player_name;
 };
 

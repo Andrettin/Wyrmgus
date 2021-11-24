@@ -2839,7 +2839,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 		return;
 	}
 
-	if (tile->is_water()) {
+	if (!preferences::get()->is_show_water_borders_enabled() && tile->is_water()) {
 		return;
 	}
 
@@ -2862,7 +2862,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 				continue;
 			}
 
-			if (adjacent_tile->is_water()) {
+			if (!preferences::get()->is_show_water_borders_enabled() && adjacent_tile->is_water()) {
 				continue;
 			}
 
@@ -2875,7 +2875,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 	if (transition_type != tile_transition_type::none) {
 		const std::vector<int> &transition_tiles = defines::get()->get_border_transition_tiles(transition_type);
 		if (!transition_tiles.empty()) {
-			tile->set_ownership_border_tile(vector::get_random(transition_tiles));
+			tile->set_ownership_border_tile(vector::get_random_async(transition_tiles));
 		}
 	}
 }
