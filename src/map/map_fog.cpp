@@ -34,6 +34,7 @@
 #include "actions.h"
 #include "database/defines.h"
 #include "database/preferences.h"
+#include "game/game.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
