@@ -37,6 +37,7 @@
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "editor.h" //for personal name generation
+#include "game/game.h"
 #include "iolib.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"
