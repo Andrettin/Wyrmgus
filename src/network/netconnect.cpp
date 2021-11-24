@@ -32,6 +32,7 @@
 #include "netconnect.h"
 
 #include "database/preferences.h"
+#include "game/game.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "master.h"
