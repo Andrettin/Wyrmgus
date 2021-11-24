@@ -39,6 +39,7 @@
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "engine_interface.h"
+#include "game/game.h"
 #include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
