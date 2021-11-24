@@ -39,6 +39,7 @@
 #include "currency.h"
 #include "economy/resource_storage_type.h"
 #include "editor.h"
+#include "game/game.h"
 #include "gender.h"
 #include "grand_strategy.h"
 #include "language/language.h"
