@@ -3696,13 +3696,11 @@ void CUnit::UpdateSettlement()
 			this->UpdateBuildingSettlementAssignment();
 		}
 	} else {
-		if (this->Player->get_index() == PlayerNumNeutral) {
-			return;
-		}
+		const tile *tile = this->get_center_tile();
 
-		const wyrmgus::tile *tile = this->get_center_tile();
-
-		if (tile->get_owner() == this->Player || (this->Player->has_neutral_faction_type() && tile->get_owner() != nullptr)) {
+		if (this->Player->get_index() == PlayerNumNeutral || this->Player->has_neutral_faction_type()) {
+			this->settlement = tile->get_settlement();
+		} else if (tile->get_owner() == this->Player) {
 			this->settlement = tile->get_settlement();
 		} else {
 			this->settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->get_tile_size());
@@ -3716,12 +3714,8 @@ void CUnit::UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settleme
 		return;
 	}
 	
-	if (this->Player->get_index() == PlayerNumNeutral) {
-		return;
-	}
-		
 	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
-		if (!player->has_neutral_faction_type() && this->Player != player.get()) {
+		if (player->get_index() != PlayerNumNeutral && !player->has_neutral_faction_type() && this->Player != player.get()) {
 			continue;
 		}
 
@@ -7180,7 +7174,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	MapMarkUnitSight(unit);
 	
 	//Wyrmgus start
-	if (unit.settlement) {
+	if (unit.settlement && unit.get_site() == unit.settlement) {
 		unit.UpdateBuildingSettlementAssignment(unit.settlement);
 	}
 	//Wyrmgus end
