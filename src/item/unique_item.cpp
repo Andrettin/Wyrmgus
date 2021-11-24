@@ -29,6 +29,7 @@
 #include "item/unique_item.h"
 
 #include "character.h"
+#include "game/game.h"
 #include "network.h"
 #include "item/persistent_item.h"
 #include "ui/interface.h"

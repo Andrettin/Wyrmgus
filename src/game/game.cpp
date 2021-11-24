@@ -145,6 +145,11 @@ bool UseHPForXp = false;				/// true if gain XP by dealing damage, false if by k
 
 bool DefiningData = false;
 
+bool GameRunning = false;				/// Current running state
+bool GamePaused = false;				/// Current pause state
+bool GameObserve = false;				/// Observe mode
+bool GameEstablishing = false;			/// Game establishing mode
+
 static std::vector<std::unique_ptr<gcn::Container>> Containers;
 
 namespace wyrmgus {

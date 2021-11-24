@@ -289,4 +289,13 @@ extern bool UseHPForXp;                     /// true if gain XP by dealing damag
 extern bool DefiningData;
 //Wyrmgus end
 
+/// Flag telling if the game is running
+extern bool GameRunning;
+/// Flag telling if the game is paused
+extern bool GamePaused;
+/// Flag telling if the game is in observe mode
+extern bool GameObserve;
+/// Flag telling if the game is in establishing mode
+extern bool GameEstablishing;
+
 extern void CleanGame();
