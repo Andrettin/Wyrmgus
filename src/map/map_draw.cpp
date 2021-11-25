@@ -44,6 +44,7 @@
 #include "particle.h"
 #include "pathfinder.h"
 #include "player/player.h"
+#include "player/player_color.h"
 #include "translate.h"
 #include "ui/cursor.h"
 #include "ui/ui.h"
@@ -54,6 +55,7 @@
 #include "util/vector_util.h"
 #include "video/font.h"
 #include "video/font_color.h"
+#include "video/renderer.h"
 #include "video/video.h"
 
 CViewport::CViewport()
@@ -381,6 +383,15 @@ void CViewport::draw_map_tile_border(const tile *tile, const QPoint &pixel_pos, 
 
 	if (tile->get_owner() == nullptr) {
 		return;
+	}
+
+	if (CursorBuilding != nullptr) {
+		render_commands.push_back([pixel_pos, player_color](renderer *renderer) {
+			QColor color = player_color->get_minimap_color();
+			color.setAlpha(64);
+
+			renderer->fill_rect(pixel_pos, defines::get()->get_scaled_tile_size(), color);
+		});
 	}
 
 	if (tile->get_ownership_border_tile() == -1) {
