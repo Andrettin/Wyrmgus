@@ -32,6 +32,7 @@
 
 #include "database/defines.h"
 #include "database/preferences.h"
+#include "editor.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
@@ -385,7 +386,7 @@ void CViewport::draw_map_tile_border(const tile *tile, const QPoint &pixel_pos, 
 		return;
 	}
 
-	if (CursorBuilding != nullptr) {
+	if (CursorBuilding != nullptr && !CEditor::get()->is_running()) {
 		render_commands.push_back([pixel_pos, player_color](renderer *renderer) {
 			QColor color = player_color->get_minimap_color();
 			color.setAlpha(64);
