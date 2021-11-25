@@ -35,8 +35,8 @@
 
 void CAnimation_Unbreakable::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	assert_throw(unit.Anim.Anim == this);
-	assert_throw(unit.Anim.Unbreakable != this->state);
+	assert_log(unit.Anim.Anim == this);
+	assert_log(unit.Anim.Unbreakable != this->state);
 
 	unit.Anim.Unbreakable = this->state;
 }
