@@ -619,6 +619,14 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 				return nullptr;
 			}
 		}
+
+		//if we end with an impassable tile, then we need to increment the passable block count to account for the gap between the last and first passable tiles
+		if (impassable) {
+			++passable_block_count;
+			if (passable_block_count > 2) {
+				return nullptr;
+			}
+		}
 	}
 
 	if (GameEstablishing) {
