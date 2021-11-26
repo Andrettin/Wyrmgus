@@ -1387,34 +1387,6 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		start_date = current_campaign->get_start_date();
 	}
 
-	for (size_t j = 0; j < site->HistoricalResources.size(); ++j) {
-		if (
-			(!current_campaign && std::get<1>(site->HistoricalResources[j]).Year == 0 && std::get<1>(site->HistoricalResources[j]).Year == 0)
-			|| (
-				current_campaign && start_date.ContainsDate(std::get<0>(site->HistoricalResources[j]))
-				&& (!start_date.ContainsDate(std::get<1>(site->HistoricalResources[j])) || std::get<1>(site->HistoricalResources[j]).Year == 0)
-				)
-			) {
-			const unit_type *type = std::get<2>(site->HistoricalResources[j]);
-			if (!type) {
-				fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): historical resource type is null.\n", site->Ident.c_str());
-				continue;
-			}
-			const Vec2i resource_unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
-			CUnit *unit = CreateResourceUnit(site_pos - resource_unit_offset, *type, z, false); // don't generate unique resources when setting special properties, since for map templates unique resources are supposed to be explicitly indicated
-			if (std::get<3>(site->HistoricalResources[j])) {
-				unit->set_unique(std::get<3>(site->HistoricalResources[j]));
-			}
-			int resource_quantity = std::get<4>(site->HistoricalResources[j]);
-			if (resource_quantity) { //set the resource_quantity after setting the unique unit, so that unique resources can be decreased in quantity over time
-				unit->SetResourcesHeld(resource_quantity);
-				unit->Variable[GIVERESOURCE_INDEX].Value = resource_quantity;
-				unit->Variable[GIVERESOURCE_INDEX].Max = resource_quantity;
-				unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
-			}
-		}
-	}
-
 	if (!site->get_satellites().empty()) {
 		int64_t orbit_distance = 0;
 		if (site->get_base_unit_type() != nullptr) {

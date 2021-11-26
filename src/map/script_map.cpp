@@ -1471,39 +1471,6 @@ static int CclDefineSite(lua_State *l)
 
 				site->HistoricalBuildings.push_back(std::make_tuple(start_date, end_date, building_class, unique, building_owner));
 			}
-		} else if (!strcmp(value, "HistoricalResources")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CDate start_date;
-				lua_rawgeti(l, -1, j + 1);
-				CclGetDate(l, &start_date);
-				lua_pop(l, 1);
-				++j;
-				CDate end_date;
-				lua_rawgeti(l, -1, j + 1);
-				CclGetDate(l, &end_date);
-				lua_pop(l, 1);
-				++j;
-				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
-				++j;
-				
-				wyrmgus::unique_item *unique = nullptr;
-				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && wyrmgus::unique_item::try_get(LuaToString(l, -1)) != nullptr) {
-					unique = wyrmgus::unique_item::get(LuaToString(l, -1));
-				} else {
-					--j;
-				}
-				lua_pop(l, 1);
-				++j;
-				
-				int quantity = LuaToNumber(l, -1, j + 1);
-
-				site->HistoricalResources.push_back(std::make_tuple(start_date, end_date, unit_type, unique, quantity));
-			}
 		} else if (!strcmp(value, "Regions")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
