@@ -29,6 +29,7 @@
 class CPlayer;
 class CUnit;
 class CUpgrade;
+class PlayerAi;
 struct lua_State;
 
 static int CclDefineQuest(lua_State *l);
@@ -149,6 +150,12 @@ public:
 	{
 		Q_UNUSED(resource)
 		Q_UNUSED(quantity)
+		Q_UNUSED(player_quest_objective)
+	}
+
+	virtual void check_ai(PlayerAi *ai_player, const player_quest_objective *player_quest_objective) const
+	{
+		Q_UNUSED(ai_player)
 		Q_UNUSED(player_quest_objective)
 	}
 

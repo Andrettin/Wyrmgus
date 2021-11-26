@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "ai/ai_local.h"
 #include "map/site_game_data.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
@@ -205,6 +206,40 @@ public:
 		}
 
 		player_quest_objective->increment_counter();
+	}
+
+	virtual void check_ai(PlayerAi *ai_player, const player_quest_objective *player_quest_objective) const override
+	{
+		CPlayer *player = ai_player->Player;
+
+		const unit_type *unit_type_to_build = nullptr;
+		if (!this->get_unit_types().empty()) {
+			unit_type_to_build = this->get_unit_types().front();
+		} else {
+			unit_type_to_build = player->get_class_unit_type(this->get_unit_classes().front());
+		}
+
+		if (unit_type_to_build->BoolFlag[TOWNHALL_INDEX].value) {
+			return; //town hall construction can't be handled by requests
+		}
+
+		int units_to_build = this->get_quantity() - player_quest_objective->get_counter();
+
+		for (const AiBuildQueue &queue : ai_player->UnitTypeBuilt) { //count transport capacity under construction to see if should request more
+			if (this->get_settlement() != nullptr && this->get_settlement() != queue.settlement) {
+				continue;
+			}
+
+			if (!vector::contains(this->get_unit_types(), queue.Type) && !vector::contains(this->get_unit_classes(), queue.Type->get_unit_class())) {
+				continue;
+			}
+
+			units_to_build -= queue.Want - queue.Made;
+		}
+
+		if (units_to_build > 0) {
+			AiAddUnitTypeRequest(*unit_type_to_build, units_to_build, 0, this->get_settlement());
+		}
 	}
 };
 

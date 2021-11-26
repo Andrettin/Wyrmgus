@@ -2737,7 +2737,7 @@ void AiExplore(const Vec2i &pos, const tile_flag mask)
 */
 void AiResourceManager()
 {
-	AiPlayer->check_quest_units_to_build();
+	AiPlayer->check_quest_objectives();
 
 	// Check if something needs to be build / trained.
 	AiCheckingWork();

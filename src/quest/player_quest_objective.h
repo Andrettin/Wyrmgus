@@ -73,6 +73,7 @@ public:
 	void on_unit_built(const CUnit *unit);
 	void on_unit_destroyed(const CUnit *unit);
 	void on_resource_gathered(const resource *resource, const int quantity);
+	void check_ai() const;
 
 private:
 	const wyrmgus::quest_objective *quest_objective = nullptr;

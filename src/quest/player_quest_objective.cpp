@@ -63,4 +63,13 @@ void player_quest_objective::on_resource_gathered(const resource *resource, cons
 	this->get_quest_objective()->on_resource_gathered(resource, quantity, this);
 }
 
+void player_quest_objective::check_ai() const
+{
+	if (!this->get_player()->AiEnabled) {
+		return;
+	}
+
+	this->get_quest_objective()->check_ai(this->get_player()->Ai.get(), this);
+}
+
 }

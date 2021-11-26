@@ -358,7 +358,7 @@ public:
 		}
 	}
 
-	void check_quest_units_to_build();
+	void check_quest_objectives();
 
 	CPlayer *Player = nullptr;		/// Engine player structure
 	CAiType *AiType = nullptr;		/// AI type of this player AI

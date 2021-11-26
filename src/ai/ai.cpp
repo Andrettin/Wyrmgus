@@ -184,42 +184,12 @@ AiHelper AiHelpers;             /// AI helper variables
 
 PlayerAi *AiPlayer;             /// Current AI player
 
-void PlayerAi::check_quest_units_to_build()
+void PlayerAi::check_quest_objectives()
 {
+	//iterate through the quest objectives, and affect the AI accordingly
+
 	for (const auto &objective : this->Player->get_quest_objectives()) {
-		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
-		if (quest_objective->get_objective_type() != wyrmgus::objective_type::build_units) {
-			continue;
-		}
-
-		const wyrmgus::unit_type *unit_type_to_build = nullptr;
-		if (!quest_objective->get_unit_types().empty()) {
-			unit_type_to_build = quest_objective->get_unit_types().front();
-		} else {
-			unit_type_to_build = this->Player->get_class_unit_type(quest_objective->get_unit_classes().front());
-		}
-
-		if (unit_type_to_build->BoolFlag[TOWNHALL_INDEX].value) {
-			continue; //town hall construction can't be handled by requests
-		}
-
-		int units_to_build = quest_objective->get_quantity() - objective->get_counter();
-
-		for (const AiBuildQueue &queue : this->UnitTypeBuilt) { //count transport capacity under construction to see if should request more
-			if (quest_objective->get_settlement() != nullptr && quest_objective->get_settlement() != queue.settlement) {
-				continue;
-			}
-
-			if (!wyrmgus::vector::contains(quest_objective->get_unit_types(), queue.Type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), queue.Type->get_unit_class())) {
-				continue;
-			}
-
-			units_to_build -= queue.Want - queue.Made;
-		}
-
-		if (units_to_build > 0) {
-			AiAddUnitTypeRequest(*unit_type_to_build, units_to_build, 0, quest_objective->get_settlement());
-		}
+		objective->check_ai();
 	}
 }
 
