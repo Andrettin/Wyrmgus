@@ -1544,7 +1544,14 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			}
 		}
 
-		CUnit *unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, settlement);
+		QPoint building_pos;
+		if (ontop != nullptr) {
+			building_pos = site_game_data->get_site_unit()->tilePos;
+		} else {
+			building_pos = site_pos - building_unit_offset;
+		}
+
+		CUnit *unit = CreateUnit(building_pos, *unit_type, player, z, true, settlement);
 
 		if (first_building) {
 			if (base_unit_type == nullptr && !site->get_name().empty()) {
