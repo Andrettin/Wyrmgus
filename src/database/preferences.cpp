@@ -72,7 +72,15 @@ void preferences::load()
 	}
 
 	sml_parser parser;
-	const sml_data data = parser.parse(preferences_path);
+	sml_data data;
+
+	try {
+		data = parser.parse(preferences_path);
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		log::log_error("Failed to parse preferences file.");
+	}
+
 	database::process_sml_data(this, data);
 	this->initialize();
 }
@@ -105,7 +113,10 @@ void preferences::save() const
 	data.add_property("key_scroll_speed", std::to_string(this->get_key_scroll_speed()));
 	data.add_property("mouse_scroll_speed", std::to_string(this->get_mouse_scroll_speed()));
 	data.add_property("reverse_mousewheel_scrolling", string::from_bool(this->is_reverse_mousewheel_scrolling_enabled()));
-	data.add_property("local_player_name", "\"" + string::escaped(this->get_local_player_name()) + "\"");
+
+	if (!this->get_local_player_name().empty()) {
+		data.add_property("local_player_name", "\"" + string::escaped(this->get_local_player_name()) + "\"");
+	}
 
 	try {
 		data.print_to_file(preferences_path);

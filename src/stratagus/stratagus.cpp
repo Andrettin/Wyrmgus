@@ -559,6 +559,11 @@ void load_defines()
 	try {
 		//load the preferences before the defines, as the latter depend on the preferences
 		preferences::get()->load();
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error loading preferences."));
+	}
+
+	try {
 		database::get()->load_defines();
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error loading defines."));

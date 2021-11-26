@@ -335,8 +335,8 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
 	const int minimap_color_index = defines::get()->get_minimap_color_index();
 
-	QColor color(Qt::transparent);
-	QColor with_non_land_color(Qt::transparent);
+	QColor territory_color(Qt::transparent);
+	QColor territory_with_non_land_color(Qt::transparent);
 	QColor realm_color(Qt::transparent);
 	QColor realm_with_non_land_color(Qt::transparent);
 
@@ -355,14 +355,14 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		}
 
 		if (!is_tile_water && !is_tile_space) {
-			color = player->get_minimap_color();
-			with_non_land_color = color;
+			territory_color = player->get_minimap_color();
+			territory_with_non_land_color = territory_color;
 			realm_color = realm_player->get_minimap_color();
 			realm_with_non_land_color = realm_color;
 		} else {
 			if (player != CPlayer::get_neutral_player()) {
-				with_non_land_color = player->get_minimap_color();
-				with_non_land_color.setAlpha(non_land_territory_alpha);
+				territory_with_non_land_color = player->get_minimap_color();
+				territory_with_non_land_color.setAlpha(non_land_territory_alpha);
 			}
 
 			if (realm_player != CPlayer::get_neutral_player()) {
@@ -392,8 +392,8 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		this->mode_overlay_images[minimap_mode::settlements_with_non_land][z].setPixelColor(mx, my, settlement_with_non_land_color);
 	}
 
-	this->mode_overlay_images[minimap_mode::territories][z].setPixelColor(mx, my, color);
-	this->mode_overlay_images[minimap_mode::territories_with_non_land][z].setPixelColor(mx, my, with_non_land_color);
+	this->mode_overlay_images[minimap_mode::territories][z].setPixelColor(mx, my, territory_color);
+	this->mode_overlay_images[minimap_mode::territories_with_non_land][z].setPixelColor(mx, my, territory_with_non_land_color);
 	this->mode_overlay_images[minimap_mode::realms][z].setPixelColor(mx, my, realm_color);
 	this->mode_overlay_images[minimap_mode::realms_with_non_land][z].setPixelColor(mx, my, realm_with_non_land_color);
 }
