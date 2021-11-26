@@ -220,6 +220,16 @@ public:
 		}
 
 		if (unit_type_to_build->BoolFlag[TOWNHALL_INDEX].value) {
+			//if a quest to build a town hall specifies a settlement, declare war on the owner of the settlement if we aren't at war already
+			if (this->get_settlement() != nullptr) {
+				const site_game_data *settlement_game_data = this->get_settlement()->get_game_data();
+				CPlayer *settlement_owner = settlement_game_data->get_owner();
+
+				if (settlement_owner != nullptr && settlement_owner != player && !player->has_enemy_stance_with(settlement_owner)) {
+					player->set_enemy_diplomatic_stance_with(settlement_owner);
+				}
+			}
+
 			return; //town hall construction can't be handled by requests
 		}
 

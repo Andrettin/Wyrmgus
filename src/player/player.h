@@ -824,6 +824,11 @@ public:
 		return this->enemies.contains(index);
 	}
 
+	bool has_enemy_stance_with(const CPlayer *other_player) const
+	{
+		return this->has_enemy_stance_with(other_player->get_index());
+	}
+
 	Q_INVOKABLE bool has_enemy_stance_with_sync(CPlayer *other_player) const
 	{
 		std::shared_lock<std::shared_mutex> lock(this->mutex);
