@@ -1338,6 +1338,9 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::get_neutral_player(), z, no_bordering_impassable, settlement);
 		unit->set_site(site);
 
+		//update the map pos of the site to the center pos of the site unit, as the location may have shifted
+		site_game_data->set_map_pos(unit->get_center_tile_pos());
+
 		if (site->is_settlement()) {
 			unit->settlement = site;
 		} else {
@@ -1544,14 +1547,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			}
 		}
 
-		QPoint building_pos;
-		if (ontop != nullptr) {
-			building_pos = site_game_data->get_site_unit()->tilePos;
-		} else {
-			building_pos = site_pos - building_unit_offset;
-		}
-
-		CUnit *unit = CreateUnit(building_pos, *unit_type, player, z, true, settlement);
+		CUnit *unit = CreateUnit(site_game_data->get_map_pos(), *unit_type, player, z, true, settlement);
 
 		if (first_building) {
 			if (base_unit_type == nullptr && !site->get_name().empty()) {
@@ -1669,7 +1665,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 	for (auto &[unit_class, group_population] : site_history->get_population_groups()) {
 		population -= group_population;
 
-		this->apply_population_unit(unit_class, group_population, site_pos, z, player, settlement);
+		this->apply_population_unit(unit_class, group_population, site_game_data->get_map_pos(), z, player, settlement);
 
 		//population that isn't enough to be applied as a unit of its own
 		const int remaining_group_population = group_population % defines::get()->get_population_per_unit();
@@ -1679,7 +1675,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 	if (population != 0) { //remaining population after subtracting the amount of population specified to belong to particular groups
 		const unit_class *population_class = player->get_default_population_class(base_unit_type ? base_unit_type->get_domain() : unit_domain::land);
 
-		this->apply_population_unit(population_class, population, site_pos, z, player, settlement);
+		this->apply_population_unit(population_class, population, site_game_data->get_map_pos(), z, player, settlement);
 
 		const int remaining_population = population % defines::get()->get_population_per_unit();
 		population = remaining_population;
