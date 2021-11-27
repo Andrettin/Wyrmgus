@@ -685,15 +685,18 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	//put the possible transporters in a vector
 	std::vector<CUnit *> transporters;
 	for (CUnit *ai_transporter : AiPlayer->Transporters[water_landmass]) {
-		if (!ai_transporter->IsIdle()) { //is already moving, may be going to a unit to transport it
+		if (!ai_transporter->IsIdle()) {
+			//is already moving, may be going to a unit to transport it
 			continue;
 		}
-		if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) <= 0) { //already full
+		if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) <= 0) {
+			//already full
 			continue;
 		}
 		
-		if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), ai_transporter) != AiPlayer->Scouts.end()) { //the transporters have to stop scouting
-			AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), ai_transporter), AiPlayer->Scouts.end());
+		if (vector::contains(AiPlayer->Scouts, ai_transporter)) {
+			//the transporters have to stop scouting
+			vector::remove(AiPlayer->Scouts, ai_transporter);
 		}
 		
 		transporters.push_back(ai_transporter);
@@ -707,7 +710,8 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 			continue;
 		}
 		
-		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) {
+			//already unloaded to the enemy's landmass
 			continue;
 		}
 		

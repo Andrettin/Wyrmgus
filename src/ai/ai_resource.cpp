@@ -158,7 +158,8 @@ static int AiCheckSupply(const PlayerAi &pai, const unit_type &type)
 	for (unsigned int i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
 		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
 		
-		if (queue.Type->BoolFlag[TOWNHALL_INDEX].value) { //don't count town halls
+		if (queue.Type->BoolFlag[TOWNHALL_INDEX].value) {
+			//don't count town halls
 			continue;
 		}
 
@@ -351,7 +352,8 @@ static int AiBuildBuilding(const unit_type &type, const unit_type &building, con
 	table.resize(num);	
 	
 	CUnit *near_unit = nullptr;
-	if (building.TerrainType || building.BoolFlag[TOWNHALL_INDEX].value) { //terrain type units and town halls have a particular place to be built, so we need to find the worker with a terrain traversal
+	if (building.TerrainType || building.BoolFlag[TOWNHALL_INDEX].value) {
+		//terrain type units and town halls have a particular place to be built, so we need to find the worker with a terrain traversal
 		TerrainTraversal terrainTraversal;
 
 		terrainTraversal.SetSize(CMap::get()->Info->MapWidths[z], CMap::get()->Info->MapHeights[z]);
@@ -360,15 +362,18 @@ static int AiBuildBuilding(const unit_type &type, const unit_type &building, con
 		terrainTraversal.PushPos(nearPos);
 
 		int maxRange = 15;
-		if (building.BoolFlag[TOWNHALL_INDEX].value) { //for settlements, look farther for builders
+		if (building.BoolFlag[TOWNHALL_INDEX].value) {
+			//for settlements, look farther for builders
 			maxRange = 9999;
 		}
 
 		tile_flag movemask = type.MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit);
-		if (OnTopDetails(building, nullptr)) { //if the building is built on top of something else, make sure the building it is built on top of doesn't block the movemask
+		if (OnTopDetails(building, nullptr)) {
+			//if the building is built on top of something else, make sure the building it is built on top of doesn't block the movemask
 			movemask &= ~(tile_flag::building);
 			movemask &= ~(tile_flag::air_building);
 		}
+
 		UnitFinder unitFinder(*AiPlayer->Player, table, maxRange, movemask, &near_unit, z);
 
 		terrainTraversal.Run(unitFinder);

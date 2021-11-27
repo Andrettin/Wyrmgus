@@ -1804,13 +1804,22 @@ bool CPlayer::has_settlement(const wyrmgus::site *settlement) const
 		return false;
 	}
 
-	const wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
+	const site_game_data *settlement_game_data = settlement->get_game_data();
+	const CUnit *settlement_unit = settlement_game_data->get_site_unit();
 
-	if (settlement_game_data->get_site_unit() && settlement_game_data->get_site_unit()->Player == this) {
-		return true;
+	if (settlement_unit == nullptr) {
+		return false;
 	}
 
-	return false;
+	if (settlement_unit->Player != this) {
+		return false;
+	}
+
+	if (settlement_unit->is_under_construction()) {
+		return false;
+	}
+
+	return true;
 }
 
 bool CPlayer::has_coastal_settlement() const

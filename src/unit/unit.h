@@ -406,6 +406,11 @@ public:
 		return this->Active != 0;
 	}
 
+	bool is_under_construction() const
+	{
+		return this->UnderConstruction != 0;
+	}
+
 	int MapDistanceTo(const CUnit &dst) const;
 
 	int MapDistanceTo(const Vec2i &pos, int z) const;
