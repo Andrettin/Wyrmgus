@@ -637,16 +637,35 @@ bool CMap::tile_borders_same_settlement_territory(const QPoint &pos, const int z
 	return false;
 }
 
+site_set CMap::get_tile_border_settlements(const QPoint &pos, const int z) const
+{
+	const site *tile_settlement = this->Field(pos, z)->get_settlement();
+	site_set bordering_settlements;
+
+	point::for_each_adjacent(pos, [&](const QPoint &adjacent_pos) {
+		if (!this->Info->IsPointOnMap(adjacent_pos, z)) {
+			return;
+		}
+
+		const site *adjacent_tile_settlement = this->Field(adjacent_pos, z)->get_settlement();
+		if (tile_settlement != adjacent_tile_settlement && adjacent_tile_settlement != nullptr) {
+			bordering_settlements.insert(adjacent_tile_settlement);
+		}
+	});
+
+	return bordering_settlements;
+}
+
 bool CMap::tile_borders_other_settlement_territory(const QPoint &pos, const int z) const
 {
-	const wyrmgus::site *tile_settlement = this->Field(pos, z)->get_settlement();
+	const site *tile_settlement = this->Field(pos, z)->get_settlement();
 
-	std::optional<QPoint> result = wyrmgus::point::find_adjacent_if(pos, [&](const QPoint &adjacent_pos) {
+	std::optional<QPoint> result = point::find_adjacent_if(pos, [&](const QPoint &adjacent_pos) {
 		if (!this->Info->IsPointOnMap(adjacent_pos, z)) {
 			return false;
 		}
 
-		const wyrmgus::site *adjacent_tile_settlement = this->Field(adjacent_pos, z)->get_settlement();
+		const site *adjacent_tile_settlement = this->Field(adjacent_pos, z)->get_settlement();
 		return tile_settlement != adjacent_tile_settlement;
 	});
 
@@ -686,7 +705,7 @@ bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
 			if (!this->Info->IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			const wyrmgus::tile &mf = *this->Field(adjacent_pos, z);
+			const tile &mf = *this->Field(adjacent_pos, z);
 			
 			if (mf.CheckMask(tile_flag::building)) {
 				return true;

@@ -39,6 +39,7 @@
 #include "player/player.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "util/set_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -143,6 +144,9 @@ void site_game_data::process_territory_tile(const tile *tile, const QPoint &tile
 {
 	if (CMap::get()->tile_borders_other_settlement_territory(tile_pos, z)) {
 		this->add_border_tile(tile_pos);
+
+		const site_set tile_border_settlements = CMap::get()->get_tile_border_settlements(tile_pos, z);
+		set::merge(this->border_settlements, tile_border_settlements);
 	} else if (CMap::get()->is_tile_on_map_borders(tile_pos, z)) {
 		this->add_tile_pos_to_territory_rect(tile_pos);
 	}

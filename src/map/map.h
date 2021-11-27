@@ -69,6 +69,7 @@
 */
 
 #include "color.h"
+#include "map/site_container.h"
 #include "util/point_container.h"
 #include "util/qunique_ptr.h"
 #include "util/singleton.h"
@@ -244,6 +245,7 @@ public:
 	bool TileBordersFlag(const Vec2i &pos, const int z, const tile_flag flag, const bool reverse = false) const; // reverse means that it returns true if the tile borders one tile without the flag
 	bool tile_borders_other_terrain_feature(const QPoint &pos, const int z) const;
 	bool tile_borders_same_settlement_territory(const QPoint &pos, const int z, const bool diagonal_allowed) const;
+	site_set get_tile_border_settlements(const QPoint &pos, const int z) const;
 	bool tile_borders_other_settlement_territory(const QPoint &pos, const int z) const;
 	bool tile_borders_other_player_territory(const QPoint &pos, const int z, const int range = 0) const;
 	bool TileBordersBuilding(const Vec2i &pos, int z);
