@@ -852,6 +852,7 @@ set(wyrmgus_quest_objective_HDRS
 	src/quest/objective/found_faction_objective.h
 	src/quest/objective/gather_resource_objective.h
 	src/quest/objective/have_resource_objective.h
+	src/quest/objective/have_settlement_objective.h
 	src/quest/objective/hero_must_survive_objective.h
 	src/quest/objective/quest_objective.h
 	src/quest/objective/recruit_hero_objective.h

@@ -40,6 +40,7 @@
 #include "quest/objective/found_faction_objective.h"
 #include "quest/objective/gather_resource_objective.h"
 #include "quest/objective/have_resource_objective.h"
+#include "quest/objective/have_settlement_objective.h"
 #include "quest/objective/hero_must_survive_objective.h"
 #include "quest/objective/recruit_hero_objective.h"
 #include "quest/objective/research_upgrade_objective.h"
@@ -83,6 +84,8 @@ std::unique_ptr<quest_objective> quest_objective::from_sml_property(const sml_pr
 		return std::make_unique<destroy_unique_objective>(value, quest);
 	} else if (key == "found_faction") {
 		return std::make_unique<found_faction_objective>(value, quest);
+	} else if (key == "have_settlement") {
+		return std::make_unique<have_settlement_objective>(value, quest);
 	} else if (key == "hero_must_survive") {
 		return std::make_unique<hero_must_survive_objective>(value, quest);
 	} else if (key == "recruit_hero") {
@@ -121,8 +124,6 @@ void quest_objective::process_sml_property(const sml_property &property)
 		this->quantity = std::stoi(value);
 	} else if (key == "objective_string") {
 		this->objective_string = value;
-	} else if (key == "settlement") {
-		this->settlement = site::get(value);
 	} else if (key == "faction") {
 		this->faction = faction::get(value);
 	} else if (key == "unit_class") {

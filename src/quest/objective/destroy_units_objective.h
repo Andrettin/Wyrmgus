@@ -39,6 +39,18 @@ public:
 	{
 	}
 
+	virtual void process_sml_property(const wyrmgus::sml_property &property) override
+	{
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+
+		if (key == "settlement") {
+			this->settlement = site::get(value);
+		} else {
+			quest_objective::process_sml_property(property);
+		}
+	}
+
 	virtual objective_type get_objective_type() const override
 	{
 		return objective_type::destroy_units;
@@ -59,11 +71,24 @@ public:
 			objective_str += this->get_unit_type_objective_string(unit_type, nullptr, first);
 		}
 
-		if (this->get_settlement() != nullptr) {
-			objective_str += " in " + this->get_settlement()->get_game_data()->get_current_cultural_name();
+		if (this->settlement != nullptr) {
+			objective_str += " in " + this->settlement->get_game_data()->get_current_cultural_name();
 		}
 
 		return objective_str;
+	}
+
+	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
+	{
+		if (this->get_faction() != nullptr) {
+			const CPlayer *faction_player = GetFactionPlayer(this->get_faction());
+
+			if (faction_player != nullptr && this->settlement != nullptr && !faction_player->has_settlement(this->settlement)) {
+				return false;
+			}
+		}
+
+		return destroy_unit_objective_base::is_quest_acceptance_allowed(player);
 	}
 
 	bool overlaps_with(const destroy_units_objective *other_objective) const
@@ -101,17 +126,35 @@ public:
 		return false;
 	}
 
+	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
+	{
+		Q_UNUSED(player)
+
+		if (this->get_faction() != nullptr) {
+			const CPlayer *faction_player = GetFactionPlayer(this->get_faction());
+
+			if (faction_player != nullptr && this->settlement != nullptr && !faction_player->has_settlement(this->settlement)) {
+				return std::make_pair(true, "The target no longer exists.");
+			}
+		}
+
+		return quest_objective::check_failure(player);
+	}
+
 	virtual bool is_objective_unit(const CUnit *unit) const override
 	{
 		if (
 			(!vector::contains(this->get_unit_types(), unit->Type) && !vector::contains(this->get_unit_classes(), unit->Type->get_unit_class()))
-			|| (this->get_settlement() != nullptr && this->get_settlement() != unit->settlement)
+			|| (this->settlement != nullptr && this->settlement != unit->settlement)
 		) {
 			return false;
 		}
 
 		return destroy_unit_objective_base::is_objective_unit(unit);
 	}
+
+private:
+	const site *settlement = nullptr;
 };
 
 }

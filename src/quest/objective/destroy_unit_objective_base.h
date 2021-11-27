@@ -49,10 +49,6 @@ public:
 			if (faction_player == nullptr || !faction_player->is_alive()) {
 				return false;
 			}
-
-			if (this->get_settlement() != nullptr && !faction_player->has_settlement(this->get_settlement())) {
-				return false;
-			}
 		}
 
 		return true;
@@ -65,10 +61,6 @@ public:
 		if (this->get_faction() != nullptr) {
 			const CPlayer *faction_player = GetFactionPlayer(this->get_faction());
 			if (faction_player == nullptr || !faction_player->is_alive()) {
-				return std::make_pair(true, "The target no longer exists.");
-			}
-
-			if (this->get_settlement() != nullptr && !faction_player->has_settlement(this->get_settlement())) {
 				return std::make_pair(true, "The target no longer exists.");
 			}
 		}

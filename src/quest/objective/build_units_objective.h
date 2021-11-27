@@ -46,6 +46,18 @@ public:
 	{
 	}
 
+	virtual void process_sml_property(const wyrmgus::sml_property &property) override
+	{
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+
+		if (key == "settlement") {
+			this->settlement = site::get(value);
+		} else {
+			quest_objective::process_sml_property(property);
+		}
+	}
+
 	virtual void check() const override
 	{
 		if (this->get_unit_types().empty() && this->get_unit_classes().empty()) {
@@ -77,8 +89,8 @@ public:
 			objective_str += this->get_unit_type_objective_string(unit_type, player, first);
 		}
 
-		if (this->get_settlement() != nullptr) {
-			objective_str += " in " + this->get_settlement()->get_game_data()->get_current_cultural_name();
+		if (this->settlement != nullptr) {
+			objective_str += " in " + this->settlement->get_game_data()->get_current_cultural_name();
 		}
 
 		return objective_str;
@@ -102,11 +114,11 @@ public:
 
 		bool validated = false;
 		for (const unit_type *unit_type : unit_types) {
-			if (this->get_settlement() != nullptr && !player->has_settlement(this->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+			if (this->settlement != nullptr && !player->has_settlement(this->settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 				continue;
 			}
 
-			if (!player->HasUnitBuilder(unit_type, this->get_settlement()) || !check_conditions(unit_type, player)) {
+			if (!player->HasUnitBuilder(unit_type, this->settlement) || !check_conditions(unit_type, player)) {
 				continue;
 			}
 
@@ -175,12 +187,12 @@ public:
 		bool validated = false;
 		std::string validation_error;
 		for (const unit_type *unit_type : unit_types) {
-			if (this->get_settlement() != nullptr && !player->has_settlement(this->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+			if (this->settlement != nullptr && !player->has_settlement(this->settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 				validation_error = "You no longer hold the required settlement.";
 				continue;
 			}
 
-			if (!player->HasUnitBuilder(unit_type, this->get_settlement()) || !check_conditions(unit_type, player)) {
+			if (!player->HasUnitBuilder(unit_type, this->settlement) || !check_conditions(unit_type, player)) {
 				validation_error = "You can no longer produce the required unit.";
 				continue;
 			}
@@ -201,7 +213,7 @@ public:
 			return;
 		}
 
-		if (this->get_settlement() != nullptr && this->get_settlement() != unit->settlement) {
+		if (this->settlement != nullptr && this->settlement != unit->settlement) {
 			return;
 		}
 
@@ -220,26 +232,13 @@ public:
 		}
 
 		if (unit_type_to_build->BoolFlag[TOWNHALL_INDEX].value) {
-			if (this->get_settlement() != nullptr) {
-				const site_game_data *settlement_game_data = this->get_settlement()->get_game_data();
-				CPlayer *settlement_owner = settlement_game_data->get_owner();
-
-				if (settlement_owner == nullptr) {
-					//perform the settlement construction check for the settlement
-					ai_player->check_settlement_construction({ this->get_settlement() });
-				} else if (settlement_owner != player && !player->has_enemy_stance_with(settlement_owner)) {
-					//declare war on the owner of the settlement if we aren't at war already
-					player->set_enemy_diplomatic_stance_with(settlement_owner);
-				}
-			}
-
 			return; //town hall construction can't be handled by requests
 		}
 
 		int units_to_build = this->get_quantity() - player_quest_objective->get_counter();
 
 		for (const AiBuildQueue &queue : ai_player->UnitTypeBuilt) { //count transport capacity under construction to see if should request more
-			if (this->get_settlement() != nullptr && this->get_settlement() != queue.settlement) {
+			if (this->settlement != nullptr && this->settlement != queue.settlement) {
 				continue;
 			}
 
@@ -251,9 +250,12 @@ public:
 		}
 
 		if (units_to_build > 0) {
-			AiAddUnitTypeRequest(*unit_type_to_build, units_to_build, 0, this->get_settlement());
+			AiAddUnitTypeRequest(*unit_type_to_build, units_to_build, 0, this->settlement);
 		}
 	}
+
+private:
+	const site *settlement = nullptr;
 };
 
 }

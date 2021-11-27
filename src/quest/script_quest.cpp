@@ -169,9 +169,6 @@ static int CclDefineQuest(lua_State *l)
 					} else if (!strcmp(value, "upgrade")) {
 						const CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, k + 1));
 						objective->upgrade = upgrade;
-					} else if (!strcmp(value, "settlement")) {
-						const wyrmgus::site *site = wyrmgus::site::get(LuaToString(l, -1, k + 1));
-						objective->settlement = site;
 					} else if (!strcmp(value, "faction")) {
 						const wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, k + 1));
 						objective->faction = faction;

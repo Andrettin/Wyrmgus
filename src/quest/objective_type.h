@@ -40,7 +40,8 @@ enum class objective_type {
 	destroy_unique,
 	destroy_faction,
 	found_faction,
-	bring_unit_to_site
+	bring_unit_to_site,
+	have_settlement
 };
 
 inline objective_type string_to_objective_type(const std::string &str)
@@ -69,6 +70,8 @@ inline objective_type string_to_objective_type(const std::string &str)
 		return objective_type::found_faction;
 	} else if (str == "bring_unit_to_site") {
 		return objective_type::bring_unit_to_site;
+	} else if (str == "have_settlement") {
+		return objective_type::have_settlement;
 	}
 
 	throw std::runtime_error("Invalid objective type: \"" + str + "\".");
@@ -101,6 +104,8 @@ inline std::string objective_type_to_string(const objective_type objective_type)
 			return "found_faction";
 		case objective_type::bring_unit_to_site:
 			return "bring_unit_to_site";
+		case objective_type::have_settlement:
+			return "have_settlement";
 		default:
 			break;
 	}

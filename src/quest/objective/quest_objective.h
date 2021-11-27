@@ -174,11 +174,6 @@ public:
 		return this->upgrade;
 	}
 
-	const site *get_settlement() const
-	{
-		return this->settlement;
-	}
-
 	const wyrmgus::faction *get_faction() const
 	{
 		return this->faction;
@@ -192,7 +187,6 @@ private:
 	std::vector<const unit_class *> unit_classes;
 	std::vector<const unit_type *> unit_types;
 	const CUpgrade *upgrade = nullptr;
-	const site *settlement = nullptr;
 	const wyrmgus::faction *faction = nullptr;
 
 	friend int ::CclDefineQuest(lua_State *l);
