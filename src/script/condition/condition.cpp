@@ -72,6 +72,7 @@
 #include "script/condition/terrain_condition.h"
 #include "script/condition/time_of_day_condition.h"
 #include "script/condition/trigger_condition.h"
+#include "script/condition/unique_can_drop_condition.h"
 #include "script/condition/unit_class_condition.h"
 #include "script/condition/unit_type_condition.h"
 #include "script/condition/upgrade_condition.h"
@@ -141,6 +142,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<time_of_day_condition>(value);
 	} else if (key == "trigger") {
 		return std::make_unique<trigger_condition>(value);
+	} else if (key == "unique_can_drop") {
+		return std::make_unique<unique_can_drop_condition>(value);
 	} else if (key == "unit_class") {
 		return std::make_unique<unit_class_condition>(value);
 	} else if (key == "unit_type") {

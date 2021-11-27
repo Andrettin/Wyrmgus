@@ -912,6 +912,7 @@ set(wyrmgus_script_condition_HDRS
 	src/script/condition/terrain_condition.h
 	src/script/condition/time_of_day_condition.h
 	src/script/condition/trigger_condition.h
+	src/script/condition/unique_can_drop_condition.h
 	src/script/condition/unit_class_condition.h
 	src/script/condition/unit_type_condition.h
 	src/script/condition/upgrade_class_condition.h
