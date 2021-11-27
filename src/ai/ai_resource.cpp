@@ -43,6 +43,7 @@
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/site.h"
+#include "map/site_container.h"
 #include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -2271,33 +2272,41 @@ static void AiCheckPathwayConstruction()
 	AiPlayer->LastPathwayConstructionBuilding = 0;
 }
 
-/**
-**  Check if the AI can build a settlement.
-*/
-void AiCheckSettlementConstruction()
+void PlayerAi::check_settlement_construction()
 {
-	if (AiPlayer->Player->AiName == "passive") {
+	this->check_settlement_construction(this->Player->get_border_settlements());
+}
+
+void PlayerAi::check_settlement_construction(const site_set &settlements)
+{
+	//check if the AI can build a settlement
+	if (this->Player->AiName == "passive") {
 		return;
 	}
 
-	if (AiPlayer->Player->get_faction() == nullptr) {
+	if (this->Player->get_faction() == nullptr) {
 		return;
 	}
 
-	const unit_type *town_hall_type = AiPlayer->Player->get_faction()->get_class_unit_type(defines::get()->get_town_hall_class());
+	const unit_type *town_hall_type = this->Player->get_faction()->get_class_unit_type(defines::get()->get_town_hall_class());
 	if (town_hall_type == nullptr) {
 		return;
 	}
 	
-	if (!check_conditions(town_hall_type, AiPlayer->Player)) {
+	if (!check_conditions(town_hall_type, this->Player)) {
 		return;
 	}
 
 	//check in which landmasses this player has workers
-	const landmass_set builder_landmasses = AiPlayer->Player->get_builder_landmasses(town_hall_type);
-	
+	const landmass_set builder_landmasses = this->Player->get_builder_landmasses(town_hall_type);
+
 	//check settlement units to see if can build in one
-	for (CUnit *settlement_unit : CMap::get()->get_settlement_units()) {
+	for (const site *settlement : settlements) {
+		const site_game_data *settlement_game_data = settlement->get_game_data();
+
+		CUnit *settlement_unit = settlement_game_data->get_site_unit();
+		assert_throw(settlement_unit != nullptr);
+
 		if (!settlement_unit->IsAliveOnMap()) {
 			continue;
 		}
@@ -2306,7 +2315,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		if (!settlement_unit->IsVisibleAsGoal(*AiPlayer->Player)) {
+		if (!settlement_unit->IsVisibleAsGoal(*this->Player)) {
 			continue;
 		}
 		
@@ -2315,48 +2324,43 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		if (AiGetUnitTypeRequestedCount(*AiPlayer, town_hall_type, 0, settlement_unit->settlement) > 0) { //already requested
+		if (AiGetUnitTypeRequestedCount(*this, town_hall_type, 0, settlement) > 0) {
+			//already requested
 			continue;
 		}
 		
-		if (!CanBuildHere(nullptr, *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer->ID)) {
+		this->request_settlement_construction(settlement, town_hall_type);
+	}
+}
+
+void PlayerAi::request_settlement_construction(const site *settlement, const unit_type *town_hall_type)
+{
+	const site_game_data *settlement_game_data = settlement->get_game_data();
+	CUnit *settlement_unit = settlement_game_data->get_site_unit();
+
+	if (!CanBuildHere(nullptr, *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer->ID)) {
+		return;
+	}
+
+	//find a free worker who can build a settlement on this site
+	for (const unit_type *builder_type : AiHelpers.get_builders(town_hall_type)) {
+		//the type is available
+		if (this->Player->GetUnitTypeAiActiveCount(builder_type) > 0) {
+			AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+			return;
+		}
+	}
+
+	for (const unit_class *builder_class : AiHelpers.get_builder_classes(town_hall_type->get_unit_class())) {
+		const unit_type *builder_type = this->Player->get_faction()->get_class_unit_type(builder_class);
+
+		if (builder_type == nullptr) {
 			continue;
 		}
-		
-		bool requested_settlement = false;
 
-		//
-		// Find a free worker who can build a settlement on this site
-		//
-		for (const unit_type *builder_type : AiHelpers.get_builders(town_hall_type)) {
-			//
-			// The type is available
-			//
-			if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
-				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
-				requested_settlement = true;
-				break;
-			}
-		}
-
-		if (!requested_settlement && AiPlayer->Player->get_faction() != nullptr) {
-			for (const unit_class *builder_class : AiHelpers.get_builder_classes(town_hall_type->get_unit_class())) {
-				const unit_type *builder_type = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
-
-				if (builder_type == nullptr) {
-					continue;
-				}
-
-				if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
-					AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
-					requested_settlement = true;
-					break;
-				}
-			}
-		}
-
-		if (requested_settlement) {
-			break;
+		if (this->Player->GetUnitTypeAiActiveCount(builder_type) > 0) {
+			AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+			return;
 		}
 	}
 }

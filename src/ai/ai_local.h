@@ -29,6 +29,7 @@
 #pragma once
 
 #include "map/landmass_container.h"
+#include "map/site_container.h"
 #include "unit/unit_cache.h"
 #include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
@@ -358,6 +359,9 @@ public:
 		}
 	}
 
+	void check_settlement_construction();
+	void check_settlement_construction(const site_set &settlements);
+	void request_settlement_construction(const site *settlement, const unit_type *town_hall_type);
 	void check_quest_objectives();
 
 	CPlayer *Player = nullptr;		/// Engine player structure
@@ -737,7 +741,6 @@ extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUn
 
 //Wyrmgus start
 extern void AiTransportCapacityRequest(const int capacity_needed, const landmass *landmass);
-extern void AiCheckSettlementConstruction();
 extern void AiCheckDockConstruction();
 extern void AiCheckUpgrades();
 extern void AiCheckBuildings();

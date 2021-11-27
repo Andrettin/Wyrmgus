@@ -1533,7 +1533,7 @@ void AiEachMinute(CPlayer &player)
 	}
 #endif
 
-	AiCheckSettlementConstruction();
+	AiPlayer->check_settlement_construction();
 	AiCheckTransporters();
 	AiCheckDockConstruction();
 	
