@@ -386,15 +386,6 @@ void CViewport::draw_map_tile_border(const tile *tile, const QPoint &pixel_pos, 
 		return;
 	}
 
-	if (CursorBuilding != nullptr && !CEditor::get()->is_running()) {
-		render_commands.push_back([pixel_pos, player_color](renderer *renderer) {
-			QColor color = player_color->get_minimap_color();
-			color.setAlpha(64);
-
-			renderer->fill_rect(pixel_pos, defines::get()->get_scaled_tile_size(), color);
-		});
-	}
-
 	if (tile->get_ownership_border_tile() == -1) {
 		return;
 	}
