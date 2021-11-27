@@ -28,6 +28,7 @@
 
 #include "economy/resource_container.h"
 #include "map/landmass_container.h"
+#include "map/site_container.h"
 #include "player/player_container.h"
 #include "ui/icon.h"
 #include "unit/unit_class_container.h"
@@ -297,6 +298,8 @@ public:
 	bool has_settlement_with_resource_source(const wyrmgus::resource *resource) const;
 	const wyrmgus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
 	void update_building_settlement_assignment(const wyrmgus::site *old_settlement, const int z) const;
+	site_set get_border_settlements() const;
+
 	bool HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 
@@ -692,6 +695,11 @@ public:
 	}
 
 	void set_revealed(const bool revealed);
+
+	PlayerAi *get_ai() const
+	{
+		return this->Ai.get();
+	}
 
 	int get_resource_total(const resource *resource) const
 	{

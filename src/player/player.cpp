@@ -118,6 +118,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util/assert_util.h"
 #include "util/log_util.h"
+#include "util/set_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
@@ -1907,6 +1908,27 @@ void CPlayer::update_building_settlement_assignment(const wyrmgus::site *old_set
 
 		unit->UpdateSettlement();
 	}
+}
+
+site_set CPlayer::get_border_settlements() const
+{
+	//get the settlements bordering this player
+	const std::vector<const site *> settlements = this->get_settlements();
+
+	site_set border_settlements;
+
+	for (const site *settlement : settlements) {
+		for (const site *border_settlement : settlement->get_game_data()->get_border_settlements()) {
+			const CPlayer *border_settlement_owner = border_settlement->get_game_data()->get_owner();
+			if (border_settlement_owner == this) {
+				continue;
+			}
+
+			border_settlements.insert(border_settlement);
+		}
+	}
+
+	return border_settlements;
 }
 
 bool CPlayer::HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement) const
