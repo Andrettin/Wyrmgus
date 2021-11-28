@@ -312,8 +312,8 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 
 	const std::string front_subtoken = queue::take(subtokens);
 
-	if (front_subtoken == "titled_name") {
-		return faction->get_default_titled_name();
+	if (front_subtoken == "adjective") {
+		return faction->get_adjective();
 	} else if (front_subtoken == "class_unit_type") {
 		if (subtokens.empty()) {
 			throw std::runtime_error("No unit class specified for the faction \"class_unit_type\" token.");
@@ -332,6 +332,8 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 		const CUpgrade *upgrade = faction->get_class_upgrade(upgrade_class);
 
 		return this->process_named_data_entry_tokens(upgrade, tokens);
+	} else if (front_subtoken == "titled_name") {
+		return faction->get_default_titled_name();
 	} else {
 		return this->process_named_data_entry_token(faction, front_subtoken);
 	}
