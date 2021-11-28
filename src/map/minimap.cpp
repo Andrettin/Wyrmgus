@@ -344,7 +344,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 	const tile &mf = *map_layer->Field(tile_index);
 	const site *settlement = mf.get_settlement();
 	if (settlement != nullptr) {
-		const bool is_tile_water = mf.is_water() && !mf.is_river();
+		const bool is_tile_sea = mf.is_sea();
 		const bool is_tile_space = mf.is_space();
 
 		const CPlayer *player = CPlayer::get_neutral_player();
@@ -355,7 +355,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 			realm_player = mf.get_realm_owner();
 		}
 
-		if (!is_tile_water && !is_tile_space) {
+		if (!is_tile_sea && !is_tile_space) {
 			territory_color = player->get_minimap_color();
 			territory_with_non_land_color = territory_color;
 			realm_color = realm_player->get_minimap_color();
@@ -374,7 +374,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 
 		if (player != realm_player) {
 			const QPoint tile_pos = CMap::get()->get_index_pos(tile_index, z);
-			if (mf.is_border_tile() || CMap::get()->tile_borders_other_player_territory(tile_pos, z) || (!mf.is_sea() && CMap::get()->tile_borders_sea(tile_pos, z))) {
+			if (CMap::get()->tile_borders_other_realm_territory(tile_pos, z) || (!mf.is_sea() && CMap::get()->tile_borders_sea(tile_pos, z))) {
 				territory_color = realm_color;
 				territory_with_non_land_color = realm_with_non_land_color;
 			}
@@ -392,7 +392,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		const QColor settlement_color = settlement->get_color();
 		QColor settlement_with_non_land_color = settlement_color;
 
-		if (is_tile_water == is_settlement_water && is_tile_space == is_settlement_space) {
+		if (is_tile_sea == is_settlement_water && is_tile_space == is_settlement_space) {
 			this->mode_overlay_images[minimap_mode::settlements][z].setPixelColor(mx, my, settlement_color);
 		} else {
 			settlement_with_non_land_color.setAlpha(non_land_territory_alpha);

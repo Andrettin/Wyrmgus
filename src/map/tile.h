@@ -383,11 +383,6 @@ public:
 
 	const player_color *get_player_color() const;
 
-	bool is_border_tile() const
-	{
-		return this->get_ownership_border_tile() != -1;
-	}
-
 	int get_ownership_border_tile() const
 	{
 		return this->ownership_border_tile;

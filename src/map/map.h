@@ -249,6 +249,7 @@ public:
 	site_set get_tile_border_settlements(const QPoint &pos, const int z) const;
 	bool tile_borders_other_settlement_territory(const QPoint &pos, const int z) const;
 	bool tile_borders_other_player_territory(const QPoint &pos, const int z, const int range = 0) const;
+	bool tile_borders_other_realm_territory(const QPoint &pos, const int z) const;
 	bool TileBordersBuilding(const Vec2i &pos, int z);
 	bool tile_borders_pathway(const QPoint &pos, const int z, const bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);

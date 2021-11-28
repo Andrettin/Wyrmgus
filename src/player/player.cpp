@@ -1084,13 +1084,13 @@ void CPlayer::apply_history(const CDate &start_date)
 		CPlayer *diplomacy_state_player = GetFactionPlayer(other_faction);
 		if (diplomacy_state_player != nullptr) {
 			switch (state) {
-				case wyrmgus::diplomacy_state::overlord:
-				case wyrmgus::diplomacy_state::personal_union_overlord:
-				case wyrmgus::diplomacy_state::vassal:
-				case wyrmgus::diplomacy_state::personal_union_vassal:
+				case diplomacy_state::overlord:
+				case diplomacy_state::personal_union_overlord:
+				case diplomacy_state::vassal:
+				case diplomacy_state::personal_union_vassal:
 					CommandDiplomacy(this->get_index(), state, diplomacy_state_player->get_index());
 					break;
-				case wyrmgus::diplomacy_state::allied:
+				case diplomacy_state::allied:
 					CommandSharedVision(this->get_index(), true, diplomacy_state_player->get_index());
 					CommandSharedVision(diplomacy_state_player->get_index(), true, this->get_index());
 					//fallthrough

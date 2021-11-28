@@ -223,6 +223,34 @@ void site_game_data::update_territory_tiles()
 			emit map_layer->tile_overlay_transition_images_changed(tile_pos, tile->OverlayTransitionTiles, player_color);
 		}
 	}
+
+	this->update_border_territory_tiles();
+}
+
+void site_game_data::update_border_territory_tiles()
+{
+	//update the minimap territories of border tiles for adjacent settlements, in case a change in ownership of this one affects the realm outline of the other settlement owner's territory
+
+	const int z = this->get_site_unit()->MapLayer->ID;
+	for (const QPoint &tile_pos : this->border_tiles) {
+		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+				if (x_offset == 0 && y_offset == 0) {
+					continue;
+				}
+
+				const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
+				if (!CMap::get()->Info->IsPointOnMap(adjacent_pos, z)) {
+					continue;
+				}
+
+				tile *adjacent_tile = CMap::get()->Field(adjacent_pos, z);
+				if (adjacent_tile->get_settlement() != nullptr && adjacent_tile->get_settlement() != this->site) {
+					UI.get_minimap()->update_territory_xy(adjacent_pos, z);
+				}
+			}
+		}
+	}
 }
 
 bool site_game_data::has_resource_source(const resource *resource) const
