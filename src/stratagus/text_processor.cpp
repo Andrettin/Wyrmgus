@@ -393,6 +393,8 @@ std::string text_processor::process_player_tokens(const CPlayer *player, std::qu
 		const unit_type *unit_type = player->get_class_unit_type(unit_class);
 
 		return this->process_named_data_entry_tokens(unit_type, tokens);
+	} else if (front_subtoken == "faction") {
+		return this->process_faction_tokens(player->get_faction(), tokens);
 	} else if (front_subtoken == "last_created_unit") {
 		return this->process_unit_tokens(player->get_last_created_unit(), tokens);
 	}
