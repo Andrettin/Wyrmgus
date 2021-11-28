@@ -67,7 +67,6 @@ class CButtonPanel
 	int X;
 	int Y;
 	vector<CUIButton> Buttons;
-	CColor AutoCastBorderColorRGB;
 };
 
 class CResourceInfo

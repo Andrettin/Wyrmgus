@@ -109,39 +109,6 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 			label.Draw(x + p->TextPos.x - style->Font->Width(text), y + p->TextPos.y, text, render_commands);
 		}
 	}
-
-	//
-	//  Border
-	//
-	if (!p->BorderColor) {
-		CColor color(p->BorderColorRGB);
-		//Wyrmgus start
-		/*
-		if (p->BorderColorRGB.R > 0 || p->BorderColorRGB.G > 0 || p->BorderColorRGB.B > 0) {
-			int shift = GameCycle % 0x20;
-			color.R >>= shift / 2;
-			color.G >>= shift / 2;
-			color.B >>= shift / 2;
-			if (shift >= 0x10) {
-				color.R = (p->BorderColorRGB.R > 0) << ((shift - 0x10) / 2);
-				color.G = (p->BorderColorRGB.G > 0) << ((shift - 0x10) / 2);
-				color.B = (p->BorderColorRGB.B > 0) << ((shift - 0x10) / 2);
-			}
-		}
-		*/
-		//Wyrmgus end
-		p->BorderColor = CVideo::MapRGB(color);
-	}
-	if (p->BorderSize) {
-		for (int i = 0; i < p->BorderSize; ++i) {
-			//Wyrmgus start
-//			Video.DrawRectangleClip(p->BorderColor, x - i, y - i,
-//									style->Width + 2 * i, style->Height + 2 * i);
-			Video.DrawRectangleClip(p->BorderColor, x - i - 1, y - i - 1,
-									(style->Width + 2 * i) + 2, (style->Height + 2 * i) + 2, render_commands);
-			//Wyrmgus end
-		}
-	}
 }
 
 void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y, const std::string &text, std::vector<std::function<void(renderer *)>> &render_commands)

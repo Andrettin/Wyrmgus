@@ -630,22 +630,6 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 			CclGetPos(l, &w, &h);
 		} else if (!strcmp(value, "Frame")) {
 			p->Frame = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Border")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_pushnil(l);
-			while (lua_next(l, -2)) {
-				value = LuaToString(l, -2);
-				if (!strcmp(value, "Color")) {
-					p->BorderColorRGB.Parse(l);
-				} else if (!strcmp(value, "Size")) {
-					p->BorderSize = LuaToNumber(l, -1);
-				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-				lua_pop(l, 1);
-			}
 		} else if (!strcmp(value, "TextPos")) {
 			CclGetPos(l, &p->TextPos.x, &p->TextPos.y);
 		} else if (!strcmp(value, "TextAlign")) {

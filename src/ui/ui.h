@@ -65,9 +65,6 @@ class ButtonStyleProperties
 public:
 	std::shared_ptr<CGraphic> Sprite;
 	int Frame = 0;
-	CColor BorderColorRGB;
-	IntColor BorderColor = 0;
-	int BorderSize = 0;
 	TextAlignment TextAlign = TextAlignment::Undefined; /// Text alignment
 	PixelPos TextPos = PixelPos(0, 0); /// Text location
 	const wyrmgus::font_color *TextNormalColor = nullptr; /// Normal text color
@@ -263,7 +260,6 @@ public:
 	int X = 0;
 	int Y = 0;
 	std::vector<CUIButton> Buttons;
-	CColor AutoCastBorderColorRGB;
 };
 
 class CResourceInfo

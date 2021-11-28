@@ -116,11 +116,11 @@ public:
 	void DrawCooldownSpellIcon(const PixelPos &pos, const int percent, std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 	/// Draw icon of a unit
-	void DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player, bool transparent, bool grayscale, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands) const;
+	void DrawUnitIcon(const ButtonStyle &style, const unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player, QColor border_color, const bool transparent, const bool grayscale, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands) const;
 
-	void DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player, std::vector<std::function<void(renderer *)>> &render_commands) const
+	void DrawUnitIcon(const ButtonStyle &style, const unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player, std::vector<std::function<void(renderer *)>> &render_commands) const
 	{
-		this->DrawUnitIcon(style, flags, pos, text, player, false, false, 100, render_commands);
+		this->DrawUnitIcon(style, flags, pos, text, player, QColor(), false, false, 100, render_commands);
 	}
 
 private:

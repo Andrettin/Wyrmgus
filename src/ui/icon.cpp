@@ -154,7 +154,7 @@ void icon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent, std::ve
 **  @param pos     display pixel position
 **  @param text    Optional text to display
 */
-void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player_color, bool transparent, bool grayscale, int show_percent, std::vector<std::function<void(renderer *)>> &render_commands) const
+void icon::DrawUnitIcon(const ButtonStyle &style, const unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player_color, QColor border_color, const bool transparent, const bool grayscale, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const color_modification color_modification(this->get_hue_rotation(), this->get_hue_ignored_colors(), player_color);
 
@@ -163,22 +163,15 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos
 	s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->get_graphics();
 	//Wyrmgus end
 	s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = this->get_frame();
-	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
-		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;
-		s.Default.BorderColor = 0;
-		//Wyrmgus start
-//		s.Default.BorderSize = 2;
-		//Wyrmgus end
+
+	if (flags & IconSelected) {
+		border_color = defines::get()->get_selected_border_color();
+	} else if (flags & IconAutoCast) {
+		border_color = defines::get()->get_autocast_border_color();
 	}
-	//Wyrmgus start
-	if (!(flags & IconAutoCast)) {
-		s.Default.BorderSize = 0;
-	}
-	//Wyrmgus end
 
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
-	//Wyrmgus start
 	if (Preference.IconsShift && defines::get()->get_icon_frame_graphics() != nullptr && defines::get()->get_pressed_icon_frame_graphics() != nullptr) {
 		Video.FillRectangle(ColorBlack, pos.x, pos.y, (46 * scale_factor).to_int(), (38 * scale_factor).to_int(), render_commands);
 		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
@@ -186,11 +179,10 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos
 				DrawUIButton(&s, flags, pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), text, grayscale, color_modification, true, render_commands);
 			}
 			DrawUIButton(&s, flags, pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), text, grayscale, color_modification, transparent, show_percent, render_commands);
-			if (flags & IconSelected) {
-				Video.DrawRectangle(ColorGreen, pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), (46 * scale_factor).to_int() - (1 * scale_factor).to_int(), (38 * scale_factor).to_int() - (1 * scale_factor).to_int(), render_commands);
-			} else if (flags & IconAutoCast) {
-				Video.DrawRectangle(CVideo::MapRGB(UI.ButtonPanel.AutoCastBorderColorRGB), pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), (46 * scale_factor).to_int() - (1 * scale_factor).to_int(), (38 * scale_factor).to_int() - (1 * scale_factor).to_int(), render_commands);
+			if (border_color.isValid()) {
+				Video.DrawRectangle(CVideo::MapRGB(border_color), pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), (46 * scale_factor).to_int() - (1 * scale_factor).to_int(), (38 * scale_factor).to_int() - (1 * scale_factor).to_int(), render_commands);
 			}
+
 			if (defines::get()->get_command_button_frame_graphics() == nullptr || !(flags & IconCommandButton)) {
 				defines::get()->get_pressed_icon_frame_graphics()->DrawClip(pos.x - (4 * scale_factor).to_int(), pos.y - (4 * scale_factor).to_int(), render_commands);
 			} else {
@@ -201,69 +193,15 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags, const PixelPos
 				DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, color_modification, true, render_commands);
 			}
 			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, color_modification, transparent, show_percent, render_commands);
-			if (flags & IconSelected) {
-				Video.DrawRectangle(ColorGreen, pos.x, pos.y, (46 * scale_factor).to_int(), (38 * scale_factor).to_int(), render_commands);
-			} else if (flags & IconAutoCast) {
-				Video.DrawRectangle(CVideo::MapRGB(UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, (46 * scale_factor).to_int(), (38 * scale_factor).to_int(), render_commands);
+
+			if (border_color.isValid()) {
+				Video.DrawRectangle(CVideo::MapRGB(border_color), pos.x, pos.y, (46 * scale_factor).to_int(), (38 * scale_factor).to_int(), render_commands);
 			}
+
 			if (defines::get()->get_command_button_frame_graphics() != nullptr && (flags & IconCommandButton)) {
 				defines::get()->get_command_button_frame_graphics()->DrawClip(pos.x - (5 * scale_factor).to_int(), pos.y - (4 * scale_factor).to_int(), render_commands);
 			} else {
 				defines::get()->get_icon_frame_graphics()->DrawClip(pos.x - (4 * scale_factor).to_int(), pos.y - (4 * scale_factor).to_int(), render_commands);
-			}
-		}
-	//Wyrmgus end
-	//Wyrmgus start
-//	if (Preference.IconsShift) {
-	} else if (Preference.IconsShift) {
-	//Wyrmgus end
-		// Left and top edge of Icon
-		Video.DrawHLine(ColorWhite, pos.x - (1 * scale_factor).to_int(), pos.y - (1 * scale_factor).to_int(), (49 * scale_factor).to_int(), render_commands);
-		Video.DrawVLine(ColorWhite, pos.x - (1 * scale_factor).to_int(), pos.y, (40 * scale_factor).to_int(), render_commands);
-		Video.DrawVLine(ColorWhite, pos.x, pos.y + (38 * scale_factor).to_int(), (2 * scale_factor).to_int(), render_commands);
-		Video.DrawHLine(ColorWhite, pos.x + (46 * scale_factor).to_int(), pos.y, (2 * scale_factor).to_int(), render_commands);
-
-		// Bottom and Right edge of Icon
-		Video.DrawHLine(ColorGray, pos.x + (1 * scale_factor).to_int(), pos.y + (38 * scale_factor).to_int(), (47 * scale_factor).to_int(), render_commands);
-		Video.DrawHLine(ColorGray, pos.x + (1 * scale_factor).to_int(), pos.y + (39 * scale_factor).to_int(), (47 * scale_factor).to_int(), render_commands);
-		Video.DrawVLine(ColorGray, pos.x + (46 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), (37 * scale_factor).to_int(), render_commands);
-		Video.DrawVLine(ColorGray, pos.x + (47 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), (37 * scale_factor).to_int(), render_commands);
-
-		Video.DrawRectangle(ColorBlack, pos.x - (3 * scale_factor).to_int(), pos.y - (3 * scale_factor).to_int(), (52 * scale_factor).to_int(), (44 * scale_factor).to_int(), render_commands);
-		Video.DrawRectangle(ColorBlack, pos.x - (4 * scale_factor).to_int(), pos.y - (4 * scale_factor).to_int(), (54 * scale_factor).to_int(), (46 * scale_factor).to_int(), render_commands);
-
-		if (flags & IconActive) { // Code to make a border appear around the icon when the mouse hovers over it.
-			Video.DrawRectangle(ColorGray, pos.x - (4 * scale_factor).to_int(), pos.y - 4, (54 * scale_factor).to_int(), (46 * scale_factor).to_int(), render_commands);
-			if (show_percent < 100) {
-				DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, color_modification, true, render_commands);
-			}
-			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, color_modification, transparent, show_percent, render_commands);
-		}
-
-		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
-			//Wyrmgus start
-//			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player);
-			if (show_percent < 100) {
-				DrawUIButton(&s, flags, pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), text, grayscale, color_modification, true, render_commands);
-			}
-			DrawUIButton(&s, flags, pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), text, grayscale, color_modification, transparent, show_percent, render_commands);
-			//Wyrmgus end
-			if (flags & IconSelected) {
-				Video.DrawRectangle(ColorGreen, pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), (46 * scale_factor).to_int(), (38 * scale_factor).to_int(), render_commands);
-			}			
-			Video.DrawRectangle(ColorGray, pos.x, pos.y, (48 * scale_factor).to_int(), (40 * scale_factor).to_int(), render_commands);
-			Video.DrawVLine(ColorDarkGray, pos.x - (1 * scale_factor).to_int(), pos.y - (1 * scale_factor).to_int(), (40 * scale_factor).to_int(), render_commands);
-			Video.DrawHLine(ColorDarkGray, pos.x - (1 * scale_factor).to_int(), pos.y - (1 * scale_factor).to_int(), (49 * scale_factor).to_int(), render_commands);
-			Video.DrawHLine(ColorDarkGray, pos.x - (1 * scale_factor).to_int(), pos.y + (39 * scale_factor).to_int(), (2 * scale_factor).to_int(), render_commands);
-
-			Video.DrawRectangle(ColorGray, pos.x - (4 * scale_factor).to_int(), pos.y - (4 * scale_factor).to_int(), (54 * scale_factor).to_int(), (46 * scale_factor).to_int(), render_commands);
-		} else {
-			if (show_percent < 100) {
-				DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, color_modification, true, render_commands);
-			}
-			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, color_modification, transparent, show_percent, render_commands);
-			if (flags & IconSelected) {
-				Video.DrawRectangle(ColorGreen, pos.x, pos.y, (46 * scale_factor).to_int(), (38 * scale_factor).to_int(), render_commands);
 			}
 		}
 	} else {

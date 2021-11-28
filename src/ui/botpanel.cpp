@@ -1088,6 +1088,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 
 		const wyrmgus::unit_type *button_unit_type = button->get_value_unit_type(Selected[0]);
 		const CUpgrade *button_upgrade = button->get_value_upgrade(Selected[0]);
+		QColor border_color;
 			
 		// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
 		if (button->Icon.Name.empty() && button->Action == ButtonCmd::Attack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != nullptr && Selected[0]->UnitInside->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(button->Action) != nullptr) {
@@ -1101,7 +1102,14 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::UpgradeToClass || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && button_unit_type->get_icon() != nullptr) {
 			button_icon = button_unit_type->get_icon();
 		} else if (button->Action == ButtonCmd::Buy) {
-			button_icon = wyrmgus::unit_manager::get()->GetSlotUnit(button->Value).get_icon();
+			const CUnit &sold_unit = unit_manager::get()->GetSlotUnit(button->Value);
+			button_icon = sold_unit.get_icon();
+
+			if (sold_unit.get_unique() != nullptr) {
+				border_color = defines::get()->get_unique_item_border_color();
+			} else if (sold_unit.Prefix != nullptr || sold_unit.Suffix != nullptr) {
+				border_color = defines::get()->get_magic_item_border_color();
+			}
 		} else if ((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass) && button->Icon.Name.empty() && button_upgrade->get_icon()) {
 			button_icon = button_upgrade->get_icon();
 		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button->Value]->get_icon() != nullptr) {
@@ -1138,7 +1146,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 			if (IsButtonUsable(*Selected[0], *button)) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(*button, ButtonUnderCursor),
-												   pos, str, player_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], *button), render_commands);
+												   pos, str, player_color, border_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], *button), render_commands);
 												   
 				if (
 					((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(button_unit_type) != 0)
@@ -1162,11 +1170,11 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 			) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(*button, ButtonUnderCursor),
-												   pos, str, player_color, false, true, 100, render_commands);
+												   pos, str, player_color, border_color, false, true, 100, render_commands);
 			} else {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(*button, ButtonUnderCursor),
-												   pos, str, player_color, true, false, 100, render_commands);
+												   pos, str, player_color, border_color, true, false, 100, render_commands);
 			}
 		}
 	}

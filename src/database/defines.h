@@ -78,6 +78,10 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::civilization* neutral_civilization MEMBER neutral_civilization READ get_neutral_civilization NOTIFY changed)
 	Q_PROPERTY(int minimap_color_index MEMBER minimap_color_index READ get_minimap_color_index)
 	Q_PROPERTY(int minimap_non_land_territory_alpha MEMBER minimap_non_land_territory_alpha READ get_minimap_non_land_territory_alpha)
+	Q_PROPERTY(QColor selected_border_color MEMBER selected_border_color READ get_selected_border_color)
+	Q_PROPERTY(QColor autocast_border_color MEMBER autocast_border_color READ get_autocast_border_color)
+	Q_PROPERTY(QColor magic_item_border_color MEMBER magic_item_border_color READ get_magic_item_border_color)
+	Q_PROPERTY(QColor unique_item_border_color MEMBER unique_item_border_color READ get_unique_item_border_color)
 	Q_PROPERTY(int map_area_top_margin MEMBER map_area_top_margin READ get_map_area_top_margin)
 	Q_PROPERTY(int map_area_bottom_margin MEMBER map_area_bottom_margin READ get_map_area_bottom_margin)
 	Q_PROPERTY(wyrmgus::resource* time_resource MEMBER time_resource)
@@ -227,6 +231,26 @@ public:
 	int get_minimap_non_land_territory_alpha() const
 	{
 		return this->minimap_non_land_territory_alpha;
+	}
+
+	const QColor &get_selected_border_color() const
+	{
+		return this->selected_border_color;
+	}
+
+	const QColor &get_autocast_border_color() const
+	{
+		return this->autocast_border_color;
+	}
+
+	const QColor &get_magic_item_border_color() const
+	{
+		return this->magic_item_border_color;
+	}
+
+	const QColor &get_unique_item_border_color() const
+	{
+		return this->unique_item_border_color;
 	}
 
 	int get_map_area_top_margin() const
@@ -459,6 +483,10 @@ private:
 	civilization *neutral_civilization = nullptr;
 	int minimap_color_index = 0;
 	int minimap_non_land_territory_alpha = 64;
+	QColor selected_border_color;
+	QColor autocast_border_color;
+	QColor magic_item_border_color;
+	QColor unique_item_border_color;
 	int map_area_top_margin = 0;
 	int map_area_bottom_margin = 0;
 	std::filesystem::path border_image_file;
