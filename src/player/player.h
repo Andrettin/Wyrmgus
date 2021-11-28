@@ -378,6 +378,15 @@ public:
 
 	bool at_war() const;
 
+	bool can_declare_war_on(const CPlayer *other_player) const
+	{
+		if (this->is_independent()) {
+			return true;
+		}
+
+		return this->is_any_vassal_of(other_player);
+	}
+
 	//Wyrmgus start
 //	void SetStartView(const Vec2i &pos) { StartPos = pos; }
 	void SetStartView(const Vec2i &pos, int z) { StartPos = pos; StartMapLayer = z; }
@@ -904,6 +913,11 @@ public:
 
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
+
+	bool is_independent() const
+	{
+		return this->get_overlord() == nullptr;
+	}
 
 	bool is_overlord_of(const CPlayer *player) const
 	{

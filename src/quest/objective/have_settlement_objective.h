@@ -113,9 +113,11 @@ public:
 		if (settlement_owner == nullptr) {
 			//perform the settlement construction check for the settlement
 			ai_player->check_settlement_construction({ this->settlement });
-		} else if (settlement_owner != player && !player->has_enemy_stance_with(settlement_owner)) {
-			//declare war on the owner of the settlement if we aren't at war already
-			player->set_enemy_diplomatic_stance_with(settlement_owner);
+		} else if (settlement_owner != player && !player->has_enemy_stance_with(settlement_owner) && !player->at_war()) {
+			if (player->can_declare_war_on(settlement_owner)) {
+				//declare war on the owner of the settlement if we aren't at war already
+				player->set_enemy_diplomatic_stance_with(settlement_owner);
+			}
 		}
 	}
 

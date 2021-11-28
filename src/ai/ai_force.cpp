@@ -926,7 +926,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		const wyrmgus::quest *current_quest = current_campaign ? current_campaign->get_quest() : nullptr;
 
 		//attack neutral players if the current campaign's quest is completed, or if there is no main quest for the current campaign, or if this is a network game (so that the GetThisPlayer() conditional does not affect a network game, as that would cause a desync)
-		const bool include_neutral = !AiPlayer->Player->at_war() && GameCycle >= PlayerAi::enforced_peace_cycle_count && (IsNetworkGame() || current_quest == nullptr || CPlayer::GetThisPlayer()->is_quest_completed(current_quest));
+		const bool include_neutral = !AiPlayer->Player->at_war() && AiPlayer->Player->is_independent() && GameCycle >= PlayerAi::enforced_peace_cycle_count && (IsNetworkGame() || current_quest == nullptr || CPlayer::GetThisPlayer()->is_quest_completed(current_quest));
 
 		/* Search in entire map */
 		const CUnit *enemy = nullptr;
@@ -1694,7 +1694,7 @@ void AiForce::Update()
 	const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 	const wyrmgus::quest *current_quest = current_campaign ? current_campaign->get_quest() : nullptr;
 
-	const bool include_neutral = !AiPlayer->Player->at_war() && GameCycle >= PlayerAi::enforced_peace_cycle_count && (IsNetworkGame() || current_quest == nullptr || CPlayer::GetThisPlayer()->is_quest_completed(current_quest));
+	const bool include_neutral = !AiPlayer->Player->at_war() && AiPlayer->Player->is_independent() && GameCycle >= PlayerAi::enforced_peace_cycle_count && (IsNetworkGame() || current_quest == nullptr || CPlayer::GetThisPlayer()->is_quest_completed(current_quest));
 
 	if (State == AiForceAttackingState::GoingToRallyPoint) {
 		// Check if we are near the goalpos
