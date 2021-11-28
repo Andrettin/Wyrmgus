@@ -295,6 +295,12 @@ public:
 	bool is_non_coastal_water() const;
 	bool is_coastal_water() const;
 	bool is_river() const;
+
+	bool is_sea() const
+	{
+		return this->is_water() && !this->is_river();
+	}
+
 	bool is_space() const;
 
 	/// Returns true, if water on the map tile field

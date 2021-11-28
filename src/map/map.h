@@ -243,6 +243,7 @@ public:
 	bool TileBordersTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z) const;
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, const wyrmgus::terrain_type *new_terrain, const int z) const;
 	bool TileBordersFlag(const Vec2i &pos, const int z, const tile_flag flag, const bool reverse = false) const; // reverse means that it returns true if the tile borders one tile without the flag
+	bool tile_borders_sea(const QPoint &pos, const int z) const;
 	bool tile_borders_other_terrain_feature(const QPoint &pos, const int z) const;
 	bool tile_borders_same_settlement_territory(const QPoint &pos, const int z, const bool diagonal_allowed) const;
 	site_set get_tile_border_settlements(const QPoint &pos, const int z) const;

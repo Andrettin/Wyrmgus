@@ -340,7 +340,8 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 	QColor realm_color(Qt::transparent);
 	QColor realm_with_non_land_color(Qt::transparent);
 
-	const tile &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
+	const int tile_index = Minimap2MapX[z][mx] + Minimap2MapY[z][my];
+	const tile &mf = *map_layer->Field(tile_index);
 	const site *settlement = mf.get_settlement();
 	if (settlement != nullptr) {
 		const bool is_tile_water = mf.is_water() && !mf.is_river();
@@ -371,9 +372,17 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 			}
 		}
 
+		if (player != realm_player) {
+			const QPoint tile_pos = CMap::get()->get_index_pos(tile_index, z);
+			if (mf.is_border_tile() || CMap::get()->tile_borders_other_player_territory(tile_pos, z) || (!mf.is_sea() && CMap::get()->tile_borders_sea(tile_pos, z))) {
+				territory_color = realm_color;
+				territory_with_non_land_color = realm_with_non_land_color;
+			}
+		}
+
 		const CUnit *settlement_unit = settlement->get_game_data()->get_site_unit();
 		if (settlement_unit == nullptr) {
-			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has territory, but no settlement unit.");
+			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has a territory, but no settlement unit.");
 		}
 
 		const tile *settlement_center_tile = settlement_unit->get_center_tile();

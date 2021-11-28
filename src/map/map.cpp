@@ -596,6 +596,26 @@ bool CMap::TileBordersFlag(const Vec2i &pos, const int z, const tile_flag flag, 
 	return false;
 }
 
+bool CMap::tile_borders_sea(const QPoint &pos, const int z) const
+{
+	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+			const QPoint adjacent_pos(pos.x() + sub_x, pos.y() + sub_y);
+			if (!this->Info->IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
+				continue;
+			}
+
+			const tile *adjacent_tile = this->Field(adjacent_pos, z);
+
+			if (adjacent_tile->is_sea()) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool CMap::tile_borders_other_terrain_feature(const QPoint &pos, const int z) const
 {
 	const wyrmgus::terrain_feature *tile_terrain_feature = this->Field(pos, z)->get_terrain_feature();
