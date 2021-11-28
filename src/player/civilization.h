@@ -62,6 +62,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 
 	Q_PROPERTY(int index READ get_index CONSTANT)
 	Q_PROPERTY(QString link_string READ get_link_qstring CONSTANT)
+	Q_PROPERTY(std::string adjective MEMBER adjective)
 	Q_PROPERTY(wyrmgus::civilization* parent_civilization MEMBER parent_civilization READ get_parent_civilization)
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
@@ -85,7 +86,6 @@ public:
 	explicit civilization(const std::string &identifier);
 	virtual ~civilization() override;
 
-	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
@@ -109,6 +109,11 @@ public:
 	QString get_link_qstring() const
 	{
 		return QString::fromStdString(this->get_link_string());
+	}
+
+	const std::string &get_adjective() const
+	{
+		return this->adjective;
 	}
 
 	civilization *get_parent_civilization() const
@@ -245,10 +250,8 @@ signals:
 public:
 	int ID = -1;
 private:
+	std::string adjective;
 	civilization *parent_civilization = nullptr;
-public:
-	std::string Adjective;			/// adjective pertaining to the civilization
-private:
 	wyrmgus::interface_style *interface_style = nullptr; //the civilization's interface style
 	CUpgrade *upgrade = nullptr;
 	wyrmgus::language *language = nullptr;	/// the language used by the civilization

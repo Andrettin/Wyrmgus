@@ -150,18 +150,6 @@ faction::~faction()
 {
 }
 
-void faction::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "adjective") {
-		this->Adjective = value;
-	} else {
-		data_entry::process_sml_property(property);
-	}
-}
-
 void faction::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
@@ -279,7 +267,11 @@ void faction::initialize()
 
 void faction::check() const
 {
-	if (this->civilization == nullptr) {
+	if (this->get_adjective().empty()) {
+		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no adjective.");
+	}
+
+	if (this->get_civilization() == nullptr) {
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no civilization.");
 	}
 

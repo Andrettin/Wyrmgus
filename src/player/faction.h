@@ -70,6 +70,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_OBJECT
 
 	Q_PROPERTY(QString link_string READ get_link_qstring CONSTANT)
+	Q_PROPERTY(std::string adjective MEMBER adjective)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::faction* parent_faction MEMBER parent_faction)
@@ -112,7 +113,6 @@ public:
 	explicit faction(const std::string &identifier);
 	~faction();
 
-	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
@@ -139,6 +139,11 @@ public:
 	QString get_link_qstring() const
 	{
 		return QString::fromStdString(this->get_link_string());
+	}
+
+	const std::string &get_adjective() const
+	{
+		return this->adjective;
 	}
 
 	wyrmgus::civilization *get_civilization() const
@@ -231,7 +236,7 @@ public:
 
 		const std::string title_name = std::string(this->get_title_name(government_type, tier));
 		if (this->uses_short_name()) {
-			return this->Adjective + " " + title_name;
+			return this->get_adjective() + " " + title_name;
 		} else {
 			return title_name + " of " + this->get_name();
 		}
@@ -354,10 +359,10 @@ signals:
 	void changed();
 
 public:
-	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
 	int ID = -1;														/// faction ID
 private:
+	std::string adjective;
 	wyrmgus::civilization *civilization = nullptr;
 	faction_type type; //faction type (i.e. tribe or polity)
 	faction *parent_faction = nullptr;

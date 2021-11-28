@@ -723,7 +723,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Background")) {
 			civilization->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Adjective")) {
-			civilization->Adjective = LuaToString(l, -1);
+			civilization->adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Interface")) {
 			civilization->interface_style = interface_style::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Visible")) {
@@ -1229,8 +1229,8 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_pushstring(l, civilization->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Adjective")) {
-		if (!civilization->Adjective.empty()) {
-			lua_pushstring(l, civilization->Adjective.c_str());
+		if (!civilization->get_adjective().empty()) {
+			lua_pushstring(l, civilization->get_adjective().c_str());
 		} else {
 			lua_pushstring(l, civilization->get_name().c_str());
 		}
@@ -1461,7 +1461,7 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "Background")) {
 			faction->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Adjective")) {
-			faction->Adjective = LuaToString(l, -1);
+			faction->adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			const std::string faction_type_name = LuaToString(l, -1);
 			faction->type = wyrmgus::string_to_faction_type(faction_type_name);
@@ -2120,8 +2120,8 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushstring(l, faction->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Adjective")) {
-		if (!faction->Adjective.empty()) {
-			lua_pushstring(l, faction->Adjective.c_str());
+		if (!faction->get_adjective().empty()) {
+			lua_pushstring(l, faction->get_adjective().c_str());
 		} else {
 			lua_pushstring(l, faction->get_name().c_str());
 		}
