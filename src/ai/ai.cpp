@@ -1460,7 +1460,11 @@ void AiEachSecond(CPlayer &player)
 {
 	AiPlayer = player.Ai.get();
 
-	assert_throw(AiPlayer != nullptr);
+	assert_log(AiPlayer != nullptr);
+
+	if (AiPlayer == nullptr) {
+		return;
+	}
 
 	//if the AI player doesn't have a faction, set a random one for it
 	if (player.get_faction() == nullptr) {
@@ -1502,11 +1506,12 @@ void AiEachSecond(CPlayer &player)
 void AiEachHalfMinute(CPlayer &player)
 {
 	AiPlayer = player.Ai.get();
-#ifdef DEBUG
-	if (!AiPlayer) {
+
+	assert_log(AiPlayer != nullptr);
+
+	if (AiPlayer == nullptr) {
 		return;
 	}
-#endif
 
 	if (AiPlayer->Scouting) { //check periodically if has found new enemies
 		AiPlayer->Scouting = false;
@@ -1527,14 +1532,15 @@ void AiEachHalfMinute(CPlayer &player)
 void AiEachMinute(CPlayer &player)
 {
 	AiPlayer = player.Ai.get();
-#ifdef DEBUG
-	if (!AiPlayer) {
+
+	assert_log(AiPlayer != nullptr);
+
+	if (AiPlayer == nullptr) {
 		return;
 	}
-#endif
 
 	AiPlayer->check_settlement_construction();
-	AiCheckTransporters();
+	AiPlayer->check_transporters();
 	AiCheckDockConstruction();
 	
 	AiForceManagerEachMinute();

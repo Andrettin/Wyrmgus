@@ -761,10 +761,11 @@ void AiSendExplorers()
 	//Wyrmgus end
 }
 
-//Wyrmgus start
-void AiCheckTransporters()
+void PlayerAi::check_transporters()
 {
-	for (const auto &kv_pair : AiPlayer->Transporters) {
+	//assign free transporters according to their water zone (water "landmass")
+
+	for (const auto &kv_pair : this->Transporters) {
 		for (CUnit *ai_transporter : kv_pair.second) {
 			if (!ai_transporter->IsIdle()) {
 				continue;
@@ -772,47 +773,62 @@ void AiCheckTransporters()
 			
 			CUnit *uins = ai_transporter->UnitInside;
 			for (int j = 0; j < ai_transporter->InsideCount; ++j, uins = uins->NextContained) {
-				if (uins->GroupId == 0) { //if the unit no longer is part of a force, then it likely has been reset and the attack through water has been cancelled, so unload it
+				if (uins->GroupId == 0) {
+					//if the unit no longer is part of a force, then it likely has been reset and the attack through water has been cancelled, so unload it
 					CommandUnload(*ai_transporter, ai_transporter->tilePos, uins, 0, ai_transporter->MapLayer->ID);
 				}
 			}
 		}
 	}
 
-	AiPlayer->Transporters.clear();
-	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
-		CUnit &unit = AiPlayer->Player->GetUnit(i);
+	this->Transporters.clear();
+
+	for (int i = 0; i != this->Player->GetUnitCount(); ++i) {
+		CUnit &unit = this->Player->GetUnit(i);
 
 		if (!unit.IsAliveOnMap()) {
 			continue;
 		}
+
 		if (!unit.Type->CanTransport()) {
 			continue;
 		}
-		if (unit.Type->get_domain() != unit_domain::water && unit.Type->get_domain() != unit_domain::air && unit.Type->get_domain() != unit_domain::air_low && unit.Type->get_domain() != unit_domain::space) {
+
+		switch (unit.Type->get_domain()) {
+			case unit_domain::water:
+			case unit_domain::air:
+			case unit_domain::air_low:
+			case unit_domain::space:
+				break;
+			default:
+				continue;
+		}
+
+		if (!unit.CanMove()) {
 			continue;
 		}
-		if (unit.CanMove() == false) {
-			continue;
-		}
+
 		if (!unit.Active) {
 			continue;
 		}
-		if (unit.GroupId != 0) { //don't use units in forces
+
+		if (unit.GroupId != 0) {
+			//don't use units in forces
 			continue;
 		}
 		
 		const landmass *landmass = CMap::get()->get_tile_landmass(unit.tilePos, unit.MapLayer->ID);
 		
-		AiPlayer->Transporters[landmass].push_back(&unit);
+		this->Transporters[landmass].push_back(&unit);
 	}
 }
 
-int AiGetTransportCapacity(const landmass *water_landmass)
+int PlayerAi::get_transport_capacity(const landmass *water_landmass) const
 {
-	const auto find_iterator = AiPlayer->Transporters.find(water_landmass);
+	//get the current transport capacity of the AI for a given water zone
+	const auto find_iterator = this->Transporters.find(water_landmass);
 
-	if (find_iterator == AiPlayer->Transporters.end()) {
+	if (find_iterator == this->Transporters.end()) {
 		return 0;
 	}
 	
@@ -825,17 +841,30 @@ int AiGetTransportCapacity(const landmass *water_landmass)
 	return transport_capacity;
 }
 
-int AiGetRequestedTransportCapacity(const landmass *water_landmass)
+int PlayerAi::get_requested_transport_capacity(const landmass *water_landmass) const
 {
+	//get the current requested transport capacity of the AI for a given water zone
 	int transport_capacity = 0;
 	
-	for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
-		const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
-		if (queue.landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->get_domain() == unit_domain::water || queue.Type->get_domain() == unit_domain::air || queue.Type->get_domain() == unit_domain::air_low || queue.Type->get_domain() == unit_domain::space)) {
-			transport_capacity += queue.Want * queue.Type->MaxOnBoard;
+	for (unsigned int i = 0; i < this->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
+		const AiBuildQueue &queue = this->UnitTypeBuilt[i];
+
+		if (queue.landmass != water_landmass || !queue.Type->CanTransport()) {
+			continue;
 		}
+
+		switch (queue.Type->get_domain()) {
+			case unit_domain::water:
+			case unit_domain::air:
+			case unit_domain::air_low:
+			case unit_domain::space:
+				break;
+			default:
+				continue;
+		}
+
+		transport_capacity += queue.Want * queue.Type->MaxOnBoard;
 	}
 	
 	return transport_capacity;
 }
-//Wyrmgus end

@@ -2442,7 +2442,7 @@ void AiCheckDockConstruction()
 		if (!has_dock) { // if doesn't have a dock, request one
 			AiAddUnitTypeRequest(*dock_type, 1, water_landmass);
 		} else {
-			int transport_capacity = AiGetTransportCapacity(water_landmass) + AiGetRequestedTransportCapacity(water_landmass);
+			int transport_capacity = AiPlayer->get_transport_capacity(water_landmass) + AiPlayer->get_requested_transport_capacity(water_landmass);
 			if (transport_capacity == 0) { //if the AI has no transporters in the given landmass, build one (for scouting)
 				AiTransportCapacityRequest(1, water_landmass);
 			}

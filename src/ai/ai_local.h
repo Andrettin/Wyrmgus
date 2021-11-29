@@ -162,7 +162,7 @@ public:
 	//Wyrmgus start
 //	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
 	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z);
-	bool CheckTransporters(const Vec2i &pos, int z);
+	bool check_transporters(const QPoint &pos, const int z);
 	//Wyrmgus end
 	void Insert(std::shared_ptr<wyrmgus::unit_ref> &&unit);
 	void Insert(CUnit *unit);
@@ -362,6 +362,11 @@ public:
 	void check_settlement_construction();
 	void check_settlement_construction(const site_set &settlements);
 	void request_settlement_construction(const site *settlement, const unit_type *town_hall_type);
+
+	void check_transporters();
+	int get_transport_capacity(const landmass *water_landmass) const;
+	int get_requested_transport_capacity(const landmass *water_landmass) const;
+
 	void check_quest_objectives();
 
 	CPlayer *Player = nullptr;		/// Engine player structure
@@ -785,12 +790,6 @@ extern int AiFindWall(AiForce *force);
 /// Send explorers around the map
 extern void AiSendExplorers();
 //Wyrmgus start
-/// Assign free transporters according to their water zone (water "landmass")
-extern void AiCheckTransporters();
-/// Get the current transport capacity of the AI for a given water zone
-extern int AiGetTransportCapacity(const landmass *water_landmass);
-/// Get the current requested transport capacity of the AI for a given water zone
-extern int AiGetRequestedTransportCapacity(const landmass *water_landmass);
 /// Get the quantity of units belonging to a particular type, possibly including requests
 extern int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const landmass *landmass, const bool include_requests, const bool include_upgrades);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
