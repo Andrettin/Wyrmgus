@@ -839,10 +839,10 @@ void AiForce::Attack(const Vec2i &pos, int z)
 
 	//Wyrmgus start
 	//if one of the force's units is being used as a scout, stop its function as a scout when the force is used to attack
-	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+	for (const std::shared_ptr<unit_ref> &unit_ref : this->get_units()) {
 		CUnit *unit = unit_ref->get();
-		if (wyrmgus::vector::contains(AiPlayer->Scouts, unit)) {
-			wyrmgus::vector::remove(AiPlayer->Scouts, unit);
+		if (vector::contains(AiPlayer->Scouts, unit)) {
+			vector::remove(AiPlayer->Scouts, unit);
 		}
 	}
 	//Wyrmgus end
@@ -1425,8 +1425,8 @@ void AiForce::Update()
 	//if one of the force's units is being used as a scout, stop its function as a scout when the force is used to attack
 	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
 		CUnit *unit = unit_ref->get();
-		if (wyrmgus::vector::contains(AiPlayer->Scouts, unit)) {
-			wyrmgus::vector::remove(AiPlayer->Scouts, unit);
+		if (vector::contains(AiPlayer->Scouts, unit)) {
+			vector::remove(AiPlayer->Scouts, unit);
 		}
 	}
 	//Wyrmgus end

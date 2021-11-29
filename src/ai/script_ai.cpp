@@ -1770,8 +1770,9 @@ static int CclDefineAiPlayer(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				++k;
-				ai->Scouts.push_back(&wyrmgus::unit_manager::get()->GetSlotUnit(num));
+				ai->Scouts.push_back(&unit_manager::get()->GetSlotUnit(num));
 			}
+			//Wyrmgus end
 		} else if (!strcmp(value, "transporters")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -1784,7 +1785,18 @@ static int CclDefineAiPlayer(lua_State *l)
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				ai->add_transporter(&unit_manager::get()->GetSlotUnit(num), landmass);
 			}
-		//Wyrmgus end
+		} else if (!strcmp(value, "site-transport-units")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				const std::string site_identifier = LuaToString(l, j + 1, k + 1);
+				const site *site = site::get(site_identifier);
+				++k;
+				const int num = LuaToNumber(l, j + 1, k + 1);
+				ai->add_site_transport_unit(&unit_manager::get()->GetSlotUnit(num), site);
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

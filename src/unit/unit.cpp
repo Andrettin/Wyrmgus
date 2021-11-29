@@ -4225,7 +4225,8 @@ void UnitLost(CUnit &unit)
 		if (unit.CurrentAction() != UnitAction::Built) {
 			if (player.AiEnabled && player.Ai) {
 				if (std::find(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit) != player.Ai->Scouts.end()) {
-					if (player.Ai->Scouting) { //if an AI player's scout has been lost, unmark it as "scouting" so that the force can see if it now has a viable target
+					if (player.Ai->Scouting) {
+						//if an AI player's scout has been lost, unmark it as "scouting" so that the force can see if it now has a viable target
 						player.Ai->Scouting = false;
 					}
 				}

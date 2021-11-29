@@ -584,7 +584,8 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		}
 		file.printf("},\n");
 	}
-	
+	//Wyrmgus end
+
 	if (!ai.get_transporters().empty()) {
 		file.printf("  \"transporters\", {");
 		for (const auto &kv_pair : ai.get_transporters()) {
@@ -595,7 +596,16 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		}
 		file.printf("},\n");
 	}
-	//Wyrmgus end
+	
+	if (!ai.get_site_transport_units().empty()) {
+		file.printf("  \"site-transport-units\", {");
+		for (const auto &[site, transport_units] : ai.get_site_transport_units()) {
+			for (const std::shared_ptr<unit_ref> &ai_unit : transport_units) {
+				file.printf(" \"%s\", %d,", site->get_identifier().c_str(), UnitNumber(**ai_unit));
+			}
+		}
+		file.printf("},\n");
+	}
 	
 	//Wyrmgus start
 	file.printf("  \"pathway-construction-building\", %u,\n", ai.LastPathwayConstructionBuilding);
@@ -1488,6 +1498,8 @@ void AiEachSecond(CPlayer &player)
 
 	//  Handle the force manager.
 	AiForceManager();
+
+	AiPlayer->check_site_transport_units();
 
 	//  Check for magic actions.
 	AiCheckMagic();

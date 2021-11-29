@@ -3897,7 +3897,8 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, const bool type_change)
 		this->change_resource_demand(resource, quantity);
 	}
 	
-	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && CMap::get()->Info->IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && CMap::get()->Info->IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) {
+		//assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		this->Ai->Scouts.push_back(unit);
 	}
 	
@@ -3950,8 +3951,14 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, const bool type_change)
 		this->change_resource_demand(resource, -quantity);
 	}
 	
-	if (this->AiEnabled && this->Ai && std::find(this->Ai->Scouts.begin(), this->Ai->Scouts.end(), unit) != this->Ai->Scouts.end()) {
-		this->Ai->Scouts.erase(std::remove(this->Ai->Scouts.begin(), this->Ai->Scouts.end(), unit), this->Ai->Scouts.end());
+	if (this->AiEnabled && this->Ai != nullptr) {
+		if (vector::contains(this->Ai->Scouts, unit)) {
+			vector::remove(this->Ai->Scouts, unit);
+		}
+
+		if (this->Ai->is_site_transport_unit(unit)) {
+			this->Ai->remove_site_transport_unit(unit);
+		}
 	}
 	
 	if (!type_change) {

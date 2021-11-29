@@ -394,6 +394,17 @@ public:
 	void request_transport_capacity(const int capacity_needed, const landmass *landmass);
 	bool check_unit_transport(const std::vector<std::shared_ptr<unit_ref>> &units, const landmass *home_landmass, const QPoint &goal_pos, const int z);
 
+	const site_map<std::vector<std::shared_ptr<unit_ref>>> &get_site_transport_units() const
+	{
+		return this->site_transport_units;
+	}
+
+	bool is_site_transport_unit(const CUnit *unit) const;
+	void add_site_transport_unit(CUnit *unit, const site *site);
+	void remove_site_transport_unit(CUnit *unit);
+	void transport_worker_to_site(const site *site);
+	void check_site_transport_units();
+
 	void check_quest_objectives();
 
 	CPlayer *Player = nullptr;		/// Engine player structure
@@ -435,6 +446,7 @@ public:
 	//Wyrmgus end
 private:
 	landmass_map<std::vector<CUnit *>> transporters; //AI transporters, mapped to the sea (water "landmass") they belong to
+	site_map<std::vector<std::shared_ptr<unit_ref>>> site_transport_units; //units to be transported to certain sites
 };
 
 /**

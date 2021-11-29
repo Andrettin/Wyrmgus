@@ -286,6 +286,10 @@ int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range, int z)
 
 static bool IsAlreadyWorking(const CUnit &unit)
 {
+	if (AiPlayer->is_site_transport_unit(&unit)) {
+		return true;
+	}
+
 	for (size_t i = 0; i != unit.Orders.size(); ++i) {
 		const UnitAction action = unit.Orders[i]->Action;
 
@@ -1528,6 +1532,11 @@ static void AiCollectResources()
 		}
 		//Wyrmgus end
 
+		if (AiPlayer->is_site_transport_unit(&unit)) {
+			//unit being transported to another landmass
+			continue;
+		}
+
 		// Send workers with resources back home.
 		if (unit.ResourcesHeld) {
 			const int c = unit.CurrentResource;
@@ -1827,6 +1836,10 @@ static void AiCollectResources()
 		if (!scout_unit.IsIdle()) {
 			continue;
 		}
+
+		if (AiPlayer->is_site_transport_unit(&scout_unit)) {
+			continue;
+		}
 		
 		scout_unit.Scout();
 		break; //only do this with one at a time to not strain performance too much
@@ -1843,6 +1856,10 @@ static void AiCollectResources()
 
 static bool IsReadyToRepair(const CUnit &unit)
 {
+	if (AiPlayer->is_site_transport_unit(&unit)) {
+		return false;
+	}
+
 	if (unit.IsIdle()) {
 		return true;
 	} else if (unit.Orders.size() == 1 && unit.CurrentAction() == UnitAction::Resource) {
@@ -2335,6 +2352,7 @@ void PlayerAi::check_settlement_construction(const site_set &settlements)
 		
 		const landmass *settlement_landmass = settlement_game_data->get_landmass();
 		if (!builder_landmasses.contains(settlement_landmass)) {
+			this->transport_worker_to_site(settlement);
 			continue;
 		}
 		
@@ -2344,6 +2362,38 @@ void PlayerAi::check_settlement_construction(const site_set &settlements)
 		}
 		
 		this->request_settlement_construction(settlement, town_hall_type);
+	}
+}
+
+void PlayerAi::transport_worker_to_site(const site *site)
+{
+	if (this->site_transport_units.contains(site)) {
+		//already transporting a unit to the site, possibly a worker
+		return;
+	}
+
+	const unit_type *town_hall_type = this->Player->get_faction()->get_class_unit_type(defines::get()->get_town_hall_class());
+	const std::vector<CUnit *> builders = this->Player->get_builders(town_hall_type);
+
+	const landmass *site_landmass = site->get_game_data()->get_landmass();
+
+	for (CUnit *builder : builders) {
+		if (!builder->Active) {
+			continue;
+		}
+
+		const landmass *builder_landmass = CMap::get()->get_tile_landmass(builder->tilePos, builder->MapLayer->ID);
+		if (!builder_landmass->borders_landmass_secondarily(site_landmass)) {
+			continue;
+		}
+
+		if (IsAlreadyWorking(*builder)) {
+			continue;
+		}
+
+		CommandStopUnit(*builder);
+		this->add_site_transport_unit(builder, site);
+		return;
 	}
 }
 

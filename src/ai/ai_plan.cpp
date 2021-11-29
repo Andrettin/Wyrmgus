@@ -777,7 +777,7 @@ void PlayerAi::check_transporters()
 			
 			CUnit *uins = ai_transporter->UnitInside;
 			for (int j = 0; j < ai_transporter->InsideCount; ++j, uins = uins->NextContained) {
-				if (uins->GroupId == 0) {
+				if (uins->GroupId == 0 && !this->is_site_transport_unit(uins)) {
 					//if the unit no longer is part of a force, then it likely has been reset and the attack through water has been cancelled, so unload it
 					CommandUnload(*ai_transporter, ai_transporter->tilePos, uins, 0, ai_transporter->MapLayer->ID);
 				}
@@ -887,6 +887,26 @@ bool PlayerAi::check_unit_transport(const std::vector<std::shared_ptr<unit_ref>>
 	const landmass *goal_landmass = CMap::get()->get_tile_landmass(goal_pos, z);
 
 	const landmass *water_landmass = nullptr;
+
+	if (home_landmass == nullptr) {
+		for (const std::shared_ptr<unit_ref> &unit_ref : units) {
+			const CUnit *unit = *unit_ref;
+			const landmass *unit_landmass = CMap::get()->get_tile_landmass(unit->tilePos, unit->MapLayer->ID);
+			if (unit_landmass == goal_landmass) {
+				continue;
+			}
+
+			if (!unit_landmass->borders_landmass(goal_landmass) && unit_landmass->borders_landmass_secondarily(goal_landmass)) {
+				home_landmass = unit_landmass;
+				break;
+			}
+
+			if (water_landmass == nullptr && unit_landmass->borders_landmass(goal_landmass)) {
+				water_landmass = unit_landmass;
+			}
+		}
+	}
+
 	if (home_landmass != nullptr && goal_landmass != nullptr) {
 		for (const landmass *border_landmass : goal_landmass->get_border_landmasses()) {
 			if (home_landmass->borders_landmass(border_landmass)) {
@@ -1034,4 +1054,80 @@ bool PlayerAi::check_unit_transport(const std::vector<std::shared_ptr<unit_ref>>
 	}
 
 	return true;
+}
+
+bool PlayerAi::is_site_transport_unit(const CUnit *unit) const
+{
+	for (const auto &[site, transport_units] : this->site_transport_units) {
+		for (const std::shared_ptr<unit_ref> &transport_unit : transport_units) {
+			if (*transport_unit == unit) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+void PlayerAi::add_site_transport_unit(CUnit *unit, const site *site)
+{
+	this->site_transport_units[site].push_back(unit->acquire_ref());
+}
+
+void PlayerAi::remove_site_transport_unit(CUnit *unit)
+{
+	for (auto &[site, transport_units] : this->site_transport_units) {
+		for (size_t i = 0; i < transport_units.size();) {
+			const std::shared_ptr<unit_ref> &transport_unit_ref = transport_units[i];
+			CUnit *transport_unit = *transport_unit_ref;
+
+			if (transport_unit == unit) {
+				transport_units.erase(transport_units.begin() + i);
+			} else {
+				++i;
+			}
+		}
+
+	}
+}
+
+void PlayerAi::check_site_transport_units()
+{
+	std::vector<const site *> site_keys_to_remove;
+
+	for (auto &[site, transport_units] : this->site_transport_units) {
+		const site_game_data *site_game_data = site->get_game_data();
+		const landmass *site_landmass = site_game_data->get_landmass();
+
+		for (size_t i = 0; i < transport_units.size();) {
+			const std::shared_ptr<unit_ref> &transport_unit_ref = transport_units[i];
+			CUnit *transport_unit = *transport_unit_ref;
+
+			if (!transport_unit->IsAlive() || transport_unit->get_center_tile_landmass() == site_landmass) {
+				transport_units.erase(transport_units.begin() + i);
+			} else {
+				++i;
+			}
+		}
+
+		if (transport_units.empty()) {
+			site_keys_to_remove.push_back(site);
+			continue;
+		}
+
+		QPoint target_pos = site_game_data->get_map_pos();
+		if (site_game_data->get_site_unit() != nullptr) {
+			target_pos = site_game_data->get_site_unit()->tilePos;
+		}
+
+		const int z = site_game_data->get_map_layer()->ID;
+
+		for (const std::shared_ptr<unit_ref> &transport_unit : transport_units) {
+			this->check_unit_transport({ transport_unit }, nullptr, target_pos, z);
+		}
+	}
+
+	for (const site *site : site_keys_to_remove) {
+		this->site_transport_units.erase(site);
+	}
 }
