@@ -41,8 +41,10 @@
 #include "unit/unit_domain_blocker_finder.h"
 #include "unit/unit_find.h"
 #include "util/assert_util.h"
+#include "util/enum_util.h"
 #include "util/log_util.h"
 #include "util/number_util.h"
+#include "util/point_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
 
@@ -383,7 +385,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				CUnit *goal = mf->UnitCache.find(unit_finder);
 				if (!goal) {
 					//shouldn't happen, mask says there is something on this tile
-					assert_throw(false);
+					throw std::runtime_error("Error in CostMoveToCallBack_Default: tile " + point::to_string(CMap::get()->get_index_pos(index, z)) + " says there is something impassable in its mask (" + std::to_string(enumeration::to_underlying(flags)) + "), but no appropriate unit could be found on the tile for domain \"" + unit_domain_to_string(unit.Type->get_domain()) + "\" (unit cache size: " + std::to_string(mf->UnitCache.size()) + ").");
 				}
 
 				//Wyrmgus start
