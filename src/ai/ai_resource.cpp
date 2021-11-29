@@ -705,10 +705,9 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	return nullptr;
 }
 
-//Wyrmgus start
-void AiTransportCapacityRequest(const int capacity_needed, const landmass *landmass)
+void PlayerAi::request_transport_capacity(const int capacity_needed, const landmass *landmass)
 {
-	if (AiPlayer->Player->get_faction() == nullptr) {
+	if (this->Player->get_faction() == nullptr) {
 		return;
 	}
 
@@ -720,15 +719,15 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 	for (int i = 0; i < n; ++i) {
 		const unit_type *type = AiHelpers.NavalTransporters[i];
 
-		if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->is_class_unit_type(type)) {
+		if (this->Player->get_faction() != nullptr && !this->Player->is_class_unit_type(type)) {
 			continue;
 		}
 
-		if (!AiRequestedTypeAllowed(*AiPlayer->Player, *type, true)) {
+		if (!AiRequestedTypeAllowed(*this->Player, *type, true)) {
 			continue;
 		}
 
-		const resource_map<int> type_costs = AiPlayer->Player->GetUnitTypeCosts(type);
+		const resource_map<int> type_costs = this->Player->GetUnitTypeCosts(type);
 		int cost = 0;
 		for (const auto &[resource, type_cost] : type_costs) {
 			if (resource == defines::get()->get_time_resource()) {
@@ -755,10 +754,10 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 
 		bool has_builder = false;
 		for (const unit_type *builder : AiHelpers.get_trainers(best_type)) {
-			if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder) > 0) {
+			if (this->Player->GetUnitTypeAiActiveCount(builder) > 0) {
 				std::vector<CUnit *> builder_table;
 
-				FindPlayerUnitsByType(*AiPlayer->Player, *builder, builder_table, true);
+				FindPlayerUnitsByType(*this->Player, *builder, builder_table, true);
 
 				for (size_t j = 0; j != builder_table.size(); ++j) {
 					CUnit &builder_unit = *builder_table[j];
@@ -774,18 +773,18 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 			}
 		}
 
-		if (!has_builder && AiPlayer->Player->get_faction() != nullptr) {
+		if (!has_builder && this->Player->get_faction() != nullptr) {
 			for (const unit_class *builder_class : AiHelpers.get_trainer_classes(best_type->get_unit_class())) {
-				const unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
+				const unit_type *builder = this->Player->get_faction()->get_class_unit_type(builder_class);
 
 				if (builder == nullptr) {
 					continue;
 				}
 
-				if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder) > 0) {
+				if (this->Player->GetUnitTypeAiActiveCount(builder) > 0) {
 					std::vector<CUnit *> builder_table;
 
-					FindPlayerUnitsByType(*AiPlayer->Player, *builder, builder_table, true);
+					FindPlayerUnitsByType(*this->Player, *builder, builder_table, true);
 
 					for (size_t j = 0; j != builder_table.size(); ++j) {
 						CUnit &builder_unit = *builder_table[j];
@@ -802,9 +801,10 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 			}
 		}
 		
-		if (!has_builder) { //if doesn't have an already built builder, see if there's one in the requests already
-			for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
-				const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
+		if (!has_builder) {
+			//if doesn't have an already built builder, see if there's one in the requests already
+			for (unsigned int i = 0; i < this->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
+				const AiBuildQueue &queue = this->UnitTypeBuilt[i];
 				if (queue.landmass != landmass) {
 					continue;
 				}
@@ -819,11 +819,11 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 		if (!has_builder) { // if doesn't have a builder, request one
 			bool requested_builder = false;
 			for (const unit_type *builder : AiHelpers.get_trainers(best_type)) {
-				if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->is_class_unit_type(builder)) {
+				if (this->Player->get_faction() != nullptr && !this->Player->is_class_unit_type(builder)) {
 					continue;
 				}
 
-				if (!AiRequestedTypeAllowed(*AiPlayer->Player, *builder)) {
+				if (!AiRequestedTypeAllowed(*this->Player, *builder)) {
 					continue;
 				}
 
@@ -832,15 +832,15 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 				break;
 			}
 
-			if (!requested_builder && AiPlayer->Player->get_faction() != nullptr) {
+			if (!requested_builder && this->Player->get_faction() != nullptr) {
 				for (const unit_class *builder_class : AiHelpers.get_trainer_classes(best_type->get_unit_class())) {
-					const unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
+					const unit_type *builder = this->Player->get_faction()->get_class_unit_type(builder_class);
 
 					if (builder == nullptr) {
 						continue;
 					}
 
-					if (!AiRequestedTypeAllowed(*AiPlayer->Player, *builder)) {
+					if (!AiRequestedTypeAllowed(*this->Player, *builder)) {
 						continue;
 					}
 
@@ -854,7 +854,6 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 		AiAddUnitTypeRequest(*best_type, count_requested, landmass);
 	}
 }
-//Wyrmgus end
 
 /**
 **  Build new units to reduce the food shortage.
@@ -2443,8 +2442,9 @@ void AiCheckDockConstruction()
 			AiAddUnitTypeRequest(*dock_type, 1, water_landmass);
 		} else {
 			int transport_capacity = AiPlayer->get_transport_capacity(water_landmass) + AiPlayer->get_requested_transport_capacity(water_landmass);
-			if (transport_capacity == 0) { //if the AI has no transporters in the given landmass, build one (for scouting)
-				AiTransportCapacityRequest(1, water_landmass);
+			if (transport_capacity == 0) {
+				//if the AI has no transporters in the given landmass, build one (for scouting)
+				AiPlayer->request_transport_capacity(1, water_landmass);
 			}
 		}
 	}

@@ -126,12 +126,12 @@ public:
 	AiForce();
 	~AiForce();
 
-	const std::vector<std::shared_ptr<wyrmgus::unit_ref>> &get_units() const
+	const std::vector<std::shared_ptr<unit_ref>> &get_units() const
 	{
 		return this->units;
 	}
 
-	std::shared_ptr<wyrmgus::unit_ref> take_last_unit();
+	std::shared_ptr<unit_ref> take_last_unit();
 
 	void Remove(CUnit *unit);
 	void Reset(const bool types = false);
@@ -183,7 +183,7 @@ public:
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
 private:
-	std::vector<std::shared_ptr<wyrmgus::unit_ref>> units;  /// Units in the force
+	std::vector<std::shared_ptr<unit_ref>> units;  //units in the force
 
 public:
 	// If attacking
@@ -364,8 +364,35 @@ public:
 	void request_settlement_construction(const site *settlement, const unit_type *town_hall_type);
 
 	void check_transporters();
+
+	const landmass_map<std::vector<CUnit *>> &get_transporters() const
+	{
+		return this->transporters;
+	}
+
+	const std::vector<CUnit *> &get_transporters(const landmass *water_landmass) const
+	{
+		static const std::vector<CUnit *> empty_list;
+
+		const auto find_iterator = this->transporters.find(water_landmass);
+		if (find_iterator != this->transporters.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_list;
+	}
+
+	void add_transporter(CUnit *transporter, const landmass *water_landmass)
+	{
+		this->transporters[water_landmass].push_back(transporter);
+	}
+
+	void remove_transporter(CUnit *transporter);
+
 	int get_transport_capacity(const landmass *water_landmass) const;
 	int get_requested_transport_capacity(const landmass *water_landmass) const;
+	void request_transport_capacity(const int capacity_needed, const landmass *landmass);
+	bool check_unit_transport(const std::vector<std::shared_ptr<unit_ref>> &units, const landmass *home_landmass, const QPoint &goal_pos, const int z);
 
 	void check_quest_objectives();
 
@@ -405,7 +432,8 @@ public:
 	//Wyrmgus start
 	int LastPathwayConstructionBuilding = 0;		/// Last building checked for pathway construction in this turn
 	std::vector<CUnit *> Scouts;				/// AI scouting units
-	landmass_map<std::vector<CUnit *>> Transporters; //AI transporters, mapped to the sea (water "landmass") they belong to
+private:
+	landmass_map<std::vector<CUnit *>> transporters; //AI transporters, mapped to the sea (water "landmass") they belong to
 	//Wyrmgus end
 };
 
@@ -745,7 +773,6 @@ extern void AiNewDepotRequest(CUnit &worker);
 extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit);
 
 //Wyrmgus start
-extern void AiTransportCapacityRequest(const int capacity_needed, const landmass *landmass);
 extern void AiCheckDockConstruction();
 extern void AiCheckUpgrades();
 extern void AiCheckBuildings();

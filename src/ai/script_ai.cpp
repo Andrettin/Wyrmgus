@@ -1782,7 +1782,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				const landmass *landmass = CMap::get()->get_landmasses()[landmass_index].get();
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
-				ai->Transporters[landmass].push_back(&wyrmgus::unit_manager::get()->GetSlotUnit(num));
+				ai->add_transporter(&unit_manager::get()->GetSlotUnit(num), landmass);
 			}
 		//Wyrmgus end
 		} else {

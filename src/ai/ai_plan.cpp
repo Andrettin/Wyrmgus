@@ -32,6 +32,7 @@
 
 #include "actions.h"
 #include "commands.h"
+#include "map/landmass.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
@@ -47,11 +48,12 @@
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
+#include "util/vector_util.h"
 
-class _EnemyOnMapTile
+class _EnemyOnMapTile final
 {
 public:
-	_EnemyOnMapTile(const CUnit &unit, const Vec2i _pos, CUnit **enemy) :
+	explicit _EnemyOnMapTile(const CUnit &unit, const Vec2i _pos, CUnit **enemy) :
 		source(&unit) , pos(_pos), best(enemy)
 	{
 	}
@@ -765,7 +767,7 @@ void PlayerAi::check_transporters()
 {
 	//assign free transporters according to their water zone (water "landmass")
 
-	for (const auto &kv_pair : this->Transporters) {
+	for (const auto &kv_pair : this->transporters) {
 		for (CUnit *ai_transporter : kv_pair.second) {
 			if (!ai_transporter->IsIdle()) {
 				continue;
@@ -781,7 +783,7 @@ void PlayerAi::check_transporters()
 		}
 	}
 
-	this->Transporters.clear();
+	this->transporters.clear();
 
 	for (int i = 0; i != this->Player->GetUnitCount(); ++i) {
 		CUnit &unit = this->Player->GetUnit(i);
@@ -819,16 +821,25 @@ void PlayerAi::check_transporters()
 		
 		const landmass *landmass = CMap::get()->get_tile_landmass(unit.tilePos, unit.MapLayer->ID);
 		
-		this->Transporters[landmass].push_back(&unit);
+		this->transporters[landmass].push_back(&unit);
+	}
+}
+
+void PlayerAi::remove_transporter(CUnit *transporter)
+{
+	for (auto &kv_pair : this->transporters) {
+		if (vector::contains(kv_pair.second, transporter)) {
+			vector::remove(kv_pair.second, transporter);
+		}
 	}
 }
 
 int PlayerAi::get_transport_capacity(const landmass *water_landmass) const
 {
 	//get the current transport capacity of the AI for a given water zone
-	const auto find_iterator = this->Transporters.find(water_landmass);
+	const auto find_iterator = this->transporters.find(water_landmass);
 
-	if (find_iterator == this->Transporters.end()) {
+	if (find_iterator == this->transporters.end()) {
 		return 0;
 	}
 	
@@ -867,4 +878,151 @@ int PlayerAi::get_requested_transport_capacity(const landmass *water_landmass) c
 	}
 	
 	return transport_capacity;
+}
+
+bool PlayerAi::check_unit_transport(const std::vector<std::shared_ptr<unit_ref>> &units, const landmass *home_landmass, const QPoint &goal_pos, const int z)
+{
+	const landmass *goal_landmass = CMap::get()->get_tile_landmass(goal_pos, z);
+
+	const landmass *water_landmass = nullptr;
+	if (home_landmass != nullptr && goal_landmass != nullptr) {
+		for (const landmass *border_landmass : goal_landmass->get_border_landmasses()) {
+			if (home_landmass->borders_landmass(border_landmass)) {
+				water_landmass = border_landmass;
+				break;
+			}
+		}
+	}
+
+	if (water_landmass == nullptr) {
+		//not optimal that this is possible, perhaps should give the closest water "landmass" on the way, even if it doesn't border the goal itself?
+		return true;
+	}
+
+	const int transport_capacity = this->get_transport_capacity(water_landmass);
+
+	int transport_capacity_needed = 0;
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : units) {
+		CUnit *ai_unit = unit_ref->get();
+		if (ai_unit->Removed) { //already in a transporter
+			continue;
+		}
+
+		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+			continue;
+		}
+
+		transport_capacity_needed += ai_unit->Type->BoardSize;
+	}
+
+	int net_transport_capacity_needed = transport_capacity_needed - transport_capacity;
+
+	if (net_transport_capacity_needed > 0) {
+		net_transport_capacity_needed -= this->get_requested_transport_capacity(water_landmass);
+		if (net_transport_capacity_needed > 0) { //if the quantity required is still above zero even after counting the transport capacity under construction, then request more
+			this->request_transport_capacity(net_transport_capacity_needed, water_landmass);
+		}
+
+		return false;
+	}
+
+	//has enough transporters, see then if all units are already boarded
+	//put the possible transporters in a vector
+	std::vector<CUnit *> transporters;
+	for (CUnit *ai_transporter : this->get_transporters(water_landmass)) {
+		if (!ai_transporter->IsIdle()) {
+			//is already moving, may be going to a unit to transport it
+			continue;
+		}
+		if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) <= 0) {
+			//already full
+			continue;
+		}
+
+		if (vector::contains(this->Scouts, ai_transporter)) {
+			//the transporters have to stop scouting
+			vector::remove(this->Scouts, ai_transporter);
+		}
+
+		transporters.push_back(ai_transporter);
+	}
+
+	bool has_unboarded_unit = false;
+	for (size_t i = 0; i != units.size(); ++i) {
+		CUnit *ai_unit = *units[i];
+
+		if (ai_unit->Removed) { //already in a transporter
+			continue;
+		}
+
+		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) {
+			//already unloaded to the enemy's landmass
+			continue;
+		}
+
+		has_unboarded_unit = true;
+
+		if (!ai_unit->IsIdle()) {
+			//if the unit isn't idle, don't give it the order to board (it may already be boarding a transporter)
+			continue;
+		}
+
+		const int delay = i; //to avoid a lot of CPU consumption, send them with a small time difference
+		ai_unit->Wait += delay;
+
+		for (CUnit *ai_transporter : transporters) {
+			if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) < ai_unit->Type->BoardSize) {
+				//the unit's board size is too big to fit in the transporter
+				continue;
+			}
+
+			ai_transporter->Wait += delay;
+
+			CommandBoard(*ai_unit, *ai_transporter, FlushCommands);
+			CommandFollow(*ai_transporter, *ai_unit, FlushCommands);
+
+			//only tell one unit to board a particular transporter at a single time, to avoid units getting in the way of one another
+			vector::remove(transporters, ai_transporter);
+			break;
+		}
+
+		if (transporters.size() == 0) {
+			break;
+		}
+	}
+
+	//everyone is already boarded, time to move to the enemy shores!
+	bool has_loaded_unit = false;
+	for (size_t i = 0; i != units.size(); ++i) {
+		CUnit *ai_unit = *units[i];
+
+		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+			continue;
+		}
+
+		has_loaded_unit = true;
+
+		if (ai_unit->Container) { //in a transporter
+			if (!ai_unit->Container->IsIdle()) { //already moving (presumably to unload)
+				continue;
+			}
+
+			if (ai_unit->Container->Type->MaxOnBoard > ai_unit->Container->BoardCount && has_unboarded_unit) {
+				//send the transporter to unload units if it is full, or if all of the force's units are already boarded
+				//sending a transporter that is full to unload, even if all of the force's units aren't boarded yet, is useful to prevent transporter congestion
+				continue;
+			}
+
+			const int delay = i; // To avoid lot of CPU consuption, send them with a small time difference.
+			ai_unit->Container->Wait += delay;
+			//tell the transporter to unload to the goal pos
+			CommandUnload(*ai_unit->Container, goal_pos, nullptr, FlushCommands, z, goal_landmass);
+		}
+	}
+
+	if (has_unboarded_unit || has_loaded_unit) {
+		return false;
+	}
+
+	return true;
 }

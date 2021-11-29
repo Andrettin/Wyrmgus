@@ -4229,11 +4229,8 @@ void UnitLost(CUnit &unit)
 						player.Ai->Scouting = false;
 					}
 				}
-				for (auto &kv_pair : player.Ai->Transporters) {
-					if (vector::contains(kv_pair.second, &unit)) {
-						vector::remove(kv_pair.second, &unit);
-					}
-				}
+
+				player.Ai->remove_transporter(&unit);
 			}
 			
 			player.DecreaseCountsForUnit(&unit);

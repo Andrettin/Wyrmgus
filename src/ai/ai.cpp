@@ -585,9 +585,9 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		file.printf("},\n");
 	}
 	
-	if (!ai.Transporters.empty()) {
+	if (!ai.get_transporters().empty()) {
 		file.printf("  \"transporters\", {");
-		for (const auto &kv_pair : ai.Transporters) {
+		for (const auto &kv_pair : ai.get_transporters()) {
 			const landmass *landmass = kv_pair.first;
 			for (const CUnit *ai_unit : kv_pair.second) {
 				file.printf(" %zu, %d,", landmass->get_index(), UnitNumber(*ai_unit));
@@ -1402,7 +1402,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 			const landmass *landmass = CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID);
 			
 			if (landmass != nullptr) {
-				what.Player->Ai->Transporters[landmass].push_back(&what);
+				what.Player->Ai->add_transporter(&what, landmass);
 			}
 		}
 	}
