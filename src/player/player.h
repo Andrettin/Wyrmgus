@@ -317,7 +317,8 @@ public:
 	std::string get_full_name() const;
 	std::string_view get_faction_title_name() const;
 	std::string_view GetCharacterTitleName(const character_title title_type, const wyrmgus::gender gender) const;
-	landmass_set get_builder_landmasses(const unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
+	std::vector<CUnit *> get_builders(const unit_type *building) const;
+	landmass_set get_builder_landmasses(const unit_type *building) const;
 	std::vector<const CUpgrade *> GetResearchableUpgrades();
 
 	const std::vector<CUnit *> &get_units() const

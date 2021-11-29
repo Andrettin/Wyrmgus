@@ -2285,11 +2285,36 @@ std::string_view CPlayer::GetCharacterTitleName(const character_title title_type
 	return faction->get_character_title_name(title_type, government_type, tier, gender);
 }
 
-landmass_set CPlayer::get_builder_landmasses(const wyrmgus::unit_type *building) const
+std::vector<CUnit *> CPlayer::get_builders(const unit_type *building) const
 {
+	//builds a vector with possible builders for the building
+	std::vector<CUnit *> builders;
+
+	for (const unit_type *builder_type : AiHelpers.get_builders(building)) {
+		if (this->GetUnitTypeAiActiveCount(builder_type) > 0) {
+			FindPlayerUnitsByType(*this, *builder_type, builders, true);
+		}
+	}
+
+	if (this->get_faction() != nullptr) {
+		for (const unit_class *builder_class : AiHelpers.get_builder_classes(building->get_unit_class())) {
+			const unit_type *builder_type = this->get_faction()->get_class_unit_type(builder_class);
+
+			if (this->GetUnitTypeAiActiveCount(builder_type) > 0) {
+				FindPlayerUnitsByType(*this, *builder_type, builders, true);
+			}
+		}
+	}
+
+	return builders;
+}
+
+landmass_set CPlayer::get_builder_landmasses(const unit_type *building) const
+{
+	//builds a set with builder landmasses; the building is the structure to be built by the builder in question
 	landmass_set builder_landmasses;
 
-	for (const wyrmgus::unit_type *builder_type : AiHelpers.get_builders(building)) {
+	for (const unit_type *builder_type : AiHelpers.get_builders(building)) {
 		if (this->GetUnitTypeAiActiveCount(builder_type) > 0) {
 			std::vector<CUnit *> builder_table;
 
@@ -2308,8 +2333,8 @@ landmass_set CPlayer::get_builder_landmasses(const wyrmgus::unit_type *building)
 	}
 
 	if (this->get_faction() != nullptr) {
-		for (const wyrmgus::unit_class *builder_class : AiHelpers.get_builder_classes(building->get_unit_class())) {
-			const wyrmgus::unit_type *builder_type = this->get_faction()->get_class_unit_type(builder_class);
+		for (const unit_class *builder_class : AiHelpers.get_builder_classes(building->get_unit_class())) {
+			const unit_type *builder_type = this->get_faction()->get_class_unit_type(builder_class);
 
 			if (this->GetUnitTypeAiActiveCount(builder_type) > 0) {
 				std::vector<CUnit *> builder_table;
