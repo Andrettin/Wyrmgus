@@ -87,4 +87,15 @@ bool landmass::borders_landmass(const landmass *landmass) const
 	return vector::contains(this->border_landmasses, landmass);
 }
 
+bool landmass::borders_landmass_secondarily(const landmass *landmass) const
+{
+	for (const wyrmgus::landmass *border_landmass : this->get_border_landmasses()) {
+		if (border_landmass->borders_landmass(landmass)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 }

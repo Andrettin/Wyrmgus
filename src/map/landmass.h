@@ -61,6 +61,8 @@ public:
 		this->border_landmasses.push_back(landmass);
 	}
 
+	bool borders_landmass_secondarily(const landmass *landmass) const;
+
 	const wyrmgus::world *get_world() const
 	{
 		return this->world;
