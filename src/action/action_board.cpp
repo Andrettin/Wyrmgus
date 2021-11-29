@@ -189,7 +189,6 @@ int COrder_Board::MoveToTransporter(CUnit &unit)
 */
 bool COrder_Board::WaitForTransporter(CUnit &unit)
 {
-
 	if (unit.Wait) {
 		unit.Wait--;
 		return false;

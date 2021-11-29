@@ -36,6 +36,8 @@
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
+#include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "missile.h"
@@ -902,13 +904,16 @@ bool PlayerAi::check_unit_transport(const std::vector<std::shared_ptr<unit_ref>>
 	const int transport_capacity = this->get_transport_capacity(water_landmass);
 
 	int transport_capacity_needed = 0;
-	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : units) {
-		CUnit *ai_unit = unit_ref->get();
-		if (ai_unit->Removed) { //already in a transporter
+	for (const std::shared_ptr<unit_ref> &unit_ref : units) {
+		const CUnit *ai_unit = *unit_ref;
+
+		if (ai_unit->Removed) {
+			//already in a transporter
 			continue;
 		}
 
-		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) {
+			//already unloaded to the target landmass
 			continue;
 		}
 
@@ -951,12 +956,13 @@ bool PlayerAi::check_unit_transport(const std::vector<std::shared_ptr<unit_ref>>
 	for (size_t i = 0; i != units.size(); ++i) {
 		CUnit *ai_unit = *units[i];
 
-		if (ai_unit->Removed) { //already in a transporter
+		if (ai_unit->Removed) {
+			//already in a transporter
 			continue;
 		}
 
 		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) {
-			//already unloaded to the enemy's landmass
+			//already unloaded to the target landmass
 			continue;
 		}
 
@@ -996,14 +1002,17 @@ bool PlayerAi::check_unit_transport(const std::vector<std::shared_ptr<unit_ref>>
 	for (size_t i = 0; i != units.size(); ++i) {
 		CUnit *ai_unit = *units[i];
 
-		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::get()->get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) {
+			//already unloaded to the target landmass
 			continue;
 		}
 
 		has_loaded_unit = true;
 
-		if (ai_unit->Container) { //in a transporter
-			if (!ai_unit->Container->IsIdle()) { //already moving (presumably to unload)
+		if (ai_unit->Container) {
+			//in a transporter
+			if (!ai_unit->Container->IsIdle()) {
+				//already moving (presumably to unload)
 				continue;
 			}
 

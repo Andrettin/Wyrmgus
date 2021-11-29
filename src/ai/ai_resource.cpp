@@ -292,6 +292,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 		if (action == UnitAction::Build || action == UnitAction::Repair) {
 			return true;
 		}
+
 		if (action == UnitAction::Resource) {
 			const COrder_Resource &order = *static_cast<const COrder_Resource *>(unit.Orders[i].get());
 
@@ -300,6 +301,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 			}
 		}
 	}
+
 	return false;
 }
 
@@ -1520,7 +1522,8 @@ static void AiCollectResources()
 		}
 		
 		//Wyrmgus start
-		if (unit.GroupId != 0) { //don't gather/trade with units that are parts of forces
+		if (unit.GroupId != 0) {
+			//don't gather/trade with units that are parts of forces
 			continue;
 		}
 		//Wyrmgus end
@@ -1844,6 +1847,7 @@ static bool IsReadyToRepair(const CUnit &unit)
 			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -2017,6 +2021,7 @@ static void AiCheckRepair()
 				return;
 			}
 		}
+
 		// Building under construction but no worker
 		if (unit.CurrentAction() == UnitAction::Built) {
 			int j;
@@ -2323,7 +2328,7 @@ void PlayerAi::check_settlement_construction(const site_set &settlements)
 			continue;
 		}
 		
-		const landmass *settlement_landmass = CMap::get()->get_tile_landmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		const landmass *settlement_landmass = settlement_game_data->get_landmass();
 		if (!builder_landmasses.contains(settlement_landmass)) {
 			continue;
 		}
@@ -2438,7 +2443,8 @@ void AiCheckDockConstruction()
 			}
 		}
 		
-		if (!has_dock) { // if doesn't have a dock, request one
+		if (!has_dock) {
+			//if doesn't have a dock, request one
 			AiAddUnitTypeRequest(*dock_type, 1, water_landmass);
 		} else {
 			int transport_capacity = AiPlayer->get_transport_capacity(water_landmass) + AiPlayer->get_requested_transport_capacity(water_landmass);

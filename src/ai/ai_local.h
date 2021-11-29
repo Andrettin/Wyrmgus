@@ -432,9 +432,9 @@ public:
 	//Wyrmgus start
 	int LastPathwayConstructionBuilding = 0;		/// Last building checked for pathway construction in this turn
 	std::vector<CUnit *> Scouts;				/// AI scouting units
+	//Wyrmgus end
 private:
 	landmass_map<std::vector<CUnit *>> transporters; //AI transporters, mapped to the sea (water "landmass") they belong to
-	//Wyrmgus end
 };
 
 /**
