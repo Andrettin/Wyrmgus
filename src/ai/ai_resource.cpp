@@ -1815,6 +1815,11 @@ static void AiCollectResources()
 	//explore with the workers that are still idle (as that means they haven't gotten something to harvest)
 	for (int i = 0; i < n; ++i) {
 		CUnit &scout_unit = AiPlayer->Player->GetUnit(i);
+
+		if (!scout_unit.IsAliveOnMap()) {
+			continue;
+		}
+
 		if (!scout_unit.Type->BoolFlag[HARVESTER_INDEX].value || !scout_unit.Active) {
 			continue;
 		}
