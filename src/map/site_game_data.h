@@ -34,6 +34,7 @@ class CUnit;
 
 namespace wyrmgus {
 
+class landmass;
 class resource;
 class site;
 class sml_data;
@@ -98,6 +99,8 @@ public:
 
 		return this->get_map_layer() != nullptr && this->get_map_pos() != QPoint(-1, -1);
 	}
+
+	const landmass *get_landmass() const;
 
 	const QRect &get_territory_rect() const
 	{

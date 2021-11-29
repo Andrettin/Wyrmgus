@@ -39,6 +39,7 @@
 #include "player/player.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "util/assert_util.h"
 #include "util/set_util.h"
 #include "util/vector_util.h"
 
@@ -138,6 +139,17 @@ CPlayer *site_game_data::get_realm_owner() const
 	}
 
 	return nullptr;
+}
+
+const landmass *site_game_data::get_landmass() const
+{
+	assert_throw(this->is_on_map());
+
+	if (this->get_site_unit() != nullptr) {
+		return CMap::get()->get_tile_landmass(this->get_site_unit()->tilePos, this->get_site_unit()->MapLayer->ID);
+	}
+
+	return CMap::get()->get_tile_landmass(this->get_map_pos(), this->get_map_layer()->ID);
 }
 
 void site_game_data::process_territory_tile(const tile *tile, const QPoint &tile_pos, const int z)
