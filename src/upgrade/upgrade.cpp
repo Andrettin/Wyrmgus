@@ -2755,13 +2755,36 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool multi
 
 bool IsPercentageVariable(const int var)
 {
-	return (
-		var == CHARGEBONUS_INDEX || var == BACKSTAB_INDEX
-		|| var == BONUSAGAINSTMOUNTED_INDEX || var == BONUSAGAINSTBUILDINGS_INDEX || var == BONUSAGAINSTAIR_INDEX || var == BONUSAGAINSTGIANTS_INDEX || var == BONUSAGAINSTDRAGONS_INDEX
-		|| var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX || var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == ACIDRESISTANCE_INDEX || var == SHADOW_RESISTANCE_INDEX
-		|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
-		|| var == TIMEEFFICIENCYBONUS_INDEX || var == RESEARCHSPEEDBONUS_INDEX || var == TRADECOST_INDEX || var == SALVAGEFACTOR_INDEX || var == MUGGING_INDEX || var == RAIDING_INDEX
-	);
+	switch (var) {
+		case CHARGEBONUS_INDEX:
+		case BACKSTAB_INDEX:
+		case BONUSAGAINSTMOUNTED_INDEX:
+		case BONUSAGAINSTBUILDINGS_INDEX:
+		case BONUSAGAINSTAIR_INDEX:
+		case BONUSAGAINSTGIANTS_INDEX:
+		case BONUSAGAINSTDRAGONS_INDEX:
+		case FIRERESISTANCE_INDEX:
+		case COLDRESISTANCE_INDEX:
+		case ARCANERESISTANCE_INDEX:
+		case LIGHTNINGRESISTANCE_INDEX:
+		case AIRRESISTANCE_INDEX:
+		case EARTHRESISTANCE_INDEX:
+		case WATERRESISTANCE_INDEX:
+		case ACIDRESISTANCE_INDEX:
+		case SHADOW_RESISTANCE_INDEX:
+		case HACKRESISTANCE_INDEX:
+		case PIERCERESISTANCE_INDEX:
+		case BLUNTRESISTANCE_INDEX:
+		case TIMEEFFICIENCYBONUS_INDEX:
+		case RESEARCHSPEEDBONUS_INDEX:
+		case TRADECOST_INDEX:
+		case SALVAGEFACTOR_INDEX:
+		case MUGGING_INDEX:
+		case RAIDING_INDEX:
+			return true;
+		default:
+			return false;
+	}
 }
 
 bool IsBonusVariable(const int var)
@@ -2798,17 +2821,43 @@ bool IsBonusVariable(const int var)
 
 bool IsBooleanVariable(const int var)
 {
-	return var == DISEMBARKMENTBONUS_INDEX || var == DESERTSTALK_INDEX || var == FORESTSTALK_INDEX || var == SWAMPSTALK_INDEX || var == DEHYDRATIONIMMUNITY_INDEX || var == LEADERSHIPAURA_INDEX || var == REGENERATIONAURA_INDEX || var == HYDRATINGAURA_INDEX || var == ETHEREALVISION_INDEX;
+	switch (var) {
+		case DISEMBARKMENTBONUS_INDEX:
+		case DESERTSTALK_INDEX:
+		case FORESTSTALK_INDEX:
+		case SWAMPSTALK_INDEX:
+		case DEHYDRATIONIMMUNITY_INDEX:
+		case LEADERSHIPAURA_INDEX:
+		case REGENERATIONAURA_INDEX:
+		case HYDRATINGAURA_INDEX:
+		case ETHEREALVISION_INDEX:
+			return true;
+		default:
+			return false;
+	}
 }
 
 bool IsKnowledgeVariable(const int var)
 {
-	return var == KNOWLEDGEMAGIC_INDEX || var == KNOWLEDGEWARFARE_INDEX || var == KNOWLEDGEMINING_INDEX;
+	switch (var) {
+		case KNOWLEDGEMAGIC_INDEX:
+		case KNOWLEDGEWARFARE_INDEX:
+		case KNOWLEDGEMINING_INDEX:
+			return true;
+		default:
+			return false;
+	}
 }
 
 bool IsPotentiallyNegativeVariable(const int var)
 {
-	return var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX;
+	switch (var) {
+		case DAYSIGHTRANGEBONUS_INDEX:
+		case NIGHTSIGHTRANGEBONUS_INDEX:
+			return true;
+		default:
+			return false;
+	}
 }
 
 std::string GetVariableDisplayName(int var, bool increase)

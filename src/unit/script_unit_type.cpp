@@ -3009,12 +3009,13 @@ void UpdateUnitVariables(CUnit &unit)
 			default:
 				break;
 		}
+
 		unit.Variable[i].Value = 0;
 		unit.Variable[i].Max = 0;
 		unit.Variable[i].Enable = 1;
 	}
 
-	//Wyrmgus
+	//Wyrmgus start
 	unit.Variable[VARIATION_INDEX].Max = unit.Type->get_variations().size();
 	unit.Variable[VARIATION_INDEX].Enable = 1;
 	unit.Variable[VARIATION_INDEX].Value = unit.Variation;
