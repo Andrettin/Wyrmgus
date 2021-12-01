@@ -2037,6 +2037,9 @@ static int CclSetUnitVariable(lua_State *l)
 		if (index == -1) {
 			LuaError(l, "Bad variable name '%s'\n" _C_ name);
 		}
+
+		const int old_value = unit->Variable[index].Value;
+
 		value = LuaToNumber(l, 3);
 		if (nargs == 3) {
 			//Wyrmgus start
@@ -2061,7 +2064,7 @@ static int CclSetUnitVariable(lua_State *l)
 			}
 		}
 
-		unit->on_variable_changed(index);
+		unit->on_variable_changed(index, unit->Variable[index].Value - old_value);
 	}
 	lua_pushnumber(l, value);
 	//Wyrmgus start

@@ -32,6 +32,7 @@
 #include "upgrade/upgrade_structs.h" //for CUnitStats
 
 class CConfigData;
+class CUnit;
 class CUpgrade;
 struct lua_State;
 
@@ -77,6 +78,9 @@ public:
 	int GetUnitStock(unit_type *unit_type) const;
 	void SetUnitStock(unit_type *unit_type, int quantity);
 	void ChangeUnitStock(unit_type *unit_type, int quantity);
+
+	bool affects_variable(const int var_index) const;
+	void apply_to_unit(CUnit *unit, const int multiplier) const;
 
 	int UpgradeId = 0;						/// used to filter required modifier
 

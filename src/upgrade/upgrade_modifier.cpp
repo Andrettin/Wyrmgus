@@ -30,6 +30,9 @@
 #include "upgrade/upgrade_modifier.h"
 
 #include "config.h"
+#include "game/game.h"
+#include "map/map.h"
+#include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
@@ -186,6 +189,99 @@ void upgrade_modifier::SetUnitStock(unit_type *unit_type, int quantity)
 void upgrade_modifier::ChangeUnitStock(unit_type *unit_type, int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
+}
+
+bool upgrade_modifier::affects_variable(const int var_index) const
+{
+	const unit_variable &modifier_variable = this->Modifier.Variables[var_index];
+
+	return modifier_variable.Enable || modifier_variable.Value != 0 || modifier_variable.Max != 0 || modifier_variable.Increase != 0 || this->ModifyPercent[var_index] != 0;
+}
+
+void upgrade_modifier::apply_to_unit(CUnit *unit, const int multiplier) const
+{
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
+		if (!this->affects_variable(i)) {
+			continue;
+		}
+
+		switch (i) {
+			case SIGHTRANGE_INDEX:
+			case DAYSIGHTRANGEBONUS_INDEX:
+			case NIGHTSIGHTRANGEBONUS_INDEX:
+			case ETHEREALVISION_INDEX:
+				if (!unit->Removed && !SaveGameLoading) {
+					MapUnmarkUnitSight(*unit);
+				}
+				break;
+			default:
+				break;
+		}
+
+		unit_variable &unit_variable = unit->Variable[i];
+		const wyrmgus::unit_variable &modifier_variable = this->Modifier.Variables[i];
+		const int modify_percent = this->ModifyPercent[i];
+
+		unit_variable.Enable |= modifier_variable.Enable;
+
+		const int effective_modify_percent = modify_percent * multiplier;
+		const int effective_modifier_value = modifier_variable.Value * multiplier;
+
+		const int old_value = unit_variable.Value;
+
+		if (effective_modify_percent) {
+			if (i != MANA_INDEX || effective_modify_percent < 0) {
+				if (multiplier < 0) {
+					//need to calculate it a bit differently to "undo" the modification
+					unit_variable.Value = unit_variable.Value * 100 / (100 - modify_percent);
+				} else {
+					unit_variable.Value += unit_variable.Value * modify_percent / 100;
+				}
+			}
+
+			if (multiplier < 0) {
+				unit_variable.Max = unit_variable.Max * 100 / (100 + modify_percent);
+			} else {
+				unit_variable.Max += unit_variable.Max * modify_percent / 100;
+			}
+		} else {
+			if (i != MANA_INDEX || effective_modifier_value < 0) {
+				unit_variable.Value += effective_modifier_value;
+			}
+			unit_variable.Increase += modifier_variable.Increase * multiplier;
+		}
+
+		unit_variable.Max += modifier_variable.Max * multiplier;
+		unit_variable.Max = std::max(unit_variable.Max, 0);
+		if (unit_variable.Max > 0) {
+			unit_variable.Value = std::clamp(unit_variable.Value, 0, unit_variable.Max);
+		}
+
+		switch (i) {
+			case SIGHTRANGE_INDEX:
+			case DAYSIGHTRANGEBONUS_INDEX:
+			case NIGHTSIGHTRANGEBONUS_INDEX:
+			case ETHEREALVISION_INDEX:
+				//if the sight range was modified, we need to change the unit to the new range, as otherwise the counters get confused
+				if (!unit->Removed && !SaveGameLoading) {
+					UpdateUnitSightRange(*unit);
+					MapMarkUnitSight(*unit);
+				}
+				break;
+			default:
+				break;
+		}
+
+		unit->on_variable_changed(i, unit_variable.Value - old_value);
+	}
+
+	for (const auto &[stock_unit_type, unit_stock] : this->Modifier.get_unit_stocks()) {
+		const int effective_unit_stock = unit_stock * multiplier;
+
+		if (effective_unit_stock < 0) {
+			unit->ChangeUnitStock(stock_unit_type, effective_unit_stock);
+		}
+	}
 }
 
 }

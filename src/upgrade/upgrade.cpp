@@ -1680,10 +1680,10 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 					
 					//Wyrmgus start
 					if (
-						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit->EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit->EquippedItems[static_cast<int>(wyrmgus::item_slot::shield)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit->EquippedItems[static_cast<int>(wyrmgus::item_slot::boots)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit->EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)].size() > 0)
+						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit->EquippedItems[static_cast<int>(item_slot::weapon)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit->EquippedItems[static_cast<int>(item_slot::shield)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit->EquippedItems[static_cast<int>(item_slot::boots)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit->EquippedItems[static_cast<int>(item_slot::arrows)].size() > 0)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't apply the modifier to it
 						continue;
 					}
@@ -1694,47 +1694,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 					}
 					//Wyrmgus end
 					
-					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-						unit->Variable[j].Enable |= um->Modifier.Variables[j].Enable;
-						if (um->ModifyPercent[j]) {
-							if (j != MANA_INDEX || um->ModifyPercent[j] < 0) {
-								unit->Variable[j].Value += unit->Variable[j].Value * um->ModifyPercent[j] / 100;
-							}
-							unit->Variable[j].Max += unit->Variable[j].Max * um->ModifyPercent[j] / 100;
-						} else {
-							if (j != MANA_INDEX || um->Modifier.Variables[j].Value < 0) {
-								unit->Variable[j].Value += um->Modifier.Variables[j].Value;
-							}
-							unit->Variable[j].Increase += um->Modifier.Variables[j].Increase;
-						}
-
-						unit->Variable[j].Max += um->Modifier.Variables[j].Max;
-						unit->Variable[j].Max = std::max(unit->Variable[j].Max, 0);
-						if (unit->Variable[j].Max > 0) {
-							unit->Variable[j].Value = std::clamp(unit->Variable[j].Value, 0, unit->Variable[j].Max);
-						}
-						//Wyrmgus start
-						if (j == ATTACKRANGE_INDEX && unit->Container) {
-							unit->Container->UpdateContainerAttackRange();
-						} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
-							unit->UpdateXPRequired();
-						} else if (IsKnowledgeVariable(j)) {
-							unit->CheckKnowledgeChange(j, um->Modifier.Variables[j].Value);
-						} else if ((j == SIGHTRANGE_INDEX || j == DAYSIGHTRANGEBONUS_INDEX || j == NIGHTSIGHTRANGEBONUS_INDEX) && !unit->Removed) {
-							// If Sight range is upgraded, we need to change EVERY unit
-							// to the new range, otherwise the counters get confused.
-							MapUnmarkUnitSight(*unit);
-							UpdateUnitSightRange(*unit);
-							MapMarkUnitSight(*unit);
-						}
-						//Wyrmgus end
-					}
-					
-					for (const auto &[stock_unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
-						if (unit_stock < 0) {
-							unit->ChangeUnitStock(stock_unit_type, unit_stock);
-						}
-					}
+					um->apply_to_unit(unit, 1);
 				}
 			}
 			
@@ -1965,58 +1925,16 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 					
 					//Wyrmgus start
 					if (
-						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit->EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit->EquippedItems[static_cast<int>(wyrmgus::item_slot::shield)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit->EquippedItems[static_cast<int>(wyrmgus::item_slot::boots)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit->EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)].size() > 0)
+						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit->EquippedItems[static_cast<int>(item_slot::weapon)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit->EquippedItems[static_cast<int>(item_slot::shield)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit->EquippedItems[static_cast<int>(item_slot::boots)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit->EquippedItems[static_cast<int>(item_slot::arrows)].size() > 0)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't remove the modifier from it (it already doesn't have it)
 						continue;
 					}
 					//Wyrmgus end
-					
-					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-						unit->Variable[j].Enable |= um->Modifier.Variables[j].Enable;
-						if (um->ModifyPercent[j]) {
-							if (j != MANA_INDEX || um->ModifyPercent[j] >= 0) {
-								unit->Variable[j].Value = unit->Variable[j].Value * 100 / (100 + um->ModifyPercent[j]);
-							}
-							unit->Variable[j].Max = unit->Variable[j].Max * 100 / (100 + um->ModifyPercent[j]);
-						} else {
-							if (j != MANA_INDEX || um->Modifier.Variables[j].Value >= 0) {
-								unit->Variable[j].Value -= um->Modifier.Variables[j].Value;
-							}
-							unit->Variable[j].Increase -= um->Modifier.Variables[j].Increase;
-						}
 
-						unit->Variable[j].Max -= um->Modifier.Variables[j].Max;
-						unit->Variable[j].Max = std::max(unit->Variable[j].Max, 0);
-
-						if (unit->Variable[j].Max > 0) {
-							unit->Variable[j].Value = std::clamp(unit->Variable[j].Value, 0, unit->Variable[j].Max);
-						}
-
-						//Wyrmgus start
-						if (j == ATTACKRANGE_INDEX && unit->Container) {
-							unit->Container->UpdateContainerAttackRange();
-						} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
-							unit->UpdateXPRequired();
-						} else if (IsKnowledgeVariable(j)) {
-							unit->CheckKnowledgeChange(j, - um->Modifier.Variables[j].Value);
-						} else if ((j == SIGHTRANGE_INDEX || j == DAYSIGHTRANGEBONUS_INDEX || j == NIGHTSIGHTRANGEBONUS_INDEX) && !unit->Removed) {
-							// If Sight range is upgraded, we need to change EVERY unit
-							// to the new range, otherwise the counters get confused.
-							MapUnmarkUnitSight(*unit);
-							UpdateUnitSightRange(*unit);
-							MapMarkUnitSight(*unit);
-						}
-						//Wyrmgus end
-					}
-					
-					for (const auto &[stock_unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
-						if (unit_stock > 0) {
-							unit->ChangeUnitStock(stock_unit_type, -unit_stock);
-						}
-					}
+					um->apply_to_unit(unit, -1);
 				}
 			}
 			
@@ -2085,72 +2003,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 		}
 	}
 
-	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-		switch (j) {
-			case SIGHTRANGE_INDEX:
-			case DAYSIGHTRANGEBONUS_INDEX:
-			case NIGHTSIGHTRANGEBONUS_INDEX:
-			case ETHEREALVISION_INDEX:
-				if (!unit.Removed && !SaveGameLoading) {
-					MapUnmarkUnitSight(unit);
-				}
-				break;
-			default:
-				break;
-		}
-
-		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
-		if (um->ModifyPercent[j]) {
-			if (j != MANA_INDEX || um->ModifyPercent[j] < 0) {
-				unit.Variable[j].Value += unit.Variable[j].Value * um->ModifyPercent[j] / 100;
-			}
-			unit.Variable[j].Max += unit.Variable[j].Max * um->ModifyPercent[j] / 100;
-		} else {
-			if (j != MANA_INDEX || um->Modifier.Variables[j].Value < 0) {
-				unit.Variable[j].Value += um->Modifier.Variables[j].Value;
-			}
-			unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
-		}
-
-		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
-		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
-		if (unit.Variable[j].Max > 0) {
-			unit.Variable[j].Value = std::clamp(unit.Variable[j].Value, 0, unit.Variable[j].Max);
-		}
-
-		if (IsKnowledgeVariable(j)) {
-			unit.CheckKnowledgeChange(j, um->Modifier.Variables[j].Value);
-		}
-
-		switch (j) {
-			case ATTACKRANGE_INDEX:
-				if (unit.Container && !SaveGameLoading) {
-					unit.Container->UpdateContainerAttackRange();
-				}
-				break;
-			case LEVEL_INDEX:
-			case POINTS_INDEX:
-				unit.UpdateXPRequired();
-				break;
-			case SIGHTRANGE_INDEX:
-			case DAYSIGHTRANGEBONUS_INDEX:
-			case NIGHTSIGHTRANGEBONUS_INDEX:
-			case ETHEREALVISION_INDEX:
-				if (!unit.Removed && !SaveGameLoading) {
-					UpdateUnitSightRange(unit);
-					MapMarkUnitSight(unit);
-				}
-				break;
-			default:
-				break;
-		}
-	}
-	
-	for (const auto &[unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
-		if (unit_stock < 0) {
-			unit.ChangeUnitStock(unit_type, unit_stock);
-		}
-	}
+	um->apply_to_unit(&unit, 1);
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
@@ -2191,47 +2044,8 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifie
 			unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
 		}
 	}
-	
-	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
-		if (um->ModifyPercent[j]) {
-			if (j != MANA_INDEX || um->ModifyPercent[j] >= 0) {
-				unit.Variable[j].Value = unit.Variable[j].Value * 100 / (100 + um->ModifyPercent[j]);
-			}
-			unit.Variable[j].Max = unit.Variable[j].Max * 100 / (100 + um->ModifyPercent[j]);
-		} else {
-			if (j != MANA_INDEX || um->Modifier.Variables[j].Value >= 0) {
-				unit.Variable[j].Value -= um->Modifier.Variables[j].Value;
-			}
-			unit.Variable[j].Increase -= um->Modifier.Variables[j].Increase;
-		}
-		unit.Variable[j].Max -= um->Modifier.Variables[j].Max;
-		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
-		if (unit.Variable[j].Max > 0) {
-			unit.Variable[j].Value = std::clamp(unit.Variable[j].Value, 0, unit.Variable[j].Max);
-		}
-		//Wyrmgus start
-		if (j == ATTACKRANGE_INDEX && unit.Container) {
-			unit.Container->UpdateContainerAttackRange();
-		} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
-			unit.UpdateXPRequired();
-		} else if (IsKnowledgeVariable(j)) {
-			unit.CheckKnowledgeChange(j, - um->Modifier.Variables[j].Value);
-		} else if (j == SIGHTRANGE_INDEX || j == DAYSIGHTRANGEBONUS_INDEX || j == NIGHTSIGHTRANGEBONUS_INDEX) {
-			if (!unit.Removed && !SaveGameLoading) {
-				MapUnmarkUnitSight(unit);
-				UpdateUnitSightRange(unit);
-				MapMarkUnitSight(unit);
-			}
-		}
-		//Wyrmgus end
-	}
 
-	for (const auto &[unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
-		if (unit_stock > 0) {
-			unit.ChangeUnitStock(unit_type, -unit_stock);
-		}
-	}
+	um->apply_to_unit(&unit, -1);
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden

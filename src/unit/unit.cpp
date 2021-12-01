@@ -3723,11 +3723,15 @@ void CUnit::UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settleme
 	}
 }
 
-void CUnit::on_variable_changed(const int var_index)
+void CUnit::on_variable_changed(const int var_index, const int change)
 {
+	if (change == 0) {
+		return;
+	}
+
 	switch (var_index) {
 		case ATTACKRANGE_INDEX:
-			if (this->Container != nullptr) {
+			if (this->Container != nullptr && !SaveGameLoading) {
 				this->Container->UpdateContainerAttackRange();
 			}
 			break;
@@ -3742,7 +3746,9 @@ void CUnit::on_variable_changed(const int var_index)
 			this->Player->UpdateLevelUpUnits();
 			break;
 		case KNOWLEDGEMAGIC_INDEX:
-			this->CheckIdentification();
+		case KNOWLEDGEWARFARE_INDEX:
+		case KNOWLEDGEMINING_INDEX:
+			this->CheckKnowledgeChange(var_index, change);
 			break;
 		default:
 			break;
@@ -7502,6 +7508,8 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 {
 	const int var = missile.Type->ChangeVariable;
 
+	const int old_value = target.Variable[var].Value;
+
 	target.Variable[var].Enable = 1;
 	target.Variable[var].Value += missile.Type->ChangeAmount;
 	if (target.Variable[var].Value > target.Variable[var].Max) {
@@ -7518,7 +7526,7 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 		}
 	}
 	
-	target.on_variable_changed(var);
+	target.on_variable_changed(var, target.Variable[var].Value - old_value);
 }
 
 static void HitUnit_Burning(CUnit &target)

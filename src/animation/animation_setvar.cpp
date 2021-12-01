@@ -50,7 +50,7 @@ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 		return;
 	}
 
-	const std::vector<std::string> str_list = wyrmgus::string::split(this->var_str, '.');
+	const std::vector<std::string> str_list = string::split(this->var_str, '.');
 
 	const int index = UnitTypeVar.VariableNameLookup[str_list[0]]; //user variables
 	if (index == -1) {
@@ -71,6 +71,8 @@ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 			value = rop;
 	}
 
+	const int old_value = goal->Variable[index].Value;
+
 	if (str_list[1] == "Value") {
 		goal->Variable[index].Value = value;
 	}
@@ -80,7 +82,7 @@ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 	goal->Variable[index].Value = std::clamp(goal->Variable[index].Value, 0, goal->GetModifiedVariable(index, VariableAttribute::Max));
 	//Wyrmgus end
 
-	goal->on_variable_changed(index);
+	goal->on_variable_changed(index, goal->Variable[index].Value - old_value);
 }
 
 /*
