@@ -126,15 +126,15 @@ void DoScrollArea(int state, bool fast, bool isKeyboard, const Qt::KeyboardModif
 
 	if (fast) {
 		//Wyrmgus start
-//		stepx = (int)(speed * vp->MapWidth / 2 * wyrmgus::defines::get()->get_tile_width() * FRAMES_PER_SECOND / 4);
-//		stepy = (int)(speed * vp->MapHeight / 2 * wyrmgus::defines::get()->get_tile_height() * FRAMES_PER_SECOND / 4);
-		stepx = (int)(speed * wyrmgus::defines::get()->get_scaled_tile_width() * FRAMES_PER_SECOND / 4 * 4);
-		stepy = (int)(speed * wyrmgus::defines::get()->get_scaled_tile_height() * FRAMES_PER_SECOND / 4 * 4);
+//		stepx = (int)(speed * vp->MapWidth / 2 * defines::get()->get_tile_width() * FRAMES_PER_SECOND / 4);
+//		stepy = (int)(speed * vp->MapHeight / 2 * defines::get()->get_tile_height() * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * defines::get()->get_scaled_tile_width() * FRAMES_PER_SECOND / 4 * 4);
+		stepy = (int)(speed * defines::get()->get_scaled_tile_height() * FRAMES_PER_SECOND / 4 * 4);
 		//Wyrmgus end
 	} else {// dynamic: let these variables increase up to fast..
 		// FIXME: pixels per second should be configurable
-		stepx = (int)(speed * wyrmgus::defines::get()->get_scaled_tile_width() * FRAMES_PER_SECOND / 4);
-		stepy = (int)(speed * wyrmgus::defines::get()->get_scaled_tile_height() * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * defines::get()->get_scaled_tile_width() * FRAMES_PER_SECOND / 4);
+		stepy = (int)(speed * defines::get()->get_scaled_tile_height() * FRAMES_PER_SECOND / 4);
 	}
 	if ((state & (ScrollLeft | ScrollRight)) && (state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
 		stepx = stepx * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
@@ -490,23 +490,11 @@ void GameMainLoop()
 	MultiPlayerReplayEachCycle();
 	
 	//Wyrmgus start
-	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
+	if (GameCycle == 0) { //so that these don't trigger when loading a saved game
 		const campaign *current_campaign = game::get()->get_current_campaign();
-		if (current_campaign != nullptr) {
-			game::get()->apply_player_history();
-		}
-		
-		//update the sold units of all units before starting, to make sure they fit the current conditions
-		//make a copy of the units list, as updating the sold units can change the list
-		const std::vector<CUnit *> units = wyrmgus::unit_manager::get()->get_units();
-		for (CUnit *unit : units) {
-			if (unit && unit->IsAlive()) {
-				unit->UpdateSoldUnits();
-			}
-		}
 		
 		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
-			wyrmgus::context ctx;
+			context ctx;
 			ctx.current_player = CPlayer::GetThisPlayer();
 			CurrentQuest->IntroductionDialogue->call(CPlayer::GetThisPlayer(), ctx);
 		}

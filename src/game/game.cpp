@@ -1722,6 +1722,19 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 		std::throw_with_nested(std::runtime_error("Failed to preprocess map."));
 	}
 
+	if (current_campaign != nullptr) {
+		game::get()->apply_player_history();
+	}
+
+	//update the sold units of all units before starting, to make sure they fit the current conditions
+	//make a copy of the units list, as updating the sold units can change the list
+	const std::vector<CUnit *> units = unit_manager::get()->get_units();
+	for (CUnit *unit : units) {
+		if (unit && unit->IsAlive()) {
+			unit->UpdateSoldUnits();
+		}
+	}
+
 	map->reset_tile_visibility();
 
 	//update the sight of all units, and mark tiles as visible
