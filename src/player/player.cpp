@@ -544,6 +544,42 @@ void CPlayer::calculate_military_score()
 	}
 }
 
+bool CPlayer::has_military_advantage_over(const CPlayer *other_player) const
+{
+	const int military_score = this->get_military_score_with_overlords();
+	const int other_military_score = other_player->get_military_score_with_overlords();
+
+	int net_military_score = military_score - other_military_score;
+
+	for (const int player_index : this->enemies) {
+		const CPlayer *enemy_player = CPlayer::Players[player_index].get();
+		if (enemy_player == other_player) {
+			continue;
+		}
+
+		if (enemy_player->is_any_overlord_of(other_player)) {
+			continue;
+		}
+
+		net_military_score -= enemy_player->get_military_score();
+	}
+
+	for (const int player_index : other_player->enemies) {
+		const CPlayer *enemy_player = CPlayer::Players[player_index].get();
+		if (enemy_player == this) {
+			continue;
+		}
+
+		if (enemy_player->is_any_overlord_of(this)) {
+			continue;
+		}
+
+		net_military_score += enemy_player->get_military_score();
+	}
+
+	return net_military_score > 0;
+}
+
 void CPlayer::Save(CFile &file) const
 {
 	const CPlayer &p = *this;

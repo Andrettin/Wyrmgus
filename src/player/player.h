@@ -726,12 +726,24 @@ public:
 		return this->military_score;
 	}
 
+	int get_military_score_with_overlords() const
+	{
+		int score = this->get_military_score();
+
+		if (this->get_overlord() != nullptr) {
+			score += this->get_overlord()->get_military_score_with_overlords();
+		}
+
+		return score;
+	}
+
 	void change_military_score(const int change)
 	{
 		this->military_score += change;
 	}
 
 	void calculate_military_score();
+	bool has_military_advantage_over(const CPlayer *other_player) const;
 
 	int get_resource_total(const resource *resource) const
 	{
