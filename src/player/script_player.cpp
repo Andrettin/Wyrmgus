@@ -316,7 +316,7 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "total-unit-limit")) {
 			this->TotalUnitLimit = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "score")) {
-			this->Score = LuaToNumber(l, j + 1);
+			this->score = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-units")) {
 			this->TotalUnits = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-buildings")) {
@@ -2379,9 +2379,6 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "TotalUnitLimit")) {
 		lua_pushnumber(l, p->TotalUnitLimit);
 		return 1;
-	} else if (!strcmp(data, "Score")) {
-		lua_pushnumber(l, p->Score);
-		return 1;
 	} else if (!strcmp(data, "TotalUnits")) {
 		lua_pushnumber(l, p->TotalUnits);
 		return 1;
@@ -2592,8 +2589,6 @@ static int CclSetPlayerData(lua_State *l)
 		p->BuildingLimit = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "TotalUnitLimit")) {
 		p->TotalUnitLimit = LuaToNumber(l, 3);
-	} else if (!strcmp(data, "Score")) {
-		p->Score = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "TotalUnits")) {
 		p->TotalUnits = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "TotalBuildings")) {

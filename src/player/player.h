@@ -711,6 +711,16 @@ public:
 		return this->Ai.get();
 	}
 
+	int get_score() const
+	{
+		return this->score;
+	}
+
+	void change_score(const int change)
+	{
+		this->score += change;
+	}
+
 	int get_resource_total(const resource *resource) const
 	{
 		const auto find_iterator = this->resource_totals.find(resource);
@@ -1160,7 +1170,9 @@ public:
 	int BuildingLimit;   /// # buildings allowed
 	int TotalUnitLimit;  /// # total unit number allowed
 
-	int Score = 0;           /// Player score points
+private:
+	int score = 0;           /// Player score points
+public:
 	int TotalUnits = 0;
 	int TotalBuildings = 0;
 private:

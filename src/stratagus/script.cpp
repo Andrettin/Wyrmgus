@@ -890,8 +890,6 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		return player->BuildingLimit;
 	} else if (!strcmp(prop, "TotalUnitLimit")) {
 		return player->TotalUnitLimit;
-	} else if (!strcmp(prop, "Score")) {
-		return player->Score;
 	} else if (!strcmp(prop, "TotalUnits")) {
 		return player->TotalUnits;
 	} else if (!strcmp(prop, "TotalBuildings")) {

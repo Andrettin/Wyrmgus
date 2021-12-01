@@ -136,29 +136,8 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 //	const Vec2i pos(goalPos - type.GetHalfTileSize());
 	//Wyrmgus end
 
-	//Wyrmgus start
-//	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
-	//Wyrmgus end
 	if (caster.is_enemy_of(*target)) {
-		//Wyrmgus start
-		caster.Player->Score += target->Variable[POINTS_INDEX].Value;
-		//Wyrmgus end
-		if (target->Type->BoolFlag[BUILDING_INDEX].value) {
-			caster.Player->TotalRazings++;
-		} else {
-			caster.Player->TotalKills++;
-		}
-		//Wyrmgus start
-		caster.Player->UnitTypeKills[target->Type->Slot]++;
-		
-		//distribute experience between nearby units belonging to the same player
-		if (!target->Type->BoolFlag[BUILDING_INDEX].value) {
-			caster.ChangeExperience(UseHPForXp ? target->Variable[HP_INDEX].Value : target->Variable[POINTS_INDEX].Value, ExperienceRange);
-		}
-		//Wyrmgus end
-		caster.Variable[KILL_INDEX].Value++;
-		caster.Variable[KILL_INDEX].Max++;
-		caster.Variable[KILL_INDEX].Enable = 1;
+		HitUnit_IncreaseScoreForKill(caster, *target, false);
 	}
 
 	// as said somewhere else -- no corpses :)

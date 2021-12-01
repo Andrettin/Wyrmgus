@@ -1059,6 +1059,7 @@ extern int ThreatCalculate(const CUnit &unit, const CUnit &dest);
 //Wyrmgus start
 //extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = nullptr);
 extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = nullptr, bool show_damage = true);
+extern void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target, const bool include_contained_units);
 extern void HitUnit_NormalHitSpecialDamageEffects(CUnit &attacker, CUnit &target);
 extern void HitUnit_SpecialDamageEffect(CUnit &target, int dmg_var);
 extern void HitUnit_RunAway(CUnit &target, const CUnit &attacker);

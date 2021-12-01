@@ -672,7 +672,7 @@ void CPlayer::Save(CFile &file) const
 	file.printf(" \"building-limit\", %d,", p.BuildingLimit);
 	file.printf(" \"total-unit-limit\", %d,", p.TotalUnitLimit);
 
-	file.printf("\n  \"score\", %d,", p.Score);
+	file.printf("\n  \"score\", %d,", p.get_score());
 	file.printf("\n  \"total-units\", %d,", p.TotalUnits);
 	file.printf("\n  \"total-buildings\", %d,", p.TotalBuildings);
 	file.printf("\n  \"total-resources\", {");
@@ -1015,7 +1015,7 @@ void CPlayer::Init(player_type type)
 	this->NumBuildingsUnderConstruction = 0;
 	this->NumTownHalls = 0;
 	//Wyrmgus end
-	this->Score = 0;
+	this->score = 0;
 	//Wyrmgus start
 	this->LostTownHallTimer = 0;
 	this->HeroCooldownTimer = 0;
@@ -2464,7 +2464,7 @@ void CPlayer::Clear()
 	//	UnitLimit = 0;
 	//	BuildingLimit = 0;
 	//	TotalUnitLimit = 0;
-	this->Score = 0;
+	this->score = 0;
 	this->TotalUnits = 0;
 	this->TotalBuildings = 0;
 	this->resource_totals.clear();

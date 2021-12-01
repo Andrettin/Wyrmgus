@@ -804,7 +804,7 @@ void DrawResources(std::vector<std::function<void(renderer *)>> &render_commands
 		}
 	}
 	if (UI.Resources[ScoreCost].TextX != -1) {
-		const int score = CPlayer::GetThisPlayer()->Score;
+		const int score = CPlayer::GetThisPlayer()->get_score();
 
 		UI.Resources[ScoreCost].Text = FormatNumber(score);
 		UI.Resources[ScoreCost].Font = score > 99999 ? wyrmgus::defines::get()->get_small_font() : wyrmgus::defines::get()->get_game_font();

@@ -7364,23 +7364,22 @@ static bool HitUnit_IsUnitWillDie(const CUnit *attacker, const CUnit &target, in
 		   || (target.Variable[HP_INDEX].Value == 0);
 }
 
-static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
+void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target, const bool include_contained_units)
 {
-	attacker.Player->Score += target.Variable[POINTS_INDEX].Value;
+	attacker.Player->change_score(target.Variable[POINTS_INDEX].Value);
+
 	if (target.Type->BoolFlag[BUILDING_INDEX].value) {
 		attacker.Player->TotalRazings++;
 	} else {
 		attacker.Player->TotalKills++;
 	}
 	
-	//Wyrmgus start
 	attacker.Player->UnitTypeKills[target.Type->Slot]++;
 	
 	//distribute experience between nearby units belonging to the same player
 	if (!target.Type->BoolFlag[BUILDING_INDEX].value) {
 		attacker.ChangeExperience(UseHPForXp ? target.Variable[HP_INDEX].Value : target.Variable[POINTS_INDEX].Value, ExperienceRange);
 	}
-	//Wyrmgus end
 	
 	attacker.Variable[KILL_INDEX].Value++;
 	attacker.Variable[KILL_INDEX].Max++;
@@ -7388,20 +7387,15 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	
 	attacker.Player->on_unit_destroyed(&target);
 
-	//Wyrmgus start
 	//also increase score for units inside the target that will be destroyed when the target dies
-	if (
-		target.UnitInside
-		&& !target.Type->BoolFlag[SAVECARGO_INDEX].value
-	) {
+	if (target.UnitInside && include_contained_units) {
 		CUnit *boarded_unit = target.UnitInside;
 		for (int i = 0; i < target.InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
 			if (!boarded_unit->Type->BoolFlag[ITEM_INDEX].value) { //ignore items
-				HitUnit_IncreaseScoreForKill(attacker, *boarded_unit);
+				HitUnit_IncreaseScoreForKill(attacker, *boarded_unit, include_contained_units);
 			}
 		}
 	}
-	//Wyrmgus end
 }
 
 static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
@@ -7752,7 +7746,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		}
 		if (destroyer) {
 			if (target.is_enemy_of(*destroyer) || target.Player->get_type() == player_type::neutral) {
-				HitUnit_IncreaseScoreForKill(*destroyer, target);
+				HitUnit_IncreaseScoreForKill(*destroyer, target, !target.Type->BoolFlag[SAVECARGO_INDEX].value);
 			}
 		}
 		LetUnitDie(target);

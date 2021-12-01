@@ -224,7 +224,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 			}
 		}
 	}
-					
+	
 	//Wyrmgus start
 	//change variation if upgrading (new unit type may have different variations)
 	unit.ChooseVariation(&newtype);
