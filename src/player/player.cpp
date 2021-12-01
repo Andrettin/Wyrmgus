@@ -551,7 +551,7 @@ bool CPlayer::has_military_advantage_over(const CPlayer *other_player) const
 
 	int net_military_score = military_score - other_military_score;
 
-	for (const int player_index : this->enemies) {
+	for (const int player_index : this->get_enemies()) {
 		const CPlayer *enemy_player = CPlayer::Players[player_index].get();
 		if (enemy_player == other_player) {
 			continue;
@@ -564,7 +564,7 @@ bool CPlayer::has_military_advantage_over(const CPlayer *other_player) const
 		net_military_score -= enemy_player->get_military_score();
 	}
 
-	for (const int player_index : other_player->enemies) {
+	for (const int player_index : other_player->get_enemies()) {
 		const CPlayer *enemy_player = CPlayer::Players[player_index].get();
 		if (enemy_player == this) {
 			continue;
@@ -1990,6 +1990,19 @@ site_set CPlayer::get_border_settlements() const
 	}
 
 	return border_settlements;
+}
+
+player_set CPlayer::get_border_players() const
+{
+	player_set border_players;
+
+	const site_set border_settlements = this->get_border_settlements();
+
+	for (const site *border_settlement : border_settlements) {
+		border_players.insert(border_settlement->get_game_data()->get_owner());
+	}
+
+	return border_players;
 }
 
 bool CPlayer::HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement) const

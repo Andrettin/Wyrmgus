@@ -299,6 +299,7 @@ public:
 	const wyrmgus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
 	void update_building_settlement_assignment(const wyrmgus::site *old_settlement, const int z) const;
 	site_set get_border_settlements() const;
+	player_set get_border_players() const;
 
 	bool HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
@@ -870,6 +871,11 @@ public:
 	//Wyrmgus end
 	/// Notify player about a problem
 	void Notify(const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
+
+	const player_index_set &get_enemies() const
+	{
+		return this->enemies;
+	}
 
 	bool has_enemy_stance_with(const int index) const
 	{

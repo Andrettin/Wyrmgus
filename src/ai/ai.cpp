@@ -135,6 +135,7 @@
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
+#include "game/game.h"
 #include "grand_strategy.h"
 #include "iolib.h"
 //Wyrmgus start
@@ -171,6 +172,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/assert_util.h"
+#include "util/container_util.h"
 #include "util/enum_util.h"
 #include "util/log_util.h"
 #include "util/util.h"
@@ -183,6 +185,29 @@ std::vector<std::unique_ptr<CAiType>> AiTypes; /// List of all AI types.
 AiHelper AiHelpers;             /// AI helper variables
 
 PlayerAi *AiPlayer;             /// Current AI player
+
+void PlayerAi::evaluate_diplomacy()
+{
+	if (game::get()->get_current_campaign() == nullptr) {
+		//only evaluate diplomacy in the campaign mode
+		return;
+	}
+
+	//evaluate whether the AI's diplomacy should change
+
+	//check if any players we have a hostile stance to do not have a hostile stance with us, and if so, whether we should accept peace
+	for (const int player_index : this->Player->get_enemies()) {
+		const CPlayer *enemy_player = CPlayer::Players[player_index].get();
+
+		if (enemy_player->has_enemy_stance_with(this->Player)) {
+			continue;
+		}
+
+		if (enemy_player->has_military_advantage_over(this->Player)) {
+			this->Player->set_neutral_diplomatic_stance_with(enemy_player);
+		}
+	}
+}
 
 void PlayerAi::check_quest_objectives()
 {
@@ -1508,6 +1533,8 @@ void AiEachSecond(CPlayer &player)
 	if (GameCycle > AiPlayer->LastExplorationGameCycle + 5 * CYCLES_PER_SECOND) {
 		AiSendExplorers();
 	}
+
+	AiPlayer->evaluate_diplomacy();
 }
 
 /**

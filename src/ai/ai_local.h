@@ -404,7 +404,8 @@ public:
 	void remove_site_transport_unit(CUnit *unit);
 	void transport_worker_to_site(const site *site);
 	void check_site_transport_units();
-
+	
+	void evaluate_diplomacy();
 	void check_quest_objectives();
 
 	CPlayer *Player = nullptr;		/// Engine player structure
