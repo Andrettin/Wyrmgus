@@ -2991,6 +2991,15 @@ void CUnit::AssignToPlayer(CPlayer &player)
 {
 	const wyrmgus::unit_type &type = *Type;
 
+	this->Stats = &type.Stats[player.get_index()];
+
+	if (!SaveGameLoading) {
+		if (UnitTypeVar.GetNumberVariable()) {
+			assert_throw(!this->Stats->Variables.empty());
+			this->Variable = this->Stats->Variables;
+		}
+	}
+
 	// Build player unit table
 	//Wyrmgus start
 //	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitAction::Die) {
@@ -3018,7 +3027,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		
 		player.IncreaseCountsForUnit(this);
 
-		player.Demand += type.Stats[player.get_index()].Variables[DEMAND_INDEX].Value; // food needed
+		player.Demand += type.Stats[player.get_index()].Variables[DEMAND_INDEX].Value; //food needed
 	}
 
 	// Don't Add the building if it's dying, used to load a save game
@@ -3040,14 +3049,8 @@ void CUnit::AssignToPlayer(CPlayer &player)
 //		}
 		//Wyrmgus end
 	}
-	Player = &player;
-	Stats = &type.Stats[Player->get_index()];
-	if (!SaveGameLoading) {
-		if (UnitTypeVar.GetNumberVariable()) {
-			assert_throw(!Stats->Variables.empty());
-			this->Variable = Stats->Variables;
-		}
-	}
+
+	this->Player = &player;
 	
 	//Wyrmgus start
 	if (!SaveGameLoading) {
