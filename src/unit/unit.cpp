@@ -3736,8 +3736,11 @@ void CUnit::on_variable_changed(const int var_index, const int change)
 			}
 			break;
 		case LEVEL_INDEX:
+			this->UpdateXPRequired();
+			break;
 		case POINTS_INDEX:
 			this->UpdateXPRequired();
+			this->Player->change_military_score(change);
 			break;
 		case XP_INDEX:
 			this->XPChanged();
@@ -7057,6 +7060,27 @@ bool CUnit::is_near_site(const wyrmgus::site *site) const
 
 		return this->MapDistanceTo(site_data->get_map_pos(), site_data->get_map_layer()->ID) <= 1;
 	}
+}
+
+bool CUnit::counts_for_military_score() const
+{
+	if (!this->IsAlive()) {
+		return false;
+	}
+
+	if (!this->CanMove()) {
+		return false;
+	}
+
+	if (this->Type->BoolFlag[HARVESTER_INDEX].value) {
+		return false;
+	}
+
+	if (!this->CanAttack()) {
+		return false;
+	}
+
+	return true;
 }
 
 /**

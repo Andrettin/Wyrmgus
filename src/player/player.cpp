@@ -529,6 +529,21 @@ void CPlayer::set_revealed(const bool revealed)
 	}
 }
 
+void CPlayer::calculate_military_score()
+{
+	this->military_score = 0;
+
+	for (int i = 0; i < this->GetUnitCount(); ++i) {
+		const CUnit &unit = this->GetUnit(i);
+
+		if (!unit.counts_for_military_score()) {
+			continue;
+		}
+
+		this->military_score += unit.Variable[POINTS_INDEX].Value;
+	}
+}
+
 void CPlayer::Save(CFile &file) const
 {
 	const CPlayer &p = *this;
@@ -1016,6 +1031,7 @@ void CPlayer::Init(player_type type)
 	this->NumTownHalls = 0;
 	//Wyrmgus end
 	this->score = 0;
+	this->military_score = 0;
 	//Wyrmgus start
 	this->LostTownHallTimer = 0;
 	this->HeroCooldownTimer = 0;
@@ -2465,6 +2481,7 @@ void CPlayer::Clear()
 	//	BuildingLimit = 0;
 	//	TotalUnitLimit = 0;
 	this->score = 0;
+	this->military_score = 0;
 	this->TotalUnits = 0;
 	this->TotalBuildings = 0;
 	this->resource_totals.clear();
@@ -3786,33 +3803,40 @@ int CPlayer::GetUpgradeCostsMask(const CUpgrade *upgrade) const
 
 //Wyrmgus end
 
-void CPlayer::SetUnitTypeCount(const wyrmgus::unit_type *type, int quantity)
+void CPlayer::SetUnitTypeCount(const unit_type *type, int quantity)
 {
 	if (!type) {
 		return;
 	}
 	
 	if (quantity <= 0) {
-		if (this->UnitTypesCount.find(type) != this->UnitTypesCount.end()) {
-			this->UnitTypesCount.erase(type);
+		auto find_iterator = this->UnitTypesCount.find(type);
+		if (find_iterator != this->UnitTypesCount.end()) {
+			this->UnitTypesCount.erase(find_iterator);
 		}
 	} else {
 		this->UnitTypesCount[type] = quantity;
 	}
 }
 
-void CPlayer::ChangeUnitTypeCount(const wyrmgus::unit_type *type, int quantity)
+void CPlayer::ChangeUnitTypeCount(const unit_type *type, int quantity)
 {
 	this->SetUnitTypeCount(type, this->GetUnitTypeCount(type) + quantity);
 }
 
-int CPlayer::GetUnitTypeCount(const wyrmgus::unit_type *type) const
+int CPlayer::GetUnitTypeCount(const unit_type *type) const
 {
-	if (type != nullptr && this->UnitTypesCount.find(type) != this->UnitTypesCount.end()) {
-		return this->UnitTypesCount.find(type)->second;
-	} else {
+	if (type == nullptr) {
 		return 0;
 	}
+
+	const auto find_iterator = this->UnitTypesCount.find(type);
+
+	if (find_iterator != this->UnitTypesCount.end()) {
+		return find_iterator->second;
+	}
+
+	return 0;
 }
 
 void CPlayer::SetUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type, int quantity)
@@ -3875,7 +3899,7 @@ int CPlayer::GetUnitTypeAiActiveCount(const wyrmgus::unit_type *type) const
 
 void CPlayer::IncreaseCountsForUnit(CUnit *unit, const bool type_change)
 {
-	const wyrmgus::unit_type *type = unit->Type;
+	const unit_type *type = unit->Type;
 
 	this->ChangeUnitTypeCount(type, 1);
 	this->units_by_type[type].push_back(unit);
@@ -3891,6 +3915,10 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, const bool type_change)
 
 	if (type->BoolFlag[TOWNHALL_INDEX].value) {
 		this->NumTownHalls++;
+	}
+
+	if (unit->counts_for_military_score()) {
+		this->change_military_score(unit->Variable[POINTS_INDEX].Value);
 	}
 	
 	for (const auto &[resource, quantity] : type->Stats[this->get_index()].get_resource_demands()) {
@@ -3946,7 +3974,11 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, const bool type_change)
 	if (type->BoolFlag[TOWNHALL_INDEX].value) {
 		this->NumTownHalls--;
 	}
-	
+
+	if (unit->counts_for_military_score()) {
+		this->change_military_score(-unit->Variable[POINTS_INDEX].Value);
+	}
+
 	for (const auto &[resource, quantity] : type->Stats[this->get_index()].get_resource_demands()) {
 		this->change_resource_demand(resource, -quantity);
 	}

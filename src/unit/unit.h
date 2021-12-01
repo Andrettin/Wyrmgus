@@ -752,6 +752,7 @@ public:
 	}
 
 	bool is_near_site(const wyrmgus::site *site) const;
+	bool counts_for_military_score() const;
 
 public:
 	class CUnitManagerData final

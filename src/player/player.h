@@ -721,6 +721,18 @@ public:
 		this->score += change;
 	}
 
+	int get_military_score() const
+	{
+		return this->military_score;
+	}
+
+	void change_military_score(const int change)
+	{
+		this->military_score += change;
+	}
+
+	void calculate_military_score();
+
 	int get_resource_total(const resource *resource) const
 	{
 		const auto find_iterator = this->resource_totals.find(resource);
@@ -1171,7 +1183,8 @@ public:
 	int TotalUnitLimit;  /// # total unit number allowed
 
 private:
-	int score = 0;           /// Player score points
+	int score = 0; //player score points
+	int military_score = 0; //how militarily powerful the player is
 public:
 	int TotalUnits = 0;
 	int TotalBuildings = 0;

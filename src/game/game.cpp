@@ -603,9 +603,12 @@ void StartMap(const std::filesystem::path &filepath, const bool clean)
 	//	UI.StatusLine.Set(NameLine);
 		//Wyrmgus end
 
-		//update the quest pool for all players
-		for (size_t i = 0; i < PlayerNumNeutral; ++i) {
-			CPlayer::Players[i]->update_quest_pool();
+		for (CPlayer *player : CPlayer::get_non_neutral_players()) {
+			//update the quest pool for all players
+			player->update_quest_pool();
+
+			//recalculate the military score when starting the game
+			player->calculate_military_score();
 		}
 
 		if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::get()->MapLayers.size())) {
