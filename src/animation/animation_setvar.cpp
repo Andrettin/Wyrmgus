@@ -80,17 +80,7 @@ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 	goal->Variable[index].Value = std::clamp(goal->Variable[index].Value, 0, goal->GetModifiedVariable(index, VariableAttribute::Max));
 	//Wyrmgus end
 
-	//Wyrmgus start
-	if (index == ATTACKRANGE_INDEX && goal->Container) {
-		goal->Container->UpdateContainerAttackRange();
-	} else if (index == LEVEL_INDEX || index == POINTS_INDEX) {
-		goal->UpdateXPRequired();
-	} else if (index == XP_INDEX) {
-		goal->XPChanged();
-	} else if (index == KNOWLEDGEMAGIC_INDEX) {
-		goal->CheckIdentification();
-	}
-	//Wyrmgus end
+	goal->on_variable_changed(index);
 }
 
 /*

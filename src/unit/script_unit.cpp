@@ -2060,19 +2060,8 @@ static int CclSetUnitVariable(lua_State *l)
 				LuaError(l, "Bad variable type '%s'\n" _C_ type);
 			}
 		}
-		//Wyrmgus start
-		if (index == ATTACKRANGE_INDEX && unit->Container) {
-			unit->Container->UpdateContainerAttackRange();
-		} else if (index == LEVELUP_INDEX) {
-			unit->Player->UpdateLevelUpUnits();
-		} else if (index == LEVEL_INDEX || index == POINTS_INDEX) {
-			unit->UpdateXPRequired();
-		} else if (index == XP_INDEX) {
-			unit->XPChanged();
-		} else if (index == KNOWLEDGEMAGIC_INDEX) {
-			unit->CheckIdentification();
-		}
-		//Wyrmgus end
+
+		unit->on_variable_changed(index);
 	}
 	lua_pushnumber(l, value);
 	//Wyrmgus start

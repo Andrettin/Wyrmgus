@@ -3723,6 +3723,32 @@ void CUnit::UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settleme
 	}
 }
 
+void CUnit::on_variable_changed(const int var_index)
+{
+	switch (var_index) {
+		case ATTACKRANGE_INDEX:
+			if (this->Container != nullptr) {
+				this->Container->UpdateContainerAttackRange();
+			}
+			break;
+		case LEVEL_INDEX:
+		case POINTS_INDEX:
+			this->UpdateXPRequired();
+			break;
+		case XP_INDEX:
+			this->XPChanged();
+			break;
+		case LEVELUP_INDEX:
+			this->Player->UpdateLevelUpUnits();
+			break;
+		case KNOWLEDGEMAGIC_INDEX:
+			this->CheckIdentification();
+			break;
+		default:
+			break;
+	}
+}
+
 void CUnit::XPChanged()
 {
 	if (!this->Type->can_gain_experience()) {
@@ -7492,17 +7518,7 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 		}
 	}
 	
-	//Wyrmgus start
-	if (var == ATTACKRANGE_INDEX && target.Container) {
-		target.Container->UpdateContainerAttackRange();
-	} else if (var == LEVEL_INDEX || var == POINTS_INDEX) {
-		target.UpdateXPRequired();
-	} else if (var == XP_INDEX) {
-		target.XPChanged();
-	} else if (var == KNOWLEDGEMAGIC_INDEX) {
-		target.CheckIdentification();
-	}
-	//Wyrmgus end
+	target.on_variable_changed(var);
 }
 
 static void HitUnit_Burning(CUnit &target)

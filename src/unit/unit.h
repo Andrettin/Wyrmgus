@@ -198,8 +198,9 @@ public:
 	void UpdateExtraName();
 	void UpdateSettlement();
 	void UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settlement = nullptr); //update the settlement assignment of surrounding buildings for this town hall
-	void XPChanged();
 	//Wyrmgus end
+	void on_variable_changed(const int var_index);
+	void XPChanged();
 	/// Change owner of unit
 	//Wyrmgus start
 //	void ChangeOwner(CPlayer &newplayer);
