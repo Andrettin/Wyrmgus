@@ -90,7 +90,8 @@ public:
 			variation->LayerFiles[i] = this->LayerFiles[i];
 		}
 		variation->ButtonIcons = this->ButtonIcons;
-		variation->conditions_ptr = this->conditions_ptr;
+		variation->player_conditions_ptr = this->player_conditions_ptr;
+		variation->unit_conditions_ptr = this->unit_conditions_ptr;
 
 		return variation;
 	}
@@ -165,9 +166,14 @@ public:
 		return this->construction;
 	}
 	
-	const and_condition *get_conditions() const
+	const and_condition *get_player_conditions() const
 	{
-		return this->conditions_ptr;
+		return this->player_conditions_ptr;
+	}
+
+	const and_condition *get_unit_conditions() const
+	{
+		return this->unit_conditions_ptr;
 	}
 
 signals:
@@ -221,8 +227,10 @@ public:
 	std::map<ButtonCmd, IconConfig> ButtonIcons;				/// icons for button actions
 
 private:
-	std::unique_ptr<const and_condition> conditions;
-	const and_condition *conditions_ptr = nullptr;
+	std::unique_ptr<const and_condition> player_conditions;
+	const and_condition *player_conditions_ptr = nullptr;
+	std::unique_ptr<const and_condition> unit_conditions;
+	const and_condition *unit_conditions_ptr = nullptr;
 
 	friend int ::CclDefineUnitType(lua_State *l);
 	friend class unit_type;

@@ -100,11 +100,16 @@ void unit_type_variation::process_sml_scope(const sml_data &scope)
 			const resource *resource = resource::get(property.get_key());
 			this->FileWhenLoaded[resource->get_index()] = database::get()->get_graphics_filepath(property.get_value());
 		});
-	} else if (tag == "conditions") {
+	} else if (tag == "player_conditions") {
 		auto conditions = std::make_unique<and_condition>();
 		database::process_sml_data(conditions, scope);
-		this->conditions = std::move(conditions);
-		this->conditions_ptr = this->conditions.get();
+		this->player_conditions = std::move(conditions);
+		this->player_conditions_ptr = this->player_conditions.get();
+	} else if (tag == "conditions" || tag == "unit_conditions") {
+		auto conditions = std::make_unique<and_condition>();
+		database::process_sml_data(conditions, scope);
+		this->unit_conditions = std::move(conditions);
+		this->unit_conditions_ptr = this->unit_conditions.get();
 	} else {
 		throw std::runtime_error("Invalid unit type variation scope: \"" + tag + "\".");
 	}
@@ -304,8 +309,12 @@ void unit_type_variation::ProcessConfigData(const CConfigData *config_data)
 
 void unit_type_variation::check() const
 {
-	if (this->get_conditions() != nullptr) {
-		this->get_conditions()->check_validity();
+	if (this->get_player_conditions() != nullptr) {
+		this->get_player_conditions()->check_validity();
+	}
+
+	if (this->get_unit_conditions() != nullptr) {
+		this->get_unit_conditions()->check_validity();
 	}
 }
 

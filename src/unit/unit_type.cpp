@@ -2202,6 +2202,7 @@ int unit_type::get_resource_step(const resource *resource, const int player) con
 const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player, const int image_layer) const
 {
 	const std::vector<qunique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
+
 	for (const auto &variation : variation_list) {
 		bool upgrades_check = true;
 		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
@@ -2223,8 +2224,14 @@ const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player,
 		if (upgrades_check == false) {
 			continue;
 		}
+
+		if (variation->get_player_conditions() != nullptr && !variation->get_player_conditions()->check(player)) {
+			continue;
+		}
+
 		return variation.get();
 	}
+
 	return nullptr;
 }
 
