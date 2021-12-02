@@ -196,7 +196,11 @@ void PlayerAi::evaluate_diplomacy()
 	//evaluate whether the AI's diplomacy should change
 
 	//check if any players we have a hostile stance to do not have a hostile stance with us, and if so, whether we should accept peace
-	for (const int player_index : this->Player->get_enemies()) {
+
+	//copy the set, as we may modify the original one during the loop
+	const player_index_set enemies = this->Player->get_enemies();
+
+	for (const int player_index : enemies) {
 		const CPlayer *enemy_player = CPlayer::Players[player_index].get();
 
 		if (enemy_player->has_enemy_stance_with(this->Player)) {
