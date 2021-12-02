@@ -30,6 +30,7 @@ namespace wyrmgus {
 
 enum class government_type {
 	none,
+	tribe,
 	monarchy,
 	republic,
 	theocracy
@@ -39,6 +40,8 @@ inline government_type string_to_government_type(const std::string &str)
 {
 	if (str == "none") {
 		return government_type::none;
+	} else if (str == "tribe") {
+		return government_type::tribe;
 	} else if (str == "monarchy") {
 		return government_type::monarchy;
 	} else if (str == "republic") {
@@ -55,6 +58,8 @@ inline std::string government_type_to_string(const government_type government_ty
 	switch (government_type) {
 		case government_type::none:
 			return "none";
+		case government_type::tribe:
+			return "tribe";
 		case government_type::monarchy:
 			return "monarchy";
 		case government_type::republic:

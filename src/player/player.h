@@ -206,10 +206,7 @@ public:
 		return this->government_type;
 	}
 
-	void set_government_type(const wyrmgus::government_type government_type)
-	{
-		this->government_type = government_type;
-	}
+	void set_government_type(const wyrmgus::government_type government_type);
 
 	const wyrmgus::religion *get_religion() const
 	{

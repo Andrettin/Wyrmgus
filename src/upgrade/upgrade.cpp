@@ -58,6 +58,7 @@
 #include "player/civilization_group.h"
 #include "player/dynasty.h"
 #include "player/faction.h"
+#include "player/government_type.h"
 #include "player/player.h"
 #include "religion/deity.h"
 #include "script.h"
@@ -255,7 +256,8 @@ bool CUpgrade::compare_encyclopedia_entries(const CUpgrade *lhs, const CUpgrade 
 	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
-CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifier), Work(item_class::none)
+CUpgrade::CUpgrade(const std::string &identifier)
+	: detailed_data_entry(identifier), Work(item_class::none), government_type(government_type::none)
 {
 }
 
@@ -386,6 +388,10 @@ void CUpgrade::initialize()
 		} else if (this->civilization_group != nullptr) {
 			this->civilization_group->set_class_upgrade(upgrade_class, this);
 		}
+	}
+
+	if (this->get_government_type() != government_type::none) {
+		CUpgrade::government_type_upgrades[this->get_government_type()] = this;
 	}
 
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->get_identifier() + "\")) then table.insert(Units, \"" + this->get_identifier() + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
@@ -2112,6 +2118,10 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	}
 	//Wyrmgus end
 
+	if (upgrade->get_government_type() != government_type::none && player.get_government_type() != upgrade->get_government_type()) {
+		player.set_government_type(upgrade->get_government_type());
+	}
+	
 	if (upgrade->get_dynasty() != nullptr && player.get_dynasty() != upgrade->get_dynasty()) {
 		player.set_dynasty(upgrade->get_dynasty());
 	}

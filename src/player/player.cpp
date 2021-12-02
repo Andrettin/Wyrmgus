@@ -1413,7 +1413,6 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		const wyrmgus::player_color *player_color = nullptr;
 
 		this->set_faction_tier(faction->get_default_tier());
-		this->set_government_type(faction->get_default_government_type());
 
 		const wyrmgus::player_color *faction_color = faction->get_color();
 		if (faction_color != nullptr) {
@@ -1551,6 +1550,24 @@ void CPlayer::set_random_faction()
 		this->SetFaction(chosen_faction);
 	} else {
 		this->SetFaction(nullptr);
+	}
+}
+
+void CPlayer::set_government_type(const wyrmgus::government_type government_type)
+{
+	if (government_type == this->get_government_type()) {
+		return;
+	}
+
+	this->government_type = government_type;
+
+	const CUpgrade *government_type_upgrade = CUpgrade::get_government_type_upgrade(government_type);
+	if (government_type_upgrade != nullptr && !this->has_upgrade(government_type_upgrade)) {
+		if (GameEstablishing) {
+			AllowUpgradeId(*this, government_type_upgrade->ID, 'R');
+		} else {
+			UpgradeAcquire(*this, government_type_upgrade);
+		}
 	}
 }
 

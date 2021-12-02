@@ -212,6 +212,7 @@ void faction::initialize()
 
 	if (this->get_type() == faction_type::tribe) {
 		this->definite_article = true;
+		this->default_government_type = government_type::tribe;
 	}
 
 	std::sort(this->AiBuildingTemplates.begin(), this->AiBuildingTemplates.end(), [](const std::unique_ptr<CAiBuildingTemplate> &a, const std::unique_ptr<CAiBuildingTemplate> &b) {

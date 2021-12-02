@@ -62,6 +62,7 @@ namespace wyrmgus {
 	class upgrade_class;
 	class upgrade_modifier;
 	enum class gender;
+	enum class government_type;
 	enum class item_class;
 }
 
@@ -280,10 +281,22 @@ class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data
 	Q_PROPERTY(bool magic_suffix MEMBER magic_suffix READ is_magic_suffix)
 	Q_PROPERTY(int magic_level MEMBER magic_level READ get_magic_level)
 	Q_PROPERTY(wyrmgus::unit_type* item MEMBER item READ get_item)
+	Q_PROPERTY(wyrmgus::government_type government_type MEMBER government_type READ get_government_type)
 
 public:
 	static constexpr const char *class_identifier = "upgrade";
 	static constexpr const char *database_folder = "upgrades";
+
+	static const CUpgrade *get_government_type_upgrade(const government_type government_type)
+	{
+		const auto find_iterator = CUpgrade::government_type_upgrades.find(government_type);
+
+		if (find_iterator != CUpgrade::government_type_upgrades.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
 
 	static CUpgrade *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
@@ -362,6 +375,10 @@ public:
 		return entries;
 	}
 
+private:
+	static inline std::map<government_type, const CUpgrade *> government_type_upgrades;
+
+public:
 	explicit CUpgrade(const std::string &identifier);
 	~CUpgrade();
 
@@ -602,6 +619,11 @@ public:
 		this->deity = deity;
 	}
 
+	wyrmgus::government_type get_government_type() const
+	{
+		return this->government_type;
+	}
+
 	std::string get_research_verb_string() const
 	{
 		if (this->get_deity() != nullptr) {
@@ -675,6 +697,7 @@ private:
 	const wyrmgus::dynasty *dynasty = nullptr; //the dynasty to which the upgrade pertains, if this is a dynasty upgrade
 	const wyrmgus::deity *deity = nullptr; //the deity to which the upgrade pertains, if this is a deity upgrade
 	const magic_domain *deity_domain = nullptr; //the deity domain to which the upgrade pertains, if this is a deity domain upgrade
+	wyrmgus::government_type government_type; //the government type to which the upgrade pertains, if this is a government type upgrade
 
 	friend int CclDefineUpgrade(lua_State *l);
 	friend int CclDefineDependency(lua_State *l);
