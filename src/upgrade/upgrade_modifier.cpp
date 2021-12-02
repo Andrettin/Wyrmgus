@@ -61,6 +61,8 @@ std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate() const
 	modifier->Modifier = this->Modifier;
 	memcpy(modifier->ModifyPercent.get(), this->ModifyPercent.get(), sizeof(UnitTypeVar.GetNumberVariable()));
 	modifier->SpeedResearch = this->SpeedResearch;
+	modifier->infantry_cost_modifier = this->infantry_cost_modifier;
+	modifier->cavalry_cost_modifier = this->cavalry_cost_modifier;
 	memcpy(modifier->ImproveIncomes, this->ImproveIncomes, sizeof(modifier->ImproveIncomes));
 	modifier->UnitStock = this->UnitStock;
 	memcpy(modifier->ChangeUnits, this->ChangeUnits, sizeof(modifier->ChangeUnits));
@@ -80,19 +82,25 @@ void upgrade_modifier::process_sml_property(const sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	const std::string variable_name = string::snake_case_to_pascal_case(key);
-
-	const int index = UnitTypeVar.VariableNameLookup[variable_name.c_str()]; // variable index
-	if (index != -1) { // valid index
-		if (string::is_number(value)) {
-			this->Modifier.Variables[index].Enable = 1;
-			this->Modifier.Variables[index].Value = std::stoi(value);
-			this->Modifier.Variables[index].Max = std::stoi(value);
-		} else { // error
-			throw std::runtime_error("Invalid value (\"" + value +"\") for variable \"" + key + "\" when defining modifier for upgrade \"" + CUpgrade::get_all()[this->UpgradeId]->get_identifier() + "\".");
-		}
+	if (key == "infantry_cost_modifier") {
+		this->infantry_cost_modifier = std::stoi(value);
+	} else if (key == "cavalry_cost_modifier") {
+		this->cavalry_cost_modifier = std::stoi(value);
 	} else {
-		throw std::runtime_error("Invalid upgrade modifier property: \"" + key + "\".");
+		const std::string variable_name = string::snake_case_to_pascal_case(key);
+
+		const int index = UnitTypeVar.VariableNameLookup[variable_name.c_str()]; // variable index
+		if (index != -1) { // valid index
+			if (string::is_number(value)) {
+				this->Modifier.Variables[index].Enable = 1;
+				this->Modifier.Variables[index].Value = std::stoi(value);
+				this->Modifier.Variables[index].Max = std::stoi(value);
+			} else { // error
+				throw std::runtime_error("Invalid value (\"" + value + "\") for variable \"" + key + "\" when defining modifier for upgrade \"" + CUpgrade::get_all()[this->UpgradeId]->get_identifier() + "\".");
+			}
+		} else {
+			throw std::runtime_error("Invalid upgrade modifier property: \"" + key + "\".");
+		}
 	}
 }
 

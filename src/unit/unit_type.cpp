@@ -2437,6 +2437,11 @@ bool unit_type::can_gain_experience() const
 	return this->BoolFlag[ORGANIC_INDEX].value;
 }
 
+bool unit_type::is_infantry() const
+{
+	return this->BoolFlag[ORGANIC_INDEX].value && !this->BoolFlag[COWARD_INDEX].value && !this->BoolFlag[MOUNTED_INDEX].value && !this->BoolFlag[FAUNA_INDEX].value && !this->BoolFlag[HARVESTER_INDEX].value && this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value == 1 && this->BoolFlag[CANATTACK_INDEX].value;
+}
+
 gender unit_type::get_gender() const
 {
 	return this->DefaultStat.get_gender();

@@ -1504,6 +1504,15 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch += um->SpeedResearch;
 	}
+
+	if (um->get_infantry_cost_modifier() != 0) {
+		player.change_infantry_cost_modifier(um->get_infantry_cost_modifier());
+	}
+
+	if (um->get_cavalry_cost_modifier() != 0) {
+		player.change_cavalry_cost_modifier(um->get_cavalry_cost_modifier());
+	}
+
 	if (um->change_civilization_to != nullptr && GameRunning && um->change_civilization_to != player.get_civilization()) {
 		player.set_civilization(um->change_civilization_to);
 	}
@@ -1758,6 +1767,14 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch -= um->SpeedResearch;
+	}
+
+	if (um->get_infantry_cost_modifier() != 0) {
+		player.change_infantry_cost_modifier(-um->get_infantry_cost_modifier());
+	}
+
+	if (um->get_cavalry_cost_modifier() != 0) {
+		player.change_cavalry_cost_modifier(-um->get_cavalry_cost_modifier());
 	}
 
 	for (int z = 0; z < UpgradeMax; ++z) {

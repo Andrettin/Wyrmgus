@@ -1231,6 +1231,7 @@ public:
 	}
 
 	bool can_gain_experience() const;
+	bool is_infantry() const;
 
 	gender get_gender() const;
 

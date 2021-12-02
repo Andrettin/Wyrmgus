@@ -776,6 +776,8 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"speed-train\", %d,", p.SpeedTrain);
 	file.printf("\n  \"speed-upgrade\", %d,", p.SpeedUpgrade);
 	file.printf("\n  \"speed-research\", %d,", p.SpeedResearch);
+	file.printf("\n  \"infantry-cost-modifier\", %d,", p.get_infantry_cost_modifier());
+	file.printf("\n  \"cavalry-cost-modifier\", %d,", p.get_cavalry_cost_modifier());
 	
 	//Wyrmgus start
 	file.printf("\n  \"current-quests\", {");
@@ -2553,6 +2555,8 @@ void CPlayer::Clear()
 	this->SpeedTrain = CPlayer::base_speed_factor;
 	this->SpeedUpgrade = CPlayer::base_speed_factor;
 	this->SpeedResearch = CPlayer::base_speed_factor;
+	this->infantry_cost_modifier = 0;
+	this->cavalry_cost_modifier = 0;
 
 	emit diplomatic_stances_changed();
 	emit shared_vision_changed();
@@ -3774,6 +3778,18 @@ resource_map<int> CPlayer::GetUnitTypeCosts(const unit_type *type, const bool hi
 	for (auto &[resource, cost] : costs) {
 		if (type->TrainQuantity != 0) {
 			cost *= type->TrainQuantity;
+		}
+
+		int cost_modifier = 0;
+		if (type->is_infantry()) {
+			cost_modifier = this->get_infantry_cost_modifier();
+		} else if (type->BoolFlag[MOUNTED_INDEX].value) {
+			cost_modifier = this->get_cavalry_cost_modifier();
+		}
+
+		if (cost_modifier != 0) {
+			cost *= 100 + cost_modifier;
+			cost /= 100;
 		}
 
 		if (type->CostModifier != 0) {

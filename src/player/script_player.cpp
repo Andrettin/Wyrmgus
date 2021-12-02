@@ -385,6 +385,10 @@ void CPlayer::Load(lua_State *l)
 			this->SpeedUpgrade = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "speed-research")) {
 			this->SpeedResearch = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "infantry-cost-modifier")) {
+			this->infantry_cost_modifier = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "cavalry-cost-modifier")) {
+			this->cavalry_cost_modifier = LuaToNumber(l, j + 1);
 		//Wyrmgus start
 		/*
 		} else if (!strcmp(value, "color")) {

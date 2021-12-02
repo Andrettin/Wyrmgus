@@ -63,6 +63,16 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
+	int get_infantry_cost_modifier() const
+	{
+		return this->infantry_cost_modifier;
+	}
+
+	int get_cavalry_cost_modifier() const
+	{
+		return this->cavalry_cost_modifier;
+	}
+
 	const std::vector<unit_type *> &get_unit_types() const
 	{
 		return this->unit_types;
@@ -87,6 +97,10 @@ public:
 	CUnitStats Modifier;					/// modifier of unit stats.
 	std::unique_ptr<int[]> ModifyPercent;	/// use for percent modifiers
 	int SpeedResearch = 0;					/// speed factor for researching
+private:
+	int infantry_cost_modifier = 0;
+	int cavalry_cost_modifier = 0;
+public:
 	int ImproveIncomes[MaxCosts];			/// improve incomes
 	unit_type_map<int> UnitStock;	/// unit stock
 	// allow/forbid bitmaps -- used as chars for example:

@@ -666,6 +666,26 @@ public:
 		}
 	}
 
+	int get_infantry_cost_modifier() const
+	{
+		return this->infantry_cost_modifier;
+	}
+
+	void change_infantry_cost_modifier(const int change)
+	{
+		this->infantry_cost_modifier += change;
+	}
+
+	int get_cavalry_cost_modifier() const
+	{
+		return this->cavalry_cost_modifier;
+	}
+
+	void change_cavalry_cost_modifier(const int change)
+	{
+		this->cavalry_cost_modifier += change;
+	}
+
 	const wyrmgus::unit_type_map<std::vector<CUnit *>> &get_units_by_type() const
 	{
 		return this->units_by_type;
@@ -1161,7 +1181,11 @@ public:
 	int SpeedTrain;                  /// speed factor for training
 	int SpeedUpgrade;                /// speed factor for upgrading
 	int SpeedResearch;               /// speed factor for researching
+private:
+	int infantry_cost_modifier = 0;
+	int cavalry_cost_modifier = 0;
 
+public:
 	wyrmgus::unit_type_map<int> UnitTypesCount;  						/// total units of unit-type
 	wyrmgus::unit_type_map<int> UnitTypesUnderConstructionCount;  		/// total under construction units of unit-type
 	wyrmgus::unit_type_map<int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
