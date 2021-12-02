@@ -489,22 +489,6 @@ void GameMainLoop()
 
 	MultiPlayerReplayEachCycle();
 	
-	//Wyrmgus start
-	if (GameCycle == 0) { //so that these don't trigger when loading a saved game
-		const campaign *current_campaign = game::get()->get_current_campaign();
-		
-		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
-			context ctx;
-			ctx.current_player = CPlayer::GetThisPlayer();
-			CurrentQuest->IntroductionDialogue->call(CPlayer::GetThisPlayer(), ctx);
-		}
-
-		if (current_campaign != nullptr && current_campaign->get_quest() != nullptr) {
-			CPlayer::GetThisPlayer()->accept_quest(current_campaign->get_quest());
-		}
-	}
-	//Wyrmgus end
-
 	game::get()->set_running(true);
 
 	engine_interface::get()->set_waiting_for_interface(true);

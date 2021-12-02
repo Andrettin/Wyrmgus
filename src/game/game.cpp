@@ -43,6 +43,7 @@
 #include "database/defines.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
+#include "dialogue.h"
 #include "economy/resource.h"
 #include "editor.h"
 #include "engine_interface.h"
@@ -183,6 +184,38 @@ game::~game()
 {
 }
 
+void game::on_started()
+{
+	if (GameCycle == 0) { //so that these don't trigger when loading a saved game
+		if (this->get_current_campaign() != nullptr) {
+			this->apply_player_history();
+
+			if (this->get_current_campaign()->get_quest() != nullptr) {
+				CPlayer::GetThisPlayer()->accept_quest(this->get_current_campaign()->get_quest());
+			}
+		}
+
+		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
+			context ctx;
+			ctx.current_player = CPlayer::GetThisPlayer();
+			CurrentQuest->IntroductionDialogue->call(CPlayer::GetThisPlayer(), ctx);
+		}
+	}
+
+	//update the sold units of all units before starting, to make sure they fit the current conditions
+	//make a copy of the units list, as updating the sold units can change the list
+	const std::vector<CUnit *> units = unit_manager::get()->get_units();
+	for (CUnit *unit : units) {
+		if (unit && unit->IsAlive()) {
+			unit->UpdateSoldUnits();
+		}
+	}
+
+	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+		UI.get_minimap()->update_exploration(z);
+	}
+}
+
 int game::get_cycles_per_year() const
 {
 	return defines::get()->get_cycles_per_year(this->get_current_year());
@@ -258,7 +291,7 @@ void game::do_cycle()
 		}
 
 		if (GameCycle % CYCLES_PER_IN_GAME_HOUR == 0) {
-			game::get()->increment_current_total_hours();
+			this->increment_current_total_hours();
 
 			for (const std::unique_ptr<CMapLayer> &map_layer : CMap::get()->MapLayers) {
 				map_layer->DoPerHourLoop();
@@ -1764,23 +1797,6 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 	// Triggers
 	//
 	trigger::InitActiveTriggers();
-
-	if (current_campaign != nullptr) {
-		game::get()->apply_player_history();
-	}
-
-	//update the sold units of all units before starting, to make sure they fit the current conditions
-	//make a copy of the units list, as updating the sold units can change the list
-	const std::vector<CUnit *> units = unit_manager::get()->get_units();
-	for (CUnit *unit : units) {
-		if (unit && unit->IsAlive()) {
-			unit->UpdateSoldUnits();
-		}
-	}
-
-	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
-		UI.get_minimap()->update_exploration(z);
-	}
 
 #if 0
 	if (!UI.SelectedViewport) {
