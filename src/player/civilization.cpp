@@ -491,6 +491,12 @@ std::string_view civilization::get_character_title_name(const character_title ti
 					}
 				case faction_type::polity:
 					switch (government_type) {
+						case government_type::tribe:
+							if (gender == gender::female) {
+								return "Chieftess";
+							} else {
+								return "Chieftain";
+							}
 						case government_type::monarchy:
 							switch (tier) {
 								case faction_tier::barony:

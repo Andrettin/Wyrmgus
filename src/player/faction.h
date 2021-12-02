@@ -228,19 +228,7 @@ public:
 	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;
 	std::string_view get_character_title_name(const character_title title_type, const government_type government_type, const faction_tier tier, const gender gender) const;
 
-	std::string get_titled_name(const government_type government_type, const faction_tier tier) const
-	{
-		if (this->uses_simple_name()) {
-			return this->get_name();
-		}
-
-		const std::string title_name = std::string(this->get_title_name(government_type, tier));
-		if (this->uses_short_name()) {
-			return this->get_adjective() + " " + title_name;
-		} else {
-			return title_name + " of " + this->get_name();
-		}
-	}
+	std::string get_titled_name(const government_type government_type, const faction_tier tier) const;
 
 	std::string get_default_titled_name() const
 	{
