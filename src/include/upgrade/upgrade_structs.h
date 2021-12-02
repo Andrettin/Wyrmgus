@@ -287,7 +287,7 @@ public:
 	static constexpr const char *class_identifier = "upgrade";
 	static constexpr const char *database_folder = "upgrades";
 
-	static const CUpgrade *get_government_type_upgrade(const government_type government_type)
+	static const CUpgrade *get_government_type_upgrade(const wyrmgus::government_type government_type)
 	{
 		const auto find_iterator = CUpgrade::government_type_upgrades.find(government_type);
 
@@ -376,7 +376,7 @@ public:
 	}
 
 private:
-	static inline std::map<government_type, const CUpgrade *> government_type_upgrades;
+	static inline std::map<wyrmgus::government_type, const CUpgrade *> government_type_upgrades;
 
 public:
 	explicit CUpgrade(const std::string &identifier);
