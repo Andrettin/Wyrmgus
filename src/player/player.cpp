@@ -3801,27 +3801,29 @@ resource_map<int> CPlayer::GetUnitTypeCosts(const unit_type *type, const bool hi
 			cost *= type->TrainQuantity;
 		}
 
-		int cost_modifier = 0;
-		if (type->is_infantry()) {
-			cost_modifier = this->get_infantry_cost_modifier();
-		} else if (type->BoolFlag[MOUNTED_INDEX].value) {
-			cost_modifier = this->get_cavalry_cost_modifier();
-		}
-
-		if (cost_modifier != 0) {
-			cost *= 100 + cost_modifier;
-			cost /= 100;
-		}
-
-		if (type->CostModifier != 0) {
-			int type_count = this->GetUnitTypeCount(type) + this->GetUnitTypeUnderConstructionCount(type);
-			if (ignore_one) {
-				type_count--;
+		if (resource != defines::get()->get_time_resource()) {
+			int cost_modifier = 0;
+			if (type->is_infantry()) {
+				cost_modifier = this->get_infantry_cost_modifier();
+			} else if (type->BoolFlag[MOUNTED_INDEX].value) {
+				cost_modifier = this->get_cavalry_cost_modifier();
 			}
 
-			for (int j = 0; j < type_count; ++j) {
-				cost *= 100 + type->CostModifier;
+			if (cost_modifier != 0) {
+				cost *= 100 + cost_modifier;
 				cost /= 100;
+			}
+
+			if (type->CostModifier != 0) {
+				int type_count = this->GetUnitTypeCount(type) + this->GetUnitTypeUnderConstructionCount(type);
+				if (ignore_one) {
+					type_count--;
+				}
+
+				for (int j = 0; j < type_count; ++j) {
+					cost *= 100 + type->CostModifier;
+					cost /= 100;
+				}
 			}
 		}
 	}
