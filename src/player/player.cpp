@@ -1408,6 +1408,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
 		this->set_name(this->get_faction()->get_name());
 	}
+
 	if (this->get_faction() != nullptr) {
 		const wyrmgus::player_color *player_color = nullptr;
 
@@ -2293,18 +2294,21 @@ std::vector<character *> CPlayer::get_recruitable_heroes_from_list(const std::ve
 **
 **  @param upgrade    Upgrade.
 */
-bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority) const
+bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, const bool ignore_lower_priority) const
 {
 	for (const auto &modifier : upgrade->get_modifiers()) {
-		for (size_t j = 0; j < modifier->RemoveUpgrades.size(); ++j) {
-			const CUpgrade *removed_upgrade = modifier->RemoveUpgrades[j];
-			bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->ID) == 'R');
-			if (has_upgrade) {
-				if (ignore_lower_priority && this->get_faction() != nullptr && this->get_faction()->GetUpgradePriority(removed_upgrade) < this->get_faction()->GetUpgradePriority(upgrade)) {
-					continue;
-				}
-				return true;
+		for (const CUpgrade *removed_upgrade : modifier->get_removed_upgrades()) {
+			const bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->ID) == 'R');
+
+			if (!has_upgrade) {
+				continue;
 			}
+
+			if (ignore_lower_priority && this->get_faction() != nullptr && this->get_faction()->GetUpgradePriority(removed_upgrade) < this->get_faction()->GetUpgradePriority(upgrade)) {
+				continue;
+			}
+
+			return true;
 		}
 	}
 	

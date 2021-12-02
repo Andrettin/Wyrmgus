@@ -67,12 +67,12 @@ std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate() const
 	modifier->UnitStock = this->UnitStock;
 	memcpy(modifier->ChangeUnits, this->ChangeUnits, sizeof(modifier->ChangeUnits));
 	memcpy(modifier->ChangeUpgrades, this->ChangeUpgrades, sizeof(modifier->ChangeUpgrades));
-	modifier->unit_types = this->unit_types;
-	modifier->unit_classes = this->unit_classes;
 	modifier->ConvertTo = this->ConvertTo;
 	modifier->change_civilization_to = this->change_civilization_to;
 	modifier->change_faction_to = this->change_faction_to;
-	modifier->RemoveUpgrades = this->RemoveUpgrades;
+	modifier->removed_upgrades = this->removed_upgrades;
+	modifier->unit_types = this->unit_types;
+	modifier->unit_classes = this->unit_classes;
 
 	return modifier;
 }
@@ -117,10 +117,10 @@ void upgrade_modifier::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->unit_classes.push_back(unit_class::get(value));
 		}
-	} else if (tag == "remove_upgrades") {
+	} else if (tag == "removed_upgrades") {
 		for (const std::string &value : values) {
-			CUpgrade *removed_upgrade = CUpgrade::get(value);
-			this->RemoveUpgrades.push_back(removed_upgrade);
+			const CUpgrade *removed_upgrade = CUpgrade::get(value);
+			this->removed_upgrades.push_back(removed_upgrade);
 		}
 	} else if (tag == "costs") {
 		scope.for_each_property([&](const sml_property &property) {
@@ -156,19 +156,6 @@ void upgrade_modifier::process_sml_scope(const sml_data &scope)
 	}
 }
 
-bool upgrade_modifier::applies_to(const unit_type *unit_type) const
-{
-	if (vector::contains(this->get_unit_types(), unit_type)) {
-		return true;
-	}
-
-	if (unit_type->get_unit_class() != nullptr && vector::contains(this->get_unit_classes(), unit_type->get_unit_class())) {
-		return true;
-	}
-
-	return false;
-}
-
 int upgrade_modifier::GetUnitStock(unit_type *unit_type) const
 {
 	auto find_iterator = this->UnitStock.find(unit_type);
@@ -184,7 +171,7 @@ void upgrade_modifier::SetUnitStock(unit_type *unit_type, int quantity)
 	if (!unit_type) {
 		return;
 	}
-	
+
 	if (quantity == 0) {
 		if (this->UnitStock.contains(unit_type)) {
 			this->UnitStock.erase(unit_type);
@@ -197,6 +184,19 @@ void upgrade_modifier::SetUnitStock(unit_type *unit_type, int quantity)
 void upgrade_modifier::ChangeUnitStock(unit_type *unit_type, int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
+}
+
+bool upgrade_modifier::applies_to(const unit_type *unit_type) const
+{
+	if (vector::contains(this->get_unit_types(), unit_type)) {
+		return true;
+	}
+
+	if (unit_type->get_unit_class() != nullptr && vector::contains(this->get_unit_classes(), unit_type->get_unit_class())) {
+		return true;
+	}
+
+	return false;
 }
 
 bool upgrade_modifier::affects_variable(const int var_index) const

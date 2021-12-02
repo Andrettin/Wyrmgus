@@ -73,6 +73,15 @@ public:
 		return this->cavalry_cost_modifier;
 	}
 
+	int GetUnitStock(unit_type *unit_type) const;
+	void SetUnitStock(unit_type *unit_type, int quantity);
+	void ChangeUnitStock(unit_type *unit_type, int quantity);
+
+	const std::vector<const CUpgrade *> &get_removed_upgrades() const
+	{
+		return this->removed_upgrades;
+	}
+
 	const std::vector<unit_type *> &get_unit_types() const
 	{
 		return this->unit_types;
@@ -85,10 +94,6 @@ public:
 
 	bool applies_to(const unit_type *unit_type) const;
 	
-	int GetUnitStock(unit_type *unit_type) const;
-	void SetUnitStock(unit_type *unit_type, int quantity);
-	void ChangeUnitStock(unit_type *unit_type, int quantity);
-
 	bool affects_variable(const int var_index) const;
 	void apply_to_unit(CUnit *unit, const int multiplier) const;
 
@@ -109,19 +114,17 @@ public:
 	// TODO: pointers or ids would be faster and less memory use
 	int  ChangeUnits[UnitTypeMax];			/// add/remove allowed units
 	char ChangeUpgrades[UpgradeMax];		/// allow/forbid upgrades
-private:
-	std::vector<unit_type *> unit_types; //which unit types are affected
-	std::vector<unit_class *> unit_classes; //which unit classes are affected
 
-public:
 	unit_type *ConvertTo = nullptr;			/// convert to this unit-type.
 
-	//Wyrmgus start
-	const civilization *change_civilization_to = nullptr;	/// changes the player's civilization to this one
-	const faction *change_faction_to = nullptr;	/// changes the player's faction to this one
-	
-	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
-	//Wyrmgus end
+	const civilization *change_civilization_to = nullptr;	//changes the player's civilization to this one
+	const faction *change_faction_to = nullptr;	//changes the player's faction to this one
+
+private:
+	std::vector<const CUpgrade *> removed_upgrades; //upgrades to be removed when this upgrade modifier is applied
+
+	std::vector<unit_type *> unit_types; //which unit types are affected
+	std::vector<unit_class *> unit_classes; //which unit classes are affected
 
 	friend int ::CclDefineModifier(lua_State *l);
 };

@@ -6717,8 +6717,8 @@ bool CUnit::is_spell_empowered(const wyrmgus::spell *spell) const
 bool CUnit::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const
 {
 	for (const auto &modifier : upgrade->get_modifiers()) {
-		for (size_t j = 0; j < modifier->RemoveUpgrades.size(); ++j) {
-			if (this->GetIndividualUpgrade(modifier->RemoveUpgrades[j]) > 0) {
+		for (const CUpgrade *removed_upgrade : modifier->get_removed_upgrades()) {
+			if (this->GetIndividualUpgrade(removed_upgrade) > 0) {
 				return true;
 			}
 		}

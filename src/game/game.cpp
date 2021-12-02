@@ -594,9 +594,7 @@ void StartMap(const std::filesystem::path &filepath, const bool clean)
 			CleanPlayers();
 		}
 
-		//Wyrmgus start
 		GameEstablishing = true;
-		//Wyrmgus end
 		CreateGame(filepath, CMap::get());
 
 		//Wyrmgus start

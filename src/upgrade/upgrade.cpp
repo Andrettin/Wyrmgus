@@ -933,7 +933,7 @@ static int CclDefineModifier(lua_State *l)
 		} else if (!strcmp(key, "remove-upgrade")) {
 			const char *value = LuaToString(l, j + 1, 2);
 			CUpgrade *removed_upgrade = CUpgrade::get(value);
-			um->RemoveUpgrades.push_back(removed_upgrade);
+			um->removed_upgrades.push_back(removed_upgrade);
 		//Wyrmgus end
 		} else if (!strcmp(key, "apply-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
@@ -1543,13 +1543,11 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 		}
 	}
 	
-	//Wyrmgus start
-	for (size_t i = 0; i < um->RemoveUpgrades.size(); ++i) {
-		if (player.Allow.Upgrades[um->RemoveUpgrades[i]->ID] == 'R') {
-			UpgradeLost(player, um->RemoveUpgrades[i]->ID);
+	for (const CUpgrade *removed_upgrade : um->get_removed_upgrades()) {
+		if (player.Allow.Upgrades[removed_upgrade->ID] == 'R') {
+			UpgradeLost(player, removed_upgrade->ID);
 		}
 	}
-	//Wyrmgus end
 
 	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (unit_type->is_template()) {
@@ -2008,9 +2006,9 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 {
 	assert_throw(um != nullptr);
 
-	for (size_t i = 0; i < um->RemoveUpgrades.size(); ++i) {
-		if (unit.GetIndividualUpgrade(um->RemoveUpgrades[i])) {
-			IndividualUpgradeLost(unit, um->RemoveUpgrades[i], true);
+	for (const CUpgrade *removed_upgrade : um->get_removed_upgrades()) {
+		if (unit.GetIndividualUpgrade(removed_upgrade) > 0) {
+			IndividualUpgradeLost(unit, removed_upgrade, true);
 		}
 	}
 
@@ -2097,6 +2095,7 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 		return;
 	}
 	//Wyrmgus end
+
 	int id = upgrade->ID;
 	player.UpgradeTimers.Upgrades[id] = upgrade->get_time_cost();
 	AllowUpgradeId(player, id, 'R');  // research done
@@ -2145,6 +2144,7 @@ void UpgradeLost(CPlayer &player, int id)
 		return;
 	}
 	//Wyrmgus end
+
 	player.UpgradeTimers.Upgrades[id] = 0;
 	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
 	

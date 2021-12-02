@@ -2540,10 +2540,9 @@ void AiCheckUpgrades()
 		
 		//remove any removed upgrades from the requests, to prevent mutually-incompatible upgrades from being researched back and forth
 		for (const auto &modifier : upgrade->get_modifiers()) {
-			for (size_t j = 0; j < modifier->RemoveUpgrades.size(); ++j) {
-				CUpgrade *removed_upgrade = modifier->RemoveUpgrades[j];
-				if (std::find(AiPlayer->ResearchRequests.begin(), AiPlayer->ResearchRequests.end(), removed_upgrade) != AiPlayer->ResearchRequests.end()) {
-					AiPlayer->ResearchRequests.erase(std::remove(AiPlayer->ResearchRequests.begin(), AiPlayer->ResearchRequests.end(), removed_upgrade), AiPlayer->ResearchRequests.end());
+			for (const CUpgrade *removed_upgrade : modifier->get_removed_upgrades()) {
+				if (vector::contains(AiPlayer->ResearchRequests, removed_upgrade)) {
+					vector::remove(AiPlayer->ResearchRequests, removed_upgrade);
 				}
 			}
 		}
