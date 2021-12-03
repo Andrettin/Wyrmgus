@@ -412,6 +412,24 @@ std::string_view civilization::get_title_name(const government_type government_t
 	}
 
 	switch (government_type) {
+		case government_type::tribe:
+			switch (tier) {
+				case faction_tier::barony:
+				case faction_tier::viscounty:
+					return "Band";
+				case faction_tier::county:
+				case faction_tier::marquisate:
+					return "Clan";
+				case faction_tier::duchy:
+				case faction_tier::grand_duchy:
+					return "Tribe";
+				case faction_tier::kingdom:
+				case faction_tier::empire:
+					return "Tribal Confederation";
+				default:
+					break;
+			}
+			break;
 		case government_type::monarchy:
 			switch (tier) {
 				case faction_tier::barony:
