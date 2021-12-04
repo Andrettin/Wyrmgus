@@ -238,7 +238,6 @@ public:
 	bool develops_from_faction(const faction *faction, const bool include_indirect) const;
 	bool develops_to_faction(const faction *faction, const bool include_indirect) const;
 
-	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int get_force_type_weight(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<ai_force_template>> &get_ai_force_templates(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &GetAiBuildingTemplates() const;
@@ -377,7 +376,6 @@ private:
 	title_name_map title_names;
 	character_title_name_map character_title_names;
 public:
-	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<ButtonCmd, const wyrmgus::icon *> ButtonIcons;				/// icons for button actions
 private:
 	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the faction

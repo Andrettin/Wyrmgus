@@ -2531,7 +2531,7 @@ void AiCheckUpgrades()
 		if (AiHasUpgrade(*AiPlayer, upgrade, true)) {
 			continue;
 		}
-		
+
 		if (AiPlayer->Player->UpgradeRemovesExistingUpgrade(upgrade, true)) {
 			continue;
 		}

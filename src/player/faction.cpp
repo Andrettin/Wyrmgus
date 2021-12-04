@@ -48,7 +48,6 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
-#include "util/log_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
@@ -415,19 +414,6 @@ bool faction::develops_to_faction(const faction *faction, const bool include_ind
 	}
 
 	return false;
-}
-
-int faction::GetUpgradePriority(const CUpgrade *upgrade) const
-{
-	if (upgrade == nullptr) {
-		log::log_error("Error in faction::GetUpgradePriority: the upgrade is null.");
-	}
-	
-	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {
-		return this->UpgradePriorities.find(upgrade)->second;
-	}
-	
-	return this->civilization->GetUpgradePriority(upgrade);
 }
 
 int faction::get_force_type_weight(const ai_force_type force_type) const

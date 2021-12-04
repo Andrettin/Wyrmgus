@@ -52,7 +52,6 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "util/container_util.h"
-#include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
@@ -319,19 +318,6 @@ std::string civilization::get_encyclopedia_text() const
 	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
 
 	return text;
-}
-
-int civilization::GetUpgradePriority(const CUpgrade *upgrade) const
-{
-	if (upgrade == nullptr) {
-		log::log_error("Error in civilization::GetUpgradePriority: the upgrade is null.");
-	}
-	
-	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {
-		return this->UpgradePriorities.find(upgrade)->second;
-	}
-	
-	return 100;
 }
 
 int civilization::get_force_type_weight(const ai_force_type force_type) const

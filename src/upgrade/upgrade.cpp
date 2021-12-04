@@ -63,6 +63,7 @@
 #include "religion/deity.h"
 #include "script.h"
 #include "script/condition/and_condition.h"
+#include "script/factor.h"
 //Wyrmgus start
 #include "settings.h"
 #include "translate.h"
@@ -309,15 +310,6 @@ void CUpgrade::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->scaled_cost_unit_classes.push_back(unit_class::get(value));
 		}
-	} else if (tag == "civilization_priorities") {
-		scope.for_each_property([&](const sml_property &property) {
-			const std::string &key = property.get_key();
-			const std::string &value = property.get_value();
-
-			wyrmgus::civilization *priority_civilization = civilization::get(key);
-			const int priority = std::stoi(value);
-			priority_civilization->UpgradePriorities[this] = priority;
-		});
 	} else if (tag == "modifier") {
 		auto modifier = std::make_unique<upgrade_modifier>();
 		modifier->UpgradeId = this->ID;
@@ -332,6 +324,9 @@ void CUpgrade::process_sml_scope(const sml_data &scope)
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->conditions, scope);
+	} else if (tag == "ai_priority") {
+		this->ai_priority = std::make_unique<factor<CPlayer>>();
+		database::process_sml_data(this->ai_priority, scope);
 	} else if (tag == "affixed_item_classes") {
 		for (const std::string &value : values) {
 			this->affixed_item_classes.insert(string_to_item_class(value));
@@ -407,6 +402,10 @@ void CUpgrade::check() const
 
 	if (this->get_conditions() != nullptr) {
 		this->get_conditions()->check_validity();
+	}
+
+	if (this->ai_priority != nullptr) {
+		this->ai_priority->check();
 	}
 }
 
@@ -603,6 +602,15 @@ int CUpgrade::get_price() const
 	return resource::get_price(this->get_costs());
 }
 
+int CUpgrade::calculate_ai_priority(const CPlayer *player) const
+{
+	if (this->ai_priority != nullptr) {
+		return this->ai_priority->calculate(player);
+	}
+
+	return CUpgrade::default_ai_priority;
+}
+
 bool CUpgrade::check_drop_conditions(const CUnit *dropper, const CPlayer *dropper_player) const
 {
 	if (dropper != nullptr) {
@@ -781,34 +789,6 @@ static int CclDefineUpgrade(lua_State *l)
 				++j;
 				
 				upgrade->GrandStrategyProductionEfficiencyModifier[resource] = LuaToNumber(l, -1, j + 1);
-			}
-		} else if (!strcmp(value, "CivilizationPriorities")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				std::string civilization_ident = LuaToString(l, -1, j + 1);
-				wyrmgus::civilization *priority_civilization = wyrmgus::civilization::get(civilization_ident);
-				++j;
-
-				int priority = LuaToNumber(l, -1, j + 1);
-
-				priority_civilization->UpgradePriorities[upgrade] = priority;
-			}
-		} else if (!strcmp(value, "FactionPriorities")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				std::string faction_ident = LuaToString(l, -1, j + 1);
-				wyrmgus::faction *priority_faction = wyrmgus::faction::get(faction_ident);
-				++j;
-				
-				int priority = LuaToNumber(l, -1, j + 1);
-
-				priority_faction->UpgradePriorities[upgrade] = priority;
 			}
 		} else if (!strcmp(value, "ItemAffix")) {
 			if (!lua_istable(l, -1)) {

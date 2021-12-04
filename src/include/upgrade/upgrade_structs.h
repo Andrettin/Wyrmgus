@@ -64,6 +64,9 @@ namespace wyrmgus {
 	enum class gender;
 	enum class government_type;
 	enum class item_class;
+
+	template <typename T>
+	class factor;
 }
 
 /**
@@ -286,6 +289,7 @@ class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data
 public:
 	static constexpr const char *class_identifier = "upgrade";
 	static constexpr const char *database_folder = "upgrades";
+	static constexpr int default_ai_priority = 100;
 
 	static const CUpgrade *get_government_type_upgrade(const wyrmgus::government_type government_type)
 	{
@@ -597,6 +601,8 @@ public:
 		return this->conditions.get();
 	}
 
+	int calculate_ai_priority(const CPlayer *player) const;
+
 	bool check_drop_conditions(const CUnit *dropper, const CPlayer *dropper_player) const;
 
 	const wyrmgus::dynasty *get_dynasty() const
@@ -694,6 +700,7 @@ public:
 private:
 	std::unique_ptr<and_condition> preconditions;
 	std::unique_ptr<and_condition> conditions;
+	std::unique_ptr<factor<CPlayer>> ai_priority;
 	const wyrmgus::dynasty *dynasty = nullptr; //the dynasty to which the upgrade pertains, if this is a dynasty upgrade
 	const wyrmgus::deity *deity = nullptr; //the deity to which the upgrade pertains, if this is a deity upgrade
 	const magic_domain *deity_domain = nullptr; //the deity domain to which the upgrade pertains, if this is a deity domain upgrade

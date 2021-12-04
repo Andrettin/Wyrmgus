@@ -55,7 +55,7 @@ void factor_modifier<scope_type>::process_sml_property(const sml_property &prope
 
 	if (key == "factor") {
 		if (sml_operator == sml_operator::assignment) {
-			this->factor = std::stoi(value);
+			this->factor = centesimal_int(value);
 		} else {
 			throw std::runtime_error("Invalid operator for property (\"" + property.get_key() + "\").");
 		}
@@ -70,6 +70,16 @@ void factor_modifier<scope_type>::process_sml_scope(const sml_data &scope)
 {
 	std::unique_ptr<const condition> condition = wyrmgus::condition::from_sml_scope(scope);
 	this->conditions->add_condition(std::move(condition));
+}
+
+template <typename scope_type>
+void factor_modifier<scope_type>::check_validity() const
+{
+	if (this->factor == 0) {
+		throw std::runtime_error("Factor modifier has a factor of 0.");
+	}
+
+	this->conditions->check_validity();
 }
 
 template <typename scope_type>

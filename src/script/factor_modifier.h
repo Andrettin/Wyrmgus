@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <util/fractional_int.h>
+
 class CPlayer;
 class CUnit;
 
@@ -45,8 +47,9 @@ public:
 
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
+	void check_validity() const;
 
-	int get_factor() const
+	const centesimal_int &get_factor() const
 	{
 		return this->factor;
 	}
@@ -59,7 +62,7 @@ public:
 	bool check_conditions(const scope_type *scope) const;
 
 private:
-	int factor = 0; //the factor of the modifier itself
+	centesimal_int factor; //the factor of the modifier itself
 	bool additive = false; //whether the modifier is additive instead of multiplicative
 	std::unique_ptr<and_condition> conditions; //conditions for whether the modifier is to be applied
 };

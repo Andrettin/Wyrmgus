@@ -56,6 +56,11 @@ public:
 		});
 	}
 
+	void check() const
+	{
+		this->weight_factor->check();
+	}
+
 	int calculate_weight(const scope_type *scope) const
 	{
 		return this->weight_factor->calculate(scope);
@@ -99,6 +104,13 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override
 	{
 		this->entries.emplace_back(scope);
+	}
+
+	virtual void check() const override
+	{
+		for (const random_list_entry<scope_type> &entry : this->entries) {
+			entry.check();
+		}
 	}
 
 	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override

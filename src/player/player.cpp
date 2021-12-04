@@ -1704,7 +1704,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !check_conditions(upgrade, &player)) {
 			continue;
 		}
-	
+		
 		if (player.UpgradeRemovesExistingUpgrade(upgrade, player.AiEnabled)) {
 			continue;
 		}
@@ -2311,8 +2311,10 @@ std::vector<character *> CPlayer::get_recruitable_heroes_from_list(const std::ve
 **
 **  @param upgrade    Upgrade.
 */
-bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, const bool ignore_lower_priority) const
+bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, const bool ignore_lower_ai_priority) const
 {
+	const int upgrade_ai_priority = upgrade->calculate_ai_priority(this);
+
 	for (const auto &modifier : upgrade->get_modifiers()) {
 		for (const CUpgrade *removed_upgrade : modifier->get_removed_upgrades()) {
 			const bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->ID) == 'R');
@@ -2321,7 +2323,7 @@ bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, const bool 
 				continue;
 			}
 
-			if (ignore_lower_priority && this->get_faction() != nullptr && this->get_faction()->GetUpgradePriority(removed_upgrade) < this->get_faction()->GetUpgradePriority(upgrade)) {
+			if (ignore_lower_ai_priority && this->get_faction() != nullptr && removed_upgrade->calculate_ai_priority(this) < upgrade_ai_priority) {
 				continue;
 			}
 

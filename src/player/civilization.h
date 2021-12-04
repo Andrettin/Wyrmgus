@@ -134,7 +134,6 @@ public:
 		return nullptr;
 	}
 	
-	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int get_force_type_weight(const ai_force_type force_type) const;
 
 	wyrmgus::interface_style *get_interface_style() const
@@ -266,7 +265,6 @@ private:
 	std::vector<const civilization *> develops_to; //to which civilizations this civilization develops
 public:
 	std::vector<quest *> Quests;	/// quests belonging to this civilization
-	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
 private:
 	std::map<ai_force_type, std::vector<std::unique_ptr<ai_force_template>>> ai_force_templates;	/// Force templates, mapped to each force type
 	std::map<ai_force_type, int> ai_force_type_weights;	/// Weights for each force type

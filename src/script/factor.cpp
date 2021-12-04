@@ -83,6 +83,18 @@ void factor<scope_type>::process_sml_scope(const sml_data &scope)
 }
 
 template <typename scope_type>
+void factor<scope_type>::check() const
+{
+	if (this->base_value == 0) {
+		throw std::runtime_error("Factor has a base value of 0.");
+	}
+
+	for (const std::unique_ptr<factor_modifier<scope_type>> &modifier : this->modifiers) {
+		modifier->check_validity();
+	}
+}
+
+template <typename scope_type>
 int factor<scope_type>::calculate(const scope_type *scope) const
 {
 	int value = this->base_value;
@@ -90,8 +102,7 @@ int factor<scope_type>::calculate(const scope_type *scope) const
 	if (scope != nullptr) {
 		for (const std::unique_ptr<factor_modifier<scope_type>> &modifier : this->modifiers) {
 			if (modifier->check_conditions(scope)) {
-				value *= modifier->get_factor();
-				value /= 100;
+				value = (value * modifier->get_factor()).to_int();
 			}
 		}
 	}

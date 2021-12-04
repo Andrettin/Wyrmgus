@@ -311,7 +311,7 @@ public:
 
 	bool is_character_available_for_recruitment(const wyrmgus::character *character, bool ignore_neutral = false) const;
 	std::vector<wyrmgus::character *> get_recruitable_heroes_from_list(const std::vector<wyrmgus::character *> &heroes);
-	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, const bool ignore_lower_priority) const;
+	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, const bool ignore_lower_ai_priority) const;
 	std::string get_full_name() const;
 	std::string_view get_faction_title_name() const;
 	std::string_view GetCharacterTitleName(const character_title title_type, const wyrmgus::gender gender) const;
