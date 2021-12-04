@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,59 +26,80 @@
 
 #include "stratagus.h"
 
-#include "script/factor_modifier.h"
+#include "script/factor.h"
 
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
 #include "database/sml_property.h"
-#include "script/condition/and_condition.h"
+#include "script/factor_modifier.h"
 
 namespace wyrmgus {
 
 template <typename scope_type>
-factor_modifier<scope_type>::factor_modifier()
-{
-	this->conditions = std::make_unique<and_condition>();
-}
-
-template <typename scope_type>
-factor_modifier<scope_type>::~factor_modifier()
+factor<scope_type>::factor()
 {
 }
 
 template <typename scope_type>
-void factor_modifier<scope_type>::process_sml_property(const sml_property &property)
+factor<scope_type>::factor(const int base_value) : base_value(base_value)
+{
+}
+
+template <typename scope_type>
+factor<scope_type>::~factor()
+{
+}
+
+template <typename scope_type>
+void factor<scope_type>::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const sml_operator sml_operator = property.get_operator();
 	const std::string &value = property.get_value();
 
-	if (key == "factor") {
+	if (key == "base_value") {
 		if (sml_operator == sml_operator::assignment) {
-			this->factor = std::stoi(value);
+			this->base_value = std::stoi(value);
 		} else {
-			throw std::runtime_error("Invalid operator for property (\"" + property.get_key() + "\").");
+			throw std::runtime_error("Invalid operator for property \"" + key + "\".");
 		}
 	} else {
-		std::unique_ptr<const condition> condition = wyrmgus::condition::from_sml_property(property);
-		this->conditions->add_condition(std::move(condition));
+		throw std::runtime_error("Invalid factor property: \"" + key + "\".");
 	}
 }
 
 template <typename scope_type>
-void factor_modifier<scope_type>::process_sml_scope(const sml_data &scope)
+void factor<scope_type>::process_sml_scope(const sml_data &scope)
 {
-	std::unique_ptr<const condition> condition = wyrmgus::condition::from_sml_scope(scope);
-	this->conditions->add_condition(std::move(condition));
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "modifier") {
+		auto modifier = std::make_unique<factor_modifier<scope_type>>();
+		database::process_sml_data(modifier, scope);
+		this->modifiers.push_back(std::move(modifier));
+	} else {
+		throw std::runtime_error("Invalid factor scope: \"" + scope.get_tag() + "\".");
+	}
 }
 
 template <typename scope_type>
-bool factor_modifier<scope_type>::check_conditions(const scope_type *scope) const
+int factor<scope_type>::calculate(const scope_type *scope) const
 {
-	return this->conditions->check(scope);
+	int value = this->base_value;
+
+	if (scope != nullptr) {
+		for (const std::unique_ptr<factor_modifier<scope_type>> &modifier : this->modifiers) {
+			if (modifier->check_conditions(scope)) {
+				value *= modifier->get_factor();
+				value /= 100;
+			}
+		}
+	}
+
+	return value;
 }
 
-template class factor_modifier<CPlayer>;
-template class factor_modifier<CUnit>;
+template class factor<CPlayer>;
+template class factor<CUnit>;
 
 }

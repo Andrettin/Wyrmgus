@@ -77,7 +77,7 @@ void world_game_data::process_sml_scope(const sml_data &scope)
 	if (tag == "map_rect") {
 		this->map_rect = scope.to_rect();
 	} else {
-		throw std::runtime_error("Invalid site game data scope: \"" + scope.get_tag() + "\".");
+		throw std::runtime_error("Invalid site game data scope: \"" + tag + "\".");
 	}
 }
 

@@ -28,6 +28,7 @@
 
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
+#include "script/factor.h"
 #include "script/factor_modifier.h"
 #include "util/vector_random_util.h"
 
@@ -39,36 +40,25 @@ class random_list_entry
 public:
 	explicit random_list_entry(const sml_data &scope)
 	{
-		this->base_weight = std::stoi(scope.get_tag());
+		const int base_weight = std::stoi(scope.get_tag());
+
+		this->weight_factor = std::make_unique<factor<scope_type>>(base_weight);
 		this->effects = std::make_unique<effect_list<scope_type>>();
 
 		scope.for_each_element([&](const sml_property &property) {
 			this->effects->process_sml_property(property);
 		}, [&](const sml_data &child_scope) {
 			if (child_scope.get_tag() == "modifier") {
-				auto modifier = std::make_unique<factor_modifier<scope_type>>();
-				database::process_sml_data(modifier, child_scope);
-				this->weight_modifiers.push_back(std::move(modifier));
+				this->weight_factor->process_sml_scope(child_scope);
 			} else {
 				this->effects->process_sml_scope(child_scope);
 			}
 		});
 	}
 
-	int get_weight(const scope_type *scope) const
+	int calculate_weight(const scope_type *scope) const
 	{
-		int weight = this->base_weight;
-
-		if (scope != nullptr) {
-			for (const std::unique_ptr<factor_modifier<scope_type>> &modifier : this->weight_modifiers) {
-				if (modifier->check_conditions(scope)) {
-					weight *= modifier->get_factor();
-					weight /= 100;
-				}
-			}
-		}
-
-		return weight;
+		return this->weight_factor->calculate(scope);
 	}
 
 	void do_effects(scope_type *scope, const context &ctx) const
@@ -88,8 +78,7 @@ public:
 	}
 
 private:
-	int base_weight = 0;
-	std::vector<std::unique_ptr<factor_modifier<scope_type>>> weight_modifiers;
+	std::unique_ptr<factor<scope_type>> weight_factor;
 	std::unique_ptr<effect_list<scope_type>> effects;
 };
 
@@ -127,7 +116,7 @@ public:
 		int total_weight = 0;
 		std::vector<std::pair<const random_list_entry<scope_type> *, int>> entry_weights;
 		for (const random_list_entry<scope_type> &entry : this->entries) {
-			const int weight = entry.get_weight(scope);
+			const int weight = entry.calculate_weight(scope);
 			if (weight > 0) {
 				total_weight += weight;
 				entry_weights.emplace_back(&entry, weight);
@@ -169,7 +158,7 @@ private:
 		std::vector<const random_list_entry<scope_type> *> weighted_entries;
 
 		for (const random_list_entry<scope_type> &entry : this->entries) {
-			const int weight = entry.get_weight(scope);
+			const int weight = entry.calculate_weight(scope);
 
 			for (int i = 0; i < weight; ++i) {
 				weighted_entries.push_back(&entry);

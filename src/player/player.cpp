@@ -2450,17 +2450,17 @@ std::vector<const CUpgrade *> CPlayer::GetResearchableUpgrades()
 	std::vector<const CUpgrade *> researchable_upgrades;
 
 	for (const auto &kv_pair : this->UnitTypesAiActiveCount) {
-		const wyrmgus::unit_type *type = kv_pair.first;
+		const unit_type *type = kv_pair.first;
 
 		for (const CUpgrade *upgrade : AiHelpers.get_researched_upgrades(type)) {
-			if (!wyrmgus::vector::contains(researchable_upgrades, upgrade)) {
+			if (!vector::contains(researchable_upgrades, upgrade)) {
 				researchable_upgrades.push_back(upgrade);
 			}
 		}
 
-		for (const wyrmgus::upgrade_class *upgrade_class : AiHelpers.get_researched_upgrade_classes(type->get_unit_class())) {
+		for (const upgrade_class *upgrade_class : AiHelpers.get_researched_upgrade_classes(type->get_unit_class())) {
 			const CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
-			if (upgrade != nullptr && !wyrmgus::vector::contains(researchable_upgrades, upgrade)) {
+			if (upgrade != nullptr && !vector::contains(researchable_upgrades, upgrade)) {
 				researchable_upgrades.push_back(upgrade);
 			}
 		}
