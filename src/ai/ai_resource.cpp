@@ -61,6 +61,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util/assert_util.h"
 #include "util/util.h"
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
 static constexpr int COLLECT_RESOURCES_INTERVAL = 4;
@@ -2518,6 +2519,7 @@ void AiCheckUpgrades()
 	}
 
 	std::vector<const CUpgrade *> potential_upgrades = AiPlayer->Player->GetResearchableUpgrades();
+	vector::shuffle(potential_upgrades); //shuffle the vector, so that upgrades are chosen at random
 	
 	for (size_t i = 0; i < potential_upgrades.size(); ++i) {
 		const CUpgrade *upgrade = potential_upgrades[i];
@@ -2534,7 +2536,8 @@ void AiCheckUpgrades()
 			continue;
 		}
 		
-		if (AiPlayer->NeededMask & AiPlayer->Player->GetUpgradeCostsMask(upgrade)) { //don't request the upgrade if it is going to use up a resource that is currently needed
+		if (AiPlayer->NeededMask & AiPlayer->Player->GetUpgradeCostsMask(upgrade)) {
+			//don't request the upgrade if it is going to use up a resource that is currently needed
 			continue;
 		}
 		
