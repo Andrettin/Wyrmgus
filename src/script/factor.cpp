@@ -28,6 +28,7 @@
 
 #include "script/factor.h"
 
+#include "database/database.h"
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
 #include "database/sml_property.h"
