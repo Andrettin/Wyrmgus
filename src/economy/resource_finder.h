@@ -36,7 +36,7 @@ struct find_resource_result final
 {
 	bool is_valid() const
 	{
-		this->resource_pos != QPoint(-1, -1) || this->resource_unit != nullptr;
+		return this->resource_pos != QPoint(-1, -1) || this->resource_unit != nullptr;
 	}
 
 	QPoint resource_pos = QPoint(-1, -1);
