@@ -331,14 +331,27 @@ static void do_mouse_warp()
 */
 static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Qt::KeyboardModifiers key_modifiers)
 {
-	// Scale mouse-coordinates to viewport
-	if (ZoomNoResize && (event.type & (SDL_MOUSEBUTTONUP | SDL_MOUSEBUTTONDOWN | SDL_MOUSEMOTION))) {
-		event.button.x = (Uint16)floorf(event.button.x * float(Video.Width) / Video.ViewportWidth);
-		event.button.y = (Uint16)floorf(event.button.y * float(Video.Height) / Video.ViewportHeight);
-		//Wyrmgus start
-		event.motion.x = (Uint16)floorf(event.motion.x * float(Video.Width) / Video.ViewportWidth);
-		event.motion.y = (Uint16)floorf(event.motion.y * float(Video.Height) / Video.ViewportHeight);
-		//Wyrmgus end
+	switch (event.type) {
+		case SDL_MOUSEBUTTONUP:
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEMOTION:
+			//scale mouse-coordinates to viewport
+			if (ZoomNoResize) {
+				event.button.x = static_cast<Uint16>(floorf(event.button.x * float(Video.Width) / Video.ViewportWidth));
+				event.button.y = static_cast<Uint16>(floorf(event.button.y * float(Video.Height) / Video.ViewportHeight));
+
+				event.motion.x = static_cast<Uint16>(floorf(event.motion.x * float(Video.Width) / Video.ViewportWidth));
+				event.motion.y = static_cast<Uint16>(floorf(event.motion.y * float(Video.Height) / Video.ViewportHeight));
+			}
+			break;
+		case SDL_KEYDOWN:
+		case SDL_KEYUP:
+			if (event.key.keysym.sym == SDLK_UNKNOWN) {
+				return;
+			}
+			break;
+		default:
+			break;
 	}
 
 	switch (event.type) {
