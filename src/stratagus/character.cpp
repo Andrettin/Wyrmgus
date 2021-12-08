@@ -1000,7 +1000,9 @@ bool character::is_item_equipped(const persistent_item *item) const
 {
 	const item_slot item_slot = item->get_item_slot();
 	
-	assert_throw(item_slot != item_slot::none);
+	if (item_slot == item_slot::none) {
+		return false;
+	}
 	
 	const auto find_iterator = this->equipped_items.find(item_slot);
 	if (find_iterator != this->equipped_items.end()) {
