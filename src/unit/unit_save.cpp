@@ -442,7 +442,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(",\n  \"rally_point_map_layer\", %d, ", unit.get_rally_point_map_layer()->ID);
 	}
 	if (unit.get_character() != nullptr && unit.CurrentAction() != UnitAction::Die && !unit.Destroyed) {
-		if (!unit.get_character()->Custom) {
+		if (!unit.get_character()->is_custom()) {
 			file.printf(",\n  \"character\", \"%s\"", unit.get_character()->get_identifier().c_str());
 		} else {
 			file.printf(",\n  \"custom-hero\", \"%s\"", unit.get_character()->get_identifier().c_str());

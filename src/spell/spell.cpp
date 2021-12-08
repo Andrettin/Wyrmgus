@@ -229,12 +229,12 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 		}
 	}
 	if (condition->civilization_equivalent != nullptr) {
-		if (caster.Type->get_civilization() == nullptr || (caster.Type->get_civilization() == condition->civilization_equivalent && (caster.get_character() == nullptr || (caster.get_character()->get_civilization() && caster.get_character()->get_civilization() == condition->civilization_equivalent))) || caster.Type->get_civilization()->get_species() != condition->civilization_equivalent->get_species() || condition->civilization_equivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr || (caster.get_character() != nullptr && !caster.get_character()->Custom)) {
+		if (caster.Type->get_civilization() == nullptr || (caster.Type->get_civilization() == condition->civilization_equivalent && (caster.get_character() == nullptr || (caster.get_character()->get_civilization() && caster.get_character()->get_civilization() == condition->civilization_equivalent))) || caster.Type->get_civilization()->get_species() != condition->civilization_equivalent->get_species() || condition->civilization_equivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr || (caster.get_character() != nullptr && !caster.get_character()->is_custom())) {
 			return false;
 		}
 	}
 	if (condition->FactionEquivalent != nullptr) {
-		if (caster.Type->get_civilization() == nullptr || caster.Type->get_civilization() != condition->FactionEquivalent->get_civilization() || condition->FactionEquivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr|| (caster.get_character() != nullptr && !caster.get_character()->Custom)) {
+		if (caster.Type->get_civilization() == nullptr || caster.Type->get_civilization() != condition->FactionEquivalent->get_civilization() || condition->FactionEquivalent->get_class_unit_type(caster.Type->get_unit_class()) == nullptr|| (caster.get_character() != nullptr && !caster.get_character()->is_custom())) {
 			return false;
 		}
 	}

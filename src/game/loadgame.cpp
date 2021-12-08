@@ -79,7 +79,7 @@ bool SaveGameLoading;                 /// If a Saved Game is Loading
 
 static void delete_lua_callbacks()
 {
-	for (wyrmgus::character *character : wyrmgus::character::get_all()) {
+	for (character *character : character::get_all()) {
 		character->Conditions.reset();
 	}
 

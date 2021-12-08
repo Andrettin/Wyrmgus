@@ -130,7 +130,7 @@ void character::create_custom_hero(const std::string &name, const std::string &s
 	auto hero = make_qunique<character>(identifier);
 	hero->moveToThread(QApplication::instance()->thread());
 
-	hero->Custom = true;
+	hero->custom = true;
 
 	hero->set_name(name);
 	hero->surname = surname;
@@ -433,7 +433,8 @@ void character::initialize()
 		this->level = this->get_base_level();
 	}
 
-	if (this->get_gender() == gender::none && this->get_unit_type() != nullptr) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
+	if (this->get_gender() == gender::none && this->get_unit_type() != nullptr) {
+		//if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
 		if (this->get_unit_type()->get_gender() != gender::none) {
 			this->gender = this->get_unit_type()->get_gender();
 		}
@@ -750,7 +751,7 @@ void character::save() const
 		return;
 	}
 
-	if (!this->Custom) {
+	if (!this->is_custom()) {
 		fprintf(fd, "DefineCharacter(\"%s\", {\n", this->get_identifier().c_str());
 	} else {
 		fprintf(fd, "DefineCustomHero(\"%s\", {\n", this->get_identifier().c_str());
@@ -774,7 +775,7 @@ void character::save() const
 	if (this->get_unit_type() != nullptr) {
 		fprintf(fd, "\tType = \"%s\",\n", this->get_unit_type()->get_identifier().c_str());
 	}
-	if (this->Custom) {
+	if (this->is_custom()) {
 		if (this->get_trait() != nullptr) {
 			fprintf(fd, "\tTrait = \"%s\",\n", this->get_trait()->get_identifier().c_str());
 		}
@@ -798,7 +799,7 @@ void character::save() const
 		}
 		fprintf(fd, "},\n");
 	}
-	if (this->Custom && this->Deities.size() > 0) {
+	if (this->is_custom() && this->Deities.size() > 0) {
 		fprintf(fd, "\tDeities = {");
 		for (size_t j = 0; j < this->Deities.size(); ++j) {
 			fprintf(fd, "\"%s\"", this->Deities[j]->get_identifier().c_str());
@@ -1168,7 +1169,7 @@ std::filesystem::path character::get_save_filepath() const
 
 	filepath /= "heroes";
 
-	if (this->Custom) {
+	if (this->is_custom()) {
 		filepath /= "custom";
 	}
 
@@ -1198,11 +1199,13 @@ int GetAttributeVariableIndex(int attribute)
 
 void SaveHeroes()
 {
-	for (const character *character : character::get_all()) { //save characters
+	//save characters
+	for (const character *character : character::get_all()) {
 		character->save();
 	}
 
-	for (const character *hero : character::get_custom_heroes()) { //save custom heroes
+	//save custom heroes
+	for (const character *hero : character::get_custom_heroes()) {
 		hero->save();
 	}
 			

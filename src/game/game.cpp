@@ -1199,7 +1199,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, const int writeTerrain)
 				f->printf("SetUnitVariable(unit, \"Active\", false)\n");
 			}
 			if (unit->get_character() != nullptr) {
-				if (!unit->get_character()->Custom) {
+				if (!unit->get_character()->is_custom()) {
 					f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit->get_character()->get_identifier().c_str());
 				} else {
 					f->printf("SetUnitVariable(unit, \"CustomHero\", \"%s\")\n", unit->get_character()->get_identifier().c_str());

@@ -779,7 +779,7 @@ void CGrandStrategyFaction::MinisterSuccession(const wyrmgus::character_title ti
 				(GrandStrategyGame.Heroes[i]->Province != nullptr && GrandStrategyGame.Heroes[i]->Province->Owner == this)
 				|| (GrandStrategyGame.Heroes[i]->Province == nullptr && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != nullptr && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this)
 			)
-			&& !GrandStrategyGame.Heroes[i]->Custom
+			&& !GrandStrategyGame.Heroes[i]->is_custom()
 			&& GrandStrategyGame.Heroes[i]->IsEligibleForTitle(title)
 		) {
 			int score = GrandStrategyGame.Heroes[i]->GetTitleScore(title);
@@ -928,7 +928,7 @@ bool CGrandStrategyHero::IsVisible()
 
 bool CGrandStrategyHero::IsGenerated()
 {
-	return !this->Custom && wyrmgus::character::get(this->get_full_name()) == nullptr;
+	return !this->is_custom() && character::get(this->get_full_name()) == nullptr;
 }
 
 bool CGrandStrategyHero::IsEligibleForTitle(const wyrmgus::character_title title)

@@ -418,7 +418,7 @@ static int CclDefineCustomHero(lua_State *l)
 	} else {
 		fprintf(stderr, "Custom hero \"%s\" is being redefined.\n", hero_ident.c_str());
 	}
-	hero->Custom = true;
+	hero->custom = true;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -860,7 +860,7 @@ static int CclGetCustomHeroData(lua_State *l)
 static int CclGetCharacters(lua_State *l)
 {
 	std::vector<std::string> character_names;
-	for (const wyrmgus::character *character : wyrmgus::character::get_all()) {
+	for (const character *character : character::get_all()) {
 		character_names.push_back(character->Ident);
 	}
 	

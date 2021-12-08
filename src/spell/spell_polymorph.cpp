@@ -126,7 +126,7 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 		}
 	}
 
-	if (game::get()->is_persistency_enabled() && target->get_character() != nullptr && target->get_character()->Custom && target->get_character()->get_civilization() && this->civilization != nullptr && this->civilization != target->get_character()->get_civilization() && target->Player == CPlayer::GetThisPlayer()) {
+	if (game::get()->is_persistency_enabled() && target->get_character() != nullptr && target->get_character()->is_custom() && target->get_character()->get_civilization() && this->civilization != nullptr && this->civilization != target->get_character()->get_civilization() && target->Player == CPlayer::GetThisPlayer()) {
 		target->get_character()->civilization = this->civilization;
 		target->get_character()->save();
 	}

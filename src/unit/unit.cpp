@@ -827,7 +827,8 @@ void CUnit::Retrain()
 			for (int i = 0; i < remove_count; ++i) {
 				AbilityLost(*this, upgrade);
 			}
-		} else if (upgrade->get_deity() != nullptr && this->get_character() != nullptr && this->get_character()->Custom) { //allow changing the deity for custom heroes
+		} else if (upgrade->get_deity() != nullptr && this->get_character() != nullptr && this->get_character()->is_custom()) {
+			//allow changing the deity for custom heroes
 			IndividualUpgradeLost(*this, upgrade, true);
 		}
 	}
@@ -6620,7 +6621,7 @@ bool CUnit::can_learn_ability(const CUpgrade *ability) const
 		if (this->get_character() == nullptr) {
 			return false;
 		}
-		if (!this->get_character()->Custom && this->GetIndividualUpgrade(ability) == 0) {
+		if (!this->get_character()->is_custom() && this->GetIndividualUpgrade(ability) == 0) {
 			return false;
 		}
 

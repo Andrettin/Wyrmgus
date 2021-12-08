@@ -2425,7 +2425,7 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 					QString encyclopedia_type;
 					QString encyclopedia_identifier;
 
-					if (Selected[0]->get_character() != nullptr && !Selected[0]->get_character()->Custom) {
+					if (Selected[0]->get_character() != nullptr && !Selected[0]->get_character()->is_custom()) {
 						if (Selected[0]->get_character()->is_deity()) {
 							encyclopedia_type = "deity";
 							encyclopedia_identifier = Selected[0]->get_character()->get_deity()->get_identifier_qstring();

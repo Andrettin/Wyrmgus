@@ -1738,7 +1738,7 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "CustomCharacter")) {
-		if (unit->get_character() != nullptr && unit->get_character()->Custom) {
+		if (unit->get_character() != nullptr && unit->get_character()->is_custom()) {
 			lua_pushboolean(l, true);
 		} else {
 			lua_pushboolean(l, false);
