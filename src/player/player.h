@@ -744,12 +744,12 @@ public:
 		return this->military_score;
 	}
 
-	int get_military_score_with_overlords() const
+	int get_military_score_with_overlords_against(const CPlayer *other_player) const
 	{
 		int score = this->get_military_score();
 
-		if (this->get_overlord() != nullptr) {
-			score += this->get_overlord()->get_military_score_with_overlords();
+		if (this->get_overlord() != nullptr && this->get_overlord() != other_player) {
+			score += this->get_overlord()->get_military_score_with_overlords_against(other_player);
 		}
 
 		return score;
@@ -761,7 +761,7 @@ public:
 	}
 
 	void calculate_military_score();
-	int get_military_score_advantage_over(const CPlayer *other_player) const;
+	int get_military_score_percent_advantage_over(const CPlayer *other_player) const;
 	bool has_military_advantage_over(const CPlayer *other_player) const;
 
 	int get_resource_total(const resource *resource) const
@@ -1016,6 +1016,8 @@ public:
 		return false;
 	}
 
+	bool is_tile_explored(const QPoint &tile_pos, const int z) const;
+	bool is_player_capital_explored(const CPlayer *other_player) const;
 	//Wyrmgus start
 	bool HasContactWith(const CPlayer &player) const;
 	bool has_neutral_faction_type() const;

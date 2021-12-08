@@ -194,21 +194,54 @@ void PlayerAi::evaluate_diplomacy()
 	}
 
 	//evaluate whether the AI's diplomacy should change
+	CPlayer *player = this->Player;
+
+	//check if we should declare war against another player
+	if (!player->at_war()) {
+		if (player->is_independent()) {
+			std::vector<CPlayer *> border_players = container::to_vector(player->get_border_players());
+			vector::shuffle(border_players);
+
+			for (CPlayer *border_player : border_players) {
+				if (!player->is_player_capital_explored(border_player)) {
+					//don't declare war on players for which we don't have their capital location explored, as they might be unreachable (e.g. in a world or landmass we have no way to get to)
+					continue;
+				}
+
+				if (!player->can_declare_war_on(border_player)) {
+					continue;
+				}
+
+				if (player->get_military_score_percent_advantage_over(border_player) >= PlayerAi::military_score_advantage_threshold) {
+					player->set_enemy_diplomatic_stance_with(border_player);
+					break;
+				}
+			}
+		} else {
+			CPlayer *overlord = player->get_overlord();
+
+			assert_throw(overlord != nullptr);
+
+			if (player->can_declare_war_on(overlord) && player->has_military_advantage_over(overlord)) {
+				player->set_enemy_diplomatic_stance_with(overlord);
+			}
+		}
+	}
 
 	//check if any players we have a hostile stance to do not have a hostile stance with us, and if so, whether we should accept peace
 
 	//copy the set, as we may modify the original one during the loop
-	const player_index_set enemies = this->Player->get_enemies();
+	const player_index_set enemies = player->get_enemies();
 
-	for (const int player_index : enemies) {
-		const CPlayer *enemy_player = CPlayer::Players[player_index].get();
+	for (const int enemy_player_index : enemies) {
+		const CPlayer *enemy_player = CPlayer::Players[enemy_player_index].get();
 
-		if (enemy_player->has_enemy_stance_with(this->Player)) {
+		if (enemy_player->has_enemy_stance_with(player)) {
 			continue;
 		}
 
-		if (enemy_player->has_military_advantage_over(this->Player)) {
-			this->Player->set_neutral_diplomatic_stance_with(enemy_player);
+		if (enemy_player->has_military_advantage_over(player)) {
+			player->set_neutral_diplomatic_stance_with(enemy_player);
 		}
 	}
 }

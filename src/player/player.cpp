@@ -544,41 +544,40 @@ void CPlayer::calculate_military_score()
 	}
 }
 
-int CPlayer::get_military_score_advantage_over(const CPlayer *other_player) const
+int CPlayer::get_military_score_percent_advantage_over(const CPlayer *other_player) const
 {
-	const int military_score = this->get_military_score_with_overlords();
-	const int other_military_score = other_player->get_military_score_with_overlords();
-
-	int net_military_score = military_score - other_military_score;
+	int military_score = this->get_military_score_with_overlords_against(other_player);
+	int other_military_score = other_player->get_military_score_with_overlords_against(this);
 
 	for (const CPlayer *loop_player : CPlayer::get_non_neutral_players()) {
 		if (loop_player == this || loop_player == other_player) {
 			continue;
 		}
 
-		if (loop_player->is_any_overlord_of(other_player)) {
-			continue;
-		}
-
-		if (loop_player->is_any_overlord_of(this)) {
+		if (loop_player->is_any_overlord_of(this) || loop_player->is_any_overlord_of(other_player)) {
+			//already included in the military scores
 			continue;
 		}
 
 		if (loop_player->is_enemy_of(*this)) {
-			net_military_score -= loop_player->get_military_score();
+			other_military_score += loop_player->get_military_score();
 		}
 
 		if (loop_player->is_enemy_of(*other_player)) {
-			net_military_score += loop_player->get_military_score();
+			military_score += loop_player->get_military_score();
 		}
 	}
 
-	return net_military_score;
+	military_score = std::max(military_score, 1);
+	other_military_score = std::max(other_military_score, 1);
+
+	//returns the military score advantage as a percentage
+	return (military_score * 100 / other_military_score) - 100;
 }
 
 bool CPlayer::has_military_advantage_over(const CPlayer *other_player) const
 {
-	return this->get_military_score_advantage_over(other_player) > 0;
+	return this->get_military_score_percent_advantage_over(other_player) > 0;
 }
 
 void CPlayer::Save(CFile &file) const
@@ -2147,7 +2146,19 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 	}
 
 	for (const qunique_ptr<CPlayer> &other_player : CPlayer::Players) {
-		if (other_player.get() != this && other_player->get_type() != player_type::nobody && other_player->get_faction() == faction) {
+		if (other_player.get() == this) {
+			continue;
+		}
+
+		if (other_player->get_type() == player_type::nobody) {
+			continue;
+		}
+
+		if (!other_player->is_alive()) {
+			continue;
+		}
+
+		if (other_player->get_faction() == faction) {
 			//faction is already in use
 			return false;
 		}
@@ -4682,6 +4693,19 @@ bool CPlayer::IsTeamed(const CPlayer &player) const
 bool CPlayer::IsTeamed(const CUnit &unit) const
 {
 	return IsTeamed(*unit.Player);
+}
+
+bool CPlayer::is_tile_explored(const QPoint &tile_pos, const int z) const
+{
+	assert_throw(CMap::get()->get_info()->IsPointOnMap(tile_pos, z));
+
+	const tile *tile = CMap::get()->Field(tile_pos, z);
+	return tile->player_info->IsTeamExplored(*this);
+}
+
+bool CPlayer::is_player_capital_explored(const CPlayer *other_player) const
+{
+	return this->is_tile_explored(other_player->StartPos, other_player->StartMapLayer);
 }
 
 //Wyrmgus start
