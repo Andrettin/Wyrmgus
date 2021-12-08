@@ -476,25 +476,27 @@ void character::initialize()
 	}
 
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
-	if (this->get_unit_type() != nullptr && this->get_unit_type()->BoolFlag[FAUNA_INDEX].value && this->get_unit_type()->get_species() != nullptr) {
-		wyrmgus::species *species = this->get_unit_type()->get_species();
-		if (!species->is_initialized()) {
-			species->initialize();
-		}
+	if (!this->is_custom()) {
+		if (this->get_unit_type() != nullptr && this->get_unit_type()->BoolFlag[FAUNA_INDEX].value && this->get_unit_type()->get_species() != nullptr) {
+			wyrmgus::species *species = this->get_unit_type()->get_species();
+			if (!species->is_initialized()) {
+				species->initialize();
+			}
 
-		if (!this->get_name().empty()) {
-			this->unit_type->get_species()->add_specimen_name(this->get_gender(), this->get_name());
-		}
-	} else if (this->civilization != nullptr) {
-		if (!this->civilization->is_initialized()) {
-			this->civilization->initialize();
-		}
+			if (!this->get_name().empty()) {
+				this->unit_type->get_species()->add_specimen_name(this->get_gender(), this->get_name());
+			}
+		} else if (this->civilization != nullptr) {
+			if (!this->civilization->is_initialized()) {
+				this->civilization->initialize();
+			}
 
-		if (!this->get_name().empty()) {
-			this->civilization->add_personal_name(this->get_gender(), this->get_name());
-		}
-		if (!this->get_surname().empty()) {
-			this->civilization->add_surname(this->get_surname());
+			if (!this->get_name().empty()) {
+				this->civilization->add_personal_name(this->get_gender(), this->get_name());
+			}
+			if (!this->get_surname().empty()) {
+				this->civilization->add_surname(this->get_surname());
+			}
 		}
 	}
 
@@ -530,16 +532,18 @@ void character::initialize()
 		}
 	}
 
-	if (this->home_settlement != nullptr) {
-		this->home_settlement->add_character(this);
-	}
+	if (!this->is_custom()) {
+		if (this->home_settlement != nullptr) {
+			this->home_settlement->add_character(this);
+		}
 
-	if (this->civilization != nullptr) {
-		this->civilization->add_character(this);
-	}
+		if (this->civilization != nullptr) {
+			this->civilization->add_character(this);
+		}
 
-	if (this->default_faction != nullptr) {
-		this->default_faction->add_character(this);
+		if (this->default_faction != nullptr) {
+			this->default_faction->add_character(this);
+		}
 	}
 
 	for (const std::unique_ptr<persistent_item> &default_item : this->default_items) {

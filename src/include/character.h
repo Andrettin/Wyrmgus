@@ -102,6 +102,26 @@ public:
 	static constexpr const char *class_identifier = "character";
 	static constexpr const char *database_folder = "characters";
 
+	static void initialize_all()
+	{
+		for (character *custom_hero : character::get_custom_heroes()) {
+			if (!custom_hero->is_initialized()) {
+				custom_hero->initialize();
+			}
+		}
+
+		data_type::initialize_all();
+	}
+
+	static void check_all()
+	{
+		for (const character *custom_hero : character::get_custom_heroes()) {
+			custom_hero->check();
+		}
+
+		data_type::check_all();
+	}
+
 	static void clear();
 
 	static bool compare_encyclopedia_entries(const character *lhs, const character *rhs);
