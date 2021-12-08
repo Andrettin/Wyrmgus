@@ -544,7 +544,7 @@ void CPlayer::calculate_military_score()
 	}
 }
 
-bool CPlayer::has_military_advantage_over(const CPlayer *other_player) const
+int CPlayer::get_military_score_advantage_over(const CPlayer *other_player) const
 {
 	const int military_score = this->get_military_score_with_overlords();
 	const int other_military_score = other_player->get_military_score_with_overlords();
@@ -577,7 +577,12 @@ bool CPlayer::has_military_advantage_over(const CPlayer *other_player) const
 		net_military_score += enemy_player->get_military_score();
 	}
 
-	return net_military_score > 0;
+	return net_military_score;
+}
+
+bool CPlayer::has_military_advantage_over(const CPlayer *other_player) const
+{
+	return this->get_military_score_advantage_over(other_player) > 0;
 }
 
 void CPlayer::Save(CFile &file) const
@@ -3237,12 +3242,11 @@ void CPlayer::RemoveModifier(CUpgrade *modifier)
 		}
 	}
 }
+//Wyrmgus end
 
 bool CPlayer::at_war() const
 {
-	for (int i = 0; i < PlayerNumNeutral; ++i) {
-		const CPlayer *other_player = CPlayer::Players[i].get();
-
+	for (const CPlayer *other_player : CPlayer::get_non_neutral_players()) {
 		if (other_player == this) {
 			continue;
 		}
@@ -3262,7 +3266,6 @@ bool CPlayer::at_war() const
 	
 	return false;
 }
-//Wyrmgus end
 
 std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const
 {

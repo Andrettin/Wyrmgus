@@ -761,6 +761,7 @@ public:
 	}
 
 	void calculate_military_score();
+	int get_military_score_advantage_over(const CPlayer *other_player) const;
 	bool has_military_advantage_over(const CPlayer *other_player) const;
 
 	int get_resource_total(const resource *resource) const
