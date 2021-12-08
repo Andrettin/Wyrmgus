@@ -2020,7 +2020,13 @@ player_set CPlayer::get_border_players() const
 	const site_set border_settlements = this->get_border_settlements();
 
 	for (const site *border_settlement : border_settlements) {
-		border_players.insert(border_settlement->get_game_data()->get_owner());
+		CPlayer *settlement_owner = border_settlement->get_game_data()->get_owner();
+
+		if (settlement_owner == nullptr) {
+			continue;
+		}
+
+		border_players.insert(settlement_owner);
 	}
 
 	return border_players;
