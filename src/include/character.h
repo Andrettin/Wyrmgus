@@ -277,6 +277,8 @@ public:
 	}
 
 	bool is_item_equipped(const persistent_item *item) const;
+	void equip_item(const persistent_item *item);
+	void deequip_item(const persistent_item *item);
 
 	bool IsUsable() const;
 	bool CanAppear(bool ignore_neutral = false) const;
@@ -465,9 +467,7 @@ public:
 	std::unique_ptr<LuaCallback> Conditions;
 private:
 	std::unique_ptr<const and_condition> conditions;
-public:
-	std::vector<const persistent_item *> EquippedItems[static_cast<int>(wyrmgus::item_slot::count)]; //equipped items of the character, per slot
-private:
+	std::map<item_slot, std::vector<const persistent_item *>> equipped_items;
 	bool ai_active = true; //whether the character's AI is active
 public:
 	std::vector<const wyrmgus::deity *> Deities; //deities chosen by this character to worship

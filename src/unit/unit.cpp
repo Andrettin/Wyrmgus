@@ -1568,10 +1568,10 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		const wyrmgus::persistent_item *persistent_item = this->get_character()->get_item(&item);
 		if (persistent_item != nullptr) {
 			if (!this->get_character()->is_item_equipped(persistent_item)) {
-				this->get_character()->EquippedItems[static_cast<int>(item_slot)].push_back(persistent_item);
+				this->get_character()->equip_item(persistent_item);
 				this->get_character()->save();
 			} else {
-				fprintf(stderr, "Item is not equipped by character \"%s\"'s unit, but is equipped by the character itself.\n", this->get_character()->get_identifier().c_str());
+				log::log_error("Item is not equipped by character \"" + this->get_character()->get_identifier() + "\"'s unit, but is equipped by the character itself.");
 			}
 		} else {
 			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", this->get_character()->get_identifier().c_str());
@@ -1691,17 +1691,18 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	if (game::get()->is_persistency_enabled() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
 		const wyrmgus::persistent_item *persistent_item = this->get_character()->get_item(&item);
 		if (persistent_item != nullptr) {
-			if (get_character()->is_item_equipped(persistent_item)) {
-				wyrmgus::vector::remove(this->get_character()->EquippedItems[static_cast<int>(item_slot)], persistent_item);
+			if (this->get_character()->is_item_equipped(persistent_item)) {
+				this->get_character()->deequip_item(persistent_item);
 				this->get_character()->save();
 			} else {
-				fprintf(stderr, "Item is equipped by character \"%s\"'s unit, but not by the character itself.\n", this->get_character()->get_identifier().c_str());
+				log::log_error("Item is equipped by character \"" + this->get_character()->get_identifier() + "\"'s unit, but not by the character itself.");
 			}
 		} else {
 			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", this->get_character()->get_identifier().c_str());
 		}
 	}
-	wyrmgus::vector::remove(this->EquippedItems[static_cast<int>(item_slot)], &item);
+
+	vector::remove(this->EquippedItems[static_cast<int>(item_slot)], &item);
 	
 	if (item_slot == wyrmgus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from weapon technologies, and apply ability effects that are weapon class-specific accordingly

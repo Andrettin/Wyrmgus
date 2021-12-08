@@ -59,6 +59,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/assert_util.h"
 #include "util/date_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
@@ -497,7 +498,8 @@ void character::initialize()
 		}
 	}
 
-	if (this->get_trait() == nullptr) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
+	if (this->get_trait() == nullptr) {
+		//if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
 		if (this->get_unit_type() != nullptr && this->get_unit_type()->get_traits().size() == 1) {
 			this->trait = this->get_unit_type()->get_traits().at(0);
 		}
@@ -560,7 +562,7 @@ void character::initialize()
 		}
 
 		if (item->get_item_slot() != item_slot::none) {
-			this->EquippedItems[static_cast<int>(item->get_item_slot())].push_back(item.get());
+			this->equip_item(item.get());
 		} else {
 			fprintf(stderr, "Item \"%s\" cannot be equipped, as it belongs to no item slot.\n", item->get_unit_type()->get_identifier().c_str());
 		}
@@ -994,15 +996,45 @@ bool character::is_item_equipped(const persistent_item *item) const
 {
 	const item_slot item_slot = item->get_item_slot();
 	
-	if (item_slot == item_slot::none) {
-		return false;
-	}
+	assert_throw(item_slot != item_slot::none);
 	
-	if (vector::contains(this->EquippedItems[static_cast<int>(item_slot)], item)) {
-		return true;
+	const auto find_iterator = this->equipped_items.find(item_slot);
+	if (find_iterator != this->equipped_items.end()) {
+		if (vector::contains(find_iterator->second, item)) {
+			return true;
+		}
 	}
 	
 	return false;
+}
+
+void character::equip_item(const persistent_item *item)
+{
+	assert_throw(item->get_owner() == this);
+	assert_throw(!this->is_item_equipped(item));
+
+	const item_slot item_slot = item->get_item_slot();
+	assert_throw(item_slot != item_slot::none);
+
+	this->equipped_items[item_slot].push_back(item);
+}
+
+void character::deequip_item(const persistent_item *item)
+{
+	assert_throw(item->get_owner() == this);
+	assert_log(this->is_item_equipped(item));
+
+	const item_slot item_slot = item->get_item_slot();
+	assert_throw(item_slot != item_slot::none);
+
+	auto find_iterator = this->equipped_items.find(item_slot);
+	if (find_iterator != this->equipped_items.end()) {
+		vector::remove(find_iterator->second, item);
+		
+		if (find_iterator->second.empty()) {
+			this->equipped_items.erase(find_iterator);
+		}
+	}
 }
 
 bool character::IsUsable() const
