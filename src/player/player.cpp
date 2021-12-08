@@ -551,30 +551,26 @@ int CPlayer::get_military_score_advantage_over(const CPlayer *other_player) cons
 
 	int net_military_score = military_score - other_military_score;
 
-	for (const int player_index : this->get_enemies()) {
-		const CPlayer *enemy_player = CPlayer::Players[player_index].get();
-		if (enemy_player == other_player) {
+	for (const CPlayer *loop_player : CPlayer::get_non_neutral_players()) {
+		if (loop_player == this || loop_player == other_player) {
 			continue;
 		}
 
-		if (enemy_player->is_any_overlord_of(other_player)) {
+		if (loop_player->is_any_overlord_of(other_player)) {
 			continue;
 		}
 
-		net_military_score -= enemy_player->get_military_score();
-	}
-
-	for (const int player_index : other_player->get_enemies()) {
-		const CPlayer *enemy_player = CPlayer::Players[player_index].get();
-		if (enemy_player == this) {
+		if (loop_player->is_any_overlord_of(this)) {
 			continue;
 		}
 
-		if (enemy_player->is_any_overlord_of(this)) {
-			continue;
+		if (loop_player->is_enemy_of(*this)) {
+			net_military_score -= loop_player->get_military_score();
 		}
 
-		net_military_score += enemy_player->get_military_score();
+		if (loop_player->is_enemy_of(*other_player)) {
+			net_military_score += loop_player->get_military_score();
+		}
 	}
 
 	return net_military_score;
