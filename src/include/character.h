@@ -389,6 +389,11 @@ public:
 		this->level = level;
 	}
 
+	bool is_custom() const
+	{
+		return this->custom;
+	}
+
 	const std::vector<const CUpgrade *> &get_base_abilities() const
 	{
 		return this->base_abilities;
@@ -439,7 +444,9 @@ private:
 	int level = 0; //the character's current level
 public:
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
-	bool Custom = false;		/// Whether this character is a custom hero
+private:
+	bool custom = false; //whether this character is a custom hero
+public:
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
 private:
 	std::string surname; //the character's surname
