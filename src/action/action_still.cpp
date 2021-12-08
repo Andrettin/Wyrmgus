@@ -442,7 +442,12 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	//Wyrmgus start
 	//if unit is in a container which is attacking, and the container has a goal, use that goal (if possible) instead
 //	CUnit *autoAttackUnit = AttackUnitsInRange(unit);
-	CUnit *autoAttackUnit = unit.Container && unit.Container->CurrentAction() == UnitAction::Attack && unit.Container->CurrentOrder()->has_goal() ? unit.Container->CurrentOrder()->get_goal() : AttackUnitsInRange(unit);
+	CUnit *autoAttackUnit = nullptr;
+	if (unit.Container != nullptr && unit.Container->CurrentAction() == UnitAction::Attack && unit.Container->CurrentOrder()->has_goal() && !unit.Container->CurrentOrder()->get_goal()->Destroyed) {
+		autoAttackUnit = unit.Container->CurrentOrder()->get_goal();
+	} else {
+		autoAttackUnit = AttackUnitsInRange(unit);
+	}
 	//Wyrmgus end
 
 	if (autoAttackUnit == nullptr) {
