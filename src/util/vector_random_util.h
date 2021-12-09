@@ -70,6 +70,11 @@ inline void process_randomly(const std::vector<T> &vector, const function_type &
 template <typename T>
 inline void shuffle(std::vector<T> &vector)
 {
+	if (vector.empty()) {
+		//nothing to shuffle
+		return;
+	}
+
 	std::vector<T> shuffled_vector;
 
 	vector::process_randomly(vector, [&shuffled_vector](T &&element) {

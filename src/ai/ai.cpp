@@ -188,6 +188,10 @@ PlayerAi *AiPlayer;             /// Current AI player
 
 void PlayerAi::evaluate_diplomacy()
 {
+	if (AiPlayer->Player->AiName == "passive") {
+		return;
+	}
+
 	if (game::get()->get_current_campaign() == nullptr) {
 		//only evaluate diplomacy in the campaign mode
 		return;
@@ -196,34 +200,82 @@ void PlayerAi::evaluate_diplomacy()
 	//evaluate whether the AI's diplomacy should change
 	CPlayer *player = this->Player;
 
-	//check if we should declare war against another player
-	if (!player->at_war()) {
-		if (player->is_independent()) {
-			std::vector<CPlayer *> border_players = container::to_vector(player->get_border_players());
-			vector::shuffle(border_players);
+	const bool territorial_player = player->NumTownHalls > 0 || player->is_revealed();
 
-			for (CPlayer *border_player : border_players) {
-				if (!player->is_player_capital_explored(border_player)) {
-					//don't declare war on players for which we don't have their capital location explored, as they might be unreachable (e.g. in a world or landmass we have no way to get to)
-					continue;
+	//if we have aren't a territorial player, declare war on the owner of our start tile, if anyone owns it
+	if (!territorial_player) {
+		const tile *start_tile = CMap::get()->Field(player->StartPos, player->StartMapLayer);
+		CPlayer *tile_owner = start_tile->get_owner();
+
+		if (tile_owner != nullptr) {
+			assert_throw(tile_owner != player);
+
+			if (!player->has_enemy_stance_with(tile_owner) && player->can_declare_war_on(tile_owner)) {
+				player->set_enemy_diplomatic_stance_with(tile_owner);
+			}
+		}
+
+		return;
+	}
+
+	if (player->NumTownHalls > 0) {
+		//check if we should declare war against another player
+		if (!player->at_war()) {
+			if (player->is_independent()) {
+				std::vector<CPlayer *> border_players = container::to_vector(player->get_border_players());
+				vector::shuffle(border_players);
+
+				for (CPlayer *border_player : border_players) {
+					if (!player->is_player_capital_explored(border_player)) {
+						//don't declare war on players for which we don't have their capital location explored, as they might be unreachable (e.g. in a world or landmass we have no way to get to)
+						continue;
+					}
+
+					if (!player->can_declare_war_on(border_player)) {
+						continue;
+					}
+
+					if (player->get_military_score_percent_advantage_over(border_player) >= PlayerAi::military_score_advantage_threshold) {
+						player->set_enemy_diplomatic_stance_with(border_player);
+						break;
+					}
 				}
+			} else {
+				CPlayer *overlord = player->get_overlord();
 
-				if (!player->can_declare_war_on(border_player)) {
-					continue;
+				assert_throw(overlord != nullptr);
+
+				if (player->can_declare_war_on(overlord) && player->has_military_advantage_over(overlord)) {
+					player->set_enemy_diplomatic_stance_with(overlord);
 				}
+			}
+		}
 
-				if (player->get_military_score_percent_advantage_over(border_player) >= PlayerAi::military_score_advantage_threshold) {
-					player->set_enemy_diplomatic_stance_with(border_player);
+		//declare war on revealed players with units in our territory
+		for (const int revealed_player_index : CPlayer::get_revealed_player_indexes()) {
+			CPlayer *revealed_player = CPlayer::Players[revealed_player_index].get();
+
+			if (player->has_enemy_stance_with(revealed_player)) {
+				//already an enemy
+				continue;
+			}
+
+			if (!player->can_declare_war_on(revealed_player) || !player->has_military_advantage_over(revealed_player)) {
+				continue;
+			}
+
+			bool unit_in_territory = false;
+			for (const CUnit *revealed_player_unit : revealed_player->get_units()) {
+				const CPlayer *unit_tile_owner = revealed_player_unit->get_center_tile_owner();
+
+				if (unit_tile_owner == player) {
+					unit_in_territory = true;
 					break;
 				}
 			}
-		} else {
-			CPlayer *overlord = player->get_overlord();
 
-			assert_throw(overlord != nullptr);
-
-			if (player->can_declare_war_on(overlord) && player->has_military_advantage_over(overlord)) {
-				player->set_enemy_diplomatic_stance_with(overlord);
+			if (unit_in_territory) {
+				player->set_enemy_diplomatic_stance_with(revealed_player);
 			}
 		}
 	}

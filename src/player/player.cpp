@@ -3272,6 +3272,11 @@ bool CPlayer::at_war() const
 			continue;
 		}
 
+		if (other_player->is_revealed()) {
+			//don't count revealed players, as they don't pose a lasting threat, in principle
+			continue;
+		}
+
 		if (this->is_enemy_of(*other_player)) {
 			return true;
 		}
