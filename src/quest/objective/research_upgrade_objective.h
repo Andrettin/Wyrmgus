@@ -31,8 +31,10 @@
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"
+#include "script/condition/condition.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
+#include "upgrade/upgrade_modifier.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {

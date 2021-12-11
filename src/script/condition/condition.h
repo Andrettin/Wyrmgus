@@ -129,7 +129,7 @@ extern bool check_special_conditions(const CUpgrade *target, const CPlayer *play
 
 //check conditions for player
 template <bool precondition = false, typename T>
-extern bool check_conditions(const T *target, const CPlayer *player, const bool ignore_units = false, const bool is_neutral_use = false)
+inline bool check_conditions(const T *target, const CPlayer *player, const bool ignore_units = false, const bool is_neutral_use = false)
 {
 	if constexpr (!precondition) {
 		if (!check_conditions<true>(target, player, ignore_units, is_neutral_use)) {
@@ -162,7 +162,7 @@ extern bool check_special_conditions(const CUpgrade *target, const CUnit *unit, 
 
 //check conditions for unit
 template <bool precondition = false, typename T>
-extern bool check_conditions(const T *target, const CUnit *unit, const bool ignore_units = false)
+inline bool check_conditions(const T *target, const CUnit *unit, const bool ignore_units = false)
 {
 	if constexpr (!precondition) {
 		if (!check_conditions<true>(target, unit, ignore_units)) {
