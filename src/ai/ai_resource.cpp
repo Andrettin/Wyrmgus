@@ -2307,7 +2307,11 @@ static void AiCheckPathwayConstruction()
 
 void PlayerAi::check_settlement_construction()
 {
-	this->check_settlement_construction(this->Player->get_border_settlements());
+	if (this->Player->NumTownHalls > 0) {
+		this->check_settlement_construction(this->Player->get_border_settlements());
+	} else {
+		this->check_settlement_construction(CMap::get()->get_settlements());
+	}
 }
 
 void PlayerAi::check_settlement_construction(const site_set &settlements)
@@ -2354,7 +2358,9 @@ void PlayerAi::check_settlement_construction(const site_set &settlements)
 		
 		const landmass *settlement_landmass = settlement_game_data->get_landmass();
 		if (!builder_landmasses.contains(settlement_landmass)) {
-			this->transport_worker_to_site(settlement);
+			if (this->Player->NumTownHalls > 0) {
+				this->transport_worker_to_site(settlement);
+			}
 			continue;
 		}
 		

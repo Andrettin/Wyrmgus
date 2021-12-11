@@ -303,6 +303,8 @@ public:
 
 	void add_landmass(std::unique_ptr<landmass> &&landmass);
 
+	site_set get_settlements() const;
+
 	const std::vector<CUnit *> &get_settlement_units() const
 	{
 		return this->settlement_units;

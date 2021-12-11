@@ -4313,6 +4313,18 @@ void CMap::add_landmass(std::unique_ptr<landmass> &&landmass)
 	this->landmasses.push_back(std::move(landmass));
 }
 
+site_set CMap::get_settlements() const
+{
+	//get the settlements on the map
+	site_set settlements;
+
+	for (const CUnit *settlement_unit : this->get_settlement_units()) {
+		settlements.insert(settlement_unit->settlement);
+	}
+
+	return settlements;
+}
+
 void CMap::remove_settlement_unit(CUnit *settlement_unit)
 {
 	vector::remove(this->settlement_units, settlement_unit);
