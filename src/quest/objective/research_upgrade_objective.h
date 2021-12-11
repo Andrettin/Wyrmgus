@@ -32,6 +32,7 @@
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"
 #include "script/condition/condition.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
