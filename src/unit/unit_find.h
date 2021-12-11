@@ -498,22 +498,19 @@ extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource, int z);
 //extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, const tile_flag flags, int *distance = nullptr);
 extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, const tile_flag flags, const int z, int max_difference = 0, int *distance = nullptr);
 //Wyrmgus end
-/// Find best enemy in numeric range to attack
-//Wyrmgus start
-//extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred);
-//extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range);
-template <bool circle = false>
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, bool include_neutral = false);
 
-extern template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, int range, CUnitFilter pred, bool include_neutral);
-extern template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, int range, CUnitFilter pred, bool include_neutral);
+/// Find best enemy in numeric range to attack
+template <bool circle = false>
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pred);
+
+extern template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, const int range, CUnitFilter pred);
+extern template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, const int range, CUnitFilter pred);
 
 template <bool circle>
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, const bool include_neutral = false);
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, const int range);
 
-extern template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, const int range, const bool include_neutral);
-extern template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, const int range, const bool include_neutral);
-//Wyrmgus end
+extern template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, const int range);
+extern template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, const int range);
 
 /// Find best enemy in attack range to attack
 extern CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred);
@@ -521,12 +518,10 @@ extern CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred);
 extern CUnit *AttackUnitsInRange(const CUnit &unit);
 
 /// Find best enemy in reaction range to attack
+extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred);
+
+extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
+
 //Wyrmgus start
-//extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred);
-//extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
-extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, bool include_neutral = false);
-
-extern CUnit *AttackUnitsInReactRange(const CUnit &unit, bool include_neutral = false);
-
 extern bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, const tile_flag flags);
 //Wyrmgus end

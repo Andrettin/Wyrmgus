@@ -68,16 +68,15 @@ static constexpr int AIATTACK_BUILDING = 2;
 static constexpr int AIATTACK_AGRESSIVE = 3;
 
 //Wyrmgus start
-class EnemyUnitFinder
+class EnemyUnitFinder final
 {
 public:
-	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, int find_type, bool include_neutral, bool allow_water) :
+	explicit EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const int find_type, const bool allow_water)
 	//Wyrmgus end
-		unit(unit),
+		: unit(unit),
 		movemask(unit.Type->MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)),
 		attackrange(unit.get_best_attack_range()),
 		find_type(find_type),
-		include_neutral(include_neutral),
 		allow_water(allow_water),
 		result_unit(result_unit),
 		result_enemy_wall_pos(result_enemy_wall_pos),
@@ -91,7 +90,6 @@ private:
 	tile_flag movemask;
 	const int attackrange;
 	const int find_type;
-	bool include_neutral;
 	bool allow_water;
 	CUnit **result_unit;
 	Vec2i *result_enemy_wall_pos;
@@ -109,13 +107,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	
 	if (unit.MapLayer->Field(pos)->CheckMask(tile_flag::wall) && !CMap::get()->Info->IsPointOnMap(*result_enemy_wall_pos, *result_enemy_wall_map_layer)) {
 		const CPlayer *tile_owner = unit.MapLayer->Field(pos)->get_owner();
-		if (
-			tile_owner != nullptr
-			&& (
-				unit.is_enemy_of(*tile_owner)
-				|| (include_neutral && !unit.is_allied_with(*tile_owner) && unit.Player != tile_owner && !unit.Player->has_building_access(tile_owner))
-			)
-		) {
+		if (tile_owner != nullptr && unit.is_enemy_of(*tile_owner)) {
 			*result_enemy_wall_pos = pos;
 			*result_enemy_wall_map_layer = unit.MapLayer->ID;
 		}
@@ -138,21 +130,14 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
 	Vec2i maxpos = pos + Vec2i(unit.Type->get_tile_size() - QSize(1, 1) + QSize(attackrange, attackrange));
 	Select(minpos, maxpos, table, unit.MapLayer->ID, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit *dest = table[i];
-		const wyrmgus::unit_type &dtype = *dest->Type;
+	for (CUnit *dest : table) {
+		const unit_type &dtype = *dest->Type;
 
 		if (!dest->IsAliveOnMap()) {
 			continue;
 		}
 		
-		if (
-			(
-				!unit.is_enemy_of(*dest) // a friend or neutral
-				&& (!include_neutral || unit.is_allied_with(*dest) || unit.Player == dest->Player || unit.Player->has_building_access(dest->Player))
-			)
-			|| !unit.Type->can_target(dest)
-		) {
+		if (!unit.is_enemy_of(*dest) || !unit.Type->can_target(dest)) {
 			continue;
 		}
 
@@ -179,22 +164,24 @@ class AiForceEnemyFinder final
 public:
 	//Wyrmgus start
 //	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy)
-	explicit AiForceEnemyFinder(const int force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
+	explicit AiForceEnemyFinder(const int force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool allow_water) 
+		: enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), allow_water(allow_water)
 	//Wyrmgus end
 	{
 		assert_throw(enemy != nullptr);
 		*enemy = nullptr;
-		wyrmgus::vector::for_each_unless(AiPlayer->Force[force].get_units(), *this);
+		vector::for_each_unless(AiPlayer->Force[force].get_units(), *this);
 	}
 
 	//Wyrmgus start
 //	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy)
-	explicit AiForceEnemyFinder(AiForce &force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
+	explicit AiForceEnemyFinder(AiForce &force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool allow_water)
+		: enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), allow_water(allow_water)
 	//Wyrmgus end
 	{
 		assert_throw(enemy != nullptr);
 		*enemy = nullptr;
-		wyrmgus::vector::for_each_unless(force.get_units(), *this);
+		vector::for_each_unless(force.get_units(), *this);
 	}
 
 	bool found() const { return *enemy != nullptr; }
@@ -203,7 +190,7 @@ public:
 	{
 		//Wyrmgus start
 //		if (unit->Type->CanAttack == false) {
-		if (unit->CanAttack() == false || std::find(CheckedTypes.begin(), CheckedTypes.end(), unit->Type) != CheckedTypes.end()) { // don't check for multiple units of the same type, since the result will be the same in almost all cases, so we save performance
+		if (unit->CanAttack() == false || vector::contains(CheckedTypes, unit->Type)) { //don't check for multiple units of the same type, since the result will be the same in almost all cases, so we save performance
 		//Wyrmgus end
 			return *enemy == nullptr;
 		}
@@ -213,7 +200,7 @@ public:
 		if constexpr (FIND_TYPE == AIATTACK_RANGE) {
 			//Wyrmgus start
 //			*enemy = AttackUnitsInReactRange(*unit);
-			*enemy = AttackUnitsInReactRange(*unit, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), IncludeNeutral);
+			*enemy = AttackUnitsInReactRange(*unit, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
 			//Wyrmgus end
 		//Wyrmgus start
 		} else {
@@ -226,7 +213,7 @@ public:
 
 			CUnit *result_unit = nullptr;
 
-			EnemyUnitFinder enemyUnitFinder(*unit, &result_unit, result_enemy_wall_pos, result_enemy_wall_map_layer, FIND_TYPE, IncludeNeutral, allow_water);
+			EnemyUnitFinder enemyUnitFinder(*unit, &result_unit, result_enemy_wall_pos, result_enemy_wall_map_layer, FIND_TYPE, allow_water);
 
 			terrainTraversal.Run(enemyUnitFinder);
 			*enemy = result_unit;
@@ -235,12 +222,12 @@ public:
 		/*
 		} else if (FIND_TYPE == AIATTACK_ALLMAP) {
 //			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), false, IncludeNeutral);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), false);
 			//Wyrmgus end
 		} else if (FIND_TYPE == AIATTACK_BUILDING) {
 			//Wyrmgus start
 //			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::get_neutral_player()), IsBuildingType()), false, IncludeNeutral);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::get_neutral_player()), IsBuildingType()), false);
 			//Wyrmgus end
 			//Wyrmgus start
 			//why make sure the enemy is null?
@@ -249,13 +236,13 @@ public:
 			if (*enemy == nullptr || !(*enemy)->Type->BoolFlag[BUILDING_INDEX].value) {
 				//Wyrmgus start
 //				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), false, IncludeNeutral);
+				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), false);
 				//Wyrmgus end
 			}
 		} else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
 			//Wyrmgus start
 //			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::get_neutral_player()), IsAggresiveUnit()), false, IncludeNeutral);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::get_neutral_player()), IsAggresiveUnit()), false);
 			//Wyrmgus end
 			//Wyrmgus start
 			//why ask that the enemy be null?
@@ -264,7 +251,7 @@ public:
 			if (*enemy == nullptr) {
 				//Wyrmgus start
 //				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), false, IncludeNeutral);
+				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(*CPlayer::get_neutral_player()), false);
 				//Wyrmgus end
 			}
 		*/
@@ -283,7 +270,6 @@ private:
 	//Wyrmgus start
 	Vec2i *result_enemy_wall_pos;
 	int *result_enemy_wall_map_layer;
-	const bool IncludeNeutral;
 	const bool allow_water;
 	std::vector<const wyrmgus::unit_type *> CheckedTypes;
 	//Wyrmgus end
@@ -786,12 +772,6 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		}
 	}
 	if (CMap::get()->Info->IsPointOnMap(goalPos, z) == false) {
-		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
-		const wyrmgus::quest *current_quest = current_campaign ? current_campaign->get_quest() : nullptr;
-
-		//attack neutral players if the current campaign's quest is completed, or if there is no main quest for the current campaign, or if this is a network game (so that the GetThisPlayer() conditional does not affect a network game, as that would cause a desync)
-		const bool include_neutral = !AiPlayer->Player->at_war() && AiPlayer->Player->is_independent() && AiPlayer->Player->NumTownHalls == 0 && GameCycle >= PlayerAi::enforced_peace_cycle_count && (IsNetworkGame() || current_quest == nullptr || CPlayer::GetThisPlayer()->is_quest_completed(current_quest));
-
 		/* Search in entire map */
 		const CUnit *enemy = nullptr;
 		Vec2i enemy_wall_pos(-1, -1);
@@ -799,17 +779,17 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		if (isTransporter) {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy);
-			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, false);
+			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy, &enemy_wall_pos, &enemy_wall_map_layer, false);
 			//Wyrmgus end
 		} else if (isNaval) {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy);
-			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, false);
+			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy, &enemy_wall_pos, &enemy_wall_map_layer, false);
 			//Wyrmgus end
 		} else {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy);
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, true);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy, &enemy_wall_pos, &enemy_wall_map_layer, true);
 			//Wyrmgus end
 		}
 		if (enemy) {
@@ -1555,11 +1535,6 @@ void AiForce::Update()
 	//Wyrmgus end
 	assert_throw(CMap::get()->Info->IsPointOnMap(GoalPos, GoalMapLayer));
 
-	const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
-	const wyrmgus::quest *current_quest = current_campaign ? current_campaign->get_quest() : nullptr;
-
-	const bool include_neutral = !AiPlayer->Player->at_war() && AiPlayer->Player->is_independent() && AiPlayer->Player->NumTownHalls == 0 && GameCycle >= PlayerAi::enforced_peace_cycle_count && (IsNetworkGame() || current_quest == nullptr || CPlayer::GetThisPlayer()->is_quest_completed(current_quest));
-
 	if (State == AiForceAttackingState::GoingToRallyPoint) {
 		// Check if we are near the goalpos
 		//Wyrmgus start
@@ -1589,12 +1564,12 @@ void AiForce::Update()
 			int enemy_wall_map_layer = -1;
 			
 //			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, true);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, true);
 			//Wyrmgus end
 			if (!unit) {
 				//Wyrmgus start
 //				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
-				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, true);
+				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, true);
 				//Wyrmgus end
 				if (!unit && !CMap::get()->Info->IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 					//Wyrmgus start
@@ -1688,12 +1663,12 @@ void AiForce::Update()
 		if (isNaval) {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
-			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, false);
+			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, false);
 			//Wyrmgus end
 		} else {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, true);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, true);
 			//Wyrmgus end
 		}
 		if (!unit && !CMap::get()->Info->IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
@@ -1956,7 +1931,7 @@ void AiForceManager::Update()
 						int dummy_wall_map_layer = -1;
 						//Wyrmgus start
 //						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
-						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy, &dummy_wall_pos, &dummy_wall_map_layer, false, false).found()) {
+						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy, &dummy_wall_pos, &dummy_wall_map_layer, false).found()) {
 						//Wyrmgus end
 							force.ReturnToHome();
 						}

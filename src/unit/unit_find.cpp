@@ -1000,15 +1000,9 @@ CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource, int z)
 class BestTargetFinder
 {
 public:
-	//Wyrmgus start
-//	BestTargetFinder(const CUnit &a) :
-	explicit BestTargetFinder(const CUnit &a, bool i_n) :
-	//Wyrmgus end
-		//Wyrmgus start
-//		attacker(&a)
-		attacker(&a), include_neutral(i_n)
-		//Wyrmgus end
-	{}
+	explicit BestTargetFinder(const CUnit &a) : attacker(&a)
+	{
+	}
 
 	CUnit *Find(const std::vector<CUnit *> &table) const
 	{
@@ -1046,12 +1040,8 @@ private:
 		int attackrange = attacker->get_best_attack_range();
 
 		//Wyrmgus start
-//		if (!player.is_enemy_of(*dest) // a friend or neutral
-		if (
-			(
-				!attacker->is_enemy_of(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->is_allied_with(*dest) || dest->Player->get_type() == player_type::neutral || attacker->Player == dest->Player)
-			)
+//		if (!player.is_enemy_of(*dest) //a friend or neutral
+		if (!attacker->is_enemy_of(*dest) //a friend or neutral
 		//Wyrmgus end
 			|| !dest->IsVisibleAsGoal(player)
 			|| !type.can_target(dest)) {
@@ -1128,10 +1118,7 @@ private:
 	}
 
 private:
-	const CUnit *attacker;
-	//Wyrmgus start
-	const bool include_neutral;
-	//Wyrmgus end
+	const CUnit *attacker = nullptr;
 };
 
 /**
@@ -1152,10 +1139,7 @@ public:
 	**  @param range  Distance range to look.
 	**
 	*/
-	//Wyrmgus start
-//	BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
-	explicit BestRangeTargetFinder(const CUnit &a, const int r, const bool i_n) : attacker(&a), range(r), include_neutral(i_n),
-	//Wyrmgus end
+	explicit BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
 		size((a.GetMissile().Missile->get_range() + r) * 2)
 	{
 		this->good = std::vector<int>(size * size, 0);
@@ -1165,15 +1149,8 @@ public:
 	class FillBadGood
 	{
 	public:
-		//Wyrmgus start
-//		FillBadGood(const CUnit &a, int r, std::vector<int> *g, std::vector<int> *b, int s):
-		explicit FillBadGood(const CUnit &a, int r, std::vector<int> &g, std::vector<int> &b, const int s, const bool i_n):
-		//Wyrmgus end
-			attacker(&a), range(r), size(s),
-			//Wyrmgus start
-			include_neutral(i_n),
-			//Wyrmgus end
-			good(g), bad(b)
+		explicit FillBadGood(const CUnit &a, const int r, std::vector<int> &g, std::vector<int> &b, const int s)
+			: attacker(&a), range(r), size(s), good(g), bad(b)
 		{
 		}
 
@@ -1228,11 +1205,8 @@ public:
 									 + attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 			}
 			//Wyrmgus start
-//			if (!player.is_enemy_of(*dest)) { // a friend or neutral
-			if (
-				!attacker->is_enemy_of(*dest) // a friend or neutral
-				&& (!include_neutral || attacker->is_allied_with(*dest) || dest->Player->get_type() == player_type::neutral || attacker->Player == dest->Player)
-			) {
+//			if (!player.is_enemy_of(*dest)) { //a friend or neutral
+			if (!attacker->is_enemy_of(*dest)) { //a friend or neutral
 			//Wyrmgus end
 				dest->CacheLock = 1;
 
@@ -1348,27 +1322,18 @@ public:
 		std::vector<int> &good;
 		std::vector<int> &bad;
 		const int size;
-		//Wyrmgus start
-		const bool include_neutral;
-		//Wyrmgus end
 	};
 
 	CUnit *Find(std::vector<CUnit *> &table)
 	{
-		//Wyrmgus start
-//		FillBadGood(*attacker, range, good, bad, size).Fill(table.begin(), table.end());
-		FillBadGood(*attacker, range, good, bad, size, include_neutral).Fill(table.begin(), table.end());
-		//Wyrmgus end
+		FillBadGood(*attacker, range, good, bad, size).Fill(table.begin(), table.end());
 		return Find(table.begin(), table.end());
 
 	}
 
 	CUnit *Find(CUnitCache &cache)
 	{
-		//Wyrmgus start
-//		FillBadGood(*attacker, range, good, bad, size).Fill(cache);
-		FillBadGood(*attacker, range, good, bad, size, include_neutral).Fill(cache);
-		//Wyrmgus end
+		FillBadGood(*attacker, range, good, bad, size).Fill(cache);
 		return Find(cache.begin(), cache.end());
 	}
 
@@ -1452,14 +1417,12 @@ private:
 	std::vector<int> good;
 	std::vector<int> bad;
 	const int size = 0;
-	//Wyrmgus start
-	const bool include_neutral = false;
-	//Wyrmgus end
 };
 
-struct CompareUnitDistance {
-	const CUnit *referenceunit;
-	CompareUnitDistance(const CUnit &unit): referenceunit(&unit) {}
+struct CompareUnitDistance final
+{
+	explicit CompareUnitDistance(const CUnit &unit) : referenceunit(&unit) {}
+
 	bool operator()(const CUnit *c1, const CUnit *c2)
 	{
 		int d1 = c1->MapDistanceTo(*referenceunit);
@@ -1470,6 +1433,8 @@ struct CompareUnitDistance {
 			return d1 < d2;
 		}
 	}
+
+	const CUnit *referenceunit = nullptr;
 };
 
 /**
@@ -1540,11 +1505,8 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, cons
 **
 **  @return       Unit to be attacked.
 */
-//Wyrmgus start
 template <bool circle>
-//CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pred)
-CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pred, const bool include_neutral)
-//Wyrmgus end
+CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pred)
 {
 	// if necessary, take possible damage on allied units into account...
 	if (unit.GetMissile().Missile->get_range() > 1
@@ -1566,10 +1528,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pre
 			//Wyrmgus end
 
 		if (table.empty() == false) {
-			//Wyrmgus start
-//			return BestRangeTargetFinder(unit, range).Find(table);
-			return BestRangeTargetFinder(unit, range, include_neutral).Find(table);
-			//Wyrmgus end
+			return BestRangeTargetFinder(unit, range).Find(table);
 		}
 		return nullptr;
 	} else {
@@ -1589,27 +1548,21 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pre
 		}
 
 		// Find the best unit to attack
-		//Wyrmgus start
-//		return BestTargetFinder(unit).Find(table);
-		return BestTargetFinder(unit, include_neutral).Find(table);
-		//Wyrmgus end
+		return BestTargetFinder(unit).Find(table);
 	}
 }
 
-template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, int range, CUnitFilter pred, bool include_neutral = false);
-template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, int range, CUnitFilter pred, bool include_neutral = false);
+template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, const int range, CUnitFilter pred);
+template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, const int range, CUnitFilter pred);
 
 template <bool circle>
-CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, const bool include_neutral)
+CUnit *AttackUnitsInDistance(const CUnit &unit, const int range)
 {
-	//Wyrmgus start
-//	return AttackUnitsInDistance(unit, range, NoFilter());
-	return AttackUnitsInDistance<circle>(unit, range, NoFilter(), include_neutral);
-	//Wyrmgus end
+	return AttackUnitsInDistance<circle>(unit, range, NoFilter());
 }
 
-template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, const int range, const bool include_neutral);
-template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, const int range, const bool include_neutral);
+template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, const int range);
+template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, const int range);
 
 /**
 **  Attack units in attack range.
@@ -1636,25 +1589,16 @@ CUnit *AttackUnitsInRange(const CUnit &unit)
 **
 **  @return      Pointer to unit which should be attacked.
 */
-//Wyrmgus start
-//CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred)
-CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, const bool include_neutral)
-//Wyrmgus end
+CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred)
 {
 	assert_throw(unit.CanAttack());
 	const int range = unit.GetReactionRange();
-	//Wyrmgus start
-//	return AttackUnitsInDistance<true>(unit, range, pred);
-	return AttackUnitsInDistance<true>(unit, range, pred, include_neutral);
-	//Wyrmgus end
+	return AttackUnitsInDistance<true>(unit, range, pred);
 }
 
-CUnit *AttackUnitsInReactRange(const CUnit &unit, bool include_neutral)
+CUnit *AttackUnitsInReactRange(const CUnit &unit)
 {
-	//Wyrmgus start
-//	return AttackUnitsInReactRange(unit, NoFilter());
-	return AttackUnitsInReactRange(unit, NoFilter(), include_neutral);
-	//Wyrmgus end
+	return AttackUnitsInReactRange(unit, NoFilter());
 }
 
 class PathwayConnectionFinder final
