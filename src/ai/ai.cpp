@@ -388,10 +388,9 @@ static void AiCheckUnits()
 	}
 
 	//  Look if some researches are missing.
-	n = (int)AiPlayer->ResearchRequests.size();
-	for (int i = 0; i < n; ++i) {
-		if (UpgradeIdAllowed(*AiPlayer->Player, AiPlayer->ResearchRequests[i]->ID) == 'A') {
-			AiAddResearchRequest(AiPlayer->ResearchRequests[i]);
+	for (const CUpgrade *requested_upgrade : AiPlayer->get_research_requests()) {
+		if (UpgradeIdAllowed(*AiPlayer->Player, requested_upgrade->ID) == 'A') {
+			AiAddResearchRequest(requested_upgrade);
 		}
 	}
 	
@@ -651,9 +650,8 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	file.printf("},\n");
 
 	file.printf("  \"research\", {");
-	const size_t researchRequestsCount = ai.ResearchRequests.size();
-	for (size_t i = 0; i != researchRequestsCount; ++i) {
-		file.printf("\"%s\", ", ai.ResearchRequests[i]->get_identifier().c_str());
+	for (const CUpgrade *requested_upgrade : ai.get_research_requests()) {
+		file.printf("\"%s\", ", requested_upgrade->get_identifier().c_str());
 	}
 	file.printf("},\n");
 
@@ -1748,11 +1746,12 @@ bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_req
 	}
 
 	if (include_requests) {
-		if (pai.Player->UpgradeTimers.Upgrades[upgrade->ID] > 0) { //already researching
+		if (pai.Player->UpgradeTimers.Upgrades[upgrade->ID] > 0) {
+			//already researching
 			return true;
 		}
 		
-		if (std::find(pai.ResearchRequests.begin(), pai.ResearchRequests.end(), upgrade) != pai.ResearchRequests.end()) {
+		if (vector::contains(pai.get_research_requests(), upgrade)) {
 			return true;
 		}
 	}

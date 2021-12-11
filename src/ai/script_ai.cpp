@@ -734,9 +734,9 @@ static void InsertUpgradeToRequests(wyrmgus::unit_type *type)
 **
 **  @param upgrade  Upgrade to be appended.
 */
-static void InsertResearchRequests(CUpgrade *upgrade)
+static void InsertResearchRequests(const CUpgrade *upgrade)
 {
-	AiPlayer->ResearchRequests.push_back(upgrade);
+	AiPlayer->add_research_request(upgrade);
 }
 
 //----------------------------------------------------------------------------
@@ -1252,12 +1252,14 @@ static int CclAiResearch(lua_State *l)
 		LuaError(l, "Upgrade needed");
 		upgrade = nullptr;
 	}
+
 	//Wyrmgus start
 //	InsertResearchRequests(upgrade);
 	if (UpgradeIdentAllowed(*AiPlayer->Player, str) != 'R') {
 		InsertResearchRequests(upgrade);
 	}
 	//Wyrmgus end
+
 	lua_pushboolean(l, 0);
 	return 1;
 }
@@ -1407,10 +1409,10 @@ static int CclAiDump(lua_State *l)
 				printf("%s ", aip.Ai->UpgradeToRequests[i]->Ident.c_str());
 			}
 			printf("\n");
-			n = aip.Ai->ResearchRequests.size();
-			printf("ResearchRequests(%u):\n", static_cast<unsigned int>(n));
-			for (size_t i = 0; i < n; ++i) {
-				printf("%s ", aip.Ai->ResearchRequests[i]->get_identifier().c_str());
+
+			printf("ResearchRequests(%u):\n", static_cast<unsigned int>(aip.Ai->get_research_requests().size()));
+			for (const CUpgrade *requested_upgrade : aip.Ai->get_research_requests()) {
+				printf("%s ", requested_upgrade->get_identifier().c_str());
 			}
 			printf("\n");
 
@@ -1753,7 +1755,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				const char *ident = LuaToString(l, j + 1, k + 1);
-				ai->ResearchRequests.push_back(CUpgrade::get(ident));
+				ai->add_research_request(CUpgrade::get(ident));
 			}
 		} else if (!strcmp(value, "building")) {
 			CclParseBuildQueue(l, ai, j + 1);

@@ -405,6 +405,13 @@ public:
 	void remove_site_transport_unit(CUnit *unit);
 	void transport_worker_to_site(const site *site);
 	void check_site_transport_units();
+
+	const std::vector<const CUpgrade *> &get_research_requests() const
+	{
+		return this->research_requests;
+	}
+
+	void add_research_request(const CUpgrade *upgrade);
 	
 	void evaluate_diplomacy();
 	void check_quest_objectives();
@@ -439,7 +446,9 @@ public:
 	unsigned long LastCanNotMoveGameCycle = 0;	/// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;	/// unit-types to build/train request,priority list
 	std::vector<wyrmgus::unit_type *> UpgradeToRequests;		/// Upgrade to unit-type requested and priority list
-	std::vector<const CUpgrade *> ResearchRequests;		/// Upgrades requested and priority list
+private:
+	std::vector<const CUpgrade *> research_requests; //upgrades requested and priority list
+public:
 	std::vector<AiBuildQueue> UnitTypeBuilt;		/// What the resource manager should build
 	int LastRepairBuilding = 0;						/// Last building checked for repair in this turn
 	//Wyrmgus start
@@ -780,7 +789,8 @@ extern void AiResetUnitTypeEquiv();
 extern int AiFindUnitTypeEquiv(const wyrmgus::unit_type &type, int *result);
 /// Finds all available equivalents units to a given one, in the preferred order
 extern int AiFindAvailableUnitTypeEquiv(const wyrmgus::unit_type &type, int *result);
-extern bool AiRequestedTypeAllowed(const CPlayer &player, const wyrmgus::unit_type &type, bool allow_can_build_builder = false, bool include_upgrade = false);
+extern bool AiRequestedTypeAllowed(const CPlayer &player, const unit_type &type, const bool allow_can_build_builder = false, const bool include_upgrade = false);
+extern bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upgrade, const bool allow_can_build_researcher = false);
 extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit &worker);

@@ -438,7 +438,7 @@ static int AiBuildBuilding(const unit_type &type, const unit_type &building, con
 	return 0;
 }
 
-bool AiRequestedTypeAllowed(const CPlayer &player, const unit_type &type, bool allow_can_build_builder, bool include_upgrade)
+bool AiRequestedTypeAllowed(const CPlayer &player, const unit_type &type, const bool allow_can_build_builder, const bool include_upgrade)
 {
 	if (!check_conditions(&type, &player)) {
 		return false;
@@ -491,7 +491,7 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const unit_type &type, bool a
 	return false;
 }
 
-static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upgrade, bool allow_can_build_researcher = false)
+bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upgrade, const bool allow_can_build_researcher)
 {
 	if (UpgradeIdAllowed(*AiPlayer->Player, upgrade->ID) != 'A') {
 		return false;
@@ -1155,6 +1155,7 @@ void AiAddResearchRequest(const CUpgrade *upgrade)
 		AiPlayer->NeededMask |= costNeeded;
 		return;
 	}
+
 	//
 	// Check if we have a place for the upgrade to research
 	//
@@ -2540,17 +2541,8 @@ void AiCheckUpgrades()
 			//don't request the upgrade if it is going to use up a resource that is currently needed
 			continue;
 		}
-		
-		//remove any removed upgrades from the requests, to prevent mutually-incompatible upgrades from being researched back and forth
-		for (const auto &modifier : upgrade->get_modifiers()) {
-			for (const CUpgrade *removed_upgrade : modifier->get_removed_upgrades()) {
-				if (vector::contains(AiPlayer->ResearchRequests, removed_upgrade)) {
-					vector::remove(AiPlayer->ResearchRequests, removed_upgrade);
-				}
-			}
-		}
 
-		AiPlayer->ResearchRequests.push_back(upgrade);
+		AiPlayer->add_research_request(upgrade);
 	}
 }
 

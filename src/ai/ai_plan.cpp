@@ -50,6 +50,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade_modifier.h"
 #include "util/vector_util.h"
 
 class _EnemyOnMapTile final
@@ -1130,4 +1131,18 @@ void PlayerAi::check_site_transport_units()
 	for (const site *site : site_keys_to_remove) {
 		this->site_transport_units.erase(site);
 	}
+}
+
+void PlayerAi::add_research_request(const CUpgrade *upgrade)
+{
+	//remove any removed upgrades from the requests, to prevent mutually-incompatible upgrades from being researched back and forth
+	for (const auto &modifier : upgrade->get_modifiers()) {
+		for (const CUpgrade *removed_upgrade : modifier->get_removed_upgrades()) {
+			if (vector::contains(this->research_requests, removed_upgrade)) {
+				vector::remove(this->research_requests, removed_upgrade);
+			}
+		}
+	}
+
+	this->research_requests.push_back(upgrade);
 }
