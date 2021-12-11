@@ -84,6 +84,7 @@
 #include "player/vassalage_type.h"
 #include "quest/campaign.h"
 #include "quest/objective/quest_objective.h"
+#include "quest/objective/research_upgrade_objective.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"
@@ -2324,6 +2325,26 @@ std::vector<character *> CPlayer::get_recruitable_heroes_from_list(const std::ve
 
 	return recruitable_heroes;
 }
+
+bool CPlayer::is_upgrade_quest_objective(const CUpgrade *upgrade) const
+{
+	for (const auto &objective : this->get_quest_objectives()) {
+		const quest_objective *quest_objective = objective->get_quest_objective();
+
+		if (quest_objective->get_objective_type() != objective_type::research_upgrade) {
+			continue;
+		}
+
+		const research_upgrade_objective *research_quest_objective = static_cast<const research_upgrade_objective *>(quest_objective);
+
+		if (upgrade == research_quest_objective->get_player_upgrade(this)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 /**
 **  Check if the upgrade removes an existing upgrade of the player.
 **
@@ -2342,6 +2363,10 @@ bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, const bool 
 			}
 
 			if (ignore_lower_ai_priority && this->get_faction() != nullptr && removed_upgrade->calculate_ai_priority(this) < upgrade_ai_priority) {
+				if (this->is_upgrade_quest_objective(upgrade)) {
+					return true;
+				}
+
 				continue;
 			}
 
@@ -3072,7 +3097,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 			return false;
 		}
 
-		if (objective->get_objective_type() == wyrmgus::objective_type::recruit_hero) {
+		if (objective->get_objective_type() == objective_type::recruit_hero) {
 			++recruit_heroes_quantity;
 		}
 	}
@@ -3125,7 +3150,8 @@ bool CPlayer::check_quest_completion(const wyrmgus::quest *quest) const
 //returns the reason for failure (empty if none)
 std::pair<bool, std::string> CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 {
-	if (quest->CurrentCompleted) { // quest already completed by someone else
+	if (quest->CurrentCompleted) {
+		//quest already completed by someone else
 		return std::make_pair(true, "Another faction has completed the quest before you could.");
 	}
 
@@ -3136,7 +3162,7 @@ std::pair<bool, std::string> CPlayer::check_quest_failure(const wyrmgus::quest *
 		}
 
 		//"unfailable" quests should also fail when a hero which should survive dies
-		if (quest->is_unfailable() && quest_objective->get_objective_type() != wyrmgus::objective_type::hero_must_survive) {
+		if (quest->is_unfailable() && quest_objective->get_objective_type() != objective_type::hero_must_survive) {
 			continue;
 		}
 
