@@ -147,6 +147,35 @@ public:
 			return false;
 		}
 
+		//do not allow accepting the quest if it requires researching an upgrade which would remove the research objective of another quest
+		for (const auto &objective : player->get_quest_objectives()) {
+			const quest_objective *quest_objective = objective->get_quest_objective();
+
+			if (quest_objective->get_objective_type() != objective_type::research_upgrade) {
+				continue;
+			}
+
+			const research_upgrade_objective *research_quest_objective = static_cast<const research_upgrade_objective *>(quest_objective);
+
+			const CUpgrade *other_upgrade = research_quest_objective->get_player_upgrade(player);
+
+			if (other_upgrade == nullptr) {
+				continue;
+			}
+
+			for (const auto &modifier : upgrade->get_modifiers()) {
+				if (vector::contains(modifier->get_removed_upgrades(), other_upgrade)) {
+					return false;
+				}
+			}
+
+			for (const auto &modifier : other_upgrade->get_modifiers()) {
+				if (vector::contains(modifier->get_removed_upgrades(), upgrade)) {
+					return false;
+				}
+			}
+		}
+
 		return true;
 	}
 
