@@ -106,7 +106,8 @@ public:
 
 		bool has_researcher = player->HasUpgradeResearcher(upgrade);
 
-		if (!has_researcher) { //check if the quest includes an objective to build a researcher of the upgrade
+		if (!has_researcher) {
+			//check if the quest includes an objective to build a researcher of the upgrade
 			for (const auto &other_objective : this->get_quest()->get_objectives()) {
 				if (other_objective.get() == this) {
 					continue;
@@ -128,7 +129,8 @@ public:
 					}
 
 					for (const unit_type *unit_type : unit_types) {
-						if (vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
+						if (vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) {
+							//if the unit type of the other objective is a researcher of this upgrade
 							has_researcher = true;
 							break;
 						}
@@ -214,6 +216,25 @@ public:
 
 		const int count = UpgradeIdAllowed(*player_quest_objective->get_player(), upgrade->ID) == 'R' ? 1 : 0;
 		player_quest_objective->set_counter(count);
+	}
+
+	virtual void check_ai(PlayerAi *ai_player, const player_quest_objective *player_quest_objective) const override
+	{
+		const CUpgrade *upgrade = this->get_player_upgrade(player_quest_objective->get_player());
+
+		if (upgrade == nullptr) {
+			return;
+		}
+
+		if (!AiRequestedUpgradeAllowed(*ai_player->Player, upgrade)) {
+			return;
+		}
+
+		if (AiHasUpgrade(*ai_player, upgrade, true)) {
+			return;
+		}
+
+		ai_player->add_research_request(upgrade);
 	}
 
 private:
