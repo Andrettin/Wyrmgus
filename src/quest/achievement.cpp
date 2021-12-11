@@ -29,8 +29,8 @@
 #include "quest/achievement.h"
 
 #include "character.h"
+#include "engine_interface.h"
 #include "game/difficulty.h"
-#include "game/game.h" //for the GameName variable
 #include "player/player.h"
 #include "player/player_color.h"
 #include "quest/quest.h"
@@ -199,7 +199,7 @@ void achievement::obtain(const bool save, const bool display)
 	}
 
 	if (display) {
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->get_name() + " achievement.\", nil, \"" + this->get_icon()->get_identifier() + "\", \"" + (this->get_player_color() ? this->get_player_color()->get_identifier() : "") + "\") end;");
+		emit engine_interface::get()->achievementUnlockedDialogOpened(this);
 	}
 }
 
@@ -267,9 +267,4 @@ void SetAchievementObtained(const std::string &achievement_ident, const bool sav
 void save_achievements()
 {
 	achievement::save_achievements();
-}
-
-void check_achievements()
-{
-	achievement::check_achievements();
 }

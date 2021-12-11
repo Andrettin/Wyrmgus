@@ -145,5 +145,4 @@ private:
 
 extern void SetAchievementObtained(const std::string &achievement_ident, const bool save = true, const bool display = true);
 
-extern void check_achievements();
 extern void save_achievements();

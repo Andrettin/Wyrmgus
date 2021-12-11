@@ -625,6 +625,13 @@ void engine_interface::load_game_deferred(const std::filesystem::path &filepath)
 	});
 }
 
+void engine_interface::check_achievements()
+{
+	this->post([]() {
+		achievement::check_achievements();
+	});
+}
+
 void engine_interface::crop_image_frames(const QString &filepath, const QSize &src_frame_size, const QSize &min_size) const
 {
 	try {
