@@ -134,7 +134,7 @@ public:
 
 	void Init();
 
-	std::shared_ptr<wyrmgus::unit_ref> acquire_ref();
+	std::shared_ptr<wyrmgus::unit_ref> acquire_ref() const;
 
 	int get_ref_count() const
 	{

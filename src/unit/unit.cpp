@@ -592,7 +592,7 @@ void CUnit::Release(const bool final)
 	wyrmgus::unit_manager::get()->ReleaseUnit(this);
 }
 
-std::shared_ptr<wyrmgus::unit_ref> CUnit::acquire_ref()
+std::shared_ptr<wyrmgus::unit_ref> CUnit::acquire_ref() const
 {
 	if (this->base_ref == nullptr) {
 		throw std::runtime_error("Tried to acquire a reference to a unit which already had its base reference cleared.");

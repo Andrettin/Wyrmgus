@@ -56,11 +56,28 @@ extern template struct context_base<true>;
 
 struct context final : context_base<false>
 {
+	static context from_scope(CPlayer *player)
+	{
+		context ctx;
+		ctx.current_player = player;
+		return ctx;
+	}
+
+	static context from_scope(CUnit *unit);
 };
 
 struct read_only_context final : context_base<true>
 {
 public:
+	static read_only_context from_scope(const CPlayer *player)
+	{
+		read_only_context ctx;
+		ctx.current_player = player;
+		return ctx;
+	}
+
+	static read_only_context from_scope(const CUnit *unit);
+
 	read_only_context()
 	{
 	}

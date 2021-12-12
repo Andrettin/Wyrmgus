@@ -92,4 +92,20 @@ sml_data context_base<read_only>::to_sml_data(const std::string &tag) const
 template struct context_base<false>;
 template struct context_base<true>;
 
+context context::from_scope(CUnit *unit)
+{
+	context ctx;
+	ctx.current_unit = unit->acquire_ref();
+	ctx.current_player = unit->Player;
+	return ctx;
+}
+
+read_only_context read_only_context::from_scope(const CUnit *unit)
+{
+	read_only_context ctx;
+	ctx.current_unit = unit->acquire_ref();
+	ctx.current_player = unit->Player;
+	return ctx;
+}
+
 }
