@@ -152,6 +152,18 @@ inline void capitalize(std::string &str)
 	str[0] = toupper(str[0]);
 }
 
+inline std::string capitalized(std::string &&str)
+{
+	string::capitalize(str);
+	return str;
+}
+
+inline std::string capitalized(const std::string &str)
+{
+	std::string result(str);
+	return string::capitalized(std::move(result));
+}
+
 inline void normalize(std::string &str)
 {
 	//remove special characters from the string that shouldn't be displayed even in strings for which accented characters are acceptable
