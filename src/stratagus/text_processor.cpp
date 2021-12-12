@@ -28,6 +28,7 @@
 
 #include "text_processor.h"
 
+#include "gender.h"
 #include "language/word.h"
 #include "literary_text.h"
 #include "map/site.h"
@@ -456,7 +457,21 @@ std::string text_processor::process_unit_tokens(const CUnit *unit, std::queue<st
 
 	const std::string front_subtoken = queue::take(subtokens);
 
-	if (front_subtoken == "settlement") {
+	if (front_subtoken == "name") {
+		return unit->get_full_name();
+	} else if (front_subtoken == "simple_name") {
+		return unit->get_simple_name();
+	} else if (front_subtoken == "personal_pronoun") {
+		return get_gender_personal_pronoun(unit->get_gender());
+	} else if (front_subtoken == "capitalized_personal_pronoun") {
+		return string::capitalized(get_gender_personal_pronoun(unit->get_gender()));
+	} else if (front_subtoken == "possessive_pronoun") {
+		return get_gender_possessive_pronoun(unit->get_gender());
+	} else if (front_subtoken == "capitalized_possessive_pronoun") {
+		return string::capitalized(get_gender_possessive_pronoun(unit->get_gender()));
+	} else if (front_subtoken == "oblique_pronoun") {
+		return get_gender_oblique_pronoun(unit->get_gender());
+	} else if (front_subtoken == "settlement") {
 		const site *settlement = unit->settlement;
 
 		if (settlement == nullptr) {

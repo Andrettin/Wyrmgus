@@ -1542,8 +1542,8 @@ std::string EvalString(const StringDesc *s)
 			if (unit != nullptr) {
 				//Wyrmgus start
 //				return unit->Type->Name;
-				if (!unit->get_name().empty() && unit->Identified) {
-					return unit->get_name();
+				if (!unit->get_full_name().empty() && unit->Identified) {
+					return unit->get_full_name();
 				} else if (!unit->Identified) {
 					return unit->get_type_name() + " (Unidentified)";
 				} else {
@@ -1556,7 +1556,7 @@ std::string EvalString(const StringDesc *s)
 		//Wyrmgus start
 		case EString_UnitTypeName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit.get());
-			if (unit != nullptr && !unit->get_name().empty() && ((unit->Prefix == nullptr && unit->Suffix == nullptr && unit->Spell == nullptr) || unit->get_unique() != nullptr || unit->Work != nullptr || unit->Elixir != nullptr)) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
+			if (unit != nullptr && !unit->get_full_name().empty() && ((unit->Prefix == nullptr && unit->Suffix == nullptr && unit->Spell == nullptr) || unit->get_unique() != nullptr || unit->Work != nullptr || unit->Elixir != nullptr)) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
 				return unit->get_type_name();
 			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
 				return std::string();

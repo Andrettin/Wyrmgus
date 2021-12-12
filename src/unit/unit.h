@@ -699,7 +699,9 @@ public:
 	const wyrmgus::icon *GetButtonIcon(const ButtonCmd button_action) const;
 	MissileConfig GetMissile() const;
 	const std::shared_ptr<CPlayerColorGraphic> &GetLayerSprite(int image_layer) const;
-	std::string get_name() const;
+	const std::string &get_simple_name() const;
+	std::string get_full_name() const;
+
 	const std::string &get_base_type_name() const;
 	std::string get_type_name() const;
 	std::string GetMessageName() const;

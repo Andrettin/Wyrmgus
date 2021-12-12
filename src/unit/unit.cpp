@@ -6858,10 +6858,10 @@ const std::shared_ptr<CPlayerColorGraphic> &CUnit::GetLayerSprite(const int imag
 	}
 }
 
-std::string CUnit::get_name() const
+const std::string &CUnit::get_simple_name() const
 {
 	if (GameRunning && this->get_character() != nullptr && this->get_character()->get_deity() != nullptr) {
-		if (CPlayer::GetThisPlayer()->Race >= 0) {
+		if (CPlayer::GetThisPlayer()->get_civilization() != nullptr) {
 			const std::string &cultural_name = this->get_character()->get_deity()->get_cultural_name(CPlayer::GetThisPlayer()->get_civilization());
 			
 			if (!cultural_name.empty()) {
@@ -6877,12 +6877,17 @@ std::string CUnit::get_name() const
 		return this->site->get_game_data()->get_current_cultural_name();
 	}
 	
-	std::string name = this->Name;
-	
+	return this->Name;
+}
+
+std::string CUnit::get_full_name() const
+{
+	std::string name = this->get_simple_name();
+
 	if (name.empty()) {
 		return name;
 	}
-	
+
 	if (!this->ExtraName.empty()) {
 		name += " " + this->ExtraName;
 	}
@@ -6890,7 +6895,7 @@ std::string CUnit::get_name() const
 	if (!this->get_surname().empty()) {
 		name += " " + this->get_surname();
 	}
-	
+
 	return name;
 }
 
@@ -6923,7 +6928,8 @@ std::string CUnit::get_type_name() const
 
 std::string CUnit::GetMessageName() const
 {
-	std::string name = this->get_name();
+	std::string name = this->get_full_name();
+
 	if (name.empty()) {
 		return this->get_type_name();
 	}

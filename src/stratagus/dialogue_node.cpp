@@ -232,7 +232,7 @@ const CUnit *dialogue_node::get_speaker_unit() const
 std::string dialogue_node::get_title_string(const CUnit *speaker_unit) const
 {
 	if (speaker_unit != nullptr) {
-		std::string unit_name = speaker_unit->get_name();
+		std::string unit_name = speaker_unit->get_full_name();
 		if (!unit_name.empty()) {
 			return unit_name;
 		} else {

@@ -935,10 +935,10 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 						if (!UnitUnderCursor->Identified) {
 							unit_name = UnitUnderCursor->get_type_name() + " (" + _("Unidentified") + ")";
 						} else {
-							unit_name = UnitUnderCursor->get_name();
+							unit_name = UnitUnderCursor->get_full_name();
 						}
-					} else if (UnitUnderCursor->get_site() != nullptr && !UnitUnderCursor->get_site()->is_settlement() && !UnitUnderCursor->get_name().empty()) {
-						unit_name = UnitUnderCursor->get_name() + " (" + UnitUnderCursor->get_type_name() + ")";
+					} else if (UnitUnderCursor->get_site() != nullptr && !UnitUnderCursor->get_site()->is_settlement() && !UnitUnderCursor->get_full_name().empty()) {
+						unit_name = UnitUnderCursor->get_full_name() + " (" + UnitUnderCursor->get_type_name() + ")";
 					} else {
 						unit_name = UnitUnderCursor->get_type_name();
 					}
