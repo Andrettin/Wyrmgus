@@ -49,6 +49,8 @@
 #include "script/effect/random_list_effect.h"
 #include "script/effect/remove_character_effect.h"
 #include "script/effect/remove_unit_effect.h"
+#include "script/effect/restore_hp_percent_effect.h"
+#include "script/effect/restore_mana_percent_effect.h"
 #include "script/effect/resource_effect.h"
 #include "script/effect/scripted_effect_effect.h"
 #include "script/effect/unique_effect.h"
@@ -77,10 +79,14 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 			return std::make_unique<resource_effect>(resource::get(key), value, effect_operator);
 		}
 	} else if constexpr (std::is_same_v<scope_type, CUnit>) {
-		if (key == "experience_effect") {
+		if (key == "experience") {
 			return std::make_unique<experience_effect>(value, effect_operator);
 		} else if (key == "remove_unit") {
 			return std::make_unique<remove_unit_effect>(value, effect_operator);
+		} else if (key == "restore_hp_percent") {
+			return std::make_unique<restore_hp_percent_effect>(value, effect_operator);
+		} else if (key == "restore_mana_percent") {
+			return std::make_unique<restore_mana_percent_effect>(value, effect_operator);
 		} else if (key == "unique") {
 			return std::make_unique<unique_effect>(value, effect_operator);
 		}

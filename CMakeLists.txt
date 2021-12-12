@@ -948,6 +948,8 @@ set(wyrmgus_script_effect_HDRS
 	src/script/effect/remove_character_effect.h
 	src/script/effect/remove_unit_effect.h
 	src/script/effect/resource_effect.h
+	src/script/effect/restore_hp_percent_effect.h
+	src/script/effect/restore_mana_percent_effect.h
 	src/script/effect/scope_effect.h
 	src/script/effect/scope_effect_base.h
 	src/script/effect/scripted_effect.h

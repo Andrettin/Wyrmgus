@@ -811,6 +811,29 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 	this->Player->UpdateLevelUpUnits();
 }
 
+void CUnit::restore_hp(const int amount)
+{
+	this->Variable[HP_INDEX].Value += amount;
+	this->Variable[HP_INDEX].Value = std::clamp(this->Variable[HP_INDEX].Value, 0, this->Variable[HP_INDEX].Max);
+}
+
+void CUnit::restore_hp_percent(const int percent)
+{
+	this->restore_hp(this->Variable[HP_INDEX].Max * percent / 100);
+}
+
+void CUnit::restore_mana(const int amount)
+{
+	this->Variable[MANA_INDEX].Value += amount;
+	this->Variable[MANA_INDEX].Value = std::clamp(this->Variable[MANA_INDEX].Value, 0, this->Variable[MANA_INDEX].Max);
+}
+
+void CUnit::restore_mana_percent(const int percent)
+{
+	this->restore_mana(this->Variable[MANA_INDEX].Max * percent / 100);
+}
+
+
 void CUnit::Retrain()
 {
 	//lose all abilities (the AbilityLost function also returns the level-ups to the unit)

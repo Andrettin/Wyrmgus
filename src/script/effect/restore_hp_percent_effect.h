@@ -30,53 +30,33 @@
 
 namespace wyrmgus {
 
-class experience_effect final : public effect<CUnit>
+class restore_hp_percent_effect final : public effect<CUnit>
 {
 public:
-	explicit experience_effect(const std::string &value, const sml_operator effect_operator)
+	explicit restore_hp_percent_effect(const std::string &value, const sml_operator effect_operator)
 		: effect(effect_operator)
 	{
-		this->quantity = std::stoi(value);
+		this->percent = std::stoi(value);
 	}
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static const std::string identifier = "experience";
+		static const std::string identifier = "restore_hp_percent";
 		return identifier;
 	}
 
 	virtual void do_assignment_effect(CUnit *unit) const override
 	{
-		unit->set_experience(this->quantity);
-	}
-
-	virtual void do_addition_effect(CUnit *unit) const override
-	{
-		unit->change_experience(this->quantity);
-	}
-
-	virtual void do_subtraction_effect(CUnit *unit) const override
-	{
-		unit->change_experience(-this->quantity);
+		unit->restore_hp_percent(this->percent);
 	}
 
 	virtual std::string get_assignment_string() const override
 	{
-		return "Set experience to " + std::to_string(this->quantity);
-	}
-
-	virtual std::string get_addition_string() const override
-	{
-		return "Gain " + std::to_string(this->quantity) + " experience";
-	}
-
-	virtual std::string get_subtraction_string() const override
-	{
-		return "Lose " + std::to_string(this->quantity) + " experience";
+		return "Restore HP by " + std::to_string(this->percent) + "%";
 	}
 
 private:
-	int quantity = 0;
+	int percent = 0;
 };
 
 }
