@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,48 +26,49 @@
 
 #pragma once
 
-#include "script/effect/scope_effect_base.h"
+#include "script/effect/scope_effect.h"
 
 namespace wyrmgus {
 
-template <typename upper_scope_type, typename scope_type>
-class scope_effect : public scope_effect_base<upper_scope_type, scope_type>
+template <typename scope_type>
+class current_unit_effect final : public scope_effect<scope_type, CUnit>
 {
 public:
-	explicit scope_effect(const sml_operator effect_operator) : scope_effect_base<upper_scope_type, scope_type>(effect_operator)
+	explicit current_unit_effect(const sml_operator effect_operator) : scope_effect<scope_type, CUnit>(effect_operator)
 	{
 	}
 
-	virtual scope_type *get_scope(const upper_scope_type *upper_scope) const
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "current_unit";
+		return class_identifier;
+	}
+
+	virtual std::string get_scope_name() const override
+	{
+		return "Current unit";
+	}
+
+	virtual const CUnit *get_scope(const scope_type *upper_scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(upper_scope)
 
-		return nullptr;
+		if (ctx.current_unit == nullptr) {
+			return nullptr;
+		}
+
+		return ctx.current_unit->get();
 	}
 
-	virtual const scope_type *get_scope(const upper_scope_type *upper_scope, const read_only_context &ctx) const
+	virtual CUnit *get_scope(const scope_type *upper_scope, const context &ctx) const override
 	{
-		Q_UNUSED(ctx);
+		Q_UNUSED(upper_scope)
 
-		return this->get_scope(upper_scope);
-	}
+		if (ctx.current_unit == nullptr) {
+			return nullptr;
+		}
 
-	virtual scope_type *get_scope(const upper_scope_type *upper_scope, const context &ctx) const
-	{
-		Q_UNUSED(ctx);
-
-		return this->get_scope(upper_scope);
-	}
-
-	virtual void do_assignment_effect(upper_scope_type *upper_scope, const context &ctx) const override final
-	{
-		scope_type *new_scope = this->get_scope(upper_scope, ctx);
-		this->do_scope_effect(new_scope, ctx);
-	}
-
-	virtual const scope_type *get_effects_string_scope(const upper_scope_type *upper_scope, const read_only_context &ctx) const override final
-	{
-		return this->get_scope(upper_scope, ctx);
+		return ctx.current_unit->get();
 	}
 };
 

@@ -68,17 +68,18 @@ public:
 
 	virtual std::string get_scope_name() const = 0;
 
-	virtual const scope_type *get_effects_string_scope(const upper_scope_type *upper_scope) const
+	virtual const scope_type *get_effects_string_scope(const upper_scope_type *upper_scope, const read_only_context &ctx) const
 	{
 		Q_UNUSED(upper_scope)
+		Q_UNUSED(ctx)
 
 		return nullptr;
 	}
 
-	std::string get_assignment_string(const upper_scope_type *upper_scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override final
+	virtual std::string get_assignment_string(const upper_scope_type *upper_scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override final
 	{
 		std::string str = this->get_scope_name() + ":\n";
-		str += this->effects.get_effects_string(this->get_effects_string_scope(upper_scope), ctx, indent + 1, prefix);
+		str += this->effects.get_effects_string(this->get_effects_string_scope(upper_scope, ctx), ctx, indent + 1, prefix);
 		return str;
 	}
 

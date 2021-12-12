@@ -931,6 +931,7 @@ set(wyrmgus_script_effect_HDRS
 	src/script/effect/character_unit_effect.h
 	src/script/effect/complete_quest_effect.h
 	src/script/effect/create_unit_effect.h
+	src/script/effect/current_unit_effect.h
 	src/script/effect/delayed_effect.h
 	src/script/effect/delayed_effect_instance.h
 	src/script/effect/effect.h
