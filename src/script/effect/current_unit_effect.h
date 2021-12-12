@@ -27,6 +27,7 @@
 #pragma once
 
 #include "script/effect/scope_effect.h"
+#include "unit/unit_ref.h"
 
 namespace wyrmgus {
 
