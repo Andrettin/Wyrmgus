@@ -80,7 +80,7 @@ public:
 	}
 
 	void do_effects(CPlayer *player, const context &ctx) const;
-	std::string get_tooltip(CPlayer *player) const;
+	std::string get_tooltip(const context &ctx) const;
 
 	void delete_lua_callbacks();
 

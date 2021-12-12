@@ -36,6 +36,8 @@
 #include "luacallback.h"
 #include "script/context.h"
 #include "script/effect/effect_list.h"
+#include "text_processor.h"
+#include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 
@@ -135,16 +137,26 @@ void dialogue_option::do_effects(CPlayer *player, const context &ctx) const
 	}
 }
 
-std::string dialogue_option::get_tooltip(CPlayer *player) const
+std::string dialogue_option::get_tooltip(const context &ctx) const
 {
 	if (!this->tooltip.empty()) {
-		return this->tooltip;
+		text_processing_context text_ctx(ctx);
+		const text_processor text_processor(std::move(text_ctx));
+
+		std::string tooltip;
+
+		try {
+			tooltip = text_processor.process_text(this->tooltip, true);
+		} catch (const std::exception &exception) {
+			exception::report(exception);
+			tooltip = this->tooltip;
+		}
+
+		return tooltip;
 	}
 
 	if (this->effects != nullptr) {
-		read_only_context ctx;
-		ctx.current_player = player;
-		return this->effects->get_effects_string(player, ctx);
+		return this->effects->get_effects_string(ctx.current_player, ctx);
 	}
 
 	return std::string();

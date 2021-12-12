@@ -119,7 +119,7 @@ void dialogue_node::check() const
 void dialogue_node::call(CPlayer *player, const context &ctx) const
 {
 	if (this->conditions != nullptr) {
-		if (!this->conditions->check(player)) {
+		if (!this->conditions->check(player, ctx)) {
 			this->get_dialogue()->call_node(this->ID + 1, player, ctx);
 			return;
 		}
@@ -143,7 +143,7 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 		if (player->AiEnabled && !this->option_pointers.empty()) {
 			//AIs will choose a random option
 			const int option_index = static_cast<int>(random::get()->generate(this->option_pointers.size()));
-			this->dialogue->call_node_option_effect(this->ID, option_index, player);
+			this->dialogue->call_node_option_effect(this->ID, option_index, player, ctx);
 		}
 
 		return;
@@ -168,7 +168,7 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 		for (const dialogue_option *option : this->option_pointers) {
 			options.push_back(QString::fromStdString(option->get_name()));
 			option_hotkeys.push_back(QString::fromStdString(option->get_hotkey()));
-			option_tooltips.push_back(QString::fromStdString(option->get_tooltip(player)));
+			option_tooltips.push_back(QString::fromStdString(option->get_tooltip(ctx)));
 		}
 	} else {
 		options.push_back(dialogue_option::default_name);
