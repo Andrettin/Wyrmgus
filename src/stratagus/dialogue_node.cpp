@@ -42,6 +42,7 @@
 #include "sound/sound.h"
 #include "text_processor.h"
 #include "unit/unit_find.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "util/exception_util.h"
 #include "util/string_util.h"
@@ -176,7 +177,9 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 		option_tooltips.push_back(QString());
 	}
 
-	emit engine_interface::get()->dialogueNodeCalled(this->dialogue, this->ID, title_str, text, icon_identifier, player_color_identifier, options, option_hotkeys, option_tooltips);
+	const int unit_number = ctx.current_unit != nullptr ? UnitNumber(*ctx.current_unit->get()) : -1;
+
+	emit engine_interface::get()->dialogueNodeCalled(this->dialogue, this->ID, title_str, text, icon_identifier, player_color_identifier, options, option_hotkeys, option_tooltips, unit_number);
 
 	if (this->sound != nullptr) {
 		const int channel = PlayGameSound(this->sound, MaxSampleVolume);
