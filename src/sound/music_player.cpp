@@ -228,11 +228,13 @@ bool music_player::are_music_conditions_fulfilled(const music *music) const
 		return true;
 	}
 
-	if (CPlayer::GetThisPlayer() == nullptr) {
+	const CPlayer *this_player = CPlayer::GetThisPlayer();
+
+	if (this_player == nullptr) {
 		return false;
 	}
 
-	if (!music->get_conditions()->check(CPlayer::GetThisPlayer())) {
+	if (!music->get_conditions()->check(CPlayer::GetThisPlayer(), read_only_context::from_scope(this_player))) {
 		return false;
 	}
 

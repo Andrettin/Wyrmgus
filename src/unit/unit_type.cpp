@@ -2225,7 +2225,7 @@ const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player,
 			continue;
 		}
 
-		if (variation->get_player_conditions() != nullptr && !variation->get_player_conditions()->check(player)) {
+		if (variation->get_player_conditions() != nullptr && !variation->get_player_conditions()->check(player, read_only_context::from_scope(player))) {
 			continue;
 		}
 

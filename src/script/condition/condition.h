@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "script/context.h"
+
 class CConfigData;
 class CPlayer;
 class CUnit;
@@ -39,6 +41,7 @@ class named_data_entry;
 class sml_data;
 class sml_property;
 class unit_type;
+struct read_only_context;
 
 class condition
 {
@@ -109,8 +112,8 @@ public:
 		return true;
 	}
 
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const = 0;
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const;
+	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units = false) const = 0;
+	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units = false) const;
 
 	//get the condition as a string
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const = 0;
@@ -147,10 +150,12 @@ inline bool check_conditions(const T *target, const CPlayer *player, const bool 
 		}
 	}
 
+	const read_only_context ctx = read_only_context::from_scope(player);
+
 	if constexpr (precondition) {
-		return target->get_preconditions() == nullptr || target->get_preconditions()->check(player, ignore_units);
+		return target->get_preconditions() == nullptr || target->get_preconditions()->check(player, ctx, ignore_units);
 	} else {
-		return target->get_conditions() == nullptr || target->get_conditions()->check(player, ignore_units);
+		return target->get_conditions() == nullptr || target->get_conditions()->check(player, ctx, ignore_units);
 	}
 }
 
@@ -180,10 +185,12 @@ inline bool check_conditions(const T *target, const CUnit *unit, const bool igno
 		}
 	}
 
+	const read_only_context ctx = read_only_context::from_scope(unit);
+
 	if constexpr (precondition) {
-		return target->get_preconditions() == nullptr || target->get_preconditions()->check(unit, ignore_units);
+		return target->get_preconditions() == nullptr || target->get_preconditions()->check(unit, ctx, ignore_units);
 	} else {
-		return target->get_conditions() == nullptr || target->get_conditions()->check(unit, ignore_units);
+		return target->get_conditions() == nullptr || target->get_conditions()->check(unit, ctx, ignore_units);
 	}
 }
 

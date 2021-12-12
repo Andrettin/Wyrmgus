@@ -28,14 +28,14 @@
 
 #include "character.h"
 #include "player/player.h"
-#include "script/condition/scope_condition_base.h"
+#include "script/condition/scope_condition.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 
 namespace wyrmgus {
 
-class character_unit_condition final : public scope_condition_base<CUnit>
+class character_unit_condition final : public scope_condition<CUnit>
 {
 public:
 	virtual void process_sml_property(const sml_property &property) override
@@ -46,7 +46,7 @@ public:
 		if (key == "character") {
 			this->character = character::get(value);
 		} else {
-			scope_condition_base::process_sml_property(property);
+			scope_condition::process_sml_property(property);
 		}
 	}
 
@@ -56,20 +56,15 @@ public:
 			throw std::runtime_error("\"character_unit\" condition has no character set for it.");
 		}
 
-		scope_condition_base::check_validity();
+		scope_condition::check_validity();
 	}
 
-	virtual bool check(const CPlayer *player, const bool ignore_units) const override
+	virtual const CUnit *get_scope(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(player)
+		Q_UNUSED(ctx)
 
-		const CUnit *character_unit = this->character->get_unit();
-
-		if (character_unit == nullptr) {
-			return false;
-		}
-
-		return this->check_scope(character_unit, ignore_units);
+		return this->character->get_unit();
 	}
 
 	virtual std::string get_scope_name() const override

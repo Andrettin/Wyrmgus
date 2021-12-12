@@ -32,6 +32,7 @@
 #include "database/sml_operator.h"
 #include "database/sml_property.h"
 #include "script/condition/and_condition.h"
+#include "script/context.h"
 
 namespace wyrmgus {
 
@@ -85,7 +86,7 @@ void factor_modifier<scope_type>::check_validity() const
 template <typename scope_type>
 bool factor_modifier<scope_type>::check_conditions(const scope_type *scope) const
 {
-	return this->conditions->check(scope);
+	return this->conditions->check(scope, read_only_context::from_scope(scope));
 }
 
 template class factor_modifier<CPlayer>;

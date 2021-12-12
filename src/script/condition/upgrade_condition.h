@@ -58,16 +58,17 @@ public:
 		return true;
 	}
 
-	virtual bool check(const CPlayer *player, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
 	{
+		Q_UNUSED(ctx)
 		Q_UNUSED(ignore_units)
 
 		return UpgradeIdAllowed(*player, this->upgrade->ID) == 'R';
 	}
 
-	virtual bool check(const CUnit *unit, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
 	{
-		return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->upgrade);
+		return this->check(unit->Player, ctx, ignore_units) || unit->GetIndividualUpgrade(this->upgrade);
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override

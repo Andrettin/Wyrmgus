@@ -41,15 +41,17 @@ public:
 		this->time_of_day = time_of_day::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
 	{
+		Q_UNUSED(ctx)
 		Q_UNUSED(ignore_units)
 
 		return CMap::get()->MapLayers[player->StartMapLayer]->get_tile_time_of_day(player->StartPos) == this->time_of_day;
 	}
 
-	virtual bool check(const CUnit *unit, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
 	{
+		Q_UNUSED(ctx)
 		Q_UNUSED(ignore_units)
 
 		if (unit->MapLayer == nullptr) {

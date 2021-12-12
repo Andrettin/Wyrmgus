@@ -241,10 +241,10 @@ void condition::process_sml_scope(const sml_data &scope)
 	throw std::runtime_error("Invalid condition scope: \"" + scope.get_tag() + "\".");
 }
 
-bool condition::check(const CUnit *unit, const bool ignore_units) const
+bool condition::check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const
 {
 	//conditions check the unit's player by default, but can be overriden in the case of e.g. upgrades (where we want to check individual upgrades for the unit)
-	return this->check(unit->Player, ignore_units);
+	return this->check(unit->Player, ctx, ignore_units);
 }
 
 void and_condition::ProcessConfigDataSection(const CConfigData *section)
@@ -294,10 +294,10 @@ bool and_condition::check(const civilization *civilization) const
 	return true;
 }
 
-bool and_condition::check(const CPlayer *player, const bool ignore_units) const
+bool and_condition::check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const
 {
 	for (const auto &condition : this->conditions) {
-		if (!condition->check(player, ignore_units)) {
+		if (!condition->check(player, ctx, ignore_units)) {
 			return false;
 		}
 	}
@@ -305,10 +305,10 @@ bool and_condition::check(const CPlayer *player, const bool ignore_units) const
 	return true;
 }
 
-bool and_condition::check(const CUnit *unit, const bool ignore_units) const
+bool and_condition::check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const
 {
 	for (const auto &condition : this->conditions) {
-		if (!condition->check(unit, ignore_units)) {
+		if (!condition->check(unit, ctx, ignore_units)) {
 			return false;
 		}
 	}
@@ -510,15 +510,15 @@ static int CclDefineDependency(lua_State *l)
 			
 			if (!strncmp(required, "unit", 4)) {
 				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(required);
-				condition = new wyrmgus::unit_type_condition(unit_type, count > 0 ? count : 1);
+				condition = new unit_type_condition(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
-				condition = new wyrmgus::upgrade_condition(required);
+				condition = new upgrade_condition(required);
 			} else {
 				LuaError(l, "Invalid required type for condition: \"%s\"" _C_ required);
 			}
 			
 			if (count == 0) {
-				condition = new wyrmgus::not_condition(std::unique_ptr<wyrmgus::condition>(condition));
+				condition = new not_condition(std::unique_ptr<wyrmgus::condition>(condition));
 			}
 			
 			conditions.push_back(std::unique_ptr<wyrmgus::condition>(condition));

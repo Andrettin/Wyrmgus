@@ -35,23 +35,28 @@ template <typename scope_type>
 class scope_condition : public scope_condition_base<scope_type>
 {
 public:
-	virtual const scope_type *get_scope(const CPlayer *player) const = 0;
+	virtual const scope_type *get_scope(const CPlayer *player, const read_only_context &ctx) const = 0;
 
-	virtual const scope_type *get_scope(const CUnit *unit) const
+	virtual const scope_type *get_scope(const CUnit *unit, const read_only_context &ctx) const
 	{
-		return this->get_scope(unit->Player);
+		return this->get_scope(unit->Player, ctx);
 	}
 
-	virtual bool check(const CPlayer *player, const bool ignore_units) const override final
+	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override final
 	{
-		const scope_type *scope = this->get_scope(player);
-		return this->check_scope(scope, ignore_units);
+		const scope_type *scope = this->get_scope(player, ctx);
+
+		if (scope == nullptr) {
+			return false;
+		}
+
+		return this->check_scope(scope, ctx, ignore_units);
 	}
 
-	virtual bool check(const CUnit *unit, const bool ignore_units) const override final
+	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override final
 	{
-		const scope_type *scope = this->get_scope(unit);
-		return this->check_scope(scope, ignore_units);
+		const scope_type *scope = this->get_scope(unit, ctx);
+		return this->check_scope(scope, ctx, ignore_units);
 	}
 };
 

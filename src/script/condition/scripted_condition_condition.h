@@ -44,14 +44,14 @@ public:
 		return this->scripted_condition->get_conditions()->check(civilization);
 	}
 
-	virtual bool check(const CPlayer *player, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
 	{
-		return this->scripted_condition->get_conditions()->check(player, ignore_units);
+		return this->scripted_condition->get_conditions()->check(player, ctx, ignore_units);
 	}
 
-	virtual bool check(const CUnit *unit, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
 	{
-		return this->scripted_condition->get_conditions()->check(unit, ignore_units);
+		return this->scripted_condition->get_conditions()->check(unit, ctx, ignore_units);
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override

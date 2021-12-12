@@ -45,8 +45,8 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void check_validity() const override;
 	virtual bool check(const civilization *civilization) const override;
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units = false) const override;
+	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units = false) const override;
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{

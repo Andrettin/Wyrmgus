@@ -73,10 +73,10 @@ public:
 		return true;
 	}
 
-	virtual bool check(const CPlayer *player, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
 	{
 		for (const auto &condition : this->conditions) {
-			if (condition->check(player, ignore_units)) {
+			if (condition->check(player, ctx, ignore_units)) {
 				return false;
 			}
 		}
@@ -84,10 +84,10 @@ public:
 		return true;
 	}
 
-	virtual bool check(const CUnit *unit, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
 	{
 		for (const auto &condition : this->conditions) {
-			if (condition->check(unit, ignore_units)) {
+			if (condition->check(unit, ctx, ignore_units)) {
 				return false;
 			}
 		}

@@ -2165,7 +2165,7 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 		}
 	}
 
-	if (faction->get_preconditions() != nullptr && !faction->get_preconditions()->check(this)) {
+	if (faction->get_preconditions() != nullptr && !faction->get_preconditions()->check(this, read_only_context::from_scope(this))) {
 		return false;
 	}
 
@@ -2181,7 +2181,7 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 			}
 		}
 
-		if (faction->get_conditions() != nullptr && !faction->get_conditions()->check(this)) {
+		if (faction->get_conditions() != nullptr && !faction->get_conditions()->check(this, read_only_context::from_scope(this))) {
 			return false;
 		}
 	}
@@ -2275,7 +2275,7 @@ bool CPlayer::is_character_available_for_recruitment(const character *character,
 		return false;
 	}
 	
-	if (character->get_conditions() != nullptr && !character->get_conditions()->check(this)) {
+	if (character->get_conditions() != nullptr && !character->get_conditions()->check(this, read_only_context::from_scope(this))) {
 		return false;
 	}
 	
@@ -3087,7 +3087,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 		return false;
 	}
 
-	if (quest->get_conditions() != nullptr && !quest->get_conditions()->check(this)) {
+	if (quest->get_conditions() != nullptr && !quest->get_conditions()->check(this, read_only_context::from_scope(this))) {
 		return false;
 	}
 	

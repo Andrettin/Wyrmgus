@@ -1257,11 +1257,13 @@ bool CUnit::can_have_variation(const wyrmgus::unit_type_variation *variation) co
 		return false;
 	}
 
-	if (variation->get_player_conditions() != nullptr && !variation->get_player_conditions()->check(this->Player)) {
+	const read_only_context ctx = read_only_context::from_scope(this);
+
+	if (variation->get_player_conditions() != nullptr && !variation->get_player_conditions()->check(this->Player, ctx)) {
 		return false;
 	}
 
-	if (variation->get_unit_conditions() != nullptr && !variation->get_unit_conditions()->check(this)) {
+	if (variation->get_unit_conditions() != nullptr && !variation->get_unit_conditions()->check(this, ctx)) {
 		return false;
 	}
 

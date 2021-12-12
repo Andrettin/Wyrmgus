@@ -41,9 +41,10 @@ public:
 		this->day_of_the_week = string_to_day_of_the_week(value);
 	}
 
-	virtual bool check(const CPlayer *player, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
 	{
 		Q_UNUSED(player)
+		Q_UNUSED(ctx)
 		Q_UNUSED(ignore_units)
 
 		if (IsNetworkGame()) {

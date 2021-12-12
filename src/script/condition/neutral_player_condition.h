@@ -34,9 +34,10 @@ namespace wyrmgus {
 class neutral_player_condition final : public scope_condition<CPlayer>
 {
 public:
-	virtual const CPlayer *get_scope(const CPlayer *player) const override
+	virtual const CPlayer *get_scope(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(player)
+		Q_UNUSED(ctx)
 
 		return CPlayer::get_neutral_player();
 	}
