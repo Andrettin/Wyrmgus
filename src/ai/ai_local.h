@@ -303,7 +303,7 @@ public:
 class PlayerAi final
 {
 public:
-	static constexpr int enforced_peace_cycle_count = CYCLES_PER_MINUTE * 20;
+	static constexpr int enforced_peace_cycle_count = CYCLES_PER_MINUTE * 5;
 	static constexpr int military_score_advantage_threshold = 100; //the relative military score must be 100% greater
 
 	const resource_map<int> &get_reserve() const

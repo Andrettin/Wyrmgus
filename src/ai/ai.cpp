@@ -207,7 +207,7 @@ void PlayerAi::evaluate_diplomacy()
 		const tile *start_tile = CMap::get()->Field(player->StartPos, player->StartMapLayer);
 		CPlayer *tile_owner = start_tile->get_owner();
 
-		if (tile_owner != nullptr) {
+		if (tile_owner != nullptr && GameCycle > PlayerAi::enforced_peace_cycle_count) {
 			assert_throw(tile_owner != player);
 
 			if (!player->has_enemy_stance_with(tile_owner) && player->can_declare_war_on(tile_owner)) {
@@ -220,7 +220,7 @@ void PlayerAi::evaluate_diplomacy()
 
 	if (player->NumTownHalls > 0) {
 		//check if we should declare war against another player
-		if (!player->at_war()) {
+		if (!player->at_war() && GameCycle > PlayerAi::enforced_peace_cycle_count) {
 			if (player->is_independent()) {
 				std::vector<CPlayer *> border_players = container::to_vector(player->get_border_players());
 				vector::shuffle(border_players);
