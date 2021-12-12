@@ -186,19 +186,9 @@ game::~game()
 
 void game::on_started()
 {
-	if (GameCycle == 0) { //so that these don't trigger when loading a saved game
+	if (GameCycle == 0) { //so that this doesn't trigger when loading a saved game
 		if (this->get_current_campaign() != nullptr) {
 			this->apply_player_history();
-
-			if (this->get_current_campaign()->get_quest() != nullptr) {
-				CPlayer::GetThisPlayer()->accept_quest(this->get_current_campaign()->get_quest());
-			}
-		}
-
-		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
-			context ctx;
-			ctx.current_player = CPlayer::GetThisPlayer();
-			CurrentQuest->IntroductionDialogue->call(CPlayer::GetThisPlayer(), ctx);
 		}
 	}
 

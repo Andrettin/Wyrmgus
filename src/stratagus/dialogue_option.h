@@ -46,7 +46,8 @@ class effect_list;
 class dialogue_option final
 {
 public:
-	static constexpr const char *default_name = "~!Continue";
+	static constexpr const char *default_name = "Continue";
+	static constexpr const char *default_hotkey = "c";
 
 	explicit dialogue_option(const dialogue_node *node);
 	~dialogue_option();
@@ -59,6 +60,11 @@ public:
 	const std::string &get_name() const
 	{
 		return this->name;
+	}
+
+	const std::string &get_hotkey() const
+	{
+		return this->hotkey;
 	}
 
 	dialogue *get_dialogue() const;
@@ -79,7 +85,8 @@ public:
 	void delete_lua_callbacks();
 
 private:
-	std::string name = dialogue_option::default_name;
+	std::string name;
+	std::string hotkey;
 	const dialogue_node *node = nullptr;
 	std::string next_node_identifier;
 	const dialogue_node *next_node = nullptr;

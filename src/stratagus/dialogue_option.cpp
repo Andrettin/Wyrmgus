@@ -37,6 +37,7 @@
 #include "script/context.h"
 #include "script/effect/effect_list.h"
 #include "util/string_conversion_util.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -57,6 +58,8 @@ void dialogue_option::process_sml_property(const sml_property &property)
 		this->get_dialogue()->map_option(this, value);
 	} else if (key == "name") {
 		this->name = value;
+	} else if (key == "hotkey") {
+		this->hotkey = value;
 	} else if (key == "next_node") {
 		this->next_node_identifier = value;
 	} else if (key == "end_dialogue") {
@@ -85,6 +88,22 @@ void dialogue_option::initialize()
 	if (!this->next_node_identifier.empty()) {
 		this->next_node = this->get_dialogue()->get_node(this->next_node_identifier);
 		this->next_node_identifier.clear();
+	}
+
+	if (this->name.empty()) {
+		this->name = dialogue_option::default_name;
+
+		if (this->hotkey.empty()) {
+			this->hotkey = dialogue_option::default_hotkey;
+		}
+	} else {
+		//for backwards compatibility
+		static const std::string highlight_marker = "~!";
+		const size_t hotkey_pos = this->name.find(highlight_marker);
+		if (hotkey_pos != std::string::npos) {
+			string::replace(this->name, "~!", "");
+			this->hotkey = this->name.at(hotkey_pos);
+		}
 	}
 }
 

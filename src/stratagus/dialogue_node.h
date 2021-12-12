@@ -27,6 +27,7 @@
 #pragma once
 
 class CPlayer;
+class CUnit;
 class LuaCallback;
 struct lua_State;
 
@@ -69,6 +70,10 @@ public:
 
 	void call(CPlayer *player, const context &ctx) const;
 	void option_effect(const int option_index, CPlayer *player, const context &ctx) const;
+
+	const CUnit *get_speaker_unit() const;
+	std::string get_title_string(const CUnit *speaker_unit) const;
+	std::string get_text(const context &ctx) const;
 
 	void delete_lua_callbacks();
 

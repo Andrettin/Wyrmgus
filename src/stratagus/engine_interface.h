@@ -280,6 +280,7 @@ signals:
 	void encyclopediaEntryOpened(QString link);
 	void factionChoiceDialogOpened(const QVariantList &factions);
 	void achievementUnlockedDialogOpened(QObject *achievement);
+	void dialogueNodeCalled(QObject *dialogue, const int node_index, const QString &title_str, const QString &text, const QString &icon_identifier, const QString &player_color_identifier, const QStringList &options, const QStringList &option_hotkeys, const QStringList &option_tooltips);
 
 private:
 	std::queue<std::function<void()>> posted_commands;

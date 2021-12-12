@@ -31,9 +31,11 @@
 #include "character.h"
 #include "dialogue.h"
 #include "dialogue_option.h"
+#include "engine_interface.h"
 #include "luacallback.h"
 #include "player/faction.h"
 #include "player/player.h"
+#include "player/player_color.h"
 #include "script.h"
 #include "script/condition/and_condition.h"
 #include "script/context.h"
@@ -137,110 +139,44 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 		this->ImmediateEffects->run();
 	}
 
-	std::string lua_command = "Event(";
-
-	const CUnit *speaker_unit = nullptr;
-	if (this->speaker != nullptr) {
-		speaker_unit = this->speaker->get_unit();
-	} else if (this->speaker_unit_type != nullptr) {
-		const CPlayer *speaker_player = CPlayer::get_neutral_player();
-		if (this->speaker_faction != nullptr) {
-			speaker_player = GetFactionPlayer(this->speaker_faction);
+	if (player != CPlayer::GetThisPlayer()) {
+		if (player->AiEnabled && !this->option_pointers.empty()) {
+			//AIs will choose a random option
+			const int option_index = static_cast<int>(random::get()->generate(this->option_pointers.size()));
+			this->dialogue->call_node_option_effect(this->ID, option_index, player);
 		}
 
-		if (speaker_player != nullptr) {
-			std::vector<CUnit *> potential_speaker_units;
-			FindPlayerUnitsByType(*speaker_player, *this->speaker_unit_type, potential_speaker_units);
-
-			if (!potential_speaker_units.empty()) {
-				const size_t index = std::min(potential_speaker_units.size() - 1, this->speaker_index);
-				speaker_unit = potential_speaker_units.at(index);
-			}
-		}
+		return;
 	}
 
-	if (speaker_unit != nullptr) {
-		lua_command += std::to_string(UnitNumber(*speaker_unit)) + ", ";
-	} else {
-		lua_command += "\"" + this->speaker_name + "\", ";
-	}
+	const CUnit *speaker_unit = this->get_speaker_unit();
 
-	text_processing_context text_ctx(ctx);
-	const text_processor text_processor(std::move(text_ctx));
+	const QString title_str = QString::fromStdString(this->get_title_string(speaker_unit));
+	const QString text = QString::fromStdString(this->get_text(ctx));
 
-	std::string text;
-	try {
-		text = text_processor.process_text(this->text, true);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
-		text = this->text;
-	}
-	string::replace(text, "\"", "\\\"");
-	string::replace(text, "\n", "\\n");
+	const icon *icon = speaker_unit ? speaker_unit->get_icon() : nullptr;
+	const QString icon_identifier = icon ? icon->get_identifier_qstring() : "";
 
-	lua_command += "\"" + std::move(text) + "\", ";
-	lua_command += std::to_string(player->get_index()) + ", ";
+	const player_color *player_color = speaker_unit ? speaker_unit->get_player_color() : nullptr;
+	const QString player_color_identifier = player_color ? player_color->get_identifier_qstring() : "";
 
-	lua_command += "{";
-	if (!this->option_pointers.empty() && !this->option_pointers.front()->get_name().empty()) {
-		bool first = true;
-		for (const dialogue_option *option : this->option_pointers) {
-			if (!first) {
-				lua_command += ", ";
-			} else {
-				first = false;
-			}
-			lua_command += "\"" + option->get_name() + "\"";
-		}
-	} else {
-		lua_command += "\"~!Continue\"";
-	}
-	lua_command += "}, ";
+	QStringList options;
+	QStringList option_hotkeys;
+	QStringList option_tooltips;
 
-	lua_command += "{";
 	if (!this->option_pointers.empty()) {
-		bool first = true;
-		for (size_t i = 0; i < this->option_pointers.size(); ++i) {
-			if (!first) {
-				lua_command += ", ";
-			} else {
-				first = false;
-			}
-			lua_command += "function(s) ";
-			lua_command += "CallDialogueNodeOptionEffect(\"" + this->get_dialogue()->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(i) + ", " + std::to_string(player->get_index()) + ");";
-			lua_command += " end";
+		for (const dialogue_option *option : this->option_pointers) {
+			options.push_back(QString::fromStdString(option->get_name()));
+			option_hotkeys.push_back(QString::fromStdString(option->get_hotkey()));
+			option_tooltips.push_back(QString::fromStdString(option->get_tooltip(player)));
 		}
 	} else {
-		lua_command += "function(s) ";
-		lua_command += "CallDialogueNodeOptionEffect(\"" + this->get_dialogue()->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(0) + ", " + std::to_string(player->get_index()) + ");";
-		lua_command += " end";
+		options.push_back(dialogue_option::default_name);
+		option_hotkeys.push_back(dialogue_option::default_hotkey);
+		option_tooltips.push_back(QString());
 	}
-	lua_command += "}, ";
 
-	lua_command += "nil, nil, nil, ";
-
-	lua_command += "{";
-	if (!this->option_pointers.empty() && !this->option_pointers.front()->get_tooltip(player).empty()) {
-		lua_command += "OptionTooltips = {";
-		bool first = true;
-		for (const dialogue_option *option : this->option_pointers) {
-			if (!first) {
-				lua_command += ", ";
-			} else {
-				first = false;
-			}
-			std::string tooltip = string::to_tooltip(option->get_tooltip(player));
-			string::replace(tooltip, "\n", "\\n");
-			string::replace(tooltip, "\t", "\\t");
-			lua_command += "\"" + tooltip + "\"";
-		}
-		lua_command += "}";
-	}
-	lua_command += "}";
-
-	lua_command += ")";
-
-	CclCommand(lua_command);
+	emit engine_interface::get()->dialogueNodeCalled(this->dialogue, this->ID, title_str, text, icon_identifier, player_color_identifier, options, option_hotkeys, option_tooltips);
 
 	if (this->sound != nullptr) {
 		const int channel = PlayGameSound(this->sound, MaxSampleVolume);
@@ -267,6 +203,61 @@ void dialogue_node::option_effect(const int option_index, CPlayer *player, const
 	}
 
 	this->get_dialogue()->call_node(this->ID + 1, player, ctx);
+}
+
+const CUnit *dialogue_node::get_speaker_unit() const
+{
+	if (this->speaker != nullptr) {
+		return this->speaker->get_unit();
+	} else if (this->speaker_unit_type != nullptr) {
+		const CPlayer *speaker_player = CPlayer::get_neutral_player();
+		if (this->speaker_faction != nullptr) {
+			speaker_player = GetFactionPlayer(this->speaker_faction);
+		}
+
+		if (speaker_player != nullptr) {
+			std::vector<CUnit *> potential_speaker_units;
+			FindPlayerUnitsByType(*speaker_player, *this->speaker_unit_type, potential_speaker_units);
+
+			if (!potential_speaker_units.empty()) {
+				const size_t index = std::min(potential_speaker_units.size() - 1, this->speaker_index);
+				return potential_speaker_units.at(index);
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+std::string dialogue_node::get_title_string(const CUnit *speaker_unit) const
+{
+	if (speaker_unit != nullptr) {
+		std::string unit_name = speaker_unit->get_name();
+		if (!unit_name.empty()) {
+			return unit_name;
+		} else {
+			speaker_unit->Type->get_name();
+		}
+	}
+
+	return this->speaker_name;
+}
+
+std::string dialogue_node::get_text(const context &ctx) const
+{
+	text_processing_context text_ctx(ctx);
+	const text_processor text_processor(std::move(text_ctx));
+
+	std::string text;
+
+	try {
+		text = text_processor.process_text(this->text, true);
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		text = this->text;
+	}
+
+	return text;
 }
 
 void dialogue_node::delete_lua_callbacks()

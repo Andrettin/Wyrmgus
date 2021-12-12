@@ -30,6 +30,7 @@
 
 #include "dialogue_node.h"
 #include "dialogue_option.h"
+#include "engine_interface.h"
 #include "player/player.h"
 #include "script.h"
 #include "script/context.h"
@@ -136,6 +137,21 @@ void dialogue::call_node_option_effect(const int node_index, const int option_in
 	this->nodes[node_index]->option_effect(option_index, player, ctx);
 }
 
+void dialogue::call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const
+{
+	context ctx;
+	ctx.current_player = player;
+
+	this->call_node_option_effect(node_index, option_index, player, ctx);
+}
+
+void dialogue::call_node_option_effect_sync(const int node_index, const int option_index) const
+{
+	engine_interface::get()->sync([this, node_index, option_index]() {
+		this->call_node_option_effect(node_index, option_index, CPlayer::GetThisPlayer());
+	});
+}
+
 void dialogue::delete_lua_callbacks()
 {
 	for (const std::unique_ptr<dialogue_node> &node : this->nodes) {
@@ -147,10 +163,10 @@ void dialogue::delete_lua_callbacks()
 
 void CallDialogue(const std::string &dialogue_ident, int player_index)
 {
-	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
+	const dialogue *dialogue = dialogue::get(dialogue_ident);
 
 	CPlayer *player = CPlayer::Players.at(player_index).get();
-	wyrmgus::context ctx;
+	context ctx;
 	ctx.current_player = player;
 
 	dialogue->call(player, ctx);
@@ -158,10 +174,10 @@ void CallDialogue(const std::string &dialogue_ident, int player_index)
 
 void CallDialogueNode(const std::string &dialogue_ident, int node, int player_index)
 {
-	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
+	const dialogue *dialogue = dialogue::get(dialogue_ident);
 
 	CPlayer *player = CPlayer::Players.at(player_index).get();
-	wyrmgus::context ctx;
+	context ctx;
 	ctx.current_player = player;
 
 	dialogue->call_node(node, player, ctx);
@@ -169,11 +185,9 @@ void CallDialogueNode(const std::string &dialogue_ident, int node, int player_in
 
 void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player_index)
 {
-	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
+	const dialogue *dialogue = dialogue::get(dialogue_ident);
 
 	CPlayer *player = CPlayer::Players.at(player_index).get();
-	wyrmgus::context ctx;
-	ctx.current_player = player;
 
-	dialogue->call_node_option_effect(node, option, player, ctx);
+	dialogue->call_node_option_effect(node, option, player);
 }

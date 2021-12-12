@@ -502,6 +502,18 @@ void GameMainLoop()
 	engine_interface::get()->set_loading_message("");
 
 	if (GameCycle == 0) {
+		if (game::get()->get_current_campaign() != nullptr) {
+			if (game::get()->get_current_campaign()->get_quest() != nullptr) {
+				CPlayer::GetThisPlayer()->accept_quest(game::get()->get_current_campaign()->get_quest());
+			}
+		}
+
+		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
+			context ctx;
+			ctx.current_player = CPlayer::GetThisPlayer();
+			CurrentQuest->IntroductionDialogue->call(CPlayer::GetThisPlayer(), ctx);
+		}
+
 		//if the person player has no faction, bring up the faction choice interface
 		if (CPlayer::GetThisPlayer() != nullptr && CPlayer::GetThisPlayer()->get_faction() == nullptr) {
 			std::vector<faction *> potential_factions = CPlayer::GetThisPlayer()->get_potential_factions();

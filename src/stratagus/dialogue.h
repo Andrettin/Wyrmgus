@@ -88,7 +88,7 @@ public:
 
 	const dialogue_option *get_option(const std::string &identifier) const
 	{
-		auto find_iterator = this->options_by_identifier.find(identifier);
+		const auto find_iterator = this->options_by_identifier.find(identifier);
 		if (find_iterator != this->options_by_identifier.end()) {
 			return find_iterator->second;
 		}
@@ -101,6 +101,8 @@ public:
 	void call(CPlayer *player, const context &ctx) const;
 	void call_node(const int node_index, CPlayer *player, const context &ctx) const;
 	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player, const context &ctx) const;
+	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const;
+	Q_INVOKABLE void call_node_option_effect_sync(const int node_index, const int option_index) const;
 
 	void delete_lua_callbacks();
 	
