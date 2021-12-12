@@ -101,8 +101,7 @@ public:
 	void call(CPlayer *player, const context &ctx) const;
 	void call_node(const int node_index, CPlayer *player, const context &ctx) const;
 	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player, const context &ctx) const;
-	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const;
-	Q_INVOKABLE void call_node_option_effect_sync(const int node_index, const int option_index) const;
+	Q_INVOKABLE void call_node_option_effect_sync(const int node_index, const int option_index, const int unit_number) const;
 
 	void delete_lua_callbacks();
 	
@@ -116,6 +115,4 @@ private:
 
 }
 
-extern void CallDialogue(const std::string &dialogue_ident, int player);
-extern void CallDialogueNode(const std::string &dialogue_ident, int node, int player);
-extern void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player);
+extern void CallDialogue(const std::string &dialogue_ident, const int player, const int unit_number = -1);

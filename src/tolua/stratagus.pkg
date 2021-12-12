@@ -153,9 +153,7 @@ extern void SetQuestCompleted(std::string quest_ident, bool save);
 extern void SetAchievementObtained(std::string achievement_ident, const bool save = true, const bool display = true);
 extern void save_achievements();
 
-extern void CallDialogue(std::string dialogue_ident, int player);
-extern void CallDialogueNode(std::string dialogue_ident, int node, int player);
-extern void CallDialogueNodeOptionEffect(std::string dialogue_ident, int node, int option, int player);
+extern void CallDialogue(std::string dialogue_ident, int player, int unit_number = -1);
 //Wyrmgus end
 
 extern void load_database(const bool initial_definition);

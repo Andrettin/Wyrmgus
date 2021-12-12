@@ -37,6 +37,8 @@
 #include "script/effect/call_dialogue_effect.h"
 #include "script/trigger.h"
 #include "sound/sound_server.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
 
 namespace wyrmgus {
 
@@ -137,18 +139,19 @@ void dialogue::call_node_option_effect(const int node_index, const int option_in
 	this->nodes[node_index]->option_effect(option_index, player, ctx);
 }
 
-void dialogue::call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const
+void dialogue::call_node_option_effect_sync(const int node_index, const int option_index, const int unit_number) const
 {
-	context ctx;
-	ctx.current_player = player;
+	CPlayer *player = CPlayer::GetThisPlayer();
 
-	this->call_node_option_effect(node_index, option_index, player, ctx);
-}
+	engine_interface::get()->sync([this, node_index, option_index, player, unit_number]() {
+		context ctx;
+		ctx.current_player = player;
 
-void dialogue::call_node_option_effect_sync(const int node_index, const int option_index) const
-{
-	engine_interface::get()->sync([this, node_index, option_index]() {
-		this->call_node_option_effect(node_index, option_index, CPlayer::GetThisPlayer());
+		if (unit_number != -1) {
+			ctx.current_unit = unit_manager::get()->GetSlotUnit(unit_number).acquire_ref();
+		}
+
+		this->call_node_option_effect(node_index, option_index, player, ctx);
 	});
 }
 
@@ -161,33 +164,18 @@ void dialogue::delete_lua_callbacks()
 
 }
 
-void CallDialogue(const std::string &dialogue_ident, int player_index)
+void CallDialogue(const std::string &dialogue_ident, const int player_index, const int unit_number)
 {
 	const dialogue *dialogue = dialogue::get(dialogue_ident);
 
 	CPlayer *player = CPlayer::Players.at(player_index).get();
+
 	context ctx;
 	ctx.current_player = player;
+
+	if (unit_number != -1) {
+		ctx.current_unit = unit_manager::get()->GetSlotUnit(unit_number).acquire_ref();
+	}
 
 	dialogue->call(player, ctx);
-}
-
-void CallDialogueNode(const std::string &dialogue_ident, int node, int player_index)
-{
-	const dialogue *dialogue = dialogue::get(dialogue_ident);
-
-	CPlayer *player = CPlayer::Players.at(player_index).get();
-	context ctx;
-	ctx.current_player = player;
-
-	dialogue->call_node(node, player, ctx);
-}
-
-void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player_index)
-{
-	const dialogue *dialogue = dialogue::get(dialogue_ident);
-
-	CPlayer *player = CPlayer::Players.at(player_index).get();
-
-	dialogue->call_node_option_effect(node, option, player);
 }
