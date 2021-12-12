@@ -38,6 +38,7 @@
 #include "script/effect/current_unit_effect.h"
 #include "script/effect/create_unit_effect.h"
 #include "script/effect/delayed_effect.h"
+#include "script/effect/experience_effect.h"
 #include "script/effect/hidden_effect.h"
 #include "script/effect/if_effect.h"
 #include "script/effect/kill_character_effect.h"
@@ -76,7 +77,9 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 			return std::make_unique<resource_effect>(resource::get(key), value, effect_operator);
 		}
 	} else if constexpr (std::is_same_v<scope_type, CUnit>) {
-		if (key == "remove_unit") {
+		if (key == "experience_effect") {
+			return std::make_unique<experience_effect>(value, effect_operator);
+		} else if (key == "remove_unit") {
 			return std::make_unique<remove_unit_effect>(value, effect_operator);
 		} else if (key == "unique") {
 			return std::make_unique<unique_effect>(value, effect_operator);

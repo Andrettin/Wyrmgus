@@ -671,27 +671,38 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	replaced_unit.Release();
 }
 
-void CUnit::ChangeExperience(int amount, int around_range)
+void CUnit::set_experience(const int amount)
+{
+	if (!this->Type->can_gain_experience()) {
+		return;
+	}
+
+	this->Variable[XP_INDEX].Max = amount;
+
+	//prevent experience from becoming negative
+	this->Variable[XP_INDEX].Max = std::max(0, this->Variable[XP_INDEX].Max);
+
+	this->Variable[XP_INDEX].Value = this->Variable[XP_INDEX].Max;
+	this->XPChanged();
+}
+
+void CUnit::change_experience(const int base_amount, const int around_range)
 {
 	std::vector<CUnit *> table;
 	if (around_range > 0) {
 		SelectAroundUnit(*this, around_range, table, MakeAndPredicate(HasSamePlayerAs(*this->Player), IsNotBuildingType()));
 	}
 	
-	amount /= 1 + table.size();
+	const int amount = base_amount / (1 + table.size());
 
 	if (this->Type->can_gain_experience()) {
-		this->Variable[XP_INDEX].Max += amount;
-		this->Variable[XP_INDEX].Value = this->Variable[XP_INDEX].Max;
-		this->XPChanged();
+		this->set_experience(this->Variable[XP_INDEX].Max + amount);
 	}
 
 	if (around_range > 0) {
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i]->Type->can_gain_experience()) {
-				table[i]->Variable[XP_INDEX].Max += amount;
-				table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
-				table[i]->XPChanged();
+		for (CUnit *nearby_unit : table) {
+			if (nearby_unit->Type->can_gain_experience()) {
+				this->set_experience(nearby_unit->Variable[XP_INDEX].Max + amount);
 			}
 		}
 	}
@@ -7451,7 +7462,7 @@ void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target, const bool inc
 	
 	//distribute experience between nearby units belonging to the same player
 	if (!target.Type->BoolFlag[BUILDING_INDEX].value) {
-		attacker.ChangeExperience(UseHPForXp ? target.Variable[HP_INDEX].Value : target.Variable[POINTS_INDEX].Value, ExperienceRange);
+		attacker.change_experience(UseHPForXp ? target.Variable[HP_INDEX].Value : target.Variable[POINTS_INDEX].Value, ExperienceRange);
 	}
 	
 	attacker.Variable[KILL_INDEX].Value++;
@@ -7491,7 +7502,7 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 
 //	if (UseHPForXp && attacker && target.is_enemy_of(*attacker)) {
 	if (UseHPForXp && attacker && (target.is_enemy_of(*attacker) || target.Player->get_type() == player_type::neutral) && !target.Type->BoolFlag[BUILDING_INDEX].value) {
-		attacker->ChangeExperience(damage, ExperienceRange);
+		attacker->change_experience(damage, ExperienceRange);
 	}
 	//Wyrmgus end
 	

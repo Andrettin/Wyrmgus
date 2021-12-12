@@ -223,7 +223,8 @@ public:
 	void SetResourcesHeld(int quantity);
 	void ChangeResourcesHeld(int quantity);
 	void ReplaceOnTop(CUnit &replaced_unit);
-	void ChangeExperience(int amount, int around_range = 0); //around_range is the range around the unit that other units of the same player will receive experience
+	void set_experience(const int amount);
+	void change_experience(const int base_amount, const int around_range = 0); //around_range is the range around the unit that other units of the same player will receive experience
 	void IncreaseLevel(int level_quantity, bool automatic_learning = true);
 	void Retrain();
 	void auto_use_item();

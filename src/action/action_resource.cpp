@@ -1332,7 +1332,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
 	int xp_gained = unit.ResourcesHeld;
 	xp_gained /= 20;
-	unit.ChangeExperience(xp_gained);
+	unit.change_experience(xp_gained);
 
 	if (this->CurrentResource == TradeCost && this->trade_partner != nullptr) {
 		if (this->trade_partner != unit.Player && !this->trade_partner->is_neutral_player()) {

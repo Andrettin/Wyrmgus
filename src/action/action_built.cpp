@@ -264,7 +264,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			
 			//Wyrmgus start
 			// give experience to the builder
-			worker->ChangeExperience(xp_gained / worker_count);
+			worker->change_experience(xp_gained / worker_count);
 			//Wyrmgus end
 		}
 	}
@@ -273,7 +273,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (worker_count > 0) {
 		for (size_t i = 0; i != table.size(); ++i) { // also give experience to all other workers who helped build the structure
 			if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->get_goal() == &unit) {
-				table[i]->ChangeExperience(xp_gained / worker_count);
+				table[i]->change_experience(xp_gained / worker_count);
 			}
 		}
 	}
