@@ -29,6 +29,7 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 
+class CUnit;
 class CUpgrade;
 struct lua_State;
 
@@ -113,9 +114,11 @@ public:
 		return this->resources_held;
 	}
 
+	wyrmgus::icon *get_icon() const;
 	bool can_drop() const;				/// Check whether this unique item can drop
 	int get_magic_level() const;			/// Get this unique item's magic level
-	wyrmgus::icon *get_icon() const;
+
+	CUnit *get_unit() const;
 
 signals:
 	void changed();

@@ -74,6 +74,7 @@
 #include "script/condition/time_of_day_condition.h"
 #include "script/condition/trigger_condition.h"
 #include "script/condition/unique_can_drop_condition.h"
+#include "script/condition/unique_unit_condition.h"
 #include "script/condition/unit_class_condition.h"
 #include "script/condition/unit_type_condition.h"
 #include "script/condition/upgrade_condition.h"
@@ -187,14 +188,16 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 		condition = std::make_unique<neutral_player_condition>();
 	} else if (tag == "not") {
 		condition = std::make_unique<not_condition>();
+	} else if (tag == "settlement") {
+		condition = std::make_unique<settlement_condition>();
 	} else if (tag == "source_unit") {
 		condition = std::make_unique<source_unit_condition>();
+	} else if (tag == "unique_unit") {
+		condition = std::make_unique<unique_unit_condition>();
 	} else if (tag == "unit_class") {
 		condition = std::make_unique<unit_class_condition>();
 	} else if (tag == "unit_type") {
 		condition = std::make_unique<unit_type_condition>();
-	} else if (tag == "settlement") {
-		condition = std::make_unique<settlement_condition>();
 	} else {
 		throw std::runtime_error("Invalid condition scope: \"" + tag + "\".");
 	}

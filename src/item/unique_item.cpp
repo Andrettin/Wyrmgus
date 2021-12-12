@@ -114,6 +114,15 @@ std::string unique_item::get_encyclopedia_text() const
 	return text;
 }
 
+icon *unique_item::get_icon() const
+{
+	if (this->icon != nullptr) {
+		return this->icon;
+	} else {
+		return this->get_unit_type()->get_icon();
+	}
+}
+
 bool unique_item::can_drop() const
 {
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop
@@ -136,23 +145,12 @@ bool unique_item::can_drop() const
 	}
 	
 	if (GameRunning) {
-		for (const CUnit *unit : unit_manager::get()->get_units()) {
-			if (unit->get_unique() == this && !unit->Bound) {
-				return false;
-			}
+		if (this->get_unit() != nullptr) {
+			return false;
 		}
 	}
 
 	return true;
-}
-
-icon *unique_item::get_icon() const
-{
-	if (this->icon != nullptr) {
-		return this->icon;
-	} else {
-		return this->get_unit_type()->get_icon();
-	}
 }
 
 int unique_item::get_magic_level() const
@@ -180,6 +178,17 @@ int unique_item::get_magic_level() const
 	}
 	
 	return magic_level;
+}
+
+CUnit *unique_item::get_unit() const
+{
+	for (CUnit *unit : unit_manager::get()->get_units()) {
+		if (unit->get_unique() == this && !unit->Bound) {
+			return unit;
+		}
+	}
+
+	return nullptr;
 }
 
 }

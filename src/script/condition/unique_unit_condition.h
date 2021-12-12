@@ -26,12 +26,13 @@
 
 #pragma once
 
-#include "character.h"
+#include "item/unique_item.h"
 #include "script/condition/scope_condition.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
-class character_unit_condition final : public scope_condition<CUnit>
+class unique_unit_condition final : public scope_condition<CUnit>
 {
 public:
 	virtual void process_sml_property(const sml_property &property) override
@@ -39,8 +40,8 @@ public:
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
 
-		if (key == "character") {
-			this->character = character::get(value);
+		if (key == "unique") {
+			this->unique = unique_item::get(value);
 		} else {
 			scope_condition::process_sml_property(property);
 		}
@@ -48,8 +49,8 @@ public:
 
 	virtual void check_validity() const override
 	{
-		if (this->character == nullptr) {
-			throw std::runtime_error("\"character_unit\" condition has no character set for it.");
+		if (this->unique == nullptr) {
+			throw std::runtime_error("\"unique_unit\" condition has no unique set for it.");
 		}
 
 		scope_condition::check_validity();
@@ -57,19 +58,19 @@ public:
 
 	virtual const CUnit *get_scope(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player)
-		Q_UNUSED(ctx)
+		Q_UNUSED(player);
+		Q_UNUSED(ctx);
 
-		return this->character->get_unit();
+		return this->unique->get_unit();
 	}
 
 	virtual std::string get_scope_name() const override
 	{
-		return string::highlight(this->character->get_full_name());
+		return string::highlight(this->unique->get_name());
 	}
 
 private:
-	const wyrmgus::character *character = nullptr;
+	const unique_item *unique = nullptr;
 };
 
 }
