@@ -293,6 +293,8 @@ public:
 	void Clamp(Vec2i &pos, int z) const;
 	//Wyrmgus end
 
+	void clamp(QPoint &pos, const int z) const;
+
 	//Warning: we expect typical usage as xmin = x - range
 	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z);
 

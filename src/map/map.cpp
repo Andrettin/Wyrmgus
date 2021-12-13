@@ -4330,6 +4330,11 @@ void CMap::remove_settlement_unit(CUnit *settlement_unit)
 	vector::remove(this->settlement_units, settlement_unit);
 }
 
+void CMap::clamp(QPoint &pos, const int z) const
+{
+	point::clamp(pos, QPoint(0, 0), QPoint(this->Info->MapWidths[z] - 1, this->Info->MapHeights[z] - 1));
+}
+
 void CMap::FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z)
 {
 	minpos.x = std::max<short>(0, minpos.x);

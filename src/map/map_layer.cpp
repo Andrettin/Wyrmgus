@@ -46,6 +46,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "util/assert_util.h"
 #include "util/point_util.h"
 
 CMapLayer::CMapLayer(const QSize &size) : size(size)
@@ -398,6 +399,8 @@ const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const int tile_index
 
 const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const QPoint &tile_pos) const
 {
+	assert_throw(CMap::get()->Info->IsPointOnMap(tile_pos, this->ID));
+
 	return this->get_tile_time_of_day(point::to_index(tile_pos, this->get_width()));
 }
 

@@ -201,8 +201,8 @@ void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_com
 {
 	// Align to grid
 	const CViewport &vp = *UI.MouseViewport;
-	const Vec2i mpos = vp.ScreenToTilePos(CursorScreenPos);
-	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(mpos);
+	const QPoint top_left_tile_pos = vp.ScreenToTilePos(CursorScreenPos);
+	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(top_left_tile_pos);
 	const int z = UI.CurrentMapLayer->ID;
 
 	CUnit *ontop = nullptr;
@@ -218,7 +218,9 @@ void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_com
 	PushClipping();
 	vp.SetClipping();
 
-	const QPoint center_tile_pos = mpos + CursorBuilding->get_tile_center_pos_offset();
+	QPoint center_tile_pos = top_left_tile_pos + CursorBuilding->get_tile_center_pos_offset();
+	CMap::get()->clamp(center_tile_pos, UI.CurrentMapLayer->ID);
+
 	const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(center_tile_pos);
 
 //	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
@@ -297,12 +299,12 @@ void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_com
 	if (!Selected.empty()) {
 		f = 1;
 		for (size_t i = 0; f && i < Selected.size(); ++i) {
-			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos, z)) != nullptr);
+			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, top_left_tile_pos, z)) != nullptr);
 			// Assign ontop or null
 			ontop = (ontop == Selected[i] ? nullptr : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, z)) != nullptr);
+		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, top_left_tile_pos, z)) != nullptr);
 		if (!CEditor::get()->is_running() || ontop == (CUnit *)1) {
 			ontop = nullptr;
 		}
@@ -311,14 +313,14 @@ void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_com
 	const tile_flag mask = CursorBuilding->MovementMask;
 	int h = CursorBuilding->get_tile_height();
 	// reduce to view limits
-	h = std::min(h, vp.MapPos.y + vp.MapHeight - mpos.y);
+	h = std::min(h, vp.MapPos.y + vp.MapHeight - top_left_tile_pos.y());
 	int w0 = CursorBuilding->get_tile_width();
-	w0 = std::min(w0, vp.MapPos.x + vp.MapWidth - mpos.x);
+	w0 = std::min(w0, vp.MapPos.x + vp.MapWidth - top_left_tile_pos.x());
 
 	while (h--) {
 		int w = w0;
 		while (w--) {
-			const Vec2i posIt(mpos.x + w, mpos.y + h);
+			const Vec2i posIt(top_left_tile_pos.x() + w, top_left_tile_pos.y() + h);
 			uint32_t color;
 
 			if (f && (ontop ||

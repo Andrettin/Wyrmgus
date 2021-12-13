@@ -63,6 +63,25 @@ inline constexpr QSize to_size(const QPoint &point)
 	return QSize(point.x(), point.y());
 }
 
+inline void clamp(QPoint &point, const QPoint &min, const QPoint &max)
+{
+	if (point.x() < min.x()) {
+		point.setX(min.x());
+	}
+
+	if (point.y() < min.y()) {
+		point.setY(min.y());
+	}
+
+	if (point.x() > max.x()) {
+		point.setX(max.x());
+	}
+
+	if (point.y() > max.y()) {
+		point.setY(max.y());
+	}
+}
+
 inline int square_distance_to(const QPoint &point, const QPoint &other_point)
 {
 	const int dx = point.x() - other_point.x();
