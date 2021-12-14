@@ -2815,13 +2815,12 @@ void CUnit::Scout()
 {
 	int scout_range = std::max(16, this->CurrentSightRange * 2);
 			
-	Vec2i target_pos = this->tilePos;
+	QPoint target_pos = this->tilePos;
 
-	target_pos.x += SyncRand(scout_range * 2 + 1) - scout_range;
-	target_pos.y += SyncRand(scout_range * 2 + 1) - scout_range;
+	target_pos += QPoint(SyncRand(scout_range * 2 + 1) - scout_range, SyncRand(scout_range * 2 + 1) - scout_range);
 
 	// restrict to map
-	CMap::get()->Clamp(target_pos, this->MapLayer->ID);
+	CMap::get()->clamp(target_pos, this->MapLayer->ID);
 
 	// move if possible
 	if (target_pos != this->tilePos) {
@@ -7658,15 +7657,18 @@ void HitUnit_SpecialDamageEffect(CUnit &target, int dmg_var)
 void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 //Wyrmgus end
 {
-	Vec2i pos = target.tilePos - attacker.tilePos;
-	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
+	QPoint pos = target.tilePos - attacker.tilePos;
+	int d = isqrt(pos.x() * pos.x() + pos.y() * pos.y());
 
 	if (!d) {
 		d = 1;
 	}
-	pos.x = target.tilePos.x + (pos.x * 5) / d + SyncRand(4);
-	pos.y = target.tilePos.y + (pos.y * 5) / d + SyncRand(4);
-	CMap::get()->Clamp(pos, target.MapLayer->ID);
+
+	pos.setX(target.tilePos.x + (pos.x() * 5) / d + SyncRand(4));
+	pos.setY(target.tilePos.y + (pos.y() * 5) / d + SyncRand(4));
+
+	CMap::get()->clamp(pos, target.MapLayer->ID);
+
 	CommandStopUnit(target);
 	CommandMove(target, pos, 0, target.MapLayer->ID);
 }

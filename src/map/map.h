@@ -288,11 +288,6 @@ public:
 	/// Remove unit from cache
 	void Remove(CUnit &unit);
 
-	//Wyrmgus start
-//	void Clamp(Vec2i &pos) const;
-	void Clamp(Vec2i &pos, int z) const;
-	//Wyrmgus end
-
 	void clamp(QPoint &pos, const int z) const;
 
 	//Warning: we expect typical usage as xmin = x - range

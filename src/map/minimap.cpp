@@ -729,10 +729,10 @@ void minimap::draw_image(const QImage &image, const int z, std::vector<std::func
 QPoint minimap::texture_to_tile_pos(const QPoint &texture_pos) const
 {
 	const int z = UI.CurrentMapLayer->ID;
-	Vec2i tile_pos(((texture_pos.x() - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z],
+	QPoint tile_pos(((texture_pos.x() - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z],
 		((texture_pos.y() - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]);
 
-	CMap::get()->Clamp(tile_pos, UI.CurrentMapLayer->ID);
+	CMap::get()->clamp(tile_pos, UI.CurrentMapLayer->ID);
 
 	return tile_pos;
 }

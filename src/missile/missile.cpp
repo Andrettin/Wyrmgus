@@ -832,18 +832,15 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 **
 **  @return         sx,sy,ex,ey defining area in Map
 */
-static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxMax)
+static void GetMissileMapArea(const Missile &missile, QPoint &box_min, QPoint &box_max)
 {
 	PixelSize missileSize(missile.Type->get_frame_size());
 	PixelDiff margin(defines::get()->get_tile_width() - 1, defines::get()->get_tile_height() - 1);
-	boxMin = CMap::get()->map_pixel_pos_to_tile_pos(missile.position);
-	boxMax = CMap::get()->map_pixel_pos_to_tile_pos(missile.position + missileSize + margin);
-	//Wyrmgus start
-//	CMap::get()->Clamp(boxMin);
-//	CMap::get()->Clamp(boxMax);
-	CMap::get()->Clamp(boxMin, missile.MapLayer);
-	CMap::get()->Clamp(boxMax, missile.MapLayer);
-	//Wyrmgus end
+	box_min = CMap::get()->map_pixel_pos_to_tile_pos(missile.position);
+	box_max = CMap::get()->map_pixel_pos_to_tile_pos(missile.position + missileSize + margin);
+
+	CMap::get()->clamp(box_min, missile.MapLayer);
+	CMap::get()->clamp(box_max, missile.MapLayer);
 }
 
 /**
@@ -856,16 +853,18 @@ static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxM
 */
 static int MissileVisibleInViewport(const CViewport &vp, const Missile &missile)
 {
-	Vec2i boxmin;
-	Vec2i boxmax;
+	QPoint boxmin;
+	QPoint boxmax;
 
 	GetMissileMapArea(missile, boxmin, boxmax);
+
 	if (!vp.AnyMapAreaVisibleInViewport(boxmin, boxmax)) {
 		return 0;
 	}
+
 	Vec2i pos;
-	for (pos.x = boxmin.x; pos.x <= boxmax.x; ++pos.x) {
-		for (pos.y = boxmin.y; pos.y <= boxmax.y; ++pos.y) {
+	for (pos.x = boxmin.x(); pos.x <= boxmax.x(); ++pos.x) {
+		for (pos.y = boxmin.y(); pos.y <= boxmax.y(); ++pos.y) {
 			//Wyrmgus start
 //			if (ReplayRevealMap || CMap::get()->Field(pos)->player_info->IsTeamVisible(*ThisPlayer)) {
 			if (ReplayRevealMap || CMap::get()->Field(pos, missile.MapLayer)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {

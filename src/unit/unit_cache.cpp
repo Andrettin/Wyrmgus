@@ -101,16 +101,3 @@ void CMap::Remove(CUnit &unit)
 		index += unit.MapLayer->get_width();
 	} while (--i && unit.tilePos.y + (i - h) < unit.MapLayer->get_height());
 }
-
-//Wyrmgus start
-//void CMap::Clamp(Vec2i &pos) const
-void CMap::Clamp(Vec2i &pos, int z) const
-//Wyrmgus end
-{
-	//Wyrmgus start
-//	pos.x = std::clamp<short int>(pos.x, 0, this->Info->MapWidth - 1);
-//	pos.y = std::clamp<short int>(pos.y, 0, this->Info->MapHeight - 1);
-	pos.x = std::clamp<short int>(pos.x, 0, this->Info->MapWidths[z] - 1);
-	pos.y = std::clamp<short int>(pos.y, 0, this->Info->MapHeights[z] - 1);
-	//Wyrmgus end
-}

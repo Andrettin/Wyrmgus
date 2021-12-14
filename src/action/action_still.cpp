@@ -187,13 +187,12 @@ static bool MoveRandomly(CUnit &unit)
 	}
 
 	// pick random location
-	Vec2i pos = unit.tilePos;
+	QPoint pos = unit.tilePos;
 
-	pos.x += SyncRand(unit.Type->get_random_movement_distance() * 2 + 1) - unit.Type->get_random_movement_distance();
-	pos.y += SyncRand(unit.Type->get_random_movement_distance() * 2 + 1) - unit.Type->get_random_movement_distance();
+	pos += QPoint(SyncRand(unit.Type->get_random_movement_distance() * 2 + 1) - unit.Type->get_random_movement_distance(), SyncRand(unit.Type->get_random_movement_distance() * 2 + 1) - unit.Type->get_random_movement_distance());
 
 	//restrict to map
-	CMap::get()->Clamp(pos, unit.MapLayer->ID);
+	CMap::get()->clamp(pos, unit.MapLayer->ID);
 
 	//move if possible
 	if (pos != unit.tilePos) {
