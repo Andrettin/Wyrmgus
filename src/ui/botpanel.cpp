@@ -317,10 +317,22 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	//Wyrmgus start
-	if (condition->Class && type && type->get_unit_class() == nullptr && !(type->BoolFlag[ITEM_INDEX].value && type->get_item_class() != wyrmgus::item_class::none)) {
+	if (condition->Class && type && type->get_unit_class() == nullptr && !(type->BoolFlag[ITEM_INDEX].value && type->get_item_class() != item_class::none)) {
 		return false;
 	}
 	
+	if (condition->item_usable != CONDITION_TRUE) {
+		if ((condition->item_usable == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && Selected.size() == 1 && type->BoolFlag[ITEM_INDEX].value && Selected[0]->CanUseItem(&unit_manager::get()->GetSlotUnit(button.Value)))) {
+			return false;
+		}
+	}
+	
+	if (condition->item_equippable != CONDITION_TRUE) {
+		if ((condition->item_equippable == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && Selected.size() == 1 && type->BoolFlag[ITEM_INDEX].value && Selected[0]->can_equip_item_class(type->get_item_class()))) {
+			return false;
+		}
+	}
+
 	if (condition->unit_class != nullptr) {
 		if (!type || condition->unit_class != type->get_unit_class()) {
 			return false;

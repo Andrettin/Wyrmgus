@@ -69,6 +69,8 @@ public:
 	wyrmgus::unit_domain unit_domain; //unit domain (i.e. land, air, etc.) of the button's unit type
 	const wyrmgus::unit_class *unit_class = nullptr; /// unit type class of the button's unit type
 	wyrmgus::item_class item_class;				/// item class of the button's item
+	char item_usable = 0; //check if the button's item is usable by the selected unit
+	char item_equippable = 0; //check if the button's item is equippable by the selected unit
 	int CanStore = -1;			/// whether the button's unit type can store a particular resource
 	int ImproveIncome = -1;		/// whether the button's unit type improves the processing of a particular resource
 	CUpgrade *ResearchedUpgrade = nullptr;	/// whether the button's player has researched a particular upgrade
