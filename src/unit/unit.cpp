@@ -1078,11 +1078,11 @@ void CUnit::apply_character_properties()
 
 	//load learned abilities
 	std::vector<const CUpgrade *> abilities_to_remove;
-	for (size_t i = 0; i < this->get_character()->get_abilities().size(); ++i) {
-		if (can_learn_ability(this->get_character()->get_abilities()[i])) {
-			AbilityAcquire(*this, this->get_character()->get_abilities()[i], false);
+	for (const CUpgrade *ability : this->get_character()->get_abilities()) {
+		if (this->can_learn_ability(ability)) {
+			AbilityAcquire(*this, ability, false);
 		} else { //can't learn the ability? something changed in the game's code, remove it from persistent data and allow the hero to repick the ability
-			abilities_to_remove.push_back(this->get_character()->get_abilities()[i]);
+			abilities_to_remove.push_back(ability);
 		}
 	}
 
@@ -6653,10 +6653,13 @@ bool CUnit::HasInventory() const
 template <bool precondition>
 bool CUnit::can_learn_ability(const CUpgrade *ability) const
 {
-	if (ability->get_deity() != nullptr) { //if is a deity choice "ability", only allow for custom heroes (but display the icon for already-acquired deities for all heroes)
+	if (ability->get_deity() != nullptr) {
+		//if is a deity choice "ability", only allow for custom heroes (but display the icon for already-acquired deities for all heroes)
+
 		if (this->get_character() == nullptr) {
 			return false;
 		}
+
 		if (!this->get_character()->is_custom() && this->GetIndividualUpgrade(ability) == 0) {
 			return false;
 		}
@@ -6678,7 +6681,7 @@ bool CUnit::can_learn_ability(const CUpgrade *ability) const
 		}
 	}
 	
-	if (!wyrmgus::check_conditions<precondition>(ability, this, false)) {
+	if (!check_conditions<precondition>(ability, this, false)) {
 		return false;
 	}
 	

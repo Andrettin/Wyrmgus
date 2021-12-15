@@ -93,7 +93,9 @@ public:
 
 		emit running_changed();
 
-		this->on_started();
+		if (running) {
+			this->on_started();
+		}
 	}
 
 	void on_started();

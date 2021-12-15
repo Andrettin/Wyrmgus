@@ -773,7 +773,7 @@ static bool CommandKey(int key, const Qt::KeyboardModifiers key_modifiers)
 			break;
 
 		//Wyrmgus start
-		case 'q': // Shift+Q: select all army units
+		case 'q': // Alt+Q: select all army units
 			if (!(key_modifiers & Qt::ControlModifier) && (key_modifiers & Qt::AltModifier)) {
 				if (GameObserve || GamePaused || GameEstablishing) {
 					break;
