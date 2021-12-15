@@ -294,40 +294,6 @@ int PlaySample(wyrmgus::sample *sample, Origin *origin)
 	return channel;
 }
 
-/**
-**  Set the global sound volume.
-**
-**  @param volume  the sound volume 0-255
-*/
-void SetEffectsVolume(int volume)
-{
-	preferences::get()->set_sound_effects_volume(volume);
-}
-
-/**
-**  Get effects volume
-*/
-int GetEffectsVolume()
-{
-	return preferences::get()->get_sound_effects_volume();
-}
-
-/**
-**  Set effects enabled
-*/
-void SetEffectsEnabled(bool enabled)
-{
-	preferences::get()->set_sound_effects_enabled(enabled);
-}
-
-/**
-**  Check if effects are enabled
-*/
-bool IsEffectsEnabled()
-{
-	return preferences::get()->are_sound_effects_enabled();
-}
-
 /*----------------------------------------------------------------------------
 --  Music
 ----------------------------------------------------------------------------*/
@@ -340,78 +306,12 @@ void SetMusicFinishedCallback(void (*callback)())
 	Mix_HookMusicFinished(callback);
 }
 
-void play_menu_music()
-{
-	music_player::get()->play_music_type(music_type::menu);
-}
-
-void play_credits_music()
-{
-	music_player::get()->play_music_type(music_type::credits);
-}
-
-void play_loading_music()
-{
-	music_player::get()->play_music_type(music_type::loading);
-}
-
-void play_map_music()
-{
-	music_player::get()->play_music_type(music_type::map);
-}
-
-void play_victory_music()
-{
-	music_player::get()->play_music_type(music_type::victory);
-}
-
-void play_defeat_music()
-{
-	music_player::get()->play_music_type(music_type::defeat);
-}
-
 /**
 **  Stop the current playing music.
 */
 void StopMusic()
 {
 	Mix_FadeOutMusic(200);
-}
-
-/**
-**  Set the music volume.
-**
-**  @param volume  the music volume 0-255
-*/
-void SetMusicVolume(int volume)
-{
-	preferences::get()->set_music_volume(volume);
-
-	Mix_VolumeMusic(preferences::get()->get_music_volume() * music_player::get()->get_current_volume_modifier() / 100 * MIX_MAX_VOLUME / MaxVolume);
-}
-
-/**
-**  Get music volume
-*/
-int GetMusicVolume()
-{
-	return preferences::get()->get_music_volume();
-}
-
-/**
-**  Set music enabled
-*/
-void SetMusicEnabled(bool enabled)
-{
-	preferences::get()->set_music_enabled(enabled);
-}
-
-/**
-**  Check if music is enabled
-*/
-bool IsMusicEnabled()
-{
-	return preferences::get()->is_music_enabled();
 }
 
 /**

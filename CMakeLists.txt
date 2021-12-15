@@ -572,7 +572,6 @@ set(tolua_FILES
 	src/tolua/mod.pkg
 	src/tolua/network.pkg
 	src/tolua/player.pkg
-	src/tolua/sound.pkg
 	src/tolua/stratagus.pkg
 	src/tolua/translate.pkg
 	src/tolua/trigger.pkg

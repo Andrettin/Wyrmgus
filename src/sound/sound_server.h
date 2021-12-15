@@ -63,37 +63,13 @@ extern std::unique_ptr<wyrmgus::sample> LoadSample(const std::filesystem::path &
 /// Play a sample
 extern int PlaySample(wyrmgus::sample *sample, Origin *origin = nullptr);
 
-/// Set effects volume
-extern void SetEffectsVolume(int volume);
-/// Get effects volume
-extern int GetEffectsVolume();
-/// Set effects enabled
-extern void SetEffectsEnabled(bool enabled);
-/// Check if effects are enabled
-extern bool IsEffectsEnabled();
-
 /// Set the music finished callback
 void SetMusicFinishedCallback(void (*callback)());
-
-extern void play_menu_music();
-extern void play_credits_music();
-extern void play_loading_music();
-extern void play_map_music();
-extern void play_victory_music();
-extern void play_defeat_music();
 
 /// Increase tension value for the music
 extern void AddMusicTension(int value);
 /// Stop music playing
 extern void StopMusic();
-/// Set music volume
-extern void SetMusicVolume(int volume);
-/// Get music volume
-extern int GetMusicVolume();
-/// Set music enabled
-extern void SetMusicEnabled(bool enabled);
-/// Check if music is enabled
-extern bool IsMusicEnabled();
 
 /// Check if sound is enabled
 extern bool SoundEnabled();
