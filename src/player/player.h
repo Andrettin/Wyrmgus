@@ -360,7 +360,7 @@ public:
 	void update_current_quests();
 	void accept_quest(wyrmgus::quest *quest);
 	void complete_quest(wyrmgus::quest *quest);
-	void fail_quest(wyrmgus::quest *quest, const std::string &fail_reason = "");
+	void fail_quest(wyrmgus::quest *quest, const std::string &failure_reason_string = "");
 	void remove_current_quest(wyrmgus::quest *quest);
 	bool can_quest_be_available(const wyrmgus::quest *quest) const;
 	bool can_accept_quest(const wyrmgus::quest *quest) const;

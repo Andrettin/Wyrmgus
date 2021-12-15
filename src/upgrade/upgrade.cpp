@@ -1338,13 +1338,13 @@ void UpgradesCclRegister()
 */
 int UnitTypeIdByIdent(const std::string &ident)
 {
-	const wyrmgus::unit_type *type = wyrmgus::unit_type::try_get(ident);
+	const unit_type *type = unit_type::get(ident);
 
-	if (type) {
+	if (type != nullptr) {
 		return type->Slot;
 	}
 
-	throw std::runtime_error("Fix this " + ident + ".");
+	throw std::runtime_error("No unit type found for identifier: \"" + ident + "\".");
 }
 
 /**

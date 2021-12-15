@@ -2975,9 +2975,9 @@ void CPlayer::accept_quest(wyrmgus::quest *quest)
 	this->update_current_quests();
 }
 
-void CPlayer::complete_quest(wyrmgus::quest *quest)
+void CPlayer::complete_quest(quest *quest)
 {
-	if (wyrmgus::vector::contains(this->completed_quests, quest)) {
+	if (vector::contains(this->completed_quests, quest)) {
 		return;
 	}
 	
@@ -2996,7 +2996,7 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 	}
 
 	if (quest->get_completion_effects() != nullptr) {
-		wyrmgus::context ctx;
+		context ctx;
 		ctx.current_player = this;
 		quest->get_completion_effects()->do_effects(this, ctx);
 	}
@@ -3007,24 +3007,19 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 			quest->on_completed(difficulty);
 		}
 
-		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
+		const campaign *current_campaign = game::get()->get_current_campaign();
 		if (current_campaign != nullptr && current_campaign->get_quest() == quest) {
-			wyrmgus::context ctx;
+			context ctx;
 			ctx.current_player = this;
-			wyrmgus::defines::get()->get_campaign_victory_dialogue()->call(this, ctx);
+			defines::get()->get_campaign_victory_dialogue()->call(this, ctx);
 		}
 
-		std::string rewards_string = quest->get_rewards_string(this);
-		if (!rewards_string.empty()) {
-			wyrmgus::string::replace(rewards_string, "\n", "\\n");
-			wyrmgus::string::replace(rewards_string, "\t", "\\t");
-			rewards_string = "Rewards:\\n" + rewards_string;
-		}
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->get_name() + " quest!\\n\\n" + rewards_string + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->get_player_color() ? quest->get_player_color()->get_identifier() : "") + "\", " + std::to_string(quest->get_icon() ? quest->get_icon()->get_frame() : 0) + ") end;");
+		const QString rewards_string = QString::fromStdString(quest->get_rewards_string(this));
+		emit engine_interface::get()->questCompletedDialogOpened(quest, rewards_string);
 	}
 }
 
-void CPlayer::fail_quest(wyrmgus::quest *quest, const std::string &fail_reason)
+void CPlayer::fail_quest(quest *quest, const std::string &failure_reason_string)
 {
 	this->remove_current_quest(quest);
 	
@@ -3036,20 +3031,20 @@ void CPlayer::fail_quest(wyrmgus::quest *quest, const std::string &fail_reason)
 	}
 	
 	if (quest->get_failure_effects() != nullptr) {
-		wyrmgus::context ctx;
+		context ctx;
 		ctx.current_player = this;
 		quest->get_failure_effects()->do_effects(this, ctx);
 	}
 
 	if (this == CPlayer::GetThisPlayer()) {
-		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
+		const campaign *current_campaign = game::get()->get_current_campaign();
 		if (current_campaign != nullptr && current_campaign->get_quest() == quest) {
-			wyrmgus::context ctx;
+			context ctx;
 			ctx.current_player = this;
-			wyrmgus::defines::get()->get_campaign_defeat_dialogue()->call(this, ctx);
+			defines::get()->get_campaign_defeat_dialogue()->call(this, ctx);
 		}
 
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->get_player_color() ? quest->get_player_color()->get_identifier() : "") + "\", " + std::to_string(quest->get_icon() ? quest->get_icon()->get_frame() : 0) + ") end;");
+		emit engine_interface::get()->questFailedDialogOpened(quest, QString::fromStdString(failure_reason_string));
 	}
 }
 
