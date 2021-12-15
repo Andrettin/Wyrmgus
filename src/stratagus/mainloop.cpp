@@ -63,7 +63,8 @@
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
-#include "sound/music.h"
+#include "sound/music_player.h"
+#include "sound/music_type.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "time/calendar.h"
@@ -485,7 +486,7 @@ void GameMainLoop()
 
 	CParticleManager::init();
 
-	CclCommand("if (GameStarting ~= nil) then GameStarting() end");
+	music_player::get()->play_music_type(music_type::map);
 
 	MultiPlayerReplayEachCycle();
 	
