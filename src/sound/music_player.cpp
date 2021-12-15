@@ -64,7 +64,7 @@ void music_player::play_music_type(const music_type type)
 	}
 
 	this->current_music_type = type;
-	StopMusic();
+	this->stop();
 	this->current_music = nullptr;
 
 	//clear all loaded data when the music type changes, to prevent music from causing too much memory consumption
@@ -222,6 +222,11 @@ const music *music_player::get_next_submusic() const
 	}
 }
 
+void music_player::stop()
+{
+	Mix_FadeOutMusic(200);
+}
+
 bool music_player::are_music_conditions_fulfilled(const music *music) const
 {
 	if (music->get_conditions() == nullptr) {
@@ -258,7 +263,7 @@ void music_player::check_current_music()
 {
 	//check whether the current music or submusic still fulfill their conditions, and if not stop the currently-playing sample, so that a new one will be picked
 	if (!this->are_current_music_conditions_fulfilled()) {
-		StopMusic();
+		this->stop();
 	}
 }
 

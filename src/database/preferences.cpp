@@ -197,7 +197,7 @@ void preferences::set_music_enabled(const bool enabled)
 	if (enabled) {
 		music_player::get()->play();
 	} else {
-		StopMusic();
+		music_player::get()->stop();
 	}
 
 	emit music_enabled_changed();

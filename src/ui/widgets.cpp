@@ -2553,8 +2553,6 @@ int MenuScreen::run(bool loop)
 	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 	CursorOn = cursor_on::unknown;
 
-	CallbackMusicOn();
-
 	if (loop) {
 		const EventCallback *old_callbacks = GetCallbacks();
 		SetCallbacks(&GuichanCallbacks);

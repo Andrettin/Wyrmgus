@@ -49,6 +49,8 @@ public:
 	const music *get_next_music() const;
 	const music *get_next_submusic() const;
 
+	void stop();
+
 	bool are_music_conditions_fulfilled(const music *music) const;
 	bool are_current_music_conditions_fulfilled() const;
 	void check_current_music();

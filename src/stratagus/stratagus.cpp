@@ -184,6 +184,7 @@ extern void beos_init(int argc, char **argv);
 #include "results.h"
 #include "script.h"
 #include "settings.h"
+#include "sound/music_player.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "time/calendar.h"
@@ -355,7 +356,7 @@ void Exit(const int err)
 		QApplication::exit(err);
 	}, Qt::QueuedConnection);
 
-	StopMusic();
+	music_player::get()->stop();
 	QuitSound();
 	NetworkQuitGame();
 
@@ -491,9 +492,7 @@ void stratagusMain(int argc, char **argv)
 	InitVideo();
 
 	//setup sound
-	if (InitSound()) {
-		InitMusic();
-	}
+	InitSound();
 
 	//  Show title screens.
 	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);

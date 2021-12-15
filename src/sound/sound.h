@@ -154,8 +154,6 @@ struct Origin {
 	unsigned Id;        /// unique identifier (if the pointer has been shared)
 };
 
-extern bool CallbackMusic;  /// flag true callback ccl if stops
-
 /// global range control (max cut off distance for sound)
 extern int DistanceSilent;
 
@@ -188,17 +186,6 @@ extern void InitSoundClient();
 
 /// Check if music is finished and play the next song
 extern void CheckMusicFinished();
-
-/// Initialize music
-extern void InitMusic();
-
-/// Turn music stopped callback on
-#define CallbackMusicOn() \
-	CallbackMusic = true;
-/// Turn music stopped callback off
-#define CallbackMusicOff() \
-	CallbackMusic = false;
-
 
 // sound_id.cpp
 

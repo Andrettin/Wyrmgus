@@ -38,14 +38,9 @@
 #include "player/civilization.h"
 #include "player/faction.h"
 #include "sound/music.h"
-#include "sound/music_player.h"
-#include "sound/music_type.h"
 #include "sound/sample.h"
 #include "sound/sound.h"
 #include "sound/unit_sound_type.h"
-//Wyrmgus start
-#include "ui/interface.h" //for player faction music
-//Wyrmgus end
 #include "unit/unit.h"
 //Wyrmgus start
 #include "unit/unit_manager.h"
@@ -299,22 +294,6 @@ int PlaySample(wyrmgus::sample *sample, Origin *origin)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Set the music finished callback
-*/
-void SetMusicFinishedCallback(void (*callback)())
-{
-	Mix_HookMusicFinished(callback);
-}
-
-/**
-**  Stop the current playing music.
-*/
-void StopMusic()
-{
-	Mix_FadeOutMusic(200);
-}
-
-/**
 **  Add tension to music
 */
 void AddMusicTension(int value)
@@ -417,7 +396,7 @@ static void InitSdlSound()
 **
 **  @return  True on success, or false otherwise.
 */
-bool InitSound()
+void InitSound()
 {
 	//
 	// Open sound device, 16-bit samples, stereo.
@@ -428,7 +407,7 @@ bool InitSound()
 	} catch (const std::exception &exception) {
 		exception::report(exception);
 		SoundInitialized = false;
-		return false;
+		return;
 	}
 
 	// ARI: The following must be done here to allow sound to work in
@@ -440,14 +419,12 @@ bool InitSound()
 
 	for (int i = 0; i < MaxChannels; ++i) {
 		Channels[i].Unit.reset();
-		Channels[i].Voice = wyrmgus::unit_sound_type::none;
+		Channels[i].Voice = unit_sound_type::none;
 	}
 
 	//now we're ready for the callback to run
 	Mix_ResumeMusic();
 	Mix_Resume(-1);
-
-	return true;
 }
 
 /**
@@ -459,8 +436,8 @@ void QuitSound()
 		return;
 	}
 
-	wyrmgus::sound::unload_all();
-	wyrmgus::music::unload_all();
+	sound::unload_all();
+	music::unload_all();
 
 	Mix_CloseAudio();
 	Mix_Quit();

@@ -40,8 +40,6 @@
 
 #include <SDL_mixer.h>
 
-bool CallbackMusic;                       /// flag true callback ccl if stops
-
 namespace wyrmgus {
 
 music::music(const std::string &identifier) : data_entry(identifier)
@@ -135,14 +133,6 @@ void music::unload()
 }
 
 /**
-**  Callback for when music has finished
-**  Note: we are in the sdl audio thread
-*/
-static void MusicFinishedCallback()
-{
-}
-
-/**
 **  Check if music is finished and play the next song
 */
 void CheckMusicFinished()
@@ -153,15 +143,7 @@ void CheckMusicFinished()
 
 	const bool finished = !music_player::get()->is_playing();
 
-	if (finished && SoundEnabled() && preferences::get()->is_music_enabled() && CallbackMusic) {
+	if (finished && SoundEnabled() && preferences::get()->is_music_enabled()) {
 		music_player::get()->play();
 	}
-}
-
-/**
-**  Init music
-*/
-void InitMusic()
-{
-	SetMusicFinishedCallback(MusicFinishedCallback);
 }

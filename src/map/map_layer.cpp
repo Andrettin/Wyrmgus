@@ -37,7 +37,6 @@
 #include "map/tile_flag.h"
 #include "map/world.h"
 #include "map/world_game_data.h"
-#include "sound/music.h"
 #include "sound/sound_server.h"
 #include "time/season.h"
 #include "time/season_schedule.h"

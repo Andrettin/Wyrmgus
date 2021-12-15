@@ -1667,8 +1667,6 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 		NetworkOnStartGame();
 	}
 
-	CallbackMusicOn();
-
 #if 0
 	GamePaused = true;
 #endif

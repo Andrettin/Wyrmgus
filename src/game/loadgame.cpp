@@ -52,7 +52,6 @@
 #include "script.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
-#include "sound/music.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "spell/spell.h"
@@ -177,7 +176,6 @@ void InitModules()
 	FastForwardCycle = 0;
 	SyncHash = 0;
 
-	CallbackMusicOn();
 	InitUserInterface();
 	InitPlayers();
 	InitMissileTypes();

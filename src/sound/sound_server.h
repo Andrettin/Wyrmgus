@@ -63,17 +63,12 @@ extern std::unique_ptr<wyrmgus::sample> LoadSample(const std::filesystem::path &
 /// Play a sample
 extern int PlaySample(wyrmgus::sample *sample, Origin *origin = nullptr);
 
-/// Set the music finished callback
-void SetMusicFinishedCallback(void (*callback)());
-
 /// Increase tension value for the music
 extern void AddMusicTension(int value);
-/// Stop music playing
-extern void StopMusic();
 
 /// Check if sound is enabled
 extern bool SoundEnabled();
 /// Initialize the sound card.
-extern bool InitSound();
+extern void InitSound();
 ///  Cleanup sound.
 extern void QuitSound();
