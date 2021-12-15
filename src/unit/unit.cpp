@@ -1856,6 +1856,10 @@ int CUnit::get_aura_range() const
 
 void CUnit::ApplyAura(const int aura_index)
 {
+	if (this->Removed) {
+		return;
+	}
+
 	if (aura_index == LEADERSHIPAURA_INDEX) {
 		if (!this->IsInCombat()) {
 			return;

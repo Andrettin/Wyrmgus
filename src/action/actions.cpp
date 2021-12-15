@@ -425,7 +425,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	if (unit.IsAlive() && unit.CurrentAction() != UnitAction::Built) {
+	if (unit.IsAliveOnMap() && unit.CurrentAction() != UnitAction::Built) {
 		//apply auras
 		if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0) {
 			unit.ApplyAura(LEADERSHIPAURA_INDEX);
