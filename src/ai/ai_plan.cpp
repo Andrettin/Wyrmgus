@@ -1135,6 +1135,11 @@ void PlayerAi::check_site_transport_units()
 
 void PlayerAi::add_research_request(const CUpgrade *upgrade)
 {
+	if (vector::contains(this->research_requests, upgrade)) {
+		//already added
+		return;
+	}
+
 	//remove any removed upgrades from the requests, to prevent mutually-incompatible upgrades from being researched back and forth
 	for (const auto &modifier : upgrade->get_modifiers()) {
 		for (const CUpgrade *removed_upgrade : modifier->get_removed_upgrades()) {
