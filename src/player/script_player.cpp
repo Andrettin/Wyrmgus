@@ -2634,10 +2634,10 @@ static int CclSetPlayerData(lua_State *l)
 
 		if (!strncmp(ident, "upgrade", 7)) {
 			if (acquire == "R" && UpgradeIdentAllowed(*p, ident) != 'R') {
-				UpgradeAcquire(*p, CUpgrade::get(ident));
+				p->acquire_upgrade(CUpgrade::get(ident));
 			} else if (acquire == "F" || acquire == "A") {
 				if (UpgradeIdentAllowed(*p, ident) == 'R') {
-					UpgradeLost(*p, CUpgrade::get(ident)->ID);
+					p->lose_upgrade(CUpgrade::get(ident));
 				}
 				AllowUpgradeId(*p, UpgradeIdByIdent(ident), acquire[0]);
 			}

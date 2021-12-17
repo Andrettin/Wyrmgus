@@ -2558,7 +2558,8 @@ void AiCheckBuildings()
 		return;
 	}
 
-	if (AiPlayer->Player->NumTownHalls < 1) { //don't build structures if has no town hall yet
+	if (AiPlayer->Player->NumTownHalls < 1) {
+		//don't build structures if has no town hall yet
 		return;
 	}
 

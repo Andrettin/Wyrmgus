@@ -1480,7 +1480,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const wyrmgus::unit_type &src, wy
 **  @param player  Player that get all the upgrades.
 **  @param um      Upgrade modifier that do the effects
 */
-static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifier *um)
+void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifier *um)
 {
 	assert_throw(um != nullptr);
 
@@ -1531,7 +1531,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 	
 	for (const CUpgrade *removed_upgrade : um->get_removed_upgrades()) {
 		if (player.Allow.Upgrades[removed_upgrade->ID] == 'R') {
-			UpgradeLost(player, removed_upgrade->ID);
+			player.lose_upgrade(removed_upgrade);
 		}
 	}
 
@@ -1743,7 +1743,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 **  @param player  Player that get all the upgrades.
 **  @param um      Upgrade modifier that do the effects
 */
-static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifier *um)
+void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifier *um)
 {
 	assert_throw(um != nullptr);
 
@@ -2066,98 +2066,6 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifie
 	}
 	unit.UpdateButtonIcons();
 	//Wyrmgus end
-}
-
-/**
-**  Handle that an upgrade was acquired.
-**
-**  @param player   Player researching the upgrade.
-**  @param upgrade  Upgrade ready researched.
-*/
-void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
-{
-	//Wyrmgus start
-	if (!GameRunning && !GameEstablishing) {
-		return;
-	}
-	//Wyrmgus end
-
-	int id = upgrade->ID;
-	player.UpgradeTimers.Upgrades[id] = upgrade->get_time_cost();
-	AllowUpgradeId(player, id, 'R');  // research done
-
-	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
-	if (upgrade_deity != nullptr) { // if is a deity upgrade
-		for (const wyrmgus::magic_domain *domain : upgrade_deity->get_domains()) {
-			const CUpgrade *domain_upgrade = domain->get_deity_domain_upgrade();
-			if (player.Allow.Upgrades[domain_upgrade->ID] != 'R') {
-				UpgradeAcquire(player, domain_upgrade);
-			}
-		}
-		player.Deities.push_back(upgrade_deity);
-	}
-	//Wyrmgus end
-
-	if (upgrade->get_government_type() != government_type::none && player.get_government_type() != upgrade->get_government_type()) {
-		player.set_government_type(upgrade->get_government_type());
-	}
-	
-	if (upgrade->get_dynasty() != nullptr && player.get_dynasty() != upgrade->get_dynasty()) {
-		player.set_dynasty(upgrade->get_dynasty());
-	}
-	
-	for (const auto &modifier : upgrade->get_modifiers()) {
-		ApplyUpgradeModifier(player, modifier.get());
-	}
-
-	player.check_age();
-	
-	//
-	//  Upgrades could change the buttons displayed.
-	//
-	if (&player == CPlayer::GetThisPlayer()) {
-		SelectedUnitChanged();
-	}
-}
-
-/**
-**  Upgrade will be lost
-**
-**  @param player   Player researching the upgrade.
-**  @param id       Upgrade to be lost.
-**  
-*/
-void UpgradeLost(CPlayer &player, int id)
-{
-	//Wyrmgus start
-	if (!GameRunning && !GameEstablishing) {
-		return;
-	}
-	//Wyrmgus end
-
-	player.UpgradeTimers.Upgrades[id] = 0;
-	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
-	
-	const CUpgrade *upgrade = CUpgrade::get_all()[id];
-	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
-	if (upgrade_deity != nullptr) {
-		for (const wyrmgus::magic_domain *domain : upgrade_deity->get_domains()) {
-			const CUpgrade *domain_upgrade = domain->get_deity_domain_upgrade();
-			if (player.Allow.Upgrades[domain_upgrade->ID] == 'R') {
-				UpgradeLost(player, domain_upgrade->ID);
-			}
-		}
-		wyrmgus::vector::remove(player.Deities, upgrade_deity);
-	}
-
-	for (const auto &modifier : upgrade->get_modifiers()) {
-		RemoveUpgradeModifier(player, modifier.get());
-	}
-
-	//upgrades could change the buttons displayed.
-	if (&player == CPlayer::GetThisPlayer()) {
-		SelectedUnitChanged();
-	}
 }
 
 /**

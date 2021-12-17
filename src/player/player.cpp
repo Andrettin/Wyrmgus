@@ -57,6 +57,7 @@
 //Wyrmgus start
 #include "luacallback.h"
 //Wyrmgus end
+#include "magic_domain.h"
 #include "map/landmass.h"
 #include "map/map.h"
 #include "map/map_info.h"
@@ -1108,13 +1109,13 @@ void CPlayer::apply_history(const CDate &start_date)
 		}
 
 		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
-			UpgradeAcquire(*this, upgrade);
+			this->acquire_upgrade(upgrade);
 		}
 	}
 
 	for (const CUpgrade *upgrade : faction_history->get_acquired_upgrades()) {
 		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
-			UpgradeAcquire(*this, upgrade);
+			this->acquire_upgrade(upgrade);
 		}
 	}
 
@@ -1192,13 +1193,13 @@ void CPlayer::apply_civilization_history(const wyrmgus::civilization_base *civil
 		}
 
 		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
-			UpgradeAcquire(*this, upgrade);
+			this->acquire_upgrade(upgrade);
 		}
 	}
 
 	for (const CUpgrade *upgrade : civilization_history->get_acquired_upgrades()) {
 		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
-			UpgradeAcquire(*this, upgrade);
+			this->acquire_upgrade(upgrade);
 		}
 	}
 
@@ -1313,7 +1314,7 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 	if (this->get_civilization() != nullptr && (GameRunning || GameEstablishing)) {
 		const wyrmgus::civilization *old_civilization = this->get_civilization();
 		if (old_civilization->get_upgrade() != nullptr && this->Allow.Upgrades[old_civilization->get_upgrade()->ID] == 'R') {
-			UpgradeLost(*this, old_civilization->get_upgrade()->ID);
+			this->lose_upgrade(old_civilization->get_upgrade());
 		}
 	}
 
@@ -1339,7 +1340,7 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 		const wyrmgus::civilization *new_civilization = this->get_civilization();
 		CUpgrade *civilization_upgrade = new_civilization->get_upgrade();
 		if (civilization_upgrade != nullptr && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
-			UpgradeAcquire(*this, civilization_upgrade);
+			this->acquire_upgrade(civilization_upgrade);
 		}
 	}
 
@@ -1365,25 +1366,26 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 
 	if (this->get_faction() != nullptr) {
 		if (this->get_faction()->get_upgrade() != nullptr && this->Allow.Upgrades[this->get_faction()->get_upgrade()->ID] == 'R') {
-			UpgradeLost(*this, this->get_faction()->get_upgrade()->ID);
+			this->lose_upgrade(this->get_faction()->get_upgrade());
 		}
 
-		const CUpgrade *faction_type_upgrade = wyrmgus::defines::get()->get_faction_type_upgrade(this->get_faction()->get_type());
+		const CUpgrade *faction_type_upgrade = defines::get()->get_faction_type_upgrade(this->get_faction()->get_type());
 		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] == 'R') {
-			UpgradeLost(*this, faction_type_upgrade->ID);
+			this->lose_upgrade(faction_type_upgrade);
 		}
 	}
 
 	if (old_faction != nullptr && faction != nullptr) {
-		for (const wyrmgus::upgrade_class *upgrade_class : wyrmgus::upgrade_class::get_all()) {
+		for (const upgrade_class *upgrade_class : upgrade_class::get_all()) {
 			const CUpgrade *old_faction_class_upgrade = old_faction->get_class_upgrade(upgrade_class);
 			const CUpgrade *new_faction_class_upgrade = faction->get_class_upgrade(upgrade_class);
-			if (old_faction_class_upgrade != new_faction_class_upgrade) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
+			if (old_faction_class_upgrade != new_faction_class_upgrade) {
+				//if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
 				if (old_faction_class_upgrade != nullptr && this->Allow.Upgrades[old_faction_class_upgrade->ID] == 'R') {
-					UpgradeLost(*this, old_faction_class_upgrade->ID);
+					this->lose_upgrade(old_faction_class_upgrade);
 
 					if (new_faction_class_upgrade != nullptr) {
-						UpgradeAcquire(*this, new_faction_class_upgrade);
+						this->acquire_upgrade(new_faction_class_upgrade);
 					}
 				}
 			}
@@ -1406,7 +1408,8 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		return;
 	}
 	
-	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
+	if (!IsNetworkGame()) {
+		//only set the faction's name as the player's name if this is a single player game
 		this->set_name(this->get_faction()->get_name());
 	}
 
@@ -1428,8 +1431,8 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 			int best_usage_count = -1;
 			int best_rgb_difference = -1;
 			std::vector<const wyrmgus::player_color *> available_colors;
-			for (const wyrmgus::player_color *pc : wyrmgus::player_color::get_all()) {
-				if (pc == wyrmgus::defines::get()->get_neutral_player_color()) {
+			for (const wyrmgus::player_color *pc : player_color::get_all()) {
+				if (pc == defines::get()->get_neutral_player_color()) {
 					continue;
 				}
 
@@ -1494,17 +1497,17 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 				if (GameEstablishing) {
 					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
 				} else {
-					UpgradeAcquire(*this, faction_upgrade);
+					this->acquire_upgrade(faction_upgrade);
 				}
 			}
 		}
 		
-		const CUpgrade *faction_type_upgrade = wyrmgus::defines::get()->get_faction_type_upgrade(this->get_faction()->get_type());
+		const CUpgrade *faction_type_upgrade = defines::get()->get_faction_type_upgrade(this->get_faction()->get_type());
 		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] != 'R') {
 			if (GameEstablishing) {
 				AllowUpgradeId(*this, faction_type_upgrade->ID, 'R');
 			} else {
-				UpgradeAcquire(*this, faction_type_upgrade);
+				this->acquire_upgrade(faction_type_upgrade);
 			}
 		}
 	} else {
@@ -1567,7 +1570,7 @@ void CPlayer::set_government_type(const wyrmgus::government_type government_type
 		if (GameEstablishing) {
 			AllowUpgradeId(*this, government_type_upgrade->ID, 'R');
 		} else {
-			UpgradeAcquire(*this, government_type_upgrade);
+			this->acquire_upgrade(government_type_upgrade);
 		}
 	}
 }
@@ -1582,7 +1585,7 @@ void CPlayer::set_dynasty(const wyrmgus::dynasty *dynasty)
 	
 	if (old_dynasty != nullptr) {
 		if (old_dynasty->get_upgrade() != nullptr && this->Allow.Upgrades[old_dynasty->get_upgrade()->ID] == 'R') {
-			UpgradeLost(*this, old_dynasty->get_upgrade()->ID);
+			this->lose_upgrade(old_dynasty->get_upgrade());
 		}
 	}
 
@@ -1597,7 +1600,7 @@ void CPlayer::set_dynasty(const wyrmgus::dynasty *dynasty)
 			if (GameEstablishing) {
 				AllowUpgradeId(*this, dynasty->get_upgrade()->ID, 'R');
 			} else {
-				UpgradeAcquire(*this, dynasty->get_upgrade());
+				this->acquire_upgrade(dynasty->get_upgrade());
 			}
 		}
 	}
@@ -1719,6 +1722,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		if (!chosen_upgrade->get_name().empty()) {
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->get_name().c_str(), this->get_name().c_str());
 		}
+
 		if (&player == CPlayer::GetThisPlayer() && player.get_civilization() != nullptr) {
 			const wyrmgus::sound *sound = player.get_civilization()->get_research_complete_sound();
 
@@ -1726,10 +1730,12 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 				PlayGameSound(sound, MaxSampleVolume);
 			}
 		}
+
 		if (player.AiEnabled) {
 			AiResearchComplete(unit, chosen_upgrade);
 		}
-		UpgradeAcquire(player, chosen_upgrade);
+
+		player.acquire_upgrade(chosen_upgrade);
 	}
 }
 
@@ -1821,6 +1827,88 @@ bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) con
 	}
 
 	return false;
+}
+
+void CPlayer::acquire_upgrade(const CUpgrade *upgrade)
+{
+	//Wyrmgus start
+	if (!GameRunning && !GameEstablishing) {
+		return;
+	}
+	//Wyrmgus end
+
+	const int upgrade_index = upgrade->ID;
+	this->UpgradeTimers.Upgrades[upgrade_index] = upgrade->get_time_cost();
+	AllowUpgradeId(*this, upgrade_index, 'R');  // research done
+
+	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
+	if (upgrade_deity != nullptr) { // if is a deity upgrade
+		for (const wyrmgus::magic_domain *domain : upgrade_deity->get_domains()) {
+			const CUpgrade *domain_upgrade = domain->get_deity_domain_upgrade();
+			if (this->Allow.Upgrades[domain_upgrade->ID] != 'R') {
+				this->acquire_upgrade(domain_upgrade);
+			}
+		}
+
+		this->Deities.push_back(upgrade_deity);
+	}
+	//Wyrmgus end
+
+	if (upgrade->get_government_type() != government_type::none && this->get_government_type() != upgrade->get_government_type()) {
+		this->set_government_type(upgrade->get_government_type());
+	}
+
+	if (upgrade->get_dynasty() != nullptr && this->get_dynasty() != upgrade->get_dynasty()) {
+		this->set_dynasty(upgrade->get_dynasty());
+	}
+
+	for (const auto &modifier : upgrade->get_modifiers()) {
+		ApplyUpgradeModifier(*this, modifier.get());
+	}
+
+	this->check_age();
+
+	//
+	//  Upgrades could change the buttons displayed.
+	//
+	if (this == CPlayer::GetThisPlayer()) {
+		SelectedUnitChanged();
+	}
+}
+
+void CPlayer::lose_upgrade(const CUpgrade *upgrade)
+{
+	//Wyrmgus start
+	if (!GameRunning && !GameEstablishing) {
+		return;
+	}
+	//Wyrmgus end
+
+	const int upgrade_index = upgrade->get_index();
+
+	this->UpgradeTimers.Upgrades[upgrade_index] = 0;
+	AllowUpgradeId(*this, upgrade_index, 'A'); // research is lost i.e. available
+
+	const deity *upgrade_deity = upgrade->get_deity();
+	if (upgrade_deity != nullptr) {
+		for (const magic_domain *domain : upgrade_deity->get_domains()) {
+			const CUpgrade *domain_upgrade = domain->get_deity_domain_upgrade();
+			if (this->Allow.Upgrades[domain_upgrade->ID] == 'R') {
+				this->lose_upgrade(domain_upgrade);
+			}
+		}
+
+		vector::remove(this->Deities, upgrade_deity);
+	}
+
+	for (const auto &modifier : upgrade->get_modifiers()) {
+		RemoveUpgradeModifier(*this, modifier.get());
+	}
+
+	//upgrades could change the buttons displayed.
+	if (this == CPlayer::GetThisPlayer()) {
+		SelectedUnitChanged();
+	}
 }
 
 const unit_class *CPlayer::get_default_population_class(const unit_domain domain) const
@@ -3259,7 +3347,7 @@ void CPlayer::AddModifier(CUpgrade *modifier, int cycles)
 		}
 	} else {
 		this->Modifiers.push_back(std::pair<CUpgrade *, int>(modifier, GameCycle + cycles));
-		UpgradeAcquire(*this, modifier);
+		this->acquire_upgrade(modifier);
 	}
 	
 }
@@ -3267,7 +3355,7 @@ void CPlayer::AddModifier(CUpgrade *modifier, int cycles)
 void CPlayer::RemoveModifier(CUpgrade *modifier)
 {
 	if (this->Allow.Upgrades[modifier->ID] == 'R') {
-		UpgradeLost(*this, modifier->ID);
+		this->lose_upgrade(modifier);
 		for (size_t i = 0; i < this->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
 			if (this->Modifiers[i].first == modifier) {
 				this->Modifiers.erase(std::remove(this->Modifiers.begin(), this->Modifiers.end(), this->Modifiers[i]), this->Modifiers.end());

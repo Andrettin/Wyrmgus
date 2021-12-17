@@ -285,6 +285,9 @@ public:
 	bool has_upgrade(const CUpgrade *upgrade) const;
 	bool has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) const;
 
+	void acquire_upgrade(const CUpgrade *upgrade);
+	void lose_upgrade(const CUpgrade *upgrade);
+
 	const unit_class *get_default_population_class(const unit_domain domain) const;
 
 	std::vector<CUnit *> get_town_hall_units() const;

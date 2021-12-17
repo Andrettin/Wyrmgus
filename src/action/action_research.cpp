@@ -172,7 +172,8 @@ void COrder_Research::Execute(CUnit &unit)
 		if (player.AiEnabled) {
 			AiResearchComplete(unit, &upgrade);
 		}
-		UpgradeAcquire(player, &upgrade);
+
+		player.acquire_upgrade(&upgrade);
 		this->Finished = true;
 		return;
 	}
