@@ -1449,7 +1449,7 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 
 	for (int i = (wyrmgus::upgrade_modifier::UpgradeModifiers.size() - 1); i >= 0; --i) {
 		const wyrmgus::upgrade_modifier *modifier = wyrmgus::upgrade_modifier::UpgradeModifiers[i];
-		const CUpgrade *upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+		const CUpgrade *upgrade = modifier->get_upgrade();
 		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 			if (
 				(
@@ -1544,7 +1544,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	if (item_slot == wyrmgus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from weapon technologies or from abilities which require the base weapon class but aren't compatible with this weapon's class; and apply upgrade modifiers from abilities which require this weapon's class
 		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = modifier->get_upgrade();
 			if (
 				(modifier_upgrade->is_weapon() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type))
 				|| (modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
@@ -1571,7 +1571,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == wyrmgus::item_slot::shield && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from shield technologies
 		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = modifier->get_upgrade();
 			if (modifier_upgrade->is_shield() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
@@ -1579,7 +1579,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == wyrmgus::item_slot::boots && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from boots technologies
 		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = modifier->get_upgrade();
 			if (modifier_upgrade->is_boots() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
@@ -1587,7 +1587,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == wyrmgus::item_slot::arrows && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from arrows technologies
 		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = modifier->get_upgrade();
 			if (modifier_upgrade->is_arrows() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
@@ -1743,9 +1743,9 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	if (item_slot == wyrmgus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from weapon technologies, and apply ability effects that are weapon class-specific accordingly
 		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = modifier->get_upgrade();
 			if (
-				(modifier_upgrade->is_weapon() && Player->Allow.Upgrades[modifier->UpgradeId] == 'R' && modifier->applies_to(this->Type))
+				(modifier_upgrade->is_weapon() && Player->Allow.Upgrades[modifier->get_upgrade()->get_index()] == 'R' && modifier->applies_to(this->Type))
 				|| (modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
 			) {
 				if (this->GetIndividualUpgrade(modifier_upgrade)) {
@@ -1770,7 +1770,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == wyrmgus::item_slot::shield && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from shield technologies
 		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = modifier->get_upgrade();
 			if (modifier_upgrade->is_shield() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
@@ -1778,7 +1778,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == wyrmgus::item_slot::boots && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from boots technologies
 		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = modifier->get_upgrade();
 			if (modifier_upgrade->is_boots() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
@@ -1786,7 +1786,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	} else if (item_slot == wyrmgus::item_slot::arrows && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from arrows technologies
 		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
-			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+			const CUpgrade *modifier_upgrade = modifier->get_upgrade();
 			if (modifier_upgrade->is_arrows() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
@@ -4932,7 +4932,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
 	for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
-		const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+		const CUpgrade *modifier_upgrade = modifier->get_upgrade();
 		if (oldplayer->Allow.Upgrades[modifier_upgrade->ID] != 'R' && newplayer.Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) { //if the old player doesn't have the modifier's upgrade (but the new one does), and the upgrade is applicable to the unit
 			//Wyrmgus start
 //			ApplyIndividualUpgradeModifier(*this, modifier);
@@ -5881,8 +5881,8 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 		if (!item->Identified) { //if the item is unidentified, don't show the effects of its affixes
 			for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 				if (
-					(item->Prefix != nullptr && modifier->UpgradeId == item->Prefix->ID)
-					|| (item->Suffix != nullptr && modifier->UpgradeId == item->Suffix->ID)
+					(item->Prefix != nullptr && modifier->get_upgrade() == item->Prefix)
+					|| (item->Suffix != nullptr && modifier->get_upgrade() == item->Suffix)
 				) {
 					if (!increase) {
 						value -= modifier->Modifier.Variables[variable_index].Value;
@@ -5932,7 +5932,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 			}
 		} else if (EquippedItems[static_cast<int>(item_slot)].size() == 0 && (item_slot == wyrmgus::item_slot::weapon || item_slot == wyrmgus::item_slot::shield || item_slot == wyrmgus::item_slot::boots || item_slot == wyrmgus::item_slot::arrows)) {
 			for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
-				const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
+				const CUpgrade *modifier_upgrade = modifier->get_upgrade();
 				if (
 					(
 						(

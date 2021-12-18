@@ -236,11 +236,11 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 
 			for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 				if (
-					(item->get_prefix() != nullptr && modifier->UpgradeId == item->get_prefix()->ID)
-					|| (item->get_suffix() != nullptr && modifier->UpgradeId == item->get_suffix()->ID)
-					|| (item->get_work() != nullptr && modifier->UpgradeId == item->get_work()->ID)
-					|| (item->get_elixir() != nullptr && modifier->UpgradeId == item->get_elixir()->ID)
-					) {
+					(item->get_prefix() != nullptr && modifier->get_upgrade() == item->get_prefix())
+					|| (item->get_suffix() != nullptr && modifier->get_upgrade() == item->get_suffix())
+					|| (item->get_work() != nullptr && modifier->get_upgrade() == item->get_work())
+					|| (item->get_elixir() != nullptr && modifier->get_upgrade() == item->get_elixir())
+				) {
 					variable_value += modifier->Modifier.Variables[var].Value;
 					variable_increase += modifier->Modifier.Variables[var].Increase;
 				}

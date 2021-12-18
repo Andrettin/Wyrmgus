@@ -31,7 +31,7 @@
 #include "unit/unit_type_container.h"
 #include "upgrade/upgrade_structs.h" //for CUnitStats
 
-class CConfigData;
+class CPlayer;
 class CUnit;
 class CUpgrade;
 struct lua_State;
@@ -56,12 +56,17 @@ class upgrade_modifier final
 public:
 	static std::vector<upgrade_modifier *> UpgradeModifiers;
 
-	upgrade_modifier();
+	explicit upgrade_modifier(const CUpgrade *upgrade);
 
-	std::unique_ptr<upgrade_modifier> duplicate() const;
+	std::unique_ptr<upgrade_modifier> duplicate(const CUpgrade *new_upgrade) const;
 	
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
+
+	const CUpgrade *get_upgrade() const
+	{
+		return this->upgrade;
+	}
 
 	int get_infantry_cost_modifier() const
 	{
@@ -95,10 +100,14 @@ public:
 	bool applies_to(const unit_type *unit_type) const;
 	
 	bool affects_variable(const int var_index) const;
+	void apply_to_player(CPlayer *player) const;
+	void remove_from_player(CPlayer *player) const;
 	void apply_to_unit(CUnit *unit, const int multiplier) const;
 
-	int UpgradeId = 0;						/// used to filter required modifier
+private:
+	const CUpgrade *upgrade = nullptr; //used to filter required modifier
 
+public:
 	CUnitStats Modifier;					/// modifier of unit stats.
 	std::unique_ptr<int[]> ModifyPercent;	/// use for percent modifiers
 	int SpeedResearch = 0;					/// speed factor for researching

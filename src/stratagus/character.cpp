@@ -1161,8 +1161,8 @@ void character::UpdateAttributes()
 		this->Attributes[i] = this->get_unit_type()->DefaultStat.Variables[var].Value;
 		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			if (
-				(this->get_trait() != nullptr && modifier->UpgradeId == this->get_trait()->ID)
-				|| vector::contains(this->abilities, CUpgrade::get_all()[modifier->UpgradeId])
+				(this->get_trait() != nullptr && modifier->get_upgrade() == this->get_trait())
+				|| vector::contains(this->abilities, modifier->get_upgrade())
 			) {
 				if (modifier->Modifier.Variables[var].Value != 0) {
 					this->Attributes[i] += modifier->Modifier.Variables[var].Value;

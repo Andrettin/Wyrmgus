@@ -311,8 +311,7 @@ void CUpgrade::process_sml_scope(const sml_data &scope)
 			this->scaled_cost_unit_classes.push_back(unit_class::get(value));
 		}
 	} else if (tag == "modifier") {
-		auto modifier = std::make_unique<upgrade_modifier>();
-		modifier->UpgradeId = this->ID;
+		auto modifier = std::make_unique<upgrade_modifier>(this);
 
 		database::process_sml_data(modifier, scope);
 
@@ -548,8 +547,7 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 	this->scaled_cost_unit_classes = parent_upgrade->scaled_cost_unit_classes;
 
 	for (const auto &modifier : parent_upgrade->get_modifiers()) {
-		std::unique_ptr<wyrmgus::upgrade_modifier> duplicated_modifier = modifier->duplicate();
-		duplicated_modifier->UpgradeId = this->ID;
+		std::unique_ptr<upgrade_modifier> duplicated_modifier = modifier->duplicate(this);
 		wyrmgus::upgrade_modifier::UpgradeModifiers.push_back(duplicated_modifier.get());
 		this->modifiers.push_back(std::move(duplicated_modifier));
 	}
@@ -858,13 +856,10 @@ static int CclDefineModifier(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
-	auto um = std::make_unique<wyrmgus::upgrade_modifier>();
+	const std::string upgrade_ident = LuaToString(l, 1);
+	CUpgrade *upgrade = CUpgrade::get(upgrade_ident);
 
-	std::string upgrade_ident = LuaToString(l, 1);
-	um->UpgradeId = UpgradeIdByIdent(upgrade_ident);
-	if (um->UpgradeId == -1) {
-		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
-	}
+	auto um = std::make_unique<wyrmgus::upgrade_modifier>(upgrade);
 	
 	for (int j = 1; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
@@ -969,8 +964,8 @@ static int CclDefineModifier(lua_State *l)
 		}
 	}
 
-	wyrmgus::upgrade_modifier::UpgradeModifiers.push_back(um.get());
-	CUpgrade::get_all()[um->UpgradeId]->add_modifier(std::move(um));
+	upgrade_modifier::UpgradeModifiers.push_back(um.get());
+	upgrade->add_modifier(std::move(um));
 
 	return 0;
 }
@@ -1375,7 +1370,7 @@ int UpgradeIdByIdent(const std::string &ident)
 **  @param src     From this unit-type.
 **  @param dst     To this unit-type.
 */
-static void ConvertUnitTypeTo(CPlayer &player, const wyrmgus::unit_type &src, wyrmgus::unit_type &dst)
+void ConvertUnitTypeTo(CPlayer &player, const unit_type &src, unit_type &dst)
 {
 	//Wyrmgus start
 	if (player.AiEnabled && GameCycle > 0) {
@@ -1466,517 +1461,6 @@ static void ConvertUnitTypeTo(CPlayer &player, const wyrmgus::unit_type &src, wy
 					}
 				//Wyrmgus end
 				}
-			}
-		}
-	}
-}
-
-/**
-**  Apply the modifiers of an upgrade.
-**
-**  This function will mark upgrade done and do all required modifications
-**  to unit types and will modify allow/forbid maps
-**
-**  @param player  Player that get all the upgrades.
-**  @param um      Upgrade modifier that do the effects
-*/
-void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifier *um)
-{
-	assert_throw(um != nullptr);
-
-	int pn = player.get_index();
-
-	//Wyrmgus start
-	if (um->SpeedResearch != 0) {
-		player.SpeedResearch += um->SpeedResearch;
-	}
-
-	if (um->get_infantry_cost_modifier() != 0) {
-		player.change_infantry_cost_modifier(um->get_infantry_cost_modifier());
-	}
-
-	if (um->get_cavalry_cost_modifier() != 0) {
-		player.change_cavalry_cost_modifier(um->get_cavalry_cost_modifier());
-	}
-
-	if (um->change_civilization_to != nullptr && GameRunning && um->change_civilization_to != player.get_civilization()) {
-		player.set_civilization(um->change_civilization_to);
-	}
-	if (um->change_faction_to != nullptr && GameRunning && (um->change_faction_to->get_civilization() != player.get_civilization() || um->change_faction_to != player.get_faction())) {
-		if (um->change_faction_to->get_civilization() != player.get_civilization()) {
-			player.set_civilization(um->change_faction_to->get_civilization());
-		}
-		player.SetFaction(um->change_faction_to);
-	}
-	//Wyrmgus end
-
-	for (int z = 0; z < UpgradeMax; ++z) {
-		// allow/forbid upgrades for player.  only if upgrade is not acquired
-
-		// FIXME: check if modify is allowed
-
-		if (player.Allow.Upgrades[z] != 'R') {
-			if (um->ChangeUpgrades[z] == 'A') {
-				player.Allow.Upgrades[z] = 'A';
-			}
-			if (um->ChangeUpgrades[z] == 'F') {
-				player.Allow.Upgrades[z] = 'F';
-			}
-			// we can even have upgrade acquired w/o costs
-			if (um->ChangeUpgrades[z] == 'R') {
-				player.Allow.Upgrades[z] = 'R';
-			}
-		}
-	}
-	
-	for (const CUpgrade *removed_upgrade : um->get_removed_upgrades()) {
-		if (player.Allow.Upgrades[removed_upgrade->ID] == 'R') {
-			player.lose_upgrade(removed_upgrade);
-		}
-	}
-
-	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		if (unit_type->is_template()) {
-			continue;
-		}
-
-		CUnitStats &stat = unit_type->Stats[pn];
-		// add/remove allowed units
-
-		//Wyrmgus start
-		if (stat.Variables.empty()) { // unit type's stats not initialized
-			break;
-		}
-		//Wyrmgus end
-
-		// FIXME: check if modify is allowed
-
-		player.Allow.Units[unit_type->Slot] += um->ChangeUnits[unit_type->Slot];
-
-		// this modifier should be applied to unittype id == z
-		if (um->applies_to(unit_type)) {
-
-			// if a unit type's supply is changed, we need to update the player's supply accordingly
-			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade;
-
-				FindUnitsByType(*unit_type, unitupgrade);
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->get_index() == pn && unit.IsAlive()) {
-						unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
-					}
-				}
-			}
-			
-			// if a unit type's demand is changed, we need to update the player's demand accordingly
-			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade;
-
-				FindUnitsByType(*unit_type, unitupgrade);
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->get_index() == pn && unit.IsAlive()) {
-						unit.Player->Demand += um->Modifier.Variables[DEMAND_INDEX].Value;
-					}
-				}
-			}
-			
-			// upgrade costs :)
-			for (const auto &[resource, cost] : um->Modifier.get_costs()) {
-				stat.change_cost(resource, cost);
-			}
-
-			for (const auto &[resource, storing] : um->Modifier.get_storing()) {
-				stat.change_storing(resource, storing);
-			}
-
-			for (const auto &[resource, quantity] : um->Modifier.get_improve_incomes()) {
-				if (stat.get_improve_income(resource) == 0) {
-					stat.set_improve_income(resource, resource->get_default_income() + quantity);
-				} else {
-					stat.change_improve_income(resource, quantity);
-				}
-
-				//update player's income
-				std::vector<CUnit *> unitupgrade;
-				FindUnitsByType(*unit_type, unitupgrade);
-				if (unitupgrade.size() > 0) {
-					player.set_income(resource, std::max(player.get_income(resource), stat.get_improve_income(resource)));
-				}
-			}
-
-			for (const auto &[resource, quantity] : um->Modifier.get_resource_demands()) {
-				stat.change_resource_demand(resource, quantity);
-			}
-			
-			for (const auto &[stock_unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
-				stat.change_unit_stock(stock_unit_type, unit_stock);
-			}
-
-			int varModified = 0;
-			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-				varModified |= um->Modifier.Variables[j].Value
-							   | um->Modifier.Variables[j].Max
-							   | um->Modifier.Variables[j].Increase
-							   | um->Modifier.Variables[j].Enable
-							   | um->ModifyPercent[j];
-				stat.Variables[j].Enable |= um->Modifier.Variables[j].Enable;
-				if (um->ModifyPercent[j]) {
-					if (j != MANA_INDEX || um->ModifyPercent[j] < 0) {
-						stat.Variables[j].Value += stat.Variables[j].Value * um->ModifyPercent[j] / 100;
-					}
-					stat.Variables[j].Max += stat.Variables[j].Max * um->ModifyPercent[j] / 100;
-				} else {
-					if (j != MANA_INDEX || um->Modifier.Variables[j].Value < 0) {
-						stat.Variables[j].Value += um->Modifier.Variables[j].Value;
-					}
-					stat.Variables[j].Max += um->Modifier.Variables[j].Max;
-					stat.Variables[j].Increase += um->Modifier.Variables[j].Increase;
-				}
-
-				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
-				//Wyrmgus start
-//				stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
-				if (stat.Variables[j].Max > 0) {
-					stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
-				}
-				//Wyrmgus end
-			}
-			
-			if (um->Modifier.Variables[TRADECOST_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade;
-
-				FindUnitsByType(*unit_type, unitupgrade);
-				if (unitupgrade.size() > 0) {
-					player.TradeCost = std::min(player.TradeCost, stat.Variables[TRADECOST_INDEX].Value);
-				}
-			}
-
-			// And now modify ingame units
-			//Wyrmgus start
-			std::vector<CUnit *> unitupgrade;
-
-			FindUnitsByType(*unit_type, unitupgrade, true);
-			//Wyrmgus end
-			
-			if (varModified) {
-				//Wyrmgus start
-//				std::vector<CUnit *> unitupgrade;
-
-//				FindUnitsByType(*UnitTypes[z], unitupgrade, true);
-				//Wyrmgus end
-				for (CUnit *unit : unitupgrade) {
-					if (unit->Player != &player) {
-						continue;
-					}
-					
-					//Wyrmgus start
-					if (
-						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit->EquippedItems[static_cast<int>(item_slot::weapon)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit->EquippedItems[static_cast<int>(item_slot::shield)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit->EquippedItems[static_cast<int>(item_slot::boots)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit->EquippedItems[static_cast<int>(item_slot::arrows)].size() > 0)
-					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't apply the modifier to it
-						continue;
-					}
-					
-					if (unit->get_character() != nullptr && CUpgrade::get_all()[um->UpgradeId]->get_deity() != nullptr) {
-						//heroes choose their own deities
-						continue;
-					}
-					//Wyrmgus end
-					
-					um->apply_to_unit(unit, 1);
-				}
-			}
-			
-			//Wyrmgus start
-			for (size_t j = 0; j != unitupgrade.size(); ++j) {
-				CUnit &unit = *unitupgrade[j];
-
-				if (unit.Player != &player) {
-					continue;
-				}
-				
-				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
-				for (const CUpgrade *ability_upgrade : unit.Type->StartingAbilities) {
-					if (!unit.GetIndividualUpgrade(ability_upgrade) && check_conditions(ability_upgrade, &unit)) {
-						IndividualUpgradeAcquire(unit, ability_upgrade);
-					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !check_conditions(ability_upgrade, &unit)) {
-						IndividualUpgradeLost(unit, ability_upgrade);
-					}
-				}
-				
-				//change variation if current one becomes forbidden
-				const wyrmgus::unit_type_variation *current_variation = unit.GetVariation();
-				if (current_variation != nullptr) {
-					if (!unit.can_have_variation(current_variation)) {
-						unit.ChooseVariation();
-					}
-				}
-				for (int i = 0; i < MaxImageLayers; ++i) {
-					const wyrmgus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
-					if (current_layer_variation != nullptr) {
-						if (!unit.can_have_variation(current_layer_variation)) {
-							unit.ChooseVariation(nullptr, false, i);
-						}
-					}
-				}
-				unit.UpdateButtonIcons();
-			}
-			//Wyrmgus end
-			
-			if (um->ConvertTo) {
-				ConvertUnitTypeTo(player, *unit_type, *um->ConvertTo);
-			}
-		}
-	}
-}
-
-/**
-**  Remove the modifiers of an upgrade.
-**
-**  This function will unmark upgrade as done and undo all required modifications
-**  to unit types and will modify allow/forbid maps back
-**
-**  @param player  Player that get all the upgrades.
-**  @param um      Upgrade modifier that do the effects
-*/
-void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifier *um)
-{
-	assert_throw(um != nullptr);
-
-	int pn = player.get_index();
-
-	if (um->SpeedResearch != 0) {
-		player.SpeedResearch -= um->SpeedResearch;
-	}
-
-	if (um->get_infantry_cost_modifier() != 0) {
-		player.change_infantry_cost_modifier(-um->get_infantry_cost_modifier());
-	}
-
-	if (um->get_cavalry_cost_modifier() != 0) {
-		player.change_cavalry_cost_modifier(-um->get_cavalry_cost_modifier());
-	}
-
-	for (int z = 0; z < UpgradeMax; ++z) {
-		// allow/forbid upgrades for player.  only if upgrade is not acquired
-
-		// FIXME: check if modify is allowed
-
-		if (player.Allow.Upgrades[z] != 'R') {
-			if (um->ChangeUpgrades[z] == 'A') {
-				player.Allow.Upgrades[z] = 'F';
-			}
-			if (um->ChangeUpgrades[z] == 'F') {
-				player.Allow.Upgrades[z] = 'A';
-			}
-			// we can even have upgrade acquired w/o costs
-			if (um->ChangeUpgrades[z] == 'R') {
-				player.Allow.Upgrades[z] = 'A';
-			}
-		}
-	}
-
-	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		if (unit_type->is_template()) {
-			continue;
-		}
-
-		CUnitStats &stat = unit_type->Stats[pn];
-		// add/remove allowed units
-
-		//Wyrmgus start
-		if (stat.Variables.empty()) { // unit types stats not initialized
-			break;
-		}
-		//Wyrmgus end
-		
-		// FIXME: check if modify is allowed
-
-		player.Allow.Units[unit_type->Slot] -= um->ChangeUnits[unit_type->Slot];
-
-		// this modifier should be applied to unittype id == z
-		if (um->applies_to(unit_type)) {
-			// if a unit type's supply is changed, we need to update the player's supply accordingly
-			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade;
-
-				FindUnitsByType(*unit_type, unitupgrade);
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->get_index() == pn && unit.IsAlive()) {
-						unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
-					}
-				}
-			}
-			
-			// if a unit type's demand is changed, we need to update the player's demand accordingly
-			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade;
-
-				FindUnitsByType(*unit_type, unitupgrade);
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->get_index() == pn && unit.IsAlive()) {
-						unit.Player->Demand -= um->Modifier.Variables[DEMAND_INDEX].Value;
-					}
-				}
-			}
-			
-			// upgrade costs :)
-			for (const auto &[resource, cost] : um->Modifier.get_costs()) {
-				stat.change_cost(resource, -cost);
-			}
-
-			for (const auto &[resource, storing] : um->Modifier.get_storing()) {
-				stat.change_storing(resource, -storing);
-			}
-
-			for (const auto &[resource, quantity] : um->Modifier.get_improve_incomes()) {
-				stat.change_improve_income(resource, -quantity);
-
-				//if this was the highest improve income, search for another
-				if (player.get_income(resource) != 0 && (stat.get_improve_income(resource) + quantity) == player.get_income(resource)) {
-					int m = resource->get_default_income();
-
-					for (int k = 0; k < player.GetUnitCount(); ++k) {
-						const CUnit &player_unit = player.GetUnit(k);
-						if (!player_unit.IsAlive()) {
-							continue;
-						}
-
-						m = std::max(m, player_unit.Type->Stats[player.get_index()].get_improve_income(resource));
-					}
-
-					player.set_income(resource, m);
-				}
-			}
-
-			for (const auto &[resource, quantity] : um->Modifier.get_resource_demands()) {
-				stat.change_resource_demand(resource, -quantity);
-			}
-
-			for (const auto &[stock_unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
-				stat.change_unit_stock(stock_unit_type, -unit_stock);
-			}
-
-			int varModified = 0;
-			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-				varModified |= um->Modifier.Variables[j].Value
-							   | um->Modifier.Variables[j].Max
-							   | um->Modifier.Variables[j].Increase
-							   | um->Modifier.Variables[j].Enable
-							   | um->ModifyPercent[j];
-				stat.Variables[j].Enable |= um->Modifier.Variables[j].Enable;
-				if (um->ModifyPercent[j]) {
-					if (j != MANA_INDEX || um->Modifier.Variables[j].Value >= 0) {
-						stat.Variables[j].Value = stat.Variables[j].Value * 100 / (100 + um->ModifyPercent[j]);
-					}
-					stat.Variables[j].Max = stat.Variables[j].Max * 100 / (100 + um->ModifyPercent[j]);
-				} else {
-					if (j != MANA_INDEX || um->Modifier.Variables[j].Value >= 0) {
-						stat.Variables[j].Value -= um->Modifier.Variables[j].Value;
-					}
-					stat.Variables[j].Max -= um->Modifier.Variables[j].Max;
-					stat.Variables[j].Increase -= um->Modifier.Variables[j].Increase;
-				}
-
-				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
-				//Wyrmgus start
-//				stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
-				if (stat.Variables[j].Max > 0) {
-					stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
-				}
-				//Wyrmgus end
-			}
-			
-			if (um->Modifier.Variables[TRADECOST_INDEX].Value && (stat.Variables[TRADECOST_INDEX].Value + um->Modifier.Variables[TRADECOST_INDEX].Value) == player.TradeCost) {
-				int m = DefaultTradeCost;
-
-				for (int k = 0; k < player.GetUnitCount(); ++k) {
-					if (player.GetUnit(k).Type != nullptr) {
-						m = std::min(m, player.GetUnit(k).Type->Stats[player.get_index()].Variables[TRADECOST_INDEX].Value);
-					}
-				}
-				player.TradeCost = m;
-			}
-
-			//Wyrmgus start
-			std::vector<CUnit *> unitupgrade;
-
-			FindUnitsByType(*unit_type, unitupgrade, true);
-			//Wyrmgus end
-			
-			// And now modify ingame units
-			if (varModified) {
-				//Wyrmgus start
-				/*
-				std::vector<CUnit *> unitupgrade;
-
-				FindUnitsByType(*UnitTypes[z], unitupgrade, true);
-				*/
-				//Wyrmgus end
-				for (CUnit *unit : unitupgrade) {
-					if (unit->Player != &player) {
-						continue;
-					}
-					
-					//Wyrmgus start
-					if (
-						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit->EquippedItems[static_cast<int>(item_slot::weapon)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit->EquippedItems[static_cast<int>(item_slot::shield)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit->EquippedItems[static_cast<int>(item_slot::boots)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit->EquippedItems[static_cast<int>(item_slot::arrows)].size() > 0)
-					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't remove the modifier from it (it already doesn't have it)
-						continue;
-					}
-					//Wyrmgus end
-
-					um->apply_to_unit(unit, -1);
-				}
-			}
-			
-			//Wyrmgus start
-			for (size_t j = 0; j != unitupgrade.size(); ++j) {
-				CUnit &unit = *unitupgrade[j];
-
-				if (unit.Player != &player) {
-					continue;
-				}
-				
-				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
-				for (const CUpgrade *ability_upgrade : unit.Type->StartingAbilities) {
-					if (!unit.GetIndividualUpgrade(ability_upgrade) && check_conditions(ability_upgrade, &unit)) {
-						IndividualUpgradeAcquire(unit, ability_upgrade);
-					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !check_conditions(ability_upgrade, &unit)) {
-						IndividualUpgradeLost(unit, ability_upgrade);
-					}
-				}
-				
-				//change variation if current one becomes forbidden
-				const wyrmgus::unit_type_variation *current_variation = unit.GetVariation();
-				if (current_variation != nullptr) {
-					if (!unit.can_have_variation(current_variation)) {
-						unit.ChooseVariation();
-					}
-				}
-				for (int i = 0; i < MaxImageLayers; ++i) {
-					const wyrmgus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
-					if (current_layer_variation != nullptr) {
-						if (!unit.can_have_variation(current_layer_variation)) {
-							unit.ChooseVariation(nullptr, false, i);
-						}
-					}
-				}
-				unit.UpdateButtonIcons();
-			}
-			//Wyrmgus end
-			
-			if (um->ConvertTo) {
-				ConvertUnitTypeTo(player, *um->ConvertTo, *unit_type);
 			}
 		}
 	}
@@ -2078,12 +1562,12 @@ void ApplyUpgrades()
 	for (CUpgrade *upgrade : CUpgrade::get_all()) {
 		for (int p = 0; p < PlayerMax; ++p) {
 			if (CPlayer::Players[p]->Allow.Upgrades[upgrade->ID] == 'R') {
-				int id = upgrade->ID;
+				const int id = upgrade->ID;
 				CPlayer::Players[p]->UpgradeTimers.Upgrades[id] = upgrade->get_time_cost();
 				AllowUpgradeId(*CPlayer::Players[p], id, 'R');  // research done
 
 				for (const auto &modifier : upgrade->get_modifiers()) {
-					ApplyUpgradeModifier(*CPlayer::Players[p], modifier.get());
+					modifier->apply_to_player(CPlayer::Players[p].get());
 				}
 			}
 		}

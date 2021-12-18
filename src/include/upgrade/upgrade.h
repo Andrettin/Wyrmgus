@@ -35,6 +35,7 @@ class CUpgrade;
 class CUnit;
 
 namespace wyrmgus {
+	class unit_type;
 	class upgrade_modifier;
 }
 
@@ -62,11 +63,10 @@ extern int UpgradeIdByIdent(const std::string &sid);
 --  Upgrades
 ----------------------------------------------------------------------------*/
 
-extern void ApplyUpgradeModifier(CPlayer &player, const upgrade_modifier *um);
-extern void RemoveUpgradeModifier(CPlayer &player, const upgrade_modifier *um);
-
 /// Apply researched upgrades when map is loading
 extern void ApplyUpgrades();
+
+extern void ConvertUnitTypeTo(CPlayer &player, const unit_type &src, unit_type &dst);
 
 extern void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier *um); /// Apply upgrade modifier of an individual upgrade
 //Wyrmgus start
