@@ -1019,18 +1019,6 @@ static int CclClearObjectives(lua_State *l)
 //Wyrmgus end
 
 /**
-**  Set the keys which are use for grouping units, helpful for other keyboards
-**
-**  @param l  Lua state.
-*/
-static int CclSetGroupKeys(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	UiGroupKeys = LuaToString(l, 1);
-	return 0;
-}
-
-/**
 ** Set basic map caracteristics.
 **
 **  @param l  Lua state.
@@ -1192,8 +1180,6 @@ void UserInterfaceCclRegister()
 	//
 	lua_register(Lua, "SetSelectionStyle", CclSetSelectionStyle);
 
-	lua_register(Lua, "SetGroupKeys", CclSetGroupKeys);
-	
 	lua_register(Lua, "DefineIcon", CclDefineIcon);
 	lua_register(Lua, "GetIconData", CclGetIconData);
 	lua_register(Lua, "GetIcons", CclGetIcons);

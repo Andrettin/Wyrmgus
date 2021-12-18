@@ -91,7 +91,7 @@ static std::array<Vec2i, 3> SavedMapPosition;				/// Saved map position
 static std::array<char, 80> message_input;	/// line input for messages/long commands
 static int InputIndex;							/// current index into input
 static char InputStatusLine[99];				/// Last input status line
-const char DefaultGroupKeys[] = "0123456789`";	/// Default group keys
+static const char *DefaultGroupKeys = "0123456789";
 std::string UiGroupKeys = DefaultGroupKeys;		/// Up to 11 keys, last unselect. Default for qwerty
 char SkipGameCycle;								/// Skip the next game cycle
 enum interface_state current_interface_state;	/// Current interface state

@@ -466,7 +466,6 @@ extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
 
 extern bool RightButtonAttacks;         /// right button attacks
 
-extern const char DefaultGroupKeys[];         /// Default group keys
 extern std::string UiGroupKeys;               /// Up to 11 keys used for group selection
 
 /// Initialize the ui
