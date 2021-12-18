@@ -7436,12 +7436,12 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 		var_index = MUGGING_INDEX;
 	}
 	
-	if (!attacker->Variable[var_index].Value) {
+	if (attacker->Variable[var_index].Value == 0) {
 		return;
 	}
 	
 	if (!attacker->Variable[SHIELDPIERCING_INDEX].Value) {
-		int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
+		const int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
 							? std::min(target.Variable[SHIELD_INDEX].Value, damage * (100 - target.Variable[SHIELDPERMEABILITY_INDEX].Value) / 100)
 							: 0;
 		
@@ -7459,17 +7459,15 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 			continue;
 		}
 
-		int resource_change = cost * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) / 100;
-		resource_change = std::min(resource_change, target.Player->get_resource(resource, resource_storage_type::both));
+		const int resource_change = cost * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) / 100;
 		attacker->Player->change_resource(resource, resource_change, false);
 		attacker->Player->change_resource_total(resource, resource_change);
-		target.Player->change_resource(resource, -resource_change, false);
 	}
 }
 
 static bool HitUnit_IsUnitWillDie(const CUnit *attacker, const CUnit &target, int damage)
 {
-	int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
+	const int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
 					   ? std::min(target.Variable[SHIELD_INDEX].Value, damage * (100 - target.Variable[SHIELDPERMEABILITY_INDEX].Value) / 100)
 					   : 0;
 	return (target.Variable[HP_INDEX].Value <= damage && attacker && attacker->Variable[SHIELDPIERCING_INDEX].Value)
@@ -7516,7 +7514,7 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 	if (attacker && attacker->Variable[SHIELDPIERCING_INDEX].Value) {
 		target.Variable[HP_INDEX].Value -= damage;
 	} else {
-		int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
+		const int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
 						   ? std::min(target.Variable[SHIELD_INDEX].Value, damage * (100 - target.Variable[SHIELDPERMEABILITY_INDEX].Value) / 100)
 						   : 0;
 		if (shieldDamage) {

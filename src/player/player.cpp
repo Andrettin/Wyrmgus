@@ -3451,9 +3451,9 @@ int CPlayer::get_resource(const wyrmgus::resource *resource, const resource_stor
 void CPlayer::change_resource(const wyrmgus::resource *resource, const int value, const bool store)
 {
 	if (value < 0) {
-		const int fromStore = std::min(this->get_stored_resource(resource), abs(value));
-		this->change_stored_resource(resource, -fromStore);
-		this->change_resource(resource, -(abs(value) - fromStore));
+		const int from_store = std::min(this->get_stored_resource(resource), abs(value));
+		this->change_stored_resource(resource, -from_store);
+		this->change_resource(resource, -(abs(value) - from_store));
 		this->set_resource(resource, std::max(this->get_resource(resource), 0));
 	} else {
 		if (store && this->get_max_resource(resource) != -1) {
