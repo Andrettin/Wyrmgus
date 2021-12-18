@@ -1567,7 +1567,7 @@ void ApplyUpgrades()
 				AllowUpgradeId(*CPlayer::Players[p], id, 'R');  // research done
 
 				for (const auto &modifier : upgrade->get_modifiers()) {
-					modifier->apply_to_player(CPlayer::Players[p].get());
+					modifier->apply_to_player(CPlayer::Players[p].get(), 1);
 				}
 			}
 		}

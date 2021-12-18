@@ -100,8 +100,8 @@ public:
 	bool applies_to(const unit_type *unit_type) const;
 	
 	bool affects_variable(const int var_index) const;
-	void apply_to_player(CPlayer *player) const;
-	void remove_from_player(CPlayer *player) const;
+
+	void apply_to_player(CPlayer *player, const int multiplier) const;
 	void apply_to_unit(CUnit *unit, const int multiplier) const;
 
 private:

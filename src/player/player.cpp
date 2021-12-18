@@ -1863,7 +1863,7 @@ void CPlayer::acquire_upgrade(const CUpgrade *upgrade)
 	}
 
 	for (const auto &modifier : upgrade->get_modifiers()) {
-		modifier->apply_to_player(this);
+		modifier->apply_to_player(this, 1);
 	}
 
 	this->check_age();
@@ -1902,7 +1902,7 @@ void CPlayer::lose_upgrade(const CUpgrade *upgrade)
 	}
 
 	for (const auto &modifier : upgrade->get_modifiers()) {
-		modifier->remove_from_player(this);
+		modifier->apply_to_player(this, -1);
 	}
 
 	//upgrades could change the buttons displayed.
