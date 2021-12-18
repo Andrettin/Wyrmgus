@@ -56,6 +56,81 @@ void word::process_sml_scope(const sml_data &scope)
 	}
 }
 
+std::string word::get_encyclopedia_text() const
+{
+	std::string text;
+
+	if (this->get_language() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Language: " + this->get_language()->get_name());
+	}
+
+	if (this->get_type() != word_type::none) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Type: " + word_type_to_name(this->get_type()));
+	}
+
+	if (this->get_gender() != grammatical_gender::none) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Gender: " + grammatical_gender_to_name(this->get_gender()));
+	}
+
+	if (!this->get_meanings().empty()) {
+		std::string meanings_text;
+		for (const std::string &meaning : this->get_meanings()) {
+			if (!meanings_text.empty()) {
+				meanings_text += ", ";
+			}
+
+			meanings_text += meaning;
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Meanings: " + meanings_text);
+	}
+
+	if (this->get_etymon() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Derives From: " + this->get_etymon()->get_link_string());
+	}
+
+	if (!this->compound_elements.empty()) {
+		std::string compound_elements_text;
+		for (const word *compound_element : this->compound_elements) {
+			if (!compound_elements_text.empty()) {
+				compound_elements_text += ", ";
+			}
+
+			compound_elements_text += compound_element->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Compound Elements: " + compound_elements_text);
+	}
+
+	if (!this->get_reflexes().empty()) {
+		std::string reflexes_text;
+		for (const word *reflex : this->get_reflexes()) {
+			if (!reflexes_text.empty()) {
+				reflexes_text += ", ";
+			}
+
+			reflexes_text += reflex->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Derives To: " + reflexes_text);
+	}
+
+	if (!this->compound_element_of.empty()) {
+		std::string compounds_text;
+		for (const word *compound : this->compound_element_of) {
+			if (!compounds_text.empty()) {
+				compounds_text += ", ";
+			}
+
+			compounds_text += compound->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Compound Element of: " + compounds_text);
+	}
+
+	return text;
+}
+
 void word::set_language(wyrmgus::language *language)
 {
 	if (language == this->get_language()) {

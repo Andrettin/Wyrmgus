@@ -36,6 +36,7 @@
 #include "game/game.h"
 #include "game_concept.h"
 #include "item/unique_item.h"
+#include "language/word.h"
 #include "literary_text.h"
 #include "map/map.h"
 #include "map/map_info.h"
@@ -556,6 +557,8 @@ QObject *engine_interface::get_link_target(const QString &link_str) const
 			object = unit_type::get(link_target);
 		} else if (link_type == "upgrade") {
 			object = CUpgrade::get(link_target);
+		} else if (link_type == "word") {
+			object = word::get(link_target);
 		} else if (link_type == "world") {
 			object = world::get(link_target);
 		} else {

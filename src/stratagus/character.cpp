@@ -39,6 +39,7 @@
 #include "iolib.h"
 #include "item/persistent_item.h"
 #include "item/unique_item.h"
+#include "language/word.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "map/site.h"
@@ -635,6 +636,8 @@ void character::reset_history()
 std::string character::get_encyclopedia_text() const
 {
 	std::string text;
+
+	named_data_entry::concatenate_encyclopedia_text(text, "Name: " + (this->get_name_word() ? this->get_name_word()->get_link_string(this->get_name()) : this->get_name()));
 
 	if (this->get_civilization() != nullptr) {
 		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_link_string());

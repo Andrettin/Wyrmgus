@@ -103,6 +103,38 @@ inline std::string word_type_to_string(const word_type type)
 	throw std::runtime_error("Invalid word type: \"" + std::to_string(static_cast<int>(type)) + "\".");
 }
 
+inline std::string word_type_to_name(const word_type type)
+{
+	switch (type) {
+		case word_type::none:
+			return "None";
+		case word_type::noun:
+			return "Noun";
+		case word_type::verb:
+			return "Verb";
+		case word_type::adjective:
+			return "Adjective";
+		case word_type::pronoun:
+			return "Pronoun";
+		case word_type::adverb:
+			return "Adverb";
+		case word_type::conjunction:
+			return "Conjunction";
+		case word_type::adposition:
+			return "Adposition";
+		case word_type::article:
+			return "Article";
+		case word_type::numeral:
+			return "Numeral";
+		case word_type::affix:
+			return "Affix";
+		default:
+			break;
+	}
+
+	throw std::runtime_error("Invalid word type: \"" + std::to_string(static_cast<int>(type)) + "\".");
+}
+
 }
 
 Q_DECLARE_METATYPE(wyrmgus::word_type)

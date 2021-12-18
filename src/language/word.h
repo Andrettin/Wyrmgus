@@ -66,6 +66,13 @@ public:
 		}
 	}
 
+	virtual bool has_encyclopedia_entry() const override
+	{
+		return true;
+	}
+
+	virtual std::string get_encyclopedia_text() const override;
+
 	const std::string &get_anglicized_name() const
 	{
 		if (!this->anglicized_name.empty()) {
