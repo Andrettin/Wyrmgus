@@ -85,14 +85,6 @@ std::string word::get_encyclopedia_text() const
 		named_data_entry::concatenate_encyclopedia_text(text, "Language: " + this->get_language()->get_name());
 	}
 
-	if (this->get_type() != word_type::none) {
-		named_data_entry::concatenate_encyclopedia_text(text, "Type: " + word_type_to_name(this->get_type()));
-	}
-
-	if (this->get_gender() != grammatical_gender::none) {
-		named_data_entry::concatenate_encyclopedia_text(text, "Gender: " + grammatical_gender_to_name(this->get_gender()));
-	}
-
 	if (!this->get_meanings().empty()) {
 		std::string meanings_text;
 		for (const std::string &meaning : this->get_meanings()) {
@@ -104,6 +96,14 @@ std::string word::get_encyclopedia_text() const
 		}
 
 		named_data_entry::concatenate_encyclopedia_text(text, "Meaning: " + meanings_text);
+	}
+
+	if (this->get_type() != word_type::none) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Type: " + word_type_to_name(this->get_type()));
+	}
+
+	if (this->get_gender() != grammatical_gender::none) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Gender: " + grammatical_gender_to_name(this->get_gender()));
 	}
 
 	if (this->get_etymon() != nullptr) {
