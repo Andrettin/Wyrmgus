@@ -336,7 +336,7 @@ const name_generator *civilization_base::get_personal_name_generator(const gende
 	return nullptr;
 }
 
-void civilization_base::add_personal_name(const gender gender, const std::string &name)
+void civilization_base::add_personal_name(const gender gender, const name_variant &name)
 {
 	if (this->personal_name_generators.find(gender) == this->personal_name_generators.end()) {
 		this->personal_name_generators[gender] = std::make_unique<name_generator>();
@@ -374,7 +374,7 @@ const name_generator *civilization_base::get_surname_generator() const
 	return nullptr;
 }
 
-void civilization_base::add_surname(const std::string &surname)
+void civilization_base::add_surname(const name_variant &surname)
 {
 	if (this->surname_generator == nullptr) {
 		this->surname_generator = std::make_unique<name_generator>();
@@ -405,7 +405,7 @@ const name_generator *civilization_base::get_unit_class_name_generator(const uni
 	return fallback_name_generator::get()->get_unit_class_name_generator(unit_class);
 }
 
-void civilization_base::add_unit_class_name(const unit_class *unit_class, const std::string &name)
+void civilization_base::add_unit_class_name(const unit_class *unit_class, const name_variant &name)
 {
 	if (this->unit_class_name_generators.find(unit_class) == this->unit_class_name_generators.end()) {
 		this->unit_class_name_generators[unit_class] = std::make_unique<name_generator>();
@@ -418,7 +418,7 @@ void civilization_base::add_unit_class_name(const unit_class *unit_class, const 
 	}
 }
 
-void civilization_base::add_ship_name(const std::string &ship_name)
+void civilization_base::add_ship_name(const name_variant &ship_name)
 {
 	if (this->ship_name_generator == nullptr) {
 		this->ship_name_generator = std::make_unique<name_generator>();

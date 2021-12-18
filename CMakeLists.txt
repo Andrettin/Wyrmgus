@@ -201,6 +201,7 @@ source_group(item FILES ${item_SRCS})
 
 set(language_SRCS
 	src/language/language.cpp
+	src/language/name_variant.cpp
 	src/language/word.cpp
 )
 source_group(language FILES ${language_SRCS})
@@ -761,6 +762,7 @@ set(wyrmgus_language_HDRS
 	src/language/grammatical_gender.h
 	src/language/language.h
 	src/language/language_family.h
+	src/language/name_variant.h
 	src/language/word.h
 	src/language/word_type.h
 )

@@ -68,7 +68,18 @@ void name_generator::propagate_unit_class_names(const unit_class_map<std::unique
 
 bool name_generator::is_name_valid(const std::string &name) const
 {
-	return vector::contains(this->names, name);
+	for (const name_variant &name_variant : this->names) {
+		if (get_name_variant_string(name_variant) == name) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void name_generator::add_names(const std::vector<name_variant> &names)
+{
+	vector::merge(this->names, names);
 }
 
 void name_generator::add_names(const std::vector<std::string> &names)
@@ -78,7 +89,8 @@ void name_generator::add_names(const std::vector<std::string> &names)
 
 std::string name_generator::generate_name() const
 {
-	return vector::get_random(this->names);
+	const name_variant &name_variant = vector::get_random(this->names);
+	return get_name_variant_string(name_variant);
 }
 
 }

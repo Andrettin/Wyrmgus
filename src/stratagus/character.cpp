@@ -462,6 +462,10 @@ void character::initialize()
 			this->set_name(this->get_deity()->get_name());
 		}
 
+		if (this->get_name_word() == nullptr) {
+			this->set_name_word(this->get_deity()->get_name_word());
+		}
+
 		if (this->get_description().empty()) {
 			this->set_description(this->get_deity()->get_description());
 		}
@@ -483,16 +487,16 @@ void character::initialize()
 				species->initialize();
 			}
 
-			if (!this->get_name().empty()) {
-				this->unit_type->get_species()->add_specimen_name(this->get_gender(), this->get_name());
+			if (this->has_name_variant()) {
+				this->unit_type->get_species()->add_specimen_name(this->get_gender(), this->get_name_variant());
 			}
 		} else if (this->civilization != nullptr) {
 			if (!this->civilization->is_initialized()) {
 				this->civilization->initialize();
 			}
 
-			if (!this->get_name().empty()) {
-				this->civilization->add_personal_name(this->get_gender(), this->get_name());
+			if (this->has_name_variant()) {
+				this->civilization->add_personal_name(this->get_gender(), this->get_name_variant());
 			}
 			if (!this->get_surname().empty()) {
 				this->civilization->add_surname(this->get_surname());
@@ -583,7 +587,7 @@ void character::initialize()
 		location->initialize();
 	}
 
-	data_entry::initialize();
+	named_data_entry::initialize();
 }
 
 void character::check() const

@@ -27,6 +27,7 @@
 #pragma once
 
 #include "database/detailed_data_entry.h"
+#include "language/name_variant.h"
 #include "unit/unit_class_container.h"
 
 class CUpgrade;
@@ -169,15 +170,15 @@ public:
 	}
 
 	const name_generator *get_personal_name_generator(const gender gender) const;
-	void add_personal_name(const gender gender, const std::string &name);
+	void add_personal_name(const gender gender, const name_variant &name);
 
 	const name_generator *get_surname_generator() const;
-	void add_surname(const std::string &surname);
+	void add_surname(const name_variant &surname);
 
 	const name_generator *get_unit_class_name_generator(const unit_class *unit_class) const;
-	void add_unit_class_name(const unit_class *unit_class, const std::string &name);
+	void add_unit_class_name(const unit_class *unit_class, const name_variant &name);
 
-	void add_ship_name(const std::string &ship_name);
+	void add_ship_name(const name_variant &ship_name);
 
 	void add_names_from(const civilization_base *other);
 	void add_names_from(const faction *faction);

@@ -89,7 +89,7 @@ void fallback_name_generator::add_personal_names(const std::map<gender, std::uni
 	name_generator::propagate_ungendered_names(personal_names, this->personal_name_generators);
 }
 
-void fallback_name_generator::add_surnames(const std::vector<std::string> &surnames)
+void fallback_name_generator::add_surnames(const std::vector<name_variant> &surnames)
 {
 	if (this->surname_generator == nullptr) {
 		this->surname_generator = std::make_unique<name_generator>();
@@ -125,7 +125,7 @@ void fallback_name_generator::add_unit_class_names(const unit_class_map<std::uni
 	name_generator::propagate_unit_class_names(unit_class_names, this->ship_name_generator);
 }
 
-void fallback_name_generator::add_ship_names(const std::vector<std::string> &ship_names)
+void fallback_name_generator::add_ship_names(const std::vector<name_variant> &ship_names)
 {
 	if (this->ship_name_generator == nullptr) {
 		this->ship_name_generator = std::make_unique<name_generator>();

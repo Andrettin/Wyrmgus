@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,53 +24,29 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
 #include "language/name_variant.h"
-#include "unit/unit_class_container.h"
+
+#include "language/word.h"
 
 namespace wyrmgus {
 
-enum class gender;
-
-class name_generator final
+std::string get_name_variant_string(const name_variant &name_variant)
 {
-public:
-	static constexpr size_t minimum_name_count = 10;
+	std::string name_string = std::visit([](auto &&name_value) {
+		using name_type = std::decay_t<decltype(name_value)>;
 
-	static void propagate_ungendered_names(const std::map<gender, std::unique_ptr<name_generator>> &source_name_map, std::map<gender, std::unique_ptr<name_generator>> &target_name_map);
+		if constexpr (std::is_same_v<name_type, std::string>) {
+			return name_value;
+		} else if constexpr (std::is_same_v<name_type, const word *>) {
+			return name_value->get_anglicized_name();
+		} else {
+			static_assert(false, "Invalid name variant type.");
+		}
+	}, name_variant);
 
-	static void propagate_ungendered_names(std::map<gender, std::unique_ptr<name_generator>> &name_map)
-	{
-		name_generator::propagate_ungendered_names(name_map, name_map);
-	}
-
-	static void propagate_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_name_generators, std::unique_ptr<name_generator> &ship_name_generator);
-
-	const std::vector<name_variant> &get_names() const
-	{
-		return this->names;
-	}
-
-	size_t get_name_count() const
-	{
-		return this->names.size();
-	}
-
-	bool is_name_valid(const std::string &name) const;
-
-	void add_name(const name_variant &name)
-	{
-		this->names.push_back(name);
-	}
-
-	void add_names(const std::vector<name_variant> &names);
-	void add_names(const std::vector<std::string> &names);
-
-	std::string generate_name() const;
-
-private:
-	std::vector<name_variant> names; //name list for generation
-};
+	return name_string;
+}
 
 }

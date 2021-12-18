@@ -27,10 +27,12 @@
 #pragma once
 
 #include "database/data_entry.h"
+#include "language/name_variant.h"
 
 namespace wyrmgus {
 
 class text_processor;
+class word;
 struct text_processing_context;
 
 class named_data_entry : public data_entry
@@ -38,6 +40,7 @@ class named_data_entry : public data_entry
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY changed)
+	Q_PROPERTY(wyrmgus::word* name_word READ get_name_word WRITE set_name_word NOTIFY changed)
 	Q_PROPERTY(QString encyclopedia_text READ get_encyclopedia_text_qstring NOTIFY encyclopedia_text_changed)
 
 public:
@@ -65,6 +68,7 @@ public:
 
 	virtual ~named_data_entry() {}
 
+	virtual void initialize() override;
 	virtual void process_text() override;
 
 	virtual std::string get_encyclopedia_text() const
@@ -92,6 +96,34 @@ public:
 		return QString::fromStdString(this->get_name());
 	}
 
+	word *get_name_word() const
+	{
+		return this->name_word;
+	}
+
+	void set_name_word(word *word)
+	{
+		if (word == this->name_word) {
+			return;
+		}
+
+		this->name_word = word;
+	}
+
+	bool has_name_variant() const
+	{
+		return this->get_name_word() != nullptr || !this->get_name().empty();
+	}
+
+	name_variant get_name_variant() const
+	{
+		if (this->get_name_word() != nullptr) {
+			return this->get_name_word();
+		}
+
+		return this->get_name();
+	}
+
 	virtual text_processing_context get_text_processing_context() const;
 	text_processor create_text_processor() const;
 
@@ -106,6 +138,7 @@ signals:
 
 private:
 	std::string name;
+	word *name_word = nullptr;
 };
 
 }

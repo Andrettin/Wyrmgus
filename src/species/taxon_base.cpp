@@ -157,7 +157,7 @@ const name_generator *taxon_base::get_specimen_name_generator(const gender gende
 	return nullptr;
 }
 
-void taxon_base::add_specimen_name(const gender gender, const std::string &name)
+void taxon_base::add_specimen_name(const gender gender, const name_variant &name)
 {
 	if (this->specimen_name_generators.find(gender) == this->specimen_name_generators.end()) {
 		this->specimen_name_generators[gender] = std::make_unique<name_generator>();

@@ -27,6 +27,7 @@
 #pragma once
 
 #include "database/detailed_data_entry.h"
+#include "language/name_variant.h"
 
 struct lua_State;
 
@@ -73,7 +74,7 @@ public:
 
 	const name_generator *get_specimen_name_generator(const gender gender) const;
 
-	void add_specimen_name(const gender gender, const std::string &name);
+	void add_specimen_name(const gender gender, const name_variant &name);
 	void add_specimen_names_from(const taxon_base *other);
 
 private:

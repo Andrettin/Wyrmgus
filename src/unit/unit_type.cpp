@@ -1495,7 +1495,7 @@ void unit_type::initialize()
 		}
 	}
 
-	data_entry::initialize();
+	named_data_entry::initialize();
 }
 
 void unit_type::check() const

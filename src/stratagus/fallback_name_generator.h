@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "language/name_variant.h"
 #include "unit/unit_class_container.h"
 #include "util/singleton.h"
 
@@ -51,12 +52,12 @@ public:
 		return this->surname_generator.get();
 	}
 
-	void add_surnames(const std::vector<std::string> &surnames);
+	void add_surnames(const std::vector<name_variant> &surnames);
 
 	const name_generator *get_unit_class_name_generator(const unit_class *unit_class) const;
 	void add_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_names);
 
-	void add_ship_names(const std::vector<std::string> &ship_names);
+	void add_ship_names(const std::vector<name_variant> &ship_names);
 
 private:
 	//name generation lists containing all names (i.e. from each civilization, species and etc.)

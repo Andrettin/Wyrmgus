@@ -44,6 +44,7 @@ class word final : public named_data_entry, public data_type<word>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(std::string anglicized_name MEMBER anglicized_name)
 	Q_PROPERTY(wyrmgus::language* language MEMBER language WRITE set_language)
 	Q_PROPERTY(wyrmgus::word_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::grammatical_gender gender MEMBER gender READ get_gender)
@@ -63,6 +64,15 @@ public:
 		if (this->get_language() == nullptr) {
 			throw std::runtime_error("Word \"" + this->get_identifier() + "\" has not been assigned to any language.");
 		}
+	}
+
+	const std::string &get_anglicized_name() const
+	{
+		if (!this->anglicized_name.empty()) {
+			return this->anglicized_name;
+		}
+
+		return this->get_name();
 	}
 
 	const wyrmgus::language *get_language() const
@@ -128,6 +138,7 @@ public:
 	const std::string &GetParticiple(int grammatical_tense);
 
 private:
+	std::string anglicized_name;
 	wyrmgus::language *language = nullptr;
 	word_type type;
 	grammatical_gender gender; //what is the gender of the word, if it is a noun or article

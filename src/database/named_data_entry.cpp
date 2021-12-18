@@ -28,9 +28,19 @@
 
 #include "database/named_data_entry.h"
 
+#include "language/word.h"
 #include "text_processor.h"
 
 namespace wyrmgus {
+
+void named_data_entry::initialize()
+{
+	if (this->get_name_word() != nullptr && this->name.empty()) {
+		this->name = this->get_name_word()->get_anglicized_name();
+	}
+
+	data_entry::initialize();
+}
 
 void named_data_entry::process_text()
 {
