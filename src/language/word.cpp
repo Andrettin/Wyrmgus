@@ -79,7 +79,7 @@ std::string word::get_encyclopedia_text() const
 				meanings_text += ", ";
 			}
 
-			meanings_text += meaning;
+			meanings_text += "\"" + meaning + "\"";
 		}
 
 		named_data_entry::concatenate_encyclopedia_text(text, "Meanings: " + meanings_text);
