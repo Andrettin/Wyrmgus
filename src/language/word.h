@@ -55,14 +55,21 @@ public:
 	static constexpr const char *class_identifier = "word";
 	static constexpr const char *database_folder = "words";
 
+	static bool compare(const word *lhs, const word *rhs);
+
 	explicit word(const std::string &identifier);
 
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize() override;
 
 	virtual void check() const override
 	{
 		if (this->get_language() == nullptr) {
 			throw std::runtime_error("Word \"" + this->get_identifier() + "\" has not been assigned to any language.");
+		}
+
+		if (this->get_etymon() != nullptr && !this->compound_elements.empty()) {
+			throw std::runtime_error("Word \"" + this->get_identifier() + "\" has both an etymon and compound elements.");
 		}
 	}
 

@@ -36,6 +36,19 @@
 
 namespace wyrmgus {
 
+bool word::compare(const word *lhs, const word *rhs)
+{
+	if (lhs->get_language() != rhs->get_language()) {
+		if ((lhs->get_language() == nullptr) != (rhs->get_language() == nullptr)) {
+			return lhs->get_language() != nullptr;
+		}
+
+		return lhs->get_language()->get_identifier() < rhs->get_language()->get_identifier();
+	}
+
+	return lhs->get_identifier() < rhs->get_identifier();
+}
+
 word::word(const std::string &identifier)
 	: named_data_entry(identifier), type(word_type::none), gender(grammatical_gender::none)
 {
@@ -54,6 +67,14 @@ void word::process_sml_scope(const sml_data &scope)
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
+}
+
+void word::initialize()
+{
+	std::sort(this->reflexes.begin(), this->reflexes.end(), word::compare);
+	std::sort(this->compound_element_of.begin(), this->compound_element_of.end(), word::compare);
+
+	data_entry::initialize();
 }
 
 std::string word::get_encyclopedia_text() const
@@ -82,7 +103,7 @@ std::string word::get_encyclopedia_text() const
 			meanings_text += "\"" + meaning + "\"";
 		}
 
-		named_data_entry::concatenate_encyclopedia_text(text, "Meanings: " + meanings_text);
+		named_data_entry::concatenate_encyclopedia_text(text, "Meaning: " + meanings_text);
 	}
 
 	if (this->get_etymon() != nullptr) {
