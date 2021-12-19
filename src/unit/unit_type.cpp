@@ -41,6 +41,7 @@
 #include "iolib.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"
+#include "language/word.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/terrain_type.h"
@@ -1566,6 +1567,8 @@ std::string unit_type::get_encyclopedia_text() const
 {
 	std::string text;
 
+	named_data_entry::concatenate_encyclopedia_text(text, "Name: " + (this->get_name_word() ? this->get_name_word()->get_link_string(this->get_name()) : this->get_name()));
+
 	if (this->get_civilization() != nullptr && this->get_civilization() != defines::get()->get_neutral_civilization()) {
 		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_link_string());
 	} else if (this->get_civilization_group() != nullptr) {
@@ -1799,8 +1802,9 @@ void unit_type::set_parent(const unit_type *parent_type)
 	
 	this->Parent = parent_type;
 	
-	if (this->get_name().empty()) {
+	if (!this->has_name_variant()) {
 		this->set_name(parent_type->get_name());
+		this->set_name_word(parent_type->get_name_word());
 	}
 	this->set_unit_class(parent_type->unit_class);
 	this->draw_level = parent_type->draw_level;
