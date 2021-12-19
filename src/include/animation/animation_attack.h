@@ -30,12 +30,14 @@
 
 #include "animation.h"
 
-class CAnimation_Attack : public CAnimation
+class CAnimation_Attack final : public CAnimation
 {
 public:
-	CAnimation_Attack() : CAnimation(AnimationAttack) {}
+	CAnimation_Attack() : CAnimation(AnimationAttack)
+	{
+	}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 };

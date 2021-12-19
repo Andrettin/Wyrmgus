@@ -117,7 +117,7 @@ const wyrmgus::button *LastDrawnButtonPopup = nullptr;
 /// for unit buttons sub-menus etc.
 const wyrmgus::button_level *CurrentButtonLevel = nullptr;
 /// Pointer to current buttons
-std::vector<std::unique_ptr<wyrmgus::button>> CurrentButtons;
+std::vector<std::unique_ptr<button>> CurrentButtons;
 
 void InitButtons()
 {
@@ -1416,16 +1416,8 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 	}
 	
 	bool res = false;
-	if (buttonaction.Allowed) {
-		res = buttonaction.Allowed(unit, buttonaction);
-		if (!res) {
-			return false;
-		} else {
-			res = false;
-		}
-	}
 
-	const wyrmgus::unit_type *unit_type = buttonaction.get_value_unit_type(&unit);
+	const unit_type *unit_type = buttonaction.get_value_unit_type(&unit);
 	const CUpgrade *upgrade = buttonaction.get_value_upgrade(&unit);
 
 	// Check button-specific cases
@@ -1470,7 +1462,7 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = unit.can_learn_ability(upgrade);
 			break;
 		case ButtonCmd::SpellCast:
-			res = wyrmgus::spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
+			res = spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonCmd::Faction:
 			res = CPlayer::GetThisPlayer()->can_found_faction(CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[buttonaction.Value]);
@@ -1480,7 +1472,7 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 			break;
 		case ButtonCmd::Buy:
 			res = true;
-			if (wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value).get_character() != nullptr) {
+			if (unit_manager::get()->GetSlotUnit(buttonaction.Value).get_character() != nullptr) {
 				res = CPlayer::GetThisPlayer()->Heroes.size() < CPlayer::max_heroes;
 			}
 			break;
@@ -1557,14 +1549,14 @@ int GetButtonCooldownPercent(const CUnit &unit, const wyrmgus::button &buttonact
 **  @todo FIXME : make UpdateButtonPanelMultipleUnits more configurable.
 **  @todo show all possible buttons or just same button...
 */
-static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<wyrmgus::button>> &buttonActions)
+static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<button>> &buttonActions)
 {
 	std::array<char, 128> unit_ident{};
 	//Wyrmgus start
 	std::vector<std::array<char, 128>> individual_unit_ident;
 	//Wyrmgus end
 
-	sprintf(unit_ident.data(), ",%s-group,", wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str());
+	sprintf(unit_ident.data(), ",%s-group,", CPlayer::GetThisPlayer()->get_civilization()->get_identifier().c_str());
 	
 	//Wyrmgus start
 	for (size_t i = 0; i != Selected.size(); ++i) {
@@ -1574,7 +1566,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<wyr
 	}
 	//Wyrmgus end
 
-	for (const wyrmgus::button *button : wyrmgus::button::get_all()) {
+	for (const button *button : button::get_all()) {
 		if (button->get_level() != CurrentButtonLevel) {
 			continue;
 		}
@@ -1582,7 +1574,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<wyr
 		//Wyrmgus start
 		bool used_by_all = true;
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (!strstr(button->UnitMask.c_str(), individual_unit_ident[i].data()) && !wyrmgus::vector::contains(button->get_unit_classes(), Selected[i]->Type->get_unit_class())) {
+			if (!strstr(button->UnitMask.c_str(), individual_unit_ident[i].data()) && !vector::contains(button->get_unit_classes(), Selected[i]->Type->get_unit_class())) {
 				used_by_all = false;
 				break;
 			}
@@ -1626,7 +1618,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<wyr
 **
 **  @todo FIXME : Remove Hack for cancel button.
 */
-static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std::unique_ptr<wyrmgus::button>> &buttonActions)
+static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std::unique_ptr<button>> &buttonActions)
 {
 	std::array<char, 128> unit_ident{};
 
@@ -1650,7 +1642,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 		sprintf(unit_ident.data(), ",%s,", unit.Type->Ident.c_str());
 		only_cancel_allowed = false;
 	}
-	for (const wyrmgus::button *button : wyrmgus::button::get_all()) {
+	for (const button *button : button::get_all()) {
 		assert_throw(0 < button->get_pos() && button->get_pos() <= (int)UI.ButtonPanel.Buttons.size());
 
 		// Same level
@@ -1660,7 +1652,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 
 		// any unit or unit in list
 		if (button->UnitMask[0] != '*'
-			&& !strstr(button->UnitMask.c_str(), unit_ident.data()) && (only_cancel_allowed || !wyrmgus::vector::contains(button->get_unit_classes(), unit.Type->get_unit_class()))) {
+			&& !strstr(button->UnitMask.c_str(), unit_ident.data()) && (only_cancel_allowed || !vector::contains(button->get_unit_classes(), unit.Type->get_unit_class()))) {
 			continue;
 		}
 		//Wyrmgus start
@@ -1726,13 +1718,13 @@ void CButtonPanel::Update()
 		unsigned int sold_unit_count = 0;
 		unsigned int potential_faction_count = 0;
 		unsigned int potential_dynasty_count = 0;
-		for (wyrmgus::button *button : wyrmgus::button::get_all()) {
+		for (button *button : button::get_all()) {
 			if (button->Action != ButtonCmd::Faction && button->Action != ButtonCmd::Dynasty && button->Action != ButtonCmd::Buy) {
 				continue;
 			}
 			std::array<char, 128> unit_ident{};
 			sprintf(unit_ident.data(), ",%s,", unit.Type->Ident.c_str());
-			if (button->UnitMask[0] != '*' && !strstr(button->UnitMask.c_str(), unit_ident.data()) && !wyrmgus::vector::contains(button->get_unit_classes(), unit.Type->get_unit_class())) {
+			if (button->UnitMask[0] != '*' && !strstr(button->UnitMask.c_str(), unit_ident.data()) && !vector::contains(button->get_unit_classes(), unit.Type->get_unit_class())) {
 				continue;
 			}
 
@@ -1740,7 +1732,7 @@ void CButtonPanel::Update()
 				if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_faction_count >= CPlayer::GetThisPlayer()->get_faction()->DevelopsTo.size()) {
 					button->Value = -1;
 				} else {
-					const wyrmgus::faction *faction = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[potential_faction_count];
+					const faction *faction = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[potential_faction_count];
 					button->Value = potential_faction_count;
 					button->Hint = "Found ";
 					if (faction->uses_definite_article()) {
@@ -1758,7 +1750,7 @@ void CButtonPanel::Update()
 				if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_dynasty_count >= CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) {
 					button->Value = -1;
 				} else {
-					const wyrmgus::dynasty *dynasty = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[potential_dynasty_count];
+					const dynasty *dynasty = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[potential_dynasty_count];
 					button->Value = potential_dynasty_count;
 					button->Hint = "Choose the ";
 					button->Hint += dynasty->get_name();
@@ -1799,10 +1791,10 @@ void CButtonPanel::Update()
 	}
 
 	for (size_t i = CurrentButtons.size(); i != UI.ButtonPanel.Buttons.size(); ++i) {
-		CurrentButtons.push_back(std::make_unique<wyrmgus::button>());
+		CurrentButtons.push_back(std::make_unique<button>());
 	}
 
-	for (const std::unique_ptr<wyrmgus::button> &button : CurrentButtons) {
+	for (const std::unique_ptr<button> &button : CurrentButtons) {
 		button->pos = -1;
 	}
 

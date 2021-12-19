@@ -30,14 +30,16 @@
 
 #include "animation.h"
 
-class CAnimation_Goto : public CAnimation
+class CAnimation_Goto final : public CAnimation
 {
 public:
-	CAnimation_Goto() : CAnimation(AnimationGoto), gotoLabel(nullptr) {}
+	CAnimation_Goto() : CAnimation(AnimationGoto)
+	{
+	}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 private:
-	CAnimation *gotoLabel;
+	CAnimation *gotoLabel = nullptr;
 };

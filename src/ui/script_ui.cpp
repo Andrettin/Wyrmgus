@@ -787,7 +787,7 @@ static int CclDefineButton(lua_State *l)
 	const QUuid uuid = QUuid::createUuid();
 	const std::string identifier = uuid.toString(QUuid::WithoutBraces).toStdString();
 
-	wyrmgus::button *button = wyrmgus::button::add(identifier, nullptr);
+	button *button = button::add(identifier, nullptr);
 
 	//
 	// Parse the arguments
@@ -798,7 +798,7 @@ static int CclDefineButton(lua_State *l)
 		if (!strcmp(value, "Pos")) {
 			button->pos = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Level")) {
-			button->level = wyrmgus::button_level::get(LuaToString(l, -1));
+			button->level = button_level::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "AlwaysShow")) {
 			button->always_show = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
@@ -1085,7 +1085,7 @@ static int CclDefineIcon(lua_State *l)
 		}
 	}
 
-	wyrmgus::icon *icon = wyrmgus::icon::add(ident, nullptr);
+	icon *icon = icon::add(ident, nullptr);
 	icon->file = file;
 	icon->set_frame(frame);
 	icon->set_graphics(CPlayerColorGraphic::New(icon->get_file().string(), size, nullptr));
