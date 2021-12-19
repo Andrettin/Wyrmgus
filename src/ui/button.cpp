@@ -36,6 +36,7 @@
 #include "player/dynasty.h"
 #include "player/faction.h"
 #include "player/player.h"
+#include "script/condition/and_condition.h"
 #include "script/trigger.h"
 #include "spell/spell.h"
 #include "ui/button_cmd.h"
@@ -178,6 +179,9 @@ button::button(const std::string &identifier) : data_entry(identifier), Action(B
 {
 }
 
+button::~button()
+{
+}
 
 void button::process_sml_property(const sml_property &property)
 {
@@ -249,6 +253,9 @@ void button::process_sml_property(const sml_property &property)
 		} else {
 			throw std::runtime_error("Invalid button check: \"" + value + "\".");
 		}
+	} else if (key == "allow_arg") {
+		this->allow_strings.clear();
+		this->allow_strings.push_back(value);
 	} else {
 		data_entry::process_sml_property(property);
 	}
@@ -259,7 +266,17 @@ void button::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "unit_types") {
+	if (tag == "allow_arg") {
+		this->allow_strings = values;
+	} else if (tag == "preconditions") {
+		this->preconditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->preconditions, scope);
+		this->preconditions_ptr = this->preconditions.get();
+	} else if (tag == "conditions") {
+		this->conditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->conditions, scope);
+		this->conditions_ptr = this->conditions.get();
+	} else if (tag == "unit_types") {
 		for (const std::string &value : values) {
 			if (this->UnitMask.empty()) {
 				this->UnitMask += ",";
@@ -271,8 +288,6 @@ void button::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->unit_classes.push_back(unit_class::get(value));
 		}
-	} else if (tag == "allow_arg") {
-		this->allow_strings = values;
 	} else {
 		data_entry::process_sml_scope(scope);
 	}

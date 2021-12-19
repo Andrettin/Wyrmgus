@@ -40,6 +40,7 @@ static int CclDefineButton(lua_State *l);
 
 namespace wyrmgus {
 
+class and_condition;
 class button;
 class button_level;
 class resource;
@@ -48,7 +49,7 @@ class unit_type;
 
 typedef bool (*button_check_func)(const CUnit &, const button &);
 
-class button : public data_entry, public data_type<button>
+class button final : public data_entry, public data_type<button>
 {
 	Q_OBJECT
 
@@ -64,7 +65,8 @@ public:
 
 	static void add_button_key_to_name(std::string &value_name, const std::string &button_key);
 
-	button(const std::string &identifier = "");
+	explicit button(const std::string &identifier = "");
+	~button();
 
 	button &operator =(const button &other_button)
 	{
@@ -77,6 +79,8 @@ public:
 		this->ValueStr = other_button.ValueStr;
 		this->Allowed = other_button.Allowed;
 		this->allow_strings = other_button.allow_strings;
+		this->preconditions_ptr = other_button.preconditions_ptr;
+		this->conditions_ptr = other_button.conditions_ptr;
 		this->UnitMask = other_button.UnitMask;
 		this->unit_classes = other_button.unit_classes;
 		this->Icon = other_button.Icon;
@@ -133,6 +137,16 @@ public:
 	int get_key() const;
 	std::string get_hint() const;
 
+	const and_condition *get_preconditions() const
+	{
+		return this->preconditions_ptr;
+	}
+
+	const and_condition *get_conditions() const
+	{
+		return this->conditions_ptr;
+	}
+
 	const std::vector<unit_class *> &get_unit_classes() const
 	{
 		return this->unit_classes;
@@ -152,6 +166,12 @@ public:
 
 	button_check_func Allowed = nullptr;    /// Check if this button is allowed
 	std::vector<std::string> allow_strings; //arguments for allowed
+private:
+	std::unique_ptr<and_condition> preconditions; //conditions for the button to be shown
+	const and_condition *preconditions_ptr = nullptr;
+	std::unique_ptr<and_condition> conditions; //conditions for the button to be usable
+	const and_condition *conditions_ptr = nullptr;
+public:
 	std::string UnitMask;       //for which units is it available
 private:
 	std::vector<unit_class *> unit_classes; //unit classes for which the button is available

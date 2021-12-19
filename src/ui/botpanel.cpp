@@ -62,6 +62,7 @@
 #include "player/player.h"
 #include "quest/achievement.h"
 #include "script/condition/and_condition.h"
+#include "script/context.h"
 #include "script/trigger.h"
 #include "sound/game_sound_set.h"
 #include "sound/sound.h"
@@ -1241,6 +1242,10 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = false;
 		}
 	}
+
+	if (buttonaction.get_preconditions() != nullptr && !buttonaction.get_preconditions()->check(&unit, read_only_context::from_scope(&unit))) {
+		return false;
+	}
 	
 	//Wyrmgus start
 	if (!CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && (!CPlayer::GetThisPlayer()->has_building_access(Selected[0], buttonaction.Action) || !IsNeutralUsableButtonAction(buttonaction.Action))) {
@@ -1415,6 +1420,10 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 		return false;
 	}
 	
+	if (buttonaction.get_conditions() != nullptr && !buttonaction.get_conditions()->check(&unit, read_only_context::from_scope(&unit))) {
+		return false;
+	}
+
 	bool res = false;
 
 	const unit_type *unit_type = buttonaction.get_value_unit_type(&unit);
