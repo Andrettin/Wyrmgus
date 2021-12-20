@@ -69,6 +69,11 @@ inline std::filesystem::path from_qstring(const QString &path_str)
 #endif
 }
 
+inline std::filesystem::path from_qurl(const QUrl &url)
+{
+	return path::from_qstring(url.toLocalFile());
+}
+
 }
 
 Q_DECLARE_METATYPE(std::filesystem::path)
