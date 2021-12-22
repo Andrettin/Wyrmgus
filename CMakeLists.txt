@@ -949,6 +949,7 @@ set(wyrmgus_script_effect_HDRS
 	src/script/effect/neutral_player_effect.h
 	src/script/effect/random_effect.h
 	src/script/effect/random_list_effect.h
+	src/script/effect/random_unit_of_class_effect.h
 	src/script/effect/random_unit_of_type_effect.h
 	src/script/effect/remove_character_effect.h
 	src/script/effect/remove_unit_effect.h
