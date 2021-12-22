@@ -49,6 +49,7 @@
 #include "script/effect/neutral_player_effect.h"
 #include "script/effect/random_effect.h"
 #include "script/effect/random_list_effect.h"
+#include "script/effect/random_unit_of_type_effect.h"
 #include "script/effect/remove_character_effect.h"
 #include "script/effect/remove_unit_effect.h"
 #include "script/effect/restore_hp_percent_effect.h"
@@ -137,6 +138,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 				effect = std::make_unique<create_unit_effect>(scope.get_operator());
 			} else if (effect_identifier == "last_created_unit") {
 				effect = std::make_unique<last_created_unit_effect>(scope.get_operator());
+			} else if (effect_identifier == "random_unit_of_type") {
+				effect = std::make_unique<random_unit_of_type_effect>(scope.get_operator());
 			}
 		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
 			if (effect_identifier == "level_check") {
