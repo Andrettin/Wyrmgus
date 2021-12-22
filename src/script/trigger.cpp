@@ -558,6 +558,9 @@ void TriggersEachCycle()
 						if (player->get_type() == player_type::nobody) {
 							continue;
 						}
+						if (!player->is_alive()) {
+							continue;
+						}
 						if (!check_conditions(current_trigger, player)) {
 							continue;
 						}
