@@ -41,6 +41,7 @@ class dialogue;
 class dialogue_option;
 class faction;
 class icon;
+class player_color;
 class sml_data;
 class sml_property;
 class sound;
@@ -74,6 +75,8 @@ public:
 
 	const CUnit *get_speaker_unit() const;
 	std::string get_title_string(const CUnit *speaker_unit) const;
+	const wyrmgus::icon *get_icon(const CUnit *speaker_unit) const;
+	const wyrmgus::player_color *get_player_color(const CUnit *speaker_unit) const;
 	std::string get_text(const context &ctx) const;
 
 	void delete_lua_callbacks();
@@ -83,6 +86,7 @@ private:
 	wyrmgus::dialogue *dialogue = nullptr;
 	std::string title;
 	const wyrmgus::icon *icon = nullptr;
+	const wyrmgus::player_color *player_color = nullptr;
 	const character *speaker = nullptr;
 	const unit_type *speaker_unit_type = nullptr;
 	const faction *speaker_faction = nullptr; //faction of the player to whom the speaker belongs

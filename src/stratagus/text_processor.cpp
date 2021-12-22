@@ -146,11 +146,19 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens, con
 			return std::string();
 		}
 
+		if (this->context.script_context.source_unit == nullptr) {
+			throw std::runtime_error("No source unit provided when processing source unit tokens.");
+		}
+
 		str = this->process_unit_tokens(this->context.script_context.source_unit->get(), tokens);
 	} else if (front_subtoken == "unit") {
 		if (!process_in_game_data) {
 			processed = false;
 			return std::string();
+		}
+
+		if (this->context.script_context.current_unit == nullptr) {
+			throw std::runtime_error("No current unit provided when processing current unit tokens.");
 		}
 
 		str = this->process_unit_tokens(this->context.script_context.current_unit->get(), tokens);

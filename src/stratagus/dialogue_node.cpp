@@ -69,6 +69,8 @@ void dialogue_node::process_sml_property(const sml_property &property)
 		this->title = value;
 	} else if (key == "icon") {
 		this->icon = icon::get(value);
+	} else if (key == "player_color") {
+		this->player_color = player_color::get(value);
 	} else if (key == "text") {
 		this->text = value;
 	} else if (key == "sound") {
@@ -161,10 +163,10 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 	const QString title_str = QString::fromStdString(this->get_title_string(speaker_unit));
 	const QString text = QString::fromStdString(this->get_text(ctx));
 
-	const wyrmgus::icon *icon = speaker_unit ? speaker_unit->get_icon() : this->icon;
+	const wyrmgus::icon *icon = this->get_icon(speaker_unit);
 	const QString icon_identifier = icon ? icon->get_identifier_qstring() : "";
 
-	const player_color *player_color = speaker_unit ? speaker_unit->get_player_color() : defines::get()->get_neutral_player_color();
+	const wyrmgus::player_color *player_color = this->get_player_color(speaker_unit);
 	const QString player_color_identifier = player_color ? player_color->get_identifier_qstring() : "";
 
 	QStringList options;
@@ -250,6 +252,28 @@ std::string dialogue_node::get_title_string(const CUnit *speaker_unit) const
 	}
 
 	return this->title;
+}
+
+const wyrmgus::icon *dialogue_node::get_icon(const CUnit *speaker_unit) const
+{
+	if (speaker_unit != nullptr) {
+		return speaker_unit->get_icon();
+	}
+
+	return this->icon;
+}
+
+const wyrmgus::player_color *dialogue_node::get_player_color(const CUnit *speaker_unit) const
+{
+	if (speaker_unit != nullptr) {
+		return speaker_unit->get_player_color();
+	}
+
+	if (this->player_color != nullptr) {
+		return this->player_color;
+	}
+
+	return defines::get()->get_neutral_player_color();
 }
 
 std::string dialogue_node::get_text(const context &ctx) const

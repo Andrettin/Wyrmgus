@@ -166,7 +166,11 @@ void dialogue::delete_lua_callbacks()
 
 void CallDialogue(const std::string &dialogue_ident, const int player_index, const int unit_number)
 {
-	const dialogue *dialogue = dialogue::get(dialogue_ident);
+	const dialogue *dialogue = dialogue::try_get(dialogue_ident);
+
+	if (dialogue == nullptr) {
+		return;
+	}
 
 	CPlayer *player = CPlayer::Players.at(player_index).get();
 
