@@ -36,6 +36,7 @@
 #include "script/effect/call_dialogue_effect.h"
 #include "script/effect/character_unit_effect.h"
 #include "script/effect/complete_quest_effect.h"
+#include "script/effect/current_player_effect.h"
 #include "script/effect/current_unit_effect.h"
 #include "script/effect/create_unit_effect.h"
 #include "script/effect/delayed_effect.h"
@@ -110,6 +111,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 
 	if (effect_identifier == "character_unit") {
 		effect = std::make_unique<character_unit_effect<scope_type>>(scope.get_operator());
+	} else if (effect_identifier == "current_player") {
+		effect = std::make_unique<current_player_effect<scope_type>>(scope.get_operator());
 	} else if (effect_identifier == "current_unit") {
 		effect = std::make_unique<current_unit_effect<scope_type>>(scope.get_operator());
 	} else if (effect_identifier == "delayed") {

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,68 +26,50 @@
 
 #pragma once
 
-#include "player/player.h"
-#include "script/effect/scope_effect_base.h"
-#include "unit/unit.h"
-#include "unit/unit_type.h"
+#include "script/effect/scope_effect.h"
 
 namespace wyrmgus {
 
-class any_unit_of_type_effect final : public scope_effect_base<CPlayer, CUnit>
+template <typename scope_type>
+class current_player_effect final : public scope_effect<scope_type, CPlayer>
 {
 public:
-	explicit any_unit_of_type_effect(const sml_operator effect_operator) : scope_effect_base(effect_operator)
+	explicit current_player_effect(const sml_operator effect_operator) : scope_effect<scope_type, CPlayer>(effect_operator)
 	{
 	}
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static const std::string class_identifier = "any_unit_of_type";
+		static const std::string class_identifier = "current_player";
 		return class_identifier;
-	}
-
-	virtual void process_sml_property(const sml_property &property) override
-	{
-		const std::string &key = property.get_key();
-		const std::string &value = property.get_value();
-
-		if (key == "unit_type") {
-			this->unit_type = unit_type::get(value);
-		} else {
-			scope_effect_base::process_sml_property(property);
-		}
-	}
-
-	virtual void check() const override
-	{
-		if (this->unit_type == nullptr) {
-			throw std::runtime_error("\"any_unit_of_type\" effect has no unit type set for it.");
-		}
-
-		scope_effect_base::check();
-	}
-
-	virtual void do_assignment_effect(CPlayer *player, const context &ctx) const override
-	{
-		//copy the unit list, as the effects could change the player's list (e.g. by removing a unit)
-		const std::vector<CUnit *> type_units = player->get_type_units(this->unit_type);
-
-		for (CUnit *unit : type_units) {
-			if (unit->IsUnusable()) {
-				continue;
-			}
-
-			this->do_scope_effect(unit, ctx);
-		}
 	}
 
 	virtual std::string get_scope_name() const override
 	{
-		return "Any " + string::highlight(this->unit_type->get_name()) + " unit";
+		return "Current player";
 	}
 
-private:
-	const wyrmgus::unit_type *unit_type = nullptr;
+	virtual const CPlayer *get_scope(const scope_type *upper_scope, const read_only_context &ctx) const override
+	{
+		Q_UNUSED(upper_scope)
+
+		if (ctx.current_player == nullptr) {
+			return nullptr;
+		}
+
+		return ctx.current_player;
+	}
+
+	virtual CPlayer *get_scope(const scope_type *upper_scope, const context &ctx) const override
+	{
+		Q_UNUSED(upper_scope)
+
+		if (ctx.current_player == nullptr) {
+			return nullptr;
+		}
+
+		return ctx.current_player;
+	}
 };
 
 }
