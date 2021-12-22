@@ -696,7 +696,7 @@ public:
 	{
 		static std::vector<CUnit *> empty_vector;
 
-		auto find_iterator = this->get_units_by_type().find(unit_type);
+		const auto find_iterator = this->get_units_by_type().find(unit_type);
 		if (find_iterator != this->get_units_by_type().end()) {
 			return find_iterator->second;
 		}
@@ -713,7 +713,7 @@ public:
 	{
 		static std::vector<CUnit *> empty_vector;
 
-		auto find_iterator = this->get_units_by_class().find(unit_class);
+		const auto find_iterator = this->get_units_by_class().find(unit_class);
 		if (find_iterator != this->get_units_by_class().end()) {
 			return find_iterator->second;
 		}

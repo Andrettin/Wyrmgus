@@ -928,6 +928,7 @@ set(wyrmgus_script_condition_HDRS
 
 set(wyrmgus_script_effect_HDRS
 	src/script/effect/accept_quest_effect.h
+	src/script/effect/any_unit_of_class_effect.h
 	src/script/effect/any_unit_of_type_effect.h
 	src/script/effect/call_dialogue_effect.h
 	src/script/effect/character_unit_effect.h
