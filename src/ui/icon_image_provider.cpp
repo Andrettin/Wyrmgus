@@ -31,7 +31,7 @@
 #include "database/preferences.h"
 #include "player/player_color.h"
 #include "ui/icon.h"
-#include "util/log_util.h"
+#include "util/exception_util.h"
 #include "util/string_util.h"
 #include "video/color_modification.h"
 #include "video/video.h"
@@ -42,44 +42,49 @@ QImage icon_image_provider::requestImage(const QString &id, QSize *size, const Q
 {
 	Q_UNUSED(requested_size)
 
-	const std::string id_str = id.toStdString();
-	const std::vector<std::string> id_list = string::split(id_str, '/');
+	try {
+		const std::string id_str = id.toStdString();
+		const std::vector<std::string> id_list = string::split(id_str, '/');
 
-	size_t index = 0;
-	const std::string &icon_identifier = id_list.at(index);
-	const icon *icon = icon::get(icon_identifier);
+		size_t index = 0;
+		const std::string &icon_identifier = id_list.at(index);
+		const icon *icon = icon::get(icon_identifier);
 
-	++index;
-
-	const player_color *player_color = nullptr;
-	if (index < id_list.size()) {
-		const std::string &player_color_identifier = id_list.at(index);
-		player_color = player_color::get(player_color_identifier);
 		++index;
-	}
 
-	bool grayscale = false;
-	if (index < id_list.size()) {
-		if (id_list.at(index) == "grayscale") {
-			grayscale = true;
+		const player_color *player_color = nullptr;
+		if (index < id_list.size()) {
+			const std::string &player_color_identifier = id_list.at(index);
+			player_color = player_color::get(player_color_identifier);
 			++index;
 		}
+
+		bool grayscale = false;
+		if (index < id_list.size()) {
+			if (id_list.at(index) == "grayscale") {
+				grayscale = true;
+				++index;
+			}
+		}
+
+		std::shared_ptr<CGraphic> graphics = icon->get_graphics();
+		graphics->Load(preferences::get()->get_scale_factor());
+
+		const QImage &image = graphics->get_or_create_frame_image(icon->get_frame(), color_modification(icon->get_hue_rotation(), icon->get_hue_ignored_colors(), player_color), grayscale);
+
+		if (image.isNull()) {
+			throw std::runtime_error("Icon image for ID \"" + id_str + "\" is null.");
+		}
+
+		if (size != nullptr) {
+			*size = image.size();
+		}
+
+		return image;
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		return QImage();
 	}
-
-	std::shared_ptr<CGraphic> graphics = icon->get_graphics();
-	graphics->Load(preferences::get()->get_scale_factor());
-
-	const QImage &image = graphics->get_or_create_frame_image(icon->get_frame(), color_modification(icon->get_hue_rotation(), icon->get_hue_ignored_colors(), player_color), grayscale);
-
-	if (image.isNull()) {
-		log::log_error("Icon image for ID \"" + id_str + "\" is null.");
-	}
-
-	if (size != nullptr) {
-		*size = image.size();
-	}
-
-	return image;
 }
 
 }

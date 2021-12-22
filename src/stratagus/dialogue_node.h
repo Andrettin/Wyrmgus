@@ -40,6 +40,7 @@ class character;
 class dialogue;
 class dialogue_option;
 class faction;
+class icon;
 class sml_data;
 class sml_property;
 class sound;
@@ -81,6 +82,7 @@ public:
 private:
 	wyrmgus::dialogue *dialogue = nullptr;
 	std::string title;
+	const wyrmgus::icon *icon = nullptr;
 	const character *speaker = nullptr;
 	const unit_type *speaker_unit_type = nullptr;
 	const faction *speaker_faction = nullptr; //faction of the player to whom the speaker belongs

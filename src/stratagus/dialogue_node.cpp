@@ -29,6 +29,7 @@
 #include "dialogue_node.h"
 
 #include "character.h"
+#include "database/defines.h"
 #include "dialogue.h"
 #include "dialogue_option.h"
 #include "engine_interface.h"
@@ -41,6 +42,7 @@
 #include "script/context.h"
 #include "sound/sound.h"
 #include "text_processor.h"
+#include "ui/icon.h"
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
@@ -65,6 +67,8 @@ void dialogue_node::process_sml_property(const sml_property &property)
 
 	if (key == "title") {
 		this->title = value;
+	} else if (key == "icon") {
+		this->icon = icon::get(value);
 	} else if (key == "text") {
 		this->text = value;
 	} else if (key == "sound") {
@@ -157,10 +161,10 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 	const QString title_str = QString::fromStdString(this->get_title_string(speaker_unit));
 	const QString text = QString::fromStdString(this->get_text(ctx));
 
-	const icon *icon = speaker_unit ? speaker_unit->get_icon() : nullptr;
+	const wyrmgus::icon *icon = speaker_unit ? speaker_unit->get_icon() : this->icon;
 	const QString icon_identifier = icon ? icon->get_identifier_qstring() : "";
 
-	const player_color *player_color = speaker_unit ? speaker_unit->get_player_color() : nullptr;
+	const player_color *player_color = speaker_unit ? speaker_unit->get_player_color() : defines::get()->get_neutral_player_color();
 	const QString player_color_identifier = player_color ? player_color->get_identifier_qstring() : "";
 
 	QStringList options;
