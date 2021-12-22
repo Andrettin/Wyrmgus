@@ -669,7 +669,7 @@ static int CclDefineDialogue(lua_State *l)
 						} else if (speaker_type == "unit") {
 							node->speaker_unit_type = wyrmgus::unit_type::get(speaker);
 						} else {
-							node->speaker_name = speaker;
+							node->title = speaker;
 						}
 					} else if (!strcmp(value, "speaker-player")) {
 						node->speaker_faction = wyrmgus::faction::get(LuaToString(l, -1, k + 1));

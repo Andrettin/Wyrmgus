@@ -63,7 +63,9 @@ void dialogue_node::process_sml_property(const sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "text") {
+	if (key == "title") {
+		this->title = value;
+	} else if (key == "text") {
 		this->text = value;
 	} else if (key == "sound") {
 		this->sound = sound::get(value);
@@ -243,7 +245,7 @@ std::string dialogue_node::get_title_string(const CUnit *speaker_unit) const
 		}
 	}
 
-	return this->speaker_name;
+	return this->title;
 }
 
 std::string dialogue_node::get_text(const context &ctx) const

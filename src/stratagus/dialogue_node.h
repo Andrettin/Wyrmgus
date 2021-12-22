@@ -80,9 +80,9 @@ public:
 	int ID = -1;
 private:
 	wyrmgus::dialogue *dialogue = nullptr;
+	std::string title;
 	const character *speaker = nullptr;
 	const unit_type *speaker_unit_type = nullptr;
-	std::string speaker_name;
 	const faction *speaker_faction = nullptr; //faction of the player to whom the speaker belongs
 	size_t speaker_index = 0;
 	std::string text;
