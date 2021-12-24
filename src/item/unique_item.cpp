@@ -60,6 +60,15 @@ bool unique_item::compare_encyclopedia_entries(const unique_item *lhs, const uni
 	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
+void unique_item::initialize()
+{
+	if (this->set != nullptr) {
+		this->set->add_set_unique(this);
+	}
+
+	data_entry::initialize();
+}
+
 std::string unique_item::get_encyclopedia_text() const
 {
 	std::string text;

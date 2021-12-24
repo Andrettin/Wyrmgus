@@ -65,6 +65,8 @@ public:
 	{
 	}
 
+	virtual void initialize() override;
+
 	virtual void check() const override
 	{
 		if (this->get_unit_type() == nullptr) {

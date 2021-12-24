@@ -70,7 +70,6 @@ static int CclDefineUniqueItem(lua_State *l)
 			std::string set_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(set_ident);
 			item->set = upgrade;
-			item->set->UniqueItems.push_back(item);
 		} else if (!strcmp(value, "Spell")) {
 			const std::string spell_ident = LuaToString(l, -1);
 			wyrmgus::spell *spell = wyrmgus::spell::get(spell_ident);
