@@ -1426,6 +1426,10 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 			}
 		}
 
+		if (this->get_government_type() == government_type::none) {
+			this->set_government_type(faction->get_default_government_type());
+		}
+
 		const wyrmgus::player_color *faction_color = faction->get_color();
 		if (faction_color != nullptr) {
 			if (this->get_player_color_usage_count(faction_color) == 0) {
