@@ -29,7 +29,7 @@
 
 cmake_minimum_required(VERSION 3.7.0)
 
-project(wyrmgus VERSION 5.3.1)
+project(wyrmgus VERSION 5.3.2)
 add_compile_definitions(
 	StratagusMajorVersion=${CMAKE_PROJECT_VERSION_MAJOR}
 	StratagusMinorVersion=${CMAKE_PROJECT_VERSION_MINOR}
