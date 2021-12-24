@@ -1620,21 +1620,22 @@ std::string EvalString(const StringDesc *s)
 			if (unit != nullptr && unit->get_unique() != nullptr && unit->get_unique()->get_set() != nullptr) {
 				std::string set_items_string;
 				bool first = true;
-				for (const wyrmgus::unique_item *unique_item : unit->get_unique()->get_set()->UniqueItems) {
+				for (const unique_item *set_unique : unit->get_unique()->get_set()->get_set_uniques()) {
 					if (!first) {
 						set_items_string += "\n";
 					} else {
 						first = false;
 					}
-					const bool item_equipped = unit->Container && unit->Container->IsUniqueItemEquipped(unique_item);
+					const bool item_equipped = unit->Container && unit->Container->is_unique_item_equipped(set_unique);
 					if (!item_equipped) {
 						set_items_string += "~<";
 					}
-					set_items_string += unique_item->get_name();
+					set_items_string += set_unique->get_name();
 					if (!item_equipped) {
 						set_items_string += "~>";
 					}
 				}
+
 				return set_items_string;
 			} else {
 				return std::string();

@@ -99,39 +99,6 @@ static int CclDefineUniqueItem(lua_State *l)
 	return 0;
 }
 
-static int CclGetItems(lua_State *l)
-{
-	std::vector<const wyrmgus::unit_type *> items;
-	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		if (unit_type->is_template()) {
-			continue;
-		}
-
-		if (unit_type->BoolFlag[ITEM_INDEX].value) {
-			items.push_back(unit_type);
-		}
-	}
-		
-	lua_createtable(l, items.size(), 0);
-	for (size_t i = 1; i <= items.size(); ++i)
-	{
-		lua_pushstring(l, items[i-1]->Ident.c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
-static int CclGetUniqueItems(lua_State *l)
-{
-	lua_createtable(l, wyrmgus::unique_item::get_all().size(), 0);
-	for (size_t i = 1; i <= wyrmgus::unique_item::get_all().size(); ++i)
-	{
-		lua_pushstring(l, wyrmgus::unique_item::get_all()[i-1]->get_identifier().c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
 /**
 **  Get unique item data.
 **
@@ -247,7 +214,5 @@ static int CclGetUniqueItemData(lua_State *l)
 void ItemCclRegister()
 {
 	lua_register(Lua, "DefineUniqueItem", CclDefineUniqueItem);
-	lua_register(Lua, "GetItems", CclGetItems);
-	lua_register(Lua, "GetUniqueItems", CclGetUniqueItems);
 	lua_register(Lua, "GetUniqueItemData", CclGetUniqueItemData);
 }

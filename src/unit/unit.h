@@ -685,12 +685,12 @@ public:
 	bool IsItemEquipped(const CUnit *item) const;
 	bool is_item_class_equipped(const wyrmgus::item_class item_class) const;
 	bool is_item_type_equipped(const wyrmgus::unit_type *item_type) const;
-	bool IsUniqueItemEquipped(const wyrmgus::unique_item *unique) const;
+	bool is_unique_item_equipped(const unique_item *unique) const;
 	bool can_equip_item(const CUnit *item) const;
 	bool can_equip_item_class(const item_class item_class) const;
 	bool CanUseItem(CUnit *item) const;
-	bool IsItemSetComplete(const CUnit *item) const;
-	bool EquippingItemCompletesSet(const CUnit *item) const;
+	bool is_item_set_complete(const CUnit *item) const;
+	bool equipping_item_completes_set(const CUnit *item) const;
 	bool DeequippingItemBreaksSet(const CUnit *item) const;
 	bool HasInventory() const;
 

@@ -537,7 +537,7 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 	this->shield = parent_upgrade->is_shield();
 	this->boots = parent_upgrade->is_boots();
 	this->arrows = parent_upgrade->is_arrows();
-	this->item = parent_upgrade->get_item();
+	this->item = parent_upgrade->item;
 	this->magic_prefix = parent_upgrade->magic_prefix;
 	this->magic_suffix = parent_upgrade->magic_suffix;
 	this->RunicAffix = parent_upgrade->RunicAffix;

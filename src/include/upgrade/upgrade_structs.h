@@ -264,7 +264,7 @@ private:
 	unit_type_map<int> unit_stocks;	/// Units in stock
 };
 
-class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data_type<CUpgrade>
+class CUpgrade final : public detailed_data_entry, public data_type<CUpgrade>
 {
 	Q_OBJECT
 
@@ -283,7 +283,7 @@ class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data
 	Q_PROPERTY(bool magic_prefix MEMBER magic_prefix READ is_magic_prefix)
 	Q_PROPERTY(bool magic_suffix MEMBER magic_suffix READ is_magic_suffix)
 	Q_PROPERTY(int magic_level MEMBER magic_level READ get_magic_level)
-	Q_PROPERTY(wyrmgus::unit_type* item MEMBER item READ get_item)
+	Q_PROPERTY(wyrmgus::unit_type* item MEMBER item)
 	Q_PROPERTY(wyrmgus::government_type government_type MEMBER government_type READ get_government_type)
 
 public:
@@ -386,8 +386,8 @@ public:
 	explicit CUpgrade(const std::string &identifier);
 	~CUpgrade();
 
-	virtual void process_sml_property(const wyrmgus::sml_property &property) override;
-	virtual void process_sml_scope(const wyrmgus::sml_data &scope) override;
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
 
@@ -533,17 +533,27 @@ public:
 		return this->incompatible_affixes.contains(affix);
 	}
 
-	wyrmgus::unit_type *get_item() const
+	const unit_type *get_item() const
 	{
 		return this->item;
 	}
 
-	const std::vector<std::unique_ptr<const wyrmgus::upgrade_modifier>> &get_modifiers() const
+	const std::vector<std::unique_ptr<const upgrade_modifier>> &get_modifiers() const
 	{
 		return this->modifiers;
 	}
 
-	void add_modifier(std::unique_ptr<const wyrmgus::upgrade_modifier> &&modifier);
+	void add_modifier(std::unique_ptr<const upgrade_modifier> &&modifier);
+
+	const std::vector<const unique_item *> &get_set_uniques() const
+	{
+		return this->set_uniques;
+	}
+
+	void add_set_unique(const unique_item *unique)
+	{
+		this->set_uniques.push_back(unique);
+	}
 
 	const resource_map<int> &get_costs() const
 	{
@@ -579,12 +589,12 @@ public:
 		return 0;
 	}
 
-	const std::vector<const wyrmgus::unit_type *> &get_scaled_cost_unit_types() const
+	const std::vector<const unit_type *> &get_scaled_cost_unit_types() const
 	{
 		return this->scaled_cost_unit_types;
 	}
 
-	const std::vector<const wyrmgus::unit_class *> &get_scaled_cost_unit_classes() const
+	const std::vector<const unit_class *> &get_scaled_cost_unit_classes() const
 	{
 		return this->scaled_cost_unit_classes;
 	}
@@ -673,7 +683,7 @@ public:
 	std::vector<std::string> Epithets;	/// epithets when a character has a certain trait
 	//Wyrmgus end
 private:
-	wyrmgus::unit_type *item = nullptr;
+	unit_type *item = nullptr;
 public:
 	int   ID = 0;						/// numerical id
 private:
@@ -685,16 +695,14 @@ public:
 	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
 	item_class Work;			/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work
-	wyrmgus::character *Author = nullptr;		/// Author of this literary work (if it is one)
+	character *Author = nullptr;		/// Author of this literary work (if it is one)
 private:
-	std::vector<std::unique_ptr<const wyrmgus::upgrade_modifier>> modifiers; //upgrade modifiers for this upgrade
+	std::vector<std::unique_ptr<const upgrade_modifier>> modifiers; //upgrade modifiers for this upgrade
+	std::vector<const unique_item *> set_uniques;	//unique items who form a part of this set upgrade
+	std::vector<const unit_type *> scaled_cost_unit_types;	//units for which the upgrade's costs are scaled
+	std::vector<const unit_class *> scaled_cost_unit_classes;	//units for which the upgrade's costs are scaled
 public:
-	std::vector<const wyrmgus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
-private:
-	std::vector<const wyrmgus::unit_type *> scaled_cost_unit_types;	//units for which the upgrade's costs are scaled
-	std::vector<const wyrmgus::unit_class *> scaled_cost_unit_classes;	//units for which the upgrade's costs are scaled
-public:
-	std::vector<wyrmgus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
+	std::vector<character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons
 private:

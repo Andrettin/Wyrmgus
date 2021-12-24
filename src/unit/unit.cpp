@@ -1594,7 +1594,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
-	if (item.get_unique() != nullptr && item.get_unique()->get_set() != nullptr && this->EquippingItemCompletesSet(&item)) {
+	if (item.get_unique() != nullptr && item.get_unique()->get_set() != nullptr && this->equipping_item_completes_set(&item)) {
 		for (const auto &modifier : item.get_unique()->get_set()->get_modifiers()) {
 			ApplyIndividualUpgradeModifier(*this, modifier.get());
 		}
@@ -5894,7 +5894,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 		}
 		
 		if (item->get_unique() != nullptr && item->get_unique()->get_set() != nullptr) {
-			if (this->EquippingItemCompletesSet(item)) {
+			if (this->equipping_item_completes_set(item)) {
 				for (const auto &modifier : item->get_unique()->get_set()->get_modifiers()) {
 					if (!increase) {
 						value += modifier->Modifier.Variables[variable_index].Value;
@@ -6436,16 +6436,16 @@ bool CUnit::is_item_type_equipped(const wyrmgus::unit_type *item_type) const
 	return false;
 }
 
-bool CUnit::IsUniqueItemEquipped(const wyrmgus::unique_item *unique) const
+bool CUnit::is_unique_item_equipped(const unique_item *unique) const
 {
-	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(unique->get_unit_type()->get_item_class());
+	const item_slot item_slot = get_item_class_slot(unique->get_unit_type()->get_item_class());
 		
-	if (item_slot == wyrmgus::item_slot::none) {
+	if (item_slot == item_slot::none) {
 		return false;
 	}
 		
-	for (size_t i = 0; i < this->EquippedItems[static_cast<int>(item_slot)].size(); ++i) {
-		if (EquippedItems[static_cast<int>(item_slot)][i]->get_unique() == unique) {
+	for (const CUnit *equipped_item : this->EquippedItems[static_cast<int>(item_slot)]) {
+		if (equipped_item->get_unique() == unique) {
 			return true;
 		}
 	}
@@ -6570,10 +6570,16 @@ bool CUnit::CanUseItem(CUnit *item) const
 	return true;
 }
 
-bool CUnit::IsItemSetComplete(const CUnit *item) const
+bool CUnit::is_item_set_complete(const CUnit *item) const
 {
-	for (size_t i = 0; i < item->get_unique()->get_set()->UniqueItems.size(); ++i) {
-		if (!this->IsUniqueItemEquipped(item->get_unique()->get_set()->UniqueItems[i])) {
+	const unique_item *item_unique = item->get_unique();
+	assert_throw(item_unique != nullptr);
+
+	const CUpgrade *item_set = item_unique->get_set();
+	assert_throw(item_set != nullptr);
+
+	for (const unique_item *set_unique : item_set->get_set_uniques()) {
+		if (!this->is_unique_item_equipped(set_unique)) {
 			return false;
 		}
 	}
@@ -6581,18 +6587,18 @@ bool CUnit::IsItemSetComplete(const CUnit *item) const
 	return true;
 }
 
-bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
+bool CUnit::equipping_item_completes_set(const CUnit *item) const
 {
-	for (const wyrmgus::unique_item *unique_item : item->get_unique()->get_set()->UniqueItems) {
-		const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(unique_item->get_unit_type()->get_item_class());
+	for (const unique_item *unique_item : item->get_unique()->get_set()->get_set_uniques()) {
+		const item_slot item_slot = get_item_class_slot(unique_item->get_unit_type()->get_item_class());
 		
-		if (item_slot == wyrmgus::item_slot::none) {
+		if (item_slot == item_slot::none) {
 			return false;
 		}
 		
 		bool has_item_equipped = false;
-		for (size_t j = 0; j < this->EquippedItems[static_cast<int>(item_slot)].size(); ++j) {
-			if (EquippedItems[static_cast<int>(item_slot)][j]->get_unique() == unique_item) {
+		for (const CUnit *equipped_item : this->EquippedItems[static_cast<int>(item_slot)]) {
+			if (equipped_item->get_unique() == unique_item) {
 				has_item_equipped = true;
 				break;
 			}
@@ -6611,7 +6617,7 @@ bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 
 bool CUnit::DeequippingItemBreaksSet(const CUnit *item) const
 {
-	if (!IsItemSetComplete(item)) {
+	if (!this->is_item_set_complete(item)) {
 		return false;
 	}
 	
