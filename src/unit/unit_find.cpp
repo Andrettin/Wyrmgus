@@ -203,119 +203,200 @@ bool FindTerrainType(const tile_flag movemask, const wyrmgus::resource *resource
 	return terrainTraversal.Run(terrainFinder);
 }
 
-
-template <const bool NEARLOCATION>
-class BestDepotFinder final
+class depot_finder_base
 {
-	void operator()(CUnit *const dest)
+protected:
+	explicit depot_finder_base(const wyrmgus::resource *resource, const int range, const CPlayer *player) : resource(resource), range(range)
 	{
-		/* Only resource depots */
-		if (dest->Type->can_store(resource)
-			//Wyrmgus start
-			&& (NEARLOCATION || u_near.worker->can_return_goods_to(dest, resource))
-			//Wyrmgus end
-			&& dest->IsAliveOnMap()
-			&& dest->CurrentAction() != UnitAction::Built) {
-			// Unit in range?
+		for (const auto &kv_pair : player->get_units_by_type()) {
+			const unit_type *unit_type = kv_pair.first;
+			if (unit_type->can_store(resource)) {
+				vector::merge(this->units, kv_pair.second);
+			}
+		}
 
-			if constexpr (NEARLOCATION) {
-				const int d = dest->MapDistanceTo(u_near.loc, u_near.layer);
+		for (int i = 0; i < PlayerMax - 1; ++i) {
+			const CPlayer *other_player = CPlayer::Players[i].get();
 
-				//
-				// Take this depot?
-				//
-				if (d <= this->range && d < this->best_dist) {
-					this->best_depot = dest;
-					this->best_dist = d;
-				}
-			} else {
-				const CUnit *worker = this->u_near.worker;
-				const CUnit *first_container = worker->GetFirstContainer();
+			if (other_player == player) {
+				continue;
+			}
 
-				//simple distance
-				const int distance = first_container->MapDistanceTo(*dest);
-
-				// Use Circle, not square :)
-				if (distance > this->range) {
-					return;
-				}
-
-				if (this->best_dist == INT_MAX) {
-					this->best_depot = dest;
-				}
-
-				if (distance >= this->best_dist) {
-					//if the depot's simple distance is greater or equal to the real travel distance of the currently-chosen depot, then it can never be closer than it, and we have no reason to actually calculate its real travel distance 
-					return;
-				}
-				
-				//calculate real travel distance
-				const int travel_distance = UnitReachable(*worker, *dest, 1, 0, true);
-
-				//
-				// Take this depot?
-				//
-				if (travel_distance && travel_distance < this->best_dist) {
-					this->best_depot = dest;
-					this->best_dist = travel_distance;
+			if (player->is_allied_with(*other_player)) {
+				for (const auto &kv_pair : other_player->get_units_by_type()) {
+					const unit_type *unit_type = kv_pair.first;
+					if (unit_type->can_store(resource)) {
+						vector::merge(this->units, kv_pair.second);
+					}
 				}
 			}
 		}
 	}
 
+	const wyrmgus::resource *get_resource() const
+	{
+		return this->resource;
+	}
+
+	int get_range() const
+	{
+		return this->range;
+	}
+
+	std::vector<CUnit *> &get_units()
+	{
+		return this->units;
+	}
+
+	int get_best_distance() const
+	{
+		return this->best_distance;
+	}
+
+	CUnit *get_best_depot() const
+	{
+		return this->best_depot;
+	}
+
+	void set_best_depot(CUnit *depot, const int distance)
+	{
+		this->best_depot = depot;
+		this->best_distance = distance;
+	}
+
 public:
-	explicit BestDepotFinder(const CUnit &w, const resource *res, const int ran)
-		: resource(res), range(ran)
+	CUnit *find()
 	{
-		u_near.worker = &w;
-	}
+		for (CUnit *unit : this->units) {
+			if (!this->is_valid_depot(unit)) {
+				continue;
+			}
 
-	//Wyrmgus start
-//	explicit BestDepotFinder(const Vec2i &pos, const resource *res, const int ran)
-	explicit BestDepotFinder(const Vec2i &pos, const resource *res, const int ran, const int z)
-	//Wyrmgus end
-		: resource(res), range(ran)
-	{
-		u_near.loc = pos;
-		u_near.layer = z;
-	}
-
-	CUnit *find(std::vector<CUnit *> &units)
-	{
-		if constexpr (!NEARLOCATION) {
-			//sort by distance as a performance improvement, so that we don't call UnitReachable() unnecessarily
-			const CUnit *first_container = this->u_near.worker->GetFirstContainer();
-
-			std::sort(units.begin(), units.end(), [first_container](const CUnit *lhs, const CUnit *rhs) {
-				return first_container->MapDistanceTo(*lhs) < first_container->MapDistanceTo(*rhs);
-			});
-		}
-
-		for (CUnit *unit : units) {
-			this->operator()(unit);
+			this->visit(unit);
 		}
 
 		return this->best_depot;
 	}
 
-	CUnit *Find(CUnitCache &cache)
+protected:
+	virtual bool is_valid_depot(const CUnit *dest) const
 	{
-		cache.for_each(*this);
-		return this->best_depot;
+		//only resource depots
+		if (!dest->Type->can_store(resource)) {
+			return false;
+		}
+
+		if (!dest->IsAliveOnMap()) {
+			return false;
+		}
+
+		if (dest->CurrentAction() == UnitAction::Built) {
+			return false;
+		}
+
+		return true;
 	}
 
 private:
-	struct {
-		const CUnit *worker;
-		Vec2i loc;
-		int layer;
-	} u_near;
+	virtual void visit(CUnit *const dest) = 0;
 
+private:
 	const wyrmgus::resource *resource = nullptr;
 	const int range;
-	int best_dist = INT_MAX;
-public:
+	std::vector<CUnit *> units;
+	int best_distance = INT_MAX;
 	CUnit *best_depot = nullptr;
+};
+
+class depot_finder final : public depot_finder_base
+{
+public:
+	explicit depot_finder(const CUnit *worker, const wyrmgus::resource *resource, const int range)
+		: depot_finder_base(resource, range, worker->Player), worker(worker)
+	{
+	}
+
+	CUnit *find()
+	{
+		//sort by distance as a performance improvement, so that we don't call UnitReachable() unnecessarily
+		const CUnit *first_container = this->worker->GetFirstContainer();
+
+		std::sort(this->get_units().begin(), this->get_units().end(), [first_container](const CUnit *lhs, const CUnit *rhs) {
+			return first_container->MapDistanceTo(*lhs) < first_container->MapDistanceTo(*rhs);
+		});
+
+		return depot_finder_base::find();
+	}
+
+	virtual bool is_valid_depot(const CUnit *dest) const override
+	{
+		if (!this->worker->can_return_goods_to(dest, this->get_resource())) {
+			return false;
+		}
+
+		return depot_finder_base::is_valid_depot(dest);
+	}
+
+	virtual void visit(CUnit *const dest) override
+	{
+		// Unit in range?
+
+		const CUnit *worker = this->worker;
+		const CUnit *first_container = worker->GetFirstContainer();
+
+		//simple distance
+		const int distance = first_container->MapDistanceTo(*dest);
+
+		// Use Circle, not square :)
+		if (distance > this->get_range()) {
+			return;
+		}
+
+		if (distance >= this->get_best_distance()) {
+			//if the depot's simple distance is greater or equal to the real travel distance of the currently-chosen depot, then it can never be closer than it, and we have no reason to actually calculate its real travel distance 
+			return;
+		}
+
+		//calculate real travel distance
+		const int travel_distance = UnitReachable(*worker, *dest, 1, 0, true);
+
+		//
+		// Take this depot?
+		//
+		if (travel_distance && travel_distance < this->get_best_distance()) {
+			this->set_best_depot(dest, travel_distance);
+		}
+	}
+
+private:
+	const CUnit *worker = nullptr;
+};
+
+class near_location_depot_finder final : public depot_finder_base
+{
+public:
+	explicit near_location_depot_finder(const QPoint &pos, const wyrmgus::resource *resource, const int range, const int z, const CPlayer *player) : depot_finder_base(resource, range, player), pos(pos), z(z)
+	{
+	}
+
+private:
+	virtual void visit(CUnit *const dest) override
+	{
+		// Unit in range?
+
+		const int d = dest->MapDistanceTo(this->pos, this->z);
+
+		//
+		// Take this depot?
+		//
+		if (d <= this->get_range() && d < this->get_best_distance()) {
+			this->set_best_depot(dest, d);
+		}
+	}
+
+private:
+	const QPoint pos;
+	const int z;
 };
 
 //Wyrmgus start
@@ -423,30 +504,8 @@ public:
 
 CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, const int range, const resource *resource, const int z)
 {
-	BestDepotFinder<true> finder(pos, resource, range, z);
-
-	std::vector<CUnit *> table;
-
-	for (const auto &kv_pair : p.get_units_by_type()) {
-		const unit_type *unit_type = kv_pair.first;
-		if (unit_type->can_store(resource)) {
-			vector::merge(table, kv_pair.second);
-		}
-	}
-
-	for (int i = 0; i < PlayerMax - 1; ++i) {
-		const CPlayer *other_player = CPlayer::Players[i].get();
-		if (other_player->is_allied_with(p) && p.is_allied_with(*other_player)) {
-			for (const auto &kv_pair : other_player->get_units_by_type()) {
-				const wyrmgus::unit_type *unit_type = kv_pair.first;
-				if (unit_type->can_store(resource)) {
-					vector::merge(table, kv_pair.second);
-				}
-			}
-		}
-	}
-
-	return finder.find(table);
+	near_location_depot_finder finder(pos, resource, range, z, &p);
+	return finder.find();
 }
 
 class CResourceFinder final
@@ -736,31 +795,8 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, const int ra
 */
 CUnit *FindDeposit(const CUnit &unit, const int range, const resource *resource)
 {
-	BestDepotFinder<false> finder(unit, resource, range);
-
-	std::vector<CUnit *> table;
-
-	for (const auto &kv_pair : unit.Player->get_units_by_type()) {
-		const wyrmgus::unit_type *unit_type = kv_pair.first;
-		if (unit_type->can_store(resource)) {
-			vector::merge(table, kv_pair.second);
-		}
-	}
-
-	for (int i = 0; i < PlayerMax - 1; ++i) {
-		const CPlayer *other_player = CPlayer::Players[i].get();
-
-		if (unit.Player->is_allied_with(*other_player)) {
-			for (const auto &kv_pair : other_player->get_units_by_type()) {
-				const wyrmgus::unit_type *unit_type = kv_pair.first;
-				if (unit_type->can_store(resource)) {
-					vector::merge(table, kv_pair.second);
-				}
-			}
-		}
-	}
-
-	return finder.find(table);
+	depot_finder finder(&unit, resource, range);
+	return finder.find();
 }
 
 //Wyrmgus start
