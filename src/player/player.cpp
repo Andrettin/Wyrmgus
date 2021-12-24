@@ -1416,7 +1416,15 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 	if (this->get_faction() != nullptr) {
 		const wyrmgus::player_color *player_color = nullptr;
 
-		this->set_faction_tier(faction->get_default_tier());
+		if (this->get_faction_tier() == faction_tier::none) {
+			this->set_faction_tier(faction->get_default_tier());
+		} else {
+			if (this->get_faction_tier() < faction->get_min_tier()) {
+				this->set_faction_tier(faction->get_min_tier());
+			} else if (this->get_faction_tier() > faction->get_max_tier()) {
+				this->set_faction_tier(faction->get_max_tier());
+			}
+		}
 
 		const wyrmgus::player_color *faction_color = faction->get_color();
 		if (faction_color != nullptr) {
