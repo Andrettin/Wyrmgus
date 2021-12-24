@@ -330,9 +330,9 @@ std::string_view faction::get_title_name(const wyrmgus::government_type governme
 		return string::empty_str;
 	}
 
-	auto find_iterator = this->title_names.find(government_type);
+	const auto find_iterator = this->title_names.find(government_type);
 	if (find_iterator != this->title_names.end()) {
-		auto sub_find_iterator = find_iterator->second.find(tier);
+		const auto sub_find_iterator = find_iterator->second.find(tier);
 		if (sub_find_iterator != find_iterator->second.end()) {
 			return sub_find_iterator->second;
 		}
@@ -343,7 +343,7 @@ std::string_view faction::get_title_name(const wyrmgus::government_type governme
 
 std::string_view faction::get_character_title_name(const character_title title_type, const wyrmgus::government_type government_type, const faction_tier tier, const gender gender) const
 {
-	auto find_iterator = this->character_title_names.find(title_type);
+	const auto find_iterator = this->character_title_names.find(title_type);
 	if (find_iterator != this->character_title_names.end()) {
 		auto secondary_find_iterator = find_iterator->second.find(government_type);
 		if (secondary_find_iterator == find_iterator->second.end()) {

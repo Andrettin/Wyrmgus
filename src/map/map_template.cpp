@@ -898,7 +898,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		const faction *current_faction = current_campaign->get_faction();
 		if (current_faction != nullptr && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->get_faction() != current_faction) {
 			CPlayer::GetThisPlayer()->set_civilization(current_faction->get_civilization());
-			CPlayer::GetThisPlayer()->SetFaction(current_faction);
+			CPlayer::GetThisPlayer()->set_faction(current_faction);
 			CPlayer::GetThisPlayer()->set_resource(defines::get()->get_wealth_resource(), 2500); // give the player enough resources to start up
 			CPlayer::GetThisPlayer()->set_resource(resource::get_all()[WoodCost], 2500);
 			CPlayer::GetThisPlayer()->set_resource(resource::get_all()[StoneCost], 2500);

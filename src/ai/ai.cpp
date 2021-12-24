@@ -505,7 +505,7 @@ static void AiCheckUnits()
 		}
 		
 		if (potential_factions.size() > 0) {
-			AiPlayer->Player->SetFaction(vector::get_random(potential_factions));
+			AiPlayer->Player->set_faction(vector::get_random(potential_factions));
 		}
 		
 		if (AiPlayer->Player->get_dynasty() == nullptr) { //if the AI player has no dynasty, pick one if available

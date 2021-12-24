@@ -907,7 +907,7 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 		if (player->get_type() == player_type::nobody) {
 			player->set_type(player_type::computer);
 			player->set_civilization(faction->get_civilization());
-			player->SetFaction(faction);
+			player->set_faction(faction);
 			player->AiEnabled = true;
 			player->AiName = faction->DefaultAI;
 			player->Team = 1;
@@ -1319,7 +1319,7 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 	}
 
 	if (GameRunning) {
-		this->SetFaction(nullptr);
+		this->set_faction(nullptr);
 	} else {
 		this->faction = nullptr;
 	}
@@ -1352,7 +1352,7 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 	}
 }
 
-void CPlayer::SetFaction(const wyrmgus::faction *faction)
+void CPlayer::set_faction(const wyrmgus::faction *faction)
 {
 	if (faction == this->get_faction()) {
 		return;
@@ -1551,9 +1551,9 @@ void CPlayer::set_random_faction()
 	
 	if (!potential_factions.empty()) {
 		const wyrmgus::faction *chosen_faction = vector::get_random(potential_factions);
-		this->SetFaction(chosen_faction);
+		this->set_faction(chosen_faction);
 	} else {
-		this->SetFaction(nullptr);
+		this->set_faction(nullptr);
 	}
 }
 

@@ -187,7 +187,7 @@ public:
 		return this->faction;
 	}
 
-	void SetFaction(const wyrmgus::faction *faction);
+	void set_faction(const wyrmgus::faction *faction);
 	Q_INVOKABLE void set_faction_async(wyrmgus::faction *faction);
 	void set_random_faction();
 

@@ -2549,7 +2549,7 @@ static int CclSetPlayerData(lua_State *l)
 		p->set_name(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
 		if (GameRunning) {
-			p->SetFaction(nullptr);
+			p->set_faction(nullptr);
 		}
 
 		const char *civilization_ident = LuaToString(l, 3);
@@ -2561,7 +2561,7 @@ static int CclSetPlayerData(lua_State *l)
 		if (faction_name == "random") {
 			p->set_random_faction();
 		} else {
-			p->SetFaction(faction::try_get(faction_name));
+			p->set_faction(faction::try_get(faction_name));
 		}
 	} else if (!strcmp(data, "Type")) {
 		p->set_type(static_cast<player_type>(LuaToNumber(l, 3)));

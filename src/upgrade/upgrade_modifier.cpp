@@ -238,7 +238,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 					player->set_civilization(this->change_faction_to->get_civilization());
 				}
 
-				player->SetFaction(this->change_faction_to);
+				player->set_faction(this->change_faction_to);
 			}
 		}
 	}

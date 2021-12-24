@@ -242,7 +242,7 @@ static void ApplyReplaySettings()
 		GameSettings.Presets[i].AIScript = CurrentReplay->Players[i].AIScript;
 		GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
 		//Wyrmgus start
-		CPlayer::Players[i]->SetFaction(CurrentReplay->Players[i].Faction); // should use a game settings preset instead
+		CPlayer::Players[i]->set_faction(CurrentReplay->Players[i].Faction); // should use a game settings preset instead
 		//Wyrmgus end
 		GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
 		GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
