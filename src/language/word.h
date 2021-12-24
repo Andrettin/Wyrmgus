@@ -75,7 +75,27 @@ public:
 
 	virtual bool has_encyclopedia_entry() const override
 	{
-		return true;
+		if (!this->get_meanings().empty()) {
+			return true;
+		}
+
+		if (this->get_etymon() != nullptr) {
+			return true;
+		}
+
+		if (!this->get_reflexes().empty()) {
+			return true;
+		}
+
+		if (!this->compound_elements.empty()) {
+			return true;
+		}
+
+		if (!this->compound_element_of.empty()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	virtual std::string get_encyclopedia_text() const override;
