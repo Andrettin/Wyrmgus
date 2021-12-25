@@ -140,14 +140,28 @@ public:
 		Q_UNUSED(indent)
 		Q_UNUSED(links_allowed)
 
-		std::string str = string::highlight(this->unit_class->get_name());
+		std::string str;
 
 		if (this->count > 1) {
-			str += '(' + std::to_string(this->count) + ')';
+			str += std::to_string(this->count) + " ";
+		}
+
+		str += string::highlight(this->unit_class->get_name()) + " class ";
+
+		const bool is_building = !this->unit_class->get_unit_types().empty() && this->unit_class->get_unit_types().front()->BoolFlag[BUILDING_INDEX].value;
+
+		if (is_building) {
+			str += "building";
+		} else {
+			str += "unit";
+		}
+
+		if (this->count > 1) {
+			str += "s";
 		}
 
 		if (this->settlement != nullptr) {
-			str += " in " + this->settlement->get_name();
+			str += " in " + settlement->get_name();
 		}
 
 		return str;

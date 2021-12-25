@@ -120,10 +120,22 @@ public:
 	{
 		Q_UNUSED(indent)
 
-		std::string str = condition::get_object_string(this->unit_type, links_allowed);
+		std::string str;
 
 		if (this->count > 1) {
-			str += '(' + std::to_string(this->count) + ')';
+			str += std::to_string(this->count) + " ";
+		}
+
+		str += condition::get_object_string(this->unit_type, links_allowed) + " ";
+
+		if (this->unit_type->BoolFlag[BUILDING_INDEX].value) {
+			str += "building";
+		} else {
+			str += "unit";
+		}
+
+		if (this->count > 1) {
+			str += "s";
 		}
 
 		if (this->settlement != nullptr) {
