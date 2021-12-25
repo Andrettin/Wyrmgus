@@ -908,6 +908,8 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 
 /**
 **  Find path.
+**
+**  @return  _move_return_ or the path length
 */
 int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, const int gh,
 				  const int tilesizex, const int tilesizey, const int minrange, const int maxrange,
