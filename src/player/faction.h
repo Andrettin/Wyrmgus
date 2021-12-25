@@ -83,8 +83,8 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade NOTIFY changed)
 	Q_PROPERTY(wyrmgus::site* default_capital MEMBER default_capital READ get_default_capital)
-	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
-	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
+	Q_PROPERTY(bool simple_name MEMBER simple_name)
+	Q_PROPERTY(bool short_name MEMBER short_name)
 	Q_PROPERTY(bool definite_article MEMBER definite_article READ uses_definite_article)
 	Q_PROPERTY(wyrmgus::deity* holy_order_deity MEMBER holy_order_deity READ get_holy_order_deity)
 
@@ -183,6 +183,17 @@ public:
 		return this->max_tier;
 	}
 
+	faction_tier get_nearest_valid_tier(const faction_tier tier) const
+	{
+		if (tier < this->get_min_tier()) {
+			return this->get_min_tier();
+		} else if (tier > this->get_max_tier()) {
+			return this->get_max_tier();
+		}
+
+		return tier;
+	}
+
 	government_type get_default_government_type() const
 	{
 		return this->default_government_type;
@@ -209,11 +220,7 @@ public:
 	}
 
 	bool uses_simple_name() const;
-
-	bool uses_short_name() const
-	{
-		return this->short_name;
-	}
+	bool uses_short_name(const government_type government_type) const;
 
 	bool uses_definite_article() const
 	{

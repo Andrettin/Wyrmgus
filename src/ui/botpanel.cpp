@@ -1931,9 +1931,9 @@ void CButtonPanel::DoClicked_StandGround(const Qt::KeyboardModifiers key_modifie
 	}
 }
 
-void CButtonPanel::DoClicked_Button(int button)
+void CButtonPanel::DoClicked_Button(const int button)
 {
-	CurrentButtonLevel = wyrmgus::button_level::try_get(CurrentButtons[button]->ValueStr);
+	CurrentButtonLevel = button_level::try_get(CurrentButtons[button]->ValueStr);
 	LastDrawnButtonPopup = nullptr;
 	UI.ButtonPanel.Update();
 }

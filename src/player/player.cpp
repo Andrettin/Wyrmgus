@@ -1419,11 +1419,7 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 		if (this->get_faction_tier() == faction_tier::none) {
 			this->set_faction_tier(faction->get_default_tier());
 		} else {
-			if (this->get_faction_tier() < faction->get_min_tier()) {
-				this->set_faction_tier(faction->get_min_tier());
-			} else if (this->get_faction_tier() > faction->get_max_tier()) {
-				this->set_faction_tier(faction->get_max_tier());
-			}
+			this->set_faction_tier(faction->get_nearest_valid_tier(this->get_faction_tier()));
 		}
 
 		if (this->get_government_type() == government_type::none) {

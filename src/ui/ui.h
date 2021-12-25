@@ -234,7 +234,7 @@ private:
 	void DoClicked_Return(const Qt::KeyboardModifiers key_modifiers);
 	void DoClicked_Stop();
 	void DoClicked_StandGround(const Qt::KeyboardModifiers key_modifiers);
-	void DoClicked_Button(int button);
+	void DoClicked_Button(const int button);
 	void DoClicked_CancelUpgrade();
 	void DoClicked_CancelTrain();
 	void DoClicked_CancelBuild();
