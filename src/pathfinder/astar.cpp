@@ -909,11 +909,11 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 /**
 **  Find path.
 */
-int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
-				  int tilesizex, int tilesizey, int minrange, int maxrange,
+int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, const int gh,
+				  const int tilesizex, const int tilesizey, const int minrange, const int maxrange,
 				  //Wyrmgus start
 //				  std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit)
-                  std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int max_length, int z)
+                  std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, const int max_length, const int z)
 				  //Wyrmgus end
 {
 	assert_throw(CMap::get()->Info->IsPointOnMap(startPos, z));

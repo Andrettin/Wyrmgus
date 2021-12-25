@@ -255,17 +255,16 @@ void FreePathfinder()
 **  Can the unit 'src' reach the place goalPos.
 **
 **  @param src       Unit for the path.
-**  @param goalPos   Map tile position.
-**  @param w         Width of Goal
-**  @param h         Height of Goal
+**  @param goal_pos  Map tile position.
+**  @param goal_size Size of Goal
 **  @param minrange  min range to the tile
 **  @param range     Range to the tile.
 **
 **  @return          Distance to place.
 */
 //Wyrmgus start
-//int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
-int PlaceReachable(const CUnit &src, const Vec2i &goalPos, const int w, const int h, const int minrange, const int range, const int max_length, const int z, const bool from_outside_container)
+//int PlaceReachable(const CUnit &src, const QPoint &goal_pos, const QSize &goal_size, const int min_range, const int range)
+int PlaceReachable(const CUnit &src, const QPoint &goal_pos, const QSize &goal_size, const int min_range, const int range, const int max_length, const int z, const bool from_outside_container)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -275,7 +274,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, const int w, const in
 	//Wyrmgus end
 
 	if (range <= 1) {
-		const tile *dst_tile = CMap::get()->Field(goalPos, z);
+		const tile *dst_tile = CMap::get()->Field(goal_pos, z);
 
 		switch (src.Type->get_domain()) {
 			case unit_domain::land:
@@ -302,12 +301,12 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, const int w, const in
 				break;
 		}
 	}
-	
+
 	int i = PF_FAILED;
 	if (!src.Container || !from_outside_container) {
-		i = AStarFindPath(src.tilePos, goalPos, w, h,
-						  src.Type->get_tile_width(), src.Type->get_tile_height(),
-						  minrange, range, nullptr, src, max_length, z);
+		i = AStarFindPath(src.tilePos, goal_pos, goal_size.width(), goal_size.height(),
+			src.Type->get_tile_width(), src.Type->get_tile_height(),
+			min_range, range, nullptr, src, max_length, z);
 	} else {
 		const Vec2i offset(1, 1);
 		const Vec2i extra_tile_size(src.Container->Type->get_tile_size() - QSize(1, 1));
@@ -327,17 +326,16 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, const int w, const in
 					continue;
 				}
 
-				temp_i = AStarFindPath(it, goalPos, w, h,
-						  src.Type->get_tile_width(), src.Type->get_tile_height(),
-						  minrange, range, nullptr, src, max_length, z);
-						  
+				temp_i = AStarFindPath(it, goal_pos, goal_size.width(), goal_size.height(),
+					src.Type->get_tile_width(), src.Type->get_tile_height(),
+					min_range, range, nullptr, src, max_length, z);
+
 				if (temp_i > i && i < PF_REACHED) {
 					i = temp_i;
 				}
 			}
 		}
 	}
-
 	switch (i) {
 		case PF_FAILED:
 		case PF_UNREACHABLE:
@@ -345,7 +343,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, const int w, const in
 			break;
 		case PF_REACHED:
 			/* since most of this function usage check return value as bool
-			 * then reached state should be track as true value */
+			 * then reached state should be tracked as true value */
 			i = 1;
 			break;
 		case PF_WAIT:
@@ -371,8 +369,8 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, const int w, const in
 **  @return       Distance to place.
 */
 //Wyrmgus start
-//int UnitReachable(const CUnit &src, const CUnit &dst, int range)
-int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length, bool from_outside_container)
+//int UnitReachable(const CUnit &src, const CUnit &dst, const int range)
+int UnitReachable(const CUnit &src, const CUnit &dst, const int range, const int max_length, const bool from_outside_container)
 //Wyrmgus end
 {
 	//  Find a path to the goal.
@@ -382,9 +380,10 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 
 	const int depth = PlaceReachable(src, dst.tilePos,
 									 //Wyrmgus start
-//									 dst.Type->get_tile_width(), dst.Type->get_tile_height(), 0, range);
-									 dst.Type->get_tile_width(), dst.Type->get_tile_height(), 0, range, max_length, dst.MapLayer->ID, from_outside_container);
+//									 dst.Type->get_tile_size(), 0, range);
+									 dst.Type->get_tile_size(), 0, range, max_length, dst.MapLayer->ID, from_outside_container);
 									 //Wyrmgus end
+
 	if (depth <= 0) {
 		return 0;
 	}

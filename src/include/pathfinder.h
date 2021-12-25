@@ -220,14 +220,15 @@ extern void FreePathfinder();
 extern int NextPathElement(CUnit &unit, int &xdp, int &ydp);
 /// Return distance to unit.
 //Wyrmgus start
-//extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);
-extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range, int max_length = 0, bool from_outside_container = false);
+//extern int UnitReachable(const CUnit &unit, const CUnit &dst, const int range);
+extern int UnitReachable(const CUnit &unit, const CUnit &dst, const int range, const int max_length = 0, const bool from_outside_container = false);
 //Wyrmgus end
+
 /// Can the unit 'src' reach the place x,y
-extern int PlaceReachable(const CUnit &src, const Vec2i &pos, const int w, const int h,
+extern int PlaceReachable(const CUnit &src, const QPoint &goal_pos, const QSize &goal_size,
 						  //Wyrmgus start
-//						  int minrange, int maxrange);
-						  const int minrange, const int maxrange, const int max_length, const int z, const bool from_outside_container = false);
+//						  const int min_range, const int max_range);
+						  const int min_range, const int max_range, const int max_length, const int z, const bool from_outside_container = false);
 						  //Wyrmgus end
 
 // in astar.cpp
@@ -243,11 +244,11 @@ extern int GetAStarUnknownTerrainCost();
 
 //Wyrmgus start
 /// Find and a* path for a unit
-extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
-						 int tilesizex, int tilesizey, int minrange,
+extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, const int gh,
+						 const int tilesizex, const int tilesizey, const int minrange,
 						 //Wyrmgus start
-//						 int maxrange, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit);
-						 int maxrange, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int max_length, int z);
+//						 const int maxrange, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit);
+						 const int maxrange, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, const int max_length, const int z);
 						 //Wyrmgus end
 //Wyrmgus end
 

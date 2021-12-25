@@ -1459,12 +1459,12 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 */
 void AiCanNotMove(CUnit &unit)
 {
-	const Vec2i &goalPos = unit.pathFinderData->input.GetGoalPos();
-	const int gw = unit.pathFinderData->input.GetGoalSize().x;
+	const Vec2i &goal_pos = unit.pathFinderData->input.GetGoalPos();
+	const Vec2i &goal_size = unit.pathFinderData->input.GetGoalSize();
 	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 
 	AiPlayer = unit.Player->Ai.get();
-	if (PlaceReachable(unit, goalPos, gw, gh, 0, MaxMapWidth - 1, 0, unit.MapLayer->ID)) {
+	if (PlaceReachable(unit, goal_pos, goal_size, 0, MaxMapWidth - 1, 0, unit.MapLayer->ID)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 		//Wyrmgus start
