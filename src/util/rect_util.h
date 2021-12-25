@@ -63,6 +63,33 @@ inline void for_each_edge_point(const QRect &rect, const function_type &function
 }
 
 template <typename function_type>
+inline void for_each_edge_point_until(const QRect &rect, const function_type &function)
+{
+	const QPoint min_pos = rect.topLeft();
+	const QPoint max_pos = rect.bottomRight();
+
+	for (int x = min_pos.x(); x <= max_pos.x(); ++x) {
+		if (function(QPoint(x, min_pos.y())) == true) {
+			return;
+		}
+
+		if (function(QPoint(x, max_pos.y())) == true) {
+			return;
+		}
+	}
+
+	for (int y = min_pos.y() + 1; y < max_pos.y(); ++y) {
+		if (function(QPoint(min_pos.x(), y)) == true) {
+			return;
+		}
+
+		if (function(QPoint(max_pos.x(), y)) == true) {
+			return;
+		}
+	}
+}
+
+template <typename function_type>
 inline std::vector<QPoint> find_points_if(const QRect &rect, const function_type &function)
 {
 	std::vector<QPoint> points;

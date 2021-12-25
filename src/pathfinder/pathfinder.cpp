@@ -43,6 +43,7 @@
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
 #include "util/log_util.h"
+#include "util/rect_util.h"
 #include "util/size_util.h"
 
 //astar.cpp
@@ -303,39 +304,48 @@ int PlaceReachable(const CUnit &src, const QPoint &goal_pos, const QSize &goal_s
 	}
 
 	int i = PF_FAILED;
+
 	if (!src.Container || !from_outside_container) {
 		i = AStarFindPath(src.tilePos, goal_pos, goal_size.width(), goal_size.height(),
 			src.Type->get_tile_width(), src.Type->get_tile_height(),
 			min_range, range, nullptr, src, max_length, z);
 	} else {
-		const Vec2i offset(1, 1);
-		const Vec2i extra_tile_size(src.Container->Type->get_tile_size() - QSize(1, 1));
-		const Vec2i start_pos = src.Container->tilePos - offset;
-		const Vec2i end_pos = src.Container->tilePos + extra_tile_size + offset;
-		const Vec2i pos_diff = end_pos - start_pos;
+		const CUnit *first_container = src.GetFirstContainer();
 
-		int temp_i = PF_FAILED;
-		for (Vec2i it = start_pos; it.y <= end_pos.y; it.y += pos_diff.y) {
-			for (it.x = start_pos.x; it.x <= end_pos.x; it.x += pos_diff.x) {
-				if (!CMap::get()->Info->IsPointOnMap(it, src.Container->MapLayer)) {
-					continue;
-				}
+		const QPoint offset(1, 1);
 
-				if (!CanMoveToMask(it, src.Type->MovementMask, z)) {
-					//ignore tiles to which the unit cannot be dropped from its container
-					continue;
-				}
+		QRect container_rect = first_container->get_tile_rect();
+		container_rect.setTopLeft(container_rect.topLeft() - offset);
+		container_rect.setBottomRight(container_rect.bottomRight() + offset);
 
-				temp_i = AStarFindPath(it, goal_pos, goal_size.width(), goal_size.height(),
-					src.Type->get_tile_width(), src.Type->get_tile_height(),
-					min_range, range, nullptr, src, max_length, z);
-
-				if (temp_i > i && i < PF_REACHED) {
-					i = temp_i;
-				}
+		rect::for_each_edge_point_until(container_rect, [&](const QPoint &tile_pos) {
+			if (!CMap::get()->Info->IsPointOnMap(tile_pos, first_container->MapLayer)) {
+				return false;
 			}
-		}
+
+			if (!CanMoveToMask(tile_pos, src.Type->MovementMask, z)) {
+				//ignore tiles to which the unit cannot be dropped from its container
+				return false;
+			}
+
+			const int temp_i = AStarFindPath(tile_pos, goal_pos, goal_size.width(), goal_size.height(),
+				src.Type->get_tile_width(), src.Type->get_tile_height(),
+				min_range, range, nullptr, src, max_length, z);
+
+			switch (temp_i) {
+				case PF_FAILED:
+				case PF_UNREACHABLE:
+				case PF_WAIT:
+					return false;
+				default:
+					break;
+			}
+
+			i = temp_i;
+			return true;
+		});
 	}
+
 	switch (i) {
 		case PF_FAILED:
 		case PF_UNREACHABLE:
