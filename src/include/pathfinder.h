@@ -60,7 +60,7 @@ enum _move_return_ {
 	PF_MOVE = 1           /// On the way moving
 };
 
-class PathFinderInput
+class PathFinderInput final
 {
 public:
 	PathFinderInput();
@@ -93,16 +93,16 @@ public:
 	void Load(lua_State *l);
 
 private:
-	CUnit *unit;
+	CUnit *unit = nullptr;
 	Vec2i unitSize;
 	Vec2i goalPos;
 	Vec2i goalSize;
-	int minRange;
-	int maxRange;
+	int minRange = 0;
+	int maxRange = 0;
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
-	bool isRecalculatePathNeeded;
+	bool isRecalculatePathNeeded = true;
 };
 
 class PathFinderOutput final

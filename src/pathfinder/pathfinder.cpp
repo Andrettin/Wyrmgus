@@ -405,11 +405,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, const int range, const int
 --  REAL PATH-FINDER
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-//PathFinderInput::PathFinderInput() : unit(nullptr), minRange(0), maxRange(0),
-PathFinderInput::PathFinderInput() : unit(nullptr), minRange(0), maxRange(0), MapLayer(0),
-//Wyrmgus end
-	isRecalculatePathNeeded(true)
+PathFinderInput::PathFinderInput()
 {
 	unitSize.x = 0;
 	unitSize.y = 0;

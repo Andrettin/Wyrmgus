@@ -248,8 +248,8 @@ static void AStarRemoveMinimum(const int pos, const int z)
 **  @return  0 or PF_FAILED
 */
 //Wyrmgus start
-//static inline int AStarAddNode(const Vec2i &pos, const int o, const int costs)
-static inline int AStarAddNode(const Vec2i &pos, const int o, const int costs, const int z)
+//static int AStarAddNode(const Vec2i &pos, const int o, const int costs)
+static int AStarAddNode(const Vec2i &pos, const int o, const int costs, const int z)
 //Wyrmgus end
 {
 	int bigi = 0;
