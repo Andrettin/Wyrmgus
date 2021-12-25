@@ -56,7 +56,7 @@ public:
 	{
 		Q_UNUSED(indent)
 
-		return "Belongs to the " + condition::get_object_string(this->civilization, links_allowed) + " civilization";
+		return condition::get_object_string(this->civilization, links_allowed) + " civilization";
 	}
 
 private:

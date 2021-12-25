@@ -62,7 +62,7 @@ public:
 		Q_UNUSED(indent)
 		Q_UNUSED(links_allowed)
 
-		return "Belongs to the " + string::highlight(this->group->get_name()) + " civilization group";
+		return string::highlight(this->group->get_name()) + " civilization group";
 	}
 
 private:

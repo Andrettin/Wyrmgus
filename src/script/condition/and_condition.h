@@ -57,7 +57,7 @@ public:
 		std::string str;
 
 		if (add_own_string) {
-			str += "All of these must be true:";
+			str += "All of:";
 		}
 
 		str += "\n";

@@ -51,7 +51,7 @@ public:
 	{
 		Q_UNUSED(indent)
 
-		return "Is the " + condition::get_object_string(this->faction, links_allowed) + " faction";
+		return condition::get_object_string(this->faction, links_allowed) + " faction";
 	}
 
 private:

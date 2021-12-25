@@ -97,7 +97,7 @@ public:
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
-		std::string str = "None of these must be true:\n";
+		std::string str = "None of:\n";
 		str += condition::get_conditions_string(this->conditions, indent + 1, links_allowed);
 		return str;
 	}

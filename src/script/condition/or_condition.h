@@ -100,7 +100,7 @@ public:
 			return this->conditions.front()->get_string(indent, links_allowed);
 		}
 
-		std::string str = "One of these must be true:\n";
+		std::string str = "One of:\n";
 		str += condition::get_conditions_string(this->conditions, indent + 1, links_allowed);
 		return str;
 	}
