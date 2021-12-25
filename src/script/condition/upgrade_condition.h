@@ -75,7 +75,7 @@ public:
 	{
 		Q_UNUSED(indent)
 
-		return "Has the " + condition::get_object_string(this->upgrade, links_allowed) + " upgrade";
+		return condition::get_object_string(this->upgrade, links_allowed) + " upgrade";
 	}
 
 private:

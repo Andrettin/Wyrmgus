@@ -317,6 +317,8 @@ public:
 		return this->conditions;
 	}
 
+	std::string get_requirements_string() const;
+
 	const std::vector<const dynasty *> &get_dynasties() const
 	{
 		return this->dynasties;

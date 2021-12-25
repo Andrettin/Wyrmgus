@@ -48,6 +48,24 @@ public:
 	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units = false) const override;
 	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units = false) const override;
 
+	std::string get_string(const size_t indent, const bool links_allowed, const bool add_own_string) const
+	{
+		if (this->conditions.size() == 1) {
+			return this->conditions.front()->get_string(indent, links_allowed);
+		}
+
+		std::string str;
+
+		if (add_own_string) {
+			str += "All of these must be true:";
+		}
+
+		str += "\n";
+		str += this->get_conditions_string(indent + 1, links_allowed);
+
+		return str;
+	}
+
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		if (this->conditions.size() == 1) {

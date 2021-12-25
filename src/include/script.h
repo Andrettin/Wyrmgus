@@ -165,6 +165,7 @@ enum EString {
 	EString_UpgradeMaxLimit,	/// Upgrade's max limit
 	EString_FactionCivilization,	/// Faction's civilization
 	EString_FactionType,		/// Faction's type
+	EString_FactionRequirementsString,
 	EString_FactionCoreSettlements,	/// Core settlements of the faction
 	EString_ResourceIdent,	/// Resource's ident
 	EString_ResourceName,	/// Resource's name

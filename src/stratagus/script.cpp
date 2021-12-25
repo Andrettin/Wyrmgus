@@ -74,6 +74,7 @@
 #include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/number_util.h"
+#include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
@@ -1240,6 +1241,9 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "FactionType")) {
 			res->e = EString_FactionType;
 			res->D.Faction = CclParseFactionDesc(l);
+		} else if (!strcmp(key, "FactionRequirementsString")) {
+			res->e = EString_FactionRequirementsString;
+			res->D.Faction = CclParseFactionDesc(l);
 		} else if (!strcmp(key, "FactionCoreSettlements")) {
 			res->e = EString_FactionCoreSettlements;
 			res->D.Faction = CclParseFactionDesc(l);
@@ -1775,8 +1779,9 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string();
 			}
-		case EString_UpgradeRequirementsString : // upgrade's effects string
+		case EString_UpgradeRequirementsString:
 			upgrade = s->D.Upgrade;
+
 			if (upgrade != nullptr) {
 				return (**upgrade).get_requirements_string();
 			} else { // ERROR.
@@ -1803,6 +1808,14 @@ std::string EvalString(const StringDesc *s)
 			if (faction != nullptr) {
 				return IdentToName(wyrmgus::faction_type_to_string((**faction).get_type()));
 			} else {
+				return std::string();
+			}
+		case EString_FactionRequirementsString:
+			faction = s->D.Faction;
+
+			if (faction != nullptr) {
+				return string::dehighlight((**faction).get_requirements_string());
+			} else { // ERROR.
 				return std::string();
 			}
 		case EString_FactionCoreSettlements : // the faction's core settlements
@@ -2749,6 +2762,11 @@ static int CclFactionType(lua_State *l)
 	return Alias(l, "FactionType");
 }
 
+static int CclFactionRequirementsString(lua_State *l)
+{
+	return Alias(l, "FactionRequirementsString");
+}
+
 /**
 **  Return equivalent lua table for FactionCoreSettlements.
 **  {"FactionCoreSettlements", {}}
@@ -3036,6 +3054,7 @@ static void AliasRegister()
 	lua_register(Lua, "UpgradeMaxLimit", CclUpgradeMaxLimit);
 	lua_register(Lua, "FactionCivilization", CclFactionCivilization);
 	lua_register(Lua, "FactionType", CclFactionType);
+	lua_register(Lua, "FactionRequirementsString", CclFactionRequirementsString);
 	lua_register(Lua, "FactionCoreSettlements", CclFactionCoreSettlements);
 	lua_register(Lua, "ButtonPlayer", CclButtonPlayer);
 	lua_register(Lua, "ResourceIdent", CclResourceIdent);

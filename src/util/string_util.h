@@ -322,6 +322,14 @@ inline std::string highlight(const std::string &str)
 	return "~<" + str + "~>";
 }
 
+inline std::string dehighlight(const std::string &str)
+{
+	std::string result = str;
+	string::replace(result, "~<", "");
+	string::replace(result, "~>", "");
+	return result;
+}
+
 }
 
 Q_DECLARE_METATYPE(std::string)

@@ -561,6 +561,25 @@ const std::vector<CFiller> &faction::get_ui_fillers() const
 	return this->get_civilization()->get_ui_fillers();
 }
 
+std::string faction::get_requirements_string() const
+{
+	if (this->get_upgrade() != nullptr) {
+		if (!this->get_upgrade()->get_requirements_string().empty()) {
+			return this->get_upgrade()->get_requirements_string();
+		}
+
+		if (this->get_upgrade()->get_conditions() != nullptr) {
+			return this->get_upgrade()->get_conditions()->get_string(0, false, false);
+		}
+	}
+
+	if (this->get_conditions() != nullptr) {
+		return this->get_conditions()->get_string(0, false, false);
+	}
+
+	return std::string();
+}
+
 void faction::remove_dynasty(const wyrmgus::dynasty *dynasty)
 {
 	vector::remove(this->dynasties, dynasty);

@@ -439,7 +439,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (wyrmgus::game::get()->get_current_campaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button.Value]->get_core_settlements().size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (game::get()->get_current_campaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button.Value]->get_core_settlements().size() > 0)) {
 			return false;
 		}
 	}
@@ -484,7 +484,33 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::TrainClass || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::BuildClass || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::UpgradeToClass || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty) && !upgrade->get_requirements_string().empty())))) {
+		bool has_requirements_string = !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer();
+
+		switch (button.Action) {
+			case ButtonCmd::Train:
+			case ButtonCmd::TrainClass:
+			case ButtonCmd::Build:
+			case ButtonCmd::BuildClass:
+			case ButtonCmd::UpgradeTo:
+			case ButtonCmd::UpgradeToClass:
+			case ButtonCmd::Buy:
+				has_requirements_string = has_requirements_string && type != nullptr && !type->RequirementsString.empty();
+				break;
+			case ButtonCmd::Research:
+			case ButtonCmd::ResearchClass:
+			case ButtonCmd::LearnAbility:
+			case ButtonCmd::Dynasty:
+				has_requirements_string = has_requirements_string && upgrade != nullptr && (!upgrade->get_requirements_string().empty() || upgrade->get_conditions() != nullptr);
+				break;
+			case ButtonCmd::Faction:
+				has_requirements_string = has_requirements_string && button.Value != -1 && !CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button.Value]->get_requirements_string().empty();
+				break;
+			default:
+				has_requirements_string = false;
+				break;
+		}
+
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ has_requirements_string) {
 			return false;
 		}
 	}

@@ -99,7 +99,7 @@ public:
 		Q_UNUSED(indent)
 		Q_UNUSED(links_allowed)
 
-		return "Has an upgrade of the " + string::highlight(this->upgrade_class->get_name()) + " upgrade class";
+		return string::highlight(this->upgrade_class->get_name()) + " upgrade class";
 	}
 
 private:
