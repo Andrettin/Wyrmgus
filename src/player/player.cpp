@@ -1694,60 +1694,61 @@ CCurrency *CPlayer::GetCurrency() const
 	return nullptr;
 }
 
-void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
+void CPlayer::share_upgrade_progress(CPlayer &other_player, CUnit &unit)
 {
-	std::vector<const CUpgrade *> upgrade_list = this->GetResearchableUpgrades();
+	const std::vector<const CUpgrade *> upgrade_list = this->GetResearchableUpgrades();
+
 	std::vector<const CUpgrade *> potential_upgrades;
 
-	for (size_t i = 0; i < upgrade_list.size(); ++i) {
-		if (this->Allow.Upgrades[upgrade_list[i]->ID] != 'R') {
+	for (const CUpgrade *upgrade : upgrade_list) {
+		if (this->Allow.Upgrades[upgrade->ID] != 'R') {
 			continue;
 		}
 		
-		if (upgrade_list[i]->get_upgrade_class() == nullptr) {
+		if (upgrade->get_upgrade_class() == nullptr) {
 			continue;
 		}
 
-		if (player.get_faction() == nullptr) {
+		if (other_player.get_faction() == nullptr) {
 			continue;
 		}
 		
-		const CUpgrade *upgrade = player.get_faction()->get_class_upgrade(upgrade_list[i]->get_upgrade_class());
-		if (upgrade == nullptr) {
+		const CUpgrade *other_upgrade = other_player.get_faction()->get_class_upgrade(upgrade->get_upgrade_class());
+		if (other_upgrade == nullptr) {
 			continue;
 		}
 		
-		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !check_conditions(upgrade, &player)) {
+		if (other_player.Allow.Upgrades[other_upgrade->ID] != 'A' || !check_conditions(other_upgrade, &other_player)) {
 			continue;
 		}
 		
-		if (player.UpgradeRemovesExistingUpgrade(upgrade, player.AiEnabled)) {
+		if (other_player.UpgradeRemovesExistingUpgrade(other_upgrade, other_player.AiEnabled)) {
 			continue;
 		}
 		
-		potential_upgrades.push_back(upgrade);
+		potential_upgrades.push_back(other_upgrade);
 	}
 	
-	if (potential_upgrades.size() > 0) {
-		const CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
+	if (!potential_upgrades.empty()) {
+		const CUpgrade *chosen_upgrade = vector::get_random(potential_upgrades);
 		
 		if (!chosen_upgrade->get_name().empty()) {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->get_name().c_str(), this->get_name().c_str());
+			other_player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->get_name().c_str(), this->get_name().c_str());
 		}
 
-		if (&player == CPlayer::GetThisPlayer() && player.get_civilization() != nullptr) {
-			const wyrmgus::sound *sound = player.get_civilization()->get_research_complete_sound();
+		if (&other_player == CPlayer::GetThisPlayer() && other_player.get_civilization() != nullptr) {
+			const sound *sound = other_player.get_civilization()->get_research_complete_sound();
 
 			if (sound != nullptr) {
 				PlayGameSound(sound, MaxSampleVolume);
 			}
 		}
 
-		if (player.AiEnabled) {
+		if (other_player.AiEnabled) {
 			AiResearchComplete(unit, chosen_upgrade);
 		}
 
-		player.acquire_upgrade(chosen_upgrade);
+		other_player.acquire_upgrade(chosen_upgrade);
 	}
 }
 

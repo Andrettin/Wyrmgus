@@ -1029,8 +1029,9 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 		return;
 	}
 	
-	if (unit.Player->get_index() != player) { //if the player "training" the unit isn't the same one that owns the trainer building, then make the former share some technological progress with the latter
-		CPlayer::Players[player]->ShareUpgradeProgress(*unit.Player, unit);
+	if (unit.Player->get_index() != player) {
+		//if the player "training" the unit isn't the same one that owns the trainer building, then make the former share some technological progress with the latter
+		CPlayer::Players[player]->share_upgrade_progress(*unit.Player, unit);
 	}
 
 	if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order

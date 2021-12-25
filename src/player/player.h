@@ -274,7 +274,7 @@ public:
 		return this->quest_objectives;
 	}
 
-	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
+	void share_upgrade_progress(CPlayer &other_player, CUnit &unit);
 	int get_player_color_usage_count(const wyrmgus::player_color *player_color) const;
 	void update_territory_tiles();
 
