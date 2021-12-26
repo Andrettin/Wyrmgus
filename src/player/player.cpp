@@ -3699,8 +3699,8 @@ int CPlayer::get_effective_resource_demand(const resource *resource) const
 		resource_demand /= this->get_price(resource);
 	}
 	
-	if (resource->DemandElasticity != 100) {
-		resource_demand = this->get_resource_demand(resource) + ((resource_demand - this->get_resource_demand(resource)) * resource->DemandElasticity / 100);
+	if (resource->get_demand_elasticity() != 100) {
+		resource_demand = this->get_resource_demand(resource) + ((resource_demand - this->get_resource_demand(resource)) * resource->get_demand_elasticity() / 100);
 	}
 	
 	resource_demand = std::max(resource_demand, 0);

@@ -89,6 +89,7 @@ class resource final : public named_data_entry, public data_type<resource>
 	Q_PROPERTY(wyrmgus::resource* final_resource MEMBER final_resource)
 	Q_PROPERTY(int final_resource_conversion_rate MEMBER final_resource_conversion_rate READ get_final_resource_conversion_rate)
 	Q_PROPERTY(int base_price MEMBER base_price READ get_base_price)
+	Q_PROPERTY(int demand_elasticity MEMBER demand_elasticity READ get_demand_elasticity)
 	Q_PROPERTY(wyrmgus::resource* input_resource MEMBER input_resource)
 	Q_PROPERTY(bool luxury MEMBER luxury READ is_luxury)
 	Q_PROPERTY(bool special MEMBER special READ is_special)
@@ -167,6 +168,11 @@ public:
 		return this->base_price;
 	}
 
+	int get_demand_elasticity() const
+	{
+		return this->demand_elasticity;
+	}
+
 	bool IsMineResource() const;
 
 	const resource *get_input_resource() const
@@ -202,9 +208,7 @@ private:
 	resource *final_resource = nullptr;
 	int final_resource_conversion_rate = 100;
 	int base_price = 0;
-public:
-	int DemandElasticity = 100;
-private:
+	int demand_elasticity = 100;
 	resource *input_resource = nullptr;
 	bool luxury = false;
 	bool special = false; //whether this is a special resource, i.e. whether it should not be shown among the main resources

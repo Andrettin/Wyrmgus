@@ -2111,7 +2111,7 @@ static int CclDefineResource(lua_State *l)
 		} else if (!strcmp(value, "BasePrice")) {
 			resource->base_price = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DemandElasticity")) {
-			resource->DemandElasticity = LuaToNumber(l, -1);
+			resource->demand_elasticity = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "InputResource")) {
 			const std::string input_resource_ident = LuaToString(l, -1);
 			wyrmgus::resource *input_resource = resource::get(input_resource_ident);
