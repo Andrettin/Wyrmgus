@@ -178,6 +178,7 @@ public:
 
 	void set_name(const std::string &name);
 	void update_name_from_faction();
+	bool uses_definite_article() const;
 
 	//Wyrmgus start
 	const wyrmgus::civilization *get_civilization() const;

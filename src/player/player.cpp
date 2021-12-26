@@ -1308,6 +1308,19 @@ void CPlayer::update_name_from_faction()
 	this->set_name(this->get_faction()->get_name(this->get_government_type(), this->get_faction_tier()));
 }
 
+bool CPlayer::uses_definite_article() const
+{
+	if (game::get()->is_multiplayer()) {
+		return false;
+	}
+
+	if (this->get_faction() == nullptr) {
+		return false;
+	}
+
+	return this->get_faction()->uses_definite_article(this->get_government_type());
+}
+
 const wyrmgus::civilization *CPlayer::get_civilization() const
 {
 	if (this->Race != -1) {
@@ -1751,7 +1764,13 @@ void CPlayer::share_upgrade_progress(CPlayer &other_player, CUnit &unit)
 		const CUpgrade *chosen_upgrade = vector::get_random(potential_upgrades);
 		
 		if (!chosen_upgrade->get_name().empty()) {
-			other_player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->get_name().c_str(), this->get_name().c_str());
+			std::string message = chosen_upgrade->get_name() + " acquired through contact with ";
+			if (this->uses_definite_article()) {
+				message += "the ";
+			}
+			message += this->get_name();
+
+			other_player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, message.c_str());
 		}
 
 		if (&other_player == CPlayer::GetThisPlayer() && other_player.get_civilization() != nullptr) {
@@ -4520,7 +4539,13 @@ void CPlayer::set_neutral_diplomatic_stance_with(const CPlayer *player)
 	emit diplomatic_stances_changed();
 
 	if (GameCycle > 0 && player == CPlayer::GetThisPlayer()) {
-		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to neutral"), _(this->get_name().c_str()));
+		std::string message;
+		if (this->uses_definite_article()) {
+			message += "The ";
+		}
+		message += this->get_name() + " changed their diplomatic stance with us to neutral";
+
+		CPlayer::GetThisPlayer()->Notify(message.c_str());
 	}
 }
 
@@ -4544,7 +4569,13 @@ void CPlayer::set_allied_diplomatic_stance_with(const CPlayer *player)
 	emit diplomatic_stances_changed();
 
 	if (GameCycle > 0 && player == CPlayer::GetThisPlayer()) {
-		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to allied"), _(this->get_name().c_str()));
+		std::string message;
+		if (this->uses_definite_article()) {
+			message += "The ";
+		}
+		message += this->get_name() + " changed their diplomatic stance with us to allied";
+
+		CPlayer::GetThisPlayer()->Notify(message.c_str());
 	}
 }
 
@@ -4571,9 +4602,21 @@ void CPlayer::set_enemy_diplomatic_stance_with(CPlayer *player)
 
 	if (GameCycle > 0) {
 		if (player == CPlayer::GetThisPlayer()) {
-			CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to enemy"), _(this->get_name().c_str()));
+			std::string message;
+			if (this->uses_definite_article()) {
+				message += "The ";
+			}
+			message += this->get_name() + " changed their diplomatic stance with us to enemy";
+
+			CPlayer::GetThisPlayer()->Notify(message.c_str());
 		} else if (this == CPlayer::GetThisPlayer()) {
-			CPlayer::GetThisPlayer()->Notify(_("We have changed our diplomatic stance with %s to enemy"), _(player->get_name().c_str()));
+			std::string message = "We have changed our diplomatic stance with ";
+			if (player->uses_definite_article()) {
+				message += "the ";
+			}
+			message += player->get_name() + " to enemy";
+
+			CPlayer::GetThisPlayer()->Notify(message.c_str());
 		}
 	}
 
@@ -4633,7 +4676,13 @@ void CPlayer::set_shared_vision_with(CPlayer *player, const bool shared_vision)
 		}
 
 		if (GameCycle > 0 && player == CPlayer::GetThisPlayer()) {
-			CPlayer::GetThisPlayer()->Notify(_("%s is now sharing vision with us"), _(this->get_name().c_str()));
+			std::string message;
+			if (this->uses_definite_article()) {
+				message += "The ";
+			}
+			message += this->get_name() + " is now sharing vision with us";
+
+			CPlayer::GetThisPlayer()->Notify(message.c_str());
 		}
 	} else {
 		this->shared_vision.erase(player->get_index());
@@ -4644,7 +4693,13 @@ void CPlayer::set_shared_vision_with(CPlayer *player, const bool shared_vision)
 		}
 
 		if (GameCycle > 0 && player == CPlayer::GetThisPlayer()) {
-			CPlayer::GetThisPlayer()->Notify(_("%s is no longer sharing vision with us"), _(this->get_name().c_str()));
+			std::string message;
+			if (this->uses_definite_article()) {
+				message += "The ";
+			}
+			message += this->get_name() + " is no longer sharing vision with us";
+
+			CPlayer::GetThisPlayer()->Notify(message.c_str());
 		}
 	}
 
