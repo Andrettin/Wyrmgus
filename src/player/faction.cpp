@@ -180,6 +180,12 @@ void faction::process_sml_scope(const sml_data &scope)
 		auto conditions = std::make_unique<and_condition>();
 		database::process_sml_data(conditions, scope);
 		this->conditions = std::move(conditions);
+	} else if (tag == "force_templates") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			auto force_template = std::make_unique<ai_force_template>();
+			database::process_sml_data(force_template, child_scope);
+			this->ai_force_templates[force_template->get_force_type()].push_back(std::move(force_template));
+		});
 	} else if (tag == "unit_class_names") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
