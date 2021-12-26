@@ -128,6 +128,7 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<player_color>("", 1);
 		qmlRegisterAnonymousType<preferences>("", 1);
 		qmlRegisterAnonymousType<quest>("", 1);
+		qmlRegisterAnonymousType<resource>("", 1);
 		qmlRegisterAnonymousType<results_info>("", 1);
 		qmlRegisterAnonymousType<timeline>("", 1);
 		qmlRegisterAnonymousType<unit_type>("", 1);
@@ -149,6 +150,7 @@ int main(int argc, char **argv)
 		qmlRegisterType<player_color>();
 		qmlRegisterType<preferences>();
 		qmlRegisterType<quest>();
+		qmlRegisterType<resource>();
 		qmlRegisterType<results_info>();
 		qmlRegisterType<timeline>();
 		qmlRegisterType<unit_type>();

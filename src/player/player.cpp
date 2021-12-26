@@ -3432,6 +3432,44 @@ bool CPlayer::at_war() const
 	return false;
 }
 
+void CPlayer::set_resource(const resource *resource, const int quantity)
+{
+	std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+	if (this == CPlayer::GetThisPlayer()) {
+		lock = std::unique_lock<std::shared_mutex>(this->mutex);
+	}
+
+	if (quantity <= 0) {
+		if (this->resources.contains(resource)) {
+			this->resources.erase(resource);
+		}
+	} else {
+		this->resources[resource] = quantity;
+	}
+
+	emit resource_stored_changed(resource->get_index(), this->get_resource(resource, resource_storage_type::both));
+}
+
+void CPlayer::set_stored_resource(const resource *resource, const int quantity)
+{
+	std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+	if (this == CPlayer::GetThisPlayer()) {
+		lock = std::unique_lock<std::shared_mutex>(this->mutex);
+	}
+
+	if (quantity == 0) {
+		if (this->stored_resources.contains(resource)) {
+			this->stored_resources.erase(resource);
+		}
+	} else {
+		this->stored_resources[resource] = quantity;
+	}
+
+	emit resource_stored_changed(resource->get_index(), this->get_resource(resource, resource_storage_type::both));
+}
+
 std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const
 {
 	return Units.begin();
@@ -3477,6 +3515,13 @@ int CPlayer::get_resource(const wyrmgus::resource *resource, const resource_stor
 			DebugPrint("Wrong resource type\n");
 			return -1;
 	}
+}
+
+int CPlayer::get_resource_sync(resource *resource) const
+{
+	std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+	return this->get_resource(resource, resource_storage_type::both);
 }
 
 /**

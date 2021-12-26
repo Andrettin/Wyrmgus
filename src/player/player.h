@@ -405,16 +405,7 @@ public:
 		return 0;
 	}
 
-	void set_resource(const resource *resource, const int quantity)
-	{
-		if (quantity <= 0) {
-			if (this->resources.contains(resource)) {
-				this->resources.erase(resource);
-			}
-		} else {
-			this->resources[resource] = quantity;
-		}
-	}
+	void set_resource(const resource *resource, const int quantity);
 
 	void change_resource(const resource *resource, const int quantity)
 	{
@@ -481,16 +472,7 @@ public:
 		return 0;
 	}
 
-	void set_stored_resource(const resource *resource, const int quantity)
-	{
-		if (quantity == 0) {
-			if (this->stored_resources.contains(resource)) {
-				this->stored_resources.erase(resource);
-			}
-		} else {
-			this->stored_resources[resource] = quantity;
-		}
-	}
+	void set_stored_resource(const resource *resource, const int quantity);
 
 	void change_stored_resource(const resource *resource, const int quantity)
 	{
@@ -796,6 +778,8 @@ public:
 
 	/// Get a resource of the player
 	int get_resource(const wyrmgus::resource *resource, const resource_storage_type type) const;
+	Q_INVOKABLE int get_resource_sync(wyrmgus::resource *resource) const;
+
 	/// Adds/subtracts some resources to/from the player store
 	void change_resource(const wyrmgus::resource *resource, const int value, const bool store);
 	/// Set a resource of the player
@@ -1123,6 +1107,7 @@ signals:
 	void name_changed();
 	void type_changed();
 	void alive_changed();
+	void resource_stored_changed(const int resource_index, const int amount);
 	void diplomatic_stances_changed();
 	void shared_vision_changed();
 
