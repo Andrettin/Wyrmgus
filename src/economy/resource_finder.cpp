@@ -215,7 +215,7 @@ struct find_resource_context final
 
 		return resource == this->resource
 			|| (!this->only_same_resource && resource->get_index() != TradeCost && resource->get_final_resource() == this->resource)
-			|| (this->include_luxury_resources && resource->LuxuryResource);
+			|| (this->include_luxury_resources && resource->is_luxury());
 	}
 
 	bool is_valid_resource_tile(const tile *tile) const

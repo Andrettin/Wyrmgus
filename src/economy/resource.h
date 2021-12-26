@@ -89,14 +89,24 @@ class resource final : public named_data_entry, public data_type<resource>
 	Q_PROPERTY(int final_resource_conversion_rate MEMBER final_resource_conversion_rate READ get_final_resource_conversion_rate)
 	Q_PROPERTY(int base_price MEMBER base_price READ get_base_price)
 	Q_PROPERTY(wyrmgus::resource* input_resource MEMBER input_resource)
+	Q_PROPERTY(bool luxury MEMBER luxury READ is_luxury)
 
 public:
 	static constexpr const char *class_identifier = "resource";
 	static constexpr const char *database_folder = "resources";
 
+	static const std::vector<const resource *> &get_luxury_resources()
+	{
+		return resource::luxury_resources;
+	}
+
 	static int get_price(const resource_map<int> &costs);
 	static int get_mass_multiplier(const uint64_t mass, const uint64_t base_mass);
 
+private:
+	static inline std::vector<const resource *> luxury_resources;
+
+public:
 	explicit resource(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
@@ -155,6 +165,11 @@ public:
 		return this->input_resource;
 	}
 
+	bool is_luxury() const
+	{
+		return this->luxury;
+	}
+
 private:
 	int index = -1;
 	resource_icon *icon = nullptr;
@@ -172,8 +187,8 @@ public:
 	int DemandElasticity = 100;
 private:
 	resource *input_resource = nullptr;
+	bool luxury = false;
 public:
-	bool LuxuryResource = false;
 	bool Hidden = false;
 	std::vector<resource *> ChildResources; //resources (other than this one) that have this resource as their final resource
 
@@ -207,8 +222,6 @@ extern int DefaultResourcesHigh[MaxCosts];
 **  Default names for the resources.
 */
 extern std::string DefaultResourceNames[MaxCosts];
-
-extern std::vector<int> LuxuryResources;
 
 extern int GetResourceIdByName(const char *resourceName);
 extern int GetResourceIdByName(lua_State *l, const char *resourceName);

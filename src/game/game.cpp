@@ -2107,8 +2107,7 @@ static int CclDefineResource(lua_State *l)
 		} else if (!strcmp(value, "FinalResourceConversionRate")) {
 			resource->final_resource_conversion_rate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "LuxuryResource")) {
-			resource->LuxuryResource = LuaToBoolean(l, -1);
-			LuxuryResources.push_back(resource_id);
+			resource->luxury = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "BasePrice")) {
 			resource->base_price = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DemandElasticity")) {

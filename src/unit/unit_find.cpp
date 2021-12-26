@@ -524,7 +524,7 @@ public:
 		const wyrmgus::unit_type &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((unit->get_given_resource() == resource || (!only_same && unit->GivesResource != TradeCost && wyrmgus::resource::get_all()[unit->GivesResource]->get_final_resource() == resource) || (include_luxury && wyrmgus::resource::get_all()[unit->GivesResource]->LuxuryResource))
+		return ((unit->get_given_resource() == resource || (!only_same && unit->GivesResource != TradeCost && wyrmgus::resource::get_all()[unit->GivesResource]->get_final_resource() == resource) || (include_luxury && wyrmgus::resource::get_all()[unit->GivesResource]->is_luxury()))
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start

@@ -1436,17 +1436,17 @@ static void AiProduceResources()
 		const resource *chosen_resource = nullptr;
 		int best_value = 0;
 		for (const resource *resource : produced_resources) {
-			if (!resource->LuxuryResource && AiCanSellResource(resource)) {
+			if (!resource->is_luxury() && AiCanSellResource(resource)) {
 				continue;
 			}
 			
-			if (resource->LuxuryResource && !market_unit) {
+			if (resource->is_luxury() && !market_unit) {
 				continue;
 			}
 			
 			const wyrmgus::resource *input_resource = resource->get_input_resource();
 
-			if (input_resource != nullptr && !AiCanSellResource(input_resource) && !(input_resource == defines::get()->get_wealth_resource() && resource->LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
+			if (input_resource != nullptr && !AiCanSellResource(input_resource) && !(input_resource == defines::get()->get_wealth_resource() && resource->is_luxury())) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
 				continue;
 			}
 			
@@ -1511,7 +1511,7 @@ static void AiCollectResources()
 			//Wyrmgus start
 //			const int c = order.GetCurrentResource();
 			const resource *cost_resource = resource::get_all()[order.GetCurrentResource()]->get_final_resource();
-			if (cost_resource->LuxuryResource) {
+			if (cost_resource->is_luxury()) {
 				num_units_assigned[cost_resource->get_index()]++;
 				cost_resource = defines::get()->get_wealth_resource();
 			}
@@ -1791,7 +1791,7 @@ static void AiCollectResources()
 		) {
 			bool is_luxury_input = false;
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (resource::get_all()[i]->LuxuryResource && resource::get_all()[i]->get_input_resource() != nullptr && resource::get_all()[i]->get_input_resource() == resource && num_units_assigned[i] > 0) {
+				if (resource::get_all()[i]->is_luxury() && resource::get_all()[i]->get_input_resource() != nullptr && resource::get_all()[i]->get_input_resource() == resource && num_units_assigned[i] > 0) {
 					is_luxury_input = true;
 					break;
 				}

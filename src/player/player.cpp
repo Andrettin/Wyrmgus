@@ -2844,9 +2844,7 @@ void CPlayer::PerformResourceTrade()
 		}
 	}
 	
-	for (size_t i = 0; i < LuxuryResources.size(); ++i) {
-		const resource *res = resource::get_all()[LuxuryResources[i]];
-		
+	for (const resource *res : resource::get_luxury_resources()) {
 		while ((this->get_resource(res) + this->get_stored_resource(res)) >= 100) {
 			market_unit->sell_resource(res, this->get_index());
 		}

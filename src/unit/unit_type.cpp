@@ -448,8 +448,6 @@
 */
 std::string DefaultResourceNames[MaxCosts];
 
-std::vector<int> LuxuryResources;
-
 /**
 **  Default names for the resources.
 */

@@ -89,6 +89,10 @@ void resource::initialize()
 		this->final_resource->ChildResources.push_back(this);
 	}
 
+	if (this->is_luxury()) {
+		resource::luxury_resources.push_back(this);
+	}
+
 	data_entry::initialize();
 }
 
