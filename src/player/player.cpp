@@ -3437,18 +3437,20 @@ void CPlayer::set_resource(const resource *resource, const int quantity)
 {
 	const int old_quantity = this->get_resource(resource);
 
-	std::optional<std::unique_lock<std::shared_mutex>> lock;
+	{
+		std::optional<std::unique_lock<std::shared_mutex>> lock;
 
-	if (this == CPlayer::GetThisPlayer()) {
-		lock = std::unique_lock<std::shared_mutex>(this->mutex);
-	}
-
-	if (quantity <= 0) {
-		if (this->resources.contains(resource)) {
-			this->resources.erase(resource);
+		if (this == CPlayer::GetThisPlayer()) {
+			lock = std::unique_lock<std::shared_mutex>(this->mutex);
 		}
-	} else {
-		this->resources[resource] = quantity;
+
+		if (quantity <= 0) {
+			if (this->resources.contains(resource)) {
+				this->resources.erase(resource);
+			}
+		} else {
+			this->resources[resource] = quantity;
+		}
 	}
 
 	if (resource->is_special()) {
@@ -3464,18 +3466,20 @@ void CPlayer::set_stored_resource(const resource *resource, const int quantity)
 {
 	const int old_quantity = this->get_stored_resource(resource);
 
-	std::optional<std::unique_lock<std::shared_mutex>> lock;
+	{
+		std::optional<std::unique_lock<std::shared_mutex>> lock;
 
-	if (this == CPlayer::GetThisPlayer()) {
-		lock = std::unique_lock<std::shared_mutex>(this->mutex);
-	}
-
-	if (quantity == 0) {
-		if (this->stored_resources.contains(resource)) {
-			this->stored_resources.erase(resource);
+		if (this == CPlayer::GetThisPlayer()) {
+			lock = std::unique_lock<std::shared_mutex>(this->mutex);
 		}
-	} else {
-		this->stored_resources[resource] = quantity;
+
+		if (quantity == 0) {
+			if (this->stored_resources.contains(resource)) {
+				this->stored_resources.erase(resource);
+			}
+		} else {
+			this->stored_resources[resource] = quantity;
+		}
 	}
 
 	if (resource->is_special()) {
