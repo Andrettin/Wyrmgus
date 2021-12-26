@@ -981,13 +981,13 @@ void CPlayer::Init(player_type type)
 	this->set_type(type);
 	this->Race = wyrmgus::defines::get()->get_neutral_civilization()->ID;
 	this->faction = nullptr;
-	this->faction_tier = wyrmgus::faction_tier::none;
-	this->government_type = wyrmgus::government_type::none;
+	this->faction_tier = faction_tier::none;
+	this->government_type = government_type::none;
 	this->religion = nullptr;
 	this->dynasty = nullptr;
 	this->age = nullptr;
 	this->overlord = nullptr;
-	this->vassalage_type = wyrmgus::vassalage_type::none;
+	this->vassalage_type = vassalage_type::none;
 	this->Team = team;
 	this->enemies.clear();
 	this->allies.clear();
@@ -1572,6 +1572,8 @@ void CPlayer::set_faction_async(wyrmgus::faction *faction)
 
 void CPlayer::set_random_faction()
 {
+	this->set_government_type(government_type::tribe);
+
 	// set random one from the civilization's factions
 	std::vector<wyrmgus::faction *> potential_factions = this->get_potential_factions();
 	
@@ -2347,23 +2349,9 @@ std::vector<faction *> CPlayer::get_potential_factions() const
 				continue;
 			}
 
-			const CUpgrade *polity_upgrade = defines::get()->get_faction_type_upgrade(faction_type::polity);
-			const bool can_be_polity = (polity_upgrade != nullptr && check_conditions<false>(polity_upgrade, this, false));
-
-			switch (faction->get_type()) {
-				case faction_type::tribe:
-					if (can_be_polity) {
-						//don't put tribal factions in the list if the player already has access to polity factions
-						continue;
-					}
-					break;
-				case faction_type::polity:
-					if (!can_be_polity) {
-						continue;
-					}
-					break;
-				default:
-					break;
+			//only make factions available as an initial faction if they can have the player's government type
+			if (!faction->is_government_type_valid(this->get_government_type())) {
+				continue;
 			}
 
 			//in multiplayer factions can be chosen multiple times by different (human) players, but otherwise factions can only appear for one given player

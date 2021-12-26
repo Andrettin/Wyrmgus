@@ -517,6 +517,8 @@ void GameMainLoop()
 
 		//if the person player has no faction, bring up the faction choice interface
 		if (CPlayer::GetThisPlayer() != nullptr && CPlayer::GetThisPlayer()->get_faction() == nullptr) {
+			CPlayer::GetThisPlayer()->set_government_type(government_type::tribe);
+
 			std::vector<faction *> potential_factions = CPlayer::GetThisPlayer()->get_potential_factions();
 
 			if (!potential_factions.empty()) {
