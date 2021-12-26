@@ -44,6 +44,11 @@ public:
 		return this->scripted_condition->get_conditions()->check(civilization);
 	}
 
+	virtual bool check(const government_type government_type) const override
+	{
+		return this->scripted_condition->get_conditions()->check(government_type);
+	}
+
 	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
 	{
 		return this->scripted_condition->get_conditions()->check(player, ctx, ignore_units);

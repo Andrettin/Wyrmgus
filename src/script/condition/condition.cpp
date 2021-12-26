@@ -295,39 +295,6 @@ void and_condition::check_validity() const
 	}
 }
 
-bool and_condition::check(const civilization *civilization) const
-{
-	for (const auto &condition : this->conditions) {
-		if (!condition->check(civilization)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-bool and_condition::check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const
-{
-	for (const auto &condition : this->conditions) {
-		if (!condition->check(player, ctx, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-bool and_condition::check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const
-{
-	for (const auto &condition : this->conditions) {
-		if (!condition->check(unit, ctx, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
 void or_condition::ProcessConfigDataSection(const CConfigData *section)
 {
 	std::unique_ptr<condition> condition = nullptr;

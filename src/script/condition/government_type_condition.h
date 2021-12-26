@@ -39,6 +39,11 @@ public:
 		this->government_type = string_to_government_type(value);
 	}
 
+	virtual bool check(const government_type government_type) const override
+	{
+		return this->government_type == government_type;
+	}
+
 	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
 	{
 		Q_UNUSED(ctx)

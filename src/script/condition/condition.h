@@ -41,6 +41,7 @@ class named_data_entry;
 class sml_data;
 class sml_property;
 class unit_type;
+enum class government_type;
 struct read_only_context;
 
 class condition
@@ -109,6 +110,13 @@ public:
 	{
 		//check whether a civilization can, in principle, fulfill the condition
 		Q_UNUSED(civilization)
+		return true;
+	}
+
+	virtual bool check(const government_type government_type) const
+	{
+		//check whether a government type can, in principle, fulfill the condition
+		Q_UNUSED(government_type)
 		return true;
 	}
 

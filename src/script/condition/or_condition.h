@@ -61,37 +61,48 @@ public:
 		}
 	}
 
-	virtual bool check(const civilization *civilization) const override
+	template <typename scope_type>
+	bool check_internal(const scope_type scope) const
 	{
 		for (const auto &condition : this->conditions) {
-			if (condition->check(civilization)) {
+			if (condition->check(scope)) {
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	template <typename scope_type>
+	bool check_internal(const scope_type scope, const read_only_context &ctx, const bool ignore_units) const
+	{
+		for (const auto &condition : this->conditions) {
+			if (condition->check(scope, ctx, ignore_units)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	virtual bool check(const civilization *civilization) const override
+	{
+		return this->check_internal(civilization);
+	}
+
+	virtual bool check(const government_type government_type) const override
+	{
+		return this->check_internal(government_type);
 	}
 
 	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
 	{
-		for (const auto &condition : this->conditions) {
-			if (condition->check(player, ctx, ignore_units)) {
-				return true;
-			}
-		}
-
-		return false;
+		return this->check_internal(player, ctx, ignore_units);
 	}
 
 	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
 	{
-		for (const auto &condition : this->conditions) {
-			if (condition->check(unit, ctx, ignore_units)) {
-				return true;
-			}
-		}
-
-		return false;
+		return this->check_internal(unit, ctx, ignore_units);
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
