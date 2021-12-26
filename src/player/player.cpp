@@ -1432,14 +1432,16 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 	
 	const wyrmgus::player_color *player_color = nullptr;
 
-	if (this->get_faction_tier() == faction_tier::none) {
-		this->set_faction_tier(faction->get_default_tier());
-	} else {
-		this->set_faction_tier(faction->get_nearest_valid_tier(this->get_faction_tier()));
-	}
+	if (!GameEstablishing) {
+		if (this->get_faction_tier() == faction_tier::none) {
+			this->set_faction_tier(faction->get_default_tier());
+		} else {
+			this->set_faction_tier(faction->get_nearest_valid_tier(this->get_faction_tier()));
+		}
 
-	if (this->get_government_type() == government_type::none) {
-		this->set_government_type(faction->get_default_government_type());
+		if (this->get_government_type() == government_type::none) {
+			this->set_government_type(faction->get_default_government_type());
+		}
 	}
 
 	if (!IsNetworkGame()) {
