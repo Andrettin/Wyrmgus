@@ -408,9 +408,8 @@ std::string_view civilization::get_title_name(const government_type government_t
 					return "Clan";
 				case faction_tier::duchy:
 				case faction_tier::grand_duchy:
-					return "Tribe";
 				case faction_tier::kingdom:
-					return "Tribal Confederation";
+					return "Tribe";
 				case faction_tier::empire:
 					return "Horde";
 				default:
