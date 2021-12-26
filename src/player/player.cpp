@@ -119,6 +119,7 @@
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/assert_util.h"
+#include "util/container_util.h"
 #include "util/log_util.h"
 #include "util/set_util.h"
 #include "util/string_util.h"
@@ -3434,6 +3435,8 @@ bool CPlayer::at_war() const
 
 void CPlayer::set_resource(const resource *resource, const int quantity)
 {
+	const int old_quantity = this->get_resource(resource);
+
 	std::optional<std::unique_lock<std::shared_mutex>> lock;
 
 	if (this == CPlayer::GetThisPlayer()) {
@@ -3448,11 +3451,19 @@ void CPlayer::set_resource(const resource *resource, const int quantity)
 		this->resources[resource] = quantity;
 	}
 
+	if (resource->is_special()) {
+		if (old_quantity == 0 || quantity == 0) {
+			this->check_special_resource(resource);
+		}
+	}
+
 	emit resource_stored_changed(resource->get_index(), this->get_resource(resource, resource_storage_type::both));
 }
 
 void CPlayer::set_stored_resource(const resource *resource, const int quantity)
 {
+	const int old_quantity = this->get_stored_resource(resource);
+
 	std::optional<std::unique_lock<std::shared_mutex>> lock;
 
 	if (this == CPlayer::GetThisPlayer()) {
@@ -3465,6 +3476,12 @@ void CPlayer::set_stored_resource(const resource *resource, const int quantity)
 		}
 	} else {
 		this->stored_resources[resource] = quantity;
+	}
+
+	if (resource->is_special()) {
+		if (old_quantity == 0 || quantity == 0) {
+			this->check_special_resource(resource);
+		}
 	}
 
 	emit resource_stored_changed(resource->get_index(), this->get_resource(resource, resource_storage_type::both));
@@ -5029,3 +5046,21 @@ bool CPlayer::HasHero(const wyrmgus::character *hero) const
 	return false;
 }
 //Wyrmgus end
+
+QVariantList CPlayer::get_current_special_resources_sync() const
+{
+	std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+	return container::to_qvariant_list(this->current_special_resources);
+}
+
+void CPlayer::check_special_resource(const resource *resource)
+{
+	const int stored_quantity = this->get_resource(resource, resource_storage_type::both);
+
+	if (stored_quantity > 0 || this->has_settlement_with_resource_source(resource)) {
+		this->add_current_special_resource(resource);
+	} else {
+		this->remove_current_special_resource(resource);
+	}
+}

@@ -83,7 +83,7 @@ class resource final : public named_data_entry, public data_type<resource>
 	Q_OBJECT
 
 	Q_PROPERTY(int index READ get_index CONSTANT)
-	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon NOTIFY changed)
 	Q_PROPERTY(int default_income MEMBER default_income READ get_default_income)
 	Q_PROPERTY(int default_amount MEMBER default_amount READ get_default_amount)
 	Q_PROPERTY(wyrmgus::resource* final_resource MEMBER final_resource)
@@ -121,6 +121,7 @@ public:
 
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void initialize() override;
+	virtual void check() const override;
 
 	int get_index() const
 	{
@@ -184,6 +185,9 @@ public:
 	{
 		return this->special;
 	}
+
+signals:
+	void changed();
 
 private:
 	int index = -1;

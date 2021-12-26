@@ -92,6 +92,7 @@ class CPlayer final : public QObject
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY name_changed)
 	Q_PROPERTY(bool active READ is_active_sync NOTIFY type_changed)
 	Q_PROPERTY(bool alive READ is_alive_sync NOTIFY alive_changed)
+	Q_PROPERTY(QVariantList current_special_resources READ get_current_special_resources_sync NOTIFY current_special_resources_changed)
 
 public:
 	static constexpr int max_heroes = 4; //maximum heroes per player
@@ -1094,6 +1095,44 @@ public:
 		this->recent_trade_partners.clear();
 	}
 
+	QVariantList get_current_special_resources_sync() const;
+
+	void add_current_special_resource(const resource *resource)
+	{
+		if (this->current_special_resources.contains(resource)) {
+			return;
+		}
+
+		std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+		if (this == CPlayer::GetThisPlayer()) {
+			lock = std::unique_lock<std::shared_mutex>(this->mutex);
+		}
+
+		this->current_special_resources.insert(resource);
+
+		emit current_special_resources_changed();
+	}
+
+	void remove_current_special_resource(const resource *resource)
+	{
+		if (!this->current_special_resources.contains(resource)) {
+			return;
+		}
+
+		std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+		if (this == CPlayer::GetThisPlayer()) {
+			lock = std::unique_lock<std::shared_mutex>(this->mutex);
+		}
+
+		this->current_special_resources.erase(resource);
+
+		emit current_special_resources_changed();
+	}
+
+	void check_special_resource(const resource *resource);
+
 	void Init(player_type type);
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
@@ -1108,6 +1147,7 @@ signals:
 	void type_changed();
 	void alive_changed();
 	void resource_stored_changed(const int resource_index, const int amount);
+	void current_special_resources_changed();
 	void diplomatic_stances_changed();
 	void shared_vision_changed();
 
@@ -1253,6 +1293,7 @@ private:
 	player_index_set shared_vision; //set of player indexes that this player has shared vision with
 	player_index_set mutual_shared_vision; //set of player indexes that this player has mutual shared vision with
 	player_set recent_trade_partners;
+	resource_set current_special_resources; //the special resources currently produced or stored by the player
 	mutable std::shared_mutex mutex; //mutex for protecting player data which is written from the Wyrmgus thread, but which can be read from the Qt thread
 
 	friend void CleanPlayers();

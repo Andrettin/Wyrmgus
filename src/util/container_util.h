@@ -54,6 +54,14 @@ inline QVariantList to_qvariant_list(const T &container)
 			list.append(QVariant::fromValue(path::to_qstring(element)));
 		} else if constexpr (std::is_same_v<typename T::value_type, std::string>) {
 			list.append(QVariant::fromValue(QString::fromStdString(element)));
+		} else if constexpr (std::is_pointer_v<typename T::value_type>) {
+			using mutable_type = std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<typename T::value_type>>>;
+
+			if constexpr (std::is_same_v<typename T::value_type, mutable_type>) {
+				list.append(QVariant::fromValue(element));
+			} else {
+				list.append(QVariant::fromValue(const_cast<mutable_type>(element)));
+			}
 		} else {
 			list.append(QVariant::fromValue(element));
 		}

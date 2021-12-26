@@ -104,6 +104,15 @@ void resource::initialize()
 	data_entry::initialize();
 }
 
+void resource::check() const
+{
+	if (this->is_main() || this->is_special()) {
+		if (this->get_icon() == nullptr) {
+			throw std::runtime_error("Resource \"" + this->get_identifier() + "\" is a main or special resource, but has no icon.");
+		}
+	}
+}
+
 bool resource::IsMineResource() const
 {
 	switch (this->get_index()) {

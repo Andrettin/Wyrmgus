@@ -280,10 +280,27 @@ bool site_game_data::has_resource_source(const resource *resource) const
 	return false;
 }
 
+void site_game_data::add_resource_unit(CUnit *unit, const resource *resource)
+{
+	assert_throw(resource != nullptr);
+
+	std::vector<CUnit *> &resource_units = this->resource_units[resource];
+
+	const bool was_empty = resource_units.empty();
+
+	resource_units.push_back(unit);
+
+	if (was_empty && resource->is_special() && this->get_owner() != nullptr) {
+		this->get_owner()->check_special_resource(resource);
+	}
+}
+
 void site_game_data::add_resource_unit(CUnit *unit)
 {
 	const resource *unit_resource = unit->Type->get_given_resource();
-	this->add_resource_unit(unit, unit_resource);
+	if (unit_resource != nullptr) {
+		this->add_resource_unit(unit, unit_resource);
+	}
 
 	for (const resource *produced_resource : AiHelpers.get_produced_resources(unit->Type)) {
 		if (produced_resource == unit_resource) {
@@ -296,18 +313,26 @@ void site_game_data::add_resource_unit(CUnit *unit)
 
 void site_game_data::remove_resource_unit(CUnit *unit, const resource *resource)
 {
+	assert_throw(resource != nullptr);
+
 	std::vector<CUnit *> &resource_units = this->resource_units[resource];
 	vector::remove(resource_units, unit);
 
 	if (resource_units.empty()) {
 		this->resource_units.erase(resource);
+
+		if (resource->is_special() && this->get_owner() != nullptr) {
+			this->get_owner()->check_special_resource(resource);
+		}
 	}
 }
 
 void site_game_data::remove_resource_unit(CUnit *unit)
 {
 	const resource *unit_resource = unit->Type->get_given_resource();
-	this->remove_resource_unit(unit, unit_resource);
+	if (unit_resource != nullptr) {
+		this->remove_resource_unit(unit, unit_resource);
+	}
 
 	for (const resource *produced_resource : AiHelpers.get_produced_resources(unit->Type)) {
 		if (produced_resource == unit_resource) {
