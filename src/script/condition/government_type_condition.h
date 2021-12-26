@@ -26,17 +26,17 @@
 
 #pragma once
 
-#include "player/faction_type.h"
+#include "player/government_type.h"
 #include "script/condition/condition.h"
 
 namespace wyrmgus {
 
-class faction_type_condition final : public condition
+class government_type_condition final : public condition
 {
 public:
-	explicit faction_type_condition(const std::string &value)
+	explicit government_type_condition(const std::string &value)
 	{
-		this->faction_type = string_to_faction_type(value);
+		this->government_type = string_to_government_type(value);
 	}
 
 	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
@@ -44,11 +44,7 @@ public:
 		Q_UNUSED(ctx)
 		Q_UNUSED(ignore_units)
 
-		if (player->get_faction() == nullptr) {
-			return false;
-		}
-
-		return player->get_faction()->get_type() == this->faction_type;
+		return player->get_government_type() == this->government_type;
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
@@ -56,11 +52,11 @@ public:
 		Q_UNUSED(indent)
 		Q_UNUSED(links_allowed)
 
-		return string::highlight(get_faction_type_name(this->faction_type)) + " faction type";
+		return string::highlight(get_government_type_name(this->government_type)) + " government type";
 	}
 
 private:
-	wyrmgus::faction_type faction_type = faction_type::none;
+	wyrmgus::government_type government_type = government_type::none;
 };
 
 }

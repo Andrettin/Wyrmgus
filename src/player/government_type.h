@@ -73,6 +73,26 @@ inline std::string government_type_to_string(const government_type government_ty
 	throw std::runtime_error("Invalid government type: \"" + std::to_string(static_cast<int>(government_type)) + "\".");
 }
 
+inline std::string get_government_type_name(const government_type government_type)
+{
+	switch (government_type) {
+		case government_type::none:
+			return "None";
+		case government_type::tribe:
+			return "Tribe";
+		case government_type::monarchy:
+			return "Monarchy";
+		case government_type::republic:
+			return "Republic";
+		case government_type::theocracy:
+			return "Theocracy";
+		default:
+			break;
+	}
+
+	throw std::runtime_error("Invalid government type: \"" + std::to_string(static_cast<int>(government_type)) + "\".");
+}
+
 }
 
 Q_DECLARE_METATYPE(wyrmgus::government_type)
