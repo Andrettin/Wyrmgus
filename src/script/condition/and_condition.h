@@ -89,31 +89,17 @@ public:
 		return this->check_internal(unit, ctx, ignore_units);
 	}
 
-	std::string get_string(const size_t indent, const bool links_allowed, const bool add_own_string) const
-	{
-		if (this->conditions.size() == 1) {
-			return this->conditions.front()->get_string(indent, links_allowed);
-		}
-
-		std::string str;
-
-		if (add_own_string) {
-			str += "All of:";
-		}
-
-		str += "\n";
-		str += this->get_conditions_string(indent + 1, links_allowed);
-
-		return str;
-	}
-
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
+		if (this->conditions.empty()) {
+			return std::string();
+		}
+
 		if (this->conditions.size() == 1) {
 			return this->conditions.front()->get_string(indent, links_allowed);
 		}
 
-		std::string str = "All of these must be true:\n";
+		std::string str = "All of:\n";
 		str += this->get_conditions_string(indent + 1, links_allowed);
 		return str;
 	}

@@ -599,12 +599,12 @@ std::string faction::get_requirements_string() const
 		}
 
 		if (this->get_upgrade()->get_conditions() != nullptr) {
-			return this->get_upgrade()->get_conditions()->get_string(0, false, false);
+			return "\n" + this->get_upgrade()->get_conditions()->get_conditions_string(1, false);
 		}
 	}
 
 	if (this->get_conditions() != nullptr) {
-		return this->get_conditions()->get_string(0, false, false);
+		return "\n" + this->get_conditions()->get_conditions_string(1, false);
 	}
 
 	return std::string();
