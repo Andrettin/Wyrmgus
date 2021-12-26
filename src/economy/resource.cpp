@@ -90,6 +90,14 @@ void resource::initialize()
 	}
 
 	if (this->is_luxury()) {
+		this->special = true;
+	}
+
+	if (this->is_main()) {
+		resource::main_resources.push_back(this);
+	}
+
+	if (this->is_luxury()) {
 		resource::luxury_resources.push_back(this);
 	}
 
@@ -111,6 +119,11 @@ bool resource::IsMineResource() const
 		default:
 			return false;
 	}
+}
+
+bool resource::is_main() const
+{
+	return this->get_final_resource() == this && !this->is_special() && this != defines::get()->get_time_resource();
 }
 
 }

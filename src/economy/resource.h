@@ -82,6 +82,7 @@ class resource final : public named_data_entry, public data_type<resource>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(int index READ get_index CONSTANT)
 	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(int default_income MEMBER default_income READ get_default_income)
 	Q_PROPERTY(int default_amount MEMBER default_amount READ get_default_amount)
@@ -90,10 +91,16 @@ class resource final : public named_data_entry, public data_type<resource>
 	Q_PROPERTY(int base_price MEMBER base_price READ get_base_price)
 	Q_PROPERTY(wyrmgus::resource* input_resource MEMBER input_resource)
 	Q_PROPERTY(bool luxury MEMBER luxury READ is_luxury)
+	Q_PROPERTY(bool special MEMBER special READ is_special)
 
 public:
 	static constexpr const char *class_identifier = "resource";
 	static constexpr const char *database_folder = "resources";
+
+	static const std::vector<resource *> &get_main_resources()
+	{
+		return resource::main_resources;
+	}
 
 	static const std::vector<const resource *> &get_luxury_resources()
 	{
@@ -104,6 +111,7 @@ public:
 	static int get_mass_multiplier(const uint64_t mass, const uint64_t base_mass);
 
 private:
+	static inline std::vector<resource *> main_resources;
 	static inline std::vector<const resource *> luxury_resources;
 
 public:
@@ -165,9 +173,16 @@ public:
 		return this->input_resource;
 	}
 
+	bool is_main() const;
+
 	bool is_luxury() const
 	{
 		return this->luxury;
+	}
+
+	bool is_special() const
+	{
+		return this->special;
 	}
 
 private:
@@ -188,6 +203,7 @@ public:
 private:
 	resource *input_resource = nullptr;
 	bool luxury = false;
+	bool special = false; //whether this is a special resource, i.e. whether it should not be shown among the main resources
 public:
 	bool Hidden = false;
 	std::vector<resource *> ChildResources; //resources (other than this one) that have this resource as their final resource

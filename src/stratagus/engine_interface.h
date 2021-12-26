@@ -67,6 +67,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(int max_map_height READ get_max_map_height CONSTANT)
 	Q_PROPERTY(CPlayer* this_player READ get_this_player NOTIFY this_player_changed)
 	Q_PROPERTY(QVariantList non_neutral_players READ get_non_neutral_players CONSTANT)
+	Q_PROPERTY(QVariantList main_resources READ get_main_resources CONSTANT)
 	Q_PROPERTY(wyrmgus::interface_style* current_interface_style READ get_current_interface_style NOTIFY current_interface_style_changed)
 	Q_PROPERTY(bool modal_dialog_open READ is_modal_dialog_open WRITE set_modal_dialog_open_async)
 
@@ -248,6 +249,8 @@ public:
 
 	CPlayer *get_this_player() const;
 	QVariantList get_non_neutral_players() const;
+
+	QVariantList get_main_resources() const;
 
 	interface_style *get_current_interface_style() const
 	{

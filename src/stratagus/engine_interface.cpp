@@ -592,6 +592,11 @@ QVariantList engine_interface::get_non_neutral_players() const
 	return container::to_qvariant_list(CPlayer::get_non_neutral_players());
 }
 
+QVariantList engine_interface::get_main_resources() const
+{
+	return container::to_qvariant_list(resource::get_main_resources());
+}
+
 void engine_interface::set_current_interface_style(interface_style *interface_style)
 {
 	if (interface_style == nullptr) {
