@@ -1769,16 +1769,24 @@ void CButtonPanel::Update()
 				} else {
 					const faction *faction = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[potential_faction_count];
 					button->Value = potential_faction_count;
+
+					const government_type player_government_type = CPlayer::GetThisPlayer()->get_government_type();
+					const government_type government_type = faction->is_government_type_valid(player_government_type) ? player_government_type : faction->get_default_government_type();
+					const faction_tier faction_tier = faction->get_nearest_valid_tier(CPlayer::GetThisPlayer()->get_faction_tier());
+
+					const std::string faction_name = faction->get_name(government_type, faction_tier);
+					const bool uses_definite_article = faction->uses_definite_article(government_type);
+
 					button->Hint = "Found ";
-					if (faction->uses_definite_article()) {
+					if (uses_definite_article) {
 						button->Hint += "the ";
 					}
-					button->Hint += faction->get_name();
+					button->Hint += faction_name;
 					button->Description = "Changes your faction to ";
-					if (faction->uses_definite_article()) {
+					if (uses_definite_article) {
 						button->Description += "the ";
 					}
-					button->Description += faction->get_name();
+					button->Description += faction_name;
 				}
 				potential_faction_count += 1;
 			} else if (button->Action == ButtonCmd::Dynasty) {

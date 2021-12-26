@@ -372,6 +372,15 @@ std::string_view faction::get_character_title_name(const character_title title_t
 	return this->get_civilization()->get_character_title_name(title_type, this->get_type(), government_type, tier, gender);
 }
 
+std::string faction::get_name(const government_type government_type, const faction_tier tier) const
+{
+	if (this->uses_short_name(government_type)) {
+		return this->get_titled_name(government_type, tier);
+	}
+
+	return this->get_name();
+}
+
 std::string faction::get_titled_name(const government_type government_type, const faction_tier tier) const
 {
 	if (this->uses_simple_name()) {
@@ -447,6 +456,19 @@ CCurrency *faction::GetCurrency() const
 	return this->civilization->GetCurrency();
 }
 
+bool faction::is_government_type_valid(const government_type government_type) const
+{
+	if (this->get_preconditions() != nullptr && !this->get_preconditions()->check(government_type)) {
+		return false;
+	}
+
+	if (this->get_conditions() != nullptr && !this->get_conditions()->check(government_type)) {
+		return false;
+	}
+
+	return true;
+}
+
 bool faction::uses_simple_name() const
 {
 	return this->simple_name || this->get_type() != faction_type::polity;
@@ -461,6 +483,14 @@ bool faction::uses_short_name(const government_type government_type) const
 	return this->short_name;
 }
 
+bool faction::uses_definite_article(const government_type government_type) const
+{
+	if (this->uses_short_name(government_type)) {
+		return true;
+	}
+
+	return this->definite_article;
+}
 
 const std::vector<std::unique_ptr<ai_force_template>> &faction::get_ai_force_templates(const ai_force_type force_type) const
 {

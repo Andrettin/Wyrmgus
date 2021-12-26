@@ -1299,6 +1299,15 @@ void CPlayer::set_name(const std::string &name)
 	emit name_changed();
 }
 
+void CPlayer::update_name_from_faction()
+{
+	if (this->get_faction() == nullptr) {
+		return;
+	}
+
+	this->set_name(this->get_faction()->get_name(this->get_government_type(), this->get_faction_tier()));
+}
+
 const wyrmgus::civilization *CPlayer::get_civilization() const
 {
 	if (this->Race != -1) {
@@ -1408,120 +1417,116 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 		return;
 	}
 	
+	const wyrmgus::player_color *player_color = nullptr;
+
+	if (this->get_faction_tier() == faction_tier::none) {
+		this->set_faction_tier(faction->get_default_tier());
+	} else {
+		this->set_faction_tier(faction->get_nearest_valid_tier(this->get_faction_tier()));
+	}
+
+	if (this->get_government_type() == government_type::none) {
+		this->set_government_type(faction->get_default_government_type());
+	}
+
 	if (!IsNetworkGame()) {
 		//only set the faction's name as the player's name if this is a single player game
-		this->set_name(this->get_faction()->get_name());
+		this->update_name_from_faction();
 	}
 
-	if (this->get_faction() != nullptr) {
-		const wyrmgus::player_color *player_color = nullptr;
-
-		if (this->get_faction_tier() == faction_tier::none) {
-			this->set_faction_tier(faction->get_default_tier());
-		} else {
-			this->set_faction_tier(faction->get_nearest_valid_tier(this->get_faction_tier()));
+	const wyrmgus::player_color *faction_color = faction->get_color();
+	if (faction_color != nullptr) {
+		if (this->get_player_color_usage_count(faction_color) == 0) {
+			player_color = faction_color;
 		}
+	}
 
-		if (this->get_government_type() == government_type::none) {
-			this->set_government_type(faction->get_default_government_type());
-		}
-
-		const wyrmgus::player_color *faction_color = faction->get_color();
-		if (faction_color != nullptr) {
-			if (this->get_player_color_usage_count(faction_color) == 0) {
-				player_color = faction_color;
-			}
-		}
-
-		if (player_color == nullptr) {
-			//if all of the faction's colors are used, get one of the least used player colors
-			//out of those colors, give priority to the one closest (in RGB values) to the faction's color
-			int best_usage_count = -1;
-			int best_rgb_difference = -1;
-			std::vector<const wyrmgus::player_color *> available_colors;
-			for (const wyrmgus::player_color *pc : player_color::get_all()) {
-				if (pc == defines::get()->get_neutral_player_color()) {
-					continue;
-				}
-
-				if (pc->is_hidden()) {
-					continue;
-				}
-
-				const int usage_count = this->get_player_color_usage_count(pc);
-				if (best_usage_count != -1 && usage_count > best_usage_count) {
-					continue;
-				}
-
-				if (usage_count < best_usage_count) {
-					available_colors.clear();
-					best_rgb_difference = -1;
-				}
-
-				int rgb_difference = -1;
-
-				if (faction_color != nullptr) {
-					for (size_t i = 0; i < faction_color->get_colors().size(); ++i) {
-						const QColor &faction_color_shade = faction_color->get_colors()[i];
-						const QColor &pc_color_shade = pc->get_colors()[i];
-						rgb_difference += std::abs(faction_color_shade.red() - pc_color_shade.red());
-						rgb_difference += std::abs(faction_color_shade.green() - pc_color_shade.green());
-						rgb_difference += std::abs(faction_color_shade.blue() - pc_color_shade.blue());
-					}
-				}
-
-				if (best_rgb_difference != -1 && rgb_difference > best_rgb_difference) {
-					continue;
-				}
-
-				if (rgb_difference < best_rgb_difference) {
-					available_colors.clear();
-				}
-
-				available_colors.push_back(pc);
-				best_usage_count = usage_count;
-				best_rgb_difference = rgb_difference;
+	if (player_color == nullptr) {
+		//if all of the faction's colors are used, get one of the least used player colors
+		//out of those colors, give priority to the one closest (in RGB values) to the faction's color
+		int best_usage_count = -1;
+		int best_rgb_difference = -1;
+		std::vector<const wyrmgus::player_color *> available_colors;
+		for (const wyrmgus::player_color *pc : player_color::get_all()) {
+			if (pc == defines::get()->get_neutral_player_color()) {
+				continue;
 			}
 
-			if (!available_colors.empty()) {
-				player_color = available_colors[SyncRand(available_colors.size())];
+			if (pc->is_hidden()) {
+				continue;
 			}
-		}
-		
-		if (player_color == nullptr) {
-			throw std::runtime_error("No player color chosen for player \"" + this->get_name() + "\" (" + std::to_string(this->get_index()) + ").");
-		}
 
-		this->player_color = player_color;
+			const int usage_count = this->get_player_color_usage_count(pc);
+			if (best_usage_count != -1 && usage_count > best_usage_count) {
+				continue;
+			}
 
-		if (!CEditor::get()->is_running()) {
-			//update the territory on the minimap for the new color
-			this->update_territory_tiles();
-		}
+			if (usage_count < best_usage_count) {
+				available_colors.clear();
+				best_rgb_difference = -1;
+			}
 
-		if (this->get_faction()->get_upgrade() != nullptr) {
-			const CUpgrade *faction_upgrade = this->get_faction()->get_upgrade();
-			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
-				if (GameEstablishing) {
-					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
-				} else {
-					this->acquire_upgrade(faction_upgrade);
+			int rgb_difference = -1;
+
+			if (faction_color != nullptr) {
+				for (size_t i = 0; i < faction_color->get_colors().size(); ++i) {
+					const QColor &faction_color_shade = faction_color->get_colors()[i];
+					const QColor &pc_color_shade = pc->get_colors()[i];
+					rgb_difference += std::abs(faction_color_shade.red() - pc_color_shade.red());
+					rgb_difference += std::abs(faction_color_shade.green() - pc_color_shade.green());
+					rgb_difference += std::abs(faction_color_shade.blue() - pc_color_shade.blue());
 				}
 			}
+
+			if (best_rgb_difference != -1 && rgb_difference > best_rgb_difference) {
+				continue;
+			}
+
+			if (rgb_difference < best_rgb_difference) {
+				available_colors.clear();
+			}
+
+			available_colors.push_back(pc);
+			best_usage_count = usage_count;
+			best_rgb_difference = rgb_difference;
 		}
-		
-		const CUpgrade *faction_type_upgrade = defines::get()->get_faction_type_upgrade(this->get_faction()->get_type());
-		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] != 'R') {
+
+		if (!available_colors.empty()) {
+			player_color = available_colors[SyncRand(available_colors.size())];
+		}
+	}
+
+	if (player_color == nullptr) {
+		throw std::runtime_error("No player color chosen for player \"" + this->get_name() + "\" (" + std::to_string(this->get_index()) + ").");
+	}
+
+	this->player_color = player_color;
+
+	if (!CEditor::get()->is_running()) {
+		//update the territory on the minimap for the new color
+		this->update_territory_tiles();
+	}
+
+	if (this->get_faction()->get_upgrade() != nullptr) {
+		const CUpgrade *faction_upgrade = this->get_faction()->get_upgrade();
+		if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
 			if (GameEstablishing) {
-				AllowUpgradeId(*this, faction_type_upgrade->ID, 'R');
+				AllowUpgradeId(*this, faction_upgrade->ID, 'R');
 			} else {
-				this->acquire_upgrade(faction_type_upgrade);
+				this->acquire_upgrade(faction_upgrade);
 			}
 		}
-	} else {
-		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->get_name().c_str(), this->get_index(), this->get_civilization()->get_identifier().c_str());
 	}
-	
+
+	const CUpgrade *faction_type_upgrade = defines::get()->get_faction_type_upgrade(this->get_faction()->get_type());
+	if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] != 'R') {
+		if (GameEstablishing) {
+			AllowUpgradeId(*this, faction_type_upgrade->ID, 'R');
+		} else {
+			this->acquire_upgrade(faction_type_upgrade);
+		}
+	}
+
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
 
@@ -1565,6 +1570,19 @@ void CPlayer::set_random_faction()
 	}
 }
 
+void CPlayer::set_faction_tier(const wyrmgus::faction_tier tier)
+{
+	if (tier == this->get_faction_tier()) {
+		return;
+	}
+
+	this->faction_tier = tier;
+
+	if (!game::get()->is_multiplayer()) {
+		this->update_name_from_faction();
+	}
+}
+
 void CPlayer::set_government_type(const wyrmgus::government_type government_type)
 {
 	if (government_type == this->get_government_type()) {
@@ -1580,6 +1598,10 @@ void CPlayer::set_government_type(const wyrmgus::government_type government_type
 		} else {
 			this->acquire_upgrade(government_type_upgrade);
 		}
+	}
+
+	if (!game::get()->is_multiplayer()) {
+		this->update_name_from_faction();
 	}
 }
 

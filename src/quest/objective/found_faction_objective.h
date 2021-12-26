@@ -49,13 +49,17 @@ public:
 	{
 		Q_UNUSED(player)
 
+		const government_type player_government_type = player->get_government_type();
+		const government_type government_type = this->faction->is_government_type_valid(player_government_type) ? player_government_type : this->faction->get_default_government_type();
+		const faction_tier faction_tier = this->faction->get_nearest_valid_tier(player->get_faction_tier());
+
 		std::string str = "Found ";
 
-		if (this->faction->uses_definite_article()) {
+		if (this->faction->uses_definite_article(government_type)) {
 			str += "the ";
 		}
 
-		str += this->faction->get_name();
+		str += this->faction->get_name(government_type, faction_tier);
 
 		return str;
 	}

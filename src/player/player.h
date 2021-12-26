@@ -177,6 +177,7 @@ public:
 	}
 
 	void set_name(const std::string &name);
+	void update_name_from_faction();
 
 	//Wyrmgus start
 	const wyrmgus::civilization *get_civilization() const;
@@ -196,10 +197,7 @@ public:
 		return this->faction_tier;
 	}
 
-	void set_faction_tier(const wyrmgus::faction_tier tier)
-	{
-		this->faction_tier = tier;
-	}
+	void set_faction_tier(const wyrmgus::faction_tier tier);
 
 	wyrmgus::government_type get_government_type() const
 	{

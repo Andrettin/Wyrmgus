@@ -85,7 +85,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(wyrmgus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name)
 	Q_PROPERTY(bool short_name MEMBER short_name)
-	Q_PROPERTY(bool definite_article MEMBER definite_article READ uses_definite_article)
+	Q_PROPERTY(bool definite_article MEMBER definite_article)
 	Q_PROPERTY(wyrmgus::deity* holy_order_deity MEMBER holy_order_deity READ get_holy_order_deity)
 
 public:
@@ -199,6 +199,8 @@ public:
 		return this->default_government_type;
 	}
 
+	bool is_government_type_valid(const government_type government_type) const;
+
 	bool is_playable() const
 	{
 		return this->playable;
@@ -221,11 +223,7 @@ public:
 
 	bool uses_simple_name() const;
 	bool uses_short_name(const government_type government_type) const;
-
-	bool uses_definite_article() const
-	{
-		return this->definite_article;
-	}
+	bool uses_definite_article(const government_type government_type) const;
 
 	deity *get_holy_order_deity() const
 	{
@@ -235,6 +233,12 @@ public:
 	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;
 	std::string_view get_character_title_name(const character_title title_type, const government_type government_type, const faction_tier tier, const gender gender) const;
 
+	const std::string &get_name() const
+	{
+		return named_data_entry::get_name();
+	}
+
+	std::string get_name(const government_type government_type, const faction_tier tier) const;
 	std::string get_titled_name(const government_type government_type, const faction_tier tier) const;
 
 	std::string get_default_titled_name() const
