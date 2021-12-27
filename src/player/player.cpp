@@ -3509,7 +3509,7 @@ void CPlayer::set_resource_demand(const resource *resource, const int quantity)
 		this->resource_demands[resource] = quantity;
 	}
 
-	emit resource_demand_changed(resource->get_index(), quantity);
+	emit effective_resource_demand_changed(resource->get_index(), this->get_effective_resource_demand(resource));
 }
 
 void CPlayer::set_income(const resource *resource, const int quantity)
@@ -3593,6 +3593,8 @@ void CPlayer::set_price(const resource *resource, const int quantity)
 
 	emit price_changed(resource->get_index(), quantity);
 	emit effective_sell_price_changed(resource->get_index(), this->get_effective_resource_sell_price(resource));
+	emit effective_buy_price_changed(resource->get_index(), this->get_effective_resource_buy_price(resource));
+	emit effective_resource_demand_changed(resource->get_index(), this->get_effective_resource_demand(resource));
 }
 
 std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const

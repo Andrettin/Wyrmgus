@@ -492,13 +492,6 @@ public:
 		return 0;
 	}
 
-	Q_INVOKABLE int get_resource_demand_sync(wyrmgus::resource *resource) const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_resource_demand(resource);
-	}
-
 	void set_resource_demand(const resource *resource, const int quantity);
 
 	void change_resource_demand(const resource *resource, const int quantity)
@@ -824,8 +817,16 @@ public:
 	int ConvergePricesWith(CPlayer &player, int max_convergences);
 	/// Get the resource price
 	int get_resource_price(const resource *resource) const;
+
 	/// Get the effective resource demand for the player, given the current prices
 	int get_effective_resource_demand(const resource *resource) const;
+
+	Q_INVOKABLE int get_effective_resource_demand_sync(wyrmgus::resource *resource) const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_effective_resource_demand(resource);
+	}
 
 	int get_effective_resource_sell_price(const resource *resource, const int traded_quantity = 100) const;
 
@@ -837,6 +838,13 @@ public:
 	}
 
 	int get_effective_resource_buy_price(const resource *resource, const int traded_quantity = 100) const;
+
+	Q_INVOKABLE int get_effective_resource_buy_price_sync(wyrmgus::resource *resource) const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_effective_resource_buy_price(resource);
+	}
 
 	/// Get the total price difference between this player and another one
 	int GetTotalPriceDifferenceWith(const CPlayer &player) const;
@@ -1185,7 +1193,8 @@ signals:
 	void resource_stored_changed(const int resource_index, const int amount);
 	void price_changed(const int resource_index, const int price);
 	void effective_sell_price_changed(const int resource_index, const int price);
-	void resource_demand_changed(const int resource_index, const int demand);
+	void effective_buy_price_changed(const int resource_index, const int price);
+	void effective_resource_demand_changed(const int resource_index, const int demand);
 	void resource_processing_bonus_changed(const int resource_index, const int bonus);
 	void resource_children_processing_bonus_string_changed(const int resource_index, const QString &str);
 	void trade_cost_changed();
