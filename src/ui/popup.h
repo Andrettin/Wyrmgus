@@ -106,7 +106,6 @@ public:
 	char DynastyUpgrade = 0;	/// check if the button's upgrade is a dynasty upgrade
 	char UpgradeResearched = 0;	/// check if the button's upgrade has already been researched
 	char Ability = 0;			/// check if the button's upgrade is an ability
-	char ChildResources = 0;	/// check if the button's resource has child resources
 	char ImproveIncomes = 0;	/// check if the button's unit type has processing bonuses for any resource
 	char LuxuryResource = 0;	/// check if the button's resource is a luxury resource
 	char RequirementsString = 0;	/// check if the button's unit type or upgrade has a requirements string

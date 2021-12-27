@@ -2117,7 +2117,7 @@ static int CclDefineResource(lua_State *l)
 			wyrmgus::resource *input_resource = resource::get(input_resource_ident);
 			resource->input_resource = input_resource;
 		} else if (!strcmp(value, "Hidden")) {
-			resource->Hidden = LuaToBoolean(l, -1);
+			resource->hidden = LuaToBoolean(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

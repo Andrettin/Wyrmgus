@@ -3493,6 +3493,69 @@ void CPlayer::set_stored_resource(const resource *resource, const int quantity)
 	emit resource_stored_changed(resource->get_index(), this->get_resource(resource, resource_storage_type::both));
 }
 
+void CPlayer::set_income(const resource *resource, const int quantity)
+{
+	std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+	if (this == CPlayer::GetThisPlayer()) {
+		lock = std::unique_lock<std::shared_mutex>(this->mutex);
+	}
+
+	if (quantity == 0) {
+		if (this->incomes.contains(resource)) {
+			this->incomes.erase(resource);
+		}
+	} else {
+		this->incomes[resource] = quantity;
+	}
+
+	emit resource_processing_bonus_changed(resource->get_index(), this->get_processing_bonus(resource));
+
+	if (!resource->is_final()) {
+		const wyrmgus::resource *final_resource = resource->get_final_resource();
+		const QString str = QString::fromStdString(this->get_children_processing_bonus_string(final_resource));
+		emit resource_children_processing_bonus_string_changed(final_resource->get_index(), str);
+	}
+}
+
+int CPlayer::get_processing_bonus(const resource *resource) const
+{
+	return this->get_income(resource) - resource->get_default_income();
+}
+
+int CPlayer::get_processing_bonus_sync(resource *resource) const
+{
+	std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+	return this->get_processing_bonus(resource);
+}
+
+std::string CPlayer::get_children_processing_bonus_string(const resource *resource) const
+{
+	std::string str;
+
+	bool first = true;
+	for (const wyrmgus::resource *child_resource : resource->get_child_resources()) {
+		if (child_resource->get_index() == TradeCost || child_resource->is_hidden()) {
+			continue;
+		}
+
+		if (this->get_income(child_resource) > child_resource->get_default_income()) {
+			if (!first) {
+				str += "\n";
+			} else {
+				first = false;
+			}
+			str += child_resource->get_name();
+			str += " Processing Bonus: +";
+			str += std::to_string(this->get_processing_bonus(child_resource));
+			str += "%";
+		}
+	}
+
+	return str;
+}
+
 std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const
 {
 	return Units.begin();

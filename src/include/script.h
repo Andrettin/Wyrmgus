@@ -169,8 +169,6 @@ enum EString {
 	EString_FactionCoreSettlements,	/// Core settlements of the faction
 	EString_ResourceIdent,	/// Resource's ident
 	EString_ResourceName,	/// Resource's name
-	EString_ResourceConversionRates,		/// Resource's conversion rates
-	EString_ResourceImproveIncomes,			/// Resource's processing bonuses
 	//Wyrmgus end
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.

@@ -545,15 +545,17 @@ public:
 		return 0;
 	}
 
-	void set_income(const resource *resource, const int quantity)
+	void set_income(const resource *resource, const int quantity);
+
+	int get_processing_bonus(const resource *resource) const;
+	Q_INVOKABLE int get_processing_bonus_sync(wyrmgus::resource *resource) const;
+	std::string get_children_processing_bonus_string(const resource *resource) const;
+
+	Q_INVOKABLE QString get_children_processing_bonus_string_sync(resource *resource) const
 	{
-		if (quantity == 0) {
-			if (this->incomes.contains(resource)) {
-				this->incomes.erase(resource);
-			}
-		} else {
-			this->incomes[resource] = quantity;
-		}
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return QString::fromStdString(this->get_children_processing_bonus_string(resource));
 	}
 
 	int get_revenue(const resource *resource) const
@@ -1147,6 +1149,8 @@ signals:
 	void type_changed();
 	void alive_changed();
 	void resource_stored_changed(const int resource_index, const int amount);
+	void resource_processing_bonus_changed(const int resource_index, const int bonus);
+	void resource_children_processing_bonus_string_changed(const int resource_index, const QString &str);
 	void current_special_resources_changed();
 	void diplomatic_stances_changed();
 	void shared_vision_changed();

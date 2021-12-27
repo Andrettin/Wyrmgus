@@ -91,8 +91,10 @@ class resource final : public named_data_entry, public data_type<resource>
 	Q_PROPERTY(int base_price MEMBER base_price READ get_base_price)
 	Q_PROPERTY(int demand_elasticity MEMBER demand_elasticity READ get_demand_elasticity)
 	Q_PROPERTY(wyrmgus::resource* input_resource MEMBER input_resource)
-	Q_PROPERTY(bool luxury MEMBER luxury READ is_luxury)
+	Q_PROPERTY(bool luxury MEMBER luxury READ is_luxury NOTIFY changed)
 	Q_PROPERTY(bool special MEMBER special READ is_special)
+	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
+	Q_PROPERTY(QString conversion_rates_string READ get_conversion_rates_qstring CONSTANT)
 
 public:
 	static constexpr const char *class_identifier = "resource";
@@ -158,6 +160,11 @@ public:
 		return this;
 	}
 
+	bool is_final() const
+	{
+		return this->get_final_resource() == this;
+	}
+
 	int get_final_resource_conversion_rate() const
 	{
 		return this->final_resource_conversion_rate;
@@ -192,6 +199,46 @@ public:
 		return this->special;
 	}
 
+	bool is_hidden() const
+	{
+		return this->hidden;
+	}
+
+	const std::vector<const resource *> &get_child_resources() const
+	{
+		return this->child_resources;
+	}
+
+	std::string get_conversion_rates_string() const
+	{
+		std::string str;
+
+		bool first = true;
+		for (const wyrmgus::resource *child_resource : this->get_child_resources()) {
+			if (child_resource->get_index() == TradeCost || child_resource->is_hidden()) {
+				continue;
+			}
+
+			if (!first) {
+				str += "\n";
+			} else {
+				first = false;
+			}
+
+			str += child_resource->get_name();
+			str += " Conversion Rate: ";
+			str += std::to_string(child_resource->get_final_resource_conversion_rate());
+			str += "%";
+		}
+
+		return str;
+	}
+
+	QString get_conversion_rates_qstring() const
+	{
+		return QString::fromStdString(this->get_conversion_rates_string());
+	}
+
 signals:
 	void changed();
 
@@ -212,9 +259,9 @@ private:
 	resource *input_resource = nullptr;
 	bool luxury = false;
 	bool special = false; //whether this is a special resource, i.e. whether it should not be shown among the main resources
+	bool hidden = false;
+	std::vector<const resource *> child_resources; //resources (other than this one) that have this resource as their final resource
 public:
-	bool Hidden = false;
-	std::vector<resource *> ChildResources; //resources (other than this one) that have this resource as their final resource
 
 	friend int ::CclDefineDefaultResourceNames(lua_State *l);
 	friend int ::CclDefineResource(lua_State *l);

@@ -86,7 +86,7 @@ void resource::process_sml_property(const sml_property &property)
 void resource::initialize()
 {
 	if (this->final_resource != nullptr) {
-		this->final_resource->ChildResources.push_back(this);
+		this->final_resource->child_resources.push_back(this);
 	}
 
 	if (this->is_luxury()) {
@@ -132,7 +132,7 @@ bool resource::IsMineResource() const
 
 bool resource::is_main() const
 {
-	return this->get_final_resource() == this && !this->is_special() && this != defines::get()->get_time_resource();
+	return this->is_final() && !this->is_special() && this != defines::get()->get_time_resource();
 }
 
 }

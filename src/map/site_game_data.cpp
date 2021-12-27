@@ -271,7 +271,7 @@ bool site_game_data::has_resource_source(const resource *resource) const
 		return true;
 	}
 
-	for (const wyrmgus::resource *child_resource : resource->ChildResources) {
+	for (const wyrmgus::resource *child_resource : resource->get_child_resources()) {
 		if (this->get_resource_tile_count(child_resource) > 0 || !this->get_resource_units(child_resource).empty()) {
 			return true;
 		}

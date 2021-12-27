@@ -1253,12 +1253,6 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "ResourceName")) {
 			res->e = EString_ResourceName;
 			res->D.Resource = CclParseResourceDesc(l);
-		} else if (!strcmp(key, "ResourceConversionRates")) {
-			res->e = EString_ResourceConversionRates;
-			res->D.Resource = CclParseResourceDesc(l);
-		} else if (!strcmp(key, "ResourceImproveIncomes")) {
-			res->e = EString_ResourceImproveIncomes;
-			res->D.Resource = CclParseResourceDesc(l);
 		//Wyrmgus end
 		} else if (!strcmp(key, "If")) {
 			res->e = EString_If;
@@ -1861,64 +1855,6 @@ std::string EvalString(const StringDesc *s)
 			resource = s->D.Resource;
 			if (resource != nullptr) {
 				return (*resource)->get_name();
-			} else { // ERROR.
-				return std::string();
-			}
-		case EString_ResourceConversionRates : // unit type's processing bonuses
-			resource = s->D.Resource;
-			if (resource != nullptr) {
-				std::string conversion_rates;
-				bool first = true;
-				for (const wyrmgus::resource *child_resource : (*resource)->ChildResources) {
-					if (child_resource->get_index() == TradeCost || child_resource->Hidden) {
-						continue;
-					}
-					if (!first) {
-						conversion_rates += "\n";
-					} else {
-						first = false;
-					}
-					conversion_rates += child_resource->get_name();
-					conversion_rates += " to ";
-					conversion_rates += (*resource)->get_name();
-					conversion_rates += " Conversion Rate: ";
-					conversion_rates += std::to_string(child_resource->get_final_resource_conversion_rate());
-					conversion_rates += "%";
-				}
-				return conversion_rates;
-			} else { // ERROR.
-				return std::string();
-			}
-		case EString_ResourceImproveIncomes : // unit type's processing bonuses
-			resource = s->D.Resource;
-			if (resource != nullptr) {
-				std::string improve_incomes;
-				bool first = true;
-				if (CPlayer::GetThisPlayer()->get_income((*resource)) > (*resource)->get_default_income()) {
-					first = false;
-					improve_incomes += (*resource)->get_name();
-					improve_incomes += " Processing Bonus: +";
-					improve_incomes += std::to_string(CPlayer::GetThisPlayer()->get_income((*resource)) - (*resource)->get_default_income());
-					improve_incomes += "%";
-				}
-				for (const wyrmgus::resource *child_resource : (*resource)->ChildResources) {
-					if (child_resource->get_index() == TradeCost || child_resource->Hidden) {
-						continue;
-					}
-
-					if (CPlayer::GetThisPlayer()->get_income(child_resource) > child_resource->get_default_income()) {
-						if (!first) {
-							improve_incomes += "\n";
-						} else {
-							first = false;
-						}
-						improve_incomes += child_resource->get_name();
-						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string(CPlayer::GetThisPlayer()->get_income(child_resource) - child_resource->get_default_income());
-						improve_incomes += "%";
-					}
-				}
-				return improve_incomes;
 			} else { // ERROR.
 				return std::string();
 			}
@@ -2810,16 +2746,6 @@ static int CclResourceName(lua_State *l)
 {
 	return Alias(l, "ResourceName");
 }
-
-static int CclResourceConversionRates(lua_State *l)
-{
-	return Alias(l, "ResourceConversionRates");
-}
-
-static int CclResourceImproveIncomes(lua_State *l)
-{
-	return Alias(l, "ResourceImproveIncomes");
-}
 //Wyrmgus end
 
 static int CclTileTerrainFeatureName(lua_State *l)
@@ -3059,8 +2985,6 @@ static void AliasRegister()
 	lua_register(Lua, "ButtonPlayer", CclButtonPlayer);
 	lua_register(Lua, "ResourceIdent", CclResourceIdent);
 	lua_register(Lua, "ResourceName", CclResourceName);
-	lua_register(Lua, "ResourceConversionRates", CclResourceConversionRates);
-	lua_register(Lua, "ResourceImproveIncomes", CclResourceImproveIncomes);
 	//Wyrmgus end
 	lua_register(Lua, "TileTerrainFeatureName", CclTileTerrainFeatureName);
 	lua_register(Lua, "TileWorldName", CclTileWorldName);

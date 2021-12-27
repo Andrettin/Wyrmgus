@@ -359,40 +359,24 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 
-	if (condition->ChildResources != CONDITION_TRUE) {
-		if ((condition->ChildResources == CONDITION_ONLY) ^ (wyrmgus::resource::get_all()[button.Value]->ChildResources.size() > 0)) {
-			return false;
-		}
-	}
-
 	if (condition->ImproveIncomes != CONDITION_TRUE) {
 		bool improve_incomes = false;
-		if (button.Action == ButtonCmd::ProduceResource) {
-			if (CPlayer::GetThisPlayer()->get_income(button.get_value_resource()) > button.get_value_resource()->get_default_income()) {
+
+		if (!type) {
+			return false;
+		}
+
+		for (const auto &[resource, quantity] : type->Stats[CPlayer::GetThisPlayer()->get_index()].get_improve_incomes()) {
+			if (resource->get_index() == TimeCost) {
+				continue;
+			}
+
+			if (quantity > resource->get_default_income()) {
 				improve_incomes = true;
-			}
-
-			for (const resource *child_resource : resource::get_all()[button.Value]->ChildResources) {
-				if (CPlayer::GetThisPlayer()->get_income(child_resource) > child_resource->get_default_income()) {
-					improve_incomes = true;
-					break;
-				}
-			}
-		} else {
-			if (!type) {
-				return false;
-			}
-			for (const auto &[resource, quantity] : type->Stats[CPlayer::GetThisPlayer()->get_index()].get_improve_incomes()) {
-				if (resource->get_index() == TimeCost) {
-					continue;
-				}
-
-				if (quantity > resource->get_default_income()) {
-					improve_incomes = true;
-					break;
-				}
+				break;
 			}
 		}
+
 		if ((condition->ImproveIncomes == CONDITION_ONLY) ^ improve_incomes) {
 			return false;
 		}

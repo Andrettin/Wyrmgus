@@ -810,8 +810,6 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 			condition->UpgradeResearched = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Ability")) {
 			condition->Ability = Ccl2Condition(l, LuaToString(l, -1));
-		} else if (!strcmp(key, "ChildResources")) {
-			condition->ChildResources = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ImproveIncomes")) {
 			condition->ImproveIncomes = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "LuxuryResource")) {
