@@ -444,10 +444,10 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 
 			if (trade_cost_change <= 0) {
 				if (!unitupgrade.empty()) {
-					player->TradeCost = std::min(player->TradeCost, stat.Variables[TRADECOST_INDEX].Value);
+					player->set_trade_cost(std::min(player->get_trade_cost(), stat.Variables[TRADECOST_INDEX].Value));
 				}
 			} else {
-				if ((stat.Variables[TRADECOST_INDEX].Value + trade_cost_change) <= player->TradeCost) {
+				if ((stat.Variables[TRADECOST_INDEX].Value + trade_cost_change) <= player->get_trade_cost()) {
 					int m = DefaultTradeCost;
 
 					for (int k = 0; k < player->GetUnitCount(); ++k) {
@@ -456,7 +456,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 						}
 					}
 
-					player->TradeCost = m;
+					player->set_trade_cost(m);
 				}
 			}
 		}

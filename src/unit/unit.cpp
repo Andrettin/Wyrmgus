@@ -4374,7 +4374,7 @@ void UnitLost(CUnit &unit)
 					m = std::min(m, player.GetUnit(j).Type->Stats[player.get_index()].Variables[TRADECOST_INDEX].Value);
 				}
 			}
-			player.TradeCost = m;
+			player.set_trade_cost(m);
 		}
 		
 		//Wyrmgus start
@@ -4494,7 +4494,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	}
 	
 	if (type.Stats[player.get_index()].Variables[TRADECOST_INDEX].Enable) {
-		player.TradeCost = std::min(player.TradeCost, type.Stats[player.get_index()].Variables[TRADECOST_INDEX].Value);
+		player.set_trade_cost(std::min(player.get_trade_cost(), type.Stats[player.get_index()].Variables[TRADECOST_INDEX].Value));
 	}
 	
 	//Wyrmgus start

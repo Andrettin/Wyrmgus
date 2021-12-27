@@ -857,7 +857,7 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		const resource *resource = resource::get(arg);
 		return player->get_effective_resource_sell_price(resource);
 	} else if (!strcmp(prop, "TradeCost")) {
-		return player->TradeCost;
+		return player->get_trade_cost();
 		//Wyrmgus end
 	} else if (!strcmp(prop, "UnitTypesCount")) {
 		const std::string unit(arg);

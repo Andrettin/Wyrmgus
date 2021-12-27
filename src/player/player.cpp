@@ -721,7 +721,7 @@ void CPlayer::Save(CFile &file) const
 	}
 	
 	file.printf(" \"supply\", %d,", p.Supply);
-	file.printf(" \"trade-cost\", %d,", p.TradeCost);
+	file.printf(" \"trade-cost\", %d,", p.get_trade_cost());
 	file.printf(" \"unit-limit\", %d,", p.UnitLimit);
 	file.printf(" \"building-limit\", %d,", p.BuildingLimit);
 	file.printf(" \"total-unit-limit\", %d,", p.TotalUnitLimit);
@@ -1045,7 +1045,7 @@ void CPlayer::Init(player_type type)
 		this->set_income(resource, resource->get_default_income());
 	}
 	
-	this->TradeCost = DefaultTradeCost;
+	this->trade_cost = DefaultTradeCost;
 
 	//initial max resource amounts.
 	for (const resource *resource : resource::get_all()) {
@@ -2721,7 +2721,7 @@ void CPlayer::Clear()
 	//Wyrmgus end
 	this->Supply = 0;
 	this->Demand = 0;
-	this->TradeCost = 0;
+	this->trade_cost = 0;
 	// FIXME: can't clear limits since it's initialized already
 	//	UnitLimit = 0;
 	//	BuildingLimit = 0;
@@ -3493,6 +3493,25 @@ void CPlayer::set_stored_resource(const resource *resource, const int quantity)
 	emit resource_stored_changed(resource->get_index(), this->get_resource(resource, resource_storage_type::both));
 }
 
+void CPlayer::set_resource_demand(const resource *resource, const int quantity)
+{
+	std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+	if (this == CPlayer::GetThisPlayer()) {
+		lock = std::unique_lock<std::shared_mutex>(this->mutex);
+	}
+
+	if (quantity == 0) {
+		if (this->resource_demands.contains(resource)) {
+			this->resource_demands.erase(resource);
+		}
+	} else {
+		this->resource_demands[resource] = quantity;
+	}
+
+	emit resource_demand_changed(resource->get_index(), quantity);
+}
+
 void CPlayer::set_income(const resource *resource, const int quantity)
 {
 	std::optional<std::unique_lock<std::shared_mutex>> lock;
@@ -3554,6 +3573,26 @@ std::string CPlayer::get_children_processing_bonus_string(const resource *resour
 	}
 
 	return str;
+}
+
+void CPlayer::set_price(const resource *resource, const int quantity)
+{
+	std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+	if (this == CPlayer::GetThisPlayer()) {
+		lock = std::unique_lock<std::shared_mutex>(this->mutex);
+	}
+
+	if (quantity == 0) {
+		if (this->prices.contains(resource)) {
+			this->prices.erase(resource);
+		}
+	} else {
+		this->prices[resource] = quantity;
+	}
+
+	emit price_changed(resource->get_index(), quantity);
+	emit effective_sell_price_changed(resource->get_index(), this->get_effective_resource_sell_price(resource));
 }
 
 std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const
@@ -3786,7 +3825,7 @@ int CPlayer::get_effective_resource_sell_price(const resource *resource, const i
 		return 100;
 	}
 	
-	int price = traded_quantity * this->get_price(resource) / 100 * (100 - this->TradeCost) / 100;
+	int price = traded_quantity * this->get_price(resource) / 100 * (100 - this->get_trade_cost()) / 100;
 	price = std::max(1, price);
 	return price;
 }
@@ -3796,7 +3835,7 @@ int CPlayer::get_effective_resource_sell_price(const resource *resource, const i
 */
 int CPlayer::get_effective_resource_buy_price(const resource *resource, const int traded_quantity) const
 {
-	int price = traded_quantity * this->get_price(resource) / 100 * 100 / (100 - this->TradeCost);
+	int price = traded_quantity * this->get_price(resource) / 100 * 100 / (100 - this->get_trade_cost());
 	price = std::max(1, price);
 	return price;
 }

@@ -92,6 +92,7 @@ class CPlayer final : public QObject
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY name_changed)
 	Q_PROPERTY(bool active READ is_active_sync NOTIFY type_changed)
 	Q_PROPERTY(bool alive READ is_alive_sync NOTIFY alive_changed)
+	Q_PROPERTY(int trade_cost READ get_trade_cost_sync NOTIFY trade_cost_changed)
 	Q_PROPERTY(QVariantList current_special_resources READ get_current_special_resources_sync NOTIFY current_special_resources_changed)
 
 public:
@@ -491,16 +492,14 @@ public:
 		return 0;
 	}
 
-	void set_resource_demand(const resource *resource, const int quantity)
+	Q_INVOKABLE int get_resource_demand_sync(wyrmgus::resource *resource) const
 	{
-		if (quantity == 0) {
-			if (this->resource_demands.contains(resource)) {
-				this->resource_demands.erase(resource);
-			}
-		} else {
-			this->resource_demands[resource] = quantity;
-		}
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_resource_demand(resource);
 	}
+
+	void set_resource_demand(const resource *resource, const int quantity);
 
 	void change_resource_demand(const resource *resource, const int quantity)
 	{
@@ -551,7 +550,7 @@ public:
 	Q_INVOKABLE int get_processing_bonus_sync(wyrmgus::resource *resource) const;
 	std::string get_children_processing_bonus_string(const resource *resource) const;
 
-	Q_INVOKABLE QString get_children_processing_bonus_string_sync(resource *resource) const
+	Q_INVOKABLE QString get_children_processing_bonus_string_sync(wyrmgus::resource *resource) const
 	{
 		std::shared_lock<std::shared_mutex> lock(this->mutex);
 
@@ -591,16 +590,14 @@ public:
 		return 0;
 	}
 
-	void set_price(const resource *resource, const int quantity)
+	Q_INVOKABLE int get_price_sync(wyrmgus::resource *resource) const
 	{
-		if (quantity == 0) {
-			if (this->prices.contains(resource)) {
-				this->prices.erase(resource);
-			}
-		} else {
-			this->prices[resource] = quantity;
-		}
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_price(resource);
 	}
+
+	void set_price(const resource *resource, const int quantity);
 
 	void change_price(const resource *resource, const int quantity)
 	{
@@ -649,6 +646,35 @@ public:
 		} else {
 			this->resource_return_speeds[resource] = quantity;
 		}
+	}
+
+	int get_trade_cost() const
+	{
+		return this->trade_cost;
+	}
+
+	int get_trade_cost_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_trade_cost();
+	}
+
+	void set_trade_cost(const int trade_cost)
+	{
+		if (trade_cost == this->get_trade_cost()) {
+			return;
+		}
+
+		std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+		if (this == CPlayer::GetThisPlayer()) {
+			lock = std::unique_lock<std::shared_mutex>(this->mutex);
+		}
+
+		this->trade_cost = trade_cost;
+
+		emit trade_cost_changed();
 	}
 
 	int get_infantry_cost_modifier() const
@@ -802,6 +828,14 @@ public:
 	int get_effective_resource_demand(const resource *resource) const;
 
 	int get_effective_resource_sell_price(const resource *resource, const int traded_quantity = 100) const;
+
+	Q_INVOKABLE int get_effective_resource_sell_price_sync(wyrmgus::resource *resource) const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_effective_resource_sell_price(resource);
+	}
+
 	int get_effective_resource_buy_price(const resource *resource, const int traded_quantity = 100) const;
 
 	/// Get the total price difference between this player and another one
@@ -1149,8 +1183,12 @@ signals:
 	void type_changed();
 	void alive_changed();
 	void resource_stored_changed(const int resource_index, const int amount);
+	void price_changed(const int resource_index, const int price);
+	void effective_sell_price_changed(const int resource_index, const int price);
+	void resource_demand_changed(const int resource_index, const int demand);
 	void resource_processing_bonus_changed(const int resource_index, const int bonus);
 	void resource_children_processing_bonus_string_changed(const int resource_index, const QString &str);
+	void trade_cost_changed();
 	void current_special_resources_changed();
 	void diplomatic_stances_changed();
 	void shared_vision_changed();
@@ -1200,9 +1238,9 @@ private:
 	resource_map<int> prices;		  /// price of each resource
 	resource_map<int> resource_demands; /// demand for the resources
 	resource_map<int> stored_resource_demands; /// stored demand for the resources (converted into a trade action when reaches 100)
+	int trade_cost = DefaultTradeCost;
 	
 public:
-	int TradeCost;					/// cost of trading
 	//Wyrmgus end
 
 private:

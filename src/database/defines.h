@@ -85,7 +85,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(int map_area_top_margin MEMBER map_area_top_margin READ get_map_area_top_margin)
 	Q_PROPERTY(int map_area_bottom_margin MEMBER map_area_bottom_margin READ get_map_area_bottom_margin)
 	Q_PROPERTY(wyrmgus::resource* time_resource MEMBER time_resource)
-	Q_PROPERTY(wyrmgus::resource* wealth_resource MEMBER wealth_resource)
+	Q_PROPERTY(wyrmgus::resource* wealth_resource MEMBER wealth_resource NOTIFY changed)
 	Q_PROPERTY(wyrmgus::time_of_day* underground_time_of_day MEMBER underground_time_of_day)
 	Q_PROPERTY(wyrmgus::time_of_day_schedule* default_time_of_day_schedule MEMBER default_time_of_day_schedule)
 	Q_PROPERTY(wyrmgus::season_schedule* default_season_schedule MEMBER default_season_schedule)
