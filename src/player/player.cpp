@@ -2753,6 +2753,8 @@ void CPlayer::Clear()
 	this->infantry_cost_modifier = 0;
 	this->cavalry_cost_modifier = 0;
 
+	this->Allow.Clear();
+
 	emit diplomatic_stances_changed();
 	emit shared_vision_changed();
 }
