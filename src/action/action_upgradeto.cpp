@@ -135,8 +135,8 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	if (!unit.UnderConstruction) {
 		player.DecreaseCountsForUnit(&unit, true);
 		
-		player.Demand += newtype.Stats[player.get_index()].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.get_index()].Variables[DEMAND_INDEX].Value;
-		player.Supply += newtype.Stats[player.get_index()].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.get_index()].Variables[SUPPLY_INDEX].Value;
+		player.change_demand(newtype.Stats[player.get_index()].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.get_index()].Variables[DEMAND_INDEX].Value);
+		player.change_supply(newtype.Stats[player.get_index()].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.get_index()].Variables[SUPPLY_INDEX].Value);
 
 		// Change resource limit
 		for (const resource *resource : resource::get_all()) {

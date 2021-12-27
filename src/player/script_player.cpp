@@ -304,9 +304,9 @@ void CPlayer::Load(lua_State *l)
 			--j;
 		//Wyrmgus end
 		} else if (!strcmp(value, "supply")) {
-			this->Supply = LuaToNumber(l, j + 1);
+			this->supply = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "demand")) {
-			this->Demand = LuaToNumber(l, j + 1);
+			this->demand = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "trade-cost")) {
 			this->trade_cost = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "unit-limit")) {
@@ -2369,10 +2369,10 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Supply")) {
-		lua_pushnumber(l, p->Supply);
+		lua_pushnumber(l, p->get_supply());
 		return 1;
 	} else if (!strcmp(data, "Demand")) {
-		lua_pushnumber(l, p->Demand);
+		lua_pushnumber(l, p->get_demand());
 		return 1;
 	} else if (!strcmp(data, "UnitLimit")) {
 		lua_pushnumber(l, p->UnitLimit);

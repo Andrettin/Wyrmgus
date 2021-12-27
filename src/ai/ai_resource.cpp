@@ -151,7 +151,7 @@ static int AiCheckSupply(const PlayerAi &pai, const unit_type &type)
 	}
 
 	// We are already out of food.
-	remaining += pai.Player->Supply - pai.Player->Demand - type.Stats[pai.Player->get_index()].Variables[DEMAND_INDEX].Value;
+	remaining += pai.Player->get_supply() - pai.Player->get_demand() - type.Stats[pai.Player->get_index()].Variables[DEMAND_INDEX].Value;
 	if (remaining < 0) {
 		return 0;
 	}
@@ -2816,7 +2816,7 @@ void AiResourceManager()
 	// Look if we can build a farm in advance.
 	//Wyrmgus start
 //	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply == AiPlayer->Player->Demand) {
-	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply <= (AiPlayer->Player->Demand + 4)) { //try to keep surplus supply (of 4 in this case)
+	if (!AiPlayer->NeedSupply && AiPlayer->Player->get_supply() <= (AiPlayer->Player->get_demand() + 4)) { //try to keep surplus supply (of 4 in this case)
 	//Wyrmgus end
 		AiRequestSupply();
 	}

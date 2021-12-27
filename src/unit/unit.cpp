@@ -3072,7 +3072,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		
 		player.IncreaseCountsForUnit(this);
 
-		player.Demand += type.Stats[player.get_index()].Variables[DEMAND_INDEX].Value; //food needed
+		player.change_demand(type.Stats[player.get_index()].Variables[DEMAND_INDEX].Value); //food needed
 	}
 
 	// Don't Add the building if it's dying, used to load a save game
@@ -4327,11 +4327,11 @@ void UnitLost(CUnit &unit)
 	}
 
 	//  Handle unit demand. (Currently only food supported.)
-	player.Demand -= type.Stats[player.get_index()].Variables[DEMAND_INDEX].Value;
+	player.change_demand(-type.Stats[player.get_index()].Variables[DEMAND_INDEX].Value);
 
 	//  Update information.
 	if (unit.CurrentAction() != UnitAction::Built) {
-		player.Supply -= unit.Variable[SUPPLY_INDEX].Value;
+		player.change_supply(-unit.Variable[SUPPLY_INDEX].Value);
 		// Decrease resource limit
 		for (const resource *resource : resource::get_all()) {
 			if (player.get_max_resource(resource) != -1 && type.Stats[player.get_index()].get_storing(resource) != 0) {
@@ -4476,7 +4476,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	// Handle unit supply and max resources.
 	// Note an upgraded unit can't give more supply.
 	if (!upgrade) {
-		player.Supply += unit.Variable[SUPPLY_INDEX].Value;
+		player.change_supply(unit.Variable[SUPPLY_INDEX].Value);
 		for (const resource *resource : resource::get_all()) {
 			if (player.get_max_resource(resource) != -1 && type.Stats[player.get_index()].get_storing(resource) != 0) {
 				player.change_max_resource(resource, type.Stats[player.get_index()].get_storing(resource));
@@ -4907,8 +4907,8 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus end
 		DebugPrint("Resource transfer not supported\n");
 	}
-	newplayer.Demand += Type->Stats[newplayer.get_index()].Variables[DEMAND_INDEX].Value;
-	newplayer.Supply += this->Variable[SUPPLY_INDEX].Value;
+	newplayer.change_demand(this->Type->Stats[newplayer.get_index()].Variables[DEMAND_INDEX].Value);
+	newplayer.change_supply(this->Variable[SUPPLY_INDEX].Value);
 
 	// Increase resource limit
 	for (const resource *resource : resource::get_all()) {

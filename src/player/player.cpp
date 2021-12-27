@@ -720,7 +720,7 @@ void CPlayer::Save(CFile &file) const
 		file.printf(" \"revealed\",");
 	}
 	
-	file.printf(" \"supply\", %d,", p.Supply);
+	file.printf(" \"supply\", %d,", p.get_supply());
 	file.printf(" \"trade-cost\", %d,", p.get_trade_cost());
 	file.printf(" \"unit-limit\", %d,", p.UnitLimit);
 	file.printf(" \"building-limit\", %d,", p.BuildingLimit);
@@ -1064,8 +1064,8 @@ void CPlayer::Init(player_type type)
 	this->last_created_unit = nullptr;
 	//Wyrmgus end
 
-	this->Supply = 0;
-	this->Demand = 0;
+	this->supply = 0;
+	this->demand = 0;
 	this->NumBuildings = 0;
 	//Wyrmgus start
 	this->NumBuildingsUnderConstruction = 0;
@@ -2719,8 +2719,8 @@ void CPlayer::Clear()
 	this->NumBuildingsUnderConstruction = 0;
 	this->NumTownHalls = 0;
 	//Wyrmgus end
-	this->Supply = 0;
-	this->Demand = 0;
+	this->supply = 0;
+	this->demand = 0;
 	this->trade_cost = 0;
 	// FIXME: can't clear limits since it's initialized already
 	//	UnitLimit = 0;
@@ -3954,7 +3954,7 @@ int CPlayer::CheckLimits(const wyrmgus::unit_type &type) const
 	}
 	//Wyrmgus start
 //	if (this->Demand + type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value > this->Supply && type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value) {
-	if (this->Demand + (type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value * (type.TrainQuantity ? type.TrainQuantity : 1)) > this->Supply && type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value) {
+	if (this->get_demand() + (type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value * (type.TrainQuantity ? type.TrainQuantity : 1)) > this->get_supply() && type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		Notify("%s", _("Insufficient Supply, increase Supply."));

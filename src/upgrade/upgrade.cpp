@@ -1484,7 +1484,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 
 	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 		if (unit.IsAlive()) {
-			unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
+			unit.Player->change_supply(um->Modifier.Variables[SUPPLY_INDEX].Value);
 		}
 	}
 
@@ -1526,7 +1526,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifie
 
 	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 		if (unit.IsAlive()) {
-			unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
+			unit.Player->change_supply(-um->Modifier.Variables[SUPPLY_INDEX].Value);
 		}
 	}
 

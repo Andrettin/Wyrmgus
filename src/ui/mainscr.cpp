@@ -791,33 +791,6 @@ void DrawResources(std::vector<std::function<void(renderer *)>> &render_commands
 			}
 		}
 	}
-	if (UI.Resources[FoodCost].TextX != -1) {
-		char tmp[256];
-		snprintf(tmp, sizeof(tmp), "%d/%d", CPlayer::GetThisPlayer()->Demand, CPlayer::GetThisPlayer()->Supply);
-		UI.Resources[FoodCost].Text = tmp;
-		UI.Resources[FoodCost].Font = wyrmgus::defines::get()->get_game_font();
-		label.SetFont(UI.Resources[FoodCost].Font);
-		if (CPlayer::GetThisPlayer()->Supply < CPlayer::GetThisPlayer()->Demand) {
-			label.DrawReverse(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, UI.Resources[FoodCost].Text, render_commands);
-		} else {
-			label.Draw(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, UI.Resources[FoodCost].Text, render_commands);
-		}
-	}
-	if (UI.Resources[ScoreCost].TextX != -1) {
-		const int score = CPlayer::GetThisPlayer()->get_score();
-
-		UI.Resources[ScoreCost].Text = FormatNumber(score);
-		UI.Resources[ScoreCost].Font = score > 99999 ? wyrmgus::defines::get()->get_small_font() : wyrmgus::defines::get()->get_game_font();
-		
-		label.SetFont(UI.Resources[ScoreCost].Font);
-		label.Draw(UI.Resources[ScoreCost].TextX, UI.Resources[ScoreCost].TextY + (score > 99999) * 3, UI.Resources[ScoreCost].Text, render_commands);
-	}
-	if (UI.Resources[FreeWorkersCount].TextX != -1) {
-		const int workers = CPlayer::GetThisPlayer()->FreeWorkers.size();
-
-		label.SetFont(wyrmgus::defines::get()->get_game_font());
-		label.Draw(UI.Resources[FreeWorkersCount].TextX, UI.Resources[FreeWorkersCount].TextY, workers, render_commands);
-	}
 }
 
 /*----------------------------------------------------------------------------
@@ -1072,22 +1045,6 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		}
 	}
 		
-	const wyrmgus::resource_icon *food_icon = wyrmgus::defines::get()->get_food_icon();
-	if (food_icon != nullptr && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + food_icon->get_graphics()->get_frame_height())) {
-		//hackish way to make the popup appear correctly
-		wyrmgus::button ba;
-		ba.Hint = _("Food");
-		ba.Action = ButtonCmd::None;
-		ba.Popup = "popup_food";
-		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false, render_commands);
-		LastDrawnButtonPopup = nullptr;
-	}
-	
-	const wyrmgus::resource_icon *score_icon = wyrmgus::defines::get()->get_score_icon();
-	if (score_icon != nullptr && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + score_icon->get_graphics()->get_frame_height())) {
-		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
-	}
-	
 	const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
 	const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
 	std::shared_ptr<const CGraphic> time_of_day_icon_graphics;

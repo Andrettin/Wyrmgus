@@ -882,9 +882,9 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		return player->NumBuildingsUnderConstruction;
 		//Wyrmgus end
 	} else if (!strcmp(prop, "Supply")) {
-		return player->Supply;
+		return player->get_supply();
 	} else if (!strcmp(prop, "Demand")) {
-		return player->Demand;
+		return player->get_demand();
 	} else if (!strcmp(prop, "UnitLimit")) {
 		return player->UnitLimit;
 	} else if (!strcmp(prop, "BuildingLimit")) {

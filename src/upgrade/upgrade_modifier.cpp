@@ -319,7 +319,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 		if (this->Modifier.Variables[SUPPLY_INDEX].Value != 0) {
 			for (CUnit *unit : unitupgrade) {
 				if (unit->IsAlive()) {
-					player->Supply += this->Modifier.Variables[SUPPLY_INDEX].Value * multiplier;
+					player->change_supply(this->Modifier.Variables[SUPPLY_INDEX].Value * multiplier);
 				}
 			}
 		}
@@ -328,7 +328,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 		if (this->Modifier.Variables[DEMAND_INDEX].Value != 0) {
 			for (CUnit *unit : unitupgrade) {
 				if (unit->IsAlive()) {
-					player->Demand += this->Modifier.Variables[DEMAND_INDEX].Value * multiplier;
+					player->change_demand(this->Modifier.Variables[DEMAND_INDEX].Value * multiplier);
 				}
 			}
 		}
