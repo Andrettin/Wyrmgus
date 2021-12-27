@@ -94,6 +94,7 @@ class CPlayer final : public QObject
 	Q_PROPERTY(bool alive READ is_alive_sync NOTIFY alive_changed)
 	Q_PROPERTY(int supply READ get_supply_sync NOTIFY supply_changed)
 	Q_PROPERTY(int demand READ get_demand_sync NOTIFY demand_changed)
+	Q_PROPERTY(int population READ get_population_sync NOTIFY population_changed)
 	Q_PROPERTY(int trade_cost READ get_trade_cost_sync NOTIFY trade_cost_changed)
 	Q_PROPERTY(QVariantList current_special_resources READ get_current_special_resources_sync NOTIFY current_special_resources_changed)
 
@@ -806,6 +807,40 @@ public:
 		this->set_demand(this->get_demand() + change);
 	}
 
+	int get_population() const
+	{
+		return this->population;
+	}
+
+	int get_population_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_population();
+	}
+
+	void set_population(const int population)
+	{
+		if (population == this->get_population()) {
+			return;
+		}
+
+		std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+		if (this == CPlayer::GetThisPlayer()) {
+			lock = std::unique_lock<std::shared_mutex>(this->mutex);
+		}
+
+		this->population = population;
+
+		emit population_changed();
+	}
+
+	void change_population(const int change)
+	{
+		this->set_population(this->get_population() + change);
+	}
+
 	int get_score() const
 	{
 		return this->score;
@@ -953,8 +988,8 @@ public:
 	resource_map<int> GetUpgradeCosts(const CUpgrade *upgrade) const;
 	int GetUpgradeCostsMask(const CUpgrade *upgrade) const;
 
-	void SetUnitTypeCount(const wyrmgus::unit_type *type, int quantity);
-	void ChangeUnitTypeCount(const wyrmgus::unit_type *type, int quantity);
+	void SetUnitTypeCount(const wyrmgus::unit_type *type, const int quantity);
+	void ChangeUnitTypeCount(const wyrmgus::unit_type *type, const int quantity);
 	int GetUnitTypeCount(const wyrmgus::unit_type *type) const;
 
 	void SetUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type, int quantity);
@@ -981,8 +1016,6 @@ public:
 
 	/// Does the player have units of a given type
 	bool has_unit_type(const wyrmgus::unit_type *unit_type) const;
-
-	int get_population() const;
 
 	/// Notify player about a problem
 	//Wyrmgus start
@@ -1262,6 +1295,7 @@ signals:
 	void alive_changed();
 	void supply_changed();
 	void demand_changed();
+	void population_changed();
 	void resource_stored_changed(const int resource_index, const int amount);
 	void price_changed(const int resource_index, const int price);
 	void effective_sell_price_changed(const int resource_index, const int price);
@@ -1371,6 +1405,7 @@ public:
 private:
 	int supply = 0;         /// supply available/produced
 	int demand = 0;         /// demand of player
+	int population = 0;
 public:
 
 	int UnitLimit;       /// # food units allowed

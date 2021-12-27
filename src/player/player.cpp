@@ -1066,6 +1066,7 @@ void CPlayer::Init(player_type type)
 
 	this->supply = 0;
 	this->demand = 0;
+	this->population = 0;
 	this->NumBuildings = 0;
 	//Wyrmgus start
 	this->NumBuildingsUnderConstruction = 0;
@@ -2721,6 +2722,7 @@ void CPlayer::Clear()
 	//Wyrmgus end
 	this->supply = 0;
 	this->demand = 0;
+	this->population = 0;
 	this->trade_cost = 0;
 	// FIXME: can't clear limits since it's initialized already
 	//	UnitLimit = 0;
@@ -4233,9 +4235,15 @@ int CPlayer::GetUpgradeCostsMask(const CUpgrade *upgrade) const
 
 //Wyrmgus end
 
-void CPlayer::SetUnitTypeCount(const unit_type *type, int quantity)
+void CPlayer::SetUnitTypeCount(const unit_type *type, const int quantity)
 {
 	if (!type) {
+		return;
+	}
+
+	const int old_quantity = this->GetUnitTypeCount(type);
+
+	if (quantity == old_quantity) {
 		return;
 	}
 	
@@ -4247,9 +4255,14 @@ void CPlayer::SetUnitTypeCount(const unit_type *type, int quantity)
 	} else {
 		this->UnitTypesCount[type] = quantity;
 	}
+
+	const bool is_population_unit = !type->BoolFlag[BUILDING_INDEX].value && !type->BoolFlag[FAUNA_INDEX].value;
+	if (is_population_unit) {
+		this->change_population((quantity - old_quantity) * defines::get()->get_population_per_unit());
+	}
 }
 
-void CPlayer::ChangeUnitTypeCount(const unit_type *type, int quantity)
+void CPlayer::ChangeUnitTypeCount(const unit_type *type, const int quantity)
 {
 	this->SetUnitTypeCount(type, this->GetUnitTypeCount(type) + quantity);
 }
@@ -4444,22 +4457,6 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, const bool type_change)
 bool CPlayer::has_unit_type(const wyrmgus::unit_type *unit_type) const
 {
 	return this->GetUnitTypeCount(unit_type) > 0;
-}
-
-int CPlayer::get_population() const
-{
-	int people_count = 0;
-
-	for (const auto &kv_pair : this->UnitTypesCount) {
-		const wyrmgus::unit_type *unit_type = kv_pair.first;
-		if (unit_type->BoolFlag[BUILDING_INDEX].value || unit_type->BoolFlag[FAUNA_INDEX].value) {
-			continue;
-		}
-
-		people_count += kv_pair.second;
-	}
-
-	return people_count * defines::get()->get_population_per_unit();
 }
 
 /**

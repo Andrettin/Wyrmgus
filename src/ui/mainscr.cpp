@@ -1029,7 +1029,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 			DrawGenericPopup(idle_worker_tooltip, UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y, render_commands);
 		}
 	}
-		
+	
 	if (UI.LevelUpUnitButton && !CPlayer::GetThisPlayer()->LevelUpUnits.empty()) {
 		if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
 			std::string level_up_unit_tooltip = _("Find Unit with Available Level Up");
