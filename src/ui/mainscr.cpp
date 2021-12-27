@@ -1072,31 +1072,6 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		}
 	}
 		
-	//draw a popup when hovering over a resource icon
-	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		const wyrmgus::resource_icon *icon = resource->get_icon();
-		if (icon == nullptr) {
-			continue;
-		}
-
-		const int index = resource->get_index();
-		if (UI.Resources[index].IconX == -1) {
-			continue;
-		}
-
-		if (CursorScreenPos.x >= UI.Resources[index].IconX && CursorScreenPos.x < (UI.Resources[index].TextX + UI.Resources[index].Font->Width(UI.Resources[index].Text)) && CursorScreenPos.y >= UI.Resources[index].IconY && CursorScreenPos.y < (UI.Resources[index].IconY + icon->get_graphics()->Height)) {
-			//hackish way to make the popup appear correctly for the resource
-			auto ba = std::make_unique<wyrmgus::button>();
-			ba->Hint = resource->get_name();
-			ba->Action = ButtonCmd::ProduceResource;
-			ba->Value = index;
-			ba->ValueStr = resource->get_identifier();
-			ba->Popup = "popup_resource";
-			DrawPopup(*ba, UI.Resources[index].IconX, UI.Resources[index].IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, false, render_commands);
-			LastDrawnButtonPopup = nullptr;
-		}
-	}
-	
 	const wyrmgus::resource_icon *food_icon = wyrmgus::defines::get()->get_food_icon();
 	if (food_icon != nullptr && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + food_icon->get_graphics()->get_frame_height())) {
 		//hackish way to make the popup appear correctly
