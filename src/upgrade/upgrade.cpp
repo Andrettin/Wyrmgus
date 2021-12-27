@@ -2062,9 +2062,9 @@ bool IsKnowledgeVariable(const int var)
 	}
 }
 
-bool IsPotentiallyNegativeVariable(const int var)
+bool is_potentially_negative_variable(const int var_index)
 {
-	switch (var) {
+	switch (var_index) {
 		case DAYSIGHTRANGEBONUS_INDEX:
 		case NIGHTSIGHTRANGEBONUS_INDEX:
 			return true;

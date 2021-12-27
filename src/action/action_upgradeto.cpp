@@ -186,12 +186,14 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		}
 		
 		if (unit.Variable[i].Max && unit.Variable[i].Value) {
-			if (i != MANA_INDEX || (newstats.Variables[i].Max - oldstats.Variables[i].Max) < 0) {
-				unit.Variable[i].Value += newstats.Variables[i].Max - oldstats.Variables[i].Max;
+			const int diff = newstats.Variables[i].Max - oldstats.Variables[i].Max;
+			if (i != MANA_INDEX || diff < 0) {
+				unit.Variable[i].Value += diff;
 			}
 		} else {
-			if (i != MANA_INDEX || (newstats.Variables[i].Value - oldstats.Variables[i].Value) < 0) {
-				unit.Variable[i].Value += newstats.Variables[i].Value - oldstats.Variables[i].Value;
+			const int diff = newstats.Variables[i].Value - oldstats.Variables[i].Value;
+			if (i != MANA_INDEX || diff < 0) {
+				unit.Variable[i].Value += diff;
 			}
 		}
 		if (i == KILL_INDEX || i == XP_INDEX) {

@@ -427,7 +427,9 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 				stat_variable.Increase += modifier_variable.Increase * multiplier;
 			}
 
-			stat_variable.Max = std::max(stat_variable.Max, 0);
+			if (!is_potentially_negative_variable(j)) {
+				stat_variable.Max = std::max(stat_variable.Max, 0);
+			}
 
 			//Wyrmgus start
 //			stat_variable.Value = std::clamp(stat_variable.Value, 0, stat_variable.Max);
@@ -593,7 +595,11 @@ void upgrade_modifier::apply_to_unit(CUnit *unit, const int multiplier) const
 		}
 
 		unit_variable.Max += modifier_variable.Max * multiplier;
-		unit_variable.Max = std::max(unit_variable.Max, 0);
+
+		if (!is_potentially_negative_variable(i)) {
+			unit_variable.Max = std::max(unit_variable.Max, 0);
+		}
+
 		if (unit_variable.Max > 0) {
 			unit_variable.Value = std::clamp(unit_variable.Value, 0, unit_variable.Max);
 		}

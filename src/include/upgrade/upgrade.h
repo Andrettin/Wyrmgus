@@ -100,6 +100,6 @@ extern bool IsPercentageVariable(const int var);
 extern bool IsBonusVariable(const int var);
 extern bool IsBooleanVariable(const int var);
 extern bool IsKnowledgeVariable(const int var);
-extern bool IsPotentiallyNegativeVariable(const int var);
+extern bool is_potentially_negative_variable(const int var);
 extern std::string GetVariableDisplayName(int var, bool increase = false);
 //Wyrmgus end
