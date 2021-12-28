@@ -1696,11 +1696,19 @@ void CPlayer::check_age()
 */
 void CPlayer::set_age(const wyrmgus::age *age)
 {
-	if (this->age == age) {
+	if (age == this->get_age()) {
 		return;
 	}
-	
-	this->age = age;
+
+	{
+		std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+		if (this == CPlayer::GetThisPlayer()) {
+			lock = std::unique_lock<std::shared_mutex>(this->mutex);
+		}
+
+		this->age = age;
+	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
 		if (this->age != nullptr) {
@@ -1710,7 +1718,9 @@ void CPlayer::set_age(const wyrmgus::age *age)
 		}
 	}
 	
-	wyrmgus::age::check_current_age();
+	emit age_changed();
+
+	age::check_current_age();
 }
 
 /**

@@ -125,7 +125,6 @@ void age::check() const
 	}
 }
 
-
 }
 
 /**

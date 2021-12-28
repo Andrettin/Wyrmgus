@@ -38,7 +38,7 @@ class age final : public named_data_entry, public data_type<age>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon NOTIFY changed)
 	Q_PROPERTY(int priority MEMBER priority READ get_priority)
 
 public:
@@ -58,7 +58,7 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void check() const override;
 
-	resource_icon *get_icon() const
+	const resource_icon *get_icon() const
 	{
 		return this->icon;
 	}
@@ -77,6 +77,9 @@ public:
 	{
 		return this->conditions;
 	}
+
+signals:
+	void changed();
 
 private:
 	resource_icon *icon = nullptr;

@@ -91,6 +91,7 @@ class CPlayer final : public QObject
 
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY name_changed)
 	Q_PROPERTY(bool active READ is_active_sync NOTIFY type_changed)
+	Q_PROPERTY(wyrmgus::age* age READ get_age_sync NOTIFY age_changed)
 	Q_PROPERTY(bool alive READ is_alive_sync NOTIFY alive_changed)
 	Q_PROPERTY(int supply READ get_supply_sync NOTIFY supply_changed)
 	Q_PROPERTY(int demand READ get_demand_sync NOTIFY demand_changed)
@@ -231,8 +232,16 @@ public:
 		return this->age;
 	}
 
+	wyrmgus::age *get_age_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return const_cast<wyrmgus::age *>(this->get_age());
+	}
+
 	void check_age();
 	void set_age(const wyrmgus::age *age);
+
 	CCurrency *GetCurrency() const;
 
 	bool is_alive() const
@@ -1292,6 +1301,7 @@ public:
 signals:
 	void name_changed();
 	void type_changed();
+	void age_changed();
 	void alive_changed();
 	void supply_changed();
 	void demand_changed();
