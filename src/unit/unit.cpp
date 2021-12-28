@@ -702,7 +702,7 @@ void CUnit::change_experience(const int base_amount, const int around_range)
 	if (around_range > 0) {
 		for (CUnit *nearby_unit : table) {
 			if (nearby_unit->Type->can_gain_experience()) {
-				this->set_experience(nearby_unit->Variable[XP_INDEX].Max + amount);
+				nearby_unit->set_experience(nearby_unit->Variable[XP_INDEX].Max + amount);
 			}
 		}
 	}
