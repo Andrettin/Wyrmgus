@@ -33,6 +33,7 @@
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "editor.h"
+#include "engine_interface.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
@@ -166,6 +167,26 @@ QPoint CViewport::screen_center_to_tile_pos() const
 	return this->ScreenToTilePos(this->get_top_left_pos() + size::to_point(this->get_pixel_size()) / 2);
 }
 
+const time_of_day *CViewport::get_center_tile_time_of_day() const
+{
+	if (UI.CurrentMapLayer == nullptr) {
+		return nullptr;
+	}
+
+	const QPoint tile_pos = this->screen_center_to_tile_pos();
+	return UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
+}
+
+const season *CViewport::get_center_tile_season() const
+{
+	if (UI.CurrentMapLayer == nullptr) {
+		return nullptr;
+	}
+
+	const QPoint tile_pos = this->screen_center_to_tile_pos();
+	return UI.CurrentMapLayer->get_tile_season(tile_pos);
+}
+
 /**
 **  Change viewpoint of map viewport v to tilePos.
 **
@@ -203,6 +224,11 @@ void CViewport::Set(const PixelPos &mapPos)
 	}
 	this->MapWidth = (pixel_size.width() + this->Offset.x - 1) / defines::get()->get_scaled_tile_width() + 1;
 	this->MapHeight = (pixel_size.height() + this->Offset.y - 1) / defines::get()->get_scaled_tile_height() + 1;
+
+	if (this == UI.SelectedViewport) {
+		engine_interface::get()->update_current_time_of_day();
+		engine_interface::get()->update_current_season();
+	}
 }
 
 /**

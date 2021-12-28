@@ -613,6 +613,52 @@ void engine_interface::set_current_interface_style(interface_style *interface_st
 	emit current_interface_style_changed();
 }
 
+void engine_interface::set_current_time_of_day(const time_of_day *time_of_day)
+{
+	if (time_of_day == this->current_time_of_day) {
+		return;
+	}
+
+	std::unique_lock<std::shared_mutex> lock(this->mutex);
+
+	this->current_time_of_day = time_of_day;
+
+	emit current_time_of_day_changed();
+}
+
+void engine_interface::update_current_time_of_day()
+{
+	if (UI.SelectedViewport == nullptr) {
+		this->set_current_time_of_day(nullptr);
+		return;
+	}
+
+	this->set_current_time_of_day(UI.SelectedViewport->get_center_tile_time_of_day());
+}
+
+void engine_interface::set_current_season(const season *season)
+{
+	if (season == this->current_season) {
+		return;
+	}
+
+	std::unique_lock<std::shared_mutex> lock(this->mutex);
+
+	this->current_season = season;
+
+	emit current_season_changed();
+}
+
+void engine_interface::update_current_season()
+{
+	if (UI.SelectedViewport == nullptr) {
+		this->set_current_season(nullptr);
+		return;
+	}
+
+	this->set_current_season(UI.SelectedViewport->get_center_tile_season());
+}
+
 void engine_interface::set_modal_dialog_open_async(const bool value)
 {
 	this->post([this, value]() {

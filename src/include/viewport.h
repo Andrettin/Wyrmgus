@@ -34,7 +34,9 @@ class CUnit;
 
 namespace wyrmgus {
 	class renderer;
+	class season;
 	class tile;
+	class time_of_day;
 }
 
 /**
@@ -62,7 +64,7 @@ namespace wyrmgus {
 **    Viewport is bound to a unit. If the unit moves the viewport
 **    changes the position together with the unit.
 */
-class CViewport
+class CViewport final
 {
 public:
 	CViewport();
@@ -85,6 +87,9 @@ public:
 	/// convert tilepos coordonates into screen (take the center of the tile)
 	PixelPos TilePosToScreen_Center(const Vec2i &tilePos) const;
 	QPoint screen_center_to_tile_pos() const;
+
+	const time_of_day *get_center_tile_time_of_day() const;
+	const season *get_center_tile_season() const;
 
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const Vec2i &tilePos, const PixelDiff &offset);

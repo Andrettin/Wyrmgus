@@ -45,6 +45,8 @@ class map_info;
 class network_manager;
 class parameters;
 class preferences;
+class season;
+class time_of_day;
 
 //interface for the engine, to be used in the context of QML
 class engine_interface final : public QObject, public singleton<engine_interface>
@@ -69,6 +71,8 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(QVariantList non_neutral_players READ get_non_neutral_players CONSTANT)
 	Q_PROPERTY(QVariantList main_resources READ get_main_resources CONSTANT)
 	Q_PROPERTY(wyrmgus::interface_style* current_interface_style READ get_current_interface_style NOTIFY current_interface_style_changed)
+	Q_PROPERTY(wyrmgus::time_of_day* current_time_of_day READ get_current_time_of_day_sync NOTIFY current_time_of_day_changed)
+	Q_PROPERTY(wyrmgus::season* current_season READ get_current_season_sync NOTIFY current_season_changed)
 	Q_PROPERTY(bool modal_dialog_open READ is_modal_dialog_open WRITE set_modal_dialog_open_async)
 
 public:
@@ -259,6 +263,26 @@ public:
 
 	void set_current_interface_style(interface_style *interface_style);
 
+	time_of_day *get_current_time_of_day_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return const_cast<time_of_day *>(this->current_time_of_day);
+	}
+
+	void set_current_time_of_day(const time_of_day *time_of_day);
+	void update_current_time_of_day();
+
+	season *get_current_season_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return const_cast<season *>(this->current_season);
+	}
+
+	void set_current_season(const season *season);
+	void update_current_season();
+
 	bool is_modal_dialog_open() const
 	{
 		return this->modal_dialog_open;
@@ -280,6 +304,8 @@ signals:
 	void custom_heroes_changed();
 	void this_player_changed();
 	void current_interface_style_changed();
+	void current_time_of_day_changed();
+	void current_season_changed();
 	void encyclopediaEntryOpened(QString link);
 	void factionChoiceDialogOpened(const QVariantList &factions);
 	void achievementUnlockedDialogOpened(QObject *achievement);
@@ -297,9 +323,12 @@ private:
 	std::mutex input_event_mutex;
 	QString loading_message; //the loading message to be displayed
 	interface_style *current_interface_style = nullptr;
+	const time_of_day *current_time_of_day = nullptr;
+	const season *current_season = nullptr;
 	bool modal_dialog_open = false;
 	mutable std::shared_mutex loading_message_mutex;
 	std::vector<qunique_ptr<map_info>> map_infos;
+	mutable std::shared_mutex mutex; //a general-purpose mutex
 };
 
 }

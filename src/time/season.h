@@ -37,7 +37,7 @@ class season final : public named_data_entry, public data_type<season>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "season";
@@ -54,10 +54,13 @@ public:
 		}
 	}
 
-	resource_icon *get_icon() const
+	const resource_icon *get_icon() const
 	{
 		return this->icon;
 	}
+
+signals:
+	void changed();
 
 private:
 	resource_icon *icon = nullptr;

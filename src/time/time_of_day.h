@@ -43,7 +43,7 @@ class time_of_day final : public named_data_entry, public data_type<time_of_day>
 	Q_PROPERTY(bool day MEMBER day READ is_day)
 	Q_PROPERTY(bool dusk MEMBER dusk READ is_dusk)
 	Q_PROPERTY(bool night MEMBER night READ is_night)
-	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "time_of_day";
@@ -89,13 +89,17 @@ public:
 		return this->night;
 	}
 
-	resource_icon *get_icon() const
+	const resource_icon *get_icon() const
 	{
 		return this->icon;
 	}
 
 	bool HasColorModification() const;
 
+signals:
+	void changed();
+
+public:
 	int ID = -1;								/// The ID of this time of day
 private:
 	bool dawn = false;							/// Whether this is a dawn time of day

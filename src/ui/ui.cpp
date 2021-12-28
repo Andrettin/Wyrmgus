@@ -176,6 +176,9 @@ void InitUserInterface()
 
 	UI.CompletedBarColor = CVideo::MapRGB(UI.CompletedBarColorRGB);
 	UI.ViewportCursorColor = ColorWhite;
+
+	engine_interface::get()->update_current_time_of_day();
+	engine_interface::get()->update_current_season();
 }
 
 /**

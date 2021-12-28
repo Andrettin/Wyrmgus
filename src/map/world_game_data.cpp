@@ -29,6 +29,7 @@
 #include "map/world_game_data.h"
 
 #include "database/sml_data.h"
+#include "engine_interface.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -194,6 +195,9 @@ void world_game_data::set_time_of_day(const scheduled_time_of_day *time_of_day)
 			}
 		}
 	}
+
+	//if this world is currently the central one in the viewport, the current season for interface purposes may have changed, so update it
+	engine_interface::get()->update_current_time_of_day();
 }
 
 const time_of_day *world_game_data::get_time_of_day() const
@@ -299,6 +303,9 @@ void world_game_data::set_season(const scheduled_season *season)
 			}
 		}
 	}
+
+	//if this world is currently the central one in the viewport, the current season for interface purposes may have changed, so update it
+	engine_interface::get()->update_current_season();
 }
 
 const wyrmgus::season *world_game_data::get_season() const

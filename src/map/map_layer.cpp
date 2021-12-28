@@ -29,6 +29,7 @@
 #include "map/map_layer.h"
 
 #include "database/defines.h"
+#include "engine_interface.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/minimap.h"
@@ -352,6 +353,8 @@ void CMapLayer::SetTimeOfDay(const scheduled_time_of_day *time_of_day)
 			}
 		}
 	}
+
+	engine_interface::get()->update_current_time_of_day();
 }
 
 /**
@@ -490,6 +493,8 @@ void CMapLayer::SetSeason(const scheduled_season *season)
 			}
 		}
 	}
+
+	engine_interface::get()->update_current_season();
 }
 
 /**

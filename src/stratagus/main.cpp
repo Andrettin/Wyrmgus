@@ -47,6 +47,8 @@
 #include "quest/quest.h"
 #include "religion/pantheon.h"
 #include "time/calendar.h"
+#include "time/season.h"
+#include "time/time_of_day.h"
 #include "time/timeline.h"
 #include "ui/empty_image_provider.h"
 #include "ui/icon.h"
@@ -130,6 +132,8 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<quest>("", 1);
 		qmlRegisterAnonymousType<resource>("", 1);
 		qmlRegisterAnonymousType<results_info>("", 1);
+		qmlRegisterAnonymousType<season>("", 1);
+		qmlRegisterAnonymousType<time_of_day>("", 1);
 		qmlRegisterAnonymousType<timeline>("", 1);
 		qmlRegisterAnonymousType<unit_type>("", 1);
 #else
@@ -152,6 +156,8 @@ int main(int argc, char **argv)
 		qmlRegisterType<quest>();
 		qmlRegisterType<resource>();
 		qmlRegisterType<results_info>();
+		qmlRegisterType<season>();
+		qmlRegisterType<time_of_day>();
 		qmlRegisterType<timeline>();
 		qmlRegisterType<unit_type>();
 #endif

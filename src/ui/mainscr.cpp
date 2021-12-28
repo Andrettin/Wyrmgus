@@ -726,14 +726,13 @@ static void DrawUnitInfo(CUnit &unit, std::vector<std::function<void(renderer *)
 void DrawTime(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (UI.CurrentMapLayer != nullptr) {
-		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
-		const time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
+		const time_of_day *time_of_day = UI.SelectedViewport->get_center_tile_time_of_day();
 		if (time_of_day != nullptr) {
 			const resource_icon *icon = time_of_day->get_icon();
 			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY, render_commands);
 		}
 
-		const season *season = UI.CurrentMapLayer->get_tile_season(tile_pos);
+		const season *season = UI.SelectedViewport->get_center_tile_season();
 		if (season != nullptr) {
 			const resource_icon *icon = season->get_icon();
 			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY, render_commands);
@@ -938,8 +937,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		}
 	}
 		
-	const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
-	const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
+	const wyrmgus::time_of_day *time_of_day = UI.SelectedViewport->get_center_tile_time_of_day();
 	std::shared_ptr<const CGraphic> time_of_day_icon_graphics;
 	if (time_of_day != nullptr) {
 		time_of_day_icon_graphics = time_of_day->get_icon()->get_graphics();
@@ -957,7 +955,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
 	}
 	
-	const wyrmgus::season *season = UI.CurrentMapLayer->get_tile_season(tile_pos);
+	const wyrmgus::season *season = UI.SelectedViewport->get_center_tile_season();
 	std::shared_ptr<const CGraphic> season_icon_graphics;
 	if (season != nullptr) {
 		season_icon_graphics = season->get_icon()->get_graphics();
