@@ -678,8 +678,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	//Wyrmgus end
 
 	// If resource is still under construction, wait!
-	if ((goal->Type->MaxOnBoard && goal->Resource.Active >= goal->Type->MaxOnBoard)
-		|| goal->CurrentAction() == UnitAction::Built) {
+	if (goal->CurrentAction() == UnitAction::Built) {
 		// FIXME: Determine somehow when the resource will be free to use
 		// FIXME: Could we somehow find another resource? Think minerals
 		// FIXME: We should add a flag for that, and a limited range.
@@ -1143,7 +1142,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 				source->MineLow = 1;
 			}
 
-			if (source->Type->MaxOnBoard) {
+			if (!source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value && source->Type->MaxOnBoard) {
 				int count = 0;
 				CUnit *next = nullptr;
 				for (const std::shared_ptr<wyrmgus::unit_ref> &worker_ref : source->Resource.Workers) {
@@ -1161,6 +1160,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 						}
 					}
 				}
+
 				if (next != nullptr) {
 					if (!unit.Player->AiEnabled) {
 						DebugPrint("%d: Worker %d report: Unfreez resource gathering of %d <Wait %d> on %d [Assigned: %d Waiting %d].\n"
