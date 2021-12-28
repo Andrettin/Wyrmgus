@@ -75,4 +75,3 @@ enum GameTypes {
 
 extern bool DefiningData;
 extern void SetCurrentTotalHours(const unsigned long long hours);
-extern void SetCurrentAge(const std::string age_ident);

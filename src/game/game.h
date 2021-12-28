@@ -35,6 +35,7 @@ class CUnit;
 
 namespace wyrmgus {
 
+class age;
 class campaign;
 class results_info;
 class sml_data;

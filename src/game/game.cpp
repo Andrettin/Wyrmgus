@@ -390,10 +390,6 @@ void game::save(const std::filesystem::path &filepath) const
 	file.printf("GameCycle = %lu\n", GameCycle);
 	file.printf("SetCurrentTotalHours(%" PRIu64 ")\n", this->get_current_total_hours());
 
-	if (age::current_age != nullptr) {
-		file.printf("SetCurrentAge(\"%s\")\n", age::current_age->get_identifier().c_str());
-	}
-
 	file.printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
 
 	SaveUnitTypes(file);
@@ -1619,8 +1615,6 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 	total_hours += start_date.time().hour();
 
 	game::get()->set_current_total_hours(total_hours);
-
-	age::current_age = nullptr;
 	//Wyrmgus end
 
 	if (CMap::get()->Info->get_presentation_filepath().empty() && !filepath.empty()) {

@@ -1719,8 +1719,6 @@ void CPlayer::set_age(const wyrmgus::age *age)
 	}
 	
 	emit age_changed();
-
-	age::check_current_age();
 }
 
 /**

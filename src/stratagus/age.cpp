@@ -41,8 +41,6 @@
 
 namespace wyrmgus {
 
-const age *age::current_age = nullptr;
-
 void age::initialize_all()
 {
 	data_type::initialize_all();
@@ -54,37 +52,6 @@ void age::initialize_all()
 			return a->get_identifier() < b->get_identifier();
 		}
 	});
-}
-
-void age::set_current_age(const age *age)
-{
-	if (age == age::current_age) {
-		return;
-	}
-
-	age::current_age = age;
-}
-
-//check which age fits the current overall situation best, out of the ages each player is in
-void age::check_current_age()
-{
-	const age *best_age = age::current_age;
-
-	for (int p = 0; p < PlayerMax; ++p) {
-		const age *age = CPlayer::Players[p]->get_age();
-
-		if (age == nullptr) {
-			continue;
-		}
-
-		if (!best_age || age->priority > best_age->priority) {
-			best_age = age;
-		}
-	}
-
-	if (best_age != age::current_age) {
-		age::set_current_age(best_age);
-	}
 }
 
 age::age(const std::string &identifier) : named_data_entry(identifier)
@@ -125,20 +92,4 @@ void age::check() const
 	}
 }
 
-}
-
-/**
-**	@brief	Set the current overall in-game age
-**
-**	@param	age_ident	The age's string identifier
-*/
-void SetCurrentAge(const std::string &age_ident)
-{
-	wyrmgus::age *age = wyrmgus::age::get(age_ident);
-	
-	if (!age) {
-		return;
-	}
-	
-	wyrmgus::age::current_age = age;
 }
