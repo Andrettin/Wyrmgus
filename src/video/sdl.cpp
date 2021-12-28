@@ -397,15 +397,15 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Q
 
 						if (IsSDLWindowVisible && event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
 							IsSDLWindowVisible = false;
-							if (!GamePaused) {
+							if (!game::get()->is_paused()) {
 								DoTogglePause = true;
-								UiTogglePause();
+								game::get()->toggle_paused();
 							}
 						} else if (!IsSDLWindowVisible && event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
 							IsSDLWindowVisible = true;
-							if (GamePaused && DoTogglePause) {
+							if (game::get()->is_paused() && DoTogglePause) {
 								DoTogglePause = false;
-								UiTogglePause();
+								game::get()->toggle_paused();
 							}
 						}
 					}

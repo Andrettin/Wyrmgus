@@ -300,7 +300,7 @@ static void GameLogicLoop()
 	//
 	// Game logic part
 	//
-	if (!GamePaused && NetworkInSync && !SkipGameCycle) {
+	if (!game::get()->is_paused() && NetworkInSync && !SkipGameCycle) {
 		SinglePlayerReplayEachCycle();
 		++GameCycle;
 		MultiPlayerReplayEachCycle();
@@ -525,7 +525,7 @@ void GameMainLoop()
 
 				if (!game::get()->is_multiplayer()) {
 					//pause so that the game loop won't start before the player has chosen a faction
-					SetGamePaused(true);
+					game::get()->set_paused(true);
 				}
 
 				emit engine_interface::get()->factionChoiceDialogOpened(container::to_qvariant_list(potential_factions));
@@ -543,7 +543,7 @@ void GameMainLoop()
 	CParticleManager::exit();
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
-	GamePaused = false;
+	game::get()->set_paused(false);
 	GodMode = false;
 
 	SetCallbacks(old_callbacks);

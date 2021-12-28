@@ -225,8 +225,6 @@ extern int GetHoldClickDelay();
 /// Set hold click delay
 extern void SetHoldClickDelay(int delay);
 
-/// Toggle pause mode
-extern void UiTogglePause();
 /// Toggle minimap mode.
 extern void UiToggleMinimapMode();
 extern void UiToggleMinimapZoom();
@@ -379,5 +377,3 @@ extern void SelectedUnitChanged();
 //
 /// Set the game paused or unpaused
 extern void SetGamePaused(bool paused);
-/// Get the game paused or unpaused
-extern bool GetGamePaused();

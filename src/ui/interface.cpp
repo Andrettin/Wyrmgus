@@ -324,21 +324,6 @@ static void UiToggleMusic()
 }
 
 /**
-**  Toggle pause on / off.
-*/
-void UiTogglePause()
-{
-	if (!IsNetworkGame()) {
-		GamePaused = !GamePaused;
-		if (GamePaused) {
-			UI.StatusLine.Set(_("Game Paused"));
-		} else {
-			UI.StatusLine.Set(_("Game Resumed"));
-		}
-	}
-}
-
-/**
 **  Increase game speed.
 */
 static void UiIncreaseGameSpeed()
@@ -769,13 +754,13 @@ static bool CommandKey(int key, const Qt::KeyboardModifiers key_modifiers)
 			}
 		// FALL THROUGH (CTRL+P, ALT+P)
 		case SDLK_PAUSE:
-			UiTogglePause();
+			game::get()->toggle_paused();
 			break;
 
 		//Wyrmgus start
 		case 'q': // Alt+Q: select all army units
 			if (!(key_modifiers & Qt::ControlModifier) && (key_modifiers & Qt::AltModifier)) {
-				if (GameObserve || GamePaused || GameEstablishing) {
+				if (GameObserve || game::get()->is_paused() || GameEstablishing) {
 					break;
 				}
 
@@ -819,7 +804,7 @@ static bool CommandKey(int key, const Qt::KeyboardModifiers key_modifiers)
 		//Wyrmgus start
 		case 'w': // Alt+W: select all units of the same type as the first currently selected one
 			if (!(key_modifiers & Qt::ControlModifier) && (key_modifiers & Qt::AltModifier)) {
-				if (GameObserve || GamePaused || GameEstablishing) {
+				if (GameObserve || game::get()->is_paused() || GameEstablishing) {
 					break;
 				}
 
@@ -994,7 +979,7 @@ static int InputKey(int key)
 			Replace2TildeByTilde(message_input.data());
 #ifdef DEBUG
 			if (message_input[0] == '-') {
-				if (!GameObserve && !GamePaused && !GameEstablishing) {
+				if (!GameObserve && !game::get()->is_paused() && !GameEstablishing) {
 					CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, message_input.data(), -1);
 					CclCommand(message_input.data() + 1, false);
 				}
@@ -1002,8 +987,8 @@ static int InputKey(int key)
 #endif
 				if (!IsNetworkGame()) {
 					//Wyrmgus start
-//					if (!GameObserve && !GamePaused && !GameEstablishing) {
-					if (!GameObserve && !GamePaused && !GameEstablishing && !SaveGameLoading) {
+//					if (!GameObserve && !game::get()->is_paused() && !GameEstablishing) {
+					if (!GameObserve && !game::get()->is_paused() && !GameEstablishing && !SaveGameLoading) {
 					//Wyrmgus end
 						if (HandleCheats(message_input.data())) {
 							CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, message_input.data(), -1);
@@ -1248,7 +1233,7 @@ void HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers k
 	} else {
 		// If no modifier look if button bound
 		if (!(key_modifiers & (Qt::ControlModifier | Qt::AltModifier))) {
-			if (!GameObserve && !GamePaused && !GameEstablishing) {
+			if (!GameObserve && !game::get()->is_paused() && !GameEstablishing) {
 				if (UI.ButtonPanel.DoKey(key, key_modifiers)) {
 					return;
 				}

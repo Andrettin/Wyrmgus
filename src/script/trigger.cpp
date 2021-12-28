@@ -409,7 +409,7 @@ void StopGame(GameResults result)
 	}
 
 	GameResult = result;
-	GamePaused = true;
+	game::get()->set_paused(true);
 	GameRunning = false;
 	game::get()->store_results();
 
@@ -508,7 +508,7 @@ void TriggersEachCycle()
 			trigger::CurrentTriggerId = 0;
 		}
 
-		if (GamePaused) {
+		if (game::get()->is_paused()) {
 			return;
 		}
 

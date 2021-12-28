@@ -22,8 +22,6 @@ void StopGame(GameResults result);
 
 extern bool GameRunning;
 extern void SetGamePaused(bool paused);
-extern bool GetGamePaused();
-extern tolua_property__s bool GamePaused;
 extern bool GameObserve;
 extern bool GameEstablishing;
 

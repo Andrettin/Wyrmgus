@@ -2601,7 +2601,7 @@ void MenuScreen::stop(int result, bool stopAll)
 			} else {
 				SetCallbacks(&EditorCallbacks);
 			}
-			GamePaused = false;
+			game::get()->set_paused(false);
 			UI.StatusLine.Clear();
 			if (GameRunning) {
 				UIHandleMouseMove(CursorScreenPos, stored_key_modifiers);

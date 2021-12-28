@@ -1448,7 +1448,7 @@ void EditorUpdateDisplay()
 	*/
 	//Wyrmgus end
 
-	if (CursorOn == cursor_on::map && Gui->getTop() == editorContainer.get() && !GamePaused) {
+	if (CursorOn == cursor_on::map && Gui->getTop() == editorContainer.get() && !game::get()->is_paused()) {
 		DrawMapCursor(render_commands); // cursor on map
 	}
 
@@ -1529,9 +1529,10 @@ static void EditorCallbackButtonUp(unsigned button, const Qt::KeyboardModifiers 
 */
 static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifiers key_modifiers)
 {
-	if (GamePaused) {
+	if (game::get()->is_paused()) {
 		return;
 	}
+
 	if ((button >> MouseHoldShift) != 0) {
 		// Ignore repeated events when holding down a button
 		return;

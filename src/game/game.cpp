@@ -147,7 +147,6 @@ bool UseHPForXp = false;				/// true if gain XP by dealing damage, false if by k
 bool DefiningData = false;
 
 bool GameRunning = false;				/// Current running state
-bool GamePaused = false;				/// Current pause state
 bool GameObserve = false;				/// Observe mode
 bool GameEstablishing = false;			/// Game establishing mode
 
@@ -204,6 +203,35 @@ void game::on_started()
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
 		UI.get_minimap()->update_exploration(z);
 	}
+}
+
+void game::set_paused(const bool paused)
+{
+	if (paused == this->is_paused()) {
+		return;
+	}
+
+	if (paused && this->is_multiplayer()) {
+		//cannot pause the game during multiplayer
+		return;
+	}
+
+	//Wyrmgus start
+	KeyScrollState = MouseScrollState = ScrollNone;
+	//Wyrmgus end
+
+	std::unique_lock<std::shared_mutex> lock(this->mutex);
+
+	this->paused = paused;
+
+	emit paused_changed();
+}
+
+void game::set_paused_async(const bool paused)
+{
+	engine_interface::get()->post([this, paused]() {
+		this->set_paused(paused);
+	});
 }
 
 int game::get_cycles_per_year() const
@@ -1291,21 +1319,7 @@ static void LoadMap(const std::filesystem::path &filepath, CMap &map)
 */
 void SetGamePaused(bool paused)
 {
-	//Wyrmgus start
-	KeyScrollState = MouseScrollState = ScrollNone;
-	//Wyrmgus end
-
-	GamePaused = paused;
-}
-
-/**
-**  Get the game paused or unpaused
-**
-**  @return  True if the game is paused, false otherwise
-*/
-bool GetGamePaused()
-{
-	return GamePaused;
+	game::get()->set_paused(paused);
 }
 
 /*----------------------------------------------------------------------------
@@ -1656,10 +1670,6 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 	if (IsNetworkGame()) { // Prepare network play
 		NetworkOnStartGame();
 	}
-
-#if 0
-	GamePaused = true;
-#endif
 
 	//
 	// Setup game types

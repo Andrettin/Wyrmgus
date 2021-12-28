@@ -50,6 +50,7 @@ class game final : public QObject, public singleton<game>
 	Q_OBJECT
 
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
+	Q_PROPERTY(bool paused READ is_paused_sync WRITE set_paused_async NOTIFY paused_changed)
 	Q_PROPERTY(bool multiplayer READ is_multiplayer NOTIFY multiplayer_changed)
 	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign_sync NOTIFY current_campaign_changed)
 	Q_PROPERTY(int current_year READ get_current_year_sync NOTIFY current_year_changed)
@@ -102,6 +103,26 @@ public:
 	}
 
 	void on_started();
+
+	bool is_paused() const
+	{
+		return this->paused;
+	}
+
+	bool is_paused_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->is_paused();
+	}
+
+	void set_paused(const bool paused);
+	void set_paused_async(const bool paused);
+
+	void toggle_paused()
+	{
+		this->set_paused(!this->is_paused());
+	}
 
 	bool is_multiplayer() const
 	{
@@ -283,6 +304,7 @@ signals:
 	void started();
 	void stopped();
 	void running_changed();
+	void paused_changed();
 	void multiplayer_changed();
 	void current_campaign_changed();
 	void current_year_changed();
@@ -291,6 +313,7 @@ signals:
 
 private:
 	bool running = false;
+	bool paused = false;
 	bool multiplayer = false;
 	const campaign *current_campaign = nullptr;
 	int current_year = 0;
@@ -344,8 +367,6 @@ extern bool DefiningData;
 
 /// Flag telling if the game is running
 extern bool GameRunning;
-/// Flag telling if the game is paused
-extern bool GamePaused;
 /// Flag telling if the game is in observe mode
 extern bool GameObserve;
 /// Flag telling if the game is in establishing mode
