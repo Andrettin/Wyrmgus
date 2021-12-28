@@ -51,6 +51,8 @@ class game final : public QObject, public singleton<game>
 
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 	Q_PROPERTY(bool multiplayer READ is_multiplayer NOTIFY multiplayer_changed)
+	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign_sync NOTIFY current_campaign_changed)
+	Q_PROPERTY(int current_year READ get_current_year_sync NOTIFY current_year_changed)
 	Q_PROPERTY(bool console_active READ is_console_active_sync NOTIFY console_active_changed)
 	Q_PROPERTY(wyrmgus::results_info* results READ get_results NOTIFY results_changed)
 
@@ -117,14 +119,29 @@ public:
 		emit multiplayer_changed();
 	}
 
-	campaign *get_current_campaign() const
+	const campaign *get_current_campaign() const
 	{
 		return this->current_campaign;
 	}
 
-	void set_current_campaign(campaign *campaign)
+	campaign *get_current_campaign_sync() const
 	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return const_cast<campaign *>(this->get_current_campaign());
+	}
+
+	void set_current_campaign(const campaign *campaign)
+	{
+		if (campaign == this->get_current_campaign()) {
+			return;
+		}
+
+		std::unique_lock<std::shared_mutex> lock(this->mutex);
+
 		this->current_campaign = campaign;
+
+		emit current_campaign_changed();
 	}
 
 	int get_current_year() const
@@ -132,9 +149,36 @@ public:
 		return this->current_year;
 	}
 
+	int get_current_year_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_current_year();
+	}
+
 	void set_current_year(const int year)
 	{
+		if (year == this->get_current_year()) {
+			return;
+		}
+
+		std::unique_lock<std::shared_mutex> lock(this->mutex);
+
 		this->current_year = year;
+
+		emit current_year_changed();
+	}
+
+	void increment_current_year()
+	{
+		int year = this->get_current_year();
+		++year;
+
+		if (year == 0) {
+			++year;
+		}
+
+		this->set_current_year(year);
 	}
 
 	int get_cycles_per_year() const;
@@ -240,13 +284,15 @@ signals:
 	void stopped();
 	void running_changed();
 	void multiplayer_changed();
+	void current_campaign_changed();
+	void current_year_changed();
 	void console_active_changed();
 	void results_changed();
 
 private:
 	bool running = false;
 	bool multiplayer = false;
-	campaign *current_campaign = nullptr;
+	const campaign *current_campaign = nullptr;
 	int current_year = 0;
 	uint64_t current_total_hours = 0; //the total in-game hours
 	bool cheat = false; //whether a cheat was used in this game

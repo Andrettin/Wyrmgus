@@ -739,16 +739,6 @@ void DrawTime(std::vector<std::function<void(renderer *)>> &render_commands)
 			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY, render_commands);
 		}
 	}
-	
-	if (game::get()->get_current_campaign() != nullptr) {
-		if (UI.DatePanel.TextX != -1) {
-			const int year = game::get()->get_current_year();
-			const std::string year_string = date::year_to_labeled_string(year);
-
-			const CLabel label(defines::get()->get_game_font());
-			label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, year_string, render_commands);
-		}
-	}
 }
 
 /*----------------------------------------------------------------------------

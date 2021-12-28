@@ -359,7 +359,6 @@ public:
 	CInfoPanel InfoPanel;				/// Info panel
 	CResourceInfo TimeOfDayPanel;		/// Time of day panel
 	CResourceInfo SeasonPanel;			/// Season panel
-	CResourceInfo DatePanel;			/// Date panel
 	std::vector<std::unique_ptr<CUnitInfoPanel>> InfoPanelContents;	/// Info panel contents
 
 	std::vector<std::unique_ptr<CPopup>> ButtonPopups;	/// Popup windows for buttons

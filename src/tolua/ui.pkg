@@ -113,7 +113,6 @@ class CUserInterface
 	CInfoPanel InfoPanel;
 	CResourceInfo TimeOfDayPanel;
 	CResourceInfo SeasonPanel;
-	CResourceInfo DatePanel;
 	CUIButton *SingleSelectedButton;
 
 	vector<CUIButton> SelectedButtons;

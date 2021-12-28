@@ -273,11 +273,7 @@ void game::do_cycle()
 {
 	try {
 		if (GameCycle % this->get_cycles_per_year() == 0) {
-			++this->current_year;
-
-			if (this->current_year == 0) {
-				++this->current_year;
-			}
+			this->increment_current_year();
 		}
 
 		if (GameCycle % CYCLES_PER_IN_GAME_HOUR == 0) {
