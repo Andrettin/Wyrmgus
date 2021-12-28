@@ -410,7 +410,7 @@ public:
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
 
-	bool IsUnusable(bool ignore_built_state = false) const;
+	bool IsUnusable(const bool ignore_built_state = false) const;
 
 	bool is_ai_active() const
 	{

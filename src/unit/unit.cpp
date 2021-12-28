@@ -8315,9 +8315,9 @@ bool CUnit::IsTeamed(const CUnit &unit) const
 **  Check if the unit is unusable (for attacking...)
 **  @todo look if correct used (UnitAction::Built is no problem if attacked)?
 */
-bool CUnit::IsUnusable(bool ignore_built_state) const
+bool CUnit::IsUnusable(const bool ignore_built_state) const
 {
-	return (!IsAliveOnMap() || (!ignore_built_state && CurrentAction() == UnitAction::Built));
+	return (!IsAliveOnMap() || (!ignore_built_state && this->is_under_construction()));
 }
 
 /**

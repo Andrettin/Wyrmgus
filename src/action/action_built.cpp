@@ -190,6 +190,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	player.IncreaseCountsForUnit(&unit);
 
+	unit.UnderConstruction = 0;
+
 	if (unit.get_site() != nullptr) {
 		wyrmgus::site_game_data *site_game_data = unit.get_site()->get_game_data();
 
@@ -202,12 +204,12 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		}
 	}
 
-	unit.UnderConstruction = 0;
 	if (unit.Frame < 0) {
 		unit.Frame = -1;
 	} else {
 		unit.Frame = 0;
 	}
+
 	CUnit *worker = order.get_worker();
 	
 	//Wyrmgus start

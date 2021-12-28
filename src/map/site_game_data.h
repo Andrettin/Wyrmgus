@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "economy/resource_container.h"
 #include "map/site_container.h"
 
 class CMapLayer;
@@ -211,8 +212,8 @@ private:
 	QRect territory_rect; //the territory rectangle of the site
 	std::vector<QPoint> trade_route_tiles; //the tiles containing a trade route in the settlement's territory
 	bool coastal = false;
-	std::map<const resource *, int> resource_tile_counts; //resource tile counts in the settlement's territory
-	std::map<const resource *, std::vector<CUnit *>> resource_units; //resource units in the settlement's territory
+	resource_map<int> resource_tile_counts; //resource tile counts in the settlement's territory
+	resource_map<std::vector<CUnit *>> resource_units; //resource units in the settlement's territory
 	site_set border_settlements; //other settlements bordering this one
 };
 

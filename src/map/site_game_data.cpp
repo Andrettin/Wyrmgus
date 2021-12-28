@@ -124,11 +124,47 @@ void site_game_data::set_owner(CPlayer *player)
 		return;
 	}
 
+	CPlayer *old_owner = this->get_owner();
+
 	this->owner = player;
 
-	if (this->site->is_settlement() && GameCycle > 0) {
-		this->update_border_tiles();
-		this->update_territory_tiles();
+	if (this->site->is_settlement()) {
+		if (GameCycle > 0) {
+			this->update_border_tiles();
+			this->update_territory_tiles();
+		}
+
+		for (const auto &[resource, tile_count] : this->resource_tile_counts) {
+			const wyrmgus::resource *final_resource = resource->get_final_resource();
+
+			if (!final_resource->is_special()) {
+				continue;
+			}
+
+			if (old_owner != nullptr) {
+				old_owner->check_special_resource(final_resource);
+			}
+
+			if (this->get_owner() != nullptr) {
+				this->get_owner()->check_special_resource(final_resource);
+			}
+		}
+
+		for (const auto &[resource, units] : this->resource_units) {
+			const wyrmgus::resource *final_resource = resource->get_final_resource();
+
+			if (!final_resource->is_special()) {
+				continue;
+			}
+
+			if (old_owner != nullptr) {
+				old_owner->check_special_resource(final_resource);
+			}
+
+			if (this->get_owner() != nullptr) {
+				this->get_owner()->check_special_resource(final_resource);
+			}
+		}
 	}
 }
 
