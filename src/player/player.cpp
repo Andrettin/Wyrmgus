@@ -601,8 +601,8 @@ void CPlayer::Save(CFile &file) const
 	if (p.get_dynasty() != nullptr) {
 		file.printf(" \"dynasty\", \"%s\",", p.get_dynasty()->get_identifier().c_str());
 	}
-	if (p.age) {
-		file.printf(" \"age\", \"%s\",", p.age->get_identifier().c_str());
+	if (p.get_age() != nullptr) {
+		file.printf(" \"age\", \"%s\",", p.get_age()->get_identifier().c_str());
 	}
 	if (p.get_player_color() != nullptr) {
 		file.printf(" \"player-color\", \"%s\",", p.get_player_color()->get_identifier().c_str());

@@ -265,12 +265,8 @@ extern void DrawUserDefinedButtons(std::vector<std::function<void(renderer *)>> 
 extern void UpdateMessages();
 /// Draw messages as overlay over of the map
 extern void DrawMessages(std::vector<std::function<void(renderer *)>> &render_commands);
-/// Draw the player resource in resource line
-extern void DrawResources(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw the time of day, season and date
 extern void DrawTime(std::vector<std::function<void(renderer *)>> &render_commands);
-/// Draw the age
-extern void DrawAge(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw the map layer buttons
 extern void DrawMapLayerButtons(std::vector<std::function<void(renderer *)>> &render_commands);
 //Wyrmgus start

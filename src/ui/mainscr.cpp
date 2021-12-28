@@ -717,83 +717,6 @@ static void DrawUnitInfo(CUnit &unit, std::vector<std::function<void(renderer *)
 }
 
 /*----------------------------------------------------------------------------
---  RESOURCES
-----------------------------------------------------------------------------*/
-
-/**
-**  Draw the player resource in top line.
-**
-**  @todo FIXME : make DrawResources more configurable (format, font).
-*/
-void DrawResources(std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	CLabel label(wyrmgus::defines::get()->get_game_font());
-
-	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		const wyrmgus::resource_icon *icon = resource->get_icon();
-		const int index = resource->get_index();
-		if (icon != nullptr && UI.Resources[index].IconX != -1) {
-			const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
-			icon_graphics->DrawFrameClip(icon->get_frame(), UI.Resources[index].IconX, UI.Resources[index].IconY, render_commands);
-		}
-	}
-
-	// Draw all icons of resource.
-	for (int i = FoodCost; i <= FreeWorkersCount; ++i) {
-		const wyrmgus::resource_icon *icon = nullptr;
-		switch (i) {
-			case FoodCost:
-				icon = wyrmgus::defines::get()->get_food_icon();
-				break;
-			case ScoreCost:
-				icon = wyrmgus::defines::get()->get_score_icon();
-				break;
-			case ManaResCost:
-				icon = wyrmgus::defines::get()->get_mana_icon();
-				break;
-			default:
-				break;
-		}
-
-		if (icon == nullptr) {
-			continue;
-		}
-
-		if (UI.Resources[i].IconX == -1) {
-			continue;
-		}
-
-		icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.Resources[i].IconX, UI.Resources[i].IconY, render_commands);
-	}
-
-	for (const resource *resource : resource::get_all()) {
-		const int index = resource->get_index();
-
-		CResourceInfo &resource_info = UI.Resources[index];
-
-		if (resource_info.TextX != -1) {
-			if (CPlayer::GetThisPlayer()->get_max_resource(resource) != -1) {
-				const int res_amount = CPlayer::GetThisPlayer()->get_resource(resource, resource_storage_type::both);
-				const std::string tmp = std::to_string(res_amount) + " (" + std::to_string(CPlayer::GetThisPlayer()->get_max_resource(resource) - CPlayer::GetThisPlayer()->get_stored_resource(resource)) + ")";
-				
-				resource_info.Text = tmp;
-				resource_info.Font = wyrmgus::defines::get()->get_small_font();
-				label.SetFont(resource_info.Font);
-
-				label.Draw(resource_info.TextX, resource_info.TextY + (3 * preferences::get()->get_scale_factor()).to_int(), tmp, render_commands);
-			} else {
-				const int resource_amount = CPlayer::GetThisPlayer()->get_resource(resource);
-				resource_info.Text = FormatNumber(resource_amount);
-				resource_info.Font = resource_amount > 99999 ? wyrmgus::defines::get()->get_small_font() : wyrmgus::defines::get()->get_game_font();
-				label.SetFont(resource_info.Font);
-
-				label.Draw(resource_info.TextX, resource_info.TextY + (resource_amount > 99999) * 3, resource_info.Text, render_commands);
-			}
-		}
-	}
-}
-
-/*----------------------------------------------------------------------------
 --  DAYTIME
 ----------------------------------------------------------------------------*/
 
@@ -825,26 +748,6 @@ void DrawTime(std::vector<std::function<void(renderer *)>> &render_commands)
 			const CLabel label(defines::get()->get_game_font());
 			label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, year_string, render_commands);
 		}
-	}
-}
-
-void DrawAge(std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	const age *age = nullptr;
-	if (CPlayer::GetThisPlayer() != nullptr) {
-		age = CPlayer::GetThisPlayer()->get_age();
-	} else {
-		age = age::current_age;
-	}
-
-	const resource_icon *icon = age->get_icon();
-	icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.AgePanel.IconX, UI.AgePanel.IconY, render_commands);
-	
-	if (UI.AgePanel.TextX != -1) {
-		UI.AgePanel.Font = defines::get()->get_game_font();
-		
-		CLabel label(UI.AgePanel.Font);
-		label.Draw(UI.AgePanel.TextX, UI.AgePanel.TextY, age->get_name(), render_commands);
 	}
 }
 
@@ -1081,27 +984,6 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 	) {
 		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
 	}
-	
-	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text
-	/*
-	const wyrmgus::age *age = nullptr;
-	if (CPlayer::GetThisPlayer() != nullptr) {
-		age = CPlayer::GetThisPlayer()->get_age();
-	} else {
-		age = wyrmgus::age::current_age;
-	}
-
-	if (
-		UI.AgePanel.TextX != -1
-		&& age != nullptr
-		&& CursorScreenPos.x >= UI.AgePanel.TextX
-		&& CursorScreenPos.x < (UI.AgePanel.TextX + UI.AgePanel.Font->Width(age->get_name()))
-		&& CursorScreenPos.y >= UI.AgePanel.TextY
-		&& CursorScreenPos.y < (UI.AgePanel.TextY + UI.AgePanel.Font->Height())
-	) {
-		DrawGenericPopup(_(age->get_name().c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 * wyrmgus::preferences::get()->get_scale_factor() + cursor::get_current_cursor()->G->getHeight() / 2, "", "", false);
-	}
-	*/
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
 		DrawGenericPopup(wyrmgus::world::get_all()[ButtonUnderCursor]->get_name(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y, render_commands);

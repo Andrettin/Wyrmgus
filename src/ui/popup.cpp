@@ -319,33 +319,30 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
-			if (UI.Resources[i].IconWidth != -1)	{
-				popupWidth += (UI.Resources[i].IconWidth + (5 * scale_factor).to_int());
+			const wyrmgus::resource_icon *icon = nullptr;
+			if (i >= MaxCosts) {
+				switch (i) {
+					case FoodCost:
+						icon = defines::get()->get_food_icon();
+						break;
+					case ScoreCost:
+						icon = defines::get()->get_score_icon();
+						break;
+					case ManaResCost:
+						icon = defines::get()->get_mana_icon();
+						break;
+					default:
+						break;
+				}
 			} else {
-				const wyrmgus::resource_icon *icon = nullptr;
-				if (i >= MaxCosts) {
-					switch (i) {
-						case FoodCost:
-							icon = defines::get()->get_food_icon();
-							break;
-						case ScoreCost:
-							icon = defines::get()->get_score_icon();
-							break;
-						case ManaResCost:
-							icon = defines::get()->get_mana_icon();
-							break;
-						default:
-							break;
-					}
-				} else {
-					const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
-					icon = resource->get_icon();
-				}
-
-				if (icon != nullptr) {
-					popupWidth += (icon->get_graphics()->Width + (5 * scale_factor).to_int());
-				}
+				const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
+				icon = resource->get_icon();
 			}
+
+			if (icon != nullptr) {
+				popupWidth += (icon->get_graphics()->Width + (5 * scale_factor).to_int());
+			}
+
 			popupWidth += (font->Width(Costs[i]) + (5 * scale_factor).to_int());
 		}
 	}
@@ -356,13 +353,11 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 
 		if (spell->get_mana_cost()) {
 			popupWidth = 10;
-			if (UI.Resources[ManaResCost].IconWidth != -1) {
-				popupWidth += (UI.Resources[ManaResCost].IconWidth + (5 * scale_factor).to_int());
-			} else {
-				if (icon != nullptr) {
-					popupWidth += (icon->get_graphics()->Width + (5 * scale_factor).to_int());
-				}
+
+			if (icon != nullptr) {
+				popupWidth += (icon->get_graphics()->Width + (5 * scale_factor).to_int());
 			}
+
 			popupWidth += font->Width(spell->get_mana_cost());
 			popupWidth = std::max<int>(popupWidth, font->Width(spell->get_name()) + (10 * scale_factor).to_int());
 		} else {
@@ -439,10 +434,9 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 			}
 
 			if (icon != nullptr) {
-				int x_offset = UI.Resources[i].IconWidth;
 				const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
 				icon_graphics->DrawFrameClip(icon->get_frame(),	x , y, render_commands);
-				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + (5 * scale_factor).to_int());
+				x += icon_graphics->Width + (5 * scale_factor).to_int();
 				y_offset = icon_graphics->Height;
 				y_offset -= label.Height();
 				y_offset /= 2;
@@ -458,11 +452,10 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 		if (spell.get_mana_cost() != 0) {
 			int y_offset = 0;
 			if (icon != nullptr) {
-				int x_offset =  UI.Resources[ManaResCost].IconWidth;
 				x += (5 * scale_factor).to_int();
 				const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
 				icon_graphics->DrawFrameClip(icon->get_frame(), x, y, render_commands);
-				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + (5 * scale_factor).to_int());
+				x += icon_graphics->Width + (5 * scale_factor).to_int();
 				y_offset = icon_graphics->Height;
 				y_offset -= font->Height();
 				y_offset /= 2;

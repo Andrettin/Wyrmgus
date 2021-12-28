@@ -274,8 +274,6 @@ public:
 	int TextY = -1;	/// text Y position
 };
 
-constexpr int MaxResourceInfo = MaxCosts + 4; /// +4 for food and score and mana and free workers count
-
 class CInfoPanel final
 {
 public:
@@ -358,13 +356,10 @@ public:
 
 	std::vector<CFiller> Fillers;		/// Filler graphics
 
-	CResourceInfo Resources[MaxResourceInfo];	/// Icon+Text of all resources
-
 	CInfoPanel InfoPanel;				/// Info panel
 	CResourceInfo TimeOfDayPanel;		/// Time of day panel
 	CResourceInfo SeasonPanel;			/// Season panel
 	CResourceInfo DatePanel;			/// Date panel
-	CResourceInfo AgePanel;				/// Age panel
 	std::vector<std::unique_ptr<CUnitInfoPanel>> InfoPanelContents;	/// Info panel contents
 
 	std::vector<std::unique_ptr<CPopup>> ButtonPopups;	/// Popup windows for buttons
