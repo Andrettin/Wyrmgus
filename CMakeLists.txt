@@ -1146,7 +1146,6 @@ set(wyrmgus_xbrz_HDRS
 
 set(wyrmgus_generic_HDRS
 	src/include/actions.h
-	src/include/age.h
 	src/include/ai.h
 	src/include/animation.h
 	src/include/character.h
@@ -1186,6 +1185,7 @@ set(wyrmgus_generic_HDRS
 	src/include/viewport.h
 	src/include/widgets.h
 	src/include/SetupConsole_win32.h
+	src/stratagus/age.h
 	src/stratagus/character_history.h
 	src/stratagus/character_title.h
 	src/stratagus/dialogue.h
