@@ -90,8 +90,9 @@ class resource final : public named_data_entry, public data_type<resource>
 	Q_PROPERTY(int base_price MEMBER base_price READ get_base_price)
 	Q_PROPERTY(int demand_elasticity MEMBER demand_elasticity READ get_demand_elasticity)
 	Q_PROPERTY(wyrmgus::resource* input_resource MEMBER input_resource)
+	Q_PROPERTY(bool main READ is_main CONSTANT)
 	Q_PROPERTY(bool luxury MEMBER luxury READ is_luxury NOTIFY changed)
-	Q_PROPERTY(bool special MEMBER special READ is_special)
+	Q_PROPERTY(bool special MEMBER special READ is_special NOTIFY changed)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(QString conversion_rates_string READ get_conversion_rates_qstring CONSTANT)
 
