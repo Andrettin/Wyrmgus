@@ -876,7 +876,11 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 	} else { //below
 		y = y + (10 * scale_factor).to_int();
 	}
-	y = std::clamp(y, 0, Video.Height - 1);
+
+	//ensure the popup is drawn below the top bar, so that it doesn't appear below it
+	const int min_y = (16 * defines::get()->get_scale_factor()).to_int();
+
+	y = std::clamp(y, min_y, Video.Height - 1);
 
 	// Background
 	Video.FillTransRectangle(popup->BackgroundColor, x, y, popupWidth, popupHeight, popup->BackgroundColor >> ASHIFT, render_commands);
@@ -970,7 +974,10 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const font_co
 	} else { //below
 		y = y + (10 * scale_factor).to_int();
 	}
-	y = std::clamp(y, 0, Video.Height - 1);
+
+	//ensure the popup is drawn below the top bar, so that it doesn't appear below it
+	const int min_y = (16 * defines::get()->get_scale_factor()).to_int();
+	y = std::clamp(y, min_y, Video.Height - 1);
 
 	// Background
 	const IntColor BackgroundColor = CVideo::MapRGBA(28, 28, 28, 208);
