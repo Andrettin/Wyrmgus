@@ -717,30 +717,6 @@ static void DrawUnitInfo(CUnit &unit, std::vector<std::function<void(renderer *)
 }
 
 /*----------------------------------------------------------------------------
---  DAYTIME
-----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Draw the time of day
-*/
-void DrawTime(std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	if (UI.CurrentMapLayer != nullptr) {
-		const time_of_day *time_of_day = UI.SelectedViewport->get_center_tile_time_of_day();
-		if (time_of_day != nullptr) {
-			const resource_icon *icon = time_of_day->get_icon();
-			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY, render_commands);
-		}
-
-		const season *season = UI.SelectedViewport->get_center_tile_season();
-		if (season != nullptr) {
-			const resource_icon *icon = season->get_icon();
-			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY, render_commands);
-		}
-	}
-}
-
-/*----------------------------------------------------------------------------
 --  Map Layer Buttons
 ----------------------------------------------------------------------------*/
 
@@ -941,36 +917,6 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 	std::shared_ptr<const CGraphic> time_of_day_icon_graphics;
 	if (time_of_day != nullptr) {
 		time_of_day_icon_graphics = time_of_day->get_icon()->get_graphics();
-	}
-
-	if (
-		time_of_day_icon_graphics != nullptr
-		&& UI.TimeOfDayPanel.IconX != -1
-		&& UI.TimeOfDayPanel.IconY != -1
-		&& CursorScreenPos.x >= UI.TimeOfDayPanel.IconX
-		&& CursorScreenPos.x < (UI.TimeOfDayPanel.IconX + time_of_day_icon_graphics->get_frame_width())
-		&& CursorScreenPos.y >= UI.TimeOfDayPanel.IconY
-		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + time_of_day_icon_graphics->get_frame_height())
-	) {
-		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
-	}
-	
-	const wyrmgus::season *season = UI.SelectedViewport->get_center_tile_season();
-	std::shared_ptr<const CGraphic> season_icon_graphics;
-	if (season != nullptr) {
-		season_icon_graphics = season->get_icon()->get_graphics();
-	}
-
-	if (
-		season_icon_graphics != nullptr
-		&& UI.SeasonPanel.IconX != -1
-		&& UI.SeasonPanel.IconY != -1
-		&& CursorScreenPos.x >= UI.SeasonPanel.IconX
-		&& CursorScreenPos.x < (UI.SeasonPanel.IconX + season_icon_graphics->get_frame_width())
-		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
-		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + season_icon_graphics->get_frame_height())
-	) {
-		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + (16 * preferences::get()->get_scale_factor()).to_int() + cursor::get_current_cursor()->get_graphics()->getHeight() / 2, nullptr, nullptr, false, render_commands);
 	}
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {

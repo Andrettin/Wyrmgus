@@ -236,7 +236,6 @@ void UpdateDisplay()
 		UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport, render_commands);
 
 		UI.InfoPanel.Draw(render_commands);
-		DrawTime(render_commands);
 		DrawMapLayerButtons(render_commands);
 		UI.StatusLine.Draw(render_commands);
 		UI.StatusLine.DrawCosts(render_commands);

@@ -69,15 +69,6 @@ class CButtonPanel
 	vector<CUIButton> Buttons;
 };
 
-class CResourceInfo
-{
-	int IconX;
-	int IconY;
-	int IconWidth;
-	int TextX;
-	int TextY;
-};
-
 class CInfoPanel
 {
 	int X;
@@ -111,8 +102,6 @@ class CUserInterface
 	minimap *get_minimap() const;
 	
 	CInfoPanel InfoPanel;
-	CResourceInfo TimeOfDayPanel;
-	CResourceInfo SeasonPanel;
 	CUIButton *SingleSelectedButton;
 
 	vector<CUIButton> SelectedButtons;

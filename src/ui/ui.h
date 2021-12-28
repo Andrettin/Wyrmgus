@@ -60,7 +60,7 @@ enum class TextAlignment {
 	Right
 };
 
-class ButtonStyleProperties
+class ButtonStyleProperties final
 {
 public:
 	std::shared_ptr<CGraphic> Sprite;
@@ -71,7 +71,7 @@ public:
 	const wyrmgus::font_color *TextReverseColor = nullptr; /// Reverse text color
 };
 
-class ButtonStyle
+class ButtonStyle final
 {
 public:
 	int Width = 0;                  /// Button width
@@ -88,7 +88,7 @@ public:
 };
 
 /// buttons on screen themselves
-class CUIButton
+class CUIButton final
 {
 public:
 	bool Contains(const PixelPos &screenPos) const;
@@ -217,7 +217,7 @@ private:
 	bool loaded = false;
 };
 
-class CButtonPanel
+class CButtonPanel final
 {
 public:
 	void Draw(std::vector<std::function<void(renderer *)>> &render_commands);
@@ -262,18 +262,6 @@ public:
 	std::vector<CUIButton> Buttons;
 };
 
-class CResourceInfo
-{
-public:
-	int IconX = -1;		/// icon X position
-	int IconY = -1;		/// icon Y position
-	int IconWidth = -1;	/// icon W size
-	wyrmgus::font *Font = nullptr; /// Font
-	std::string Text;	/// text
-	int TextX = -1;	/// text X position
-	int TextY = -1;	/// text Y position
-};
-
 class CInfoPanel final
 {
 public:
@@ -284,12 +272,10 @@ public:
 	int Y = 0;
 };
 
-class CUIUserButton
+class CUIUserButton final
 {
 public:
-	CUIUserButton() : Clicked(false) {}
-
-	bool Clicked;            // true if button is clicked, false otherwise
+	bool Clicked = false;    // true if button is clicked, false otherwise
 	CUIButton Button;        // User button
 };
 
@@ -357,8 +343,6 @@ public:
 	std::vector<CFiller> Fillers;		/// Filler graphics
 
 	CInfoPanel InfoPanel;				/// Info panel
-	CResourceInfo TimeOfDayPanel;		/// Time of day panel
-	CResourceInfo SeasonPanel;			/// Season panel
 	std::vector<std::unique_ptr<CUnitInfoPanel>> InfoPanelContents;	/// Info panel contents
 
 	std::vector<std::unique_ptr<CPopup>> ButtonPopups;	/// Popup windows for buttons
