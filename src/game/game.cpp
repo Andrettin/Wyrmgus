@@ -227,9 +227,9 @@ void game::set_paused(const bool paused)
 	emit paused_changed();
 }
 
-void game::set_paused_async(const bool paused)
+void game::set_paused_sync(const bool paused)
 {
-	engine_interface::get()->post([this, paused]() {
+	engine_interface::get()->sync([this, paused]() {
 		this->set_paused(paused);
 	});
 }

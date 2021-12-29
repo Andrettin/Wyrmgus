@@ -50,7 +50,7 @@ class game final : public QObject, public singleton<game>
 	Q_OBJECT
 
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
-	Q_PROPERTY(bool paused READ is_paused_sync WRITE set_paused_async NOTIFY paused_changed)
+	Q_PROPERTY(bool paused READ is_paused_sync WRITE set_paused_sync NOTIFY paused_changed)
 	Q_PROPERTY(bool multiplayer READ is_multiplayer NOTIFY multiplayer_changed)
 	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign_sync NOTIFY current_campaign_changed)
 	Q_PROPERTY(int current_year READ get_current_year_sync NOTIFY current_year_changed)
@@ -117,7 +117,7 @@ public:
 	}
 
 	void set_paused(const bool paused);
-	void set_paused_async(const bool paused);
+	void set_paused_sync(const bool paused);
 
 	void toggle_paused()
 	{
