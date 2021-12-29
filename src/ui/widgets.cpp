@@ -2553,6 +2553,10 @@ int MenuScreen::run(bool loop)
 	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 	CursorOn = cursor_on::unknown;
 
+	if (this->getDrawMenusUnder()) {
+		engine_interface::get()->change_lua_dialog_open_count(1);
+	}
+
 	if (loop) {
 		const EventCallback *old_callbacks = GetCallbacks();
 		SetCallbacks(&GuichanCallbacks);
@@ -2582,8 +2586,13 @@ int MenuScreen::run(bool loop)
 */
 void MenuScreen::stop(int result, bool stopAll)
 {
-	if (running == false)
+	if (running == false) {
 		return;
+	}
+
+	if (this->getDrawMenusUnder()) {
+		engine_interface::get()->change_lua_dialog_open_count(-1);
+	}
 
 	if (!this->runLoop) {
 		Gui->setTop(this->oldtop);

@@ -74,6 +74,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(wyrmgus::time_of_day* current_time_of_day READ get_current_time_of_day_sync NOTIFY current_time_of_day_changed)
 	Q_PROPERTY(wyrmgus::season* current_season READ get_current_season_sync NOTIFY current_season_changed)
 	Q_PROPERTY(bool modal_dialog_open READ is_modal_dialog_open WRITE set_modal_dialog_open_async)
+	Q_PROPERTY(bool lua_dialog_open READ is_lua_dialog_open_sync NOTIFY lua_dialog_open_changed)
 
 public:
 	engine_interface();
@@ -290,6 +291,35 @@ public:
 
 	void set_modal_dialog_open_async(const bool value);
 
+	bool is_lua_dialog_open_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->open_lua_dialog_count > 0;
+	}
+
+	void set_lua_dialog_open_count(const int count)
+	{
+		if (count == this->open_lua_dialog_count) {
+			return;
+		}
+
+		const int old_count = this->open_lua_dialog_count;
+
+		std::unique_lock<std::shared_mutex> lock(this->mutex);
+
+		this->open_lua_dialog_count = count;
+
+		if (count == 0 || old_count == 0) {
+			emit lua_dialog_open_changed();
+		}
+	}
+
+	void change_lua_dialog_open_count(const int change)
+	{
+		this->set_lua_dialog_open_count(this->open_lua_dialog_count + change);
+	}
+
 	Q_INVOKABLE void load_game(const QUrl &file_url);
 	void load_game_deferred(const std::filesystem::path &filepath);
 
@@ -312,6 +342,7 @@ signals:
 	void dialogueNodeCalled(QObject *dialogue, const int node_index, const QString &title_str, const QString &text, const QString &icon_identifier, const QString &player_color_identifier, const QStringList &options, const QStringList &option_hotkeys, const QStringList &option_tooltips, const int unit_number);
 	void questCompletedDialogOpened(QObject *quest, const QString &rewards_string);
 	void questFailedDialogOpened(QObject *quest, const QString &failure_reason_string);
+	void lua_dialog_open_changed();
 
 private:
 	std::queue<std::function<void()>> posted_commands;
@@ -326,6 +357,7 @@ private:
 	const time_of_day *current_time_of_day = nullptr;
 	const season *current_season = nullptr;
 	bool modal_dialog_open = false;
+	int open_lua_dialog_count = 0;
 	mutable std::shared_mutex loading_message_mutex;
 	std::vector<qunique_ptr<map_info>> map_infos;
 	mutable std::shared_mutex mutex; //a general-purpose mutex
