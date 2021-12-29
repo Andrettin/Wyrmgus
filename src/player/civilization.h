@@ -278,7 +278,7 @@ private:
 	std::vector<character *> characters;
 public:
 	std::vector<deity *> Deities;
-	std::vector<site *> sites; //sites used for this civilization if a randomly-generated one is required
+	std::vector<const site *> sites; //sites used for this civilization if a randomly-generated one is required
 private:
 	std::map<government_type, std::map<faction_tier, std::string>> title_names;
 	std::map<character_title, std::map<faction_type, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>> character_title_names;

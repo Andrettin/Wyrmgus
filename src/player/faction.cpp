@@ -35,6 +35,7 @@
 #include "fallback_name_generator.h"
 #include "gender.h"
 #include "luacallback.h"
+#include "map/site.h"
 #include "name_generator.h"
 #include "player/civilization.h"
 #include "player/diplomacy_state.h"
@@ -167,6 +168,11 @@ void faction::process_sml_scope(const sml_data &scope)
 			this->DevelopsTo.push_back(other_faction);
 			other_faction->DevelopsFrom.push_back(this);
 		}
+	} else if (tag == "core_settlements") {
+		for (const std::string &value : values) {
+			const site *settlement = site::get(value);
+			this->core_settlements.push_back(settlement);
+		}
 	} else if (tag == "title_names") {
 		faction::process_title_names(this->title_names, scope);
 	} else if (tag == "character_title_names") {
@@ -214,6 +220,10 @@ void faction::initialize()
 {
 	if (this->civilization != nullptr) {
 		this->civilization->add_faction(this);
+
+		for (const site *core_settlement : this->get_core_settlements()) {
+			this->get_civilization()->sites.push_back(core_settlement);
+		}
 	}
 
 	if (this->get_type() == faction_type::tribe) {
@@ -288,6 +298,12 @@ void faction::check() const
 
 	if (this->DevelopsTo.size() > button::get_faction_button_count()) {
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" can develop to " + std::to_string(this->DevelopsTo.size()) + " different factions, but there are only buttons for a faction to develop to " + std::to_string(button::get_faction_button_count()) + " different ones.");
+	}
+
+	for (const site *core_settlement : this->get_core_settlements()) {
+		if (!core_settlement->is_settlement()) {
+			throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has site \"" + core_settlement->get_identifier() + "\" set as one of its core settlements, but the latter is not a settlement.");
+		}
 	}
 
 	for (const auto &kv_pair : this->ai_force_templates) {

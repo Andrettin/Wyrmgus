@@ -113,9 +113,6 @@ void site::ProcessConfigData(const CConfigData *config_data)
 			this->pos.setY(std::stoi(value));
 		} else if (key == "map_template") {
 			this->map_template = map_template::get(value);
-		} else if (key == "core") {
-			faction *faction = faction::get(value);
-			this->add_core(faction);
 		} else if (key == "region") {
 			region *region = region::get(value);
 			this->regions.push_back(region);
@@ -252,19 +249,6 @@ void site::initialize()
 	//if a settlement has no color assigned to it, assign a random one instead
 	if (this->is_settlement() && !this->get_color().isValid()) {
 		this->color = random::get()->generate_color();
-	}
-
-	for (faction *core_faction : this->get_cores()) {
-		core_faction->get_civilization()->sites.push_back(this);
-	}
-
-	if (this->is_settlement()) { 
-		for (faction *core_faction : this->get_cores()) {
-			core_faction->add_core_settlement(this);
-		}
-	} else {
-		//if the site is a minor one, but has faction cores, remove them
-		this->cores.clear();
 	}
 
 	if (this->get_map_template() != nullptr) {
@@ -519,23 +503,6 @@ centesimal_int site::get_mass_jm() const
 void site::set_mass_jm(const centesimal_int &mass_jm)
 {
 	this->mass = astronomy::jovian_mass_to_zg(mass_jm);
-}
-
-QVariantList site::get_cores_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_cores());
-}
-
-void site::add_core(faction *faction)
-{
-	this->cores.push_back(faction);
-	faction->sites.push_back(this);
-}
-
-void site::remove_core(faction *faction)
-{
-	vector::remove(this->cores, faction);
-	vector::remove(faction->sites, this);
 }
 
 QVariantList site::get_regions_qvariant_list() const

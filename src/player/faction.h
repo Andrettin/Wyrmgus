@@ -350,11 +350,6 @@ public:
 		return this->core_settlements;
 	}
 
-	void add_core_settlement(const site *settlement)
-	{
-		this->core_settlements.push_back(settlement);
-	}
-
 signals:
 	void changed();
 

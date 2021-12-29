@@ -1355,16 +1355,6 @@ static int CclDefineSite(lua_State *l)
 				
 				site->cultural_names[civilization] = cultural_name;
 			}
-		} else if (!strcmp(value, "Cores")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
-				
-				site->add_core(faction);
-			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

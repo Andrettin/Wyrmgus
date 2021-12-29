@@ -81,7 +81,6 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(quint64 mass MEMBER mass READ get_mass)
 	Q_PROPERTY(wyrmgus::centesimal_int mass_jm READ get_mass_jm WRITE set_mass_jm)
 	Q_PROPERTY(wyrmgus::site* connection_destination MEMBER connection_destination)
-	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
 	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
 
@@ -260,16 +259,6 @@ public:
 		return this->is_settlement() && !this->get_name().empty() && !this->is_connector();
 	}
 
-	const std::vector<faction *> &get_cores() const
-	{
-		return this->cores;
-	}
-
-	QVariantList get_cores_qvariant_list() const;
-
-	Q_INVOKABLE void add_core(faction *faction);
-	Q_INVOKABLE void remove_core(faction *faction);
-
 	const std::vector<region *> &get_regions() const
 	{
 		return this->regions;
@@ -330,7 +319,6 @@ private:
 	uint64_t mass = 0; //the mass of the site in zettagrams, if it is a celestial body
 	site *connection_destination = nullptr;
 	std::vector<region *> regions; //regions where this site is located
-	std::vector<faction *> cores; //factions which have this site as a core
 	std::map<const civilization *, std::string> cultural_names;	/// Names for the site for each different culture/civilization
 	QColor color; //color used to represent the site on the minimap, and to identify its territory on territory images
 	std::vector<character *> characters; //characters which can be recruited at this site

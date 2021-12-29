@@ -535,7 +535,7 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_name == "domains") {
 		magic_domain *domain_value = magic_domain::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(magic_domain *, domain_value));
-	} else if (property_name == "factions" || property_name == "cores") {
+	} else if (property_name == "factions") {
 		faction *faction_value = faction::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(faction *, faction_value));
 	} else if (property_name == "files") {
