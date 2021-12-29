@@ -275,6 +275,11 @@ void game::run_map_async(const QString &filepath)
 void game::run_campaign_async(campaign *campaign)
 {
 	engine_interface::get()->post([this, campaign]() {
+		if (this->get_current_campaign() != nullptr) {
+			//already running
+			return;
+		}
+
 		this->set_current_campaign(campaign);
 		this->run_map(database::get()->get_campaign_map_filepath());
 	});
