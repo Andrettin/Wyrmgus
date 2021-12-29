@@ -361,6 +361,10 @@ void button::initialize()
 		this->UnitMask = "," + this->UnitMask + ",";
 	}
 
+	if (this->Action == ButtonCmd::Faction) {
+		++button::faction_button_count;
+	}
+
 	data_entry::initialize();
 }
 

@@ -1744,10 +1744,12 @@ void CButtonPanel::Update()
 		unsigned int sold_unit_count = 0;
 		unsigned int potential_faction_count = 0;
 		unsigned int potential_dynasty_count = 0;
+
 		for (button *button : button::get_all()) {
 			if (button->Action != ButtonCmd::Faction && button->Action != ButtonCmd::Dynasty && button->Action != ButtonCmd::Buy) {
 				continue;
 			}
+
 			std::array<char, 128> unit_ident{};
 			sprintf(unit_ident.data(), ",%s,", unit.Type->Ident.c_str());
 			if (button->UnitMask[0] != '*' && !strstr(button->UnitMask.c_str(), unit_ident.data()) && !vector::contains(button->get_unit_classes(), unit.Type->get_unit_class())) {

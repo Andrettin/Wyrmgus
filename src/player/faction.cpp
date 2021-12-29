@@ -45,6 +45,7 @@
 #include "player/player.h"
 #include "player/player_color.h"
 #include "script/condition/and_condition.h"
+#include "ui/button.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
@@ -283,6 +284,10 @@ void faction::check() const
 
 	if (this->get_type() == faction_type::none) {
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no type.");
+	}
+
+	if (this->DevelopsTo.size() > button::get_faction_button_count()) {
+		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" can develop to " + std::to_string(this->DevelopsTo.size()) + " different factions, but there are only buttons for a faction to develop to " + std::to_string(button::get_faction_button_count()) + " different ones.");
 	}
 
 	for (const auto &kv_pair : this->ai_force_templates) {

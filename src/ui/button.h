@@ -65,6 +65,15 @@ public:
 
 	static void add_button_key_to_name(std::string &value_name, const std::string &button_key);
 
+	static size_t get_faction_button_count()
+	{
+		return button::faction_button_count;
+	}
+
+private:
+	static inline size_t faction_button_count = 0;
+
+public:
 	explicit button(const std::string &identifier = "");
 	~button();
 
