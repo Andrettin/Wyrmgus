@@ -1608,22 +1608,22 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 
 		//sort players by order of distance of their start position to the main player's
 		std::sort(listed_players.begin(), listed_players.end(), [](const CPlayer *a, const CPlayer *b) {
-			return wyrmgus::point::distance_to(CPlayer::GetThisPlayer()->StartPos, a->StartPos) < wyrmgus::point::distance_to(CPlayer::GetThisPlayer()->StartPos, b->StartPos);
+			return point::distance_to(CPlayer::GetThisPlayer()->StartPos, a->StartPos) < point::distance_to(CPlayer::GetThisPlayer()->StartPos, b->StartPos);
 		});
 
 		for (const CPlayer *player : listed_players) {
 			if (player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->is_allied_with(*player)) {
-				label.SetNormalColor(wyrmgus::defines::get()->get_ally_font_color());
+				label.SetNormalColor(defines::get()->get_ally_font_color());
 			} else if (CPlayer::GetThisPlayer()->is_enemy_of(*player)) {
-				label.SetNormalColor(wyrmgus::defines::get()->get_enemy_font_color());
+				label.SetNormalColor(defines::get()->get_enemy_font_color());
 			} else {
-				label.SetNormalColor(wyrmgus::defines::get()->get_default_font_color());
+				label.SetNormalColor(defines::get()->get_default_font_color());
 			}
 
 			Video.DrawRectangleClip(ColorWhite, x, y, (12 * scale_factor).to_int(), (12 * scale_factor).to_int(), render_commands);
 			Video.FillRectangleClip(CVideo::MapRGB(player->get_minimap_color()), x + 1, y + 1, (12 * scale_factor).to_int() - 2, (12 * scale_factor).to_int() - 2, render_commands);
 
-			label.Draw(x + (15 * scale_factor).to_int(), y, _(player->get_full_name().c_str()), render_commands);
+			label.Draw(x + (15 * scale_factor).to_int(), y, _(player->get_name().c_str()), render_commands);
 			y += (14 * scale_factor).to_int();
 
 			if ((y + (12 * scale_factor).to_int()) > Video.Height) { // if the square would overflow the screen, don't draw the player
@@ -1663,7 +1663,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 	//Wyrmgus start
 	//draw icon panel frame, if any
 	if (
-		wyrmgus::defines::get()->get_infopanel_frame_graphics() != nullptr
+		defines::get()->get_infopanel_frame_graphics() != nullptr
 		&& (unit.CurrentAction() != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->get_index()].get_time_cost() == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
 		&& (unit.CurrentAction() != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->get_index()].get_time_cost() == 0)
 		&& (unit.CurrentAction() != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().get_time_cost() == 0)
