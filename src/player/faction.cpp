@@ -291,6 +291,10 @@ void faction::check() const
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no type.");
 	}
 
+	if (this->get_default_tier() == faction_tier::none) {
+		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no default tier.");
+	}
+
 	for (const site *core_settlement : this->get_core_settlements()) {
 		if (!core_settlement->is_settlement()) {
 			throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has site \"" + core_settlement->get_identifier() + "\" set as one of its core settlements, but the latter is not a settlement.");
