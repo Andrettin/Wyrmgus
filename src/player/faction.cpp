@@ -156,19 +156,7 @@ void faction::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "develops_from") {
-		for (const std::string &value : values) {
-			faction *other_faction = faction::get(value);
-			this->DevelopsFrom.push_back(other_faction);
-			other_faction->DevelopsTo.push_back(this);
-		}
-	} else if (tag == "develops_to") {
-		for (const std::string &value : values) {
-			faction *other_faction = faction::get(value);
-			this->DevelopsTo.push_back(other_faction);
-			other_faction->DevelopsFrom.push_back(this);
-		}
-	} else if (tag == "core_settlements") {
+	if (tag == "core_settlements") {
 		for (const std::string &value : values) {
 			const site *settlement = site::get(value);
 			this->core_settlements.push_back(settlement);
@@ -303,10 +291,6 @@ void faction::check() const
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no type.");
 	}
 
-	if (this->DevelopsTo.size() > button::get_faction_button_count()) {
-		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" can develop to " + std::to_string(this->DevelopsTo.size()) + " different factions, but there are only buttons for a faction to develop to " + std::to_string(button::get_faction_button_count()) + " different ones.");
-	}
-
 	for (const site *core_settlement : this->get_core_settlements()) {
 		if (!core_settlement->is_settlement()) {
 			throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has site \"" + core_settlement->get_identifier() + "\" set as one of its core settlements, but the latter is not a settlement.");
@@ -427,36 +411,6 @@ std::string faction::get_titled_name(const government_type government_type, cons
 	} else {
 		return title_name + " of " + this->get_name();
 	}
-}
-
-bool faction::develops_from_faction(const faction *faction, const bool include_indirect) const
-{
-	for (const wyrmgus::faction *origin_faction : this->DevelopsFrom) {
-		if (origin_faction == faction) {
-			return true;
-		}
-
-		if (include_indirect && origin_faction->develops_from_faction(faction, include_indirect)) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool faction::develops_to_faction(const faction *faction, const bool include_indirect) const
-{
-	for (const wyrmgus::faction *derived_faction : this->DevelopsTo) {
-		if (derived_faction == faction) {
-			return true;
-		}
-
-		if (include_indirect && derived_faction->develops_to_faction(faction, include_indirect)) {
-			return true;
-		}
-	}
-
-	return false;
 }
 
 int faction::get_force_type_weight(const ai_force_type force_type) const

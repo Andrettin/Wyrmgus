@@ -1492,26 +1492,6 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "Currency")) {
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
 			faction->Currency = currency;
-		} else if (!strcmp(value, "DevelopsFrom")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				wyrmgus::faction *second_faction = wyrmgus::faction::get(LuaToString(l, -1, k + 1));
-				faction->DevelopsFrom.push_back(second_faction);
-				second_faction->DevelopsTo.push_back(faction);
-			}
-		} else if (!strcmp(value, "DevelopsTo")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				wyrmgus::faction *second_faction = wyrmgus::faction::get(LuaToString(l, -1, k + 1));
-				faction->DevelopsTo.push_back(second_faction);
-				second_faction->DevelopsFrom.push_back(faction);
-			}
 		} else if (!strcmp(value, "Titles")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
