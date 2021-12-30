@@ -119,7 +119,7 @@ void faction::process_character_title_name_scope(character_title_name_map &chara
 	});
 }
 
-void faction::process_character_title_name_scope(std::map<wyrmgus::government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const sml_data &scope)
+void faction::process_character_title_name_scope(std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const wyrmgus::government_type government_type = string_to_government_type(tag);
@@ -176,6 +176,13 @@ void faction::process_sml_scope(const sml_data &scope)
 	} else if (tag == "title_names") {
 		faction::process_title_names(this->title_names, scope);
 	} else if (tag == "character_title_names") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+			const character_title title_type = string_to_character_title(key);
+			character_title_names[title_type][government_type::none][faction_tier::none][gender::none] = value;
+		});
+
 		scope.for_each_child([&](const sml_data &child_scope) {
 			faction::process_character_title_name_scope(this->character_title_names, child_scope);
 		});
