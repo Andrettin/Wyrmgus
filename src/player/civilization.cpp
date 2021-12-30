@@ -55,6 +55,7 @@
 #include "util/path_util.h"
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
+#include "util/vector_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -265,6 +266,12 @@ void civilization::check() const
 
 		if (this->get_language() == nullptr) {
 			throw std::runtime_error("Civilization \"" + this->get_identifier() + "\" has no language.");
+		}
+	}
+
+	for (const civilization *other_civilization : this->get_develops_from()) {
+		if (vector::contains(other_civilization->get_develops_from(), this)) {
+			throw std::runtime_error("Civilizations \"" + this->get_identifier() + "\" and \"" + other_civilization->get_identifier() + "\" are both set to develop from each other.");
 		}
 	}
 
