@@ -76,6 +76,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(wyrmgus::faction* parent_faction MEMBER parent_faction)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::player_color* color MEMBER color READ get_color NOTIFY changed)
+	Q_PROPERTY(std::string default_ai MEMBER default_ai)
 	Q_PROPERTY(wyrmgus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
 	Q_PROPERTY(wyrmgus::faction_tier min_tier MEMBER min_tier READ get_min_tier)
 	Q_PROPERTY(wyrmgus::faction_tier max_tier MEMBER max_tier READ get_max_tier)
@@ -164,6 +165,11 @@ public:
 	const wyrmgus::icon *get_icon() const
 	{
 		return this->icon;
+	}
+
+	const std::string &get_default_ai() const
+	{
+		return this->default_ai;
 	}
 	
 	CCurrency *GetCurrency() const;
@@ -354,13 +360,13 @@ signals:
 	void changed();
 
 public:
-	std::string DefaultAI = "land-attack";
 	int ID = -1;														/// faction ID
 private:
 	std::string adjective;
 	wyrmgus::civilization *civilization = nullptr;
 	faction_type type; //faction type (i.e. tribe or polity)
 	faction *parent_faction = nullptr;
+	std::string default_ai = "land-attack";
 	faction_tier default_tier;
 	faction_tier min_tier;
 	faction_tier max_tier;

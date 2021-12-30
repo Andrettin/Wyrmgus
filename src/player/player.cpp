@@ -910,7 +910,7 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 			player->set_civilization(faction->get_civilization());
 			player->set_faction(faction);
 			player->AiEnabled = true;
-			player->AiName = faction->DefaultAI;
+			player->AiName = faction->get_default_ai();
 			player->Team = 1;
 			player->set_resource(defines::get()->get_wealth_resource(), 2500); // give the new player enough resources to start up
 			player->set_resource(resource::get_all()[WoodCost], 2500);

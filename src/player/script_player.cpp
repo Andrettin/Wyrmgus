@@ -1480,7 +1480,7 @@ static int CclDefineFaction(lua_State *l)
 			const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(government_type_name);
 			faction->default_government_type = government_type;
 		} else if (!strcmp(value, "DefaultAI")) {
-			faction->DefaultAI = LuaToString(l, -1);
+			faction->default_ai = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentFaction")) {
 			faction->parent_faction = wyrmgus::faction::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Playable")) {
@@ -2165,7 +2165,7 @@ static int CclGetFactionData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "DefaultAI")) {
-		lua_pushstring(l, faction->DefaultAI.c_str());
+		lua_pushstring(l, faction->get_default_ai().c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
