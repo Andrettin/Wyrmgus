@@ -2301,6 +2301,10 @@ bool CPlayer::can_potentially_found_faction(const wyrmgus::faction *faction) con
 			}
 			break;
 		case faction_type::polity:
+			if (this->get_faction()->get_type() == faction_type::tribe && !faction->is_government_type_valid(government_type::tribe)) {
+				//if the current faction is a tribal one, the target faction must have the tribe government type be valid for them, as otherwise it won't be possible to transition from one into the other
+				return false;
+			}
 			break;
 		default:
 			return false;
@@ -2367,6 +2371,10 @@ void CPlayer::update_potentially_foundable_factions()
 
 	if (this->potentially_foundable_factions.size() > button::get_faction_button_count()) {
 		log::log_error("Player of faction \"" + this->get_faction()->get_identifier() + "\" can develop to " + std::to_string(this->potentially_foundable_factions.size()) + " different factions, but there are only buttons for a faction to develop to " + std::to_string(button::get_faction_button_count()) + " different ones.");
+	}
+
+	if (this == CPlayer::GetThisPlayer() && !Selected.empty() && Selected[0]->Type->BoolFlag[TOWNHALL_INDEX].value) {
+		UI.ButtonPanel.Update();
 	}
 }
 

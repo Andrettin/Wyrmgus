@@ -493,10 +493,8 @@ static void AiCheckUnits()
 	//Wyrmgus start
 	//check if any factions can be founded, and if so, pick one randomly
 	if (AiPlayer->Player->get_faction() != nullptr && AiPlayer->Player->NumTownHalls > 0) {
-		std::vector<const wyrmgus::faction *> potential_factions;
-		for (size_t i = 0; i < AiPlayer->Player->get_faction()->DevelopsTo.size(); ++i) {
-			const wyrmgus::faction *possible_faction = AiPlayer->Player->get_faction()->DevelopsTo[i];
-			
+		std::vector<const faction *> potential_factions;
+		for (const faction *possible_faction : AiPlayer->Player->get_potentially_foundable_factions()) {
 			if (!AiPlayer->Player->can_found_faction(possible_faction)) {
 				continue;
 			}
@@ -504,7 +502,7 @@ static void AiCheckUnits()
 			potential_factions.push_back(possible_faction);
 		}
 		
-		if (potential_factions.size() > 0) {
+		if (!potential_factions.empty()) {
 			AiPlayer->Player->set_faction(vector::get_random(potential_factions));
 		}
 		

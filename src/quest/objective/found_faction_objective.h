@@ -66,9 +66,7 @@ public:
 
 	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
 	{
-		const wyrmgus::faction *player_faction = player->get_faction();
-
-		if (player_faction == nullptr || !player_faction->develops_to_faction(this->faction, true)) {
+		if (!player->can_potentially_found_faction(this->faction)) {
 			return false;
 		}
 
@@ -80,7 +78,7 @@ public:
 		const wyrmgus::faction *player_faction = player->get_faction();
 
 		if (player_faction != this->faction) {
-			if (player_faction == nullptr || !player_faction->develops_to_faction(this->faction, true)) {
+			if (!player->can_potentially_found_faction(this->faction)) {
 				return std::make_pair(true, "The faction can no longer be founded.");
 			}
 		}
