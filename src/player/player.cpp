@@ -2310,11 +2310,6 @@ bool CPlayer::can_potentially_found_faction(const wyrmgus::faction *faction) con
 			return false;
 	}
 
-	const int tier_diff = static_cast<int>(faction->get_min_tier()) - static_cast<int>(this->get_faction_tier());
-	if (tier_diff > 1) {
-		return false;
-	}
-
 	if (faction->get_max_tier() < this->get_faction()->get_max_tier()) {
 		return false;
 	}
