@@ -295,6 +295,10 @@ void faction::check() const
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no default tier.");
 	}
 
+	if (this->get_civilization()->is_playable() && (this->get_type() == faction_type::tribe || this->get_type() == faction_type::polity) && this->get_icon() == nullptr) {
+		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" is a tribe or polity belonging to a playable civilization, but has no icon.");
+	}
+
 	for (const site *core_settlement : this->get_core_settlements()) {
 		if (!core_settlement->is_settlement()) {
 			throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has site \"" + core_settlement->get_identifier() + "\" set as one of its core settlements, but the latter is not a settlement.");

@@ -2293,6 +2293,10 @@ bool CPlayer::can_potentially_found_faction(const wyrmgus::faction *faction) con
 		return false;
 	}
 
+	if (this->get_civilization()->is_playable() && !faction->get_civilization()->is_playable()) {
+		return false;
+	}
+
 	switch (faction->get_type()) {
 		case faction_type::tribe:
 			if (this->get_faction()->get_type() == faction_type::polity) {
