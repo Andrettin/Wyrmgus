@@ -2289,12 +2289,22 @@ bool CPlayer::can_potentially_found_faction(const wyrmgus::faction *faction) con
 		return false;
 	}
 
-	if (faction->get_civilization() != this->get_civilization() && !vector::contains(this->get_civilization()->get_develops_to(), faction->get_civilization())) {
-		return false;
-	}
+	if (faction->get_civilization() != this->get_civilization()) {
+		if (!vector::contains(this->get_civilization()->get_develops_to(), faction->get_civilization())) {
+			return false;
+		}
 
-	if (this->get_civilization()->is_playable() && !faction->get_civilization()->is_playable()) {
-		return false;
+		if (this->get_civilization()->is_playable() && !faction->get_civilization()->is_playable()) {
+			return false;
+		}
+
+		if (faction->get_preconditions() != nullptr && !faction->get_preconditions()->check(this->get_civilization())) {
+			return false;
+		}
+
+		if (faction->get_conditions() != nullptr && !faction->get_conditions()->check(this->get_civilization())) {
+			return false;
+		}
 	}
 
 	switch (faction->get_type()) {
