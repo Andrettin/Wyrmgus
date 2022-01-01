@@ -35,6 +35,7 @@
 #include "quest/campaign.h"
 #include "time/calendar.h"
 #include "time/timeline.h"
+#include "util/date_util.h"
 #include "util/string_conversion_util.h"
 
 namespace wyrmgus {
@@ -176,11 +177,15 @@ void data_entry::load_history()
 
 void data_entry::load_date_scope(const sml_data &date_scope, const QDateTime &date)
 {
-	date_scope.for_each_element([&](const sml_property &property) {
-		this->process_sml_dated_property(property, date);
-	}, [&](const sml_data &scope) {
-		this->process_sml_dated_scope(scope, date);
-	});
+	try {
+		date_scope.for_each_element([&](const sml_property &property) {
+			this->process_sml_dated_property(property, date);
+		}, [&](const sml_data &scope) {
+			this->process_sml_dated_scope(scope, date);
+		});
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error loading history for data entry instance \"" + this->get_identifier() + "\", for the " + date::to_string(date) + " date."));
+	}
 }
 
 }
