@@ -10,7 +10,7 @@
 //
 /**@name ui.cpp - The user interface globals. */
 //
-//      (c) Copyright 1999-2021 by Lutz Sammer, Andreas Arens,
+//      (c) Copyright 1999-2022 by Lutz Sammer, Andreas Arens,
 //                                 Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

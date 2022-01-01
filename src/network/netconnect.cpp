@@ -10,7 +10,7 @@
 //
 /**@name netconnect.cpp - The network high level connection code. */
 //
-//      (c) Copyright 2001-2021 by Lutz Sammer, Andreas Arens, Jimmy Salmon and
+//      (c) Copyright 2001-2022 by Lutz Sammer, Andreas Arens, Jimmy Salmon and
 //                                 Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

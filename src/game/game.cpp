@@ -10,7 +10,7 @@
 //
 /**@name game.cpp - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2021 by Lutz Sammer, Andreas Arens,
+//      (c) Copyright 1998-2022 by Lutz Sammer, Andreas Arens,
 //      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

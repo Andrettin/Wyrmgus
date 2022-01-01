@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 1998-2021 by Lutz Sammer, Francois Beerten,
+//      (c) Copyright 1998-2022 by Lutz Sammer, Francois Beerten,
 //      Jimmy Salmon, Pali Rohár, cybermind and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

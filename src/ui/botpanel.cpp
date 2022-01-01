@@ -10,7 +10,7 @@
 //
 /**@name botpanel.cpp - The bottom panel. */
 //
-//      (c) Copyright 1999-2021 by Lutz Sammer, Vladi Belperchinov-Shabanski,
+//      (c) Copyright 1999-2022 by Lutz Sammer, Vladi Belperchinov-Shabanski,
 //		Jimmy Salmon, cybermind and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

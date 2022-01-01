@@ -10,7 +10,7 @@
 //
 /**@name upgrade_structs.h - The upgrade/allow header file. */
 //
-//      (c) Copyright 1999-2021 by Vladi Belperchinov-Shabanski,
+//      (c) Copyright 1999-2022 by Vladi Belperchinov-Shabanski,
 //		Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

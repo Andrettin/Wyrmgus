@@ -10,7 +10,7 @@
 //
 /**@name selection.cpp - The units' selection. */
 //
-//      (c) Copyright 1999-2021 by Patrice Fortier, Lutz Sammer,
+//      (c) Copyright 1999-2022 by Patrice Fortier, Lutz Sammer,
 //      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

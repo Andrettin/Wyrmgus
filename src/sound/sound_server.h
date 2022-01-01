@@ -10,7 +10,7 @@
 //
 /**@name sound_server.h - The sound server header file. */
 //
-//      (c) Copyright 1998-2021 by Lutz Sammer, Fabrice Rossi,
+//      (c) Copyright 1998-2022 by Lutz Sammer, Fabrice Rossi,
 //                                 Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

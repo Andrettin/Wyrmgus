@@ -10,7 +10,7 @@
 //
 /**@name spell_areaadjustvital.cpp - The spell AreaAdjustVital. */
 //
-//      (c) Copyright 1998-2021 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2022 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

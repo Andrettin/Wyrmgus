@@ -10,7 +10,7 @@
 //
 /**@name mainscr.cpp - The main screen. */
 //
-//      (c) Copyright 1998-2021 by Lutz Sammer, Valery Shchedrin,
+//      (c) Copyright 1998-2022 by Lutz Sammer, Valery Shchedrin,
 //      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

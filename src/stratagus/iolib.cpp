@@ -10,7 +10,7 @@
 //
 /**@name iolib.cpp - Compression-IO helper functions. */
 //
-//      (c) Copyright 2000-2021 by Andreas Arens, Lutz Sammer Jimmy Salmon,
+//      (c) Copyright 2000-2022 by Andreas Arens, Lutz Sammer Jimmy Salmon,
 //                                 Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

@@ -10,7 +10,7 @@
 //
 /**@name sound_server.cpp - The sound server (hardware layer and so on) */
 //
-//      (c) Copyright 1998-2021 by Lutz Sammer, Fabrice Rossi,
+//      (c) Copyright 1998-2022 by Lutz Sammer, Fabrice Rossi,
 //                                 Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

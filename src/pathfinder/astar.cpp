@@ -10,7 +10,7 @@
 //
 /**@name astar.cpp - The a* path finder routines. */
 //
-//      (c) Copyright 1999-2021 by Lutz Sammer, Fabrice Rossi, Russell Smith,
+//      (c) Copyright 1999-2022 by Lutz Sammer, Fabrice Rossi, Russell Smith,
 //                                 Francois Beerten, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

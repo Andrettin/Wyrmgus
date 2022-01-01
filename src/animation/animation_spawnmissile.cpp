@@ -10,7 +10,7 @@
 //
 /**@name animation_spawnmissile.cpp - The animation SpawnMissile. */
 //
-//      (c) Copyright 2012-2021 by Joris Dauphin and Andrettin
+//      (c) Copyright 2012-2022 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

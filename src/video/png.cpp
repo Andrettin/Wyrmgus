@@ -10,7 +10,7 @@
 //
 /**@name png.cpp - The png graphic file loader. */
 //
-//      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon, Pali Rohár and Andrettin
+//      (c) Copyright 1998-2022 by Lutz Sammer, Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

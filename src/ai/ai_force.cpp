@@ -10,7 +10,7 @@
 //
 /**@name ai_force.cpp - AI force functions. */
 //
-//      (c) Copyright 2001-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 2001-2022 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

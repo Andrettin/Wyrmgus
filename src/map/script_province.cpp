@@ -10,7 +10,7 @@
 //
 /**@name script_province.cpp - The province ccl functions. */
 //
-//      (c) Copyright 2016-2021 by Andrettin
+//      (c) Copyright 2016-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

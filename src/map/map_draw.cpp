@@ -10,7 +10,7 @@
 //
 /**@name map_draw.cpp - The map drawing. */
 //
-//      (c) Copyright 1999-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1999-2022 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

@@ -10,7 +10,7 @@
 //
 /**@name unit_find.h - The unit find header file. */
 //
-//      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon, Joris Dauphin
+//      (c) Copyright 1998-2022 by Lutz Sammer, Jimmy Salmon, Joris Dauphin
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

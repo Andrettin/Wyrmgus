@@ -9,7 +9,7 @@
 #         Wyrmgus - A free fantasy real time strategy game engine
 #
 #    CMakeLists.txt
-#    Copyright (C) 2011-2021  Pali Rohár <pali.rohar@gmail.com>,
+#    Copyright (C) 2011-2022  Pali Rohár <pali.rohar@gmail.com>,
 #    cybermind <cybermindid@gmail.com> and Andrettin
 #
 #    This program is free software: you can redistribute it and/or modify

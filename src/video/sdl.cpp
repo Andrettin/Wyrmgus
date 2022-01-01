@@ -10,7 +10,7 @@
 //
 /**@name sdl.cpp - SDL video support. */
 //
-//      (c) Copyright 1999-2021 by Lutz Sammer, Jimmy Salmon, Nehal Mistry,
+//      (c) Copyright 1999-2022 by Lutz Sammer, Jimmy Salmon, Nehal Mistry,
 //                                 Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
