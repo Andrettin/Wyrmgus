@@ -32,9 +32,12 @@
 
 class COrder_TransformInto : public COrder
 {
-	friend std::unique_ptr<COrder>COrder::NewActionTransformInto(wyrmgus::unit_type &type);
+	friend std::unique_ptr<COrder>COrder::NewActionTransformInto(const unit_type &type);
+
 public:
-	COrder_TransformInto() : COrder(UnitAction::TransformInto), Type(nullptr) {}
+	COrder_TransformInto() : COrder(UnitAction::TransformInto)
+	{
+	}
 
 	virtual std::unique_ptr<COrder> Clone() const override
 	{
@@ -56,7 +59,7 @@ public:
 	//Wyrmgus end
 
 private:
-	wyrmgus::unit_type *Type; /// Transform unit into this unit-type
+	const wyrmgus::unit_type *Type = nullptr; /// Transform unit into this unit-type
 };
 
 class COrder_UpgradeTo final : public COrder

@@ -7569,6 +7569,28 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, const int da
 		return;
 	}
 
+	if (target.get_character() != nullptr) {
+		//characters cannot be captured
+		return;
+	}
+
+	//convert buildings to the equivalent type for the attacker's player
+	if (target.Type->BoolFlag[BUILDING_INDEX].value) {
+		const unit_class *target_unit_class = target.Type->get_unit_class();
+
+		if (target_unit_class == nullptr) {
+			return;
+		}
+
+		const unit_type *new_unit_type = attacker->Player->get_class_unit_type(target_unit_class);
+
+		if (new_unit_type == nullptr) {
+			return;
+		}
+
+		CommandTransformIntoType(target, *new_unit_type);
+	}
+
 	target.ChangeOwner(*attacker->Player, true);
 	CommandStopUnit(*attacker); //attacker shouldn't continue attack!
 

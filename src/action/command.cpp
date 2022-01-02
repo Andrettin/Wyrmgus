@@ -1119,7 +1119,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type
 **  @param type   upgrade to type
 **  @param flush  if true, flush command queue.
 */
-void CommandUpgradeTo(CUnit &unit, const wyrmgus::unit_type &type, int flush)
+void CommandUpgradeTo(CUnit &unit, const unit_type &type, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return;
@@ -1145,7 +1145,7 @@ void CommandUpgradeTo(CUnit &unit, const wyrmgus::unit_type &type, int flush)
 **  @param unit   pointer to unit.
 **  @param type   upgrade to type
 */
-void CommandTransformIntoType(CUnit &unit, wyrmgus::unit_type &type)
+void CommandTransformIntoType(CUnit &unit, const unit_type &type)
 {
 	if (unit.CriticalOrder != nullptr && unit.CriticalOrder->Action == UnitAction::TransformInto) {
 		return;

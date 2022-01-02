@@ -187,7 +187,7 @@ public:
 	static std::unique_ptr<COrder> NewActionStandGround();
 	static std::unique_ptr<COrder> NewActionStill();
 	static std::unique_ptr<COrder> NewActionTrain(CUnit &trainer, const wyrmgus::unit_type &type, int player);
-	static std::unique_ptr<COrder> NewActionTransformInto(wyrmgus::unit_type &type);
+	static std::unique_ptr<COrder> NewActionTransformInto(const unit_type &type);
 	static std::unique_ptr<COrder> NewActionUnload(const Vec2i &pos, CUnit *what, int z, const landmass *landmass);
 	static std::unique_ptr<COrder> NewActionUpgradeTo(CUnit &unit, const wyrmgus::unit_type &type);
 	//Wyrmgus start

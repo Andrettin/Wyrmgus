@@ -61,7 +61,7 @@
 /// How many resources the player gets back if canceling upgrade
 static constexpr int CancelUpgradeCostsFactor = 100;
 
-std::unique_ptr<COrder> COrder::NewActionTransformInto(wyrmgus::unit_type &type)
+std::unique_ptr<COrder> COrder::NewActionTransformInto(const unit_type &type)
 {
 	auto order = std::make_unique<COrder_TransformInto>();
 

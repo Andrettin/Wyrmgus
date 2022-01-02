@@ -138,9 +138,9 @@ extern void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &what, int pl
 /// Prepare command cancel training
 extern void CommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type);
 /// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit &unit, const wyrmgus::unit_type &what, int flush);
+extern void CommandUpgradeTo(CUnit &unit, const unit_type &what, int flush);
 /// immediate transforming into type.
-extern void CommandTransformIntoType(CUnit &unit, wyrmgus::unit_type &type);
+extern void CommandTransformIntoType(CUnit &unit, const unit_type &type);
 /// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit &unit);
 /// Prepare command research
