@@ -670,6 +670,66 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	replaced_unit.Release();
 }
 
+void CUnit::restore_ontop()
+{
+	// Destroy resource-platform, must re-make resource patch.
+	//Wyrmgus start
+//	const CBuildRestrictionOnTop *b = OnTopDetails(*this, nullptr);
+	const CBuildRestrictionOnTop *b = OnTopDetails(*this->Type, nullptr);
+	//Wyrmgus end
+	if (b != nullptr) {
+		if (b->ReplaceOnDie && (this->Type->get_given_resource() == nullptr || this->ResourcesHeld != 0) && this->MapLayer != nullptr) {
+			CUnit *temp = MakeUnitAndPlace(this->tilePos, *b->Parent, CPlayer::get_neutral_player(), this->MapLayer->ID);
+			if (temp == nullptr) {
+				DebugPrint("Unable to allocate Unit");
+			} else {
+				//Wyrmgus start
+//				temp->ResourcesHeld = this->ResourcesHeld;
+//				temp->Variable[GIVERESOURCE_INDEX].Value = this->Variable[GIVERESOURCE_INDEX].Value;
+//				temp->Variable[GIVERESOURCE_INDEX].Max = this->Variable[GIVERESOURCE_INDEX].Max;
+//				temp->Variable[GIVERESOURCE_INDEX].Enable = this->Variable[GIVERESOURCE_INDEX].Enable;
+				//Wyrmgus end
+				//Wyrmgus start
+				if (this->get_unique() != nullptr) {
+					temp->set_unique(this->get_unique());
+				} else {
+					if (this->Prefix != nullptr) {
+						temp->SetPrefix(this->Prefix);
+					}
+					if (this->Suffix != nullptr) {
+						temp->SetSuffix(this->Suffix);
+					}
+					if (this->Spell != nullptr) {
+						temp->SetSpell(this->Spell);
+					}
+				}
+				if (this->get_site() != nullptr) {
+					temp->set_site(this->get_site());
+
+					if (this->get_site()->is_settlement()) {
+						temp->settlement = this->settlement;
+						CMap::get()->remove_settlement_unit(this);
+						CMap::get()->add_settlement_unit(temp);
+					}
+
+					this->set_site(nullptr);
+				}
+				if (this->Type->get_given_resource() != nullptr && this->ResourcesHeld != 0) {
+					temp->SetResourcesHeld(this->ResourcesHeld);
+					temp->Variable[GIVERESOURCE_INDEX].Value = this->Variable[GIVERESOURCE_INDEX].Value;
+					temp->Variable[GIVERESOURCE_INDEX].Max = this->Variable[GIVERESOURCE_INDEX].Max;
+					temp->Variable[GIVERESOURCE_INDEX].Enable = this->Variable[GIVERESOURCE_INDEX].Enable;
+				}
+				//Wyrmgus end
+			}
+			//Wyrmgus start
+		} else if (this->get_site() != nullptr && this->get_site()->get_game_data()->get_site_unit() == this) {
+			this->get_site()->get_game_data()->set_site_unit(nullptr);
+			//Wyrmgus end
+		}
+	}
+}
+
 void CUnit::set_experience(const int amount)
 {
 	if (!this->Type->can_gain_experience()) {
@@ -4402,63 +4462,6 @@ void UnitLost(CUnit &unit)
 	unit.CurrentOrder()->Cancel(unit);
 
 	DebugPrint("%d: Lost %s(%d)\n" _C_ player.get_index() _C_ type.Ident.c_str() _C_ UnitNumber(unit));
-
-	// Destroy resource-platform, must re-make resource patch.
-	//Wyrmgus start
-//	const CBuildRestrictionOnTop *b = OnTopDetails(unit, nullptr);
-	const CBuildRestrictionOnTop *b = OnTopDetails(*unit.Type, nullptr);
-	//Wyrmgus end
-	if (b != nullptr) {
-		if (b->ReplaceOnDie && (type.get_given_resource() == nullptr || unit.ResourcesHeld != 0) && unit.MapLayer != nullptr) {
-			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, CPlayer::get_neutral_player(), unit.MapLayer->ID);
-			if (temp == nullptr) {
-				DebugPrint("Unable to allocate Unit");
-			} else {
-				//Wyrmgus start
-//				temp->ResourcesHeld = unit.ResourcesHeld;
-//				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
-//				temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
-//				temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
-				//Wyrmgus end
-				//Wyrmgus start
-				if (unit.get_unique() != nullptr) {
-					temp->set_unique(unit.get_unique());
-				} else {
-					if (unit.Prefix != nullptr) {
-						temp->SetPrefix(unit.Prefix);
-					}
-					if (unit.Suffix != nullptr) {
-						temp->SetSuffix(unit.Suffix);
-					}
-					if (unit.Spell != nullptr) {
-						temp->SetSpell(unit.Spell);
-					}
-				}
-				if (unit.get_site() != nullptr) {
-					temp->set_site(unit.get_site());
-
-					if (unit.get_site()->is_settlement()) {
-						temp->settlement = unit.settlement;
-						CMap::get()->remove_settlement_unit(&unit);
-						CMap::get()->add_settlement_unit(temp);
-					}
-
-					unit.set_site(nullptr);
-				}
-				if (type.get_given_resource() != nullptr && unit.ResourcesHeld != 0) {
-					temp->SetResourcesHeld(unit.ResourcesHeld);
-					temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
-					temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
-					temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
-				}
-				//Wyrmgus end
-			}
-		//Wyrmgus start
-		} else if (unit.get_site() != nullptr && unit.get_site()->get_game_data()->get_site_unit() == &unit) {
-			unit.get_site()->get_game_data()->set_site_unit(nullptr);
-		//Wyrmgus end
-		}
-	}
 }
 
 /**
@@ -7173,7 +7176,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		return;
 	}
 
-	PlayUnitSound(unit, wyrmgus::unit_sound_type::dying);
+	PlayUnitSound(unit, unit_sound_type::dying);
 
 	//
 	// Catapults,... explodes.
@@ -7253,8 +7256,8 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	unit.Remove(nullptr);
 	UnitLost(unit);
+	unit.restore_ontop();
 	unit.clear_orders();
-
 
 	// Unit has death animation.
 
