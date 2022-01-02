@@ -383,7 +383,6 @@
 */
 
 bool EnableTrainingQueue;                 /// Config: training queues enabled
-bool EnableBuildingCapture = false;               /// Config: capture buildings enabled
 bool RevealAttacker;                      /// Config: reveal attacker enabled
 int ResourcesMultiBuildersMultiplier = 0; /// Config: spend resources for building with multiple workers
 
@@ -4963,7 +4962,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus start
 	if (&newplayer == CPlayer::GetThisPlayer() && show_change) {
 		this->Blink = 5;
-		PlayGameSound(wyrmgus::game_sound_set::get()->get_rescue_sound(), MaxSampleVolume);
+		PlayGameSound(game_sound_set::get()->get_rescue_sound(), MaxSampleVolume);
 	}
 	//Wyrmgus end
 }
@@ -7547,22 +7546,43 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 	//Wyrmgus end
 }
 
-static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, int damage)
+static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, const int damage)
 {
-	// FIXME: this is dumb. I made repairers capture. crap.
-	// david: capture enemy buildings
-	// Only worker types can capture.
-	// Still possible to destroy building if not careful (too many attackers)
-	if (EnableBuildingCapture && attacker
-		&& target.Type->BoolFlag[BUILDING_INDEX].value && target.Variable[HP_INDEX].Value <= damage * 3
-		&& attacker->is_enemy_of(target)
-		&& attacker->can_repair()) {
-		target.ChangeOwner(*attacker->Player);
-		CommandStopUnit(*attacker); // Attacker shouldn't continue attack!
+	Q_UNUSED(damage);
+
+	static constexpr int capture_hp_threshold = 10;
+
+	//capture enemy buildings
+
+	if (!target.Type->BoolFlag[CAPTURABLE_INDEX].value) {
+		return;
+	}
+
+	if (target.Variable[HP_INDEX].get_percent_value() >= capture_hp_threshold) {
+		return;
+	}
+
+	if (attacker == nullptr || !attacker->is_enemy_of(target)) {
+		return;
+	}
+
+	target.ChangeOwner(*attacker->Player, true);
+	CommandStopUnit(*attacker); //attacker shouldn't continue attack!
+
+	//stop nearby units belonging to the attacker's player from continuing to attack the target unit
+	static constexpr int nearby_attacker_stop_range = 16;
+
+	std::vector<CUnit *> nearby_units;
+	SelectAroundUnit(target, nearby_attacker_stop_range, nearby_units, HasSamePlayerAs(*attacker->Player));
+
+	for (CUnit *nearby_unit : nearby_units) {
+		if (nearby_unit->CurrentOrder()->get_goal() == &target) {
+			CommandStopUnit(*attacker);
+		}
 	}
 }
 
-static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
+static void HitUnit_ShowDamageMissile(const CUnit &target, const int damage)
 {
 	const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();
 

@@ -34,7 +34,7 @@ namespace wyrmgus {
 **  It is used to define variables and use it after
 **  to manage magic, energy, shield or other stuff.
 */
-class unit_variable
+class unit_variable final
 {
 public:
 	bool operator ==(const unit_variable &rhs) const
@@ -44,7 +44,20 @@ public:
 			   && this->Increase == rhs.Increase
 			   && this->Enable == rhs.Enable;
 	}
-	bool operator !=(const unit_variable &rhs) const { return !(*this == rhs); }
+
+	bool operator !=(const unit_variable &rhs) const
+	{
+		return !(*this == rhs);
+	}
+
+	int get_percent_value() const
+	{
+		if (this->Max == 0) {
+			return 0;
+		}
+
+		return this->Value * 100 / this->Max;
+	}
 
 public:
 	int Max = 0;        /// Maximum for the variable. (Assume min is 0.)

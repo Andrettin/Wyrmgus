@@ -83,16 +83,20 @@ private:
 	const wyrmgus::unit_type *type;
 };
 
-class HasSamePlayerAs : public CUnitFilter
+class HasSamePlayerAs final : public CUnitFilter
 {
 public:
-	explicit HasSamePlayerAs(const CPlayer &_player) : player(&_player) {}
+	explicit HasSamePlayerAs(const CPlayer &_player) : player(&_player)
+	{
+	}
+
 	bool operator()(const CUnit *unit) const
 	{
 		return unit->Player == player;
 	}
+
 private:
-	const CPlayer *player;
+	const CPlayer *player = nullptr;
 };
 
 class HasNotSamePlayerAs : public CUnitFilter

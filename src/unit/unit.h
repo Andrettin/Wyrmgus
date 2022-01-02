@@ -990,7 +990,6 @@ extern unsigned long ShowOrdersCount;   /// Show orders for some time
 extern unsigned long ShowNameDelay;     /// Delay to show unit's name
 extern unsigned long ShowNameTime;      /// Show unit's name for some time
 extern bool EnableTrainingQueue;               /// Config: training queues enabled
-extern bool EnableBuildingCapture;             /// Config: building capture enabled
 extern bool RevealAttacker;                    /// Config: reveal attacker enabled
 extern int ResourcesMultiBuildersMultiplier;   /// Config: spend resources for building with multiple workers
 extern const CViewport *CurrentViewport; /// CurrentViewport
