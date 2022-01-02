@@ -269,7 +269,8 @@ public:
 	bool is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int z) const;
 	std::vector<const map_template *> get_pos_subtemplates(const QPoint &pos, const int z) const;
 	std::vector<const map_template *> get_rect_subtemplates(const QRect &rect, const int z) const;
-	bool is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::site *settlement);
+	bool is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::site *settlement) const;
+	bool is_rect_on_settlement_borders(const QRect &rect, const int z) const;
 	
 	const world *calculate_pos_world(const QPoint &pos, const int z, const bool include_adjacent) const;
 

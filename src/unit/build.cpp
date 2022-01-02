@@ -631,26 +631,10 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 
 	if (GameEstablishing) {
 		//do not allow buildings to be placed on borders at start
-		const site *previous_settlement = nullptr;
+		const QRect rect(pos, type.get_tile_size());
 
-		for (int x = pos.x(); x < pos.x() + type.get_tile_width(); ++x) {
-			for (int y = pos.y(); y < pos.y() + type.get_tile_height(); ++y) {
-				const QPoint tile_pos(x, y);
-
-				if (!CMap::get()->Info->IsPointOnMap(tile_pos, z)) {
-					continue;
-				}
-
-				const tile *tile = CMap::get()->Field(tile_pos, z);
-
-				const site *settlement = tile->get_settlement();
-
-				if (previous_settlement != nullptr && settlement != nullptr && settlement != previous_settlement) {
-					return nullptr;
-				}
-
-				previous_settlement = tile->get_settlement();
-			}
+		if (CMap::get()->is_rect_on_settlement_borders(rect, z)) {
+			return nullptr;
 		}
 	}
 

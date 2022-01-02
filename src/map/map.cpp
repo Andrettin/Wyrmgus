@@ -1155,7 +1155,7 @@ std::vector<const map_template *> CMap::get_rect_subtemplates(const QRect &rect,
 	return subtemplates;
 }
 
-bool CMap::is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::site *settlement)
+bool CMap::is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::site *settlement) const
 {
 	for (int x = rect.x(); x <= rect.right(); ++x) {
 		for (int y = rect.y(); y <= rect.bottom(); ++y) {
@@ -1179,6 +1179,33 @@ bool CMap::is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::
 	}
 
 	return true;
+}
+
+bool CMap::is_rect_on_settlement_borders(const QRect &rect, const int z) const
+{
+	const site *previous_settlement = nullptr;
+
+	for (int x = rect.x(); x <= rect.right(); ++x) {
+		for (int y = rect.y(); y <= rect.bottom(); ++y) {
+			const QPoint tile_pos(x, y);
+
+			if (!this->Info->IsPointOnMap(tile_pos, z)) {
+				continue;
+			}
+
+			const tile *tile = this->Field(tile_pos, z);
+
+			const site *settlement = tile->get_settlement();
+
+			if (previous_settlement != nullptr && settlement != nullptr && settlement != previous_settlement) {
+				return true;
+			}
+
+			previous_settlement = tile->get_settlement();
+		}
+	}
+
+	return false;
 }
 
 const world *CMap::calculate_pos_world(const QPoint &pos, const int z, const bool include_adjacent) const
@@ -3774,10 +3801,10 @@ void CMap::expand_terrain_features_to_same_terrain(const int z)
 	//expand terrain features to neighboring tiles with the same terrain
 	const QRect rect = this->get_rect(z);
 
-	std::vector<QPoint> seeds = wyrmgus::rect::find_points_if(rect, [&](const QPoint &tile_pos) {
-		const wyrmgus::tile *tile = this->Field(tile_pos, z);
+	std::vector<QPoint> seeds = rect::find_points_if(rect, [&](const QPoint &tile_pos) {
+		const tile *tile = this->Field(tile_pos, z);
 
-		const wyrmgus::terrain_feature *terrain_feature = tile->get_terrain_feature();
+		const terrain_feature *terrain_feature = tile->get_terrain_feature();
 		if (terrain_feature == nullptr) {
 			return false;
 		}
@@ -3791,16 +3818,16 @@ void CMap::expand_terrain_features_to_same_terrain(const int z)
 
 	//expand seeds
 	vector::process_randomly(seeds, [&](const QPoint &seed_pos) {
-		const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
+		const tile *seed_tile = this->Field(seed_pos, z);
 
-		const wyrmgus::terrain_feature *terrain_feature = seed_tile->get_terrain_feature();
+		const terrain_feature *terrain_feature = seed_tile->get_terrain_feature();
 
-		const std::vector<QPoint> adjacent_positions = wyrmgus::point::get_adjacent_if(seed_pos, [&](const QPoint &adjacent_pos) {
+		const std::vector<QPoint> adjacent_positions = point::get_adjacent_if(seed_pos, [&](const QPoint &adjacent_pos) {
 			if (!this->Info->IsPointOnMap(adjacent_pos, z)) {
 				return false;
 			}
 
-			const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
+			const tile *adjacent_tile = this->Field(adjacent_pos, z);
 
 			if (adjacent_tile->get_top_terrain() != terrain_feature->get_terrain_type()) {
 				return false;
@@ -3819,7 +3846,7 @@ void CMap::expand_terrain_features_to_same_terrain(const int z)
 				seeds.push_back(seed_pos);
 			}
 
-			QPoint adjacent_pos = wyrmgus::vector::get_random(adjacent_positions);
+			QPoint adjacent_pos = vector::get_random(adjacent_positions);
 			this->Field(adjacent_pos, z)->set_terrain_feature(terrain_feature);
 			seeds.push_back(std::move(adjacent_pos));
 		}
@@ -3969,9 +3996,9 @@ void CMap::generate_settlement_territories(const int z)
 	const QRect rect = this->get_rect(z);
 
 	point_set seeds = rect::find_point_set_if(rect, [&](const QPoint &tile_pos) {
-		const wyrmgus::tile *tile = this->Field(tile_pos, z);
+		const tile *tile = this->Field(tile_pos, z);
 
-		const wyrmgus::site *settlement = tile->get_settlement();
+		const site *settlement = tile->get_settlement();
 		if (settlement == nullptr) {
 			return false;
 		}
@@ -3999,7 +4026,7 @@ void CMap::generate_settlement_territories(const int z)
 	std::vector<QPoint> remaining_positions;
 
 	rect::for_each_point(rect, [&](const QPoint &tile_pos) {
-		wyrmgus::tile *tile = this->Field(tile_pos, z);
+		tile *tile = this->Field(tile_pos, z);
 
 		if (tile->get_settlement() != nullptr) {
 			return;
@@ -4011,7 +4038,7 @@ void CMap::generate_settlement_territories(const int z)
 	while (!remaining_positions.empty()) {
 		for (size_t i = 0; i < remaining_positions.size();) {
 			const QPoint &tile_pos = remaining_positions.at(i);
-			wyrmgus::tile *tile = this->Field(tile_pos, z);
+			tile *tile = this->Field(tile_pos, z);
 
 			site_map<int> settlement_neighbor_count;
 
@@ -4028,7 +4055,7 @@ void CMap::generate_settlement_territories(const int z)
 					}
 
 					const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
-					const wyrmgus::site *adjacent_settlement = adjacent_tile->get_settlement();
+					const site *adjacent_settlement = adjacent_tile->get_settlement();
 
 					if (adjacent_settlement == nullptr) {
 						continue;
@@ -4044,7 +4071,7 @@ void CMap::generate_settlement_territories(const int z)
 				continue;
 			}
 
-			const wyrmgus::site *best_settlement = nullptr;
+			const site *best_settlement = nullptr;
 			int best_settlement_neighbor_count = 0;
 			for (const auto &kv_pair : settlement_neighbor_count) {
 				if (kv_pair.second > best_settlement_neighbor_count) {
@@ -4062,6 +4089,32 @@ void CMap::generate_settlement_territories(const int z)
 
 	this->process_settlement_territory_tiles(z);
 
+	//bump buildings which are on a settlement border to be entirely in the territory of their center tile's settlement
+	for (CUnit *unit : unit_manager::get()->get_units()) {
+		if (!unit->IsAliveOnMap()) {
+			continue;
+		}
+
+		if (!unit->Type->BoolFlag[BUILDING_INDEX].value) {
+			continue;
+		}
+
+		const QRect building_rect = unit->get_tile_rect();
+		if (!this->is_rect_on_settlement_borders(building_rect, unit->MapLayer->ID)) {
+			continue;
+		}
+
+		const site *settlement = unit->get_center_tile_settlement();
+
+		if (settlement == nullptr) {
+			continue;
+		}
+
+		unit->Remove(nullptr);
+		const QPoint drop_pos = FindNearestDrop(*unit->Type, unit->tilePos, unit->Direction, unit->MapLayer->ID, true, true, settlement);
+		unit->Place(drop_pos, unit->MapLayer->ID);
+	}
+
 	//update the settlement of all buildings, as settlement territories have changed
 	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
 		if (!player->is_alive() || player->get_index() == PlayerNumNeutral) {
@@ -4072,14 +4125,14 @@ void CMap::generate_settlement_territories(const int z)
 	}
 }
 
-wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const tile_flag block_flags, const tile_flag same_flags)
+point_set CMap::expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const tile_flag block_flags, const tile_flag same_flags)
 {
 	//the seeds blocked by the block flags are stored, and then returned by the function
-	wyrmgus::point_set blocked_seeds;
+	point_set blocked_seeds;
 
 	//expand seeds
-	wyrmgus::vector::process_randomly(seeds, [&](const QPoint &seed_pos) {
-		const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
+	vector::process_randomly(seeds, [&](const QPoint &seed_pos) {
+		const tile *seed_tile = this->Field(seed_pos, z);
 
 		//tiles with a block flag can be expanded to, but they can't serve as a basis for further expansion
 		if (seed_tile->CheckMask(block_flags)) {
@@ -4087,10 +4140,10 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 			return;
 		}
 
-		const wyrmgus::site *settlement = seed_tile->get_settlement();
-		const wyrmgus::tile *settlement_tile = this->Field(settlement->get_game_data()->get_site_unit()->get_center_tile_pos(), z);
+		const site *settlement = seed_tile->get_settlement();
+		const tile *settlement_tile = this->Field(settlement->get_game_data()->get_site_unit()->get_center_tile_pos(), z);
 
-		const std::vector<QPoint> adjacent_positions = wyrmgus::point::get_diagonally_adjacent_if(seed_pos, [&](const QPoint &diagonal_pos) {
+		const std::vector<QPoint> adjacent_positions = point::get_diagonally_adjacent_if(seed_pos, [&](const QPoint &diagonal_pos) {
 			const QPoint vertical_pos(seed_pos.x(), diagonal_pos.y());
 			const QPoint horizontal_pos(diagonal_pos.x(), seed_pos.y());
 
@@ -4098,9 +4151,9 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 				return false;
 			}
 
-			const wyrmgus::tile *diagonal_tile = this->Field(diagonal_pos, z);
-			const wyrmgus::tile *vertical_tile = this->Field(vertical_pos, z);
-			const wyrmgus::tile *horizontal_tile = this->Field(horizontal_pos, z);
+			const tile *diagonal_tile = this->Field(diagonal_pos, z);
+			const tile *vertical_tile = this->Field(vertical_pos, z);
+			const tile *horizontal_tile = this->Field(horizontal_pos, z);
 
 			if ( //the tiles must either have no settlement, or have the settlement we want to assign
 				(diagonal_tile->get_settlement() != nullptr && diagonal_tile->get_settlement() != settlement)
@@ -4165,12 +4218,12 @@ void CMap::process_settlement_territory_tiles(const int z)
 
 void CMap::calculate_settlement_resource_units()
 {
-	for (const wyrmgus::site *site : wyrmgus::site::get_all()) {
+	for (const site *site : site::get_all()) {
 		site->get_game_data()->clear_resource_units();
 	}
 
 	//add resource units to the settlement resource unit lists
-	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+	for (CUnit *unit : unit_manager::get()->get_units()) {
 		if (!unit->IsAliveOnMap()) {
 			continue;
 		}
@@ -4179,7 +4232,7 @@ void CMap::calculate_settlement_resource_units()
 			continue;
 		}
 		
-		const wyrmgus::tile *tile = unit->get_center_tile();
+		const tile *tile = unit->get_center_tile();
 		if (tile->get_settlement() != nullptr) {
 			tile->get_settlement()->get_game_data()->add_resource_unit(unit);
 		}
