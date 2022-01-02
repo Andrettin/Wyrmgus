@@ -7580,7 +7580,7 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, const int da
 
 	for (CUnit *nearby_unit : nearby_units) {
 		if (nearby_unit->CurrentOrder()->get_goal() == &target) {
-			CommandStopUnit(*attacker);
+			CommandStopUnit(*nearby_unit);
 		}
 	}
 }
