@@ -4350,7 +4350,7 @@ void UnitLost(CUnit &unit)
 				continue;
 			}
 
-			if (player.get_income(resource) != 0 && type.Stats[player.get_index()].get_improve_income(resource) == player.get_income(resource)) {
+			if (player.get_income_modifier(resource) != 0 && type.Stats[player.get_index()].get_improve_income(resource) == player.get_income_modifier(resource)) {
 				int m = resource->get_default_income();
 
 				for (int j = 0; j < player.GetUnitCount(); ++j) {
@@ -4362,7 +4362,7 @@ void UnitLost(CUnit &unit)
 					m = std::max(m, player_unit.Type->Stats[player.get_index()].get_improve_income(resource));
 				}
 
-				player.set_income(resource, m);
+				player.set_income_modifier(resource, m);
 			}
 		}
 
@@ -4490,7 +4490,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 			continue;
 		}
 
-		player.set_income(resource, std::max(player.get_income(resource), type.Stats[player.get_index()].get_improve_income(resource)));
+		player.set_income_modifier(resource, std::max(player.get_income_modifier(resource), type.Stats[player.get_index()].get_improve_income(resource)));
 	}
 	
 	if (type.Stats[player.get_index()].Variables[TRADECOST_INDEX].Enable) {

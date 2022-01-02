@@ -676,10 +676,10 @@ void CPlayer::Save(CFile &file) const
 		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), quantity);
 	}
 
-	// Incomes
-	file.printf("},\n  \"incomes\", {");
+	//income modifiers
+	file.printf("},\n  \"income-modifiers\", {");
 	bool first = true;
-	for (const auto &[resource, quantity] : p.incomes) {
+	for (const auto &[resource, quantity] : p.income_modifiers) {
 		if (first) {
 			first = false;
 		} else {
@@ -1040,9 +1040,9 @@ void CPlayer::Init(player_type type)
 		}
 	}
 
-	//initial default incomes.
+	//initial default income modifiers
 	for (const resource *resource : resource::get_all()) {
-		this->set_income(resource, resource->get_default_income());
+		this->set_income_modifier(resource, resource->get_default_income());
 	}
 	
 	this->trade_cost = DefaultTradeCost;
@@ -2802,7 +2802,7 @@ void CPlayer::Clear()
 	this->stored_resources.clear();
 	this->max_resources.clear();
 	this->last_resources.clear();
-	this->incomes.clear();
+	this->income_modifiers.clear();
 	this->estimated_revenues.clear();
 	//Wyrmgus start
 	this->resource_demands.clear();
@@ -3634,7 +3634,7 @@ void CPlayer::set_resource_demand(const resource *resource, const int quantity)
 	emit effective_resource_demand_changed(resource->get_index(), this->get_effective_resource_demand(resource));
 }
 
-void CPlayer::set_income(const resource *resource, const int quantity)
+void CPlayer::set_income_modifier(const resource *resource, const int quantity)
 {
 	std::optional<std::unique_lock<std::shared_mutex>> lock;
 
@@ -3643,11 +3643,11 @@ void CPlayer::set_income(const resource *resource, const int quantity)
 	}
 
 	if (quantity == 0) {
-		if (this->incomes.contains(resource)) {
-			this->incomes.erase(resource);
+		if (this->income_modifiers.contains(resource)) {
+			this->income_modifiers.erase(resource);
 		}
 	} else {
-		this->incomes[resource] = quantity;
+		this->income_modifiers[resource] = quantity;
 	}
 
 	emit resource_processing_bonus_changed(resource->get_index(), this->get_processing_bonus(resource));
@@ -3661,7 +3661,7 @@ void CPlayer::set_income(const resource *resource, const int quantity)
 
 int CPlayer::get_processing_bonus(const resource *resource) const
 {
-	return this->get_income(resource) - resource->get_default_income();
+	return this->get_income_modifier(resource) - resource->get_default_income();
 }
 
 int CPlayer::get_processing_bonus_sync(resource *resource) const
@@ -3681,7 +3681,7 @@ std::string CPlayer::get_children_processing_bonus_string(const resource *resour
 			continue;
 		}
 
-		if (this->get_income(child_resource) > child_resource->get_default_income()) {
+		if (this->get_income_modifier(child_resource) > child_resource->get_default_income()) {
 			if (!first) {
 				str += "\n";
 			} else {

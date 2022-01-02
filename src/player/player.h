@@ -547,18 +547,18 @@ public:
 		this->set_stored_resource_demand(resource, this->get_stored_resource_demand(resource) + quantity);
 	}
 
-	int get_income(const resource *resource) const
+	int get_income_modifier(const resource *resource) const
 	{
-		const auto find_iterator = this->incomes.find(resource);
+		const auto find_iterator = this->income_modifiers.find(resource);
 
-		if (find_iterator != this->incomes.end()) {
+		if (find_iterator != this->income_modifiers.end()) {
 			return find_iterator->second;
 		}
 
 		return 0;
 	}
 
-	void set_income(const resource *resource, const int quantity);
+	void set_income_modifier(const resource *resource, const int quantity);
 
 	int get_processing_bonus(const resource *resource) const;
 	Q_INVOKABLE int get_processing_bonus_sync(wyrmgus::resource *resource) const;
@@ -1366,7 +1366,7 @@ private:
 	resource_map<int> max_resources;   /// max resources can be stored
 	resource_map<int> stored_resources;/// resources in store buildings (can't exceed MaxResources)
 	resource_map<int> last_resources;  /// last values for revenue
-	resource_map<int> incomes;        /// income of the resources
+	resource_map<int> income_modifiers; //income modifier per resource
 	resource_map<int> estimated_revenues; //estimated income rate per resource
 	//Wyrmgus start
 	resource_map<int> prices;		  /// price of each resource

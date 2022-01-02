@@ -836,7 +836,7 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		return player->get_max_resource(resource);
 	} else if (!strcmp(prop, "Incomes")) {
 		const resource *resource = resource::get(arg);
-		return player->get_income(resource);
+		return player->get_income_modifier(resource);
 		//Wyrmgus start
 	} else if (!strcmp(prop, "Prices")) {
 		const resource *resource = resource::get(arg);

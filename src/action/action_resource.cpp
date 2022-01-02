@@ -1311,7 +1311,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 	// Update resource.
 	const resource *final_resource = resource::get_all()[this->CurrentResource]->get_final_resource();
-	const int processed_resource_change = unit.ResourcesHeld * player.get_income(resource::get_all()[this->CurrentResource]) / 100;
+	const int processed_resource_change = unit.ResourcesHeld * player.get_income_modifier(resource::get_all()[this->CurrentResource]) / 100;
 	int final_resource_change = processed_resource_change * resource::get_all()[this->CurrentResource]->get_final_resource_conversion_rate() / 100;
 	
 	if (player.AiEnabled) {

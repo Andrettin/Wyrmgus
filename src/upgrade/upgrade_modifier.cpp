@@ -353,13 +353,13 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 			stat.change_improve_income(resource, processing_bonus_change);
 
 			if (processing_bonus_change >= 0) {
-				//update player's income
+				//update player's income modifier
 				if (!unitupgrade.empty()) {
-					player->set_income(resource, std::max(player->get_income(resource), stat.get_improve_income(resource)));
+					player->set_income_modifier(resource, std::max(player->get_income_modifier(resource), stat.get_improve_income(resource)));
 				}
 			} else {
-				//if this was the highest improve income, search for another
-				if (player->get_income(resource) != 0 && old_processing_bonus >= player->get_income(resource)) {
+				//if this was the highest income modifier, search for another
+				if (player->get_income_modifier(resource) != 0 && old_processing_bonus >= player->get_income_modifier(resource)) {
 					int m = resource->get_default_income();
 
 					for (int k = 0; k < player->GetUnitCount(); ++k) {
@@ -371,7 +371,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 						m = std::max(m, player_unit.Type->Stats[player_index].get_improve_income(resource));
 					}
 
-					player->set_income(resource, m);
+					player->set_income_modifier(resource, m);
 				}
 			}
 		}

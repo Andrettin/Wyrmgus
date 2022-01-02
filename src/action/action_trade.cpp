@@ -220,7 +220,7 @@ void COrder_Trade::Execute(CUnit &unit)
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->get_given_resource()->get_index()].c_str());
 					}
 					unit.Player->change_resource(goal->Type->get_given_resource(), goal->ResourcesHeld, false);
-					unit.Player->change_resource_total(goal->Type->get_given_resource(), goal->ResourcesHeld * unit.Player->get_income(goal->Type->get_given_resource()) / 100);
+					unit.Player->change_resource_total(goal->Type->get_given_resource(), goal->ResourcesHeld * unit.Player->get_income_modifier(goal->Type->get_given_resource()) / 100);
 				}
 			} else { //cannot use
 				if (unit.Player == CPlayer::GetThisPlayer()) {

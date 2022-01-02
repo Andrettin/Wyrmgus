@@ -254,7 +254,7 @@ void CPlayer::Load(lua_State *l)
 				const resource *res = resource::get(value);
 				this->set_last_resource(res, LuaToNumber(l, j + 1, k + 1));
 			}
-		} else if (!strcmp(value, "incomes")) {
+		} else if (!strcmp(value, "income-modifiers")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -264,7 +264,7 @@ void CPlayer::Load(lua_State *l)
 				++k;
 
 				const resource *res = resource::get(value);
-				this->set_income(res, LuaToNumber(l, j + 1, k + 1));
+				this->set_income_modifier(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		} else if (!strcmp(value, "revenue")) {
 			if (!lua_istable(l, j + 1)) {
