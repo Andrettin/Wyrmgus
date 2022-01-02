@@ -690,7 +690,7 @@ void CPlayer::Save(CFile &file) const
 
 	// Revenue
 	file.printf("},\n  \"revenue\", {");
-	for (const auto &[resource, quantity] : p.revenues) {
+	for (const auto &[resource, quantity] : p.estimated_revenues) {
 		if (quantity == 0) {
 			continue;
 		}
@@ -2803,7 +2803,7 @@ void CPlayer::Clear()
 	this->max_resources.clear();
 	this->last_resources.clear();
 	this->incomes.clear();
-	this->revenues.clear();
+	this->estimated_revenues.clear();
 	//Wyrmgus start
 	this->resource_demands.clear();
 	this->stored_resource_demands.clear();
@@ -4642,16 +4642,6 @@ void PlayersEachSecond(const int playerIdx)
 	try {
 		const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
 
-		if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
-			for (const resource *resource : resource::get_all()) {
-				int revenue = player->get_resource(resource) + player->get_stored_resource(resource) - player->get_last_resource(resource);
-				//estimate per minute
-				revenue *= 6;
-				player->set_revenue(resource, revenue);
-				player->set_last_resource(resource, player->get_resource(resource) + player->get_stored_resource(resource));
-			}
-		}
-
 		if (player->AiEnabled) {
 			AiEachSecond(*player);
 		}
@@ -4693,6 +4683,12 @@ void PlayersEachMinute(const int playerIdx)
 {
 	try {
 		const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
+
+		for (const resource *resource : resource::get_all()) {
+			const int revenue = player->get_resource(resource) + player->get_stored_resource(resource) - player->get_last_resource(resource);
+			player->set_estimated_revenue(resource, revenue);
+			player->set_last_resource(resource, player->get_resource(resource) + player->get_stored_resource(resource));
+		}
 
 		if (player->AiEnabled) {
 			AiEachMinute(*player);

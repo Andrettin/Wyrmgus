@@ -571,25 +571,25 @@ public:
 		return QString::fromStdString(this->get_children_processing_bonus_string(resource));
 	}
 
-	int get_revenue(const resource *resource) const
+	int get_estimated_revenue(const resource *resource) const
 	{
-		const auto find_iterator = this->revenues.find(resource);
+		const auto find_iterator = this->estimated_revenues.find(resource);
 
-		if (find_iterator != this->revenues.end()) {
+		if (find_iterator != this->estimated_revenues.end()) {
 			return find_iterator->second;
 		}
 
 		return 0;
 	}
 
-	void set_revenue(const resource *resource, const int quantity)
+	void set_estimated_revenue(const resource *resource, const int quantity)
 	{
 		if (quantity == 0) {
-			if (this->revenues.contains(resource)) {
-				this->revenues.erase(resource);
+			if (this->estimated_revenues.contains(resource)) {
+				this->estimated_revenues.erase(resource);
 			}
 		} else {
-			this->revenues[resource] = quantity;
+			this->estimated_revenues[resource] = quantity;
 		}
 	}
 
@@ -1367,7 +1367,7 @@ private:
 	resource_map<int> stored_resources;/// resources in store buildings (can't exceed MaxResources)
 	resource_map<int> last_resources;  /// last values for revenue
 	resource_map<int> incomes;        /// income of the resources
-	resource_map<int> revenues;       /// income rate of the resources
+	resource_map<int> estimated_revenues; //estimated income rate per resource
 	//Wyrmgus start
 	resource_map<int> prices;		  /// price of each resource
 	resource_map<int> resource_demands; /// demand for the resources

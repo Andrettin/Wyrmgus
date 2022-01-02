@@ -276,7 +276,7 @@ void CPlayer::Load(lua_State *l)
 				++k;
 
 				const resource *res = resource::get(value);
-				this->set_revenue(res, LuaToNumber(l, j + 1, k + 1));
+				this->set_estimated_revenue(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "prices")) {
