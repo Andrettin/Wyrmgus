@@ -2148,6 +2148,29 @@ void CUnit::set_site(const wyrmgus::site *site)
 	}
 }
 
+void CUnit::update_site_owner()
+{
+	if (this->get_site() == nullptr) {
+		return;
+	}
+
+	if (this->is_under_construction()) {
+		return;
+	}
+
+	site_game_data *site_game_data = this->get_site()->get_game_data();
+
+	if (site_game_data->get_site_unit() != this) {
+		return;
+	}
+
+	if (this->Player->get_index() != PlayerNumNeutral) {
+		site_game_data->set_owner(this->Player);
+	} else {
+		site_game_data->set_owner(nullptr);
+	}
+}
+
 void CUnit::Identify()
 {
 	if (game::get()->is_persistency_enabled() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && !this->Container->get_character()->get_item(this)->is_identified()) { //update the persistent item, if applicable and if it hasn't been updated yet
@@ -3173,14 +3196,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		
 		this->UpdateSoldUnits();
 
-		if (this->site != nullptr && this->site->get_game_data()->get_site_unit() == this && !this->UnderConstruction) {
-			//update site ownership
-			if (player.get_index() != PlayerNumNeutral) {
-				this->site->get_game_data()->set_owner(&player);
-			} else {
-				this->site->get_game_data()->set_owner(nullptr);
-			}
-		}
+		this->update_site_owner();
 	}
 	//Wyrmgus end
 }
@@ -4957,17 +4973,15 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	
 	UpdateUnitSightRange(*this);
 	MapMarkUnitSight(*this);
-	
-	//not very elegant way to make sure the tile ownership is calculated correctly
-	MapUnmarkUnitSight(*this);
-	MapMarkUnitSight(*this);
-	
+		
 	//Wyrmgus start
 	if (&newplayer == CPlayer::GetThisPlayer() && show_change) {
 		this->Blink = 5;
 		PlayGameSound(game_sound_set::get()->get_rescue_sound(), MaxSampleVolume);
 	}
 	//Wyrmgus end
+
+	this->update_site_owner();
 }
 
 static bool IsMineAssignedBy(const CUnit *mine, const CUnit *worker)

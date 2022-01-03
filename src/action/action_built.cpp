@@ -192,17 +192,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	unit.UnderConstruction = 0;
 
-	if (unit.get_site() != nullptr) {
-		wyrmgus::site_game_data *site_game_data = unit.get_site()->get_game_data();
-
-		if (site_game_data->get_site_unit() == &unit) {
-			if (player.get_index() != PlayerNumNeutral) {
-				site_game_data->set_owner(&player);
-			} else {
-				site_game_data->set_owner(nullptr);
-			}
-		}
-	}
+	unit.update_site_owner();
 
 	if (unit.Frame < 0) {
 		unit.Frame = -1;

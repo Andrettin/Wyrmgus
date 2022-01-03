@@ -286,6 +286,7 @@ public:
 	}
 
 	void set_site(const wyrmgus::site *site);
+	void update_site_owner();
 
 	void Identify();
 	void CheckIdentification();

@@ -111,7 +111,7 @@ void site_game_data::set_site_unit(CUnit *unit)
 
 	this->site_unit = unit;
 
-	if (this->site_unit != nullptr && this->site_unit->Player != nullptr && this->site_unit->Player->get_index() != PlayerNumNeutral && !this->site_unit->UnderConstruction) {
+	if (this->site_unit != nullptr && this->site_unit->Player != nullptr && this->site_unit->Player->get_index() != PlayerNumNeutral && !this->site_unit->is_under_construction()) {
 		this->set_owner(this->site_unit->Player);
 	} else {
 		this->set_owner(nullptr);
