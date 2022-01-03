@@ -2921,6 +2921,92 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	}
 }
 
+bool CPlayer::capture_unit(CUnit *unit)
+{
+	if (!unit->Type->BoolFlag[CAPTURABLE_INDEX].value) {
+		return false;
+	}
+
+	if (unit->get_character() != nullptr) {
+		//characters cannot be captured
+		return false;
+	}
+
+	//if we are capturing a town hall, capture all other buildings in its settlement as well
+	if (unit->Type->BoolFlag[TOWNHALL_INDEX].value && unit->settlement != nullptr) {
+		const site_game_data *settlement_game_data = unit->settlement->get_game_data();
+		const QRect &settlement_territory_rect = settlement_game_data->get_territory_rect();
+
+		std::vector<CUnit *> settlement_buildings;
+		Select(settlement_territory_rect.topLeft(), settlement_territory_rect.bottomRight(), settlement_buildings, unit->MapLayer->ID, HasSamePlayerAs(*unit->Player));
+
+		for (CUnit *settlement_building : settlement_buildings) {
+			if (settlement_building == unit) {
+				continue;
+			}
+
+			if (!settlement_building->Type->BoolFlag[BUILDING_INDEX].value) {
+				continue;
+			}
+
+			if (settlement_building->get_center_tile_settlement() != unit->settlement) {
+				continue;
+			}
+
+			this->capture_unit(settlement_building);
+		}
+	}
+
+	if (unit->UnitInside != nullptr) {
+		CUnit *unit_inside = unit->UnitInside;
+
+		for (int i = unit->InsideCount; i; --i, unit_inside = unit_inside->NextContained) {
+			if (unit_inside->Player->is_neutral_player()) {
+				continue;
+			}
+
+			if (unit_inside->Player == unit->Player) {
+				this->capture_unit(unit_inside);
+			} else {
+				DropOutOnSide(*unit_inside, LookingW, unit);
+			}
+		}
+	}
+
+	//convert buildings to the equivalent type for the attacker's player
+	if (unit->Type->BoolFlag[BUILDING_INDEX].value) {
+		const unit_class *target_unit_class = unit->Type->get_unit_class();
+
+		if (target_unit_class == nullptr) {
+			return false;
+		}
+
+		const unit_type *new_unit_type = this->get_class_unit_type(target_unit_class);
+
+		if (new_unit_type == nullptr) {
+			return false;
+		}
+
+		CommandTransformIntoType(*unit, *new_unit_type);
+	}
+
+	unit->ChangeOwner(*this, true);
+
+	//stop nearby units from continuing to attack the target unit
+	static constexpr int nearby_attacker_stop_range = 16;
+
+	std::vector<CUnit *> nearby_units;
+	SelectAroundUnit(*unit, nearby_attacker_stop_range, nearby_units);
+
+	for (CUnit *nearby_unit : nearby_units) {
+		if (nearby_unit->CurrentOrder()->get_goal() == unit) {
+			CommandStopUnit(*nearby_unit);
+		}
+	}
+
+	return true;
+}
+
 void CPlayer::UpdateFreeWorkers()
 {
 	FreeWorkers.clear();

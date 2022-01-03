@@ -5456,17 +5456,18 @@ void DropOutAll(const CUnit &source)
 
 	for (int i = source.InsideCount; i; --i, unit = unit->NextContained) {
 		DropOutOnSide(*unit, LookingW, &source);
-	}
-	
-	//Wyrmgus start
-	if (unit->Type->BoolFlag[ITEM_INDEX].value && unit->get_unique() == nullptr) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
-		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
-		if (unit->Prefix != nullptr || unit->Suffix != nullptr || unit->Spell != nullptr || unit->Work != nullptr || unit->Elixir != nullptr) {
-			ttl_cycles *= 4;
+
+		//Wyrmgus start
+		if (unit->Type->BoolFlag[ITEM_INDEX].value && unit->get_unique() == nullptr) {
+			//save the initial cycle items were placed in the ground to destroy them if they have been there for too long
+			int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
+			if (unit->Prefix != nullptr || unit->Suffix != nullptr || unit->Spell != nullptr || unit->Work != nullptr || unit->Elixir != nullptr) {
+				ttl_cycles *= 4;
+			}
+			unit->TTL = GameCycle + ttl_cycles;
 		}
-		unit->TTL = GameCycle + ttl_cycles;
+		//Wyrmgus end
 	}
-	//Wyrmgus end
 }
 
 /*----------------------------------------------------------------------------
@@ -7553,13 +7554,13 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, const int da
 {
 	Q_UNUSED(damage);
 
-	static constexpr int capture_hp_threshold = 10;
-
 	//capture enemy buildings
 
 	if (!target.Type->BoolFlag[CAPTURABLE_INDEX].value) {
 		return;
 	}
+
+	static constexpr int capture_hp_threshold = 10;
 
 	if (target.Variable[HP_INDEX].get_percent_value() >= capture_hp_threshold) {
 		return;
@@ -7569,42 +7570,7 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, const int da
 		return;
 	}
 
-	if (target.get_character() != nullptr) {
-		//characters cannot be captured
-		return;
-	}
-
-	//convert buildings to the equivalent type for the attacker's player
-	if (target.Type->BoolFlag[BUILDING_INDEX].value) {
-		const unit_class *target_unit_class = target.Type->get_unit_class();
-
-		if (target_unit_class == nullptr) {
-			return;
-		}
-
-		const unit_type *new_unit_type = attacker->Player->get_class_unit_type(target_unit_class);
-
-		if (new_unit_type == nullptr) {
-			return;
-		}
-
-		CommandTransformIntoType(target, *new_unit_type);
-	}
-
-	target.ChangeOwner(*attacker->Player, true);
-	CommandStopUnit(*attacker); //attacker shouldn't continue attack!
-
-	//stop nearby units belonging to the attacker's player from continuing to attack the target unit
-	static constexpr int nearby_attacker_stop_range = 16;
-
-	std::vector<CUnit *> nearby_units;
-	SelectAroundUnit(target, nearby_attacker_stop_range, nearby_units, HasSamePlayerAs(*attacker->Player));
-
-	for (CUnit *nearby_unit : nearby_units) {
-		if (nearby_unit->CurrentOrder()->get_goal() == &target) {
-			CommandStopUnit(*nearby_unit);
-		}
-	}
+	attacker->Player->capture_unit(&target);
 }
 
 static void HitUnit_ShowDamageMissile(const CUnit &target, const int damage)

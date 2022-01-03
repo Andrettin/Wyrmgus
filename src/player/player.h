@@ -361,6 +361,8 @@ public:
 		return this->last_created_unit;
 	}
 
+	bool capture_unit(CUnit *unit);
+
 	void UpdateFreeWorkers();
 	//Wyrmgus start
 	void PerformResourceTrade();
