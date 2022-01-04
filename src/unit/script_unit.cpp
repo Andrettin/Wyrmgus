@@ -1626,8 +1626,8 @@ static int CclGetUnitsInsideUnit(lua_State *l)
 	
 	lua_newtable(l);
 	
-	CUnit *unit = transporter.UnitInside;
-	for (int i = 0; i < transporter.InsideCount; ++i, unit = unit->NextContained) {
+	for (size_t i = 0; i < transporter.get_units_inside().size(); ++i) {
+		const CUnit *unit = transporter.get_units_inside().at(i);
 		lua_pushnumber(l, UnitNumber(*unit));
 		lua_rawseti(l, -2, i + 1);
 	}

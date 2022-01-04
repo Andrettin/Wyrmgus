@@ -151,7 +151,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 				} else if (cur == "ResourceActive") {
 					return goal->Resource.Active;
 				} else if (cur == "InsideCount") {
-					return goal->InsideCount;
+					return static_cast<int>(goal->get_units_inside().size());
 				} else if (cur == "_Distance") {
 					return unit.MapDistanceTo(*goal);
 				}

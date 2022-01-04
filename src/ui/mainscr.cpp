@@ -604,10 +604,9 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit, std::vector<std::fu
 
 static void DrawUnitInfo_transporter(CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	CUnit *uins = unit.UnitInside;
 	size_t j = 0;
 
-	for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
+	for (const CUnit *uins : unit.get_units_inside()) {
 		//Wyrmgus start
 //		if (!uins->Boarded || j >= UI.TransportingButtons.size()) {
 		if (!uins->Boarded || j >= UI.TransportingButtons.size() || (unit.Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
@@ -639,10 +638,9 @@ static void DrawUnitInfo_transporter(CUnit &unit, std::vector<std::function<void
 //Wyrmgus start
 static void DrawUnitInfo_inventory(CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	CUnit *uins = unit.UnitInside;
 	size_t j = 0;
 
-	for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
+	for (const CUnit *uins : unit.get_units_inside()) {
 		if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 			continue;
 		}
@@ -709,7 +707,7 @@ static void DrawUnitInfo(CUnit &unit, std::vector<std::function<void(renderer *)
 	}
 	
 	//Wyrmgus start
-	if (unit.HasInventory() && unit.InsideCount && CurrentButtonLevel == wyrmgus::defines::get()->get_inventory_button_level()) {
+	if (unit.HasInventory() && unit.has_units_inside() && CurrentButtonLevel == defines::get()->get_inventory_button_level()) {
 		DrawUnitInfo_inventory(unit, render_commands);
 		return;
 	}
@@ -830,11 +828,10 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 			LastDrawnButtonPopup = nullptr;
 		}
 		
-		if (!(Selected[0]->Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->is_allied_with(*Selected[0]->Player) && !CPlayer::GetThisPlayer()->has_building_access(Selected[0])) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == wyrmgus::defines::get()->get_inventory_button_level()) {
-		CUnit *uins = Selected[0]->UnitInside;
-		size_t j = 0;
+		if (!(Selected[0]->Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->is_allied_with(*Selected[0]->Player) && !CPlayer::GetThisPlayer()->has_building_access(Selected[0])) && Selected[0]->HasInventory() && Selected[0]->has_units_inside() && CurrentButtonLevel == defines::get()->get_inventory_button_level()) {
+			size_t j = 0;
 
-			for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
+			for (const CUnit *uins : Selected[0]->get_units_inside()) {
 				if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 					continue;
 				}

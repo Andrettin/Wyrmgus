@@ -216,13 +216,19 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	}
 	
 	//drop units that can no longer be in the container
-	if (unit.UnitInside) {
-		CUnit *uins = unit.UnitInside;
-		for (int i = unit.InsideCount; i && unit.BoardCount > newtype.MaxOnBoard; --i, uins = uins->NextContained) {
+	if (unit.has_units_inside() && unit.BoardCount > newtype.MaxOnBoard) {
+		//copy the vector since we may modify it
+		const std::vector<CUnit *> units_inside = unit.get_units_inside();
+
+		for (CUnit *uins : units_inside) {
 			if (uins->Boarded) {
 				uins->Boarded = 0;
 				unit.BoardCount -= uins->Type->BoardSize;
 				DropOutOnSide(*uins, LookingW, &unit);
+			}
+
+			if (unit.BoardCount <= newtype.MaxOnBoard) {
+				break;
 			}
 		}
 	}

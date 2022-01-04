@@ -2957,10 +2957,11 @@ bool CPlayer::capture_unit(CUnit *unit)
 		}
 	}
 
-	if (unit->UnitInside != nullptr) {
-		CUnit *unit_inside = unit->UnitInside;
+	if (unit->has_units_inside()) {
+		//copy the vector since we may modify it
+		const std::vector<CUnit *> units_inside = unit->get_units_inside();
 
-		for (int i = unit->InsideCount; i; --i, unit_inside = unit_inside->NextContained) {
+		for (CUnit *unit_inside : units_inside) {
 			if (unit_inside->Player->is_neutral_player()) {
 				continue;
 			}

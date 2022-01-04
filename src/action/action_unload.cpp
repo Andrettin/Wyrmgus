@@ -370,8 +370,7 @@ static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z
 	Vec2i dummyPos;
 	//Wyrmgus start
 	/*
-	CUnit *unit = transporter.UnitInside;
-	for (int i = 0; i < transporter.InsideCount; ++i, unit = unit->NextContained) {
+	for (const CUnit *unit : transporter.get_units_inside()) {
 		//Wyrmgus start
 //		if (FindUnloadPosition(transporter, *unit, pos, maxUnloadRange, &dummyPos)) {
 		if (FindUnloadPosition(transporter, *unit, pos, maxUnloadRange, &dummyPos, z, landmass)) {
@@ -385,8 +384,7 @@ static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z
 			return true;
 		}
 	} else {
-		CUnit *unit = transporter.UnitInside;
-		for (int i = 0; i < transporter.InsideCount; ++i, unit = unit->NextContained) {
+		for (const CUnit *unit : transporter.get_units_inside()) {
 			if (FindUnloadPosition(transporter, *unit, pos, maxUnloadRange, &dummyPos, z, landmass)) {
 				return true;
 			}
@@ -482,9 +480,10 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 //Wyrmgus end
 {
 	// Check there are units onboard
-	if (!transporter.UnitInside) {
+	if (!transporter.has_units_inside()) {
 		return 0;
 	}
+
 	const bool isTransporterRemoved = transporter.Removed;
 	const bool selected = transporter.Selected;
 
@@ -567,9 +566,11 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 			++stillonboard;
 		}
 	} else {
-		// Unload all units.
-		CUnit *goal = transporter.UnitInside;
-		for (int i = transporter.InsideCount; i; --i, goal = goal->NextContained) {
+		//copy the vector since we may modify it
+		const std::vector<CUnit *> units_inside = transporter.get_units_inside();
+
+		//unload all units
+		for (CUnit *goal : units_inside) {
 			if (goal->Boarded) {
 				//Wyrmgus start
 //				if (!UnloadUnit(transporter, *goal)) {

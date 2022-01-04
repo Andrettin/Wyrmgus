@@ -1121,8 +1121,8 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 		QColor border_color;
 			
 		// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
-		if (button->Icon.Name.empty() && button->Action == ButtonCmd::Attack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != nullptr && Selected[0]->UnitInside->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(button->Action) != nullptr) {
-			button_icon = Selected[0]->UnitInside->GetButtonIcon(button->Action);
+		if (button->Icon.Name.empty() && button->Action == ButtonCmd::Attack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->has_units_inside() && Selected[0]->get_units_inside().at(0)->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->get_units_inside().at(0)->GetButtonIcon(button->Action) != nullptr) {
+			button_icon = Selected[0]->get_units_inside().at(0)->GetButtonIcon(button->Action);
 		} else if (button->Icon.Name.empty() && Selected[0]->GetButtonIcon(button->Action) != nullptr) {
 			button_icon = Selected[0]->GetButtonIcon(button->Action);
 		} else if (button->Action == ButtonCmd::ExperienceUpgradeTo && Selected[0]->GetVariation() && button_unit_type->GetVariation(Selected[0]->GetVariation()->get_identifier()) != nullptr && !button_unit_type->GetVariation(Selected[0]->GetVariation()->get_identifier())->Icon.Name.empty()) {
@@ -1211,23 +1211,23 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 	
 	//Wyrmgus start
 	if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
-		CUnit *uins = Selected[0]->UnitInside;
-		size_t j = 0;
+		size_t i = 0;
 
-		for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
-			if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
+		for (const CUnit *uins : Selected[0]->get_units_inside()) {
+			if (!uins->Boarded || i >= UI.TransportingButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
 				continue;
 			}
-			if (static_cast<size_t>(ButtonUnderCursor) == j) {
+			if (static_cast<size_t>(ButtonUnderCursor) == i) {
 				const wyrmgus::font_color *text_color = nullptr;
 				if (uins->get_unique() != nullptr || uins->get_character() != nullptr) {
 					text_color = wyrmgus::defines::get()->get_unique_font_color();
 				} else if (uins->Prefix != nullptr || uins->Suffix != nullptr) {
 					text_color = wyrmgus::defines::get()->get_magic_font_color();
 				}
-				DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, text_color, nullptr, render_commands);
+				DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[i].X, UI.TransportingButtons[i].Y, text_color, nullptr, render_commands);
 			}
-			++j;
+
+			++i;
 		}
 	}
 	//Wyrmgus end

@@ -776,8 +776,7 @@ void PlayerAi::check_transporters()
 				continue;
 			}
 			
-			CUnit *uins = ai_transporter->UnitInside;
-			for (int j = 0; j < ai_transporter->InsideCount; ++j, uins = uins->NextContained) {
+			for (CUnit *uins : ai_transporter->get_units_inside()) {
 				if (uins->GroupId == 0 && !this->is_site_transport_unit(uins)) {
 					//if the unit no longer is part of a force, then it likely has been reset and the attack through water has been cancelled, so unload it
 					CommandUnload(*ai_transporter, ai_transporter->tilePos, uins, 0, ai_transporter->MapLayer->ID);

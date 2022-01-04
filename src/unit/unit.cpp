@@ -160,22 +160,6 @@
 **  free. This points to the transporter for units on board, or to
 **  the building for peasants inside(when they are mining).
 **
-**  CUnit::UnitInside
-**
-**  Pointer to the last unit added inside. Order doesn't really
-**  matter. All units inside are kept in a circular linked list.
-**  This is null if there are no units inside. Multiple levels
-**  of inclusion are allowed, though not very useful right now
-**
-**  CUnit::NextContained, CUnit::PrevContained
-**
-**  The next and previous element in the curent container. Bogus
-**  values allowed for units not contained.
-**
-**  CUnit::InsideCount
-**
-**  The number of units inside the container.
-**
 **  CUnit::BoardCount
 **
 **  The number of units transported inside the container. This
@@ -412,12 +396,9 @@ void CUnit::Init()
 	this->ref.reset();
 	this->ReleaseCycle = 0;
 	this->PlayerSlot = static_cast<size_t>(-1);
-	this->InsideCount = 0;
+	this->units_inside.clear();
 	this->BoardCount = 0;
-	this->UnitInside = nullptr;
 	this->Container = nullptr;
-	this->NextContained = nullptr;
-	this->PrevContained = nullptr;
 
 	this->Resource.Workers.clear();
 	this->Resource.Active = 0;
@@ -989,9 +970,7 @@ void CUnit::auto_use_item()
 		return;
 	}
 	
-	CUnit *uins = this->UnitInside;
-	
-	for (int i = 0; i < this->InsideCount; ++i, uins = uins->NextContained) {
+	for (CUnit *uins : this->get_units_inside()) {
 		if (!uins->Type->BoolFlag[ITEM_INDEX].value || uins->Elixir) {
 			continue;
 		}
@@ -1022,7 +1001,7 @@ void CUnit::auto_use_item()
 			if (this->CriticalOrder == nullptr) {
 				this->CriticalOrder = COrder::NewActionUse(*uins);
 			}
-			break;
+			return;
 		}
 	}
 }
@@ -1942,9 +1921,8 @@ void CUnit::ApplyAura(const int aura_index)
 	SelectAroundUnit<true>(*this, aura_range, table, MakeOrPredicate(MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), HasSamePlayerAs(*CPlayer::get_neutral_player())));
 
 	for (CUnit *nearby_unit : table) {
-		if (nearby_unit->UnitInside) {
-			CUnit *uins = nearby_unit->UnitInside;
-			for (int j = 0; j < nearby_unit->InsideCount; ++j, uins = uins->NextContained) {
+		if (nearby_unit->has_units_inside()) {
+			for (CUnit *uins : nearby_unit->get_units_inside()) {
 				if (uins->Player == this->Player || uins->is_allied_with(*this->Player)) {
 					uins->ApplyAuraEffect(aura_index);
 				}
@@ -2191,9 +2169,7 @@ void CUnit::CheckIdentification()
 		return;
 	}
 	
-	CUnit *uins = this->UnitInside;
-	
-	for (int i = 0; i < this->InsideCount; ++i, uins = uins->NextContained) {
+	for (CUnit *uins : this->get_units_inside()) {
 		if (!uins->Type->BoolFlag[ITEM_INDEX].value) {
 			continue;
 		}
@@ -3362,8 +3338,7 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 	}
 	//Wyrmgus end
 
-	CUnit *unit_inside = unit.UnitInside;
-	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
+	for (const CUnit *unit_inside : unit.get_units_inside()) {
 		//Wyrmgus start
 //		MapMarkUnitSightRec(*unit_inside, pos, width, height, f, f2);
 		MapMarkUnitSightRec<sight_marker, detect_cloak_marker, ethereal_vision_marker>(*unit_inside, pos, width, height);
@@ -3491,8 +3466,7 @@ void UpdateUnitSightRange(CUnit &unit)
 		}
 	}
 
-	CUnit *unit_inside = unit.UnitInside;
-	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
+	for (CUnit *unit_inside : unit.get_units_inside()) {
 		UpdateUnitSightRange(*unit_inside);
 	}
 }
@@ -3600,20 +3574,13 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 */
 void CUnit::AddInContainer(CUnit &host)
 {
-	assert_throw(Container == nullptr);
-	Container = &host;
-	if (host.InsideCount == 0) {
-		NextContained = PrevContained = this;
-	} else {
-		NextContained = host.UnitInside;
-		PrevContained = host.UnitInside->PrevContained;
-		host.UnitInside->PrevContained->NextContained = this;
-		host.UnitInside->PrevContained = this;
-	}
-	host.UnitInside = this;
-	host.InsideCount++;
+	assert_throw(this->Container == nullptr);
+	this->Container = &host;
+	host.add_unit_inside(this);
+
 	//Wyrmgus start
-	if (!SaveGameLoading) { //if host has no range by itself, but the unit has range, and the unit can attack from a transporter, change the host's range to the unit's; but don't do this while loading, as it causes a crash (since one unit needs to be loaded before the other, and when this function is processed both won't already have their variables set)
+	if (!SaveGameLoading) {
+		//if host has no range by itself, but the unit has range, and the unit can attack from a transporter, change the host's range to the unit's; but don't do this while loading, as it causes a crash (since one unit needs to be loaded before the other, and when this function is processed both won't already have their variables set)
 		host.UpdateContainerAttackRange();
 	}
 	//Wyrmgus end
@@ -3628,18 +3595,9 @@ static void RemoveUnitFromContainer(CUnit &unit)
 {
 	CUnit *host = unit.Container; // transporter which contain unit.
 	assert_throw(unit.Container != nullptr);
-	assert_throw(unit.Container->InsideCount > 0);
+	assert_throw(unit.Container->has_units_inside());
 	
-	host->InsideCount--;
-	unit.NextContained->PrevContained = unit.PrevContained;
-	unit.PrevContained->NextContained = unit.NextContained;
-	if (host->InsideCount == 0) {
-		host->UnitInside = nullptr;
-	} else {
-		if (host->UnitInside == &unit) {
-			host->UnitInside = unit.NextContained;
-		}
-	}
+	host->remove_unit_inside(&unit);
 	unit.Container = nullptr;
 	//Wyrmgus start
 	//reset host attack range
@@ -3655,8 +3613,7 @@ void CUnit::UpdateContainerAttackRange()
 	//recalculate attack range, if this unit is a transporter (or garrisonable building) from which units can attack
 	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) {
 		if (this->BoardCount > 0) {
-			CUnit *boarded_unit = this->UnitInside;
-			for (int i = 0; i < this->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
+			for (const CUnit *boarded_unit : this->get_units_inside()) {
 				if (boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX) > this->best_contained_unit_attack_range && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) { //if container has no range by itself, but the unit has range, and the unit can attack from a transporter, change the container's range to the unit's
 					this->best_contained_unit_attack_range = boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX);
 				}
@@ -3923,15 +3880,13 @@ void CUnit::XPChanged()
 */
 static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 {
-	const wyrmgus::time_of_day *old_time_of_day = unit.get_center_tile_time_of_day();
+	const time_of_day *old_time_of_day = unit.get_center_tile_time_of_day();
 	
-	CUnit *unit_inside = unit.UnitInside;
-
 	unit.tilePos = pos;
 	unit.Offset = CMap::get()->get_pos_index(pos, z);
 	unit.MapLayer = CMap::get()->MapLayers[z].get();
 
-	const wyrmgus::time_of_day *new_time_of_day = unit.get_center_tile_time_of_day();
+	const time_of_day *new_time_of_day = unit.get_center_tile_time_of_day();
 
 	//Wyrmgus start
 	if (!SaveGameLoading && old_time_of_day != new_time_of_day) {
@@ -3939,7 +3894,7 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 	}
 	//Wyrmgus end
 
-	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
+	for (CUnit *unit_inside : unit.get_units_inside()) {
 		UnitInXY(*unit_inside, pos, z);
 	}
 }
@@ -4883,15 +4838,13 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 
 	// Rescue all units in buildings/transporters.
 	//Wyrmgus start
-//	CUnit *uins = UnitInside;
-//	for (int i = InsideCount; i; --i, uins = uins->NextContained) {
+//	for (CUnit *uins : this->get_units_inside()) {
 //		uins->ChangeOwner(newplayer);
 //	}
 
 	//only rescue units inside if the player is actually a rescuable player (to avoid, for example, unintended worker owner changes when a depot changes hands)
 	if (oldplayer->get_type() == player_type::rescue_active || oldplayer->get_type() == player_type::rescue_passive) {
-		CUnit *uins = UnitInside;
-		for (int i = InsideCount; i; --i, uins = uins->NextContained) {
+		for (CUnit *uins : this->get_units_inside()) {
 			uins->ChangeOwner(newplayer);
 		}
 	}
@@ -4902,7 +4855,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 
 	//  Now the new side!
 
-	if (Type->BoolFlag[BUILDING_INDEX].value) {
+	if (this->Type->BoolFlag[BUILDING_INDEX].value) {
 		//Wyrmgus start
 //		if (!Type->BoolFlag[WALL_INDEX].value) {
 		//Wyrmgus end
@@ -5466,9 +5419,10 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 */
 void DropOutAll(const CUnit &source)
 {
-	CUnit *unit = source.UnitInside;
+	//copy the vector since we may modify it
+	const std::vector<CUnit *> units_inside = source.get_units_inside();
 
-	for (int i = source.InsideCount; i; --i, unit = unit->NextContained) {
+	for (CUnit *unit : units_inside) {
 		DropOutOnSide(*unit, LookingW, &source);
 
 		//Wyrmgus start
@@ -6148,9 +6102,9 @@ int CUnit::get_resource_step(const resource *resource) const
 	return resource_step;
 }
 
-int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, const bool ignore_saved_cargo, const wyrmgus::unit_type *type) const
+int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, const bool ignore_saved_cargo, const unit_type *type) const
 {
-	if (!this->UnitInside) {
+	if (!this->has_units_inside()) {
 		return 0;
 	}
 	
@@ -6160,8 +6114,7 @@ int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, c
 	
 	int inside_count = 0;
 	
-	CUnit *inside_unit = this->UnitInside;
-	for (int j = 0; j < this->InsideCount; ++j, inside_unit = inside_unit->NextContained) {
+	for (const CUnit *inside_unit : this->get_units_inside()) {
 		if ( //only count units of the faction, ignore items
 			(!player || inside_unit->Player == player)
 			&& (!ignore_items || !inside_unit->Type->BoolFlag[ITEM_INDEX].value)
@@ -6169,6 +6122,7 @@ int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, c
 		) {
 			inside_count++;
 		}
+
 		inside_count += inside_unit->GetTotalInsideCount(player, ignore_items, ignore_saved_cargo);
 	}
 
@@ -6179,8 +6133,7 @@ bool CUnit::CanAttack(bool count_inside) const
 {
 	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && !this->Type->BoolFlag[CANATTACK_INDEX].value) { //transporters without an attack can only attack through a unit within them
 		if (count_inside && this->BoardCount > 0) {
-			CUnit *boarded_unit = this->UnitInside;
-			for (int i = 0; i < this->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
+			for (const CUnit *boarded_unit : this->get_units_inside()) {
 				if (boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) {
 					return true;
 				}
@@ -7182,7 +7135,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	// removed units, just remove.
 	if (unit.Removed) {
 		DebugPrint("Killing a removed unit?\n");
-		if (unit.UnitInside) {
+		if (unit.has_units_inside()) {
 			DestroyAllInside(unit);
 		}
 		UnitLost(unit);
@@ -7237,21 +7190,14 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	//Wyrmgus end
 
 	// Transporters lose or save their units and buildings their workers
-	//Wyrmgus start
-//	if (unit.UnitInside && unit.Type->BoolFlag[SAVECARGO_INDEX].value) {
-	if (
-		unit.UnitInside
-		&& (
-			unit.Type->BoolFlag[SAVECARGO_INDEX].value
-			|| (unit.HasInventory() && unit.get_character() == nullptr)
-		)
-	) {
-	//Wyrmgus end
-		DropOutAll(unit);
-	} else if (unit.UnitInside) {
-		DestroyAllInside(unit);
+	if (unit.has_units_inside()) {
+		if (unit.Type->BoolFlag[SAVECARGO_INDEX].value || (unit.HasInventory() && unit.get_character() == nullptr)) {
+			DropOutAll(unit);
+		} else {
+			DestroyAllInside(unit);
+		}
 	}
-	
+
 	//Wyrmgus start
 	//drop items upon death
 	if (!suicide && unit.CurrentAction() != UnitAction::Built && (unit.get_character() != nullptr || unit.Type->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
@@ -7329,12 +7275,13 @@ void LetUnitDie(CUnit &unit, bool suicide)
 */
 void DestroyAllInside(CUnit &source)
 {
-	CUnit *unit = source.UnitInside;
+	//copy the vector since we may modify it
+	const std::vector<CUnit *> units_inside = source.get_units_inside();
 
 	// No Corpses, we are inside something, and we can't be seen
-	for (int i = source.InsideCount; i; --i, unit = unit->NextContained) {
+	for (CUnit *unit : units_inside) {
 		// Transporter inside a transporter?
-		if (unit->UnitInside) {
+		if (unit->has_units_inside()) {
 			DestroyAllInside(*unit);
 		}
 		UnitLost(*unit);
@@ -7522,9 +7469,8 @@ void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target, const bool inc
 	attacker.Player->on_unit_destroyed(&target);
 
 	//also increase score for units inside the target that will be destroyed when the target dies
-	if (target.UnitInside && include_contained_units) {
-		CUnit *boarded_unit = target.UnitInside;
-		for (int i = 0; i < target.InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
+	if (target.has_units_inside() && include_contained_units) {
+		for (CUnit *boarded_unit : target.get_units_inside()) {
 			if (!boarded_unit->Type->BoolFlag[ITEM_INDEX].value) { //ignore items
 				HitUnit_IncreaseScoreForKill(attacker, *boarded_unit, include_contained_units);
 			}
@@ -8169,7 +8115,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (&picker == &unit) { // Cannot pick up itself.
 		return false;
 	}
-	if (picker.HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= ((int) UI.InventoryButtons.size())) { // full
+	if (picker.HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value && picker.get_units_inside().size() >= UI.InventoryButtons.size()) { //full
 		if (picker.Player == CPlayer::GetThisPlayer()) {
 			std::string picker_name = picker.Name + "'s (" + picker.get_type_name() + ")";
 			picker.Player->Notify(NotifyRed, picker.tilePos, picker.MapLayer->ID, _("%s inventory is full."), picker_name.c_str());

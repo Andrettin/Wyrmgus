@@ -239,7 +239,7 @@ static void PlaceUnits()
 		
 		//Wyrmgus start
 		//calculate attack range for containers now, as when loading a game it couldn't be done when the container was initially loaded
-		if (unit->BoardCount > 0 && unit->InsideCount > 0) {
+		if (unit->BoardCount > 0 && unit->has_units_inside()) {
 			unit->UpdateContainerAttackRange();
 		}
 		

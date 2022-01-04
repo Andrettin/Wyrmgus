@@ -487,6 +487,26 @@ public:
 	
 	CUnit *GetFirstContainer() const;
 
+	const std::vector<CUnit *> &get_units_inside() const
+	{
+		return this->units_inside;
+	}
+
+	bool has_units_inside() const
+	{
+		return !this->get_units_inside().empty();
+	}
+
+	void add_unit_inside(CUnit *unit)
+	{
+		this->units_inside.push_back(unit);
+	}
+
+	void remove_unit_inside(CUnit *unit)
+	{
+		std::erase(this->units_inside, unit);
+	}
+
 	bool has_rally_point() const
 	{
 		return this->get_rally_point_pos().x() != -1 && this->get_rally_point_pos().y() != -1;
@@ -793,12 +813,11 @@ public:
 	CUnitManagerData UnitManagerData;
 	size_t PlayerSlot;  /// index in Player->Units
 
-	int    InsideCount;   /// Number of units inside.
+private:
+	std::vector<CUnit *> units_inside;
+public:
 	int    BoardCount;    /// Number of units transported inside.
-	CUnit *UnitInside;    /// Pointer to one of the units inside.
 	CUnit *Container;     /// Pointer to the unit containing it (or 0)
-	CUnit *NextContained; /// Next unit in the container.
-	CUnit *PrevContained; /// Previous unit in the container.
 
 	struct {
 		std::vector<std::shared_ptr<wyrmgus::unit_ref>> Workers; ///references to the workers assigned to this resource.

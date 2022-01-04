@@ -693,7 +693,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideCount) {
+//		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->get_units_inside().size()) {
 		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->Resource.Active) {
 		//Wyrmgus end
 			this->clear_goal();
@@ -706,7 +706,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 				unit.Removed = 1;
 			}
 		//Wyrmgus start
-//		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->InsideCount) {
+//		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->get_units_inside().size()) {
 		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->Resource.Active) {
 		//Wyrmgus end
 			//Resource is full, wait

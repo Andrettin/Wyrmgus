@@ -240,7 +240,11 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		case UnitRefItSelf:
 			return &unit;
 		case UnitRefInside:
-			return unit.UnitInside;
+			if (unit.has_units_inside()) {
+				return unit.get_units_inside().at(0);
+			}
+
+			return nullptr;
 		case UnitRefContainer:
 			return unit.Container;
 		case UnitRefWorker :

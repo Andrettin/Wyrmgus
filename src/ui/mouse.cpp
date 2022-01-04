@@ -1094,7 +1094,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 		if (Selected.size() == 1 && Selected[0]->HasInventory() && CurrentButtonLevel == wyrmgus::defines::get()->get_inventory_button_level()) {
 			const size_t size = UI.InventoryButtons.size();
 
-			for (size_t i = std::min<size_t>(Selected[0]->InsideCount, size); i != 0;) {
+			for (size_t i = std::min<size_t>(Selected[0]->get_units_inside().size(), size); i != 0;) {
 				--i;
 				if (UI.InventoryButtons[i].Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaInventory;
@@ -2522,10 +2522,9 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 			if (!GameObserve && !game::get()->is_paused() && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->is_allied_with(*Selected[0]) || CPlayer::GetThisPlayer()->has_building_access(Selected[0]))) {
 			//Wyrmgus end
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
-					CUnit *uins = Selected[0]->UnitInside;
 					size_t j = 0;
 
-					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
+					for (CUnit *uins : Selected[0]->get_units_inside()) {
 						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
 							continue;
 						}
@@ -2544,11 +2543,13 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 		} else if (ButtonAreaUnderCursor == ButtonAreaInventory) {
 			//  for inventory unit
 			if (!GameObserve && !game::get()->is_paused() && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-				if (Selected[0]->InsideCount >= ButtonUnderCursor) {
-					CUnit *uins = Selected[0]->UnitInside;
+				if (static_cast<int>(Selected[0]->get_units_inside().size()) >= ButtonUnderCursor) {
+					//copy the vector since we may modify it
+					const std::vector<CUnit *> units_inside = Selected[0]->get_units_inside();
+
 					size_t j = 0;
 
-					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
+					for (CUnit *uins : units_inside) {
 						if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size() || (Selected[0]->Player != CPlayer::GetThisPlayer() && uins->Player != CPlayer::GetThisPlayer())) {
 							continue;
 						}
