@@ -2966,10 +2966,13 @@ bool CPlayer::capture_unit(CUnit *unit)
 			}
 
 			if (unit_inside->Player == unit->Player) {
-				this->capture_unit(unit_inside);
-			} else {
-				DropOutOnSide(*unit_inside, LookingW, unit);
+				const bool captured = this->capture_unit(unit_inside);
+				if (captured) {
+					continue;
+				}
 			}
+
+			DropOutOnSide(*unit_inside, LookingW, unit);
 		}
 	}
 
