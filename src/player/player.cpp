@@ -2973,6 +2973,9 @@ bool CPlayer::capture_unit(CUnit *unit)
 		}
 	}
 
+	//stop the captured unit if it was doing anything (we don't want it to keep training units, etc.)
+	CommandStopUnit(*unit);
+
 	//convert buildings to the equivalent type for the attacker's player
 	if (unit->Type->BoolFlag[BUILDING_INDEX].value) {
 		const unit_class *target_unit_class = unit->Type->get_unit_class();
