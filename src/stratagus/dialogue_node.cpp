@@ -33,6 +33,7 @@
 #include "dialogue.h"
 #include "dialogue_option.h"
 #include "engine_interface.h"
+#include "game/game.h"
 #include "luacallback.h"
 #include "player/faction.h"
 #include "player/player.h"
@@ -192,6 +193,10 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 	if (this->sound != nullptr) {
 		const int channel = PlayGameSound(this->sound, MaxSampleVolume);
 		dialogue::add_sound_channel(channel);
+	}
+
+	if (!game::get()->is_multiplayer()) {
+		game::get()->set_paused(true);
 	}
 }
 
