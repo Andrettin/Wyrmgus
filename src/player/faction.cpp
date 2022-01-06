@@ -417,7 +417,12 @@ std::string faction::get_titled_name(const government_type government_type, cons
 	if (this->uses_short_name(government_type)) {
 		return this->get_adjective() + " " + title_name;
 	} else {
-		return title_name + " of " + this->get_name();
+		std::string str = title_name + " of ";
+		if (this->definite_article) {
+			str += "the ";
+		}
+		str += this->get_name();
+		return str;
 	}
 }
 
