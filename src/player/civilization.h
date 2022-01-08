@@ -41,6 +41,7 @@ static int CclDefineCivilization(lua_State *l);
 namespace wyrmgus {
 
 class ai_force_template;
+class and_condition;
 class calendar;
 class character;
 class deity;
@@ -215,6 +216,11 @@ public:
 		return this->ui_fillers;
 	}
 
+	const std::unique_ptr<const and_condition> &get_conditions() const
+	{
+		return this->conditions;
+	}
+
 	const std::vector<faction *> &get_factions() const
 	{
 		return this->factions;
@@ -274,6 +280,7 @@ public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
 	std::vector<CFiller> ui_fillers;
+	std::unique_ptr<const and_condition> conditions;
 	std::vector<faction *> factions;
 	std::vector<character *> characters;
 public:

@@ -459,6 +459,10 @@ CCurrency *faction::GetCurrency() const
 
 bool faction::is_government_type_valid(const government_type government_type) const
 {
+	if (this->get_civilization()->get_conditions() != nullptr && !this->get_civilization()->get_conditions()->check(government_type)) {
+		return false;
+	}
+
 	if (this->get_preconditions() != nullptr && !this->get_preconditions()->check(government_type)) {
 		return false;
 	}
@@ -604,11 +608,17 @@ std::string faction::get_requirements_string() const
 		}
 	}
 
-	if (this->get_conditions() != nullptr) {
-		return "\n" + this->get_conditions()->get_conditions_string(1, false);
+	std::string str;
+
+	if (this->get_civilization()->get_conditions() != nullptr) {
+		str += "\n" + this->get_civilization()->get_conditions()->get_conditions_string(1, false);
 	}
 
-	return std::string();
+	if (this->get_conditions() != nullptr) {
+		str += "\n" + this->get_conditions()->get_conditions_string(1, false);
+	}
+
+	return str;
 }
 
 void faction::remove_dynasty(const wyrmgus::dynasty *dynasty)

@@ -2298,6 +2298,10 @@ bool CPlayer::can_potentially_found_faction(const wyrmgus::faction *faction) con
 			return false;
 		}
 
+		if (faction->get_civilization()->get_conditions() != nullptr && !faction->get_civilization()->get_conditions()->check(this->get_civilization())) {
+			return false;
+		}
+
 		if (faction->get_preconditions() != nullptr && !faction->get_preconditions()->check(this->get_civilization())) {
 			return false;
 		}
@@ -2429,7 +2433,9 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 		}
 	}
 
-	if (faction->get_preconditions() != nullptr && !faction->get_preconditions()->check(this, read_only_context::from_scope(this))) {
+	const read_only_context ctx = read_only_context::from_scope(this);
+
+	if (faction->get_preconditions() != nullptr && !faction->get_preconditions()->check(this, ctx)) {
 		return false;
 	}
 
@@ -2445,7 +2451,11 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 			}
 		}
 
-		if (faction->get_conditions() != nullptr && !faction->get_conditions()->check(this, read_only_context::from_scope(this))) {
+		if (faction->get_civilization()->get_conditions() != nullptr && !faction->get_civilization()->get_conditions()->check(this, ctx)) {
+			return false;
+		}
+
+		if (faction->get_conditions() != nullptr && !faction->get_conditions()->check(this, ctx)) {
 			return false;
 		}
 	}

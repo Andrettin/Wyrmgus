@@ -109,6 +109,10 @@ void civilization::process_sml_scope(const sml_data &scope)
 			filler.Y = pos.y();
 			this->ui_fillers.push_back(std::move(filler));
 		});
+	} else if (tag == "conditions") {
+		auto conditions = std::make_unique<and_condition>();
+		database::process_sml_data(conditions, scope);
+		this->conditions = std::move(conditions);
 	} else if (tag == "force_type_weights") {
 		this->ai_force_type_weights.clear();
 
@@ -279,6 +283,10 @@ void civilization::check() const
 		for (const std::unique_ptr<ai_force_template> &force_template : kv_pair.second) {
 			force_template->check();
 		}
+	}
+
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
 	}
 
 	data_entry::check();
