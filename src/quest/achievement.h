@@ -133,9 +133,7 @@ private:
 	wyrmgus::character *character = nullptr; //character related to the achievement's requirements
 	unit_type *character_type = nullptr; //unit type required for a character to have for the achievement
 	int character_level = 0; //character level required for the achievement
-public:
-	std::vector<const quest *> RequiredQuests;
-private:
+	std::vector<const quest *> required_quests;
 	bool obtained = false;
 
 	friend int ::CclDefineAchievement(lua_State *l);

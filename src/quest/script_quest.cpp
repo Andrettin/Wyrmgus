@@ -550,12 +550,12 @@ static int CclDefineAchievement(lua_State *l)
 			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
 			achievement->character_type = unit_type;
 		} else if (!strcmp(value, "RequiredQuests")) {
-			achievement->RequiredQuests.clear();
+			achievement->required_quests.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_ident = LuaToString(l, -1, j + 1);
 				wyrmgus::quest *required_quest = wyrmgus::quest::get(quest_ident);
-				achievement->RequiredQuests.push_back(required_quest);
+				achievement->required_quests.push_back(required_quest);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

@@ -529,7 +529,7 @@ void character::initialize()
 
 	//check if the abilities are correct for this character's unit type
 	if (this->get_unit_type() != nullptr && this->get_abilities().size() > 0 && static_cast<int>(AiHelpers.LearnableAbilities.size()) > this->get_unit_type()->Slot) {
-		int ability_count = static_cast<int>(this->get_abilities().size());
+		const int ability_count = static_cast<int>(this->get_abilities().size());
 		for (int i = (ability_count - 1); i >= 0; --i) {
 			if (!vector::contains(AiHelpers.LearnableAbilities[this->get_unit_type()->Slot], this->abilities[i])) {
 				vector::remove(this->abilities, this->abilities[i]);

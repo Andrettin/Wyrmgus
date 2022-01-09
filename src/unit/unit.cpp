@@ -884,7 +884,7 @@ void CUnit::Retrain()
 		}
 
 		if (upgrade->is_ability()) {
-			if (wyrmgus::vector::contains(this->Type->StartingAbilities, upgrade)) {
+			if (vector::contains(this->Type->StartingAbilities, upgrade)) {
 				continue;
 			}
 
@@ -917,15 +917,16 @@ void CUnit::Retrain()
 	//now, revert the unit's type to the base level one
 	while (this->Type->Stats[this->Player->get_index()].Variables[LEVEL_INDEX].Value > base_level) {
 		bool found_previous_unit_type = false;
-		for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		for (unit_type *unit_type : unit_type::get_all()) {
 			if (unit_type->is_template()) {
 				continue;
 			}
 
-			if (this->get_character() != nullptr && wyrmgus::vector::contains(this->get_character()->ForbiddenUpgrades, unit_type)) {
+			if (this->get_character() != nullptr && vector::contains(this->get_character()->ForbiddenUpgrades, unit_type)) {
 				continue;
 			}
-			if (((int) AiHelpers.ExperienceUpgrades.size()) > unit_type->Slot) {
+
+			if (static_cast<int>(AiHelpers.ExperienceUpgrades.size()) > unit_type->Slot) {
 				for (size_t j = 0; j != AiHelpers.ExperienceUpgrades[unit_type->Slot].size(); ++j) {
 					if (AiHelpers.ExperienceUpgrades[unit_type->Slot][j] == this->Type) {
 						this->Variable[LEVELUP_INDEX].Value += 1;

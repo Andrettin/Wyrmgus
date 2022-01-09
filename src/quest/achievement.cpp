@@ -137,7 +137,7 @@ void achievement::process_sml_scope(const sml_data &scope)
 
 	if (tag == "required_quests") {
 		for (const std::string &value : values) {
-			this->RequiredQuests.push_back(quest::get(value));
+			this->required_quests.push_back(quest::get(value));
 		}
 	} else {
 		data_entry::process_sml_scope(scope);
@@ -150,7 +150,7 @@ bool achievement::can_obtain() const
 		return false;
 	}
 
-	for (const quest *required_quest : this->RequiredQuests) {
+	for (const quest *required_quest : this->required_quests) {
 		if (!required_quest->is_completed() || (this->get_difficulty() != difficulty::none && required_quest->get_highest_completed_difficulty() < this->get_difficulty())) {
 			return false;
 		}
@@ -211,7 +211,7 @@ int achievement::get_progress() const
 
 	int progress = 0;
 
-	for (const quest *required_quest : this->RequiredQuests) {
+	for (const quest *required_quest : this->required_quests) {
 		if (required_quest->is_completed() && (this->get_difficulty() == difficulty::none || required_quest->get_highest_completed_difficulty() >= this->get_difficulty())) {
 			progress++;
 		}
@@ -245,7 +245,7 @@ int achievement::get_progress_max() const
 	}
 
 	int progress_max = 0;
-	progress_max += this->RequiredQuests.size();
+	progress_max += this->required_quests.size();
 	progress_max += this->character_level;
 
 	return progress_max;
