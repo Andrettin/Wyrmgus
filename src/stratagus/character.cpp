@@ -1190,7 +1190,7 @@ void character::UpdateAttributes()
 
 void character::remove_ability(const CUpgrade *ability)
 {
-	vector::remove(this->abilities, ability);
+	vector::remove_one(this->abilities, ability);
 }
 
 text_processing_context character::get_text_processing_context() const
