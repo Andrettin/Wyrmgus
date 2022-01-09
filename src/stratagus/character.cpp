@@ -1193,6 +1193,36 @@ void character::remove_ability(const CUpgrade *ability)
 	vector::remove_one(this->abilities, ability);
 }
 
+void character::add_bonus_ability(const CUpgrade *ability)
+{
+	this->bonus_abilities.push_back(ability);
+
+	//if the ability has already been acquired and is at maximum, then free one level-up upgrade ability spot for the character
+	bool removed_ability = false;
+	const int ability_count = this->get_ability_count(ability);
+	if (ability_count > 0 && ability_count >= ability->MaxLimit) {
+		vector::remove_one(this->abilities, ability);
+		removed_ability = true;
+	}
+
+	//if the game is running, update the character's unit accordingly
+	if (game::get()->is_running()) {
+		CUnit *character_unit = this->get_unit();
+
+		if (character_unit != nullptr) {
+			if (removed_ability) {
+				character_unit->Variable[LEVELUP_INDEX].Value += 1;
+				character_unit->Variable[LEVELUP_INDEX].Max = character_unit->Variable[LEVELUP_INDEX].Value;
+				character_unit->Variable[LEVELUP_INDEX].Enable = 1;
+			} else {
+				if (check_conditions(ability, character_unit)) {
+					IndividualUpgradeAcquire(*character_unit, ability);
+				}
+			}
+		}
+	}
+}
+
 text_processing_context character::get_text_processing_context() const
 {
 	text_processing_context ctx;

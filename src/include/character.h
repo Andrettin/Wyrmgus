@@ -446,6 +446,13 @@ public:
 		return count;
 	}
 
+	const std::vector<const CUpgrade *> &get_bonus_abilities() const
+	{
+		return this->bonus_abilities;
+	}
+
+	void add_bonus_ability(const CUpgrade *ability);
+
 	const unit_sound_set *get_sound_set() const
 	{
 		return this->sound_set.get();
@@ -507,6 +514,7 @@ public:
 private:
 	std::vector<const CUpgrade *> base_abilities; //the character's base abilities; these will not be lost after retraining
 	std::vector<const CUpgrade *> abilities;
+	std::vector<const CUpgrade *> bonus_abilities; //abilities received as a bonus e.g. from achievements; these are not lost after retraining
 public:
 	std::vector<const CUpgrade *> ReadWorks;
 	std::vector<const CUpgrade *> ConsumedElixirs;

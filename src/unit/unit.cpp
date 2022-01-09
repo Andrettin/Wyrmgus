@@ -898,6 +898,12 @@ void CUnit::Retrain()
 						remove_count--;
 					}
 				}
+
+				for (const CUpgrade *bonus_ability : this->get_character()->get_bonus_abilities()) {
+					if (bonus_ability == upgrade) {
+						remove_count--;
+					}
+				}
 			}
 
 			for (int i = 0; i < remove_count; ++i) {
@@ -1099,6 +1105,12 @@ void CUnit::apply_character_properties()
 	}
 
 	for (const CUpgrade *ability_upgrade : this->Type->StartingAbilities) {
+		if (check_conditions(ability_upgrade, this)) {
+			IndividualUpgradeAcquire(*this, ability_upgrade);
+		}
+	}
+
+	for (const CUpgrade *ability_upgrade : this->get_character()->get_bonus_abilities()) {
 		if (check_conditions(ability_upgrade, this)) {
 			IndividualUpgradeAcquire(*this, ability_upgrade);
 		}
