@@ -126,6 +126,8 @@ public:
 
 	static bool compare_encyclopedia_entries(const character *lhs, const character *rhs);
 
+	static std::vector<character *> get_all_with_custom();
+
 	static const std::vector<character *> &get_custom_heroes()
 	{
 		return character::custom_heroes;

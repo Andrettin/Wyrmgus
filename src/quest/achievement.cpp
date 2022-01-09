@@ -191,7 +191,7 @@ bool achievement::can_obtain() const
 	} else if (this->character_type != nullptr || this->character_level > 0) {
 		bool found_hero = false;
 
-		for (const wyrmgus::character *hero : character::get_all()) {
+		for (const wyrmgus::character *hero : character::get_all_with_custom()) {
 			if (!hero->is_playable()) {
 				continue;
 			}
@@ -206,25 +206,6 @@ bool achievement::can_obtain() const
 
 			found_hero = true;
 			break;
-		}
-
-		if (!found_hero) {
-			for (const wyrmgus::character *hero : character::get_custom_heroes()) {
-				if (!hero->is_playable()) {
-					continue;
-				}
-
-				if (this->character_type && hero->get_unit_type() != this->character_type) {
-					continue;
-				}
-
-				if (this->character_level > 0 && hero->get_level() < this->character_level) {
-					continue;
-				}
-
-				found_hero = true;
-				break;
-			}
 		}
 
 		if (!found_hero) {
@@ -275,7 +256,7 @@ int achievement::get_progress() const
 	} else if (this->character_level > 0) {
 		int highest_level = 0;
 
-		for (const wyrmgus::character *hero : character::get_all()) {
+		for (const wyrmgus::character *hero : character::get_all_with_custom()) {
 			if (!hero->is_playable()) {
 				continue;
 			}
@@ -284,20 +265,6 @@ int achievement::get_progress() const
 			if (highest_level >= this->character_level) {
 				highest_level = this->character_level;
 				break;
-			}
-		}
-
-		if (highest_level < this->character_level) {
-			for (const wyrmgus::character *hero : character::get_custom_heroes()) {
-				if (!hero->is_playable()) {
-					continue;
-				}
-
-				highest_level = std::max(highest_level, hero->get_level());
-				if (highest_level >= this->character_level) {
-					highest_level = this->character_level;
-					break;
-				}
 			}
 		}
 

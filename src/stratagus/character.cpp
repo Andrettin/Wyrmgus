@@ -112,6 +112,13 @@ bool character::compare_encyclopedia_entries(const character *lhs, const charact
 	return lhs->get_full_name() < rhs->get_full_name();
 }
 
+std::vector<character *> character::get_all_with_custom()
+{
+	std::vector<character *> characters = character::get_all();
+	vector::merge(characters, character::get_custom_heroes());
+	return characters;
+}
+
 void character::create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, CUpgrade *trait, const std::string &variation_identifier)
 {
 	std::string identifier = "custom_" + string::lowered(name);
@@ -687,7 +694,10 @@ std::string character::get_encyclopedia_text() const
 		std::set<const CUpgrade *> written_abilities;
 
 		std::string abilities_text;
-		for (const CUpgrade *ability : this->get_abilities()) {
+		std::vector<const CUpgrade *> abilities = this->get_abilities();
+		vector::merge(abilities, this->get_bonus_abilities());
+
+		for (const CUpgrade *ability : abilities) {
 			if (written_abilities.contains(ability)) {
 				continue;
 			}
@@ -1296,16 +1306,11 @@ int GetAttributeVariableIndex(int attribute)
 
 void SaveHeroes()
 {
-	//save characters
-	for (const character *character : character::get_all()) {
+	//save characters and custom heroes
+	for (const character *character : character::get_all_with_custom()) {
 		character->save();
 	}
 
-	//save custom heroes
-	for (const character *hero : character::get_custom_heroes()) {
-		hero->save();
-	}
-			
 	//see if the old heroes.lua save file is present, and if so, delete it
 	std::string path = parameters::get()->GetUserDirectory();
 
