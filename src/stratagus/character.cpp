@@ -1073,6 +1073,19 @@ bool character::IsUsable() const
 	return true;
 }
 
+bool character::is_playable() const
+{
+	if (!this->IsUsable()) {
+		return false;
+	}
+
+	if (this->get_civilization() == nullptr) {
+		return false;
+	}
+
+	return this->get_civilization()->is_playable();
+}
+
 bool character::CanAppear(bool ignore_neutral) const
 {
 	if (!this->IsUsable()) {

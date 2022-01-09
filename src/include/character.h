@@ -301,6 +301,7 @@ public:
 	void deequip_item(const persistent_item *item);
 
 	bool IsUsable() const;
+	bool is_playable() const;
 	bool CanAppear(bool ignore_neutral = false) const;
 	bool CanWorship() const;
 	bool HasMajorDeity() const;
