@@ -884,11 +884,13 @@ void CUnit::Retrain()
 		}
 
 		if (upgrade->is_ability()) {
-			if (vector::contains(this->Type->StartingAbilities, upgrade)) {
-				continue;
-			}
-
 			int remove_count = upgrade_count;
+
+			for (const CUpgrade *starting_ability : this->Type->StartingAbilities) {
+				if (starting_ability == upgrade) {
+					remove_count--;
+				}
+			}
 
 			if (this->get_character() != nullptr) {
 				for (const CUpgrade *base_ability : this->get_character()->get_base_abilities()) {
