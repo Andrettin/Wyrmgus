@@ -190,7 +190,8 @@ bool achievement::can_obtain() const
 		}
 	} else if (this->character_type != nullptr || this->character_level > 0) {
 		bool found_hero = false;
-		for (const wyrmgus::character *hero : character::get_custom_heroes()) {
+
+		for (const wyrmgus::character *hero : character::get_all()) {
 			if (this->character_type && hero->get_unit_type() != this->character_type) {
 				continue;
 			}
@@ -201,6 +202,21 @@ bool achievement::can_obtain() const
 
 			found_hero = true;
 			break;
+		}
+
+		if (!found_hero) {
+			for (const wyrmgus::character *hero : character::get_custom_heroes()) {
+				if (this->character_type && hero->get_unit_type() != this->character_type) {
+					continue;
+				}
+
+				if (this->character_level > 0 && hero->get_level() < this->character_level) {
+					continue;
+				}
+
+				found_hero = true;
+				break;
+			}
 		}
 
 		if (!found_hero) {
