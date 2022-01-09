@@ -684,18 +684,19 @@ std::string character::get_encyclopedia_text() const
 
 	named_data_entry::concatenate_encyclopedia_text(text, "Level: " + std::to_string(this->get_level()));
 
-	if (!this->get_abilities().empty()) {
+	std::vector<const CUpgrade *> abilities = this->get_abilities();
+	vector::merge(abilities, this->get_bonus_abilities());
+
+	if (!abilities.empty()) {
 		std::map<const CUpgrade *, int> ability_counts;
 
-		for (const CUpgrade *ability : this->get_abilities()) {
+		for (const CUpgrade *ability : abilities) {
 			ability_counts[ability]++;
 		}
 
 		std::set<const CUpgrade *> written_abilities;
 
 		std::string abilities_text;
-		std::vector<const CUpgrade *> abilities = this->get_abilities();
-		vector::merge(abilities, this->get_bonus_abilities());
 
 		for (const CUpgrade *ability : abilities) {
 			if (written_abilities.contains(ability)) {
