@@ -42,6 +42,10 @@ class named_data_entry : public data_entry
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY changed)
 	Q_PROPERTY(wyrmgus::word* name_word READ get_name_word WRITE set_name_word NOTIFY changed)
 	Q_PROPERTY(QString encyclopedia_text READ get_encyclopedia_text_qstring NOTIFY encyclopedia_text_changed)
+	Q_PROPERTY(int tree_x READ get_tree_x CONSTANT)
+	Q_PROPERTY(int tree_y READ get_tree_y CONSTANT)
+	Q_PROPERTY(int tree_width READ get_tree_width CONSTANT)
+	Q_PROPERTY(bool tree_line_visible MEMBER tree_line_visible NOTIFY changed)
 
 public:
 	static bool compare_encyclopedia_entries(const named_data_entry *lhs, const named_data_entry *rhs)
@@ -132,6 +136,31 @@ public:
 		return this->get_name();
 	}
 
+	virtual named_data_entry *get_tree_parent() const
+	{
+		return nullptr;
+	}
+
+	void add_tree_child(const named_data_entry *data_entry)
+	{
+		this->tree_children.push_back(data_entry);
+	}
+
+	int get_tree_x() const;
+	int get_tree_relative_x(const std::vector<const named_data_entry *> &siblings) const;
+	int get_tree_y() const;
+	int get_tree_width() const;
+
+	virtual std::vector<const named_data_entry *> get_top_tree_elements() const
+	{
+		return {};
+	}
+
+	virtual bool is_hidden_in_tree() const
+	{
+		return false;
+	}
+
 signals:
 	void encyclopedia_text_changed();
 	void changed();
@@ -139,6 +168,8 @@ signals:
 private:
 	std::string name;
 	word *name_word = nullptr;
+	std::vector<const named_data_entry *> tree_children;
+	bool tree_line_visible = true;
 };
 
 }

@@ -60,10 +60,26 @@ class achievement final : public named_data_entry, public data_type<achievement>
 	Q_PROPERTY(bool obtained READ is_obtained NOTIFY changed)
 	Q_PROPERTY(int progress READ get_progress NOTIFY changed)
 	Q_PROPERTY(int progress_max READ get_progress_max NOTIFY changed)
+	Q_PROPERTY(wyrmgus::achievement* tree_parent MEMBER tree_parent NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "achievement";
 	static constexpr const char *database_folder = "achievements";
+
+	static std::vector<const achievement *> get_all_visible()
+	{
+		std::vector<const achievement *> achievements;
+
+		for (const achievement *achievement : achievement::get_all()) {
+			if (achievement->is_hidden()) {
+				continue;
+			}
+
+			achievements.push_back(achievement);
+		}
+
+		return achievements;
+	}
 
 	static std::filesystem::path get_achievements_filepath();
 	static void load_achievements();
@@ -120,6 +136,10 @@ public:
 
 	bool is_hidden() const
 	{
+		if (this->tree_parent != nullptr && this->tree_parent->is_hidden()) {
+			return true;
+		}
+
 		return this->hidden;
 	}
 
@@ -133,6 +153,24 @@ public:
 	int get_progress() const;
 	int get_progress_max() const;
 	void apply_rewards() const;
+
+	virtual named_data_entry *get_tree_parent() const override
+	{
+		return this->tree_parent;
+	}
+
+	virtual bool is_hidden_in_tree() const override
+	{
+		return this->is_hidden();
+	}
+
+	virtual std::vector<const named_data_entry *> get_top_tree_elements() const override
+	{
+		std::vector<const named_data_entry *> top_tree_elements;
+		const std::vector<const achievement *> visible_achievements = achievement::get_all_visible();
+		top_tree_elements.insert(top_tree_elements.end(), visible_achievements.begin(), visible_achievements.end());
+		return top_tree_elements;
+	}
 
 signals:
 	void changed();
@@ -150,6 +188,7 @@ private:
 	std::vector<const quest *> required_quests;
 	std::vector<const CUpgrade *> reward_abilities;
 	bool obtained = false;
+	achievement *tree_parent = nullptr;
 
 	friend int ::CclDefineAchievement(lua_State *l);
 };

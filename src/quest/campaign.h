@@ -63,10 +63,6 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(bool available READ is_available NOTIFY available_changed)
 	Q_PROPERTY(wyrmgus::campaign* tree_parent MEMBER tree_parent NOTIFY changed)
-	Q_PROPERTY(int tree_x READ get_tree_x CONSTANT)
-	Q_PROPERTY(int tree_y READ get_tree_y CONSTANT)
-	Q_PROPERTY(int tree_width READ get_tree_width CONSTANT)
-	Q_PROPERTY(bool tree_line_visible MEMBER tree_line_visible NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "campaign";
@@ -74,11 +70,11 @@ public:
 
 	static void initialize_all();
 
-	static std::vector<campaign *> get_all_visible()
+	static std::vector<const campaign *> get_all_visible()
 	{
-		std::vector<campaign *> campaigns;
+		std::vector<const campaign *> campaigns;
 
-		for (campaign *campaign : campaign::get_all()) {
+		for (const campaign *campaign : campaign::get_all()) {
 			if (campaign->is_hidden()) {
 				continue;
 			}
@@ -157,15 +153,23 @@ public:
 		return this->required_map_templates.contains(map_template);
 	}
 
-	void add_tree_child(const campaign *campaign)
+	virtual named_data_entry *get_tree_parent() const override
 	{
-		this->tree_children.push_back(campaign);
+		return this->tree_parent;
 	}
 
-	int get_tree_x() const;
-	int get_tree_relative_x(const std::vector<const campaign *> &siblings) const;
-	int get_tree_y() const;
-	int get_tree_width() const;
+	virtual bool is_hidden_in_tree() const override
+	{
+		return this->is_hidden();
+	}
+
+	virtual std::vector<const named_data_entry *> get_top_tree_elements() const override
+	{
+		std::vector<const named_data_entry *> top_tree_elements;
+		const std::vector<const campaign *> visible_campaigns = campaign::get_all_visible();
+		top_tree_elements.insert(top_tree_elements.end(), visible_campaigns.begin(), visible_campaigns.end());
+		return top_tree_elements;
+	}
 
 signals:
 	void available_changed();
@@ -189,8 +193,6 @@ public:
 	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
 private:
 	campaign *tree_parent = nullptr;
-	std::vector<const campaign *> tree_children;
-	bool tree_line_visible = true;
 	
 	friend int ::CclDefineCampaign(lua_State *l);
 	friend int ::CclGetCampaignData(lua_State *l);
