@@ -1598,7 +1598,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	unit.Variable[LEVELUP_INDEX].Enable = 1;
 	if (game::get()->is_persistency_enabled() && unit.get_character() != nullptr) {
-		if (wyrmgus::vector::contains(unit.get_character()->get_abilities(), upgrade)) {
+		if (vector::contains(unit.get_character()->get_abilities(), upgrade)) {
 			if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 				unit.get_character()->remove_ability(upgrade);
 				unit.get_character()->save();

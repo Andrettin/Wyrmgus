@@ -1014,7 +1014,7 @@ void CUnit::set_character(wyrmgus::character *character)
 	}
 
 	if (this->get_character() != nullptr) {
-		wyrmgus::vector::remove(this->Player->Heroes, this);
+		vector::remove(this->Player->Heroes, this);
 
 		this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 0;
 	}
@@ -1120,7 +1120,8 @@ void CUnit::apply_character_properties()
 	for (const CUpgrade *ability : this->get_character()->get_abilities()) {
 		if (this->can_learn_ability(ability)) {
 			AbilityAcquire(*this, ability, false);
-		} else { //can't learn the ability? something changed in the game's code, remove it from persistent data and allow the hero to repick the ability
+		} else {
+			//can't learn the ability? something changed in the game's code, remove it from persistent data and allow the hero to repick the ability
 			abilities_to_remove.push_back(ability);
 		}
 	}

@@ -529,11 +529,20 @@ void character::initialize()
 
 	//check if the abilities are correct for this character's unit type
 	if (this->get_unit_type() != nullptr && this->get_abilities().size() > 0 && static_cast<int>(AiHelpers.LearnableAbilities.size()) > this->get_unit_type()->Slot) {
-		const int ability_count = static_cast<int>(this->get_abilities().size());
-		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (!vector::contains(AiHelpers.LearnableAbilities[this->get_unit_type()->Slot], this->abilities[i])) {
-				vector::remove(this->abilities, this->abilities[i]);
-			}
+		std::erase_if(this->abilities, [this](const CUpgrade *ability) {
+			return !vector::contains(AiHelpers.LearnableAbilities[this->get_unit_type()->Slot], ability);
+		});
+	}
+
+	//if the character has an ability multiple times, and it is over the max limit, remove the instances of it over the limit
+	const int ability_count = static_cast<int>(this->get_abilities().size());
+	for (int i = (ability_count - 1); i >= 0;) {
+		const CUpgrade *ability = this->get_abilities().at(i);
+		const int count = this->get_ability_count(ability);
+		if (count > ability->MaxLimit) {
+			this->abilities.erase(this->abilities.begin() + i);
+		} else {
+			--i;
 		}
 	}
 

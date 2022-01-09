@@ -433,6 +433,19 @@ public:
 
 	void remove_ability(const CUpgrade *ability);
 
+	int get_ability_count(const CUpgrade *counted_ability) const
+	{
+		int count = 0;
+
+		for (const CUpgrade *ability : this->get_abilities()) {
+			if (ability == counted_ability) {
+				++count;
+			}
+		}
+
+		return count;
+	}
+
 	const unit_sound_set *get_sound_set() const
 	{
 		return this->sound_set.get();

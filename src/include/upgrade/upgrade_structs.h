@@ -692,7 +692,7 @@ private:
 public:
 	//Wyrmgus start
 	resource_map<int> GrandStrategyProductionEfficiencyModifier; //production modifier for a particular resource for the grand strategy mode
-	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
+	int MaxLimit = 1; //maximum amount of times this upgrade can be acquired as an individual upgrade
 	item_class Work;			/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work
 	character *Author = nullptr;		/// Author of this literary work (if it is one)
