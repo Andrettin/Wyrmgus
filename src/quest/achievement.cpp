@@ -36,6 +36,7 @@
 #include "quest/quest.h"
 #include "script.h"
 #include "unit/unit_type.h"
+#include "util/assert_util.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
@@ -139,6 +140,10 @@ void achievement::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->required_quests.push_back(quest::get(value));
 		}
+	} else if (tag == "reward_abilities") {
+		for (const std::string &value : values) {
+			this->reward_abilities.push_back(CUpgrade::get(value));
+		}
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -193,6 +198,8 @@ void achievement::obtain(const bool save, const bool display)
 	}
 
 	this->obtained = true;
+
+	this->apply_rewards();
 
 	if (save) {
 		achievement::save_achievements();
@@ -249,6 +256,17 @@ int achievement::get_progress_max() const
 	progress_max += this->character_level;
 
 	return progress_max;
+}
+
+void achievement::apply_rewards() const
+{
+	if (!this->reward_abilities.empty()) {
+		assert_throw(this->character != nullptr);
+
+		for (const CUpgrade *upgrade : this->reward_abilities) {
+			this->character->add_bonus_ability(upgrade);
+		}
+	}
 }
 
 }

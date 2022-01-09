@@ -29,6 +29,7 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
+class CUpgrade;
 struct lua_State;
 
 static int CclDefineAchievement(lua_State *l);
@@ -78,6 +79,10 @@ public:
 		if (this->get_icon() == nullptr) {
 			throw std::runtime_error("Achievement \"" + this->get_identifier() + "\" has no icon.");
 		}
+
+		if (!this->reward_abilities.empty() && this->character == nullptr) {
+			throw std::runtime_error("Achievement \"" + this->get_identifier() + "\" has reward abilities, but no character.");
+		}
 	}
 
 	const wyrmgus::icon *get_icon() const
@@ -119,6 +124,7 @@ public:
 	void obtain(bool save = true, bool display = true);
 	int get_progress() const;
 	int get_progress_max() const;
+	void apply_rewards() const;
 
 signals:
 	void changed();
@@ -134,6 +140,7 @@ private:
 	unit_type *character_type = nullptr; //unit type required for a character to have for the achievement
 	int character_level = 0; //character level required for the achievement
 	std::vector<const quest *> required_quests;
+	std::vector<const CUpgrade *> reward_abilities;
 	bool obtained = false;
 
 	friend int ::CclDefineAchievement(lua_State *l);
