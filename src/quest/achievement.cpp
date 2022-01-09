@@ -149,6 +149,25 @@ void achievement::process_sml_scope(const sml_data &scope)
 	}
 }
 
+std::string achievement::get_rewards_string() const
+{
+	std::string str;
+
+	bool first = true;
+
+	for (const CUpgrade *ability : this->reward_abilities) {
+		if (first) {
+			first = false;
+		} else {
+			str += ", ";
+		}
+
+		str += ability->get_name();
+	}
+
+	return str;
+}
+
 bool achievement::can_obtain() const
 {
 	if (this->is_obtained() || this->unobtainable) {
@@ -165,6 +184,7 @@ bool achievement::can_obtain() const
 		if (this->character_type != nullptr && this->character->get_unit_type() != this->character_type) {
 			return false;
 		}
+
 		if (this->character_level > 0 && this->character->get_level() < this->character_level) {
 			return false;
 		}

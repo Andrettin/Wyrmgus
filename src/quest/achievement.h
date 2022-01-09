@@ -49,6 +49,7 @@ class achievement final : public named_data_entry, public data_type<achievement>
 
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
 	Q_PROPERTY(QString description READ get_description_qstring CONSTANT)
+	Q_PROPERTY(QString rewards_string READ get_rewards_qstring CONSTANT)
 	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color NOTIFY changed)
 	Q_PROPERTY(wyrmgus::difficulty difficulty MEMBER difficulty)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
@@ -98,6 +99,13 @@ public:
 	QString get_description_qstring() const
 	{
 		return QString::fromStdString(this->get_description());
+	}
+
+	std::string get_rewards_string() const;
+
+	QString get_rewards_qstring() const
+	{
+		return QString::fromStdString(this->get_rewards_string());
 	}
 
 	const wyrmgus::player_color *get_player_color() const
