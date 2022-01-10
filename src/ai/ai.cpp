@@ -507,8 +507,8 @@ static void AiCheckUnits()
 		}
 		
 		if (AiPlayer->Player->get_dynasty() == nullptr) { //if the AI player has no dynasty, pick one if available
-			std::vector<const wyrmgus::dynasty *> potential_dynasties;
-			for (const wyrmgus::dynasty *dynasty : AiPlayer->Player->get_faction()->get_dynasties()) {
+			std::vector<const dynasty *> potential_dynasties;
+			for (const dynasty *dynasty : AiPlayer->Player->get_faction()->get_dynasties()) {
 				if (!AiPlayer->Player->can_choose_dynasty(dynasty)) {
 					continue;
 				}
@@ -516,8 +516,8 @@ static void AiCheckUnits()
 				potential_dynasties.push_back(dynasty);
 			}
 			
-			if (potential_dynasties.size() > 0) {
-				AiPlayer->Player->set_dynasty(wyrmgus::vector::get_random(potential_dynasties));
+			if (!potential_dynasties.empty()) {
+				AiPlayer->Player->set_dynasty(vector::get_random(potential_dynasties));
 			}
 		}
 	}
