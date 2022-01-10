@@ -1626,6 +1626,10 @@ void CPlayer::set_government_type(const wyrmgus::government_type government_type
 	if (!game::get()->is_multiplayer()) {
 		this->update_name_from_faction();
 	}
+
+	if (!can_government_type_have_dynasty(government_type) && this->get_dynasty() != nullptr) {
+		this->set_dynasty(nullptr);
+	}
 }
 
 void CPlayer::set_dynasty(const wyrmgus::dynasty *dynasty)
@@ -1644,16 +1648,14 @@ void CPlayer::set_dynasty(const wyrmgus::dynasty *dynasty)
 
 	this->dynasty = dynasty;
 
-	if (dynasty == nullptr) {
-		return;
-	}
-	
-	if (dynasty->get_upgrade() != nullptr) {
-		if (this->Allow.Upgrades[dynasty->get_upgrade()->ID] != 'R') {
-			if (GameEstablishing) {
-				AllowUpgradeId(*this, dynasty->get_upgrade()->ID, 'R');
-			} else {
-				this->acquire_upgrade(dynasty->get_upgrade());
+	if (dynasty != nullptr) {
+		if (dynasty->get_upgrade() != nullptr) {
+			if (this->Allow.Upgrades[dynasty->get_upgrade()->ID] != 'R') {
+				if (GameEstablishing) {
+					AllowUpgradeId(*this, dynasty->get_upgrade()->ID, 'R');
+				} else {
+					this->acquire_upgrade(dynasty->get_upgrade());
+				}
 			}
 		}
 	}
@@ -2514,11 +2516,15 @@ bool CPlayer::can_choose_dynasty(const wyrmgus::dynasty *dynasty) const
 		return false;
 	}
 
-	if (!wyrmgus::check_conditions<preconditions_only>(dynasty->get_upgrade(), this, false)) {
+	if (!can_government_type_have_dynasty(this->get_government_type())) {
 		return false;
 	}
 
-	return wyrmgus::check_conditions<preconditions_only>(dynasty, this, false);
+	if (!check_conditions<preconditions_only>(dynasty->get_upgrade(), this, false)) {
+		return false;
+	}
+
+	return check_conditions<preconditions_only>(dynasty, this, false);
 }
 
 template bool CPlayer::can_choose_dynasty<false>(const wyrmgus::dynasty *dynasty) const;

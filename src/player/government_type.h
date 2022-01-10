@@ -93,6 +93,17 @@ inline std::string get_government_type_name(const government_type government_typ
 	throw std::runtime_error("Invalid government type: \"" + std::to_string(static_cast<int>(government_type)) + "\".");
 }
 
+inline bool can_government_type_have_dynasty(const government_type government_type)
+{
+	switch (government_type) {
+		case government_type::tribe:
+		case government_type::monarchy:
+			return true;
+		default:
+			return false;
+	}
+}
+
 }
 
 Q_DECLARE_METATYPE(wyrmgus::government_type)
