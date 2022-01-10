@@ -1429,6 +1429,7 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 	}
 	
 	if (this->get_faction() == nullptr) {
+		this->set_dynasty(nullptr);
 		return;
 	}
 	
@@ -1449,6 +1450,10 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 	if (!IsNetworkGame()) {
 		//only set the faction's name as the player's name if this is a single player game
 		this->update_name_from_faction();
+	}
+
+	if (this->get_dynasty() != nullptr && !vector::contains(this->get_dynasty()->get_factions(), faction)) {
+		this->set_dynasty(nullptr);
 	}
 
 	const wyrmgus::player_color *faction_color = faction->get_color();
