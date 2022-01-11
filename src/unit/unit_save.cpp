@@ -346,12 +346,13 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\n  \"units-contained\", {");
 		bool first = true;
 		for (const CUnit *uins : unit.get_units_inside()) {
-			file.printf("\"%s\"", UnitReference(uins).c_str());
 			if (first) {
 				first = false;
 			} else {
 				file.printf(", ");
 			}
+
+			file.printf("\"%s\"", UnitReference(uins).c_str());
 		}
 		file.printf("},\n  ");
 	}
