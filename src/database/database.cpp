@@ -707,10 +707,16 @@ void database::parse()
 
 		std::vector<std::future<void>> futures;
 
+		std::exception_ptr exception;
+
 		//parse the files in each data type's folder
 		for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
 			std::future<void> future = thread_pool::get()->async([&]() {
-				metadata->get_parsing_function()(path, data_module);
+				try {
+					metadata->get_parsing_function()(path, data_module);
+				} catch (...) {
+					exception = std::current_exception();
+				}
 			});
 
 			futures.push_back(std::move(future));
@@ -719,6 +725,10 @@ void database::parse()
 		//we need to wait for the futures per module, so that this remains lock-free, as each data type has its own parsed SML data list
 		for (std::future<void> &future : futures) {
 			future.wait();
+		}
+
+		if (exception != nullptr) {
+			std::rethrow_exception(exception);
 		}
 	}
 }

@@ -512,7 +512,7 @@ static void AiCheckUnits()
 				if (!AiPlayer->Player->can_choose_dynasty(dynasty)) {
 					continue;
 				}
-					
+				
 				potential_dynasties.push_back(dynasty);
 			}
 			
