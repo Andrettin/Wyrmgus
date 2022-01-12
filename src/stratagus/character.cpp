@@ -740,6 +740,10 @@ std::string character::get_encyclopedia_genealogical_text() const
 {
 	std::string text;
 
+	if (this->get_dynasty() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Dynasty: " + this->get_dynasty()->get_link_string());
+	}
+
 	const wyrmgus::character *father = this->get_father();
 	if (father != nullptr) {
 		named_data_entry::concatenate_encyclopedia_text(text, "Father: " + (father->is_deity() ? father->get_deity()->get_link_string() : father->get_link_string()));
