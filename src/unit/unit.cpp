@@ -3737,7 +3737,9 @@ void CUnit::update_epithet()
 			continue;
 		}
 
-		potential_epithets.push_back(epithet);
+		for (int i = 0; i < epithet->get_weight(); ++i) {
+			potential_epithets.push_back(epithet);
+		}
 	}
 	
 	if (!potential_epithets.empty()) {

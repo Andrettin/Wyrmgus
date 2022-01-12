@@ -37,6 +37,8 @@ class epithet final : public named_data_entry, public data_type<epithet>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(int weight MEMBER weight READ get_weight)
+
 public:
 	static constexpr const char *class_identifier = "epithet";
 	static constexpr const char *database_folder = "epithets";
@@ -47,12 +49,18 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void check() const override;
 
+	int get_weight() const
+	{
+		return this->weight;
+	}
+
 	const std::unique_ptr<condition> &get_conditions() const
 	{
 		return this->conditions;
 	}
 
 private:
+	int weight = 1;
 	std::unique_ptr<condition> conditions;
 };
 
