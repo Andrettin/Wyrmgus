@@ -36,6 +36,7 @@
 //Wyrmgus end
 #include "animation.h"
 #include "commands.h"
+#include "epithet.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -313,8 +314,8 @@ static int CclUnit(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "personal-name")) {
 			unit->Name = LuaToString(l, 2, j + 1);
-		} else if (!strcmp(value, "extra-name")) {
-			unit->ExtraName = LuaToString(l, 2, j + 1);
+		} else if (!strcmp(value, "epithet")) {
+			unit->epithet = epithet::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "surname")) {
 			unit->surname = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "site")) {

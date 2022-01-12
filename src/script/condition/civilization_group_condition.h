@@ -57,6 +57,14 @@ public:
 		return this->check(player->get_civilization());
 	}
 
+	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
+	{
+		Q_UNUSED(ctx)
+		Q_UNUSED(ignore_units)
+
+		return this->check(unit->get_civilization());
+	}
+
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)

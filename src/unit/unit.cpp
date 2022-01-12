@@ -44,6 +44,7 @@
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "economy/resource_storage_type.h"
+#include "epithet.h"
 #include "game/game.h"
 #include "gender.h"
 #include "editor.h"
@@ -441,8 +442,8 @@ void CUnit::Init()
 	pathFinderData->input.SetUnit(*this);
 
 	//Wyrmgus start
-	Name.clear();
-	ExtraName.clear();
+	this->Name.clear();
+	this->epithet = nullptr;
 	this->surname.clear();
 	Variation = 0;
 	memset(LayerVariation, -1, sizeof(LayerVariation));
@@ -1062,7 +1063,7 @@ void CUnit::apply_character_properties()
 	}
 
 	this->Name = this->get_character()->get_name();
-	this->ExtraName = this->get_character()->ExtraName;
+	this->epithet = this->get_character()->get_epithet();
 	this->surname = this->get_character()->get_surname();
 
 	if (this->get_character()->get_unit_type() != nullptr) {
@@ -3669,12 +3670,8 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	const wyrmgus::faction *faction = this->Player->get_faction();
 	
 	const wyrmgus::language *language = civilization ? civilization->get_language() : nullptr;
-	
-	if (this->Name.empty()) { //this is the first time the unit receives a name
-		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != nullptr && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
-			this->ExtraName = this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
-		}
-	}
+
+	const bool first_name_assignment = this->Name.empty();
 	
 	if (!this->Type->is_personal_name_valid(this->Name, faction, this->get_gender())) {
 		//first see if can translate the current personal name
@@ -3695,26 +3692,56 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 			}
 		}
 	}
+
+	if (first_name_assignment || this->get_epithet() != nullptr) {
+		//only update the epithet if this is the first name assignment, or if the unit already has an epithet which we should check to see if it is still valid
+		this->update_epithet();
+	}
 	
 	if (update_settlement_name && (this->Type->BoolFlag[TOWNHALL_INDEX].value || (this->Type->BoolFlag[BUILDING_INDEX].value && !this->settlement))) {
 		this->UpdateSettlement();
 	}
 }
 
-void CUnit::UpdateExtraName()
+void CUnit::update_epithet()
 {
 	if (this->get_character() != nullptr || !this->Type->BoolFlag[ORGANIC_INDEX].value || this->Type->BoolFlag[FAUNA_INDEX].value) {
 		return;
 	}
-	
+
 	if (this->Trait == nullptr) {
+		//don't assign an epithet before the unit has a trait
 		return;
 	}
+
+	const read_only_context ctx = read_only_context::from_scope(this);
 	
-	this->ExtraName.clear();
+	if (this->get_epithet() != nullptr) {
+		if (this->get_epithet()->get_conditions() != nullptr && !this->get_epithet()->get_conditions()->check(this, ctx)) {
+			this->epithet = nullptr;
+		} else {
+			//already has a valid epithet
+			return;
+		}
+	}
+
+	if (SyncRand(4) != 0) {
+		//75% chance that the unit will receive no epithet at all
+		return;
+	}
+
+	std::vector<const wyrmgus::epithet *> potential_epithets;
+
+	for (const wyrmgus::epithet *epithet : epithet::get_all()) {
+		if (this->get_epithet()->get_conditions() != nullptr && !this->get_epithet()->get_conditions()->check(this, ctx)) {
+			continue;
+		}
+
+		potential_epithets.push_back(epithet);
+	}
 	
-	if (this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
-		this->ExtraName = this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
+	if (!potential_epithets.empty()) {
+		this->epithet = vector::get_random(potential_epithets);
 	}
 }
 
@@ -6922,11 +6949,9 @@ std::string CUnit::get_full_name() const
 		return name;
 	}
 
-	if (!this->ExtraName.empty()) {
-		name += " " + this->ExtraName;
-	}
-
-	if (!this->get_surname().empty()) {
+	if (this->get_epithet() != nullptr) {
+		name += " " + this->get_epithet()->get_name();
+	} else if (!this->get_surname().empty()) {
 		name += " " + this->get_surname();
 	}
 

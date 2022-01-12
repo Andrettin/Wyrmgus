@@ -414,6 +414,7 @@ set(wyrmgus_base_SRCS
 	src/stratagus/dialogue_node.cpp
 	src/stratagus/dialogue_option.cpp
 	src/stratagus/engine_interface.cpp
+	src/stratagus/epithet.cpp
 	src/stratagus/fallback_name_generator.cpp
 	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp
@@ -1193,6 +1194,7 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/dialogue_option.h
 	src/stratagus/direction.h
 	src/stratagus/engine_interface.h
+	src/stratagus/epithet.h
 	src/stratagus/fallback_name_generator.h
 	src/stratagus/game_concept.h
 	src/stratagus/gender.h

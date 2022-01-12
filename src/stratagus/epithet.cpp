@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,51 +24,39 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "player/civilization.h"
-#include "script/condition/condition.h"
+#include "epithet.h"
+
+#include "script/condition/and_condition.h"
 
 namespace wyrmgus {
 
-class civilization_condition final : public condition
+epithet::epithet(const std::string &identifier) : named_data_entry(identifier)
 {
-public:
-	explicit civilization_condition(const std::string &value)
-	{
-		this->civilization = civilization::get(value);
+}
+
+epithet::~epithet()
+{
+}
+
+void epithet::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "conditions") {
+		this->conditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->conditions, scope);
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
+}
 
-	virtual bool check(const civilization *civilization) const override
-	{
-		return civilization == this->civilization;
+void epithet::check() const
+{
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
 	}
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
-	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
-
-		return this->check(player->get_civilization());
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
-	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
-
-		return this->check(unit->get_civilization());
-	}
-
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
-	{
-		Q_UNUSED(indent)
-
-		return condition::get_object_string(this->civilization, links_allowed) + " civilization";
-	}
-
-private:
-	const wyrmgus::civilization *civilization = nullptr;
-};
+}
 
 }

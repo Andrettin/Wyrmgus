@@ -44,6 +44,7 @@
 #include "dialogue.h"
 #include "economy/resource.h"
 #include "engine_interface.h"
+#include "epithet.h"
 #include "game/difficulty.h"
 #include "gender.h"
 #include "item/item_class.h"
@@ -298,6 +299,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(dynasty::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::ecological_niche") {
 			new_property_value = QVariant::fromValue(string_to_ecological_niche(property.get_value()));
+		} else if (property_class_name == "wyrmgus::epithet*") {
+			new_property_value = QVariant::fromValue(epithet::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::faction*") {
 			new_property_value = QVariant::fromValue(faction::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::faction_tier") {

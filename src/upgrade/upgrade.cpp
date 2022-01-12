@@ -826,16 +826,6 @@ static int CclDefineUpgrade(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				upgrade->WeaponClasses.insert(wyrmgus::string_to_item_class(LuaToString(l, -1, j + 1)));
 			}
-		} else if (!strcmp(value, "Epithets")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				std::string epithet = LuaToString(l, -1, j + 1);
-
-				upgrade->Epithets.push_back(epithet);
-			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1623,7 +1613,7 @@ void TraitAcquire(CUnit &unit, CUpgrade *upgrade)
 
 	IndividualUpgradeAcquire(unit, upgrade);
 
-	unit.UpdateExtraName();
+	unit.update_epithet();
 
 	//
 	//  Upgrades could change the buttons displayed.

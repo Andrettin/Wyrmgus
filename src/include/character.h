@@ -50,6 +50,7 @@ namespace wyrmgus {
 	class civilization;
 	class deity;
 	class dynasty;
+	class epithet;
 	class faction;
 	class historical_location;
 	class icon;
@@ -80,6 +81,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::dynasty* dynasty MEMBER dynasty)
+	Q_PROPERTY(wyrmgus::epithet* epithet MEMBER epithet)
 	Q_PROPERTY(QString surname READ get_surname_qstring)
 	Q_PROPERTY(QString full_name READ get_full_name_qstring NOTIFY changed)
 	Q_PROPERTY(wyrmgus::icon* icon READ get_icon WRITE set_base_icon NOTIFY changed)
@@ -201,6 +203,11 @@ public:
 	const wyrmgus::dynasty *get_dynasty() const
 	{
 		return this->dynasty;
+	}
+
+	const wyrmgus::epithet *get_epithet() const
+	{
+		return this->epithet;
 	}
 
 	const std::string &get_surname() const
@@ -491,9 +498,7 @@ public:
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
 private:
 	bool custom = false; //whether this character is a custom hero
-public:
-	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
-private:
+	wyrmgus::epithet *epithet = nullptr;
 	std::string surname; //the character's surname
 	std::string variation; //the identifier of the character variation
 	wyrmgus::icon *icon = nullptr;

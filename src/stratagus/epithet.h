@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,49 +26,34 @@
 
 #pragma once
 
-#include "player/civilization.h"
-#include "script/condition/condition.h"
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 
 namespace wyrmgus {
 
-class civilization_condition final : public condition
+class condition;
+
+class epithet final : public named_data_entry, public data_type<epithet>
 {
+	Q_OBJECT
+
 public:
-	explicit civilization_condition(const std::string &value)
+	static constexpr const char *class_identifier = "epithet";
+	static constexpr const char *database_folder = "epithets";
+
+	explicit epithet(const std::string &identifier);
+	virtual ~epithet() override;
+	
+	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void check() const override;
+
+	const std::unique_ptr<condition> &get_conditions() const
 	{
-		this->civilization = civilization::get(value);
-	}
-
-	virtual bool check(const civilization *civilization) const override
-	{
-		return civilization == this->civilization;
-	}
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
-	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
-
-		return this->check(player->get_civilization());
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
-	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
-
-		return this->check(unit->get_civilization());
-	}
-
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
-	{
-		Q_UNUSED(indent)
-
-		return condition::get_object_string(this->civilization, links_allowed) + " civilization";
+		return this->conditions;
 	}
 
 private:
-	const wyrmgus::civilization *civilization = nullptr;
+	std::unique_ptr<condition> conditions;
 };
 
 }

@@ -679,9 +679,6 @@ private:
 	std::set<const CUpgrade *> incompatible_affixes;
 public:
 	std::set<item_class> WeaponClasses; //if isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
-	//Wyrmgus start
-	std::vector<std::string> Epithets;	/// epithets when a character has a certain trait
-	//Wyrmgus end
 private:
 	unit_type *item = nullptr;
 public:

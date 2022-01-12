@@ -57,6 +57,7 @@ namespace wyrmgus {
 	class civilization_base;
 	class construction;
 	class construction_frame;
+	class epithet;
 	class landmass;
 	class map_template;
 	class player_color;
@@ -195,7 +196,7 @@ public:
 	void UpdateContainerAttackRange();
 	void UpdateXPRequired();
 	void UpdatePersonalName(bool update_settlement_name = true);
-	void UpdateExtraName();
+	void update_epithet();
 	void UpdateSettlement();
 	void UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settlement = nullptr); //update the settlement assignment of surrounding buildings for this town hall
 	//Wyrmgus end
@@ -739,6 +740,11 @@ public:
 	std::string GetMessageName() const;
 	//Wyrmgus end
 
+	const wyrmgus::epithet *get_epithet() const
+	{
+		return this->epithet;
+	}
+
 	const std::string &get_surname() const
 	{
 		return this->surname;
@@ -854,9 +860,9 @@ public:
 	int         Frame;      /// Image frame: <0 is mirrored
 	//Wyrmgus start
 	std::string Name;		/// Unit's personal/proper name (if any)
-	std::string ExtraName;	/// Unit's "extra" name (i.e. a nickname)
 private:
-	std::string surname;	/// Unit's surname
+	const wyrmgus::epithet *epithet = nullptr;
+	std::string surname;
 	wyrmgus::character *character = nullptr; //character represented by this unit
 public:
 	const wyrmgus::site *settlement = nullptr;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)

@@ -33,6 +33,7 @@
 #include "character_title.h"
 #include "config.h"
 #include "engine_interface.h"
+#include "epithet.h"
 #include "game/game.h"
 #include "gender.h"
 #include "iocompat.h"
@@ -802,9 +803,6 @@ void character::save() const
 	} else {
 		fprintf(fd, "DefineCustomHero(\"%s\", {\n", this->get_identifier().c_str());
 		fprintf(fd, "\tName = \"%s\",\n", this->get_name().c_str());
-		if (!this->ExtraName.empty()) {
-			fprintf(fd, "\tExtraName = \"%s\",\n", this->ExtraName.c_str());
-		}
 		if (!this->get_surname().empty()) {
 			fprintf(fd, "\tFamilyName = \"%s\",\n", this->get_surname().c_str());
 		}
@@ -1161,8 +1159,8 @@ std::string character::get_full_name() const
 {
 	std::string full_name = this->get_name();
 
-	if (!this->ExtraName.empty()) {
-		full_name += " " + this->ExtraName;
+	if (this->get_epithet() != nullptr) {
+		full_name += " " + this->get_epithet()->get_name();
 	} else if (!this->get_surname().empty()) {
 		full_name += " " + this->get_surname();
 	}

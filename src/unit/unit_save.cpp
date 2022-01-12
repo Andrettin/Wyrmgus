@@ -34,6 +34,7 @@
 #include "animation.h"
 #include "character.h"
 #include "economy/resource.h"
+#include "epithet.h"
 #include "iolib.h"
 #include "item/unique_item.h"
 #include "map/map.h"
@@ -152,8 +153,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"trait\", \"%s\", ", unit.Trait->get_identifier().c_str());
 	}
 	file.printf("\"personal-name\", \"%s\", ", unit.Name.c_str());
-	if (!unit.ExtraName.empty()) {
-		file.printf("\"extra-name\", \"%s\", ", unit.ExtraName.c_str());
+	if (unit.get_epithet() != nullptr) {
+		file.printf("\"epithet\", \"%s\", ", unit.get_epithet()->get_identifier().c_str());
 	}
 	if (!unit.get_surname().empty()) {
 		file.printf("\"surname\", \"%s\", ", unit.get_surname().c_str());

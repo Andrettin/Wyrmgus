@@ -32,6 +32,7 @@
 
 #include "ai/ai_local.h" //for using AiHelpers
 #include "character_title.h"
+#include "epithet.h"
 #include "gender.h"
 #include "grand_strategy.h"
 #include "item/persistent_item.h"
@@ -90,9 +91,9 @@ static int CclDefineCharacter(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				alternate_names.push_back(LuaToString(l, -1, j + 1));
 			}
-		} else if (!strcmp(value, "ExtraName")) {
-			character->ExtraName = LuaToString(l, -1);
-		} else if (!strcmp(value, "FamilyName")) {
+		} else if (!strcmp(value, "Epithet")) {
+			character->epithet = epithet::get(LuaToString(l, -1));
+		} else if (!strcmp(value, "FamilyName") || !strcmp(value, "Surname")) {
 			character->surname = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			character->set_description(LuaToString(l, -1));
@@ -427,7 +428,7 @@ static int CclDefineCustomHero(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			hero->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "ExtraName")) {
-			hero->ExtraName = LuaToString(l, -1);
+			//ignore, here only for backwards compatibility
 		} else if (!strcmp(value, "FamilyName")) {
 			hero->surname = LuaToString(l, -1);
 		} else if (!strcmp(value, "Dynasty")) { // for backwards compatibility
