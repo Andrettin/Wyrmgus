@@ -3733,7 +3733,7 @@ void CUnit::update_epithet()
 	std::vector<const wyrmgus::epithet *> potential_epithets;
 
 	for (const wyrmgus::epithet *epithet : epithet::get_all()) {
-		if (this->get_epithet()->get_conditions() != nullptr && !this->get_epithet()->get_conditions()->check(this, ctx)) {
+		if (epithet->get_conditions() != nullptr && !epithet->get_conditions()->check(this, ctx)) {
 			continue;
 		}
 
