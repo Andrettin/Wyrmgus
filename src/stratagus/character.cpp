@@ -689,6 +689,10 @@ std::string character::get_encyclopedia_text() const
 
 	named_data_entry::concatenate_encyclopedia_text(text, "Level: " + std::to_string(this->get_level()));
 
+	if (this->get_trait() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Trait: " + this->get_trait()->get_name());
+	}
+
 	std::vector<const CUpgrade *> abilities = this->get_abilities();
 	vector::merge(abilities, this->get_bonus_abilities());
 
