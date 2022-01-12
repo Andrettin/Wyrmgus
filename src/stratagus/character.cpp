@@ -45,6 +45,7 @@
 #include "map/site.h"
 #include "parameters.h"
 #include "player/civilization.h"
+#include "player/dynasty.h"
 #include "player/faction.h"
 #include "player/player.h"
 #include "province.h"
@@ -485,6 +486,10 @@ void character::initialize()
 		if (this->get_quote().empty()) {
 			this->set_quote(this->get_deity()->get_quote());
 		}
+	}
+
+	if (this->get_dynasty() != nullptr && this->get_surname().empty()) {
+		this->set_surname(this->get_dynasty()->get_name());
 	}
 
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
