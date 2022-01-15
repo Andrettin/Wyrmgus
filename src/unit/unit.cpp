@@ -3666,10 +3666,10 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		return;
 	}
 	
-	const wyrmgus::civilization *civilization = this->get_civilization();
-	const wyrmgus::faction *faction = this->Player->get_faction();
+	const civilization *civilization = this->get_civilization();
+	const faction *faction = this->Player->get_faction();
 	
-	const wyrmgus::language *language = civilization ? civilization->get_language() : nullptr;
+	const language *language = civilization ? civilization->get_language() : nullptr;
 
 	const bool first_name_assignment = this->Name.empty();
 	
@@ -3685,7 +3685,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 
 	if constexpr (surname_generation_enabled) {
 		if (civilization != nullptr && this->Type->BoolFlag[ORGANIC_INDEX].value) {
-			const wyrmgus::name_generator *surname_generator = civilization->get_surname_generator();
+			const name_generator *surname_generator = civilization->get_surname_generator(this->get_gender());
 
 			if (surname_generator != nullptr && (this->get_surname().empty() || !surname_generator->is_name_valid(this->get_surname()))) {
 				this->surname = surname_generator->generate_name();

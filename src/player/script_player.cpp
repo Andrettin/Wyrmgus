@@ -896,11 +896,6 @@ static int CclDefineCivilization(lua_State *l)
 				
 				civilization->add_unit_class_name(unit_class, LuaToString(l, -1, j + 1));
 			}
-		} else if (!strcmp(value, "FamilyNames")) {
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				civilization->add_surname(LuaToString(l, -1, j + 1));
-			}
 		} else if (!strcmp(value, "ProvinceNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {

@@ -80,13 +80,22 @@ void fallback_name_generator::add_personal_names(const std::unique_ptr<gendered_
 	this->personal_name_generator->add_names_from(source_name_generator);
 }
 
-void fallback_name_generator::add_surnames(const std::vector<name_variant> &surnames)
+const name_generator *fallback_name_generator::get_surname_generator(const gender gender) const
 {
-	if (this->surname_generator == nullptr) {
-		this->surname_generator = std::make_unique<name_generator>();
+	if (this->surname_generator != nullptr) {
+		return this->surname_generator->get_name_generator(gender);
 	}
 
-	this->surname_generator->add_names(surnames);
+	return nullptr;
+}
+
+void fallback_name_generator::add_surnames(const std::unique_ptr<gendered_name_generator> &source_name_generator)
+{
+	if (this->surname_generator == nullptr) {
+		this->surname_generator = std::make_unique<gendered_name_generator>();
+	}
+
+	this->surname_generator->add_names_from(source_name_generator);
 }
 
 const name_generator *fallback_name_generator::get_unit_class_name_generator(const unit_class *unit_class) const

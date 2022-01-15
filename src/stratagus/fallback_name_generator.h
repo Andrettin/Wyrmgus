@@ -48,12 +48,8 @@ public:
 	const name_generator *get_personal_name_generator(const gender gender) const;
 	void add_personal_names(const std::unique_ptr<gendered_name_generator> &source_name_generator);
 
-	const name_generator *get_surname_generator() const
-	{
-		return this->surname_generator.get();
-	}
-
-	void add_surnames(const std::vector<name_variant> &surnames);
+	const name_generator *get_surname_generator(const gender gender) const;
+	void add_surnames(const std::unique_ptr<gendered_name_generator> &source_name_generator);
 
 	const name_generator *get_unit_class_name_generator(const unit_class *unit_class) const;
 	void add_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_names);
@@ -62,9 +58,9 @@ public:
 
 private:
 	//name generation lists containing all names (i.e. from each civilization, species and etc.)
-	std::unique_ptr<name_generator> surname_generator;
 	std::unique_ptr<gendered_name_generator> specimen_name_generator;
 	std::unique_ptr<gendered_name_generator> personal_name_generator;
+	std::unique_ptr<gendered_name_generator> surname_generator;
 	unit_class_map<std::unique_ptr<name_generator>> unit_class_name_generators;
 	std::unique_ptr<name_generator> ship_name_generator;
 };

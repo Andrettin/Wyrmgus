@@ -513,7 +513,7 @@ void character::initialize()
 				this->civilization->add_personal_name(this->get_gender(), this->get_name_variant());
 			}
 			if (!this->get_surname().empty()) {
-				this->civilization->add_surname(this->get_surname());
+				this->civilization->add_surname(this->get_gender(), this->get_surname());
 			}
 		}
 	}
