@@ -70,6 +70,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_domain.h"
 #include "unit/unit_type_variation.h"
+#include "unit/variation_tag.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/assert_util.h"
@@ -2405,29 +2406,34 @@ bool unit_type::can_produce_a_resource() const
 	return this->get_given_resource() != nullptr || !AiHelpers.get_produced_resources(this).empty();
 }
 
-std::vector<unit_type_variation *> unit_type::get_custom_hero_variations() const
+std::vector<variation_tag *> unit_type::get_custom_hero_hair_color_tags() const
 {
-	std::vector<unit_type_variation *> variations;
+	std::vector<variation_tag *> hair_color_tags;
 
 	for (const auto &variation : this->get_variations()) {
-		if (variation->get_name().empty()) {
-			//only show as available variations which have a display name
-			continue;
-		}
+		for (const variation_tag *tag : variation->get_tags()) {
+			if (!tag->is_hair_color()) {
+				continue;
+			}
 
-		variations.push_back(variation.get());
+			if (vector::contains(hair_color_tags, tag)) {
+				continue;
+			}
+
+			hair_color_tags.push_back(const_cast<variation_tag *>(tag));
+		}
 	}
 
-	std::sort(variations.begin(), variations.end(), [](const unit_type_variation *lhs, const unit_type_variation *rhs) {
+	std::sort(hair_color_tags.begin(), hair_color_tags.end(), [](const variation_tag *lhs, const variation_tag *rhs) {
 		return lhs->get_name() < rhs->get_name();
 	});
 
-	return variations;
+	return hair_color_tags;
 }
 
-QVariantList unit_type::get_custom_hero_variations_qvariant_list() const
+QVariantList unit_type::get_custom_hero_hair_color_tags_qvariant_list() const
 {
-	return container::to_qvariant_list(this->get_custom_hero_variations());
+	return container::to_qvariant_list(this->get_custom_hero_hair_color_tags());
 }
 
 const std::filesystem::path &unit_type::get_encyclopedia_background_file() const
