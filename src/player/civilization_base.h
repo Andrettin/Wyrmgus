@@ -38,6 +38,7 @@ class civilization_group;
 class civilization_history;
 class cursor;
 class faction;
+class gendered_name_generator;
 class name_generator;
 class player_color;
 class resource;
@@ -199,8 +200,8 @@ private:
 	std::map<cursor_type, cursor *> cursors;
 	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
-	std::map<gender, std::unique_ptr<name_generator>> personal_name_generators; //personal name generators for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 	std::unique_ptr<name_generator> surname_generator;
+	std::unique_ptr<gendered_name_generator> personal_name_generator; //personal name generators for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 	unit_class_map<std::unique_ptr<name_generator>> unit_class_name_generators; //unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 	std::unique_ptr<name_generator> ship_name_generator;
 	std::unique_ptr<civilization_history> history;

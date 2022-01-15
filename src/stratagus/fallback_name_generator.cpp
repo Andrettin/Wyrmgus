@@ -29,6 +29,7 @@
 #include "fallback_name_generator.h"
 
 #include "gender.h"
+#include "gendered_name_generator.h"
 #include "name_generator.h"
 #include "unit/unit_class.h"
 #include "util/vector_util.h"
@@ -45,48 +46,38 @@ fallback_name_generator::~fallback_name_generator()
 
 const name_generator *fallback_name_generator::get_specimen_name_generator(const gender gender) const
 {
-	const auto find_iterator = this->specimen_name_generators.find(gender);
-	if (find_iterator != this->specimen_name_generators.end()) {
-		return find_iterator->second.get();
+	if (this->specimen_name_generator != nullptr) {
+		return this->specimen_name_generator->get_name_generator(gender);
 	}
 
 	return nullptr;
 }
 
-void fallback_name_generator::add_specimen_names(const std::map<gender, std::unique_ptr<name_generator>> &specimen_names)
+void fallback_name_generator::add_specimen_names(const std::unique_ptr<gendered_name_generator> &source_name_generator)
 {
-	for (const auto &kv_pair : specimen_names) {
-		if (this->specimen_name_generators.find(kv_pair.first) == this->specimen_name_generators.end()) {
-			this->specimen_name_generators[kv_pair.first] = std::make_unique<name_generator>();
-		}
-
-		this->specimen_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
+	if (this->specimen_name_generator == nullptr) {
+		this->specimen_name_generator = std::make_unique<gendered_name_generator>();
 	}
 
-	name_generator::propagate_ungendered_names(specimen_names, this->specimen_name_generators);
+	this->specimen_name_generator->add_names_from(source_name_generator);
 }
 
 const name_generator *fallback_name_generator::get_personal_name_generator(const gender gender) const
 {
-	const auto find_iterator = this->personal_name_generators.find(gender);
-	if (find_iterator != this->personal_name_generators.end()) {
-		return find_iterator->second.get();
+	if (this->personal_name_generator != nullptr) {
+		return this->personal_name_generator->get_name_generator(gender);
 	}
 
 	return nullptr;
 }
 
-void fallback_name_generator::add_personal_names(const std::map<gender, std::unique_ptr<name_generator>> &personal_names)
+void fallback_name_generator::add_personal_names(const std::unique_ptr<gendered_name_generator> &source_name_generator)
 {
-	for (const auto &kv_pair : personal_names) {
-		if (this->personal_name_generators.find(kv_pair.first) == this->personal_name_generators.end()) {
-			this->personal_name_generators[kv_pair.first] = std::make_unique<name_generator>();
-		}
-
-		this->personal_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
+	if (this->personal_name_generator == nullptr) {
+		this->personal_name_generator = std::make_unique<gendered_name_generator>();
 	}
 
-	name_generator::propagate_ungendered_names(personal_names, this->personal_name_generators);
+	this->personal_name_generator->add_names_from(source_name_generator);
 }
 
 void fallback_name_generator::add_surnames(const std::vector<name_variant> &surnames)

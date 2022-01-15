@@ -35,22 +35,6 @@
 
 namespace wyrmgus {
 
-void name_generator::propagate_ungendered_names(const std::map<gender, std::unique_ptr<name_generator>> &source_name_map, std::map<gender, std::unique_ptr<name_generator>> &target_name_map)
-{
-	const auto find_iterator = source_name_map.find(gender::none);
-	if (find_iterator != source_name_map.end()) {
-		if (target_name_map.find(gender::male) == target_name_map.end()) {
-			target_name_map[gender::male] = std::make_unique<name_generator>();
-		}
-		target_name_map[gender::male]->add_names(find_iterator->second->get_names());
-
-		if (target_name_map.find(gender::female) == target_name_map.end()) {
-			target_name_map[gender::female] = std::make_unique<name_generator>();
-		}
-		target_name_map[gender::female]->add_names(find_iterator->second->get_names());
-	}
-}
-
 void name_generator::propagate_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_name_generators, std::unique_ptr<name_generator> &ship_name_generator)
 {
 	for (const auto &kv_pair : unit_class_name_generators) {

@@ -40,6 +40,7 @@ static int CclDefineSpeciesPhylum(lua_State *l);
 
 namespace wyrmgus {
 
+class gendered_name_generator;
 class name_generator;
 class taxon;
 enum class gender;
@@ -80,7 +81,7 @@ public:
 private:
 	taxon *supertaxon = nullptr;
 	bool ethereal = false;
-	std::map<gender, std::unique_ptr<name_generator>> specimen_name_generators; //specimen names, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
+	std::unique_ptr<gendered_name_generator> specimen_name_generator; //specimen names, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 
 	friend int ::CclDefineSpecies(lua_State *l);
 	friend int ::CclDefineSpeciesGenus(lua_State *l);

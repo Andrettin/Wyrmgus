@@ -38,13 +38,6 @@ class name_generator final
 public:
 	static constexpr size_t minimum_name_count = 10;
 
-	static void propagate_ungendered_names(const std::map<gender, std::unique_ptr<name_generator>> &source_name_map, std::map<gender, std::unique_ptr<name_generator>> &target_name_map);
-
-	static void propagate_ungendered_names(std::map<gender, std::unique_ptr<name_generator>> &name_map)
-	{
-		name_generator::propagate_ungendered_names(name_map, name_map);
-	}
-
 	static void propagate_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_name_generators, std::unique_ptr<name_generator> &ship_name_generator);
 
 	const std::vector<name_variant> &get_names() const

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,46 +27,47 @@
 #pragma once
 
 #include "language/name_variant.h"
-#include "unit/unit_class_container.h"
-#include "util/singleton.h"
 
 namespace wyrmgus {
 
-class gendered_name_generator;
 class name_generator;
 enum class gender;
 
-class fallback_name_generator final : public singleton<fallback_name_generator>
+class gendered_name_generator final
 {
 public:
-	fallback_name_generator();
-	~fallback_name_generator();
+	gendered_name_generator();
+	~gendered_name_generator();
 
-	const name_generator *get_specimen_name_generator(const gender gender) const;
-	void add_specimen_names(const std::unique_ptr<gendered_name_generator> &source_name_generator);
-
-	const name_generator *get_personal_name_generator(const gender gender) const;
-	void add_personal_names(const std::unique_ptr<gendered_name_generator> &source_name_generator);
-
-	const name_generator *get_surname_generator() const
+	const name_generator *get_name_generator(const gender gender) const
 	{
-		return this->surname_generator.get();
+		const auto find_iterator = this->name_generators.find(gender);
+		if (find_iterator != this->name_generators.end()) {
+			return find_iterator->second.get();
+		}
+
+		return nullptr;
 	}
 
-	void add_surnames(const std::vector<name_variant> &surnames);
+	void add_name(const gender gender, const name_variant &name);
+	void add_names(const gender gender, const std::vector<name_variant> &names);
+	void add_names(const gender gender, const std::vector<std::string> &names);
+	void add_names_from(const std::unique_ptr<gendered_name_generator> &source_name_generator);
 
-	const name_generator *get_unit_class_name_generator(const unit_class *unit_class) const;
-	void add_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_names);
+	void propagate_ungendered_names_from(const gendered_name_generator *source_name_generator);
 
-	void add_ship_names(const std::vector<name_variant> &ship_names);
+	void propagate_ungendered_names_from(const std::unique_ptr<gendered_name_generator> &source_name_generator)
+	{
+		this->propagate_ungendered_names_from(source_name_generator.get());
+	}
+
+	void propagate_ungendered_names()
+	{
+		this->propagate_ungendered_names_from(this);
+	}
 
 private:
-	//name generation lists containing all names (i.e. from each civilization, species and etc.)
-	std::unique_ptr<name_generator> surname_generator;
-	std::unique_ptr<gendered_name_generator> specimen_name_generator;
-	std::unique_ptr<gendered_name_generator> personal_name_generator;
-	unit_class_map<std::unique_ptr<name_generator>> unit_class_name_generators;
-	std::unique_ptr<name_generator> ship_name_generator;
+	std::map<gender, std::unique_ptr<name_generator>> name_generators;
 };
 
 }

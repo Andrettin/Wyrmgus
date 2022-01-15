@@ -32,6 +32,7 @@
 #include "database/sml_operator.h"
 #include "fallback_name_generator.h"
 #include "gender.h"
+#include "gendered_name_generator.h"
 #include "name_generator.h"
 #include "player/civilization_group.h"
 #include "player/civilization_history.h"
@@ -73,24 +74,20 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 			this->not_enough_resource_sounds[resource] = sound;
 		});
 	} else if (tag == "personal_names") {
-		if (!values.empty()) {
-			if (this->personal_name_generators.find(gender::none) == this->personal_name_generators.end()) {
-				this->personal_name_generators[gender::none] = std::make_unique<name_generator>();
-			}
+		if (this->personal_name_generator == nullptr) {
+			this->personal_name_generator = std::make_unique<gendered_name_generator>();
+		}
 
-			this->personal_name_generators[gender::none]->add_names(values);
+		if (!values.empty()) {
+			this->personal_name_generator->add_names(gender::none, values);
 		}
 
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
-			const wyrmgus::gender gender = string_to_gender(tag);
+			const gender gender = string_to_gender(tag);
 
-			if (this->personal_name_generators.find(gender) == this->personal_name_generators.end()) {
-				this->personal_name_generators[gender] = std::make_unique<name_generator>();
-			}
-
-			this->personal_name_generators[gender]->add_names(child_scope.get_values());
+			this->personal_name_generator->add_names(gender, child_scope.get_values());
 		});
 	} else if (tag == "surnames") {
 		if (this->surname_generator == nullptr) {
@@ -139,17 +136,21 @@ void civilization_base::initialize()
 		this->group->add_names_from(this);
 	}
 
-	fallback_name_generator::get()->add_personal_names(this->personal_name_generators);
+	if (this->personal_name_generator != nullptr) {
+		fallback_name_generator::get()->add_personal_names(this->personal_name_generator);
+		this->personal_name_generator->propagate_ungendered_names();
+	}
+
 	if (this->surname_generator != nullptr) {
 		fallback_name_generator::get()->add_surnames(this->surname_generator->get_names());
 	}
+
 	fallback_name_generator::get()->add_unit_class_names(this->unit_class_name_generators);
+	name_generator::propagate_unit_class_names(this->unit_class_name_generators, this->ship_name_generator);
+
 	if (this->ship_name_generator != nullptr) {
 		fallback_name_generator::get()->add_ship_names(this->ship_name_generator->get_names());
 	}
-
-	name_generator::propagate_ungendered_names(this->personal_name_generators);
-	name_generator::propagate_unit_class_names(this->unit_class_name_generators, this->ship_name_generator);
 
 	data_entry::initialize();
 }
@@ -317,11 +318,16 @@ CUpgrade *civilization_base::get_class_upgrade(const upgrade_class *upgrade_clas
 
 const name_generator *civilization_base::get_personal_name_generator(const gender gender) const
 {
-	const auto find_iterator = this->personal_name_generators.find(gender);
-	if (find_iterator != this->personal_name_generators.end()) {
-		const size_t name_count = find_iterator->second->get_name_count();
+	const name_generator *name_generator = nullptr;
+
+	if (this->personal_name_generator != nullptr) {
+		name_generator = this->personal_name_generator->get_name_generator(gender);
+	}
+
+	if (name_generator != nullptr) {
+		const size_t name_count = name_generator->get_name_count();
 		if (name_count >= name_generator::minimum_name_count) {
-			return find_iterator->second.get();
+			return name_generator;
 		}
 	}
 
@@ -329,31 +335,20 @@ const name_generator *civilization_base::get_personal_name_generator(const gende
 		return this->get_group()->get_personal_name_generator(gender);
 	}
 
-	if (find_iterator != this->personal_name_generators.end()) {
-		return find_iterator->second.get();
-	}
-
-	return nullptr;
+	return name_generator;
 }
 
 void civilization_base::add_personal_name(const gender gender, const name_variant &name)
 {
-	if (this->personal_name_generators.find(gender) == this->personal_name_generators.end()) {
-		this->personal_name_generators[gender] = std::make_unique<name_generator>();
+	if (this->personal_name_generator == nullptr) {
+		this->personal_name_generator = std::make_unique<gendered_name_generator>();
 	}
 
-	this->personal_name_generators[gender]->add_name(name);
+	this->personal_name_generator->add_name(gender, name);
 
 	if (gender == gender::none) {
-		if (this->personal_name_generators.find(gender::male) == this->personal_name_generators.end()) {
-			this->personal_name_generators[gender::male] = std::make_unique<name_generator>();
-		}
-		this->personal_name_generators[gender::male]->add_name(name);
-
-		if (this->personal_name_generators.find(gender::female) == this->personal_name_generators.end()) {
-			this->personal_name_generators[gender::female] = std::make_unique<name_generator>();
-		}
-		this->personal_name_generators[gender::female]->add_name(name);
+		this->personal_name_generator->add_name(gender::male, name);
+		this->personal_name_generator->add_name(gender::female, name);
 	}
 
 	if (this->group != nullptr) {
@@ -433,15 +428,13 @@ void civilization_base::add_ship_name(const name_variant &ship_name)
 
 void civilization_base::add_names_from(const civilization_base *other)
 {
-	for (const auto &kv_pair : other->personal_name_generators) {
-		if (this->personal_name_generators.find(kv_pair.first) == this->personal_name_generators.end()) {
-			this->personal_name_generators[kv_pair.first] = std::make_unique<name_generator>();
+	if (other->personal_name_generator != nullptr) {
+		if (this->personal_name_generator == nullptr) {
+			this->personal_name_generator = std::make_unique<gendered_name_generator>();
 		}
 
-		this->personal_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
+		this->personal_name_generator->add_names_from(other->personal_name_generator);
 	}
-
-	name_generator::propagate_ungendered_names(other->personal_name_generators, this->personal_name_generators);
 
 	if (other->surname_generator != nullptr) {
 		if (this->surname_generator == nullptr) {
