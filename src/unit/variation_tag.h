@@ -35,6 +35,8 @@ class variation_tag final : public named_data_entry, public data_type<variation_
 {
 	Q_OBJECT
 
+	Q_PROPERTY(bool hair_color MEMBER hair_color READ is_hair_color)
+
 public:
 	static constexpr const char *class_identifier = "variation_tag";
 	static constexpr const char *database_folder = "variation_tags";
@@ -42,6 +44,14 @@ public:
 	explicit variation_tag(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
+
+	bool is_hair_color() const
+	{
+		return this->hair_color;
+	}
+
+private:
+	bool hair_color = false; //whether this is a hair color variation tag
 };
 
 }
