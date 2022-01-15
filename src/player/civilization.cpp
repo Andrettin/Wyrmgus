@@ -838,6 +838,28 @@ QString civilization::generate_female_personal_name() const
 	return "";
 }
 
+QString civilization::generate_male_surname() const
+{
+	const name_generator *name_generator = this->get_surname_generator(gender::male);
+
+	if (name_generator != nullptr) {
+		return QString::fromStdString(name_generator->generate_name());
+	}
+
+	return "";
+}
+
+QString civilization::generate_female_surname() const
+{
+	const name_generator *name_generator = this->get_surname_generator(gender::female);
+
+	if (name_generator != nullptr) {
+		return QString::fromStdString(name_generator->generate_name());
+	}
+
+	return "";
+}
+
 QVariantList civilization::get_custom_hero_unit_types() const
 {
 	std::vector<unit_type *> unit_types;

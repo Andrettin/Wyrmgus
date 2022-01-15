@@ -247,6 +247,8 @@ public:
 	Q_INVOKABLE QVariantList get_tech_tree_entries() const;
 	Q_INVOKABLE QString generate_male_personal_name() const;
 	Q_INVOKABLE QString generate_female_personal_name() const;
+	Q_INVOKABLE QString generate_male_surname() const;
+	Q_INVOKABLE QString generate_female_surname() const;
 	Q_INVOKABLE QVariantList get_custom_hero_unit_types() const;
 
 signals:
