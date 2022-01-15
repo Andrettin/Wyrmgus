@@ -38,6 +38,7 @@
 #include "ui/button.h"
 #include "ui/button_cmd.h"
 #include "unit/construction.h"
+#include "unit/variation_tag.h"
 #include "util/util.h"
 #include "video/video.h"
 
@@ -87,6 +88,7 @@ void unit_type_variation::process_sml_property(const sml_property &property)
 void unit_type_variation::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "frame_size") {
 		this->frame_size = scope.to_size();
@@ -110,6 +112,10 @@ void unit_type_variation::process_sml_scope(const sml_data &scope)
 		database::process_sml_data(conditions, scope);
 		this->unit_conditions = std::move(conditions);
 		this->unit_conditions_ptr = this->unit_conditions.get();
+	} else if (tag == "tags") {
+		for (const std::string &value : values) {
+			this->tags.insert(variation_tag::get(value));
+		}
 	} else {
 		throw std::runtime_error("Invalid unit type variation scope: \"" + tag + "\".");
 	}

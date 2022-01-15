@@ -49,6 +49,7 @@
 #include "spell/spell.h"
 #include "time/timeline.h"
 #include "unit/unit_type.h"
+#include "unit/variation_tag.h"
 #include "upgrade/upgrade.h"
 #include "util/log_util.h"
 #include "util/string_util.h"
@@ -101,10 +102,8 @@ static int CclDefineCharacter(lua_State *l)
 			character->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
 			character->set_quote(LuaToString(l, -1));
-		} else if (!strcmp(value, "Variation")) {
-			character->variation = LuaToString(l, -1);
-		} else if (!strcmp(value, "HairVariation")) {
-			character->variation = LuaToString(l, -1);
+		} else if (!strcmp(value, "Variation") || !strcmp(value, "HairVariation")) {
+			character->variation_tags.insert(variation_tag::get(LuaToString(l, -1)));
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
@@ -435,10 +434,15 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->surname = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			hero->set_description(LuaToString(l, -1));
-		} else if (!strcmp(value, "Variation")) {
-			hero->variation = LuaToString(l, -1);
-		} else if (!strcmp(value, "HairVariation")) {
-			hero->variation = LuaToString(l, -1);
+		} else if (!strcmp(value, "Variation") || !strcmp(value, "HairVariation")) {
+			const std::string variation_tag_identifier = LuaToString(l, -1);
+			const variation_tag *variation_tag = variation_tag::try_get(variation_tag_identifier);
+
+			if (variation_tag != nullptr) {
+				hero->variation_tags.insert(variation_tag);
+			} else {
+				log::log_error("Variation tag \"" + variation_tag_identifier + "\" does not exist.");
+			}
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
@@ -769,9 +773,6 @@ static int CclGetCharacterData(lua_State *l)
 		} else {
 			lua_pushstring(l, "");
 		}
-		return 1;
-	} else if (!strcmp(data, "HairVariation")) {
-		lua_pushstring(l, character->get_variation().c_str());
 		return 1;
 	} else if (!strcmp(data, "IsUsable")) {
 		lua_pushboolean(l, character->IsUsable());

@@ -61,6 +61,7 @@ namespace wyrmgus {
 	class site;
 	class unit_sound_set;
 	class unit_type;
+	class variation_tag;
 	enum class character_title;
 	enum class gender;
 }
@@ -95,7 +96,6 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(wyrmgus::site* home_settlement MEMBER home_settlement)
 	Q_PROPERTY(int start_year MEMBER start_year READ get_start_year)
 	Q_PROPERTY(int end_year MEMBER end_year READ get_end_year)
-	Q_PROPERTY(QString variation READ get_variation_qstring)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 	Q_PROPERTY(CUpgrade* trait MEMBER trait READ get_trait)
 	Q_PROPERTY(int base_level MEMBER base_level READ get_base_level)
@@ -145,7 +145,7 @@ public:
 		return nullptr;
 	}
 
-	static void create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, CUpgrade *trait, const std::string &variation_identifier);
+	static void create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, CUpgrade *trait, const std::string &variation_tag_identifier);
 	static void remove_custom_hero(character *custom_hero);
 
 	static bool is_name_valid_for_custom_hero(const std::string &name);
@@ -321,16 +321,9 @@ public:
 		return QString::fromStdString(this->get_full_name());
 	}
 
-	const std::string &get_variation() const
+	const std::set<const variation_tag *> &get_variation_tags() const
 	{
-		return this->variation;
-	}
-
-	Q_INVOKABLE void set_variation(const std::string &variation);
-
-	QString get_variation_qstring() const
-	{
-		return QString::fromStdString(this->get_variation());
+		return this->variation_tags;
 	}
 
 	wyrmgus::icon *get_base_icon() const
@@ -500,7 +493,7 @@ private:
 	bool custom = false; //whether this character is a custom hero
 	wyrmgus::epithet *epithet = nullptr;
 	std::string surname; //the character's surname
-	std::string variation; //the identifier of the character variation
+	std::set<const variation_tag *> variation_tags;
 	wyrmgus::icon *icon = nullptr;
 	wyrmgus::icon *heroic_icon = nullptr; //the character's heroic icon (level 3 and upper)
 	wyrmgus::unit_type *unit_type = nullptr;

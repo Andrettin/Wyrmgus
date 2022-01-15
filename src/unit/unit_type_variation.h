@@ -44,6 +44,7 @@ class construction;
 class season;
 class terrain_type;
 class unit_type;
+class variation_tag;
 enum class item_class;
 
 class unit_type_variation final : public QObject
@@ -176,6 +177,29 @@ public:
 		return this->unit_conditions_ptr;
 	}
 
+	const std::set<const variation_tag *> &get_tags() const
+	{
+		return this->tags;
+	}
+
+	bool has_tag(const variation_tag *tag) const
+	{
+		return this->tags.contains(tag);
+	}
+
+	size_t get_shared_tag_count(const std::set<const variation_tag *> &other_tags) const
+	{
+		size_t shared_tag_count = 0;
+
+		for (const variation_tag *tag : other_tags) {
+			if (this->has_tag(tag)) {
+				++shared_tag_count;
+			}
+		}
+
+		return shared_tag_count;
+	}
+
 signals:
 	void changed();
 
@@ -231,6 +255,7 @@ private:
 	const and_condition *player_conditions_ptr = nullptr;
 	std::unique_ptr<const and_condition> unit_conditions;
 	const and_condition *unit_conditions_ptr = nullptr;
+	std::set<const variation_tag *> tags;
 
 	friend int ::CclDefineUnitType(lua_State *l);
 	friend class unit_type;

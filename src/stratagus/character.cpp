@@ -60,6 +60,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type_variation.h"
+#include "unit/variation_tag.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/assert_util.h"
@@ -121,7 +122,7 @@ std::vector<character *> character::get_all_with_custom()
 	return characters;
 }
 
-void character::create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, CUpgrade *trait, const std::string &variation_identifier)
+void character::create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, CUpgrade *trait, const std::string &variation_tag_identifier)
 {
 	std::string identifier = "custom_" + string::lowered(name);
 	if (!surname.empty()) {
@@ -151,7 +152,10 @@ void character::create_custom_hero(const std::string &name, const std::string &s
 	hero->level = hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
 
 	hero->trait = trait;
-	hero->variation = variation_identifier;
+
+	if (!variation_tag_identifier.empty()) {
+		hero->variation_tags.insert(variation_tag::get(variation_tag_identifier));
+	}
 
 	if (hero->get_gender() == gender::none) {
 		//if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
@@ -219,7 +223,11 @@ void character::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "conditions") {
+	if (tag == "variation_tags") {
+		for (const std::string &value : values) {
+			this->variation_tags.insert(variation_tag::get(value));
+		}
+	} else if (tag == "conditions") {
 		auto conditions = std::make_unique<and_condition>();
 		database::process_sml_data(conditions, scope);
 		this->conditions = std::move(conditions);
@@ -308,8 +316,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 
 			this->default_faction = faction::get(value);
 		} else if (key == "hair_variation") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->variation = value;
+			this->variation_tags.insert(variation_tag::get(value));
 		} else if (key == "trait") {
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
@@ -823,8 +830,8 @@ void character::save() const
 		if (this->get_trait() != nullptr) {
 			fprintf(fd, "\tTrait = \"%s\",\n", this->get_trait()->get_identifier().c_str());
 		}
-		if (!this->get_variation().empty()) {
-			fprintf(fd, "\tVariation = \"%s\",\n", this->get_variation().c_str());
+		if (!this->get_variation_tags().empty()) {
+			fprintf(fd, "\tVariation = \"%s\",\n", (*this->get_variation_tags().begin())->get_identifier().c_str());
 		}
 	}
 	if (this->get_level() != 0) {
@@ -1168,11 +1175,6 @@ std::string character::get_full_name() const
 	return full_name;
 }
 
-void character::set_variation(const std::string &variation)
-{
-	this->variation = FindAndReplaceString(variation, "_", "-");
-}
-
 icon *character::get_icon() const
 {
 	if (this->get_level() >= 3 && this->heroic_icon != nullptr) {
@@ -1182,11 +1184,14 @@ icon *character::get_icon() const
 	}
 	
 	if (this->get_unit_type() != nullptr) {
-		if (!this->get_variation().empty() && this->get_unit_type()->GetVariation(this->get_variation()) != nullptr && !this->get_unit_type()->GetVariation(this->get_variation())->Icon.Name.empty()) {
-			return this->get_unit_type()->GetVariation(this->get_variation())->Icon.Icon;
-		} else {
-			return this->get_unit_type()->get_icon();
+		if (!this->get_variation_tags().empty()) {
+			const unit_type_variation *variation = this->get_unit_type()->get_variation(this->get_variation_tags());
+			if (variation != nullptr && !variation->Icon.Name.empty()) {
+				return variation->Icon.Icon;
+			}
 		}
+
+		return this->get_unit_type()->get_icon();
 	}
 
 	return nullptr;

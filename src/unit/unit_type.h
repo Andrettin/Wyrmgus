@@ -78,6 +78,7 @@ namespace wyrmgus {
 	class unit_sound_set;
 	class unit_type;
 	class unit_type_variation;
+	class variation_tag;
 	class world;
 	enum class can_target_flag;
 	enum class gender;
@@ -1052,7 +1053,7 @@ public:
 	int GetAvailableLevelUpUpgrades() const;
 	int get_resource_step(const resource *resource, const int player) const;
 	const unit_type_variation *GetDefaultVariation(const CPlayer *player, const int image_layer = -1) const;
-	unit_type_variation *GetVariation(const std::string &variation_name, int image_layer = -1) const;
+	const unit_type_variation *get_variation(const std::set<const variation_tag *> &variation_tags, const int image_layer = -1) const;
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	const std::string &GetDefaultName(const CPlayer *player) const;
 	const std::shared_ptr<CPlayerColorGraphic> &GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;

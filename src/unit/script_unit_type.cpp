@@ -74,6 +74,7 @@
 #include "unit/unit_domain.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type_variation.h"
+#include "unit/variation_tag.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
@@ -802,6 +803,10 @@ static int CclDefineUnitType(lua_State *l)
 						variation->ResourceMax = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "weight")) {
 						variation->Weight = LuaToNumber(l, -1, k + 1);
+					} else if (!strcmp(value, "tag")) {
+						const std::string tag_identifier = LuaToString(l, -1, k + 1);
+						const variation_tag *tag = variation_tag::get(tag_identifier);
+						variation->tags.insert(tag);
 					} else {
 						printf("\n%s\n", type->get_name().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);

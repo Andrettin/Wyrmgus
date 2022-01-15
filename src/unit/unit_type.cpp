@@ -2237,15 +2237,27 @@ const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player,
 	return nullptr;
 }
 
-unit_type_variation *unit_type::GetVariation(const std::string &variation_name, int image_layer) const
+const unit_type_variation *unit_type::get_variation(const std::set<const variation_tag *> &variation_tags, const int image_layer) const
 {
+	if (variation_tags.empty()) {
+		return nullptr;
+	}
+
 	const std::vector<qunique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
+
+	const unit_type_variation *chosen_variation = nullptr;
+	size_t best_shared_tag_count = 0;
+
 	for (const auto &variation : variation_list) {
-		if (variation->get_identifier() == variation_name) {
-			return variation.get();
+		const size_t shared_tag_count = variation->get_shared_tag_count(variation_tags);
+
+		if (shared_tag_count > best_shared_tag_count) {
+			chosen_variation = variation.get();
+			best_shared_tag_count = shared_tag_count;
 		}
 	}
-	return nullptr;
+
+	return chosen_variation;
 }
 
 std::string unit_type::GetRandomVariationIdent(int image_layer) const

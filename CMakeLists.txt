@@ -1072,6 +1072,7 @@ set(wyrmgus_unit_HDRS
 	src/unit/unit_type.h
 	src/unit/unit_type_container.h
 	src/unit/unit_variable.h
+	src/unit/variation_tag.h
 )
 
 set(wyrmgus_upgrade_HDRS

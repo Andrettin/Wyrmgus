@@ -1361,47 +1361,52 @@ bool CUnit::can_have_variation(const wyrmgus::unit_type_variation *variation) co
 
 void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, const bool ignore_old_variation, const int image_layer, const bool notify)
 {
-	std::string priority_variation;
+	const std::set<const variation_tag *> *current_tags = nullptr;
 	if (image_layer == -1) {
-		if (this->get_character() != nullptr && !this->get_character()->get_variation().empty()) {
-			priority_variation = this->get_character()->get_variation();
+		if (this->get_character() != nullptr && !this->get_character()->get_variation_tags().empty()) {
+			current_tags = &this->get_character()->get_variation_tags();
 		} else if (this->GetVariation() != nullptr) {
-			priority_variation = this->GetVariation()->get_identifier();
+			current_tags = &this->GetVariation()->get_tags();
 		}
 	} else {
-		if (image_layer == HairImageLayer && this->get_character() != nullptr && !this->get_character()->get_variation().empty()) {
-			priority_variation = this->get_character()->get_variation();
+		if (image_layer == HairImageLayer && this->get_character() != nullptr && !this->get_character()->get_variation_tags().empty()) {
+			current_tags = &this->get_character()->get_variation_tags();
 		} else if (this->GetLayerVariation(image_layer)) {
-			priority_variation = this->GetLayerVariation(image_layer)->get_identifier();
+			current_tags = &this->GetLayerVariation(image_layer)->get_tags();
 		}
 	}
 	
-	std::vector<wyrmgus::unit_type_variation *> type_variations;
+	std::vector<const unit_type_variation *> potential_variations;
 	const std::vector<qunique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? (new_type != nullptr ? new_type->get_variations() : this->Type->get_variations()) : (new_type != nullptr ? new_type->LayerVariations[image_layer] : this->Type->LayerVariations[image_layer]);
 	
-	bool found_similar = false;
+	size_t best_shared_tag_count = 0;
+
 	for (const auto &variation : variation_list) {
 		if (!this->can_have_variation(variation.get())) {
 			continue;
 		}
 
-		if (!ignore_old_variation && !priority_variation.empty() && (variation->get_identifier().find(priority_variation) != std::string::npos || priority_variation.find(variation->get_identifier()) != std::string::npos)) { // if the priority variation's ident is included in that of a new viable variation (or vice-versa), give priority to the new variation over others
-			if (!found_similar) {
-				found_similar = true;
-				type_variations.clear();
-			}
-		} else {
-			if (found_similar) {
+		if (!ignore_old_variation && current_tags != nullptr) {
+			const size_t shared_tag_count = variation->get_shared_tag_count(*current_tags);
+
+			if (shared_tag_count < best_shared_tag_count) {
 				continue;
+			}
+
+			if (shared_tag_count > best_shared_tag_count) {
+				//clear the variations previously added to the list if this one shares more tags with the current tag list
+				potential_variations.clear();
+				best_shared_tag_count = shared_tag_count;
 			}
 		}
 
-		for (int j = 0; j < variation->Weight; ++j) {
-			type_variations.push_back(variation.get());
+		for (int i = 0; i < variation->Weight; ++i) {
+			potential_variations.push_back(variation.get());
 		}
 	}
-	if (type_variations.size() > 0) {
-		this->SetVariation(vector::get_random(type_variations), image_layer, notify);
+
+	if (!potential_variations.empty()) {
+		this->SetVariation(vector::get_random(potential_variations), image_layer, notify);
 	}
 }
 
