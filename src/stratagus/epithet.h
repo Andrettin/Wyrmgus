@@ -54,6 +54,11 @@ public:
 		return this->weight;
 	}
 
+	void increment_weight()
+	{
+		++this->weight;
+	}
+
 	const std::unique_ptr<condition> &get_conditions() const
 	{
 		return this->conditions;

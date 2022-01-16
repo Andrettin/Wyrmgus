@@ -519,9 +519,15 @@ void character::initialize()
 			if (this->has_name_variant()) {
 				this->civilization->add_personal_name(this->get_gender(), this->get_name_variant());
 			}
+
 			if (!this->get_surname().empty()) {
 				this->civilization->add_surname(this->get_gender(), this->get_surname());
 			}
+		}
+
+		if (this->get_epithet() != nullptr && this->get_epithet()->get_weight() > 0) {
+			//increase the weight of the character's epithet (if the epithet doesn't have weight 0, i.e. it is available for generation), so that more common epithets will also be more commonly generated
+			this->epithet->increment_weight();
 		}
 	}
 
