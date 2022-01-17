@@ -994,7 +994,7 @@ static int CclAiForce(lua_State *l)
 	int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, 2, j + 1);
-		wyrmgus::unit_type *type = CclGetUnitType(l);
+		const unit_type *type = CclGetUnitType(l);
 		lua_pop(l, 1);
 		++j;
 		int count = LuaToNumber(l, 2, j + 1);

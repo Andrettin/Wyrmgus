@@ -788,7 +788,7 @@ extern void AiResetUnitTypeEquiv();
 /// Finds all equivalents units to a given one
 extern int AiFindUnitTypeEquiv(const wyrmgus::unit_type &type, int *result);
 /// Finds all available equivalents units to a given one, in the preferred order
-extern int AiFindAvailableUnitTypeEquiv(const wyrmgus::unit_type &type, int *result);
+extern int AiFindAvailableUnitTypeEquiv(const unit_type &type, int *result);
 extern bool AiRequestedTypeAllowed(const CPlayer &player, const unit_type &type, const bool allow_can_build_builder = false, const bool include_upgrade = false);
 extern bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upgrade, const bool allow_can_build_researcher = false);
 extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax]);

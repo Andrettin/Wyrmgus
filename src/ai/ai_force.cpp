@@ -360,7 +360,7 @@ class UnitTypePrioritySorter_Decreasing
 public:
 	bool operator()(int lhs, int rhs) const
 	{
-		return wyrmgus::unit_type::get_all()[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > wyrmgus::unit_type::get_all()[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
+		return unit_type::get_all()[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > unit_type::get_all()[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
 	}
 };
 
@@ -437,7 +437,7 @@ void AiForce::CountTypes(unsigned int *counter, const size_t len)
 **
 **  @return       True if it fits, false otherwise.
 */
-bool AiForce::can_be_assigned_to(const wyrmgus::unit_type &type)
+bool AiForce::can_be_assigned_to(const unit_type &type)
 {
 	bool flag = false;
 	unsigned int counter[UnitTypeMax + 1];
