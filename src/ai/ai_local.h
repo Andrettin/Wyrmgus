@@ -168,7 +168,7 @@ public:
 	void Insert(CUnit *unit);
 
 private:
-	void CountTypes(unsigned int *counter, const size_t len);
+	void count_types(unit_type_map<unsigned> &counter);
 	bool can_be_assigned_to(const unit_type &type);
 
 	void Update();
@@ -782,11 +782,11 @@ extern void AiResourceManager();
 /// Ask the ai to explore around pos
 extern void AiExplore(const Vec2i &pos, const tile_flag exploreMask);
 /// Make two unittypes be considered equals
-extern void AiNewUnitTypeEquiv(const wyrmgus::unit_type &a, const wyrmgus::unit_type &b);
+extern void AiNewUnitTypeEquiv(const unit_type &a, const unit_type &b);
 /// Remove any equivalence between unittypes
 extern void AiResetUnitTypeEquiv();
 /// Finds all equivalents units to a given one
-extern int AiFindUnitTypeEquiv(const wyrmgus::unit_type &type, int *result);
+extern int AiFindUnitTypeEquiv(const unit_type &type, int *result);
 /// Finds all available equivalents units to a given one, in the preferred order
 extern int AiFindAvailableUnitTypeEquiv(const unit_type &type, int *result);
 extern bool AiRequestedTypeAllowed(const CPlayer &player, const unit_type &type, const bool allow_can_build_builder = false, const bool include_upgrade = false);

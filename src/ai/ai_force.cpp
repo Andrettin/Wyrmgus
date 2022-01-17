@@ -313,7 +313,7 @@ void AiResetUnitTypeEquiv()
 **  @param a  the first unittype
 **  @param b  the second unittype
 */
-void AiNewUnitTypeEquiv(const wyrmgus::unit_type &a, const wyrmgus::unit_type &b)
+void AiNewUnitTypeEquiv(const unit_type &a, const unit_type &b)
 {
 	int find = UnitTypeEquivs[a.Slot];
 	int replace = UnitTypeEquivs[b.Slot];
@@ -352,6 +352,7 @@ int AiFindUnitTypeEquiv(const wyrmgus::unit_type &unittype, int *result)
 			++count;
 		}
 	}
+
 	return count;
 }
 
@@ -397,9 +398,10 @@ int AiFindAvailableUnitTypeEquiv(const wyrmgus::unit_type &unittype, int *usable
 class AiForceCounter final
 {
 public:
-	explicit AiForceCounter(const std::vector<std::shared_ptr<unit_ref>> &units, unsigned int *d, const size_t len) : data(d)
+	explicit AiForceCounter(const std::vector<std::shared_ptr<unit_ref>> &units, unit_type_map<unsigned> &data) : data(data)
 	{
-		memset(data, 0, len);
+		this->data.clear();
+
 		for (const std::shared_ptr<unit_ref> &unit : units) {
 			(*this)(*unit);
 		}
@@ -407,14 +409,14 @@ public:
 
 	void operator()(const CUnit *const unit) const
 	{
-		++this->data[UnitTypeEquivs[unit->Type->Slot]];
+		++this->data[unit_type::get_all()[UnitTypeEquivs[unit->Type->Slot]]];
 		
-		const wyrmgus::unit_class *unit_class = unit->Type->get_unit_class();
+		const unit_class *unit_class = unit->Type->get_unit_class();
 
 		if (unit_class != nullptr) {
 			for (const wyrmgus::unit_type *class_unit_type : unit_class->get_unit_types()) {
 				if (class_unit_type != unit->Type) {
-					++this->data[UnitTypeEquivs[class_unit_type->Slot]];
+					++this->data[unit_type::get_all()[UnitTypeEquivs[class_unit_type->Slot]]];
 					//also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
 				}
 			}
@@ -422,12 +424,12 @@ public:
 	}
 
 private:
-	unsigned int *data;//[UnitTypeMax + 1];
+	unit_type_map<unsigned> &data;
 };
 
-void AiForce::CountTypes(unsigned int *counter, const size_t len)
+void AiForce::count_types(unit_type_map<unsigned> &counter)
 {
-	AiForceCounter(this->get_units(), counter, len);
+	AiForceCounter(this->get_units(), counter);
 }
 
 /**
@@ -440,20 +442,20 @@ void AiForce::CountTypes(unsigned int *counter, const size_t len)
 bool AiForce::can_be_assigned_to(const unit_type &type)
 {
 	bool flag = false;
-	unsigned int counter[UnitTypeMax + 1];
+	unit_type_map<unsigned> counter;
 
-	// Count units in force.
-	this->CountTypes(counter, sizeof(counter));
+	//count unit types in force
+	this->count_types(counter);
 
 	// Look what should be in the force.
 	this->Completed = true;
 
 	for (const AiUnitType &aitype : this->UnitTypes) {
-		const int slot = aitype.Type->Slot;
+		const unit_type *unit_type = aitype.Type;
 
-		if (counter[slot] < aitype.Want) { //the counter includes other units of the same class
-			if (UnitTypeEquivs[type.Slot] == slot || type.get_unit_class() == aitype.Type->get_unit_class()) {
-				if (counter[slot] < aitype.Want - 1) {
+		if (counter[unit_type] < aitype.Want) { //the counter includes other units of the same class
+			if (UnitTypeEquivs[type.Slot] == unit_type->get_index() || type.get_unit_class() == aitype.Type->get_unit_class()) {
+				if (counter[unit_type] < aitype.Want - 1) {
 					this->Completed = false;
 				}
 
