@@ -121,7 +121,7 @@ static std::vector<std::vector<Open>> OpenSet;
 
 //Wyrmgus start
 //static std::vector<int> CostMoveToCache;
-static std::vector<std::vector<int>> CostMoveToCache;
+static std::vector<std::map<int, int>> CostMoveToCache;
 //Wyrmgus end
 static constexpr int CacheNotSet = -5;
 
@@ -151,7 +151,7 @@ void InitAStar()
 		OpenSet.emplace_back();
 		OpenSet.back().reserve(open_set_max_size);
 
-		CostMoveToCache.push_back(std::vector<int>(AStarMapWidth[z] * AStarMapHeight[z], CacheNotSet));
+		CostMoveToCache.emplace_back();
 
 		for (int i = 0; i < 9; ++i) {
 			Heading2O[i].push_back(Heading2Y[i] * AStarMapWidth[z]);
@@ -220,7 +220,19 @@ static void AStarCleanUp(int z)
 static void CostMoveToCacheCleanUp(const int z)
 //Wyrmgus end
 {
-	std::fill(CostMoveToCache[z].begin(), CostMoveToCache[z].end(), CacheNotSet);
+	CostMoveToCache[z].clear();
+}
+
+static int get_cost_move_to_cache(const int index, const int z)
+{
+	const std::map<int, int> &cache = CostMoveToCache[z];
+
+	const auto find_iterator = cache.find(index);
+	if (find_iterator != cache.end()) {
+		return find_iterator->second;
+	}
+
+	return CacheNotSet;
 }
 
 /**
@@ -484,7 +496,7 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
 	}
 	//Wyrmgus end
 
-	int c = CostMoveToCache[z][index];
+	int c = get_cost_move_to_cache(index, z);
 
 	if (c != CacheNotSet) {
 		return c;
