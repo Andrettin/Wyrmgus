@@ -57,22 +57,6 @@ struct Node {
 	char Direction = 0;     /// Direction for trace back
 };
 
-struct Open {
-	Vec2i pos = Vec2i(0, 0);
-	short int Costs = 0; /// complete costs to goal
-	//Wyrmgus start
-//	unsigned short int O = 0;     /// Offset into matrix
-	unsigned int O = 0;     /// Offset into matrix
-	//Wyrmgus end
-};
-
-/// heuristic cost function for a*
-static int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
-{
-	const Vec2i diff = pos - goalPos;
-	return std::max<int>(wyrmgus::number::fast_abs(diff.x), wyrmgus::number::fast_abs(diff.y));
-}
-
 //Wyrmgus start
 //std::array<int, 9> Heading2O;//heading to offset
 std::array<std::vector<int>, 9> Heading2O;//heading to offset
@@ -111,13 +95,49 @@ static std::vector<int> AStarMapHeight;
 static int AStarGoalX;
 static int AStarGoalY;
 
+struct Open {
+	bool operator <(const Open &rhs) const
+	{
+		if (this->Costs != rhs.Costs) {
+			return this->Costs < rhs.Costs;
+		}
+
+		const int cost_to_goal = AStarMatrix[this->z][this->O].CostToGoal;
+		const int rhs_cost_to_goal = AStarMatrix[rhs.z][rhs.O].CostToGoal;
+
+		if (cost_to_goal != rhs_cost_to_goal) {
+			return cost_to_goal < rhs_cost_to_goal;
+		}
+
+		const int dist = number::fast_abs(this->pos.x - AStarGoalX) + number::fast_abs(this->pos.y - AStarGoalY);
+		const int rhs_dist = number::fast_abs(rhs.pos.x - AStarGoalX) + number::fast_abs(rhs.pos.y - AStarGoalY);
+
+		return dist < rhs_dist;
+	}
+
+	Vec2i pos = Vec2i(0, 0);
+	size_t z = 0;
+	short int Costs = 0; /// complete costs to goal
+	//Wyrmgus start
+//	unsigned short int O = 0;     /// Offset into matrix
+	unsigned int O = 0;     /// Offset into matrix
+	//Wyrmgus end
+};
+
+/// heuristic cost function for a*
+static int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
+{
+	const Vec2i diff = pos - goalPos;
+	return std::max<int>(number::fast_abs(diff.x), wyrmgus::number::fast_abs(diff.y));
+}
+
 /**
 **  The Open set is handled by a stored array
 **  the end of the array holds the item with the smallest cost.
 */
 
 /// The set of Open nodes
-static std::vector<std::vector<Open>> OpenSet;
+static std::vector<std::set<Open>> OpenSet;
 
 //Wyrmgus start
 //static std::vector<int> CostMoveToCache;
@@ -149,7 +169,6 @@ void InitAStar()
 
 		const size_t open_set_max_size = AStarMapWidth[z] * AStarMapHeight[z] / MAX_OPEN_SET_RATIO;
 		OpenSet.emplace_back();
-		OpenSet.back().reserve(open_set_max_size);
 
 		CostMoveToCache.emplace_back();
 
@@ -236,25 +255,6 @@ static int get_cost_move_to_cache(const int index, const int z)
 }
 
 /**
-**  Find the best node in the current open node set
-**  Returns the position of this node in the open node set
-*/
-static int AStarFindMinimum(const int z)
-{
-	return static_cast<int>(OpenSet[z].size()) - 1;
-}
-
-/**
-**  Remove the minimum from the open node set
-*/
-static void AStarRemoveMinimum(const int pos, const int z)
-{
-	assert_throw(pos == static_cast<int>(OpenSet[z].size()) - 1);
-
-	OpenSet[z].pop_back();
-}
-
-/**
 **  Add a new node to the open set (and update the heap structure)
 **
 **  @return  0 or PF_FAILED
@@ -264,48 +264,12 @@ static void AStarRemoveMinimum(const int pos, const int z)
 static int AStarAddNode(const Vec2i &pos, const int o, const int costs, const int z)
 //Wyrmgus end
 {
-	int bigi = 0;
-	int smalli = static_cast<int>(OpenSet[z].size());
-	int midcost;
-	int midi;
-	int midCostToGoal;
-	int midDist;
-
-	const int costToGoal = AStarMatrix[z][o].CostToGoal;
-	const int dist = number::fast_abs(pos.x - AStarGoalX) + number::fast_abs(pos.y - AStarGoalY);
-
-	// find where we should insert this node.
-	// binary search where to insert the new node
-	while (bigi < smalli) {
-		midi = (smalli + bigi) >> 1;
-		const Open &open = OpenSet[z][midi];
-		midcost = open.Costs;
-		midCostToGoal = AStarMatrix[z][open.O].CostToGoal;
-		midDist = number::fast_abs(open.pos.x - AStarGoalX) + number::fast_abs(open.pos.y - AStarGoalY);
-		if (costs > midcost || (costs == midcost
-								&& (costToGoal > midCostToGoal || (costToGoal == midCostToGoal
-																   && dist > midDist)))) {
-			smalli = midi;
-		} else if (costs < midcost || (costs == midcost
-									   && (costToGoal < midCostToGoal || (costToGoal == midCostToGoal
-											   && dist < midDist)))) {
-			if (bigi == midi) {
-				bigi++;
-			} else {
-				bigi = midi;
-			}
-		} else {
-			bigi = midi;
-			smalli = midi;
-		}
-	}
-
 	// fill our new node
 	Open node;
 	node.pos = pos;
 	node.O = o;
 	node.Costs = costs;
-	OpenSet[z].insert(OpenSet[z].begin() + bigi, std::move(node));
+	OpenSet[z].insert(std::move(node));
 
 	return 0;
 }
@@ -315,9 +279,9 @@ static int AStarAddNode(const Vec2i &pos, const int o, const int costs, const in
 **  Can be further optimised knowing that the new cost MUST BE LOWER
 **  than the old one.
 */
-static void AStarReplaceNode(const int pos, const int z)
+static void AStarReplaceNode(const Open *node_ptr, const int z)
 {
-	Open node = vector::take(OpenSet[z], static_cast<size_t>(pos));
+	Open node = std::move(OpenSet[z].extract(*node_ptr).value());
 
 	// Re-add the node with the new cost
 	AStarAddNode(node.pos, node.O, node.Costs, z);
@@ -326,17 +290,17 @@ static void AStarReplaceNode(const int pos, const int z)
 /**
 **  Check if a node is already in the open set.
 **
-**  @return  -1 if not found and the position of the node in the table if found.
+**  @return  The pointer to the node if found, or null otherwise.
 */
-static int AStarFindNode(const int eo, const int z)
+static const Open *AStarFindNode(const int eo, const int z)
 {
-	for (size_t i = 0; i < OpenSet[z].size(); ++i) {
-		if (OpenSet[z][i].O == eo) {
-			return static_cast<int>(i);
+	for (const Open &open_node : OpenSet[z]) {
+		if (open_node.O == eo) {
+			return &open_node;
 		}
 	}
 
-	return -1;
+	return nullptr;
 }
 
 /**
@@ -994,11 +958,14 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, con
 		ret = PF_FAILED;
 		return ret;
 	}
-	AStarAddToClose(OpenSet[z][0].O, z);
+
+	AStarAddToClose((*OpenSet[z].begin()).O, z);
+
 	if (AStarMatrix[z][eo].InGoal) {
 		ret = PF_REACHED;
 		return ret;
 	}
+
 	Vec2i endPos;
 	
 	//Wyrmgus start
@@ -1015,12 +982,10 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, con
 		//Wyrmgus end
 		
 		// Find the best node of from the open set
-		const int shortest = AStarFindMinimum(z);
-		const int x = OpenSet[z][shortest].pos.x;
-		const int y = OpenSet[z][shortest].pos.y;
-		const int o = OpenSet[z][shortest].O;
-
-		AStarRemoveMinimum(shortest, z);
+		const Open shortest = std::move(OpenSet[z].extract(OpenSet[z].begin()).value());
+		const int x = shortest.pos.x;
+		const int y = shortest.pos.y;
+		const int o = shortest.O;
 
 		// If we have reached the goal, then exit.
 		if (AStarMatrix[z][o].InGoal == 1) {
@@ -1110,8 +1075,8 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, con
 				AStarMatrix[z][eo].Direction = i;
 
 				// this point might be already in the OpenSet
-				const int j = AStarFindNode(eo, z);
-				if (j == -1) {
+				const Open *j = AStarFindNode(eo, z);
+				if (j == nullptr) {
 					costToGoal = AStarCosts(endPos, goalPos);
 					//Wyrmgus start
 //					AStarMatrix[eo].CostToGoal = costToGoal;
