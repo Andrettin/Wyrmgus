@@ -95,40 +95,48 @@ static std::vector<int> AStarMapHeight;
 static int AStarGoalX;
 static int AStarGoalY;
 
-struct Open {
+static int AStarGoalZ;
+
+struct Open final
+{
+	explicit Open(const Vec2i &pos, const short int costs, const unsigned int offset)
+		: pos(pos), costs(costs), offset(offset)
+	{
+		this->distance = number::fast_abs(this->pos.x - AStarGoalX) + number::fast_abs(this->pos.y - AStarGoalY);
+	}
+
 	bool operator <(const Open &rhs) const
 	{
-		if (this->Costs != rhs.Costs) {
-			return this->Costs < rhs.Costs;
+		if (this->costs != rhs.costs) {
+			return this->costs < rhs.costs;
 		}
 
-		const int cost_to_goal = AStarMatrix[this->z][this->O].CostToGoal;
-		const int rhs_cost_to_goal = AStarMatrix[rhs.z][rhs.O].CostToGoal;
+		const int cost_to_goal = AStarMatrix[AStarGoalZ][this->offset].CostToGoal;
+		const int rhs_cost_to_goal = AStarMatrix[AStarGoalZ][rhs.offset].CostToGoal;
 
 		if (cost_to_goal != rhs_cost_to_goal) {
 			return cost_to_goal < rhs_cost_to_goal;
 		}
 
-		const int dist = number::fast_abs(this->pos.x - AStarGoalX) + number::fast_abs(this->pos.y - AStarGoalY);
-		const int rhs_dist = number::fast_abs(rhs.pos.x - AStarGoalX) + number::fast_abs(rhs.pos.y - AStarGoalY);
+		if (this->distance != rhs.distance) {
+			return this->distance < rhs.distance;
+		}
 
-		return dist < rhs_dist;
+		return this->offset < rhs.offset;
 	}
 
-	Vec2i pos = Vec2i(0, 0);
-	size_t z = 0;
-	short int Costs = 0; /// complete costs to goal
-	//Wyrmgus start
-//	unsigned short int O = 0;     /// Offset into matrix
-	unsigned int O = 0;     /// Offset into matrix
-	//Wyrmgus end
+	const Vec2i pos = Vec2i(0, 0);
+	const short int costs = 0; //complete costs to goal
+	const unsigned int offset = 0; //offset into matrix
+private:
+	int distance = 0;
 };
 
 /// heuristic cost function for a*
 static int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 {
 	const Vec2i diff = pos - goalPos;
-	return std::max<int>(number::fast_abs(diff.x), wyrmgus::number::fast_abs(diff.y));
+	return std::max<int>(number::fast_abs(diff.x), number::fast_abs(diff.y));
 }
 
 /**
@@ -265,11 +273,7 @@ static int AStarAddNode(const Vec2i &pos, const int o, const int costs, const in
 //Wyrmgus end
 {
 	// fill our new node
-	Open node;
-	node.pos = pos;
-	node.O = o;
-	node.Costs = costs;
-	OpenSet[z].insert(std::move(node));
+	OpenSet[z].emplace(pos, costs, o);
 
 	return 0;
 }
@@ -284,7 +288,7 @@ static void AStarReplaceNode(const Open *node_ptr, const int z)
 	Open node = std::move(OpenSet[z].extract(*node_ptr).value());
 
 	// Re-add the node with the new cost
-	AStarAddNode(node.pos, node.O, node.Costs, z);
+	AStarAddNode(node.pos, node.offset, node.costs, z);
 }
 
 /**
@@ -295,7 +299,7 @@ static void AStarReplaceNode(const Open *node_ptr, const int z)
 static const Open *AStarFindNode(const int eo, const int z)
 {
 	for (const Open &open_node : OpenSet[z]) {
-		if (open_node.O == eo) {
+		if (open_node.offset == eo) {
 			return &open_node;
 		}
 	}
@@ -905,6 +909,8 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, con
 	AStarGoalX = goalPos.x;
 	AStarGoalY = goalPos.y;
 
+	AStarGoalZ = z;
+
 	//  Check for simple cases first
 	int ret = AStarFindSimplePath(startPos, goalPos, gw, gh, tilesizex, tilesizey,
 								  //Wyrmgus start
@@ -959,7 +965,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, con
 		return ret;
 	}
 
-	AStarAddToClose((*OpenSet[z].begin()).O, z);
+	AStarAddToClose((*OpenSet[z].begin()).offset, z);
 
 	if (AStarMatrix[z][eo].InGoal) {
 		ret = PF_REACHED;
@@ -985,7 +991,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, con
 		const Open shortest = std::move(OpenSet[z].extract(OpenSet[z].begin()).value());
 		const int x = shortest.pos.x;
 		const int y = shortest.pos.y;
-		const int o = shortest.O;
+		const int o = shortest.offset;
 
 		// If we have reached the goal, then exit.
 		if (AStarMatrix[z][o].InGoal == 1) {
