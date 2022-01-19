@@ -114,7 +114,7 @@ public:
 
 		bool validated = false;
 		for (const unit_type *unit_type : unit_types) {
-			if (this->settlement != nullptr && !player->has_settlement(this->settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+			if (this->settlement != nullptr && !player->has_settlement(this->settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value && !this->get_quest()->has_settlement_objective(this->settlement)) {
 				continue;
 			}
 
@@ -187,12 +187,12 @@ public:
 		bool validated = false;
 		std::string validation_error;
 		for (const unit_type *unit_type : unit_types) {
-			if (this->settlement != nullptr && !player->has_settlement(this->settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+			if (this->settlement != nullptr && !player->has_settlement(this->settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value && !this->get_quest()->has_settlement_objective(this->settlement)) {
 				validation_error = "You no longer hold the required settlement.";
 				continue;
 			}
 
-			if (!player->HasUnitBuilder(unit_type, this->settlement) || !check_conditions(unit_type, player)) {
+			if (!player->HasUnitBuilder(unit_type, this->settlement) || !check_conditions<true>(unit_type, player)) {
 				validation_error = "You can no longer produce the required unit.";
 				continue;
 			}

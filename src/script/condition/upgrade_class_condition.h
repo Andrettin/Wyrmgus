@@ -48,6 +48,7 @@ public:
 		if (this->upgrade_class->get_preconditions() != nullptr && !this->upgrade_class->get_preconditions()->check(civilization)) {
 			return false;
 		}
+
 		if (this->upgrade_class->get_conditions() != nullptr && !this->upgrade_class->get_conditions()->check(civilization)) {
 			return false;
 		}

@@ -500,7 +500,7 @@ public:
 	{
 		static std::vector<const wyrmgus::unit_type *> empty_vector;
 
-		auto find_iterator = this->trainers.find(unit_type);
+		const auto find_iterator = this->trainers.find(unit_type);
 		if (find_iterator != this->trainers.end()) {
 			return find_iterator->second;
 		}
@@ -512,7 +512,7 @@ public:
 	{
 		static std::vector<const wyrmgus::unit_class *> empty_vector;
 
-		auto find_iterator = this->trainer_classes.find(unit_class);
+		const auto find_iterator = this->trainer_classes.find(unit_class);
 		if (find_iterator != this->trainer_classes.end()) {
 			return find_iterator->second;
 		}
@@ -524,7 +524,7 @@ public:
 	{
 		static std::vector<const wyrmgus::unit_type *> empty_vector;
 
-		auto find_iterator = this->builders.find(unit_type);
+		const auto find_iterator = this->builders.find(unit_type);
 		if (find_iterator != this->builders.end()) {
 			return find_iterator->second;
 		}
@@ -536,7 +536,7 @@ public:
 	{
 		static std::vector<const wyrmgus::unit_class *> empty_vector;
 
-		auto find_iterator = this->builder_classes.find(unit_class);
+		const auto find_iterator = this->builder_classes.find(unit_class);
 		if (find_iterator != this->builder_classes.end()) {
 			return find_iterator->second;
 		}
@@ -548,7 +548,7 @@ public:
 	{
 		static std::vector<const wyrmgus::unit_type *> empty_vector;
 
-		auto find_iterator = this->unit_type_upgrades.find(unit_type);
+		const auto find_iterator = this->unit_type_upgrades.find(unit_type);
 		if (find_iterator != this->unit_type_upgrades.end()) {
 			return find_iterator->second;
 		}
@@ -560,7 +560,7 @@ public:
 	{
 		static std::vector<const wyrmgus::unit_type *> empty_vector;
 
-		auto find_iterator = this->unit_type_upgradees.find(unit_type);
+		const auto find_iterator = this->unit_type_upgradees.find(unit_type);
 		if (find_iterator != this->unit_type_upgradees.end()) {
 			return find_iterator->second;
 		}
@@ -572,7 +572,7 @@ public:
 	{
 		static std::vector<const wyrmgus::unit_class *> empty_vector;
 
-		auto find_iterator = this->unit_class_upgrades.find(unit_class);
+		const auto find_iterator = this->unit_class_upgrades.find(unit_class);
 		if (find_iterator != this->unit_class_upgrades.end()) {
 			return find_iterator->second;
 		}
@@ -584,7 +584,7 @@ public:
 	{
 		static std::vector<const wyrmgus::unit_class *> empty_vector;
 
-		auto find_iterator = this->unit_class_upgradees.find(unit_class);
+		const auto find_iterator = this->unit_class_upgradees.find(unit_class);
 		if (find_iterator != this->unit_class_upgradees.end()) {
 			return find_iterator->second;
 		}
@@ -596,7 +596,7 @@ public:
 	{
 		static std::vector<const wyrmgus::unit_type *> empty_vector;
 
-		auto find_iterator = this->researchers.find(upgrade);
+		const auto find_iterator = this->researchers.find(upgrade);
 		if (find_iterator != this->researchers.end()) {
 			return find_iterator->second;
 		}
@@ -608,7 +608,7 @@ public:
 	{
 		static std::vector<const wyrmgus::unit_class *> empty_vector;
 
-		auto find_iterator = this->researcher_classes.find(upgrade_class);
+		const auto find_iterator = this->researcher_classes.find(upgrade_class);
 		if (find_iterator != this->researcher_classes.end()) {
 			return find_iterator->second;
 		}
@@ -620,7 +620,7 @@ public:
 	{
 		static std::vector<const wyrmgus::resource *> empty_vector;
 
-		auto find_iterator = this->produced_resources.find(unit_type);
+		const auto find_iterator = this->produced_resources.find(unit_type);
 		if (find_iterator != this->produced_resources.end()) {
 			return find_iterator->second;
 		}
@@ -632,7 +632,7 @@ public:
 	{
 		static std::vector<const CUpgrade *> empty_vector;
 
-		auto find_iterator = this->researched_upgrades.find(unit_type);
+		const auto find_iterator = this->researched_upgrades.find(unit_type);
 		if (find_iterator != this->researched_upgrades.end()) {
 			return find_iterator->second;
 		}
@@ -644,7 +644,7 @@ public:
 	{
 		static std::vector<const wyrmgus::upgrade_class *> empty_vector;
 
-		auto find_iterator = this->researched_upgrade_classes.find(unit_class);
+		const auto find_iterator = this->researched_upgrade_classes.find(unit_class);
 		if (find_iterator != this->researched_upgrade_classes.end()) {
 			return find_iterator->second;
 		}

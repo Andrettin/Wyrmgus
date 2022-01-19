@@ -39,6 +39,7 @@
 #include "parameters.h"
 #include "player/civilization.h"
 #include "quest/achievement.h"
+#include "quest/objective/have_settlement_objective.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "script/condition/and_condition.h"
@@ -295,6 +296,23 @@ void quest::on_completed(const difficulty difficulty)
 	quest::save_quest_completion();
 
 	achievement::check_achievements();
+}
+
+bool quest::has_settlement_objective(const site *settlement) const
+{
+	for (const auto &objective : this->get_objectives()) {
+		if (objective->get_objective_type() != objective_type::have_settlement) {
+			continue;
+		}
+
+		const have_settlement_objective *have_settlement_objective = static_cast<const wyrmgus::have_settlement_objective *>(objective.get());
+
+		if (have_settlement_objective->get_settlement() == settlement) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 }

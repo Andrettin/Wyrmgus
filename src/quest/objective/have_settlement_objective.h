@@ -121,6 +121,11 @@ public:
 		}
 	}
 
+	const site *get_settlement() const
+	{
+		return this->settlement;
+	}
+
 private:
 	const site *settlement = nullptr;
 };

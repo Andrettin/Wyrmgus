@@ -44,6 +44,7 @@ class dialogue;
 class icon;
 class player_color;
 class quest_objective;
+class site;
 enum class difficulty;
 
 template <typename scope_type>
@@ -206,6 +207,8 @@ public:
 	bool overlaps_with(const quest *other_quest) const;
 
 	void on_completed(const difficulty difficulty);
+
+	bool has_settlement_objective(const site *settlement) const;
 
 signals:
 	void completed_changed();
