@@ -192,7 +192,7 @@ public:
 				continue;
 			}
 
-			if (!player->HasUnitBuilder(unit_type, this->settlement) || !check_conditions<true>(unit_type, player)) {
+			if (!player->HasUnitBuilder(unit_type, this->settlement) || !check_conditions(unit_type, player)) {
 				validation_error = "You can no longer produce the required unit.";
 				continue;
 			}
