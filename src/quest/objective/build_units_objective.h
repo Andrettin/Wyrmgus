@@ -30,6 +30,7 @@
 #include "map/site_game_data.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
+#include "quest/quest.h"
 #include "quest/player_quest_objective.h"
 #include "script/condition/and_condition.h"
 #include "unit/unit.h"
