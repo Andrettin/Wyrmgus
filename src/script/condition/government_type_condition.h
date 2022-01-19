@@ -39,6 +39,16 @@ public:
 		this->government_type = string_to_government_type(value);
 	}
 
+	virtual bool check(const civilization *civilization) const override
+	{
+		const CUpgrade *upgrade = CUpgrade::get_government_type_upgrade(this->government_type);
+		if (upgrade != nullptr && !upgrade->is_available_for_civilization(civilization)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	virtual bool check(const government_type government_type) const override
 	{
 		return this->government_type == government_type;
