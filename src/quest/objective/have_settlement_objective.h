@@ -30,6 +30,7 @@
 #include "database/defines.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
+#include "player/faction.h"
 #include "player/player.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
