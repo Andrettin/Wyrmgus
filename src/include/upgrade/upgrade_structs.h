@@ -651,6 +651,9 @@ public:
 
 	Q_INVOKABLE QString get_upgrade_effects_qstring() const;
 
+	bool has_researcher_for_civilization(const wyrmgus::civilization *civilization) const;
+	bool is_available_for_civilization(const wyrmgus::civilization *civilization) const;
+
 signals:
 	void changed();
 

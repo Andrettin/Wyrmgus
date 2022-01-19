@@ -35,8 +35,8 @@
 #include "action/action_train.h"
 //Wyrmgus start
 #include "action/action_upgradeto.h"
-#include "ai/ai_local.h"
 //Wyrmgus end
+#include "ai/ai_local.h"
 #include "age.h"
 #include "character.h"
 #include "commands.h"
@@ -635,6 +635,81 @@ bool CUpgrade::check_drop_conditions(const CUnit *dropper, const CPlayer *droppe
 QString CUpgrade::get_upgrade_effects_qstring() const
 {
 	return QString::fromStdString(GetUpgradeEffectsString(this->get_identifier()));
+}
+
+bool CUpgrade::has_researcher_for_civilization(const wyrmgus::civilization *civilization) const
+{
+	//check whether the upgrade has a valid researcher
+	std::vector<const unit_type *> researchers = AiHelpers.get_researchers(this);
+
+	const wyrmgus::upgrade_class *upgrade_class = this->get_upgrade_class();
+
+	if (upgrade_class != nullptr) {
+		for (const unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade_class)) {
+			const unit_type *researcher = civilization->get_class_unit_type(researcher_class);
+
+			if (researcher == nullptr) {
+				continue;
+			}
+
+			researchers.push_back(researcher);
+		}
+	}
+
+	for (const unit_type *researcher : researchers) {
+		const unit_class *researcher_class = researcher->get_unit_class();
+
+		if (researcher_class != nullptr) {
+			if (researcher_class->get_preconditions() != nullptr && !researcher_class->get_preconditions()->check(civilization)) {
+				continue;
+			}
+
+			if (researcher_class->get_conditions() != nullptr && !researcher_class->get_conditions()->check(civilization)) {
+				continue;
+			}
+		}
+
+		if (researcher->get_preconditions() != nullptr && !researcher->get_preconditions()->check(civilization)) {
+			continue;
+		}
+
+		if (researcher->get_conditions() != nullptr && !researcher->get_conditions()->check(civilization)) {
+			continue;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool CUpgrade::is_available_for_civilization(const wyrmgus::civilization *civilization) const
+{
+	const wyrmgus::upgrade_class *upgrade_class = this->get_upgrade_class();
+
+	if (upgrade_class != nullptr) {
+		if (upgrade_class->get_preconditions() != nullptr && !upgrade_class->get_preconditions()->check(civilization)) {
+			return false;
+		}
+
+		if (upgrade_class->get_conditions() != nullptr && !upgrade_class->get_conditions()->check(civilization)) {
+			return false;
+		}
+	}
+
+	if (this->get_preconditions() != nullptr && !this->get_preconditions()->check(civilization)) {
+		return false;
+	}
+
+	if (this->get_conditions() != nullptr && !this->get_conditions()->check(civilization)) {
+		return false;
+	}
+
+	if (!this->has_researcher_for_civilization(civilization)) {
+		return false;
+	}
+
+	return true;
 }
 
 /**

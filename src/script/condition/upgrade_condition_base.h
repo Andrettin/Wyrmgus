@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,54 +26,31 @@
 
 #pragma once
 
-#include "script/condition/upgrade_condition_base.h"
+#include "script/condition/condition.h"
+#include "unit/unit.h"
+#include "upgrade/upgrade.h"
+#include "upgrade/upgrade_class.h"
+#include "upgrade/upgrade_structs.h"
 
 namespace wyrmgus {
 
-class upgrade_condition final : public upgrade_condition_base
+class upgrade_condition_base : public condition
 {
 public:
-	upgrade_condition()
+	bool check_upgrade(const civilization *civilization, const CUpgrade *upgrade) const
 	{
+		return upgrade->is_available_for_civilization(civilization);
 	}
 
-	explicit upgrade_condition(const std::string &value)
+	bool check_upgrade(const CPlayer *player, const CUpgrade *upgrade) const
 	{
-		this->upgrade = CUpgrade::get(value);
+		return UpgradeIdAllowed(*player, upgrade->ID) == 'R';
 	}
 
-	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-
-	virtual bool check(const civilization *civilization) const override
+	bool check_upgrade(const CUnit *unit, const CUpgrade *upgrade) const
 	{
-		return this->check_upgrade(civilization, this->upgrade);
+		return this->check_upgrade(unit->Player, upgrade) || unit->GetIndividualUpgrade(upgrade);
 	}
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
-	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
-
-		return this->check_upgrade(player, this->upgrade);
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
-	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
-
-		return this->check_upgrade(unit, this->upgrade);
-	}
-
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
-	{
-		Q_UNUSED(indent)
-
-		return condition::get_object_string(this->upgrade, links_allowed) + " upgrade";
-	}
-
-private:
-	const CUpgrade *upgrade = nullptr;
 };
 
 }

@@ -26,16 +26,12 @@
 
 #pragma once
 
-#include "script/condition/condition.h"
-#include "unit/unit.h"
-#include "upgrade/upgrade.h"
-#include "upgrade/upgrade_class.h"
-#include "upgrade/upgrade_structs.h"
+#include "script/condition/upgrade_condition_base.h"
 #include "util/string_util.h"
 
 namespace wyrmgus {
 
-class upgrade_class_condition final : public condition
+class upgrade_class_condition final : public upgrade_condition_base
 {
 public:
 	explicit upgrade_class_condition(const std::string &value)
@@ -45,29 +41,13 @@ public:
 
 	virtual bool check(const civilization *civilization) const override
 	{
-		if (this->upgrade_class->get_preconditions() != nullptr && !this->upgrade_class->get_preconditions()->check(civilization)) {
-			return false;
-		}
-
-		if (this->upgrade_class->get_conditions() != nullptr && !this->upgrade_class->get_conditions()->check(civilization)) {
-			return false;
-		}
-
 		const CUpgrade *upgrade = civilization->get_class_upgrade(this->upgrade_class);
 
 		if (upgrade == nullptr) {
 			return false;
 		}
 
-		if (upgrade->get_preconditions() != nullptr && !upgrade->get_preconditions()->check(civilization)) {
-			return false;
-		}
-
-		if (upgrade->get_conditions() != nullptr && !upgrade->get_conditions()->check(civilization)) {
-			return false;
-		}
-
-		return true;
+		return this->check_upgrade(civilization, upgrade);
 	}
 
 	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
@@ -81,18 +61,21 @@ public:
 			return false;
 		}
 
-		return UpgradeIdAllowed(*player, upgrade->ID) == 'R';
+		return this->check_upgrade(player, upgrade);
 	}
 
 	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
 	{
+		Q_UNUSED(ctx)
+		Q_UNUSED(ignore_units)
+
 		const CUpgrade *upgrade = unit->Player->get_class_upgrade(this->upgrade_class);
 
 		if (upgrade == nullptr) {
 			return false;
 		}
 
-		return this->check(unit->Player, ctx, ignore_units) || unit->GetIndividualUpgrade(upgrade);
+		return this->check_upgrade(unit, upgrade);
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
