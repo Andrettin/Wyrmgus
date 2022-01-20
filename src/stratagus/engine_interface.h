@@ -236,6 +236,7 @@ public:
 	Q_INVOKABLE QVariantList get_character_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_civilization_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_deity_encyclopedia_entries() const;
+	Q_INVOKABLE QVariantList get_dynasty_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_faction_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_game_concept_encyclopedia_entries() const;
 	Q_INVOKABLE QVariantList get_item_encyclopedia_entries() const;

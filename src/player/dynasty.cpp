@@ -70,6 +70,40 @@ void dynasty::check() const
 	}
 }
 
+std::string dynasty::get_encyclopedia_text() const
+{
+	std::string text;
+
+	std::vector<const faction *> factions = this->get_factions();
+	std::sort(factions.begin(), factions.end(), named_data_entry::compare_encyclopedia_entries);
+
+	if (!factions.empty()) {
+		std::string factions_text = "Factions: ";
+		for (size_t i = 0; i < factions.size(); ++i) {
+			if (i > 0) {
+				factions_text += ", ";
+			}
+
+			const faction *faction = factions.at(i);
+			factions_text += faction->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, std::move(factions_text));
+	}
+
+	if (this->get_upgrade() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Effects: " + this->get_upgrade()->get_effects_string());
+	}
+
+	if (this->get_conditions() != nullptr) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Conditions:\n" + this->get_conditions()->get_conditions_string(1, true));
+	}
+
+	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
+
+	return text;
+}
+
 void dynasty::set_upgrade(CUpgrade *upgrade)
 {
 	if (upgrade == this->get_upgrade()) {

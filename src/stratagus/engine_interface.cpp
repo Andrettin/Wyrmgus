@@ -44,6 +44,7 @@
 #include "map/world.h"
 #include "network/network_manager.h"
 #include "player/civilization.h"
+#include "player/dynasty.h"
 #include "player/faction.h"
 #include "player/player.h"
 #include "quest/achievement.h"
@@ -473,6 +474,11 @@ QVariantList engine_interface::get_civilization_encyclopedia_entries() const
 QVariantList engine_interface::get_deity_encyclopedia_entries() const
 {
 	return container::to_qvariant_list(deity::get_encyclopedia_entries());
+}
+
+QVariantList engine_interface::get_dynasty_encyclopedia_entries() const
+{
+	return container::to_qvariant_list(dynasty::get_encyclopedia_entries());
 }
 
 QVariantList engine_interface::get_faction_encyclopedia_entries() const

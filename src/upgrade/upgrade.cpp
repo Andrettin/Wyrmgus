@@ -524,7 +524,7 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 	this->set_description(parent_upgrade->get_description());
 	this->set_quote(parent_upgrade->get_quote());
 	this->set_background(parent_upgrade->get_background());
-	this->effects_string = parent_upgrade->get_effects_string();
+	this->effects_string = parent_upgrade->effects_string;
 	this->requirements_string = parent_upgrade->get_requirements_string();
 	this->costs = parent_upgrade->costs;
 	this->scaled_costs = parent_upgrade->scaled_costs;
@@ -1281,9 +1281,6 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
 		lua_pushstring(l, upgrade->get_quote().c_str());
-		return 1;
-	} else if (!strcmp(data, "EffectsString")) {
-		lua_pushstring(l, upgrade->get_effects_string().c_str());
 		return 1;
 	} else if (!strcmp(data, "RequirementsString")) {
 		lua_pushstring(l, upgrade->get_requirements_string().c_str());

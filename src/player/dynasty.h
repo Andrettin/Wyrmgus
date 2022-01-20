@@ -33,7 +33,8 @@ class CUpgrade;
 
 namespace wyrmgus {
 
-class condition;
+class and_condition;
+class character;
 class faction;
 class icon;
 
@@ -42,8 +43,8 @@ class dynasty final : public detailed_data_entry, public data_type<dynasty>
 	Q_OBJECT
 
 	Q_PROPERTY(CUpgrade* upgrade READ get_upgrade WRITE set_upgrade)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
-	Q_PROPERTY(QVariantList factions READ get_factions_qvariant_list)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
+	Q_PROPERTY(QVariantList factions READ get_factions_qvariant_list NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "dynasty";
@@ -62,6 +63,8 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void check() const override;
 
+	virtual std::string get_encyclopedia_text() const override;
+
 	int get_index() const
 	{
 		return this->index;
@@ -79,7 +82,7 @@ public:
 		return this->icon;
 	}
 
-	const std::vector<faction *> &get_factions() const
+	const std::vector<const faction *> &get_factions() const
 	{
 		return this->factions;
 	}
@@ -89,23 +92,26 @@ public:
 	Q_INVOKABLE void add_faction(faction *faction);
 	Q_INVOKABLE void remove_faction(faction *faction);
 
-	const std::unique_ptr<condition> &get_preconditions() const
+	const std::unique_ptr<and_condition> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	const std::unique_ptr<condition> &get_conditions() const
+	const std::unique_ptr<and_condition> &get_conditions() const
 	{
 		return this->conditions;
 	}
+
+signals:
+	void changed();
 
 private:
 	int index = -1;
 	CUpgrade *upgrade = nullptr; //dynasty upgrade applied when the dynasty is set
 	wyrmgus::icon *icon = nullptr;
-	std::vector<faction *> factions; //to which factions is this dynasty available
-	std::unique_ptr<condition> preconditions;
-	std::unique_ptr<condition> conditions;
+	std::vector<const faction *> factions; //to which factions is this dynasty available
+	std::unique_ptr<and_condition> preconditions;
+	std::unique_ptr<and_condition> conditions;
 };
 
 }
