@@ -35,9 +35,16 @@ class basic_data_entry : public QObject
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QString class_name READ get_class_name CONSTANT)
+
 public:
 	virtual void process_sml_property(const sml_property &property);
 	virtual void process_sml_scope(const sml_data &scope);
+
+	QString get_class_name() const
+	{
+		return this->metaObject()->className();
+	}
 };
 
 }

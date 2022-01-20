@@ -584,6 +584,10 @@ void character::initialize()
 		if (this->default_faction != nullptr) {
 			this->default_faction->add_character(this);
 		}
+
+		if (this->dynasty != nullptr) {
+			this->dynasty->add_character(this);
+		}
 	}
 
 	for (const std::unique_ptr<persistent_item> &default_item : this->default_items) {
@@ -1308,6 +1312,29 @@ std::filesystem::path character::get_save_filepath() const
 	filepath.make_preferred();
 
 	return filepath;
+}
+
+std::vector<const named_data_entry *> character::get_top_tree_elements() const
+{
+	std::vector<const named_data_entry *> top_tree_elements;
+
+	if (this->get_dynasty() == nullptr) {
+		return top_tree_elements;
+	}
+
+	for (const character *character : this->get_dynasty()->get_characters()) {
+		if (character->get_tree_parent() != nullptr) {
+			continue;
+		}
+
+		if (character->is_hidden_in_tree()) {
+			continue;
+		}
+
+		top_tree_elements.push_back(character);
+	}
+
+	return top_tree_elements;
 }
 
 }

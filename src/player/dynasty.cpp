@@ -28,6 +28,7 @@
 
 #include "player/dynasty.h"
 
+#include "character.h"
 #include "player/faction.h"
 #include "script/condition/and_condition.h"
 #include "upgrade/upgrade_structs.h"
@@ -128,6 +129,21 @@ void dynasty::add_faction(faction *faction)
 void dynasty::remove_faction(faction *faction)
 {
 	vector::remove(this->factions, faction);
+}
+
+QVariantList dynasty::get_dynastic_tree_characters() const
+{
+	std::vector<const character *> tree_characters;
+
+	for (const character *character : this->get_characters()) {
+		if (character->is_hidden_in_tree()) {
+			continue;
+		}
+
+		tree_characters.push_back(character);
+	}
+
+	return container::to_qvariant_list(tree_characters);
 }
 
 }

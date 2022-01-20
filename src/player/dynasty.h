@@ -45,6 +45,7 @@ class dynasty final : public detailed_data_entry, public data_type<dynasty>
 	Q_PROPERTY(CUpgrade* upgrade READ get_upgrade WRITE set_upgrade)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
 	Q_PROPERTY(QVariantList factions READ get_factions_qvariant_list NOTIFY changed)
+	Q_PROPERTY(QVariantList dynastic_tree_characters READ get_dynastic_tree_characters NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "dynasty";
@@ -102,6 +103,18 @@ public:
 		return this->conditions;
 	}
 
+	const std::vector<const character *> &get_characters() const
+	{
+		return this->characters;
+	}
+
+	QVariantList get_dynastic_tree_characters() const;
+
+	void add_character(const character *character)
+	{
+		this->characters.push_back(character);
+	}
+
 signals:
 	void changed();
 
@@ -112,6 +125,7 @@ private:
 	std::vector<const faction *> factions; //to which factions is this dynasty available
 	std::unique_ptr<and_condition> preconditions;
 	std::unique_ptr<and_condition> conditions;
+	std::vector<const character *> characters;
 };
 
 }

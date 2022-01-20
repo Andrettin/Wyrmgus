@@ -99,6 +99,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 	Q_PROPERTY(CUpgrade* trait MEMBER trait READ get_trait)
 	Q_PROPERTY(int base_level MEMBER base_level READ get_base_level)
+	Q_PROPERTY(wyrmgus::character* tree_parent READ get_tree_parent_character NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "character";
@@ -471,6 +472,35 @@ public:
 	CUnit *get_unit() const;
 
 	std::filesystem::path get_save_filepath() const;
+
+	character *get_tree_parent_character() const
+	{
+		if (this->get_dynasty() == nullptr) {
+			return nullptr;
+		}
+
+		if (this->get_father() != nullptr && this->get_father()->get_dynasty() == this->get_dynasty() && !this->get_father()->is_hidden_in_tree()) {
+			return this->get_father();
+		}
+
+		if (this->get_mother() != nullptr && this->get_mother()->get_dynasty() == this->get_dynasty() && !this->get_father()->is_hidden_in_tree()) {
+			return this->get_mother();
+		}
+
+		return nullptr;
+	}
+
+	virtual named_data_entry *get_tree_parent() const override
+	{
+		return this->get_tree_parent_character();
+	}
+
+	virtual bool is_hidden_in_tree() const override
+	{
+		return !this->IsUsable();
+	}
+
+	virtual std::vector<const named_data_entry *> get_top_tree_elements() const override;
 
 signals:
 	void changed();
