@@ -4035,7 +4035,7 @@ void CUnit::Place(const Vec2i &pos, const int z)
 	//Wyrmgus start
 	if (this->IsAlive()) {
 		if (this->Type->BoolFlag[BUILDING_INDEX].value) {
-			this->UpdateSettlement(); // update the settlement name of a building when placing it
+			this->UpdateSettlement(); //update the settlement name of a building when placing it
 		}
 
 		//remove pathways, destroyed walls and decoration units under buildings
