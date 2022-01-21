@@ -497,7 +497,7 @@ public:
 
 	virtual bool is_hidden_in_tree() const override
 	{
-		return !this->IsUsable();
+		return !this->has_encyclopedia_entry();
 	}
 
 	virtual std::vector<const named_data_entry *> get_top_tree_elements() const override;

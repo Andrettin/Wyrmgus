@@ -2926,12 +2926,10 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 		return;
 	}
 
-	if (!preferences::get()->is_show_water_borders_enabled() && tile->is_water()) {
-		return;
-	}
-
-	if (!preferences::get()->is_show_water_borders_enabled() && tile->is_space()) {
-		return;
+	if (!preferences::get()->is_show_water_borders_enabled()) {
+		if (tile->is_water() || tile->is_space()) {
+			return;
+		}
 	}
 
 	std::vector<direction> adjacent_directions;
