@@ -507,54 +507,45 @@ uint32_t minimap::get_unit_minimap_color(const CUnit *unit, const unit_type *typ
 	return CVideo::MapRGB(unit->Player->get_minimap_color());
 }
 
-uint32_t minimap::get_terrain_unit_minimap_color(const CUnit *unit, const unit_type *type, const bool red_phase) const
+QColor minimap::get_terrain_unit_minimap_color(const CUnit *unit, const unit_type *type, const bool red_phase) const
 {
 	if (this->get_mode() == minimap_mode::terrain_only) {
-		return this->get_unit_minimap_color(unit, type, red_phase);
+		return Video.GetRGBA(this->get_unit_minimap_color(unit, type, red_phase));
 	}
 
 	const tile *center_tile = unit->get_center_tile();
-
-	QColor color;
 
 	switch (this->get_mode()) {
 		case minimap_mode::territories:
 		case minimap_mode::territories_with_non_land:
 			if (center_tile->get_owner() != nullptr) {
-				color = center_tile->get_owner()->get_minimap_color();
+				return center_tile->get_owner()->get_minimap_color();
 			} else {
-				color = CPlayer::get_neutral_player()->get_minimap_color();
+				return CPlayer::get_neutral_player()->get_minimap_color();
 			}
 			break;
 		case minimap_mode::realms:
 		case minimap_mode::realms_with_non_land:
 			if (center_tile->get_realm_owner() != nullptr) {
-				color = center_tile->get_realm_owner()->get_minimap_color();
+				return center_tile->get_realm_owner()->get_minimap_color();
 			} else {
-				color = CPlayer::get_neutral_player()->get_minimap_color();
+				return CPlayer::get_neutral_player()->get_minimap_color();
 			}
 			break;
 		case minimap_mode::settlements:
 		case minimap_mode::settlements_with_non_land:
 			if (center_tile->get_settlement() != nullptr) {
-				color = center_tile->get_settlement()->get_color();
+				return center_tile->get_settlement()->get_color();
 			}
 			break;
 		default:
 			throw std::runtime_error("Unexpected minimap mode: " + std::to_string(static_cast<int>(this->get_mode())) + ".");
 	}
 
-	if (!color.isValid()) {
-		return 0;
-	}
-
-	return Video.MapRGBA(color);
+	return QColor(Qt::transparent);
 }
 
-/**
-**  Draw a unit on the minimap.
-*/
-void minimap::draw_unit_on(const CUnit *unit, const bool red_phase)
+void minimap::draw_unit(const CUnit *unit, const bool red_phase)
 {
 	const int z = UI.CurrentMapLayer->ID;
 
@@ -594,18 +585,22 @@ void minimap::draw_unit_on(const CUnit *unit, const bool red_phase)
 }
 
 //draw a unit as terrain, on its center tile
-void minimap::draw_terrain_unit_on(const CUnit *unit, const bool red_phase)
+void minimap::draw_terrain_unit(const CUnit *unit, const bool red_phase)
 {
 	const unit_type *type = this->get_unit_minimap_type(unit);
-	const uint32_t color = this->get_terrain_unit_minimap_color(unit, type, red_phase);
+	const QColor color = this->get_terrain_unit_minimap_color(unit, type, red_phase);
 
 	const int z = UI.CurrentMapLayer->ID;
-	const QPoint center_pos = unit->get_center_tile_pos();
 
 	const int x = 1 + this->XOffset[z] + Map2MinimapX[z][center_pos.x()];
 	const int y = 1 + this->YOffset[z] + Map2MinimapY[z][center_pos.y()];
 
-	*(uint32_t *) &(this->overlay_images[z].bits()[(x + y * MinimapTextureWidth[z]) * 4]) = color;
+	//draw as a circle
+	QPainter painter(&this->overlay_images[z]);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setBrush(QBrush(color));
+	painter.setPen(QPen(color));
+	painter.drawEllipse(x, y, type->get_tile_width(), type->get_tile_height());
 }
 
 /**
@@ -647,7 +642,7 @@ void minimap::Update()
 		//draw units on the map
 		for (const CUnit *unit : unit_manager::get()->get_units()) {
 			if (unit->IsVisibleOnMinimap()) {
-				this->draw_unit_on(unit, red_phase);
+				this->draw_unit(unit, red_phase);
 			}
 		}
 	} else {
@@ -661,7 +656,7 @@ void minimap::Update()
 				continue;
 			}
 
-			this->draw_terrain_unit_on(unit, red_phase);
+			this->draw_terrain_unit(unit, red_phase);
 		}
 	}
 }

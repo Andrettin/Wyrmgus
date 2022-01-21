@@ -82,6 +82,7 @@
 #include <QJsonDocument>
 #include <QMetaProperty>
 #include <QObject>
+#include <QPainter>
 #include <QPoint>
 #include <QQuickFramebufferObject>
 #include <QStandardPaths>

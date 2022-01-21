@@ -352,6 +352,7 @@ inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUni
 			}
 		}
 	}
+
 	for (size_t i = 0; i != units.size(); ++i) {
 		units[i]->CacheLock = 0;
 	}
