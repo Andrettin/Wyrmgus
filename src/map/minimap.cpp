@@ -59,14 +59,6 @@ static constexpr int ATTACK_BLINK_DURATION = 7 * CYCLES_PER_SECOND;
 
 static constexpr int SCALE_PRECISION = 100;
 
-static std::vector<int> MinimapTextureWidth;
-static std::vector<int> MinimapTextureHeight;
-
-static std::vector<std::vector<int>> Minimap2MapX;                  /// fast conversion table
-static std::vector<std::vector<int>> Minimap2MapY;                  /// fast conversion table
-static std::vector<std::vector<int>> Map2MinimapX;      /// fast conversion table
-static std::vector<std::vector<int>> Map2MinimapY;     /// fast conversion table
-
 // MinimapScale:
 // 32x32 64x64 96x96 128x128 256x256 512x512 ...
 // *4    *2    *4/3  *1      *1/2    *1/4
@@ -95,8 +87,8 @@ minimap::minimap() : mode(minimap_mode::terrain)
 */
 void minimap::Create()
 {
-	MinimapTextureWidth.resize(CMap::get()->MapLayers.size());
-	MinimapTextureHeight.resize(CMap::get()->MapLayers.size());
+	this->minimap_texture_width.resize(CMap::get()->MapLayers.size());
+	this->minimap_texture_height.resize(CMap::get()->MapLayers.size());
 
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
 		// Scale to biggest value.
@@ -120,51 +112,51 @@ void minimap::Create()
 		//
 		// Calculate minimap fast lookup tables.
 		//
-		Minimap2MapX.push_back(std::vector<int>(texture_width * texture_height, 0));
-		Minimap2MapY.push_back(std::vector<int>(texture_width * texture_height, 0));
+		this->minimap_to_map_x.push_back(std::vector<int>(texture_width * texture_height, 0));
+		this->minimap_to_map_y.push_back(std::vector<int>(texture_width * texture_height, 0));
 		for (int i = XOffset[z]; i < texture_width - XOffset[z]; ++i) {
-			Minimap2MapX[z][i] = ((i - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z];
+			this->minimap_to_map_x[z][i] = ((i - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z];
 		}
 		for (int i = YOffset[z]; i < texture_height - YOffset[z]; ++i) {
-			Minimap2MapY[z][i] = (((i - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]) * CMap::get()->Info->MapWidths[z];
+			this->minimap_to_map_y[z][i] = (((i - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]) * CMap::get()->Info->MapWidths[z];
 		}
-		Map2MinimapX.push_back(std::vector<int>(CMap::get()->Info->MapWidths[z], 0));
-		Map2MinimapY.push_back(std::vector<int>(CMap::get()->Info->MapHeights[z], 0));
+		this->map_to_minimap_x.push_back(std::vector<int>(CMap::get()->Info->MapWidths[z], 0));
+		this->map_to_minimap_y.push_back(std::vector<int>(CMap::get()->Info->MapHeights[z], 0));
 		for (int i = 0; i < CMap::get()->Info->MapWidths[z]; ++i) {
-			Map2MinimapX[z][i] = (i * MinimapScaleX[z]) / MINIMAP_FAC;
+			this->map_to_minimap_x[z][i] = (i * MinimapScaleX[z]) / MINIMAP_FAC;
 		}
 		for (int i = 0; i < CMap::get()->Info->MapHeights[z]; ++i) {
-			Map2MinimapY[z][i] = (i * MinimapScaleY[z]) / MINIMAP_FAC;
+			this->map_to_minimap_y[z][i] = (i * MinimapScaleY[z]) / MINIMAP_FAC;
 		}
 
 		// Palette updated from UpdateMinimapTerrain()
-		for (MinimapTextureWidth[z] = 1; MinimapTextureWidth[z] < texture_width; MinimapTextureWidth[z] <<= 1) {
+		for (this->minimap_texture_width[z] = 1; this->minimap_texture_width[z] < texture_width; this->minimap_texture_width[z] <<= 1) {
 		}
-		for (MinimapTextureHeight[z] = 1; MinimapTextureHeight[z] < texture_height; MinimapTextureHeight[z] <<= 1) {
+		for (this->minimap_texture_height[z] = 1; this->minimap_texture_height[z] < texture_height; this->minimap_texture_height[z] <<= 1) {
 		}
 
-		QImage terrain_image(MinimapTextureWidth[z], MinimapTextureHeight[z], QImage::Format_RGBA8888);
+		QImage terrain_image(this->minimap_texture_width[z], this->minimap_texture_height[z], QImage::Format_RGBA8888);
 		terrain_image.fill(Qt::transparent);
 		this->terrain_images.push_back(std::move(terrain_image));
 
-		QImage unexplored_image(MinimapTextureWidth[z], MinimapTextureHeight[z], QImage::Format_RGBA8888);
+		QImage unexplored_image(this->minimap_texture_width[z], this->minimap_texture_height[z], QImage::Format_RGBA8888);
 		unexplored_image.fill(Qt::transparent);
 		this->unexplored_images.push_back(std::move(unexplored_image));
 
-		QImage fog_of_war_image(MinimapTextureWidth[z], MinimapTextureHeight[z], QImage::Format_RGBA8888);
+		QImage fog_of_war_image(this->minimap_texture_width[z], this->minimap_texture_height[z], QImage::Format_RGBA8888);
 		fog_of_war_image.fill(Qt::transparent);
 		this->fog_of_war_images.push_back(std::move(fog_of_war_image));
 
 		for (int i = 0; i < static_cast<int>(minimap_mode::count); ++i) {
 			const minimap_mode mode = static_cast<minimap_mode>(i);
 			if (minimap_mode_has_overlay(mode)) {
-				QImage mode_overlay_image(MinimapTextureWidth[z], MinimapTextureHeight[z], QImage::Format_RGBA8888);
+				QImage mode_overlay_image(this->minimap_texture_width[z], this->minimap_texture_height[z], QImage::Format_RGBA8888);
 				mode_overlay_image.fill(Qt::transparent);
 				this->mode_overlay_images[mode].push_back(std::move(mode_overlay_image));
 			}
 		}
 
-		QImage overlay_image(MinimapTextureWidth[z], MinimapTextureHeight[z], QImage::Format_RGBA8888);
+		QImage overlay_image(this->minimap_texture_width[z], this->minimap_texture_height[z], QImage::Format_RGBA8888);
 		overlay_image.fill(Qt::transparent);
 		this->overlay_images.push_back(std::move(overlay_image));
 
@@ -188,7 +180,7 @@ void minimap::UpdateTerrain(int z)
 	
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
 		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
-			const int tile_index = Minimap2MapX[z][mx] + Minimap2MapY[z][my];
+			const int tile_index = this->minimap_to_map_x[z][mx] + this->minimap_to_map_y[z][my];
 			const tile &mf = *map_layer->Field(tile_index);
 			const terrain_type *terrain = mf.get_top_terrain(true);
 
@@ -197,7 +189,7 @@ void minimap::UpdateTerrain(int z)
 			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
 
 			const uint32_t c = CVideo::MapRGB(color);
-			*(uint32_t *) &(terrain_image_buffer[(mx + my * MinimapTextureWidth[z]) * 4]) = c;
+			*(uint32_t *) &(terrain_image_buffer[(mx + my * this->minimap_texture_width[z]) * 4]) = c;
 		}
 	}
 }
@@ -228,7 +220,7 @@ void minimap::update_exploration(const int z)
 			if (ReplayRevealMap) {
 				visibility_state = 2;
 			} else {
-				const tile *tile = map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
+				const tile *tile = map_layer->Field(this->minimap_to_map_x[z][mx] + this->minimap_to_map_y[z][my]);
 				visibility_state = tile->player_info->get_team_visibility_state(*CPlayer::GetThisPlayer());
 			}
 
@@ -268,7 +260,7 @@ void minimap::UpdateXY(const Vec2i &pos, const int z)
 	unsigned char *terrain_image_buffer = this->terrain_images[z].bits();
 
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
-		const int y = Minimap2MapY[z][my];
+		const int y = this->minimap_to_map_y[z][my];
 		if (y < ty) {
 			continue;
 		}
@@ -277,7 +269,7 @@ void minimap::UpdateXY(const Vec2i &pos, const int z)
 		}
 
 		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
-			const int x = Minimap2MapX[z][mx];
+			const int x = this->minimap_to_map_x[z][mx];
 
 			if (x < tx) {
 				continue;
@@ -292,7 +284,7 @@ void minimap::UpdateXY(const Vec2i &pos, const int z)
 			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
 
 			const uint32_t c = CVideo::MapRGB(color);
-			*(uint32_t *) &(terrain_image_buffer[(mx + my * MinimapTextureWidth[z]) * 4]) = c;
+			*(uint32_t *) &(terrain_image_buffer[(mx + my * this->minimap_texture_width[z]) * 4]) = c;
 		}
 	}
 }
@@ -306,7 +298,7 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 	const int tx = pos.x();
 
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
-		const int y = Minimap2MapY[z][my];
+		const int y = this->minimap_to_map_y[z][my];
 		if (y < ty) {
 			continue;
 		}
@@ -315,7 +307,7 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 		}
 
 		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
-			const int x = Minimap2MapX[z][mx];
+			const int x = this->minimap_to_map_x[z][mx];
 
 			if (x < tx) {
 				continue;
@@ -340,7 +332,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 	QColor realm_color(Qt::transparent);
 	QColor realm_with_non_land_color(Qt::transparent);
 
-	const int tile_index = Minimap2MapX[z][mx] + Minimap2MapY[z][my];
+	const int tile_index = this->minimap_to_map_x[z][mx] + this->minimap_to_map_y[z][my];
 	const tile &mf = *map_layer->Field(tile_index);
 	const site *settlement = mf.get_settlement();
 	if (settlement != nullptr) {
@@ -433,7 +425,7 @@ void minimap::update_exploration_xy(const QPoint &pos, const int z)
 	}
 
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
-		const int y = Minimap2MapY[z][my];
+		const int y = this->minimap_to_map_y[z][my];
 		if (y < ty) {
 			continue;
 		}
@@ -442,7 +434,7 @@ void minimap::update_exploration_xy(const QPoint &pos, const int z)
 		}
 
 		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
-			const int x = Minimap2MapX[z][mx];
+			const int x = this->minimap_to_map_x[z][mx];
 
 			if (x < tx) {
 				continue;
@@ -561,16 +553,16 @@ void minimap::draw_unit(const CUnit *unit, const bool red_phase)
 	const int texture_width = this->get_texture_width(z);
 	const int texture_height = this->get_texture_height(z);
 
-	const int mx = 1 + this->XOffset[z] + Map2MinimapX[z][unit->tilePos.x];
-	const int my = 1 + this->YOffset[z] + Map2MinimapY[z][unit->tilePos.y];
-	int w = Map2MinimapX[z][type->get_tile_width()];
+	const int mx = 1 + this->XOffset[z] + this->map_to_minimap_x[z][unit->tilePos.x];
+	const int my = 1 + this->YOffset[z] + this->map_to_minimap_y[z][unit->tilePos.y];
+	int w = this->map_to_minimap_x[z][type->get_tile_width()];
 
-	if (mx + w >= texture_width) { // clip right side
+	if (mx + w >= texture_width) { //clip right side
 		w = texture_width - mx;
 	}
 
-	int h0 = Map2MinimapY[z][type->get_tile_height()];
-	if (my + h0 >= texture_height) { // clip bottom side
+	int h0 = this->map_to_minimap_y[z][type->get_tile_height()];
+	if (my + h0 >= texture_height) { //clip bottom side
 		h0 = texture_height - my;
 	}
 
@@ -579,7 +571,7 @@ void minimap::draw_unit(const CUnit *unit, const bool red_phase)
 	while (w-- >= 0) {
 		int h = h0;
 		while (h-- >= 0) {
-			*(uint32_t *) &(overlay_image_buffer[((mx + w) + (my + h) * MinimapTextureWidth[z]) * 4]) = color;
+			*(uint32_t *) &(overlay_image_buffer[((mx + w) + (my + h) * this->minimap_texture_width[z]) * 4]) = color;
 		}
 	}
 }
@@ -592,8 +584,8 @@ void minimap::draw_terrain_unit(const CUnit *unit, const bool red_phase)
 
 	const int z = UI.CurrentMapLayer->ID;
 
-	const int x = 1 + this->XOffset[z] + Map2MinimapX[z][center_pos.x()];
-	const int y = 1 + this->YOffset[z] + Map2MinimapY[z][center_pos.y()];
+	const int x = 1 + this->XOffset[z] + this->map_to_minimap_x[z][unit->tilePos.x];
+	const int y = 1 + this->YOffset[z] + this->map_to_minimap_y[z][unit->tilePos.y];
 
 	//draw as a circle
 	QPainter painter(&this->overlay_images[z]);
@@ -633,7 +625,7 @@ void minimap::Update()
 	for (int my = 0; my < texture_height; ++my) {
 		for (int mx = 0; mx < texture_width; ++mx) {
 			if (mx < XOffset[z] || mx >= texture_width - XOffset[z] || my < YOffset[z] || my >= texture_height - YOffset[z]) {
-				*(uint32_t *) &(overlay_image_buffer[(mx + my * MinimapTextureWidth[z]) * 4]) = CVideo::MapRGB(0, 0, 0);
+				*(uint32_t *) &(overlay_image_buffer[(mx + my * this->minimap_texture_width[z]) * 4]) = CVideo::MapRGB(0, 0, 0);
 			}
 		}
 	}
@@ -795,10 +787,10 @@ void minimap::Destroy()
 	this->unexplored_images.clear();
 	this->fog_of_war_images.clear();
 
-	Minimap2MapX.clear();
-	Minimap2MapY.clear();
-	Map2MinimapX.clear();
-	Map2MinimapY.clear();
+	this->minimap_to_map_x.clear();
+	this->minimap_to_map_y.clear();
+	this->map_to_minimap_x.clear();
+	this->map_to_minimap_y.clear();
 
 	MinimapScaleX.clear();
 	MinimapScaleY.clear();

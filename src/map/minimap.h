@@ -146,6 +146,14 @@ public:
 	int H = 0;
 	std::vector<int> XOffset;
 	std::vector<int> YOffset;
+private:
+	std::vector<std::vector<int>> minimap_to_map_x; //fast conversion table
+	std::vector<std::vector<int>> minimap_to_map_y; //fast conversion table
+	std::vector<std::vector<int>> map_to_minimap_x; //fast conversion table
+	std::vector<std::vector<int>> map_to_minimap_y; //fast conversion table
+	std::vector<int> minimap_texture_width;
+	std::vector<int> minimap_texture_height;
+public:
 	bool ShowSelected = false;
 	bool Transparent = false;
 	bool UpdateCache = false;
