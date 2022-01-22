@@ -223,6 +223,8 @@ public:
 		this->set_population(this->get_population() + change);
 	}
 
+	void do_population_growth();
+
 private:
 	const wyrmgus::site *site = nullptr;
 	CUnit *site_unit = nullptr; //unit which represents the site

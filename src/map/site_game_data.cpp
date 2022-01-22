@@ -390,4 +390,9 @@ void site_game_data::remove_resource_unit(CUnit *unit)
 	}
 }
 
+void site_game_data::do_population_growth()
+{
+	this->change_population(std::max(1, this->get_population() / 10000));
+}
+
 }

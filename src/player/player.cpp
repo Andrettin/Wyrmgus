@@ -4765,6 +4765,12 @@ void PlayersEachSecond(const int playerIdx)
 		player->PerformResourceTrade();
 		//Wyrmgus end
 		player->update_current_quests();
+
+		if (defines::get()->is_population_enabled()) {
+			for (const site *settlement : player->get_settlements()) {
+				settlement->get_game_data()->do_population_growth();
+			}
+		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error executing the per second actions for player " + std::to_string(playerIdx) + "."));
 	}
