@@ -30,6 +30,7 @@
 
 #include "ai.h"
 #include "animation.h"
+#include "database/defines.h"
 #include "economy/resource_storage_type.h"
 //Wyrmgus start
 #include "game/game.h"
@@ -38,6 +39,8 @@
 #include "item/item_slot.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
+#include "map/site_game_data.h"
 #include "player/civilization.h"
 #include "player/faction.h"
 #include "player/player.h"
@@ -136,7 +139,16 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		player.DecreaseCountsForUnit(&unit, true);
 		
 		player.change_demand(newtype.Stats[player.get_index()].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.get_index()].Variables[DEMAND_INDEX].Value);
-		player.change_supply(newtype.Stats[player.get_index()].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.get_index()].Variables[SUPPLY_INDEX].Value);
+
+		const int supply_change = newtype.Stats[player.get_index()].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.get_index()].Variables[SUPPLY_INDEX].Value;
+
+		if (supply_change != 0) {
+			player.change_supply(supply_change);
+
+			if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
+				unit.get_settlement()->get_game_data()->change_food_supply(supply_change);
+			}
+		}
 
 		// Change resource limit
 		for (const resource *resource : resource::get_all()) {

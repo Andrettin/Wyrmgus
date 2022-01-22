@@ -35,6 +35,7 @@
 //Wyrmgus end
 #include "character.h"
 #include "commands.h"
+#include "database/defines.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -345,6 +346,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 
 	UpdateForNewUnit(unit, 0);
+
+	if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
+		unit.get_settlement()->get_game_data()->change_food_supply(unit.Variable[SUPPLY_INDEX].Value);
+	}
 
 	// Set the direction of the building if it supports them
 	if (type.get_num_directions() > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false) {

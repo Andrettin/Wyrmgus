@@ -2154,7 +2154,19 @@ void CUnit::set_settlement(const wyrmgus::site *settlement)
 		return;
 	}
 
+	const wyrmgus::site *old_settlement = this->get_settlement();
+
 	this->settlement = settlement;
+
+	if (defines::get()->is_population_enabled() && this->Variable[SUPPLY_INDEX].Value != 0 && !this->is_under_construction() && this->IsAlive()) {
+		if (old_settlement != nullptr) {
+			old_settlement->get_game_data()->change_food_supply(-this->Variable[SUPPLY_INDEX].Value);
+		}
+
+		if (this->get_settlement() != nullptr) {
+			this->get_settlement()->get_game_data()->change_food_supply(this->Variable[SUPPLY_INDEX].Value);
+		}
+	}
 }
 
 void CUnit::update_site_owner()
@@ -4421,7 +4433,14 @@ void UnitLost(CUnit &unit)
 
 	//  Update information.
 	if (unit.CurrentAction() != UnitAction::Built) {
-		player.change_supply(-unit.Variable[SUPPLY_INDEX].Value);
+		if (unit.Variable[SUPPLY_INDEX].Value != 0) {
+			player.change_supply(-unit.Variable[SUPPLY_INDEX].Value);
+
+			if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
+				unit.get_settlement()->get_game_data()->change_food_supply(-unit.Variable[SUPPLY_INDEX].Value);
+			}
+		}
+
 		// Decrease resource limit
 		for (const resource *resource : resource::get_all()) {
 			if (player.get_max_resource(resource) != -1 && type.Stats[player.get_index()].get_storing(resource) != 0) {
@@ -4509,7 +4528,10 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	// Handle unit supply and max resources.
 	// Note an upgraded unit can't give more supply.
 	if (!upgrade) {
-		player.change_supply(unit.Variable[SUPPLY_INDEX].Value);
+		if (unit.Variable[SUPPLY_INDEX].Value != 0) {
+			player.change_supply(unit.Variable[SUPPLY_INDEX].Value);
+		}
+
 		for (const resource *resource : resource::get_all()) {
 			if (player.get_max_resource(resource) != -1 && type.Stats[player.get_index()].get_storing(resource) != 0) {
 				player.change_max_resource(resource, type.Stats[player.get_index()].get_storing(resource));
@@ -4910,6 +4932,11 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	}
 	//Wyrmgus end
 
+	if (this->get_settlement() != nullptr && !this->Type->BoolFlag[TOWNHALL_INDEX].value) {
+		//set the settlement to null before calling UnitLost() so that the food supply won't be removed twice
+		this->set_settlement(nullptr);
+	}
+
 	//  Must change food/gold and other.
 	UnitLost(*this);
 
@@ -4995,6 +5022,10 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus end
 
 	this->update_site_owner();
+
+	if (this->get_settlement() == nullptr) {
+		this->UpdateSettlement();
+	}
 }
 
 static bool IsMineAssignedBy(const CUnit *mine, const CUnit *worker)

@@ -51,6 +51,8 @@
 #include "item/item_class.h"
 #include "magic_domain.h"
 #include "map/map.h"
+#include "map/site.h"
+#include "map/site_game_data.h"
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
@@ -1544,9 +1546,13 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 		}
 	}
 
-	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
+	if (um->Modifier.Variables[SUPPLY_INDEX].Value != 0) {
 		if (unit.IsAlive()) {
 			unit.Player->change_supply(um->Modifier.Variables[SUPPLY_INDEX].Value);
+
+			if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
+				unit.get_settlement()->get_game_data()->change_food_supply(um->Modifier.Variables[SUPPLY_INDEX].Value);
+			}
 		}
 	}
 
@@ -1586,9 +1592,13 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifie
 {
 	assert_throw(um != nullptr);
 
-	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
+	if (um->Modifier.Variables[SUPPLY_INDEX].Value != 0) {
 		if (unit.IsAlive()) {
 			unit.Player->change_supply(-um->Modifier.Variables[SUPPLY_INDEX].Value);
+
+			if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
+				unit.get_settlement()->get_game_data()->change_food_supply(-um->Modifier.Variables[SUPPLY_INDEX].Value);
+			}
 		}
 	}
 

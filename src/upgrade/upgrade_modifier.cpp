@@ -30,8 +30,11 @@
 #include "upgrade/upgrade_modifier.h"
 
 #include "config.h"
+#include "database/defines.h"
 #include "game/game.h"
 #include "map/map.h"
+#include "map/site.h"
+#include "map/site_game_data.h"
 #include "player/faction.h"
 #include "player/player.h"
 #include "script/condition/and_condition.h"
@@ -319,7 +322,13 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 		if (this->Modifier.Variables[SUPPLY_INDEX].Value != 0) {
 			for (CUnit *unit : unitupgrade) {
 				if (unit->IsAlive()) {
-					player->change_supply(this->Modifier.Variables[SUPPLY_INDEX].Value * multiplier);
+					const int supply_change = this->Modifier.Variables[SUPPLY_INDEX].Value * multiplier;
+
+					player->change_supply(supply_change);
+
+					if (defines::get()->is_population_enabled() && unit->get_settlement() != nullptr) {
+						unit->get_settlement()->get_game_data()->change_food_supply(supply_change);
+					}
 				}
 			}
 		}
