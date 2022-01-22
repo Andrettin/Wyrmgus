@@ -4045,7 +4045,7 @@ void CUnit::Place(const Vec2i &pos, const int z)
 	//Wyrmgus start
 	if (this->IsAlive()) {
 		if (this->Type->BoolFlag[BUILDING_INDEX].value) {
-			this->UpdateSettlement(); //update the settlement name of a building when placing it
+			this->UpdateSettlement(); //update the settlement of a building when placing it
 		}
 
 		//remove pathways, destroyed walls and decoration units under buildings
@@ -7312,7 +7312,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	MapMarkUnitSight(unit);
 	
 	//Wyrmgus start
-	if (unit.get_settlement() != nullptr && unit.get_site() == unit.get_settlement()) {
+	if (unit.get_settlement() != nullptr && type->BoolFlag[TOWNHALL_INDEX].value) {
 		unit.UpdateBuildingSettlementAssignment(unit.get_settlement());
 	}
 	//Wyrmgus end
