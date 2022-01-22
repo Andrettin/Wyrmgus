@@ -472,7 +472,7 @@ static void AiCheckUnits()
 								mercenary_type->get_unit_class() == queue.Type->get_unit_class()
 								&& queue.Want > queue.Made
 								&& (!queue.landmass || queue.landmass == CMap::get()->get_tile_landmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
-								&& (!queue.settlement || queue.settlement == mercenary_building->settlement)
+								&& (!queue.settlement || queue.settlement == mercenary_building->get_settlement())
 							) {
 								queue.Made++;
 								CommandTrainUnit(*mercenary_building, *mercenary_type, AiPlayer->Player->get_index(), FlushCommands);
@@ -1284,7 +1284,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 	assert_throw(what.Player->get_type() != player_type::person);
 	//Wyrmgus start
 //	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
-	AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
+	AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.get_settlement());
 	//Wyrmgus end
 }
 
@@ -1504,11 +1504,11 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
 	if (unit.Player == what.Player) {
-		AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
+		AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.get_settlement());
 	} else { //remove the request of the unit the mercenary is substituting
 		wyrmgus::unit_type *requested_unit_type = what.Player->get_faction()->get_class_unit_type(what.Type->get_unit_class());
 		if (requested_unit_type != nullptr) {
-			AiRemoveFromBuilt(what.Player->Ai.get(), *requested_unit_type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
+			AiRemoveFromBuilt(what.Player->Ai.get(), *requested_unit_type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.get_settlement());
 		}
 	}
 	//Wyrmgus end

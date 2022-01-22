@@ -214,7 +214,7 @@ public:
 			return;
 		}
 
-		if (this->settlement != nullptr && this->settlement != unit->settlement) {
+		if (this->settlement != nullptr && this->settlement != unit->get_settlement()) {
 			return;
 		}
 

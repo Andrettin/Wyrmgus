@@ -145,7 +145,7 @@ public:
 	{
 		if (
 			(!vector::contains(this->get_unit_types(), unit->Type) && !vector::contains(this->get_unit_classes(), unit->Type->get_unit_class()))
-			|| (this->settlement != nullptr && this->settlement != unit->settlement)
+			|| (this->settlement != nullptr && this->settlement != unit->get_settlement())
 		) {
 			return false;
 		}

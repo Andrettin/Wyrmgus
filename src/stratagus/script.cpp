@@ -1602,8 +1602,8 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitSettlementName: //name of the unit's settlement
 			unit = EvalUnit(s->D.Unit.get());
-			if (unit != nullptr && unit->settlement != nullptr) {
-				return unit->settlement->get_game_data()->get_current_cultural_name();
+			if (unit != nullptr && unit->get_settlement() != nullptr) {
+				return unit->get_settlement()->get_game_data()->get_current_cultural_name();
 			} else {
 				return std::string();
 			}

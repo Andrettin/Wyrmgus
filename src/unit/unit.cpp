@@ -551,7 +551,7 @@ void CUnit::Release(const bool final)
 
 	//Wyrmgus start
 	this->character = nullptr;
-	this->settlement = nullptr;
+	this->set_settlement(nullptr);
 	this->set_site(nullptr);
 	this->unique = nullptr;
 	this->ConnectingDestination = nullptr;
@@ -626,12 +626,12 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 		}
 	}
 
-	if (replaced_unit.settlement != nullptr) {
-		this->settlement = replaced_unit.settlement;
+	if (replaced_unit.get_settlement() != nullptr) {
+		this->set_settlement(replaced_unit.get_settlement());
 	}
 
-	if (replaced_unit.site != nullptr) {
-		this->set_site(replaced_unit.site);
+	if (replaced_unit.get_site() != nullptr) {
+		this->set_site(replaced_unit.get_site());
 
 		if (replaced_unit.site->is_settlement()) {
 			CMap::get()->remove_settlement_unit(&replaced_unit);
@@ -689,7 +689,7 @@ void CUnit::restore_ontop()
 					temp->set_site(this->get_site());
 
 					if (this->get_site()->is_settlement()) {
-						temp->settlement = this->settlement;
+						temp->set_settlement(this->settlement);
 						CMap::get()->remove_settlement_unit(this);
 						CMap::get()->add_settlement_unit(temp);
 					}
@@ -2146,6 +2146,15 @@ void CUnit::set_site(const wyrmgus::site *site)
 	if (site != nullptr) {
 		site->get_game_data()->set_site_unit(this);
 	}
+}
+
+void CUnit::set_settlement(const wyrmgus::site *settlement)
+{
+	if (settlement == this->get_settlement()) {
+		return;
+	}
+
+	this->settlement = settlement;
 }
 
 void CUnit::update_site_owner()
@@ -3809,31 +3818,32 @@ void CUnit::UpdateSettlement()
 			}
 			
 			if (potential_settlements.size() > 0) {
-				this->settlement = vector::take_random(potential_settlements);
-				this->set_site(this->settlement);
+				this->set_settlement(vector::take_random(potential_settlements));
+				this->set_site(this->get_settlement());
 				CMap::get()->add_settlement_unit(this);
 
 				//set the tiles the settlement unit is located to its settlement
 				for (int x = this->tilePos.x; x < (this->tilePos.x + this->Type->get_tile_width()); ++x) {
 					for (int y = this->tilePos.y; y < (this->tilePos.y + this->Type->get_tile_height()); ++y) {
 						const QPoint tile_pos(x, y);
-						this->MapLayer->Field(tile_pos)->set_settlement(this->settlement);
+						this->MapLayer->Field(tile_pos)->set_settlement(this->get_settlement());
 					}
 				}
 			}
 		}
-		if (this->settlement != nullptr) {
+
+		if (this->get_settlement() != nullptr) {
 			this->UpdateBuildingSettlementAssignment();
 		}
 	} else {
 		const tile *tile = this->get_center_tile();
 
 		if (this->Player->get_index() == PlayerNumNeutral || this->Player->has_neutral_faction_type()) {
-			this->settlement = tile->get_settlement();
+			this->set_settlement(tile->get_settlement());
 		} else if (tile->get_owner() == this->Player) {
-			this->settlement = tile->get_settlement();
+			this->set_settlement(tile->get_settlement());
 		} else {
-			this->settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->get_tile_size());
+			this->set_settlement(this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->get_tile_size()));
 		}
 	}
 }
@@ -7302,8 +7312,8 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	MapMarkUnitSight(unit);
 	
 	//Wyrmgus start
-	if (unit.settlement && unit.get_site() == unit.settlement) {
-		unit.UpdateBuildingSettlementAssignment(unit.settlement);
+	if (unit.get_settlement() != nullptr && unit.get_site() == unit.get_settlement()) {
+		unit.UpdateBuildingSettlementAssignment(unit.get_settlement());
 	}
 	//Wyrmgus end
 	

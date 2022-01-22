@@ -1022,7 +1022,7 @@ static bool AiTrainUnit(const unit_type &type, const unit_type &what, const land
 			continue;
 		}
 		
-		if (settlement && unit.settlement != settlement) {
+		if (settlement && unit.get_settlement() != settlement) {
 			continue;
 		}
 		//Wyrmgus end
@@ -2669,7 +2669,7 @@ static void AiCheckMinecartConstruction()
 					
 			for (size_t j = 0; j < mine_table.size(); ++j) {
 				const CUnit *mine_unit = mine_table[j];
-				const site *mine_settlement = mine_unit->settlement;
+				const site *mine_settlement = mine_unit->get_settlement();
 						
 				if (mine_settlement == nullptr) {
 					continue;

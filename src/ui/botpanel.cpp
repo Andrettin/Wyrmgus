@@ -407,7 +407,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->settlement_name != CONDITION_TRUE) {
-		if ((condition->settlement_name == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && unit_manager::get()->GetSlotUnit(button.Value).settlement != nullptr)) {
+		if ((condition->settlement_name == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && unit_manager::get()->GetSlotUnit(button.Value).get_settlement() != nullptr)) {
 			return false;
 		}
 	}

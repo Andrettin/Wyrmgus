@@ -289,6 +289,13 @@ public:
 	void set_site(const wyrmgus::site *site);
 	void update_site_owner();
 
+	const wyrmgus::site *get_settlement() const
+	{
+		return this->settlement;
+	}
+
+	void set_settlement(const wyrmgus::site *settlement);
+
 	void Identify();
 	void CheckIdentification();
 	void CheckKnowledgeChange(int variable, int change);
@@ -864,9 +871,7 @@ private:
 	const wyrmgus::epithet *epithet = nullptr;
 	std::string surname;
 	wyrmgus::character *character = nullptr; //character represented by this unit
-public:
-	const wyrmgus::site *settlement = nullptr;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
-private:
+	const wyrmgus::site *settlement = nullptr;	//settlement (for if the unit is a town hall or a building associated to a settlement)
 	const wyrmgus::site *site = nullptr; //the site to which the unit belongs, if it is a site unit (not necessarily the same as the settlement, e.g. if the site is a non-major one)
 public:
 	CUpgrade *Trait;	/// Unit's trait

@@ -1049,7 +1049,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				}
 				
 				for (int j = 0; j < 5; ++j) {
-					CreateUnit(worker_pos - worker_unit_offset, *worker_type, player, player->StartMapLayer, false, worker_town_hall->settlement);
+					CreateUnit(worker_pos - worker_unit_offset, *worker_type, player, player->StartMapLayer, false, worker_town_hall->get_settlement());
 				}
 			}
 		}
@@ -1342,7 +1342,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		site_game_data->set_map_pos(unit->get_center_tile_pos());
 
 		if (site->is_settlement()) {
-			unit->settlement = site;
+			unit->set_settlement(site);
 		} else {
 			first_building = false;
 		}
@@ -1352,7 +1352,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			for (int x = unit->tilePos.x; x < (unit->tilePos.x + unit->Type->get_tile_width()); ++x) {
 				for (int y = unit->tilePos.y; y < (unit->tilePos.y + unit->Type->get_tile_height()); ++y) {
 					const QPoint tile_pos(x, y);
-					CMap::get()->Field(tile_pos, z)->set_settlement(unit->settlement);
+					CMap::get()->Field(tile_pos, z)->set_settlement(unit->get_settlement());
 				}
 			}
 		}

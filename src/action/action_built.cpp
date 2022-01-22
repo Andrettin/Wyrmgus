@@ -443,7 +443,7 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 			   unit.Player->get_index() _C_ UnitNumber(unit) _C_ unit.Type->get_identifier().c_str());
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
-	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, CMap::get()->get_tile_landmass(unit.tilePos, unit.MapLayer->ID), unit.settlement);
+	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, CMap::get()->get_tile_landmass(unit.tilePos, unit.MapLayer->ID), unit.get_settlement());
 	//Wyrmgus end
 }
 

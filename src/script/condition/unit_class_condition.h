@@ -120,7 +120,7 @@ public:
 
 			int counter = 0;
 			for (const CUnit *unit : units) {
-				if (unit->settlement == this->settlement) {
+				if (unit->get_settlement() == this->settlement) {
 					counter++;
 
 					if (counter >= this->count) {

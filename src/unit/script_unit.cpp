@@ -319,12 +319,12 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "surname")) {
 			unit->surname = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "site")) {
-			unit->set_site(wyrmgus::site::get(LuaToString(l, 2, j + 1)));
+			unit->set_site(site::get(LuaToString(l, 2, j + 1)));
 			if (unit->site->is_settlement()) {
 				CMap::get()->add_settlement_unit(unit);
 			}
 		} else if (!strcmp(value, "settlement")) {
-			unit->settlement = wyrmgus::site::get(LuaToString(l, 2, j + 1));
+			unit->settlement = site::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "trait")) {
 			unit->Trait = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "prefix")) {
@@ -1731,8 +1731,8 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushboolean(l, false);
 		}
 	} else if (!strcmp(value, "Settlement")) {
-		if (unit->settlement != nullptr) {
-			lua_pushstring(l, unit->settlement->Ident.c_str());
+		if (unit->get_settlement() != nullptr) {
+			lua_pushstring(l, unit->get_settlement()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

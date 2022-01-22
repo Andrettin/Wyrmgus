@@ -480,7 +480,7 @@ std::string text_processor::process_unit_tokens(const CUnit *unit, std::queue<st
 	} else if (front_subtoken == "oblique_pronoun") {
 		return get_gender_oblique_pronoun(unit->get_gender());
 	} else if (front_subtoken == "settlement") {
-		const site *settlement = unit->settlement;
+		const site *settlement = unit->get_settlement();
 
 		if (settlement == nullptr) {
 			settlement = unit->get_center_tile_settlement();

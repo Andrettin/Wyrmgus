@@ -4393,7 +4393,7 @@ site_set CMap::get_settlements() const
 	site_set settlements;
 
 	for (const CUnit *settlement_unit : this->get_settlement_units()) {
-		settlements.insert(settlement_unit->settlement);
+		settlements.insert(settlement_unit->get_settlement());
 	}
 
 	return settlements;

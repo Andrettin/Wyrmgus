@@ -1836,7 +1836,7 @@ void CPlayer::update_territory_tiles()
 		}
 
 		for (const CUnit *town_hall : kv_pair.second) {
-			town_hall->settlement->get_game_data()->update_territory_tiles();
+			town_hall->get_settlement()->get_game_data()->update_territory_tiles();
 		}
 	}
 
@@ -2028,7 +2028,7 @@ std::vector<const wyrmgus::site *> CPlayer::get_settlements() const
 
 	const std::vector<CUnit *> town_hall_units = this->get_town_hall_units();
 	for (const CUnit *town_hall_unit : town_hall_units) {
-		settlements.push_back(town_hall_unit->settlement);
+		settlements.push_back(town_hall_unit->get_settlement());
 	}
 
 	return settlements;
@@ -2128,7 +2128,7 @@ const wyrmgus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, cons
 	}
 	
 	if (best_hall) {
-		return best_hall->settlement;
+		return best_hall->get_settlement();
 	} else {
 		return nullptr;
 	}
@@ -2147,7 +2147,7 @@ void CPlayer::update_building_settlement_assignment(const wyrmgus::site *old_set
 			continue;
 		}
 
-		if (old_settlement != nullptr && unit->settlement != old_settlement) {
+		if (old_settlement != nullptr && unit->get_settlement() != old_settlement) {
 			continue;
 		}
 
@@ -2238,7 +2238,7 @@ bool CPlayer::HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site
 			} else {
 				for (int i = 0; i < this->GetUnitCount(); ++i) {
 					CUnit &unit = this->GetUnit(i);
-					if (unit.Type == unit_type_upgradee && unit.settlement == settlement) {
+					if (unit.Type == unit_type_upgradee && unit.get_settlement() == settlement) {
 						return true;
 					}
 				}
@@ -2260,7 +2260,7 @@ bool CPlayer::HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site
 				} else {
 					for (int i = 0; i < this->GetUnitCount(); ++i) {
 						CUnit &unit = this->GetUnit(i);
-						if (unit.Type->get_unit_class() == unit_class_upgradee && unit.settlement == settlement) {
+						if (unit.Type->get_unit_class() == unit_class_upgradee && unit.get_settlement() == settlement) {
 							return true;
 						}
 					}
@@ -2954,8 +2954,8 @@ bool CPlayer::capture_unit(CUnit *unit)
 	}
 
 	//if we are capturing a town hall, capture all other buildings in its settlement as well
-	if (unit->Type->BoolFlag[TOWNHALL_INDEX].value && unit->settlement != nullptr) {
-		const site_game_data *settlement_game_data = unit->settlement->get_game_data();
+	if (unit->Type->BoolFlag[TOWNHALL_INDEX].value && unit->get_settlement() != nullptr) {
+		const site_game_data *settlement_game_data = unit->get_settlement()->get_game_data();
 		const QRect &settlement_territory_rect = settlement_game_data->get_territory_rect();
 
 		std::vector<CUnit *> settlement_buildings;
@@ -2970,7 +2970,7 @@ bool CPlayer::capture_unit(CUnit *unit)
 				continue;
 			}
 
-			if (settlement_building->get_center_tile_settlement() != unit->settlement) {
+			if (settlement_building->get_center_tile_settlement() != unit->get_settlement()) {
 				continue;
 			}
 
