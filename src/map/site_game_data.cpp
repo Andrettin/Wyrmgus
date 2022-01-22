@@ -53,6 +53,8 @@ void site_game_data::process_sml_property(const sml_property &property)
 
 	if (key == "map_layer") {
 		this->map_layer = CMap::get()->MapLayers[std::stoi(value)].get();
+	} else if (key == "population") {
+		this->set_population(std::stoll(value));
 	} else {
 		throw std::runtime_error("Invalid site game data property: \"" + key + "\".");
 	}
@@ -79,6 +81,10 @@ sml_data site_game_data::to_sml_data() const
 
 	if (this->get_map_layer() != nullptr) {
 		data.add_property("map_layer", std::to_string(this->get_map_layer()->ID));
+	}
+
+	if (this->get_population() != 0) {
+		data.add_property("population", std::to_string(this->get_population()));
 	}
 
 	return data;
