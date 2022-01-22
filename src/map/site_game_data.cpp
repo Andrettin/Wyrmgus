@@ -392,7 +392,22 @@ void site_game_data::remove_resource_unit(CUnit *unit)
 
 void site_game_data::do_population_growth()
 {
-	this->change_population(std::max(1, this->get_population() / 10000));
+	int population_growth = 0;
+
+	if (this->get_population() < this->get_population_capacity()) {
+		population_growth = this->get_population() * defines::get()->get_population_growth_multiplier() / std::max(1, this->get_population_capacity());
+		population_growth = std::max(1, population_growth);
+
+		const int available_capacity = this->get_population_capacity() - this->get_population();
+		population_growth = std::min(available_capacity, population_growth);
+	} else if (this->get_population() > this->get_population_capacity()) {
+		population_growth = -(this->get_population_capacity() * defines::get()->get_population_growth_multiplier() / std::max(1, this->get_population()));
+		population_growth = std::min(-1, population_growth);
+	}
+
+	if (population_growth != 0) {
+		this->change_population(population_growth);
+	}
 }
 
 }

@@ -224,6 +224,11 @@ public:
 		this->set_population(this->get_population() + change);
 	}
 
+	int get_population_capacity() const
+	{
+		return this->get_food_supply() * site_game_data::population_per_food;
+	}
+
 	void do_population_growth();
 
 	int get_food_supply() const
