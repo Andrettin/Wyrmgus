@@ -4490,9 +4490,11 @@ void CPlayer::SetUnitTypeCount(const unit_type *type, const int quantity)
 		this->UnitTypesCount[type] = quantity;
 	}
 
-	const bool is_population_unit = !type->BoolFlag[BUILDING_INDEX].value && !type->BoolFlag[FAUNA_INDEX].value;
-	if (is_population_unit) {
-		this->change_population((quantity - old_quantity) * defines::get()->get_population_per_unit());
+	if (!defines::get()->is_population_enabled()) {
+		const bool is_population_unit = !type->BoolFlag[BUILDING_INDEX].value && !type->BoolFlag[FAUNA_INDEX].value;
+		if (is_population_unit) {
+			this->change_population(static_cast<int64_t>(quantity - old_quantity) * defines::get()->get_population_per_unit());
+		}
 	}
 }
 

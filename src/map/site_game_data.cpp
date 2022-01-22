@@ -131,8 +131,14 @@ void site_game_data::set_owner(CPlayer *player)
 
 	if (this->site->is_settlement()) {
 		if (defines::get()->is_population_enabled()) {
+			if (old_owner != nullptr) {
+				old_owner->change_population(-this->get_population());
+			}
+
 			if (this->owner != nullptr) {
-				if (this->get_population() == 0) {
+				if (this->get_population() != 0) {
+					this->owner->change_population(this->get_population());
+				} else {
 					this->set_population(site_game_data::min_population);
 				}
 			} else {
@@ -396,7 +402,13 @@ void site_game_data::set_population(const int64_t population)
 		return;
 	}
 
+	const int64_t old_population = this->get_population();
+
 	this->population = population;
+
+	if (this->get_owner() != nullptr) {
+		this->get_owner()->change_population(this->get_population() - old_population);
+	}
 }
 
 void site_game_data::do_population_growth()
