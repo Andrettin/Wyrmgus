@@ -99,6 +99,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::button_level* inventory_button_level MEMBER inventory_button_level READ get_inventory_button_level)
 	Q_PROPERTY(wyrmgus::button_level* cancel_button_level MEMBER cancel_button_level READ get_cancel_button_level)
 	Q_PROPERTY(wyrmgus::unit_class* town_hall_class MEMBER town_hall_class READ get_town_hall_class)
+	Q_PROPERTY(bool population_enabled MEMBER population_enabled READ is_population_enabled)
 	Q_PROPERTY(wyrmgus::unit_class* default_population_class MEMBER default_population_class)
 	Q_PROPERTY(wyrmgus::unit_class* default_water_population_class MEMBER default_water_population_class)
 	Q_PROPERTY(wyrmgus::unit_class* default_space_population_class MEMBER default_space_population_class)
@@ -349,6 +350,11 @@ public:
 		return this->town_hall_class;
 	}
 
+	bool is_population_enabled() const
+	{
+		return this->population_enabled;
+	}
+
 	const unit_class *get_default_population_class() const
 	{
 		return this->default_population_class;
@@ -506,6 +512,7 @@ private:
 	button_level *inventory_button_level = nullptr;
 	button_level *cancel_button_level = nullptr;
 	unit_class *town_hall_class = nullptr;
+	bool population_enabled = false;
 	unit_class *default_population_class = nullptr;
 	unit_class *default_water_population_class = nullptr;
 	unit_class *default_space_population_class = nullptr;
