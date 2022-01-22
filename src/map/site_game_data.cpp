@@ -419,26 +419,21 @@ void site_game_data::set_population(const int64_t population)
 
 void site_game_data::do_population_growth()
 {
-	int64_t population_growth = 0;
+	const int food_surplus = this->get_food_supply() - this->get_food_demand();
 
-	if (this->get_population() < this->get_population_capacity()) {
-		population_growth = this->get_population_capacity() * defines::get()->get_population_growth_multiplier() / std::max<int64_t>(1, this->get_population());
-		population_growth = std::max<int64_t>(1, population_growth);
+	const int64_t available_capacity = this->get_population_capacity() - this->get_population();
+	int64_t population_growth = static_cast<int64_t>(food_surplus) * defines::get()->get_population_growth_per_food();
 
-		//population cannot grow by more than the current population
-		population_growth = std::min<int64_t>(this->get_population(), population_growth);
-
-		const int64_t available_capacity = this->get_population_capacity() - this->get_population();
+	if (available_capacity > 0) {
+		//the population cannot grow beyond capacity
 		population_growth = std::min<int64_t>(available_capacity, population_growth);
-	} else if (this->get_population() > this->get_population_capacity()) {
-		int64_t population_decrease = this->get_population() * defines::get()->get_population_growth_multiplier() / std::max<int64_t>(1, this->get_population_capacity());
-		population_decrease = std::max<int64_t>(1, population_decrease);
+	} else if (available_capacity < 0) {
+		//must decrease by something
+		population_growth = std::min<int64_t>(-defines::get()->get_population_growth_per_food(), population_growth);
 
-		//population cannot decrease by more than the overpopulation
+		//the population cannot decrease by more than the overpopulation
 		const int64_t overpopulation = this->get_population() - this->get_population_capacity();
-		population_decrease = std::min<int64_t>(overpopulation, population_decrease);
-
-		population_growth = population_decrease * -1;
+		population_growth = std::max<int64_t>(-overpopulation, population_growth);
 	}
 
 	if (population_growth != 0) {

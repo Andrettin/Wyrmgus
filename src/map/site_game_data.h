@@ -219,7 +219,7 @@ public:
 
 	int64_t get_population_capacity() const
 	{
-		return this->get_food_supply() * site_game_data::population_per_food;
+		return static_cast<int64_t>(this->get_food_supply()) * site_game_data::population_per_food;
 	}
 
 	void do_population_growth();
