@@ -1449,6 +1449,25 @@ void PreprocessMap()
 			world_game_data->set_time_of_day_by_hours(hours);
 		}
 
+		if (defines::get()->is_population_enabled()) {
+			//ensure all settlements have at least some population
+			for (const site *site : site::get_all()) {
+				if (!site->is_settlement()) {
+					continue;
+				}
+
+				site_game_data *settlement_game_data = site->get_game_data();
+
+				if (settlement_game_data->get_site_unit() == nullptr || settlement_game_data->get_owner() == nullptr) {
+					continue;
+				}
+
+				if (settlement_game_data->get_population() == 0) {
+					settlement_game_data->set_population(site_game_data::min_population);
+				}
+			}
+		}
+
 		CMap::get()->calculate_settlement_resource_units();
 
 		//Wyrmgus start

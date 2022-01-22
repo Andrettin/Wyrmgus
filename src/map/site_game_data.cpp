@@ -29,6 +29,7 @@
 #include "map/site_game_data.h"
 
 #include "ai/ai_local.h"
+#include "database/defines.h"
 #include "database/sml_data.h"
 #include "map/map.h"
 #include "map/map_info.h"
@@ -129,6 +130,16 @@ void site_game_data::set_owner(CPlayer *player)
 	this->owner = player;
 
 	if (this->site->is_settlement()) {
+		if (defines::get()->is_population_enabled()) {
+			if (this->owner != nullptr) {
+				if (this->get_population() == 0) {
+					this->set_population(site_game_data::min_population);
+				}
+			} else {
+				this->set_population(0);
+			}
+		}
+
 		if (GameCycle > 0) {
 			this->update_border_tiles();
 			this->update_territory_tiles();
