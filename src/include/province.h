@@ -62,28 +62,20 @@ public:
 class CProvince
 {
 public:
-	CProvince() :
-		ID(-1),
-		Water(false), Coastal(false)
-	{
-	}
-	
 	std::string Name;
 	wyrmgus::world *world = nullptr;
-	int ID;																/// ID of this province
-	bool Water;															/// Whether the province is a water province or not
-	bool Coastal;														/// Whether the province is a coastal province or not
-	std::map<int, std::string> CulturalNames;							/// Names for the province for each different culture/civilization
-	std::map<wyrmgus::faction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
-	std::vector<wyrmgus::faction *> FactionClaims;								/// Factions which have a claim to this province
-	std::vector<wyrmgus::region *> Regions;										/// Regions to which this province belongs
-	std::map<int, wyrmgus::faction *> HistoricalOwners;							/// Historical owners of the province, mapped to the year
-	std::map<int, wyrmgus::faction *> HistoricalClaims;							/// Historical claims over the province, mapped to the year
-	std::map<int, int> HistoricalCultures;								/// Historical cultures which were predominant in the province, mapped to the year
-	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
-	std::map<int, std::map<int, bool>> HistoricalSettlementBuildings;	/// Historical settlement buildings, mapped to building unit type id and year
-	std::map<CUpgrade *, std::map<int, bool>> HistoricalModifiers;		/// Historical province modifiers, mapped to the modifier's upgrade and year
-	std::map<std::tuple<int, int>, wyrmgus::character *> HistoricalGovernors;	/// Historical governors of the province, mapped to the beginning and end of the term
+	int ID = -1;								/// ID of this province
+	bool Water = false;							/// Whether the province is a water province or not
+	bool Coastal = false;						/// Whether the province is a coastal province or not
+	std::map<int, std::string> CulturalNames;	/// Names for the province for each different culture/civilization
+	std::map<faction *, std::string> FactionCulturalNames; /// Names for the province for each different faction
+	std::vector<faction *> FactionClaims;		/// Factions which have a claim to this province
+	std::vector<region *> Regions;				/// Regions to which this province belongs
+	std::map<int, faction *> HistoricalOwners;	/// Historical owners of the province, mapped to the year
+	std::map<int, faction *> HistoricalClaims;	/// Historical claims over the province, mapped to the year
+	std::map<int, int> HistoricalCultures; /// Historical cultures which were predominant in the province, mapped to the year
+	std::map<int, std::map<int, bool>> HistoricalSettlementBuildings; /// Historical settlement buildings, mapped to building unit type id and year
+	std::map<CUpgrade *, std::map<int, bool>> HistoricalModifiers; /// Historical province modifiers, mapped to the modifier's upgrade and year
 };
 
 class WorldMapTile

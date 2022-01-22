@@ -217,17 +217,6 @@ static int CclDefineProvince(lua_State *l)
 					province->HistoricalCultures[year] = historical_civilization->ID;
 				}
 			}
-		} else if (!strcmp(value, "HistoricalPopulation")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				int year = LuaToNumber(l, -1, j + 1);
-				++j;
-				int historical_population = LuaToNumber(l, -1, j + 1);
-				province->HistoricalPopulation[year] = historical_population;
-			}
 		} else if (!strcmp(value, "HistoricalSettlementBuildings")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

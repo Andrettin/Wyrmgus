@@ -326,7 +326,6 @@ private:
 	std::unique_ptr<site_game_data> game_data;
 public:
 	std::map<CDate, const faction *> HistoricalOwners;			/// Historical owners of the site
-	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::vector<std::tuple<CDate, CDate, const unit_type *, int, const faction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
 	std::vector<std::tuple<CDate, CDate, const unit_class *, unique_item *, const faction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 

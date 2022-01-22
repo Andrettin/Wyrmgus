@@ -1374,19 +1374,6 @@ static int CclDefineSite(lua_State *l)
 					site->HistoricalOwners[date] = nullptr;
 				}
 			}
-		} else if (!strcmp(value, "HistoricalPopulation")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CDate date;
-				lua_rawgeti(l, -1, j + 1);
-				CclGetDate(l, &date);
-				lua_pop(l, 1);
-				++j;
-				site->HistoricalPopulation[date] = LuaToNumber(l, -1, j + 1);
-			}
 		} else if (!strcmp(value, "HistoricalUnits")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

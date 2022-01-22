@@ -1,22 +1,13 @@
-
 extern bool GrandStrategy;
 extern int GrandStrategyYear;
-extern std::string GrandStrategyWorld;
-extern int PopulationGrowthThreshold;
 
-extern int GetProvinceId(std::string province_name);
 extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
 extern void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceHero(std::string province_name, std::string hero_full_name, int value);
-extern void SetProvinceFood(std::string province_name, int quantity);
-extern void ChangeProvinceFood(std::string province_name, int quantity);
 extern void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void RemoveProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
-extern void InitializeGrandStrategyGame(bool show_loading = true);
-extern void FinalizeGrandStrategyInitialization();
-extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);

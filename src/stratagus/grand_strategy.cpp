@@ -60,8 +60,6 @@
 bool GrandStrategy = false;				///if the game is in grand strategy mode
 bool GrandStrategyGameLoading = false;
 int GrandStrategyYear = 0;
-std::string GrandStrategyWorld;
-int PopulationGrowthThreshold = 1000;
 CGrandStrategyGame GrandStrategyGame;
 std::map<std::string, int> GrandStrategyHeroStringToIndex;
 std::vector<std::unique_ptr<CGrandStrategyEvent>> GrandStrategyEvents;
@@ -392,28 +390,6 @@ void CGrandStrategyProvince::ChangeUnitQuantity(int unit_type_id, int quantity)
 	this->SetUnitQuantity(unit_type_id, this->Units[unit_type_id] + quantity);
 }
 
-void CGrandStrategyProvince::SetPopulation(int quantity)
-{
-	if (this->civilization == -1) {
-		return;
-	}
-
-	int worker_unit_type = this->GetClassUnitType(wyrmgus::unit_class::get("worker"));
-	
-	if (quantity > 0) {
-		quantity /= 10000; // each population unit represents 10,000 people
-		quantity /= 2; // only (working-age) adults are represented, so around half of the total population
-		quantity = std::max(1, quantity);
-	}
-	
-//	quantity -= this->TotalUnits - this->Units[worker_unit_type]; // decrease from the quantity to be set the population that isn't composed of workers
-	// don't take military units in consideration for this population count for now (since they don't cost food anyway)
-	quantity -= this->TotalWorkers - this->Units[worker_unit_type]; // decrease from the quantity to be set the population that isn't composed of workers
-	quantity = std::max(0, quantity);
-			
-	this->SetUnitQuantity(worker_unit_type, quantity);
-}
-
 void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 {
 	if (value == 1) {
@@ -542,11 +518,6 @@ bool CGrandStrategyProvince::BordersFaction(int faction_civilization, int factio
 		}
 	}
 	return false;
-}
-
-int CGrandStrategyProvince::GetPopulation()
-{
-	return (this->TotalWorkers * 10000) * 2;
 }
 
 int CGrandStrategyProvince::GetClassUnitType(const wyrmgus::unit_class *unit_class)
@@ -1156,25 +1127,6 @@ void SetProvinceHero(std::string province_name, std::string hero_full_name, int 
 	}
 }
 
-void SetProvinceFood(std::string province_name, int quantity)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress = std::max(0, quantity);
-	}
-}
-
-void ChangeProvinceFood(std::string province_name, int quantity)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress += quantity;
-		GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress = std::max(0, GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress);
-	}
-}
-
 void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name)
 {
 	int province_id = GetProvinceId(province_name);
@@ -1203,10 +1155,8 @@ void RemoveProvinceClaim(std::string province_name, std::string civilization_nam
 	}
 }
 
-void InitializeGrandStrategyGame(bool show_loading)
+void InitializeGrandStrategyGame()
 {
-	Q_UNUSED(show_loading)
-
 	//initialize literary works
 	for (CUpgrade *upgrade : CUpgrade::get_all()) {
 		if (upgrade->Work == wyrmgus::item_class::none || upgrade->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
@@ -1231,13 +1181,6 @@ void FinalizeGrandStrategyInitialization()
 		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[i];
 		CProvince *base_province = GetProvince(province->Name);
 		
-		for (std::map<int, int>::reverse_iterator iterator = base_province->HistoricalPopulation.rbegin(); iterator != base_province->HistoricalPopulation.rend(); ++iterator) {
-			if (GrandStrategyYear >= iterator->first) {
-				province->SetPopulation(iterator->second);
-				break;
-			}
-		}
-				
 		for (std::map<CUpgrade *, std::map<int, bool>>::iterator iterator = base_province->HistoricalModifiers.begin(); iterator != base_province->HistoricalModifiers.end(); ++iterator) {
 			for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
 				if (GrandStrategyYear >= second_iterator->first) {
@@ -1247,11 +1190,6 @@ void FinalizeGrandStrategyInitialization()
 			}
 		}
 	}
-}
-
-void SetGrandStrategyWorld(std::string world)
-{
-	GrandStrategyWorld = world;
 }
 
 void DoGrandStrategyTurn()

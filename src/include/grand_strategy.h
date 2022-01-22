@@ -51,7 +51,7 @@ namespace wyrmgus {
 	enum class diplomacy_state;
 }
 
-class CGrandStrategyProvince : public CProvince
+class CGrandStrategyProvince final : public CProvince
 {
 public:
 	CGrandStrategyProvince()
@@ -69,7 +69,6 @@ public:
 	void SetModifier(CUpgrade *modifier, bool has_modifier);
 	void SetUnitQuantity(int unit_type_id, int quantity);
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
-	void SetPopulation(int quantity);
 	void SetHero(std::string hero_full_name, int value);
 	void AddFactionClaim(int civilization_id, int faction_id);
 	void RemoveFactionClaim(int civilization_id, int faction_id);
@@ -80,7 +79,6 @@ public:
 	bool BordersProvince(CGrandStrategyProvince *province);
 	bool HasSecondaryBorderThroughWaterWith(CGrandStrategyProvince *province);
 	bool BordersFaction(int faction_civilization, int faction, bool check_through_water = false);
-	int GetPopulation();
 	int GetClassUnitType(const wyrmgus::unit_class *unit_class);
 	int GetDesirabilityRating();
 	std::string GenerateWorkName();
@@ -89,7 +87,6 @@ public:
 	int civilization = -1;												/// Civilization of the province (-1 = no one).
 	int TotalUnits = 0;													/// Total quantity of units in the province
 	int TotalWorkers = 0;												/// Total quantity of workers in the province
-	int PopulationGrowthProgress = 0;									/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
 	int FoodConsumption = 0;											/// How much food the people in the province consume
 	int Labor = 0;														/// How much labor available this province has
 	int MilitaryScore = 0;												/// Military score of the forces in the province (including fortifications and militia)
@@ -249,8 +246,6 @@ public:
 
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
 extern int GrandStrategyYear;
-extern std::string GrandStrategyWorld;
-extern int PopulationGrowthThreshold;					/// How much population growth progress must be accumulated before a new worker unit is created in the province
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 extern std::map<std::string, int> GrandStrategyHeroStringToIndex;
 extern std::vector<std::unique_ptr<CGrandStrategyEvent>> GrandStrategyEvents;
@@ -262,13 +257,10 @@ extern void SetProvinceSettlementBuilding(std::string province_name, std::string
 extern void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceHero(std::string province_name, std::string hero_full_name, int value);
-extern void SetProvinceFood(std::string province_name, int quantity);
-extern void ChangeProvinceFood(std::string province_name, int quantity);
 extern void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void RemoveProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
-extern void InitializeGrandStrategyGame(bool show_loading = true);
+extern void InitializeGrandStrategyGame();
 extern void FinalizeGrandStrategyInitialization();
-extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
