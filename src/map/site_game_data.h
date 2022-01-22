@@ -45,6 +45,8 @@ class tile;
 class site_game_data final
 {
 public:
+	static constexpr int min_population = 100;
+
 	explicit site_game_data(const site *site) : site(site)
 	{
 	}
@@ -202,6 +204,25 @@ public:
 		return this->border_settlements;
 	}
 
+	int get_population() const
+	{
+		return this->population;
+	}
+
+	void set_population(const int population)
+	{
+		if (population == this->get_population()) {
+			return;
+		}
+
+		this->population = population;
+	}
+
+	void change_population(const int change)
+	{
+		this->set_population(this->get_population() + change);
+	}
+
 private:
 	const wyrmgus::site *site = nullptr;
 	CUnit *site_unit = nullptr; //unit which represents the site
@@ -215,6 +236,7 @@ private:
 	resource_map<int> resource_tile_counts; //resource tile counts in the settlement's territory
 	resource_map<std::vector<CUnit *>> resource_units; //resource units in the settlement's territory
 	site_set border_settlements; //other settlements bordering this one
+	int population = 0;
 };
 
 }
