@@ -46,6 +46,7 @@ class site_game_data final
 {
 public:
 	static constexpr int min_population = 100;
+	static constexpr int population_per_food = 10000;
 
 	explicit site_game_data(const site *site) : site(site)
 	{
@@ -225,6 +226,30 @@ public:
 
 	void do_population_growth();
 
+	int get_food_supply() const
+	{
+		return this->food_supply;
+	}
+
+	void set_food_supply(const int food_supply)
+	{
+		if (food_supply == this->get_food_supply()) {
+			return;
+		}
+
+		this->food_supply = food_supply;
+	}
+
+	void change_food_supply(const int change)
+	{
+		this->set_food_supply(this->get_food_supply() + change);
+	}
+
+	int get_food_demand() const
+	{
+		return this->get_population() / site_game_data::population_per_food;
+	}
+
 private:
 	const wyrmgus::site *site = nullptr;
 	CUnit *site_unit = nullptr; //unit which represents the site
@@ -239,6 +264,7 @@ private:
 	resource_map<std::vector<CUnit *>> resource_units; //resource units in the settlement's territory
 	site_set border_settlements; //other settlements bordering this one
 	int population = 0;
+	int food_supply = 0;
 };
 
 }
