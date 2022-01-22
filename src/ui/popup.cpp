@@ -712,6 +712,8 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 			condition->Quote = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "Encyclopedia")) {
 			condition->Encyclopedia = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "Population")) {
+			condition->population = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "SettlementName")) {
 			condition->settlement_name = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "SiteName")) {

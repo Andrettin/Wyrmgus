@@ -400,6 +400,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 
+	if (condition->population != CONDITION_TRUE) {
+		if ((condition->population == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && defines::get()->is_population_enabled() && unit_manager::get()->GetSlotUnit(button.Value).get_site() != nullptr && unit_manager::get()->GetSlotUnit(button.Value).get_site()->is_settlement() && !unit_manager::get()->GetSlotUnit(button.Value).Player->is_neutral_player() && !unit_manager::get()->GetSlotUnit(button.Value).is_under_construction())) {
+			return false;
+		}
+	}
+	
 	if (condition->settlement_name != CONDITION_TRUE) {
 		if ((condition->settlement_name == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && unit_manager::get()->GetSlotUnit(button.Value).settlement != nullptr)) {
 			return false;

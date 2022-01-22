@@ -902,8 +902,6 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		return player->TotalRazings;
 	} else if (!strcmp(prop, "TotalKills")) {
 		return player->TotalKills;
-	} else if (!strcmp(prop, "Population")) {
-		return player->get_population();
 	} else if (!strcmp(prop, "Overlord")) {
 		if (player->get_overlord() != nullptr) {
 			return player->get_overlord()->get_index();
@@ -1180,6 +1178,9 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "UnitQuote")) {
 			res->e = EString_UnitQuote;
+			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "UnitPopulation")) {
+			res->e = EString_UnitPopulation;
 			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "UnitSettlementName")) {
 			res->e = EString_UnitSettlementName;
@@ -1528,7 +1529,7 @@ std::string EvalString(const StringDesc *s)
 			}
 			return res;
 		case EString_String : {   // 42 -> "42".
-			return wyrmgus::number::to_formatted_string(EvalNumber(s->D.Number.get()));
+			return number::to_formatted_string(EvalNumber(s->D.Number.get()));
 		}
 		case EString_InverseVideo : // "a" -> "~<a~>"
 			tmp1 = EvalString(s->D.String.get());
@@ -1589,6 +1590,13 @@ std::string EvalString(const StringDesc *s)
 				} else {
 					return unit->get_unique()->get_quote();
 				}
+			} else {
+				return std::string();
+			}
+		case EString_UnitPopulation:
+			unit = EvalUnit(s->D.Unit.get());
+			if (unit != nullptr && unit->get_site() != nullptr) {
+				return number::to_formatted_string(unit->get_site()->get_game_data()->get_population());
 			} else {
 				return std::string();
 			}
@@ -2476,6 +2484,11 @@ static int CclUnitQuote(lua_State *l)
 	LuaCheckArgs(l, 1);
 	return Alias(l, "UnitQuote");
 }
+static int CclUnitPopulation(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitPopulation");
+}
 
 /**
 **  Return equivalent lua table for UnitSettlementName.
@@ -2959,6 +2972,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitTrait", CclUnitTrait);
 	lua_register(Lua, "UnitSpell", CclUnitSpell);
 	lua_register(Lua, "UnitQuote", CclUnitQuote);
+	lua_register(Lua, "UnitPopulation", CclUnitPopulation);
 	lua_register(Lua, "UnitSettlementName", CclUnitSettlementName);
 	lua_register(Lua, "UnitSiteName", CclUnitSiteName);
 	lua_register(Lua, "UnitUniqueSet", CclUnitUniqueSet);

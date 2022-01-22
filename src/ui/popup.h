@@ -60,6 +60,7 @@ public:
 	bool Description = false;	/// check if the button's unit type has a description.
 	bool Quote = false;			/// check if the button's unit type has a quote.
 	bool Encyclopedia = false;	/// check if the button's unit type has an encyclopedia entry.
+	char population = 0; //check if the button's unit has a population.
 	char settlement_name = 0; //check if the button's unit has a settlement name.
 	char site_name = 0; //check if the button's unit has a site name.
 	bool CanActiveHarvest = false;	/// check if the active unit can harvest the button's unit.

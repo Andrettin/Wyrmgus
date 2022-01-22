@@ -562,6 +562,7 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		if (unit.Blink) {
 			--unit.Blink;
 		}
+
 		// 2) Buffs...
 		HandleBuffsEachSecond(unit);
 	}
