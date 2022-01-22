@@ -37,24 +37,24 @@ class region_history final : public data_entry_history
 {
 	Q_OBJECT
 
-	Q_PROPERTY(int population MEMBER population READ get_population)
+	Q_PROPERTY(qint64 population MEMBER population READ get_population)
 
 public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 
-	int get_population() const
+	int64_t get_population() const
 	{
 		return this->population;
 	}
 
-	const unit_class_map<int> &get_population_groups() const
+	const unit_class_map<int64_t> &get_population_groups() const
 	{
 		return this->population_groups;
 	}
 
 private:
-	int population = 0; //used for creating units at scenario start
-	unit_class_map<int> population_groups; //population size for unit classes
+	int64_t population = 0; //used for creating units at scenario start
+	unit_class_map<int64_t> population_groups; //population size for unit classes
 };
 
 }

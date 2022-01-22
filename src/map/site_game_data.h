@@ -205,26 +205,19 @@ public:
 		return this->border_settlements;
 	}
 
-	int get_population() const
+	int64_t get_population() const
 	{
 		return this->population;
 	}
 
-	void set_population(const int population)
-	{
-		if (population == this->get_population()) {
-			return;
-		}
+	void set_population(const int64_t population);
 
-		this->population = population;
-	}
-
-	void change_population(const int change)
+	void change_population(const int64_t change)
 	{
 		this->set_population(this->get_population() + change);
 	}
 
-	int get_population_capacity() const
+	int64_t get_population_capacity() const
 	{
 		return this->get_food_supply() * site_game_data::population_per_food;
 	}
@@ -268,7 +261,7 @@ private:
 	resource_map<int> resource_tile_counts; //resource tile counts in the settlement's territory
 	resource_map<std::vector<CUnit *>> resource_units; //resource units in the settlement's territory
 	site_set border_settlements; //other settlements bordering this one
-	int population = 0;
+	int64_t population = 0;
 	int food_supply = 0;
 };
 

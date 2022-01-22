@@ -1638,7 +1638,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			site_history->set_population(0);
 		}
 	} else {
-		int population = site_history->get_population();
+		int64_t population = site_history->get_population();
 
 		for (auto &[unit_class, group_population] : site_history->get_population_groups()) {
 			population -= group_population;
@@ -1646,7 +1646,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			this->apply_population_unit(unit_class, group_population, site_game_data->get_map_pos(), z, player, settlement);
 
 			//population that isn't enough to be applied as a unit of its own
-			const int remaining_group_population = group_population % defines::get()->get_population_per_unit();
+			const int64_t remaining_group_population = group_population % defines::get()->get_population_per_unit();
 			group_population = remaining_group_population;
 		}
 
@@ -1655,11 +1655,11 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 			this->apply_population_unit(population_class, population, site_game_data->get_map_pos(), z, player, settlement);
 
-			const int remaining_population = population % defines::get()->get_population_per_unit();
+			const int64_t remaining_population = population % defines::get()->get_population_per_unit();
 			population = remaining_population;
 		}
 
-		population = std::max(0, population);
+		population = std::max<int64_t>(0, population);
 		site_history->set_population(population);
 	}
 
@@ -1769,8 +1769,8 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 
 void map_template::apply_remaining_site_populations() const
 {
-	player_map<int> player_populations;
-	player_map<unit_class_map<int>> player_population_groups;
+	player_map<int64_t> player_populations;
+	player_map<unit_class_map<int64_t>> player_population_groups;
 
 	//add remaining site populations to their respective settlements, or for their owners if they are not the same as the settlement's owner
 	for (const site *site : site::get_all()) {

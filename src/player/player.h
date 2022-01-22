@@ -95,7 +95,7 @@ class CPlayer final : public QObject
 	Q_PROPERTY(bool alive READ is_alive_sync NOTIFY alive_changed)
 	Q_PROPERTY(int supply READ get_supply_sync NOTIFY supply_changed)
 	Q_PROPERTY(int demand READ get_demand_sync NOTIFY demand_changed)
-	Q_PROPERTY(int population READ get_population_sync NOTIFY population_changed)
+	Q_PROPERTY(qint64 population READ get_population_sync NOTIFY population_changed)
 	Q_PROPERTY(int trade_cost READ get_trade_cost_sync NOTIFY trade_cost_changed)
 	Q_PROPERTY(QVariantList current_special_resources READ get_current_special_resources_sync NOTIFY current_special_resources_changed)
 
@@ -827,19 +827,19 @@ public:
 		this->set_demand(this->get_demand() + change);
 	}
 
-	int get_population() const
+	int64_t get_population() const
 	{
 		return this->population;
 	}
 
-	int get_population_sync() const
+	int64_t get_population_sync() const
 	{
 		std::shared_lock<std::shared_mutex> lock(this->mutex);
 
 		return this->get_population();
 	}
 
-	void set_population(const int population)
+	void set_population(const int64_t population)
 	{
 		if (population == this->get_population()) {
 			return;
@@ -856,7 +856,7 @@ public:
 		emit population_changed();
 	}
 
-	void change_population(const int change)
+	void change_population(const int64_t change)
 	{
 		this->set_population(this->get_population() + change);
 	}
@@ -1426,7 +1426,7 @@ public:
 private:
 	int supply = 0;         /// supply available/produced
 	int demand = 0;         /// demand of player
-	int population = 0;
+	int64_t population = 0;
 public:
 
 	int UnitLimit;       /// # food units allowed

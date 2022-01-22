@@ -40,7 +40,7 @@ void region_history::process_sml_scope(const sml_data &scope)
 	if (tag == "population_groups") {
 		scope.for_each_property([&](const sml_property &property) {
 			const unit_class *unit_class = unit_class::get(property.get_key());
-			this->population_groups[unit_class] = std::stoi(property.get_value());
+			this->population_groups[unit_class] = std::stoll(property.get_value());
 		});
 	} else {
 		data_entry_history::process_sml_scope(scope);

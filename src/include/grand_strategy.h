@@ -36,7 +36,6 @@
 #include "video/video.h"
 #include "upgrade/upgrade_structs.h"
 
-constexpr int BasePopulationGrowthPermyriad = 12; /// Base population growth per 10,000
 constexpr int FoodConsumptionPerWorker = 100;
 
 class CGrandStrategyProvince;

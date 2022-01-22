@@ -61,7 +61,7 @@ void region::load_history_database()
 	for (const region *region : regions) {
 		const region_history *region_history = region->get_history();
 		
-		int population = region_history->get_population();
+		int64_t population = region_history->get_population();
 
 		if (population == 0) {
 			continue;
@@ -89,7 +89,7 @@ void region::load_history_database()
 		}
 
 		//apply the remaining population to sites without a predefined population in history
-		const int population_per_site = population / unpopulated_site_count;
+		const int64_t population_per_site = population / unpopulated_site_count;
 
 		for (const site *site : region->get_sites()) {
 			if (!site->can_have_population()) {

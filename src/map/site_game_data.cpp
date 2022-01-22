@@ -390,19 +390,28 @@ void site_game_data::remove_resource_unit(CUnit *unit)
 	}
 }
 
+void site_game_data::set_population(const int64_t population)
+{
+	if (population == this->get_population()) {
+		return;
+	}
+
+	this->population = population;
+}
+
 void site_game_data::do_population_growth()
 {
-	int population_growth = 0;
+	int64_t population_growth = 0;
 
 	if (this->get_population() < this->get_population_capacity()) {
-		population_growth = this->get_population() * defines::get()->get_population_growth_multiplier() / std::max(1, this->get_population_capacity());
-		population_growth = std::max(1, population_growth);
+		population_growth = this->get_population() * defines::get()->get_population_growth_multiplier() / std::max<int64_t>(1, this->get_population_capacity());
+		population_growth = std::max<int64_t>(1, population_growth);
 
-		const int available_capacity = this->get_population_capacity() - this->get_population();
-		population_growth = std::min(available_capacity, population_growth);
+		const int64_t available_capacity = this->get_population_capacity() - this->get_population();
+		population_growth = std::min<int64_t>(available_capacity, population_growth);
 	} else if (this->get_population() > this->get_population_capacity()) {
-		population_growth = -(this->get_population_capacity() * defines::get()->get_population_growth_multiplier() / std::max(1, this->get_population()));
-		population_growth = std::min(-1, population_growth);
+		population_growth = -(this->get_population_capacity() * defines::get()->get_population_growth_multiplier() / std::max<int64_t>(1, this->get_population()));
+		population_growth = std::min<int64_t>(-1, population_growth);
 	}
 
 	if (population_growth != 0) {

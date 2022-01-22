@@ -42,7 +42,7 @@ class site_history final : public data_entry_history
 	Q_PROPERTY(wyrmgus::faction* owner MEMBER owner)
 	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
 	Q_PROPERTY(wyrmgus::unit_class* pathway_class MEMBER pathway_class)
-	Q_PROPERTY(int population MEMBER population READ get_population)
+	Q_PROPERTY(qint64 population MEMBER population READ get_population)
 
 public:
 	explicit site_history(const site *site) : site(site)
@@ -70,27 +70,27 @@ public:
 		return this->pathway_class;
 	}
 
-	int get_population() const
+	int64_t get_population() const
 	{
 		return this->population;
 	}
 
-	void set_population(const int population)
+	void set_population(const int64_t population)
 	{
 		this->population = population;
 	}
 
-	void change_population(const int change)
+	void change_population(const int64_t change)
 	{
 		this->population += change;
 	}
 
-	unit_class_map<int> &get_population_groups()
+	unit_class_map<int64_t> &get_population_groups()
 	{
 		return this->population_groups;
 	}
 
-	int get_group_population(const unit_class *unit_class) const
+	int64_t get_group_population(const unit_class *unit_class) const
 	{
 		const auto find_iterator = this->population_groups.find(unit_class);
 		if (find_iterator != this->population_groups.end()) {
@@ -100,12 +100,12 @@ public:
 		return 0;
 	}
 
-	void set_group_population(const unit_class *unit_class, const int population)
+	void set_group_population(const unit_class *unit_class, const int64_t population)
 	{
 		this->population_groups[unit_class] = population;
 	}
 
-	void change_group_population(const unit_class *unit_class, const int change)
+	void change_group_population(const unit_class *unit_class, const int64_t change)
 	{
 		this->set_group_population(unit_class, this->get_group_population(unit_class) + change);
 	}
@@ -115,8 +115,8 @@ private:
 	faction *owner = nullptr;
 	std::vector<unit_class *> building_classes; //applied as buildings at scenario start
 	unit_class *pathway_class = nullptr;
-	int population = 0; //used for creating units at scenario start
-	unit_class_map<int> population_groups; //population size for unit classes
+	int64_t population = 0; //used for creating units at scenario start
+	unit_class_map<int64_t> population_groups; //population size for unit classes
 };
 
 }
