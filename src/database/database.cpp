@@ -204,6 +204,16 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 		}
 
 		new_property_value = value;
+	} else if (property_type == QVariant::LongLong) {
+		long long value = std::stoll(property.get_value());
+
+		if (property.get_operator() == sml_operator::addition) {
+			value = object->property(property_name).toLongLong() + value;
+		} else if (property.get_operator() == sml_operator::subtraction) {
+			value = object->property(property_name).toLongLong() - value;
+		}
+
+		new_property_value = value;
 	} else if (property_type == QVariant::UInt) {
 		unsigned value = std::stoul(property.get_value());
 
