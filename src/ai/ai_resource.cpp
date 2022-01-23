@@ -1031,6 +1031,10 @@ static bool AiTrainUnit(const unit_type &type, const unit_type &what, const land
 			continue;
 		}
 
+		if (!AiPlayer->Player->check_population_availability(type, &unit)) {
+			continue;
+		}
+
 		//Wyrmgus start
 //		CommandTrainUnit(unit, what, FlushCommands);
 		CommandTrainUnit(unit, what, AiPlayer->Player->get_index(), FlushCommands);
@@ -1080,10 +1084,6 @@ static int AiMakeUnit(const unit_type &typeToMake, const Vec2i &nearPos, const i
 		}
 
 		for (const unit_type *builder : *builders) {
-			if (!AiPlayer->Player->check_population_availability(type, builder)) {
-				continue;
-			}
-
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder)) {
 				if (type.BoolFlag[BUILDING_INDEX].value) {
 					if (AiBuildBuilding(*builder, type, nearPos, z, landmass, settlement)) {
