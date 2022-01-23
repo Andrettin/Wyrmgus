@@ -424,6 +424,7 @@ void CUnit::Init()
 	this->character = nullptr;
 	this->settlement = nullptr;
 	this->site = nullptr;
+	this->home_settlement = nullptr;
 	this->Trait = nullptr;
 	this->Prefix = nullptr;
 	this->Suffix = nullptr;
@@ -553,6 +554,7 @@ void CUnit::Release(const bool final)
 	this->character = nullptr;
 	this->set_settlement(nullptr);
 	this->set_site(nullptr);
+	this->set_home_settlement(nullptr);
 	this->unique = nullptr;
 	this->ConnectingDestination = nullptr;
 	
@@ -570,7 +572,7 @@ void CUnit::Release(const bool final)
 	this->clear_special_orders();
 
 	// Remove the unit from the global units table.
-	wyrmgus::unit_manager::get()->ReleaseUnit(this);
+	unit_manager::get()->ReleaseUnit(this);
 }
 
 std::shared_ptr<wyrmgus::unit_ref> CUnit::acquire_ref() const
@@ -2169,6 +2171,76 @@ void CUnit::set_settlement(const wyrmgus::site *settlement)
 	}
 }
 
+void CUnit::set_home_settlement(const wyrmgus::site *settlement)
+{
+	if (!defines::get()->is_population_enabled()) {
+		return;
+	}
+
+	if (settlement == this->get_home_settlement()) {
+		return;
+	}
+
+	const wyrmgus::site *old_home_settlement = this->get_settlement();
+
+	this->home_settlement = settlement;
+
+	const int food_cost = this->Type->Stats[this->Player->get_index()].Variables[DEMAND_INDEX].Value;
+
+	if (food_cost != 0 && !this->is_under_construction() && this->IsAlive()) {
+		if (old_home_settlement != nullptr) {
+			old_home_settlement->get_game_data()->change_unit_food_demand(-food_cost);
+		}
+
+		if (this->get_home_settlement() != nullptr) {
+			this->get_home_settlement()->get_game_data()->change_unit_food_demand(food_cost);
+		}
+	}
+}
+
+void CUnit::update_home_settlement()
+{
+	if (!this->IsAlive()) {
+		return;
+	}
+
+	if (this->get_character() != nullptr) {
+		this->set_home_settlement(nullptr);
+		return;
+	}
+
+	if (this->get_home_settlement() != nullptr && this->get_home_settlement()->get_game_data()->get_owner() == this->Player) {
+		//a valid home settlement is already assigned
+		return;
+	}
+
+	const int food_cost = this->Type->Stats[this->Player->get_index()].Variables[DEMAND_INDEX].Value;
+
+	if (food_cost == 0) {
+		//only units which have a food cost need to have a home settlement
+		return;
+	}
+
+	//find a new home settlement for the unit
+	const CUnit *best_hall = nullptr;
+	int best_distance = -1;
+
+	for (const CUnit *settlement_unit : this->Player->get_town_hall_units()) {
+		const int distance = this->MapDistanceTo(*settlement_unit);
+
+		if (best_hall == nullptr || distance < best_distance) {
+			best_hall = settlement_unit;
+			best_distance = distance;
+		}
+	}
+
+	if (best_hall != nullptr) {
+		this->set_home_settlement(best_hall->get_settlement());
+	} else {
+		this->set_home_settlement(nullptr);
+	}
+}
+
 void CUnit::update_site_owner()
 {
 	if (this->get_site() == nullptr) {
@@ -3216,6 +3288,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		this->UpdateSoldUnits();
 
 		this->update_site_owner();
+
+		if (defines::get()->is_population_enabled()) {
+			this->update_home_settlement();
+		}
 	}
 	//Wyrmgus end
 }
@@ -3855,7 +3931,7 @@ void CUnit::UpdateSettlement()
 		} else if (tile->get_owner() == this->Player) {
 			this->set_settlement(tile->get_settlement());
 		} else {
-			this->set_settlement(this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->get_tile_size()));
+			this->set_settlement(this->Player->get_nearest_settlement(this->tilePos, this->MapLayer->ID, this->Type->get_tile_size()));
 		}
 	}
 }
@@ -4439,6 +4515,10 @@ void UnitLost(CUnit &unit)
 			if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
 				unit.get_settlement()->get_game_data()->change_food_supply(-unit.Variable[SUPPLY_INDEX].Value);
 			}
+		}
+
+		if (defines::get()->is_population_enabled() && unit.get_home_settlement() != nullptr) {
+			unit.set_home_settlement(nullptr);
 		}
 
 		// Decrease resource limit
@@ -5025,6 +5105,10 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 
 	if (this->get_settlement() == nullptr) {
 		this->UpdateSettlement();
+	}
+
+	if (defines::get()->is_population_enabled() && this->get_home_settlement() == nullptr) {
+		this->update_home_settlement();
 	}
 }
 

@@ -45,7 +45,7 @@ class tile;
 class site_game_data final
 {
 public:
-	static constexpr int min_population = 100;
+	static constexpr int min_population = 1000;
 	static constexpr int population_per_food = 10000;
 
 	explicit site_game_data(const site *site) : site(site)
@@ -245,7 +245,31 @@ public:
 
 	int get_food_demand() const
 	{
+		return this->get_population_food_demand() + this->get_unit_food_demand();
+	}
+
+	int get_population_food_demand() const
+	{
 		return this->get_population() / site_game_data::population_per_food;
+	}
+
+	int get_unit_food_demand() const
+	{
+		return this->unit_food_demand;
+	}
+
+	void set_unit_food_demand(const int food_demand)
+	{
+		if (food_demand == this->get_unit_food_demand()) {
+			return;
+		}
+
+		this->unit_food_demand = food_demand;
+	}
+
+	void change_unit_food_demand(const int change)
+	{
+		this->set_unit_food_demand(this->get_unit_food_demand() + change);
 	}
 
 private:
@@ -263,6 +287,7 @@ private:
 	site_set border_settlements; //other settlements bordering this one
 	int64_t population = 0;
 	int food_supply = 0;
+	int unit_food_demand = 0;
 };
 
 }

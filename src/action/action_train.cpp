@@ -353,11 +353,15 @@ void COrder_Train::Execute(CUnit &unit)
 	}
 	*/
 	for (int i = 0; i < (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1); ++i) {
+		bool is_hired = false;
+
 		if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&nType) != 0) {
+			is_hired = true;
+
 			if (unit.GetUnitStock(&nType) > 0) {
 				unit.ChangeUnitStock(&nType, -1);
 			} else {
-				continue; //don't create the unit if no further stock of it is available
+				break; //don't create the unit if no further stock of it is available
 			}
 		}
 		
@@ -407,9 +411,11 @@ void COrder_Train::Execute(CUnit &unit)
 		//Wyrmgus end
 
 		//subtract population cost
-		if (defines::get()->is_population_enabled() && nType.get_population_cost() > 0) {
-			if (unit.get_settlement() != nullptr) {
+		if (defines::get()->is_population_enabled()) {
+			if (unit.Player == newUnit->Player && unit.get_settlement() != nullptr && !is_hired && nType.get_population_cost() > 0) {
 				unit.get_settlement()->get_game_data()->change_population(-nType.get_population_cost());
+
+				newUnit->set_home_settlement(unit.get_settlement());
 			}
 		}
 		

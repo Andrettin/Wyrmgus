@@ -139,6 +139,8 @@ void site_game_data::set_owner(CPlayer *player)
 		if (defines::get()->is_population_enabled()) {
 			if (old_owner != nullptr) {
 				old_owner->change_population(-this->get_population());
+
+				old_owner->check_unit_home_settlements();
 			}
 
 			if (this->owner != nullptr) {
@@ -147,6 +149,8 @@ void site_game_data::set_owner(CPlayer *player)
 				} else {
 					this->set_population(site_game_data::min_population);
 				}
+
+				this->owner->check_unit_home_settlements();
 			} else {
 				this->set_population(0);
 			}
@@ -437,7 +441,11 @@ void site_game_data::do_population_growth()
 	}
 
 	if (population_growth != 0) {
-		this->change_population(population_growth);
+		if ((this->get_population() + population_growth) < site_game_data::min_population) {
+			this->set_population(site_game_data::min_population);
+		} else {
+			this->change_population(population_growth);
+		}
 	}
 }
 

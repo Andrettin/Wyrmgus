@@ -296,6 +296,14 @@ public:
 
 	void set_settlement(const wyrmgus::site *settlement);
 
+	const wyrmgus::site *get_home_settlement() const
+	{
+		return this->home_settlement;
+	}
+
+	void set_home_settlement(const wyrmgus::site *settlement);
+	void update_home_settlement();
+
 	void Identify();
 	void CheckIdentification();
 	void CheckKnowledgeChange(int variable, int change);
@@ -873,6 +881,7 @@ private:
 	wyrmgus::character *character = nullptr; //character represented by this unit
 	const wyrmgus::site *settlement = nullptr;	//settlement (for if the unit is a town hall or a building associated to a settlement)
 	const wyrmgus::site *site = nullptr; //the site to which the unit belongs, if it is a site unit (not necessarily the same as the settlement, e.g. if the site is a non-major one)
+	const wyrmgus::site *home_settlement = nullptr; //home settlement for the unit, i.e. from where it gets its food
 public:
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has

@@ -532,6 +532,19 @@ void CPlayer::set_revealed(const bool revealed)
 	}
 }
 
+void CPlayer::check_unit_home_settlements()
+{
+	if (!defines::get()->is_population_enabled()) {
+		return;
+	}
+
+	for (int i = 0; i < this->GetUnitCount(); ++i) {
+		CUnit &unit = this->GetUnit(i);
+
+		unit.update_home_settlement();
+	}
+}
+
 void CPlayer::calculate_military_score()
 {
 	this->military_score = 0;
@@ -2108,7 +2121,7 @@ bool CPlayer::has_settlement_with_resource_source(const wyrmgus::resource *resou
 	return false;
 }
 
-const wyrmgus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
+const wyrmgus::site *CPlayer::get_nearest_settlement(const QPoint &pos, const int z, const QSize &tile_size) const
 {
 	CUnit *best_hall = nullptr;
 	int best_distance = -1;
@@ -2117,10 +2130,13 @@ const wyrmgus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, cons
 		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer->ID) {
 			continue;
 		}
+
 		if (!this->has_neutral_faction_type() && this != settlement_unit->Player) {
 			continue;
 		}
-		int distance = MapDistance(size, pos, z, settlement_unit->Type->get_tile_size(), settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+
+		const int distance = MapDistance(tile_size, pos, z, settlement_unit->Type->get_tile_size(), settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+
 		if (!best_hall || distance < best_distance) {
 			best_hall = settlement_unit;
 			best_distance = distance;
@@ -4837,8 +4853,10 @@ void PlayersEachMinute(const int playerIdx)
 		}
 
 		if (defines::get()->is_population_enabled()) {
-			for (const site *settlement : player->get_settlements()) {
-				settlement->get_game_data()->do_population_growth();
+			if (!player->is_neutral_player()) {
+				for (const site *settlement : player->get_settlements()) {
+					settlement->get_game_data()->do_population_growth();
+				}
 			}
 		}
 

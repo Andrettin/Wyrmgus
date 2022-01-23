@@ -323,7 +323,7 @@ public:
 	bool has_coastal_settlement() const;
 	bool HasSettlementNearWaterZone(const landmass *water_zone) const;
 	bool has_settlement_with_resource_source(const wyrmgus::resource *resource) const;
-	const wyrmgus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
+	const wyrmgus::site *get_nearest_settlement(const QPoint &pos, const int z, const QSize &tile_size) const;
 	void update_building_settlement_assignment(const wyrmgus::site *old_settlement, const int z) const;
 	site_set get_border_settlements() const;
 	player_set get_border_players() const;
@@ -874,6 +874,8 @@ public:
 	{
 		this->set_population(this->get_population() + change);
 	}
+
+	void check_unit_home_settlements();
 
 	int get_score() const
 	{

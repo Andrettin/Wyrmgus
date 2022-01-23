@@ -195,9 +195,12 @@ void game::on_started()
 	//make a copy of the units list, as updating the sold units can change the list
 	const std::vector<CUnit *> units = unit_manager::get()->get_units();
 	for (CUnit *unit : units) {
-		if (unit && unit->IsAlive()) {
-			unit->UpdateSoldUnits();
+		if (!unit->IsAlive()) {
+			continue;
 		}
+
+		unit->UpdateSoldUnits();
+		unit->update_home_settlement();
 	}
 
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
