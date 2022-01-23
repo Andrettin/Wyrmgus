@@ -101,6 +101,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::unit_class* town_hall_class MEMBER town_hall_class READ get_town_hall_class)
 	Q_PROPERTY(bool population_enabled MEMBER population_enabled READ is_population_enabled)
 	Q_PROPERTY(int population_growth_per_food MEMBER population_growth_per_food READ get_population_growth_per_food)
+	Q_PROPERTY(wyrmgus::resource_icon* population_resource_icon MEMBER population_resource_icon)
 	Q_PROPERTY(wyrmgus::unit_class* default_population_class MEMBER default_population_class)
 	Q_PROPERTY(wyrmgus::unit_class* default_water_population_class MEMBER default_water_population_class)
 	Q_PROPERTY(wyrmgus::unit_class* default_space_population_class MEMBER default_space_population_class)
@@ -361,6 +362,11 @@ public:
 		return this->population_growth_per_food;
 	}
 
+	const resource_icon *get_population_resource_icon() const
+	{
+		return this->population_resource_icon;
+	}
+
 	const unit_class *get_default_population_class() const
 	{
 		return this->default_population_class;
@@ -520,6 +526,7 @@ private:
 	unit_class *town_hall_class = nullptr;
 	bool population_enabled = false;
 	int population_growth_per_food = 100;
+	resource_icon *population_resource_icon = nullptr;
 	unit_class *default_population_class = nullptr;
 	unit_class *default_water_population_class = nullptr;
 	unit_class *default_space_population_class = nullptr;
