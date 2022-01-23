@@ -2181,7 +2181,7 @@ void CUnit::set_home_settlement(const wyrmgus::site *settlement)
 		return;
 	}
 
-	const wyrmgus::site *old_home_settlement = this->get_settlement();
+	const wyrmgus::site *old_home_settlement = this->get_home_settlement();
 
 	this->home_settlement = settlement;
 
