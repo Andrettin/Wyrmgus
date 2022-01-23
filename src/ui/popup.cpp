@@ -317,7 +317,7 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 	wyrmgus::font *font = this->Font ? this->Font : defines::get()->get_small_font();
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
-	for (unsigned int i = 1; i <= MaxCosts; ++i) {
+	for (unsigned int i = 1; i <= PopulationCost; ++i) {
 		if (Costs[i]) {
 			const wyrmgus::resource_icon *icon = nullptr;
 			if (i >= MaxCosts) {
@@ -329,7 +329,9 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 						icon = defines::get()->get_score_icon();
 						break;
 					case ManaResCost:
-						icon = defines::get()->get_mana_icon();
+						continue;
+					case PopulationCost:
+						icon = defines::get()->get_population_resource_icon();
 						break;
 					default:
 						break;
@@ -375,7 +377,7 @@ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs)
 	int popupHeight = 0;
 	wyrmgus::font *font = this->Font ? this->Font : defines::get()->get_small_font();
 
-	for (unsigned int i = 1; i <= ManaResCost; ++i) {
+	for (unsigned int i = 1; i <= PopulationCost; ++i) {
 		const wyrmgus::resource_icon *icon = nullptr;
 		if (i >= MaxCosts) {
 			switch (i) {
@@ -387,6 +389,9 @@ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs)
 					break;
 				case ManaResCost:
 					icon = defines::get()->get_mana_icon();
+					break;
+				case PopulationCost:
+					icon = defines::get()->get_population_resource_icon();
 					break;
 				default:
 					break;
@@ -400,6 +405,7 @@ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs)
 			popupHeight = std::max(icon->get_graphics()->Height, popupHeight);
 		}
 	}
+
 	return std::max(popupHeight, font->Height());
 }
 
@@ -409,7 +415,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
-	for (unsigned int i = 1; i <= MaxCosts; ++i) {
+	for (unsigned int i = 1; i <= PopulationCost; ++i) {
 		if (Costs[i]) {
 			int y_offset = 0;
 
@@ -423,7 +429,9 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 						icon = defines::get()->get_score_icon();
 						break;
 					case ManaResCost:
-						icon = defines::get()->get_mana_icon();
+						continue;
+					case PopulationCost:
+						icon = defines::get()->get_population_resource_icon();
 						break;
 					default:
 						break;

@@ -819,7 +819,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 	}
 
 	int popupWidth, popupHeight;
-	std::array<int, ManaResCost + 1> Costs{};
+	std::array<int, PopulationCost + 1> Costs{};
 	Costs.fill(0);
 
 	const unit_type *unit_type = button.get_unit_type();
@@ -854,6 +854,9 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 			}
 
 			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->get_index()].Variables[DEMAND_INDEX].Value;
+			if (defines::get()->is_population_enabled()) {
+				Costs[PopulationCost] = unit_type->get_population_cost();
+			}
 			break;
 		}
 		case ButtonCmd::Buy:
