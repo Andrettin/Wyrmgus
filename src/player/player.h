@@ -85,6 +85,20 @@ namespace wyrmgus {
 
 constexpr int PlayerNumNeutral = PlayerMax - 1;  /// this is the neutral player slot
 
+namespace wyrmgus {
+
+enum class check_limits_result {
+	success = 1,
+	building_limit_reached = -1,
+	unit_limit_reached = -2,
+	not_enough_food = -3,
+	total_unit_limit_reached = -4,
+	unit_type_limit_reached = -6,
+	not_enough_population = -7
+};
+
+}
+
 class CPlayer final : public QObject
 {
 	Q_OBJECT
@@ -984,7 +998,7 @@ public:
 
 	//check if a new unit of the type wouldn't break any unit limits or supply/demand
 	template <bool check_population>
-	int check_limits(const unit_type &type, const CUnit *builder) const;
+	check_limits_result check_limits(const unit_type &type, const CUnit *builder) const;
 
 	//check whether there is enough population available for training a unit of a given type
 	bool check_population_availability(const unit_type &type, const CUnit *builder) const;
@@ -1488,8 +1502,8 @@ private:
 	friend int ::CclUnit(lua_State *l);
 };
 
-extern template int CPlayer::check_limits<false>(const unit_type &, const CUnit *) const;
-extern template int CPlayer::check_limits<true>(const unit_type &, const CUnit *) const;
+extern template check_limits_result CPlayer::check_limits<false>(const unit_type &, const CUnit *) const;
+extern template check_limits_result CPlayer::check_limits<true>(const unit_type &, const CUnit *) const;
 
 //Wyrmgus start
 class CAiBuildingTemplate final

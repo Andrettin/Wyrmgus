@@ -289,7 +289,7 @@ static bool CheckLimit(const CUnit &unit, const wyrmgus::unit_type &type, const 
 	}
 
 	// Check if hitting any limits for the building.
-	if (player.check_limits<true>(type, &unit) < 0) {
+	if (player.check_limits<true>(type, &unit) != check_limits_result::success) {
 		player.Notify(NotifyYellow, unit.tilePos,
 					  //Wyrmgus start
 					  unit.MapLayer->ID,

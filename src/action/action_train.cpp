@@ -249,9 +249,9 @@ void COrder_Train::Execute(CUnit &unit)
 	
 	//Wyrmgus start
 	// Check if enough supply available.
-	const int food = player.check_limits<true>(nType, &unit);
-	if (food < 0) {
-		if (food == -3 && player.AiEnabled) {
+	const check_limits_result result = player.check_limits<true>(nType, &unit);
+	if (result != check_limits_result::success) {
+		if (result == check_limits_result::not_enough_food && player.AiEnabled) {
 			AiNeedMoreSupply(player);
 		}
 		this->Ticks = 0;
@@ -279,9 +279,9 @@ void COrder_Train::Execute(CUnit &unit)
 	// food check should be before changing the ticks
 	/*
 	// Check if enough supply available.
-	const int food = player.check_limits<true>(nType, &unit);
-	if (food < 0) {
-		if (food == -3 && unit.Player->AiEnabled) {
+	const check_limits_result result = player.check_limits<true>(nType, &unit);
+	if (result != check_limits_result::success) {
+		if (result == check_limits_result::not_enough_food && player.AiEnabled) {
 			AiNeedMoreSupply(*unit.Player);
 		}
 		unit.Wait = CYCLES_PER_SECOND / 6;

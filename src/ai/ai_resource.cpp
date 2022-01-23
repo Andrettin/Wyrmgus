@@ -1224,7 +1224,7 @@ void AiAddUpgradeToRequest(const unit_type &type)
 		AiPlayer->NeededMask |= resourceNeeded;
 		return;
 	}
-	if (AiPlayer->Player->check_limits<false>(type, nullptr) < 0) {
+	if (AiPlayer->Player->check_limits<false>(type, nullptr) != check_limits_result::success) {
 		return;
 	}
 	//
@@ -1310,7 +1310,7 @@ static void AiCheckingWork()
 		}
 
 		// Check limits, AI should be broken if reached.
-		if (queuep->Want > queuep->Made && AiPlayer->Player->check_limits<false>(type, nullptr) < 0) {
+		if (queuep->Want > queuep->Made && AiPlayer->Player->check_limits<false>(type, nullptr) != check_limits_result::success) {
 			continue;
 		}
 
