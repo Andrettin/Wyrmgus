@@ -1081,7 +1081,7 @@ static int AiMakeUnit(const unit_type &typeToMake, const Vec2i &nearPos, const i
 		}
 
 		for (const unit_type *builder : *builders) {
-			if (AiPlayer->Player->check_limits<true>(type, builder) < 0) {
+			if (!AiPlayer->Player->check_population_availability(type, builder)) {
 				continue;
 			}
 

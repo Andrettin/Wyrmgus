@@ -4213,12 +4213,9 @@ int CPlayer::check_limits(const unit_type &type, const CUnit *builder) const
 	}
 
 	if constexpr (check_population) {
-		if (defines::get()->is_population_enabled() && type.get_population_cost() > 0) {
-			const int settlement_population = builder != nullptr && builder->get_settlement() != nullptr ? builder->get_settlement()->get_game_data()->get_population() : 0;
-			if ((type.get_population_cost() * (type.TrainQuantity ? type.TrainQuantity : 1)) > settlement_population) {
-				this->Notify("%s", _("Insufficient Population."));
-				return -7;
-			}
+		if (!this->check_population_availability(type, builder)) {
+			this->Notify("%s", _("Insufficient Population."));
+			return -7;
 		}
 	}
 
@@ -4227,6 +4224,19 @@ int CPlayer::check_limits(const unit_type &type, const CUnit *builder) const
 
 template int CPlayer::check_limits<false>(const unit_type &, const CUnit *) const;
 template int CPlayer::check_limits<true>(const unit_type &, const CUnit *) const;
+
+bool CPlayer::check_population_availability(const unit_type &type, const CUnit *builder) const
+{
+	if (defines::get()->is_population_enabled() && type.get_population_cost() > 0) {
+		const int settlement_population = builder != nullptr && builder->get_settlement() != nullptr ? builder->get_settlement()->get_game_data()->get_population() : 0;
+
+		if ((type.get_population_cost() * (type.TrainQuantity ? type.TrainQuantity : 1)) > settlement_population) {
+			return false;
+		}
+	}
+
+	return true;
+}
 
 /**
 **  Check if enough resources for are available.

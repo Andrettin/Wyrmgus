@@ -986,6 +986,9 @@ public:
 	template <bool check_population>
 	int check_limits(const unit_type &type, const CUnit *builder) const;
 
+	//check whether there is enough population available for training a unit of a given type
+	bool check_population_availability(const unit_type &type, const CUnit *builder) const;
+
 	/// Check if enough resources are available for costs
 	int CheckCosts(const resource_map<int> &costs, const bool notify = true) const;
 	/// Check if enough resources are available for a new unit-type
