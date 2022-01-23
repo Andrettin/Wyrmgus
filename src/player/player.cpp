@@ -4184,10 +4184,12 @@ int CPlayer::CheckLimits(const wyrmgus::unit_type &type) const
 		Notify("%s", _("Building Limit Reached"));
 		return -1;
 	}
+
 	if (!type.BoolFlag[BUILDING_INDEX].value && (this->GetUnitCount() - NumBuildings) >= UnitLimit) {
 		Notify("%s", _("Unit Limit Reached"));
 		return -2;
 	}
+
 	//Wyrmgus start
 //	if (this->Demand + type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value > this->Supply && type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value) {
 	if (this->get_demand() + (type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value * (type.TrainQuantity ? type.TrainQuantity : 1)) > this->get_supply() && type.Stats[this->get_index()].Variables[DEMAND_INDEX].Value) {
@@ -4198,10 +4200,12 @@ int CPlayer::CheckLimits(const wyrmgus::unit_type &type) const
 		//Wyrmgus end
 		return -3;
 	}
+
 	if (this->GetUnitCount() >= TotalUnitLimit) {
 		Notify("%s", _("Total Unit Limit Reached"));
 		return -4;
 	}
+
 	if (GetUnitTotalCount(type) >= Allow.Units[type.Slot]) {
 		Notify(_("Limit of %d reached for this unit type"), Allow.Units[type.Slot]);
 		return -6;

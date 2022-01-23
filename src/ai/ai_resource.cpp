@@ -1027,13 +1027,18 @@ static bool AiTrainUnit(const unit_type &type, const unit_type &what, const land
 		}
 		//Wyrmgus end
 		
-		if (unit.IsIdle()) {
-			//Wyrmgus start
-//			CommandTrainUnit(unit, what, FlushCommands);
-			CommandTrainUnit(unit, what, AiPlayer->Player->get_index(), FlushCommands);
-			//Wyrmgus end
-			return true;
+		if (!unit.IsIdle()) {
+			continue;
 		}
+
+		}
+
+		//Wyrmgus start
+//		CommandTrainUnit(unit, what, FlushCommands);
+		CommandTrainUnit(unit, what, AiPlayer->Player->get_index(), FlushCommands);
+		//Wyrmgus end
+
+		return true;
 	}
 	return false;
 }
