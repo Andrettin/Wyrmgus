@@ -1031,8 +1031,6 @@ static bool AiTrainUnit(const unit_type &type, const unit_type &what, const land
 			continue;
 		}
 
-		}
-
 		//Wyrmgus start
 //		CommandTrainUnit(unit, what, FlushCommands);
 		CommandTrainUnit(unit, what, AiPlayer->Player->get_index(), FlushCommands);
@@ -1040,6 +1038,7 @@ static bool AiTrainUnit(const unit_type &type, const unit_type &what, const land
 
 		return true;
 	}
+
 	return false;
 }
 
