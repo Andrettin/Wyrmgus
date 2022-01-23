@@ -1391,6 +1391,8 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "GivesResource")) {
 			const std::string resource_identifier = LuaToString(l, -1);
 			type->given_resource = wyrmgus::resource::get(resource_identifier);
+		} else if (!strcmp(value, "PopulationCost")) {
+			type->population_cost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "CanStore")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

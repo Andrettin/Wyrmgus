@@ -790,6 +790,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(int random_movement_probability MEMBER random_movement_probability READ get_random_movement_probability)
 	Q_PROPERTY(int random_movement_distance MEMBER random_movement_distance READ get_random_movement_distance)
 	Q_PROPERTY(quint64 default_mass MEMBER default_mass READ get_default_mass)
+	Q_PROPERTY(int population_cost MEMBER population_cost READ get_population_cost)
 	Q_PROPERTY(QColor neutral_minimap_color MEMBER neutral_minimap_color READ get_neutral_minimap_color)
 	Q_PROPERTY(QString encyclopedia_background_file READ get_encyclopedia_background_file_qstring NOTIFY changed)
 
@@ -1189,6 +1190,11 @@ public:
 		return this->default_mass;
 	}
 
+	int get_population_cost() const
+	{
+		return this->population_cost;
+	}
+
 	const std::vector<qunique_ptr<unit_type_variation>> &get_variations() const
 	{
 		return this->variations;
@@ -1434,6 +1440,7 @@ public:
 	std::vector<BoolFlags> BoolFlag;
 
 private:
+	int population_cost = 0;
 	resource_set stored_resources;             /// Resources that we can store here.
 	resource *given_resource = nullptr; //the resource this unit gives
 	resource_map<std::unique_ptr<resource_info>> resource_infos;    /// Resource information.

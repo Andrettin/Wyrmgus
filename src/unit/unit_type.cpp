@@ -1876,6 +1876,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->autocast_spells = parent_type->autocast_spells;
 
 	this->repair_costs = parent_type->repair_costs;
+	this->population_cost = parent_type->population_cost;
 	this->stored_resources = parent_type->stored_resources;
 
 	for (const auto &[resource, res_info] : parent_type->resource_infos) {
