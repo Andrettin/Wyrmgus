@@ -405,6 +405,13 @@ void COrder_Train::Execute(CUnit &unit)
 			unit.Player->change_resource(defines::get()->get_wealth_resource(), newUnit->GetPrice(), true);
 		}
 		//Wyrmgus end
+
+		//subtract population cost
+		if (defines::get()->is_population_enabled() && nType.get_population_cost() > 0) {
+			if (unit.get_settlement() != nullptr) {
+				unit.get_settlement()->get_game_data()->change_population(-nType.get_population_cost());
+			}
+		}
 		
 		//we don't need to send the player a message every time a new unit is ready
 		//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
