@@ -4177,16 +4177,17 @@ int CPlayer::GetUnitTotalCount(const wyrmgus::unit_type &type) const
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-int CPlayer::CheckLimits(const wyrmgus::unit_type &type) const
+template <bool check_population>
+int CPlayer::check_limits(const unit_type &type, const CUnit *builder) const
 {
 	//  Check game limits.
 	if (type.BoolFlag[BUILDING_INDEX].value && NumBuildings >= BuildingLimit) {
-		Notify("%s", _("Building Limit Reached"));
+		this->Notify("%s", _("Building Limit Reached"));
 		return -1;
 	}
 
 	if (!type.BoolFlag[BUILDING_INDEX].value && (this->GetUnitCount() - NumBuildings) >= UnitLimit) {
-		Notify("%s", _("Unit Limit Reached"));
+		this->Notify("%s", _("Unit Limit Reached"));
 		return -2;
 	}
 
@@ -4196,22 +4197,36 @@ int CPlayer::CheckLimits(const wyrmgus::unit_type &type) const
 	//Wyrmgus end
 		//Wyrmgus start
 //		Notify("%s", _("Insufficient Supply, increase Supply."));
-		Notify("%s", _("Insufficient Food Supply, increase Food Supply."));
+		this->Notify("%s", _("Insufficient Food Supply, increase Food Supply."));
 		//Wyrmgus end
 		return -3;
 	}
 
 	if (this->GetUnitCount() >= TotalUnitLimit) {
-		Notify("%s", _("Total Unit Limit Reached"));
+		this->Notify("%s", _("Total Unit Limit Reached"));
 		return -4;
 	}
 
 	if (GetUnitTotalCount(type) >= Allow.Units[type.Slot]) {
-		Notify(_("Limit of %d reached for this unit type"), Allow.Units[type.Slot]);
+		this->Notify(_("Limit of %d reached for this unit type"), Allow.Units[type.Slot]);
 		return -6;
 	}
+
+	if constexpr (check_population) {
+		if (defines::get()->is_population_enabled() && type.get_population_cost() > 0) {
+			const int settlement_population = builder != nullptr && builder->get_settlement() != nullptr ? builder->get_settlement()->get_game_data()->get_population() : 0;
+			if ((type.get_population_cost() * (type.TrainQuantity ? type.TrainQuantity : 1)) > settlement_population) {
+				this->Notify("%s", _("Insufficient Population."));
+				return -7;
+			}
+		}
+	}
+
 	return 1;
 }
+
+template int CPlayer::check_limits<false>(const unit_type &, const CUnit *) const;
+template int CPlayer::check_limits<true>(const unit_type &, const CUnit *) const;
 
 /**
 **  Check if enough resources for are available.

@@ -2066,11 +2066,11 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 		if (Selected[best_training_place]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("Unit training queue is full"));
 			return;
-		} else if (CPlayer::GetThisPlayer()->CheckLimits(*unit_type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->get_index()].get_unit_stock(unit_type) != 0)) {
+		} else if (CPlayer::GetThisPlayer()->check_limits<true>(*unit_type, Selected[best_training_place]) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->get_index()].get_unit_stock(unit_type) != 0)) {
 			SendCommandTrainUnit(*Selected[best_training_place], *unit_type, CPlayer::GetThisPlayer()->get_index(), FlushCommands);
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
-		} else if (CPlayer::GetThisPlayer()->CheckLimits(*unit_type) == -3) {
+		} else if (CPlayer::GetThisPlayer()->check_limits<true>(*unit_type, Selected[best_training_place]) == -3) {
 			if (CPlayer::GetThisPlayer()->get_civilization() != nullptr && CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound() != nullptr) {
 				PlayGameSound(CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound(), MaxSampleVolume);
 			}
@@ -2085,7 +2085,7 @@ void CButtonPanel::DoClicked_UpgradeTo(const std::unique_ptr<wyrmgus::button> &b
 	const wyrmgus::unit_type *unit_type = button->get_value_unit_type(Selected[0]);
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[i]->Player->CheckLimits(*unit_type) != -6 && !Selected[i]->Player->CheckUnitType(*unit_type)) {
+		if (Selected[i]->Player->check_limits<false>(*unit_type, Selected[i]) != -6 && !Selected[i]->Player->CheckUnitType(*unit_type)) {
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
 				SendCommandUpgradeTo(*Selected[i], *unit_type, !(key_modifiers & Qt::ShiftModifier));
 				UI.StatusLine.Clear();
@@ -2102,7 +2102,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button, const Qt::KeyboardM
 	// FIXME: store pointer in button table!
 	wyrmgus::unit_type &type = *wyrmgus::unit_type::get_all()[CurrentButtons[button]->Value];
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[0]->Player->GetUnitTotalCount(type) < Selected[0]->Player->Allow.Units[type.Slot] || Selected[0]->Player->CheckLimits(type) != -6) { //ugly way to make the checklimits message only appear when it should
+		if (Selected[0]->Player->GetUnitTotalCount(type) < Selected[0]->Player->Allow.Units[type.Slot] || Selected[0]->Player->check_limits<false>(type, Selected[0]) != -6) { //ugly way to make the check_limits message only appear when it should
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
 				Selected[i]->Variable[LEVELUP_INDEX].Value -= 1;
 				Selected[i]->Variable[LEVELUP_INDEX].Max = Selected[i]->Variable[LEVELUP_INDEX].Value;
@@ -2193,15 +2193,15 @@ void CButtonPanel::DoClicked_Buy(int button)
 	resource_map<int> buy_costs;
 	buy_costs[defines::get()->get_wealth_resource()] = unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).GetPrice();
 
-	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->CheckLimits(*wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type) >= 0) {
-		SendCommandBuy(*Selected[0], &wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value), CPlayer::GetThisPlayer()->get_index());
+	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->check_limits<false>(*unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type, Selected[0]) >= 0) {
+		SendCommandBuy(*Selected[0], &unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value), CPlayer::GetThisPlayer()->get_index());
 		ButtonUnderCursor = -1;
 		OldButtonUnderCursor = -1;
 		LastDrawnButtonPopup = nullptr;
 		if (IsOnlySelected(*Selected[0])) {
 			SelectedUnitChanged();
 		}
-	} else if (CPlayer::GetThisPlayer()->CheckLimits(*wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type) == -3) {
+	} else if (CPlayer::GetThisPlayer()->check_limits<false>(*unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type, Selected[0]) == -3) {
 		if (CPlayer::GetThisPlayer()->get_civilization() != nullptr && CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound() != nullptr) {
 			PlayGameSound(CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound(), MaxSampleVolume);
 		}

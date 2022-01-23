@@ -1221,7 +1221,7 @@ void AiAddUpgradeToRequest(const unit_type &type)
 		AiPlayer->NeededMask |= resourceNeeded;
 		return;
 	}
-	if (AiPlayer->Player->CheckLimits(type) < 0) {
+	if (AiPlayer->Player->check_limits<false>(type, nullptr) < 0) {
 		return;
 	}
 	//
@@ -1305,10 +1305,12 @@ static void AiCheckingWork()
 			// AiRequestSupply can change UnitTypeBuilt so recalculate queuep
 			queuep = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 		}
+
 		// Check limits, AI should be broken if reached.
-		if (queuep->Want > queuep->Made && AiPlayer->Player->CheckLimits(type) < 0) {
+		if (queuep->Want > queuep->Made && AiPlayer->Player->check_limits<false>(type, nullptr) < 0) {
 			continue;
 		}
+
 		// Check if resources available.
 		const int c = AiCheckUnitTypeCosts(type);
 		if (c) {

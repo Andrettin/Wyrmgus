@@ -981,8 +981,10 @@ public:
 
 	/// Returns count of specified unittype
 	int GetUnitTotalCount(const wyrmgus::unit_type &type) const;
-	/// Check if the unit-type didn't break any unit limits and supply/demand
-	int CheckLimits(const wyrmgus::unit_type &type) const;
+
+	//check if a new unit of the type wouldn't break any unit limits or supply/demand
+	template <bool check_population>
+	int check_limits(const unit_type &type, const CUnit *builder) const;
 
 	/// Check if enough resources are available for costs
 	int CheckCosts(const resource_map<int> &costs, const bool notify = true) const;
@@ -1482,6 +1484,9 @@ private:
 	friend void SetPlayersPalette();
 	friend int ::CclUnit(lua_State *l);
 };
+
+extern template int CPlayer::check_limits<false>(const unit_type &, const CUnit *) const;
+extern template int CPlayer::check_limits<true>(const unit_type &, const CUnit *) const;
 
 //Wyrmgus start
 class CAiBuildingTemplate final

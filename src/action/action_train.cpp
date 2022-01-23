@@ -36,6 +36,8 @@
 #include "database/defines.h"
 #include "iolib.h"
 #include "map/map_layer.h"
+#include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/tile.h"
 #include "player/player.h"
 #include "player/player_type.h"
@@ -247,7 +249,7 @@ void COrder_Train::Execute(CUnit &unit)
 	
 	//Wyrmgus start
 	// Check if enough supply available.
-	const int food = player.CheckLimits(nType);
+	const int food = player.check_limits<true>(nType, &unit);
 	if (food < 0) {
 		if (food == -3 && player.AiEnabled) {
 			AiNeedMoreSupply(player);
@@ -277,7 +279,7 @@ void COrder_Train::Execute(CUnit &unit)
 	// food check should be before changing the ticks
 	/*
 	// Check if enough supply available.
-	const int food = player.CheckLimits(nType);
+	const int food = player.check_limits<true>(nType, &unit);
 	if (food < 0) {
 		if (food == -3 && unit.Player->AiEnabled) {
 			AiNeedMoreSupply(*unit.Player);
