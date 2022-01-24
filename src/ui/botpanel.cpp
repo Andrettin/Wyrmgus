@@ -412,6 +412,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
+	if (condition->home_settlement_name != CONDITION_TRUE) {
+		if ((condition->home_settlement_name == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && unit_manager::get()->GetSlotUnit(button.Value).get_home_settlement() != nullptr)) {
+			return false;
+		}
+	}
+	
 	if (condition->CanActiveHarvest && !(button.Action == ButtonCmd::Unit && Selected.size() > 0 && Selected[0]->can_harvest(&unit_manager::get()->GetSlotUnit(button.Value), false))) {
 		return false;
 	}

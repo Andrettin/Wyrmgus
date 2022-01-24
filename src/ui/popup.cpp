@@ -726,6 +726,8 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 			condition->settlement_name = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "SiteName")) {
 			condition->site_name = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "HomeSettlementName")) {
+			condition->home_settlement_name = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "CanActiveHarvest")) {
 			condition->CanActiveHarvest = LuaToBoolean(l, -1);
 		//Wyrmgus end
