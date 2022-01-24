@@ -2204,6 +2204,10 @@ void CUnit::update_home_settlement()
 		return;
 	}
 
+	if (this->Removed && this->Container == nullptr) {
+		return;
+	}
+
 	if (this->get_character() != nullptr) {
 		this->set_home_settlement(nullptr);
 		return;
@@ -4182,6 +4186,10 @@ void CUnit::Place(const Vec2i &pos, const int z)
 	//Wyrmgus end
 
 	if (game::get()->is_running()) {
+		if (defines::get()->is_population_enabled()) {
+			this->update_home_settlement();
+		}
+
 		emit this->MapLayer->unit_added(UnitNumber(*this), this->Type, this->GetVariation(), this->Frame, this->get_player_color(), this->tilePos);
 	}
 }
