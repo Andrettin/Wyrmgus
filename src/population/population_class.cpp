@@ -26,16 +26,13 @@
 
 #include "stratagus.h"
 
-#include "population/population_type.h"
+#include "population/population_class.h"
 
 #include "economy/resource.h"
-#include "player/civilization.h"
-#include "player/civilization_group.h"
-#include "population/population_class.h"
 
 namespace wyrmgus {
 
-void population_type::process_sml_scope(const sml_data &scope)
+void population_class::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
@@ -50,32 +47,6 @@ void population_type::process_sml_scope(const sml_data &scope)
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
-}
-
-void population_type::initialize()
-{
-	const wyrmgus::population_class *population_class = this->get_population_class();
-
-	if (this->get_population_class() != nullptr) {
-		if (population_class != nullptr) {
-			if (this->civilization != nullptr) {
-				this->civilization->set_class_population_type(population_class, this);
-			} else if (this->civilization_group != nullptr) {
-				this->civilization_group->set_class_population_type(population_class, this);
-			}
-		}
-	}
-}
-
-int population_type::get_production_efficiency(const resource *resource) const
-{
-	const auto find_iterator = this->production_efficiency_map.find(resource);
-
-	if (find_iterator != this->production_efficiency_map.end()) {
-		return find_iterator->second;
-	}
-
-	return this->get_population_class()->get_production_efficiency(resource);
 }
 
 }

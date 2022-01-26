@@ -320,6 +320,7 @@ set(player_SRCS
 source_group(player FILES ${player_SRCS})
 
 set(population_SRCS
+	src/population/population_class.cpp
 	src/population/population_type.cpp
 )
 source_group(population FILES ${population_SRCS})

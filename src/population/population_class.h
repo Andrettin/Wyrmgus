@@ -28,6 +28,7 @@
 
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
+#include "economy/resource_container.h"
 
 namespace wyrmgus {
 
@@ -42,6 +43,22 @@ public:
 	explicit population_class(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
+
+	virtual void process_sml_scope(const sml_data &scope) override;
+
+	int get_production_efficiency(const resource *resource) const
+	{
+		const auto find_iterator = this->production_efficiency_map.find(resource);
+
+		if (find_iterator != this->production_efficiency_map.end()) {
+			return find_iterator->second;
+		}
+
+		return 100;
+	}
+
+private:
+	resource_map<int> production_efficiency_map;
 };
 
 }
