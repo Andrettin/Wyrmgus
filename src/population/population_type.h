@@ -34,6 +34,7 @@ namespace wyrmgus {
 
 class civilization;
 class civilization_group;
+class icon;
 class population_class;
 
 class population_type final : public detailed_data_entry, public data_type<population_type>
@@ -43,6 +44,7 @@ class population_type final : public detailed_data_entry, public data_type<popul
 	Q_PROPERTY(wyrmgus::population_class* population_class MEMBER population_class)
 	Q_PROPERTY(wyrmgus::civilization_group* civilization_group MEMBER civilization_group)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
 
 public:
 	static constexpr const char *class_identifier = "population_type";
@@ -60,11 +62,20 @@ public:
 		if (this->get_population_class() == nullptr) {
 			throw std::runtime_error("Population type \"" + this->get_identifier() + "\" has no population class.");
 		}
+
+		if (this->get_icon() == nullptr) {
+			throw std::runtime_error("Population type \"" + this->get_identifier() + "\" has no icon.");
+		}
 	}
 
 	const wyrmgus::population_class *get_population_class() const
 	{
 		return this->population_class;
+	}
+
+	const wyrmgus::icon *get_icon() const
+	{
+		return this->icon;
 	}
 
 	int get_production_efficiency(const resource *resource) const;
@@ -73,6 +84,7 @@ private:
 	wyrmgus::population_class *population_class = nullptr;
 	wyrmgus::civilization_group *civilization_group = nullptr;
 	wyrmgus::civilization *civilization = nullptr;
+	wyrmgus::icon *icon = nullptr;
 	resource_map<int> production_efficiency_map;
 };
 

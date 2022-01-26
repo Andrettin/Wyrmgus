@@ -65,6 +65,8 @@ void population_type::initialize()
 			}
 		}
 	}
+
+	named_data_entry::initialize();
 }
 
 int population_type::get_production_efficiency(const resource *resource) const
