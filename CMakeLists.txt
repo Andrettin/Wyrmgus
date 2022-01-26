@@ -319,6 +319,11 @@ set(player_SRCS
 )
 source_group(player FILES ${player_SRCS})
 
+set(population_SRCS
+	src/population/population_type.cpp
+)
+source_group(population FILES ${population_SRCS})
+
 set(quest_SRCS
 	src/quest/achievement.cpp
 	src/quest/campaign.cpp
@@ -604,6 +609,7 @@ set(wyrmgus_SRCS
 	${particle_SRCS}
 	${pathfinder_SRCS}
 	${player_SRCS}
+	${population_SRCS}
 	${quest_SRCS}
 	${quest_objective_SRCS}
 	${religion_SRCS}
@@ -835,6 +841,11 @@ set(wyrmgus_player_HDRS
 	src/player/player_container.h
 	src/player/player_type.h
 	src/player/vassalage_type.h
+)
+
+set(wyrmgus_population_HDRS
+	src/population/population_class.h
+	src/population/population_type.h
 )
 
 set(wyrmgus_quest_HDRS
@@ -1227,6 +1238,7 @@ source_group(map FILES ${wyrmgus_map_HDRS})
 source_group(missile FILES ${wyrmgus_missile_HDRS})
 source_group(network FILES ${wyrmgus_network_HDRS})
 source_group(player FILES ${wyrmgus_player_HDRS})
+source_group(population FILES ${wyrmgus_population_HDRS})
 source_group(quest FILES ${wyrmgus_quest_HDRS})
 source_group(quest\\objective FILES ${wyrmgus_quest_objective_HDRS})
 source_group(religion FILES ${wyrmgus_religion_HDRS})
@@ -1259,6 +1271,7 @@ set(wyrmgus_HDRS
 	${wyrmgus_missile_HDRS}
 	${wyrmgus_network_HDRS}
 	${wyrmgus_player_HDRS}
+	${wyrmgus_population_HDRS}
 	${wyrmgus_quest_HDRS}
 	${wyrmgus_quest_objective_HDRS}
 	${wyrmgus_religion_HDRS}
@@ -1778,6 +1791,7 @@ if(ENABLE_UNITY_BUILD)
 	set_source_files_properties(${particle_SRCS} PROPERTIES UNITY_GROUP "particle")
 	set_source_files_properties(${pathfinder_SRCS} PROPERTIES UNITY_GROUP "pathfinder")
 	set_source_files_properties(${player_SRCS} PROPERTIES UNITY_GROUP "player")
+	set_source_files_properties(${population_SRCS} PROPERTIES UNITY_GROUP "population")
 	set_source_files_properties(${quest_SRCS} ${quest_objective_SRCS} PROPERTIES UNITY_GROUP "quest")
 	set_source_files_properties(${religion_SRCS} PROPERTIES UNITY_GROUP "religion")
 	set_source_files_properties(${script_SRCS} PROPERTIES UNITY_GROUP "script")

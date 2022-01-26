@@ -65,6 +65,8 @@ namespace wyrmgus {
 	class language;
 	class player_color;
 	class player_quest_objective;
+	class population_class;
+	class population_type;
 	class quest;
 	class religion;
 	class resource;
@@ -308,6 +310,7 @@ public:
 	unit_type *get_class_unit_type(const wyrmgus::unit_class *unit_class) const;
 	bool is_class_unit_type(const unit_type *unit_type) const;
 	CUpgrade *get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const;
+	const population_type *get_class_population_type(const population_class *population_class) const;
 
 	bool has_upgrade(const CUpgrade *upgrade) const;
 	bool has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) const;

@@ -41,6 +41,8 @@ class faction;
 class gendered_name_generator;
 class name_generator;
 class player_color;
+class population_class;
+class population_type;
 class resource;
 class sound;
 class species;
@@ -170,6 +172,18 @@ public:
 		}
 	}
 
+	const population_type *get_class_population_type(const population_class *population_class) const;
+
+	void set_class_population_type(const population_class *population_class, population_type *population_type)
+	{
+		if (population_type == nullptr) {
+			this->class_population_types.erase(population_class);
+			return;
+		}
+
+		this->class_population_types[population_class] = population_type;
+	}
+
 	const name_generator *get_personal_name_generator(const gender gender) const;
 	void add_personal_name(const gender gender, const name_variant &name);
 
@@ -200,6 +214,7 @@ private:
 	std::map<cursor_type, cursor *> cursors;
 	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
+	std::map<const population_class *, const population_type *> class_population_types;
 	std::unique_ptr<gendered_name_generator> personal_name_generator; //personal name generators for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 	std::unique_ptr<gendered_name_generator> surname_generator;
 	unit_class_map<std::unique_ptr<name_generator>> unit_class_name_generators; //unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings

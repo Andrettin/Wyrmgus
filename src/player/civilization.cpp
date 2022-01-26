@@ -709,6 +709,25 @@ CUpgrade *civilization::get_class_upgrade(const upgrade_class *upgrade_class) co
 	return nullptr;
 }
 
+const population_type *civilization::get_class_population_type(const population_class *population_class) const
+{
+	if (population_class == nullptr) {
+		return nullptr;
+	}
+
+	const population_type *population_type = civilization_base::get_class_population_type(population_class);
+
+	if (population_type != nullptr) {
+		return population_type;
+	}
+
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_class_population_type(population_class);
+	}
+
+	return nullptr;
+}
+
 bool civilization::is_tech_tree_entry(const unit_class *unit_class) const
 {
 	if (!unit_class->is_on_tech_tree()) {

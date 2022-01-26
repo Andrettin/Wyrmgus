@@ -327,6 +327,24 @@ CUpgrade *civilization_base::get_class_upgrade(const upgrade_class *upgrade_clas
 	return nullptr;
 }
 
+const population_type *civilization_base::get_class_population_type(const population_class *population_class) const
+{
+	if (population_class == nullptr) {
+		return nullptr;
+	}
+
+	const auto find_iterator = this->class_population_types.find(population_class);
+	if (find_iterator != this->class_population_types.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->get_group() != nullptr) {
+		return this->get_group()->get_class_population_type(population_class);
+	}
+
+	return nullptr;
+}
+
 const name_generator *civilization_base::get_personal_name_generator(const gender gender) const
 {
 	const name_generator *name_generator = nullptr;

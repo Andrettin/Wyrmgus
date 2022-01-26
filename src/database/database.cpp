@@ -75,6 +75,8 @@
 #include "player/faction_type.h"
 #include "player/government_type.h"
 #include "player/player_color.h"
+#include "population/population_class.h"
+#include "population/population_type.h"
 #include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"
@@ -361,6 +363,10 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(pantheon::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::player_color*") {
 			new_property_value = QVariant::fromValue(player_color::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::population_class*") {
+			new_property_value = QVariant::fromValue(population_class::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::population_type*") {
+			new_property_value = QVariant::fromValue(population_type::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::quest*") {
 			new_property_value = QVariant::fromValue(quest::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::recipe*") {

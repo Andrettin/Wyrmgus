@@ -1889,6 +1889,17 @@ CUpgrade *CPlayer::get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class
 	return faction->get_class_upgrade(upgrade_class);
 }
 
+const population_type *CPlayer::get_class_population_type(const population_class *population_class) const
+{
+	const civilization *civilization = this->get_civilization();
+
+	if (civilization == nullptr) {
+		return nullptr;
+	}
+
+	return civilization->get_class_population_type(population_class);
+}
+
 bool CPlayer::has_upgrade(const CUpgrade *upgrade) const
 {
 	assert_throw(upgrade != nullptr);
