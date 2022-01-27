@@ -28,6 +28,7 @@
 
 #include "video/render_context.h"
 
+#include "util/exception_util.h"
 #include "video/frame_buffer_object.h"
 
 #include <QOpenGLTexture>
@@ -42,6 +43,39 @@ void render_context::set_commands(std::vector<std::function<void(renderer *)>> &
 	}
 
 	frame_buffer_object::request_update();
+}
+
+void render_context::run(renderer *renderer)
+{
+	std::vector<std::function<void(wyrmgus::renderer *)>> commands;
+
+	{
+		std::lock_guard<std::mutex> lock(this->mutex);
+		commands = std::move(this->commands);
+	}
+
+	//run the posted OpenGL commands
+	try {
+		for (const std::function<void(wyrmgus::renderer *)> &command : commands) {
+			command(renderer);
+		}
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+
+		//clear the problematic commands
+		std::lock_guard<std::mutex> lock(this->mutex);
+		this->commands.clear();
+	}
+
+	{
+		std::lock_guard<std::mutex> lock(this->mutex);
+		//if no new commands have been set while we were rendering, store the old commands for being run again if necessary (e.g. if the window is resized)
+		if (this->commands.empty()) {
+			this->commands = std::move(commands);
+		}
+	}
+
+	this->run_free_texture_commands();
 }
 
 void render_context::set_free_texture_commands(std::vector<std::function<void()>> &&commands)

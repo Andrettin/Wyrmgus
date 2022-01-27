@@ -38,30 +38,7 @@ class render_context final : public singleton<render_context>
 public:
 	void set_commands(std::vector<std::function<void(renderer *)>> &&commands);
 
-	void run(renderer *renderer)
-	{
-		std::vector<std::function<void(wyrmgus::renderer *)>> commands;
-
-		{
-			std::lock_guard<std::mutex> lock(this->mutex);
-			commands = std::move(this->commands);
-		}
-
-		//run the posted OpenGL commands
-		for (const std::function<void(wyrmgus::renderer *)> &command : commands) {
-			command(renderer);
-		}
-
-		{
-			std::lock_guard<std::mutex> lock(this->mutex);
-			//if no new commands have been set while we were rendering, store the old commands for being run again if necessary (e.g. if the window is resized)
-			if (this->commands.empty()) {
-				this->commands = std::move(commands);
-			}
-		}
-
-		this->run_free_texture_commands();
-	}
+	void run(renderer *renderer);
 
 	void set_free_texture_commands(std::vector<std::function<void()>> &&commands);
 	void run_free_texture_commands();
