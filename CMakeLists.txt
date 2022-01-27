@@ -847,6 +847,7 @@ set(wyrmgus_player_HDRS
 set(wyrmgus_population_HDRS
 	src/population/population_class.h
 	src/population/population_type.h
+	src/population/population_unit.h
 )
 
 set(wyrmgus_quest_HDRS
