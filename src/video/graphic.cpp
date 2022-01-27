@@ -806,6 +806,14 @@ void CGraphic::create_texture(const color_modification &color_modification, cons
 
 	auto texture = std::make_unique<QOpenGLTexture>(image);
 
+	if (!texture->isCreated()) {
+		throw std::runtime_error("Failed to create OpenGL texture.");
+	}
+
+	if (!texture->isStorageAllocated()) {
+		throw std::runtime_error("Failed to allocate storage for OpenGL texture.");
+	}
+
 	if (grayscale) {
 		this->grayscale_texture = std::move(texture);
 	} else if (!color_modification.is_null()) {
