@@ -331,8 +331,6 @@ bool COrder_Attack::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 	return false;
 }
 
-
-
 bool COrder_Attack::IsWeakTargetSelected() const
 {
 	return (this->State & WEAK_TARGET) != 0;
