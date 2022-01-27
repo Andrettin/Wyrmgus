@@ -35,8 +35,15 @@ namespace wyrmgus {
 void population_class::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "production_efficiency") {
+	if (tag == "promotion_targets") {
+		for (const std::string &value : values) {
+			population_class *other_class = population_class::get(value);
+			this->promotion_targets.push_back(other_class);
+			other_class->demotion_targets.push_back(this);
+		}
+	} else if (tag == "production_efficiency") {
 		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();

@@ -58,6 +58,8 @@ public:
 	}
 
 private:
+	std::vector<const population_class *> promotion_targets;
+	std::vector<const population_class *> demotion_targets;
 	resource_map<int> production_efficiency_map;
 };
 
