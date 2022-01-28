@@ -2557,6 +2557,9 @@ int MenuScreen::run(bool loop)
 		engine_interface::get()->change_lua_dialog_open_count(1);
 	}
 
+	//this needs to be called so that FrameTicks is set, and we don't wait forever on WaitEventsOneFrame
+	SetVideoSync();
+
 	if (loop) {
 		const EventCallback *old_callbacks = GetCallbacks();
 		SetCallbacks(&GuichanCallbacks);
