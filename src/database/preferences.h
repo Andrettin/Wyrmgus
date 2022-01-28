@@ -80,6 +80,7 @@ public:
 	preferences();
 
 	void load();
+	void load_file();
 	Q_INVOKABLE void save() const;
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);

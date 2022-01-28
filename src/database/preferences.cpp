@@ -61,6 +61,12 @@ preferences::preferences() : difficulty(difficulty::normal), hotkey_setup(hotkey
 
 void preferences::load()
 {
+	this->load_file();
+	this->initialize();
+}
+
+void preferences::load_file()
+{
 	std::filesystem::path preferences_path = preferences::get_path();
 
 	if (!std::filesystem::exists(preferences_path)) {
@@ -82,7 +88,6 @@ void preferences::load()
 	}
 
 	database::process_sml_data(this, data);
-	this->initialize();
 }
 
 void preferences::save() const
