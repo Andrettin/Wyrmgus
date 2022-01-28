@@ -309,7 +309,11 @@ void engine_interface::load_map_infos()
 			}
 
 			std::sort(this->map_infos.begin(), this->map_infos.end(), [](const qunique_ptr<map_info> &lhs, const qunique_ptr<map_info> &rhs) {
-				return lhs->get_name() < rhs->get_name();
+				if (lhs->get_name() != rhs->get_name()) {
+					return lhs->get_name() < rhs->get_name();
+				}
+
+				return lhs->get_setup_filepath() < rhs->get_setup_filepath();
 			});
 		} catch (const std::exception &exception) {
 			exception::report(exception);
