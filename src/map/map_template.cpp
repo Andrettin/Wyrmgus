@@ -1634,7 +1634,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 	if (defines::get()->is_population_enabled()) {
 		if (site->is_settlement() && site_owner != nullptr && site_game_data->get_site_unit() != nullptr) {
-			site_game_data->set_population(site_history->get_population());
+			site_game_data->set_default_population_type_population(site_history->get_population());
 			site_history->set_population(0);
 		}
 	} else {
@@ -1856,7 +1856,7 @@ void map_template::apply_remaining_site_populations() const
 		const int z = game_data->get_map_layer()->ID;
 
 		if (defines::get()->is_population_enabled()) {
-			game_data->change_population(settlement_history->get_population());
+			game_data->change_default_population_type_population(settlement_history->get_population());
 			settlement_history->set_population(0);
 		} else {
 			for (auto &[unit_class, group_population] : settlement_history->get_population_groups()) {

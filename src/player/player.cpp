@@ -4251,15 +4251,30 @@ template check_limits_result CPlayer::check_limits<true>(const unit_type &, cons
 
 bool CPlayer::check_population_availability(const unit_type &type, const CUnit *builder) const
 {
-	if (defines::get()->is_population_enabled() && type.get_population_cost() > 0) {
-		const int settlement_population = builder != nullptr && builder->get_settlement() != nullptr ? builder->get_settlement()->get_game_data()->get_population() : 0;
-
-		if ((type.get_population_cost() * (type.TrainQuantity ? type.TrainQuantity : 1)) > settlement_population) {
-			return false;
-		}
+	if (!defines::get()->is_population_enabled() || type.get_population_cost() == 0) {
+		return true;
 	}
 
-	return true;
+	if (builder == nullptr) {
+		return false;
+	}
+
+	if (builder->get_settlement() == nullptr) {
+		return false;
+	}
+
+	const site_game_data *settlement_game_data = builder->get_settlement()->get_game_data();
+
+	const population_type *population_type = settlement_game_data->get_class_population_type(type.get_population_class());
+
+	if (population_type == nullptr) {
+		return false;
+	}
+
+	const int64_t available_population = builder->get_settlement()->get_game_data()->get_population_type_population(population_type);
+	const int64_t required_population = type.get_population_cost() * (type.TrainQuantity ? type.TrainQuantity : 1);
+
+	return available_population >= required_population;
 }
 
 /**

@@ -36,7 +36,10 @@ class CUnit;
 namespace wyrmgus {
 
 class landmass;
+class population_class;
+class population_type;
 class population_unit;
+class population_unit_key;
 class resource;
 class site;
 class sml_data;
@@ -210,6 +213,7 @@ public:
 		return this->population;
 	}
 
+private:
 	void set_population(const int64_t population);
 
 	void change_population(const int64_t change)
@@ -217,12 +221,31 @@ public:
 		this->set_population(this->get_population() + change);
 	}
 
+public:
+	void ensure_minimum_population();
+
+	population_unit *get_population_unit(const population_unit_key &key) const;
+	void create_population_unit(const population_unit_key &key, const int64_t population);
+	void remove_population_unit(const population_unit_key &key);
+	void clear_population_units();
+
+	void set_population_unit_population(const population_unit_key &key, const int64_t population);
+	void change_population_unit_population(const population_unit_key &key, const int64_t change);
+
+	int64_t get_population_type_population(const population_type *population_type) const;
+
+	void set_default_population_type_population(const int64_t population);
+	void change_default_population_type_population(const int64_t population);
+
+	std::vector<std::pair<population_unit *, int64_t>> get_population_units_permyriad() const;
+
 	int64_t get_population_capacity() const
 	{
 		return static_cast<int64_t>(this->get_food_supply()) * site_game_data::population_per_food;
 	}
 
 	void do_population_growth();
+	void apply_population_growth(const int64_t population_growth);
 
 	const population_type *get_class_population_type(const population_class *population_class) const;
 

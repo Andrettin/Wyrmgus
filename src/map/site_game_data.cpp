@@ -39,6 +39,7 @@
 #include "map/tile.h"
 #include "player/player.h"
 #include "population/population_unit.h"
+#include "population/population_unit_key.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"
@@ -64,6 +65,7 @@ void site_game_data::process_sml_property(const sml_property &property)
 		this->map_layer = CMap::get()->MapLayers[std::stoi(value)].get();
 	} else if (key == "population") {
 		this->set_population(std::stoll(value));
+		//FIXME: save/load population units as well
 	} else {
 		throw std::runtime_error("Invalid site game data property: \"" + key + "\".");
 	}
@@ -156,12 +158,12 @@ void site_game_data::set_owner(CPlayer *player)
 				if (this->get_population() != 0) {
 					this->owner->change_population(this->get_population());
 				} else {
-					this->set_population(site_game_data::min_population);
+					this->ensure_minimum_population();
 				}
 
 				this->owner->check_unit_home_settlements();
 			} else {
-				this->set_population(0);
+				this->clear_population_units();
 			}
 		}
 
@@ -430,6 +432,143 @@ void site_game_data::set_population(const int64_t population)
 	}
 }
 
+void site_game_data::ensure_minimum_population()
+{
+	if (this->get_population() > 0) {
+		return;
+	}
+
+	this->set_default_population_type_population(site_game_data::min_population);
+}
+
+population_unit *site_game_data::get_population_unit(const population_unit_key &key) const
+{
+	for (const std::unique_ptr<population_unit> &population_unit : this->population_units) {
+		if (population_unit->get_key() == key) {
+			return population_unit.get();
+		}
+	}
+
+	return nullptr;
+}
+
+void site_game_data::create_population_unit(const population_unit_key &key, const int64_t population)
+{
+	this->population_units.push_back(std::make_unique<population_unit>(key, population));
+	this->change_population(population);
+}
+
+void site_game_data::remove_population_unit(const population_unit_key &key)
+{
+	for (size_t i = 0; i < this->population_units.size(); ++i) {
+		const std::unique_ptr<population_unit> &population_unit = this->population_units[i];
+
+		if (population_unit->get_key() == key) {
+			this->change_population(-population_unit->get_population());
+			this->population_units.erase(this->population_units.begin() + i);
+			return;
+		}
+	}
+}
+
+void site_game_data::clear_population_units()
+{
+	this->population_units.clear();
+	this->set_population(0);
+}
+
+void site_game_data::set_population_unit_population(const population_unit_key &key, const int64_t population)
+{
+	if (population == 0) {
+		this->remove_population_unit(key);
+		return;
+	}
+
+	population_unit *population_unit = this->get_population_unit(key);
+	if (population_unit != nullptr) {
+		const int64_t old_population = population_unit->get_population();
+		population_unit->set_population(population);
+		this->change_population(population - old_population);
+		return;
+	}
+
+	//create a population unit for the key if no existing population unit was found
+	this->create_population_unit(key, population);
+}
+
+void site_game_data::change_population_unit_population(const population_unit_key &key, const int64_t change)
+{
+	population_unit *population_unit = this->get_population_unit(key);
+	if (population_unit != nullptr) {
+
+		population_unit->change_population(change);
+		this->change_population(change);
+
+		if (population_unit->get_population() <= 0) {
+			this->remove_population_unit(key);
+		}
+
+		return;
+	}
+
+	if (change > 0) {
+		this->create_population_unit(key, change);
+	}
+}
+
+int64_t site_game_data::get_population_type_population(const population_type *population_type) const
+{
+	int64_t population = 0;
+
+	for (const std::unique_ptr<population_unit> &population_unit : this->population_units) {
+		if (population_unit->get_type() == population_type) {
+			population += population_unit->get_population();
+		}
+	}
+
+	return population;
+}
+
+void site_game_data::set_default_population_type_population(const int64_t population)
+{
+	const population_type *population_type = this->get_class_population_type(defines::get()->get_default_population_class());
+
+	if (population_type == nullptr) {
+		return;
+	}
+
+	const population_unit_key population_unit_key(population_type);
+	this->set_population_unit_population(population_unit_key, population);
+}
+
+void site_game_data::change_default_population_type_population(const int64_t population)
+{
+	const population_type *population_type = this->get_class_population_type(defines::get()->get_default_population_class());
+
+	if (population_type == nullptr) {
+		return;
+	}
+
+	const population_unit_key population_unit_key(population_type);
+	this->change_population_unit_population(population_unit_key, population);
+}
+
+std::vector<std::pair<population_unit *, int64_t>> site_game_data::get_population_units_permyriad() const
+{
+	//get the settlement's population proportion for each population unit, in permyriad
+	std::vector<std::pair<population_unit *, int64_t>> population_units_permyriad;
+
+	const int64_t total_population = this->get_population();
+
+	for (const std::unique_ptr<population_unit> &population_unit : this->population_units) {
+		const int64_t permyriad = population_unit->get_population() * 10000 / total_population;
+
+		population_units_permyriad.emplace_back(std::make_pair(population_unit.get(), permyriad));
+	}
+
+	return population_units_permyriad;
+}
+
 void site_game_data::do_population_growth()
 {
 	const int food_surplus = this->get_food_supply() - this->get_food_demand();
@@ -451,9 +590,60 @@ void site_game_data::do_population_growth()
 
 	if (population_growth != 0) {
 		if ((this->get_population() + population_growth) < site_game_data::min_population) {
-			this->set_population(site_game_data::min_population);
+			population_growth = site_game_data::min_population - this->get_population();
+		}
+
+		this->apply_population_growth(population_growth);
+	}
+}
+
+void site_game_data::apply_population_growth(const int64_t population_growth)
+{
+	const std::vector<std::pair<population_unit *, int64_t>> population_units_permyriad = this->get_population_units_permyriad();
+
+	int64_t remaining_population_growth = population_growth;
+
+	for (const auto &[population_unit, permyriad] : population_units_permyriad) {
+		const int64_t population_unit_growth = population_growth * permyriad / 10000;
+
+		if (population_unit_growth == 0) {
+			continue;
+		}
+
+		this->change_population_unit_population(population_unit->get_key(), population_unit_growth);
+		//FIXME: skilled population types should increase the growth of the base population type unit, not themselves
+
+		remaining_population_growth -= population_unit_growth;
+	}
+
+	//if there is any remaining population growth, apply it to the default population class if positive, or subtract from existing population units if negative
+	if (remaining_population_growth != 0) {
+		if (remaining_population_growth > 0) {
+			this->change_default_population_type_population(remaining_population_growth);
 		} else {
-			this->change_population(population_growth);
+			for (size_t i = 0; i < this->population_units.size();) {
+				const std::unique_ptr<population_unit> &population_unit = this->population_units[i];
+
+				int64_t change = remaining_population_growth;
+				bool removed_pop = false;
+
+				if (std::abs(remaining_population_growth) >= population_unit->get_population()) {
+					change = -population_unit->get_population();
+					removed_pop = true;
+				}
+
+				this->change_population_unit_population(population_unit->get_key(), change);
+
+				remaining_population_growth -= change;
+
+				if (!removed_pop) {
+					++i;
+				}
+
+				if (remaining_population_growth == 0) {
+					break;
+				}
+			}
 		}
 	}
 }

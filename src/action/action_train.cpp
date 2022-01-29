@@ -41,6 +41,7 @@
 #include "map/tile.h"
 #include "player/player.h"
 #include "player/player_type.h"
+#include "population/population_unit_key.h"
 #include "script.h"
 #include "sound/game_sound_set.h"
 #include "sound/sound.h"
@@ -413,7 +414,16 @@ void COrder_Train::Execute(CUnit &unit)
 		//subtract population cost
 		if (defines::get()->is_population_enabled()) {
 			if (unit.Player == newUnit->Player && unit.get_settlement() != nullptr && !is_hired && nType.get_population_cost() > 0) {
-				unit.get_settlement()->get_game_data()->change_population(-nType.get_population_cost());
+				site_game_data *settlement_game_data = unit.get_settlement()->get_game_data();
+
+				const population_type *population_type = settlement_game_data->get_class_population_type(nType.get_population_class());
+
+				assert_log(population_type != nullptr);
+
+				if (population_type != nullptr) {
+					const population_unit_key population_unit_key(population_type);
+					settlement_game_data->change_population_unit_population(population_unit_key, -nType.get_population_cost());
+				}
 
 				newUnit->set_home_settlement(unit.get_settlement());
 			}

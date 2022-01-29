@@ -1463,7 +1463,7 @@ void PreprocessMap()
 				}
 
 				if (settlement_game_data->get_population() == 0) {
-					settlement_game_data->set_population(site_game_data::min_population);
+					settlement_game_data->ensure_minimum_population();
 				}
 			}
 		}
