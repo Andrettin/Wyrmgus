@@ -29,9 +29,9 @@
 namespace wyrmgus {
 
 class population_type;
-class population_unit_key;
 class sml_data;
 class sml_property;
+struct population_unit_key;
 
 class population_unit final
 {

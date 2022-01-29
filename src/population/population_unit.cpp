@@ -37,7 +37,7 @@
 namespace wyrmgus {
 
 population_unit::population_unit(const population_unit_key &key, const int64_t population)
-	: type(key.get_type()), population(population)
+	: type(key.type), population(population)
 {
 }
 

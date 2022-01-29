@@ -39,12 +39,12 @@ class landmass;
 class population_class;
 class population_type;
 class population_unit;
-class population_unit_key;
 class resource;
 class site;
 class sml_data;
 class sml_property;
 class tile;
+struct population_unit_key;
 
 class site_game_data final
 {

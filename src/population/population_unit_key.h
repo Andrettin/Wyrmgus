@@ -32,16 +32,11 @@ class population_type;
 class population_unit;
 
 //contains the characteristics which make a population unit separate from others in its settlement
-class population_unit_key final
+struct population_unit_key final
 {
 public:
 	explicit population_unit_key(const population_type *type) : type(type)
 	{
-	}
-
-	const population_type *get_type() const
-	{
-		return this->type;
 	}
 
 	bool operator ==(const population_unit_key &rhs) const
@@ -49,7 +44,6 @@ public:
 		return this->type == rhs.type;
 	}
 
-private:
 	const population_type *type = nullptr;
 };
 
