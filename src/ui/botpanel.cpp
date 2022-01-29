@@ -480,7 +480,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		bool has_requirements_string = !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer();
+		bool has_requirements_string = !Selected.empty() && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer();
 
 		switch (button.Action) {
 			case ButtonCmd::Train:
