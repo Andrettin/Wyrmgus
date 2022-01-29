@@ -38,6 +38,7 @@
 #include "map/site.h"
 #include "map/tile.h"
 #include "player/player.h"
+#include "population/population_type.h"
 #include "population/population_unit.h"
 #include "population/population_unit_key.h"
 #include "ui/ui.h"
@@ -544,9 +545,14 @@ int64_t site_game_data::get_population_type_population(const population_type *po
 	return population;
 }
 
+const population_type *site_game_data::get_default_population_type() const
+{
+	return this->get_class_population_type(defines::get()->get_default_population_class());
+}
+
 void site_game_data::set_default_population_type_population(const int64_t population)
 {
-	const population_type *population_type = this->get_class_population_type(defines::get()->get_default_population_class());
+	const population_type *population_type = this->get_default_population_type();
 
 	if (population_type == nullptr) {
 		return;
@@ -558,7 +564,7 @@ void site_game_data::set_default_population_type_population(const int64_t popula
 
 void site_game_data::change_default_population_type_population(const int64_t population)
 {
-	const population_type *population_type = this->get_class_population_type(defines::get()->get_default_population_class());
+	const population_type *population_type = this->get_default_population_type();
 
 	if (population_type == nullptr) {
 		return;
@@ -625,8 +631,13 @@ void site_game_data::apply_population_growth(const int64_t population_growth)
 			continue;
 		}
 
-		this->change_population_unit_population(population_unit->get_key(), population_unit_growth);
-		//FIXME: skilled population types should increase the growth of the base population type unit, not themselves
+		population_unit_key key = population_unit->get_key();
+
+		if (!population_unit->get_type()->is_growable()) {
+			key.type = this->get_default_population_type();
+		}
+
+		this->change_population_unit_population(key, population_unit_growth);
 
 		remaining_population_growth -= population_unit_growth;
 	}

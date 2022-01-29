@@ -234,6 +234,8 @@ public:
 
 	int64_t get_population_type_population(const population_type *population_type) const;
 
+	const population_type *get_default_population_type() const;
+
 	void set_default_population_type_population(const int64_t population);
 	void change_default_population_type_population(const int64_t population);
 

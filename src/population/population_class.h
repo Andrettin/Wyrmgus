@@ -36,6 +36,8 @@ class population_class final : public named_data_entry, public data_type<populat
 {
 	Q_OBJECT
 
+	Q_PROPERTY(bool growable MEMBER growable READ is_growable)
+
 public:
 	static constexpr const char *class_identifier = "population_class";
 	static constexpr const char *database_folder = "population_classes";
@@ -45,6 +47,11 @@ public:
 	}
 
 	virtual void process_sml_scope(const sml_data &scope) override;
+
+	bool is_growable() const
+	{
+		return this->growable;
+	}
 
 	int get_production_efficiency(const resource *resource) const
 	{
@@ -58,6 +65,7 @@ public:
 	}
 
 private:
+	bool growable = false; //whether the population class can grow via population growth; negative growth can still occur even if false however
 	std::vector<const population_class *> promotion_targets;
 	std::vector<const population_class *> demotion_targets;
 	resource_map<int> production_efficiency_map;

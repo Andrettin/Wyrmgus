@@ -78,6 +78,8 @@ public:
 		return this->icon;
 	}
 
+	bool is_growable() const;
+
 	int get_production_efficiency(const resource *resource) const;
 
 private:

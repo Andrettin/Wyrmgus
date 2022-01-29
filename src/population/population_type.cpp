@@ -69,6 +69,11 @@ void population_type::initialize()
 	named_data_entry::initialize();
 }
 
+bool population_type::is_growable() const
+{
+	return this->get_population_class()->is_growable();
+}
+
 int population_type::get_production_efficiency(const resource *resource) const
 {
 	const auto find_iterator = this->production_efficiency_map.find(resource);
