@@ -1651,7 +1651,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		}
 
 		if (population != 0) { //remaining population after subtracting the amount of population specified to belong to particular groups
-			const unit_class *population_class = player->get_default_population_class(base_unit_type ? base_unit_type->get_domain() : unit_domain::land);
+			const unit_class *population_class = player->get_default_population_unit_class(base_unit_type ? base_unit_type->get_domain() : unit_domain::land);
 
 			this->apply_population_unit(population_class, population, site_game_data->get_map_pos(), z, player, settlement);
 
@@ -1870,7 +1870,7 @@ void map_template::apply_remaining_site_populations() const
 
 			//remaining population
 			if (settlement_history->get_population() != 0) {
-				const unit_class *population_class = owner->get_default_population_class(game_data->get_site_unit()->Type->get_domain());
+				const unit_class *population_class = owner->get_default_population_unit_class(game_data->get_site_unit()->Type->get_domain());
 
 				this->apply_population_unit(population_class, settlement_history->get_population(), settlement_pos, z, owner, site);
 
@@ -1908,7 +1908,7 @@ void map_template::apply_remaining_site_populations() const
 		}
 
 		for (const auto &[player, population] : player_populations) {
-			const unit_class *population_class = player->get_default_population_class(unit_domain::land);
+			const unit_class *population_class = player->get_default_population_unit_class(unit_domain::land);
 
 			this->apply_population_unit(population_class, population, player->StartPos, player->StartMapLayer, player, nullptr);
 		}

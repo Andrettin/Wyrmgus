@@ -44,6 +44,7 @@ class interface_style;
 class map_projection;
 class music;
 class player_color;
+class population_class;
 class resource;
 class resource_icon;
 class season;
@@ -102,9 +103,10 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(bool population_enabled MEMBER population_enabled READ is_population_enabled)
 	Q_PROPERTY(int population_growth_per_food MEMBER population_growth_per_food READ get_population_growth_per_food)
 	Q_PROPERTY(wyrmgus::resource_icon* population_resource_icon MEMBER population_resource_icon)
-	Q_PROPERTY(wyrmgus::unit_class* default_population_class MEMBER default_population_class)
-	Q_PROPERTY(wyrmgus::unit_class* default_water_population_class MEMBER default_water_population_class)
-	Q_PROPERTY(wyrmgus::unit_class* default_space_population_class MEMBER default_space_population_class)
+	Q_PROPERTY(wyrmgus::population_class* default_population_class MEMBER default_population_class)
+	Q_PROPERTY(wyrmgus::unit_class* default_population_unit_class MEMBER default_population_unit_class)
+	Q_PROPERTY(wyrmgus::unit_class* default_water_population_unit_class MEMBER default_water_population_unit_class)
+	Q_PROPERTY(wyrmgus::unit_class* default_space_population_unit_class MEMBER default_space_population_unit_class)
 	Q_PROPERTY(wyrmgus::resource_icon* food_icon MEMBER food_icon READ get_food_icon)
 	Q_PROPERTY(wyrmgus::resource_icon* score_icon MEMBER score_icon READ get_score_icon)
 	Q_PROPERTY(wyrmgus::resource_icon* mana_icon MEMBER mana_icon READ get_mana_icon)
@@ -367,19 +369,24 @@ public:
 		return this->population_resource_icon;
 	}
 
-	const unit_class *get_default_population_class() const
+	const population_class *get_default_population_class() const
 	{
 		return this->default_population_class;
 	}
 
-	const unit_class *get_default_water_population_class() const
+	const unit_class *get_default_population_unit_class() const
 	{
-		return this->default_water_population_class;
+		return this->default_population_unit_class;
 	}
 
-	const unit_class *get_default_space_population_class() const
+	const unit_class *get_default_water_population_unit_class() const
 	{
-		return this->default_space_population_class;
+		return this->default_water_population_unit_class;
+	}
+
+	const unit_class *get_default_space_population_unit_class() const
+	{
+		return this->default_space_population_unit_class;
 	}
 
 	const CUpgrade *get_faction_type_upgrade(const faction_type faction_type)
@@ -527,9 +534,10 @@ private:
 	bool population_enabled = false;
 	int population_growth_per_food = 100;
 	resource_icon *population_resource_icon = nullptr;
-	unit_class *default_population_class = nullptr;
-	unit_class *default_water_population_class = nullptr;
-	unit_class *default_space_population_class = nullptr;
+	population_class *default_population_class = nullptr;
+	unit_class *default_population_unit_class = nullptr;
+	unit_class *default_water_population_unit_class = nullptr;
+	unit_class *default_space_population_unit_class = nullptr;
 	std::map<faction_type, const CUpgrade *> faction_type_upgrades;
 	std::shared_ptr<CGraphic> icon_frame_graphics;
 	std::shared_ptr<CGraphic> pressed_icon_frame_graphics;

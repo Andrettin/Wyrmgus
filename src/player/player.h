@@ -318,7 +318,7 @@ public:
 	void acquire_upgrade(const CUpgrade *upgrade);
 	void lose_upgrade(const CUpgrade *upgrade);
 
-	const unit_class *get_default_population_class(const unit_domain domain) const;
+	const unit_class *get_default_population_unit_class(const unit_domain domain) const;
 
 	std::vector<CUnit *> get_town_hall_units() const;
 	std::vector<const wyrmgus::site *> get_settlements() const;

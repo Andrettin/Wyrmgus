@@ -2010,24 +2010,24 @@ void CPlayer::lose_upgrade(const CUpgrade *upgrade)
 	}
 }
 
-const unit_class *CPlayer::get_default_population_class(const unit_domain domain) const
+const unit_class *CPlayer::get_default_population_unit_class(const unit_domain domain) const
 {
 	switch (domain) {
 		case unit_domain::water:
-			if (this->get_class_unit_type(defines::get()->get_default_water_population_class()) != nullptr) {
-				return defines::get()->get_default_water_population_class();
+			if (this->get_class_unit_type(defines::get()->get_default_water_population_unit_class()) != nullptr) {
+				return defines::get()->get_default_water_population_unit_class();
 			}
 			break;
 		case unit_domain::space:
-			if (this->get_class_unit_type(defines::get()->get_default_space_population_class()) != nullptr) {
-				return defines::get()->get_default_space_population_class();
+			if (this->get_class_unit_type(defines::get()->get_default_space_population_unit_class()) != nullptr) {
+				return defines::get()->get_default_space_population_unit_class();
 			}
 			break;
 		default:
 			break;
 	}
 
-	return defines::get()->get_default_population_class();
+	return defines::get()->get_default_population_unit_class();
 }
 
 std::vector<CUnit *> CPlayer::get_town_hall_units() const
