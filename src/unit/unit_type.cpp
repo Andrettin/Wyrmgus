@@ -1532,6 +1532,14 @@ void unit_type::check() const
 		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" has an auto-repair range greater than 0, but is not able to repair.");
 	}
 
+	if (this->get_population_cost() > 0 && this->get_population_class() == nullptr) {
+		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" has a population cost, but no population class.");
+	}
+
+	if (this->get_population_cost() == 0 && this->get_population_class() != nullptr) {
+		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" has a population class, but no population cost.");
+	}
+
 	if (this->get_preconditions() != nullptr) {
 		this->get_preconditions()->check_validity();
 	}
@@ -1877,6 +1885,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 
 	this->repair_costs = parent_type->repair_costs;
 	this->population_cost = parent_type->population_cost;
+	this->population_class = parent_type->population_class;
 	this->stored_resources = parent_type->stored_resources;
 
 	for (const auto &[resource, res_info] : parent_type->resource_infos) {
