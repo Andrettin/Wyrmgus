@@ -44,7 +44,10 @@ public:
 		return this->type;
 	}
 
-	bool operator ==(const population_unit_key &rhs) const = default;
+	bool operator ==(const population_unit_key &rhs) const
+	{
+		return this->type == rhs.type;
+	}
 
 private:
 	const population_type *type = nullptr;
