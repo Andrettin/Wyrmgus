@@ -29,6 +29,7 @@
 #include "population/population_unit.h"
 
 #include "population/population_unit_key.h"
+#include "util/assert_util.h"
 
 namespace wyrmgus {
 
@@ -40,6 +41,13 @@ population_unit::population_unit(const population_unit_key &key, const int64_t p
 population_unit_key population_unit::get_key() const
 {
 	return population_unit_key(this->get_type());
+}
+
+void population_unit::set_population(const int64_t population)
+{
+	assert_log(population >= 0);
+
+	this->population = population;
 }
 
 }

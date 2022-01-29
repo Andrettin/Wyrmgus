@@ -48,14 +48,11 @@ public:
 		return this->population;
 	}
 
-	void set_population(const int64_t population)
-	{
-		this->population = population;
-	}
+	void set_population(const int64_t population);
 
 	void change_population(const int64_t change)
 	{
-		this->population += change;
+		this->set_population(this->get_population() + change);
 	}
 
 private:
