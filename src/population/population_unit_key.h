@@ -29,38 +29,25 @@
 namespace wyrmgus {
 
 class population_type;
-class population_unit_key;
+class population_unit;
 
-class population_unit final
+//contains the characteristics which make a population unit separate from others in its settlement
+class population_unit_key final
 {
 public:
-	explicit population_unit(const population_unit_key &key, const int64_t population);
+	explicit population_unit_key(const population_type *type) : type(type)
+	{
+	}
 
 	const population_type *get_type() const
 	{
 		return this->type;
 	}
 
-	population_unit_key get_key() const;
-
-	int64_t get_population() const
-	{
-		return this->population;
-	}
-
-	void set_population(const int64_t population)
-	{
-		this->population = population;
-	}
-
-	void change_population(const int64_t change)
-	{
-		this->population += change;
-	}
+	bool operator ==(const population_unit_key &rhs) const = default;
 
 private:
 	const population_type *type = nullptr;
-	int64_t population = 0;
 };
 
 }

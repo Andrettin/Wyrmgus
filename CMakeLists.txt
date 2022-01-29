@@ -322,6 +322,7 @@ source_group(player FILES ${player_SRCS})
 set(population_SRCS
 	src/population/population_class.cpp
 	src/population/population_type.cpp
+	src/population/population_unit.cpp
 )
 source_group(population FILES ${population_SRCS})
 
@@ -848,6 +849,7 @@ set(wyrmgus_population_HDRS
 	src/population/population_class.h
 	src/population/population_type.h
 	src/population/population_unit.h
+	src/population/population_unit_key.h
 )
 
 set(wyrmgus_quest_HDRS

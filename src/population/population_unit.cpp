@@ -24,43 +24,22 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
+
+#include "population/population_unit.h"
+
+#include "population/population_unit_key.h"
 
 namespace wyrmgus {
 
-class population_type;
-class population_unit_key;
-
-class population_unit final
+population_unit::population_unit(const population_unit_key &key, const int64_t population)
+	: type(key.get_type()), population(population)
 {
-public:
-	explicit population_unit(const population_unit_key &key, const int64_t population);
+}
 
-	const population_type *get_type() const
-	{
-		return this->type;
-	}
-
-	population_unit_key get_key() const;
-
-	int64_t get_population() const
-	{
-		return this->population;
-	}
-
-	void set_population(const int64_t population)
-	{
-		this->population = population;
-	}
-
-	void change_population(const int64_t change)
-	{
-		this->population += change;
-	}
-
-private:
-	const population_type *type = nullptr;
-	int64_t population = 0;
-};
+population_unit_key population_unit::get_key() const
+{
+	return population_unit_key(this->get_type());
+}
 
 }
