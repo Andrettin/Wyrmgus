@@ -30,11 +30,21 @@ namespace wyrmgus {
 
 class population_type;
 class population_unit_key;
+class sml_data;
+class sml_property;
 
 class population_unit final
 {
 public:
+	population_unit()
+	{
+	}
+
 	explicit population_unit(const population_unit_key &key, const int64_t population);
+
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+	sml_data to_sml_data() const;
 
 	const population_type *get_type() const
 	{

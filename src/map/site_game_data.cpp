@@ -65,7 +65,6 @@ void site_game_data::process_sml_property(const sml_property &property)
 		this->map_layer = CMap::get()->MapLayers[std::stoi(value)].get();
 	} else if (key == "population") {
 		this->set_population(std::stoll(value));
-		//FIXME: save/load population units as well
 	} else {
 		throw std::runtime_error("Invalid site game data property: \"" + key + "\".");
 	}
@@ -77,6 +76,12 @@ void site_game_data::process_sml_scope(const sml_data &scope)
 
 	if (tag == "map_pos") {
 		this->map_pos = scope.to_point();
+	} else if (tag == "population_units") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			auto population_unit = std::make_unique<wyrmgus::population_unit>();
+			database::process_sml_data(population_unit, child_scope);
+			this->population_units.push_back(std::move(population_unit));
+		});
 	} else {
 		throw std::runtime_error("Invalid site game data scope: \"" + scope.get_tag() + "\".");
 	}
@@ -96,6 +101,16 @@ sml_data site_game_data::to_sml_data() const
 
 	if (this->get_population() != 0) {
 		data.add_property("population", std::to_string(this->get_population()));
+	}
+
+	if (!this->population_units.empty()) {
+		sml_data population_units_data("population_units");
+
+		for (const std::unique_ptr<population_unit> &population_unit : this->population_units) {
+			population_units_data.add_child(population_unit->to_sml_data());
+		}
+
+		data.add_child(std::move(population_units_data));
 	}
 
 	return data;
