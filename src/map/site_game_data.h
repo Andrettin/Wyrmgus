@@ -36,6 +36,7 @@ class CUnit;
 namespace wyrmgus {
 
 class landmass;
+class population_unit;
 class resource;
 class site;
 class sml_data;
@@ -45,12 +46,11 @@ class tile;
 class site_game_data final
 {
 public:
-	static constexpr int min_population = 1000;
+	static constexpr int64_t min_population = 1000;
 	static constexpr int population_per_food = 10000;
 
-	explicit site_game_data(const site *site) : site(site)
-	{
-	}
+	explicit site_game_data(const site *site);
+	~site_game_data();
 
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
@@ -288,6 +288,7 @@ private:
 	resource_map<std::vector<CUnit *>> resource_units; //resource units in the settlement's territory
 	site_set border_settlements; //other settlements bordering this one
 	int64_t population = 0;
+	std::vector<std::unique_ptr<population_unit>> population_units;
 	int food_supply = 0;
 	int unit_food_demand = 0;
 };

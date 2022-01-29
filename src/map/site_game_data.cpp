@@ -38,6 +38,7 @@
 #include "map/site.h"
 #include "map/tile.h"
 #include "player/player.h"
+#include "population/population_unit.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"
@@ -45,6 +46,14 @@
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+site_game_data::site_game_data(const wyrmgus::site *site) : site(site)
+{
+}
+
+site_game_data::~site_game_data()
+{
+}
 
 void site_game_data::process_sml_property(const sml_property &property)
 {
