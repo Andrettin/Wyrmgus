@@ -42,8 +42,19 @@ public:
 		return this->type;
 	}
 
+	void set_population(const int64_t population)
+	{
+		this->population = population;
+	}
+
+	void change_population(const int64_t change)
+	{
+		this->population += change;
+	}
+
 private:
 	const population_type *type = nullptr;
+	int64_t population = 0;
 };
 
 }
