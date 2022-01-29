@@ -449,4 +449,13 @@ void site_game_data::do_population_growth()
 	}
 }
 
+const population_type *site_game_data::get_class_population_type(const population_class *population_class) const
+{
+	if (this->owner == nullptr) {
+		return nullptr;
+	}
+
+	return this->owner->get_class_population_type(population_class);
+}
+
 }

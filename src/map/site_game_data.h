@@ -224,6 +224,8 @@ public:
 
 	void do_population_growth();
 
+	const population_type *get_class_population_type(const population_class *population_class) const;
+
 	int get_food_supply() const
 	{
 		return this->food_supply;
