@@ -343,6 +343,7 @@ signals:
 	void dialogueNodeCalled(QObject *dialogue, const int node_index, const QString &title_str, const QString &text, const QString &icon_identifier, const QString &player_color_identifier, const QStringList &options, const QStringList &option_hotkeys, const QStringList &option_tooltips, const int unit_number);
 	void questCompletedDialogOpened(QObject *quest, const QString &rewards_string);
 	void questFailedDialogOpened(QObject *quest, const QString &failure_reason_string);
+	void population_dialog_opened(QObject *settlement_game_data, const QVariantList &population_units);
 	void lua_dialog_open_changed();
 
 private:

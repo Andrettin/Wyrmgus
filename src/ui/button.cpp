@@ -786,6 +786,8 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 			return "cancel-train-unit";
 		case ButtonCmd::CancelBuild:
 			return "cancel-build";
+		case ButtonCmd::ShowPopulation:
+			return "show_population";
 	}
 
 	throw std::runtime_error("Invalid button action enum value: " + std::to_string(static_cast<int>(button_action)));
@@ -871,6 +873,8 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::CancelTrain;
 	} else if (button_action == "cancel-build") {
 		return ButtonCmd::CancelBuild;
+	} else if (button_action == "show_population") {
+		return ButtonCmd::ShowPopulation;
 	}
 
 	return ButtonCmd::None;

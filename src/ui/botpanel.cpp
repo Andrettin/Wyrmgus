@@ -42,6 +42,7 @@
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "economy/resource.h"
+#include "engine_interface.h"
 #include "game/game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -52,6 +53,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/tile.h"
 //Wyrmgus start
 #include "network.h"
@@ -1427,13 +1429,18 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 				res = res && Selected[0]->Player->is_character_available_for_recruitment(wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value).get_character(), true);
 			}
 			break;
+		case ButtonCmd::ShowPopulation:
+			res = defines::get()->is_population_enabled();
+			break;
 	}
+
 #if 0
 	// there is a additional check function -- call it
 	if (res && buttonaction.Disabled) {
 		return buttonaction.Disabled(unit, buttonaction);
 	}
 #endif
+
 	return res;
 }
 
@@ -1479,6 +1486,7 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 		case ButtonCmd::AttackGround:
 		case ButtonCmd::Salvage:
 		case ButtonCmd::EnterMapLayer:
+		case ButtonCmd::ShowPopulation:
 			res = true;
 			break;
 		case ButtonCmd::Train:
@@ -2289,6 +2297,16 @@ void CButtonPanel::DoClicked_CallbackAction(int button)
 	callback->run();
 }
 
+void CButtonPanel::DoClicked_ShowPopulation()
+{
+	assert_throw(!Selected.empty());
+	assert_throw(Selected[0]->get_settlement() != nullptr);
+
+	site_game_data *settlement_game_data = Selected[0]->get_settlement()->get_game_data();
+
+	emit engine_interface::get()->population_dialog_opened(settlement_game_data, settlement_game_data->get_population_units_qvariant_list());
+}
+
 /**
 **  Handle bottom button clicked.
 **
@@ -2398,6 +2416,9 @@ void CButtonPanel::DoClicked(int button, const Qt::KeyboardModifiers key_modifie
 		case ButtonCmd::Salvage: { DoClicked_Salvage(); break; }
 		case ButtonCmd::EnterMapLayer: { DoClicked_EnterMapLayer(); break; }
 		//Wyrmgus end
+		case ButtonCmd::ShowPopulation:
+			DoClicked_ShowPopulation();
+			break;
 	}
 }
 

@@ -253,7 +253,7 @@ private:
 	void DoClicked_BuyResource(int button);
 	void DoClicked_Salvage();
 	void DoClicked_EnterMapLayer();
-
+	void DoClicked_ShowPopulation();
 
 public:
 	std::shared_ptr<CGraphic> G;

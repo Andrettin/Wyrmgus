@@ -71,5 +71,6 @@ enum class ButtonCmd {
 	CancelUpgrade,  /// cancel upgrade
 	CancelTrain,    /// cancel training
 	CancelBuild,    /// cancel building
-	CallbackAction
+	CallbackAction,
+	ShowPopulation
 };
