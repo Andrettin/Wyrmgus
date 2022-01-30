@@ -98,7 +98,6 @@ public:
 		this->Description = other_button.Description;
 		this->CommentSound = other_button.CommentSound;
 		this->Popup = other_button.Popup;
-		this->Mod = other_button.Mod;
 
 		return *this;
 	}
@@ -191,7 +190,6 @@ public:
 	std::string Description;    /// description shown on status bar (optional)
 	SoundConfig CommentSound;   /// Sound comment used when you press the button
 	std::string Popup;          /// Popup screen used for button
-	std::string Mod;			/// Mod to which this button belongs to
 
 	friend int ::CclDefineButton(lua_State *l);
 };

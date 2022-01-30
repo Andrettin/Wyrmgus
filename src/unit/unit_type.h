@@ -1051,7 +1051,7 @@ public:
 	}
 	
 	void set_parent(const unit_type *parent_type);
-	void RemoveButtons(const ButtonCmd button_action, const std::string &mod_file = "");
+	void RemoveButtons(const ButtonCmd button_action);
 
 	void UpdateDefaultBoolFlags();
 	void calculate_movement_mask();

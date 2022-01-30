@@ -2134,14 +2134,11 @@ void unit_type::calculate_movement_mask()
 }
 
 //Wyrmgus start
-void unit_type::RemoveButtons(const ButtonCmd button_action, const std::string &mod_file)
+void unit_type::RemoveButtons(const ButtonCmd button_action)
 {
 	int buttons_size = button::get_all().size();
 	for (int i = (buttons_size - 1); i >= 0; --i) {
 		if (button_action != ButtonCmd::None && button::get_all()[i]->Action != button_action) {
-			continue;
-		}
-		if (!mod_file.empty() && button::get_all()[i]->Mod != mod_file) {
 			continue;
 		}
 		

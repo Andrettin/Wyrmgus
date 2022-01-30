@@ -915,10 +915,6 @@ static int CclDefineButton(lua_State *l)
 			if (!strncmp(button->UnitMask.c_str(), ",*,", 3)) {
 				button->UnitMask = "*";
 			}
-		//Wyrmgus start
-		} else if (!strcmp(value, "Mod")) {
-			button->Mod = LuaToString(l, -1);
-		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

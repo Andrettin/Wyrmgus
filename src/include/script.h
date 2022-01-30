@@ -359,9 +359,6 @@ extern void InitLua();                /// Initialise Lua
 extern void LoadCcl(const std::string &filename, const std::string &luaArgStr = "");  /// Load ccl config file
 extern void SavePreferences();        /// Save user preferences
 //Wyrmgus start
-extern void DeleteModFaction(const std::string &faction_name);
-extern void DeleteModUnitType(const std::string &unit_type_ident);
-extern void DisableMod(const std::string &mod_file);
 extern void SetDLCFileEquivalency(const std::string dlc_file, const std::string replacement_file);
 extern std::map<std::string, std::string> DLCFileEquivalency;
 //Wyrmgus end

@@ -1296,37 +1296,6 @@ static int CclGetCivilizationData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	} else if (!strcmp(data, "Factions")) {
-		bool is_mod = false;
-		if (lua_gettop(l) >= 3) {
-			is_mod = true;
-		}
-		
-		std::string mod_file;
-
-		if (is_mod) {
-			mod_file = LuaToString(l, 3);
-		}
-		
-		std::vector<std::string> factions;
-		for (wyrmgus::faction *faction : wyrmgus::faction::get_all())
-		{
-			if (faction->get_civilization() != civilization) {
-				continue;
-			}
-			
-			if (!is_mod || faction->Mod == mod_file) {
-				factions.push_back(faction->get_identifier());
-			}
-		}
-		
-		lua_createtable(l, factions.size(), 0);
-		for (size_t i = 1; i <= factions.size(); ++i)
-		{
-			lua_pushstring(l, factions[i-1].c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
 	} else if (!strcmp(data, "Quests")) {
 		lua_createtable(l, civilization->Quests.size(), 0);
 		for (size_t i = 1; i <= civilization->Quests.size(); ++i)
@@ -1714,8 +1683,6 @@ static int CclDefineFaction(lua_State *l)
 
 				faction->HistoricalCapitals.push_back(std::pair<CDate, std::string>(date, site_ident));
 			}
-		} else if (!strcmp(value, "Mod")) {
-			faction->Mod = LuaToString(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
