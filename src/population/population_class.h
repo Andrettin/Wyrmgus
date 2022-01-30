@@ -53,6 +53,16 @@ public:
 		return this->growable;
 	}
 
+	const std::vector<const population_class *> &get_promotion_targets() const
+	{
+		return this->promotion_targets;
+	}
+
+	const std::vector<const population_class *> &get_demotion_targets() const
+	{
+		return this->demotion_targets;
+	}
+
 	int get_production_efficiency(const resource *resource) const
 	{
 		const auto find_iterator = this->production_efficiency_map.find(resource);
