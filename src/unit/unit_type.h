@@ -61,6 +61,7 @@ namespace wyrmgus {
 	class civilization_group;
 	class condition;
 	class construction;
+	class employment_type;
 	class faction;
 	class font;
 	class icon;
@@ -793,6 +794,8 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(quint64 default_mass MEMBER default_mass READ get_default_mass)
 	Q_PROPERTY(qint64 population_cost MEMBER population_cost READ get_population_cost)
 	Q_PROPERTY(wyrmgus::population_class* population_class MEMBER population_class)
+	Q_PROPERTY(wyrmgus::employment_type* employment_type MEMBER employment_type)
+	Q_PROPERTY(int employment_capacity MEMBER employment_capacity READ get_employment_capacity)
 	Q_PROPERTY(QColor neutral_minimap_color MEMBER neutral_minimap_color READ get_neutral_minimap_color)
 	Q_PROPERTY(QString encyclopedia_background_file READ get_encyclopedia_background_file_qstring NOTIFY changed)
 
@@ -1202,6 +1205,16 @@ public:
 		return this->population_class;
 	}
 
+	const wyrmgus::employment_type *get_employment_type() const
+	{
+		return this->employment_type;
+	}
+
+	int get_employment_capacity() const
+	{
+		return this->employment_capacity;
+	}
+
 	const std::vector<qunique_ptr<unit_type_variation>> &get_variations() const
 	{
 		return this->variations;
@@ -1449,6 +1462,8 @@ public:
 private:
 	int64_t population_cost = 0;
 	wyrmgus::population_class *population_class = nullptr;
+	wyrmgus::employment_type *employment_type = nullptr;
+	int employment_capacity = 0;
 	resource_set stored_resources;             /// Resources that we can store here.
 	resource *given_resource = nullptr; //the resource this unit gives
 	resource_map<std::unique_ptr<resource_info>> resource_infos;    /// Resource information.

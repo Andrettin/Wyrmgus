@@ -1540,6 +1540,14 @@ void unit_type::check() const
 		if (this->get_population_cost() == 0 && this->get_population_class() != nullptr) {
 			throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" has a population class, but no population cost.");
 		}
+
+		if (this->get_employment_capacity() > 0 && this->get_employment_type() == nullptr) {
+			throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" has an employment capacity, but no employment type.");
+		}
+
+		if (this->get_employment_capacity() == 0 && this->get_employment_type() != nullptr) {
+			throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" has an employment type, but no employment capacity.");
+		}
 	}
 
 	if (this->get_preconditions() != nullptr) {
@@ -1888,6 +1896,8 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->repair_costs = parent_type->repair_costs;
 	this->population_cost = parent_type->population_cost;
 	this->population_class = parent_type->population_class;
+	this->employment_type = parent_type->employment_type;
+	this->employment_capacity = parent_type->employment_capacity;
 	this->stored_resources = parent_type->stored_resources;
 
 	for (const auto &[resource, res_info] : parent_type->resource_infos) {

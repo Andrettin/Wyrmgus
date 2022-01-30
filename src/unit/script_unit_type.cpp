@@ -50,6 +50,7 @@
 #include "player/civilization.h"
 #include "player/faction.h"
 #include "player/player.h"
+#include "population/employment_type.h"
 #include "population/population_class.h"
 //Wyrmgus start
 #include "province.h"
@@ -1396,6 +1397,10 @@ static int CclDefineUnitType(lua_State *l)
 			type->population_cost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "PopulationClass")) {
 			type->population_class = population_class::get(LuaToString(l, -1));
+		} else if (!strcmp(value, "EmploymentType")) {
+			type->employment_type = employment_type::get(LuaToString(l, -1));
+		} else if (!strcmp(value, "EmploymentCapacity")) {
+			type->employment_capacity = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "CanStore")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

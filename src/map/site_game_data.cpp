@@ -38,11 +38,13 @@
 #include "map/site.h"
 #include "map/tile.h"
 #include "player/player.h"
+#include "population/employment_type.h"
 #include "population/population_type.h"
 #include "population/population_unit.h"
 #include "population/population_unit_key.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_type.h"
 #include "util/assert_util.h"
 #include "util/set_util.h"
 #include "util/vector_util.h"
@@ -717,12 +719,20 @@ void site_game_data::on_settlement_building_added(const CUnit *building)
 	if (building->Variable[SUPPLY_INDEX].Value != 0) {
 		this->change_food_supply(building->Variable[SUPPLY_INDEX].Value);
 	}
+
+	if (building->Type->get_employment_type() != nullptr) {
+		this->change_employment_capacity(building->Type->get_employment_type(), building->Type->get_employment_capacity());
+	}
 }
 
 void site_game_data::on_settlement_building_removed(const CUnit *building)
 {
 	if (building->Variable[SUPPLY_INDEX].Value != 0) {
 		this->change_food_supply(-building->Variable[SUPPLY_INDEX].Value);
+	}
+
+	if (building->Type->get_employment_type() != nullptr) {
+		this->change_employment_capacity(building->Type->get_employment_type(), -building->Type->get_employment_capacity());
 	}
 }
 

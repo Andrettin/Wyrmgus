@@ -28,6 +28,7 @@
 
 #include "economy/resource_container.h"
 #include "map/site_container.h"
+#include "population/employment_type_container.h"
 #include "util/qunique_ptr.h"
 
 class CMapLayer;
@@ -306,6 +307,32 @@ public:
 		this->set_unit_food_demand(this->get_unit_food_demand() + change);
 	}
 
+	int get_employment_capacity(const employment_type *employment_type) const
+	{
+		const auto find_iterator = this->employment_capacities.find(employment_type);
+		if (find_iterator != this->employment_capacities.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_employment_capacity(const employment_type *employment_type, const int capacity)
+	{
+		if (capacity <= 0) {
+			if (this->employment_capacities.contains(employment_type)) {
+				this->employment_capacities.erase(employment_type);
+			}
+		} else {
+			this->employment_capacities[employment_type] = capacity;
+		}
+	}
+
+	void change_employment_capacity(const employment_type *employment_type, const int change)
+	{
+		this->set_employment_capacity(employment_type, this->get_employment_capacity(employment_type) + change);
+	}
+
 	void on_settlement_building_added(const CUnit *building);
 	void on_settlement_building_removed(const CUnit *building);
 
@@ -329,6 +356,7 @@ private:
 	std::vector<qunique_ptr<population_unit>> population_units;
 	int food_supply = 0;
 	int unit_food_demand = 0;
+	employment_type_map<int> employment_capacities;
 };
 
 }
