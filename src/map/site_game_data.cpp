@@ -458,6 +458,17 @@ void site_game_data::ensure_minimum_population()
 	this->set_default_population_type_population(site_game_data::min_population);
 }
 
+QVariantList site_game_data::get_population_units_qvariant_list() const
+{
+	QVariantList list;
+
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
+		list.append(QVariant::fromValue(population_unit.get()));
+	}
+
+	return list;
+}
+
 population_unit *site_game_data::get_population_unit(const population_unit_key &key) const
 {
 	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
@@ -476,6 +487,8 @@ void site_game_data::create_population_unit(const population_unit_key &key, cons
 	this->population_units.push_back(std::move(population_unit));
 
 	this->change_population(population);
+
+	emit population_units_changed(this->get_population_units_qvariant_list());
 }
 
 void site_game_data::remove_population_unit(const population_unit_key &key)
@@ -486,6 +499,9 @@ void site_game_data::remove_population_unit(const population_unit_key &key)
 		if (population_unit->get_key() == key) {
 			this->change_population(-population_unit->get_population());
 			this->population_units.erase(this->population_units.begin() + i);
+
+			emit population_units_changed(this->get_population_units_qvariant_list());
+
 			return;
 		}
 	}
@@ -495,6 +511,8 @@ void site_game_data::clear_population_units()
 {
 	this->population_units.clear();
 	this->set_population(0);
+
+	emit population_units_changed(this->get_population_units_qvariant_list());
 }
 
 void site_game_data::set_population_unit_population(const population_unit_key &key, const int64_t population)

@@ -227,6 +227,8 @@ private:
 public:
 	void ensure_minimum_population();
 
+	QVariantList get_population_units_qvariant_list() const;
+
 	population_unit *get_population_unit(const population_unit_key &key) const;
 	void create_population_unit(const population_unit_key &key, const int64_t population);
 	void remove_population_unit(const population_unit_key &key);
@@ -301,6 +303,9 @@ public:
 	{
 		this->set_unit_food_demand(this->get_unit_food_demand() + change);
 	}
+
+signals:
+	void population_units_changed(const QVariantList &population_units);
 
 private:
 	const wyrmgus::site *site = nullptr;
