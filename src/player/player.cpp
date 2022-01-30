@@ -4878,11 +4878,9 @@ void PlayersEachMinute(const int playerIdx)
 			AiEachMinute(*player);
 		}
 
-		if (defines::get()->is_population_enabled()) {
-			if (!player->is_neutral_player()) {
-				for (const site *settlement : player->get_settlements()) {
-					settlement->get_game_data()->do_population_growth();
-				}
+		if (!player->is_neutral_player()) {
+			for (const site *settlement : player->get_settlements()) {
+				settlement->get_game_data()->do_per_minute_loop();
 			}
 		}
 

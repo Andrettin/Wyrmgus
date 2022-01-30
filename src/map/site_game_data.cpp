@@ -118,6 +118,13 @@ sml_data site_game_data::to_sml_data() const
 	return data;
 }
 
+void site_game_data::do_per_minute_loop()
+{
+	if (defines::get()->is_population_enabled() && this->site->is_settlement()) {
+		this->do_population_growth();
+	}
+}
+
 const std::string &site_game_data::get_current_cultural_name() const
 {
 	const CUnit *unit = this->get_site_unit();

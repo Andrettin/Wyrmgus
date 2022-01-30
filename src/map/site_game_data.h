@@ -63,6 +63,8 @@ public:
 
 	sml_data to_sml_data() const;
 
+	void do_per_minute_loop();
+
 	const std::string &get_current_cultural_name() const;
 
 	CUnit *get_site_unit() const
