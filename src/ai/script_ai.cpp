@@ -233,7 +233,7 @@ static std::vector<const wyrmgus::unit_type *> get_supply_units()
 		unsigned int other_cost = 0;
 
 		for (const resource *resource : resource::get_all()) {
-			cost += type->DefaultStat.get_cost(resource); //this cannot be MapDefaultStat because this function is called when the AiHelper is defined, rather than when a game is started
+			cost += type->DefaultStat.get_cost(resource);
 			other_cost += other_type->DefaultStat.get_cost(resource);
 		}
 

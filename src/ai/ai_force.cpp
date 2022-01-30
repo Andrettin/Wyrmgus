@@ -361,7 +361,7 @@ class UnitTypePrioritySorter_Decreasing
 public:
 	bool operator()(int lhs, int rhs) const
 	{
-		return unit_type::get_all()[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > unit_type::get_all()[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
+		return unit_type::get_all()[lhs]->DefaultStat.Variables[PRIORITY_INDEX].Value > unit_type::get_all()[rhs]->DefaultStat.Variables[PRIORITY_INDEX].Value;
 	}
 };
 

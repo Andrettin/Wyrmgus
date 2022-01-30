@@ -301,7 +301,7 @@ UStrInt GetComponent(const CUnit &unit, const int index, const VariableAttribute
 			var = &unit.Variable[index];
 			break;
 		case 1: // Type:
-			var = &unit.Type->MapDefaultStat.Variables[index];
+			var = &unit.Type->DefaultStat.Variables[index];
 			break;
 		case 2: // Stats:
 			var = &unit.Stats->Variables[index];
@@ -393,7 +393,7 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, const int index, const Vari
 			var = &type.Stats[CPlayer::GetThisPlayer()->get_index()].Variables[index];
 			break;
 		case 1: // Type:
-			var = &type.MapDefaultStat.Variables[index];
+			var = &type.DefaultStat.Variables[index];
 			break;
 		case 2: // Stats:
 			var = &type.Stats[CPlayer::GetThisPlayer()->get_index()].Variables[index];

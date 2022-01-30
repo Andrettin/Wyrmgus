@@ -229,10 +229,10 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 	wyrmgus::tile &mf = *Field(pos);
 
 	if (humanwall) {
-		const int value = UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max;
+		const int value = UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max;
 		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value);
 	} else {
-		const int value = UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max;
+		const int value = UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max;
 		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value);
 	}
 
@@ -274,7 +274,7 @@ void CMap::HitWall(const Vec2i &pos, unsigned damage, int z)
 //		this->Field(pos)->set_value(v - damage);
 		this->Field(pos, z)->set_value(v - damage);
 //		MapFixWallTile(pos);
-		if (this->Field(pos, z)->get_overlay_terrain()->UnitType && this->Field(pos, z)->get_value() <= this->Field(pos, z)->get_overlay_terrain()->UnitType->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
+		if (this->Field(pos, z)->get_overlay_terrain()->UnitType && this->Field(pos, z)->get_value() <= this->Field(pos, z)->get_overlay_terrain()->UnitType->DefaultStat.Variables[HP_INDEX].Max / 2) {
 			this->SetOverlayTerrainDamaged(pos, true, z);
 		}
 		//Wyrmgus end

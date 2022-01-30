@@ -2048,31 +2048,19 @@ static int CclGetUnitTypeData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		const std::string res = LuaToString(l, 3);
 		const resource *resource = resource::get(res);
-		if (!GameRunning && !CEditor::get()->is_running()) {
-			lua_pushnumber(l, type->DefaultStat.get_cost(resource));
-		} else {
-			lua_pushnumber(l, type->MapDefaultStat.get_cost(resource));
-		}
+		lua_pushnumber(l, type->DefaultStat.get_cost(resource));
 		return 1;
 	} else if (!strcmp(data, "ImproveProduction")) {
 		LuaCheckArgs(l, 3);
 		const std::string res = LuaToString(l, 3);
 		const resource *resource = resource::get(res);
-		if (!GameRunning && !CEditor::get()->is_running()) {
-			lua_pushnumber(l, type->DefaultStat.get_improve_income(resource));
-		} else {
-			lua_pushnumber(l, type->MapDefaultStat.get_improve_income(resource));
-		}
+		lua_pushnumber(l, type->DefaultStat.get_improve_income(resource));
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "UnitStock")) {
 		LuaCheckArgs(l, 3);
 		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, 3));
-		if (!GameRunning && !CEditor::get()->is_running()) {
-			lua_pushnumber(l, type->DefaultStat.get_unit_stock(unit_type));
-		} else {
-			lua_pushnumber(l, type->MapDefaultStat.get_unit_stock(unit_type));
-		}
+		lua_pushnumber(l, type->DefaultStat.get_unit_stock(unit_type));
 		return 1;
 	} else if (!strcmp(data, "TrainQuantity")) {
 		lua_pushnumber(l, type->TrainQuantity);
@@ -2134,18 +2122,10 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->MinAttackRange);
 		return 1;
 	} else if (!strcmp(data, "MaxAttackRange")) {
-		if (!GameRunning && !CEditor::get()->is_running()) {
-			lua_pushnumber(l, type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value);
-		} else {
-			lua_pushnumber(l, type->MapDefaultStat.Variables[ATTACKRANGE_INDEX].Value);
-		}
+		lua_pushnumber(l, type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value);
 		return 1;
 	} else if (!strcmp(data, "Priority")) {
-		if (!GameRunning && !CEditor::get()->is_running()) {
-			lua_pushnumber(l, type->DefaultStat.Variables[PRIORITY_INDEX].Value);
-		} else {
-			lua_pushnumber(l, type->MapDefaultStat.Variables[PRIORITY_INDEX].Value);
-		}
+		lua_pushnumber(l, type->DefaultStat.Variables[PRIORITY_INDEX].Value);
 		return 1;
 	} else if (!strcmp(data, "Domain")) {
 		lua_pushstring(l, unit_domain_to_string(type->get_domain()).c_str());
@@ -2445,11 +2425,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[data];
 		if (index != -1) { // valid index
-			if (!GameRunning && !CEditor::get()->is_running()) {
-				lua_pushnumber(l, type->DefaultStat.Variables[index].Value);
-			} else {
-				lua_pushnumber(l, type->MapDefaultStat.Variables[index].Value);
-			}
+			lua_pushnumber(l, type->DefaultStat.Variables[index].Value);
 			return 1;
 		}
 
@@ -3008,19 +2984,19 @@ void UpdateUnitVariables(CUnit &unit)
 	//Wyrmgus start
 	/*
 	// SightRange
-	unit.Variable[SIGHTRANGE_INDEX].Value = type->MapDefaultStat.Variables[SIGHTRANGE_INDEX].Value;
+	unit.Variable[SIGHTRANGE_INDEX].Value = type->DefaultStat.Variables[SIGHTRANGE_INDEX].Value;
 	unit.Variable[SIGHTRANGE_INDEX].Max = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
 	*/
 	//Wyrmgus end
 
 	// AttackRange
 	//Wyrmgus start
-//	unit.Variable[ATTACKRANGE_INDEX].Value = type->MapDefaultStat.Variables[ATTACKRANGE_INDEX].Max;
+//	unit.Variable[ATTACKRANGE_INDEX].Value = type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
 //	unit.Variable[ATTACKRANGE_INDEX].Max = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	//Wyrmgus end
 
 	// Priority
-	unit.Variable[PRIORITY_INDEX].Value = type->MapDefaultStat.Variables[PRIORITY_INDEX].Max;
+	unit.Variable[PRIORITY_INDEX].Value = type->DefaultStat.Variables[PRIORITY_INDEX].Max;
 	unit.Variable[PRIORITY_INDEX].Max = unit.Stats->Variables[PRIORITY_INDEX].Max;
 
 	// Position

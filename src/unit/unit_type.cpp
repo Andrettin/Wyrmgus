@@ -2086,7 +2086,7 @@ void unit_type::calculate_movement_mask()
 		// A little chaos, buildings without HP can be entered.
 		// The oil-patch is a very special case.
 		//
-		if (this->MapDefaultStat.Variables[HP_INDEX].Max) {
+		if (this->DefaultStat.Variables[HP_INDEX].Max) {
 			this->FieldFlags = tile_flag::building;
 			if (this->get_domain() == unit_domain::air || this->get_domain() == unit_domain::space) {
 				this->FieldFlags |= tile_flag::air_building;
@@ -2566,9 +2566,8 @@ void resource_info::process_sml_scope(const sml_data &scope)
 void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 {
 	if (reset) {
-		type.MapDefaultStat = type.DefaultStat;
 		for (int player = 0; player < PlayerMax; ++player) {
-			type.Stats[player] = type.MapDefaultStat;
+			type.Stats[player] = type.DefaultStat;
 		}
 	}
 

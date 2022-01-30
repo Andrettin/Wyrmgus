@@ -3084,7 +3084,7 @@ void CUnit::Init(const wyrmgus::unit_type &type, const bool loading_saved_unit)
 
 	if (UnitTypeVar.GetNumberVariable()) {
 		assert_throw(Variable.empty());
-		this->Variable = type.MapDefaultStat.Variables;
+		this->Variable = type.DefaultStat.Variables;
 	} else {
 		this->Variable.clear();
 	}

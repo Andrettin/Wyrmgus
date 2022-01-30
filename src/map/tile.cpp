@@ -213,7 +213,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 		if (terrain_type->get_resource() != nullptr) {
 			this->value = terrain_type->get_resource()->get_default_amount();
 		} else if (terrain_type->has_flag(tile_flag::wall) && terrain_type->UnitType) {
-			this->value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
+			this->value = terrain_type->UnitType->DefaultStat.Variables[HP_INDEX].Max;
 		}
 	}
 

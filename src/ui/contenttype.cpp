@@ -113,7 +113,7 @@ void CContentTypeText::Draw(const CUnit &unit, font *defaultfont, std::vector<st
 					assert_throw(false);
 			}
 		} else {
-			int value = unit.Type->MapDefaultStat.Variables[this->Index].Value;
+			int value = unit.Type->DefaultStat.Variables[this->Index].Value;
 			int diff = unit.Stats->Variables[this->Index].Value - value;
 
 			if (!diff) {

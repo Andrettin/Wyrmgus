@@ -1444,7 +1444,7 @@ private:
 
 public:
 	CUnitStats DefaultStat;
-	CUnitStats MapDefaultStat;
+
 	struct BoolFlags {
 		bool value;             /// User defined flag. Used for (dis)allow target.
 		char CanTransport;      /// Can transport units with this flag.
