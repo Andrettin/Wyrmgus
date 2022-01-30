@@ -705,4 +705,18 @@ const population_type *site_game_data::get_class_population_type(const populatio
 	return this->owner->get_class_population_type(population_class);
 }
 
+void site_game_data::on_settlement_building_added(const CUnit *building)
+{
+	if (building->Variable[SUPPLY_INDEX].Value != 0) {
+		this->change_food_supply(building->Variable[SUPPLY_INDEX].Value);
+	}
+}
+
+void site_game_data::on_settlement_building_removed(const CUnit *building)
+{
+	if (building->Variable[SUPPLY_INDEX].Value != 0) {
+		this->change_food_supply(-building->Variable[SUPPLY_INDEX].Value);
+	}
+}
+
 }

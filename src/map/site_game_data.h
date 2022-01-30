@@ -304,6 +304,9 @@ public:
 		this->set_unit_food_demand(this->get_unit_food_demand() + change);
 	}
 
+	void on_settlement_building_added(const CUnit *building);
+	void on_settlement_building_removed(const CUnit *building);
+
 signals:
 	void population_units_changed(const QVariantList &population_units);
 

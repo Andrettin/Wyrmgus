@@ -348,7 +348,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	UpdateForNewUnit(unit, 0);
 
 	if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
-		unit.get_settlement()->get_game_data()->change_food_supply(unit.Variable[SUPPLY_INDEX].Value);
+		unit.get_settlement()->get_game_data()->on_settlement_building_added(&unit);
 	}
 
 	// Set the direction of the building if it supports them

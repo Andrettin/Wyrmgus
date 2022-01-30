@@ -144,10 +144,6 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 
 		if (supply_change != 0) {
 			player.change_supply(supply_change);
-
-			if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
-				unit.get_settlement()->get_game_data()->change_food_supply(supply_change);
-			}
 		}
 
 		// Change resource limit
@@ -156,6 +152,10 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 				player.change_max_resource(resource, newtype.Stats[player.get_index()].get_storing(resource) - oldtype.Stats[player.get_index()].get_storing(resource));
 				player.set_resource(resource, player.get_stored_resource(resource), resource_storage_type::building);
 			}
+		}
+
+		if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
+			unit.get_settlement()->get_game_data()->on_settlement_building_removed(&unit);
 		}
 	}
 
@@ -316,6 +316,10 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	if (!unit.UnderConstruction) {
 		UpdateForNewUnit(unit, 1);
 		player.IncreaseCountsForUnit(&unit, true);
+
+		if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
+			unit.get_settlement()->get_game_data()->on_settlement_building_added(&unit);
+		}
 	}
 	//Wyrmgus start
 	/*

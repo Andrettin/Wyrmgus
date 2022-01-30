@@ -2160,13 +2160,13 @@ void CUnit::set_settlement(const wyrmgus::site *settlement)
 
 	this->settlement = settlement;
 
-	if (defines::get()->is_population_enabled() && this->Variable[SUPPLY_INDEX].Value != 0 && !this->is_under_construction() && this->IsAlive()) {
+	if (defines::get()->is_population_enabled() && !this->is_under_construction() && this->IsAlive()) {
 		if (old_settlement != nullptr) {
-			old_settlement->get_game_data()->change_food_supply(-this->Variable[SUPPLY_INDEX].Value);
+			old_settlement->get_game_data()->on_settlement_building_removed(this);
 		}
 
 		if (this->get_settlement() != nullptr) {
-			this->get_settlement()->get_game_data()->change_food_supply(this->Variable[SUPPLY_INDEX].Value);
+			this->get_settlement()->get_game_data()->on_settlement_building_added(this);
 		}
 	}
 }
@@ -4519,14 +4519,16 @@ void UnitLost(CUnit &unit)
 	if (unit.CurrentAction() != UnitAction::Built) {
 		if (unit.Variable[SUPPLY_INDEX].Value != 0) {
 			player.change_supply(-unit.Variable[SUPPLY_INDEX].Value);
-
-			if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
-				unit.get_settlement()->get_game_data()->change_food_supply(-unit.Variable[SUPPLY_INDEX].Value);
-			}
 		}
 
-		if (defines::get()->is_population_enabled() && unit.get_home_settlement() != nullptr) {
-			unit.set_home_settlement(nullptr);
+		if (defines::get()->is_population_enabled()) {
+			if (unit.get_settlement() != nullptr) {
+				unit.get_settlement()->get_game_data()->on_settlement_building_removed(&unit);
+			}
+
+			if (unit.get_home_settlement() != nullptr) {
+				unit.set_home_settlement(nullptr);
+			}
 		}
 
 		// Decrease resource limit
