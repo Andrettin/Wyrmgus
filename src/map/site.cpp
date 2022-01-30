@@ -296,7 +296,8 @@ void site::reset_history()
 
 void site::reset_game_data()
 {
-	this->game_data = std::make_unique<site_game_data>(this);
+	this->game_data = make_qunique<site_game_data>(this);
+	this->game_data->moveToThread(QApplication::instance()->thread());
 }
 
 const std::string &site::get_cultural_name(const civilization *civilization) const

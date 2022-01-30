@@ -47,8 +47,10 @@ class sml_property;
 class tile;
 struct population_unit_key;
 
-class site_game_data final
+class site_game_data final : public QObject
 {
+	Q_OBJECT
+
 public:
 	static constexpr int64_t min_population = 1000;
 	static constexpr int population_per_food = 10000;

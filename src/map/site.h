@@ -32,6 +32,7 @@
 #include "time/date.h"
 #include "util/color_container.h"
 #include "util/geocoordinate.h"
+#include "util/qunique_ptr.h"
 
 class CMapLayer;
 class CPlayer;
@@ -323,7 +324,7 @@ private:
 	QColor color; //color used to represent the site on the minimap, and to identify its territory on territory images
 	std::vector<character *> characters; //characters which can be recruited at this site
 	std::unique_ptr<site_history> history;
-	std::unique_ptr<site_game_data> game_data;
+	qunique_ptr<site_game_data> game_data;
 public:
 	std::map<CDate, const faction *> HistoricalOwners;			/// Historical owners of the site
 	std::vector<std::tuple<CDate, CDate, const unit_type *, int, const faction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
