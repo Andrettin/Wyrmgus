@@ -24,29 +24,21 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
+
+#include "population/population_unit_key.h"
+
+#include "population/population_type.h"
 
 namespace wyrmgus {
 
-class population_type;
-class population_unit;
-
-//contains the characteristics which make a population unit separate from others in its settlement
-struct population_unit_key final
+bool population_unit_key::operator <(const population_unit_key &rhs) const
 {
-public:
-	explicit population_unit_key(const population_type *type) : type(type)
-	{
+	if (this->type != rhs.type) {
+		return this->type->get_identifier() < rhs.type->get_identifier();
 	}
 
-	bool operator ==(const population_unit_key &rhs) const
-	{
-		return this->type == rhs.type;
-	}
-
-	bool operator <(const population_unit_key &rhs) const;
-
-	const population_type *type = nullptr;
-};
+	return false;
+}
 
 }

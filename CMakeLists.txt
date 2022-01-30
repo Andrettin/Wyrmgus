@@ -325,6 +325,7 @@ set(population_SRCS
 	src/population/population_class.cpp
 	src/population/population_type.cpp
 	src/population/population_unit.cpp
+	src/population/population_unit_key.cpp
 )
 source_group(population FILES ${population_SRCS})
 
