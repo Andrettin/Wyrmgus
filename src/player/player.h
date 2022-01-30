@@ -109,6 +109,7 @@ class CPlayer final : public QObject
 	Q_PROPERTY(bool active READ is_active_sync NOTIFY type_changed)
 	Q_PROPERTY(wyrmgus::age* age READ get_age_sync NOTIFY age_changed)
 	Q_PROPERTY(bool alive READ is_alive_sync NOTIFY alive_changed)
+	Q_PROPERTY(wyrmgus::player_color* player_color READ get_player_color_sync NOTIFY player_color_changed)
 	Q_PROPERTY(int supply READ get_supply_sync NOTIFY supply_changed)
 	Q_PROPERTY(int demand READ get_demand_sync NOTIFY demand_changed)
 	Q_PROPERTY(qint64 population READ get_population_sync NOTIFY population_changed)
@@ -294,6 +295,26 @@ public:
 	const wyrmgus::player_color *get_player_color() const
 	{
 		return this->player_color;
+	}
+
+	wyrmgus::player_color *get_player_color_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return const_cast<wyrmgus::player_color *>(this->get_player_color());
+	}
+
+	void set_player_color(const wyrmgus::player_color *player_color)
+	{
+		if (player_color == this->get_player_color()) {
+			return;
+		}
+
+		std::unique_lock<std::shared_mutex> lock(this->mutex);
+
+		this->player_color = player_color;
+
+		emit player_color_changed();
 	}
 
 	const QColor &get_minimap_color() const;
@@ -1338,6 +1359,7 @@ signals:
 	void type_changed();
 	void age_changed();
 	void alive_changed();
+	void player_color_changed();
 	void supply_changed();
 	void demand_changed();
 	void population_changed();

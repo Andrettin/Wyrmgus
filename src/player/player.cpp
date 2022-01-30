@@ -1535,7 +1535,7 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 		throw std::runtime_error("No player color chosen for player \"" + this->get_name() + "\" (" + std::to_string(this->get_index()) + ").");
 	}
 
-	this->player_color = player_color;
+	this->set_player_color(player_color);
 
 	if (!CEditor::get()->is_running()) {
 		//update the territory on the minimap for the new color
@@ -4903,11 +4903,11 @@ void SetPlayersPalette()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (CPlayer::Players[i]->get_faction() == nullptr) {
-			CPlayer::Players[i]->player_color = vector::get_random(player_color::get_all());
+			CPlayer::Players[i]->set_player_color(vector::get_random(player_color::get_all()));
 		}
 	}
 
-	CPlayer::get_neutral_player()->player_color = defines::get()->get_neutral_player_color();
+	CPlayer::get_neutral_player()->set_player_color(defines::get()->get_neutral_player_color());
 }
 
 /**
