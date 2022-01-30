@@ -2392,21 +2392,15 @@ void CUnit::GenerateDrop()
 			potential_drops.push_back(this->Type->Drops[i]);
 		}
 	}
+
 	if (this->Player->AiEnabled) {
 		for (size_t i = 0; i < this->Type->AiDrops.size(); ++i) {
 			if (check_conditions(this->Type->AiDrops[i], this)) {
 				potential_drops.push_back(this->Type->AiDrops[i]);
 			}
 		}
-
-		for (auto iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
-			for (size_t i = 0; i < iterator->second.size(); ++i) {
-				if (check_conditions(iterator->second[i], this)) {
-					potential_drops.push_back(iterator->second[i]);
-				}
-			}
-		}
 	}
+
 	if (potential_drops.size() > 0) {
 		chosen_drop = potential_drops[SyncRand(potential_drops.size())];
 	}

@@ -1582,8 +1582,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "RequirementsString")) {
 			type->RequirementsString = LuaToString(l, -1);
-		} else if (!strcmp(value, "ExperienceRequirementsString")) {
-			type->ExperienceRequirementsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "BuildingRulesString")) {
 			type->BuildingRulesString = LuaToString(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
@@ -1657,8 +1655,6 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				type->WeaponClasses.push_back(wyrmgus::string_to_item_class(LuaToString(l, -1, j + 1)));
 			}
-		} else if (!strcmp(value, "Mod")) {
-			type->Mod = LuaToString(l, -1);
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];
@@ -2180,9 +2176,6 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "ButtonHint")) {
 		lua_pushstring(l, type->ButtonHint.c_str());
 		return 1;
-	} else if (!strcmp(data, "Mod")) {
-		lua_pushstring(l, type->Mod.string().c_str());
-		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "GivesResource")) {
 		if (type->get_given_resource() != nullptr) {
@@ -2279,34 +2272,13 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "AiDrops")) {
-		bool is_mod = false;
-		if (lua_gettop(l) >= 3) {
-			is_mod = true;
+		lua_createtable(l, type->AiDrops.size(), 0);
+		for (size_t i = 1; i <= type->AiDrops.size(); ++i)
+		{
+			lua_pushstring(l, type->AiDrops[i - 1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
 		}
-		
-		std::string mod_file;
-		if (is_mod) {
-			mod_file = LuaToString(l, 3);
-		}
-
-		const auto mod_find_iterator = type->ModAiDrops.find(mod_file);
-		if (is_mod && mod_find_iterator != type->ModAiDrops.end()) {
-			lua_createtable(l, mod_find_iterator->second.size(), 0);
-			for (size_t i = 1; i <= mod_find_iterator->second.size(); ++i)
-			{
-				lua_pushstring(l, mod_find_iterator->second[i-1]->Ident.c_str());
-				lua_rawseti(l, -2, i);
-			}
-			return 1;
-		} else {
-			lua_createtable(l, type->AiDrops.size(), 0);
-			for (size_t i = 1; i <= type->AiDrops.size(); ++i)
-			{
-				lua_pushstring(l, type->AiDrops[i-1]->Ident.c_str());
-				lua_rawseti(l, -2, i);
-			}
-			return 1;
-		}
+		return 1;
 	} else if (!strcmp(data, "Affixes")) {
 		lua_createtable(l, type->Affixes.size(), 0);
 		for (size_t i = 1; i <= type->Affixes.size(); ++i)
@@ -2467,34 +2439,13 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Trains")) {
-		bool is_mod = false;
-		if (lua_gettop(l) >= 3) {
-			is_mod = true;
+		lua_createtable(l, type->Trains.size(), 0);
+		for (size_t i = 1; i <= type->Trains.size(); ++i)
+		{
+			lua_pushstring(l, type->Trains[i - 1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
 		}
-		
-		std::string mod_file;
-		if (is_mod) {
-			mod_file = LuaToString(l, 3);
-		}
-
-		const auto mod_find_iterator = type->ModTrains.find(mod_file);
-		if (is_mod && mod_find_iterator != type->ModTrains.end()) {
-			lua_createtable(l, mod_find_iterator->second.size(), 0);
-			for (size_t i = 1; i <= mod_find_iterator->second.size(); ++i)
-			{
-				lua_pushstring(l, mod_find_iterator->second[i-1]->Ident.c_str());
-				lua_rawseti(l, -2, i);
-			}
-			return 1;
-		} else {
-			lua_createtable(l, type->Trains.size(), 0);
-			for (size_t i = 1; i <= type->Trains.size(); ++i)
-			{
-				lua_pushstring(l, type->Trains[i-1]->Ident.c_str());
-				lua_rawseti(l, -2, i);
-			}
-			return 1;
-		}
+		return 1;
 	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[data];
@@ -2857,16 +2808,9 @@ static int CclDefineExtraDeathTypes(lua_State *l)
 //Wyrmgus start
 static int CclGetUnitTypes(lua_State *l)
 {
-	std::string mod_file;
-	if (lua_gettop(l) >= 1) {
-		mod_file = LuaToString(l, 1);
-	}
-	
 	std::vector<std::string> unit_types;
 	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		if (mod_file.empty() || unit_type->Mod == mod_file) {
-			unit_types.push_back(unit_type->Ident);
-		}
+		unit_types.push_back(unit_type->Ident);
 	}
 		
 	lua_createtable(l, unit_types.size(), 0);
@@ -3532,337 +3476,6 @@ static int CclSetSettlementSiteUnit(lua_State *l)
 //Wyrmgus end
 
 /**
-**  Set the map default stat for a unit type
-**
-**  @param ident			Unit type ident
-**  @param variable_key		Key of the desired variable
-**  @param value			Value to set to
-**  @param variable_type	Type to be modified (i.e. "Value", "Max", etc.); alternatively, resource type if variable_key equals "Costs"
-*/
-void SetModStat(const std::string &mod_file, const std::string &ident, const std::string &variable_key, const int value, const std::string &variable_type)
-{
-	wyrmgus::unit_type *type = wyrmgus::unit_type::get(ident);
-	
-	if (type->ModDefaultStats.find(mod_file) == type->ModDefaultStats.end()) {
-		type->ModDefaultStats[mod_file].Variables.resize(UnitTypeVar.GetNumberVariable());
-	}
-	
-	if (variable_key == "Costs") {
-		const resource *resource = resource::get(variable_type);
-		if (GameRunning || CEditor::get()->is_running()) {
-			type->MapDefaultStat.change_cost(resource, -type->ModDefaultStats[mod_file].get_cost(resource));
-			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].change_cost(resource, -type->ModDefaultStats[mod_file].get_cost(resource));
-			}
-		}
-
-		type->ModDefaultStats[mod_file].set_cost(resource, value);
-		if (GameRunning || CEditor::get()->is_running()) {
-			type->MapDefaultStat.change_cost(resource, type->ModDefaultStats[mod_file].get_cost(resource));
-			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].change_cost(resource, type->ModDefaultStats[mod_file].get_cost(resource));
-			}
-		}
-	} else if (variable_key == "ImproveProduction") {
-		const resource *resource = resource::get(variable_type);
-		if (GameRunning || CEditor::get()->is_running()) {
-			type->MapDefaultStat.change_improve_income(resource, -type->ModDefaultStats[mod_file].get_improve_income(resource));
-			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].change_improve_income(resource, -type->ModDefaultStats[mod_file].get_improve_income(resource));
-			}
-		}
-		type->ModDefaultStats[mod_file].set_improve_income(resource, value);
-		if (GameRunning || CEditor::get()->is_running()) {
-			type->MapDefaultStat.change_improve_income(resource, type->ModDefaultStats[mod_file].get_improve_income(resource));
-			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].change_improve_income(resource, type->ModDefaultStats[mod_file].get_improve_income(resource));
-			}
-		}
-	} else if (variable_key == "UnitStock") {
-		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(variable_type);
-		if (GameRunning || CEditor::get()->is_running()) {
-			type->MapDefaultStat.change_unit_stock(unit_type, - type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
-			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].change_unit_stock(unit_type, - type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
-			}
-		}
-		type->ModDefaultStats[mod_file].set_unit_stock(unit_type, value);
-		if (GameRunning || CEditor::get()->is_running()) {
-			type->MapDefaultStat.change_unit_stock(unit_type, type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
-			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].change_unit_stock(unit_type, type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
-			}
-		}
-	} else {
-		int variable_index = UnitTypeVar.VariableNameLookup[variable_key.c_str()];
-		if (variable_index != -1) { // valid index
-			if (variable_type == "Value") {
-				if (GameRunning || CEditor::get()->is_running()) {
-					type->MapDefaultStat.Variables[variable_index].Value -= type->ModDefaultStats[mod_file].Variables[variable_index].Value;
-					for (int player = 0; player < PlayerMax; ++player) {
-						type->Stats[player].Variables[variable_index].Value -= type->ModDefaultStats[mod_file].Variables[variable_index].Value;
-					}
-				}
-				type->ModDefaultStats[mod_file].Variables[variable_index].Value = value;
-				if (GameRunning || CEditor::get()->is_running()) {
-					type->MapDefaultStat.Variables[variable_index].Value += type->ModDefaultStats[mod_file].Variables[variable_index].Value;
-					for (int player = 0; player < PlayerMax; ++player) {
-						type->Stats[player].Variables[variable_index].Value += type->ModDefaultStats[mod_file].Variables[variable_index].Value;
-					}
-				}
-			} else if (variable_type == "Max") {
-				if (GameRunning || CEditor::get()->is_running()) {
-					type->MapDefaultStat.Variables[variable_index].Max -= type->ModDefaultStats[mod_file].Variables[variable_index].Max;
-					for (int player = 0; player < PlayerMax; ++player) {
-						type->Stats[player].Variables[variable_index].Max -= type->ModDefaultStats[mod_file].Variables[variable_index].Max;
-					}
-				}
-				type->ModDefaultStats[mod_file].Variables[variable_index].Max = value;
-				if (GameRunning || CEditor::get()->is_running()) {
-					type->MapDefaultStat.Variables[variable_index].Max += type->ModDefaultStats[mod_file].Variables[variable_index].Max;
-					for (int player = 0; player < PlayerMax; ++player) {
-						type->Stats[player].Variables[variable_index].Max += type->ModDefaultStats[mod_file].Variables[variable_index].Max;
-					}
-				}
-			} else if (variable_type == "Increase") {
-				if (GameRunning || CEditor::get()->is_running()) {
-					type->MapDefaultStat.Variables[variable_index].Increase -= type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
-					for (int player = 0; player < PlayerMax; ++player) {
-						type->Stats[player].Variables[variable_index].Increase -= type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
-					}
-				}
-				type->ModDefaultStats[mod_file].Variables[variable_index].Increase = value;
-				if (GameRunning || CEditor::get()->is_running()) {
-					type->MapDefaultStat.Variables[variable_index].Increase += type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
-					for (int player = 0; player < PlayerMax; ++player) {
-						type->Stats[player].Variables[variable_index].Increase += type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
-					}
-				}
-			} else if (variable_type == "Enable") {
-				type->ModDefaultStats[mod_file].Variables[variable_index].Enable = value;
-				if (GameRunning || CEditor::get()->is_running()) {
-					type->MapDefaultStat.Variables[variable_index].Enable = type->ModDefaultStats[mod_file].Variables[variable_index].Enable;
-					for (int player = 0; player < PlayerMax; ++player) {
-						type->Stats[player].Variables[variable_index].Enable = type->ModDefaultStats[mod_file].Variables[variable_index].Enable;
-					}
-				}
-			} else {
-				fprintf(stderr, "Invalid type: %s\n", variable_type.c_str());
-				return;
-			}
-		} else {
-			fprintf(stderr, "Invalid variable: %s\n", variable_key.c_str());
-			return;
-		}
-	}
-}
-
-/**
-**  Set the map sound for a unit type
-**
-**  @param ident			Unit type ident
-**  @param sound_type		Type of the sound
-**  @param sound			The sound to be set for that type
-*/
-void SetModSound(const std::string &mod_file, const std::string &ident, const std::string &sound, const std::string &sound_type, const std::string &sound_subtype)
-{
-	if (sound.empty()) {
-		return;
-	}
-	wyrmgus::unit_type *type = wyrmgus::unit_type::get(ident);
-	
-	if (sound_type == "selected") {
-		type->ModSounds[mod_file].Selected.Name = sound;
-	} else if (sound_type == "acknowledge") {
-		type->ModSounds[mod_file].Acknowledgement.Name = sound;
-	} else if (sound_type == "attack") {
-		type->ModSounds[mod_file].Attack.Name = sound;
-	//Wyrmgus start
-	} else if (sound_type == "idle") {
-		type->ModSounds[mod_file].Idle.Name = sound;
-	} else if (sound_type == "hit") {
-		type->ModSounds[mod_file].Hit.Name = sound;
-	} else if (sound_type == "miss") {
-		type->ModSounds[mod_file].Miss.Name = sound;
-	} else if (sound_type == "fire-missile") {
-		type->ModSounds[mod_file].FireMissile.Name = sound;
-	} else if (sound_type == "step") {
-		type->ModSounds[mod_file].Step.Name = sound;
-	} else if (sound_type == "step-dirt") {
-		type->ModSounds[mod_file].StepDirt.Name = sound;
-	} else if (sound_type == "step-grass") {
-		type->ModSounds[mod_file].StepGrass.Name = sound;
-	} else if (sound_type == "step-gravel") {
-		type->ModSounds[mod_file].StepGravel.Name = sound;
-	} else if (sound_type == "step-mud") {
-		type->ModSounds[mod_file].StepMud.Name = sound;
-	} else if (sound_type == "step-stone") {
-		type->ModSounds[mod_file].StepStone.Name = sound;
-	} else if (sound_type == "used") {
-		type->ModSounds[mod_file].Used.Name = sound;
-	//Wyrmgus end
-	} else if (sound_type == "build") {
-		type->ModSounds[mod_file].Build.Name = sound;
-	} else if (sound_type == "ready") {
-		type->ModSounds[mod_file].Ready.Name = sound;
-	} else if (sound_type == "repair") {
-		type->ModSounds[mod_file].Repair.Name = sound;
-	} else if (sound_type == "harvest") {
-		const int resId = GetResourceIdByName(sound_subtype.c_str());
-		type->ModSounds[mod_file].Harvest[resId].Name = sound;
-	} else if (sound_type == "help") {
-		type->ModSounds[mod_file].Help.Name = sound;
-	} else if (sound_type == "dead") {
-		int death;
-
-		for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-			if (sound_subtype == ExtraDeathTypes[death]) {
-				break;
-			}
-		}
-		if (death == ANIMATIONS_DEATHTYPES) {
-			type->ModSounds[mod_file].Dead[ANIMATIONS_DEATHTYPES].Name = sound;
-		} else {
-			type->ModSounds[mod_file].Dead[death].Name = sound;
-		}
-	}
-	
-	if (GameRunning || CEditor::get()->is_running()) {
-		if (sound_type == "selected") {
-			type->MapSound->Selected.Name = sound;
-		} else if (sound_type == "acknowledge") {
-			type->MapSound->Acknowledgement.Name = sound;
-		} else if (sound_type == "attack") {
-			type->MapSound->Attack.Name = sound;
-		} else if (sound_type == "idle") {
-			type->MapSound->Idle.Name = sound;
-		} else if (sound_type == "hit") {
-			type->MapSound->Hit.Name = sound;
-		} else if (sound_type == "miss") {
-			type->MapSound->Miss.Name = sound;
-		} else if (sound_type == "fire-missile") {
-			type->MapSound->FireMissile.Name = sound;
-		} else if (sound_type == "step") {
-			type->MapSound->Step.Name = sound;
-		} else if (sound_type == "step-dirt") {
-			type->MapSound->StepDirt.Name = sound;
-		} else if (sound_type == "step-grass") {
-			type->MapSound->StepGrass.Name = sound;
-		} else if (sound_type == "step-gravel") {
-			type->MapSound->StepGravel.Name = sound;
-		} else if (sound_type == "step-mud") {
-			type->MapSound->StepMud.Name = sound;
-		} else if (sound_type == "step-stone") {
-			type->MapSound->StepStone.Name = sound;
-		} else if (sound_type == "used") {
-			type->MapSound->Used.Name = sound;
-		} else if (sound_type == "build") {
-			type->MapSound->Build.Name = sound;
-		} else if (sound_type == "ready") {
-			type->MapSound->Ready.Name = sound;
-		} else if (sound_type == "repair") {
-			type->MapSound->Repair.Name = sound;
-		} else if (sound_type == "harvest") {
-			const int resId = GetResourceIdByName(sound_subtype.c_str());
-			type->MapSound->Harvest[resId].Name = sound;
-		} else if (sound_type == "help") {
-			type->MapSound->Help.Name = sound;
-		} else if (sound_type == "dead") {
-			int death;
-
-			for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-				if (sound_subtype == ExtraDeathTypes[death]) {
-					break;
-				}
-			}
-			if (death == ANIMATIONS_DEATHTYPES) {
-				type->MapSound->Dead[ANIMATIONS_DEATHTYPES].Name = sound;
-			} else {
-				type->MapSound->Dead[death].Name = sound;
-			}
-		}
-	}
-}
-
-//Wyrmgus start
-static int CclSetModTrains(lua_State *l)
-{
-	LuaCheckArgs(l, 3);
-	
-	std::string mod_file = LuaToString(l, 1);
-	wyrmgus::unit_type *type = wyrmgus::unit_type::get(LuaToString(l, 2));
-
-	for (size_t i = 0; i < type->ModTrains[mod_file].size(); ++i) {
-		if (std::find(type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].begin(), type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end(), type) != type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end()) {
-			type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].erase(std::remove(type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].begin(), type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end(), type), type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end());
-		}
-	}
-	type->ModTrains[mod_file].clear();
-	type->RemoveButtons(ButtonCmd::None, mod_file);
-	
-	if (!lua_istable(l, 3)) {
-		LuaError(l, "incorrect argument");
-	}
-	int subargs = lua_rawlen(l, 3);
-	for (int i = 0; i < subargs; ++i) {
-		const char *value = LuaToString(l, 3, i + 1);
-		wyrmgus::unit_type *trained_unit = wyrmgus::unit_type::get(value);
-		type->ModTrains[mod_file].push_back(trained_unit);
-		trained_unit->ModTrainedBy[mod_file].push_back(type);
-	}
-	
-	for (size_t i = 0; i < type->ModTrains[mod_file].size(); ++i) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = " + std::to_string(type->ModTrains[mod_file][i]->ButtonPos) + ",\n";
-		if (type->ModTrains[mod_file][i]->ButtonLevel) {
-			button_definition += "\tLevel = " + type->ModTrains[mod_file][i]->ButtonLevel->get_identifier() + ",\n";
-		}
-		button_definition += "\tAction = ";
-		if (type->ModTrains[mod_file][i]->BoolFlag[BUILDING_INDEX].value) {
-			button_definition += "\"build\"";
-		} else {
-			button_definition += "\"train-unit\"";
-		}
-		button_definition += ",\n";
-		button_definition += "\tValue = \"" + type->ModTrains[mod_file][i]->Ident + "\",\n";
-		if (!type->ModTrains[mod_file][i]->ButtonPopup.empty()) {
-			button_definition += "\tPopup = \"" + type->ModTrains[mod_file][i]->ButtonPopup + "\",\n";
-		}
-		button_definition += "\tKey = \"" + type->ModTrains[mod_file][i]->get_button_key() + "\",\n";
-		button_definition += "\tHint = \"" + type->ModTrains[mod_file][i]->ButtonHint + "\",\n";
-		button_definition += "\tMod = \"" + mod_file + "\",\n";
-		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
-	return 0;
-}
-
-static int CclSetModAiDrops(lua_State *l)
-{
-	LuaCheckArgs(l, 3);
-	
-	std::string mod_file = LuaToString(l, 1);
-	wyrmgus::unit_type *type = wyrmgus::unit_type::get(LuaToString(l, 2));
-
-	type->ModAiDrops[mod_file].clear();
-	
-	if (!lua_istable(l, 3)) {
-		LuaError(l, "incorrect argument");
-	}
-	int subargs = lua_rawlen(l, 3);
-	for (int i = 0; i < subargs; ++i) {
-		const char *value = LuaToString(l, 3, i + 1);
-		wyrmgus::unit_type *dropped_unit = wyrmgus::unit_type::get(value);
-		type->ModAiDrops[mod_file].push_back(dropped_unit);
-	}
-	
-	return 0;
-}
-//Wyrmgus end
-
-/**
 **  Register CCL features for unit-type.
 */
 void UnitTypeCclRegister()
@@ -3899,7 +3512,5 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "GetSpeciesData", CclGetSpeciesData);
 	lua_register(Lua, "GetTaxonData", CclGetTaxonData);
 	lua_register(Lua, "SetSettlementSiteUnit", CclSetSettlementSiteUnit);
-	lua_register(Lua, "SetModTrains", CclSetModTrains);
-	lua_register(Lua, "SetModAiDrops", CclSetModAiDrops);
 	//Wyrmgus end
 }

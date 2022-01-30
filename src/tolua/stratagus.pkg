@@ -107,7 +107,6 @@ $pfile "translate.pkg"
 $pfile "trigger.pkg"
 $pfile "ui.pkg"
 $pfile "unit.pkg"
-$pfile "unit_type.pkg"
 $pfile "upgrade.pkg"
 $pfile "video.pkg"
 

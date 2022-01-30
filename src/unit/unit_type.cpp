@@ -2566,32 +2566,6 @@ void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 {
 	if (reset) {
 		type.MapDefaultStat = type.DefaultStat;
-		for (auto iterator = type.ModDefaultStats.begin(); iterator != type.ModDefaultStats.end(); ++iterator) {
-			for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-				type.MapDefaultStat.Variables[i].Value += iterator->second.Variables[i].Value;
-				type.MapDefaultStat.Variables[i].Max += iterator->second.Variables[i].Max;
-				type.MapDefaultStat.Variables[i].Increase += iterator->second.Variables[i].Increase;
-				if (iterator->second.Variables[i].Enable != 0) {
-					type.MapDefaultStat.Variables[i].Enable = iterator->second.Variables[i].Enable;
-				}
-			}
-
-			for (const auto &[unit_type, unit_stock] : iterator->second.get_unit_stocks()) {
-				type.MapDefaultStat.change_unit_stock(unit_type, unit_stock);
-			}
-
-			for (const auto &[resource, cost] : iterator->second.get_costs()) {
-				type.MapDefaultStat.change_cost(resource, cost);
-			}
-
-			for (const auto &[resource, quantity] : iterator->second.get_improve_incomes()) {
-				type.MapDefaultStat.change_improve_income(resource, quantity);
-			}
-
-			for (const auto &[resource, quantity] : iterator->second.get_resource_demands()) {
-				type.MapDefaultStat.change_resource_demand(resource, quantity);
-			}
-		}
 		for (int player = 0; player < PlayerMax; ++player) {
 			type.Stats[player] = type.MapDefaultStat;
 		}
@@ -2600,77 +2574,6 @@ void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 
 		if (type.get_sound_set() != nullptr) {
 			*type.MapSound = *type.get_sound_set();
-		}
-
-		for (auto iterator = type.ModSounds.begin(); iterator != type.ModSounds.end(); ++iterator) {
-			if (!iterator->second.Selected.Name.empty()) {
-				type.MapSound->Selected = iterator->second.Selected;
-			}
-			if (!iterator->second.Acknowledgement.Name.empty()) {
-				type.MapSound->Acknowledgement = iterator->second.Acknowledgement;
-			}
-			if (!iterator->second.Attack.Name.empty()) {
-				type.MapSound->Attack = iterator->second.Attack;
-			}
-			if (!iterator->second.Idle.Name.empty()) {
-				type.MapSound->Idle = iterator->second.Idle;
-			}
-			if (!iterator->second.Hit.Name.empty()) {
-				type.MapSound->Hit = iterator->second.Hit;
-			}
-			if (!iterator->second.Miss.Name.empty()) {
-				type.MapSound->Miss = iterator->second.Miss;
-			}
-			if (!iterator->second.FireMissile.Name.empty()) {
-				type.MapSound->FireMissile = iterator->second.FireMissile;
-			}
-			if (!iterator->second.Step.Name.empty()) {
-				type.MapSound->Step = iterator->second.Step;
-			}
-			if (!iterator->second.StepDirt.Name.empty()) {
-				type.MapSound->StepDirt = iterator->second.StepDirt;
-			}
-			if (!iterator->second.StepGrass.Name.empty()) {
-				type.MapSound->StepGrass = iterator->second.StepGrass;
-			}
-			if (!iterator->second.StepGravel.Name.empty()) {
-				type.MapSound->StepGravel = iterator->second.StepGravel;
-			}
-			if (!iterator->second.StepMud.Name.empty()) {
-				type.MapSound->StepMud = iterator->second.StepMud;
-			}
-			if (!iterator->second.StepStone.Name.empty()) {
-				type.MapSound->StepStone = iterator->second.StepStone;
-			}
-			if (!iterator->second.Used.Name.empty()) {
-				type.MapSound->Used = iterator->second.Used;
-			}
-			if (!iterator->second.Build.Name.empty()) {
-				type.MapSound->Build = iterator->second.Build;
-			}
-			if (!iterator->second.Ready.Name.empty()) {
-				type.MapSound->Ready = iterator->second.Ready;
-			}
-			if (!iterator->second.Repair.Name.empty()) {
-				type.MapSound->Repair = iterator->second.Repair;
-			}
-			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				if (!iterator->second.Harvest[j].Name.empty()) {
-					type.MapSound->Harvest[j] = iterator->second.Harvest[j];
-				}
-			}
-			if (!iterator->second.Help.Name.empty()) {
-				type.MapSound->Help = iterator->second.Help;
-			}
-			if (!iterator->second.Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
-				type.MapSound->Dead[ANIMATIONS_DEATHTYPES] = iterator->second.Dead[ANIMATIONS_DEATHTYPES];
-			}
-			int death;
-			for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-				if (!iterator->second.Dead[death].Name.empty()) {
-					type.MapSound->Dead[death] = iterator->second.Dead[death];
-				}
-			}
 		}
 	}
 

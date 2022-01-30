@@ -3583,31 +3583,6 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 
 void DisableMod(const std::string &mod_file)
 {
-	const int unit_types_size = wyrmgus::unit_type::get_all().size();
-	for (int i = (unit_types_size - 1); i >= 0; --i) {
-		
-		if (wyrmgus::unit_type::get_all()[i]->Mod == mod_file) {
-			DeleteModUnitType(wyrmgus::unit_type::get_all()[i]->Ident);
-		}
-	}
-		
-	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		if (unit_type->ModTrains.find(mod_file) != unit_type->ModTrains.end()) {
-			unit_type->ModTrains.erase(mod_file);
-			unit_type->RemoveButtons(ButtonCmd::None, mod_file);
-		}
-		if (unit_type->ModTrainedBy.find(mod_file) != unit_type->ModTrainedBy.end()) {
-			unit_type->ModTrainedBy.erase(mod_file);
-			unit_type->RemoveButtons(ButtonCmd::None, mod_file);
-		}
-		if (unit_type->ModAiDrops.find(mod_file) != unit_type->ModAiDrops.end()) {
-			unit_type->ModAiDrops.erase(mod_file);
-		}
-		if (unit_type->ModDefaultStats.find(mod_file) != unit_type->ModDefaultStats.end()) {
-			unit_type->ModDefaultStats.erase(mod_file);
-		}
-	}
-	
 	std::vector<wyrmgus::faction *> factions_to_remove;
 	for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
 		if (faction->Mod == mod_file) {
