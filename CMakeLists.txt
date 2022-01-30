@@ -320,6 +320,8 @@ set(player_SRCS
 source_group(player FILES ${player_SRCS})
 
 set(population_SRCS
+	src/population/employment_type.cpp
+	src/population/employment_type_container.cpp
 	src/population/population_class.cpp
 	src/population/population_type.cpp
 	src/population/population_unit.cpp
@@ -846,6 +848,8 @@ set(wyrmgus_player_HDRS
 )
 
 set(wyrmgus_population_HDRS
+	src/population/employment_type.h
+	src/population/employment_type_container.h
 	src/population/population_class.h
 	src/population/population_type.h
 	src/population/population_unit.h

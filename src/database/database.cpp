@@ -75,6 +75,7 @@
 #include "player/faction_type.h"
 #include "player/government_type.h"
 #include "player/player_color.h"
+#include "population/employment_type.h"
 #include "population/population_class.h"
 #include "population/population_type.h"
 #include "quest/achievement.h"
@@ -311,6 +312,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(dynasty::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::ecological_niche") {
 			new_property_value = QVariant::fromValue(string_to_ecological_niche(property.get_value()));
+		} else if (property_class_name == "wyrmgus::employment_type*") {
+			new_property_value = QVariant::fromValue(employment_type::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::epithet*") {
 			new_property_value = QVariant::fromValue(epithet::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::faction*") {
