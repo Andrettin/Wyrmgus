@@ -155,10 +155,12 @@ static const wyrmgus::sound *ChooseUnitVoiceSound(const CUnit *unit, const wyrmg
 		}
 	}
 
-	sound = unit->Type->MapSound->get_sound_for_unit(unit_sound_type, unit);
+	if (unit->Type->get_sound_set() != nullptr) {
+		sound = unit->Type->get_sound_set()->get_sound_for_unit(unit_sound_type, unit);
 
-	if (sound != nullptr) {
-		return sound;
+		if (sound != nullptr) {
+			return sound;
+		}
 	}
 
 	const civilization_base *civilization_base = unit->get_civilization_base();

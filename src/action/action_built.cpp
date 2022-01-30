@@ -290,7 +290,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 //	player.Notify(NotifyGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
 	//Wyrmgus end
 	if (&player == CPlayer::GetThisPlayer()) {
-		if (type.MapSound->Ready.Sound) {
+		if (type.get_sound_set() != nullptr && type.get_sound_set()->Ready.Sound != nullptr) {
 			PlayUnitSound(unit, unit_sound_type::ready);
 		}
 

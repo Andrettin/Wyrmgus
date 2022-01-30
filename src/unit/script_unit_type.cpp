@@ -2189,12 +2189,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		const std::string sound_type = LuaToString(l, 3);
 
-		const wyrmgus::unit_sound_set *sound_set = nullptr;
-		if (!GameRunning && !CEditor::get()->is_running()) {
-			sound_set = type->get_sound_set();
-		} else {
-			sound_set = type->MapSound.get();
-		}
+		const wyrmgus::unit_sound_set *sound_set = type->get_sound_set();
 
 		if (sound_set == nullptr) {
 			lua_pushstring(l, "");

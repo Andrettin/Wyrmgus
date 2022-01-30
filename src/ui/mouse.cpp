@@ -2069,10 +2069,10 @@ static void SendCommand(const Vec2i &tilePos, const Qt::KeyboardModifiers key_mo
 			//Wyrmgus end
 				//Wyrmgus start
 				/*
-				if (Selected[i]->Type->MapSound->Attack.Sound) {
+				if (Selected[i]->Type->get_sound_set()->Attack.Sound) {
 					PlayUnitSound(*Selected[i], wyrmgus::unit_sound_type::attack);
 					break;
-				} else if (Selected[i]->Type->MapSound->Acknowledgement.Sound) {
+				} else if (Selected[i]->Type->get_sound_set()->Acknowledgement.Sound) {
 					PlayUnitSound(*Selected[i], wyrmgus::unit_sound_type::acknowledging);
 					break;
 				}

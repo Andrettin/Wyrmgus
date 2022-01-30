@@ -355,7 +355,5 @@ void MapUnitSounds()
 	// Parse all units sounds.
 	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		MapAnimSounds(*unit_type);
-
-		unit_type->MapSound->map_sounds();
 	}
 }

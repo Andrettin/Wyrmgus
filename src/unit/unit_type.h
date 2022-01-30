@@ -1474,9 +1474,8 @@ private:
 	std::filesystem::path encyclopedia_background_file;
 
 	std::unique_ptr<unit_sound_set> sound_set;			/// Sounds for events
-public:
-	std::unique_ptr<unit_sound_set> MapSound;			/// Sounds for events, map-specific
 
+public:
 	int PoisonDrain = 0;                /// How much health is drained every second when poisoned
 
 	// --- FILLED UP ---

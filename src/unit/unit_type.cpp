@@ -1352,6 +1352,10 @@ void unit_type::initialize()
 		}
 	}
 
+	if (this->sound_set != nullptr) {
+		this->sound_set->map_sounds();
+	}
+
 	// If number of directions is not specified, make a guess
 	// Building have 1 direction and units 8
 	if (this->BoolFlag[BUILDING_INDEX].value && this->num_directions == 0) {
@@ -2565,12 +2569,6 @@ void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 		type.MapDefaultStat = type.DefaultStat;
 		for (int player = 0; player < PlayerMax; ++player) {
 			type.Stats[player] = type.MapDefaultStat;
-		}
-		
-		type.MapSound = std::make_unique<wyrmgus::unit_sound_set>();
-
-		if (type.get_sound_set() != nullptr) {
-			*type.MapSound = *type.get_sound_set();
 		}
 	}
 
