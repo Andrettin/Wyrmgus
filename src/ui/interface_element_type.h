@@ -45,7 +45,8 @@ enum class interface_element_type {
 	slider_bar,
 	slider_marker,
 	icon_frame,
-	pressed_icon_frame
+	pressed_icon_frame,
+	command_button_frame
 };
 
 inline interface_element_type string_to_interface_element_type(const std::string &str)
@@ -84,6 +85,8 @@ inline interface_element_type string_to_interface_element_type(const std::string
 		return interface_element_type::icon_frame;
 	} else if (str == "pressed_icon_frame") {
 		return interface_element_type::pressed_icon_frame;
+	} else if (str == "command_button_frame") {
+		return interface_element_type::command_button_frame;
 	}
 
 	throw std::runtime_error("Invalid interface element type: \"" + str + "\".");

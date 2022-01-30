@@ -215,6 +215,8 @@ const std::shared_ptr<CGraphic> &interface_style::get_interface_element_graphics
 			return defines::get()->get_icon_frame_graphics();
 		case interface_element_type::pressed_icon_frame:
 			return defines::get()->get_pressed_icon_frame_graphics();
+		case interface_element_type::command_button_frame:
+			return defines::get()->get_command_button_frame_graphics();
 		default:
 			throw std::runtime_error("Invalid interface element type: \"" + std::to_string(static_cast<int>(type)) + "\".");
 	}
