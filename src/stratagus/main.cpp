@@ -43,6 +43,7 @@
 #include "player/faction.h"
 #include "player/player.h"
 #include "player/player_color.h"
+#include "population/population_type.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"
 #include "religion/pantheon.h"
@@ -128,6 +129,7 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<pantheon>("", 1);
 		qmlRegisterAnonymousType<parameters>("", 1);
 		qmlRegisterAnonymousType<player_color>("", 1);
+		qmlRegisterAnonymousType<population_type>("", 1);
 		qmlRegisterAnonymousType<preferences>("", 1);
 		qmlRegisterAnonymousType<quest>("", 1);
 		qmlRegisterAnonymousType<resource>("", 1);
@@ -152,6 +154,7 @@ int main(int argc, char **argv)
 		qmlRegisterType<pantheon>();
 		qmlRegisterType<parameters>();
 		qmlRegisterType<player_color>();
+		qmlRegisterType<population_type>();
 		qmlRegisterType<preferences>();
 		qmlRegisterType<quest>();
 		qmlRegisterType<resource>();

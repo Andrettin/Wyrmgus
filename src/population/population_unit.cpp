@@ -82,9 +82,13 @@ population_unit_key population_unit::get_key() const
 
 void population_unit::set_population(const int64_t population)
 {
+	std::unique_lock<std::shared_mutex> lock(this->mutex);
+
 	assert_log(population >= 0);
 
 	this->population = population;
+
+	emit population_changed();
 }
 
 }

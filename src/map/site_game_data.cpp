@@ -79,7 +79,8 @@ void site_game_data::process_sml_scope(const sml_data &scope)
 		this->map_pos = scope.to_point();
 	} else if (tag == "population_units") {
 		scope.for_each_child([&](const sml_data &child_scope) {
-			auto population_unit = std::make_unique<wyrmgus::population_unit>();
+			auto population_unit = make_qunique<wyrmgus::population_unit>();
+			population_unit->moveToThread(QApplication::instance()->thread());
 			database::process_sml_data(population_unit, child_scope);
 			this->population_units.push_back(std::move(population_unit));
 		});
@@ -107,7 +108,7 @@ sml_data site_game_data::to_sml_data() const
 	if (!this->population_units.empty()) {
 		sml_data population_units_data("population_units");
 
-		for (const std::unique_ptr<population_unit> &population_unit : this->population_units) {
+		for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
 			population_units_data.add_child(population_unit->to_sml_data());
 		}
 
@@ -459,7 +460,7 @@ void site_game_data::ensure_minimum_population()
 
 population_unit *site_game_data::get_population_unit(const population_unit_key &key) const
 {
-	for (const std::unique_ptr<population_unit> &population_unit : this->population_units) {
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
 		if (population_unit->get_key() == key) {
 			return population_unit.get();
 		}
@@ -470,14 +471,17 @@ population_unit *site_game_data::get_population_unit(const population_unit_key &
 
 void site_game_data::create_population_unit(const population_unit_key &key, const int64_t population)
 {
-	this->population_units.push_back(std::make_unique<population_unit>(key, population));
+	auto population_unit = make_qunique<wyrmgus::population_unit>(key, population);
+	population_unit->moveToThread(QApplication::instance()->thread());
+	this->population_units.push_back(std::move(population_unit));
+
 	this->change_population(population);
 }
 
 void site_game_data::remove_population_unit(const population_unit_key &key)
 {
 	for (size_t i = 0; i < this->population_units.size(); ++i) {
-		const std::unique_ptr<population_unit> &population_unit = this->population_units[i];
+		const qunique_ptr<population_unit> &population_unit = this->population_units[i];
 
 		if (population_unit->get_key() == key) {
 			this->change_population(-population_unit->get_population());
@@ -536,7 +540,7 @@ int64_t site_game_data::get_population_type_population(const population_type *po
 {
 	int64_t population = 0;
 
-	for (const std::unique_ptr<population_unit> &population_unit : this->population_units) {
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
 		if (population_unit->get_type() == population_type) {
 			population += population_unit->get_population();
 		}
@@ -581,7 +585,7 @@ std::vector<std::pair<population_unit *, int64_t>> site_game_data::get_populatio
 
 	const int64_t total_population = this->get_population();
 
-	for (const std::unique_ptr<population_unit> &population_unit : this->population_units) {
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
 		const int64_t permyriad = population_unit->get_population() * 10000 / total_population;
 
 		population_units_permyriad.emplace_back(std::make_pair(population_unit.get(), permyriad));
@@ -648,7 +652,7 @@ void site_game_data::apply_population_growth(const int64_t population_growth)
 			this->change_default_population_type_population(remaining_population_growth);
 		} else {
 			for (size_t i = 0; i < this->population_units.size();) {
-				const std::unique_ptr<population_unit> &population_unit = this->population_units[i];
+				const qunique_ptr<population_unit> &population_unit = this->population_units[i];
 
 				int64_t change = remaining_population_growth;
 				bool removed_pop = false;

@@ -44,7 +44,7 @@ class population_type final : public detailed_data_entry, public data_type<popul
 	Q_PROPERTY(wyrmgus::population_class* population_class MEMBER population_class)
 	Q_PROPERTY(wyrmgus::civilization_group* civilization_group MEMBER civilization_group)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
 
 public:
 	static constexpr const char *class_identifier = "population_type";
@@ -81,6 +81,9 @@ public:
 	bool is_growable() const;
 
 	int get_production_efficiency(const resource *resource) const;
+
+signals:
+	void changed();
 
 private:
 	wyrmgus::population_class *population_class = nullptr;

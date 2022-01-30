@@ -28,6 +28,7 @@
 
 #include "economy/resource_container.h"
 #include "map/site_container.h"
+#include "util/qunique_ptr.h"
 
 class CMapLayer;
 class CPlayer;
@@ -313,7 +314,7 @@ private:
 	resource_map<std::vector<CUnit *>> resource_units; //resource units in the settlement's territory
 	site_set border_settlements; //other settlements bordering this one
 	int64_t population = 0;
-	std::vector<std::unique_ptr<population_unit>> population_units;
+	std::vector<qunique_ptr<population_unit>> population_units;
 	int food_supply = 0;
 	int unit_food_demand = 0;
 };

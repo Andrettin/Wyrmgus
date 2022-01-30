@@ -33,8 +33,13 @@ class sml_data;
 class sml_property;
 struct population_unit_key;
 
-class population_unit final
+class population_unit final : public QObject
 {
+	Q_OBJECT
+
+	Q_PROPERTY(wyrmgus::population_type* type READ get_type_unconst CONSTANT)
+	Q_PROPERTY(qint64 population READ get_population_sync NOTIFY population_changed)
+
 public:
 	population_unit()
 	{
@@ -51,11 +56,26 @@ public:
 		return this->type;
 	}
 
+private:
+	//for the Qt property (pointers there can't be const)
+	population_type *get_type_unconst() const
+	{
+		return const_cast<population_type *>(this->type);
+	}
+
+public:
 	population_unit_key get_key() const;
 
 	int64_t get_population() const
 	{
 		return this->population;
+	}
+
+	int64_t get_population_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_population();
 	}
 
 	void set_population(const int64_t population);
@@ -65,9 +85,13 @@ public:
 		this->set_population(this->get_population() + change);
 	}
 
+signals:
+	void population_changed();
+
 private:
 	const population_type *type = nullptr;
 	int64_t population = 0;
+	mutable std::shared_mutex mutex; //mutex for protecting data which is written from the Wyrmgus thread, but which can be read from the Qt thread
 };
 
 }
