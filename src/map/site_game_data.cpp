@@ -39,6 +39,7 @@
 #include "map/tile.h"
 #include "player/player.h"
 #include "population/employment_type.h"
+#include "population/population_class.h"
 #include "population/population_type.h"
 #include "population/population_unit.h"
 #include "population/population_unit_key.h"
@@ -124,6 +125,7 @@ void site_game_data::do_per_minute_loop()
 {
 	if (defines::get()->is_population_enabled() && this->site->is_settlement()) {
 		this->do_population_growth();
+		this->do_population_employment();
 	}
 }
 
@@ -702,6 +704,44 @@ void site_game_data::apply_population_growth(const int64_t population_growth)
 				}
 			}
 		}
+	}
+}
+
+void site_game_data::do_population_employment()
+{
+	this->check_employment_validity();
+}
+
+void site_game_data::check_employment_validity()
+{
+	std::vector<population_unit *> invalid_employment_population_units;
+
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
+		if (population_unit->get_employment_type() == nullptr) {
+			continue;
+		}
+
+		if (this->get_employment_capacity(population_unit->get_employment_type()) == 0) {
+			invalid_employment_population_units.push_back(population_unit.get());
+		}
+	}
+
+	//move the population of population units with an invalid employment to that of their corresponding unemployed population unit
+	for (population_unit *population_unit : invalid_employment_population_units) {
+		const int64_t population = population_unit->get_population();
+
+		population_unit_key key = population_unit->get_key();
+		this->change_population_unit_population(key, -population);
+
+		key.employment_type = nullptr;
+		if (!population_unit->get_type()->get_population_class()->can_have_unemployment()) {
+			const population_class *unemployed_class = population_unit->get_type()->get_population_class()->get_unemployed_class();
+			if (unemployed_class != nullptr) {
+				const population_type *unemployed_type = this->get_class_population_type(unemployed_class);
+				key.type = unemployed_type;
+			}
+		}
+		this->change_population_unit_population(key, population);
 	}
 }
 

@@ -37,6 +37,7 @@ class population_class final : public named_data_entry, public data_type<populat
 	Q_OBJECT
 
 	Q_PROPERTY(bool growable MEMBER growable READ is_growable)
+	Q_PROPERTY(bool unemployment MEMBER unemployment READ can_have_unemployment)
 
 public:
 	static constexpr const char *class_identifier = "population_class";
@@ -53,6 +54,11 @@ public:
 		return this->growable;
 	}
 
+	bool can_have_unemployment() const
+	{
+		return this->unemployment;
+	}
+
 	const std::vector<const population_class *> &get_promotion_targets() const
 	{
 		return this->promotion_targets;
@@ -61,6 +67,23 @@ public:
 	const std::vector<const population_class *> &get_demotion_targets() const
 	{
 		return this->demotion_targets;
+	}
+
+	const population_class *get_unemployed_class() const
+	{
+		if (this->can_have_unemployment()) {
+			return this;
+		}
+
+		for (const population_class *demotion_target : this->demotion_targets) {
+			const population_class *unemployed_class = demotion_target->get_unemployed_class();
+
+			if (unemployed_class != nullptr) {
+				return unemployed_class;
+			}
+		}
+
+		return nullptr;
 	}
 
 	int get_production_efficiency(const resource *resource) const
@@ -76,6 +99,7 @@ public:
 
 private:
 	bool growable = false; //whether the population class can grow via population growth; negative growth can still occur even if false however
+	bool unemployment = false; //whether the population class can be unemployed, or if when unemployment it must immediately demote
 	std::vector<const population_class *> promotion_targets;
 	std::vector<const population_class *> demotion_targets;
 	resource_map<int> production_efficiency_map;
