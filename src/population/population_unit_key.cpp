@@ -40,6 +40,10 @@ bool population_unit_key::operator <(const population_unit_key &rhs) const
 	}
 
 	if (this->employment_type != rhs.employment_type) {
+		if (this->employment_type == nullptr || rhs.employment_type == nullptr) {
+			return this->employment_type == nullptr;
+		}
+
 		return this->employment_type->get_identifier() < rhs.employment_type->get_identifier();
 	}
 
