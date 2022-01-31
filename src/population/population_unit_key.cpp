@@ -28,6 +28,7 @@
 
 #include "population/population_unit_key.h"
 
+#include "population/employment_type.h"
 #include "population/population_type.h"
 
 namespace wyrmgus {
@@ -36,6 +37,10 @@ bool population_unit_key::operator <(const population_unit_key &rhs) const
 {
 	if (this->type != rhs.type) {
 		return this->type->get_identifier() < rhs.type->get_identifier();
+	}
+
+	if (this->employment_type != rhs.employment_type) {
+		return this->employment_type->get_identifier() < rhs.employment_type->get_identifier();
 	}
 
 	return false;

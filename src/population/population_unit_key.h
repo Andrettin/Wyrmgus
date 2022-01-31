@@ -28,6 +28,7 @@
 
 namespace wyrmgus {
 
+class employment_type;
 class population_type;
 class population_unit;
 
@@ -35,18 +36,20 @@ class population_unit;
 struct population_unit_key final
 {
 public:
-	explicit population_unit_key(const population_type *type) : type(type)
+	explicit population_unit_key(const population_type *type, const wyrmgus::employment_type *employment_type)
+		: type(type), employment_type(employment_type)
 	{
 	}
 
 	bool operator ==(const population_unit_key &rhs) const
 	{
-		return this->type == rhs.type;
+		return this->type == rhs.type && this->employment_type == rhs.employment_type;
 	}
 
 	bool operator <(const population_unit_key &rhs) const;
 
 	const population_type *type = nullptr;
+	const wyrmgus::employment_type *employment_type = nullptr;
 };
 
 }

@@ -28,6 +28,7 @@
 
 namespace wyrmgus {
 
+class employment_type;
 class population_type;
 class sml_data;
 class sml_property;
@@ -64,6 +65,11 @@ private:
 	}
 
 public:
+	const wyrmgus::employment_type *get_employment_type() const
+	{
+		return this->employment_type;
+	}
+
 	population_unit_key get_key() const;
 
 	int64_t get_population() const
@@ -90,6 +96,7 @@ signals:
 
 private:
 	const population_type *type = nullptr;
+	const wyrmgus::employment_type *employment_type = nullptr;
 	int64_t population = 0;
 	mutable std::shared_mutex mutex; //mutex for protecting data which is written from the Wyrmgus thread, but which can be read from the Qt thread
 };

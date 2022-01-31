@@ -589,7 +589,7 @@ void site_game_data::set_default_population_type_population(const int64_t popula
 		return;
 	}
 
-	const population_unit_key population_unit_key(population_type);
+	const population_unit_key population_unit_key(population_type, nullptr);
 	this->set_population_unit_population(population_unit_key, population);
 }
 
@@ -601,7 +601,7 @@ void site_game_data::change_default_population_type_population(const int64_t pop
 		return;
 	}
 
-	const population_unit_key population_unit_key(population_type);
+	const population_unit_key population_unit_key(population_type, nullptr);
 	this->change_population_unit_population(population_unit_key, population);
 }
 

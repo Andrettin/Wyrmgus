@@ -30,6 +30,7 @@
 
 #include "database/sml_data.h"
 #include "database/sml_property.h"
+#include "population/employment_type.h"
 #include "population/population_type.h"
 #include "population/population_unit_key.h"
 #include "util/assert_util.h"
@@ -37,7 +38,7 @@
 namespace wyrmgus {
 
 population_unit::population_unit(const population_unit_key &key, const int64_t population)
-	: type(key.type), population(population)
+	: type(key.type), employment_type(key.employment_type), population(population)
 {
 }
 
@@ -48,6 +49,8 @@ void population_unit::process_sml_property(const sml_property &property)
 
 	if (key == "type") {
 		this->type = population_type::get(value);
+	} else if (key == "employment_type") {
+		this->employment_type = employment_type::get(value);
 	} else if (key == "population") {
 		this->set_population(std::stoll(value));
 	} else {
@@ -68,6 +71,10 @@ sml_data population_unit::to_sml_data() const
 		data.add_property("type", this->get_type()->get_identifier());
 	}
 
+	if (this->get_employment_type() != nullptr) {
+		data.add_property("employment_type", this->get_employment_type()->get_identifier());
+	}
+
 	if (this->get_population() != 0) {
 		data.add_property("population", std::to_string(this->get_population()));
 	}
@@ -77,7 +84,7 @@ sml_data population_unit::to_sml_data() const
 
 population_unit_key population_unit::get_key() const
 {
-	return population_unit_key(this->get_type());
+	return population_unit_key(this->get_type(), this->get_employment_type());
 }
 
 void population_unit::set_population(const int64_t population)
