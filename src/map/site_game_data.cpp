@@ -682,6 +682,10 @@ void site_game_data::move_to_unemployment(const population_unit_key &population_
 		if (unemployed_class != nullptr) {
 			const population_type *unemployed_type = this->get_class_population_type(unemployed_class);
 			key.type = unemployed_type;
+
+			if (unemployed_type == nullptr) {
+				return;
+			}
 		}
 	}
 	this->change_population_unit_population(key, quantity);
@@ -850,8 +854,36 @@ void site_game_data::check_available_employment()
 		}
 
 		for (population_unit *population_unit : employable_population_units) {
+			//whether the population unit taking up this employment would entail a promotion
+			const bool is_promotion_employment = !vector::contains(employment_type->get_employees(), population_unit->get_type()->get_population_class());
+
+			population_unit_key key = population_unit->get_key();
+
+			if (is_promotion_employment) {
+				key.type = nullptr;
+
+				for (const population_class *employee_class : employment_type->get_employees()) {
+					if (!vector::contains(population_unit->get_type()->get_population_class()->get_promotion_targets(), employee_class)) {
+						continue;
+					}
+
+					const population_type *employee_type = this->get_class_population_type(employee_class);
+					if (employee_type == nullptr) {
+						continue;
+					}
+
+					key.type = employee_type;
+					break;
+				}
+
+				if (key.type == nullptr) {
+					//this is a promotion-based employment, but no actual promotion type is available
+					continue;
+				}
+			}
+
 			const int64_t employed_change = std::min(available_capacity, population_unit->get_population());
-			this->move_to_employment(population_unit->get_key(), employment_type, employed_change);
+			this->move_to_employment(key, employment_type, employed_change);
 			available_capacity -= employed_change;
 
 			if (available_capacity <= 0) {

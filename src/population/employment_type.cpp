@@ -49,7 +49,17 @@ void employment_type::process_sml_scope(const sml_data &scope)
 
 bool employment_type::can_employ(const population_class *population_class) const
 {
-	return vector::contains(this->get_employees(), population_class);
+	if (vector::contains(this->get_employees(), population_class)) {
+		return true;
+	}
+
+	for (const wyrmgus::population_class *promotion_target : population_class->get_promotion_targets()) {
+		if (vector::contains(this->get_employees(), promotion_target)) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 }
