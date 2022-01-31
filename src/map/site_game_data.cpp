@@ -549,19 +549,22 @@ void site_game_data::change_population_unit_population(const population_unit_key
 {
 	population_unit *population_unit = this->get_population_unit(key);
 	if (population_unit != nullptr) {
-
-		population_unit->change_population(change);
-		this->change_population(change);
-
-		if (population_unit->get_population() <= 0) {
-			this->remove_population_unit(key);
-		}
-
+		this->change_population_unit_population(population_unit, change);
 		return;
 	}
 
 	if (change > 0) {
 		this->create_population_unit(key, change);
+	}
+}
+
+void site_game_data::change_population_unit_population(population_unit *population_unit, const int64_t change)
+{
+	population_unit->change_population(change);
+	this->change_population(change);
+
+	if (population_unit->get_population() <= 0) {
+		this->remove_population_unit(population_unit->get_key());
 	}
 }
 
@@ -576,6 +579,42 @@ int64_t site_game_data::get_population_type_population(const population_type *po
 	}
 
 	return population;
+}
+
+void site_game_data::change_population_type_population(const population_type *population_type, const int64_t change)
+{
+	if (change >= 0) {
+		const population_unit_key population_unit_key(population_type, nullptr);
+		this->change_population_unit_population(population_unit_key, change);
+		return;
+	}
+
+	//we only handle negative changes here
+	std::vector<population_unit *> population_type_units;
+
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
+		if (population_unit->get_type() == population_type) {
+			population_type_units.push_back(population_unit.get());
+		}
+	}
+
+	int64_t remaining_change = change;
+
+	for (population_unit *population_unit : population_type_units) {
+		const int64_t population_unit_change = std::min(population_unit->get_population(), std::abs(remaining_change)) * -1;
+
+		if (population_unit_change == 0) {
+			continue;
+		}
+
+		this->change_population_unit_population(population_unit, change);
+
+		remaining_change -= population_unit_change;
+
+		if (remaining_change == 0) {
+			return;
+		}
+	}
 }
 
 const population_type *site_game_data::get_default_population_type() const

@@ -240,7 +240,10 @@ public:
 	void set_population_unit_population(const population_unit_key &key, const int64_t population);
 	void change_population_unit_population(const population_unit_key &key, const int64_t change);
 
+	void change_population_unit_population(population_unit *population_unit, const int64_t change);
+
 	int64_t get_population_type_population(const population_type *population_type) const;
+	void change_population_type_population(const population_type *population_type, const int64_t change);
 
 	const population_type *get_default_population_type() const;
 

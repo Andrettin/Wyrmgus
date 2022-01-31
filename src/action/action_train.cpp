@@ -421,8 +421,7 @@ void COrder_Train::Execute(CUnit &unit)
 				assert_log(population_type != nullptr);
 
 				if (population_type != nullptr) {
-					const population_unit_key population_unit_key(population_type);
-					settlement_game_data->change_population_unit_population(population_unit_key, -nType.get_population_cost());
+					settlement_game_data->change_population_type_population(population_type, -nType.get_population_cost());
 				}
 
 				newUnit->set_home_settlement(unit.get_settlement());
