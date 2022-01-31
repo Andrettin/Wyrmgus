@@ -254,6 +254,7 @@ public:
 
 	void move_to_employment(const population_unit_key &population_unit_key, const employment_type *employment_type, const int64_t quantity);
 	void move_to_unemployment(const population_unit_key &population_unit_key, const int64_t quantity);
+	void change_population_unit_to_type(const population_unit_key &population_unit_key, const population_type *population_type, const int64_t quantity);
 
 	int64_t get_population_capacity() const
 	{

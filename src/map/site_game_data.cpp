@@ -691,6 +691,15 @@ void site_game_data::move_to_unemployment(const population_unit_key &population_
 	this->change_population_unit_population(key, quantity);
 }
 
+void site_game_data::change_population_unit_to_type(const population_unit_key &population_unit_key, const population_type *population_type, const int64_t quantity)
+{
+	wyrmgus::population_unit_key key = population_unit_key;
+	this->change_population_unit_population(key, -quantity);
+
+	key.type = population_type;
+	this->change_population_unit_population(key, quantity);
+}
+
 void site_game_data::do_population_growth()
 {
 	const int food_surplus = this->get_food_supply() - this->get_food_demand();
@@ -884,6 +893,7 @@ void site_game_data::check_available_employment()
 				}
 
 				employed_change = population_unit->calculate_promotion_quantity(available_capacity);
+				this->change_population_unit_to_type(population_unit->get_key(), key.type, employed_change);
 			}
 
 			this->move_to_employment(key, employment_type, employed_change);
