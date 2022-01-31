@@ -294,31 +294,7 @@ public:
 
 	int get_food_demand() const
 	{
-		return this->get_population_food_demand() + this->get_unit_food_demand();
-	}
-
-	int get_population_food_demand() const
-	{
 		return this->get_population() / site_game_data::population_per_food;
-	}
-
-	int get_unit_food_demand() const
-	{
-		return this->unit_food_demand;
-	}
-
-	void set_unit_food_demand(const int food_demand)
-	{
-		if (food_demand == this->get_unit_food_demand()) {
-			return;
-		}
-
-		this->unit_food_demand = food_demand;
-	}
-
-	void change_unit_food_demand(const int change)
-	{
-		this->set_unit_food_demand(this->get_unit_food_demand() + change);
 	}
 
 	int get_employment_capacity(const employment_type *employment_type) const
@@ -371,7 +347,6 @@ private:
 	int64_t population = 0;
 	std::vector<qunique_ptr<population_unit>> population_units;
 	int food_supply = 0;
-	int unit_food_demand = 0;
 	employment_type_map<int> employment_capacities;
 };
 

@@ -2181,21 +2181,7 @@ void CUnit::set_home_settlement(const wyrmgus::site *settlement)
 		return;
 	}
 
-	const wyrmgus::site *old_home_settlement = this->get_home_settlement();
-
 	this->home_settlement = settlement;
-
-	const int food_cost = this->Type->Stats[this->Player->get_index()].Variables[DEMAND_INDEX].Value;
-
-	if (food_cost != 0 && !this->is_under_construction() && this->IsAlive()) {
-		if (old_home_settlement != nullptr) {
-			old_home_settlement->get_game_data()->change_unit_food_demand(-food_cost);
-		}
-
-		if (this->get_home_settlement() != nullptr) {
-			this->get_home_settlement()->get_game_data()->change_unit_food_demand(food_cost);
-		}
-	}
 }
 
 void CUnit::update_home_settlement()
