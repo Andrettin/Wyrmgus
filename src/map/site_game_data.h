@@ -252,6 +252,8 @@ public:
 
 	std::vector<std::pair<population_unit *, int64_t>> get_population_units_permyriad() const;
 
+	void move_to_unemployment(population_unit *population_unit, const int64_t quantity);
+
 	int64_t get_population_capacity() const
 	{
 		return static_cast<int64_t>(this->get_food_supply()) * site_game_data::population_per_food;
@@ -261,6 +263,7 @@ public:
 	void apply_population_growth(const int64_t population_growth);
 	void do_population_employment();
 	void check_employment_validity();
+	void check_employment_capacities();
 
 	const population_type *get_class_population_type(const population_class *population_class) const;
 
@@ -338,7 +341,7 @@ public:
 		this->set_employment_capacity(employment_type, this->get_employment_capacity(employment_type) + change);
 	}
 
-	int get_employment_workforce(const employment_type *employment_type) const;
+	int64_t get_employment_workforce(const employment_type *employment_type) const;
 
 	void on_settlement_building_added(const CUnit *building);
 	void on_settlement_building_removed(const CUnit *building);
