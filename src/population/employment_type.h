@@ -66,6 +66,8 @@ public:
 		return this->employees;
 	}
 
+	bool can_employ(const population_class *population_class) const;
+
 private:
 	resource *output_resource = nullptr;
 	resource *input_resource = nullptr;

@@ -252,7 +252,8 @@ public:
 
 	std::vector<std::pair<population_unit *, int64_t>> get_population_units_permyriad() const;
 
-	void move_to_unemployment(population_unit *population_unit, const int64_t quantity);
+	void move_to_employment(const population_unit_key &population_unit_key, const employment_type *employment_type, const int64_t quantity);
+	void move_to_unemployment(const population_unit_key &population_unit_key, const int64_t quantity);
 
 	int64_t get_population_capacity() const
 	{
@@ -264,6 +265,7 @@ public:
 	void do_population_employment();
 	void check_employment_validity();
 	void check_employment_capacities();
+	void check_available_employment();
 
 	const population_type *get_class_population_type(const population_class *population_class) const;
 

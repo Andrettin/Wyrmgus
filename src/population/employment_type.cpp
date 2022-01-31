@@ -29,6 +29,7 @@
 #include "population/employment_type.h"
 
 #include "population/population_class.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
 
@@ -44,6 +45,11 @@ void employment_type::process_sml_scope(const sml_data &scope)
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
+}
+
+bool employment_type::can_employ(const population_class *population_class) const
+{
+	return vector::contains(this->get_employees(), population_class);
 }
 
 }

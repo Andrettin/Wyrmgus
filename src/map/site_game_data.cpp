@@ -662,14 +662,23 @@ std::vector<std::pair<population_unit *, int64_t>> site_game_data::get_populatio
 	return population_units_permyriad;
 }
 
-void site_game_data::move_to_unemployment(population_unit *population_unit, const int64_t quantity)
+void site_game_data::move_to_employment(const population_unit_key &population_unit_key, const employment_type *employment_type, const int64_t quantity)
 {
-	population_unit_key key = population_unit->get_key();
+	wyrmgus::population_unit_key key = population_unit_key;
+	this->change_population_unit_population(key, -quantity);
+
+	key.employment_type = employment_type;
+	this->change_population_unit_population(key, quantity);
+}
+
+void site_game_data::move_to_unemployment(const population_unit_key &population_unit_key, const int64_t quantity)
+{
+	wyrmgus::population_unit_key key = population_unit_key;
 	this->change_population_unit_population(key, -quantity);
 
 	key.employment_type = nullptr;
-	if (!population_unit->get_type()->get_population_class()->can_have_unemployment()) {
-		const population_class *unemployed_class = population_unit->get_type()->get_population_class()->get_unemployed_class();
+	if (!population_unit_key.type->get_population_class()->can_have_unemployment()) {
+		const population_class *unemployed_class = population_unit_key.type->get_population_class()->get_unemployed_class();
 		if (unemployed_class != nullptr) {
 			const population_type *unemployed_type = this->get_class_population_type(unemployed_class);
 			key.type = unemployed_type;
@@ -766,6 +775,7 @@ void site_game_data::do_population_employment()
 {
 	this->check_employment_validity();
 	this->check_employment_capacities();
+	this->check_available_employment();
 }
 
 void site_game_data::check_employment_validity()
@@ -785,7 +795,7 @@ void site_game_data::check_employment_validity()
 	//move the population of population units with an invalid employment to that of their corresponding unemployed population unit
 	for (population_unit *population_unit : invalid_employment_population_units) {
 		const int64_t population = population_unit->get_population();
-		this->move_to_unemployment(population_unit, population);
+		this->move_to_unemployment(population_unit->get_key(), population);
 	}
 }
 
@@ -807,10 +817,44 @@ void site_game_data::check_employment_capacities()
 
 		for (population_unit *population_unit : employment_population_units) {
 			const int64_t unemployed_change = std::min(surplus_workforce, population_unit->get_population());
-			this->move_to_unemployment(population_unit, unemployed_change);
+			this->move_to_unemployment(population_unit->get_key(), unemployed_change);
 			surplus_workforce -= unemployed_change;
 
 			if (surplus_workforce <= 0) {
+				break;
+			}
+		}
+	}
+}
+
+void site_game_data::check_available_employment()
+{
+	for (const auto &[employment_type, capacity] : this->employment_capacities) {
+		int64_t available_capacity = capacity - this->get_employment_workforce(employment_type);
+
+		if (available_capacity <= 0) {
+			continue;
+		}
+
+		std::vector<population_unit *> employable_population_units;
+		for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
+			if (population_unit->get_employment_type() != nullptr) {
+				continue;
+			}
+
+			if (!employment_type->can_employ(population_unit->get_type()->get_population_class())) {
+				continue;
+			}
+
+			employable_population_units.push_back(population_unit.get());
+		}
+
+		for (population_unit *population_unit : employable_population_units) {
+			const int64_t employed_change = std::min(available_capacity, population_unit->get_population());
+			this->move_to_employment(population_unit->get_key(), employment_type, employed_change);
+			available_capacity -= employed_change;
+
+			if (available_capacity <= 0) {
 				break;
 			}
 		}
