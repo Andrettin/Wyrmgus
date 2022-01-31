@@ -859,6 +859,8 @@ void site_game_data::check_available_employment()
 
 			population_unit_key key = population_unit->get_key();
 
+			int64_t employed_change = std::min(available_capacity, population_unit->get_population());
+
 			if (is_promotion_employment) {
 				key.type = nullptr;
 
@@ -880,9 +882,10 @@ void site_game_data::check_available_employment()
 					//this is a promotion-based employment, but no actual promotion type is available
 					continue;
 				}
+
+				employed_change = population_unit->calculate_promotion_quantity(available_capacity);
 			}
 
-			const int64_t employed_change = std::min(available_capacity, population_unit->get_population());
 			this->move_to_employment(key, employment_type, employed_change);
 			available_capacity -= employed_change;
 

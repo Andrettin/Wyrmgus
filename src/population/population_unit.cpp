@@ -34,6 +34,7 @@
 #include "population/population_type.h"
 #include "population/population_unit_key.h"
 #include "util/assert_util.h"
+#include "util/random.h"
 
 namespace wyrmgus {
 
@@ -96,6 +97,15 @@ void population_unit::set_population(const int64_t population)
 	this->population = population;
 
 	emit population_changed();
+}
+
+int64_t population_unit::calculate_promotion_quantity(const int64_t promotion_capacity) const
+{
+	int64_t quantity = std::max(promotion_capacity / population_unit::capacity_growth_divisor, population_unit::min_base_growth);
+	quantity = std::min(quantity, promotion_capacity);
+	quantity = std::min(quantity, this->get_population());
+	quantity = random::get()->generate_in_range<int64_t>(1, quantity);
+	return quantity;
 }
 
 }

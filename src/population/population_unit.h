@@ -42,6 +42,9 @@ class population_unit final : public QObject
 	Q_PROPERTY(qint64 population READ get_population_sync NOTIFY population_changed)
 
 public:
+	static constexpr int64_t capacity_growth_divisor = 10;
+	static constexpr int64_t min_base_growth = 1000; //minimum base growth (used if capacity / capacity_growth_divisor is lower than this; still subject to be reduced further by other factors)
+
 	population_unit()
 	{
 	}
@@ -90,6 +93,8 @@ public:
 	{
 		this->set_population(this->get_population() + change);
 	}
+
+	int64_t calculate_promotion_quantity(const int64_t promotion_capacity) const;
 
 signals:
 	void population_changed();
