@@ -608,7 +608,7 @@ void site_game_data::change_population_type_population(const population_type *po
 			continue;
 		}
 
-		this->change_population_unit_population(population_unit, change);
+		this->change_population_unit_population(population_unit, population_unit_change);
 
 		remaining_change -= population_unit_change;
 
@@ -820,7 +820,7 @@ void site_game_data::do_population_promotion()
 			}
 
 			const int64_t promotion_quantity = population_unit->calculate_promotion_quantity(available_capacity);
-			const bool removed_pop = promotion_quantity == population_unit->get_population();
+			const bool removed_pop = promotion_quantity >= population_unit->get_population();
 
 			this->change_population_unit_to_type(population_unit->get_key(), promotion_type, promotion_quantity);
 
