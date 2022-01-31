@@ -125,6 +125,7 @@ void site_game_data::do_per_minute_loop()
 {
 	if (defines::get()->is_population_enabled() && this->site->is_settlement()) {
 		this->do_population_growth();
+		this->do_population_promotion();
 		this->do_population_employment();
 	}
 }
@@ -779,6 +780,52 @@ void site_game_data::apply_population_growth(const int64_t population_growth)
 				if (remaining_population_growth == 0) {
 					break;
 				}
+			}
+		}
+	}
+}
+
+void site_game_data::do_population_promotion()
+{
+	std::vector<population_unit *> promotable_population_units;
+
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
+		if (population_unit->get_type()->get_population_class()->get_promotion_targets().empty()) {
+			continue;
+		}
+
+		if (population_unit->get_employment_type() == nullptr) {
+			//can only promote here within employment; promoting when becoming employed is handled in the available employment check code
+			continue;
+		}
+
+		promotable_population_units.push_back(population_unit.get());
+	}
+
+	for (population_unit *population_unit : promotable_population_units) {
+		for (const population_class *promotion_class : population_unit->get_type()->get_population_class()->get_promotion_targets()) {
+			if (!vector::contains(population_unit->get_employment_type()->get_employees(), promotion_class)) {
+				continue;
+			}
+
+			const population_type *promotion_type = this->get_class_population_type(promotion_class);
+			if (promotion_type == nullptr) {
+				continue;
+			}
+
+			const int64_t available_capacity = this->get_employment_capacity(population_unit->get_employment_type()) - this->get_employment_workforce(population_unit->get_employment_type()) + population_unit->get_population();
+
+			if (available_capacity <= 0) {
+				continue;
+			}
+
+			const int64_t promotion_quantity = population_unit->calculate_promotion_quantity(available_capacity);
+			const bool removed_pop = promotion_quantity == population_unit->get_population();
+
+			this->change_population_unit_to_type(population_unit->get_key(), promotion_type, promotion_quantity);
+
+			if (removed_pop) {
+				break;
 			}
 		}
 	}
