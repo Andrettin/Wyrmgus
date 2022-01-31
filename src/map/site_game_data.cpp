@@ -714,25 +714,42 @@ const population_type *site_game_data::get_class_population_type(const populatio
 	return this->owner->get_class_population_type(population_class);
 }
 
-void site_game_data::on_settlement_building_added(const CUnit *building)
+int site_game_data::get_employment_workforce(const employment_type *employment_type) const
 {
-	if (building->Variable[SUPPLY_INDEX].Value != 0) {
-		this->change_food_supply(building->Variable[SUPPLY_INDEX].Value);
+	int workforce = 0;
+
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
+		if (population_unit->get_employment_type() == employment_type) {
+			workforce += population_unit->get_population();
+		}
 	}
 
-	if (building->Type->get_employment_type() != nullptr) {
-		this->change_employment_capacity(building->Type->get_employment_type(), building->Type->get_employment_capacity());
+	return workforce;
+}
+
+void site_game_data::on_settlement_building_added(const CUnit *building)
+{
+	if (defines::get()->is_population_enabled()) {
+		if (building->Variable[SUPPLY_INDEX].Value != 0) {
+			this->change_food_supply(building->Variable[SUPPLY_INDEX].Value);
+		}
+
+		if (building->Type->get_employment_type() != nullptr) {
+			this->change_employment_capacity(building->Type->get_employment_type(), building->Type->get_employment_capacity());
+		}
 	}
 }
 
 void site_game_data::on_settlement_building_removed(const CUnit *building)
 {
-	if (building->Variable[SUPPLY_INDEX].Value != 0) {
-		this->change_food_supply(-building->Variable[SUPPLY_INDEX].Value);
-	}
+	if (defines::get()->is_population_enabled()) {
+		if (building->Variable[SUPPLY_INDEX].Value != 0) {
+			this->change_food_supply(-building->Variable[SUPPLY_INDEX].Value);
+		}
 
-	if (building->Type->get_employment_type() != nullptr) {
-		this->change_employment_capacity(building->Type->get_employment_type(), -building->Type->get_employment_capacity());
+		if (building->Type->get_employment_type() != nullptr) {
+			this->change_employment_capacity(building->Type->get_employment_type(), -building->Type->get_employment_capacity());
+		}
 	}
 }
 

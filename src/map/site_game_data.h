@@ -333,6 +333,8 @@ public:
 		this->set_employment_capacity(employment_type, this->get_employment_capacity(employment_type) + change);
 	}
 
+	int get_employment_workforce(const employment_type *employment_type) const;
+
 	void on_settlement_building_added(const CUnit *building);
 	void on_settlement_building_removed(const CUnit *building);
 
