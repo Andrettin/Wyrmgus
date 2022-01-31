@@ -39,6 +39,7 @@ class population_unit final : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::population_type* type READ get_type_unconst CONSTANT)
+	Q_PROPERTY(wyrmgus::employment_type* employment_type READ get_employment_type_unconst CONSTANT)
 	Q_PROPERTY(qint64 population READ get_population_sync NOTIFY population_changed)
 
 public:
@@ -73,6 +74,14 @@ public:
 		return this->employment_type;
 	}
 
+private:
+	//for the Qt property (pointers there can't be const)
+	wyrmgus::employment_type *get_employment_type_unconst() const
+	{
+		return const_cast<wyrmgus::employment_type *>(this->employment_type);
+	}
+
+public:
 	population_unit_key get_key() const;
 
 	int64_t get_population() const

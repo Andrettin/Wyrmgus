@@ -43,6 +43,7 @@
 #include "player/faction.h"
 #include "player/player.h"
 #include "player/player_color.h"
+#include "population/employment_type.h"
 #include "population/population_type.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"
@@ -122,6 +123,7 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<CPlayer>("", 1);
 		qmlRegisterAnonymousType<CUpgrade>("", 1);
 		qmlRegisterAnonymousType<defines>("", 1);
+		qmlRegisterAnonymousType<employment_type>("", 1);
 		qmlRegisterAnonymousType<faction>("", 1);
 		qmlRegisterAnonymousType<game>("", 1);
 		qmlRegisterAnonymousType<icon>("", 1);
@@ -147,6 +149,7 @@ int main(int argc, char **argv)
 		qmlRegisterType<CPlayer>();
 		qmlRegisterType<CUpgrade>();
 		qmlRegisterType<defines>();
+		qmlRegisterType<employment_type>();
 		qmlRegisterType<faction>();
 		qmlRegisterType<game>();
 		qmlRegisterType<icon>();

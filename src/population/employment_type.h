@@ -26,15 +26,15 @@
 
 #pragma once
 
-#include "database/data_entry.h"
 #include "database/data_type.h"
+#include "database/named_data_entry.h"
 
 namespace wyrmgus {
 
 class population_class;
 class resource;
 
-class employment_type final : public data_entry, public data_type<employment_type>
+class employment_type final : public named_data_entry, public data_type<employment_type>
 {
 	Q_OBJECT
 
@@ -45,7 +45,7 @@ public:
 	static constexpr const char *class_identifier = "employment_type";
 	static constexpr const char *database_folder = "employment_types";
 
-	explicit employment_type(const std::string &identifier) : data_entry(identifier)
+	explicit employment_type(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 
