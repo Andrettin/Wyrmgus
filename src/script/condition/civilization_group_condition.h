@@ -42,6 +42,10 @@ public:
 
 	virtual bool check(const civilization *civilization) const override
 	{
+		if (civilization == nullptr) {
+			return false;
+		}
+
 		return civilization->is_part_of_group(this->group);
 	}
 
