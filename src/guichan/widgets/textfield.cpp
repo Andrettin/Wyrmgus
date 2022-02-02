@@ -189,15 +189,6 @@ namespace gcn
 			mSelectEndOffset = 0;
             fixScroll();
         }
-        else if (hasMouse() && button == MouseInput::MIDDLE)
-        {
-            std::string str;
-            if (GetClipboard(str) >= 0) {
-                for (size_t i = 0; i < str.size(); ++i) {
-                    keyPress(Key(str[i]));
-                }
-            }
-        }
     }
 
 	void TextField::mouseMotion(int x, int)
@@ -342,13 +333,6 @@ namespace gcn
 				mSelectStart = selFirst;
 				mSelectEndOffset = 0;
 			}
-
-            if (GetClipboard(str) >= 0) {
-                for (size_t i = 0; i < str.size(); ++i) {
-                    keyPress(Key(str[i]));
-                }
-                ret = true;
-            }
         }
 
         else if (key.isCharacter())

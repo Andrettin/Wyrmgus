@@ -32,10 +32,6 @@
 class CEditor;
 class CPlayer;
 
-namespace boost::asio {
-	class io_context;
-}
-
 namespace wyrmgus {
 
 class defines;
