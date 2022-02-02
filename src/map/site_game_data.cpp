@@ -452,6 +452,8 @@ void site_game_data::set_population(const int64_t population)
 		return;
 	}
 
+	assert_log(population >= 0);
+
 	const int64_t old_population = this->get_population();
 
 	this->population = population;

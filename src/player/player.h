@@ -883,6 +883,8 @@ public:
 			return;
 		}
 
+		assert_log(population >= 0);
+
 		std::optional<std::unique_lock<std::shared_mutex>> lock;
 
 		if (this == CPlayer::GetThisPlayer()) {
