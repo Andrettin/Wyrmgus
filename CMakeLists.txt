@@ -527,6 +527,7 @@ set(util_SRCS
 	src/util/astronomy_util.cpp
 	src/util/color_container.cpp
 	src/util/date_util.cpp
+	src/util/event_loop.cpp
 	src/util/exception_util.cpp
 	src/util/geocircle_util.cpp
 	src/util/geocoordinate.cpp
@@ -1122,6 +1123,7 @@ set(wyrmgus_util_HDRS
 	src/util/container_util.h
 	src/util/date_util.h
 	src/util/enum_util.h
+	src/util/event_loop.h
 	src/util/exception_util.h
 	src/util/fractional_int.h
 	src/util/geocircle_util.h
