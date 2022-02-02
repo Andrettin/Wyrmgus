@@ -56,6 +56,8 @@ public:
 	static constexpr const char *class_identifier = "animation_set";
 	static constexpr const char *database_folder = "animation_sets";
 
+	static const std::set<std::string> database_dependencies;
+
 	static void clear();
 
 	explicit animation_set(const std::string &identifier) : data_entry(identifier)
@@ -67,7 +69,10 @@ public:
 	static void LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 	static void LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
+
+	void set_animations(const std::string &animation_type, const animation_sequence *animation_sequence);
 
 	const resource_map<const CAnimation *> &get_harvest_animations() const
 	{

@@ -62,6 +62,8 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 
 namespace wyrmgus {
 
+const std::set<std::string> animation_set::database_dependencies = { animation_sequence::class_identifier };
+
 void animation_set::clear()
 {
 	CAnimation::animation_list.clear();
@@ -155,6 +157,33 @@ void animation_set::LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
 	}
 }
 
+void animation_set::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (
+		key == "start"
+		|| key == "still"
+		|| key.starts_with("death")
+		|| key == "attack"
+		|| key == "ranged_attack"
+		|| key == "spell_cast"
+		|| key == "move"
+		|| key == "repair"
+		|| key == "train"
+		|| key == "research"
+		|| key == "upgrade"
+		|| key == "build"
+		|| key.starts_with("harvest")
+	) {
+		const animation_sequence *animation_sequence = animation_sequence::get(value);
+		this->set_animations(key, animation_sequence);
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
 void animation_set::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
@@ -179,60 +208,64 @@ void animation_set::process_sml_scope(const sml_data &scope)
 	) {
 		animation_sequence *animation_sequence = animation_sequence::add(this->get_identifier() + "_" + tag, this->get_module());
 		database::process_sml_data(animation_sequence, scope);
-
 		FixLabels();
 
-		const CAnimation *first_anim = animation_sequence->get_first_animation();
-
-		if (tag == "start") {
-			this->Start = first_anim;
-		} else if (tag == "still") {
-			this->Still = first_anim;
-		} else if (tag.starts_with("death")) {
-			const size_t find_pos = tag.find("_");
-			if (find_pos != std::string::npos) {
-				const std::string death_type = tag.substr(find_pos + 1, tag.size() - find_pos - 1);
-
-				const int death_index = ExtraDeathIndex(death_type.c_str());
-				if (death_index == ANIMATIONS_DEATHTYPES) {
-					this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
-				} else {
-					this->Death[death_index] = first_anim;
-				}
-			} else {
-				this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
-			}
-		} else if (tag == "attack") {
-			this->Attack = first_anim;
-		} else if (tag == "ranged_attack") {
-			this->RangedAttack = first_anim;
-		} else if (tag == "spell_cast") {
-			this->SpellCast = first_anim;
-		} else if (tag == "move") {
-			this->Move = first_anim;
-		} else if (tag == "repair") {
-			this->Repair = first_anim;
-		} else if (tag == "train") {
-			this->Train = first_anim;
-		} else if (tag == "research") {
-			this->Research = first_anim;
-		} else if (tag == "upgrade") {
-			this->Upgrade = first_anim;
-		} else if (tag == "build") {
-			this->Build = first_anim;
-		} else if (tag.starts_with("harvest")) {
-			const size_t find_pos = tag.find("_");
-			assert_throw(find_pos != std::string::npos);
-
-			const std::string resource_identifier = tag.substr(find_pos + 1, tag.size() - find_pos - 1);
-			const resource *resource = resource::get(resource_identifier);
-
-			this->harvest_animations[resource] = first_anim;
-		} else {
-			throw std::runtime_error("Invalid animation type: \"" + tag + "\".");
-		}
+		this->set_animations(tag, animation_sequence);
 	} else {
-		throw std::runtime_error("Invalid animation type: \"" + tag + "\".");
+		data_entry::process_sml_scope(scope);
+	}
+}
+
+void animation_set::set_animations(const std::string &animation_type, const animation_sequence *animation_sequence)
+{
+	const CAnimation *first_anim = animation_sequence->get_first_animation();
+
+	if (animation_type == "start") {
+		this->Start = first_anim;
+	} else if (animation_type == "still") {
+		this->Still = first_anim;
+	} else if (animation_type.starts_with("death")) {
+		const size_t find_pos = animation_type.find("_");
+		if (find_pos != std::string::npos) {
+			const std::string death_type = animation_type.substr(find_pos + 1, animation_type.size() - find_pos - 1);
+
+			const int death_index = ExtraDeathIndex(death_type.c_str());
+			if (death_index == ANIMATIONS_DEATHTYPES) {
+				this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
+			} else {
+				this->Death[death_index] = first_anim;
+			}
+		} else {
+			this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
+		}
+	} else if (animation_type == "attack") {
+		this->Attack = first_anim;
+	} else if (animation_type == "ranged_attack") {
+		this->RangedAttack = first_anim;
+	} else if (animation_type == "spell_cast") {
+		this->SpellCast = first_anim;
+	} else if (animation_type == "move") {
+		this->Move = first_anim;
+	} else if (animation_type == "repair") {
+		this->Repair = first_anim;
+	} else if (animation_type == "train") {
+		this->Train = first_anim;
+	} else if (animation_type == "research") {
+		this->Research = first_anim;
+	} else if (animation_type == "upgrade") {
+		this->Upgrade = first_anim;
+	} else if (animation_type == "build") {
+		this->Build = first_anim;
+	} else if (animation_type.starts_with("harvest")) {
+		const size_t find_pos = animation_type.find("_");
+		assert_throw(find_pos != std::string::npos);
+
+		const std::string resource_identifier = animation_type.substr(find_pos + 1, animation_type.size() - find_pos - 1);
+		const resource *resource = resource::get(resource_identifier);
+
+		this->harvest_animations[resource] = first_anim;
+	} else {
+		throw std::runtime_error("Invalid animation type: \"" + animation_type + "\".");
 	}
 }
 
