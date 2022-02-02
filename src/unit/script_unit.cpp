@@ -34,7 +34,7 @@
 //Wyrmgus start
 #include "ai/ai_local.h"
 //Wyrmgus end
-#include "animation/animation.h"
+#include "animation/animation_set.h"
 #include "commands.h"
 #include "epithet.h"
 //Wyrmgus start

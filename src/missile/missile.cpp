@@ -30,7 +30,7 @@
 
 #include "action/action_spellcast.h"
 #include "actions.h"
-#include "animation/animation.h"
+#include "animation/animation_set.h"
 #include "config.h"
 #include "database/defines.h"
 #include "database/preferences.h"

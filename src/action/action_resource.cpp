@@ -33,6 +33,7 @@
 #include "ai.h"
 #include "ai/ai_local.h"
 #include "animation/animation.h"
+#include "animation/animation_set.h"
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end

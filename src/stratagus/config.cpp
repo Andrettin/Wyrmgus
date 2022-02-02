@@ -28,7 +28,6 @@
 
 #include "config.h"
 
-#include "animation/animation.h"
 #include "character.h"
 #include "currency.h"
 #include "game/game.h"

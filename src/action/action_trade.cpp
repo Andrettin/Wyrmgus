@@ -29,6 +29,7 @@
 #include "action/action_trade.h"
 
 #include "animation/animation.h"
+#include "animation/animation_set.h"
 #include "character.h"
 #include "commands.h"
 #include "database/defines.h"

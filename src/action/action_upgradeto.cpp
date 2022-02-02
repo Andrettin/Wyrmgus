@@ -30,6 +30,7 @@
 
 #include "ai.h"
 #include "animation/animation.h"
+#include "animation/animation_set.h"
 #include "database/defines.h"
 #include "economy/resource_storage_type.h"
 //Wyrmgus start

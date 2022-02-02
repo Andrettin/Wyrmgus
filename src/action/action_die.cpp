@@ -29,6 +29,7 @@
 #include "action/action_die.h"
 
 #include "animation/animation.h"
+#include "animation/animation_set.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "player/player.h"
