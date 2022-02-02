@@ -616,7 +616,11 @@ void animation_set::process_sml_scope(const sml_data &scope)
 			this->Build = std::move(first_anim);
 		} else if (tag == "harvest") {
 			this->harvest_animations[resource] = std::move(first_anim);
+		} else {
+			throw std::runtime_error("Invalid animation type: \"" + tag + "\".");
 		}
+	} else {
+		throw std::runtime_error("Invalid animation type: \"" + tag + "\".");
 	}
 }
 
