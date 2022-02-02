@@ -61,7 +61,6 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/assert_util.h"
-#include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
@@ -104,7 +103,7 @@ int main(int argc, char **argv)
 
 		parameters::get()->process();
 
-		event_loop::get()->co_spawn([argc, argv]() {
+		std::thread stratagus_thread([argc, argv]() {
 			try {
 				stratagusMain(argc, argv);
 			} catch (const std::exception &exception) {
@@ -203,7 +202,7 @@ int main(int argc, char **argv)
 
 		const int result = app.exec();
 
-		event_loop::get()->stop();
+		stratagus_thread.join();
 
 		return result;
 	} catch (const std::exception &exception) {

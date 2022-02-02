@@ -68,8 +68,6 @@
 #include <variant>
 #include <vector>
 
-#include <boost/asio/awaitable.hpp>
-
 #include <QApplication>
 #include <QColor>
 #include <QDateTime>
