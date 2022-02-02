@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
 
 //SpawnMissile flags
 enum SpawnMissile_Flags {

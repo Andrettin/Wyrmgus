@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "animation.h" //for the ANIMATIONS_DEATHTYPES constant
+#include "animation/animation.h" //for the ANIMATIONS_DEATHTYPES constant
 #include "color.h"
 #include "database/detailed_data_entry.h"
 #include "database/data_type.h"

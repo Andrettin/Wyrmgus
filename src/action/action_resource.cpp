@@ -32,7 +32,7 @@
 
 #include "ai.h"
 #include "ai/ai_local.h"
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end

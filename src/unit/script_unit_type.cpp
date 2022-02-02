@@ -29,7 +29,7 @@
 #include "unit/unit_type.h"
 
 #include "actions.h"
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus start
 #include "character.h" //for updating levels
 //Wyrmgus end

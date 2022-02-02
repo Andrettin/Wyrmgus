@@ -707,24 +707,25 @@ set(wyrmgus_ai_HDRS
 )
 
 set(wyrmgus_animation_HDRS
-	src/include/animation/animation_attack.h
-	src/include/animation/animation_die.h
-	src/include/animation/animation_exactframe.h
-	src/include/animation/animation_frame.h
-	src/include/animation/animation_goto.h
-	src/include/animation/animation_ifvar.h
-	src/include/animation/animation_label.h
-	src/include/animation/animation_move.h
-	src/include/animation/animation_randomgoto.h
-	src/include/animation/animation_randomrotate.h
-	src/include/animation/animation_randomsound.h
-	src/include/animation/animation_randomwait.h
-	src/include/animation/animation_rotate.h
-	src/include/animation/animation_setvar.h
-	src/include/animation/animation_sound.h
-	src/include/animation/animation_spawnmissile.h
-	src/include/animation/animation_unbreakable.h
-	src/include/animation/animation_wait.h
+	src/animation/animation.h
+	src/animation/animation_attack.h
+	src/animation/animation_die.h
+	src/animation/animation_exactframe.h
+	src/animation/animation_frame.h
+	src/animation/animation_goto.h
+	src/animation/animation_ifvar.h
+	src/animation/animation_label.h
+	src/animation/animation_move.h
+	src/animation/animation_randomgoto.h
+	src/animation/animation_randomrotate.h
+	src/animation/animation_randomsound.h
+	src/animation/animation_randomwait.h
+	src/animation/animation_rotate.h
+	src/animation/animation_setvar.h
+	src/animation/animation_sound.h
+	src/animation/animation_spawnmissile.h
+	src/animation/animation_unbreakable.h
+	src/animation/animation_wait.h
 )
 
 set(wyrmgus_database_HDRS
@@ -1174,7 +1175,6 @@ set(wyrmgus_xbrz_HDRS
 set(wyrmgus_generic_HDRS
 	src/include/actions.h
 	src/include/ai.h
-	src/include/animation.h
 	src/include/character.h
 	src/include/color.h
 	src/include/commands.h

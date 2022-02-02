@@ -38,7 +38,7 @@
 //Wyrmgus start
 #include "ai/ai_local.h" //for using AiHelpers
 //Wyrmgus end
-#include "animation.h"
+#include "animation/animation.h"
 #include "character.h"
 #include "commands.h"
 #include "database/defines.h"

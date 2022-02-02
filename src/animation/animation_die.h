@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_setvar.h - The animation SetVar headerfile. */
+/**@name animation_die.h - The animation die headerfile. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2005-2007 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,20 +28,23 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_SetVar : public CAnimation
+class CAnimation_Die : public CAnimation
 {
 public:
-	CAnimation_SetVar() : CAnimation(AnimationSetVar)
-	{
-	}
+	CAnimation_Die() : CAnimation(AnimationDie) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const override;
-	virtual void Init(const char *s, lua_State *l) override;
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s, lua_State *l);
 
 private:
-	SetVar_ModifyTypes mod;
-	std::string var_str;
-	int value = 0;
+	std::string DeathType;
 };
+
+
+class AnimationDie_Exception
+{
+};
+
+extern void AnimationDie_OnCatch(CUnit &unit);

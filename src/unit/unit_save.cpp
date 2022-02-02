@@ -31,7 +31,7 @@
 #include "unit/unit.h"
 
 #include "actions.h"
-#include "animation.h"
+#include "animation/animation.h"
 #include "character.h"
 #include "economy/resource.h"
 #include "epithet.h"

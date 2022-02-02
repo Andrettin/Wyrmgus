@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_ifvar.h - The animation IfVar headerfile. */
+/**@name animation_exactframe.h - The animation  headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -28,22 +28,21 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_IfVar final : public CAnimation
+class CAnimation_ExactFrame final : public CAnimation
 {
 public:
-	CAnimation_IfVar() : CAnimation(AnimationIfVar), binOpFunc(nullptr), gotoLabel(nullptr) {}
+	CAnimation_ExactFrame() : CAnimation(AnimationExactFrame) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
+
+	int get_frame() const
+	{
+		return this->frame;
+	}
 
 private:
-	typedef bool BinOpFunc(int lhs, int rhs);
-
-private:
-	std::string leftVar;
-	std::string rightVar;
-	BinOpFunc *binOpFunc;
-	CAnimation *gotoLabel;
+	int frame = 0;
 };

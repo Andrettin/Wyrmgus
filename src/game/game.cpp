@@ -34,7 +34,7 @@
 #include "actions.h"
 #include "age.h"
 #include "ai.h"
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end

@@ -28,7 +28,7 @@
 
 #include "action/action_board.h"
 
-#include "animation.h"
+#include "animation/animation.h"
 #include "commands.h"
 #include "database/defines.h"
 #include "database/preferences.h"

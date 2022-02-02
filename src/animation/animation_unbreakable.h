@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_randomrotate.h - The animation RandomRotate headerfile. */
+/**@name animation_unbreakable.h - The animation Unbreakable headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -28,16 +28,16 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_RandomRotate final : public CAnimation
+class CAnimation_Unbreakable : public CAnimation
 {
 public:
-	CAnimation_RandomRotate() : CAnimation(AnimationRandomRotate) {}
+	CAnimation_Unbreakable() : CAnimation(AnimationUnbreakable), state(0) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const override;
-	virtual void Init(const char *s, lua_State *l) override;
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s, lua_State *l);
 
 private:
-	int rotate = 0;
+	bool state = false;
 };

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_rotate.h - The animation Rotate headerfile. */
+/**@name animation_wait.h - The animation Wait headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -28,18 +28,16 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_Rotate final : public CAnimation
+class CAnimation_Wait final : public CAnimation
 {
 public:
-	CAnimation_Rotate() : CAnimation(AnimationRotate) {}
+	CAnimation_Wait() : CAnimation(AnimationWait) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
 	virtual void Init(const char *s, lua_State *l) override;
 
 private:
-	int rotate = 0;
+	int wait = 0;
 };
-
-extern void UnitRotate(CUnit &unit, int rotate);

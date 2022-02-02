@@ -28,7 +28,7 @@
 
 #include "action/action_pickup.h"
 
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus start
 #include "character.h"
 #include "commands.h"

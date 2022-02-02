@@ -31,7 +31,7 @@
 #include "action/action_research.h"
 
 #include "ai.h"
-#include "animation.h"
+#include "animation/animation.h"
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "player/civilization.h"

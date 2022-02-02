@@ -29,7 +29,7 @@
 #include "action/action_upgradeto.h"
 
 #include "ai.h"
-#include "animation.h"
+#include "animation/animation.h"
 #include "database/defines.h"
 #include "economy/resource_storage_type.h"
 //Wyrmgus start

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_RandomSound.h - The animation RandomSound headerfile. */
+/**@name animation_attack.h - The animation  headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -28,19 +28,16 @@
 
 #pragma once
 
-#include "animation.h"
-#include "sound/unitsound.h"
+#include "animation/animation.h"
 
-class CAnimation_RandomSound final : public CAnimation
+class CAnimation_Attack final : public CAnimation
 {
 public:
-	CAnimation_RandomSound() : CAnimation(AnimationRandomSound) {}
+	CAnimation_Attack() : CAnimation(AnimationAttack)
+	{
+	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
 	virtual void Init(const char *s, lua_State *l) override;
 
-	void MapSound();
-
-private:
-	std::vector<SoundConfig> sounds;
 };

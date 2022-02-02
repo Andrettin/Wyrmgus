@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
 
 class CAnimation_Label : public CAnimation
 {

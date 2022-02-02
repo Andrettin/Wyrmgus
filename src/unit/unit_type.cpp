@@ -30,7 +30,7 @@
 
 #include "actions.h"
 #include "ai/ai_local.h" //for using AiHelpers
-#include "animation.h"
+#include "animation/animation.h"
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
 #include "config.h"

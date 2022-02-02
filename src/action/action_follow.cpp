@@ -30,7 +30,7 @@
 
 #include "action/action_follow.h"
 
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end

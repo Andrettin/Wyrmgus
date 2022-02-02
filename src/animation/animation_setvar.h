@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_exactframe.h - The animation  headerfile. */
+/**@name animation_setvar.h - The animation SetVar headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -28,21 +28,20 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_ExactFrame final : public CAnimation
+class CAnimation_SetVar : public CAnimation
 {
 public:
-	CAnimation_ExactFrame() : CAnimation(AnimationExactFrame) {}
+	CAnimation_SetVar() : CAnimation(AnimationSetVar)
+	{
+	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
 	virtual void Init(const char *s, lua_State *l) override;
 
-	int get_frame() const
-	{
-		return this->frame;
-	}
-
 private:
-	int frame = 0;
+	SetVar_ModifyTypes mod;
+	std::string var_str;
+	int value = 0;
 };

@@ -30,7 +30,7 @@
 
 #include "action/action_still.h"
 
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus start
 #include "character.h" //for the gender identifiers
 //Wyrmgus end

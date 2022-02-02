@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_unbreakable.h - The animation Unbreakable headerfile. */
+/**@name animation_ifvar.h - The animation IfVar headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -28,16 +28,22 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_Unbreakable : public CAnimation
+class CAnimation_IfVar final : public CAnimation
 {
 public:
-	CAnimation_Unbreakable() : CAnimation(AnimationUnbreakable), state(0) {}
+	CAnimation_IfVar() : CAnimation(AnimationIfVar), binOpFunc(nullptr), gotoLabel(nullptr) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	bool state = false;
+	typedef bool BinOpFunc(int lhs, int rhs);
+
+private:
+	std::string leftVar;
+	std::string rightVar;
+	BinOpFunc *binOpFunc;
+	CAnimation *gotoLabel;
 };

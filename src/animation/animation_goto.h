@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_randomwait.h - The animation RandomWait headerfile. */
+/**@name animation_goto.h - The animation Goto headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -28,17 +28,18 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_RandomWait : public CAnimation
+class CAnimation_Goto final : public CAnimation
 {
 public:
-	CAnimation_RandomWait() : CAnimation(AnimationRandomWait) {}
+	CAnimation_Goto() : CAnimation(AnimationGoto)
+	{
+	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
 	virtual void Init(const char *s, lua_State *l) override;
 
 private:
-	int min_wait = 0;
-	int max_wait = 0;
+	CAnimation *gotoLabel = nullptr;
 };

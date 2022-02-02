@@ -29,7 +29,7 @@
 
 #include "action/action_spellcast.h"
 
-#include "animation.h"
+#include "animation/animation.h"
 
 #include "animation/animation_attack.h"
 #include "animation/animation_die.h"

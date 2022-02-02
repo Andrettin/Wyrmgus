@@ -34,7 +34,7 @@
 #include "action/action_built.h"
 #include "action/action_upgradeto.h"
 //Wyrmgus start
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus end
 #include "database/defines.h"
 #include "database/preferences.h"

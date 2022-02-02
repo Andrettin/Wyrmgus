@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_die.h - The animation die headerfile. */
+/**@name animation_sound.h - The animation Sound headerfile. */
 //
-//      (c) Copyright 2005-2007 by Jimmy Salmon
+//      (c) Copyright 2012 by Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,23 +28,19 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
+#include "sound/unitsound.h"
 
-class CAnimation_Die : public CAnimation
+class CAnimation_Sound final : public CAnimation
 {
 public:
-	CAnimation_Die() : CAnimation(AnimationDie) {}
+	CAnimation_Sound() : CAnimation(AnimationSound) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
+
+	void MapSound();
 
 private:
-	std::string DeathType;
+	SoundConfig sound;
 };
-
-
-class AnimationDie_Exception
-{
-};
-
-extern void AnimationDie_OnCatch(CUnit &unit);

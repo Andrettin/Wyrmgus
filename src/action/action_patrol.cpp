@@ -28,7 +28,7 @@
 
 #include "action/action_patrol.h"
 
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end

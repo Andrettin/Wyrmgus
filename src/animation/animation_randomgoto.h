@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_frame.h - The animation Frame headerfile. */
+/**@name animation_randomgoto.h - The animation RandomGoto headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -28,21 +28,17 @@
 
 #pragma once
 
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_Frame final : public CAnimation
+class CAnimation_RandomGoto final : public CAnimation
 {
 public:
-	CAnimation_Frame() : CAnimation(AnimationFrame) {}
+	CAnimation_RandomGoto() : CAnimation(AnimationRandomGoto) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
 	virtual void Init(const char *s, lua_State *l) override;
 
-	int get_frame() const
-	{
-		return this->frame;
-	}
-
 private:
-	int frame = 0;
+	int random = 0;
+	CAnimation *gotoLabel = nullptr;
 };
