@@ -51,9 +51,6 @@
 #define __func__ __FUNCTION__
 #endif
 
-#if !(_MSC_VER >= 1500 && _MSC_VER < 1600)
-#define vsnprintf _vsnprintf
-#endif
 #define strdup _strdup
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
