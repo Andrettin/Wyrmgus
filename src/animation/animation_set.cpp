@@ -180,6 +180,8 @@ void animation_set::process_sml_scope(const sml_data &scope)
 		animation_sequence *animation_sequence = animation_sequence::add(this->get_identifier() + "_" + tag, this->get_module());
 		database::process_sml_data(animation_sequence, scope);
 
+		FixLabels();
+
 		const CAnimation *first_anim = animation_sequence->get_first_animation();
 
 		if (tag == "start") {

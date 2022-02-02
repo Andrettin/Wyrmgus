@@ -146,8 +146,6 @@ void animation_sequence::initialize()
 
 	this->animations.back()->set_next(this->animations.front().get());
 
-	FixLabels();
-
 	//must add to array in a fixed order for save games
 	animation_sequence::AddAnimationToArray(this->animations.front().get());
 
