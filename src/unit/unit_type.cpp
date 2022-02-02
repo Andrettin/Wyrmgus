@@ -2762,20 +2762,22 @@ static int GetStillFrame(const wyrmgus::unit_type &type)
 		return 0;
 	}
 	
-	CAnimation *anim = type.get_animation_set()->Still.get();
+	const CAnimation *anim = type.get_animation_set()->Still;
 
 	while (anim) {
 		if (anim->Type == AnimationFrame) {
-			CAnimation_Frame &a_frame = *static_cast<CAnimation_Frame *>(anim);
+			const CAnimation_Frame *a_frame = static_cast<const CAnimation_Frame *>(anim);
 			// Use the frame facing down
-			return a_frame.get_frame() + type.get_num_directions() / 2;
+			return a_frame->get_frame() + type.get_num_directions() / 2;
 		} else if (anim->Type == AnimationExactFrame) {
-			CAnimation_ExactFrame &a_frame = *static_cast<CAnimation_ExactFrame *>(anim);
+			const CAnimation_ExactFrame *a_frame = static_cast<const CAnimation_ExactFrame *>(anim);
 
-			return a_frame.get_frame();
+			return a_frame->get_frame();
 		}
+
 		anim = anim->get_next();
 	}
+
 	return type.get_num_directions() / 2;
 }
 

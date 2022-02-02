@@ -46,6 +46,8 @@ extern std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 namespace wyrmgus {
 
+class animation_sequence;
+
 class animation_set final : public data_entry, public data_type<animation_set>
 {
 	Q_OBJECT
@@ -56,18 +58,18 @@ public:
 
 	static void clear();
 
-	explicit animation_set(const std::string &identifier);
-	~animation_set();
+	explicit animation_set(const std::string &identifier) : data_entry(identifier)
+	{
+		memset(this->Death, 0, sizeof(this->Death));
+	}
 
-	static void AddAnimationToArray(CAnimation *anim);
 	static void SaveUnitAnim(CFile &file, const CUnit &unit);
 	static void LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 	static void LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void initialize() override;
 
-	const resource_map<std::unique_ptr<CAnimation>> &get_harvest_animations() const
+	const resource_map<const CAnimation *> &get_harvest_animations() const
 	{
 		return this->harvest_animations;
 	}
@@ -77,28 +79,28 @@ public:
 		const auto find_iterator = this->harvest_animations.find(resource);
 
 		if (find_iterator != this->harvest_animations.end()) {
-			return find_iterator->second.get();
+			return find_iterator->second;
 		}
 
 		return nullptr;
 	}
 	
 public:
-	std::unique_ptr<CAnimation> Attack;
-	std::unique_ptr<CAnimation> RangedAttack;
-	std::unique_ptr<CAnimation> Build;
-	std::unique_ptr<CAnimation> Death[ANIMATIONS_DEATHTYPES + 1];
+	const CAnimation *Attack = nullptr;
+	const CAnimation *RangedAttack = nullptr;
+	const CAnimation *Build = nullptr;
+	const CAnimation *Death[ANIMATIONS_DEATHTYPES + 1];
 private:
-	resource_map<std::unique_ptr<CAnimation>> harvest_animations;
+	resource_map<const CAnimation *> harvest_animations;
 public:
-	std::unique_ptr<CAnimation> Move;
-	std::unique_ptr<CAnimation> Repair;
-	std::unique_ptr<CAnimation> Research;
-	std::unique_ptr<CAnimation> SpellCast;
-	std::unique_ptr<CAnimation> Start;
-	std::unique_ptr<CAnimation> Still;
-	std::unique_ptr<CAnimation> Train;
-	std::unique_ptr<CAnimation> Upgrade;
+	const CAnimation *Move = nullptr;
+	const CAnimation *Repair = nullptr;
+	const CAnimation *Research = nullptr;
+	const CAnimation *SpellCast = nullptr;
+	const CAnimation *Start = nullptr;
+	const CAnimation *Still = nullptr;
+	const CAnimation *Train = nullptr;
+	const CAnimation *Upgrade = nullptr;
 
 	friend int ::CclDefineAnimations(lua_State *l);
 };

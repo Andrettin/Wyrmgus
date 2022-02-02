@@ -216,9 +216,9 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 static void AnimateActionTrain(CUnit &unit)
 {
 	if (unit.get_animation_set()->Train) {
-		UnitShowAnimation(unit, unit.get_animation_set()->Train.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Train);
 	} else {
-		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still);
 	}
 }
 

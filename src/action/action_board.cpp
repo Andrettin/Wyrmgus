@@ -276,7 +276,7 @@ void COrder_Board::Execute(CUnit &unit)
 			if (this->WaitForTransporter(unit)) {
 				this->state = board_state::enter_transporter;
 			} else {
-				UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
+				UnitShowAnimation(unit, unit.get_animation_set()->Still);
 			}
 			break;
 

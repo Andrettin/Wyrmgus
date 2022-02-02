@@ -83,10 +83,10 @@ static bool AnimateActionDie(CUnit &unit)
 		return false;
 	}
 	if (animations->Death[unit.DamagedType]) {
-		UnitShowAnimation(unit, animations->Death[unit.DamagedType].get());
+		UnitShowAnimation(unit, animations->Death[unit.DamagedType]);
 		return true;
 	} else if (animations->Death[ANIMATIONS_DEATHTYPES]) {
-		UnitShowAnimation(unit, animations->Death[ANIMATIONS_DEATHTYPES].get());
+		UnitShowAnimation(unit, animations->Death[ANIMATIONS_DEATHTYPES]);
 		return true;
 	}
 	return false;

@@ -91,35 +91,36 @@ public:
 		Q_UNUSED(l)
 	}
 
-	CAnimation *get_next() const
+	const CAnimation *get_next() const
 	{
-		return this->next_ptr;
+		return this->next;
 	}
 
-	void set_next(std::unique_ptr<CAnimation> &&animation)
-	{
-		this->next = std::move(animation);
-		this->set_next(this->next.get());
-	}
-
-	void set_next(CAnimation *animation)
+	void set_next(const CAnimation *animation)
 	{
 		if (animation == nullptr) {
 			throw std::runtime_error("Tried to set a null animation pointer as the next animation of another animation.");
 		}
 
-		this->next_ptr = animation;
+		this->next = animation;
 	}
 
 	const AnimationType Type;
 private:
-	std::unique_ptr<CAnimation> next;
-	CAnimation *next_ptr = nullptr; //non-owning next pointer, needed to circle back to the beginning
+	const CAnimation *next = nullptr;
 };
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+struct LabelsStruct {
+	CAnimation *Anim = nullptr;
+	std::string Name;
+};
+extern std::vector<LabelsStruct> Labels;
+
+struct LabelsLaterStruct {
+	CAnimation **Anim = nullptr;
+	std::string Name;
+};
+extern std::vector<LabelsLaterStruct> LabelsLater;
 
 extern void AnimationCclRegister();
 
@@ -131,4 +132,6 @@ extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 extern int ParseAnimInt(const CUnit &unit, const std::string &parseint);
 extern int ParseAnimFlags(const CUnit &unit, const char *parseflag);
 
+extern void AddLabel(CAnimation *anim, const std::string &name);
 extern void FindLabelLater(CAnimation **anim, const std::string &name);
+extern void FixLabels();

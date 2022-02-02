@@ -1431,7 +1431,6 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 	//
 	// Sound part
 	//
-	MapUnitSounds();
 	if (SoundEnabled()) {
 		InitSoundClient();
 	}

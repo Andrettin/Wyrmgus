@@ -298,7 +298,7 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 */
 static void AnimateActionRepair(CUnit &unit)
 {
-	UnitShowAnimation(unit, unit.get_animation_set()->Repair.get());
+	UnitShowAnimation(unit, unit.get_animation_set()->Repair);
 }
 
 void COrder_Repair::Execute(CUnit &unit)

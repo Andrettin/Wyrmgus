@@ -489,7 +489,7 @@ PixelPos COrder_UpgradeTo::Show(const CViewport &, const PixelPos &lastScreenPos
 static void AnimateActionUpgradeTo(CUnit &unit)
 {
 	const wyrmgus::animation_set *animations = unit.get_animation_set();
-	UnitShowAnimation(unit, animations->Upgrade.get() ? animations->Upgrade.get() : animations->Still.get());
+	UnitShowAnimation(unit, animations->Upgrade ? animations->Upgrade : animations->Still);
 }
 
 void COrder_UpgradeTo::Execute(CUnit &unit)

@@ -132,7 +132,7 @@ void COrder_Research::Execute(CUnit &unit)
 	const CUpgrade &upgrade = this->GetUpgrade();
 	const wyrmgus::unit_type &type = *unit.Type;
 
-	UnitShowAnimation(unit, unit.get_animation_set()->Research ? unit.get_animation_set()->Research.get() : unit.get_animation_set()->Still.get());
+	UnitShowAnimation(unit, unit.get_animation_set()->Research ? unit.get_animation_set()->Research : unit.get_animation_set()->Still);
 	if (unit.Wait) {
 		unit.Wait--;
 		return;

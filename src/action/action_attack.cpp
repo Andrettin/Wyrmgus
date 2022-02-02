@@ -91,13 +91,13 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	}
 	*/
 	if (unit.get_animation_set() && unit.get_animation_set()->RangedAttack && unit.IsAttackRanged(order.get_goal(), order.GetGoalPos(), order.GetGoalMapLayer())) {
-		UnitShowAnimation(unit, unit.get_animation_set()->RangedAttack.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->RangedAttack);
 	} else {
 		if (!unit.get_animation_set() || !unit.get_animation_set()->Attack) {
 			order.OnAnimationAttack(unit);
 			return;
 		}
-		UnitShowAnimation(unit, unit.get_animation_set()->Attack.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Attack);
 	}
 	//Wyrmgus end
 }
@@ -715,7 +715,7 @@ void COrder_Attack::Execute(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still);
 		unit.Wait--;
 		return;
 	}

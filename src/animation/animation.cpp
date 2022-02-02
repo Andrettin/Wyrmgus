@@ -51,6 +51,7 @@
 #include "animation/animation_wait.h"
 
 #include "actions.h"
+#include "animation/animation_sequence.h"
 #include "animation/animation_set.h"
 #include "config.h"
 #include "player/player.h"
@@ -62,17 +63,8 @@
 #include "util/string_util.h"
 #include "util/util.h"
 
-struct LabelsStruct {
-	CAnimation *Anim = nullptr;
-	std::string Name;
-};
-static std::vector<LabelsStruct> Labels;
-
-struct LabelsLaterStruct {
-	CAnimation **Anim = nullptr;
-	std::string Name;
-};
-static std::vector<LabelsLaterStruct> LabelsLater;
+std::vector<LabelsStruct> Labels;
+std::vector<LabelsLaterStruct> LabelsLater;
 
 /*----------------------------------------------------------------------------
 --  Animation
@@ -313,24 +305,18 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 
 	--unit.Anim.Wait;
 	if (!unit.Anim.Wait) {
+		assert_throw(unit.Anim.Anim != nullptr);
 		// Advance to next frame
 		unit.Anim.Anim = unit.Anim.Anim->get_next();
+		assert_throw(unit.Anim.Anim != nullptr);
 	}
 	return move;
-}
-
-static const CAnimation *Advance(const CAnimation *anim, int n)
-{
-	for (int i = 0; i < n; ++i) {
-		anim = anim->get_next();
-	}
-	return anim;
 }
 
 /**
 **  Add a label
 */
-static void AddLabel(CAnimation *anim, const std::string &name)
+void AddLabel(CAnimation *anim, const std::string &name)
 {
 	LabelsStruct label;
 
@@ -368,234 +354,11 @@ void FindLabelLater(CAnimation **anim, const std::string &name)
 /**
 **  Fix labels
 */
-static void FixLabels()
+void FixLabels()
 {
 	for (size_t i = 0; i < LabelsLater.size(); ++i) {
 		*LabelsLater[i].Anim = FindLabel(LabelsLater[i].Name);
 	}
-}
-
-namespace wyrmgus {
-
-void animation_set::LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
-{
-	if (!lua_istable(l, luaIndex)) {
-		LuaError(l, "incorrect argument");
-	}
-	const int nargs = lua_rawlen(l, luaIndex);
-
-	for (int j = 0; j != nargs; ++j) {
-		const char *value = LuaToString(l, luaIndex, j + 1);
-		++j;
-
-		if (!strcmp(value, "anim-wait")) {
-			unit.Anim.Wait = LuaToNumber(l, luaIndex, j + 1);
-		} else if (!strcmp(value, "curr-anim")) {
-			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.Anim.CurrAnim = CAnimation::animation_list.at(animIndex);
-		} else if (!strcmp(value, "anim")) {
-			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.Anim.Anim = Advance(unit.Anim.CurrAnim, animIndex);
-		} else if (!strcmp(value, "unbreakable")) {
-			unit.Anim.Unbreakable = true;
-			--j;
-		} else {
-			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-void animation_set::LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
-{
-	if (!lua_istable(l, luaIndex)) {
-		LuaError(l, "incorrect argument");
-	}
-	const int nargs = lua_rawlen(l, luaIndex);
-
-	for (int j = 0; j != nargs; ++j) {
-		const char *value = LuaToString(l, luaIndex, j + 1);
-		++j;
-
-		if (!strcmp(value, "anim-wait")) {
-			unit.WaitBackup.Wait = LuaToNumber(l, luaIndex, j + 1);
-		} else if (!strcmp(value, "curr-anim")) {
-			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.WaitBackup.CurrAnim = CAnimation::animation_list.at(animIndex);
-		} else if (!strcmp(value, "anim")) {
-			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.WaitBackup.Anim = Advance(unit.WaitBackup.CurrAnim, animIndex);
-		} else if (!strcmp(value, "unbreakable")) {
-			unit.WaitBackup.Unbreakable = true;
-			--j;
-		} else {
-			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-void animation_set::process_sml_scope(const sml_data &scope)
-{
-	const std::string &tag = scope.get_tag();
-
-	Labels.clear();
-	LabelsLater.clear();
-
-	if (
-		tag == "start"
-		|| tag == "still"
-		|| tag == "death"
-		|| tag == "attack"
-		|| tag == "ranged_attack"
-		|| tag == "spell_cast"
-		|| tag == "move"
-		|| tag == "repair"
-		|| tag == "train"
-		|| tag == "research"
-		|| tag == "upgrade"
-		|| tag == "build"
-		|| tag == "harvest"
-	) {
-		const resource *resource = nullptr;
-		std::string death_type;
-		std::unique_ptr<CAnimation> first_anim;
-		CAnimation *prev_anim = nullptr;
-
-		scope.for_each_property([&](const sml_property &property) {
-			const std::string &key = property.get_key();
-			const std::string &value = property.get_value();
-
-			std::unique_ptr<CAnimation> anim;
-
-			if (tag == "death" && key == "death_type") {
-				death_type = FindAndReplaceString(value, "_", "-");
-			} else if (tag == "harvest" && key == "resource") {
-				resource = resource::get(value);
-			} else if (key == "frame") {
-				anim = std::make_unique<CAnimation_Frame>();
-			} else if (key == "exact_frame") {
-				anim = std::make_unique<CAnimation_ExactFrame>();
-			} else if (key == "wait") {
-				anim = std::make_unique<CAnimation_Wait>();
-			} else if (key == "random_wait") {
-				anim = std::make_unique<CAnimation_RandomWait>();
-			} else if (key == "sound") {
-				anim = std::make_unique<CAnimation_Sound>();
-			} else if (key == "random_sound") {
-				anim = std::make_unique<CAnimation_RandomSound>();
-			} else if (key == "attack") {
-				anim = std::make_unique<CAnimation_Attack>();
-			} else if (key == "spawn_missile") {
-				anim = std::make_unique<CAnimation_SpawnMissile>();
-			} else if (key == "if_var") {
-				anim = std::make_unique<CAnimation_IfVar>();
-			} else if (key == "set_var") {
-				anim = std::make_unique<CAnimation_SetVar>();
-			} else if (key == "die") {
-				anim = std::make_unique<CAnimation_Die>();
-			} else if (key == "rotate") {
-				anim = std::make_unique<CAnimation_Rotate>();
-			} else if (key == "random_rotate") {
-				anim = std::make_unique<CAnimation_RandomRotate>();
-			} else if (key == "move") {
-				anim = std::make_unique<CAnimation_Move>();
-			} else if (key == "unbreakable") {
-				anim = std::make_unique<CAnimation_Unbreakable>();
-			} else if (key == "label") {
-				anim = std::make_unique<CAnimation_Label>();
-				AddLabel(anim.get(), value);
-			} else if (key == "goto") {
-				anim = std::make_unique<CAnimation_Goto>();
-			} else if (key == "random_goto") {
-				anim = std::make_unique<CAnimation_RandomGoto>();
-			} else {
-				throw std::runtime_error("Invalid animation property: \"" + key + "\".");
-			}
-
-			if (anim) {
-				anim->Init(value.c_str(), nullptr);
-
-				CAnimation *temp_prev_anim = prev_anim;
-				prev_anim = anim.get();
-
-				if (!first_anim) {
-					first_anim = std::move(anim);
-				} else {
-					temp_prev_anim->set_next(std::move(anim));
-				}
-			}
-		});
-
-		if (first_anim && prev_anim) {
-			prev_anim->set_next(first_anim.get());
-		}
-
-		FixLabels();
-
-		if (tag == "start") {
-			this->Start = std::move(first_anim);
-		} else if (tag == "still") {
-			this->Still = std::move(first_anim);
-		} else if (tag == "death") {
-			if (!death_type.empty()) {
-				const int death_index = ExtraDeathIndex(death_type.c_str());
-				if (death_index == ANIMATIONS_DEATHTYPES) {
-					this->Death[ANIMATIONS_DEATHTYPES] = std::move(first_anim);
-				} else {
-					this->Death[death_index] = std::move(first_anim);
-				}
-			} else {
-				this->Death[ANIMATIONS_DEATHTYPES] = std::move(first_anim);
-			}
-		} else if (tag == "attack") {
-			this->Attack = std::move(first_anim);
-		} else if (tag == "ranged_attack") {
-			this->RangedAttack = std::move(first_anim);
-		} else if (tag == "spell_cast") {
-			this->SpellCast = std::move(first_anim);
-		} else if (tag == "move") {
-			this->Move = std::move(first_anim);
-		} else if (tag == "repair") {
-			this->Repair = std::move(first_anim);
-		} else if (tag == "train") {
-			this->Train = std::move(first_anim);
-		} else if (tag == "research") {
-			this->Research = std::move(first_anim);
-		} else if (tag == "upgrade") {
-			this->Upgrade = std::move(first_anim);
-		} else if (tag == "build") {
-			this->Build = std::move(first_anim);
-		} else if (tag == "harvest") {
-			this->harvest_animations[resource] = std::move(first_anim);
-		} else {
-			throw std::runtime_error("Invalid animation type: \"" + tag + "\".");
-		}
-	} else {
-		throw std::runtime_error("Invalid animation type: \"" + tag + "\".");
-	}
-}
-
-void animation_set::initialize()
-{
-	// Must add to array in a fixed order for save games
-	animation_set::AddAnimationToArray(this->Start.get());
-	animation_set::AddAnimationToArray(this->Still.get());
-	for (int i = 0; i != ANIMATIONS_DEATHTYPES + 1; ++i) {
-		animation_set::AddAnimationToArray(this->Death[i].get());
-	}
-	animation_set::AddAnimationToArray(this->Attack.get());
-	animation_set::AddAnimationToArray(this->RangedAttack.get());
-	animation_set::AddAnimationToArray(this->SpellCast.get());
-	animation_set::AddAnimationToArray(this->Move.get());
-	animation_set::AddAnimationToArray(this->Repair.get());
-	animation_set::AddAnimationToArray(this->Train.get());
-
-	for (const auto &kv_pair : this->harvest_animations) {
-		animation_set::AddAnimationToArray(kv_pair.second.get());
-	}
-
-	data_entry::initialize();
-}
-
 }
 
 /**
@@ -660,7 +423,7 @@ static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char 
 /**
 **  Parse an animation
 */
-static std::unique_ptr<CAnimation> ParseAnimation(lua_State *l, int idx)
+static std::vector<std::unique_ptr<CAnimation>> ParseAnimation(lua_State *l, int idx)
 {
 	if (!lua_istable(l, idx)) {
 		LuaError(l, "incorrect argument");
@@ -668,38 +431,30 @@ static std::unique_ptr<CAnimation> ParseAnimation(lua_State *l, int idx)
 	const int args = lua_rawlen(l, idx);
 
 	if (args == 0) {
-		return nullptr;
+		return {};
 	}
 	Labels.clear();
 	LabelsLater.clear();
 
 	const char *str = LuaToString(l, idx, 1);
 
-	std::unique_ptr<CAnimation> firstAnim = ParseAnimationFrame(l, str);
-	CAnimation *prev = firstAnim.get();
+	std::vector<std::unique_ptr<CAnimation>> animations;
+
+	animations.push_back(ParseAnimationFrame(l, str));
+	CAnimation *first_anim = animations.back().get();
+
+	CAnimation *prev = first_anim;
 	for (int j = 1; j < args; ++j) {
 		const char *secondary_str = LuaToString(l, idx, j + 1);
 		std::unique_ptr<CAnimation> anim = ParseAnimationFrame(l, secondary_str);
-		CAnimation *temp_anim = anim.get();
-		prev->set_next(std::move(anim));
-		prev = temp_anim;
+		prev->set_next(anim.get());
+		prev = anim.get();
+		animations.push_back(std::move(anim));
 	}
-	prev->set_next(firstAnim.get());
+	prev->set_next(first_anim);
 	FixLabels();
-	return firstAnim;
-}
 
-namespace wyrmgus {
-
-void animation_set::AddAnimationToArray(CAnimation *anim)
-{
-	if (!anim) {
-		return;
-	}
-
-	CAnimation::animation_list.push_back(anim);
-}
-
+	return animations;
 }
 
 /**
@@ -721,43 +476,48 @@ static int CclDefineAnimations(lua_State *l)
 	while (lua_next(l, 2)) {
 		const char *value = LuaToString(l, -2);
 
+		std::vector<std::unique_ptr<CAnimation>> animations = ParseAnimation(l, -1);
+		animation_sequence *animation_sequence = animation_sequence::add(anims->get_identifier() + "_" + value, anims->get_module());
+		animation_sequence->set_animations(std::move(animations));
+		const CAnimation *first_anim = animation_sequence->get_first_animation();
+
 		if (!strcmp(value, "Start")) {
-			anims->Start = ParseAnimation(l, -1);
+			anims->Start = first_anim;
 		} else if (!strncmp(value, "Still", 5)) {
-			anims->Still = ParseAnimation(l, -1);
+			anims->Still = first_anim;
 		} else if (!strncmp(value, "Death", 5)) {
 			if (strlen(value) > 5) {
 				const int death = ExtraDeathIndex(value + 6);
 				if (death == ANIMATIONS_DEATHTYPES) {
-					anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
+					anims->Death[ANIMATIONS_DEATHTYPES] = first_anim;
 				} else {
-					anims->Death[death] = ParseAnimation(l, -1);
+					anims->Death[death] = first_anim;
 				}
 			} else {
-				anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
+				anims->Death[ANIMATIONS_DEATHTYPES] = first_anim;
 			}
 		} else if (!strcmp(value, "Attack")) {
-			anims->Attack = ParseAnimation(l, -1);
+			anims->Attack = first_anim;
 		} else if (!strcmp(value, "RangedAttack")) {
-			anims->RangedAttack = ParseAnimation(l, -1);
+			anims->RangedAttack = first_anim;
 		} else if (!strcmp(value, "SpellCast")) {
-			anims->SpellCast = ParseAnimation(l, -1);
+			anims->SpellCast = first_anim;
 		} else if (!strcmp(value, "Move")) {
-			anims->Move = ParseAnimation(l, -1);
+			anims->Move = first_anim;
 		} else if (!strcmp(value, "Repair")) {
-			anims->Repair = ParseAnimation(l, -1);
+			anims->Repair = first_anim;
 		} else if (!strcmp(value, "Train")) {
-			anims->Train = ParseAnimation(l, -1);
+			anims->Train = first_anim;
 		} else if (!strcmp(value, "Research")) {
-			anims->Research = ParseAnimation(l, -1);
+			anims->Research = first_anim;
 		} else if (!strcmp(value, "Upgrade")) {
-			anims->Upgrade = ParseAnimation(l, -1);
+			anims->Upgrade = first_anim;
 		} else if (!strcmp(value, "Build")) {
-			anims->Build = ParseAnimation(l, -1);
+			anims->Build = first_anim;
 		} else if (!strncmp(value, "Harvest_", 8)) {
 			const std::string resource_str = value + 8;
 			const resource *res = resource::get(resource_str);
-			anims->harvest_animations[res] = ParseAnimation(l, -1);
+			anims->harvest_animations[res] = first_anim;
 		} else {
 			LuaError(l, "Unsupported animation: %s" _C_ value);
 		}

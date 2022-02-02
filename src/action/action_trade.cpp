@@ -174,7 +174,7 @@ void COrder_Trade::Execute(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still);
 		unit.Wait--;
 		return;
 	}

@@ -541,7 +541,7 @@ void COrder_Still::Execute(CUnit &unit)
 		case state::standby:
 			if (!unit.has_status_effect(status_effect::stun)) {
 				//only show the idle animation when still if the unit is not stunned
-				UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
+				UnitShowAnimation(unit, unit.get_animation_set()->Still);
 			}
 			if (SyncRand(100000) == 0) {
 				PlayUnitSound(unit, unit_sound_type::idle);

@@ -163,7 +163,7 @@ int DoActionMove(CUnit &unit)
 
 	assert_throw(unit.CanMove());
 
-	if (!unit.Moving && (unit.get_animation_set()->Move.get() != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+	if (!unit.Moving && (unit.get_animation_set()->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 		assert_throw(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
@@ -248,7 +248,7 @@ int DoActionMove(CUnit &unit)
 	}
 
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
-	int move = UnitShowAnimationScaled(unit, unit.get_animation_set()->Move.get(), DefaultTileMovementCost);
+	int move = UnitShowAnimationScaled(unit, unit.get_animation_set()->Move, DefaultTileMovementCost);
 
 	unit.pixel_offset += QPoint(posd.x * move, posd.y * move);
 	
@@ -280,7 +280,7 @@ void COrder_Move::Execute(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still);
 		unit.Wait--;
 		return;
 	}

@@ -270,9 +270,9 @@ static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 		return;
 	}
 	if (animations->SpellCast) {
-		UnitShowAnimation(unit, animations->SpellCast.get());
+		UnitShowAnimation(unit, animations->SpellCast);
 	} else {
-		UnitShowAnimation(unit, animations->Attack.get());
+		UnitShowAnimation(unit, animations->Attack);
 	}
 }
 
@@ -370,7 +370,7 @@ void COrder_SpellCast::Execute(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still);
 		unit.Wait--;
 		return;
 	}

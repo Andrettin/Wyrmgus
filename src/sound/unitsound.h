@@ -98,9 +98,3 @@ public:
 };
 
 }
-
-/**
-**  Performs the mapping between sound names and sound* for each unit type.
-**  Set ranges for some sounds (infinite range for acknowledge and help sounds).
-*/
-extern void MapUnitSounds();

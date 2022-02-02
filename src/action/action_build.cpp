@@ -452,7 +452,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	// We need somebody to work on it.
 	if (!type.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
-		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still);
 		unit.Remove(build);
 		this->State = State_BuildFromInside;
 		if (unit.Selected) {
@@ -488,9 +488,9 @@ static void AnimateActionBuild(CUnit &unit)
 	}
 
 	if (animations->Build) {
-		UnitShowAnimation(unit, animations->Build.get());
+		UnitShowAnimation(unit, animations->Build);
 	} else if (animations->Repair) {
-		UnitShowAnimation(unit, animations->Repair.get());
+		UnitShowAnimation(unit, animations->Repair);
 	}
 }
 
@@ -527,7 +527,7 @@ void COrder_Build::Execute(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still);
 		unit.Wait--;
 		return;
 	}
