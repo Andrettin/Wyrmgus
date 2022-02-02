@@ -33,22 +33,8 @@
 #include "data_type.h"
 #include "economy/resource_container.h"
 
-constexpr int ANIMATIONS_DEATHTYPES = 40;
-
-class CFile;
 class CUnit;
 struct lua_State;
-
-static int CclDefineAnimations(lua_State *l);
-
-namespace wyrmgus {
-	class animation_set;
-}
-
-/**
-**  Default names for the extra death types.
-*/
-extern std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 enum AnimationType {
 	AnimationNone,
@@ -130,76 +116,6 @@ private:
 	std::unique_ptr<CAnimation> next;
 	CAnimation *next_ptr = nullptr; //non-owning next pointer, needed to circle back to the beginning
 };
-
-namespace wyrmgus {
-
-class animation_set final : public data_entry, public data_type<animation_set>
-{
-	Q_OBJECT
-
-public:
-	static constexpr const char *class_identifier = "animation_set";
-	static constexpr const char *database_folder = "animation_sets";
-
-	static void clear()
-	{
-		CAnimation::animation_list.clear();
-		data_type::clear();
-	}
-
-	explicit animation_set(const std::string &identifier) : data_entry(identifier)
-	{
-	}
-
-	~animation_set()
-	{
-	}
-
-	static void AddAnimationToArray(CAnimation *anim);
-	static void SaveUnitAnim(CFile &file, const CUnit &unit);
-	static void LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
-	static void LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
-
-	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void initialize() override;
-
-	const resource_map<std::unique_ptr<CAnimation>> &get_harvest_animations() const
-	{
-		return this->harvest_animations;
-	}
-
-	const CAnimation *get_harvest_animation(const resource *resource) const
-	{
-		const auto find_iterator = this->harvest_animations.find(resource);
-
-		if (find_iterator != this->harvest_animations.end()) {
-			return find_iterator->second.get();
-		}
-
-		return nullptr;
-	}
-	
-public:
-	std::unique_ptr<CAnimation> Attack;
-	std::unique_ptr<CAnimation> RangedAttack;
-	std::unique_ptr<CAnimation> Build;
-	std::unique_ptr<CAnimation> Death[ANIMATIONS_DEATHTYPES + 1];
-private:
-	resource_map<std::unique_ptr<CAnimation>> harvest_animations;
-public:
-	std::unique_ptr<CAnimation> Move;
-	std::unique_ptr<CAnimation> Repair;
-	std::unique_ptr<CAnimation> Research;
-	std::unique_ptr<CAnimation> SpellCast;
-	std::unique_ptr<CAnimation> Start;
-	std::unique_ptr<CAnimation> Still;
-	std::unique_ptr<CAnimation> Train;
-	std::unique_ptr<CAnimation> Upgrade;
-
-	friend int ::CclDefineAnimations(lua_State *l);
-};
-
-}
 
 /*----------------------------------------------------------------------------
 --  Functions

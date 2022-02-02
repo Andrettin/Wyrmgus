@@ -28,7 +28,7 @@
 
 #include "unit/unit_type_variation.h"
 
-#include "animation/animation.h"
+#include "animation/animation_set.h"
 #include "config.h"
 #include "item/item_class.h"
 #include "map/terrain_type.h"

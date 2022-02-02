@@ -30,9 +30,9 @@
 
 #include "actions.h"
 #include "ai/ai_local.h" //for using AiHelpers
-#include "animation/animation.h"
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
+#include "animation/animation_set.h"
 #include "config.h"
 #include "database/defines.h"
 #include "database/preferences.h"

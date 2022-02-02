@@ -93,6 +93,7 @@ set(animation_SRCS
 	src/animation/animation_randomsound.cpp
 	src/animation/animation_randomwait.cpp
 	src/animation/animation_rotate.cpp
+	src/animation/animation_set.cpp
 	src/animation/animation_setvar.cpp
 	src/animation/animation_sound.cpp
 	src/animation/animation_spawnmissile.cpp
@@ -721,6 +722,7 @@ set(wyrmgus_animation_HDRS
 	src/animation/animation_randomsound.h
 	src/animation/animation_randomwait.h
 	src/animation/animation_rotate.h
+	src/animation/animation_set.h
 	src/animation/animation_setvar.h
 	src/animation/animation_sound.h
 	src/animation/animation_spawnmissile.h

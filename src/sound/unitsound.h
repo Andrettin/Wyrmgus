@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include "animation/animation.h" //for the ANIMATIONS_DEATHTYPES constant
+#include "animation/animation_set.h" //for the ANIMATIONS_DEATHTYPES constant
 #include "economy/resource.h" // MaxCosts
 
 class CUnit;

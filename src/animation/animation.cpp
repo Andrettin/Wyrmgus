@@ -51,8 +51,8 @@
 #include "animation/animation_wait.h"
 
 #include "actions.h"
+#include "animation/animation_set.h"
 #include "config.h"
-#include "iolib.h"
 #include "player/player.h"
 #include "script.h"
 #include "spell/spell.h"
@@ -317,56 +317,6 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 		unit.Anim.Anim = unit.Anim.Anim->get_next();
 	}
 	return move;
-}
-
-static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
-{
-	if (base == anim) {
-		return 0;
-	}
-	int i = 1;
-	for (const CAnimation *it = base->get_next(); it != base; it = it->get_next()) {
-		if (it == anim) {
-			return i;
-		}
-		++i;
-	}
-	return -1;
-}
-
-namespace wyrmgus {
-
-void animation_set::SaveUnitAnim(CFile &file, const CUnit &unit)
-{
-	file.printf("\"anim-data\", {");
-	file.printf("\"anim-wait\", %d,", unit.Anim.Wait);
-	for (size_t i = 0; i < CAnimation::animation_list.size(); ++i) {
-		if (CAnimation::animation_list[i] == unit.Anim.CurrAnim) {
-			file.printf("\"curr-anim\", %zu,", i);
-			file.printf("\"anim\", %d,", GetAdvanceIndex(unit.Anim.CurrAnim, unit.Anim.Anim));
-			break;
-		}
-	}
-	if (unit.Anim.Unbreakable) {
-		file.printf(" \"unbreakable\",");
-	}
-	file.printf("}, ");
-	// Wait backup info
-	file.printf("\"wait-anim-data\", {");
-	file.printf("\"anim-wait\", %d,", unit.WaitBackup.Wait);
-	for (size_t i = 0; i < CAnimation::animation_list.size(); ++i) {
-		if (CAnimation::animation_list[i] == unit.WaitBackup.CurrAnim) {
-			file.printf("\"curr-anim\", %zu,", i);
-			file.printf("\"anim\", %d,", GetAdvanceIndex(unit.WaitBackup.CurrAnim, unit.WaitBackup.Anim));
-			break;
-		}
-	}
-	if (unit.WaitBackup.Unbreakable) {
-		file.printf(" \"unbreakable\",");
-	}
-	file.printf("}");
-}
-
 }
 
 static const CAnimation *Advance(const CAnimation *anim, int n)

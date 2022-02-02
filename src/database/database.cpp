@@ -29,7 +29,7 @@
 #include "database/database.h"
 
 #include "age.h"
-#include "animation/animation.h"
+#include "animation/animation_set.h"
 #include "character.h"
 #include "character_title.h"
 #include "database/data_module.h"
