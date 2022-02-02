@@ -877,24 +877,7 @@ public:
 		return this->get_population();
 	}
 
-	void set_population(const int64_t population)
-	{
-		if (population == this->get_population()) {
-			return;
-		}
-
-		assert_log(population >= 0);
-
-		std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-		if (this == CPlayer::GetThisPlayer()) {
-			lock = std::unique_lock<std::shared_mutex>(this->mutex);
-		}
-
-		this->population = population;
-
-		emit population_changed();
-	}
+	void set_population(const int64_t population);
 
 	void change_population(const int64_t change)
 	{

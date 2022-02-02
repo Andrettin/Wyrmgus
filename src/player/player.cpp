@@ -532,6 +532,25 @@ void CPlayer::set_revealed(const bool revealed)
 	}
 }
 
+void CPlayer::set_population(const int64_t population)
+{
+	if (population == this->get_population()) {
+		return;
+	}
+
+	assert_log(population >= 0);
+
+	std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+	if (this == CPlayer::GetThisPlayer()) {
+		lock = std::unique_lock<std::shared_mutex>(this->mutex);
+	}
+
+	this->population = population;
+
+	emit population_changed();
+}
+
 void CPlayer::check_unit_home_settlements()
 {
 	if (!defines::get()->is_population_enabled()) {
