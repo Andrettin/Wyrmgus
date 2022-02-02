@@ -31,6 +31,7 @@
 #include "sound/unitsound.h"
 #include "ui/icon.h"
 
+class CConfigData;
 class CUnit;
 class CUpgrade;
 enum class ButtonCmd;
