@@ -35,12 +35,23 @@
 #include "population/population_unit_key.h"
 #include "util/assert_util.h"
 #include "util/random.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
 
 population_unit::population_unit(const population_unit_key &key, const int64_t population)
 	: type(key.type), employment_type(key.employment_type), population(population)
 {
+	assert_throw(this->get_type() != nullptr);
+
+	if (this->get_employment_type() != nullptr) {
+		assert_throw(vector::contains(this->get_employment_type()->get_employees(), this->get_type()->get_population_class()));
+	}
+
+	assert_log(this->population >= 0);
+	if (this->population < 0) {
+		this->population = 0;
+	}
 }
 
 void population_unit::process_sml_property(const sml_property &property)
