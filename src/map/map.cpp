@@ -400,7 +400,7 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 		std::vector<CUnit *> table;
 		if (player != nullptr) {
 			Select(random_pos - QPoint(32, 32), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::get_neutral_player())));
-		} else if (unit_type->get_given_resource() == nullptr) {
+		} else if (unit_type->get_given_resource() == nullptr && !unit_type->BoolFlag[BUILDING_INDEX].value) {
 			if (unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->get_domain() == unit_domain::air || unit_type->get_domain() == unit_domain::space))) {
 				Select(random_pos - QPoint(16, 16), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(16, 16), table, z, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
 			} else {
