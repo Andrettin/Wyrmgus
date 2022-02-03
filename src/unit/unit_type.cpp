@@ -44,7 +44,9 @@
 #include "language/word.h"
 #include "luacallback.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "map/terrain_type.h"
+#include "map/tile.h"
 #include "map/tile_flag.h"
 #include "missile.h"
 #include "mod.h"
@@ -2515,14 +2517,150 @@ std::string unit_type::get_destroy_verb_string() const
 	}
 }
 
+
+static bool is_tile_impassable(const QPoint &pos, const int z, const unit_type &unit_type)
+{
+	if (!CMap::get()->Info->IsPointOnMap(pos, z)) {
+		return false;
+	}
+
+	const tile *tile = CMap::get()->Field(pos, z);
+
+	if (tile->has_flag(tile_flag::rock) || tile->has_flag(tile_flag::tree)) {
+		return true;
+	}
+
+	switch (unit_type.get_domain()) {
+		case unit_domain::land:
+			if (!unit_type.BoolFlag[SHOREBUILDING_INDEX].value && !tile->has_flag(tile_flag::land_allowed)) {
+				return true;
+			}
+			break;
+		case unit_domain::water:
+			if (!tile->has_flag(tile_flag::water_allowed) && !tile->has_flag(tile_flag::coast_allowed)) {
+				return true;
+			}
+			break;
+		default:
+			break;
+	}
+
+	return false;
+}
+
+static bool check_tile_passable_blocks(const QPoint &pos, const int z, const unit_type &unit_type, bool &current_impassable, int &passable_block_count, const bool diagonal_edge)
+{
+	const bool impassable = is_tile_impassable(pos, z, unit_type);
+
+	if (impassable == current_impassable) {
+		return true;
+	}
+
+	if (impassable == false) {
+		++passable_block_count;
+
+		//the maximum allowed number is 2 to account for an impassable tile in the middle of the border, but which wouldn't prevent the rest of the tiles from being passable between themselves
+		if (passable_block_count > 2) {
+			return false;
+		}
+	} else {
+		if (diagonal_edge) {
+			//ignore impassability (but not passability) for diagonal edges
+			return true;
+		}
+	}
+
+	current_impassable = impassable;
+
+	return true;
+}
+
+bool unit_type::pos_borders_impassable(const QPoint &pos, const int z) const
+{
+	for (int x = pos.x() - 1; x < pos.x() + this->get_tile_width() + 1; ++x) {
+		for (int y = pos.y() - 1; y < pos.y() + this->get_tile_height() + 1; ++y) {
+			const QPoint tile_pos(x, y);
+
+			if (!CMap::get()->Info->IsPointOnMap(tile_pos, z)) {
+				continue;
+			}
+
+			const tile *tile = CMap::get()->Field(tile_pos, z);
+
+			if (tile->has_flag(tile_flag::building)) {
+				return true;
+			}
+		}
+	}
+
+	//additionally, the building's adjacent tiles cannot contain more than one block of passable tiles which cannot be traversed between one another
+	//ignore the tiles at the diagonal ends of the rectangle around the building; since units can move diagonally, they are not relevant for passability
+	bool impassable = false;
+	int passable_block_count = 1;
+
+	for (int x = pos.x() - 1; x < pos.x() + this->get_tile_width() + 1; ++x) {
+		const int y = pos.y() - 1;
+		const QPoint tile_pos(x, y);
+		const bool diagonal_edge = (x == pos.x() - 1) || (x == pos.x() + this->get_tile_width());
+		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge)) {
+			return true;
+		}
+	}
+
+	for (int y = pos.y() - 1; y < pos.y() + this->get_tile_height() + 1; ++y) {
+		const int x = pos.x() + this->get_tile_width();
+		const QPoint tile_pos(x, y);
+		const bool diagonal_edge = (y == pos.y() - 1) || (y == pos.y() + this->get_tile_height());
+		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge)) {
+			return true;
+		}
+	}
+
+	for (int x = pos.x() + this->get_tile_width(); x >= pos.x() - 1; --x) {
+		const int y = pos.y() + this->get_tile_height();
+		const QPoint tile_pos(x, y);
+		const bool diagonal_edge = (x == pos.x() - 1) || (x == pos.x() + this->get_tile_width());
+		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge)) {
+			return true;
+		}
+	}
+
+	for (int y = pos.y() + this->get_tile_height(); y >= pos.y() - 1; --y) {
+		const int x = pos.x() - 1;
+		const QPoint tile_pos(x, y);
+		const bool diagonal_edge = (y == pos.y() - 1) || (y == pos.y() + this->get_tile_height());
+		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge)) {
+			return true;
+		}
+	}
+
+	//if we end with an impassable tile, then we need to increment the passable block count to account for the gap between the last and first passable tiles
+	if (impassable) {
+		++passable_block_count;
+		if (passable_block_count > 2) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool unit_type::can_be_dropped_on_pos(const QPoint &pos, const int z, const bool no_building_bordering_impassable, const bool ignore_ontop, const site *settlement) const
 {
 	if (!UnitTypeCanBeAt(*this, pos, z) && (!this->BoolFlag[BUILDING_INDEX].value || !OnTopDetails(*this, nullptr) || ignore_ontop)) {
 		return false;
 	}
 
-	if (this->BoolFlag[BUILDING_INDEX].value && !ignore_ontop && CanBuildUnitType(nullptr, *this, pos, 1, true, z, no_building_bordering_impassable) == nullptr) {
-		return false;
+	if (this->BoolFlag[BUILDING_INDEX].value) {
+		if (ignore_ontop) {
+			if (no_building_bordering_impassable && this->pos_borders_impassable(pos, z)) {
+				return false;
+			}
+		} else {
+			if (CanBuildUnitType(nullptr, *this, pos, 1, true, z, no_building_bordering_impassable) == nullptr) {
+				return false;
+			}
+		}
 	}
 
 	if (settlement != nullptr && !CMap::get()->is_rect_in_settlement(QRect(pos, this->get_tile_size()), z, settlement)) {
