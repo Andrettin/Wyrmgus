@@ -776,7 +776,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 						} else {
 							unit_name = UnitUnderCursor->get_full_name();
 						}
-					} else if (UnitUnderCursor->get_site() != nullptr && !UnitUnderCursor->get_site()->is_settlement() && !UnitUnderCursor->get_full_name().empty()) {
+					} else if (UnitUnderCursor->get_site() != nullptr && UnitUnderCursor->get_site()->can_use_name_for_site_unit() && !UnitUnderCursor->get_full_name().empty()) {
 						unit_name = UnitUnderCursor->get_full_name() + " (" + UnitUnderCursor->get_type_name() + ")";
 					} else {
 						unit_name = UnitUnderCursor->get_type_name();
