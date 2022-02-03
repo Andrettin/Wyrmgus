@@ -265,6 +265,7 @@ public:
 	void apply_population_growth(const int64_t population_growth);
 
 	void do_population_promotion();
+	void do_population_demotion();
 
 	void do_population_employment();
 	void check_employment_validity();

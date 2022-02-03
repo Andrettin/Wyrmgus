@@ -126,6 +126,7 @@ void site_game_data::do_per_minute_loop()
 	if (defines::get()->is_population_enabled() && this->site->is_settlement()) {
 		this->do_population_growth();
 		this->do_population_promotion();
+		this->do_population_demotion();
 		this->do_population_employment();
 	}
 }
@@ -680,17 +681,6 @@ void site_game_data::move_to_unemployment(const population_unit_key &population_
 	this->change_population_unit_population(key, -quantity);
 
 	key.employment_type = nullptr;
-	if (!population_unit_key.type->get_population_class()->can_have_unemployment()) {
-		const population_class *unemployed_class = population_unit_key.type->get_population_class()->get_unemployed_class();
-		if (unemployed_class != nullptr) {
-			const population_type *unemployed_type = this->get_class_population_type(unemployed_class);
-			key.type = unemployed_type;
-
-			if (unemployed_type == nullptr) {
-				return;
-			}
-		}
-	}
 	this->change_population_unit_population(key, quantity);
 }
 
@@ -826,6 +816,53 @@ void site_game_data::do_population_promotion()
 			const bool removed_pop = promotion_quantity >= population_unit->get_population();
 
 			this->change_population_unit_to_type(population_unit->get_key(), promotion_type, promotion_quantity);
+
+			if (removed_pop) {
+				break;
+			}
+		}
+	}
+}
+
+void site_game_data::do_population_demotion()
+{
+	std::vector<population_unit *> demotable_population_units;
+
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
+		if (population_unit->get_type()->get_population_class()->get_demotion_targets().empty()) {
+			continue;
+		}
+
+		bool should_demote = false;
+
+		if (population_unit->get_employment_type() == nullptr && !population_unit->get_type()->get_population_class()->can_have_unemployment()) {
+			should_demote = true;
+		}
+
+		if (!should_demote) {
+			continue;
+		}
+
+		demotable_population_units.push_back(population_unit.get());
+	}
+
+	for (population_unit *population_unit : demotable_population_units) {
+		for (const population_class *demotion_class : population_unit->get_type()->get_population_class()->get_demotion_targets()) {
+			if (population_unit->get_employment_type() != nullptr && !vector::contains(population_unit->get_employment_type()->get_employees(), demotion_class)) {
+				continue;
+			}
+
+			const population_type *demotion_type = this->get_class_population_type(demotion_class);
+			if (demotion_type == nullptr) {
+				continue;
+			}
+
+			const int64_t base_demotion_quantity = population_unit->get_population();
+
+			const int64_t demotion_quantity = population_unit->calculate_promotion_quantity(base_demotion_quantity);
+			const bool removed_pop = demotion_quantity >= population_unit->get_population();
+
+			this->change_population_unit_to_type(population_unit->get_key(), demotion_type, demotion_quantity);
 
 			if (removed_pop) {
 				break;

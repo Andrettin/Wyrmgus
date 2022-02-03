@@ -69,23 +69,6 @@ public:
 		return this->demotion_targets;
 	}
 
-	const population_class *get_unemployed_class() const
-	{
-		if (this->can_have_unemployment()) {
-			return this;
-		}
-
-		for (const population_class *demotion_target : this->demotion_targets) {
-			const population_class *unemployed_class = demotion_target->get_unemployed_class();
-
-			if (unemployed_class != nullptr) {
-				return unemployed_class;
-			}
-		}
-
-		return nullptr;
-	}
-
 	int get_production_efficiency(const resource *resource) const
 	{
 		const auto find_iterator = this->production_efficiency_map.find(resource);
