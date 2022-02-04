@@ -182,10 +182,10 @@ void renderer::draw_pixel(const QPoint &pos, const QColor &color)
 	this->painter->endNativePainting();
 }
 
-void renderer::draw_rect(const QPoint &pos, const QSize &size, const QColor &color, const int line_width)
+void renderer::draw_rect(const QPoint &pos, const QSize &size, const QColor &color, const double line_width)
 {
 	QPen pen(color);
-	pen.setWidth(line_width);
+	pen.setWidthF(line_width);
 
 	this->painter->setPen(pen);
 	this->painter->drawRect(QRect(pos, size));
@@ -196,10 +196,10 @@ void renderer::fill_rect(const QRect &rect, const QColor &color)
 	this->painter->fillRect(rect, color);
 }
 
-void renderer::draw_line(const QPoint &start_pos, const QPoint &end_pos, const QColor &color, const int line_width)
+void renderer::draw_line(const QPoint &start_pos, const QPoint &end_pos, const QColor &color, const double line_width)
 {
 	QPen pen(color);
-	pen.setWidth(line_width);
+	pen.setWidthF(line_width);
 
 	this->painter->setPen(pen);
 	this->painter->drawLine(start_pos, end_pos);
