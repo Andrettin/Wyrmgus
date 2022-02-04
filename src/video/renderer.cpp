@@ -188,7 +188,12 @@ void renderer::draw_rect(const QPoint &pos, const QSize &size, const QColor &col
 	pen.setWidthF(line_width);
 
 	this->painter->setPen(pen);
-	this->painter->drawRect(QRect(pos, size));
+
+	this->draw_vertical_line(pos, size.height(), color, line_width);
+	this->draw_vertical_line(pos + QPoint(size.width() - 1, 0), size.height(), color, line_width);
+
+	this->draw_horizontal_line(pos, size.width(), color, line_width);
+	this->draw_horizontal_line(pos + QPoint(0, size.height() - 1), size.width(), color, line_width);
 }
 
 void renderer::fill_rect(const QRect &rect, const QColor &color)
