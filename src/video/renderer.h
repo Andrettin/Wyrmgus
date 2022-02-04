@@ -250,13 +250,16 @@ public:
 		this->fill_rect(QRect(pixel_pos, size), color);
 	}
 
-	void draw_line(const QPoint &start_pos, const QPoint &end_pos, const QColor &color)
+	void draw_line(const QPoint &start_pos, const QPoint &end_pos, const QColor &color, const int line_width = 1)
 	{
-		this->painter->setPen(QPen(color));
+		QPen pen(color);
+		pen.setWidth(line_width);
+
+		this->painter->setPen(pen);
 		this->painter->drawLine(start_pos, end_pos);
 	}
 
-	void draw_horizontal_line(const QPoint &pos, const int width, const QColor &color)
+	void draw_horizontal_line(const QPoint &pos, const int width, const QColor &color, const int line_width = 1)
 	{
 		if (width == 0) {
 			return;
@@ -269,10 +272,10 @@ public:
 			end_pos += QPoint(width + 1, 0);
 		}
 
-		this->draw_line(pos, end_pos, color);
+		this->draw_line(pos, end_pos, color, line_width);
 	}
 
-	void draw_vertical_line(const QPoint &pos, const int height, const QColor &color)
+	void draw_vertical_line(const QPoint &pos, const int height, const QColor &color, const int line_width = 1)
 	{
 		if (height == 0) {
 			return;
@@ -285,7 +288,7 @@ public:
 			end_pos += QPoint(0, height + 1);
 		}
 
-		this->draw_line(pos, end_pos, color);
+		this->draw_line(pos, end_pos, color, line_width);
 	}
 
 private:
