@@ -190,7 +190,7 @@ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos, 
 
 	const int w = (this->GetUnitType().get_box_width() * preferences::get()->get_scale_factor()).to_int();
 	const int h = (this->GetUnitType().get_box_height() * preferences::get()->get_scale_factor()).to_int();
-	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2, render_commands);
+	DrawSelection(ColorGray, ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2, render_commands);
 
 	if (preferences::get()->are_pathlines_enabled()) {
 		Video.FillCircleClip(ColorGreen, lastScreenPos, (2 * preferences::get()->get_scale_factor()).to_int(), render_commands);

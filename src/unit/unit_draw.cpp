@@ -106,7 +106,7 @@ unsigned long ShowNameTime;                  /// Show unit's name for some time
 **  @param x1,y1    Coordinates of the top left corner.
 **  @param x2,y2    Coordinates of the bottom right corner.
 */
-void (*DrawSelection)(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands) = DrawSelectionNone;
+void (*DrawSelection)(IntColor color, IntColor secondary_color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands) = DrawSelectionNone;
 
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
@@ -122,8 +122,6 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 */
 void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	IntColor color;
-
 	//Wyrmgus start
 	const wyrmgus::unit_type &type = *unit.Type;
 	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
@@ -142,12 +140,15 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	
 	// show player color circle below unit if that is activated
 	if (preferences::get()->is_player_color_circle_enabled() && unit.Player->get_index() != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
-		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), x + (type.BoxOffsetX * scale_factor).to_int() + 1, y + (type.BoxOffsetY * scale_factor).to_int() + 1, x + (type.get_box_width() * scale_factor).to_int() + (type.BoxOffsetX * scale_factor).to_int() - 1, y + (type.get_box_height() * scale_factor).to_int() + (type.BoxOffsetY * scale_factor).to_int() - 1, render_commands);
+		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), IntColor(0), x + (type.BoxOffsetX * scale_factor).to_int() + 1, y + (type.BoxOffsetY * scale_factor).to_int() + 1, x + (type.get_box_width() * scale_factor).to_int() + (type.BoxOffsetX * scale_factor).to_int() - 1, y + (type.get_box_height() * scale_factor).to_int() + (type.BoxOffsetY * scale_factor).to_int() - 1, render_commands);
 //		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
 	//Wyrmgus end
 	
 	// FIXME: make these colors customizable with scripts.
+
+	IntColor color = 0;
+	IntColor secondary_color = 0;
 
 	if (CEditor::get()->is_running() && UnitUnderCursor == &unit && CEditor::get()->State == EditorSelecting) {
 		color = ColorWhite;
@@ -157,6 +158,16 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 		} else if ((unit.Selected || (unit.Blink & 1))
 				   && (unit.Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
 			color = ColorGreen;
+
+			if (unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) {
+				if (unit.Variable[HP_INDEX].get_percent_value() < 25) {
+					secondary_color = ColorRed;
+				} else if (unit.Variable[HP_INDEX].get_percent_value() < 50) {
+					secondary_color = ColorOrange;
+				} else if (unit.Variable[HP_INDEX].get_percent_value() < 75) {
+					secondary_color = ColorYellow;
+				}
+			}
 		} else if (CPlayer::GetThisPlayer()->is_enemy_of(unit)) {
 			color = ColorRed;
 		} else {
@@ -177,6 +188,10 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 		return;
 	}
 
+	if (secondary_color == 0) {
+		secondary_color = color;
+	}
+
 	//Wyrmgus start
 	/*
 //	const wyrmgus::unit_type &type = *unit.Type;
@@ -193,7 +208,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	y = screenPos.y - box_size.height() / 2 - (frame_size.height() - sprite_height) / 2;
 	
 //	DrawSelection(color, x + type.BoxOffsetX * scale_factor, y + type.BoxOffsetY * scale_factor, x + type.BoxWidth * scale_factor + type.BoxOffsetX * scale_factor, y + type.BoxHeight * scale_factor + type.BoxOffsetY * scale_factor);
-	DrawSelection(color, x + (type.BoxOffsetX * scale_factor).to_int(), y + (type.BoxOffsetY * scale_factor).to_int(), x + box_size.width() + (type.BoxOffsetX * scale_factor).to_int(), y + box_size.height() + (type.BoxOffsetY * scale_factor).to_int(), render_commands);
+	DrawSelection(color, secondary_color, x + (type.BoxOffsetX * scale_factor).to_int(), y + (type.BoxOffsetY * scale_factor).to_int(), x + box_size.width() + (type.BoxOffsetX * scale_factor).to_int(), y + box_size.height() + (type.BoxOffsetY * scale_factor).to_int(), render_commands);
 	//Wyrmgus end
 }
 
@@ -204,7 +219,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionNone(IntColor, int, int, int, int, std::vector<std::function<void(renderer *)>> &render_commands)
+void DrawSelectionNone(IntColor, IntColor, int, int, int, int, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	Q_UNUSED(render_commands)
 }
@@ -216,8 +231,10 @@ void DrawSelectionNone(IntColor, int, int, int, int, std::vector<std::function<v
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCircle(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
+void DrawSelectionCircle(IntColor color, IntColor secondary_color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
+	Q_UNUSED(secondary_color);
+
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 						 std::min((x2 - x1) / 2, (y2 - y1) / 2) + 2, render_commands);
 }
@@ -229,8 +246,10 @@ void DrawSelectionCircle(IntColor color, int x1, int y1, int x2, int y2, std::ve
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCircleWithTrans(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
+void DrawSelectionCircleWithTrans(IntColor color, IntColor secondary_color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
+	Q_UNUSED(secondary_color);
+
 	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 							  std::min((x2 - x1) / 2, (y2 - y1) / 2), 95, render_commands);
 	//Wyrmgus start
@@ -248,9 +267,37 @@ void DrawSelectionCircleWithTrans(IntColor color, int x1, int y1, int x2, int y2
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionRectangle(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
+void DrawSelectionRectangle(IntColor color, IntColor secondary_color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1, render_commands);
+	if (color == secondary_color) {
+		Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1, render_commands);
+	} else {
+		static constexpr int base_corner_pixels = 6;
+
+		const int corner_pixels = (base_corner_pixels * preferences::get()->get_scale_factor()).to_int();
+
+		Video.DrawVLineClip(color, x1, y1, corner_pixels, render_commands);
+		Video.DrawHLineClip(color, x1 + 1, y1 - 1, corner_pixels - 1, render_commands);
+
+		Video.DrawVLineClip(color, x2, y1, corner_pixels, render_commands);
+		Video.DrawHLineClip(color, x2 - corner_pixels + 1, y1 - 1, corner_pixels - 1, render_commands);
+
+		Video.DrawVLineClip(color, x1, y2 - corner_pixels, corner_pixels, render_commands);
+		Video.DrawHLineClip(color, x1, y2, corner_pixels - 1, render_commands);
+
+		Video.DrawVLineClip(color, x2, y2 - corner_pixels, corner_pixels, render_commands);
+		Video.DrawHLineClip(color, x2 - corner_pixels + 1, y2, corner_pixels - 1, render_commands);
+
+		const int secondary_start_x = x1 + corner_pixels;
+		const int secondary_width = (x2 - corner_pixels) - secondary_start_x;
+		Video.DrawHLineClip(secondary_color, secondary_start_x, y1 - 1, secondary_width, render_commands);
+		Video.DrawHLineClip(secondary_color, secondary_start_x, y2, secondary_width, render_commands);
+
+		const int secondary_start_y = y1 + corner_pixels + 1;
+		const int secondary_height = (y2 - corner_pixels) - secondary_start_y - 1;
+		Video.DrawVLineClip(secondary_color, x1, secondary_start_y, secondary_height, render_commands);
+		Video.DrawVLineClip(secondary_color, x2, secondary_start_y, secondary_height, render_commands);
+	}
 }
 
 /**
@@ -260,8 +307,10 @@ void DrawSelectionRectangle(IntColor color, int x1, int y1, int x2, int y2, std:
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionRectangleWithTrans(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
+void DrawSelectionRectangleWithTrans(IntColor color, IntColor secondary_color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
+	Q_UNUSED(secondary_color);
+
 	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1, render_commands);
 	Video.FillTransRectangleClip(color, x1 + 1, y1 + 1,
 								 x2 - x1 - 2, y2 - y1 - 2, 75, render_commands);
@@ -274,9 +323,11 @@ void DrawSelectionRectangleWithTrans(IntColor color, int x1, int y1, int x2, int
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCorners(IntColor color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
+void DrawSelectionCorners(IntColor color, IntColor secondary_color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	static constexpr int base_corner_pixels = 6;
+
+	Q_UNUSED(secondary_color);
 
 	const int corner_pixels = (base_corner_pixels * preferences::get()->get_scale_factor()).to_int();
 
