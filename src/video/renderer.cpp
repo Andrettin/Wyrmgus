@@ -33,9 +33,16 @@
 #include "video/render_context.h"
 
 #include <QOpenGLFramebufferObjectFormat>
+#include <QOpenGLPaintDevice>
+#include <QPainter>
 #include <QQuickWindow>
 
 namespace wyrmgus {
+
+renderer::renderer(const frame_buffer_object *fbo) : fbo(fbo)
+{
+	this->blitter.create();
+}
 
 renderer::~renderer()
 {
@@ -65,6 +72,36 @@ QSizeF renderer::get_target_sizef() const
 	return this->fbo->size();
 }
 
+void renderer::init_opengl()
+{
+	this->paint_device = std::make_unique<QOpenGLPaintDevice>(this->get_target_size());
+	this->paint_device->setPaintFlipped(true);
+	this->painter = std::make_unique<QPainter>(this->paint_device.get());
+
+	const QSizeF target_sizef = this->get_target_sizef();
+	const QSize target_size = target_sizef.toSize();
+
+	glViewport(0, 0, static_cast<GLsizei>(target_size.width()), static_cast<GLsizei>(target_size.height()));
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glOrtho(0, target_sizef.width(), target_sizef.height(), 0, -1, 1);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glTranslatef(0.375, 0.375, 0.);
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	glClearDepth(1.0f);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	this->setup_native_opengl_state();
+}
+
 void renderer::reset_opengl()
 {
 	this->painter.reset();
@@ -73,12 +110,99 @@ void renderer::reset_opengl()
 	this->fbo->window()->resetOpenGLState();
 }
 
+void renderer::blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pixel_pos, const QSize &frame_size, const bool flip, const unsigned char opacity, const int show_percent, const QSize &rendered_size)
+{
+	this->painter->beginNativePainting();
+	this->setup_native_opengl_state();
+
+	const QSize target_size = this->get_target_size();
+
+	QRect source_rect;
+
+	QSize source_frame_size = frame_size;
+	QSize source_rendered_size = rendered_size;
+	if (show_percent < 100) {
+		source_frame_size = QSize(frame_size.width(), frame_size.height() * show_percent / 100);
+		source_rendered_size = QSize(rendered_size.width(), rendered_size.height() * show_percent / 100);
+	}
+
+	if (flip) {
+		source_rect = QRect(QPoint(frame_pixel_pos.x() + source_frame_size.width(), frame_pixel_pos.y()), QSize(-source_frame_size.width(), source_frame_size.height()));
+	} else {
+		source_rect = QRect(frame_pixel_pos, source_frame_size);
+	}
+
+	const QSize texture_size(texture->width(), texture->height());
+	const QMatrix3x3 source = QOpenGLTextureBlitter::sourceTransform(source_rect, texture_size, QOpenGLTextureBlitter::OriginBottomLeft);
+
+	const QRect target_rect(this->get_mirrored_pos(pos, source_rendered_size), source_rendered_size);
+	const QMatrix4x4 target = QOpenGLTextureBlitter::targetTransform(target_rect, QRect(QPoint(0, 0), target_size));
+
+	this->blitter.bind();
+
+	if (opacity != 255) {
+		this->blitter.setOpacity(opacity / 255.0);
+	}
+
+	this->blitter.blit(texture->textureId(), target, source);
+
+	if (opacity != 255) {
+		this->blitter.setOpacity(1.0);
+	}
+
+	this->blitter.release();
+
+	this->painter->endNativePainting();
+}
+
 void renderer::blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size, const bool flip, const unsigned char opacity, const int show_percent)
 {
 	const int frames_per_row = size.width() / frame_size.width();
 	const QPoint frame_pos = point::from_index(frame_index, frames_per_row);
 	const QPoint frame_pixel_pos(frame_pos.x() * frame_size.width(), frame_pos.y() * frame_size.height());
 	this->blit_texture_frame(texture, pos, frame_pixel_pos, frame_size, flip, opacity, show_percent, frame_size);
+}
+
+void renderer::draw_pixel(const QPoint &pos, const QColor &color)
+{
+	this->painter->beginNativePainting();
+	this->setup_native_opengl_state();
+
+	glDisable(GL_TEXTURE_2D);
+	glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
+
+	const QPoint mirrored_pos = this->get_mirrored_pos(pos, 1);
+
+	glBegin(GL_POINTS);
+	glVertex2i(mirrored_pos.x(), mirrored_pos.y());
+	glEnd();
+
+	glEnable(GL_TEXTURE_2D);
+
+	this->painter->endNativePainting();
+}
+
+void renderer::draw_rect(const QPoint &pos, const QSize &size, const QColor &color, const int line_width)
+{
+	QPen pen(color);
+	pen.setWidth(line_width);
+
+	this->painter->setPen(pen);
+	this->painter->drawRect(QRect(pos, size));
+}
+
+void renderer::fill_rect(const QRect &rect, const QColor &color)
+{
+	this->painter->fillRect(rect, color);
+}
+
+void renderer::draw_line(const QPoint &start_pos, const QPoint &end_pos, const QColor &color, const int line_width)
+{
+	QPen pen(color);
+	pen.setWidth(line_width);
+
+	this->painter->setPen(pen);
+	this->painter->drawLine(start_pos, end_pos);
 }
 
 }
