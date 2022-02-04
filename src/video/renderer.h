@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <QOpenGLPaintDevice>
 #include <QOpenGLTexture>
 #include <QOpenGLTextureBlitter>
 
@@ -68,6 +69,10 @@ public:
 
 	void init_opengl()
 	{
+		this->paint_device = std::make_unique<QOpenGLPaintDevice>(this->get_target_size());
+		this->paint_device->setPaintFlipped(true);
+		this->painter = std::make_unique<QPainter>(this->paint_device.get());
+
 		const QSizeF target_sizef = this->get_target_sizef();
 		const QSize target_size = target_sizef.toSize();
 
@@ -87,12 +92,20 @@ public:
 
 		glClearDepth(1.0f);
 
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		this->setup_native_opengl_state();
+	}
+
+	void reset_opengl();
+
+	void setup_native_opengl_state()
+	{
 		glShadeModel(GL_FLAT);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_LINE_SMOOTH);
 		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
@@ -102,6 +115,9 @@ public:
 
 	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pixel_pos, const QSize &frame_size, const bool flip, const unsigned char opacity, const int show_percent, const QSize &rendered_size)
 	{
+		this->painter->beginNativePainting();
+		this->setup_native_opengl_state();
+
 		const QSize target_size = this->get_target_size();
 
 		QRect source_rect;
@@ -138,6 +154,8 @@ public:
 		}
 
 		this->blitter.release();
+
+		this->painter->endNativePainting();
 	}
 
 	void blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size, const bool flip, const unsigned char opacity, const int show_percent);
@@ -149,6 +167,9 @@ public:
 
 	void draw_pixel(const QPoint &pos, const QColor &color)
 	{
+		this->painter->beginNativePainting();
+		this->setup_native_opengl_state();
+
 		glDisable(GL_TEXTURE_2D);
 		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
 
@@ -159,11 +180,17 @@ public:
 		glEnd();
 
 		glEnable(GL_TEXTURE_2D);
+
+		this->painter->endNativePainting();
 	}
 
 	void draw_rect(const QPoint &pos, const QSize &size, const QColor &color)
 	{
+		this->painter->beginNativePainting();
+		this->setup_native_opengl_state();
+
 		glDisable(GL_TEXTURE_2D);
+
 		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
 
 		const QPoint mirrored_pos = this->get_mirrored_pos(pos, size);
@@ -189,11 +216,17 @@ public:
 		glEnd();
 
 		glEnable(GL_TEXTURE_2D);
+
+		this->painter->endNativePainting();
 	}
 
 	void fill_rect(const QRect &rect, const QColor &color)
 	{
+		this->painter->beginNativePainting();
+		this->setup_native_opengl_state();
+
 		glDisable(GL_TEXTURE_2D);
+
 		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
 
 		const QPoint pos = rect.topLeft();
@@ -208,6 +241,8 @@ public:
 		glEnd();
 
 		glEnable(GL_TEXTURE_2D);
+
+		this->painter->endNativePainting();
 	}
 
 	void fill_rect(const QPoint &pixel_pos, const QSize &size, const QColor &color)
@@ -217,53 +252,47 @@ public:
 
 	void draw_line(const QPoint &start_pos, const QPoint &end_pos, const QColor &color)
 	{
-		glDisable(GL_TEXTURE_2D);
-		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
-
-		const QPoint mirrored_start_pos = this->get_mirrored_pos(start_pos, 0);
-		const QPoint mirrored_end_pos = this->get_mirrored_pos(end_pos, 0);
-
-		glBegin(GL_LINES);
-		glVertex2f(mirrored_start_pos.x(), mirrored_start_pos.y());
-		glVertex2f(mirrored_end_pos.x(), mirrored_end_pos.y());
-		glEnd();
-
-		glEnable(GL_TEXTURE_2D);
+		this->painter->setPen(QPen(color));
+		this->painter->drawLine(start_pos, end_pos);
 	}
 
 	void draw_horizontal_line(const QPoint &pos, const int width, const QColor &color)
 	{
-		glDisable(GL_TEXTURE_2D);
-		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
+		if (width == 0) {
+			return;
+		}
 
-		const QPoint mirrored_pos = this->get_mirrored_pos(pos, 1);
+		QPoint end_pos = pos;
+		if (width > 0) {
+			end_pos += QPoint(width - 1, 0);
+		} else {
+			end_pos += QPoint(width + 1, 0);
+		}
 
-		glBegin(GL_LINES);
-		glVertex2i(mirrored_pos.x(), mirrored_pos.y());
-		glVertex2i(mirrored_pos.x() + width, mirrored_pos.y());
-		glEnd();
-
-		glEnable(GL_TEXTURE_2D);
+		this->draw_line(pos, end_pos, color);
 	}
 
 	void draw_vertical_line(const QPoint &pos, const int height, const QColor &color)
 	{
-		glDisable(GL_TEXTURE_2D);
-		glColor4ub(color.red(), color.green(), color.blue(), color.alpha());
+		if (height == 0) {
+			return;
+		}
 
-		const QPoint mirrored_pos = this->get_mirrored_pos(pos, height);
+		QPoint end_pos = pos;
+		if (height > 0) {
+			end_pos += QPoint(0, height - 1);
+		} else {
+			end_pos += QPoint(0, height + 1);
+		}
 
-		glBegin(GL_LINES);
-		glVertex2i(mirrored_pos.x(), mirrored_pos.y());
-		glVertex2i(mirrored_pos.x(), mirrored_pos.y() + height);
-		glEnd();
-
-		glEnable(GL_TEXTURE_2D);
+		this->draw_line(pos, end_pos, color);
 	}
 
 private:
 	const frame_buffer_object *fbo = nullptr;
 	QOpenGLTextureBlitter blitter;
+	std::unique_ptr<QOpenGLPaintDevice> paint_device;
+	std::unique_ptr<QPainter> painter;
 };
 
 }

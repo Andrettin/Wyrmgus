@@ -57,12 +57,20 @@ void renderer::render()
 	//run the posted OpenGL commands
 	render_context::get()->run(this);
 
-	this->fbo->window()->resetOpenGLState();
+	this->reset_opengl();
 }
 
 QSizeF renderer::get_target_sizef() const
 {
 	return this->fbo->size();
+}
+
+void renderer::reset_opengl()
+{
+	this->painter.reset();
+	this->paint_device.reset();
+
+	this->fbo->window()->resetOpenGLState();
 }
 
 void renderer::blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QSize &size, const int frame_index, const QSize &frame_size, const bool flip, const unsigned char opacity, const int show_percent)
