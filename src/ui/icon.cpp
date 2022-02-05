@@ -37,6 +37,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"
+#include "video/renderer.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -178,9 +179,13 @@ void icon::DrawUnitIcon(const ButtonStyle &style, const unsigned flags, const Pi
 			if (show_percent < 100) {
 				DrawUIButton(&s, flags, pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), text, grayscale, color_modification, true, render_commands);
 			}
+
 			DrawUIButton(&s, flags, pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), text, grayscale, color_modification, transparent, show_percent, render_commands);
+
 			if (border_color.isValid()) {
-				Video.DrawRectangle(CVideo::MapRGB(border_color), pos.x + (1 * scale_factor).to_int(), pos.y + (1 * scale_factor).to_int(), (46 * scale_factor).to_int() - (1 * scale_factor).to_int(), (38 * scale_factor).to_int() - (1 * scale_factor).to_int(), render_commands);
+				render_commands.push_back([pos, border_color, scale_factor](renderer *renderer) {
+					renderer->draw_rect(pos + QPoint((1 * scale_factor).to_int(), (1 * scale_factor).to_int()), defines::get()->get_scaled_icon_size() - QSize((1 * scale_factor).to_int(), (1 * scale_factor).to_int()), CVideo::MapRGB(border_color));
+				});
 			}
 
 			if (defines::get()->get_command_button_frame_graphics() == nullptr || !(flags & IconCommandButton)) {
@@ -195,7 +200,9 @@ void icon::DrawUnitIcon(const ButtonStyle &style, const unsigned flags, const Pi
 			DrawUIButton(&s, flags, pos.x, pos.y, text, grayscale, color_modification, transparent, show_percent, render_commands);
 
 			if (border_color.isValid()) {
-				Video.DrawRectangle(CVideo::MapRGB(border_color), pos.x, pos.y, (46 * scale_factor).to_int(), (38 * scale_factor).to_int(), render_commands);
+				render_commands.push_back([pos, border_color](renderer *renderer) {
+					renderer->draw_rect(pos, defines::get()->get_scaled_icon_size(), CVideo::MapRGB(border_color));
+				});
 			}
 
 			if (defines::get()->get_command_button_frame_graphics() != nullptr && (flags & IconCommandButton)) {

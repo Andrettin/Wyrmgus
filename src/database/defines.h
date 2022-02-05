@@ -191,6 +191,11 @@ public:
 		return this->icon_size;
 	}
 
+	QSize get_scaled_icon_size() const
+	{
+		return this->get_icon_size() * this->get_scale_factor();
+	}
+
 	const QSize &get_resource_icon_size() const
 	{
 		return this->resource_icon_size;
