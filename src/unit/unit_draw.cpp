@@ -150,11 +150,11 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 			color = ColorGreen;
 
 			if (unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) {
-				if (unit.Variable[HP_INDEX].get_percent_value() < 25) {
+				if (unit.Variable[HP_INDEX].get_percent_value() <= 25) {
 					secondary_color = ColorRed;
-				} else if (unit.Variable[HP_INDEX].get_percent_value() < 50) {
+				} else if (unit.Variable[HP_INDEX].get_percent_value() <= 50) {
 					secondary_color = ColorOrange;
-				} else if (unit.Variable[HP_INDEX].get_percent_value() < 75) {
+				} else if (unit.Variable[HP_INDEX].get_percent_value() <= 75) {
 					secondary_color = ColorYellow;
 				}
 			}
