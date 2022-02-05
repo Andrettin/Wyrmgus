@@ -734,11 +734,11 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 		CUnit &unit = *table[i];
 		const wyrmgus::unit_type &type = *unit.Type;
 		QPoint sprite_pos = unit.get_scaled_map_pixel_pos_center();
-		sprite_pos += type.get_offset() * scale_factor - (size::to_point(type.get_box_size() * scale_factor) + QPoint(type.BoxOffsetX, type.BoxOffsetY) * scale_factor) / 2;
+		sprite_pos += type.get_offset() * scale_factor - (size::to_point(type.get_box_size() * scale_factor) + type.get_box_offset() * scale_factor) / 2;
 
-		if (sprite_pos.x() + (type.get_box_width() * scale_factor).to_int() + (type.BoxOffsetX * scale_factor).to_int() < corner_topleft.x
+		if (sprite_pos.x() + (type.get_box_width() * scale_factor).to_int() + (type.get_box_offset().x() * scale_factor).to_int() < corner_topleft.x
 			|| sprite_pos.x() > corner_bottomright.x
-			|| sprite_pos.y() + (type.get_box_height() * scale_factor).to_int() + (type.BoxOffsetY * scale_factor).to_int() < corner_topleft.y
+			|| sprite_pos.y() + (type.get_box_height() * scale_factor).to_int() + (type.get_box_offset().y() * scale_factor).to_int() < corner_topleft.y
 			|| sprite_pos.y() > corner_bottomright.y) {
 			continue;
 		}

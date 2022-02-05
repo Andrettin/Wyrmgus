@@ -5653,7 +5653,7 @@ CUnit *UnitOnScreen(int x, int y)
 		const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
 		unit_sprite_pos -= size::to_point(type.get_box_size()) * scale_factor / 2;
-		unit_sprite_pos += QPoint(type.BoxOffsetX, type.BoxOffsetY) * scale_factor;
+		unit_sprite_pos += type.get_box_offset() * scale_factor;
 
 		if (x >= unit_sprite_pos.x() && x < (unit_sprite_pos.x() + (type.get_box_width() * scale_factor).to_int())
 			&& y >= unit_sprite_pos.y() && y < (unit_sprite_pos.y() + (type.get_box_height() * scale_factor).to_int())) {

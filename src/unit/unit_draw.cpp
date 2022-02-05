@@ -141,8 +141,8 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	
 	// show player color circle below unit if that is activated
 	if (preferences::get()->is_player_color_circle_enabled() && unit.Player->get_index() != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
-		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), IntColor(0), x + (type.BoxOffsetX * scale_factor).to_int() + 1, y + (type.BoxOffsetY * scale_factor).to_int() + 1, x + (type.get_box_width() * scale_factor).to_int() + (type.BoxOffsetX * scale_factor).to_int() - 1, y + (type.get_box_height() * scale_factor).to_int() + (type.BoxOffsetY * scale_factor).to_int() - 1, render_commands);
-//		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
+		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), IntColor(0), x + (type.get_box_offset().x() * scale_factor).to_int() + 1, y + (type.get_box_offset().y() * scale_factor).to_int() + 1, x + (type.get_box_width() * scale_factor).to_int() + (type.get_box_offset().x() * scale_factor).to_int() - 1, y + (type.get_box_height() * scale_factor).to_int() + (type.get_box_offset().y() * scale_factor).to_int() - 1, render_commands);
+//		DrawSelectionRectangle(unit.Player->Color, x + type.get_box_offset().x(), y + type.get_box_offset().y(), x + type.BoxWidth + type.get_box_offset().x() + 1, y + type.BoxHeight + type.get_box_offset().y() + 1);
 	}
 	//Wyrmgus end
 	
@@ -208,8 +208,8 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	x = screenPos.x - box_size.width() / 2 - (frame_size.width() - sprite_width) / 2;
 	y = screenPos.y - box_size.height() / 2 - (frame_size.height() - sprite_height) / 2;
 	
-//	DrawSelection(color, x + type.BoxOffsetX * scale_factor, y + type.BoxOffsetY * scale_factor, x + type.BoxWidth * scale_factor + type.BoxOffsetX * scale_factor, y + type.BoxHeight * scale_factor + type.BoxOffsetY * scale_factor);
-	DrawSelection(color, secondary_color, x + (type.BoxOffsetX * scale_factor).to_int(), y + (type.BoxOffsetY * scale_factor).to_int(), x + box_size.width() + (type.BoxOffsetX * scale_factor).to_int(), y + box_size.height() + (type.BoxOffsetY * scale_factor).to_int(), render_commands);
+//	DrawSelection(color, x + type.get_box_offset().x() * scale_factor, y + type.get_box_offset().y() * scale_factor, x + type.BoxWidth * scale_factor + type.get_box_offset().x() * scale_factor, y + type.BoxHeight * scale_factor + type.get_box_offset().y() * scale_factor);
+	DrawSelection(color, secondary_color, x + (type.get_box_offset().x() * scale_factor).to_int(), y + (type.get_box_offset().y() * scale_factor).to_int(), x + box_size.width() + (type.get_box_offset().x() * scale_factor).to_int(), y + box_size.height() + (type.get_box_offset().y() * scale_factor).to_int(), render_commands);
 	//Wyrmgus end
 }
 

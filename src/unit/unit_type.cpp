@@ -1842,8 +1842,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->LightFile = parent_type->LightFile;
 	this->tile_size = parent_type->tile_size;
 	this->box_size = parent_type->box_size;
-	this->BoxOffsetX = parent_type->BoxOffsetX;
-	this->BoxOffsetY = parent_type->BoxOffsetY;
+	this->box_offset = parent_type->box_offset;
 	this->construction = parent_type->construction;
 	this->domain = parent_type->domain;
 	this->Missile.Name = parent_type->Missile.Name;

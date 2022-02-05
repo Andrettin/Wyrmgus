@@ -774,6 +774,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
 	Q_PROPERTY(QSize box_size MEMBER box_size READ get_box_size)
+	Q_PROPERTY(QPoint box_offset MEMBER box_offset READ get_box_offset)
 	Q_PROPERTY(std::filesystem::path image_file MEMBER image_file WRITE set_image_file)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(QPoint offset MEMBER offset READ get_offset)
@@ -972,6 +973,11 @@ public:
 	int get_box_height() const
 	{
 		return this->get_box_size().height();
+	}
+
+	const QPoint &get_box_offset() const
+	{
+		return this->box_offset;
 	}
 
 	const std::filesystem::path &get_image_file() const
@@ -1373,10 +1379,7 @@ private:
 private:
 	QSize tile_size = QSize(0, 0);
 	QSize box_size = QSize(0, 0);
-public:
-	int BoxOffsetX = 0;				/// Selected box size horizontal offset
-	int BoxOffsetY = 0;				/// Selected box size vertical offset
-private:
+	QPoint box_offset = QPoint(0, 0);
 	int num_directions = 0;			/// Number of directions unit can face
 public:
 	int MinAttackRange = 0;			/// Minimal attack range

@@ -1109,7 +1109,9 @@ static int CclDefineUnitType(lua_State *l)
 			CclGetPos(l, &box_size.x, &box_size.y);
 			type->box_size = box_size;
 		} else if (!strcmp(value, "BoxOffset")) {
-			CclGetPos(l, &type->BoxOffsetX, &type->BoxOffsetY);
+			Vec2i box_offset;
+			CclGetPos(l, &box_offset.x, &box_offset.y);
+			type->box_offset = box_offset;
 		} else if (!strcmp(value, "NumDirections")) {
 			type->num_directions = LuaToNumber(l, -1);
 		//Wyrmgus start
