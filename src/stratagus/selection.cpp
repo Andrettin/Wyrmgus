@@ -741,6 +741,10 @@ static void SelectSpritesInsideRectangle(const QPoint &corner_top_left, const QP
 			continue;
 		}
 
+		if (!unit.IsVisible(*CPlayer::GetThisPlayer())) {
+			continue;
+		}
+
 		table[n++] = &unit;
 	}
 
@@ -971,20 +975,25 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 			continue;
 		}
+
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
+
 		if (unit.Type->get_domain() == unit_domain::air || unit.Type->get_domain() == unit_domain::space) {
 			continue;
 		}
+
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
+
 		//Wyrmgus start
 		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
 		//Wyrmgus end
+
 		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;
