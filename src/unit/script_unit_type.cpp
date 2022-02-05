@@ -2576,6 +2576,7 @@ static int CclDefineDecorations(lua_State *l)
 		std::optional<wyrmgus::status_effect> status_effect;
 		bool show_as_status_effect = false;
 		bool hero_symbol = false;
+		bool hp_bar = false;
 		bool resource_bar = false;
 	} tmp;
 
@@ -2631,6 +2632,8 @@ static int CclDefineDecorations(lua_State *l)
 				tmp.show_as_status_effect = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "HeroSymbol")) {
 				tmp.hero_symbol = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "HPBar")) {
+				tmp.hp_bar = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ResourceBar")) {
 				tmp.resource_bar = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "Method")) {
@@ -2735,6 +2738,7 @@ static int CclDefineDecorations(lua_State *l)
 		decovar->status_effect = tmp.status_effect;
 		decovar->show_as_status_effect = tmp.show_as_status_effect;
 		decovar->hero_symbol = tmp.hero_symbol;
+		decovar->hp_bar = tmp.hp_bar;
 		decovar->resource_bar = tmp.resource_bar;
 
 		//Wyrmgus start

@@ -59,6 +59,7 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(bool hero_symbol MEMBER hero_symbol READ is_hero_symbol_enabled NOTIFY changed)
 	Q_PROPERTY(bool pathlines MEMBER pathlines READ are_pathlines_enabled NOTIFY changed)
 	Q_PROPERTY(bool player_color_circle MEMBER player_color_circle READ is_player_color_circle_enabled NOTIFY changed)
+	Q_PROPERTY(bool hp_bar MEMBER hp_bar READ is_hp_bar_enabled NOTIFY changed)
 	Q_PROPERTY(bool resource_bar MEMBER resource_bar READ is_resource_bar_enabled NOTIFY changed)
 	Q_PROPERTY(bool show_hotkeys MEMBER show_hotkeys READ is_show_hotkeys_enabled NOTIFY changed)
 	Q_PROPERTY(bool show_messages MEMBER show_messages READ is_show_messages_enabled NOTIFY changed)
@@ -319,6 +320,11 @@ public:
 		return this->player_color_circle;
 	}
 
+	bool is_hp_bar_enabled() const
+	{
+		return this->hp_bar;
+	}
+
 	bool is_resource_bar_enabled() const
 	{
 		return this->resource_bar;
@@ -409,6 +415,7 @@ private:
 	bool hero_symbol = false;
 	bool pathlines = false;
 	bool player_color_circle = false;
+	bool hp_bar = false;
 	bool resource_bar = false;
 	bool show_hotkeys = true;
 	bool show_messages = true;

@@ -634,6 +634,7 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 //			|| max == 0)) {
 			|| (var.ShowIfCanCastAnySpell && !unit.CanCastAnySpell())
 			|| (var.hero_symbol && !preferences::get()->is_hero_symbol_enabled())
+			|| (var.hp_bar && !preferences::get()->is_hp_bar_enabled())
 			|| (var.resource_bar && !preferences::get()->is_resource_bar_enabled())
 			|| max == 0 || max < var.MinValue
 		) {

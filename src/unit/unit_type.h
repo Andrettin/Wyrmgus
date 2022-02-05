@@ -461,6 +461,7 @@ public:
 	std::optional<wyrmgus::status_effect> status_effect;
 	bool show_as_status_effect = false;
 	bool hero_symbol = false;
+	bool hp_bar = false;
 	bool resource_bar = false;
 };
 

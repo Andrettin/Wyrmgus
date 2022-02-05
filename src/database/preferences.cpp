@@ -111,6 +111,7 @@ void preferences::save() const
 	data.add_property("hero_symbol", string::from_bool(this->is_hero_symbol_enabled()));
 	data.add_property("pathlines", string::from_bool(this->are_pathlines_enabled()));
 	data.add_property("player_color_circle", string::from_bool(this->is_player_color_circle_enabled()));
+	data.add_property("hp_bar", string::from_bool(this->is_hp_bar_enabled()));
 	data.add_property("resource_bar", string::from_bool(this->is_resource_bar_enabled()));
 	data.add_property("show_hotkeys", string::from_bool(this->is_show_hotkeys_enabled()));
 	data.add_property("show_messages", string::from_bool(this->is_show_messages_enabled()));
