@@ -224,10 +224,7 @@ void UpdateDisplay()
 		//Wyrmgus end
 
 		for (size_t i = 0; i < UI.Fillers.size(); ++i) {
-			UI.Fillers[i].G->DrawSubClip(0, 0,
-				UI.Fillers[i].G->Width,
-				UI.Fillers[i].G->Height,
-				UI.Fillers[i].X, UI.Fillers[i].Y, render_commands);
+			UI.Fillers[i].G->render(QPoint(UI.Fillers[i].X, UI.Fillers[i].Y), render_commands);
 		}
 
 		DrawUserDefinedButtons(render_commands);
