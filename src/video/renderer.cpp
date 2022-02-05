@@ -207,7 +207,7 @@ void renderer::draw_line(const QPoint &start_pos, const QPoint &end_pos, const Q
 	pen.setWidthF(line_width);
 
 	this->painter->setPen(pen);
-	this->painter->drawLine(start_pos, end_pos);
+	this->painter->drawLine(start_pos + QPoint(1, 1), end_pos + QPoint(1, 1));
 }
 
 }
