@@ -312,19 +312,20 @@ void DrawSelectionCorners(const IntColor int_color, const IntColor secondary_int
 	const QColor color = Video.GetRGBA(int_color);
 
 	render_commands.push_back([color, x1, y1, x2, y2](renderer *renderer) {
+		const double line_width = (1 * preferences::get()->get_scale_factor()).to_double();
 		const int corner_pixels = (base_corner_pixels * preferences::get()->get_scale_factor()).to_int();
 
-		renderer->draw_vertical_line(QPoint(x1, y1), corner_pixels, color);
-		renderer->draw_horizontal_line(QPoint(x1, y1), corner_pixels, color);
+		renderer->draw_vertical_line(QPoint(x1, y1), corner_pixels, color, line_width);
+		renderer->draw_horizontal_line(QPoint(x1, y1), corner_pixels, color, line_width);
 
-		renderer->draw_vertical_line(QPoint(x2, y1), corner_pixels, color);
-		renderer->draw_horizontal_line(QPoint(x2, y1), -corner_pixels, color);
+		renderer->draw_vertical_line(QPoint(x2, y1), corner_pixels, color, line_width);
+		renderer->draw_horizontal_line(QPoint(x2, y1), -corner_pixels, color, line_width);
 
-		renderer->draw_vertical_line(QPoint(x1, y2), -corner_pixels, color);
-		renderer->draw_horizontal_line(QPoint(x1, y2), corner_pixels, color);
+		renderer->draw_vertical_line(QPoint(x1, y2), -corner_pixels, color, line_width);
+		renderer->draw_horizontal_line(QPoint(x1, y2), corner_pixels, color, line_width);
 
-		renderer->draw_vertical_line(QPoint(x2, y2), -corner_pixels, color);
-		renderer->draw_horizontal_line(QPoint(x2, y2), -corner_pixels, color);
+		renderer->draw_vertical_line(QPoint(x2, y2), -corner_pixels, color, line_width);
+		renderer->draw_horizontal_line(QPoint(x2, y2), -corner_pixels, color, line_width);
 	});
 }
 
