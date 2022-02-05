@@ -88,6 +88,7 @@
 #include "upgrade/upgrade.h"
 #include "video/font.h"
 #include "video/font_color.h"
+#include "video/renderer.h"
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------
@@ -1617,8 +1618,13 @@ static void InfoPanel_draw_no_selection(std::vector<std::function<void(renderer 
 				label.SetNormalColor(defines::get()->get_default_font_color());
 			}
 
-			Video.DrawRectangleClip(ColorWhite, x, y, (12 * scale_factor).to_int(), (12 * scale_factor).to_int(), render_commands);
-			Video.FillRectangleClip(CVideo::MapRGB(player->get_minimap_color()), x + 1, y + 1, (12 * scale_factor).to_int() - 2, (12 * scale_factor).to_int() - 2, render_commands);
+			const QColor rect_color = player->get_minimap_color();
+
+			render_commands.push_back([x, y, scale_factor, rect_color](renderer *renderer) {
+				renderer->draw_rect(QPoint(x, y), QSize((12 * scale_factor).to_int(), (12 * scale_factor).to_int()), Video.GetRGBA(ColorWhite));
+
+				renderer->fill_rect(QPoint(x + 1, y + 1), QSize((12 * scale_factor).to_int() - 2, (12 * scale_factor).to_int() - 2), rect_color);
+			});
 
 			label.Draw(x + (15 * scale_factor).to_int(), y, _(player->get_name().c_str()), render_commands);
 			y += (14 * scale_factor).to_int();
