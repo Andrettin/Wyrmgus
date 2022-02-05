@@ -62,6 +62,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
+#include "util/size_util.h"
 #include "video/video.h"
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, const landmass *landmass, const wyrmgus::site *settlement);
@@ -185,20 +186,20 @@ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos, 
 	}
 	//Wyrmgus end
 
-	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
-	targetPos += PixelPos(this->GetUnitType().get_tile_size() - QSize(1, 1)) * wyrmgus::defines::get()->get_scaled_tile_size() / 2;
+	const QSize box_size = this->GetUnitType().get_box_size() * preferences::get()->get_scale_factor();
+	const QPoint box_offset = this->GetUnitType().get_box_offset() * preferences::get()->get_scale_factor();
+	const QPoint target_center_pos = vp.TilePosToScreen_TopLeft(this->goalPos) + this->GetUnitType().get_scaled_half_tile_pixel_size();
+	const QPoint target_pos = target_center_pos + box_offset - size::to_point(box_size / 2);
 
-	const int w = (this->GetUnitType().get_box_width() * preferences::get()->get_scale_factor()).to_int();
-	const int h = (this->GetUnitType().get_box_height() * preferences::get()->get_scale_factor()).to_int();
-	DrawSelection(ColorGray, ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2, render_commands);
+	DrawSelection(ColorGray, ColorGray, target_pos.x(), target_pos.y(), target_pos.x() + box_size.width() - 1, target_pos.y() + box_size.height() - 1, render_commands);
 
 	if (preferences::get()->are_pathlines_enabled()) {
 		Video.FillCircleClip(ColorGreen, lastScreenPos, (2 * preferences::get()->get_scale_factor()).to_int(), render_commands);
-		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos, render_commands);
-		Video.FillCircleClip(ColorGreen, targetPos, (3 * preferences::get()->get_scale_factor()).to_int(), render_commands);
+		Video.DrawLineClip(ColorGreen, lastScreenPos, target_center_pos, render_commands);
+		Video.FillCircleClip(ColorGreen, target_center_pos, (3 * preferences::get()->get_scale_factor()).to_int(), render_commands);
 	}
 
-	return targetPos;
+	return target_center_pos;
 }
 
 void COrder_Build::UpdatePathFinderData(PathFinderInput &input)
