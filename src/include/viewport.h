@@ -37,6 +37,7 @@ namespace wyrmgus {
 	class season;
 	class tile;
 	class time_of_day;
+	class unit_type;
 }
 
 /**
@@ -90,6 +91,8 @@ public:
 
 	const time_of_day *get_center_tile_time_of_day() const;
 	const season *get_center_tile_season() const;
+
+	QRect get_unit_type_box_rect(const unit_type *unit_type, const QPoint &tile_pos) const;
 
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const Vec2i &tilePos, const PixelDiff &offset);

@@ -187,6 +187,16 @@ const season *CViewport::get_center_tile_season() const
 	return UI.CurrentMapLayer->get_tile_season(tile_pos);
 }
 
+QRect CViewport::get_unit_type_box_rect(const unit_type *unit_type, const QPoint &tile_pos) const
+{
+	const QSize box_size = unit_type->get_box_size() * preferences::get()->get_scale_factor();
+	const QPoint box_offset = unit_type->get_box_offset() * preferences::get()->get_scale_factor();
+	const QPoint target_center_pos = this->TilePosToScreen_TopLeft(tile_pos) + unit_type->get_scaled_half_tile_pixel_size();
+	const QPoint target_pos = target_center_pos + box_offset - size::to_point(box_size / 2);
+
+	return QRect(target_pos, box_size);
+}
+
 /**
 **  Change viewpoint of map viewport v to tilePos.
 **
