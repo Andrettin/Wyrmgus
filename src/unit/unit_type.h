@@ -980,6 +980,8 @@ public:
 		return this->box_offset;
 	}
 
+	QRect get_scaled_box_rect(const QPoint &center_pixel_pos) const;
+
 	const std::filesystem::path &get_image_file() const
 	{
 		return this->image_file;

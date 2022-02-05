@@ -186,10 +186,10 @@ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos, 
 	}
 	//Wyrmgus end
 
-	const QRect box = vp.get_unit_type_box_rect(&this->GetUnitType(), this->goalPos);
+	const QRect box_rect = vp.get_unit_type_box_rect(&this->GetUnitType(), this->goalPos);
 	const QPoint target_center_pos = vp.TilePosToScreen_TopLeft(this->goalPos) + this->GetUnitType().get_scaled_half_tile_pixel_size();
 
-	DrawSelection(ColorGray, ColorGray, box.x(), box.y(), box.right(), box.bottom(), render_commands);
+	DrawSelection(ColorGray, ColorGray, box_rect.x(), box_rect.y(), box_rect.right(), box_rect.bottom(), render_commands);
 
 	if (preferences::get()->are_pathlines_enabled()) {
 		Video.FillCircleClip(ColorGreen, lastScreenPos, (2 * preferences::get()->get_scale_factor()).to_int(), render_commands);

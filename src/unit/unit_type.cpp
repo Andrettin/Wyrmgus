@@ -1725,6 +1725,15 @@ QPoint unit_type::get_tile_center_pos_offset() const
 	return (size::to_point(this->get_tile_size()) - QPoint(1, 1)) / 2;
 }
 
+QRect unit_type::get_scaled_box_rect(const QPoint &center_pixel_pos) const
+{
+	const QSize box_size = this->get_box_size() * preferences::get()->get_scale_factor();
+	const QPoint box_offset = this->get_box_offset() * preferences::get()->get_scale_factor();
+	const QPoint box_pos = center_pixel_pos + box_offset - size::to_point(box_size / 2);
+
+	return QRect(box_pos, box_size);
+}
+
 void unit_type::set_image_file(const std::filesystem::path &filepath)
 {
 	if (filepath == this->get_image_file()) {

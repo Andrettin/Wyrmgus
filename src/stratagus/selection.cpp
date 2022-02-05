@@ -724,26 +724,26 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
 **
 **  @return           number of units found
 */
-static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright,
+static void SelectSpritesInsideRectangle(const QPoint &corner_top_left, const QPoint &corner_bottom_right,
 										 std::vector<CUnit *> &table)
 {
 	int n = 0;
-	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
+
+	const QRect rect(corner_top_left, corner_bottom_right);
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
-		const wyrmgus::unit_type &type = *unit.Type;
-		QPoint sprite_pos = unit.get_scaled_map_pixel_pos_center();
-		sprite_pos += type.get_offset() * scale_factor - (size::to_point(type.get_box_size() * scale_factor) + type.get_box_offset() * scale_factor) / 2;
 
-		if (sprite_pos.x() + (type.get_box_width() * scale_factor).to_int() + (type.get_box_offset().x() * scale_factor).to_int() < corner_topleft.x
-			|| sprite_pos.x() > corner_bottomright.x
-			|| sprite_pos.y() + (type.get_box_height() * scale_factor).to_int() + (type.get_box_offset().y() * scale_factor).to_int() < corner_topleft.y
-			|| sprite_pos.y() > corner_bottomright.y) {
+		const QPoint unit_center_pos = unit.get_scaled_map_pixel_pos_center();
+		const QRect box_rect = unit.Type->get_scaled_box_rect(unit_center_pos);
+
+		if (!box_rect.intersects(rect)) {
 			continue;
 		}
+
 		table[n++] = &unit;
 	}
+
 	table.resize(n);
 }
 

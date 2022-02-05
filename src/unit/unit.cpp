@@ -5706,7 +5706,7 @@ CUnit *UnitOnScreen(int x, int y)
 
 PixelPos CUnit::get_map_pixel_pos_top_left() const
 {
-	const PixelPos pos(tilePos.x * defines::get()->get_tile_width() + this->get_pixel_offset().x(), tilePos.y * defines::get()->get_tile_height() + this->get_pixel_offset().y());
+	PixelPos pos(this->tilePos.x * defines::get()->get_tile_width() + this->get_pixel_offset().x(), this->tilePos.y * defines::get()->get_tile_height() + this->get_pixel_offset().y());
 	return pos;
 }
 

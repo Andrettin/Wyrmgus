@@ -123,28 +123,17 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 */
 void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	//Wyrmgus start
-	const wyrmgus::unit_type &type = *unit.Type;
-	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
-	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
-	QSize frame_size = type.get_frame_size() * scale_factor;
-	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
-	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
-	const wyrmgus::unit_type_variation *variation = unit.GetVariation();
-	if (variation != nullptr && variation->get_frame_size() != QSize(0, 0)) {
-		frame_size = variation->get_frame_size() * scale_factor;
-		sprite_width = (variation->Sprite ? variation->Sprite->Width : 0);
-		sprite_height = (variation->Sprite ? variation->Sprite->Height : 0);
-	}
-	int x = screenPos.x - (type.get_box_width() * scale_factor).to_int() / 2 - (frame_size.width() - sprite_width) / 2;
-	int y = screenPos.y - (type.get_box_height() * scale_factor).to_int() / 2 - (frame_size.height() - sprite_height) / 2;
-	
+	const QPoint unit_screen_center_pos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
+	const QRect box_rect = unit.Type->get_scaled_box_rect(unit_screen_center_pos);
+
 	// show player color circle below unit if that is activated
 	if (preferences::get()->is_player_color_circle_enabled() && unit.Player->get_index() != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
-		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), IntColor(0), x + (type.get_box_offset().x() * scale_factor).to_int() + 1, y + (type.get_box_offset().y() * scale_factor).to_int() + 1, x + (type.get_box_width() * scale_factor).to_int() + (type.get_box_offset().x() * scale_factor).to_int() - 1, y + (type.get_box_height() * scale_factor).to_int() + (type.get_box_offset().y() * scale_factor).to_int() - 1, render_commands);
-//		DrawSelectionRectangle(unit.Player->Color, x + type.get_box_offset().x(), y + type.get_box_offset().y(), x + type.BoxWidth + type.get_box_offset().x() + 1, y + type.BoxHeight + type.get_box_offset().y() + 1);
+		const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
+		const QPoint player_color_circle_offset = QPoint(1, 1) * scale_factor;
+		const QRect player_color_circle_rect(box_rect.topLeft() + player_color_circle_offset, box_rect.bottomRight() - player_color_circle_offset);
+
+		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), IntColor(0), player_color_circle_rect.x(), player_color_circle_rect.y(), player_color_circle_rect.right(), player_color_circle_rect.bottom(), render_commands);
 	}
-	//Wyrmgus end
 	
 	// FIXME: make these colors customizable with scripts.
 
@@ -193,24 +182,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 		secondary_color = color;
 	}
 
-	//Wyrmgus start
-	/*
-//	const wyrmgus::unit_type &type = *unit.Type;
-//	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
-//	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - (type.Sprite ? type.Sprite->Width : 0)) / 2;
-//	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - (type.Sprite ? type.Sprite->Height : 0)) / 2;
-	*/
-	//Wyrmgus end
-
-	//Wyrmgus start
-	const QSize box_size = type.get_box_size() * scale_factor;
-
-	x = screenPos.x - box_size.width() / 2 - (frame_size.width() - sprite_width) / 2;
-	y = screenPos.y - box_size.height() / 2 - (frame_size.height() - sprite_height) / 2;
-	
-//	DrawSelection(color, x + type.get_box_offset().x() * scale_factor, y + type.get_box_offset().y() * scale_factor, x + type.BoxWidth * scale_factor + type.get_box_offset().x() * scale_factor, y + type.BoxHeight * scale_factor + type.get_box_offset().y() * scale_factor);
-	DrawSelection(color, secondary_color, x + (type.get_box_offset().x() * scale_factor).to_int(), y + (type.get_box_offset().y() * scale_factor).to_int(), x + box_size.width() + (type.get_box_offset().x() * scale_factor).to_int(), y + box_size.height() + (type.get_box_offset().y() * scale_factor).to_int(), render_commands);
-	//Wyrmgus end
+	DrawSelection(color, secondary_color, box_rect.x(), box_rect.y(), box_rect.right(), box_rect.bottom(), render_commands);
 }
 
 /**
