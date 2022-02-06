@@ -101,7 +101,6 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::button_level* cancel_button_level MEMBER cancel_button_level READ get_cancel_button_level)
 	Q_PROPERTY(wyrmgus::unit_class* town_hall_class MEMBER town_hall_class READ get_town_hall_class)
 	Q_PROPERTY(bool population_enabled MEMBER population_enabled READ is_population_enabled)
-	Q_PROPERTY(int population_growth_per_food MEMBER population_growth_per_food READ get_population_growth_per_food)
 	Q_PROPERTY(wyrmgus::resource_icon* population_resource_icon MEMBER population_resource_icon)
 	Q_PROPERTY(wyrmgus::population_class* default_population_class MEMBER default_population_class)
 	Q_PROPERTY(wyrmgus::unit_class* default_population_unit_class MEMBER default_population_unit_class)
@@ -364,11 +363,6 @@ public:
 		return this->population_enabled;
 	}
 
-	int get_population_growth_per_food() const
-	{
-		return this->population_growth_per_food;
-	}
-
 	const resource_icon *get_population_resource_icon() const
 	{
 		return this->population_resource_icon;
@@ -537,7 +531,6 @@ private:
 	button_level *cancel_button_level = nullptr;
 	unit_class *town_hall_class = nullptr;
 	bool population_enabled = false;
-	int population_growth_per_food = 100;
 	resource_icon *population_resource_icon = nullptr;
 	population_class *default_population_class = nullptr;
 	unit_class *default_population_unit_class = nullptr;

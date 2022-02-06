@@ -46,6 +46,9 @@ public:
 	static constexpr int64_t capacity_growth_divisor = 10;
 	static constexpr int64_t min_base_growth = 1000; //minimum base growth (used if capacity / capacity_growth_divisor is lower than this; still subject to be reduced further by other factors)
 
+	static int64_t calculate_growth_quantity(const int64_t capacity, const int64_t current_population, const bool limit_to_population);
+	static int64_t calculate_population_growth_quantity(const int64_t population_growth_capacity, const int64_t current_population);
+
 	static bool compare(const population_unit *lhs, const population_unit *rhs);
 	
 	population_unit()
@@ -105,7 +108,20 @@ public:
 		this->set_population(this->get_population() + change);
 	}
 
-	int64_t calculate_promotion_quantity(const int64_t promotion_capacity) const;
+	int64_t calculate_growth_quantity(const int64_t capacity, const bool limit_to_population) const
+	{
+		return population_unit::calculate_growth_quantity(capacity, this->get_population(), limit_to_population);
+	}
+
+	int64_t calculate_population_growth_quantity(const int64_t population_growth_capacity) const
+	{
+		return population_unit::calculate_population_growth_quantity(population_growth_capacity, this->get_population());
+	}
+
+	int64_t calculate_promotion_quantity(const int64_t promotion_capacity) const
+	{
+		return this->calculate_growth_quantity(promotion_capacity, true);
+	}
 
 signals:
 	void population_changed();

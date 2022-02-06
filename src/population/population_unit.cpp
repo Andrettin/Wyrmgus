@@ -35,10 +35,32 @@
 #include "population/population_type.h"
 #include "population/population_unit_key.h"
 #include "util/assert_util.h"
+#include "util/number_util.h"
 #include "util/random.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+int64_t population_unit::calculate_growth_quantity(const int64_t capacity, const int64_t current_population, const bool limit_to_population)
+{
+	int64_t quantity = std::max(capacity / population_unit::capacity_growth_divisor, population_unit::min_base_growth);
+	quantity = std::min(quantity, capacity);
+	if (limit_to_population) {
+		quantity = std::min(quantity, current_population);
+	}
+	quantity = random::get()->generate_in_range<int64_t>(1, quantity);
+	return quantity;
+}
+
+int64_t population_unit::calculate_population_growth_quantity(const int64_t population_growth_capacity, const int64_t current_population)
+{
+	const int64_t sign = number::sign(population_growth_capacity);
+	const bool limit_to_population = population_growth_capacity < 0;
+
+	const int64_t quantity = population_unit::calculate_growth_quantity(std::abs(population_growth_capacity), current_population, limit_to_population) * sign;
+	return quantity;
+}
+
 
 bool population_unit::compare(const population_unit *lhs, const population_unit *rhs)
 {
@@ -132,15 +154,6 @@ void population_unit::set_population(const int64_t population)
 	this->population = population;
 
 	emit population_changed();
-}
-
-int64_t population_unit::calculate_promotion_quantity(const int64_t promotion_capacity) const
-{
-	int64_t quantity = std::max(promotion_capacity / population_unit::capacity_growth_divisor, population_unit::min_base_growth);
-	quantity = std::min(quantity, promotion_capacity);
-	quantity = std::min(quantity, this->get_population());
-	quantity = random::get()->generate_in_range<int64_t>(1, quantity);
-	return quantity;
 }
 
 }

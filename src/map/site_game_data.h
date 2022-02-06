@@ -262,7 +262,7 @@ public:
 	}
 
 	void do_population_growth();
-	void apply_population_growth(const int64_t population_growth);
+	void apply_population_growth(const int64_t population_growth_capacity);
 
 	void do_population_promotion();
 	void do_population_demotion();

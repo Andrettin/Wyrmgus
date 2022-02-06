@@ -719,84 +719,52 @@ void site_game_data::change_population_unit_to_type(const population_unit_key &p
 
 void site_game_data::do_population_growth()
 {
-	const int food_surplus = this->get_food_supply() - this->get_food_demand();
-
 	const int64_t available_capacity = this->get_population_capacity() - this->get_population();
-	int64_t population_growth = static_cast<int64_t>(food_surplus) * defines::get()->get_population_growth_per_food();
 
-	if (available_capacity > 0) {
-		//the population cannot grow beyond capacity
-		population_growth = std::min<int64_t>(available_capacity, population_growth);
-	} else if (available_capacity < 0) {
-		//must decrease by something
-		population_growth = std::min<int64_t>(-defines::get()->get_population_growth_per_food(), population_growth);
-
-		//the population cannot decrease by more than the overpopulation
-		const int64_t overpopulation = this->get_population() - this->get_population_capacity();
-		population_growth = std::max<int64_t>(-overpopulation, population_growth);
-	}
-
-	if (population_growth != 0) {
-		if ((this->get_population() + population_growth) < site_game_data::min_population) {
-			population_growth = site_game_data::min_population - this->get_population();
-		}
-
-		this->apply_population_growth(population_growth);
+	if (available_capacity != 0) {
+		this->apply_population_growth(available_capacity);
 	}
 }
 
-void site_game_data::apply_population_growth(const int64_t population_growth)
+void site_game_data::apply_population_growth(const int64_t population_growth_capacity)
 {
 	const std::vector<std::pair<population_unit *, int64_t>> population_units_permyriad = this->get_population_units_permyriad();
 
-	int64_t remaining_population_growth = population_growth;
+	int64_t remaining_population_growth_capacity = population_growth_capacity;
 
 	for (const auto &[population_unit, permyriad] : population_units_permyriad) {
-		const int64_t population_unit_growth = population_growth * permyriad / 10000;
+		const int64_t population_unit_growth_capacity = population_growth_capacity * permyriad / 10000;
 
-		if (population_unit_growth == 0) {
+		if (population_unit_growth_capacity == 0) {
 			continue;
 		}
 
 		population_unit_key key = population_unit->get_key();
 
-		if (population_unit_growth > 0 && !population_unit->get_type()->is_growable()) {
+		if (population_unit_growth_capacity > 0 && !population_unit->get_type()->is_growable()) {
 			key.type = this->get_default_population_type();
 			key.employment_type = nullptr;
 		}
 
+		const int64_t population_unit_growth = population_unit->calculate_population_growth_quantity(population_unit_growth_capacity);
+
 		this->change_population_unit_population(key, population_unit_growth);
 
-		remaining_population_growth -= population_unit_growth;
+		remaining_population_growth_capacity -= population_unit_growth_capacity;
 	}
 
-	//if there is any remaining population growth, apply it to the default population class if positive, or subtract from existing population units if negative
-	if (remaining_population_growth != 0) {
-		if (remaining_population_growth > 0) {
-			this->change_default_population_type_population(remaining_population_growth);
+	//if there is any remaining population growth capacity, apply it to the default population class if positive, or subtract from existing population units if negative
+	if (remaining_population_growth_capacity != 0) {
+		if (remaining_population_growth_capacity > 0) {
+			const int64_t population_unit_growth = population_unit::calculate_population_growth_quantity(remaining_population_growth_capacity, 0);
+			this->change_default_population_type_population(population_unit_growth);
 		} else {
-			for (size_t i = 0; i < this->population_units.size();) {
-				const qunique_ptr<population_unit> &population_unit = this->population_units[i];
+			if (!this->population_units.empty()) {
+				const qunique_ptr<population_unit> &population_unit = this->population_units.front();
 
-				int64_t change = remaining_population_growth;
-				bool removed_pop = false;
-
-				if (std::abs(remaining_population_growth) >= population_unit->get_population()) {
-					change = -population_unit->get_population();
-					removed_pop = true;
-				}
+				const int64_t change = population_unit->calculate_population_growth_quantity(remaining_population_growth_capacity);
 
 				this->change_population_unit_population(population_unit->get_key(), change);
-
-				remaining_population_growth -= change;
-
-				if (!removed_pop) {
-					++i;
-				}
-
-				if (remaining_population_growth == 0) {
-					break;
-				}
 			}
 		}
 	}
