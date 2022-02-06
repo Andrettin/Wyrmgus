@@ -83,6 +83,8 @@
 #include "player/player_color.h"
 #include "player/player_type.h"
 #include "player/vassalage_type.h"
+#include "population/population_class.h"
+#include "population/population_type.h"
 #include "quest/campaign.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective/research_upgrade_objective.h"
@@ -4257,7 +4259,23 @@ check_limits_result CPlayer::check_limits(const unit_type &type, const CUnit *bu
 
 	if constexpr (check_population) {
 		if (!this->check_population_availability(type, builder)) {
-			this->Notify("%s", _("Insufficient Population."));
+			std::string population_name = type.get_population_class()->get_name();
+
+			const population_type *population_type = nullptr;
+
+			if (builder != nullptr && builder->get_settlement() != nullptr) {
+				population_type = builder->get_settlement()->get_game_data()->get_class_population_type(type.get_population_class());
+			}
+
+			if (population_type == nullptr) {
+				population_type = this->get_class_population_type(type.get_population_class());
+			}
+
+			if (population_type != nullptr) {
+				population_name = population_type->get_name();
+			}
+
+			this->Notify(_("Insufficient %s population."), population_name.c_str());
 			return check_limits_result::not_enough_population;
 		}
 	}
