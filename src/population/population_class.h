@@ -48,6 +48,7 @@ public:
 	}
 
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void check() const override;
 
 	bool is_growable() const
 	{
@@ -68,6 +69,8 @@ public:
 	{
 		return this->demotion_targets;
 	}
+
+	bool promotes_to(const population_class *other, const bool include_indirectly) const;
 
 	int get_production_efficiency(const resource *resource) const
 	{

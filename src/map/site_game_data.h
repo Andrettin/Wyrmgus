@@ -272,6 +272,8 @@ public:
 	void check_employment_capacities();
 	void check_available_employment();
 
+	void sort_population_units();
+
 	const population_type *get_class_population_type(const population_class *population_class) const;
 
 	int get_food_supply() const

@@ -31,6 +31,7 @@
 #include "database/sml_data.h"
 #include "database/sml_property.h"
 #include "population/employment_type.h"
+#include "population/population_class.h"
 #include "population/population_type.h"
 #include "population/population_unit_key.h"
 #include "util/assert_util.h"
@@ -38,6 +39,29 @@
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+bool population_unit::compare(const population_unit *lhs, const population_unit *rhs)
+{
+	if (lhs->get_population() != rhs->get_population()) {
+		return lhs->get_population() > rhs->get_population();
+	}
+
+	const population_type *lhs_type = lhs->get_type();
+	const population_type *rhs_type = rhs->get_type();
+
+	const population_class *lhs_class = lhs_type->get_population_class();
+	const population_class *rhs_class = rhs_type->get_population_class();
+
+	if (lhs_class->promotes_to(rhs_class, true)) {
+		return true;
+	}
+
+	if (rhs_class->promotes_to(lhs_class, true)) {
+		return false;
+	}
+
+	return lhs_class->get_identifier() < rhs_class->get_identifier();
+}
 
 population_unit::population_unit(const population_unit_key &key, const int64_t population)
 	: type(key.type), employment_type(key.employment_type), population(population)

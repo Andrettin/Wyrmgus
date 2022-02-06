@@ -128,6 +128,8 @@ void site_game_data::do_per_minute_loop()
 		this->do_population_promotion();
 		this->do_population_demotion();
 		this->do_population_employment();
+
+		this->sort_population_units();
 	}
 }
 
@@ -991,6 +993,23 @@ void site_game_data::check_available_employment()
 			}
 		}
 	}
+}
+
+void site_game_data::sort_population_units()
+{
+	const bool is_sorted = std::is_sorted(this->population_units.begin(), this->population_units.end(), [](const qunique_ptr<population_unit> &lhs, const qunique_ptr<population_unit> &rhs) {
+		return population_unit::compare(lhs.get(), rhs.get());
+	});
+
+	if (is_sorted) {
+		return;
+	}
+
+	std::sort(this->population_units.begin(), this->population_units.end(), [](const qunique_ptr<population_unit> &lhs, const qunique_ptr<population_unit> &rhs) {
+		return population_unit::compare(lhs.get(), rhs.get());
+	});
+
+	emit population_units_changed(this->get_population_units_qvariant_list());
 }
 
 const population_type *site_game_data::get_class_population_type(const population_class *population_class) const

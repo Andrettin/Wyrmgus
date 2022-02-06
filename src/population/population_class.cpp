@@ -29,6 +29,7 @@
 #include "population/population_class.h"
 
 #include "economy/resource.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
 
@@ -54,6 +55,38 @@ void population_class::process_sml_scope(const sml_data &scope)
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
+}
+
+void population_class::check() const
+{
+	for (const population_class *promotion_target : this->get_promotion_targets()) {
+		if (vector::contains(promotion_target->get_promotion_targets(), this)) {
+			throw std::runtime_error("Population classes \"" + this->get_identifier() + "\" and \"" + promotion_target->get_identifier() + "\" are both set as promotion targets of each other.");
+		}
+	}
+
+	for (const population_class *demotion_target : this->get_demotion_targets()) {
+		if (vector::contains(demotion_target->get_demotion_targets(), this)) {
+			throw std::runtime_error("Population classes \"" + this->get_identifier() + "\" and \"" + demotion_target->get_identifier() + "\" are both set as demotion targets of each other.");
+		}
+	}
+}
+
+bool population_class::promotes_to(const population_class *other, const bool include_indirectly) const
+{
+	if (vector::contains(this->get_promotion_targets(), other)) {
+		return true;
+	}
+
+	if (include_indirectly) {
+		for (const population_class *promotion_target : this->get_promotion_targets()) {
+			if (promotion_target->promotes_to(other, include_indirectly)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 }

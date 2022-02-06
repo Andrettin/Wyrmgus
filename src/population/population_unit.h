@@ -46,6 +46,8 @@ public:
 	static constexpr int64_t capacity_growth_divisor = 10;
 	static constexpr int64_t min_base_growth = 1000; //minimum base growth (used if capacity / capacity_growth_divisor is lower than this; still subject to be reduced further by other factors)
 
+	static bool compare(const population_unit *lhs, const population_unit *rhs);
+	
 	population_unit()
 	{
 	}
