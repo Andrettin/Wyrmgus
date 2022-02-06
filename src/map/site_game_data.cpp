@@ -69,6 +69,8 @@ void site_game_data::process_sml_property(const sml_property &property)
 		this->map_layer = CMap::get()->MapLayers[std::stoi(value)].get();
 	} else if (key == "population") {
 		this->set_population(std::stoll(value));
+	} else if (key == "food_supply") {
+		this->food_supply = std::stoi(value);
 	} else {
 		throw std::runtime_error("Invalid site game data property: \"" + key + "\".");
 	}
@@ -80,6 +82,12 @@ void site_game_data::process_sml_scope(const sml_data &scope)
 
 	if (tag == "map_pos") {
 		this->map_pos = scope.to_point();
+	} else if (tag == "employment_capacities") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+			this->employment_capacities[employment_type::get(key)] = std::stoi(value);
+		});
 	} else if (tag == "population_units") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			auto population_unit = make_qunique<wyrmgus::population_unit>();
@@ -106,6 +114,20 @@ sml_data site_game_data::to_sml_data() const
 
 	if (this->get_population() != 0) {
 		data.add_property("population", std::to_string(this->get_population()));
+	}
+
+	if (this->get_food_supply() != 0) {
+		data.add_property("food_supply", std::to_string(this->get_food_supply()));
+	}
+
+	if (!this->employment_capacities.empty()) {
+		sml_data employment_capacities_data("employment_capacities");
+
+		for (const auto &[employment_type, capacity] : this->employment_capacities) {
+			employment_capacities_data.add_property(employment_type->get_identifier(), std::to_string(capacity));
+		}
+
+		data.add_child(std::move(employment_capacities_data));
 	}
 
 	if (!this->population_units.empty()) {
