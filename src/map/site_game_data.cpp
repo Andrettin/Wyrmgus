@@ -736,7 +736,7 @@ void site_game_data::apply_population_growth(const int64_t population_growth)
 
 		population_unit_key key = population_unit->get_key();
 
-		if (!population_unit->get_type()->is_growable()) {
+		if (population_unit_growth > 0 && !population_unit->get_type()->is_growable()) {
 			key.type = this->get_default_population_type();
 			key.employment_type = nullptr;
 		}
