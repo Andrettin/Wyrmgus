@@ -861,7 +861,7 @@ void CommandDismiss(CUnit &unit, bool salvage)
 					&& table[i]->CurrentOrder()->get_goal() == &unit
 				) {
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						CPlayer::GetThisPlayer()->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, "%s", _("Cannot salvage if enemies are attacking it."));
+						CPlayer::GetThisPlayer()->Notify(notification_type::red, unit.tilePos, unit.MapLayer->ID, "%s", _("Cannot salvage if enemies are attacking it."));
 					}
 					return;
 				}
@@ -1024,7 +1024,7 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 	//Wyrmgus start
 	if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
 		if (player == CPlayer::GetThisPlayer()->get_index()) {
-			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
+			CPlayer::GetThisPlayer()->Notify(notification_type::yellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
 		}
 		return;
 	}

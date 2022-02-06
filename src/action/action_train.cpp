@@ -303,8 +303,8 @@ void COrder_Train::Execute(CUnit &unit)
 
 	if (newUnit == nullptr) { // No more memory :/
 		//Wyrmgus start
-//		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
-		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.GetDefaultName(player).c_str());
+//		player.Notify(notification_type::yellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
+		player.Notify(notification_type::yellow, unit.tilePos, _("Unable to train %s"), nType.GetDefaultName(player).c_str());
 		//Wyrmgus end
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return;
@@ -330,10 +330,6 @@ void COrder_Train::Execute(CUnit &unit)
 	}
 
 	DropOutOnSide(*newUnit, LookingW, &unit);
-	//Wyrmgus start
-	//we don't need to send the player a message every time a new unit is ready
-	//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
-	//Wyrmgus end
 	if (&player == ThisPlayer) {
 		PlayUnitSound(*newUnit, VoiceReady);
 	}
@@ -374,8 +370,8 @@ void COrder_Train::Execute(CUnit &unit)
 
 		if (newUnit == nullptr) { // No more memory :/
 			//Wyrmgus start
-	//		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
-			player.Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
+	//		player.Notify(notification_type::yellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
+			player.Notify(notification_type::yellow, unit.tilePos, unit.MapLayer->ID, _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 			unit.Wait = CYCLES_PER_SECOND / 6;
 			return;
@@ -429,9 +425,6 @@ void COrder_Train::Execute(CUnit &unit)
 			}
 		}
 		
-		//we don't need to send the player a message every time a new unit is ready
-		//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
-
 		if (&player == CPlayer::GetThisPlayer()) {
 			PlayUnitSound(*newUnit, wyrmgus::unit_sound_type::ready);
 		}

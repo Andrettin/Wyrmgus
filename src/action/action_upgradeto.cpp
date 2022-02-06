@@ -519,18 +519,9 @@ void COrder_UpgradeTo::Execute(CUnit &unit)
 	}
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
-		//Wyrmgus start
-		//I think it is too much to notify the player whenever an individual upgrade is cancelled
-//		player.Notify(NotifyYellow, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
-		//Wyrmgus end
 		this->Finished = true;
 		return;
 	}
-
-	//Wyrmgus start
-	//I think it is too much to notify the player whenever an individual upgrade is completed
-//	player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s complete"), unit.Type->Name.c_str());
-	//Wyrmgus end
 
 	//  Warn AI.
 	if (player.AiEnabled) {

@@ -250,8 +250,8 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 			}
 
 			//Wyrmgus start
-//			unit.Player->Notify(NotifyYellow, unit.tilePos, "%s", _("You cannot reach building place"));
-			unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, _("%s cannot reach building place"), unit.GetMessageName().c_str());
+//			unit.Player->Notify(notification_type::yellow, unit.tilePos, "%s", _("%s cannot reach building place"), unit.GetMessageName().c_str());
+			unit.Player->Notify(notification_type::yellow, unit.tilePos, unit.MapLayer->ID, _("%s cannot reach building place"), unit.GetMessageName().c_str());
 			//Wyrmgus end
 			if (unit.Player->AiEnabled) {
 				//Wyrmgus start
@@ -279,7 +279,7 @@ static bool CheckLimit(const CUnit &unit, const wyrmgus::unit_type &type, const 
 	// Check if enough resources for the building.
 	if (player.CheckUnitType(type)) {
 		// FIXME: Better tell what is missing?
-		player.Notify(NotifyYellow, unit.tilePos,
+		player.Notify(notification_type::yellow, unit.tilePos,
 					  //Wyrmgus start
 					  unit.MapLayer->ID,
 //					  _("Not enough resources to build %s"), type.Name.c_str());
@@ -290,7 +290,7 @@ static bool CheckLimit(const CUnit &unit, const wyrmgus::unit_type &type, const 
 
 	// Check if hitting any limits for the building.
 	if (player.check_limits<true>(type, &unit) != check_limits_result::success) {
-		player.Notify(NotifyYellow, unit.tilePos,
+		player.Notify(notification_type::yellow, unit.tilePos,
 					  //Wyrmgus start
 					  unit.MapLayer->ID,
 //					  _("Can't build more units %s"), type.Name.c_str());
@@ -404,7 +404,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	// If unable to make unit, stop, and report message
 	if (build == nullptr) {
 		// FIXME: Should we retry this?
-		unit.Player->Notify(NotifyYellow, unit.tilePos,
+		unit.Player->Notify(notification_type::yellow, unit.tilePos,
 							//Wyrmgus start
 							unit.MapLayer->ID,
 //							_("Unable to create building %s"), type.Name.c_str());
@@ -582,7 +582,7 @@ void COrder_Build::Execute(CUnit &unit)
 		}
 	}
 	if (this->State == State_StartBuilding_Failed) {
-		unit.Player->Notify(NotifyYellow, unit.tilePos,
+		unit.Player->Notify(notification_type::yellow, unit.tilePos,
 							//Wyrmgus start
 							unit.MapLayer->ID,
 //							_("You cannot build %s here"), type.Name.c_str());

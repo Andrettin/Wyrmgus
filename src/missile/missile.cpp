@@ -753,7 +753,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			}
 			PlayUnitSound(unit, unit_sound_type::hit);
 			
-			//apply Thorns damage if attacker is at melee range
+			//apply thorns damage if attacker is at melee range
 			if (goal && goal->Variable[THORNSDAMAGE_INDEX].Value && unit.MapDistanceTo(*goal) <= 1) {
 				int thorns_damage = std::max<int>(goal->Variable[THORNSDAMAGE_INDEX].Value - unit.Variable[ARMOR_INDEX].Value, 1);
 				thorns_damage -= SyncRand((thorns_damage + 2) / 2);

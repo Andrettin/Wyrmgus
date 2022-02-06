@@ -385,7 +385,7 @@ void COrder_SpellCast::Execute(CUnit &unit)
 			if (!CanCastSpell(unit, spell, order.get_goal())) {
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.get_mana_cost()) {
-					unit.Player->Notify(NotifyYellow, unit.tilePos,
+					unit.Player->Notify(notification_type::yellow, unit.tilePos,
 										//Wyrmgus start
 										unit.MapLayer->ID,
 //										_("%s: not enough mana for spell: %s"),
@@ -394,7 +394,7 @@ void COrder_SpellCast::Execute(CUnit &unit)
 										unit.GetMessageName().c_str(), spell.get_name().c_str());
 										//Wyrmgus end
 				} else if (unit.get_spell_cooldown_timer(&spell) > 0) {
-					unit.Player->Notify(NotifyYellow, unit.tilePos,
+					unit.Player->Notify(notification_type::yellow, unit.tilePos,
 										//Wyrmgus start
 										unit.MapLayer->ID,
 //										_("%s: spell is not ready yet: %s"),
@@ -403,7 +403,7 @@ void COrder_SpellCast::Execute(CUnit &unit)
 										unit.GetMessageName().c_str(), spell.get_name().c_str());
 										//Wyrmgus end
 				} else if (unit.Player->CheckCosts(spell.get_costs(), false)) {
-					unit.Player->Notify(NotifyYellow, unit.tilePos,
+					unit.Player->Notify(notification_type::yellow, unit.tilePos,
 										//Wyrmgus start
 										unit.MapLayer->ID,
 //										_("%s: not enough resources to cast spell: %s"),
@@ -413,12 +413,12 @@ void COrder_SpellCast::Execute(CUnit &unit)
 										//Wyrmgus end
 				//Wyrmgus start
 				} else if (spell.get_target() == wyrmgus::spell_target_type::unit && order.get_goal() == nullptr) {
-					unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID,
+					unit.Player->Notify(notification_type::yellow, unit.tilePos, unit.MapLayer->ID,
 										_("%s needs a target to use the %s ability."),
 										unit.GetMessageName().c_str(), spell.get_name().c_str());
 				//Wyrmgus end
 				} else {
-					unit.Player->Notify(NotifyYellow, unit.tilePos,
+					unit.Player->Notify(notification_type::yellow, unit.tilePos,
 										//Wyrmgus start
 										unit.MapLayer->ID,
 //										_("%s: can't cast spell: %s"),

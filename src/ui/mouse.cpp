@@ -353,7 +353,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 								break;
 							}
 						} else if (check_conditions<true>(unit_type, unit.Player, false)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
-							CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
+							CPlayer::GetThisPlayer()->Notify(notification_type::yellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 							break;
 						}
 					}
@@ -379,7 +379,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, 0, dest.MapLayer->ID);
 								break;
 							} else if (check_conditions<true>(unit_type, unit.Player, false)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
-								CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
+								CPlayer::GetThisPlayer()->Notify(notification_type::yellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 								break;
 							}
 						}
@@ -2566,7 +2566,7 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 											if (uins->get_unique() == nullptr) {
 												item_name = "the " + item_name;
 											}
-											Selected[0]->Player->Notify(NotifyRed, Selected[0]->tilePos, Selected[0]->MapLayer->ID, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());
+											Selected[0]->Player->Notify(notification_type::red, Selected[0]->tilePos, Selected[0]->MapLayer->ID, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());
 										}
 									}
 								} else if ((1 << button) == RightButton) {

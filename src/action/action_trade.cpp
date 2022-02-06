@@ -218,14 +218,14 @@ void COrder_Trade::Execute(CUnit &unit)
 					PlayUnitSound(*goal->ConnectingDestination, wyrmgus::unit_sound_type::used);
 				} else if (goal->Type->get_given_resource() != nullptr && goal->ResourcesHeld > 0) {
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->get_given_resource()->get_index()].c_str());
+						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->get_given_resource()->get_index()].c_str());
 					}
 					unit.Player->change_resource(goal->Type->get_given_resource(), goal->ResourcesHeld, false);
 					unit.Player->change_resource_total(goal->Type->get_given_resource(), goal->ResourcesHeld * unit.Player->get_income_modifier(goal->Type->get_given_resource()) / 100);
 				}
 			} else { //cannot use
 				if (unit.Player == CPlayer::GetThisPlayer()) {
-					unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s cannot use %s"), unit.GetMessageName().c_str(), goal_name.c_str());
+					unit.Player->Notify(notification_type::red, unit.tilePos, unit.MapLayer->ID, _("%s cannot use %s"), unit.GetMessageName().c_str(), goal_name.c_str());
 				}
 				this->Finished = true;
 				return;

@@ -99,6 +99,12 @@ enum class check_limits_result {
 	not_enough_population = -7
 };
 
+enum class notification_type {
+	red,     /// Red alarm
+	yellow,  /// Yellow alarm
+	green    /// Green alarm
+};
+
 }
 
 class CPlayer final : public QObject
@@ -1069,11 +1075,22 @@ public:
 
 	/// Notify player about a problem
 	//Wyrmgus start
-//	void Notify(int type, const Vec2i &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this
-	void Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(5, 6); // Don't forget to count this
+//	void Notify(const notification_type type, const QPoint &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this
+	void Notify(const notification_type type, const QPoint &pos, const int z, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(5, 6); // Don't forget to count this
 	//Wyrmgus end
+
+	void notify(const notification_type type, const QPoint &pos, const int z, const std::string &msg) const
+	{
+		this->Notify(type, pos, z, "%s", msg.c_str());
+	}
+
 	/// Notify player about a problem
 	void Notify(const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
+
+	void notify(const std::string &msg) const
+	{
+		this->Notify("%s", msg.c_str());
+	}
 
 	const player_index_set &get_enemies() const
 	{
@@ -1573,15 +1590,6 @@ public:
 	//Wyrmgus start
 	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	//Wyrmgus end
-};
-
-/**
-**  Notify types. Noties are send to the player.
-*/
-enum NotifyType {
-	NotifyRed,     /// Red alram
-	NotifyYellow,  /// Yellow alarm
-	NotifyGreen    /// Green alarm
 };
 
 extern int NumPlayers; //how many player slots used

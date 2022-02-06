@@ -219,23 +219,23 @@ void COrder_Use::Execute(CUnit &unit)
 				} else if (goal->Work != nullptr) {
 					unit.ReadWork(goal->Work);
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->get_identifier()).c_str());
+						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->get_identifier()).c_str());
 					}
 				} else if (goal->Elixir != nullptr) {
 					unit.ConsumeElixir(goal->Elixir);
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->get_identifier()).c_str());
+						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->get_identifier()).c_str());
 					}
 				} else if (goal->Type->get_given_resource() != nullptr && goal->ResourcesHeld > 0) {
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->get_given_resource()->get_index()].c_str());
+						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->get_given_resource()->get_index()].c_str());
 					}
 					unit.Player->change_resource(goal->Type->get_given_resource(), goal->ResourcesHeld, false);
 					unit.Player->change_resource_total(goal->Type->get_given_resource(), goal->ResourcesHeld * unit.Player->get_income_modifier(goal->Type->get_given_resource()) / 100);
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 					const int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) - unit.Variable[HP_INDEX].Value));
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
+						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
 					}
 					unit.Variable[HP_INDEX].Value += hp_healed;
 					
@@ -244,13 +244,13 @@ void COrder_Use::Execute(CUnit &unit)
 					}
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->get_domain() != unit_domain::air && unit.Type->get_domain() != unit_domain::air_low && unit.Type->get_domain() != unit_domain::space) {
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
+						unit.Player->Notify(notification_type::red, unit.tilePos, unit.MapLayer->ID, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
 					}
 					HitUnit(NoUnitP, unit, goal->Variable[HITPOINTHEALING_INDEX].Value * -1);
 				} else if (goal->Variable[MANA_RESTORATION_INDEX].Value > 0) {
 					const int mana_restored = std::min(goal->Variable[MANA_RESTORATION_INDEX].Value, (unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max) - unit.Variable[MANA_INDEX].Value));
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s restored %d mana"), unit.GetMessageName().c_str(), mana_restored);
+						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s restored %d mana"), unit.GetMessageName().c_str(), mana_restored);
 					}
 					unit.Variable[MANA_INDEX].Value += mana_restored;
 
@@ -262,12 +262,12 @@ void COrder_Use::Execute(CUnit &unit)
 					unit.apply_status_effect(status_effect::slow, 1000);
 
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s has been slowed"), unit.GetMessageName().c_str());
+						unit.Player->Notify(notification_type::red, unit.tilePos, unit.MapLayer->ID, _("%s has been slowed"), unit.GetMessageName().c_str());
 					}
 				}
 			} else { //cannot use
 				if (unit.Player == CPlayer::GetThisPlayer()) {
-					unit.Player->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, _("%s cannot use %s"), unit.GetMessageName().c_str(), goal_name.c_str());
+					unit.Player->Notify(notification_type::red, unit.tilePos, unit.MapLayer->ID, _("%s cannot use %s"), unit.GetMessageName().c_str(), goal_name.c_str());
 				}
 				this->Finished = true;
 				return;

@@ -820,7 +820,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 				const wyrmgus::unit_type *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
 				if (this->Player == CPlayer::GetThisPlayer()) {
-					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->get_name().c_str());
+					this->Player->Notify(notification_type::green, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->get_name().c_str());
 				}
 				TransformUnitIntoType(*this, *chosen_unit_type);
 				upgrade_found = true;
@@ -841,7 +841,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 						AbilityAcquire(*this, chosen_ability);
 						upgrade_found = true;
 						if (this->Player == CPlayer::GetThisPlayer()) {
-							this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has acquired the %s ability!"), this->GetMessageName().c_str(), chosen_ability->get_name().c_str());
+							this->Player->Notify(notification_type::green, this->tilePos, this->MapLayer->ID, _("%s has acquired the %s ability!"), this->GetMessageName().c_str(), chosen_ability->get_name().c_str());
 						}
 					}
 				}
@@ -972,7 +972,7 @@ void CUnit::Retrain()
 	}
 
 	if (this->Player == CPlayer::GetThisPlayer()) {
-		this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s's level-up choices have been reset."), unit_name.c_str());
+		this->Player->Notify(notification_type::green, this->tilePos, this->MapLayer->ID, _("%s's level-up choices have been reset."), unit_name.c_str());
 	}
 }
 
@@ -2264,7 +2264,7 @@ void CUnit::Identify()
 	this->Identified = true;
 	
 	if (this->Container != nullptr && this->Container->Player == CPlayer::GetThisPlayer()) {
-		this->Container->Player->Notify(NotifyGreen, this->Container->tilePos, this->Container->MapLayer->ID, _("%s has identified the %s!"), this->Container->GetMessageName().c_str(), this->GetMessageName().c_str());
+		this->Container->Player->Notify(notification_type::green, this->Container->tilePos, this->Container->MapLayer->ID, _("%s has identified the %s!"), this->Container->GetMessageName().c_str(), this->GetMessageName().c_str());
 	}
 }
 
@@ -2867,7 +2867,7 @@ void CUnit::UpdateSoldUnits()
 			new_unit->generate_special_properties(this, this->Player, true, true, false);
 			new_unit->Identified = true;
 			if (new_unit->get_unique() != nullptr && this->Player == CPlayer::GetThisPlayer()) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
-				this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, "%s", _("Unique item available for sale"));
+				this->Player->Notify(notification_type::green, this->tilePos, this->MapLayer->ID, "%s", _("Unique item available for sale"));
 			}
 		}
 		new_unit->Remove(this);
@@ -3984,7 +3984,7 @@ void CUnit::XPChanged()
 		this->Variable[XP_INDEX].Max -= this->Variable[XPREQUIRED_INDEX].Max;
 		this->Variable[XP_INDEX].Value -= this->Variable[XPREQUIRED_INDEX].Value;
 		if (this->Player == CPlayer::GetThisPlayer()) {
-			this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has leveled up!"), GetMessageName().c_str());
+			this->Player->Notify(notification_type::green, this->tilePos, this->MapLayer->ID, _("%s has leveled up!"), GetMessageName().c_str());
 		}
 		this->IncreaseLevel(1);
 	}
@@ -7518,7 +7518,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				HelpMeLastX = target.tilePos.x;
 				HelpMeLastY = target.tilePos.y;
 				PlayUnitSound(target, wyrmgus::unit_sound_type::help);
-				target.Player->Notify(NotifyRed, target.tilePos, target.MapLayer->ID, _("%s attacked"), target.GetMessageName().c_str());
+				target.Player->Notify(notification_type::red, target.tilePos, target.MapLayer->ID, _("%s attacked"), target.GetMessageName().c_str());
 			}
 		}
 	}
@@ -8263,7 +8263,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (picker.HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value && picker.get_units_inside().size() >= UI.InventoryButtons.size()) { //full
 		if (picker.Player == CPlayer::GetThisPlayer()) {
 			std::string picker_name = picker.Name + "'s (" + picker.get_type_name() + ")";
-			picker.Player->Notify(NotifyRed, picker.tilePos, picker.MapLayer->ID, _("%s inventory is full."), picker_name.c_str());
+			picker.Player->Notify(notification_type::red, picker.tilePos, picker.MapLayer->ID, _("%s inventory is full."), picker_name.c_str());
 		}
 		return false;
 	}

@@ -1827,7 +1827,7 @@ void CPlayer::share_upgrade_progress(CPlayer &other_player, CUnit &unit)
 			}
 			message += this->get_name();
 
-			other_player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, message.c_str());
+			other_player.notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, message);
 		}
 
 		if (&other_player == CPlayer::GetThisPlayer() && other_player.get_civilization() != nullptr) {
@@ -4937,7 +4937,7 @@ void SetPlayersPalette()
 **
 **  @todo FIXME: We must also notfiy allied players.
 */
-void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const
+void CPlayer::Notify(const notification_type type, const QPoint &pos, const int z, const char *fmt, ...) const
 {
 	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 	std::array<char, 128> temp{};
@@ -4954,13 +4954,13 @@ void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) co
 	vsnprintf(temp.data(), temp.size() - 1, fmt, va);
 	va_end(va);
 	switch (type) {
-		case NotifyRed:
+		case notification_type::red:
 			color = ColorRed;
 			break;
-		case NotifyYellow:
+		case notification_type::yellow:
 			color = ColorYellow;
 			break;
-		case NotifyGreen:
+		case notification_type::green:
 			color = ColorGreen;
 			break;
 		default: color = ColorWhite;
@@ -5027,7 +5027,7 @@ void CPlayer::set_neutral_diplomatic_stance_with(const CPlayer *player)
 		}
 		message += this->get_name() + " changed their diplomatic stance with us to neutral";
 
-		CPlayer::GetThisPlayer()->Notify(message.c_str());
+		CPlayer::GetThisPlayer()->notify(message);
 	}
 }
 
@@ -5057,7 +5057,7 @@ void CPlayer::set_allied_diplomatic_stance_with(const CPlayer *player)
 		}
 		message += this->get_name() + " changed their diplomatic stance with us to allied";
 
-		CPlayer::GetThisPlayer()->Notify(message.c_str());
+		CPlayer::GetThisPlayer()->notify(message);
 	}
 }
 
@@ -5098,7 +5098,7 @@ void CPlayer::set_enemy_diplomatic_stance_with(CPlayer *player)
 			}
 			message += player->get_name() + " to enemy";
 
-			CPlayer::GetThisPlayer()->Notify(message.c_str());
+			CPlayer::GetThisPlayer()->notify(message);
 		}
 	}
 
@@ -5164,7 +5164,7 @@ void CPlayer::set_shared_vision_with(CPlayer *player, const bool shared_vision)
 			}
 			message += this->get_name() + " is now sharing vision with us";
 
-			CPlayer::GetThisPlayer()->Notify(message.c_str());
+			CPlayer::GetThisPlayer()->notify(message);
 		}
 	} else {
 		this->shared_vision.erase(player->get_index());
@@ -5181,7 +5181,7 @@ void CPlayer::set_shared_vision_with(CPlayer *player, const bool shared_vision)
 			}
 			message += this->get_name() + " is no longer sharing vision with us";
 
-			CPlayer::GetThisPlayer()->Notify(message.c_str());
+			CPlayer::GetThisPlayer()->notify(message);
 		}
 	}
 
