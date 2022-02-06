@@ -58,6 +58,7 @@
 #include "player/faction.h"
 #include "player/faction_type.h"
 #include "player/player.h"
+#include "population/employment_type.h"
 #include "script/trigger.h"
 #include "spell/spell.h"
 #include "time/timeline.h"
@@ -1185,6 +1186,9 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitEmployment")) {
 			res->e = EString_UnitEmployment;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "UnitEmploymentType")) {
+			res->e = EString_UnitEmploymentType;
+			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "UnitSettlementName")) {
 			res->e = EString_UnitSettlementName;
 			res->D.Unit = CclParseUnitDesc(l);
@@ -1624,6 +1628,13 @@ std::string EvalString(const StringDesc *s)
 				}
 
 				return number::to_formatted_string(static_cast<int>(employment)) + "/" + number::to_formatted_string(employment_capacity);
+			} else {
+				return std::string();
+			}
+		case EString_UnitEmploymentType:
+			unit = EvalUnit(s->D.Unit.get());
+			if (unit != nullptr && unit->Type->get_employment_type() != nullptr) {
+				return unit->Type->get_employment_type()->get_name();
 			} else {
 				return std::string();
 			}
@@ -2523,6 +2534,12 @@ static int CclUnitEmployment(lua_State *l)
 	return Alias(l, "UnitEmployment");
 }
 
+static int CclUnitEmploymentType(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitEmploymentType");
+}
+
 static int CclUnitSettlementName(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
@@ -3005,6 +3022,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitQuote", CclUnitQuote);
 	lua_register(Lua, "UnitPopulation", CclUnitPopulation);
 	lua_register(Lua, "UnitEmployment", CclUnitEmployment);
+	lua_register(Lua, "UnitEmploymentType", CclUnitEmploymentType);
 	lua_register(Lua, "UnitSettlementName", CclUnitSettlementName);
 	lua_register(Lua, "UnitSiteName", CclUnitSiteName);
 	lua_register(Lua, "UnitHomeSettlementName", CclUnitHomeSettlementName);
