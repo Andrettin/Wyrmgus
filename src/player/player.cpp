@@ -1402,6 +1402,14 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 		}
 	}
 
+	if (GameRunning) {
+		const std::vector<const site *> settlements = this->get_settlements();
+
+		for (const site *settlement : settlements) {
+			settlement->get_game_data()->on_civilization_changed();
+		}
+	}
+
 	if (this == CPlayer::GetThisPlayer()) {
 		//update the current interface style if it changed
 		QMetaObject::invokeMethod(QApplication::instance(), [interface_style = this->get_interface_style()] {

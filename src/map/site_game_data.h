@@ -328,6 +328,7 @@ public:
 
 	int64_t get_employment_workforce(const employment_type *employment_type) const;
 
+	void on_civilization_changed();
 	void on_settlement_building_added(const CUnit *building);
 	void on_settlement_building_removed(const CUnit *building);
 

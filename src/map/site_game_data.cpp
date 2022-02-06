@@ -215,6 +215,10 @@ void site_game_data::set_owner(CPlayer *player)
 					this->ensure_minimum_population();
 				}
 
+				if (old_owner != nullptr && old_owner->get_civilization() != this->owner->get_civilization()) {
+					this->on_civilization_changed();
+				}
+
 				this->owner->check_unit_home_settlements();
 			} else {
 				this->clear_population_units();
@@ -1022,6 +1026,29 @@ int64_t site_game_data::get_employment_workforce(const employment_type *employme
 	}
 
 	return workforce;
+}
+
+void site_game_data::on_civilization_changed()
+{
+	std::vector<population_unit *> population_units_to_convert;
+
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
+		if (population_unit->get_type() != this->get_class_population_type(population_unit->get_type()->get_population_class())) {
+			population_units_to_convert.push_back(population_unit.get());
+		}
+	}
+
+	for (population_unit *population_unit : population_units_to_convert) {
+		const population_type *new_population_type = this->get_class_population_type(population_unit->get_type()->get_population_class());
+
+		population_unit_key new_key = population_unit->get_key();
+		new_key.type = new_population_type;
+
+		const int64_t population = population_unit->get_population();
+
+		this->change_population_unit_population(population_unit->get_key(), -population);
+		this->change_population_unit_population(new_key, population);
+	}
 }
 
 void site_game_data::on_settlement_building_added(const CUnit *building)
