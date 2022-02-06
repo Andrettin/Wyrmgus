@@ -1182,6 +1182,9 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitPopulation")) {
 			res->e = EString_UnitPopulation;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "UnitEmployment")) {
+			res->e = EString_UnitEmployment;
+			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "UnitSettlementName")) {
 			res->e = EString_UnitSettlementName;
 			res->D.Unit = CclParseUnitDesc(l);
@@ -1600,6 +1603,27 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->get_site() != nullptr) {
 				return number::to_formatted_string(unit->get_site()->get_game_data()->get_population());
+			} else {
+				return std::string();
+			}
+		case EString_UnitEmployment:
+			unit = EvalUnit(s->D.Unit.get());
+			if (unit != nullptr && unit->Type->get_employment_capacity() > 0) {
+				const int employment_capacity = unit->Type->get_employment_capacity();
+
+				int64_t employment = 0;
+
+				if (unit->get_settlement() != nullptr) {
+					const site_game_data *settlement_game_data = unit->get_settlement()->get_game_data();
+					const employment_type *employment_type = unit->Type->get_employment_type();
+
+					//the displayed employment is the workforce/capacity proportion for the settlement, applied to this building's employment capacity
+					employment = settlement_game_data->get_employment_workforce(employment_type);
+					employment *= employment_capacity;
+					employment /= settlement_game_data->get_employment_capacity(employment_type);
+				}
+
+				return number::to_formatted_string(static_cast<int>(employment)) + "/" + number::to_formatted_string(employment_capacity);
 			} else {
 				return std::string();
 			}
@@ -2481,23 +2505,22 @@ static int CclUnitSpell(lua_State *l)
 	return Alias(l, "UnitSpell");
 }
 
-/**
-**  Return equivalent lua table for UnitQuote.
-**  {"UnitQuote", {arg1}}
-**
-**  @param l  Lua state.
-**
-**  @return   equivalent lua table.
-*/
 static int CclUnitQuote(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	return Alias(l, "UnitQuote");
 }
+
 static int CclUnitPopulation(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	return Alias(l, "UnitPopulation");
+}
+
+static int CclUnitEmployment(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitEmployment");
 }
 
 static int CclUnitSettlementName(lua_State *l)
@@ -2981,6 +3004,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitSpell", CclUnitSpell);
 	lua_register(Lua, "UnitQuote", CclUnitQuote);
 	lua_register(Lua, "UnitPopulation", CclUnitPopulation);
+	lua_register(Lua, "UnitEmployment", CclUnitEmployment);
 	lua_register(Lua, "UnitSettlementName", CclUnitSettlementName);
 	lua_register(Lua, "UnitSiteName", CclUnitSiteName);
 	lua_register(Lua, "UnitHomeSettlementName", CclUnitHomeSettlementName);

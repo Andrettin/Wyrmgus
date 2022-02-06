@@ -145,7 +145,8 @@ enum EString {
 	EString_UnitTrait,			/// Unit Trait
 	EString_UnitSpell,			/// Unit spell
 	EString_UnitQuote,			/// Unit quote
-	EString_UnitPopulation,		/// Unit population
+	EString_UnitPopulation,
+	EString_UnitEmployment,
 	EString_UnitSettlementName,	/// Unit Settlement Name
 	EString_UnitSiteName,	/// Unit Settlement Name
 	EString_UnitHomeSettlementName,

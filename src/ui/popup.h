@@ -61,6 +61,7 @@ public:
 	bool Quote = false;			/// check if the button's unit type has a quote.
 	bool Encyclopedia = false;	/// check if the button's unit type has an encyclopedia entry.
 	char population = 0; //check if the button's unit has a population.
+	char employment = 0; //check if the button's unit has employment.
 	char settlement_name = 0; //check if the button's unit has a settlement name.
 	char site_name = 0; //check if the button's unit has a site name.
 	char home_settlement_name = 0;

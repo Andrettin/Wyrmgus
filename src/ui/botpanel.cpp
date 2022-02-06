@@ -407,6 +407,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			return false;
 		}
 	}
+
+	if (condition->employment != CONDITION_TRUE) {
+		if ((condition->employment == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && defines::get()->is_population_enabled() && unit_manager::get()->GetSlotUnit(button.Value).Type->get_employment_capacity() > 0 && !unit_manager::get()->GetSlotUnit(button.Value).is_under_construction())) {
+			return false;
+		}
+	}
 	
 	if (condition->settlement_name != CONDITION_TRUE) {
 		if ((condition->settlement_name == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && unit_manager::get()->GetSlotUnit(button.Value).get_settlement() != nullptr)) {
