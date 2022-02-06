@@ -4260,11 +4260,13 @@ check_limits_result CPlayer::check_limits(const unit_type &type, const CUnit *bu
 	if constexpr (check_population) {
 		if (!this->check_population_availability(type, builder)) {
 			std::string population_name = type.get_population_class()->get_name();
+			std::string location_str;
 
 			const population_type *population_type = nullptr;
 
 			if (builder != nullptr && builder->get_settlement() != nullptr) {
 				population_type = builder->get_settlement()->get_game_data()->get_class_population_type(type.get_population_class());
+				location_str = " in " + builder->get_settlement()->get_game_data()->get_current_cultural_name();
 			}
 
 			if (population_type == nullptr) {
@@ -4275,7 +4277,7 @@ check_limits_result CPlayer::check_limits(const unit_type &type, const CUnit *bu
 				population_name = population_type->get_name();
 			}
 
-			this->Notify(_("Insufficient %s population."), population_name.c_str());
+			this->Notify(_("Insufficient %s population%s."), population_name.c_str(), location_str.c_str());
 			return check_limits_result::not_enough_population;
 		}
 	}
