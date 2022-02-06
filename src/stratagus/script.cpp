@@ -1621,10 +1621,14 @@ std::string EvalString(const StringDesc *s)
 					const site_game_data *settlement_game_data = unit->get_settlement()->get_game_data();
 					const employment_type *employment_type = unit->Type->get_employment_type();
 
-					//the displayed employment is the workforce/capacity proportion for the settlement, applied to this building's employment capacity
-					employment = settlement_game_data->get_employment_workforce(employment_type);
-					employment *= employment_capacity;
-					employment /= settlement_game_data->get_employment_capacity(employment_type);
+					const int settlement_employment_capacity = settlement_game_data->get_employment_capacity(employment_type);
+
+					if (settlement_employment_capacity > 0) {
+						//the displayed employment is the workforce/capacity proportion for the settlement, applied to this building's employment capacity
+						employment = settlement_game_data->get_employment_workforce(employment_type);
+						employment *= employment_capacity;
+						employment /= settlement_employment_capacity;
+					}
 				}
 
 				return number::to_formatted_string(static_cast<int>(employment)) + "/" + number::to_formatted_string(employment_capacity);
