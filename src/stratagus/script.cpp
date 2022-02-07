@@ -1183,6 +1183,9 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitPopulation")) {
 			res->e = EString_UnitPopulation;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "UnitHousing")) {
+			res->e = EString_UnitHousing;
+			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "UnitEmployment")) {
 			res->e = EString_UnitEmployment;
 			res->D.Unit = CclParseUnitDesc(l);
@@ -1607,6 +1610,13 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->get_site() != nullptr) {
 				return number::to_formatted_string(unit->get_site()->get_game_data()->get_population());
+			} else {
+				return std::string();
+			}
+		case EString_UnitHousing:
+			unit = EvalUnit(s->D.Unit.get());
+			if (unit != nullptr && unit->get_site() != nullptr) {
+				return number::to_formatted_string(unit->get_site()->get_game_data()->get_housing_demand()) + "/" + number::to_formatted_string(unit->get_site()->get_game_data()->get_housing());
 			} else {
 				return std::string();
 			}
@@ -2532,6 +2542,12 @@ static int CclUnitPopulation(lua_State *l)
 	return Alias(l, "UnitPopulation");
 }
 
+static int CclUnitHousing(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitHousing");
+}
+
 static int CclUnitEmployment(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
@@ -3025,6 +3041,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitSpell", CclUnitSpell);
 	lua_register(Lua, "UnitQuote", CclUnitQuote);
 	lua_register(Lua, "UnitPopulation", CclUnitPopulation);
+	lua_register(Lua, "UnitHousing", CclUnitHousing);
 	lua_register(Lua, "UnitEmployment", CclUnitEmployment);
 	lua_register(Lua, "UnitEmploymentType", CclUnitEmploymentType);
 	lua_register(Lua, "UnitSettlementName", CclUnitSettlementName);
