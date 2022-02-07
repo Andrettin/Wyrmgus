@@ -29,6 +29,7 @@
 #include "population/population_class.h"
 
 #include "economy/resource.h"
+#include "util/assert_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -59,6 +60,8 @@ void population_class::process_sml_scope(const sml_data &scope)
 
 void population_class::check() const
 {
+	assert_throw(this->get_resource_icon() != nullptr);
+
 	for (const population_class *promotion_target : this->get_promotion_targets()) {
 		if (vector::contains(promotion_target->get_promotion_targets(), this)) {
 			throw std::runtime_error("Population classes \"" + this->get_identifier() + "\" and \"" + promotion_target->get_identifier() + "\" are both set as promotion targets of each other.");

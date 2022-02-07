@@ -35,6 +35,7 @@
 #include "item/item_class.h"
 #include "player/faction.h"
 #include "player/player.h"
+#include "population/population_class.h"
 #include "script.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
@@ -330,9 +331,15 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 						break;
 					case ManaResCost:
 						continue;
-					case PopulationCost:
-						icon = defines::get()->get_population_resource_icon();
+					case PopulationCost: {
+						const unit_type *unit_type = button.get_value_unit_type(Selected[0]);
+						if (unit_type != nullptr && unit_type->get_population_class() != nullptr) {
+							icon = unit_type->get_population_class()->get_resource_icon();
+						} else {
+							icon = defines::get()->get_population_resource_icon();
+						}
 						break;
+					}
 					default:
 						break;
 				}
@@ -390,9 +397,15 @@ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs)
 				case ManaResCost:
 					icon = defines::get()->get_mana_icon();
 					break;
-				case PopulationCost:
-					icon = defines::get()->get_population_resource_icon();
+				case PopulationCost: {
+					const unit_type *unit_type = button.get_value_unit_type(Selected[0]);
+					if (unit_type != nullptr && unit_type->get_population_class() != nullptr) {
+						icon = unit_type->get_population_class()->get_resource_icon();
+					} else {
+						icon = defines::get()->get_population_resource_icon();
+					}
 					break;
+				}
 				default:
 					break;
 			}
@@ -430,9 +443,15 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 						break;
 					case ManaResCost:
 						continue;
-					case PopulationCost:
-						icon = defines::get()->get_population_resource_icon();
+					case PopulationCost: {
+						const unit_type *unit_type = button.get_value_unit_type(Selected[0]);
+						if (unit_type != nullptr && unit_type->get_population_class() != nullptr) {
+							icon = unit_type->get_population_class()->get_resource_icon();
+						} else {
+							icon = defines::get()->get_population_resource_icon();
+						}
 						break;
+					}
 					default:
 						break;
 				}

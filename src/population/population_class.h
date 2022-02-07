@@ -32,10 +32,13 @@
 
 namespace wyrmgus {
 
+class resource_icon;
+
 class population_class final : public named_data_entry, public data_type<population_class>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::resource_icon* resource_icon MEMBER resource_icon)
 	Q_PROPERTY(bool growable MEMBER growable READ is_growable)
 	Q_PROPERTY(bool unemployment MEMBER unemployment READ can_have_unemployment)
 
@@ -49,6 +52,11 @@ public:
 
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void check() const override;
+
+	const wyrmgus::resource_icon *get_resource_icon() const
+	{
+		return this->resource_icon;
+	}
 
 	bool is_growable() const
 	{
@@ -84,6 +92,7 @@ public:
 	}
 
 private:
+	wyrmgus::resource_icon *resource_icon = nullptr;
 	bool growable = false; //whether the population class can grow via population growth; negative growth can still occur even if false however
 	bool unemployment = false; //whether the population class can be unemployed, or if when unemployment it must immediately demote
 	std::vector<const population_class *> promotion_targets;
