@@ -312,12 +312,23 @@ public:
 
 	void set_employment_capacity(const employment_type *employment_type, const int capacity)
 	{
+		const int old_capacity = this->get_employment_capacity(employment_type);
+
 		if (capacity <= 0) {
 			if (this->employment_capacities.contains(employment_type)) {
 				this->employment_capacities.erase(employment_type);
 			}
+
+			//check if any population unit's employment has become invalid as a result of the elimination of this employment type's capacity
+			this->check_employment_validity();
 		} else {
 			this->employment_capacities[employment_type] = capacity;
+
+			//if the capacity has decreased, check if there is surplus workforce
+			const bool decreased = (capacity - old_capacity) < 0;
+			if (decreased) {
+				this->check_employment_capacities();
+			}
 		}
 	}
 

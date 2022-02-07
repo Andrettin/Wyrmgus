@@ -897,6 +897,7 @@ void site_game_data::check_employment_validity()
 
 void site_game_data::check_employment_capacities()
 {
+	//check if any employment workforce is over capacity and if so, reduce it to capacity
 	for (const auto &[employment_type, capacity] : this->employment_capacities) {
 		int64_t surplus_workforce = this->get_employment_workforce(employment_type) - capacity;
 
