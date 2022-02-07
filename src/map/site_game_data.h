@@ -54,7 +54,7 @@ class site_game_data final : public QObject
 
 public:
 	static constexpr int64_t min_population = 1000;
-	static constexpr int population_per_food = 10000;
+	static constexpr int population_per_housing = 10000;
 
 	explicit site_game_data(const site *site);
 	~site_game_data();
@@ -258,7 +258,7 @@ public:
 
 	int64_t get_population_capacity() const
 	{
-		return static_cast<int64_t>(this->get_food_supply()) * site_game_data::population_per_food;
+		return static_cast<int64_t>(this->get_housing()) * site_game_data::population_per_housing;
 	}
 
 	void do_population_growth();
@@ -276,28 +276,28 @@ public:
 
 	const population_type *get_class_population_type(const population_class *population_class) const;
 
-	int get_food_supply() const
+	int get_housing() const
 	{
-		return this->food_supply;
+		return this->housing;
 	}
 
-	void set_food_supply(const int food_supply)
+	void set_housing(const int housing)
 	{
-		if (food_supply == this->get_food_supply()) {
+		if (housing == this->get_housing()) {
 			return;
 		}
 
-		this->food_supply = food_supply;
+		this->housing = housing;
 	}
 
-	void change_food_supply(const int change)
+	void change_housing(const int change)
 	{
-		this->set_food_supply(this->get_food_supply() + change);
+		this->set_housing(this->get_housing() + change);
 	}
 
-	int get_food_demand() const
+	int get_housing_demand() const
 	{
-		return this->get_population() / site_game_data::population_per_food;
+		return this->get_population() / site_game_data::population_per_housing;
 	}
 
 	int get_employment_capacity(const employment_type *employment_type) const
@@ -361,7 +361,7 @@ private:
 	site_set border_settlements; //other settlements bordering this one
 	int64_t population = 0;
 	std::vector<qunique_ptr<population_unit>> population_units;
-	int food_supply = 0;
+	int housing = 0;
 	employment_type_map<int> employment_capacities;
 };
 

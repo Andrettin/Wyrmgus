@@ -327,7 +327,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 					player->change_supply(supply_change);
 
 					if (defines::get()->is_population_enabled() && unit->get_settlement() != nullptr) {
-						unit->get_settlement()->get_game_data()->change_food_supply(supply_change);
+						unit->get_settlement()->get_game_data()->change_housing(supply_change);
 					}
 				}
 			}

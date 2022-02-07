@@ -1551,7 +1551,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 			unit.Player->change_supply(um->Modifier.Variables[SUPPLY_INDEX].Value);
 
 			if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
-				unit.get_settlement()->get_game_data()->change_food_supply(um->Modifier.Variables[SUPPLY_INDEX].Value);
+				unit.get_settlement()->get_game_data()->change_housing(um->Modifier.Variables[SUPPLY_INDEX].Value);
 			}
 		}
 	}
@@ -1597,7 +1597,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifie
 			unit.Player->change_supply(-um->Modifier.Variables[SUPPLY_INDEX].Value);
 
 			if (defines::get()->is_population_enabled() && unit.get_settlement() != nullptr) {
-				unit.get_settlement()->get_game_data()->change_food_supply(-um->Modifier.Variables[SUPPLY_INDEX].Value);
+				unit.get_settlement()->get_game_data()->change_housing(-um->Modifier.Variables[SUPPLY_INDEX].Value);
 			}
 		}
 	}

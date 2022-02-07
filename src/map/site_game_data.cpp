@@ -69,8 +69,8 @@ void site_game_data::process_sml_property(const sml_property &property)
 		this->map_layer = CMap::get()->MapLayers[std::stoi(value)].get();
 	} else if (key == "population") {
 		this->set_population(std::stoll(value));
-	} else if (key == "food_supply") {
-		this->food_supply = std::stoi(value);
+	} else if (key == "housing") {
+		this->housing = std::stoi(value);
 	} else {
 		throw std::runtime_error("Invalid site game data property: \"" + key + "\".");
 	}
@@ -116,8 +116,8 @@ sml_data site_game_data::to_sml_data() const
 		data.add_property("population", std::to_string(this->get_population()));
 	}
 
-	if (this->get_food_supply() != 0) {
-		data.add_property("food_supply", std::to_string(this->get_food_supply()));
+	if (this->get_housing() != 0) {
+		data.add_property("housing", std::to_string(this->get_housing()));
 	}
 
 	if (!this->employment_capacities.empty()) {
@@ -1056,7 +1056,7 @@ void site_game_data::on_settlement_building_added(const CUnit *building)
 {
 	if (defines::get()->is_population_enabled()) {
 		if (building->Variable[SUPPLY_INDEX].Value != 0) {
-			this->change_food_supply(building->Variable[SUPPLY_INDEX].Value);
+			this->change_housing(building->Variable[SUPPLY_INDEX].Value);
 		}
 
 		if (building->Type->get_employment_type() != nullptr) {
@@ -1069,7 +1069,7 @@ void site_game_data::on_settlement_building_removed(const CUnit *building)
 {
 	if (defines::get()->is_population_enabled()) {
 		if (building->Variable[SUPPLY_INDEX].Value != 0) {
-			this->change_food_supply(-building->Variable[SUPPLY_INDEX].Value);
+			this->change_housing(-building->Variable[SUPPLY_INDEX].Value);
 		}
 
 		if (building->Type->get_employment_type() != nullptr) {
