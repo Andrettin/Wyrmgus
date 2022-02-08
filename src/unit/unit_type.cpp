@@ -1911,6 +1911,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->neutral_minimap_color = parent_type->neutral_minimap_color;
 	this->encyclopedia_background_file = parent_type->encyclopedia_background_file;
 	this->random_movement_probability = parent_type->random_movement_probability;
+	this->neutral_random_movement_probability = parent_type->neutral_random_movement_probability;
 	this->random_movement_distance = parent_type->random_movement_distance;
 	this->given_resource = parent_type->given_resource;
 	this->RequirementsString = parent_type->RequirementsString;

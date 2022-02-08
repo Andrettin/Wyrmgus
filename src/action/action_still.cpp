@@ -179,7 +179,17 @@ void UnHideUnit(CUnit &unit)
 */
 static bool MoveRandomly(CUnit &unit)
 {
-	if (!unit.Type->get_random_movement_probability() || SyncRand(100) > unit.Type->get_random_movement_probability()) {
+	int random_movement_probability = unit.Type->get_random_movement_probability();
+
+	if (unit.Player->is_neutral_player() && unit.Type->get_neutral_random_movement_probability() != 0) {
+		random_movement_probability = unit.Type->get_neutral_random_movement_probability();
+	}
+
+	if (random_movement_probability == 0) {
+		return false;
+	}
+
+	if (SyncRand(100) > random_movement_probability) {
 		return false;
 	}
 
@@ -190,7 +200,9 @@ static bool MoveRandomly(CUnit &unit)
 	// pick random location
 	QPoint pos = unit.tilePos;
 
-	pos += QPoint(SyncRand(unit.Type->get_random_movement_distance() * 2 + 1) - unit.Type->get_random_movement_distance(), SyncRand(unit.Type->get_random_movement_distance() * 2 + 1) - unit.Type->get_random_movement_distance());
+	const int random_movement_distance = unit.Type->get_random_movement_distance();
+
+	pos += QPoint(SyncRand(random_movement_distance * 2 + 1) - random_movement_distance, SyncRand(random_movement_distance * 2 + 1) - random_movement_distance);
 
 	//restrict to map
 	CMap::get()->clamp(pos, unit.MapLayer->ID);
@@ -203,8 +215,8 @@ static bool MoveRandomly(CUnit &unit)
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->get_species() != nullptr && wyrmgus::vector::contains(unit.Type->get_species()->get_native_terrain_types(), CMap::get()->GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
-				if (!wyrmgus::vector::contains(unit.Type->get_species()->get_native_terrain_types(), CMap::get()->GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
+			if (unit.Type->get_species() != nullptr && vector::contains(unit.Type->get_species()->get_native_terrain_types(), CMap::get()->GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
+				if (!vector::contains(unit.Type->get_species()->get_native_terrain_types(), CMap::get()->GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
 					return false;
 				}
 			}
@@ -244,6 +256,7 @@ static bool MoveRandomly(CUnit &unit)
 					}
 				}
 			}
+
 			CommandMove(unit, pos, FlushCommands, unit.MapLayer->ID);
 			return true;
 		}

@@ -793,6 +793,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
 	Q_PROPERTY(wyrmgus::resource* given_resource MEMBER given_resource)
 	Q_PROPERTY(int random_movement_probability MEMBER random_movement_probability READ get_random_movement_probability)
+	Q_PROPERTY(int neutral_random_movement_probability MEMBER neutral_random_movement_probability READ get_neutral_random_movement_probability)
 	Q_PROPERTY(int random_movement_distance MEMBER random_movement_distance READ get_random_movement_distance)
 	Q_PROPERTY(quint64 default_mass MEMBER default_mass READ get_default_mass)
 	Q_PROPERTY(qint64 population_cost MEMBER population_cost READ get_population_cost)
@@ -1211,6 +1212,11 @@ public:
 		return this->random_movement_probability;
 	}
 
+	int get_neutral_random_movement_probability() const
+	{
+		return this->neutral_random_movement_probability;
+	}
+
 	int get_random_movement_distance() const
 	{
 		return this->random_movement_distance;
@@ -1423,8 +1429,9 @@ private:
 public:
 	int AutoBuildRate = 0;			/// The rate at which the building builds itself
 private:
-	int random_movement_probability = 0; //probability to move randomly.
-	int random_movement_distance = 1; //quantity of tiles to move randomly.
+	int random_movement_probability = 0; //probability to move randomly
+	int neutral_random_movement_probability = 0; //probability to move randomly if owned by the neutral player
+	int random_movement_distance = 1; //quantity of tiles to move randomly
 public:
 	int ClicksToExplode = 0;		/// Number of consecutive clicks until unit suicides.
 	int MaxOnBoard = 0;				/// Number of Transporter slots.
