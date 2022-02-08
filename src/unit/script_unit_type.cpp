@@ -1599,12 +1599,6 @@ static int CclDefineUnitType(lua_State *l)
 				wyrmgus::unit_type *sold_unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
 				type->SoldUnits.push_back(sold_unit_type);
 			}
-		} else if (!strcmp(value, "SpawnUnits")) {
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				wyrmgus::unit_type *spawned_unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
-				type->SpawnUnits.push_back(spawned_unit_type);
-			}
 		} else if (!strcmp(value, "Drops")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {

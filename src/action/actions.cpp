@@ -639,18 +639,7 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 
 		unit.UpdateSoldUnits();
-		
-		for (size_t i = 0; i < unit.Type->SpawnUnits.size(); ++i) {
-			wyrmgus::unit_type *spawned_type = unit.Type->SpawnUnits[i];
-			int spawned_type_demand = spawned_type->Stats[unit.Player->get_index()].Variables[DEMAND_INDEX].Value;
-			if ((GameCycle % (CYCLES_PER_MINUTE * spawned_type_demand)) == 0) { //the quantity of minutes it takes to spawn the unit depends on the unit's supply demand
-				if ((unit.Player->GetUnitTypeCount(spawned_type) * spawned_type_demand) >= (unit.Player->GetUnitTypeCount(unit.Type) * 5)) { //max limit reached
-					continue;
-				}
-				CUnit *spawned_unit = MakeUnit(*spawned_type, unit.Player);
-				DropOutOnSide(*spawned_unit, spawned_unit->Direction, &unit);
-			}
-		}
+		unit.spawn_units();
 	}
 }
 //Wyrmgus end

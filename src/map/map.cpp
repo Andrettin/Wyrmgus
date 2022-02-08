@@ -358,7 +358,13 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 		allowed_terrains = unit_type->get_species()->get_native_terrain_types();
 	}
 	
-	for (const wyrmgus::unit_type *spawned_type : unit_type->SpawnUnits) {
+	for (const wyrmgus::unit_type *spawned_type : unit_type->get_spawned_units()) {
+		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
+			vector::merge(allowed_terrains, spawned_type->get_species()->get_native_terrain_types());
+		}
+	}
+
+	for (const wyrmgus::unit_type *spawned_type : unit_type->get_neutral_spawned_units()) {
 		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
 			vector::merge(allowed_terrains, spawned_type->get_species()->get_native_terrain_types());
 		}

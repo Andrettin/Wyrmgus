@@ -836,6 +836,14 @@ void unit_type::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->WeaponClasses.push_back(string_to_item_class(value));
 		}
+	} else if (tag == "spawned_units") {
+		for (const std::string &value : values) {
+			this->spawned_units.push_back(unit_type::get(value));
+		}
+	} else if (tag == "neutral_spawned_units") {
+		for (const std::string &value : values) {
+			this->neutral_spawned_units.push_back(unit_type::get(value));
+		}
 	} else if (tag == "drops") {
 		for (const std::string &value : values) {
 			this->Drops.push_back(unit_type::get(value));
@@ -1556,6 +1564,12 @@ void unit_type::check() const
 		}
 	}
 
+	if (!this->get_spawned_units().empty() || !this->get_neutral_spawned_units().empty()) {
+		if (this->get_max_spawned_demand() == 0) {
+			throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" has spawned units, but no maximum spawned demand.");
+		}
+	}
+
 	if (this->get_preconditions() != nullptr) {
 		this->get_preconditions()->check_validity();
 	}
@@ -1926,7 +1940,9 @@ void unit_type::set_parent(const unit_type *parent_type)
 	}
 	this->WeaponClasses = parent_type->WeaponClasses;
 	this->SoldUnits = parent_type->SoldUnits;
-	this->SpawnUnits = parent_type->SpawnUnits;
+	this->spawned_units = parent_type->spawned_units;
+	this->neutral_spawned_units = parent_type->neutral_spawned_units;
+	this->max_spawned_demand = parent_type->max_spawned_demand;
 	this->Drops = parent_type->Drops;
 	this->AiDrops = parent_type->AiDrops;
 	this->DropSpells = parent_type->DropSpells;

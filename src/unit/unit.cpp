@@ -2904,6 +2904,65 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 	}
 }
 
+void CUnit::spawn_units()
+{
+	if (!this->Type->get_spawned_units().empty()) {
+		this->spawn_units(this->Type->get_spawned_units());
+	}
+
+	if (!this->Type->get_neutral_spawned_units().empty() && this->Player->is_neutral_player()) {
+		this->spawn_units(this->Type->get_neutral_spawned_units());
+	}
+}
+
+void CUnit::spawn_units(const std::vector<const unit_type *> &spawned_types)
+{
+	const int max_spawned_demand = this->Type->get_max_spawned_demand();
+	int spawned_demand = this->get_nearby_spawned_demand();
+
+	if (spawned_demand >= max_spawned_demand) {
+		return;
+	}
+
+	for (const unit_type *spawned_type : spawned_types) {
+		const int spawned_type_demand = spawned_type->Stats[this->Player->get_index()].Variables[DEMAND_INDEX].Value;
+
+		//the quantity of minutes it takes to spawn the unit depends on the unit's supply demand
+		if ((GameCycle % (CYCLES_PER_MINUTE * spawned_type_demand)) != 0) {
+			continue;
+		}
+
+		CUnit *spawned_unit = MakeUnit(*spawned_type, this->Player);
+		DropOutOnSide(*spawned_unit, spawned_unit->Direction, this);
+
+		spawned_demand += spawned_type_demand;
+
+		if (spawned_demand >= max_spawned_demand) {
+			return;
+		}
+	}
+}
+
+int CUnit::get_nearby_spawned_demand() const
+{
+	static constexpr int nearby_spawned_range = 16;
+
+	int spawned_demand = 0;
+
+	std::vector<CUnit *> nearby_units;
+	SelectAroundUnit(*this, nearby_spawned_range, nearby_units, HasSamePlayerAs(*this->Player));
+
+	for (CUnit *nearby_unit : nearby_units) {
+		if (!vector::contains(this->Type->get_spawned_units(), nearby_unit->Type) && !vector::contains(this->Type->get_neutral_spawned_units(), nearby_unit->Type)) {
+			continue;
+		}
+
+		spawned_demand += nearby_unit->Type->Stats[this->Player->get_index()].Variables[DEMAND_INDEX].Value;;
+	}
+
+	return spawned_demand;
+}
+
 /**
 **  Produce a resource
 **

@@ -786,6 +786,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::item_class item_class MEMBER item_class READ get_item_class)
 	Q_PROPERTY(wyrmgus::species* species MEMBER species)
 	Q_PROPERTY(CUpgrade* elixir MEMBER elixir)
+	Q_PROPERTY(int max_spawned_demand MEMBER max_spawned_demand READ get_max_spawned_demand)
 	Q_PROPERTY(QVariantList traits READ get_traits_qvariant_list NOTIFY changed)
 	Q_PROPERTY(wyrmgus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
 	Q_PROPERTY(int repair_hp MEMBER repair_hp READ get_repair_hp)
@@ -1108,6 +1109,22 @@ public:
 	{
 		return this->elixir;
 	}
+
+	const std::vector<const unit_type *> &get_spawned_units() const
+	{
+		return this->spawned_units;
+	}
+
+	const std::vector<const unit_type *> &get_neutral_spawned_units() const
+	{
+		return this->neutral_spawned_units;
+	}
+
+	int get_max_spawned_demand() const
+	{
+		return this->max_spawned_demand;
+	}
+
 	const std::vector<CUpgrade *> &get_traits() const
 	{
 		return this->traits;
@@ -1299,7 +1316,11 @@ private:
 	CUpgrade *elixir = nullptr; //which elixir does this (item) unit type always have
 public:
 	std::vector<unit_type *> SoldUnits;		/// Units which this unit can sell.
-	std::vector<unit_type *> SpawnUnits;	/// Units which this unit can spawn.
+private:
+	std::vector<const unit_type *> spawned_units;
+	std::vector<const unit_type *> neutral_spawned_units;
+	int max_spawned_demand = 0; //the maximum amount of total food demand the nearby units of the spawned unit types for this unit type can have before spawning stops
+public:
 	std::vector<unit_type *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<unit_type *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<spell *> DropSpells;		/// Spells which can be applied to dropped items
