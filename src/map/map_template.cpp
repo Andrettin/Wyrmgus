@@ -1436,6 +1436,12 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		}
 	}
 
+	if (site_owner == nullptr || site_history->get_building_classes().empty()) {
+		if (site_history->get_neutral_building_type() != nullptr) {
+			CreateUnit(site_game_data->get_map_pos(), *site_history->get_neutral_building_type(), CPlayer::get_neutral_player(), z, true, settlement);
+		}
+	}
+
 	if (site_owner == nullptr) {
 		return;
 	}

@@ -34,6 +34,7 @@ namespace wyrmgus {
 class faction;
 class site;
 class unit_class;
+class unit_type;
 
 class site_history final : public data_entry_history
 {
@@ -41,6 +42,7 @@ class site_history final : public data_entry_history
 
 	Q_PROPERTY(wyrmgus::faction* owner MEMBER owner)
 	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
+	Q_PROPERTY(wyrmgus::unit_type* neutral_building_type MEMBER neutral_building_type)
 	Q_PROPERTY(wyrmgus::unit_class* pathway_class MEMBER pathway_class)
 	Q_PROPERTY(qint64 population MEMBER population READ get_population)
 
@@ -64,6 +66,11 @@ public:
 	QVariantList get_building_classes_qvariant_list() const;
 	Q_INVOKABLE void add_building_class(unit_class *building_class);
 	Q_INVOKABLE void remove_building_class(unit_class *building_class);
+
+	const unit_type *get_neutral_building_type() const
+	{
+		return this->neutral_building_type;
+	}
 
 	const unit_class *get_pathway_class() const
 	{
@@ -114,6 +121,7 @@ private:
 	const wyrmgus::site *site = nullptr;
 	faction *owner = nullptr;
 	std::vector<unit_class *> building_classes; //applied as buildings at scenario start
+	unit_type *neutral_building_type = nullptr; //the building applied on this site at scenario start if it has no owner
 	unit_class *pathway_class = nullptr;
 	int64_t population = 0; //used for creating units at scenario start
 	unit_class_map<int64_t> population_groups; //population size for unit classes
