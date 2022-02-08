@@ -143,7 +143,9 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 	if (CEditor::get()->is_running() && UnitUnderCursor == &unit && CEditor::get()->State == EditorSelecting) {
 		color = ColorWhite;
 	} else if (unit.Selected || unit.TeamSelected || (unit.Blink & 1)) {
-		if (unit.Player->get_index() == PlayerNumNeutral) {
+		if (CPlayer::GetThisPlayer()->is_enemy_of(unit)) {
+			color = ColorRed;
+		} else if (unit.Player->get_index() == PlayerNumNeutral) {
 			color = ColorYellow;
 		} else if ((unit.Selected || (unit.Blink & 1))
 				   && (unit.Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
@@ -158,8 +160,6 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit, std::vector<std::
 					secondary_color = ColorYellow;
 				}
 			}
-		} else if (CPlayer::GetThisPlayer()->is_enemy_of(unit)) {
-			color = ColorRed;
 		} else {
 			color = CVideo::MapRGB(unit.Player->get_minimap_color());
 
