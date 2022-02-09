@@ -2952,8 +2952,8 @@ void CUnit::spawn_units(const std::vector<const unit_type *> &spawned_types)
 
 	weighted_average_demand /= static_cast<int>(weighted_spawned_types.size());
 
-	//0.5% chance to spawn a unit in a second, with the chance decreasing proportionally to the weighted average demand
-	const int random_chance = 200 * std::max(weighted_average_demand, 1);
+	//0.1% chance to spawn a unit in a second, with the chance decreasing proportionally to the weighted average demand
+	const int random_chance = 1000 * std::max(weighted_average_demand, 1);
 	if (random::get()->generate(random_chance) != 0) {
 		return;
 	}
