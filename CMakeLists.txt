@@ -1437,14 +1437,6 @@ endif()
 option(WITH_GEOJSON "Compile with support for generating map data from GeoJSON files" ON)
 option(WITH_TEST "Compile the test project" ON)
 
-if(NOT WITH_RENDERER)
-	if(OPENGL_FOUND)
-		set(WITH_RENDERER "OpenGL")
-	else()
-		set(WITH_RENDERER "NativeSDL")
-	endif()
-endif()
-
 # Binary name
 set(BINARY_NAME "wyrmgus" CACHE PATH "Sets the name of the binary.")
 
@@ -1515,13 +1507,13 @@ if(WITH_X11 AND X11_FOUND)
 	set(wyrmgus_LIBS ${wyrmgus_LIBS} ${X11_X11_LIB})
 endif()
 
-if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)
+if(OPENGL_FOUND)
 	add_definitions(-DUSE_OPENGL)
 	include_directories(${OPENGL_INCLUDE_DIR})
 	set(wyrmgus_LIBS ${wyrmgus_LIBS} ${OPENGL_LIBRARIES})
 	message(STATUS "Using OpenGL")
-elseif(NOT WITH_RENDERER STREQUAL "NativeSDL")
-	message(FATAL_ERROR "Specified rendering support was not found in system.\nChoose: NativeSDL OpenGL OpenGLES")
+else()
+	message(FATAL_ERROR "OpenGL rendering support was not found in the system.")
 endif()
 
 # Platform definitions
@@ -1747,12 +1739,6 @@ else()
 endif()
 
 log_package("X11" "X11")
-
-if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)
-	message("Renderer: OpenGL (Disable by param -DWITH_RENDERER=NativeSDL)")
-else()
-	message("Renderer: NativeSDL (Enable OpenGL by param -DWITH_RENDERER=OpenGL)")
-endif()
 
 message("==================================")
 
