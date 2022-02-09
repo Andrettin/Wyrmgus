@@ -1321,7 +1321,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 	site_game_data->set_map_pos(site_pos);
 	site_game_data->set_map_layer(CMap::get()->MapLayers[z].get());
 
-	const wyrmgus::site *settlement = site->is_settlement() ? site : CMap::get()->Field(site_pos, z)->get_settlement();
+	const wyrmgus::site *settlement = site->get_settlement() ? site->get_settlement() : CMap::get()->Field(site_pos, z)->get_settlement();
 
 	//it is acceptable sites with geocoordinate to have their positions shifted, e.g. if it was coastal to shift it enough inland to give space for the building to be placed
 	const bool is_position_shift_acceptable = !site->get_geocoordinate().is_null() || !site->get_astrocoordinate().is_null();

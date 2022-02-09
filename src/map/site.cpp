@@ -192,6 +192,10 @@ void site::ProcessConfigData(const CConfigData *config_data)
 
 void site::initialize()
 {
+	if (this->is_settlement()) {
+		this->settlement = this;
+	}
+
 	if (this->geocoordinate_reference_site != nullptr) {
 		if (!this->geocoordinate_reference_site->is_initialized()) {
 			this->geocoordinate_reference_site->initialize();
