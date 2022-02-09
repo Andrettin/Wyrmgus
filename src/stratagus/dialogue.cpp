@@ -148,7 +148,10 @@ void dialogue::call_node_option_effect_sync(const int node_index, const int opti
 		ctx.current_player = player;
 
 		if (unit_number != -1) {
-			ctx.current_unit = unit_manager::get()->GetSlotUnit(unit_number).acquire_ref();
+			CUnit &unit = unit_manager::get()->GetSlotUnit(unit_number);
+			if (!unit.Destroyed) {
+				ctx.current_unit = unit.acquire_ref();
+			}
 		}
 
 		this->call_node_option_effect(node_index, option_index, player, ctx);
