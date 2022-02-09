@@ -2906,41 +2906,69 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 
 void CUnit::spawn_units()
 {
+	std::vector<const unit_type *> spawned_units;
+
 	if (!this->Type->get_spawned_units().empty()) {
-		this->spawn_units(this->Type->get_spawned_units());
+		spawned_units = this->Type->get_spawned_units();
 	}
 
 	if (!this->Type->get_neutral_spawned_units().empty() && this->Player->is_neutral_player()) {
-		this->spawn_units(this->Type->get_neutral_spawned_units());
+		vector::merge(spawned_units, this->Type->get_neutral_spawned_units());
 	}
+
+	if (spawned_units.empty()) {
+		return;
+	}
+
+	this->spawn_units(spawned_units);
 }
 
 void CUnit::spawn_units(const std::vector<const unit_type *> &spawned_types)
 {
+	//spawn a random unit type, with the chance for a type to be picked being inversely weighted by demand
+
+	int max_spawned_type_demand = 0;
+	for (const unit_type *spawned_type : spawned_types) {
+		const int spawned_type_demand = spawned_type->Stats[this->Player->get_index()].Variables[DEMAND_INDEX].Value;
+
+		if (spawned_type_demand > max_spawned_type_demand) {
+			max_spawned_type_demand = spawned_type_demand;
+		}
+	}
+
+	std::vector<const unit_type *> weighted_spawned_types;
+	int weighted_average_demand = 0;
+
+	for (const unit_type *spawned_type : spawned_types) {
+		const int spawned_type_demand = spawned_type->Stats[this->Player->get_index()].Variables[DEMAND_INDEX].Value;
+		const int inverse_demand_weight = (max_spawned_type_demand + 1) - spawned_type_demand;
+
+		weighted_average_demand += spawned_type_demand * inverse_demand_weight;
+
+		for (int i = 0; i < inverse_demand_weight; ++i) {
+			weighted_spawned_types.push_back(spawned_type);
+		}
+	}
+
+	weighted_average_demand /= static_cast<int>(weighted_spawned_types.size());
+
+	//1% chance to spawn a unit in a second, with the chance decreasing proportionally to the weighted average demand
+	const int random_chance = 100 * std::max(weighted_average_demand, 1);
+	if (random::get()->generate(random_chance) != 0) {
+		return;
+	}
+
 	const int max_spawned_demand = this->Type->get_max_spawned_demand();
-	int spawned_demand = this->get_nearby_spawned_demand();
+	const int spawned_demand = this->get_nearby_spawned_demand();
 
 	if (spawned_demand >= max_spawned_demand) {
 		return;
 	}
 
-	for (const unit_type *spawned_type : spawned_types) {
-		const int spawned_type_demand = spawned_type->Stats[this->Player->get_index()].Variables[DEMAND_INDEX].Value;
+	const unit_type *spawned_type = vector::get_random(weighted_spawned_types);
 
-		//the quantity of minutes it takes to spawn the unit depends on the unit's supply demand
-		if ((GameCycle % (CYCLES_PER_MINUTE * spawned_type_demand)) != 0) {
-			continue;
-		}
-
-		CUnit *spawned_unit = MakeUnit(*spawned_type, this->Player);
-		DropOutOnSide(*spawned_unit, spawned_unit->Direction, this);
-
-		spawned_demand += spawned_type_demand;
-
-		if (spawned_demand >= max_spawned_demand) {
-			return;
-		}
-	}
+	CUnit *spawned_unit = MakeUnit(*spawned_type, this->Player);
+	DropOutOnSide(*spawned_unit, spawned_unit->Direction, this);
 }
 
 int CUnit::get_nearby_spawned_demand() const

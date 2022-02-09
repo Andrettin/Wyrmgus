@@ -565,6 +565,10 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 
 		// 2) Buffs...
 		HandleBuffsEachSecond(unit);
+
+		if (!unit.Type->get_spawned_units().empty() || (!unit.Type->get_neutral_spawned_units().empty() && unit.Player->is_neutral_player())) {
+			unit.spawn_units();
+		}
 	}
 }
 
@@ -639,7 +643,6 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 
 		unit.UpdateSoldUnits();
-		unit.spawn_units();
 	}
 }
 //Wyrmgus end
