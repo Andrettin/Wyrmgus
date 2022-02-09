@@ -2573,25 +2573,31 @@ static bool is_tile_impassable(const QPoint &pos, const int z, const unit_type &
 	return false;
 }
 
-static bool check_tile_passable_blocks(const QPoint &pos, const int z, const unit_type &unit_type, bool &current_impassable, int &passable_block_count, const bool diagonal_edge)
+static bool check_tile_passable_blocks(const QPoint &pos, const int z, const unit_type &unit_type, std::optional<bool> &current_impassable, int &passable_block_count, const bool diagonal_edge, bool &start_impassable)
 {
 	const bool impassable = is_tile_impassable(pos, z, unit_type);
 
-	if (impassable == current_impassable) {
+	if (current_impassable.has_value() && impassable == current_impassable) {
 		return true;
 	}
 
 	if (impassable == false) {
 		++passable_block_count;
 
-		//the maximum allowed number is 2 to account for an impassable tile in the middle of the border, but which wouldn't prevent the rest of the tiles from being passable between themselves
-		if (passable_block_count > 2) {
+		//the maximum allowed number is 2 if the start is not impassable to account for an impassable tile in the middle of the border, but which wouldn't prevent the rest of the tiles from being passable between themselves
+		const int max_passable_blocks = start_impassable ? 1 : 2;
+
+		if (passable_block_count > max_passable_blocks) {
 			return false;
 		}
 	} else {
 		if (diagonal_edge) {
 			//ignore impassability (but not passability) for diagonal edges
 			return true;
+		}
+
+		if (!current_impassable.has_value()) {
+			start_impassable = true;
 		}
 	}
 
@@ -2620,14 +2626,15 @@ bool unit_type::pos_borders_impassable(const QPoint &pos, const int z) const
 
 	//additionally, the building's adjacent tiles cannot contain more than one block of passable tiles which cannot be traversed between one another
 	//ignore the tiles at the diagonal ends of the rectangle around the building; since units can move diagonally, they are not relevant for passability
-	bool impassable = false;
-	int passable_block_count = 1;
+	std::optional<bool> impassable;
+	bool start_impassable = false;
+	int passable_block_count = 0;
 
 	for (int x = pos.x() - 1; x < pos.x() + this->get_tile_width() + 1; ++x) {
 		const int y = pos.y() - 1;
 		const QPoint tile_pos(x, y);
 		const bool diagonal_edge = (x == pos.x() - 1) || (x == pos.x() + this->get_tile_width());
-		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge)) {
+		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge, start_impassable)) {
 			return true;
 		}
 	}
@@ -2636,7 +2643,7 @@ bool unit_type::pos_borders_impassable(const QPoint &pos, const int z) const
 		const int x = pos.x() + this->get_tile_width();
 		const QPoint tile_pos(x, y);
 		const bool diagonal_edge = (y == pos.y() - 1) || (y == pos.y() + this->get_tile_height());
-		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge)) {
+		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge, start_impassable)) {
 			return true;
 		}
 	}
@@ -2645,7 +2652,7 @@ bool unit_type::pos_borders_impassable(const QPoint &pos, const int z) const
 		const int y = pos.y() + this->get_tile_height();
 		const QPoint tile_pos(x, y);
 		const bool diagonal_edge = (x == pos.x() - 1) || (x == pos.x() + this->get_tile_width());
-		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge)) {
+		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge, start_impassable)) {
 			return true;
 		}
 	}
@@ -2654,15 +2661,7 @@ bool unit_type::pos_borders_impassable(const QPoint &pos, const int z) const
 		const int x = pos.x() - 1;
 		const QPoint tile_pos(x, y);
 		const bool diagonal_edge = (y == pos.y() - 1) || (y == pos.y() + this->get_tile_height());
-		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge)) {
-			return true;
-		}
-	}
-
-	//if we end with an impassable tile, then we need to increment the passable block count to account for the gap between the last and first passable tiles
-	if (impassable) {
-		++passable_block_count;
-		if (passable_block_count > 2) {
+		if (!check_tile_passable_blocks(tile_pos, z, *this, impassable, passable_block_count, diagonal_edge, start_impassable)) {
 			return true;
 		}
 	}
