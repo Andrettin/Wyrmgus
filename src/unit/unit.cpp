@@ -2981,7 +2981,7 @@ int CUnit::get_nearby_spawned_demand() const
 	std::vector<CUnit *> nearby_units;
 	SelectAroundUnit(*this, nearby_spawned_range, nearby_units, HasSamePlayerAs(*this->Player));
 
-	for (CUnit *nearby_unit : nearby_units) {
+	for (const CUnit *nearby_unit : nearby_units) {
 		if (!vector::contains(this->Type->get_spawned_units(), nearby_unit->Type) && !vector::contains(this->Type->get_neutral_spawned_units(), nearby_unit->Type)) {
 			continue;
 		}
