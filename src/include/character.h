@@ -483,7 +483,7 @@ public:
 			return this->get_father();
 		}
 
-		if (this->get_mother() != nullptr && this->get_mother()->get_dynasty() == this->get_dynasty() && !this->get_father()->is_hidden_in_tree()) {
+		if (this->get_mother() != nullptr && this->get_mother()->get_dynasty() == this->get_dynasty() && !this->get_mother()->is_hidden_in_tree()) {
 			return this->get_mother();
 		}
 
