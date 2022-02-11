@@ -273,7 +273,7 @@ public:
 	{
 		if (!color_modification.is_null()) {
 			if (color_modification.get_player_color() != nullptr && (color_modification.get_player_color() == this->get_conversible_player_color() || !this->has_player_color())) {
-				const wyrmgus::color_modification modification(color_modification.get_hue_rotation(), color_modification.get_hue_ignored_colors(), nullptr, color_modification.get_red_change(), color_modification.get_green_change(), color_modification.get_blue_change());
+				const wyrmgus::color_modification modification(color_modification.get_hue_rotation(), color_modification.is_desaturated(), color_modification.get_hue_ignored_colors(), nullptr, color_modification.get_red_change(), color_modification.get_green_change(), color_modification.get_blue_change());
 				return this->get_or_create_frame_image(frame_index, modification, grayscale);
 			}
 		}
@@ -319,7 +319,7 @@ public:
 	{
 		if (!color_modification.is_null()) {
 			if (color_modification.get_player_color() != nullptr && (color_modification.get_player_color() == this->get_conversible_player_color() || !this->has_player_color())) {
-				const wyrmgus::color_modification modification(color_modification.get_hue_rotation(), color_modification.get_hue_ignored_colors(), nullptr, color_modification.get_red_change(), color_modification.get_green_change(), color_modification.get_blue_change());
+				const wyrmgus::color_modification modification(color_modification.get_hue_rotation(), color_modification.is_desaturated(), color_modification.get_hue_ignored_colors(), nullptr, color_modification.get_red_change(), color_modification.get_green_change(), color_modification.get_blue_change());
 				return this->get_or_create_texture(modification, grayscale);
 			}
 		}

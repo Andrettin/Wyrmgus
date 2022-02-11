@@ -41,18 +41,23 @@ public:
 	{
 	}
 
-	explicit color_modification(const double hue_rotation, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change);
+	explicit color_modification(const double hue_rotation, const bool desaturated, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change);
 
-	explicit color_modification(const double hue_rotation, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color)
-		: color_modification(hue_rotation, hue_ignored_colors, player_color, 0, 0, 0)
+	explicit color_modification(const double hue_rotation, const bool desaturated, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color)
+		: color_modification(hue_rotation, desaturated, hue_ignored_colors, player_color, 0, 0, 0)
 	{
 	}
 
-	explicit color_modification(const double hue_rotation, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day);
+	explicit color_modification(const double hue_rotation, const bool desaturated, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day);
 
 	double get_hue_rotation() const
 	{
 		return this->hue_rotation;
+	}
+
+	bool is_desaturated() const
+	{
+		return this->desaturated;
 	}
 
 	const color_set &get_hue_ignored_colors() const
@@ -87,32 +92,36 @@ public:
 
 	bool is_null() const
 	{
-		return this->get_hue_rotation() == 0 && this->get_player_color() == nullptr && !this->has_rgb_change();
+		return this->get_hue_rotation() == 0 && !this->is_desaturated() && this->get_player_color() == nullptr && !this->has_rgb_change();
 	}
 
 	bool operator <(const color_modification &other) const {
-		if (this->get_hue_rotation() < other.get_hue_rotation()) {
-			return true;
-		} else if (this->get_hue_rotation() == other.get_hue_rotation()) {
-			if (this->get_hue_ignored_colors() < other.get_hue_ignored_colors()) {
-				return true;
-			} else if (this->get_hue_ignored_colors() == other.get_hue_ignored_colors()) {
-				if (this->get_player_color() < other.get_player_color()) {
-					return true;
-				} else if (this->get_player_color() == other.get_player_color()) {
-					if (this->get_red_change() < other.get_red_change()) {
-						return true;
-					} else if (this->get_red_change() == other.get_red_change()) {
-						if (this->get_green_change() < other.get_green_change()) {
-							return true;
-						} else if (this->get_green_change() == other.get_green_change()) {
-							if (this->get_blue_change() < other.get_blue_change()) {
-								return true;
-							}
-						}
-					}
-				}
-			}
+		if (this->get_hue_rotation() != other.get_hue_rotation()) {
+			return this->get_hue_rotation() < other.get_hue_rotation();
+		}
+
+		if (this->is_desaturated() != other.is_desaturated()) {
+			return !this->is_desaturated();
+		}
+
+		if (this->get_hue_ignored_colors() != other.get_hue_ignored_colors()) {
+			return this->get_hue_ignored_colors() < other.get_hue_ignored_colors();
+		}
+
+		if (this->get_player_color() != other.get_player_color()) {
+			return this->get_player_color() < other.get_player_color();
+		}
+
+		if (this->get_red_change() != other.get_red_change()) {
+			return this->get_red_change() < other.get_red_change();
+		}
+
+		if (this->get_green_change() != other.get_green_change()) {
+			return this->get_green_change() < other.get_green_change();
+		}
+
+		if (this->get_blue_change() != other.get_blue_change()) {
+			return this->get_blue_change() < other.get_blue_change();
 		}
 
 		return false;
@@ -121,7 +130,8 @@ public:
 
 private:
 	double hue_rotation = 0; //rotation in degrees to the hue
-	color_set hue_ignored_colors; //ignored colors for the hue rotation
+	bool desaturated = false;
+	color_set hue_ignored_colors; //ignored colors for the hue rotation and desaturation
 
 	const wyrmgus::player_color *player_color = nullptr; //the player color to be applied to the texture
 

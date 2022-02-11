@@ -33,6 +33,7 @@
 #include "map/terrain_type.h"
 #include "player/player_color.h"
 #include "time/season.h"
+#include "util/container_util.h"
 #include "util/log_util.h"
 #include "util/string_util.h"
 #include "video/video.h"
@@ -89,7 +90,9 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 
 	graphics->Load(preferences::get()->get_scale_factor());
 
-	const QImage &image = graphics->get_or_create_frame_image(frame_index, color_modification(0, color_set(), player_color), false);
+	const color_set ignored_colors = container::to_set<std::vector<QColor>, color_set>(graphics->get_conversible_player_color()->get_colors());
+
+	const QImage &image = graphics->get_or_create_frame_image(frame_index, color_modification(terrain->get_hue_rotation(), terrain->is_desaturated(), ignored_colors, player_color), false);
 
 	if (image.isNull()) {
 		log::log_error("Tile image for ID \"" + id_str + "\" is null.");

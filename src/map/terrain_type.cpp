@@ -305,9 +305,14 @@ void terrain_type::calculate_minimap_color(const season *season)
 	const player_color *conversible_player_color = graphic->get_conversible_player_color();
 
 	QImage image = graphic->get_image();
-	if (this->get_hue_rotation() != 0) {
+	if (this->get_hue_rotation() != 0 || this->is_desaturated()) {
 		const color_set ignored_colors = container::to_set<std::vector<QColor>, color_set>(conversible_player_color->get_colors());
-		image::rotate_hue(image, this->get_hue_rotation(), ignored_colors);
+
+		if (this->get_hue_rotation() != 0) {
+			image::rotate_hue(image, this->get_hue_rotation(), ignored_colors);
+		} else if (this->is_desaturated()) {
+			image::desaturate(image, ignored_colors);
+		}
 	}
 
 	int pixel_count = 0;

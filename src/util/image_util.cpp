@@ -484,4 +484,29 @@ void rotate_hue(QImage &image, const double degrees, const color_set &ignored_co
 	}
 }
 
+void desaturate(QImage &image, const color_set &ignored_colors)
+{
+	for (int x = 0; x < image.width(); ++x) {
+		for (int y = 0; y < image.height(); ++y) {
+			QColor pixel_color = image.pixelColor(x, y);
+
+			if (ignored_colors.contains(pixel_color)) {
+				continue;
+			}
+
+			const int old_red = pixel_color.red();
+			const int old_green = pixel_color.green();
+			const int old_blue = pixel_color.blue();
+
+			const int new_value = std::clamp((old_red + old_green + old_blue) / 3, 0, 255);
+
+			pixel_color.setRed(new_value);
+			pixel_color.setGreen(new_value);
+			pixel_color.setBlue(new_value);
+
+			image.setPixelColor(x, y, pixel_color);
+		}
+	}
+}
+
 }

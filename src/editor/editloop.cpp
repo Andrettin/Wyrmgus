@@ -959,7 +959,7 @@ static void DrawTileIcon(const terrain_type *terrain, unsigned x, unsigned y, un
 	x += 3;
 	y += 3;
 
-	const color_modification color_modification(terrain->get_hue_rotation(), color_set(), nullptr, nullptr);
+	const color_modification color_modification(terrain->get_hue_rotation(), terrain->is_desaturated(), color_set(), nullptr, nullptr);
 	terrain->get_graphics()->render_frame(terrain->get_solid_tiles().front(), QPoint(x, y), color_modification, render_commands);
 
 	if (flags & IconSelected) {
@@ -1069,7 +1069,7 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 			const terrain_type *terrain = CEditor::get()->ShownTileTypes[i];
 
 			if (terrain->get_graphics() != nullptr && !terrain->get_solid_tiles().empty()) {
-				const color_modification color_modification(terrain->get_hue_rotation(), color_set(), nullptr, nullptr);
+				const color_modification color_modification(terrain->get_hue_rotation(), terrain->is_desaturated(), color_set(), nullptr, nullptr);
 				terrain->get_graphics()->render_frame(terrain->get_solid_tiles().front(), QPoint(x, y), color_modification, render_commands);
 			}
 
