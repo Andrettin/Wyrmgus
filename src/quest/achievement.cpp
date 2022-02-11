@@ -79,7 +79,7 @@ void achievement::save_achievements()
 	//save achievements
 	const std::filesystem::path achievements_filepath = achievement::get_achievements_filepath();
 
-	sml_data data;
+	gsml_data data;
 
 	for (const achievement *achievement : achievement::get_all()) {
 		if (achievement->is_obtained()) {
@@ -119,7 +119,7 @@ achievement::achievement(const std::string &identifier) : named_data_entry(ident
 {
 }
 
-void achievement::process_sml_property(const sml_property &property)
+void achievement::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -127,11 +127,11 @@ void achievement::process_sml_property(const sml_property &property)
 	if (key == "description") {
 		this->description = value;
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 
-void achievement::process_sml_scope(const sml_data &scope)
+void achievement::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -145,7 +145,7 @@ void achievement::process_sml_scope(const sml_data &scope)
 			this->reward_abilities.push_back(CUpgrade::get(value));
 		}
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

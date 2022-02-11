@@ -59,7 +59,7 @@ public:
 	explicit historical_unit(const std::string &identifier);
 	~historical_unit();
 	
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void check() const override;
 	virtual data_entry_history *get_history_base() override;
 

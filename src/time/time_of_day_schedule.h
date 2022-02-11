@@ -45,7 +45,7 @@ public:
 	{
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 
 	virtual void check() const override
 	{
@@ -80,7 +80,7 @@ public:
 	explicit time_of_day_schedule(const std::string &identifier);
 	~time_of_day_schedule();
 
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
 

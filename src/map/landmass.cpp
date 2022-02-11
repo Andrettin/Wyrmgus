@@ -28,14 +28,14 @@
 
 #include "map/landmass.h"
 
-#include "database/sml_data.h"
+#include "database/gsml_data.h"
 #include "map/map.h"
 #include "map/world.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
 
-void landmass::process_sml_property(const sml_property &property)
+void landmass::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -47,7 +47,7 @@ void landmass::process_sml_property(const sml_property &property)
 	}
 }
 
-void landmass::process_sml_scope(const sml_data &scope)
+void landmass::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -63,16 +63,16 @@ void landmass::process_sml_scope(const sml_data &scope)
 	}
 }
 
-sml_data landmass::to_sml_data() const
+gsml_data landmass::to_gsml_data() const
 {
-	sml_data data;
+	gsml_data data;
 
 	if (this->get_world() != nullptr) {
 		data.add_property("world", this->get_world()->get_identifier());
 	}
 
 	if (!this->get_border_landmasses().empty()) {
-		sml_data border_landmasses_data("border_landmasses");
+		gsml_data border_landmasses_data("border_landmasses");
 		for (const landmass *border_landmass : this->get_border_landmasses()) {
 			border_landmasses_data.add_value(std::to_string(border_landmass->get_index()));
 		}

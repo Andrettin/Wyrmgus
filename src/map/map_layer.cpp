@@ -72,14 +72,14 @@ CMapLayer::~CMapLayer()
 {
 }
 
-void CMapLayer::process_sml_property(const sml_property &property)
+void CMapLayer::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 
 	throw std::runtime_error("Invalid map layer property: \"" + key + "\".");
 }
 
-void CMapLayer::process_sml_scope(const sml_data &scope)
+void CMapLayer::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
@@ -90,11 +90,11 @@ void CMapLayer::process_sml_scope(const sml_data &scope)
 	}
 }
 
-sml_data CMapLayer::to_sml_data() const
+gsml_data CMapLayer::to_gsml_data() const
 {
-	sml_data data;
+	gsml_data data;
 
-	data.add_child(sml_data::from_size(this->get_size(), "size"));
+	data.add_child(gsml_data::from_size(this->get_size(), "size"));
 
 	return data;
 }

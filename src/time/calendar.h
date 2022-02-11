@@ -50,7 +50,7 @@ public:
 	explicit calendar(const std::string &identifier);
 	~calendar();
 
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void initialize() override;
 
 	bool is_any_base_calendar(calendar *calendar) const

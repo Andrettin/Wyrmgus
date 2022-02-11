@@ -88,7 +88,7 @@ terrain_type::~terrain_type()
 {
 }
 
-void terrain_type::process_sml_property(const sml_property &property)
+void terrain_type::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -96,11 +96,11 @@ void terrain_type::process_sml_property(const sml_property &property)
 	if (key == "character") {
 		this->set_character(value.front());
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 
-void terrain_type::process_sml_scope(const sml_data &scope)
+void terrain_type::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -123,7 +123,7 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 			this->Flags |= flag;
 		}
 	} else if (tag == "intermediate_terrain_types") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			terrain_type *other_terrain_type = terrain_type::get(property.get_key());
 			const terrain_type *intermediate_terrain_type = terrain_type::get(property.get_value());
 
@@ -135,7 +135,7 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 			this->solid_tiles.push_back(std::stoi(value));
 		}
 
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const int tile = std::stoi(property.get_key());
 			const int weight = std::stoi(property.get_value());
 
@@ -156,14 +156,14 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 			this->decoration_tiles.push_back(std::stoi(value));
 		}
 	} else if (tag == "season_image_files") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const season *season = season::get(property.get_key());
 			const std::filesystem::path filepath = property.get_value();
 
 			this->season_image_files[season] = filepath;
 		});
 	} else if (tag == "season_minimap_colors") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const season *season = season::get(child_scope.get_tag());
 			const QColor color = child_scope.to_color();
 
@@ -174,7 +174,7 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 			this->snowy_seasons.insert(season::get(value));
 		}
 	} else if (tag == "transition_tiles" || tag == "adjacent_transition_tiles") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &child_tag = child_scope.get_tag();
 			const terrain_type *transition_terrain = nullptr;
 
@@ -182,7 +182,7 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 				transition_terrain = terrain_type::get(child_tag);
 			}
 
-			child_scope.for_each_child([&](const sml_data &grandchild_scope) {
+			child_scope.for_each_child([&](const gsml_data &grandchild_scope) {
 				const std::string &grandchild_tag = grandchild_scope.get_tag();
 				const tile_transition_type transition_type = GetTransitionTypeIdByName(FindAndReplaceString(grandchild_tag, "_", "-"));
 				std::vector<int> tiles;
@@ -199,7 +199,7 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 			});
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

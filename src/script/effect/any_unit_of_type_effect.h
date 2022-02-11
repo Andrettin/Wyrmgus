@@ -36,7 +36,7 @@ namespace wyrmgus {
 class any_unit_of_type_effect final : public scope_effect_base<CPlayer, CUnit>
 {
 public:
-	explicit any_unit_of_type_effect(const sml_operator effect_operator) : scope_effect_base(effect_operator)
+	explicit any_unit_of_type_effect(const gsml_operator effect_operator) : scope_effect_base(effect_operator)
 	{
 	}
 
@@ -46,7 +46,7 @@ public:
 		return class_identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
@@ -54,7 +54,7 @@ public:
 		if (key == "unit_type") {
 			this->unit_type = unit_type::get(value);
 		} else {
-			scope_effect_base::process_sml_property(property);
+			scope_effect_base::process_gsml_property(property);
 		}
 	}
 

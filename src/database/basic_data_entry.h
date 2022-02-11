@@ -28,8 +28,8 @@
 
 namespace wyrmgus {
 
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 
 class basic_data_entry : public QObject
 {
@@ -38,8 +38,8 @@ class basic_data_entry : public QObject
 	Q_PROPERTY(QString class_name READ get_class_name CONSTANT)
 
 public:
-	virtual void process_sml_property(const sml_property &property);
-	virtual void process_sml_scope(const sml_data &scope);
+	virtual void process_gsml_property(const gsml_property &property);
+	virtual void process_gsml_scope(const gsml_data &scope);
 
 	QString get_class_name() const
 	{

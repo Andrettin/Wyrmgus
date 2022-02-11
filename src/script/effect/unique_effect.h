@@ -36,7 +36,7 @@ namespace wyrmgus {
 class unique_effect final : public effect<CUnit>
 {
 public:
-	explicit unique_effect(const std::string &value, const sml_operator effect_operator)
+	explicit unique_effect(const std::string &value, const gsml_operator effect_operator)
 		: effect(effect_operator)
 	{
 		this->unique = unique_item::get(value);

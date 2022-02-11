@@ -43,14 +43,14 @@ template <typename scope_type>
 class scripted_effect_base
 {
 public:
-	void process_sml_property(const sml_property &property)
+	void process_gsml_property(const gsml_property &property)
 	{
-		this->effects.process_sml_property(property);
+		this->effects.process_gsml_property(property);
 	}
 
-	void process_sml_scope(const sml_data &scope)
+	void process_gsml_scope(const gsml_data &scope)
 	{
-		this->effects.process_sml_scope(scope);
+		this->effects.process_gsml_scope(scope);
 	}
 
 	void check() const
@@ -79,14 +79,14 @@ public:
 	{
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
-		scripted_effect_base::process_sml_property(property);
+		scripted_effect_base::process_gsml_property(property);
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override
+	virtual void process_gsml_scope(const gsml_data &scope) override
 	{
-		scripted_effect_base::process_sml_scope(scope);
+		scripted_effect_base::process_gsml_scope(scope);
 	}
 
 	virtual void check() const override
@@ -107,14 +107,14 @@ public:
 	{
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
-		scripted_effect_base::process_sml_property(property);
+		scripted_effect_base::process_gsml_property(property);
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override
+	virtual void process_gsml_scope(const gsml_data &scope) override
 	{
-		scripted_effect_base::process_sml_scope(scope);
+		scripted_effect_base::process_gsml_scope(scope);
 	}
 
 	virtual void check() const override

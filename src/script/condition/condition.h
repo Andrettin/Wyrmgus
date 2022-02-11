@@ -37,9 +37,9 @@ namespace wyrmgus {
 
 class button;
 class civilization;
+class gsml_data;
+class gsml_property;
 class named_data_entry;
-class sml_data;
-class sml_property;
 class unit_type;
 enum class government_type;
 struct read_only_context;
@@ -47,8 +47,8 @@ struct read_only_context;
 class condition
 {
 public:
-	static std::unique_ptr<const condition> from_sml_property(const sml_property &property);
-	static std::unique_ptr<const condition> from_sml_scope(const sml_data &scope);
+	static std::unique_ptr<const condition> from_gsml_property(const gsml_property &property);
+	static std::unique_ptr<const condition> from_gsml_scope(const gsml_data &scope);
 
 	static std::string get_conditions_string(const std::vector<std::unique_ptr<const condition>> &conditions, const size_t indent, const bool links_allowed)
 	{
@@ -99,8 +99,8 @@ public:
 	void ProcessConfigData(const CConfigData *config_data);
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property);
 	virtual void ProcessConfigDataSection(const CConfigData *section);
-	virtual void process_sml_property(const sml_property &property);
-	virtual void process_sml_scope(const sml_data &scope);
+	virtual void process_gsml_property(const gsml_property &property);
+	virtual void process_gsml_scope(const gsml_data &scope);
 
 	virtual void check_validity() const
 	{

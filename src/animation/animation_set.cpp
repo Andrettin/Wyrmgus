@@ -157,7 +157,7 @@ void animation_set::LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
 	}
 }
 
-void animation_set::process_sml_property(const sml_property &property)
+void animation_set::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -180,11 +180,11 @@ void animation_set::process_sml_property(const sml_property &property)
 		const animation_sequence *animation_sequence = animation_sequence::get(value);
 		this->set_animations(key, animation_sequence);
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 
-void animation_set::process_sml_scope(const sml_data &scope)
+void animation_set::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
@@ -207,12 +207,12 @@ void animation_set::process_sml_scope(const sml_data &scope)
 		|| tag.starts_with("harvest")
 	) {
 		animation_sequence *animation_sequence = animation_sequence::add(this->get_identifier() + "_" + tag, this->get_module());
-		database::process_sml_data(animation_sequence, scope);
+		database::process_gsml_data(animation_sequence, scope);
 		FixLabels();
 
 		this->set_animations(tag, animation_sequence);
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

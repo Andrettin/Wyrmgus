@@ -73,7 +73,7 @@ std::unique_ptr<quest_objective> quest_objective::try_from_identifier(const std:
 	return nullptr;
 }
 
-std::unique_ptr<quest_objective> quest_objective::from_sml_property(const sml_property &property, const wyrmgus::quest *quest)
+std::unique_ptr<quest_objective> quest_objective::from_gsml_property(const gsml_property &property, const wyrmgus::quest *quest)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -95,7 +95,7 @@ std::unique_ptr<quest_objective> quest_objective::from_sml_property(const sml_pr
 	}
 }
 
-std::unique_ptr<quest_objective> quest_objective::from_sml_scope(const sml_data &scope, const wyrmgus::quest *quest)
+std::unique_ptr<quest_objective> quest_objective::from_gsml_scope(const gsml_data &scope, const wyrmgus::quest *quest)
 {
 	const std::string &tag = scope.get_tag();
 	std::unique_ptr<quest_objective> objective;
@@ -105,7 +105,7 @@ std::unique_ptr<quest_objective> quest_objective::from_sml_scope(const sml_data 
 		throw std::runtime_error("Invalid quest objective scope: \"" + tag + "\".");
 	}
 
-	database::process_sml_data(objective, scope);
+	database::process_gsml_data(objective, scope);
 
 	return objective;
 }
@@ -115,7 +115,7 @@ quest_objective::quest_objective(const wyrmgus::quest *quest)
 {
 }
 
-void quest_objective::process_sml_property(const sml_property &property)
+void quest_objective::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -139,7 +139,7 @@ void quest_objective::process_sml_property(const sml_property &property)
 	}
 }
 
-void quest_objective::process_sml_scope(const sml_data &scope)
+void quest_objective::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();

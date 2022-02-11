@@ -41,8 +41,8 @@ public:
 	}
 
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void check_validity() const override;
 
 	template <typename scope_type>

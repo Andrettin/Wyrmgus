@@ -146,8 +146,8 @@ public:
 		return duplicate;
 	}
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	const wyrmgus::unit_type *get_unit_type() const
 	{
@@ -873,8 +873,8 @@ public:
 	explicit unit_type(const std::string &identifier);
 	~unit_type();
 
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	virtual void check() const override;

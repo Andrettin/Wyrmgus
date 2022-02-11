@@ -41,8 +41,8 @@ static int CclDefineModifier(lua_State *l);
 namespace wyrmgus {
 
 class faction;
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 class unit_class;
 class unit_type;
 
@@ -60,8 +60,8 @@ public:
 
 	std::unique_ptr<upgrade_modifier> duplicate(const CUpgrade *new_upgrade) const;
 	
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	const CUpgrade *get_upgrade() const
 	{

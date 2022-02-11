@@ -36,14 +36,14 @@
 
 namespace wyrmgus {
 
-historical_location::historical_location(const sml_data &data)
+historical_location::historical_location(const gsml_data &data)
 {
-	database::process_sml_data(this, data);
+	database::process_gsml_data(this, data);
 	this->initialize();
 	this->check();
 }
 	
-void historical_location::process_sml_property(const sml_property &property)
+void historical_location::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -61,7 +61,7 @@ void historical_location::process_sml_property(const sml_property &property)
 	}
 }
 
-void historical_location::process_sml_scope(const sml_data &scope)
+void historical_location::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 

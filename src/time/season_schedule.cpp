@@ -40,21 +40,21 @@ season_schedule::~season_schedule()
 {
 }
 
-void season_schedule::process_sml_scope(const sml_data &scope)
+void season_schedule::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "scheduled_seasons") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &child_tag = child_scope.get_tag();
 			const season *season = season::get(child_tag);
 			const size_t index = this->scheduled_seasons.size();
 			auto scheduled_season = std::make_unique<wyrmgus::scheduled_season>(index, season, this);
-			database::process_sml_data(scheduled_season, child_scope);
+			database::process_gsml_data(scheduled_season, child_scope);
 			this->scheduled_seasons.push_back(std::move(scheduled_season));
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

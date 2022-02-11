@@ -46,7 +46,7 @@ public:
 		return identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
 	virtual void check() const;
 	virtual int Cast(CUnit &caster, const spell &spell,
 		CUnit *target, const Vec2i &goalPos, int z, int modifier) override;

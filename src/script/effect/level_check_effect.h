@@ -35,7 +35,7 @@ namespace wyrmgus {
 class level_check_effect final : public effect<CUnit>
 {
 public:
-	explicit level_check_effect(const sml_operator effect_operator) : effect<CUnit>(effect_operator)
+	explicit level_check_effect(const gsml_operator effect_operator) : effect<CUnit>(effect_operator)
 	{
 	}
 
@@ -45,7 +45,7 @@ public:
 		return class_identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
@@ -53,20 +53,20 @@ public:
 		if (key == "level") {
 			this->level = std::stoi(value);
 		} else {
-			effect<CUnit>::process_sml_property(property);
+			effect<CUnit>::process_gsml_property(property);
 		}
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override
+	virtual void process_gsml_scope(const gsml_data &scope) override
 	{
 		const std::string &tag = scope.get_tag();
 
 		if (tag == "success") {
-			database::process_sml_data(this->success_effects, scope);
+			database::process_gsml_data(this->success_effects, scope);
 		} else if (tag == "failure") {
-			database::process_sml_data(this->failure_effects, scope);
+			database::process_gsml_data(this->failure_effects, scope);
 		} else {
-			effect<CUnit>::process_sml_scope(scope);
+			effect<CUnit>::process_gsml_scope(scope);
 		}
 	}
 

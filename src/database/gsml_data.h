@@ -26,39 +26,39 @@
 
 #pragma once
 
-#include "database/sml_data_visitor.h"
-#include "database/sml_element_visitor.h"
-#include "database/sml_property.h"
-#include "database/sml_property_visitor.h"
+#include "database/gsml_data_visitor.h"
+#include "database/gsml_element_visitor.h"
+#include "database/gsml_property.h"
+#include "database/gsml_property_visitor.h"
 
 namespace wyrmgus {
 
 class geocoordinate;
-class sml_parser;
+class gsml_parser;
 
 //stratagus markup language data
-class sml_data final
+class gsml_data final
 {
 public:
-	static sml_data from_point(const QPoint &point, const std::string &tag = std::string())
+	static gsml_data from_point(const QPoint &point, const std::string &tag = std::string())
 	{
-		sml_data point_data(tag);
+		gsml_data point_data(tag);
 		point_data.add_value(std::to_string(point.x()));
 		point_data.add_value(std::to_string(point.y()));
 		return point_data;
 	}
 
-	static sml_data from_size(const QSize &point, const std::string &tag = std::string())
+	static gsml_data from_size(const QSize &point, const std::string &tag = std::string())
 	{
-		sml_data point_data(tag);
+		gsml_data point_data(tag);
 		point_data.add_value(std::to_string(point.width()));
 		point_data.add_value(std::to_string(point.height()));
 		return point_data;
 	}
 
-	static sml_data from_rect(const QRect &rect, const std::string &tag = std::string())
+	static gsml_data from_rect(const QRect &rect, const std::string &tag = std::string())
 	{
-		sml_data rect_data(tag);
+		gsml_data rect_data(tag);
 
 		const QPoint top_left = rect.topLeft();
 		rect_data.add_value(std::to_string(top_left.x()));
@@ -71,19 +71,19 @@ public:
 		return rect_data;
 	}
 
-	explicit sml_data(std::string &&tag = std::string());
+	explicit gsml_data(std::string &&tag = std::string());
 
-	explicit sml_data(std::string &&tag, const sml_operator scope_operator)
+	explicit gsml_data(std::string &&tag, const gsml_operator scope_operator)
 		: tag(std::move(tag)), scope_operator(scope_operator)
 	{
 	}
 
-	explicit sml_data(const std::string &tag) : sml_data(std::string(tag))
+	explicit gsml_data(const std::string &tag) : gsml_data(std::string(tag))
 	{
 	}
 
-	explicit sml_data(const std::string &tag, const sml_operator scope_operator)
-		: sml_data(std::string(tag), scope_operator)
+	explicit gsml_data(const std::string &tag, const gsml_operator scope_operator)
+		: gsml_data(std::string(tag), scope_operator)
 	{
 	}
 
@@ -92,12 +92,12 @@ public:
 		return this->tag;
 	}
 
-	sml_operator get_operator() const
+	gsml_operator get_operator() const
 	{
 		return this->scope_operator;
 	}
 
-	const sml_data *get_parent() const
+	const gsml_data *get_parent() const
 	{
 		return this->parent;
 	}
@@ -105,7 +105,7 @@ public:
 	bool has_children() const
 	{
 		for (const auto &element : this->get_elements()) {
-			if (std::holds_alternative<sml_data>(element)) {
+			if (std::holds_alternative<gsml_data>(element)) {
 				return true;
 			}
 		}
@@ -118,7 +118,7 @@ public:
 		int count = 0;
 
 		for (const auto &element : this->get_elements()) {
-			if (std::holds_alternative<sml_data>(element)) {
+			if (std::holds_alternative<gsml_data>(element)) {
 				++count;
 			}
 		}
@@ -126,30 +126,30 @@ public:
 		return count;
 	}
 
-	const sml_data &get_child(const std::string &tag) const
+	const gsml_data &get_child(const std::string &tag) const
 	{
 		for (const auto &element : this->get_elements()) {
-			if (!std::holds_alternative<sml_data>(element)) {
+			if (!std::holds_alternative<gsml_data>(element)) {
 				continue;
 			}
 
-			const sml_data &child = std::get<sml_data>(element);
+			const gsml_data &child = std::get<gsml_data>(element);
 			if (child.get_tag() == tag) {
 				return child;
 			}
 		}
 
-		throw std::runtime_error("No child with tag \"" + tag + "\" found for SML data.");
+		throw std::runtime_error("No child with tag \"" + tag + "\" found for GSML data.");
 	}
 
 	bool has_child(const std::string &tag) const
 	{
 		for (const auto &element : this->get_elements()) {
-			if (!std::holds_alternative<sml_data>(element)) {
+			if (!std::holds_alternative<gsml_data>(element)) {
 				continue;
 			}
 
-			if (std::get<sml_data>(element).get_tag() == tag) {
+			if (std::get<gsml_data>(element).get_tag() == tag) {
 				return true;
 			}
 		}
@@ -157,21 +157,21 @@ public:
 		return false;
 	}
 
-	sml_data &add_child(sml_data &&child)
+	gsml_data &add_child(gsml_data &&child)
 	{
 		this->elements.emplace_back(std::move(child));
-		return std::get<sml_data>(this->elements.back());
+		return std::get<gsml_data>(this->elements.back());
 	}
 
-	sml_data &add_child()
+	gsml_data &add_child()
 	{
-		return this->add_child(sml_data());
+		return this->add_child(gsml_data());
 	}
 
-	sml_data &add_child(std::string &&tag, const sml_operator sml_operator)
+	gsml_data &add_child(std::string &&tag, const gsml_operator gsml_operator)
 	{
-		this->elements.push_back(sml_data(std::move(tag), sml_operator));
-		return std::get<sml_data>(this->elements.back());
+		this->elements.push_back(gsml_data(std::move(tag), gsml_operator));
+		return std::get<gsml_data>(this->elements.back());
 	}
 
 	void remove_child(const std::string &tag)
@@ -179,34 +179,34 @@ public:
 		for (size_t i = 0; i < this->elements.size(); ++i) {
 			const auto &element = this->elements.at(i);
 
-			if (!std::holds_alternative<sml_data>(element)) {
+			if (!std::holds_alternative<gsml_data>(element)) {
 				continue;
 			}
 
-			const sml_data &child = std::get<sml_data>(element);
+			const gsml_data &child = std::get<gsml_data>(element);
 			if (child.get_tag() == tag) {
 				this->elements.erase(this->elements.begin() + i);
 				return;
 			}
 		}
 
-		throw std::runtime_error("No child with tag \"" + tag + "\" found for SML data.");
+		throw std::runtime_error("No child with tag \"" + tag + "\" found for GSML data.");
 	}
 
 	template <typename function_type>
 	void for_each_child(const function_type &function) const
 	{
-		const sml_data_visitor visitor(function);
+		const gsml_data_visitor visitor(function);
 		for (const auto &element : this->get_elements()) {
 			std::visit(visitor, element);
 		}
 	}
 
-	std::vector<const sml_property *> try_get_properties(const std::string &key) const
+	std::vector<const gsml_property *> try_get_properties(const std::string &key) const
 	{
-		std::vector<const sml_property *> properties;
+		std::vector<const gsml_property *> properties;
 
-		this->for_each_property([&](const sml_property &property) {
+		this->for_each_property([&](const gsml_property &property) {
 			if (property.get_key() == key) {
 				properties.push_back(&property);
 			}
@@ -218,26 +218,26 @@ public:
 	const std::string &get_property_value(const std::string &key) const
 	{
 		for (const auto &element : this->get_elements()) {
-			if (!std::holds_alternative<sml_property>(element)) {
+			if (!std::holds_alternative<gsml_property>(element)) {
 				continue;
 			}
 
-			const sml_property &property = std::get<sml_property>(element);
+			const gsml_property &property = std::get<gsml_property>(element);
 			if (property.get_key() == key) {
 				return property.get_value();
 			}
 		}
 
-		throw std::runtime_error("No property with key \"" + key + "\" found for SML data.");
+		throw std::runtime_error("No property with key \"" + key + "\" found for GSML data.");
 	}
 
 	void add_property(const std::string &key, const std::string &value);
-	void add_property(std::string &&key, const sml_operator sml_operator, std::string &&value);
+	void add_property(std::string &&key, const gsml_operator gsml_operator, std::string &&value);
 
 	template <typename function_type>
 	void for_each_property(const function_type &function) const
 	{
-		const sml_property_visitor visitor(function);
+		const gsml_property_visitor visitor(function);
 		for (const auto &element : this->get_elements()) {
 			std::visit(visitor, element);
 		}
@@ -249,7 +249,7 @@ public:
 		for (size_t i = 0; i < this->elements.size();) {
 			const auto &element = this->elements.at(i);
 
-			if (std::holds_alternative<sml_property>(element)) {
+			if (std::holds_alternative<gsml_property>(element)) {
 				this->elements.erase(this->elements.begin() + i);
 			} else {
 				++i;
@@ -277,7 +277,7 @@ public:
 		return this->get_elements().empty() && this->get_values().empty();
 	}
 
-	const std::vector<std::variant<sml_property, sml_data>> &get_elements() const
+	const std::vector<std::variant<gsml_property, gsml_data>> &get_elements() const
 	{
 		return this->elements;
 	}
@@ -285,7 +285,7 @@ public:
 	template <typename property_function_type, typename data_function_type>
 	void for_each_element(const property_function_type &property_function, const data_function_type &data_function) const
 	{
-		const sml_element_visitor visitor(property_function, data_function);
+		const gsml_element_visitor visitor(property_function, data_function);
 		for (const auto &element : this->get_elements()) {
 			std::visit(visitor, element);
 		}
@@ -387,12 +387,12 @@ public:
 			}
 		}
 
-		this->for_each_property([&](const sml_property &property) {
+		this->for_each_property([&](const gsml_property &property) {
 			property.print(ostream, indentation);
 		});
 
 		bool new_line = true;
-		this->for_each_child([&](const sml_data &child_data) {
+		this->for_each_child([&](const gsml_data &child_data) {
 			child_data.print(ostream, indentation, new_line);
 			if (new_line && child_data.is_minor()) {
 				new_line = false;
@@ -408,18 +408,18 @@ public:
 private:
 	bool is_minor() const
 	{
-		//get whether this is minor SML data, e.g. just containing a few simple values
+		//get whether this is minor GSML data, e.g. just containing a few simple values
 		return this->get_tag().empty() && this->get_elements().empty() && this->get_values().size() < 5;
 	}
 
 private:
 	std::string tag;
-	sml_operator scope_operator;
-	sml_data *parent = nullptr;
-	std::vector<std::string> values; //values directly attached to the SML data scope, used for e.g. name arrays
-	std::vector<std::variant<sml_property, sml_data>> elements;
+	gsml_operator scope_operator;
+	gsml_data *parent = nullptr;
+	std::vector<std::string> values; //values directly attached to the GSML data scope, used for e.g. name arrays
+	std::vector<std::variant<gsml_property, gsml_data>> elements;
 
-	friend sml_parser;
+	friend gsml_parser;
 };
 
 }

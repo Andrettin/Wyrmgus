@@ -42,15 +42,15 @@ cheat::~cheat()
 {
 }
 
-void cheat::process_sml_scope(const sml_data &scope)
+void cheat::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "effects") {
 		this->effects = std::make_unique<effect_list<CPlayer>>();
-		database::process_sml_data(this->effects, scope);
+		database::process_gsml_data(this->effects, scope);
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

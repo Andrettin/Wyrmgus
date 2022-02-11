@@ -36,13 +36,13 @@ struct lua_State;
 static int CclStratagusMap(lua_State *l);
 
 namespace wyrmgus {
+	class gsml_data;
+	class gsml_property;
 	class player_color;
 	class scheduled_season;
 	class scheduled_time_of_day;
 	class season;
 	class season_schedule;
-	class sml_data;
-	class sml_property;
 	class terrain_type;
 	class tile;
 	class time_of_day;
@@ -67,10 +67,10 @@ public:
 
 	~CMapLayer();
 	
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
-	sml_data to_sml_data() const;
+	gsml_data to_gsml_data() const;
 
 	tile *Field(const unsigned int index) const;
 	

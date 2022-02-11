@@ -35,14 +35,14 @@ template <typename scope_type>
 class scope_condition_base : public condition
 {
 public:
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
-		this->conditions.process_sml_property(property);
+		this->conditions.process_gsml_property(property);
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override final
+	virtual void process_gsml_scope(const gsml_data &scope) override final
 	{
-		this->conditions.process_sml_scope(scope);
+		this->conditions.process_gsml_scope(scope);
 	}
 
 	virtual void check_validity() const override

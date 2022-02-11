@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	virtual void process_sml_property(const wyrmgus::sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
@@ -47,7 +47,7 @@ public:
 		if (key == "settlement") {
 			this->settlement = site::get(value);
 		} else {
-			quest_objective::process_sml_property(property);
+			quest_objective::process_gsml_property(property);
 		}
 	}
 

@@ -29,8 +29,8 @@
 #include "map/generated_terrain.h"
 
 #include "config.h"
-#include "database/sml_data.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_property.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "util/string_conversion_util.h"
@@ -38,7 +38,7 @@
 
 namespace wyrmgus {
 
-void generated_terrain::process_sml_property(const sml_property &property)
+void generated_terrain::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -61,7 +61,7 @@ void generated_terrain::process_sml_property(const sml_property &property)
 	}
 }
 
-void generated_terrain::process_sml_scope(const sml_data &scope)
+void generated_terrain::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 

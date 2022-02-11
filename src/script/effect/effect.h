@@ -32,9 +32,9 @@ class CUnit;
 namespace wyrmgus {
 
 class dialogue;
-class sml_data;
-class sml_property;
-enum class sml_operator;
+class gsml_data;
+class gsml_property;
+enum class gsml_operator;
 struct context;
 struct read_only_context;
 
@@ -45,10 +45,10 @@ template <typename scope_type>
 class effect
 {
 public:
-	static std::unique_ptr<effect> from_sml_property(const sml_property &property);
-	static std::unique_ptr<effect> from_sml_scope(const sml_data &scope);
+	static std::unique_ptr<effect> from_gsml_property(const gsml_property &property);
+	static std::unique_ptr<effect> from_gsml_scope(const gsml_data &scope);
 
-	explicit effect(const sml_operator effect_operator);
+	explicit effect(const gsml_operator effect_operator);
 
 	virtual ~effect()
 	{
@@ -56,8 +56,8 @@ public:
 
 	virtual const std::string &get_class_identifier() const = 0;
 
-	virtual void process_sml_property(const sml_property &property);
-	virtual void process_sml_scope(const sml_data &scope);
+	virtual void process_gsml_property(const gsml_property &property);
+	virtual void process_gsml_scope(const gsml_data &scope);
 
 	virtual void check() const
 	{
@@ -126,7 +126,7 @@ public:
 	}
 
 private:
-	sml_operator effect_operator;
+	gsml_operator effect_operator;
 };
 
 extern template class effect<CPlayer>;

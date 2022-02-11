@@ -94,7 +94,7 @@ static void CclSpellMissileLocation(lua_State *l, wyrmgus::spell_action_spawn_mi
 
 namespace wyrmgus {
 
-void spell_action_spawn_missile::process_sml_property(const sml_property &property)
+void spell_action_spawn_missile::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -124,14 +124,14 @@ void spell_action_spawn_missile::process_sml_property(const sml_property &proper
 	}
 }
 
-void spell_action_spawn_missile::process_sml_scope(const sml_data &scope)
+void spell_action_spawn_missile::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "start_point") {
-		database::process_sml_data(this->StartPoint, scope);
+		database::process_gsml_data(this->StartPoint, scope);
 	} else if (tag == "end_point") {
-		database::process_sml_data(this->EndPoint, scope);
+		database::process_gsml_data(this->EndPoint, scope);
 	} else {
 		throw std::runtime_error("Invalid spawn missile spell action scope: \"" + tag + "\".");
 	}
@@ -288,7 +288,7 @@ int spell_action_spawn_missile::Cast(CUnit &caster, const spell &, CUnit *target
 	return 1;
 }
 
-void spell_action_spawn_missile::missile_location::process_sml_property(const sml_property &property)
+void spell_action_spawn_missile::missile_location::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -308,7 +308,7 @@ void spell_action_spawn_missile::missile_location::process_sml_property(const sm
 	}
 }
 
-void spell_action_spawn_missile::missile_location::process_sml_scope(const sml_data &scope)
+void spell_action_spawn_missile::missile_location::process_gsml_scope(const gsml_data &scope)
 {
 	throw std::runtime_error("Invalid spawn missile spell location scope: \"" + scope.get_tag() + "\".");
 }

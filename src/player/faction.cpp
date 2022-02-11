@@ -75,13 +75,13 @@ bool faction::compare_encyclopedia_entries(const faction *lhs, const faction *rh
 	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
-void faction::process_title_names(title_name_map &title_names, const sml_data &scope)
+void faction::process_title_names(title_name_map &title_names, const gsml_data &scope)
 {
-	scope.for_each_child([&](const sml_data &child_scope) {
+	scope.for_each_child([&](const gsml_data &child_scope) {
 		faction::process_title_name_scope(title_names, child_scope);
 	});
 
-	scope.for_each_property([&](const sml_property &property) {
+	scope.for_each_property([&](const gsml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
 		wyrmgus::government_type government_type = string_to_government_type(key);
@@ -89,12 +89,12 @@ void faction::process_title_names(title_name_map &title_names, const sml_data &s
 	});
 }
 
-void faction::process_title_name_scope(title_name_map &title_names, const sml_data &scope)
+void faction::process_title_name_scope(title_name_map &title_names, const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const wyrmgus::government_type government_type = string_to_government_type(tag);
 
-	scope.for_each_property([&](const sml_property &property) {
+	scope.for_each_property([&](const gsml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
 		const faction_tier tier = string_to_faction_tier(key);
@@ -102,16 +102,16 @@ void faction::process_title_name_scope(title_name_map &title_names, const sml_da
 	});
 }
 
-void faction::process_character_title_name_scope(character_title_name_map &character_title_names, const sml_data &scope)
+void faction::process_character_title_name_scope(character_title_name_map &character_title_names, const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const character_title title_type = string_to_character_title(tag);
 
-	scope.for_each_child([&](const sml_data &child_scope) {
+	scope.for_each_child([&](const gsml_data &child_scope) {
 		faction::process_character_title_name_scope(character_title_names[title_type], child_scope);
 	});
 
-	scope.for_each_property([&](const sml_property &property) {
+	scope.for_each_property([&](const gsml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
 		const wyrmgus::government_type government_type = string_to_government_type(key);
@@ -119,22 +119,22 @@ void faction::process_character_title_name_scope(character_title_name_map &chara
 	});
 }
 
-void faction::process_character_title_name_scope(std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const sml_data &scope)
+void faction::process_character_title_name_scope(std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const wyrmgus::government_type government_type = string_to_government_type(tag);
 
-	scope.for_each_child([&](const sml_data &child_scope) {
+	scope.for_each_child([&](const gsml_data &child_scope) {
 		faction::process_character_title_name_scope(character_title_names[government_type], child_scope);
 	});
 }
 
-void faction::process_character_title_name_scope(std::map<faction_tier, std::map<gender, std::string>> &character_title_names, const sml_data &scope)
+void faction::process_character_title_name_scope(std::map<faction_tier, std::map<gender, std::string>> &character_title_names, const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const faction_tier faction_tier = string_to_faction_tier(tag);
 
-	scope.for_each_property([&](const sml_property &property) {
+	scope.for_each_property([&](const gsml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
 		const gender gender = string_to_gender(key);
@@ -151,7 +151,7 @@ faction::~faction()
 {
 }
 
-void faction::process_sml_scope(const sml_data &scope)
+void faction::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -164,32 +164,32 @@ void faction::process_sml_scope(const sml_data &scope)
 	} else if (tag == "title_names") {
 		faction::process_title_names(this->title_names, scope);
 	} else if (tag == "character_title_names") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 			const character_title title_type = string_to_character_title(key);
 			character_title_names[title_type][government_type::none][faction_tier::none][gender::none] = value;
 		});
 
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			faction::process_character_title_name_scope(this->character_title_names, child_scope);
 		});
 	} else if (tag == "preconditions") {
 		auto preconditions = std::make_unique<and_condition>();
-		database::process_sml_data(preconditions, scope);
+		database::process_gsml_data(preconditions, scope);
 		this->preconditions = std::move(preconditions);
 	} else if (tag == "conditions") {
 		auto conditions = std::make_unique<and_condition>();
-		database::process_sml_data(conditions, scope);
+		database::process_gsml_data(conditions, scope);
 		this->conditions = std::move(conditions);
 	} else if (tag == "force_templates") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto force_template = std::make_unique<ai_force_template>();
-			database::process_sml_data(force_template, child_scope);
+			database::process_gsml_data(force_template, child_scope);
 			this->ai_force_templates[force_template->get_force_type()].push_back(std::move(force_template));
 		});
 	} else if (tag == "unit_class_names") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
 			const unit_class *unit_class = unit_class::get(tag);
@@ -207,7 +207,7 @@ void faction::process_sml_scope(const sml_data &scope)
 
 		this->ship_name_generator->add_names(values);
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

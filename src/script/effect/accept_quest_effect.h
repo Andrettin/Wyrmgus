@@ -36,7 +36,7 @@ namespace wyrmgus {
 class accept_quest_effect final : public effect<CPlayer>
 {
 public:
-	explicit accept_quest_effect(const std::string &quest_identifier, const sml_operator effect_operator)
+	explicit accept_quest_effect(const std::string &quest_identifier, const gsml_operator effect_operator)
 		: effect(effect_operator)
 	{
 		this->quest = quest::get(quest_identifier);

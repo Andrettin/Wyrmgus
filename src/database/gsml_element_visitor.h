@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2022 by Andrettin
+//      (c) Copyright 2020-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,29 +28,33 @@
 
 namespace wyrmgus {
 
-class sml_data;
-enum class sml_operator;
+class gsml_data;
+class gsml_property;
 
-class sml_parser
+template <typename property_function_type, typename data_function_type>
+class gsml_element_visitor final
 {
 public:
-	explicit sml_parser();
+	gsml_element_visitor(const property_function_type &property_function, const data_function_type &data_function)
+		: property_function(property_function), data_function(data_function)
+	{
+	}
 
-	sml_data parse(const std::filesystem::path &filepath);
-	sml_data parse(const std::string &sml_string);
+	gsml_element_visitor(property_function_type &&property_function, data_function_type &&data_function) = delete;
+
+	void operator()(const gsml_property &property) const
+	{
+		this->property_function(property);
+	}
+
+	void operator()(const gsml_data &scope) const
+	{
+		this->data_function(scope);
+	}
 
 private:
-	void parse(std::istream &istream, sml_data &sml_data);
-	void parse_line(const std::string &line);
-	bool parse_escaped_character(std::string &current_string, const char c);
-	void parse_tokens();
-	void reset();
-
-private:
-	std::vector<std::string> tokens;
-	sml_data *current_sml_data = nullptr;
-	std::string current_key;
-	sml_operator current_property_operator;
+	const property_function_type &property_function;
+	const data_function_type &data_function;
 };
 
 }

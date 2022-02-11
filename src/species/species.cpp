@@ -140,7 +140,7 @@ species::species(const std::string &identifier)
 {
 }
 
-void species::process_sml_scope(const sml_data &scope)
+void species::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -157,7 +157,7 @@ void species::process_sml_scope(const sml_data &scope)
 			other_species->evolutions.push_back(this);
 		}
 	} else {
-		taxon_base::process_sml_scope(scope);
+		taxon_base::process_gsml_scope(scope);
 	}
 }
 

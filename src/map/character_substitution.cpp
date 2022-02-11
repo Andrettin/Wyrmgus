@@ -28,8 +28,8 @@
 
 #include "map/character_substitution.h"
 
-#include "database/sml_data.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_property.h"
 #include "util/container_util.h"
 #include "util/queue_util.h"
 #include "util/string_conversion_util.h"
@@ -38,7 +38,7 @@
 
 namespace wyrmgus {
 
-void character_substitution::process_sml_property(const sml_property &property)
+void character_substitution::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -54,7 +54,7 @@ void character_substitution::process_sml_property(const sml_property &property)
 	}
 }
 
-void character_substitution::process_sml_scope(const sml_data &scope)
+void character_substitution::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -68,7 +68,7 @@ void character_substitution::process_sml_scope(const sml_data &scope)
 			this->target_characters.push_back(string::to_character(value));
 		}
 
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const char c = string::to_character(property.get_key());
 			const int weight = std::stoi(property.get_value());
 
@@ -81,7 +81,7 @@ void character_substitution::process_sml_scope(const sml_data &scope)
 			this->shuffle_character_sets.push_back({ string::to_character(value) });
 		}
 
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			std::vector<char> character_set;
 
 			for (const std::string &value : child_scope.get_values()) {

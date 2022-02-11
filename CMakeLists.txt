@@ -129,12 +129,12 @@ set(database_SRCS
 	src/database/database.cpp
 	src/database/defines.cpp
 	src/database/detailed_data_entry.cpp
+	src/database/gsml_data.cpp
+	src/database/gsml_parser.cpp
+	src/database/gsml_property.cpp
 	src/database/named_data_entry.cpp
 	src/database/predefines.cpp
 	src/database/preferences.cpp
-	src/database/sml_data.cpp
-	src/database/sml_parser.cpp
-	src/database/sml_property.cpp
 )
 source_group(database FILES ${database_SRCS})
 
@@ -743,16 +743,16 @@ set(wyrmgus_database_HDRS
 	src/database/database.h
 	src/database/defines.h
 	src/database/detailed_data_entry.h
+	src/database/gsml_data.h
+	src/database/gsml_data_visitor.h
+	src/database/gsml_element_visitor.h
+	src/database/gsml_operator.h
+	src/database/gsml_parser.h
+	src/database/gsml_property.h
+	src/database/gsml_property_visitor.h
 	src/database/named_data_entry.h
 	src/database/predefines.h
 	src/database/preferences.h
-	src/database/sml_data.h
-	src/database/sml_data_visitor.h
-	src/database/sml_element_visitor.h
-	src/database/sml_operator.h
-	src/database/sml_parser.h
-	src/database/sml_property.h
-	src/database/sml_property_visitor.h
 )
 
 set(wyrmgus_economy_HDRS

@@ -59,24 +59,24 @@ dialogue::~dialogue()
 {
 }
 
-void dialogue::process_sml_scope(const sml_data &scope)
+void dialogue::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "trigger") {
 		//create the trigger for this dialogue
 		wyrmgus::trigger *trigger = trigger::add(this->get_identifier(), this->get_module());
-		database::process_sml_data(trigger, scope);
+		database::process_gsml_data(trigger, scope);
 
 		//add an effect to call this dialogue to the trigger
-		auto dialogue_effect = std::make_unique<call_dialogue_effect<CPlayer>>(this, sml_operator::assignment);
+		auto dialogue_effect = std::make_unique<call_dialogue_effect<CPlayer>>(this, gsml_operator::assignment);
 		trigger->add_effect(std::move(dialogue_effect));
 
 		trigger->Type = trigger::TriggerType::PlayerTrigger;
 	} else {
 		auto node = std::make_unique<dialogue_node>(this);
 		node->ID = this->nodes.size();
-		database::process_sml_data(node, scope);
+		database::process_gsml_data(node, scope);
 
 		if (!tag.empty()) {
 			this->nodes_by_identifier[tag] = node.get();

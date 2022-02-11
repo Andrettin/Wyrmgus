@@ -36,10 +36,10 @@ static int CclDefineCharacter(lua_State *l);
 
 namespace wyrmgus {
 
+class gsml_data;
+class gsml_property;
 class map_template;
 class site;
-class sml_data;
-class sml_property;
 
 class historical_location final
 {
@@ -54,10 +54,10 @@ public:
 		this->check();
 	}
 
-	explicit historical_location(const sml_data &data);
+	explicit historical_location(const gsml_data &data);
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
 	void initialize();
 	void check() const;

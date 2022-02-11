@@ -36,7 +36,7 @@
 
 namespace wyrmgus {
 
-void construction_frame::process_sml_property(const sml_property &property)
+void construction_frame::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -62,7 +62,7 @@ construction::~construction()
 {
 }
 
-void construction::process_sml_property(const sml_property &property)
+void construction::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -70,25 +70,25 @@ void construction::process_sml_property(const sml_property &property)
 	if (key == "image_file") {
 		this->image_file = database::get()->get_graphics_filepath(value);
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 
-void construction::process_sml_scope(const sml_data &scope)
+void construction::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "frames") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto cframe = std::make_unique<construction_frame>();
-			database::process_sml_data(cframe, child_scope);
+			database::process_gsml_data(cframe, child_scope);
 			if (!this->frames.empty()) {
 				this->frames.back()->next = cframe.get();
 			}
 			this->frames.push_back(std::move(cframe));
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

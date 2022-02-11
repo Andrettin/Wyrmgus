@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2022 by Andrettin
+//      (c) Copyright 2020-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,18 +28,32 @@
 
 namespace wyrmgus {
 
-enum class sml_operator
+class gsml_data;
+class gsml_property;
+
+//a visitor that only does an action when visiting GSML properties
+template <typename function_type>
+class gsml_property_visitor
 {
-	none,
-	assignment,
-	addition,
-	subtraction,
-	equality,
-	inequality,
-	less_than,
-	less_than_or_equality,
-	greater_than,
-	greater_than_or_equality
+public:
+	gsml_property_visitor(const function_type &function) : function(function)
+	{
+	}
+
+	gsml_property_visitor(function_type &&function) = delete;
+
+	void operator()(const gsml_property &property) const
+	{
+		this->function(property);
+	}
+
+	void operator()(const gsml_data &scope) const
+	{
+		Q_UNUSED(scope)
+	}
+
+private:
+	const function_type &function;
 };
 
 }

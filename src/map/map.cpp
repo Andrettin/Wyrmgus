@@ -31,8 +31,8 @@
 
 #include "ai/ai_local.h"
 #include "database/defines.h"
+#include "database/gsml_parser.h"
 #include "database/preferences.h"
-#include "database/sml_parser.h"
 #include "direction.h"
 //Wyrmgus start
 #include "editor.h"
@@ -1866,14 +1866,14 @@ QRect CMap::get_rect(const int z) const
 	return QRect(QPoint(0, 0), QPoint(this->Info->MapWidths[z] - 1, this->Info->MapHeights[z] - 1));
 }
 
-void CMap::process_sml_property(const sml_property &property)
+void CMap::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 
 	throw std::runtime_error("Invalid map data property: \"" + key + "\".");
 }
 
-void CMap::process_sml_scope(const sml_data &scope)
+void CMap::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
@@ -1896,7 +1896,7 @@ void CMap::process_sml_scope(const sml_data &scope)
 		this->Info->MapHeights.push_back(this->Info->MapHeight);
 		this->MapLayers.push_back(std::move(map_layer));
 	} else if (tag == "extra_map_layers") {
-		scope.for_each_child([&](const sml_data &map_layer_data) {
+		scope.for_each_child([&](const gsml_data &map_layer_data) {
 			//must process the size here already, as it is required for the map layer's constructor
 			const QSize size = map_layer_data.get_child("size").to_size();
 
@@ -1906,7 +1906,7 @@ void CMap::process_sml_scope(const sml_data &scope)
 				map_layer->moveToThread(QApplication::instance()->thread());
 			}
 
-			database::process_sml_data(map_layer, map_layer_data);
+			database::process_gsml_data(map_layer, map_layer_data);
 
 			this->Info->MapWidths.push_back(map_layer->get_width());
 			this->Info->MapHeights.push_back(map_layer->get_height());
@@ -1921,15 +1921,15 @@ void CMap::process_sml_scope(const sml_data &scope)
 
 		//now, process the data for each landmass
 		size_t current_index = 0;
-		scope.for_each_child([&](const sml_data &landmass_data) {
+		scope.for_each_child([&](const gsml_data &landmass_data) {
 			const std::unique_ptr<landmass> &landmass = this->get_landmasses()[current_index];
-			database::process_sml_data(landmass, landmass_data);
+			database::process_gsml_data(landmass, landmass_data);
 			++current_index;
 		});
 	} else if (tag == "world_data") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const world *world = world::get(child_scope.get_tag());
-			database::process_sml_data(world->get_game_data(), child_scope);
+			database::process_gsml_data(world->get_game_data(), child_scope);
 		});
 	} else {
 		throw std::runtime_error("Invalid map data scope: \"" + scope.get_tag() + "\".");
@@ -1942,28 +1942,28 @@ void CMap::save(CFile &file) const
 	file.printf("--- MODULE: map\n");
 	file.printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName.c_str());
 
-	sml_data map_data;
+	gsml_data map_data;
 
-	map_data.add_child(sml_data::from_size(this->MapLayers.front()->get_size(), "size"));
+	map_data.add_child(gsml_data::from_size(this->MapLayers.front()->get_size(), "size"));
 
 	if (this->MapLayers.size() > 1) {
-		sml_data extra_map_layers_data("extra_map_layers");
+		gsml_data extra_map_layers_data("extra_map_layers");
 		for (size_t i = 1; i < this->MapLayers.size(); ++i) {
 			const CMapLayer *map_layer = this->MapLayers.at(i).get();
-			extra_map_layers_data.add_child(map_layer->to_sml_data());
+			extra_map_layers_data.add_child(map_layer->to_gsml_data());
 		}
 		map_data.add_child(std::move(extra_map_layers_data));
 	}
 
 	if (!this->get_landmasses().empty()) {
-		sml_data landmasses_data("landmasses");
+		gsml_data landmasses_data("landmasses");
 		for (const auto &landmass : this->get_landmasses()) {
-			landmasses_data.add_child(landmass->to_sml_data());
+			landmasses_data.add_child(landmass->to_gsml_data());
 		}
 		map_data.add_child(std::move(landmasses_data));
 	}
 
-	sml_data world_game_data("world_data");
+	gsml_data world_game_data("world_data");
 	for (const world *world : world::get_all()) {
 		if (world->get_game_data() == nullptr) {
 			continue;
@@ -1973,7 +1973,7 @@ void CMap::save(CFile &file) const
 			continue;
 		}
 
-		sml_data world_data = world->get_game_data()->to_sml_data();
+		gsml_data world_data = world->get_game_data()->to_gsml_data();
 
 		if (world_data.is_empty()) {
 			continue;
@@ -4454,8 +4454,8 @@ void SetMapWorld(const std::string &map_world)
 	CMap::get()->get_info()->MapWorld = map_world;
 }
 
-void load_map_data(const std::string &sml_string)
+void load_map_data(const std::string &gsml_string)
 {
-	sml_parser parser;
-	database::process_sml_data(CMap::get(), parser.parse(sml_string));
+	gsml_parser parser;
+	database::process_gsml_data(CMap::get(), parser.parse(gsml_string));
 }

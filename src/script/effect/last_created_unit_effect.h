@@ -34,7 +34,7 @@ namespace wyrmgus {
 class last_created_unit_effect final : public scope_effect<CPlayer, CUnit>
 {
 public:
-	explicit last_created_unit_effect(const sml_operator effect_operator) : scope_effect<CPlayer, CUnit>(effect_operator)
+	explicit last_created_unit_effect(const gsml_operator effect_operator) : scope_effect<CPlayer, CUnit>(effect_operator)
 	{
 	}
 

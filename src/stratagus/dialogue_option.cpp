@@ -29,8 +29,8 @@
 #include "dialogue_option.h"
 
 #include "database/database.h"
-#include "database/sml_data.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_property.h"
 #include "dialogue.h"
 #include "dialogue_node.h"
 #include "luacallback.h"
@@ -51,7 +51,7 @@ dialogue_option::~dialogue_option()
 {
 }
 
-void dialogue_option::process_sml_property(const sml_property &property)
+void dialogue_option::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -73,13 +73,13 @@ void dialogue_option::process_sml_property(const sml_property &property)
 	}
 }
 
-void dialogue_option::process_sml_scope(const sml_data &scope)
+void dialogue_option::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "effects") {
 		this->effects = std::make_unique<effect_list<CPlayer>>();
-		database::process_sml_data(this->effects, scope);
+		database::process_gsml_data(this->effects, scope);
 	} else {
 		throw std::runtime_error("Invalid dialogue option scope: \"" + tag + "\".");
 	}

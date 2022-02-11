@@ -218,7 +218,7 @@ character::~character()
 {
 }
 
-void character::process_sml_scope(const sml_data &scope)
+void character::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -229,7 +229,7 @@ void character::process_sml_scope(const sml_data &scope)
 		}
 	} else if (tag == "conditions") {
 		auto conditions = std::make_unique<and_condition>();
-		database::process_sml_data(conditions, scope);
+		database::process_gsml_data(conditions, scope);
 		this->conditions = std::move(conditions);
 	} else if (tag == "deities") {
 		for (const std::string &value : values) {
@@ -252,7 +252,7 @@ void character::process_sml_scope(const sml_data &scope)
 			this->abilities.push_back(ability);
 		}
 	} else if (tag == "default_items") {
-		scope.for_each_element([&](const sml_property &property) {
+		scope.for_each_element([&](const gsml_property &property) {
 			const wyrmgus::unit_type *unit_type = unit_type::get(property.get_key());
 			const int quantity = std::stoi(property.get_value());
 
@@ -260,15 +260,15 @@ void character::process_sml_scope(const sml_data &scope)
 				auto item = std::make_unique<persistent_item>(unit_type, this);
 				this->default_items.push_back(std::move(item));
 			}
-		}, [&](const sml_data &child_scope) {
+		}, [&](const gsml_data &child_scope) {
 			const wyrmgus::unit_type *unit_type = unit_type::get(child_scope.get_tag());
 
 			auto item = std::make_unique<persistent_item>(unit_type, this);
-			database::process_sml_data(item, child_scope);
+			database::process_gsml_data(item, child_scope);
 			this->default_items.push_back(std::move(item));
 		});
 	} else if (tag == "items") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			wyrmgus::unit_type *unit_type = unit_type::try_get(child_scope.get_tag());
 
 			if (unit_type == nullptr) {
@@ -276,7 +276,7 @@ void character::process_sml_scope(const sml_data &scope)
 			}
 
 			auto item = std::make_unique<persistent_item>(unit_type, this);
-			database::process_sml_data(item, child_scope);
+			database::process_gsml_data(item, child_scope);
 			this->add_item(std::move(item));
 		});
 	} else if (tag == "sounds") {
@@ -284,9 +284,9 @@ void character::process_sml_scope(const sml_data &scope)
 			this->sound_set = std::make_unique<unit_sound_set>();
 		}
 
-		database::process_sml_data(this->sound_set, scope);
+		database::process_gsml_data(this->sound_set, scope);
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

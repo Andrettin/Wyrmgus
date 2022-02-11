@@ -61,7 +61,7 @@ dialogue_node::~dialogue_node()
 {
 }
 
-void dialogue_node::process_sml_property(const sml_property &property)
+void dialogue_node::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -91,17 +91,17 @@ void dialogue_node::process_sml_property(const sml_property &property)
 	}
 }
 
-void dialogue_node::process_sml_scope(const sml_data &scope)
+void dialogue_node::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "conditions") {
 		auto conditions = std::make_unique<and_condition>();
-		database::process_sml_data(conditions, scope);
+		database::process_gsml_data(conditions, scope);
 		this->conditions = std::move(conditions);
 	} else if (tag == "option") {
 		auto option = std::make_unique<dialogue_option>(this);
-		database::process_sml_data(option, scope);
+		database::process_gsml_data(option, scope);
 		this->add_option(std::move(option));
 	} else {
 		throw std::runtime_error("Invalid dialogue node scope: \"" + tag + "\".");

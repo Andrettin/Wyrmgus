@@ -49,8 +49,8 @@ class resource;
 class resource_icon;
 class season;
 class season_schedule;
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 class terrain_type;
 class time_of_day;
 class time_of_day_schedule;
@@ -121,8 +121,8 @@ class defines final : public QObject, public singleton<defines>
 
 public:
 	void load(const std::filesystem::path &base_path);
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 	void initialize();
 
 	interface_style *get_default_interface_style() const

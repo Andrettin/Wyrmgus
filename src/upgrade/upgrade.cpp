@@ -268,7 +268,7 @@ CUpgrade::~CUpgrade()
 {
 }
 
-void CUpgrade::process_sml_property(const sml_property &property)
+void CUpgrade::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -279,17 +279,17 @@ void CUpgrade::process_sml_property(const sml_property &property)
 	} else if (key == "button_key") {
 		this->button_key = value;
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 
-void CUpgrade::process_sml_scope(const sml_data &scope)
+void CUpgrade::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "costs") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -297,7 +297,7 @@ void CUpgrade::process_sml_scope(const sml_data &scope)
 			this->costs[resource] = std::stoi(value);
 		});
 	} else if (tag == "scaled_costs") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -315,19 +315,19 @@ void CUpgrade::process_sml_scope(const sml_data &scope)
 	} else if (tag == "modifier") {
 		auto modifier = std::make_unique<upgrade_modifier>(this);
 
-		database::process_sml_data(modifier, scope);
+		database::process_gsml_data(modifier, scope);
 
 		upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
 		this->modifiers.push_back(std::move(modifier));
 	} else if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->preconditions, scope);
+		database::process_gsml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->conditions, scope);
+		database::process_gsml_data(this->conditions, scope);
 	} else if (tag == "ai_priority") {
 		this->ai_priority = std::make_unique<factor<CPlayer>>();
-		database::process_sml_data(this->ai_priority, scope);
+		database::process_gsml_data(this->ai_priority, scope);
 	} else if (tag == "affixed_item_classes") {
 		for (const std::string &value : values) {
 			this->affixed_item_classes.insert(string_to_item_class(value));

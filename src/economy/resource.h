@@ -123,7 +123,7 @@ public:
 	{
 	}
 
-	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
 	virtual void initialize() override;
 	virtual void check() const override;
 

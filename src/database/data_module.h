@@ -28,8 +28,8 @@
 
 namespace wyrmgus {
 
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 
 class data_module final : public QObject
 {
@@ -43,8 +43,8 @@ public:
 	{
 	}
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	const std::string &get_identifier() const
 	{

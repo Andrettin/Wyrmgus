@@ -62,10 +62,10 @@
 namespace wyrmgus {
 
 template <typename scope_type>
-std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const sml_property &property)
+std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
-	const sml_operator effect_operator = property.get_operator();
+	const gsml_operator effect_operator = property.get_operator();
 	const std::string &value = property.get_value();
 
 	if constexpr (std::is_same_v<scope_type, CPlayer>) {
@@ -106,7 +106,7 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 }
 
 template <typename scope_type>
-std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml_data &scope)
+std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_scope(const gsml_data &scope)
 {
 	const std::string &effect_identifier = scope.get_tag();
 	std::unique_ptr<effect> effect;
@@ -155,24 +155,24 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 		throw std::runtime_error("Invalid scope effect: \"" + effect_identifier + "\".");
 	}
 
-	database::process_sml_data(effect, scope);
+	database::process_gsml_data(effect, scope);
 
 	return effect;
 }
 
 template <typename scope_type>
-effect<scope_type>::effect(const sml_operator effect_operator) : effect_operator(effect_operator)
+effect<scope_type>::effect(const gsml_operator effect_operator) : effect_operator(effect_operator)
 {
 }
 
 template <typename scope_type>
-void effect<scope_type>::process_sml_property(const sml_property &property)
+void effect<scope_type>::process_gsml_property(const gsml_property &property)
 {
 	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\".");
 }
 
 template <typename scope_type>
-void effect<scope_type>::process_sml_scope(const sml_data &scope)
+void effect<scope_type>::process_gsml_scope(const gsml_data &scope)
 {
 	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\".");
 }
@@ -181,13 +181,13 @@ template <typename scope_type>
 void effect<scope_type>::do_effect(scope_type *scope, const context &ctx) const
 {
 	switch (this->effect_operator) {
-		case sml_operator::assignment:
+		case gsml_operator::assignment:
 			this->do_assignment_effect(scope, ctx);
 			break;
-		case sml_operator::addition:
+		case gsml_operator::addition:
 			this->do_addition_effect(scope);
 			break;
-		case sml_operator::subtraction:
+		case gsml_operator::subtraction:
 			this->do_subtraction_effect(scope);
 			break;
 		default:
@@ -199,11 +199,11 @@ template <typename scope_type>
 std::string effect<scope_type>::get_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const
 {
 	switch (this->effect_operator) {
-		case sml_operator::assignment:
+		case gsml_operator::assignment:
 			return this->get_assignment_string(scope, ctx, indent, prefix);
-		case sml_operator::addition:
+		case gsml_operator::addition:
 			return this->get_addition_string();
-		case sml_operator::subtraction:
+		case gsml_operator::subtraction:
 			return this->get_subtraction_string();
 		default:
 			throw std::runtime_error("Invalid effect operator: \"" + std::to_string(static_cast<int>(this->effect_operator)) + "\".");

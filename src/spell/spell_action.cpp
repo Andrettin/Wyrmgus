@@ -30,7 +30,7 @@
 #include "spell/spell_action.h"
 
 #include "database/database.h"
-#include "database/sml_data.h"
+#include "database/gsml_data.h"
 #include "spell/apply_status_effects_spell_action.h"
 #include "spell/spell_action_adjust_variable.h"
 #include "spell/spell_action_adjust_vitals.h"
@@ -39,7 +39,7 @@
 
 namespace wyrmgus {
 
-std::unique_ptr<spell_action> spell_action::from_sml_scope(const sml_data &scope)
+std::unique_ptr<spell_action> spell_action::from_gsml_scope(const gsml_data &scope)
 {
 	const std::string &action_identifier = scope.get_tag();
 	std::unique_ptr<spell_action> action;
@@ -58,18 +58,18 @@ std::unique_ptr<spell_action> spell_action::from_sml_scope(const sml_data &scope
 		throw std::runtime_error("Invalid scope spell action: \"" + action_identifier + "\".");
 	}
 
-	database::process_sml_data(action, scope);
+	database::process_gsml_data(action, scope);
 	action->check();
 
 	return action;
 }
 
-void spell_action::process_sml_property(const sml_property &property)
+void spell_action::process_gsml_property(const gsml_property &property)
 {
 	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" spell action: \"" + property.get_key() + "\".");
 }
 
-void spell_action::process_sml_scope(const sml_data &scope)
+void spell_action::process_gsml_scope(const gsml_data &scope)
 {
 	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" spell action: \"" + scope.get_tag() + "\".");
 }

@@ -66,8 +66,8 @@ namespace wyrmgus {
 class unit_sound_set final
 {
 public:
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	void map_sounds();
 

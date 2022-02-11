@@ -35,7 +35,7 @@ namespace wyrmgus {
 class remove_unit_effect final : public effect<CUnit>
 {
 public:
-	explicit remove_unit_effect(const std::string &value, const sml_operator effect_operator)
+	explicit remove_unit_effect(const std::string &value, const gsml_operator effect_operator)
 		: effect(effect_operator)
 	{
 		this->remove_unit = string::to_bool(value);

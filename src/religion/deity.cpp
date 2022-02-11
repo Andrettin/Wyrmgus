@@ -80,19 +80,19 @@ deity::deity(const std::string &identifier)
 {
 }
 
-void deity::process_sml_scope(const sml_data &scope)
+void deity::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "character") {
-		database::process_sml_data(this->get_character(), scope);
+		database::process_gsml_data(this->get_character(), scope);
 	} else if (tag == "cultural_names") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const civilization *civilization = civilization::get(property.get_key());
 			this->cultural_names[civilization] = property.get_value();
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

@@ -69,8 +69,8 @@ public:
 	static void LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 	static void LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 
 	void set_animations(const std::string &animation_type, const animation_sequence *animation_sequence);
 

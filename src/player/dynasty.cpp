@@ -45,18 +45,18 @@ dynasty::~dynasty()
 {
 }
 
-void dynasty::process_sml_scope(const sml_data &scope)
+void dynasty::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->preconditions, scope);
+		database::process_gsml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->conditions, scope);
+		database::process_gsml_data(this->conditions, scope);
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

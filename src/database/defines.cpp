@@ -29,9 +29,9 @@
 #include "database/defines.h"
 
 #include "database/database.h"
+#include "database/gsml_data.h"
+#include "database/gsml_parser.h"
 #include "database/preferences.h"
-#include "database/sml_data.h"
-#include "database/sml_parser.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "player/faction_type.h"
@@ -55,12 +55,12 @@ void defines::load(const std::filesystem::path &data_path)
 		return;
 	}
 
-	sml_parser parser;
-	const sml_data data = parser.parse(defines_path);
-	database::process_sml_data(this, data);
+	gsml_parser parser;
+	const gsml_data data = parser.parse(defines_path);
+	database::process_gsml_data(this, data);
 }
 
-void defines::process_sml_property(const sml_property &property)
+void defines::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -78,19 +78,19 @@ void defines::process_sml_property(const sml_property &property)
 	} else if (key == "progress_bar_file") {
 		this->progress_bar_graphics = CGraphic::New(value);
 	} else {
-		database::process_sml_property_for_object(this, property);
+		database::process_gsml_property_for_object(this, property);
 	}
 }
 
-void defines::process_sml_scope(const sml_data &scope)
+void defines::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "game_sound_set") {
-		database::process_sml_data(game_sound_set::get(), scope);
+		database::process_gsml_data(game_sound_set::get(), scope);
 	} else if (tag == "border_transition_tiles") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			std::string transition_type_str = child_scope.get_tag();
 			string::replace(transition_type_str, "_", "-");
 			const tile_transition_type transition_type = GetTransitionTypeIdByName(transition_type_str);
@@ -103,14 +103,14 @@ void defines::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else if (tag == "faction_type_upgrades") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const faction_type faction_type = string_to_faction_type(property.get_key());
 			const CUpgrade *upgrade = CUpgrade::get(property.get_value());
 
 			this->faction_type_upgrades[faction_type] = upgrade;
 		});
 	} else if (tag == "cycles_per_year_after") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const int threshold = std::stoi(property.get_key());
 			const int seconds = std::stoi(property.get_value());
 
@@ -121,7 +121,7 @@ void defines::process_sml_scope(const sml_data &scope)
 			terrain_type::map_to_wesnoth_string(nullptr, value);
 		}
 	} else {
-		database::process_sml_scope_for_object(this, scope);
+		database::process_gsml_scope_for_object(this, scope);
 	}
 }
 

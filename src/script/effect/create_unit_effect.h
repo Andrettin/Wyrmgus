@@ -44,12 +44,12 @@ namespace wyrmgus {
 class create_unit_effect final : public effect<CPlayer>
 {
 public:
-	explicit create_unit_effect(const sml_operator effect_operator)
+	explicit create_unit_effect(const gsml_operator effect_operator)
 		: effect(effect_operator)
 	{
 	}
 
-	explicit create_unit_effect(const std::string &unit_type_identifier, const sml_operator effect_operator)
+	explicit create_unit_effect(const std::string &unit_type_identifier, const gsml_operator effect_operator)
 		: create_unit_effect(effect_operator)
 	{
 		this->unit_type = unit_type::get(unit_type_identifier);
@@ -61,7 +61,7 @@ public:
 		return class_identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
@@ -79,18 +79,18 @@ public:
 		} else if (key == "ttl") {
 			this->ttl = std::stoi(value);
 		} else {
-			effect::process_sml_property(property);
+			effect::process_gsml_property(property);
 		}
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override
+	virtual void process_gsml_scope(const gsml_data &scope) override
 	{
 		const std::string &tag = scope.get_tag();
 
 		if (tag == "pos") {
 			this->pos = scope.to_point();
 		} else {
-			effect::process_sml_scope(scope);
+			effect::process_gsml_scope(scope);
 		}
 	}
 

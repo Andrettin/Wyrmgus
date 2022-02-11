@@ -67,7 +67,7 @@ persistent_item::persistent_item(const CUnit *item_unit, character *owner) : per
 	this->identified = item_unit->Identified;
 }
 
-void persistent_item::process_sml_property(const sml_property &property)
+void persistent_item::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -127,7 +127,7 @@ void persistent_item::process_sml_property(const sml_property &property)
 	}
 }
 
-void persistent_item::process_sml_scope(const sml_data &scope)
+void persistent_item::process_gsml_scope(const gsml_data &scope)
 {
 	throw std::runtime_error("Invalid persistent item scope: \"" + scope.get_tag() + "\".");
 }

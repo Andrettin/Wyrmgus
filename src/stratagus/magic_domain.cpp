@@ -44,14 +44,14 @@ magic_domain *magic_domain::add(const std::string &identifier, const wyrmgus::da
 	return domain;
 }
 
-void magic_domain::process_sml_scope(const sml_data &scope)
+void magic_domain::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "deity_domain_upgrade") {
-		database::process_sml_data(this->deity_domain_upgrade, scope);
+		database::process_gsml_data(this->deity_domain_upgrade, scope);
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

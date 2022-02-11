@@ -80,14 +80,14 @@ public:
 	static std::filesystem::path get_quest_completion_filepath();
 
 	static void load_quest_completion();
-	static void load_quest_completion_scope(const sml_data &scope);
+	static void load_quest_completion_scope(const gsml_data &scope);
 	static void save_quest_completion();
 
 	explicit quest(const std::string &identifier);
 	~quest();
 	
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void initialize() override;
 	virtual void process_text() override;
 	virtual void check() const override;

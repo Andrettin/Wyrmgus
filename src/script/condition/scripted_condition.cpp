@@ -41,14 +41,14 @@ scripted_condition::~scripted_condition()
 {
 }
 
-void scripted_condition::process_sml_property(const sml_property &property)
+void scripted_condition::process_gsml_property(const gsml_property &property)
 {
-	this->conditions->process_sml_property(property);
+	this->conditions->process_gsml_property(property);
 }
 
-void scripted_condition::process_sml_scope(const sml_data &scope)
+void scripted_condition::process_gsml_scope(const gsml_data &scope)
 {
-	this->conditions->process_sml_scope(scope);
+	this->conditions->process_gsml_scope(scope);
 }
 
 void scripted_condition::check() const

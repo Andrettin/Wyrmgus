@@ -47,8 +47,8 @@ public:
 	explicit character_history(wyrmgus::faction *default_faction, const site *default_location_site);
 	~character_history();
 
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 
 	bool is_active() const
 	{

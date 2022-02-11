@@ -35,8 +35,8 @@ struct lua_State;
 
 namespace wyrmgus {
 
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 class spell;
 
 /**
@@ -46,7 +46,7 @@ class spell;
 class spell_action
 {
 public:
-	static std::unique_ptr<spell_action> from_sml_scope(const sml_data &scope);
+	static std::unique_ptr<spell_action> from_gsml_scope(const gsml_data &scope);
 
 	explicit spell_action(const bool mod = false) : ModifyManaCaster(mod)
 	{
@@ -57,8 +57,8 @@ public:
 	};
 
 	virtual const std::string &get_class_identifier() const = 0;
-	virtual void process_sml_property(const sml_property &property);
-	virtual void process_sml_scope(const sml_data &scope);
+	virtual void process_gsml_property(const gsml_property &property);
+	virtual void process_gsml_scope(const gsml_data &scope);
 	virtual void check() const {}
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
 

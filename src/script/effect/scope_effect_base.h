@@ -35,21 +35,21 @@ template <typename upper_scope_type, typename scope_type>
 class scope_effect_base : public effect<upper_scope_type>
 {
 public:
-	explicit scope_effect_base(const sml_operator effect_operator) : effect<upper_scope_type>(effect_operator)
+	explicit scope_effect_base(const gsml_operator effect_operator) : effect<upper_scope_type>(effect_operator)
 	{
-		if (effect_operator != sml_operator::assignment) {
+		if (effect_operator != gsml_operator::assignment) {
 			throw std::runtime_error("Scope effects can only have the assignment operator as their operator.");
 		}
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
-		this->effects.process_sml_property(property);
+		this->effects.process_gsml_property(property);
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override final
+	virtual void process_gsml_scope(const gsml_data &scope) override final
 	{
-		this->effects.process_sml_scope(scope);
+		this->effects.process_gsml_scope(scope);
 	}
 
 	virtual void check() const override

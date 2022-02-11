@@ -290,7 +290,7 @@ spell::~spell()
 {
 }
 
-void spell::process_sml_property(const sml_property &property)
+void spell::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -307,11 +307,11 @@ void spell::process_sml_property(const sml_property &property)
 		const int item_class = static_cast<int>(string_to_item_class(value));
 		this->ItemSpell[item_class] = true;
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 
-void spell::process_sml_scope(const sml_data &scope)
+void spell::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -323,26 +323,26 @@ void spell::process_sml_scope(const sml_data &scope)
 			domain->add_spell(this);
 		}
 	} else if (tag == "actions") {
-		scope.for_each_child([&](const sml_data &child_scope) {
-			this->actions.push_back(spell_action::from_sml_scope(child_scope));
+		scope.for_each_child([&](const gsml_data &child_scope) {
+			this->actions.push_back(spell_action::from_gsml_scope(child_scope));
 		});
 	} else if (tag == "cast_conditions") {
 		if (!this->cast_conditions) {
 			this->cast_conditions = std::make_unique<ConditionInfo>();
 		}
-		database::process_sml_data(this->cast_conditions, scope);
+		database::process_gsml_data(this->cast_conditions, scope);
 	} else if (tag == "autocast") {
 		if (!this->autocast) {
 			this->autocast = std::make_unique<AutoCastInfo>();
 		}
-		database::process_sml_data(this->autocast, scope);
+		database::process_gsml_data(this->autocast, scope);
 	} else if (tag == "ai_cast") {
 		if (!this->ai_cast) {
 			this->ai_cast = std::make_unique<AutoCastInfo>();
 		}
-		database::process_sml_data(this->ai_cast, scope);
+		database::process_gsml_data(this->ai_cast, scope);
 	} else if (tag == "resource_costs") {
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -350,7 +350,7 @@ void spell::process_sml_scope(const sml_data &scope)
 			this->costs[resource] = std::stoi(value);
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 
@@ -786,10 +786,10 @@ ConditionInfo::ConditionInfo()
 	}
 }
 
-void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
+void ConditionInfo::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
-	const sml_operator &property_operator = property.get_operator();
+	const gsml_operator &property_operator = property.get_operator();
 	const std::string &value = property.get_value();
 
 	if (key == "alliance") {
@@ -814,7 +814,7 @@ void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
 			this->Variable[index].Check = true;
 
 			switch (property_operator) {
-				case wyrmgus::sml_operator::equality:
+				case gsml_operator::equality:
 					this->Variable[index].ExactValue = std::stoi(value);
 					break;
 				default:
@@ -832,20 +832,20 @@ void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
 	}
 }
 
-void ConditionInfo::process_sml_scope(const wyrmgus::sml_data &scope)
+void ConditionInfo::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "status_effects") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
-			const sml_operator &property_operator = property.get_operator();
+			const gsml_operator &property_operator = property.get_operator();
 			const std::string &value = property.get_value();
 
 			const status_effect status_effect = string_to_status_effect(key);
 
 			switch (property_operator) {
-				case sml_operator::equality:
+				case gsml_operator::equality:
 					this->status_effect_values[status_effect] = std::stoi(value);
 					break;
 				default:
@@ -859,7 +859,7 @@ void ConditionInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 		if (index != -1) {
 			this->Variable[index].Check = true;
 
-			scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			scope.for_each_property([&](const gsml_property &property) {
 				const std::string &key = property.get_key();
 				const std::string &value = property.get_value();
 
@@ -891,7 +891,7 @@ void ConditionInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 	}
 }
 
-void AutoCastInfo::process_sml_property(const wyrmgus::sml_property &property)
+void AutoCastInfo::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -911,12 +911,12 @@ void AutoCastInfo::process_sml_property(const wyrmgus::sml_property &property)
 	}
 }
 
-void AutoCastInfo::process_sml_scope(const wyrmgus::sml_data &scope)
+void AutoCastInfo::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "priority") {
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -945,7 +945,7 @@ void AutoCastInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 			this->cast_conditions = std::make_unique<ConditionInfo>();
 		}
 
-		database::process_sml_data(this->cast_conditions, scope);
+		database::process_gsml_data(this->cast_conditions, scope);
 	} else {
 		throw std::runtime_error("Invalid autocast info scope: \"" + tag + "\".");
 	}

@@ -45,7 +45,7 @@ bool literary_text::compare_encyclopedia_entries(const literary_text *lhs, const
 	return named_data_entry::compare_encyclopedia_entries(lhs, rhs);
 }
 
-void literary_text::process_sml_scope(const sml_data &scope)
+void literary_text::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -58,7 +58,7 @@ void literary_text::process_sml_scope(const sml_data &scope)
 			this->chapters.push_back(chapter);
 		}
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

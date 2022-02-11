@@ -105,16 +105,16 @@ public:
 
 	static bool compare_encyclopedia_entries(const faction *lhs, const faction *rhs);
 
-	static void process_title_names(title_name_map &title_names, const sml_data &scope);
-	static void process_title_name_scope(title_name_map &title_names, const sml_data &scope);
-	static void process_character_title_name_scope(character_title_name_map &character_title_names, const sml_data &scope);
-	static void process_character_title_name_scope(std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const sml_data &scope);
-	static void process_character_title_name_scope(std::map<faction_tier, std::map<gender, std::string>> &character_title_names, const sml_data &scope);
+	static void process_title_names(title_name_map &title_names, const gsml_data &scope);
+	static void process_title_name_scope(title_name_map &title_names, const gsml_data &scope);
+	static void process_character_title_name_scope(character_title_name_map &character_title_names, const gsml_data &scope);
+	static void process_character_title_name_scope(std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const gsml_data &scope);
+	static void process_character_title_name_scope(std::map<faction_tier, std::map<gender, std::string>> &character_title_names, const gsml_data &scope);
 
 	explicit faction(const std::string &identifier);
 	~faction();
 
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
 	virtual data_entry_history *get_history_base() override;

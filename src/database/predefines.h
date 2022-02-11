@@ -30,8 +30,8 @@
 
 namespace wyrmgus {
 
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 
 class predefines final : public QObject, public singleton<predefines>
 {
@@ -41,8 +41,8 @@ class predefines final : public QObject, public singleton<predefines>
 
 public:
 	void load(const std::filesystem::path &base_path);
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	bool is_documents_modules_loading_enabled() const
 	{

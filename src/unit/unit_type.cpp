@@ -664,7 +664,7 @@ unit_type::~unit_type()
 {
 }
 
-void unit_type::process_sml_property(const sml_property &property)
+void unit_type::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -782,11 +782,11 @@ void unit_type::process_sml_property(const sml_property &property)
 			return;
 		}
 
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 
-void unit_type::process_sml_scope(const sml_data &scope)
+void unit_type::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -796,7 +796,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			this->subtypes.push_back(unit_type::get(value));
 		}
 
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const unit_type *subtype = unit_type::get(property.get_key());
 			const int weight = std::stoi(property.get_value());
 
@@ -805,11 +805,11 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else if (tag == "hue_ignored_colors") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			this->hue_ignored_colors.insert(child_scope.to_color());
 		});
 	} else if (tag == "costs") {
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -817,7 +817,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			this->DefaultStat.set_cost(resource, std::stoi(value));
 		});
 	} else if (tag == "repair_costs") {
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -825,7 +825,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			this->repair_costs[resource] = std::stoi(value);
 		});
 	} else if (tag == "starting_resources") {
-		if (scope.get_operator() == sml_operator::assignment) {
+		if (scope.get_operator() == gsml_operator::assignment) {
 			this->starting_resources.clear();
 		}
 
@@ -853,7 +853,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			this->AiDrops.push_back(unit_type::get(value));
 		}
 	} else if (tag == "default_equipment") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -872,7 +872,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
 		}
 
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -902,7 +902,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			this->Affixes.push_back(CUpgrade::get(value));
 		}
 	} else if (tag == "resource_gathering") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 			const resource *resource = resource::get(tag);
 
@@ -912,10 +912,10 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			}
 
 			resource_info *res_info_ptr = this->resource_infos[resource].get();
-			database::process_sml_data(res_info_ptr, child_scope);
+			database::process_gsml_data(res_info_ptr, child_scope);
 		});
 	} else if (tag == "variations") {
-		if (scope.get_operator() == sml_operator::assignment) {
+		if (scope.get_operator() == gsml_operator::assignment) {
 			//remove previously defined variations, if any
 			this->variations.clear();
 
@@ -928,12 +928,12 @@ void unit_type::process_sml_scope(const sml_data &scope)
 		this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 		this->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
 
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 			auto variation = make_qunique<unit_type_variation>(tag, this);
 			variation->moveToThread(QApplication::instance()->thread());
 
-			database::process_sml_data(variation, child_scope);
+			database::process_gsml_data(variation, child_scope);
 
 			this->variations.push_back(std::move(variation));
 		});
@@ -942,7 +942,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 	} else if (tag == "button_icons") {
 		this->ButtonIcons.clear();
 
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -960,20 +960,20 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			this->sound_set = std::make_unique<unit_sound_set>();
 		}
 
-		database::process_sml_data(this->sound_set, scope);
+		database::process_gsml_data(this->sound_set, scope);
 	} else if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->preconditions, scope);
+		database::process_gsml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->conditions, scope);
+		database::process_gsml_data(this->conditions, scope);
 	} else {
 		const std::string pascal_case_tag = string::snake_case_to_pascal_case(tag);
 
 		const int index = UnitTypeVar.VariableNameLookup[pascal_case_tag.c_str()]; // variable index
 
 		if (index != -1) { // valid index
-			scope.for_each_property([&](const sml_property &property) {
+			scope.for_each_property([&](const gsml_property &property) {
 				const std::string &key = property.get_key();
 				const std::string &value = property.get_value();
 
@@ -993,7 +993,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			return;
 		}
 
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 
@@ -2694,7 +2694,7 @@ bool unit_type::can_be_dropped_on_pos(const QPoint &pos, const int z, const bool
 	return true;
 }
 
-void resource_info::process_sml_property(const sml_property &property)
+void resource_info::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -2718,7 +2718,7 @@ void resource_info::process_sml_property(const sml_property &property)
 	}
 }
 
-void resource_info::process_sml_scope(const sml_data &scope)
+void resource_info::process_gsml_scope(const gsml_data &scope)
 {
 	throw std::runtime_error("Invalid resource gathering info scope: \"" + scope.get_tag() + "\".");
 }

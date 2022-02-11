@@ -686,7 +686,7 @@ void font::make_font_color_texture(const wyrmgus::font_color *fc)
 	this->font_color_graphics[fc] = std::move(newg);
 }
 
-void font::process_sml_property(const sml_property &property)
+void font::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -694,7 +694,7 @@ void font::process_sml_property(const sml_property &property)
 	if (key == "file") {
 		this->filepath = database::get()->get_graphics_filepath(value);
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 

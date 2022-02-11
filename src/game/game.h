@@ -37,9 +37,9 @@ namespace wyrmgus {
 
 class age;
 class campaign;
+class gsml_data;
+class gsml_property;
 class results_info;
-class sml_data;
-class sml_property;
 class trigger;
 
 template <typename scope_type>
@@ -227,8 +227,8 @@ public:
 
 	void do_cycle();
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	void save(const std::filesystem::path &filepath) const;
 	void save_game_data(CFile &file) const;
@@ -334,7 +334,7 @@ class CFile;
 class CGraphic;
 //Wyrmgus end
 
-extern void load_game_data(const std::string &sml_string);
+extern void load_game_data(const std::string &gsml_string);
 
 extern void LoadGame(const std::filesystem::path &filepath); /// Load saved game
 extern int SaveGame(const std::string &file_url_str); /// Save game

@@ -61,7 +61,7 @@ public:
 	explicit dynasty(const std::string &identifier);
 	~dynasty();
 
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void check() const override;
 
 	virtual std::string get_encyclopedia_text() const override;

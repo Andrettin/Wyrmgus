@@ -26,18 +26,18 @@
 
 #include "stratagus.h"
 
-#include "database/sml_parser.h"
+#include "database/gsml_parser.h"
 
-#include "database/sml_data.h"
-#include "database/sml_operator.h"
+#include "database/gsml_data.h"
+#include "database/gsml_operator.h"
 
 namespace wyrmgus {
 
-sml_parser::sml_parser() : current_property_operator(sml_operator::none)
+gsml_parser::gsml_parser() : current_property_operator(gsml_operator::none)
 {
 }
 
-sml_data sml_parser::parse(const std::filesystem::path &filepath)
+gsml_data gsml_parser::parse(const std::filesystem::path &filepath)
 {
 	if (!std::filesystem::exists(filepath)) {
 		throw std::runtime_error("File \"" + filepath.string() + "\" not found.");
@@ -49,37 +49,37 @@ sml_data sml_parser::parse(const std::filesystem::path &filepath)
 		throw std::runtime_error("Failed to open file: " + filepath.string());
 	}
 
-	sml_data file_sml_data(filepath.stem().string());
+	gsml_data file_gsml_data(filepath.stem().string());
 
 	try {
-		this->parse(ifstream, file_sml_data);
+		this->parse(ifstream, file_gsml_data);
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error parsing data file \"" + filepath.string() + "\"."));
 	}
 
-	return file_sml_data;
+	return file_gsml_data;
 }
 
-sml_data sml_parser::parse(const std::string &sml_string)
+gsml_data gsml_parser::parse(const std::string &gsml_string)
 {
-	std::istringstream istream(sml_string);
+	std::istringstream istream(gsml_string);
 
-	sml_data sml_data;
+	gsml_data gsml_data;
 
 	try {
-		this->parse(istream, sml_data);
+		this->parse(istream, gsml_data);
 	} catch (...) {
-		std::throw_with_nested(std::runtime_error("Error parsing data string: \"" + sml_string + "\"."));
+		std::throw_with_nested(std::runtime_error("Error parsing data string: \"" + gsml_string + "\"."));
 	}
 
-	return sml_data;
+	return gsml_data;
 }
 
-void sml_parser::parse(std::istream &istream, sml_data &sml_data)
+void gsml_parser::parse(std::istream &istream, gsml_data &gsml_data)
 {
 	std::string line;
 	int line_index = 1;
-	this->current_sml_data = &sml_data;
+	this->current_gsml_data = &gsml_data;
 
 	try {
 		while (std::getline(istream, line)) {
@@ -94,7 +94,7 @@ void sml_parser::parse(std::istream &istream, sml_data &sml_data)
 	this->reset();
 }
 
-void sml_parser::parse_line(const std::string &line)
+void gsml_parser::parse_line(const std::string &line)
 {
 	bool opened_quotation_marks = false;
 	bool escaped = false;
@@ -144,14 +144,14 @@ void sml_parser::parse_line(const std::string &line)
 }
 
 /**
-**	@brief	Parse an escaped character in a SML data file line
+**	@brief	Parse an escaped character in a GSML data file line
 **
 **	@param	current_string	The string currently being built from the parsing
 **	@param	c				The character
 **
 **	@return	True if an escaped character was added to the string, or false otherwise
 */
-bool sml_parser::parse_escaped_character(std::string &current_string, const char c)
+bool gsml_parser::parse_escaped_character(std::string &current_string, const char c)
 {
 	if (c == 'n') {
 		current_string += '\n';
@@ -171,32 +171,32 @@ bool sml_parser::parse_escaped_character(std::string &current_string, const char
 }
 
 /**
-**	@brief	Parse the current tokens from the SML data file
+**	@brief	Parse the current tokens from the GSML data file
 */
-void sml_parser::parse_tokens()
+void gsml_parser::parse_tokens()
 {
 	for (std::string &token : this->tokens) {
-		if (!this->current_key.empty() && this->current_property_operator == sml_operator::none && token != "=" && token != "+=" && token != "-=" && token != "==" && token != "!=" && token != "<" && token != "<=" && token != ">" && token != ">=" && token != "{") {
+		if (!this->current_key.empty() && this->current_property_operator == gsml_operator::none && token != "=" && token != "+=" && token != "-=" && token != "==" && token != "!=" && token != "<" && token != "<=" && token != ">" && token != ">=" && token != "{") {
 			//if the previously-given key isn't empty and no operator has been provided before or now, then the key was actually a value, part of a simple collection of values
-			this->current_sml_data->add_value(std::move(this->current_key));
+			this->current_gsml_data->add_value(std::move(this->current_key));
 			this->current_key = std::string();
 		}
 
 		if (this->current_key.empty()) {
 			if (token == "{") { //opens a new, untagged scope
-				sml_data &new_sml_data = this->current_sml_data->add_child();
-				new_sml_data.parent = this->current_sml_data;
-				this->current_sml_data = &new_sml_data;
+				gsml_data &new_gsml_data = this->current_gsml_data->add_child();
+				new_gsml_data.parent = this->current_gsml_data;
+				this->current_gsml_data = &new_gsml_data;
 			} else if (token == "}") { //closes current tag
-				if (this->current_sml_data == nullptr) {
+				if (this->current_gsml_data == nullptr) {
 					throw std::runtime_error("Tried closing tag before any tag had been opened.");
 				}
 
-				if (this->current_sml_data->get_parent() == nullptr) {
+				if (this->current_gsml_data->get_parent() == nullptr) {
 					throw std::runtime_error("An extra tag closing token is present.");
 				}
 
-				this->current_sml_data = this->current_sml_data->parent;
+				this->current_gsml_data = this->current_gsml_data->parent;
 			} else { //key
 				this->current_key = std::move(token);
 			}
@@ -204,25 +204,25 @@ void sml_parser::parse_tokens()
 			continue;
 		}
 
-		if (this->current_property_operator == sml_operator::none) { //operator
+		if (this->current_property_operator == gsml_operator::none) { //operator
 			if (token == "=") {
-				this->current_property_operator = sml_operator::assignment;
+				this->current_property_operator = gsml_operator::assignment;
 			} else if (token == "+=") {
-				this->current_property_operator = sml_operator::addition;
+				this->current_property_operator = gsml_operator::addition;
 			} else if (token == "-=") {
-				this->current_property_operator = sml_operator::subtraction;
+				this->current_property_operator = gsml_operator::subtraction;
 			} else if (token == "==") {
-				this->current_property_operator = sml_operator::equality;
+				this->current_property_operator = gsml_operator::equality;
 			} else if (token == "!=") {
-				this->current_property_operator = sml_operator::inequality;
+				this->current_property_operator = gsml_operator::inequality;
 			} else if (token == "<") {
-				this->current_property_operator = sml_operator::less_than;
+				this->current_property_operator = gsml_operator::less_than;
 			} else if (token == "<=") {
-				this->current_property_operator = sml_operator::less_than_or_equality;
+				this->current_property_operator = gsml_operator::less_than_or_equality;
 			} else if (token == ">") {
-				this->current_property_operator = sml_operator::greater_than;
+				this->current_property_operator = gsml_operator::greater_than;
 			} else if (token == ">=") {
-				this->current_property_operator = sml_operator::greater_than_or_equality;
+				this->current_property_operator = gsml_operator::greater_than_or_equality;
 			} else {
 				throw std::runtime_error("Tried using operator \"" + token + "\" for key \"" + this->current_key + "\", but it is not a valid operator.");
 			}
@@ -232,31 +232,31 @@ void sml_parser::parse_tokens()
 
 		//value
 		if (token == "{") { //opens tag
-			if (this->current_property_operator != sml_operator::assignment && this->current_property_operator != sml_operator::addition) {
+			if (this->current_property_operator != gsml_operator::assignment && this->current_property_operator != gsml_operator::addition) {
 				throw std::runtime_error("Only the assignment and addition operators are valid after a tag.");
 			}
 
 			std::string &tag_name = this->current_key;
-			sml_data &new_sml_data = this->current_sml_data->add_child(std::move(tag_name), this->current_property_operator);
-			new_sml_data.parent = this->current_sml_data;
-			this->current_sml_data = &new_sml_data;
+			gsml_data &new_gsml_data = this->current_gsml_data->add_child(std::move(tag_name), this->current_property_operator);
+			new_gsml_data.parent = this->current_gsml_data;
+			this->current_gsml_data = &new_gsml_data;
 		} else {
-			this->current_sml_data->add_property(std::move(this->current_key), this->current_property_operator, std::move(token));
+			this->current_gsml_data->add_property(std::move(this->current_key), this->current_property_operator, std::move(token));
 		}
 
 		this->current_key = std::string();
-		this->current_property_operator = sml_operator::none;
+		this->current_property_operator = gsml_operator::none;
 	}
 
 	this->tokens.clear();
 }
 
-void sml_parser::reset()
+void gsml_parser::reset()
 {
 	this->tokens.clear();
-	this->current_sml_data = nullptr;
+	this->current_gsml_data = nullptr;
 	this->current_key = std::string();
-	this->current_property_operator = sml_operator::none;
+	this->current_property_operator = gsml_operator::none;
 }
 
 }

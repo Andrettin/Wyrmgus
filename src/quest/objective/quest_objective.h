@@ -37,12 +37,12 @@ static int CclDefineQuest(lua_State *l);
 namespace wyrmgus {
 
 class faction;
+class gsml_data;
+class gsml_property;
 class player_quest_objective;
 class quest;
 class resource;
 class site;
-class sml_data;
-class sml_property;
 class unit_class;
 class unit_type;
 enum class objective_type;
@@ -61,8 +61,8 @@ public:
 		return objective;
 	}
 
-	static std::unique_ptr<quest_objective> from_sml_property(const sml_property &property, const quest *quest);
-	static std::unique_ptr<quest_objective> from_sml_scope(const sml_data &scope, const quest *quest);
+	static std::unique_ptr<quest_objective> from_gsml_property(const gsml_property &property, const quest *quest);
+	static std::unique_ptr<quest_objective> from_gsml_scope(const gsml_data &scope, const quest *quest);
 
 protected:
 	explicit quest_objective(const wyrmgus::quest *quest);
@@ -72,8 +72,8 @@ public:
 	{
 	}
 
-	virtual void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	virtual void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	virtual void check() const
 	{

@@ -110,7 +110,7 @@ $pfile "unit.pkg"
 $pfile "upgrade.pkg"
 $pfile "video.pkg"
 
-extern void load_game_data(const std::string sml_string);
+extern void load_game_data(const std::string gsml_string);
 
 extern int SaveGame(const std::string filepath_str);
 

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2019-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,33 +28,42 @@
 
 namespace wyrmgus {
 
-class sml_data;
-class sml_property;
+enum class gsml_operator;
 
-template <typename property_function_type, typename data_function_type>
-class sml_element_visitor final
+class gsml_property final
 {
 public:
-	sml_element_visitor(const property_function_type &property_function, const data_function_type &data_function)
-		: property_function(property_function), data_function(data_function)
+	explicit gsml_property(std::string &&key, const gsml_operator property_operator, std::string &&value)
+		: key(std::move(key)), property_operator(property_operator), value(std::move(value))
 	{
 	}
 
-	sml_element_visitor(property_function_type &&property_function, data_function_type &&data_function) = delete;
-
-	void operator()(const sml_property &property) const
+	explicit gsml_property(const std::string &key, const gsml_operator property_operator, const std::string &value)
+		: key(key), property_operator(property_operator), value(value)
 	{
-		this->property_function(property);
 	}
 
-	void operator()(const sml_data &scope) const
+	const std::string &get_key() const
 	{
-		this->data_function(scope);
+		return this->key;
 	}
+
+	gsml_operator get_operator() const
+	{
+		return this->property_operator;
+	}
+
+	const std::string &get_value() const
+	{
+		return this->value;
+	}
+
+	void print(std::ostream &ostream, const size_t indentation) const;
 
 private:
-	const property_function_type &property_function;
-	const data_function_type &data_function;
+	std::string key;
+	gsml_operator property_operator;
+	std::string value;
 };
 
 }

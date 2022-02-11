@@ -31,8 +31,8 @@
 
 namespace wyrmgus {
 
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 class sound;
 
 /**
@@ -51,8 +51,8 @@ class game_sound_set final : public QObject, public singleton<game_sound_set>
 	Q_PROPERTY(wyrmgus::sound* chat_message MEMBER chat_message)
 
 public:
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	const sound *get_placement_error_sound() const
 	{

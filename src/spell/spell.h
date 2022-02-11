@@ -114,8 +114,8 @@ class ConditionInfo final
 public:
 	ConditionInfo();
 
-	void process_sml_property(const wyrmgus::sml_property &property);
-	void process_sml_scope(const wyrmgus::sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 	
 	//
 	//  Conditions that check specific flags. Possible values are the defines below.
@@ -157,8 +157,8 @@ public:
 	{
 	}
 	
-	void process_sml_property(const wyrmgus::sml_property &property);
-	void process_sml_scope(const wyrmgus::sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 	
 	const ConditionInfo *get_cast_conditions() const
 	{
@@ -213,8 +213,8 @@ public:
 	explicit spell(const std::string &identifier);
 	~spell();
 
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 
 	void delete_lua_callbacks();
 

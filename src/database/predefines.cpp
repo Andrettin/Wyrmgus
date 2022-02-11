@@ -29,8 +29,8 @@
 #include "database/predefines.h"
 
 #include "database/database.h"
-#include "database/sml_data.h"
-#include "database/sml_parser.h"
+#include "database/gsml_data.h"
+#include "database/gsml_parser.h"
 
 namespace wyrmgus {
 
@@ -42,19 +42,19 @@ void predefines::load(const std::filesystem::path &data_path)
 		return;
 	}
 
-	sml_parser parser;
-	const sml_data data = parser.parse(predefines_path);
-	database::process_sml_data(this, data);
+	gsml_parser parser;
+	const gsml_data data = parser.parse(predefines_path);
+	database::process_gsml_data(this, data);
 }
 
-void predefines::process_sml_property(const sml_property &property)
+void predefines::process_gsml_property(const gsml_property &property)
 {
-	database::process_sml_property_for_object(this, property);
+	database::process_gsml_property_for_object(this, property);
 }
 
-void predefines::process_sml_scope(const sml_data &scope)
+void predefines::process_gsml_scope(const gsml_data &scope)
 {
-	database::process_sml_scope_for_object(this, scope);
+	database::process_gsml_scope_for_object(this, scope);
 }
 
 }

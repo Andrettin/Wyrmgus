@@ -84,7 +84,7 @@ std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate(const CUpgrade *ne
 	return modifier;
 }
 
-void upgrade_modifier::process_sml_property(const sml_property &property)
+void upgrade_modifier::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -111,7 +111,7 @@ void upgrade_modifier::process_sml_property(const sml_property &property)
 	}
 }
 
-void upgrade_modifier::process_sml_scope(const sml_data &scope)
+void upgrade_modifier::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -130,7 +130,7 @@ void upgrade_modifier::process_sml_scope(const sml_data &scope)
 			this->removed_upgrades.push_back(removed_upgrade);
 		}
 	} else if (tag == "costs") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -138,7 +138,7 @@ void upgrade_modifier::process_sml_scope(const sml_data &scope)
 			this->Modifier.set_cost(resource, std::stoi(value));
 		});
 	} else if (tag == "processing_bonus") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -149,7 +149,7 @@ void upgrade_modifier::process_sml_scope(const sml_data &scope)
 		const std::string variable_name = string::snake_case_to_pascal_case(tag);
 		const int index = UnitTypeVar.VariableNameLookup[variable_name.c_str()]; // variable index
 		if (index != -1) { // valid index
-			scope.for_each_property([&](const sml_property &property) {
+			scope.for_each_property([&](const gsml_property &property) {
 				const std::string &key = property.get_key();
 				if (key == "percent_value") {
 					this->ModifyPercent[index] = std::stoi(property.get_value());

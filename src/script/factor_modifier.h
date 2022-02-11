@@ -34,8 +34,8 @@ class CUnit;
 namespace wyrmgus {
 
 class and_condition;
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 
 //a modifier for a factor, e.g. a random chance or weight
 template <typename scope_type>
@@ -45,8 +45,8 @@ public:
 	factor_modifier();
 	~factor_modifier();
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 	void check_validity() const;
 
 	const centesimal_int &get_factor() const

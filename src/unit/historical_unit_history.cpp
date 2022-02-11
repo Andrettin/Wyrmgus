@@ -28,8 +28,8 @@
 
 #include "unit/historical_unit_history.h"
 
-#include "database/sml_data.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_property.h"
 #include "map/historical_location.h"
 #include "map/site.h"
 
@@ -43,7 +43,7 @@ historical_unit_history::~historical_unit_history()
 {
 }
 
-void historical_unit_history::process_sml_property(const sml_property &property)
+void historical_unit_history::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -51,18 +51,18 @@ void historical_unit_history::process_sml_property(const sml_property &property)
 	if (key == "location") {
 		this->location = std::make_unique<historical_location>(site::get(value));
 	} else {
-		data_entry_history::process_sml_property(property);
+		data_entry_history::process_gsml_property(property);
 	}
 }
 
-void historical_unit_history::process_sml_scope(const sml_data &scope)
+void historical_unit_history::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "location") {
 		this->location = std::make_unique<historical_location>(scope);
 	} else {
-		data_entry_history::process_sml_scope(scope);
+		data_entry_history::process_gsml_scope(scope);
 	}
 }
 

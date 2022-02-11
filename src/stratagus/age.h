@@ -50,7 +50,7 @@ public:
 	explicit age(const std::string &identifier);
 	virtual ~age() override;
 	
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void check() const override;
 
 	const resource_icon *get_icon() const

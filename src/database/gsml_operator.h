@@ -28,42 +28,18 @@
 
 namespace wyrmgus {
 
-enum class sml_operator;
-
-class sml_property final
+enum class gsml_operator
 {
-public:
-	explicit sml_property(std::string &&key, const sml_operator property_operator, std::string &&value)
-		: key(std::move(key)), property_operator(property_operator), value(std::move(value))
-	{
-	}
-
-	explicit sml_property(const std::string &key, const sml_operator property_operator, const std::string &value)
-		: key(key), property_operator(property_operator), value(value)
-	{
-	}
-
-	const std::string &get_key() const
-	{
-		return this->key;
-	}
-
-	sml_operator get_operator() const
-	{
-		return this->property_operator;
-	}
-
-	const std::string &get_value() const
-	{
-		return this->value;
-	}
-
-	void print(std::ostream &ostream, const size_t indentation) const;
-
-private:
-	std::string key;
-	sml_operator property_operator;
-	std::string value;
+	none,
+	assignment,
+	addition,
+	subtraction,
+	equality,
+	inequality,
+	less_than,
+	less_than_or_equality,
+	greater_than,
+	greater_than_or_equality
 };
 
 }

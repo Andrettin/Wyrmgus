@@ -37,7 +37,7 @@ namespace wyrmgus {
 class any_unit_of_type_condition final : public scope_condition_base<CUnit>
 {
 public:
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
@@ -45,7 +45,7 @@ public:
 		if (key == "unit_type") {
 			this->unit_type = unit_type::get(value);
 		} else {
-			scope_condition_base::process_sml_property(property);
+			scope_condition_base::process_gsml_property(property);
 		}
 	}
 

@@ -29,8 +29,8 @@
 #include "ai/ai_force_template.h"
 
 #include "ai/ai_force_type.h"
-#include "database/sml_data.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_property.h"
 #include "unit/unit_class.h"
 
 namespace wyrmgus {
@@ -40,7 +40,7 @@ ai_force_template::ai_force_template()
 {
 }
 
-void ai_force_template::process_sml_property(const sml_property &property)
+void ai_force_template::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -56,12 +56,12 @@ void ai_force_template::process_sml_property(const sml_property &property)
 	}
 }
 
-void ai_force_template::process_sml_scope(const sml_data &scope)
+void ai_force_template::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "units") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 

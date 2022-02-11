@@ -29,8 +29,8 @@
 #include "script/effect/delayed_effect_instance.h"
 
 #include "database/database.h"
-#include "database/sml_data.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_property.h"
 #include "dialogue.h"
 #include "player/player.h"
 #include "script/effect/scripted_effect.h"
@@ -66,7 +66,7 @@ delayed_effect_instance<scope_type>::delayed_effect_instance(scope_type *scope, 
 }
 
 template <typename scope_type>
-void delayed_effect_instance<scope_type>::process_sml_property(const sml_property &property)
+void delayed_effect_instance<scope_type>::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -94,22 +94,22 @@ void delayed_effect_instance<scope_type>::process_sml_property(const sml_propert
 }
 
 template <typename scope_type>
-void delayed_effect_instance<scope_type>::process_sml_scope(const sml_data &scope)
+void delayed_effect_instance<scope_type>::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "context") {
 		this->context = wyrmgus::context();
-		database::process_sml_data(this->context, scope);
+		database::process_gsml_data(this->context, scope);
 	} else {
 		throw std::runtime_error("Invalid delayed effect instance scope: \"" + scope.get_tag() + "\".");
 	}
 }
 
 template <typename scope_type>
-sml_data delayed_effect_instance<scope_type>::to_sml_data() const
+gsml_data delayed_effect_instance<scope_type>::to_gsml_data() const
 {
-	sml_data data;
+	gsml_data data;
 
 	if (this->scripted_effect != nullptr) {
 		std::string scripted_effect_identifier;
@@ -133,7 +133,7 @@ sml_data delayed_effect_instance<scope_type>::to_sml_data() const
 
 	data.add_property("remaining_cycles", std::to_string(this->get_remaining_cycles()));
 
-	data.add_child(this->context.to_sml_data("context"));
+	data.add_child(this->context.to_gsml_data("context"));
 
 	return data;
 }

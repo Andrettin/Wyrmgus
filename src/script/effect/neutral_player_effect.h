@@ -35,7 +35,7 @@ template <typename scope_type>
 class neutral_player_effect final : public scope_effect<scope_type, CPlayer>
 {
 public:
-	explicit neutral_player_effect(const sml_operator effect_operator) : scope_effect<scope_type, CPlayer>(effect_operator)
+	explicit neutral_player_effect(const gsml_operator effect_operator) : scope_effect<scope_type, CPlayer>(effect_operator)
 	{
 	}
 

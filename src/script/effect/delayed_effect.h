@@ -40,7 +40,7 @@ template <typename scope_type>
 class delayed_effect final : public effect<scope_type>
 {
 public:
-	explicit delayed_effect(const sml_operator effect_operator) : effect<scope_type>(effect_operator)
+	explicit delayed_effect(const gsml_operator effect_operator) : effect<scope_type>(effect_operator)
 	{
 	}
 
@@ -50,7 +50,7 @@ public:
 		return class_identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
@@ -66,7 +66,7 @@ public:
 		} else if (key == "cycles") {
 			this->delay = std::stoi(value);
 		} else {
-			effect<scope_type>::process_sml_property(property);
+			effect<scope_type>::process_gsml_property(property);
 		}
 	}
 

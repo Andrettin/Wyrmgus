@@ -38,20 +38,20 @@ template <typename scope_type>
 class random_list_entry
 {
 public:
-	explicit random_list_entry(const sml_data &scope)
+	explicit random_list_entry(const gsml_data &scope)
 	{
 		const int base_weight = std::stoi(scope.get_tag());
 
 		this->weight_factor = std::make_unique<factor<scope_type>>(base_weight);
 		this->effects = std::make_unique<effect_list<scope_type>>();
 
-		scope.for_each_element([&](const sml_property &property) {
-			this->effects->process_sml_property(property);
-		}, [&](const sml_data &child_scope) {
+		scope.for_each_element([&](const gsml_property &property) {
+			this->effects->process_gsml_property(property);
+		}, [&](const gsml_data &child_scope) {
 			if (child_scope.get_tag() == "modifier") {
-				this->weight_factor->process_sml_scope(child_scope);
+				this->weight_factor->process_gsml_scope(child_scope);
 			} else {
-				this->effects->process_sml_scope(child_scope);
+				this->effects->process_gsml_scope(child_scope);
 			}
 		});
 	}
@@ -91,7 +91,7 @@ template <typename scope_type>
 class random_list_effect final : public effect<scope_type>
 {
 public:
-	explicit random_list_effect(const sml_operator effect_operator) : effect<scope_type>(effect_operator)
+	explicit random_list_effect(const gsml_operator effect_operator) : effect<scope_type>(effect_operator)
 	{
 	}
 
@@ -101,7 +101,7 @@ public:
 		return identifier;
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override
+	virtual void process_gsml_scope(const gsml_data &scope) override
 	{
 		this->entries.emplace_back(scope);
 	}

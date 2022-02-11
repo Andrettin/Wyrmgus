@@ -44,14 +44,14 @@ public:
 
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
-		this->conditions.push_back(condition::from_sml_property(property));
+		this->conditions.push_back(condition::from_gsml_property(property));
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override
+	virtual void process_gsml_scope(const gsml_data &scope) override
 	{
-		this->conditions.push_back(condition::from_sml_scope(scope));
+		this->conditions.push_back(condition::from_gsml_scope(scope));
 	}
 
 	virtual void check_validity() const override

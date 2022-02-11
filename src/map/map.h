@@ -86,12 +86,12 @@ class CUnitCache;
 namespace wyrmgus {
 	class faction;
 	class generated_terrain;
+	class gsml_data;
+	class gsml_property;
 	class landmass;
 	class map_info;
 	class map_template;
 	class site;
-	class sml_data;
-	class sml_property;
 	class terrain_type;
 	class tile;
 	class unit_type;
@@ -157,8 +157,8 @@ public:
 
 	QRect get_rect(const int z) const;
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	//save the map.
 	void save(CFile &file) const;
@@ -502,7 +502,7 @@ extern void SetSeasonSchedule(const std::string &season_schedule_ident, int z = 
 
 extern void SetMapWorld(const std::string &map_world);
 
-extern void load_map_data(const std::string &sml_string);
+extern void load_map_data(const std::string &gsml_string);
 
 // in unit.c
 

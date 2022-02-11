@@ -54,8 +54,8 @@ public:
 		{
 		}
 
-		void process_sml_property(const sml_property &property);
-		void process_sml_scope(const sml_data &scope);
+		void process_gsml_property(const gsml_property &property);
+		void process_gsml_scope(const gsml_data &scope);
 		void evaluate(const CUnit &caster, const CUnit *target, const Vec2i &goalPos, PixelPos *res) const;
 
 		location_base_type Base;	/// The base for the location (caster/target)
@@ -87,8 +87,8 @@ public:
 		return identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void check() const override;
 	virtual int Cast(CUnit &caster, const spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;

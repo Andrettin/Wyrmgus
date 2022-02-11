@@ -40,7 +40,7 @@ class region_history final : public data_entry_history
 	Q_PROPERTY(qint64 population MEMBER population READ get_population)
 
 public:
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 
 	int64_t get_population() const
 	{

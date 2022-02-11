@@ -34,7 +34,7 @@ namespace wyrmgus {
 class character_unit_condition final : public scope_condition<CUnit>
 {
 public:
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
@@ -42,7 +42,7 @@ public:
 		if (key == "character") {
 			this->character = character::get(value);
 		} else {
-			scope_condition::process_sml_property(property);
+			scope_condition::process_gsml_property(property);
 		}
 	}
 

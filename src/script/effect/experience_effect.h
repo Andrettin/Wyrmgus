@@ -33,7 +33,7 @@ namespace wyrmgus {
 class experience_effect final : public effect<CUnit>
 {
 public:
-	explicit experience_effect(const std::string &value, const sml_operator effect_operator)
+	explicit experience_effect(const std::string &value, const gsml_operator effect_operator)
 		: effect(effect_operator)
 	{
 		this->quantity = std::stoi(value);

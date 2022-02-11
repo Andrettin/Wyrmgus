@@ -30,7 +30,7 @@
 
 #include "database/data_module.h"
 #include "database/database.h"
-#include "database/sml_parser.h"
+#include "database/gsml_parser.h"
 #include "game/difficulty.h"
 #include "game/game.h"
 #include "iocompat.h"
@@ -70,12 +70,12 @@ void quest::load_quest_completion()
 		return;
 	}
 
-	sml_parser parser;
-	const sml_data data = parser.parse(quests_filepath);
+	gsml_parser parser;
+	const gsml_data data = parser.parse(quests_filepath);
 
 	quest::load_quest_completion_scope(data);
 
-	data.for_each_child([&](const sml_data &scope) {
+	data.for_each_child([&](const gsml_data &scope) {
 		if (!database::get()->has_module(scope.get_tag())) {
 			return;
 		}
@@ -84,9 +84,9 @@ void quest::load_quest_completion()
 	});
 }
 
-void quest::load_quest_completion_scope(const sml_data &scope)
+void quest::load_quest_completion_scope(const gsml_data &scope)
 {
-	scope.for_each_property([&](const sml_property &property) {
+	scope.for_each_property([&](const gsml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
 
@@ -111,10 +111,10 @@ void quest::save_quest_completion()
 	//save quests
 	const std::filesystem::path quests_filepath = quest::get_quest_completion_filepath();
 
-	sml_data data;
+	gsml_data data;
 
 	if (std::filesystem::exists(quests_filepath)) {
-		sml_parser parser;
+		gsml_parser parser;
 		data = parser.parse(quests_filepath);
 
 		//keep scopes for non-loaded modules unchanged; otherwise, clear data for re-saving
@@ -137,10 +137,10 @@ void quest::save_quest_completion()
 	}
 
 	for (const auto &[data_module, quests] : completed_quests) {
-		sml_data *quest_scope = &data;
+		gsml_data *quest_scope = &data;
 
 		if (data_module != nullptr) {
-			quest_scope = &data.add_child(sml_data(data_module->get_identifier()));
+			quest_scope = &data.add_child(gsml_data(data_module->get_identifier()));
 		}
 
 		for (const quest *quest : quests) {
@@ -164,7 +164,7 @@ quest::~quest()
 {
 }
 
-void quest::process_sml_property(const sml_property &property)
+void quest::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -172,21 +172,21 @@ void quest::process_sml_property(const sml_property &property)
 	if (key == "hint") {
 		this->hint = value;
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 
-void quest::process_sml_scope(const sml_data &scope)
+void quest::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "objectives") {
-		scope.for_each_element([&](const sml_property &property) {
-			auto objective = quest_objective::from_sml_property(property, this);
+		scope.for_each_element([&](const gsml_property &property) {
+			auto objective = quest_objective::from_gsml_property(property, this);
 			this->objectives.push_back(std::move(objective));
-		}, [&](const sml_data &child_scope) {
-			auto objective = quest_objective::from_sml_scope(child_scope, this);
+		}, [&](const gsml_data &child_scope) {
+			auto objective = quest_objective::from_gsml_scope(child_scope, this);
 			this->objectives.push_back(std::move(objective));
 		});
 	} else if (tag == "objective_strings") {
@@ -195,18 +195,18 @@ void quest::process_sml_scope(const sml_data &scope)
 		}
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->conditions, scope);
+		database::process_gsml_data(this->conditions, scope);
 	} else if (tag == "accept_effects") {
 		this->accept_effects = std::make_unique<effect_list<CPlayer>>();
-		database::process_sml_data(this->accept_effects, scope);
+		database::process_gsml_data(this->accept_effects, scope);
 	} else if (tag == "completion_effects") {
 		this->completion_effects = std::make_unique<effect_list<CPlayer>>();
-		database::process_sml_data(this->completion_effects, scope);
+		database::process_gsml_data(this->completion_effects, scope);
 	} else if (tag == "failure_effects") {
 		this->failure_effects = std::make_unique<effect_list<CPlayer>>();
-		database::process_sml_data(this->failure_effects, scope);
+		database::process_gsml_data(this->failure_effects, scope);
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

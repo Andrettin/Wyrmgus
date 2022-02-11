@@ -183,7 +183,7 @@ button::~button()
 {
 }
 
-void button::process_sml_property(const sml_property &property)
+void button::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -257,11 +257,11 @@ void button::process_sml_property(const sml_property &property)
 		this->allow_strings.clear();
 		this->allow_strings.push_back(value);
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 
-void button::process_sml_scope(const sml_data &scope)
+void button::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -270,11 +270,11 @@ void button::process_sml_scope(const sml_data &scope)
 		this->allow_strings = values;
 	} else if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->preconditions, scope);
+		database::process_gsml_data(this->preconditions, scope);
 		this->preconditions_ptr = this->preconditions.get();
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->conditions, scope);
+		database::process_gsml_data(this->conditions, scope);
 		this->conditions_ptr = this->conditions.get();
 	} else if (tag == "unit_types") {
 		for (const std::string &value : values) {
@@ -289,7 +289,7 @@ void button::process_sml_scope(const sml_data &scope)
 			this->unit_classes.push_back(unit_class::get(value));
 		}
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

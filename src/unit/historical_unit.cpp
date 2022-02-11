@@ -46,7 +46,7 @@ historical_unit::~historical_unit()
 {
 }
 
-void historical_unit::process_sml_scope(const sml_data &scope)
+void historical_unit::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -56,7 +56,7 @@ void historical_unit::process_sml_scope(const sml_data &scope)
 			this->unit_classes.push_back(unit_class::get(value));
 		}
 
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 			unit_class *unit_class = unit_class::get(key);
@@ -70,7 +70,7 @@ void historical_unit::process_sml_scope(const sml_data &scope)
 			this->unit_types.push_back(unit_type::get(value));
 		}
 
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 			unit_type *unit_type = unit_type::get(key);
@@ -80,7 +80,7 @@ void historical_unit::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

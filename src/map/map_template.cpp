@@ -103,7 +103,7 @@ map_template::~map_template()
 {
 }
 
-void map_template::process_sml_property(const sml_property &property)
+void map_template::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -138,25 +138,25 @@ void map_template::process_sml_property(const sml_property &property)
 	} else if (key == "max_subtemplate_y") {
 		this->max_subtemplate_pos.setY(std::stoi(value));
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 
-void map_template::process_sml_scope(const sml_data &scope)
+void map_template::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "generated_terrains") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			terrain_type *terrain_type = terrain_type::get(child_scope.get_tag());
 
 			auto generated_terrain = std::make_unique<wyrmgus::generated_terrain>(terrain_type);
-			database::process_sml_data(generated_terrain, child_scope);
+			database::process_gsml_data(generated_terrain, child_scope);
 
 			this->generated_terrains.push_back(std::move(generated_terrain));
 		});
 	} else if (tag == "generated_neutral_units" || tag == "player_location_generated_neutral_units") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			unit_type *unit_type = unit_type::get(property.get_key());
 			const int quantity = std::stoi(property.get_value());
 
@@ -169,12 +169,12 @@ void map_template::process_sml_scope(const sml_data &scope)
 	} else if (tag == "tile_terrains" || tag == "overlay_tile_terrains") {
 		point_map<const terrain_type *> &tile_terrains = (tag == "overlay_tile_terrains") ? this->overlay_tile_terrains : this->tile_terrains;
 
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
 			const int x = std::stoi(tag);
 
-			child_scope.for_each_property([&](const sml_property &property) {
+			child_scope.for_each_property([&](const gsml_property &property) {
 				const std::string &key = property.get_key();
 				const std::string &value = property.get_value();
 
@@ -185,7 +185,7 @@ void map_template::process_sml_scope(const sml_data &scope)
 			});
 		});
 	} else if (tag == "terrain_substitutions") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -195,7 +195,7 @@ void map_template::process_sml_scope(const sml_data &scope)
 			this->terrain_substitutions[terrain] = other_terrain;
 		});
 	} else if (tag == "default_base_terrains") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -205,7 +205,7 @@ void map_template::process_sml_scope(const sml_data &scope)
 			this->default_base_terrains[overlay_terrain] = base_terrain;
 		});
 	} else if (tag == "character_units") {
-		scope.for_each_element([&](const sml_property &property) {
+		scope.for_each_element([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -213,22 +213,22 @@ void map_template::process_sml_scope(const sml_data &scope)
 			const unit_type *unit_type = unit_type::get(value);
 
 			this->character_units[character] = std::make_unique<character_unit>(unit_type);
-		}, [&](const sml_data &child_scope) {
+		}, [&](const gsml_data &child_scope) {
 			const char character = string::to_character(child_scope.get_tag());
 
 			auto unit = std::make_unique<character_unit>();
-			database::process_sml_data(unit, child_scope);
+			database::process_gsml_data(unit, child_scope);
 
 			this->character_units[character] = std::move(unit);
 		});
 	} else if (tag == "character_substitutions") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto substitution = std::make_unique<character_substitution>();
-			database::process_sml_data(substitution, child_scope);
+			database::process_gsml_data(substitution, child_scope);
 			this->character_substitutions.push_back(std::move(substitution));
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

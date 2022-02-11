@@ -28,8 +28,8 @@
 
 #include "player/civilization_base.h"
 
-#include "database/sml_data.h"
-#include "database/sml_operator.h"
+#include "database/gsml_data.h"
+#include "database/gsml_operator.h"
 #include "fallback_name_generator.h"
 #include "gender.h"
 #include "gendered_name_generator.h"
@@ -53,7 +53,7 @@ civilization_base::~civilization_base()
 {
 }
 
-void civilization_base::process_sml_scope(const sml_data &scope)
+void civilization_base::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -63,9 +63,9 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 			this->unit_sound_set = std::make_unique<wyrmgus::unit_sound_set>();
 		}
 
-		database::process_sml_data(this->unit_sound_set, scope);
+		database::process_gsml_data(this->unit_sound_set, scope);
 	} else if (tag == "not_enough_resource_sounds") {
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -82,7 +82,7 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 			this->personal_name_generator->add_names(gender::none, values);
 		}
 
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
 			const gender gender = string_to_gender(tag);
@@ -98,7 +98,7 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 			this->surname_generator->add_names(gender::none, values);
 		}
 
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
 			const gender gender = string_to_gender(tag);
@@ -106,7 +106,7 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 			this->surname_generator->add_names(gender, child_scope.get_values());
 		});
 	} else if (tag == "unit_class_names") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
 			const unit_class *unit_class = unit_class::get(tag);
@@ -124,7 +124,7 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 
 		this->ship_name_generator->add_names(values);
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

@@ -34,7 +34,7 @@ template <typename scope_type>
 class current_player_effect final : public scope_effect<scope_type, CPlayer>
 {
 public:
-	explicit current_player_effect(const sml_operator effect_operator) : scope_effect<scope_type, CPlayer>(effect_operator)
+	explicit current_player_effect(const gsml_operator effect_operator) : scope_effect<scope_type, CPlayer>(effect_operator)
 	{
 	}
 

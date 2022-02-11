@@ -28,22 +28,22 @@
 
 #include "map/region_history.h"
 
-#include "database/sml_data.h"
+#include "database/gsml_data.h"
 #include "unit/unit_class.h"
 
 namespace wyrmgus {
 
-void region_history::process_sml_scope(const sml_data &scope)
+void region_history::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "population_groups") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const unit_class *unit_class = unit_class::get(property.get_key());
 			this->population_groups[unit_class] = std::stoll(property.get_value());
 		});
 	} else {
-		data_entry_history::process_sml_scope(scope);
+		data_entry_history::process_gsml_scope(scope);
 	}
 }
 

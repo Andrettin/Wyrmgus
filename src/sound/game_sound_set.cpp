@@ -30,14 +30,14 @@
 
 namespace wyrmgus {
 
-void game_sound_set::process_sml_property(const sml_property &property)
+void game_sound_set::process_gsml_property(const gsml_property &property)
 {
-	database::process_sml_property_for_object(this, property);
+	database::process_gsml_property_for_object(this, property);
 }
 
-void game_sound_set::process_sml_scope(const sml_data &scope)
+void game_sound_set::process_gsml_scope(const gsml_data &scope)
 {
-	database::process_sml_scope_for_object(this, scope);
+	database::process_gsml_scope_for_object(this, scope);
 }
 
 }

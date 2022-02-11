@@ -45,8 +45,8 @@ public:
 		return identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual int Cast(CUnit &caster, const spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;

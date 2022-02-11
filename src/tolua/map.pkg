@@ -44,4 +44,4 @@ extern void ApplyCampaignMap(std::string campaign_ident);
 
 extern void SetMapWorld(const std::string map_world);
 
-extern void load_map_data(const std::string sml_string);
+extern void load_map_data(const std::string gsml_string);

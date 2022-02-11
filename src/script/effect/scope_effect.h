@@ -34,7 +34,7 @@ template <typename upper_scope_type, typename scope_type>
 class scope_effect : public scope_effect_base<upper_scope_type, scope_type>
 {
 public:
-	explicit scope_effect(const sml_operator effect_operator) : scope_effect_base<upper_scope_type, scope_type>(effect_operator)
+	explicit scope_effect(const gsml_operator effect_operator) : scope_effect_base<upper_scope_type, scope_type>(effect_operator)
 	{
 	}
 

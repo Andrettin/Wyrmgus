@@ -28,7 +28,7 @@
 
 namespace wyrmgus {
 
-void time_of_day::process_sml_scope(const sml_data &scope)
+void time_of_day::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -38,7 +38,7 @@ void time_of_day::process_sml_scope(const sml_data &scope)
 		this->ColorModification.G = std::stoi(values[1]);
 		this->ColorModification.B = std::stoi(values[2]);
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

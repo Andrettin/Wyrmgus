@@ -28,8 +28,8 @@
 
 #include "script/effect/effect_list.h"
 
-#include "database/sml_data.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_property.h"
 #include "script/effect/effect.h"
 
 namespace wyrmgus {
@@ -45,15 +45,15 @@ effect_list<scope_type>::~effect_list()
 }
 
 template <typename scope_type>
-void effect_list<scope_type>::process_sml_property(const sml_property &property)
+void effect_list<scope_type>::process_gsml_property(const gsml_property &property)
 {
-	this->effects.push_back(effect<scope_type>::from_sml_property(property));
+	this->effects.push_back(effect<scope_type>::from_gsml_property(property));
 }
 
 template <typename scope_type>
-void effect_list<scope_type>::process_sml_scope(const sml_data &scope)
+void effect_list<scope_type>::process_gsml_scope(const gsml_data &scope)
 {
-	this->effects.push_back(effect<scope_type>::from_sml_scope(scope));
+	this->effects.push_back(effect<scope_type>::from_gsml_scope(scope));
 }
 
 template <typename scope_type>

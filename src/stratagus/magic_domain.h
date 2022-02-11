@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 
 	const CUpgrade *get_deity_domain_upgrade() const
 	{

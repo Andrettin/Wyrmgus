@@ -71,7 +71,7 @@ int resource::get_mass_multiplier(const uint64_t mass, const uint64_t base_mass)
 	return mass_multiplier;
 }
 
-void resource::process_sml_property(const sml_property &property)
+void resource::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -79,7 +79,7 @@ void resource::process_sml_property(const sml_property &property)
 	if (key == "action_name") {
 		this->action_name = value;
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 	}
 }
 

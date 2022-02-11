@@ -38,7 +38,7 @@ template <typename scope_type>
 class scripted_effect_effect final : public effect<scope_type>
 {
 public:
-	explicit scripted_effect_effect(const std::string &effect_identifier, const sml_operator effect_operator) : effect<scope_type>(effect_operator)
+	explicit scripted_effect_effect(const std::string &effect_identifier, const gsml_operator effect_operator) : effect<scope_type>(effect_operator)
 	{
 		static_assert(std::is_same_v<scope_type, CPlayer> || std::is_same_v<scope_type, CUnit>);
 

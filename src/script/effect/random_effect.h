@@ -38,7 +38,7 @@ template <typename scope_type>
 class random_effect final : public effect<scope_type>
 {
 public:
-	explicit random_effect(const sml_operator effect_operator) : effect<scope_type>(effect_operator)
+	explicit random_effect(const gsml_operator effect_operator) : effect<scope_type>(effect_operator)
 	{
 	}
 
@@ -48,7 +48,7 @@ public:
 		return class_identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
@@ -56,13 +56,13 @@ public:
 		if (key == "chance") {
 			this->chance = decimillesimal_int(value);
 		} else {
-			this->effects.process_sml_property(property);
+			this->effects.process_gsml_property(property);
 		}
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override
+	virtual void process_gsml_scope(const gsml_data &scope) override
 	{
-		this->effects.process_sml_scope(scope);
+		this->effects.process_gsml_scope(scope);
 	}
 
 	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override

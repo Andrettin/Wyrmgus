@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2022 by Andrettin
+//      (c) Copyright 2020-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,31 +24,36 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#include "database/sml_property.h"
-
-#include "database/sml_operator.h"
+#pragma once
 
 namespace wyrmgus {
 
-void sml_property::print(std::ostream &ostream, const size_t indentation) const
-{
-	ostream << std::string(indentation, '\t') << this->get_key() << " ";
+class gsml_data;
+class gsml_property;
 
-	switch (this->get_operator()) {
-		case sml_operator::assignment:
-			ostream << "=";
-			break;
-		case sml_operator::addition:
-			ostream << "+=";
-			break;
-		case sml_operator::subtraction:
-			ostream << "-=";
-			break;
-		case sml_operator::none:
-			throw std::runtime_error("Cannot print the SML \"none\" operator.");
+//a visitor that only does an action when visiting GSML data
+template <typename function_type>
+class gsml_data_visitor final
+{
+public:
+	gsml_data_visitor(const function_type &function) : function(function)
+	{
 	}
 
-	ostream << " " << this->get_value() << "\n";
-}
+	gsml_data_visitor(function_type &&function) = delete;
+
+	void operator()(const gsml_property &property) const
+	{
+		Q_UNUSED(property)
+	}
+
+	void operator()(const gsml_data &scope) const
+	{
+		this->function(scope);
+	}
+
+private:
+	const function_type &function;
+};
 
 }

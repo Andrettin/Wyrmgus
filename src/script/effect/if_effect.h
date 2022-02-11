@@ -36,7 +36,7 @@ template <typename scope_type>
 class if_effect final : public effect<scope_type>
 {
 public:
-	explicit if_effect(const sml_operator effect_operator) : effect<scope_type>(effect_operator)
+	explicit if_effect(const gsml_operator effect_operator) : effect<scope_type>(effect_operator)
 	{
 	}
 
@@ -46,19 +46,19 @@ public:
 		return class_identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
-		this->effects.process_sml_property(property);
+		this->effects.process_gsml_property(property);
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override
+	virtual void process_gsml_scope(const gsml_data &scope) override
 	{
 		const std::string &tag = scope.get_tag();
 
 		if (tag == "conditions") {
-			database::process_sml_data(this->conditions, scope);
+			database::process_gsml_data(this->conditions, scope);
 		} else {
-			this->effects.process_sml_scope(scope);
+			this->effects.process_gsml_scope(scope);
 		}
 	}
 

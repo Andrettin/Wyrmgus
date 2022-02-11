@@ -37,14 +37,14 @@ class CUnit;
 
 namespace wyrmgus {
 
+class gsml_data;
+class gsml_property;
 class landmass;
 class population_class;
 class population_type;
 class population_unit;
 class resource;
 class site;
-class sml_data;
-class sml_property;
 class tile;
 struct population_unit_key;
 
@@ -59,10 +59,10 @@ public:
 	explicit site_game_data(const site *site);
 	~site_game_data();
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
-	sml_data to_sml_data() const;
+	gsml_data to_gsml_data() const;
 
 	void do_per_minute_loop();
 

@@ -68,13 +68,13 @@ civilization::~civilization()
 {
 }
 
-void civilization::process_sml_scope(const sml_data &scope)
+void civilization::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "button_icons") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -90,13 +90,13 @@ void civilization::process_sml_scope(const sml_data &scope)
 	} else if (tag == "title_names") {
 		faction::process_title_names(this->title_names, scope);
 	} else if (tag == "character_title_names") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			this->process_character_title_name_scope(child_scope);
 		});
 	} else if (tag == "ui_fillers") {
 		this->ui_fillers.clear();
 
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			CFiller filler = CFiller();
 			const std::string filler_file = child_scope.get_property_value("file");
 			if (filler_file.empty()) {
@@ -111,12 +111,12 @@ void civilization::process_sml_scope(const sml_data &scope)
 		});
 	} else if (tag == "conditions") {
 		auto conditions = std::make_unique<and_condition>();
-		database::process_sml_data(conditions, scope);
+		database::process_gsml_data(conditions, scope);
 		this->conditions = std::move(conditions);
 	} else if (tag == "force_type_weights") {
 		this->ai_force_type_weights.clear();
 
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -124,16 +124,16 @@ void civilization::process_sml_scope(const sml_data &scope)
 			this->ai_force_type_weights[force_type] = std::stoi(value);
 		});
 	} else if (tag == "force_templates") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto force_template = std::make_unique<ai_force_template>();
-			database::process_sml_data(force_template, child_scope);
+			database::process_gsml_data(force_template, child_scope);
 			this->ai_force_templates[force_template->get_force_type()].push_back(std::move(force_template));
 		});
 	} else if (tag == "ai_building_templates") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto building_template = std::make_unique<CAiBuildingTemplate>();
 
-			child_scope.for_each_property([&](const sml_property &property) {
+			child_scope.for_each_property([&](const gsml_property &property) {
 				const std::string &key = property.get_key();
 				const std::string &value = property.get_value();
 
@@ -158,7 +158,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 			other_civilization->develops_to.push_back(this);
 		}
 	} else {
-		civilization_base::process_sml_scope(scope);
+		civilization_base::process_gsml_scope(scope);
 	}
 }
 
@@ -599,26 +599,26 @@ std::string_view civilization::get_character_title_name(const character_title ti
 	return string::empty_str;
 }
 
-void civilization::process_character_title_name_scope(const sml_data &scope)
+void civilization::process_character_title_name_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const character_title title_type = string_to_character_title(tag);
 
-	scope.for_each_child([&](const sml_data &child_scope) {
+	scope.for_each_child([&](const gsml_data &child_scope) {
 		this->process_character_title_name_scope(title_type, child_scope);
 	});
 }
 
-void civilization::process_character_title_name_scope(const character_title title_type, const sml_data &scope)
+void civilization::process_character_title_name_scope(const character_title title_type, const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const faction_type faction_type = string_to_faction_type(tag);
 
-	scope.for_each_child([&](const sml_data &child_scope) {
+	scope.for_each_child([&](const gsml_data &child_scope) {
 		faction::process_character_title_name_scope(this->character_title_names[title_type][faction_type], child_scope);
 	});
 
-	scope.for_each_property([&](const sml_property &property) {
+	scope.for_each_property([&](const gsml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
 		const wyrmgus::government_type government_type = string_to_government_type(key);

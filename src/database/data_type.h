@@ -29,8 +29,8 @@
 #include "database/data_module_container.h"
 #include "database/data_type_metadata.h"
 #include "database/database.h"
-#include "database/sml_data.h"
-#include "database/sml_operator.h"
+#include "database/gsml_data.h"
+#include "database/gsml_operator.h"
 #include "util/qunique_ptr.h"
 
 namespace wyrmgus {
@@ -192,7 +192,7 @@ public:
 			return;
 		}
 
-		database::parse_folder(database_path, data_type::sml_data_to_process[data_module]);
+		database::parse_folder(database_path, data_type::gsml_data_to_process[data_module]);
 	}
 
 	static void process_database(const bool definition)
@@ -201,27 +201,27 @@ public:
 			return;
 		}
 
-		for (const auto &kv_pair : data_type::sml_data_to_process) {
+		for (const auto &kv_pair : data_type::gsml_data_to_process) {
 			const data_module *data_module = kv_pair.first;
 
 			database::get()->set_current_module(data_module);
 
-			const std::vector<sml_data> &sml_data_list = kv_pair.second;
-			for (const sml_data &data : sml_data_list) {
-				data.for_each_child([&](const sml_data &data_entry) {
+			const std::vector<gsml_data> &gsml_data_list = kv_pair.second;
+			for (const gsml_data &data : gsml_data_list) {
+				data.for_each_child([&](const gsml_data &data_entry) {
 					const std::string &identifier = data_entry.get_tag();
 
 					T *instance = nullptr;
 					if (definition) {
-						if (data_entry.get_operator() != sml_operator::addition) {
+						if (data_entry.get_operator() != gsml_operator::addition) {
 							//addition operators for data entry scopes mean modifying already-defined entries
 							instance = T::add(identifier, data_module);
 						} else {
 							instance = T::get(identifier);
 						}
 
-						for (const sml_property *alias_property : data_entry.try_get_properties("aliases")) {
-							if (alias_property->get_operator() != sml_operator::addition) {
+						for (const gsml_property *alias_property : data_entry.try_get_properties("aliases")) {
+							if (alias_property->get_operator() != gsml_operator::addition) {
 								throw std::runtime_error("Only the addition operator is supported for data entry aliases.");
 							}
 
@@ -242,7 +242,7 @@ public:
 					} else {
 						try {
 							instance = T::get(identifier);
-							database::process_sml_data<T>(instance, data_entry);
+							database::process_gsml_data<T>(instance, data_entry);
 							instance->set_defined(true);
 						} catch (...) {
 							std::throw_with_nested(std::runtime_error("Error processing or loading data for " + std::string(T::class_identifier) + " instance \"" + identifier + "\"."));
@@ -255,7 +255,7 @@ public:
 		database::get()->set_current_module(nullptr);
 
 		if (!definition) {
-			data_type::sml_data_to_process.clear();
+			data_type::gsml_data_to_process.clear();
 		}
 	}
 
@@ -348,7 +348,7 @@ private:
 	static inline std::vector<T *> instances;
 	static inline std::map<std::string, qunique_ptr<T>> instances_by_identifier;
 	static inline std::map<std::string, T *> instances_by_alias;
-	static inline data_module_map<std::vector<sml_data>> sml_data_to_process;
+	static inline data_module_map<std::vector<gsml_data>> gsml_data_to_process;
 	static inline bool class_initialized = data_type::initialize_class();
 
 public:

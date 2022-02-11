@@ -28,7 +28,7 @@
 
 #include "map/world_game_data.h"
 
-#include "database/sml_data.h"
+#include "database/gsml_data.h"
 #include "engine_interface.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -45,7 +45,7 @@
 
 namespace wyrmgus {
 
-void world_game_data::process_sml_property(const sml_property &property)
+void world_game_data::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -71,7 +71,7 @@ void world_game_data::process_sml_property(const sml_property &property)
 	}
 }
 
-void world_game_data::process_sml_scope(const sml_data &scope)
+void world_game_data::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
@@ -82,12 +82,12 @@ void world_game_data::process_sml_scope(const sml_data &scope)
 	}
 }
 
-sml_data world_game_data::to_sml_data() const
+gsml_data world_game_data::to_gsml_data() const
 {
-	sml_data data(this->world->get_identifier());
+	gsml_data data(this->world->get_identifier());
 
 	if (this->get_map_rect().isValid()) {
-		data.add_child(sml_data::from_rect(this->get_map_rect(), "map_rect"));
+		data.add_child(gsml_data::from_rect(this->get_map_rect(), "map_rect"));
 	}
 
 	if (this->map_layer != nullptr) {

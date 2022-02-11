@@ -41,8 +41,8 @@
 #include "commands.h"
 #include "database/database.h"
 #include "database/defines.h"
-#include "database/sml_data.h"
-#include "database/sml_parser.h"
+#include "database/gsml_data.h"
+#include "database/gsml_parser.h"
 #include "dialogue.h"
 #include "economy/resource.h"
 #include "editor.h"
@@ -331,7 +331,7 @@ void game::do_cycle()
 	}
 }
 
-void game::process_sml_property(const sml_property &property)
+void game::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -347,26 +347,26 @@ void game::process_sml_property(const sml_property &property)
 	}
 }
 
-void game::process_sml_scope(const sml_data &scope)
+void game::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "player_delayed_effects") {
-		scope.for_each_child([&](const sml_data &delayed_effect_data) {
+		scope.for_each_child([&](const gsml_data &delayed_effect_data) {
 			auto delayed_effect = std::make_unique<delayed_effect_instance<CPlayer>>();
-			database::process_sml_data(delayed_effect, delayed_effect_data);
+			database::process_gsml_data(delayed_effect, delayed_effect_data);
 			this->add_delayed_effect(std::move(delayed_effect));
 		});
 	} else if (tag == "unit_delayed_effects") {
-		scope.for_each_child([&](const sml_data &delayed_effect_data) {
+		scope.for_each_child([&](const gsml_data &delayed_effect_data) {
 			auto delayed_effect = std::make_unique<delayed_effect_instance<CUnit>>();
-			database::process_sml_data(delayed_effect, delayed_effect_data);
+			database::process_gsml_data(delayed_effect, delayed_effect_data);
 			this->add_delayed_effect(std::move(delayed_effect));
 		});
 	} else if (tag == "site_data") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const site *site = site::get(child_scope.get_tag());
-			database::process_sml_data(site->get_game_data(), child_scope);
+			database::process_gsml_data(site->get_game_data(), child_scope);
 		});
 	} else {
 		throw std::runtime_error("Invalid game data scope: \"" + scope.get_tag() + "\".");
@@ -448,7 +448,7 @@ void game::save(const std::filesystem::path &filepath) const
 
 void game::save_game_data(CFile &file) const
 {
-	sml_data game_data;
+	gsml_data game_data;
 
 	if (this->get_current_campaign() != nullptr) {
 		game_data.add_property("current_campaign", this->get_current_campaign()->get_identifier());
@@ -461,28 +461,28 @@ void game::save_game_data(CFile &file) const
 	}
 
 	if (!this->player_delayed_effects.empty()) {
-		sml_data delayed_effects_data("player_delayed_effects");
+		gsml_data delayed_effects_data("player_delayed_effects");
 		for (const auto &delayed_effect : this->player_delayed_effects) {
-			delayed_effects_data.add_child(delayed_effect->to_sml_data());
+			delayed_effects_data.add_child(delayed_effect->to_gsml_data());
 		}
 		game_data.add_child(std::move(delayed_effects_data));
 	}
 
 	if (!this->unit_delayed_effects.empty()) {
-		sml_data delayed_effects_data("unit_delayed_effects");
+		gsml_data delayed_effects_data("unit_delayed_effects");
 		for (const auto &delayed_effect : this->unit_delayed_effects) {
-			delayed_effects_data.add_child(delayed_effect->to_sml_data());
+			delayed_effects_data.add_child(delayed_effect->to_gsml_data());
 		}
 		game_data.add_child(std::move(delayed_effects_data));
 	}
 
-	sml_data site_game_data("site_data");
+	gsml_data site_game_data("site_data");
 	for (const site *site : site::get_all()) {
 		if (site->get_game_data() == nullptr) {
 			continue;
 		}
 
-		sml_data site_data = site->get_game_data()->to_sml_data();
+		gsml_data site_data = site->get_game_data()->to_gsml_data();
 
 		if (site_data.is_empty()) {
 			continue;
@@ -577,10 +577,10 @@ void game::clear_results()
 
 }
 
-void load_game_data(const std::string &sml_string)
+void load_game_data(const std::string &gsml_string)
 {
-	sml_parser parser;
-	database::process_sml_data(game::get(), parser.parse(sml_string));
+	gsml_parser parser;
+	database::process_gsml_data(game::get(), parser.parse(gsml_string));
 }
 
 /**

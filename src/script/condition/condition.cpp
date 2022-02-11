@@ -93,7 +93,7 @@
 
 namespace wyrmgus {
 
-std::unique_ptr<const condition> condition::from_sml_property(const sml_property &property)
+std::unique_ptr<const condition> condition::from_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -173,7 +173,7 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 	}
 }
 
-std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope)
+std::unique_ptr<const condition> condition::from_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	std::unique_ptr<condition> condition;
@@ -214,7 +214,7 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 		throw std::runtime_error("Invalid condition scope: \"" + tag + "\".");
 	}
 
-	database::process_sml_data(condition, scope);
+	database::process_gsml_data(condition, scope);
 
 	return condition;
 }
@@ -249,12 +249,12 @@ void condition::ProcessConfigDataSection(const CConfigData *section)
 	fprintf(stderr, "Invalid condition property: \"%s\".\n", section->Tag.c_str());
 }
 
-void condition::process_sml_property(const sml_property &property)
+void condition::process_gsml_property(const gsml_property &property)
 {
 	throw std::runtime_error("Invalid condition property: \"" + property.get_key() + "\".");
 }
 
-void condition::process_sml_scope(const sml_data &scope)
+void condition::process_gsml_scope(const gsml_data &scope)
 {
 	throw std::runtime_error("Invalid condition scope: \"" + scope.get_tag() + "\".");
 }
@@ -284,14 +284,14 @@ void and_condition::ProcessConfigDataSection(const CConfigData *section)
 	this->conditions.push_back(std::move(condition));
 }
 
-void and_condition::process_sml_property(const sml_property &property)
+void and_condition::process_gsml_property(const gsml_property &property)
 {
-	this->conditions.push_back(condition::from_sml_property(property));
+	this->conditions.push_back(condition::from_gsml_property(property));
 }
 
-void and_condition::process_sml_scope(const sml_data &scope)
+void and_condition::process_gsml_scope(const gsml_data &scope)
 {
-	this->conditions.push_back(condition::from_sml_scope(scope));
+	this->conditions.push_back(condition::from_gsml_scope(scope));
 }
 
 void and_condition::check_validity() const

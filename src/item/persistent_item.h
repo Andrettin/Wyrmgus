@@ -37,8 +37,8 @@ static int CclDefineCustomHero(lua_State *l);
 namespace wyrmgus {
 
 class character;
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 class spell;
 class unique_item;
 class unit_type;
@@ -74,8 +74,8 @@ public:
 		return std::make_unique<persistent_item>(*this);
 	}
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
 	void initialize();
 

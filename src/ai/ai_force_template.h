@@ -33,8 +33,8 @@ static int CclDefineFaction(lua_State *l);
 
 namespace wyrmgus {
 
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 class unit_class;
 enum class ai_force_type;
 
@@ -43,8 +43,8 @@ class ai_force_template final
 public:
 	ai_force_template();
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 	void check() const;
 
 	ai_force_type get_force_type() const

@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "database/sml_data.h"
+#include "database/gsml_data.h"
 #include "util/qunique_ptr.h"
 #include "util/singleton.h"
 #include "util/type_traits.h"
@@ -50,43 +50,43 @@ public:
 	static constexpr const char *sounds_folder = "sounds";
 
 	template <typename T>
-	static void process_sml_data(T *instance, const sml_data &data)
+	static void process_gsml_data(T *instance, const gsml_data &data)
 	{
-		data.for_each_element([&](const sml_property &property) {
-			instance->process_sml_property(property);
-		}, [&](const sml_data &scope) {
-			instance->process_sml_scope(scope);
+		data.for_each_element([&](const gsml_property &property) {
+			instance->process_gsml_property(property);
+		}, [&](const gsml_data &scope) {
+			instance->process_gsml_scope(scope);
 		});
 	}
 
 	template <typename T>
-	static void process_sml_data(T &instance, const sml_data &data)
+	static void process_gsml_data(T &instance, const gsml_data &data)
 	{
 		if constexpr (is_specialization_of_v<T, std::unique_ptr>) {
-			database::process_sml_data(instance.get(), data);
+			database::process_gsml_data(instance.get(), data);
 		} else {
-			database::process_sml_data(&instance, data);
+			database::process_gsml_data(&instance, data);
 		}
 	}
 
 	template <typename T>
-	static void process_sml_data(const std::unique_ptr<T> &instance, const sml_data &data)
+	static void process_gsml_data(const std::unique_ptr<T> &instance, const gsml_data &data)
 	{
-		database::process_sml_data(instance.get(), data);
+		database::process_gsml_data(instance.get(), data);
 	}
 
 	template <typename T>
-	static void process_sml_data(const qunique_ptr<T> &instance, const sml_data &data)
+	static void process_gsml_data(const qunique_ptr<T> &instance, const gsml_data &data)
 	{
-		database::process_sml_data(instance.get(), data);
+		database::process_gsml_data(instance.get(), data);
 	}
 
-	static void process_sml_property_for_object(QObject *object, const sml_property &property);
-	static QVariant process_sml_property_value(const sml_property &property, const QMetaProperty &meta_property, const QObject *object);
-	static void process_sml_scope_for_object(QObject *object, const sml_data &scope);
-	static QVariant process_sml_scope_value(const sml_data &scope, const QMetaProperty &meta_property);
-	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const std::string &value);
-	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const sml_data &scope);
+	static void process_gsml_property_for_object(QObject *object, const gsml_property &property);
+	static QVariant process_gsml_property_value(const gsml_property &property, const QMetaProperty &meta_property, const QObject *object);
+	static void process_gsml_scope_for_object(QObject *object, const gsml_data &scope);
+	static QVariant process_gsml_scope_value(const gsml_data &scope, const QMetaProperty &meta_property);
+	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const gsml_operator gsml_operator, const std::string &value);
+	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const gsml_operator gsml_operator, const gsml_data &scope);
 
 	static std::filesystem::path get_documents_modules_path()
 	{
@@ -112,7 +112,7 @@ public:
 
 	static void ensure_path_exists(const std::filesystem::path &path);
 
-	static void parse_folder(const std::filesystem::path &path, std::vector<sml_data> &sml_data_list);
+	static void parse_folder(const std::filesystem::path &path, std::vector<gsml_data> &gsml_data_list);
 
 public:
 	database();

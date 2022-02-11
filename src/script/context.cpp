@@ -28,7 +28,7 @@
 
 #include "script/context.h"
 
-#include "database/sml_data.h"
+#include "database/gsml_data.h"
 #include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
@@ -37,7 +37,7 @@
 namespace wyrmgus {
 
 template <bool read_only>
-void context_base<read_only>::process_sml_property(const sml_property &property)
+void context_base<read_only>::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -60,15 +60,15 @@ void context_base<read_only>::process_sml_property(const sml_property &property)
 }
 
 template <bool read_only>
-void context_base<read_only>::process_sml_scope(const sml_data &scope)
+void context_base<read_only>::process_gsml_scope(const gsml_data &scope)
 {
 	throw std::runtime_error("Invalid context scope: \"" + scope.get_tag() + "\".");
 }
 
 template <bool read_only>
-sml_data context_base<read_only>::to_sml_data(const std::string &tag) const
+gsml_data context_base<read_only>::to_gsml_data(const std::string &tag) const
 {
-	sml_data data(tag);
+	gsml_data data(tag);
 
 	if (this->source_player != nullptr) {
 		data.add_property("source_player", std::to_string(this->source_player->get_index()));

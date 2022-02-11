@@ -79,16 +79,16 @@ icon::icon(const std::string &identifier) : icon_base(identifier)
 {
 }
 
-void icon::process_sml_scope(const sml_data &scope)
+void icon::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "hue_ignored_colors") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			this->hue_ignored_colors.insert(child_scope.to_color());
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

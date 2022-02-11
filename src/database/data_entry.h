@@ -32,8 +32,8 @@ namespace wyrmgus {
 
 class data_entry_history;
 class data_module;
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 
 //a (de)serializable and identifiable entry to the database
 class data_entry : public basic_data_entry
@@ -66,10 +66,10 @@ public:
 		this->aliases.insert(alias);
 	}
 
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void process_sml_dated_property(const sml_property &property, const QDateTime &date);
-	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date);
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
+	virtual void process_gsml_dated_property(const gsml_property &property, const QDateTime &date);
+	virtual void process_gsml_dated_scope(const gsml_data &scope, const QDateTime &date);
 
 	bool is_defined() const
 	{
@@ -116,7 +116,7 @@ public:
 	}
 
 	void load_history();
-	void load_date_scope(const sml_data &date_scope, const QDateTime &date);
+	void load_date_scope(const gsml_data &date_scope, const QDateTime &date);
 
 	virtual void reset_history()
 	{
@@ -141,7 +141,7 @@ private:
 	bool defined = false; //whether the data entry's definition has been concluded (with its data having been processed)
 	bool initialized = false;
 	const wyrmgus::data_module *data_module = nullptr; //the module to which the data entry belongs, if any
-	std::vector<sml_data> history_data;
+	std::vector<gsml_data> history_data;
 };
 
 }

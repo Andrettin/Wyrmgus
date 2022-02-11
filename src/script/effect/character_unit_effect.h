@@ -35,7 +35,7 @@ template <typename scope_type>
 class character_unit_effect final : public scope_effect<scope_type, CUnit>
 {
 public:
-	explicit character_unit_effect(const sml_operator effect_operator) : scope_effect<scope_type, CUnit>(effect_operator)
+	explicit character_unit_effect(const gsml_operator effect_operator) : scope_effect<scope_type, CUnit>(effect_operator)
 	{
 	}
 
@@ -45,7 +45,7 @@ public:
 		return class_identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
@@ -53,7 +53,7 @@ public:
 		if (key == "character") {
 			this->character = character::get(value);
 		} else {
-			scope_effect<scope_type, CUnit>::process_sml_property(property);
+			scope_effect<scope_type, CUnit>::process_gsml_property(property);
 		}
 	}
 

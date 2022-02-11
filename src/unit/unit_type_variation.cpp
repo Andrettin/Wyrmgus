@@ -61,7 +61,7 @@ unit_type_variation::~unit_type_variation()
 {
 }
 
-void unit_type_variation::process_sml_property(const sml_property &property)
+void unit_type_variation::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -81,11 +81,11 @@ void unit_type_variation::process_sml_property(const sml_property &property)
 	} else if (key == "resource_max") {
 		this->ResourceMax = std::stoi(value);
 	} else {
-		database::process_sml_property_for_object(this, property);
+		database::process_gsml_property_for_object(this, property);
 	}
 }
 
-void unit_type_variation::process_sml_scope(const sml_data &scope)
+void unit_type_variation::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -93,23 +93,23 @@ void unit_type_variation::process_sml_scope(const sml_data &scope)
 	if (tag == "frame_size") {
 		this->frame_size = scope.to_size();
 	} else if (tag == "resource_image_files") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const resource *resource = resource::get(property.get_key());
 			this->FileWhenEmpty[resource->get_index()] = database::get()->get_graphics_filepath(property.get_value());
 		});
 	} else if (tag == "resource_loaded_image_files") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const resource *resource = resource::get(property.get_key());
 			this->FileWhenLoaded[resource->get_index()] = database::get()->get_graphics_filepath(property.get_value());
 		});
 	} else if (tag == "player_conditions") {
 		auto conditions = std::make_unique<and_condition>();
-		database::process_sml_data(conditions, scope);
+		database::process_gsml_data(conditions, scope);
 		this->player_conditions = std::move(conditions);
 		this->player_conditions_ptr = this->player_conditions.get();
 	} else if (tag == "conditions" || tag == "unit_conditions") {
 		auto conditions = std::make_unique<and_condition>();
-		database::process_sml_data(conditions, scope);
+		database::process_gsml_data(conditions, scope);
 		this->unit_conditions = std::move(conditions);
 		this->unit_conditions_ptr = this->unit_conditions.get();
 	} else if (tag == "tags") {

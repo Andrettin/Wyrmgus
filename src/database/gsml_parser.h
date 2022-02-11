@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2019-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,32 +28,29 @@
 
 namespace wyrmgus {
 
-class sml_data;
-class sml_property;
+class gsml_data;
+enum class gsml_operator;
 
-//a visitor that only does an action when visiting SML properties
-template <typename function_type>
-class sml_property_visitor
+class gsml_parser
 {
 public:
-	sml_property_visitor(const function_type &function) : function(function)
-	{
-	}
+	explicit gsml_parser();
 
-	sml_property_visitor(function_type &&function) = delete;
-
-	void operator()(const sml_property &property) const
-	{
-		this->function(property);
-	}
-
-	void operator()(const sml_data &scope) const
-	{
-		Q_UNUSED(scope)
-	}
+	gsml_data parse(const std::filesystem::path &filepath);
+	gsml_data parse(const std::string &gsml_string);
 
 private:
-	const function_type &function;
+	void parse(std::istream &istream, gsml_data &gsml_data);
+	void parse_line(const std::string &line);
+	bool parse_escaped_character(std::string &current_string, const char c);
+	void parse_tokens();
+	void reset();
+
+private:
+	std::vector<std::string> tokens;
+	gsml_data *current_gsml_data = nullptr;
+	std::string current_key;
+	gsml_operator current_property_operator;
 };
 
 }

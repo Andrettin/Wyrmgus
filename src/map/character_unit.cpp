@@ -28,8 +28,8 @@
 
 #include "map/character_unit.h"
 
-#include "database/sml_data.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_property.h"
 #include "player/player.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
@@ -38,7 +38,7 @@
 
 namespace wyrmgus {
 
-void character_unit::process_sml_property(const sml_property &property)
+void character_unit::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -53,7 +53,7 @@ void character_unit::process_sml_property(const sml_property &property)
 	}
 }
 
-void character_unit::process_sml_scope(const sml_data &scope)
+void character_unit::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -63,7 +63,7 @@ void character_unit::process_sml_scope(const sml_data &scope)
 			this->unit_types.push_back(unit_type::get(value));
 		}
 
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const unit_type *unit_type = unit_type::get(property.get_key());
 			const int weight = std::stoi(property.get_value());
 

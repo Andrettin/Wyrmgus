@@ -41,21 +41,21 @@ time_of_day_schedule::~time_of_day_schedule()
 {
 }
 
-void time_of_day_schedule::process_sml_scope(const sml_data &scope)
+void time_of_day_schedule::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "scheduled_times_of_day") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &child_tag = child_scope.get_tag();
 			const time_of_day *time_of_day = time_of_day::get(child_tag);
 			const size_t index = this->scheduled_times_of_day.size();
 			auto scheduled_season = std::make_unique<wyrmgus::scheduled_time_of_day>(index, time_of_day, this);
-			database::process_sml_data(scheduled_season, child_scope);
+			database::process_gsml_data(scheduled_season, child_scope);
 			this->scheduled_times_of_day.push_back(std::move(scheduled_season));
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 
@@ -97,12 +97,12 @@ int time_of_day_schedule::GetDefaultHourMultiplier() const
 	return 1;
 }
 
-void scheduled_time_of_day::process_sml_scope(const sml_data &scope)
+void scheduled_time_of_day::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "season_hours") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -120,7 +120,7 @@ void scheduled_time_of_day::process_sml_scope(const sml_data &scope)
 			this->season_hours[season] = hours;
 		});
 	} else {
-		scheduled_time_period::process_sml_scope(scope);
+		scheduled_time_period::process_gsml_scope(scope);
 	}
 }
 

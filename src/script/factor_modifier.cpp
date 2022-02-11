@@ -28,9 +28,9 @@
 
 #include "script/factor_modifier.h"
 
-#include "database/sml_data.h"
-#include "database/sml_operator.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_operator.h"
+#include "database/gsml_property.h"
 #include "script/condition/and_condition.h"
 #include "script/context.h"
 
@@ -48,28 +48,28 @@ factor_modifier<scope_type>::~factor_modifier()
 }
 
 template <typename scope_type>
-void factor_modifier<scope_type>::process_sml_property(const sml_property &property)
+void factor_modifier<scope_type>::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
-	const sml_operator sml_operator = property.get_operator();
+	const gsml_operator gsml_operator = property.get_operator();
 	const std::string &value = property.get_value();
 
 	if (key == "factor") {
-		if (sml_operator == sml_operator::assignment) {
+		if (gsml_operator == gsml_operator::assignment) {
 			this->factor = centesimal_int(value);
 		} else {
 			throw std::runtime_error("Invalid operator for property (\"" + property.get_key() + "\").");
 		}
 	} else {
-		std::unique_ptr<const condition> condition = wyrmgus::condition::from_sml_property(property);
+		std::unique_ptr<const condition> condition = wyrmgus::condition::from_gsml_property(property);
 		this->conditions->add_condition(std::move(condition));
 	}
 }
 
 template <typename scope_type>
-void factor_modifier<scope_type>::process_sml_scope(const sml_data &scope)
+void factor_modifier<scope_type>::process_gsml_scope(const gsml_data &scope)
 {
-	std::unique_ptr<const condition> condition = wyrmgus::condition::from_sml_scope(scope);
+	std::unique_ptr<const condition> condition = wyrmgus::condition::from_gsml_scope(scope);
 	this->conditions->add_condition(std::move(condition));
 }
 

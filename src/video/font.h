@@ -59,7 +59,7 @@ public:
 	explicit font(const std::string &ident);
 	virtual ~font();
 
-	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
 	virtual void initialize() override;
 
 	bool is_loaded() const;

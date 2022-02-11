@@ -40,12 +40,12 @@ template <typename scope_type>
 class call_dialogue_effect final : public effect<scope_type>
 {
 public:
-	explicit call_dialogue_effect(const std::string &dialogue_identifier, const sml_operator effect_operator)
+	explicit call_dialogue_effect(const std::string &dialogue_identifier, const gsml_operator effect_operator)
 		: call_dialogue_effect(dialogue::get(dialogue_identifier), effect_operator)
 	{
 	}
 
-	explicit call_dialogue_effect(const wyrmgus::dialogue *dialogue, const sml_operator effect_operator)
+	explicit call_dialogue_effect(const wyrmgus::dialogue *dialogue, const gsml_operator effect_operator)
 		: effect<scope_type>(effect_operator)
 	{
 		this->dialogue = dialogue;

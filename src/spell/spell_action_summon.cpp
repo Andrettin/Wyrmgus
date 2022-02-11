@@ -43,7 +43,7 @@
 
 namespace wyrmgus {
 
-void spell_action_summon::process_sml_property(const sml_property &property)
+void spell_action_summon::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();

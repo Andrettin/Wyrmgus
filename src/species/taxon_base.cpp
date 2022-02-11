@@ -28,7 +28,7 @@
 
 #include "species/taxon_base.h"
 
-#include "database/sml_data.h"
+#include "database/gsml_data.h"
 #include "fallback_name_generator.h"
 #include "gender.h"
 #include "gendered_name_generator.h"
@@ -46,7 +46,7 @@ taxon_base::~taxon_base()
 {
 }
 
-void taxon_base::process_sml_scope(const sml_data &scope)
+void taxon_base::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -60,7 +60,7 @@ void taxon_base::process_sml_scope(const sml_data &scope)
 			this->specimen_name_generator->add_names(gender::none, values);
 		}
 
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
 			const gender gender = string_to_gender(tag);
@@ -68,7 +68,7 @@ void taxon_base::process_sml_scope(const sml_data &scope)
 			this->specimen_name_generator->add_names(gender, child_scope.get_values());
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

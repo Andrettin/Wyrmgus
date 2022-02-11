@@ -54,9 +54,9 @@ enum class construction_image_type {
 class construction_frame final
 {
 public:
-	void process_sml_property(const sml_property &property);
+	void process_gsml_property(const gsml_property &property);
 
-	void process_sml_scope(const sml_data &scope)
+	void process_gsml_scope(const gsml_data &scope)
 	{
 		throw std::runtime_error("Invalid construction frame scope: \"" + scope.get_tag() + "\".");
 	}
@@ -107,8 +107,8 @@ public:
 
 	~construction();
 
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 
 	virtual void check() const
 	{

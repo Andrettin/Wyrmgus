@@ -80,7 +80,7 @@ animation_sequence::~animation_sequence()
 {
 }
 
-void animation_sequence::process_sml_property(const sml_property &property)
+void animation_sequence::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -125,7 +125,7 @@ void animation_sequence::process_sml_property(const sml_property &property)
 	} else if (key == "random_goto") {
 		anim = std::make_unique<CAnimation_RandomGoto>();
 	} else {
-		data_entry::process_sml_property(property);
+		data_entry::process_gsml_property(property);
 		return;
 	}
 

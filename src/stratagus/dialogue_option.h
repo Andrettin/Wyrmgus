@@ -36,8 +36,8 @@ namespace wyrmgus {
 
 class dialogue;
 class dialogue_node;
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 struct context;
 
 template <typename scope_type>
@@ -52,8 +52,8 @@ public:
 	explicit dialogue_option(const dialogue_node *node);
 	~dialogue_option();
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 	void initialize();
 	void check() const;
 

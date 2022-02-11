@@ -66,7 +66,7 @@ public:
 	explicit upgrade_class(const std::string &identifier);
 	~upgrade_class();
 
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
 

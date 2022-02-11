@@ -37,7 +37,7 @@ namespace wyrmgus {
 class kill_character_effect final : public effect<CPlayer>
 {
 public:
-	explicit kill_character_effect(const std::string &character_identifier, const sml_operator effect_operator)
+	explicit kill_character_effect(const std::string &character_identifier, const gsml_operator effect_operator)
 		: effect(effect_operator)
 	{
 		this->character = character::get(character_identifier);

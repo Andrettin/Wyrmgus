@@ -38,7 +38,7 @@ class resource;
 class resource_effect final : public effect<CPlayer>
 {
 public:
-	explicit resource_effect(const resource *resource, const std::string &value, const sml_operator effect_operator)
+	explicit resource_effect(const resource *resource, const std::string &value, const gsml_operator effect_operator)
 		: effect(effect_operator), resource(resource)
 	{
 		this->quantity = std::stoi(value);

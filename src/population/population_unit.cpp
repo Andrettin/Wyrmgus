@@ -28,8 +28,8 @@
 
 #include "population/population_unit.h"
 
-#include "database/sml_data.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_property.h"
 #include "population/employment_type.h"
 #include "population/population_class.h"
 #include "population/population_type.h"
@@ -100,7 +100,7 @@ population_unit::population_unit(const population_unit_key &key, const int64_t p
 	}
 }
 
-void population_unit::process_sml_property(const sml_property &property)
+void population_unit::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -116,14 +116,14 @@ void population_unit::process_sml_property(const sml_property &property)
 	}
 }
 
-void population_unit::process_sml_scope(const sml_data &scope)
+void population_unit::process_gsml_scope(const gsml_data &scope)
 {
 	throw std::runtime_error("Invalid population unit scope: \"" + scope.get_tag() + "\".");
 }
 
-sml_data population_unit::to_sml_data() const
+gsml_data population_unit::to_gsml_data() const
 {
-	sml_data data;
+	gsml_data data;
 
 	if (this->get_type() != nullptr) {
 		data.add_property("type", this->get_type()->get_identifier());

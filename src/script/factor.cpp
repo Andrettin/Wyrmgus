@@ -29,9 +29,9 @@
 #include "script/factor.h"
 
 #include "database/database.h"
-#include "database/sml_data.h"
-#include "database/sml_operator.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_operator.h"
+#include "database/gsml_property.h"
 #include "script/factor_modifier.h"
 
 namespace wyrmgus {
@@ -52,14 +52,14 @@ factor<scope_type>::~factor()
 }
 
 template <typename scope_type>
-void factor<scope_type>::process_sml_property(const sml_property &property)
+void factor<scope_type>::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
-	const sml_operator sml_operator = property.get_operator();
+	const gsml_operator gsml_operator = property.get_operator();
 	const std::string &value = property.get_value();
 
 	if (key == "base_value") {
-		if (sml_operator == sml_operator::assignment) {
+		if (gsml_operator == gsml_operator::assignment) {
 			this->base_value = std::stoi(value);
 		} else {
 			throw std::runtime_error("Invalid operator for property \"" + key + "\".");
@@ -70,13 +70,13 @@ void factor<scope_type>::process_sml_property(const sml_property &property)
 }
 
 template <typename scope_type>
-void factor<scope_type>::process_sml_scope(const sml_data &scope)
+void factor<scope_type>::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "modifier") {
 		auto modifier = std::make_unique<factor_modifier<scope_type>>();
-		database::process_sml_data(modifier, scope);
+		database::process_gsml_data(modifier, scope);
 		this->modifiers.push_back(std::move(modifier));
 	} else {
 		throw std::runtime_error("Invalid factor scope: \"" + scope.get_tag() + "\".");

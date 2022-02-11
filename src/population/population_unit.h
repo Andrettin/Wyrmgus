@@ -29,9 +29,9 @@
 namespace wyrmgus {
 
 class employment_type;
+class gsml_data;
+class gsml_property;
 class population_type;
-class sml_data;
-class sml_property;
 struct population_unit_key;
 
 class population_unit final : public QObject
@@ -57,9 +57,9 @@ public:
 
 	explicit population_unit(const population_unit_key &key, const int64_t population);
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
-	sml_data to_sml_data() const;
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
+	gsml_data to_gsml_data() const;
 
 	const population_type *get_type() const
 	{

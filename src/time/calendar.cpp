@@ -42,26 +42,26 @@ calendar::~calendar()
 {
 }
 
-void calendar::process_sml_scope(const sml_data &scope)
+void calendar::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "day_of_the_week_names") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
 			this->day_of_the_week_names[string_to_day_of_the_week(key)] = value;
 		});
 	} else if (tag == "month_names") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
 			this->month_names[string_to_month(key)] = value;
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

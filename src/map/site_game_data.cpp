@@ -30,7 +30,7 @@
 
 #include "ai/ai_local.h"
 #include "database/defines.h"
-#include "database/sml_data.h"
+#include "database/gsml_data.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
@@ -60,7 +60,7 @@ site_game_data::~site_game_data()
 {
 }
 
-void site_game_data::process_sml_property(const sml_property &property)
+void site_game_data::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -76,23 +76,23 @@ void site_game_data::process_sml_property(const sml_property &property)
 	}
 }
 
-void site_game_data::process_sml_scope(const sml_data &scope)
+void site_game_data::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "map_pos") {
 		this->map_pos = scope.to_point();
 	} else if (tag == "employment_capacities") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 			this->employment_capacities[employment_type::get(key)] = std::stoi(value);
 		});
 	} else if (tag == "population_units") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto population_unit = make_qunique<wyrmgus::population_unit>();
 			population_unit->moveToThread(QApplication::instance()->thread());
-			database::process_sml_data(population_unit, child_scope);
+			database::process_gsml_data(population_unit, child_scope);
 			this->population_units.push_back(std::move(population_unit));
 		});
 	} else {
@@ -100,12 +100,12 @@ void site_game_data::process_sml_scope(const sml_data &scope)
 	}
 }
 
-sml_data site_game_data::to_sml_data() const
+gsml_data site_game_data::to_gsml_data() const
 {
-	sml_data data(this->site->get_identifier());
+	gsml_data data(this->site->get_identifier());
 
 	if (this->get_map_pos() != QPoint(-1, -1)) {
-		data.add_child(sml_data::from_point(this->get_map_pos(), "map_pos"));
+		data.add_child(gsml_data::from_point(this->get_map_pos(), "map_pos"));
 	}
 
 	if (this->get_map_layer() != nullptr) {
@@ -121,7 +121,7 @@ sml_data site_game_data::to_sml_data() const
 	}
 
 	if (!this->employment_capacities.empty()) {
-		sml_data employment_capacities_data("employment_capacities");
+		gsml_data employment_capacities_data("employment_capacities");
 
 		for (const auto &[employment_type, capacity] : this->employment_capacities) {
 			employment_capacities_data.add_property(employment_type->get_identifier(), std::to_string(capacity));
@@ -131,10 +131,10 @@ sml_data site_game_data::to_sml_data() const
 	}
 
 	if (!this->population_units.empty()) {
-		sml_data population_units_data("population_units");
+		gsml_data population_units_data("population_units");
 
 		for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
-			population_units_data.add_child(population_unit->to_sml_data());
+			population_units_data.add_child(population_unit->to_gsml_data());
 		}
 
 		data.add_child(std::move(population_units_data));

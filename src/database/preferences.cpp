@@ -30,8 +30,8 @@
 
 #include "database/database.h"
 #include "database/defines.h"
-#include "database/sml_data.h"
-#include "database/sml_parser.h"
+#include "database/gsml_data.h"
+#include "database/gsml_parser.h"
 #include "game/difficulty.h"
 #include "sound/music_player.h"
 #include "sound/sound_server.h"
@@ -77,8 +77,8 @@ void preferences::load_file()
 		}
 	}
 
-	sml_parser parser;
-	sml_data data;
+	gsml_parser parser;
+	gsml_data data;
 
 	try {
 		data = parser.parse(preferences_path);
@@ -87,18 +87,18 @@ void preferences::load_file()
 		log::log_error("Failed to parse preferences file.");
 	}
 
-	database::process_sml_data(this, data);
+	database::process_gsml_data(this, data);
 }
 
 void preferences::save() const
 {
 	const std::filesystem::path preferences_path = preferences::get_path();
 
-	sml_data data(preferences_path.filename().stem().string());
+	gsml_data data(preferences_path.filename().stem().string());
 
 	data.add_property("scale_factor", this->get_scale_factor().to_string());
 	data.add_property("fullscreen", string::from_bool(this->is_fullscreen()));
-	data.add_child(sml_data::from_size(this->get_window_size(), "window_size"));
+	data.add_child(gsml_data::from_size(this->get_window_size(), "window_size"));
 	data.add_property("window_maximized", string::from_bool(this->window_maximized));
 	data.add_property("game_speed", std::to_string(this->get_game_speed()));
 	data.add_property("difficulty", difficulty_to_string(this->get_difficulty()));
@@ -132,20 +132,20 @@ void preferences::save() const
 	}
 }
 
-void preferences::process_sml_property(const sml_property &property)
+void preferences::process_gsml_property(const gsml_property &property)
 {
 	//use a try-catch for the properties, as the property or its value could no longer exist
 	try {
-		database::process_sml_property_for_object(this, property);
+		database::process_gsml_property_for_object(this, property);
 	} catch (const std::runtime_error &exception) {
 		exception::report(exception);
 	}
 }
 
-void preferences::process_sml_scope(const sml_data &scope)
+void preferences::process_gsml_scope(const gsml_data &scope)
 {
 	try {
-		database::process_sml_scope_for_object(this, scope);
+		database::process_gsml_scope_for_object(this, scope);
 	} catch (const std::runtime_error &exception) {
 		exception::report(exception);
 	}

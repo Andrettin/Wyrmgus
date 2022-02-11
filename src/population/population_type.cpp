@@ -35,12 +35,12 @@
 
 namespace wyrmgus {
 
-void population_type::process_sml_scope(const sml_data &scope)
+void population_type::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "production_efficiency") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
@@ -48,7 +48,7 @@ void population_type::process_sml_scope(const sml_data &scope)
 			this->production_efficiency_map[resource] = std::stoi(value);
 		});
 	} else {
-		data_entry::process_sml_scope(scope);
+		data_entry::process_gsml_scope(scope);
 	}
 }
 

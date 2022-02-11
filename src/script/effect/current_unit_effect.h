@@ -35,7 +35,7 @@ template <typename scope_type>
 class current_unit_effect final : public scope_effect<scope_type, CUnit>
 {
 public:
-	explicit current_unit_effect(const sml_operator effect_operator) : scope_effect<scope_type, CUnit>(effect_operator)
+	explicit current_unit_effect(const gsml_operator effect_operator) : scope_effect<scope_type, CUnit>(effect_operator)
 	{
 	}
 

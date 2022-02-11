@@ -40,10 +40,10 @@ class character;
 class dialogue;
 class dialogue_option;
 class faction;
+class gsml_data;
+class gsml_property;
 class icon;
 class player_color;
-class sml_data;
-class sml_property;
 class sound;
 class unit_type;
 struct context;
@@ -54,8 +54,8 @@ public:
 	explicit dialogue_node(wyrmgus::dialogue *dialogue);
 	~dialogue_node();
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 	void initialize();
 	void check() const;
 

@@ -30,8 +30,8 @@
 
 #include "time/time_period_schedule.h"
 
-#include "database/sml_data.h"
-#include "database/sml_property.h"
+#include "database/gsml_data.h"
+#include "database/gsml_property.h"
 #include "util/date_util.h"
 
 namespace wyrmgus {
@@ -66,7 +66,7 @@ void time_period_schedule::CalculateHourMultiplier()
 	this->HourMultiplier = std::max(multiplier, 1);
 }
 
-void scheduled_time_period::process_sml_property(const sml_property &property)
+void scheduled_time_period::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -80,7 +80,7 @@ void scheduled_time_period::process_sml_property(const sml_property &property)
 	}
 }
 
-void scheduled_time_period::process_sml_scope(const sml_data &scope)
+void scheduled_time_period::process_gsml_scope(const gsml_data &scope)
 {
 	throw std::runtime_error("Invalid scheduled time period scope: \"" + scope.get_tag() + "\".");
 }

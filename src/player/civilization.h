@@ -87,7 +87,7 @@ public:
 	explicit civilization(const std::string &identifier);
 	virtual ~civilization() override;
 
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
 
@@ -192,8 +192,8 @@ public:
 
 	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;
 	std::string_view get_character_title_name(const character_title title_type, const faction_type faction_type, const government_type government_type, const faction_tier tier, const gender gender) const;
-	void process_character_title_name_scope(const sml_data &scope);
-	void process_character_title_name_scope(const character_title title_type, const sml_data &scope);
+	void process_character_title_name_scope(const gsml_data &scope);
+	void process_character_title_name_scope(const character_title title_type, const gsml_data &scope);
 
 	const std::vector<std::unique_ptr<ai_force_template>> &get_ai_force_templates(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &GetAiBuildingTemplates() const;

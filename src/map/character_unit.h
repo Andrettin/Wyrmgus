@@ -28,8 +28,8 @@
 
 namespace wyrmgus {
 
-class sml_data;
-class sml_property;
+class gsml_data;
+class gsml_property;
 class unit_type;
 
 class character_unit final
@@ -44,8 +44,8 @@ public:
 		this->unit_types.push_back(unit_type);
 	}
 
-	void process_sml_property(const sml_property &property);
-	void process_sml_scope(const sml_data &scope);
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	void check() const
 	{

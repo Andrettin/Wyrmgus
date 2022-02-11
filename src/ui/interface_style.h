@@ -53,7 +53,7 @@ public:
 	explicit interface_style(const std::string &identifier);
 	~interface_style();
 
-	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void initialize() override;
 
 	void set_top_bar_file(const std::filesystem::path &filepath);
