@@ -782,7 +782,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(QPoint offset MEMBER offset READ get_offset)
 	Q_PROPERTY(int num_directions MEMBER num_directions READ get_num_directions)
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
-	Q_PROPERTY(double hue_rotation MEMBER hue_rotation READ get_hue_rotation)
+	Q_PROPERTY(int hue_rotation MEMBER hue_rotation READ get_hue_rotation)
 	Q_PROPERTY(wyrmgus::colorization_type colorization MEMBER colorization READ get_colorization)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(wyrmgus::item_class item_class MEMBER item_class READ get_item_class)
@@ -1024,7 +1024,7 @@ public:
 		return this->conversible_player_color;
 	}
 
-	double get_hue_rotation() const
+	int get_hue_rotation() const
 	{
 		return this->hue_rotation;
 	}
@@ -1360,7 +1360,7 @@ private:
 	QSize frame_size = QSize(0, 0); //sprite frame size
 	QPoint offset = QPoint(0, 0); //sprite horizontal offset
 	player_color *conversible_player_color = nullptr; //the conversible player color for the unit graphics
-	double hue_rotation = 0;
+	int hue_rotation = 0;
 	colorization_type colorization;
 	color_set hue_ignored_colors;
 	int draw_level = 0;                                   /// Level to Draw UnitType at

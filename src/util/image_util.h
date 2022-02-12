@@ -103,7 +103,7 @@ inline void index_to_image_palette(QImage &image, const QImage &other_image)
 	image::index_to_palette(image, image::get_colors(other_image));
 }
 
-extern void rotate_hue(QImage &image, const double degrees, const color_set &ignored_colors);
+extern void rotate_hue(QImage &image, const int degrees, const color_set &ignored_colors);
 extern void colorize(QImage &image, const colorization_type colorization, const color_set &ignored_colors);
 
 template <typename function_type>

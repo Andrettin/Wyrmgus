@@ -76,7 +76,7 @@ class icon final : public icon_base, public data_type<icon>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
-	Q_PROPERTY(double hue_rotation MEMBER hue_rotation READ get_hue_rotation)
+	Q_PROPERTY(int hue_rotation MEMBER hue_rotation READ get_hue_rotation)
 	Q_PROPERTY(wyrmgus::colorization_type colorization MEMBER colorization READ get_colorization)
 
 public:
@@ -98,7 +98,7 @@ public:
 		return this->conversible_player_color;
 	}
 
-	double get_hue_rotation() const
+	int get_hue_rotation() const
 	{
 		return this->hue_rotation;
 	}
@@ -132,7 +132,7 @@ public:
 
 private:
 	player_color *conversible_player_color = nullptr;
-	double hue_rotation = 0;
+	int hue_rotation = 0;
 	colorization_type colorization;
 	color_set hue_ignored_colors;
 

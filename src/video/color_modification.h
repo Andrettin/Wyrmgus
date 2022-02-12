@@ -40,16 +40,16 @@ class color_modification final
 public:
 	color_modification();
 
-	explicit color_modification(const double hue_rotation, const colorization_type colorization, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change);
+	explicit color_modification(const int hue_rotation, const colorization_type colorization, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change);
 
-	explicit color_modification(const double hue_rotation, const colorization_type colorization, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color)
+	explicit color_modification(const int hue_rotation, const colorization_type colorization, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color)
 		: color_modification(hue_rotation, colorization, hue_ignored_colors, player_color, 0, 0, 0)
 	{
 	}
 
-	explicit color_modification(const double hue_rotation, const colorization_type colorization, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day);
+	explicit color_modification(const int hue_rotation, const colorization_type colorization, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day);
 
-	double get_hue_rotation() const
+	int get_hue_rotation() const
 	{
 		return this->hue_rotation;
 	}
@@ -125,7 +125,7 @@ public:
 
 
 private:
-	double hue_rotation = 0; //rotation in degrees to the hue
+	int hue_rotation = 0; //rotation in degrees to the hue
 	colorization_type colorization;
 	color_set hue_ignored_colors; //ignored colors for the hue rotation and desaturation
 

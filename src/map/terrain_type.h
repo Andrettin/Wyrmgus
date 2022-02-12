@@ -54,7 +54,7 @@ class terrain_type final : public named_data_entry, public data_type<terrain_typ
 	Q_PROPERTY(std::filesystem::path image_file MEMBER image_file WRITE set_image_file)
 	Q_PROPERTY(std::filesystem::path transition_image_file MEMBER transition_image_file WRITE set_transition_image_file)
 	Q_PROPERTY(std::filesystem::path elevation_image_file MEMBER elevation_image_file WRITE set_elevation_image_file)
-	Q_PROPERTY(double hue_rotation MEMBER hue_rotation READ get_hue_rotation)
+	Q_PROPERTY(int hue_rotation MEMBER hue_rotation READ get_hue_rotation)
 	Q_PROPERTY(wyrmgus::colorization_type colorization MEMBER colorization READ get_colorization)
 	Q_PROPERTY(bool overlay MEMBER overlay READ is_overlay)
 	Q_PROPERTY(bool buildable MEMBER buildable READ is_buildable)
@@ -264,7 +264,7 @@ public:
 		return this->elevation_graphics;
 	}
 
-	double get_hue_rotation() const
+	int get_hue_rotation() const
 	{
 		return this->hue_rotation;
 	}
@@ -481,7 +481,7 @@ private:
 	std::map<const season *, std::shared_ptr<CPlayerColorGraphic>> season_graphics;		/// Graphics to be displayed instead of the normal ones during particular seasons
 	std::filesystem::path elevation_image_file;
 	std::shared_ptr<CGraphic> elevation_graphics; //semi-transparent elevation graphics, displayed on borders so that they look better
-	double hue_rotation = 0;
+	int hue_rotation = 0;
 	colorization_type colorization;
 	std::vector<terrain_type *> base_terrain_types; //possible base terrain types for this terrain type (if it is an overlay terrain)
 public:
