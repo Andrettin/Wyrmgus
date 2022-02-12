@@ -834,7 +834,10 @@ set(wyrmgus_network_HDRS
 )
 
 set(wyrmgus_pathfinder_HDRS
+	src/pathfinder/astar_heuristic.h
+	src/pathfinder/astar_visitor.h
 	src/pathfinder/pathfinder.h
+	src/pathfinder/pathfinder_data.h
 )
 
 set(wyrmgus_player_HDRS

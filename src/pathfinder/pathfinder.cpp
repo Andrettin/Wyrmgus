@@ -34,6 +34,9 @@
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "pathfinder/astar_heuristic.h"
+#include "pathfinder/astar_visitor.h"
+#include "pathfinder/pathfinder_data.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"
 #include "unit/unit_type.h"
@@ -41,6 +44,132 @@
 #include "util/log_util.h"
 #include "util/rect_util.h"
 #include "util/size_util.h"
+
+#include <boost/graph/filtered_graph.hpp>
+
+namespace wyrmgus {
+
+pathfinder::pathfinder()
+{
+}
+
+pathfinder::~pathfinder()
+{
+}
+
+void pathfinder::initialize()
+{
+	this->clear();
+
+	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {
+		this->data_map[z] = std::make_unique<pathfinder_data>(z);
+	}
+}
+
+void pathfinder::clear()
+{
+	this->data_map.clear();
+}
+
+struct vertex_filter final
+{
+	vertex_filter()
+	{
+	}
+
+	explicit vertex_filter(const CUnit *unit, const size_t z) : unit(unit), z(z)
+	{
+	}
+
+	template <typename vertex_type>
+	bool operator()(const vertex_type &tile_index) const
+	{
+		const int cost = CostMoveTo(tile_index, *unit, z);
+		return cost >= 0;
+	}
+
+private:
+	const CUnit *unit = nullptr;
+	size_t z = 0;
+};
+
+int pathfinder::find_path(const QPoint &start_pos, const QSize &source_size, const QPoint &goal_pos, const QSize &goal_size, const int min_range, const int max_range, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit *unit, const int max_length, const int z)
+{
+	using cost = pathfinder_data::cost;
+	using edge = pathfinder_data::edge;
+	using graph = pathfinder_data::graph;
+	using vertex = pathfinder_data::vertex;
+	using filtered_graph = boost::filtered_graph<graph, boost::keep_all, vertex_filter>;
+
+	const vertex start = CMap::get()->get_pos_index(start_pos, z);
+	const vertex goal = CMap::get()->get_pos_index(goal_pos, z);
+
+	vertex_filter tile_filter(unit, z);
+
+	pathfinder_data *data = this->get_data(z);
+	graph &map_graph = data->get_map_graph();
+
+	//filtered_graph filtered_map_graph(data->get_map_graph(), boost::keep_all(), tile_filter);
+
+	std::vector<vertex> vertex_predecessors(boost::num_vertices(map_graph));
+	std::vector<cost> vertex_costs(boost::num_vertices(map_graph));
+
+	auto weight_function = boost::make_function_property_map<edge, cost>([z, unit](const edge edge) {
+		const vertex target_tile_index = edge.m_target;
+		const int cost = CostMoveTo(target_tile_index, *unit, z);
+
+		if (cost < 0) {
+			return 1000;
+		}
+
+		return cost;
+	});
+
+	try {
+		boost::astar_search_tree(map_graph, start, astar_heuristic<graph, cost>(goal, z),
+			weight_map(weight_function).
+			predecessor_map(boost::make_iterator_property_map(vertex_predecessors.begin(), boost::get(boost::vertex_index, map_graph))).
+			distance_map(boost::make_iterator_property_map(vertex_costs.begin(), boost::get(boost::vertex_index, map_graph))).
+			visitor(astar_visitor<vertex>(goal)));
+	} catch (found_goal) {
+		std::vector<char> path_directions;
+
+		for (vertex v = goal;; v = vertex_predecessors[v]) {
+			if (vertex_costs[v] == 1000) {
+				return PF_FAILED;
+			}
+
+			if (vertex_predecessors[v] == v) {
+				break;
+			}
+
+			const QPoint tile_pos = CMap::get()->get_index_pos(v, z);
+			const QPoint prev_tile_pos = CMap::get()->get_index_pos(vertex_predecessors[v], z);
+			const QPoint diff = tile_pos - prev_tile_pos;
+			const char heading = XY2Heading[diff.x() + 1][diff.y() + 1];
+			path_directions.push_back(heading);
+		}
+
+		std::reverse(path_directions.begin(), path_directions.end());
+
+		if (path != nullptr) {
+			for (size_t i = 0; i < path_directions.size(); ++i) {
+				if (i >= PathFinderOutput::MAX_PATH_LENGTH) {
+					break;
+				}
+
+				const char dir = path_directions[i];
+				(*path)[i] = dir;
+			}
+		}
+
+		return static_cast<int>(path_directions.size());
+	}
+
+	return PF_FAILED;
+}
+
+}
 
 //astar.cpp
 
@@ -234,6 +363,8 @@ void InitPathfinder()
 //	InitAStar(Map.Info.MapWidth, Map.Info.MapHeight);
 	InitAStar();
 	//Wyrmgus end
+
+	pathfinder::get()->initialize();
 }
 
 /**
@@ -242,6 +373,8 @@ void InitPathfinder()
 void FreePathfinder()
 {
 	FreeAStar();
+
+	pathfinder::get()->clear();
 }
 
 /*----------------------------------------------------------------------------

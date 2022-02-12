@@ -59,7 +59,6 @@ struct Node {
 //std::array<int, 9> Heading2O;//heading to offset
 std::array<std::vector<int>, 9> Heading2O;//heading to offset
 //Wyrmgus end
-static constexpr std::array<std::array<int, 3>, 3> XY2Heading = { { {7, 6, 5}, {0, 0, 4}, {1, 2, 3} } };
 
 /// cost matrix
 //Wyrmgus start
@@ -330,7 +329,7 @@ static void AStarAddToClose(int node, int z)
 //Wyrmgus end
 
 /* build-in costmoveto code */
-static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int z)
+int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int z)
 {
 #ifdef DEBUG
 	{
@@ -453,7 +452,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 **                0 -> no induced cost, except move
 **               >0 -> costly tile
 */
-static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
+int CostMoveTo(unsigned int index, const CUnit &unit, int z)
 {
 	//Wyrmgus start
 	if (!&unit) {
@@ -951,6 +950,8 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, con
 //	AStarMatrix[eo].Direction = 8;
 	AStarMatrix[z][eo].Direction = 8;
 	//Wyrmgus end
+
+	return pathfinder::get()->find_path(startPos, QSize(tilesizex, tilesizey), goalPos, QSize(gw, gh), minrange, maxrange, path, &unit, max_length, z);
 
 	// place start point in open, it that failed, try another pathfinder
 	int costToGoal = AStarCosts(startPos, goalPos);
