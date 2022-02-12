@@ -34,6 +34,7 @@ enum class colorization_type {
 	gray,
 	green,
 	red,
+	white,
 	yellow
 };
 
@@ -49,6 +50,8 @@ inline colorization_type string_to_colorization_type(const std::string &str)
 		return colorization_type::green;
 	} else if (str == "red") {
 		return colorization_type::red;
+	} else if (str == "white") {
+		return colorization_type::white;
 	} else if (str == "yellow") {
 		return colorization_type::yellow;
 	}

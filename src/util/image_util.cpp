@@ -487,17 +487,15 @@ void rotate_hue(QImage &image, const double degrees, const color_set &ignored_co
 
 static void colorize_rgb(const colorization_type colorization, const int old_red, const int old_green, const int old_blue, int &new_red, int &new_green, int &new_blue)
 {
+	const int rgb_max = std::max(std::max(old_red, old_green), old_blue);
 	const int rgb_sum = old_red + old_green + old_blue;
 
 	switch (colorization) {
 		case colorization_type::blue: {
-			const int new_value = std::clamp(rgb_sum, 0, 255);
+			const int new_value = std::clamp(rgb_max, 0, 255);
 			new_blue = new_value;
-
-			const int rest = (rgb_sum - new_value) / 2;
-			const int rest_value = std::clamp(rest, 0, 255);
-			new_red = rest_value;
-			new_green = rest_value;
+			new_green = new_value / 2;
+			new_red = 0;
 			break;
 		}
 		case colorization_type::gray: {
@@ -508,33 +506,31 @@ static void colorize_rgb(const colorization_type colorization, const int old_red
 			break;
 		}
 		case colorization_type::green: {
-			const int new_value = std::clamp(rgb_sum, 0, 255);
+			const int new_value = std::clamp(rgb_max, 0, 255);
 			new_green = new_value;
-
-			const int rest = (rgb_sum - new_value) / 2;
-			const int rest_value = std::clamp(rest, 0, 255);
-			new_red = rest_value;
-			new_blue = rest_value;
+			new_red = 0;
+			new_blue = 0;
 			break;
 		}
 		case colorization_type::red: {
-			const int new_value = std::clamp(rgb_sum, 0, 255);
+			const int new_value = std::clamp(rgb_max, 0, 255);
 			new_red = new_value;
-
-			const int rest = (rgb_sum - new_value) / 2;
-			const int rest_value = std::clamp(rest, 0, 255);
-			new_green = rest_value;
-			new_blue = rest_value;
+			new_green = 0;
+			new_blue = 0;
+			break;
+		}
+		case colorization_type::white: {
+			const int new_value = std::clamp(rgb_max, 0, 255);
+			new_red = new_value;
+			new_green = new_value;
+			new_blue = new_value;
 			break;
 		}
 		case colorization_type::yellow: {
-			const int new_value = std::clamp(rgb_sum / 2, 0, 255);
+			const int new_value = std::clamp(rgb_max, 0, 255);
 			new_red = new_value;
 			new_green = new_value;
-
-			const int rest = rgb_sum - new_value * 2;
-			const int rest_value = std::clamp(rest, 0, 255);
-			new_blue = rest_value;
+			new_blue = 0;
 			break;
 		}
 		default:
