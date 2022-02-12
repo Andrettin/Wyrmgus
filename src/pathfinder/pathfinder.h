@@ -33,57 +33,14 @@
 #endif
 
 #include "util/assert_util.h"
-#include "util/singleton.h"
 #include "vec2i.h"
 
 class CUnit;
 class CFile;
 struct lua_State;
 
-class PathFinderOutput final
-{
-public:
-	enum { MAX_PATH_LENGTH = 28 }; /// max length of precalculated path
-public:
-	void Save(CFile &file) const;
-	void Load(lua_State *l);
-public:
-	unsigned short int Cycles = 0;  /// how much Cycles we move.
-	char Fast = 0;                  /// Flag fast move (one step)
-	char Length = 0;                /// stored path length
-	std::array<char, MAX_PATH_LENGTH> Path{}; /// directions of stored path
-};
-
 namespace wyrmgus {
-
-class pathfinder_data;
-enum class tile_flag : uint32_t;
-
-class pathfinder final : public singleton<pathfinder>
-{
-public:
-	pathfinder();
-	~pathfinder();
-
-	void initialize();
-	void clear();
-
-	pathfinder_data *get_data(const size_t z) const
-	{
-		const auto find_iterator = this->data_map.find(z);
-		if (find_iterator != this->data_map.end()) {
-			return find_iterator->second.get();
-		}
-		
-		return nullptr;
-	}
-
-	int find_path(const QPoint &start_pos, const QSize &source_size, const QPoint &goal_pos, const QSize &goal_size, const int min_range, const int max_range, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit *unit, const int max_length, const int z);
-
-private:
-	std::map<size_t, std::unique_ptr<pathfinder_data>> data_map;
-};
-
+	enum class tile_flag : uint32_t;
 }
 
 /**
@@ -144,6 +101,20 @@ private:
 	int MapLayer = 0;
 	//Wyrmgus end
 	bool isRecalculatePathNeeded = true;
+};
+
+class PathFinderOutput final
+{
+public:
+	enum {MAX_PATH_LENGTH = 28}; /// max length of precalculated path
+public:
+	void Save(CFile &file) const;
+	void Load(lua_State *l);
+public:
+	unsigned short int Cycles = 0;  /// how much Cycles we move.
+	char Fast = 0;                  /// Flag fast move (one step)
+	char Length = 0;                /// stored path length
+	std::array<char, MAX_PATH_LENGTH> Path{}; /// directions of stored path
 };
 
 class PathFinderData final
@@ -237,7 +208,6 @@ extern int AStarUnknownTerrainCost;
 //  N NE  E SE  S SW  W NW
 constexpr std::array<int, 9> Heading2X = { 0, +1, +1, +1, 0, -1, -1, -1, 0 };
 constexpr std::array<int, 9> Heading2Y = { -1, -1, 0, +1, +1, +1, 0, -1, 0 };
-constexpr std::array<std::array<int, 3>, 3> XY2Heading = { { {7, 6, 5}, {0, 0, 4}, {1, 2, 3} } };
 
 /// Init the pathfinder
 extern void InitPathfinder();
@@ -269,9 +239,6 @@ extern int GetAStarMovingUnitCrossingCost();
 
 extern void SetAStarUnknownTerrainCost(int cost);
 extern int GetAStarUnknownTerrainCost();
-
-extern int CostMoveTo(unsigned int index, const CUnit &unit, int z);
-extern int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int z);
 
 //Wyrmgus start
 /// Find and a* path for a unit
