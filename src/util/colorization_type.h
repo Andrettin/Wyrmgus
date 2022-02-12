@@ -28,7 +28,7 @@
 
 namespace wyrmgus {
 
-enum class coloration_type {
+enum class colorization_type {
 	none,
 	blue,
 	gray,
@@ -37,25 +37,25 @@ enum class coloration_type {
 	yellow
 };
 
-inline coloration_type string_to_coloration_type(const std::string &str)
+inline colorization_type string_to_colorization_type(const std::string &str)
 {
 	if (str == "none") {
-		return coloration_type::none;
+		return colorization_type::none;
 	} else if (str == "blue") {
-		return coloration_type::blue;
+		return colorization_type::blue;
 	} else if (str == "gray") {
-		return coloration_type::gray;
+		return colorization_type::gray;
 	} else if (str == "green") {
-		return coloration_type::green;
+		return colorization_type::green;
 	} else if (str == "red") {
-		return coloration_type::red;
+		return colorization_type::red;
 	} else if (str == "yellow") {
-		return coloration_type::yellow;
+		return colorization_type::yellow;
 	}
 
-	throw std::runtime_error("Invalid coloration type: \"" + str + "\".");
+	throw std::runtime_error("Invalid colorization type: \"" + str + "\".");
 }
 
 }
 
-Q_DECLARE_METATYPE(wyrmgus::coloration_type)
+Q_DECLARE_METATYPE(wyrmgus::colorization_type)

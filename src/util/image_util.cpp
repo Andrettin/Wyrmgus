@@ -29,7 +29,7 @@
 #include "util/image_util.h"
 
 #include "util/angle_util.h"
-#include "util/coloration_type.h"
+#include "util/colorization_type.h"
 #include "util/container_util.h"
 #include "util/fractional_int.h"
 #include "util/path_util.h"
@@ -485,7 +485,7 @@ void rotate_hue(QImage &image, const double degrees, const color_set &ignored_co
 	}
 }
 
-void colorate(QImage &image, const coloration_type coloration, const color_set &ignored_colors)
+void colorize(QImage &image, const colorization_type colorization, const color_set &ignored_colors)
 {
 	for (int x = 0; x < image.width(); ++x) {
 		for (int y = 0; y < image.height(); ++y) {
@@ -505,8 +505,8 @@ void colorate(QImage &image, const coloration_type coloration, const color_set &
 
 			const int sum = old_red + old_green + old_blue;
 
-			switch (coloration) {
-				case coloration_type::blue: {
+			switch (colorization) {
+				case colorization_type::blue: {
 					const int new_value = std::clamp(sum, 0, 255);
 					new_blue = new_value;
 
@@ -516,14 +516,14 @@ void colorate(QImage &image, const coloration_type coloration, const color_set &
 					new_green = rest_value;
 					break;
 				}
-				case coloration_type::gray: {
+				case colorization_type::gray: {
 					const int new_value = std::clamp(sum / 3, 0, 255);
 					new_red = new_value;
 					new_green = new_value;
 					new_blue = new_value;
 					break;
 				}
-				case coloration_type::green: {
+				case colorization_type::green: {
 					const int new_value = std::clamp(sum / 3, 0, 255);
 					new_green = new_value;
 
@@ -533,7 +533,7 @@ void colorate(QImage &image, const coloration_type coloration, const color_set &
 					new_blue = rest_value;
 					break;
 				}
-				case coloration_type::red: {
+				case colorization_type::red: {
 					const int new_value = std::clamp(sum * 3 / 4, 0, 255);
 					new_red = new_value;
 
@@ -543,7 +543,7 @@ void colorate(QImage &image, const coloration_type coloration, const color_set &
 					new_blue = rest_value;
 					break;
 				}
-				case coloration_type::yellow: {
+				case colorization_type::yellow: {
 					const int new_value = std::clamp(sum / 2, 0, 255);
 					new_red = new_value;
 					new_green = new_value;

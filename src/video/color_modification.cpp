@@ -28,29 +28,29 @@
 
 #include "video/color_modification.h"
 
-#include "util/coloration_type.h"
+#include "util/colorization_type.h"
 #include "time/time_of_day.h"
 
 namespace wyrmgus {
 
-color_modification::color_modification() : coloration(coloration_type::none)
+color_modification::color_modification() : colorization(colorization_type::none)
 {
 }
 
-color_modification::color_modification(const double hue_rotation, const coloration_type coloration, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change) : hue_rotation(hue_rotation), coloration(coloration), hue_ignored_colors(hue_ignored_colors), player_color(player_color), red_change(red_change), green_change(green_change), blue_change(blue_change)
+color_modification::color_modification(const double hue_rotation, const colorization_type colorization, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change) : hue_rotation(hue_rotation), colorization(colorization), hue_ignored_colors(hue_ignored_colors), player_color(player_color), red_change(red_change), green_change(green_change), blue_change(blue_change)
 {
-	if (this->get_hue_rotation() != 0 && this->get_coloration() != coloration_type::none) {
-		throw std::runtime_error("A color modification cannot both have a hue rotation and a coloration.");
+	if (this->get_hue_rotation() != 0 && this->get_colorization() != colorization_type::none) {
+		throw std::runtime_error("A color modification cannot both have a hue rotation and a colorization.");
 	}
 }
 
-color_modification::color_modification(const double hue_rotation, const coloration_type coloration, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day) : color_modification(hue_rotation, coloration, hue_ignored_colors, player_color, time_of_day ? time_of_day->ColorModification.R : 0, time_of_day ? time_of_day->ColorModification.G : 0, time_of_day ? time_of_day->ColorModification.B : 0)
+color_modification::color_modification(const double hue_rotation, const colorization_type colorization, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day) : color_modification(hue_rotation, colorization, hue_ignored_colors, player_color, time_of_day ? time_of_day->ColorModification.R : 0, time_of_day ? time_of_day->ColorModification.G : 0, time_of_day ? time_of_day->ColorModification.B : 0)
 {
 }
 
 bool color_modification::is_null() const
 {
-	return this->get_hue_rotation() == 0 && this->get_coloration() == coloration_type::none && this->get_player_color() == nullptr && !this->has_rgb_change();
+	return this->get_hue_rotation() == 0 && this->get_colorization() == colorization_type::none && this->get_player_color() == nullptr && !this->has_rgb_change();
 }
 
 }

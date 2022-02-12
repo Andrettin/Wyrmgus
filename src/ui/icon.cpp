@@ -37,7 +37,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"
-#include "util/coloration_type.h"
+#include "util/colorization_type.h"
 #include "video/renderer.h"
 #include "video/video.h"
 
@@ -76,7 +76,7 @@ void icon::load_all()
 }
 
 
-icon::icon(const std::string &identifier) : icon_base(identifier), coloration(coloration_type::none)
+icon::icon(const std::string &identifier) : icon_base(identifier), colorization(colorization_type::none)
 {
 }
 
@@ -121,7 +121,7 @@ std::shared_ptr<CPlayerColorGraphic> icon::get_graphics() const
 */
 void icon::DrawIcon(const PixelPos &pos, const player_color *player_color, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	this->get_graphics()->render_frame(this->get_frame(), pos, color_modification(this->get_hue_rotation(), this->get_coloration(), this->get_hue_ignored_colors(), player_color), render_commands);
+	this->get_graphics()->render_frame(this->get_frame(), pos, color_modification(this->get_hue_rotation(), this->get_colorization(), this->get_hue_ignored_colors(), player_color), render_commands);
 }
 
 /**
@@ -158,7 +158,7 @@ void icon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent, std::ve
 */
 void icon::DrawUnitIcon(const ButtonStyle &style, const unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player_color, QColor border_color, const bool transparent, const bool grayscale, const int show_percent, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	const color_modification color_modification(this->get_hue_rotation(), this->get_coloration(), this->get_hue_ignored_colors(), player_color);
+	const color_modification color_modification(this->get_hue_rotation(), this->get_colorization(), this->get_hue_ignored_colors(), player_color);
 
 	ButtonStyle s(style);
 

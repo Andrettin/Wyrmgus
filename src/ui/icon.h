@@ -68,7 +68,7 @@ namespace wyrmgus {
 
 class player_color;
 class renderer;
-enum class coloration_type;
+enum class colorization_type;
 
 /// Icon: rectangle image used in menus
 class icon final : public icon_base, public data_type<icon>
@@ -77,7 +77,7 @@ class icon final : public icon_base, public data_type<icon>
 
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 	Q_PROPERTY(double hue_rotation MEMBER hue_rotation READ get_hue_rotation)
-	Q_PROPERTY(wyrmgus::coloration_type coloration MEMBER coloration READ get_coloration)
+	Q_PROPERTY(wyrmgus::colorization_type colorization MEMBER colorization READ get_colorization)
 
 public:
 	static constexpr const char *class_identifier = "icon";
@@ -103,9 +103,9 @@ public:
 		return this->hue_rotation;
 	}
 
-	coloration_type get_coloration() const
+	colorization_type get_colorization() const
 	{
-		return this->coloration;
+		return this->colorization;
 	}
 
 	const color_set &get_hue_ignored_colors() const
@@ -133,7 +133,7 @@ public:
 private:
 	player_color *conversible_player_color = nullptr;
 	double hue_rotation = 0;
-	coloration_type coloration;
+	colorization_type colorization;
 	color_set hue_ignored_colors;
 
 	friend int ::CclDefineIcon(lua_State *l);
