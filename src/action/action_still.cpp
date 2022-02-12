@@ -47,6 +47,7 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "missile.h"
+#include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "player/player_type.h"
 #include "script.h"
