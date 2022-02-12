@@ -114,7 +114,6 @@
 #include "upgrade/upgrade_category_rank.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
-#include "util/coloration_type.h"
 #include "util/geocoordinate.h"
 #include "util/path_util.h"
 #include "util/qunique_ptr.h"
@@ -293,8 +292,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(civilization_group::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::civilization_group_rank") {
 			new_property_value = QVariant::fromValue(string_to_civilization_group_rank(property.get_value()));
-		} else if (property_class_name == "wyrmgus::coloration_type") {
-			new_property_value = QVariant::fromValue(string_to_coloration_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::construction*") {
 			new_property_value = QVariant::fromValue(construction::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::cursor*") {

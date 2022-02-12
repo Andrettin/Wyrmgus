@@ -41,7 +41,6 @@ namespace wyrmgus {
 class resource;
 class season;
 class unit_type;
-enum class coloration_type;
 enum class tile_flag : uint32_t;
 enum class tile_transition_type;
 
@@ -55,7 +54,7 @@ class terrain_type final : public named_data_entry, public data_type<terrain_typ
 	Q_PROPERTY(std::filesystem::path transition_image_file MEMBER transition_image_file WRITE set_transition_image_file)
 	Q_PROPERTY(std::filesystem::path elevation_image_file MEMBER elevation_image_file WRITE set_elevation_image_file)
 	Q_PROPERTY(double hue_rotation MEMBER hue_rotation READ get_hue_rotation)
-	Q_PROPERTY(wyrmgus::coloration_type coloration MEMBER coloration READ get_coloration)
+	Q_PROPERTY(bool desaturated MEMBER desaturated READ is_desaturated)
 	Q_PROPERTY(bool overlay MEMBER overlay READ is_overlay)
 	Q_PROPERTY(bool buildable MEMBER buildable READ is_buildable)
 	Q_PROPERTY(bool pathway MEMBER pathway READ is_pathway)
@@ -269,9 +268,9 @@ public:
 		return this->hue_rotation;
 	}
 
-	coloration_type get_coloration() const
+	bool is_desaturated() const
 	{
-		return this->coloration;
+		return this->desaturated;
 	}
 
 	bool is_overlay() const
@@ -482,7 +481,7 @@ private:
 	std::filesystem::path elevation_image_file;
 	std::shared_ptr<CGraphic> elevation_graphics; //semi-transparent elevation graphics, displayed on borders so that they look better
 	double hue_rotation = 0;
-	coloration_type coloration;
+	bool desaturated = false;
 	std::vector<terrain_type *> base_terrain_types; //possible base terrain types for this terrain type (if it is an overlay terrain)
 public:
 	std::vector<terrain_type *> BorderTerrains;				/// Terrain types which this one can border

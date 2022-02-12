@@ -39,7 +39,6 @@
 #include "player/player_color.h"
 #include "time/season.h"
 #include "upgrade/upgrade_structs.h"
-#include "util/coloration_type.h"
 #include "util/container_util.h"
 #include "util/image_util.h"
 #include "util/string_conversion_util.h"
@@ -80,7 +79,7 @@ void terrain_type::LoadTerrainTypeGraphics()
 }
 
 terrain_type::terrain_type(const std::string &identifier)
-	: named_data_entry(identifier), Flags(tile_flag::none), coloration(coloration_type::none)
+	: named_data_entry(identifier), Flags(tile_flag::none)
 {
 }
 
@@ -306,13 +305,13 @@ void terrain_type::calculate_minimap_color(const season *season)
 	const player_color *conversible_player_color = graphic->get_conversible_player_color();
 
 	QImage image = graphic->get_image();
-	if (this->get_hue_rotation() != 0 || this->get_coloration() != coloration_type::none) {
+	if (this->get_hue_rotation() != 0 || this->is_desaturated()) {
 		const color_set ignored_colors = container::to_set<std::vector<QColor>, color_set>(conversible_player_color->get_colors());
 
 		if (this->get_hue_rotation() != 0) {
 			image::rotate_hue(image, this->get_hue_rotation(), ignored_colors);
-		} else if (this->get_coloration() != coloration_type::none) {
-			image::colorate(image, this->get_coloration(), ignored_colors);
+		} else if (this->is_desaturated()) {
+			image::desaturate(image, ignored_colors);
 		}
 	}
 

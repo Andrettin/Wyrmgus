@@ -70,7 +70,7 @@ QImage icon_image_provider::requestImage(const QString &id, QSize *size, const Q
 		std::shared_ptr<CGraphic> graphics = icon->get_graphics();
 		graphics->Load(preferences::get()->get_scale_factor());
 
-		const QImage &image = graphics->get_or_create_frame_image(icon->get_frame(), color_modification(icon->get_hue_rotation(), icon->get_coloration(), icon->get_hue_ignored_colors(), player_color), grayscale);
+		const QImage &image = graphics->get_or_create_frame_image(icon->get_frame(), color_modification(icon->get_hue_rotation(), icon->is_desaturated(), icon->get_hue_ignored_colors(), player_color), grayscale);
 
 		if (image.isNull()) {
 			throw std::runtime_error("Icon image for ID \"" + id_str + "\" is null.");

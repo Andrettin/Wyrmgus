@@ -760,7 +760,7 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_pt
 		opacity = int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value);
 	}
 
-	const color_modification color_modification(type.get_hue_rotation(), type.get_coloration(), type.get_hue_ignored_colors(), player_color, time_of_day);
+	const color_modification color_modification(type.get_hue_rotation(), type.is_desaturated(), type.get_hue_ignored_colors(), player_color, time_of_day);
 	sprite->render_frame(frame, pos, color_modification, false, flip, opacity, 100, render_commands);
 }
 
