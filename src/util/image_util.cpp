@@ -485,6 +485,63 @@ void rotate_hue(QImage &image, const double degrees, const color_set &ignored_co
 	}
 }
 
+static void colorize_rgb(const colorization_type colorization, const int old_red, const int old_green, const int old_blue, int &new_red, int &new_green, int &new_blue)
+{
+	const int rgb_sum = old_red + old_green + old_blue;
+
+	switch (colorization) {
+		case colorization_type::blue: {
+			const int new_value = std::clamp(rgb_sum, 0, 255);
+			new_blue = new_value;
+
+			const int rest = (rgb_sum - new_value) / 2;
+			const int rest_value = std::clamp(rest, 0, 255);
+			new_red = rest_value;
+			new_green = rest_value;
+			break;
+		}
+		case colorization_type::gray: {
+			const int new_value = std::clamp(rgb_sum / 3, 0, 255);
+			new_red = new_value;
+			new_green = new_value;
+			new_blue = new_value;
+			break;
+		}
+		case colorization_type::green: {
+			const int new_value = std::clamp(rgb_sum, 0, 255);
+			new_green = new_value;
+
+			const int rest = (rgb_sum - new_value) / 2;
+			const int rest_value = std::clamp(rest, 0, 255);
+			new_red = rest_value;
+			new_blue = rest_value;
+			break;
+		}
+		case colorization_type::red: {
+			const int new_value = std::clamp(rgb_sum, 0, 255);
+			new_red = new_value;
+
+			const int rest = (rgb_sum - new_value) / 2;
+			const int rest_value = std::clamp(rest, 0, 255);
+			new_green = rest_value;
+			new_blue = rest_value;
+			break;
+		}
+		case colorization_type::yellow: {
+			const int new_value = std::clamp(rgb_sum / 2, 0, 255);
+			new_red = new_value;
+			new_green = new_value;
+
+			const int rest = rgb_sum - new_value * 2;
+			const int rest_value = std::clamp(rest, 0, 255);
+			new_blue = rest_value;
+			break;
+		}
+		default:
+			assert(false);
+	}
+}
+
 void colorize(QImage &image, const colorization_type colorization, const color_set &ignored_colors)
 {
 	for (int x = 0; x < image.width(); ++x) {
@@ -503,59 +560,7 @@ void colorize(QImage &image, const colorization_type colorization, const color_s
 			int new_green = 0;
 			int new_blue = 0;
 
-			const int sum = old_red + old_green + old_blue;
-
-			switch (colorization) {
-				case colorization_type::blue: {
-					const int new_value = std::clamp(sum, 0, 255);
-					new_blue = new_value;
-
-					const int rest = (sum - new_value) / 2;
-					const int rest_value = std::clamp(rest, 0, 255);
-					new_red = rest_value;
-					new_green = rest_value;
-					break;
-				}
-				case colorization_type::gray: {
-					const int new_value = std::clamp(sum / 3, 0, 255);
-					new_red = new_value;
-					new_green = new_value;
-					new_blue = new_value;
-					break;
-				}
-				case colorization_type::green: {
-					const int new_value = std::clamp(sum / 3, 0, 255);
-					new_green = new_value;
-
-					const int rest = (sum - new_value) / 2;
-					const int rest_value = std::clamp(rest, 0, 255);
-					new_red = rest_value;
-					new_blue = rest_value;
-					break;
-				}
-				case colorization_type::red: {
-					const int new_value = std::clamp(sum * 3 / 4, 0, 255);
-					new_red = new_value;
-
-					const int rest = (sum - new_value) / 2;
-					const int rest_value = std::clamp(rest, 0, 255);
-					new_green = rest_value;
-					new_blue = rest_value;
-					break;
-				}
-				case colorization_type::yellow: {
-					const int new_value = std::clamp(sum / 2, 0, 255);
-					new_red = new_value;
-					new_green = new_value;
-
-					const int rest = sum - new_value * 2;
-					const int rest_value = std::clamp(rest, 0, 255);
-					new_blue = rest_value;
-					break;
-				}
-				default:
-					assert(false);
-			}
+			image::colorize_rgb(colorization, old_red, old_green, old_blue, new_red, new_green, new_blue);
 
 			pixel_color.setRed(new_red);
 			pixel_color.setGreen(new_green);
