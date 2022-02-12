@@ -83,6 +83,7 @@ namespace wyrmgus {
 	class variation_tag;
 	class world;
 	enum class can_target_flag;
+	enum class coloration_type;
 	enum class gender;
 	enum class item_class;
 	enum class item_slot;
@@ -782,7 +783,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(int num_directions MEMBER num_directions READ get_num_directions)
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 	Q_PROPERTY(double hue_rotation MEMBER hue_rotation READ get_hue_rotation)
-	Q_PROPERTY(bool desaturated MEMBER desaturated READ is_desaturated)
+	Q_PROPERTY(wyrmgus::coloration_type coloration MEMBER coloration READ get_coloration)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(wyrmgus::item_class item_class MEMBER item_class READ get_item_class)
 	Q_PROPERTY(wyrmgus::species* species MEMBER species)
@@ -1028,9 +1029,9 @@ public:
 		return this->hue_rotation;
 	}
 
-	bool is_desaturated() const
+	coloration_type get_coloration() const
 	{
-		return this->desaturated;
+		return this->coloration;
 	}
 
 	const color_set &get_hue_ignored_colors() const
@@ -1360,7 +1361,7 @@ private:
 	QPoint offset = QPoint(0, 0); //sprite horizontal offset
 	player_color *conversible_player_color = nullptr; //the conversible player color for the unit graphics
 	double hue_rotation = 0;
-	bool desaturated = false;
+	coloration_type coloration;
 	color_set hue_ignored_colors;
 	int draw_level = 0;                                   /// Level to Draw UnitType at
 public:

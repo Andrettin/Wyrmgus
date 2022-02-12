@@ -1119,6 +1119,7 @@ set(wyrmgus_util_HDRS
 	src/util/astronomy_util.h
 	src/util/char_util.h
 	src/util/color_container.h
+	src/util/coloration_type.h
 	src/util/container_util.h
 	src/util/date_util.h
 	src/util/enum_util.h

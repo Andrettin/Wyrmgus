@@ -29,6 +29,7 @@
 #include "util/image_util.h"
 
 #include "util/angle_util.h"
+#include "util/coloration_type.h"
 #include "util/container_util.h"
 #include "util/fractional_int.h"
 #include "util/path_util.h"
@@ -484,7 +485,7 @@ void rotate_hue(QImage &image, const double degrees, const color_set &ignored_co
 	}
 }
 
-void desaturate(QImage &image, const color_set &ignored_colors)
+void colorate(QImage &image, const coloration_type coloration, const color_set &ignored_colors)
 {
 	for (int x = 0; x < image.width(); ++x) {
 		for (int y = 0; y < image.height(); ++y) {
@@ -498,11 +499,67 @@ void desaturate(QImage &image, const color_set &ignored_colors)
 			const int old_green = pixel_color.green();
 			const int old_blue = pixel_color.blue();
 
-			const int new_value = std::clamp((old_red + old_green + old_blue) / 3, 0, 255);
+			int new_red = 0;
+			int new_green = 0;
+			int new_blue = 0;
 
-			pixel_color.setRed(new_value);
-			pixel_color.setGreen(new_value);
-			pixel_color.setBlue(new_value);
+			const int sum = old_red + old_green + old_blue;
+
+			switch (coloration) {
+				case coloration_type::blue: {
+					const int new_value = std::clamp(sum, 0, 255);
+					new_blue = new_value;
+
+					const int rest = (sum - new_value) / 2;
+					const int rest_value = std::clamp(rest, 0, 255);
+					new_red = rest_value;
+					new_green = rest_value;
+					break;
+				}
+				case coloration_type::gray: {
+					const int new_value = std::clamp(sum / 3, 0, 255);
+					new_red = new_value;
+					new_green = new_value;
+					new_blue = new_value;
+					break;
+				}
+				case coloration_type::green: {
+					const int new_value = std::clamp(sum / 3, 0, 255);
+					new_green = new_value;
+
+					const int rest = (sum - new_value) / 2;
+					const int rest_value = std::clamp(rest, 0, 255);
+					new_red = rest_value;
+					new_blue = rest_value;
+					break;
+				}
+				case coloration_type::red: {
+					const int new_value = std::clamp(sum * 3 / 4, 0, 255);
+					new_red = new_value;
+
+					const int rest = (sum - new_value) / 2;
+					const int rest_value = std::clamp(rest, 0, 255);
+					new_green = rest_value;
+					new_blue = rest_value;
+					break;
+				}
+				case coloration_type::yellow: {
+					const int new_value = std::clamp(sum / 2, 0, 255);
+					new_red = new_value;
+					new_green = new_value;
+
+					const int rest = sum - new_value * 2;
+					const int rest_value = std::clamp(rest, 0, 255);
+					new_blue = rest_value;
+					break;
+				}
+				default:
+					assert(false);
+			}
+
+			pixel_color.setRed(new_red);
+			pixel_color.setGreen(new_green);
+			pixel_color.setBlue(new_blue);
 
 			image.setPixelColor(x, y, pixel_color);
 		}
