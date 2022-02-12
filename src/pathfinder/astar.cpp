@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name astar.cpp - The a* path finder routines. */
-//
 //      (c) Copyright 1999-2022 by Lutz Sammer, Fabrice Rossi, Russell Smith,
 //                                 Francois Beerten, Jimmy Salmon and Andrettin
 //
@@ -471,6 +469,7 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
 	}
 
 	c = CostMoveToCallBack_Default(index, unit, z);
+	CostMoveToCache[z][index] = c;
 
 	return c;
 }
