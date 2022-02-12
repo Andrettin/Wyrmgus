@@ -147,7 +147,7 @@ static std::vector<std::set<Open>> OpenSet;
 
 //Wyrmgus start
 //static std::vector<int> CostMoveToCache;
-static std::vector<std::map<int, int>> CostMoveToCache;
+static std::vector<std::unordered_map<int, int>> CostMoveToCache;
 //Wyrmgus end
 static constexpr int CacheNotSet = -5;
 
@@ -250,7 +250,7 @@ static void CostMoveToCacheCleanUp(const int z)
 
 static int get_cost_move_to_cache(const int index, const int z)
 {
-	const std::map<int, int> &cache = CostMoveToCache[z];
+	const std::unordered_map<int, int> &cache = CostMoveToCache[z];
 
 	const auto find_iterator = cache.find(index);
 	if (find_iterator != cache.end()) {
