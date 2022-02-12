@@ -38,7 +38,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "missile.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"
 

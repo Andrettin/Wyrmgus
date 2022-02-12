@@ -36,7 +36,7 @@
 #include "economy/resource.h"
 #include "map/map.h"
 #include "map/site.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/civilization.h"
 #include "player/player.h"
 #include "script.h"

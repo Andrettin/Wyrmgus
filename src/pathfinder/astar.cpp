@@ -29,6 +29,8 @@
 
 #include "stratagus.h"
 
+#include "pathfinder/pathfinder.h"
+
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
@@ -47,8 +49,6 @@
 #include "util/point_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
-
-#include "pathfinder.h"
 
 struct Node {
 	int CostFromStart = 0;  /// Real costs to reach this point

@@ -43,7 +43,7 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "missile.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "script.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

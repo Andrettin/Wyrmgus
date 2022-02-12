@@ -45,6 +45,7 @@
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/tile_flag.h"
+#include "pathfinder/pathfinder.h"
 #include "player/civilization.h"
 #include "player/faction.h"
 #include "player/player.h"

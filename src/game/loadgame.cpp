@@ -45,7 +45,7 @@
 #include "map/terrain_type.h"
 #include "missile.h"
 #include "particle.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "quest/quest.h"
 #include "replay.h"

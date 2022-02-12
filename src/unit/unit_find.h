@@ -32,7 +32,6 @@
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
-#include "pathfinder.h"
 #include "unit/unit.h"
 #include "unit/unit_cache.h"
 #include "unit/unit_domain.h"
@@ -42,6 +41,8 @@
 
 class CPlayer;
 class CUnit;
+class TerrainTraversal;
+enum class VisitResult;
 
 namespace wyrmgus {
 	class resource;

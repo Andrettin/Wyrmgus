@@ -28,7 +28,7 @@
 
 #include "stratagus.h"
 
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 
 #include "map/map.h"
 #include "player/player.h"

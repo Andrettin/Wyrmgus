@@ -68,7 +68,7 @@
 #include "netconnect.h"
 #include "network.h"
 #include "parameters.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/civilization.h"
 #include "player/diplomacy_state.h"
 #include "player/faction.h"

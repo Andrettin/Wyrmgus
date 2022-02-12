@@ -833,6 +833,10 @@ set(wyrmgus_network_HDRS
 	src/network/network_state.h
 )
 
+set(wyrmgus_pathfinder_HDRS
+	src/pathfinder/pathfinder.h
+)
+
 set(wyrmgus_player_HDRS
 	src/player/civilization.h
 	src/player/civilization_base.h
@@ -1203,7 +1207,6 @@ set(wyrmgus_generic_HDRS
 	src/include/network.h
 	src/include/network/netsockets.h
 	src/include/particle.h
-	src/include/pathfinder.h
 	src/include/province.h
 	src/include/replay.h
 	src/include/results.h
@@ -1252,6 +1255,7 @@ source_group(language FILES ${wyrmgus_language_HDRS})
 source_group(map FILES ${wyrmgus_map_HDRS})
 source_group(missile FILES ${wyrmgus_missile_HDRS})
 source_group(network FILES ${wyrmgus_network_HDRS})
+source_group(pathfinder FILES ${wyrmgus_pathfinder_HDRS})
 source_group(player FILES ${wyrmgus_player_HDRS})
 source_group(population FILES ${wyrmgus_population_HDRS})
 source_group(quest FILES ${wyrmgus_quest_HDRS})
@@ -1285,6 +1289,7 @@ set(wyrmgus_HDRS
 	${wyrmgus_map_HDRS}
 	${wyrmgus_missile_HDRS}
 	${wyrmgus_network_HDRS}
+	${wyrmgus_pathfinder_HDRS}
 	${wyrmgus_player_HDRS}
 	${wyrmgus_population_HDRS}
 	${wyrmgus_quest_HDRS}

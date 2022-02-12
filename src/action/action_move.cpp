@@ -42,7 +42,7 @@
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "script.h"
 #include "settings.h"

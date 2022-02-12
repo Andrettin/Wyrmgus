@@ -32,7 +32,7 @@
 #include "economy/resource.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "unit/unit_find.h"
 

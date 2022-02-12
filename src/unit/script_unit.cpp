@@ -46,7 +46,7 @@
 #include "map/map_layer.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "player/player_type.h"
 #include "script.h"

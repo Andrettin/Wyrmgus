@@ -40,7 +40,7 @@
 #include "map/minimap.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/diplomacy_state.h"
 #include "player/player.h"
 #include "player/player_type.h"

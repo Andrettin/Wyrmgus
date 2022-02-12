@@ -44,7 +44,7 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "network.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/faction.h"
 #include "player/player.h"
 #include "player/player_type.h"

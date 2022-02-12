@@ -40,7 +40,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "spell/spell.h"
 #include "spell/status_effect.h"

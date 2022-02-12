@@ -44,7 +44,7 @@
 #include "map/world_game_data.h"
 #include "missile.h"
 #include "particle.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "player/player_color.h"
 #include "translate.h"

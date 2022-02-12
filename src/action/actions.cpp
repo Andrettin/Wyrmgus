@@ -60,7 +60,7 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "missile.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "script.h"
 #include "script/condition/condition.h"

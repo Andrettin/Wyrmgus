@@ -47,7 +47,7 @@
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/civilization.h"
 #include "player/player.h"
 #include "quest/objective_type.h"

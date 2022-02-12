@@ -68,7 +68,7 @@
 #include "missile.h"
 #include "name_generator.h"
 #include "network.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/civilization.h"
 #include "player/civilization_group.h"
 #include "player/faction.h"

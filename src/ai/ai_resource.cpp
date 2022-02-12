@@ -48,7 +48,7 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/faction.h"
 #include "player/player.h"
 #include "script.h"

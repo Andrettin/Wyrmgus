@@ -44,7 +44,7 @@
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "script.h"
 #include "spell/status_effect.h"

@@ -8,11 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name pathfinder.cpp - The path finder routines. */
-//
-//      I use breadth-first.
-//
-//      (c) Copyright 1998-2007 by Lutz Sammer and Russell Smith
+//      (c) Copyright 1998-2022 by Lutz Sammer, Russell Smith and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -30,7 +26,7 @@
 
 #include "stratagus.h"
 
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 
 #include "actions.h"
 #include "map/landmass.h"
