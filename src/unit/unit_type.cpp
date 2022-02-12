@@ -76,6 +76,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/assert_util.h"
+#include "util/coloration_type.h"
 #include "util/container_util.h"
 #include "util/path_util.h"
 #include "util/size_util.h"
@@ -639,6 +640,7 @@ bool unit_type::compare_encyclopedia_entries(const unit_type *lhs, const unit_ty
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
 	item_class(item_class::none),
 	domain(unit_domain::land),
+	coloration(coloration_type::none),
 	FieldFlags(tile_flag::none),
 	MovementMask(tile_flag::none),
 	can_target_flags(can_target_flag::none),
@@ -2911,7 +2913,7 @@ void DrawUnitType(const unit_type &type, const std::shared_ptr<CPlayerColorGraph
 		opacity = int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value);
 	}
 
-	const color_modification color_modification(type.get_hue_rotation(), type.is_desaturated(), type.get_hue_ignored_colors(), player_color, time_of_day);
+	const color_modification color_modification(type.get_hue_rotation(), type.get_coloration(), type.get_hue_ignored_colors(), player_color, time_of_day);
 	sprite->render_frame(frame, pos, color_modification, false, flip, opacity, 100, render_commands);
 }
 

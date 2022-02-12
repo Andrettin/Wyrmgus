@@ -92,7 +92,7 @@ QImage tile_image_provider::requestImage(const QString &id, QSize *size, const Q
 
 	const color_set ignored_colors = container::to_set<std::vector<QColor>, color_set>(graphics->get_conversible_player_color()->get_colors());
 
-	const QImage &image = graphics->get_or_create_frame_image(frame_index, color_modification(terrain->get_hue_rotation(), terrain->is_desaturated(), ignored_colors, player_color), false);
+	const QImage &image = graphics->get_or_create_frame_image(frame_index, color_modification(terrain->get_hue_rotation(), terrain->get_coloration(), ignored_colors, player_color), false);
 
 	if (image.isNull()) {
 		log::log_error("Tile image for ID \"" + id_str + "\" is null.");

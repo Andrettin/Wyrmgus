@@ -49,6 +49,7 @@
 #include "ui/cursor_type.h"
 #include "ui/ui.h"
 #include "util/assert_util.h"
+#include "util/coloration_type.h"
 #include "video/font.h"
 #include "video/video.h"
 
@@ -380,7 +381,7 @@ void PlayerColorImageWidget::draw(gcn::Graphics* graphics, std::vector<std::func
 		player_color = player_color::get(WidgetPlayerColor);
 	}
 	
-	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), color_modification(0, false, color_set(), player_color), 0, this->grayscale, render_commands);
+	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), color_modification(0, coloration_type::none, color_set(), player_color), 0, this->grayscale, render_commands);
 }
 
 void PlayerColorImageWidget::set_frame(const int frame)
@@ -697,7 +698,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics, std::vector<std::func
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth() - 1, img->getHeight() - 1, color_modification(0, false, color_set(), player_color), Transparency, this->grayscale, render_commands);
+								img->getWidth() - 1, img->getHeight() - 1, color_modification(0, coloration_type::none, color_set(), player_color), Transparency, this->grayscale, render_commands);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
@@ -711,7 +712,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics, std::vector<std::func
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-								img->getWidth(), img->getHeight(), color_modification(0, false, color_set(), player_color), Transparency, this->grayscale, render_commands);
+								img->getWidth(), img->getHeight(), color_modification(0, coloration_type::none, color_set(), player_color), Transparency, this->grayscale, render_commands);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
@@ -722,7 +723,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics, std::vector<std::func
 			glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
-							img->getWidth(), img->getHeight(), color_modification(0, false, color_set(), player_color), Transparency, this->grayscale, render_commands);
+							img->getWidth(), img->getHeight(), color_modification(0, coloration_type::none, color_set(), player_color), Transparency, this->grayscale, render_commands);
 		if (Transparency) {
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}

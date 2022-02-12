@@ -53,6 +53,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
+#include "util/coloration_type.h"
 #include "util/size_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
@@ -318,7 +319,7 @@ void CViewport::draw_map_tile(const tile *tile, const QPoint &pixel_pos, std::ve
 		const std::shared_ptr<CPlayerColorGraphic> &terrain_graphics = terrain->get_graphics(season);
 		if (terrain_graphics != nullptr) {
 			const int frame_index = solid_tile + (terrain == tile->get_terrain() ? tile->AnimationFrame : 0);
-			const color_modification color_modification(terrain->get_hue_rotation(), terrain->is_desaturated(), color_set(), player_color, time_of_day);
+			const color_modification color_modification(terrain->get_hue_rotation(), terrain->get_coloration(), color_set(), player_color, time_of_day);
 			terrain_graphics->render_frame(frame_index, pixel_pos, color_modification, render_commands);
 		}
 	}
@@ -331,7 +332,7 @@ void CViewport::draw_map_tile(const tile *tile, const QPoint &pixel_pos, std::ve
 		if (transition_terrain_graphics != nullptr) {
 			const wyrmgus::time_of_day *transition_time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile, transition_terrain->Flags);
 
-			const color_modification color_modification(transition_terrain->get_hue_rotation(), transition_terrain->is_desaturated(), color_set(), player_color, transition_time_of_day);
+			const color_modification color_modification(transition_terrain->get_hue_rotation(), transition_terrain->get_coloration(), color_set(), player_color, transition_time_of_day);
 			transition_terrain_graphics->render_frame(transition_tiles[i].tile_frame, pixel_pos, color_modification, render_commands);
 		}
 	}
@@ -389,7 +390,7 @@ void CViewport::draw_map_tile_overlay_terrain(const tile *tile, const QPoint &pi
 			const int frame_index = overlay_solid_tile + (overlay_terrain == tile->get_overlay_terrain() ? tile->OverlayAnimationFrame : 0);
 			const wyrmgus::time_of_day *overlay_time_of_day = is_overlay_space ? nullptr : time_of_day;
 
-			const color_modification color_modification(overlay_terrain->get_hue_rotation(), overlay_terrain->is_desaturated(), color_set(), player_color, overlay_time_of_day);
+			const color_modification color_modification(overlay_terrain->get_hue_rotation(), overlay_terrain->get_coloration(), color_set(), player_color, overlay_time_of_day);
 			overlay_terrain_graphics->render_frame(frame_index, pixel_pos, color_modification, render_commands);
 		}
 	}
@@ -405,7 +406,7 @@ void CViewport::draw_map_tile_overlay_terrain(const tile *tile, const QPoint &pi
 		if (overlay_transition_graphics != nullptr) {
 			const wyrmgus::time_of_day *overlay_transition_time_of_day = is_overlay_transition_space ? nullptr : time_of_day;
 
-			const color_modification color_modification(overlay_transition_terrain->get_hue_rotation(), overlay_transition_terrain->is_desaturated(), color_set(), player_color, overlay_transition_time_of_day);
+			const color_modification color_modification(overlay_transition_terrain->get_hue_rotation(), overlay_transition_terrain->get_coloration(), color_set(), player_color, overlay_transition_time_of_day);
 			overlay_transition_graphics->render_frame(overlay_transition_tiles[i].tile_frame, pixel_pos, color_modification, render_commands);
 		}
 	}
@@ -428,7 +429,7 @@ void CViewport::draw_map_tile_border(const tile *tile, const QPoint &pixel_pos, 
 	}
 
 	const std::shared_ptr<CPlayerColorGraphic> &border_graphics = defines::get()->get_border_graphics();
-	const color_modification color_modification(0, false, color_set(), player_color, nullptr);
+	const color_modification color_modification(0, coloration_type::none, color_set(), player_color, nullptr);
 	border_graphics->render_frame(tile->get_ownership_border_tile(), pixel_pos + defines::get()->get_border_offset(), color_modification, false, false, defines::get()->get_border_opacity(), 100, render_commands);
 }
 

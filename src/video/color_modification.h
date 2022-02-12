@@ -32,32 +32,31 @@ namespace wyrmgus {
 
 class player_color;
 class time_of_day;
+enum class coloration_type;
 
 //a color modification to be applied to a texture
 class color_modification final
 {
 public:
-	color_modification()
+	color_modification();
+
+	explicit color_modification(const double hue_rotation, const coloration_type coloration, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change);
+
+	explicit color_modification(const double hue_rotation, const coloration_type coloration, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color)
+		: color_modification(hue_rotation, coloration, hue_ignored_colors, player_color, 0, 0, 0)
 	{
 	}
 
-	explicit color_modification(const double hue_rotation, const bool desaturated, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const short red_change, const short green_change, const short blue_change);
-
-	explicit color_modification(const double hue_rotation, const bool desaturated, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color)
-		: color_modification(hue_rotation, desaturated, hue_ignored_colors, player_color, 0, 0, 0)
-	{
-	}
-
-	explicit color_modification(const double hue_rotation, const bool desaturated, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day);
+	explicit color_modification(const double hue_rotation, const coloration_type coloration, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day);
 
 	double get_hue_rotation() const
 	{
 		return this->hue_rotation;
 	}
 
-	bool is_desaturated() const
+	coloration_type get_coloration() const
 	{
-		return this->desaturated;
+		return this->coloration;
 	}
 
 	const color_set &get_hue_ignored_colors() const
@@ -90,18 +89,15 @@ public:
 		return this->get_red_change() != 0 || this->get_green_change() != 0 || this->get_blue_change() != 0;
 	}
 
-	bool is_null() const
-	{
-		return this->get_hue_rotation() == 0 && !this->is_desaturated() && this->get_player_color() == nullptr && !this->has_rgb_change();
-	}
+	bool is_null() const;
 
 	bool operator <(const color_modification &other) const {
 		if (this->get_hue_rotation() != other.get_hue_rotation()) {
 			return this->get_hue_rotation() < other.get_hue_rotation();
 		}
 
-		if (this->is_desaturated() != other.is_desaturated()) {
-			return !this->is_desaturated();
+		if (this->get_coloration() != other.get_coloration()) {
+			return this->get_coloration() < other.get_coloration();
 		}
 
 		if (this->get_hue_ignored_colors() != other.get_hue_ignored_colors()) {
@@ -130,7 +126,7 @@ public:
 
 private:
 	double hue_rotation = 0; //rotation in degrees to the hue
-	bool desaturated = false;
+	coloration_type coloration;
 	color_set hue_ignored_colors; //ignored colors for the hue rotation and desaturation
 
 	const wyrmgus::player_color *player_color = nullptr; //the player color to be applied to the texture
