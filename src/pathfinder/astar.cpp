@@ -147,7 +147,7 @@ static std::vector<std::set<Open>> OpenSet;
 
 //Wyrmgus start
 //static std::vector<int> CostMoveToCache;
-static std::vector<std::unordered_map<int, int>> CostMoveToCache;
+static std::vector<std::vector<int>> CostMoveToCache;
 //Wyrmgus end
 static constexpr int CacheNotSet = -5;
 
@@ -176,7 +176,7 @@ void InitAStar()
 		const size_t open_set_max_size = AStarMapWidth[z] * AStarMapHeight[z] / MAX_OPEN_SET_RATIO;
 		OpenSet.emplace_back();
 
-		CostMoveToCache.emplace_back();
+		CostMoveToCache.push_back(std::vector<int>(AStarMapWidth[z] * AStarMapHeight[z], CacheNotSet));
 
 		for (int i = 0; i < 9; ++i) {
 			Heading2O[i].push_back(Heading2Y[i] * AStarMapWidth[z]);
@@ -203,20 +203,6 @@ void FreeAStar()
 }
 
 /**
-**  Prepare pathfinder.
-*/
-//Wyrmgus start
-//static void AStarPrepare()
-static void AStarPrepare(int z)
-//Wyrmgus end
-{
-	//Wyrmgus start
-//	std::fill(AStarMatrix.begin(), AStarMatrix.end(), Node());
-	std::fill(AStarMatrix[z].begin(), AStarMatrix[z].end(), Node());
-	//Wyrmgus end
-}
-
-/**
 **  Clean up A*
 */
 //Wyrmgus start
@@ -224,40 +210,21 @@ static void AStarPrepare(int z)
 static void AStarCleanUp(int z)
 //Wyrmgus end
 {
+	std::vector<int> &cache = CostMoveToCache[z];
+
 	//Wyrmgus start
 //	if (CloseSet.size() >= Threshold) {
 	if (CloseSet[z].size() >= Threshold[z]) {
 	//Wyrmgus end
-		//Wyrmgus start
-//		AStarPrepare();
-		AStarPrepare(z);
-		//Wyrmgus end
+		std::fill(AStarMatrix[z].begin(), AStarMatrix[z].end(), Node());
+		std::fill(cache.begin(), cache.end(), CacheNotSet);
 	} else {
 		for (const int close : CloseSet[z]) {
 			AStarMatrix[z][close].CostFromStart = 0;
 			AStarMatrix[z][close].InGoal = 0;
+			cache[close] = CacheNotSet;
 		}
 	}
-}
-
-//Wyrmgus start
-//static void CostMoveToCacheCleanUp()
-static void CostMoveToCacheCleanUp(const int z)
-//Wyrmgus end
-{
-	CostMoveToCache[z].clear();
-}
-
-static int get_cost_move_to_cache(const int index, const int z)
-{
-	const std::unordered_map<int, int> &cache = CostMoveToCache[z];
-
-	const auto find_iterator = cache.find(index);
-	if (find_iterator != cache.end()) {
-		return find_iterator->second;
-	}
-
-	return CacheNotSet;
 }
 
 /**
@@ -462,14 +429,13 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
 	}
 	//Wyrmgus end
 
-	int c = get_cost_move_to_cache(index, z);
+	int &c = CostMoveToCache[z][index];
 
 	if (c != CacheNotSet) {
 		return c;
 	}
 
 	c = CostMoveToCallBack_Default(index, unit, z);
-	CostMoveToCache[z][index] = c;
 
 	return c;
 }
@@ -922,7 +888,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, con
 
 	//  Initialize
 	AStarCleanUp(z);
-	CostMoveToCacheCleanUp(z);
 
 	OpenSet[z].clear();
 	CloseSet[z].clear();
