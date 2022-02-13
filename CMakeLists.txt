@@ -1330,6 +1330,7 @@ set(util_test_SRCS
 	test/util/geocoordinate_test.cpp
 	test/util/image_test.cpp
 	test/util/number_test.cpp
+	test/util/random_test.cpp
 	test/util/string_conversion_test.cpp
 	test/util/time_test.cpp
 )
