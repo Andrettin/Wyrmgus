@@ -864,8 +864,6 @@ static int CclCreateUnit(lua_State *l)
 	}
 	CUnit *unit = MakeUnit(*unittype, CPlayer::Players[playerno].get());
 	if (unit == nullptr) {
-		fprintf(stderr, "CreateUnit: Unable to allocate unit.\n");
-		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
 		//Wyrmgus start
@@ -950,7 +948,6 @@ static int CclCreateUnitInTransporter(lua_State *l)
 	}
 	CUnit *unit = MakeUnit(*unittype, CPlayer::Players[playerno].get());
 	if (unit == nullptr || !CanTransport(*transporter, *unit)) {
-		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, ipos, transporter->MapLayer->ID)
@@ -1024,7 +1021,6 @@ static int CclCreateUnitOnTop(lua_State *l)
 	}
 	CUnit *unit = MakeUnit(*unittype, CPlayer::Players[playerno].get());
 	if (unit == nullptr) {
-		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
 		unit->MapLayer = CMap::get()->MapLayers[z].get();
@@ -1088,7 +1084,6 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	CUnit *unit = MakeUnit(*unittype, CPlayer::Players[playerno].get());
 	
 	if (unit == nullptr) {
-		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, new_pos, worker->MapLayer->ID)

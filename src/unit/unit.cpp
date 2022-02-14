@@ -3424,14 +3424,20 @@ const civilization_base *CUnit::get_civilization_base() const
 */
 CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 {
+	if (type.is_disabled()) {
+		return nullptr;
+	}
+
 	if (!type.get_subtypes().empty()) {
 		return MakeUnit(*vector::get_random(type.get_subtypes()), player);
 	}
 
-	CUnit *unit = wyrmgus::unit_manager::get()->AllocUnit();
+	CUnit *unit = unit_manager::get()->AllocUnit();
 	if (unit == nullptr) {
+		log::log_error("Unable to allocate unit.");
 		return nullptr;
 	}
+
 	unit->Init(type, false);
 	// Only Assign if a Player was specified
 	if (player) {
@@ -4278,6 +4284,7 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const wyrmgus::unit_type &type, CPlaye
 	if (unit != nullptr) {
 		unit->Place(pos, z);
 	}
+
 	return unit;
 }
 
@@ -4317,6 +4324,7 @@ CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, cons
 		unit->Place(res_pos, z);
 		UpdateForNewUnit(*unit, 0);
 	}
+
 	return unit;
 }
 

@@ -1311,6 +1311,10 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 {
 	const unit_type *base_unit_type = site->get_base_unit_type();
 
+	if (base_unit_type != nullptr && base_unit_type->is_disabled()) {
+		base_unit_type = nullptr;
+	}
+
 	Vec2i unit_offset(0, 0);
 	if (base_unit_type != nullptr) {
 		unit_offset = (base_unit_type->get_tile_size() - QSize(1, 1)) / 2;

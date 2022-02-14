@@ -620,20 +620,6 @@ public:
 
 class CBuildRestrictionOnTop final : public CBuildRestriction
 {
-	class functor final
-	{
-	public:
-		explicit functor(const wyrmgus::unit_type *type, const Vec2i &_pos): Parent(type), pos(_pos)
-		{
-		}
-
-		bool operator()(CUnit *const unit);
-		CUnit *ontop = nullptr;   /// building that is unit is an addon too.
-	private:
-		const unit_type *const Parent = nullptr;  /// building that is unit is an addon too.
-		const Vec2i pos;  //functor work position
-	};
-
 public:
 	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
 	{
@@ -804,6 +790,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(int employment_capacity MEMBER employment_capacity READ get_employment_capacity)
 	Q_PROPERTY(QColor neutral_minimap_color MEMBER neutral_minimap_color READ get_neutral_minimap_color)
 	Q_PROPERTY(QString encyclopedia_background_file READ get_encyclopedia_background_file_qstring NOTIFY changed)
+	Q_PROPERTY(bool disabled MEMBER disabled READ is_disabled)
 
 public:
 	static constexpr const char *class_identifier = "unit_type";
@@ -1308,6 +1295,11 @@ public:
 	bool pos_borders_impassable(const QPoint &pos, const int z) const;
 	bool can_be_dropped_on_pos(const QPoint &pos, const int z, const bool no_building_bordering_impassable, const bool ignore_ontop, const site *settlement) const;
 
+	bool is_disabled() const
+	{
+		return this->disabled;
+	}
+
 signals:
 	void changed();
 
@@ -1534,11 +1526,12 @@ public:
 	//Wyrmgus start
 	std::shared_ptr<CGraphic> LightSprite;						/// Light sprite image
 	std::shared_ptr<CPlayerColorGraphic> LayerSprites[MaxImageLayers];	/// Layer sprite images
-	
+	//Wyrmgus end
+
 private:
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;
-	//Wyrmgus end
+	bool disabled = false;
 
 	friend int ::CclDefineUnitType(lua_State *l);
 	friend int ::CclDefineDependency(lua_State *l);

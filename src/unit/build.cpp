@@ -62,13 +62,19 @@ const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const
 		const CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(b.get());
 
 		if (ontopb) {
+			if (ontopb->Parent->is_disabled()) {
+				continue;
+			}
+
 			if (!parent) {
 				// Guess this is right
 				return ontopb;
 			}
+
 			if (parent == ontopb->Parent) {
 				return ontopb;
 			}
+
 			continue;
 		}
 
@@ -77,11 +83,17 @@ const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const
 		if (andb) {
 			for (const auto &sub_b : andb->and_list) {
 				ontopb = dynamic_cast<CBuildRestrictionOnTop *>(sub_b.get());
+
 				if (ontopb) {
+					if (ontopb->Parent->is_disabled()) {
+						continue;
+					}
+
 					if (!parent) {
 						// Guess this is right
 						return ontopb;
 					}
+
 					if (parent == ontopb->Parent) {
 						return ontopb;
 					}
@@ -372,25 +384,6 @@ bool CBuildRestrictionAddOn::Check(const CUnit *, const wyrmgus::unit_type &, co
 	//Wyrmgus end
 }
 
-/**
-**  Check OnTop Restriction
-*/
-bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
-{
-	if (unit->tilePos == pos
-		&& !unit->Destroyed && unit->Orders[0]->Action != UnitAction::Die) {
-		if (unit->Type == this->Parent && unit->Orders[0]->Action != UnitAction::Built) {
-			// Available to build on
-			ontop = unit;
-		} else {
-			// Something else is built on this already
-			ontop = nullptr;
-			return false;
-		}
-	}
-	return true;
-}
-
 class AliveConstructedAndSameTypeAs
 {
 public:
@@ -410,6 +403,10 @@ void CBuildRestrictionOnTop::Init()
 
 bool CBuildRestrictionOnTop::Check(const CUnit *builder, const wyrmgus::unit_type &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 {
+	if (this->Parent->is_disabled()) {
+		return true;
+	}
+
 	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
 
 	ontoptarget = nullptr;

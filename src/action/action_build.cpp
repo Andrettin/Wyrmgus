@@ -397,10 +397,6 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	CUnit *build = MakeUnit(type, unit.Player);
 	
-	//Wyrmgus start
-	build->Name.clear(); // under construction buildings should have no proper name
-	//Wyrmgus end
-	
 	// If unable to make unit, stop, and report message
 	if (build == nullptr) {
 		// FIXME: Should we retry this?
@@ -415,6 +411,11 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		}
 		return false;
 	}
+
+	//Wyrmgus start
+	build->Name.clear(); // under construction buildings should have no proper name
+	//Wyrmgus end
+
 	build->UnderConstruction = 1;
 	build->CurrentSightRange = 0;
 	build->MapLayer = CMap::get()->MapLayers[this->MapLayer].get();
