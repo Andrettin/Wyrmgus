@@ -1595,6 +1595,10 @@ bool unit_type::has_encyclopedia_entry() const
 		return false;
 	}
 
+	if (this->is_disabled()) {
+		return false;
+	}
+
 	if (this->BoolFlag[ITEM_INDEX].value && this->get_item_class() != item_class::none) {
 		return true;
 	}
