@@ -154,6 +154,8 @@ public:
 		return this->settings.get();
 	}
 
+	void set_settings(qunique_ptr<map_settings> &&settings);
+
 	std::string get_description() const;
 
 	QString get_description_qstring() const

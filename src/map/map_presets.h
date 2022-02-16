@@ -38,6 +38,8 @@ class map_presets final : public data_entry, public data_type<map_presets>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QString description READ get_description_qstring CONSTANT)
+
 public:
 	static constexpr const char *class_identifier = "map_presets";
 	static constexpr const char *database_folder = "map_presets";
@@ -51,6 +53,13 @@ public:
 	const map_settings *get_settings() const
 	{
 		return this->settings.get();
+	}
+
+	std::string get_description() const;
+
+	QString get_description_qstring() const
+	{
+		return QString::fromStdString(this->get_description());
 	}
 
 private:

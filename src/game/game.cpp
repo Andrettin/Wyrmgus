@@ -57,6 +57,8 @@
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
+#include "map/map_presets.h"
+#include "map/map_settings.h"
 #include "map/minimap.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
@@ -1306,6 +1308,10 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 			gsml_parser parser;
 			database::process_gsml_data(CMap::get()->get_info(), parser.parse(path::from_string(path)));
 		}
+	}
+
+	if (current_campaign != nullptr && current_campaign->get_map_presets() != nullptr) {
+		CMap::get()->get_info()->set_settings(current_campaign->get_map_presets()->get_settings()->duplicate());
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {

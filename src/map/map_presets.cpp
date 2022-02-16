@@ -55,4 +55,9 @@ void map_presets::process_gsml_scope(const gsml_data &scope)
 	this->settings->process_gsml_scope(scope);
 }
 
+std::string map_presets::get_description() const
+{
+	return this->settings->get_string();
+}
+
 }

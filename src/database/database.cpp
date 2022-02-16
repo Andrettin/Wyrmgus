@@ -57,6 +57,7 @@
 #include "language/word.h"
 #include "language/word_type.h"
 #include "magic_domain.h"
+#include "map/map_presets.h"
 #include "map/map_projection.h"
 #include "map/map_template.h"
 #include "map/region.h"
@@ -353,6 +354,8 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(language_family::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::magic_domain*") {
 			new_property_value = QVariant::fromValue(magic_domain::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::map_presets*") {
+			new_property_value = QVariant::fromValue(map_presets::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::map_projection*") {
 			new_property_value = QVariant::fromValue(map_projection::from_string(property.get_value()));
 		} else if (property_class_name == "wyrmgus::map_template*") {

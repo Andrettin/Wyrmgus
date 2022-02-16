@@ -42,6 +42,7 @@ namespace wyrmgus {
 class calendar;
 class faction;
 class icon;
+class map_presets;
 class map_template;
 class player_color;
 class quest;
@@ -62,6 +63,7 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 	Q_PROPERTY(QVariantList map_templates READ get_map_templates_qvariant_list)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(bool available READ is_available NOTIFY available_changed)
+	Q_PROPERTY(wyrmgus::map_presets* map_presets MEMBER map_presets NOTIFY changed)
 	Q_PROPERTY(wyrmgus::campaign* tree_parent MEMBER tree_parent NOTIFY changed)
 
 public:
@@ -153,6 +155,11 @@ public:
 		return this->required_map_templates.contains(map_template);
 	}
 
+	const wyrmgus::map_presets *get_map_presets() const
+	{
+		return this->map_presets;
+	}
+
 	virtual named_data_entry *get_tree_parent() const override
 	{
 		return this->tree_parent;
@@ -192,6 +199,7 @@ public:
 	std::vector<Vec2i> MapSizes;				/// Map sizes
 	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
 private:
+	wyrmgus::map_presets *map_presets = nullptr;
 	campaign *tree_parent = nullptr;
 	
 	friend int ::CclDefineCampaign(lua_State *l);

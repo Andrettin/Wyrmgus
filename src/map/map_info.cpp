@@ -226,6 +226,11 @@ int map_info::get_person_player_index() const
 	return -1;
 }
 
+void map_info::set_settings(qunique_ptr<map_settings> &&settings)
+{
+	this->settings = std::move(settings);
+}
+
 std::string map_info::get_description() const
 {
 	std::string str = "Map: " + this->get_name() + " (" + std::to_string(this->get_map_width()) + "x" + std::to_string(this->get_map_height()) + ")";
