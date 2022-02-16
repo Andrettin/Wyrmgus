@@ -30,6 +30,7 @@
 #include "map/map_info.h"
 
 #include "map/map_layer.h"
+#include "map/map_preset.h"
 #include "map/map_settings.h"
 #include "player/player.h" //for the PlayerNumNeutral constexpr
 #include "player/player_type.h"
@@ -50,7 +51,14 @@ map_info::~map_info()
 
 void map_info::process_gsml_property(const gsml_property &property)
 {
-	database::process_gsml_property_for_object(this, property);
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "settings") {
+		this->settings = map_preset::get(value)->get_settings()->duplicate();
+	} else {
+		database::process_gsml_property_for_object(this, property);
+	}
 }
 
 void map_info::process_gsml_scope(const gsml_data &scope)
