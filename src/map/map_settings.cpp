@@ -60,6 +60,7 @@ qunique_ptr<map_settings> map_settings::duplicate() const
 		settings->moveToThread(QApplication::instance()->thread());
 	}
 
+	settings->name = this->name;
 	settings->disabled_unit_types = this->disabled_unit_types;
 
 	return settings;
@@ -71,7 +72,15 @@ std::string map_settings::get_string() const
 		return std::string();
 	}
 
-	std::string str = "Map Settings:";
+	std::string str;
+
+	str += "Map Settings";
+
+	if (!this->name.empty()) {
+		str += " (" + this->name + ")";
+	}
+
+	str += ":";
 
 	if (!this->disabled_unit_types.empty()) {
 		str += "\n\tDisabled Unit Types:";

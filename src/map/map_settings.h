@@ -38,6 +38,8 @@ class map_settings final : public QObject
 {
 	Q_OBJECT
 
+	Q_PROPERTY(std::string name MEMBER name)
+
 public:
 	void process_gsml_property(const gsml_property &property);
 	void process_gsml_scope(const gsml_data &scope);
@@ -49,6 +51,7 @@ public:
 	bool is_unit_type_disabled(const unit_type *unit_type) const;
 
 private:
+	std::string name;
 	unit_type_set disabled_unit_types;
 };
 
