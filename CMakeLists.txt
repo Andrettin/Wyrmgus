@@ -223,6 +223,7 @@ set(map_SRCS
 	src/map/map_layer.cpp
 	src/map/map_projection.cpp
 	src/map/map_radar.cpp
+	src/map/map_settings.cpp
 	src/map/map_template.cpp
 	src/map/map_template_container.cpp
 	src/map/map_wall.cpp
@@ -798,6 +799,7 @@ set(wyrmgus_map_HDRS
 	src/map/map_info.h
 	src/map/map_layer.h
 	src/map/map_projection.h
+	src/map/map_settings.h
 	src/map/map_template.h
 	src/map/map_template_container.h
 	src/map/map_template_history.h

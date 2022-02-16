@@ -38,6 +38,7 @@ static int CclStratagusMap(lua_State *l);
 
 namespace wyrmgus {
 
+class map_settings;
 enum class player_type;
 
 class map_info final : public QObject
@@ -53,6 +54,9 @@ class map_info final : public QObject
 	Q_PROPERTY(int person_player_index READ get_person_player_index CONSTANT)
 
 public:
+	map_info();
+	~map_info();
+
 	bool IsPointOnMap(const int x, const int y, const int z) const;
 
 	bool IsPointOnMap(const Vec2i &pos, const int z) const;
@@ -61,7 +65,7 @@ public:
 
 	bool IsPointOnMap(const Vec2i &pos, const CMapLayer *map_layer) const;
 
-	void Clear();
+	void reset();
 
 	qunique_ptr<map_info> duplicate() const;
 
@@ -122,6 +126,11 @@ public:
 	int get_person_player_count() const;
 	int get_person_player_index() const;
 
+	const map_settings *get_settings() const
+	{
+		return this->settings.get();
+	}
+
 private:
 	std::string name;
 	std::filesystem::path presentation_filepath;
@@ -136,6 +145,8 @@ public:
 	int PlayerSide[PlayerMax];  /// Same player->Side
 	unsigned int MapUID;        /// Unique Map ID (hash)
 	std::string MapWorld = "Custom";
+private:
+	qunique_ptr<map_settings> settings;
 
 	friend int ::CclPresentMap(lua_State *l);
 	friend int ::CclStratagusMap(lua_State *l);

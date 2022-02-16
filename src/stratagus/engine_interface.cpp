@@ -262,14 +262,14 @@ QVariantList engine_interface::get_playable_civilizations() const
 
 void engine_interface::load_map_info(const std::filesystem::path &filepath)
 {
-	CMap::get()->get_info()->Clear();
+	CMap::get()->get_info()->reset();
 
 	LuaLoadFile(filepath.string());
 	CMap::get()->get_info()->set_presentation_filepath(filepath);
 
 	this->map_infos.push_back(CMap::get()->get_info()->duplicate());
 
-	CMap::get()->get_info()->Clear();
+	CMap::get()->get_info()->reset();
 }
 
 void engine_interface::load_map_info(const QUrl &file_url)

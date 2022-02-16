@@ -90,6 +90,7 @@ namespace wyrmgus {
 	class gsml_property;
 	class landmass;
 	class map_info;
+	class map_settings;
 	class map_template;
 	class site;
 	class terrain_type;
@@ -154,6 +155,8 @@ public:
 	{
 		return this->Info.get();
 	}
+
+	const map_settings *get_settings() const;
 
 	QRect get_rect(const int z) const;
 

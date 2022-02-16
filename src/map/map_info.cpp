@@ -30,6 +30,7 @@
 #include "map/map_info.h"
 
 #include "map/map_layer.h"
+#include "map/map_settings.h"
 #include "player/player.h" //for the PlayerNumNeutral constexpr
 #include "player/player_type.h"
 #include "util/log_util.h"
@@ -37,6 +38,15 @@
 #include "util/string_util.h"
 
 namespace wyrmgus {
+
+map_info::map_info()
+{
+	this->reset();
+}
+
+map_info::~map_info()
+{
+}
 
 /**
 **	@brief	Get whether a given coordinate is a valid point on the map
@@ -92,7 +102,7 @@ bool map_info::IsPointOnMap(const Vec2i &pos, const CMapLayer *map_layer) const
 	return IsPointOnMap(pos.x, pos.y, map_layer);
 }
 
-void map_info::Clear()
+void map_info::reset()
 {
 	this->name.clear();
 	this->presentation_filepath.clear();
@@ -105,6 +115,11 @@ void map_info::Clear()
 	memset(this->player_types, 0, sizeof(this->player_types));
 	this->MapUID = 0;
 	this->MapWorld = "Custom";
+
+	this->settings = make_qunique<map_settings>();
+	if (QApplication::instance()->thread() != QThread::currentThread()) {
+		this->settings->moveToThread(QApplication::instance()->thread());
+	}
 }
 
 qunique_ptr<map_info> map_info::duplicate() const
@@ -125,6 +140,7 @@ qunique_ptr<map_info> map_info::duplicate() const
 	memcpy(info->PlayerSide, this->PlayerSide, sizeof(info->PlayerSide));
 	info->MapUID = this->MapUID;
 	info->MapWorld = this->MapWorld;
+	info->settings = this->settings->duplicate();
 
 	return info;
 }

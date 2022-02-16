@@ -697,7 +697,6 @@ void FreeAllContainers()
 **
 **  @param smpname  smp filename
 **  @param mapname  map filename
-**  @param map      map loaded
 */
 static void LoadStratagusMap(const std::filesystem::path &smp_path, const std::filesystem::path &map_path)
 {
@@ -954,7 +953,6 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, const int writeTerra
 
 	return WriteMapSetup(mapSetup, map, writeTerrain);
 }
-
 
 /**
 **  Load any map.

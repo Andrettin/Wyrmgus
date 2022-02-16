@@ -1844,7 +1844,7 @@ void CMap::Clean()
 
 	// Tileset freed by Tileset?
 
-	this->Info->Clear();
+	this->Info->reset();
 	this->NoFogOfWar = false;
 	this->Tileset->clear();
 	this->TileModelsFileName.clear();
@@ -1859,6 +1859,15 @@ void CMap::Clean()
 void CMap::ClearMapLayers()
 {
 	this->MapLayers.clear();
+}
+
+const map_settings *CMap::get_settings() const
+{
+	if (this->get_info() == nullptr) {
+		return nullptr;
+	}
+
+	return this->get_info()->get_settings();
 }
 
 QRect CMap::get_rect(const int z) const
@@ -4446,6 +4455,7 @@ void LoadStratagusMapInfo(const std::filesystem::path &map_path)
 	}
 
 	const std::string filename = LibraryFileName(map_path.string().c_str());
+
 	LuaLoadFile(filename);
 }
 
