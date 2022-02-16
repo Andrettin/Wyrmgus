@@ -63,6 +63,12 @@ void map_info::process_gsml_scope(const gsml_data &scope)
 			const std::string &value = values[i];
 			this->player_types[i] = string_to_player_type(value);
 		}
+	} else if (tag == "settings") {
+		this->settings = make_qunique<map_settings>();
+		if (QApplication::instance()->thread() != QThread::currentThread()) {
+			this->settings->moveToThread(QApplication::instance()->thread());
+		}
+		database::process_gsml_data(this->settings, scope);
 	} else {
 		database::process_gsml_scope_for_object(this, scope);
 	}

@@ -30,6 +30,7 @@
 
 #include "character.h"
 #include "database/defines.h"
+#include "database/gsml_parser.h"
 #include "database/preferences.h"
 #include "editor.h"
 #include "game/difficulty.h"
@@ -264,7 +265,13 @@ void engine_interface::load_map_info(const std::filesystem::path &filepath)
 {
 	CMap::get()->get_info()->reset();
 
-	LuaLoadFile(filepath.string());
+	if (filepath.extension() == ".wmp") {
+		gsml_parser parser;
+		database::process_gsml_data(CMap::get()->get_info(), parser.parse(filepath));
+	} else {
+		LuaLoadFile(path::to_string(filepath));
+	}
+
 	CMap::get()->get_info()->set_presentation_filepath(filepath);
 
 	this->map_infos.push_back(CMap::get()->get_info()->duplicate());
@@ -274,7 +281,9 @@ void engine_interface::load_map_info(const std::filesystem::path &filepath)
 
 void engine_interface::load_map_info(const QUrl &file_url)
 {
+	this->clear_map_infos();
 	this->load_map_info(path::from_qurl(file_url));
+	CMap::get()->set_info(this->map_infos.front()->duplicate());
 }
 
 void engine_interface::load_map_infos()
@@ -300,11 +309,16 @@ void engine_interface::load_map_infos()
 						}
 					}
 
-					if (!dir_entry.is_regular_file() || dir_entry.path().extension() != ".smp") {
+					if (!dir_entry.is_regular_file()) {
+						continue;
+					}
+
+					if (dir_entry.path().extension() != ".smp" && dir_entry.path().extension() != ".wmp") {
 						continue;
 					}
 
 					this->load_map_info(dir_entry.path());
+
 				}
 			}
 

@@ -87,6 +87,7 @@
 //Wyrmgus end
 #include "util/assert_util.h"
 #include "util/container_util.h"
+#include "util/path_util.h"
 #include "util/point_util.h"
 #include "util/rect_util.h"
 #include "util/set_util.h"
@@ -1859,6 +1860,11 @@ void CMap::Clean()
 void CMap::ClearMapLayers()
 {
 	this->MapLayers.clear();
+}
+
+void CMap::set_info(qunique_ptr<map_info> &&info)
+{
+	this->Info = std::move(info);
 }
 
 const map_settings *CMap::get_settings() const
@@ -4449,13 +4455,18 @@ void CMap::remove_animated_tile(tile *tile)
 void LoadStratagusMapInfo(const std::filesystem::path &map_path)
 {
 	// Set the default map setup by replacing .smp with .sms
-	if (map_path.string().find(".smp") != std::string::npos) {
+	if (map_path.string().find(".smp") != std::string::npos || map_path.string().find(".wmp") != std::string::npos) {
 		CMap::get()->Info->set_presentation_filepath(map_path);
 	}
 
 	const std::string filename = LibraryFileName(map_path.string().c_str());
 
-	LuaLoadFile(filename);
+	if (map_path.string().find(".wmp") != std::string::npos) {
+		gsml_parser parser;
+		database::process_gsml_data(CMap::get()->get_info(), parser.parse(path::from_string(filename)));
+	} else {
+		LuaLoadFile(filename);
+	}
 }
 
 void SetMapWorld(const std::string &map_world)

@@ -86,7 +86,7 @@ public:
 		return QString::fromStdString(this->get_name());
 	}
 
-	void set_name(const std::string &name)
+	Q_INVOKABLE void set_name(const std::string &name)
 	{
 		this->name = name;
 	}

@@ -963,8 +963,10 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, const int writeTerra
 static void LoadMap(const std::filesystem::path &filepath, CMap &map)
 {
 	if (filepath.extension() == ".smp"
+		|| filepath.extension() == ".wmp"
 #ifdef USE_ZLIB
 		|| filepath.string().ends_with(".smp.gz")
+		|| filepath.string().ends_with(".wmp.gz")
 #endif
 	) {
 		if (map.Info->get_setup_filepath().empty()) {
@@ -1300,6 +1302,9 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 
 		if (filepath.extension() == ".smp") {
 			LuaLoadFile(path);
+		} else if (filepath.extension() == ".wmp") {
+			gsml_parser parser;
+			database::process_gsml_data(CMap::get()->get_info(), parser.parse(path::from_string(path)));
 		}
 	}
 

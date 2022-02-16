@@ -156,6 +156,8 @@ public:
 		return this->Info.get();
 	}
 
+	void set_info(qunique_ptr<map_info> &&info);
+
 	const map_settings *get_settings() const;
 
 	QRect get_rect(const int z) const;
