@@ -56,6 +56,7 @@ class map_info final : public QObject
 	Q_PROPERTY(int player_count READ get_player_count CONSTANT)
 	Q_PROPERTY(int person_player_count READ get_person_player_count CONSTANT)
 	Q_PROPERTY(int person_player_index READ get_person_player_index CONSTANT)
+	Q_PROPERTY(QString description READ get_description_qstring CONSTANT)
 
 public:
 	map_info();
@@ -151,6 +152,13 @@ public:
 	const map_settings *get_settings() const
 	{
 		return this->settings.get();
+	}
+
+	std::string get_description() const;
+
+	QString get_description_qstring() const
+	{
+		return QString::fromStdString(this->get_description());
 	}
 
 signals:

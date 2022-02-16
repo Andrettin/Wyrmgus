@@ -44,6 +44,8 @@ public:
 
 	qunique_ptr<map_settings> duplicate() const;
 
+	std::string get_string() const;
+
 	bool is_unit_type_disabled(const unit_type *unit_type) const;
 
 private:

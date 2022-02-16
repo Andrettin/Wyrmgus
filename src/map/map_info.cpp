@@ -218,4 +218,16 @@ int map_info::get_person_player_index() const
 	return -1;
 }
 
+std::string map_info::get_description() const
+{
+	std::string str = "Map: " + this->get_name() + " (" + std::to_string(this->get_map_width()) + "x" + std::to_string(this->get_map_height()) + ")";
+
+	std::string settings_str = this->get_settings()->get_string();
+	if (!settings_str.empty()) {
+		str += "\n\n" + std::move(settings_str);
+	}
+
+	return str;
+}
+
 }

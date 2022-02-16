@@ -65,6 +65,25 @@ qunique_ptr<map_settings> map_settings::duplicate() const
 	return settings;
 }
 
+std::string map_settings::get_string() const
+{
+	if (this->disabled_unit_types.empty()) {
+		return std::string();
+	}
+
+	std::string str = "Map Settings:";
+
+	if (!this->disabled_unit_types.empty()) {
+		str += "\n\tDisabled Unit Types:";
+
+		for (const unit_type *unit_type : this->disabled_unit_types) {
+			str += "\n\t\t" + unit_type->get_name();
+		}
+	}
+
+	return str;
+}
+
 bool map_settings::is_unit_type_disabled(const unit_type *unit_type) const
 {
 	return this->disabled_unit_types.contains(unit_type) || unit_type->is_disabled();
