@@ -1021,28 +1021,16 @@ static int CclClearObjectives(lua_State *l)
 */
 static int CclPresentMap(lua_State *l)
 {
-	//Wyrmgus start
-	/*
-	LuaCheckArgs(l, 5);
-
-	Map.Info.Description = LuaToString(l, 1);
-	// Number of players in LuaToNumber(l, 3); // Not used yet.
-	Map.Info.MapWidth = LuaToNumber(l, 3);
-	Map.Info.MapHeight = LuaToNumber(l, 4);
-	Map.Info.MapUID = LuaToNumber(l, 5);
-	*/
-
 	CMap::get()->Info->name = LuaToString(l, 1);
 	
 	if (lua_gettop(l) > 1) {
 		LuaCheckArgs(l, 5);
 		
 		// Number of players in LuaToNumber(l, 3); // Not used yet.
-		CMap::get()->Info->MapWidth = LuaToNumber(l, 3);
-		CMap::get()->Info->MapHeight = LuaToNumber(l, 4);
+		CMap::get()->Info->map_size.setWidth(LuaToNumber(l, 3));
+		CMap::get()->Info->map_size.setHeight(LuaToNumber(l, 4));
 		CMap::get()->Info->MapUID = LuaToNumber(l, 5);
 	}
-	//Wyrmgus end
 
 	return 0;
 }

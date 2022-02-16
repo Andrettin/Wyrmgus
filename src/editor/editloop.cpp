@@ -2291,7 +2291,7 @@ void CEditor::Init()
 		//Wyrmgus start
 //		Map.Fields = new tile[Map.Info.MapWidth * Map.Info.MapHeight];
 		CMap::get()->ClearMapLayers();
-		auto new_map_layer = std::make_unique<CMapLayer>(CMap::get()->Info->MapWidth, CMap::get()->Info->MapHeight);
+		auto new_map_layer = std::make_unique<CMapLayer>(CMap::get()->Info->get_map_width(), CMap::get()->Info->get_map_height());
 
 		if (QApplication::instance()->thread() != QThread::currentThread()) {
 			new_map_layer->moveToThread(QApplication::instance()->thread());
@@ -2299,9 +2299,9 @@ void CEditor::Init()
 
 		new_map_layer->ID = CMap::get()->MapLayers.size();
 		CMap::get()->Info->MapWidths.clear();
-		CMap::get()->Info->MapWidths.push_back(CMap::get()->Info->MapWidth);
+		CMap::get()->Info->MapWidths.push_back(CMap::get()->Info->get_map_width());
 		CMap::get()->Info->MapHeights.clear();
-		CMap::get()->Info->MapHeights.push_back(CMap::get()->Info->MapHeight);
+		CMap::get()->Info->MapHeights.push_back(CMap::get()->Info->get_map_height());
 		CMap::get()->MapLayers.push_back(std::move(new_map_layer));
 		//Wyrmgus end
 

@@ -112,14 +112,24 @@ public:
 		return setup_filepath;
 	}
 
+	const QSize &get_map_size() const
+	{
+		return this->map_size;
+	}
+
+	void set_map_size(const QSize &size)
+	{
+		this->map_size = size;
+	}
+
 	int get_map_width() const
 	{
-		return this->MapWidth;
+		return this->get_map_size().width();
 	}
 
 	int get_map_height() const
 	{
-		return this->MapHeight;
+		return this->get_map_size().height();
 	}
 
 	int get_player_count() const;
@@ -134,9 +144,8 @@ public:
 private:
 	std::string name;
 	std::filesystem::path presentation_filepath;
+	QSize map_size = QSize(0, 0);
 public:
-	int MapWidth;               /// Map width
-	int MapHeight;              /// Map height
 	//Wyrmgus start
 	std::vector<int> MapWidths;	/// Map width for each map layer
 	std::vector<int> MapHeights; /// Map height for each map layer

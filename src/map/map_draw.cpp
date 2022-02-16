@@ -211,8 +211,8 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const QSize pixel_size = this->get_pixel_size();
 
-	x = std::min(x, (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * defines::get()->get_scaled_tile_width() - (pixel_size.width()) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * defines::get()->get_scaled_tile_height() - (pixel_size.height()) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->get_map_width()) * defines::get()->get_scaled_tile_width() - (pixel_size.width()) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->get_map_height()) * defines::get()->get_scaled_tile_height() - (pixel_size.height()) - 1 + UI.MapArea.ScrollPaddingBottom);
 
 	this->MapPos.x = x / defines::get()->get_scaled_tile_width();
 	if (x < 0 && x % defines::get()->get_scaled_tile_width()) {

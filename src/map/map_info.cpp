@@ -106,7 +106,7 @@ void map_info::reset()
 {
 	this->name.clear();
 	this->presentation_filepath.clear();
-	this->MapWidth = this->MapHeight = 0;
+	this->map_size = QSize(0, 0);
 	//Wyrmgus start
 	this->MapWidths.clear();
 	this->MapHeights.clear();
@@ -132,8 +132,7 @@ qunique_ptr<map_info> map_info::duplicate() const
 
 	info->name = this->name;
 	info->presentation_filepath = this->presentation_filepath;
-	info->MapWidth = this->MapWidth;
-	info->MapHeight = this->MapHeight;
+	info->map_size = this->map_size;
 	info->MapWidths = this->MapWidths;
 	info->MapHeights = this->MapHeights;
 	memcpy(info->player_types, this->player_types, sizeof(info->player_types));

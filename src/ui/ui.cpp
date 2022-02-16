@@ -156,8 +156,8 @@ void InitUserInterface()
 	//
 	// Calculations
 	//
-	if (CMap::get()->Info->MapWidth) {
-		const QSize map_pixel_size(CMap::get()->Info->MapWidth * defines::get()->get_scaled_tile_width(), CMap::get()->Info->MapHeight * defines::get()->get_scaled_tile_height());
+	if (CMap::get()->Info->get_map_width()) {
+		const QSize map_pixel_size = CMap::get()->Info->get_map_size() * defines::get()->get_scaled_tile_size();
 
 		if (map_pixel_size.width() < map_area_rect.width()) {
 			map_area_rect.setWidth(map_pixel_size.width());
@@ -422,8 +422,8 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	//Wyrmgus start
 //	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * defines::get()->get_scaled_tile_width() - 1;
 //	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * defines::get()->get_scaled_tile_height() - 1;
-	int right = vp.get_top_left_pos().x() + (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->MapWidth) * defines::get()->get_scaled_tile_width() - 1;
-	int bottom = vp.get_top_left_pos().y() + (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->MapHeight) * defines::get()->get_scaled_tile_height() - 1;
+	int right = vp.get_top_left_pos().x() + (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->get_map_width()) * defines::get()->get_scaled_tile_width() - 1;
+	int bottom = vp.get_top_left_pos().y() + (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->get_map_height()) * defines::get()->get_scaled_tile_height() - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary

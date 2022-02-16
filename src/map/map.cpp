@@ -1780,15 +1780,15 @@ void CMap::Create()
 {
 	assert_throw(this->MapLayers.empty());
 
-	auto map_layer = std::make_unique<CMapLayer>(this->Info->MapWidth, this->Info->MapHeight);
+	auto map_layer = std::make_unique<CMapLayer>(this->Info->get_map_width(), this->Info->get_map_height());
 
 	if (QApplication::instance()->thread() != QThread::currentThread()) {
 		map_layer->moveToThread(QApplication::instance()->thread());
 	}
 
 	map_layer->ID = this->MapLayers.size();
-	this->Info->MapWidths.push_back(this->Info->MapWidth);
-	this->Info->MapHeights.push_back(this->Info->MapHeight);
+	this->Info->MapWidths.push_back(this->Info->get_map_width());
+	this->Info->MapHeights.push_back(this->Info->get_map_height());
 	
 	if (!CEditor::get()->is_running()) {
 		map_layer->set_season_schedule(defines::get()->get_default_season_schedule());
@@ -1888,11 +1888,10 @@ void CMap::process_gsml_scope(const gsml_data &scope)
 
 	if (tag == "size") {
 		const QSize map_size = scope.to_size();
-		this->Info->MapWidth = map_size.width();
-		this->Info->MapHeight = map_size.height();
+		this->Info->set_map_size(map_size);
 
 		this->ClearMapLayers();
-		auto map_layer = std::make_unique<CMapLayer>(this->Info->MapWidth, this->Info->MapHeight);
+		auto map_layer = std::make_unique<CMapLayer>(this->Info->get_map_width(), this->Info->get_map_height());
 
 		if (QApplication::instance()->thread() != QThread::currentThread()) {
 			map_layer->moveToThread(QApplication::instance()->thread());
@@ -1900,9 +1899,9 @@ void CMap::process_gsml_scope(const gsml_data &scope)
 
 		map_layer->ID = this->MapLayers.size();
 		this->Info->MapWidths.clear();
-		this->Info->MapWidths.push_back(this->Info->MapWidth);
+		this->Info->MapWidths.push_back(this->Info->get_map_width());
 		this->Info->MapHeights.clear();
-		this->Info->MapHeights.push_back(this->Info->MapHeight);
+		this->Info->MapHeights.push_back(this->Info->get_map_height());
 		this->MapLayers.push_back(std::move(map_layer));
 	} else if (tag == "extra_map_layers") {
 		scope.for_each_child([&](const gsml_data &map_layer_data) {

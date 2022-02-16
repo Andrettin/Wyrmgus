@@ -721,7 +721,7 @@ static void LoadStratagusMap(const std::filesystem::path &smp_path, const std::f
 	}
 #endif
 
-	if (!CMap::get()->Info->MapWidth || !CMap::get()->Info->MapHeight) {
+	if (!CMap::get()->Info->get_map_width() || !CMap::get()->Info->get_map_height()) {
 		throw std::runtime_error(path::to_string(map_path) + ": invalid map");
 	}
 
@@ -775,7 +775,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map)
 		f->printf(")\n");
 
 		f->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
-			map.Info->get_name().c_str(), numplayers, map.Info->MapWidth, map.Info->MapHeight,
+			map.Info->get_name().c_str(), numplayers, map.Info->get_map_width(), map.Info->get_map_height(),
 			map.Info->MapUID + 1);
 	} catch (const FileException &) {
 		log::log_error("Cannot write the map presentation.");
@@ -934,7 +934,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, const int writeTerrain)
 */
 int SaveStratagusMap(const std::string &mapName, CMap &map, const int writeTerrain)
 {
-	if (!map.Info->MapWidth || !map.Info->MapHeight) {
+	if (!map.Info->get_map_width() || !map.Info->get_map_height()) {
 		throw std::runtime_error(mapName + ": invalid Stratagus map");
 	}
 
@@ -1050,7 +1050,7 @@ static void GameTypeFreeForAll()
 */
 static void GameTypeTopVsBottom()
 {
-	const int middle = CMap::get()->Info->MapHeight / 2;
+	const int middle = CMap::get()->Info->get_map_height() / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (CPlayer::Players[i]->has_neutral_faction_type()) {
@@ -1084,7 +1084,7 @@ static void GameTypeTopVsBottom()
 */
 static void GameTypeLeftVsRight()
 {
-	const int middle = CMap::get()->Info->MapWidth / 2;
+	const int middle = CMap::get()->Info->get_map_width() / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (CPlayer::Players[i]->has_neutral_faction_type()) {

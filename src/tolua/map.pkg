@@ -9,8 +9,8 @@ class map_info
 	string get_presentation_filepath_string() const;
 	void set_presentation_filepath(string filepath);
 	
-	int MapWidth;
-	int MapHeight;
+	int get_map_width() const;
+	int get_map_height() const;
 	
 	//Wyrmgus start
 	bool IsPointOnMap(const int x, const int y, const int z) const;

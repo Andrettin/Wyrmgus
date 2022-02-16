@@ -186,8 +186,8 @@ static int CclGetNumUnitsAt(lua_State *l)
 	}
 	
 	if (z == 0 && (CMap::get()->Info->MapWidths.size() == 0 || CMap::get()->Info->MapHeights.size() == 0)) {
-		maxPos.x = std::min<int>(maxPos.x, CMap::get()->Info->MapWidth - 1);
-		maxPos.y = std::min<int>(maxPos.y, CMap::get()->Info->MapHeight - 1);
+		maxPos.x = std::min<int>(maxPos.x, CMap::get()->Info->get_map_width() - 1);
+		maxPos.y = std::min<int>(maxPos.y, CMap::get()->Info->get_map_height() - 1);
 	} else if (z != -1) {
 		maxPos.x = std::min<int>(maxPos.x, CMap::get()->Info->MapWidths[z] - 1);
 		maxPos.y = std::min<int>(maxPos.y, CMap::get()->Info->MapHeights[z] - 1);
