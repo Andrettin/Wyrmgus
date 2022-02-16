@@ -51,6 +51,10 @@ void campaign::initialize_all()
 
 	campaign::sort_instances([](const campaign *a, const campaign *b) {
 		if (a->get_timeline() != b->get_timeline()) {
+			if (a->get_timeline() == nullptr || b->get_timeline() == nullptr) {
+				return a->get_timeline() == nullptr;
+			}
+
 			return a->get_timeline()->get_point_of_divergence() < b->get_timeline()->get_point_of_divergence();
 		} else if (a->get_start_date() != b->get_start_date()) {
 			return a->get_start_date() < b->get_start_date();
