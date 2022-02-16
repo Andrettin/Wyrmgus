@@ -42,9 +42,11 @@ public:
 	static constexpr const char *class_identifier = "timeline";
 	static constexpr const char *database_folder = "timelines";
 
-	timeline(const std::string &identifier) : named_data_entry(identifier)
+	explicit timeline(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
+
+	virtual void check() const override;
 
 	timeline *get_parent_timeline() const
 	{

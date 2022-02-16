@@ -409,6 +409,8 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(time_of_day::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::time_of_day_schedule*") {
 			new_property_value = QVariant::fromValue(time_of_day_schedule::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::timeline*") {
+			new_property_value = QVariant::fromValue(timeline::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::unique_item*") {
 			new_property_value = QVariant::fromValue(unique_item::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::unit_class*") {
