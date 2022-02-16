@@ -37,6 +37,7 @@
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
+#include "map/map_settings.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -62,7 +63,7 @@ const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const
 		const CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(b.get());
 
 		if (ontopb) {
-			if (ontopb->Parent->is_disabled()) {
+			if (CMap::get()->get_settings()->is_unit_type_disabled(ontopb->Parent)) {
 				continue;
 			}
 
@@ -85,7 +86,7 @@ const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const
 				ontopb = dynamic_cast<CBuildRestrictionOnTop *>(sub_b.get());
 
 				if (ontopb) {
-					if (ontopb->Parent->is_disabled()) {
+					if (CMap::get()->get_settings()->is_unit_type_disabled(ontopb->Parent)) {
 						continue;
 					}
 
@@ -403,7 +404,7 @@ void CBuildRestrictionOnTop::Init()
 
 bool CBuildRestrictionOnTop::Check(const CUnit *builder, const wyrmgus::unit_type &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 {
-	if (this->Parent->is_disabled()) {
+	if (CMap::get()->get_settings()->is_unit_type_disabled(this->Parent)) {
 		return true;
 	}
 

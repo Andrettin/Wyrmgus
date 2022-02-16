@@ -45,6 +45,7 @@
 #include "map/map_info.h"
 #include "map/map_layer.h"
 #include "map/map_projection.h"
+#include "map/map_settings.h"
 #include "map/map_template_history.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
@@ -1311,7 +1312,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 {
 	const unit_type *base_unit_type = site->get_base_unit_type();
 
-	if (base_unit_type != nullptr && base_unit_type->is_disabled()) {
+	if (base_unit_type != nullptr && CMap::get()->get_settings()->is_unit_type_disabled(base_unit_type)) {
 		base_unit_type = nullptr;
 	}
 

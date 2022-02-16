@@ -58,6 +58,7 @@
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
+#include "map/map_settings.h"
 #include "map/nearby_sight_unmarker.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
@@ -3424,7 +3425,7 @@ const civilization_base *CUnit::get_civilization_base() const
 */
 CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 {
-	if (type.is_disabled()) {
+	if (CMap::get()->get_settings()->is_unit_type_disabled(&type)) {
 		return nullptr;
 	}
 
