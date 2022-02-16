@@ -28,8 +28,9 @@
 
 #include "video/color_modification.h"
 
-#include "util/colorization_type.h"
+#include "database/preferences.h"
 #include "time/time_of_day.h"
+#include "util/colorization_type.h"
 
 namespace wyrmgus {
 
@@ -44,7 +45,7 @@ color_modification::color_modification(const int hue_rotation, const colorizatio
 	}
 }
 
-color_modification::color_modification(const int hue_rotation, const colorization_type colorization, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day) : color_modification(hue_rotation, colorization, hue_ignored_colors, player_color, time_of_day ? time_of_day->ColorModification.R : 0, time_of_day ? time_of_day->ColorModification.G : 0, time_of_day ? time_of_day->ColorModification.B : 0)
+color_modification::color_modification(const int hue_rotation, const colorization_type colorization, const color_set &hue_ignored_colors, const wyrmgus::player_color *player_color, const time_of_day *time_of_day) : color_modification(hue_rotation, colorization, hue_ignored_colors, player_color, time_of_day && preferences::get()->is_time_of_day_shading_enabled() ? time_of_day->ColorModification.R : 0, time_of_day && preferences::get()->is_time_of_day_shading_enabled() ? time_of_day->ColorModification.G : 0, time_of_day && preferences::get()->is_time_of_day_shading_enabled() ? time_of_day->ColorModification.B : 0)
 {
 }
 
