@@ -221,7 +221,7 @@ set(map_SRCS
 	src/map/map_grid_model.cpp
 	src/map/map_info.cpp
 	src/map/map_layer.cpp
-	src/map/map_preset.cpp
+	src/map/map_presets.cpp
 	src/map/map_projection.cpp
 	src/map/map_radar.cpp
 	src/map/map_settings.cpp
@@ -799,7 +799,7 @@ set(wyrmgus_map_HDRS
 	src/map/map_grid_model.h
 	src/map/map_info.h
 	src/map/map_layer.h
-	src/map/map_preset.h
+	src/map/map_presets.h
 	src/map/map_projection.h
 	src/map/map_settings.h
 	src/map/map_template.h

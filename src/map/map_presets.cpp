@@ -26,13 +26,13 @@
 
 #include "stratagus.h"
 
-#include "map/map_preset.h"
+#include "map/map_presets.h"
 
 #include "map/map_settings.h"
 
 namespace wyrmgus {
 
-map_preset::map_preset(const std::string &identifier) : data_entry(identifier)
+map_presets::map_presets(const std::string &identifier) : data_entry(identifier)
 {
 	this->settings = make_qunique<map_settings>();
 
@@ -41,16 +41,16 @@ map_preset::map_preset(const std::string &identifier) : data_entry(identifier)
 	}
 }
 
-map_preset::~map_preset()
+map_presets::~map_presets()
 {
 }
 
-void map_preset::process_gsml_property(const gsml_property &property)
+void map_presets::process_gsml_property(const gsml_property &property)
 {
 	this->settings->process_gsml_property(property);
 }
 
-void map_preset::process_gsml_scope(const gsml_data &scope)
+void map_presets::process_gsml_scope(const gsml_data &scope)
 {
 	this->settings->process_gsml_scope(scope);
 }

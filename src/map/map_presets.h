@@ -34,16 +34,16 @@ namespace wyrmgus {
 
 class map_settings;
 
-class map_preset final : public data_entry, public data_type<map_preset>
+class map_presets final : public data_entry, public data_type<map_presets>
 {
 	Q_OBJECT
 
 public:
-	static constexpr const char *class_identifier = "map_preset";
+	static constexpr const char *class_identifier = "map_presets";
 	static constexpr const char *database_folder = "map_presets";
 
-	explicit map_preset(const std::string &identifier);
-	virtual ~map_preset() override;
+	explicit map_presets(const std::string &identifier);
+	virtual ~map_presets() override;
 
 	void process_gsml_property(const gsml_property &property);
 	void process_gsml_scope(const gsml_data &scope);
