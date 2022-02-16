@@ -48,6 +48,26 @@ map_info::~map_info()
 {
 }
 
+void map_info::process_gsml_property(const gsml_property &property)
+{
+	database::process_gsml_property_for_object(this, property);
+}
+
+void map_info::process_gsml_scope(const gsml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "player_types") {
+		for (size_t i = 0; i < values.size(); ++i) {
+			const std::string &value = values[i];
+			this->player_types[i] = string_to_player_type(value);
+		}
+	} else {
+		database::process_gsml_scope_for_object(this, scope);
+	}
+}
+
 /**
 **	@brief	Get whether a given coordinate is a valid point on the map
 **

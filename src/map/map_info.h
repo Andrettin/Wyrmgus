@@ -39,6 +39,8 @@ static int CclStratagusMap(lua_State *l);
 
 namespace wyrmgus {
 
+class gsml_data;
+class gsml_property;
 class map_settings;
 enum class player_type;
 
@@ -46,8 +48,9 @@ class map_info final : public QObject
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString name READ get_name_qstring CONSTANT)
+	Q_PROPERTY(QString name READ get_name_qstring NOTIFY changed)
 	Q_PROPERTY(QString presentation_filepath READ get_presentation_filepath_qstring CONSTANT)
+	Q_PROPERTY(QSize map_size MEMBER map_size READ get_map_size NOTIFY changed)
 	Q_PROPERTY(int map_width READ get_map_width CONSTANT)
 	Q_PROPERTY(int map_height READ get_map_height CONSTANT)
 	Q_PROPERTY(int player_count READ get_player_count CONSTANT)
@@ -57,6 +60,9 @@ class map_info final : public QObject
 public:
 	map_info();
 	~map_info();
+
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
 
 	bool IsPointOnMap(const int x, const int y, const int z) const;
 
@@ -146,6 +152,9 @@ public:
 	{
 		return this->settings.get();
 	}
+
+signals:
+	void changed();
 
 private:
 	std::string name;
