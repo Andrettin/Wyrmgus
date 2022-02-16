@@ -703,7 +703,7 @@ void NetworkServerStartGame()
 	std::array<int, PlayerMax> rev{};
 	int h = 0;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (CMap::get()->Info->player_types[i] == player_type::person) {
+		if (CMap::get()->Info->get_player_types()[i] == player_type::person) {
 			rev[i] = h;
 			num[h++] = i;
 			DebugPrint("Slot %d is available for an interactive player (%d)\n" _C_ i _C_ rev[i]);
@@ -712,15 +712,15 @@ void NetworkServerStartGame()
 	// Make a list of the available computer slots.
 	int n = h;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (CMap::get()->Info->player_types[i] == player_type::computer) {
+		if (CMap::get()->Info->get_player_types()[i] == player_type::computer) {
 			rev[i] = n++;
 			DebugPrint("Slot %d is available for an ai computer player (%d)\n" _C_ i _C_ rev[i]);
 		}
 	}
 	// Make a list of the remaining slots.
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (CMap::get()->Info->player_types[i] != player_type::person
-			&& CMap::get()->Info->player_types[i] != player_type::computer) {
+		if (CMap::get()->Info->get_player_types()[i] != player_type::person
+			&& CMap::get()->Info->get_player_types()[i] != player_type::computer) {
 			rev[i] = n++;
 			// player_type::nobody - not available to anything..
 		}
@@ -801,7 +801,7 @@ void NetworkServerStartGame()
 
 	if (NoRandomPlacementMultiplayer == 1) {
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (CMap::get()->Info->player_types[i] != player_type::computer) {
+			if (CMap::get()->Info->get_player_types()[i] != player_type::computer) {
 				org[i] = Hosts[i].PlyNr;
 			}
 		}
@@ -1017,10 +1017,10 @@ void NetworkGamePrepareGameSettings()
 	int c = 0;
 	int h = 0;
 	for (int i = 0; i < PlayerMax; i++) {
-		if (CMap::get()->Info->player_types[i] == player_type::person) {
+		if (CMap::get()->Info->get_player_types()[i] == player_type::person) {
 			num[h++] = i;
 		}
-		if (CMap::get()->Info->player_types[i] == player_type::computer) {
+		if (CMap::get()->Info->get_player_types()[i] == player_type::computer) {
 			comp[c++] = i; // available computer player slots
 		}
 	}

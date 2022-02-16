@@ -33,6 +33,7 @@
 class CMapLayer;
 struct lua_State;
 
+static int CclDefinePlayerTypes(lua_State *l);
 static int CclPresentMap(lua_State *l);
 static int CclStratagusMap(lua_State *l);
 
@@ -132,6 +133,11 @@ public:
 		return this->get_map_size().height();
 	}
 
+	const std::array<player_type, PlayerMax> &get_player_types() const
+	{
+		return this->player_types;
+	}
+
 	int get_player_count() const;
 	int get_person_player_count() const;
 	int get_person_player_index() const;
@@ -150,13 +156,16 @@ public:
 	std::vector<int> MapWidths;	/// Map width for each map layer
 	std::vector<int> MapHeights; /// Map height for each map layer
 	//Wyrmgus end
-	player_type player_types[PlayerMax];  /// Same player->Type
-	int PlayerSide[PlayerMax];  /// Same player->Side
+private:
+	std::array<player_type, PlayerMax> player_types;  /// Same player->Type
+public:
+	std::array<int, PlayerMax> PlayerSide;  /// Same player->Side
 	unsigned int MapUID;        /// Unique Map ID (hash)
 	std::string MapWorld = "Custom";
 private:
 	qunique_ptr<map_settings> settings;
 
+	friend int ::CclDefinePlayerTypes(lua_State *l);
 	friend int ::CclPresentMap(lua_State *l);
 	friend int ::CclStratagusMap(lua_State *l);
 };

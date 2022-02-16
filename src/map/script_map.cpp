@@ -870,12 +870,7 @@ static int CclDefinePlayerTypes(lua_State *l)
 		const std::string type = LuaToString(l, i + 1);
 		CMap::get()->Info->player_types[i] = string_to_player_type(type);
 	}
-	for (int i = numplayers; i < PlayerMax - 1; ++i) {
-		CMap::get()->Info->player_types[i] = player_type::nobody;
-	}
-	if (numplayers < PlayerMax) {
-		CMap::get()->Info->player_types[PlayerMax - 1] = player_type::neutral;
-	}
+
 	return 0;
 }
 

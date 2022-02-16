@@ -1304,7 +1304,7 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		player_type playertype = CMap::get()->Info->player_types[i];
+		player_type playertype = CMap::get()->Info->get_player_types()[i];
 		// Network games only:
 		if (GameSettings.Presets[i].Type != player_type::none) {
 			playertype = GameSettings.Presets[i].Type;

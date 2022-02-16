@@ -111,8 +111,11 @@ void map_info::reset()
 	this->MapWidths.clear();
 	this->MapHeights.clear();
 	//Wyrmgus end
-	memset(this->PlayerSide, 0, sizeof(this->PlayerSide));
-	memset(this->player_types, 0, sizeof(this->player_types));
+	std::fill(this->PlayerSide.begin(), this->PlayerSide.end(), 0);
+
+	std::fill(this->player_types.begin(), this->player_types.end(), player_type::nobody);
+	this->player_types[PlayerNumNeutral] = player_type::neutral;
+
 	this->MapUID = 0;
 	this->MapWorld = "Custom";
 
@@ -135,8 +138,8 @@ qunique_ptr<map_info> map_info::duplicate() const
 	info->map_size = this->map_size;
 	info->MapWidths = this->MapWidths;
 	info->MapHeights = this->MapHeights;
-	memcpy(info->player_types, this->player_types, sizeof(info->player_types));
-	memcpy(info->PlayerSide, this->PlayerSide, sizeof(info->PlayerSide));
+	info->player_types = this->player_types;
+	info->PlayerSide = this->PlayerSide;
 	info->MapUID = this->MapUID;
 	info->MapWorld = this->MapWorld;
 	info->settings = this->settings->duplicate();
