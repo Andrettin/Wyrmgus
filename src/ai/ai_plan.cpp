@@ -589,21 +589,26 @@ static CUnit *GetBestScout(const unit_domain domain)
 		if (!unit.IsAliveOnMap()) {
 			continue;
 		}
+
 		if (unit.CanMove() == false) {
 			continue;
 		}
+
 		if (!unit.Active) {
 			continue; //only scout with AI active units
 		}
+
 		if (unit.GroupId != 0) { //don't scout with units that are parts of forces that have a goal
 			int force = AiPlayer->Force.GetForce(unit);
 			if (force != -1 && CMap::get()->Info->IsPointOnMap(AiPlayer->Force[force].GoalPos, AiPlayer->Force[force].GoalMapLayer)) {
 				continue;
 			}
 		}
+
 		if (unit.Variable[SIGHTRANGE_INDEX].Value < 1) {
 			continue; //don't scout with units who have too low a sight range
 		}
+
 		if (!unit.IsIdle()) { //don't choose units that aren't idle as scouts
 			continue;
 		}

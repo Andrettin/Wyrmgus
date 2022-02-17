@@ -2024,7 +2024,7 @@ static void AiCheckRepair()
 //			&& unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max
 			&& unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max)
 //			&& unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
-			) {
+		) {
 			//Wyrmgus end
 			//
 			// FIXME: Repair only units under control
