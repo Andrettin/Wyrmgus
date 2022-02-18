@@ -227,6 +227,7 @@ set(map_SRCS
 	src/map/map_settings.cpp
 	src/map/map_template.cpp
 	src/map/map_template_container.cpp
+	src/map/map_template_unit.cpp
 	src/map/map_wall.cpp
 	src/map/minimap.cpp
 	src/map/nearby_sight_unmarker.cpp
@@ -806,6 +807,7 @@ set(wyrmgus_map_HDRS
 	src/map/map_template.h
 	src/map/map_template_container.h
 	src/map/map_template_history.h
+	src/map/map_template_unit.h
 	src/map/mercator_map_projection.h
 	src/map/minimap.h
 	src/map/minimap_mode.h

@@ -47,6 +47,7 @@
 #include "map/map_projection.h"
 #include "map/map_settings.h"
 #include "map/map_template_history.h"
+#include "map/map_template_unit.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "map/site_history.h"
@@ -227,6 +228,17 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 			auto substitution = std::make_unique<character_substitution>();
 			database::process_gsml_data(substitution, child_scope);
 			this->character_substitutions.push_back(std::move(substitution));
+		});
+	} else if (tag == "units") {
+		scope.for_each_child([&](const gsml_data &child_scope) {
+			const std::string &tag = child_scope.get_tag();
+
+			const unit_type *unit_type = unit_type::get(tag);
+
+			auto unit = std::make_unique<map_template_unit>(unit_type);
+			database::process_gsml_data(unit, child_scope);
+
+			this->units.push_back(std::move(unit));
 		});
 	} else {
 		data_entry::process_gsml_scope(scope);
@@ -1930,6 +1942,28 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 {
 	if (!random) {
 		this->apply_character_map_units(template_start_pos, map_start_pos, z);
+
+		for (const std::unique_ptr<map_template_unit> &map_template_unit : this->units) {
+			const unit_type *unit_type = map_template_unit->get_type();
+			const QPoint unit_pos = map_start_pos + map_template_unit->get_pos() - template_start_pos;
+			const faction *faction = map_template_unit->get_faction();
+
+			CPlayer *player = CPlayer::get_neutral_player();
+
+			if (faction != nullptr) {
+				player = GetOrAddFactionPlayer(faction);
+
+				if (!player) {
+					continue;
+				}
+
+				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
+					player->SetStartView(unit_pos, z);
+				}
+			}
+
+			CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z);
+		}
 	}
 
 	const campaign *current_campaign = game::get()->get_current_campaign();

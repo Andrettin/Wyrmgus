@@ -54,6 +54,7 @@ class historical_location;
 class historical_unit;
 class map_projection;
 class map_template_history;
+class map_template_unit;
 class site;
 class terrain_type;
 class tile;
@@ -576,6 +577,11 @@ public:
 	void set_tile_terrain(const QPoint &tile_pos, const terrain_type *terrain);
 	void apply_tile_terrains(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 
+	const std::vector<std::unique_ptr<map_template_unit>> &get_units() const
+	{
+		return this->units;
+	}
+
 	const wyrmgus::map_projection *get_map_projection() const;
 
 	const decimillesimal_int &get_min_longitude() const
@@ -759,6 +765,7 @@ private:
 public:
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
 private:
+	std::vector<std::unique_ptr<map_template_unit>> units;
 	wyrmgus::map_projection *map_projection = nullptr;
 	wyrmgus::georectangle georectangle;
 	decimillesimal_int astrodistance_multiplier = decimillesimal_int(1);
