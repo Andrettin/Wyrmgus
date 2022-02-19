@@ -191,6 +191,18 @@ void game::on_started()
 		if (this->get_current_campaign() != nullptr) {
 			this->apply_player_history();
 		}
+
+		for (const CUpgrade *starting_upgrade : CMap::get()->get_settings()->get_starting_upgrades()) {
+			for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
+				if (player->get_type() == player_type::nobody) {
+					continue;
+				}
+
+				if (UpgradeIdAllowed(*player, starting_upgrade->ID) != 'R') {
+					player->acquire_upgrade(starting_upgrade);
+				}
+			}
+		}
 	}
 
 	//update the sold units of all units before starting, to make sure they fit the current conditions

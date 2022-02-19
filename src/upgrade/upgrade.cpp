@@ -1913,107 +1913,57 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool multi
 		padding_string = "\n";
 	}
 
-	if (upgrade) {
-		std::string upgrade_effects_string;
-		
-		bool first_element = true;
-		//check if the upgrade makes modifications to any units
-		for (const auto &modifier : upgrade->get_modifiers()) {
-			if (!first_element) {
-				upgrade_effects_string += padding_string;
-			} else {
-				first_element = false;
+	if (upgrade == nullptr) {
+		return std::string();
+	}
+
+	std::string upgrade_effects_string;
+
+	bool first_element = true;
+	//check if the upgrade makes modifications to any units
+	for (const auto &modifier : upgrade->get_modifiers()) {
+		if (!first_element) {
+			upgrade_effects_string += padding_string;
+		} else {
+			first_element = false;
+		}
+
+		bool first_var = true;
+		for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
+			if (var == PRIORITY_INDEX || var == POINTS_INDEX) {
+				continue;
 			}
-				
-			bool first_var = true;
-			for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
-				if (var == PRIORITY_INDEX || var == POINTS_INDEX) {
-					continue;
-				}
-						
-				if (var == STRENGTH_INDEX || var == DEXTERITY_INDEX || var == INTELLIGENCE_INDEX || var == CHARISMA_INDEX) { // don't show attributes for now
-					continue;
-				}
-				
-				if (modifier->Modifier.Variables[var].Value != 0) {
-					if (!first_var) {
-						upgrade_effects_string += padding_string;
-					} else {
-						first_var = false;
-					}
 
-					if (IsBooleanVariable(var) && modifier->Modifier.Variables[var].Value < 0) {
-						upgrade_effects_string += "Lose ";
-					}
-										
-					if (!IsBooleanVariable(var)) {
-						if (modifier->Modifier.Variables[var].Value > 0) {
-							upgrade_effects_string += "+";
-						}
-						upgrade_effects_string += std::to_string(modifier->Modifier.Variables[var].Value);
-						if (IsPercentageVariable(var)) {
-							upgrade_effects_string += "%";
-						}
-						upgrade_effects_string += " ";
-					}
-
-					upgrade_effects_string += GetVariableDisplayName(var);
-						
-					bool first_unit_type = true;
-					for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-						if (unit_type->is_template()) {
-							continue;
-						}
-
-						if (modifier->applies_to(unit_type)) {
-							if (!first_unit_type) {
-								upgrade_effects_string += ", ";
-							} else {
-								upgrade_effects_string += " for ";
-								first_unit_type = false;
-							}
-									
-							upgrade_effects_string += unit_type->GetNamePlural();
-						}
-					}
-				}
-					
-				if (modifier->Modifier.Variables[var].Increase != 0) {
-					if (!first_var) {
-						upgrade_effects_string += padding_string;
-					} else {
-						first_var = false;
-					}
-
-					if (modifier->Modifier.Variables[var].Increase > 0) {
-						upgrade_effects_string += "+";
-					}
-					upgrade_effects_string += std::to_string(modifier->Modifier.Variables[var].Increase);
-					upgrade_effects_string += " ";
-											
-					upgrade_effects_string += GetVariableDisplayName(var, true);
-				}
+			if (var == STRENGTH_INDEX || var == DEXTERITY_INDEX || var == INTELLIGENCE_INDEX || var == CHARISMA_INDEX) { // don't show attributes for now
+				continue;
 			}
-				
-			bool first_res = true;
-			for (const auto &[resource, quantity] : modifier->Modifier.get_improve_incomes()) {
-				if (!first_res) {
+
+			if (modifier->Modifier.Variables[var].Value != 0) {
+				if (!first_var) {
 					upgrade_effects_string += padding_string;
 				} else {
-					first_res = false;
+					first_var = false;
 				}
 
-				if (quantity > 0) {
-					upgrade_effects_string += "+";
+				if (IsBooleanVariable(var) && modifier->Modifier.Variables[var].Value < 0) {
+					upgrade_effects_string += "Lose ";
 				}
-				upgrade_effects_string += std::to_string(quantity);
-				upgrade_effects_string += "%";
-				upgrade_effects_string += " ";
-				upgrade_effects_string += resource->get_name();
-				upgrade_effects_string += " Processing";
+
+				if (!IsBooleanVariable(var)) {
+					if (modifier->Modifier.Variables[var].Value > 0) {
+						upgrade_effects_string += "+";
+					}
+					upgrade_effects_string += std::to_string(modifier->Modifier.Variables[var].Value);
+					if (IsPercentageVariable(var)) {
+						upgrade_effects_string += "%";
+					}
+					upgrade_effects_string += " ";
+				}
+
+				upgrade_effects_string += GetVariableDisplayName(var);
 
 				bool first_unit_type = true;
-				for (const unit_type *unit_type : unit_type::get_all()) {
+				for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 					if (unit_type->is_template()) {
 						continue;
 					}
@@ -2030,12 +1980,62 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool multi
 					}
 				}
 			}
+
+			if (modifier->Modifier.Variables[var].Increase != 0) {
+				if (!first_var) {
+					upgrade_effects_string += padding_string;
+				} else {
+					first_var = false;
+				}
+
+				if (modifier->Modifier.Variables[var].Increase > 0) {
+					upgrade_effects_string += "+";
+				}
+				upgrade_effects_string += std::to_string(modifier->Modifier.Variables[var].Increase);
+				upgrade_effects_string += " ";
+
+				upgrade_effects_string += GetVariableDisplayName(var, true);
+			}
 		}
-		
-		return upgrade_effects_string;
+
+		bool first_res = true;
+		for (const auto &[resource, quantity] : modifier->Modifier.get_improve_incomes()) {
+			if (!first_res) {
+				upgrade_effects_string += padding_string;
+			} else {
+				first_res = false;
+			}
+
+			if (quantity > 0) {
+				upgrade_effects_string += "+";
+			}
+			upgrade_effects_string += std::to_string(quantity);
+			upgrade_effects_string += "%";
+			upgrade_effects_string += " ";
+			upgrade_effects_string += resource->get_name();
+			upgrade_effects_string += " Processing";
+
+			bool first_unit_type = true;
+			for (const unit_type *unit_type : unit_type::get_all()) {
+				if (unit_type->is_template()) {
+					continue;
+				}
+
+				if (modifier->applies_to(unit_type)) {
+					if (!first_unit_type) {
+						upgrade_effects_string += ", ";
+					} else {
+						upgrade_effects_string += " for ";
+						first_unit_type = false;
+					}
+
+					upgrade_effects_string += unit_type->GetNamePlural();
+				}
+			}
+		}
 	}
-	
-	return "";
+
+	return upgrade_effects_string;
 }
 
 bool IsPercentageVariable(const int var)

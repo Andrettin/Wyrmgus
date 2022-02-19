@@ -265,8 +265,8 @@ inline std::string get_singular_form(const std::string &str)
 
 inline std::string get_plural_form(const std::string &str)
 {
-	if (str == "Einherjar" || str == "Wose") {
-		return str; // no difference
+	if (str.ends_with("Cavalry") || str == "Einherjar" || str.ends_with("Infantry") || str == "Wose") {
+		return str; //no difference
 	}
 
 	std::string result(str);

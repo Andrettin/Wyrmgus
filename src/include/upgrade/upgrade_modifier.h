@@ -104,6 +104,8 @@ public:
 	void apply_to_player(CPlayer *player, const int multiplier) const;
 	void apply_to_unit(CUnit *unit, const int multiplier) const;
 
+	std::string get_string() const;
+
 private:
 	const CUpgrade *upgrade = nullptr; //used to filter required modifier
 

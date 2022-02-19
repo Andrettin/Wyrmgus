@@ -866,7 +866,7 @@ std::string FullyDecapitalizeString(const std::string &text)
 
 std::string GetPluralForm(const std::string &name)
 {
-	return wyrmgus::string::get_plural_form(name);
+	return string::get_plural_form(name);
 }
 
 std::string IdentToName(const std::string &text)

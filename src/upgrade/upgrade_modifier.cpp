@@ -640,4 +640,118 @@ void upgrade_modifier::apply_to_unit(CUnit *unit, const int multiplier) const
 	}
 }
 
+std::string upgrade_modifier::get_string() const
+{
+	std::string str;
+
+	bool first = true;
+
+	for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
+		switch (var) {
+			case PRIORITY_INDEX:
+			case POINTS_INDEX:
+			//don't show attributes for now
+			case STRENGTH_INDEX:
+			case DEXTERITY_INDEX:
+			case INTELLIGENCE_INDEX:
+			case CHARISMA_INDEX:
+				continue;
+			default:
+				break;
+		}
+
+		if (this->Modifier.Variables[var].Value != 0) {
+			if (first) {
+				first = false;
+			} else {
+				str += ", ";
+			}
+
+			if (IsBooleanVariable(var)) {
+				if (this->Modifier.Variables[var].Value < 0) {
+					str += "Lose ";
+				}
+			} else {
+				if (this->Modifier.Variables[var].Value > 0) {
+					str += "+";
+				}
+
+				str += std::to_string(this->Modifier.Variables[var].Value);
+
+				if (IsPercentageVariable(var)) {
+					str += "%";
+				}
+
+				str += " ";
+			}
+
+			str += GetVariableDisplayName(var);
+		}
+
+		if (this->Modifier.Variables[var].Increase != 0) {
+			if (first) {
+				first = false;
+			} else {
+				str += ", ";
+			}
+
+			if (this->Modifier.Variables[var].Increase > 0) {
+				str += "+";
+			}
+			str += std::to_string(this->Modifier.Variables[var].Increase);
+			str += " ";
+
+			str += GetVariableDisplayName(var, true);
+		}
+	}
+
+	for (const auto &[resource, quantity] : this->Modifier.get_improve_incomes()) {
+		if (first) {
+			first = false;
+		} else {
+			str += ", ";
+		}
+
+		if (quantity > 0) {
+			str += "+";
+		}
+
+		str += std::to_string(quantity);
+		str += "%";
+		str += " ";
+		str += resource->get_name();
+		str += " Processing";
+	}
+
+	first = true;
+
+	for (const unit_class *unit_class : this->get_unit_classes()) {
+		if (first) {
+			first = false;
+			str += " for ";
+		} else {
+			str += ", ";
+		}
+
+		str += string::get_plural_form(unit_class->get_name());
+	}
+
+	for (const unit_type *unit_type : this->get_unit_types()) {
+		if (unit_type->is_template()) {
+			continue;
+		}
+
+		if (first) {
+			first = false;
+			str += " for ";
+		} else {
+			str += ", ";
+		}
+
+		str += unit_type->GetNamePlural();
+	}
+
+	return str;
+}
+
 }

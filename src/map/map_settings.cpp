@@ -30,6 +30,8 @@
 
 #include "database/database.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade_modifier.h"
+#include "upgrade/upgrade_structs.h"
 
 namespace wyrmgus {
 
@@ -47,6 +49,10 @@ void map_settings::process_gsml_scope(const gsml_data &scope)
 		for (const std::string &value : values) {
 			this->disabled_unit_types.insert(unit_type::get(value));
 		}
+	} else if (tag == "starting_upgrades") {
+		for (const std::string &value : values) {
+			this->starting_upgrades.insert(CUpgrade::get(value));
+		}
 	} else {
 		database::process_gsml_scope_for_object(this, scope);
 	}
@@ -62,6 +68,7 @@ qunique_ptr<map_settings> map_settings::duplicate() const
 
 	settings->name = this->name;
 	settings->disabled_unit_types = this->disabled_unit_types;
+	settings->starting_upgrades = this->starting_upgrades;
 
 	return settings;
 }
@@ -87,6 +94,16 @@ std::string map_settings::get_string() const
 
 		for (const unit_type *unit_type : this->disabled_unit_types) {
 			str += "\n\t\t" + unit_type->get_name();
+		}
+	}
+
+	if (!this->starting_upgrades.empty()) {
+		str += "\n\tModifiers:";
+
+		for (const CUpgrade *upgrade : this->starting_upgrades) {
+			for (const std::unique_ptr<const upgrade_modifier> &upgrade_modifier : upgrade->get_modifiers()) {
+				str += "\n\t\t" + upgrade_modifier->get_string();
+			}
 		}
 	}
 

@@ -27,6 +27,7 @@
 #pragma once
 
 #include "unit/unit_type_container.h"
+#include "upgrade/upgrade_container.h"
 #include "util/qunique_ptr.h"
 
 namespace wyrmgus {
@@ -50,9 +51,15 @@ public:
 
 	bool is_unit_type_disabled(const unit_type *unit_type) const;
 
+	const upgrade_set &get_starting_upgrades() const
+	{
+		return this->starting_upgrades;
+	}
+
 private:
 	std::string name;
 	unit_type_set disabled_unit_types;
+	upgrade_set starting_upgrades;
 };
 
 }
