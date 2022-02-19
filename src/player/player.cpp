@@ -3014,7 +3014,7 @@ void CPlayer::RemoveUnit(CUnit &unit)
 
 bool CPlayer::capture_unit(CUnit *unit)
 {
-	if (!unit->Type->BoolFlag[CAPTURABLE_INDEX].value) {
+	if (unit->Variable[CAPTURABLE_INDEX].Value == 0) {
 		return false;
 	}
 

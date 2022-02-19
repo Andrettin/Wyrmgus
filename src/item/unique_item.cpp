@@ -220,7 +220,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 					|| var == BONUSAGAINSTMOUNTED_INDEX || var == BONUSAGAINSTBUILDINGS_INDEX || var == BONUSAGAINSTAIR_INDEX || var == BONUSAGAINSTGIANTS_INDEX || var == BONUSAGAINSTDRAGONS_INDEX
 					|| var == SUPPLY_INDEX || var == ETHEREALVISION_INDEX
 					|| var == ATTACKRANGE_INDEX)
-				) {
+			) {
 				continue;
 			}
 

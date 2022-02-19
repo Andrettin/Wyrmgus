@@ -164,7 +164,6 @@ static const char PIERCEDAMAGE_KEY[] = "PierceDamage";
 static const char BLUNTDAMAGE_KEY[] = "BluntDamage";
 static const char ETHEREAL_KEY[] = "Ethereal";
 static const char CELESTIAL_BODY_KEY[] = "CelestialBody";
-static const char CAPTURABLE_KEY[] = "Capturable";
 static const char HIDDENOWNERSHIP_KEY[] = "HiddenOwnership";
 static const char HIDDENINEDITOR_KEY[] = "HiddenInEditor";
 static const char INVERTEDSOUTHEASTARMS_KEY[] = "InvertedSoutheastArms";
@@ -295,6 +294,7 @@ static const char REGENERATIONAURA_KEY[] = "RegenerationAura";
 static const char HYDRATINGAURA_KEY[] = "HydratingAura";
 static const char ETHEREALVISION_KEY[] = "EtherealVision";
 static const char HERO_KEY[] = "Hero";
+static const char CAPTURABLE_KEY[] = "Capturable";
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -325,7 +325,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 		DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
 		HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY, GRAVEL_KEY,
 		HACKDAMAGE_KEY, PIERCEDAMAGE_KEY, BLUNTDAMAGE_KEY,
-		ETHEREAL_KEY, CELESTIAL_BODY_KEY, CAPTURABLE_KEY, HIDDENOWNERSHIP_KEY, HIDDENINEDITOR_KEY, INVERTEDSOUTHEASTARMS_KEY, INVERTEDEASTARMS_KEY
+		ETHEREAL_KEY, CELESTIAL_BODY_KEY, HIDDENOWNERSHIP_KEY, HIDDENINEDITOR_KEY, INVERTEDSOUTHEASTARMS_KEY, INVERTEDEASTARMS_KEY
 		//Wyrmgus end
 	};
 
@@ -373,7 +373,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 		DISEMBARKMENTBONUS_KEY, TRADECOST_KEY, SALVAGEFACTOR_KEY, MUGGING_KEY, RAIDING_KEY,
 		DESERTSTALK_KEY, FORESTSTALK_KEY, SWAMPSTALK_KEY,
 		AURA_RANGE_BONUS_KEY, LEADERSHIPAURA_KEY, REGENERATIONAURA_KEY, HYDRATINGAURA_KEY,
-		ETHEREALVISION_KEY, HERO_KEY
+		ETHEREALVISION_KEY, HERO_KEY, CAPTURABLE_KEY
 		//Wyrmgus end
 	};
 
@@ -2936,6 +2936,7 @@ void UpdateUnitVariables(CUnit &unit)
 			case HYDRATINGAURA_INDEX:
 			case ETHEREALVISION_INDEX:
 			case HERO_INDEX:
+			case CAPTURABLE_INDEX:
 				continue;
 			default:
 				break;

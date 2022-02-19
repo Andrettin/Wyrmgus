@@ -7758,7 +7758,7 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, const int da
 
 	//capture enemy buildings
 
-	if (!target.Type->BoolFlag[CAPTURABLE_INDEX].value) {
+	if (target.Variable[CAPTURABLE_INDEX].Value == 0) {
 		return;
 	}
 
