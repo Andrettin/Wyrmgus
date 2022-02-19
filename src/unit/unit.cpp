@@ -7762,7 +7762,7 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, const int da
 		return;
 	}
 
-	static constexpr int capture_hp_threshold = 10;
+	static constexpr int capture_hp_threshold = 20;
 
 	if (target.Variable[HP_INDEX].get_percent_value() >= capture_hp_threshold) {
 		return;
