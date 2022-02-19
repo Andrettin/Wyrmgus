@@ -243,6 +243,18 @@ void CPlayer::Load(lua_State *l)
 				const resource *res = resource::get(value);
 				this->max_resources[res] = LuaToNumber(l, j + 1, k + 1);
 			}
+		} else if (!strcmp(value, "incomes")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, j + 1, k + 1);
+				++k;
+
+				const resource *res = resource::get(value);
+				this->set_income(res, LuaToNumber(l, j + 1, k + 1));
+			}
 		} else if (!strcmp(value, "income-modifiers")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

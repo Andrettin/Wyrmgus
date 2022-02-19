@@ -571,6 +571,29 @@ public:
 		this->set_stored_resource_demand(resource, this->get_stored_resource_demand(resource) + quantity);
 	}
 
+	const resource_map<int> &get_incomes() const
+	{
+		return this->incomes;
+	}
+
+	int get_income(const resource *resource) const
+	{
+		const auto find_iterator = this->incomes.find(resource);
+
+		if (find_iterator != this->incomes.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_income(const resource *resource, const int quantity);
+
+	void change_income(const resource *resource, const int quantity)
+	{
+		this->set_income(resource, this->get_income(resource) + quantity);
+	}
+
 	int get_income_modifier(const resource *resource) const
 	{
 		const auto find_iterator = this->income_modifiers.find(resource);
@@ -1371,6 +1394,7 @@ private:
 	resource_map<int> resources;      /// resources in overall store
 	resource_map<int> max_resources;   /// max resources can be stored
 	resource_map<int> stored_resources;/// resources in store buildings (can't exceed MaxResources)
+	resource_map<int> incomes; //passive incomes per resource
 	resource_map<int> income_modifiers; //income modifier per resource
 	//Wyrmgus start
 	resource_map<int> prices;		  /// price of each resource

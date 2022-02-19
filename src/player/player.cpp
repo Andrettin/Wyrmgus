@@ -700,9 +700,21 @@ void CPlayer::Save(CFile &file) const
 		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), quantity);
 	}
 
+	//incomes
+	file.printf("},\n  \"incomes\", {");
+	bool first = true;
+	for (const auto &[resource, quantity] : p.incomes) {
+		if (first) {
+			first = false;
+		} else {
+			file.printf(" ");
+		}
+		file.printf("\"%s\", %d,", resource->get_identifier().c_str(), quantity);
+	}
+
 	//income modifiers
 	file.printf("},\n  \"income-modifiers\", {");
-	bool first = true;
+	first = true;
 	for (const auto &[resource, quantity] : p.income_modifiers) {
 		if (first) {
 			first = false;
@@ -2872,6 +2884,7 @@ void CPlayer::Clear()
 	this->resources.clear();
 	this->stored_resources.clear();
 	this->max_resources.clear();
+	this->incomes.clear();
 	this->income_modifiers.clear();
 	//Wyrmgus start
 	this->resource_demands.clear();
@@ -3796,6 +3809,17 @@ void CPlayer::set_resource_demand(const resource *resource, const int quantity)
 	}
 
 	emit effective_resource_demand_changed(resource->get_index(), this->get_effective_resource_demand(resource));
+}
+
+void CPlayer::set_income(const resource *resource, const int quantity)
+{
+	if (quantity == 0) {
+		if (this->incomes.contains(resource)) {
+			this->incomes.erase(resource);
+		}
+	} else {
+		this->incomes[resource] = quantity;
+	}
 }
 
 void CPlayer::set_income_modifier(const resource *resource, const int quantity)
@@ -4908,6 +4932,31 @@ void PlayersEachMinute(const int playerIdx)
 {
 	try {
 		const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
+
+		for (const auto &[resource, quantity] : player->get_incomes()) {
+			const wyrmgus::resource *final_resource = resource->get_final_resource();
+			int final_resource_change = quantity * resource->get_final_resource_conversion_rate() / 100;
+
+			if (player->AiEnabled) {
+				switch (GameSettings.Difficulty) {
+					case DifficultyEasy:
+						final_resource_change /= 2;
+						break;
+					case DifficultyHard:
+						final_resource_change *= 4;
+						final_resource_change /= 3;
+						break;
+					case DifficultyBrutal:
+						final_resource_change *= 2;
+						break;
+					default:
+						break;
+				}
+			}
+
+			player->change_resource(final_resource, final_resource_change, true);
+			player->change_resource_total(final_resource, final_resource_change);
+		}
 
 		if (player->AiEnabled) {
 			AiEachMinute(*player);
