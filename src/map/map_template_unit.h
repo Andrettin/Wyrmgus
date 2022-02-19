@@ -31,6 +31,7 @@ namespace wyrmgus {
 class faction;
 class gsml_data;
 class gsml_property;
+class unit_class;
 class unit_type;
 
 class map_template_unit final
