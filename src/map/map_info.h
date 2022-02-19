@@ -49,6 +49,8 @@ class map_info final : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY changed)
+	Q_PROPERTY(std::string description MEMBER description)
+	Q_PROPERTY(std::string author MEMBER author)
 	Q_PROPERTY(QString presentation_filepath READ get_presentation_filepath_qstring CONSTANT)
 	Q_PROPERTY(QSize map_size MEMBER map_size READ get_map_size NOTIFY changed)
 	Q_PROPERTY(int map_width READ get_map_width CONSTANT)
@@ -56,7 +58,7 @@ class map_info final : public QObject
 	Q_PROPERTY(int player_count READ get_player_count CONSTANT)
 	Q_PROPERTY(int person_player_count READ get_person_player_count CONSTANT)
 	Q_PROPERTY(int person_player_index READ get_person_player_index CONSTANT)
-	Q_PROPERTY(QString description READ get_description_qstring CONSTANT)
+	Q_PROPERTY(QString text READ get_text_qstring CONSTANT)
 
 public:
 	map_info();
@@ -156,11 +158,11 @@ public:
 
 	void set_settings(qunique_ptr<map_settings> &&settings);
 
-	std::string get_description() const;
+	std::string get_text() const;
 
-	QString get_description_qstring() const
+	QString get_text_qstring() const
 	{
-		return QString::fromStdString(this->get_description());
+		return QString::fromStdString(this->get_text());
 	}
 
 signals:
@@ -168,6 +170,8 @@ signals:
 
 private:
 	std::string name;
+	std::string description;
+	std::string author;
 	std::filesystem::path presentation_filepath;
 	QSize map_size = QSize(0, 0);
 public:

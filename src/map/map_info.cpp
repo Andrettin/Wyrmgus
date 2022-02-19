@@ -168,6 +168,8 @@ qunique_ptr<map_info> map_info::duplicate() const
 	}
 
 	info->name = this->name;
+	info->description = this->description;
+	info->author = this->author;
 	info->presentation_filepath = this->presentation_filepath;
 	info->map_size = this->map_size;
 	info->MapWidths = this->MapWidths;
@@ -231,9 +233,17 @@ void map_info::set_settings(qunique_ptr<map_settings> &&settings)
 	this->settings = std::move(settings);
 }
 
-std::string map_info::get_description() const
+std::string map_info::get_text() const
 {
 	std::string str = "Map: " + this->get_name() + " (" + std::to_string(this->get_map_width()) + "x" + std::to_string(this->get_map_height()) + ")";
+
+	if (!this->description.empty()) {
+		str += "\n\nDescription: " + this->description;
+	}
+
+	if (!this->author.empty()) {
+		str += "\n\nAuthor: " + this->author;
+	}
 
 	std::string settings_str = this->get_settings()->get_string();
 	if (!settings_str.empty()) {

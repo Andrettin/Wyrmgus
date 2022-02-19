@@ -937,21 +937,30 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 	
 	// no player belonging to this faction, so let's make an unused player slot be created for it
 	
-	for (int i = 0; i < NumPlayers; ++i) {
-		const qunique_ptr<CPlayer> &player = CPlayer::Players[i];
+	for (CPlayer *player : CPlayer::get_non_neutral_players()) {
+		if (player->get_faction() != nullptr) {
+			continue;
+		}
+
+		player->set_civilization(faction->get_civilization());
+		player->set_faction(faction);
+
 		if (player->get_type() == player_type::nobody) {
 			player->set_type(player_type::computer);
-			player->set_civilization(faction->get_civilization());
-			player->set_faction(faction);
 			player->AiEnabled = true;
-			player->AiName = faction->get_default_ai();
 			player->Team = 1;
-			player->set_resource(defines::get()->get_wealth_resource(), 2500); // give the new player enough resources to start up
-			player->set_resource(resource::get_all()[WoodCost], 2500);
-			player->set_resource(resource::get_all()[StoneCost], 2500);
-
-			return player.get();
 		}
+
+		if (player->get_type() == player_type::computer) {
+			player->AiName = faction->get_default_ai();
+		}
+
+		//give the new player enough resources to start up
+		player->set_resource(defines::get()->get_wealth_resource(), 2500);
+		player->set_resource(resource::get_all()[WoodCost], 2500);
+		player->set_resource(resource::get_all()[StoneCost], 2500);
+
+		return player;
 	}
 	
 	throw std::runtime_error("Cannot add player for faction \"" + faction->get_identifier() + "\": no player slots available.");
