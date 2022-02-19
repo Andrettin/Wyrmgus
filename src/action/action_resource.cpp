@@ -1319,8 +1319,8 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		if (GameSettings.Difficulty == DifficultyEasy) {
 			final_resource_change /= 2;
 		} else if (GameSettings.Difficulty == DifficultyHard) {
-			final_resource_change *= 3;
-			final_resource_change /= 4;
+			final_resource_change *= 4;
+			final_resource_change /= 3;
 		} else if (GameSettings.Difficulty == DifficultyBrutal) {
 			final_resource_change *= 2;
 		}
