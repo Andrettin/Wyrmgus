@@ -37,6 +37,7 @@
 #include "unit/unit_manager.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "upgrade/upgrade_structs.h"
 
 namespace wyrmgus {
 
