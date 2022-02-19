@@ -58,10 +58,16 @@ public:
 		return this->faction;
 	}
 
+	int get_player_index() const
+	{
+		return this->player_index;
+	}
+
 private:
 	const unit_type *type = nullptr;
 	QPoint pos = QPoint(0, 0);
 	const wyrmgus::faction *faction = nullptr;
+	int player_index = -1;
 };
 
 }

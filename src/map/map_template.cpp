@@ -1947,6 +1947,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			const unit_type *unit_type = map_template_unit->get_type();
 			const QPoint unit_pos = map_start_pos + map_template_unit->get_pos() - template_start_pos;
 			const faction *faction = map_template_unit->get_faction();
+			const int player_index = map_template_unit->get_player_index();
 
 			CPlayer *player = CPlayer::get_neutral_player();
 
@@ -1956,10 +1957,12 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				if (!player) {
 					continue;
 				}
+			} else if (player_index != -1) {
+				player = CPlayer::Players.at(player_index).get();
+			}
 
-				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
-					player->SetStartView(unit_pos, z);
-				}
+			if (!player->is_neutral_player() && player->StartPos.x == 0 && player->StartPos.y == 0) {
+				player->SetStartView(unit_pos, z);
 			}
 
 			CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z);

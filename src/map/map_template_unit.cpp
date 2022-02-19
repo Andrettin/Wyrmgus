@@ -40,6 +40,8 @@ void map_template_unit::process_gsml_property(const gsml_property &property)
 
 	if (key == "faction") {
 		this->faction = faction::get(value);
+	} else if (key == "player") {
+		this->player_index = std::stoi(value);
 	} else {
 		throw std::runtime_error("Invalid map template unit property: \"" + key + "\".");
 	}
