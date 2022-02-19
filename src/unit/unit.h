@@ -40,7 +40,6 @@ class CMapLayer;
 class COrder;
 class CPlayer;
 class CUnit;
-class CUnitStats;
 class CUpgrade;
 class CViewport;
 class Missile;
@@ -69,6 +68,7 @@ namespace wyrmgus {
 	class unique_item;
 	class unit_manager;
 	class unit_ref;
+	class unit_stats;
 	class unit_type;
 	class unit_type_variation;
 	class world;
@@ -871,7 +871,7 @@ public:
 
 	const wyrmgus::unit_type *Type;        /// Pointer to unit-type (peon,...)
 	CPlayer    *Player;            /// Owner of this unit
-	const CUnitStats *Stats;       /// Current unit stats
+	const unit_stats *Stats = nullptr;       /// Current unit stats
 	int         CurrentSightRange; /// Unit's Current Sight Range
 
 	// Pathfinding stuff:

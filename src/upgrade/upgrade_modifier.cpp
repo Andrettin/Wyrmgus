@@ -301,7 +301,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 			continue;
 		}
 
-		CUnitStats &stat = unit_type->Stats[player_index];
+		unit_stats &stat = unit_type->Stats[player_index];
 
 		//Wyrmgus start
 		if (stat.Variables.empty()) {

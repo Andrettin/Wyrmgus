@@ -371,7 +371,7 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 		}
 	}
 
-	const CUnitStats &stats = player != nullptr ? unit_type->Stats[player->get_index()] : unit_type->DefaultStat;
+	const unit_stats &stats = player != nullptr ? unit_type->Stats[player->get_index()] : unit_type->DefaultStat;
 
 	std::vector<QPoint> potential_positions;
 

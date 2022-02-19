@@ -34,7 +34,7 @@
 #include "economy/resource_container.h"
 #include "missileconfig.h"
 #include "ui/icon.h"
-#include "upgrade/upgrade_structs.h"
+#include "unit/unit_stats.h"
 #include "util/color_container.h"
 #include "vec2i.h"
 
@@ -46,6 +46,7 @@ class CFile;
 class CPlayer;
 class CPlayerColorGraphic;
 class CUnit;
+class CUpgrade;
 class LuaCallback;
 enum class ButtonCmd;
 struct lua_State;
@@ -1478,7 +1479,7 @@ private:
 	uint64_t default_mass = 0; //the default mass of the unit type, if it is a celestial body
 
 public:
-	CUnitStats DefaultStat;
+	unit_stats DefaultStat;
 
 	struct BoolFlags {
 		bool value;             /// User defined flag. Used for (dis)allow target.
@@ -1519,7 +1520,7 @@ public:
 	tile_flag MovementMask;          /// Unit check this map flags for move
 
 	/// @todo This stats should? be moved into the player struct
-	CUnitStats Stats[PlayerMax];     /// Unit status for each player
+	unit_stats Stats[PlayerMax];     /// Unit status for each player
 
 	std::shared_ptr<CPlayerColorGraphic> Sprite;     /// Sprite images
 	std::shared_ptr<CGraphic> ShadowSprite;          /// Shadow sprite image

@@ -1704,7 +1704,7 @@ static int CclDefineUnitStats(lua_State *l)
 
 	assert_throw(playerId < PlayerMax);
 
-	CUnitStats *stats = &type->Stats[playerId];
+	unit_stats *stats = &type->Stats[playerId];
 	if (stats->Variables.empty()) {
 		stats->Variables.resize(UnitTypeVar.GetNumberVariable());
 	}

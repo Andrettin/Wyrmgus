@@ -161,9 +161,9 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	}
 
 	//  adjust Variables with percent.
-	const CUnitStats &newstats = newtype.Stats[player.get_index()];
+	const unit_stats &newstats = newtype.Stats[player.get_index()];
 	//Wyrmgus start
-	const CUnitStats &oldstats = oldtype.Stats[player.get_index()];
+	const unit_stats &oldstats = oldtype.Stats[player.get_index()];
 	//Wyrmgus end
 	
 	//if the old unit type had a starting ability that the new one doesn't have, remove it; and apply it if the reverse happens
@@ -502,7 +502,7 @@ void COrder_UpgradeTo::Execute(CUnit &unit)
 
 	CPlayer &player = *unit.Player;
 	const wyrmgus::unit_type &newtype = *this->Type;
-	const CUnitStats &newstats = newtype.Stats[player.get_index()];
+	const unit_stats &newstats = newtype.Stats[player.get_index()];
 
 	//Wyrmgus start
 //	this->Ticks += std::max(1, player.SpeedUpgrade / CPlayer::base_speed_factor);

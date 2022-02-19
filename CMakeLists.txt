@@ -510,6 +510,7 @@ set(unit_SRCS
 	src/unit/unit_manager.cpp
 	src/unit/unit_ref.cpp
 	src/unit/unit_save.cpp
+	src/unit/unit_stats.cpp
 	src/unit/unit_type_container.cpp
 	src/unit/unit_type_variation.cpp
 	src/unit/unit_type.cpp
@@ -1107,6 +1108,7 @@ set(wyrmgus_unit_HDRS
 	src/unit/unit_list_model.h
 	src/unit/unit_manager.h
 	src/unit/unit_ref.h
+	src/unit/unit_stats.h
 	src/unit/unit_type_variation.h
 	src/unit/unit_type.h
 	src/unit/unit_type_container.h

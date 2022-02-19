@@ -28,8 +28,8 @@
 #pragma once
 
 #include "economy/resource.h"
+#include "unit/unit_stats.h"
 #include "unit/unit_type_container.h"
-#include "upgrade/upgrade_structs.h" //for CUnitStats
 
 class CPlayer;
 class CUnit;
@@ -40,6 +40,7 @@ static int CclDefineModifier(lua_State *l);
 
 namespace wyrmgus {
 
+class civilization;
 class faction;
 class gsml_data;
 class gsml_property;
@@ -110,7 +111,7 @@ private:
 	const CUpgrade *upgrade = nullptr; //used to filter required modifier
 
 public:
-	CUnitStats Modifier;					/// modifier of unit stats.
+	unit_stats Modifier;					/// modifier of unit stats.
 	std::unique_ptr<int[]> ModifyPercent;	/// use for percent modifiers
 	int SpeedResearch = 0;					/// speed factor for researching
 private:

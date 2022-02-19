@@ -53,6 +53,7 @@
 #include "spell/spell_teleport.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_structs.h"
 
 // **************************************************************************
 // Action parsers for spellAction

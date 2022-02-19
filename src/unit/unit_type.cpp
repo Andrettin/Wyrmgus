@@ -2764,8 +2764,7 @@ void UpdateStats(int reset)
 **  @param plynr  Player number.
 **  @param file   Output file.
 */
-static bool SaveUnitStats(const CUnitStats &stats, const wyrmgus::unit_type &type, int plynr,
-						  CFile &file)
+static bool SaveUnitStats(const unit_stats &stats, const wyrmgus::unit_type &type, const int plynr, CFile &file)
 {
 	assert_throw(plynr < PlayerMax);
 

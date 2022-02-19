@@ -366,9 +366,9 @@ Missile *MakeLocalMissile(const wyrmgus::missile_type &mtype, const PixelPos &st
 **  @return                damage inflicted to goal.
 */
 //Wyrmgus start
-//static int CalculateDamageStats(const CUnitStats &attacker_stats,
-//								const CUnitStats &goal_stats, int bloodlust)
-static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal, const Missile *missile = nullptr)
+//static int CalculateDamageStats(const unit_stats &attacker_stats,
+//								const unit_stats &goal_stats, int bloodlust)
+static int CalculateDamageStats(const CUnit &attacker, const unit_stats &goal_stats, const CUnit *goal, const Missile *missile = nullptr)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -594,7 +594,7 @@ int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *
 **
 **  @return                whether the target was hit or not.
 */
-static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal)
+static bool CalculateHit(const CUnit &attacker, const unit_stats &goal_stats, const CUnit *goal)
 {
 	if (GodMode && attacker.Player == CPlayer::GetThisPlayer() && (!goal || goal->Player != CPlayer::GetThisPlayer())) {
 		return true; //always hit if in god mode
@@ -1338,8 +1338,6 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 */
 static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int splash)
 {
-	CUnitStats *stats; // stat of the wall.
-
 	//Wyrmgus start
 //	if (!CMap::get()->WallOnMap(tilePos)) {
 	if (!CMap::get()->WallOnMap(tilePos, missile.MapLayer)) {
@@ -1347,7 +1345,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 		return;
 	}
 	
-	stats = CMap::get()->Field(tilePos, missile.MapLayer)->get_overlay_terrain()->UnitType->Stats;
+	const unit_stats *stats = CMap::get()->Field(tilePos, missile.MapLayer)->get_overlay_terrain()->UnitType->Stats;
 	
 	if (missile.Damage || missile.LightningDamage) {  // direct damage, spells mostly
 		int damage = missile.Damage / splash;

@@ -37,6 +37,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "upgrade/upgrade_structs.h"
 #include "util/log_util.h"
 #include "util/string_conversion_util.h"
 
