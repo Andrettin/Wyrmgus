@@ -36,6 +36,7 @@
 #include "ai/ai_force_template.h"
 #include "ai/ai_force_type.h"
 #include "commands.h"
+#include "database/defines.h"
 #include "game/game.h"
 #include "map/landmass.h"
 #include "map/map.h"
@@ -1779,8 +1780,12 @@ void AiForceManager::CheckForceRecruitment()
 		return;
 	}
 	
-	if (AiPlayer->Player->NumTownHalls < 1) { //don't build up forces if the AI has no town hall yet
-		return;
+	if (AiPlayer->Player->NumTownHalls < 1 && AiPlayer->Player->get_faction() != nullptr) {
+		//don't build up forces if the AI has no town hall yet, but has workers to rebuild it
+		const unit_type *town_hall_type = AiPlayer->Player->get_faction()->get_class_unit_type(defines::get()->get_town_hall_class());
+		if (town_hall_type != nullptr && !AiPlayer->Player->get_builders(town_hall_type).empty()) {
+			return;
+		}
 	}
 
 	bool all_forces_completed = true;
