@@ -243,17 +243,6 @@ void CPlayer::Load(lua_State *l)
 				const resource *res = resource::get(value);
 				this->max_resources[res] = LuaToNumber(l, j + 1, k + 1);
 			}
-		} else if (!strcmp(value, "last-resources")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, j + 1, k + 1);
-				++k;
-				const resource *res = resource::get(value);
-				this->set_last_resource(res, LuaToNumber(l, j + 1, k + 1));
-			}
 		} else if (!strcmp(value, "income-modifiers")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -265,18 +254,6 @@ void CPlayer::Load(lua_State *l)
 
 				const resource *res = resource::get(value);
 				this->set_income_modifier(res, LuaToNumber(l, j + 1, k + 1));
-			}
-		} else if (!strcmp(value, "revenue")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, j + 1, k + 1);
-				++k;
-
-				const resource *res = resource::get(value);
-				this->set_estimated_revenue(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "prices")) {

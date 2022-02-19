@@ -508,28 +508,6 @@ public:
 		this->set_max_resource(resource, this->get_max_resource(resource) + quantity);
 	}
 
-	int get_last_resource(const resource *resource) const
-	{
-		const auto find_iterator = this->last_resources.find(resource);
-
-		if (find_iterator != this->last_resources.end()) {
-			return find_iterator->second;
-		}
-
-		return 0;
-	}
-
-	void set_last_resource(const resource *resource, const int quantity)
-	{
-		if (quantity == 0) {
-			if (this->last_resources.contains(resource)) {
-				this->last_resources.erase(resource);
-			}
-		} else {
-			this->last_resources[resource] = quantity;
-		}
-	}
-
 	int get_stored_resource(const resource *resource) const
 	{
 		const auto find_iterator = this->stored_resources.find(resource);
@@ -615,28 +593,6 @@ public:
 		std::shared_lock<std::shared_mutex> lock(this->mutex);
 
 		return QString::fromStdString(this->get_children_processing_bonus_string(resource));
-	}
-
-	int get_estimated_revenue(const resource *resource) const
-	{
-		const auto find_iterator = this->estimated_revenues.find(resource);
-
-		if (find_iterator != this->estimated_revenues.end()) {
-			return find_iterator->second;
-		}
-
-		return 0;
-	}
-
-	void set_estimated_revenue(const resource *resource, const int quantity)
-	{
-		if (quantity == 0) {
-			if (this->estimated_revenues.contains(resource)) {
-				this->estimated_revenues.erase(resource);
-			}
-		} else {
-			this->estimated_revenues[resource] = quantity;
-		}
 	}
 
 	int get_price(const resource *resource) const
@@ -1415,9 +1371,7 @@ private:
 	resource_map<int> resources;      /// resources in overall store
 	resource_map<int> max_resources;   /// max resources can be stored
 	resource_map<int> stored_resources;/// resources in store buildings (can't exceed MaxResources)
-	resource_map<int> last_resources;  /// last values for revenue
 	resource_map<int> income_modifiers; //income modifier per resource
-	resource_map<int> estimated_revenues; //estimated income rate per resource
 	//Wyrmgus start
 	resource_map<int> prices;		  /// price of each resource
 	resource_map<int> resource_demands; /// demand for the resources
