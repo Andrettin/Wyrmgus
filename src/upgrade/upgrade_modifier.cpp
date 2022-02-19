@@ -151,8 +151,11 @@ void upgrade_modifier::process_gsml_scope(const gsml_data &scope)
 		if (index != -1) { // valid index
 			scope.for_each_property([&](const gsml_property &property) {
 				const std::string &key = property.get_key();
+				const int value = std::stoi(property.get_value());
 				if (key == "percent_value") {
-					this->ModifyPercent[index] = std::stoi(property.get_value());
+					this->ModifyPercent[index] = value;
+				} else if (key == "increase") {
+					this->Modifier.Variables[index].Increase = value;
 				} else {
 					throw std::runtime_error("Invalid upgrade modifier variable property: \"" + key + "\".");
 				}
