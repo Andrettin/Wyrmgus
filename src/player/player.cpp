@@ -3085,7 +3085,9 @@ bool CPlayer::capture_unit(CUnit *unit)
 			return false;
 		}
 
-		CommandTransformIntoType(*unit, *new_unit_type);
+		if (unit->Type != new_unit_type) {
+			CommandTransformIntoType(*unit, *new_unit_type);
+		}
 	}
 
 	unit->ChangeOwner(*this, true);
