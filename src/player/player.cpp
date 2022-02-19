@@ -4733,6 +4733,10 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, const bool type_change)
 		this->change_military_score(unit->Variable[POINTS_INDEX].Value);
 	}
 	
+	for (const auto &[resource, quantity] : type->Stats[this->get_index()].get_incomes()) {
+		this->change_income(resource, quantity);
+	}
+
 	for (const auto &[resource, quantity] : type->Stats[this->get_index()].get_resource_demands()) {
 		this->change_resource_demand(resource, quantity);
 	}
@@ -4789,6 +4793,10 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, const bool type_change)
 
 	if (unit->counts_for_military_score()) {
 		this->change_military_score(-unit->Variable[POINTS_INDEX].Value);
+	}
+
+	for (const auto &[resource, quantity] : type->Stats[this->get_index()].get_incomes()) {
+		this->change_income(resource, -quantity);
 	}
 
 	for (const auto &[resource, quantity] : type->Stats[this->get_index()].get_resource_demands()) {

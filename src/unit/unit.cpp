@@ -4620,10 +4620,6 @@ void UnitLost(CUnit &unit)
 				player.set_max_resource(resource, std::max(0, new_max_value));
 				player.set_resource(resource, player.get_stored_resource(resource), resource_storage_type::building);
 			}
-
-			if (type.Stats[player.get_index()].get_income(resource) != 0) {
-				player.change_income(resource, -type.Stats[player.get_index()].get_income(resource));
-			}
 		}
 
 		//  Handle income improvements, look if a player loses a building
@@ -4718,10 +4714,6 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	for (const resource *resource : resource::get_all()) {
 		if (resource == defines::get()->get_time_resource()) {
 			continue;
-		}
-
-		if (type.Stats[player.get_index()].get_income(resource) != 0) {
-			player.change_income(resource, type.Stats[player.get_index()].get_income(resource));
 		}
 
 		player.set_income_modifier(resource, std::max(player.get_income_modifier(resource), type.Stats[player.get_index()].get_improve_income(resource)));
