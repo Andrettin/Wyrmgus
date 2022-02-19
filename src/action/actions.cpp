@@ -356,12 +356,12 @@ static void HandleBuffsEachCycle(CUnit &unit)
 **
 **  @param unit  the unit to operate on
 */
-static bool HandleBurnAndPoison(CUnit &unit)
+static void HandleBurnAndPoison(CUnit &unit)
 {
 	if (unit.Removed || unit.Destroyed || unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) == 0
 		|| unit.CurrentAction() == UnitAction::Built
 		|| unit.CurrentAction() == UnitAction::Die) {
-		return false;
+		return;
 	}
 	// Burn & poison
 	//Wyrmgus start
@@ -373,22 +373,17 @@ static bool HandleBurnAndPoison(CUnit &unit)
 //		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
 		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate, nullptr, false); //a bit too repetitive to show damage every single time the burn effect is applied
 		//Wyrmgus end
-		return true;
 	}
 
 	if (unit.has_status_effect(status_effect::poison) && unit.Type->PoisonDrain) {
 		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain, nullptr, false);
-		return true;
 	}
 
 	//Wyrmgus start
 	if (unit.has_status_effect(status_effect::bleeding) || unit.has_status_effect(status_effect::dehydration)) {
 		HitUnit(NoUnitP, unit, 1, nullptr, false);
-		//don't return true since we don't want to stop regeneration (positive or negative) from happening
 	}
 	//Wyrmgus end
-
-	return false;
 }
 
 /**
@@ -407,9 +402,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 	// User defined variables
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (i == HP_INDEX) {
-			if (HandleBurnAndPoison(unit)) {
-				continue;
-			}
+			HandleBurnAndPoison(unit);
 
 			//Wyrmgus start
 			if (unit.has_status_effect(status_effect::regeneration)) {
