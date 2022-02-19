@@ -2066,6 +2066,7 @@ bool IsPercentageVariable(const int var)
 		case SALVAGEFACTOR_INDEX:
 		case MUGGING_INDEX:
 		case RAIDING_INDEX:
+		case CAPTURE_HP_THRESHOLD_INDEX:
 			return true;
 		default:
 			return false;
@@ -2116,7 +2117,6 @@ bool IsBooleanVariable(const int var)
 		case REGENERATIONAURA_INDEX:
 		case HYDRATINGAURA_INDEX:
 		case ETHEREALVISION_INDEX:
-		case CAPTURABLE_INDEX:
 			return true;
 		default:
 			return false;
@@ -2165,8 +2165,11 @@ std::string GetVariableDisplayName(int var, bool increase)
 	variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
 	variable_name = FindAndReplaceString(variable_name, "Supply", "FoodSupply");
 	variable_name = FindAndReplaceString(variable_name, "Demand", "FoodCost");
+
 	variable_name = SeparateCapitalizedStringElements(variable_name);
+
 	variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
+	variable_name = FindAndReplaceString(variable_name, "Capture Hp Threshold", "Capture HP Threshold");
 	variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
 	variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
 

@@ -7758,13 +7758,11 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, const int da
 
 	//capture enemy buildings
 
-	if (target.Variable[CAPTURABLE_INDEX].Value == 0) {
+	if (target.Variable[CAPTURE_HP_THRESHOLD_INDEX].Value == 0) {
 		return;
 	}
 
-	static constexpr int capture_hp_threshold = 20;
-
-	if (target.Variable[HP_INDEX].get_percent_value() >= capture_hp_threshold) {
+	if (target.Variable[HP_INDEX].get_percent_value() >= target.Variable[CAPTURE_HP_THRESHOLD_INDEX].Value) {
 		return;
 	}
 
