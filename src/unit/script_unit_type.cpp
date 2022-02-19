@@ -1745,6 +1745,21 @@ static int CclDefineUnitStats(lua_State *l)
 				stats->set_storing(res, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);
 			}
+		} else if (!strcmp(value, "incomes")) {
+			lua_rawgeti(l, 3, j + 1);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, 3, j + 1);
+				value = LuaToString(l, -1, k + 1);
+				++k;
+				const resource *res = resource::get(value);
+				stats->set_income(res, LuaToNumber(l, -1, k + 1));
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "improve-production")) {
 			lua_rawgeti(l, 3, j + 1);
 			if (!lua_istable(l, -1)) {

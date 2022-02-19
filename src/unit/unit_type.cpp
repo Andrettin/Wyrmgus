@@ -2801,6 +2801,17 @@ static bool SaveUnitStats(const unit_stats &stats, const wyrmgus::unit_type &typ
 		file.printf("\"%s\", %d,", resource->get_identifier().c_str(), quantity);
 	}
 
+	file.printf("},\n\"incomes\", {");
+	first = true;
+	for (const auto &[resource, quantity] : stats.get_incomes()) {
+		if (first) {
+			first = false;
+		} else {
+			file.printf(" ");
+		}
+		file.printf("\"%s\", %d,", resource->get_identifier().c_str(), quantity);
+	}
+
 	file.printf("},\n\"improve-production\", {");
 	first = true;
 	for (const auto &[resource, quantity] : stats.get_improve_incomes()) {

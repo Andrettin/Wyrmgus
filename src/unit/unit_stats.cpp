@@ -39,6 +39,7 @@ const unit_stats &unit_stats::operator = (const unit_stats &rhs)
 {
 	this->costs = rhs.costs;
 	this->storing = rhs.storing;
+	this->incomes = rhs.incomes;
 	this->improve_incomes = rhs.improve_incomes;
 	this->resource_demands = rhs.resource_demands;
 	this->unit_stocks = rhs.unit_stocks;
@@ -54,6 +55,10 @@ bool unit_stats::operator == (const unit_stats &rhs) const
 	}
 
 	if (this->storing != rhs.storing) {
+		return false;
+	}
+
+	if (this->incomes != rhs.incomes) {
 		return false;
 	}
 

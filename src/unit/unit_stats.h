@@ -113,6 +113,38 @@ public:
 		this->set_storing(resource, this->get_storing(resource) + quantity);
 	}
 
+	const resource_map<int> &get_incomes() const
+	{
+		return this->incomes;
+	}
+
+	int get_income(const resource *resource) const
+	{
+		const auto find_iterator = this->incomes.find(resource);
+
+		if (find_iterator != this->incomes.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_income(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->incomes.contains(resource)) {
+				this->incomes.erase(resource);
+			}
+		} else {
+			this->incomes[resource] = quantity;
+		}
+	}
+
+	void change_income(const resource *resource, const int quantity)
+	{
+		this->set_income(resource, this->get_income(resource) + quantity);
+	}
+
 	const resource_map<int> &get_improve_incomes() const
 	{
 		return this->improve_incomes;
@@ -225,6 +257,7 @@ public:
 private:
 	resource_map<int> costs;            /// current costs of the unit
 	resource_map<int> storing;          /// storage increasing
+	resource_map<int> incomes; //passive resource incomes for the owner player
 	resource_map<int> improve_incomes;   /// Gives player an improved income
 	resource_map<int> resource_demands;	/// Resource demand
 	unit_type_map<int> unit_stocks;	/// Units in stock

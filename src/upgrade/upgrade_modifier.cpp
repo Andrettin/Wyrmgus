@@ -137,6 +137,14 @@ void upgrade_modifier::process_gsml_scope(const gsml_data &scope)
 			const resource *resource = resource::get(key);
 			this->Modifier.set_cost(resource, std::stoi(value));
 		});
+	} else if (tag == "incomes") {
+		scope.for_each_property([&](const gsml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const resource *resource = resource::get(key);
+			this->Modifier.set_income(resource, std::stoi(value));
+		});
 	} else if (tag == "processing_bonus") {
 		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
@@ -323,7 +331,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 
 		//if a unit type's supply is going to be changed, we need to update the player's supply accordingly
 		if (this->Modifier.Variables[SUPPLY_INDEX].Value != 0) {
-			for (CUnit *unit : unitupgrade) {
+			for (const CUnit *unit : unitupgrade) {
 				if (unit->IsAlive()) {
 					const int supply_change = this->Modifier.Variables[SUPPLY_INDEX].Value * multiplier;
 
@@ -338,7 +346,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 
 		//if a unit type's demand is going to be changed, we need to update the player's demand accordingly
 		if (this->Modifier.Variables[DEMAND_INDEX].Value != 0) {
-			for (CUnit *unit : unitupgrade) {
+			for (const CUnit *unit : unitupgrade) {
 				if (unit->IsAlive()) {
 					player->change_demand(this->Modifier.Variables[DEMAND_INDEX].Value * multiplier);
 				}
@@ -352,6 +360,17 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 
 		for (const auto &[resource, storing] : this->Modifier.get_storing()) {
 			stat.change_storing(resource, storing * multiplier);
+		}
+
+		for (const auto &[resource, quantity] : this->Modifier.get_incomes()) {
+			const int income = quantity * multiplier;
+			stat.change_income(resource, income);
+
+			for (const CUnit *unit : unitupgrade) {
+				if (unit->IsAlive()) {
+					player->change_income(resource, income);
+				}
+			}
 		}
 
 		for (const auto &[resource, quantity] : this->Modifier.get_improve_incomes()) {
@@ -706,6 +725,23 @@ std::string upgrade_modifier::get_string() const
 
 			str += GetVariableDisplayName(var, true);
 		}
+	}
+
+	for (const auto &[resource, quantity] : this->Modifier.get_incomes()) {
+		if (first) {
+			first = false;
+		} else {
+			str += ", ";
+		}
+
+		if (quantity > 0) {
+			str += "+";
+		}
+
+		str += std::to_string(quantity);
+		str += " ";
+		str += resource->get_name();
+		str += " Income";
 	}
 
 	for (const auto &[resource, quantity] : this->Modifier.get_improve_incomes()) {
