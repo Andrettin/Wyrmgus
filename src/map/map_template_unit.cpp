@@ -30,6 +30,8 @@
 
 #include "map/map_template.h"
 #include "player/faction.h"
+#include "unit/unit_class.h"
+#include "unit/unit_type.h"
 
 namespace wyrmgus {
 
@@ -38,7 +40,11 @@ void map_template_unit::process_gsml_property(const gsml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "faction") {
+	if (key == "type") {
+		this->type = unit_type::get(value);
+	} else if (key == "unit_class") {
+		this->unit_class = unit_class::get(value);
+	} else if (key == "faction") {
 		this->faction = faction::get(value);
 	} else if (key == "player") {
 		this->player_index = std::stoi(value);

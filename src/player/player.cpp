@@ -1900,11 +1900,16 @@ void CPlayer::update_territory_tiles()
 unit_type *CPlayer::get_class_unit_type(const unit_class *unit_class) const
 {
 	const wyrmgus::faction *faction = this->get_faction();
-	if (faction == nullptr) {
-		return nullptr;
+	if (faction != nullptr) {
+		return faction->get_class_unit_type(unit_class);
 	}
 
-	return faction->get_class_unit_type(unit_class);
+	const civilization *civilization = this->get_civilization();
+	if (civilization != nullptr) {
+		return civilization->get_class_unit_type(unit_class);
+	}
+
+	return nullptr;
 }
 
 bool CPlayer::is_class_unit_type(const unit_type *unit_type) const

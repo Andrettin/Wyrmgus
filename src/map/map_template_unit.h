@@ -48,6 +48,11 @@ public:
 		return this->type;
 	}
 
+	const wyrmgus::unit_class *get_unit_class() const
+	{
+		return this->unit_class;
+	}
+
 	const QPoint &get_pos() const
 	{
 		return this->pos;
@@ -65,6 +70,7 @@ public:
 
 private:
 	const unit_type *type = nullptr;
+	const wyrmgus::unit_class *unit_class = nullptr;
 	QPoint pos = QPoint(0, 0);
 	const wyrmgus::faction *faction = nullptr;
 	int player_index = -1;

@@ -233,10 +233,16 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
-			const unit_type *unit_type = unit_type::get(tag);
+			const unit_type *unit_type = nullptr;
+
+			if (!tag.empty()) {
+				unit_type = unit_type::get(tag);
+			}
 
 			auto unit = std::make_unique<map_template_unit>(unit_type);
 			database::process_gsml_data(unit, child_scope);
+
+			assert_throw(unit->get_type() != nullptr || unit->get_unit_class() != nullptr);
 
 			this->units.push_back(std::move(unit));
 		});
@@ -1945,6 +1951,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 
 		for (const std::unique_ptr<map_template_unit> &map_template_unit : this->units) {
 			const unit_type *unit_type = map_template_unit->get_type();
+
 			const QPoint unit_pos = map_start_pos + map_template_unit->get_pos() - template_start_pos;
 			const faction *faction = map_template_unit->get_faction();
 			const int player_index = map_template_unit->get_player_index();
@@ -1959,6 +1966,17 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				}
 			} else if (player_index != -1) {
 				player = CPlayer::Players.at(player_index).get();
+			}
+
+			if (unit_type == nullptr) {
+				const unit_class *unit_class = map_template_unit->get_unit_class();
+				if (unit_class != nullptr) {
+					unit_type = player->get_class_unit_type(unit_class);
+				}
+
+				if (unit_type == nullptr) {
+					continue;
+				}
 			}
 
 			if (!player->is_neutral_player() && player->StartPos.x == 0 && player->StartPos.y == 0) {
