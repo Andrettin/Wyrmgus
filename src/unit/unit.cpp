@@ -8319,7 +8319,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	// FIXME : should be parametrable.
 	//Wyrmgus start
 //	if (!transporter.IsTeamed(unit)) {
-	if (!transporter.IsTeamed(unit) && !transporter.is_allied_with(unit) && transporter.Player->get_type() != player_type::neutral && unit.Player->get_type() != player_type::neutral) {
+	if (!transporter.IsTeamed(unit) && !transporter.is_allied_with(unit) && (transporter.Player->get_type() != player_type::neutral || transporter.Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value) && unit.Player->get_type() != player_type::neutral) {
 	//Wyrmgus end
 		return 0;
 	}
