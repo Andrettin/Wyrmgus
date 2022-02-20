@@ -1891,10 +1891,9 @@ static int CclSavedGameInfo(lua_State *l)
 		if (!strcmp(value, "SaveFile")) {
 			CurrentMapPath = LuaToString(l, -1);
 			std::filesystem::path path = database::get()->get_root_path();
-			path /= LuaToString(l, -1);
-			if (LuaLoadFile(path::to_string(path)) == -1) {
-				DebugPrint("Load failed: %s\n" _C_ value);
-			}
+			path /= path::from_string(LuaToString(l, -1));
+
+			LoadStratagusMapInfo(path);
 		} else if (!strcmp(value, "SyncHash")) {
 			SyncHash = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SyncRandSeed")) {
