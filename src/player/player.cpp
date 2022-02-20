@@ -3813,6 +3813,12 @@ void CPlayer::set_resource_demand(const resource *resource, const int quantity)
 
 void CPlayer::set_income(const resource *resource, const int quantity)
 {
+	std::optional<std::unique_lock<std::shared_mutex>> lock;
+
+	if (this == CPlayer::GetThisPlayer()) {
+		lock = std::unique_lock<std::shared_mutex>(this->mutex);
+	}
+
 	if (quantity == 0) {
 		if (this->incomes.contains(resource)) {
 			this->incomes.erase(resource);
@@ -3820,6 +3826,8 @@ void CPlayer::set_income(const resource *resource, const int quantity)
 	} else {
 		this->incomes[resource] = quantity;
 	}
+
+	emit income_changed(resource->get_index(), quantity);
 }
 
 void CPlayer::set_income_modifier(const resource *resource, const int quantity)

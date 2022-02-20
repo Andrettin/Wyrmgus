@@ -587,6 +587,13 @@ public:
 		return 0;
 	}
 
+	Q_INVOKABLE int get_income_sync(wyrmgus::resource *resource) const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_income(resource);
+	}
+
 	void set_income(const resource *resource, const int quantity);
 
 	void change_income(const resource *resource, const int quantity)
@@ -1349,6 +1356,7 @@ signals:
 	void effective_sell_price_changed(const int resource_index, const int price);
 	void effective_buy_price_changed(const int resource_index, const int price);
 	void effective_resource_demand_changed(const int resource_index, const int demand);
+	void income_changed(const int resource_index, const int income);
 	void resource_processing_bonus_changed(const int resource_index, const int bonus);
 	void resource_children_processing_bonus_string_changed(const int resource_index, const QString &str);
 	void trade_cost_changed();
