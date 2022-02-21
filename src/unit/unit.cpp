@@ -4117,9 +4117,7 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 
 	//Wyrmgus start
 	if (!SaveGameLoading && old_time_of_day != new_time_of_day) {
-		MapUnmarkUnitSight(unit);
 		UpdateUnitSightRange(unit);
-		MapMarkUnitSight(unit);
 	}
 	//Wyrmgus end
 
