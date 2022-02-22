@@ -1320,7 +1320,7 @@ static int CclDefineSite(lua_State *l)
 	}
 
 	std::string site_ident = LuaToString(l, 1);
-	wyrmgus::site *site = wyrmgus::site::get_or_add(site_ident, nullptr);
+	wyrmgus::site *site = wyrmgus::site::add(site_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
