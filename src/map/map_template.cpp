@@ -48,6 +48,7 @@
 #include "map/map_settings.h"
 #include "map/map_template_history.h"
 #include "map/map_template_unit.h"
+#include "map/pmp.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "map/site_history.h"
@@ -2581,6 +2582,8 @@ void map_template::load_terrain(const bool overlay)
 		this->load_terrain_file(overlay);
 	} else if (terrain_filepath.extension() == ".wes" && !overlay) {
 		this->load_wesnoth_terrain_file();
+	} else if (terrain_filepath.extension() == ".pmp" && !overlay) {
+		this->load_0_ad_terrain_file();
 	} else {
 		throw std::runtime_error("Invalid terrain file extension: \"" + terrain_filepath.extension().string() + "\".");
 	}
@@ -2740,6 +2743,60 @@ void map_template::load_wesnoth_terrain_file()
 			} catch (...) {
 				std::throw_with_nested(std::runtime_error("Failed to process terrain string " + std::to_string(x + 1) + " of line " + std::to_string(y + 1) + " for terrain file \"" + terrain_filepath.string() + "\"."));
 			}
+		}
+	}
+}
+
+void map_template::load_0_ad_terrain_file()
+{
+	const std::filesystem::path &terrain_filepath = this->get_terrain_file();
+
+	std::vector<std::vector<std::string>> terrain_strings;
+
+	std::ifstream map_ifstream(terrain_filepath, std::ios::binary);
+	map_ifstream.exceptions(std::ifstream::badbit | std::ifstream::failbit | std::ifstream::eofbit);
+
+	assert_throw(map_ifstream.is_open());
+
+	const pmp pmp(map_ifstream);
+
+	this->terrain_image = QImage(pmp.map_size * pmp_patch::tile_size, pmp.map_size * pmp_patch::tile_size, QImage::Format_RGBA8888);
+	this->terrain_image.fill(Qt::transparent);
+
+	int patch_x = 0;
+	int patch_y = pmp.map_size - 1;
+	for (const pmp_patch &patch : pmp.patches) {
+		int tile_offset_x = 0;
+		int tile_offset_y = pmp_patch::tile_size - 1;
+
+		for (const pmp_tile &tile : patch.tiles) {
+			const pmp_string &texture_name = pmp.terrain_textures.at(tile.texture_1);
+			const terrain_type *terrain = terrain_type::get_by_0_ad_texture_name(std::string(texture_name.to_string_view()));
+
+			if (terrain != nullptr) {
+				const QColor &color = terrain->get_color();
+
+				if (!color.isValid()) {
+					throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
+				}
+
+				const int tile_x = patch_x * pmp_patch::tile_size + tile_offset_x;
+				const int tile_y = patch_y * pmp_patch::tile_size + tile_offset_y;
+
+				this->terrain_image.setPixelColor(tile_x, tile_y, color);
+			}
+
+			++tile_offset_x;
+			if (tile_offset_x >= static_cast<int>(pmp_patch::tile_size)) {
+				tile_offset_x = 0;
+				--tile_offset_y;
+			}
+		}
+
+		++patch_x;
+		if (patch_x >= static_cast<int>(pmp.map_size)) {
+			patch_x = 0;
+			--patch_y;
 		}
 	}
 }

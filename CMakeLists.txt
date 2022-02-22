@@ -812,6 +812,7 @@ set(wyrmgus_map_HDRS
 	src/map/mercator_map_projection.h
 	src/map/minimap.h
 	src/map/minimap_mode.h
+	src/map/pmp.h
 	src/map/nearby_sight_unmarker.h
 	src/map/region.h
 	src/map/region_history.h

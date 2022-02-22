@@ -146,7 +146,7 @@ public:
 			return find_iterator->second;
 		}
 
-		throw std::runtime_error("No terrain type found for string: \"" + str + "\".");
+		throw std::runtime_error("No terrain type found for Wesnoth string: \"" + str + "\".");
 	}
 
 	static terrain_type *try_get_by_wesnoth_string(const std::string &str)
@@ -162,10 +162,30 @@ public:
 	static void map_to_wesnoth_string(terrain_type *terrain, const std::string &str)
 	{
 		if (terrain_type::try_get_by_wesnoth_string(str) != nullptr) {
-			throw std::runtime_error("String \"" + str + "\" is already used by another terrain type.");
+			throw std::runtime_error("Wesnoth string \"" + str + "\" is already used by another terrain type.");
 		}
 
 		terrain_type::terrain_types_by_wesnoth_string[str] = terrain;
+	}
+
+	static terrain_type *get_by_0_ad_texture_name(const std::string &str)
+	{
+		const auto find_iterator = terrain_type::terrain_types_by_0_ad_texture_name.find(str);
+		if (find_iterator != terrain_type::terrain_types_by_0_ad_texture_name.end()) {
+			return find_iterator->second;
+		}
+
+		throw std::runtime_error("No terrain type found for 0 A.D. texture name: \"" + str + "\".");
+	}
+
+	static terrain_type *try_get_by_0_ad_texture_name(const std::string &str)
+	{
+		const auto find_iterator = terrain_type::terrain_types_by_0_ad_texture_name.find(str);
+		if (find_iterator != terrain_type::terrain_types_by_0_ad_texture_name.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
 	}
 
 	static terrain_type *add(const std::string &identifier, const wyrmgus::data_module *data_module)
@@ -183,6 +203,7 @@ public:
 		terrain_type::terrain_types_by_color.clear();
 		terrain_type::terrain_types_by_tile_number.clear();
 		terrain_type::terrain_types_by_wesnoth_string.clear();
+		terrain_type::terrain_types_by_0_ad_texture_name.clear();
 	}
 
 	explicit terrain_type(const std::string &identifier);
@@ -195,6 +216,7 @@ private:
 	static inline color_map<terrain_type *> terrain_types_by_color;
 	static inline std::map<int, terrain_type *> terrain_types_by_tile_number;
 	static inline std::map<std::string, terrain_type *> terrain_types_by_wesnoth_string;
+	static inline std::map<std::string, terrain_type *> terrain_types_by_0_ad_texture_name;
 
 public:
 	virtual void process_gsml_property(const gsml_property &property) override;
@@ -221,6 +243,7 @@ public:
 
 	void map_to_tile_number(const int tile_number);
 	void map_to_wesnoth_string(const std::string &str);
+	void map_to_0_ad_texture_name(const std::string &str);
 
 	const std::filesystem::path &get_image_file() const
 	{
