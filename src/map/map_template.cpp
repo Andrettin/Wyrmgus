@@ -1047,7 +1047,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 
 		// add five workers at the player's starting location
 		if (player->NumTownHalls > 0) {
-			const unit_type *worker_type = player->get_faction()->get_class_unit_type(unit_class::get("worker"));
+			const unit_type *worker_type = player->get_class_unit_type(unit_class::get("worker"));
 			if (worker_type != nullptr && player->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
 				const Vec2i worker_unit_offset((worker_type->get_tile_size() - QSize(1, 1)) / 2);
 				
@@ -1117,8 +1117,10 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		if (this->get_world() != nullptr) {
 			this->get_world()->get_game_data()->set_map_rect(map_rect, CMap::get()->MapLayers[z].get());
 		}
-
-		this->apply_remaining_site_populations();
+		
+		if (current_campaign != nullptr) {
+			this->apply_remaining_site_populations();
+		}
 	}
 
 	this->clear_application_data();
@@ -1997,7 +1999,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				player->SetStartView(unit_pos, z);
 			}
 
-			CUnit *unit = CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z);
+			CUnit *unit = CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z, true, nullptr, true);
 
 			const int resource_amount = map_template_unit->get_resource_amount();
 			if (resource_amount > 0) {

@@ -4299,7 +4299,7 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const wyrmgus::unit_type &type, CPlaye
 **
 **  @return        Pointer to created unit.
 */
-CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, const int z, const bool no_building_bordering_impassable, const site *settlement)
+CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, const int z, const bool no_building_bordering_impassable, const site *settlement, const bool ignore_ontop)
 {
 	CUnit *unit = MakeUnit(type, player);
 
@@ -4307,9 +4307,9 @@ CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, cons
 		unit->MapLayer = CMap::get()->MapLayers[z].get();
 
 		const int heading = SyncRand(256);
-		const QPoint res_pos = FindNearestDrop(type, pos, heading, z, no_building_bordering_impassable, false, settlement);
+		const QPoint res_pos = FindNearestDrop(type, pos, heading, z, no_building_bordering_impassable, ignore_ontop, settlement);
 		
-		if (type.BoolFlag[BUILDING_INDEX].value) {
+		if (type.BoolFlag[BUILDING_INDEX].value && !ignore_ontop) {
 			const CBuildRestrictionOnTop *b = OnTopDetails(type, nullptr);
 			if (b && b->ReplaceOnBuild) {
 				CUnitCache &unitCache = CMap::get()->Field(res_pos, z)->UnitCache;
