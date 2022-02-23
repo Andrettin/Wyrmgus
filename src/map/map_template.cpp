@@ -2823,7 +2823,7 @@ void map_template::load_0_ad_terrain_file()
 			if (xml_reader.name() == "WaterBody") {
 				uint16_t water_height = 0;
 
-				static constexpr int water_height_multiplier = 112;
+				const int water_height_multiplier = defines::get()->get_0_ad_water_height_multiplier();
 
 				while (xml_reader.readNextStartElement()) {
 					if (xml_reader.name() == "Height") {

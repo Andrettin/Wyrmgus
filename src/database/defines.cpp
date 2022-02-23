@@ -77,6 +77,8 @@ void defines::process_gsml_property(const gsml_property &property)
 		this->infopanel_frame_graphics = CGraphic::New(value);
 	} else if (key == "progress_bar_file") {
 		this->progress_bar_graphics = CGraphic::New(value);
+	} else if (key == "0_ad_water_height_multiplier") {
+		this->zero_ad_water_height_multiplier = std::stoi(value);
 	} else {
 		database::process_gsml_property_for_object(this, property);
 	}
@@ -126,7 +128,7 @@ void defines::process_gsml_scope(const gsml_data &scope)
 		}
 	} else if (tag == "0_ad_template_resource_amounts") {
 		scope.for_each_property([&](const gsml_property &property) {
-			this->mapped_0_ad_template_resource_amounts[property.get_key()] = std::stoi(property.get_value());
+			this->zero_ad_template_resource_amounts[property.get_key()] = std::stoi(property.get_value());
 		});
 	} else {
 		database::process_gsml_scope_for_object(this, scope);

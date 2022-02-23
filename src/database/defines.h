@@ -493,13 +493,18 @@ public:
 
 	int get_0_ad_template_resource_amount(const std::string &template_name) const
 	{
-		const auto find_iterator = this->mapped_0_ad_template_resource_amounts.find(template_name);
+		const auto find_iterator = this->zero_ad_template_resource_amounts.find(template_name);
 
-		if (find_iterator != this->mapped_0_ad_template_resource_amounts.end()) {
+		if (find_iterator != this->zero_ad_template_resource_amounts.end()) {
 			return find_iterator->second;
 		}
 
 		throw std::runtime_error("No resource amount set for 0 A.D. template \"" + template_name + "\".");
+	}
+
+	int get_0_ad_water_height_multiplier() const
+	{
+		return this->zero_ad_water_height_multiplier;
 	}
 
 signals:
@@ -571,7 +576,8 @@ private:
 	std::vector<std::filesystem::path> loading_background_files;
 	std::vector<std::string> tips;
 	std::set<std::string> ignored_0_ad_template_names;
-	std::map<std::string, int> mapped_0_ad_template_resource_amounts;
+	std::map<std::string, int> zero_ad_template_resource_amounts;
+	int zero_ad_water_height_multiplier = 0;
 };
 
 }
