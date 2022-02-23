@@ -188,6 +188,16 @@ public:
 		return nullptr;
 	}
 
+	static terrain_type *try_get_by_0_ad_template_name(const std::string &str)
+	{
+		const auto find_iterator = terrain_type::terrain_types_by_0_ad_template_name.find(str);
+		if (find_iterator != terrain_type::terrain_types_by_0_ad_template_name.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+
 	static terrain_type *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		terrain_type *terrain_type = data_type::add(identifier, data_module);
@@ -204,6 +214,7 @@ public:
 		terrain_type::terrain_types_by_tile_number.clear();
 		terrain_type::terrain_types_by_wesnoth_string.clear();
 		terrain_type::terrain_types_by_0_ad_texture_name.clear();
+		terrain_type::terrain_types_by_0_ad_template_name.clear();
 	}
 
 	explicit terrain_type(const std::string &identifier);
@@ -217,6 +228,7 @@ private:
 	static inline std::map<int, terrain_type *> terrain_types_by_tile_number;
 	static inline std::map<std::string, terrain_type *> terrain_types_by_wesnoth_string;
 	static inline std::map<std::string, terrain_type *> terrain_types_by_0_ad_texture_name;
+	static inline std::map<std::string, terrain_type *> terrain_types_by_0_ad_template_name;
 
 public:
 	virtual void process_gsml_property(const gsml_property &property) override;
@@ -244,6 +256,7 @@ public:
 	void map_to_tile_number(const int tile_number);
 	void map_to_wesnoth_string(const std::string &str);
 	void map_to_0_ad_texture_name(const std::string &str);
+	void map_to_0_ad_template_name(const std::string &str);
 
 	const std::filesystem::path &get_image_file() const
 	{

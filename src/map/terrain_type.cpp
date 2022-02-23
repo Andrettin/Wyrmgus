@@ -122,6 +122,10 @@ void terrain_type::process_gsml_scope(const gsml_data &scope)
 		for (const std::string &value : values) {
 			this->map_to_0_ad_texture_name(value);
 		}
+	} else if (tag == "0_ad_template_names") {
+		for (const std::string &value : values) {
+			this->map_to_0_ad_template_name(value);
+		}
 	} else if (tag == "flags") {
 		for (const std::string &value : values) {
 			const tile_flag flag = string_to_tile_flag(value);
@@ -416,6 +420,15 @@ void terrain_type::map_to_0_ad_texture_name(const std::string &str)
 	}
 
 	terrain_type::terrain_types_by_0_ad_texture_name[str] = this;
+}
+
+void terrain_type::map_to_0_ad_template_name(const std::string &str)
+{
+	if (terrain_type::try_get_by_0_ad_template_name(str) != nullptr) {
+		throw std::runtime_error("0 A.D. template name \"" + str + "\" is already used by another terrain type.");
+	}
+
+	terrain_type::terrain_types_by_0_ad_template_name[str] = this;
 }
 
 void terrain_type::set_image_file(const std::filesystem::path &filepath)

@@ -91,6 +91,8 @@
 #include "util/vector_util.h"
 #include "video/video.h"
 
+#include <QXmlStreamReader>
+
 namespace wyrmgus {
 
 //map templates must be initialized after sites, as sites add themselves to the map template site list in their initialization function, and during map template initialization the sites are then sorted
@@ -2751,8 +2753,6 @@ void map_template::load_0_ad_terrain_file()
 {
 	const std::filesystem::path &terrain_filepath = this->get_terrain_file();
 
-	std::vector<std::vector<std::string>> terrain_strings;
-
 	std::ifstream map_ifstream(terrain_filepath, std::ios::binary);
 	map_ifstream.exceptions(std::ifstream::badbit | std::ifstream::failbit | std::ifstream::eofbit);
 
@@ -2798,6 +2798,82 @@ void map_template::load_0_ad_terrain_file()
 			patch_x = 0;
 			--patch_y;
 		}
+	}
+
+	std::filesystem::path xml_filepath = terrain_filepath;
+	xml_filepath.replace_extension(".xml");
+
+	QFile file(path::to_qstring(xml_filepath));
+	if (!file.open(QIODevice::ReadOnly)) {
+		assert_throw(false);
+	}
+
+	QXmlStreamReader xml_reader(&file);
+
+	static constexpr int pos_divisor = 4;
+
+	while (!xml_reader.atEnd()) {
+		const QXmlStreamReader::TokenType tokenType = xml_reader.readNext();
+
+		if (tokenType == QXmlStreamReader::StartElement) {
+			if (xml_reader.name() == "Entity") {
+				std::string template_name;
+				int player = PlayerNumNeutral;
+				QPoint pos(-1, -1);
+
+				while (xml_reader.readNextStartElement()) {
+					if (xml_reader.name() == "Template") {
+						template_name = xml_reader.readElementText().toStdString();
+					} else if (xml_reader.name() == "Player") {
+						const int xml_player = xml_reader.readElementText().toInt();
+
+						if (xml_player == 0) {
+							player = PlayerNumNeutral;
+						} else {
+							player = xml_player - 1;
+						}
+					} else if (xml_reader.name() == "Position") {
+						const QXmlStreamAttributes attributes = xml_reader.attributes();
+						const double xml_x = attributes.value("x").toDouble();
+						const double xml_y = attributes.value("z").toDouble();
+
+						const int x = static_cast<int>(xml_x / pos_divisor);
+						const int y = this->terrain_image.height() - static_cast<int>(xml_y / pos_divisor) - 1;
+						pos = QPoint(x, y);
+					} else {
+						xml_reader.skipCurrentElement();
+					}
+				}
+
+				assert_throw(!template_name.empty());
+				assert_throw(pos != QPoint(-1, -1));
+
+				const terrain_type *terrain = terrain_type::try_get_by_0_ad_template_name(template_name);
+				if (terrain != nullptr) {
+					const QColor &color = terrain->get_color();
+
+					if (!color.isValid()) {
+						throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
+					}
+
+					for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+						for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+							const QPoint tile_pos = pos + QPoint(x_offset, y_offset);
+
+							if (!this->terrain_image.rect().contains(tile_pos)) {
+								continue;
+							}
+
+							this->terrain_image.setPixelColor(tile_pos, color);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (xml_reader.hasError()) {
+		throw std::runtime_error(xml_reader.errorString().toStdString());
 	}
 }
 
