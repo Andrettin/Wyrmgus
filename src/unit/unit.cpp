@@ -4329,28 +4329,28 @@ CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, cons
 	return unit;
 }
 
-CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int z, bool allow_unique)
+CUnit *CreateResourceUnit(const Vec2i &pos, const unit_type &type, int z, bool allow_unique)
 {
 	CUnit *unit = CreateUnit(pos, type, CPlayer::get_neutral_player(), z, true);
 	unit->generate_special_properties(nullptr, nullptr, allow_unique, false, false);
 			
 	// create metal rocks near metal resources
-	const wyrmgus::unit_type *metal_rock_type = nullptr;
+	const unit_type *metal_rock_type = nullptr;
 	if (type.get_identifier() == "unit_gold_deposit") {
-		metal_rock_type = wyrmgus::unit_type::get("unit_gold_rock");
+		metal_rock_type = unit_type::get("unit_gold_rock");
 	} else if (type.get_identifier() == "unit_silver_deposit") {
-		metal_rock_type = wyrmgus::unit_type::get("unit_silver_rock");
+		metal_rock_type = unit_type::get("unit_silver_rock");
 	} else if (type.get_identifier() == "unit_copper_deposit") {
-		metal_rock_type = wyrmgus::unit_type::get("unit_copper_rock");
+		metal_rock_type = unit_type::get("unit_copper_rock");
 	} else if (type.Ident == "unit-diamond-deposit") {
-		metal_rock_type = wyrmgus::unit_type::get("unit_diamond_rock");
+		metal_rock_type = unit_type::get("unit_diamond_rock");
 	} else if (type.Ident == "unit-emerald-deposit") {
-		metal_rock_type = wyrmgus::unit_type::get("unit_emerald_rock");
+		metal_rock_type = unit_type::get("unit_emerald_rock");
 	}
-	if (metal_rock_type) {
-		const Vec2i metal_rock_offset((type.get_tile_size() - QSize(1, 1)) / 2);
+
+	if (metal_rock_type != nullptr) {
 		for (int i = 0; i < 9; ++i) {
-			CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, CPlayer::get_neutral_player(), z);
+			CreateUnit(unit->get_center_tile_pos(), *metal_rock_type, CPlayer::get_neutral_player(), z);
 		}
 	}
 			
