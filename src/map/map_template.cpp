@@ -2917,6 +2917,10 @@ void map_template::load_0_ad_terrain_file()
 				}
 
 				if (unit_type != nullptr || unit_class != nullptr) {
+					if (unit_type != nullptr && unit_type->BoolFlag[FAUNA_INDEX].value) {
+						player = PlayerNumNeutral;
+					}
+
 					int resource_amount = 0;
 					if (unit_type != nullptr && unit_type->get_given_resource() != nullptr) {
 						resource_amount = defines::get()->get_0_ad_template_resource_amount(template_name);
