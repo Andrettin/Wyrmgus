@@ -437,29 +437,34 @@ QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinat
 		reference_subtemplate = this->get_map_template()->get_default_astrocoordinate_reference_subtemplate();
 	}
 
-	if (reference_subtemplate == nullptr) {
-		throw std::runtime_error("Could not convert astrocoordinate to pos for site \"" + this->get_identifier() + "\", as it has no astrocoordinate reference subtemplate.");
-	}
+	QSize reference_subtemplate_applied_size = QSize(0, 0);
 
-	const QSize reference_subtemplate_applied_size = reference_subtemplate->get_applied_size();
+	if (reference_subtemplate != nullptr) {
+		reference_subtemplate_applied_size = reference_subtemplate->get_applied_size();
+	}
 
 	const QPoint relative_pos = this->astrocoordinate_to_relative_pos(astrocoordinate, reference_subtemplate_applied_size);
 
 	QPoint base_pos;
-	if constexpr (use_map_pos) {
-		if (!reference_subtemplate->is_on_map()) {
-			throw std::runtime_error("Could not convert an astrocoordinate to a map pos for site \"" + this->get_identifier() + "\", as its reference subtemplate is not on the map.");
+	if (reference_subtemplate != nullptr) {
+		if constexpr (use_map_pos) {
+			if (!reference_subtemplate->is_on_map()) {
+				throw std::runtime_error("Could not convert an astrocoordinate to a map pos for site \"" + this->get_identifier() + "\", as its reference subtemplate is not on the map.");
+			}
+
+			base_pos = reference_subtemplate->get_current_map_start_pos();
+		} else {
+			if (reference_subtemplate->get_subtemplate_top_left_pos() == QPoint(-1, -1)) {
+				throw std::runtime_error("Could not convert an astrocoordinate to a pos for site \"" + this->get_identifier() + "\", as its reference subtemplate has no subtemplate position within the main template.");
+			}
+			base_pos = reference_subtemplate->get_top_template_relative_pos();
 		}
 
-		base_pos = reference_subtemplate->get_current_map_start_pos();
+		base_pos += QPoint(reference_subtemplate_applied_size.width() / 2 - 1, reference_subtemplate_applied_size.height() / 2 - 1);
 	} else {
-		if (reference_subtemplate->get_subtemplate_top_left_pos() == QPoint(-1, -1)) {
-			throw std::runtime_error("Could not convert an astrocoordinate to a pos for site \"" + this->get_identifier() + "\", as its reference subtemplate has no subtemplate position within the main template.");
-		}
-		base_pos = reference_subtemplate->get_top_template_relative_pos();
+		const QSize map_template_applied_size = this->get_map_template()->get_applied_size();
+		base_pos = QPoint(map_template_applied_size.width() / 2 - 1, map_template_applied_size.height() / 2 - 1);
 	}
-
-	base_pos += QPoint(reference_subtemplate_applied_size.width() / 2 - 1, reference_subtemplate_applied_size.height() / 2 - 1);
 
 	//apply the relative position of the celestial body to the reference subtemplate's center
 	return base_pos + relative_pos;
