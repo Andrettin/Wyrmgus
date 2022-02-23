@@ -2927,7 +2927,7 @@ void map_template::load_0_ad_terrain_file()
 					int quantity = 1;
 					if (resource_amount > 0 && unit_type != nullptr && unit_type->get_tile_size() == QSize(1, 1)) {
 						quantity = resource_amount / resource_amount_per_unit;
-						resource_amount /= resource_amount_per_unit;
+						resource_amount /= quantity;
 
 						assert_throw(quantity > 0);
 						assert_throw(resource_amount > 0);
