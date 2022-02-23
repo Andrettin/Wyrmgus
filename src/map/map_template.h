@@ -93,6 +93,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(wyrmgus::terrain_type* unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* surrounding_terrain_type MEMBER surrounding_terrain_type READ get_surrounding_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* surrounding_overlay_terrain_type MEMBER surrounding_overlay_terrain_type READ get_surrounding_overlay_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* default_water_terrain_type MEMBER default_water_terrain_type)
 	Q_PROPERTY(bool clear_terrain MEMBER clear_terrain)
 	Q_PROPERTY(bool clear_path_to_other_subtemplates MEMBER clear_path_to_other_subtemplates READ clears_path_to_other_subtemplates)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
@@ -744,6 +745,7 @@ private:
 	terrain_type *surrounding_overlay_terrain_type = nullptr;
 	terrain_type *unusable_area_terrain_type = nullptr; //the terrain type for the template's unusable area, e.g. the area outside its circle if the template is a circle
 	terrain_type *unusable_area_overlay_terrain_type = nullptr;
+	terrain_type *default_water_terrain_type = nullptr;
 	bool clear_terrain = false; //whether to clear terrain in the map template's area before applying
 	bool clear_path_to_other_subtemplates = false; //whether to clear a path to other subtemplates from this subtemplate's clear edge points
 	std::vector<map_template *> subtemplates;

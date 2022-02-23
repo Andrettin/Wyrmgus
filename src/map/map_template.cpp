@@ -2763,6 +2763,9 @@ void map_template::load_0_ad_terrain_file()
 	this->terrain_image = QImage(pmp.map_size * pmp_patch::tile_size, pmp.map_size * pmp_patch::tile_size, QImage::Format_RGBA8888);
 	this->terrain_image.fill(Qt::transparent);
 
+	this->overlay_terrain_image = QImage(pmp.map_size * pmp_patch::tile_size, pmp.map_size * pmp_patch::tile_size, QImage::Format_RGBA8888);
+	this->overlay_terrain_image.fill(Qt::transparent);
+
 	int patch_x = 0;
 	int patch_y = pmp.map_size - 1;
 	for (const pmp_patch &patch : pmp.patches) {
@@ -2812,11 +2815,55 @@ void map_template::load_0_ad_terrain_file()
 
 	static constexpr int pos_divisor = 4;
 
+	const QRect image_rect = this->overlay_terrain_image.rect();
+
 	while (!xml_reader.atEnd()) {
 		const QXmlStreamReader::TokenType tokenType = xml_reader.readNext();
 
 		if (tokenType == QXmlStreamReader::StartElement) {
-			if (xml_reader.name() == "Entity") {
+			if (xml_reader.name() == "WaterBody") {
+				uint16_t water_height = 0;
+
+				static constexpr int water_height_multiplier = 112;
+
+				while (xml_reader.readNextStartElement()) {
+					if (xml_reader.name() == "Height") {
+						water_height = static_cast<uint16_t>(xml_reader.readElementText().toDouble() * water_height_multiplier);
+					} else {
+						xml_reader.skipCurrentElement();
+					}
+				}
+
+				if (water_height > 0) {
+					assert_throw(this->default_water_terrain_type != nullptr);
+
+					int tile_x = 0;
+					int tile_y = image_rect.height() - 1;
+
+					for (const uint16_t tile_height : pmp.height_map) {
+						if (tile_height < water_height && image_rect.contains(tile_x, tile_y)) {
+							const terrain_type *terrain = this->default_water_terrain_type;
+							const QColor &color = terrain->get_color();
+
+							if (!color.isValid()) {
+								throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
+							}
+
+							this->overlay_terrain_image.setPixelColor(tile_x, tile_y, color);
+						}
+
+						++tile_x;
+						if (tile_x > image_rect.width()) {
+							tile_x = 0;
+							--tile_y;
+						}
+
+						if (tile_y < 0) {
+							break;
+						}
+					}
+				}
+			} else if (xml_reader.name() == "Entity") {
 				std::string template_name;
 				int player = PlayerNumNeutral;
 				QPoint pos(-1, -1);
@@ -2838,7 +2885,7 @@ void map_template::load_0_ad_terrain_file()
 						const double xml_y = attributes.value("z").toDouble();
 
 						const int x = static_cast<int>(xml_x / pos_divisor);
-						const int y = this->terrain_image.height() - static_cast<int>(xml_y / pos_divisor) - 1;
+						const int y = image_rect.height() - static_cast<int>(xml_y / pos_divisor) - 1;
 						pos = QPoint(x, y);
 					} else {
 						xml_reader.skipCurrentElement();
@@ -2860,11 +2907,11 @@ void map_template::load_0_ad_terrain_file()
 						for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 							const QPoint tile_pos = pos + QPoint(x_offset, y_offset);
 
-							if (!this->terrain_image.rect().contains(tile_pos)) {
+							if (!image_rect.contains(tile_pos)) {
 								continue;
 							}
 
-							this->terrain_image.setPixelColor(tile_pos, color);
+							this->overlay_terrain_image.setPixelColor(tile_pos, color);
 						}
 					}
 				}
