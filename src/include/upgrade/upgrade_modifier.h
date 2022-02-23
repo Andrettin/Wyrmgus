@@ -125,7 +125,6 @@ public:
 	// TODO: see below allow more semantics?
 	// TODO: pointers or ids would be faster and less memory use
 	int  ChangeUnits[UnitTypeMax];			/// add/remove allowed units
-	char ChangeUpgrades[UpgradeMax];		/// allow/forbid upgrades
 
 	unit_type *ConvertTo = nullptr;			/// convert to this unit-type.
 
@@ -133,6 +132,7 @@ public:
 	const faction *change_faction_to = nullptr;	//changes the player's faction to this one
 
 private:
+	std::vector<const CUpgrade *> free_upgrades; //upgrades granted for free when this upgrade modifier is applied
 	std::vector<const CUpgrade *> removed_upgrades; //upgrades to be removed when this upgrade modifier is applied
 
 	std::vector<unit_type *> unit_types; //which unit types are affected

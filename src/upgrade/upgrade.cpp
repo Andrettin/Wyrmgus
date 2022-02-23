@@ -877,13 +877,6 @@ static int CclDefineModifier(lua_State *l)
 			} else {
 				LuaError(l, "unit expected");
 			}
-		} else if (!strcmp(key, "allow")) {
-			const char *value = LuaToString(l, j + 1, 2);
-			//Wyrmgus start
-//			um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
-			um->ChangeUpgrades[CUpgrade::get(value)->ID] = *strdup(LuaToString(l, j + 1, 3));
-			//Wyrmgus end
-		//Wyrmgus start
 		} else if (!strcmp(key, "remove-upgrade")) {
 			const char *value = LuaToString(l, j + 1, 2);
 			CUpgrade *removed_upgrade = CUpgrade::get(value);

@@ -55,7 +55,6 @@ upgrade_modifier::upgrade_modifier(const CUpgrade *upgrade) : upgrade(upgrade)
 {
 	memset(this->ChangeUnits, 0, sizeof(this->ChangeUnits));
 	
-	memset(this->ChangeUpgrades, '?', sizeof(this->ChangeUpgrades));
 	this->Modifier.Variables.resize(UnitTypeVar.GetNumberVariable());
 	this->ModifyPercent = std::make_unique<int[]>(UnitTypeVar.GetNumberVariable());
 	memset(this->ModifyPercent.get(), 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
@@ -73,10 +72,10 @@ std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate(const CUpgrade *ne
 	memcpy(modifier->ImproveIncomes, this->ImproveIncomes, sizeof(modifier->ImproveIncomes));
 	modifier->UnitStock = this->UnitStock;
 	memcpy(modifier->ChangeUnits, this->ChangeUnits, sizeof(modifier->ChangeUnits));
-	memcpy(modifier->ChangeUpgrades, this->ChangeUpgrades, sizeof(modifier->ChangeUpgrades));
 	modifier->ConvertTo = this->ConvertTo;
 	modifier->change_civilization_to = this->change_civilization_to;
 	modifier->change_faction_to = this->change_faction_to;
+	modifier->free_upgrades = this->free_upgrades;
 	modifier->removed_upgrades = this->removed_upgrades;
 	modifier->unit_types = this->unit_types;
 	modifier->unit_classes = this->unit_classes;
@@ -123,6 +122,11 @@ void upgrade_modifier::process_gsml_scope(const gsml_data &scope)
 	} else if (tag == "unit_classes") {
 		for (const std::string &value : values) {
 			this->unit_classes.push_back(unit_class::get(value));
+		}
+	} else if (tag == "free_upgrades") {
+		for (const std::string &value : values) {
+			const CUpgrade *free_upgrade = CUpgrade::get(value);
+			this->free_upgrades.push_back(free_upgrade);
 		}
 	} else if (tag == "removed_upgrades") {
 		for (const std::string &value : values) {
@@ -257,39 +261,15 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 		}
 	}
 
-	for (int z = 0; z < UpgradeMax; ++z) {
-		// allow/forbid upgrades for player; only if upgrade is not acquired
-
-		if (this->ChangeUpgrades[z] == '?') {
-			continue;
-		}
-
-		// FIXME: check if modify is allowed
-
-		if (player->Allow.Upgrades[z] != 'R') {
-			if (this->ChangeUpgrades[z] == 'A') {
-				if (multiplier > 0) {
-					player->Allow.Upgrades[z] = 'A';
-				} else {
-					player->Allow.Upgrades[z] = 'F';
-				}
+	for (const CUpgrade *free_upgrade : this->free_upgrades) {
+		if (multiplier > 0) {
+			if (!player->has_upgrade(free_upgrade)) {
+				player->acquire_upgrade(free_upgrade);
 			}
-
-			if (this->ChangeUpgrades[z] == 'F') {
-				if (multiplier > 0) {
-					player->Allow.Upgrades[z] = 'F';
-				} else {
-					player->Allow.Upgrades[z] = 'A';
-				}
-			}
-
-			// we can even have upgrade acquired w/o costs
-			if (this->ChangeUpgrades[z] == 'R') {
-				if (multiplier > 0) {
-					player->Allow.Upgrades[z] = 'R';
-				} else {
-					player->Allow.Upgrades[z] = 'A';
-				}
+		} else {
+			//free upgrades are lost when the upgrade that granted them is removed
+			if (player->has_upgrade(free_upgrade)) {
+				player->lose_upgrade(free_upgrade);
 			}
 		}
 	}
