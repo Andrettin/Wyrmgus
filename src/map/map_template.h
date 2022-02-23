@@ -118,6 +118,8 @@ public:
 
 	static const std::set<std::string> database_dependencies;
 
+	static void set_terrain_image_pixel(QImage &terrain_image, const QPoint &pos, const terrain_type *terrain);
+
 	explicit map_template(const std::string &identifier);
 	~map_template();
 

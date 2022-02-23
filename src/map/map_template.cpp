@@ -98,6 +98,17 @@ namespace wyrmgus {
 //map templates must be initialized after sites, as sites add themselves to the map template site list in their initialization function, and during map template initialization the sites are then sorted
 const std::set<std::string> map_template::database_dependencies = { site::class_identifier };
 
+void map_template::set_terrain_image_pixel(QImage &terrain_image, const QPoint &pos, const terrain_type *terrain)
+{
+	const QColor &color = terrain->get_color();
+
+	if (!color.isValid()) {
+		throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
+	}
+
+	terrain_image.setPixelColor(pos, color);
+}
+
 map_template::map_template(const std::string &identifier)
 	: named_data_entry(identifier), CDataType(identifier),
 	georectangle(geocoordinate(geocoordinate::min_longitude, geocoordinate::min_latitude), geocoordinate(geocoordinate::max_longitude, geocoordinate::max_latitude))
@@ -2654,13 +2665,7 @@ void map_template::load_terrain_file(const bool overlay)
 					throw std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + this->get_identifier() + "\", as character \"" + terrain_character + "\".");
 				}
 
-				const QColor &color = terrain->get_color();
-
-				if (!color.isValid()) {
-					throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
-				}
-
-				terrain_image.setPixelColor(x, y, color);
+				map_template::set_terrain_image_pixel(terrain_image, QPoint(x, y), terrain);
 			} catch (...) {
 				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x + 1) + " of line " + std::to_string(y + 1) + " for terrain file \"" + terrain_file.string() + "\"."));
 			}
@@ -2724,23 +2729,11 @@ void map_template::load_wesnoth_terrain_file()
 				}
 
 				if (terrain != nullptr) {
-					const QColor &color = terrain->get_color();
-
-					if (!color.isValid()) {
-						throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
-					}
-
-					this->terrain_image.setPixelColor(x, y, color);
+					map_template::set_terrain_image_pixel(this->terrain_image, QPoint(x, y), terrain);
 				}
 
 				if (overlay_terrain != nullptr) {
-					const QColor &overlay_color = overlay_terrain->get_color();
-
-					if (!overlay_color.isValid()) {
-						throw std::runtime_error("Terrain \"" + overlay_terrain->get_identifier() + "\" has no color.");
-					}
-
-					this->overlay_terrain_image.setPixelColor(x, y, overlay_color);
+					map_template::set_terrain_image_pixel(this->overlay_terrain_image, QPoint(x, y), overlay_terrain);
 				}
 			} catch (...) {
 				std::throw_with_nested(std::runtime_error("Failed to process terrain string " + std::to_string(x + 1) + " of line " + std::to_string(y + 1) + " for terrain file \"" + terrain_filepath.string() + "\"."));
@@ -2777,16 +2770,10 @@ void map_template::load_0_ad_terrain_file()
 			const terrain_type *terrain = terrain_type::get_by_0_ad_texture_name(std::string(texture_name.to_string_view()));
 
 			if (terrain != nullptr) {
-				const QColor &color = terrain->get_color();
-
-				if (!color.isValid()) {
-					throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
-				}
-
 				const int tile_x = patch_x * pmp_patch::tile_size + tile_offset_x;
 				const int tile_y = patch_y * pmp_patch::tile_size + tile_offset_y;
 
-				this->terrain_image.setPixelColor(tile_x, tile_y, color);
+				map_template::set_terrain_image_pixel(this->terrain_image, QPoint(tile_x, tile_y), terrain);
 			}
 
 			++tile_offset_x;
@@ -2843,13 +2830,7 @@ void map_template::load_0_ad_terrain_file()
 					for (const uint16_t tile_height : pmp.height_map) {
 						if (tile_height < water_height && image_rect.contains(tile_x, tile_y)) {
 							const terrain_type *terrain = this->default_water_terrain_type;
-							const QColor &color = terrain->get_color();
-
-							if (!color.isValid()) {
-								throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
-							}
-
-							this->overlay_terrain_image.setPixelColor(tile_x, tile_y, color);
+							map_template::set_terrain_image_pixel(this->overlay_terrain_image, QPoint(tile_x, tile_y), terrain);
 						}
 
 						++tile_x;
@@ -2897,12 +2878,6 @@ void map_template::load_0_ad_terrain_file()
 
 				const terrain_type *terrain = terrain_type::try_get_by_0_ad_template_name(template_name);
 				if (terrain != nullptr) {
-					const QColor &color = terrain->get_color();
-
-					if (!color.isValid()) {
-						throw std::runtime_error("Terrain \"" + terrain->get_identifier() + "\" has no color.");
-					}
-
 					for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 						for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 							const QPoint tile_pos = pos + QPoint(x_offset, y_offset);
@@ -2911,7 +2886,7 @@ void map_template::load_0_ad_terrain_file()
 								continue;
 							}
 
-							this->overlay_terrain_image.setPixelColor(tile_pos, color);
+							map_template::set_terrain_image_pixel(this->overlay_terrain_image, tile_pos, terrain);
 						}
 					}
 				}
