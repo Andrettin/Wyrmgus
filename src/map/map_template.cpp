@@ -2925,8 +2925,12 @@ void map_template::load_0_ad_terrain_file()
 					static constexpr int resource_amount_per_unit = 1000;
 
 					int quantity = 1;
-					if (resource_amount > 0) {
+					if (resource_amount > 0 && unit_type != nullptr && unit_type->get_tile_size() == QSize(1, 1)) {
 						quantity = resource_amount / resource_amount_per_unit;
+						resource_amount /= resource_amount_per_unit;
+
+						assert_throw(quantity > 0);
+						assert_throw(resource_amount > 0);
 					}
 
 					for (int i = 0; i < quantity; ++i) {
@@ -2935,7 +2939,7 @@ void map_template::load_0_ad_terrain_file()
 						unit->set_pos(pos);
 						unit->set_player_index(player);
 						if (resource_amount > 0) {
-							unit->set_resource_amount(resource_amount_per_unit);
+							unit->set_resource_amount(resource_amount);
 						}
 						this->units.push_back(std::move(unit));
 					}
