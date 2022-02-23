@@ -1999,14 +1999,16 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				player->SetStartView(unit_pos, z);
 			}
 
-			CUnit *unit = CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z, true, nullptr, true);
-
 			const int resource_amount = map_template_unit->get_resource_amount();
+
 			if (resource_amount > 0) {
+				CUnit *unit = CreateResourceUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, z, false);
 				unit->SetResourcesHeld(resource_amount);
 				unit->Variable[GIVERESOURCE_INDEX].Value = resource_amount;
 				unit->Variable[GIVERESOURCE_INDEX].Max = resource_amount;
 				unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
+			} else {
+				CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z, true, nullptr, true);
 			}
 		}
 	}
