@@ -38,6 +38,8 @@
 #include "map/tileset.h"
 #include "player/player_color.h"
 #include "time/season.h"
+#include "unit/unit_class.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/colorization_type.h"
 #include "util/container_util.h"
@@ -426,6 +428,14 @@ void terrain_type::map_to_0_ad_template_name(const std::string &str)
 {
 	if (terrain_type::try_get_by_0_ad_template_name(str) != nullptr) {
 		throw std::runtime_error("0 A.D. template name \"" + str + "\" is already used by another terrain type.");
+	}
+
+	if (unit_class::try_get_by_0_ad_template_name(str) != nullptr) {
+		throw std::runtime_error("0 A.D. template name \"" + str + "\" is already used by a unit class.");
+	}
+
+	if (unit_type::try_get_by_0_ad_template_name(str) != nullptr) {
+		throw std::runtime_error("0 A.D. template name \"" + str + "\" is already used by a unit type.");
 	}
 
 	terrain_type::terrain_types_by_0_ad_template_name[str] = this;

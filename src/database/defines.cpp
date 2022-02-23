@@ -120,6 +120,14 @@ void defines::process_gsml_scope(const gsml_data &scope)
 		for (const std::string &value : values) {
 			terrain_type::map_to_wesnoth_string(nullptr, value);
 		}
+	} else if (tag == "ignored_0_ad_template_names") {
+		for (const std::string &value : values) {
+			this->ignored_0_ad_template_names.insert(value);
+		}
+	} else if (tag == "0_ad_template_resource_amounts") {
+		scope.for_each_property([&](const gsml_property &property) {
+			this->mapped_0_ad_template_resource_amounts[property.get_key()] = std::stoi(property.get_value());
+		});
 	} else {
 		database::process_gsml_scope_for_object(this, scope);
 	}

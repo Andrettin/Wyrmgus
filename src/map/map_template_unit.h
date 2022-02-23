@@ -54,9 +54,19 @@ public:
 		return this->unit_class;
 	}
 
+	void set_unit_class(const wyrmgus::unit_class *unit_class)
+	{
+		this->unit_class = unit_class;
+	}
+
 	const QPoint &get_pos() const
 	{
 		return this->pos;
+	}
+
+	void set_pos(const QPoint &pos)
+	{
+		this->pos = pos;
 	}
 
 	const wyrmgus::faction *get_faction() const
@@ -69,12 +79,28 @@ public:
 		return this->player_index;
 	}
 
+	void set_player_index(const int index)
+	{
+		this->player_index = index;
+	}
+
+	int get_resource_amount() const
+	{
+		return this->resource_amount;
+	}
+
+	void set_resource_amount(const int amount)
+	{
+		this->resource_amount = amount;
+	}
+
 private:
 	const unit_type *type = nullptr;
 	const wyrmgus::unit_class *unit_class = nullptr;
 	QPoint pos = QPoint(0, 0);
 	const wyrmgus::faction *faction = nullptr;
 	int player_index = -1;
+	int resource_amount = 0;
 };
 
 }

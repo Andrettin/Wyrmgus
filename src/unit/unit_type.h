@@ -804,6 +804,23 @@ public:
 		return unit_type;
 	}
 
+	static const unit_type *try_get_by_0_ad_template_name(const std::string &str)
+	{
+		const auto find_iterator = unit_type::unit_types_by_0_ad_template_name.find(str);
+		if (find_iterator != unit_type::unit_types_by_0_ad_template_name.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+
+	static void clear()
+	{
+		data_type::clear();
+
+		unit_type::unit_types_by_0_ad_template_name.clear();
+	}
+
 	static bool compare_building_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs);
 	static bool compare_item_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs);
 	static bool compare_unit_encyclopedia_entries(const unit_type *lhs, const unit_type *rhs);
@@ -860,6 +877,10 @@ public:
 		return entries;
 	}
 
+private:
+	static inline std::map<std::string, const unit_type *> unit_types_by_0_ad_template_name;
+
+public:
 	explicit unit_type(const std::string &identifier);
 	~unit_type();
 
@@ -1300,6 +1321,8 @@ public:
 	{
 		return this->disabled;
 	}
+
+	void map_to_0_ad_template_name(const std::string &str);
 
 signals:
 	void changed();

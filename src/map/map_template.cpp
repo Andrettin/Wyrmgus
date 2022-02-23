@@ -1997,7 +1997,15 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				player->SetStartView(unit_pos, z);
 			}
 
-			CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z);
+			CUnit *unit = CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z);
+
+			const int resource_amount = map_template_unit->get_resource_amount();
+			if (resource_amount > 0) {
+				unit->SetResourcesHeld(resource_amount);
+				unit->Variable[GIVERESOURCE_INDEX].Value = resource_amount;
+				unit->Variable[GIVERESOURCE_INDEX].Max = resource_amount;
+				unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
+			}
 		}
 	}
 
@@ -2804,6 +2812,8 @@ void map_template::load_0_ad_terrain_file()
 
 	const QRect image_rect = this->overlay_terrain_image.rect();
 
+	this->units.clear();
+
 	while (!xml_reader.atEnd()) {
 		const QXmlStreamReader::TokenType tokenType = xml_reader.readNext();
 
@@ -2876,6 +2886,10 @@ void map_template::load_0_ad_terrain_file()
 				assert_throw(!template_name.empty());
 				assert_throw(pos != QPoint(-1, -1));
 
+				if (defines::get()->is_0_ad_template_name_ignored(template_name)) {
+					continue;
+				}
+
 				const terrain_type *terrain = terrain_type::try_get_by_0_ad_template_name(template_name);
 				if (terrain != nullptr) {
 					for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -2889,7 +2903,45 @@ void map_template::load_0_ad_terrain_file()
 							map_template::set_terrain_image_pixel(this->overlay_terrain_image, tile_pos, terrain);
 						}
 					}
+
+					continue;
 				}
+
+				const unit_type *unit_type = unit_type::try_get_by_0_ad_template_name(template_name);
+				const unit_class *unit_class = nullptr;
+
+				if (unit_type == nullptr) {
+					unit_class = unit_class::try_get_by_0_ad_template_name(template_name);
+				}
+
+				if (unit_type != nullptr || unit_class != nullptr) {
+					int resource_amount = 0;
+					if (unit_type != nullptr && unit_type->get_given_resource() != nullptr) {
+						resource_amount = defines::get()->get_0_ad_template_resource_amount(template_name);
+					}
+
+					static constexpr int resource_amount_per_unit = 1000;
+
+					int quantity = 1;
+					if (resource_amount > 0) {
+						quantity = resource_amount / resource_amount_per_unit;
+					}
+
+					for (int i = 0; i < quantity; ++i) {
+						auto unit = std::make_unique<map_template_unit>(unit_type);
+						unit->set_unit_class(unit_class);
+						unit->set_pos(pos);
+						unit->set_player_index(player);
+						if (resource_amount > 0) {
+							unit->set_resource_amount(resource_amount_per_unit);
+						}
+						this->units.push_back(std::move(unit));
+					}
+
+					continue;
+				}
+
+				throw std::runtime_error("No terrain type, unit class or unit type found for 0 A.D. template name \"" + template_name + "\".");
 			}
 		}
 	}

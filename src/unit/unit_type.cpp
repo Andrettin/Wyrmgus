@@ -969,6 +969,10 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition>();
 		database::process_gsml_data(this->conditions, scope);
+	} else if (tag == "0_ad_template_names") {
+		for (const std::string &value : values) {
+			this->map_to_0_ad_template_name(value);
+		}
 	} else {
 		const std::string pascal_case_tag = string::snake_case_to_pascal_case(tag);
 
@@ -2698,6 +2702,23 @@ bool unit_type::can_be_dropped_on_pos(const QPoint &pos, const int z, const bool
 	}
 
 	return true;
+}
+
+void unit_type::map_to_0_ad_template_name(const std::string &str)
+{
+	if (terrain_type::try_get_by_0_ad_template_name(str) != nullptr) {
+		throw std::runtime_error("0 A.D. template name \"" + str + "\" is already used by a terrain type.");
+	}
+
+	if (unit_class::try_get_by_0_ad_template_name(str) != nullptr) {
+		throw std::runtime_error("0 A.D. template name \"" + str + "\" is already used by a unit class.");
+	}
+
+	if (unit_type::try_get_by_0_ad_template_name(str) != nullptr) {
+		throw std::runtime_error("0 A.D. template name \"" + str + "\" is already used by another unit type.");
+	}
+
+	unit_type::unit_types_by_0_ad_template_name[str] = this;
 }
 
 void resource_info::process_gsml_property(const gsml_property &property)

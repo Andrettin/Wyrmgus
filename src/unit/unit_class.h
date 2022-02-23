@@ -59,12 +59,30 @@ public:
 		return unit_class;
 	}
 
+	static const unit_class *try_get_by_0_ad_template_name(const std::string &str)
+	{
+		const auto find_iterator = unit_class::unit_classes_by_0_ad_template_name.find(str);
+		if (find_iterator != unit_class::unit_classes_by_0_ad_template_name.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+
 	static const std::vector<unit_class *> &get_town_hall_classes()
 	{
 		return unit_class::town_hall_classes;
 	}
 
+	static void clear()
+	{
+		data_type::clear();
+
+		unit_class::unit_classes_by_0_ad_template_name.clear();
+	}
+
 private:
+	static inline std::map<std::string, const unit_class *> unit_classes_by_0_ad_template_name;
 	static inline std::vector<unit_class *> town_hall_classes;
 
 public:
@@ -163,6 +181,8 @@ public:
 	int get_tech_tree_relative_x() const;
 	int get_tech_tree_y() const;
 	int get_tech_tree_width() const;
+
+	void map_to_0_ad_template_name(const std::string &str);
 
 private:
 	int index = -1;

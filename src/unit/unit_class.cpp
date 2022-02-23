@@ -28,7 +28,9 @@
 
 #include "unit/unit_class.h"
 
+#include "map/terrain_type.h"
 #include "script/condition/and_condition.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "util/vector_util.h"
 
@@ -45,6 +47,7 @@ unit_class::~unit_class()
 void unit_class::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition>();
@@ -52,6 +55,10 @@ void unit_class::process_gsml_scope(const gsml_data &scope)
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition>();
 		database::process_gsml_data(this->conditions, scope);
+	} else if (tag == "0_ad_template_names") {
+		for (const std::string &value : values) {
+			this->map_to_0_ad_template_name(value);
+		}
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}
@@ -171,6 +178,23 @@ int unit_class::get_tech_tree_width() const
 	}
 
 	return std::max(children_width, 1);
+}
+
+void unit_class::map_to_0_ad_template_name(const std::string &str)
+{
+	if (terrain_type::try_get_by_0_ad_template_name(str) != nullptr) {
+		throw std::runtime_error("0 A.D. template name \"" + str + "\" is already used by a terrain type.");
+	}
+
+	if (unit_class::try_get_by_0_ad_template_name(str) != nullptr) {
+		throw std::runtime_error("0 A.D. template name \"" + str + "\" is already used by another unit class.");
+	}
+
+	if (unit_type::try_get_by_0_ad_template_name(str) != nullptr) {
+		throw std::runtime_error("0 A.D. template name \"" + str + "\" is already used by a unit type.");
+	}
+
+	unit_class::unit_classes_by_0_ad_template_name[str] = this;
 }
 
 }

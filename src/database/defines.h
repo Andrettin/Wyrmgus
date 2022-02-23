@@ -486,6 +486,22 @@ public:
 
 	Q_INVOKABLE void remove_tip(const std::string &tip);
 
+	bool is_0_ad_template_name_ignored(const std::string &template_name) const
+	{
+		return this->ignored_0_ad_template_names.contains(template_name);
+	}
+
+	int get_0_ad_template_resource_amount(const std::string &template_name) const
+	{
+		const auto find_iterator = this->mapped_0_ad_template_resource_amounts.find(template_name);
+
+		if (find_iterator != this->mapped_0_ad_template_resource_amounts.end()) {
+			return find_iterator->second;
+		}
+
+		throw std::runtime_error("No resource amount set for 0 A.D. template \"" + template_name + "\".");
+	}
+
 signals:
 	void changed();
 
@@ -554,6 +570,8 @@ private:
 	std::filesystem::path default_menu_background_file;
 	std::vector<std::filesystem::path> loading_background_files;
 	std::vector<std::string> tips;
+	std::set<std::string> ignored_0_ad_template_names;
+	std::map<std::string, int> mapped_0_ad_template_resource_amounts;
 };
 
 }
