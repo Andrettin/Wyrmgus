@@ -419,7 +419,7 @@ QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astro
 	astrodistance_value += site::base_astrodistance_additive_modifier;
 	astrodistance_value += this->get_astrodistance_additive_modifier();
 	if (this->orbits_map_template()) {
-		astrodistance_value += number::cbrt(this->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
+		astrodistance_value += (number::cbrt(this->get_distance_from_orbit_center()) * this->get_map_template()->get_orbit_distance_multiplier()).to_int();
 	} else {
 		astrodistance_value += this->get_map_template()->get_astrodistance_additive_modifier();
 	}
@@ -487,12 +487,13 @@ QSize site::get_size_with_satellites() const
 	QSize size = this->get_size();
 
 	int max_satellite_space = 0;
+	const decimillesimal_int orbit_distance_multiplier = this->get_top_orbit_center()->get_map_template()->get_orbit_distance_multiplier();
 
 	for (const site *satellite : this->get_satellites()) {
 		const QSize satellite_size = satellite->get_size_with_satellites();
 
 		int satellite_space = site::base_orbit_distance;
-		satellite_space += number::cbrt(satellite->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
+		satellite_space = std::max((isqrt(satellite->get_distance_from_orbit_center()) * orbit_distance_multiplier).to_int(), satellite_space);
 		satellite_space += satellite_size.width();
 
 		if (satellite_space > max_satellite_space) {

@@ -1438,7 +1438,8 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 			int64_t satellite_orbit_distance = orbit_distance;
 			satellite_orbit_distance += satellite_size.width() / 2;
-			satellite_orbit_distance += number::cbrt(satellite->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
+
+			satellite_orbit_distance = std::max<int64_t>((isqrt(satellite->get_distance_from_orbit_center()) * this->get_orbit_distance_multiplier()).to_int(), satellite_orbit_distance);
 
 			const QPoint satellite_pos = this->generate_site_orbit_position(satellite, z, satellite_orbit_distance);
 
@@ -3490,8 +3491,6 @@ QPoint map_template::generate_site_orbit_position(const site *site, const int z,
 			potential_circle_points.emplace_back(x, y);
 		}
 	}
-
-	const QSize site_size = site->get_size_with_satellites();
 
 	const site_game_data *orbit_center_game_data = site->get_orbit_center()->get_game_data();
 
