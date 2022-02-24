@@ -493,7 +493,7 @@ QSize site::get_size_with_satellites() const
 		const QSize satellite_size = satellite->get_size_with_satellites();
 
 		int satellite_space = site::base_orbit_distance;
-		satellite_space = std::max((isqrt(satellite->get_distance_from_orbit_center()) * orbit_distance_multiplier).to_int(), satellite_space);
+		satellite_space = std::max((isqrt(satellite->get_distance_from_orbit_center()) * orbit_distance_multiplier).to_int() + satellite->get_astrodistance_additive_modifier(), satellite_space);
 		satellite_space += satellite_size.width();
 
 		if (satellite_space > max_satellite_space) {
