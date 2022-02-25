@@ -1439,7 +1439,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			int64_t satellite_orbit_distance = orbit_distance;
 			satellite_orbit_distance += satellite_size.width() / 2;
 
-			satellite_orbit_distance = std::max<int64_t>((isqrt(satellite->get_distance_from_orbit_center()) * this->get_orbit_distance_multiplier()).to_int() + satellite->get_astrodistance_additive_modifier(), satellite_orbit_distance);
+			satellite_orbit_distance = std::max<int64_t>((number::cbrt(satellite->get_distance_from_orbit_center()) * this->get_orbit_distance_multiplier()).to_int() + satellite->get_astrodistance_additive_modifier(), satellite_orbit_distance);
 
 			const QPoint satellite_pos = this->generate_site_orbit_position(satellite, z, satellite_orbit_distance);
 
