@@ -1396,6 +1396,10 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			}
 		}
 
+		if (site->get_orbit_center() != nullptr && site->get_base_unit_type() != nullptr && site->get_base_unit_type()->BoolFlag[CELESTIAL_BODY_INDEX].value) {
+			CMap::get()->add_orbiting_celestial_body_unit(unit);
+		}
+
 		if (site->get_mass() != 0 && base_unit_type->get_default_mass() != 0 && site->get_mass() != base_unit_type->get_default_mass() && unit->ResourcesHeld != 0) {
 			//change the unit's resources held depending on the difference between its mass and the default mass of its base unit type
 			const int mass_multiplier = resource::get_mass_multiplier(site->get_mass(), base_unit_type->get_default_mass());

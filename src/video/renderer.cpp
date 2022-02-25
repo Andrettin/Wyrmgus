@@ -210,4 +210,13 @@ void renderer::draw_line(const QPoint &start_pos, const QPoint &end_pos, const Q
 	this->painter->drawLine(start_pos + QPoint(1, 1), end_pos + QPoint(1, 1));
 }
 
+void renderer::draw_circle(const QPoint &pos, const int radius, const QColor &color, const double line_width)
+{
+	QPen pen(color);
+	pen.setWidthF(line_width);
+
+	this->painter->setPen(pen);
+	this->painter->drawEllipse(pos, radius, radius);
+}
+
 }

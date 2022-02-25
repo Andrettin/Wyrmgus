@@ -133,6 +133,8 @@ public:
 		this->draw_line(pos, end_pos, color, line_width);
 	}
 
+	void draw_circle(const QPoint &pos, const int radius, const QColor &color, const double line_width = 1.0);
+
 private:
 	const frame_buffer_object *fbo = nullptr;
 	QOpenGLTextureBlitter blitter;

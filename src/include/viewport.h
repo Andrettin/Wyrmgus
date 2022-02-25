@@ -149,6 +149,8 @@ public:
 		this->rect.setBottomRight(bottom_right_pos);
 	}
 
+	const QRect get_map_rect() const;
+
 private:
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const PixelPos &mapPixelPos);

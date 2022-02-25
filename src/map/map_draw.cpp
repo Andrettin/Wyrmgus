@@ -37,6 +37,8 @@
 #include "map/map.h"
 #include "map/map_info.h"
 #include "map/map_layer.h"
+#include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
@@ -54,6 +56,7 @@
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
 #include "util/colorization_type.h"
+#include "util/point_util.h"
 #include "util/size_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
@@ -193,6 +196,13 @@ QRect CViewport::get_unit_type_box_rect(const unit_type *unit_type, const QPoint
 	const QPoint pixel_center_pos = this->TilePosToScreen_TopLeft(tile_pos) + unit_type->get_scaled_half_tile_pixel_size();
 
 	return unit_type->get_scaled_box_rect(pixel_center_pos);
+}
+
+const QRect CViewport::get_map_rect() const
+{
+	const QPoint top_left = CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(this->MapPos) - QPoint(1, 1);
+
+	return QRect(top_left, this->get_pixel_size());
 }
 
 /**
@@ -488,6 +498,7 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 	{
 		// Now we need to sort units, missiles, particles by draw level and draw them
 		std::vector<CUnit *> unittable;
+		std::vector<CUnit *> celestial_bodies;
 		std::vector<Missile *> missiletable;
 		std::vector<CParticle *> particletable;
 
@@ -497,11 +508,45 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 		const size_t nmissiles = missiletable.size();
 		ParticleManager.prepareToDraw(*this, particletable);
 		const size_t nparticles = particletable.size();
+
+		//draw celestial body orbits beneath all units and missiles
+		const QRect map_rect = this->get_map_rect();
+
+		for (const CUnit *celestial_body : CMap::get()->get_orbiting_celestial_body_units()) {
+			if (celestial_body->get_site() == nullptr) {
+				continue;
+			}
+
+			const site *orbit_center = celestial_body->get_site()->get_orbit_center();
+			if (orbit_center == nullptr) {
+				continue;
+			}
+
+			const CUnit *orbit_center_unit = orbit_center->get_game_data()->get_site_unit();
+			if (orbit_center_unit == nullptr) {
+				continue;
+			}
+
+			const QPoint celestial_body_center_pixel_pos = celestial_body->get_scaled_map_pixel_pos_center();
+			const QPoint orbit_center_pixel_pos = orbit_center_unit->get_scaled_map_pixel_pos_center();
+
+			const int pixel_distance = point::distance_to(celestial_body_center_pixel_pos, orbit_center_pixel_pos);
+			const QRect orbit_rect(orbit_center_pixel_pos - QPoint(pixel_distance, pixel_distance), orbit_center_pixel_pos + QPoint(pixel_distance, pixel_distance));
+
+			if (!orbit_rect.intersects(map_rect)) {
+				continue;
+			}
+
+			const QPoint orbit_center_screen_pixel_pos = this->scaled_map_to_screen_pixel_pos(orbit_center_pixel_pos);
+
+			render_commands.push_back([orbit_center_screen_pixel_pos, pixel_distance](renderer *renderer) {
+				renderer->draw_circle(orbit_center_screen_pixel_pos, pixel_distance, CVideo::GetRGBA(ColorBlue));
+			});
+		}
 		
 		size_t i = 0;
 		size_t j = 0;
 		size_t k = 0;
-
 
 		while ((i < nunits && j < nmissiles) || (i < nunits && k < nparticles)
 			   || (j < nmissiles && k < nparticles)) {

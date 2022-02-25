@@ -323,6 +323,10 @@ static int CclUnit(lua_State *l)
 			if (unit->site->is_settlement()) {
 				CMap::get()->add_settlement_unit(unit);
 			}
+
+			if (unit->site->get_orbit_center() != nullptr && unit->site->get_base_unit_type() != nullptr && unit->site->get_base_unit_type()->BoolFlag[CELESTIAL_BODY_INDEX].value) {
+				CMap::get()->add_orbiting_celestial_body_unit(unit);
+			}
 		} else if (!strcmp(value, "settlement")) {
 			unit->settlement = site::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "home_settlement")) {

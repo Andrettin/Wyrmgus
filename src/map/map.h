@@ -320,6 +320,21 @@ public:
 
 	void remove_settlement_unit(CUnit *settlement_unit);
 
+	const std::vector<const CUnit *> &get_orbiting_celestial_body_units() const
+	{
+		return this->orbiting_celestial_body_units;
+	}
+
+	void add_orbiting_celestial_body_unit(CUnit *celestial_body_unit)
+	{
+		this->orbiting_celestial_body_units.push_back(celestial_body_unit);
+	}
+
+	void remove_orbiting_celestial_body_unit(const CUnit *celestial_body_unit)
+	{
+		std::erase(this->orbiting_celestial_body_units, celestial_body_unit);
+	}
+
 private:
 	/// Build tables for fog of war
 	void InitFogOfWar();
@@ -351,6 +366,7 @@ public:
 private:
 	std::vector<std::unique_ptr<landmass>> landmasses;
 	std::vector<CUnit *> settlement_units;	/// the town hall / settlement site units
+	std::vector<const CUnit *> orbiting_celestial_body_units;
 	//Wyrmgus start
 public:
 	std::vector<std::unique_ptr<CMapLayer>> MapLayers;	/// the map layers composing the map

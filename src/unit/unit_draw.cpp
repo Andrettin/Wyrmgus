@@ -1392,7 +1392,9 @@ int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table)
 			table.pop_back();
 		}
 	}
+
 	assert_throw(n == table.size());
 	std::sort(table.begin(), table.begin() + n, DrawLevelCompare);
+
 	return n;
 }
