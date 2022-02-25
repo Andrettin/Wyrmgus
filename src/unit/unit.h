@@ -194,6 +194,7 @@ public:
 	void AddInContainer(CUnit &host);
 
 	void drop_out_nearest(const Vec2i &goal_pos, const CUnit *container);
+	void drop_out_on_side(const int heading, const CUnit *container);
 
 	//Wyrmgus start
 	void UpdateContainerAttackRange();
@@ -1089,9 +1090,6 @@ extern int DirectionToHeading(const Vec2i &dir);
 extern void UnitUpdateHeading(CUnit &unit, const bool notify = true);
 /// Heading and frame from delta direction
 extern void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta);
-
-/// @todo more docu
-extern void DropOutOnSide(CUnit &unit, int heading, const CUnit *container);
 
 /// Drop out all units in the unit
 extern void DropOutAll(const CUnit &unit);

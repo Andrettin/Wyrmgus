@@ -329,7 +329,7 @@ void COrder_Train::Execute(CUnit &unit)
 		AddToGroup(&newUnit, 1, num);
 	}
 
-	DropOutOnSide(*newUnit, LookingW, &unit);
+	newUnit->drop_out_on_side(LookingW, &unit);
 	if (&player == ThisPlayer) {
 		PlayUnitSound(*newUnit, VoiceReady);
 	}
@@ -399,7 +399,7 @@ void COrder_Train::Execute(CUnit &unit)
 		if (unit.has_rally_point() && unit.get_rally_point_map_layer() == unit.MapLayer) {
 			newUnit->drop_out_nearest(unit.get_rally_point_pos(), &unit);
 		} else {
-			DropOutOnSide(*newUnit, LookingW, &unit);
+			newUnit->drop_out_on_side(LookingW, &unit);
 		}
 
 		//Wyrmgus start

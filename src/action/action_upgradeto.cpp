@@ -237,7 +237,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 			if (uins->Boarded) {
 				uins->Boarded = 0;
 				unit.BoardCount -= uins->Type->BoardSize;
-				DropOutOnSide(*uins, LookingW, &unit);
+				uins->drop_out_on_side(LookingW, &unit);
 			}
 
 			if (unit.BoardCount <= newtype.MaxOnBoard) {

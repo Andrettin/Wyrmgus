@@ -822,7 +822,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 //		assert_throw(!resinfo.HarvestFromOutside);
 		assert_throw(!source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
 		//Wyrmgus end
-		DropOutOnSide(unit, LookingW, &source);
+		unit.drop_out_on_side(LookingW, &source);
 	}
 	this->goalPos.x = -1;
 	this->goalPos.y = -1;
@@ -1001,7 +1001,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 						}
 
 						if (unit.Container) {
-							DropOutOnSide(unit, LookingW, source);
+							unit.drop_out_on_side(LookingW, source);
 						}
 						this->Finished = true;
 						return 0;
@@ -1198,7 +1198,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer))) {
 		//Wyrmgus end
 			assert_throw(unit.Container != nullptr);
-			DropOutOnSide(unit, LookingW, source);
+			unit.drop_out_on_side(LookingW, source);
 		}
 		CUnit *mine = this->Resource.get_mine();
 
@@ -1400,7 +1400,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			//Wyrmgus end
 		} else {
 			if (depot) {
-				DropOutOnSide(unit, LookingW, depot);
+				unit.drop_out_on_side(LookingW, depot);
 			}
 			this->Finished = true;
 			return false;
@@ -1474,7 +1474,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 					   _C_ pos.x _C_ pos.y _C_ range);
 #endif // DEBUG
 			if (depot) {
-				DropOutOnSide(unit, LookingW, depot);
+				unit.drop_out_on_side(LookingW, depot);
 			}
 			if (mine) {
 				unit.DeAssignWorkerFromMine(*mine);

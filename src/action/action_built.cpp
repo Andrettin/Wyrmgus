@@ -165,7 +165,7 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 	if (worker != nullptr) {
 		worker->ClearAction();
 
-		DropOutOnSide(*worker, LookingW, &unit);
+		worker->drop_out_on_side(LookingW, &unit);
 	}
 	// Player gets back 75% of the original cost for a building.
 	const resource_map<int> type_costs = unit.Player->GetUnitTypeCosts(unit.Type, false, true);
@@ -241,7 +241,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		} else { // Drop out the worker.
 			worker->ClearAction();
 
-			DropOutOnSide(*worker, LookingW, &unit);
+			worker->drop_out_on_side(LookingW, &unit);
 
 			// If we can harvest from the new building, do it.
 			if (type.get_given_resource() != nullptr && worker->Type->get_resource_info(type.get_given_resource()) != nullptr) {

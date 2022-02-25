@@ -2886,7 +2886,7 @@ void CUnit::UpdateSoldUnits()
 void CUnit::SellUnit(CUnit *sold_unit, int player)
 {
 	this->SoldUnits.erase(std::remove(this->SoldUnits.begin(), this->SoldUnits.end(), sold_unit), this->SoldUnits.end());
-	DropOutOnSide(*sold_unit, sold_unit->Direction, this);
+	sold_unit->drop_out_on_side(sold_unit->Direction, this);
 	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
 		sold_unit->ChangeOwner(*CPlayer::Players[player]);
 	}
@@ -2970,7 +2970,7 @@ void CUnit::spawn_units(const std::vector<const unit_type *> &spawned_types)
 	const unit_type *spawned_type = vector::get_random(weighted_spawned_types);
 
 	CUnit *spawned_unit = MakeUnit(*spawned_type, this->Player);
-	DropOutOnSide(*spawned_unit, spawned_unit->Direction, this);
+	spawned_unit->drop_out_on_side(spawned_unit->Direction, this);
 }
 
 int CUnit::get_nearby_spawned_demand() const
@@ -3020,7 +3020,7 @@ void CUnit::ProduceResource(const wyrmgus::resource *resource)
 			CUnit *uins = uins_ref->get();
 			if (uins->Container == this) {
 				uins->CurrentOrder()->Finished = true;
-				DropOutOnSide(*uins, LookingW, this);
+				uins->drop_out_on_side(LookingW, this);
 			}
 		}
 		this->Resource.Active = 0;
@@ -4370,6 +4370,109 @@ void CUnit::drop_out_nearest(const Vec2i &goal_pos, const CUnit *container)
 }
 
 /**
+**  Place a unit on the map to the side of a unit.
+**
+**  @param unit       Unit to drop out.
+**  @param heading    Direction in which the unit should appear.
+**  @param container  Unit "containing" unit to drop (may be different of unit.Container).
+*/
+void CUnit::drop_out_on_side(const int heading, const CUnit *container)
+{
+	Vec2i pos;
+	int addx = 0;
+	int addy = 0;
+	//Wyrmgus start
+	int z;
+	//Wyrmgus end
+
+	if (container) {
+		pos = container->tilePos;
+		pos -= Vec2i(this->Type->get_tile_size() - QSize(1, 1));
+		addx = container->Type->get_tile_width() + this->Type->get_tile_width() - 1;
+		addy = container->Type->get_tile_height() + this->Type->get_tile_height() - 1;
+		z = container->MapLayer->ID;
+
+		if (heading < LookingNE || heading > LookingNW) {
+			pos.x += addx - 1;
+			--pos.y;
+			goto startn;
+		} else if (heading < LookingSE) {
+			pos.x += addx;
+			pos.y += addy - 1;
+			goto starte;
+		} else if (heading < LookingSW) {
+			pos.y += addy;
+			goto starts;
+		} else {
+			--pos.x;
+			goto startw;
+		}
+	} else {
+		pos = this->tilePos;
+		z = this->MapLayer->ID;
+
+		if (heading < LookingNE || heading > LookingNW) {
+			goto starts;
+		} else if (heading < LookingSE) {
+			goto startw;
+		} else if (heading < LookingSW) {
+			goto startn;
+		} else {
+			goto starte;
+		}
+	}
+	// FIXME: don't search outside of the map
+	for (;;) {
+	startw:
+		for (int i = addy; i--; ++pos.y) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(*this, pos)) {
+			if (UnitCanBeAt(*this, pos, z)) {
+				//Wyrmgus end
+				goto found;
+			}
+		}
+		++addx;
+	starts:
+		for (int i = addx; i--; ++pos.x) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(*this, pos)) {
+			if (UnitCanBeAt(*this, pos, z)) {
+				//Wyrmgus end
+				goto found;
+			}
+		}
+		++addy;
+	starte:
+		for (int i = addy; i--; --pos.y) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(*this, pos)) {
+			if (UnitCanBeAt(*this, pos, z)) {
+				//Wyrmgus end
+				goto found;
+			}
+		}
+		++addx;
+	startn:
+		for (int i = addx; i--; --pos.x) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(*this, pos)) {
+			if (UnitCanBeAt(*this, pos, z)) {
+				//Wyrmgus end
+				goto found;
+			}
+		}
+		++addy;
+	}
+
+found:
+	//Wyrmgus start
+//	this->Place(pos);
+	this->Place(pos, z);
+	//Wyrmgus end
+}
+
+/**
 **  Create new unit and place on map.
 **
 **  @param pos     map tile position.
@@ -5576,109 +5679,6 @@ void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta)
   ----------------------------------------------------------------------------*/
 
 /**
-**  Place a unit on the map to the side of a unit.
-**
-**  @param unit       Unit to drop out.
-**  @param heading    Direction in which the unit should appear.
-**  @param container  Unit "containing" unit to drop (may be different of unit.Container).
-*/
-void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
-{
-	Vec2i pos;
-	int addx = 0;
-	int addy = 0;
-	//Wyrmgus start
-	int z;
-	//Wyrmgus end
-
-	if (container) {
-		pos = container->tilePos;
-		pos -= Vec2i(unit.Type->get_tile_size() - QSize(1, 1));
-		addx = container->Type->get_tile_width() + unit.Type->get_tile_width() - 1;
-		addy = container->Type->get_tile_height() + unit.Type->get_tile_height() - 1;
-		z = container->MapLayer->ID;
-
-		if (heading < LookingNE || heading > LookingNW) {
-			pos.x += addx - 1;
-			--pos.y;
-			goto startn;
-		} else if (heading < LookingSE) {
-			pos.x += addx;
-			pos.y += addy - 1;
-			goto starte;
-		} else if (heading < LookingSW) {
-			pos.y += addy;
-			goto starts;
-		} else {
-			--pos.x;
-			goto startw;
-		}
-	} else {
-		pos = unit.tilePos;
-		z = unit.MapLayer->ID;
-
-		if (heading < LookingNE || heading > LookingNW) {
-			goto starts;
-		} else if (heading < LookingSE) {
-			goto startw;
-		} else if (heading < LookingSW) {
-			goto startn;
-		} else {
-			goto starte;
-		}
-	}
-	// FIXME: don't search outside of the map
-	for (;;) {
-startw:
-		for (int i = addy; i--; ++pos.y) {
-			//Wyrmgus start
-//			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z)) {
-			//Wyrmgus end
-				goto found;
-			}
-		}
-		++addx;
-starts:
-		for (int i = addx; i--; ++pos.x) {
-			//Wyrmgus start
-//			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z)) {
-			//Wyrmgus end
-				goto found;
-			}
-		}
-		++addy;
-starte:
-		for (int i = addy; i--; --pos.y) {
-			//Wyrmgus start
-//			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z)) {
-			//Wyrmgus end
-				goto found;
-			}
-		}
-		++addx;
-startn:
-		for (int i = addx; i--; --pos.x) {
-			//Wyrmgus start
-//			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z)) {
-			//Wyrmgus end
-				goto found;
-			}
-		}
-		++addy;
-	}
-
-found:
-	//Wyrmgus start
-//	unit.Place(pos);
-	unit.Place(pos, z);
-	//Wyrmgus end
-}
-
-/**
 **  Drop out all units inside unit.
 **
 **  @param source  All units inside source are dropped out.
@@ -5689,7 +5689,7 @@ void DropOutAll(const CUnit &source)
 	const std::vector<CUnit *> units_inside = source.get_units_inside();
 
 	for (CUnit *unit : units_inside) {
-		DropOutOnSide(*unit, LookingW, &source);
+		unit->drop_out_on_side(LookingW, &source);
 
 		//Wyrmgus start
 		if (unit->Type->BoolFlag[ITEM_INDEX].value && unit->get_unique() == nullptr) {

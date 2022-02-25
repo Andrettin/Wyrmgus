@@ -271,7 +271,7 @@ void COrder_PickUp::Execute(CUnit &unit)
 				}
 				unit.tilePos = goal->Goal->tilePos;
 				unit.MapLayer = goal->Goal->MapLayer;
-				DropOutOnSide(unit, unit.Direction, nullptr);
+				unit.drop_out_on_side(unit.Direction, nullptr);
 
 				// FIXME: we must check if the units supports the new order.
 				CUnit &dest = *goal->Goal;

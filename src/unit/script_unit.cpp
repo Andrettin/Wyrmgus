@@ -779,7 +779,7 @@ static int CclMoveUnit(lua_State *l)
 		const int heading = SyncRand(256);
 
 		unit->tilePos = ipos;
-		DropOutOnSide(*unit, heading, nullptr);
+		unit->drop_out_on_side(heading, nullptr);
 	}
 	lua_pushvalue(l, 1);
 	return 1;
@@ -958,7 +958,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 
 			unit->tilePos = ipos;
 			unit->MapLayer = transporter->MapLayer;
-			DropOutOnSide(*unit, heading, nullptr);
+			unit->drop_out_on_side(heading, nullptr);
 		}
 
 		// Place the unit inside the transporter.
@@ -1094,7 +1094,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 
 			unit->tilePos = new_pos;
 			unit->MapLayer = worker->MapLayer;
-			DropOutOnSide(*unit, heading, nullptr);
+			unit->drop_out_on_side(heading, nullptr);
 		}
 		UpdateForNewUnit(*unit, 0);
 		//Wyrmgus end

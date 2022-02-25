@@ -209,7 +209,7 @@ void COrder_Trade::Execute(CUnit &unit)
 					int old_z = unit.MapLayer->ID;
 					SaveSelection();
 					unit.Remove(nullptr);
-					DropOutOnSide(unit, unit.Direction, goal->ConnectingDestination);
+					unit.drop_out_on_side(unit.Direction, goal->ConnectingDestination);
 					RestoreSelection();
 					if (unit.Player == CPlayer::GetThisPlayer() && Selected.size() > 0 && &unit == Selected[0] && old_z == UI.CurrentMapLayer->ID) {
 						ChangeCurrentMapLayer(unit.MapLayer->ID);
@@ -291,7 +291,7 @@ void COrder_Trade::Execute(CUnit &unit)
 				}
 				unit.tilePos = goal->Goal->tilePos;
 				unit.MapLayer = goal->Goal->MapLayer;
-				DropOutOnSide(unit, unit.Direction, nullptr);
+				unit.drop_out_on_side(unit.Direction, nullptr);
 
 				// FIXME: we must check if the units supports the new order.
 				CUnit &dest = *goal->Goal;

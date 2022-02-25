@@ -260,7 +260,7 @@ void COrder_Follow::Execute(CUnit &unit)
 				//Wyrmgus start
 				unit.MapLayer = goal->Goal->MapLayer;
 				//Wyrmgus end
-				DropOutOnSide(unit, unit.Direction, nullptr);
+				unit.drop_out_on_side(unit.Direction, nullptr);
 
 				// FIXME: we must check if the units supports the new order.
 				CUnit &dest = *goal->Goal;

@@ -3055,7 +3055,7 @@ bool CPlayer::capture_unit(CUnit *unit)
 				}
 			}
 
-			DropOutOnSide(*unit_inside, LookingW, unit);
+			unit_inside->drop_out_on_side(LookingW, unit);
 		}
 	}
 
