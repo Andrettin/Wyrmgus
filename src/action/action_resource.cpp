@@ -803,7 +803,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	// If we are fully loaded first search for a depot.
 	if (unit.ResourcesHeld && (depot = FindDeposit(unit, 1000, unit.get_current_resource()))) {
 		if (unit.Container) {
-			DropOutNearest(unit, depot->tilePos + depot->GetHalfTileSize(), &source);
+			unit.drop_out_nearest(depot->tilePos + depot->GetHalfTileSize(), &source);
 		}
 		// Remember where it mined, so it can look around for another resource.
 		//
@@ -1217,7 +1217,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || CMap::get()->Info->IsPointOnMap(this->goalPos, this->MapLayer))) {
 		//Wyrmgus end
 			assert_throw(unit.Container != nullptr);
-			DropOutNearest(unit, depot->tilePos + depot->GetHalfTileSize(), source);
+			unit.drop_out_nearest(depot->tilePos + depot->GetHalfTileSize(), source);
 		}
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 	}
@@ -1392,7 +1392,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		if (FindTerrainType(unit.Type->MovementMask, wyrmgus::resource::get_all()[this->CurrentResource], 10, *unit.Player, pos, &pos, z)) {
 		//Wyrmgus end
 			if (depot) {
-				DropOutNearest(unit, pos, depot);
+				unit.drop_out_nearest(pos, depot);
 			}
 			this->goalPos = pos;
 			//Wyrmgus start
@@ -1453,7 +1453,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 		if (goal) {
 			if (depot) {
-				DropOutNearest(unit, goal->tilePos + goal->GetHalfTileSize(), depot);
+				unit.drop_out_nearest(goal->tilePos + goal->GetHalfTileSize(), depot);
 			}
 
 			if (goal != mine) {

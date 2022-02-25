@@ -338,7 +338,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		UpdateUnitSightRange(unit);
 		if (!container) {
 			if (!UnitTypeCanBeAt(newtype, pos, unit.MapLayer->ID)) {
-				DropOutNearest(unit, pos, nullptr);
+				unit.drop_out_nearest(pos, nullptr);
 			} else {
 				unit.Place(pos, unit.MapLayer->ID);
 			}

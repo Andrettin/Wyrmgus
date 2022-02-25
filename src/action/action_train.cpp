@@ -397,7 +397,7 @@ void COrder_Train::Execute(CUnit &unit)
 		*/
 
 		if (unit.has_rally_point() && unit.get_rally_point_map_layer() == unit.MapLayer) {
-			DropOutNearest(*newUnit, unit.get_rally_point_pos(), &unit);
+			newUnit->drop_out_nearest(unit.get_rally_point_pos(), &unit);
 		} else {
 			DropOutOnSide(*newUnit, LookingW, &unit);
 		}

@@ -192,6 +192,9 @@ public:
 	//Wyrmgus end
 	/// Add a unit inside a container. Only deal with list stuff.
 	void AddInContainer(CUnit &host);
+
+	void drop_out_nearest(const Vec2i &goal_pos, const CUnit *container);
+
 	//Wyrmgus start
 	void UpdateContainerAttackRange();
 	void UpdateXPRequired();
@@ -1089,8 +1092,6 @@ extern void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta);
 
 /// @todo more docu
 extern void DropOutOnSide(CUnit &unit, int heading, const CUnit *container);
-/// @todo more docu
-extern void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container);
 
 /// Drop out all units in the unit
 extern void DropOutAll(const CUnit &unit);

@@ -4270,6 +4270,106 @@ void CUnit::Place(const Vec2i &pos, const int z)
 }
 
 /**
+**  Place a unit on the map nearest to goalPos.
+**
+**  @param unit  Unit to drop out.
+**  @param goalPos Goal map tile position.
+**  @param addx  Tile width of unit it's dropping out of.
+**  @param addy  Tile height of unit it's dropping out of.
+*/
+void CUnit::drop_out_nearest(const Vec2i &goal_pos, const CUnit *container)
+{
+	Vec2i pos;
+	Vec2i bestPos;
+	int bestd = 99999;
+	int addx = 0;
+	int addy = 0;
+	//Wyrmgus start
+	int z;
+	//Wyrmgus end
+
+	if (container) {
+		assert_throw(this->Removed);
+		pos = container->tilePos;
+		pos -= Vec2i(this->Type->get_tile_size() - QSize(1, 1));
+		addx = container->Type->get_tile_width() + this->Type->get_tile_width() - 1;
+		addy = container->Type->get_tile_height() + this->Type->get_tile_height() - 1;
+		--pos.x;
+		z = container->MapLayer->ID;
+	} else {
+		pos = this->tilePos;
+		z = this->MapLayer->ID;
+	}
+	// FIXME: if we reach the map borders we can go fast up, left, ...
+
+	for (;;) {
+		for (int i = addy; i--; ++pos.y) { // go down
+			//Wyrmgus start
+//			if (UnitCanBeAt(*this, pos)) {
+			if (UnitCanBeAt(*this, pos, z)) {
+				//Wyrmgus end
+				const int n = point::square_distance_to(goal_pos, pos);
+
+				if (n < bestd) {
+					bestd = n;
+					bestPos = pos;
+				}
+			}
+		}
+		++addx;
+		for (int i = addx; i--; ++pos.x) { // go right
+			//Wyrmgus start
+//			if (UnitCanBeAt(*this, pos)) {
+			if (UnitCanBeAt(*this, pos, z)) {
+				//Wyrmgus end
+				const int n = point::square_distance_to(goal_pos, pos);
+
+				if (n < bestd) {
+					bestd = n;
+					bestPos = pos;
+				}
+			}
+		}
+		++addy;
+		for (int i = addy; i--; --pos.y) { // go up
+			//Wyrmgus start
+//			if (UnitCanBeAt(*this, pos)) {
+			if (UnitCanBeAt(*this, pos, z)) {
+				//Wyrmgus end
+				const int n = point::square_distance_to(goal_pos, pos);
+
+				if (n < bestd) {
+					bestd = n;
+					bestPos = pos;
+				}
+			}
+		}
+		++addx;
+		for (int i = addx; i--; --pos.x) { // go left
+			//Wyrmgus start
+//			if (UnitCanBeAt(*this, pos)) {
+			if (UnitCanBeAt(*this, pos, z)) {
+				//Wyrmgus end
+				const int n = point::square_distance_to(goal_pos, pos);
+
+				if (n < bestd) {
+					bestd = n;
+					bestPos = pos;
+				}
+			}
+		}
+		if (bestd != 99999) {
+			//Wyrmgus start
+//			this->Place(bestPos);
+			this->Place(bestPos, z);
+			//Wyrmgus end
+			return;
+		}
+		++addy;
+	}
+}
+
+/**
 **  Create new unit and place on map.
 **
 **  @param pos     map tile position.
@@ -5576,106 +5676,6 @@ found:
 //	unit.Place(pos);
 	unit.Place(pos, z);
 	//Wyrmgus end
-}
-
-/**
-**  Place a unit on the map nearest to goalPos.
-**
-**  @param unit  Unit to drop out.
-**  @param goalPos Goal map tile position.
-**  @param addx  Tile width of unit it's dropping out of.
-**  @param addy  Tile height of unit it's dropping out of.
-*/
-void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
-{
-	Vec2i pos;
-	Vec2i bestPos;
-	int bestd = 99999;
-	int addx = 0;
-	int addy = 0;
-	//Wyrmgus start
-	int z;
-	//Wyrmgus end
-
-	if (container) {
-		assert_throw(unit.Removed);
-		pos = container->tilePos;
-		pos -= Vec2i(unit.Type->get_tile_size() - QSize(1, 1));
-		addx = container->Type->get_tile_width() + unit.Type->get_tile_width() - 1;
-		addy = container->Type->get_tile_height() + unit.Type->get_tile_height() - 1;
-		--pos.x;
-		z = container->MapLayer->ID;
-	} else {
-		pos = unit.tilePos;
-		z = unit.MapLayer->ID;
-	}
-	// FIXME: if we reach the map borders we can go fast up, left, ...
-
-	for (;;) {
-		for (int i = addy; i--; ++pos.y) { // go down
-			//Wyrmgus start
-//			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z)) {
-			//Wyrmgus end
-				const int n = point::square_distance_to(goalPos, pos);
-
-				if (n < bestd) {
-					bestd = n;
-					bestPos = pos;
-				}
-			}
-		}
-		++addx;
-		for (int i = addx; i--; ++pos.x) { // go right
-			//Wyrmgus start
-//			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z)) {
-			//Wyrmgus end
-				const int n = point::square_distance_to(goalPos, pos);
-
-				if (n < bestd) {
-					bestd = n;
-					bestPos = pos;
-				}
-			}
-		}
-		++addy;
-		for (int i = addy; i--; --pos.y) { // go up
-			//Wyrmgus start
-//			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z)) {
-			//Wyrmgus end
-				const int n = point::square_distance_to(goalPos, pos);
-
-				if (n < bestd) {
-					bestd = n;
-					bestPos = pos;
-				}
-			}
-		}
-		++addx;
-		for (int i = addx; i--; --pos.x) { // go left
-			//Wyrmgus start
-//			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z)) {
-			//Wyrmgus end
-				const int n = point::square_distance_to(goalPos, pos);
-
-				if (n < bestd) {
-					bestd = n;
-					bestPos = pos;
-				}
-			}
-		}
-		if (bestd != 99999) {
-			//Wyrmgus start
-//			unit.Place(bestPos);
-			unit.Place(bestPos, z);
-			//Wyrmgus end
-			return;
-		}
-		++addy;
-	}
 }
 
 /**
