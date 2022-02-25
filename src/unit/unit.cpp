@@ -4369,21 +4369,13 @@ void CUnit::drop_out_nearest(const Vec2i &goal_pos, const CUnit *container)
 	}
 }
 
-/**
-**  Place a unit on the map to the side of a unit.
-**
-**  @param unit       Unit to drop out.
-**  @param heading    Direction in which the unit should appear.
-**  @param container  Unit "containing" unit to drop (may be different of unit.Container).
-*/
-void CUnit::drop_out_on_side(const int heading, const CUnit *container)
+template <typename function_type>
+void CUnit::drop_out_on_side_base(const int heading, const CUnit *container, const function_type &pos_check_function)
 {
 	Vec2i pos;
 	int addx = 0;
 	int addy = 0;
-	//Wyrmgus start
-	int z;
-	//Wyrmgus end
+	int z = 0;
 
 	if (container) {
 		pos = container->tilePos;
@@ -4421,44 +4413,33 @@ void CUnit::drop_out_on_side(const int heading, const CUnit *container)
 			goto starte;
 		}
 	}
+
 	// FIXME: don't search outside of the map
 	for (;;) {
 	startw:
 		for (int i = addy; i--; ++pos.y) {
-			//Wyrmgus start
-//			if (UnitCanBeAt(*this, pos)) {
-			if (UnitCanBeAt(*this, pos, z)) {
-				//Wyrmgus end
+			if (pos_check_function(this, pos, z)) {
 				goto found;
 			}
 		}
 		++addx;
 	starts:
 		for (int i = addx; i--; ++pos.x) {
-			//Wyrmgus start
-//			if (UnitCanBeAt(*this, pos)) {
-			if (UnitCanBeAt(*this, pos, z)) {
-				//Wyrmgus end
+			if (pos_check_function(this, pos, z)) {
 				goto found;
 			}
 		}
 		++addy;
 	starte:
 		for (int i = addy; i--; --pos.y) {
-			//Wyrmgus start
-//			if (UnitCanBeAt(*this, pos)) {
-			if (UnitCanBeAt(*this, pos, z)) {
-				//Wyrmgus end
+			if (pos_check_function(this, pos, z)) {
 				goto found;
 			}
 		}
 		++addx;
 	startn:
 		for (int i = addx; i--; --pos.x) {
-			//Wyrmgus start
-//			if (UnitCanBeAt(*this, pos)) {
-			if (UnitCanBeAt(*this, pos, z)) {
-				//Wyrmgus end
+			if (pos_check_function(this, pos, z)) {
 				goto found;
 			}
 		}
@@ -4466,10 +4447,22 @@ void CUnit::drop_out_on_side(const int heading, const CUnit *container)
 	}
 
 found:
-	//Wyrmgus start
-//	this->Place(pos);
 	this->Place(pos, z);
-	//Wyrmgus end
+}
+
+/**
+**  Place a unit on the map to the side of a unit.
+**
+**  @param unit       Unit to drop out.
+**  @param heading    Direction in which the unit should appear.
+**  @param container  Unit "containing" unit to drop (may be different of unit.Container).
+*/
+void CUnit::drop_out_on_side(const int heading, const CUnit *container)
+{
+	this->drop_out_on_side_base(heading, container, [](const CUnit *unit, const Vec2i &pos, const int z) {
+		return UnitCanBeAt(*unit, pos, z);
+	});
+}
 }
 
 /**

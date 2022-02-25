@@ -194,6 +194,12 @@ public:
 	void AddInContainer(CUnit &host);
 
 	void drop_out_nearest(const Vec2i &goal_pos, const CUnit *container);
+
+private:
+	template <typename function_type>
+	void drop_out_on_side_base(const int heading, const CUnit *container, const function_type &pos_check_function);
+
+public:
 	void drop_out_on_side(const int heading, const CUnit *container);
 
 	//Wyrmgus start
