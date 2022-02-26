@@ -53,6 +53,7 @@
 #include "script/condition/completed_quest_condition.h"
 #include "script/condition/dynasty_condition.h"
 #include "script/condition/equipment_condition.h"
+#include "script/condition/equipped_condition.h"
 #include "script/condition/faction_condition.h"
 #include "script/condition/faction_type_condition.h"
 #include "script/condition/government_type_condition.h"
@@ -118,6 +119,8 @@ std::unique_ptr<const condition> condition::from_gsml_property(const gsml_proper
 		return std::make_unique<dynasty_condition>(value);
 	} else if (key == "equipment") {
 		return std::make_unique<equipment_condition>(value);
+	} else if (key == "equipped") {
+		return std::make_unique<equipped_condition>(value);
 	} else if (key == "faction") {
 		return std::make_unique<faction_condition>(value);
 	} else if (key == "faction_type") {

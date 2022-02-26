@@ -742,6 +742,7 @@ public:
 	bool is_item_class_equipped(const wyrmgus::item_class item_class) const;
 	bool is_item_type_equipped(const wyrmgus::unit_type *item_type) const;
 	bool is_unique_item_equipped(const unique_item *unique) const;
+	bool is_equipped() const;
 	bool can_equip_item(const CUnit *item) const;
 	bool can_equip_item_class(const item_class item_class) const;
 	bool CanUseItem(CUnit *item) const;

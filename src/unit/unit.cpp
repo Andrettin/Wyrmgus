@@ -1677,6 +1677,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", this->get_character()->get_identifier().c_str());
 		}
 	}
+
 	EquippedItems[static_cast<int>(item_slot)].push_back(&item);
 	
 	//change variation, if the current one has become forbidden
@@ -1695,6 +1696,10 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		) {
 			ChooseVariation(nullptr, false, i);
 		}
+	}
+
+	if (item.GetVariation() != nullptr && !item.can_have_variation(item.GetVariation())) {
+		item.ChooseVariation();
 	}
 	
 	if (item_slot == wyrmgus::item_slot::weapon || item_slot == wyrmgus::item_slot::arrows) {
@@ -1875,7 +1880,11 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 			ChooseVariation(nullptr, false, i);
 		}
 	}
-	
+
+	if (item.GetVariation() != nullptr && !item.can_have_variation(item.GetVariation())) {
+		item.ChooseVariation();
+	}
+
 	if (item_slot == wyrmgus::item_slot::weapon || item_slot == wyrmgus::item_slot::arrows) {
 		this->ChooseButtonIcon(ButtonCmd::Attack);
 		this->ChooseButtonIcon(ButtonCmd::StandGround);
@@ -6710,6 +6719,27 @@ bool CUnit::is_unique_item_equipped(const unique_item *unique) const
 	}
 	
 	return false;
+}
+
+bool CUnit::is_equipped() const
+{
+	if (!this->Type->BoolFlag[ITEM_INDEX].value) {
+		return false;
+	}
+
+	if (this->Container == nullptr) {
+		return false;
+	}
+
+	if (!this->Container->HasInventory()) {
+		return false;
+	}
+
+	if (this->Type->get_item_class() == item_class::none) {
+		return false;
+	}
+
+	return this->Container->IsItemEquipped(this);
 }
 
 bool CUnit::can_equip_item(const CUnit *item) const
