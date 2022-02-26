@@ -1840,6 +1840,7 @@ void CMap::Clean()
 	//Wyrmgus start
 	this->ClearMapLayers();
 	this->settlement_units.clear();
+	this->orbiting_celestial_body_units.clear();
 	//Wyrmgus end
 	this->animated_tiles.clear();
 
