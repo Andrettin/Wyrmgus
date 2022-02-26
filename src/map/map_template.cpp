@@ -1350,6 +1350,11 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		base_unit_type = nullptr;
 	}
 
+	if (base_unit_type != nullptr && base_unit_type->BoolFlag[STAR_INDEX].value && site->get_satellites().empty()) {
+		//do not apply stars which have no satellites
+		return;
+	}
+
 	Vec2i unit_offset(0, 0);
 	if (base_unit_type != nullptr) {
 		unit_offset = (base_unit_type->get_tile_size() - QSize(1, 1)) / 2;
