@@ -482,28 +482,25 @@ const QSize &site::get_size() const
 	return size::empty_size;
 }
 
-QSize site::get_size_with_satellites() const
+QSize site::get_satellite_orbit_size() const
 {
-	QSize size = this->get_size();
-
-	int max_satellite_space = 0;
-	const decimillesimal_int orbit_distance_multiplier = this->get_top_orbit_center()->get_map_template()->get_orbit_distance_multiplier();
+	QSize size(0, 0);
 
 	for (const site *satellite : this->get_satellites()) {
-		const QSize satellite_size = satellite->get_size_with_satellites();
-
-		int satellite_space = site::base_orbit_distance;
-		satellite_space = std::max((number::cbrt(satellite->get_distance_from_orbit_center()) * orbit_distance_multiplier).to_int() + satellite->get_astrodistance_additive_modifier(), satellite_space);
-		satellite_space += satellite_size.width();
-
-		if (satellite_space > max_satellite_space) {
-			max_satellite_space = satellite_space;
+		if (satellite->get_base_unit_type() == nullptr || !satellite->get_base_unit_type()->BoolFlag[BUILDING_INDEX].value) {
+			continue;
 		}
+
+		size += QSize(site::base_orbit_distance - 1, site::base_orbit_distance - 1);
+		size += satellite->get_size_with_satellites();
 	}
 
-	size += QSize(max_satellite_space, max_satellite_space);
-
 	return size;
+}
+
+QSize site::get_size_with_satellites() const
+{
+	return this->get_size() + this->get_satellite_orbit_size();
 }
 
 centesimal_int site::get_mass_jm() const

@@ -244,6 +244,7 @@ public:
 	}
 
 	const QSize &get_size() const;
+	QSize get_satellite_orbit_size() const;
 	QSize get_size_with_satellites() const;
 
 	const site *get_settlement() const

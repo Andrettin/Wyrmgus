@@ -1432,20 +1432,54 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 	if (!site->get_satellites().empty()) {
 		int64_t orbit_distance = 0;
-		if (site->get_base_unit_type() != nullptr) {
-			orbit_distance += site->get_base_unit_type()->get_tile_width() / 2;
-		}
-		orbit_distance += site::base_orbit_distance;
 
 		for (const wyrmgus::site *satellite : site->get_satellites()) {
-			const QSize satellite_size = satellite->get_size_with_satellites();
+			QPoint satellite_pos(-1, -1);
 
-			int64_t satellite_orbit_distance = orbit_distance;
-			satellite_orbit_distance += satellite_size.width() / 2;
+			int min_distance = 0;
+			int max_distance = 0;
 
-			satellite_orbit_distance = std::max<int64_t>((number::cbrt(satellite->get_distance_from_orbit_center()) * this->get_orbit_distance_multiplier()).to_int() + satellite->get_astrodistance_additive_modifier(), satellite_orbit_distance);
+			const bool is_substantial_celestial_body = satellite->get_base_unit_type()->BoolFlag[BUILDING_INDEX].value;
 
-			const QPoint satellite_pos = this->generate_site_orbit_position(satellite, z, satellite_orbit_distance);
+			QSize subsatellite_orbit_size(0, 0);
+
+			if (is_substantial_celestial_body) {
+				orbit_distance += site::base_orbit_distance;
+
+				subsatellite_orbit_size = satellite->get_satellite_orbit_size();
+				orbit_distance += std::max(subsatellite_orbit_size.width(), subsatellite_orbit_size.height());
+
+				min_distance = orbit_distance;
+				max_distance = orbit_distance;
+			} else {
+				const int distance = std::max((number::cbrt(satellite->get_distance_from_orbit_center()) * this->get_orbit_distance_multiplier()).to_int() + satellite->get_astrodistance_additive_modifier(), site::base_orbit_distance);
+				min_distance = distance;
+				max_distance = distance;
+			}
+
+			std::vector<QPoint> potential_orbit_positions = site_game_data->get_site_unit()->get_tile_positions_in_distance_to(satellite->get_size(), min_distance, max_distance);
+
+			while (!potential_orbit_positions.empty()) {
+				QPoint random_orbit_pos = vector::take_random(potential_orbit_positions);
+
+				if (!UnitTypeCanBeAt(*satellite->get_base_unit_type(), random_orbit_pos, z)) {
+					continue;
+				}
+
+				satellite_pos = std::move(random_orbit_pos);
+				break;
+			}
+
+			assert_throw(satellite_pos != QPoint(-1, -1));
+
+			satellite_pos += satellite->get_base_unit_type()->get_tile_center_pos_offset();
+
+			if (is_substantial_celestial_body) {
+				orbit_distance += std::max(satellite->get_size().width(), satellite->get_size().height());
+				orbit_distance += std::max(subsatellite_orbit_size.width(), subsatellite_orbit_size.height());
+			}
+
+			assert_throw(satellite_pos != QPoint(-1, -1));
 
 			try {
 				this->apply_site(satellite, satellite_pos, z);

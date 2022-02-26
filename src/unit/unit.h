@@ -202,6 +202,8 @@ private:
 public:
 	void drop_out_on_side(const int heading, const CUnit *container);
 
+	std::vector<QPoint> get_tile_positions_in_distance_to(const QSize &target_size, const int min_distance, const int max_distance) const;
+
 	//Wyrmgus start
 	void UpdateContainerAttackRange();
 	void UpdateXPRequired();

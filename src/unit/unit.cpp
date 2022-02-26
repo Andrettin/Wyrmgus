@@ -106,6 +106,7 @@
 #include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/point_util.h"
+#include "util/rect_util.h"
 #include "util/size_util.h"
 //Wyrmgus start
 #include "util/util.h"
@@ -4377,7 +4378,7 @@ void CUnit::drop_out_on_side_base(const int heading, const CUnit *container, con
 	int addy = 0;
 	int z = 0;
 
-	if (container) {
+	if (container != nullptr) {
 		pos = container->tilePos;
 		pos -= Vec2i(this->Type->get_tile_size() - QSize(1, 1));
 		addx = container->Type->get_tile_width() + this->Type->get_tile_width() - 1;
@@ -4463,6 +4464,35 @@ void CUnit::drop_out_on_side(const int heading, const CUnit *container)
 		return UnitCanBeAt(*unit, pos, z);
 	});
 }
+
+std::vector<QPoint> CUnit::get_tile_positions_in_distance_to(const QSize &target_size, const int min_distance, const int max_distance) const
+{
+	const QPoint max_distance_offset(max_distance, max_distance);
+
+	const QPoint top_left(this->tilePos - max_distance_offset - size::to_point(target_size));
+	const QPoint bottom_right(this->tilePos + size::to_point(this->Type->get_tile_size()) + max_distance_offset);
+
+	const QRect rect(top_left, bottom_right);
+
+	std::vector<QPoint> tile_positions;
+
+	const int z = this->MapLayer->ID;
+
+	rect::for_each_point(rect, [&](const QPoint &pos) {
+		const int distance = MapDistance(target_size, pos, z, this->Type->get_tile_size(), this->tilePos, z);
+
+		if (distance < min_distance) {
+			return;
+		}
+
+		if (distance > max_distance) {
+			return;
+		}
+
+		tile_positions.push_back(pos);
+	});
+
+	return tile_positions;
 }
 
 /**
