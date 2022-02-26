@@ -515,7 +515,7 @@ QSize site::get_satellite_orbit_size() const
 			continue;
 		}
 
-		size += QSize(site::base_orbit_distance - 1, site::base_orbit_distance - 1);
+		size += QSize(site::base_orbit_distance, site::base_orbit_distance);
 		size += satellite->get_size_with_satellites();
 	}
 
