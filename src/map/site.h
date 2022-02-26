@@ -225,6 +225,9 @@ public:
 		return this->satellites;
 	}
 
+	//get the nearest substantial (i.e. not asteroid) satellites to a given distance from orbit center
+	std::pair<const site *, const site *> get_nearest_satellites(const int64_t distance) const;
+
 	int get_distance_from_orbit_center() const
 	{
 		return this->distance_from_orbit_center;

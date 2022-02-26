@@ -234,10 +234,12 @@ void site::initialize()
 		this->pos = this->pos_reference_site->get_pos() + this->pos;
 	}
 
-	if (!this->get_geocoordinate().is_null()) {
-		this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
-	} else if (!this->get_astrocoordinate().is_null()) {
-		this->pos = this->astrocoordinate_to_pos<false>(this->get_astrocoordinate());
+	if (this->get_map_template() != nullptr) {
+		if (!this->get_geocoordinate().is_null()) {
+			this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
+		} else if (!this->get_astrocoordinate().is_null()) {
+			this->pos = this->astrocoordinate_to_pos<false>(this->get_astrocoordinate());
+		}
 	}
 
 	if (!this->satellites.empty()) {
@@ -389,6 +391,28 @@ void site::set_orbit_center(site *orbit_center)
 	if (orbit_center != nullptr) {
 		orbit_center->satellites.push_back(this);
 	}
+}
+
+std::pair<const site *, const site *> site::get_nearest_satellites(const int64_t distance) const
+{
+	std::pair<const site *, const site *> nearest_satellites;
+
+	for (const site *satellite : this->get_satellites()) {
+		const bool is_substantial_celestial_body = satellite->get_base_unit_type()->BoolFlag[BUILDING_INDEX].value;
+		if (!is_substantial_celestial_body) {
+			continue;
+		}
+
+		if (satellite->get_distance_from_orbit_center() <= distance && (nearest_satellites.first == nullptr || satellite->get_distance_from_orbit_center() > nearest_satellites.first->get_distance_from_orbit_center())) {
+			nearest_satellites.first = satellite;
+		}
+
+		if (satellite->get_distance_from_orbit_center() >= distance && (nearest_satellites.second == nullptr || satellite->get_distance_from_orbit_center() < nearest_satellites.second->get_distance_from_orbit_center())) {
+			nearest_satellites.second = satellite;
+		}
+	}
+
+	return nearest_satellites;
 }
 
 centesimal_int site::get_distance_from_orbit_center_au() const

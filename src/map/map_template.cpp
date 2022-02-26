@@ -1434,57 +1434,19 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		int64_t orbit_distance = 0;
 
 		for (const wyrmgus::site *satellite : site->get_satellites()) {
-			QPoint satellite_pos(-1, -1);
-
-			int min_distance = 0;
-			int max_distance = 0;
-
 			const bool is_substantial_celestial_body = satellite->get_base_unit_type()->BoolFlag[BUILDING_INDEX].value;
 
-			QSize subsatellite_orbit_size(0, 0);
-
 			if (is_substantial_celestial_body) {
-				orbit_distance += site::base_orbit_distance;
-
-				subsatellite_orbit_size = satellite->get_satellite_orbit_size();
-				orbit_distance += std::max(subsatellite_orbit_size.width(), subsatellite_orbit_size.height());
-
-				min_distance = orbit_distance;
-				max_distance = orbit_distance;
-			} else {
-				const int distance = std::max((number::cbrt(satellite->get_distance_from_orbit_center()) * this->get_orbit_distance_multiplier()).to_int() + satellite->get_astrodistance_additive_modifier(), site::base_orbit_distance);
-				min_distance = distance;
-				max_distance = distance;
+				this->apply_satellite_site(satellite, orbit_distance);
 			}
+		}
 
-			std::vector<QPoint> potential_orbit_positions = site_game_data->get_site_unit()->get_tile_positions_in_distance_to(satellite->get_size(), min_distance, max_distance);
+		//apply asteroids later
+		for (const wyrmgus::site *satellite : site->get_satellites()) {
+			const bool is_substantial_celestial_body = satellite->get_base_unit_type()->BoolFlag[BUILDING_INDEX].value;
 
-			while (!potential_orbit_positions.empty()) {
-				QPoint random_orbit_pos = vector::take_random(potential_orbit_positions);
-
-				if (!UnitTypeCanBeAt(*satellite->get_base_unit_type(), random_orbit_pos, z)) {
-					continue;
-				}
-
-				satellite_pos = std::move(random_orbit_pos);
-				break;
-			}
-
-			assert_throw(satellite_pos != QPoint(-1, -1));
-
-			satellite_pos += satellite->get_base_unit_type()->get_tile_center_pos_offset();
-
-			if (is_substantial_celestial_body) {
-				orbit_distance += std::max(satellite->get_size().width(), satellite->get_size().height());
-				orbit_distance += std::max(subsatellite_orbit_size.width(), subsatellite_orbit_size.height());
-			}
-
-			assert_throw(satellite_pos != QPoint(-1, -1));
-
-			try {
-				this->apply_site(satellite, satellite_pos, z);
-			} catch (...) {
-				std::throw_with_nested(std::runtime_error("Failed to apply satellite site \"" + satellite->get_identifier() + "\"."));
+			if (!is_substantial_celestial_body) {
+				this->apply_satellite_site(satellite, orbit_distance);
 			}
 		}
 	}
@@ -1785,6 +1747,91 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 				}
 			}
 		}
+	}
+}
+
+void map_template::apply_satellite_site(const site *satellite, int64_t &orbit_distance) const
+{
+	QPoint satellite_pos(-1, -1);
+
+	int min_distance = 0;
+	int max_distance = 0;
+
+	const bool is_substantial_celestial_body = satellite->get_base_unit_type()->BoolFlag[BUILDING_INDEX].value;
+
+	QSize subsatellite_orbit_size(0, 0);
+	const site *orbit_center = satellite->get_orbit_center();
+	const CUnit *orbit_center_unit = orbit_center->get_game_data()->get_site_unit();
+	const int z = orbit_center_unit->MapLayer->ID;
+
+	if (is_substantial_celestial_body) {
+		orbit_distance += site::base_orbit_distance;
+
+		subsatellite_orbit_size = satellite->get_satellite_orbit_size();
+		orbit_distance += std::max(subsatellite_orbit_size.width(), subsatellite_orbit_size.height());
+
+		min_distance = orbit_distance;
+		max_distance = orbit_distance;
+	} else {
+		const std::pair<const site *, const site *> nearest_orbit_siblings = orbit_center->get_nearest_satellites(satellite->get_distance_from_orbit_center());
+
+		if (nearest_orbit_siblings.first != nullptr) {
+			min_distance = nearest_orbit_siblings.first->get_game_data()->get_site_unit()->MapDistanceTo(*orbit_center_unit);
+		} else {
+			min_distance = site::base_orbit_distance;
+		}
+
+		if (nearest_orbit_siblings.second != nullptr) {
+			max_distance = nearest_orbit_siblings.second->get_game_data()->get_site_unit()->MapDistanceTo(*orbit_center_unit);
+		} else {
+			max_distance = min_distance + site::base_orbit_distance;
+		}
+	}
+
+	std::vector<QPoint> potential_orbit_positions = orbit_center_unit->get_tile_positions_in_distance_to(satellite->get_size(), min_distance, max_distance);
+
+	while (!potential_orbit_positions.empty()) {
+		QPoint random_orbit_pos = vector::take_random(potential_orbit_positions);
+
+		if (!UnitTypeCanBeAt(*satellite->get_base_unit_type(), random_orbit_pos, z)) {
+			continue;
+		}
+
+		std::vector<CUnit *> nearby_units;
+		Select(random_orbit_pos - QPoint(1, 1), random_orbit_pos + size::to_point(satellite->get_base_unit_type()->get_tile_size()), nearby_units, z);
+
+		bool nearby_building = false;
+		for (const CUnit *nearby_unit : nearby_units) {
+			if (nearby_unit->Type->BoolFlag[BUILDING_INDEX].value) {
+				nearby_building = true;
+				break;
+			}
+		}
+
+		if (nearby_building) {
+			//don't place asteroids adjacent to space buildings or to worlds/stars
+			continue;
+		}
+
+		satellite_pos = std::move(random_orbit_pos);
+		break;
+	}
+
+	assert_throw(satellite_pos != QPoint(-1, -1));
+
+	satellite_pos += satellite->get_base_unit_type()->get_tile_center_pos_offset();
+
+	if (is_substantial_celestial_body) {
+		orbit_distance += std::max(satellite->get_size().width(), satellite->get_size().height());
+		orbit_distance += std::max(subsatellite_orbit_size.width(), subsatellite_orbit_size.height());
+	}
+
+	assert_throw(satellite_pos != QPoint(-1, -1));
+
+	try {
+		this->apply_site(satellite, satellite_pos, z);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to apply satellite site \"" + satellite->get_identifier() + "\"."));
 	}
 }
 
