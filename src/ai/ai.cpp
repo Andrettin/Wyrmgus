@@ -701,7 +701,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		for (const auto &kv_pair : ai.get_transporters()) {
 			const landmass *landmass = kv_pair.first;
 			for (const CUnit *ai_unit : kv_pair.second) {
-				file.printf(" %zu, %d,", landmass->get_index(), UnitNumber(*ai_unit));
+				file.printf(" %zu, %d,", landmass ? landmass->get_index() : -1, UnitNumber(*ai_unit));
 			}
 		}
 		file.printf("},\n");

@@ -1782,7 +1782,10 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				const int landmass_index = LuaToNumber(l, j + 1, k + 1);
-				const landmass *landmass = CMap::get()->get_landmasses()[landmass_index].get();
+				const landmass *landmass = nullptr;
+				if (landmass_index != -1) {
+					landmass = CMap::get()->get_landmasses()[landmass_index].get();
+				}
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				ai->add_transporter(&unit_manager::get()->GetSlotUnit(num), landmass);
