@@ -3542,7 +3542,7 @@ QPoint map_template::generate_celestial_site_position(const site *site, const in
 
 		//ensure there are no units placed where the celestial site and its satellites would be
 		std::vector<CUnit *> units;
-		Select(random_pos - size::to_point((celestial_site_size + QSize(1, 1)) / 2), random_pos + size::to_point((celestial_site_size + QSize(1, 1)) / 2), units, z);
+		Select<true>(random_pos - size::to_point((celestial_site_size + QSize(1, 1)) / 2), random_pos + size::to_point((celestial_site_size + QSize(1, 1)) / 2), units, z);
 		if (!units.empty()) {
 			return false;
 		}

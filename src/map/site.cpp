@@ -244,11 +244,11 @@ void site::initialize()
 
 	if (!this->satellites.empty()) {
 		std::sort(this->satellites.begin(), this->satellites.end(), [](const site *a, const site *b) {
-			if (a->distance_from_orbit_center == 0 || b->distance_from_orbit_center == 0) {
-				return a->distance_from_orbit_center != 0; //place satellites without a predefined distance from orbit center last
+			if (a->get_distance_from_orbit_center() == 0 || b->get_distance_from_orbit_center() == 0) {
+				return a->get_distance_from_orbit_center() != 0; //place satellites without a predefined distance from orbit center last
 			}
 
-			return a->distance_from_orbit_center < b->distance_from_orbit_center;
+			return a->get_distance_from_orbit_center() < b->get_distance_from_orbit_center();
 		});
 	}
 
@@ -403,6 +403,10 @@ std::pair<const site *, const site *> site::get_nearest_satellites(const int64_t
 			continue;
 		}
 
+		if (satellite->get_distance_from_orbit_center() == 0) {
+			continue;
+		}
+
 		if (satellite->get_distance_from_orbit_center() <= distance && (nearest_satellites.first == nullptr || satellite->get_distance_from_orbit_center() > nearest_satellites.first->get_distance_from_orbit_center())) {
 			nearest_satellites.first = satellite;
 		}
@@ -516,7 +520,7 @@ QSize site::get_satellite_orbit_size() const
 		}
 
 		size += QSize(site::base_orbit_distance, site::base_orbit_distance);
-		size += satellite->get_size_with_satellites();
+		size += satellite->get_size() + satellite->get_satellite_orbit_size();
 	}
 
 	return size;
@@ -524,7 +528,7 @@ QSize site::get_satellite_orbit_size() const
 
 QSize site::get_size_with_satellites() const
 {
-	return this->get_size() + this->get_satellite_orbit_size();
+	return this->get_size() + this->get_satellite_orbit_size() * 2;
 }
 
 centesimal_int site::get_mass_jm() const
