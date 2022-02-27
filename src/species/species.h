@@ -86,6 +86,11 @@ public:
 
 	std::string get_scientific_name() const;
 
+	virtual const std::string &get_common_name() const override
+	{
+		return this->get_name();
+	}
+
 	geological_era get_era() const
 	{
 		return this->era;

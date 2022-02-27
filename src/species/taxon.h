@@ -56,7 +56,7 @@ public:
 
 	virtual void check() const override;
 
-	const std::string &get_common_name() const
+	virtual const std::string &get_common_name() const override
 	{
 		if (!this->common_name.empty()) {
 			return this->common_name;

@@ -36,6 +36,8 @@
 #include "map/world_game_data.h"
 #include "province.h"
 #include "species/species.h"
+#include "species/taxon.h"
+#include "species/taxonomic_rank.h"
 #include "ui/ui.h"
 #include "util/geojson_util.h"
 #include "util/string_util.h"
@@ -99,8 +101,13 @@ std::string world::get_encyclopedia_text() const
 {
 	std::string text;
 
-	const std::vector<const species *> sapient_species = this->get_native_sapient_species();
+	std::vector<const species *> sapient_species = this->get_native_sapient_species();
+
 	if (!sapient_species.empty()) {
+		std::sort(sapient_species.begin(), sapient_species.end(), [](const species *lhs, const species *rhs) {
+			return lhs->get_name() < rhs->get_name();
+		});
+
 		std::string species_text = "Native Sapients: ";
 		for (size_t i = 0; i < sapient_species.size(); ++i) {
 			if (i > 0) {
@@ -116,17 +123,60 @@ std::string world::get_encyclopedia_text() const
 
 	const std::vector<const species *> fauna_species = this->get_native_fauna_species();
 	if (!fauna_species.empty()) {
-		std::string species_text = "Native Fauna: ";
-		for (size_t i = 0; i < fauna_species.size(); ++i) {
-			if (i > 0) {
-				species_text += ", ";
-			}
-
-			const species *species = fauna_species[i];
-			species_text += string::get_plural_form(species->get_name());
+		std::vector<const taxon_base *> fauna_taxons;
+		for (const species *species : fauna_species) {
+			fauna_taxons.push_back(species);
 		}
 
-		named_data_entry::concatenate_encyclopedia_text(text, std::move(species_text));
+		//if the number of fauna species is too large, group them in their taxons
+		static constexpr size_t max_taxon_names_size = 20;
+		taxonomic_rank current_rank = taxonomic_rank::genus;
+		while (fauna_taxons.size() > max_taxon_names_size && current_rank <= taxonomic_rank::empire) {
+			std::map<const taxon *, int> supertaxon_counts;
+
+			for (const taxon_base *taxon : fauna_taxons) {
+				if (taxon->get_rank() >= current_rank) {
+					continue;
+				}
+
+				const wyrmgus::taxon *rank_supertaxon = taxon->get_supertaxon_of_rank(current_rank);
+				if (rank_supertaxon == nullptr) {
+					continue;
+				}
+
+				++supertaxon_counts[rank_supertaxon];
+			}
+
+			for (const auto &[supertaxon, count] : supertaxon_counts) {
+				if (count <= 1) {
+					continue;
+				}
+
+				std::erase_if(fauna_taxons, [supertaxon](const taxon_base *taxon) {
+					return taxon->is_subtaxon_of(supertaxon);
+				});
+
+				fauna_taxons.push_back(supertaxon);
+			}
+
+			current_rank = static_cast<taxonomic_rank>(static_cast<int>(current_rank) + 1);
+		}
+
+		std::sort(fauna_taxons.begin(), fauna_taxons.end(), [](const taxon_base *lhs, const taxon_base *rhs) {
+			return lhs->get_common_name() < rhs->get_common_name();
+		});
+
+		std::string taxons_text = "Native Fauna: ";
+		for (size_t i = 0; i < fauna_taxons.size(); ++i) {
+			if (i > 0) {
+				taxons_text += ", ";
+			}
+
+			const taxon_base *taxon = fauna_taxons[i];
+			taxons_text += string::get_plural_form(taxon->get_common_name());
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, std::move(taxons_text));
 	}
 
 	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());

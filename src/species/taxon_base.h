@@ -73,6 +73,8 @@ public:
 
 	bool is_ethereal() const;
 
+	virtual const std::string &get_common_name() const = 0;
+
 	const name_generator *get_specimen_name_generator(const gender gender) const;
 
 	void add_specimen_name(const gender gender, const name_variant &name);
