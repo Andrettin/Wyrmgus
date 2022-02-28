@@ -592,7 +592,12 @@ void minimap::draw_terrain_unit(const CUnit *unit, const bool red_phase)
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.setBrush(QBrush(color));
 	painter.setPen(QPen(color));
-	painter.drawEllipse(x, y, type->get_tile_width(), type->get_tile_height());
+
+	if (type->get_tile_size() == QSize(1, 1)) {
+		painter.drawPoint(x, y);
+	} else {
+		painter.drawEllipse(x, y, type->get_tile_width(), type->get_tile_height());
+	}
 }
 
 /**
