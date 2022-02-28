@@ -584,8 +584,8 @@ void minimap::draw_terrain_unit(const CUnit *unit, const bool red_phase)
 
 	const int z = UI.CurrentMapLayer->ID;
 
-	const int x = 1 + this->XOffset[z] + this->map_to_minimap_x[z][unit->tilePos.x];
-	const int y = 1 + this->YOffset[z] + this->map_to_minimap_y[z][unit->tilePos.y];
+	const int x = this->XOffset[z] + this->map_to_minimap_x[z][unit->tilePos.x];
+	const int y = this->YOffset[z] + this->map_to_minimap_y[z][unit->tilePos.y];
 
 	//draw as a circle
 	QPainter painter(&this->overlay_images[z]);
@@ -593,11 +593,7 @@ void minimap::draw_terrain_unit(const CUnit *unit, const bool red_phase)
 	painter.setBrush(QBrush(color));
 	painter.setPen(QPen(color));
 
-	if (type->get_tile_size() == QSize(1, 1)) {
-		painter.drawPoint(x, y);
-	} else {
-		painter.drawEllipse(x, y, type->get_tile_width(), type->get_tile_height());
-	}
+	painter.drawEllipse(x, y, type->get_tile_width() + 1, type->get_tile_height() + 1);
 }
 
 /**
