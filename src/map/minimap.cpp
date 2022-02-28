@@ -640,7 +640,7 @@ void minimap::Update()
 	} else {
 		//when drawing only terrain, draw celestial body units on their center tile
 		for (const CUnit *unit : unit_manager::get()->get_units()) {
-			if (!unit->Type->BoolFlag[CELESTIAL_BODY_INDEX].value) {
+			if (!unit->Type->BoolFlag[CELESTIAL_BODY_INDEX].value && !unit->Type->BoolFlag[ASTEROID_INDEX].value) {
 				continue;
 			}
 
