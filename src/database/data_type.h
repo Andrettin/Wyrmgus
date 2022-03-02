@@ -132,7 +132,9 @@ public:
 			std::string alias = identifier;
 			std::replace(alias.begin(), alias.end(), '_', '-');
 			T::add_instance_alias(instance, alias);
-		} else if (identifier.find("-") != std::string::npos) {
+		}
+		
+		if (identifier.find("-") != std::string::npos) {
 			std::string alias = identifier;
 			std::replace(alias.begin(), alias.end(), '-', '_');
 			T::add_instance_alias(instance, alias);

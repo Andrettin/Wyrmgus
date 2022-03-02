@@ -477,7 +477,7 @@ static int CclDefineAnimations(lua_State *l)
 		const char *value = LuaToString(l, -2);
 
 		std::vector<std::unique_ptr<CAnimation>> animations = ParseAnimation(l, -1);
-		animation_sequence *animation_sequence = animation_sequence::add(anims->get_identifier() + "_" + value, anims->get_module());
+		animation_sequence *animation_sequence = animation_sequence::add(anims->get_identifier() + "_" + string::lowered(value), anims->get_module());
 		animation_sequence->set_animations(std::move(animations));
 		const CAnimation *first_anim = animation_sequence->get_first_animation();
 
