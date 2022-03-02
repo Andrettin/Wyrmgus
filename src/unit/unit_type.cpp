@@ -903,6 +903,10 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 		for (const std::string &value : values) {
 			this->Affixes.push_back(CUpgrade::get(value));
 		}
+	} else if (tag == "stored_resources") {
+		for (const std::string &value : values) {
+			this->stored_resources.insert(resource::get(value));
+		}
 	} else if (tag == "resource_gathering") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
