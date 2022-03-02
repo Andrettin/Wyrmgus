@@ -139,6 +139,8 @@ bool map_info::IsPointOnMap(const Vec2i &pos, const CMapLayer *map_layer) const
 void map_info::reset()
 {
 	this->name.clear();
+	this->description.clear();
+	this->author.clear();
 	this->presentation_filepath.clear();
 	this->map_size = QSize(0, 0);
 	//Wyrmgus start
