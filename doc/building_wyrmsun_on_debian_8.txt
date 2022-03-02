@@ -65,11 +65,6 @@ This is the game.
 
 'git clone https://github.com/Andrettin/Wyrmsun.git'
 
-First go into Wyrmgus and init OAML module.
-
-'cd Wyrmgus'
-'git submodule update --init'
-
 Now you're ready to build the engine.
 
 'mkdir build'
