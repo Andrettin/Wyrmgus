@@ -1393,7 +1393,6 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			type->BoolFlag[HARVESTER_INDEX].value = 1;
 		} else if (!strcmp(value, "GivesResource")) {
 			const std::string resource_identifier = LuaToString(l, -1);
 			type->given_resource = wyrmgus::resource::get(resource_identifier);

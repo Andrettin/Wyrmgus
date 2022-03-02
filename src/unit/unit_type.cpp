@@ -1391,7 +1391,9 @@ void unit_type::initialize()
 	if (this->MouseAction == MouseActionAttack && !this->CanAttack) {
 		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\": right-attack is set, but can-attack is not.");
 	}
+
 	this->UpdateDefaultBoolFlags();
+
 	if (GameRunning || CEditor::get()->is_running()) {
 		InitUnitType(*this);
 		LoadUnitType(this);
@@ -2005,6 +2007,10 @@ void unit_type::UpdateDefaultBoolFlags()
 	this->BoolFlag[AIRUNIT_INDEX].value = this->is_air_unit();
 	this->BoolFlag[EXPLODEWHENKILLED_INDEX].value = this->ExplodeWhenKilled;
 	this->BoolFlag[CANATTACK_INDEX].value = this->CanAttack;
+
+	if (!this->resource_infos.empty()) {
+		this->BoolFlag[HARVESTER_INDEX].value = true;
+	}
 }
 
 void unit_type::calculate_movement_mask()
