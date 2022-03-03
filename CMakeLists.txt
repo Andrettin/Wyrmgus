@@ -1452,7 +1452,7 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18.0")
 	option(ENABLE_UNITY_BUILD "Use unity builds for compilation" ON)
 endif()
 
-option(WITH_GEOJSON "Compile with support for generating map data from GeoJSON files" ON)
+option(WITH_GEOJSON "Compile with support for generating map data from GeoJSON files" OFF)
 option(WITH_TEST "Compile the test project" ON)
 
 # Binary name
