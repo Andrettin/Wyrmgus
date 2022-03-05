@@ -54,7 +54,7 @@
 #include <random>
 #include <set>
 #include <shared_mutex>
-#ifdef __has_include(<source_location>)
+#if __has_include(<source_location>)
 #include <source_location>
 #endif
 #include <sstream>
