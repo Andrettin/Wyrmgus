@@ -30,7 +30,7 @@
 
 #include "actions.h"
 
-class COrder_Die : public COrder
+class COrder_Die final : public COrder
 {
 public:
 	COrder_Die() : COrder(UnitAction::Die)

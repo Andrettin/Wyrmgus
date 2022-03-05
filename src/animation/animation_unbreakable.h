@@ -30,7 +30,7 @@
 
 #include "animation/animation.h"
 
-class CAnimation_Unbreakable : public CAnimation
+class CAnimation_Unbreakable final : public CAnimation
 {
 public:
 	CAnimation_Unbreakable() : CAnimation(AnimationUnbreakable), state(0) {}

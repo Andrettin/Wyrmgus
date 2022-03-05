@@ -30,7 +30,7 @@
 
 #include "actions.h"
 
-class COrder_TransformInto : public COrder
+class COrder_TransformInto final : public COrder
 {
 	friend std::unique_ptr<COrder>COrder::NewActionTransformInto(const unit_type &type);
 

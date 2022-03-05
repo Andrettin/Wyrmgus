@@ -37,7 +37,7 @@ enum class use_state {
 	target_reached = 128,
 };
 
-class COrder_Use : public COrder
+class COrder_Use final : public COrder
 {
 public:
 	COrder_Use() : COrder(UnitAction::Use)

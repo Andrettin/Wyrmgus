@@ -29,7 +29,7 @@
 
 #include "spell/spell_action.h"
 
-class Spell_Demolish : public wyrmgus::spell_action
+class Spell_Demolish final : public wyrmgus::spell_action
 {
 public:
 	virtual const std::string &get_class_identifier() const override

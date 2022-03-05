@@ -31,7 +31,7 @@
 
 namespace wyrmgus {
 
-class timeline : public named_data_entry, public data_type<timeline>
+class timeline final : public named_data_entry, public data_type<timeline>
 {
 	Q_OBJECT
 

@@ -30,7 +30,7 @@
 
 #include "animation/animation.h"
 
-class CAnimation_RandomWait : public CAnimation
+class CAnimation_RandomWait final : public CAnimation
 {
 public:
 	CAnimation_RandomWait() : CAnimation(AnimationRandomWait) {}

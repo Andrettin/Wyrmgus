@@ -30,7 +30,7 @@
 
 #include "animation/animation.h"
 
-class CAnimation_Die : public CAnimation
+class CAnimation_Die final : public CAnimation
 {
 public:
 	CAnimation_Die() : CAnimation(AnimationDie) {}

@@ -127,7 +127,7 @@ protected:
 };
 
 // Chunk particle
-class CChunkParticle : public CParticle
+class CChunkParticle final : public CParticle
 {
 public:
 	//Wyrmgus start
@@ -173,7 +173,7 @@ protected:
 };
 
 // Smoke particle
-class CSmokeParticle : public CParticle
+class CSmokeParticle final : public CParticle
 {
 public:
 	//Wyrmgus start
@@ -195,7 +195,7 @@ protected:
 	} speedVector;
 };
 
-class CRadialParticle : public CParticle
+class CRadialParticle final : public CParticle
 {
 public:
 	//Wyrmgus start

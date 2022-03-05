@@ -30,7 +30,7 @@
 
 #include "actions.h"
 
-class COrder_Train : public COrder
+class COrder_Train final : public COrder
 {
 	friend std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, const wyrmgus::unit_type &type, int player);
 

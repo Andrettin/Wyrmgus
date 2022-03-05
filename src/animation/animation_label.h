@@ -30,7 +30,7 @@
 
 #include "animation/animation.h"
 
-class CAnimation_Label : public CAnimation
+class CAnimation_Label final : public CAnimation
 {
 public:
 	CAnimation_Label() : CAnimation(AnimationLabel) {}

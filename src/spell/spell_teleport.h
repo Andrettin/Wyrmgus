@@ -28,7 +28,7 @@
 
 #include "spell/spell_action.h"
 
-class Spell_Teleport : public wyrmgus::spell_action
+class Spell_Teleport final : public wyrmgus::spell_action
 {
 public:
 	Spell_Teleport() : wyrmgus::spell_action(0) {}

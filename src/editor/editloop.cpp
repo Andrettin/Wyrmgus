@@ -161,7 +161,7 @@ static std::unique_ptr<gcn::Container> editorContainer;
 static std::unique_ptr<gcn::Slider> editorUnitSlider;
 static std::unique_ptr<gcn::Slider> editorSlider;
 
-class EditorUnitSliderListener : public gcn::ActionListener
+class EditorUnitSliderListener final : public gcn::ActionListener
 {
 public:
 	virtual void action(const std::string &)
@@ -183,7 +183,7 @@ public:
 
 static std::unique_ptr<EditorUnitSliderListener> editorUnitSliderListener;
 
-class EditorSliderListener : public gcn::ActionListener
+class EditorSliderListener final : public gcn::ActionListener
 {
 public:
 	virtual void action(const std::string &)

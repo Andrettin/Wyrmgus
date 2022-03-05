@@ -30,7 +30,7 @@
 
 #include "animation/animation.h"
 
-class CAnimation_SetVar : public CAnimation
+class CAnimation_SetVar final : public CAnimation
 {
 public:
 	CAnimation_SetVar() : CAnimation(AnimationSetVar)
