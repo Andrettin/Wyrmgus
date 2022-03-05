@@ -344,7 +344,7 @@ const CUnitCache &CMap::get_tile_unit_cache(const QPoint &pos, int z)
 	return this->Field(pos, z)->UnitCache;
 }
 
-QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const QPoint &min_pos, const QPoint &max_pos, const int z) const
+QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const QPoint &min_pos, const QPoint &max_pos, const int z, const site *site) const
 {
 	if (SaveGameLoading) {
 		return QPoint(-1, -1);
@@ -416,6 +416,44 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 		} else if (unit_type->get_given_resource() != nullptr && !unit_type->BoolFlag[BUILDING_INDEX].value) {
 			//for non-building resources (i.e. wood piles), place them within a certain distance of player units, to prevent them from blocking the way
 			Select(random_pos - QPoint(4, 4), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
+		}
+
+		if (table.empty() && site != nullptr && !site->get_satellites().empty()) {
+			const QSize size_with_satellites = site->get_size_with_satellites();
+
+			//cannot intersect with the orbit of any orbiting celestial body that is already placed
+			const QRect orbit_rect(random_pos - size::to_point(size_with_satellites / 2) - QPoint(1, 1), random_pos + size::to_point(size_with_satellites / 2) + QPoint(1, 1));
+			bool intersecting_orbit = false;
+			for (const CUnit *celestial_body : CMap::get()->get_orbiting_celestial_body_units()) {
+				if (celestial_body->get_site() == nullptr) {
+					continue;
+				}
+
+				const wyrmgus::site *orbit_center = celestial_body->get_site()->get_orbit_center();
+				if (orbit_center == nullptr) {
+					continue;
+				}
+
+				const CUnit *orbit_center_unit = orbit_center->get_game_data()->get_site_unit();
+				if (orbit_center_unit == nullptr) {
+					continue;
+				}
+
+				const QPoint orbit_center_tile_pos = orbit_center_unit->tilePos;
+				const int tile_distance = celestial_body->MapDistanceTo(*orbit_center_unit);
+				const QRect other_orbit_rect(orbit_center_tile_pos - QPoint(tile_distance, tile_distance) - size::to_point(celestial_body->Type->get_tile_size()) - QPoint(1, 1), orbit_center_tile_pos + QPoint(tile_distance, tile_distance) + size::to_point(celestial_body->Type->get_tile_size()) + QPoint(1, 1));
+
+				if (orbit_rect.intersects(other_orbit_rect)) {
+					intersecting_orbit = true;
+					break;
+				}
+			}
+
+			if (intersecting_orbit) {
+				continue;
+			}
+
+			Select<true>(random_pos - size::to_point((size_with_satellites + QSize(1, 1)) / 2), random_pos + size::to_point((size_with_satellites + QSize(1, 1)) / 2), table, z);
 		}
 		
 		if (!table.empty()) {
@@ -4291,7 +4329,7 @@ void CMap::generate_neutral_units(const wyrmgus::unit_type *unit_type, const int
 	
 	for (int i = 0; i < quantity; ++i) {
 		if (i == 0 || !grouped) {
-			unit_pos = this->generate_unit_location(unit_type, nullptr, min_pos, max_pos, z);
+			unit_pos = this->generate_unit_location(unit_type, nullptr, min_pos, max_pos, z, nullptr);
 		}
 		if (!this->Info->IsPointOnMap(unit_pos, z)) {
 			continue;

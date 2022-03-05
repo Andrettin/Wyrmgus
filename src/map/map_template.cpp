@@ -1304,7 +1304,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					if (site->orbits_map_template()) {
 						site_pos = this->generate_celestial_site_position(site, z);
 					} else {
-						site_pos = CMap::get()->generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
+						site_pos = CMap::get()->generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z, site);
 						site_pos += unit_offset;
 					}
 				} catch (...) {
@@ -1868,7 +1868,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::get()->generate_unit_location(type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(type, nullptr, map_start_pos, map_end - QPoint(1, 1), z, nullptr);
 			unit_pos += unit_offset;
 		}
 		if (!CMap::get()->Info->IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
@@ -2119,7 +2119,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::get()->generate_unit_location(type, std::get<2>(this->Units[i]), map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(type, std::get<2>(this->Units[i]), map_start_pos, map_end - QPoint(1, 1), z, nullptr);
 			unit_pos += unit_offset;
 		}
 		if (!CMap::get()->Info->IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
@@ -2173,7 +2173,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::get()->generate_unit_location(hero->get_unit_type(), std::get<2>(this->Heroes[i]), map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(hero->get_unit_type(), std::get<2>(this->Heroes[i]), map_start_pos, map_end - QPoint(1, 1), z, nullptr);
 			unit_pos += unit_offset;
 		}
 		if (!CMap::get()->Info->IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
@@ -2389,7 +2389,7 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 		unit_pos = this->get_location_map_position(unit_location, template_start_pos, map_start_pos, true);
 
 		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
-			unit_pos = CMap::get()->generate_unit_location(unit_type, unit_faction, map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(unit_type, unit_faction, map_start_pos, map_end - QPoint(1, 1), z, nullptr);
 			if (unit_pos.x() != -1 && unit_pos.y() != -1) {
 				unit_pos += unit_type->get_tile_center_pos_offset();
 			}
@@ -2491,7 +2491,7 @@ void map_template::apply_character(character *character, const QPoint &template_
 		unit_pos = this->get_location_map_position(character_location, template_start_pos, map_start_pos, true);
 
 		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
-			unit_pos = CMap::get()->generate_unit_location(unit_type, unit_faction, map_start_pos, map_end - QPoint(1, 1), z);
+			unit_pos = CMap::get()->generate_unit_location(unit_type, unit_faction, map_start_pos, map_end - QPoint(1, 1), z, nullptr);
 			if (unit_pos.x() != -1 && unit_pos.y() != -1) {
 				unit_pos += unit_type->get_tile_center_pos_offset();
 			}
