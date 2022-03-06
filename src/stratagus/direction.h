@@ -89,6 +89,32 @@ inline std::string direction_to_string(const direction direction)
 	throw std::runtime_error("Invalid direction: \"" + std::to_string(static_cast<int>(direction)) + "\".");
 }
 
+inline QPoint direction_to_offset(const direction direction)
+{
+	switch (direction) {
+		case direction::north:
+			return QPoint(0, -1);
+		case direction::northeast:
+			return QPoint(1, -1);
+		case direction::east:
+			return QPoint(1, 0);
+		case direction::southeast:
+			return QPoint(1, 1);
+		case direction::south:
+			return QPoint(0, 1);
+		case direction::southwest:
+			return QPoint(-1, 1);
+		case direction::west:
+			return QPoint(-1, 0);
+		case direction::northwest:
+			return QPoint(-1, -1);
+		default:
+			break;
+	}
+
+	throw std::runtime_error("Invalid direction: \"" + std::to_string(static_cast<int>(direction)) + "\".");
+}
+
 }
 
 Q_DECLARE_METATYPE(wyrmgus::direction)
