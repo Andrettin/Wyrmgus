@@ -134,11 +134,6 @@ void dungeon_generator::generate() const
 
 		tile->SetTerrain(this->get_deep_wall_terrain());
 	});
-
-	const int generated_unit_count = this->map_rect.width() * this->map_rect.height() / 400;
-	for (int i = 0; i < generated_unit_count; ++i) {
-		CMap::get()->generate_neutral_units(this->get_random_unit_type(), 1, this->map_rect.topLeft(), this->map_rect.bottomRight(), false, this->z);
-	}
 }
 
 void dungeon_generator::generate_central_room() const
