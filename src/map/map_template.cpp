@@ -39,6 +39,8 @@
 #include "item/unique_item.h"
 #include "map/character_substitution.h"
 #include "map/character_unit.h"
+#include "map/dungeon_generation_settings.h"
+#include "map/dungeon_generator.h"
 #include "map/generated_terrain.h"
 #include "map/historical_location.h"
 #include "map/map.h"
@@ -260,6 +262,14 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 
 			this->units.push_back(std::move(unit));
 		});
+	} else if (tag == "dungeon_generation") {
+		this->dungeon_generation = make_qunique<dungeon_generation_settings>();
+
+		if (QApplication::instance()->thread() != QThread::currentThread()) {
+			this->dungeon_generation->moveToThread(QApplication::instance()->thread());
+		}
+
+		database::process_gsml_data(this->dungeon_generation, scope);
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}
@@ -896,6 +906,12 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				}
 			}
 		}
+	}
+
+	if (this->is_dungeon()) {
+		const QRect map_rect(map_start_pos, map_end - QPoint(1, 1));
+		dungeon_generator dungeon_generator(map_rect, z, this->dungeon_generation.get());
+		dungeon_generator.generate();
 	}
 
 	if (this->IsSubtemplateArea() && this->get_surrounding_terrain_type() != nullptr) {

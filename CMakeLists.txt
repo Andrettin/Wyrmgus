@@ -211,6 +211,8 @@ source_group(language FILES ${language_SRCS})
 set(map_SRCS
 	src/map/character_substitution.cpp
 	src/map/character_unit.cpp
+	src/map/dungeon_generation_settings.cpp
+	src/map/dungeon_generator.cpp
 	src/map/generated_terrain.cpp
 	src/map/historical_location.cpp
 	src/map/landmass.cpp
@@ -793,6 +795,8 @@ set(wyrmgus_language_HDRS
 set(wyrmgus_map_HDRS
 	src/map/character_substitution.h
 	src/map/character_unit.h
+	src/map/dungeon_generation_settings.h
+	src/map/dungeon_generator.h
 	src/map/equirectangular_map_projection.h
 	src/map/generated_terrain.h
 	src/map/historical_location.h

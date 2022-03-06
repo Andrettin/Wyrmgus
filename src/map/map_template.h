@@ -48,6 +48,7 @@ class campaign;
 class character;
 class character_substitution;
 class character_unit;
+class dungeon_generation_settings;
 class faction;
 class generated_terrain;
 class historical_location;
@@ -699,6 +700,11 @@ public:
 
 		return nullptr;
 	}
+
+	bool is_dungeon() const
+	{
+		return this->dungeon_generation != nullptr;
+	}
 	
 private:
 	terrain_character_map_type terrain_character_map;
@@ -788,6 +794,7 @@ private:
 	std::map<const terrain_type *, const terrain_type *> default_base_terrains;
 	std::map<char, std::unique_ptr<character_unit>> character_units;
 	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
+	qunique_ptr<dungeon_generation_settings> dungeon_generation;
 	std::unique_ptr<map_template_history> history;
 
 	friend int ::CclDefineMapTemplate(lua_State *l);
