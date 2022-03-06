@@ -908,6 +908,17 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 	}
 
+	if (current_campaign != nullptr) {
+		const faction *current_faction = current_campaign->get_faction();
+		if (current_faction != nullptr && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->get_faction() != current_faction) {
+			CPlayer::GetThisPlayer()->set_civilization(current_faction->get_civilization());
+			CPlayer::GetThisPlayer()->set_faction(current_faction);
+			CPlayer::GetThisPlayer()->set_resource(defines::get()->get_wealth_resource(), 2500); // give the player enough resources to start up
+			CPlayer::GetThisPlayer()->set_resource(resource::get_all()[WoodCost], 2500);
+			CPlayer::GetThisPlayer()->set_resource(resource::get_all()[StoneCost], 2500);
+		}
+	}
+
 	if (this->is_dungeon()) {
 		const QRect map_rect(map_start_pos, map_end - QPoint(1, 1));
 		dungeon_generator dungeon_generator(map_rect, z, this->dungeon_generation.get());
@@ -940,17 +951,6 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 					CMap::get()->Field(surrounding_pos, z)->SetTerrain(this->get_surrounding_overlay_terrain_type());
 				}
 			}
-		}
-	}
-	
-	if (current_campaign) {
-		const faction *current_faction = current_campaign->get_faction();
-		if (current_faction != nullptr && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->get_faction() != current_faction) {
-			CPlayer::GetThisPlayer()->set_civilization(current_faction->get_civilization());
-			CPlayer::GetThisPlayer()->set_faction(current_faction);
-			CPlayer::GetThisPlayer()->set_resource(defines::get()->get_wealth_resource(), 2500); // give the player enough resources to start up
-			CPlayer::GetThisPlayer()->set_resource(resource::get_all()[WoodCost], 2500);
-			CPlayer::GetThisPlayer()->set_resource(resource::get_all()[StoneCost], 2500);
 		}
 	}
 	
@@ -1320,7 +1320,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					if (site->orbits_map_template()) {
 						site_pos = this->generate_celestial_site_position(site, z);
 					} else {
-						site_pos = CMap::get()->generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z, site);
+						site_pos = CMap::get()->generate_unit_location(base_unit_type, CPlayer::get_neutral_player(), map_start_pos, map_end - QPoint(1, 1), z, site);
 						site_pos += unit_offset;
 					}
 				} catch (...) {
@@ -1884,7 +1884,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::get()->generate_unit_location(type, nullptr, map_start_pos, map_end - QPoint(1, 1), z, nullptr);
+			unit_pos = CMap::get()->generate_unit_location(type, CPlayer::get_neutral_player(), map_start_pos, map_end - QPoint(1, 1), z, nullptr);
 			unit_pos += unit_offset;
 		}
 		if (!CMap::get()->Info->IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {

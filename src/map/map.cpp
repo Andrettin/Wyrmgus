@@ -344,13 +344,11 @@ const CUnitCache &CMap::get_tile_unit_cache(const QPoint &pos, int z)
 	return this->Field(pos, z)->UnitCache;
 }
 
-QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const QPoint &min_pos, const QPoint &max_pos, const int z, const site *site) const
+QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const CPlayer *player, const QPoint &min_pos, const QPoint &max_pos, const int z, const site *site) const
 {
 	if (SaveGameLoading) {
 		return QPoint(-1, -1);
 	}
-	
-	CPlayer *player = GetFactionPlayer(faction);
 	
 	QPoint random_pos(-1, -1);
 	
@@ -405,8 +403,14 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 		}
 		
 		std::vector<CUnit *> table;
-		if (player != nullptr) {
-			Select(random_pos - QPoint(32, 32), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::get_neutral_player())));
+		if (player != nullptr && !player->is_neutral_player()) {
+			//generate units for the non-neutral player at a distance from units belonging to other players, or to neutral buildings and hostile units
+			Select(random_pos - QPoint(32, 32), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::get_neutral_player()), IsBuildingType())));
+
+			//check if there are any (neutral) hostile units nearby
+			if (table.empty()) {
+				Select(random_pos - QPoint(8, 8), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(8, 8), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), IsEnemyWithPlayer(*player)));
+			}
 		} else if (unit_type->get_given_resource() == nullptr && !unit_type->BoolFlag[BUILDING_INDEX].value) {
 			if (unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->get_domain() == unit_domain::air || unit_type->get_domain() == unit_domain::space))) {
 				Select(random_pos - QPoint(16, 16), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(16, 16), table, z, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
@@ -484,7 +488,17 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 	
 	return QPoint(-1, -1);
 }
-//Wyrmgus end
+
+QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const QPoint &min_pos, const QPoint &max_pos, const int z, const site *site) const
+{
+	if (SaveGameLoading) {
+		return QPoint(-1, -1);
+	}
+	
+	const CPlayer *player = GetFactionPlayer(faction);
+	
+	return this->generate_unit_location(unit_type, player, min_pos, max_pos, z, site);
+}
 
 /**
 **  Wall on map tile.
@@ -4329,7 +4343,7 @@ void CMap::generate_neutral_units(const wyrmgus::unit_type *unit_type, const int
 	
 	for (int i = 0; i < quantity; ++i) {
 		if (i == 0 || !grouped) {
-			unit_pos = this->generate_unit_location(unit_type, nullptr, min_pos, max_pos, z, nullptr);
+			unit_pos = this->generate_unit_location(unit_type, CPlayer::get_neutral_player(), min_pos, max_pos, z, nullptr);
 		}
 		if (!this->Info->IsPointOnMap(unit_pos, z)) {
 			continue;
