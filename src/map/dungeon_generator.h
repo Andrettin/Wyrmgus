@@ -26,6 +26,8 @@
 
 #pragma once
 
+class CPlayer;
+
 namespace wyrmgus {
 
 class character;
