@@ -28,6 +28,7 @@
 
 namespace wyrmgus {
 
+class character;
 class dungeon_generation_settings;
 class terrain_type;
 class unit_type;
@@ -82,6 +83,7 @@ private:
 	void generate_guard(const QPoint &tile_pos) const;
 	void generate_item(const QPoint &tile_pos) const;
 	void generate_trap(const QPoint &tile_pos) const;
+	void generate_hero(CPlayer *player) const;
 
 	const terrain_type *get_floor_terrain() const;
 	const terrain_type *get_wall_terrain() const;
@@ -91,6 +93,7 @@ private:
 	const unit_type *get_random_unit_type() const;
 	const unit_type *get_random_item_unit_type() const;
 	const unit_type *get_random_trap_unit_type() const;
+	character *get_random_hero() const;
 
 private:
 	QRect map_rect;

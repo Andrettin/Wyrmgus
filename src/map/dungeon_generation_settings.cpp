@@ -28,6 +28,7 @@
 
 #include "map/dungeon_generation_settings.h"
 
+#include "character.h"
 #include "database/database.h"
 #include "unit/unit_type.h"
 
@@ -82,6 +83,10 @@ void dungeon_generation_settings::process_gsml_scope(const gsml_data &scope)
 				this->trap_unit_types.push_back(unit_type);
 			}
 		});
+	} else if (tag == "heroes") {
+		for (const std::string &value : values) {
+			this->heroes.push_back(character::get(value));
+		}
 	} else {
 		database::process_gsml_scope_for_object(this, scope);
 	}

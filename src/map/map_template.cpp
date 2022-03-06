@@ -2211,7 +2211,8 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			}
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->get_unit_type(), player, z);
 			unit->set_character(hero);
-			if (!unit->Type->BoolFlag[BUILDING_INDEX].value && !unit->Type->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
+			if (!unit->Type->BoolFlag[BUILDING_INDEX].value && !unit->Type->BoolFlag[HARVESTER_INDEX].value) {
+				//make non-building, non-harvester units not have an active AI
 				unit->Active = 0;
 				player->ChangeUnitTypeAiActiveCount(hero->get_unit_type(), -1);
 			}

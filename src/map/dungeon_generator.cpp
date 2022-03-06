@@ -28,12 +28,14 @@
 
 #include "map/dungeon_generator.h"
 
+#include "character.h"
 #include "direction.h"
 #include "map/dungeon_generation_settings.h"
 #include "map/map.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "player/player.h"
+#include "player/player_type.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
@@ -56,6 +58,7 @@ void dungeon_generator::generate() const
 	assert_throw(!this->settings->get_unit_types().empty());
 	assert_throw(!this->settings->get_item_unit_types().empty());
 	assert_throw(!this->settings->get_trap_unit_types().empty());
+	assert_throw(!this->settings->get_heroes().empty());
 
 	//set the edges to be walls
 	rect::for_each_edge_point(this->map_rect, [&](const QPoint &tile_pos) {
@@ -99,6 +102,15 @@ void dungeon_generator::generate() const
 
 	if (this->settings->get_glyph_unit_type() != nullptr) {
 		CMap::get()->generate_neutral_units(this->settings->get_glyph_unit_type(), 1, this->map_rect.topLeft(), this->map_rect.bottomRight(), false, this->z);
+	}
+
+	//create the hero for each player
+	for (CPlayer *player : CPlayer::get_non_neutral_players()) {
+		if (player->get_type() != player_type::person) {
+			continue;
+		}
+
+		this->generate_hero(player);
 	}
 
 	//make wall tiles which only border other wall tiles into deep wall tiles
@@ -581,6 +593,20 @@ void dungeon_generator::generate_trap(const QPoint &tile_pos) const
 	CreateUnit(tile_pos, *unit_type, CPlayer::get_neutral_player(), this->z);
 }
 
+void dungeon_generator::generate_hero(CPlayer *player) const
+{
+	character *hero = this->get_random_hero();
+	const unit_type *unit_type = hero->get_unit_type();
+	const QPoint unit_pos = CMap::get()->generate_unit_location(unit_type, player, this->map_rect.topLeft(), this->map_rect.bottomRight(), this->z, nullptr);
+
+	assert_throw(this->map_rect.contains(unit_pos));
+
+	CUnit *hero_unit = CreateUnit(unit_pos, *unit_type, player, this->z);
+	hero_unit->set_character(hero);
+
+	player->SetStartView(unit_pos, this->z);
+}
+
 const terrain_type *dungeon_generator::get_floor_terrain() const
 {
 	return this->settings->get_floor_terrain();
@@ -614,6 +640,34 @@ const unit_type *dungeon_generator::get_random_item_unit_type() const
 const unit_type *dungeon_generator::get_random_trap_unit_type() const
 {
 	return container::get_random(this->settings->get_trap_unit_types());
+}
+
+character *dungeon_generator::get_random_hero() const
+{
+	//get a random hero out of the lowest-level ones
+	const std::vector<character *> &heroes = this->settings->get_heroes();
+
+	std::vector<character *> potential_heroes;
+	int lowest_level = std::numeric_limits<int>::max();
+
+	for (character *hero : heroes) {
+		if (!hero->CanAppear()) {
+			continue;
+		}
+
+		if (hero->get_level() <= lowest_level) {
+			if (hero->get_level() < lowest_level) {
+				lowest_level = hero->get_level();
+				potential_heroes.clear();
+			}
+
+			potential_heroes.push_back(hero);
+		}
+	}
+
+	assert_throw(!potential_heroes.empty());
+
+	return container::get_random(potential_heroes);
 }
 
 }

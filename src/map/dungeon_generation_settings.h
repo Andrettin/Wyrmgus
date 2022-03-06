@@ -28,6 +28,7 @@
 
 namespace wyrmgus {
 
+class character;
 class gsml_data;
 class gsml_property;
 class terrain_type;
@@ -87,6 +88,11 @@ public:
 		return this->trap_unit_types;
 	}
 
+	const std::vector<character *> &get_heroes() const
+	{
+		return this->heroes;
+	}
+
 private:
 	terrain_type *floor_terrain = nullptr;
 	terrain_type *wall_terrain = nullptr;
@@ -96,6 +102,7 @@ private:
 	std::vector<const unit_type *> unit_types;
 	std::vector<const unit_type *> item_unit_types;
 	std::vector<const unit_type *> trap_unit_types;
+	std::vector<character *> heroes;
 };
 
 }
