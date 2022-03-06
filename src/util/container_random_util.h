@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2022 by Andrettin
+//      (c) Copyright 2020-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,31 +26,20 @@
 
 #pragma once
 
-namespace wyrmgus {
+#include "util/random.h"
 
-class gsml_data;
-enum class gsml_operator;
+namespace wyrmgus::container {
 
-class gsml_parser final
+template <typename T>
+inline const T::value_type &get_random(const T &container)
 {
-public:
-	explicit gsml_parser();
+	return container[random::get()->generate(container.size())];
+}
 
-	gsml_data parse(const std::filesystem::path &filepath);
-	gsml_data parse(const std::string &gsml_string);
-
-private:
-	void parse(std::istream &istream, gsml_data &gsml_data);
-	void parse_line(const std::string &line);
-	bool parse_escaped_character(std::string &current_string, const char c);
-	void parse_tokens();
-	void reset();
-
-private:
-	std::vector<std::string> tokens;
-	gsml_data *current_gsml_data = nullptr;
-	std::string current_key;
-	gsml_operator current_property_operator;
-};
+template <typename T>
+inline const T::value_type &get_random_async(const T &container)
+{
+	return container[random::get()->generate_async(container.size())];
+}
 
 }
