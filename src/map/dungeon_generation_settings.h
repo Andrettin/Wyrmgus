@@ -77,6 +77,11 @@ public:
 		return this->unit_types;
 	}
 
+	const std::vector<const unit_type *> &get_item_unit_types() const
+	{
+		return this->item_unit_types;
+	}
+
 	const std::vector<const unit_type *> &get_trap_unit_types() const
 	{
 		return this->trap_unit_types;
@@ -89,6 +94,7 @@ private:
 	terrain_type *water_terrain = nullptr;
 	unit_type *glyph_unit_type = nullptr;
 	std::vector<const unit_type *> unit_types;
+	std::vector<const unit_type *> item_unit_types;
 	std::vector<const unit_type *> trap_unit_types;
 };
 

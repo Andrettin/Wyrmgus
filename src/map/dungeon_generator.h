@@ -80,6 +80,8 @@ private:
 	void complete_area_terrain(const QRect &rect, const terrain_type *terrain) const;
 
 	void generate_guard(const QPoint &tile_pos) const;
+	void generate_item(const QPoint &tile_pos) const;
+	void generate_trap(const QPoint &tile_pos) const;
 
 	const terrain_type *get_floor_terrain() const;
 	const terrain_type *get_wall_terrain() const;
@@ -87,6 +89,7 @@ private:
 	const terrain_type *get_water_terrain() const;
 
 	const unit_type *get_random_unit_type() const;
+	const unit_type *get_random_item_unit_type() const;
 	const unit_type *get_random_trap_unit_type() const;
 
 private:

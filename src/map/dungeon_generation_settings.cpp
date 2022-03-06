@@ -56,6 +56,19 @@ void dungeon_generation_settings::process_gsml_scope(const gsml_data &scope)
 				this->unit_types.push_back(unit_type);
 			}
 		});
+	} else if (tag == "items") {
+		for (const std::string &value : values) {
+			this->item_unit_types.push_back(unit_type::get(value));
+		}
+
+		scope.for_each_property([&](const gsml_property &property) {
+			const unit_type *unit_type = unit_type::get(property.get_key());
+			const int weight = std::stoi(property.get_value());
+
+			for (int i = 0; i < weight; ++i) {
+				this->item_unit_types.push_back(unit_type);
+			}
+		});
 	} else if (tag == "traps") {
 		for (const std::string &value : values) {
 			this->trap_unit_types.push_back(unit_type::get(value));

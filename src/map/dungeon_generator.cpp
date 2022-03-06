@@ -54,6 +54,7 @@ void dungeon_generator::generate() const
 	assert_throw(this->settings->get_deep_wall_terrain() != nullptr);
 	assert_throw(this->settings->get_water_terrain() != nullptr);
 	assert_throw(!this->settings->get_unit_types().empty());
+	assert_throw(!this->settings->get_item_unit_types().empty());
 	assert_throw(!this->settings->get_trap_unit_types().empty());
 
 	//set the edges to be walls
@@ -336,6 +337,7 @@ void dungeon_generator::generate_internal_room_features(const QRect &room_floor_
 		case 7:
 		case 8:
 			//item
+			this->generate_item(room_floor_rect.topLeft() + QPoint(random::get()->generate(width), random::get()->generate(height)));
 			break;
 		case 9:
 			//unfilled central area
@@ -344,13 +346,14 @@ void dungeon_generator::generate_internal_room_features(const QRect &room_floor_
 			//room with runetraps
 			rect::for_each_point(room_floor_rect, [&](const QPoint &tile_pos) {
 				if (random::get()->dice(4) == 1) {
-					CreateUnit(tile_pos, *this->get_random_trap_unit_type(), CPlayer::get_neutral_player(), this->z);
+					this->generate_trap(tile_pos);
 				}
 			});
 			break;
 		case 13:
 			//item and trap
-			CreateUnit(room_floor_rect.topLeft() + QPoint(random::get()->generate(width), random::get()->generate(height)), *this->get_random_trap_unit_type(), CPlayer::get_neutral_player(), this->z);
+			this->generate_item(room_floor_rect.topLeft() + QPoint(random::get()->generate(width), random::get()->generate(height)));
+			this->generate_trap(room_floor_rect.topLeft() + QPoint(random::get()->generate(width), random::get()->generate(height)));
 			break;
 		case 14:
 		case 15:
@@ -392,7 +395,7 @@ void dungeon_generator::generate_internal_room_features(const QRect &room_floor_
 			break;
 		case 20:
 			//monster and spellbook
-			CreateUnit(room_floor_rect.topLeft() + QPoint(random::get()->generate(width), random::get()->generate(height)), *this->get_random_unit_type(), CPlayer::get_neutral_player(), this->z);
+			this->generate_guard(room_floor_rect.topLeft() + QPoint(random::get()->generate(width), random::get()->generate(height)));
 			break;
 		case 21: {
 			const QRect inner_rect(room_floor_rect.topLeft() + QPoint(1, 1), room_floor_rect.bottomRight() - QPoint(1, 1));
@@ -407,7 +410,7 @@ void dungeon_generator::generate_internal_room_features(const QRect &room_floor_
 			//traps and bones
 			rect::for_each_point(room_floor_rect, [&](const QPoint &tile_pos) {
 				if (random::get()->dice(4) == 1) {
-					CreateUnit(tile_pos, *this->get_random_trap_unit_type(), CPlayer::get_neutral_player(), this->z);
+					this->generate_trap(tile_pos);
 				}
 			});
 			break;
@@ -552,6 +555,32 @@ void dungeon_generator::generate_guard(const QPoint &tile_pos) const
 	CreateUnit(tile_pos, *unit_type, CPlayer::get_neutral_player(), this->z);
 }
 
+void dungeon_generator::generate_item(const QPoint &tile_pos) const
+{
+	const unit_type *unit_type = this->get_random_item_unit_type();
+
+	assert_throw(unit_type->BoolFlag[ITEM_INDEX].value);
+
+	if (!UnitTypeCanBeAt(*unit_type, tile_pos, this->z)) {
+		return;
+	}
+
+	CUnit *item_unit = CreateUnit(tile_pos, *unit_type, CPlayer::get_neutral_player(), this->z);
+
+	item_unit->generate_special_properties(nullptr, CPlayer::get_neutral_player(), true, false, false);
+}
+
+void dungeon_generator::generate_trap(const QPoint &tile_pos) const
+{
+	const unit_type *unit_type = this->get_random_trap_unit_type();
+
+	if (!UnitTypeCanBeAt(*unit_type, tile_pos, this->z)) {
+		return;
+	}
+
+	CreateUnit(tile_pos, *unit_type, CPlayer::get_neutral_player(), this->z);
+}
+
 const terrain_type *dungeon_generator::get_floor_terrain() const
 {
 	return this->settings->get_floor_terrain();
@@ -575,6 +604,11 @@ const terrain_type *dungeon_generator::get_water_terrain() const
 const unit_type *dungeon_generator::get_random_unit_type() const
 {
 	return container::get_random(this->settings->get_unit_types());
+}
+
+const unit_type *dungeon_generator::get_random_item_unit_type() const
+{
+	return container::get_random(this->settings->get_item_unit_types());
 }
 
 const unit_type *dungeon_generator::get_random_trap_unit_type() const
