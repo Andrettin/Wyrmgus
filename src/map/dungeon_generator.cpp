@@ -91,6 +91,15 @@ void dungeon_generator::generate() const
 		}
 	});
 
+	const int generated_unit_count = this->map_rect.width() * this->map_rect.height() / 400;
+	for (int i = 0; i < generated_unit_count; ++i) {
+		CMap::get()->generate_neutral_units(this->get_random_unit_type(), 1, this->map_rect.topLeft(), this->map_rect.bottomRight(), false, this->z);
+	}
+
+	if (this->settings->get_glyph_unit_type() != nullptr) {
+		CMap::get()->generate_neutral_units(this->settings->get_glyph_unit_type(), 1, this->map_rect.topLeft(), this->map_rect.bottomRight(), false, this->z);
+	}
+
 	//make wall tiles which only border other wall tiles into deep wall tiles
 	rect::for_each_point(this->map_rect, [&](const QPoint &tile_pos) {
 		tile *tile = CMap::get()->Field(tile_pos, this->z);
@@ -508,6 +517,8 @@ void dungeon_generator::set_tile_terrain(const QPoint &tile_pos, const terrain_t
 
 	if (terrain->is_overlay()) {
 		tile->SetTerrain(this->get_floor_terrain());
+	} else {
+		tile->RemoveOverlayTerrain();
 	}
 
 	tile->SetTerrain(terrain);

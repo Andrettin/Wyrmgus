@@ -41,6 +41,7 @@ class dungeon_generation_settings final : public QObject
 	Q_PROPERTY(wyrmgus::terrain_type* wall_terrain MEMBER wall_terrain)
 	Q_PROPERTY(wyrmgus::terrain_type* deep_wall_terrain MEMBER deep_wall_terrain)
 	Q_PROPERTY(wyrmgus::terrain_type* water_terrain MEMBER water_terrain)
+	Q_PROPERTY(wyrmgus::unit_type* glyph MEMBER glyph_unit_type)
 
 public:
 	void process_gsml_property(const gsml_property &property);
@@ -66,6 +67,11 @@ public:
 		return this->water_terrain;
 	}
 
+	const unit_type *get_glyph_unit_type() const
+	{
+		return this->glyph_unit_type;
+	}
+
 	const std::vector<const unit_type *> &get_unit_types() const
 	{
 		return this->unit_types;
@@ -81,6 +87,7 @@ private:
 	terrain_type *wall_terrain = nullptr;
 	terrain_type *deep_wall_terrain = nullptr;
 	terrain_type *water_terrain = nullptr;
+	unit_type *glyph_unit_type = nullptr;
 	std::vector<const unit_type *> unit_types;
 	std::vector<const unit_type *> trap_unit_types;
 };
