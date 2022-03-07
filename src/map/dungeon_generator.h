@@ -65,6 +65,7 @@ public:
 
 private:
 	void generate_central_room() const;
+	bool generate_chamber(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	void generate_oval_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	bool generate_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	void generate_corridor_to_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
@@ -86,6 +87,7 @@ private:
 	void generate_guard(const QPoint &tile_pos) const;
 	void generate_creep() const;
 	void generate_item(const QPoint &tile_pos) const;
+	void generate_item(const QRect &tile_rect) const;
 	void generate_trap(const QPoint &tile_pos) const;
 	void generate_hero(CPlayer *player) const;
 

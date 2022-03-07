@@ -171,6 +171,177 @@ void dungeon_generator::generate_central_room() const
 	}
 }
 
+bool dungeon_generator::generate_chamber(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
+{
+	QPoint start_pos = edge_tile_pos + (dir_offset - QPoint(1, 1)) * 2;
+	QPoint end_pos = edge_tile_pos + (dir_offset + QPoint(1, 1)) * 2;
+
+	const QPoint cp = start_pos + QPoint(2, 2);
+
+	QRect room_rect = dungeon_generator::create_rect(start_pos, end_pos);
+
+	if (!this->is_area_clear(room_rect)) {
+		return false;
+	}
+
+	//make the room rect cover the inner room area
+	start_pos += QPoint(1, 1);
+	end_pos -= QPoint(1, 1);
+
+	room_rect = dungeon_generator::create_rect(start_pos, end_pos);
+
+	this->set_area_terrain(room_rect, this->get_floor_terrain());
+	this->set_tile_terrain(edge_tile_pos, this->get_floor_terrain());
+
+	bool continued = false;
+	bool straight = false;
+
+	switch (random::get()->dice(4)) {
+		case 1:
+		case 2:
+			continued = (this->generate_room(cp + 2 * dir_offset, dir_offset) || continued);
+			break;
+		case 3:
+			continued = (this->generate_chamber(cp + 2 * dir_offset, dir_offset) || continued);
+			break;
+		default:
+			break;
+	}
+
+	if (continued && random::get()->dice(3) == 1) {
+		straight = true;
+	} else {
+		const QPoint inverted_dir_offset(dir_offset.y(), dir_offset.x());
+
+		if (random::get()->dice(3) == 1) {
+			continued = (this->generate_chamber(cp + 2 * inverted_dir_offset, inverted_dir_offset) || continued);
+		}
+
+		if (random::get()->dice(3) == 1) {
+			continued = (this->generate_chamber(cp - 2 * inverted_dir_offset, inverted_dir_offset * -1) || continued);
+		}
+	}
+
+	if (continued) {
+		if (straight) {
+			switch (random::get()->dice(2)) {
+				case 1: {
+					//narrow passage
+					const QRect passage_wall_rect = dungeon_generator::create_rect(cp - QPoint(1, 1), cp + QPoint(1, 1));
+					this->set_area_terrain(passage_wall_rect, this->get_wall_terrain());
+
+					const QRect passage_floor_rect = dungeon_generator::create_rect(cp - dir_offset, cp + dir_offset);
+					this->set_area_terrain(passage_floor_rect, this->get_floor_terrain());
+					break;
+				}
+				case 2:
+					//flanking items
+					//generates a menhir, gravestone, bone, or stone bench
+					break;
+			}
+		} else {
+			switch (random::get()->dice(8)) {
+				case 1:
+					//trap and chest
+					this->generate_trap(cp - dir_offset);
+					this->generate_item(cp);
+					break;
+				case 2:
+					this->set_tile_terrain(cp, this->get_wall_terrain());
+
+					//"secret" item
+					this->generate_item(dungeon_generator::create_rect(cp - QPoint(1, 1), cp + QPoint(1, 1)));
+					break;
+				case 3:
+					//menhir
+					break;
+				case 4:
+					//fountain
+					break;
+			}
+		}
+	} else {
+		//we have an ending chamber, so add something interesting
+		switch (random::get()->dice(30)) {
+			case 1:
+				//trap and chest
+				this->generate_trap(cp);
+				this->generate_item(cp + dir_offset);
+				break;
+			case 2:
+				//rune traps and chest
+				this->generate_trap(cp);
+				this->generate_trap(cp + QPoint(dir_offset.y(), -dir_offset.x()));
+				this->generate_trap(cp + QPoint(-dir_offset.y(), dir_offset.x()));
+				this->generate_item(cp + dir_offset);
+				break;
+			case 3:
+				//central item with pit
+				this->generate_item(cp - dir_offset);
+				this->generate_item(cp);
+				break;
+			case 4:
+				this->set_tile_terrain(cp, this->get_water_terrain());
+				break;
+			case 5:
+				this->set_tile_terrain(cp, this->get_wall_terrain());
+
+				//"secret" item
+				this->generate_item(dungeon_generator::create_rect(cp - QPoint(1, 1), cp + QPoint(1, 1)));
+				break;
+			case 6:
+				//gravestone(s) and NPC
+
+				if (random::get()->dice(3) == 1) {
+					this->generate_guard(cp);
+				}
+				break;
+			case 7:
+				this->generate_guard(cp);
+				this->generate_item(room_rect);
+				this->generate_item(room_rect);
+				if (random::get()->dice(2) == 1) {
+					this->generate_item(room_rect);
+					this->generate_item(room_rect);
+				}
+				break;
+			case 8:
+				//pit trap
+				this->generate_trap(cp - dir_offset);
+				break;
+			case 9:
+				rect::for_each_point(room_rect, [&](const QPoint &tile_pos) {
+					this->generate_guard(tile_pos);
+				});
+				break;
+			case 10:
+				rect::for_each_point(room_rect, [&](const QPoint &tile_pos) {
+					this->generate_guard(tile_pos);
+				});
+				break;
+			case 11:
+				//food
+				rect::for_each_point(room_rect, [&](const QPoint &tile_pos) {
+					this->generate_item(tile_pos);
+				});
+				break;
+			case 12:
+				//altar
+				break;
+			case 13:
+				//fountain
+				break;
+			default:
+				this->generate_internal_room_features(room_rect);
+				break;
+		}
+	}
+
+	this->complete_area_terrain(dungeon_generator::create_rect(start_pos - QPoint(1, 1), end_pos + QPoint(1, 1)), this->get_wall_terrain());
+
+	return true;
+}
+
 void dungeon_generator::generate_oval_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
 {
 	const int width = random::get()->dice(2, 3);
@@ -467,6 +638,9 @@ void dungeon_generator::extend_dungeon(const QPoint &edge_tile_pos, const QPoint
 	const char c = container::get_random(dungeon_dna);
 	
 	switch (c) {
+		case 'h':
+			this->generate_chamber(edge_tile_pos, dir_offset);
+			break;
 		case 'o':
 			this->generate_oval_room(edge_tile_pos, dir_offset);
 			break;
@@ -618,6 +792,23 @@ void dungeon_generator::generate_creep() const
 void dungeon_generator::generate_item(const QPoint &tile_pos) const
 {
 	const unit_type *unit_type = this->get_random_item_unit_type();
+
+	assert_throw(unit_type->BoolFlag[ITEM_INDEX].value);
+
+	CUnit *item_unit = CreateUnit(tile_pos, *unit_type, CPlayer::get_neutral_player(), this->z);
+
+	item_unit->generate_special_properties(nullptr, CPlayer::get_neutral_player(), true, false, false);
+}
+
+void dungeon_generator::generate_item(const QRect &tile_rect) const
+{
+	const unit_type *unit_type = this->get_random_item_unit_type();
+	const QPoint tile_pos = CMap::get()->generate_unit_location(unit_type, CPlayer::get_neutral_player(), tile_rect.topLeft(), tile_rect.bottomRight(), this->z, nullptr, true);
+
+	if (!tile_rect.contains(tile_pos)) {
+		assert_log(false);
+		return;
+	}
 
 	assert_throw(unit_type->BoolFlag[ITEM_INDEX].value);
 
