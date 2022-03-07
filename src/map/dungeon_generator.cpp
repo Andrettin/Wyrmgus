@@ -171,6 +171,34 @@ void dungeon_generator::generate_central_room() const
 	}
 }
 
+void dungeon_generator::generate_oval_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
+{
+	const int width = random::get()->dice(2, 3);
+	const int height = random::get()->dice(2, 3);
+
+	const QPoint start_pos = edge_tile_pos + (dir_offset - QPoint(1, 1)) * QPoint(width, height);
+	const QPoint end_pos = edge_tile_pos + (dir_offset + QPoint(1, 1)) * QPoint(width, height);
+
+	const QRect room_rect = dungeon_generator::create_rect(start_pos, end_pos);
+
+	if (!this->is_area_clear(room_rect)) {
+		return;
+	}
+
+	const QPoint cp = (start_pos + end_pos) / 2;
+
+	for (int x = start_pos.x(); x <= (start_pos.x() + width * 2); ++x) {
+		for (int y = start_pos.y(); y < (start_pos.y() + height * 2); ++y) {
+			if ((((x - cp.x()) * (x - cp.x()) * 100) / (width * width) + ((y - cp.y()) * (y - cp.y()) * 100) / (height * height)) < 100) {
+				this->set_tile_terrain(QPoint(x, y), this->get_floor_terrain());
+			}
+		}
+	}
+
+	const QRect inner_rect = dungeon_generator::create_rect(cp, edge_tile_pos);
+	this->set_area_terrain(inner_rect, this->get_floor_terrain());
+}
+
 bool dungeon_generator::generate_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
 {
 	const QPoint min_pos_offset(random::get()->dice(std::abs(dir_offset.x() - 1), 5), random::get()->dice(std::abs(dir_offset.y() - 1), 5));
@@ -439,6 +467,9 @@ void dungeon_generator::extend_dungeon(const QPoint &edge_tile_pos, const QPoint
 	const char c = container::get_random(dungeon_dna);
 	
 	switch (c) {
+		case 'o':
+			this->generate_oval_room(edge_tile_pos, dir_offset);
+			break;
 		case 'r':
 			this->generate_room(edge_tile_pos, dir_offset);
 			break;
