@@ -97,7 +97,7 @@ void dungeon_generator::generate() const
 
 	const int generated_unit_count = this->map_rect.width() * this->map_rect.height() / 400;
 	for (int i = 0; i < generated_unit_count; ++i) {
-		CMap::get()->generate_neutral_units(this->get_random_unit_type(), 1, this->map_rect.topLeft(), this->map_rect.bottomRight(), false, this->z);
+		this->generate_creep();
 	}
 
 	if (this->settings->get_glyph_unit_type() != nullptr) {
@@ -598,15 +598,28 @@ void dungeon_generator::generate_guard(const QPoint &tile_pos) const
 	CreateUnit(tile_pos, *unit_type, CPlayer::get_neutral_player(), this->z);
 }
 
+void dungeon_generator::generate_creep() const
+{
+	const unit_type *unit_type = this->get_random_unit_type();
+	const QPoint tile_pos = CMap::get()->generate_unit_location(unit_type, CPlayer::get_neutral_player(), this->map_rect.topLeft(), this->map_rect.bottomRight(), this->z, nullptr, true);
+
+	if (!this->map_rect.contains(tile_pos)) {
+		assert_log(false);
+		return;
+	}
+
+	CreateUnit(tile_pos, *unit_type, CPlayer::get_neutral_player(), this->z);
+
+	if (random::get()->dice(10) == 1) {
+		this->generate_item(tile_pos);
+	}
+}
+
 void dungeon_generator::generate_item(const QPoint &tile_pos) const
 {
 	const unit_type *unit_type = this->get_random_item_unit_type();
 
 	assert_throw(unit_type->BoolFlag[ITEM_INDEX].value);
-
-	if (!UnitTypeCanBeAt(*unit_type, tile_pos, this->z)) {
-		return;
-	}
 
 	CUnit *item_unit = CreateUnit(tile_pos, *unit_type, CPlayer::get_neutral_player(), this->z);
 

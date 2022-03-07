@@ -84,6 +84,7 @@ private:
 	void complete_area_terrain(const QRect &rect, const terrain_type *terrain) const;
 
 	void generate_guard(const QPoint &tile_pos) const;
+	void generate_creep() const;
 	void generate_item(const QPoint &tile_pos) const;
 	void generate_trap(const QPoint &tile_pos) const;
 	void generate_hero(CPlayer *player) const;
