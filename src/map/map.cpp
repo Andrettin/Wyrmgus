@@ -344,7 +344,7 @@ const CUnitCache &CMap::get_tile_unit_cache(const QPoint &pos, int z)
 	return this->Field(pos, z)->UnitCache;
 }
 
-QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const CPlayer *player, const QPoint &min_pos, const QPoint &max_pos, const int z, const site *site) const
+QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const CPlayer *player, const QPoint &min_pos, const QPoint &max_pos, const int z, const site *site, const bool ignore_native_terrain) const
 {
 	if (SaveGameLoading) {
 		return QPoint(-1, -1);
@@ -353,19 +353,22 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const C
 	QPoint random_pos(-1, -1);
 	
 	std::vector<const terrain_type *> allowed_terrains;
-	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->get_species() != nullptr) { //if the unit is a fauna one, it has to start on terrain it is native to
-		allowed_terrains = unit_type->get_species()->get_native_terrain_types();
-	}
-	
-	for (const wyrmgus::unit_type *spawned_type : unit_type->get_spawned_units()) {
-		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
-			vector::merge(allowed_terrains, spawned_type->get_species()->get_native_terrain_types());
-		}
-	}
 
-	for (const wyrmgus::unit_type *spawned_type : unit_type->get_neutral_spawned_units()) {
-		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
-			vector::merge(allowed_terrains, spawned_type->get_species()->get_native_terrain_types());
+	if (!ignore_native_terrain) {
+		if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->get_species() != nullptr) { //if the unit is a fauna one, it has to start on terrain it is native to
+			allowed_terrains = unit_type->get_species()->get_native_terrain_types();
+		}
+
+		for (const wyrmgus::unit_type *spawned_type : unit_type->get_spawned_units()) {
+			if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
+				vector::merge(allowed_terrains, spawned_type->get_species()->get_native_terrain_types());
+			}
+		}
+
+		for (const wyrmgus::unit_type *spawned_type : unit_type->get_neutral_spawned_units()) {
+			if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
+				vector::merge(allowed_terrains, spawned_type->get_species()->get_native_terrain_types());
+			}
 		}
 	}
 

@@ -215,7 +215,7 @@ public:
 
 	const CUnitCache &get_tile_unit_cache(const QPoint &pos, int z);
 
-	QPoint generate_unit_location(const wyrmgus::unit_type *unit_type, const CPlayer *player, const QPoint &min_pos, const QPoint &max_pos, const int z, const site *site) const;
+	QPoint generate_unit_location(const wyrmgus::unit_type *unit_type, const CPlayer *player, const QPoint &min_pos, const QPoint &max_pos, const int z, const site *site, const bool ignore_native_terrain = false) const;
 	QPoint generate_unit_location(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const QPoint &min_pos, const QPoint &max_pos, const int z, const site *site) const;
 
 	void reset_tile_visibility();
