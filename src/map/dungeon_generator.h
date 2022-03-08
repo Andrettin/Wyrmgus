@@ -69,6 +69,7 @@ private:
 	void generate_linking_corridor(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	void generate_oval_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	bool generate_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
+	void generate_square_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	void generate_corridor_to_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	void generate_maze(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 

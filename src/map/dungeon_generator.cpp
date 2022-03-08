@@ -441,6 +441,120 @@ bool dungeon_generator::generate_room(const QPoint &edge_tile_pos, const QPoint 
 	return true;
 }
 
+void dungeon_generator::generate_square_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
+{
+	const QPoint start_pos = edge_tile_pos + (dir_offset - QPoint(1, 1)) * 3;
+	const QPoint end_pos = edge_tile_pos + (dir_offset + QPoint(1, 1)) * 3;
+
+	const QPoint cp = start_pos + QPoint(3, 3);
+
+	const QRect room_rect = dungeon_generator::create_rect(start_pos, end_pos);
+
+	if (!this->is_area_clear(room_rect)) {
+		return;
+	}
+
+	const QRect room_floor_rect(room_rect.topLeft() + QPoint(1, 1), room_rect.bottomRight() - QPoint(1, 1));
+	this->set_area_terrain(room_floor_rect, this->get_floor_terrain());
+
+	this->set_tile_terrain(edge_tile_pos, this->get_floor_terrain());
+
+	bool continued = false;
+
+	//room ahead
+	switch (random::get()->dice(4)) {
+		case 1:
+		case 2:
+			continued = (this->generate_room(cp + 3 * dir_offset, dir_offset) || continued);
+			break;
+		case 3:
+			continued = (this->generate_chamber(cp + 3 * dir_offset, dir_offset) || continued);
+			break;
+		default:
+			break;
+	}
+
+	//side rooms
+	const QPoint inverted_dir_offset(dir_offset.y(), dir_offset.x());
+
+	if (random::get()->dice(2) == 1) {
+		if (random::get()->dice(2) == 1) {
+			continued = (this->generate_chamber(cp + 3 * inverted_dir_offset, inverted_dir_offset) || continued);
+		} else {
+			continued = (this->generate_room(cp + 3 * inverted_dir_offset, inverted_dir_offset) || continued);
+		}
+	}
+
+	if (random::get()->dice(2) == 1) {
+		if (random::get()->dice(2) == 1) {
+			continued = (this->generate_chamber(cp - 3 * inverted_dir_offset, inverted_dir_offset * -1) || continued);
+		} else {
+			continued = (this->generate_room(cp - 3 * inverted_dir_offset, inverted_dir_offset * -1) || continued);
+		}
+	}
+
+	if (continued) {
+		switch (random::get()->dice(8)) {
+			case 1:
+				//chest and trap
+				this->generate_item(cp);
+				this->generate_trap(cp + dir_offset);
+				break;
+			case 2:
+				this->generate_guard(cp);
+				break;
+			case 3:
+				//fire
+				break;
+			case 4:
+			case 5:
+				this->set_area_terrain(room_floor_rect, this->get_wall_terrain());
+
+				if (!this->is_tile_clear(cp - QPoint(3, 0))) {
+					this->set_area_terrain(dungeon_generator::create_rect(cp, cp - QPoint(3, 0)), this->get_floor_terrain());
+				}
+
+				if (!this->is_tile_clear(cp + QPoint(3, 0))) {
+					this->set_area_terrain(dungeon_generator::create_rect(cp, cp + QPoint(3, 0)), this->get_floor_terrain());
+				}
+
+				if (!this->is_tile_clear(cp - QPoint(0, 3))) {
+					this->set_area_terrain(dungeon_generator::create_rect(cp, cp - QPoint(0, 3)), this->get_floor_terrain());
+				}
+
+				if (!this->is_tile_clear(cp + QPoint(0, 3))) {
+					this->set_area_terrain(dungeon_generator::create_rect(cp, cp + QPoint(0, 3)), this->get_floor_terrain());
+				}
+
+				break;
+			default:
+				this->generate_internal_room_features(room_floor_rect);
+				break;
+		}
+	} else {
+		//we have an ending chamber, so add something really interesting
+		switch (random::get()->dice(8)) {
+			case 1:
+				//creature and chest
+				this->generate_guard(cp);
+				this->generate_item(cp + dir_offset);
+				break;
+			case 2:
+				//shop
+				break;
+			case 3:
+				//fire and NPCs
+				this->generate_guard(cp);
+				this->generate_guard(cp - dir_offset);
+				break;
+			default:
+				break;
+		}
+	}
+
+	this->complete_area_terrain(room_rect, this->get_wall_terrain());
+}
+
 void dungeon_generator::generate_corridor_to_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
 {
 	const int corridor_length = random::get()->dice(2, 10);
@@ -732,6 +846,9 @@ void dungeon_generator::extend_dungeon(const QPoint &edge_tile_pos, const QPoint
 			break;
 		case 'r':
 			this->generate_room(edge_tile_pos, dir_offset);
+			break;
+		case 's':
+			this->generate_square_room(edge_tile_pos, dir_offset);
 			break;
 		case 't':
 			this->generate_corridor_to_room(edge_tile_pos, dir_offset);
