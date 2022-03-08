@@ -95,7 +95,8 @@ void dungeon_generator::generate() const
 		}
 	});
 
-	const int generated_unit_count = this->map_rect.width() * this->map_rect.height() / 400;
+	static constexpr int creep_count_divisor = 200;
+	const int generated_unit_count = this->map_rect.width() * this->map_rect.height() / creep_count_divisor;
 	for (int i = 0; i < generated_unit_count; ++i) {
 		this->generate_creep();
 	}
