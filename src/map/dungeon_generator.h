@@ -66,6 +66,7 @@ public:
 private:
 	void generate_central_room() const;
 	bool generate_chamber(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
+	void generate_linking_corridor(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	void generate_oval_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	bool generate_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	void generate_corridor_to_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;

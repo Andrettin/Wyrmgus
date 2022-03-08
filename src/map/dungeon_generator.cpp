@@ -342,6 +342,25 @@ bool dungeon_generator::generate_chamber(const QPoint &edge_tile_pos, const QPoi
 	return true;
 }
 
+void dungeon_generator::generate_linking_corridor(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
+{
+	//make a corridor which links two areas
+	QPoint cp = edge_tile_pos;
+
+	for (int i = random::get()->dice(4, 10); i > 0; --i) {
+		cp += dir_offset;
+
+		if (!this->is_tile_clear(cp)) {
+			break;
+		}
+	}
+
+	if (!this->is_tile_clear(cp)) {
+		const QRect room_rect = dungeon_generator::create_rect(edge_tile_pos, cp - dir_offset);
+		this->set_area_terrain(room_rect, this->get_floor_terrain());
+	}
+}
+
 void dungeon_generator::generate_oval_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
 {
 	const int width = random::get()->dice(2, 3);
@@ -640,6 +659,9 @@ void dungeon_generator::extend_dungeon(const QPoint &edge_tile_pos, const QPoint
 	switch (c) {
 		case 'h':
 			this->generate_chamber(edge_tile_pos, dir_offset);
+			break;
+		case 'k':
+			this->generate_linking_corridor(edge_tile_pos, dir_offset);
 			break;
 		case 'o':
 			this->generate_oval_room(edge_tile_pos, dir_offset);
