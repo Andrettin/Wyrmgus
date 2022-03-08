@@ -70,10 +70,12 @@ private:
 	void generate_oval_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	bool generate_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 	void generate_corridor_to_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
+	void generate_maze(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 
 	void generate_room_features(const QRect &room_floor_rect) const;
 	void generate_ending_room_features(const QRect &room_floor_rect) const;
 	void generate_internal_room_features(const QRect &room_floor_rect) const;
+	void generate_inner_maze(const QRect &room_rect) const;
 
 	void extend_dungeon(const QPoint &edge_tile_pos, const QPoint &dir_offset) const;
 

@@ -469,6 +469,26 @@ void dungeon_generator::generate_corridor_to_room(const QPoint &edge_tile_pos, c
 	this->generate_room(edge_tile_pos + (j2 * dir_offset), QPoint(-dir_offset.y(), dir_offset.x()));
 }
 
+void dungeon_generator::generate_maze(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
+{
+	const int s = random::get()->dice(7) + 1;
+
+	const QPoint start_pos = edge_tile_pos + dir_offset + (dir_offset - QPoint(1, 1)) * s;
+	const QPoint end_pos = edge_tile_pos + dir_offset + (dir_offset + QPoint(1, 1)) * s;
+
+	const QRect room_rect = dungeon_generator::create_rect(start_pos, end_pos);
+
+	if (!this->is_area_clear(room_rect)) {
+		return;
+	}
+
+	this->generate_inner_maze(room_rect);
+
+	this->set_tile_terrain(edge_tile_pos + dir_offset, this->get_floor_terrain());
+	this->set_tile_terrain(edge_tile_pos + QPoint(dir_offset.y(), -dir_offset.x()), this->get_wall_terrain());
+	this->set_tile_terrain(edge_tile_pos + QPoint(-dir_offset.y(), dir_offset.x()), this->get_wall_terrain());
+}
+
 void dungeon_generator::generate_room_features(const QRect &room_floor_rect) const
 {
 	const int width = room_floor_rect.width();
@@ -649,6 +669,49 @@ void dungeon_generator::generate_internal_room_features(const QRect &room_floor_
 	}
 }
 
+void dungeon_generator::generate_inner_maze(const QRect &room_rect) const
+{
+	this->set_area_terrain(room_rect, this->get_wall_terrain());
+
+	const int rw = (room_rect.width() + 1) / 2;
+	const int rh = (room_rect.height() + 1) / 2;
+
+	const QPoint top_left = room_rect.topLeft();
+
+	const QPoint sp = top_left + QPoint(2 * random::get()->generate(rw), 2 * random::get()->generate(rh));
+	this->set_tile_terrain(sp, this->get_floor_terrain());
+
+	int finished_count = 0;
+
+	for (int i = 1; (i < (rw * rh * 1000)) && (finished_count < (rw * rh)); ++i) {
+		const QPoint tile_pos = top_left + QPoint(2 * random::get()->generate(rw), 2 * random::get()->generate(rh));
+
+		if (!this->map_rect.contains(tile_pos)) {
+			continue;
+		}
+
+		const tile *tile = CMap::get()->Field(tile_pos, this->z);
+
+		if (tile->get_overlay_terrain() != this->get_wall_terrain()) {
+			continue;
+		}
+
+		const int dx = (random::get()->dice(2) == 1) ? (random::get()->generate(2) * 2 - 1) : 0;
+		const int dy = (dx == 0) ? (random::get()->generate(2) * 2 - 1) : 0;
+		const QPoint dp(dx, dy);
+
+		const QPoint lp = tile_pos + dp * 2;
+
+		if (room_rect.contains(lp) && this->map_rect.contains(lp)) {
+			if (CMap::get()->Field(lp, this->z)->get_overlay_terrain() != this->get_wall_terrain()) {
+				this->set_tile_terrain(tile_pos, this->get_floor_terrain());
+				this->set_tile_terrain(tile_pos + dp, this->get_floor_terrain());
+				++finished_count;
+			}
+		}
+	}
+}
+
 void dungeon_generator::extend_dungeon(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
 {
 	static constexpr std::array dungeon_dna = { 't', 't', 't', 'k', 'r', 'r', 'r', 'o', 'o', 'z', 'h', 's'};
@@ -671,6 +734,9 @@ void dungeon_generator::extend_dungeon(const QPoint &edge_tile_pos, const QPoint
 			break;
 		case 't':
 			this->generate_corridor_to_room(edge_tile_pos, dir_offset);
+			break;
+		case 'z':
+			this->generate_maze(edge_tile_pos, dir_offset);
 			break;
 		default:
 			break;
