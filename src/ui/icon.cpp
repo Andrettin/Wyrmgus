@@ -191,7 +191,7 @@ void icon::DrawUnitIcon(const ButtonStyle &style, const unsigned flags, const Pi
 
 			if (border_color.isValid()) {
 				render_commands.push_back([pos, border_color, scale_factor](renderer *renderer) {
-					renderer->draw_rect(pos + QPoint((1 * scale_factor).to_int(), (1 * scale_factor).to_int()), defines::get()->get_scaled_icon_size() - QSize((1 * scale_factor).to_int(), (1 * scale_factor).to_int()), CVideo::MapRGB(border_color));
+					renderer->draw_rect(pos + QPoint((1 * scale_factor).to_int(), (1 * scale_factor).to_int()), defines::get()->get_scaled_icon_size() - QSize((1 * scale_factor).to_int(), (1 * scale_factor).to_int()), border_color);
 				});
 			}
 		} else {
@@ -208,7 +208,7 @@ void icon::DrawUnitIcon(const ButtonStyle &style, const unsigned flags, const Pi
 
 			if (border_color.isValid()) {
 				render_commands.push_back([pos, border_color](renderer *renderer) {
-					renderer->draw_rect(pos, defines::get()->get_scaled_icon_size(), CVideo::MapRGB(border_color));
+					renderer->draw_rect(pos, defines::get()->get_scaled_icon_size(), border_color);
 				});
 			}
 		}
