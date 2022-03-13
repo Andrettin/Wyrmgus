@@ -152,12 +152,7 @@ public:
 	void apply_historical_unit(const historical_unit *historical_unit, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const;
 	void apply_character(character *character, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const;
 
-	void clear_application_data()
-	{
-		//clear data created for the application or position generation for the template
-		this->clear_terrain_character_maps();
-		this->clear_terrain_images();
-	}
+	void clear_application_data();
 
 	bool IsSubtemplateArea() const;
 	const map_template *GetTopMapTemplate() const;

@@ -37,7 +37,8 @@ class unit_type;
 class map_template_unit final
 {
 public:
-	explicit map_template_unit(const unit_type *unit_type) : type(unit_type)
+	explicit map_template_unit(const unit_type *unit_type, const bool temporary)
+		: type(unit_type), temporary(temporary)
 	{
 	}
 
@@ -57,6 +58,11 @@ public:
 	void set_unit_class(const wyrmgus::unit_class *unit_class)
 	{
 		this->unit_class = unit_class;
+	}
+
+	bool is_temporary() const
+	{
+		return this->temporary;
 	}
 
 	const QPoint &get_pos() const
@@ -97,6 +103,7 @@ public:
 private:
 	const unit_type *type = nullptr;
 	const wyrmgus::unit_class *unit_class = nullptr;
+	bool temporary = false;
 	QPoint pos = QPoint(0, 0);
 	const wyrmgus::faction *faction = nullptr;
 	int player_index = -1;

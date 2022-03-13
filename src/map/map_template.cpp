@@ -255,7 +255,7 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 				unit_type = unit_type::get(tag);
 			}
 
-			auto unit = std::make_unique<map_template_unit>(unit_type);
+			auto unit = std::make_unique<map_template_unit>(unit_type, false);
 			database::process_gsml_data(unit, child_scope);
 
 			assert_throw(unit->get_type() != nullptr || unit->get_unit_class() != nullptr);
@@ -2545,6 +2545,18 @@ void map_template::apply_character(character *character, const QPoint &template_
 	}
 }
 
+void map_template::clear_application_data()
+{
+	//clear data created for the application or position generation for the template
+	this->clear_terrain_character_maps();
+	this->clear_terrain_images();
+
+	//clear temporary units
+	std::erase_if(this->units, [this](const std::unique_ptr<map_template_unit> &unit) {
+		return unit->is_temporary();
+	});
+}
+
 /**
 **	@brief	Get whether this map template is a subtemplate area of another one
 **
@@ -2924,8 +2936,6 @@ void map_template::load_0_ad_terrain_file()
 
 	const QRect image_rect = this->overlay_terrain_image.rect();
 
-	this->units.clear();
-
 	while (!xml_reader.atEnd()) {
 		const QXmlStreamReader::TokenType tokenType = xml_reader.readNext();
 
@@ -3048,7 +3058,7 @@ void map_template::load_0_ad_terrain_file()
 					}
 
 					for (int i = 0; i < quantity; ++i) {
-						auto unit = std::make_unique<map_template_unit>(unit_type);
+						auto unit = std::make_unique<map_template_unit>(unit_type, true);
 						unit->set_unit_class(unit_class);
 						unit->set_pos(pos);
 						unit->set_player_index(player);
@@ -3069,6 +3079,11 @@ void map_template::load_0_ad_terrain_file()
 	if (xml_reader.hasError()) {
 		throw std::runtime_error(xml_reader.errorString().toStdString());
 	}
+
+	//make the temporary units be applied first
+	std::sort(this->units.begin(), this->units.end(), [](const std::unique_ptr<map_template_unit> &lhs, const std::unique_ptr<map_template_unit> &rhs) {
+		return lhs->is_temporary() == rhs->is_temporary() || lhs->is_temporary();
+	});
 }
 
 QImage map_template::load_terrain_image_file(const std::filesystem::path &filepath)
