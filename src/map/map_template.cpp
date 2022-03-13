@@ -547,6 +547,11 @@ void map_template::check() const
 		throw std::runtime_error("Map template \"" + this->get_identifier() + "\" has \"" + this->get_default_astrocoordinate_reference_subtemplate()->get_identifier() + "\" as its default astrocoordinate reference subtemplate, but the latter is not a subtemplate of the former, even indirectly.");
 	}
 	*/
+
+	for (const std::unique_ptr<map_template_unit> &map_template_unit : this->units) {
+		assert_throw(map_template_unit->get_pos().x() < this->get_size().width());
+		assert_throw(map_template_unit->get_pos().y() < this->get_size().height());
+	}
 }
 
 data_entry_history *map_template::get_history_base()
