@@ -1126,6 +1126,9 @@ void CUnit::apply_character_properties()
 		this->IncreaseLevel(this->get_character()->get_level() - this->Variable[LEVEL_INDEX].Value, false);
 	}
 
+	//ensure that the XP required is properly updated
+	this->UpdateXPRequired();
+
 	this->Variable[XP_INDEX].Enable = 1;
 	this->Variable[XP_INDEX].Value = this->Variable[XPREQUIRED_INDEX].Value * this->get_character()->ExperiencePercent / 100;
 	this->Variable[XP_INDEX].Max = this->Variable[XP_INDEX].Value;

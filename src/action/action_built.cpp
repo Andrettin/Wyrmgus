@@ -226,7 +226,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 	
 	//give builders experience for the construction of the structure
-	int xp_gained = type.Stats[unit.Player->get_index()].get_time_cost() / 10;
+	const int xp_gained = type.Stats[unit.Player->get_index()].get_time_cost() / 10;
 	//Wyrmgus end
 
 	if (worker != nullptr) {
