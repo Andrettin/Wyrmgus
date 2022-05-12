@@ -42,8 +42,8 @@ enum class minimap_mode;
 class minimap final
 {
 public:
-	static inline const QColor unexplored_color = QColor(0, 0, 0);
-	static inline const QColor fog_of_war_color = QColor(0, 0, 0, 128);
+	static constexpr QColor unexplored_color = QColor(0, 0, 0);
+	static constexpr QColor fog_of_war_color = QColor(0, 0, 0, 128);
 
 	minimap();
 

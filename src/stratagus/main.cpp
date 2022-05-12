@@ -115,7 +115,6 @@ int main(int argc, char **argv)
 
 		QQmlApplicationEngine engine;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
 		qmlRegisterAnonymousType<calendar>("", 1);
 		qmlRegisterAnonymousType<campaign>("", 1);
 		qmlRegisterAnonymousType<CEditor>("", 1);
@@ -142,34 +141,6 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<time_of_day>("", 1);
 		qmlRegisterAnonymousType<timeline>("", 1);
 		qmlRegisterAnonymousType<unit_type>("", 1);
-#else
-		qmlRegisterType<calendar>();
-		qmlRegisterType<campaign>();
-		qmlRegisterType<CEditor>();
-		qmlRegisterType<civilization>();
-		qmlRegisterType<civilization_group>();
-		qmlRegisterType<CPlayer>();
-		qmlRegisterType<CUpgrade>();
-		qmlRegisterType<defines>();
-		qmlRegisterType<employment_type>();
-		qmlRegisterType<faction>();
-		qmlRegisterType<game>();
-		qmlRegisterType<icon>();
-		qmlRegisterType<map_presets>();
-		qmlRegisterType<network_manager>();
-		qmlRegisterType<pantheon>();
-		qmlRegisterType<parameters>();
-		qmlRegisterType<player_color>();
-		qmlRegisterType<population_type>();
-		qmlRegisterType<preferences>();
-		qmlRegisterType<quest>();
-		qmlRegisterType<resource>();
-		qmlRegisterType<results_info>();
-		qmlRegisterType<season>();
-		qmlRegisterType<time_of_day>();
-		qmlRegisterType<timeline>();
-		qmlRegisterType<unit_type>();
-#endif
 
 		qmlRegisterType<frame_buffer_object>("frame_buffer_object", 1, 0, "FrameBufferObject");
 		qmlRegisterType<map_grid_model>("map_grid_model", 1, 0, "MapGridModel");

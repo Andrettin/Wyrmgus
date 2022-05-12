@@ -73,7 +73,7 @@ class terrain_type final : public named_data_entry, public data_type<terrain_typ
 public:
 	static constexpr const char *class_identifier = "terrain_type";
 	static constexpr const char *database_folder = "terrain_types";
-	static inline const QColor none_color = QColor(0, 0, 0);
+	static constexpr QColor none_color = QColor(0, 0, 0);
 	static constexpr int decoration_tile_inverse_weight = 256; //decoration tiles have a chance of 1 in [the value of this variable] to be picked as solid tiles for a given tile
 
 	static terrain_type *get_by_character(const char character)
