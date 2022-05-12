@@ -440,7 +440,7 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, in
 void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, const wyrmgus::unit_type &what, int flush, int z)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("build", &unit, flush, pos.x, pos.y, NoUnitP, what.Ident.c_str(), -1);
+		CommandLog("build", &unit, flush, pos.x, pos.y, NoUnitP, what.get_identifier().c_str(), -1);
 		CommandBuildBuilding(unit, pos, what, flush, z);
 	} else {
 		NetworkSendCommand(MessageCommandBuild, unit, pos.x, pos.y, NoUnitP, &what, flush);
@@ -531,9 +531,9 @@ void SendCommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &what, const int
 {
 	if (!IsNetworkGame()) {
 		//Wyrmgus start
-//		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
+//		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what.get_identifier().c_str(), -1);
 //		CommandTrainUnit(unit, what, flush);
-		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), player);
+		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what.get_identifier().c_str(), player);
 		CommandTrainUnit(unit, what, player, flush);
 		//Wyrmgus end
 	} else {
@@ -555,7 +555,7 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *
 {
 	if (!IsNetworkGame()) {
 		CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
-				   type ? type->Ident.c_str() : nullptr, slot);
+				   type ? type->get_identifier().c_str() : nullptr, slot);
 		CommandCancelTraining(unit, slot, type);
 	} else {
 		NetworkSendCommand(MessageCommandCancelTrain, unit, slot, 0, NoUnitP,
@@ -573,7 +573,7 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *
 void SendCommandUpgradeTo(CUnit &unit, const wyrmgus::unit_type &what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("upgrade-to", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
+		CommandLog("upgrade-to", &unit, flush, -1, -1, NoUnitP, what.get_identifier().c_str(), -1);
 		CommandUpgradeTo(unit, what, flush);
 	} else {
 		NetworkSendCommand(MessageCommandUpgrade, unit, 0, 0, NoUnitP, &what, flush);
@@ -607,7 +607,7 @@ void SendCommandCancelUpgradeTo(CUnit &unit)
 void SendCommandTransformInto(CUnit &unit, wyrmgus::unit_type &what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("transform-into", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
+		CommandLog("transform-into", &unit, flush, -1, -1, NoUnitP, what.get_identifier().c_str(), -1);
 		CommandTransformIntoType(unit, what);
 	} else {
 		NetworkSendCommand(MessageCommandUpgrade, unit, 2, 0, NoUnitP, &what, flush); //use X as a way to mark that this is a transformation and not an upgrade
@@ -800,7 +800,7 @@ void SendCommandAutosellResource(int player, int resource)
 void ExecCommand(unsigned char msgnr, UnitRef unum,
 				 unsigned short x, unsigned short y, UnitRef dstnr)
 {
-	CUnit &unit = wyrmgus::unit_manager::get()->GetSlotUnit(unum);
+	CUnit &unit = unit_manager::get()->GetSlotUnit(unum);
 	const Vec2i pos(x, y);
 	const int arg1 = x;
 	const int arg2 = y;
@@ -834,7 +834,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandDefend: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
+				CUnit &dest = unit_manager::get()->GetSlotUnit(dstnr);
 				assert_throw(dest.Type != nullptr);
 				CommandLog("defend", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandDefend(unit, dest, status);
@@ -843,7 +843,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		}
 		case MessageCommandFollow: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
+				CUnit &dest = unit_manager::get()->GetSlotUnit(dstnr);
 				assert_throw(dest.Type != nullptr);
 				CommandLog("follow", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandFollow(unit, dest, status);
@@ -866,7 +866,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		//Wyrmgus start
 		case MessageCommandPickUp: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
+				CUnit &dest = unit_manager::get()->GetSlotUnit(dstnr);
 				assert_throw(dest.Type != nullptr);
 				CommandLog("pick-up", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandPickUp(unit, dest, status);
@@ -877,7 +877,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandRepair: {
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
-				dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
+				dest = &unit_manager::get()->GetSlotUnit(dstnr);
 				assert_throw(dest && dest->Type);
 			}
 			CommandLog("repair", &unit, status, pos.x, pos.y, dest, nullptr, -1);
@@ -891,7 +891,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandAttack: {
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
-				dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
+				dest = &unit_manager::get()->GetSlotUnit(dstnr);
 				assert_throw(dest && dest->Type);
 			}
 			CommandLog("attack", &unit, status, pos.x, pos.y, dest, nullptr, -1);
@@ -905,7 +905,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		//Wyrmgus start
 		case MessageCommandUse: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
+				CUnit &dest = unit_manager::get()->GetSlotUnit(dstnr);
 				assert_throw(dest.Type != nullptr);
 				CommandLog("use", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandUse(unit, dest, status);
@@ -914,7 +914,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		}
 		case MessageCommandTrade: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
+				CUnit &dest = unit_manager::get()->GetSlotUnit(dstnr);
 				assert_throw(dest.Type != nullptr);
 				CommandLog("trade", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandTrade(unit, dest, status);
@@ -928,7 +928,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandBoard: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
+				CUnit &dest = unit_manager::get()->GetSlotUnit(dstnr);
 				assert_throw(dest.Type != nullptr);
 				CommandLog("board", &unit, status, arg1, arg2, &dest, nullptr, -1);
 				CommandBoard(unit, dest, status);
@@ -938,7 +938,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandUnload: {
 			CUnit *dest = nullptr;
 			if (dstnr != (unsigned short)0xFFFF) {
-				dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
+				dest = &unit_manager::get()->GetSlotUnit(dstnr);
 				assert_throw(dest && dest->Type);
 			}
 			CommandLog("unload", &unit, status, pos.x, pos.y, dest, nullptr, -1);
@@ -946,7 +946,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandBuild:
-			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, wyrmgus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
+			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, unit_type::get_all()[dstnr]->get_identifier().c_str(), -1);
 			CommandBuildBuilding(unit, pos, *wyrmgus::unit_type::get_all()[dstnr], status);
 			break;
 		case MessageCommandDismiss:
@@ -967,21 +967,21 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandReturn: {
-			CUnit *dest = (dstnr != (unsigned short)0xFFFF) ? &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr) : nullptr;
+			CUnit *dest = (dstnr != (unsigned short)0xFFFF) ? &unit_manager::get()->GetSlotUnit(dstnr) : nullptr;
 			CommandLog("return", &unit, status, -1, -1, dest, nullptr, -1);
 			CommandReturnGoods(unit, dest, status);
 			break;
 		}
 		case MessageCommandTrain:
-			CommandLog("train", &unit, status, -1, -1, NoUnitP, wyrmgus::unit_type::get_all()[dstnr]->Ident.c_str(), arg1); // use X as a way to mark the player
-			CommandTrainUnit(unit, *wyrmgus::unit_type::get_all()[dstnr], arg1, status);
+			CommandLog("train", &unit, status, -1, -1, NoUnitP, unit_type::get_all()[dstnr]->get_identifier().c_str(), arg1); // use X as a way to mark the player
+			CommandTrainUnit(unit, *unit_type::get_all()[dstnr], arg1, status);
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
 			if (dstnr != (unsigned short)0xFFFF) {
 				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
-					wyrmgus::unit_type::get_all()[dstnr]->Ident.c_str(), (short)x);
-				CommandCancelTraining(unit, (short)x, wyrmgus::unit_type::get_all()[dstnr]);
+					unit_type::get_all()[dstnr]->get_identifier().c_str(), (short)x);
+				CommandCancelTraining(unit, (short)x, unit_type::get_all()[dstnr]);
 			} else {
 				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP, nullptr, (short)x);
 				CommandCancelTraining(unit, (short)x, nullptr);
@@ -997,12 +997,12 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			*/
 			if (arg1 == 2) { //use X as a way to mark whether this is an upgrade or a transformation
 				CommandLog("transform-into", &unit, status, -1, -1, NoUnitP,
-					wyrmgus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
-				CommandTransformIntoType(unit, *wyrmgus::unit_type::get_all()[dstnr]);
+					unit_type::get_all()[dstnr]->get_identifier().c_str(), -1);
+				CommandTransformIntoType(unit, *unit_type::get_all()[dstnr]);
 			} else {
 				CommandLog("upgrade-to", &unit, status, -1, -1, NoUnitP,
-					wyrmgus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
-				CommandUpgradeTo(unit, *wyrmgus::unit_type::get_all()[dstnr], status);
+					unit_type::get_all()[dstnr]->get_identifier().c_str(), -1);
+				CommandUpgradeTo(unit, *unit_type::get_all()[dstnr], status);
 			}
 			break;
 			//Wyrmgus end

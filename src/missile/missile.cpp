@@ -1778,7 +1778,7 @@ static void SavePixelPos(CFile &file, const PixelPos &pos)
 */
 void Missile::SaveMissile(CFile &file) const
 {
-	file.printf("Missile(\"type\", \"%s\",", this->Type->Ident.c_str());
+	file.printf("Missile(\"type\", \"%s\",", this->Type->get_identifier().c_str());
 	file.printf(" \"%s\",", this->Local ? "local" : "global");
 	file.printf(" \"pos\", ");
 	SavePixelPos(file, this->position);

@@ -1952,7 +1952,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			CurrentButtons[j]->pos = j;
 			CurrentButtons[j]->level = nullptr;
 			CurrentButtons[j]->Action = ButtonCmd::EditorUnit;
-			CurrentButtons[j]->ValueStr = CEditor::get()->ShownUnitTypes[i]->Ident;
+			CurrentButtons[j]->ValueStr = CEditor::get()->ShownUnitTypes[i]->get_identifier();
 			CurrentButtons[j]->Value = CEditor::get()->ShownUnitTypes[i]->Slot;
 			CurrentButtons[j]->Popup = "popup_unit";
 		}
@@ -2258,7 +2258,7 @@ void CEditor::Init()
 				continue;
 			}
 			
-			this->UnitTypes.push_back(unit_type->Ident);
+			this->UnitTypes.push_back(unit_type->get_identifier());
 		}
 	}
 	//Wyrmgus end

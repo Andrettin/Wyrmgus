@@ -1616,7 +1616,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<but
 	//Wyrmgus start
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		std::array<char, 128> ident_array{};
-		sprintf(ident_array.data(), ",%s,", Selected[i]->Type->Ident.c_str());
+		sprintf(ident_array.data(), ",%s,", Selected[i]->Type->get_identifier().c_str());
 		individual_unit_ident.push_back(std::move(ident_array));
 	}
 	//Wyrmgus end
@@ -1694,7 +1694,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident.data(), sizeof(unit_ident), ",cancel-upgrade,");
 	} else {
-		sprintf(unit_ident.data(), ",%s,", unit.Type->Ident.c_str());
+		sprintf(unit_ident.data(), ",%s,", unit.Type->get_identifier().c_str());
 		only_cancel_allowed = false;
 	}
 	for (const button *button : button::get_all()) {
@@ -1780,7 +1780,7 @@ void CButtonPanel::Update()
 			}
 
 			std::array<char, 128> unit_ident{};
-			sprintf(unit_ident.data(), ",%s,", unit.Type->Ident.c_str());
+			sprintf(unit_ident.data(), ",%s,", unit.Type->get_identifier().c_str());
 			if (button->UnitMask[0] != '*' && !strstr(button->UnitMask.c_str(), unit_ident.data()) && !vector::contains(button->get_unit_classes(), unit.Type->get_unit_class())) {
 				continue;
 			}

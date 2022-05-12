@@ -179,7 +179,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	const wyrmgus::unit_type &type = *unit.Type;
 	CPlayer &player = *unit.Player;
 
-	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.get_index() _C_ type.Ident.c_str() _C_ type.GetDefaultName(&player).c_str());
+	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.get_index() _C_ type.get_identifier().c_str() _C_ type.GetDefaultName(&player).c_str());
 
 	// HACK: the building is ready now
 	//Wyrmgus start

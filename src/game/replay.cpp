@@ -457,7 +457,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	log->GameCycle = GameCycle;
 
 	log->UnitNumber = (unit ? UnitNumber(*unit) : -1);
-	log->UnitIdent = (unit ? unit->Type->Ident.c_str() : "");
+	log->UnitIdent = (unit ? unit->Type->get_identifier().c_str() : "");
 
 	log->Action = action;
 	log->Flush = flush;
@@ -783,7 +783,7 @@ static void DoNextReplay()
 	const char *val = ReplayStep->Value.c_str();
 	const int num = ReplayStep->Num;
 
-	assert_throw(unitSlot == -1 || ReplayStep->UnitIdent == unit->Type->Ident);
+	assert_throw(unitSlot == -1 || ReplayStep->UnitIdent == unit->Type->get_identifier());
 
 	if (wyrmgus::random::get()->get_seed() != ReplayStep->SyncRandSeed) {
 #ifdef DEBUG

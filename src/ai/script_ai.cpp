@@ -1400,13 +1400,13 @@ static int CclAiDump(lua_State *l)
 			size_t n = aip.Ai->UnitTypeRequests.size();
 			printf("UnitTypeRequests(%u):\n", static_cast<unsigned int>(n));
 			for (size_t i = 0; i < n; ++i) {
-				printf("%s ", aip.Ai->UnitTypeRequests[i].Type->Ident.c_str());
+				printf("%s ", aip.Ai->UnitTypeRequests[i].Type->get_identifier().c_str());
 			}
 			printf("\n");
 			n = aip.Ai->UpgradeToRequests.size();
 			printf("UpgradeToRequests(%u):\n", static_cast<unsigned int>(n));
 			for (size_t i = 0; i < n; ++i) {
-				printf("%s ", aip.Ai->UpgradeToRequests[i]->Ident.c_str());
+				printf("%s ", aip.Ai->UpgradeToRequests[i]->get_identifier().c_str());
 			}
 			printf("\n");
 
@@ -1420,7 +1420,7 @@ static int CclAiDump(lua_State *l)
 			printf("Building queue:\n");
 			for (size_t i = 0; i < aip.Ai->UnitTypeBuilt.size(); ++i) {
 				const AiBuildQueue &queue = aip.Ai->UnitTypeBuilt[i];
-				printf("%s(%d/%d) ", queue.Type->Ident.c_str(), queue.Made, queue.Want);
+				printf("%s(%d/%d) ", queue.Type->get_identifier().c_str(), queue.Made, queue.Want);
 			}
 			printf("\n");
 
@@ -1431,7 +1431,7 @@ static int CclAiDump(lua_State *l)
 					   aip.Ai->Force[i].Attacking ? ",attack" : "");
 				for (size_t j = 0; j < aip.Ai->Force[i].UnitTypes.size(); ++j) {
 					const AiUnitType &aut = aip.Ai->Force[i].UnitTypes[j];
-					printf("%s(%d) ", aut.Type->Ident.c_str(), aut.Want);
+					printf("%s(%d) ", aut.Type->get_identifier().c_str(), aut.Want);
 				}
 				printf("\n");
 			}

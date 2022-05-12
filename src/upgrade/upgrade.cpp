@@ -634,7 +634,7 @@ void SaveUpgrades(CFile &file)
 	//  Save the allow
 	//
 	for (const unit_type *unit_type : unit_type::get_all()) {
-		file.printf("DefineUnitAllow(\"%s\", ", unit_type->Ident.c_str());
+		file.printf("DefineUnitAllow(\"%s\", ", unit_type->get_identifier().c_str());
 		for (int p = 0; p < PlayerMax; ++p) {
 			if (p) {
 				file.printf(", ");

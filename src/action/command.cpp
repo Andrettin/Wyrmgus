@@ -1075,7 +1075,7 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 void CommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type)
 {
 	DebugPrint("Cancel %d type: %s\n" _C_ slot _C_
-			   type ? type->Ident.c_str() : "-any-");
+			   type ? type->get_identifier().c_str() : "-any-");
 
 	ClearSavedAction(unit);
 

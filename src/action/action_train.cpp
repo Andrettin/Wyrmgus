@@ -84,7 +84,7 @@ void COrder_Train::Save(CFile &file, const CUnit &unit) const
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	file.printf("\"type\", \"%s\",", this->Type->Ident.c_str());
+	file.printf("\"type\", \"%s\",", this->Type->get_identifier().c_str());
 	//Wyrmgus start
 	file.printf("\"player\", %d,", this->Player);
 	//Wyrmgus end

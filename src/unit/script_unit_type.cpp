@@ -1642,7 +1642,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->item_class = wyrmgus::string_to_item_class(LuaToString(l, -1));
 		} else if (!strcmp(value, "Species")) {
 			type->species = wyrmgus::species::get(LuaToString(l, -1));
-			type->species->set_unit_type(type);
 		} else if (!strcmp(value, "TerrainType")) {
 			type->TerrainType = wyrmgus::terrain_type::get(LuaToString(l, -1));
 			type->TerrainType->UnitType = type;
@@ -1912,7 +1911,7 @@ static int CclGetUnitTypeIdent(lua_State *l)
 
 	const wyrmgus::unit_type *type = CclGetUnitType(l);
 	if (type) {
-		lua_pushstring(l, type->Ident.c_str());
+		lua_pushstring(l, type->get_identifier().c_str());
 	} else {
 		LuaError(l, "unit '%s' not defined" _C_ LuaToString(l, -1));
 	}
@@ -2254,7 +2253,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, type->Drops.size(), 0);
 		for (size_t i = 1; i <= type->Drops.size(); ++i)
 		{
-			lua_pushstring(l, type->Drops[i-1]->Ident.c_str());
+			lua_pushstring(l, type->Drops[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2262,7 +2261,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, type->AiDrops.size(), 0);
 		for (size_t i = 1; i <= type->AiDrops.size(); ++i)
 		{
-			lua_pushstring(l, type->AiDrops[i - 1]->Ident.c_str());
+			lua_pushstring(l, type->AiDrops[i - 1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2292,7 +2291,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, droppers.size(), 0);
 		for (size_t i = 1; i <= droppers.size(); ++i)
 		{
-			lua_pushstring(l, droppers[i-1]->Ident.c_str());
+			lua_pushstring(l, droppers[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2429,7 +2428,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, type->Trains.size(), 0);
 		for (size_t i = 1; i <= type->Trains.size(); ++i)
 		{
-			lua_pushstring(l, type->Trains[i - 1]->Ident.c_str());
+			lua_pushstring(l, type->Trains[i - 1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2797,7 +2796,7 @@ static int CclGetUnitTypes(lua_State *l)
 {
 	std::vector<std::string> unit_types;
 	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		unit_types.push_back(unit_type->Ident);
+		unit_types.push_back(unit_type->get_identifier());
 	}
 		
 	lua_createtable(l, unit_types.size(), 0);
@@ -3059,7 +3058,7 @@ void UpdateUnitVariables(CUnit &unit)
 		//Wyrmgus end
 			DebugPrint("Value out of range: '%s'(%d), for variable '%s',"
 					   " value = %d, max = %d\n"
-					   _C_ type->Ident.c_str() _C_ UnitNumber(unit) _C_ UnitTypeVar.VariableNameLookup[i]
+					   _C_ type->get_identifier().c_str() _C_ UnitNumber(unit) _C_ UnitTypeVar.VariableNameLookup[i]
 					   //Wyrmgus start
 //					   _C_ unit.Variable[i].Value _C_ unit.Variable[i].Max);
 					   _C_ unit.Variable[i].Value _C_ unit.GetModifiedVariable(i, VariableAttribute::Max));

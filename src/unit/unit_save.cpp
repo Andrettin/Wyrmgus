@@ -108,9 +108,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\nUnit(%d, {", UnitNumber(unit));
 
 	// 'type and 'player must be first, needed to create the unit slot
-	file.printf("\"type\", \"%s\", ", unit.Type->Ident.c_str());
+	file.printf("\"type\", \"%s\", ", unit.Type->get_identifier().c_str());
 	if (unit.Seen.Type) {
-		file.printf("\"seen-type\", \"%s\", ", unit.Seen.Type->Ident.c_str());
+		file.printf("\"seen-type\", \"%s\", ", unit.Seen.Type->get_identifier().c_str());
 	}
 
 	file.printf("\"player\", %d,\n  ", unit.Player->get_index());
@@ -428,11 +428,11 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		const unit_type *unit_type = kv_pair.first;
 
 		if (unit.GetUnitStock(unit_type) != 0) {
-			file.printf(",\n  \"unit-stock\", \"%s\", %d", unit_type->Ident.c_str(), unit.GetUnitStock(unit_type));
+			file.printf(",\n  \"unit-stock\", \"%s\", %d", unit_type->get_identifier().c_str(), unit.GetUnitStock(unit_type));
 		}
 
 		if (unit.GetUnitStockReplenishmentTimer(unit_type) != 0) {
-			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", unit_type->Ident.c_str(), unit.GetUnitStockReplenishmentTimer(unit_type));
+			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", unit_type->get_identifier().c_str(), unit.GetUnitStockReplenishmentTimer(unit_type));
 		}
 	}
 

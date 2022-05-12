@@ -1715,7 +1715,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_TypeIdent : // name of the unit type
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).Ident;
+				return (**type).get_identifier();
 			} else { // ERROR.
 				return std::string();
 			}

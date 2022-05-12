@@ -1235,7 +1235,7 @@ void AiAddUpgradeToRequest(const unit_type &type)
 
 	if (unit_type_upgradees.empty() && unit_class_upgradees.empty()) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->get_index() _C_ type.Ident.c_str());
+				   _C_ AiPlayer->Player->get_index() _C_ type.get_identifier().c_str());
 		return;
 	}
 
@@ -1951,13 +1951,13 @@ static int AiRepairUnit(CUnit &unit)
 	const unit_type &type = *unit.Type;
 	if (type.Slot >= n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->get_index() _C_ type.Ident.c_str());
+				   _C_ AiPlayer->Player->get_index() _C_ type.get_identifier().c_str());
 		return 0;
 	}
 	std::vector<const unit_type *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit II: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->get_index() _C_ type.Ident.c_str());
+				   _C_ AiPlayer->Player->get_index() _C_ type.get_identifier().c_str());
 		return 0;
 	}
 
@@ -2637,7 +2637,7 @@ void AiCheckBuildings()
 	} else if (!AiHelpers.get_unit_type_upgradees(unit_type).empty() || !AiHelpers.get_unit_class_upgradees(unit_type->get_unit_class()).empty()) { //upgraded to from another building
 		AiAddUpgradeToRequest(*unit_type);
 	} else {
-		fprintf(stderr, "Unit type \"%s\" is in an AiBuildingTemplate, but it cannot be built by any worker, and no unit type can upgrade to it.\n", unit_type->Ident.c_str());
+		fprintf(stderr, "Unit type \"%s\" is in an AiBuildingTemplate, but it cannot be built by any worker, and no unit type can upgrade to it.\n", unit_type->get_identifier().c_str());
 	}
 }
 

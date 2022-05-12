@@ -30,7 +30,6 @@
 #include "color.h"
 #include "database/detailed_data_entry.h"
 #include "database/data_type.h"
-#include "data_type.h"
 #include "economy/resource_container.h"
 #include "missileconfig.h"
 #include "ui/icon.h"
@@ -751,7 +750,7 @@ namespace wyrmgus {
 
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
-class unit_type final : public detailed_data_entry, public data_type<unit_type>, public CDataType
+class unit_type final : public detailed_data_entry, public data_type<unit_type>
 {
 	Q_OBJECT
 
@@ -888,7 +887,6 @@ public:
 
 	virtual void process_gsml_property(const gsml_property &property) override;
 	virtual void process_gsml_scope(const gsml_data &scope) override;
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	virtual void check() const override;
 

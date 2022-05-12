@@ -131,7 +131,7 @@ void COrder_Build::Save(CFile &file, const CUnit &unit) const
 	if (this->get_building_unit() != nullptr) {
 		file.printf(" \"building\", \"%s\",", UnitReference(this->get_building_unit()).c_str());
 	}
-	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());
+	file.printf(" \"type\", \"%s\",", this->Type->get_identifier().c_str());
 	file.printf(" \"state\", %d", this->State);
 	file.printf("}");
 }
@@ -216,7 +216,7 @@ void COrder_Build::AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
 			   unit.Player->get_index() _C_ UnitNumber(unit) _C_
-			   unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
+			   unit.Type->get_identifier().c_str() _C_ this->Type->get_identifier().c_str());
 	if (this->BuildingUnit == nullptr) {
 		//Wyrmgus start
 //		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);

@@ -4580,9 +4580,9 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const unit_type &type, int z, bool a
 		metal_rock_type = unit_type::get("unit_silver_rock");
 	} else if (type.get_identifier() == "unit_copper_deposit") {
 		metal_rock_type = unit_type::get("unit_copper_rock");
-	} else if (type.Ident == "unit-diamond-deposit") {
+	} else if (type.get_identifier() == "unit-diamond-deposit") {
 		metal_rock_type = unit_type::get("unit_diamond_rock");
-	} else if (type.Ident == "unit-emerald-deposit") {
+	} else if (type.get_identifier() == "unit-emerald-deposit") {
 		metal_rock_type = unit_type::get("unit_emerald_rock");
 	}
 
@@ -4708,7 +4708,7 @@ void CUnit::Remove(CUnit *host)
 {
 	if (Removed) { // could happen!
 		// If unit is removed (inside) and building is destroyed.
-		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident.c_str() _C_ UnitNumber(*this));
+		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->get_identifier().c_str() _C_ UnitNumber(*this));
 		return;
 	}
 
@@ -4920,7 +4920,7 @@ void UnitLost(CUnit &unit)
 	//  Handle order cancels.
 	unit.CurrentOrder()->Cancel(unit);
 
-	DebugPrint("%d: Lost %s(%d)\n" _C_ player.get_index() _C_ type.Ident.c_str() _C_ UnitNumber(unit));
+	DebugPrint("%d: Lost %s(%d)\n" _C_ player.get_index() _C_ type.get_identifier().c_str() _C_ UnitNumber(unit));
 }
 
 /**

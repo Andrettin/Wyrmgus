@@ -397,7 +397,7 @@ void COrder_TransformInto::Save(CFile &file, const CUnit &unit) const
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	file.printf(" \"type\", \"%s\"", this->Type->Ident.c_str());
+	file.printf(" \"type\", \"%s\"", this->Type->get_identifier().c_str());
 	file.printf("}");
 }
 
@@ -453,7 +453,7 @@ void COrder_UpgradeTo::Save(CFile &file, const CUnit &unit) const
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());
+	file.printf(" \"type\", \"%s\",", this->Type->get_identifier().c_str());
 	file.printf(" \"ticks\", %d", this->Ticks);
 	file.printf("}");
 }

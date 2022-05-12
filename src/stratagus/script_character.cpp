@@ -718,7 +718,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Type")) {
 		if (character->get_unit_type() != nullptr) {
-			lua_pushstring(l, character->get_unit_type()->Ident.c_str());
+			lua_pushstring(l, character->get_unit_type()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -833,7 +833,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Type")) {
 		if (character->get_unit_type() != nullptr) {
-			lua_pushstring(l, character->get_unit_type()->Ident.c_str());
+			lua_pushstring(l, character->get_unit_type()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

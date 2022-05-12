@@ -40,7 +40,6 @@
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "ui/button.h"
-#include "unit/unit_type.h"
 #include "util/util.h"
 
 #include <boost/tokenizer.hpp>
@@ -241,11 +240,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			wyrmgus::site *site = wyrmgus::site::get_or_add(ident, nullptr);
 			if (!define_only) {
 				site->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "unit_type") {
-			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_or_add(ident, nullptr);
-			if (!define_only) {
-				unit_type->ProcessConfigData(config_data);
 			}
 		} else {
 			fprintf(stderr, "Invalid data type: \"%s\".\n", config_data->Tag.c_str());

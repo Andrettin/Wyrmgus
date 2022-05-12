@@ -2493,7 +2493,7 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 					if (order_slot != -1) {
 						const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[order_slot].get());
 
-						DebugPrint("Cancel slot %d %s\n" _C_ order_slot _C_ order.GetUnitType().Ident.c_str());
+						DebugPrint("Cancel slot %d %s\n" _C_ order_slot _C_ order.GetUnitType().get_identifier().c_str());
 						SendCommandCancelTraining(*Selected[0], order_slot, &order.GetUnitType());
 					}
 				}
@@ -2502,7 +2502,7 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 		} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
 			if (!GameObserve && !game::get()->is_paused() && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->get_identifier().c_str());
 					SendCommandCancelUpgradeTo(*Selected[0]);
 				}
 			}
@@ -2510,7 +2510,7 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 		} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
 			if (!GameObserve && !game::get()->is_paused() && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->get_identifier().c_str());
 					SendCommandCancelResearch(*Selected[0]);
 				}
 			}

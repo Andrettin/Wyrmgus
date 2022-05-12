@@ -1705,7 +1705,7 @@ static int CclGetUnitVariable(lua_State *l)
 	if (!strcmp(value, "RegenerationRate")) {
 		lua_pushnumber(l, unit->Variable[HP_INDEX].Increase);
 	} else if (!strcmp(value, "Ident")) {
-		lua_pushstring(l, unit->Type->Ident.c_str());
+		lua_pushstring(l, unit->Type->get_identifier().c_str());
 	} else if (!strcmp(value, "ResourcesHeld")) {
 		lua_pushnumber(l, unit->ResourcesHeld);
 	} else if (!strcmp(value, "GiveResourceType")) {
@@ -1924,7 +1924,7 @@ static int CclSetUnitVariable(lua_State *l)
 			} else {
 				unit->Player->ChangeUnitTypeAiActiveCount(unit->Type, -1);
 				if (unit->Player->GetUnitTypeAiActiveCount(unit->Type) < 0) { // if unit AI active count is negative, something wrong happened
-					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->get_index(), unit->Type->Ident.c_str(), unit->Player->GetUnitTypeAiActiveCount(unit->Type));
+					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->get_index(), unit->Type->get_identifier().c_str(), unit->Player->GetUnitTypeAiActiveCount(unit->Type));
 				}
 			}
 		}

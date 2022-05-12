@@ -895,7 +895,7 @@ void character::save() const
 		for (size_t j = 0; j < this->get_items().size(); ++j) {
 			const auto &item = this->get_items()[j];
 			fprintf(fd, "\n\t\t{");
-			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", item->get_unit_type()->Ident.c_str());
+			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", item->get_unit_type()->get_identifier().c_str());
 			if (item->Prefix != nullptr) {
 				fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", item->Prefix->get_identifier().c_str());
 			}

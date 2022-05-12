@@ -986,7 +986,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 		
 		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(unit_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
-			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
+			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->get_identifier().c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
 		CUnit *unit = CreateResourceUnit(unit_pos - unit_offset, *type, z);
@@ -1652,7 +1652,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			const Vec2i building_unit_offset((unit_type->get_tile_size() - QSize(1, 1)) / 2);
 			if (!is_position_shift_acceptable && first_building) {
 				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset + Vec2i(unit_type->get_tile_size() - QSize(1, 1)), z)) {
-					fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->Ident.c_str(), site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
+					fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->get_identifier().c_str(), site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
 				}
 			}
 			CUnit *unit = nullptr;
@@ -1897,7 +1897,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 		}
 		
 		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(unit_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(unit_pos - unit_offset + Vec2i(type->get_tile_size() - QSize(1, 1)), z)) {
-			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
+			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->get_identifier().c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
 
 		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, CPlayer::get_neutral_player(), z, true);

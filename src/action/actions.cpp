@@ -139,7 +139,7 @@ void COrder::AiUnitKilled(CUnit &unit)
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
 					   unit.Player->get_index() _C_ UnitNumber(unit) _C_
-					   unit.Type->Ident.c_str() _C_ Action);
+					   unit.Type->get_identifier().c_str() _C_ Action);
 			break;
 	}
 }
