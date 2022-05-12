@@ -41,9 +41,7 @@ jobs:
       fail-fast: false
       matrix:
         container:
-          - andrettin/wyrmgus:bullseye
-          - andrettin/wyrmgus:focal
-          - andrettin/wyrmgus:groovy
+          - andrettin/wyrmgus:jammy
     container: ${{ matrix.container }}
     steps:
       - name: Check code
