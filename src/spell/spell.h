@@ -46,8 +46,8 @@ class CUnit;
 class CUpgrade;
 struct lua_State;
 
-static int CclDefineSpell(lua_State *l);
-static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
+extern int CclDefineSpell(lua_State *l);
+extern void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
 
 namespace wyrmgus {
 	class civilization;

@@ -776,7 +776,7 @@ void CallHandler(unsigned int handle, int value)
 **
 **  @param l  Lua state.
 */
-static int CclDefineButton(lua_State *l)
+int CclDefineButton(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -1019,7 +1019,7 @@ static int CclClearObjectives(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclPresentMap(lua_State *l)
+int CclPresentMap(lua_State *l)
 {
 	CMap::get()->Info->name = LuaToString(l, 1);
 	
@@ -1040,7 +1040,7 @@ static int CclPresentMap(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineIcon(lua_State *l)
+int CclDefineIcon(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {

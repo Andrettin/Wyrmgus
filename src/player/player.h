@@ -50,7 +50,7 @@ enum class ButtonCmd;
 enum class DiplomacyState;
 struct lua_State;
 
-static int CclUnit(lua_State *l);
+extern int CclUnit(lua_State *l);
 
 namespace wyrmgus {
 	class age;

@@ -39,7 +39,7 @@ class CUpgrade;
 class LuaCallback;
 enum class ButtonCmd;
 
-static int CclDefineFaction(lua_State *l);
+extern int CclDefineFaction(lua_State *l);
 
 namespace wyrmgus {
 

@@ -31,11 +31,11 @@
 
 struct lua_State;
 
-static int CclDefineSpeciesGenus(lua_State *l);
-static int CclDefineSpeciesFamily(lua_State *l);
-static int CclDefineSpeciesOrder(lua_State *l);
-static int CclDefineSpeciesClass(lua_State *l);
-static int CclDefineSpeciesPhylum(lua_State *l);
+extern int CclDefineSpeciesGenus(lua_State *l);
+extern int CclDefineSpeciesFamily(lua_State *l);
+extern int CclDefineSpeciesOrder(lua_State *l);
+extern int CclDefineSpeciesClass(lua_State *l);
+extern int CclDefineSpeciesPhylum(lua_State *l);
 
 namespace wyrmgus {
 

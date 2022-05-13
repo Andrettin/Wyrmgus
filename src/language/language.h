@@ -32,7 +32,7 @@
 
 struct lua_State;
 
-static int CclDefineLanguage(lua_State *l);
+extern int CclDefineLanguage(lua_State *l);
 
 enum ArticleTypes {
 	ArticleTypeNoArticle,

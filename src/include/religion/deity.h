@@ -32,7 +32,7 @@
 class CUpgrade;
 struct lua_State;
 
-static int CclDefineDeity(lua_State *l);
+extern int CclDefineDeity(lua_State *l);
 
 namespace wyrmgus {
 

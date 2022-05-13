@@ -31,7 +31,7 @@ class CUnit;
 class LuaCallback;
 struct lua_State;
 
-static int CclDefineDialogue(lua_State *l);
+extern int CclDefineDialogue(lua_State *l);
 
 namespace wyrmgus {
 

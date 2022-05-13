@@ -31,7 +31,7 @@
 
 struct lua_State;
 
-static int CclDefineSpecies(lua_State *l);
+extern int CclDefineSpecies(lua_State *l);
 
 namespace wyrmgus {
 

@@ -81,7 +81,7 @@
 **
 **  @param l  Lua state.
 */
-static int CclStratagusMap(lua_State *l)
+int CclStratagusMap(lua_State *l)
 {
 	int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
@@ -855,7 +855,7 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 **
 **  @param l  Lua state.
 */
-static int CclDefinePlayerTypes(lua_State *l)
+int CclDefinePlayerTypes(lua_State *l)
 {
 	int numplayers = lua_gettop(l); /* Number of players == number of arguments */
 	if (numplayers < 2) {
@@ -1034,7 +1034,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineTerrainType(lua_State *l)
+int CclDefineTerrainType(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -1220,7 +1220,7 @@ static int CclDefineTerrainType(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineMapTemplate(lua_State *l)
+int CclDefineMapTemplate(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -1312,7 +1312,7 @@ static int CclDefineMapTemplate(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineSite(lua_State *l)
+int CclDefineSite(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -1466,7 +1466,7 @@ static int CclDefineSite(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineTerrainFeature(lua_State *l)
+int CclDefineTerrainFeature(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {

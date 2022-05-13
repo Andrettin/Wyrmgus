@@ -32,7 +32,7 @@ class CUpgrade;
 class PlayerAi;
 struct lua_State;
 
-static int CclDefineQuest(lua_State *l);
+extern int CclDefineQuest(lua_State *l);
 
 namespace wyrmgus {
 

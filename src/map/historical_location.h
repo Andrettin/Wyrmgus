@@ -32,7 +32,7 @@
 class CConfigData;
 struct lua_State;
 
-static int CclDefineCharacter(lua_State *l);
+extern int CclDefineCharacter(lua_State *l);
 
 namespace wyrmgus {
 

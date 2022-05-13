@@ -35,7 +35,6 @@ class LuaCallback;
 struct lua_State;
 
 static int CclDefineCampaign(lua_State *l);
-static int CclGetCampaignData(lua_State *l);
 
 namespace wyrmgus {
 
@@ -202,7 +201,6 @@ private:
 	campaign *tree_parent = nullptr;
 	
 	friend int ::CclDefineCampaign(lua_State *l);
-	friend int ::CclGetCampaignData(lua_State *l);
 };
 
 }

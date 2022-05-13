@@ -462,7 +462,7 @@ static std::vector<std::unique_ptr<CAnimation>> ParseAnimation(lua_State *l, int
 **
 **  @param l  Lua state.
 */
-static int CclDefineAnimations(lua_State *l)
+int CclDefineAnimations(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {

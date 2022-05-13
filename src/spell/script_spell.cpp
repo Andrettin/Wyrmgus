@@ -222,7 +222,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 **
 **  @note: autocast must be allocated. All data already in is LOST.
 */
-static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
+void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 {
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -283,7 +283,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 **
 **  @param l  Lua state.
 */
-static int CclDefineSpell(lua_State *l)
+int CclDefineSpell(lua_State *l)
 {
 	const int args = lua_gettop(l);
 	const std::string identname = LuaToString(l, 1);

@@ -35,7 +35,7 @@ class CFile;
 class CUnit;
 struct lua_State;
 
-static int CclDefineAnimations(lua_State *l);
+extern int CclDefineAnimations(lua_State *l);
 
 constexpr int ANIMATIONS_DEATHTYPES = 40;
 

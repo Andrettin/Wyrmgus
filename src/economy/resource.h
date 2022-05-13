@@ -34,8 +34,8 @@
 class CGraphic;
 struct lua_State;
 
-static int CclDefineDefaultResourceNames(lua_State *l);
-static int CclDefineResource(lua_State *l);
+extern int CclDefineDefaultResourceNames(lua_State *l);
+extern int CclDefineResource(lua_State *l);
 
 /**
 **  Indices into costs/resource/income array.

@@ -33,7 +33,7 @@
 class CUnit;
 struct lua_State;
 
-static int CclStratagusMap(lua_State *l);
+extern int CclStratagusMap(lua_State *l);
 
 namespace wyrmgus {
 	class gsml_data;

@@ -32,7 +32,7 @@
 class CUpgrade;
 struct lua_State;
 
-static int CclDefineAchievement(lua_State *l);
+extern int CclDefineAchievement(lua_State *l);
 
 namespace wyrmgus {
 

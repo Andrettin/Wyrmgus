@@ -645,7 +645,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<std::unique_ptr<CBuildR
 **
 **  @param l  Lua state.
 */
-static int CclDefineUnitType(lua_State *l)
+int CclDefineUnitType(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -3074,7 +3074,7 @@ void UpdateUnitVariables(CUnit &unit)
 **
 **  @param l  Lua state.
 */
-static int CclDefineSpeciesPhylum(lua_State *l)
+int CclDefineSpeciesPhylum(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -3106,7 +3106,7 @@ static int CclDefineSpeciesPhylum(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineSpeciesClass(lua_State *l)
+int CclDefineSpeciesClass(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -3140,7 +3140,7 @@ static int CclDefineSpeciesClass(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineSpeciesOrder(lua_State *l)
+int CclDefineSpeciesOrder(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -3174,7 +3174,7 @@ static int CclDefineSpeciesOrder(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineSpeciesFamily(lua_State *l)
+int CclDefineSpeciesFamily(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -3208,7 +3208,7 @@ static int CclDefineSpeciesFamily(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineSpeciesGenus(lua_State *l)
+int CclDefineSpeciesGenus(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -3244,7 +3244,7 @@ static int CclDefineSpeciesGenus(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineSpecies(lua_State *l)
+int CclDefineSpecies(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {

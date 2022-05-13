@@ -41,9 +41,9 @@ class CPlayer;
 class CUnit;
 struct lua_State;
 
-static int CclDefineDependency(lua_State *l);
-static int CclDefinePredependency(lua_State *l);
-static int CclDefineUpgrade(lua_State *l);
+extern int CclDefineDependency(lua_State *l);
+extern int CclDefinePredependency(lua_State *l);
+extern int CclDefineUpgrade(lua_State *l);
 
 namespace wyrmgus {
 	class and_condition;

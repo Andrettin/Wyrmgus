@@ -268,7 +268,7 @@ static void CclParseOrders(lua_State *l, CUnit &unit)
 **  @todo  Verify that vision table is always correct (transporter)
 **  @todo (PlaceUnit() and host-info).
 */
-static int CclUnit(lua_State *l)
+int CclUnit(lua_State *l)
 {
 	const int slot = LuaToNumber(l, 1);
 

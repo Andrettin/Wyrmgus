@@ -33,9 +33,9 @@
 class CMapLayer;
 struct lua_State;
 
-static int CclDefinePlayerTypes(lua_State *l);
-static int CclPresentMap(lua_State *l);
-static int CclStratagusMap(lua_State *l);
+extern int CclDefinePlayerTypes(lua_State *l);
+extern int CclPresentMap(lua_State *l);
+extern int CclStratagusMap(lua_State *l);
 
 namespace wyrmgus {
 

@@ -48,7 +48,7 @@ enum class UnitAction : char;
 enum class VariableAttribute;
 struct lua_State;
 
-static int CclUnit(lua_State *l);
+extern int CclUnit(lua_State *l);
 
 namespace wyrmgus {
 	class animation_set;

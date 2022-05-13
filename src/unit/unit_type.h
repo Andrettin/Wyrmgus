@@ -50,9 +50,9 @@ class LuaCallback;
 enum class ButtonCmd;
 struct lua_State;
 
-static int CclDefineDependency(lua_State *l);
-static int CclDefinePredependency(lua_State *l);
-static int CclDefineUnitType(lua_State *l);
+extern int CclDefineDependency(lua_State *l);
+extern int CclDefinePredependency(lua_State *l);
+extern int CclDefineUnitType(lua_State *l);
 
 namespace wyrmgus {
 	class animation_set;

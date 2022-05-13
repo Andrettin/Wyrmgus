@@ -36,7 +36,7 @@ class CCurrency;
 class CUpgrade;
 struct lua_State;
 
-static int CclDefineCivilization(lua_State *l);
+extern int CclDefineCivilization(lua_State *l);
 
 namespace wyrmgus {
 

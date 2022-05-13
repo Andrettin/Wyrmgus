@@ -31,8 +31,8 @@ class CUnit;
 class CUpgrade;
 struct lua_State;
 
-static int CclDefineCharacter(lua_State *l);
-static int CclDefineCustomHero(lua_State *l);
+extern int CclDefineCharacter(lua_State *l);
+extern int CclDefineCustomHero(lua_State *l);
 
 namespace wyrmgus {
 

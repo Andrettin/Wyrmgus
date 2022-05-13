@@ -33,7 +33,7 @@ class CUnit;
 class CUpgrade;
 struct lua_State;
 
-static int CclDefineUniqueItem(lua_State *l);
+extern int CclDefineUniqueItem(lua_State *l);
 
 namespace wyrmgus {
 

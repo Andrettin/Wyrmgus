@@ -55,7 +55,7 @@
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
-static int CclDefineCharacter(lua_State *l)
+int CclDefineCharacter(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -399,7 +399,7 @@ static int CclDefineCharacter(lua_State *l)
 	return 0;
 }
 
-static int CclDefineCustomHero(lua_State *l)
+int CclDefineCustomHero(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {

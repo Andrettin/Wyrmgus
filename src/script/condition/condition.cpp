@@ -466,7 +466,7 @@ std::string PrintConditions(const wyrmgus::button &button)
 --  Ccl part of conditions
 ----------------------------------------------------------------------------*/
 
-static int CclDefineDependency(lua_State *l)
+int CclDefineDependency(lua_State *l)
 {
 	const int args = lua_gettop(l);
 	const char *target = LuaToString(l, 1);
@@ -552,7 +552,7 @@ static int CclDefineDependency(lua_State *l)
 	return 0;
 }
 
-static int CclDefinePredependency(lua_State *l)
+int CclDefinePredependency(lua_State *l)
 {
 	const int args = lua_gettop(l);
 	const char *target = LuaToString(l, 1);

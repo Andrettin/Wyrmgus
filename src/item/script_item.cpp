@@ -36,7 +36,7 @@
 #include "upgrade/upgrade.h"
 #include "util/log_util.h"
 
-static int CclDefineUniqueItem(lua_State *l)
+int CclDefineUniqueItem(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {

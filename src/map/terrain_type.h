@@ -34,7 +34,7 @@ class CGraphic;
 class CPlayerColorGraphic;
 struct lua_State;
 
-static int CclDefineTerrainType(lua_State *l);
+extern int CclDefineTerrainType(lua_State *l);
 
 namespace wyrmgus {
 

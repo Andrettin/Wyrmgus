@@ -693,7 +693,7 @@ static int CclSharedVision(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineCivilization(lua_State *l)
+int CclDefineCivilization(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -924,7 +924,7 @@ static int CclDefineCivilization(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineLanguageWord(lua_State *l)
+int CclDefineLanguageWord(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -1391,7 +1391,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineFaction(lua_State *l)
+int CclDefineFaction(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -1731,7 +1731,7 @@ static int CclDefineReligion(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDeity(lua_State *l)
+int CclDefineDeity(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -1829,7 +1829,7 @@ static int CclDefineDeity(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineLanguage(lua_State *l)
+int CclDefineLanguage(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {

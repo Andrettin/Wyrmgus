@@ -667,7 +667,7 @@ void SaveUpgrades(CFile &file)
 **
 **  @param l  Lua state.
 */
-static int CclDefineUpgrade(lua_State *l)
+int CclDefineUpgrade(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -825,7 +825,7 @@ static int CclDefineUpgrade(lua_State *l)
 **
 **  @param l  List of modifiers.
 */
-static int CclDefineModifier(lua_State *l)
+int CclDefineModifier(lua_State *l)
 {
 	const int args = lua_gettop(l);
 

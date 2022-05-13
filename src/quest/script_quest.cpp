@@ -51,7 +51,7 @@
 #include "upgrade/upgrade.h"
 #include "util/date_util.h"
 
-static int CclDefineQuest(lua_State *l)
+int CclDefineQuest(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -459,8 +459,8 @@ static int CclGetCampaignData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "MapTemplate")) {
-		if (!campaign->map_templates.empty()) {
-			lua_pushstring(l, campaign->map_templates[0]->Ident.c_str());
+		if (!campaign->get_map_templates().empty()) {
+			lua_pushstring(l, campaign->get_map_templates().at(0)->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -505,7 +505,7 @@ static int CclGetCampaignData(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineAchievement(lua_State *l)
+int CclDefineAchievement(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -628,7 +628,7 @@ static int CclGetAchievementData(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDialogue(lua_State *l)
+int CclDefineDialogue(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {

@@ -37,7 +37,7 @@ class CUpgrade;
 enum class ButtonCmd;
 struct lua_State;
 
-static int CclDefineButton(lua_State *l);
+extern int CclDefineButton(lua_State *l);
 
 namespace wyrmgus {
 

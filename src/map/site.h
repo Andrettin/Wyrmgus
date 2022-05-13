@@ -39,7 +39,7 @@ class CPlayer;
 class CUnit;
 struct lua_State;
 
-static int CclDefineSite(lua_State *l);
+extern int CclDefineSite(lua_State *l);
 
 namespace wyrmgus {
 

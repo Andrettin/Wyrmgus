@@ -40,7 +40,7 @@
 class CPlayer;
 struct lua_State;
 
-static int CclDefineMapTemplate(lua_State *l);
+extern int CclDefineMapTemplate(lua_State *l);
 
 namespace wyrmgus {
 

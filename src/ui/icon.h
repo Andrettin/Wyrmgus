@@ -62,7 +62,7 @@ class CPlayerColorGraphic;
 class ButtonStyle;
 struct lua_State;
 
-static int CclDefineIcon(lua_State *l);
+extern int CclDefineIcon(lua_State *l);
 
 namespace wyrmgus {
 

@@ -28,8 +28,8 @@
 
 struct lua_State;
 
-static int CclDefineCivilization(lua_State *l);
-static int CclDefineFaction(lua_State *l);
+extern int CclDefineCivilization(lua_State *l);
+extern int CclDefineFaction(lua_State *l);
 
 namespace wyrmgus {
 

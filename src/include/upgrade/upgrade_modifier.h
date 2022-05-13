@@ -36,7 +36,7 @@ class CUnit;
 class CUpgrade;
 struct lua_State;
 
-static int CclDefineModifier(lua_State *l);
+extern int CclDefineModifier(lua_State *l);
 
 namespace wyrmgus {
 

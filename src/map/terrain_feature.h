@@ -32,7 +32,7 @@
 
 struct lua_State;
 
-static int CclDefineTerrainFeature(lua_State *l);
+extern int CclDefineTerrainFeature(lua_State *l);
 
 namespace wyrmgus {
 

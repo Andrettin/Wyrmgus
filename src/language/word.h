@@ -32,7 +32,7 @@
 
 struct lua_State;
 
-static int CclDefineLanguageWord(lua_State *l);
+extern int CclDefineLanguageWord(lua_State *l);
 
 namespace wyrmgus {
 

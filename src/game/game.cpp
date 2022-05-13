@@ -1760,7 +1760,7 @@ static int CclSetSpeeds(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineResource(lua_State *l)
+int CclDefineResource(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -1818,7 +1818,7 @@ static int CclDefineResource(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDefaultResourceNames(lua_State *l)
+int CclDefineDefaultResourceNames(lua_State *l)
 {
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		DefaultResourceNames[i].clear();
