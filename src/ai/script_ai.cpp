@@ -343,18 +343,11 @@ static std::vector<const wyrmgus::unit_type *> get_naval_transporter_units()
 }
 //Wyrmgus end
 
-/**
-**  Init AiHelper.
-**
-**  @param aiHelper  variable to initialise.
-**
-**  @todo missing Equiv initialisation.
-*/
-static void InitAiHelper(AiHelper &aiHelper)
+void AiHelper::init()
 {
 	//Wyrmgus start
 	//free AI helper (except for equivs) before initializing, in case this is a re-definition
-	AiHelpers.clear();
+	this->clear();
 	//Wyrmgus end
 	
 	const std::vector<const unit_type *> reparable_units = get_reparable_units();
@@ -366,14 +359,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 	//Wyrmgus end
 
 	for (const unit_type *supply_unit_type : supply_units) {
-		AiHelperInsert(aiHelper.UnitLimit, supply_unit_type);
+		AiHelperInsert(this->UnitLimit, supply_unit_type);
 	}
 	//Wyrmgus start
 	for (const unit_type *sell_market : market_units) {
-		AiHelperInsert(aiHelper.SellMarkets, 0, sell_market);
+		AiHelperInsert(this->SellMarkets, 0, sell_market);
 	}
 	for (const unit_type *naval_transporter : naval_transporter_units) {
-		AiHelperInsert(aiHelper.NavalTransporters, naval_transporter);
+		AiHelperInsert(this->NavalTransporters, naval_transporter);
 	}
 	//Wyrmgus end
 
@@ -384,7 +377,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 		for (const unit_type *mine_unit_type : mine_units) {
 			if (mine_unit_type->get_given_resource() == resource) {
-				AiHelperInsert(aiHelper.Mines, resource->get_index(), mine_unit_type);
+				AiHelperInsert(this->Mines, resource->get_index(), mine_unit_type);
 			}
 		}
 		for (const unit_type *unit_type : unit_type::get_all()) {
@@ -393,7 +386,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 			}
 
 			if (unit_type->can_store(resource)) {
-				AiHelperInsert(aiHelper.Depots, resource->get_index(), unit_type);
+				AiHelperInsert(this->Depots, resource->get_index(), unit_type);
 			}
 		}
 	}
@@ -408,7 +401,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 			case ButtonCmd::Repair:
 				for (const unit_type *repairer : unitmask) {
 					for (const unit_type *reparable_unit_type : reparable_units) {
-						AiHelperInsert(aiHelper.Repair, reparable_unit_type->get_index(), repairer);
+						AiHelperInsert(this->Repair, reparable_unit_type->get_index(), repairer);
 					}
 				}
 				break;
@@ -416,7 +409,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const unit_type *buildingType = unit_type::get(button->ValueStr);
 
 				for (const unit_type *builder : unitmask) {
-					AiHelperInsert(aiHelper.builders, buildingType, builder);
+					AiHelperInsert(this->builders, buildingType, builder);
 				}
 				break;
 			}
@@ -424,7 +417,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const unit_class *built_class = unit_class::get(button->ValueStr);
 
 				for (const unit_class *builder : button->get_unit_classes()) {
-					AiHelperInsert(aiHelper.builder_classes, built_class, builder);
+					AiHelperInsert(this->builder_classes, built_class, builder);
 				}
 				break;
 			}
@@ -432,7 +425,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const unit_type *trained_type = unit_type::get(button->ValueStr);
 
 				for (const unit_type *trainer : unitmask) {
-					AiHelperInsert(aiHelper.trainers, trained_type, trainer);
+					AiHelperInsert(this->trainers, trained_type, trainer);
 				}
 				break;
 			}
@@ -440,7 +433,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const unit_class *trained_class = unit_class::get(button->ValueStr);
 
 				for (const unit_class *trainer : button->get_unit_classes()) {
-					AiHelperInsert(aiHelper.trainer_classes, trained_class, trainer);
+					AiHelperInsert(this->trainer_classes, trained_class, trainer);
 				}
 				break;
 			}
@@ -448,8 +441,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const unit_type *upgrade_to_type = unit_type::get(button->ValueStr);
 
 				for (const unit_type *unit_type : unitmask) {
-					AiHelperInsert(aiHelper.unit_type_upgrades, unit_type, upgrade_to_type);
-					AiHelperInsert(aiHelper.unit_type_upgradees, upgrade_to_type, unit_type);
+					AiHelperInsert(this->unit_type_upgrades, unit_type, upgrade_to_type);
+					AiHelperInsert(this->unit_type_upgradees, upgrade_to_type, unit_type);
 				}
 				break;
 			}
@@ -457,8 +450,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const unit_class *upgrade_to_class = unit_class::get(button->ValueStr);
 
 				for (const unit_class *unit_class : button->get_unit_classes()) {
-					AiHelperInsert(aiHelper.unit_class_upgrades, unit_class, upgrade_to_class);
-					AiHelperInsert(aiHelper.unit_class_upgradees, upgrade_to_class, unit_class);
+					AiHelperInsert(this->unit_class_upgrades, unit_class, upgrade_to_class);
+					AiHelperInsert(this->unit_class_upgradees, upgrade_to_class, unit_class);
 				}
 				break;
 			}
@@ -466,8 +459,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const CUpgrade *upgrade = CUpgrade::get(button->ValueStr);
 
 				for (const unit_type *researcher : unitmask) {
-					AiHelperInsert(aiHelper.researchers, upgrade, researcher);
-					AiHelperInsert(aiHelper.researched_upgrades, researcher, upgrade);
+					AiHelperInsert(this->researchers, upgrade, researcher);
+					AiHelperInsert(this->researched_upgrades, researcher, upgrade);
 				}
 				break;
 			}
@@ -475,8 +468,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const upgrade_class *upgrade_class = upgrade_class::get(button->ValueStr);
 
 				for (const unit_class *researcher : button->get_unit_classes()) {
-					AiHelperInsert(aiHelper.researcher_classes, upgrade_class, researcher);
-					AiHelperInsert(aiHelper.researched_upgrade_classes, researcher, upgrade_class);
+					AiHelperInsert(this->researcher_classes, upgrade_class, researcher);
+					AiHelperInsert(this->researched_upgrade_classes, researcher, upgrade_class);
 				}
 				break;
 			}
@@ -484,7 +477,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const int resource = GetResourceIdByName(button->ValueStr.c_str());
 
 				for (const unit_type *sell_market : unitmask) {
-					AiHelperInsert(aiHelper.SellMarkets, resource - 1, sell_market);
+					AiHelperInsert(this->SellMarkets, resource - 1, sell_market);
 				}
 				break;
 			}
@@ -492,7 +485,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				int resource = GetResourceIdByName(button->ValueStr.c_str());
 
 				for (const unit_type *buy_market : unitmask) {
-					AiHelperInsert(aiHelper.BuyMarkets, resource - 1, buy_market);
+					AiHelperInsert(this->BuyMarkets, resource - 1, buy_market);
 				}
 				break;
 			}
@@ -500,7 +493,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const resource *resource = resource::get(button->ValueStr);
 
 				for (const unit_type *producer : unitmask) {
-					AiHelperInsert(aiHelper.produced_resources, producer, resource);
+					AiHelperInsert(this->produced_resources, producer, resource);
 				}
 				break;
 			}
@@ -508,7 +501,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const unit_type *upgrade_to_type = unit_type::get(button->ValueStr);
 
 				for (const unit_type *experience_upgradee : unitmask) {
-					AiHelperInsert(aiHelper.ExperienceUpgrades, experience_upgradee->get_index(), upgrade_to_type);
+					AiHelperInsert(this->ExperienceUpgrades, experience_upgradee->get_index(), upgrade_to_type);
 				}
 				break;
 			}
@@ -517,7 +510,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 				if (ability->is_ability()) {
 					for (const unit_type *learner : unitmask) {
-						AiHelperInsert(aiHelper.LearnableAbilities, learner->get_index(), ability);
+						AiHelperInsert(this->LearnableAbilities, learner->get_index(), ability);
 					}
 				}
 				break;
@@ -537,7 +530,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 */
 static int CclDefineAiHelper(lua_State *l)
 {
-	InitAiHelper(AiHelpers);
+	AiHelpers.init();
 
 	const int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {

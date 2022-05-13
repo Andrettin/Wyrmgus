@@ -34,7 +34,7 @@
 class LuaCallback;
 struct lua_State;
 
-static int CclDefineCampaign(lua_State *l);
+extern int CclDefineCampaign(lua_State *l);
 
 namespace wyrmgus {
 

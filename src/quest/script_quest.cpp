@@ -323,7 +323,7 @@ static int CclGetQuestData(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineCampaign(lua_State *l)
+int CclDefineCampaign(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {

@@ -45,8 +45,6 @@ class CPlayer;
 class CUnit;
 class CUpgrade;
 
-static void InitAiHelper(AiHelper &aiHelper);
-
 namespace wyrmgus {
 	class landmass;
 	class resource;
@@ -467,9 +465,11 @@ private:
 **  building or upgrade or spell, it could lookup in this tables to find
 **  where it could be trained, built or researched.
 */
-class AiHelper
+class AiHelper final
 {
 public:
+	void init();
+
 	void clear()
 	{
 		this->trainers.clear();
@@ -604,9 +604,9 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<const wyrmgus::unit_class *> &get_researcher_classes(const wyrmgus::upgrade_class *upgrade_class) const
+	const std::vector<const unit_class *> &get_researcher_classes(const upgrade_class *upgrade_class) const
 	{
-		static std::vector<const wyrmgus::unit_class *> empty_vector;
+		static std::vector<const unit_class *> empty_vector;
 
 		const auto find_iterator = this->researcher_classes.find(upgrade_class);
 		if (find_iterator != this->researcher_classes.end()) {
@@ -616,9 +616,9 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<const wyrmgus::resource *> &get_produced_resources(const wyrmgus::unit_type *unit_type) const
+	const std::vector<const resource *> &get_produced_resources(const unit_type *unit_type) const
 	{
-		static std::vector<const wyrmgus::resource *> empty_vector;
+		static std::vector<const resource *> empty_vector;
 
 		const auto find_iterator = this->produced_resources.find(unit_type);
 		if (find_iterator != this->produced_resources.end()) {
@@ -628,7 +628,7 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<const CUpgrade *> &get_researched_upgrades(const wyrmgus::unit_type *unit_type) const
+	const std::vector<const CUpgrade *> &get_researched_upgrades(const unit_type *unit_type) const
 	{
 		static std::vector<const CUpgrade *> empty_vector;
 
@@ -640,9 +640,9 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<const wyrmgus::upgrade_class *> &get_researched_upgrade_classes(const wyrmgus::unit_class *unit_class) const
+	const std::vector<const upgrade_class *> &get_researched_upgrade_classes(const unit_class *unit_class) const
 	{
-		static std::vector<const wyrmgus::upgrade_class *> empty_vector;
+		static std::vector<const upgrade_class *> empty_vector;
 
 		const auto find_iterator = this->researched_upgrade_classes.find(unit_class);
 		if (find_iterator != this->researched_upgrade_classes.end()) {
@@ -654,94 +654,94 @@ public:
 
 private:
 	//unit types associated with lists of other unit types which can train them
-	wyrmgus::unit_type_map<std::vector<const wyrmgus::unit_type *>> trainers;
+	unit_type_map<std::vector<const unit_type *>> trainers;
 
 	//unit classes associated with lists of other unit classes which can train them
-	wyrmgus::unit_class_map<std::vector<const wyrmgus::unit_class *>> trainer_classes;
+	unit_class_map<std::vector<const unit_class *>> trainer_classes;
 
 	//(building) unit types associated with lists of other unit types which can build them
-	wyrmgus::unit_type_map<std::vector<const wyrmgus::unit_type *>> builders;
+	unit_type_map<std::vector<const unit_type *>> builders;
 
 	//(building) unit classes associated with lists of other unit classes which can build them
-	wyrmgus::unit_class_map<std::vector<const wyrmgus::unit_class *>> builder_classes;
+	unit_class_map<std::vector<const unit_class *>> builder_classes;
 
 	//lists of unit type upgrades, mapped to the unit type for which they are available
-	wyrmgus::unit_type_map<std::vector<const wyrmgus::unit_type *>> unit_type_upgrades;
+	unit_type_map<std::vector<const unit_type *>> unit_type_upgrades;
 
 	//lists of unit types which can perform unit type upgrades, mapped to the unit type to which they can upgrade
-	wyrmgus::unit_type_map<std::vector<const wyrmgus::unit_type *>> unit_type_upgradees;
+	unit_type_map<std::vector<const unit_type *>> unit_type_upgradees;
 
 	//lists of unit class upgrades, mapped to the unit class for which they are available
-	wyrmgus::unit_class_map<std::vector<const wyrmgus::unit_class *>> unit_class_upgrades;
+	unit_class_map<std::vector<const unit_class *>> unit_class_upgrades;
 
 	//lists of unit classes which can perform unit class upgrades, mapped to the unit class to which they can upgrade
-	wyrmgus::unit_class_map<std::vector<const wyrmgus::unit_class *>> unit_class_upgradees;
+	unit_class_map<std::vector<const unit_class *>> unit_class_upgradees;
 
 	//upgrades associated with lists of unit types which can research them
-	std::map<const CUpgrade *, std::vector<const wyrmgus::unit_type *>> researchers;
+	std::map<const CUpgrade *, std::vector<const unit_type *>> researchers;
 
 	//upgrade classes associated with lists of unit classes which can research them
-	std::map<const wyrmgus::upgrade_class *, std::vector<const wyrmgus::unit_class *>> researcher_classes;
+	std::map<const upgrade_class *, std::vector<const unit_class *>> researcher_classes;
 
 public:
 	/**
 	** The index is the unit that should be repaired, giving a table of all
 	** units/buildings which could repair this unit.
 	*/
-	std::vector<std::vector<const wyrmgus::unit_type *>> Repair;
+	std::vector<std::vector<const unit_type *>> Repair;
 
 	/**
 	** A table of all units/buildings which could reduce the unit-limit.
 	*/
-	std::vector<const wyrmgus::unit_type *> UnitLimit;
+	std::vector<const unit_type *> UnitLimit;
 
 	/**
 	** The index is the unit that should be made, giving a table of all
 	** units/buildings which are equivalent.
 	*/
-	std::vector<std::vector<const wyrmgus::unit_type *>> Equiv;
+	std::vector<std::vector<const unit_type *>> Equiv;
 
 	/**
 	** The index is the resource id - 1 (we can't mine TIME), giving a table of all
 	** units/buildings/mines which can harvest this resource.
 	*/
-	std::vector<std::vector<const wyrmgus::unit_type *>> Mines;
+	std::vector<std::vector<const unit_type *>> Mines;
 
 	/**
 	** The index is the resource id - 1 (we can't store TIME), giving a table of all
 	** units/buildings/mines which can store this resource.
 	*/
-	std::vector<std::vector<const wyrmgus::unit_type *>> Depots;
+	std::vector<std::vector<const unit_type *>> Depots;
 	
 	//Wyrmgus start
 	/**
 	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
 	** units/buildings/mines which can sell this resource. In index 0 (respective to CopperCost) we store all units with the "Market" tag instead.
 	*/
-	std::vector<std::vector<const wyrmgus::unit_type *>> SellMarkets;
+	std::vector<std::vector<const unit_type *>> SellMarkets;
 	
 	/**
 	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
 	** units/buildings/mines which can buy this resource.
 	*/
-	std::vector<std::vector<const wyrmgus::unit_type *>> BuyMarkets;
+	std::vector<std::vector<const unit_type *>> BuyMarkets;
 
 private:
 	//lists of resources, mapped to the unit types that can produce them
-	wyrmgus::unit_type_map<std::vector<const wyrmgus::resource *>> produced_resources;
+	unit_type_map<std::vector<const resource *>> produced_resources;
 
 	//unit types associated with lists of upgrades which they can research
-	wyrmgus::unit_type_map<std::vector<const CUpgrade *>> researched_upgrades;
+	unit_type_map<std::vector<const CUpgrade *>> researched_upgrades;
 
 	//unit classes associated with lists of upgrade classes which they can research
-	wyrmgus::unit_class_map<std::vector<const wyrmgus::upgrade_class *>> researched_upgrade_classes;
+	unit_class_map<std::vector<const upgrade_class *>> researched_upgrade_classes;
 
 public:
 	/**
 	** The index is the unit that should acquire an experience upgrade, giving a table of all
 	** possible upgrades for it.
 	*/
-	std::vector<std::vector<const wyrmgus::unit_type *>> ExperienceUpgrades;
+	std::vector<std::vector<const unit_type *>> ExperienceUpgrades;
 	
 	/**
 	** The index is the unit type that should acquire a learnable ability, giving a table of all
@@ -752,9 +752,7 @@ public:
 	/**
 	** A table of all naval transporter units.
 	*/
-	std::vector<const wyrmgus::unit_type *> NavalTransporters;
-
-	friend void InitAiHelper(AiHelper &aiHelper);
+	std::vector<const unit_type *> NavalTransporters;
 };
 
 extern std::vector<std::unique_ptr<CAiType>> AiTypes;   /// List of all AI types
