@@ -249,7 +249,7 @@ struct find_resource_context final
 
 find_resource_result resource_finder::find()
 {
-	if (this->depot = nullptr) { // Find the nearest depot
+	if (this->depot == nullptr) { // Find the nearest depot
 		this->depot = FindDepositNearLoc(*this->worker->Player, this->start_unit->tilePos, this->range, this->resource, this->start_unit->MapLayer->ID);
 	}
 
