@@ -84,8 +84,6 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 			this->faction = faction;
 		} else if (key == "hidden") {
 			this->hidden = string::to_bool(value);
-		} else if (key == "sandbox") {
-			this->Sandbox = string::to_bool(value);
 		} else if (key == "start_date") {
 			this->start_date = string::to_date(value);
 		} else if (key == "required_quest") {

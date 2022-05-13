@@ -345,8 +345,6 @@ static int CclDefineCampaign(lua_State *l)
 			campaign->faction = wyrmgus::faction::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
 			campaign->hidden = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Sandbox")) {
-			campaign->Sandbox = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "StartYear")) {
 			campaign->start_date.setDate(QDate(LuaToNumber(l, -1), 0, 0));
 		} else if (!strcmp(value, "StartDate")) {
@@ -451,9 +449,6 @@ static int CclGetCampaignData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
 		lua_pushboolean(l, campaign->is_hidden());
-		return 1;
-	} else if (!strcmp(data, "Sandbox")) {
-		lua_pushboolean(l, campaign->Sandbox);
 		return 1;
 	} else if (!strcmp(data, "RequiredQuests")) {
 		lua_createtable(l, campaign->get_required_quests().size(), 0);

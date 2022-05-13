@@ -189,7 +189,6 @@ private:
 	calendar *start_date_calendar = nullptr; //the calendar for the start date
 	wyrmgus::timeline *timeline = nullptr; //the timeline in which the campaign is set
 	bool hidden = false; //whether the campaign is hidden
-	bool Sandbox = false;			/// Whether the campaign is a sandbox one
 	std::vector<wyrmgus::quest *> required_quests;		/// Quests required by the campaign
 	wyrmgus::faction *faction = nullptr;	//which faction the player plays as in the campaign
 	wyrmgus::quest *quest = nullptr; //the quest which is acquired when the campaign starts, and which when completed means that the campaign has been completed as well
