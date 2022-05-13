@@ -1767,6 +1767,12 @@ message("==================================")
 
 # Compile Stratagus
 
+if(MSVC)
+	add_compile_options(/W4 /w44800 /wd4458)
+else()
+	add_compile_options(-Wall -Werror)
+endif()
+
 add_custom_command(OUTPUT tolua.cpp
 	COMMAND ${TOLUA++_APP} ARGS -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg
 	DEPENDS ${tolua_FILES}
@@ -1782,14 +1788,6 @@ if(WITH_TEST)
 	add_executable(wyrmgus_test ${wyrmgus_test_SRCS})
 	add_test(wyrmgus_test wyrmgus_test)
 	enable_testing()
-endif()
-
-if (MSVC)
-	target_compile_options(wyrmgus PRIVATE /W4 /w44800 /wd4458)
-	target_compile_options(wyrmgus_main PRIVATE /W4 /w44800 /wd4458)
-	if(WITH_TEST)
-		target_compile_options(wyrmgus_test PRIVATE /W4 /w44800 /wd4458)
-	endif()
 endif()
 
 target_precompile_headers(wyrmgus PRIVATE src/pch.h)
