@@ -5173,7 +5173,7 @@ void CPlayer::set_enemy_diplomatic_stance_with(CPlayer *player)
 			}
 			message += this->get_name() + " changed their diplomatic stance with us to enemy";
 
-			CPlayer::GetThisPlayer()->Notify(message.c_str());
+			CPlayer::GetThisPlayer()->notify(message);
 		} else if (this == CPlayer::GetThisPlayer()) {
 			std::string message = "We have changed our diplomatic stance with ";
 			if (player->uses_definite_article()) {
