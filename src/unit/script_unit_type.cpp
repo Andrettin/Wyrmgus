@@ -2593,7 +2593,7 @@ static int CclDefineDecorations(lua_State *l)
 	for (int i = 0; i < nargs; i++) {
 		assert_throw(lua_istable(l, i + 1));
 		CDecoVar *decovar = nullptr;
-		memset(&tmp, 0, sizeof(tmp));
+		tmp = {};
 		lua_pushnil(l);
 		while (lua_next(l, i + 1)) {
 			const char *key = LuaToString(l, -2);

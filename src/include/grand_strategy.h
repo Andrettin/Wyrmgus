@@ -135,7 +135,7 @@ public:
 	
 	int Faction = -1;											/// The faction's ID (-1 = none).
 	int civilization = -1;										/// Civilization of the faction (-1 = none).
-	government_type government_type = government_type::monarchy;	/// Government type of the faction (-1 = none).
+	wyrmgus::government_type government_type = government_type::monarchy;	/// Government type of the faction (-1 = none).
 	CGrandStrategyProvince *Capital = nullptr;					/// Capital province of this faction
 	bool Technologies[UpgradeMax];								/// Whether a faction has a particular technology or not
 	std::vector<int> OwnedProvinces;							/// Provinces owned by this faction

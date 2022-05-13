@@ -646,9 +646,6 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	MovementMask(tile_flag::none)
 {
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
-	//Wyrmgus start
-	memset(LayerSprites, 0, sizeof(LayerSprites));
-	//Wyrmgus end
 
 	this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
 

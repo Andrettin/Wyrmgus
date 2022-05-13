@@ -44,17 +44,14 @@
 
 namespace wyrmgus {
 
-unit_type_variation::unit_type_variation(const std::string &identifier, const wyrmgus::unit_type *unit_type, const int image_layer) : identifier(identifier), unit_type(unit_type), ImageLayer(image_layer)
+unit_type_variation::unit_type_variation(const std::string &identifier, const wyrmgus::unit_type *unit_type, const int image_layer)
+	: identifier(identifier), unit_type(unit_type), ImageLayer(image_layer)
 {
 	if (image_layer == -1) {
 		this->index = static_cast<int>(unit_type->get_variations().size());
 	} else {
 		this->index = unit_type->LayerVariations[image_layer].size();
 	}
-
-	memset(LayerSprites, 0, sizeof(LayerSprites));
-	memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));
-	memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));
 }
 
 unit_type_variation::~unit_type_variation()

@@ -1391,7 +1391,6 @@ private:
 		}
 		const wyrmgus::unit_type &type = *attacker->Type;
 		const wyrmgus::unit_type &dtype = *dest->Type;
-		const int missile_range = attacker->GetMissile().Missile->get_range() + range - 1;
 		int x = attacker->tilePos.x;
 		int y = attacker->tilePos.y;
 

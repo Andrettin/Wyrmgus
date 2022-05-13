@@ -490,7 +490,7 @@ void MapUnmarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-template <wyrmgus::map_marker_func_ptr marker>
+template <map_marker_func_ptr marker>
 //Wyrmgus start
 //void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range)
 void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)

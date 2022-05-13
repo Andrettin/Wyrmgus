@@ -1549,7 +1549,7 @@ public:
 	std::shared_ptr<CGraphic> ShadowSprite;          /// Shadow sprite image
 	//Wyrmgus start
 	std::shared_ptr<CGraphic> LightSprite;						/// Light sprite image
-	std::shared_ptr<CPlayerColorGraphic> LayerSprites[MaxImageLayers];	/// Layer sprite images
+	std::array<std::shared_ptr<CPlayerColorGraphic>, MaxImageLayers> LayerSprites{};	/// Layer sprite images
 	//Wyrmgus end
 
 private:

@@ -244,9 +244,9 @@ public:
 	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
 	std::filesystem::path FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.
 	std::filesystem::path FileWhenEmpty[MaxCosts];      /// Change the graphic when the unit is empty.
-	std::shared_ptr<CPlayerColorGraphic> LayerSprites[MaxImageLayers];	/// The graphics corresponding to LayerFiles.
-	std::shared_ptr<CPlayerColorGraphic> SpriteWhenLoaded[MaxCosts]; /// The graphic corresponding to FileWhenLoaded.
-	std::shared_ptr<CPlayerColorGraphic> SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
+	std::array<std::shared_ptr<CPlayerColorGraphic>, MaxImageLayers> LayerSprites{};	/// The graphics corresponding to LayerFiles.
+	std::array<std::shared_ptr<CPlayerColorGraphic>, MaxCosts> SpriteWhenLoaded{}; /// The graphic corresponding to FileWhenLoaded.
+	std::array<std::shared_ptr<CPlayerColorGraphic>, MaxCosts> SpriteWhenEmpty{};  /// The graphic corresponding to FileWhenEmpty
 	
 	std::map<ButtonCmd, IconConfig> ButtonIcons;				/// icons for button actions
 

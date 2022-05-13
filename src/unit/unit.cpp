@@ -481,8 +481,8 @@ void CUnit::Init()
 	Summoned = 0;
 	Waiting = 0;
 	MineLow = 0;
-	memset(&Anim, 0, sizeof(Anim));
-	memset(&WaitBackup, 0, sizeof(WaitBackup));
+	Anim = _unit_anim_();
+	WaitBackup = _unit_anim_();
 	this->GivesResource = 0;
 	this->CurrentResource = 0;
 	this->reset_step_count();
@@ -3519,10 +3519,12 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 **  @param f       Function to (un)mark for normal vision.
 **  @param f2        Function to (un)mark for cloaking vision.
 */
-template <wyrmgus::map_marker_func_ptr sight_marker, wyrmgus::map_marker_func_ptr detect_cloak_marker, wyrmgus::map_marker_func_ptr ethereal_vision_marker>
+template <map_marker_func_ptr sight_marker, map_marker_func_ptr detect_cloak_marker, map_marker_func_ptr ethereal_vision_marker>
 static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height)
 {
 	static_assert(sight_marker != nullptr);
+	static_assert(detect_cloak_marker != nullptr);
+	static_assert(ethereal_vision_marker != nullptr);
 
 	//Wyrmgus start
 	/*
@@ -3538,12 +3540,12 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 	MapSight<sight_marker>(*unit.Player, pos, width, height,
 			 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, unit.MapLayer->ID);
 
-	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && detect_cloak_marker) {
+	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value) {
 		MapSight<detect_cloak_marker>(*unit.Player, pos, width, height,
 				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, unit.MapLayer->ID);
 	}
 	
-	if (unit.Variable[ETHEREALVISION_INDEX].Value && ethereal_vision_marker) {
+	if (unit.Variable[ETHEREALVISION_INDEX].Value) {
 		MapSight<ethereal_vision_marker>(*unit.Player, pos, width, height,
 				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, unit.MapLayer->ID);
 	}
