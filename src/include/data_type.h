@@ -39,6 +39,10 @@ public:
 	{
 	}
 
+	virtual ~CDataType()
+	{
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
 	
 	const std::string &GetIdent() const

@@ -64,7 +64,6 @@ int CclDefineCharacter(lua_State *l)
 
 	std::string character_ident = LuaToString(l, 1);
 	wyrmgus::character *character = wyrmgus::character::try_get(character_ident);
-	bool redefinition = false;
 	if (!character) {
 		if (LoadingPersistentHeroes) {
 			wyrmgus::log::log_error("Character \"" + character_ident + "\" has persistent data, but doesn't exist.");
@@ -72,7 +71,6 @@ int CclDefineCharacter(lua_State *l)
 		}
 		character = wyrmgus::character::get_or_add(character_ident, nullptr);
 	} else {
-		redefinition = true;
 		if (!LoadingPersistentHeroes) {
 			fprintf(stderr, "Character \"%s\" is being redefined.\n", character_ident.c_str());
 		}

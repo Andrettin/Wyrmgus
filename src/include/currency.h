@@ -28,7 +28,7 @@
 
 #include "data_type.h"
 
-class CCurrency : CDataType
+class CCurrency final : CDataType
 {
 public:
 	static CCurrency *GetCurrency(const std::string &ident, const bool should_find = true);
