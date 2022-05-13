@@ -251,6 +251,8 @@ const sound *unit_sound_set::get_sound_for_unit(const unit_sound_type unit_sound
 				}
 			}
 			break;
+		default:
+			break;
 	}
 
 	return nullptr;
