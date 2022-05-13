@@ -2823,7 +2823,7 @@ void CUnit::UpdateSoldUnits()
 		if (this->Player == CPlayer::GetThisPlayer()) {
 			for (wyrmgus::character *custom_hero : character::get_custom_heroes()) {
 				if (
-					(custom_hero->get_civilization() != nullptr && custom_hero->get_civilization() == civilization || custom_hero->get_unit_type() == civilization->get_class_unit_type(custom_hero->get_unit_type()->get_unit_class()))
+					(custom_hero->get_civilization() != nullptr && (custom_hero->get_civilization() == civilization || custom_hero->get_unit_type() == civilization->get_class_unit_type(custom_hero->get_unit_type()->get_unit_class())))
 					&& check_conditions(custom_hero->get_unit_type(), this, true) && custom_hero->CanAppear()
 				) {
 					potential_heroes.push_back(custom_hero);

@@ -111,8 +111,7 @@ public:
 class CGrandStrategyFaction
 {
 public:
-	CGrandStrategyFaction() :
-		Faction(-1), civilization(-1), FactionTier(wyrmgus::faction_tier::barony), government_type(wyrmgus::government_type::monarchy), Capital(nullptr)
+	CGrandStrategyFaction()
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Resources, 0, sizeof(Resources));
@@ -134,11 +133,10 @@ public:
 	std::string get_full_name();
 	CGrandStrategyProvince *GetRandomProvinceWeightedByPopulation();
 	
-	int Faction;												/// The faction's ID (-1 = none).
-	int civilization;											/// Civilization of the faction (-1 = none).
-	wyrmgus::government_type government_type;					/// Government type of the faction (-1 = none).
-	wyrmgus::faction_tier FactionTier;						/// What is the tier of this faction (barony, etc.).
-	CGrandStrategyProvince *Capital;							/// Capital province of this faction
+	int Faction = -1;											/// The faction's ID (-1 = none).
+	int civilization = -1;										/// Civilization of the faction (-1 = none).
+	government_type government_type = government_type::monarchy;	/// Government type of the faction (-1 = none).
+	CGrandStrategyProvince *Capital = nullptr;					/// Capital province of this faction
 	bool Technologies[UpgradeMax];								/// Whether a faction has a particular technology or not
 	std::vector<int> OwnedProvinces;							/// Provinces owned by this faction
 	int Resources[MaxCosts];									/// Amount of each resource stored by the faction.

@@ -1289,7 +1289,7 @@ int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_rawlen(l, -1);
+
 			// Free any old restrictions if they are redefined
 			type->BuildingRules.clear();
 			ParseBuildingRules(l, type->BuildingRules);
@@ -1297,7 +1297,7 @@ int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_rawlen(l, -1);
+
 			// Free any old restrictions if they are redefined
 			type->AiBuildingRules.clear();
 			ParseBuildingRules(l, type->AiBuildingRules);

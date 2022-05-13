@@ -2982,7 +2982,7 @@ void CPlayer::RemoveUnit(CUnit &unit)
 {
 	assert_throw(unit.Player == this);
 	//Wyrmgus start
-	if (unit.PlayerSlot == -1 || this->Units[unit.PlayerSlot] != &unit) {
+	if (unit.PlayerSlot == static_cast<size_t>(-1) || this->Units[unit.PlayerSlot] != &unit) {
 		log::log_error("Error in CPlayer::RemoveUnit: the unit's PlayerSlot doesn't match its position in the player's units array; Unit's PlayerSlot: " + std::to_string(unit.PlayerSlot) + ", Unit Type: \"" + (unit.Type ? unit.Type->get_identifier() : "") + "\".");
 		return;
 	}

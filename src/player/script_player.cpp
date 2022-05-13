@@ -1348,16 +1348,13 @@ static int CclGetFactionClassUnitType(lua_State *l)
 {
 	std::string class_name = LuaToString(l, 1);
 	const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::try_get(class_name);
-	int faction_id = -1;
 	wyrmgus::faction *faction = nullptr;
 	const int nargs = lua_gettop(l);
 	if (nargs == 2) {
 		faction = wyrmgus::faction::get(LuaToString(l, 2));
-		faction_id = faction->ID;
 	} else if (nargs == 3) {
 		//the civilization was the second argument, but it isn't needed anymore
 		faction = wyrmgus::faction::get(LuaToString(l, 3));
-		faction_id = faction->ID;
 	}
 	std::string unit_type_ident;
 	if (unit_class != nullptr) {

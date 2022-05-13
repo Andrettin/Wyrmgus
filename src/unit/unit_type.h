@@ -1493,10 +1493,10 @@ private:
 	can_target_flag can_target_flags; //which units can it attack
 
 public:
-	unsigned Flip : 1;              /// Flip image when facing left
-	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
-	unsigned CanAttack : 1;         /// Unit can attack.
-	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
+	unsigned Flip : 1 = 1;              /// Flip image when facing left
+	unsigned ExplodeWhenKilled : 1 = 0; /// Death explosion animated
+	unsigned CanAttack : 1 = 0;         /// Unit can attack.
+	unsigned Neutral : 1 = 0;           /// Unit is neutral, used by the editor
 
 private:
 	uint64_t default_mass = 0; //the default mass of the unit type, if it is a celestial body

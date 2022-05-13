@@ -638,16 +638,12 @@ bool unit_type::compare_encyclopedia_entries(const unit_type *lhs, const unit_ty
 }
 
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier),
+	colorization(colorization_type::none),
 	item_class(item_class::none),
 	domain(unit_domain::land),
-	colorization(colorization_type::none),
-	FieldFlags(tile_flag::none),
-	MovementMask(tile_flag::none),
 	can_target_flags(can_target_flag::none),
-	Flip(1),
-	ExplodeWhenKilled(0),
-	CanAttack(0),
-	Neutral(0)
+	FieldFlags(tile_flag::none),
+	MovementMask(tile_flag::none)
 {
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 	//Wyrmgus start
@@ -2892,7 +2888,7 @@ std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 				|| var == SIGHTRANGE_INDEX || var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX
 				|| var == HP_INDEX || var == MANA_INDEX
 				|| var == AURA_RANGE_BONUS_INDEX || var == LEADERSHIPAURA_INDEX || var == REGENERATIONAURA_INDEX || var == HYDRATINGAURA_INDEX
-				|| var == ETHEREALVISION_INDEX || var == SPEEDBONUS_INDEX || var == RAIL_SPEED_BONUS_INDEX || var == SUPPLY_INDEX || var == TIMEEFFICIENCYBONUS_INDEX || var == RESEARCHSPEEDBONUS_INDEX || var == GARRISONEDRANGEBONUS_INDEX || CAPTURE_HP_THRESHOLD_INDEX)
+				|| var == ETHEREALVISION_INDEX || var == SPEEDBONUS_INDEX || var == RAIL_SPEED_BONUS_INDEX || var == SUPPLY_INDEX || var == TIMEEFFICIENCYBONUS_INDEX || var == RESEARCHSPEEDBONUS_INDEX || var == GARRISONEDRANGEBONUS_INDEX || var == CAPTURE_HP_THRESHOLD_INDEX)
 			) {
 				continue;
 			}

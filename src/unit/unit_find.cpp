@@ -111,7 +111,7 @@ public:
 //	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
 //		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
 	explicit TerrainFinder(const CPlayer &player, const int maxDist, const tile_flag movemask, const wyrmgus::resource *resource, Vec2i *resPos, const int z, const landmass *landmass) :
-		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z), landmass(landmass)
+		player(player), maxDist(maxDist), movemask(movemask), resource(resource), z(z), landmass(landmass), resPos(resPos)
 	{
 	}
 	//Wyrmgus end
@@ -123,10 +123,10 @@ private:
 	//Wyrmgus start
 //	int resmask;
 	const wyrmgus::resource *resource = nullptr;
-	int z;
+	int z = 0;
 	const wyrmgus::landmass *landmass = nullptr;
 	//Wyrmgus end
-	Vec2i *resPos;
+	Vec2i *resPos = nullptr;
 };
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -1167,7 +1167,7 @@ private:
 **  @note This could be improved, for better performance / better trade.
 **  @note Will be moved to unit_ai.c soon.
 */
-class BestRangeTargetFinder
+class BestRangeTargetFinder final
 {
 public:
 	/**
@@ -1182,11 +1182,11 @@ public:
 		this->bad = std::vector<int>(size * size, 0);
 	}
 	
-	class FillBadGood
+	class FillBadGood final
 	{
 	public:
 		explicit FillBadGood(const CUnit &a, const int r, std::vector<int> &g, std::vector<int> &b, const int s)
-			: attacker(&a), range(r), size(s), good(g), bad(b)
+			: attacker(&a), range(r), good(g), bad(b), size(s)
 		{
 		}
 
@@ -1352,7 +1352,7 @@ public:
 
 
 	private:
-		const CUnit *attacker;
+		const CUnit *attacker = nullptr;
 		const int range;
 		int enemy_count = 0;
 		std::vector<int> &good;
