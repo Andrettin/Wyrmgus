@@ -173,7 +173,6 @@ void InitAStar()
 		CloseSet.emplace_back();
 		CloseSet.back().reserve(threshold);
 
-		const size_t open_set_max_size = AStarMapWidth[z] * AStarMapHeight[z] / MAX_OPEN_SET_RATIO;
 		OpenSet.emplace_back();
 
 		CostMoveToCache.push_back(std::vector<int>(AStarMapWidth[z] * AStarMapHeight[z], CacheNotSet));
@@ -264,7 +263,7 @@ static void AStarReplaceNode(const Open *node_ptr, const int z)
 static const Open *AStarFindNode(const int eo, const int z)
 {
 	for (const Open &open_node : OpenSet[z]) {
-		if (open_node.offset == eo) {
+		if (static_cast<int>(open_node.offset) == eo) {
 			return &open_node;
 		}
 	}
@@ -420,10 +419,10 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 **                0 -> no induced cost, except move
 **               >0 -> costly tile
 */
-static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
+static int CostMoveTo(unsigned int index, const CUnit *unit, int z)
 {
 	//Wyrmgus start
-	if (!&unit) {
+	if (unit == nullptr) {
 		log::log_error("Error in CostMoveTo(unsigned int index, const CUnit &unit): Unit is null.");
 		return -1;
 	}
@@ -435,7 +434,7 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
 		return c;
 	}
 
-	c = CostMoveToCallBack_Default(index, unit, z);
+	c = CostMoveToCallBack_Default(index, *unit, z);
 
 	return c;
 }
@@ -450,7 +449,7 @@ public:
 
 	void operator()(int offset, int z) const
 	{
-		if (CostMoveTo(offset, unit, z) >= 0) {
+		if (CostMoveTo(offset, &unit, z) >= 0) {
 			AStarMatrix[z][offset].InGoal = 1;
 			goal_reachable = true;
 		}
@@ -705,7 +704,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 		}
 
 		unsigned int offset = GetIndex(goal.x, goal.y, z);
-		if (CostMoveTo(offset, unit, z) >= 0) {
+		if (CostMoveTo(offset, &unit, z) >= 0) {
 			AStarMatrix[z][offset].InGoal = 1;
 			return 1;
 		} else {
@@ -837,7 +836,7 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 	if (minrange <= distance && number::fast_abs(diff.x) <= 1 && number::fast_abs(diff.y) <= 1) {
 	//Wyrmgus end
 		// Move to adjacent cell
-		if (CostMoveTo(GetIndex(goal.x, goal.y, z), unit, z) == -1) {
+		if (CostMoveTo(GetIndex(goal.x, goal.y, z), &unit, z) == -1) {
 			return PF_UNREACHABLE;
 		}
 
@@ -1009,7 +1008,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, con
 			// if the point is "move to"-able and
 			// if we have not reached this point before,
 			// or if we have a better path to it, we add it to open set
-			int new_cost = CostMoveTo(eo, unit, z);
+			int new_cost = CostMoveTo(eo, &unit, z);
 			if (new_cost == -1) {
 				// uncrossable tile
 				continue;
