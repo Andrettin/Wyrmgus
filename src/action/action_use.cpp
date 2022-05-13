@@ -213,7 +213,7 @@ void COrder_Use::Execute(CUnit &unit)
 						ChangeCurrentMapLayer(unit.MapLayer->ID);
 						UI.SelectedViewport->Center(unit.get_scaled_map_pixel_pos_center());
 					}
-					PlayUnitSound(*goal->ConnectingDestination, wyrmgus::unit_sound_type::used);
+					PlayUnitSound(goal->ConnectingDestination, wyrmgus::unit_sound_type::used);
 				} else if (goal->Spell != nullptr) {
 					CommandSpellCast(unit, unit.tilePos, nullptr, *goal->Spell, FlushCommands, unit.MapLayer->ID);
 				} else if (goal->Work != nullptr) {
@@ -272,7 +272,7 @@ void COrder_Use::Execute(CUnit &unit)
 				this->Finished = true;
 				return;
 			}
-			PlayUnitSound(*goal, wyrmgus::unit_sound_type::used);
+			PlayUnitSound(goal, wyrmgus::unit_sound_type::used);
 			if (goal->Type->BoolFlag[POWERUP_INDEX].value || wyrmgus::is_consumable_item_class(goal->Type->get_item_class())) { //only destroy item if it is consumable
 				if (goal->Container == nullptr) {
 					goal->Remove(nullptr);

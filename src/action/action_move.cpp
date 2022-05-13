@@ -203,9 +203,9 @@ int DoActionMove(CUnit &unit)
 			//Wyrmgus end
 
 			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {
-				PlayUnitSound(unit, wyrmgus::unit_sound_type::docking);
+				PlayUnitSound(&unit, wyrmgus::unit_sound_type::docking);
 			} else if (mf_cur.CoastOnMap() && mf_next.WaterOnMap()) {
-				PlayUnitSound(unit, wyrmgus::unit_sound_type::docking); // undocking
+				PlayUnitSound(&unit, wyrmgus::unit_sound_type::docking); // undocking
 			}
 		}
 		Vec2i pos = unit.tilePos + posd;
@@ -216,7 +216,7 @@ int DoActionMove(CUnit &unit)
 		unit.increment_step_count();
 		//Wyrmgus end
 		//Wyrmgus start
-		PlayUnitSound(unit, wyrmgus::unit_sound_type::step);
+		PlayUnitSound(&unit, unit_sound_type::step);
 		//Wyrmgus end
 
 		// Remove unit from the current selection

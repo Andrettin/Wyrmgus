@@ -257,31 +257,31 @@ static char CalculateStereo(const CUnit &unit)
 **  @param unit   Sound initiator, unit speaking
 **  @param voice  Type of sound wanted (Ready,Die,Yes,...)
 */
-void PlayUnitSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_type)
+void PlayUnitSound(const CUnit *unit, const wyrmgus::unit_sound_type unit_sound_type)
 {
-	if (!UI.CurrentMapLayer || unit.MapLayer != UI.CurrentMapLayer) {
+	if (!UI.CurrentMapLayer || unit->MapLayer != UI.CurrentMapLayer) {
 		return;
 	}
 	
-	if (unit.has_status_effect(status_effect::stun) && is_voice_unit_sound_type(unit_sound_type)) {
+	if (unit->has_status_effect(status_effect::stun) && is_voice_unit_sound_type(unit_sound_type)) {
 		//don't speak if stunned
 		return;
 	}
 	
-	const wyrmgus::sound *sound = ChooseUnitVoiceSound(&unit, unit_sound_type);
+	const wyrmgus::sound *sound = ChooseUnitVoiceSound(unit, unit_sound_type);
 	if (!sound) {
 		return;
 	}
 
 	const bool selection = (unit_sound_type == wyrmgus::unit_sound_type::selected || unit_sound_type == wyrmgus::unit_sound_type::construction);
-	Origin source = {&unit, unsigned(UnitNumber(unit))};
+	Origin source = {unit, unsigned(UnitNumber(*unit))};
 	
 	//don't speak if already speaking
 	if (wyrmgus::is_voice_unit_sound_type(unit_sound_type) && UnitSoundIsPlaying(&source)) {
 		return;
 	}
 
-	const int volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), wyrmgus::get_unit_sound_type_range(unit_sound_type)) * sound->VolumePercent / 100;
+	const int volume = CalculateVolume(false, ViewPointDistanceToUnit(*unit), wyrmgus::get_unit_sound_type_range(unit_sound_type)) * sound->VolumePercent / 100;
 
 	if (volume == 0) {
 		return;
@@ -292,7 +292,7 @@ void PlayUnitSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_
 		return;
 	}
 	SetChannelVolume(channel, volume);
-	SetChannelStereo(channel, CalculateStereo(unit));
+	SetChannelStereo(channel, CalculateStereo(*unit));
 	SetChannelVoiceGroup(channel, unit_sound_type);
 }
 
@@ -304,10 +304,10 @@ void PlayUnitSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_
 **  @param unit   Sound initiator, unit speaking
 **  @param sound  Sound to be generated
 */
-void PlayUnitSound(const CUnit &unit, wyrmgus::sound *sound)
+void PlayUnitSound(const CUnit *unit, wyrmgus::sound *sound)
 {
 	//Wyrmgus start
-	if (!&unit) {
+	if (!unit) {
 		log::log_error("Error in PlayUnitSound: unit is null.");
 		return;
 	}
@@ -316,13 +316,13 @@ void PlayUnitSound(const CUnit &unit, wyrmgus::sound *sound)
 		return;
 	}
 
-	if (unit.MapLayer != UI.CurrentMapLayer) {
+	if (unit->MapLayer != UI.CurrentMapLayer) {
 		return;
 	}
 
-	Origin source = {&unit, unsigned(UnitNumber(unit))};
+	Origin source = {unit, unsigned(UnitNumber(*unit))};
 
-	const int volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->get_range()) * sound->VolumePercent / 100;
+	const int volume = CalculateVolume(false, ViewPointDistanceToUnit(*unit), sound->get_range()) * sound->VolumePercent / 100;
 
 	if (volume == 0) {
 		return;
@@ -333,7 +333,7 @@ void PlayUnitSound(const CUnit &unit, wyrmgus::sound *sound)
 		return;
 	}
 	SetChannelVolume(channel, volume);
-	SetChannelStereo(channel, CalculateStereo(unit));
+	SetChannelStereo(channel, CalculateStereo(*unit));
 }
 
 /**

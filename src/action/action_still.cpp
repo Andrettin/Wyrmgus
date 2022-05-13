@@ -558,7 +558,7 @@ void COrder_Still::Execute(CUnit &unit)
 				UnitShowAnimation(unit, unit.get_animation_set()->Still);
 			}
 			if (SyncRand(100000) == 0) {
-				PlayUnitSound(unit, unit_sound_type::idle);
+				PlayUnitSound(&unit, unit_sound_type::idle);
 			}
 			unit.reset_step_count();
 			break;

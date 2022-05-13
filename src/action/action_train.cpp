@@ -331,7 +331,7 @@ void COrder_Train::Execute(CUnit &unit)
 
 	newUnit->drop_out_on_side(LookingW, &unit);
 	if (&player == ThisPlayer) {
-		PlayUnitSound(*newUnit, VoiceReady);
+		PlayUnitSound(newUnit, VoiceReady);
 	}
 	if (unit.Player->AiEnabled) {
 		AiTrainingComplete(unit, *newUnit);
@@ -426,7 +426,7 @@ void COrder_Train::Execute(CUnit &unit)
 		}
 		
 		if (&player == CPlayer::GetThisPlayer()) {
-			PlayUnitSound(*newUnit, wyrmgus::unit_sound_type::ready);
+			PlayUnitSound(newUnit, unit_sound_type::ready);
 		}
 		if (newUnit->Player->AiEnabled) {
 			AiTrainingComplete(unit, *newUnit);

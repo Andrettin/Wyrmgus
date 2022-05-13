@@ -455,7 +455,7 @@ void UiFindIdleWorker()
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentButtonLevel = nullptr;
-		PlayUnitSound(*Selected[0], wyrmgus::unit_sound_type::selected);
+		PlayUnitSound(Selected[0], wyrmgus::unit_sound_type::selected);
 		SelectionChanged();
 		if (unit->MapLayer != UI.CurrentMapLayer) {
 			ChangeCurrentMapLayer(unit->MapLayer->ID);
@@ -492,7 +492,7 @@ void UiFindLevelUpUnit()
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentButtonLevel = nullptr;
-		PlayUnitSound(*Selected[0], wyrmgus::unit_sound_type::selected);
+		PlayUnitSound(Selected[0], wyrmgus::unit_sound_type::selected);
 		SelectionChanged();
 		if (unit->MapLayer != UI.CurrentMapLayer) {
 			ChangeCurrentMapLayer(unit->MapLayer->ID);
@@ -515,7 +515,7 @@ void UiFindHeroUnit(int hero_index)
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = nullptr;
-	PlayUnitSound(*Selected[0], wyrmgus::unit_sound_type::selected);
+	PlayUnitSound(Selected[0], wyrmgus::unit_sound_type::selected);
 	SelectionChanged();
 	if (unit->MapLayer != UI.CurrentMapLayer) {
 		ChangeCurrentMapLayer(unit->MapLayer->ID);

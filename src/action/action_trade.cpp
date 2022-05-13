@@ -215,7 +215,7 @@ void COrder_Trade::Execute(CUnit &unit)
 						ChangeCurrentMapLayer(unit.MapLayer->ID);
 						UI.SelectedViewport->Center(unit.get_scaled_map_pixel_pos_center());
 					}
-					PlayUnitSound(*goal->ConnectingDestination, wyrmgus::unit_sound_type::used);
+					PlayUnitSound(goal->ConnectingDestination, wyrmgus::unit_sound_type::used);
 				} else if (goal->Type->get_given_resource() != nullptr && goal->ResourcesHeld > 0) {
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->get_given_resource()->get_index()].c_str());
@@ -230,7 +230,7 @@ void COrder_Trade::Execute(CUnit &unit)
 				this->Finished = true;
 				return;
 			}
-			PlayUnitSound(*goal, wyrmgus::unit_sound_type::used);
+			PlayUnitSound(goal, unit_sound_type::used);
 			if (goal->Type->BoolFlag[POWERUP_INDEX].value || wyrmgus::is_consumable_item_class(goal->Type->get_item_class())) { //only destroy item if it is consumable
 				if (goal->Container == nullptr) {
 					goal->Remove(nullptr);

@@ -706,14 +706,14 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 		//
 		if (spell.get_sound_when_cast() != nullptr) {
 			if (spell.get_target() == wyrmgus::spell_target_type::self) {
-				PlayUnitSound(caster, spell.get_sound_when_cast());
+				PlayUnitSound(&caster, spell.get_sound_when_cast());
 			} else {
 				PlayGameSound(spell.get_sound_when_cast(), CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.get_sound_when_cast()->get_range()) * spell.get_sound_when_cast()->VolumePercent / 100);
 			}
 		} else if (caster.Type->get_sound_set() != nullptr && caster.Type->get_sound_set()->Hit.Sound != nullptr) {
 			//if the spell has no sound-when-cast designated, use the unit's hit sound instead (if any)
 			if (spell.get_target() == spell_target_type::self) {
-				PlayUnitSound(caster, caster.Type->get_sound_set()->Hit.Sound);
+				PlayUnitSound(&caster, caster.Type->get_sound_set()->Hit.Sound);
 			} else {
 				PlayGameSound(caster.Type->get_sound_set()->Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), caster.Type->get_sound_set()->Hit.Sound->get_range()) * caster.Type->get_sound_set()->Hit.Sound->VolumePercent / 100);
 			}

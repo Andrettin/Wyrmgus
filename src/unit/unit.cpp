@@ -7466,7 +7466,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		return;
 	}
 
-	PlayUnitSound(unit, unit_sound_type::dying);
+	PlayUnitSound(&unit, unit_sound_type::dying);
 
 	//
 	// Catapults,... explodes.
@@ -7676,7 +7676,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				HelpMeLastCycle = GameCycle + CYCLES_PER_SECOND * 2;
 				HelpMeLastX = target.tilePos.x;
 				HelpMeLastY = target.tilePos.y;
-				PlayUnitSound(target, wyrmgus::unit_sound_type::help);
+				PlayUnitSound(&target, wyrmgus::unit_sound_type::help);
 				target.Player->Notify(notification_type::red, target.tilePos, target.MapLayer->ID, _("%s attacked"), target.GetMessageName().c_str());
 			}
 		}

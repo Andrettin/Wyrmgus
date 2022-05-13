@@ -160,9 +160,9 @@ extern int DistanceSilent;
 /// Calculates volume level
 extern unsigned char CalculateVolume(bool isVolume, int power, unsigned char range);
 /// Play a unit sound
-extern void PlayUnitSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_type);
+extern void PlayUnitSound(const CUnit *unit, const wyrmgus::unit_sound_type unit_sound_type);
 /// Play a unit sound
-extern void PlayUnitSound(const CUnit &unit, wyrmgus::sound *sound);
+extern void PlayUnitSound(const CUnit *unit, wyrmgus::sound *sound);
 /// Play a missile sound
 extern void PlayMissileSound(const Missile &missile, wyrmgus::sound *sound);
 /// Play a game sound

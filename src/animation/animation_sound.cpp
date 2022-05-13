@@ -40,7 +40,7 @@ void CAnimation_Sound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	assert_throw(unit.Anim.Anim == this);
 	if (unit.IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
-		PlayUnitSound(unit, this->sound.Sound);
+		PlayUnitSound(&unit, this->sound.Sound);
 	}
 }
 

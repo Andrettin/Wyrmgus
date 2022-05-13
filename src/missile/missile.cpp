@@ -719,7 +719,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 				if (CMap::get()->Field(goalPos, z)->get_overlay_terrain()->UnitType && CalculateHit(unit, *CMap::get()->Field(goalPos, z)->get_overlay_terrain()->UnitType->Stats, nullptr) == true) {
 				//Wyrmgus end
 					//Wyrmgus start
-					PlayUnitSound(unit, wyrmgus::unit_sound_type::hit);
+					PlayUnitSound(&unit, wyrmgus::unit_sound_type::hit);
 					damage = CalculateDamageStats(unit, *CMap::get()->Field(goalPos, z)->get_overlay_terrain()->UnitType->Stats, nullptr);
 					//Wyrmgus end
 					CMap::get()->HitWall(goalPos,
@@ -751,7 +751,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			if (goal->IsAlive()) {
 				HitUnit_NormalHitSpecialDamageEffects(unit, *goal);
 			}
-			PlayUnitSound(unit, unit_sound_type::hit);
+			PlayUnitSound(&unit, unit_sound_type::hit);
 			
 			//apply thorns damage if attacker is at melee range
 			if (goal && goal->Variable[THORNSDAMAGE_INDEX].Value && unit.MapDistanceTo(*goal) <= 1) {
@@ -760,7 +760,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 				HitUnit(goal, unit, thorns_damage);
 			}
 		} else {
-			PlayUnitSound(unit, unit_sound_type::miss);
+			PlayUnitSound(&unit, unit_sound_type::miss);
 		}
 		//Wyrmgus end
 		return;
@@ -820,7 +820,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		}
 	}
 	
-	PlayUnitSound(unit, wyrmgus::unit_sound_type::fire_missile);
+	PlayUnitSound(&unit, wyrmgus::unit_sound_type::fire_missile);
 }
 
 /**

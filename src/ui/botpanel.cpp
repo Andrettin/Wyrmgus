@@ -2280,7 +2280,7 @@ void CButtonPanel::DoClicked_EnterMapLayer()
 	for (size_t i = 0; i < Selected.size(); ++i) {
 		CUnit *connection_destination = Selected[i]->ConnectingDestination;
 		if (connection_destination != nullptr) {
-			PlayUnitSound(*connection_destination, wyrmgus::unit_sound_type::used);
+			PlayUnitSound(connection_destination, wyrmgus::unit_sound_type::used);
 			Selected[i]->Blink = 4;
 			connection_destination->Blink = 4;
 			UnSelectUnit(*Selected[i]);
