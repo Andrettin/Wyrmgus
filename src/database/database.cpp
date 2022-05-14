@@ -616,7 +616,6 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	const QMetaObject *meta_object = object->metaObject();
 	const std::string class_name = meta_object->className();
 	const int property_index = meta_object->indexOfProperty(property_name.c_str());
-	QMetaProperty meta_property = meta_object->property(property_index);
 
 	if (gsml_operator == gsml_operator::assignment) {
 		throw std::runtime_error("The assignment operator is not available for list properties.");

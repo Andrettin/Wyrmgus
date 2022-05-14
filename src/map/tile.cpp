@@ -867,7 +867,6 @@ void tile::remove_incompatible_units()
 	}
 
 	for (CUnit *unit : units_to_remove) {
-		const QPoint tile_pos = unit->tilePos;
 		unit->Remove(nullptr);
 		LetUnitDie(*unit);
 	}
