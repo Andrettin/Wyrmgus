@@ -26,7 +26,9 @@
 
 #pragma once
 
+#pragma warning(push, 0)
 #include <QAbstractListModel> 
+#pragma warning(pop)
 
 class CMapLayer;
 class CUnit;

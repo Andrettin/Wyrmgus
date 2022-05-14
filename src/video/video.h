@@ -35,7 +35,9 @@
 #include "util/fractional_int.h"
 #include "video/color_modification.h"
 
+#pragma warning(push, 0)
 #include <QOpenGLTexture>
+#pragma warning(pop)
 
 namespace wyrmgus {
 	class font;

@@ -35,8 +35,10 @@
 #include "replay.h"
 #include "video/video.h"
 
+#pragma warning(push, 0)
 #include <QCommandLineParser>
 #include <QRegularExpression>
+#pragma warning(pop)
 
 namespace wyrmgus {
 

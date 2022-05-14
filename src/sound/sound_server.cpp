@@ -50,10 +50,12 @@
 #include "util/queue_util.h"
 #include "util/qunique_ptr.h"
 
+#pragma warning(push, 0)
 #include <QAudioDeviceInfo>
 #include <QAudioFormat>
 
 #include <SDL_mixer.h>
+#pragma warning(pop)
 
 static bool SoundInitialized;    /// is sound initialized
 

@@ -26,7 +26,9 @@
 
 #pragma once
 
+#pragma warning(push, 0)
 #include <QQuickImageProvider>
+#pragma warning(pop)
 
 namespace wyrmgus {
 

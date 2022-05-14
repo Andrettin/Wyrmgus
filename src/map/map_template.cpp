@@ -93,7 +93,9 @@
 #include "util/vector_util.h"
 #include "video/video.h"
 
+#pragma warning(push, 0)
 #include <QXmlStreamReader>
+#pragma warning(pop)
 
 namespace wyrmgus {
 

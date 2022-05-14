@@ -32,10 +32,12 @@
 #include "video/frame_buffer_object.h"
 #include "video/render_context.h"
 
+#pragma warning(push, 0)
 #include <QOpenGLFramebufferObjectFormat>
 #include <QOpenGLPaintDevice>
 #include <QPainter>
 #include <QQuickWindow>
+#pragma warning(pop)
 
 namespace wyrmgus {
 

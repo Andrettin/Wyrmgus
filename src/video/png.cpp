@@ -33,9 +33,11 @@
 #include "util/path_util.h"
 #include "video/video.h"
 
+#pragma warning(push, 0)
 #include <QPixmap>
 #include <QScreen>
 #include <QWindow>
+#pragma warning(pop)
 
 /**
 **  Load a png graphic file.

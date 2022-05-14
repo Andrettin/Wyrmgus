@@ -42,7 +42,9 @@
 #include "util/path_util.h"
 #include "util/string_conversion_util.h"
 
+#pragma warning(push, 0)
 #include <QSettings>
+#pragma warning(pop)
 
 namespace wyrmgus {
 

@@ -56,7 +56,9 @@
 #include "video/font_color.h"
 #include "video/video.h"
 
+#pragma warning(push, 0)
 #include <QUuid>
+#pragma warning(pop)
 
 std::string ClickMissile;		/// FIXME:docu
 std::string DamageMissile;		/// FIXME:docu

@@ -29,7 +29,9 @@
 #include "util/geojson_util.h"
 
 #ifdef USE_GEOJSON
+#pragma warning(push, 0)
 #include <QtLocation/private/qgeojson_p.h>
+#pragma warning(pop)
 #endif
 
 namespace wyrmgus::geojson {

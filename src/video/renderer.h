@@ -26,8 +26,10 @@
 
 #pragma once
 
+#pragma warning(push, 0)
 #include <QOpenGLTexture>
 #include <QOpenGLTextureBlitter>
+#pragma warning(pop)
 
 class QOpenGLPaintDevice;
 class QPainter;

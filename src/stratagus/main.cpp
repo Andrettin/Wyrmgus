@@ -68,10 +68,12 @@
 #include "version.h"
 #include "video/frame_buffer_object.h"
 
+#pragma warning(push, 0)
 #include <QDir>
 #include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#pragma warning(pop)
 
 int main(int argc, char **argv)
 {

@@ -31,7 +31,9 @@
 #include "util/exception_util.h"
 #include "video/frame_buffer_object.h"
 
+#pragma warning(push, 0)
 #include <QOpenGLTexture>
+#pragma warning(pop)
 
 namespace wyrmgus {
 

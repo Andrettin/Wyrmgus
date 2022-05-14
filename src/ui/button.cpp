@@ -55,7 +55,9 @@
 #include "video/video.h"
 #include "widgets.h"
 
+#pragma warning(push, 0)
 #include <QUuid>
+#pragma warning(pop)
 
 namespace wyrmgus {
 

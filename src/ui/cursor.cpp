@@ -52,7 +52,9 @@
 //Wyrmgus end
 #include "video/video.h"
 
+#pragma warning(push, 0)
 #include <QPixmap>
+#pragma warning(pop)
 
 CursorState CurrentCursorState;    /// current cursor state (point,...)
 ButtonCmd CursorAction;            /// action for selection
