@@ -206,16 +206,7 @@ void LoadMissileSprites()
 /**
 **  Constructor
 */
-Missile::Missile() :
-	Type(nullptr), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
-	Delay(0), Damage(0), LightningDamage(0),
-	TTL(-1), Hidden(0), DestroyMissile(0),
-	CurrentStep(0), TotalStep(0),
-	//Wyrmgus start
-//	Local(0)
-	Local(0),
-	AlwaysHits(false), AlwaysCritical(false)
-	//Wyrmgus end
+Missile::Missile()
 {
 	position.x = 0;
 	position.y = 0;

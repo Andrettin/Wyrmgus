@@ -500,12 +500,12 @@ public:
 	PixelPos source; /// Missile source position
 	PixelPos position;   /// missile pixel position
 	PixelPos destination;  /// missile pixel destination
-	const wyrmgus::missile_type *Type;  /// missile-type pointer
-	int SpriteFrame;  /// sprite frame counter
-	int State;        /// state
-	int AnimWait;     /// Animation wait.
-	int Wait;         /// delay between frames
-	int Delay;        /// delay to show up
+	const wyrmgus::missile_type *Type = nullptr;  /// missile-type pointer
+	int SpriteFrame = 0;  /// sprite frame counter
+	int State = 0;        /// state
+	int AnimWait = 0;     /// Animation wait.
+	int Wait = 0;         /// delay between frames
+	int Delay = 0;        /// delay to show up
 	//Wyrmgus start
 	int MapLayer;	  /// map layer the missile is in
 	//Wyrmgus end
@@ -515,23 +515,23 @@ public:
 
 	std::vector<CUnit *> PiercedUnits;	/// Units which are already pierced by this missile
 
-	int Damage;				/// direct damage that the missile applies
-	int LightningDamage;	/// direct lightning damage that the missile applies
+	int Damage = 0;				/// direct damage that the missile applies
+	int LightningDamage = 0;	/// direct lightning damage that the missile applies
 
-	int TTL;             /// time to live (ticks) used for spells
-	int Hidden;          /// If this is 1 then the missile is invisible
-	int DestroyMissile;  /// this tells missile-class-straight-fly, that it's time to die
+	int TTL = -1;             /// time to live (ticks) used for spells
+	int Hidden = 0;          /// If this is 1 then the missile is invisible
+	int DestroyMissile = 0;  /// this tells missile-class-straight-fly, that it's time to die
 
 	// Internal use:
-	int CurrentStep;  /// Current step (0 <= x < TotalStep).
-	int TotalStep;    /// Total step.
+	int CurrentStep = 0;  /// Current step (0 <= x < TotalStep).
+	int TotalStep = 0;    /// Total step.
 	
 	//Wyrmgus start
-	bool AlwaysHits;		/// Missile always hits
-	bool AlwaysCritical;	/// Whether the missile always results in a critical hit
+	bool AlwaysHits = false;		/// Missile always hits
+	bool AlwaysCritical = false;	/// Whether the missile always results in a critical hit
 	//Wyrmgus end
 
-	unsigned  Local: 1;     /// missile is a local missile
+	unsigned  Local: 1 = 0;     /// missile is a local missile
 	unsigned int Slot;      /// unique number for draw level.
 
 	static unsigned int Count; /// slot number generator.
