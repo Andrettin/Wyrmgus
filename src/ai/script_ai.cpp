@@ -1550,8 +1550,6 @@ static int CclDefineAiPlayer(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
-			const int cclforceIdx = LuaToNumber(l, j + 1, 1);
-			UNUSED(cclforceIdx);
 			const int forceIdx = ai->Force.FindFreeForce(AiForceRole::Default);
 
 			for (int k = 1; k < subargs; ++k) {
