@@ -1370,14 +1370,7 @@ void ConvertUnitTypeTo(CPlayer &player, const unit_type &src, unit_type &dst)
 	for (int i = 0; i < player.GetUnitCount(); ++i) {
 		CUnit &unit = player.GetUnit(i);
 
-		//Wyrmgus start
-		if (&unit == nullptr) {
-			fprintf(stderr, "Error in ConvertUnitTypeTo: unit %d, of player %d is null.\n", i, player.get_index());
-			continue;
-		}
-		//Wyrmgus end
-
-		//  Convert already existing units to this type.
+		//convert already existing units to this type.
 		//Wyrmgus start
 //		if (unit.Type == &src) {
 		if (unit.Type == &src && unit.get_character() == nullptr) { //don't do this for persistent characters
