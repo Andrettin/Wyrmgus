@@ -28,7 +28,6 @@
 
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
-#include "language/grammatical_gender.h"
 
 struct lua_State;
 
@@ -148,7 +147,7 @@ private:
 	language_family *family = nullptr;
 public:
 	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
-	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][static_cast<int>(grammatical_gender::count)];
+	std::map<grammatical_gender, std::string> AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers];
 	bool used_by_civilization_or_faction = false;
 	language *DialectOf = nullptr; ///of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 	std::vector<language *> Dialects;							/// Dialects of this language

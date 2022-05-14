@@ -32,9 +32,7 @@ enum class grammatical_gender {
 	none = -1,
 	masculine,
 	feminine,
-	neuter,
-
-	count
+	neuter
 };
 
 inline grammatical_gender string_to_grammatical_gender(const std::string &str)

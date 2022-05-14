@@ -97,15 +97,22 @@ std::string language::GetAdjectiveEnding(int article_type, int grammatical_case,
 		grammatical_number = GrammaticalNumberNoNumber;
 	}
 
-	if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][static_cast<int>(grammatical_gender)].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][static_cast<int>(grammatical_gender)];
-	} else if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][static_cast<int>(grammatical_gender::none)].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][static_cast<int>(grammatical_gender::none)];
-	} else if (!this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][static_cast<int>(grammatical_gender::none)].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][static_cast<int>(grammatical_gender::none)];
+	auto find_iterator = this->AdjectiveEndings[article_type][grammatical_case][grammatical_number].find(grammatical_gender);
+	if (find_iterator != this->AdjectiveEndings[article_type][grammatical_case][grammatical_number].end()) {
+		return find_iterator->second;
 	}
 
-	return "";
+	find_iterator = this->AdjectiveEndings[article_type][grammatical_case][grammatical_number].find(grammatical_gender::none);
+	if (find_iterator != this->AdjectiveEndings[article_type][grammatical_case][grammatical_number].end()) {
+		return find_iterator->second;
+	}
+
+	find_iterator = this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber].find(grammatical_gender::none);
+	if (find_iterator != this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber].end()) {
+		return find_iterator->second;
+	}
+
+	return std::string();
 }
 
 }

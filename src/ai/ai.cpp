@@ -1459,7 +1459,6 @@ void AiCanNotMove(CUnit &unit)
 {
 	const Vec2i &goal_pos = unit.pathFinderData->input.GetGoalPos();
 	const Vec2i &goal_size = unit.pathFinderData->input.GetGoalSize();
-	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 
 	AiPlayer = unit.Player->Ai.get();
 	if (PlaceReachable(unit, goal_pos, goal_size, 0, MaxMapWidth - 1, 0, unit.MapLayer->ID)) {
