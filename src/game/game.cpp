@@ -1174,9 +1174,6 @@ static void GameTypeManTeamVsMachine()
 
 static int itemsToLoad;
 static int itemsLoaded;
-static std::shared_ptr<CGraphic> loadingEmpty;
-static std::shared_ptr<CGraphic> loadingFull;
-static font *loadingFont = nullptr;
 
 void CalculateItemsToLoad()
 {
