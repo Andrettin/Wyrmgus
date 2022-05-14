@@ -89,8 +89,6 @@ static int IconHeight;                      /// Icon height in panels
 static int ButtonPanelWidth;
 static int ButtonPanelHeight;
 
-char TileToolRandom;      /// Tile tool draws random
-static char TileToolDecoration;  /// Tile tool draws with decorations
 static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
 static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
 static bool UpdateMinimap = false;        /// Update units on the minimap
@@ -1020,35 +1018,19 @@ static void DrawTileIcons(std::vector<std::function<void(renderer *)>> &render_c
 	x += (100 * scale_factor).to_int();
 	y -= (20 * 3 * scale_factor).to_int();
 	//Wyrmgus end
-	//Wyrmgus start
-	/*
-	if (TileToolRandom) {
-		label.DrawReverseCentered(x, y, "Random");
-	} else {
-		label.DrawCentered(x, y, "Random");
-	}
-	*/
+
 	if (TileCursorSize == 5) {
 		label.DrawReverseCentered(x, y, "5x5", render_commands);
 	} else {
 		label.DrawCentered(x, y, "5x5", render_commands);
 	}
-	//Wyrmgus end
 	y += (20 * scale_factor).to_int();
-	//Wyrmgus start
-	/*
-	if (TileToolDecoration) {
-		label.DrawReverseCentered(x, y, "Filler");
-	} else {
-		label.DrawCentered(x, y, "Filler");
-	}
-	*/
+
 	if (TileCursorSize == 10) {
 		label.DrawReverseCentered(x, y, "10x10", render_commands);
 	} else {
 		label.DrawCentered(x, y, "10x10", render_commands);
 	}
-	//Wyrmgus end
 	y += (20 * scale_factor).to_int();
 
 	int i = CEditor::get()->TileIndex;
@@ -1465,10 +1447,6 @@ void EditorUpdateDisplay()
 	}
 	//Wyrmgus end
 	
-	// Menu button
-	const int flag_active = ButtonAreaUnderCursor == ButtonAreaMenu
-							&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0;
-
 	// Minimap
 	if (UI.SelectedViewport) {
 		UI.get_minimap()->Draw(render_commands);
@@ -1482,6 +1460,7 @@ void EditorUpdateDisplay()
 	if (UI.ButtonPanel.G) {
 		UI.ButtonPanel.G->DrawClip(UI.ButtonPanel.X, UI.ButtonPanel.Y, render_commands);
 	}
+
 	DrawEditorPanel(render_commands);
 
 	if (CursorOn == cursor_on::map) {
@@ -1587,12 +1566,8 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 				case 301: TileCursorSize = 2; return;
 				case 302: TileCursorSize = 3; return;
 				case 303: TileCursorSize = 4; return;
-				//Wyrmgus start
-//				case 304: TileToolRandom ^= 1; return;
-//				case 305: TileToolDecoration ^= 1; return;
 				case 304: TileCursorSize = 5; return;
 				case 305: TileCursorSize = 10; return;
-				//Wyrmgus end
 			}
 		}
 		if (CEditor::get()->CursorTileIndex != -1) {

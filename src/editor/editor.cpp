@@ -77,12 +77,6 @@ void CEditor::start(const std::filesystem::path &filepath)
 	}
 
 	//Wyrmgus start
-	if (!TileToolRandom) {
-		TileToolRandom ^= 1;
-	}
-	//Wyrmgus end
-
-	//Wyrmgus start
 	CleanPlayers(); //clean players, as they could not have been cleansed after a scenario
 	//Wyrmgus end
 

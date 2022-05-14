@@ -118,8 +118,6 @@ public:
 	int PopUpY = -1;
 };
 
-extern char TileToolRandom;
-
 /// Editor main event loop
 extern void EditorMainLoop();
 /// Update editor display
