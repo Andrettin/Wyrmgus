@@ -1010,36 +1010,6 @@ void SetGamePaused(bool paused)
 --  Game types
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-/**
-**  Melee
-*/
-static void GameTypeMelee()
-{
-	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->has_neutral_faction_type()) {
-			continue;
-		}
-
-		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (CPlayer::Players[j]->has_neutral_faction_type()) {
-				continue;
-			}
-
-			if (CPlayer::Players[i]->get_type() == player_type::computer && CPlayer::Players[j]->get_type() == player_type::computer) {
-				CommandDiplomacy(i, diplomacy_state::allied, j);
-				CPlayer::Players[i]->set_shared_vision_with(CPlayer::Players[j].get(), true);
-				CommandDiplomacy(j, diplomacy_state::allied, i);
-				CPlayer::Players[j]->set_shared_vision_with(CPlayer::Players[i].get(), true);
-			} else {
-				CommandDiplomacy(i, diplomacy_state::enemy, j);
-				CommandDiplomacy(j, diplomacy_state::enemy, i);
-			}
-		}
-	}
-}
-//Wyrmgus end
-
 /**
 **  Free for all
 */
