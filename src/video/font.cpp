@@ -597,7 +597,7 @@ std::string GetLineFont(unsigned int line, const std::string &s, unsigned int ma
 		}
 		//Wyrmgus start
 //		s1 = s1.substr(res + 1);
-		if (s1.substr(res, 1).find(' ') != -1 || s1.substr(res, 1).find('\n') != -1) {
+		if (s1.substr(res, 1).find(' ') != std::string::npos || s1.substr(res, 1).find('\n') != std::string::npos) {
 			s1 = s1.substr(res + 1);
 		} else {
 			s1 = s1.substr(res);
