@@ -199,10 +199,7 @@ public:
 	unsigned int getTileNumber(int basic, bool random, bool filler) const;
 	void fillSolidTiles(std::vector<unsigned int> *solidTiles) const;
 
-	//Wyrmgus start
-//	unsigned getQuadFromTile(unsigned int tile) const;
 	unsigned getQuadFromTile(unsigned int tileIndex) const;
-	//Wyrmgus end
 	//Wyrmgus start
 	int getFromMixedLookupTable(int base_terrain, int tile) const;
 //	int getTileBySurrounding(const tile_flag type

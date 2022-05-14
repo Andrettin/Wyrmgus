@@ -211,7 +211,7 @@ void minimap::update_exploration(const int z)
 	const int texture_width = this->get_texture_width(z);
 	const int texture_height = this->get_texture_height(z);
 	const CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
-	const int this_player_index = CPlayer::GetThisPlayer()->get_index();
+	const CPlayer &this_player = *CPlayer::GetThisPlayer();
 
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
 		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
@@ -221,7 +221,7 @@ void minimap::update_exploration(const int z)
 				visibility_state = 2;
 			} else {
 				const tile *tile = map_layer->Field(this->minimap_to_map_x[z][mx] + this->minimap_to_map_y[z][my]);
-				visibility_state = tile->player_info->get_team_visibility_state(*CPlayer::GetThisPlayer());
+				visibility_state = tile->player_info->get_team_visibility_state(this_player);
 			}
 
 			this->update_exploration_pixel(mx, my, z, visibility_state);
@@ -325,7 +325,6 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 {
 	const CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
 	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
-	const int minimap_color_index = defines::get()->get_minimap_color_index();
 
 	QColor territory_color(Qt::transparent);
 	QColor territory_with_non_land_color(Qt::transparent);
@@ -419,7 +418,6 @@ void minimap::update_exploration_xy(const QPoint &pos, const int z)
 		visibility_state = 2;
 	} else {
 		const CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
-		const int this_player_index = CPlayer::GetThisPlayer()->get_index();
 		const tile *tile = map_layer->Field(pos);
 		visibility_state = tile->player_info->get_team_visibility_state(*CPlayer::GetThisPlayer());
 	}

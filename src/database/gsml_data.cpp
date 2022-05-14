@@ -93,6 +93,8 @@ void gsml_data::print(std::ostream &ostream, const size_t indentation, const boo
 				break;
 			case gsml_operator::none:
 				throw std::runtime_error("Cannot print the GSML \"none\" operator.");
+			default:
+				throw std::runtime_error("Operator unsupported for GSML data: " + std::to_string(static_cast<int>(this->get_operator())));
 		}
 		ostream << " ";
 	}

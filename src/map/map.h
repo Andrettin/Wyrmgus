@@ -228,7 +228,7 @@ public:
 	/// Reveal the complete map, make everything known.
 	//Wyrmgus start
 //	void Reveal();
-	void Reveal(bool only_person_players = false);
+	void Reveal(const bool only_person_players = false);
 	//Wyrmgus end
 
 	//

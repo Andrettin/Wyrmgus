@@ -206,7 +206,7 @@ void CMap::MarkSeenTile(wyrmgus::tile &mf)
 */
 //Wyrmgus start
 //void CMap::Reveal()
-void CMap::Reveal(bool only_person_players)
+void CMap::Reveal(const bool only_person_players)
 //Wyrmgus end
 {
 	//  Mark every explored tile as visible. 1 turns into 2.
@@ -226,8 +226,6 @@ void CMap::Reveal(bool only_person_players)
 		MarkSeenTile(mf);
 	}
 	*/
-
-	const int this_player_index = CPlayer::GetThisPlayer()->get_index();
 
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		for (int i = 0; i != this->Info->MapWidths[z] * this->Info->MapHeights[z]; ++i) {

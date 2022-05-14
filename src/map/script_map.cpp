@@ -89,8 +89,6 @@ int CclStratagusMap(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "version")) {
-			std::array<char, 64> buf{};
-
 			const std::string save_version = LuaToString(l, j + 1);
 			if (save_version != QApplication::applicationVersion().toStdString()) {
 				fprintf(stderr, "Warning: not saved with this version.\n");

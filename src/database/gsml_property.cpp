@@ -24,6 +24,8 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
+#include "stratagus.h"
+
 #include "database/gsml_property.h"
 
 #include "database/gsml_operator.h"
@@ -43,6 +45,24 @@ void gsml_property::print(std::ostream &ostream, const size_t indentation) const
 			break;
 		case gsml_operator::subtraction:
 			ostream << "-=";
+			break;
+		case gsml_operator::equality:
+			ostream << "==";
+			break;
+		case gsml_operator::inequality:
+			ostream << "!=";
+			break;
+		case gsml_operator::less_than:
+			ostream << "<";
+			break;
+		case gsml_operator::less_than_or_equality:
+			ostream << "<=";
+			break;
+		case gsml_operator::greater_than:
+			ostream << ">";
+			break;
+		case gsml_operator::greater_than_or_equality:
+			ostream << ">=";
 			break;
 		case gsml_operator::none:
 			throw std::runtime_error("Cannot print the GSML \"none\" operator.");

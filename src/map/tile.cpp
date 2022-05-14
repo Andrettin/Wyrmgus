@@ -844,7 +844,7 @@ void tile::bump_incompatible_units()
 	for (CUnit *unit : units_to_bump) {
 		const QPoint tile_pos = unit->tilePos;
 		unit->Remove(nullptr);
-		unit->drop_out_nearest(unit->tilePos, nullptr);
+		unit->drop_out_nearest(tile_pos, nullptr);
 	}
 }
 
