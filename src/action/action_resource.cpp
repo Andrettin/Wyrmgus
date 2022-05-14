@@ -661,7 +661,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		this->goalPos.y = -1;
 		//Wyrmgus start
 //		if ((goal = UnitFindResource(unit, unit, 15, this->get_current_resource(), unit.Player->AiEnabled))) {
-		if ((goal = UnitFindResource(unit, unit, 15, this->get_current_resource(), true, nullptr, true, false, false, false, true))) {
+		if ((goal = UnitFindResource(unit, unit, 15, this->get_current_resource(), true, nullptr, true, false, false, false, true)) != nullptr) {
 		//Wyrmgus end
 			this->State = SUB_START_RESOURCE;
 			this->set_goal(goal);
@@ -804,7 +804,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	}
 
 	// If we are fully loaded first search for a depot.
-	if (unit.ResourcesHeld && (depot = FindDeposit(unit, 1000, unit.get_current_resource()))) {
+	if (unit.ResourcesHeld && (depot = FindDeposit(unit, 1000, unit.get_current_resource())) != nullptr) {
 		if (unit.Container) {
 			unit.drop_out_nearest(depot->tilePos + depot->GetHalfTileSize(), &source);
 		}

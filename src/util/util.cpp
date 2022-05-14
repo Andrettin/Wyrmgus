@@ -256,9 +256,9 @@ char *optarg;
 static void getopt_err(const char *argv0, const char *str, char opt)
 {
 	if (opterr) {
-		const char *x;
+		const char *x = nullptr;
 
-		while ((x = strchr(argv0, '/'))) {
+		while ((x = strchr(argv0, '/')) != nullptr) {
 			argv0 = x + 1;
 		}
 

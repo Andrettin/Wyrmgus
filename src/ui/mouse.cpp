@@ -2296,7 +2296,7 @@ static void UIHandleButtonDown_OnMap(const Qt::KeyboardModifiers key_modifiers)
 			// FIXME: Johns: Perhaps we should use a pixel map coordinates
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, unit_domain::none, UI.CurrentMapLayer->ID))
+			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, unit_domain::none, UI.CurrentMapLayer->ID)) != nullptr
 				&& !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross

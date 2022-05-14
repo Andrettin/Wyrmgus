@@ -173,8 +173,8 @@ private:
 private:
 	std::vector<dataType> m_values;
 	std::queue<PosNode> m_queue;
-	unsigned int m_extented_width;
-	unsigned int m_height;
+	unsigned int m_extented_width = 0;
+	unsigned int m_height = 0;
 };
 
 template <typename T>

@@ -422,8 +422,6 @@ class CUnit;
 class CDecoVar
 {
 public:
-	CDecoVar() {}
-
 	virtual ~CDecoVar()
 	{
 	}
@@ -431,35 +429,35 @@ public:
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const unit_type &type, const unit_variable &var, std::vector<std::function<void(renderer *)>> &render_commands) const = 0;
 
-	unsigned int Index;     /// Index of the variable. @see DefineVariables
+	unsigned int Index = 0;	/// Index of the variable. @see DefineVariables
 
 	//Wyrmgus start
-	int MinValue;			/// Minimum value of the variable
+	int MinValue = 0;		/// Minimum value of the variable
 	//Wyrmgus end
 
-	int OffsetX;            /// Offset in X coord.
-	int OffsetY;            /// Offset in Y coord.
+	int OffsetX = 0;		/// Offset in X coord.
+	int OffsetY = 0;		/// Offset in Y coord.
 
-	int OffsetXPercent;     /// Percent offset (tile_size.width()) in X coord.
-	int OffsetYPercent;     /// Percent offset (tile_size.height()) in Y coord.
+	int OffsetXPercent = 0;	/// Percent offset (tile_size.width()) in X coord.
+	int OffsetYPercent = 0;	/// Percent offset (tile_size.height()) in Y coord.
 
-	bool IsCenteredInX;     /// if true, use center of deco instead of left border
-	bool IsCenteredInY;     /// if true, use center of deco instead of upper border
+	bool IsCenteredInX = false;	/// if true, use center of deco instead of left border
+	bool IsCenteredInY = false;	/// if true, use center of deco instead of upper border
 
-	bool ShowIfNotEnable;   /// if false, Show only if var is enable
-	bool ShowWhenNull;      /// if false, don't show if var is null (F.E poison)
-	bool HideHalf;          /// if true, don't show when 0 < var < max.
-	bool ShowWhenMax;       /// if false, don't show if var is to max. (Like mana)
-	bool ShowOnlySelected;  /// if true, show only for selected units.
+	bool ShowIfNotEnable = false;   /// if false, Show only if var is enable
+	bool ShowWhenNull = false;      /// if false, don't show if var is null (F.E poison)
+	bool HideHalf = false;          /// if true, don't show when 0 < var < max.
+	bool ShowWhenMax = false;       /// if false, don't show if var is to max. (Like mana)
+	bool ShowOnlySelected = false;  /// if true, show only for selected units.
 
-	bool HideNeutral;       /// if true, don't show for neutral unit.
-	bool HideAllied;        /// if true, don't show for allied unit. (but show own units)
+	bool HideNeutral = false;       /// if true, don't show for neutral unit.
+	bool HideAllied = false;        /// if true, don't show for allied unit. (but show own units)
 	//Wyrmgus start
-	bool HideSelf;			/// if true, don't show for own units.
+	bool HideSelf = false;			/// if true, don't show for own units.
 	//Wyrmgus end
-	bool ShowOpponent;      /// if true, show for opponent unit.
+	bool ShowOpponent = false;      /// if true, show for opponent unit.
 	
-	bool ShowIfCanCastAnySpell;   /// if true, only show if the unit can cast a spell.
+	bool ShowIfCanCastAnySpell = false;   /// if true, only show if the unit can cast a spell.
 
 	std::optional<wyrmgus::status_effect> status_effect;
 	bool show_as_status_effect = false;
@@ -664,7 +662,7 @@ public:
 	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 
 	int Distance = 0;        /// distance to build (circle)
-	DistanceTypeType DistanceType;
+	DistanceTypeType DistanceType = DistanceTypeType::Equal;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
 	wyrmgus::unit_type *RestrictType = nullptr;
@@ -692,7 +690,7 @@ public:
 	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 	
 	int Count = 0;
-	DistanceTypeType CountType;
+	DistanceTypeType CountType = DistanceTypeType::Equal;
 	std::string RestrictTypeName;
 	wyrmgus::unit_type *RestrictType = nullptr;
 	std::string RestrictTypeOwner;

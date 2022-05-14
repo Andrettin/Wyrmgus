@@ -1769,7 +1769,7 @@ message("==================================")
 # Compile Stratagus
 
 if(MSVC)
-	add_compile_options(/W4 /w44800 /wd4458)
+	add_compile_options(/W4 /w44800 /wd4244 /wd4458)
 else()
 	add_compile_options(-Wall)
 

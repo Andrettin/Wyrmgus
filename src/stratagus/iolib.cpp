@@ -245,17 +245,17 @@ int CFile::PImpl::open(const std::string &filepath_str, const long openflags)
 	if (openflags & CL_OPEN_WRITE) {
 #ifdef USE_ZLIB
 			if ((openflags & CL_WRITE_GZ)
-				&& (cl_gz = gzopen(gz_filepath_str.c_str(), openstring))) {
+				&& (cl_gz = gzopen(gz_filepath_str.c_str(), openstring)) != nullptr) {
 				cl_type = CLF_TYPE_GZIP;
 			} else
 #endif
-				if ((cl_plain = fopen(filepath_str.c_str(), openstring))) {
+				if ((cl_plain = fopen(filepath_str.c_str(), openstring)) != nullptr) {
 					cl_type = CLF_TYPE_PLAIN;
 				}
 	} else {
-		if (!(cl_plain = fopen(filepath_str.c_str(), openstring))) { // try plain first
+		if ((cl_plain = fopen(filepath_str.c_str(), openstring)) == nullptr) { // try plain first
 #ifdef USE_ZLIB
-			if ((cl_gz = gzopen(gz_filepath_str.c_str(), "rb"))) {
+			if ((cl_gz = gzopen(gz_filepath_str.c_str(), "rb")) != nullptr) {
 				cl_type = CLF_TYPE_GZIP;
 			} else
 #endif
@@ -267,10 +267,10 @@ int CFile::PImpl::open(const std::string &filepath_str, const long openflags)
 #ifdef USE_ZLIB
 				if (buf[0] == 0x1f) { // don't check for buf[1] == 0x8b, so that old compress also works!
 					fclose(cl_plain);
-					if ((cl_gz = gzopen(filepath_str.c_str(), "rb"))) {
+					if ((cl_gz = gzopen(filepath_str.c_str(), "rb")) != nullptr) {
 						cl_type = CLF_TYPE_GZIP;
 					} else {
-						if (!(cl_plain = fopen(filepath_str.c_str(), "rb"))) {
+						if ((cl_plain = fopen(filepath_str.c_str(), "rb")) == nullptr) {
 							cl_type = CLF_TYPE_INVALID;
 						}
 					}
