@@ -936,7 +936,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const font_co
 	i = 1;
 	while (!(content_width_sub = GetLineFont(i++, popup_text, 0, font)).empty()) {
 		int line_width = font->getWidth(content_width_sub);
-		int cost_symbol_pos = content_width_sub.find("COST_", 0);
+		const size_t cost_symbol_pos = content_width_sub.find("COST_", 0);
 		if (cost_symbol_pos != std::string::npos) {
 			const int res = std::stoi(content_width_sub.substr(cost_symbol_pos + 5, content_width_sub.find(" ", cost_symbol_pos) - (cost_symbol_pos + 5) + 1));
 			line_width -= font->getWidth("COST_" + std::to_string(res));
@@ -1032,7 +1032,8 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const font_co
 								y_off, popupWidth - (2 * scale_factor).to_int(), 1, render_commands);
 			sub = sub.substr(sub.find("LINE", 0) + 4, sub.length());
 		}
-		int cost_symbol_pos = sub.find("COST_", 0);
+
+		const size_t cost_symbol_pos = sub.find("COST_", 0);
 		if (cost_symbol_pos != std::string::npos) {
 			int x_offset = 0;
 			const int res = std::stoi(sub.substr(cost_symbol_pos + 5, sub.find(" ", cost_symbol_pos) - (cost_symbol_pos + 5) + 1));
@@ -1438,6 +1439,8 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 		case ButtonCmd::ShowPopulation:
 			res = defines::get()->is_population_enabled();
 			break;
+		default:
+			break;
 	}
 
 #if 0
@@ -1542,6 +1545,8 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 		case ButtonCmd::BuyResource:
 			res = true;
 			break;
+		default:
+			break;
 	}
 
 	return res;
@@ -1566,6 +1571,8 @@ int GetButtonCooldown(const CUnit &unit, const wyrmgus::button &buttonaction)
 				cooldown = CPlayer::GetThisPlayer()->HeroCooldownTimer;
 			}
 			break;
+		default:
+			break;
 	}
 
 	return cooldown;
@@ -1589,6 +1596,8 @@ int GetButtonCooldownPercent(const CUnit &unit, const wyrmgus::button &buttonact
 			if (buttonaction.Value != -1 && wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value).get_character() != nullptr) {
 				cooldown = CPlayer::GetThisPlayer()->HeroCooldownTimer * 100 / HeroCooldownCycles;
 			}
+			break;
+		default:
 			break;
 	}
 
@@ -2371,9 +2380,15 @@ void CButtonPanel::DoClicked(int button, const Qt::KeyboardModifiers key_modifie
 	
 	//  Handle action on button.
 	switch (CurrentButtons[button]->Action) {
-		case ButtonCmd::Unload: { DoClicked_Unload(button, key_modifiers); break; }
-		case ButtonCmd::SpellCast: { DoClicked_SpellCast(button, key_modifiers); break; }
-		case ButtonCmd::Repair: { DoClicked_Repair(button, key_modifiers); break; }
+		case ButtonCmd::Unload:
+			DoClicked_Unload(button, key_modifiers);
+			break;
+		case ButtonCmd::SpellCast:
+			DoClicked_SpellCast(button, key_modifiers);
+			break;
+		case ButtonCmd::Repair:
+			DoClicked_Repair(button, key_modifiers);
+			break;
 		case ButtonCmd::Move:    // Follow Next
 		case ButtonCmd::Patrol:  // Follow Next
 		case ButtonCmd::Harvest: // Follow Next
@@ -2383,15 +2398,31 @@ void CButtonPanel::DoClicked(int button, const Qt::KeyboardModifiers key_modifie
 		case ButtonCmd::Unit:
 		case ButtonCmd::EditorUnit:
 		//Wyrmgus end
-		case ButtonCmd::AttackGround: { DoClicked_SelectTarget(button); break; }
-		case ButtonCmd::Return: { DoClicked_Return(key_modifiers); break; }
-		case ButtonCmd::Stop: { DoClicked_Stop(); break; }
-		case ButtonCmd::StandGround: { DoClicked_StandGround(key_modifiers); break; }
-		case ButtonCmd::Button: { DoClicked_Button(button); break; }
+		case ButtonCmd::AttackGround:
+			DoClicked_SelectTarget(button);
+			break;
+		case ButtonCmd::Return:
+			DoClicked_Return(key_modifiers);
+			break;
+		case ButtonCmd::Stop:
+			DoClicked_Stop();
+			break;
+		case ButtonCmd::StandGround:
+			DoClicked_StandGround(key_modifiers);
+			break;
+		case ButtonCmd::Button:
+			DoClicked_Button(button);
+			break;
 		case ButtonCmd::Cancel: // Follow Next
-		case ButtonCmd::CancelUpgrade: { DoClicked_CancelUpgrade(); break; }
-		case ButtonCmd::CancelTrain: { DoClicked_CancelTrain(); break; }
-		case ButtonCmd::CancelBuild: { DoClicked_CancelBuild(); break; }
+		case ButtonCmd::CancelUpgrade:
+			DoClicked_CancelUpgrade();
+			break;
+		case ButtonCmd::CancelTrain:
+			DoClicked_CancelTrain();
+			break;
+		case ButtonCmd::CancelBuild:
+			DoClicked_CancelBuild();
+			break;
 		case ButtonCmd::Build:
 		case ButtonCmd::BuildClass:
 			DoClicked_Build(CurrentButtons[button]);
@@ -2409,21 +2440,45 @@ void CButtonPanel::DoClicked(int button, const Qt::KeyboardModifiers key_modifie
 		case ButtonCmd::Dynasty:
 			DoClicked_Research(CurrentButtons[button], key_modifiers);
 			break;
-		case ButtonCmd::CallbackAction: { DoClicked_CallbackAction(button); break; }
+		case ButtonCmd::CallbackAction:
+			DoClicked_CallbackAction(button);
+			break;
 		//Wyrmgus start
-		case ButtonCmd::LearnAbility: { DoClicked_LearnAbility(button); break; }
-		case ButtonCmd::ExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button, key_modifiers); break; }
-		case ButtonCmd::Faction: { DoClicked_Faction(button); break; }
-		case ButtonCmd::Quest: { DoClicked_Quest(button); break; }
-		case ButtonCmd::Buy: { DoClicked_Buy(button); break; }
-		case ButtonCmd::ProduceResource: { DoClicked_ProduceResource(button); break; }
-		case ButtonCmd::SellResource: { DoClicked_SellResource(button, key_modifiers); break; }
-		case ButtonCmd::BuyResource: { DoClicked_BuyResource(button); break; }
-		case ButtonCmd::Salvage: { DoClicked_Salvage(); break; }
-		case ButtonCmd::EnterMapLayer: { DoClicked_EnterMapLayer(); break; }
+		case ButtonCmd::LearnAbility:
+			DoClicked_LearnAbility(button);
+			break;
+		case ButtonCmd::ExperienceUpgradeTo:
+			DoClicked_ExperienceUpgradeTo(button, key_modifiers);
+			break;
+		case ButtonCmd::Faction:
+			DoClicked_Faction(button);
+			break;
+		case ButtonCmd::Quest:
+			DoClicked_Quest(button);
+			break;
+		case ButtonCmd::Buy:
+			DoClicked_Buy(button);
+			break;
+		case ButtonCmd::ProduceResource:
+			DoClicked_ProduceResource(button);
+			break;
+		case ButtonCmd::SellResource:
+			DoClicked_SellResource(button, key_modifiers);
+			break;
+		case ButtonCmd::BuyResource:
+			DoClicked_BuyResource(button);
+			break;
+		case ButtonCmd::Salvage:
+			DoClicked_Salvage();
+			break;
+		case ButtonCmd::EnterMapLayer:
+			DoClicked_EnterMapLayer();
+			break;
 		//Wyrmgus end
 		case ButtonCmd::ShowPopulation:
 			DoClicked_ShowPopulation();
+			break;
+		default:
 			break;
 	}
 }

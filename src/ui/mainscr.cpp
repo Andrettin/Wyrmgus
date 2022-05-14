@@ -199,33 +199,6 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 }
 
 /**
-**  Draw mana bar of a unit at x,y.
-**  Placed under icons on top-panel.
-**
-**  @param unit  Pointer to unit.
-**  @param x     Screen X position of icon
-**  @param y     Screen Y position of icon
-*/
-static void UiDrawManaBar(const CUnit &unit, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	// FIXME: add icon borders
-	y += unit.Type->get_icon()->get_graphics()->Height;
-	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->get_icon()->get_graphics()->Width, 4, render_commands);
-
-	//Wyrmgus start
-//	if (unit.Stats->Variables[MANA_INDEX].Max) {
-	if (unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max)) {
-	//Wyrmgus end
-		//Wyrmgus start
-//		int f = (100 * unit.Variable[MANA_INDEX].Value) / unit.Variable[MANA_INDEX].Max;
-		int f = (100 * unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Value)) / unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max);
-		//Wyrmgus end
-		f = (f * (unit.Type->get_icon()->get_graphics()->Width)) / 100;
-		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2, render_commands);
-	}
-}
-
-/**
 **  Tell if we can show the content.
 **  verify each sub condition for that.
 **
@@ -624,14 +597,6 @@ static void DrawUnitInfo_transporter(CUnit &unit, std::vector<std::function<void
 		uins->get_icon()->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->get_player_color(), render_commands);
 		//Wyrmgus start
 //		UiDrawLifeBar(*uins, pos.x, pos.y);
-//		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-		if (uins->Type->Spells.size() > 0 && uins->Variable[MANA_INDEX].Enable && uins->GetModifiedVariable(MANA_INDEX, VariableAttribute::Max)) {
-		//Wyrmgus end
-			//Wyrmgus start
-//			UiDrawManaBar(*uins, pos.x, pos.y);
-			// don't draw the mana bar when within transporters, as there's not enough space for it
-			//Wyrmgus end
-		}
 		++j;
 	}
 }

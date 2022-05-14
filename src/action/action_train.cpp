@@ -169,50 +169,6 @@ void COrder_Train::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newTyp
 	this->Type = &newType;
 }
 
-/**
-**  Unit can handle order.
-**
-**  @param unit   Newly trained unit.
-**  @param order  New order for the unit.
-**
-**  @return  true if the the unit can do it, false otherwise.
-*/
-static bool CanHandleOrder(const CUnit &unit, COrder *order)
-{
-	if (order == nullptr) {
-		return false;
-	}
-
-	if (order->Action == UnitAction::Resource) {
-		//  Check if new unit can harvest.
-		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
-			return false;
-		}
-		//  Also check if new unit can harvest this specific resource.
-		CUnit *goal = order->get_goal();
-		//Wyrmgus start
-//		if (goal && unit.Type->get_resource_info(goal->Type->get_give_n_resource()) == nullptr) {
-		if (goal && unit.Type->get_resource_info(goal->get_given_resource()) == nullptr) {
-		//Wyrmgus end
-			return false;
-		}
-		return true;
-	}
-
-	//Wyrmgus start
-//	if (order->Action == UnitAction::Attack && !unit.Type->CanAttack) {
-	if (order->Action == UnitAction::Attack && !unit.CanAttack(true)) {
-	//Wyrmgus end
-		return false;
-	}
-
-	if (order->Action == UnitAction::Board && unit.Type->get_domain() != unit_domain::land) {
-		return false;
-	}
-
-	return true;
-}
-
 static void AnimateActionTrain(CUnit &unit)
 {
 	if (unit.get_animation_set()->Train) {

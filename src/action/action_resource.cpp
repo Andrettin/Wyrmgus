@@ -82,7 +82,10 @@ class NearReachableTerrainFinder final
 {
 public:
 	explicit NearReachableTerrainFinder(const CPlayer &player, const int maxDist, const tile_flag movemask, const int resource, Vec2i *resPos, const int z) :
-		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z) {}
+		player(player), maxDist(maxDist), movemask(movemask), resource(resource), z(z), resPos(resPos)
+	{
+	}
+
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CPlayer &player;
@@ -93,7 +96,7 @@ private:
 	int resource;
 	int z;
 	//Wyrmgus end
-	Vec2i *resPos;
+	Vec2i *resPos = nullptr;
 };
 
 VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -1405,9 +1408,8 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			return false;
 		}
 	} else {
-		static constexpr unsigned int too_many_workers = 15;
+		static constexpr int too_many_workers = 15;
 		CUnit *mine = this->Resource.get_mine();
-		static constexpr int range = 15;
 		CUnit *newdepot = nullptr;
 		CUnit *goal = nullptr;
 		const bool longWay = unit.pathFinderData->output.Cycles > 500;
@@ -1443,7 +1445,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 				}
 
 				//Wyrmgus start
-	//			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
+	//			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), 1000,
 	//									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
 				goal = UnitFindResource(unit, start_unit ? *start_unit : unit, 1000, this->get_current_resource(), true, newdepot ? newdepot : depot, true, false, false, false, true);
 				//Wyrmgus end

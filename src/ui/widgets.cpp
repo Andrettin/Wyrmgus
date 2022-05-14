@@ -2225,21 +2225,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics, std::vector<std::functio
 		throw std::runtime_error("Not all graphics for ImageDropDownWidget were set.");
 	}
 
-	int alpha = getBaseColor().a;
-	gcn::Color faceColor = getBaseColor();
-	faceColor.a = alpha;
-	gcn::Color highlightColor = faceColor + 0x303030;
-	highlightColor.a = alpha;
-	gcn::Color shadowColor = faceColor - 0x303030;
-	shadowColor.a = alpha;
-
-
-	//Wyrmgus start
-//	img->Resize(getWidth(), h);
-//	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), h);
-//	img->SetOriginalSize();
 	graphics->drawImage(img.get(), 0, 0, 0, 0, img->getWidth(), img->getHeight(), render_commands);
-	//Wyrmgus end
 	
 	graphics->setFont(getFont());
 
@@ -2249,15 +2235,6 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics, std::vector<std::functio
 			2, (h - getFont()->getHeight()) / 2, render_commands);
 	}
 
-	//Wyrmgus start
-	/*
-	if (hasFocus())
-	{
-		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth() - h, h));
-	}
-	*/
-	//Wyrmgus end
-
 	drawButton(graphics, render_commands);
 
 	if (mDroppedDown)
@@ -2265,17 +2242,6 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics, std::vector<std::functio
 		graphics->pushClipArea(mScrollArea->getDimension());
 		mScrollArea->draw(graphics, render_commands);
 		graphics->popClipArea();
-
-		// Draw two lines separating the ListBox with se selected
-		// element view.
-		//Wyrmgus start
-		/*
-		graphics->setColor(highlightColor);
-		graphics->drawLine(0, h, getWidth(), h);
-		graphics->setColor(shadowColor);
-		graphics->drawLine(0, h + 1,getWidth(),h + 1);
-		*/
-		//Wyrmgus end
 	}
 }
 

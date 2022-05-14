@@ -788,6 +788,10 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 			return "cancel-build";
 		case ButtonCmd::ShowPopulation:
 			return "show_population";
+		case ButtonCmd::Player:
+			return "player";
+		case ButtonCmd::CallbackAction:
+			return "callback_action";
 	}
 
 	throw std::runtime_error("Invalid button action enum value: " + std::to_string(static_cast<int>(button_action)));

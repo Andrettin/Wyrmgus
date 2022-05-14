@@ -131,7 +131,6 @@ void COrder_Die::Execute(CUnit &unit)
 	unit.Type = corpse_type;
 	unit.Stats = &corpse_type->Stats[unit.Player->get_index()];
 	//Wyrmgus start
-	const unsigned int var_size = UnitTypeVar.GetNumberVariable();
 	unit.Variable = corpse_type->Stats[unit.Player->get_index()].Variables;
 	//Wyrmgus end
 	UpdateUnitSightRange(unit);

@@ -64,7 +64,7 @@
 #include "video/video.h"
 
 PopupConditionPanel::PopupConditionPanel() 
-	: ButtonAction(ButtonCmd::None), item_class(item_class::none), unit_domain(unit_domain::none)
+	: ButtonAction(ButtonCmd::None), unit_domain(unit_domain::none), item_class(item_class::none)
 {
 }
 
