@@ -1771,7 +1771,7 @@ message("==================================")
 if(MSVC)
 	add_compile_options(/W4 /w44800 /wd4244 /wd4458)
 else()
-	add_compile_options(-Wall)
+	add_compile_options(-Wall -Wno-unknown-pragmas)
 
 	if(WITH_WARNINGS_AS_ERRORS)
 		add_compile_options(-Werror)
