@@ -1451,6 +1451,7 @@ option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 option(ENABLE_STRIP "Strip all symbols from executables" OFF)
 option(ENABLE_USEGAMEDIR "Place all files created by Stratagus (logs, savegames) in the game directory, otherwise place everything in the user directory" ON)
 option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simultaneously in MSVC" ON)
+option(WITH_WARNINGS_AS_ERRORS "Compile Stratagus with warnings as errors" OFF)
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18.0")
 	#unity builds using defined groups require CMake 3.18
@@ -1770,7 +1771,11 @@ message("==================================")
 if(MSVC)
 	add_compile_options(/W4 /w44800 /wd4458)
 else()
-	add_compile_options(-Wall -Werror)
+	add_compile_options(-Wall)
+
+	if(WITH_WARNINGS_AS_ERRORS)
+		add_compile_options(-Werror)
+	endif()
 endif()
 
 add_custom_command(OUTPUT tolua.cpp

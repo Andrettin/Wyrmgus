@@ -12,6 +12,7 @@ env:
     -DOpenGL_GL_PREFERENCE=GLVND
     -DWITH_GEOJSON=OFF
     -DWITH_X11=ON
+    -DWITH_WARNINGS_AS_ERRORS=ON
   WYRMSUN_URL: https://github.com/Andrettin/Wyrmsun
   WYRMSUN_BRANCH: master
   DISPLAY: :0
