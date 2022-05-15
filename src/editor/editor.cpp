@@ -53,7 +53,7 @@
 #include "util/path_util.h"
 #include "video/video.h"
 
-CEditor::CEditor() : SelectedPlayer(PlayerNumNeutral)
+CEditor::CEditor() : SelectedPlayer(PlayerNumNeutral), State(EditorStateType::EditorSelecting)
 {
 }
 
