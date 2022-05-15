@@ -56,6 +56,9 @@ public:
 		return future;
 	}
 
+	void co_spawn(const std::function<boost::asio::awaitable<void>()> &function);
+	void co_spawn_sync(const std::function<boost::asio::awaitable<void>()> &function);
+
 private:
 	std::unique_ptr<boost::asio::thread_pool> pool;
 };
