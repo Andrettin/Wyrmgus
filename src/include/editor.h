@@ -54,7 +54,8 @@ class CEditor final : public QObject, public singleton<CEditor>
 public:
 	CEditor();
 
-	void start(const std::filesystem::path &filepath);
+	[[nodiscard]]
+	boost::asio::awaitable<void> start(const std::filesystem::path &filepath);
 
 	Q_INVOKABLE void start_async(const QString &filepath);
 
@@ -119,7 +120,9 @@ public:
 };
 
 /// Editor main event loop
-extern void EditorMainLoop();
+[[nodiscard]]
+extern boost::asio::awaitable<void> EditorMainLoop();
+
 /// Update editor display
 extern void EditorUpdateDisplay();
 

@@ -288,7 +288,8 @@ static void InitGameCallbacks()
 	GameCallbacks.NetworkEvent = NetworkEvent;
 }
 
-static void GameLogicLoop()
+[[nodiscard]]
+static boost::asio::awaitable<void> GameLogicLoop()
 {
 	// Can't find a better place.
 	// FIXME: We need to find a better place!
@@ -402,7 +403,7 @@ static void GameLogicLoop()
 	CheckMusicFinished(); // Check for next song
 
 	if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
-		WaitEventsOneFrame();
+		co_await WaitEventsOneFrame();
 	}
 
 	if (!NetworkInSync) {
@@ -437,13 +438,12 @@ static void DisplayLoop()
 	}
 }
 
-static void SingleGameLoop()
+[[nodiscard]]
+static boost::asio::awaitable<void> SingleGameLoop()
 {
 	while (GameRunning) {
-		engine_interface::get()->run_event_loop();
-
 		DisplayLoop();
-		GameLogicLoop();
+		co_await GameLogicLoop();
 	}
 
 	if (!load_game_file.empty()) {
@@ -462,7 +462,7 @@ static void SingleGameLoop()
 **  Display update.
 **  Input/Network/Sound.
 */
-void GameMainLoop()
+boost::asio::awaitable<void> GameMainLoop()
 {
 	const EventCallback *old_callbacks;
 
@@ -530,7 +530,7 @@ void GameMainLoop()
 		}
 	}
 
-	SingleGameLoop();
+	co_await SingleGameLoop();
 
 	NetworkQuitGame();
 	EndReplayLog();

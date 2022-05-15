@@ -624,7 +624,8 @@ extern void SetCallbacks(const EventCallback *callbacks);
 extern const EventCallback *GetCallbacks();
 
 /// Process all system events. Returns if the time for a frame is over
-extern void WaitEventsOneFrame();
+[[nodiscard]]
+extern boost::asio::awaitable<void> WaitEventsOneFrame();
 
 /// Poll all sdl events
 extern void PollEvents();

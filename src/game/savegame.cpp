@@ -83,30 +83,30 @@ int SaveGame(const std::string &file_url_str)
 	return 0;
 }
 
-void StartSavedGame(const std::filesystem::path &filepath)
+boost::asio::awaitable<void> StartSavedGame(const std::filesystem::path &filepath)
 {
 	SaveGameLoading = true;
 	CleanPlayers();
 	LoadGame(filepath);
 
-	StartMap(filepath, false);
+	co_await StartMap(filepath, false);
 }
 
-void load_game(const std::filesystem::path &filepath)
+boost::asio::awaitable<void> load_game(const std::filesystem::path &filepath)
 {
 	engine_interface::get()->set_loading_message("Loading Saved Game...");
 
 	if (game::get()->is_running()) {
 		set_load_game_file(filepath);
 		StopGame(GameNoResult);
-		return;
+		co_return;
 	}
 
 	CclCommand("ClearPlayerDataObjectives();");
 
 	while (true) {
 		CclCommand("InitGameVariables(); LoadedGame = true;");
-		StartSavedGame(filepath);
+		co_await StartSavedGame(filepath);
 
 		if (GameResult != GameRestart) {
 			break;

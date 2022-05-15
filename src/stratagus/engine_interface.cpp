@@ -64,6 +64,7 @@
 #include "ui/interface.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
+#include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/image_util.h"
 #include "util/path_util.h"
@@ -111,33 +112,6 @@ network_manager *engine_interface::get_network_manager() const
 	return network_manager::get();
 }
 
-void engine_interface::run_event_loop()
-{
-	//run the commands posted from the Qt thread
-
-	while (true) {
-		std::function<void()> command;
-
-		{
-			std::lock_guard lock(this->command_mutex);
-
-			if (this->posted_commands.empty()) {
-				break;
-			}
-
-			command = queue::take(this->posted_commands);
-		}
-
-		command();
-	}
-}
-
-void engine_interface::post(const std::function<void()> &function)
-{
-	std::lock_guard lock(this->command_mutex);
-	this->posted_commands.push(function);
-}
-
 double engine_interface::get_scale_factor() const
 {
 	return preferences::get()->get_scale_factor().to_double();
@@ -159,7 +133,7 @@ QString engine_interface::get_user_maps_path() const
 
 void engine_interface::call_lua_command(const QString &command)
 {
-	this->post([command]() {
+	event_loop::get()->post([command]() {
 		CclCommand(command.toStdString());
 	});
 }
@@ -169,7 +143,7 @@ void engine_interface::play_sound(const QString &sound_identifier)
 	try {
 		const sound *sound = sound::get(sound_identifier.toStdString());
 
-		this->post([sound]() {
+		event_loop::get()->post([sound]() {
 			PlayGameSound(sound, MaxSampleVolume);
 		});
 	} catch (const std::exception &exception) {
@@ -182,7 +156,7 @@ void engine_interface::play_music(const QString &type_str)
 	try {
 		const music_type type = string_to_music_type(type_str.toStdString());
 
-		this->post([type]() {
+		event_loop::get()->post([type]() {
 			music_player::get()->play_music_type(type);
 		});
 	} catch (const std::exception &exception) {
@@ -192,7 +166,7 @@ void engine_interface::play_music(const QString &type_str)
 
 void engine_interface::exit()
 {
-	this->post([]() {
+	event_loop::get()->post([]() {
 		if (CEditor::get()->is_running()) {
 			CEditor::get()->set_running(false);
 			GameResult = GameExit;
@@ -290,7 +264,7 @@ void engine_interface::load_map_infos()
 {
 	this->clear_map_infos();
 
-	this->sync([this]() { //must be synchronized as it uses Lua and alters the map singleton
+	event_loop::get()->sync([this]() { //must be synchronized as it uses Lua and alters the map singleton
 		try {
 			const std::vector<std::filesystem::path> map_paths = database::get()->get_maps_paths();
 
@@ -685,7 +659,7 @@ void engine_interface::update_current_season()
 
 void engine_interface::set_modal_dialog_open_async(const bool value)
 {
-	this->post([this, value]() {
+	event_loop::get()->post([this, value]() {
 		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 		this->modal_dialog_open = value;
 	});
@@ -698,14 +672,14 @@ void engine_interface::load_game(const QUrl &file_url)
 
 void engine_interface::load_game_deferred(const std::filesystem::path &filepath)
 {
-	this->post([filepath]() {
-		::load_game(filepath);
+	event_loop::get()->co_spawn([filepath]() -> boost::asio::awaitable<void> {
+		co_await ::load_game(filepath);
 	});
 }
 
 void engine_interface::check_achievements()
 {
-	this->post([]() {
+	event_loop::get()->post([]() {
 		achievement::check_achievements();
 	});
 }

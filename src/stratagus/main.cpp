@@ -62,6 +62,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/assert_util.h"
+#include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
@@ -106,9 +107,9 @@ int main(int argc, char **argv)
 
 		parameters::get()->process();
 
-		std::thread stratagus_thread([argc, argv]() {
+		event_loop::get()->co_spawn([argc, argv]() -> boost::asio::awaitable<void> {
 			try {
-				stratagusMain(argc, argv);
+				co_await stratagusMain(argc, argv);
 			} catch (const std::exception &exception) {
 				exception::report(exception);
 				QMetaObject::invokeMethod(QApplication::instance(), [] { QApplication::exit(EXIT_FAILURE); }, Qt::QueuedConnection);
@@ -178,7 +179,7 @@ int main(int argc, char **argv)
 
 		const int result = app.exec();
 
-		stratagus_thread.join();
+		event_loop::get()->stop();
 
 		return result;
 	} catch (const std::exception &exception) {

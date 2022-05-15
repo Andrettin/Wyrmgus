@@ -76,35 +76,6 @@ public:
 	engine_interface();
 	~engine_interface();
 
-	void post(const std::function<void()> &function);
-
-	std::future<void> async(const std::function<void()> &function)
-	{
-		std::shared_ptr<std::promise<void>> promise = std::make_unique<std::promise<void>>();
-		std::future<void> future = promise->get_future();
-
-		this->post([promise, function]() {
-			function();
-			promise->set_value();
-		});
-
-		return future;
-	}
-
-	void sync(const std::function<void()> &function)
-	{
-		if (this->is_waiting_for_interface()) {
-			function();
-			return;
-		}
-
-		//post an action, and then wait for it to be completed
-		std::future<void> future = this->async(function);
-		future.wait();
-	}
-
-	void run_event_loop();
-
 	parameters *get_parameters() const;
 	defines *get_defines() const;
 	preferences *get_preferences() const;
@@ -343,8 +314,6 @@ signals:
 	void lua_dialog_open_changed();
 
 private:
-	std::queue<std::function<void()>> posted_commands;
-	std::mutex command_mutex;
 	bool running = false;
 	std::promise<void> map_view_created_promise;
 	std::atomic<bool> waiting_for_interface = false;

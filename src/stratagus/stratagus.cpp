@@ -171,6 +171,7 @@ extern void beos_init(int argc, char **argv);
 #include "database/preferences.h"
 #include "direction.h"
 #include "editor.h"
+#include "engine_interface.h"
 #include "game/game.h"
 #include "guichan.h"
 #include "iocompat.h"
@@ -201,6 +202,7 @@ extern void beos_init(int argc, char **argv);
 #include "video/font_color.h"
 #include "video/video.h"
 #include "widgets.h"
+#include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/point_util.h"
@@ -444,7 +446,7 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-void stratagusMain(int argc, char **argv)
+boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 {
 	Q_UNUSED(argc)
 	Q_UNUSED(argv)
@@ -508,15 +510,34 @@ void stratagusMain(int argc, char **argv)
 	unit_manager::get()->init();	// Units memory management
 	PreMenuSetup();		// Load everything needed for menus
 
+	MenuLoop();
+
+	CurrentCursorState = CursorState::Point;
+	CursorOn = cursor_on::unknown;
+
+	//this needs to be called so that FrameTicks is set, and we don't wait forever on WaitEventsOneFrame
+	SetVideoSync();
+
+	SetCallbacks(&GuichanCallbacks);
+
 	try {
-		MenuLoop();
+		while (GameResult != GameExit) {
+			if (GameRunning) {
+				co_await event_loop::get()->await_ms(1000);
+			} else {
+				UpdateDisplay();
+				CheckMusicFinished();
+
+				co_await WaitEventsOneFrame();
+			}
+		}
 	} catch (const std::exception &exception) {
 		exception::report(exception);
 		Exit(EXIT_FAILURE);
-		return;
+		co_return;
 	}
 
-	Exit(0);
+	Exit(EXIT_SUCCESS);
 }
 
 //Wyrmgus start

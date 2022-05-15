@@ -114,7 +114,7 @@ void TitleScreen::ShowLabels(std::vector<std::function<void(renderer *)>> &rende
 	}
 }
 
-void TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &render_commands) const
+boost::asio::awaitable<void> TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const EventCallback *old_callbacks = GetCallbacks();
 	EventCallback callbacks;
@@ -145,7 +145,7 @@ void TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &r
 		g->DrawClip((Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2, render_commands);
 		this->ShowLabels(render_commands);
 
-		WaitEventsOneFrame();
+		co_await WaitEventsOneFrame();
 	}
 
 	SetCallbacks(old_callbacks);
@@ -154,10 +154,10 @@ void TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &r
 /**
 **  Show the title screens
 */
-void ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands)
+boost::asio::awaitable<void> ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (TitleScreens.empty()) {
-		return;
+		co_return;
 	}
 
 	SetVideoSync();
@@ -168,19 +168,9 @@ void ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_comma
 		}
 
 		if (!title_screen.File.empty()) {
-			title_screen.ShowTitleImage(render_commands);
+			co_await title_screen.ShowTitleImage(render_commands);
 		}
 
 		Video.ClearScreen();
 	}
-}
-
-void ShowFullImage(const std::string &filename, unsigned int timeOutInSecond, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	TitleScreen titleScreen;
-
-	titleScreen.File = filename;
-	titleScreen.Timeout = timeOutInSecond;
-
-	titleScreen.ShowTitleImage(render_commands);
 }

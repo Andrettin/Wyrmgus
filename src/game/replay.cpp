@@ -1026,14 +1026,14 @@ int SaveReplay(const std::string &filename)
 	return 0;
 }
 
-void StartReplay(const std::filesystem::path &filepath, const bool reveal)
+boost::asio::awaitable<void> StartReplay(const std::filesystem::path &filepath, const bool reveal)
 {
 	CleanPlayers();
 	LoadReplay(filepath);
 
 	ReplayRevealMap = reveal;
 
-	StartMap(CurrentMapPath, false);
+	co_await StartMap(CurrentMapPath, false);
 }
 
 /**

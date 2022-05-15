@@ -122,6 +122,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util/assert_util.h"
 #include "util/container_util.h"
+#include "util/event_loop.h"
 #include "util/log_util.h"
 #include "util/set_util.h"
 #include "util/string_util.h"
@@ -1389,10 +1390,6 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 		//if the civilization of the person player changed, update the UI
 		if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer() == this) || (!CPlayer::GetThisPlayer() && this->get_index() == 0)) {
 			//load proper UI
-			std::array<char, 256> buf{};
-			snprintf(buf.data(), sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", this->get_civilization()->get_identifier().c_str());
-			CclCommand(buf.data());
-
 			UI.Load();
 		}
 
@@ -1619,7 +1616,7 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 
 void CPlayer::set_faction_async(wyrmgus::faction *faction)
 {
-	engine_interface::get()->post([this, faction]() {
+	event_loop::get()->post([this, faction]() {
 		SendCommandSetFaction(this, faction);
 	});
 }
@@ -5119,7 +5116,7 @@ void CPlayer::set_neutral_diplomatic_stance_with_async(CPlayer *player)
 	const int index = this->get_index();
 	const int other_index = player->get_index();
 
-	engine_interface::get()->post([index, other_index]() {
+	event_loop::get()->post([index, other_index]() {
 		SendCommandDiplomacy(index, diplomacy_state::neutral, other_index);
 	});
 }
@@ -5149,7 +5146,7 @@ void CPlayer::set_allied_diplomatic_stance_with_async(CPlayer *player)
 	const int index = this->get_index();
 	const int other_index = player->get_index();
 
-	engine_interface::get()->post([index, other_index]() {
+	event_loop::get()->post([index, other_index]() {
 		SendCommandDiplomacy(index, diplomacy_state::allied, other_index);
 	});
 }
@@ -5207,7 +5204,7 @@ void CPlayer::set_enemy_diplomatic_stance_with_async(CPlayer *player)
 	const int index = this->get_index();
 	const int other_index = player->get_index();
 
-	engine_interface::get()->post([index, other_index]() {
+	event_loop::get()->post([index, other_index]() {
 		SendCommandDiplomacy(index, diplomacy_state::enemy, other_index);
 	});
 }
@@ -5276,7 +5273,7 @@ void CPlayer::set_shared_vision_with_async(CPlayer *player, const bool shared_vi
 	const int index = this->get_index();
 	const int other_index = player->get_index();
 
-	engine_interface::get()->post([index, other_index, shared_vision]() {
+	event_loop::get()->post([index, other_index, shared_vision]() {
 		SendCommandSharedVision(index, shared_vision, other_index);
 	});
 }

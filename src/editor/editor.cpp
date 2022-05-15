@@ -46,10 +46,10 @@
 
 #include "editor.h"
 
-#include "engine_interface.h"
 #include "game/game.h"
 #include "map/map.h"
 #include "player/player.h"
+#include "util/event_loop.h"
 #include "util/path_util.h"
 #include "video/video.h"
 
@@ -62,7 +62,7 @@ CEditor::CEditor() : SelectedPlayer(PlayerNumNeutral)
 **
 **  @param filename  Map to load, null to create a new map
 */
-void CEditor::start(const std::filesystem::path &filepath)
+boost::asio::awaitable<void> CEditor::start(const std::filesystem::path &filepath)
 {
 	std::string nc, rc;
 
@@ -81,7 +81,7 @@ void CEditor::start(const std::filesystem::path &filepath)
 	//Wyrmgus end
 
 	// Run the editor.
-	EditorMainLoop();
+	co_await EditorMainLoop();
 
 	// Clear screen
 	Video.ClearScreen();
@@ -95,14 +95,14 @@ void CEditor::start(const std::filesystem::path &filepath)
 
 void CEditor::start_async(const QString &filepath)
 {
-	engine_interface::get()->post([this, filepath]() {
-		this->start(path::from_qstring(filepath));
+	event_loop::get()->co_spawn([this, filepath]() -> boost::asio::awaitable<void> {
+		co_await this->start(path::from_qstring(filepath));
 	});
 }
 
 void CEditor::set_running_async(const bool running)
 {
-	engine_interface::get()->post([this, running]() {
+	event_loop::get()->post([this, running]() {
 		this->set_running(running);
 	});
 }

@@ -50,6 +50,7 @@
 #include "ui/ui.h"
 #include "util/assert_util.h"
 #include "util/colorization_type.h"
+#include "util/thread_pool.h"
 #include "video/font.h"
 #include "video/video.h"
 
@@ -57,7 +58,7 @@
 std::unique_ptr<gcn::Gui> Gui;         /// A Gui object - binds it all together
 static std::unique_ptr<gcn::SDLInput> Input;  /// Input driver
 
-static EventCallback GuichanCallbacks;
+EventCallback GuichanCallbacks;
 
 static std::stack<MenuScreen *> MenuStack;
 
@@ -166,7 +167,7 @@ void handleInput(const SDL_Event *event)
 			}
 		}
 	} else {
-		if (Gui) {
+		if (Gui && Gui->getTop() != nullptr) {
 			Gui->logic();
 		}
 	}
@@ -174,7 +175,7 @@ void handleInput(const SDL_Event *event)
 
 void DrawGuichanWidgets(std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	if (Gui) {
+	if (Gui && Gui->getTop() != nullptr) {
 		Gui->setUseDirtyDrawing(false);
 		Gui->draw(render_commands);
 	}
@@ -2495,8 +2496,7 @@ int StatBoxWidget::getPercent() const
 /**
 **  MenuScreen constructor
 */
-MenuScreen::MenuScreen() :
-	Container()
+MenuScreen::MenuScreen() : Container()
 {
 	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	setOpaque(false);
@@ -2510,7 +2510,7 @@ MenuScreen::MenuScreen() :
 /**
 **  Run the menu.  Loops until stop is called.
 */
-int MenuScreen::run(bool loop)
+int MenuScreen::run(const bool loop)
 {
 	loopResult = 0;
 	runLoop = loop;
@@ -2524,22 +2524,16 @@ int MenuScreen::run(bool loop)
 		engine_interface::get()->change_lua_dialog_open_count(1);
 	}
 
-	//this needs to be called so that FrameTicks is set, and we don't wait forever on WaitEventsOneFrame
-	SetVideoSync();
-
 	if (loop) {
 		const EventCallback *old_callbacks = GetCallbacks();
 		SetCallbacks(&GuichanCallbacks);
-		while (runLoop) {
-			if (GameResult == GameExit) {
-				break;
-			}
-
-			engine_interface::get()->run_event_loop();
-
+		while (runLoop && GameResult != GameExit) {
 			UpdateDisplay();
 			CheckMusicFinished();
-			WaitEventsOneFrame();
+
+			thread_pool::get()->co_spawn_sync([]() -> boost::asio::awaitable<void> {
+				co_await WaitEventsOneFrame();
+			});
 		}
 		SetCallbacks(old_callbacks);
 		Gui->setTop(this->oldtop);

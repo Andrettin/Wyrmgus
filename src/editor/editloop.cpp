@@ -2405,7 +2405,7 @@ std::string get_user_maps_path()
 /**
 **  Editor main event loop.
 */
-void EditorMainLoop()
+boost::asio::awaitable<void> EditorMainLoop()
 {
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
@@ -2481,8 +2481,6 @@ void EditorMainLoop()
 	engine_interface::get()->set_loading_message("");
 
 	while (CEditor::get()->is_running()) {
-		engine_interface::get()->run_event_loop();
-
 		CheckMusicFinished();
 
 		if (FrameCounter % FRAMES_PER_SECOND == 0) {
@@ -2509,7 +2507,7 @@ void EditorMainLoop()
 			}
 		}
 
-		WaitEventsOneFrame();
+		co_await WaitEventsOneFrame();
 	}
 
 	game::get()->clear_results();

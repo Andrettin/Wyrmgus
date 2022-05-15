@@ -50,7 +50,8 @@ public:
 class TitleScreen final
 {
 public:
-	void ShowTitleImage(std::vector<std::function<void(renderer *)>> &render_commands) const;
+	[[nodiscard]]
+	boost::asio::awaitable<void> ShowTitleImage(std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 private:
 	void ShowLabels(std::vector<std::function<void(renderer *)>> &render_commands) const;
@@ -66,4 +67,5 @@ public:
 
 extern std::vector<TitleScreen> TitleScreens;          /// File for title screen
 
-extern void ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands);
+[[nodiscard]]
+extern boost::asio::awaitable<void> ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands);

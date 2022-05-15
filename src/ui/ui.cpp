@@ -235,6 +235,12 @@ void CUserInterface::Load()
 			this->cursors[cursor_type] = cursor;
 		}
 	}
+
+	if (cursor::get_current_cursor() == nullptr && database::get()->is_initialized()) {
+		//set the initial cursor
+		//the database needs to have been initialized so that the cursor definitions are present
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
+	}
 }
 
 

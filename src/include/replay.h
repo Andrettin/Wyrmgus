@@ -56,7 +56,8 @@ extern void CleanReplayLog();
 /// Save the replay list to file
 extern void SaveReplayList(CFile &file);
 
-extern void StartReplay(const std::filesystem::path &filepath, const bool reveal);
+[[nodiscard]]
+extern boost::asio::awaitable<void> StartReplay(const std::filesystem::path &filepath, const bool reveal);
 
 /// Register ccl functions related to network
 extern void ReplayCclRegister();

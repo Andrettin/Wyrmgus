@@ -30,7 +30,6 @@
 
 #include "dialogue_node.h"
 #include "dialogue_option.h"
-#include "engine_interface.h"
 #include "player/player.h"
 #include "script.h"
 #include "script/context.h"
@@ -39,6 +38,7 @@
 #include "sound/sound_server.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "util/event_loop.h"
 
 namespace wyrmgus {
 
@@ -143,7 +143,7 @@ void dialogue::call_node_option_effect_sync(const int node_index, const int opti
 {
 	CPlayer *player = CPlayer::GetThisPlayer();
 
-	engine_interface::get()->sync([this, node_index, option_index, player, unit_number]() {
+	event_loop::get()->sync([this, node_index, option_index, player, unit_number]() {
 		context ctx;
 		ctx.current_player = player;
 

@@ -60,6 +60,7 @@
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "util/event_loop.h"
 #include "util/queue_util.h"
 #include "video/font.h"
 #include "video/video.h"
@@ -821,7 +822,7 @@ static SDL_Event qevent_to_sdl_event(std::unique_ptr<QInputEvent> &&qevent)
 **  All events available are fetched. Sound and network only if available.
 **  Returns if the time for one frame is over.
 */
-void WaitEventsOneFrame()
+boost::asio::awaitable<void> WaitEventsOneFrame()
 {
 	++FrameCounter;
 
@@ -888,7 +889,8 @@ void WaitEventsOneFrame()
 		// Time of frame over? This makes the CPU happy. :(
 		ticks = SDL_GetTicks();
 		if (!interrupts && ticks < NextFrameTicks) {
-			SDL_Delay(NextFrameTicks - ticks);
+			const uint64_t ms = static_cast<uint64_t>(NextFrameTicks - ticks);
+			co_await event_loop::get()->await_ms(ms);
 			ticks = SDL_GetTicks();
 		}
 		while (ticks >= (unsigned long)(NextFrameTicks)) {

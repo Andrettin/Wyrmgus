@@ -115,6 +115,7 @@
 #include "upgrade/upgrade.h"
 #include "util/assert_util.h"
 #include "util/date_util.h"
+#include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
@@ -246,7 +247,7 @@ void game::set_paused(const bool paused)
 
 void game::set_paused_sync(const bool paused)
 {
-	engine_interface::get()->sync([this, paused]() {
+	event_loop::get()->sync([this, paused]() {
 		this->set_paused(paused);
 	});
 }
@@ -256,7 +257,7 @@ int game::get_cycles_per_year() const
 	return defines::get()->get_cycles_per_year(this->get_current_year());
 }
 
-void game::run_map(const std::filesystem::path &filepath)
+boost::asio::awaitable<void> game::run_map(const std::filesystem::path &filepath)
 {
 	engine_interface::get()->set_loading_message("Starting Game...");
 
@@ -269,7 +270,7 @@ void game::run_map(const std::filesystem::path &filepath)
 
 		CclCommand("InitGameVariables();");
 
-		StartMap(filepath, true);
+		co_await StartMap(filepath, true);
 
 		if (GameResult != GameRestart) {
 			break;
@@ -284,21 +285,21 @@ void game::run_map(const std::filesystem::path &filepath)
 
 void game::run_map_async(const QString &filepath)
 {
-	engine_interface::get()->post([this, filepath]() {
-		this->run_map(path::from_qstring(filepath));
+	event_loop::get()->co_spawn([this, filepath]() -> boost::asio::awaitable<void> {
+		co_await this->run_map(path::from_qstring(filepath));
 	});
 }
 
 void game::run_campaign_async(campaign *campaign)
 {
-	engine_interface::get()->post([this, campaign]() {
+	event_loop::get()->co_spawn([this, campaign]() -> boost::asio::awaitable<void> {
 		if (this->get_current_campaign() != nullptr) {
 			//already running
-			return;
+			co_return;
 		}
 
 		this->set_current_campaign(campaign);
-		this->run_map(database::get()->get_campaign_map_filepath());
+		co_await this->run_map(database::get()->get_campaign_map_filepath());
 	});
 }
 
@@ -635,7 +636,7 @@ void RunMap(const std::string &filepath)
 	}
 }
 
-void StartMap(const std::filesystem::path &filepath, const bool clean)
+boost::asio::awaitable<void> StartMap(const std::filesystem::path &filepath, const bool clean)
 {
 	try {
 		std::string nc, rc;
@@ -682,7 +683,7 @@ void StartMap(const std::filesystem::path &filepath, const bool clean)
 		UI.get_minimap()->Update();
 
 		//  Play the game.
-		GameMainLoop();
+		co_await GameMainLoop();
 
 		//  Clear screen
 		Video.ClearScreen();

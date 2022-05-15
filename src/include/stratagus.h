@@ -161,9 +161,13 @@ extern unsigned long FastForwardCycle;		/// Game Replay Fast Forward Counter
 extern void Exit(const int err);                  /// Exit
 
 extern void UpdateDisplay();            /// Game display update
-extern void DrawMapArea(std::vector<std::function<void(wyrmgus::renderer *)>> &render_commands);              /// Draw the map area
-extern void GameMainLoop();             /// Game main loop
-extern void stratagusMain(int argc, char **argv); /// main entry
+extern void DrawMapArea(std::vector<std::function<void(wyrmgus::renderer *)>> &render_commands); //draw the map area
+
+[[nodiscard]]
+extern boost::asio::awaitable<void> GameMainLoop(); //game main loop
+
+[[nodiscard]]
+extern boost::asio::awaitable<void> stratagusMain(int argc, char **argv); /// main entry
 
 //Wyrmgus start
 enum Difficulties {

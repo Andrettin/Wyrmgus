@@ -37,6 +37,7 @@ class CPlayerColorGraphic;
 
 extern bool GuichanActive;
 extern std::unique_ptr<gcn::Gui> Gui;
+extern EventCallback GuichanCallbacks;
 
 void initGuichan();
 void freeGuichan();
@@ -473,7 +474,8 @@ class MenuScreen final : public gcn::Container
 public:
 	MenuScreen();
 
-	int run(bool loop = true);
+	int run(const bool loop = true);
+
 	void stop(int result = 0, bool stopAll = false);
 	void stopAll(int result = 0) { stop(result, true); }
 	void addLogicCallback(LuaActionListener *listener);
