@@ -55,6 +55,7 @@
 #include "util/log_util.h"
 #include "util/point_util.h"
 #include "util/set_util.h"
+#include "util/thread_pool.h"
 #include "video/font.h"
 #include "video/render_context.h"
 #include "video/renderer.h"
@@ -753,7 +754,9 @@ QImage CGraphic::create_modified_image(const color_modification &color_modificat
 
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
-		image = image::scale(image, scale_factor / this->custom_scale_factor, this->get_loaded_frame_size());
+		thread_pool::get()->co_spawn_sync([this, &image, &scale_factor]() -> boost::asio::awaitable<void> {
+			image = co_await image::scale(image, scale_factor / this->custom_scale_factor, this->get_loaded_frame_size());
+		});
 	}
 
 	if (color_modification.has_rgb_change() && !grayscale) {

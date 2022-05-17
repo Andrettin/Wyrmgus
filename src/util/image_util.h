@@ -51,8 +51,11 @@ inline QImage get_frame(const QImage &image, const int frame_x, const int frame_
 	return image.copy(pixel_x, pixel_y, frame_size.width(), frame_size.height());
 }
 
+[[nodiscard]]
 extern QImage scale(const QImage &src_image, const centesimal_int &scale_factor);
-extern QImage scale(const QImage &src_image, const centesimal_int &scale_factor, const QSize &old_frame_size);
+
+[[nodiscard]]
+extern boost::asio::awaitable<QImage> scale(const QImage &src_image, const centesimal_int &scale_factor, const QSize &old_frame_size);
 
 inline QImage scale_frame(const QImage &image, const int frame_x, const int frame_y, const centesimal_int &scale_factor, const QSize &old_frame_size)
 {

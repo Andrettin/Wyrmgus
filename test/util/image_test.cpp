@@ -29,6 +29,7 @@
 #include "util/image_util.h"
 
 #include "util/fractional_int.h"
+#include "util/thread_pool.h"
 
 #include <boost/test/unit_test.hpp>
 
@@ -47,15 +48,17 @@ BOOST_AUTO_TEST_CASE(scale_image_test)
 
 BOOST_AUTO_TEST_CASE(scale_frame_image_test)
 {
-	QImage image(360, 864, QImage::Format_RGBA8888);
-	image.fill(Qt::black);
+	thread_pool::get()->co_spawn_sync([]() -> boost::asio::awaitable<void> {
+		QImage image(360, 864, QImage::Format_RGBA8888);
+		image.fill(Qt::black);
 
-	const QSize frame_size(72, 72);
+		const QSize frame_size(72, 72);
 
-	for (int scale_factor = 2; scale_factor <= 5; ++scale_factor) {
-		const QImage scaled_image = image::scale(image, centesimal_int(scale_factor), frame_size);
+		for (int scale_factor = 2; scale_factor <= 5; ++scale_factor) {
+			const QImage scaled_image = co_await image::scale(image, centesimal_int(scale_factor), frame_size);
 
-		BOOST_CHECK(scaled_image.width() == image.width() * scale_factor);
-		BOOST_CHECK(scaled_image.height() == image.height() * scale_factor);
-	}
+			BOOST_CHECK(scaled_image.width() == image.width() * scale_factor);
+			BOOST_CHECK(scaled_image.height() == image.height() * scale_factor);
+		}
+	});
 }

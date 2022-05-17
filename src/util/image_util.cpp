@@ -37,6 +37,10 @@
 #include "util/thread_pool.h"
 #include "xbrz.h"
 
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/thread_pool.hpp>
+#include <boost/asio/use_awaitable.hpp>
+
 namespace wyrmgus::image {
 
 static void copy_frame_data(const uint32_t *src_frame_data, uint32_t *dst_data, const QSize &frame_size, const int frame_x, const int frame_y, const int dst_width)
@@ -93,15 +97,17 @@ QImage scale(const QImage &src_image, const centesimal_int &scale_factor)
 	return result_image;
 }
 
-QImage scale(const QImage &src_image, const centesimal_int &scale_factor, const QSize &old_frame_size)
+boost::asio::awaitable<QImage> scale(const QImage &src_image, const centesimal_int &scale_factor, const QSize &old_frame_size)
 {
 	if (src_image.format() != QImage::Format_RGBA8888) {
 		const QImage reformatted_src_image = src_image.convertToFormat(QImage::Format_RGBA8888);
-		return image::scale(reformatted_src_image, scale_factor, old_frame_size);
+
+		QImage scaled_image = co_await image::scale(reformatted_src_image, scale_factor, old_frame_size);
+		co_return scaled_image;
 	}
 
 	if (src_image.size() == old_frame_size) {
-		return image::scale(src_image, scale_factor); //image has only one frame
+		co_return image::scale(src_image, scale_factor); //image has only one frame
 	}
 
 	//scale an image with xBRZ
@@ -127,27 +133,27 @@ QImage scale(const QImage &src_image, const centesimal_int &scale_factor, const 
 	const int vertical_frame_count = src_image.height() / old_frame_size.height();
 
 	//scale each frame individually
-	std::vector<std::future<void>> futures;
+	std::vector<boost::asio::awaitable<void>> awaitables;
 	const int result_width = result_size.width();
 
 	for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
 		for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
-			std::future<void> future = thread_pool::get()->async([&, frame_x, frame_y]() {
+			boost::asio::awaitable<void> awaitable = boost::asio::co_spawn(thread_pool::get()->get_pool().get_executor(), [frame_x, frame_y, &src_image, &scale_factor, &old_frame_size, &new_frame_size, dst_data, result_width]() -> boost::asio::awaitable<void> {
 				const QImage result_frame_image = image::scale_frame(src_image, frame_x, frame_y, scale_factor, old_frame_size);
 
 				const uint32_t *frame_data = reinterpret_cast<const uint32_t *>(result_frame_image.constBits());
-				image::copy_frame_data(frame_data, dst_data, new_frame_size, frame_x, frame_y, result_width);
-			});
+				co_return image::copy_frame_data(frame_data, dst_data, new_frame_size, frame_x, frame_y, result_width);
+			}, boost::asio::use_awaitable);
 
-			futures.push_back(std::move(future));
+			awaitables.push_back(std::move(awaitable));
 		}
 	}
 
-	for (std::future<void> &future : futures) {
-		future.wait();
+	for (boost::asio::awaitable<void> &awaitable : awaitables) {
+		co_await std::move(awaitable);
 	}
 
-	return result_image;
+	co_return result_image;
 }
 
 std::set<QRgb> get_rgbs(const QImage &image)

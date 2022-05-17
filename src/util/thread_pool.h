@@ -41,6 +41,11 @@ public:
 	thread_pool();
 	~thread_pool();
 
+	boost::asio::thread_pool &get_pool() const
+	{
+		return *this->pool;
+	}
+
 	void post(const std::function<void()> &function);
 
 	std::future<void> async(const std::function<void()> &function)
