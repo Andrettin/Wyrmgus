@@ -64,8 +64,12 @@ void thread_pool::co_spawn_sync(const std::function<boost::asio::awaitable<void>
 	std::future<void> future = promise.get_future();
 
 	this->co_spawn([&promise, &function]() -> boost::asio::awaitable<void> {
-		co_await function();
-		promise.set_value();
+		try {
+			co_await function();
+			promise.set_value();
+		} catch (...) {
+			promise.set_exception(std::current_exception());
+		}
 	});
 
 	future.wait();
