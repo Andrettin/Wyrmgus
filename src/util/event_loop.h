@@ -63,9 +63,6 @@ public:
 	void co_spawn(const std::function<boost::asio::awaitable<void>()> &function);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> co_spawn_and_await(const std::function<boost::asio::awaitable<void>()> &function);
-
-	[[nodiscard]]
 	boost::asio::awaitable<void> await_ms(const uint64_t ms);
 
 private:

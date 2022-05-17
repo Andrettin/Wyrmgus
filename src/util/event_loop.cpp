@@ -105,11 +105,6 @@ void event_loop::co_spawn(const std::function<boost::asio::awaitable<void>()> &f
 	}, boost::asio::detached);
 }
 
-boost::asio::awaitable<void> event_loop::co_spawn_and_await(const std::function<boost::asio::awaitable<void>()> &function)
-{
-	co_await boost::asio::co_spawn(this->io_context->get_executor(), function, boost::asio::use_awaitable);
-}
-
 boost::asio::awaitable<void> event_loop::await_ms(const uint64_t ms)
 {
 	boost::asio::steady_timer timer(*this->io_context);
