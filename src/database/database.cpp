@@ -125,6 +125,10 @@
 #include "video/font.h"
 #include "video/font_color.h"
 
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/thread_pool.hpp>
+#include <boost/asio/use_awaitable.hpp>
+
 namespace wyrmgus {
 
 /**
@@ -694,7 +698,7 @@ const std::filesystem::path &database::get_base_path(const data_module *data_mod
 	return this->get_root_path();
 }
 
-void database::parse_folder(const std::filesystem::path &path, std::vector<gsml_data> &gsml_data_list)
+boost::asio::awaitable<void> database::parse_folder(const std::filesystem::path &path, std::vector<gsml_data> &gsml_data_list)
 {
 	std::filesystem::recursive_directory_iterator dir_iterator(path);
 
@@ -709,11 +713,21 @@ void database::parse_folder(const std::filesystem::path &path, std::vector<gsml_
 		filepaths_by_depth[dir_iterator.depth()].insert(dir_entry.path());
 	}
 
+	std::vector<boost::asio::awaitable<gsml_data>> awaitables;
+
 	for (const auto &kv_pair : filepaths_by_depth) {
 		for (const std::filesystem::path &filepath : kv_pair.second) {
-			gsml_parser parser;
-			gsml_data_list.push_back(parser.parse(filepath));
+			boost::asio::awaitable<gsml_data> awaitable = boost::asio::co_spawn(thread_pool::get()->get_pool().get_executor(), [&filepath]() -> boost::asio::awaitable<gsml_data> {
+				gsml_parser parser;
+				co_return parser.parse(filepath);
+			}, boost::asio::use_awaitable);
+
+			awaitables.push_back(std::move(awaitable));
 		}
+	}
+
+	for (boost::asio::awaitable<gsml_data> &awaitable : awaitables) {
+		gsml_data_list.push_back(co_await std::move(awaitable));
 	}
 }
 
@@ -725,42 +739,30 @@ database::~database()
 {
 }
 
-void database::parse()
+boost::asio::awaitable<void> database::parse()
 {
 	const auto data_paths_with_module = this->get_data_paths_with_module();
 	for (const auto &kv_pair : data_paths_with_module) {
 		const std::filesystem::path &path = kv_pair.first;
 		const data_module *data_module = kv_pair.second;
 
-		std::vector<std::future<void>> futures;
-
-		std::exception_ptr exception;
+		std::vector<boost::asio::awaitable<void>> awaitables;
 
 		//parse the files in each data type's folder
 		for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
-			std::future<void> future = thread_pool::get()->async([&]() {
-				try {
-					metadata->get_parsing_function()(path, data_module);
-				} catch (...) {
-					exception = std::current_exception();
-				}
-			});
-
-			futures.push_back(std::move(future));
+			boost::asio::awaitable<void> awaitable = metadata->get_parsing_function()(path, data_module);
+			awaitables.push_back(std::move(awaitable));
 		}
 
-		//we need to wait for the futures per module, so that this remains lock-free, as each data type has its own parsed GSML data list
-		for (std::future<void> &future : futures) {
-			future.wait();
-		}
-
-		if (exception != nullptr) {
-			std::rethrow_exception(exception);
+		//we need to wait for the awaitables per module, so that this remains lock-free, as each data type has its own parsed GSML data list
+		for (boost::asio::awaitable<void> &awaitable : awaitables) {
+			co_await std::move(awaitable);
 		}
 	}
 }
 
-void database::load(const bool initial_definition)
+[[nodiscard]]
+boost::asio::awaitable<void> database::load(const bool initial_definition)
 {
 	if (initial_definition) {
 		//sort the metadata instances so they are placed after their class' dependencies' metadata
@@ -780,7 +782,7 @@ void database::load(const bool initial_definition)
 
 		this->load_predefines();
 		this->process_modules();
-		this->parse();
+		co_await this->parse();
 	}
 
 	try {

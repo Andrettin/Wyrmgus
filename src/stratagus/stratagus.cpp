@@ -197,16 +197,17 @@ extern void beos_init(int argc, char **argv);
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit_manager.h"
+#include "util/event_loop.h"
+#include "util/exception_util.h"
+#include "util/log_util.h"
+#include "util/point_util.h"
+#include "util/thread_pool.h"
+#include "util/util.h"
 #include "version.h"
 #include "video/font.h"
 #include "video/font_color.h"
 #include "video/video.h"
 #include "widgets.h"
-#include "util/event_loop.h"
-#include "util/exception_util.h"
-#include "util/log_util.h"
-#include "util/point_util.h"
-#include "util/util.h"
 
 #include "missile.h" //for FreeBurningBuildingFrames
 
@@ -567,11 +568,13 @@ direction GetDirectionFromOffset(const int x, const int y)
 
 void load_database(const bool initial_definition)
 {
-	try {
-		database::get()->load(initial_definition);
-	} catch (...) {
-		std::throw_with_nested(std::runtime_error("Error loading database."));
-	}
+	thread_pool::get()->co_spawn_sync([initial_definition]() -> boost::asio::awaitable<void> {
+		try {
+			co_await database::get()->load(initial_definition);
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Error loading database."));
+		}
+	});
 }
 
 void load_defines()

@@ -182,19 +182,20 @@ public:
 		std::sort(data_type::instances.begin(), data_type::instances.end(), function);
 	}
 
-	static void parse_database(const std::filesystem::path &data_path, const data_module *data_module)
+	[[nodiscard]]
+	static boost::asio::awaitable<void> parse_database(const std::filesystem::path &data_path, const data_module *data_module)
 	{
 		if (std::string(T::database_folder).empty()) {
-			return;
+			co_return;
 		}
 
 		const std::filesystem::path database_path(data_path / T::database_folder);
 
 		if (!std::filesystem::exists(database_path)) {
-			return;
+			co_return;
 		}
 
-		database::parse_folder(database_path, data_type::gsml_data_to_process[data_module]);
+		co_await database::parse_folder(database_path, data_type::gsml_data_to_process[data_module]);
 	}
 
 	static void process_database(const bool definition)

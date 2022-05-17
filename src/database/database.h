@@ -112,14 +112,19 @@ public:
 
 	static void ensure_path_exists(const std::filesystem::path &path);
 
-	static void parse_folder(const std::filesystem::path &path, std::vector<gsml_data> &gsml_data_list);
+	[[nodiscard]]
+	static boost::asio::awaitable<void> parse_folder(const std::filesystem::path &path, std::vector<gsml_data> &gsml_data_list);
 
 public:
 	database();
 	~database();
 
-	void parse();
-	void load(const bool initial_definition);
+	[[nodiscard]]
+	boost::asio::awaitable<void> parse();
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> load(const bool initial_definition);
+
 	void load_predefines();
 	void load_defines();
 	static void load_history();
