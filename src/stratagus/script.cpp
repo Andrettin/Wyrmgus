@@ -3284,7 +3284,7 @@ int CclCommand(const std::string &command, bool exitOnError)
 
 		return status;
 	} catch (...) {
-		std::throw_with_nested("Error calling Lua command: \"" + command + "\"");
+		std::throw_with_nested(std::runtime_error("Error calling Lua command: \"" + command + "\""));
 	}
 }
 
