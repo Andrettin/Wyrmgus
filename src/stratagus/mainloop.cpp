@@ -83,6 +83,7 @@
 #include "util/container_util.h"
 #include "util/path_util.h"
 #include "util/string_util.h"
+#include "util/thread_pool.h"
 #include "video/font.h"
 #include "video/render_context.h"
 #include "video/video.h"
@@ -487,7 +488,9 @@ boost::asio::awaitable<void> GameMainLoop()
 	game::get()->set_running(true);
 
 	engine_interface::get()->set_waiting_for_interface(true);
-	engine_interface::get()->get_map_view_created_future().wait();
+
+	co_await thread_pool::get()->await_future(engine_interface::get()->get_map_view_created_future());
+
 	engine_interface::get()->reset_map_view_created_promise();
 	engine_interface::get()->set_waiting_for_interface(false);
 
