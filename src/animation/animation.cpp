@@ -96,6 +96,7 @@ static int ParseAnimPlayer(const CUnit &unit, const std::string &parseint)
 	if (parseint == "this") {
 		return unit.Player->get_index();
 	}
+
 	return ParseAnimInt(unit, parseint);
 }
 
@@ -107,7 +108,6 @@ static int ParseAnimPlayer(const CUnit &unit, const std::string &parseint)
 **
 **  @return  The parsed value.
 */
-
 int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 {
 	const CUnit *goal = &unit;
@@ -116,7 +116,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 		return 0;
 	}
 
-	const std::vector<std::string> str_list = wyrmgus::string::split(parseint, '.');
+	const std::vector<std::string> str_list = string::split(parseint, '.');
 
 	if (str_list.size() > 1) {
 		const std::string &cur = str_list[1];
@@ -147,8 +147,10 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 				} else if (cur == "_Distance") {
 					return unit.MapDistanceTo(*goal);
 				}
+
 				throw std::runtime_error("Bad variable name \"" + cur + "\".");
 			}
+
 			if (next == "Value") {
 				//Wyrmgus start
 	//			return goal->Variable[index].Value;
@@ -189,13 +191,13 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 		} else if (parseint[0] == 's') { //spell type detected
 			assert_throw(goal->CurrentAction() == UnitAction::SpellCast);
 			const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-			const wyrmgus::spell &spell = order.GetSpell();
+			const spell &spell = order.GetSpell();
 			if (spell.get_identifier() == cur) {
 				return 1;
 			}
 			return 0;
 		} else if (parseint[0] == 'S') { // check if autocast for this spell available
-			const wyrmgus::spell *spell = wyrmgus::spell::get(cur);
+			const spell *spell = spell::get(cur);
 			if (unit.is_autocast_spell(spell)) {
 				return 1;
 			}
@@ -215,6 +217,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 
 	//check if we are trying to parse a number
 	assert_throw(isdigit(parseint[0]) || parseint[0] == '-');
+
 	return std::stoi(parseint);
 }
 
@@ -228,18 +231,20 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 */
 int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 {
-	char s[100];
+	std::array<char, 100> s{};
 	int flags = 0;
 
-	strcpy(s, parseflag);
-	char *cur = s;
-	char *next = s;
+	strcpy(s.data(), parseflag);
+	char *cur = s.data();
+	char *next = s.data();
+
 	while (next && *next) {
 		next = strchr(cur, '.');
 		if (next) {
 			*next = '\0';
 			++next;
 		}
+
 		if (unit.Anim.Anim->Type == AnimationSpawnMissile) {
 			if (!strcmp(cur, "none")) {
 				flags = SM_None;
@@ -260,11 +265,12 @@ int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 				throw std::runtime_error("Unknown animation flag: \"" + std::string(cur) + "\".");
 			}
 		}
+
 		cur = next;
 	}
+
 	return flags;
 }
-
 
 /**
 **  Show unit animation.
@@ -277,28 +283,30 @@ int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 */
 int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 {
-	// Changing animations
+	//changing animations
 	if (anim && unit.Anim.CurrAnim != anim) {
-		// Assert fails when transforming unit (upgrade-to).
+		//assert fails when transforming unit (upgrade-to)
 		assert_log(!unit.Anim.Unbreakable || unit.Waiting);
 		unit.Anim.Anim = unit.Anim.CurrAnim = anim;
 		unit.Anim.Wait = 0;
 	}
 
-	// Currently waiting
+	//currently waiting
 	if (unit.Anim.Wait) {
 		--unit.Anim.Wait;
 		if (!unit.Anim.Wait) {
-			// Advance to next frame
+			//advance to next frame
 			unit.Anim.Anim = unit.Anim.Anim->get_next();
 		}
+
 		return 0;
 	}
+
 	int move = 0;
 	while (!unit.Anim.Wait) {
 		unit.Anim.Anim->Action(unit, move, scale);
 		if (!unit.Anim.Wait) {
-			// Advance to next frame
+			//advance to next frame
 			unit.Anim.Anim = unit.Anim.Anim->get_next();
 		}
 	}
@@ -306,10 +314,11 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 	--unit.Anim.Wait;
 	if (!unit.Anim.Wait) {
 		assert_throw(unit.Anim.Anim != nullptr);
-		// Advance to next frame
+		//advance to next frame
 		unit.Anim.Anim = unit.Anim.Anim->get_next();
 		assert_throw(unit.Anim.Anim != nullptr);
 	}
+
 	return move;
 }
 
@@ -416,7 +425,9 @@ static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char 
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
 	}
+
 	anim->Init(extraArg.c_str(), l);
+
 	return anim;
 }
 
@@ -428,11 +439,13 @@ static std::vector<std::unique_ptr<CAnimation>> ParseAnimation(lua_State *l, int
 	if (!lua_istable(l, idx)) {
 		LuaError(l, "incorrect argument");
 	}
+
 	const int args = lua_rawlen(l, idx);
 
 	if (args == 0) {
 		return {};
 	}
+
 	Labels.clear();
 	LabelsLater.clear();
 
@@ -451,6 +464,7 @@ static std::vector<std::unique_ptr<CAnimation>> ParseAnimation(lua_State *l, int
 		prev = anim.get();
 		animations.push_back(std::move(anim));
 	}
+
 	prev->set_next(first_anim);
 	FixLabels();
 
@@ -470,7 +484,7 @@ int CclDefineAnimations(lua_State *l)
 	}
 
 	const char *name = LuaToString(l, 1);
-	wyrmgus::animation_set *anims = wyrmgus::animation_set::get_or_add(name, nullptr);
+	animation_set *anims = animation_set::get_or_add(name, nullptr);
 
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {
