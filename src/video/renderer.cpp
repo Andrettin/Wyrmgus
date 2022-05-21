@@ -165,6 +165,11 @@ void renderer::blit_texture_frame(const QOpenGLTexture *texture, const QPoint &p
 	this->blit_texture_frame(texture, pos, frame_pixel_pos, frame_size, flip, opacity, show_percent, frame_size);
 }
 
+void renderer::draw_image(const QImage &image, const QPoint &pos)
+{
+	this->painter->drawImage(pos, image);
+}
+
 void renderer::draw_pixel(const QPoint &pos, const QColor &color)
 {
 	this->painter->beginNativePainting();

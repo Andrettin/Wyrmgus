@@ -92,6 +92,8 @@ public:
 		this->blit_texture_frame(texture, pos, QPoint(0, 0), size, flip, opacity, 100, rendered_size);
 	}
 
+	void draw_image(const QImage &image, const QPoint &pos);
+
 	void draw_pixel(const QPoint &pos, const QColor &color);
 	void draw_rect(const QPoint &pos, const QSize &size, const QColor &color, const double line_width = 1.0);
 	void fill_rect(const QRect &rect, const QColor &color);
