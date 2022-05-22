@@ -225,12 +225,6 @@ void DrawSelectionCircleWithTrans(IntColor color, IntColor secondary_color, int 
 
 	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 							  std::min((x2 - x1) / 2, (y2 - y1) / 2), 95, render_commands);
-	//Wyrmgus start
-	/*
-	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-						 std::min((x2 - x1) / 2, (y2 - y1) / 2));
-	*/
-	//Wyrmgus end
 }
 
 /**

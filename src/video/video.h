@@ -492,7 +492,6 @@ public:
 	bool ResizeScreen(int width, int height);
 
 	void DrawPixelClip(uint32_t color, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawTransPixelClip(uint32_t color, int x, int y, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void DrawVLine(uint32_t color, int x, int y, int height, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawTransVLine(uint32_t color, int x, int y, int height, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);

@@ -68,23 +68,6 @@ void DrawPixel(uint32_t color, int x, int y, std::vector<std::function<void(rend
 }
 
 /**
-**  Draw translucent pixel unclipped.
-**
-**  @param color  color
-**  @param x      x coordinate on the screen
-**  @param y      y coordinate on the screen
-**  @param alpha  alpha value of pixel.
-*/
-void DrawTransPixel(uint32_t color, int x, int y, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	GLubyte r, g, b;
-
-	CVideo::GetRGB(color, &r, &g, &b);
-	color = CVideo::MapRGBA(r, g, b, alpha);
-	DrawPixel(color, x, y, render_commands);
-}
-
-/**
 **  Draw pixel clipped to current clip setting.
 **
 **  @param color  color
@@ -97,23 +80,6 @@ void DrawPixelClip(uint32_t color, int x, int y, std::vector<std::function<void(
 		return;
 	}
 	DrawPixel(color, x, y, render_commands);
-}
-
-/**
-**  Draw translucent pixel clipped to current clip setting.
-**
-**  @param color  color
-**  @param x      x coordinate on the screen
-**  @param y      y coordinate on the screen
-**  @param alpha  alpha value of pixel.
-*/
-void DrawTransPixelClip(uint32_t color, int x, int y, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	GLubyte r, g, b;
-
-	CVideo::GetRGB(color, &r, &g, &b);
-	color = CVideo::MapRGBA(r, g, b, alpha);
-	DrawPixelClip(color, x, y, render_commands);
 }
 
 /**
@@ -941,11 +907,6 @@ void FillTransCircleClip(uint32_t color, int x, int y,
 void CVideo::DrawPixelClip(uint32_t color, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	linedraw_gl::DrawPixelClip(color, x, y, render_commands);
-}
-
-void CVideo::DrawTransPixelClip(uint32_t color, int x, int y, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	linedraw_gl::DrawTransPixelClip(color, x, y, alpha, render_commands);
 }
 
 void CVideo::DrawVLine(uint32_t color, int x, int y, int height, std::vector<std::function<void(renderer *)>> &render_commands)
