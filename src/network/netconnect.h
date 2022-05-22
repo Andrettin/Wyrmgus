@@ -87,9 +87,6 @@ extern int NetLocalPlayerNumber;           /// Player number of local client
 
 extern std::string NetworkMapName;
 
-extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
-extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
-
 template <typename T>
 inline void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
 {

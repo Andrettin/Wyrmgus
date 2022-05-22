@@ -31,13 +31,16 @@
 
 class CHost;
 class CInitMessage_Config;
-class CServerSetup;
 class CUDPSocket;
+
+namespace wyrmgus {
+	class multiplayer_setup;
+}
 
 class CClient final
 {
 public:
-	void Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
+	void Init(const std::string &name, CUDPSocket *socket, multiplayer_setup *server_setup, multiplayer_setup *local_setup, unsigned long tick);
 
 	void SetServerHost(std::unique_ptr<CHost> &&host)
 	{
@@ -98,8 +101,8 @@ private:
 	NetworkState networkState;
 	unsigned char lastMsgTypeSent;  /// Subtype of last InitConfig message sent
 	CUDPSocket *socket = nullptr;
-	CServerSetup *serverSetup = nullptr;
-	CServerSetup *localSetup = nullptr;
+	multiplayer_setup *server_setup = nullptr;
+	multiplayer_setup *local_setup = nullptr;
 };
 
 extern CClient Client;

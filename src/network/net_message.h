@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include "network/multiplayer_setup.h"
+
 /**
  * Number of bytes in the name of a network player,
  * including the terminating null character.
@@ -54,39 +56,6 @@ public:
 	uint16_t Port;         /// Port on host
 	uint16_t PlyNr;        /// Player number
 	char PlyName[NetPlayerNameSize];  /// Name of player
-};
-
-/**
-**  Multiplayer game setup menu state
-*/
-class CServerSetup final
-{
-public:
-	CServerSetup() { Clear(); }
-	size_t Serialize(unsigned char *p) const;
-	size_t Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
-	void Clear();
-
-	bool operator == (const CServerSetup &rhs) const;
-	bool operator != (const CServerSetup &rhs) const { return !(*this == rhs); }
-public:
-	uint8_t ResourcesOption;       /// Resources option
-	uint8_t UnitsOption;           /// Unit # option
-	uint8_t FogOfWar;              /// Fog of war option
-	//Wyrmgus start
-//	uint8_t Inside;                /// Inside option
-	//Wyrmgus end
-	uint8_t RevealMap;             /// Reveal all the map
-	uint8_t TilesetSelection;      /// Tileset select option
-	uint8_t GameTypeOption;        /// Game type option
-	uint8_t Difficulty;            /// Difficulty option
-	uint8_t MapRichness;           /// Map richness option
-	uint8_t Opponents;             /// Number of AI opponents
-	uint8_t CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
-	uint8_t Ready[PlayerMax];      /// Client ready state
-	uint8_t Race[PlayerMax];       /// Client race selection
-	// Fill in here...
 };
 
 /**
@@ -236,15 +205,20 @@ class CInitMessage_State
 {
 public:
 	CInitMessage_State() {}
-	CInitMessage_State(int type, const CServerSetup &data);
+	CInitMessage_State(int type, const multiplayer_setup &data);
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + CServerSetup::Size(); }
+
+	static size_t Size()
+	{
+		return CInitMessage_Header::Size() + multiplayer_setup::size();
+	}
+
 private:
 	CInitMessage_Header header;
 public:
-	CServerSetup State;  /// Server Setup State information
+	multiplayer_setup State;  /// Server Setup State information
 };
 
 class CInitMessage_Resync
@@ -474,3 +448,8 @@ public:
 	CNetworkPacketHeader Header;  /// Packet Header Info
 	std::vector<unsigned char> Command[MaxNetworkCommands];
 };
+
+extern size_t serialize8(unsigned char *buf, uint8_t data);
+extern size_t serialize8(unsigned char *buf, int8_t data);
+extern size_t deserialize8(const unsigned char *buf, uint8_t *data);
+extern size_t deserialize8(const unsigned char *buf, int8_t *data);

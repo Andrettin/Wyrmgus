@@ -37,6 +37,7 @@
 #include "map/map_info.h"
 #include "network/master.h"
 #include "network/client.h"
+#include "network/multiplayer_setup.h"
 #include "network/network_state.h"
 #include "network/network.h"
 #include "parameters.h"
@@ -67,13 +68,10 @@ int NetPlayers;                         /// How many network players
 std::string NetworkMapName;             /// Name of the map received with ICMMap
 static int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
-CServerSetup ServerSetupState; // Server selection state for Multiplayer clients
-CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
-
-class CServer
+class CServer final
 {
 public:
-	void Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup);
+	void Init(const std::string &name, CUDPSocket *socket, multiplayer_setup *server_setup);
 
 	void Update(unsigned long frameCounter);
 	void Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
@@ -96,11 +94,12 @@ private:
 	void Send_Map(const CNetworkHost &host);
 	void Send_State(const CNetworkHost &host);
 	void Send_GoodBye(const CNetworkHost &host);
+
 private:
 	std::string name;
 	NetworkState networkStates[PlayerMax]; /// Client Host states
-	CUDPSocket *socket;
-	CServerSetup *serverSetup;
+	CUDPSocket *socket = nullptr;
+	multiplayer_setup *server_setup = nullptr;
 };
 
 static CServer Server;
@@ -148,8 +147,8 @@ void CServer::KickClient(int c)
 {
 	DebugPrint("kicking client %d\n" _C_ Hosts[c].PlyNr);
 	Hosts[c].Clear();
-	serverSetup->Ready[c] = 0;
-	serverSetup->Race[c] = 0;
+	this->server_setup->Ready[c] = 0;
+	this->server_setup->Race[c] = 0;
 	networkStates[c].Clear();
 	// Resync other clients
 	for (int n = 1; n < PlayerMax - 1; ++n) {
@@ -159,13 +158,13 @@ void CServer::KickClient(int c)
 	}
 }
 
-void CServer::Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup)
+void CServer::Init(const std::string &name, CUDPSocket *socket, multiplayer_setup *server_setup)
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		networkStates[i].Clear();
 		//Hosts[i].Clear();
 	}
-	this->serverSetup = serverSetup;
+	this->server_setup = server_setup;
 	this->name = name;
 	this->socket = socket;
 }
@@ -219,7 +218,7 @@ void CServer::Send_Map(const CNetworkHost &host)
 
 void CServer::Send_State(const CNetworkHost &host)
 {
-	const CInitMessage_State message(MessageInit_FromServer, *serverSetup);
+	const CInitMessage_State message(MessageInit_FromServer, *this->server_setup);
 
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
@@ -271,7 +270,7 @@ int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
 			// occupy first available slot
-			if (serverSetup->CompOpt[i] == 0) {
+			if (this->server_setup->CompOpt[i] == 0) {
 				if (Hosts[i].PlyNr == 0) {
 					h = i;
 					break;
@@ -445,8 +444,8 @@ void CServer::Parse_State(const int h, const CInitMessage_State &msg)
 			// networkStates[h].State = ccs_async;
 			networkStates[h].MsgCnt = 0;
 			// Use information supplied by the client:
-			serverSetup->Ready[h] = msg.State.Ready[h];
-			serverSetup->Race[h] = msg.State.Race[h];
+			this->server_setup->Ready[h] = msg.State.Ready[h];
+			this->server_setup->Race[h] = msg.State.Race[h];
 			// Add additional info usage here!
 
 			// Resync other clients (and us..)
@@ -693,12 +692,12 @@ void NetworkProcessServerRequest()
 */
 void NetworkServerStartGame()
 {
-	assert_throw(ServerSetupState.CompOpt[0] == 0);
+	assert_throw(multiplayer_setup::get_server_setup().CompOpt[0] == 0);
 
-	// save it first..
-	LocalSetupState = ServerSetupState;
+	//save it first...
+	multiplayer_setup::get_local_setup() = multiplayer_setup::get_server_setup();
 
-	// Make a list of the available player slots.
+	//make a list of the available player slots.
 	std::array<int, PlayerMax> num{};
 	std::array<int, PlayerMax> rev{};
 	int h = 0;
@@ -727,10 +726,10 @@ void NetworkServerStartGame()
 	}
 
 #ifdef DEBUG
-	printf("INITIAL ServerSetupState:\n");
+	printf("Initial Server Multiplayer Setup:\n");
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
-		if (ServerSetupState.CompOpt[i] == 0) {
+		printf("%02d: CO: %d   Race: %d   Host: ", i, multiplayer_setup::get_server_setup().CompOpt[i], multiplayer_setup::get_server_setup().Race[i]);
+		if (multiplayer_setup::get_server_setup().CompOpt[i] == 0) {
 			const std::string hostStr = CHost(Hosts[i].Host, Hosts[i].Port).toString();
 			printf(" %s %s", hostStr.c_str(), Hosts[i].PlyName);
 		}
@@ -753,11 +752,11 @@ void NetworkServerStartGame()
 	// Calculate NetPlayers
 	NetPlayers = h;
 	//Wyrmgus start
-//	int compPlayers = ServerSetupState.Opponents;
-	bool compPlayers = ServerSetupState.Opponents > 0;
+//	int compPlayers = multiplayer_setup::get_server_setup().Opponents;
+	const bool compPlayers = multiplayer_setup::get_server_setup().Opponents > 0;
 	//Wyrmgus end
 	for (int i = 1; i < h; ++i) {
-		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != 0) {
+		if (Hosts[i].PlyNr == 0 && multiplayer_setup::get_server_setup().CompOpt[i] != 0) {
 			NetPlayers--;
 		} else if (Hosts[i].PlyName[0] == 0) {
 			NetPlayers--;
@@ -766,11 +765,11 @@ void NetworkServerStartGame()
 			if (compPlayers) {
 			//Wyrmgus end
 				// Unused slot gets a computer player
-				ServerSetupState.CompOpt[i] = 1;
-				LocalSetupState.CompOpt[i] = 1;
+				multiplayer_setup::get_server_setup().CompOpt[i] = 1;
+				multiplayer_setup::get_local_setup().CompOpt[i] = 1;
 			} else {
-				ServerSetupState.CompOpt[i] = 2;
-				LocalSetupState.CompOpt[i] = 2;
+				multiplayer_setup::get_server_setup().CompOpt[i] = 2;
+				multiplayer_setup::get_local_setup().CompOpt[i] = 2;
 			}
 		}
 	}
@@ -784,8 +783,8 @@ void NetworkServerStartGame()
 					DebugPrint("Compact: Hosts %d -> Hosts %d\n" _C_ j _C_ i);
 					Hosts[i] = Hosts[j];
 					Hosts[j].Clear();
-					std::swap(LocalSetupState.CompOpt[i], LocalSetupState.CompOpt[j]);
-					std::swap(LocalSetupState.Race[i], LocalSetupState.Race[j]);
+					std::swap(multiplayer_setup::get_local_setup().CompOpt[i], multiplayer_setup::get_local_setup().CompOpt[j]);
+					std::swap(multiplayer_setup::get_local_setup().Race[i], multiplayer_setup::get_local_setup().Race[j]);
 					break;
 				}
 			}
@@ -833,11 +832,11 @@ void NetworkServerStartGame()
 	for (int i = 0; i < PlayerMax; ++i) {
 		num[i] = 1;
 		n = org[i];
-		ServerSetupState.CompOpt[n] = LocalSetupState.CompOpt[i];
-		ServerSetupState.Race[n] = LocalSetupState.Race[i];
+		multiplayer_setup::get_server_setup().CompOpt[n] = multiplayer_setup::get_local_setup().CompOpt[i];
+		multiplayer_setup::get_server_setup().Race[n] = multiplayer_setup::get_local_setup().Race[i];
 	}
 
-	/* NOW we have NetPlayers in Hosts array, with ServerSetupState shuffled up to match it.. */
+	/* NOW we have NetPlayers in Hosts array, with server multiplayer setup shuffled up to match it.. */
 
 	//
 	// Send all clients host:ports to all clients.
@@ -858,7 +857,7 @@ void NetworkServerStartGame()
 	}
 
 	// Prepare the final state message:
-	const CInitMessage_State statemsg(MessageInit_FromServer, ServerSetupState);
+	const CInitMessage_State statemsg(MessageInit_FromServer, multiplayer_setup::get_server_setup());
 
 	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ HostsCount);
 	// Send all clients host:ports to all clients.
@@ -963,15 +962,17 @@ void NetworkInitServerConnect(int openslots)
 	for (int i = 0; i < PlayerMax; ++i) {
 		Hosts[i].Clear();
 	}
-	ServerSetupState.Clear();
-	LocalSetupState.Clear(); // Unused when we are server
-	Server.Init(preferences::get()->get_local_player_name(), &NetworkFildes, &ServerSetupState);
+
+	multiplayer_setup::get_server_setup() = multiplayer_setup();
+	multiplayer_setup::get_local_setup() = multiplayer_setup(); //unused when we are server
+
+	Server.Init(preferences::get()->get_local_player_name(), &NetworkFildes, &multiplayer_setup::get_server_setup());
 
 	// preset the server (initially always slot 0)
 	Hosts[0].SetName(preferences::get()->get_local_player_name().c_str());
 
 	for (int i = openslots; i < PlayerMax - 1; ++i) {
-		ServerSetupState.CompOpt[i] = 1;
+		multiplayer_setup::get_server_setup().CompOpt[i] = 1;
 	}
 }
 
@@ -996,8 +997,8 @@ void NetworkGamePrepareGameSettings()
 
 #ifdef DEBUG
 	for (int i = 0; i < PlayerMax - 1; i++) {
-		printf("%02d: CO: %d   Race: %d   Name: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
-		if (ServerSetupState.CompOpt[i] == 0) {
+		printf("%02d: CO: %d   Race: %d   Name: ", i, multiplayer_setup::get_server_setup().CompOpt[i], multiplayer_setup::get_server_setup().Race[i]);
+		if (multiplayer_setup::get_server_setup().CompOpt[i] == 0) {
 			for (int h = 0; h != HostsCount; ++h) {
 				if (Hosts[h].PlyNr == i) {
 					printf("%s", Hosts[h].PlyName);
@@ -1025,8 +1026,8 @@ void NetworkGamePrepareGameSettings()
 		}
 	}
 	for (int i = 0; i < h; i++) {
-		GameSettings.Presets[num[i]].Race = ServerSetupState.Race[num[i]];
-		switch (ServerSetupState.CompOpt[num[i]]) {
+		GameSettings.Presets[num[i]].Race = multiplayer_setup::get_server_setup().Race[num[i]];
+		switch (multiplayer_setup::get_server_setup().CompOpt[num[i]]) {
 			case 0: {
 				GameSettings.Presets[num[i]].Type = player_type::person;
 				break;
@@ -1041,7 +1042,7 @@ void NetworkGamePrepareGameSettings()
 		}
 	}
 	for (int i = 0; i < c; i++) {
-		if (ServerSetupState.CompOpt[comp[i]] == 2) { // closed..
+		if (multiplayer_setup::get_server_setup().CompOpt[comp[i]] == 2) { // closed..
 			GameSettings.Presets[comp[i]].Type = player_type::nobody;
 			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp[i]);
 		}

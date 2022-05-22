@@ -30,6 +30,7 @@
 
 #include "network/net_message.h"
 
+#include "network/multiplayer_setup.h"
 #include "network/net_lowlevel.h"
 #include "network/netconnect.h"
 #include "network/network.h"
@@ -43,6 +44,7 @@ size_t serialize32(unsigned char *buf, uint32_t data)
 	}
 	return sizeof(data);
 }
+
 size_t serialize32(unsigned char *buf, int32_t data)
 {
 	if (buf) {
@@ -50,6 +52,7 @@ size_t serialize32(unsigned char *buf, int32_t data)
 	}
 	return sizeof(data);
 }
+
 size_t serialize16(unsigned char *buf, uint16_t data)
 {
 	if (buf) {
@@ -57,6 +60,7 @@ size_t serialize16(unsigned char *buf, uint16_t data)
 	}
 	return sizeof(data);
 }
+
 size_t serialize16(unsigned char *buf, int16_t data)
 {
 	if (buf) {
@@ -64,6 +68,7 @@ size_t serialize16(unsigned char *buf, int16_t data)
 	}
 	return sizeof(data);
 }
+
 size_t serialize8(unsigned char *buf, uint8_t data)
 {
 	if (buf) {
@@ -71,6 +76,7 @@ size_t serialize8(unsigned char *buf, uint8_t data)
 	}
 	return sizeof(data);
 }
+
 size_t serialize8(unsigned char *buf, int8_t data)
 {
 	if (buf) {
@@ -78,6 +84,7 @@ size_t serialize8(unsigned char *buf, int8_t data)
 	}
 	return sizeof(data);
 }
+
 template <int N>
 size_t serialize(unsigned char *buf, const char(&data)[N])
 {
@@ -86,6 +93,7 @@ size_t serialize(unsigned char *buf, const char(&data)[N])
 	}
 	return N;
 }
+
 size_t serialize(unsigned char *buf, const std::string &s)
 {
 	if (buf) {
@@ -103,6 +111,7 @@ size_t serialize(unsigned char *buf, const std::string &s)
 	return 2 + (s.size() + 3);
 	//Wyrmgus end
 }
+
 size_t serialize(unsigned char *buf, const std::vector<unsigned char> &data)
 {
 	if (buf) {
@@ -129,37 +138,44 @@ size_t deserialize32(const unsigned char *buf, uint32_t *data)
 	*data = ntohl(*reinterpret_cast<const uint32_t *>(buf));
 	return sizeof(*data);
 }
+
 size_t deserialize32(const unsigned char *buf, int32_t *data)
 {
 	*data = ntohl(*reinterpret_cast<const int32_t *>(buf));
 	return sizeof(*data);
 }
+
 size_t deserialize16(const unsigned char *buf, uint16_t *data)
 {
 	*data = ntohs(*reinterpret_cast<const uint16_t *>(buf));
 	return sizeof(*data);
 }
+
 size_t deserialize16(const unsigned char *buf, int16_t *data)
 {
 	*data = ntohs(*reinterpret_cast<const int16_t *>(buf));
 	return sizeof(*data);
 }
+
 size_t deserialize8(const unsigned char *buf, uint8_t *data)
 {
 	*data = *buf;
 	return sizeof(*data);
 }
+
 size_t deserialize8(const unsigned char *buf, int8_t *data)
 {
 	*data = *buf;
 	return sizeof(*data);
 }
+
 template <int N>
 size_t deserialize(const unsigned char *buf, char(&data)[N])
 {
 	memcpy(data, buf, N);
 	return N;
 }
+
 size_t deserialize(const unsigned char *buf, std::string &s)
 {
 	uint16_t size;
@@ -171,6 +187,7 @@ size_t deserialize(const unsigned char *buf, std::string &s)
 	return 2 + (s.size() + 3);
 	//Wyrmgus end
 }
+
 size_t deserialize(const unsigned char *buf, std::vector<unsigned char> &data)
 {
 	uint16_t size;
@@ -219,104 +236,6 @@ void CNetworkHost::Clear()
 void CNetworkHost::SetName(const char *name)
 {
 	strncpy_s(this->PlyName, sizeof(this->PlyName), name, _TRUNCATE);
-}
-
-// CServerSetup
-
-size_t CServerSetup::Serialize(unsigned char *buf) const
-{
-	unsigned char *p = buf;
-
-	p += serialize8(p, this->ResourcesOption);
-	p += serialize8(p, this->UnitsOption);
-	p += serialize8(p, this->FogOfWar);
-	//Wyrmgus start
-//	p += serialize8(p, this->Inside);
-	//Wyrmgus end
-	p += serialize8(p, this->RevealMap);
-	p += serialize8(p, this->TilesetSelection);
-	p += serialize8(p, this->GameTypeOption);
-	p += serialize8(p, this->Difficulty);
-	p += serialize8(p, this->MapRichness);
-	p += serialize8(p, this->Opponents);
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += serialize8(p, this->CompOpt[i]);
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += serialize8(p, this->Ready[i]);
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += serialize8(p, this->Race[i]);
-	}
-	return p - buf;
-}
-
-size_t CServerSetup::Deserialize(const unsigned char *p)
-{
-	const unsigned char *buf = p;
-	p += deserialize8(p, &this->ResourcesOption);
-	p += deserialize8(p, &this->UnitsOption);
-	p += deserialize8(p, &this->FogOfWar);
-	//Wyrmgus start
-//	p += deserialize8(p, &this->Inside);
-	//Wyrmgus end
-	p += deserialize8(p, &this->RevealMap);
-	p += deserialize8(p, &this->TilesetSelection);
-	p += deserialize8(p, &this->GameTypeOption);
-	p += deserialize8(p, &this->Difficulty);
-	p += deserialize8(p, &this->MapRichness);
-	p += deserialize8(p, &this->Opponents);
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += deserialize8(p, &this->CompOpt[i]);
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += deserialize8(p, &this->Ready[i]);
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += deserialize8(p, &this->Race[i]);
-	}
-	return p - buf;
-}
-
-void CServerSetup::Clear()
-{
-	ResourcesOption = 0;
-	UnitsOption = 0;
-	FogOfWar = 0;
-	//Wyrmgus start
-//	Inside = 0;
-	//Wyrmgus end
-	RevealMap = 0;
-	TilesetSelection = 0;
-	GameTypeOption = 0;
-	Difficulty = 0;
-	MapRichness = 0;
-	Opponents = 0;
-	memset(CompOpt, 0, sizeof(CompOpt));
-	memset(Ready, 0, sizeof(Ready));
-	//Wyrmgus start
-//	memset(Race, 0, sizeof(Race));
-	memset(Race, -1, sizeof(Race));
-	//Wyrmgus end
-}
-
-bool CServerSetup::operator == (const CServerSetup &rhs) const
-{
-	return (ResourcesOption == rhs.ResourcesOption
-			&& UnitsOption == rhs.UnitsOption
-			&& FogOfWar == rhs.FogOfWar
-			//Wyrmgus start
-//			&& Inside == rhs.Inside
-			//Wyrmgus end
-			&& RevealMap == rhs.RevealMap
-			&& TilesetSelection == rhs.TilesetSelection
-			&& GameTypeOption == rhs.GameTypeOption
-			&& Difficulty == rhs.Difficulty
-			&& MapRichness == rhs.MapRichness
-			&& Opponents == rhs.Opponents
-			&& memcmp(CompOpt, rhs.CompOpt, sizeof(CompOpt)) == 0
-			&& memcmp(Ready, rhs.Ready, sizeof(Ready)) == 0
-			&& memcmp(Race, rhs.Race, sizeof(Race)) == 0);
 }
 
 //  CInitMessage_Header
@@ -508,9 +427,8 @@ void CInitMessage_Map::Deserialize(const unsigned char *p)
 
 // CInitMessage_State
 
-CInitMessage_State::CInitMessage_State(int type, const CServerSetup &data) :
-	header(type, ICMState),
-	State(data)
+CInitMessage_State::CInitMessage_State(int type, const multiplayer_setup &data)
+	: header(type, ICMState), State(data)
 {
 }
 
@@ -520,14 +438,14 @@ std::unique_ptr<const unsigned char[]> CInitMessage_State::Serialize() const
 	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
-	p += this->State.Serialize(p);
+	p += this->State.serialize(p);
 	return buf;
 }
 
 void CInitMessage_State::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
-	p += this->State.Deserialize(p);
+	p += this->State.deserialize(p);
 }
 
 // CInitMessage_Resync

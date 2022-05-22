@@ -67,10 +67,10 @@ void network_manager::init_client_connect()
 		Hosts[i].Clear();
 	}
 
-	ServerSetupState.Clear();
-	LocalSetupState.Clear();
+	multiplayer_setup::get_server_setup() = multiplayer_setup();
+	multiplayer_setup::get_local_setup() = multiplayer_setup();
 
-	Client.Init(preferences::get()->get_local_player_name(), &NetworkFildes, &ServerSetupState, &LocalSetupState, GetTicks());
+	Client.Init(preferences::get()->get_local_player_name(), &NetworkFildes, &multiplayer_setup::get_server_setup(), &multiplayer_setup::get_local_setup(), GetTicks());
 }
 
 void network_manager::process_client_request()

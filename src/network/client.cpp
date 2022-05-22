@@ -32,6 +32,7 @@
 #include "database/database.h"
 #include "map/map.h"
 #include "map/map_info.h"
+#include "network/multiplayer_setup.h"
 #include "network/netconnect.h"
 #include "network/net_message.h"
 #include "network/netsockets.h"
@@ -113,14 +114,14 @@ void CClient::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &ms
 		icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
 }
 
-void CClient::Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick)
+void CClient::Init(const std::string &name, CUDPSocket *socket, multiplayer_setup *server_setup, multiplayer_setup *local_setup, unsigned long tick)
 {
 	networkState.LastFrame = tick;
 	networkState.State = ccs_connecting;
 	networkState.MsgCnt = 0;
 	lastMsgTypeSent = ICMServerQuit;
-	this->serverSetup = serverSetup;
-	this->localSetup = localSetup;
+	this->server_setup = server_setup;
+	this->local_setup = local_setup;
 	this->name = name;
 	this->socket = socket;
 }
@@ -186,7 +187,7 @@ bool CClient::Update_connected(unsigned long tick)
 	}
 }
 
-static bool IsLocalSetupInSync(const CServerSetup &state1, const CServerSetup &state2, int index)
+static bool IsLocalSetupInSync(const multiplayer_setup &state1, const multiplayer_setup &state2, int index)
 {
 	return (state1.Race[index] == state2.Race[index]
 		&& state1.Ready[index] == state2.Ready[index]);
@@ -196,7 +197,7 @@ bool CClient::Update_synced(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_synced);
 
-	if (IsLocalSetupInSync(*serverSetup, *localSetup, NetLocalHostsSlot) == false) {
+	if (IsLocalSetupInSync(*this->server_setup, *this->local_setup, NetLocalHostsSlot) == false) {
 		networkState.State = ccs_changed;
 		networkState.MsgCnt = 0;
 		return Update(tick);
@@ -325,7 +326,7 @@ void CClient::Send_Resync(unsigned long tick)
 
 void CClient::Send_State(unsigned long tick)
 {
-	const CInitMessage_State message(MessageInit_FromClient, *localSetup);
+	const CInitMessage_State message(MessageInit_FromClient, *this->local_setup);
 
 	SendRateLimited(message, tick, 450);
 }
@@ -571,17 +572,17 @@ void CClient::Parse_State(const unsigned char *buf)
 	msg.Deserialize(buf);
 	if (networkState.State == ccs_mapinfo) {
 		// Server has sent us first state info
-		*serverSetup = msg.State;
+		*this->server_setup = msg.State;
 		networkState.State = ccs_synced;
 		networkState.MsgCnt = 0;
 	} else if (networkState.State == ccs_synced
 		|| networkState.State == ccs_changed) {
-		*serverSetup = msg.State;
+		*this->server_setup = msg.State;
 		networkState.State = ccs_async;
 		networkState.MsgCnt = 0;
 	} else if (networkState.State == ccs_goahead) {
 		// Server has sent final state info
-		*serverSetup = msg.State;
+		*this->server_setup = msg.State;
 		networkState.State = ccs_started;
 		networkState.MsgCnt = 0;
 	}

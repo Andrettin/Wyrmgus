@@ -128,7 +128,6 @@ boost::asio::awaitable<void> TitleScreen::ShowTitleImage(std::vector<std::functi
 	callbacks.KeyPressed = WaitCallbackKeyPressed;
 	callbacks.KeyReleased = WaitCallbackKeyReleased;
 	callbacks.KeyRepeated = WaitCallbackKeyRepeated;
-	//callbacks.NetworkEvent = NetworkEvent;
 	callbacks.NetworkEvent = nullptr;
 
 	SetCallbacks(&callbacks);

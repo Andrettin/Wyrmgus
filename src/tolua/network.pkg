@@ -1,4 +1,7 @@
+$#include "network/multiplayer_setup.h"
 $#include "network/network.h"
+
+$using namespace wyrmgus;
 
 void InitNetwork1(void);
 void ExitNetwork1(void);
@@ -12,13 +15,13 @@ int GetNetworkState();
 void NetworkServerResyncClients(void);
 void NetworkDetachFromServer(void);
 
-class CServerSetup {
+class multiplayer_setup {
+	static multiplayer_setup &get_server_setup();
+	static multiplayer_setup &get_local_setup();
+	
 	unsigned char ResourcesOption;
 	unsigned char UnitsOption;
 	unsigned char FogOfWar;
-	//Wyrmgus start
-//	unsigned char Inside;
-	//Wyrmgus end
 	unsigned char RevealMap;
 	unsigned char GameTypeOption;
 	unsigned char Difficulty;
@@ -28,8 +31,7 @@ class CServerSetup {
 	unsigned short Ready[PlayerMax];	// cannot use char since tolua interpret variable as string else.
 	unsigned short Race[PlayerMax];		// cannot use char since tolua interpret variable as string else.
 };
-extern CServerSetup LocalSetupState;
-extern CServerSetup ServerSetupState;
+
 extern int NetLocalHostsSlot;
 tolua_readonly int NetPlayerNameSize;
 struct CNetworkHost {

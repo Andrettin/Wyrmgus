@@ -283,6 +283,7 @@ source_group(missile FILES ${missile_SRCS})
 set(network_SRCS
 	src/network/client.cpp
 	src/network/commands.cpp
+	src/network/multiplayer_setup.cpp
 	src/network/net_lowlevel.cpp
 	src/network/net_message.cpp
 	src/network/master.cpp
@@ -844,6 +845,7 @@ set(wyrmgus_missile_HDRS
 set(wyrmgus_network_HDRS
 	src/network/client.h
 	src/network/master.h
+	src/network/multiplayer_setup.h
 	src/network/net_lowlevel.h
 	src/network/net_message.h
 	src/network/netconnect.h
