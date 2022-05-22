@@ -156,12 +156,10 @@ static int CclSetDamageMissile(lua_State *l)
 static int CclSetZoomNoResize(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (CclInConfigFile) {
 		// May have been set from the command line
 		ZoomNoResize = LuaToBoolean(l, 1);
 	}
-#endif
 	return 0;
 }
 

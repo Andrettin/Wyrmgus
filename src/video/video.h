@@ -541,10 +541,8 @@ public:
 
 	int Width = 0;
 	int Height = 0;
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	int ViewportWidth;         /// Actual width of the window
 	int ViewportHeight;        /// Actual height of the window
-#endif
 	int Depth = 0;
 };
 

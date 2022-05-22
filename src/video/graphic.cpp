@@ -452,10 +452,8 @@ void CGraphic::GenFramesMap()
 	frame_map.resize(NumFrames);
 
 	for (int frame = 0; frame < NumFrames; ++frame) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 		frame_map[frame].x = (frame % (GraphicWidth / Width)) * Width;
 		frame_map[frame].y = (frame / (GraphicWidth / Width)) * Height;
-#endif
 	}
 }
 

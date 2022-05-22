@@ -1534,7 +1534,6 @@ if(WITH_X11 AND X11_FOUND)
 endif()
 
 if(OPENGL_FOUND)
-	add_definitions(-DUSE_OPENGL)
 	include_directories(${OPENGL_INCLUDE_DIR})
 	set(wyrmgus_LIBS ${wyrmgus_LIBS} ${OPENGL_LIBRARIES})
 	message(STATUS "Using OpenGL")

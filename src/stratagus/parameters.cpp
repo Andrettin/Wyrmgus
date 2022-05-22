@@ -71,7 +71,6 @@ void parameters::process()
 		{ { "s", "sleep" }, "Number of frames for the AI to sleep before it starts.", "frames" },
 		{ { "u", "user-path" }, "Path where wyrmgus saves preferences, log and savegame", "path" },
 		{ { "m", "video-mode" }, "Video mode resolution in format <xres>x<yres>.", "mode" },
-#if defined(USE_OPENGL) || defined(USE_GLES)
 		{
 			{ "x", "scaling-mode" },
 			"Controls fullscreen scaling if your graphics card supports shaders. "
@@ -81,7 +80,6 @@ void parameters::process()
 			"idx"
 		},
 		{ { "Z", "retro-scale" }, "Use OpenGL to scale the screen to the viewport (retro-style). Implies -O." },
-#endif
 	};
 	cmd_parser.addOptions(options);
 

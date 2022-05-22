@@ -285,12 +285,6 @@ static void PrintHeader()
 #ifdef USE_ZLIB
 		"ZLIB "
 #endif
-#ifdef USE_OPENGL
-		"OPENGL "
-#endif
-#ifdef USE_GLES
-		"GLES "
-#endif
 #ifdef USE_WIN32
 		"WIN32 "
 #endif

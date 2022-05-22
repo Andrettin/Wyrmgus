@@ -219,8 +219,6 @@ LuaActionListener::~LuaActionListener()
 {
 }
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-
 /*----------------------------------------------------------------------------
 --  MyOpenGLGraphics
 ----------------------------------------------------------------------------*/
@@ -327,7 +325,6 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle, std::vecto
 							 x1, y1, x2 - x1, y2 - y1, c.a, render_commands);
 }
 
-#endif
 
 ImageWidget::ImageWidget(const std::string &image_path, const int scale_factor, const int image_width, const int image_height)
 	: ImageWidget(CGraphic::New(image_path), centesimal_int(scale_factor), image_width, image_height)
