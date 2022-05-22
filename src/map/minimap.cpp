@@ -654,7 +654,7 @@ void minimap::Update()
 
 void minimap::draw_events(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	const unsigned char alpha = 192;
+	static constexpr unsigned char alpha = 192;
 
 	for (int i = 0; i < NumMinimapEvents; ++i) {
 		QPoint screen_pos = this->texture_to_screen_pos(MinimapEvents[i].pos);
@@ -669,7 +669,13 @@ void minimap::draw_events(std::vector<std::function<void(renderer *)>> &render_c
 			screen_pos.setY(this->Y + this->get_height() - 1);
 		}
 
-		Video.DrawTransCircleClip(MinimapEvents[i].Color, screen_pos.x(), screen_pos.y(), MinimapEvents[i].Size, alpha, render_commands);
+		QColor circle_color = CVideo::GetRGBA(MinimapEvents[i].Color);
+		circle_color.setAlpha(alpha);
+		const int radius = MinimapEvents[i].Size;
+		render_commands.push_back([screen_pos, radius, circle_color](renderer *renderer) {
+			renderer->draw_circle(screen_pos, radius, circle_color);
+		});
+
 		MinimapEvents[i].Size -= 1;
 		if (MinimapEvents[i].Size < 2) {
 			MinimapEvents[i] = MinimapEvents[--NumMinimapEvents];

@@ -50,6 +50,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "video/renderer.h"
 #include "video/video.h"
 
 #pragma warning(push, 0)
@@ -291,7 +292,10 @@ void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_com
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		const PixelPos center(screenPos + CursorBuilding->get_scaled_half_tile_pixel_size());
 		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->get_tile_width() - 1)) * defines::get()->get_scaled_tile_width() + 1;
-		Video.DrawCircleClip(ColorRed, center.x, center.y, radius, render_commands);
+
+		render_commands.push_back([center, radius](renderer *renderer) {
+			renderer->draw_circle(center, radius, CVideo::GetRGBA(ColorRed));
+		});
 	}
 
 	//

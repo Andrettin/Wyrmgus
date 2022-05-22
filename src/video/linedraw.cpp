@@ -697,59 +697,6 @@ void DrawCircle(uint32_t color, int x, int y, int radius, std::vector<std::funct
 }
 
 /**
-**  Draw circle clipped.
-**
-**  @param color   color
-**  @param x       Center x coordinate on the screen
-**  @param y       Center y coordinate on the screen
-**  @param radius  radius of circle
-*/
-void DrawCircleClip(uint32_t color, int x, int y, int radius, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	int cx = 0;
-	int cy = radius;
-	int df = 1 - radius;
-	int d_e = 3;
-	int d_se = -2 * radius + 5;
-
-	// FIXME: could be much improved :)
-	do {
-		if (cx == 0) {
-			DrawPixelClip(color, x, y + cy, render_commands);
-			DrawPixelClip(color, x, y - cy, render_commands);
-			DrawPixelClip(color, x + cy, y, render_commands);
-			DrawPixelClip(color, x - cy, y, render_commands);
-		} else if (cx == cy) {
-			assert_throw(cx != 0 && cy != 0);
-			DrawPixelClip(color, x + cx, y + cy, render_commands);
-			DrawPixelClip(color, x - cx, y + cy, render_commands);
-			DrawPixelClip(color, x + cx, y - cy, render_commands);
-			DrawPixelClip(color, x - cx, y - cy, render_commands);
-		} else if (cx < cy) {
-			assert_throw(cx != 0 && cy != 0);
-			DrawPixelClip(color, x + cx, y + cy, render_commands);
-			DrawPixelClip(color, x + cx, y - cy, render_commands);
-			DrawPixelClip(color, x + cy, y + cx, render_commands);
-			DrawPixelClip(color, x + cy, y - cx, render_commands);
-			DrawPixelClip(color, x - cx, y + cy, render_commands);
-			DrawPixelClip(color, x - cx, y - cy, render_commands);
-			DrawPixelClip(color, x - cy, y + cx, render_commands);
-			DrawPixelClip(color, x - cy, y - cx, render_commands);
-		}
-		if (df < 0) {
-			df += d_e;
-			d_se += 2;
-		} else {
-			df += d_se;
-			d_se += 4;
-			--cy;
-		}
-		d_e += 2;
-		++cx;
-	} while (cx <= cy);
-}
-
-/**
 **  Draw translucent circle.
 **
 **  @param color   color
@@ -766,25 +713,6 @@ void DrawTransCircle(uint32_t color, int x, int y, int radius,
 	CVideo::GetRGB(color, &r, &g, &b);
 	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawCircle(color, x, y, radius, render_commands);
-}
-
-/**
-**  Draw translucent circle clipped.
-**
-**  @param color   color
-**  @param x       Center x coordinate on the screen
-**  @param y       Center y coordinate on the screen
-**  @param radius  radius of circle
-**  @param alpha   alpha value of pixels.
-*/
-void DrawTransCircleClip(uint32_t color, int x, int y, int radius,
-						 unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	GLubyte r, g, b;
-
-	CVideo::GetRGB(color, &r, &g, &b);
-	color = CVideo::MapRGBA(r, g, b, alpha);
-	DrawCircleClip(color, x, y, radius, render_commands);
 }
 
 /**
@@ -1017,16 +945,6 @@ void CVideo::DrawCircle(uint32_t color, int x, int y, int r, std::vector<std::fu
 void CVideo::DrawTransCircle(uint32_t color, int x, int y, int r, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	linedraw_gl::DrawTransCircle(color, x, y, r, alpha, render_commands);
-}
-
-void CVideo::DrawCircleClip(uint32_t color, int x, int y, int r, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	linedraw_gl::DrawCircleClip(color, x, y, r, render_commands);
-}
-
-void CVideo::DrawTransCircleClip(uint32_t color, int x, int y, int r, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	linedraw_gl::DrawTransCircleClip(color, x, y, r, alpha, render_commands);
 }
 
 void CVideo::FillCircle(uint32_t color, int x, int y, int r, std::vector<std::function<void(renderer *)>> &render_commands)

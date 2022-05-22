@@ -520,8 +520,6 @@ public:
 
 	void DrawCircle(uint32_t color, int x, int y, int r, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawTransCircle(uint32_t color, int x, int y, int r, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawCircleClip(uint32_t color, int x, int y, int r, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawTransCircleClip(uint32_t color, int x, int y, int r, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void FillCircle(uint32_t color, int x, int y, int radius, std::vector<std::function<void(renderer *)>> &render_commands);
 	void FillTransCircle(uint32_t color, int x, int y, int radius, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);

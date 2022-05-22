@@ -208,8 +208,9 @@ void DrawSelectionCircle(IntColor color, IntColor secondary_color, int x1, int y
 {
 	Q_UNUSED(secondary_color);
 
-	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-						 std::min((x2 - x1) / 2, (y2 - y1) / 2) + 2, render_commands);
+	render_commands.push_back([color, x1, y1, x2, y2](renderer *renderer) {
+		renderer->draw_circle(QPoint((x1 + x2) / 2, (y1 + y2) / 2), std::min((x2 - x1) / 2, (y2 - y1) / 2) + 2, CVideo::GetRGBA(color));
+	});
 }
 
 /**
@@ -867,7 +868,9 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 
 			if (value) {
 				// Radius -1 so you can see all ranges
-				Video.DrawCircleClip(ColorGreen, center.x, center.y, radius - 1, render_commands);
+				render_commands.push_back([center, radius](renderer *renderer) {
+					renderer->draw_circle(center, radius - 1, CVideo::GetRGBA(ColorGreen));
+				});
 			}
 		}
 		//Wyrmgus start
@@ -879,9 +882,12 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
-					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius, render_commands);
+					render_commands.push_back([center, radius](renderer *renderer) {
+						renderer->draw_circle(center, radius, CVideo::GetRGBA(ColorBlue));
+					});
 				}
 			}
+
 			if (Preference.ShowAttackRange) {
 				//Wyrmgus start
 //				const int value = stats.Variables[ATTACKRANGE_INDEX].Max;
@@ -891,8 +897,10 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 				const int radius = value * defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
-					// Radius +1 so you can see all ranges
-					Video.DrawCircleClip(ColorGreen, center.x, center.y, radius - 1, render_commands);
+					//radius +1 so you can see all ranges
+					render_commands.push_back([center, radius](renderer *renderer) {
+						renderer->draw_circle(center, radius - 1, CVideo::GetRGBA(ColorGreen));
+					});
 				}
 			}
 		}
@@ -905,7 +913,10 @@ static void DrawInformations(const CUnit &unit, const unit_type &type, const Pix
 				const int radius = value * defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
-					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius, render_commands);
+					//radius +1 so you can see all ranges
+					render_commands.push_back([center, radius](renderer *renderer) {
+						renderer->draw_circle(center, radius, CVideo::GetRGBA(ColorBlue));
+					});
 				}
 			}
 		}
