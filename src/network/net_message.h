@@ -59,7 +59,7 @@ public:
 /**
 **  Multiplayer game setup menu state
 */
-class CServerSetup
+class CServerSetup final
 {
 public:
 	CServerSetup() { Clear(); }

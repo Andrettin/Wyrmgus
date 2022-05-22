@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "net_message.h"
+#include "network/net_message.h"
 #include "network/netsockets.h"
 
 class CHost;

@@ -1,4 +1,4 @@
-$#include "network.h"
+$#include "network/network.h"
 
 void InitNetwork1(void);
 void ExitNetwork1(void);

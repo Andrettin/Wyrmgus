@@ -43,7 +43,7 @@
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/minimap_mode.h"
-#include "network.h"
+#include "network/network.h"
 #include "player/player.h"
 #include "player/player_color.h"
 #include "player/player_type.h"

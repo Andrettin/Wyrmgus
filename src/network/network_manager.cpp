@@ -30,10 +30,10 @@
 #include "network/network_manager.h"
 
 #include "database/preferences.h"
-#include "netconnect.h"
+#include "network/netconnect.h"
 #include "network/client.h"
 #include "network/netsockets.h"
-#include "network.h"
+#include "network/network.h"
 #include "video/video.h"
 
 namespace wyrmgus {

@@ -31,7 +31,7 @@
 #include "ai.h"
 #include "database/database.h"
 #include "editor.h"
-#include "network.h"
+#include "network/network.h"
 #include "replay.h"
 #include "video/video.h"
 

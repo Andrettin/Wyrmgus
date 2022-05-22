@@ -29,7 +29,7 @@
 
 #include "network/network_state.h"
 
-#include "netconnect.h"
+#include "network/netconnect.h"
 
 void NetworkState::Clear()
 {

@@ -843,6 +843,12 @@ set(wyrmgus_missile_HDRS
 
 set(wyrmgus_network_HDRS
 	src/network/client.h
+	src/network/master.h
+	src/network/net_lowlevel.h
+	src/network/net_message.h
+	src/network/netconnect.h
+	src/network/netsockets.h
+	src/network/network.h
 	src/network/network_manager.h
 	src/network/network_state.h
 )
@@ -1213,17 +1219,11 @@ set(wyrmgus_generic_HDRS
 	src/include/iocompat.h
 	src/include/iolib.h
 	src/include/luacallback.h
-	src/include/master.h
 	src/include/menus.h
 	src/include/missile.h
 	src/include/missileconfig.h
 	src/include/mod.h
 	src/include/myendian.h
-	src/include/net_lowlevel.h
-	src/include/net_message.h
-	src/include/netconnect.h
-	src/include/network.h
-	src/include/network/netsockets.h
 	src/include/particle.h
 	src/include/province.h
 	src/include/replay.h

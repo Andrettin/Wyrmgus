@@ -45,7 +45,7 @@
 #include "map/terrain_type.h"
 #include "map/world.h"
 //Wyrmgus start
-#include "network.h" //for updating levels
+#include "network/network.h" //for updating levels
 //Wyrmgus end
 #include "player/civilization.h"
 #include "player/faction.h"

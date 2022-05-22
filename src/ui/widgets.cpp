@@ -37,8 +37,8 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "netconnect.h"
-#include "network.h"
+#include "network/netconnect.h"
+#include "network/network.h"
 #include "player/player_color.h"
 //Wyrmgus start
 #include "results.h"

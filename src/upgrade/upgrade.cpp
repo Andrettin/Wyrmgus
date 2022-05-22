@@ -54,7 +54,7 @@
 #include "map/site.h"
 #include "map/site_game_data.h"
 //Wyrmgus start
-#include "network.h"
+#include "network/network.h"
 //Wyrmgus end
 #include "player/civilization.h"
 #include "player/civilization_group.h"

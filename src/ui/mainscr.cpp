@@ -53,7 +53,7 @@
 #include "map/tile.h"
 #include "map/world.h"
 #include "menus.h"
-#include "network.h"
+#include "network/network.h"
 #include "player/civilization.h"
 #include "player/player.h"
 #include "player/player_type.h"

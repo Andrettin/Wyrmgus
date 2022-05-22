@@ -34,8 +34,8 @@
 //Wyrmgus start
 #include "map/map.h" //it contains map width and height
 //Wyrmgus end
-#include "net_message.h"
-#include "network.h"
+#include "network/net_message.h"
+#include "network/network.h"
 #include "player/diplomacy_state.h"
 #include "player/dynasty.h"
 #include "player/faction.h"

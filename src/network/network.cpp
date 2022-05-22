@@ -210,16 +210,16 @@
 
 #include "stratagus.h"
 
-#include "network.h"
+#include "network/network.h"
 
 #include "actions.h"
 #include "commands.h"
 #include "database/preferences.h"
 #include "game/game.h"
 #include "map/map.h"
-#include "net_lowlevel.h"
-#include "net_message.h"
-#include "netconnect.h"
+#include "network/net_lowlevel.h"
+#include "network/net_message.h"
+#include "network/netconnect.h"
 #include "parameters.h"
 #include "player/player.h"
 #include "player/player_type.h"

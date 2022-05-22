@@ -28,12 +28,12 @@
 
 #include "stratagus.h"
 
-#include "master.h"
+#include "network/master.h"
 
 #include "game/game.h"
+#include "network/net_lowlevel.h"
 #include "network/netsockets.h"
-#include "network.h"
-#include "net_lowlevel.h"
+#include "network/network.h"
 #include "parameters.h"
 #include "script.h"
 

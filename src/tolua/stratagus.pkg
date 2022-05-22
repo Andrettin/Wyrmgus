@@ -18,7 +18,7 @@ $#include "map/map.h"
 $#include "map/map_info.h"
 $#include "map/minimap.h"
 $#include "mod.h"
-$#include "netconnect.h"
+$#include "network/netconnect.h"
 $#include "player/player.h"
 //Wyrmgus start
 $#include "province.h"

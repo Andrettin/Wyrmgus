@@ -47,7 +47,7 @@
 #include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "menus.h"
-#include "network.h"
+#include "network/network.h"
 #include "parameters.h"
 #include "player/civilization.h"
 #include "player/player.h"

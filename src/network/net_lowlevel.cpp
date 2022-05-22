@@ -28,7 +28,7 @@
 
 #include "stratagus.h"
 
-#include "net_lowlevel.h"
+#include "network/net_lowlevel.h"
 
 #include "util/assert_util.h"
 #include "util/log_util.h"

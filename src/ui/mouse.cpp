@@ -49,7 +49,7 @@
 #include "map/world.h"
 #include "menus.h"
 #include "missile.h"
-#include "network.h"
+#include "network/network.h"
 #include "player/player.h"
 #include "player/player_type.h"
 //Wyrmgus start

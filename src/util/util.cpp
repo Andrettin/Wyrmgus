@@ -31,7 +31,7 @@
 #include "util/util.h"
 
 //Wyrmgus start
-#include "network.h"
+#include "network/network.h"
 //Wyrmgus end
 #include "util/log_util.h"
 #include "util/random.h"

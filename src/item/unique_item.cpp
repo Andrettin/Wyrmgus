@@ -30,8 +30,8 @@
 
 #include "character.h"
 #include "game/game.h"
-#include "network.h"
 #include "item/persistent_item.h"
+#include "network/network.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"

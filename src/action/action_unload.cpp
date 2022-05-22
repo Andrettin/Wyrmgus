@@ -42,7 +42,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 //Wyrmgus start
-#include "network.h"
+#include "network/network.h"
 //Wyrmgus end
 #include "pathfinder/pathfinder.h"
 #include "player/player.h"

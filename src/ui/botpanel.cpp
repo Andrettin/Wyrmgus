@@ -56,7 +56,7 @@
 #include "map/site_game_data.h"
 #include "map/tile.h"
 //Wyrmgus start
-#include "network.h"
+#include "network/network.h"
 //Wyrmgus end
 #include "player/civilization.h"
 #include "player/dynasty.h"

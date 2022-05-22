@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "network.h"
+#include "network/network.h"
 #include "script/condition/condition.h"
 
 namespace wyrmgus {

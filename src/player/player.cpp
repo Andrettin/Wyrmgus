@@ -67,8 +67,8 @@
 #include "map/site_game_data.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "network.h"
-#include "netconnect.h"
+#include "network/network.h"
+#include "network/netconnect.h"
 //Wyrmgus start
 #include "parameters.h"
 //Wyrmgus end

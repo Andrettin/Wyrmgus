@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "network.h"
+#include "network/network.h"
 #include "script/condition/condition.h"
 #include "time/day_of_the_week.h"
 #include "util/locale_util.h"

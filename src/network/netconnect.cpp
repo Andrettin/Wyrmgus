@@ -29,16 +29,16 @@
 
 #include "stratagus.h"
 
-#include "netconnect.h"
+#include "network/netconnect.h"
 
 #include "database/preferences.h"
 #include "game/game.h"
 #include "map/map.h"
 #include "map/map_info.h"
-#include "master.h"
+#include "network/master.h"
 #include "network/client.h"
 #include "network/network_state.h"
-#include "network.h"
+#include "network/network.h"
 #include "parameters.h"
 #include "player/player.h"
 #include "player/player_type.h"

@@ -46,7 +46,7 @@
 #include "map/minimap.h"
 #include "map/terrain_type.h"
 #include "missile.h"
-#include "network.h"
+#include "network/network.h"
 #include "particle.h"
 #include "player/civilization.h"
 #include "player/faction.h"

@@ -29,7 +29,8 @@
 #include "stratagus.h"
 
 #include "network/netsockets.h"
-#include "net_lowlevel.h"
+
+#include "network/net_lowlevel.h"
 
 #ifdef __MORPHOS__
 #undef socket
