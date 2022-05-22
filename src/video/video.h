@@ -491,17 +491,11 @@ public:
 	void ClearScreen();
 	bool ResizeScreen(int width, int height);
 
-	void DrawPixelClip(uint32_t color, int x, int y, std::vector<std::function<void(renderer *)>> &render_commands);
-
 	void DrawVLine(uint32_t color, int x, int y, int height, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawTransVLine(uint32_t color, int x, int y, int height, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawVLineClip(uint32_t color, int x, int y, int height, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawTransVLineClip(uint32_t color, int x, int y, int height, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void DrawHLine(uint32_t color, int x, int y, int width, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawTransHLine(uint32_t color, int x, int y, int width, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawHLineClip(uint32_t color, int x, int y, int width, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawTransHLineClip(uint32_t color, int x, int y, int width, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void DrawLine(uint32_t color, int sx, int sy, int dx, int dy, std::vector<std::function<void(renderer *)>> &render_commands);
 	void DrawTransLine(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
@@ -517,9 +511,6 @@ public:
 	void FillTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 	void FillRectangleClip(uint32_t color, int x, int y, int w, int h, std::vector<std::function<void(renderer *)>> &render_commands);
 	void FillTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
-
-	void DrawCircle(uint32_t color, int x, int y, int r, std::vector<std::function<void(renderer *)>> &render_commands);
-	void DrawTransCircle(uint32_t color, int x, int y, int r, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void FillCircle(uint32_t color, int x, int y, int radius, std::vector<std::function<void(renderer *)>> &render_commands);
 	void FillTransCircle(uint32_t color, int x, int y, int radius, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);

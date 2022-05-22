@@ -201,14 +201,6 @@ namespace gcn
 		//Wyrmgus end
 
         /**
-         * Draws a single point/pixel.
-         *
-         * @param x the x coordinate.
-         * @param y the y coordinate.
-         */
-        virtual void drawPoint(int x, int y, std::vector<std::function<void(renderer *)>> &render_commands) = 0;
-
-        /**
          * Ddraws a line.
          *
          * @param x1 the first x coordinate.
