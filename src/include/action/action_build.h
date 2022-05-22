@@ -36,7 +36,7 @@ namespace wyrmgus {
 
 class COrder_Build final : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement);
+	friend std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const unit_type &building, int z, const site *settlement);
 public:
 	COrder_Build();
 	virtual ~COrder_Build() override;
@@ -52,16 +52,19 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
 	virtual void Execute(CUnit &unit) override;
+
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
+	virtual QPoint get_shown_target_pos(const CViewport &vp) const override;
+
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 	
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType);
+	void ConvertUnitType(const CUnit &unit, unit_type &newType);
 	//Wyrmgus end
 
 	virtual void AiUnitKilled(CUnit &unit) override;
 
-	const wyrmgus::unit_type &GetUnitType() const { return *Type; }
+	const unit_type &GetUnitType() const { return *Type; }
 	virtual const Vec2i GetGoalPos() const override { return goalPos; }
 	//Wyrmgus start
 	virtual const int GetGoalMapLayer() const override { return MapLayer; }
@@ -77,13 +80,13 @@ private:
 	CUnit *get_building_unit() const;
 
 private:
-	const wyrmgus::unit_type *Type = nullptr;        /// build a unit of this unit-type
-	std::shared_ptr<wyrmgus::unit_ref> BuildingUnit;  /// unit builded.
+	const unit_type *Type = nullptr;        /// build a unit of this unit-type
+	std::shared_ptr<unit_ref> BuildingUnit;  /// unit builded.
 	int State = 0;
 	int Range = 0;
 	Vec2i goalPos;
 	//Wyrmgus start
 	int MapLayer = 0;
-	const wyrmgus::site *settlement = nullptr;
+	const site *settlement = nullptr;
 	//Wyrmgus end
 };

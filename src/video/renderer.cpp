@@ -230,7 +230,9 @@ void renderer::fill_circle(const QPoint &pos, const int radius, const QColor &co
 {
 	this->painter->setPen(QPen(Qt::transparent));
 	this->painter->setBrush(QBrush(color));
+
 	this->painter->drawEllipse(pos, radius, radius);
+
 	this->painter->setBrush(QBrush());
 }
 

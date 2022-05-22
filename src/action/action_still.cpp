@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_still.cpp - The stand still action. */
-//
 //      (c) Copyright 1998-2022 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -67,6 +65,7 @@
 //Wyrmgus end
 #include "util/util.h"
 #include "util/vector_util.h"
+#include "video/renderer.h"
 #include "video/video.h"
 
 std::unique_ptr<COrder> COrder::NewActionStandGround()
@@ -119,11 +118,14 @@ bool COrder_Still::IsValid() const
 PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	if (preferences::get()->are_pathlines_enabled()) {
+		QColor color = CVideo::GetRGBA(ColorGray);
 		if (this->Action == UnitAction::StandGround) {
-			Video.FillCircleClip(ColorBlack, lastScreenPos, (2 * preferences::get()->get_scale_factor()).to_int(), render_commands);
-		} else {
-			Video.FillCircleClip(ColorGray, lastScreenPos, (2 * preferences::get()->get_scale_factor()).to_int(), render_commands);
+			color = CVideo::GetRGBA(ColorBlack);
 		}
+
+		render_commands.push_back([lastScreenPos, color](renderer *renderer) {
+			renderer->fill_circle(lastScreenPos, (2 * preferences::get()->get_scale_factor()).to_int(), color);
+		});
 	}
 
 	return lastScreenPos;

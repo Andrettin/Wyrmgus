@@ -56,7 +56,11 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
 	virtual void Execute(CUnit &unit) override;
+
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
+	virtual QPoint get_shown_target_pos(const CViewport &vp) const override;
+	virtual QColor get_shown_target_color() const override;
+
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
 private:

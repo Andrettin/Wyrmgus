@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_trade.h - The trade action headerfile. */
-//
 //      (c) Copyright 2017-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -61,7 +59,10 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
 	virtual void Execute(CUnit &unit) override;
+
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
+	virtual QPoint get_shown_target_pos(const CViewport &vp) const override;
+
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
 private:

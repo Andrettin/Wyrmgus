@@ -55,7 +55,13 @@ public:
 
 	virtual void Execute(CUnit &unit) override;
 	virtual void OnAnimationAttack(CUnit &unit) override;
+
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
+	virtual QPoint get_shown_target_pos(const CViewport &vp) const override;
+	virtual QColor get_shown_source_color() const override;
+	virtual QColor get_shown_line_color() const override;
+	virtual QColor get_shown_target_color() const override;
+
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/) override;
 

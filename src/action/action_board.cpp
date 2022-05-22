@@ -113,31 +113,26 @@ bool COrder_Board::IsValid() const
 
 PixelPos COrder_Board::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	PixelPos targetPos;
-
 	if (this->has_goal()) {
-		//Wyrmgus start
 		if (this->get_goal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
-		//Wyrmgus end
-		targetPos = vp.scaled_map_to_screen_pixel_pos(this->get_goal()->get_scaled_map_pixel_pos_center());
 	} else {
-		//Wyrmgus start
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
-		//Wyrmgus end
-		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
 
-	if (preferences::get()->are_pathlines_enabled()) {
-		Video.FillCircleClip(ColorGreen, lastScreenPos, (2 * preferences::get()->get_scale_factor()).to_int(), render_commands);
-		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos, render_commands);
-		Video.FillCircleClip(ColorGreen, targetPos, (3 * preferences::get()->get_scale_factor()).to_int(), render_commands);
-	}
+	return COrder::Show(vp, lastScreenPos, render_commands);
+}
 
-	return targetPos;
+QPoint COrder_Board::get_shown_target_pos(const CViewport &vp) const
+{
+	if (this->has_goal()) {
+		return vp.scaled_map_to_screen_pixel_pos(this->get_goal()->get_scaled_map_pixel_pos_center());
+	} else {
+		return vp.TilePosToScreen_Center(this->goalPos);
+	}
 }
 
 void COrder_Board::UpdatePathFinderData(PathFinderInput &input)

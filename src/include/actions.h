@@ -118,7 +118,11 @@ public:
 
 	virtual bool IsValid() const = 0;
 
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const = 0;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const;
+	virtual QPoint get_shown_target_pos(const CViewport &vp) const;
+	virtual QColor get_shown_source_color() const;
+	virtual QColor get_shown_line_color() const;
+	virtual QColor get_shown_target_color() const;
 
 	virtual void OnAnimationAttack(CUnit &unit);
 

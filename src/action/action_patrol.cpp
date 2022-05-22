@@ -51,6 +51,7 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
+#include "video/renderer.h"
 #include "video/video.h"
 
 //Wyrmgus start
@@ -150,10 +151,15 @@ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos,
 	const PixelPos pos2 = vp.TilePosToScreen_Center(this->WayPoint);
 
 	if (preferences::get()->are_pathlines_enabled()) {
-		Video.DrawLineClip(ColorGreen, lastScreenPos, pos1, render_commands);
-		Video.FillCircleClip(ColorBlue, pos1, (2 * preferences::get()->get_scale_factor()).to_int(), render_commands);
-		Video.DrawLineClip(ColorBlue, pos1, pos2, render_commands);
-		Video.FillCircleClip(ColorBlue, pos2, (3 * preferences::get()->get_scale_factor()).to_int(), render_commands);
+		render_commands.push_back([lastScreenPos, pos1, pos2](renderer *renderer) {
+			renderer->draw_line(lastScreenPos, pos1, CVideo::GetRGBA(ColorGreen));
+
+			renderer->fill_circle(pos1, (2 * preferences::get()->get_scale_factor()).to_int(), CVideo::GetRGBA(ColorBlue));
+
+			renderer->draw_line(pos1, pos2, CVideo::GetRGBA(ColorBlue));
+
+			renderer->fill_circle(pos2, (3 * preferences::get()->get_scale_factor()).to_int(), CVideo::GetRGBA(ColorBlue));
+		});
 	}
 
 	return pos2;

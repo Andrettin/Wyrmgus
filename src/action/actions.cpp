@@ -53,6 +53,7 @@
 
 #include "animation/animation_die.h"
 #include "commands.h"
+#include "database/preferences.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_info.h"
@@ -75,6 +76,8 @@
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
 #include "util/random.h"
+#include "video/renderer.h"
+#include "video/video.h"
 
 unsigned SyncHash; /// Hash calculated to find sync failures
 
@@ -142,6 +145,49 @@ void COrder::AiUnitKilled(CUnit &unit)
 					   unit.Type->get_identifier().c_str() _C_ Action);
 			break;
 	}
+}
+
+PixelPos COrder::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
+{
+	const QPoint target_pos = this->get_shown_target_pos(vp);
+
+	if (preferences::get()->are_pathlines_enabled()) {
+		const QColor source_color = this->get_shown_source_color();
+		const QColor line_color = this->get_shown_line_color();
+		const QColor target_color = this->get_shown_target_color();
+
+		render_commands.push_back([lastScreenPos, target_pos, source_color, line_color, target_color](renderer *renderer) {
+			renderer->fill_circle(lastScreenPos, (2 * preferences::get()->get_scale_factor()).to_int(), source_color);
+
+			renderer->draw_line(lastScreenPos, target_pos, line_color);
+
+			renderer->fill_circle(target_pos, (3 * preferences::get()->get_scale_factor()).to_int(), target_color);
+		});
+	}
+
+	return target_pos;
+}
+
+QPoint COrder::get_shown_target_pos(const CViewport &vp) const
+{
+	Q_UNUSED(vp);
+
+	throw std::runtime_error("get_shown_target_pos() has not been implemented for this order class.");
+}
+
+QColor COrder::get_shown_source_color() const
+{
+	return CVideo::GetRGBA(ColorGreen);
+}
+
+QColor COrder::get_shown_line_color() const
+{
+	return CVideo::GetRGBA(ColorGreen);
+}
+
+QColor COrder::get_shown_target_color() const
+{
+	return CVideo::GetRGBA(ColorGreen);
 }
 
 /**

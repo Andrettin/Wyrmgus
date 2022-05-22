@@ -180,24 +180,20 @@ bool COrder_Build::IsValid() const
 
 PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	//Wyrmgus start
 	if (this->MapLayer != UI.CurrentMapLayer->ID) {
 		return lastScreenPos;
 	}
-	//Wyrmgus end
 
 	const QRect box_rect = vp.get_unit_type_box_rect(&this->GetUnitType(), this->goalPos);
-	const QPoint target_center_pos = vp.TilePosToScreen_TopLeft(this->goalPos) + this->GetUnitType().get_scaled_half_tile_pixel_size();
 
 	DrawSelection(ColorGray, ColorGray, box_rect.x(), box_rect.y(), box_rect.right(), box_rect.bottom(), render_commands);
 
-	if (preferences::get()->are_pathlines_enabled()) {
-		Video.FillCircleClip(ColorGreen, lastScreenPos, (2 * preferences::get()->get_scale_factor()).to_int(), render_commands);
-		Video.DrawLineClip(ColorGreen, lastScreenPos, target_center_pos, render_commands);
-		Video.FillCircleClip(ColorGreen, target_center_pos, (3 * preferences::get()->get_scale_factor()).to_int(), render_commands);
-	}
+	return COrder::Show(vp, lastScreenPos, render_commands);
+}
 
-	return target_center_pos;
+QPoint COrder_Build::get_shown_target_pos(const CViewport &vp) const
+{
+	return vp.TilePosToScreen_TopLeft(this->goalPos) + this->GetUnitType().get_scaled_half_tile_pixel_size();
 }
 
 void COrder_Build::UpdatePathFinderData(PathFinderInput &input)

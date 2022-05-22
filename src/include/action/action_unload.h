@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_unload.h - The actions headerfile. */
-//
-//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2022 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -56,7 +54,10 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
 	virtual void Execute(CUnit &unit) override;
+
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
+	virtual QPoint get_shown_target_pos(const CViewport &vp) const override;
+
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
 private:

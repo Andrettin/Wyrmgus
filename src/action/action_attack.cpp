@@ -237,25 +237,41 @@ bool COrder_Attack::IsValid() const
 
 PixelPos COrder_Attack::Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const
 {
-	PixelPos targetPos;
-
 	if (this->has_goal()) {
 		if (this->get_goal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
-		targetPos = vp.scaled_map_to_screen_pixel_pos(this->get_goal()->get_scaled_map_pixel_pos_center());
 	} else {
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
-		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
-	if (preferences::get()->are_pathlines_enabled()) {
-		Video.FillCircleClip(ColorRed, lastScreenPos, (2 * preferences::get()->get_scale_factor()).to_int(), render_commands);
-		Video.DrawLineClip(ColorRed, lastScreenPos, targetPos, render_commands);
-		Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, (3 * preferences::get()->get_scale_factor()).to_int(), render_commands);
+
+	return COrder::Show(vp, lastScreenPos, render_commands);
+}
+
+QPoint COrder_Attack::get_shown_target_pos(const CViewport &vp) const
+{
+	if (this->has_goal()) {
+		return vp.scaled_map_to_screen_pixel_pos(this->get_goal()->get_scaled_map_pixel_pos_center());
+	} else {
+		return vp.TilePosToScreen_Center(this->goalPos);
 	}
-	return targetPos;
+}
+
+QColor COrder_Attack::get_shown_source_color() const
+{
+	return CVideo::GetRGBA(ColorRed);
+}
+
+QColor COrder_Attack::get_shown_line_color() const
+{
+	return CVideo::GetRGBA(ColorRed);
+}
+
+QColor COrder_Attack::get_shown_target_color() const
+{
+	return CVideo::GetRGBA(IsWeakTargetSelected() ? ColorBlue : ColorRed);
 }
 
 void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)

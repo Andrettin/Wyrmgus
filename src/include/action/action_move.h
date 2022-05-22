@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_move.h - The actions headerfile. */
-//
-//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2022 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -37,13 +35,8 @@ class COrder_Move final : public COrder
 	friend std::unique_ptr<COrder> COrder::NewActionMove(const Vec2i &pos, int z);
 	//Wyrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Move() : COrder(UnitAction::Move), Range(0)
-	COrder_Move() : COrder(UnitAction::Move), Range(0), MapLayer(0)
-	//Wyrmgus end
+	COrder_Move() : COrder(UnitAction::Move)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
 	}
 
 	virtual std::unique_ptr<COrder> Clone() const override
@@ -57,13 +50,16 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
 	virtual void Execute(CUnit &unit) override;
+
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos, std::vector<std::function<void(renderer *)>> &render_commands) const override;
+	virtual QPoint get_shown_target_pos(const CViewport &vp) const override;
+
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
 private:
-	int Range;
-	Vec2i goalPos;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
 };
