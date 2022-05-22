@@ -220,12 +220,16 @@ void DrawSelectionCircle(IntColor color, IntColor secondary_color, int x1, int y
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCircleWithTrans(IntColor color, IntColor secondary_color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
+void DrawSelectionCircleWithTrans(IntColor int_color, IntColor secondary_int_color, int x1, int y1, int x2, int y2, std::vector<std::function<void(renderer *)>> &render_commands)
 {
-	Q_UNUSED(secondary_color);
+	Q_UNUSED(secondary_int_color);
 
-	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-							  std::min((x2 - x1) / 2, (y2 - y1) / 2), 95, render_commands);
+	render_commands.push_back([int_color, x1, y1, x2, y2](renderer *renderer) {
+		QColor color = CVideo::GetRGBA(int_color);
+		color.setAlpha(95);
+
+		renderer->fill_circle(QPoint((x1 + x2) / 2, (y1 + y2) / 2), std::min((x2 - x1) / 2, (y2 - y1) / 2), color);
+	});
 }
 
 /**

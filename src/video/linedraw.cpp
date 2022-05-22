@@ -555,25 +555,6 @@ void FillCircle(uint32_t color, int x, int y, int radius, std::vector<std::funct
 }
 
 /**
-**  Fill translucent circle clipped.
-**
-**  @param color   color
-**  @param x       Center x coordinate on the screen
-**  @param y       Center y coordinate on the screen
-**  @param radius  radius of circle
-**  @param alpha   alpha value of pixels.
-*/
-void FillTransCircle(uint32_t color, int x, int y,
-					 int radius, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	GLubyte r, g, b;
-
-	CVideo::GetRGB(color, &r, &g, &b);
-	color = CVideo::MapRGBA(r, g, b, alpha);
-	FillCircle(color, x, y, radius, render_commands);
-}
-
-/**
 **  Fill circle clipped.
 **
 **  @param color   color
@@ -610,25 +591,6 @@ void FillCircleClip(uint32_t color, int x, int y, int radius, std::vector<std::f
 		d_e += 2;
 		++cx;
 	} while (cx <= cy);
-}
-
-/**
-**  Fill translucent circle clipped.
-**
-**  @param color   color
-**  @param x       Center x coordinate on the screen
-**  @param y       Center y coordinate on the screen
-**  @param radius  radius of circle
-**  @param alpha   alpha value of pixels.
-*/
-void FillTransCircleClip(uint32_t color, int x, int y,
-						 int radius, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	GLubyte r, g, b;
-
-	CVideo::GetRGB(color, &r, &g, &b);
-	color = CVideo::MapRGBA(r, g, b, alpha);
-	FillCircleClip(color, x, y, radius, render_commands);
 }
 
 }
@@ -703,17 +665,7 @@ void CVideo::FillCircle(uint32_t color, int x, int y, int r, std::vector<std::fu
 	linedraw_gl::FillCircle(color, x, y, r, render_commands);
 }
 
-void CVideo::FillTransCircle(uint32_t color, int x, int y, int r, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	linedraw_gl::FillTransCircle(color, x, y, r, alpha, render_commands);
-}
-
 void CVideo::FillCircleClip(uint32_t color, const PixelPos &screenPos, int r, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	linedraw_gl::FillCircleClip(color, screenPos.x, screenPos.y, r, render_commands);
-}
-
-void CVideo::FillTransCircleClip(uint32_t color, int x, int y, int r, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	linedraw_gl::FillTransCircleClip(color, x, y, r, alpha, render_commands);
 }

@@ -510,9 +510,7 @@ public:
 	void FillTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	void FillCircle(uint32_t color, int x, int y, int radius, std::vector<std::function<void(renderer *)>> &render_commands);
-	void FillTransCircle(uint32_t color, int x, int y, int radius, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 	void FillCircleClip(uint32_t color, const PixelPos &screenPos, int radius, std::vector<std::function<void(renderer *)>> &render_commands);
-	void FillTransCircleClip(uint32_t color, int x, int y, int radius, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands);
 
 	static uint32_t MapRGB(const uint8_t r, const uint8_t g, const uint8_t b)
 	{
