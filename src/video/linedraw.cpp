@@ -86,36 +86,6 @@ void DrawHLine(uint32_t color, int x, int y, int width, std::vector<std::functio
 }
 
 /**
-**  Draw horizontal line clipped.
-**
-**  @param color  color
-**  @param x      x coordinate on the screen
-**  @param y      y coordinate on the screen
-**  @param width  width of line (0=don't draw).
-*/
-void DrawHLineClip(uint32_t color, int x, int y, int width, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	if (y < ClipY1 || y > ClipY2) {
-		return;
-	}
-	if (x < ClipX1) {
-		int f = ClipX1 - x;
-		if (width <= f) {
-			return;
-		}
-		width -= f;
-		x = ClipX1;
-	}
-	if ((x + width) > ClipX2 + 1) {
-		if (x > ClipX2) {
-			return;
-		}
-		width = ClipX2 - x + 1;
-	}
-	DrawHLine(color, x, y, width, render_commands);
-}
-
-/**
 **  Draw vertical line unclipped.
 **
 **  @param color   color
@@ -132,36 +102,6 @@ void DrawVLine(uint32_t color, int x, int y, int height, std::vector<std::functi
 	render_commands.push_back([x, y, height, r, g, b, a](renderer *renderer) {
 		renderer->draw_vertical_line(QPoint(x, y), height, QColor(r, g, b, a));
 	});
-}
-
-/**
-**  Draw vertical line clipped.
-**
-**  @param color   color
-**  @param x       x coordinate on the screen
-**  @param y       y coordinate on the screen
-**  @param height  height of line (0=don't draw).
-*/
-void DrawVLineClip(uint32_t color, int x, int y, int height, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	if (x < ClipX1 || x > ClipX2) {
-		return;
-	}
-	if (y < ClipY1) {
-		int f = ClipY1 - y;
-		if (height <= f) {
-			return;
-		}
-		height -= f;
-		y = ClipY1;
-	}
-	if ((y + height) > ClipY2 + 1) {
-		if (y > ClipY2) {
-			return;
-		}
-		height = ClipY2 - y + 1;
-	}
-	DrawVLine(color, x, y, height, render_commands);
 }
 
 /**
@@ -516,83 +456,6 @@ void FillTransRectangleClip(uint32_t color, int x, int y,
 	FillRectangleClip(color, x, y, w, h, render_commands);
 }
 
-/**
-**  Fill circle.
-**
-**  @param color   color
-**  @param x       Center x coordinate on the screen
-**  @param y       Center y coordinate on the screen
-**  @param radius  radius of circle
-*/
-void FillCircle(uint32_t color, int x, int y, int radius, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	int p = 1 - radius;
-	int py = radius;
-
-	for (int px = 0; px <= py; ++px) {
-		// Fill up the middle half of the circle
-		DrawVLine(color, x + px, y, py + 1, render_commands);
-		DrawVLine(color, x + px, y - py, py, render_commands);
-		if (px) {
-			DrawVLine(color, x - px, y, py + 1, render_commands);
-			DrawVLine(color, x - px, y - py, py, render_commands);
-		}
-
-		if (p < 0) {
-			p += 2 * px + 3;
-		} else {
-			p += 2 * (px - py) + 5;
-			py -= 1;
-			// Fill up the left/right half of the circle
-			if (py >= px) {
-				DrawVLine(color, x + py + 1, y, px + 1, render_commands);
-				DrawVLine(color, x + py + 1, y - px, px, render_commands);
-				DrawVLine(color, x - py - 1, y, px + 1, render_commands);
-				DrawVLine(color, x - py - 1, y - px,  px, render_commands);
-			}
-		}
-	}
-}
-
-/**
-**  Fill circle clipped.
-**
-**  @param color   color
-**  @param x       Center x coordinate on the screen
-**  @param y       Center y coordinate on the screen
-**  @param radius  radius of circle
-*/
-void FillCircleClip(uint32_t color, int x, int y, int radius, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	int cx = 0;
-	int cy = radius;
-	int df = 1 - radius;
-	int d_e = 3;
-	int d_se = -2 * radius + 5;
-
-	// FIXME: could be much improved :)
-	do {
-		DrawHLineClip(color, x - cy, y - cx, 1 + cy * 2, render_commands);
-		if (cx) {
-			DrawHLineClip(color, x - cy, y + cx, 1 + cy * 2, render_commands);
-		}
-		if (df < 0) {
-			df += d_e;
-			d_se += 2;
-		} else {
-			if (cx != cy) {
-				DrawHLineClip(color, x - cx, y - cy, 1 + cx * 2, render_commands);
-				DrawHLineClip(color, x - cx, y + cy, 1 + cx * 2, render_commands);
-			}
-			df += d_se;
-			d_se += 4;
-			--cy;
-		}
-		d_e += 2;
-		++cx;
-	} while (cx <= cy);
-}
-
 }
 
 void CVideo::DrawVLine(uint32_t color, int x, int y, int height, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -600,19 +463,9 @@ void CVideo::DrawVLine(uint32_t color, int x, int y, int height, std::vector<std
 	linedraw_gl::DrawVLine(color, x, y, height, render_commands);
 }
 
-void CVideo::DrawVLineClip(uint32_t color, int x, int y, int height, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	linedraw_gl::DrawVLineClip(color, x, y, height, render_commands);
-}
-
 void CVideo::DrawHLine(uint32_t color, int x, int y, int width, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	linedraw_gl::DrawHLine(color, x, y, width, render_commands);
-}
-
-void CVideo::DrawHLineClip(uint32_t color, int x, int y, int width, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	linedraw_gl::DrawHLineClip(color, x, y, width, render_commands);
 }
 
 void CVideo::DrawLine(uint32_t color, int sx, int sy, int dx, int dy, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -658,14 +511,4 @@ void CVideo::FillRectangleClip(uint32_t color, int x, int y, int w, int h, std::
 void CVideo::FillTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha, std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	linedraw_gl::FillTransRectangleClip(color, x, y, w, h, alpha, render_commands);
-}
-
-void CVideo::FillCircle(uint32_t color, int x, int y, int r, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	linedraw_gl::FillCircle(color, x, y, r, render_commands);
-}
-
-void CVideo::FillCircleClip(uint32_t color, const PixelPos &screenPos, int r, std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	linedraw_gl::FillCircleClip(color, screenPos.x, screenPos.y, r, render_commands);
 }
