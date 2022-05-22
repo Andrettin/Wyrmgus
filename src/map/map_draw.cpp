@@ -629,18 +629,6 @@ void CViewport::Draw(std::vector<std::function<void(renderer *)>> &render_comman
 		}
 	}
 	
-	//Wyrmgus start
-	//if a selected unit has a rally point, show it
-	//better to not show it all the time, so that there's no clutter
-	/*
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (!Selected[i]Destroyed && !Selected[i]Removed && Selected[i]->get_rally_point_pos().x() != -1 && Selected[i]->get_rally_point_pos().y() != -1) {
-			Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(Selected[i]->get_rally_point_pos()), 3);
-		}
-	}
-	*/
-	//Wyrmgus end
-
 	DrawBorder(render_commands);
 	PopClipping();
 }

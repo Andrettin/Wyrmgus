@@ -843,12 +843,13 @@ void ShowOrder(const CUnit &unit, std::vector<std::function<void(renderer *)>> &
 		unit.NewOrder->Show(*CurrentViewport, screenStartPos, render_commands);
 	}
 	
-	//Wyrmgus start
 	//if unit has rally point, show it
 	if (unit.get_rally_point_pos().x() != -1 && unit.get_rally_point_pos().y() != -1 && unit.get_rally_point_map_layer() != nullptr && unit.get_rally_point_map_layer() == UI.CurrentMapLayer) {
-		Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(unit.get_rally_point_pos()), (3 * preferences::get()->get_scale_factor()).to_int(), render_commands);
+		const QPoint rally_point_screen_pos = CurrentViewport->TilePosToScreen_Center(unit.get_rally_point_pos());
+		render_commands.push_back([rally_point_screen_pos](renderer *renderer) {
+			renderer->fill_circle(rally_point_screen_pos, (3 * preferences::get()->get_scale_factor()).to_int(), CVideo::GetRGBA(ColorGreen));
+		});
 	}
-	//Wyrmgus end
 }
 
 /**
