@@ -34,6 +34,7 @@
 #include "network/client.h"
 #include "network/netsockets.h"
 #include "network/network.h"
+#include "network/server.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -67,10 +68,7 @@ void network_manager::init_client_connect()
 		Hosts[i].Clear();
 	}
 
-	multiplayer_setup::get_server_setup() = multiplayer_setup();
-	multiplayer_setup::get_local_setup() = multiplayer_setup();
-
-	Client.Init(preferences::get()->get_local_player_name(), &NetworkFildes, &multiplayer_setup::get_server_setup(), &multiplayer_setup::get_local_setup(), GetTicks());
+	Client.Init(preferences::get()->get_local_player_name(), &NetworkFildes, GetTicks());
 }
 
 void network_manager::process_client_request()

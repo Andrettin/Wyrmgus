@@ -42,7 +42,7 @@
 #include "util/util.h"
 #include "version.h"
 
-CClient Client;
+CClient &Client = *CClient::get();
 
 static const char *ncconstatenames[] = {
 	"ccs_unused",
@@ -64,6 +64,14 @@ static const char *ncconstatenames[] = {
 	"ccs_incompatibleengine",  // incompatible engine version
 	"ccs_incompatiblenetwork", // incompatible network version
 };
+
+CClient::CClient()
+{
+}
+
+CClient::~CClient()
+{
+}
 
 /**
 ** Send a message to the server, but only if the last packet was a while ago
@@ -114,14 +122,14 @@ void CClient::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &ms
 		icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
 }
 
-void CClient::Init(const std::string &name, CUDPSocket *socket, multiplayer_setup *server_setup, multiplayer_setup *local_setup, unsigned long tick)
+void CClient::Init(const std::string &name, CUDPSocket *socket, unsigned long tick)
 {
 	networkState.LastFrame = tick;
 	networkState.State = ccs_connecting;
 	networkState.MsgCnt = 0;
 	lastMsgTypeSent = ICMServerQuit;
-	this->server_setup = server_setup;
-	this->local_setup = local_setup;
+	this->server_setup = std::make_unique<multiplayer_setup>();
+	this->local_setup = std::make_unique<multiplayer_setup>();
 	this->name = name;
 	this->socket = socket;
 }

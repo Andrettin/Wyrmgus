@@ -1,5 +1,7 @@
+$#include "network/client.h"
 $#include "network/multiplayer_setup.h"
 $#include "network/network.h"
+$#include "network/server.h"
 
 $using namespace wyrmgus;
 
@@ -16,7 +18,6 @@ void NetworkServerResyncClients(void);
 void NetworkDetachFromServer(void);
 
 class multiplayer_setup {
-	static multiplayer_setup &get_server_setup();
 	static multiplayer_setup &get_local_setup();
 	
 	unsigned char ResourcesOption;
@@ -30,6 +31,19 @@ class multiplayer_setup {
 	unsigned short CompOpt[PlayerMax];	// cannot use char since tolua interpret variable as string else.
 	unsigned short Ready[PlayerMax];	// cannot use char since tolua interpret variable as string else.
 	unsigned short Race[PlayerMax];		// cannot use char since tolua interpret variable as string else.
+};
+
+class CClient {
+	static CClient *get();
+
+	multiplayer_setup &get_server_setup();
+	multiplayer_setup &get_local_setup();
+};
+
+class server {
+	static server *get();
+	
+	multiplayer_setup &get_setup();
 };
 
 extern int NetLocalHostsSlot;

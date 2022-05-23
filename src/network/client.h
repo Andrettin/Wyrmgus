@@ -40,7 +40,16 @@ namespace wyrmgus {
 class CClient final
 {
 public:
-	void Init(const std::string &name, CUDPSocket *socket, multiplayer_setup *server_setup, multiplayer_setup *local_setup, unsigned long tick);
+	static CClient *get()
+	{
+		static CClient instance;
+		return &instance;
+	}
+
+	CClient();
+	~CClient();
+
+	void Init(const std::string &name, CUDPSocket *socket, unsigned long tick);
 
 	void SetServerHost(std::unique_ptr<CHost> &&host)
 	{
@@ -55,6 +64,16 @@ public:
 	int GetNetworkState() const
 	{
 		return networkState.State;
+	}
+
+	multiplayer_setup &get_server_setup() const
+	{
+		return *this->server_setup;
+	}
+
+	multiplayer_setup &get_local_setup() const
+	{
+		return *this->local_setup;
 	}
 
 private:
@@ -101,11 +120,11 @@ private:
 	NetworkState networkState;
 	unsigned char lastMsgTypeSent;  /// Subtype of last InitConfig message sent
 	CUDPSocket *socket = nullptr;
-	multiplayer_setup *server_setup = nullptr;
-	multiplayer_setup *local_setup = nullptr;
+	std::unique_ptr<multiplayer_setup> server_setup;
+	std::unique_ptr<multiplayer_setup> local_setup;
 };
 
-extern CClient Client;
+extern CClient &Client;
 
 static constexpr const char *icmsgsubtypenames[] = {
 	"Hello",                   // Client Request

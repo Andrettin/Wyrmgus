@@ -31,12 +31,6 @@ namespace wyrmgus {
 class multiplayer_setup final
 {
 public:
-	static multiplayer_setup &get_server_setup()
-	{
-		static multiplayer_setup server_setup;
-		return server_setup;
-	}
-
 	static multiplayer_setup &get_local_setup()
 	{
 		static multiplayer_setup local_setup;

@@ -75,12 +75,20 @@ static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, cons
 
 namespace wyrmgus {
 
+server::server()
+{
+}
+
+server::~server()
+{
+}
+
 void server::KickClient(int c)
 {
 	DebugPrint("kicking client %d\n" _C_ Hosts[c].PlyNr);
 	Hosts[c].Clear();
-	this->server_setup->Ready[c] = 0;
-	this->server_setup->Race[c] = 0;
+	this->setup->Ready[c] = 0;
+	this->setup->Race[c] = 0;
 	networkStates[c].Clear();
 	// Resync other clients
 	for (int n = 1; n < PlayerMax - 1; ++n) {
@@ -90,15 +98,17 @@ void server::KickClient(int c)
 	}
 }
 
-void server::Init(const std::string &name, CUDPSocket *socket, multiplayer_setup *server_setup)
+void server::Init(const std::string &name, CUDPSocket *socket)
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		networkStates[i].Clear();
 		//Hosts[i].Clear();
 	}
-	this->server_setup = server_setup;
+
 	this->name = name;
 	this->socket = socket;
+
+	this->setup = std::make_unique<multiplayer_setup>();
 }
 
 void server::Send_AreYouThere(const CNetworkHost &host)
@@ -150,7 +160,7 @@ void server::Send_Map(const CNetworkHost &host)
 
 void server::Send_State(const CNetworkHost &host)
 {
-	const CInitMessage_State message(MessageInit_FromServer, *this->server_setup);
+	const CInitMessage_State message(MessageInit_FromServer, *this->setup);
 
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
@@ -252,7 +262,7 @@ int server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
 			// occupy first available slot
-			if (this->server_setup->CompOpt[i] == 0) {
+			if (this->setup->CompOpt[i] == 0) {
 				if (Hosts[i].PlyNr == 0) {
 					h = i;
 					break;
@@ -426,8 +436,8 @@ void server::Parse_State(const int h, const CInitMessage_State &msg)
 		// networkStates[h].State = ccs_async;
 		networkStates[h].MsgCnt = 0;
 		// Use information supplied by the client:
-		this->server_setup->Ready[h] = msg.State.Ready[h];
-		this->server_setup->Race[h] = msg.State.Race[h];
+		this->setup->Ready[h] = msg.State.Ready[h];
+		this->setup->Race[h] = msg.State.Race[h];
 		// Add additional info usage here!
 
 		// Resync other clients (and us..)

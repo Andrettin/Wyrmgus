@@ -42,13 +42,21 @@ class multiplayer_setup;
 class server final : public QObject, public singleton<server>
 {
 public:
-	void Init(const std::string &name, CUDPSocket *socket, multiplayer_setup *server_setup);
+	server();
+	~server();
+
+	void Init(const std::string &name, CUDPSocket *socket);
 
 	void Update(unsigned long frameCounter);
 	void Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
 
 	void MarkClientsAsResync();
 	void KickClient(int c);
+
+	multiplayer_setup &get_setup() const
+	{
+		return *this->setup;
+	}
 
 private:
 	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
@@ -71,7 +79,7 @@ private:
 	std::string name;
 	NetworkState networkStates[PlayerMax]; /// Client Host states
 	CUDPSocket *socket = nullptr;
-	multiplayer_setup *server_setup = nullptr;
+	std::unique_ptr<multiplayer_setup> setup;
 };
 
 }
