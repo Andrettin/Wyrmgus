@@ -119,7 +119,6 @@ extern void NetworkGamePrepareGameSettings();
 
 extern int GetNetworkState();
 
-extern void NetworkInitServerConnect(int openslots); /// Setup network connect state machine for the server
 extern int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host);  /// Parse a network connect event
 extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client request messages
 extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages

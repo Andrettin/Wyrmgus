@@ -88,6 +88,21 @@ void network_manager::process_client_request()
 	}
 }
 
+void network_manager::init_server_connect(const int open_slots)
+{
+	NetConnectRunning = 1;
+	NetConnectType = 1;
+
+	for (int i = 0; i < PlayerMax; ++i) {
+		Hosts[i].Clear();
+	}
+
+	this->get_server()->init(preferences::get()->get_local_player_name(), &NetworkFildes, open_slots);
+
+	// preset the server (initially always slot 0)
+	Hosts[0].SetName(preferences::get()->get_local_player_name().c_str());
+}
+
 int network_manager::get_network_state() const
 {
 	return this->get_client()->GetNetworkState();

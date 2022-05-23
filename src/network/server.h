@@ -47,11 +47,12 @@ public:
 	server();
 	~server();
 
-	void Init(const std::string &name, CUDPSocket *socket);
+	void init(const std::string &name, CUDPSocket *socket, const int open_slots);
 
 	void Update(unsigned long frameCounter);
 	void Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
 
+	void resync_clients();
 	void MarkClientsAsResync();
 	void KickClient(int c);
 

@@ -10,7 +10,6 @@ void ExitNetwork1(void);
 
 bool IsNetworkGame();
 
-void NetworkInitServerConnect(int openslots);
 void NetworkServerStartGame(void);
 void NetworkProcessClientRequest(void);
 int GetNetworkState();

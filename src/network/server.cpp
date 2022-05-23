@@ -90,26 +90,30 @@ void server::KickClient(int c)
 	Hosts[c].Clear();
 	this->setup->Ready[c] = 0;
 	this->setup->Race[c] = 0;
-	networkStates[c].Clear();
-	// Resync other clients
+	this->networkStates[c].Clear();
+
+	//resync other clients
 	for (int n = 1; n < PlayerMax - 1; ++n) {
 		if (n != c && Hosts[n].PlyNr) {
-			networkStates[n].State = ccs_async;
+			this->networkStates[n].State = ccs_async;
 		}
 	}
 }
 
-void server::Init(const std::string &name, CUDPSocket *socket)
+void server::init(const std::string &name, CUDPSocket *socket, const int open_slots)
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		networkStates[i].Clear();
-		//Hosts[i].Clear();
+		this->networkStates[i].Clear();
 	}
 
 	this->name = name;
 	this->socket = socket;
 
 	this->setup = std::make_unique<multiplayer_setup>();
+
+	for (int i = open_slots; i < PlayerMax - 1; ++i) {
+		this->setup->CompOpt[i] = 1;
+	}
 }
 
 void server::set_fog_of_war(const bool fow)
@@ -122,7 +126,7 @@ void server::set_fog_of_war(const bool fow)
 
 	this->setup->FogOfWar = fow_uint8;
 
-	NetworkServerResyncClients();
+	this->resync_clients();
 	GameSettings.NoFogOfWar = !fow;
 }
 
@@ -252,6 +256,15 @@ void server::Parse(unsigned long frameCounter, const unsigned char *buf, const C
 		DebugPrint("Server: Unhandled subtype %d from host %d\n" _C_ msgsubtype _C_ index);
 		break;
 	}
+}
+
+void server::resync_clients()
+{
+	if (NetConnectRunning != 1) {
+		return;
+	}
+
+	this->MarkClientsAsResync();
 }
 
 void server::MarkClientsAsResync()

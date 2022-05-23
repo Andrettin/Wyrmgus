@@ -438,28 +438,6 @@ void NetworkDetachFromServer()
 }
 
 /**
-** Setup Network connect state machine for the server
-*/
-void NetworkInitServerConnect(int openslots)
-{
-	NetConnectRunning = 1;
-	NetConnectType = 1;
-
-	for (int i = 0; i < PlayerMax; ++i) {
-		Hosts[i].Clear();
-	}
-
-	server::get()->Init(preferences::get()->get_local_player_name(), &NetworkFildes);
-
-	// preset the server (initially always slot 0)
-	Hosts[0].SetName(preferences::get()->get_local_player_name().c_str());
-
-	for (int i = openslots; i < PlayerMax - 1; ++i) {
-		server::get()->get_setup().CompOpt[i] = 1;
-	}
-}
-
-/**
 ** Notify state change by menu user to connected clients
 */
 void NetworkServerResyncClients()
