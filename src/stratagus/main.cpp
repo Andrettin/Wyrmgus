@@ -37,7 +37,9 @@
 #include "map/map_presets.h"
 #include "map/tile_image_provider.h"
 #include "map/tile_transition.h"
+#include "network/client.h"
 #include "network/network_manager.h"
+#include "network/server.h"
 #include "parameters.h"
 #include "player/civilization.h"
 #include "player/civilization_group.h"
@@ -123,6 +125,7 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<CEditor>("", 1);
 		qmlRegisterAnonymousType<civilization>("", 1);
 		qmlRegisterAnonymousType<civilization_group>("", 1);
+		qmlRegisterAnonymousType<client>("", 1);
 		qmlRegisterAnonymousType<CPlayer>("", 1);
 		qmlRegisterAnonymousType<CUpgrade>("", 1);
 		qmlRegisterAnonymousType<defines>("", 1);
@@ -141,6 +144,7 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<resource>("", 1);
 		qmlRegisterAnonymousType<results_info>("", 1);
 		qmlRegisterAnonymousType<season>("", 1);
+		qmlRegisterAnonymousType<server>("", 1);
 		qmlRegisterAnonymousType<time_of_day>("", 1);
 		qmlRegisterAnonymousType<timeline>("", 1);
 		qmlRegisterAnonymousType<unit_type>("", 1);

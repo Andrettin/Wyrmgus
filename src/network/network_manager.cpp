@@ -39,6 +39,16 @@
 
 namespace wyrmgus {
 
+client *network_manager::get_client() const
+{
+	return client::get();
+}
+
+server *network_manager::get_server() const
+{
+	return server::get();
+}
+
 bool network_manager::setup_server_address(const std::string &server_address, int port)
 {
 	if (port == 0) {
@@ -51,7 +61,7 @@ bool network_manager::setup_server_address(const std::string &server_address, in
 		return false;
 	}
 
-	client::get()->SetServerHost(std::move(host));
+	this->get_client()->SetServerHost(std::move(host));
 
 	return true;
 }
@@ -68,19 +78,19 @@ void network_manager::init_client_connect()
 		Hosts[i].Clear();
 	}
 
-	client::get()->Init(preferences::get()->get_local_player_name(), &NetworkFildes, GetTicks());
+	this->get_client()->Init(preferences::get()->get_local_player_name(), &NetworkFildes, GetTicks());
 }
 
 void network_manager::process_client_request()
 {
-	if (client::get()->Update(GetTicks()) == false) {
+	if (this->get_client()->Update(GetTicks()) == false) {
 		NetConnectRunning = 0;
 	}
 }
 
 int network_manager::get_network_state() const
 {
-	return client::get()->GetNetworkState();
+	return this->get_client()->GetNetworkState();
 }
 
 }

@@ -30,11 +30,20 @@
 
 namespace wyrmgus {
 
+class client;
+class server;
+
 class network_manager final : public QObject, public singleton<network_manager>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::client* client READ get_client CONSTANT)
+	Q_PROPERTY(wyrmgus::server* server READ get_server CONSTANT)
+
 public:
+	client *get_client() const;
+	server *get_server() const;
+
 	bool setup_server_address(const std::string &server_address, int port);
 
 	Q_INVOKABLE bool setup_server_address(const QString &server_address, const int port = 0)
