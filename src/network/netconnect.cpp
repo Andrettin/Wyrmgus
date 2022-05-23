@@ -181,7 +181,7 @@ void NetworkServerStartGame()
 	assert_throw(server::get()->get_setup().CompOpt[0] == 0);
 
 	//save it first...
-	multiplayer_setup::get_local_setup() = server::get()->get_setup();
+	multiplayer_setup local_setup = server::get()->get_setup();
 
 	//make a list of the available player slots.
 	std::array<int, PlayerMax> num{};
@@ -252,10 +252,10 @@ void NetworkServerStartGame()
 			//Wyrmgus end
 				// Unused slot gets a computer player
 				server::get()->get_setup().CompOpt[i] = 1;
-				multiplayer_setup::get_local_setup().CompOpt[i] = 1;
+				local_setup.CompOpt[i] = 1;
 			} else {
 				server::get()->get_setup().CompOpt[i] = 2;
-				multiplayer_setup::get_local_setup().CompOpt[i] = 2;
+				local_setup.CompOpt[i] = 2;
 			}
 		}
 	}
@@ -269,8 +269,8 @@ void NetworkServerStartGame()
 					DebugPrint("Compact: Hosts %d -> Hosts %d\n" _C_ j _C_ i);
 					Hosts[i] = Hosts[j];
 					Hosts[j].Clear();
-					std::swap(multiplayer_setup::get_local_setup().CompOpt[i], multiplayer_setup::get_local_setup().CompOpt[j]);
-					std::swap(multiplayer_setup::get_local_setup().Race[i], multiplayer_setup::get_local_setup().Race[j]);
+					std::swap(local_setup.CompOpt[i], local_setup.CompOpt[j]);
+					std::swap(local_setup.Race[i], local_setup.Race[j]);
 					break;
 				}
 			}
@@ -318,8 +318,8 @@ void NetworkServerStartGame()
 	for (int i = 0; i < PlayerMax; ++i) {
 		num[i] = 1;
 		n = org[i];
-		server::get()->get_setup().CompOpt[n] = multiplayer_setup::get_local_setup().CompOpt[i];
-		server::get()->get_setup().Race[n] = multiplayer_setup::get_local_setup().Race[i];
+		server::get()->get_setup().CompOpt[n] = local_setup.CompOpt[i];
+		server::get()->get_setup().Race[n] = local_setup.Race[i];
 	}
 
 	/* NOW we have NetPlayers in Hosts array, with server multiplayer setup shuffled up to match it.. */

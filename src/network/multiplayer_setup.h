@@ -31,12 +31,6 @@ namespace wyrmgus {
 class multiplayer_setup final
 {
 public:
-	static multiplayer_setup &get_local_setup()
-	{
-		static multiplayer_setup local_setup;
-		return local_setup;
-	}
-
 	static size_t size()
 	{
 		return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax;

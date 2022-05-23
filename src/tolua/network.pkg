@@ -18,8 +18,6 @@ void NetworkServerResyncClients(void);
 void NetworkDetachFromServer(void);
 
 class multiplayer_setup {
-	static multiplayer_setup &get_local_setup();
-	
 	unsigned char ResourcesOption;
 	unsigned char UnitsOption;
 	unsigned char FogOfWar;
