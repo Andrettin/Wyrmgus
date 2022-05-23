@@ -120,10 +120,6 @@ void server::set_fog_of_war(const bool fow)
 {
 	const uint8_t fow_uint8 = static_cast<uint8_t>(fow);
 
-	if (fow_uint8 == this->setup->FogOfWar) {
-		return;
-	}
-
 	this->setup->FogOfWar = fow_uint8;
 
 	this->resync_clients();
