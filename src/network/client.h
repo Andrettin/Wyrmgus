@@ -40,6 +40,8 @@ class multiplayer_setup;
 
 class client final : public QObject, public singleton<client>
 {
+	Q_OBJECT
+
 public:
 	client();
 	~client();

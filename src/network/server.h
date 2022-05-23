@@ -41,6 +41,8 @@ class multiplayer_setup;
 
 class server final : public QObject, public singleton<server>
 {
+	Q_OBJECT
+
 public:
 	server();
 	~server();
@@ -57,6 +59,8 @@ public:
 	{
 		return *this->setup;
 	}
+
+	Q_INVOKABLE void set_fog_of_war(const bool fow);
 
 private:
 	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);

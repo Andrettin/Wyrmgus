@@ -34,6 +34,7 @@
 #include "network/multiplayer_setup.h"
 #include "network/netconnect.h"
 #include "network/netsockets.h"
+#include "settings.h"
 #include "version.h"
 
 /**
@@ -109,6 +110,20 @@ void server::Init(const std::string &name, CUDPSocket *socket)
 	this->socket = socket;
 
 	this->setup = std::make_unique<multiplayer_setup>();
+}
+
+void server::set_fog_of_war(const bool fow)
+{
+	const uint8_t fow_uint8 = static_cast<uint8_t>(fow);
+
+	if (fow_uint8 == this->setup->FogOfWar) {
+		return;
+	}
+
+	this->setup->FogOfWar = fow_uint8;
+
+	NetworkServerResyncClients();
+	GameSettings.NoFogOfWar = !fow;
 }
 
 void server::Send_AreYouThere(const CNetworkHost &host)
