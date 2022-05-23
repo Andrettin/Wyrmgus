@@ -412,6 +412,11 @@ void client::SetConfig(const CInitMessage_Config &msg)
 	NetPlayers = HostsCount + 1;
 }
 
+void client::SetServerHost(std::unique_ptr<CHost> &&host)
+{
+	this->serverHost = std::move(host);
+}
+
 bool client::Parse(const std::array<unsigned char, 1024> &buf)
 {
 	CInitMessage_Header header;

@@ -46,10 +46,7 @@ public:
 
 	void Init(const std::string &name, CUDPSocket *socket, unsigned long tick);
 
-	void SetServerHost(std::unique_ptr<CHost> &&host)
-	{
-		this->serverHost = std::move(host);
-	}
+	void SetServerHost(std::unique_ptr<CHost> &&host);
 
 	bool Parse(const std::array<unsigned char, 1024> &buf);
 	bool Update(unsigned long tick);
