@@ -292,6 +292,7 @@ set(network_SRCS
 	src/network/network_manager.cpp
 	src/network/network_state.cpp
 	src/network/netsockets.cpp
+	src/network/server.cpp
 )
 source_group(network FILES ${network_SRCS})
 
@@ -853,6 +854,7 @@ set(wyrmgus_network_HDRS
 	src/network/network.h
 	src/network/network_manager.h
 	src/network/network_state.h
+	src/network/server.h
 )
 
 set(wyrmgus_pathfinder_HDRS

@@ -51,6 +51,10 @@ class CUDPSocket;
 /// Network protocol printf format arguments
 #define NetworkProtocolFormatArgs(v) (v) / 10000, ((v) / 100) % 100, (v) % 100
 
+// received nothing from client for xx frames?
+constexpr int CLIENT_LIVE_BEAT = 60;
+constexpr int CLIENT_IS_DEAD = 300;
+
 /**
 **  Network Client connect states
 */
@@ -95,6 +99,20 @@ inline void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T 
 }
 
 extern void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
+
+template <typename T>
+inline void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const T &msg)
+{
+	NetworkSendICMessage(socket, host, msg);
+
+#ifdef DEBUG
+	const std::string hostStr = host.toString();
+	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
+		_C_ icmsgsubtypenames[msg.GetHeader().GetSubType()]);
+#endif
+}
+
+extern void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
 extern int FindHostIndexBy(const CHost &host);
 extern void NetworkServerStartGame();       /// Server user has finally hit the start game button

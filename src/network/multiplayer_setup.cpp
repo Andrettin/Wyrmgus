@@ -30,6 +30,8 @@
 
 #include "network/net_message.h"
 
+namespace wyrmgus {
+
 size_t multiplayer_setup::serialize(unsigned char *buf) const
 {
 	unsigned char *p = buf;
@@ -77,4 +79,6 @@ size_t multiplayer_setup::deserialize(const unsigned char *p)
 		p += deserialize8(p, &this->Race[i]);
 	}
 	return p - buf;
+}
+
 }
