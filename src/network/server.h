@@ -53,7 +53,11 @@ public:
 	void Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
 
 	void resync_clients();
-	void MarkClientsAsResync();
+
+private:
+	void mark_clients_as_resync();
+
+public:
 	void KickClient(int c);
 
 	multiplayer_setup &get_setup() const
@@ -62,6 +66,7 @@ public:
 	}
 
 	Q_INVOKABLE void set_fog_of_war(const bool fow);
+	Q_INVOKABLE void set_reveal_map(const bool reveal_map);
 
 private:
 	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);

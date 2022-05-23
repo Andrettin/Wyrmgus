@@ -126,6 +126,16 @@ void server::set_fog_of_war(const bool fow)
 	GameSettings.NoFogOfWar = !fow;
 }
 
+void server::set_reveal_map(const bool reveal_map)
+{
+	const uint8_t reveal_map_uint8 = static_cast<uint8_t>(reveal_map);
+
+	this->setup->RevealMap = reveal_map_uint8;
+
+	this->resync_clients();
+	GameSettings.RevealMap = reveal_map;
+}
+
 void server::Send_AreYouThere(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMAYT); // AreYouThere
@@ -260,14 +270,14 @@ void server::resync_clients()
 		return;
 	}
 
-	this->MarkClientsAsResync();
+	this->mark_clients_as_resync();
 }
 
-void server::MarkClientsAsResync()
+void server::mark_clients_as_resync()
 {
 	for (int i = 1; i < PlayerMax - 1; ++i) {
-		if (Hosts[i].PlyNr && networkStates[i].State == ccs_synced) {
-			networkStates[i].State = ccs_async;
+		if (Hosts[i].PlyNr && this->networkStates[i].State == ccs_synced) {
+			this->networkStates[i].State = ccs_async;
 		}
 	}
 }
