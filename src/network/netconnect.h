@@ -36,15 +36,14 @@ class CInitMessage_Header;
 class CUDPSocket;
 
 /// Network protocol major version
-#define NetworkProtocolMajorVersion StratagusMajorVersion
+constexpr int NetworkProtocolMajorVersion = StratagusMajorVersion;
 /// Network protocol minor version (maximum 99)
-#define NetworkProtocolMinorVersion StratagusMinorVersion
+constexpr int NetworkProtocolMinorVersion = StratagusMinorVersion;
 /// Network protocol patch level (maximum 99)
-#define NetworkProtocolPatchLevel   StratagusPatchLevel
+constexpr int NetworkProtocolPatchLevel = StratagusPatchLevel;
 /// Network protocol version (1,2,3) -> 10203
-#define NetworkProtocolVersion \
-	(NetworkProtocolMajorVersion * 10000 + NetworkProtocolMinorVersion * 100 + \
-	 NetworkProtocolPatchLevel)
+constexpr int NetworkProtocolVersion = (NetworkProtocolMajorVersion * 10000 + NetworkProtocolMinorVersion * 100 + \
+	NetworkProtocolPatchLevel);
 
 /// Network protocol printf format string
 #define NetworkProtocolFormatString "%d.%d.%d"

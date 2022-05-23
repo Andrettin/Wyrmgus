@@ -27,7 +27,7 @@
 #define VERSION _version_str1
 
 /// Stratagus version (1,2,3) -> 10203
-#define StratagusVersion (StratagusMajorVersion * 10000 + StratagusMinorVersion * 100 + StratagusPatchLevel)
+constexpr int StratagusVersion = (StratagusMajorVersion * 10000 + StratagusMinorVersion * 100 + StratagusPatchLevel);
 
 /// Homepage
 #define HOMEPAGE "https://github.com/Andrettin/Wyrmgus"
