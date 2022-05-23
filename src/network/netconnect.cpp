@@ -110,7 +110,7 @@ int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHo
 	const unsigned char msgtype = header.GetType();
 	if ((msgtype == MessageInit_FromClient && NetConnectRunning != 1)
 		|| (msgtype == MessageInit_FromServer && NetConnectRunning != 2)) {
-		if (NetConnectRunning == 2 && Client.GetNetworkState() == ccs_started) {
+		if (NetConnectRunning == 2 && client::get()->GetNetworkState() == ccs_started) {
 			// Client has acked ready to start and receives first real network packet.
 			// This indicates that we missed the 'Go' in started state and the game
 			// has been started by the server, so do the same for the client.
@@ -126,7 +126,7 @@ int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHo
 			   hostStr.c_str());
 #endif
 	if (NetConnectRunning == 2) { // client
-		if (Client.Parse(buf) == false) {
+		if (client::get()->Parse(buf) == false) {
 			NetConnectRunning = 0;
 		}
 	} else if (NetConnectRunning == 1) { // server
@@ -140,14 +140,14 @@ int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHo
 */
 void NetworkProcessClientRequest()
 {
-	if (Client.Update(GetTicks()) == false) {
+	if (client::get()->Update(GetTicks()) == false) {
 		NetConnectRunning = 0;
 	}
 }
 
 int GetNetworkState()
 {
-	return Client.GetNetworkState();
+	return client::get()->GetNetworkState();
 }
 
 int FindHostIndexBy(const CHost &host)
@@ -434,7 +434,7 @@ breakout:
 */
 void NetworkDetachFromServer()
 {
-	Client.DetachFromServer();
+	client::get()->DetachFromServer();
 }
 
 /**

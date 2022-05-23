@@ -33,8 +33,8 @@ class multiplayer_setup {
 	unsigned short Race[PlayerMax];		// cannot use char since tolua interpret variable as string else.
 };
 
-class CClient {
-	static CClient *get();
+class client {
+	static client *get();
 
 	multiplayer_setup &get_server_setup();
 	multiplayer_setup &get_local_setup();

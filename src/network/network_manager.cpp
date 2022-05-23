@@ -51,7 +51,7 @@ bool network_manager::setup_server_address(const std::string &server_address, in
 		return false;
 	}
 
-	Client.SetServerHost(std::move(host));
+	client::get()->SetServerHost(std::move(host));
 
 	return true;
 }
@@ -68,19 +68,19 @@ void network_manager::init_client_connect()
 		Hosts[i].Clear();
 	}
 
-	Client.Init(preferences::get()->get_local_player_name(), &NetworkFildes, GetTicks());
+	client::get()->Init(preferences::get()->get_local_player_name(), &NetworkFildes, GetTicks());
 }
 
 void network_manager::process_client_request()
 {
-	if (Client.Update(GetTicks()) == false) {
+	if (client::get()->Update(GetTicks()) == false) {
 		NetConnectRunning = 0;
 	}
 }
 
 int network_manager::get_network_state() const
 {
-	return Client.GetNetworkState();
+	return client::get()->GetNetworkState();
 }
 
 }

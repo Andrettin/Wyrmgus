@@ -42,8 +42,6 @@
 #include "util/util.h"
 #include "version.h"
 
-CClient &Client = *CClient::get();
-
 static const char *ncconstatenames[] = {
 	"ccs_unused",
 	"ccs_connecting",          // new client
@@ -65,11 +63,13 @@ static const char *ncconstatenames[] = {
 	"ccs_incompatiblenetwork", // incompatible network version
 };
 
-CClient::CClient()
+namespace wyrmgus {
+
+client::client()
 {
 }
 
-CClient::~CClient()
+client::~client()
 {
 }
 
@@ -81,7 +81,7 @@ CClient::~CClient()
 ** @param msecs  microseconds to delay
 */
 template <typename T>
-void CClient::SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs)
+void client::SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs)
 {
 	const unsigned long now = tick;
 	if (now - networkState.LastFrame < msecs) {
@@ -102,7 +102,7 @@ void CClient::SendRateLimited(const T &msg, unsigned long tick, unsigned long ms
 }
 
 template<>
-void CClient::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &msg, unsigned long tick, unsigned long msecs)
+void client::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &msg, unsigned long tick, unsigned long msecs)
 {
 	const unsigned long now = tick;
 	if (now - networkState.LastFrame < msecs) {
@@ -122,7 +122,7 @@ void CClient::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &ms
 		icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
 }
 
-void CClient::Init(const std::string &name, CUDPSocket *socket, unsigned long tick)
+void client::Init(const std::string &name, CUDPSocket *socket, unsigned long tick)
 {
 	networkState.LastFrame = tick;
 	networkState.State = ccs_connecting;
@@ -134,13 +134,13 @@ void CClient::Init(const std::string &name, CUDPSocket *socket, unsigned long ti
 	this->socket = socket;
 }
 
-void CClient::DetachFromServer()
+void client::DetachFromServer()
 {
 	networkState.State = ccs_detaching;
 	networkState.MsgCnt = 0;
 }
 
-bool CClient::Update_disconnected()
+bool client::Update_disconnected()
 {
 	assert_throw(networkState.State == ccs_disconnected);
 	const CInitMessage_Header message(MessageInit_FromClient, ICMSeeYou);
@@ -153,7 +153,7 @@ bool CClient::Update_disconnected()
 	return false;
 }
 
-bool CClient::Update_detaching(unsigned long tick)
+bool client::Update_detaching(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_detaching);
 
@@ -167,7 +167,7 @@ bool CClient::Update_detaching(unsigned long tick)
 	}
 }
 
-bool CClient::Update_connecting(unsigned long tick)
+bool client::Update_connecting(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_connecting);
 
@@ -181,7 +181,7 @@ bool CClient::Update_connecting(unsigned long tick)
 	}
 }
 
-bool CClient::Update_connected(unsigned long tick)
+bool client::Update_connected(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_connected);
 
@@ -201,7 +201,7 @@ static bool IsLocalSetupInSync(const multiplayer_setup &state1, const multiplaye
 		&& state1.Ready[index] == state2.Ready[index]);
 }
 
-bool CClient::Update_synced(unsigned long tick)
+bool client::Update_synced(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_synced);
 
@@ -214,7 +214,7 @@ bool CClient::Update_synced(unsigned long tick)
 	return true;
 }
 
-bool CClient::Update_changed(unsigned long tick)
+bool client::Update_changed(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_changed);
 
@@ -228,7 +228,7 @@ bool CClient::Update_changed(unsigned long tick)
 	}
 }
 
-bool CClient::Update_async(unsigned long tick)
+bool client::Update_async(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_async);
 
@@ -242,7 +242,7 @@ bool CClient::Update_async(unsigned long tick)
 	}
 }
 
-bool CClient::Update_mapinfo(unsigned long tick)
+bool client::Update_mapinfo(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_mapinfo);
 
@@ -257,7 +257,7 @@ bool CClient::Update_mapinfo(unsigned long tick)
 	}
 }
 
-bool CClient::Update_badmap(unsigned long tick)
+bool client::Update_badmap(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_badmap);
 
@@ -271,7 +271,7 @@ bool CClient::Update_badmap(unsigned long tick)
 	}
 }
 
-bool CClient::Update_goahead(unsigned long tick)
+bool client::Update_goahead(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_goahead);
 
@@ -285,7 +285,7 @@ bool CClient::Update_goahead(unsigned long tick)
 	}
 }
 
-bool CClient::Update_started(unsigned long tick)
+bool client::Update_started(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_started);
 
@@ -297,63 +297,63 @@ bool CClient::Update_started(unsigned long tick)
 	}
 }
 
-void CClient::Send_Go(unsigned long tick)
+void client::Send_Go(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMGo);
 
 	SendRateLimited(message, tick, 250);
 }
 
-void CClient::Send_Config(unsigned long tick)
+void client::Send_Config(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMConfig);
 
 	SendRateLimited(message, tick, 250);
 }
 
-void CClient::Send_MapUidMismatch(unsigned long tick)
+void client::Send_MapUidMismatch(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMMapUidMismatch); // MAP Uid doesn't match
 
 	SendRateLimited(message, tick, 650);
 }
 
-void CClient::Send_Map(unsigned long tick)
+void client::Send_Map(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMMap);
 
 	SendRateLimited(message, tick, 650);
 }
 
-void CClient::Send_Resync(unsigned long tick)
+void client::Send_Resync(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMResync);
 
 	SendRateLimited(message, tick, 450);
 }
 
-void CClient::Send_State(unsigned long tick)
+void client::Send_State(unsigned long tick)
 {
 	const CInitMessage_State message(MessageInit_FromClient, *this->local_setup);
 
 	SendRateLimited(message, tick, 450);
 }
 
-void CClient::Send_Waiting(unsigned long tick, unsigned long msec)
+void client::Send_Waiting(unsigned long tick, unsigned long msec)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMWaiting);
 
 	SendRateLimited(message, tick, msec);
 }
 
-void CClient::Send_Hello(unsigned long tick)
+void client::Send_Hello(unsigned long tick)
 {
 	const CInitMessage_Hello message(name.c_str());
 
 	SendRateLimited(message, tick, 500);
 }
 
-void CClient::Send_GoodBye(unsigned long tick)
+void client::Send_GoodBye(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMGoodBye);
 
@@ -363,7 +363,7 @@ void CClient::Send_GoodBye(unsigned long tick)
 /*
 ** @return false when client has finished.
 */
-bool CClient::Update(unsigned long tick)
+bool client::Update(unsigned long tick)
 {
 	switch (networkState.State) {
 		case ccs_disconnected: return Update_disconnected();
@@ -382,7 +382,7 @@ bool CClient::Update(unsigned long tick)
 	return true;
 }
 
-void CClient::SetConfig(const CInitMessage_Config &msg)
+void client::SetConfig(const CInitMessage_Config &msg)
 {
 	HostsCount = 0;
 	for (int i = 0; i < msg.hostsCount - 1; ++i) {
@@ -412,7 +412,7 @@ void CClient::SetConfig(const CInitMessage_Config &msg)
 	NetPlayers = HostsCount + 1;
 }
 
-bool CClient::Parse(const std::array<unsigned char, 1024> &buf)
+bool client::Parse(const std::array<unsigned char, 1024> &buf)
 {
 	CInitMessage_Header header;
 	header.Deserialize(buf.data());
@@ -520,7 +520,7 @@ static bool IsSafeMapName(const char *mapname)
 	return true;
 }
 
-void CClient::Parse_Map(const unsigned char *buf)
+void client::Parse_Map(const unsigned char *buf)
 {
 	if (networkState.State != ccs_connected) {
 		return;
@@ -546,7 +546,7 @@ void CClient::Parse_Map(const unsigned char *buf)
 	networkState.MsgCnt = 0;
 }
 
-void CClient::Parse_Welcome(const unsigned char *buf)
+void client::Parse_Welcome(const unsigned char *buf)
 {
 	if (networkState.State != ccs_connecting) {
 		return;
@@ -573,7 +573,7 @@ void CClient::Parse_Welcome(const unsigned char *buf)
 	}
 }
 
-void CClient::Parse_State(const unsigned char *buf)
+void client::Parse_State(const unsigned char *buf)
 {
 	CInitMessage_State msg;
 
@@ -596,7 +596,7 @@ void CClient::Parse_State(const unsigned char *buf)
 	}
 }
 
-void CClient::Parse_Config(const unsigned char *buf)
+void client::Parse_Config(const unsigned char *buf)
 {
 	if (networkState.State != ccs_synced) {
 		return;
@@ -609,7 +609,7 @@ void CClient::Parse_Config(const unsigned char *buf)
 	networkState.MsgCnt = 0;
 }
 
-void CClient::Parse_Resync(const unsigned char *buf)
+void client::Parse_Resync(const unsigned char *buf)
 {
 	if (networkState.State != ccs_async) {
 		return;
@@ -629,7 +629,7 @@ void CClient::Parse_Resync(const unsigned char *buf)
 	networkState.MsgCnt = 0;
 }
 
-void CClient::Parse_GameFull()
+void client::Parse_GameFull()
 {
 	if (networkState.State != ccs_connecting) {
 		return;
@@ -639,7 +639,7 @@ void CClient::Parse_GameFull()
 	networkState.State = ccs_nofreeslots;
 }
 
-void CClient::Parse_ProtocolMismatch(const unsigned char *buf)
+void client::Parse_ProtocolMismatch(const unsigned char *buf)
 {
 	if (networkState.State != ccs_connecting) {
 		return;
@@ -656,7 +656,7 @@ void CClient::Parse_ProtocolMismatch(const unsigned char *buf)
 	networkState.State = ccs_incompatiblenetwork;
 }
 
-void CClient::Parse_EngineMismatch(const unsigned char *buf)
+void client::Parse_EngineMismatch(const unsigned char *buf)
 {
 	if (networkState.State != ccs_connecting) {
 		return;
@@ -675,10 +675,11 @@ void CClient::Parse_EngineMismatch(const unsigned char *buf)
 **
 ** @param msg message received
 */
-void CClient::Parse_AreYouThere()
+void client::Parse_AreYouThere()
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMIAH); // IAmHere
 
 	NetworkSendICMessage(*socket, *serverHost, message);
 }
 
+}

@@ -28,26 +28,21 @@
 #pragma once
 
 #include "network/network_state.h"
+#include "util/singleton.h"
 
 class CHost;
 class CInitMessage_Config;
 class CUDPSocket;
 
 namespace wyrmgus {
-	class multiplayer_setup;
-}
 
-class CClient final
+class multiplayer_setup;
+
+class client final : public QObject, public singleton<client>
 {
 public:
-	static CClient *get()
-	{
-		static CClient instance;
-		return &instance;
-	}
-
-	CClient();
-	~CClient();
+	client();
+	~client();
 
 	void Init(const std::string &name, CUDPSocket *socket, unsigned long tick);
 
@@ -124,7 +119,7 @@ private:
 	std::unique_ptr<multiplayer_setup> local_setup;
 };
 
-extern CClient &Client;
+}
 
 static constexpr const char *icmsgsubtypenames[] = {
 	"Hello",                   // Client Request
