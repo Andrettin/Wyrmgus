@@ -438,16 +438,6 @@ void NetworkDetachFromServer()
 }
 
 /**
-** Notify state change by menu user to connected clients
-*/
-void NetworkServerResyncClients()
-{
-	if (NetConnectRunning == 1) {
-		server::get()->MarkClientsAsResync();
-	}
-}
-
-/**
 ** Multiplayer network game final race and player type setup.
 */
 void NetworkGamePrepareGameSettings()

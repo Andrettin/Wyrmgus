@@ -13,7 +13,6 @@ bool IsNetworkGame();
 void NetworkServerStartGame(void);
 void NetworkProcessClientRequest(void);
 int GetNetworkState();
-void NetworkServerResyncClients(void);
 void NetworkDetachFromServer(void);
 
 class multiplayer_setup {
