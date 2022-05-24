@@ -82,11 +82,20 @@ public:
 		return this->ready_to_start;
 	}
 	
+	bool is_ready_to_start_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->is_ready_to_start();
+	}
+	
 	void set_ready_to_start(const bool ready)
 	{
 		if (ready == this->is_ready_to_start()) {
 			return;
 		}
+
+		std::unique_lock<std::shared_mutex> lock(this->mutex);
 
 		this->ready_to_start = ready;
 		emit ready_to_start_changed();
@@ -120,6 +129,7 @@ private:
 	CUDPSocket *socket = nullptr;
 	std::unique_ptr<multiplayer_setup> setup;
 	bool ready_to_start = false;
+	mutable std::shared_mutex mutex;
 };
 
 }
