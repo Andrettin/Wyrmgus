@@ -471,10 +471,15 @@ class MenuScreen final : public gcn::Container
 public:
 	MenuScreen();
 
-	int run(const bool loop = true);
+	void run(const bool loop = true);
 
-	void stop(int result = 0, bool stopAll = false);
-	void stopAll(int result = 0) { stop(result, true); }
+	void stop(bool stopAll = false);
+
+	void stopAll()
+	{
+		this->stop(true);
+	}
+
 	void addLogicCallback(LuaActionListener *listener);
 	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 	virtual void logic() override;
@@ -483,7 +488,6 @@ public:
 
 private:
 	bool runLoop = true;
-	int loopResult;
 	gcn::Widget *oldtop;
 	LuaActionListener *logiclistener = nullptr;
 	bool drawUnder = false;

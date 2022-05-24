@@ -50,7 +50,7 @@
 #include "ui/ui.h"
 #include "util/assert_util.h"
 #include "util/colorization_type.h"
-#include "util/thread_pool.h"
+#include "util/event_loop.h"
 #include "video/font.h"
 #include "video/video.h"
 
@@ -2500,45 +2500,42 @@ MenuScreen::MenuScreen() : Container()
 /**
 **  Run the menu.  Loops until stop is called.
 */
-int MenuScreen::run(const bool loop)
+void MenuScreen::run(const bool loop)
 {
-	loopResult = 0;
-	runLoop = loop;
-	running = true;
+	event_loop::get()->co_spawn([this, loop]() -> boost::asio::awaitable<void> {
+		runLoop = loop;
+		running = true;
 
-	CurrentCursorState = CursorState::Point;
-	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
-	CursorOn = cursor_on::unknown;
+		CurrentCursorState = CursorState::Point;
+		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
+		CursorOn = cursor_on::unknown;
 
-	if (this->getDrawMenusUnder()) {
-		engine_interface::get()->change_lua_dialog_open_count(1);
-	}
-
-	if (loop) {
-		const EventCallback *old_callbacks = GetCallbacks();
-		SetCallbacks(&GuichanCallbacks);
-		while (runLoop && GameResult != GameExit) {
-			UpdateDisplay();
-			CheckMusicFinished();
-
-			thread_pool::get()->co_spawn_sync([]() -> boost::asio::awaitable<void> {
-				co_await WaitEventsOneFrame();
-			});
+		if (this->getDrawMenusUnder()) {
+			engine_interface::get()->change_lua_dialog_open_count(1);
 		}
-		SetCallbacks(old_callbacks);
-		Gui->setTop(this->oldtop);
-	} else {
-		SetCallbacks(&GuichanCallbacks);
-		MenuStack.push(this);
-	}
 
-	return this->loopResult;
+		if (loop) {
+			const EventCallback *old_callbacks = GetCallbacks();
+			SetCallbacks(&GuichanCallbacks);
+			while (runLoop && GameResult != GameExit) {
+				UpdateDisplay();
+				CheckMusicFinished();
+
+				co_await WaitEventsOneFrame();
+			}
+			SetCallbacks(old_callbacks);
+			Gui->setTop(this->oldtop);
+		} else {
+			SetCallbacks(&GuichanCallbacks);
+			MenuStack.push(this);
+		}
+	});
 }
 
 /**
 **  Stop the menu from running
 */
-void MenuScreen::stop(int result, bool stopAll)
+void MenuScreen::stop(bool stopAll)
 {
 	if (running == false) {
 		return;
@@ -2573,7 +2570,6 @@ void MenuScreen::stop(int result, bool stopAll)
 	}
 
 	runLoop = false;
-	loopResult = result;
 	running = false;
 }
 

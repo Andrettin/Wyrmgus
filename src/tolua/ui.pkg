@@ -441,9 +441,9 @@ class MenuScreen : public Container
 {
 	MenuScreen();
 
-	int run(bool loop = true);
-	void stop(int result = 0);
-	void stopAll(int result = 0);
+	void run(bool loop = true);
+	void stop();
+	void stopAll();
 	void addLogicCallback(LuaActionListener *actionListener);
 	void setDrawMenusUnder(bool drawunder);
 	bool getDrawMenusUnder();
