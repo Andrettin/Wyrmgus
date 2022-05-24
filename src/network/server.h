@@ -72,6 +72,9 @@ public:
 	Q_INVOKABLE void set_resources_option(const int value);
 	Q_INVOKABLE void set_difficulty(const int difficulty);
 
+	Q_INVOKABLE void start_game();
+	void init_game();
+
 private:
 	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
 	void Parse_Resync(const int h);

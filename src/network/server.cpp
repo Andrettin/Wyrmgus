@@ -29,12 +29,18 @@
 
 #include "network/server.h"
 
+#include "game/game.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "network/multiplayer_setup.h"
 #include "network/netconnect.h"
 #include "network/netsockets.h"
+#include "player/player_type.h"
 #include "settings.h"
+#include "util/assert_util.h"
+#include "util/event_loop.h"
+#include "util/path_util.h"
+#include "util/random.h"
 #include "version.h"
 
 /**
@@ -176,6 +182,276 @@ void server::set_difficulty(const int difficulty)
 	GameSettings.Difficulty = difficulty;
 
 	this->resync_clients();
+}
+
+void server::start_game()
+{
+	event_loop::get()->co_spawn([this]() -> boost::asio::awaitable<void> {
+		CMap::get()->NoFogOfWar = !static_cast<bool>(this->setup->FogOfWar);
+
+		if (static_cast<bool>(this->setup->RevealMap)) {
+			FlagRevealMap = 1;
+		}
+
+		this->init_game();
+
+		NetworkGamePrepareGameSettings();
+
+		co_await game::get()->run_map(path::from_string(NetworkMapName));
+	});
+}
+
+void server::init_game()
+{
+	assert_throw(this->setup->CompOpt[0] == 0);
+
+	//save it first...
+	multiplayer_setup local_setup = *this->setup;
+
+	//make a list of the available player slots.
+	std::array<int, PlayerMax> num{};
+	std::array<int, PlayerMax> rev{};
+	int h = 0;
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (CMap::get()->Info->get_player_types()[i] == player_type::person) {
+			rev[i] = h;
+			num[h++] = i;
+			DebugPrint("Slot %d is available for an interactive player (%d)\n" _C_ i _C_ rev[i]);
+		}
+	}
+	// Make a list of the available computer slots.
+	int n = h;
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (CMap::get()->Info->get_player_types()[i] == player_type::computer) {
+			rev[i] = n++;
+			DebugPrint("Slot %d is available for an ai computer player (%d)\n" _C_ i _C_ rev[i]);
+		}
+	}
+	// Make a list of the remaining slots.
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (CMap::get()->Info->get_player_types()[i] != player_type::person
+			&& CMap::get()->Info->get_player_types()[i] != player_type::computer) {
+			rev[i] = n++;
+			// player_type::nobody - not available to anything..
+		}
+	}
+
+#ifdef DEBUG
+	printf("Initial Server Multiplayer Setup:\n");
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		printf("%02d: CO: %d   Race: %d   Host: ", i, this->setup->CompOpt[i], this->setup->Race[i]);
+		if (this->setup->CompOpt[i] == 0) {
+			const std::string hostStr = CHost(Hosts[i].Host, Hosts[i].Port).toString();
+			printf(" %s %s", hostStr.c_str(), Hosts[i].PlyName);
+		}
+		printf("\n");
+	}
+#endif
+
+	std::array<int, PlayerMax> org{};
+	// Reverse to assign slots to menu setup state positions.
+	for (int i = 0; i < PlayerMax; ++i) {
+		org[i] = -1;
+		for (int j = 0; j < PlayerMax; ++j) {
+			if (rev[j] == i) {
+				org[i] = j;
+				break;
+			}
+		}
+	}
+
+	// Calculate NetPlayers
+	NetPlayers = h;
+	//Wyrmgus start
+//	int compPlayers = this->setup->Opponents;
+	const bool compPlayers = this->setup->Opponents > 0;
+	//Wyrmgus end
+	for (int i = 1; i < h; ++i) {
+		if (Hosts[i].PlyNr == 0 && this->setup->CompOpt[i] != 0) {
+			NetPlayers--;
+		} else if (Hosts[i].PlyName[0] == 0) {
+			NetPlayers--;
+			//Wyrmgus start
+//			if (--compPlayers >= 0) {
+			if (compPlayers) {
+				//Wyrmgus end
+					// Unused slot gets a computer player
+				this->setup->CompOpt[i] = 1;
+				local_setup.CompOpt[i] = 1;
+			} else {
+				this->setup->CompOpt[i] = 2;
+				local_setup.CompOpt[i] = 2;
+			}
+		}
+	}
+
+	// Compact host list.. (account for computer/closed slots in the middle..)
+	for (int i = 1; i < h; ++i) {
+		if (Hosts[i].PlyNr == 0) {
+			int j;
+			for (j = i + 1; j < PlayerMax - 1; ++j) {
+				if (Hosts[j].PlyNr) {
+					DebugPrint("Compact: Hosts %d -> Hosts %d\n" _C_ j _C_ i);
+					Hosts[i] = Hosts[j];
+					Hosts[j].Clear();
+					std::swap(local_setup.CompOpt[i], local_setup.CompOpt[j]);
+					std::swap(local_setup.Race[i], local_setup.Race[j]);
+					break;
+				}
+			}
+			if (j == PlayerMax - 1) {
+				break;
+			}
+		}
+	}
+
+	// Randomize the position.
+	// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
+	// Players slots are then mapped to players numbers(and colors).
+
+	if (NoRandomPlacementMultiplayer == 1) {
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (CMap::get()->Info->get_player_types()[i] != player_type::computer) {
+				org[i] = Hosts[i].PlyNr;
+			}
+		}
+	} else {
+		int j = h;
+		for (int i = 0; i < NetPlayers; ++i) {
+			assert_throw(j > 0);
+			int chosen = random::get()->generate_async(j);
+
+			n = num[chosen];
+			Hosts[i].PlyNr = n;
+			int k = org[i];
+			if (k != n) {
+				for (int o = 0; o < PlayerMax; ++o) {
+					if (org[o] == n) {
+						org[o] = k;
+						break;
+					}
+				}
+				org[i] = n;
+			}
+			DebugPrint("Assigning player %d to slot %d (%d)\n" _C_ i _C_ n _C_ org[i]);
+
+			num[chosen] = num[--j];
+		}
+	}
+
+	// Complete all setup states for the assigned slots.
+	for (int i = 0; i < PlayerMax; ++i) {
+		num[i] = 1;
+		n = org[i];
+		this->setup->CompOpt[n] = local_setup.CompOpt[i];
+		this->setup->Race[n] = local_setup.Race[i];
+	}
+
+	/* NOW we have NetPlayers in Hosts array, with server multiplayer setup shuffled up to match it.. */
+
+	//
+	// Send all clients host:ports to all clients.
+	//  Slot 0 is the server!
+	//
+	NetLocalPlayerNumber = Hosts[0].PlyNr;
+	HostsCount = NetPlayers - 1;
+
+	// Move ourselves (server slot 0) to the end of the list
+	std::swap(Hosts[0], Hosts[HostsCount]);
+
+	// Prepare the final config message:
+	CInitMessage_Config message;
+	message.hostsCount = NetPlayers;
+	for (int i = 0; i < NetPlayers; ++i) {
+		message.hosts[i] = Hosts[i];
+		message.hosts[i].PlyNr = Hosts[i].PlyNr;
+	}
+
+	// Prepare the final state message:
+	const CInitMessage_State statemsg(MessageInit_FromServer, *this->setup);
+
+	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ HostsCount);
+	// Send all clients host:ports to all clients.
+	for (int j = HostsCount; j;) {
+
+	breakout:
+		// Send to all clients.
+		for (int i = 0; i < HostsCount; ++i) {
+			const CHost host(message.hosts[i].Host, message.hosts[i].Port);
+
+			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
+				message.clientIndex = i;
+				NetworkSendICMessage_Log(*this->socket, host, message);
+			} else if (num[Hosts[i].PlyNr] == 2) {
+				NetworkSendICMessage_Log(*this->socket, host, statemsg);
+			}
+		}
+
+		// Wait for acknowledge
+		std::array<unsigned char, 1024> buf{};
+		while (j && this->socket->HasDataToRead(1000)) {
+			CHost host;
+			const int len = this->socket->Recv(buf, sizeof(buf), &host);
+			if (len < 0) {
+#ifdef DEBUG
+				const std::string hostStr = host.toString();
+				DebugPrint("*Receive ack failed: (%d) from %s\n" _C_ len _C_ hostStr.c_str());
+#endif
+				continue;
+			}
+			CInitMessage_Header header;
+			header.Deserialize(buf.data());
+			const unsigned char type = header.GetType();
+			const unsigned char subtype = header.GetSubType();
+
+			if (type == MessageInit_FromClient) {
+				switch (subtype) {
+				case ICMConfig: {
+#ifdef DEBUG
+					const std::string hostStr = host.toString();
+					DebugPrint("Got ack for InitConfig from %s\n" _C_ hostStr.c_str());
+#endif
+					const int index = FindHostIndexBy(host);
+					if (index != -1) {
+						if (num[Hosts[index].PlyNr] == 1) {
+							num[Hosts[index].PlyNr]++;
+						}
+						goto breakout;
+					}
+					break;
+				}
+				case ICMGo: {
+#ifdef DEBUG
+					const std::string hostStr = host.toString();
+					DebugPrint("Got ack for InitState from %s\n" _C_ hostStr.c_str());
+#endif
+					const int index = FindHostIndexBy(host);
+					if (index != -1) {
+						if (num[Hosts[index].PlyNr] == 2) {
+							num[Hosts[index].PlyNr] = 0;
+							--j;
+							DebugPrint("Removing host %d from waiting list\n" _C_ j);
+						}
+					}
+					break;
+				}
+				default:
+					DebugPrint("Server: Config ACK: Unhandled subtype %d\n" _C_ subtype);
+					break;
+				}
+			} else {
+				DebugPrint("Unexpected Message Type %d while waiting for Config ACK\n" _C_ type);
+			}
+		}
+	}
+
+	DebugPrint("DONE: All configs acked - Now starting...\n");
+	// Give clients a quick-start kick..
+	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
+	for (int i = 0; i < HostsCount; ++i) {
+		const CHost host(Hosts[i].Host, Hosts[i].Port);
+		NetworkSendICMessage_Log(*this->socket, host, message_go);
+	}
 }
 
 void server::Send_AreYouThere(const CNetworkHost &host)

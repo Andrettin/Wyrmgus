@@ -89,6 +89,7 @@ extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts arr
 extern int NetLocalPlayerNumber;           /// Player number of local client
 
 extern std::string NetworkMapName;
+extern int NoRandomPlacementMultiplayer;
 
 template <typename T>
 inline void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
@@ -114,7 +115,6 @@ inline void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, cons
 extern void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
 extern int FindHostIndexBy(const CHost &host);
-extern void NetworkServerStartGame();       /// Server user has finally hit the start game button
 extern void NetworkGamePrepareGameSettings();
 
 extern int GetNetworkState();
