@@ -147,6 +147,26 @@ void server::set_computer_opponents(const bool value)
 	this->resync_clients();
 }
 
+void server::set_player_civilization(const int player_index, const int civilization_index)
+{
+	this->setup->Race[player_index] = civilization_index;
+
+	GameSettings.Presets[player_index].Race = civilization_index;
+
+	this->resync_clients();
+}
+
+void server::set_resources_option(const int value)
+{
+	const uint8_t value_uint8 = static_cast<uint8_t>(value);
+
+	this->setup->ResourcesOption = value_uint8;
+
+	GameSettings.Resources = value;
+
+	this->resync_clients();
+}
+
 void server::set_difficulty(const int difficulty)
 {
 	const uint8_t difficulty_uint8 = static_cast<uint8_t>(difficulty);
@@ -154,15 +174,6 @@ void server::set_difficulty(const int difficulty)
 	this->setup->Difficulty = difficulty_uint8;
 
 	GameSettings.Difficulty = difficulty;
-
-	this->resync_clients();
-}
-
-void server::set_player_civilization(const int player_index, const int civilization_index)
-{
-	this->setup->Race[player_index] = civilization_index;
-
-	GameSettings.Presets[player_index].Race = civilization_index;
 
 	this->resync_clients();
 }

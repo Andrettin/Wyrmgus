@@ -68,8 +68,9 @@ public:
 	Q_INVOKABLE void set_fog_of_war(const bool fow);
 	Q_INVOKABLE void set_reveal_map(const bool reveal_map);
 	Q_INVOKABLE void set_computer_opponents(const bool value);
-	Q_INVOKABLE void set_difficulty(const int difficulty);
 	Q_INVOKABLE void set_player_civilization(const int player_index, const int civilization_index);
+	Q_INVOKABLE void set_resources_option(const int value);
+	Q_INVOKABLE void set_difficulty(const int difficulty);
 
 private:
 	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
