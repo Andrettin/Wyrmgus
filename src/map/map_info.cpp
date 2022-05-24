@@ -190,6 +190,11 @@ QString map_info::get_presentation_filepath_qstring() const
 	return path::to_qstring(this->get_presentation_filepath());
 }
 
+QString map_info::get_presentation_filename_qstring() const
+{
+	return path::to_qstring(this->get_presentation_filepath().filename());
+}
+
 int map_info::get_player_count() const
 {
 	int count = 0;

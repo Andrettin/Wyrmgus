@@ -52,6 +52,7 @@ class map_info final : public QObject
 	Q_PROPERTY(std::string description MEMBER description)
 	Q_PROPERTY(std::string author MEMBER author)
 	Q_PROPERTY(QString presentation_filepath READ get_presentation_filepath_qstring CONSTANT)
+	Q_PROPERTY(QString presentation_filename READ get_presentation_filename_qstring CONSTANT)
 	Q_PROPERTY(QSize map_size MEMBER map_size READ get_map_size NOTIFY changed)
 	Q_PROPERTY(int map_width READ get_map_width CONSTANT)
 	Q_PROPERTY(int map_height READ get_map_height CONSTANT)
@@ -110,6 +111,8 @@ public:
 	{
 		this->presentation_filepath = filepath;
 	}
+
+	QString get_presentation_filename_qstring() const;
 
 	std::filesystem::path get_setup_filepath() const
 	{
