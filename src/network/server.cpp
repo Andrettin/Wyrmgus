@@ -122,8 +122,9 @@ void server::set_fog_of_war(const bool fow)
 
 	this->setup->FogOfWar = fow_uint8;
 
-	this->resync_clients();
 	GameSettings.NoFogOfWar = !fow;
+
+	this->resync_clients();
 }
 
 void server::set_reveal_map(const bool reveal_map)
@@ -132,8 +133,38 @@ void server::set_reveal_map(const bool reveal_map)
 
 	this->setup->RevealMap = reveal_map_uint8;
 
-	this->resync_clients();
 	GameSettings.RevealMap = reveal_map;
+
+	this->resync_clients();
+}
+
+void server::set_computer_opponents(const bool value)
+{
+	const uint8_t value_uint8 = static_cast<uint8_t>(value);
+
+	this->setup->Opponents = value_uint8;
+
+	this->resync_clients();
+}
+
+void server::set_difficulty(const int difficulty)
+{
+	const uint8_t difficulty_uint8 = static_cast<uint8_t>(difficulty);
+
+	this->setup->Difficulty = difficulty_uint8;
+
+	GameSettings.Difficulty = difficulty;
+
+	this->resync_clients();
+}
+
+void server::set_player_civilization(const int player_index, const int civilization_index)
+{
+	this->setup->Race[player_index] = civilization_index;
+
+	GameSettings.Presets[player_index].Race = civilization_index;
+
+	this->resync_clients();
 }
 
 void server::Send_AreYouThere(const CNetworkHost &host)
