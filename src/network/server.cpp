@@ -39,6 +39,7 @@
 #include "settings.h"
 #include "util/assert_util.h"
 #include "util/event_loop.h"
+#include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/random.h"
 #include "version.h"
@@ -104,6 +105,8 @@ void server::KickClient(int c)
 			this->networkStates[n].State = ccs_async;
 		}
 	}
+
+	this->check_ready_to_start();
 }
 
 void server::init(const std::string &name, CUDPSocket *socket, const int open_slots)
@@ -120,6 +123,8 @@ void server::init(const std::string &name, CUDPSocket *socket, const int open_sl
 	for (int i = open_slots; i < PlayerMax - 1; ++i) {
 		this->setup->CompOpt[i] = 1;
 	}
+
+	this->ready_to_start = false;
 }
 
 void server::set_fog_of_war(const bool fow)
@@ -454,6 +459,26 @@ void server::init_game()
 	}
 }
 
+void server::check_ready_to_start()
+{
+	int connected_player_count = 0;
+	int ready_player_count = 0;
+
+	for (int i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
+		if (Hosts[i].PlyName[0] == 0) {
+			continue;
+		}
+
+		++connected_player_count;
+
+		if (this->setup->Ready[i] == 1) {
+			++ready_player_count;
+		}
+	}
+
+	this->set_ready_to_start(connected_player_count > 0 && ready_player_count == connected_player_count);
+}
+
 void server::Send_AreYouThere(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMAYT); // AreYouThere
@@ -641,6 +666,8 @@ int server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 	// this code path happens until client sends waiting (= has received this message)
 	Send_Welcome(Hosts[h], h);
 
+	this->check_ready_to_start();
+
 	networkStates[h].MsgCnt++;
 	if (networkStates[h].MsgCnt > 48) {
 		// Detects UDP input firewalled or behind NAT firewall clients
@@ -648,6 +675,7 @@ int server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 		KickClient(h);
 		return -1;
 	}
+
 	return h;
 }
 
@@ -811,9 +839,11 @@ void server::Parse_State(const int h, const CInitMessage_State &msg)
 		break;
 	}
 	default:
-		DebugPrint("Server: ICMState: Unhandled state %d Host %d\n" _C_ networkStates[h].State _C_ h);
+		log::log_error("Server: ICMState: Unhandled state " + std::to_string(networkStates[h].State)  + " Host " + std::to_string(h));
 		break;
 	}
+
+	this->check_ready_to_start();
 }
 
 /**

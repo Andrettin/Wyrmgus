@@ -43,6 +43,8 @@ class server final : public QObject, public singleton<server>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(bool ready_to_start READ is_ready_to_start NOTIFY ready_to_start_changed)
+
 public:
 	server();
 	~server();
@@ -75,6 +77,23 @@ public:
 	Q_INVOKABLE void start_game();
 	void init_game();
 
+	bool is_ready_to_start() const
+	{
+		return this->ready_to_start;
+	}
+	
+	void set_ready_to_start(const bool ready)
+	{
+		if (ready == this->is_ready_to_start()) {
+			return;
+		}
+
+		this->ready_to_start = ready;
+		emit ready_to_start_changed();
+	}
+
+	void check_ready_to_start();
+
 private:
 	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
 	void Parse_Resync(const int h);
@@ -92,11 +111,15 @@ private:
 	void Send_State(const CNetworkHost &host);
 	void Send_GoodBye(const CNetworkHost &host);
 
+signals:
+	void ready_to_start_changed();
+
 private:
 	std::string name;
 	NetworkState networkStates[PlayerMax]; /// Client Host states
 	CUDPSocket *socket = nullptr;
 	std::unique_ptr<multiplayer_setup> setup;
+	bool ready_to_start = false;
 };
 
 }
