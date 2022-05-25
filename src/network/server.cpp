@@ -488,20 +488,10 @@ void server::init_game()
 
 void server::check_ready_to_start()
 {
-	int connected_player_count = 0;
-	int ready_player_count = 0;
+	network_manager::get()->check_players(this->setup.get());
 
-	for (int i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
-		if (Hosts[i].PlyName[0] == 0) {
-			continue;
-		}
-
-		++connected_player_count;
-
-		if (this->setup->Ready[i] == 1) {
-			++ready_player_count;
-		}
-	}
+	const int connected_player_count = network_manager::get()->get_connected_player_count();
+	const int ready_player_count = network_manager::get()->get_ready_player_count();
 
 	this->set_ready_to_start(connected_player_count > 0 && ready_player_count == connected_player_count);
 }

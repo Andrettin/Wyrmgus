@@ -122,4 +122,25 @@ QString network_manager::get_player_name(const int player_index) const
 	return Hosts[player_index].PlyName;
 }
 
+void network_manager::check_players(const multiplayer_setup *setup)
+{
+	int connected_player_count = 0;
+	int ready_player_count = 0;
+
+	for (int i = 1; i < PlayerMax - 1; ++i) {
+		if (Hosts[i].PlyName[0] == 0) {
+			continue;
+		}
+
+		++connected_player_count;
+
+		if (setup->Ready[i] == 1) {
+			++ready_player_count;
+		}
+	}
+
+	this->set_connected_player_count(connected_player_count);
+	this->ready_player_count = ready_player_count;
+}
+
 }
