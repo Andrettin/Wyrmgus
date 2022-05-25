@@ -28,35 +28,10 @@
 
 #pragma once
 
+#include "network/multiplayer_host.h"
 #include "network/multiplayer_setup.h"
 
-/**
- * Number of bytes in the name of a network player,
- * including the terminating null character.
- */
-constexpr int NetPlayerNameSize = 16;
-
 constexpr int MaxNetworkCommands = 9;  /// Max Commands In A Packet
-
-/**
-**  Network systems active in current game.
-*/
-class CNetworkHost
-{
-public:
-	CNetworkHost() { Clear(); }
-	size_t Serialize(unsigned char *buf) const;
-	size_t Deserialize(const unsigned char *buf);
-	void Clear();
-	static size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
-
-	void SetName(const char *name);
-
-	uint32_t Host;         /// Host address
-	uint16_t Port;         /// Port on host
-	uint16_t PlyNr;        /// Player number
-	char PlyName[NetPlayerNameSize];  /// Name of player
-};
 
 /**
 **  Network init config message subtypes (menu state machine).
@@ -132,13 +107,17 @@ public:
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + 4 + PlayerMax * CNetworkHost::Size(); }
+
+	static size_t Size()
+	{
+		return CInitMessage_Header::Size() + 4 + PlayerMax * multiplayer_host::Size();
+	}
 private:
 	CInitMessage_Header header;
 public:
 	uint8_t clientIndex; /// index of receiver in hosts[]
 	uint8_t hostsCount;  /// Number of hosts
-	CNetworkHost hosts[PlayerMax]; /// Participant information
+	multiplayer_host hosts[PlayerMax]; /// Participant information
 };
 
 class CInitMessage_EngineMismatch
@@ -176,11 +155,16 @@ public:
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + PlayerMax * CNetworkHost::Size() + 2 * 4; }
+
+	static size_t Size()
+	{
+		return CInitMessage_Header::Size() + PlayerMax * multiplayer_host::Size() + 2 * 4;
+	}
+
 private:
 	CInitMessage_Header header;
 public:
-	CNetworkHost hosts[PlayerMax]; /// Participants information
+	multiplayer_host hosts[PlayerMax]; /// Participants information
 	int32_t Lag;                   /// Lag time
 	int32_t gameCyclesPerUpdate;   /// Update frequency
 };
@@ -228,11 +212,16 @@ public:
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + CNetworkHost::Size() * PlayerMax; }
+
+	static size_t Size()
+	{
+		return CInitMessage_Header::Size() + multiplayer_host::Size() * PlayerMax;
+	}
+
 private:
 	CInitMessage_Header header;
 public:
-	CNetworkHost hosts[PlayerMax]; /// Participant information
+	multiplayer_host hosts[PlayerMax]; /// Participant information
 };
 
 /**
@@ -449,7 +438,35 @@ public:
 	std::vector<unsigned char> Command[MaxNetworkCommands];
 };
 
+extern size_t serialize32(unsigned char *buf, uint32_t data);
+extern size_t serialize32(unsigned char *buf, int32_t data);
+extern size_t serialize16(unsigned char *buf, uint16_t data);
+extern size_t serialize16(unsigned char *buf, int16_t data);
 extern size_t serialize8(unsigned char *buf, uint8_t data);
 extern size_t serialize8(unsigned char *buf, int8_t data);
+extern size_t serialize(unsigned char *buf, const std::string &s);
+extern size_t serialize(unsigned char *buf, const std::vector<unsigned char> &data);
+extern size_t deserialize32(const unsigned char *buf, uint32_t *data);
+extern size_t deserialize32(const unsigned char *buf, int32_t *data);
+extern size_t deserialize16(const unsigned char *buf, uint16_t *data);
+extern size_t deserialize16(const unsigned char *buf, int16_t *data);
 extern size_t deserialize8(const unsigned char *buf, uint8_t *data);
 extern size_t deserialize8(const unsigned char *buf, int8_t *data);
+extern size_t deserialize(const unsigned char *buf, std::string &s);
+extern size_t deserialize(const unsigned char *buf, std::vector<unsigned char> &data);
+
+template <int N>
+inline size_t serialize(unsigned char *buf, const char(&data)[N])
+{
+	if (buf) {
+		memcpy(buf, data, N);
+	}
+	return N;
+}
+
+template <int N>
+inline size_t deserialize(const unsigned char *buf, char(&data)[N])
+{
+	memcpy(data, buf, N);
+	return N;
+}

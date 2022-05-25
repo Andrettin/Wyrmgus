@@ -33,10 +33,11 @@
 class CHost;
 class CInitMessage_Hello;
 class CInitMessage_State;
-class CNetworkHost;
 class CUDPSocket;
+
 namespace wyrmgus {
 
+class multiplayer_host;
 class multiplayer_setup;
 
 class server final : public QObject, public singleton<server>
@@ -112,13 +113,13 @@ private:
 	void Parse_GoodBye(const int h);
 	void Parse_SeeYou(const int h);
 
-	void Send_AreYouThere(const CNetworkHost &host);
+	void Send_AreYouThere(const multiplayer_host &host);
 	void Send_GameFull(const CHost &host);
-	void Send_Welcome(const CNetworkHost &host, int hostIndex);
-	void Send_Resync(const CNetworkHost &host, int hostIndex);
-	void Send_Map(const CNetworkHost &host);
-	void Send_State(const CNetworkHost &host);
-	void Send_GoodBye(const CNetworkHost &host);
+	void Send_Welcome(const multiplayer_host &host, int hostIndex);
+	void Send_Resync(const multiplayer_host &host, int hostIndex);
+	void Send_Map(const multiplayer_host &host);
+	void Send_State(const multiplayer_host &host);
+	void Send_GoodBye(const multiplayer_host &host);
 
 signals:
 	void ready_to_start_changed();

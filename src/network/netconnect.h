@@ -81,7 +81,7 @@ enum _net_client_con_state_ {
 extern int NetPlayers;                /// Network players
 
 extern int HostsCount;                /// Number of hosts.
-extern CNetworkHost Hosts[PlayerMax]; /// Host, port, and number of all players.
+extern multiplayer_host Hosts[PlayerMax]; /// Host, port, and number of all players.
 
 extern int NetConnectRunning;              /// Network menu: Setup mode active
 extern int NetConnectType;              /// Network menu: Setup mode active

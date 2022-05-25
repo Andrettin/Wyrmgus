@@ -10,7 +10,7 @@
 //
 /**@name net_message.cpp - The network message code. */
 //
-//      (c) Copyright 2013 by Joris Dauphin
+//      (c) Copyright 2013-2022 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -83,15 +83,6 @@ size_t serialize8(unsigned char *buf, int8_t data)
 		*buf = data;
 	}
 	return sizeof(data);
-}
-
-template <int N>
-size_t serialize(unsigned char *buf, const char(&data)[N])
-{
-	if (buf) {
-		memcpy(buf, data, N);
-	}
-	return N;
 }
 
 size_t serialize(unsigned char *buf, const std::string &s)
@@ -169,13 +160,6 @@ size_t deserialize8(const unsigned char *buf, int8_t *data)
 	return sizeof(*data);
 }
 
-template <int N>
-size_t deserialize(const unsigned char *buf, char(&data)[N])
-{
-	memcpy(data, buf, N);
-	return N;
-}
-
 size_t deserialize(const unsigned char *buf, std::string &s)
 {
 	uint16_t size;
@@ -198,44 +182,6 @@ size_t deserialize(const unsigned char *buf, std::vector<unsigned char> &data)
 //	return 2 + ((data.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
 	return 2 + (data.size() + 3);
 	//Wyrmgus end
-}
-
-// CNetworkHost
-
-size_t CNetworkHost::Serialize(unsigned char *buf) const
-{
-	unsigned char *p = buf;
-
-	p += serialize32(p, this->Host);
-	p += serialize16(p, this->Port);
-	p += serialize16(p, this->PlyNr);
-	p += serialize(p, this->PlyName);
-
-	return p - buf;
-}
-
-size_t CNetworkHost::Deserialize(const unsigned char *p)
-{
-	const unsigned char *buf = p;
-
-	p += deserialize32(p, &Host);
-	p += deserialize16(p, &Port);
-	p += deserialize16(p, &PlyNr);
-	p += deserialize(p, this->PlyName);
-	return p - buf;
-}
-
-void CNetworkHost::Clear()
-{
-	this->Host = 0;
-	this->Port = 0;
-	this->PlyNr = 0;
-	memset(this->PlyName, 0, sizeof(this->PlyName));
-}
-
-void CNetworkHost::SetName(const char *name)
-{
-	strncpy_s(this->PlyName, sizeof(this->PlyName), name, _TRUNCATE);
 }
 
 //  CInitMessage_Header

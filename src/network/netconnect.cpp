@@ -52,7 +52,7 @@
 #include "video/video.h"
 
 int HostsCount;                        /// Number of hosts.
-CNetworkHost Hosts[PlayerMax];         /// Host and ports of all players.
+multiplayer_host Hosts[PlayerMax];         /// Host and ports of all players.
 
 int NetConnectRunning = 0;             /// Network menu: Setup mode active
 int NetConnectType = 0;             /// Network menu: Setup mode active

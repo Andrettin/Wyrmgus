@@ -491,7 +491,7 @@ void server::check_ready_to_start()
 	this->set_ready_to_start(connected_player_count > 0 && ready_player_count == connected_player_count);
 }
 
-void server::Send_AreYouThere(const CNetworkHost &host)
+void server::Send_AreYouThere(const multiplayer_host &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMAYT); // AreYouThere
 
@@ -505,7 +505,7 @@ void server::Send_GameFull(const CHost &host)
 	NetworkSendICMessage_Log(*socket, host, message);
 }
 
-void server::Send_Welcome(const CNetworkHost &host, int index)
+void server::Send_Welcome(const multiplayer_host &host, int index)
 {
 	CInitMessage_Welcome message;
 
@@ -519,7 +519,7 @@ void server::Send_Welcome(const CNetworkHost &host, int index)
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
-void server::Send_Resync(const CNetworkHost &host, int hostIndex)
+void server::Send_Resync(const multiplayer_host &host, int hostIndex)
 {
 	CInitMessage_Resync message;
 
@@ -531,21 +531,21 @@ void server::Send_Resync(const CNetworkHost &host, int hostIndex)
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
-void server::Send_Map(const CNetworkHost &host)
+void server::Send_Map(const multiplayer_host &host)
 {
 	const CInitMessage_Map message(NetworkMapName.c_str(), CMap::get()->Info->MapUID);
 
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
-void server::Send_State(const CNetworkHost &host)
+void server::Send_State(const multiplayer_host &host)
 {
 	const CInitMessage_State message(MessageInit_FromServer, *this->setup);
 
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
-void server::Send_GoodBye(const CNetworkHost &host)
+void server::Send_GoodBye(const multiplayer_host &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGoodBye);
 
