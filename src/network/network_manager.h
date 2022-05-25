@@ -44,6 +44,8 @@ public:
 	client *get_client() const;
 	server *get_server() const;
 
+	void reset();
+
 	bool setup_server_address(const std::string &server_address, int port);
 
 	Q_INVOKABLE bool setup_server_address(const QString &server_address, const int port = 0)
@@ -57,6 +59,20 @@ public:
 	Q_INVOKABLE void init_server_connect(const int open_slots);
 
 	Q_INVOKABLE int get_network_state() const;
+
+	Q_INVOKABLE QString get_player_name(const int player_index) const;
+
+	std::shared_mutex &get_mutex() const
+	{
+		return this->mutex;
+	}
+
+signals:
+	void player_name_changed(const int player_index, const QString &name);
+	void player_ready_changed(const int player_index, const bool ready);
+
+private:
+	mutable std::shared_mutex mutex;
 };
 
 }

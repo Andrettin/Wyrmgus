@@ -35,6 +35,7 @@
 #include "network/multiplayer_setup.h"
 #include "network/netconnect.h"
 #include "network/netsockets.h"
+#include "network/network_manager.h"
 #include "player/player_type.h"
 #include "settings.h"
 #include "util/assert_util.h"
@@ -94,6 +95,9 @@ server::~server()
 void server::KickClient(int c)
 {
 	DebugPrint("kicking client %d\n" _C_ Hosts[c].PlyNr);
+
+	const bool was_ready = static_cast<bool>(this->setup->Ready[c]);
+
 	Hosts[c].Clear();
 	this->setup->Ready[c] = 0;
 	this->setup->Race[c] = 0;
@@ -104,6 +108,10 @@ void server::KickClient(int c)
 		if (n != c && Hosts[n].PlyNr) {
 			this->networkStates[n].State = ccs_async;
 		}
+	}
+
+	if (was_ready) {
+		emit network_manager::get()->player_ready_changed(c, false);
 	}
 
 	this->check_ready_to_start();
@@ -373,8 +381,15 @@ void server::init_game()
 	NetLocalPlayerNumber = Hosts[0].PlyNr;
 	HostsCount = NetPlayers - 1;
 
-	// Move ourselves (server slot 0) to the end of the list
-	std::swap(Hosts[0], Hosts[HostsCount]);
+	{
+		std::unique_lock<std::shared_mutex> lock(network_manager::get()->get_mutex());
+
+		// Move ourselves (server slot 0) to the end of the list
+		std::swap(Hosts[0], Hosts[HostsCount]);
+
+		emit network_manager::get()->player_name_changed(0, Hosts[0].PlyName);
+		emit network_manager::get()->player_name_changed(HostsCount, Hosts[HostsCount].PlyName);
+	}
 
 	// Prepare the final config message:
 	CInitMessage_Config message;
@@ -489,6 +504,11 @@ void server::check_ready_to_start()
 	}
 
 	this->set_ready_to_start(connected_player_count > 0 && ready_player_count == connected_player_count);
+}
+
+bool server::is_player_ready(const int player_index) const
+{
+	return static_cast<bool>(this->setup->Ready[player_index]);
 }
 
 void server::Send_AreYouThere(const multiplayer_host &host)
@@ -658,7 +678,10 @@ int server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 				}
 			}
 		}
+
 		if (h != -1) {
+			std::unique_lock<std::shared_mutex> lock(network_manager::get()->get_mutex());
+
 			Hosts[h].Host = host.getIp();
 			Hosts[h].Port = host.getPort();
 			Hosts[h].PlyNr = h;
@@ -669,6 +692,8 @@ int server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 #endif
 			networkStates[h].State = ccs_connecting;
 			networkStates[h].MsgCnt = 0;
+
+			emit network_manager::get()->player_name_changed(h, Hosts[h].PlyName);
 		} else {
 			// Game is full - reject connnection
 			Send_GameFull(host);
@@ -819,6 +844,8 @@ void server::Parse_Map(const int h)
 */
 void server::Parse_State(const int h, const CInitMessage_State &msg)
 {
+	bool player_ready_changed = false;
+
 	switch (networkStates[h].State) {
 	case ccs_mapinfo:
 		// User State Change right after connect - should not happen, but..
@@ -827,9 +854,14 @@ void server::Parse_State(const int h, const CInitMessage_State &msg)
 		// Default case: Client is in sync with us, but notes a local change
 		// networkStates[h].State = ccs_async;
 		networkStates[h].MsgCnt = 0;
+
 		// Use information supplied by the client:
-		this->setup->Ready[h] = msg.State.Ready[h];
+		if (this->setup->Ready[h] != msg.State.Ready[h]) {
+			this->setup->Ready[h] = msg.State.Ready[h];
+			player_ready_changed = true;
+		}
 		this->setup->Race[h] = msg.State.Race[h];
+
 		// Add additional info usage here!
 
 		// Resync other clients (and us..)
@@ -853,6 +885,10 @@ void server::Parse_State(const int h, const CInitMessage_State &msg)
 	default:
 		log::log_error("Server: ICMState: Unhandled state " + std::to_string(networkStates[h].State)  + " Host " + std::to_string(h));
 		break;
+	}
+
+	if (player_ready_changed) {
+		emit network_manager::get()->player_ready_changed(h, static_cast<bool>(this->setup->Ready[h]));
 	}
 
 	this->check_ready_to_start();

@@ -104,6 +104,8 @@ public:
 
 	void check_ready_to_start();
 
+	Q_INVOKABLE bool is_player_ready(const int player_index) const;
+
 private:
 	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
 	void Parse_Resync(const int h);

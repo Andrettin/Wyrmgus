@@ -49,6 +49,13 @@ server *network_manager::get_server() const
 	return server::get();
 }
 
+void network_manager::reset()
+{
+	for (int i = 0; i < PlayerMax; ++i) {
+		Hosts[i].Clear();
+	}
+}
+
 bool network_manager::setup_server_address(const std::string &server_address, int port)
 {
 	if (port == 0) {
@@ -74,9 +81,7 @@ void network_manager::init_client_connect()
 	NetConnectRunning = 2;
 	NetConnectType = 2;
 
-	for (int i = 0; i < PlayerMax; ++i) {
-		Hosts[i].Clear();
-	}
+	this->reset();
 
 	this->get_client()->Init(preferences::get()->get_local_player_name(), &NetworkFildes, GetTicks());
 }
@@ -93,19 +98,28 @@ void network_manager::init_server_connect(const int open_slots)
 	NetConnectRunning = 1;
 	NetConnectType = 1;
 
-	for (int i = 0; i < PlayerMax; ++i) {
-		Hosts[i].Clear();
-	}
+	this->reset();
 
 	this->get_server()->init(preferences::get()->get_local_player_name(), &NetworkFildes, open_slots);
 
+	std::unique_lock<std::shared_mutex> lock(this->get_mutex());
+
 	// preset the server (initially always slot 0)
 	Hosts[0].SetName(preferences::get()->get_local_player_name().c_str());
+
+	emit network_manager::get()->player_name_changed(0, Hosts[0].PlyName);
 }
 
 int network_manager::get_network_state() const
 {
 	return this->get_client()->GetNetworkState();
+}
+
+QString network_manager::get_player_name(const int player_index) const
+{
+	std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+	return Hosts[player_index].PlyName;
 }
 
 }

@@ -37,6 +37,7 @@
 #include "network/net_message.h"
 #include "network/netsockets.h"
 #include "network/network.h"
+#include "network/network_manager.h"
 #include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/util.h"
@@ -384,10 +385,19 @@ bool client::Update(unsigned long tick)
 
 void client::SetConfig(const CInitMessage_Config &msg)
 {
+	std::unique_lock<std::shared_mutex> lock(network_manager::get()->get_mutex());
+
 	HostsCount = 0;
 	for (int i = 0; i < msg.hostsCount - 1; ++i) {
 		if (i != msg.clientIndex) {
+			const bool name_changed = std::string_view(Hosts[HostsCount].PlyName) != std::string_view(msg.hosts[i].PlyName);
+
 			Hosts[HostsCount] = msg.hosts[i];
+
+			if (name_changed) {
+				emit network_manager::get()->player_name_changed(HostsCount, Hosts[HostsCount].PlyName);
+			}
+
 			HostsCount++;
 #ifdef DEBUG
 			const std::string hostStr = CHost(msg.hosts[i].Host, msg.hosts[i].Port).toString();
@@ -403,11 +413,19 @@ void client::SetConfig(const CInitMessage_Config &msg)
 				msg.hosts[i].PlyName);
 		}
 	}
+
 	// server is last:
+	const bool name_changed = std::string_view(Hosts[HostsCount].PlyName) != std::string_view(msg.hosts[msg.hostsCount - 1].PlyName);
+
 	Hosts[HostsCount].Host = serverHost->getIp();
 	Hosts[HostsCount].Port = serverHost->getPort();
 	Hosts[HostsCount].PlyNr = msg.hosts[msg.hostsCount - 1].PlyNr;
 	Hosts[HostsCount].SetName(msg.hosts[msg.hostsCount - 1].PlyName);
+
+	if (name_changed) {
+		emit network_manager::get()->player_name_changed(HostsCount, Hosts[HostsCount].PlyName);
+	}
+
 	++HostsCount;
 	NetPlayers = HostsCount + 1;
 }
@@ -556,24 +574,45 @@ void client::Parse_Welcome(const unsigned char *buf)
 	if (networkState.State != ccs_connecting) {
 		return;
 	}
+
 	CInitMessage_Welcome msg;
 
 	msg.Deserialize(buf);
 	networkState.State = ccs_connected;
 	networkState.MsgCnt = 0;
 	NetLocalHostsSlot = msg.hosts[0].PlyNr;
+
+	std::unique_lock<std::shared_mutex> lock(network_manager::get()->get_mutex());
+
+	const bool server_player_name_changed = std::string_view(Hosts[0].PlyName) != std::string_view(msg.hosts[0].PlyName);
+
 	Hosts[0].SetName(msg.hosts[0].PlyName); // Name of server player
 	CNetworkParameter::Instance.NetworkLag = msg.Lag;
 	CNetworkParameter::Instance.gameCyclesPerUpdate = msg.gameCyclesPerUpdate;
 
 	Hosts[0].Host = serverHost->getIp();
 	Hosts[0].Port = serverHost->getPort();
+
+	if (server_player_name_changed) {
+		emit network_manager::get()->player_name_changed(0, Hosts[0].PlyName);
+	}
+
 	for (int i = 1; i < PlayerMax; ++i) {
+		bool name_changed = false;
+
 		if (i != NetLocalHostsSlot) {
+			name_changed = std::string_view(Hosts[i].PlyName) != std::string_view(msg.hosts[i].PlyName);
+
 			Hosts[i] = msg.hosts[i];
 		} else {
+			name_changed = std::string_view(Hosts[i].PlyName) != this->name;
+
 			Hosts[i].PlyNr = i;
-			Hosts[i].SetName(name.c_str());
+			Hosts[i].SetName(this->name.c_str());
+		}
+
+		if (name_changed) {
+			emit network_manager::get()->player_name_changed(i, Hosts[i].PlyName);
 		}
 	}
 }
