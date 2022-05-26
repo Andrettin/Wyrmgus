@@ -2593,14 +2593,6 @@ void MenuScreen::draw(gcn::Graphics *graphics, std::vector<std::function<void(re
 
 boost::asio::awaitable<void> MenuScreen::logic()
 {
-	if (NetConnectRunning == 2) {
-		NetworkProcessClientRequest();
-	}
-
-	if (NetConnectRunning == 1) {
-		co_await NetworkProcessServerRequest();
-	}
-
 	if (logiclistener) {
 		logiclistener->action("");
 	}

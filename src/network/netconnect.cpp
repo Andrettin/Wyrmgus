@@ -162,19 +162,6 @@ int FindHostIndexBy(const CHost &host)
 }
 
 /**
-** Server Menu Loop: Send out server request messages
-*/
-boost::asio::awaitable<void> NetworkProcessServerRequest()
-{
-	if (GameRunning) {
-		co_return;
-		// Game already started...
-	}
-
-	co_await server::get()->Update(FrameCounter);
-}
-
-/**
 ** Terminate and detach Network connect state machine for the client
 */
 void NetworkDetachFromServer()

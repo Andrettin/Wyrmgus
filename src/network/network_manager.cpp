@@ -31,6 +31,7 @@
 
 #include "database/database.h"
 #include "database/preferences.h"
+#include "game/game.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "network/netconnect.h"
@@ -127,6 +128,18 @@ void network_manager::init_server_connect(const QString &map_filepath_qstr, cons
 	Hosts[0].SetName(preferences::get()->get_local_player_name().c_str());
 
 	emit network_manager::get()->player_name_changed(0, Hosts[0].PlyName);
+}
+
+void network_manager::process_server_request()
+{
+	event_loop::get()->co_spawn([this]() -> boost::asio::awaitable<void> {
+		if (GameRunning) {
+			//game already started...
+			co_return;
+		}
+
+		co_await this->get_server()->Update(FrameCounter);
+	});
 }
 
 int network_manager::get_network_state() const
