@@ -167,14 +167,14 @@ namespace gcn
         }
     }
 
-    void DropDown::logic()
+    boost::asio::awaitable<void> DropDown::logic()
     {
         if (mScrollArea == nullptr || mScrollArea->getContent() == nullptr)
         {
             throw std::runtime_error("ScrollArea or ListBox is null.");
         }
 
-        mScrollArea->logic();
+        co_await mScrollArea->logic();
         mFocusHandler.applyChanges();
     }
 

@@ -78,7 +78,8 @@ static void MenuHandleMouseMove(const PixelPos &screenPos, const Qt::KeyboardMod
 	HandleCursorMove(&pos.x, &pos.y);
 }
 
-static void MenuHandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
+[[nodiscard]]
+static boost::asio::awaitable<void> MenuHandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	Q_UNUSED(keychar)
 	Q_UNUSED(key_modifiers)
@@ -88,7 +89,7 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar, const Qt::Keyboard
 		case SDLK_PRINTSCREEN:
 		case SDLK_F11:
 			Screenshot();
-			return;
+			co_return;
 		default:
 			break;
 	}
@@ -136,7 +137,6 @@ void initGuichan()
 	GuichanCallbacks.KeyPressed = &MenuHandleKeyDown;
 	GuichanCallbacks.KeyReleased = &MenuHandleKeyUp;
 	GuichanCallbacks.KeyRepeated = &MenuHandleKeyRepeat;
-	GuichanCallbacks.NetworkEvent = NetworkEvent;
 }
 
 /**
@@ -156,7 +156,7 @@ void freeGuichan()
 **
 **  @param event  event to handle, null if no more events for this frame
 */
-void handleInput(const SDL_Event *event)
+boost::asio::awaitable<void> handleInput(const SDL_Event *event)
 {
 	if (event) {
 		if (Input) {
@@ -168,7 +168,7 @@ void handleInput(const SDL_Event *event)
 		}
 	} else {
 		if (Gui && Gui->getTop() != nullptr) {
-			Gui->logic();
+			co_await Gui->logic();
 		}
 	}
 }
@@ -1303,7 +1303,7 @@ void ScrollingWidget::add(gcn::Widget *widget, int x, int y)
 /**
 **  Scrolling the content when possible.
 */
-void ScrollingWidget::logic()
+boost::asio::awaitable<void> ScrollingWidget::logic()
 {
 	setDirty(true);
 	if (container.getHeight() + containerY - speedY > 0) {
@@ -1315,6 +1315,8 @@ void ScrollingWidget::logic()
 		finished = true;
 		generateAction();
 	}
+
+	co_return;
 }
 
 /**
@@ -2589,16 +2591,19 @@ void MenuScreen::draw(gcn::Graphics *graphics, std::vector<std::function<void(re
 	gcn::Container::draw(graphics, render_commands);
 }
 
-void MenuScreen::logic()
+boost::asio::awaitable<void> MenuScreen::logic()
 {
 	if (NetConnectRunning == 2) {
 		NetworkProcessClientRequest();
 	}
+
 	if (NetConnectRunning == 1) {
-		NetworkProcessServerRequest();
+		co_await NetworkProcessServerRequest();
 	}
+
 	if (logiclistener) {
 		logiclistener->action("");
 	}
-	Container::logic();
+
+	co_await Container::logic();
 }

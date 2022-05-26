@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name netsockets.cpp - TCP and UDP sockets. */
-//
-//      (c) Copyright 2013 by Joris Dauphin and cybermind
+//      (c) Copyright 2013-2022 by Joris Dauphin, cybermind and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,6 +29,11 @@
 #include "network/netsockets.h"
 
 #include "network/net_lowlevel.h"
+#include "util/event_loop.h"
+
+#include <boost/asio/ip/udp.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <boost/asio/use_awaitable.hpp>
 
 #ifdef __MORPHOS__
 #undef socket
@@ -61,53 +64,98 @@ bool CHost::isValid() const
 
 // CUDPSocket_Impl
 
-class CUDPSocket_Impl
+class CUDPSocket_Impl final
 {
 public:
-	CUDPSocket_Impl() : socket(Socket(-1)) {}
-	~CUDPSocket_Impl() { if (IsValid()) { Close(); } }
-	bool Open(const CHost &host) { socket = NetOpenUDP(host.getIp(), host.getPort()); return socket != INVALID_SOCKET; }
-	void Close() { NetCloseUDP(socket); socket = Socket(-1); }
-	void Send(const CHost &host, const void *buf, unsigned int len) { NetSendUDP(socket, host.getIp(), host.getPort(), buf, len); }
-
-	int Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom)
+	CUDPSocket_Impl() : socket(event_loop::get()->get_io_context())
 	{
-		unsigned long ip;
-		int port;
-		int res = NetRecvUDP(socket, buf, len, &ip, &port);
-		*hostFrom = CHost(ip, port);
-		return res;
 	}
 
-	void SetNonBlocking() { NetSetNonBlocking(socket); }
-	int HasDataToRead(int timeout) { return NetSocketReady(socket, timeout); }
-	bool IsValid() const { return socket != Socket(-1); }
+	~CUDPSocket_Impl()
+	{
+		if (IsValid()) {
+			Close();
+		}
+	}
+
+	bool Open(const CHost &host)
+	{
+		this->endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address_v4(host.getIp()), host.getPort());
+		this->socket = boost::asio::ip::udp::socket(event_loop::get()->get_io_context(), this->endpoint);
+		return this->socket.is_open();
+	}
+
+	void Close()
+	{
+		this->socket.close();
+	}
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send(const CHost &host, const void *buf, unsigned int len)
+	{
+		boost::asio::ip::udp::endpoint receiver_endpoint(boost::asio::ip::address_v4(host.getIp()), host.getPort());
+		co_await this->socket.async_send_to(boost::asio::buffer(buf, len), receiver_endpoint, boost::asio::use_awaitable);
+	}
+
+	[[nodiscard]]
+	boost::asio::awaitable<size_t> Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom)
+	{
+		boost::asio::ip::udp::endpoint sender_endpoint;
+
+		const size_t size = co_await this->socket.async_receive_from(boost::asio::buffer(buf.data(), buf.size()), sender_endpoint, boost::asio::use_awaitable);
+
+		*hostFrom = CHost(sender_endpoint.address().to_v4().to_ulong(), sender_endpoint.port());
+
+		co_return size;
+	}
+
+	void SetNonBlocking()
+	{
+		this->socket.non_blocking(true);
+	}
+
+	size_t HasDataToRead()
+	{
+		return this->socket.available();
+	}
+
+	boost::asio::awaitable<size_t> WaitForDataToRead(const int timeout)
+	{
+		boost::asio::steady_timer timer(event_loop::get()->get_io_context());
+		timer.expires_from_now(std::chrono::milliseconds(timeout));
+
+		bool timed_out = false;
+
+		timer.async_wait([this, &timed_out](const boost::system::error_code &error_code) {
+			if (error_code) {
+				return;
+			}
+
+			this->socket.cancel();
+			timed_out = true;
+		});
+
+		co_await this->socket.async_wait(boost::asio::ip::udp::socket::wait_read, boost::asio::use_awaitable);
+		timer.cancel();
+
+		if (timed_out) {
+			co_return 0;
+		} else {
+			co_return this->socket.available();
+		}
+	}
+
+	bool IsValid() const
+	{
+		return this->socket.is_open();
+	}
+
 private:
-	Socket socket;
+	boost::asio::ip::udp::endpoint endpoint;
+	boost::asio::ip::udp::socket socket;
 };
 
 // CUDPSocket
-
-#ifdef DEBUG
-
-CUDPSocket::CStatistic::CStatistic()
-{
-	clear();
-}
-
-void CUDPSocket::CStatistic::clear()
-{
-	receivedBytesCount = 0;
-	receivedBytesExpectedCount = 0;
-	receivedErrorCount = 0;
-	receivedPacketsCount = 0;
-	sentBytesCount = 0;
-	sentPacketsCount = 0;
-	biggestReceivedPacketSize = 0;
-	biggestSentPacketSize = 0;
-}
-
-#endif
 
 CUDPSocket::CUDPSocket()
 {
@@ -128,30 +176,15 @@ void CUDPSocket::Close()
 	m_impl->Close();
 }
 
-void CUDPSocket::Send(const CHost &host, const void *buf, unsigned int len)
+boost::asio::awaitable<void> CUDPSocket::Send(const CHost &host, const void *buf, unsigned int len)
 {
-#ifdef DEBUG
-	++m_statistic.sentPacketsCount;
-	m_statistic.sentBytesCount += len;
-	m_statistic.biggestSentPacketSize = std::max(m_statistic.biggestSentPacketSize, len);
-#endif
-	m_impl->Send(host, buf, len);
+	co_await m_impl->Send(host, buf, len);
 }
 
-int CUDPSocket::Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom)
+boost::asio::awaitable<size_t> CUDPSocket::Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom)
 {
-	const int res = m_impl->Recv(buf, len, hostFrom);
-#ifdef DEBUG
-	m_statistic.receivedBytesExpectedCount += len;
-	if (res == -1) {
-		++m_statistic.receivedErrorCount;
-	} else {
-		++m_statistic.receivedPacketsCount;
-		m_statistic.receivedBytesCount += res;
-		m_statistic.biggestReceivedPacketSize = std::max(m_statistic.biggestReceivedPacketSize, (unsigned int)res);
-	}
-#endif
-	return res;
+	const size_t res = co_await m_impl->Recv(buf, len, hostFrom);
+	co_return res;
 }
 
 void CUDPSocket::SetNonBlocking()
@@ -159,9 +192,14 @@ void CUDPSocket::SetNonBlocking()
 	m_impl->SetNonBlocking();
 }
 
-int CUDPSocket::HasDataToRead(int timeout)
+size_t CUDPSocket::HasDataToRead()
 {
-	return m_impl->HasDataToRead(timeout);
+	return m_impl->HasDataToRead();
+}
+
+boost::asio::awaitable<size_t> CUDPSocket::WaitForDataToRead(const int timeout)
+{
+	return m_impl->WaitForDataToRead(timeout);
 }
 
 bool CUDPSocket::IsValid() const
@@ -175,7 +213,12 @@ class CTCPSocket_Impl
 {
 public:
 	CTCPSocket_Impl() : socket(Socket(-1)) {}
-	~CTCPSocket_Impl() { if (IsValid()) { Close(); } }
+	~CTCPSocket_Impl()
+	{
+		if (IsValid()) {
+			Close();
+		}
+	}
 	bool Open(const CHost &host);
 	void Close() { NetCloseTCP(socket); socket = Socket(-1); }
 	bool Connect(const CHost &host) { return NetConnectTCP(socket, host.getIp(), host.getPort()) != -1; }

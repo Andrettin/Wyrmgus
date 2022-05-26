@@ -71,10 +71,19 @@ extern inline bool IsNetworkGame() { return NetworkFildes.IsValid(); }
 extern void InitNetwork1();  /// Initialise network
 extern void ExitNetwork1();  /// Cleanup network (port)
 extern void NetworkOnStartGame();  /// Initialise network data for ingame communication
-extern void NetworkEvent();  /// Handle network events
-extern void NetworkQuitGame();  /// Quit game: warn other users
-extern void NetworkRecover();   /// Recover network
-extern void NetworkCommands();  /// Get all network commands
+
+[[nodiscard]]
+extern boost::asio::awaitable<void> NetworkEvent();  /// Handle network events
+
+[[nodiscard]]
+extern boost::asio::awaitable<void> NetworkQuitGame();  /// Quit game: warn other users
+
+[[nodiscard]]
+extern boost::asio::awaitable<void> NetworkRecover();   /// Recover network
+
+[[nodiscard]]
+extern boost::asio::awaitable<void> NetworkCommands();  /// Get all network commands
+
 extern void NetworkSendChatMessage(const std::string &msg);  /// Send chat message
 /// Send network command.
 extern void NetworkSendCommand(int command, const CUnit &unit, int x,

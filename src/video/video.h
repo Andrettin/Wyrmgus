@@ -474,15 +474,11 @@ struct EventCallback final
 	void (*MouseExit)() = nullptr;
 
 	/// Callback for key press
-	void (*KeyPressed)(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers) = nullptr;
+	boost::asio::awaitable<void> (*KeyPressed)(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers) = nullptr;
 	/// Callback for key release
 	void (*KeyReleased)(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers) = nullptr;
 	/// Callback for key repeated
 	void (*KeyRepeated)(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers) = nullptr;
-
-	/// Callback for network event
-	void (*NetworkEvent)() = nullptr;
-
 };
 
 class CVideo
@@ -602,9 +598,6 @@ extern const EventCallback *GetCallbacks();
 /// Process all system events. Returns if the time for a frame is over
 [[nodiscard]]
 extern boost::asio::awaitable<void> WaitEventsOneFrame();
-
-/// Poll all sdl events
-extern void PollEvents();
 
 /// Push current clipping.
 extern void PushClipping();

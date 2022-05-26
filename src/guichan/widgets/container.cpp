@@ -81,9 +81,9 @@ namespace gcn
 		clear();
 	}
 
-	void Container::logic()
+	boost::asio::awaitable<void> Container::logic()
 	{
-		logicChildren();
+		co_await logicChildren();
 	}
 
 	void Container::draw(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands)
@@ -121,12 +121,12 @@ namespace gcn
 		}
 	}
 
-	void Container::logicChildren()
+	boost::asio::awaitable<void> Container::logicChildren()
 	{
 		WidgetIterator iter;
 		for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
 		{
-			(*iter)->logic();
+			co_await (*iter)->logic();
 		}
 	}
 

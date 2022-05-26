@@ -63,12 +63,6 @@ void event_loop::stop()
 	}
 }
 
-void event_loop::stop_and_exit(const int exit_code)
-{
-	this->stop();
-	Exit(exit_code);
-}
-
 void event_loop::post(const std::function<void()> &function)
 {
 	boost::asio::post(*this->io_context, [this, function]() {
@@ -76,7 +70,7 @@ void event_loop::post(const std::function<void()> &function)
 			function();
 		} catch (const std::exception &exception) {
 			exception::report(exception);
-			this->stop_and_exit(EXIT_FAILURE);
+			std::terminate();
 		}
 	});
 }
@@ -100,7 +94,7 @@ void event_loop::co_spawn(const std::function<boost::asio::awaitable<void>()> &f
 			co_await function();
 		} catch (const std::exception &exception) {
 			exception::report(exception);
-			this->stop_and_exit(EXIT_FAILURE);
+			std::terminate();
 		}
 	}, boost::asio::detached);
 }

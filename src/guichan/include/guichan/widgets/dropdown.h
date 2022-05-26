@@ -181,7 +181,8 @@ namespace gcn
 
         virtual bool _keyInputMessage(const KeyInput& keyInput);
 
-        virtual void logic();
+        [[nodiscard]]
+        virtual boost::asio::awaitable<void> logic() override;
 
         virtual void _mouseInputMessage(const MouseInput &mouseInput);
 

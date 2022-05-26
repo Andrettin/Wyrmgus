@@ -41,7 +41,9 @@ extern EventCallback GuichanCallbacks;
 
 void initGuichan();
 void freeGuichan();
-void handleInput(const SDL_Event *event);
+
+[[nodiscard]]
+boost::asio::awaitable<void> handleInput(const SDL_Event *event);
 
 namespace wyrmgus {
 	template <int N>
@@ -260,8 +262,11 @@ public:
 	void restart();
 	void setSpeed(float speed) { this->speedY = speed; }
 	float getSpeed() const { return this->speedY; }
+
 private:
-	virtual void logic() override;
+	[[nodiscard]]
+	virtual boost::asio::awaitable<void> logic() override;
+
 private:
 	gcn::Container container; /// Data container
 	float speedY;             /// vertical speed of the container (positive number: go up).
@@ -313,10 +318,14 @@ public:
 	void mousePress(int, int y, int button);
 	void setSelected(int selected);
 	void setListModel(gcn::ListModel *listModel);
-	void logic()
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> logic()
 	{
 		adjustSize();
+		co_return;
 	}
+
 private:
 	CGraphic *itemImage;
 };
@@ -482,7 +491,10 @@ public:
 
 	void addLogicCallback(LuaActionListener *listener);
 	virtual void draw(gcn::Graphics *graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
-	virtual void logic() override;
+
+	[[nodiscard]]
+	virtual boost::asio::awaitable<void> logic() override;
+
 	void setDrawMenusUnder(bool drawUnder) { this->drawUnder = drawUnder; }
 	bool getDrawMenusUnder() const { return this->drawUnder; }
 

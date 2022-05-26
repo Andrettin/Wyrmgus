@@ -143,9 +143,10 @@ namespace gcn
         }
     }
 
-    void ListBox::logic()
+    boost::asio::awaitable<void> ListBox::logic()
     {
         adjustSize();
+        co_return;
     }
 
     int ListBox::getSelected()

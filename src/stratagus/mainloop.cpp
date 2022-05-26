@@ -286,7 +286,6 @@ static void InitGameCallbacks()
 	GameCallbacks.KeyPressed = HandleKeyDown;
 	GameCallbacks.KeyReleased = HandleKeyUp;
 	GameCallbacks.KeyRepeated = HandleKeyRepeat;
-	GameCallbacks.NetworkEvent = NetworkEvent;
 }
 
 [[nodiscard]]
@@ -303,7 +302,7 @@ static boost::asio::awaitable<void> GameLogicLoop()
 		SinglePlayerReplayEachCycle();
 		++GameCycle;
 		MultiPlayerReplayEachCycle();
-		NetworkCommands(); // Get network commands
+		co_await NetworkCommands(); // Get network commands
 		TriggersEachCycle();// handle triggers
 		UnitActions();      // handle units
 		MissileActions();   // handle missiles
@@ -408,7 +407,7 @@ static boost::asio::awaitable<void> GameLogicLoop()
 	}
 
 	if (!NetworkInSync) {
-		NetworkRecover(); // recover network
+		co_await NetworkRecover(); // recover network
 	}
 }
 
@@ -535,7 +534,7 @@ boost::asio::awaitable<void> GameMainLoop()
 
 	co_await SingleGameLoop();
 
-	NetworkQuitGame();
+	co_await NetworkQuitGame();
 	EndReplayLog();
 
 	GameCycle = 0;//????

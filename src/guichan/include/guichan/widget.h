@@ -132,7 +132,11 @@ namespace gcn
          *
          * @see Gui
          */
-        virtual void logic() { }
+        [[nodiscard]]
+        virtual boost::asio::awaitable<void> logic()
+        {
+            co_return;
+        }
 
         /**
          * Gets the Widget parent container.

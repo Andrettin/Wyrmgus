@@ -50,8 +50,11 @@ public:
 
 	void SetServerHost(std::unique_ptr<CHost> &&host);
 
-	bool Parse(const std::array<unsigned char, 1024> &buf);
-	bool Update(unsigned long tick);
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Parse(const std::array<unsigned char, 1024> &buf);
+
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update(unsigned long tick);
 
 	void DetachFromServer();
 
@@ -71,30 +74,69 @@ public:
 	}
 
 private:
-	bool Update_disconnected();
-	bool Update_detaching(unsigned long tick);
-	bool Update_connecting(unsigned long tick);
-	bool Update_connected(unsigned long tick);
-	bool Update_synced(unsigned long tick);
-	bool Update_changed(unsigned long tick);
-	bool Update_async(unsigned long tick);
-	bool Update_mapinfo(unsigned long tick);
-	bool Update_badmap(unsigned long tick);
-	bool Update_goahead(unsigned long tick);
-	bool Update_started(unsigned long tick);
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_disconnected();
 
-	void Send_Go(unsigned long tick);
-	void Send_Config(unsigned long tick);
-	void Send_MapUidMismatch(unsigned long tick);
-	void Send_Map(unsigned long tick);
-	void Send_Resync(unsigned long tick);
-	void Send_State(unsigned long tick);
-	void Send_Waiting(unsigned long tick, unsigned long msec);
-	void Send_Hello(unsigned long tick);
-	void Send_GoodBye(unsigned long tick);
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_detaching(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_connecting(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_connected(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_synced(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_changed(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_async(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_mapinfo(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_badmap(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_goahead(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<bool> Update_started(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_Go(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_Config(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_MapUidMismatch(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_Map(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_Resync(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_State(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_Waiting(unsigned long tick, unsigned long msec);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_Hello(unsigned long tick);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_GoodBye(unsigned long tick);
 
 	template <typename T>
-	void SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs);
+	[[nodiscard]]
+	boost::asio::awaitable<void> SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs);
 
 	void SetConfig(const CInitMessage_Config &msg);
 
@@ -106,7 +148,9 @@ private:
 	void Parse_State(const unsigned char *buf);
 	void Parse_Welcome(const unsigned char *buf);
 	void Parse_Map(const unsigned char *buf);
-	void Parse_AreYouThere();
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Parse_AreYouThere();
 
 private:
 	std::string name;

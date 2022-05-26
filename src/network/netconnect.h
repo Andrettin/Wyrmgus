@@ -92,18 +92,21 @@ extern std::string NetworkMapName;
 extern int NoRandomPlacementMultiplayer;
 
 template <typename T>
-inline void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
+[[nodiscard]]
+inline boost::asio::awaitable<void> NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
 {
 	std::unique_ptr<const unsigned char[]> buf = msg.Serialize();
-	socket.Send(host, buf.get(), msg.Size());
+	co_await socket.Send(host, buf.get(), msg.Size());
 }
 
-extern void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
+[[nodiscard]]
+extern boost::asio::awaitable<void> NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
 template <typename T>
-inline void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const T &msg)
+[[nodiscard]]
+inline boost::asio::awaitable<void> NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const T &msg)
 {
-	NetworkSendICMessage(socket, host, msg);
+	co_await NetworkSendICMessage(socket, host, msg);
 
 #ifdef DEBUG
 	const std::string hostStr = host.toString();
@@ -112,14 +115,20 @@ inline void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, cons
 #endif
 }
 
-extern void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
+[[nodiscard]]
+extern boost::asio::awaitable<void> NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
 extern int FindHostIndexBy(const CHost &host);
 extern void NetworkGamePrepareGameSettings();
 
 extern int GetNetworkState();
 
-extern int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host);  /// Parse a network connect event
+[[nodiscard]]
+extern boost::asio::awaitable<int> NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host);  /// Parse a network connect event
+
 extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client request messages
-extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages
+
+[[nodiscard]]
+extern boost::asio::awaitable<void> NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages
+
 extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach

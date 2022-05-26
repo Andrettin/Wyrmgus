@@ -158,7 +158,8 @@ extern std::string PlayerFaction;
 extern unsigned long GameCycle;				/// Game simulation cycle counter
 extern unsigned long FastForwardCycle;		/// Game Replay Fast Forward Counter
 
-extern void Exit(const int err);                  /// Exit
+[[nodiscard]]
+extern boost::asio::awaitable<void> Exit(const int err);                  /// Exit
 
 extern void UpdateDisplay();            /// Game display update
 extern void DrawMapArea(std::vector<std::function<void(wyrmgus::renderer *)>> &render_commands); //draw the map area

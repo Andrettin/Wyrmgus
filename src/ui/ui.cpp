@@ -108,8 +108,6 @@ void ShowLoadProgress(const char *fmt, ...)
 	}
 
 	engine_interface::get()->set_loading_message(temp);
-
-	PollEvents();
 }
 
 CUnitInfoPanel::~CUnitInfoPanel()

@@ -332,7 +332,8 @@ static void do_mouse_warp()
 **  @param callbacks  Callback structure for events.
 **  @param event      SDL event structure pointer.
 */
-static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Qt::KeyboardModifiers key_modifiers)
+[[nodiscard]]
+static boost::asio::awaitable<void> SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Qt::KeyboardModifiers key_modifiers)
 {
 	switch (event.type) {
 		case SDL_MOUSEBUTTONUP:
@@ -350,7 +351,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Q
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
 			if (event.key.keysym.sym == SDLK_UNKNOWN) {
-				return;
+				co_return;
 			}
 			break;
 		default:
@@ -418,7 +419,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Q
 			break;
 
 		case SDL_KEYDOWN:
-			InputKeyButtonPress(callbacks, SDL_GetTicks(), event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0, key_modifiers);
+			co_await InputKeyButtonPress(callbacks, SDL_GetTicks(), event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0, key_modifiers);
 			break;
 
 		case SDL_KEYUP:
@@ -426,12 +427,12 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Q
 			break;
 
 		case SDL_QUIT:
-			Exit(0);
+			co_await Exit(0);
 			break;
 	}
 
 	if (&callbacks == GetCallbacks()) {
-		handleInput(&event);
+		co_await handleInput(&event);
 	}
 }
 
@@ -459,22 +460,16 @@ const EventCallback *GetCallbacks()
 	return Callbacks;
 }
 
-int PollEvent()
+[[nodiscard]]
+static boost::asio::awaitable<int> PollEvent()
 {
 	SDL_Event event;
 	if (SDL_PollEvent(&event)) { // Handle SDL event
-		SdlDoEvent(*GetCallbacks(), event, Qt::KeyboardModifiers());
-		return 1;
+		co_await SdlDoEvent(*GetCallbacks(), event, Qt::KeyboardModifiers());
+		co_return 1;
 	}
 
-	return 0;
-}
-
-void PollEvents()
-{
-	if (Callbacks == nullptr) return;
-
-	while (PollEvent()) { }
+	co_return 0;
 }
 
 static SDL_Keycode qt_key_to_sdl_key(const Qt::Key qt_key)
@@ -879,8 +874,9 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 				break;
 		}
 
+		const Qt::KeyboardModifiers modifiers = input_event->modifiers();
 		SDL_Event sdl_event = qevent_to_sdl_event(std::move(input_event));
-		SdlDoEvent(*GetCallbacks(), sdl_event, input_event->modifiers());
+		co_await SdlDoEvent(*GetCallbacks(), sdl_event, modifiers);
 	}
 
 	int interrupts = 0;
@@ -898,22 +894,24 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 			NextFrameTicks += FrameTicks;
 		}
 
-		int i = PollEvent();
+		int i = co_await PollEvent();
 
 		// Network
-		int s = 0;
+		size_t s = 0;
 		if (IsNetworkGame()) {
-			s = NetworkFildes.HasDataToRead(0);
+			s = NetworkFildes.HasDataToRead();
 			if (s > 0) {
-				GetCallbacks()->NetworkEvent();
+				co_await NetworkEvent();
 			}
 		}
+
 		// No more input and time for frame over: return
 		if (!i && s <= 0 && interrupts) {
 			break;
 		}
 	}
-	handleInput(nullptr);
+
+	co_await handleInput(nullptr);
 
 	cursor::set_last_scroll_pos(QPoint(-1, -1));
 

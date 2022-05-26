@@ -1671,7 +1671,8 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
+[[nodiscard]]
+static boost::asio::awaitable<void> EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	Q_UNUSED(keychar)
 
@@ -1680,13 +1681,13 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::Keyb
 		case SDLK_PRINTSCREEN:
 		case SDLK_F11:
 			Screenshot();
-			return;
+			co_return;
 		default:
 			break;
 	}
 
 	if (HandleKeyModifiersDown(key)) {
-		return;
+		co_return;
 	}
 
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
@@ -1720,7 +1721,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::Keyb
 			//Wyrmgus start
 			} else {
 				HandleCommandKey(key, key_modifiers);
-				return;
+				co_return;
 			//Wyrmgus end
 			}
 			break;
@@ -1728,7 +1729,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::Keyb
 			if (!(key_modifiers & (Qt::AltModifier | Qt::ControlModifier))) {
 				break;
 			}
-			Exit(0);
+			co_await Exit(0);
 
 		case 'z':
 			if (key_modifiers & Qt::ControlModifier) {
@@ -1786,7 +1787,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::Keyb
 		}
 		default:
 			HandleCommandKey(key, key_modifiers);
-			return;
+			co_return;
 	}
 }
 
@@ -2367,7 +2368,6 @@ void CEditor::Init()
 	EditorCallbacks.KeyPressed = EditorCallbackKeyDown;
 	EditorCallbacks.KeyReleased = EditorCallbackKeyUp;
 	EditorCallbacks.KeyRepeated = EditorCallbackKeyRepeated;
-	EditorCallbacks.NetworkEvent = NetworkEvent;
 	SetCallbacks(&EditorCallbacks);
 }
 

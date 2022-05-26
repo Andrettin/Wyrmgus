@@ -342,11 +342,11 @@ void PrintLicense()
 **
 **  @param err  Error code to pass to shell.
 */
-void Exit(const int err)
+boost::asio::awaitable<void> Exit(const int err)
 {
 	if (GameRunning && err != EXIT_FAILURE) {
 		StopGame(GameExit);
-		return;
+		co_return;
 	}
 	
 	QMetaObject::invokeMethod(QApplication::instance(), [err] {
@@ -355,7 +355,7 @@ void Exit(const int err)
 
 	music_player::get()->stop();
 	QuitSound();
-	NetworkQuitGame();
+	co_await NetworkQuitGame();
 
 	ExitNetwork1();
 	CleanModules();
@@ -515,6 +515,8 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 
 	SetCallbacks(&GuichanCallbacks);
 
+	int exit_code = EXIT_SUCCESS;
+
 	try {
 		while (GameResult != GameExit) {
 			if (GameRunning) {
@@ -528,11 +530,10 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 		}
 	} catch (const std::exception &exception) {
 		exception::report(exception);
-		Exit(EXIT_FAILURE);
-		co_return;
+		exit_code = EXIT_FAILURE;
 	}
 
-	Exit(EXIT_SUCCESS);
+	co_await Exit(exit_code);
 }
 
 //Wyrmgus start

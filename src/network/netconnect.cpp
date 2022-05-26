@@ -48,6 +48,7 @@
 #include "settings.h"
 #include "ui/interface.h"
 #include "util/assert_util.h"
+#include "util/thread_pool.h"
 #include "util/util.h"
 #include "video/video.h"
 
@@ -70,16 +71,16 @@ int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of player
 ** @param port Port of host to send to (network byte order).
 ** @param msg The message to send
 */
-void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
+boost::asio::awaitable<void> NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
 {
 	auto buf = std::make_unique<unsigned char[]>(msg.Size());
 	msg.Serialize(buf.get());
-	socket.Send(host, buf.get(), msg.Size());
+	co_await socket.Send(host, buf.get(), msg.Size());
 }
 
-void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
+boost::asio::awaitable<void> NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
 {
-	NetworkSendICMessage(socket, host, msg);
+	co_await NetworkSendICMessage(socket, host, msg);
 
 #ifdef DEBUG
 	const std::string hostStr = host.toString();
@@ -99,7 +100,7 @@ void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInit
 **
 **  @return 1 if packet is an InitConfig message, 0 otherwise
 */
-int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host)
+boost::asio::awaitable<int> NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host)
 {
 	assert_throw(NetConnectRunning != 0);
 
@@ -114,7 +115,7 @@ int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHo
 			// has been started by the server, so do the same for the client.
 			NetConnectRunning = 0; // End the menu..
 		}
-		return 0;
+		co_return 0;
 	}
 #ifdef DEBUG
 	const unsigned char msgsubtype = header.GetSubType();
@@ -124,13 +125,13 @@ int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHo
 			   hostStr.c_str());
 #endif
 	if (NetConnectRunning == 2) { // client
-		if (client::get()->Parse(buf) == false) {
+		if (co_await client::get()->Parse(buf) == false) {
 			NetConnectRunning = 0;
 		}
 	} else if (NetConnectRunning == 1) { // server
-		server::get()->Parse(FrameCounter, buf.data(), host);
+		co_await server::get()->Parse(FrameCounter, buf.data(), host);
 	}
-	return 1;
+	co_return 1;
 }
 
 /**
@@ -138,9 +139,11 @@ int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHo
 */
 void NetworkProcessClientRequest()
 {
-	if (client::get()->Update(GetTicks()) == false) {
-		NetConnectRunning = 0;
-	}
+	thread_pool::get()->co_spawn_sync([]() -> boost::asio::awaitable<void> {
+		if (co_await client::get()->Update(GetTicks()) == false) {
+			NetConnectRunning = 0;
+		}
+	});
 }
 
 int GetNetworkState()
@@ -161,14 +164,14 @@ int FindHostIndexBy(const CHost &host)
 /**
 ** Server Menu Loop: Send out server request messages
 */
-void NetworkProcessServerRequest()
+boost::asio::awaitable<void> NetworkProcessServerRequest()
 {
 	if (GameRunning) {
-		return;
+		co_return;
 		// Game already started...
 	}
 
-	server::get()->Update(FrameCounter);
+	co_await server::get()->Update(FrameCounter);
 }
 
 /**

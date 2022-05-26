@@ -40,6 +40,7 @@
 #include "settings.h"
 #include "util/assert_util.h"
 #include "util/event_loop.h"
+#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/random.h"
@@ -53,7 +54,8 @@
 **
 **  @return 0 if the versions match, -1 otherwise
 */
-static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, const CHost &host)
+[[nodiscard]]
+static boost::asio::awaitable<int> CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, const CHost &host)
 {
 	if (msg.Stratagus != StratagusVersion) {
 		const std::string hostStr = host.toString();
@@ -61,8 +63,8 @@ static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, cons
 			StratagusVersion, msg.Stratagus, hostStr.c_str());
 
 		const CInitMessage_EngineMismatch message;
-		NetworkSendICMessage_Log(socket, host, message);
-		return -1;
+		co_await NetworkSendICMessage_Log(socket, host, message);
+		co_return -1;
 	}
 
 	if (msg.Version != NetworkProtocolVersion) {
@@ -76,10 +78,10 @@ static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, cons
 			hostStr.c_str());
 
 		const CInitMessage_ProtocolMismatch message;
-		NetworkSendICMessage_Log(socket, host, message);
-		return -1;
+		co_await NetworkSendICMessage_Log(socket, host, message);
+		co_return -1;
 	}
-	return 0;
+	co_return 0;
 }
 
 namespace wyrmgus {
@@ -218,7 +220,7 @@ void server::start_game()
 			FlagRevealMap = 1;
 		}
 
-		this->init_game();
+		co_await this->init_game();
 
 		NetworkGamePrepareGameSettings();
 
@@ -226,7 +228,7 @@ void server::start_game()
 	});
 }
 
-void server::init_game()
+boost::asio::awaitable<void> server::init_game()
 {
 	assert_throw(this->setup->CompOpt[0] == 0);
 
@@ -413,24 +415,30 @@ void server::init_game()
 
 			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
 				message.clientIndex = i;
-				NetworkSendICMessage_Log(*this->socket, host, message);
+				co_await NetworkSendICMessage_Log(*this->socket, host, message);
 			} else if (num[Hosts[i].PlyNr] == 2) {
-				NetworkSendICMessage_Log(*this->socket, host, statemsg);
+				co_await NetworkSendICMessage_Log(*this->socket, host, statemsg);
 			}
 		}
 
 		// Wait for acknowledge
 		std::array<unsigned char, 1024> buf{};
-		while (j && this->socket->HasDataToRead(1000)) {
+		while (j && co_await this->socket->WaitForDataToRead(1000)) {
 			CHost host;
-			const int len = this->socket->Recv(buf, sizeof(buf), &host);
-			if (len < 0) {
+
+			size_t len = 0;
+
+			try {
+				len = co_await this->socket->Recv(buf, sizeof(buf), &host);
+			} catch (const std::exception &exception) {
+				exception::report(exception);
 #ifdef DEBUG
 				const std::string hostStr = host.toString();
 				DebugPrint("*Receive ack failed: (%d) from %s\n" _C_ len _C_ hostStr.c_str());
 #endif
 				continue;
 			}
+
 			CInitMessage_Header header;
 			header.Deserialize(buf.data());
 			const unsigned char type = header.GetType();
@@ -482,7 +490,7 @@ void server::init_game()
 	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
 	for (int i = 0; i < HostsCount; ++i) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);
-		NetworkSendICMessage_Log(*this->socket, host, message_go);
+		co_await NetworkSendICMessage_Log(*this->socket, host, message_go);
 	}
 }
 
@@ -501,21 +509,21 @@ bool server::is_player_ready(const int player_index) const
 	return static_cast<bool>(this->setup->Ready[player_index]);
 }
 
-void server::Send_AreYouThere(const multiplayer_host &host)
+boost::asio::awaitable<void> server::Send_AreYouThere(const multiplayer_host &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMAYT); // AreYouThere
 
-	NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
+	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
-void server::Send_GameFull(const CHost &host)
+boost::asio::awaitable<void> server::Send_GameFull(const CHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGameFull);
 
-	NetworkSendICMessage_Log(*socket, host, message);
+	co_await NetworkSendICMessage_Log(*socket, host, message);
 }
 
-void server::Send_Welcome(const multiplayer_host &host, int index)
+boost::asio::awaitable<void> server::Send_Welcome(const multiplayer_host &host, int index)
 {
 	CInitMessage_Welcome message;
 
@@ -526,10 +534,11 @@ void server::Send_Welcome(const multiplayer_host &host, int index)
 			message.hosts[i] = Hosts[i];
 		}
 	}
-	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+
+	co_await NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
-void server::Send_Resync(const multiplayer_host &host, int hostIndex)
+boost::asio::awaitable<void> server::Send_Resync(const multiplayer_host &host, int hostIndex)
 {
 	CInitMessage_Resync message;
 
@@ -538,31 +547,32 @@ void server::Send_Resync(const multiplayer_host &host, int hostIndex)
 			message.hosts[i] = Hosts[i];
 		}
 	}
-	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+
+	co_await NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
-void server::Send_Map(const multiplayer_host &host)
+boost::asio::awaitable<void> server::Send_Map(const multiplayer_host &host)
 {
 	const CInitMessage_Map message(NetworkMapName.c_str(), CMap::get()->Info->MapUID);
 
-	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	co_await NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
-void server::Send_State(const multiplayer_host &host)
+boost::asio::awaitable<void> server::Send_State(const multiplayer_host &host)
 {
 	const CInitMessage_State message(MessageInit_FromServer, *this->setup);
 
-	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	co_await NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
-void server::Send_GoodBye(const multiplayer_host &host)
+boost::asio::awaitable<void> server::Send_GoodBye(const multiplayer_host &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGoodBye);
 
-	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	co_await NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
-void server::Update(unsigned long frameCounter)
+boost::asio::awaitable<void> server::Update(unsigned long frameCounter)
 {
 	for (int i = 1; i < PlayerMax - 1; ++i) {
 		if (Hosts[i].PlyNr && Hosts[i].Host && Hosts[i].Port) {
@@ -572,14 +582,14 @@ void server::Update(unsigned long frameCounter)
 					KickClient(i);
 				} else if (fcd % 5 == 0) {
 					// Probe for the client
-					Send_AreYouThere(Hosts[i]);
+					co_await Send_AreYouThere(Hosts[i]);
 				}
 			}
 		}
 	}
 }
 
-void server::Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host)
+boost::asio::awaitable<void> server::Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host)
 {
 	const unsigned char msgsubtype = buf[1];
 	int index = FindHostIndexBy(host);
@@ -589,40 +599,52 @@ void server::Parse(unsigned long frameCounter, const unsigned char *buf, const C
 			CInitMessage_Hello msg;
 
 			msg.Deserialize(buf);
-			if (CheckVersions(msg, *socket, host)) {
-				return;
+			if (co_await CheckVersions(msg, *socket, host)) {
+				co_return;
 			}
 			// Special case: a new client has arrived
-			index = Parse_Hello(-1, msg, host);
+			index = co_await Parse_Hello(-1, msg, host);
 			networkStates[index].LastFrame = frameCounter;
 		}
-		return;
+
+		co_return;
 	}
+
 	networkStates[index].LastFrame = frameCounter;
+
 	switch (msgsubtype) {
 	case ICMHello: { // a new client has arrived
 		CInitMessage_Hello msg;
 
 		msg.Deserialize(buf);
-		Parse_Hello(index, msg, host);
+		co_await Parse_Hello(index, msg, host);
 		break;
 	}
-	case ICMResync: Parse_Resync(index); break;
-	case ICMWaiting: Parse_Waiting(index); break;
-	case ICMMap: Parse_Map(index); break;
-
+	case ICMResync:
+		co_await Parse_Resync(index);
+		break;
+	case ICMWaiting:
+		co_await Parse_Waiting(index);
+		break;
+	case ICMMap:
+		co_await Parse_Map(index);
+		break;
 	case ICMState: {
 		CInitMessage_State msg;
 
 		msg.Deserialize(buf);
-		Parse_State(index, msg);
+		co_await Parse_State(index, msg);
 		break;
 	}
 	case ICMMapUidMismatch: // Parse_MapUidMismatch(index, buf); break;
-	case ICMGoodBye: Parse_GoodBye(index); break;
-	case ICMSeeYou: Parse_SeeYou(index); break;
-	case ICMIAH: break;
-
+	case ICMGoodBye:
+		co_await Parse_GoodBye(index);
+		break;
+	case ICMSeeYou:
+		Parse_SeeYou(index);
+		break;
+	case ICMIAH:
+		break;
 	default:
 		DebugPrint("Server: Unhandled subtype %d from host %d\n" _C_ msgsubtype _C_ index);
 		break;
@@ -656,7 +678,7 @@ void server::mark_clients_as_resync()
 **
 **  @return host index
 */
-int server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
+boost::asio::awaitable<int> server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 {
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
@@ -686,12 +708,13 @@ int server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 			emit network_manager::get()->player_name_changed(h, Hosts[h].PlyName);
 		} else {
 			// Game is full - reject connnection
-			Send_GameFull(host);
-			return -1;
+			co_await Send_GameFull(host);
+			co_return -1;
 		}
 	}
+
 	// this code path happens until client sends waiting (= has received this message)
-	Send_Welcome(Hosts[h], h);
+	co_await Send_Welcome(Hosts[h], h);
 
 	this->check_ready_to_start();
 
@@ -700,10 +723,10 @@ int server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 		// Detects UDP input firewalled or behind NAT firewall clients
 		// If packets are missed, clients are kicked by AYT check later..
 		KickClient(h);
-		return -1;
+		co_return -1;
 	}
 
-	return h;
+	co_return h;
 }
 
 /**
@@ -711,7 +734,7 @@ int server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 **
 **  @param h slot number of host msg originates from
 */
-void server::Parse_Resync(const int h)
+boost::asio::awaitable<void> server::Parse_Resync(const int h)
 {
 	switch (networkStates[h].State) {
 	case ccs_mapinfo:
@@ -724,7 +747,7 @@ void server::Parse_Resync(const int h)
 	case ccs_synced: {
 		// this code path happens until client falls back to ICMWaiting
 		// (indicating Resync has completed)
-		Send_Resync(Hosts[h], h);
+		co_await Send_Resync(Hosts[h], h);
 
 		networkStates[h].MsgCnt++;
 		if (networkStates[h].MsgCnt > 50) {
@@ -743,7 +766,7 @@ void server::Parse_Resync(const int h)
 **
 **  @param h slot number of host msg originates from
 */
-void server::Parse_Waiting(const int h)
+boost::asio::awaitable<void> server::Parse_Waiting(const int h)
 {
 	switch (networkStates[h].State) {
 		// client has recvd welcome and is waiting for info
@@ -753,7 +776,7 @@ void server::Parse_Waiting(const int h)
 		/* Fall through */
 	case ccs_connected: {
 		// this code path happens until client acknowledges the map
-		Send_Map(Hosts[h]);
+		co_await Send_Map(Hosts[h]);
 
 		networkStates[h].MsgCnt++;
 		if (networkStates[h].MsgCnt > 50) {
@@ -782,7 +805,7 @@ void server::Parse_Waiting(const int h)
 
 		// this code path happens until client acknoledges the state change
 		// by sending ICMResync
-		Send_State(Hosts[h]);
+		co_await Send_State(Hosts[h]);
 
 		networkStates[h].MsgCnt++;
 		if (networkStates[h].MsgCnt > 50) {
@@ -801,7 +824,7 @@ void server::Parse_Waiting(const int h)
 **
 **  @param h slot number of host msg originates from
 */
-void server::Parse_Map(const int h)
+boost::asio::awaitable<void> server::Parse_Map(const int h)
 {
 	switch (networkStates[h].State) {
 		// client has recvd map info waiting for state info
@@ -812,7 +835,7 @@ void server::Parse_Map(const int h)
 	case ccs_mapinfo: {
 		// this code path happens until client acknowledges the state info
 		// by falling back to ICMWaiting with prev. State synced
-		Send_State(Hosts[h]);
+		co_await Send_State(Hosts[h]);
 
 		networkStates[h].MsgCnt++;
 		if (networkStates[h].MsgCnt > 50) {
@@ -832,7 +855,7 @@ void server::Parse_Map(const int h)
 **  @param h slot number of host msg originates from
 **  @param msg message received
 */
-void server::Parse_State(const int h, const CInitMessage_State &msg)
+boost::asio::awaitable<void> server::Parse_State(const int h, const CInitMessage_State &msg)
 {
 	bool player_ready_changed = false;
 
@@ -864,7 +887,7 @@ void server::Parse_State(const int h, const CInitMessage_State &msg)
 	case ccs_async: {
 		// this code path happens until client acknowledges the state change reply
 		// by sending ICMResync
-		Send_State(Hosts[h]);
+		co_await Send_State(Hosts[h]);
 
 		networkStates[h].MsgCnt++;
 		if (networkStates[h].MsgCnt > 50) {
@@ -889,25 +912,25 @@ void server::Parse_State(const int h, const CInitMessage_State &msg)
 **
 **  @param h slot number of host msg originates from
 */
-void server::Parse_GoodBye(const int h)
+boost::asio::awaitable<void> server::Parse_GoodBye(const int h)
 {
 	switch (networkStates[h].State) {
-	default:
-		// We can enter here from _ANY_ state!
-		networkStates[h].MsgCnt = 0;
-		networkStates[h].State = ccs_detaching;
-		/* Fall through */
-	case ccs_detaching: {
-		// this code path happens until client acknoledges the GoodBye
-		// by sending ICMSeeYou;
-		Send_GoodBye(Hosts[h]);
+		default:
+			// We can enter here from _ANY_ state!
+			networkStates[h].MsgCnt = 0;
+			networkStates[h].State = ccs_detaching;
+			/* Fall through */
+		case ccs_detaching: {
+			// this code path happens until client acknoledges the GoodBye
+			// by sending ICMSeeYou;
+			co_await Send_GoodBye(Hosts[h]);
 
-		networkStates[h].MsgCnt++;
-		if (networkStates[h].MsgCnt > 10) {
-			// FIXME: Client sends GoodBye, but doesn't receive our GoodBye....
+			networkStates[h].MsgCnt++;
+			if (networkStates[h].MsgCnt > 10) {
+				// FIXME: Client sends GoodBye, but doesn't receive our GoodBye....
+			}
+			break;
 		}
-		break;
-	}
 	}
 }
 

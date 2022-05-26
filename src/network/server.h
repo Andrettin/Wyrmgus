@@ -52,8 +52,11 @@ public:
 
 	void init(const std::string &name, CUDPSocket *socket, const int open_slots);
 
-	void Update(unsigned long frameCounter);
-	void Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
+	[[nodiscard]]
+	boost::asio::awaitable<void> Update(unsigned long frameCounter);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
 
 	void resync_clients();
 
@@ -76,7 +79,9 @@ public:
 	Q_INVOKABLE void set_difficulty(const int difficulty);
 
 	Q_INVOKABLE void start_game();
-	void init_game();
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> init_game();
 
 	bool is_ready_to_start() const
 	{
@@ -107,21 +112,46 @@ public:
 	Q_INVOKABLE bool is_player_ready(const int player_index) const;
 
 private:
-	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
-	void Parse_Resync(const int h);
-	void Parse_Waiting(const int h);
-	void Parse_Map(const int h);
-	void Parse_State(const int h, const CInitMessage_State &msg);
-	void Parse_GoodBye(const int h);
+	[[nodiscard]]
+	boost::asio::awaitable<int> Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Parse_Resync(const int h);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Parse_Waiting(const int h);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Parse_Map(const int h);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Parse_State(const int h, const CInitMessage_State &msg);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Parse_GoodBye(const int h);
+
 	void Parse_SeeYou(const int h);
 
-	void Send_AreYouThere(const multiplayer_host &host);
-	void Send_GameFull(const CHost &host);
-	void Send_Welcome(const multiplayer_host &host, int hostIndex);
-	void Send_Resync(const multiplayer_host &host, int hostIndex);
-	void Send_Map(const multiplayer_host &host);
-	void Send_State(const multiplayer_host &host);
-	void Send_GoodBye(const multiplayer_host &host);
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_AreYouThere(const multiplayer_host &host);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_GameFull(const CHost &host);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_Welcome(const multiplayer_host &host, int hostIndex);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_Resync(const multiplayer_host &host, int hostIndex);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_Map(const multiplayer_host &host);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_State(const multiplayer_host &host);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send_GoodBye(const multiplayer_host &host);
 
 signals:
 	void ready_to_start_changed();

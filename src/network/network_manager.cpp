@@ -35,6 +35,7 @@
 #include "network/netsockets.h"
 #include "network/network.h"
 #include "network/server.h"
+#include "util/event_loop.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -91,9 +92,11 @@ void network_manager::init_client_connect()
 
 void network_manager::process_client_request()
 {
-	if (this->get_client()->Update(GetTicks()) == false) {
-		NetConnectRunning = 0;
-	}
+	event_loop::get()->co_spawn([this]() -> boost::asio::awaitable<void> {
+		if (co_await this->get_client()->Update(GetTicks()) == false) {
+			NetConnectRunning = 0;
+		}
+	});
 }
 
 void network_manager::init_server_connect(const int open_slots)

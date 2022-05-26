@@ -56,9 +56,11 @@ static void WaitCallbackButtonReleased(unsigned, const Qt::KeyboardModifiers)
 /**
 **  Callback for input.
 */
-static void WaitCallbackKeyPressed(unsigned, unsigned, const Qt::KeyboardModifiers)
+[[nodiscard]]
+static boost::asio::awaitable<void> WaitCallbackKeyPressed(unsigned, unsigned, const Qt::KeyboardModifiers)
 {
 	WaitNoEvent = false;
+	co_return;
 }
 
 /**
@@ -128,7 +130,6 @@ boost::asio::awaitable<void> TitleScreen::ShowTitleImage(std::vector<std::functi
 	callbacks.KeyPressed = WaitCallbackKeyPressed;
 	callbacks.KeyReleased = WaitCallbackKeyReleased;
 	callbacks.KeyRepeated = WaitCallbackKeyRepeated;
-	callbacks.NetworkEvent = nullptr;
 
 	SetCallbacks(&callbacks);
 

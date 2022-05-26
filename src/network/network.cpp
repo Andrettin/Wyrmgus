@@ -232,6 +232,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
+#include "util/exception_util.h"
 #include "util/random.h"
 #include "video/video.h"
 
@@ -339,7 +340,8 @@ static int PlayerQuit[PlayerMax];          /// Player quit
 **  @param packet       Packet to send.
 **  @param numcommands  Number of commands.
 */
-static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int player = 255)
+[[nodiscard]]
+static boost::asio::awaitable<void> NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int player = 255)
 {
 	const unsigned int size = packet.Size(numcommands);
 	auto buf = std::make_unique<unsigned char[]>(size);
@@ -352,11 +354,11 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int 
 			if (Hosts[i].PlyNr == player) {
 				continue;
 			}
-			NetworkFildes.Send(host, buf.get(), size);
+			co_await NetworkFildes.Send(host, buf.get(), size);
 		}
 	} else { // client
 		const CHost host(Hosts[HostsCount - 1].Host, Hosts[HostsCount - 1].Port);
-		NetworkFildes.Send(host, buf.get(), size);
+		co_await NetworkFildes.Send(host, buf.get(), size);
 	}
 }
 
@@ -365,7 +367,8 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int 
 **
 **  @param ncq  Outgoing network queue start.
 */
-static void NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommands])
+[[nodiscard]]
+static boost::asio::awaitable<void> NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommands])
 {
 	CNetworkPacket packet;
 
@@ -382,7 +385,7 @@ static void NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommand
 	for (; i < MaxNetworkCommands; ++i) {
 		packet.Header.Type[i] = MessageNone;
 	}
-	NetworkBroadcast(packet, numcommands);
+	co_await NetworkBroadcast(packet, numcommands);
 }
 
 //----------------------------------------------------------------------------
@@ -685,7 +688,8 @@ static bool IsNetworkCommandReady(unsigned long gameNetCycle)
 	return true;
 }
 
-static void ParseResendCommand(const CNetworkPacket &packet)
+[[nodiscard]]
+static boost::asio::awaitable<void> ParseResendCommand(const CNetworkPacket &packet)
 {
 	// Destination cycle (time to execute).
 	unsigned long n = ((GameCycle + 128) & ~0xFF) | packet.Header.Cycle;
@@ -697,9 +701,11 @@ static void ParseResendCommand(const CNetworkPacket &packet)
 	// other side sends re-send until it gets an answer.
 	if (n != NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->get_index()][0].Time) {
 		// Asking for a cycle we haven't gotten to yet, ignore for now
-		return;
+		co_return;
 	}
-	NetworkSendPacket(NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->get_index()]);
+
+	co_await NetworkSendPacket(NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->get_index()]);
+
 	// Check if a player quit this cycle
 	for (int j = 0; j < HostsCount; ++j) {
 		for (int c = 0; c < MaxNetworkCommands; ++c) {
@@ -713,7 +719,7 @@ static void ParseResendCommand(const CNetworkPacket &packet)
 				for (int k = 1; k < MaxNetworkCommands; ++k) {
 					np.Header.Type[k] = MessageNone;
 				}
-				NetworkBroadcast(np, 1);
+				co_await NetworkBroadcast(np, 1);
 				break;
 			}
 		}
@@ -764,7 +770,8 @@ static bool IsAValidCommand(const CNetworkPacket &packet, int index, const int p
 	// FIXME: not all values in nc have been validated
 }
 
-static void NetworkParseInGameEvent(const std::array<unsigned char, 1024> &buf, int len, const CHost &host)
+[[nodiscard]]
+static boost::asio::awaitable<void> NetworkParseInGameEvent(const std::array<unsigned char, 1024> &buf, int len, const CHost &host)
 {
 	CNetworkPacket packet;
 	int commands;
@@ -778,18 +785,18 @@ static void NetworkParseInGameEvent(const std::array<unsigned char, 1024> &buf, 
 			const std::string hostStr = host.toString();
 			DebugPrint("Not a host in play: %s\n" _C_ hostStr.c_str());
 #endif
-			return;
+			co_return;
 		}
 		player = Hosts[index].PlyNr;
 	}
 	if (NetConnectType == 1) {
 		if (player != 255) {
-			NetworkBroadcast(packet, commands, player);
+			co_await NetworkBroadcast(packet, commands, player);
 		}
 	}
 	if (commands < 0) {
 		DebugPrint("Bad packet read\n");
-		return;
+		co_return;
 	}
 	NetworkLastCycle[player] = packet.Header.Cycle;
 	// Parse the packet commands.
@@ -805,8 +812,8 @@ static void NetworkParseInGameEvent(const std::array<unsigned char, 1024> &buf, 
 			}
 		}
 		if (packet.Header.Type[i] == MessageResend) {
-			ParseResendCommand(packet);
-			return;
+			co_await ParseResendCommand(packet);
+			co_return;
 		}
 		// Receive statistic
 		NetworkLastFrame[player] = FrameCounter;
@@ -845,44 +852,51 @@ static void NetworkParseInGameEvent(const std::array<unsigned char, 1024> &buf, 
 **  Called if message for the network is ready.
 **  (by WaitEventsOneFrame)
 */
-void NetworkEvent()
+boost::asio::awaitable<void> NetworkEvent()
 {
 	if (!IsNetworkGame()) {
 		NetworkInSync = true;
-		return;
+		co_return;
 	}
 
 	// Read the packet.
 	std::array<unsigned char, 1024> buf{};
 	CHost host;
-	int len = NetworkFildes.Recv(buf, sizeof(buf), &host);
-	if (len < 0) {
+
+	size_t len = 0;
+
+	try {
+		len = co_await NetworkFildes.Recv(buf, sizeof(buf), &host);
+	} catch (const std::exception &exception) {
+		exception::report(exception);
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
 		NetworkInSync = false;
-		return;
+		co_return;
 	}
 
 	// Setup messages
 	if (NetConnectRunning) {
-		if (NetworkParseSetupEvent(buf, host)) {
-			return;
+		if (co_await NetworkParseSetupEvent(buf, host)) {
+			co_return;
 		}
 	}
+
 	const unsigned char msgtype = buf[0];
 	if (msgtype == MessageInit_FromClient || msgtype == MessageInit_FromServer) {
-		return;
+		co_return;
 	}
-	NetworkParseInGameEvent(buf, len, host);
+
+	co_await NetworkParseInGameEvent(buf, len, host);
 }
 
 /**
 **  Quit the game.
 */
-void NetworkQuitGame()
+boost::asio::awaitable<void> NetworkQuitGame()
 {
 	if (!CPlayer::GetThisPlayer() || IsNetworkGame() == false) {
-		return;
+		co_return;
 	}
 	const int gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 	const int NetworkLag = CNetworkParameter::Instance.NetworkLag;
@@ -898,7 +912,7 @@ void NetworkQuitGame()
 		ncqs[i].Type = MessageNone;
 		ncqs[i].Data.clear();
 	}
-	NetworkSendPacket(ncqs);
+	co_await NetworkSendPacket(ncqs);
 }
 
 static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
@@ -1006,7 +1020,8 @@ static void NetworkExecCommand(const CNetworkCommandQueue &ncq)
 /**
 **  Network send commands.
 */
-static void NetworkSendCommands(unsigned long gameNetCycle)
+[[nodiscard]]
+static boost::asio::awaitable<void> NetworkSendCommands(unsigned long gameNetCycle)
 {
 	// No command available, send sync.
 	int numcommands = 0;
@@ -1054,7 +1069,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 	}
 	NetworkSyncSeeds[gameNetCycle & 0xFF] = wyrmgus::random::get()->get_seed();
 	NetworkSyncHashs[gameNetCycle & 0xFF] = SyncHash;
-	NetworkSendPacket(ncq);
+	co_await NetworkSendPacket(ncq);
 }
 
 /**
@@ -1080,27 +1095,28 @@ static void NetworkExecCommands(unsigned long gameNetCycle)
 /**
 **  Handle network commands.
 */
-void NetworkCommands()
+boost::asio::awaitable<void> NetworkCommands()
 {
 	if (!IsNetworkGame()) {
-		return;
+		co_return;
 	}
 	if ((GameCycle % CNetworkParameter::Instance.gameCyclesPerUpdate) != 0) {
-		return;
+		co_return;
 	}
 	const unsigned long gameNetCycle = GameCycle;
 	// Send messages to all clients (other players)
-	NetworkSendCommands(gameNetCycle + CNetworkParameter::Instance.NetworkLag);
+	co_await NetworkSendCommands(gameNetCycle + CNetworkParameter::Instance.NetworkLag);
 	NetworkExecCommands(gameNetCycle);
 	NetworkInSync = IsNetworkCommandReady(gameNetCycle + CNetworkParameter::Instance.gameCyclesPerUpdate);
 }
 
-static void CheckPlayerThatTimeOut(int hostIndex)
+[[nodiscard]]
+static boost::asio::awaitable<void> CheckPlayerThatTimeOut(int hostIndex)
 {
 	const int playerIndex = Hosts[hostIndex].PlyNr;
 	const unsigned long lastFrame = NetworkLastFrame[playerIndex];
 	if (!lastFrame) {
-		return;
+		co_return;
 	}
 	const int framesPerSecond = FRAMES_PER_SECOND * VideoSyncSpeed / 100;
 	const int secs = (FrameCounter - lastFrame) / framesPerSecond;
@@ -1127,7 +1143,7 @@ static void CheckPlayerThatTimeOut(int hostIndex)
 		np.Header.Type[0] = ncq->Type;
 		np.Header.Type[1] = MessageNone;
 
-		NetworkBroadcast(np, 1);
+		co_await NetworkBroadcast(np, 1);
 	}
 }
 
@@ -1138,7 +1154,8 @@ static void CheckPlayerThatTimeOut(int hostIndex)
 **  @todo
 **  We need only send to the clients, that have not delivered the packet.
 */
-static void NetworkResendCommands()
+[[nodiscard]]
+static boost::asio::awaitable<void> NetworkResendCommands()
 {
 #ifdef DEBUG
 	++NetworkStat.resentPacketCount;
@@ -1152,25 +1169,22 @@ static void NetworkResendCommands()
 	packet.Header.Type[1] = MessageNone;
 	packet.Header.Cycle = uint8_t(nextGameCycle & 0xFF);
 
-	NetworkBroadcast(packet, 1);
+	co_await NetworkBroadcast(packet, 1);
 }
 
-/**
-**  Recover network.
-*/
-void NetworkRecover()
+boost::asio::awaitable<void> NetworkRecover()
 {
 	if (HostsCount == 0) {
 		NetworkInSync = true;
-		return;
+		co_return;
 	}
 	if (FrameCounter % CNetworkParameter::Instance.gameCyclesPerUpdate != 0) {
-		return;
+		co_return;
 	}
 	for (int i = 0; i != HostsCount; ++i) {
-		CheckPlayerThatTimeOut(i);
+		co_await CheckPlayerThatTimeOut(i);
 	}
-	NetworkResendCommands();
+	co_await NetworkResendCommands();
 	const unsigned int nextGameNetCycle = GameCycle / CNetworkParameter::Instance.gameCyclesPerUpdate + 1;
 	NetworkInSync = IsNetworkCommandReady(nextGameNetCycle);
 }

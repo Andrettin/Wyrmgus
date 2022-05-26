@@ -40,8 +40,12 @@ public:
 	event_loop();
 	~event_loop();
 
+	boost::asio::io_context &get_io_context() const
+	{
+		return *this->io_context;
+	}
+
 	void stop();
-	void stop_and_exit(const int exit_code);
 
 	void post(const std::function<void()> &function);
 

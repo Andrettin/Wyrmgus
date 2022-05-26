@@ -1203,7 +1203,7 @@ static bool IsKeyPad(unsigned key, unsigned *kp)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-void HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
+boost::asio::awaitable<void> HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	switch (key) {
 		case SDLK_SYSREQ:
@@ -1213,13 +1213,13 @@ void HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers k
 			if (GameRunning) {
 				SetMessage("%s", _("Screenshot made."));
 			}
-			return;
+			co_return;
 		default:
 			break;
 	}
 
 	if (HandleKeyModifiersDown(key)) {
-		return;
+		co_return;
 	}
 
 	// Handle All other keys
@@ -1235,7 +1235,7 @@ void HandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers k
 		if (!(key_modifiers & (Qt::ControlModifier | Qt::AltModifier))) {
 			if (!GameObserve && !game::get()->is_paused() && !GameEstablishing) {
 				if (UI.ButtonPanel.DoKey(key, key_modifiers)) {
-					return;
+					co_return;
 				}
 			}
 		}
@@ -1608,7 +1608,7 @@ static unsigned DoubleKey;						/// last key pressed
 **  @param ikey       Key scancode.
 **  @param ikeychar   Character code.
 */
-void InputKeyButtonPress(const EventCallback &callbacks,
+boost::asio::awaitable<void> InputKeyButtonPress(const EventCallback &callbacks,
 						 unsigned ticks, unsigned ikey, unsigned ikeychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (!LastIKey && DoubleKey == ikey && ticks < LastKeyTicks + DoubleClickDelay) {
@@ -1621,7 +1621,7 @@ void InputKeyButtonPress(const EventCallback &callbacks,
 
 	HandleKeyModifiers(key_modifiers);
 
-	callbacks.KeyPressed(ikey, ikeychar, key_modifiers);
+	co_await callbacks.KeyPressed(ikey, ikeychar, key_modifiers);
 	KeyModifiers &= ~ModifierDoublePress;
 }
 

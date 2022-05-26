@@ -49,43 +49,27 @@ private:
 class CUDPSocket_Impl;
 class CTCPSocket_Impl;
 
-class CUDPSocket
+class CUDPSocket final
 {
 public:
 	CUDPSocket();
 	~CUDPSocket();
 	bool Open(const CHost &host);
 	void Close();
-	void Send(const CHost &host, const void *buf, unsigned int len);
-	int Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Send(const CHost &host, const void *buf, unsigned int len);
+
+	[[nodiscard]]
+	boost::asio::awaitable<size_t> Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom);
+
 	void SetNonBlocking();
-	//
-	int HasDataToRead(int timeout);
+	size_t HasDataToRead();
+
+	[[nodiscard]]
+	boost::asio::awaitable<size_t> WaitForDataToRead(const int timeout);
+
 	bool IsValid() const;
-
-#ifdef DEBUG
-	class CStatistic
-	{
-		friend class CUDPSocket;
-	public:
-		CStatistic();
-		void clear();
-	public:
-		unsigned int sentPacketsCount;
-		unsigned int receivedPacketsCount;
-		unsigned int sentBytesCount;
-		unsigned int receivedBytesCount;
-		unsigned int receivedErrorCount;
-		unsigned int receivedBytesExpectedCount;
-		unsigned int biggestSentPacketSize;
-		unsigned int biggestReceivedPacketSize;
-	};
-
-	void clearStatistic() { m_statistic.clear(); }
-	const CStatistic &getStatistic() const { return m_statistic; }
-private:
-	CStatistic m_statistic;
-#endif
 
 private:
 	std::unique_ptr<CUDPSocket_Impl> m_impl;

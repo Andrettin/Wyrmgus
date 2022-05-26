@@ -843,7 +843,7 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 	} catch (const std::exception &exception) {
 		exception::report(exception);
 		log::log_error("Failed to apply campaign map for campaign \"" + campaign_ident + "\".");
-		Exit(EXIT_FAILURE);
+		std::terminate();
 	}
 }
 //Wyrmgus end
