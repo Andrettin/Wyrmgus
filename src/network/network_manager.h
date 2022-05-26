@@ -31,6 +31,7 @@
 namespace wyrmgus {
 
 class client;
+class map_info;
 class multiplayer_setup;
 class server;
 
@@ -40,6 +41,7 @@ class network_manager final : public QObject, public singleton<network_manager>
 
 	Q_PROPERTY(wyrmgus::client* client READ get_client CONSTANT)
 	Q_PROPERTY(wyrmgus::server* server READ get_server CONSTANT)
+	Q_PROPERTY(wyrmgus::map_info* map_info READ get_map_info NOTIFY map_info_changed)
 	Q_PROPERTY(int connected_player_count READ get_connected_player_count_sync NOTIFY connected_player_count_changed)
 
 public:
@@ -61,6 +63,8 @@ public:
 	Q_INVOKABLE void init_server_connect(const QString &map_filepath_qstr, const int open_slots);
 
 	Q_INVOKABLE int get_network_state() const;
+
+	map_info *get_map_info() const;
 
 	Q_INVOKABLE QString get_player_name(const int player_index) const;
 
@@ -101,6 +105,7 @@ public:
 	}
 
 signals:
+	void map_info_changed();
 	void player_name_changed(const int player_index, const QString &name);
 	void player_ready_changed(const int player_index, const bool ready);
 	void connected_player_count_changed();

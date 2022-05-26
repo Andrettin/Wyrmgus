@@ -533,13 +533,14 @@ void client::Parse_Map(const unsigned char *buf)
 	if (networkState.State != ccs_connected) {
 		return;
 	}
+
 	CInitMessage_Map msg;
 
 	msg.Deserialize(buf);
 
 	NetworkMapName = std::string(msg.MapPath, sizeof(msg.MapPath));
 
-	const std::filesystem::path map_path = database::get()->get_root_path() / NetworkMapName;
+	const std::filesystem::path map_path = database::get()->get_root_path() / path::from_string(NetworkMapName);
 	LoadStratagusMapInfo(map_path);
 	if (msg.MapUID != CMap::get()->Info->MapUID) {
 		networkState.State = ccs_badmap;
@@ -547,8 +548,11 @@ void client::Parse_Map(const unsigned char *buf)
 			CMap::get()->Info->MapUID, static_cast<unsigned int>(msg.MapUID));
 		return;
 	}
+
 	networkState.State = ccs_mapinfo;
 	networkState.MsgCnt = 0;
+
+	emit network_manager::get()->map_info_changed();
 }
 
 void client::Parse_Welcome(const unsigned char *buf)

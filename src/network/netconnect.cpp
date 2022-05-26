@@ -139,7 +139,7 @@ boost::asio::awaitable<int> NetworkParseSetupEvent(const std::array<unsigned cha
 */
 void NetworkProcessClientRequest()
 {
-	thread_pool::get()->co_spawn_sync([]() -> boost::asio::awaitable<void> {
+	thread_pool::get()->co_spawn([]() -> boost::asio::awaitable<void> {
 		if (co_await client::get()->Update(GetTicks()) == false) {
 			NetConnectRunning = 0;
 		}

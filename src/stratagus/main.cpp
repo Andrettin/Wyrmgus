@@ -34,6 +34,7 @@
 #include "game/game.h"
 #include "game/results_info.h"
 #include "map/map_grid_model.h"
+#include "map/map_info.h"
 #include "map/map_presets.h"
 #include "map/tile_image_provider.h"
 #include "map/tile_transition.h"
@@ -133,6 +134,7 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<faction>("", 1);
 		qmlRegisterAnonymousType<game>("", 1);
 		qmlRegisterAnonymousType<icon>("", 1);
+		qmlRegisterAnonymousType<map_info>("", 1);
 		qmlRegisterAnonymousType<map_presets>("", 1);
 		qmlRegisterAnonymousType<network_manager>("", 1);
 		qmlRegisterAnonymousType<pantheon>("", 1);

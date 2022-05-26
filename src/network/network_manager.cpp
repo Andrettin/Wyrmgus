@@ -32,6 +32,7 @@
 #include "database/database.h"
 #include "database/preferences.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "network/netconnect.h"
 #include "network/client.h"
 #include "network/netsockets.h"
@@ -116,6 +117,8 @@ void network_manager::init_server_connect(const QString &map_filepath_qstr, cons
 
 	LoadStratagusMapInfo(map_filepath);
 
+	emit map_info_changed();
+
 	this->get_server()->init(preferences::get()->get_local_player_name(), &NetworkFildes, open_slots);
 
 	std::unique_lock<std::shared_mutex> lock(this->get_mutex());
@@ -129,6 +132,11 @@ void network_manager::init_server_connect(const QString &map_filepath_qstr, cons
 int network_manager::get_network_state() const
 {
 	return this->get_client()->GetNetworkState();
+}
+
+map_info *network_manager::get_map_info() const
+{
+	return CMap::get()->get_info();
 }
 
 QString network_manager::get_player_name(const int player_index) const
