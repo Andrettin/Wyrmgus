@@ -73,6 +73,8 @@ public:
 		return *this->local_setup;
 	}
 
+	Q_INVOKABLE bool is_player_ready(const int player_index) const;
+
 private:
 	[[nodiscard]]
 	boost::asio::awaitable<bool> Update_disconnected();

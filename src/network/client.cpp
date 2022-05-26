@@ -40,6 +40,7 @@
 #include "network/network_manager.h"
 #include "util/assert_util.h"
 #include "util/log_util.h"
+#include "util/path_util.h"
 #include "util/util.h"
 #include "version.h"
 
@@ -143,6 +144,11 @@ void client::DetachFromServer()
 {
 	networkState.State = ccs_detaching;
 	networkState.MsgCnt = 0;
+}
+
+bool client::is_player_ready(const int player_index) const
+{
+	return static_cast<bool>(this->server_setup->Ready[player_index]);
 }
 
 boost::asio::awaitable<bool> client::Update_disconnected()
@@ -606,23 +612,44 @@ void client::Parse_Welcome(const unsigned char *buf)
 void client::Parse_State(const unsigned char *buf)
 {
 	CInitMessage_State msg;
-
 	msg.Deserialize(buf);
-	if (networkState.State == ccs_mapinfo) {
-		// Server has sent us first state info
-		*this->server_setup = msg.State;
-		networkState.State = ccs_synced;
-		networkState.MsgCnt = 0;
-	} else if (networkState.State == ccs_synced
-		|| networkState.State == ccs_changed) {
-		*this->server_setup = msg.State;
-		networkState.State = ccs_async;
-		networkState.MsgCnt = 0;
-	} else if (networkState.State == ccs_goahead) {
-		// Server has sent final state info
-		*this->server_setup = msg.State;
-		networkState.State = ccs_started;
-		networkState.MsgCnt = 0;
+
+	switch (networkState.State) {
+		case ccs_mapinfo:
+		case ccs_synced:
+		case ccs_changed:
+		case ccs_goahead: {
+			const multiplayer_setup old_setup = *this->server_setup;
+
+			*this->server_setup = msg.State;
+			networkState.MsgCnt = 0;
+
+			for (int i = 1; i < PlayerMax - 1; ++i) {
+				if (old_setup.Ready[i] != this->server_setup->Ready[i]) {
+					emit network_manager::get()->player_ready_changed(i, static_cast<bool>(this->server_setup->Ready[i]));
+				}
+			}
+			break;
+		}
+		default:
+			break;
+	}
+
+	switch (networkState.State) {
+		case ccs_mapinfo:
+			// Server has sent us first state info
+			networkState.State = ccs_synced;
+			break;
+		case ccs_synced:
+		case ccs_changed:
+			networkState.State = ccs_async;
+			break;
+		case ccs_goahead:
+			// Server has sent final state info
+			networkState.State = ccs_started;
+			break;
+		default:
+			break;
 	}
 }
 
