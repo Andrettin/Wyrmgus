@@ -41,6 +41,7 @@ class CNetworkParameter
 public:
 	CNetworkParameter();
 	void FixValues();
+
 public:
 	std::string localHost;  /// Local network address to use
 	unsigned int localPort; /// Local network port to use
@@ -49,7 +50,8 @@ public:
 	unsigned int timeoutInS;      /// Number of seconds until player times out
 
 public:
-	static const int defaultPort = 6660; /// Default communication port
+	static constexpr int default_port = 6660; /// Default communication port
+
 public:
 	static CNetworkParameter Instance;
 };

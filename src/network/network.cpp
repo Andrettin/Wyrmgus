@@ -270,7 +270,7 @@ CNetworkParameter CNetworkParameter::Instance;
 CNetworkParameter::CNetworkParameter()
 {
 	localHost = "127.0.0.1";
-	localPort = defaultPort;
+	localPort = CNetworkParameter::default_port;
 	gameCyclesPerUpdate = 1;
 	NetworkLag = 10;
 	timeoutInS = 45;
@@ -851,6 +851,7 @@ void NetworkEvent()
 		NetworkInSync = true;
 		return;
 	}
+
 	// Read the packet.
 	std::array<unsigned char, 1024> buf{};
 	CHost host;

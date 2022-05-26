@@ -54,12 +54,15 @@ void network_manager::reset()
 	for (int i = 0; i < PlayerMax; ++i) {
 		Hosts[i].Clear();
 	}
+
+	this->connected_player_count = 0;
+	this->ready_player_count = 0;
 }
 
 bool network_manager::setup_server_address(const std::string &server_address, int port)
 {
 	if (port == 0) {
-		port = CNetworkParameter::Instance.defaultPort;
+		port = CNetworkParameter::Instance.default_port;
 	}
 
 	auto host = std::make_unique<CHost>(server_address.c_str(), port);
