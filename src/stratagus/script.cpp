@@ -230,8 +230,9 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 
 	std::string content;
 	if (GetFileContent(file, content) == false) {
-		return -1;
+		throw std::runtime_error("Failed to load Lua file: \"" + file + "\"");
 	}
+
 	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.c_str());
 
 	if (!status) {
@@ -244,6 +245,7 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 	} else {
 		report(status, true);
 	}
+
 	return status;
 }
 

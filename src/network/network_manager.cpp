@@ -29,7 +29,9 @@
 
 #include "network/network_manager.h"
 
+#include "database/database.h"
 #include "database/preferences.h"
+#include "map/map.h"
 #include "network/netconnect.h"
 #include "network/client.h"
 #include "network/netsockets.h"
@@ -100,14 +102,19 @@ void network_manager::process_client_request()
 	});
 }
 
-void network_manager::init_server_connect(const QString &map_filepath, const int open_slots)
+void network_manager::init_server_connect(const QString &map_filepath_qstr, const int open_slots)
 {
 	NetConnectRunning = 1;
 	NetConnectType = 1;
 
 	this->reset();
 
-	NetworkMapName = path::to_string(path::from_qstring(map_filepath));
+	const std::filesystem::path map_filepath = path::from_qstring(map_filepath_qstr);
+	const std::filesystem::path relative_map_filepath = std::filesystem::relative(map_filepath, database::get()->get_root_path());
+
+	NetworkMapName = path::to_string(relative_map_filepath);
+
+	LoadStratagusMapInfo(map_filepath);
 
 	this->get_server()->init(preferences::get()->get_local_player_name(), &NetworkFildes, open_slots);
 

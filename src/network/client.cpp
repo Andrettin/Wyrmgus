@@ -528,41 +528,6 @@ boost::asio::awaitable<bool> client::Parse(const std::array<unsigned char, 1024>
 	co_return true;
 }
 
-/**
-** Check if the map name looks safe.
-**
-** A map name looks safe when there are no special characters
-** and no .. or // sequences. This way only real valid
-** maps from the map directory will be loaded.
-**
-** @return  true if the map name looks safe.
-*/
-static bool IsSafeMapName(const char *mapname)
-{
-	char buf[256];
-
-	if (strncpy_s(buf, sizeof(buf), mapname, sizeof(buf)) != 0) {
-		return false;
-	}
-	if (strstr(buf, "..")) {
-		return false;
-	}
-	if (strstr(buf, "//")) {
-		return false;
-	}
-	if (buf[0] == '\0') {
-		return false;
-	}
-
-	for (const char *ch = buf; *ch != '\0'; ++ch) {
-		if (!isalnum(*ch) && *ch != '/' && *ch != '.' && *ch != '-'
-			&& *ch != '(' && *ch != ')' && *ch != '_') {
-			return false;
-		}
-	}
-	return true;
-}
-
 void client::Parse_Map(const unsigned char *buf)
 {
 	if (networkState.State != ccs_connected) {
@@ -571,12 +536,9 @@ void client::Parse_Map(const unsigned char *buf)
 	CInitMessage_Map msg;
 
 	msg.Deserialize(buf);
-	if (!IsSafeMapName(msg.MapPath)) {
-		log::log_error("Insecure map name: \"" + std::string(msg.MapPath) + "\"");
-		networkState.State = ccs_badmap;
-		return;
-	}
+
 	NetworkMapName = std::string(msg.MapPath, sizeof(msg.MapPath));
+
 	const std::filesystem::path map_path = database::get()->get_root_path() / NetworkMapName;
 	LoadStratagusMapInfo(map_path);
 	if (msg.MapUID != CMap::get()->Info->MapUID) {
