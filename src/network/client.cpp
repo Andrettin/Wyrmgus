@@ -572,7 +572,7 @@ void client::Parse_Map(const unsigned char *buf)
 
 	msg.Deserialize(buf);
 	if (!IsSafeMapName(msg.MapPath)) {
-		log::log_error("Insecure map name!");
+		log::log_error("Insecure map name: \"" + std::string(msg.MapPath) + "\"");
 		networkState.State = ccs_badmap;
 		return;
 	}

@@ -58,7 +58,7 @@ public:
 	Q_INVOKABLE void init_client_connect();
 	Q_INVOKABLE void process_client_request();
 
-	Q_INVOKABLE void init_server_connect(const int open_slots);
+	Q_INVOKABLE void init_server_connect(const QString &map_filepath, const int open_slots);
 
 	Q_INVOKABLE int get_network_state() const;
 

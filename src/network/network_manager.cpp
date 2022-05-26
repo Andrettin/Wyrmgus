@@ -36,6 +36,7 @@
 #include "network/network.h"
 #include "network/server.h"
 #include "util/event_loop.h"
+#include "util/path_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -99,12 +100,14 @@ void network_manager::process_client_request()
 	});
 }
 
-void network_manager::init_server_connect(const int open_slots)
+void network_manager::init_server_connect(const QString &map_filepath, const int open_slots)
 {
 	NetConnectRunning = 1;
 	NetConnectType = 1;
 
 	this->reset();
+
+	NetworkMapName = path::to_string(path::from_qstring(map_filepath));
 
 	this->get_server()->init(preferences::get()->get_local_player_name(), &NetworkFildes, open_slots);
 
