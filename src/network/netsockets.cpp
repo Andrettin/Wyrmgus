@@ -80,7 +80,7 @@ public:
 
 	bool Open(const CHost &host)
 	{
-		this->endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address_v4(host.getIp()), host.getPort());
+		this->endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
 		this->socket = boost::asio::ip::udp::socket(event_loop::get()->get_io_context(), this->endpoint);
 		return this->socket.is_open();
 	}
@@ -93,7 +93,7 @@ public:
 	[[nodiscard]]
 	boost::asio::awaitable<void> Send(const CHost &host, const void *buf, unsigned int len)
 	{
-		boost::asio::ip::udp::endpoint receiver_endpoint(boost::asio::ip::address_v4(host.getIp()), host.getPort());
+		boost::asio::ip::udp::endpoint receiver_endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
 		co_await this->socket.async_send_to(boost::asio::buffer(buf, len), receiver_endpoint, boost::asio::use_awaitable);
 	}
 
@@ -104,7 +104,7 @@ public:
 
 		const size_t size = co_await this->socket.async_receive_from(boost::asio::buffer(buf.data(), buf.size()), sender_endpoint, boost::asio::use_awaitable);
 
-		*hostFrom = CHost(sender_endpoint.address().to_v4().to_ulong(), sender_endpoint.port());
+		*hostFrom = CHost(htonl(sender_endpoint.address().to_v4().to_ulong()), htons(sender_endpoint.port()));
 
 		co_return size;
 	}
