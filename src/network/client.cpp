@@ -544,7 +544,7 @@ void client::Parse_Map(const unsigned char *buf)
 
 	msg.Deserialize(buf);
 
-	NetworkMapName = std::string(msg.MapPath, sizeof(msg.MapPath));
+	NetworkMapName = std::string(msg.MapPath);
 
 	const std::filesystem::path map_path = database::get()->get_root_path() / path::from_string(NetworkMapName);
 	LoadStratagusMapInfo(map_path);
