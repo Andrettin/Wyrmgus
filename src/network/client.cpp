@@ -689,6 +689,8 @@ void client::Parse_State(const unsigned char *buf)
 			if (old_setup.Opponents != this->server_setup->Opponents) {
 				emit computer_opponents_changed();
 			}
+
+			network_manager::get()->check_players(this->server_setup.get());
 			break;
 		}
 		default:
