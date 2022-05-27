@@ -46,6 +46,7 @@ class client final : public QObject, public singleton<client>
 	Q_PROPERTY(bool reveal_map READ is_reveal_map_enabled_sync NOTIFY reveal_map_changed)
 	Q_PROPERTY(bool computer_opponents READ has_computer_opponents_sync NOTIFY computer_opponents_changed)
 	Q_PROPERTY(int resources_option READ get_resources_option_sync NOTIFY resources_option_changed)
+	Q_PROPERTY(int difficulty READ get_difficulty_sync NOTIFY difficulty_changed)
 
 public:
 	client();
@@ -116,6 +117,15 @@ public:
 		std::shared_lock<std::shared_mutex> lock(this->mutex);
 
 		return this->get_resources_option();
+	}
+
+	int get_difficulty() const;
+
+	int get_difficulty_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->get_difficulty();
 	}
 
 	Q_INVOKABLE void start_game();
@@ -204,6 +214,7 @@ signals:
 	void reveal_map_changed();
 	void computer_opponents_changed();
 	void resources_option_changed();
+	void difficulty_changed();
 
 private:
 	std::string name;

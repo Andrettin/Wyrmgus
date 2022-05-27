@@ -175,6 +175,11 @@ int client::get_resources_option() const
 	return static_cast<int>(this->server_setup->ResourcesOption);
 }
 
+int client::get_difficulty() const
+{
+	return static_cast<int>(this->server_setup->Difficulty);
+}
+
 void client::set_civilization(const int civilization_index)
 {
 	event_loop::get()->post([this, civilization_index]() {
@@ -700,6 +705,11 @@ void client::Parse_State(const unsigned char *buf)
 			if (old_setup.ResourcesOption != this->server_setup->ResourcesOption) {
 				GameSettings.Resources = this->get_resources_option();
 				emit resources_option_changed();
+			}
+
+			if (old_setup.Difficulty != this->server_setup->Difficulty) {
+				GameSettings.Difficulty = this->get_difficulty();
+				emit difficulty_changed();
 			}
 
 			network_manager::get()->check_players(this->server_setup.get());
