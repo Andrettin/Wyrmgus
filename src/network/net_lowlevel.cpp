@@ -108,16 +108,6 @@ void NetExit()
 }
 
 /**
-**  Close an UDP socket port.
-**
-**  @param sockfd  Socket fildes
-*/
-void NetCloseUDP(Socket sockfd)
-{
-	closesocket(sockfd);
-}
-
-/**
 **  Close a TCP socket port.
 **
 **  @param sockfd  Socket fildes
@@ -144,16 +134,6 @@ int NetInit()
 */
 void NetExit()
 {
-}
-
-/**
-**  Close an UDP socket port.
-**
-**  @param sockfd  Socket fildes
-*/
-void NetCloseUDP(Socket sockfd)
-{
-	close(sockfd);
 }
 
 /**
@@ -352,40 +332,6 @@ int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 #endif // }
 
 /**
-**  Open an UDP Socket port.
-**
-**  @param ip !=0 Ip to bind in host notation.
-**  @param port !=0 Port to bind in host notation.
-**
-**  @return If success the socket fildes, -1 otherwise.
-*/
-Socket NetOpenUDP(unsigned long ip, int port)
-{
-	// open the socket
-	Socket sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-
-	if (sockfd == INVALID_SOCKET) {
-		return static_cast<Socket>(-1);
-	}
-	// bind local port
-	if (port) {
-		struct sockaddr_in sock_addr;
-
-		memset(&sock_addr, 0, sizeof(sock_addr));
-		sock_addr.sin_family = AF_INET;
-		sock_addr.sin_addr.s_addr = ip;
-		sock_addr.sin_port = port;
-		// Bind the socket for listening
-		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
-			log::log_error("Couldn't bind to local port.");
-			NetCloseUDP(sockfd);
-			return static_cast<Socket>(-1);
-		}
-	}
-	return sockfd;
-}
-
-/**
 **  Open a TCP socket
 **
 **  @param port  Bind socket to a specific port number
@@ -558,42 +504,6 @@ int SocketSet::HasDataToRead(Socket socket) const
 }
 
 /**
-**  Receive from a UDP socket.
-**
-**  @param sockfd    Socket
-**  @param buf       Receive message buffer.
-**  @param len       Receive message buffer length.
-**  @param hostFrom  host of the sender.
-**  @param portFrom  port of the sender.
-**
-**  @return Number of bytes placed in buffer, or -1 if failure.
-*/
-int NetRecvUDP(Socket sockfd, std::array<unsigned char, 1024> &buf, int len, unsigned long *hostFrom, int *portFrom)
-{
-	struct sockaddr_in sock_addr{};
-	socklen_t n = sizeof(struct sockaddr_in);
-	#ifdef __MORPHOS__
-	const int l = recvfrom(sockfd, (UBYTE*)buf, len, 0, (struct sockaddr *)&sock_addr, (LONG*)&n);
-	#else
-	const int l = recvfrom(sockfd, (recvfrombuftype)buf.data(), len, 0, (struct sockaddr *)&sock_addr, &n);
-	#endif
-	
-	if (l < 0) {
-		PrintFunction();
-		fprintf(stdout, "Could not read from UDP socket\n");
-		return -1;
-	}
-
-	// Packet check for validness is done higher up, we don't know who should be
-	// sending us packets at this level
-
-	*hostFrom = sock_addr.sin_addr.s_addr;
-	*portFrom = sock_addr.sin_port;
-
-	return l;
-}
-
-/**
 **  Receive from a TCP socket.
 **
 **  @param sockfd  Socket
@@ -623,33 +533,6 @@ int NetRecvTCP(Socket sockfd, void *buf, int len)
 		return 0;
 	}
 	return ret;
-}
-
-/**
-**  Send through a UPD socket to a host:port.
-**
-**  @param sockfd  Socket
-**  @param host    Host to send to (network byte order).
-**  @param port    Port of host to send to (network byte order).
-**  @param buf     Send message buffer.
-**  @param len     Send message buffer length.
-**
-**  @return Number of bytes sent.
-*/
-int NetSendUDP(Socket sockfd, unsigned long host, int port,
-			   const void *buf, int len)
-{
-	struct sockaddr_in sock_addr{};
-
-	const int n = sizeof(struct sockaddr_in);
-	sock_addr.sin_addr.s_addr = host;
-	sock_addr.sin_port = port;
-	sock_addr.sin_family = AF_INET;
-	#ifdef __MORPHOS__
-	return sendto(sockfd,  (const UBYTE*)(sendtobuftype)buf, len, 0, (struct sockaddr *)&sock_addr, n);
-	#else
-	return sendto(sockfd, (sendtobuftype)buf, len, 0, (struct sockaddr *)&sock_addr, n);
-	#endif
 }
 
 /**
