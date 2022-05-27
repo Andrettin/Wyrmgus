@@ -104,7 +104,7 @@ public:
 class CInitMessage_Config final
 {
 public:
-	static constexpr size_t max_hosts = 8;
+	static constexpr int max_hosts = 8;
 
 	CInitMessage_Config();
 	const CInitMessage_Header &GetHeader() const { return header; }
@@ -155,7 +155,7 @@ public:
 class CInitMessage_Welcome final
 {
 public:
-	static constexpr size_t max_hosts = 8;
+	static constexpr int max_hosts = 8;
 
 	CInitMessage_Welcome();
 	const CInitMessage_Header &GetHeader() const { return header; }
@@ -214,7 +214,7 @@ public:
 class CInitMessage_Resync final
 {
 public:
-	static constexpr size_t max_hosts = 8;
+	static constexpr int max_hosts = 8;
 
 	CInitMessage_Resync();
 	const CInitMessage_Header &GetHeader() const { return header; }
