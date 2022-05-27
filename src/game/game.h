@@ -356,8 +356,6 @@ extern void FreeAllContainers();
 
 extern void SaveGameSettings(CFile &file);             /// Save game settings
 
-extern void RunMap(const std::string &filepath);
-
 [[nodiscard]]
 extern boost::asio::awaitable<void> StartMap(const std::filesystem::path &filepath, const bool clean);
 

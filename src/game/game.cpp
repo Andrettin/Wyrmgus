@@ -626,16 +626,6 @@ void SaveGameSettings(CFile &file)
 	file.printf("\n");
 }
 
-void RunMap(const std::string &filepath)
-{
-	try {
-		game::get()->run_map(path::from_string(filepath));
-	} catch (const std::exception &exception) {
-		exception::report(exception);
-		Exit(EXIT_FAILURE);
-	}
-}
-
 boost::asio::awaitable<void> StartMap(const std::filesystem::path &filepath, const bool clean)
 {
 	try {

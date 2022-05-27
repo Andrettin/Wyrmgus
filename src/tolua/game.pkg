@@ -1,9 +1,6 @@
 $bool IsReplayGame();
 bool IsReplayGame();
 
-$void RunMap(const string &filepath);
-void RunMap(const string filepath);
-
 $#include "results.h"
 
 enum GameResults {
