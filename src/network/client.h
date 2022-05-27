@@ -128,6 +128,8 @@ public:
 		return this->get_difficulty();
 	}
 
+	Q_INVOKABLE void set_ready(const bool ready);
+
 	Q_INVOKABLE void start_game();
 
 private:
