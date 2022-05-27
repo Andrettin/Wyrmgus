@@ -430,16 +430,11 @@ boost::asio::awaitable<void> server::init_game()
 		while (j && co_await this->socket->WaitForDataToRead(1000)) {
 			CHost host;
 
-			size_t len = 0;
-
 			try {
-				len = co_await this->socket->Recv(buf, sizeof(buf), &host);
+				co_await this->socket->Recv(buf, sizeof(buf), &host);
 			} catch (const std::exception &exception) {
 				exception::report(exception);
-#ifdef DEBUG
-				const std::string hostStr = host.toString();
-				DebugPrint("*Receive ack failed: (%d) from %s\n" _C_ len _C_ hostStr.c_str());
-#endif
+				log::log_error("Receive ack failed.");
 				continue;
 			}
 
