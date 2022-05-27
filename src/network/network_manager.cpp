@@ -87,12 +87,14 @@ bool network_manager::setup_server_address(const std::string &server_address, in
 */
 void network_manager::init_client_connect()
 {
-	NetConnectRunning = 2;
-	NetConnectType = 2;
+	event_loop::get()->post([this]() {
+		NetConnectRunning = 2;
+		NetConnectType = 2;
 
-	this->reset();
+		this->reset();
 
-	this->get_client()->Init(preferences::get()->get_local_player_name(), &NetworkFildes, GetTicks());
+		this->get_client()->Init(preferences::get()->get_local_player_name(), &NetworkFildes, GetTicks());
+	});
 }
 
 void network_manager::process_client_request()
