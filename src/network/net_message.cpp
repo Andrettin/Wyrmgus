@@ -247,7 +247,7 @@ std::unique_ptr<const unsigned char[]> CInitMessage_Config::Serialize() const
 	p += header.Serialize(p);
 	p += serialize8(p, this->clientIndex);
 	p += serialize8(p, this->hostsCount);
-	for (int i = 0; i != PlayerMax; ++i) {
+	for (int i = 0; i < CInitMessage_Config::max_hosts; ++i) {
 		p += this->hosts[i].Serialize(p);
 	}
 	return buf;
@@ -258,7 +258,7 @@ void CInitMessage_Config::Deserialize(const unsigned char *p)
 	p += header.Deserialize(p);
 	p += deserialize8(p, &this->clientIndex);
 	p += deserialize8(p, &this->hostsCount);
-	for (int i = 0; i != PlayerMax; ++i) {
+	for (int i = 0; i < CInitMessage_Config::max_hosts; ++i) {
 		p += this->hosts[i].Deserialize(p);
 	}
 }
@@ -326,7 +326,7 @@ std::unique_ptr<const unsigned char[]> CInitMessage_Welcome::Serialize() const
 	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
-	for (int i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < CInitMessage_Welcome::max_hosts; ++i) {
 		p += this->hosts[i].Serialize(p);
 	}
 	p += serialize32(p, this->Lag);
@@ -337,7 +337,7 @@ std::unique_ptr<const unsigned char[]> CInitMessage_Welcome::Serialize() const
 void CInitMessage_Welcome::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
-	for (int i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < CInitMessage_Welcome::max_hosts; ++i) {
 		p += this->hosts[i].Deserialize(p);
 	}
 	p += deserialize32(p, &this->Lag);
@@ -407,7 +407,7 @@ std::unique_ptr<const unsigned char[]> CInitMessage_Resync::Serialize() const
 	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
-	for (int i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < CInitMessage_Resync::max_hosts; ++i) {
 		p += this->hosts[i].Serialize(p);
 	}
 	return buf;
@@ -416,7 +416,7 @@ std::unique_ptr<const unsigned char[]> CInitMessage_Resync::Serialize() const
 void CInitMessage_Resync::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
-	for (int i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < CInitMessage_Resync::max_hosts; ++i) {
 		p += this->hosts[i].Deserialize(p);
 	}
 }

@@ -101,9 +101,11 @@ public:
 	int32_t Version = 0;    /// Network protocol version
 };
 
-class CInitMessage_Config
+class CInitMessage_Config final
 {
 public:
+	static constexpr size_t max_hosts = 8;
+
 	CInitMessage_Config();
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::unique_ptr<const unsigned char[]> Serialize() const;
@@ -111,14 +113,15 @@ public:
 
 	static size_t Size()
 	{
-		return CInitMessage_Header::Size() + 4 + PlayerMax * multiplayer_host::Size();
+		return CInitMessage_Header::Size() + 4 + CInitMessage_Config::max_hosts * multiplayer_host::Size();
 	}
+
 private:
 	CInitMessage_Header header;
 public:
-	uint8_t clientIndex; /// index of receiver in hosts[]
-	uint8_t hostsCount;  /// Number of hosts
-	multiplayer_host hosts[PlayerMax]; /// Participant information
+	uint8_t clientIndex = 0; /// index of receiver in hosts[]
+	uint8_t hostsCount = 0;  /// Number of hosts
+	multiplayer_host hosts[CInitMessage_Config::max_hosts]{}; /// Participant information
 };
 
 class CInitMessage_EngineMismatch
@@ -149,9 +152,11 @@ public:
 	int32_t Version;  /// Network protocol version
 };
 
-class CInitMessage_Welcome
+class CInitMessage_Welcome final
 {
 public:
+	static constexpr size_t max_hosts = 8;
+
 	CInitMessage_Welcome();
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::unique_ptr<const unsigned char[]> Serialize() const;
@@ -159,13 +164,13 @@ public:
 
 	static size_t Size()
 	{
-		return CInitMessage_Header::Size() + PlayerMax * multiplayer_host::Size() + 2 * 4;
+		return CInitMessage_Header::Size() + CInitMessage_Welcome::max_hosts * multiplayer_host::Size() + 2 * 4;
 	}
 
 private:
 	CInitMessage_Header header;
 public:
-	multiplayer_host hosts[PlayerMax]{}; /// Participants information
+	multiplayer_host hosts[CInitMessage_Welcome::max_hosts]{}; /// Participants information
 	int32_t Lag = 0;                   /// Lag time
 	int32_t gameCyclesPerUpdate = 0;   /// Update frequency
 };
@@ -206,9 +211,11 @@ public:
 	multiplayer_setup State;  /// Server Setup State information
 };
 
-class CInitMessage_Resync
+class CInitMessage_Resync final
 {
 public:
+	static constexpr size_t max_hosts = 8;
+
 	CInitMessage_Resync();
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::unique_ptr<const unsigned char[]> Serialize() const;
@@ -216,13 +223,13 @@ public:
 
 	static size_t Size()
 	{
-		return CInitMessage_Header::Size() + multiplayer_host::Size() * PlayerMax;
+		return CInitMessage_Header::Size() + multiplayer_host::Size() * CInitMessage_Resync::max_hosts;
 	}
 
 private:
 	CInitMessage_Header header;
 public:
-	multiplayer_host hosts[PlayerMax]; /// Participant information
+	multiplayer_host hosts[CInitMessage_Resync::max_hosts]{}; /// Participant information
 };
 
 /**

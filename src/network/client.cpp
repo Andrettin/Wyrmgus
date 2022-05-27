@@ -454,6 +454,8 @@ void client::SetConfig(const CInitMessage_Config &msg)
 {
 	std::unique_lock<std::shared_mutex> lock(network_manager::get()->get_mutex());
 
+	assert_throw(msg.hostsCount <= CInitMessage_Config::max_hosts);
+
 	HostsCount = 0;
 	for (int i = 0; i < msg.hostsCount - 1; ++i) {
 		if (i != msg.clientIndex) {
@@ -633,7 +635,7 @@ void client::Parse_Welcome(const unsigned char *buf)
 		emit network_manager::get()->player_name_changed(0, Hosts[0].PlyName);
 	}
 
-	for (int i = 1; i < PlayerMax; ++i) {
+	for (int i = 1; i < CInitMessage_Welcome::max_hosts; ++i) {
 		bool name_changed = false;
 
 		if (i != NetLocalHostsSlot) {
@@ -736,7 +738,7 @@ void client::Parse_Resync(const unsigned char *buf)
 	CInitMessage_Resync msg;
 
 	msg.Deserialize(buf);
-	for (int i = 1; i < PlayerMax - 1; ++i) {
+	for (int i = 1; i < CInitMessage_Resync::max_hosts; ++i) {
 		if (i != NetLocalHostsSlot) {
 			Hosts[i] = msg.hosts[i];
 		} else {

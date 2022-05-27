@@ -403,6 +403,8 @@ boost::asio::awaitable<void> server::init_game()
 		message.hosts[i].PlyNr = Hosts[i].PlyNr;
 	}
 
+	assert_throw(message.hostsCount <= CInitMessage_Config::max_hosts);
+
 	// Prepare the final state message:
 	const CInitMessage_State statemsg(MessageInit_FromServer, *this->setup);
 
@@ -531,7 +533,7 @@ boost::asio::awaitable<void> server::Send_Welcome(const multiplayer_host &host, 
 
 	message.hosts[0].PlyNr = index; // Host array slot number
 	message.hosts[0].SetName(name.c_str()); // Name of server player
-	for (int i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
+	for (int i = 1; i < CInitMessage_Welcome::max_hosts; ++i) { // Info about other clients
 		if (i != index && Hosts[i].PlyNr) {
 			message.hosts[i] = Hosts[i];
 		}
@@ -544,7 +546,7 @@ boost::asio::awaitable<void> server::Send_Resync(const multiplayer_host &host, i
 {
 	CInitMessage_Resync message;
 
-	for (int i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
+	for (int i = 1; i < CInitMessage_Resync::max_hosts; ++i) { // Info about other clients
 		if (i != hostIndex && Hosts[i].PlyNr) {
 			message.hosts[i] = Hosts[i];
 		}
