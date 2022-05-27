@@ -488,7 +488,7 @@ boost::asio::awaitable<void> server::init_game()
 	}
 
 	DebugPrint("DONE: All configs acked - Now starting...\n");
-	// Give clients a quick-start kick..
+	// Give clients a quick-start kick...
 	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
 	for (int i = 0; i < HostsCount; ++i) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);

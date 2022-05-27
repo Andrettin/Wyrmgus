@@ -78,9 +78,35 @@ public:
 	}
 
 	Q_INVOKABLE bool is_player_ready(const int player_index) const;
-	bool has_fog_of_war_sync() const;
-	bool is_reveal_map_enabled_sync() const;
-	bool has_computer_opponents_sync() const;
+
+	bool has_fog_of_war() const;
+
+	bool has_fog_of_war_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->has_fog_of_war();
+	}
+
+	bool is_reveal_map_enabled() const;
+
+	bool is_reveal_map_enabled_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->is_reveal_map_enabled();
+	}
+
+	bool has_computer_opponents() const;
+
+	bool has_computer_opponents_sync() const
+	{
+		std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+		return this->has_computer_opponents();
+	}
+
+	Q_INVOKABLE void start_game();
 
 private:
 	[[nodiscard]]

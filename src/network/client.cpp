@@ -30,6 +30,7 @@
 #include "network/client.h"
 
 #include "database/database.h"
+#include "game/game.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "network/multiplayer_setup.h"
@@ -38,7 +39,10 @@
 #include "network/netsockets.h"
 #include "network/network.h"
 #include "network/network_manager.h"
+#include "player/player.h"
+#include "settings.h"
 #include "util/assert_util.h"
+#include "util/event_loop.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/util.h"
@@ -151,25 +155,36 @@ bool client::is_player_ready(const int player_index) const
 	return static_cast<bool>(this->server_setup->Ready[player_index]);
 }
 
-bool client::has_fog_of_war_sync() const
+bool client::has_fog_of_war() const
 {
-	std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 	return static_cast<bool>(this->server_setup->FogOfWar);
 }
 
-bool client::has_computer_opponents_sync() const
+bool client::is_reveal_map_enabled() const
 {
-	std::shared_lock<std::shared_mutex> lock(this->mutex);
+	return static_cast<bool>(this->server_setup->RevealMap);
+}
 
+bool client::has_computer_opponents() const
+{
 	return static_cast<bool>(this->server_setup->Opponents);
 }
 
-bool client::is_reveal_map_enabled_sync() const
+void client::start_game()
 {
-	std::shared_lock<std::shared_mutex> lock(this->mutex);
+	event_loop::get()->co_spawn([this]() -> boost::asio::awaitable<void> {
+		CPlayer::SetThisPlayer(CPlayer::Players[1].get());
 
-	return static_cast<bool>(this->server_setup->RevealMap);
+		CMap::get()->NoFogOfWar = !this->has_fog_of_war();
+
+		if (this->is_reveal_map_enabled()) {
+			FlagRevealMap = 1;
+		}
+
+		NetworkGamePrepareGameSettings();
+
+		co_await game::get()->run_map(path::from_string(NetworkMapName));
+	});
 }
 
 boost::asio::awaitable<bool> client::Update_disconnected()
@@ -325,7 +340,7 @@ boost::asio::awaitable<bool> client::Update_started(unsigned long tick)
 		co_await Send_Go(tick);
 		co_return true;
 	} else {
-		co_return false; // End the menu..
+		co_return false; //end the menu...
 	}
 }
 
@@ -543,7 +558,7 @@ boost::asio::awaitable<bool> client::Parse(const std::array<unsigned char, 1024>
 			Parse_Resync(buf.data());
 			break;
 		}
-		case ICMGo: { // Server's final go ..
+		case ICMGo: { //server's final go...
 			// ccs_started
 			DebugPrint("ClientParseStarted ICMGo !!!!!\n");
 			co_return false;
@@ -654,10 +669,12 @@ void client::Parse_State(const unsigned char *buf)
 			}
 
 			if (old_setup.FogOfWar != this->server_setup->FogOfWar) {
+				GameSettings.NoFogOfWar = !this->has_fog_of_war();
 				emit fog_of_war_changed();
 			}
 
 			if (old_setup.RevealMap != this->server_setup->RevealMap) {
+				GameSettings.RevealMap = this->is_reveal_map_enabled();
 				emit reveal_map_changed();
 			}
 
