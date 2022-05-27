@@ -94,19 +94,28 @@ public:
 	boost::asio::awaitable<void> Send(const CHost &host, const void *buf, unsigned int len)
 	{
 		boost::asio::ip::udp::endpoint receiver_endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
-		co_await this->socket.async_send_to(boost::asio::buffer(buf, len), receiver_endpoint, boost::asio::use_awaitable);
+
+		try {
+			co_await this->socket.async_send_to(boost::asio::buffer(buf, len), receiver_endpoint, boost::asio::use_awaitable);
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to send data through a UDP socket to endpoint: " + receiver_endpoint.address().to_string() + ":" + std::to_string(receiver_endpoint.port())));
+		}
 	}
 
 	[[nodiscard]]
 	boost::asio::awaitable<size_t> Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom)
 	{
-		boost::asio::ip::udp::endpoint sender_endpoint;
+		try {
+			boost::asio::ip::udp::endpoint sender_endpoint;
 
-		const size_t size = co_await this->socket.async_receive_from(boost::asio::buffer(buf.data(), buf.size()), sender_endpoint, boost::asio::use_awaitable);
+			const size_t size = co_await this->socket.async_receive_from(boost::asio::buffer(buf.data(), buf.size()), sender_endpoint, boost::asio::use_awaitable);
 
-		*hostFrom = CHost(htonl(sender_endpoint.address().to_v4().to_ulong()), htons(sender_endpoint.port()));
+			*hostFrom = CHost(htonl(sender_endpoint.address().to_v4().to_ulong()), htons(sender_endpoint.port()));
 
-		co_return size;
+			co_return size;
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to receive data through a UDP socket."));
+		}
 	}
 
 	void SetNonBlocking()
@@ -121,27 +130,31 @@ public:
 
 	boost::asio::awaitable<size_t> WaitForDataToRead(const int timeout)
 	{
-		boost::asio::steady_timer timer(event_loop::get()->get_io_context());
-		timer.expires_from_now(std::chrono::milliseconds(timeout));
+		try {
+			boost::asio::steady_timer timer(event_loop::get()->get_io_context());
+			timer.expires_from_now(std::chrono::milliseconds(timeout));
 
-		bool timed_out = false;
+			bool timed_out = false;
 
-		timer.async_wait([this, &timed_out](const boost::system::error_code &error_code) {
-			if (error_code) {
-				return;
+			timer.async_wait([this, &timed_out](const boost::system::error_code &error_code) {
+				if (error_code) {
+					return;
+				}
+
+				this->socket.cancel();
+				timed_out = true;
+			});
+
+			co_await this->socket.async_wait(boost::asio::ip::udp::socket::wait_read, boost::asio::use_awaitable);
+			timer.cancel();
+
+			if (timed_out) {
+				co_return 0;
+			} else {
+				co_return this->socket.available();
 			}
-
-			this->socket.cancel();
-			timed_out = true;
-		});
-
-		co_await this->socket.async_wait(boost::asio::ip::udp::socket::wait_read, boost::asio::use_awaitable);
-		timer.cancel();
-
-		if (timed_out) {
-			co_return 0;
-		} else {
-			co_return this->socket.available();
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to wait for data to receive through a UDP socket."));
 		}
 	}
 
