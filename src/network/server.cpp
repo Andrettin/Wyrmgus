@@ -112,6 +112,8 @@ void server::KickClient(int c)
 		}
 	}
 
+	emit network_manager::get()->player_name_changed(c, Hosts[c].PlyName);
+
 	if (was_ready) {
 		emit network_manager::get()->player_ready_changed(c, false);
 	}
