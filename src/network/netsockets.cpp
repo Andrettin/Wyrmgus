@@ -212,7 +212,7 @@ size_t CUDPSocket::HasDataToRead()
 
 boost::asio::awaitable<size_t> CUDPSocket::WaitForDataToRead(const int timeout)
 {
-	return m_impl->WaitForDataToRead(timeout);
+	co_return co_await m_impl->WaitForDataToRead(timeout);
 }
 
 bool CUDPSocket::IsValid() const
