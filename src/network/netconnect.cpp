@@ -146,11 +146,6 @@ void NetworkProcessClientRequest()
 	});
 }
 
-int GetNetworkState()
-{
-	return client::get()->GetNetworkState();
-}
-
 int FindHostIndexBy(const CHost &host)
 {
 	for (int i = 0; i != PlayerMax; ++i) {

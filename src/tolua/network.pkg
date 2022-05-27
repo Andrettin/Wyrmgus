@@ -11,7 +11,6 @@ void ExitNetwork1(void);
 bool IsNetworkGame();
 
 void NetworkProcessClientRequest(void);
-int GetNetworkState();
 void NetworkDetachFromServer(void);
 
 class multiplayer_setup {
