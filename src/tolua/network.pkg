@@ -42,14 +42,6 @@ class server {
 };
 
 extern int NetLocalHostsSlot;
-tolua_readonly int NetPlayerNameSize;
-struct multiplayer_host {
-	unsigned long  Host;						/// Host address
-	unsigned short Port;						/// Port on host
-	unsigned short PlyNr;						/// Player nummer
-	char           PlyName[NetPlayerNameSize];	/// Name of player
-};
-extern multiplayer_host Hosts[PlayerMax];
 
 $extern string NetworkMapName;
 string NetworkMapName;
