@@ -170,6 +170,11 @@ bool client::has_computer_opponents() const
 	return static_cast<bool>(this->server_setup->Opponents);
 }
 
+int client::get_resources_option() const
+{
+	return static_cast<int>(this->server_setup->ResourcesOption);
+}
+
 void client::set_civilization(const int civilization_index)
 {
 	event_loop::get()->post([this, civilization_index]() {
@@ -690,6 +695,11 @@ void client::Parse_State(const unsigned char *buf)
 
 			if (old_setup.Opponents != this->server_setup->Opponents) {
 				emit computer_opponents_changed();
+			}
+
+			if (old_setup.ResourcesOption != this->server_setup->ResourcesOption) {
+				GameSettings.Resources = this->get_resources_option();
+				emit resources_option_changed();
 			}
 
 			network_manager::get()->check_players(this->server_setup.get());
