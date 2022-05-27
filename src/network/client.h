@@ -42,6 +42,10 @@ class client final : public QObject, public singleton<client>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(bool fog_of_war READ has_fog_of_war_sync NOTIFY fog_of_war_changed)
+	Q_PROPERTY(bool reveal_map READ is_reveal_map_enabled_sync NOTIFY reveal_map_changed)
+	Q_PROPERTY(bool computer_opponents READ has_computer_opponents_sync NOTIFY computer_opponents_changed)
+
 public:
 	client();
 	~client();
@@ -74,6 +78,9 @@ public:
 	}
 
 	Q_INVOKABLE bool is_player_ready(const int player_index) const;
+	bool has_fog_of_war_sync() const;
+	bool is_reveal_map_enabled_sync() const;
+	bool has_computer_opponents_sync() const;
 
 private:
 	[[nodiscard]]
@@ -154,6 +161,11 @@ private:
 	[[nodiscard]]
 	boost::asio::awaitable<void> Parse_AreYouThere();
 
+signals:
+	void fog_of_war_changed();
+	void reveal_map_changed();
+	void computer_opponents_changed();
+
 private:
 	std::string name;
 	std::unique_ptr<CHost> serverHost;  /// IP:port of server to join
@@ -162,6 +174,7 @@ private:
 	CUDPSocket *socket = nullptr;
 	std::unique_ptr<multiplayer_setup> server_setup;
 	std::unique_ptr<multiplayer_setup> local_setup;
+	mutable std::shared_mutex mutex;
 };
 
 }

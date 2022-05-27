@@ -151,6 +151,27 @@ bool client::is_player_ready(const int player_index) const
 	return static_cast<bool>(this->server_setup->Ready[player_index]);
 }
 
+bool client::has_fog_of_war_sync() const
+{
+	std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+	return static_cast<bool>(this->server_setup->FogOfWar);
+}
+
+bool client::has_computer_opponents_sync() const
+{
+	std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+	return static_cast<bool>(this->server_setup->Opponents);
+}
+
+bool client::is_reveal_map_enabled_sync() const
+{
+	std::shared_lock<std::shared_mutex> lock(this->mutex);
+
+	return static_cast<bool>(this->server_setup->RevealMap);
+}
+
 boost::asio::awaitable<bool> client::Update_disconnected()
 {
 	assert_throw(networkState.State == ccs_disconnected);
@@ -619,6 +640,8 @@ void client::Parse_State(const unsigned char *buf)
 		case ccs_synced:
 		case ccs_changed:
 		case ccs_goahead: {
+			std::unique_lock<std::shared_mutex> lock(this->mutex);
+
 			const multiplayer_setup old_setup = *this->server_setup;
 
 			*this->server_setup = msg.State;
@@ -628,6 +651,18 @@ void client::Parse_State(const unsigned char *buf)
 				if (old_setup.Ready[i] != this->server_setup->Ready[i]) {
 					emit network_manager::get()->player_ready_changed(i, static_cast<bool>(this->server_setup->Ready[i]));
 				}
+			}
+
+			if (old_setup.FogOfWar != this->server_setup->FogOfWar) {
+				emit fog_of_war_changed();
+			}
+
+			if (old_setup.RevealMap != this->server_setup->RevealMap) {
+				emit reveal_map_changed();
+			}
+
+			if (old_setup.Opponents != this->server_setup->Opponents) {
+				emit computer_opponents_changed();
 			}
 			break;
 		}
