@@ -106,6 +106,8 @@ public:
 		return this->has_computer_opponents();
 	}
 
+	Q_INVOKABLE void set_civilization(const int civilization_index);
+
 	Q_INVOKABLE void start_game();
 
 private:
