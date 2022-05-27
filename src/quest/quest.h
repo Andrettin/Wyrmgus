@@ -56,6 +56,7 @@ class quest final : public detailed_data_entry, public data_type<quest>
 
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color NOTIFY changed)
+	Q_PROPERTY(QString map READ get_map_qstring)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(bool competitive MEMBER competitive READ is_competitive)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable READ is_unobtainable)
@@ -105,6 +106,11 @@ public:
 	const wyrmgus::player_color *get_player_color() const
 	{
 		return this->player_color;
+	}
+
+	const QString get_map_qstring() const
+	{
+		return QString::fromStdString(this->Map);
 	}
 
 	bool is_hidden() const
