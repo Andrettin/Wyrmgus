@@ -78,9 +78,10 @@ public:
 	size_t Serialize(unsigned char *p) const;
 	size_t Deserialize(const unsigned char *p);
 	static size_t Size() { return 2; }
+
 private:
-	unsigned char type;
-	unsigned char subtype;
+	unsigned char type = 0;
+	unsigned char subtype = 0;
 };
 
 class CInitMessage_Hello
@@ -95,9 +96,9 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	char PlyName[NetPlayerNameSize];  /// Name of player
-	int32_t Stratagus;  /// Stratagus engine version
-	int32_t Version;    /// Network protocol version
+	char PlyName[NetPlayerNameSize]{};  /// Name of player
+	int32_t Stratagus = 0;  /// Stratagus engine version
+	int32_t Version = 0;    /// Network protocol version
 };
 
 class CInitMessage_Config
@@ -164,9 +165,9 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	multiplayer_host hosts[PlayerMax]; /// Participants information
-	int32_t Lag;                   /// Lag time
-	int32_t gameCyclesPerUpdate;   /// Update frequency
+	multiplayer_host hosts[PlayerMax]{}; /// Participants information
+	int32_t Lag = 0;                   /// Lag time
+	int32_t gameCyclesPerUpdate = 0;   /// Update frequency
 };
 
 class CInitMessage_Map
@@ -181,8 +182,8 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	char MapPath[256];
-	uint32_t MapUID;  /// UID of map to play.
+	char MapPath[256]{};
+	uint32_t MapUID = 0;  /// UID of map to play.
 };
 
 class CInitMessage_State
