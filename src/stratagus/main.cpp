@@ -69,6 +69,7 @@
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
+#include "util/thread_pool.h"
 #include "version.h"
 #include "video/frame_buffer_object.h"
 
@@ -186,6 +187,7 @@ int main(int argc, char **argv)
 		const int result = app.exec();
 
 		event_loop::get()->stop();
+		thread_pool::get()->stop();
 
 		return result;
 	} catch (const std::exception &exception) {

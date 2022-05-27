@@ -41,6 +41,8 @@ public:
 	thread_pool();
 	~thread_pool();
 
+	void stop();
+
 	boost::asio::thread_pool &get_pool() const
 	{
 		return *this->pool;

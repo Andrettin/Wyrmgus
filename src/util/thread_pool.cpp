@@ -44,6 +44,11 @@ thread_pool::thread_pool()
 
 thread_pool::~thread_pool()
 {
+	this->stop();
+}
+
+void thread_pool::stop()
+{
 	this->pool->stop();
 	this->pool->join();
 }
