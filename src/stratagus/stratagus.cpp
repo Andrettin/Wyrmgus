@@ -507,6 +507,11 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 
 	MenuLoop();
 
+	if (parameters::get()->is_test_run()) {
+		Exit(EXIT_SUCCESS);
+		return;
+	}
+
 	CurrentCursorState = CursorState::Point;
 	CursorOn = cursor_on::unknown;
 
@@ -597,14 +602,9 @@ void initialize_database()
 	}
 }
 
-bool is_test_run()
-{
-	return parameters::get()->is_test_run();
-}
-
 void save_preferences()
 {
-	wyrmgus::preferences::get()->save();
+	preferences::get()->save();
 }
 
 int get_difficulty_index()

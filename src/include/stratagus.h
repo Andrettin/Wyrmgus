@@ -193,7 +193,6 @@ extern wyrmgus::direction GetDirectionFromOffset(const int x, const int y);
 
 extern void load_database(const bool initial_definition);
 extern void load_defines();
-extern bool is_test_run();
 extern void initialize_database();
 extern void save_preferences();
 

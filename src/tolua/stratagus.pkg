@@ -147,7 +147,6 @@ extern void CallDialogue(std::string dialogue_ident, int player, int unit_number
 extern void load_database(const bool initial_definition);
 extern void load_defines();
 extern void initialize_database();
-extern bool is_test_run();
 extern void save_preferences();
 
 bool is_show_tips_enabled();
