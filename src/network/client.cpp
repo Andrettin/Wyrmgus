@@ -719,7 +719,7 @@ void client::Parse_State(const unsigned char *buf)
 				emit difficulty_changed();
 			}
 
-			network_manager::get()->check_players(this->server_setup.get());
+			network_manager::get()->check_players(this->get_server_setup());
 			break;
 		}
 		default:

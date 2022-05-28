@@ -216,9 +216,9 @@ void server::set_difficulty(const int difficulty)
 void server::start_game()
 {
 	event_loop::get()->co_spawn([this]() -> boost::asio::awaitable<void> {
-		CMap::get()->NoFogOfWar = !static_cast<bool>(this->setup->FogOfWar);
+		CMap::get()->NoFogOfWar = !static_cast<bool>(this->get_setup().FogOfWar);
 
-		if (static_cast<bool>(this->setup->RevealMap)) {
+		if (static_cast<bool>(this->get_setup().RevealMap)) {
 			FlagRevealMap = 1;
 		}
 
@@ -495,7 +495,7 @@ boost::asio::awaitable<void> server::init_game()
 
 void server::check_ready_to_start()
 {
-	network_manager::get()->check_players(this->setup.get());
+	network_manager::get()->check_players(this->get_setup());
 
 	const int connected_player_count = network_manager::get()->get_connected_player_count();
 	const int ready_player_count = network_manager::get()->get_ready_player_count();

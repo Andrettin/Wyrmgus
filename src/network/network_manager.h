@@ -98,7 +98,7 @@ public:
 		return this->ready_player_count;
 	}
 
-	void check_players(const multiplayer_setup *setup);
+	void check_players(const multiplayer_setup &setup);
 
 	std::shared_mutex &get_mutex() const
 	{
