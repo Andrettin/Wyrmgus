@@ -119,7 +119,6 @@ inline boost::asio::awaitable<void> NetworkSendICMessage_Log(CUDPSocket &socket,
 extern boost::asio::awaitable<void> NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
 extern int FindHostIndexBy(const CHost &host);
-extern void NetworkGamePrepareGameSettings();
 
 [[nodiscard]]
 extern boost::asio::awaitable<int> NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host);  /// Parse a network connect event

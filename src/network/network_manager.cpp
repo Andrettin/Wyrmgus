@@ -39,6 +39,8 @@
 #include "network/netsockets.h"
 #include "network/network.h"
 #include "network/server.h"
+#include "player/player_type.h"
+#include "settings.h"
 #include "util/event_loop.h"
 #include "util/path_util.h"
 #include "video/video.h"
@@ -142,6 +144,78 @@ void network_manager::process_server_request()
 
 		co_await this->get_server()->Update(FrameCounter);
 	});
+}
+
+void network_manager::prepare_game_settings(const multiplayer_setup &setup)
+{
+	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
+
+	GameSettings.NetGameType = SettingsMultiPlayerGame;
+
+#ifdef DEBUG
+	for (int i = 0; i < PlayerMax - 1; i++) {
+		printf("%02d: CO: %d   Race: %d   Name: ", i, setup.CompOpt[i], setup.Race[i]);
+		if (setup.CompOpt[i] == 0) {
+			for (int h = 0; h != HostsCount; ++h) {
+				if (Hosts[h].PlyNr == i) {
+					printf("%s", Hosts[h].PlyName);
+				}
+			}
+			if (i == NetLocalPlayerNumber) {
+				printf("%s (localhost)", preferences::get()->get_local_player_name().c_str());
+			}
+		}
+		printf("\n");
+	}
+#endif
+
+	// Make a list of the available player slots.
+	std::array<int, PlayerMax> num{};
+	std::array<int, PlayerMax> comp{};
+	int c = 0;
+	int h = 0;
+	for (int i = 0; i < PlayerMax; i++) {
+		if (CMap::get()->Info->get_player_types()[i] == player_type::person) {
+			num[h++] = i;
+		}
+		if (CMap::get()->Info->get_player_types()[i] == player_type::computer) {
+			comp[c++] = i; // available computer player slots
+		}
+	}
+
+	for (int i = 0; i < h; i++) {
+		const int num_v = num.at(i);
+		GameSettings.Presets[num_v].Race = setup.Race.at(num_v);
+		switch (setup.CompOpt.at(num_v)) {
+		case 0: {
+			GameSettings.Presets[num_v].Type = player_type::person;
+			break;
+		}
+		case 1:
+			GameSettings.Presets[num_v].Type = player_type::computer;
+			break;
+		case 2:
+			GameSettings.Presets[num_v].Type = player_type::nobody;
+		default:
+			break;
+		}
+	}
+
+	for (int i = 0; i < c; i++) {
+		const int comp_v = comp.at(i);
+
+		if (setup.CompOpt[comp_v] == 2) { //closed...
+			GameSettings.Presets[comp_v].Type = player_type::nobody;
+			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp_v);
+		}
+	}
+
+#ifdef DEBUG
+	for (int i = 0; i != HostsCount; ++i) {
+		assert_throw(GameSettings.Presets[Hosts[i].PlyNr].Type == player_type::person);
+	}
+	assert_throw(GameSettings.Presets[NetLocalPlayerNumber].Type == player_type::person);
+#endif
 }
 
 int network_manager::get_network_state() const

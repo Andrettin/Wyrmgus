@@ -224,7 +224,7 @@ void server::start_game()
 
 		co_await this->init_game();
 
-		NetworkGamePrepareGameSettings();
+		network_manager::get()->prepare_game_settings(this->get_setup());
 
 		co_await game::get()->run_map(path::from_string(NetworkMapName));
 	});

@@ -206,7 +206,7 @@ void client::start_game()
 			FlagRevealMap = 1;
 		}
 
-		NetworkGamePrepareGameSettings();
+		network_manager::get()->prepare_game_settings(this->get_server_setup());
 
 		co_await game::get()->run_map(path::from_string(NetworkMapName));
 	});
