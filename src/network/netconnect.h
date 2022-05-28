@@ -124,5 +124,4 @@ extern void NetworkGamePrepareGameSettings();
 [[nodiscard]]
 extern boost::asio::awaitable<int> NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host);  /// Parse a network connect event
 
-extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client request messages
 extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach

@@ -134,18 +134,6 @@ boost::asio::awaitable<int> NetworkParseSetupEvent(const std::array<unsigned cha
 	co_return 1;
 }
 
-/**
-** Client Menu Loop: Send out client request messages
-*/
-void NetworkProcessClientRequest()
-{
-	thread_pool::get()->co_spawn([]() -> boost::asio::awaitable<void> {
-		if (co_await client::get()->Update(GetTicks()) == false) {
-			NetConnectRunning = 0;
-		}
-	});
-}
-
 int FindHostIndexBy(const CHost &host)
 {
 	for (int i = 0; i != PlayerMax; ++i) {
