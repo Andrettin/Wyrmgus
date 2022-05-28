@@ -38,7 +38,7 @@ public:
 
 	multiplayer_setup()
 	{
-		memset(this->Race, -1, sizeof(Race));
+		this->Race.fill(-1);
 	}
 
 	size_t serialize(unsigned char *p) const;
@@ -55,9 +55,9 @@ public:
 			&& Difficulty == rhs.Difficulty
 			&& MapRichness == rhs.MapRichness
 			&& Opponents == rhs.Opponents
-			&& memcmp(CompOpt, rhs.CompOpt, sizeof(CompOpt)) == 0
-			&& memcmp(Ready, rhs.Ready, sizeof(Ready)) == 0
-			&& memcmp(Race, rhs.Race, sizeof(Race)) == 0);
+			&& CompOpt == rhs.CompOpt
+			&& Ready == rhs.Ready
+			&& Race == rhs.Race);
 	}
 
 	bool operator !=(const multiplayer_setup &rhs) const
@@ -75,9 +75,9 @@ public:
 	uint8_t Difficulty = 0;            /// Difficulty option
 	uint8_t MapRichness = 0;           /// Map richness option
 	uint8_t Opponents = 0;             /// Number of AI opponents
-	uint8_t CompOpt[PlayerMax]{};    /// Free slot option selection  {"Available", "Computer", "Closed" }
-	uint8_t Ready[PlayerMax]{};      /// Client ready state
-	uint8_t Race[PlayerMax]{};       /// Client race selection
+	std::array<uint8_t, PlayerMax> CompOpt{};    /// Free slot option selection  {"Available", "Computer", "Closed" }
+	std::array<uint8_t, PlayerMax> Ready{};      /// Client ready state
+	std::array<int8_t, PlayerMax> Race{};       /// Client race selection
 };
 
 }

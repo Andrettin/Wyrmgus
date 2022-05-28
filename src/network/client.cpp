@@ -184,7 +184,7 @@ void client::set_civilization(const int civilization_index)
 {
 	event_loop::get()->post([this, civilization_index]() {
 		GameSettings.Presets[NetLocalHostsSlot].Race = civilization_index;
-		this->local_setup->Race[NetLocalHostsSlot] = static_cast<uint8_t>(civilization_index);
+		this->local_setup->Race[NetLocalHostsSlot] = static_cast<int8_t>(civilization_index);
 	});
 }
 

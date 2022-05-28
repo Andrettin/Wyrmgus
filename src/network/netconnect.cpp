@@ -191,26 +191,31 @@ void NetworkGamePrepareGameSettings()
 			comp[c++] = i; // available computer player slots
 		}
 	}
+
 	for (int i = 0; i < h; i++) {
-		GameSettings.Presets[num[i]].Race = server::get()->get_setup().Race[num[i]];
-		switch (server::get()->get_setup().CompOpt[num[i]]) {
+		const int num_v = num.at(i);
+		GameSettings.Presets[num_v].Race = server::get()->get_setup().Race.at(num_v);
+		switch (server::get()->get_setup().CompOpt.at(num_v)) {
 			case 0: {
-				GameSettings.Presets[num[i]].Type = player_type::person;
+				GameSettings.Presets[num_v].Type = player_type::person;
 				break;
 			}
 			case 1:
-				GameSettings.Presets[num[i]].Type = player_type::computer;
+				GameSettings.Presets[num_v].Type = player_type::computer;
 				break;
 			case 2:
-				GameSettings.Presets[num[i]].Type = player_type::nobody;
+				GameSettings.Presets[num_v].Type = player_type::nobody;
 			default:
 				break;
 		}
 	}
+
 	for (int i = 0; i < c; i++) {
-		if (server::get()->get_setup().CompOpt[comp[i]] == 2) { // closed..
-			GameSettings.Presets[comp[i]].Type = player_type::nobody;
-			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp[i]);
+		const int comp_v = comp.at(i);
+
+		if (server::get()->get_setup().CompOpt[comp_v] == 2) { //closed...
+			GameSettings.Presets[comp_v].Type = player_type::nobody;
+			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp_v);
 		}
 	}
 
