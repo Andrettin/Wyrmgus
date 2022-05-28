@@ -102,8 +102,6 @@ extern void NetExit();
 
 /// Resolve host in name or or colon dot notation.
 extern unsigned long NetResolveHost(const std::string &host);
-/// Get local IP from network file descriptor
-extern int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr);
 
 /// Open a TCP Socket port.
 extern Socket NetOpenTCP(const char *addr, int port);
