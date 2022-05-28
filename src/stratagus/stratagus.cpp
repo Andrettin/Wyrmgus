@@ -508,8 +508,8 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 	MenuLoop();
 
 	if (parameters::get()->is_test_run()) {
-		Exit(EXIT_SUCCESS);
-		return;
+		co_await Exit(EXIT_SUCCESS);
+		co_return;
 	}
 
 	CurrentCursorState = CursorState::Point;
