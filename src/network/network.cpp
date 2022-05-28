@@ -418,21 +418,6 @@ void InitNetwork1()
 	const std::string hostStr = host.toString();
 	DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
 #endif
-
-#if 0 // FIXME: need a working interface check
-	std::array<unsigned long, 10> ips{};
-	int networkNumInterfaces = NetSocketAddr(NetworkFildes, ips, 10);
-	if (networkNumInterfaces) {
-		DebugPrint("Num IP: %d\n" _C_ networkNumInterfaces);
-		for (int i = 0; i < networkNumInterfaces; ++i) {
-			DebugPrint("IP: %d.%d.%d.%d\n" _C_ NIPQUAD(ntohl(ips[i])));
-		}
-	} else {
-		fprintf(stderr, "NETWORK: Not connected to any external IPV4-network, aborting\n");
-		ExitNetwork1();
-		return;
-	}
-#endif
 }
 
 /**
