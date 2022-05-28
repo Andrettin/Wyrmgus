@@ -1,9 +1,4 @@
-$#include "network/client.h"
-$#include "network/multiplayer_setup.h"
 $#include "network/network.h"
-$#include "network/server.h"
-
-$using namespace wyrmgus;
 
 void InitNetwork1(void);
 void ExitNetwork1(void);
@@ -11,38 +6,3 @@ void ExitNetwork1(void);
 bool IsNetworkGame();
 
 void NetworkDetachFromServer(void);
-
-class multiplayer_setup {
-	unsigned char ResourcesOption;
-	unsigned char UnitsOption;
-	unsigned char FogOfWar;
-	unsigned char RevealMap;
-	unsigned char GameTypeOption;
-	unsigned char Difficulty;
-	unsigned char MapRichness;
-	unsigned char Opponents;
-	unsigned short CompOpt[PlayerMax];	// cannot use char since tolua interpret variable as string else.
-	unsigned short Ready[PlayerMax];	// cannot use char since tolua interpret variable as string else.
-	unsigned short Race[PlayerMax];		// cannot use char since tolua interpret variable as string else.
-};
-
-class client {
-	static client *get();
-
-	multiplayer_setup &get_server_setup();
-	multiplayer_setup &get_local_setup();
-};
-
-class server {
-	static server *get();
-	
-	multiplayer_setup &get_setup();
-};
-
-extern int NetLocalHostsSlot;
-
-$extern string NetworkMapName;
-string NetworkMapName;
-
-$void NetworkGamePrepareGameSettings(void);
-void NetworkGamePrepareGameSettings(void);
