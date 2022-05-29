@@ -67,10 +67,6 @@ bool CHost::isValid() const
 class CUDPSocket_Impl final
 {
 public:
-	CUDPSocket_Impl() : socket(event_loop::get()->get_io_context())
-	{
-	}
-
 	~CUDPSocket_Impl()
 	{
 		if (IsValid()) {
@@ -81,13 +77,13 @@ public:
 	bool Open(const CHost &host)
 	{
 		this->endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
-		this->socket = boost::asio::ip::udp::socket(event_loop::get()->get_io_context(), this->endpoint);
-		return this->socket.is_open();
+		this->socket = std::make_unique<boost::asio::ip::udp::socket>(event_loop::get()->get_io_context(), this->endpoint);
+		return this->socket->is_open();
 	}
 
 	void Close()
 	{
-		this->socket.close();
+		this->socket->close();
 	}
 
 	[[nodiscard]]
@@ -96,7 +92,7 @@ public:
 		boost::asio::ip::udp::endpoint receiver_endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
 
 		try {
-			co_await this->socket.async_send_to(boost::asio::buffer(buf, len), receiver_endpoint, boost::asio::use_awaitable);
+			co_await this->socket->async_send_to(boost::asio::buffer(buf, len), receiver_endpoint, boost::asio::use_awaitable);
 		} catch (...) {
 			std::throw_with_nested(std::runtime_error("Failed to send data through a UDP socket to endpoint: " + receiver_endpoint.address().to_string() + ":" + std::to_string(receiver_endpoint.port())));
 		}
@@ -108,7 +104,7 @@ public:
 		try {
 			boost::asio::ip::udp::endpoint sender_endpoint;
 
-			const size_t size = co_await this->socket.async_receive_from(boost::asio::buffer(buf.data(), buf.size()), sender_endpoint, boost::asio::use_awaitable);
+			const size_t size = co_await this->socket->async_receive_from(boost::asio::buffer(buf.data(), buf.size()), sender_endpoint, boost::asio::use_awaitable);
 
 			*hostFrom = CHost(htonl(sender_endpoint.address().to_v4().to_ulong()), htons(sender_endpoint.port()));
 
@@ -120,12 +116,12 @@ public:
 
 	void SetNonBlocking()
 	{
-		this->socket.non_blocking(true);
+		this->socket->non_blocking(true);
 	}
 
 	size_t HasDataToRead()
 	{
-		return this->socket.available();
+		return this->socket->available();
 	}
 
 	boost::asio::awaitable<size_t> WaitForDataToRead(const int timeout)
@@ -141,17 +137,17 @@ public:
 					return;
 				}
 
-				this->socket.cancel();
+				this->socket->cancel();
 				timed_out = true;
 			});
 
-			co_await this->socket.async_wait(boost::asio::ip::udp::socket::wait_read, boost::asio::use_awaitable);
+			co_await this->socket->async_wait(boost::asio::ip::udp::socket::wait_read, boost::asio::use_awaitable);
 			timer.cancel();
 
 			if (timed_out) {
 				co_return 0;
 			} else {
-				co_return this->socket.available();
+				co_return this->socket->available();
 			}
 		} catch (...) {
 			std::throw_with_nested(std::runtime_error("Failed to wait for data to receive through a UDP socket."));
@@ -160,12 +156,12 @@ public:
 
 	bool IsValid() const
 	{
-		return this->socket.is_open();
+		return this->socket != nullptr && this->socket->is_open();
 	}
 
 private:
 	boost::asio::ip::udp::endpoint endpoint;
-	boost::asio::ip::udp::socket socket;
+	std::unique_ptr<boost::asio::ip::udp::socket> socket;
 };
 
 // CUDPSocket
