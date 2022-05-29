@@ -186,6 +186,40 @@ AiHelper AiHelpers;             /// AI helper variables
 
 PlayerAi *AiPlayer;             /// Current AI player
 
+void PlayerAi::check_factions()
+{
+	//check if any factions can be founded, and if so, pick one randomly
+	if (this->Player->get_faction() != nullptr && this->Player->NumTownHalls > 0) {
+		std::vector<const faction *> potential_factions;
+		for (const faction *possible_faction : this->Player->get_potentially_foundable_factions()) {
+			if (!this->Player->can_found_faction(possible_faction)) {
+				continue;
+			}
+
+			potential_factions.push_back(possible_faction);
+		}
+
+		if (!potential_factions.empty()) {
+			this->Player->set_faction(vector::get_random(potential_factions));
+		}
+
+		if (this->Player->get_dynasty() == nullptr) { //if the AI player has no dynasty, pick one if available
+			std::vector<const dynasty *> potential_dynasties;
+			for (const dynasty *dynasty : this->Player->get_faction()->get_dynasties()) {
+				if (!this->Player->can_choose_dynasty(dynasty)) {
+					continue;
+				}
+
+				potential_dynasties.push_back(dynasty);
+			}
+
+			if (!potential_dynasties.empty()) {
+				this->Player->set_dynasty(vector::get_random(potential_dynasties));
+			}
+		}
+	}
+}
+
 void PlayerAi::evaluate_diplomacy()
 {
 	if (AiPlayer->Player->AiName == "passive") {
@@ -485,39 +519,6 @@ static void AiCheckUnits()
 						break; // only hire one unit per mercenary camp per second
 					}
 				}
-			}
-		}
-	}
-	//Wyrmgus end
-	
-	//Wyrmgus start
-	//check if any factions can be founded, and if so, pick one randomly
-	if (AiPlayer->Player->get_faction() != nullptr && AiPlayer->Player->NumTownHalls > 0) {
-		std::vector<const faction *> potential_factions;
-		for (const faction *possible_faction : AiPlayer->Player->get_potentially_foundable_factions()) {
-			if (!AiPlayer->Player->can_found_faction(possible_faction)) {
-				continue;
-			}
-				
-			potential_factions.push_back(possible_faction);
-		}
-		
-		if (!potential_factions.empty()) {
-			AiPlayer->Player->set_faction(vector::get_random(potential_factions));
-		}
-		
-		if (AiPlayer->Player->get_dynasty() == nullptr) { //if the AI player has no dynasty, pick one if available
-			std::vector<const dynasty *> potential_dynasties;
-			for (const dynasty *dynasty : AiPlayer->Player->get_faction()->get_dynasties()) {
-				if (!AiPlayer->Player->can_choose_dynasty(dynasty)) {
-					continue;
-				}
-				
-				potential_dynasties.push_back(dynasty);
-			}
-			
-			if (!potential_dynasties.empty()) {
-				AiPlayer->Player->set_dynasty(vector::get_random(potential_dynasties));
 			}
 		}
 	}
@@ -1601,6 +1602,8 @@ void AiEachSecond(CPlayer &player)
 
 	//  Look if everything is fine.
 	AiCheckUnits();
+
+	AiPlayer->check_factions();
 
 	//  Handle the resource manager.
 	AiResourceManager();

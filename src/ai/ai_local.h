@@ -411,6 +411,8 @@ public:
 
 	void add_research_request(const CUpgrade *upgrade);
 	
+	void check_factions();
+
 	void evaluate_diplomacy();
 	void check_quest_objectives();
 
