@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "util/qunique_ptr.h"
 #include "util/singleton.h"
 
 namespace boost::asio {
@@ -74,7 +75,7 @@ private:
 
 private:
 	std::unique_ptr<boost::asio::io_context> io_context;
-	std::thread io_context_thread;
+	qunique_ptr<QTimer> run_timer; //the timer for running the event loop again
 };
 
 }

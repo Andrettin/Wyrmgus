@@ -111,15 +111,6 @@ int main(int argc, char **argv)
 
 		parameters::get()->process();
 
-		event_loop::get()->co_spawn([argc, argv]() -> boost::asio::awaitable<void> {
-			try {
-				co_await stratagusMain(argc, argv);
-			} catch (const std::exception &exception) {
-				exception::report(exception);
-				QMetaObject::invokeMethod(QApplication::instance(), [] { QApplication::exit(EXIT_FAILURE); }, Qt::QueuedConnection);
-			}
-		});
-
 		QQmlApplicationEngine engine;
 
 		qmlRegisterAnonymousType<calendar>("", 1);
@@ -177,10 +168,19 @@ int main(int argc, char **argv)
 		QUrl url = QDir(root_path + "/interface/").absoluteFilePath("Main.qml");
 		url.setScheme("file");
 		QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app,
-			[url](QObject *obj, const QUrl &objUrl) {
+			[url, argc, argv](QObject *obj, const QUrl &objUrl) {
 				if (!obj && url == objUrl) {
 					QCoreApplication::exit(-1);
 				}
+
+				event_loop::get()->co_spawn([argc, argv]() -> boost::asio::awaitable<void> {
+					try {
+						co_await stratagusMain(argc, argv);
+					} catch (const std::exception &exception) {
+						exception::report(exception);
+						QMetaObject::invokeMethod(QApplication::instance(), [] { QApplication::exit(EXIT_FAILURE); }, Qt::QueuedConnection);
+					}
+				});
 			}, Qt::QueuedConnection);
 		engine.load(url);
 

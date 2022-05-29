@@ -45,9 +45,16 @@ namespace wyrmgus {
 event_loop::event_loop()
 {
 	this->io_context = std::make_unique<boost::asio::io_context>();
-	this->io_context_thread = std::thread([this]() {
+
+	this->run_timer = make_qunique<QTimer>(QApplication::instance());
+	this->run_timer->setSingleShot(true);
+	this->run_timer->setInterval(1);
+
+	QObject::connect(this->run_timer.get(), &QTimer::timeout, [this]() {
 		this->run_io_context();
 	});
+
+	this->run_timer->start();
 }
 
 event_loop::~event_loop()
@@ -58,9 +65,6 @@ event_loop::~event_loop()
 void event_loop::stop()
 {
 	this->io_context->stop();
-	if (this->io_context_thread.joinable()) {
-		this->io_context_thread.join();
-	}
 }
 
 void event_loop::post(const std::function<void()> &function)
@@ -77,7 +81,7 @@ void event_loop::post(const std::function<void()> &function)
 
 void event_loop::sync(const std::function<void()> &function)
 {
-	if (engine_interface::get()->is_waiting_for_interface()) {
+	if (engine_interface::get()->is_waiting_for_interface() || QThread::currentThread() == QApplication::instance()->thread()) {
 		function();
 		return;
 	}
@@ -108,8 +112,10 @@ boost::asio::awaitable<void> event_loop::await_ms(const uint64_t ms)
 
 void event_loop::run_io_context()
 {
-	auto work_guard = boost::asio::make_work_guard(*this->io_context);
-	this->io_context->run();
+	//only run for 1 millisecond, as otherwise the IO context can potentially keep running forever, blocking the Qt UI thread permanently
+	this->io_context->run_for(std::chrono::milliseconds(1));
+
+	this->run_timer->start();
 }
 
 }

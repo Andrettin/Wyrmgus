@@ -92,6 +92,7 @@
 #include <QString>
 #include <QThread>
 #include <QTime>
+#include <QTimer>
 #include <QVariant>
 #include <QVariantList>
 #pragma warning(pop)
