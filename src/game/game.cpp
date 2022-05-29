@@ -239,18 +239,9 @@ void game::set_paused(const bool paused)
 	KeyScrollState = MouseScrollState = ScrollNone;
 	//Wyrmgus end
 
-	std::unique_lock<std::shared_mutex> lock(this->mutex);
-
 	this->paused = paused;
 
 	emit paused_changed();
-}
-
-void game::set_paused_sync(const bool paused)
-{
-	event_loop::get()->sync([this, paused]() {
-		this->set_paused(paused);
-	});
 }
 
 int game::get_cycles_per_year() const

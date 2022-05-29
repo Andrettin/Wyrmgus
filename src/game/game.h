@@ -50,11 +50,11 @@ class game final : public QObject, public singleton<game>
 	Q_OBJECT
 
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
-	Q_PROPERTY(bool paused READ is_paused_sync WRITE set_paused_sync NOTIFY paused_changed)
+	Q_PROPERTY(bool paused READ is_paused WRITE set_paused NOTIFY paused_changed)
 	Q_PROPERTY(bool multiplayer READ is_multiplayer NOTIFY multiplayer_changed)
-	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign_sync NOTIFY current_campaign_changed)
-	Q_PROPERTY(int current_year READ get_current_year_sync NOTIFY current_year_changed)
-	Q_PROPERTY(bool console_active READ is_console_active_sync NOTIFY console_active_changed)
+	Q_PROPERTY(wyrmgus::campaign* current_campaign READ get_current_campaign NOTIFY current_campaign_changed)
+	Q_PROPERTY(int current_year READ get_current_year NOTIFY current_year_changed)
+	Q_PROPERTY(bool console_active READ is_console_active NOTIFY console_active_changed)
 	Q_PROPERTY(wyrmgus::results_info* results READ get_results NOTIFY results_changed)
 
 public:
@@ -105,15 +105,7 @@ public:
 		return this->paused;
 	}
 
-	bool is_paused_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->is_paused();
-	}
-
 	void set_paused(const bool paused);
-	void set_paused_sync(const bool paused);
 
 	void toggle_paused()
 	{
@@ -136,25 +128,16 @@ public:
 		emit multiplayer_changed();
 	}
 
-	const campaign *get_current_campaign() const
+	campaign *get_current_campaign() const
 	{
 		return this->current_campaign;
 	}
 
-	campaign *get_current_campaign_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return const_cast<campaign *>(this->get_current_campaign());
-	}
-
-	void set_current_campaign(const campaign *campaign)
+	void set_current_campaign(campaign *campaign)
 	{
 		if (campaign == this->get_current_campaign()) {
 			return;
 		}
-
-		std::unique_lock<std::shared_mutex> lock(this->mutex);
 
 		this->current_campaign = campaign;
 
@@ -166,20 +149,11 @@ public:
 		return this->current_year;
 	}
 
-	int get_current_year_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_current_year();
-	}
-
 	void set_current_year(const int year)
 	{
 		if (year == this->get_current_year()) {
 			return;
 		}
-
-		std::unique_lock<std::shared_mutex> lock(this->mutex);
 
 		this->current_year = year;
 
@@ -274,20 +248,11 @@ public:
 		return this->console_active;
 	}
 
-	bool is_console_active_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->is_console_active();
-	}
-
 	void set_console_active(const bool active)
 	{
 		if (active == this->is_console_active()) {
 			return;
 		}
-
-		std::unique_lock<std::shared_mutex> lock(this->mutex);
 
 		this->console_active = active;
 
@@ -313,7 +278,7 @@ private:
 	bool running = false;
 	bool paused = false;
 	bool multiplayer = false;
-	const campaign *current_campaign = nullptr;
+	campaign *current_campaign = nullptr;
 	int current_year = 0;
 	uint64_t current_total_hours = 0; //the total in-game hours
 	bool cheat = false; //whether a cheat was used in this game
@@ -322,7 +287,6 @@ private:
 	std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> unit_delayed_effects;
 	bool console_active = false;
 	qunique_ptr<results_info> results;
-	mutable std::shared_mutex mutex;
 };
 
 }
