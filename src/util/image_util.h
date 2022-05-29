@@ -44,6 +44,9 @@ enum class frame_order {
 	top_to_bottom
 };
 
+[[nodiscard]]
+extern boost::asio::awaitable<QImage> load(const std::filesystem::path &filepath);
+
 inline QImage get_frame(const QImage &image, const int frame_x, const int frame_y, const QSize &frame_size)
 {
 	const int pixel_x = frame_x * frame_size.width();

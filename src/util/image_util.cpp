@@ -39,6 +39,14 @@
 
 namespace wyrmgus::image {
 
+boost::asio::awaitable<QImage> load(const std::filesystem::path &filepath)
+{
+	co_return co_await thread_pool::get()->co_spawn_awaitable([&filepath]() -> boost::asio::awaitable<QImage> {
+		QImage image(path::to_qstring(filepath));
+		co_return image;
+	});
+}
+
 static void copy_frame_data(const uint32_t *src_frame_data, uint32_t *dst_data, const QSize &frame_size, const int frame_x, const int frame_y, const int dst_width)
 {
 	//BPP is assumed to be 4, hence why uint32_t buffers are used
