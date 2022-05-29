@@ -410,6 +410,8 @@ static boost::asio::awaitable<void> GameLogicLoop()
 		co_await WaitEventsOneFrame();
 	}
 
+	game::get()->process_commands();
+
 	if (!NetworkInSync) {
 		co_await NetworkRecover(); // recover network
 	}

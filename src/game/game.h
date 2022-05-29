@@ -70,6 +70,7 @@ public:
 	{
 		this->cheat = false;
 		this->clear_delayed_effects();
+		this->posted_commands.clear();
 	}
 
 	bool is_running() const
@@ -263,6 +264,21 @@ public:
 	void store_results();
 	void clear_results();
 
+	void post_command(std::function<void()> &&function)
+	{
+		this->posted_commands.push_back(std::move(function));
+	}
+
+	void process_commands()
+	{
+		//process the commands which have been queued
+		for (const std::function<void()> &function : this->posted_commands) {
+			function();
+		}
+
+		this->posted_commands.clear();
+	}
+
 signals:
 	void started();
 	void stopped();
@@ -287,6 +303,7 @@ private:
 	std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> unit_delayed_effects;
 	bool console_active = false;
 	qunique_ptr<results_info> results;
+	std::vector<std::function<void()>> posted_commands;
 };
 
 }
