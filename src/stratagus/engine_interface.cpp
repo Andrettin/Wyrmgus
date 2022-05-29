@@ -264,49 +264,47 @@ void engine_interface::load_map_infos()
 {
 	this->clear_map_infos();
 
-	event_loop::get()->sync([this]() { //must be synchronized as it uses Lua and alters the map singleton
-		try {
-			const std::vector<std::filesystem::path> map_paths = database::get()->get_maps_paths();
+	try {
+		const std::vector<std::filesystem::path> map_paths = database::get()->get_maps_paths();
 
-			for (const std::filesystem::path &map_path : map_paths) {
-				if (!std::filesystem::exists(map_path)) {
+		for (const std::filesystem::path &map_path : map_paths) {
+			if (!std::filesystem::exists(map_path)) {
+				continue;
+			}
+
+			std::filesystem::recursive_directory_iterator dir_iterator(map_path);
+
+			for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
+				if (dir_entry.is_directory()) {
+					if (dir_entry.path().filename() == "campaign" || dir_entry.path().filename() == "hidden") {
+						dir_iterator.disable_recursion_pending();
+						continue;
+					}
+				}
+
+				if (!dir_entry.is_regular_file()) {
 					continue;
 				}
 
-				std::filesystem::recursive_directory_iterator dir_iterator(map_path);
-
-				for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
-					if (dir_entry.is_directory()) {
-						if (dir_entry.path().filename() == "campaign" || dir_entry.path().filename() == "hidden") {
-							dir_iterator.disable_recursion_pending();
-							continue;
-						}
-					}
-
-					if (!dir_entry.is_regular_file()) {
-						continue;
-					}
-
-					if (dir_entry.path().extension() != ".smp" && dir_entry.path().extension() != ".wmp") {
-						continue;
-					}
-
-					this->load_map_info(dir_entry.path());
-
+				if (dir_entry.path().extension() != ".smp" && dir_entry.path().extension() != ".wmp") {
+					continue;
 				}
+
+				this->load_map_info(dir_entry.path());
+
+			}
+		}
+
+		std::sort(this->map_infos.begin(), this->map_infos.end(), [](const qunique_ptr<map_info> &lhs, const qunique_ptr<map_info> &rhs) {
+			if (lhs->get_name() != rhs->get_name()) {
+				return lhs->get_name() < rhs->get_name();
 			}
 
-			std::sort(this->map_infos.begin(), this->map_infos.end(), [](const qunique_ptr<map_info> &lhs, const qunique_ptr<map_info> &rhs) {
-				if (lhs->get_name() != rhs->get_name()) {
-					return lhs->get_name() < rhs->get_name();
-				}
-
-				return lhs->get_setup_filepath() < rhs->get_setup_filepath();
-			});
-		} catch (const std::exception &exception) {
-			exception::report(exception);
-		}
-	});
+			return lhs->get_setup_filepath() < rhs->get_setup_filepath();
+		});
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+	}
 }
 
 void engine_interface::clear_map_infos()

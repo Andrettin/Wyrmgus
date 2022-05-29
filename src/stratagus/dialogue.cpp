@@ -139,23 +139,21 @@ void dialogue::call_node_option_effect(const int node_index, const int option_in
 	this->nodes[node_index]->option_effect(option_index, player, ctx);
 }
 
-void dialogue::call_node_option_effect_sync(const int node_index, const int option_index, const int unit_number) const
+void dialogue::call_node_option_effect(const int node_index, const int option_index, const int unit_number) const
 {
 	CPlayer *player = CPlayer::GetThisPlayer();
 
-	event_loop::get()->sync([this, node_index, option_index, player, unit_number]() {
-		context ctx;
-		ctx.current_player = player;
+	context ctx;
+	ctx.current_player = player;
 
-		if (unit_number != -1) {
-			CUnit &unit = unit_manager::get()->GetSlotUnit(unit_number);
-			if (!unit.Destroyed) {
-				ctx.current_unit = unit.acquire_ref();
-			}
+	if (unit_number != -1) {
+		CUnit &unit = unit_manager::get()->GetSlotUnit(unit_number);
+		if (!unit.Destroyed) {
+			ctx.current_unit = unit.acquire_ref();
 		}
+	}
 
-		this->call_node_option_effect(node_index, option_index, player, ctx);
-	});
+	this->call_node_option_effect(node_index, option_index, player, ctx);
 }
 
 void dialogue::delete_lua_callbacks()

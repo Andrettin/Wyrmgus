@@ -50,21 +50,6 @@ public:
 
 	void post(const std::function<void()> &function);
 
-	std::future<void> async(const std::function<void()> &function)
-	{
-		std::shared_ptr<std::promise<void>> promise = std::make_unique<std::promise<void>>();
-		std::future<void> future = promise->get_future();
-
-		this->post([promise, function]() {
-			function();
-			promise->set_value();
-		});
-
-		return future;
-	}
-
-	void sync(const std::function<void()> &function);
-
 	void co_spawn(const std::function<boost::asio::awaitable<void>()> &function);
 
 	[[nodiscard]]

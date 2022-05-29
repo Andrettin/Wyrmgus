@@ -79,18 +79,6 @@ void event_loop::post(const std::function<void()> &function)
 	});
 }
 
-void event_loop::sync(const std::function<void()> &function)
-{
-	if (engine_interface::get()->is_waiting_for_interface() || QThread::currentThread() == QApplication::instance()->thread()) {
-		function();
-		return;
-	}
-
-	//post an action, and then wait for it to be completed
-	std::future<void> future = this->async(function);
-	future.wait();
-}
-
 void event_loop::co_spawn(const std::function<boost::asio::awaitable<void>()> &function)
 {
 	boost::asio::co_spawn(this->io_context->get_executor(), [this, function]() -> boost::asio::awaitable<void> {
