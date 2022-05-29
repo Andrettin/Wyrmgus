@@ -488,13 +488,13 @@ boost::asio::awaitable<void> GameMainLoop()
 
 	engine_interface::get()->set_waiting_for_interface(true);
 
+	//run the display loop once, so that the map is visible when we start
+	DisplayLoop();
+
 	co_await thread_pool::get()->await_future(engine_interface::get()->get_map_view_created_future());
 
 	engine_interface::get()->reset_map_view_created_promise();
 	engine_interface::get()->set_waiting_for_interface(false);
-
-	//run the display loop once, so that the map is visible when we start
-	DisplayLoop();
 
 	engine_interface::get()->set_loading_message("");
 
