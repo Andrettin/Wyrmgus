@@ -92,7 +92,7 @@ boost::asio::awaitable<void> thread_pool::await_future(std::future<void> &&futur
 {
 	static constexpr size_t max_timeout_ms = 1000;
 
-	co_await boost::asio::co_spawn(this->get_pool().get_executor(), [this, future = std::move(future)]() -> boost::asio::awaitable<void> {
+	co_await boost::asio::co_spawn(this->pool->get_executor(), [this, future = std::move(future)]() -> boost::asio::awaitable<void> {
 		size_t timeout_ms = 1;
 
 		while (future.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout) {

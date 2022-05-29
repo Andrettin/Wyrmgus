@@ -48,7 +48,6 @@
 #include "settings.h"
 #include "ui/interface.h"
 #include "util/assert_util.h"
-#include "util/thread_pool.h"
 #include "util/util.h"
 #include "video/video.h"
 

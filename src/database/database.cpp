@@ -125,10 +125,6 @@
 #include "video/font.h"
 #include "video/font_color.h"
 
-#include <boost/asio/co_spawn.hpp>
-#include <boost/asio/thread_pool.hpp>
-#include <boost/asio/use_awaitable.hpp>
-
 namespace wyrmgus {
 
 /**
@@ -717,10 +713,10 @@ boost::asio::awaitable<void> database::parse_folder(const std::filesystem::path 
 
 	for (const auto &kv_pair : filepaths_by_depth) {
 		for (const std::filesystem::path &filepath : kv_pair.second) {
-			boost::asio::awaitable<gsml_data> awaitable = boost::asio::co_spawn(thread_pool::get()->get_pool().get_executor(), [&filepath]() -> boost::asio::awaitable<gsml_data> {
+			boost::asio::awaitable<gsml_data> awaitable = thread_pool::get()->co_spawn_awaitable([&filepath]() -> boost::asio::awaitable<gsml_data> {
 				gsml_parser parser;
 				co_return parser.parse(filepath);
-			}, boost::asio::use_awaitable);
+			});
 
 			awaitables.push_back(std::move(awaitable));
 		}

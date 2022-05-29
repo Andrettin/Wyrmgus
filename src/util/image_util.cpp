@@ -37,10 +37,6 @@
 #include "util/thread_pool.h"
 #include "xbrz.h"
 
-#include <boost/asio/co_spawn.hpp>
-#include <boost/asio/thread_pool.hpp>
-#include <boost/asio/use_awaitable.hpp>
-
 namespace wyrmgus::image {
 
 static void copy_frame_data(const uint32_t *src_frame_data, uint32_t *dst_data, const QSize &frame_size, const int frame_x, const int frame_y, const int dst_width)
@@ -138,12 +134,12 @@ boost::asio::awaitable<QImage> scale(const QImage &src_image, const centesimal_i
 
 	for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
 		for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
-			boost::asio::awaitable<void> awaitable = boost::asio::co_spawn(thread_pool::get()->get_pool().get_executor(), [frame_x, frame_y, &src_image, &scale_factor, &old_frame_size, &new_frame_size, dst_data, result_width]() -> boost::asio::awaitable<void> {
+			boost::asio::awaitable<void> awaitable = thread_pool::get()->co_spawn_awaitable([frame_x, frame_y, &src_image, &scale_factor, &old_frame_size, &new_frame_size, dst_data, result_width]() -> boost::asio::awaitable<void> {
 				const QImage result_frame_image = image::scale_frame(src_image, frame_x, frame_y, scale_factor, old_frame_size);
 
 				const uint32_t *frame_data = reinterpret_cast<const uint32_t *>(result_frame_image.constBits());
 				co_return image::copy_frame_data(frame_data, dst_data, new_frame_size, frame_x, frame_y, result_width);
-			}, boost::asio::use_awaitable);
+			});
 
 			awaitables.push_back(std::move(awaitable));
 		}
