@@ -469,8 +469,6 @@ boost::asio::awaitable<bool> client::Update(unsigned long tick)
 
 void client::SetConfig(const CInitMessage_Config &msg)
 {
-	std::unique_lock<std::shared_mutex> lock(network_manager::get()->get_mutex());
-
 	assert_throw(msg.hostsCount <= CInitMessage_Config::max_hosts);
 
 	HostsCount = 0;
@@ -637,8 +635,6 @@ void client::Parse_Welcome(const unsigned char *buf)
 	networkState.MsgCnt = 0;
 	NetLocalHostsSlot = msg.hosts[0].PlyNr;
 
-	std::unique_lock<std::shared_mutex> lock(network_manager::get()->get_mutex());
-
 	const bool server_player_name_changed = std::string_view(Hosts[0].PlyName) != std::string_view(msg.hosts[0].PlyName);
 
 	Hosts[0].SetName(msg.hosts[0].PlyName); // Name of server player
@@ -682,8 +678,6 @@ void client::Parse_State(const unsigned char *buf)
 		case ccs_synced:
 		case ccs_changed:
 		case ccs_goahead: {
-			std::unique_lock<std::shared_mutex> lock(this->mutex);
-
 			const multiplayer_setup old_setup = *this->server_setup;
 
 			*this->server_setup = msg.State;

@@ -67,10 +67,10 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(QVariantList non_neutral_players READ get_non_neutral_players CONSTANT)
 	Q_PROPERTY(QVariantList main_resources READ get_main_resources CONSTANT)
 	Q_PROPERTY(wyrmgus::interface_style* current_interface_style READ get_current_interface_style NOTIFY current_interface_style_changed)
-	Q_PROPERTY(wyrmgus::time_of_day* current_time_of_day READ get_current_time_of_day_sync NOTIFY current_time_of_day_changed)
-	Q_PROPERTY(wyrmgus::season* current_season READ get_current_season_sync NOTIFY current_season_changed)
+	Q_PROPERTY(wyrmgus::time_of_day* current_time_of_day READ get_current_time_of_day NOTIFY current_time_of_day_changed)
+	Q_PROPERTY(wyrmgus::season* current_season READ get_current_season NOTIFY current_season_changed)
 	Q_PROPERTY(bool modal_dialog_open READ is_modal_dialog_open WRITE set_modal_dialog_open_async)
-	Q_PROPERTY(bool lua_dialog_open READ is_lua_dialog_open_sync NOTIFY lua_dialog_open_changed)
+	Q_PROPERTY(bool lua_dialog_open READ is_lua_dialog_open NOTIFY lua_dialog_open_changed)
 
 public:
 	engine_interface();
@@ -106,21 +106,16 @@ public:
 
 	const QString &get_loading_message() const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->loading_message_mutex);
 		return this->loading_message;
 	}
 
 	void set_loading_message(const QString &loading_message)
 	{
-		{
-			std::unique_lock<std::shared_mutex> lock(this->loading_message_mutex);
-
-			if (loading_message == this->loading_message) {
-				return;
-			}
-
-			this->loading_message = loading_message;
+		if (loading_message == this->loading_message) {
+			return;
 		}
+
+		this->loading_message = loading_message;
 
 		emit loading_message_changed();
 	}
@@ -165,13 +160,11 @@ public:
 
 	std::queue<std::unique_ptr<QInputEvent>> take_stored_input_events()
 	{
-		std::lock_guard<std::mutex> lock(this->input_event_mutex);
 		return std::move(this->stored_input_events);
 	}
 
 	void store_input_event(std::unique_ptr<QInputEvent> &&event)
 	{
-		std::lock_guard<std::mutex> lock(this->input_event_mutex);
 		this->stored_input_events.push(std::move(event));
 	}
 
@@ -232,20 +225,16 @@ public:
 
 	void set_current_interface_style(interface_style *interface_style);
 
-	time_of_day *get_current_time_of_day_sync() const
+	time_of_day *get_current_time_of_day() const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 		return const_cast<time_of_day *>(this->current_time_of_day);
 	}
 
 	void set_current_time_of_day(const time_of_day *time_of_day);
 	void update_current_time_of_day();
 
-	season *get_current_season_sync() const
+	season *get_current_season() const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 		return const_cast<season *>(this->current_season);
 	}
 
@@ -259,10 +248,8 @@ public:
 
 	void set_modal_dialog_open_async(const bool value);
 
-	bool is_lua_dialog_open_sync() const
+	bool is_lua_dialog_open() const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 		return this->open_lua_dialog_count > 0;
 	}
 
@@ -273,8 +260,6 @@ public:
 		}
 
 		const int old_count = this->open_lua_dialog_count;
-
-		std::unique_lock<std::shared_mutex> lock(this->mutex);
 
 		this->open_lua_dialog_count = count;
 
@@ -318,16 +303,13 @@ private:
 	std::promise<void> map_view_created_promise;
 	std::atomic<bool> waiting_for_interface = false;
 	std::queue<std::unique_ptr<QInputEvent>> stored_input_events;
-	std::mutex input_event_mutex;
 	QString loading_message; //the loading message to be displayed
 	interface_style *current_interface_style = nullptr;
 	const time_of_day *current_time_of_day = nullptr;
 	const season *current_season = nullptr;
 	bool modal_dialog_open = false;
 	int open_lua_dialog_count = 0;
-	mutable std::shared_mutex loading_message_mutex;
 	std::vector<qunique_ptr<map_info>> map_infos;
-	mutable std::shared_mutex mutex; //a general-purpose mutex
 };
 
 }

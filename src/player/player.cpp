@@ -543,12 +543,6 @@ void CPlayer::set_population(const int64_t population)
 
 	assert_log(population >= 0);
 
-	std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-	if (this == CPlayer::GetThisPlayer()) {
-		lock = std::unique_lock<std::shared_mutex>(this->mutex);
-	}
-
 	this->population = population;
 
 	emit population_changed();
@@ -1330,8 +1324,6 @@ void CPlayer::set_name(const std::string &name)
 		return;
 	}
 
-	std::unique_lock<std::shared_mutex> lock(this->mutex);
-
 	this->name = name;
 
 	emit name_changed();
@@ -1473,7 +1465,7 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 		return;
 	}
 	
-	const wyrmgus::player_color *player_color = nullptr;
+	wyrmgus::player_color *player_color = nullptr;
 
 	if (!GameEstablishing) {
 		if (this->get_faction_tier() == faction_tier::none) {
@@ -1496,7 +1488,7 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 		this->set_dynasty(nullptr);
 	}
 
-	const wyrmgus::player_color *faction_color = faction->get_color();
+	wyrmgus::player_color *faction_color = this->get_faction()->get_color();
 	if (faction_color != nullptr) {
 		if (this->get_player_color_usage_count(faction_color) == 0) {
 			player_color = faction_color;
@@ -1508,8 +1500,8 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 		//out of those colors, give priority to the one closest (in RGB values) to the faction's color
 		int best_usage_count = -1;
 		int best_rgb_difference = -1;
-		std::vector<const wyrmgus::player_color *> available_colors;
-		for (const wyrmgus::player_color *pc : player_color::get_all()) {
+		std::vector<wyrmgus::player_color *> available_colors;
+		for (wyrmgus::player_color *pc : player_color::get_all()) {
 			if (pc == defines::get()->get_neutral_player_color()) {
 				continue;
 			}
@@ -1745,22 +1737,14 @@ void CPlayer::check_age()
 **
 **	@param	age	The age to be set for the player
 */
-void CPlayer::set_age(const wyrmgus::age *age)
+void CPlayer::set_age(wyrmgus::age *age)
 {
 	if (age == this->get_age()) {
 		return;
 	}
 
-	{
-		std::optional<std::unique_lock<std::shared_mutex>> lock;
+	this->age = age;
 
-		if (this == CPlayer::GetThisPlayer()) {
-			lock = std::unique_lock<std::shared_mutex>(this->mutex);
-		}
-
-		this->age = age;
-	}
-	
 	if (this == CPlayer::GetThisPlayer()) {
 		if (this->age != nullptr) {
 			if (GameCycle > 0 && !SaveGameLoading) {
@@ -3735,20 +3719,12 @@ void CPlayer::set_resource(const resource *resource, const int quantity)
 {
 	const int old_quantity = this->get_resource(resource);
 
-	{
-		std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-		if (this == CPlayer::GetThisPlayer()) {
-			lock = std::unique_lock<std::shared_mutex>(this->mutex);
+	if (quantity <= 0) {
+		if (this->resources.contains(resource)) {
+			this->resources.erase(resource);
 		}
-
-		if (quantity <= 0) {
-			if (this->resources.contains(resource)) {
-				this->resources.erase(resource);
-			}
-		} else {
-			this->resources[resource] = quantity;
-		}
+	} else {
+		this->resources[resource] = quantity;
 	}
 
 	if (resource->is_special()) {
@@ -3764,20 +3740,12 @@ void CPlayer::set_stored_resource(const resource *resource, const int quantity)
 {
 	const int old_quantity = this->get_stored_resource(resource);
 
-	{
-		std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-		if (this == CPlayer::GetThisPlayer()) {
-			lock = std::unique_lock<std::shared_mutex>(this->mutex);
+	if (quantity == 0) {
+		if (this->stored_resources.contains(resource)) {
+			this->stored_resources.erase(resource);
 		}
-
-		if (quantity == 0) {
-			if (this->stored_resources.contains(resource)) {
-				this->stored_resources.erase(resource);
-			}
-		} else {
-			this->stored_resources[resource] = quantity;
-		}
+	} else {
+		this->stored_resources[resource] = quantity;
 	}
 
 	if (resource->is_special()) {
@@ -3791,12 +3759,6 @@ void CPlayer::set_stored_resource(const resource *resource, const int quantity)
 
 void CPlayer::set_resource_demand(const resource *resource, const int quantity)
 {
-	std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-	if (this == CPlayer::GetThisPlayer()) {
-		lock = std::unique_lock<std::shared_mutex>(this->mutex);
-	}
-
 	if (quantity == 0) {
 		if (this->resource_demands.contains(resource)) {
 			this->resource_demands.erase(resource);
@@ -3810,12 +3772,6 @@ void CPlayer::set_resource_demand(const resource *resource, const int quantity)
 
 void CPlayer::set_income(const resource *resource, const int quantity)
 {
-	std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-	if (this == CPlayer::GetThisPlayer()) {
-		lock = std::unique_lock<std::shared_mutex>(this->mutex);
-	}
-
 	if (quantity == 0) {
 		if (this->incomes.contains(resource)) {
 			this->incomes.erase(resource);
@@ -3829,12 +3785,6 @@ void CPlayer::set_income(const resource *resource, const int quantity)
 
 void CPlayer::set_income_modifier(const resource *resource, const int quantity)
 {
-	std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-	if (this == CPlayer::GetThisPlayer()) {
-		lock = std::unique_lock<std::shared_mutex>(this->mutex);
-	}
-
 	if (quantity == 0) {
 		if (this->income_modifiers.contains(resource)) {
 			this->income_modifiers.erase(resource);
@@ -3855,13 +3805,6 @@ void CPlayer::set_income_modifier(const resource *resource, const int quantity)
 int CPlayer::get_processing_bonus(const resource *resource) const
 {
 	return this->get_income_modifier(resource) - resource->get_default_income();
-}
-
-int CPlayer::get_processing_bonus_sync(resource *resource) const
-{
-	std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-	return this->get_processing_bonus(resource);
 }
 
 std::string CPlayer::get_children_processing_bonus_string(const resource *resource) const
@@ -3892,12 +3835,6 @@ std::string CPlayer::get_children_processing_bonus_string(const resource *resour
 
 void CPlayer::set_price(const resource *resource, const int quantity)
 {
-	std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-	if (this == CPlayer::GetThisPlayer()) {
-		lock = std::unique_lock<std::shared_mutex>(this->mutex);
-	}
-
 	if (quantity == 0) {
 		if (this->prices.contains(resource)) {
 			this->prices.erase(resource);
@@ -3959,10 +3896,8 @@ int CPlayer::get_resource(const wyrmgus::resource *resource, const resource_stor
 	}
 }
 
-int CPlayer::get_resource_sync(resource *resource) const
+int CPlayer::get_resource(resource *resource) const
 {
-	std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 	return this->get_resource(resource, resource_storage_type::both);
 }
 
@@ -5093,8 +5028,6 @@ void CPlayer::Notify(const char *fmt, ...) const
 
 void CPlayer::set_neutral_diplomatic_stance_with(const CPlayer *player)
 {
-	std::unique_lock<std::shared_mutex> lock(this->mutex);
-
 	this->enemies.erase(player->get_index());
 	this->allies.erase(player->get_index());
 
@@ -5123,8 +5056,6 @@ void CPlayer::set_neutral_diplomatic_stance_with_async(CPlayer *player)
 
 void CPlayer::set_allied_diplomatic_stance_with(const CPlayer *player)
 {
-	std::unique_lock<std::shared_mutex> lock(this->mutex);
-
 	this->enemies.erase(player->get_index());
 	this->allies.insert(player->get_index());
 
@@ -5153,14 +5084,10 @@ void CPlayer::set_allied_diplomatic_stance_with_async(CPlayer *player)
 
 void CPlayer::set_enemy_diplomatic_stance_with(CPlayer *player)
 {
-	{
-		std::unique_lock<std::shared_mutex> lock(this->mutex);
+	this->enemies.insert(player->get_index());
+	this->allies.erase(player->get_index());
 
-		this->enemies.insert(player->get_index());
-		this->allies.erase(player->get_index());
-
-		emit diplomatic_stances_changed();
-	}
+	emit diplomatic_stances_changed();
 
 	if (GameCycle > 0) {
 		if (player == CPlayer::GetThisPlayer()) {
@@ -5226,8 +5153,6 @@ void CPlayer::set_shared_vision_with(CPlayer *player, const bool shared_vision)
 	if (shared_vision == this->has_shared_vision_with(player)) {
 		return;
 	}
-
-	std::unique_lock<std::shared_mutex> lock(this->mutex);
 
 	if (shared_vision) {
 		this->shared_vision.insert(player->get_index());
@@ -5416,11 +5341,6 @@ bool CPlayer::is_allied_with(const CUnit &unit) const
 	return this->is_allied_with(*unit.Player);
 }
 
-bool CPlayer::has_shared_vision_with(const CPlayer *player) const
-{
-	return this->has_shared_vision_with(player->get_index());
-}
-
 bool CPlayer::has_shared_vision_with(const CUnit &unit) const
 {
 	return this->has_shared_vision_with(unit.Player);
@@ -5559,10 +5479,8 @@ bool CPlayer::HasHero(const wyrmgus::character *hero) const
 }
 //Wyrmgus end
 
-QVariantList CPlayer::get_current_special_resources_sync() const
+QVariantList CPlayer::get_current_special_resources_qvariant_list() const
 {
-	std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 	return container::to_qvariant_list(this->current_special_resources);
 }
 

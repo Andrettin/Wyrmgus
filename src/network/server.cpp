@@ -385,15 +385,11 @@ boost::asio::awaitable<void> server::init_game()
 	NetLocalPlayerNumber = Hosts[0].PlyNr;
 	HostsCount = NetPlayers - 1;
 
-	{
-		std::unique_lock<std::shared_mutex> lock(network_manager::get()->get_mutex());
+	// Move ourselves (server slot 0) to the end of the list
+	std::swap(Hosts[0], Hosts[HostsCount]);
 
-		// Move ourselves (server slot 0) to the end of the list
-		std::swap(Hosts[0], Hosts[HostsCount]);
-
-		emit network_manager::get()->player_name_changed(0, Hosts[0].PlyName);
-		emit network_manager::get()->player_name_changed(HostsCount, Hosts[HostsCount].PlyName);
-	}
+	emit network_manager::get()->player_name_changed(0, Hosts[0].PlyName);
+	emit network_manager::get()->player_name_changed(HostsCount, Hosts[HostsCount].PlyName);
 
 	// Prepare the final config message:
 	CInitMessage_Config message;
@@ -691,8 +687,6 @@ boost::asio::awaitable<int> server::Parse_Hello(int h, const CInitMessage_Hello 
 		}
 
 		if (h != -1) {
-			std::unique_lock<std::shared_mutex> lock(network_manager::get()->get_mutex());
-
 			Hosts[h].Host = host.getIp();
 			Hosts[h].Port = host.getPort();
 			Hosts[h].PlyNr = h;

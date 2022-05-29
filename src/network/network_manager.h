@@ -42,7 +42,7 @@ class network_manager final : public QObject, public singleton<network_manager>
 	Q_PROPERTY(wyrmgus::client* client READ get_client CONSTANT)
 	Q_PROPERTY(wyrmgus::server* server READ get_server CONSTANT)
 	Q_PROPERTY(wyrmgus::map_info* map_info READ get_map_info NOTIFY map_info_changed)
-	Q_PROPERTY(int connected_player_count READ get_connected_player_count_sync NOTIFY connected_player_count_changed)
+	Q_PROPERTY(int connected_player_count READ get_connected_player_count NOTIFY connected_player_count_changed)
 
 public:
 	client *get_client() const;
@@ -76,20 +76,11 @@ public:
 		return this->connected_player_count;
 	}
 
-	int get_connected_player_count_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_connected_player_count();
-	}
-
 	void set_connected_player_count(const int count)
 	{
 		if (count == this->get_connected_player_count()) {
 			return;
 		}
-
-		std::unique_lock<std::shared_mutex> lock(this->mutex);
 
 		this->connected_player_count = count;
 		emit connected_player_count_changed();
@@ -102,11 +93,6 @@ public:
 
 	void check_players(const multiplayer_setup &setup);
 
-	std::shared_mutex &get_mutex() const
-	{
-		return this->mutex;
-	}
-
 signals:
 	void map_info_changed();
 	void player_name_changed(const int player_index, const QString &name);
@@ -116,7 +102,6 @@ signals:
 private:
 	int connected_player_count = 0;
 	int ready_player_count = 0;
-	mutable std::shared_mutex mutex;
 };
 
 }

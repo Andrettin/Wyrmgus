@@ -42,11 +42,11 @@ class client final : public QObject, public singleton<client>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(bool fog_of_war READ has_fog_of_war_sync NOTIFY fog_of_war_changed)
-	Q_PROPERTY(bool reveal_map READ is_reveal_map_enabled_sync NOTIFY reveal_map_changed)
-	Q_PROPERTY(bool computer_opponents READ has_computer_opponents_sync NOTIFY computer_opponents_changed)
-	Q_PROPERTY(int resources_option READ get_resources_option_sync NOTIFY resources_option_changed)
-	Q_PROPERTY(int difficulty READ get_difficulty_sync NOTIFY difficulty_changed)
+	Q_PROPERTY(bool fog_of_war READ has_fog_of_war NOTIFY fog_of_war_changed)
+	Q_PROPERTY(bool reveal_map READ is_reveal_map_enabled NOTIFY reveal_map_changed)
+	Q_PROPERTY(bool computer_opponents READ has_computer_opponents NOTIFY computer_opponents_changed)
+	Q_PROPERTY(int resources_option READ get_resources_option NOTIFY resources_option_changed)
+	Q_PROPERTY(int difficulty READ get_difficulty NOTIFY difficulty_changed)
 
 public:
 	client();
@@ -82,51 +82,13 @@ public:
 	Q_INVOKABLE bool is_player_ready(const int player_index) const;
 
 	bool has_fog_of_war() const;
-
-	bool has_fog_of_war_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->has_fog_of_war();
-	}
-
 	bool is_reveal_map_enabled() const;
-
-	bool is_reveal_map_enabled_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->is_reveal_map_enabled();
-	}
-
 	bool has_computer_opponents() const;
-
-	bool has_computer_opponents_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->has_computer_opponents();
-	}
 
 	Q_INVOKABLE void set_civilization(const int civilization_index);
 
 	int get_resources_option() const;
-
-	int get_resources_option_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_resources_option();
-	}
-
 	int get_difficulty() const;
-
-	int get_difficulty_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_difficulty();
-	}
 
 	Q_INVOKABLE void set_ready(const bool ready);
 
@@ -226,7 +188,6 @@ private:
 	CUDPSocket *socket = nullptr;
 	std::unique_ptr<multiplayer_setup> server_setup;
 	std::unique_ptr<multiplayer_setup> local_setup;
-	mutable std::shared_mutex mutex;
 };
 
 }

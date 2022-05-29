@@ -149,8 +149,6 @@ void population_unit::set_population(const int64_t population)
 {
 	assert_log(population >= 0);
 
-	std::unique_lock<std::shared_mutex> lock(this->mutex);
-
 	this->population = population;
 
 	emit population_changed();

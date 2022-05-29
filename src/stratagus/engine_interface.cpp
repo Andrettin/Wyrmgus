@@ -617,8 +617,6 @@ void engine_interface::set_current_time_of_day(const time_of_day *time_of_day)
 		return;
 	}
 
-	std::unique_lock<std::shared_mutex> lock(this->mutex);
-
 	this->current_time_of_day = time_of_day;
 
 	emit current_time_of_day_changed();
@@ -639,8 +637,6 @@ void engine_interface::set_current_season(const season *season)
 	if (season == this->current_season) {
 		return;
 	}
-
-	std::unique_lock<std::shared_mutex> lock(this->mutex);
 
 	this->current_season = season;
 

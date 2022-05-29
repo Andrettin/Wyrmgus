@@ -112,15 +112,15 @@ class CPlayer final : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring NOTIFY name_changed)
-	Q_PROPERTY(bool active READ is_active_sync NOTIFY type_changed)
-	Q_PROPERTY(wyrmgus::age* age READ get_age_sync NOTIFY age_changed)
-	Q_PROPERTY(bool alive READ is_alive_sync NOTIFY alive_changed)
-	Q_PROPERTY(wyrmgus::player_color* player_color READ get_player_color_sync NOTIFY player_color_changed)
-	Q_PROPERTY(int supply READ get_supply_sync NOTIFY supply_changed)
-	Q_PROPERTY(int demand READ get_demand_sync NOTIFY demand_changed)
-	Q_PROPERTY(qint64 population READ get_population_sync NOTIFY population_changed)
-	Q_PROPERTY(int trade_cost READ get_trade_cost_sync NOTIFY trade_cost_changed)
-	Q_PROPERTY(QVariantList current_special_resources READ get_current_special_resources_sync NOTIFY current_special_resources_changed)
+	Q_PROPERTY(bool active READ is_active NOTIFY type_changed)
+	Q_PROPERTY(wyrmgus::age* age READ get_age NOTIFY age_changed)
+	Q_PROPERTY(bool alive READ is_alive NOTIFY alive_changed)
+	Q_PROPERTY(wyrmgus::player_color* player_color READ get_player_color NOTIFY player_color_changed)
+	Q_PROPERTY(int supply READ get_supply NOTIFY supply_changed)
+	Q_PROPERTY(int demand READ get_demand NOTIFY demand_changed)
+	Q_PROPERTY(qint64 population READ get_population NOTIFY population_changed)
+	Q_PROPERTY(int trade_cost READ get_trade_cost NOTIFY trade_cost_changed)
+	Q_PROPERTY(QVariantList current_special_resources READ get_current_special_resources_qvariant_list NOTIFY current_special_resources_changed)
 
 public:
 	static constexpr int max_heroes = 4; //maximum heroes per player
@@ -174,22 +174,12 @@ public:
 			return;
 		}
 
-		std::unique_lock<std::shared_mutex> lock(this->mutex);
-
 		this->type = type;
 
 		emit type_changed();
 	}
 
 	bool is_active() const;
-
-	bool is_active_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->is_active();
-	}
-
 	bool is_neutral_player() const;
 
 	const std::string &get_name() const
@@ -200,8 +190,6 @@ public:
 	QString get_name_qstring() const
 	{
 		//we only need to lock here and not in the get_name() function because the only possible contention is between a write from the Wyrmgus thread and a read from the Qt one; besides, get_name() returns a reference, which would make a lock there pointless
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 		return QString::fromStdString(this->get_name());
 	}
 
@@ -250,20 +238,13 @@ public:
 
 	interface_style *get_interface_style() const;
 
-	const wyrmgus::age *get_age() const
+	wyrmgus::age *get_age() const
 	{
 		return this->age;
 	}
 
-	wyrmgus::age *get_age_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return const_cast<wyrmgus::age *>(this->get_age());
-	}
-
 	void check_age();
-	void set_age(const wyrmgus::age *age);
+	void set_age(wyrmgus::age *age);
 
 	CCurrency *GetCurrency() const;
 
@@ -272,20 +253,11 @@ public:
 		return this->alive;
 	}
 
-	bool is_alive_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->is_alive();
-	}
-
 	void set_alive(const bool alive)
 	{
 		if (alive == this->is_alive()) {
 			return;
 		}
-
-		std::unique_lock<std::shared_mutex> lock(this->mutex);
 
 		this->alive = alive;
 
@@ -298,25 +270,16 @@ public:
 	std::vector<CUnit *>::const_iterator UnitBegin() const;
 	std::vector<CUnit *>::const_iterator UnitEnd() const;
 
-	const wyrmgus::player_color *get_player_color() const
+	wyrmgus::player_color *get_player_color() const
 	{
 		return this->player_color;
 	}
 
-	wyrmgus::player_color *get_player_color_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return const_cast<wyrmgus::player_color *>(this->get_player_color());
-	}
-
-	void set_player_color(const wyrmgus::player_color *player_color)
+	void set_player_color(wyrmgus::player_color *player_color)
 	{
 		if (player_color == this->get_player_color()) {
 			return;
 		}
-
-		std::unique_lock<std::shared_mutex> lock(this->mutex);
 
 		this->player_color = player_color;
 
@@ -587,11 +550,10 @@ public:
 		return 0;
 	}
 
-	Q_INVOKABLE int get_income_sync(wyrmgus::resource *resource) const
+	Q_INVOKABLE int get_income(wyrmgus::resource *resource) const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_income(resource);
+		const wyrmgus::resource *res = resource;
+		return this->get_income(res);
 	}
 
 	void set_income(const resource *resource, const int quantity);
@@ -615,13 +577,17 @@ public:
 	void set_income_modifier(const resource *resource, const int quantity);
 
 	int get_processing_bonus(const resource *resource) const;
-	Q_INVOKABLE int get_processing_bonus_sync(wyrmgus::resource *resource) const;
+
+	Q_INVOKABLE int get_processing_bonus(wyrmgus::resource *resource) const
+	{
+		const wyrmgus::resource *res = resource;
+		return this->get_processing_bonus(res);
+	}
+
 	std::string get_children_processing_bonus_string(const resource *resource) const;
 
-	Q_INVOKABLE QString get_children_processing_bonus_string_sync(wyrmgus::resource *resource) const
+	Q_INVOKABLE QString get_children_processing_bonus_qstring(wyrmgus::resource *resource) const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 		return QString::fromStdString(this->get_children_processing_bonus_string(resource));
 	}
 
@@ -636,11 +602,10 @@ public:
 		return 0;
 	}
 
-	Q_INVOKABLE int get_price_sync(wyrmgus::resource *resource) const
+	Q_INVOKABLE int get_price(wyrmgus::resource *resource)
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_price(resource);
+		const wyrmgus::resource *res = resource;
+		return this->get_price(res);
 	}
 
 	void set_price(const resource *resource, const int quantity);
@@ -699,23 +664,10 @@ public:
 		return this->trade_cost;
 	}
 
-	int get_trade_cost_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_trade_cost();
-	}
-
 	void set_trade_cost(const int trade_cost)
 	{
 		if (trade_cost == this->get_trade_cost()) {
 			return;
-		}
-
-		std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-		if (this == CPlayer::GetThisPlayer()) {
-			lock = std::unique_lock<std::shared_mutex>(this->mutex);
 		}
 
 		this->trade_cost = trade_cost;
@@ -794,23 +746,10 @@ public:
 		return this->supply;
 	}
 
-	int get_supply_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_supply();
-	}
-
 	void set_supply(const int supply)
 	{
 		if (supply == this->get_supply()) {
 			return;
-		}
-
-		std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-		if (this == CPlayer::GetThisPlayer()) {
-			lock = std::unique_lock<std::shared_mutex>(this->mutex);
 		}
 
 		this->supply = supply;
@@ -828,23 +767,10 @@ public:
 		return this->demand;
 	}
 
-	int get_demand_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_demand();
-	}
-
 	void set_demand(const int demand)
 	{
 		if (demand == this->get_demand()) {
 			return;
-		}
-
-		std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-		if (this == CPlayer::GetThisPlayer()) {
-			lock = std::unique_lock<std::shared_mutex>(this->mutex);
 		}
 
 		this->demand = demand;
@@ -860,13 +786,6 @@ public:
 	int64_t get_population() const
 	{
 		return this->population;
-	}
-
-	int64_t get_population_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_population();
 	}
 
 	void set_population(const int64_t population);
@@ -942,7 +861,7 @@ public:
 
 	/// Get a resource of the player
 	int get_resource(const wyrmgus::resource *resource, const resource_storage_type type) const;
-	Q_INVOKABLE int get_resource_sync(wyrmgus::resource *resource) const;
+	Q_INVOKABLE int get_resource(wyrmgus::resource *resource) const;
 
 	/// Adds/subtracts some resources to/from the player store
 	void change_resource(const wyrmgus::resource *resource, const int value, const bool store);
@@ -963,29 +882,26 @@ public:
 	/// Get the effective resource demand for the player, given the current prices
 	int get_effective_resource_demand(const resource *resource) const;
 
-	Q_INVOKABLE int get_effective_resource_demand_sync(wyrmgus::resource *resource) const
+	Q_INVOKABLE int get_effective_resource_demand(wyrmgus::resource *resource) const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_effective_resource_demand(resource);
+		const wyrmgus::resource *res = resource;
+		return this->get_effective_resource_demand(res);
 	}
 
 	int get_effective_resource_sell_price(const resource *resource, const int traded_quantity = 100) const;
 
-	Q_INVOKABLE int get_effective_resource_sell_price_sync(wyrmgus::resource *resource) const
+	Q_INVOKABLE int get_effective_resource_sell_price(wyrmgus::resource *resource) const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_effective_resource_sell_price(resource);
+		const wyrmgus::resource *res = resource;
+		return this->get_effective_resource_sell_price(res);
 	}
 
 	int get_effective_resource_buy_price(const resource *resource, const int traded_quantity = 100) const;
 
-	Q_INVOKABLE int get_effective_resource_buy_price_sync(wyrmgus::resource *resource) const
+	Q_INVOKABLE int get_effective_resource_buy_price(wyrmgus::resource *resource) const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_effective_resource_buy_price(resource);
+		const wyrmgus::resource *res = resource;
+		return this->get_effective_resource_buy_price(res);
 	}
 
 	/// Get the total price difference between this player and another one
@@ -1093,10 +1009,8 @@ public:
 		return this->has_enemy_stance_with(other_player->get_index());
 	}
 
-	Q_INVOKABLE bool has_enemy_stance_with_sync(CPlayer *other_player) const
+	Q_INVOKABLE bool has_enemy_stance_with(CPlayer *other_player) const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 		return this->has_enemy_stance_with(other_player->get_index());
 	}
 
@@ -1108,10 +1022,8 @@ public:
 		return this->allies.contains(index);
 	}
 
-	Q_INVOKABLE bool has_allied_stance_with_sync(CPlayer *other_player) const
+	Q_INVOKABLE bool has_allied_stance_with(CPlayer *other_player) const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 		return this->has_allied_stance_with(other_player->get_index());
 	}
 
@@ -1128,15 +1040,17 @@ public:
 		return this->shared_vision.contains(player_index);
 	}
 
-	bool has_shared_vision_with(const CPlayer *player) const;
-	bool has_shared_vision_with(const CUnit &unit) const;
-
-	Q_INVOKABLE bool has_shared_vision_with_sync(CPlayer *other_player) const
+	bool has_shared_vision_with(const CPlayer *player) const
 	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->has_shared_vision_with(other_player);
+		return this->has_shared_vision_with(player->get_index());
 	}
+
+	Q_INVOKABLE bool has_shared_vision_with(CPlayer *player) const
+	{
+		return this->has_shared_vision_with(player->get_index());
+	}
+
+	bool has_shared_vision_with(const CUnit &unit) const;
 
 	const player_index_set &get_mutual_shared_vision() const
 	{
@@ -1295,18 +1209,12 @@ public:
 		this->recent_trade_partners.clear();
 	}
 
-	QVariantList get_current_special_resources_sync() const;
+	QVariantList get_current_special_resources_qvariant_list() const;
 
 	void add_current_special_resource(const resource *resource)
 	{
 		if (this->current_special_resources.contains(resource)) {
 			return;
-		}
-
-		std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-		if (this == CPlayer::GetThisPlayer()) {
-			lock = std::unique_lock<std::shared_mutex>(this->mutex);
 		}
 
 		this->current_special_resources.insert(resource);
@@ -1318,12 +1226,6 @@ public:
 	{
 		if (!this->current_special_resources.contains(resource)) {
 			return;
-		}
-
-		std::optional<std::unique_lock<std::shared_mutex>> lock;
-
-		if (this == CPlayer::GetThisPlayer()) {
-			lock = std::unique_lock<std::shared_mutex>(this->mutex);
 		}
 
 		this->current_special_resources.erase(resource);
@@ -1376,7 +1278,7 @@ private:
 	wyrmgus::government_type government_type;
 	wyrmgus::religion *religion = nullptr; //religion of the player
 	const wyrmgus::dynasty *dynasty = nullptr; //ruling dynasty of the player
-	const wyrmgus::age *age = nullptr; //the current age the player/faction is in
+	wyrmgus::age *age = nullptr; //the current age the player/faction is in
 public:
 	std::string AiName; //AI for computer
 
@@ -1488,7 +1390,7 @@ public:
 	//Wyrmgus end
 	
 private:
-	const wyrmgus::player_color *player_color = nullptr; /// player color for units and portraits
+	wyrmgus::player_color *player_color = nullptr; /// player color for units and portraits
 
 public:
 	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
@@ -1510,7 +1412,6 @@ private:
 	player_index_set mutual_shared_vision; //set of player indexes that this player has mutual shared vision with
 	player_set recent_trade_partners;
 	resource_set current_special_resources; //the special resources currently produced or stored by the player
-	mutable std::shared_mutex mutex; //mutex for protecting player data which is written from the Wyrmgus thread, but which can be read from the Qt thread
 
 	friend void CleanPlayers();
 	friend void SetPlayersPalette();
@@ -1602,8 +1503,10 @@ extern CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction);
 extern void PlayersInitAi();
 /// Called each game cycle for player handlers (AI)
 extern void PlayersEachCycle();
+
 /// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
+
 //Wyrmgus start
 /// Called each half minute for a given player handler (AI)
 extern void PlayersEachHalfMinute(int player);

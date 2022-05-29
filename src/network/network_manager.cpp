@@ -126,8 +126,6 @@ void network_manager::init_server_connect(const QString &map_filepath_qstr, cons
 
 	this->get_server()->init(preferences::get()->get_local_player_name(), &NetworkFildes, open_slots);
 
-	std::unique_lock<std::shared_mutex> lock(this->get_mutex());
-
 	// preset the server (initially always slot 0)
 	Hosts[0].SetName(preferences::get()->get_local_player_name().c_str());
 
@@ -230,8 +228,6 @@ map_info *network_manager::get_map_info() const
 
 QString network_manager::get_player_name(const int player_index) const
 {
-	std::shared_lock<std::shared_mutex> lock(this->mutex);
-
 	return Hosts[player_index].PlyName;
 }
 

@@ -40,7 +40,7 @@ class population_unit final : public QObject
 
 	Q_PROPERTY(wyrmgus::population_type* type READ get_type_unconst CONSTANT)
 	Q_PROPERTY(wyrmgus::employment_type* employment_type READ get_employment_type_unconst CONSTANT)
-	Q_PROPERTY(qint64 population READ get_population_sync NOTIFY population_changed)
+	Q_PROPERTY(qint64 population READ get_population NOTIFY population_changed)
 
 public:
 	static constexpr int64_t capacity_growth_divisor = 10;
@@ -94,13 +94,6 @@ public:
 		return this->population;
 	}
 
-	int64_t get_population_sync() const
-	{
-		std::shared_lock<std::shared_mutex> lock(this->mutex);
-
-		return this->get_population();
-	}
-
 	void set_population(const int64_t population);
 
 	void change_population(const int64_t change)
@@ -130,7 +123,6 @@ private:
 	const population_type *type = nullptr;
 	const wyrmgus::employment_type *employment_type = nullptr;
 	int64_t population = 0;
-	mutable std::shared_mutex mutex; //mutex for protecting data which is written from the Wyrmgus thread, but which can be read from the Qt thread
 };
 
 }
