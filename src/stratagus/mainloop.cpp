@@ -302,11 +302,15 @@ static boost::asio::awaitable<void> GameLogicLoop()
 		SinglePlayerReplayEachCycle();
 		++GameCycle;
 		MultiPlayerReplayEachCycle();
-		co_await NetworkCommands(); // Get network commands
-		TriggersEachCycle();// handle triggers
-		UnitActions();      // handle units
-		MissileActions();   // handle missiles
-		PlayersEachCycle(); // handle players
+
+		if (game::get()->is_multiplayer()) {
+			co_await NetworkCommands(); //get network commands
+		}
+
+		TriggersEachCycle(); //handle triggers
+		UnitActions(); //handle units
+		MissileActions(); //handle missiles
+		PlayersEachCycle(); //handle players
 
 		CMap::get()->do_per_cycle_loop();
 		
