@@ -122,6 +122,7 @@
 #include "util/random.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
+#include "util/thread_pool.h"
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
@@ -651,7 +652,12 @@ boost::asio::awaitable<void> StartMap(const std::filesystem::path &filepath, con
 		}
 
 		GameEstablishing = true;
-		CreateGame(filepath, CMap::get());
+
+		//create the game in another thread, to not block the main one while it is loading
+		co_await thread_pool::get()->co_spawn_awaitable([&filepath]() -> boost::asio::awaitable<void> {
+			CreateGame(filepath, CMap::get());
+			co_return;
+		});
 
 		//Wyrmgus start
 	//	UI.StatusLine.Set(NameLine);

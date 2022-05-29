@@ -59,7 +59,8 @@ public:
 
 	Q_INVOKABLE void start_async(const QString &filepath);
 
-	void Init();
+	[[nodiscard]]
+	boost::asio::awaitable<void> Init();
 
 	bool is_running() const
 	{

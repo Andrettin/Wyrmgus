@@ -72,6 +72,7 @@
 #include "util/enum_util.h"
 #include "util/log_util.h"
 #include "util/point_util.h"
+#include "util/thread_pool.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
@@ -2210,7 +2211,7 @@ static void EditorCallbackExit()
 /**
 **  Create editor.
 */
-void CEditor::Init()
+boost::asio::awaitable<void> CEditor::Init()
 {
 	// Load and evaluate the editor configuration file
 	const std::string filename = LibraryFileName(parameters::get()->luaEditorStartFilename.c_str());
@@ -2301,14 +2302,17 @@ void CEditor::Init()
 		//Wyrmgus start
 //		CreateGame("", &Map);
 		//Wyrmgus end
-	//Wyrmgus start
 	}
-	if (CurrentMapPath.empty()) {
-		CreateGame("", CMap::get());
-	//Wyrmgus end
-	} else {
-		CreateGame(CurrentMapPath, CMap::get());
-	}
+
+	//create the game in another thread, to not block the main one while it is loading
+	co_await thread_pool::get()->co_spawn_awaitable([]() -> boost::asio::awaitable<void> {
+		if (CurrentMapPath.empty()) {
+			CreateGame("", CMap::get());
+		} else {
+			CreateGame(CurrentMapPath, CMap::get());
+		}
+		co_return;
+	});
 
 	ReplayRevealMap = 1;
 	FlagRevealMap = 0;
@@ -2443,7 +2447,7 @@ boost::asio::awaitable<void> EditorMainLoop()
 
 	CEditor::get()->set_running(true);
 
-	CEditor::get()->Init();
+	co_await CEditor::get()->Init();
 
 	if (first_init) {
 		first_init = false;
