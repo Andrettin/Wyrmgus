@@ -899,8 +899,6 @@ static int CclDefineTileset(lua_State *l)
 {
 	CMap::get()->Tileset->parse(l);
 
-	CMap::get()->TileGraphic = CGraphic::New(CMap::get()->Tileset->ImageFile, defines::get()->get_tile_size());
-	CMap::get()->TileGraphic->Load(preferences::get()->get_scale_factor());
 	return 0;
 }
 

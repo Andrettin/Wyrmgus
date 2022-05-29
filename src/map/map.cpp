@@ -1903,7 +1903,6 @@ void CMap::Clean()
 	this->NoFogOfWar = false;
 	this->Tileset->clear();
 	this->TileModelsFileName.clear();
-	this->TileGraphic.reset();
 
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;

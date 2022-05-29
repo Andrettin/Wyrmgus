@@ -55,10 +55,6 @@
 **
 **    Lua filename that loads all tilemodels
 **
-**  CMap::TileGraphic
-**
-**    Graphic for all the tiles
-**
 **  CMap::FogGraphic
 **
 **    Graphic for fog of war
@@ -360,7 +356,6 @@ public:
 
 	std::unique_ptr<CTileset> Tileset;          /// tileset data
 	std::string TileModelsFileName; /// lua filename that loads all tilemodels
-	std::shared_ptr<CGraphic> TileGraphic;     /// graphic for all the tiles
 	static std::shared_ptr<CGraphic> FogGraphics; //graphics for fog of war
 private:
 	std::vector<std::unique_ptr<landmass>> landmasses;
