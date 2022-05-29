@@ -411,23 +411,16 @@ public:
 **
 **  Header for the packet.
 */
-class CNetworkPacketHeader
+class CNetworkPacketHeader final
 {
 public:
-	CNetworkPacketHeader()
-	{
-		Cycle = 0;
-		memset(Type, 0, sizeof(Type));
-		OrigPlayer = 255;
-	}
-
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	static size_t Size() { return 1 + 1 + 1 * MaxNetworkCommands; }
 
-	uint8_t Type[MaxNetworkCommands];  /// Commands in packet
-	uint8_t Cycle;                     /// Destination game cycle
-	uint8_t OrigPlayer;                /// Host address
+	std::array<uint8_t, MaxNetworkCommands> Type{};  /// Commands in packet
+	uint8_t Cycle = 0;                     /// Destination game cycle
+	uint8_t OrigPlayer = 255;                /// Host address
 };
 
 /**
@@ -435,15 +428,15 @@ public:
 **
 **  This is sent over the network.
 */
-class CNetworkPacket
+class CNetworkPacket final
 {
 public:
 	size_t Serialize(unsigned char *buf, int numcommands) const;
 	void Deserialize(const unsigned char *buf, unsigned int len, int *numcommands);
 	size_t Size(int numcommands) const;
 
-	CNetworkPacketHeader Header;  /// Packet Header Info
-	std::vector<unsigned char> Command[MaxNetworkCommands];
+	CNetworkPacketHeader Header;  //packet Header Info
+	std::array<std::vector<unsigned char>, MaxNetworkCommands> Command{};
 };
 
 extern size_t serialize32(unsigned char *buf, uint32_t data);

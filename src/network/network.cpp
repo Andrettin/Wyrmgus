@@ -292,7 +292,7 @@ static unsigned long NetworkLastCycle[PlayerMax]; /// Last cycle received packet
 
 static int NetworkSyncSeeds[256];          /// Network sync seeds.
 static int NetworkSyncHashs[256];          /// Network sync hashs.
-static CNetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
+static std::array<CNetworkCommandQueue, MaxNetworkCommands> NetworkIn[256][PlayerMax]; //per-player network packet input queue
 static std::deque<CNetworkCommandQueue> CommandsIn;    /// Network command input queue
 static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input queue
 
@@ -368,24 +368,35 @@ static boost::asio::awaitable<void> NetworkBroadcast(const CNetworkPacket &packe
 **  @param ncq  Outgoing network queue start.
 */
 [[nodiscard]]
-static boost::asio::awaitable<void> NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommands])
+static boost::asio::awaitable<void> NetworkSendPacket(const std::array<CNetworkCommandQueue, MaxNetworkCommands> &ncq)
 {
-	CNetworkPacket packet;
+	try {
+		CNetworkPacket packet;
 
-	// Build packet of up to MaxNetworkCommands messages.
-	int numcommands = 0;
-	packet.Header.Cycle = ncq[0].Time & 0xFF;
-	packet.Header.OrigPlayer = CPlayer::GetThisPlayer()->get_index();
-	int i;
-	for (i = 0; i < MaxNetworkCommands && ncq[i].Type != MessageNone; ++i) {
-		packet.Header.Type[i] = ncq[i].Type;
-		packet.Command[i] = ncq[i].Data;
-		++numcommands;
+		//build packet of up to MaxNetworkCommands messages.
+		int numcommands = 0;
+		packet.Header.Cycle = ncq.at(0).Time & 0xFF;
+		packet.Header.OrigPlayer = CPlayer::GetThisPlayer()->get_index();
+
+		int i;
+		for (i = 0; i < MaxNetworkCommands && ncq.at(i).Type != MessageNone; ++i) {
+			packet.Header.Type.at(i) = ncq.at(i).Type;
+			try {
+				packet.Command.at(i) = ncq.at(i).Data;
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to copy network command queue data of size " + std::to_string(ncq.at(i).Data.size()) + "."));
+			}
+			++numcommands;
+		}
+
+		for (; i < MaxNetworkCommands; ++i) {
+			packet.Header.Type.at(i) = MessageNone;
+		}
+
+		co_await NetworkBroadcast(packet, numcommands);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to send packet."));
 	}
-	for (; i < MaxNetworkCommands; ++i) {
-		packet.Header.Type[i] = MessageNone;
-	}
-	co_await NetworkBroadcast(packet, numcommands);
 }
 
 //----------------------------------------------------------------------------
@@ -469,13 +480,14 @@ void NetworkOnStartGame()
 			}
 		}
 	}
+
 	CNetworkCommandSync nc;
 	//nc.syncHash = SyncHash;
 	//nc.syncSeed = SyncRandSeed;
 
 	for (unsigned int i = 0; i <= CNetworkParameter::Instance.NetworkLag; i += CNetworkParameter::Instance.gameCyclesPerUpdate) {
 		for (int n = 0; n < HostsCount; ++n) {
-			CNetworkCommandQueue(&ncqs)[MaxNetworkCommands] = NetworkIn[i][Hosts[n].PlyNr];
+			std::array<CNetworkCommandQueue, MaxNetworkCommands> &ncqs = NetworkIn[i][Hosts[n].PlyNr];
 
 			ncqs[0].Time = i;
 			ncqs[0].Type = MessageSync;
@@ -886,7 +898,7 @@ boost::asio::awaitable<void> NetworkQuitGame()
 	const int gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 	const int NetworkLag = CNetworkParameter::Instance.NetworkLag;
 	const int n = (GameCycle + gameCyclesPerUpdate) / gameCyclesPerUpdate * gameCyclesPerUpdate + NetworkLag;
-	CNetworkCommandQueue(&ncqs)[MaxNetworkCommands] = NetworkIn[n & 0xFF][CPlayer::GetThisPlayer()->get_index()];
+	std::array<CNetworkCommandQueue, MaxNetworkCommands> &ncqs = NetworkIn[n & 0xFF][CPlayer::GetThisPlayer()->get_index()];
 	CNetworkCommandQuit nc;
 	nc.player = CPlayer::GetThisPlayer()->get_index();
 	ncqs[0].Type = MessageQuit;
@@ -1010,7 +1022,7 @@ static boost::asio::awaitable<void> NetworkSendCommands(unsigned long gameNetCyc
 {
 	// No command available, send sync.
 	int numcommands = 0;
-	CNetworkCommandQueue(&ncq)[MaxNetworkCommands] = NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->get_index()];
+	std::array<CNetworkCommandQueue, MaxNetworkCommands> &ncq = NetworkIn[gameNetCycle & 0xFF][CPlayer::GetThisPlayer()->get_index()];
 	ncq[0].Clear();
 	if (CommandsIn.empty() && MsgCommandsIn.empty()) {
 		CNetworkCommandSync nc;
@@ -1064,7 +1076,7 @@ static void NetworkExecCommands(unsigned long gameNetCycle)
 {
 	// Must execute commands on all computers in the same order.
 	for (int i = 0; i < NumPlayers; ++i) {
-		const CNetworkCommandQueue *ncqs = NetworkIn[gameNetCycle & 0xFF][i];
+		const std::array<CNetworkCommandQueue, MaxNetworkCommands> &ncqs = NetworkIn[gameNetCycle & 0xFF][i];
 		for (int c = 0; c < MaxNetworkCommands; ++c) {
 			const CNetworkCommandQueue &ncq = ncqs[c];
 			if (ncq.Type == MessageNone) {
