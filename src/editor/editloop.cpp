@@ -2478,7 +2478,7 @@ boost::asio::awaitable<void> EditorMainLoop()
 	game::get()->set_running(true); //should use something different instead?
 
 	engine_interface::get()->set_waiting_for_interface(true);
-	engine_interface::get()->get_map_view_created_future().wait();
+	co_await thread_pool::get()->await_future(engine_interface::get()->get_map_view_created_future());
 	engine_interface::get()->reset_map_view_created_promise();
 	engine_interface::get()->set_waiting_for_interface(false);
 
