@@ -186,8 +186,9 @@ int main(int argc, char **argv)
 
 		const int result = app.exec();
 
-		event_loop::get()->stop();
 		thread_pool::get()->stop();
+
+		stratagus_on_exit_cleanup();
 
 		return result;
 	} catch (const std::exception &exception) {

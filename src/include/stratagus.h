@@ -167,6 +167,8 @@ extern void DrawMapArea(std::vector<std::function<void(wyrmgus::renderer *)>> &r
 [[nodiscard]]
 extern boost::asio::awaitable<void> GameMainLoop(); //game main loop
 
+extern void stratagus_on_exit_cleanup();
+
 [[nodiscard]]
 extern boost::asio::awaitable<void> stratagusMain(int argc, char **argv); /// main entry
 

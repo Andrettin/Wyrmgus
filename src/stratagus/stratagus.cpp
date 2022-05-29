@@ -349,29 +349,11 @@ boost::asio::awaitable<void> Exit(const int err)
 		co_return;
 	}
 	
+	co_await NetworkQuitGame();
+
 	QMetaObject::invokeMethod(QApplication::instance(), [err] {
 		QApplication::exit(err);
 	}, Qt::QueuedConnection);
-
-	music_player::get()->stop();
-	QuitSound();
-	co_await NetworkQuitGame();
-
-	ExitNetwork1();
-	CleanModules();
-	FreeBurningBuildingFrames();
-	FreeButtonStyles();
-	FreeAllContainers();
-	freeGuichan();
-	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
-			   FrameCounter _C_ SlowFrameCounter _C_
-			   (SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
-	lua_settop(Lua, 0);
-	lua_close(Lua);
-	Lua = nullptr;
-	DeInitVideo();
-
-	fprintf(stdout, "%s", _("Thanks for playing " NAME ".\n"));
 }
 
 #ifdef REDIRECT_OUTPUT
@@ -434,6 +416,28 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 #endif
+
+void stratagus_on_exit_cleanup()
+{
+	music_player::get()->stop();
+	QuitSound();
+
+	ExitNetwork1();
+	CleanModules();
+	FreeBurningBuildingFrames();
+	FreeButtonStyles();
+	FreeAllContainers();
+	freeGuichan();
+	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
+		FrameCounter _C_ SlowFrameCounter _C_
+		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
+	lua_settop(Lua, 0);
+	lua_close(Lua);
+	Lua = nullptr;
+	DeInitVideo();
+
+	fprintf(stdout, "%s", _("Thanks for playing " NAME ".\n"));
+}
 
 /**
 **  The main program: initialise, parse options and arguments.
