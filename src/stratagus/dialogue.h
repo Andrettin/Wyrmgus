@@ -101,7 +101,6 @@ public:
 	void call(CPlayer *player, const context &ctx) const;
 	void call_node(const int node_index, CPlayer *player, const context &ctx) const;
 	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player, const context &ctx) const;
-	Q_INVOKABLE void call_node_option_effect(const int node_index, const int option_index, const int unit_number) const;
 
 	void delete_lua_callbacks();
 	

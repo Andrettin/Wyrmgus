@@ -75,8 +75,7 @@ void dialogue::process_gsml_scope(const gsml_data &scope)
 
 		trigger->Type = trigger::TriggerType::PlayerTrigger;
 	} else {
-		auto node = std::make_unique<dialogue_node>(this);
-		node->ID = this->nodes.size();
+		auto node = std::make_unique<dialogue_node>(this, static_cast<int>(this->nodes.size()));
 		database::process_gsml_data(node, scope);
 
 		if (!tag.empty()) {
@@ -138,25 +137,6 @@ void dialogue::call_node_option_effect(const int node_index, const int option_in
 
 	CclCommand("trigger_player = " + std::to_string(player->get_index()) + ";");
 	this->nodes[node_index]->option_effect(option_index, player, ctx);
-}
-
-void dialogue::call_node_option_effect(const int node_index, const int option_index, const int unit_number) const
-{
-	game::get()->post_function([this, node_index, option_index, unit_number]() {
-		CPlayer *player = CPlayer::GetThisPlayer();
-
-		context ctx;
-		ctx.current_player = player;
-
-		if (unit_number != -1) {
-			CUnit &unit = unit_manager::get()->GetSlotUnit(unit_number);
-			if (!unit.Destroyed) {
-				ctx.current_unit = unit.acquire_ref();
-			}
-		}
-
-		this->call_node_option_effect(node_index, option_index, player, ctx);
-	});
 }
 
 void dialogue::delete_lua_callbacks()

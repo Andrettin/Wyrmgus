@@ -35,6 +35,7 @@ class CPlayer;
 namespace wyrmgus {
 
 class defines;
+class dialogue_node_instance;
 class game;
 class interface_style;
 class map_info;
@@ -278,6 +279,9 @@ public:
 
 	Q_INVOKABLE void check_achievements();
 
+	void add_dialogue_node_instance(qunique_ptr<dialogue_node_instance> &&dialogue_node_instance);
+	void remove_dialogue_node_instance(dialogue_node_instance *dialogue_node_instance);
+
 	Q_INVOKABLE void crop_image_frames(const QString &filepath, const QSize &src_frame_size, const QSize &min_size) const;
 
 signals:
@@ -292,7 +296,8 @@ signals:
 	void encyclopediaEntryOpened(QString link);
 	void factionChoiceDialogOpened(const QVariantList &factions);
 	void achievementUnlockedDialogOpened(QObject *achievement);
-	void dialogueNodeCalled(QObject *dialogue, const int node_index, const QString &title_str, const QString &text, const QString &icon_identifier, const QString &player_color_identifier, const QStringList &options, const QStringList &option_hotkeys, const QStringList &option_tooltips, const int unit_number);
+	void dialogue_node_called(QObject *dialogue_node_instance);
+	void dialogue_node_closed(QObject *dialogue_node_instance);
 	void questCompletedDialogOpened(QObject *quest, const QString &rewards_string);
 	void questFailedDialogOpened(QObject *quest, const QString &failure_reason_string);
 	void population_dialog_opened(QObject *settlement_game_data, const QVariantList &population_units);
@@ -310,6 +315,7 @@ private:
 	bool modal_dialog_open = false;
 	int open_lua_dialog_count = 0;
 	std::vector<qunique_ptr<map_info>> map_infos;
+	std::vector<qunique_ptr<dialogue_node_instance>> dialogue_node_instances;
 };
 
 }

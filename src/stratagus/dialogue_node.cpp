@@ -31,6 +31,7 @@
 #include "character.h"
 #include "database/defines.h"
 #include "dialogue.h"
+#include "dialogue_node_instance.h"
 #include "dialogue_option.h"
 #include "engine_interface.h"
 #include "game/game.h"
@@ -53,7 +54,7 @@
 
 namespace wyrmgus {
 
-dialogue_node::dialogue_node(wyrmgus::dialogue *dialogue) : dialogue(dialogue)
+dialogue_node::dialogue_node(wyrmgus::dialogue *dialogue, const int index) : dialogue(dialogue), index(index)
 {
 }
 
@@ -130,7 +131,7 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 {
 	if (this->conditions != nullptr) {
 		if (!this->conditions->check(player, ctx)) {
-			this->get_dialogue()->call_node(this->ID + 1, player, ctx);
+			this->get_dialogue()->call_node(this->get_index() + 1, player, ctx);
 			return;
 		}
 	}
@@ -139,7 +140,7 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 		this->Conditions->pushPreamble();
 		this->Conditions->run(1);
 		if (this->Conditions->popBoolean() == false) {
-			this->get_dialogue()->call_node(this->ID + 1, player, ctx);
+			this->get_dialogue()->call_node(this->get_index() + 1, player, ctx);
 			return;
 		}
 	}
@@ -153,7 +154,7 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 		if (player->AiEnabled && !this->option_pointers.empty()) {
 			//AIs will choose a random option
 			const int option_index = static_cast<int>(random::get()->generate(this->option_pointers.size()));
-			this->dialogue->call_node_option_effect(this->ID, option_index, player, ctx);
+			this->dialogue->call_node_option_effect(this->get_index(), option_index, player, ctx);
 		}
 
 		return;
@@ -165,10 +166,8 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 	const QString text = QString::fromStdString(this->get_text(ctx));
 
 	const wyrmgus::icon *icon = this->get_icon(speaker_unit);
-	const QString icon_identifier = icon ? icon->get_identifier_qstring() : "";
 
 	const wyrmgus::player_color *player_color = this->get_player_color(speaker_unit);
-	const QString player_color_identifier = player_color ? player_color->get_identifier_qstring() : "";
 
 	QStringList options;
 	QStringList option_hotkeys;
@@ -188,7 +187,8 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 
 	const int unit_number = ctx.current_unit != nullptr ? UnitNumber(*ctx.current_unit->get()) : -1;
 
-	emit engine_interface::get()->dialogueNodeCalled(this->dialogue, this->ID, title_str, text, icon_identifier, player_color_identifier, options, option_hotkeys, option_tooltips, unit_number);
+	auto dialogue_node_instance = make_qunique<wyrmgus::dialogue_node_instance>(this, title_str, text, icon, player_color, options, option_hotkeys, option_tooltips, unit_number);
+	engine_interface::get()->add_dialogue_node_instance(std::move(dialogue_node_instance));
 
 	if (this->sound != nullptr) {
 		const int channel = PlayGameSound(this->sound, MaxSampleVolume);
@@ -218,7 +218,7 @@ void dialogue_node::option_effect(const int option_index, CPlayer *player, const
 		}
 	}
 
-	this->get_dialogue()->call_node(this->ID + 1, player, ctx);
+	this->get_dialogue()->call_node(this->get_index() + 1, player, ctx);
 }
 
 const CUnit *dialogue_node::get_speaker_unit() const

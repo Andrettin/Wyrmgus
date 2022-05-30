@@ -32,6 +32,7 @@
 #include "database/defines.h"
 #include "database/gsml_parser.h"
 #include "database/preferences.h"
+#include "dialogue_node_instance.h"
 #include "editor.h"
 #include "game/difficulty.h"
 #include "game/game.h"
@@ -675,6 +676,21 @@ void engine_interface::check_achievements()
 {
 	event_loop::get()->post([]() {
 		achievement::check_achievements();
+	});
+}
+
+void engine_interface::add_dialogue_node_instance(qunique_ptr<dialogue_node_instance> &&dialogue_node_instance)
+{
+	wyrmgus::dialogue_node_instance *dialogue_node_instance_ptr = dialogue_node_instance.get();
+	this->dialogue_node_instances.push_back(std::move(dialogue_node_instance));
+	emit dialogue_node_called(dialogue_node_instance_ptr);
+}
+
+void engine_interface::remove_dialogue_node_instance(dialogue_node_instance *dialogue_node_instance)
+{
+	emit dialogue_node_closed(dialogue_node_instance);
+	std::erase_if(this->dialogue_node_instances, [dialogue_node_instance](const qunique_ptr<wyrmgus::dialogue_node_instance> &element) {
+		return element.get() == dialogue_node_instance;
 	});
 }
 

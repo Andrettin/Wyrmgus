@@ -51,7 +51,7 @@ struct context;
 class dialogue_node final
 {
 public:
-	explicit dialogue_node(wyrmgus::dialogue *dialogue);
+	explicit dialogue_node(wyrmgus::dialogue *dialogue, const int index);
 	~dialogue_node();
 
 	void process_gsml_property(const gsml_property &property);
@@ -62,6 +62,11 @@ public:
 	wyrmgus::dialogue *get_dialogue() const
 	{
 		return this->dialogue;
+	}
+
+	int get_index() const
+	{
+		return this->index;
 	}
 
 	void add_option(std::unique_ptr<dialogue_option> &&option)
@@ -81,9 +86,9 @@ public:
 
 	void delete_lua_callbacks();
 
-	int ID = -1;
 private:
 	wyrmgus::dialogue *dialogue = nullptr;
+	int index = -1;
 	std::string title;
 	const wyrmgus::icon *icon = nullptr;
 	const wyrmgus::player_color *player_color = nullptr;

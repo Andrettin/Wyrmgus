@@ -646,11 +646,12 @@ int CclDefineDialogue(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				auto node = std::make_unique<wyrmgus::dialogue_node>(dialogue);
-				node->ID = dialogue->nodes.size();
+				auto node = std::make_unique<wyrmgus::dialogue_node>(dialogue, static_cast<int>(dialogue->nodes.size()));
+
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for dialogue nodes)");
 				}
+
 				const int subargs = lua_rawlen(l, -1);
 				for (int k = 0; k < subargs; ++k) {
 					value = LuaToString(l, -1, k + 1);

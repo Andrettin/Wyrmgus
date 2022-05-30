@@ -433,6 +433,7 @@ set(wyrmgus_base_SRCS
 	src/stratagus/currency.cpp
 	src/stratagus/dialogue.cpp
 	src/stratagus/dialogue_node.cpp
+	src/stratagus/dialogue_node_instance.cpp
 	src/stratagus/dialogue_option.cpp
 	src/stratagus/engine_interface.cpp
 	src/stratagus/epithet.cpp
@@ -1249,6 +1250,7 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/character_title.h
 	src/stratagus/dialogue.h
 	src/stratagus/dialogue_node.h
+	src/stratagus/dialogue_node_instance.h
 	src/stratagus/dialogue_option.h
 	src/stratagus/direction.h
 	src/stratagus/engine_interface.h
