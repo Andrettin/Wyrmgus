@@ -30,6 +30,7 @@
 
 #include "dialogue_node.h"
 #include "dialogue_option.h"
+#include "game/game.h"
 #include "player/player.h"
 #include "script.h"
 #include "script/context.h"
@@ -141,19 +142,21 @@ void dialogue::call_node_option_effect(const int node_index, const int option_in
 
 void dialogue::call_node_option_effect(const int node_index, const int option_index, const int unit_number) const
 {
-	CPlayer *player = CPlayer::GetThisPlayer();
+	game::get()->post_function([this, node_index, option_index, unit_number]() {
+		CPlayer *player = CPlayer::GetThisPlayer();
 
-	context ctx;
-	ctx.current_player = player;
+		context ctx;
+		ctx.current_player = player;
 
-	if (unit_number != -1) {
-		CUnit &unit = unit_manager::get()->GetSlotUnit(unit_number);
-		if (!unit.Destroyed) {
-			ctx.current_unit = unit.acquire_ref();
+		if (unit_number != -1) {
+			CUnit &unit = unit_manager::get()->GetSlotUnit(unit_number);
+			if (!unit.Destroyed) {
+				ctx.current_unit = unit.acquire_ref();
+			}
 		}
-	}
 
-	this->call_node_option_effect(node_index, option_index, player, ctx);
+		this->call_node_option_effect(node_index, option_index, player, ctx);
+	});
 }
 
 void dialogue::delete_lua_callbacks()
