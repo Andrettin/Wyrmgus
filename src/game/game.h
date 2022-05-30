@@ -70,7 +70,7 @@ public:
 	{
 		this->cheat = false;
 		this->clear_delayed_effects();
-		this->posted_commands.clear();
+		this->posted_functions.clear();
 	}
 
 	bool is_running() const
@@ -264,19 +264,19 @@ public:
 	void store_results();
 	void clear_results();
 
-	void post_command(std::function<void()> &&function)
+	void post_function(std::function<void()> &&function)
 	{
-		this->posted_commands.push_back(std::move(function));
+		this->posted_functions.push_back(std::move(function));
 	}
 
-	void process_commands()
+	void process_functions()
 	{
-		//process the commands which have been queued
-		for (const std::function<void()> &function : this->posted_commands) {
+		//process the functions which have been posted to be processed at a specific point in the loop, since they have gameplay effects
+		for (const std::function<void()> &function : this->posted_functions) {
 			function();
 		}
 
-		this->posted_commands.clear();
+		this->posted_functions.clear();
 	}
 
 signals:
@@ -303,7 +303,7 @@ private:
 	std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> unit_delayed_effects;
 	bool console_active = false;
 	qunique_ptr<results_info> results;
-	std::vector<std::function<void()>> posted_commands;
+	std::vector<std::function<void()>> posted_functions;
 };
 
 }

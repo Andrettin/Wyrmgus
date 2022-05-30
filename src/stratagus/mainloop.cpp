@@ -410,7 +410,8 @@ static boost::asio::awaitable<void> GameLogicLoop()
 		co_await WaitEventsOneFrame();
 	}
 
-	game::get()->process_commands();
+	//process functions which are a result of user interaction, and which need to occur at a certain point in the loop, since they can have gameplay effects
+	game::get()->process_functions();
 
 	if (!NetworkInSync) {
 		co_await NetworkRecover(); // recover network

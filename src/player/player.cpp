@@ -1608,7 +1608,7 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 
 void CPlayer::set_faction_async(wyrmgus::faction *faction)
 {
-	game::get()->post_command([this, faction]() {
+	game::get()->post_function([this, faction]() {
 		SendCommandSetFaction(this, faction);
 	});
 }
@@ -5049,7 +5049,7 @@ void CPlayer::set_neutral_diplomatic_stance_with_async(CPlayer *player)
 	const int index = this->get_index();
 	const int other_index = player->get_index();
 
-	game::get()->post_command([index, other_index]() {
+	game::get()->post_function([index, other_index]() {
 		SendCommandDiplomacy(index, diplomacy_state::neutral, other_index);
 	});
 }
@@ -5077,7 +5077,7 @@ void CPlayer::set_allied_diplomatic_stance_with_async(CPlayer *player)
 	const int index = this->get_index();
 	const int other_index = player->get_index();
 
-	game::get()->post_command([index, other_index]() {
+	game::get()->post_function([index, other_index]() {
 		SendCommandDiplomacy(index, diplomacy_state::allied, other_index);
 	});
 }
@@ -5131,7 +5131,7 @@ void CPlayer::set_enemy_diplomatic_stance_with_async(CPlayer *player)
 	const int index = this->get_index();
 	const int other_index = player->get_index();
 
-	game::get()->post_command([index, other_index]() {
+	game::get()->post_function([index, other_index]() {
 		SendCommandDiplomacy(index, diplomacy_state::enemy, other_index);
 	});
 }
@@ -5198,7 +5198,7 @@ void CPlayer::set_shared_vision_with_async(CPlayer *player, const bool shared_vi
 	const int index = this->get_index();
 	const int other_index = player->get_index();
 
-	game::get()->post_command([index, other_index, shared_vision]() {
+	game::get()->post_function([index, other_index, shared_vision]() {
 		SendCommandSharedVision(index, shared_vision, other_index);
 	});
 }
