@@ -410,8 +410,6 @@ void InitNetwork1()
 {
 	CNetworkParameter::Instance.FixValues();
 
-	NetInit(); // machine dependent setup
-
 	// Our communication port
 	const int port = CNetworkParameter::Instance.localPort;
 	const char *NetworkAddr = nullptr; // FIXME : bad use
@@ -419,7 +417,6 @@ void InitNetwork1()
 
 	if (NetworkFildes.Open(host) == false) {
 		fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);
-		NetExit(); // machine dependent network exit
 		return;
 	}
 
@@ -436,7 +433,7 @@ void InitNetwork1()
 */
 void ExitNetwork1()
 {
-	if (!IsNetworkGame()) { // No network running
+	if (!IsNetworkGame()) { //no network running
 		return;
 	}
 
@@ -447,7 +444,6 @@ void ExitNetwork1()
 #endif
 
 	NetworkFildes.Close();
-	NetExit(); // machine dependent setup
 
 	NetworkInSync = true;
 	NetPlayers = 0;

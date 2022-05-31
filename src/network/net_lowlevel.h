@@ -58,10 +58,5 @@
 	(int)(((ad) >> 24) & 0xff), (int)(((ad) >> 16) & 0xff), \
 	(int)(((ad) >> 8) & 0xff), (int)((ad) & 0xff)
 
-/// Hardware dependend network init.
-extern int NetInit();
-/// Hardware dependend network exit.
-extern void NetExit();
-
 /// Resolve host in name or or colon dot notation.
 extern unsigned long NetResolveHost(const std::string &host);

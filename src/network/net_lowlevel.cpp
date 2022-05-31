@@ -50,55 +50,6 @@
 //  Low level functions
 //----------------------------------------------------------------------------
 
-#ifdef USE_WINSOCK // {
-
-/**
-**  Hardware dependend network init.
-*/
-int NetInit()
-{
-	WSADATA wsaData;
-
-	// Start up the windows networking
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData)) {
-		log::log_error("Couldn't initialize Winsock 2.");
-		return -1;
-	}
-	return 0;
-}
-
-/**
-**  Hardware dependend network exit.
-*/
-void NetExit()
-{
-	// Clean up windows networking
-	if (WSACleanup() == SOCKET_ERROR) {
-		if (WSAGetLastError() == WSAEINPROGRESS) {
-			WSACancelBlockingCall();
-			WSACleanup();
-		}
-	}
-}
-#endif // } !USE_WINSOCK
-
-#if !defined(USE_WINSOCK) // {
-/**
-**  Hardware dependend network init.
-*/
-int NetInit()
-{
-	return 0;
-}
-
-/**
-**  Hardware dependend network exit.
-*/
-void NetExit()
-{
-}
-#endif // } !USE_WINSOCK
-
 /**
 **  Resolve host in name or dotted quad notation.
 **
