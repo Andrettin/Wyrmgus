@@ -285,7 +285,6 @@ set(network_SRCS
 	src/network/commands.cpp
 	src/network/multiplayer_host.cpp
 	src/network/multiplayer_setup.cpp
-	src/network/net_lowlevel.cpp
 	src/network/net_message.cpp
 	src/network/master.cpp
 	src/network/netconnect.cpp
@@ -850,7 +849,6 @@ set(wyrmgus_network_HDRS
 	src/network/master.h
 	src/network/multiplayer_host.h
 	src/network/multiplayer_setup.h
-	src/network/net_lowlevel.h
 	src/network/net_message.h
 	src/network/netconnect.h
 	src/network/netsockets.h
@@ -1899,7 +1897,6 @@ set(metaserver_SRCS
 	metaserver/games.cpp
 	metaserver/main.cpp
 	metaserver/netdriver.cpp
-	src/network/net_lowlevel.cpp
 )
 
 set(metaserver_HDRS
