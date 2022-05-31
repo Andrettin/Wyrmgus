@@ -50,12 +50,10 @@ public:
 
 	void reset();
 
-	bool setup_server_address(const std::string &server_address, int port);
+	[[nodiscard]]
+	boost::asio::awaitable<bool> setup_server_address(const std::string &server_address, int port);
 
-	Q_INVOKABLE bool setup_server_address(const QString &server_address, const int port = 0)
-	{
-		return this->setup_server_address(server_address.toStdString(), port);
-	}
+	Q_INVOKABLE void setup_server_address(const QString &server_address, const int port = 0);
 
 	Q_INVOKABLE void init_client_connect();
 	Q_INVOKABLE void process_client_request();
@@ -94,6 +92,7 @@ public:
 	void check_players(const multiplayer_setup &setup);
 
 signals:
+	void server_address_setup_completed(const bool result);
 	void map_info_changed();
 	void player_name_changed(const int player_index, const QString &name);
 	void player_ready_changed(const int player_index, const bool ready);

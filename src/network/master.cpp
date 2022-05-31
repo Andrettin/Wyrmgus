@@ -31,7 +31,6 @@
 #include "network/master.h"
 
 #include "game/game.h"
-#include "network/net_lowlevel.h"
 #include "network/netsockets.h"
 #include "network/network.h"
 #include "parameters.h"
@@ -71,9 +70,11 @@ boost::asio::awaitable<int> CMetaClient::Init()
 	}
 
 	// Server socket
-	CHost metaServerHost(metaHost.c_str(), metaPort);
+	CHost metaServerHost = co_await CHost::from_host_name_and_port(metaHost.c_str(), metaPort);
+
 	// Client socket
-	CHost metaClientHost(CNetworkParameter::Instance.localHost.c_str(), CNetworkParameter::Instance.localPort);
+	CHost metaClientHost = co_await CHost::from_host_name_and_port(CNetworkParameter::Instance.localHost.c_str(), CNetworkParameter::Instance.localPort);
+
 	if (metaSocket.Open(metaClientHost) == false) {
 		fprintf(stderr, "METACLIENT: No free port %d available, aborting\n", metaServerHost.getPort());
 		co_return -1;

@@ -26,22 +26,60 @@
 
 #pragma once
 
-class CHost
+class CHost final
 {
 public:
-	CHost() {}
-	explicit CHost(const char *name, int port);
-	explicit CHost(unsigned long ip, int port) : ip(ip), port(port) {}
-	unsigned long getIp() const { return ip; }
-	int getPort() const { return port; }
+	[[nodiscard]]
+	static boost::asio::awaitable<void> from_host_name_and_port(CHost &host, const std::string_view &host_name, const uint16_t port);
+
+	[[nodiscard]]
+	static boost::asio::awaitable<CHost> from_host_name_and_port(const std::string_view &host_name, const uint16_t port)
+	{
+		//create a host instance from a host name and a port in host byte order 
+		CHost host;
+		
+		co_await CHost::from_host_name_and_port(host, host_name, port);
+
+		co_return host;
+	}
+
+	[[nodiscard]]
+	static CHost from_port(const uint16_t port);
+
+	CHost()
+	{
+	}
+
+	explicit CHost(const uint32_t ip, const uint16_t port) : ip(ip), port(port)
+	{
+	}
+
+	uint32_t getIp() const
+	{
+		return this->ip;
+	}
+
+	uint16_t getPort() const
+	{
+		return this->port;
+	}
+
 	std::string toString() const;
 	bool isValid() const;
 
-	bool operator == (const CHost &rhs) const { return ip == rhs.ip && port == rhs.port; }
-	bool operator != (const CHost &rhs) const { return !(*this == rhs); }
+	bool operator ==(const CHost &rhs) const
+	{
+		return this->ip == rhs.ip && this->port == rhs.port;
+	}
+
+	bool operator !=(const CHost &rhs) const
+	{
+		return !(*this == rhs);
+	}
+
 private:
-	unsigned long ip = 0;
-	int port = 0;
+	uint32_t ip = 0; //in network byte order
+	uint16_t port = 0; //in network byte order
 };
 
 class CUDPSocket_Impl;

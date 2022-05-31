@@ -31,7 +31,6 @@
 #include "network/net_message.h"
 
 #include "network/multiplayer_setup.h"
-#include "network/net_lowlevel.h"
 #include "network/netconnect.h"
 #include "network/network.h"
 #include "util/util.h"

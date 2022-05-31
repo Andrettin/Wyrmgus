@@ -67,7 +67,11 @@ extern bool NetworkInSync;        /// Network is in sync
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern inline bool IsNetworkGame() { return NetworkFildes.IsValid(); }
+extern inline bool IsNetworkGame()
+{
+	return NetworkFildes.IsValid();
+}
+
 extern void InitNetwork1();  /// Initialise network
 extern void ExitNetwork1();  /// Cleanup network (port)
 extern void NetworkOnStartGame();  /// Initialise network data for ingame communication

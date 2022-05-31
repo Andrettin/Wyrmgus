@@ -41,6 +41,7 @@
 #include "network/server.h"
 #include "player/player_type.h"
 #include "settings.h"
+#include "util/exception_util.h"
 #include "util/event_loop.h"
 #include "util/path_util.h"
 #include "video/video.h"
@@ -67,21 +68,38 @@ void network_manager::reset()
 	this->ready_player_count = 0;
 }
 
-bool network_manager::setup_server_address(const std::string &server_address, int port)
+boost::asio::awaitable<bool> network_manager::setup_server_address(const std::string &server_address, int port)
 {
 	if (port == 0) {
 		port = CNetworkParameter::Instance.default_port;
 	}
 
-	auto host = std::make_unique<CHost>(server_address.c_str(), port);
-	if (host->isValid() == false) {
-		//return false if an error occurred
-		return false;
+	auto host = std::make_unique<CHost>();
+
+	try {
+		co_await CHost::from_host_name_and_port(*host, server_address.c_str(), port);
+
+		if (host->isValid() == false) {
+			//return false if an error occurred
+			emit server_address_setup_completed(false);
+			co_return false;
+		}
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		emit server_address_setup_completed(false);
 	}
 
 	this->get_client()->SetServerHost(std::move(host));
 
-	return true;
+	emit server_address_setup_completed(true);
+	co_return true;
+}
+
+void network_manager::setup_server_address(const QString &server_address, const int port)
+{
+	event_loop::get()->co_spawn([this, server_address, port]() -> boost::asio::awaitable<void> {
+		co_await this->setup_server_address(server_address.toStdString(), port);
+	});
 }
 
 /**

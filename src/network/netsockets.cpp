@@ -28,7 +28,6 @@
 
 #include "network/netsockets.h"
 
-#include "network/net_lowlevel.h"
 #include "util/event_loop.h"
 
 #include <boost/asio/ip/tcp.hpp>
@@ -42,25 +41,46 @@
 
 // CHost
 
-CHost::CHost(const char *name, int port)
+boost::asio::awaitable<void> CHost::from_host_name_and_port(CHost &host, const std::string_view &host_name, const uint16_t port)
 {
-	this->ip = name ? NetResolveHost(name) : INADDR_ANY;
-	this->port = htons(port);
+	boost::asio::ip::tcp::resolver resolver(event_loop::get()->get_io_context());
+	boost::asio::ip::tcp::resolver::iterator it = co_await resolver.async_resolve(host_name, std::to_string(port), boost::asio::use_awaitable);
+
+	boost::asio::ip::tcp::resolver::iterator it_end;
+
+	for (; it != it_end; ++it) {
+		boost::asio::ip::address address = it->endpoint().address();
+
+		if (address.is_v4()) {
+			host.ip = htonl(address.to_v4().to_ulong());
+			host.port = htons(port);
+			break;
+		}
+	}
+
+	if (!host.isValid()) {
+		throw std::runtime_error("Failed to resolve the host name and port to an IPv4 address.");
+	}
+}
+
+CHost CHost::from_port(const uint16_t port)
+{
+	//create a host with IP as INADDR_ANY from a port in host byte order
+	CHost host;
+	host.ip = INADDR_ANY;
+	host.port = htons(port);
+	return host;
 }
 
 std::string CHost::toString() const
 {
-	char buf[24]; // 127.255.255.255:65555
-	sprintf(buf, "%d.%d.%d.%d:%d", NIPQUAD(ntohl(ip)), ntohs(port));
-	return buf;
+	const boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address_v4(ntohl(this->ip)), ntohs(this->port));
+	return endpoint.address().to_string() + ":" + std::to_string(endpoint.port());
 }
 
 bool CHost::isValid() const
 {
-	//Wyrmgus start
-//	return ip != 0 && port != 0;
-	return ip != 0 && ip != INADDR_NONE && port != 0;
-	//Wyrmgus end
+	return this->ip != 0 && this->port != 0;
 }
 
 // CUDPSocket_Impl

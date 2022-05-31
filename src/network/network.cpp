@@ -217,7 +217,6 @@
 #include "database/preferences.h"
 #include "game/game.h"
 #include "map/map.h"
-#include "network/net_lowlevel.h"
 #include "network/net_message.h"
 #include "network/netconnect.h"
 #include "parameters.h"
@@ -412,8 +411,7 @@ void InitNetwork1()
 
 	// Our communication port
 	const int port = CNetworkParameter::Instance.localPort;
-	const char *NetworkAddr = nullptr; // FIXME : bad use
-	const CHost host(NetworkAddr, port);
+	const CHost host = CHost::from_port(port);
 
 	if (NetworkFildes.Open(host) == false) {
 		fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);
