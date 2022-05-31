@@ -54,46 +54,9 @@
 # define INADDR_NONE -1
 #endif
 
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
 #define NIPQUAD(ad) \
 	(int)(((ad) >> 24) & 0xff), (int)(((ad) >> 16) & 0xff), \
 	(int)(((ad) >> 8) & 0xff), (int)((ad) & 0xff)
-
-#ifdef USE_WINSOCK
-typedef SOCKET Socket;
-#else
-typedef int Socket;
-#endif
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class SocketSet
-{
-public:
-	SocketSet() : MaxSockFD(0) {}
-
-	void AddSocket(Socket socket);
-	void DelSocket(Socket socket);
-
-	/// Wait for socket set ready.
-	int Select(int timeout);
-	/// Check if a socket in a socket set is ready.
-	int HasDataToRead(Socket socket) const;
-
-private:
-	std::vector<Socket> Sockets;
-	std::vector<int> SocketReady;
-	Socket MaxSockFD;
-};
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Hardware dependend network init.
 extern int NetInit();
@@ -102,24 +65,3 @@ extern void NetExit();
 
 /// Resolve host in name or or colon dot notation.
 extern unsigned long NetResolveHost(const std::string &host);
-
-/// Open a TCP Socket port.
-extern Socket NetOpenTCP(const char *addr, int port);
-/// Close a TCP socket port.
-extern void NetCloseTCP(Socket sockfd);
-/// Open a TCP connection.
-extern int NetConnectTCP(Socket sockfd, unsigned long addr, int port);
-/// Send through a TCP socket
-extern int NetSendTCP(Socket sockfd, const void *buf, int len);
-/// Receive from a TCP socket.
-extern int NetRecvTCP(Socket sockfd, void *buf, int len);
-/// Listen for connections on a TCP socket
-extern int NetListenTCP(Socket sockfd);
-/// Accept a connection on a TCP socket
-extern Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *clientPort);
-
-
-/// Set socket to non-blocking
-extern int NetSetNonBlocking(Socket sockfd);
-/// Wait for socket ready.
-extern int NetSocketReady(Socket sockfd, int timeout);
