@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name netsockets.h - TCP and UDP sockets. */
-//
-//      (c) Copyright 2013 by Joris Dauphin and cybermind
+//      (c) Copyright 2013-2022 by Joris Dauphin, cybermind and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -54,7 +52,10 @@ class CUDPSocket final
 public:
 	CUDPSocket();
 	~CUDPSocket();
+
+	[[nodiscard]]
 	bool Open(const CHost &host);
+
 	void Close();
 
 	[[nodiscard]]
@@ -64,6 +65,8 @@ public:
 	boost::asio::awaitable<size_t> Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom);
 
 	void SetNonBlocking();
+
+	[[nodiscard]]
 	size_t HasDataToRead();
 
 	[[nodiscard]]
@@ -81,14 +84,26 @@ class CTCPSocket
 public:
 	CTCPSocket();
 	~CTCPSocket();
+
+	[[nodiscard]]
 	bool Open(const CHost &host);
+
 	void Close();
-	bool Connect(const CHost &host);
-	int Send(const void *buf, unsigned int len);
-	int Recv(void *buf, int len);
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Connect(const CHost &host);
+
+	[[nodiscard]]
+	boost::asio::awaitable<size_t> Send(const void *buf, unsigned int len);
+
+	[[nodiscard]]
+	boost::asio::awaitable<size_t> Recv(std::array<char, 1024> &buf);
+
 	void SetNonBlocking();
-	//
-	int HasDataToRead(int timeout);
+
+	[[nodiscard]]
+	boost::asio::awaitable<size_t> WaitForDataToRead(const int timeout);
+
 	bool IsValid() const;
 private:
 	std::unique_ptr<CTCPSocket_Impl> m_impl;

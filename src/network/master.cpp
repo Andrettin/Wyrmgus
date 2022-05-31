@@ -36,6 +36,8 @@
 #include "network/network.h"
 #include "parameters.h"
 #include "script.h"
+#include "util/exception_util.h"
+#include "util/log_util.h"
 
 CMetaClient MetaClient;
 
@@ -62,43 +64,46 @@ CMetaClient::~CMetaClient()
 **
 **  @return  -1 fail, 0 success.
 */
-int CMetaClient::Init()
+boost::asio::awaitable<int> CMetaClient::Init()
 {
 	if (metaPort == -1) {
-		return -1;
+		co_return -1;
 	}
 
 	// Server socket
 	CHost metaServerHost(metaHost.c_str(), metaPort);
 	// Client socket
 	CHost metaClientHost(CNetworkParameter::Instance.localHost.c_str(), CNetworkParameter::Instance.localPort);
-	metaSocket.Open(metaClientHost);
-	if (metaSocket.IsValid() == false) {
+	if (metaSocket.Open(metaClientHost) == false) {
 		fprintf(stderr, "METACLIENT: No free port %d available, aborting\n", metaServerHost.getPort());
-		return -1;
-	}
-	if (metaSocket.Connect(metaServerHost) == false) {
-		fprintf(stderr, "METACLIENT: Unable to connect to host %s\n", metaServerHost.toString().c_str());
-		MetaClient.Close();
-		return -1;
+		co_return -1;
 	}
 
-	if (this->Send("PING") == -1) { // not sent
+	try {
+		co_await metaSocket.Connect(metaServerHost);
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		log::log_error("METACLIENT: Unable to connect to host " + metaServerHost.toString());
 		MetaClient.Close();
-		return -1;
+		co_return -1;
 	}
-	if (this->Recv() == -1) { // not received
+
+	if (co_await this->Send("PING") == -1) { // not sent
 		MetaClient.Close();
-		return -1;
+		co_return -1;
+	}
+	if (co_await this->Recv() == -1) { // not received
+		MetaClient.Close();
+		co_return -1;
 	}
 	const CClientLog &log = *GetLastMessage();
 	if (log.entry.find("PING_OK") != std::string::npos) {
 		// Everything is OK
-		return 0;
+		co_return 0;
 	} else {
 		fprintf(stderr, "METACLIENT: inappropriate message received from %s\n", metaServerHost.toString().c_str());
 		MetaClient.Close();
-		return -1;
+		co_return -1;
 	}
 }
 
@@ -122,13 +127,21 @@ void CMetaClient::Close()
 **
 **  @returns     -1 if failed, otherwise length of command
 */
-int CMetaClient::Send(const std::string cmd)
+boost::asio::awaitable<int> CMetaClient::Send(const std::string cmd)
 {
 	int ret = -1;
 	std::string mes(cmd);
 	mes.append("\n");
-	ret = metaSocket.Send(mes.c_str(), mes.size());
-	return ret;
+
+	const size_t sent_bytes = co_await metaSocket.Send(mes.c_str(), mes.size());;
+
+	if (sent_bytes == 0) {
+		ret = -1;
+	} else {
+		ret = sent_bytes;
+	}
+
+	co_return ret;
 }
 
 /**
@@ -136,18 +149,20 @@ int CMetaClient::Send(const std::string cmd)
 **
 **  @return error or number of bytes
 */
-int CMetaClient::Recv()
+boost::asio::awaitable<int> CMetaClient::Recv()
 {
-	if (metaSocket.HasDataToRead(5000) == -1) {
-		return -1;
+	if (co_await metaSocket.WaitForDataToRead(5000) == 0) {
+		co_return -1;
 	}
 
 	std::array<char, 1024> buf{};
 
-	int n = metaSocket.Recv(&buf, sizeof(buf));
-	if (n == -1) {
-		return n;
+	const size_t n = co_await metaSocket.Recv(buf);
+
+	if (n == 0) {
+		co_return -1;
 	}
+
 	// We know we now have the whole command.
 	// Convert to standard notation
 	std::string cmd(buf.data(), strlen(buf.data()));
@@ -157,5 +172,5 @@ int CMetaClient::Recv()
 	log->entry = cmd;
 	this->events.push_back(std::move(log));
 	lastRecvState = n;
-	return n;
+	co_return n;
 }

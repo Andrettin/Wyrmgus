@@ -44,10 +44,18 @@ public:
 	CMetaClient() : metaSocket() {}
 	~CMetaClient();
 	void SetMetaServer(const std::string host, const int port);
-	int Init();
+
+	[[nodiscard]]
+	boost::asio::awaitable<int> Init();
+
 	void Close();
-	int Send(const std::string cmd);
-	int Recv();
+
+	[[nodiscard]]
+	boost::asio::awaitable<int> Send(const std::string cmd);
+
+	[[nodiscard]]
+	boost::asio::awaitable<int> Recv();
+
 	int GetLastRecvState() const { return lastRecvState; }
 	int GetLogSize() const { return events.size(); }
 	const CClientLog *GetLastMessage() const { return events.back().get(); }

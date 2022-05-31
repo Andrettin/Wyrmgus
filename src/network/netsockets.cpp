@@ -31,6 +31,7 @@
 #include "network/net_lowlevel.h"
 #include "util/event_loop.h"
 
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/udp.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/asio/use_awaitable.hpp>
@@ -74,6 +75,7 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	bool Open(const CHost &host)
 	{
 		this->endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
@@ -119,11 +121,13 @@ public:
 		this->socket->non_blocking(true);
 	}
 
+	[[nodiscard]]
 	size_t HasDataToRead()
 	{
 		return this->socket->available();
 	}
 
+	[[nodiscard]]
 	boost::asio::awaitable<size_t> WaitForDataToRead(const int timeout)
 	{
 		try {
@@ -154,6 +158,7 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	bool IsValid() const
 	{
 		return this->socket != nullptr && this->socket->is_open();
@@ -221,37 +226,104 @@ bool CUDPSocket::IsValid() const
 class CTCPSocket_Impl
 {
 public:
-	CTCPSocket_Impl() : socket(Socket(-1)) {}
 	~CTCPSocket_Impl()
 	{
 		if (IsValid()) {
 			Close();
 		}
 	}
-	bool Open(const CHost &host);
-	void Close() { NetCloseTCP(socket); socket = Socket(-1); }
-	bool Connect(const CHost &host) { return NetConnectTCP(socket, host.getIp(), host.getPort()) != -1; }
-	int Send(const void *buf, unsigned int len) { return NetSendTCP(socket, buf, len); }
-	int Recv(void *buf, int len)
-	{
-		int res = NetRecvTCP(socket, buf, len);
-		return res;
-	}
-	void SetNonBlocking() { NetSetNonBlocking(socket); }
-	int HasDataToRead(int timeout) { return NetSocketReady(socket, timeout); }
-	bool IsValid() const { return socket != Socket(-1); }
-private:
-	Socket socket;
-};
 
-bool CTCPSocket_Impl::Open(const CHost &host)
-{
-	char ip[24]; // 127.255.255.255:65555
-	memset(&ip, 0, sizeof(ip));
-	sprintf(ip, "%d.%d.%d.%d", NIPQUAD(ntohl(host.getIp())));
-	this->socket = NetOpenTCP(ip, host.getPort());
-	return this->socket != INVALID_SOCKET;
-}
+	[[nodiscard]]
+	bool Open(const CHost &host)
+	{
+		this->endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
+		this->socket = std::make_unique<boost::asio::ip::tcp::socket>(event_loop::get()->get_io_context(), this->endpoint);
+		return this->socket->is_open();
+	}
+
+	void Close()
+	{
+		this->socket->close();
+	}
+
+	[[nodiscard]]
+	boost::asio::awaitable<void> Connect(const CHost &host)
+	{
+		boost::asio::ip::tcp::endpoint connect_endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
+
+		co_await this->socket->async_connect(connect_endpoint, boost::asio::use_awaitable);
+	}
+
+	[[nodiscard]]
+	boost::asio::awaitable<size_t> Send(const void *buf, unsigned int len)
+	{
+		try {
+			const size_t size = co_await this->socket->async_send(boost::asio::buffer(buf, len), boost::asio::use_awaitable);
+
+			co_return size;
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to send data through a TCP socket."));
+		}
+	}
+
+	[[nodiscard]]
+	boost::asio::awaitable<size_t> Recv(std::array<char, 1024> &buf)
+	{
+		try {
+			const size_t size = co_await this->socket->async_receive(boost::asio::buffer(buf.data(), buf.size()), boost::asio::use_awaitable);
+
+			co_return size;
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to receive data through a TCP socket."));
+		}
+	}
+
+	void SetNonBlocking()
+	{
+		this->socket->non_blocking(true);
+	}
+
+	[[nodiscard]]
+	boost::asio::awaitable<size_t> WaitForDataToRead(const int timeout)
+	{
+		try {
+			boost::asio::steady_timer timer(event_loop::get()->get_io_context());
+			timer.expires_from_now(std::chrono::milliseconds(timeout));
+
+			bool timed_out = false;
+
+			timer.async_wait([this, &timed_out](const boost::system::error_code &error_code) {
+				if (error_code) {
+					return;
+				}
+
+				this->socket->cancel();
+				timed_out = true;
+			});
+
+			co_await this->socket->async_wait(boost::asio::ip::tcp::socket::wait_read, boost::asio::use_awaitable);
+			timer.cancel();
+
+			if (timed_out) {
+				co_return 0;
+			} else {
+				co_return this->socket->available();
+			}
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to wait for data to receive through a TCP socket."));
+		}
+	}
+
+	[[nodiscard]]
+	bool IsValid() const
+	{
+		return this->socket != nullptr && this->socket->is_open();
+	}
+
+private:
+	boost::asio::ip::tcp::endpoint endpoint;
+	std::unique_ptr<boost::asio::ip::tcp::socket> socket;
+};
 
 // CTCPSocket
 
@@ -274,21 +346,21 @@ void CTCPSocket::Close()
 	m_impl->Close();
 }
 
-
-bool CTCPSocket::Connect(const CHost &host)
+boost::asio::awaitable<void> CTCPSocket::Connect(const CHost &host)
 {
-	return m_impl->Connect(host);
+	co_await m_impl->Connect(host);
 }
 
-int CTCPSocket::Send(const void *buf, unsigned int len)
+boost::asio::awaitable<size_t> CTCPSocket::Send(const void *buf, unsigned int len)
 {
-	return m_impl->Send(buf, len);
+	const size_t size = co_await m_impl->Send(buf, len);
+	co_return size;
 }
 
-int CTCPSocket::Recv(void *buf, int len)
+boost::asio::awaitable<size_t> CTCPSocket::Recv(std::array<char, 1024> &buf)
 {
-	const int res = m_impl->Recv(buf, len);
-	return res;
+	const size_t res = co_await m_impl->Recv(buf);
+	co_return res;
 }
 
 void CTCPSocket::SetNonBlocking()
@@ -296,9 +368,9 @@ void CTCPSocket::SetNonBlocking()
 	m_impl->SetNonBlocking();
 }
 
-int CTCPSocket::HasDataToRead(int timeout)
+boost::asio::awaitable<size_t> CTCPSocket::WaitForDataToRead(const int timeout)
 {
-	return m_impl->HasDataToRead(timeout);
+	co_return co_await m_impl->WaitForDataToRead(timeout);
 }
 
 bool CTCPSocket::IsValid() const
