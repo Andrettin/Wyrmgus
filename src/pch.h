@@ -69,7 +69,9 @@
 #include <variant>
 #include <vector>
 
+#ifdef USE_WIN32
 #include <SDKDDKVer.h>
+#endif
 
 #include <boost/asio/awaitable.hpp>
 
