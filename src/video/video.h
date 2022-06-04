@@ -571,9 +571,6 @@ extern void SetPlayersPalette();
 /// initialize the video part
 extern void InitVideo();
 
-/// deinitialize the video part
-void DeInitVideo();
-
 /// Load graphic from PNG file
 extern int LoadGraphicPNG(CGraphic *g, const centesimal_int &scale_factor);
 

@@ -286,10 +286,6 @@ void InitVideo()
 	InitVideoSdl();
 }
 
-void DeInitVideo()
-{
-}
-
 double get_scale_factor()
 {
 	return preferences::get()->get_scale_factor().to_double();

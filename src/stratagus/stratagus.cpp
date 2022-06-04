@@ -422,7 +422,6 @@ void stratagus_on_exit_cleanup()
 	lua_settop(Lua, 0);
 	lua_close(Lua);
 	Lua = nullptr;
-	DeInitVideo();
 
 	fprintf(stdout, "%s", _("Thanks for playing " NAME ".\n"));
 }
