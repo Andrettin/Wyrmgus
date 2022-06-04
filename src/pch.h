@@ -69,6 +69,8 @@
 #include <variant>
 #include <vector>
 
+#include <SDKDDKVer.h>
+
 #include <boost/asio/awaitable.hpp>
 
 #include <QApplication>
