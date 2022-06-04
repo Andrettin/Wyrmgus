@@ -216,15 +216,6 @@ extern void beos_init(int argc, char **argv);
 #include <dbghelp.h>
 #endif
 
-#if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
-#include "windows.h"
-#define REDIRECT_OUTPUT
-#endif
-
-#if defined(USE_WIN32) && ! defined(REDIRECT_OUTPUT)
-#include "SetupConsole_win32.h"
-#endif
-
 #ifdef __MORPHOS__
 unsigned long __stack = 1000000;
 __attribute__ ((section(".text"))) UBYTE VString[] = "$VER: Wyrmsun " VERSION "\r\n";
@@ -356,8 +347,6 @@ boost::asio::awaitable<void> Exit(const int err)
 	}, Qt::QueuedConnection);
 }
 
-#ifdef REDIRECT_OUTPUT
-
 static std::string stdoutFile;
 static std::string stderrFile;
 
@@ -398,7 +387,6 @@ static void RedirectOutput()
 	}
 	atexit(CleanupOutput);
 }
-#endif
 
 #ifdef USE_WIN32
 static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
@@ -457,15 +445,10 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 #ifdef USE_WIN32
 	SetUnhandledExceptionFilter(CreateDumpFile);
 #endif
-#if defined(USE_WIN32) && ! defined(REDIRECT_OUTPUT)
-	SetupConsole();
-#endif
 
 	parameters *parameters = parameters::get();
 
-#ifdef REDIRECT_OUTPUT
 	RedirectOutput();
-#endif
 
 	makedir(parameters->GetUserDirectory().c_str(), 0777);
 

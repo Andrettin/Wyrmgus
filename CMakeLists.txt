@@ -580,7 +580,6 @@ set(xbrz_SRCS
 source_group(xbrz FILES ${xbrz_SRCS})
 
 set(win32_SRCS
-	src/win32/SetupConsole_win32.cpp
 	src/win32/stratagus.rc
 )
 source_group(win32 FILES ${win32_SRCS})
@@ -1242,7 +1241,6 @@ set(wyrmgus_generic_HDRS
 	src/include/version.h
 	src/include/viewport.h
 	src/include/widgets.h
-	src/include/SetupConsole_win32.h
 	src/stratagus/age.h
 	src/stratagus/character_history.h
 	src/stratagus/character_title.h
@@ -1444,10 +1442,6 @@ endif()
 
 # Options for compiling
 
-if(WIN32)
-	option(ENABLE_STDIO_REDIRECT "Redirect Stratagus console output to files on Windows" ON)
-endif()
-
 option(ENABLE_METASERVER "Build Stratagus metaserver (requires Sqlite3)" OFF)
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
@@ -1523,10 +1517,6 @@ set(wyrmgus_LIBS
 	${ZLIB_LIBRARIES}
 	${QT_LIBRARIES}
 )
-
-if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
-	add_definitions(-DNO_STDIO_REDIRECT)
-endif()
 
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
@@ -1725,14 +1715,6 @@ elseif(LINUX)
 	message("Platform: Linux")
 else()
 	message("Platform: Other/No platform code")
-endif()
-
-if(WIN32 AND ENABLE_STDIO_REDIRECT)
-	message("Redirect stdio: Yes (Disable by param -DENABLE_STDIO_REDIRECT=OFF)")
-elseif(NOT WIN32)
-	message("Redirect stdio: Unsupported on this platform")
-else()
-	message("Redirect stdio: No (Enable by param -DENABLE_STDIO_REDIRECT=ON)")
 endif()
 
 if(ENABLE_TOUCHSCREEN)
