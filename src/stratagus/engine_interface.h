@@ -71,6 +71,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(wyrmgus::time_of_day* current_time_of_day READ get_current_time_of_day NOTIFY current_time_of_day_changed)
 	Q_PROPERTY(wyrmgus::season* current_season READ get_current_season NOTIFY current_season_changed)
 	Q_PROPERTY(QPoint map_view_top_left_pixel_pos READ get_map_view_top_left_pixel_pos NOTIFY map_view_top_left_pixel_pos_changed)
+	Q_PROPERTY(wyrmgus::map_info* map_info READ get_map_info NOTIFY map_info_changed)
 	Q_PROPERTY(bool modal_dialog_open READ is_modal_dialog_open WRITE set_modal_dialog_open_async)
 	Q_PROPERTY(bool lua_dialog_open READ is_lua_dialog_open NOTIFY lua_dialog_open_changed)
 
@@ -251,6 +252,8 @@ public:
 	void set_map_view_top_left_pixel_pos(const QPoint &pixel_pos);
 	void update_map_view_top_left_pixel_pos();
 
+	map_info *get_map_info() const;
+
 	bool is_modal_dialog_open() const
 	{
 		return this->modal_dialog_open;
@@ -303,6 +306,7 @@ signals:
 	void current_time_of_day_changed();
 	void current_season_changed();
 	void map_view_top_left_pixel_pos_changed();
+	void map_info_changed();
 	void encyclopediaEntryOpened(QString link);
 	void factionChoiceDialogOpened(const QVariantList &factions);
 	void achievementUnlockedDialogOpened(QObject *achievement);

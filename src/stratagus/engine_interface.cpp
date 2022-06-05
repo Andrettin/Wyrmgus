@@ -673,6 +673,11 @@ void engine_interface::update_map_view_top_left_pixel_pos()
 	this->set_map_view_top_left_pixel_pos(UI.SelectedViewport->get_scaled_map_top_left_pixel_pos());
 }
 
+map_info *engine_interface::get_map_info() const
+{
+	return CMap::get()->get_info();
+}
+
 void engine_interface::set_modal_dialog_open_async(const bool value)
 {
 	event_loop::get()->post([this, value]() {

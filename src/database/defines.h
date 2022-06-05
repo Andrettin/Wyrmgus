@@ -71,7 +71,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::font_color* enemy_font_color MEMBER enemy_font_color READ get_enemy_font_color)
 	Q_PROPERTY(wyrmgus::font_color* magic_font_color MEMBER magic_font_color READ get_magic_font_color)
 	Q_PROPERTY(wyrmgus::font_color* unique_font_color MEMBER unique_font_color READ get_unique_font_color)
-	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
+	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size NOTIFY changed)
 	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
 	Q_PROPERTY(QSize resource_icon_size MEMBER resource_icon_size READ get_resource_icon_size)
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)

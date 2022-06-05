@@ -36,6 +36,9 @@
 #include "direction.h"
 //Wyrmgus start
 #include "editor.h"
+//Wyrmgus end
+#include "engine_interface.h"
+//Wyrmgus start
 #include "game/game.h" // for the SaveGameLoading variable
 //Wyrmgus end
 #include "iolib.h"
@@ -1918,6 +1921,8 @@ void CMap::ClearMapLayers()
 void CMap::set_info(qunique_ptr<map_info> &&info)
 {
 	this->Info = std::move(info);
+
+	emit engine_interface::get()->map_info_changed();
 }
 
 const map_settings *CMap::get_settings() const
