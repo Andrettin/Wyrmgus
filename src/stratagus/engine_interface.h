@@ -70,6 +70,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(wyrmgus::interface_style* current_interface_style READ get_current_interface_style NOTIFY current_interface_style_changed)
 	Q_PROPERTY(wyrmgus::time_of_day* current_time_of_day READ get_current_time_of_day NOTIFY current_time_of_day_changed)
 	Q_PROPERTY(wyrmgus::season* current_season READ get_current_season NOTIFY current_season_changed)
+	Q_PROPERTY(QPoint map_view_top_left_pixel_pos READ get_map_view_top_left_pixel_pos NOTIFY map_view_top_left_pixel_pos_changed)
 	Q_PROPERTY(bool modal_dialog_open READ is_modal_dialog_open WRITE set_modal_dialog_open_async)
 	Q_PROPERTY(bool lua_dialog_open READ is_lua_dialog_open NOTIFY lua_dialog_open_changed)
 
@@ -241,6 +242,14 @@ public:
 
 	void set_current_season(const season *season);
 	void update_current_season();
+
+	const QPoint &get_map_view_top_left_pixel_pos() const
+	{
+		return this->map_view_top_left_pixel_pos;
+	}
+
+	void set_map_view_top_left_pixel_pos(const QPoint &pixel_pos);
+	void update_map_view_top_left_pixel_pos();
 
 	bool is_modal_dialog_open() const
 	{

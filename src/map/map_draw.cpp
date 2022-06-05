@@ -113,6 +113,11 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 	return CMap::get()->Info->IsPointOnMap(tilePos, UI.CurrentMapLayer);
 }
 
+QPoint CViewport::get_scaled_map_top_left_pixel_pos() const
+{
+	return CMap::get()->tile_pos_to_scaled_map_pixel_pos_top_left(this->MapPos) + this->Offset;
+}
+
 // Convert viewport coordinates into map pixel coordinates
 PixelPos CViewport::screen_to_map_pixel_pos(const PixelPos &screenPixelPos) const
 {
@@ -246,6 +251,7 @@ void CViewport::Set(const PixelPos &mapPos)
 	if (this == UI.SelectedViewport) {
 		engine_interface::get()->update_current_time_of_day();
 		engine_interface::get()->update_current_season();
+		engine_interface::get()->update_map_view_top_left_pixel_pos();
 	}
 }
 

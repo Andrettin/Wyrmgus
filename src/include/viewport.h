@@ -74,6 +74,8 @@ public:
 	/// Check if pos pixels are within map area
 	bool IsInsideMapArea(const PixelPos &screenPixelPos) const;
 
+	QPoint get_scaled_map_top_left_pixel_pos() const;
+
 	/// Convert screen coordinates into map pixel coordinates
 	PixelPos screen_to_map_pixel_pos(const PixelPos &screenPixelPos) const;
 	PixelPos screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPos) const;

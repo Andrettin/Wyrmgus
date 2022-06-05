@@ -652,6 +652,27 @@ void engine_interface::update_current_season()
 	this->set_current_season(UI.SelectedViewport->get_center_tile_season());
 }
 
+void engine_interface::set_map_view_top_left_pixel_pos(const QPoint &pixel_pos)
+{
+	if (pixel_pos == this->get_map_view_top_left_pixel_pos()) {
+		return;
+	}
+
+	this->map_view_top_left_pixel_pos = pixel_pos;
+
+	emit map_view_top_left_pixel_pos_changed();
+}
+
+void engine_interface::update_map_view_top_left_pixel_pos()
+{
+	if (UI.SelectedViewport == nullptr) {
+		this->set_map_view_top_left_pixel_pos(QPoint(0, 0));
+		return;
+	}
+
+	this->set_map_view_top_left_pixel_pos(UI.SelectedViewport->get_scaled_map_top_left_pixel_pos());
+}
+
 void engine_interface::set_modal_dialog_open_async(const bool value)
 {
 	event_loop::get()->post([this, value]() {
