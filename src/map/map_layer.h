@@ -194,6 +194,7 @@ signals:
 	void tile_overlay_image_changed(QPoint tile_pos, const terrain_type *terrain, short tile_frame, const player_color *player_color) const;
 	void tile_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions, const player_color *player_color) const;
 	void tile_overlay_transition_images_changed(QPoint tile_pos, std::vector<wyrmgus::tile_transition> tile_transitions, const player_color *player_color) const;
+	void tile_rect_color_change_changed(const QRect &tile_rect) const;
 
 	void unit_added(int unit_index, const unit_type *unit_type, const unit_type_variation *variation, int frame, const player_color *player_color, QPoint tile_pos) const;
 	void unit_removed(int unit_index) const;

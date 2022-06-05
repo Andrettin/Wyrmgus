@@ -34,6 +34,7 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "player/player_color.h"
+#include "time/time_of_day.h"
 #include "util/exception_util.h"
 #include "util/point_util.h"
 #include "video/video.h"
@@ -100,6 +101,30 @@ QVariant map_grid_model::data(const QModelIndex &index, const int role) const
 				return tile_data.overlay_transition_image_sources;
 			case role::overlay_transition_elevation_image_sources:
 				return tile_data.overlay_transition_elevation_image_sources;
+			case role::red_change: {
+				const time_of_day *time_of_day = this->map_layer->get_tile_time_of_day(tile_index);
+				if (time_of_day != nullptr) {
+					return time_of_day->ColorModification.R;
+				} else {
+					return 0;
+				}
+			}
+			case role::green_change: {
+				const time_of_day *time_of_day = this->map_layer->get_tile_time_of_day(tile_index);
+				if (time_of_day != nullptr) {
+					return time_of_day->ColorModification.G;
+				} else {
+					return 0;
+				}
+			}
+			case role::blue_change: {
+				const time_of_day *time_of_day = this->map_layer->get_tile_time_of_day(tile_index);
+				if (time_of_day != nullptr) {
+					return time_of_day->ColorModification.B;
+				} else {
+					return 0;
+				}
+			}
 			default:
 				throw std::runtime_error("Invalid map grid model role: " + std::to_string(role) + ".");
 		}
@@ -134,7 +159,6 @@ void map_grid_model::set_map_layer(const int z)
 	}
 
 	if (this->map_layer != nullptr) {
-		//the game loop thread will be waiting while the map view is created, so it is safe to access map data here
 		for (int y = 0; y < this->map_layer->get_height(); ++y) {
 			for (int x = 0; x < this->map_layer->get_width(); ++x) {
 				const tile *tile = this->map_layer->Field(x, y);
@@ -167,6 +191,7 @@ void map_grid_model::set_map_layer(const int z)
 		connect(this->map_layer, &CMapLayer::tile_overlay_image_changed, this, &map_grid_model::update_tile_overlay_image_source);
 		connect(this->map_layer, &CMapLayer::tile_transition_images_changed, this, &map_grid_model::update_tile_transition_image_sources);
 		connect(this->map_layer, &CMapLayer::tile_overlay_transition_images_changed, this, &map_grid_model::update_tile_overlay_transition_image_sources);
+		connect(this->map_layer, &CMapLayer::tile_rect_color_change_changed, this, &map_grid_model::update_tile_rect_color_change);
 	}
 
 	emit map_layer_changed();
@@ -228,6 +253,16 @@ void map_grid_model::update_tile_overlay_transition_image_sources(const QPoint &
 
 	const QModelIndex index = this->index(tile_pos.y(), tile_pos.x());
 	emit dataChanged(index, index, { static_cast<int>(role::overlay_transition_image_sources), static_cast<int>(role::overlay_transition_elevation_image_sources) });
+}
+
+void map_grid_model::update_tile_rect_color_change(const QRect &tile_rect)
+{
+	const QPoint top_left = tile_rect.topLeft();
+	const QPoint bottom_right = tile_rect.bottomRight();
+
+	const QModelIndex min_index = this->index(top_left.y(), top_left.x());
+	const QModelIndex max_index = this->index(bottom_right.y(), bottom_right.x());
+	emit dataChanged(min_index, max_index, { static_cast<int>(role::red_change), static_cast<int>(role::green_change), static_cast<int>(role::blue_change) });
 }
 
 }

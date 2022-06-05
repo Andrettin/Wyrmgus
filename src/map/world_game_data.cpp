@@ -172,7 +172,7 @@ void world_game_data::set_time_of_day(const scheduled_time_of_day *time_of_day)
 	//update the sight of all units
 	if (is_day_changed || is_night_changed) {
 		std::vector<CUnit *> units;
-		Select(this->map_rect.topLeft(), this->map_rect.bottomRight(), units, map_layer->ID);
+		Select(this->map_rect.topLeft(), this->map_rect.bottomRight(), units, this->map_layer->ID);
 
 		for (CUnit *unit : units) {
 			const tile *center_tile = unit->get_center_tile();
@@ -194,6 +194,13 @@ void world_game_data::set_time_of_day(const scheduled_time_of_day *time_of_day)
 				MapMarkUnitSight(*unit);
 			}
 		}
+	}
+
+	const CColor old_color_modification = old_time_of_day ? old_time_of_day->get_time_of_day()->ColorModification : CColor();
+	const CColor color_modification = this->time_of_day ? this->time_of_day->get_time_of_day()->ColorModification : CColor();
+
+	if (old_color_modification != color_modification) {
+		emit this->map_layer->tile_rect_color_change_changed(this->map_rect);
 	}
 
 	//if this world is currently the central one in the viewport, the current season for interface purposes may have changed, so update it

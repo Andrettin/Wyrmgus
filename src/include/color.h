@@ -35,10 +35,17 @@ struct lua_State;
 class CColor
 {
 public:
-	CColor() : R(0), G(0), B(0), A(0) {}
-	CColor(unsigned char r, unsigned char g, unsigned char b,
-		   unsigned char a = 0) : R(r), G(g), B(b), A(a) {}
-	CColor(const CColor &color) : R(color.R), G(color.G), B(color.B), A(color.A) {}
+	CColor()
+	{
+	}
+
+	explicit CColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 0) : R(r), G(g), B(b), A(a)
+	{
+	}
+
+	CColor(const CColor &color) : R(color.R), G(color.G), B(color.B), A(color.A)
+	{
+	}
 	
 	static CColor FromString(const std::string &str);
 
@@ -123,10 +130,10 @@ public:
 	
 public:
 	//these variables are short integers instead of unsigned chars so that they can be negative, for the case they need to represent a color modification (which can have negative values)
-	short R;			/// Red
-	short G;			/// Green
-	short B;			/// Blue
-	short A;			/// Alpha
+	short R = 0;			/// Red
+	short G = 0;			/// Green
+	short B = 0;			/// Blue
+	short A = 0;			/// Alpha
 };
 
 typedef uint32_t IntColor; // Uint32 in SDL

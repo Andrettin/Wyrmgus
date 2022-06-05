@@ -354,6 +354,13 @@ void CMapLayer::SetTimeOfDay(const scheduled_time_of_day *time_of_day)
 		}
 	}
 
+	const CColor old_color_modification = old_time_of_day ? old_time_of_day->get_time_of_day()->ColorModification : CColor();
+	const CColor color_modification = this->time_of_day ? this->time_of_day->get_time_of_day()->ColorModification : CColor();
+
+	if (old_color_modification != color_modification) {
+		emit tile_rect_color_change_changed(QRect(QPoint(0, 0), this->get_size()));
+	}
+
 	engine_interface::get()->update_current_time_of_day();
 }
 

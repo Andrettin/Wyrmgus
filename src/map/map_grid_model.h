@@ -50,10 +50,13 @@ public:
 		overlay_image_source,
 		transition_image_sources,
 		overlay_transition_image_sources,
-		overlay_transition_elevation_image_sources
+		overlay_transition_elevation_image_sources,
+		red_change,
+		green_change,
+		blue_change
 	};
 
-	struct tile_data {
+	struct tile_data final {
 		QString image_source;
 		QString overlay_image_source;
 		QStringList transition_image_sources;
@@ -90,6 +93,9 @@ public:
 		role_names.insert(static_cast<int>(role::transition_image_sources), "transition_image_sources");
 		role_names.insert(static_cast<int>(role::overlay_transition_image_sources), "overlay_transition_image_sources");
 		role_names.insert(static_cast<int>(role::overlay_transition_elevation_image_sources), "overlay_transition_elevation_image_sources");
+		role_names.insert(static_cast<int>(role::red_change), "red_change");
+		role_names.insert(static_cast<int>(role::green_change), "green_change");
+		role_names.insert(static_cast<int>(role::blue_change), "blue_change");
 
 		return role_names;
 	}
@@ -101,6 +107,7 @@ public:
 	void update_tile_overlay_image_source(const QPoint &tile_pos, const terrain_type *terrain, const short tile_frame, const player_color *player_color);
 	void update_tile_transition_image_sources(const QPoint &tile_pos, const std::vector<tile_transition> &tile_transitions, const player_color *player_color);
 	void update_tile_overlay_transition_image_sources(const QPoint &tile_pos, const std::vector<tile_transition> &tile_transitions, const player_color *player_color);
+	void update_tile_rect_color_change(const QRect &tile_rect);
 
 signals:
 	void map_layer_changed();
