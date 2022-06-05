@@ -302,6 +302,7 @@ signals:
 	void current_interface_style_changed();
 	void current_time_of_day_changed();
 	void current_season_changed();
+	void map_view_top_left_pixel_pos_changed();
 	void encyclopediaEntryOpened(QString link);
 	void factionChoiceDialogOpened(const QVariantList &factions);
 	void achievementUnlockedDialogOpened(QObject *achievement);
@@ -321,6 +322,7 @@ private:
 	interface_style *current_interface_style = nullptr;
 	const time_of_day *current_time_of_day = nullptr;
 	const season *current_season = nullptr;
+	QPoint map_view_top_left_pixel_pos;
 	bool modal_dialog_open = false;
 	int open_lua_dialog_count = 0;
 	std::vector<qunique_ptr<map_info>> map_infos;
