@@ -53,7 +53,10 @@ public:
 		overlay_transition_elevation_image_sources,
 		red_change,
 		green_change,
-		blue_change
+		blue_change,
+		transition_red_changes,
+		transition_green_changes,
+		transition_blue_changes
 	};
 
 	struct tile_data final {
@@ -96,6 +99,9 @@ public:
 		role_names.insert(static_cast<int>(role::red_change), "red_change");
 		role_names.insert(static_cast<int>(role::green_change), "green_change");
 		role_names.insert(static_cast<int>(role::blue_change), "blue_change");
+		role_names.insert(static_cast<int>(role::transition_red_changes), "transition_red_changes");
+		role_names.insert(static_cast<int>(role::transition_green_changes), "transition_green_changes");
+		role_names.insert(static_cast<int>(role::transition_blue_changes), "transition_blue_changes");
 
 		return role_names;
 	}

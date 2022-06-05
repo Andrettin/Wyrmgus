@@ -401,6 +401,11 @@ const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const tile *tile) co
 	return this->get_tile_time_of_day(tile, tile->get_flags());
 }
 
+const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const int tile_index, const tile_flag flags) const
+{
+	return this->get_tile_time_of_day(this->Field(tile_index), flags);
+}
+
 const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const int tile_index) const
 {
 	return this->get_tile_time_of_day(this->Field(tile_index));

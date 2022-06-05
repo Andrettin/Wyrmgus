@@ -140,6 +140,7 @@ public:
 	const wyrmgus::time_of_day *GetTimeOfDay() const;
 	const wyrmgus::time_of_day *get_tile_time_of_day(const tile *tile, const tile_flag flags) const;
 	const wyrmgus::time_of_day *get_tile_time_of_day(const tile *tile) const;
+	const wyrmgus::time_of_day *get_tile_time_of_day(const int tile_index, const tile_flag flags) const;
 	const wyrmgus::time_of_day *get_tile_time_of_day(const int tile_index) const;
 	const wyrmgus::time_of_day *get_tile_time_of_day(const QPoint &tile_pos) const;
 

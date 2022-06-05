@@ -125,6 +125,57 @@ QVariant map_grid_model::data(const QModelIndex &index, const int role) const
 					return 0;
 				}
 			}
+			case role::transition_red_changes: {
+				QVariantList red_changes;
+
+				for (const auto &[terrain_type, tile_frame] : this->map_layer->Field(tile_index)->TransitionTiles) {
+					const time_of_day *time_of_day = this->map_layer->get_tile_time_of_day(tile_index, terrain_type->Flags);
+
+					short change = 0;
+
+					if (time_of_day != nullptr) {
+						change = time_of_day->ColorModification.R;
+					}
+
+					red_changes.push_back(change);
+				}
+
+				return red_changes;
+			}
+			case role::transition_green_changes: {
+				QVariantList green_changes;
+
+				for (const auto &[terrain_type, tile_frame] : this->map_layer->Field(tile_index)->TransitionTiles) {
+					const time_of_day *time_of_day = this->map_layer->get_tile_time_of_day(tile_index, terrain_type->Flags);
+
+					short change = 0;
+
+					if (time_of_day != nullptr) {
+						change = time_of_day->ColorModification.G;
+					}
+
+					green_changes.push_back(change);
+				}
+
+				return green_changes;
+			}
+			case role::transition_blue_changes: {
+				QVariantList blue_changes;
+
+				for (const auto &[terrain_type, tile_frame] : this->map_layer->Field(tile_index)->TransitionTiles) {
+					const time_of_day *time_of_day = this->map_layer->get_tile_time_of_day(tile_index, terrain_type->Flags);
+
+					short change = 0;
+
+					if (time_of_day != nullptr) {
+						change = time_of_day->ColorModification.B;
+					}
+
+					blue_changes.push_back(change);
+				}
+
+				return blue_changes;
+			}
 			default:
 				throw std::runtime_error("Invalid map grid model role: " + std::to_string(role) + ".");
 		}
@@ -262,7 +313,15 @@ void map_grid_model::update_tile_rect_color_change(const QRect &tile_rect)
 
 	const QModelIndex min_index = this->index(top_left.y(), top_left.x());
 	const QModelIndex max_index = this->index(bottom_right.y(), bottom_right.x());
-	emit dataChanged(min_index, max_index, { static_cast<int>(role::red_change), static_cast<int>(role::green_change), static_cast<int>(role::blue_change) });
+
+	emit dataChanged(min_index, max_index, {
+		static_cast<int>(role::red_change),
+		static_cast<int>(role::green_change),
+		static_cast<int>(role::blue_change),
+		static_cast<int>(role::transition_red_changes),
+		static_cast<int>(role::transition_green_changes),
+		static_cast<int>(role::transition_blue_changes)
+	});
 }
 
 }
