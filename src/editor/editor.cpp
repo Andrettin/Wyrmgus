@@ -48,6 +48,7 @@
 
 #include "game/game.h"
 #include "map/map.h"
+#include "map/map_info.h"
 #include "player/player.h"
 #include "util/event_loop.h"
 #include "util/path_util.h"
@@ -93,10 +94,29 @@ boost::asio::awaitable<void> CEditor::start(const std::filesystem::path &filepat
 	CleanPlayers();
 }
 
+boost::asio::awaitable<void> CEditor::start_new(const std::string &name, const QSize &map_size)
+{
+	auto map_info = make_qunique<wyrmgus::map_info>();
+	map_info->set_name(name);
+	map_info->set_map_size(map_size);
+	map_info->set_presentation_filepath("new_map");
+
+	CMap::get()->set_info(std::move(map_info));
+
+	co_await this->start("");
+}
+
 void CEditor::start_async(const QString &filepath)
 {
 	event_loop::get()->co_spawn([this, filepath]() -> boost::asio::awaitable<void> {
 		co_await this->start(path::from_qstring(filepath));
+	});
+}
+
+void CEditor::start_new_async(const QString &name, const int map_width, const int map_height)
+{
+	event_loop::get()->co_spawn([this, name, map_width, map_height]() -> boost::asio::awaitable<void> {
+		co_await this->start_new(name.toStdString(), QSize(map_width, map_height));
 	});
 }
 

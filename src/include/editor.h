@@ -57,7 +57,11 @@ public:
 	[[nodiscard]]
 	boost::asio::awaitable<void> start(const std::filesystem::path &filepath);
 
+	[[nodiscard]]
+	boost::asio::awaitable<void> start_new(const std::string &name, const QSize &map_size);
+
 	Q_INVOKABLE void start_async(const QString &filepath);
+	Q_INVOKABLE void start_new_async(const QString &name, const int map_width, const int map_height);
 
 	[[nodiscard]]
 	boost::asio::awaitable<void> Init();
