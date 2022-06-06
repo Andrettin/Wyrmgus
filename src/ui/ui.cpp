@@ -427,8 +427,20 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	//Wyrmgus start
 //	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * defines::get()->get_scaled_tile_width() - 1;
 //	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * defines::get()->get_scaled_tile_height() - 1;
-	int right = vp.get_top_left_pos().x() + (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::get()->Info->get_map_width()) * defines::get()->get_scaled_tile_width() - 1;
-	int bottom = vp.get_top_left_pos().y() + (CMap::get()->Info->MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::get()->Info->get_map_height()) * defines::get()->get_scaled_tile_height() - 1;
+
+	const QSize scaled_tile_size = defines::get()->get_scaled_tile_size();
+
+	const QSize map_size = (CMap::get()->Info->MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_size() : CMap::get()->Info->get_map_size());
+
+	int right = vp.get_top_left_pos().x();
+	if (map_size.width() != 0) {
+		right += map_size.width() * scaled_tile_size.width() - 1;
+	}
+
+	int bottom = vp.get_top_left_pos().y();
+	if (map_size.height() != 0) {
+		bottom += map_size.height() * scaled_tile_size.height() - 1;
+	}
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary
@@ -436,7 +448,9 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	bottom = std::min<int>(bottom, ClipY);
 
 	assert_throw(right <= UI.MapArea.get_rect().right());
+	assert_throw(right >= vp.get_top_left_pos().x());
 	assert_throw(bottom <= UI.MapArea.get_rect().bottom());
+	assert_throw(bottom >= vp.get_top_left_pos().y());
 
 	vp.set_bottom_right_pos(QPoint(right, bottom));
 }
