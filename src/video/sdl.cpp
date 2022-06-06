@@ -922,6 +922,9 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 		cursor::on_current_cursor_changed();
 	}
 
+	//update the current map viewport top left pixel pos after all mouse input events have been processed, to pool their effects together
+	engine_interface::get()->update_map_view_top_left_pixel_pos();
+
 	if (!SkipGameCycle--) {
 		SkipGameCycle = SkipFrames;
 	}

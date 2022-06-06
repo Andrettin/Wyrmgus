@@ -251,7 +251,6 @@ void CViewport::Set(const PixelPos &mapPos)
 	if (this == UI.SelectedViewport) {
 		engine_interface::get()->update_current_time_of_day();
 		engine_interface::get()->update_current_season();
-		engine_interface::get()->update_map_view_top_left_pixel_pos();
 	}
 }
 
