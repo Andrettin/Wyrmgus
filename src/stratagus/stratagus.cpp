@@ -510,7 +510,7 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 
 	try {
 		while (GameResult != GameExit) {
-			if (GameRunning) {
+			if (GameRunning || CEditor::get()->is_running()) {
 				co_await event_loop::get()->await_ms(1000);
 			} else {
 				UpdateDisplay();
