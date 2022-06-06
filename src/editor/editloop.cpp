@@ -2516,6 +2516,7 @@ boost::asio::awaitable<void> EditorMainLoop()
 
 	game::get()->clear_results();
 	game::get()->set_running(false); //should use something different instead?
+	CEditor::get()->set_running(false);
 
 	CursorBuilding = nullptr;
 
