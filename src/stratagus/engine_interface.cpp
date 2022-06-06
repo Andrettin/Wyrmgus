@@ -125,6 +125,13 @@ QString engine_interface::get_save_path() const
 	return path::to_qstring(save_path);
 }
 
+QString engine_interface::get_shaders_path() const
+{
+	std::filesystem::path path = database::get()->get_shaders_path();
+	path.make_preferred();
+	return path::to_qstring(path);
+}
+
 QString engine_interface::get_user_maps_path() const
 {
 	std::filesystem::path path = database::get_user_maps_path();

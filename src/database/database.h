@@ -47,6 +47,7 @@ public:
 	static constexpr const char *maps_folder = "maps";
 	static constexpr const char *music_folder = "music";
 	static constexpr const char *save_folder = "save";
+	static constexpr const char *shaders_folder = "shaders";
 	static constexpr const char *sounds_folder = "sounds";
 
 	template <typename T>
@@ -319,6 +320,11 @@ public:
 		}
 
 		throw std::runtime_error("Graphics file \"" + relative_filepath.string() + "\" not found.");
+	}
+
+	std::filesystem::path get_shaders_path() const
+	{
+		return this->get_root_path() / database::shaders_folder;
 	}
 
 	const data_module *get_current_module() const

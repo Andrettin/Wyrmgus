@@ -59,6 +59,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(bool running READ is_running NOTIFY running_changed)
 	Q_PROPERTY(double scale_factor READ get_scale_factor NOTIFY scale_factor_changed)
 	Q_PROPERTY(QString save_path READ get_save_path CONSTANT)
+	Q_PROPERTY(QString shaders_path READ get_shaders_path CONSTANT)
 	Q_PROPERTY(QString user_maps_path READ get_user_maps_path CONSTANT)
 	Q_PROPERTY(QString loading_message READ get_loading_message NOTIFY loading_message_changed)
 	Q_PROPERTY(QVariantList custom_heroes READ get_custom_heroes NOTIFY custom_heroes_changed)
@@ -105,6 +106,7 @@ public:
 	double get_scale_factor() const;
 
 	QString get_save_path() const;
+	QString get_shaders_path() const;
 	QString get_user_maps_path() const;
 
 	const QString &get_loading_message() const
