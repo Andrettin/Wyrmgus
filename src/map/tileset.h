@@ -157,13 +157,17 @@ public:
 	CTileInfo tileinfo;   /// Tile descriptions
 };
 
-/// Tileset definition
-class CTileset final
+namespace wyrmgus {
+	
+class tileset final
 {
 public:
 	void clear();
 
-	unsigned int getTileCount() const { return tiles.size(); }
+	unsigned int getTileCount() const
+	{
+		return this->tiles.size();
+	}
 
 	unsigned int getDefaultTileIndex() const;
 	//Wyrmgus start
@@ -180,9 +184,20 @@ public:
 	unsigned getRemovedRockTile() const;
 	unsigned getRemovedTreeTile() const;
 	//Wyrmgus end
-	unsigned getBottomOneTreeTile() const { return botOneTreeTile; }
-	unsigned getTopOneTreeTile() const { return topOneTreeTile; }
-	unsigned getMidOneTreeTile() const { return midOneTreeTile; }
+	unsigned getBottomOneTreeTile() const
+	{
+		return this->botOneTreeTile;
+	}
+
+	unsigned getTopOneTreeTile() const
+	{
+		return this->topOneTreeTile;
+	}
+
+	unsigned getMidOneTreeTile() const
+	{
+		return this->midOneTreeTile;
+	}
 	
 	unsigned getHumanWallTileIndex(int dirFlag) const;
 	unsigned getOrcWallTileIndex(int dirFlag) const;
@@ -227,6 +242,7 @@ private:
 	void parseSolid(lua_State *l);
 	void parseMixed(lua_State *l);
 	int findTilePath(int base, int goal, int length, std::vector<char> &marks, int *tileIndex) const;
+
 public:
 	std::string Name;           /// Nice name to display
 	//Wyrmgus start
@@ -273,11 +289,9 @@ private:
 	std::array<unsigned, 16> orcWallTable{};    /// Orc wall placement table
 };
 
-//Wyrmgus start
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+}
 
+//Wyrmgus start
 extern void ParseTilesetTileFlags(lua_State *l, tile_flag *back, int *j);
 //Wyrmgus start
 extern std::string GetTransitionTypeNameById(const wyrmgus::tile_transition_type transition_type);

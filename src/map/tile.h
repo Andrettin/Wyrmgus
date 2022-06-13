@@ -115,7 +115,6 @@
 
 class CFile;
 class CPlayer;
-class CTileset;
 //Wyrmgus start
 class CGraphic;
 //Wyrmgus end
@@ -129,6 +128,7 @@ class resource;
 class site;
 class terrain_feature;
 class terrain_type;
+class tileset;
 class world;
 enum class tile_flag : uint32_t;
 
@@ -263,7 +263,7 @@ public:
 	void SetOverlayTerrainDestroyed(bool destroyed);
 	void SetOverlayTerrainDamaged(bool damaged);
 	//Wyrmgus end
-	void setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value);
+	void setTileIndex(const tileset &tileset, unsigned int tileIndex, int value);
 	//Wyrmgus start
 	void UpdateSeenTile();
 	//Wyrmgus end

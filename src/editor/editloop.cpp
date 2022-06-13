@@ -2284,7 +2284,7 @@ boost::asio::awaitable<void> CEditor::Init()
 
 		const int defaultTile = CMap::get()->Tileset->getDefaultTileIndex();
 		//Wyrmgus start
-		const CTileset &tileset = *CMap::get()->Tileset;
+		const tileset &tileset = *CMap::get()->Tileset;
 		//Wyrmgus end
 
 		//Wyrmgus start

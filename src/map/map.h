@@ -48,7 +48,7 @@
 **
 **  CMap::Tileset
 **
-**    Tileset data for the map. See ::CTileset. This contains all
+**    Tileset data for the map. See wyrmgus::tileset. This contains all
 **    information about the tile.
 **
 **  CMap::TileModelsFileName
@@ -75,7 +75,6 @@ class CGraphic;
 class CPlayer;
 class CFile;
 class CMapLayer;
-class CTileset;
 class CUnit;
 class CUnitCache;
 
@@ -91,6 +90,7 @@ namespace wyrmgus {
 	class site;
 	class terrain_type;
 	class tile;
+	class tileset;
 	class unit_type;
 	class world;
 	enum class tile_flag : uint32_t;
@@ -354,7 +354,7 @@ public:
 public:
 	bool NoFogOfWar = false;           /// fog of war disabled
 
-	std::unique_ptr<CTileset> Tileset;          /// tileset data
+	std::unique_ptr<tileset> Tileset;          /// tileset data
 	std::string TileModelsFileName; /// lua filename that loads all tilemodels
 	static std::shared_ptr<CGraphic> FogGraphics; //graphics for fog of war
 private:

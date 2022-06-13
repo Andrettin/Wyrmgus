@@ -93,7 +93,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		return;
 	}
 	wyrmgus::tile &mf = *Map.Field(pos);
-	const CTileset &tileset = *Map.Tileset;
+	const tileset &tileset = *Map.Tileset;
 	const unsigned tile = mf.player_info->SeenTile;
 	if (!tileset.isAWallTile(tile)) {
 		return;
@@ -145,7 +145,7 @@ void MapFixWallTile(const Vec2i &pos)
 		return;
 	}
 	wyrmgus::tile &mf = *Map.Field(pos);
-	const CTileset &tileset = *Map.Tileset;
+	const tileset &tileset = *Map.Tileset;
 	const int tile = mf.getGraphicTile();
 	if (!tileset.isAWallTile(tile)) {
 		return;

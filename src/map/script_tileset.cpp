@@ -72,7 +72,7 @@ void ParseTilesetTileFlags(lua_State *l, tile_flag *back, int *j)
 **
 **  @param l        Lua state.
 */
-void CTileset::parseSpecial(lua_State *l)
+void tileset::parseSpecial(lua_State *l)
 {
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -132,7 +132,7 @@ void CTileset::parseSpecial(lua_State *l)
 **
 **  @param l        Lua state.
 */
-void CTileset::parseSolid(lua_State *l)
+void tileset::parseSolid(lua_State *l)
 {
 	const int index = tiles.size();
 
@@ -188,7 +188,7 @@ void CTileset::parseSolid(lua_State *l)
 **
 **  @param l        Lua state.
 */
-void CTileset::parseMixed(lua_State *l)
+void tileset::parseMixed(lua_State *l)
 {
 	int index = tiles.size();
 	tiles.resize(index + 256);
@@ -233,7 +233,7 @@ void CTileset::parseMixed(lua_State *l)
 **  @param l        Lua state.
 **  @param t        FIXME: docu
 */
-void CTileset::parseSlots(lua_State *l, int t)
+void tileset::parseSlots(lua_State *l, int t)
 {
 	tiles.clear();
 
@@ -261,7 +261,7 @@ void CTileset::parseSlots(lua_State *l, int t)
 	}
 }
 
-void CTileset::parse(lua_State *l)
+void tileset::parse(lua_State *l)
 {
 	clear();
 
@@ -287,7 +287,7 @@ void CTileset::parse(lua_State *l)
 	}
 }
 
-void CTileset::buildTable()
+void tileset::buildTable()
 {
 	//  Calculate number of tiles in graphic tile
 	const int n = tiles.size();
@@ -581,7 +581,7 @@ void CTileset::buildTable()
 	//Wyrmgus end
 }
 
-void CTileset::buildWallReplacementTable()
+void tileset::buildWallReplacementTable()
 {
 	// FIXME: Build wall replacement tables
 	humanWallTable[ 0] = 0x090;

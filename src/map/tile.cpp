@@ -326,7 +326,7 @@ void tile::SetOverlayTerrainDamaged(bool damaged)
 }
 //Wyrmgus end
 
-void tile::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value)
+void tile::setTileIndex(const tileset &tileset, unsigned int tileIndex, int value)
 {
 	const CTile &tile = tileset.tiles[tileIndex];
 	//Wyrmgus start

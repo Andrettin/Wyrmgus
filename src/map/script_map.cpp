@@ -949,7 +949,7 @@ static int CclSetTileFlags(lua_State *l)
 */
 static int CclGetCurrentTileset(lua_State *l)
 {
-	const CTileset &tileset = *CMap::get()->Tileset;
+	const tileset &tileset = *CMap::get()->Tileset;
 	lua_pushstring(l, tileset.Ident.c_str());
 	return 1;
 }

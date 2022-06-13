@@ -1776,7 +1776,7 @@ bool CanMoveToMask(const Vec2i &pos, const tile_flag mask, const int z)
 
 CMap::CMap()
 {
-	this->Tileset = std::make_unique<CTileset>();
+	this->Tileset = std::make_unique<tileset>();
 
 	this->Info = make_qunique<map_info>();
 	if (QApplication::instance()->thread() != QThread::currentThread()) {
