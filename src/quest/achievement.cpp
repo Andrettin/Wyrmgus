@@ -202,8 +202,10 @@ bool achievement::can_obtain() const
 				continue;
 			}
 
-			if (this->character_level > 0 && hero->get_level() < this->character_level) {
-				continue;
+			if (this->character_level > 0) {
+				if (hero->get_level() < this->character_level || hero->get_level() == hero->get_base_level()) {
+					continue;
+				}
 			}
 
 			found_hero = true;
