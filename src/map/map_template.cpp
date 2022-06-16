@@ -960,7 +960,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false, false);
 	}
 	
-	if (!this->IsSubtemplateArea()) {
+	if (!this->IsSubtemplateArea() && this->is_tile_adjustment_enabled()) {
 		ShowLoadProgress(_("Adjusting \"%s\" Map Template Terrain..."), this->get_name().c_str());
 		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
@@ -1023,7 +1023,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		CMap::get()->generate_terrain(generated_terrain.get(), map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
 	}
 
-	if (!this->IsSubtemplateArea()) {
+	if (!this->IsSubtemplateArea() && this->is_tile_adjustment_enabled()) {
 		ShowLoadProgress(_("Readjusting \"%s\" Map Template Terrain..."), this->get_name().c_str());
 		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		CMap::get()->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);

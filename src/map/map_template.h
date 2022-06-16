@@ -73,6 +73,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
 	Q_PROPERTY(bool optional MEMBER optional READ is_optional)
 	Q_PROPERTY(bool constructed_only MEMBER constructed_only READ is_constructed_only)
+	Q_PROPERTY(bool tile_adjustment_enabled MEMBER tile_adjustment_enabled READ is_tile_adjustment_enabled)
 	Q_PROPERTY(QPoint start_pos MEMBER start_pos READ get_start_pos)
 	Q_PROPERTY(QPoint end_pos MEMBER end_pos READ get_end_pos)
 	Q_PROPERTY(QPoint subtemplate_top_left_pos MEMBER subtemplate_top_left_pos READ get_subtemplate_top_left_pos)
@@ -304,6 +305,11 @@ public:
 	bool is_constructed_only() const
 	{
 		return this->constructed_only;
+	}
+
+	bool is_tile_adjustment_enabled() const
+	{
+		return this->tile_adjustment_enabled;
 	}
 
 	bool contains_map_pos(const QPoint &pos) const
@@ -725,6 +731,7 @@ private:
 	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle
 	bool optional = false;
 	bool constructed_only = false;
+	bool tile_adjustment_enabled = true;
 	bool output_terrain_image = false;
 	bool output_territory_image = false;
 private:
