@@ -26,10 +26,9 @@
 
 #pragma once
 
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 #include "vec2i.h"
-//Wyrmgus start
-#include "color.h"
-//Wyrmgus end
 
 struct lua_State;
 //Wyrmgus start
@@ -38,6 +37,7 @@ class CPlayerColorGraphic;
 //Wyrmgus end
 
 namespace wyrmgus {
+	class terrain_type;
 	class unit_type;
 	enum class tile_flag : uint32_t;
 }
@@ -159,10 +159,38 @@ public:
 
 namespace wyrmgus {
 	
-class tileset final
+class tileset final : public named_data_entry, public data_type<tileset>
 {
+	Q_OBJECT
+
 public:
-	void clear();
+	static constexpr const char *class_identifier = "tileset";
+	static constexpr const char *database_folder = "tilesets";
+
+	explicit tileset(const std::string &identifier) : named_data_entry(identifier)
+	{
+	}
+
+	virtual void process_gsml_scope(const gsml_data &scope) override;
+
+	virtual void check() const override
+	{
+		if (this->get_identifier().empty()) {
+			throw std::runtime_error("Tileset has no identifier.");
+		}
+	}
+
+	const terrain_type *get_terrain_type_by_tile_number(const int tile_number) const
+	{
+		const auto find_iterator = this->terrain_types_by_tile_number.find(tile_number);
+		if (find_iterator != this->terrain_types_by_tile_number.end()) {
+			return find_iterator->second;
+		}
+
+		throw std::runtime_error("No terrain type found for tileset \"" + this->get_identifier() + "\" for tile number: " + std::to_string(tile_number) + ".");
+	}
+
+	void map_terrain_type_to_tile_number(const terrain_type *terrain_type, const int tile_number);
 
 	unsigned int getTileCount() const
 	{
@@ -257,11 +285,12 @@ public:
 	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
 	//Wyrmgus start
 	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
-	int TreeUnderlayTerrain;
-	int RockUnderlayTerrain;
+	int TreeUnderlayTerrain = 0;
+	int RockUnderlayTerrain = 0;
 	std::vector<unsigned> removedTreeTiles;  /// Tiles placed where trees are gone
 	std::vector<unsigned> removedRockTiles;  /// Tiles placed where trees are gone
 	//Wyrmgus end
+
 private:
 	//Wyrmgus start
 //	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
@@ -271,22 +300,24 @@ private:
 //	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used
 	std::map<std::pair<int,int>, int> mixedLookupTable;  /// Lookup for what part of tile used; mapped to a pair, which has its first element as the tile type and the second element as the graphic tile
 	//Wyrmgus end
-	unsigned topOneTreeTile;   /// Tile for one tree top
-	unsigned midOneTreeTile;   /// Tile for one tree middle
-	unsigned botOneTreeTile;   /// Tile for one tree bottom
+	unsigned topOneTreeTile = 0;   /// Tile for one tree top
+	unsigned midOneTreeTile = 0;   /// Tile for one tree middle
+	unsigned botOneTreeTile = 0;   /// Tile for one tree bottom
 	//Wyrmgus start
 //	unsigned removedTreeTile;  /// Tile placed where trees are gone
 	//Wyrmgus end
 	std::array<int, 20> woodTable{};     /// Table for tree removable
-	unsigned topOneRockTile;   /// Tile for one rock top
-	unsigned midOneRockTile;   /// Tile for one rock middle
-	unsigned botOneRockTile;   /// Tile for one rock bottom
+	unsigned topOneRockTile = 0;   /// Tile for one rock top
+	unsigned midOneRockTile = 0;   /// Tile for one rock middle
+	unsigned botOneRockTile = 0;   /// Tile for one rock bottom
 	//Wyrmgus start
 //	unsigned removedRockTile;  /// Tile placed where rocks are gone
 	//Wyrmgus end
 	std::array<int, 20> rockTable{};     /// Removed rock placement table
 	std::array<unsigned, 16> humanWallTable{};  /// Human wall placement table
 	std::array<unsigned, 16> orcWallTable{};    /// Orc wall placement table
+
+	std::map<int, const terrain_type *> terrain_types_by_tile_number;
 };
 
 }

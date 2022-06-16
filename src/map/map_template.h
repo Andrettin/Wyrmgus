@@ -59,6 +59,7 @@ class map_template_unit;
 class site;
 class terrain_type;
 class tile;
+class tileset;
 class unique_item;
 class unit_class;
 class unit_type;
@@ -81,6 +82,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(wyrmgus::geocoordinate min_subtemplate_geocoordinate MEMBER min_subtemplate_geocoordinate)
 	Q_PROPERTY(wyrmgus::geocoordinate max_subtemplate_geocoordinate MEMBER max_subtemplate_geocoordinate)
 	Q_PROPERTY(wyrmgus::world* world MEMBER world)
+	Q_PROPERTY(wyrmgus::tileset* tileset MEMBER tileset)
 	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(std::filesystem::path terrain_file MEMBER terrain_file WRITE set_terrain_file)
 	Q_PROPERTY(std::filesystem::path overlay_terrain_file MEMBER overlay_terrain_file WRITE set_overlay_terrain_file)
@@ -356,6 +358,11 @@ public:
 		return this->world;
 	}
 
+	const wyrmgus::tileset *get_tileset() const
+	{
+		return this->tileset;
+	}
+
 	map_template *get_main_template() const
 	{
 		return this->main_template;
@@ -438,6 +445,7 @@ public:
 	void load_terrain_file(const bool overlay);
 	void load_wesnoth_terrain_file();
 	void load_0_ad_terrain_file();
+	void load_stratagus_terrain_file();
 	QImage load_terrain_image_file(const std::filesystem::path &filepath);
 	void load_terrain_image(const bool overlay);
 	void load_trade_route_image();
@@ -747,6 +755,7 @@ public:
 private:
 	std::vector<const map_template *> dependency_templates; //the other templates on which this one depends on to be applied as a subtemplate, e.g. its adjacent templates, north of templates, etc.
 	wyrmgus::world *world = nullptr;
+	wyrmgus::tileset *tileset = nullptr;
 	terrain_type *base_terrain_type = nullptr;
 	terrain_type *base_overlay_terrain_type = nullptr;
 	terrain_type *border_terrain_type = nullptr;

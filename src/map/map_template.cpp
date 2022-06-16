@@ -58,6 +58,7 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
+#include "map/tileset.h"
 #include "map/world.h"
 #include "map/world_game_data.h"
 #include "player/civilization.h"
@@ -2728,6 +2729,8 @@ void map_template::load_terrain(const bool overlay)
 		this->load_wesnoth_terrain_file();
 	} else if (terrain_filepath.extension() == ".pmp" && !overlay) {
 		this->load_0_ad_terrain_file();
+	} else if (terrain_filepath.extension() == ".sms" && !overlay) {
+		this->load_stratagus_terrain_file();
 	} else {
 		throw std::runtime_error("Invalid terrain file extension: \"" + terrain_filepath.extension().string() + "\".");
 	}
@@ -3083,6 +3086,53 @@ void map_template::load_0_ad_terrain_file()
 	std::sort(this->units.begin(), this->units.end(), [](const std::unique_ptr<map_template_unit> &lhs, const std::unique_ptr<map_template_unit> &rhs) {
 		return lhs->is_temporary() == rhs->is_temporary() || lhs->is_temporary();
 	});
+}
+
+void map_template::load_stratagus_terrain_file()
+{
+	assert_throw(this->get_tileset() != nullptr);
+
+	const std::filesystem::path &terrain_filepath = this->get_terrain_file();
+
+	std::vector<std::vector<std::string>> terrain_strings;
+
+	std::ifstream is_map(terrain_filepath);
+
+	this->terrain_image = QImage(this->get_size(), QImage::Format_RGBA8888);
+	this->terrain_image.fill(Qt::transparent);
+
+	this->overlay_terrain_image = QImage(this->get_size(), QImage::Format_RGBA8888);
+	this->overlay_terrain_image.fill(Qt::transparent);
+
+	std::string line_str;
+
+	while (std::getline(is_map, line_str)) {
+		try {
+			static const std::string set_tile_prefix = "SetTile(";
+			static const std::string set_tile_suffix = ")";
+
+			if (line_str.starts_with(set_tile_prefix)) {
+				const std::string set_tile_str = line_str.substr(set_tile_prefix.size(), line_str.size() - set_tile_prefix.size() - set_tile_suffix.size());
+
+				const std::vector<std::string> set_tile_str_list = string::split(set_tile_str, ',');
+
+				assert_throw(set_tile_str_list.size() == 4);
+
+				const std::string &tile_number_str = set_tile_str_list.at(0);
+				const std::string &tile_x_str = set_tile_str_list.at(1);
+				const std::string &tile_y_str = set_tile_str_list.at(2);
+
+				const int tile_number = std::stoi(tile_number_str);
+				const int tile_x = std::stoi(tile_x_str);
+				const int tile_y = std::stoi(tile_y_str);
+
+				const terrain_type *terrain = this->get_tileset()->get_terrain_type_by_tile_number(tile_number);
+				map_template::set_terrain_image_pixel(this->terrain_image, QPoint(tile_x, tile_y), terrain);
+			}
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to process line string \"" + line_str + "\" for terrain file \"" + terrain_filepath.string() + "\"."));
+		}
+	}
 }
 
 QImage map_template::load_terrain_image_file(const std::filesystem::path &filepath)

@@ -172,6 +172,7 @@
 
 #include "map/tileset.h"
 
+#include "map/terrain_type.h"
 #include "map/tile_flag.h"
 #include "util/assert_util.h"
 #include "util/random.h"
@@ -185,39 +186,30 @@ CTile::CTile() : flag(tile_flag::none)
 
 namespace wyrmgus {
 
-void tileset::clear()
+void tileset::process_gsml_scope(const gsml_data &scope)
 {
-	Name.clear();
-	//Wyrmgus start
-	Ident.clear();
-	//Wyrmgus end
-	ImageFile.clear();
-	tiles.clear();
-	TileTypeTable.clear();
-	solidTerrainTypes.clear();
-	//Wyrmgus start
-	TreeUnderlayTerrain = 0;
-	RockUnderlayTerrain = 0;
-	//Wyrmgus end
-	topOneTreeTile = 0;
-	midOneTreeTile = 0;
-	botOneTreeTile = 0;
-	//Wyrmgus start
-//	removedTreeTile = 0;
-	removedTreeTiles.clear();
-	//Wyrmgus end
-	woodTable.fill(0);
-	mixedLookupTable.clear();
-	topOneRockTile = 0;
-	midOneRockTile = 0;
-	botOneRockTile = 0;
-	//Wyrmgus start
-//	removedRockTile = 0;
-	removedRockTiles.clear();
-	//Wyrmgus end
-	rockTable.fill(0);
-	humanWallTable.fill(0);
-	orcWallTable.fill(0);
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "tile_numbers") {
+		scope.for_each_child([&](const gsml_data &child_scope) {
+			const terrain_type *terrain_type = terrain_type::get(child_scope.get_tag());
+
+			for (const std::string &value : child_scope.get_values()) {
+				this->map_terrain_type_to_tile_number(terrain_type, std::stoi(value));
+			}
+		});
+	} else {
+		data_entry::process_gsml_scope(scope);
+	}
+}
+
+void tileset::map_terrain_type_to_tile_number(const terrain_type *terrain_type, const int tile_number)
+{
+	if (this->terrain_types_by_tile_number.contains(tile_number)) {
+		throw std::runtime_error("Tile number \"" + std::to_string(tile_number) + "\" is already used by another terrain type for tileset \"" + this->get_identifier() + "\".");
+	}
+
+	this->terrain_types_by_tile_number[tile_number] = terrain_type;
 }
 
 unsigned int tileset::getDefaultTileIndex() const

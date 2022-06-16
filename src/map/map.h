@@ -354,7 +354,7 @@ public:
 public:
 	bool NoFogOfWar = false;           /// fog of war disabled
 
-	std::unique_ptr<tileset> Tileset;          /// tileset data
+	qunique_ptr<tileset> Tileset;          /// tileset data
 	std::string TileModelsFileName; /// lua filename that loads all tilemodels
 	static std::shared_ptr<CGraphic> FogGraphics; //graphics for fog of war
 private:

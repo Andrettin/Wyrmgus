@@ -1776,10 +1776,11 @@ bool CanMoveToMask(const Vec2i &pos, const tile_flag mask, const int z)
 
 CMap::CMap()
 {
-	this->Tileset = std::make_unique<tileset>();
-
+	this->Tileset = make_qunique<tileset>("map");
 	this->Info = make_qunique<map_info>();
+
 	if (QApplication::instance()->thread() != QThread::currentThread()) {
+		this->Tileset->moveToThread(QApplication::instance()->thread());
 		this->Info->moveToThread(QApplication::instance()->thread());
 	}
 }
@@ -1904,8 +1905,12 @@ void CMap::Clean()
 
 	this->Info->reset();
 	this->NoFogOfWar = false;
-	this->Tileset->clear();
 	this->TileModelsFileName.clear();
+
+	this->Tileset = make_qunique<tileset>("map");
+	if (QApplication::instance()->thread() != QThread::currentThread()) {
+		this->Tileset->moveToThread(QApplication::instance()->thread());
+	}
 
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;

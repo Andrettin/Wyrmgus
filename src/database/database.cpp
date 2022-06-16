@@ -64,6 +64,7 @@
 #include "map/site.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "map/world.h"
 #include "missile/missile_class.h"
 #include "missile.h"
@@ -408,6 +409,8 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(terrain_feature::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::terrain_type*") {
 			new_property_value = QVariant::fromValue(terrain_type::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::tileset*") {
+			new_property_value = QVariant::fromValue(tileset::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::time_of_day*") {
 			new_property_value = QVariant::fromValue(time_of_day::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::time_of_day_schedule*") {
