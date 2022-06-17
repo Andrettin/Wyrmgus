@@ -2688,7 +2688,7 @@ void map_template::set_terrain_file(const std::filesystem::path &filepath)
 		return;
 	}
 
-	this->terrain_file = database::get()->get_maps_path(this->get_module()) / filepath;
+	this->terrain_file = database::get()->get_map_filepath(filepath);
 }
 
 void map_template::set_overlay_terrain_file(const std::filesystem::path &filepath)
@@ -2697,7 +2697,7 @@ void map_template::set_overlay_terrain_file(const std::filesystem::path &filepat
 		return;
 	}
 
-	this->overlay_terrain_file = database::get()->get_maps_path(this->get_module()) / filepath;
+	this->overlay_terrain_file = database::get()->get_map_filepath(filepath);
 }
 
 void map_template::set_trade_route_file(const std::filesystem::path &filepath)
@@ -2706,7 +2706,7 @@ void map_template::set_trade_route_file(const std::filesystem::path &filepath)
 		return;
 	}
 
-	this->trade_route_file = database::get()->get_maps_path(this->get_module()) / filepath;
+	this->trade_route_file = database::get()->get_map_filepath(filepath);
 }
 
 void map_template::load_terrain(const bool overlay)

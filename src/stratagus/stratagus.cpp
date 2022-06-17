@@ -557,8 +557,10 @@ void load_database(const bool initial_definition)
 	thread_pool::get()->co_spawn_sync([initial_definition]() -> boost::asio::awaitable<void> {
 		try {
 			co_await database::get()->load(initial_definition);
-		} catch (...) {
-			std::throw_with_nested(std::runtime_error("Error loading database."));
+		} catch (const std::exception &exception) {
+			exception::report(exception);
+			log::log_error("Error loading database.");
+			std::terminate();
 		}
 	});
 }

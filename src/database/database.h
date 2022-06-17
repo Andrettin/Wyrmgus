@@ -322,6 +322,30 @@ public:
 		throw std::runtime_error("Graphics file \"" + relative_filepath.string() + "\" not found.");
 	}
 
+	std::filesystem::path get_map_filepath(const std::filesystem::path &relative_filepath) const
+	{
+		const data_module *preferred_module = this->get_current_module();
+
+		const std::filesystem::path preferred_path = this->get_maps_path(preferred_module) / relative_filepath;
+
+		if (std::filesystem::exists(preferred_path)) {
+			return preferred_path;
+		}
+
+		const std::vector<std::filesystem::path> maps_paths = this->get_maps_paths();
+
+		//iterate the maps paths in reverse other, so that modules loaded later can override maps of those loaded earlier
+		for (auto iterator = maps_paths.rbegin(); iterator != maps_paths.rend(); ++iterator) {
+			std::filesystem::path filepath = *iterator / relative_filepath;
+
+			if (std::filesystem::exists(filepath)) {
+				return filepath;
+			}
+		}
+
+		throw std::runtime_error("Map file \"" + relative_filepath.string() + "\" not found.");
+	}
+
 	std::filesystem::path get_shaders_path() const
 	{
 		return this->get_root_path() / database::shaders_folder;
