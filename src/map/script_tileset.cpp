@@ -244,8 +244,6 @@ void tileset::parseSlots(lua_State *l, int t)
 
 void tileset::parse(lua_State *l)
 {
-	clear();
-
 	const int args = lua_gettop(l);
 	for (int j = 1; j < args; ++j) {
 		const char *value = LuaToString(l, j);
