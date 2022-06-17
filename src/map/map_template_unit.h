@@ -100,6 +100,16 @@ public:
 		this->resource_amount = amount;
 	}
 
+	bool is_position_adjustment_enabled() const
+	{
+		return this->position_adjustment_enabled;
+	}
+
+	void set_position_adjustment_enabled(const bool enabled)
+	{
+		this->position_adjustment_enabled = enabled;
+	}
+
 private:
 	const unit_type *type = nullptr;
 	const wyrmgus::unit_class *unit_class = nullptr;
@@ -108,6 +118,7 @@ private:
 	const wyrmgus::faction *faction = nullptr;
 	int player_index = -1;
 	int resource_amount = 0;
+	bool position_adjustment_enabled = true;
 };
 
 }

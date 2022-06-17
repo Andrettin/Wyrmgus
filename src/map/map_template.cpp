@@ -2109,7 +2109,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 
 			const int resource_amount = map_template_unit->get_resource_amount();
 
-			CUnit *unit = CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z, true, nullptr, true);
+			CUnit *unit = CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z, map_template_unit->is_position_adjustment_enabled(), nullptr, true);
 
 			if (resource_amount > 0) {
 				unit->SetResourcesHeld(resource_amount);
@@ -3105,14 +3105,17 @@ void map_template::load_stratagus_terrain_file()
 	this->overlay_terrain_image.fill(Qt::transparent);
 
 	std::string line_str;
+	map_template_unit *last_unit = nullptr;
 
 	while (std::getline(is_map, line_str)) {
 		try {
 			static const std::string set_tile_prefix = "SetTile(";
-			static const std::string set_tile_suffix = ")";
+			static const std::string create_unit_prefix = "unit = CreateUnit(";
+			static const std::string set_resources_held_prefix = "SetResourcesHeld(unit, ";
+			static const std::string line_suffix = ")";
 
 			if (line_str.starts_with(set_tile_prefix)) {
-				const std::string set_tile_str = line_str.substr(set_tile_prefix.size(), line_str.size() - set_tile_prefix.size() - set_tile_suffix.size());
+				const std::string set_tile_str = line_str.substr(set_tile_prefix.size(), line_str.size() - set_tile_prefix.size() - line_suffix.size());
 
 				const std::vector<std::string> set_tile_str_list = string::split(set_tile_str, ',');
 
@@ -3128,6 +3131,60 @@ void map_template::load_stratagus_terrain_file()
 
 				const terrain_type *terrain = this->get_tileset()->get_terrain_type_by_tile_number(tile_number);
 				map_template::set_terrain_image_pixel(this->terrain_image, QPoint(tile_x, tile_y), terrain);
+			} else if (line_str.starts_with(create_unit_prefix)) {
+				std::string create_unit_str = line_str.substr(create_unit_prefix.size(), line_str.size() - create_unit_prefix.size() - line_suffix.size());
+				string::replace(create_unit_str, '\"', "");
+				string::replace(create_unit_str, '{', "");
+				string::replace(create_unit_str, '}', "");
+
+				const std::vector<std::string> create_unit_str_list = string::split(create_unit_str, ',');
+
+				assert_throw(create_unit_str_list.size() == 4);
+
+				const std::string &unit_type_str = create_unit_str_list.at(0);
+				const std::string &unit_player_str = create_unit_str_list.at(1);
+				const std::string &unit_x_str = create_unit_str_list.at(2);
+				const std::string &unit_y_str = create_unit_str_list.at(3);
+
+				const unit_type *unit_type = unit_type::try_get(unit_type_str);
+
+				if (unit_type == nullptr) {
+					continue;
+				}
+
+				int unit_player_index = std::stoi(unit_player_str);
+
+				if (unit_player_index == 15) {
+					unit_player_index = PlayerNumNeutral;
+				}
+
+				if (game::get()->get_current_campaign() != nullptr && unit_player_index != PlayerNumNeutral) {
+					//ignore non-neutral units for campaigns, or replace them with what they would be built ontop of
+					const CBuildRestrictionOnTop *ontop = OnTopDetails(*unit_type, nullptr);
+					if (ontop != nullptr && ontop->Parent != nullptr && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+						unit_type = ontop->Parent;
+						unit_player_index = PlayerNumNeutral;
+					} else {
+						continue;
+					}
+				}
+
+				const int unit_x = std::stoi(unit_x_str);
+				const int unit_y = std::stoi(unit_y_str);
+
+				auto unit = std::make_unique<map_template_unit>(unit_type, true);
+				unit->set_pos(QPoint(unit_x, unit_y) + unit_type->get_tile_center_pos_offset());
+				unit->set_player_index(unit_player_index);
+				unit->set_position_adjustment_enabled(false);
+				last_unit = unit.get();
+				this->units.push_back(std::move(unit));
+			} else if (line_str.starts_with(set_resources_held_prefix)) {
+				std::string set_resources_held_str = line_str.substr(set_resources_held_prefix.size(), line_str.size() - set_resources_held_prefix.size() - line_suffix.size());
+
+				const int resources_held = std::stoi(set_resources_held_str);
+
+				assert_throw(last_unit != nullptr);
+				last_unit->set_resource_amount(resources_held);
 			}
 		} catch (...) {
 			std::throw_with_nested(std::runtime_error("Failed to process line string \"" + line_str + "\" for terrain file \"" + terrain_filepath.string() + "\"."));
