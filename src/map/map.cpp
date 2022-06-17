@@ -156,46 +156,6 @@ void CMap::MarkSeenTile(wyrmgus::tile &mf)
 	const Vec2i pos = {x, y}
 #endif
 
-	//Wyrmgus start
-	/*
-	if (this->Tileset->TileTypeTable.empty() == false) {
-#ifndef MINIMAP_UPDATE
-		//rb - GRRRRRRRRRRRR
-		const unsigned int index = &mf - this->Fields;
-		const int y = index / Info.MapWidth;
-		const int x = index - (y * Info.MapWidth);
-		const Vec2i pos(x, y);
-#endif
-
-		//  Handle wood changes. FIXME: check if for growing wood correct?
-		if (tile == this->Tileset->getRemovedTreeTile()) {
-			FixNeighbors(tile_flag::tree, 1, pos);
-		} else if (seentile == this->Tileset->getRemovedTreeTile()) {
-			FixTile(tile_flag::tree, 1, pos);
-		} else if (mf.ForestOnMap()) {
-			FixTile(tile_flag::tree, 1, pos);
-			FixNeighbors(tile_flag::tree, 1, pos);
-
-			// Handle rock changes.
-		} else if (tile == Tileset->getRemovedRockTile()) {
-			FixNeighbors(tile_flag::rock, 1, pos);
-		} else if (seentile == Tileset->getRemovedRockTile()) {
-			FixTile(tile_flag::rock, 1, pos);
-		} else if (mf.RockOnMap()) {
-			FixTile(tile_flag::rock, 1, pos);
-			FixNeighbors(tile_flag::rock, 1, pos);
-
-			//  Handle Walls changes.
-		} else if (this->Tileset->isAWallTile(tile)
-				   || this->Tileset->isAWallTile(seentile)) {
-		//Wyrmgus end
-			MapFixSeenWallTile(pos);
-			MapFixSeenWallNeighbors(pos);
-		}
-	}
-	*/
-	//Wyrmgus end
-
 #ifdef MINIMAP_UPDATE
 	//Wyrmgus start
 //	UI.get_minimap()->UpdateXY(pos);
@@ -1532,21 +1492,6 @@ void PreprocessMap()
 		}
 
 		CMap::get()->calculate_settlement_resource_units();
-
-		//Wyrmgus start
-		/*
-		// it is required for fixing the wood that all tiles are marked as seen!
-		if (this->Tileset->TileTypeTable.empty() == false) {
-			Vec2i pos;
-			for (pos.x = 0; pos.x < this->Info->MapWidth; ++pos.x) {
-				for (pos.y = 0; pos.y < this->Info->MapHeight; ++pos.y) {
-					MapFixWallTile(pos);
-					MapFixSeenWallTile(pos);
-				}
-			}
-		}
-		*/
-		//Wyrmgus end
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error preprocessing the map."));
 	}
@@ -2158,133 +2103,6 @@ void CMap::do_per_cycle_loop()
 /*----------------------------------------------------------------------------
 -- Map Tile Update Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Correct the seen wood field, depending on the surrounding.
-**
-**  @param type  type of tile to update
-**  @param seen  1 if updating seen value, 0 for real
-**  @param pos   Map tile-position.
-*/
-//Wyrmgus start
-/*
-void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
-{
-	assert_throw(type == tile_flag::tree || type == tile_flag::rock);
-
-	//  Outside of map or no wood.
-	if (!Info.IsPointOnMap(pos)) {
-		return;
-	}
-	unsigned int index = getIndex(pos);
-	wyrmgus::tile &mf = *this->Field(index);
-
-	if (!((type == tile_flag::tree && Tileset->isAWoodTile(mf.player_info->SeenTile))
-		  || (type == tile_flag::rock && Tileset->isARockTile(mf.player_info->SeenTile)))) {
-		if (seen) {
-			return;
-		}
-	}
-
-	if (!seen && !(mf.get_flags() & type)) {
-		return;
-	}
-
-	// Select Table to lookup
-	int removedtile;
-	int flags;
-	if (type == tile_flag::tree) {
-		removedtile = this->Tileset->getRemovedTreeTile();
-		flags = (tile_flag::tree | tile_flag::impassable);
-	} else { // (type == tile_flag::rock)
-		removedtile = this->Tileset->getRemovedRockTile();
-		flags = (tile_flag::rock | tile_flag::impassable);
-	}
-	//  Find out what each tile has with respect to wood, or grass.
-	int ttup;
-	int ttdown;
-	int ttleft;
-	int ttright;
-
-	if (pos.y - 1 < 0) {
-		ttup = -1; //Assign trees in all directions
-	} else {
-		const wyrmgus::tile &new_mf = *(&mf - this->Info->MapWidth);
-		ttup = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
-	}
-	if (pos.x + 1 >= this->Info->MapWidth) {
-		ttright = -1; //Assign trees in all directions
-	} else {
-		const wyrmgus::tile &new_mf = *(&mf + 1);
-		ttright = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
-	}
-	if (pos.y + 1 >= this->Info->MapHeight) {
-		ttdown = -1; //Assign trees in all directions
-	} else {
-		const wyrmgus::tile &new_mf = *(&mf + this->Info->MapWidth);
-		ttdown = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
-	}
-	if (pos.x - 1 < 0) {
-		ttleft = -1; //Assign trees in all directions
-	} else {
-		const wyrmgus::tile &new_mf = *(&mf - 1);
-		ttleft = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
-	}
-	int tile = this->Tileset->getTileBySurrounding(type, ttup, ttright, ttdown, ttleft);
-
-	//Update seen tile.
-	if (tile == -1) { // No valid wood remove it.
-		if (seen) {
-			mf.player_info->SeenTile = removedtile;
-			this->FixNeighbors(type, seen, pos);
-		} else {
-			mf.setGraphicTile(removedtile);
-			mf.Flags &= ~flags;
-			mf.set_value(0);
-			UI.get_minimap()->UpdateXY(pos);
-		}
-	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.player_info->SeenTile)) { //Same Type
-		return;
-	} else {
-		if (seen) {
-			mf.player_info->SeenTile = tile;
-		} else {
-			mf.setGraphicTile(tile);
-		}
-	}
-
-	//maybe is_explored
-	if (mf.player_info->is_explored(*ThisPlayer)) {
-		UI.get_minimap()->UpdateSeenXY(pos);
-		if (!seen) {
-			MarkSeenTile(mf);
-		}
-	}
-}
-*/
-//Wyrmgus end
-
-/**
-**  Correct the surrounding fields.
-**
-**  @param type  Tiletype of tile to adjust
-**  @param seen  1 if updating seen value, 0 for real
-**  @param pos   Map tile-position.
-*/
-//Wyrmgus start
-/*
-void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
-{
-	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1),
-							Vec2i(-1, -1), Vec2i(-1, 1), Vec2i(1, -1), Vec2i(1, 1)
-						   };
-
-	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
-		FixTile(type, seen, pos + offset[i]);
-	}
-}
-*/
-//Wyrmgus end
 
 //Wyrmgus start
 void CMap::SetTileTerrain(const QPoint &pos, const terrain_type *terrain, const int z)
@@ -4409,48 +4227,6 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 		}
 	}
 }
-//Wyrmgus end
-
-//Wyrmgus start
-/*
-/// Remove wood from the map.
-void CMap::ClearWoodTile(const Vec2i &pos)
-{
-	wyrmgus::tile &mf = *this->Field(pos);
-
-	mf.setGraphicTile(this->Tileset->getRemovedTreeTile());
-	mf.Flags &= ~(tile_flag::tree | tile_flag::impassable);
-	mf.set_value(0);
-
-	UI.get_minimap()->UpdateXY(pos);
-	FixNeighbors(tile_flag::tree, 0, pos);
-
-	//maybe is_explored
-	if (mf.player_info->is_explored(*ThisPlayer)) {
-		UI.get_minimap()->UpdateSeenXY(pos);
-		MarkSeenTile(mf);
-	}
-}
-
-/// Remove rock from the map.
-void CMap::ClearRockTile(const Vec2i &pos)
-{
-	wyrmgus::tile &mf = *this->Field(pos);
-
-	mf.setGraphicTile(this->Tileset->getRemovedRockTile());
-	mf.Flags &= ~(tile_flag::rock | tile_flag::impassable);
-	mf.set_value(0);
-	
-	UI.get_minimap()->UpdateXY(pos);
-	FixNeighbors(tile_flag::rock, 0, pos);
-
-	//maybe is_explored
-	if (mf.player_info->is_explored(*ThisPlayer)) {
-		UI.get_minimap()->UpdateSeenXY(pos);
-		MarkSeenTile(mf);
-	}
-}
-*/
 //Wyrmgus end
 
 void CMap::handle_destroyed_overlay_terrain()

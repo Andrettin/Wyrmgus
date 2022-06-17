@@ -234,38 +234,6 @@ void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 			}
 		}
 	}
-
-	/*
-	if (topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile()
-		&& topMf.get_value() >= forest_regeneration_threshold
-		&& !(topMf.Flags & occupied_flag)) {
-		DebugPrint("Real place wood\n");
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
-		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
-		topMf.player_info->SeenTile = topMf.getGraphicTile();
-		topMf.set_value(0);
-		topMf.Flags |= tile_flag::tree | tile_flag::impassable;
-		UI.get_minimap()->UpdateSeenXY(pos + offset);
-		UI.get_minimap()->UpdateXY(pos + offset);
-		
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
-		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
-		mf.player_info->SeenTile = mf.getGraphicTile();
-		mf.set_value(0);
-		mf.Flags |= tile_flag::tree | tile_flag::impassable;
-		UI.get_minimap()->UpdateSeenXY(pos);
-		UI.get_minimap()->UpdateXY(pos);
-		
-		if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(mf);
-		}
-		if (Map.Field(pos + offset)->player_info->IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(topMf);
-		}
-		FixNeighbors(tile_flag::tree, 0, pos + offset);
-		FixNeighbors(tile_flag::tree, 0, pos);
-	}
-	*/
 }
 
 /**

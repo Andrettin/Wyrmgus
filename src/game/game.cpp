@@ -846,11 +846,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, const int writeTerrain)
 			for (const std::unique_ptr<CMapLayer> &map_layer: map.MapLayers) {
 				for (int y = 0; y < map_layer->get_height(); ++y) {
 					for (int x = 0; x < map_layer->get_width(); ++x) {
-						//Wyrmgus start
 						const tile &mf = *map_layer->Field(x, y);
-	//					const int tile = mf.getGraphicTile();
-	//					const int n = map.Tileset->findTileIndexByTile(tile);
-						//Wyrmgus end
 						const int value = mf.get_value();
 						//Wyrmgus start
 	//					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
