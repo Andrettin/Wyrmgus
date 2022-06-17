@@ -198,64 +198,11 @@ public:
 	}
 
 	unsigned int getDefaultTileIndex() const;
-	//Wyrmgus start
-	unsigned int getDefaultWoodTileIndex() const;
-	//Wyrmgus end
-
-	bool isAWallTile(unsigned tile) const;
-	bool isAWoodTile(unsigned tile) const;
-	bool isARockTile(unsigned tile) const;
-
-	//Wyrmgus start
-//	unsigned getRemovedRockTile() const { return removedRockTile; }
-//	unsigned getRemovedTreeTile() const { return removedTreeTile; }
-	unsigned getRemovedRockTile() const;
-	unsigned getRemovedTreeTile() const;
-	//Wyrmgus end
-	unsigned getBottomOneTreeTile() const
-	{
-		return this->botOneTreeTile;
-	}
-
-	unsigned getTopOneTreeTile() const
-	{
-		return this->topOneTreeTile;
-	}
-
-	unsigned getMidOneTreeTile() const
-	{
-		return this->midOneTreeTile;
-	}
-	
-	unsigned getHumanWallTileIndex(int dirFlag) const;
-	unsigned getOrcWallTileIndex(int dirFlag) const;
-	unsigned getHumanWallTileIndex_broken(int dirFlag) const;
-	unsigned getOrcWallTileIndex_broken(int dirFlag) const;
-	unsigned getHumanWallTileIndex_destroyed(int dirFlag) const;
-	unsigned getOrcWallTileIndex_destroyed(int dirFlag) const;
-
-	unsigned int getSolidTerrainCount() const;
 
 	const std::string &getTerrainName(int solidTerrainIndex) const;
 
 	int findTileIndexByTile(unsigned int tile) const;
 	unsigned int getTileNumber(int basic, bool random, bool filler) const;
-	void fillSolidTiles(std::vector<unsigned int> *solidTiles) const;
-
-	unsigned getQuadFromTile(unsigned int tileIndex) const;
-	//Wyrmgus start
-	int getFromMixedLookupTable(int base_terrain, int tile) const;
-//	int getTileBySurrounding(const tile_flag type
-	int getTileBySurrounding(const tile_flag type,
-							 int tile_index,
-	//Wyrmgus end
-							 int up, int right,
-							 int bottom, int left) const;
-	int tileFromQuad(unsigned fixed, unsigned quad) const;
-	//Wyrmgus start
-//	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
-	bool isEquivalentTile(unsigned int tile1, unsigned int tile2, int tile_index) const;
-	//Wyrmgus end
 
 	void parse(lua_State *l);
 	void buildTable();
@@ -264,59 +211,23 @@ private:
 	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
 	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
 	int getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const;
-	void buildWallReplacementTable();
 	void parseSlots(lua_State *l, int t);
 	void parseSpecial(lua_State *l);
 	void parseSolid(lua_State *l);
 	void parseMixed(lua_State *l);
-	int findTilePath(int base, int goal, int length, std::vector<char> &marks, int *tileIndex) const;
 
 public:
-	std::string Name;           /// Nice name to display
 	//Wyrmgus start
 	std::string Ident;			/// Ident of the tileset
 	//Wyrmgus end
-	std::string ImageFile;      /// File containing image data
 
-public:
 	std::vector<CTile> tiles;
 
-	// TODO: currently hardcoded
-	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
 	//Wyrmgus start
 	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
-	int TreeUnderlayTerrain = 0;
-	int RockUnderlayTerrain = 0;
-	std::vector<unsigned> removedTreeTiles;  /// Tiles placed where trees are gone
-	std::vector<unsigned> removedRockTiles;  /// Tiles placed where trees are gone
 	//Wyrmgus end
 
 private:
-	//Wyrmgus start
-//	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
-	//Wyrmgus end
-
-	//Wyrmgus start
-//	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used
-	std::map<std::pair<int,int>, int> mixedLookupTable;  /// Lookup for what part of tile used; mapped to a pair, which has its first element as the tile type and the second element as the graphic tile
-	//Wyrmgus end
-	unsigned topOneTreeTile = 0;   /// Tile for one tree top
-	unsigned midOneTreeTile = 0;   /// Tile for one tree middle
-	unsigned botOneTreeTile = 0;   /// Tile for one tree bottom
-	//Wyrmgus start
-//	unsigned removedTreeTile;  /// Tile placed where trees are gone
-	//Wyrmgus end
-	std::array<int, 20> woodTable{};     /// Table for tree removable
-	unsigned topOneRockTile = 0;   /// Tile for one rock top
-	unsigned midOneRockTile = 0;   /// Tile for one rock middle
-	unsigned botOneRockTile = 0;   /// Tile for one rock bottom
-	//Wyrmgus start
-//	unsigned removedRockTile;  /// Tile placed where rocks are gone
-	//Wyrmgus end
-	std::array<int, 20> rockTable{};     /// Removed rock placement table
-	std::array<unsigned, 16> humanWallTable{};  /// Human wall placement table
-	std::array<unsigned, 16> orcWallTable{};    /// Orc wall placement table
-
 	std::map<int, const terrain_type *> terrain_types_by_tile_number;
 };
 

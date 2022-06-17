@@ -2349,15 +2349,13 @@ boost::asio::awaitable<void> CEditor::Init()
 	Units.Icon = nullptr;
 	Units.Load();
 
-	//Wyrmgus start
-//	Map.Tileset->fillSolidTiles(&CEditor::get()->ShownTileTypes);
 	CEditor::get()->ShownTileTypes.clear();
 	for (terrain_type *terrain_type : terrain_type::get_all()) {
 		if (!terrain_type->is_hidden()) {
 			CEditor::get()->ShownTileTypes.push_back(terrain_type);
 		}
 	}
-	//Wyrmgus end
+
 	VisibleTileIcons = CalculateVisibleIcons(true);
 
 	RecalculateShownUnits();

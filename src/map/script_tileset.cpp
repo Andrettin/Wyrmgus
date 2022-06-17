@@ -79,48 +79,29 @@ void tileset::parseSpecial(lua_State *l)
 	}
 	const int args = lua_rawlen(l, -1);
 	
-	//Wyrmgus start
-	removedTreeTiles.clear();
-	removedRockTiles.clear();
-	//Wyrmgus end
-
 	for (int j = 0; j < args; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
 
 		if (!strcmp(value, "top-one-tree")) {
 			++j;
-			topOneTreeTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "mid-one-tree")) {
 			++j;
-			midOneTreeTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "bot-one-tree")) {
 			++j;
-			botOneTreeTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "removed-tree")) {
 			++j;
-			//Wyrmgus start
-//			removedTreeTile = LuaToNumber(l, -1, j + 1);
-			removedTreeTiles.push_back(LuaToNumber(l, -1, j + 1));
-			//Wyrmgus end
 		} else if (!strcmp(value, "growing-tree")) {
 			++j;
 			// keep for retro compatibility.
 			// TODO : remove when game data are updated.
 		} else if (!strcmp(value, "top-one-rock")) {
 			++j;
-			topOneRockTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "mid-one-rock")) {
 			++j;
-			midOneRockTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "bot-one-rock")) {
 			++j;
-			botOneRockTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "removed-rock")) {
 			++j;
-			//Wyrmgus start
-//			removedRockTile = LuaToNumber(l, -1, j + 1);
-			removedRockTiles.push_back(LuaToNumber(l, -1, j + 1));
-			//Wyrmgus end
 		} else {
 			LuaError(l, "special: unsupported tag: %s" _C_ value);
 		}
@@ -271,11 +252,9 @@ void tileset::parse(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "name")) {
-			this->Name = LuaToString(l, j);
 		} else if (!strcmp(value, "ident")) {
 			this->Ident = LuaToString(l, j);
 		} else if (!strcmp(value, "image")) {
-			this->ImageFile = LuaToString(l, j);
 		} else if (!strcmp(value, "slots")) {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");
@@ -289,391 +268,11 @@ void tileset::parse(lua_State *l)
 
 void tileset::buildTable()
 {
-	//  Calculate number of tiles in graphic tile
-	const int n = tiles.size();
-
-	mixedLookupTable.clear();
-
-	//  Build the TileTypeTable
-	TileTypeTable.resize(n, 0);
-
-	for (int i = 0; i < n; ++i) {
-		const int tile = tiles[i].tile;
-		if (tile == 0) {
-			continue;
-		}
-		const tile_flag flag = tiles[i].flag;
-		if ((flag & tile_flag::water_allowed) != tile_flag::none) {
-			TileTypeTable[tile] = TileTypeWater;
-		} else if ((flag & tile_flag::coast_allowed) != tile_flag::none) {
-			TileTypeTable[tile] = TileTypeCoast;
-		} else if ((flag & tile_flag::wall) != tile_flag::none) {
-			TileTypeTable[tile] = TileTypeWall;
-		} else if ((flag & tile_flag::rock) != tile_flag::none) {
-			TileTypeTable[tile] = TileTypeRock;
-		} else if ((flag & tile_flag::tree) != tile_flag::none) {
-			TileTypeTable[tile] = TileTypeWood;
-		}
-	}
-	//  mark the special tiles
-	if (topOneTreeTile) {
-		TileTypeTable[topOneTreeTile] = TileTypeWood;
-	}
-	if (midOneTreeTile) {
-		TileTypeTable[midOneTreeTile] = TileTypeWood;
-	}
-	if (botOneTreeTile) {
-		TileTypeTable[botOneTreeTile] = TileTypeWood;
-	}
-	if (topOneRockTile) {
-		TileTypeTable[topOneRockTile] = TileTypeRock;
-	}
-	if (midOneRockTile) {
-		TileTypeTable[midOneRockTile] = TileTypeRock;
-	}
-	if (botOneRockTile) {
-		TileTypeTable[botOneRockTile] = TileTypeRock;
-	}
-
-	//  Build wood removement table.
-	int wood_terrain_type = 0;
-	int solid = 0;
-	int mixed = 0;
-	for (int i = 0; i < n;) {
-		const CTile &tile = tiles[i];
-		const CTileInfo &tileinfo = tile.tileinfo;
-		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
-			if ((tile.flag & tile_flag::tree) != tile_flag::none) {
-				mixed = i;
-				//Wyrmgus start
-				//set the default terrain underlays for trees
-				if (this->TreeUnderlayTerrain == 0) {
-					this->TreeUnderlayTerrain = tileinfo.MixTerrain;
-				}
-				//Wyrmgus end
-			}
-			i += 256;
-		} else {
-			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
-				if ((tile.flag & tile_flag::tree) != tile_flag::none) {
-					solid = i;
-					wood_terrain_type = tileinfo.BaseTerrain;
-				}
-			}
-			i += 16;
-		}
-	}
-	woodTable[ 0] = -1;
-	woodTable[ 1] = tiles[mixed + 0x30].tile;
-	woodTable[ 2] = tiles[mixed + 0x70].tile;
-	woodTable[ 3] = tiles[mixed + 0xB0].tile;
-	woodTable[ 4] = tiles[mixed + 0x10].tile;
-	woodTable[ 5] = tiles[mixed + 0x50].tile;
-	woodTable[ 6] = tiles[mixed + 0x90].tile;
-	woodTable[ 7] = tiles[mixed + 0xD0].tile;
-	woodTable[ 8] = tiles[mixed + 0x00].tile;
-	woodTable[ 9] = tiles[mixed + 0x40].tile;
-	woodTable[10] = tiles[mixed + 0x80].tile;
-	woodTable[11] = tiles[mixed + 0xC0].tile;
-	woodTable[12] = tiles[mixed + 0x20].tile;
-	woodTable[13] = tiles[mixed + 0x60].tile;
-	woodTable[14] = tiles[mixed + 0xA0].tile;
-	woodTable[15] = tiles[solid].tile;
-	woodTable[16] = -1;
-	woodTable[17] = botOneTreeTile;
-	woodTable[18] = topOneTreeTile;
-	woodTable[19] = midOneTreeTile;
-
-	//Mark which corners of each tile has tree in it.
-	//All corners for solid tiles. (Same for rocks)
-	//1 Bottom Left
-	//2 Bottom Right
-	//4 Top Right
-	//8 Top Left
-	//16 Bottom Tree Tile
-	//32 Top Tree Tile
-	for (int i = solid; i < solid + 16; ++i) {
-		//Wyrmgus start
-//		mixedLookupTable[tiles[i].tile] = 15;
-		mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 15;
-		//Wyrmgus end
-	}
-	for (int i = mixed; i < mixed + 256; ++i) {
-		int check = (int)((i - mixed) / 16);
-
-		switch (check) {
-			//Wyrmgus start
-			/*
-			case 0: mixedLookupTable[tiles[i].tile] = 8; break;
-			case 1: mixedLookupTable[tiles[i].tile] = 4; break;
-			case 2: mixedLookupTable[tiles[i].tile] = 8 + 4; break;
-			case 3: mixedLookupTable[tiles[i].tile] = 1; break;
-			case 4: mixedLookupTable[tiles[i].tile] = 8 + 1; break;
-			case 5: mixedLookupTable[tiles[i].tile] = 4 + 1; break;
-			case 6: mixedLookupTable[tiles[i].tile] = 8 + 4 + 1; break;
-			case 7: mixedLookupTable[tiles[i].tile] = 2; break;
-			case 8: mixedLookupTable[tiles[i].tile] = 8 + 2; break;
-			case 9: mixedLookupTable[tiles[i].tile] = 4 + 2; break;
-			case 10: mixedLookupTable[tiles[i].tile] = 8 + 4 + 2; break;
-			case 11: mixedLookupTable[tiles[i].tile] = 2 + 1; break;
-			case 12: mixedLookupTable[tiles[i].tile] = 8 + 2 + 1; break;
-			case 13:  mixedLookupTable[tiles[i].tile] = 4 + 2 + 1; break;
-			default: mixedLookupTable[tiles[i].tile] = 0; break;
-			*/
-			case 0: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8; break;
-			case 1: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4; break;
-			case 2: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4; break;
-			case 3: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 1; break;
-			case 4: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 1; break;
-			case 5: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 1; break;
-			case 6: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4 + 1; break;
-			case 7: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 2; break;
-			case 8: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 2; break;
-			case 9: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 2; break;
-			case 10: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4 + 2; break;
-			case 11: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 2 + 1; break;
-			case 12: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 2 + 1; break;
-			case 13: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 2 + 1; break;
-			default: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 0; break;
-			//Wyrmgus end
-		}
-	}
-	//16 Bottom Tree Special
-	//32 Top Tree Special
-	//64 Mid tree special - differentiate with mixed tiles.
-	//Wyrmgus start
-	/*
-	mixedLookupTable[botOneTreeTile] = 12 + 16;
-	mixedLookupTable[topOneTreeTile] = 3 + 32;
-	mixedLookupTable[midOneTreeTile] = 15 + 48;
-	*/
-	mixedLookupTable[std::pair<int, int>(wood_terrain_type, botOneTreeTile)] = 12 + 16;
-	mixedLookupTable[std::pair<int, int>(wood_terrain_type, topOneTreeTile)] = 3 + 32;
-	mixedLookupTable[std::pair<int, int>(wood_terrain_type, midOneTreeTile)] = 15 + 48;
-	//Wyrmgus end
-
-	//  Build rock removement table.
-	//Wyrmgus start
-	int rock_terrain_type = 0;
-	//Wyrmgus end
-	mixed = 0;
-	solid = 0;
-	for (int i = 0; i < n;) {
-		const CTile &tile = tiles[i];
-		const CTileInfo &tileinfo = tile.tileinfo;
-		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
-			if ((tile.flag & tile_flag::rock) != tile_flag::none) {
-				mixed = i;
-				//Wyrmgus start
-				//set the default terrain underlays for trees
-				if (this->RockUnderlayTerrain == 0) {
-					this->RockUnderlayTerrain = tileinfo.MixTerrain;
-				}
-				//Wyrmgus end
-			}
-			i += 256;
-		} else {
-			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
-				if ((tile.flag & tile_flag::rock) != tile_flag::none) {
-					solid = i;
-					//Wyrmgus start
-					rock_terrain_type = tileinfo.BaseTerrain;
-					//Wyrmgus end
-				}
-			}
-			i += 16;
-		}
-	}
-
-	//Mark which corners of each tile has rock in it.
-	//All corners for solid tiles.
-	//1 Bottom Left
-	//2 Bottom Right
-	//4 Top Right
-	//8 Top Left
-	for (int i = solid; i < solid + 16; ++i) {
-		//Wyrmgus start
-//		mixedLookupTable[tiles[i].tile] = 15;
-		mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 15;
-		//Wyrmgus end
-	}
-	for (int i = mixed; i < mixed + 256; ++i) {
-		int check = (int)((i - mixed) / 16);
-		switch (check) {
-			//Wyrmgus start
-			/*
-			case 0: mixedLookupTable[tiles[i].tile] = 8; break;
-			case 1: mixedLookupTable[tiles[i].tile] = 4; break;
-			case 2: mixedLookupTable[tiles[i].tile] = 8 + 4; break;
-			case 3: mixedLookupTable[tiles[i].tile] = 1; break;
-			case 4: mixedLookupTable[tiles[i].tile] = 8 + 1; break;
-			case 5: mixedLookupTable[tiles[i].tile] = 4 + 1; break;
-			case 6: mixedLookupTable[tiles[i].tile] = 8 + 4 + 1; break;
-			case 7: mixedLookupTable[tiles[i].tile] = 2; break;
-			case 8: mixedLookupTable[tiles[i].tile] = 8 + 2; break;
-			case 9: mixedLookupTable[tiles[i].tile] = 4 + 2; break;
-			case 10: mixedLookupTable[tiles[i].tile] = 8 + 4 + 2; break;
-			case 11: mixedLookupTable[tiles[i].tile] = 2 + 1; break;
-			case 12: mixedLookupTable[tiles[i].tile] = 8 + 2 + 1; break;
-			case 13: mixedLookupTable[tiles[i].tile] = 4 + 2 + 1; break;
-			default: mixedLookupTable[tiles[i].tile] = 0; break;
-			*/
-			case 0: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8; break;
-			case 1: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4; break;
-			case 2: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4; break;
-			case 3: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 1; break;
-			case 4: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 1; break;
-			case 5: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 1; break;
-			case 6: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4 + 1; break;
-			case 7: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 2; break;
-			case 8: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 2; break;
-			case 9: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 2; break;
-			case 10: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4 + 2; break;
-			case 11: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 2 + 1; break;
-			case 12: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 2 + 1; break;
-			case 13: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 2 + 1; break;
-			default: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 0; break;
-			//Wyrmgus end
-		}
-	}
-
-	//Wyrmgus start
-	/*
-	mixedLookupTable[botOneRockTile] = 12 + 16;
-	mixedLookupTable[topOneRockTile] = 3 + 32;
-	mixedLookupTable[midOneRockTile] = 15 + 48;
-	*/
-	mixedLookupTable[std::pair<int, int>(rock_terrain_type, botOneRockTile)] = 12 + 16;
-	mixedLookupTable[std::pair<int, int>(rock_terrain_type, topOneRockTile)] = 3 + 32;
-	mixedLookupTable[std::pair<int, int>(rock_terrain_type, midOneRockTile)] = 15 + 48;
-	//Wyrmgus end
-
-	rockTable[ 0] = -1;
-	rockTable[ 1] = tiles[mixed + 0x30].tile;
-	rockTable[ 2] = tiles[mixed + 0x70].tile;
-	rockTable[ 3] = tiles[mixed + 0xB0].tile;
-	rockTable[ 4] = tiles[mixed + 0x10].tile;
-	rockTable[ 5] = tiles[mixed + 0x50].tile;
-	rockTable[ 6] = tiles[mixed + 0x90].tile;
-	rockTable[ 7] = tiles[mixed + 0xD0].tile;
-	rockTable[ 8] = tiles[mixed + 0x00].tile;
-	rockTable[ 9] = tiles[mixed + 0x40].tile;
-	rockTable[10] = tiles[mixed + 0x80].tile;
-	rockTable[11] = tiles[mixed + 0xC0].tile;
-	rockTable[12] = tiles[mixed + 0x20].tile;
-	rockTable[13] = tiles[mixed + 0x60].tile;
-	rockTable[14] = tiles[mixed + 0xA0].tile;
-	rockTable[15] = tiles[solid].tile;
-	rockTable[16] = -1;
-	rockTable[17] = botOneRockTile;
-	rockTable[18] = topOneRockTile;
-	rockTable[19] = midOneRockTile;
-
-	buildWallReplacementTable();
-	
 	//Wyrmgus start
 	for (size_t i = 0; i != this->solidTerrainTypes.size(); ++i) {
 		int default_tile_index = findTileIndex(static_cast<unsigned char>(i), 0);
 		if (default_tile_index != -1) {
 			this->solidTerrainTypes[i].DefaultTileIndex = default_tile_index;
-		}
-	}
-	//Wyrmgus end
-}
-
-void tileset::buildWallReplacementTable()
-{
-	// FIXME: Build wall replacement tables
-	humanWallTable[ 0] = 0x090;
-	humanWallTable[ 1] = 0x830;
-	humanWallTable[ 2] = 0x810;
-	humanWallTable[ 3] = 0x850;
-	humanWallTable[ 4] = 0x800;
-	humanWallTable[ 5] = 0x840;
-	humanWallTable[ 6] = 0x820;
-	humanWallTable[ 7] = 0x860;
-	humanWallTable[ 8] = 0x870;
-	humanWallTable[ 9] = 0x8B0;
-	humanWallTable[10] = 0x890;
-	humanWallTable[11] = 0x8D0;
-	humanWallTable[12] = 0x880;
-	humanWallTable[13] = 0x8C0;
-	humanWallTable[14] = 0x8A0;
-	humanWallTable[15] = 0x0B0;
-
-	orcWallTable[ 0] = 0x0A0;
-	orcWallTable[ 1] = 0x930;
-	orcWallTable[ 2] = 0x910;
-	orcWallTable[ 3] = 0x950;
-	orcWallTable[ 4] = 0x900;
-	orcWallTable[ 5] = 0x940;
-	orcWallTable[ 6] = 0x920;
-	orcWallTable[ 7] = 0x960;
-	orcWallTable[ 8] = 0x970;
-	orcWallTable[ 9] = 0x9B0;
-	orcWallTable[10] = 0x990;
-	orcWallTable[11] = 0x9D0;
-	orcWallTable[12] = 0x980;
-	orcWallTable[13] = 0x9C0;
-	orcWallTable[14] = 0x9A0;
-	orcWallTable[15] = 0x0C0;
-
-	//Wyrmgus start
-	/*
-	// Set destroyed walls to TileTypeUnknown
-	for (int i = 0; i < 16; ++i) {
-		int n = 0;
-		unsigned int tileIndex = humanWallTable[i];
-		while (tiles[tileIndex].tile) { // Skip good tiles
-			++tileIndex;
-			++n;
-		}
-		while (!tiles[tileIndex].tile) { // Skip separator
-			++tileIndex;
-			++n;
-		}
-		while (tiles[tileIndex].tile) { // Skip good tiles
-			++tileIndex;
-			++n;
-		}
-		while (!tiles[tileIndex].tile) { // Skip separator
-			++tileIndex;
-			++n;
-		}
-		while (n < 16 && tiles[tileIndex].tile) {
-			TileTypeTable[tiles[tileIndex].tile] = TileTypeUnknown;
-			++tileIndex;
-			++n;
-		}
-	}
-	*/
-	// this only needs to happen if there are actual wall tiles being used
-	if (tiles[humanWallTable[0]].tile) {
-		// Set destroyed walls to TileTypeUnknown
-		for (int i = 0; i < 16; ++i) {
-			int n = 0;
-			unsigned int tileIndex = humanWallTable[i];
-			while (tiles[tileIndex].tile) { // Skip good tiles
-				++tileIndex;
-				++n;
-			}
-			while (!tiles[tileIndex].tile) { // Skip separator
-				++tileIndex;
-				++n;
-			}
-			while (tiles[tileIndex].tile) { // Skip good tiles
-				++tileIndex;
-				++n;
-			}
-			while (!tiles[tileIndex].tile) { // Skip separator
-				++tileIndex;
-				++n;
-			}
-			while (n < 16 && tiles[tileIndex].tile) {
-				TileTypeTable[tiles[tileIndex].tile] = TileTypeUnknown;
-				++tileIndex;
-				++n;
-			}
 		}
 	}
 	//Wyrmgus end
