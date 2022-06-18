@@ -123,7 +123,7 @@ namespace gcn
         return mInput;
     }
 
-    boost::asio::awaitable<void> Gui::logic()
+    void Gui::logic()
     {
         if (!mTop)
         {
@@ -238,7 +238,7 @@ namespace gcn
 
         } // end if
 
-        co_await mTop->logic();
+        mTop->logic();
     }
 
     void Gui::draw(Widget* top, std::vector<std::function<void(renderer *)>> &render_commands)

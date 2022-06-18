@@ -156,7 +156,7 @@ void freeGuichan()
 **
 **  @param event  event to handle, null if no more events for this frame
 */
-boost::asio::awaitable<void> handleInput(const SDL_Event *event)
+void handleInput(const SDL_Event *event)
 {
 	if (event) {
 		if (Input) {
@@ -168,7 +168,7 @@ boost::asio::awaitable<void> handleInput(const SDL_Event *event)
 		}
 	} else {
 		if (Gui && Gui->getTop() != nullptr) {
-			co_await Gui->logic();
+			Gui->logic();
 		}
 	}
 }
@@ -1303,7 +1303,7 @@ void ScrollingWidget::add(gcn::Widget *widget, int x, int y)
 /**
 **  Scrolling the content when possible.
 */
-boost::asio::awaitable<void> ScrollingWidget::logic()
+void ScrollingWidget::logic()
 {
 	setDirty(true);
 	if (container.getHeight() + containerY - speedY > 0) {
@@ -1315,8 +1315,6 @@ boost::asio::awaitable<void> ScrollingWidget::logic()
 		finished = true;
 		generateAction();
 	}
-
-	co_return;
 }
 
 /**
@@ -2591,11 +2589,11 @@ void MenuScreen::draw(gcn::Graphics *graphics, std::vector<std::function<void(re
 	gcn::Container::draw(graphics, render_commands);
 }
 
-boost::asio::awaitable<void> MenuScreen::logic()
+void MenuScreen::logic()
 {
 	if (logiclistener) {
 		logiclistener->action("");
 	}
 
-	co_await Container::logic();
+	Container::logic();
 }

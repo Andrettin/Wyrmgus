@@ -844,7 +844,7 @@ namespace gcn
         graphics->popClipArea();
     }
 
-    boost::asio::awaitable<void> ScrollArea::logic()
+    void ScrollArea::logic()
     {
         checkPolicies();
 
@@ -856,7 +856,7 @@ namespace gcn
             mContent->setPosition(-mHScroll + getContentDimension().x + mContent->getBorderSize(),
                                   -mVScroll + getContentDimension().y + mContent->getBorderSize());
 
-            co_await mContent->logic();
+            mContent->logic();
         }
     }
 

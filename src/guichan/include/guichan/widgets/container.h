@@ -145,8 +145,7 @@ namespace gcn
 
         virtual void drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        [[nodiscard]]
-        virtual boost::asio::awaitable<void> logic() override;
+        virtual void logic() override;
 
         virtual void _setFocusHandler(FocusHandler* focusHandler);
 
@@ -183,8 +182,7 @@ namespace gcn
          * logic function will be called in the order the Widgets were added
          * to the Container.
          */
-        [[nodiscard]]
-        virtual boost::asio::awaitable<void> logicChildren();
+        virtual void logicChildren();
 
         Widget* mWidgetWithMouse;
         typedef std::list<Widget*> WidgetList;

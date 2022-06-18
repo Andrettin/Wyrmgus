@@ -146,8 +146,7 @@ namespace gcn
          * NOTE: Logic also deals with user input (Mouse and Keyboard)
          *       for Widgets.
          */
-        [[nodiscard]]
-        boost::asio::awaitable<void> logic();
+        void logic();
 
         /**
          * Draws the Gui. By calling this funcion all draw functions

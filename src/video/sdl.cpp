@@ -432,7 +432,7 @@ static boost::asio::awaitable<void> SdlDoEvent(const EventCallback &callbacks, S
 	}
 
 	if (&callbacks == GetCallbacks()) {
-		co_await handleInput(&event);
+		handleInput(&event);
 	}
 }
 
@@ -925,7 +925,7 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 		}
 	}
 
-	co_await handleInput(nullptr);
+	handleInput(nullptr);
 
 	cursor::set_last_scroll_pos(QPoint(-1, -1));
 

@@ -237,8 +237,7 @@ namespace gcn
 
         virtual void drawBorder(Graphics* graphics, std::vector<std::function<void(renderer *)>> &render_commands) override;
 
-        [[nodiscard]]
-        virtual boost::asio::awaitable<void> logic() override;
+        virtual void logic() override;
 
         virtual void _mouseInputMessage(const MouseInput &mouseInput);
 

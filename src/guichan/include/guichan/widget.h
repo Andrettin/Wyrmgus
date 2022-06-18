@@ -132,10 +132,8 @@ namespace gcn
          *
          * @see Gui
          */
-        [[nodiscard]]
-        virtual boost::asio::awaitable<void> logic()
+        virtual void logic()
         {
-            co_return;
         }
 
         /**
