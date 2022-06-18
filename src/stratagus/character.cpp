@@ -666,8 +666,12 @@ data_entry_history *character::get_history_base()
 
 void character::reset_history()
 {
-	//use the home settlement as the default location
-	const site *default_location_site = this->home_settlement;
+	const site *default_location_site = nullptr;
+
+	if (this->home_settlement != nullptr && this->home_settlement->get_map_template() != nullptr) {
+		//use the home settlement as the default location
+		default_location_site = this->home_settlement;
+	}
 
 	this->history = std::make_unique<character_history>(this->default_faction, default_location_site);
 }
