@@ -38,6 +38,7 @@
 #include "vec2i.h"
 
 class CPlayer;
+class CUnit;
 struct lua_State;
 
 extern int CclDefineMapTemplate(lua_State *l);
@@ -154,6 +155,7 @@ public:
 	void apply_character_map_units(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const;
 	void apply_historical_unit(const historical_unit *historical_unit, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const;
 	void apply_character(character *character, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const;
+	void apply_unit_site_properties(CUnit *unit, const site *site) const;
 
 	void clear_application_data();
 

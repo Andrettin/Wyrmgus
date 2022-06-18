@@ -31,6 +31,7 @@ namespace wyrmgus {
 class faction;
 class gsml_data;
 class gsml_property;
+class site;
 class unit_class;
 class unit_type;
 
@@ -80,6 +81,11 @@ public:
 		return this->faction;
 	}
 
+	const wyrmgus::site *get_site() const
+	{
+		return this->site;
+	}
+
 	int get_player_index() const
 	{
 		return this->player_index;
@@ -116,6 +122,7 @@ private:
 	bool temporary = false;
 	QPoint pos = QPoint(0, 0);
 	const wyrmgus::faction *faction = nullptr;
+	const wyrmgus::site *site = nullptr;
 	int player_index = -1;
 	int resource_amount = 0;
 	bool position_adjustment_enabled = true;

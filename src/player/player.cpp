@@ -922,7 +922,7 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 		return faction_player;
 	}
 	
-	// no player belonging to this faction, so let's make an unused player slot be created for it
+	//no player belonging to this faction, so let's make an unused player slot be created for it
 	
 	for (CPlayer *player : CPlayer::get_non_neutral_players()) {
 		if (player->get_faction() != nullptr) {

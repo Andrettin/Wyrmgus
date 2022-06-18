@@ -1397,25 +1397,11 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		const bool no_bordering_impassable = is_position_shift_acceptable;
 
 		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::get_neutral_player(), z, no_bordering_impassable, settlement);
-		unit->set_site(site);
 
-		//update the map pos of the site to the center pos of the site unit, as the location may have shifted
-		site_game_data->set_map_pos(unit->get_center_tile_pos());
+		this->apply_unit_site_properties(unit, site);
 
-		if (site->is_settlement()) {
-			unit->set_settlement(site);
-		} else {
+		if (!site->is_settlement()) {
 			first_building = false;
-		}
-
-		if (site->is_settlement()) {
-			CMap::get()->add_settlement_unit(unit);
-			for (int x = unit->tilePos.x; x < (unit->tilePos.x + unit->Type->get_tile_width()); ++x) {
-				for (int y = unit->tilePos.y; y < (unit->tilePos.y + unit->Type->get_tile_height()); ++y) {
-					const QPoint tile_pos(x, y);
-					CMap::get()->Field(tile_pos, z)->set_settlement(unit->get_settlement());
-				}
-			}
 		}
 
 		if (site->get_orbit_center() != nullptr && site->get_base_unit_type() != nullptr && site->get_base_unit_type()->BoolFlag[CELESTIAL_BODY_INDEX].value) {
@@ -2121,9 +2107,18 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				player->SetStartView(unit_pos, z);
 			}
 
-			const int resource_amount = map_template_unit->get_resource_amount();
-
 			CUnit *unit = CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z, map_template_unit->is_position_adjustment_enabled(), nullptr, true);
+
+			const site *site = map_template_unit->get_site();
+			if (site != nullptr) {
+				this->apply_unit_site_properties(unit, site);
+
+				if (unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+					unit->UpdateBuildingSettlementAssignment();
+				}
+			}
+
+			const int resource_amount = map_template_unit->get_resource_amount();
 
 			if (resource_amount > 0) {
 				unit->SetResourcesHeld(resource_amount);
@@ -2557,6 +2552,27 @@ void map_template::apply_character(character *character, const QPoint &template_
 		unit->Active = 0;
 		unit_player->ChangeUnitTypeAiActiveCount(unit_type, -1);
 	}
+}
+
+void map_template::apply_unit_site_properties(CUnit *unit, const site *site) const
+{
+	unit->set_site(site);
+
+	if (site->is_settlement()) {
+		unit->set_settlement(site);
+
+		CMap::get()->add_settlement_unit(unit);
+		for (int x = unit->tilePos.x; x < (unit->tilePos.x + unit->Type->get_tile_width()); ++x) {
+			for (int y = unit->tilePos.y; y < (unit->tilePos.y + unit->Type->get_tile_height()); ++y) {
+				const QPoint tile_pos(x, y);
+				CMap::get()->Field(tile_pos, unit->MapLayer->ID)->set_settlement(unit->get_settlement());
+			}
+		}
+	}
+
+	site_game_data *site_game_data = site->get_game_data();
+	site_game_data->set_map_pos(unit->get_center_tile_pos());
+	site_game_data->set_map_layer(unit->MapLayer);
 }
 
 void map_template::clear_application_data()

@@ -29,6 +29,7 @@
 #include "map/map_template_unit.h"
 
 #include "map/map_template.h"
+#include "map/site.h"
 #include "player/faction.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
@@ -46,6 +47,8 @@ void map_template_unit::process_gsml_property(const gsml_property &property)
 		this->unit_class = unit_class::get(value);
 	} else if (key == "faction") {
 		this->faction = faction::get(value);
+	} else if (key == "site") {
+		this->site = site::get(value);
 	} else if (key == "player") {
 		this->player_index = std::stoi(value);
 	} else {
