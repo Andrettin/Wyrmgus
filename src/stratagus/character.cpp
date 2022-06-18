@@ -1176,6 +1176,14 @@ std::string character::get_full_name() const
 {
 	std::string full_name = this->get_name();
 
+	if (full_name.empty()) {
+		if (!this->get_surname().empty()) {
+			return this->get_surname();
+		}
+
+		return full_name;
+	}
+
 	if (this->get_epithet() != nullptr) {
 		full_name += " " + this->get_epithet()->get_name();
 	} else if (!this->get_surname().empty()) {

@@ -7227,6 +7227,10 @@ std::string CUnit::get_full_name() const
 	std::string name = this->get_simple_name();
 
 	if (name.empty()) {
+		if (!this->get_surname().empty()) {
+			return this->get_surname();
+		}
+
 		return name;
 	}
 
