@@ -833,6 +833,8 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 	CursorAnimate(ticks);
 
 	std::queue<std::unique_ptr<QInputEvent>> input_events = engine_interface::get()->take_stored_input_events();
+	std::vector<std::pair<SDL_Event, Qt::KeyboardModifiers>> sdl_events;
+
 	while (!input_events.empty()) {
 		std::unique_ptr<QInputEvent> input_event = queue::take(input_events);
 
@@ -876,6 +878,18 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 
 		const Qt::KeyboardModifiers modifiers = input_event->modifiers();
 		SDL_Event sdl_event = qevent_to_sdl_event(std::move(input_event));
+
+		if (sdl_event.type == SDL_MOUSEMOTION) {
+			//only process the last mouse event for this frame
+			std::erase_if(sdl_events, [](const std::pair<SDL_Event, Qt::KeyboardModifiers> &event_pair) {
+				return event_pair.first.type == SDL_MOUSEMOTION;
+			});
+		}
+
+		sdl_events.push_back({ std::move(sdl_event), modifiers });
+	}
+
+	for (auto &[sdl_event, modifiers] : sdl_events) {
 		co_await SdlDoEvent(*GetCallbacks(), sdl_event, modifiers);
 	}
 
