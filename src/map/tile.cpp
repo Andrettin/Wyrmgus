@@ -212,8 +212,8 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 	if (is_overlay) {
 		if (terrain_type->get_resource() != nullptr) {
 			this->value = terrain_type->get_resource()->get_default_amount();
-		} else if (terrain_type->has_flag(tile_flag::wall) && terrain_type->UnitType) {
-			this->value = terrain_type->UnitType->DefaultStat.Variables[HP_INDEX].Max;
+		} else if (terrain_type->has_flag(tile_flag::wall) && terrain_type->get_unit_type()) {
+			this->value = terrain_type->get_unit_type()->DefaultStat.Variables[HP_INDEX].Max;
 		}
 	}
 

@@ -359,7 +359,7 @@ static int AiBuildBuilding(const unit_type &type, const unit_type &building, con
 	table.resize(num);	
 	
 	CUnit *near_unit = nullptr;
-	if (building.TerrainType || building.BoolFlag[TOWNHALL_INDEX].value) {
+	if (building.get_terrain_type() != nullptr || building.BoolFlag[TOWNHALL_INDEX].value) {
 		//terrain type units and town halls have a particular place to be built, so we need to find the worker with a terrain traversal
 		TerrainTraversal terrainTraversal;
 
@@ -2105,12 +2105,12 @@ static bool build_pathway_for_pos(const QPoint &pathway_pos, const CMapLayer *ma
 	for (size_t p = 0; p < pathway_types.size(); ++p) {
 		const unit_type *pathway_type = pathway_types[p];
 
-		if (pathway_type->TerrainType->has_flag(tile_flag::railroad) && !rail_allowed) {
+		if (pathway_type->get_terrain_type()->has_flag(tile_flag::railroad) && !rail_allowed) {
 			//build roads around buildings, not railroads (except for mines)
 			continue;
 		}
 
-		if (mf.get_overlay_terrain() != nullptr && pathway_type->TerrainType->get_movement_bonus() <= mf.get_overlay_terrain()->get_movement_bonus()) {
+		if (mf.get_overlay_terrain() != nullptr && pathway_type->get_terrain_type()->get_movement_bonus() <= mf.get_overlay_terrain()->get_movement_bonus()) {
 			continue;
 		}
 
@@ -2184,7 +2184,7 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 
-		if (unit_type->TerrainType == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
+		if (unit_type->get_terrain_type() == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 			continue;
 		}
 		
@@ -2193,7 +2193,7 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 		
-		if (unit_type->TerrainType->is_pathway()) {
+		if (unit_type->get_terrain_type()->is_pathway()) {
 			pathway_types.push_back(unit_type);
 		}
 	}
@@ -2204,8 +2204,8 @@ static void AiCheckPathwayConstruction()
 
 	//give priority to pathways that improve movement more, and then to railroad ones
 	std::sort(pathway_types.begin(), pathway_types.end(), [](const unit_type *type, const unit_type *other_type) {
-		const terrain_type *terrain_type = type->TerrainType;
-		const wyrmgus::terrain_type *other_terrain_type = other_type->TerrainType;
+		const terrain_type *terrain_type = type->get_terrain_type();
+		const wyrmgus::terrain_type *other_terrain_type = other_type->get_terrain_type();
 
 		if (terrain_type->get_movement_bonus() != other_terrain_type->get_movement_bonus()) {
 			return terrain_type->get_movement_bonus() > other_terrain_type->get_movement_bonus();

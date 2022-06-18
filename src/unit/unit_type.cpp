@@ -1008,6 +1008,10 @@ void unit_type::initialize()
 		this->species->set_unit_type(this);
 	}
 
+	if (this->terrain_type != nullptr) {
+		this->terrain_type->set_unit_type(this);
+	}
+
 	if (this->get_civilization() != nullptr && this->get_civilization_group() != nullptr) {
 		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" has both a civilization and a civilization group.");
 	}
@@ -1790,8 +1794,8 @@ void unit_type::calculate_movement_mask()
 		this->MovementMask |= tile_flag::no_building;
 		this->MovementMask |= tile_flag::item;
 
-		if (this->TerrainType != nullptr) {
-			if (this->TerrainType->has_flag(tile_flag::road)) {
+		if (this->get_terrain_type() != nullptr) {
+			if (this->get_terrain_type()->has_flag(tile_flag::road)) {
 				this->MovementMask |= tile_flag::railroad;
 			}
 		}

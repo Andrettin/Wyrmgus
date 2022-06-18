@@ -375,6 +375,16 @@ public:
 		return this->movement_bonus;
 	}
 
+	const wyrmgus::unit_type *get_unit_type() const
+	{
+		return this->unit_type;
+	}
+
+	void set_unit_type(const wyrmgus::unit_type *unit_type)
+	{
+		this->unit_type = unit_type;
+	}
+
 	const std::vector<terrain_type *> &get_base_terrain_types() const
 	{
 		return this->base_terrain_types;
@@ -506,9 +516,7 @@ private:
 	bool allow_single = false;			/// Whether this terrain type has transitions for single tiles
 	bool hidden = false;
 	int movement_bonus = 0;
-public:
-	unit_type *UnitType = nullptr;
-private:
+	const wyrmgus::unit_type *unit_type = nullptr;
 	std::filesystem::path image_file;
 	std::shared_ptr<CPlayerColorGraphic> graphics;
 	std::filesystem::path transition_image_file;

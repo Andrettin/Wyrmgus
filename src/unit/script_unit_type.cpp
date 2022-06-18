@@ -1643,8 +1643,7 @@ int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Species")) {
 			type->species = wyrmgus::species::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TerrainType")) {
-			type->TerrainType = wyrmgus::terrain_type::get(LuaToString(l, -1));
-			type->TerrainType->UnitType = type;
+			type->terrain_type = wyrmgus::terrain_type::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "WeaponClasses")) {
 			type->WeaponClasses.clear();
 			const int args = lua_rawlen(l, -1);

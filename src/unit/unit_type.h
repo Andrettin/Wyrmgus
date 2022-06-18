@@ -773,6 +773,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(wyrmgus::item_class item_class MEMBER item_class READ get_item_class)
 	Q_PROPERTY(wyrmgus::species* species MEMBER species)
+	Q_PROPERTY(wyrmgus::terrain_type* terrain_type MEMBER terrain_type)
 	Q_PROPERTY(CUpgrade* elixir MEMBER elixir)
 	Q_PROPERTY(int max_spawned_demand MEMBER max_spawned_demand READ get_max_spawned_demand)
 	Q_PROPERTY(QVariantList traits READ get_traits_qvariant_list NOTIFY changed)
@@ -1105,6 +1106,11 @@ public:
 		return this->species;
 	}
 
+	const wyrmgus::terrain_type *get_terrain_type() const
+	{
+		return this->terrain_type;
+	}
+
 	const wyrmgus::animation_set *get_animation_set() const
 	{
 		return this->animation_set;
@@ -1388,8 +1394,8 @@ public:
 private:
 	wyrmgus::item_class item_class; //item class (if the unit type is an item)
 	wyrmgus::species *species = nullptr;
+	wyrmgus::terrain_type *terrain_type = nullptr;
 public:
-	wyrmgus::terrain_type *TerrainType = nullptr;
 	std::vector<wyrmgus::item_class> WeaponClasses; //weapon classes that the unit type can use (if the unit type uses a weapon)
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 

@@ -183,7 +183,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	// HACK: the building is ready now
 	//Wyrmgus start
-	if (!type.TerrainType) {
+	if (type.get_terrain_type() == nullptr) {
 		player.NumBuildingsUnderConstruction--;
 		player.ChangeUnitTypeUnderConstructionCount(&type, -1);
 	}
@@ -291,14 +291,14 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		}
 
 		if (worker != nullptr) {
-			if (!type.TerrainType || worker->Orders.size() == 1 || worker->Orders[1]->Action != UnitAction::Build) {
+			if (!type.get_terrain_type() || worker->Orders.size() == 1 || worker->Orders[1]->Action != UnitAction::Build) {
 				PlayUnitSound(worker, unit_sound_type::work_completed);
 			}
 		} else {
 			for (size_t i = 0; i != table.size(); ++i) {
 				// see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is null
 				if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->get_goal() == &unit) {
-					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitAction::Build) {
+					if (!type.get_terrain_type() || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitAction::Build) {
 						//don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
 						PlayUnitSound(table[i], unit_sound_type::work_completed);
 						break;
@@ -318,17 +318,17 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	// FIXME: Johns: hardcoded unit-type wall / more races!
 	//Wyrmgus start
 //	if (&type == UnitTypeOrcWall || &type == UnitTypeHumanWall) {
-	if (type.TerrainType != nullptr) {
+	if (type.get_terrain_type() != nullptr) {
 	//Wyrmgus end
 		try {
 			//Wyrmgus start
 	//		CMap::get()->SetWall(unit.tilePos, &type == UnitTypeHumanWall);
-			if (type.TerrainType->is_overlay() && CMap::get()->GetTileTerrain(unit.tilePos, type.TerrainType->is_overlay(), unit.MapLayer->ID) != nullptr && unit.MapLayer->Field(unit.tilePos)->OverlayTerrainDestroyed) {
+			if (type.get_terrain_type()->is_overlay() && CMap::get()->GetTileTerrain(unit.tilePos, type.get_terrain_type()->is_overlay(), unit.MapLayer->ID) != nullptr && unit.MapLayer->Field(unit.tilePos)->OverlayTerrainDestroyed) {
 				//remove an existent and destroyed overlay terrain if present, so that e.g. if a destroyed wall of the same type is present here, the new wall can be properly placed without still being destroyed
 				CMap::get()->RemoveTileOverlayTerrain(unit.tilePos, unit.MapLayer->ID);
 			}
 
-			CMap::get()->SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer->ID);
+			CMap::get()->SetTileTerrain(unit.tilePos, type.get_terrain_type(), unit.MapLayer->ID);
 
 			//Wyrmgus end
 			unit.Remove(nullptr);

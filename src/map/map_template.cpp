@@ -1544,7 +1544,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			if (unit_type == nullptr) {
 				continue;
 			}
-			if (unit_type->TerrainType != nullptr && unit_type->TerrainType->is_pathway()) {
+			if (unit_type->get_terrain_type() != nullptr && unit_type->get_terrain_type()->is_pathway()) {
 				pathway_type = unit_type;
 			}
 		}
@@ -1559,7 +1559,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			continue;
 		}
 
-		if (unit_type->TerrainType != nullptr) {
+		if (unit_type->get_terrain_type() != nullptr) {
 			throw std::runtime_error("A terrain type building (e.g. a wall) cannot be applied from the list of historical building classes of a site.");
 		}
 
@@ -1617,7 +1617,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 						continue;
 					}
 
-					mf.SetTerrain(pathway_type->TerrainType);
+					mf.SetTerrain(pathway_type->get_terrain_type());
 				}
 			}
 		}
@@ -1627,46 +1627,58 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		if (
 			start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
 			&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
-			) {
+		) {
 			const faction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
 			const unit_type *unit_type = nullptr;
+
 			if (building_owner) {
 				unit_type = building_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
 			} else {
 				unit_type = site_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
 			}
+
 			if (unit_type == nullptr) {
 				continue;
 			}
-			if (unit_type->TerrainType) {
+
+			if (unit_type->get_terrain_type() != nullptr) {
 				continue;
 			}
+
 			if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_settlement()) {
 				fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): site has a town hall, but isn't set as a settlement one.\n", site->Ident.c_str());
 				continue;
 			}
+
 			const Vec2i building_unit_offset((unit_type->get_tile_size() - QSize(1, 1)) / 2);
 			if (!is_position_shift_acceptable && first_building) {
 				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset + Vec2i(unit_type->get_tile_size() - QSize(1, 1)), z)) {
 					fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->get_identifier().c_str(), site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
 				}
 			}
+
 			CUnit *unit = nullptr;
+
 			if (building_owner) {
 				CPlayer *building_player = GetOrAddFactionPlayer(building_owner);
+
 				if (!building_player) {
 					continue;
 				}
+
 				if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
 					building_player->SetStartView(site_pos - building_unit_offset, z);
 				}
+
 				unit = CreateUnit(site_pos - building_unit_offset, *unit_type, building_player, z, true, settlement);
 			} else {
 				unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, settlement);
 			}
+
 			if (std::get<3>(site->HistoricalBuildings[j])) {
 				unit->set_unique(std::get<3>(site->HistoricalBuildings[j]));
 			}
+
 			if (first_building) {
 				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && unit->get_unique() == nullptr && (!building_owner || building_owner == site_owner)) {
 					//if one building is representing a minor site, make it have the site's name
@@ -1674,9 +1686,11 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 				}
 				first_building = false;
 			}
+
 			if (unit_type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == site_owner)) {
 				unit->UpdateBuildingSettlementAssignment();
 			}
+
 			if (pathway_type != nullptr) {
 				for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->get_tile_width() + 1; ++x) {
 					for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->get_tile_height() + 1; ++y) {
@@ -1693,7 +1707,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 							continue;
 						}
 
-						mf.SetTerrain(pathway_type->TerrainType);
+						mf.SetTerrain(pathway_type->get_terrain_type());
 					}
 				}
 			}

@@ -888,7 +888,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const wyrmgus::unit_type &type, con
 	//Wyrmgus start
 	if (
 		(type.get_given_resource() != nullptr && type.BoolFlag[CANHARVEST_INDEX].value && type.get_given_resource()->get_index() != TradeCost) //don't reduce refineries from the build request, they should be built dynamically via the resource gathering code without being requested
-		|| type.TerrainType // tile units are built without requests
+		|| type.get_terrain_type() // tile units are built without requests
 		|| type.BoolFlag[TOWNHALL_INDEX].value // town halls are built without requests
 	) {
 		return;
@@ -956,7 +956,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, const la
 	//Wyrmgus start
 	if (
 		(type.get_given_resource() != nullptr && type.BoolFlag[CANHARVEST_INDEX].value && type.get_given_resource()->get_index() != TradeCost) //don't reduce refineries from the build request, they should be built dynamically via the resource gathering code without being requested
-		|| type.TerrainType // tile units are built without requests
+		|| type.get_terrain_type() // tile units are built without requests
 		|| type.BoolFlag[TOWNHALL_INDEX].value // town halls are built without requests
 	) {
 		return;

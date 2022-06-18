@@ -625,7 +625,7 @@ bool CanBuildOn(const QPoint &pos, const tile_flag mask, const int z, const CPla
 		return false;
 	}
 
-	const wyrmgus::terrain_type *built_terrain = unit_type->TerrainType;
+	const wyrmgus::terrain_type *built_terrain = unit_type->get_terrain_type();
 
 	//cannot build anything other than pathways on trade routes
 	if (tile->is_on_trade_route() && (built_terrain == nullptr || !built_terrain->is_pathway())) {
@@ -713,13 +713,13 @@ CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const
 			}
 
 			//cannot build anything other than pathways on trade routes
-			if (tile->is_on_trade_route() && (type.TerrainType == nullptr || !type.TerrainType->is_pathway())) {
+			if (tile->is_on_trade_route() && (type.get_terrain_type() == nullptr || !type.get_terrain_type()->is_pathway())) {
 				ontop = nullptr;
 				break;
 			}
 
 			//can only build a pathway on top of another pathway if the latter has a smaller movement bonus
-			if (type.TerrainType != nullptr && type.TerrainType->is_pathway() && tile->get_overlay_terrain() != nullptr && tile->get_overlay_terrain()->is_pathway() && type.TerrainType->get_movement_bonus() <= tile->get_overlay_terrain()->get_movement_bonus()) {
+			if (type.get_terrain_type() != nullptr && type.get_terrain_type()->is_pathway() && tile->get_overlay_terrain() != nullptr && tile->get_overlay_terrain()->is_pathway() && type.get_terrain_type()->get_movement_bonus() <= tile->get_overlay_terrain()->get_movement_bonus()) {
 				ontop = nullptr;
 				break;
 			}

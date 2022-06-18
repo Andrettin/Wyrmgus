@@ -627,7 +627,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, co
 			   //Wyrmgus end
 
 	//Wyrmgus start
-	if (type.TerrainType || type.BoolFlag[TOWNHALL_INDEX].value) { //if the building is actually a terrain type, or if it is a town hall, then the "nearPos" is already the correct position
+	if (type.get_terrain_type() || type.BoolFlag[TOWNHALL_INDEX].value) { //if the building is actually a terrain type, or if it is a town hall, then the "nearPos" is already the correct position
 		*resultPos = nearPos;
 		return true;
 	}

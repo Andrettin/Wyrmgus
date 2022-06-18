@@ -3949,7 +3949,7 @@ void CUnit::UpdateSettlement()
 		return;
 	}
 	
-	if (!this->Type->BoolFlag[BUILDING_INDEX].value || this->Type->TerrainType) {
+	if (!this->Type->BoolFlag[BUILDING_INDEX].value || this->Type->get_terrain_type()) {
 		return;
 	}
 	
@@ -4231,7 +4231,7 @@ void CUnit::Place(const Vec2i &pos, const int z)
 		}
 
 		//remove pathways, destroyed walls and decoration units under buildings
-		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
+		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->get_terrain_type()) {
 			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->get_tile_width(); ++x) {
 				for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->get_tile_height(); ++y) {
 					if (!CMap::get()->Info->IsPointOnMap(x, y, this->MapLayer)) {
