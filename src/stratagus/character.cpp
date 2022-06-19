@@ -680,7 +680,9 @@ std::string character::get_encyclopedia_text() const
 {
 	std::string text;
 
-	named_data_entry::concatenate_encyclopedia_text(text, "Name: " + (this->get_name_word() ? this->get_name_word()->get_link_string(this->get_name()) : this->get_name()));
+	if (this->has_name_variant()) {
+		named_data_entry::concatenate_encyclopedia_text(text, "Name: " + (this->get_name_word() ? this->get_name_word()->get_link_string(this->get_name()) : this->get_name()));
+	}
 
 	if (this->get_civilization() != nullptr) {
 		named_data_entry::concatenate_encyclopedia_text(text, "Civilization: " + this->get_civilization()->get_link_string());
@@ -1178,20 +1180,23 @@ bool character::HasMajorDeity() const
 
 std::string character::get_full_name() const
 {
-	std::string full_name = this->get_name();
+	const std::string &name = this->get_name();
+	std::string full_name = name;
 
-	if (full_name.empty()) {
-		if (!this->get_surname().empty()) {
-			return this->get_surname();
-		}
-
-		return full_name;
+	if (full_name.empty() && !this->get_surname().empty()) {
+		full_name = this->get_surname();
 	}
 
 	if (this->get_epithet() != nullptr) {
-		full_name += " " + this->get_epithet()->get_name();
+		if (full_name.empty()) {
+			full_name += string::capitalized(this->get_epithet()->get_name());
+		} else {
+			full_name += " " + this->get_epithet()->get_name();
+		}
 	} else if (!this->get_surname().empty()) {
-		full_name += " " + this->get_surname();
+		if (!name.empty()) {
+			full_name += " " + this->get_surname();
+		}
 	}
 
 	return full_name;

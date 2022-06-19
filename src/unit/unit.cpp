@@ -108,6 +108,7 @@
 #include "util/point_util.h"
 #include "util/rect_util.h"
 #include "util/size_util.h"
+#include "util/string_util.h"
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
@@ -7224,23 +7225,26 @@ const std::string &CUnit::get_simple_name() const
 
 std::string CUnit::get_full_name() const
 {
-	std::string name = this->get_simple_name();
+	const std::string &name = this->get_simple_name();
+	std::string full_name = name;
 
-	if (name.empty()) {
-		if (!this->get_surname().empty()) {
-			return this->get_surname();
-		}
-
-		return name;
+	if (full_name.empty() && !this->get_surname().empty()) {
+		full_name = this->get_surname();
 	}
 
 	if (this->get_epithet() != nullptr) {
-		name += " " + this->get_epithet()->get_name();
+		if (full_name.empty()) {
+			full_name += string::capitalized(this->get_epithet()->get_name());
+		} else {
+			full_name += " " + this->get_epithet()->get_name();
+		}
 	} else if (!this->get_surname().empty()) {
-		name += " " + this->get_surname();
+		if (!name.empty()) {
+			full_name += " " + this->get_surname();
+		}
 	}
 
-	return name;
+	return full_name;
 }
 
 const std::string &CUnit::get_base_type_name() const
