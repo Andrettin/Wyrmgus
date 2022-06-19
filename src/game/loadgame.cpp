@@ -55,8 +55,6 @@
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "spell/spell.h"
-#include "time/season_schedule.h"
-#include "time/time_of_day_schedule.h"
 #include "ui/button.h"
 #include "ui/button_level.h"
 #include "ui/cursor.h"

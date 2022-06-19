@@ -786,7 +786,9 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 
 	if (!this->IsSubtemplateArea()) {
 		if (!CEditor::get()->is_running()) {
-			if (this->get_world() != nullptr && this->get_world()->get_season_schedule() != nullptr) {
+			if (this->get_tileset() != nullptr && this->get_tileset()->get_season_schedule() != nullptr) {
+				CMap::get()->MapLayers[z]->set_season_schedule(this->get_tileset()->get_season_schedule());
+			} else if (this->get_world() != nullptr && this->get_world()->get_season_schedule() != nullptr) {
 				CMap::get()->MapLayers[z]->set_season_schedule(this->get_world()->get_season_schedule());
 			} else {
 				CMap::get()->MapLayers[z]->set_season_schedule(defines::get()->get_default_season_schedule());

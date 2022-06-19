@@ -37,6 +37,7 @@ class CPlayerColorGraphic;
 //Wyrmgus end
 
 namespace wyrmgus {
+	class season_schedule;
 	class terrain_type;
 	class unit_type;
 	enum class tile_flag : uint32_t;
@@ -163,6 +164,8 @@ class tileset final : public named_data_entry, public data_type<tileset>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::season_schedule* season_schedule MEMBER season_schedule)
+
 public:
 	static constexpr const char *class_identifier = "tileset";
 	static constexpr const char *database_folder = "tilesets";
@@ -178,6 +181,11 @@ public:
 		if (this->get_identifier().empty()) {
 			throw std::runtime_error("Tileset has no identifier.");
 		}
+	}
+
+	const wyrmgus::season_schedule *get_season_schedule() const
+	{
+		return this->season_schedule;
 	}
 
 	const terrain_type *get_terrain_type_by_tile_number(const int tile_number) const
@@ -228,6 +236,7 @@ public:
 	//Wyrmgus end
 
 private:
+	wyrmgus::season_schedule *season_schedule = nullptr;
 	std::map<int, const terrain_type *> terrain_types_by_tile_number;
 };
 
