@@ -51,6 +51,8 @@ void map_template_unit::process_gsml_property(const gsml_property &property)
 		this->site = site::get(value);
 	} else if (key == "player") {
 		this->player_index = std::stoi(value);
+	} else if (key == "resource_amount") {
+		this->resource_amount = std::stoi(value);
 	} else {
 		throw std::runtime_error("Invalid map template unit property: \"" + key + "\".");
 	}
