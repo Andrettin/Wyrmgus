@@ -4117,4 +4117,18 @@ void map_template::add_site(const site *site)
 	this->sites.push_back(site);
 }
 
+const terrain_type *map_template::get_default_base_terrain(const terrain_type *overlay_terrain) const
+{
+	const auto find_iterator = this->default_base_terrains.find(overlay_terrain);
+	if (find_iterator != this->default_base_terrains.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->get_tileset() != nullptr) {
+		return this->get_tileset()->get_default_base_terrain(overlay_terrain);
+	}
+
+	return nullptr;
+}
+
 }

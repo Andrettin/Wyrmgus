@@ -90,7 +90,17 @@ void tileset::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	if (tag == "tile_numbers") {
+	if (tag == "default_base_terrains") {
+		scope.for_each_property([&](const gsml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const terrain_type *overlay_terrain = terrain_type::get(key);
+			const terrain_type *base_terrain = terrain_type::get(value);
+
+			this->default_base_terrains[overlay_terrain] = base_terrain;
+		});
+	} else if (tag == "tile_numbers") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			const terrain_type *terrain_type = terrain_type::get(child_scope.get_tag());
 

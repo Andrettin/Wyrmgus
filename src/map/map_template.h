@@ -702,15 +702,7 @@ public:
 
 	void add_site(const site *site);
 
-	const terrain_type *get_default_base_terrain(const terrain_type *overlay_terrain) const
-	{
-		const auto find_iterator = this->default_base_terrains.find(overlay_terrain);
-		if (find_iterator != this->default_base_terrains.end()) {
-			return find_iterator->second;
-		}
-
-		return nullptr;
-	}
+	const terrain_type *get_default_base_terrain(const terrain_type *overlay_terrain) const;
 
 	bool is_dungeon() const
 	{

@@ -188,6 +188,16 @@ public:
 		return this->season_schedule;
 	}
 
+	const terrain_type *get_default_base_terrain(const terrain_type *overlay_terrain) const
+	{
+		const auto find_iterator = this->default_base_terrains.find(overlay_terrain);
+		if (find_iterator != this->default_base_terrains.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+
 	const terrain_type *get_terrain_type_by_tile_number(const int tile_number) const
 	{
 		const auto find_iterator = this->terrain_types_by_tile_number.find(tile_number);
@@ -237,6 +247,7 @@ public:
 
 private:
 	wyrmgus::season_schedule *season_schedule = nullptr;
+	std::map<const terrain_type *, const terrain_type *> default_base_terrains;
 	std::map<int, const terrain_type *> terrain_types_by_tile_number;
 };
 
