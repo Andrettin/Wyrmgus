@@ -62,6 +62,8 @@ inline QVariantList to_qvariant_list(const T &container)
 			} else {
 				list.append(QVariant::fromValue(const_cast<mutable_type>(element)));
 			}
+		} else if constexpr (is_specialization_of_v<typename T::value_type, std::unique_ptr>) {
+			list.append(QVariant::fromValue(element.get()));
 		} else {
 			list.append(QVariant::fromValue(element));
 		}
