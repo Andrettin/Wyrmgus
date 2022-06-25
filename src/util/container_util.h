@@ -27,6 +27,7 @@
 #pragma once
 
 #include "util/path_util.h"
+#include "util/type_traits.h"
 
 namespace wyrmgus::container {
 
