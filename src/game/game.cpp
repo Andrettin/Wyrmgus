@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name game.cpp - The game set-up and creation. */
-//
 //      (c) Copyright 1998-2022 by Lutz Sammer, Andreas Arens,
 //      Jimmy Salmon and Andrettin
 //
@@ -568,7 +566,37 @@ void game::set_results(qunique_ptr<results_info> &&results)
 
 void game::store_results()
 {
-	auto results = make_qunique<results_info>(GameResult);
+	std::vector<qunique_ptr<player_results_info>> player_results;
+
+	for (const CPlayer *player : CPlayer::get_non_neutral_players()) {
+		if (player->TotalUnits == 0) {
+			continue;
+		}
+
+		if (player->get_type() == player_type::rescue_passive) {
+			continue;
+		}
+
+		if (player->get_type() == player_type::rescue_active) {
+			continue;
+		}
+
+		std::optional<diplomacy_state> diplomacy_state;
+
+		if (player != CPlayer::GetThisPlayer()) {
+			if (CPlayer::GetThisPlayer()->is_allied_with(*player)) {
+				diplomacy_state = diplomacy_state::allied;
+			} else if (CPlayer::GetThisPlayer()->is_enemy_of(*player)) {
+				diplomacy_state = diplomacy_state::enemy;
+			} else {
+				diplomacy_state = diplomacy_state::neutral;
+			}
+		}
+
+		player_results.push_back(make_qunique<player_results_info>(player->get_name(), diplomacy_state, player->TotalUnits, player->TotalBuildings, player->get_resource_totals(), player->TotalKills, player->TotalRazings));
+	}
+
+	auto results = make_qunique<results_info>(GameResult, std::move(player_results));
 
 	if (QApplication::instance()->thread() != QThread::currentThread()) {
 		results->moveToThread(QApplication::instance()->thread());

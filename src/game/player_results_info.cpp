@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2021-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,41 +24,36 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/qunique_ptr.h"
+#include "game/player_results_info.h"
 
-enum GameResults : int;
+#include "economy/resource.h"
+#include "player/diplomacy_state.h"
 
 namespace wyrmgus {
 
-class player_results_info;
-
-class results_info final : public QObject
+bool player_results_info::is_ally() const
 {
-	Q_OBJECT
+	return this->diplomacy_state.has_value() && this->diplomacy_state.value() == diplomacy_state::allied;
+}
 
-	Q_PROPERTY(bool victory READ is_victory CONSTANT)
-	Q_PROPERTY(bool defeat READ is_defeat CONSTANT)
-	Q_PROPERTY(bool draw READ is_draw CONSTANT)
-	Q_PROPERTY(QVariantList player_results READ get_player_results_qvariant_list CONSTANT)
+bool player_results_info::is_enemy() const
+{
+	return this->diplomacy_state.has_value() && this->diplomacy_state.value() == diplomacy_state::enemy;
+}
 
-public:
-	explicit results_info(const GameResults result, std::vector<qunique_ptr<player_results_info>> &&player_results);
-	results_info(const results_info &other) = delete;
-	~results_info();
+int player_results_info::get_resource_count(const QString &resource_identifier) const
+{
+	const resource *resource = resource::get(resource_identifier.toStdString());
 
-	bool is_victory() const;
-	bool is_defeat() const;
-	bool is_draw() const;
+	const auto find_iterator = this->resource_counts.find(resource);
 
-	QVariantList get_player_results_qvariant_list() const;
+	if (find_iterator != this->resource_counts.end()) {
+		return find_iterator->second;
+	}
 
-	results_info &operator =(const results_info &other) = delete;
-
-private:
-	GameResults result;
-	std::vector<qunique_ptr<player_results_info>> player_results;
-};
+	return 0;
+}
 
 }

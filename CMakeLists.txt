@@ -155,6 +155,7 @@ source_group(editor FILES ${editor_SRCS})
 set(game_SRCS
 	src/game/game.cpp
 	src/game/loadgame.cpp
+	src/game/player_results_info.cpp
 	src/game/replay.cpp
 	src/game/results_info.cpp
 	src/game/savegame.cpp
@@ -775,6 +776,7 @@ set(wyrmgus_economy_HDRS
 set(wyrmgus_game_HDRS
 	src/game/difficulty.h
 	src/game/game.h
+	src/game/player_results_info.h
 	src/game/results_info.h
 )
 

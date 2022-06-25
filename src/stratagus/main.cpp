@@ -33,6 +33,7 @@
 #include "engine_interface.h"
 #include "game/game.h"
 #include "game/results_info.h"
+#include "game/player_results_info.h"
 #include "map/map_grid_model.h"
 #include "map/map_info.h"
 #include "map/map_presets.h"
@@ -132,6 +133,7 @@ int main(int argc, char **argv)
 		qmlRegisterAnonymousType<pantheon>("", 1);
 		qmlRegisterAnonymousType<parameters>("", 1);
 		qmlRegisterAnonymousType<player_color>("", 1);
+		qmlRegisterAnonymousType<player_results_info>("", 1);
 		qmlRegisterAnonymousType<population_type>("", 1);
 		qmlRegisterAnonymousType<preferences>("", 1);
 		qmlRegisterAnonymousType<quest>("", 1);

@@ -832,6 +832,11 @@ public:
 	int get_military_score_percent_advantage_over(const CPlayer *other_player) const;
 	bool has_military_advantage_over(const CPlayer *other_player) const;
 
+	const resource_map<int> &get_resource_totals() const
+	{
+		return this->resource_totals;
+	}
+
 	int get_resource_total(const resource *resource) const
 	{
 		const auto find_iterator = this->resource_totals.find(resource);

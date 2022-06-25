@@ -28,9 +28,20 @@
 
 #include "game/results_info.h"
 
+#include "game/player_results_info.h"
 #include "results.h"
+#include "util/container_util.h"
 
 namespace wyrmgus {
+
+results_info::results_info(const GameResults result, std::vector<qunique_ptr<player_results_info>> &&player_results)
+	: result(result), player_results(std::move(player_results))
+{
+}
+
+results_info::~results_info()
+{
+}
 
 bool results_info::is_victory() const
 {
@@ -45,6 +56,11 @@ bool results_info::is_defeat() const
 bool results_info::is_draw() const
 {
 	return this->result == GameDraw;
+}
+
+QVariantList results_info::get_player_results_qvariant_list() const
+{
+	return container::to_qvariant_list(this->player_results);
 }
 
 }
