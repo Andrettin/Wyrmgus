@@ -256,7 +256,9 @@ void engine_interface::load_map_info(const std::filesystem::path &filepath)
 
 	CMap::get()->get_info()->set_presentation_filepath(filepath);
 
-	this->map_infos.push_back(CMap::get()->get_info()->duplicate());
+	if (!CMap::get()->get_info()->is_hidden()) {
+		this->map_infos.push_back(CMap::get()->get_info()->duplicate());
+	}
 
 	CMap::get()->get_info()->reset();
 }

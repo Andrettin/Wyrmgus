@@ -59,6 +59,7 @@ class map_info final : public QObject
 	Q_PROPERTY(int player_count READ get_player_count CONSTANT)
 	Q_PROPERTY(int person_player_count READ get_person_player_count CONSTANT)
 	Q_PROPERTY(int person_player_index READ get_person_player_index CONSTANT)
+	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(QString text READ get_text_qstring CONSTANT)
 
 public:
@@ -161,6 +162,11 @@ public:
 
 	void set_settings(qunique_ptr<map_settings> &&settings);
 
+	bool is_hidden() const
+	{
+		return this->hidden;
+	}
+
 	std::string get_text() const;
 
 	QString get_text_qstring() const
@@ -190,6 +196,7 @@ public:
 	std::string MapWorld = "Custom";
 private:
 	qunique_ptr<map_settings> settings;
+	bool hidden = false;
 
 	friend int ::CclDefinePlayerTypes(lua_State *l);
 	friend int ::CclPresentMap(lua_State *l);
