@@ -36,6 +36,8 @@ class data_module final : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring)
+	Q_PROPERTY(std::string license MEMBER license)
+	Q_PROPERTY(std::string version MEMBER version)
 
 public:
 	explicit data_module(const std::string &identifier, const std::filesystem::path &path, const data_module *parent_module)
@@ -117,6 +119,8 @@ public:
 private:
 	std::string identifier;
 	std::string name;
+	std::string license;
+	std::string version;
 	std::filesystem::path path; //the module's path
 	const data_module *parent_module = nullptr;
 	std::set<const data_module *> dependencies; //modules on which this one is dependent
