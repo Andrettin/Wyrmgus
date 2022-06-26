@@ -95,6 +95,7 @@
 #include "video/video.h"
 
 #pragma warning(push, 0)
+#include <QSettings>
 #include <QXmlStreamReader>
 #pragma warning(pop)
 
@@ -2766,6 +2767,8 @@ void map_template::load_terrain(const bool overlay)
 		this->load_wesnoth_terrain_file();
 	} else if (terrain_filepath.extension() == ".pmp" && !overlay) {
 		this->load_0_ad_terrain_file();
+	} else if (terrain_filepath.extension() == ".sav" && !overlay) {
+		this->load_freeciv_terrain_file();
 	} else if (terrain_filepath.extension() == ".sms" && !overlay) {
 		this->load_stratagus_terrain_file();
 	} else {
@@ -3147,6 +3150,48 @@ void map_template::load_0_ad_terrain_file()
 	std::sort(this->units.begin(), this->units.end(), [](const std::unique_ptr<map_template_unit> &lhs, const std::unique_ptr<map_template_unit> &rhs) {
 		return lhs->is_temporary() == rhs->is_temporary() || lhs->is_temporary();
 	});
+}
+
+void map_template::load_freeciv_terrain_file()
+{
+	this->terrain_image = QImage(this->get_size(), QImage::Format_RGBA8888);
+	this->terrain_image.fill(Qt::transparent);
+
+	this->overlay_terrain_image = QImage(this->get_size(), QImage::Format_RGBA8888);
+	this->overlay_terrain_image.fill(Qt::transparent);
+
+	const std::filesystem::path &terrain_filepath = this->get_terrain_file();
+
+	QSettings map_data(path::to_qstring(terrain_filepath), QSettings::IniFormat);
+
+	for (const QString &group : map_data.childGroups()) {
+		map_data.beginGroup(group);
+
+		if (group == "map") {
+			for (const QString &key : map_data.childKeys()) {
+				if (key.startsWith("t") && key.size() == 5) {
+					//terrain, e.g. "t0000"
+					const int y = key.mid(1).toInt();
+
+					const std::string value = map_data.value(key).toString().toStdString();
+
+					assert_throw(static_cast<int>(value.size()) == this->get_width());
+
+					for (size_t x = 0; x < value.size(); ++x) {
+						const char c = value[x];
+
+						const terrain_type *terrain = terrain_type::get_by_freeciv_char(c);
+
+						if (terrain != nullptr) {
+							map_template::set_terrain_image_pixel(this->terrain_image, QPoint(x, y), terrain);
+						}
+					}
+				}
+			}
+		}
+
+		map_data.endGroup();
+	}
 }
 
 void map_template::load_stratagus_terrain_file()

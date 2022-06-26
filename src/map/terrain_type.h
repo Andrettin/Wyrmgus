@@ -198,6 +198,35 @@ public:
 		return nullptr;
 	}
 
+	static terrain_type *get_by_freeciv_char(const char c)
+	{
+		const auto find_iterator = terrain_type::terrain_types_by_freeciv_char.find(c);
+		if (find_iterator != terrain_type::terrain_types_by_freeciv_char.end()) {
+			return find_iterator->second;
+		}
+
+		throw std::runtime_error("No terrain type found for Freeciv char: \"" + std::string(1, c) + "\".");
+	}
+
+	static terrain_type *try_get_by_freeciv_char(const char c)
+	{
+		const auto find_iterator = terrain_type::terrain_types_by_freeciv_char.find(c);
+		if (find_iterator != terrain_type::terrain_types_by_freeciv_char.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+
+	static void map_to_freeciv_char(terrain_type *terrain, const char c)
+	{
+		if (terrain_type::try_get_by_freeciv_char(c) != nullptr) {
+			throw std::runtime_error("Freeciv char \"" + std::string(1, c) + "\" is already used by another terrain type.");
+		}
+
+		terrain_type::terrain_types_by_freeciv_char[c] = terrain;
+	}
+
 	static terrain_type *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		terrain_type *terrain_type = data_type::add(identifier, data_module);
@@ -215,6 +244,7 @@ public:
 		terrain_type::terrain_types_by_wesnoth_string.clear();
 		terrain_type::terrain_types_by_0_ad_texture_name.clear();
 		terrain_type::terrain_types_by_0_ad_template_name.clear();
+		terrain_type::terrain_types_by_freeciv_char.clear();
 	}
 
 	explicit terrain_type(const std::string &identifier);
@@ -229,6 +259,7 @@ private:
 	static inline std::map<std::string, terrain_type *> terrain_types_by_wesnoth_string;
 	static inline std::map<std::string, terrain_type *> terrain_types_by_0_ad_texture_name;
 	static inline std::map<std::string, terrain_type *> terrain_types_by_0_ad_template_name;
+	static inline std::map<char, terrain_type *> terrain_types_by_freeciv_char;
 
 public:
 	virtual void process_gsml_property(const gsml_property &property) override;
@@ -257,6 +288,7 @@ public:
 	void map_to_wesnoth_string(const std::string &str);
 	void map_to_0_ad_texture_name(const std::string &str);
 	void map_to_0_ad_template_name(const std::string &str);
+	void map_to_freeciv_char(const char c);
 
 	const std::filesystem::path &get_image_file() const
 	{

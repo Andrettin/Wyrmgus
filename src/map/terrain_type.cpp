@@ -41,6 +41,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/assert_util.h"
 #include "util/colorization_type.h"
 #include "util/container_util.h"
 #include "util/image_util.h"
@@ -127,6 +128,11 @@ void terrain_type::process_gsml_scope(const gsml_data &scope)
 	} else if (tag == "0_ad_template_names") {
 		for (const std::string &value : values) {
 			this->map_to_0_ad_template_name(value);
+		}
+	} else if (tag == "freeciv_chars") {
+		for (const std::string &value : values) {
+			assert_throw(value.size() == 1);
+			this->map_to_freeciv_char(value.at(0));
 		}
 	} else if (tag == "flags") {
 		for (const std::string &value : values) {
@@ -439,6 +445,11 @@ void terrain_type::map_to_0_ad_template_name(const std::string &str)
 	}
 
 	terrain_type::terrain_types_by_0_ad_template_name[str] = this;
+}
+
+void terrain_type::map_to_freeciv_char(const char c)
+{
+	terrain_type::map_to_freeciv_char(this, c);
 }
 
 void terrain_type::set_image_file(const std::filesystem::path &filepath)
