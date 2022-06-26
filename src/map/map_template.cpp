@@ -166,6 +166,7 @@ void map_template::process_gsml_property(const gsml_property &property)
 void map_template::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "generated_terrains") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
@@ -187,6 +188,10 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			}
 		});
+	} else if (tag == "created_settlements") {
+		for (const std::string &value : values) {
+			this->created_settlements.push_back(site::get(value));
+		}
 	} else if (tag == "tile_terrains" || tag == "overlay_tile_terrains") {
 		point_map<const terrain_type *> &tile_terrains = (tag == "overlay_tile_terrains") ? this->overlay_tile_terrains : this->tile_terrains;
 
@@ -2970,6 +2975,8 @@ void map_template::load_0_ad_terrain_file()
 
 	const QRect image_rect = this->overlay_terrain_image.rect();
 
+	std::vector<const site *> settlements = this->created_settlements;
+
 	while (!xml_reader.atEnd()) {
 		const QXmlStreamReader::TokenType tokenType = xml_reader.readNext();
 
@@ -3099,6 +3106,28 @@ void map_template::load_0_ad_terrain_file()
 						if (resource_amount > 0) {
 							unit->set_resource_amount(resource_amount);
 						}
+
+						if (!settlements.empty()) {
+							bool settlement_center = false;
+							if (unit_type != nullptr) {
+								settlement_center = (unit_type == settlement_site_unit_type || unit_type->BoolFlag[TOWNHALL_INDEX].value);
+							} else if (unit_class != nullptr) {
+								settlement_center = unit_class->is_town_hall();
+							}
+
+							if (settlement_center) {
+								const site *settlement = nullptr;
+
+								if (this->random_created_settlements) {
+									settlement = vector::take_random(settlements);
+								} else {
+									settlement = vector::take_front(settlements);
+								}
+
+								unit->set_site(settlement);
+							}
+						}
+
 						this->units.push_back(std::move(unit));
 					}
 

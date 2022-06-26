@@ -103,6 +103,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(bool clear_path_to_other_subtemplates MEMBER clear_path_to_other_subtemplates READ clears_path_to_other_subtemplates)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
 	Q_PROPERTY(bool output_territory_image MEMBER output_territory_image READ outputs_territory_image)
+	Q_PROPERTY(bool random_created_settlements MEMBER random_created_settlements)
 	Q_PROPERTY(wyrmgus::map_projection* map_projection MEMBER map_projection)
 	Q_PROPERTY(wyrmgus::decimillesimal_int min_longitude READ get_min_longitude WRITE set_min_longitude)
 	Q_PROPERTY(wyrmgus::decimillesimal_int max_longitude READ get_max_longitude WRITE set_max_longitude)
@@ -783,6 +784,8 @@ private:
 	point_map<const site *> sites_by_position;
 	std::map<geocoordinate, const site *> sites_by_geocoordinate;
 	std::map<geocoordinate, const site *> sites_by_astrocoordinate;
+	std::vector<const site *> created_settlements; //sites for settlement sites which are created without a predefined site (e.g. when a map file details a settlement head without a settlement being provided); the settlements will be set to each settlement site in order
+	bool random_created_settlements = false;
 	point_map<const terrain_type *> tile_terrains;
 	point_map<const terrain_type *> overlay_tile_terrains;
 public:

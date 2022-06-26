@@ -86,6 +86,11 @@ public:
 		return this->site;
 	}
 
+	void set_site(const wyrmgus::site *site)
+	{
+		this->site = site;
+	}
+
 	int get_player_index() const
 	{
 		return this->player_index;
