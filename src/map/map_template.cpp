@@ -3094,7 +3094,7 @@ void map_template::load_0_ad_terrain_file()
 
 					int quantity = 1;
 					if (resource_amount > 0 && unit_type != nullptr && unit_type->get_tile_size() == QSize(1, 1)) {
-						quantity = resource_amount / resource_amount_per_unit;
+						quantity = std::max(resource_amount / resource_amount_per_unit, 1);
 						resource_amount /= quantity;
 
 						assert_throw(quantity > 0);
