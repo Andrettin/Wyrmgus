@@ -995,6 +995,7 @@ set(wyrmgus_script_effect_HDRS
 	src/script/effect/any_unit_of_class_effect.h
 	src/script/effect/any_unit_of_type_effect.h
 	src/script/effect/call_dialogue_effect.h
+	src/script/effect/center_on_site_effect.h
 	src/script/effect/character_unit_effect.h
 	src/script/effect/complete_quest_effect.h
 	src/script/effect/create_unit_effect.h

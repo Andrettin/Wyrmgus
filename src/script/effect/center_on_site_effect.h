@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2021-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,40 +26,75 @@
 
 #pragma once
 
-#include "player/player.h"
-#include "quest/quest.h"
+#include "map/map.h"
+#include "map/map_layer.h"
+#include "map/site.h"
+#include "map/site_game_data.h"
 #include "script/effect/effect.h"
-#include "util/string_util.h"
+#include "ui/ui.h"
 
 namespace wyrmgus {
 
-class complete_quest_effect final : public effect<CPlayer>
+class center_on_site_effect final : public effect<CPlayer>
 {
 public:
-	explicit complete_quest_effect(const std::string &quest_identifier, const gsml_operator effect_operator)
+	explicit center_on_site_effect(const std::string &site_identifier, const gsml_operator effect_operator)
 		: effect(effect_operator)
 	{
-		this->quest = quest::get(quest_identifier);
+		this->site = site::get(site_identifier);
 	}
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static const std::string class_identifier = "complete_quest";
+		static const std::string class_identifier = "center_on_site";
 		return class_identifier;
 	}
 
 	virtual void do_assignment_effect(CPlayer *player) const override
 	{
-		player->complete_quest(this->quest);
+		if (player != CPlayer::GetThisPlayer()) {
+			return;
+		}
+
+		const site_game_data *site_game_data = this->site->get_game_data();
+		if (!site_game_data->is_on_map()) {
+			return;
+		}
+
+		int map_layer_index = 0;
+		if (site_game_data->get_site_unit() != nullptr) {
+			map_layer_index = site_game_data->get_site_unit()->MapLayer->ID;
+		} else if (site_game_data->get_map_layer() != nullptr) {
+			map_layer_index = site_game_data->get_map_layer()->ID;
+		}
+
+		ChangeCurrentMapLayer(map_layer_index);
+
+		if (UI.SelectedViewport != nullptr) {
+			QPoint map_pos;
+
+			if (site_game_data->get_site_unit() != nullptr) {
+				map_pos = site_game_data->get_site_unit()->get_center_tile_pos();
+			} else {
+				map_pos = site_game_data->get_map_pos();
+			}
+
+			UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(map_pos));
+		}
 	}
 
 	virtual std::string get_assignment_string() const override
 	{
-		return "Complete the " + string::highlight(this->quest->get_name()) + " quest";
+		return std::string();
+	}
+
+	virtual bool is_hidden() const override
+	{
+		return true;
 	}
 
 private:
-	wyrmgus::quest *quest = nullptr;
+	wyrmgus::site *site = nullptr;
 };
 
 }

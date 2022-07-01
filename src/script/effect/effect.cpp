@@ -34,6 +34,7 @@
 #include "script/effect/any_unit_of_class_effect.h"
 #include "script/effect/any_unit_of_type_effect.h"
 #include "script/effect/call_dialogue_effect.h"
+#include "script/effect/center_on_site_effect.h"
 #include "script/effect/character_unit_effect.h"
 #include "script/effect/complete_quest_effect.h"
 #include "script/effect/current_player_effect.h"
@@ -71,6 +72,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_property(const
 	if constexpr (std::is_same_v<scope_type, CPlayer>) {
 		if (key == "accept_quest") {
 			return std::make_unique<accept_quest_effect>(value, effect_operator);
+		} else if (key == "center_on_site") {
+			return std::make_unique<center_on_site_effect>(value, effect_operator);
 		} else if (key == "complete_quest") {
 			return std::make_unique<complete_quest_effect>(value, effect_operator);
 		} else if (key == "create_unit") {
