@@ -825,6 +825,7 @@ public:
 		this->step_count = 0;
 	}
 
+	bool is_capturable() const;
 	bool is_near_site(const wyrmgus::site *site) const;
 	bool counts_for_military_score() const;
 

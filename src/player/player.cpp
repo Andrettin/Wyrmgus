@@ -2986,7 +2986,7 @@ void CPlayer::RemoveUnit(CUnit &unit)
 
 bool CPlayer::capture_unit(CUnit *unit)
 {
-	if (unit->Variable[CAPTURE_HP_THRESHOLD_INDEX].Value == 0) {
+	if (!unit->is_capturable()) {
 		return false;
 	}
 

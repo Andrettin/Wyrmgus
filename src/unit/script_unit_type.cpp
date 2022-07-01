@@ -1623,7 +1623,7 @@ int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				const std::string affix_ident = LuaToString(l, -1, j + 1);
-				type->Affixes.push_back(CUpgrade::get(affix_ident));
+				type->affixes.push_back(CUpgrade::get(affix_ident));
 			}
 		} else if (!strcmp(value, "Traits")) {
 			type->traits.clear(); // remove previously defined traits, to allow unit types to not inherit traits from their parent unit types
@@ -2264,14 +2264,6 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	} else if (!strcmp(data, "Affixes")) {
-		lua_createtable(l, type->Affixes.size(), 0);
-		for (size_t i = 1; i <= type->Affixes.size(); ++i)
-		{
-			lua_pushstring(l, type->Affixes[i-1]->get_identifier().c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
 	} else if (!strcmp(data, "Droppers")) { // unit types which can drop this one
 		std::vector<const wyrmgus::unit_type *> droppers;
 		for (const wyrmgus::unit_type *other_unit_type : wyrmgus::unit_type::get_all()) {
@@ -2312,10 +2304,10 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Prefixes")) {
 		std::vector<const CUpgrade *> prefixes;
-		for (size_t i = 0; i < type->Affixes.size(); ++i)
+		for (size_t i = 0; i < type->get_affixes().size(); ++i)
 		{
-			if (type->Affixes[i]->is_magic_prefix()) {
-				prefixes.push_back(type->Affixes[i]);
+			if (type->get_affixes()[i]->is_magic_prefix()) {
+				prefixes.push_back(type->get_affixes()[i]);
 			}
 		}
 		if (type->get_item_class() != wyrmgus::item_class::none) {
@@ -2335,10 +2327,10 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Suffixes")) {
 		std::vector<const CUpgrade *> suffixes;
-		for (size_t i = 0; i < type->Affixes.size(); ++i)
+		for (size_t i = 0; i < type->get_affixes().size(); ++i)
 		{
-			if (type->Affixes[i]->is_magic_suffix()) {
-				suffixes.push_back(type->Affixes[i]);
+			if (type->get_affixes()[i]->is_magic_suffix()) {
+				suffixes.push_back(type->get_affixes()[i]);
 			}
 		}
 		if (type->get_item_class() != wyrmgus::item_class::none) {

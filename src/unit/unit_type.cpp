@@ -896,7 +896,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 		}
 	} else if (tag == "affixes") {
 		for (const std::string &value : values) {
-			this->Affixes.push_back(CUpgrade::get(value));
+			this->affixes.push_back(CUpgrade::get(value));
 		}
 	} else if (tag == "stored_resources") {
 		for (const std::string &value : values) {
@@ -1634,7 +1634,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->Drops = parent_type->Drops;
 	this->AiDrops = parent_type->AiDrops;
 	this->DropSpells = parent_type->DropSpells;
-	this->Affixes = parent_type->Affixes;
+	this->affixes = parent_type->affixes;
 	this->traits = parent_type->traits;
 	this->StartingAbilities = parent_type->StartingAbilities;
 	for (size_t i = 0; i < parent_type->Trains.size(); ++i) {

@@ -2003,7 +2003,7 @@ static int CclSetUnitVariable(lua_State *l)
 			unit->set_unique(wyrmgus::unique_item::get(unique_name));
 		}
 	} else if (!strcmp(name, "GenerateSpecialProperties")) {
-		CPlayer *dropper_player = nullptr;
+		CPlayer *dropper_player = unit->Player;
 		bool always_magic = false;
 		if (nargs >= 3) {
 			int dropper_player_index = LuaToNumber(l, 3);

@@ -360,7 +360,7 @@ std::string CUpgrade::get_encyclopedia_text() const
 				continue;
 			}
 
-			if (vector::contains(unit_type->Affixes, this)) {
+			if (vector::contains(unit_type->get_affixes(), this)) {
 				applies_to_unit_types.push_back(unit_type);
 			}
 		}
@@ -1221,35 +1221,6 @@ static int CclGetUpgradeData(lua_State *l)
 			lua_pushboolean(l, upgrade->is_magic_suffix() && upgrade->has_affixed_item_class(item_class));
 			return 1;
 		}
-	} else if (!strcmp(data, "AppliesTo")) { //to which unit types or item classes this upgrade applies
-		std::vector<std::string> applies_to;
-		for (const item_class item_class : upgrade->get_affixed_item_classes()) {
-			applies_to.push_back(item_class_to_string(item_class));
-		}
-
-		for (const auto &upgrade_modifier : upgrade->get_modifiers()) {
-			for (const unit_type *unit_type : upgrade_modifier->get_unit_types()) {
-				applies_to.push_back(unit_type->get_identifier());
-			}
-		}
-
-		for (const unit_type *unit_type : unit_type::get_all()) {
-			if (unit_type->is_template()) { //if is a template, continue
-				continue;
-			}
-
-			if (vector::contains(unit_type->Affixes, upgrade)) {
-				applies_to.push_back(unit_type->get_identifier());
-			}
-		}
-
-		lua_createtable(l, applies_to.size(), 0);
-		for (size_t i = 1; i <= applies_to.size(); ++i)
-		{
-			lua_pushstring(l, applies_to[i-1].c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

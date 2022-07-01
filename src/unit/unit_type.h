@@ -1146,6 +1146,11 @@ public:
 		return this->max_spawned_demand;
 	}
 
+	const std::vector<const CUpgrade *> &get_affixes() const
+	{
+		return this->affixes;
+	}
+
 	const std::vector<CUpgrade *> &get_traits() const
 	{
 		return this->traits;
@@ -1357,8 +1362,8 @@ public:
 	std::vector<unit_type *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<unit_type *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<spell *> DropSpells;		/// Spells which can be applied to dropped items
-	std::vector<CUpgrade *> Affixes;		/// Affixes which can be generated for this unit type
 private:
+	std::vector<const CUpgrade *> affixes;		/// Affixes which can be generated for this unit type
 	std::vector<CUpgrade *> traits; //which traits this unit type can have
 public:
 	std::vector<CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with

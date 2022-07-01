@@ -2435,6 +2435,8 @@ void CUnit::GenerateDrop()
 
 void CUnit::generate_special_properties(const CUnit *dropper, const CPlayer *dropper_player, const bool allow_unique, const bool sold_item, const bool always_magic)
 {
+	assert_log(dropper_player != nullptr);
+
 	int magic_affix_chance = 10; //10% chance of the unit having a magic prefix or suffix
 	int unique_chance = 5; //0.5% chance of the unit being unique
 	if (dropper != nullptr) {
@@ -2540,15 +2542,22 @@ void CUnit::generate_prefix(const CUnit *dropper, const CPlayer *dropper_player)
 {
 	std::vector<const CUpgrade *> potential_prefixes;
 
-	for (const CUpgrade *affix : this->Type->Affixes) {
-		if (!affix->is_magic_prefix()) {
-			continue;
+	if (dropper_player != nullptr) {
+		for (const CUpgrade *affix : this->Type->get_affixes()) {
+			if (!affix->is_magic_prefix()) {
+				continue;
+			}
+
+			//check drop conditions, but not for non-capturable neutral buildings
+			if (!dropper_player->is_neutral_player() || !this->Type->BoolFlag[BUILDING_INDEX].value || this->is_capturable()) {
+				if (!affix->check_drop_conditions(dropper, dropper_player)) {
+					continue;
+				}
+			}
+
+			potential_prefixes.push_back(affix);
 		}
 
-		potential_prefixes.push_back(affix);
-	}
-
-	if (dropper_player != nullptr) {
 		for (const CUpgrade *upgrade : CUpgrade::get_all()) {
 			if (!upgrade->is_magic_prefix()) {
 				continue;
@@ -2575,20 +2584,27 @@ void CUnit::generate_suffix(const CUnit *dropper, const CPlayer *dropper_player)
 {
 	std::vector<const CUpgrade *> potential_suffixes;
 
-	for (const CUpgrade *affix : this->Type->Affixes) {
-		if (!affix->is_magic_suffix()) {
-			continue;
-		}
-
-		if (this->Prefix != nullptr && affix->is_incompatible_affix(this->Prefix)) {
-			//don't allow a suffix incompatible with the prefix to appear
-			continue;
-		}
-
-		potential_suffixes.push_back(affix);
-	}
-
 	if (dropper_player != nullptr) {
+		for (const CUpgrade *affix : this->Type->get_affixes()) {
+			if (!affix->is_magic_suffix()) {
+				continue;
+			}
+
+			//check drop conditions, but not for non-capturable neutral buildings
+			if (!dropper_player->is_neutral_player() || !this->Type->BoolFlag[BUILDING_INDEX].value || this->is_capturable()) {
+				if (!affix->check_drop_conditions(dropper, dropper_player)) {
+					continue;
+				}
+			}
+
+			if (this->Prefix != nullptr && affix->is_incompatible_affix(this->Prefix)) {
+				//don't allow a suffix incompatible with the prefix to appear
+				continue;
+			}
+
+			potential_suffixes.push_back(affix);
+		}
+
 		for (const CUpgrade *upgrade : CUpgrade::get_all()) {
 			if (!upgrade->is_magic_suffix()) {
 				continue;
@@ -2634,17 +2650,23 @@ void CUnit::generate_spell(const CUnit *dropper, const CPlayer *dropper_player)
 
 void CUnit::generate_work(const CUnit *dropper, const CPlayer *dropper_player)
 {
-	std::vector<const CUpgrade *> potential_works;
-
-	for (const CUpgrade *affix : this->Type->Affixes) {
-		if (this->Type->get_item_class() != item_class::none && affix->Work == this->Type->get_item_class() && !affix->UniqueOnly) {
-			potential_works.push_back(affix);
-		}
+	if (this->Type->get_item_class() == item_class::none) {
+		return;
 	}
+
+	std::vector<const CUpgrade *> potential_works;
 
 	if (dropper_player != nullptr) {
 		for (const CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->get_item_class() == item_class::none || upgrade->Work != this->Type->get_item_class() || upgrade->UniqueOnly) {
+			if (upgrade->Work == item_class::none) {
+				continue;
+			}
+
+			if (upgrade->Work != this->Type->get_item_class()) {
+				continue;
+			}
+
+			if (upgrade->UniqueOnly) {
 				continue;
 			}
 
@@ -2671,12 +2693,12 @@ void CUnit::generate_unique(const CUnit *dropper, const CPlayer *dropper_player)
 		}
 
 		if (unique->get_prefix() != nullptr) {
-			//the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit type must be capable of generating it on its own
-			if (!vector::contains(this->Type->Affixes, unique->get_prefix())) {
-				if (dropper_player == nullptr) {
-					continue;
-				}
+			//the dropper unit must be capable of generating this unique item's prefix to drop the item
+			if (dropper_player == nullptr) {
+				continue;
+			}
 
+			if (!dropper_player->is_neutral_player() || !this->Type->BoolFlag[BUILDING_INDEX].value || this->is_capturable()) {
 				if (!unique->get_prefix()->check_drop_conditions(dropper, dropper_player)) {
 					continue;
 				}
@@ -2684,12 +2706,12 @@ void CUnit::generate_unique(const CUnit *dropper, const CPlayer *dropper_player)
 		}
 
 		if (unique->get_suffix() != nullptr) {
-			//the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit type must be capable of generating it on its own
-			if (!vector::contains(this->Type->Affixes, unique->get_suffix())) {
-				if (dropper_player == nullptr) {
-					continue;
-				}
+			//the dropper unit must be capable of generating this unique item's suffix to drop the item
+			if (dropper_player == nullptr) {
+				continue;
+			}
 
+			if (!dropper_player->is_neutral_player() || !this->Type->BoolFlag[BUILDING_INDEX].value || this->is_capturable()) {
 				if (!unique->get_suffix()->check_drop_conditions(dropper, dropper_player)) {
 					continue;
 				}
@@ -2719,28 +2741,24 @@ void CUnit::generate_unique(const CUnit *dropper, const CPlayer *dropper_player)
 		}
 
 		if (unique->get_work() != nullptr) {
-			//the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit type must be capable of generating it on its own
-			if (!vector::contains(this->Type->Affixes, unique->get_work())) {
-				if (dropper_player == nullptr) {
-					continue;
-				}
+			//the dropper unit must be capable of generating this unique item's work to drop the item
+			if (dropper_player == nullptr) {
+				continue;
+			}
 
-				if (!unique->get_work()->check_drop_conditions(dropper, dropper_player)) {
-					continue;
-				}
+			if (!unique->get_work()->check_drop_conditions(dropper, dropper_player)) {
+				continue;
 			}
 		}
 
 		if (unique->get_elixir() != nullptr) {
-			//the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit type must be capable of generating it on its own
-			if (!vector::contains(this->Type->Affixes, unique->get_elixir())) {
-				if (dropper_player == nullptr) {
-					continue;
-				}
+			//the dropper unit must be capable of generating this unique item's elixir to drop the item
+			if (dropper_player == nullptr) {
+				continue;
+			}
 
-				if (!unique->get_elixir()->check_drop_conditions(dropper, dropper_player)) {
-					continue;
-				}
+			if (!unique->get_elixir()->check_drop_conditions(dropper, dropper_player)) {
+				continue;
 			}
 		}
 
@@ -4573,7 +4591,7 @@ CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, cons
 CUnit *CreateResourceUnit(const Vec2i &pos, const unit_type &type, int z, bool allow_unique)
 {
 	CUnit *unit = CreateUnit(pos, type, CPlayer::get_neutral_player(), z, true);
-	unit->generate_special_properties(nullptr, nullptr, allow_unique, false, false);
+	unit->generate_special_properties(nullptr, unit->Player, allow_unique, false, false);
 			
 	// create metal rocks near metal resources
 	const unit_type *metal_rock_type = nullptr;
@@ -7396,6 +7414,11 @@ wyrmgus::gender CUnit::get_gender() const
 	return static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value);
 }
 
+bool CUnit::is_capturable() const
+{
+	return this->Variable[CAPTURE_HP_THRESHOLD_INDEX].Value != 0;
+}
+
 bool CUnit::is_near_site(const wyrmgus::site *site) const
 {
 	if (this->MapLayer == nullptr) {
@@ -7828,7 +7851,7 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, const int da
 
 	//capture enemy buildings
 
-	if (target.Variable[CAPTURE_HP_THRESHOLD_INDEX].Value == 0) {
+	if (!target.is_capturable()) {
 		return;
 	}
 
