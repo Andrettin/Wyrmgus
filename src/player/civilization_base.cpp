@@ -40,6 +40,9 @@
 #include "sound/sound.h"
 #include "ui/cursor.h"
 #include "unit/unit_class.h"
+#include "unit/unit_type.h"
+#include "upgrade/upgrade_class.h"
+#include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
 
@@ -58,7 +61,25 @@ void civilization_base::process_gsml_scope(const gsml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "unit_sounds") {
+	if (tag == "class_unit_types") {
+		scope.for_each_property([&](const gsml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const unit_class *unit_class = unit_class::get(key);
+			const unit_type *unit_type = unit_type::get(value);
+			this->set_class_unit_type(unit_class, unit_type);
+		});
+	} else if (tag == "class_upgrades") {
+		scope.for_each_property([&](const gsml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const upgrade_class *upgrade_class = upgrade_class::get(key);
+			const CUpgrade *upgrade = CUpgrade::get(value);
+			this->set_class_upgrade(upgrade_class, upgrade);
+		});
+	} else if (tag == "unit_sounds") {
 		if (this->unit_sound_set == nullptr) {
 			this->unit_sound_set = std::make_unique<wyrmgus::unit_sound_set>();
 		}
