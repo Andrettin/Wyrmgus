@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020 by Andrettin
+//      (c) Copyright 2020-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@ enum class faction_type {
 	none,
 	tribe,
 	polity,
+	minor_tribe,
+	notable_house,
 	mercenary_company,
 	holy_order,
 	trading_company,
@@ -48,6 +50,10 @@ inline faction_type string_to_faction_type(const std::string &str)
 		return faction_type::tribe;
 	} else if (str == "polity") {
 		return faction_type::polity;
+	} else if (str == "minor_tribe") {
+		return faction_type::minor_tribe;
+	} else if (str == "notable_house") {
+		return faction_type::notable_house;
 	} else if (str == "mercenary_company") {
 		return faction_type::mercenary_company;
 	} else if (str == "holy_order") {
@@ -68,6 +74,10 @@ inline std::string faction_type_to_string(const faction_type type)
 			return "tribe";
 		case faction_type::polity:
 			return "polity";
+		case faction_type::minor_tribe:
+			return "minor_tribe";
+		case faction_type::notable_house:
+			return "notable_house";
 		case faction_type::mercenary_company:
 			return "mercenary_company";
 		case faction_type::holy_order:
@@ -84,6 +94,8 @@ inline std::string faction_type_to_string(const faction_type type)
 inline bool is_faction_type_neutral(const faction_type type)
 {
 	switch (type) {
+		case faction_type::minor_tribe:
+		case faction_type::notable_house:
 		case faction_type::mercenary_company:
 		case faction_type::holy_order:
 		case faction_type::trading_company:
@@ -102,6 +114,10 @@ inline std::string get_faction_type_name(const faction_type type)
 			return "Tribe";
 		case faction_type::polity:
 			return "Polity";
+		case faction_type::minor_tribe:
+			return "Minor Tribe";
+		case faction_type::notable_house:
+			return "Notable House";
 		case faction_type::mercenary_company:
 			return "Mercenary Company";
 		case faction_type::holy_order:
