@@ -115,8 +115,8 @@ public:
 	TriggerType Type = TriggerType::GlobalTrigger;
 	bool Local = false;
 private:
-	bool only_once = false;				/// Whether the trigger should occur only once in a game
-	bool campaign_only = false;			/// Whether the trigger should only occur in the campaign mode
+	bool only_once = false; //whether the trigger should occur only once in a game
+	bool campaign_only = false; //whether the trigger should only occur in the campaign mode
 public:
 	std::unique_ptr<LuaCallback> Conditions;
 	std::unique_ptr<LuaCallback> Effects;
@@ -135,14 +135,14 @@ private:
 /**
 **  Data to referer game info when game running.
 */
-struct TriggerDataType {
-	CUnit *Attacker;  /// Unit which send the missile.
-	CUnit *Defender;  /// Unit which is hit by missile.
-	CUnit *Active;    /// Unit which is selected or else under cursor unit.
+struct TriggerDataType final {
+	CUnit *Attacker = nullptr;  /// Unit which send the missile.
+	CUnit *Defender = nullptr;  /// Unit which is hit by missile.
+	CUnit *Active = nullptr;    /// Unit which is selected or else under cursor unit.
 	//Wyrmgus start
-	CUnit *Unit;	  /// Unit used in trigger
+	CUnit *Unit = nullptr;	  /// Unit used in trigger
 	//Wyrmgus end
-	const wyrmgus::unit_type *Type = nullptr;		/// Type used in trigger;
+	const unit_type *Type = nullptr;		/// Type used in trigger;
 	const CUpgrade *Upgrade = nullptr;		/// Upgrade used in trigger
 	const wyrmgus::resource *resource = nullptr;	/// Resource used in trigger
 	const wyrmgus::faction *faction = nullptr;		/// Faction used in trigger
@@ -154,12 +154,8 @@ struct TriggerDataType {
 /// Some data accessible for script during the game.
 extern TriggerDataType TriggerData;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 extern int TriggerGetPlayer(lua_State *l);/// get player number.
-extern const wyrmgus::unit_type *TriggerGetUnitType(lua_State *l); /// get the unit-type
+extern const unit_type *TriggerGetUnitType(lua_State *l); /// get the unit-type
 extern void TriggersEachCycle();    /// test triggers
 extern void call_trigger(const std::string &identifier);
 
