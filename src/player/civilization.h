@@ -200,8 +200,8 @@ public:
 
 	cursor *get_cursor(const cursor_type type) const;
 
-	unit_type *get_class_unit_type(const unit_class *unit_class) const;
-	CUpgrade *get_class_upgrade(const upgrade_class *upgrade_class) const;
+	const unit_type *get_class_unit_type(const unit_class *unit_class) const;
+	const CUpgrade *get_class_upgrade(const upgrade_class *upgrade_class) const;
 	const population_type *get_class_population_type(const population_class *population_class) const;
 
 	const std::vector<CFiller> &get_ui_fillers() const

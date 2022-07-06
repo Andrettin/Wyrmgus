@@ -297,9 +297,9 @@ public:
 	int get_player_color_usage_count(const wyrmgus::player_color *player_color) const;
 	void update_territory_tiles();
 
-	unit_type *get_class_unit_type(const wyrmgus::unit_class *unit_class) const;
+	const unit_type *get_class_unit_type(const wyrmgus::unit_class *unit_class) const;
 	bool is_class_unit_type(const unit_type *unit_type) const;
-	CUpgrade *get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const;
+	const CUpgrade *get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const;
 	const population_type *get_class_population_type(const population_class *population_class) const;
 
 	bool has_upgrade(const CUpgrade *upgrade) const;

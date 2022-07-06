@@ -1506,7 +1506,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.get_settlement());
 	} else { //remove the request of the unit the mercenary is substituting
-		wyrmgus::unit_type *requested_unit_type = what.Player->get_faction()->get_class_unit_type(what.Type->get_unit_class());
+		const unit_type *requested_unit_type = what.Player->get_faction()->get_class_unit_type(what.Type->get_unit_class());
 		if (requested_unit_type != nullptr) {
 			AiRemoveFromBuilt(what.Player->Ai.get(), *requested_unit_type, CMap::get()->get_tile_landmass(what.tilePos, what.MapLayer->ID), what.get_settlement());
 		}

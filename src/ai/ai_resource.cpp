@@ -2630,7 +2630,7 @@ void AiCheckBuildings()
 	
 	const CAiBuildingTemplate *building_template = potential_building_templates[SyncRand(potential_building_templates.size())];
 	
-	unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(building_template->get_unit_class());
+	const unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(building_template->get_unit_class());
 	
 	if (!AiHelpers.get_builders(unit_type).empty() || !AiHelpers.get_builder_classes(unit_type->get_unit_class()).empty()) { //constructed by worker
 		AiAddUnitTypeRequest(*unit_type, 1);

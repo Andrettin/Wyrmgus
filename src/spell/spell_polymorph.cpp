@@ -56,7 +56,7 @@ void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex)
 		++j;
 		if (!strcmp(value, "new-form")) {
 			value = LuaToString(l, -1, j + 1);
-			this->NewForm = wyrmgus::unit_type::get(value);
+			this->NewForm = unit_type::get(value);
 			// FIXME: temp polymorphs? hard to do.
 		} else if (!strcmp(value, "player-neutral")) {
 			this->PlayerNeutral = 1;
@@ -67,7 +67,7 @@ void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex)
 		//Wyrmgus start
 		} else if (!strcmp(value, "civilization")) {
 			value = LuaToString(l, -1, j + 1);
-			wyrmgus::civilization *civilization = wyrmgus::civilization::get(value);
+			wyrmgus::civilization *civilization = civilization::get(value);
 			this->civilization = civilization;
 		} else if (!strcmp(value, "faction")) {
 			value = LuaToString(l, -1, j + 1);
@@ -99,7 +99,7 @@ void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex)
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, const int z, const int modifier)
+int Spell_Polymorph::Cast(CUnit &caster, const spell &spell, CUnit *target, const Vec2i &goalPos, const int z, const int modifier)
 {
 	Q_UNUSED(goalPos)
 	Q_UNUSED(z)
@@ -109,18 +109,21 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 		return 0;
 	}
 
-	wyrmgus::unit_type *type = this->NewForm;
+	const unit_type *type = this->NewForm;
 	//Wyrmgus start
 	if (this->NewForm == nullptr) {
-		wyrmgus::unit_type *new_unit_type = nullptr;
+		const unit_type *new_unit_type = nullptr;
+
 		if (this->civilization != nullptr && this->Faction != -1 && this->civilization == target->Type->get_civilization()) { //get faction equivalent, if is of the same civilization
-			new_unit_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(target->Type->get_unit_class());
+			new_unit_type = faction::get_all()[this->Faction]->get_class_unit_type(target->Type->get_unit_class());
 		} else if (this->civilization != nullptr && this->civilization != target->Type->get_civilization()) {
 			new_unit_type = this->civilization->get_class_unit_type(target->Type->get_unit_class());
 		}
+
 		if (this->Detachment && target->Type->get_civilization() != nullptr && target->Type->get_faction() != nullptr) {
 			new_unit_type = target->Type->get_civilization()->get_class_unit_type(target->Type->get_unit_class());
 		}
+
 		if (new_unit_type != nullptr) {
 			type = new_unit_type;
 		}
@@ -130,9 +133,11 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 		target->get_character()->civilization = this->civilization;
 		target->get_character()->save();
 	}
+
 	if (type == nullptr) {
 		return 0;
 	}
+
 //	const Vec2i pos(goalPos - type.GetHalfTileSize());
 	//Wyrmgus end
 
@@ -151,6 +156,7 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 //	FindNearestDrop(type, pos, resPos, LookingW);
 	TransformUnitIntoType(*target, *type);
 	//Wyrmgus end
+
 	if (this->PlayerNeutral == 1) {
 		//Wyrmgus start
 //		MakeUnitAndPlace(resPos, type, CPlayer::get_neutral_player());
@@ -166,14 +172,17 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 //		MakeUnitAndPlace(resPos, type, target->Player);
 		//Wyrmgus end
 	}
+
 	//Wyrmgus start
 	if (target->get_character() != nullptr && (this->PlayerNeutral == 1 || this->PlayerNeutral == 2)) {
-		wyrmgus::vector::remove(target->Player->Heroes, target);
+		vector::remove(target->Player->Heroes, target);
 		target->set_character(nullptr);
 	}
+
 //	UnitLost(*target);
 //	target->clear_orders();
 //	target->Release();
+
 	if (game::get()->is_persistency_enabled() && target->get_character() != nullptr && &caster == target) { //save persistent data
 		if (target->Player == CPlayer::GetThisPlayer()) {
 			target->get_character()->set_unit_type(type);
@@ -181,5 +190,6 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 		}
 	}
 	//Wyrmgus end
+
 	return 1;
 }

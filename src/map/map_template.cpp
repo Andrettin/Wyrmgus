@@ -1070,10 +1070,11 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 			continue;
 		}
 
-		// add five workers at the player's starting location
+		//add five workers at the player's starting location
 		if (player->NumTownHalls > 0) {
 			const unit_type *worker_type = player->get_class_unit_type(unit_class::get("worker"));
-			if (worker_type != nullptr && player->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
+			if (worker_type != nullptr && player->GetUnitTypeCount(worker_type) == 0) {
+				//only create if the player doesn't have any workers created in another manner
 				const Vec2i worker_unit_offset((worker_type->get_tile_size() - QSize(1, 1)) / 2);
 				
 				Vec2i worker_pos(player->StartPos);
@@ -1533,11 +1534,13 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		if (
 			start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
 			&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
-			) {
-			unit_type *unit_type = site_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
+		) {
+			const unit_type *unit_type = site_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
+
 			if (unit_type == nullptr) {
 				continue;
 			}
+
 			if (unit_type->get_terrain_type() != nullptr && unit_type->get_terrain_type()->is_pathway()) {
 				pathway_type = unit_type;
 			}

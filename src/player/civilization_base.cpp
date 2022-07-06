@@ -291,7 +291,7 @@ cursor *civilization_base::get_cursor(const cursor_type type) const
 	return nullptr;
 }
 
-unit_type *civilization_base::get_class_unit_type(const unit_class *unit_class) const
+const unit_type *civilization_base::get_class_unit_type(const unit_class *unit_class) const
 {
 	if (unit_class == nullptr) {
 		return nullptr;
@@ -309,7 +309,7 @@ unit_type *civilization_base::get_class_unit_type(const unit_class *unit_class) 
 	return nullptr;
 }
 
-CUpgrade *civilization_base::get_class_upgrade(const upgrade_class *upgrade_class) const
+const CUpgrade *civilization_base::get_class_upgrade(const upgrade_class *upgrade_class) const
 {
 	if (upgrade_class == nullptr) {
 		return nullptr;

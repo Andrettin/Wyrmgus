@@ -268,9 +268,9 @@ public:
 		return this->ship_name_generator.get();
 	}
 
-	unit_type *get_class_unit_type(const unit_class *unit_class) const;
+	const unit_type *get_class_unit_type(const unit_class *unit_class) const;
 
-	void set_class_unit_type(const unit_class *unit_class, unit_type *unit_type)
+	void set_class_unit_type(const unit_class *unit_class, const unit_type *unit_type)
 	{
 		if (unit_type == nullptr) {
 			this->class_unit_types.erase(unit_class);
@@ -280,9 +280,9 @@ public:
 		this->class_unit_types[unit_class] = unit_type;
 	}
 
-	void remove_class_unit_type(unit_type *unit_type)
+	void remove_class_unit_type(const unit_type *unit_type)
 	{
-		for (unit_class_map<wyrmgus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+		for (unit_class_map<const wyrmgus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
 			if (iterator->second == unit_type) {
 				this->class_unit_types.erase(iterator->first);
 			}
@@ -291,9 +291,9 @@ public:
 
 	bool is_class_unit_type(const unit_type *unit_type) const;
 
-	CUpgrade *get_class_upgrade(const upgrade_class *upgrade_class) const;
+	const CUpgrade *get_class_upgrade(const upgrade_class *upgrade_class) const;
 
-	void set_class_upgrade(const upgrade_class *upgrade_class, CUpgrade *upgrade)
+	void set_class_upgrade(const upgrade_class *upgrade_class, const CUpgrade *upgrade)
 	{
 		if (upgrade == nullptr) {
 			this->class_upgrades.erase(upgrade_class);
@@ -303,9 +303,9 @@ public:
 		this->class_upgrades[upgrade_class] = upgrade;
 	}
 
-	void remove_class_upgrade(CUpgrade *upgrade)
+	void remove_class_upgrade(const CUpgrade *upgrade)
 	{
-		for (std::map<const upgrade_class *, CUpgrade *>::reverse_iterator iterator = this->class_upgrades.rbegin(); iterator != this->class_upgrades.rend(); ++iterator) {
+		for (std::map<const upgrade_class *, const CUpgrade *>::reverse_iterator iterator = this->class_upgrades.rbegin(); iterator != this->class_upgrades.rend(); ++iterator) {
 			if (iterator->second == upgrade) {
 				this->class_upgrades.erase(iterator->first);
 			}
@@ -385,8 +385,8 @@ private:
 public:
 	std::map<ButtonCmd, const wyrmgus::icon *> ButtonIcons;				/// icons for button actions
 private:
-	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the faction
-	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the faction
+	unit_class_map<const unit_type *> class_unit_types; //the unit type slot of a particular class for the faction
+	std::map<const upgrade_class *, const CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the faction
 public:
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 private:

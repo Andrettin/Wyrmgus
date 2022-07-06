@@ -673,13 +673,13 @@ cursor *civilization::get_cursor(const cursor_type type) const
 	return cursor::get_cursor_by_type(type);
 }
 
-unit_type *civilization::get_class_unit_type(const unit_class *unit_class) const
+const unit_type *civilization::get_class_unit_type(const unit_class *unit_class) const
 {
 	if (unit_class == nullptr) {
 		return nullptr;
 	}
 
-	unit_type *unit_type = civilization_base::get_class_unit_type(unit_class);
+	const unit_type *unit_type = civilization_base::get_class_unit_type(unit_class);
 	if (unit_type != nullptr) {
 		return unit_type;
 	}
@@ -691,13 +691,13 @@ unit_type *civilization::get_class_unit_type(const unit_class *unit_class) const
 	return nullptr;
 }
 
-CUpgrade *civilization::get_class_upgrade(const upgrade_class *upgrade_class) const
+const CUpgrade *civilization::get_class_upgrade(const upgrade_class *upgrade_class) const
 {
 	if (upgrade_class == nullptr) {
 		return nullptr;
 	}
 
-	CUpgrade *upgrade = civilization_base::get_class_upgrade(upgrade_class);
+	const CUpgrade *upgrade = civilization_base::get_class_upgrade(upgrade_class);
 	if (upgrade != nullptr) {
 		return upgrade;
 	}
@@ -808,14 +808,14 @@ bool civilization::is_tech_tree_entry(const upgrade_class *upgrade_class) const
 
 QVariantList civilization::get_tech_tree_entries() const
 {
-	std::vector<data_entry *> entries;
+	std::vector<const data_entry *> entries;
 
 	for (const unit_class *unit_class : unit_class::get_all()) {
 		if (!this->is_tech_tree_entry(unit_class)) {
 			continue;
 		}
 
-		unit_type *unit_type = this->get_class_unit_type(unit_class);
+		const unit_type *unit_type = this->get_class_unit_type(unit_class);
 		entries.push_back(unit_type);
 	}
 
@@ -824,7 +824,7 @@ QVariantList civilization::get_tech_tree_entries() const
 			continue;
 		}
 
-		CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
+		const CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
 		entries.push_back(upgrade);
 	}
 
@@ -881,10 +881,10 @@ QString civilization::generate_female_surname() const
 
 QVariantList civilization::get_custom_hero_unit_types() const
 {
-	std::vector<unit_type *> unit_types;
+	std::vector<const unit_type *> unit_types;
 
 	for (const unit_class *unit_class : unit_class::get_all()) {
-		unit_type *unit_type = this->get_class_unit_type(unit_class);
+		const unit_type *unit_type = this->get_class_unit_type(unit_class);
 
 		if (unit_type == nullptr) {
 			continue;

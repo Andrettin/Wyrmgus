@@ -542,7 +542,7 @@ const name_generator *faction::get_unit_class_name_generator(const unit_class *u
 	return this->get_civilization()->get_unit_class_name_generator(unit_class);
 }
 
-unit_type *faction::get_class_unit_type(const unit_class *unit_class) const
+const unit_type *faction::get_class_unit_type(const unit_class *unit_class) const
 {
 	if (unit_class == nullptr) {
 		return nullptr;
@@ -565,7 +565,7 @@ bool faction::is_class_unit_type(const unit_type *unit_type) const
 	return unit_type == this->get_class_unit_type(unit_type->get_unit_class());
 }
 
-CUpgrade *faction::get_class_upgrade(const upgrade_class *upgrade_class) const
+const CUpgrade *faction::get_class_upgrade(const upgrade_class *upgrade_class) const
 {
 	if (upgrade_class == nullptr) {
 		return nullptr;

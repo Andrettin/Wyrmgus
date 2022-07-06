@@ -184,7 +184,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			DebugPrint("Send command follow\n");
 			// is flush value correct ?
 			if (!acknowledged) {
-				PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+				PlayUnitSound(&unit, unit_sound_type::acknowledging);
 				acknowledged = 1;
 			}
 			SendCommandFollow(*dest, unit, 0);
@@ -194,7 +194,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			dest->Blink = 4;
 			DebugPrint("Board transporter\n");
 			if (!acknowledged) {
-				PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+				PlayUnitSound(&unit, unit_sound_type::acknowledging);
 				acknowledged = 1;
 			}
 			SendCommandBoard(unit, *dest, flush);
@@ -209,7 +209,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			DebugPrint("Send command follow\n");
 			// is flush value correct ?
 			if (!acknowledged) {
-				PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+				PlayUnitSound(&unit, unit_sound_type::acknowledging);
 				acknowledged = 1;
 			}
 			SendCommandFollow(unit, *dest, 0);
@@ -221,7 +221,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			dest->Blink = 4;
 			DebugPrint("Board transporter\n");
 			if (!acknowledged) {
-				PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+				PlayUnitSound(&unit, unit_sound_type::acknowledging);
 				acknowledged = 1;
 			}
 			SendCommandBoard(*dest, unit, flush);
@@ -248,7 +248,7 @@ static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		return false;
 	}
 	
-	for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
+	for (const spell *spell : unit.get_autocast_spells()) {
 		if (unit.CanAutoCastSpell(spell)) {
 			const AutoCastInfo *autocast = spell->get_autocast_info(unit.Player->AiEnabled);
 
@@ -259,7 +259,7 @@ static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 			if (spell->IsUnitValidAutoCastTarget(dest, unit, autocast)) {
 				dest->Blink = 4;
 				if (!acknowledged) {
-					PlayUnitSound(&unit, wyrmgus::unit_sound_type::attack);
+					PlayUnitSound(&unit, unit_sound_type::attack);
 					acknowledged = 1;
 				}
 
@@ -285,7 +285,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	//Wyrmgus end
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandReturnGoods(unit, &dest, flush);
@@ -296,7 +296,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 //	const int res = dest.Type->GivesResource;
 	const resource *res = dest.get_given_resource();
 	//Wyrmgus end
-	const wyrmgus::unit_type &type = *unit.Type;
+	const unit_type &type = *unit.Type;
 	//Wyrmgus start
 //	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
 //		&& (dest.Player == unit.Player || dest.Player->get_index() == PlayerNumNeutral)) {
@@ -309,7 +309,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 				dest.Blink = 4;
 				SendCommandResource(unit, dest, flush);
 				if (!acknowledged) {
-					PlayUnitSound(&unit, wyrmgus::unit_sound_type::harvesting);
+					PlayUnitSound(&unit, unit_sound_type::harvesting);
 					acknowledged = 1;
 				}
 				return true;
@@ -318,7 +318,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 				if (depot) {
 					dest.Blink = 4;
 					if (!acknowledged) {
-						PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+						PlayUnitSound(&unit, unit_sound_type::acknowledging);
 						acknowledged = 1;
 					}
 					SendCommandReturnGoods(unit, depot, flush);
@@ -336,18 +336,18 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			if (unit.get_current_resource() != res || unit.ResourcesHeld < type.get_resource_info(res)->ResourceCapacity) {
 			//Wyrmgus end
-				for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+				for (const unit_type *unit_type : unit_type::get_all()) {
 					if (unit_type->is_template()) {
 						continue;
 					}
 
 					if (unit_type->get_given_resource() != nullptr && unit_type->get_given_resource() == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
 						if (check_conditions(unit_type, unit.Player)) {
-							if (wyrmgus::vector::contains(AiHelpers.get_builders(unit_type), unit.Type) || wyrmgus::vector::contains(AiHelpers.get_builder_classes(unit_type->get_unit_class()), unit.Type->get_unit_class())) {
+							if (vector::contains(AiHelpers.get_builders(unit_type), unit.Type) || vector::contains(AiHelpers.get_builder_classes(unit_type->get_unit_class()), unit.Type->get_unit_class())) {
 								dest.Blink = 4;
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, flush, dest.MapLayer->ID);
 								if (!acknowledged) {
-									PlayUnitSound(&unit, wyrmgus::unit_sound_type::build);
+									PlayUnitSound(&unit, unit_sound_type::build);
 									acknowledged = 1;
 								}
 								break;
@@ -364,12 +364,12 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 				if (depot) {
 					dest.Blink = 4;
 					if (!acknowledged) {
-						PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+						PlayUnitSound(&unit, unit_sound_type::acknowledging);
 						acknowledged = 1;
 					}
 					SendCommandReturnGoods(unit, depot, flush);
 					//Wyrmgus start
-					for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+					for (const unit_type *unit_type : unit_type::get_all()) {
 						if (unit_type->is_template()) {
 							continue;
 						}
@@ -398,9 +398,9 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 	if (!UI.CurrentMapLayer->Field(pos)->player_info->IsTeamExplored(*unit.Player)) {
 		return false;
 	}
-	const wyrmgus::unit_type &type = *unit.Type;
+	const unit_type &type = *unit.Type;
 	// FIXME: support harvesting more types of terrain.
-	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
+	for (const resource *resource : resource::get_all()) {
 		if (type.get_resource_info(resource) != nullptr
 			//Wyrmgus start
 //			&& type.ResInfo[res]->TerrainHarvester
@@ -415,21 +415,21 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 			/*
 			SendCommandResourceLoc(unit, pos, flush);
 			if (!acknowledged) {
-				PlayUnitSound(&unit, wyrmgus::unit_sound_type::harvesting);
+				PlayUnitSound(&unit, unit_sound_type::harvesting);
 				acknowledged = 1;
 			}
 			*/
 			if (unit.CurrentResource != resource->get_index() || unit.ResourcesHeld < type.get_resource_info(resource)->ResourceCapacity) {
 				SendCommandResourceLoc(unit, pos, flush, UI.CurrentMapLayer->ID);
 				if (!acknowledged) {
-					PlayUnitSound(&unit, wyrmgus::unit_sound_type::harvesting);
+					PlayUnitSound(&unit, unit_sound_type::harvesting);
 					acknowledged = 1;
 				}
 			} else {
 				CUnit *depot = FindDeposit(unit, 1000, unit.get_current_resource());
 				if (depot) {
 					if (!acknowledged) {
-						PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+						PlayUnitSound(&unit, unit_sound_type::acknowledging);
 						acknowledged = 1;
 					}
 					SendCommandReturnGoods(unit, depot, flush);
@@ -445,7 +445,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 
 static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
 {
-	const wyrmgus::unit_type &type = *unit.Type;
+	const unit_type &type = *unit.Type;
 
 	// Go and repair
 	if (type.can_repair() && dest != nullptr
@@ -457,7 +457,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		&& (dest->Player == unit.Player || unit.is_allied_with(*dest))) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::repairing);
+			PlayUnitSound(&unit, unit_sound_type::repairing);
 			acknowledged = 1;
 		}
 		//Wyrmgus start
@@ -488,7 +488,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		&& CanPickUp(unit, *dest)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandPickUp(unit, *dest, flush);
@@ -499,7 +499,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && unit.CanUseItem(dest)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandUse(unit, *dest, flush);
@@ -509,13 +509,13 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//Wyrmgus start
 	//if the clicked unit is a settlement site, build on it
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == settlement_site_unit_type && (dest->Player->get_index() == PlayerNumNeutral || dest->Player == unit.Player)) {
-		wyrmgus::unit_type *town_hall_type = unit.Player->get_class_unit_type(wyrmgus::defines::get()->get_town_hall_class());
+		const unit_type *town_hall_type = unit.Player->get_class_unit_type(defines::get()->get_town_hall_class());
 		if (town_hall_type != nullptr && check_conditions(town_hall_type, unit.Player) && CanBuildUnitType(&unit, *town_hall_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
-			if (wyrmgus::vector::contains(AiHelpers.get_builders(town_hall_type), unit.Type) || wyrmgus::vector::contains(AiHelpers.get_builder_classes(town_hall_type->get_unit_class()), unit.Type->get_unit_class())) {
+			if (vector::contains(AiHelpers.get_builders(town_hall_type), unit.Type) || vector::contains(AiHelpers.get_builder_classes(town_hall_type->get_unit_class()), unit.Type->get_unit_class())) {
 				dest->Blink = 4;
 				SendCommandBuildBuilding(unit, dest->tilePos, *town_hall_type, flush, dest->MapLayer->ID);
 				if (!acknowledged) {
-					PlayUnitSound(&unit, wyrmgus::unit_sound_type::build);
+					PlayUnitSound(&unit, unit_sound_type::build);
 					acknowledged = 1;
 				}
 				return true;
@@ -531,7 +531,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		//Wyrmgus end
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 
@@ -550,7 +550,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && unit.CurrentAction() != UnitAction::Built && (unit.is_enemy_of(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::attack);
+			PlayUnitSound(&unit, unit_sound_type::attack);
 			acknowledged = 1;
 		}
 		if (type.can_target(dest)) {
@@ -569,7 +569,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//Wyrmgus end
 	// Move
 	if (!acknowledged) {
-		PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+		PlayUnitSound(&unit, unit_sound_type::acknowledging);
 		acknowledged = 1;
 	}
 	//Wyrmgus start
@@ -581,7 +581,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 
 static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos, int flush, int &acknowledged)
 {
-	const wyrmgus::unit_type &type = *unit.Type;
+	const unit_type &type = *unit.Type;
 	const int action = type.MouseAction;
 
 	//Wyrmgus start
@@ -590,7 +590,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	//Wyrmgus end
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::attack);
+			PlayUnitSound(&unit, unit_sound_type::attack);
 			acknowledged = 1;
 		}
 		if (action == MouseActionSpellCast && unit.Type->Spells.size() > 0) {
@@ -612,7 +612,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	if (&dest != &unit && CanPickUp(unit, dest)) {
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandPickUp(unit, dest, flush);
@@ -623,7 +623,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	if (&dest != &unit && unit.CanUseItem(&dest)) {
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandUse(unit, dest, flush);
@@ -633,7 +633,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	if ((dest.Player == unit.Player || unit.is_allied_with(dest) || dest.Player->get_index() == PlayerNumNeutral) && &dest != &unit) {
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 
@@ -683,12 +683,12 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			SendCommandMove(unit, pos, flush, UI.CurrentMapLayer->ID);
 			//Wyrmgus end
 			if (!acknowledged) {
-				PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+				PlayUnitSound(&unit, unit_sound_type::acknowledging);
 				acknowledged = 1;
 			}
 		} else {
 			if (!acknowledged) {
-				PlayUnitSound(&unit, wyrmgus::unit_sound_type::attack);
+				PlayUnitSound(&unit, unit_sound_type::attack);
 				acknowledged = 1;
 			}
 			//Wyrmgus start
@@ -699,7 +699,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	} else {
 		if (RightButtonAttacks) {
 			if (!acknowledged) {
-				PlayUnitSound(&unit, wyrmgus::unit_sound_type::attack);
+				PlayUnitSound(&unit, unit_sound_type::attack);
 				acknowledged = 1;
 			}
 			//Wyrmgus start
@@ -709,7 +709,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		} else {
 			// Note: move is correct here, right default is move
 			if (!acknowledged) {
-				PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+				PlayUnitSound(&unit, unit_sound_type::acknowledging);
 				acknowledged = 1;
 			}
 			//Wyrmgus start
@@ -728,7 +728,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 	if (CanPickUp(unit, dest)) {
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandPickUp(unit, dest, flush);
@@ -739,7 +739,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 	if (unit.CanUseItem(&dest)) {
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandUse(unit, dest, flush);
@@ -749,7 +749,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 	if (dest.Player == unit.Player || unit.is_allied_with(dest) || dest.Player->get_index() == PlayerNumNeutral) {
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 
@@ -775,7 +775,7 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 		dest.Blink = 4;
 		SendCommandReturnGoods(dest, &unit, flush);
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		return true;
@@ -803,17 +803,17 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		//Wyrmgus end
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandResource(unit, *dest, flush);
 		return true;
 	}
 	// FIXME: support harvesting more types of terrain.
-	const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
+	const tile &mf = *UI.CurrentMapLayer->Field(pos);
 	if (mf.player_info->IsTeamExplored(*unit.Player) && mf.get_resource() != nullptr) {
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		//Wyrmgus start
@@ -834,7 +834,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	if (unit.Removed) {
 		return;
 	}
-	const wyrmgus::unit_type &type = *unit.Type;
+	const unit_type &type = *unit.Type;
 	const int action = type.MouseAction;
 	//  Right mouse with SHIFT appends command to old commands.
 	const int flush = !(key_modifiers & Qt::ShiftModifier);
@@ -850,7 +850,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	if ((key_modifiers & Qt::ControlModifier) && (key_modifiers & Qt::AltModifier)) {
 		if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
 			if (!acknowledged) {
-				PlayUnitSound(&unit, wyrmgus::unit_sound_type::attack);
+				PlayUnitSound(&unit, unit_sound_type::attack);
 				acknowledged = 1;
 			}
 			//Wyrmgus start
@@ -864,7 +864,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	if ((key_modifiers & Qt::ControlModifier) && dest) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandFollow(unit, *dest, flush);
@@ -875,7 +875,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	if ((key_modifiers & Qt::AltModifier) && dest) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandDefend(unit, *dest, flush);
@@ -886,7 +886,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	//  Ctrl + right click on an empty space moves + stand ground
 	if ((key_modifiers & Qt::ControlModifier) && !dest) {
 		if (!acknowledged) {
-			PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+			PlayUnitSound(&unit, unit_sound_type::acknowledging);
 			acknowledged = 1;
 		}
 		//Wyrmgus start
@@ -948,7 +948,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 		}
 	}
 	if (!acknowledged) {
-		PlayUnitSound(&unit, wyrmgus::unit_sound_type::acknowledging);
+		PlayUnitSound(&unit, unit_sound_type::acknowledging);
 		acknowledged = 1;
 	}
 	//Wyrmgus start
@@ -1091,7 +1091,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 		//Wyrmgus start
-		if (Selected.size() == 1 && Selected[0]->HasInventory() && CurrentButtonLevel == wyrmgus::defines::get()->get_inventory_button_level()) {
+		if (Selected.size() == 1 && Selected[0]->HasInventory() && CurrentButtonLevel == defines::get()->get_inventory_button_level()) {
 			const size_t size = UI.InventoryButtons.size();
 
 			for (size_t i = std::min<size_t>(Selected[0]->get_units_inside().size(), size); i != 0;) {
@@ -1378,7 +1378,7 @@ static void handle_mouse_move_on_map(const PixelPos &cursor_pos, const Qt::Keybo
 
 	bool show = ReplayRevealMap ? true : false;
 	if (show == false) {
-		const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(tilePos);
+		const tile &mf = *UI.CurrentMapLayer->Field(tilePos);
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (mf.player_info->IsTeamExplored(*CPlayer::Players[i])
 				&& (i == CPlayer::GetThisPlayer()->get_index() || CPlayer::Players[i]->has_mutual_shared_vision_with(CPlayer::GetThisPlayer()) || CPlayer::Players[i]->is_revealed())) {
@@ -1398,7 +1398,7 @@ static void handle_mouse_move_on_map(const PixelPos &cursor_pos, const Qt::Keybo
 		bool has_terrain_resource = false;
 		const CViewport &cursor_vp = *UI.MouseViewport;
 		const Vec2i cursor_tile_pos = cursor_vp.ScreenToTilePos(cursor_pos);
-		for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
+		for (const resource *resource : resource::get_all()) {
 			if (Selected[0]->Type->get_resource_info(resource) != nullptr
 				//Wyrmgus start
 //					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
@@ -1805,7 +1805,7 @@ static int SendResource(const Vec2i &pos, int flush)
 {
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
-	const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
+	const tile &mf = *UI.CurrentMapLayer->Field(pos);
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
@@ -1940,7 +1940,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 			continue;
 		}
 		// CursorValue here holds the spell type id
-		const wyrmgus::spell *spell = wyrmgus::spell::get_all().at(CursorValue);
+		const spell *spell = spell::get_all().at(CursorValue);
 		if (!spell) {
 			throw std::runtime_error("Unknown spell-id: " + std::to_string(CursorValue));
 		}
@@ -1953,7 +1953,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 			continue;
 		}
 		
-		SendCommandSpellCast(unit, tilePos, spell->get_target() == wyrmgus::spell_target_type::position ? nullptr : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
+		SendCommandSpellCast(unit, tilePos, spell->get_target() == spell_target_type::position ? nullptr : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
 		ret = 1;
 		
 		//if the spell's effects do not stack on the same target, then only one selected unit should cast it
@@ -2070,24 +2070,24 @@ static void SendCommand(const Vec2i &tilePos, const Qt::KeyboardModifiers key_mo
 				//Wyrmgus start
 				/*
 				if (Selected[i]->Type->get_sound_set()->Attack.Sound) {
-					PlayUnitSound(Selected[i], wyrmgus::unit_sound_type::attack);
+					PlayUnitSound(Selected[i], unit_sound_type::attack);
 					break;
 				} else if (Selected[i]->Type->get_sound_set()->Acknowledgement.Sound) {
-					PlayUnitSound(Selected[i], wyrmgus::unit_sound_type::acknowledging);
+					PlayUnitSound(Selected[i], unit_sound_type::acknowledging);
 					break;
 				}
 				*/
-				PlayUnitSound(Selected[i], wyrmgus::unit_sound_type::attack);
+				PlayUnitSound(Selected[i], unit_sound_type::attack);
 				break;
 				//Wyrmgus end
 			} else if (CursorAction == ButtonCmd::Repair) {
-				PlayUnitSound(Selected[i], wyrmgus::unit_sound_type::repairing);
+				PlayUnitSound(Selected[i], unit_sound_type::repairing);
 				break;
 			} else if (CursorAction == ButtonCmd::Build || CursorAction == ButtonCmd::BuildClass) {
-				PlayUnitSound(Selected[i], wyrmgus::unit_sound_type::build);
+				PlayUnitSound(Selected[i], unit_sound_type::build);
 				break;
 			} else {
-				PlayUnitSound(Selected[i], wyrmgus::unit_sound_type::acknowledging);
+				PlayUnitSound(Selected[i], unit_sound_type::acknowledging);
 				break;
 			}
 		}
@@ -2174,7 +2174,7 @@ static void UISelectStateButtonDown(unsigned, const Qt::KeyboardModifiers key_mo
 			const PixelPos mapPixelPos = vp.screen_to_map_pixel_pos(CursorScreenPos);
 
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*wyrmgus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
+				MakeLocalMissile(*missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
 			SendCommand(CMap::get()->map_pixel_pos_to_tile_pos(mapPixelPos), key_modifiers);
 		}
@@ -2198,7 +2198,7 @@ static void UISelectStateButtonDown(unsigned, const Qt::KeyboardModifiers key_mo
 			CurrentButtonLevel = nullptr;
 			UI.ButtonPanel.Update();
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*wyrmgus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
+				MakeLocalMissile(*missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
 			SendCommand(cursorTilePos, key_modifiers);
 		} else {
@@ -2262,8 +2262,8 @@ static void UIHandleButtonDown_OnMap(const Qt::KeyboardModifiers key_modifiers)
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0, false, UI.CurrentMapLayer->ID) && (explored || ReplayRevealMap)) {
 			//Wyrmgus end
 				const int flush = !(key_modifiers & Qt::ShiftModifier);
-				PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_success_sound(), MaxSampleVolume);
-				PlayUnitSound(Selected[0], wyrmgus::unit_sound_type::build);
+				PlayGameSound(game_sound_set::get()->get_placement_success_sound(), MaxSampleVolume);
+				PlayUnitSound(Selected[0], unit_sound_type::build);
 				for (size_t i = 0; i != Selected.size(); ++i) {
 					//Wyrmgus start
 //					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
@@ -2277,7 +2277,7 @@ static void UIHandleButtonDown_OnMap(const Qt::KeyboardModifiers key_modifiers)
 				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && UI.CurrentMapLayer->world != CMap::get()->MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->world) {
 					CPlayer::GetThisPlayer()->Notify("%s", _("Cannot build in another world"));
 				}
-				PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
+				PlayGameSound(game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 			}
 		} else {
 			CancelBuildingMode();
@@ -2303,7 +2303,7 @@ static void UIHandleButtonDown_OnMap(const Qt::KeyboardModifiers key_modifiers)
 				if (!ClickMissile.empty()) {
 					const PixelPos mapPixelPos = UI.MouseViewport->screen_to_map_pixel_pos(CursorScreenPos);
 
-					MakeLocalMissile(*wyrmgus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
+					MakeLocalMissile(*missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 				}
 			}
 			const PixelPos mapPixelPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
@@ -2337,7 +2337,7 @@ static void UIHandleButtonDown_OnMinimap(const Qt::KeyboardModifiers key_modifie
 		if (!GameObserve && !game::get()->is_paused() && !GameEstablishing) {
 			if (!ClickMissile.empty()) {
 				const PixelPos map_pixel_pos = CMap::get()->tile_pos_to_map_pixel_pos_center(cursor_tile_pos);
-				MakeLocalMissile(*wyrmgus::missile_type::get(ClickMissile), map_pixel_pos, map_pixel_pos, UI.CurrentMapLayer->ID);
+				MakeLocalMissile(*missile_type::get(ClickMissile), map_pixel_pos, map_pixel_pos, UI.CurrentMapLayer->ID);
 			}
 			const PixelPos scaled_map_pixel_pos = CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos);
 			DoRightButton(scaled_map_pixel_pos, key_modifiers);
@@ -2392,7 +2392,7 @@ static void UIHandleButtonDown_OnButton(const Qt::KeyboardModifiers key_modifier
 		/*
 		//  clicked on info panel - single unit shown
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && Selected.size() == 1) {
-			PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
+			PlayGameSound(game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 			if (UI.SelectedViewport->Unit == Selected[0]) {
 				UI.SelectedViewport->Unit = nullptr;
 			} else {
@@ -2415,7 +2415,7 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 		if (ButtonAreaUnderCursor == ButtonAreaSelected) {
 			//  clicked on single unit shown
 			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-				PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
+				PlayGameSound(game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				if ((1 << button) == LeftButton) {
 					if (Selected[0]->MapLayer != UI.CurrentMapLayer) {
 						ChangeCurrentMapLayer(Selected[0]->MapLayer->ID);
@@ -2589,16 +2589,16 @@ static void UIHandleButtonUp_OnButton(unsigned button, const Qt::KeyboardModifie
 		//Wyrmgus start
 		} else if (ButtonAreaUnderCursor == ButtonAreaIdleWorker) {
 			if (ButtonUnderCursor == 0) {
-				PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
+				PlayGameSound(game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				UiFindIdleWorker();
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit) {
 			if (ButtonUnderCursor == 0) {
-				PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
+				PlayGameSound(game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				UiFindLevelUpUnit();
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaHeroUnit) {
-			PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
+			PlayGameSound(game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 			UiFindHeroUnit(ButtonUnderCursor);
 		//Wyrmgus end
 		}
@@ -2714,7 +2714,7 @@ void UIHandleButtonUp(unsigned button, const Qt::KeyboardModifiers key_modifiers
 			if (world_button.Clicked) {
 				world_button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-					CMap::get()->SetCurrentWorld(wyrmgus::world::get_all()[i]);
+					CMap::get()->SetCurrentWorld(world::get_all()[i]);
 					if (world_button.Callback) {
 						world_button.Callback->action("");
 					}
@@ -2874,14 +2874,14 @@ void UIHandleButtonUp(unsigned button, const Qt::KeyboardModifiers key_modifiers
 			//
 			if (Selected.size() == 1) {
 				if (Selected[0]->CurrentAction() == UnitAction::Built && Selected[0]->Player == CPlayer::GetThisPlayer()) {
-					PlayUnitSound(Selected[0], wyrmgus::unit_sound_type::construction);
+					PlayUnitSound(Selected[0], unit_sound_type::construction);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
-					PlayGameSound(wyrmgus::sound::get("burning"), MaxSampleVolume);
+					PlayGameSound(sound::get("burning"), MaxSampleVolume);
 				} else if (Selected[0]->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->has_building_access(Selected[0]) || (Selected[0]->Player->get_index() == PlayerNumNeutral && !Selected[0]->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value)) {
-					PlayUnitSound(Selected[0], wyrmgus::unit_sound_type::selected);
+					PlayUnitSound(Selected[0], unit_sound_type::selected);
 				} else {
-					PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
+					PlayGameSound(game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				}
 				//Wyrmgus start
 				/*

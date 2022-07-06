@@ -1870,7 +1870,7 @@ void CPlayer::update_territory_tiles()
 	}
 }
 
-unit_type *CPlayer::get_class_unit_type(const unit_class *unit_class) const
+const unit_type *CPlayer::get_class_unit_type(const unit_class *unit_class) const
 {
 	const wyrmgus::faction *faction = this->get_faction();
 	if (faction != nullptr) {
@@ -1895,7 +1895,7 @@ bool CPlayer::is_class_unit_type(const unit_type *unit_type) const
 	return faction->is_class_unit_type(unit_type);
 }
 
-CUpgrade *CPlayer::get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const
+const CUpgrade *CPlayer::get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const
 {
 	const wyrmgus::faction *faction = this->get_faction();
 	if (faction == nullptr) {
@@ -4920,6 +4920,7 @@ void PlayersEachMinute(const int playerIdx)
 
 		player->update_quest_pool();
 
+		//we clear the list of recent trade partners here; this happens after the market item pools have been updated, so it's ok to do it here
 		player->clear_recent_trade_partners();
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error executing the per minute actions for player " + std::to_string(playerIdx) + "."));

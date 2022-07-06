@@ -231,13 +231,13 @@ public:
 		return this->unit_type;
 	}
 
-	void set_unit_type(wyrmgus::unit_type *unit_type)
+	void set_unit_type(const wyrmgus::unit_type *unit_type)
 	{
 		if (unit_type == this->get_unit_type()) {
 			return;
 		}
 
-		this->unit_type = unit_type;
+		this->unit_type = const_cast<wyrmgus::unit_type *>(unit_type);
 	}
 
 	CUpgrade *get_trait() const
