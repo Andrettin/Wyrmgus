@@ -96,23 +96,9 @@
 #include "video/video.h"
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-#define RSHIFT  0
-#define GSHIFT  8
-#define BSHIFT  16
 #define ASHIFT  24
-#define RMASK   0x000000ff
-#define GMASK   0x0000ff00
-#define BMASK   0x00ff0000
-#define AMASK   0xff000000
 #else
-#define RSHIFT  24
-#define GSHIFT  16
-#define BSHIFT  8
 #define ASHIFT  0
-#define RMASK   0xff000000
-#define GMASK   0x00ff0000
-#define BMASK   0x0000ff00
-#define AMASK   0x000000ff
 #endif
 
 /// Last drawn popup : used to speed up drawing
