@@ -1804,6 +1804,20 @@ static int CclDefineUnitStats(lua_State *l)
 				stats->set_unit_stock(unit_type, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);
 			}
+		} else if (!strcmp(value, "unit-class-stock")) {
+			lua_rawgeti(l, 3, j + 1);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, 3, j + 1);
+				const unit_class *unit_class = unit_class::get(LuaToString(l, -1, k + 1));
+				++k;
+				stats->set_unit_class_stock(unit_class, LuaToNumber(l, -1, k + 1));
+				lua_pop(l, 1);
+			}
 		//Wyrmgus end
 		} else {
 			int i = UnitTypeVar.VariableNameLookup[value];// User variables

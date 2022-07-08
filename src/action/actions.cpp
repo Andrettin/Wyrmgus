@@ -395,6 +395,28 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 	}
 	
+	for (const auto &[unit_class, unit_stock] : unit.Type->Stats[unit.Player->get_index()].get_unit_class_stocks()) {
+		if (unit_stock <= 0) {
+			continue;
+		}
+
+		if (unit.get_unit_class_stock_replenishment_timer(unit_class) > 0) {
+			unit.change_unit_class_stock_replenishment_timer(unit_class, -1);
+			if (unit.get_unit_class_stock_replenishment_timer(unit_class) == 0 && unit.get_unit_class_stock(unit_class) < unit_stock) {
+				//if timer reached 0, replenish 1 of the stock
+				unit.change_unit_class_stock(unit_class, 1);
+			}
+		}
+
+		//if the unit still has less stock than its max, re-init the unit stock timer
+		if (unit.get_unit_class_stock_replenishment_timer(unit_class) == 0 && unit.get_unit_class_stock(unit_class) < unit_stock) {
+			const unit_type *unit_type = unit.Player->get_class_unit_type(unit_class);
+			if (unit_type != nullptr && check_conditions(unit_type, unit.Player)) {
+				unit.set_unit_class_stock_replenishment_timer(unit_class, unit_type->Stats[unit.Player->get_index()].get_time_cost() * 50);
+			}
+		}
+	}
+	
 	unit.decrement_status_effect_timers();
 }
 

@@ -61,6 +61,7 @@
 //Wyrmgus end
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
@@ -701,12 +702,18 @@ int CclUnit(lua_State *l)
 			const unit_type *stocked_unit_type = wyrmgus::unit_type::get(LuaToString(l, 2, j + 1));
 			++j;
 			unit->set_unit_stock(stocked_unit_type, LuaToNumber(l, 2, j + 1));
+		} else if (!strcmp(value, "unit-class-stock")) {
+			const unit_class *stocked_unit_class = unit_class::get(LuaToString(l, 2, j + 1));
+			++j;
+			unit->set_unit_class_stock(stocked_unit_class, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "unit-stock-replenishment-timer")) {
 			const unit_type *stocked_unit_type = unit_type::get(LuaToString(l, 2, j + 1));
 			++j;
 			unit->set_unit_stock_replenishment_timer(stocked_unit_type, LuaToNumber(l, 2, j + 1));
+		} else if (!strcmp(value, "unit-class-stock-replenishment-timer")) {
+			const unit_class *stocked_unit_class = unit_class::get(LuaToString(l, 2, j + 1));
 			++j;
-			unit->SetUnitStockReplenishmentTimer(stocked_unit_type, LuaToNumber(l, 2, j + 1));
+			unit->set_unit_class_stock_replenishment_timer(stocked_unit_class, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "character")) {
 			unit->SetCharacter(LuaToString(l, 2, j + 1), false);
 		} else if (!strcmp(value, "custom-hero")) {

@@ -28,6 +28,7 @@
 #pragma once
 
 #include "economy/resource_container.h"
+#include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
 #include "unit/unit_variable.h"
 
@@ -250,6 +251,45 @@ public:
 		this->set_unit_stock(unit_type, this->get_unit_stock(unit_type) + quantity);
 	}
 
+	const unit_class_map<int> &get_unit_class_stocks() const
+	{
+		return this->unit_class_stocks;
+	}
+
+	int get_unit_class_stock(const unit_class *unit_class) const
+	{
+		if (unit_class == nullptr) {
+			return 0;
+		}
+
+		const auto find_iterator = this->unit_class_stocks.find(unit_class);
+		if (find_iterator != this->unit_class_stocks.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_unit_class_stock(const unit_class *unit_class, const int quantity)
+	{
+		if (unit_class == nullptr) {
+			return;
+		}
+
+		if (quantity <= 0) {
+			if (this->unit_class_stocks.contains(unit_class)) {
+				this->unit_class_stocks.erase(unit_class);
+			}
+		} else {
+			this->unit_class_stocks[unit_class] = quantity;
+		}
+	}
+
+	void change_unit_class_stock(const unit_class *unit_class, const int quantity)
+	{
+		this->set_unit_class_stock(unit_class, this->get_unit_class_stock(unit_class) + quantity);
+	}
+
 	bool has_hired_unit(const unit_type *unit_type) const;
 	gender get_gender() const;
 
@@ -262,6 +302,7 @@ private:
 	resource_map<int> improve_incomes;   /// Gives player an improved income
 	resource_map<int> resource_demands;	/// Resource demand
 	unit_type_map<int> unit_stocks;
+	unit_class_map<int> unit_class_stocks;
 };
 
 }

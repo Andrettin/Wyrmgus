@@ -29,6 +29,7 @@
 #include "item/item_slot.h"
 #include "player/player_container.h"
 #include "spell/spell_container.h"
+#include "unit/unit_class_container.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_container.h"
 #include "unit/unit_variable.h"
@@ -648,6 +649,45 @@ public:
 		this->set_unit_stock(unit_type, this->get_unit_stock(unit_type) + quantity);
 	}
 
+	const unit_class_map<int> &get_unit_class_stocks() const
+	{
+		return this->unit_class_stocks;
+	}
+
+	int get_unit_class_stock(const unit_class *unit_class) const
+	{
+		if (unit_class == nullptr) {
+			return 0;
+		}
+
+		const auto find_iterator = this->unit_class_stocks.find(unit_class);
+		if (find_iterator != this->unit_class_stocks.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_unit_class_stock(const unit_class *unit_class, const int quantity)
+	{
+		if (unit_class == nullptr) {
+			return;
+		}
+
+		if (quantity <= 0) {
+			if (this->unit_class_stocks.contains(unit_class)) {
+				this->unit_class_stocks.erase(unit_class);
+			}
+		} else {
+			this->unit_class_stocks[unit_class] = quantity;
+		}
+	}
+
+	void change_unit_class_stock(const unit_class *unit_class, const int quantity)
+	{
+		this->set_unit_class_stock(unit_class, this->get_unit_class_stock(unit_class) + quantity);
+	}
+
 	int get_unit_stock_replenishment_timer(const unit_type *unit_type) const
 	{
 		const auto find_iterator = this->unit_stock_replenishment_timers.find(unit_type);
@@ -677,6 +717,37 @@ public:
 	void change_unit_stock_replenishment_timer(const unit_type *unit_type, const int quantity)
 	{
 		this->set_unit_stock_replenishment_timer(unit_type, this->get_unit_stock_replenishment_timer(unit_type) + quantity);
+	}
+
+	int get_unit_class_stock_replenishment_timer(const unit_class *unit_class) const
+	{
+		const auto find_iterator = this->unit_class_stock_replenishment_timers.find(unit_class);
+
+		if (find_iterator != this->unit_class_stock_replenishment_timers.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_unit_class_stock_replenishment_timer(const unit_class *unit_class, const int quantity)
+	{
+		if (unit_class == nullptr) {
+			return;
+		}
+
+		if (quantity <= 0) {
+			if (this->unit_class_stock_replenishment_timers.contains(unit_class)) {
+				this->unit_class_stock_replenishment_timers.erase(unit_class);
+			}
+		} else {
+			this->unit_class_stock_replenishment_timers[unit_class] = quantity;
+		}
+	}
+
+	void change_unit_class_stock_replenishment_timer(const unit_class *unit_class, const int quantity)
+	{
+		this->set_unit_class_stock_replenishment_timer(unit_class, this->get_unit_class_stock_replenishment_timer(unit_class) + quantity);
 	}
 
 	int get_resource_step(const resource *resource) const;
@@ -996,7 +1067,9 @@ public:
 	int ResourcesHeld;      /// Resources Held by a unit
 private:
 	unit_type_map<int> unit_stocks; //how many of each unit type this unit has stocked
+	unit_class_map<int> unit_class_stocks;
 	unit_type_map<int> unit_stock_replenishment_timers;
+	unit_class_map<int> unit_class_stock_replenishment_timers;
 
 public:
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit

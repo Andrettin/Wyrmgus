@@ -1030,6 +1030,7 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 	//Wyrmgus start
 	if (
 		(unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&type) != 0 && unit.get_unit_stock(&type) <= 0)
+		|| (type.get_unit_class() != nullptr && unit.Type->Stats[unit.Player->get_index()].get_unit_class_stock(type.get_unit_class()) != 0 && unit.get_unit_class_stock(type.get_unit_class()) <= 0)
 	) {
 		if (player == CPlayer::GetThisPlayer()->get_index()) {
 			CPlayer::GetThisPlayer()->Notify(notification_type::yellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));

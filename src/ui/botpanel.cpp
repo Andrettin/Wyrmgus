@@ -1199,6 +1199,11 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 						int unit_stock = Selected[0]->get_unit_stock(button_unit_type);
 						int max_unit_stock = Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(button_unit_type);
 
+						if (max_unit_stock == 0 && button_unit_type->get_unit_class() != nullptr) {
+							unit_stock = Selected[0]->get_unit_class_stock(button_unit_type->get_unit_class());
+							max_unit_stock = Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_class_stock(button_unit_type->get_unit_class());
+						}
+
 						number_string = std::to_string(unit_stock) + "/" + std::to_string(max_unit_stock);
 					} else if (button->Action == ButtonCmd::SellResource) {
 						number_string = std::to_string(Selected[0]->Player->get_effective_resource_sell_price(button->get_value_resource()));

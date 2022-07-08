@@ -316,6 +316,8 @@ void COrder_Train::Execute(CUnit &unit)
 		if (is_hired) {
 			if (unit.get_unit_stock(&nType) > 0) {
 				unit.change_unit_stock(&nType, -1);
+			} else if (nType.get_unit_class() != nullptr && unit.get_unit_class_stock(nType.get_unit_class()) > 0) {
+				unit.change_unit_class_stock(nType.get_unit_class(), -1);
 			} else {
 				//don't create the unit if no further stock of it is available
 				break;

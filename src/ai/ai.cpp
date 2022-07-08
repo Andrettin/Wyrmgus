@@ -547,6 +547,29 @@ static void AiCheckUnits()
 						break;
 					}
 				}
+
+				if (!mercenary_recruited) {
+					for (const auto &kv_pair : mercenary_building->get_unit_class_stocks()) {
+						const unit_class *mercenary_class = kv_pair.first;
+						const unit_type *mercenary_type = other_player->get_class_unit_type(mercenary_class);
+
+						if (mercenary_type == nullptr) {
+							continue;
+						}
+
+						const int unit_stock = kv_pair.second;
+
+						if (unit_stock == 0) {
+							continue;
+						}
+
+						mercenary_recruited = AiPlayer->recruit_mercenary(mercenary_building, mercenary_type);
+
+						if (mercenary_recruited) {
+							break;
+						}
+					}
+				}
 			}
 		}
 	}

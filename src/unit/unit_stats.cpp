@@ -43,6 +43,7 @@ const unit_stats &unit_stats::operator = (const unit_stats &rhs)
 	this->improve_incomes = rhs.improve_incomes;
 	this->resource_demands = rhs.resource_demands;
 	this->unit_stocks = rhs.unit_stocks;
+	this->unit_class_stocks = rhs.unit_class_stocks;
 	this->Variables = rhs.Variables;
 
 	return *this;
@@ -71,6 +72,10 @@ bool unit_stats::operator == (const unit_stats &rhs) const
 	}
 
 	if (this->unit_stocks != rhs.unit_stocks) {
+		return false;
+	}
+
+	if (this->unit_class_stocks != rhs.unit_class_stocks) {
 		return false;
 	}
 
@@ -128,6 +133,10 @@ int unit_stats::get_price() const
 bool unit_stats::has_hired_unit(const unit_type *unit_type) const
 {
 	if (this->get_unit_stock(unit_type) != 0) {
+		return true;
+	}
+
+	if (unit_type->get_unit_class() != nullptr && this->get_unit_class_stock(unit_type->get_unit_class()) != 0) {
 		return true;
 	}
 

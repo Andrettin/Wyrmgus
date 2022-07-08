@@ -164,6 +164,14 @@ void upgrade_modifier::process_gsml_scope(const gsml_data &scope)
 			const unit_type *unit_type = unit_type::get(key);
 			this->Modifier.set_unit_stock(unit_type, std::stoi(value));
 		});
+	} else if (tag == "unit_class_stocks") {
+		scope.for_each_property([&](const gsml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const wyrmgus::unit_class *unit_class = unit_class::get(key);
+			this->Modifier.set_unit_class_stock(unit_class, std::stoi(value));
+		});
 	} else {
 		const std::string variable_name = string::snake_case_to_pascal_case(tag);
 		const int index = UnitTypeVar.VariableNameLookup[variable_name.c_str()]; // variable index
@@ -370,6 +378,10 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 
 		for (const auto &[stock_unit_type, unit_stock] : this->Modifier.get_unit_stocks()) {
 			stat.change_unit_stock(stock_unit_type, unit_stock *multiplier);
+		}
+
+		for (const auto &[stock_unit_class, unit_stock] : this->Modifier.get_unit_class_stocks()) {
+			stat.change_unit_class_stock(stock_unit_class, unit_stock *multiplier);
 		}
 
 		int varModified = 0;
@@ -615,6 +627,14 @@ void upgrade_modifier::apply_to_unit(CUnit *unit, const int multiplier) const
 
 		if (effective_unit_stock < 0) {
 			unit->change_unit_stock(stock_unit_type, effective_unit_stock);
+		}
+	}
+
+	for (const auto &[stock_unit_class, unit_stock] : this->Modifier.get_unit_class_stocks()) {
+		const int effective_unit_stock = unit_stock * multiplier;
+
+		if (effective_unit_stock < 0) {
+			unit->change_unit_class_stock(stock_unit_class, effective_unit_stock);
 		}
 	}
 }

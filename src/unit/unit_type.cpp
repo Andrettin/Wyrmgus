@@ -923,6 +923,14 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			const unit_type *unit_type = unit_type::get(key);
 			this->DefaultStat.set_unit_stock(unit_type, std::stoi(value));
 		});
+	} else if (tag == "unit_class_stocks") {
+		scope.for_each_property([&](const gsml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const wyrmgus::unit_class *unit_class = unit_class::get(key);
+			this->DefaultStat.set_unit_class_stock(unit_class, std::stoi(value));
+		});
 	} else if (tag == "variations") {
 		if (scope.get_operator() == gsml_operator::assignment) {
 			//remove previously defined variations, if any
@@ -2546,6 +2554,22 @@ static bool SaveUnitStats(const unit_stats &stats, const wyrmgus::unit_type &typ
 		}
 
 		file.printf("\"%s\", %d,", unit_type->get_identifier().c_str(), unit_stock);
+	}
+
+	file.printf("},\n\"unit-class-stock\", {");
+	first = true;
+	for (const auto &[unit_class, unit_stock] : stats.get_unit_class_stocks()) {
+		if (unit_stock == type.DefaultStat.get_unit_class_stock(unit_class)) {
+			continue;
+		}
+
+		if (first) {
+			first = false;
+		} else {
+			file.printf(" ");
+		}
+
+		file.printf("\"%s\", %d,", unit_class->get_identifier().c_str(), unit_stock);
 	}
 
 	file.printf("}})\n");

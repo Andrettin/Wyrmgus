@@ -227,6 +227,15 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 			unit.change_unit_stock(unit_type, unit_stock_change);
 		}
 	}
+
+	for (const auto &kv_pair : unit.get_unit_class_stocks()) {
+		const unit_class *unit_class = kv_pair.first;
+
+		const int unit_stock_change = newstats.get_unit_class_stock(unit_class) - oldstats.get_unit_class_stock(unit_class);
+		if (unit_stock_change < 0) {
+			unit.change_unit_class_stock(unit_class, unit_stock_change);
+		}
+	}
 	
 	//drop units that can no longer be in the container
 	if (unit.has_units_inside() && unit.BoardCount > newtype.MaxOnBoard) {

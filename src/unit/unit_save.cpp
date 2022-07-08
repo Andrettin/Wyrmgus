@@ -44,6 +44,7 @@
 #include "player/player.h"
 #include "spell/spell.h"
 #include "spell/status_effect.h"
+#include "unit/unit_class.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
@@ -435,6 +436,20 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		const int replenishment_timer = unit.get_unit_stock_replenishment_timer(unit_type);
 		if (replenishment_timer != 0) {
 			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", unit_type->get_identifier().c_str(), replenishment_timer);
+		}
+	}
+
+	for (const auto &kv_pair : unit.Type->Stats[unit.Player->get_index()].get_unit_class_stocks()) {
+		const unit_class *unit_class = kv_pair.first;
+
+		const int unit_stock = unit.get_unit_class_stock(unit_class);
+		if (unit_stock != 0) {
+			file.printf(",\n  \"unit-class-stock\", \"%s\", %d", unit_class->get_identifier().c_str(), unit_stock);
+		}
+
+		const int replenishment_timer = unit.get_unit_class_stock_replenishment_timer(unit_class);
+		if (replenishment_timer != 0) {
+			file.printf(",\n  \"unit-class-stock-replenishment-timer\", \"%s\", %d", unit_class->get_identifier().c_str(), replenishment_timer);
 		}
 	}
 
