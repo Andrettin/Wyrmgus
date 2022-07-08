@@ -915,6 +915,14 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			resource_info *res_info_ptr = this->resource_infos[resource].get();
 			database::process_gsml_data(res_info_ptr, child_scope);
 		});
+	} else if (tag == "unit_stocks") {
+		scope.for_each_property([&](const gsml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const unit_type *unit_type = unit_type::get(key);
+			this->DefaultStat.set_unit_stock(unit_type, std::stoi(value));
+		});
 	} else if (tag == "variations") {
 		if (scope.get_operator() == gsml_operator::assignment) {
 			//remove previously defined variations, if any
