@@ -697,6 +697,10 @@ void unit_type::process_gsml_property(const gsml_property &property)
 		this->DefaultStat.Variables[TRANSPORT_INDEX].Enable = 1;
 	} else if (key == "annoy_computer_factor") {
 		this->AnnoyComputerFactor = std::stoi(value);
+	} else if (key == "burn_percent") {
+		this->BurnPercent = std::stoi(value);
+	} else if (key == "burn_damage_rate") {
+		this->BurnDamageRate = std::stoi(value);
 	} else if (key == "can_attack") {
 		this->CanAttack = string::to_bool(value);
 	} else if (key == "can_target_land") {
