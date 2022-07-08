@@ -632,7 +632,7 @@ std::string button::get_hint() const
 			if (this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::UpgradeToClass) {
 				hint = "Upgrade to ";
 			} else {
-				const bool hire = unit->Type->Stats[unit->Player->get_index()].get_unit_stock(unit_type) != 0;
+				const bool hire = unit->Type->Stats[unit->Player->get_index()].has_hired_unit(unit_type);
 				if (hire && !unit_type->BoolFlag[BUILDING_INDEX].value) {
 					hint = "Hire ";
 				} else {

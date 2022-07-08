@@ -30,6 +30,7 @@
 #include "player/player_container.h"
 #include "spell/spell_container.h"
 #include "unit/unit_type.h"
+#include "unit/unit_type_container.h"
 #include "unit/unit_variable.h"
 #include "vec2i.h"
 
@@ -607,12 +608,77 @@ public:
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
 	int GetDisplayPlayer() const;
 	int GetPrice() const;
-	int GetUnitStock(const wyrmgus::unit_type *unit_type) const;
-	void SetUnitStock(const wyrmgus::unit_type *unit_type, const int quantity);
-	void ChangeUnitStock(const wyrmgus::unit_type *unit_type, const int quantity);
-	int GetUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type) const;
-	void SetUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type, int quantity);
-	void ChangeUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type, int quantity);
+
+	const unit_type_map<int> &get_unit_stocks() const
+	{
+		return this->unit_stocks;
+	}
+
+	int get_unit_stock(const unit_type *unit_type) const
+	{
+		if (unit_type == nullptr) {
+			return 0;
+		}
+
+		const auto find_iterator = this->unit_stocks.find(unit_type);
+		if (find_iterator != this->unit_stocks.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_unit_stock(const unit_type *unit_type, const int quantity)
+	{
+		if (!unit_type) {
+			return;
+		}
+
+		if (quantity <= 0) {
+			if (this->unit_stocks.contains(unit_type)) {
+				this->unit_stocks.erase(unit_type);
+			}
+		} else {
+			this->unit_stocks[unit_type] = quantity;
+		}
+	}
+
+	void change_unit_stock(const unit_type *unit_type, const int quantity)
+	{
+		this->set_unit_stock(unit_type, this->get_unit_stock(unit_type) + quantity);
+	}
+
+	int get_unit_stock_replenishment_timer(const unit_type *unit_type) const
+	{
+		const auto find_iterator = this->unit_stock_replenishment_timers.find(unit_type);
+
+		if (find_iterator != this->unit_stock_replenishment_timers.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_unit_stock_replenishment_timer(const unit_type *unit_type, const int quantity)
+	{
+		if (unit_type == nullptr) {
+			return;
+		}
+
+		if (quantity <= 0) {
+			if (this->unit_stock_replenishment_timers.contains(unit_type)) {
+				this->unit_stock_replenishment_timers.erase(unit_type);
+			}
+		} else {
+			this->unit_stock_replenishment_timers[unit_type] = quantity;
+		}
+	}
+
+	void change_unit_stock_replenishment_timer(const unit_type *unit_type, const int quantity)
+	{
+		this->set_unit_stock_replenishment_timer(unit_type, this->get_unit_stock_replenishment_timer(unit_type) + quantity);
+	}
+
 	int get_resource_step(const resource *resource) const;
 	int GetTotalInsideCount(const CPlayer *player = nullptr, const bool ignore_items = true, const bool ignore_saved_cargo = false, const wyrmgus::unit_type *type = nullptr) const;
 	bool CanAttack(bool count_inside = true) const;
@@ -928,9 +994,11 @@ public:
 	//Wyrmgus end
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
-	std::map<int, int> UnitStock; 						/// How many of each unit type this unit has stocked
-	wyrmgus::unit_type_map<int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
+private:
+	unit_type_map<int> unit_stocks; //how many of each unit type this unit has stocked
+	unit_type_map<int> unit_stock_replenishment_timers;
 
+public:
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked;      /// gamecycle unit was last attacked
 	unsigned Blink : 3;          /// Let selection rectangle blink

@@ -219,12 +219,12 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		//Wyrmgus end
 	}
 
-	for (const auto &kv_pair : unit.UnitStock) {
-		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+	for (const auto &kv_pair : unit.get_unit_stocks()) {
+		const unit_type *unit_type = kv_pair.first;
 
 		const int unit_stock_change = newstats.get_unit_stock(unit_type) - oldstats.get_unit_stock(unit_type);
 		if (unit_stock_change < 0) {
-			unit.ChangeUnitStock(unit_type, unit_stock_change);
+			unit.change_unit_stock(unit_type, unit_stock_change);
 		}
 	}
 	

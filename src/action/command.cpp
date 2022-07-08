@@ -1016,13 +1016,21 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 	//Wyrmgus start
 //	if (unit.Player->check_limits<true>(type, &unit) != check_limits_result::success
 //		|| unit.Player->CheckUnitType(type)) {
-	if (CPlayer::Players[player]->check_limits<true>(type, &unit) != check_limits_result::success
-		|| CPlayer::Players[player]->CheckUnitType(type, unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&type) != 0)) {
+	if (CPlayer::Players[player]->check_limits<true>(type, &unit) != check_limits_result::success) {
 	//Wyrmgus end
 		return;
 	}
+
+	const bool is_hired = unit.Type->Stats[unit.Player->get_index()].has_hired_unit(&type);
+
+	if (CPlayer::Players[player]->CheckUnitType(type, is_hired)) {
+		return;
+	}
+
 	//Wyrmgus start
-	if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
+	if (
+		(unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&type) != 0 && unit.get_unit_stock(&type) <= 0)
+	) {
 		if (player == CPlayer::GetThisPlayer()->get_index()) {
 			CPlayer::GetThisPlayer()->Notify(notification_type::yellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
 		}
@@ -1034,7 +1042,8 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 		CPlayer::Players[player]->share_upgrade_progress(*unit.Player, unit);
 	}
 
-	if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
+	if (is_hired) {
+		//if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
 		if (unit.CriticalOrder != nullptr && unit.CriticalOrder->Action == UnitAction::Train) {
 			return;
 		}

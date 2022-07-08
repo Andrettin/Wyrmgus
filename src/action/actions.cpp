@@ -381,16 +381,17 @@ static void HandleBuffsEachCycle(CUnit &unit)
 			continue;
 		}
 
-		if (unit.GetUnitStockReplenishmentTimer(unit_type) > 0) {
-			unit.ChangeUnitStockReplenishmentTimer(unit_type, -1);
-			if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock) { //if timer reached 0, replenish 1 of the stock
-				unit.ChangeUnitStock(unit_type, 1);
+		if (unit.get_unit_stock_replenishment_timer(unit_type) > 0) {
+			unit.change_unit_stock_replenishment_timer(unit_type, -1);
+			if (unit.get_unit_stock_replenishment_timer(unit_type) == 0 && unit.get_unit_stock(unit_type) < unit_stock) {
+				//if timer reached 0, replenish 1 of the stock
+				unit.change_unit_stock(unit_type, 1);
 			}
 		}
 
 		//if the unit still has less stock than its max, re-init the unit stock timer
-		if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock && check_conditions(unit_type, unit.Player)) {
-			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->get_index()].get_time_cost() * 50);
+		if (unit.get_unit_stock_replenishment_timer(unit_type) == 0 && unit.get_unit_stock(unit_type) < unit_stock && check_conditions(unit_type, unit.Player)) {
+			unit.set_unit_stock_replenishment_timer(unit_type, unit_type->Stats[unit.Player->get_index()].get_time_cost() * 50);
 		}
 	}
 	

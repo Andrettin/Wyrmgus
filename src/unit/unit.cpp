@@ -6318,69 +6318,6 @@ int CUnit::GetPrice() const
 	return cost;
 }
 
-int CUnit::GetUnitStock(const wyrmgus::unit_type *unit_type) const
-{
-	if (unit_type == nullptr) {
-		return 0;
-	}
-
-	auto find_iterator = this->UnitStock.find(unit_type->Slot);
-	if (find_iterator != this->UnitStock.end()) {
-		return find_iterator->second;
-	} else {
-		return 0;
-	}
-}
-
-void CUnit::SetUnitStock(const wyrmgus::unit_type *unit_type, const int quantity)
-{
-	if (!unit_type) {
-		return;
-	}
-	
-	if (quantity <= 0) {
-		if (this->UnitStock.contains(unit_type->Slot)) {
-			this->UnitStock.erase(unit_type->Slot);
-		}
-	} else {
-		this->UnitStock[unit_type->Slot] = quantity;
-	}
-}
-
-void CUnit::ChangeUnitStock(const wyrmgus::unit_type *unit_type, const int quantity)
-{
-	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
-}
-
-int CUnit::GetUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type) const
-{
-	if (this->UnitStockReplenishmentTimers.find(unit_type) != this->UnitStockReplenishmentTimers.end()) {
-		return this->UnitStockReplenishmentTimers.find(unit_type)->second;
-	} else {
-		return 0;
-	}
-}
-
-void CUnit::SetUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type, int quantity)
-{
-	if (!unit_type) {
-		return;
-	}
-	
-	if (quantity <= 0) {
-		if (this->UnitStockReplenishmentTimers.find(unit_type) != this->UnitStockReplenishmentTimers.end()) {
-			this->UnitStockReplenishmentTimers.erase(unit_type);
-		}
-	} else {
-		this->UnitStockReplenishmentTimers[unit_type] = quantity;
-	}
-}
-
-void CUnit::ChangeUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type, int quantity)
-{
-	this->SetUnitStockReplenishmentTimer(unit_type, this->GetUnitStockReplenishmentTimer(unit_type) + quantity);
-}
-
 int CUnit::get_resource_step(const resource *resource) const
 {
 	const resource_info *res_info = this->Type->get_resource_info(resource);

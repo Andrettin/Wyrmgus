@@ -79,10 +79,6 @@ public:
 		return this->cavalry_cost_modifier;
 	}
 
-	int GetUnitStock(unit_type *unit_type) const;
-	void SetUnitStock(unit_type *unit_type, int quantity);
-	void ChangeUnitStock(unit_type *unit_type, int quantity);
-
 	const std::vector<const CUpgrade *> &get_removed_upgrades() const
 	{
 		return this->removed_upgrades;
@@ -119,7 +115,6 @@ private:
 	int cavalry_cost_modifier = 0;
 public:
 	int ImproveIncomes[MaxCosts];			/// improve incomes
-	unit_type_map<int> UnitStock;	/// unit stock
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
 	// TODO: see below allow more semantics?

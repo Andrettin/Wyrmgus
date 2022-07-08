@@ -416,6 +416,8 @@ public:
 	void evaluate_diplomacy();
 	void check_quest_objectives();
 
+	bool recruit_mercenary(CUnit *mercenary_building, const unit_type *mercenary_type);
+
 	CPlayer *Player = nullptr;		/// Engine player structure
 	CAiType *AiType = nullptr;		/// AI type of this player AI
 	// controller

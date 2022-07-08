@@ -341,6 +341,48 @@ void PlayerAi::check_quest_objectives()
 	}
 }
 
+bool PlayerAi::recruit_mercenary(CUnit *mercenary_building, const unit_type *mercenary_type)
+{
+	if (mercenary_type->BoolFlag[ITEM_INDEX].value) {
+		return false;
+	}
+
+	const CPlayer *mercenary_player = mercenary_building->Player;
+
+	if (!check_conditions(mercenary_type, mercenary_player)) {
+		return false;
+	}
+
+	if (AiPlayer->Player->check_limits<false>(*mercenary_type, mercenary_building) != check_limits_result::success) {
+		return false;
+	}
+
+	if (AiPlayer->Player->CheckUnitType(*mercenary_type, true)) {
+		return false;
+	}
+
+	if (mercenary_type->get_unit_class() != nullptr && !mercenary_player->is_class_unit_type(mercenary_type)) {
+		return false;
+	}
+
+	//see if there are any unit type requests for units of the same class as the mercenary
+	for (size_t k = 0; k < AiPlayer->UnitTypeBuilt.size(); ++k) {
+		AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[k];
+		if (
+			mercenary_type->get_unit_class() == queue.Type->get_unit_class()
+			&& queue.Want > queue.Made
+			&& (!queue.landmass || queue.landmass == CMap::get()->get_tile_landmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
+			&& (!queue.settlement || queue.settlement == mercenary_building->get_settlement())
+		) {
+			queue.Made++;
+			CommandTrainUnit(*mercenary_building, *mercenary_type, AiPlayer->Player->get_index(), FlushCommands);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 /**
 **  Execute the AI Script.
 */
@@ -465,6 +507,7 @@ static void AiCheckUnits()
 			if (other_player->get_type() != player_type::computer || !AiPlayer->Player->has_building_access(other_player)) {
 				continue;
 			}
+
 			for (int j = 0; j < other_player->GetUnitCount(); ++j) {
 				CUnit *mercenary_building = &other_player->GetUnit(j);
 				if (!mercenary_building || !mercenary_building->IsAliveOnMap() || !mercenary_building->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_building->IsVisible(*AiPlayer->Player)) {
@@ -488,35 +531,20 @@ static void AiCheckUnits()
 				}
 
 				bool mercenary_recruited = false;
-				for (const auto &kv_pair : mercenary_building->UnitStock) {
-					const unit_type *mercenary_type = unit_type::get_all()[kv_pair.first];
+
+				for (const auto &kv_pair : mercenary_building->get_unit_stocks()) {
+					const unit_type *mercenary_type = kv_pair.first;
 					const int unit_stock = kv_pair.second;
-					if (
-						unit_stock > 0
-						&& !mercenary_type->BoolFlag[ITEM_INDEX].value
-						&& check_conditions(mercenary_type, other_player)
-						&& AiPlayer->Player->check_limits<false>(*mercenary_type, mercenary_building) == check_limits_result::success
-						&& !AiPlayer->Player->CheckUnitType(*mercenary_type, true)
-						&& (mercenary_type->get_unit_class() == nullptr || other_player->is_class_unit_type(mercenary_type))
-					) {
-						//see if there are any unit type requests for units of the same class as the mercenary
-						for (size_t k = 0; k < AiPlayer->UnitTypeBuilt.size(); ++k) {
-							AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[k];
-							if (
-								mercenary_type->get_unit_class() == queue.Type->get_unit_class()
-								&& queue.Want > queue.Made
-								&& (!queue.landmass || queue.landmass == CMap::get()->get_tile_landmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
-								&& (!queue.settlement || queue.settlement == mercenary_building->get_settlement())
-							) {
-								queue.Made++;
-								CommandTrainUnit(*mercenary_building, *mercenary_type, AiPlayer->Player->get_index(), FlushCommands);
-								mercenary_recruited = true;
-								break;
-							}
-						}
+
+					if (unit_stock == 0) {
+						continue;
 					}
+
+					mercenary_recruited = AiPlayer->recruit_mercenary(mercenary_building, mercenary_type);
+
 					if (mercenary_recruited) {
-						break; // only hire one unit per mercenary camp per second
+						//only hire one unit per mercenary camp per second
+						break;
 					}
 				}
 			}

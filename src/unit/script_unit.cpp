@@ -698,11 +698,13 @@ int CclUnit(lua_State *l)
 				LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
 			}
 		} else if (!strcmp(value, "unit-stock")) {
-			wyrmgus::unit_type *stocked_unit_type = wyrmgus::unit_type::get(LuaToString(l, 2, j + 1));
+			const unit_type *stocked_unit_type = wyrmgus::unit_type::get(LuaToString(l, 2, j + 1));
 			++j;
-			unit->SetUnitStock(stocked_unit_type, LuaToNumber(l, 2, j + 1));
+			unit->set_unit_stock(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "unit-stock-replenishment-timer")) {
-			wyrmgus::unit_type *stocked_unit_type = wyrmgus::unit_type::get(LuaToString(l, 2, j + 1));
+			const unit_type *stocked_unit_type = unit_type::get(LuaToString(l, 2, j + 1));
+			++j;
+			unit->set_unit_stock_replenishment_timer(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 			++j;
 			unit->SetUnitStockReplenishmentTimer(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "character")) {

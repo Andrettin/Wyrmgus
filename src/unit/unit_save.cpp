@@ -427,12 +427,14 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	for (const auto &kv_pair : unit.Type->Stats[unit.Player->get_index()].get_unit_stocks()) {
 		const unit_type *unit_type = kv_pair.first;
 
-		if (unit.GetUnitStock(unit_type) != 0) {
-			file.printf(",\n  \"unit-stock\", \"%s\", %d", unit_type->get_identifier().c_str(), unit.GetUnitStock(unit_type));
+		const int unit_stock = unit.get_unit_stock(unit_type);
+		if (unit_stock != 0) {
+			file.printf(",\n  \"unit-stock\", \"%s\", %d", unit_type->get_identifier().c_str(), unit_stock);
 		}
 
-		if (unit.GetUnitStockReplenishmentTimer(unit_type) != 0) {
-			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", unit_type->get_identifier().c_str(), unit.GetUnitStockReplenishmentTimer(unit_type));
+		const int replenishment_timer = unit.get_unit_stock_replenishment_timer(unit_type);
+		if (replenishment_timer != 0) {
+			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", unit_type->get_identifier().c_str(), replenishment_timer);
 		}
 	}
 

@@ -225,9 +225,9 @@ public:
 		const auto find_iterator = this->unit_stocks.find(unit_type);
 		if (find_iterator != this->unit_stocks.end()) {
 			return find_iterator->second;
-		} else {
-			return 0;
 		}
+		
+		return 0;
 	}
 
 	void set_unit_stock(const unit_type *unit_type, const int quantity)
@@ -250,6 +250,7 @@ public:
 		this->set_unit_stock(unit_type, this->get_unit_stock(unit_type) + quantity);
 	}
 
+	bool has_hired_unit(const unit_type *unit_type) const;
 	gender get_gender() const;
 
 public:
@@ -260,7 +261,7 @@ private:
 	resource_map<int> incomes; //passive resource incomes for the owner player
 	resource_map<int> improve_incomes;   /// Gives player an improved income
 	resource_map<int> resource_demands;	/// Resource demand
-	unit_type_map<int> unit_stocks;	/// Units in stock
+	unit_type_map<int> unit_stocks;
 };
 
 }

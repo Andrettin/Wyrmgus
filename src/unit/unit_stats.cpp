@@ -125,6 +125,15 @@ int unit_stats::get_price() const
 	return resource::get_price(this->get_costs());
 }
 
+bool unit_stats::has_hired_unit(const unit_type *unit_type) const
+{
+	if (this->get_unit_stock(unit_type) != 0) {
+		return true;
+	}
+
+	return false;
+}
+
 gender unit_stats::get_gender() const
 {
 	return static_cast<gender>(this->Variables[GENDER_INDEX].Value);

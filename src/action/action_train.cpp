@@ -70,7 +70,10 @@ std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, const wyrmgus::un
 	//Wyrmgus start
 	order->Player = player;
 //	trainer.Player->SubUnitType(type);
-	CPlayer::Players[player]->SubUnitType(type, trainer.Type->Stats[trainer.Player->get_index()].get_unit_stock(&type) != 0);
+
+	const bool is_hired = trainer.Type->Stats[trainer.Player->get_index()].has_hired_unit(&type);
+
+	CPlayer::Players[player]->SubUnitType(type, is_hired);
 	//Wyrmgus end
 
 	return order;
@@ -222,7 +225,10 @@ void COrder_Train::Execute(CUnit &unit)
 //	this->Ticks += std::max(1, player.SpeedTrain / CPlayer::base_speed_factor);
 	this->Ticks += std::max(1, (player.SpeedTrain + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / CPlayer::base_speed_factor);
 	
-	if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
+	const bool is_hired = unit.Type->Stats[unit.Player->get_index()].has_hired_unit(&nType);
+
+	if (is_hired) {
+		//if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
 		this->Ticks = cost;
 	}
 	//Wyrmgus end
@@ -307,18 +313,15 @@ void COrder_Train::Execute(CUnit &unit)
 	}
 	*/
 	for (int i = 0; i < (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1); ++i) {
-		bool is_hired = false;
-
-		if (unit.Type->Stats[unit.Player->get_index()].get_unit_stock(&nType) != 0) {
-			is_hired = true;
-
-			if (unit.GetUnitStock(&nType) > 0) {
-				unit.ChangeUnitStock(&nType, -1);
+		if (is_hired) {
+			if (unit.get_unit_stock(&nType) > 0) {
+				unit.change_unit_stock(&nType, -1);
 			} else {
-				break; //don't create the unit if no further stock of it is available
+				//don't create the unit if no further stock of it is available
+				break;
 			}
 		}
-		
+
 		//Wyrmgus start
 //		CUnit *newUnit = MakeUnit(nType, &player);
 		CUnit *newUnit = MakeUnit(nType, CPlayer::Players[owner_player].get());

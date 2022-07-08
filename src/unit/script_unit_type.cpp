@@ -1799,7 +1799,7 @@ static int CclDefineUnitStats(lua_State *l)
 
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, 3, j + 1);
-				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, k + 1));
+				const unit_type *unit_type = unit_type::get(LuaToString(l, -1, k + 1));
 				++k;
 				stats->set_unit_stock(unit_type, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);

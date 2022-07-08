@@ -847,7 +847,8 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::UpgradeToClass: {
-			const resource_map<int> type_costs = CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(unit_type) != 0);
+			const bool is_hired = Selected[0]->Type->Stats[Selected[0]->Player->get_index()].has_hired_unit(unit_type);
+			const resource_map<int> type_costs = CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, is_hired);
 
 			for (const auto &[resource, cost] : type_costs) {
 				Costs[resource->get_index()] = cost;
@@ -1189,12 +1190,16 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 												   pos, str, player_color, border_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], *button), render_commands);
 												   
 				if (
-					((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(button_unit_type) != 0)
+					((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->get_index()].has_hired_unit(button_unit_type))
 					|| button->Action == ButtonCmd::SellResource || button->Action == ButtonCmd::BuyResource
 				) {
 					std::string number_string;
-					if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(button_unit_type) != 0) { //draw the quantity in stock for unit "training" cases which have it
-						number_string = std::to_string(Selected[0]->GetUnitStock(button_unit_type)) + "/" + std::to_string(Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(button_unit_type));
+					if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->get_index()].has_hired_unit(button_unit_type)) {
+						//draw the quantity in stock for unit "training" cases which have it
+						int unit_stock = Selected[0]->get_unit_stock(button_unit_type);
+						int max_unit_stock = Selected[0]->Type->Stats[Selected[0]->Player->get_index()].get_unit_stock(button_unit_type);
+
+						number_string = std::to_string(unit_stock) + "/" + std::to_string(max_unit_stock);
 					} else if (button->Action == ButtonCmd::SellResource) {
 						number_string = std::to_string(Selected[0]->Player->get_effective_resource_sell_price(button->get_value_resource()));
 					} else if (button->Action == ButtonCmd::BuyResource) {
@@ -2081,7 +2086,7 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 		if (Selected[best_training_place]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
 			CPlayer::GetThisPlayer()->Notify(notification_type::yellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("Unit training queue is full"));
 			return;
-		} else if (CPlayer::GetThisPlayer()->check_limits<true>(*unit_type, Selected[best_training_place]) == check_limits_result::success && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->get_index()].get_unit_stock(unit_type) != 0)) {
+		} else if (CPlayer::GetThisPlayer()->check_limits<true>(*unit_type, Selected[best_training_place]) == check_limits_result::success && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->get_index()].has_hired_unit(unit_type))) {
 			SendCommandTrainUnit(*Selected[best_training_place], *unit_type, CPlayer::GetThisPlayer()->get_index(), FlushCommands);
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();

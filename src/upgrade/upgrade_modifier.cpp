@@ -70,7 +70,6 @@ std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate(const CUpgrade *ne
 	modifier->infantry_cost_modifier = this->infantry_cost_modifier;
 	modifier->cavalry_cost_modifier = this->cavalry_cost_modifier;
 	memcpy(modifier->ImproveIncomes, this->ImproveIncomes, sizeof(modifier->ImproveIncomes));
-	modifier->UnitStock = this->UnitStock;
 	memcpy(modifier->ChangeUnits, this->ChangeUnits, sizeof(modifier->ChangeUnits));
 	modifier->ConvertTo = this->ConvertTo;
 	modifier->change_civilization_to = this->change_civilization_to;
@@ -176,36 +175,6 @@ void upgrade_modifier::process_gsml_scope(const gsml_data &scope)
 			throw std::runtime_error("Invalid upgrade modifier scope: \"" + tag + "\".");
 		}
 	}
-}
-
-int upgrade_modifier::GetUnitStock(unit_type *unit_type) const
-{
-	auto find_iterator = this->UnitStock.find(unit_type);
-	if (unit_type && find_iterator != this->UnitStock.end()) {
-		return find_iterator->second;
-	} else {
-		return 0;
-	}
-}
-
-void upgrade_modifier::SetUnitStock(unit_type *unit_type, int quantity)
-{
-	if (!unit_type) {
-		return;
-	}
-
-	if (quantity == 0) {
-		if (this->UnitStock.contains(unit_type)) {
-			this->UnitStock.erase(unit_type);
-		}
-	} else {
-		this->UnitStock[unit_type] = quantity;
-	}
-}
-
-void upgrade_modifier::ChangeUnitStock(unit_type *unit_type, int quantity)
-{
-	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
 bool upgrade_modifier::applies_to(const unit_type *unit_type) const
@@ -637,7 +606,7 @@ void upgrade_modifier::apply_to_unit(CUnit *unit, const int multiplier) const
 		const int effective_unit_stock = unit_stock * multiplier;
 
 		if (effective_unit_stock < 0) {
-			unit->ChangeUnitStock(stock_unit_type, effective_unit_stock);
+			unit->change_unit_stock(stock_unit_type, effective_unit_stock);
 		}
 	}
 }
