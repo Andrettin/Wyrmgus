@@ -100,6 +100,9 @@ boost::asio::awaitable<void> event_loop::await_ms(const uint64_t ms)
 
 void event_loop::run_io_context()
 {
+	//restart the IO context, in case it was placed in the stopped state due to running out of work
+	this->io_context->restart();
+
 	//only run for 1 millisecond, as otherwise the IO context can potentially keep running forever, blocking the Qt UI thread permanently
 	this->io_context->run_for(std::chrono::milliseconds(1));
 
