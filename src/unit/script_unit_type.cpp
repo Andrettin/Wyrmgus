@@ -69,6 +69,10 @@
 #include "ui/button_cmd.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
+#include "unit/build_restriction/and_build_restriction.h"
+#include "unit/build_restriction/build_restriction.h"
+#include "unit/build_restriction/distance_build_restriction.h"
+#include "unit/build_restriction/on_top_build_restriction.h"
 #include "unit/can_target_flag.h"
 #include "unit/construction.h"
 #include "unit/unit.h"
@@ -426,7 +430,7 @@ int ExtraDeathIndex(const char *death)
 **  @param l      Lua state.
 **  @param blist  BuildingRestriction to fill in
 */
-static void ParseBuildingRules(lua_State *l, std::vector<std::unique_ptr<CBuildRestriction>> &blist)
+void ParseBuildingRules(lua_State *l, std::vector<std::unique_ptr<build_restriction>> &blist)
 {
 	const int args = lua_rawlen(l, -1);
 	assert_throw(!(args & 1)); // must be even
@@ -439,7 +443,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<std::unique_ptr<CBuildR
 			LuaError(l, "incorrect argument");
 		}
 		if (!strcmp(value, "distance")) {
-			auto b = std::make_unique<CBuildRestrictionDistance>();
+			auto b = std::make_unique<distance_build_restriction>();
 
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
@@ -481,24 +485,8 @@ static void ParseBuildingRules(lua_State *l, std::vector<std::unique_ptr<CBuildR
 				}
 			}
 			blist.push_back(std::move(b));
-		} else if (!strcmp(value, "addon")) {
-			auto b = std::make_unique<CBuildRestrictionAddOn>();
-
-			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-				value = LuaToString(l, -2);
-				if (!strcmp(value, "OffsetX")) {
-					b->Offset.x = LuaToNumber(l, -1);
-				} else if (!strcmp(value, "OffsetY")) {
-					b->Offset.y = LuaToNumber(l, -1);
-				} else if (!strcmp(value, "Type")) {
-					b->ParentName = LuaToString(l, -1);
-				} else {
-					LuaError(l, "Unsupported BuildingRules addon tag: %s" _C_ value);
-				}
-			}
-			blist.push_back(std::move(b));
 		} else if (!strcmp(value, "ontop")) {
-			auto b = std::make_unique<CBuildRestrictionOnTop>();
+			auto b = std::make_unique<on_top_build_restriction>();
 
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
@@ -513,125 +501,9 @@ static void ParseBuildingRules(lua_State *l, std::vector<std::unique_ptr<CBuildR
 				}
 			}
 			blist.push_back(std::move(b));
-		} else if (!strcmp(value, "has-unit")) {
-			auto b = std::make_unique<CBuildRestrictionHasUnit>();
-
-			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-				value = LuaToString(l, -2);
-				if (!strcmp(value, "Type")) {
-					b->RestrictTypeName = LuaToString(l, -1);
-				} else if (!strcmp(value, "Owner")) {
-					b->RestrictTypeOwner = LuaToString(l, -1);
-				} else if (!strcmp(value, "Count")) {
-					b->Count = LuaToNumber(l, -1);
-				} else if (!strcmp(value, "CountType")) {
-					value = LuaToString(l, -1);
-					if (value[0] == '=') {
-						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							b->CountType = DistanceTypeType::Equal;
-						}
-					} else if (value[0] == '>') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = DistanceTypeType::GreaterThanEqual;
-						} else if (value[1] == '\0') {
-							b->CountType = DistanceTypeType::GreaterThan;
-						}
-					} else if (value[0] == '<') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = DistanceTypeType::LessThanEqual;
-						} else if (value[1] == '\0') {
-							b->CountType = DistanceTypeType::LessThan;
-						}
-					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						b->CountType = DistanceTypeType::NotEqual;
-					}
-				} else {
-					LuaError(l, "Unsupported BuildingRules has-unit tag: %s" _C_ value);
-				}
-			}
-			blist.push_back(std::move(b));
-		} else if (!strcmp(value, "surrounded-by")) {
-			auto b = std::make_unique<CBuildRestrictionSurroundedBy>();
-
-			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-				value = LuaToString(l, -2);
-				if (!strcmp(value, "Type")) {
-					b->RestrictTypeName = LuaToString(l, -1);
-				} else if (!strcmp(value, "Count")) {
-					b->Count = LuaToNumber(l, -1);
-				} else if (!strcmp(value, "CountType")) {
-					value = LuaToString(l, -1);
-					if (value[0] == '=') {
-						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							b->CountType = DistanceTypeType::Equal;
-						}
-					} else if (value[0] == '>') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = DistanceTypeType::GreaterThanEqual;
-						} else if (value[1] == '\0') {
-							b->CountType = DistanceTypeType::GreaterThan;
-						}
-					} else if (value[0] == '<') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = DistanceTypeType::LessThanEqual;
-						} else if (value[1] == '\0') {
-							b->CountType = DistanceTypeType::LessThan;
-						}
-					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						b->CountType = DistanceTypeType::NotEqual;
-					}
-				} else if (!strcmp(value, "Distance")) {
-					b->Distance = LuaToNumber(l, -1);
-				} else if (!strcmp(value, "DistanceType")) {
-					value = LuaToString(l, -1);
-					if (value[0] == '=') {
-						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							b->DistanceType = DistanceTypeType::Equal;
-						}
-					} else if (value[0] == '>') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->DistanceType = DistanceTypeType::GreaterThanEqual;
-						} else if (value[1] == '\0') {
-							b->DistanceType = DistanceTypeType::GreaterThan;
-						}
-					} else if (value[0] == '<') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->DistanceType = DistanceTypeType::LessThanEqual;
-						} else if (value[1] == '\0') {
-							b->DistanceType = DistanceTypeType::LessThan;
-						}
-					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						b->DistanceType = DistanceTypeType::NotEqual;
-					}
-				} else if (!strcmp(value, "Owner")) {
-					b->RestrictTypeOwner = LuaToString(l, -1);
-				} else if (!strcmp(value, "CheckBuilder")) {
-					b->CheckBuilder = LuaToBoolean(l, -1);
-				} else {
-					LuaError(l, "Unsupported BuildingRules surrounded-by tag: %s" _C_ value);
-				}
-			}
-			blist.push_back(std::move(b));
-		} else if (!strcmp(value, "terrain")) {
-			auto b = std::make_unique<CBuildRestrictionTerrain>();
-
-			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-				value = LuaToString(l, -2);
-				if (!strcmp(value, "Terrain")) {
-					b->RestrictTerrainTypeName = LuaToString(l, -1);
-				} else {
-					LuaError(l, "Unsupported BuildingRules terrain tag: %s" _C_ value);
-				}
-			}
-
-			blist.push_back(std::move(b));
 		} else if (!strcmp(value, "and")) {
-			auto b = std::make_unique<CBuildRestrictionAnd>();
-			ParseBuildingRules(l, b->and_list);
-			blist.push_back(std::move(b));
-		} else if (!strcmp(value, "or")) {
-			auto b = std::make_unique<CBuildRestrictionOr>();
-			ParseBuildingRules(l, b->or_list);
+			auto b = std::make_unique<and_build_restriction>();
+			ParseBuildingRules(l, b->restrictions);
 			blist.push_back(std::move(b));
 		} else {
 			LuaError(l, "Unsupported BuildingRules tag: %s" _C_ value);
@@ -1290,17 +1162,17 @@ int CclDefineUnitType(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 
-			// Free any old restrictions if they are redefined
-			type->BuildingRules.clear();
-			ParseBuildingRules(l, type->BuildingRules);
+			//free any old restrictions if they are redefined
+			type->build_restrictions = std::make_unique<and_build_restriction>();
+			ParseBuildingRules(l, type->build_restrictions->restrictions);
 		} else if (!strcmp(value, "AiBuildingRules")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 
-			// Free any old restrictions if they are redefined
-			type->AiBuildingRules.clear();
-			ParseBuildingRules(l, type->AiBuildingRules);
+			//free any old restrictions if they are redefined
+			type->ai_build_restrictions = std::make_unique<and_build_restriction>();
+			ParseBuildingRules(l, type->ai_build_restrictions->restrictions);
 		} else if (!strcmp(value, "AutoBuildRate")) {
 			type->AutoBuildRate = LuaToNumber(l, -1);
 		//Wyrmgus start

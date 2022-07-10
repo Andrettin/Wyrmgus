@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name build.cpp - The units. */
-//
 //      (c) Copyright 1998-2022 by Lutz Sammer, Jimmy Salmon, Rafal Bursig
 //		and Andrettin
 //
@@ -43,6 +41,8 @@
 #include "map/tile.h"
 #include "map/tile_flag.h"
 #include "player/player.h"
+#include "unit/build_restriction/and_build_restriction.h"
+#include "unit/build_restriction/on_top_build_restriction.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
@@ -58,46 +58,48 @@
 **
 **  @return        the BuildingRestrictionDetails
 */
-const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const wyrmgus::unit_type *parent)
+const on_top_build_restriction *OnTopDetails(const wyrmgus::unit_type &type, const wyrmgus::unit_type *parent)
 {
-	for (const std::unique_ptr<CBuildRestriction> &b : type.BuildingRules) {
-		const CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(b.get());
+	if (type.get_build_restrictions() != nullptr) {
+		for (const std::unique_ptr<build_restriction> &b : type.get_build_restrictions()->get_restrictions()) {
+			const on_top_build_restriction *ontopb = dynamic_cast<on_top_build_restriction *>(b.get());
 
-		if (ontopb) {
-			if (CMap::get()->get_settings()->is_unit_type_disabled(ontopb->Parent)) {
+			if (ontopb) {
+				if (CMap::get()->get_settings()->is_unit_type_disabled(ontopb->Parent)) {
+					continue;
+				}
+
+				if (!parent) {
+					// Guess this is right
+					return ontopb;
+				}
+
+				if (parent == ontopb->Parent) {
+					return ontopb;
+				}
+
 				continue;
 			}
 
-			if (!parent) {
-				// Guess this is right
-				return ontopb;
-			}
+			and_build_restriction *andb = dynamic_cast<and_build_restriction *>(b.get());
 
-			if (parent == ontopb->Parent) {
-				return ontopb;
-			}
+			if (andb) {
+				for (const auto &sub_b : andb->get_restrictions()) {
+					ontopb = dynamic_cast<on_top_build_restriction *>(sub_b.get());
 
-			continue;
-		}
+					if (ontopb) {
+						if (CMap::get()->get_settings()->is_unit_type_disabled(ontopb->Parent)) {
+							continue;
+						}
 
-		CBuildRestrictionAnd *andb = dynamic_cast<CBuildRestrictionAnd *>(b.get());
+						if (!parent) {
+							// Guess this is right
+							return ontopb;
+						}
 
-		if (andb) {
-			for (const auto &sub_b : andb->and_list) {
-				ontopb = dynamic_cast<CBuildRestrictionOnTop *>(sub_b.get());
-
-				if (ontopb) {
-					if (CMap::get()->get_settings()->is_unit_type_disabled(ontopb->Parent)) {
-						continue;
-					}
-
-					if (!parent) {
-						// Guess this is right
-						return ontopb;
-					}
-
-					if (parent == ontopb->Parent) {
-						return ontopb;
+						if (parent == ontopb->Parent) {
+							return ontopb;
+						}
 					}
 				}
 			}
@@ -106,423 +108,6 @@ const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const
 
 	return nullptr;
 }
-
-std::unique_ptr<CBuildRestriction> CBuildRestriction::from_gsml_scope(const gsml_data &scope)
-{
-	const std::string &tag = scope.get_tag();
-	std::unique_ptr<CBuildRestriction> building_rule;
-
-	if (tag == "and") {
-		building_rule = std::make_unique<CBuildRestrictionAnd>();
-	} else if (tag == "ontop") {
-		building_rule = std::make_unique<CBuildRestrictionOnTop>();
-	} else {
-		throw std::runtime_error("Invalid building rule scope: \"" + tag + "\".");
-	}
-
-	database::process_gsml_data(building_rule, scope);
-
-	return building_rule;
-}
-
-void CBuildRestriction::process_gsml_property(const gsml_property &property)
-{
-	throw std::runtime_error("Invalid building rule property: \"" + property.get_key() + "\".");
-}
-
-void CBuildRestriction::process_gsml_scope(const gsml_data &scope)
-{
-	throw std::runtime_error("Invalid building rule scope: \"" + scope.get_tag() + "\".");
-}
-
-void CBuildRestrictionAnd::process_gsml_scope(const gsml_data &scope)
-{
-	this->and_list.push_back(CBuildRestriction::from_gsml_scope(scope));
-}
-
-bool CBuildRestrictionAnd::Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
-{
-	for (const auto &b : this->and_list) {
-		if (!b->Check(builder, type, pos, ontoptarget, z)) {
-			return false;
-		}
-	}
-	return true;
-}
-
-/**
-**  Check Or Restriction
-*/
-bool CBuildRestrictionOr::Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
-{
-	for (const auto &b : this->or_list) {
-		if (b->Check(builder, type, pos, ontoptarget, z)) {
-			return true;
-		}
-	}
-	return false;
-}
-
-/**
-**  Init Distance Restriction
-*/
-void CBuildRestrictionDistance::Init()
-{
-	if (!this->RestrictTypeName.empty()) {
-		this->RestrictType = unit_type::get(this->RestrictTypeName);
-	}
-
-	if (!this->restrict_class_name.empty()) {
-		this->restrict_class = unit_class::get(this->restrict_class_name);
-	}
-}
-
-/**
-**  Check Distance Restriction
-*/
-bool CBuildRestrictionDistance::Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&, int z) const
-{
-	Vec2i pos1(0, 0);
-	Vec2i pos2(0, 0);
-	int distance = 0;
-	CPlayer* player = builder != nullptr ? builder->Player : CPlayer::GetThisPlayer();
-
-	if (this->DistanceType == DistanceTypeType::LessThanEqual
-		|| this->DistanceType == DistanceTypeType::GreaterThan
-		|| this->DistanceType == DistanceTypeType::Equal
-		|| this->DistanceType == DistanceTypeType::NotEqual) {
-		pos1.x = std::max<int>(pos.x - this->Distance, 0);
-		pos1.y = std::max<int>(pos.y - this->Distance, 0);
-		pos2.x = std::min<int>(pos.x + type.get_tile_width() + this->Distance, CMap::get()->Info->MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.get_tile_height() + this->Distance, CMap::get()->Info->MapHeights[z]);
-		distance = this->Distance;
-	} else if (this->DistanceType == DistanceTypeType::LessThan || this->DistanceType == DistanceTypeType::GreaterThanEqual) {
-		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
-		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
-		pos2.x = std::min<int>(pos.x + type.get_tile_width() + this->Distance + 1, CMap::get()->Info->MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.get_tile_height() + this->Distance + 1, CMap::get()->Info->MapHeights[z]);
-		distance = this->Distance - 1;
-	}
-	std::vector<CUnit *> table;
-	//Wyrmgus start
-//	Select(pos1, pos2, table);
-	Select(pos1, pos2, table, z);
-	//Wyrmgus end
-
-	for (size_t i = 0; i != table.size(); ++i) {
-		if ((builder != table[i] || this->CheckBuilder) &&
-			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
-			(this->RestrictType == table[i]->Type || (this->restrict_class != nullptr && this->restrict_class == table[i]->Type->get_unit_class()) || (!this->RestrictType && this->restrict_class == nullptr && this->RestrictTypeOwner.size() > 0)) &&
-			// RestrictTypeOwner is not set or unit belongs to a suitable player
-			(this->RestrictTypeOwner.size() == 0 ||
-			 (!this->RestrictTypeOwner.compare("self") && player == table[i]->Player) ||
-			 (!this->RestrictTypeOwner.compare("allied") && (player == table[i]->Player || player->is_allied_with(*table[i]->Player))) ||
-			 //Wyrmgus start
-//			 (!this->RestrictTypeOwner.compare("enemy") && player->is_enemy_of(*table[i]->Player)))) {
-			 (!this->RestrictTypeOwner.compare("enemy") && player->is_enemy_of(*table[i])))) {
-			 //Wyrmgus end
-
-			switch (this->DistanceType) {
-				case DistanceTypeType::GreaterThan:
-				case DistanceTypeType::GreaterThanEqual:
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) <= distance) {
-						return Diagonal ? false : !(pos.x != table[i]->tilePos.x || pos.y != table[i]->tilePos.y);
-					}
-					break;
-				case DistanceTypeType::LessThan:
-				case DistanceTypeType::LessThanEqual:
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) <= distance) {
-						return Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y;
-					}
-					break;
-				case DistanceTypeType::Equal:
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
-						return Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y;
-					}
-					break;
-				case DistanceTypeType::NotEqual:
-					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
-						return Diagonal ? false : !(pos.x != table[i]->tilePos.x || pos.y != table[i]->tilePos.y);
-					}
-					break;
-			}
-		}
-	}
-	return (this->DistanceType == DistanceTypeType::GreaterThan ||
-			this->DistanceType == DistanceTypeType::GreaterThanEqual ||
-			this->DistanceType == DistanceTypeType::NotEqual);
-}
-
-void CBuildRestrictionHasUnit::Init()
-{
-	this->RestrictType = unit_type::get(this->RestrictTypeName);
-}
-
-/**
-**  Check HasUnit Restriction
-*/
-bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&, const int z) const
-{
-	Q_UNUSED(type)
-	Q_UNUSED(pos)
-	Q_UNUSED(z)
-
-	Vec2i pos1(0, 0);
-	Vec2i pos2(0, 0);
-	CPlayer* player = builder != nullptr ? builder->Player : CPlayer::GetThisPlayer();
-	int count = 0;
-	if (this->RestrictTypeOwner.size() == 0 || !this->RestrictTypeOwner.compare("self")) {
-		count = player->GetUnitTotalCount(*this->RestrictType);
-	} else if (!this->RestrictTypeOwner.compare("allied")) {
-		count = player->GetUnitTotalCount(*this->RestrictType);
-		for (int i = 0; i < NumPlayers; i++) {
-			if (player->is_allied_with(*CPlayer::Players[i])) {
-				count += CPlayer::Players[i]->GetUnitTotalCount(*this->RestrictType);
-			}
-		}
-	} else if (!this->RestrictTypeOwner.compare("enemy")) {
-		for (int i = 0; i < NumPlayers; i++) {
-			if (player->is_enemy_of(*CPlayer::Players[i])) {
-				count += CPlayer::Players[i]->GetUnitTotalCount(*this->RestrictType);
-			}
-		}
-	} else if (!this->RestrictTypeOwner.compare("any")) {
-		for (int i = 0; i < NumPlayers; i++) {
-			count += CPlayer::Players[i]->GetUnitTotalCount(*this->RestrictType);
-		}
-	}
-	switch (this->CountType)
-	{
-	case DistanceTypeType::LessThan: return count < this->Count;
-	case DistanceTypeType::LessThanEqual: return count <= this->Count;
-	case DistanceTypeType::Equal: return count == this->Count;
-	case DistanceTypeType::NotEqual: return count != this->Count;
-	case DistanceTypeType::GreaterThanEqual: return count >= this->Count;
-	case DistanceTypeType::GreaterThan: return count > this->Count;
-	default: return false;
-	}
-}
-
-void CBuildRestrictionSurroundedBy::Init()
-{
-	this->RestrictType = unit_type::get(this->RestrictTypeName);
-}
-
-/**
-**  Check Surrounded By Restriction
-*/
-bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&, int z) const
-{
-	Vec2i pos1(0, 0);
-	Vec2i pos2(0, 0);
-	int distance = 0;
-	int count = 0;
-
-	if (this->DistanceType == DistanceTypeType::LessThanEqual
-		|| this->DistanceType == DistanceTypeType::GreaterThan
-		|| this->DistanceType == DistanceTypeType::Equal
-		|| this->DistanceType == DistanceTypeType::NotEqual) {
-		pos1.x = std::max<int>(pos.x - this->Distance, 0);
-		pos1.y = std::max<int>(pos.y - this->Distance, 0);
-		pos2.x = std::min<int>(pos.x + type.get_tile_width() + this->Distance, CMap::get()->Info->MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.get_tile_height() + this->Distance, CMap::get()->Info->MapHeights[z]);
-		distance = this->Distance;
-	}
-	else if (this->DistanceType == DistanceTypeType::LessThan || this->DistanceType == DistanceTypeType::GreaterThanEqual) {
-		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
-		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
-		pos2.x = std::min<int>(pos.x + type.get_tile_width() + this->Distance + 1, CMap::get()->Info->MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.get_tile_height() + this->Distance + 1, CMap::get()->Info->MapHeights[z]);
-		distance = this->Distance - 1;
-	}
-	std::vector<CUnit *> table;
-	//Wyrmgus start
-//	Select(pos1, pos2, table);
-	Select(pos1, pos2, table, z);
-	//Wyrmgus end
-
-	for (size_t i = 0; i != table.size(); ++i) {
-		if ((builder != table[i] || this->CheckBuilder) &&
-			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
-			(this->RestrictType == table[i]->Type || (!this->RestrictType && this->RestrictTypeOwner.size() > 0)) &&
-			// RestrictTypeOwner is not set or unit belongs to a suitable player
-			(this->RestrictTypeOwner.size() == 0 ||
-				(!this->RestrictTypeOwner.compare("self") && builder->Player == table[i]->Player) ||
-				(!this->RestrictTypeOwner.compare("allied") && (builder->Player == table[i]->Player || builder->Player->is_allied_with(*table[i]->Player))) ||
-				//Wyrmgus start
-//				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->is_enemy_of(*table[i]->Player)))) {
-				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->is_enemy_of(*table[i])))) {
-				//Wyrmgus end
-
-			switch (this->DistanceType) {
-			case DistanceTypeType::GreaterThan:
-			case DistanceTypeType::GreaterThanEqual:
-				break;
-			case DistanceTypeType::LessThan:
-			case DistanceTypeType::LessThanEqual:
-				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) <= distance) {
-					count++;
-				}
-				break;
-			case DistanceTypeType::Equal:
-				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
-					count++;
-				}
-				break;
-			case DistanceTypeType::NotEqual:
-				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer->ID) == distance) {
-					count++;
-				}
-				break;
-			}
-		}
-	}
-
-	switch (this->CountType)
-	{
-	case DistanceTypeType::LessThan: return count < this->Count;
-	case DistanceTypeType::LessThanEqual: return count <= this->Count;
-	case DistanceTypeType::Equal: return count == this->Count;
-	case DistanceTypeType::NotEqual: return count != this->Count;
-	case DistanceTypeType::GreaterThanEqual: return count >= this->Count;
-	case DistanceTypeType::GreaterThan: return count > this->Count;
-	default: return false;
-	}
-}
-
-inline bool CBuildRestrictionAddOn::functor::operator()(const CUnit *const unit) const
-{
-	return (unit->Type == Parent && unit->tilePos == this->pos);
-}
-
-void CBuildRestrictionAddOn::Init()
-{
-	this->Parent = unit_type::get(this->ParentName);
-}
-
-/**
-**  Check AddOn Restriction
-*/
-bool CBuildRestrictionAddOn::Check(const CUnit *, const wyrmgus::unit_type &, const Vec2i &pos, CUnit *&, int z) const
-{
-	Vec2i pos1 = pos - this->Offset;
-
-	if (CMap::get()->Info->IsPointOnMap(pos1, z) == false) {
-		return false;
-	}
-	functor f(Parent, pos1);
-	//Wyrmgus start
-	return (CMap::get()->Field(pos1, z)->UnitCache.find(f) != nullptr);
-	//Wyrmgus end
-}
-
-class AliveConstructedAndSameTypeAs
-{
-public:
-	explicit AliveConstructedAndSameTypeAs(const wyrmgus::unit_type &unitType) : type(&unitType) {}
-	bool operator()(const CUnit *unit) const
-	{
-		return unit->IsAlive() && unit->Type == type && unit->CurrentAction() != UnitAction::Built;
-	}
-private:
-	const wyrmgus::unit_type *type;
-};
-
-void CBuildRestrictionOnTop::process_gsml_property(const gsml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "type") {
-		this->ParentName = value;
-	} else if (key == "replace_on_die") {
-		this->ReplaceOnDie = string::to_bool(value);
-	} else if (key == "replace_on_build") {
-		this->ReplaceOnBuild = string::to_bool(value);
-	} else {
-		CBuildRestriction::process_gsml_property(property);
-	}
-}
-
-void CBuildRestrictionOnTop::Init()
-{
-	this->Parent = unit_type::get(this->ParentName);
-}
-
-bool CBuildRestrictionOnTop::Check(const CUnit *builder, const wyrmgus::unit_type &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
-{
-	if (CMap::get()->get_settings()->is_unit_type_disabled(this->Parent)) {
-		return true;
-	}
-
-	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
-
-	ontoptarget = nullptr;
-
-	CUnitCache &cache = CMap::get()->Field(pos, z)->UnitCache;
-
-	CUnitCache::iterator it = std::find_if(cache.begin(), cache.end(), AliveConstructedAndSameTypeAs(*this->Parent));
-
-	if (it != cache.end() && (*it)->tilePos == pos) {
-		CUnit &found = **it;
-		std::vector<CUnit *> table;
-		Vec2i endPos(found.tilePos + found.Type->get_tile_size() - QSize(1, 1));
-		Select(found.tilePos, endPos, table, found.MapLayer->ID);
-		for (std::vector<CUnit *>::iterator it2 = table.begin(); it2 != table.end(); ++it2) {
-			if (*it == *it2) {
-				continue;
-			}
-			if (builder == *it2) {
-				continue;
-			}
-			//Wyrmgus start
-			// allow to build if a decoration is present under the deposit
-			if ((*it2)->Type->BoolFlag[DECORATION_INDEX].value) {
-				continue;
-			}
-			//Wyrmgus end
-
-			if (found.Type->get_domain() == (*it2)->Type->get_domain()) {
-				return false;
-			}
-		}
-		ontoptarget = *it;
-		return true;
-	}
-	return false;
-}
-
-//Wyrmgus start
-void CBuildRestrictionTerrain::Init()
-{
-	this->RestrictTerrainType = terrain_type::get(this->RestrictTerrainTypeName);
-}
-
-/**
-**  Check Terrain Restriction
-*/
-bool CBuildRestrictionTerrain::Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&, int z) const
-{
-	Q_UNUSED(builder)
-
-	assert_throw(CMap::get()->Info->IsPointOnMap(pos, z));
-
-	for (int x = pos.x; x < pos.x + type.get_tile_width(); ++x) {
-		for (int y = pos.y; y < pos.y + type.get_tile_height(); ++y) {
-			if (!CMap::get()->Info->IsPointOnMap(x, y, z)) {
-				continue;
-			}
-			const Vec2i tile_pos(x, y);
-			const wyrmgus::terrain_type *terrain = CMap::get()->GetTileTerrain(tile_pos, this->RestrictTerrainType->is_overlay(), z);
-			if (this->RestrictTerrainType == terrain) {
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-//Wyrmgus end
 
 /**
 **  Can build unit here.
@@ -606,39 +191,30 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 
 	// Check special rules for AI players
 	if (unit && unit->Player->AiEnabled) {
-		bool aiChecked = true;
-		if (!type.AiBuildingRules.empty()) {
-			for (const auto &rule : type.AiBuildingRules) {
-				CUnit *ontoptarget = nullptr;
-				// All checks processed, did we really have success
-				if (rule->Check(unit, type, pos, ontoptarget, z)) {
-					// We passed a full ruleset
-					aiChecked = true;
-					break;
-				} else {
-					aiChecked = false;
-				}
+		if (type.get_ai_build_restrictions() != nullptr) {
+			CUnit *ontoptarget = nullptr;
+			//all checks processed, did we really have success
+			if (!type.get_ai_build_restrictions()->Check(unit, type, pos, ontoptarget, z)) {
+				//we passed a full ruleset
+				return nullptr;
 			}
-		}
-		if (aiChecked == false) {
-			return nullptr;
 		}
 	}
 
-	if (!type.BuildingRules.empty()) {
-		for (const auto &rule : type.BuildingRules) {
-			CUnit *ontoptarget = nullptr;
-			// All checks processed, did we really have success
-			if (rule->Check(unit, type, pos, ontoptarget, z)) {
-				// We passed a full ruleset return
-				if (unit == nullptr) {
-					return ontoptarget ? ontoptarget : (CUnit *)1;
-				} else {
-					return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
-				}
+	if (type.get_build_restrictions() != nullptr) {
+		CUnit *ontoptarget = nullptr;
+
+		//all checks processed, did we really have success
+		if (type.get_build_restrictions()->Check(unit, type, pos, ontoptarget, z)) {
+			//we passed a full ruleset return
+			if (unit == nullptr) {
+				return ontoptarget ? ontoptarget : (CUnit *)1;
+			} else {
+				return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
 			}
+		} else {
+			return nullptr;
 		}
-		return nullptr;
 	}
 	
 	if (unit && z != unit->Player->StartMapLayer && CMap::get()->MapLayers[z]->world != CMap::get()->MapLayers[unit->Player->StartMapLayer]->world) {

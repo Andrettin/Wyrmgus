@@ -73,6 +73,7 @@
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "translate.h"
+#include "unit/build_restriction/on_top_build_restriction.h"
 #include "unit/historical_unit.h"
 #include "unit/historical_unit_history.h"
 #include "unit/unit.h"
@@ -1564,7 +1565,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a town hall, but isn't set as a settlement one.");
 		}
 
-		const CBuildRestrictionOnTop *ontop = OnTopDetails(*unit_type, nullptr);
+		const on_top_build_restriction *ontop = OnTopDetails(*unit_type, nullptr);
 		if (ontop != nullptr && ontop->Parent != nullptr) {
 			if (ontop->Parent != base_unit_type) {
 				throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a building (\"" + unit_type->get_identifier() + "\") which requires being built over a \"" + ontop->Parent->get_identifier() + "\", but the site does not have that as its base unit type.");
@@ -3269,7 +3270,7 @@ void map_template::load_stratagus_terrain_file()
 
 				if (game::get()->get_current_campaign() != nullptr && unit_player_index != PlayerNumNeutral) {
 					//ignore non-neutral units for campaigns, or replace them with what they would be built ontop of
-					const CBuildRestrictionOnTop *ontop = OnTopDetails(*unit_type, nullptr);
+					const on_top_build_restriction *ontop = OnTopDetails(*unit_type, nullptr);
 					if (ontop != nullptr && ontop->Parent != nullptr && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 						unit_type = ontop->Parent;
 						unit_player_index = PlayerNumNeutral;

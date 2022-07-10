@@ -54,6 +54,7 @@
 #include "script.h"
 #include "translate.h"
 #include "ui/ui.h"
+#include "unit/build_restriction/on_top_build_restriction.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"
 //Wyrmgus start
@@ -419,8 +420,8 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	// Building on top of something, may remove what is beneath it
 	if (&ontop != &unit) {
 		//Wyrmgus start
-//		const CBuildRestrictionOnTop *b = OnTopDetails(*build, ontop.Type));
-		const CBuildRestrictionOnTop *b = OnTopDetails(*build->Type, ontop.Type);
+//		const on_top_build_restriction *b = OnTopDetails(*build, ontop.Type));
+		const on_top_build_restriction *b = OnTopDetails(*build->Type, ontop.Type);
 		//Wyrmgus end
 		assert_throw(b != nullptr);
 		if (b->ReplaceOnBuild) {

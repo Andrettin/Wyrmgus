@@ -95,6 +95,7 @@
 #include "ui/button_cmd.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "unit/build_restriction/on_top_build_restriction.h"
 #include "unit/unit_domain.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
@@ -661,8 +662,8 @@ void CUnit::restore_ontop()
 {
 	// Destroy resource-platform, must re-make resource patch.
 	//Wyrmgus start
-//	const CBuildRestrictionOnTop *b = OnTopDetails(*this, nullptr);
-	const CBuildRestrictionOnTop *b = OnTopDetails(*this->Type, nullptr);
+//	const on_top_build_restriction *b = OnTopDetails(*this, nullptr);
+	const on_top_build_restriction *b = OnTopDetails(*this->Type, nullptr);
 	//Wyrmgus end
 	if (b != nullptr) {
 		if (b->ReplaceOnDie && (this->Type->get_given_resource() == nullptr || this->ResourcesHeld != 0) && this->MapLayer != nullptr) {
@@ -2407,7 +2408,7 @@ void CUnit::GenerateDrop()
 	}
 		
 	if (chosen_drop != nullptr) {
-		const CBuildRestrictionOnTop *ontop_b = OnTopDetails(*this->Type, nullptr);
+		const on_top_build_restriction *ontop_b = OnTopDetails(*this->Type, nullptr);
 		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && this->MapLayer->Field(drop_pos)->has_flag(tile_flag::item)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
 			const QPoint res_pos = FindNearestDrop(*chosen_drop, drop_pos, LookingW, this->MapLayer->ID);
 			droppedUnit = MakeUnitAndPlace(res_pos, *chosen_drop, CPlayer::get_neutral_player(), this->MapLayer->ID);
@@ -2948,6 +2949,8 @@ void CUnit::spawn_units()
 	if (!this->Type->get_neutral_spawned_units().empty() && this->Player->is_neutral_player()) {
 		vector::merge(spawned_units, this->Type->get_neutral_spawned_units());
 	}
+
+	//FIXME: spawn units for minor faction buildings if their settlement has no owner
 
 	if (spawned_units.empty()) {
 		return;
@@ -4569,7 +4572,7 @@ CUnit *CreateUnit(const Vec2i &pos, const unit_type &type, CPlayer *player, cons
 		const QPoint res_pos = FindNearestDrop(type, pos, heading, z, no_building_bordering_impassable, ignore_ontop, settlement);
 		
 		if (type.BoolFlag[BUILDING_INDEX].value && !ignore_ontop) {
-			const CBuildRestrictionOnTop *b = OnTopDetails(type, nullptr);
+			const on_top_build_restriction *b = OnTopDetails(type, nullptr);
 			if (b && b->ReplaceOnBuild) {
 				CUnitCache &unitCache = CMap::get()->Field(res_pos, z)->UnitCache;
 				CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));

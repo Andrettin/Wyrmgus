@@ -36,7 +36,6 @@
 #include "vec2i.h"
 
 class CAnimation;
-class CBuildRestrictionOnTop;
 class CFile;
 class CMapLayer;
 class COrder;
@@ -61,6 +60,7 @@ namespace wyrmgus {
 	class epithet;
 	class landmass;
 	class map_template;
+	class on_top_build_restriction;
 	class player_color;
 	class renderer;
 	class site;
@@ -1246,7 +1246,7 @@ extern void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta);
 extern void DropOutAll(const CUnit &unit);
 
 /// Return the rule used to build this building.
-extern const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const wyrmgus::unit_type *parent);
+extern const on_top_build_restriction *OnTopDetails(const unit_type &type, const unit_type *parent);
 /// @todo more docu
 extern CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int z, const bool no_bordering_impassable = false);
 /// @todo more docu

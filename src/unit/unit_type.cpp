@@ -67,6 +67,8 @@
 #include "ui/button_cmd.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
+#include "unit/build_restriction/and_build_restriction.h"
+#include "unit/build_restriction/on_top_build_restriction.h"
 #include "unit/can_target_flag.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
@@ -748,7 +750,7 @@ void unit_type::process_gsml_property(const gsml_property &property)
 		this->RequirementsString = value;
 	} else if (key == "experience_requirements_string") {
 		this->ExperienceRequirementsString = value;
-	} else if (key == "building_rules_string") {
+	} else if (key == "build_restrictions_string") {
 		this->BuildingRulesString = value;
 	} else {
 		const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
@@ -935,14 +937,31 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			const wyrmgus::unit_class *unit_class = unit_class::get(key);
 			this->DefaultStat.set_unit_class_stock(unit_class, std::stoi(value));
 		});
-	} else if (tag == "building_rules") {
+	} else if (tag == "build_restrictions") {
 		if (scope.get_operator() == gsml_operator::assignment) {
 			//remove any old restrictions if they are redefined
-			this->BuildingRules.clear();
+			this->build_restrictions = std::make_unique<and_build_restriction>();
 		}
 
-		scope.for_each_child([&](const gsml_data &child_scope) {
-			this->BuildingRules.push_back(CBuildRestriction::from_gsml_scope(child_scope));
+		assert_throw(this->build_restrictions != nullptr);
+
+		scope.for_each_element([&](const gsml_property &property) {
+			this->build_restrictions->add_restriction(build_restriction::from_gsml_property(property));
+		}, [&](const gsml_data &child_scope) {
+			this->build_restrictions->add_restriction(build_restriction::from_gsml_scope(child_scope));
+		});
+	} else if (tag == "ai_build_restrictions") {
+		if (scope.get_operator() == gsml_operator::assignment) {
+			//remove any old restrictions if they are redefined
+			this->ai_build_restrictions = std::make_unique<and_build_restriction>();
+		}
+
+		assert_throw(this->ai_build_restrictions != nullptr);
+
+		scope.for_each_element([&](const gsml_property &property) {
+			this->ai_build_restrictions->add_restriction(build_restriction::from_gsml_property(property));
+		}, [&](const gsml_data &child_scope) {
+			this->ai_build_restrictions->add_restriction(build_restriction::from_gsml_scope(child_scope));
 		});
 	} else if (tag == "variations") {
 		if (scope.get_operator() == gsml_operator::assignment) {
@@ -1192,17 +1211,17 @@ void unit_type::initialize()
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->get_identifier() + "\")) then table.insert(Units, \"" + this->get_identifier() + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 
 	// Lookup BuildingTypes
-	for (const auto &b : this->BuildingRules) {
-		b->Init();
+	if (this->build_restrictions != nullptr) {
+		this->build_restrictions->Init();
 	}
 
 	// Lookup AiBuildingTypes
-	for (const auto &b : this->AiBuildingRules) {
-		b->Init();
+	if (this->ai_build_restrictions != nullptr) {
+		this->ai_build_restrictions->Init();
 	}
 
 	if (this->BoolFlag[BUILDING_INDEX].value) {
-		const CBuildRestrictionOnTop *ontop = OnTopDetails(*this, nullptr);
+		const on_top_build_restriction *ontop = OnTopDetails(*this, nullptr);
 
 		if (ontop != nullptr && ontop->Parent != nullptr) {
 			ontop->Parent->ontop_buildings.push_back(this);
@@ -1660,12 +1679,12 @@ void unit_type::set_parent(const unit_type *parent_type)
 	}
 	this->starting_resources = parent_type->starting_resources;
 
-	for (const auto &building_rule : parent_type->BuildingRules) {
-		this->BuildingRules.push_back(building_rule->duplicate());
+	if (parent_type->build_restrictions != nullptr) {
+		this->build_restrictions = parent_type->build_restrictions->duplicate_derived();
 	}
 
-	for (const auto &building_rule : parent_type->AiBuildingRules) {
-		this->AiBuildingRules.push_back(building_rule->duplicate());
+	if (parent_type->ai_build_restrictions != nullptr) {
+		this->ai_build_restrictions = parent_type->ai_build_restrictions->duplicate_derived();
 	}
 
 	for (const auto &parent_variation : parent_type->variations) {

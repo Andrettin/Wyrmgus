@@ -55,7 +55,9 @@ extern int CclDefinePredependency(lua_State *l);
 extern int CclDefineUnitType(lua_State *l);
 
 namespace wyrmgus {
+	class and_build_restriction;
 	class animation_set;
+	class build_restriction;
 	class button_level;
 	class civilization;
 	class civilization_group;
@@ -515,246 +517,6 @@ public:
 	char NSprite = -1;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
 	int n = 0;         /// identifiant in SpellSprite
 	int FadeValue = 0; /// if variable's value is below than FadeValue, it drawn transparent.
-};
-
-enum class DistanceTypeType {
-	Equal,
-	NotEqual,
-	LessThan,
-	LessThanEqual,
-	GreaterThan,
-	GreaterThanEqual
-};
-
-class CBuildRestriction
-{
-public:
-	static std::unique_ptr<CBuildRestriction> from_gsml_scope(const gsml_data &scope);
-
-	virtual ~CBuildRestriction()
-	{
-	}
-
-	virtual std::unique_ptr<CBuildRestriction> duplicate() const = 0;
-	virtual void process_gsml_property(const gsml_property &property);
-	virtual void process_gsml_scope(const gsml_data &scope);
-
-	virtual void Init()
-	{
-	}
-
-	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const = 0;
-};
-
-class CBuildRestrictionAnd final : public CBuildRestriction
-{
-public:
-	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
-	{
-		auto b = std::make_unique<CBuildRestrictionAnd>();
-		for (const auto &build_restriction : this->and_list) {
-			b->and_list.push_back(build_restriction->duplicate());
-		}
-		return b;
-	}
-
-	virtual void process_gsml_scope(const gsml_data &scope) override;
-
-	virtual void Init() override
-	{
-		for (const auto &build_restriction : this->and_list) {
-			build_restriction->Init();
-		}
-	}
-
-	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
-
-public:
-	std::vector<std::unique_ptr<CBuildRestriction>> and_list;
-};
-
-class CBuildRestrictionOr final : public CBuildRestriction
-{
-public:
-	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
-	{
-		auto b = std::make_unique<CBuildRestrictionOr>();
-		for (const auto &build_restriction : this->or_list) {
-			b->or_list.push_back(build_restriction->duplicate());
-		}
-		return b;
-	}
-
-	virtual void Init() override
-	{
-		for (const auto &build_restriction : this->or_list) {
-			build_restriction->Init();
-		}
-	}
-
-	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
-
-public:
-	std::vector<std::unique_ptr<CBuildRestriction>> or_list;
-};
-
-class CBuildRestrictionAddOn final : public CBuildRestriction
-{
-	class functor
-	{
-	public:
-		functor(const wyrmgus::unit_type *type, const Vec2i &_pos): Parent(type), pos(_pos) {}
-		inline bool operator()(const CUnit *const unit) const;
-	private:
-		const wyrmgus::unit_type *const Parent;   /// building that is unit is an addon too.
-		const Vec2i pos; //functor work position
-	};
-public:
-	CBuildRestrictionAddOn() : Offset(0, 0) {}
-
-	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
-	{
-		auto b = std::make_unique<CBuildRestrictionAddOn>();
-		b->Offset = this->Offset;
-		b->ParentName = this->ParentName;
-		b->Parent = this->Parent;
-		return b;
-	}
-
-	virtual void Init() override;
-	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
-
-	Vec2i Offset;           /// offset from the main building to place this
-	std::string ParentName; /// building that is unit is an addon too.
-	wyrmgus::unit_type *Parent = nullptr;      /// building that is unit is an addon too.
-};
-
-class CBuildRestrictionOnTop final : public CBuildRestriction
-{
-public:
-	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
-	{
-		auto b = std::make_unique<CBuildRestrictionOnTop>();
-		b->ParentName = this->ParentName;
-		b->Parent = this->Parent;
-		b->ReplaceOnDie = this->ReplaceOnDie;
-		b->ReplaceOnBuild = this->ReplaceOnBuild;
-		return b;
-	}
-
-	virtual void process_gsml_property(const gsml_property &property) override;
-
-	virtual void Init() override;
-	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
-
-	std::string ParentName;  /// building that is unit is an addon too.
-	unit_type *Parent = nullptr;       /// building that is unit is an addon too.
-	int ReplaceOnDie = 0;     /// recreate the parent on destruction
-	int ReplaceOnBuild = 0;   /// remove the parent, or just build over it.
-};
-
-class CBuildRestrictionDistance final : public CBuildRestriction
-{
-public:
-	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
-	{
-		auto b = std::make_unique<CBuildRestrictionDistance>();
-		b->Distance = this->Distance;
-		b->DistanceType = this->DistanceType;
-		b->RestrictTypeName = this->RestrictTypeName;
-		b->RestrictTypeOwner = this->RestrictTypeOwner;
-		b->RestrictType = this->RestrictType;
-		b->restrict_class_name = this->restrict_class_name;
-		b->restrict_class = this->restrict_class;
-		b->CheckBuilder = this->CheckBuilder;
-		b->Diagonal = this->Diagonal;
-		return b;
-	}
-
-	virtual void Init() override;
-	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
-
-	int Distance = 0;        /// distance to build (circle)
-	DistanceTypeType DistanceType = DistanceTypeType::Equal;
-	std::string RestrictTypeName;
-	std::string RestrictTypeOwner;
-	wyrmgus::unit_type *RestrictType = nullptr;
-	std::string restrict_class_name;
-	const wyrmgus::unit_class *restrict_class = nullptr;
-	bool CheckBuilder = false;
-	bool Diagonal = true;
-};
-
-class CBuildRestrictionHasUnit final : public CBuildRestriction
-{
-public:
-	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
-	{
-		auto b = std::make_unique<CBuildRestrictionHasUnit>();
-		b->Count = this->Count;
-		b->CountType = this->CountType;
-		b->RestrictTypeName = this->RestrictTypeName;
-		b->RestrictType = this->RestrictType;
-		b->RestrictTypeOwner = this->RestrictTypeOwner;
-		return b;
-	}
-
-	virtual void Init() override;
-	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
-	
-	int Count = 0;
-	DistanceTypeType CountType = DistanceTypeType::Equal;
-	std::string RestrictTypeName;
-	wyrmgus::unit_type *RestrictType = nullptr;
-	std::string RestrictTypeOwner;
-};
-
-class CBuildRestrictionSurroundedBy final : public CBuildRestriction
-{
-public:
-	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
-	{
-		auto b = std::make_unique<CBuildRestrictionSurroundedBy>();
-		b->Distance = this->Distance;
-		b->DistanceType = this->DistanceType;
-		b->Count = this->Count;
-		b->CountType = this->CountType;
-		b->RestrictTypeName = this->RestrictTypeName;
-		b->RestrictTypeOwner = this->RestrictTypeOwner;
-		b->RestrictType = this->RestrictType;
-		b->CheckBuilder = this->CheckBuilder;
-		return b;
-	}
-
-	virtual void Init() override;
-	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
-	
-	int Distance = 0;
-	DistanceTypeType DistanceType = DistanceTypeType::Equal;
-	int Count = 0;
-	DistanceTypeType CountType = DistanceTypeType::Equal;
-	std::string RestrictTypeName;
-	std::string RestrictTypeOwner;
-	wyrmgus::unit_type *RestrictType = nullptr;
-	bool CheckBuilder = false;
-};
-
-class CBuildRestrictionTerrain final : public CBuildRestriction
-{
-public:
-	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
-	{
-		auto b = std::make_unique<CBuildRestrictionTerrain>();
-		b->RestrictTerrainTypeName = this->RestrictTerrainTypeName;
-		b->RestrictTerrainType = this->RestrictTerrainType;
-		return b;
-	}
-
-	virtual void Init() override;
-	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
-
-	std::string RestrictTerrainTypeName;
-	wyrmgus::terrain_type *RestrictTerrainType = nullptr;
 };
 
 namespace wyrmgus {
@@ -1293,6 +1055,16 @@ public:
 	std::vector<variation_tag *> get_custom_hero_hair_color_tags() const;
 	Q_INVOKABLE QVariantList get_custom_hero_hair_color_tags_qvariant_list() const;
 
+	const and_build_restriction *get_build_restrictions() const
+	{
+		return this->build_restrictions.get();
+	}
+
+	const and_build_restriction *get_ai_build_restrictions() const
+	{
+		return this->ai_build_restrictions.get();
+	}
+
 	bool has_ontop_buildings() const
 	{
 		return !this->ontop_buildings.empty();
@@ -1547,9 +1319,9 @@ public:
 	//Wyrmgus start
 	std::vector<qunique_ptr<unit_type_variation>> LayerVariations[MaxImageLayers];	/// Layer variation information
 	//Wyrmgus end
-	std::vector<std::unique_ptr<CBuildRestriction>> BuildingRules;   /// Rules list for building a building.
-	std::vector<std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.
 private:
+	std::unique_ptr<and_build_restriction> build_restrictions;
+	std::unique_ptr<and_build_restriction> ai_build_restrictions;
 	std::vector<const unit_type *> ontop_buildings; //buildings which can be built on top of this one
 	QColor neutral_minimap_color; //minimap color for neutral units
 	std::filesystem::path encyclopedia_background_file;

@@ -523,6 +523,12 @@ set(unit_SRCS
 )
 source_group(unit FILES ${unit_SRCS})
 
+set(unit_build_restriction_SRCS
+	src/unit/build_restriction/build_restriction.cpp
+	src/unit/build_restriction/on_top_build_restriction.cpp
+)
+source_group(unit\\build_restriction FILES ${unit_build_restriction_SRCS})
+
 set(upgrade_SRCS
 	src/upgrade/upgrade.cpp
 	src/upgrade/upgrade_category.cpp
@@ -641,6 +647,7 @@ set(wyrmgus_SRCS
 	${time_SRCS}
 	${ui_SRCS}
 	${unit_SRCS}
+	${unit_build_restriction_SRCS}
 	${upgrade_SRCS}
 	${util_SRCS}
 	${video_SRCS}
@@ -1136,6 +1143,17 @@ set(wyrmgus_unit_HDRS
 	src/unit/variation_tag.h
 )
 
+set(wyrmgus_unit_build_restriction_HDRS
+	src/unit/build_restriction/add_on_build_restriction.h
+	src/unit/build_restriction/and_build_restriction.h
+	src/unit/build_restriction/build_restriction.h
+	src/unit/build_restriction/distance_build_restriction.h
+	src/unit/build_restriction/on_top_build_restriction.h
+	src/unit/build_restriction/or_build_restriction.h
+	src/unit/build_restriction/surrounded_by_build_restriction.h
+	src/unit/build_restriction/terrain_build_restriction.h
+)
+
 set(wyrmgus_upgrade_HDRS
 	src/include/upgrade/upgrade.h
 	src/upgrade/upgrade_category.h
@@ -1295,6 +1313,7 @@ source_group(spell FILES ${wyrmgus_spell_HDRS})
 source_group(time FILES ${wyrmgus_time_HDRS})
 source_group(ui FILES ${wyrmgus_ui_HDRS})
 source_group(unit FILES ${wyrmgus_unit_HDRS})
+source_group(unit\\build_restriction FILES ${wyrmgus_unit_build_restriction_HDRS})
 source_group(upgrade FILES ${wyrmgus_upgrade_HDRS})
 source_group(util FILES ${wyrmgus_util_HDRS})
 source_group(video FILES ${wyrmgus_video_HDRS})
@@ -1329,6 +1348,7 @@ set(wyrmgus_HDRS
 	${wyrmgus_time_HDRS}
 	${wyrmgus_ui_HDRS}
 	${wyrmgus_unit_HDRS}
+	${wyrmgus_unit_build_restriction_HDRS}
 	${wyrmgus_upgrade_HDRS}
 	${wyrmgus_util_HDRS}
 	${wyrmgus_video_HDRS}
@@ -1822,6 +1842,7 @@ if(ENABLE_UNITY_BUILD)
 	set_source_files_properties(${time_SRCS} PROPERTIES UNITY_GROUP "time")
 	set_source_files_properties(${ui_SRCS} PROPERTIES UNITY_GROUP "ui")
 	set_source_files_properties(${unit_SRCS} PROPERTIES UNITY_GROUP "unit")
+	set_source_files_properties(${unit_build_restriction_SRCS} PROPERTIES UNITY_GROUP "unit_build_restriction")
 	set_source_files_properties(${upgrade_SRCS} PROPERTIES UNITY_GROUP "upgrade")
 	set_source_files_properties(${util_SRCS} PROPERTIES UNITY_GROUP "util")
 	set_source_files_properties(${video_SRCS} PROPERTIES UNITY_GROUP "video")

@@ -65,6 +65,7 @@
 #include "ui/cursor_type.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "unit/build_restriction/on_top_build_restriction.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
@@ -535,8 +536,8 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const unit_type &type, CPlay
 	}
 
 	//Wyrmgus start
-//	const CBuildRestrictionOnTop *b = OnTopDetails(*unit, nullptr);
-	const CBuildRestrictionOnTop *b = OnTopDetails(*unit->Type, nullptr);
+//	const on_top_build_restriction *b = OnTopDetails(*unit, nullptr);
+	const on_top_build_restriction *b = OnTopDetails(*unit->Type, nullptr);
 	//Wyrmgus end
 	if (b && b->ReplaceOnBuild) {
 		CUnitCache &unitCache = UI.CurrentMapLayer->Field(pos)->UnitCache;
