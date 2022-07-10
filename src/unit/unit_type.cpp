@@ -935,6 +935,15 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			const wyrmgus::unit_class *unit_class = unit_class::get(key);
 			this->DefaultStat.set_unit_class_stock(unit_class, std::stoi(value));
 		});
+	} else if (tag == "building_rules") {
+		if (scope.get_operator() == gsml_operator::assignment) {
+			//remove any old restrictions if they are redefined
+			this->BuildingRules.clear();
+		}
+
+		scope.for_each_child([&](const gsml_data &child_scope) {
+			this->BuildingRules.push_back(CBuildRestriction::from_gsml_scope(child_scope));
+		});
 	} else if (tag == "variations") {
 		if (scope.get_operator() == gsml_operator::assignment) {
 			//remove previously defined variations, if any

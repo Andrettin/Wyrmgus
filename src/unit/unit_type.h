@@ -529,11 +529,20 @@ enum class DistanceTypeType {
 class CBuildRestriction
 {
 public:
-	virtual ~CBuildRestriction() {}
+	static std::unique_ptr<CBuildRestriction> from_gsml_scope(const gsml_data &scope);
+
+	virtual ~CBuildRestriction()
+	{
+	}
 
 	virtual std::unique_ptr<CBuildRestriction> duplicate() const = 0;
+	virtual void process_gsml_property(const gsml_property &property);
+	virtual void process_gsml_scope(const gsml_data &scope);
 
-	virtual void Init() {};
+	virtual void Init()
+	{
+	}
+
 	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const = 0;
 };
 
@@ -548,6 +557,8 @@ public:
 		}
 		return b;
 	}
+
+	virtual void process_gsml_scope(const gsml_data &scope) override;
 
 	virtual void Init() override
 	{
@@ -630,6 +641,8 @@ public:
 		b->ReplaceOnBuild = this->ReplaceOnBuild;
 		return b;
 	}
+
+	virtual void process_gsml_property(const gsml_property &property) override;
 
 	virtual void Init() override;
 	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;

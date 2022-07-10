@@ -47,6 +47,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "util/assert_util.h"
+#include "util/string_conversion_util.h"
 
 /**
 **  Find the building restriction that gives me this unit built on top
@@ -106,9 +107,39 @@ const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const
 	return nullptr;
 }
 
-/**
-**  Check And Restriction
-*/
+std::unique_ptr<CBuildRestriction> CBuildRestriction::from_gsml_scope(const gsml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	std::unique_ptr<CBuildRestriction> building_rule;
+
+	if (tag == "and") {
+		building_rule = std::make_unique<CBuildRestrictionAnd>();
+	} else if (tag == "ontop") {
+		building_rule = std::make_unique<CBuildRestrictionOnTop>();
+	} else {
+		throw std::runtime_error("Invalid building rule scope: \"" + tag + "\".");
+	}
+
+	database::process_gsml_data(building_rule, scope);
+
+	return building_rule;
+}
+
+void CBuildRestriction::process_gsml_property(const gsml_property &property)
+{
+	throw std::runtime_error("Invalid building rule property: \"" + property.get_key() + "\".");
+}
+
+void CBuildRestriction::process_gsml_scope(const gsml_data &scope)
+{
+	throw std::runtime_error("Invalid building rule scope: \"" + scope.get_tag() + "\".");
+}
+
+void CBuildRestrictionAnd::process_gsml_scope(const gsml_data &scope)
+{
+	this->and_list.push_back(CBuildRestriction::from_gsml_scope(scope));
+}
+
 bool CBuildRestrictionAnd::Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 {
 	for (const auto &b : this->and_list) {
@@ -396,6 +427,22 @@ public:
 private:
 	const wyrmgus::unit_type *type;
 };
+
+void CBuildRestrictionOnTop::process_gsml_property(const gsml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "type") {
+		this->ParentName = value;
+	} else if (key == "replace_on_die") {
+		this->ReplaceOnDie = string::to_bool(value);
+	} else if (key == "replace_on_build") {
+		this->ReplaceOnBuild = string::to_bool(value);
+	} else {
+		CBuildRestriction::process_gsml_property(property);
+	}
+}
 
 void CBuildRestrictionOnTop::Init()
 {
