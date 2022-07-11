@@ -56,6 +56,11 @@ public:
 	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override final
 	{
 		const scope_type *scope = this->get_scope(unit, ctx);
+
+		if (scope == nullptr) {
+			return false;
+		}
+
 		return this->check_scope(scope, ctx, ignore_units);
 	}
 };
