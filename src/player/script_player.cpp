@@ -2040,55 +2040,12 @@ static int CclGetFactionData(lua_State *l)
 	
 	const char *data = LuaToString(l, 2);
 
-	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, faction->get_name().c_str());
-		return 1;
-	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, faction->get_description().c_str());
-		return 1;
-	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, faction->get_quote().c_str());
-		return 1;
-	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, faction->get_background().c_str());
-		return 1;
-	} else if (!strcmp(data, "Adjective")) {
-		if (!faction->get_adjective().empty()) {
-			lua_pushstring(l, faction->get_adjective().c_str());
-		} else {
-			lua_pushstring(l, faction->get_name().c_str());
-		}
-		return 1;
-	} else if (!strcmp(data, "Type")) {
+	if (!strcmp(data, "Type")) {
 		lua_pushstring(l, wyrmgus::faction_type_to_string(faction->get_type()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (faction->get_civilization() != nullptr) {
 			lua_pushstring(l, faction->get_civilization()->get_identifier().c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "Color")) {
-		if (faction->get_color() != nullptr) {
-			lua_pushstring(l, faction->get_color()->get_identifier().c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "Playable")) {
-		lua_pushboolean(l, faction->is_playable());
-		return 1;
-	} else if (!strcmp(data, "FactionUpgrade")) {
-		if (faction->get_upgrade() != nullptr) {
-			lua_pushstring(l, faction->get_upgrade()->get_identifier().c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "ParentFaction")) {
-		if (faction->get_parent_faction() != nullptr) {
-			lua_pushstring(l, faction->get_parent_faction()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
