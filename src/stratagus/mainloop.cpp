@@ -365,11 +365,8 @@ static boost::asio::awaitable<void> GameLogicLoop()
 		//Wyrmgus start
 		int player = (GameCycle - 1) % CYCLES_PER_SECOND;
 		assert_throw(player >= 0);
-		if (player < NumPlayers) {
+		for (; player < NumPlayers; player += CYCLES_PER_SECOND) {
 			PlayersEachSecond(player);
-			if ((player + CYCLES_PER_SECOND) < NumPlayers) {
-				PlayersEachSecond(player + CYCLES_PER_SECOND);
-			}
 		}
 		
 		player = (GameCycle - 1) % (CYCLES_PER_MINUTE / 2);
