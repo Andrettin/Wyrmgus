@@ -192,6 +192,10 @@ void faction::process_gsml_scope(const gsml_data &scope)
 			const region *region = region::get(value);
 			this->neutral_target_regions.push_back(region);
 		}
+	} else if (tag == "neutral_site_conditions") {
+		auto conditions = std::make_unique<and_condition>();
+		database::process_gsml_data(conditions, scope);
+		this->neutral_site_conditions = std::move(conditions);
 	} else if (tag == "title_names") {
 		faction::process_title_names(this->title_names, scope);
 	} else if (tag == "character_title_names") {

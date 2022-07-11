@@ -379,6 +379,11 @@ public:
 		return this->max_neutral_buildings;
 	}
 
+	const std::unique_ptr<const and_condition> &get_neutral_site_conditions() const
+	{
+		return this->neutral_site_conditions;
+	}
+
 signals:
 	void changed();
 
@@ -425,6 +430,7 @@ private:
 	std::vector<const unit_class *> neutral_building_classes;
 	std::vector<const region *> neutral_target_regions;
 	int max_neutral_buildings = 0;
+	std::unique_ptr<const and_condition> neutral_site_conditions;
 public:
 	std::vector<site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
 private:

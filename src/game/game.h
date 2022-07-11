@@ -37,6 +37,7 @@ namespace wyrmgus {
 
 class age;
 class campaign;
+class faction;
 class gsml_data;
 class gsml_property;
 class results_info;
@@ -240,6 +241,8 @@ public:
 	void clear_delayed_effects();
 
 	void update_neutral_faction_presence();
+	void do_neutral_faction_expansion(const faction *faction);
+	void do_neutral_faction_contraction(const faction *faction);
 
 	results_info *get_results() const
 	{
