@@ -111,6 +111,15 @@ public:
 	static void process_character_title_name_scope(std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const gsml_data &scope);
 	static void process_character_title_name_scope(std::map<faction_tier, std::map<gender, std::string>> &character_title_names, const gsml_data &scope);
 
+	static const std::vector<const faction *> &get_neutral_factions()
+	{
+		return faction::neutral_factions;
+	}
+
+private:
+	static inline std::vector<const faction *> neutral_factions;
+
+public:
 	explicit faction(const std::string &identifier);
 	~faction();
 

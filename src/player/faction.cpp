@@ -241,6 +241,10 @@ void faction::initialize()
 		}
 	}
 
+	if (is_faction_type_neutral(this->get_type())) {
+		faction::neutral_factions.push_back(this);
+	}
+
 	if (this->get_type() == faction_type::tribe) {
 		this->definite_article = true;
 		this->default_government_type = government_type::tribe;
