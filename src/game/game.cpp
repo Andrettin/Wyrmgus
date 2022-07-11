@@ -649,6 +649,11 @@ void game::update_neutral_faction_presence()
 				}
 			}
 		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error updating the neutral faction presence."));
+	}
+}
+
 void game::set_results(qunique_ptr<results_info> &&results)
 {
 	this->results = std::move(results);
