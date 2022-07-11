@@ -68,11 +68,11 @@ inline void process_randomly(const std::vector<T> &vector, const function_type &
 }
 
 template <typename T>
-inline void shuffle(std::vector<T> &vector)
+inline std::vector<T> shuffled(const std::vector<T> &vector)
 {
 	if (vector.empty()) {
 		//nothing to shuffle
-		return;
+		return std::vector<T>();
 	}
 
 	std::vector<T> shuffled_vector;
@@ -81,7 +81,18 @@ inline void shuffle(std::vector<T> &vector)
 		shuffled_vector.push_back(std::move(element));
 	});
 
-	vector = std::move(shuffled_vector);
+	return shuffled_vector;
+}
+
+template <typename T>
+inline void shuffle(std::vector<T> &vector)
+{
+	if (vector.empty()) {
+		//nothing to shuffle
+		return;
+	}
+
+	vector = vector::shuffled(vector);
 }
 
 }
