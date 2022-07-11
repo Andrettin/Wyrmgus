@@ -5433,13 +5433,13 @@ bool CPlayer::has_building_access(const CPlayer *player, const ButtonCmd button_
 		return false;
 	}
 
-	if (
-		player->has_neutral_faction_type()
-		&& (player->get_overlord() == nullptr || this->is_any_overlord_of(player) || player->get_overlord()->is_allied_with(*this))
-	) {
-		if (player->get_faction()->get_type() != wyrmgus::faction_type::holy_order || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || wyrmgus::vector::contains(this->Deities, player->get_faction()->get_holy_order_deity())) { //if the faction is a holy order, the player must have chosen its respective deity
-			return true;
+	if (player->has_neutral_faction_type()) {
+		if (player->get_faction()->get_type() == faction_type::holy_order && (button_action == ButtonCmd::Train || button_action == ButtonCmd::TrainClass || button_action == ButtonCmd::Buy) && !vector::contains(this->Deities, player->get_faction()->get_holy_order_deity())) {
+			//if the faction is a holy order, the player must have chosen its respective deity
+			return false;
 		}
+
+		return true;
 	}
 
 	return false;
@@ -5456,7 +5456,18 @@ bool CPlayer::has_building_access(const CUnit *unit, const ButtonCmd button_acti
 		return false;
 	}
 
-	return this->has_building_access(unit->Player, button_action);
+	const CPlayer *unit_player = unit->Player;
+	if (unit_player->has_neutral_faction_type()) {
+		const site *unit_settlement = unit->get_center_tile_settlement();
+
+		const bool is_settlement_owner = (unit_settlement != nullptr && unit_settlement->get_game_data()->get_owner() == this);
+
+		if (!is_settlement_owner && !this->is_any_overlord_of(unit_player)) {
+			return false;
+		}
+	}
+
+	return this->has_building_access(unit_player, button_action);
 }
 
 bool CPlayer::has_building_access(const CUnit *unit) const

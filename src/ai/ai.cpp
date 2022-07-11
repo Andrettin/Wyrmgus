@@ -510,7 +510,12 @@ static void AiCheckUnits()
 
 			for (int j = 0; j < other_player->GetUnitCount(); ++j) {
 				CUnit *mercenary_building = &other_player->GetUnit(j);
+
 				if (!mercenary_building || !mercenary_building->IsAliveOnMap() || !mercenary_building->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_building->IsVisible(*AiPlayer->Player)) {
+					continue;
+				}
+
+				if (!AiPlayer->Player->has_building_access(mercenary_building)) {
 					continue;
 				}
 
