@@ -70,6 +70,7 @@
 #include "script/condition/scripted_condition_condition.h"
 #include "script/condition/season_condition.h"
 #include "script/condition/settlement_condition.h"
+#include "script/condition/settlement_owner_condition.h"
 #include "script/condition/site_exists_condition.h"
 #include "script/condition/snowy_terrain_condition.h"
 #include "script/condition/source_unit_condition.h"
@@ -205,6 +206,8 @@ std::unique_ptr<const condition> condition::from_gsml_scope(const gsml_data &sco
 		condition = std::make_unique<not_condition>();
 	} else if (tag == "settlement") {
 		condition = std::make_unique<settlement_condition>();
+	} else if (tag == "settlement_owner") {
+		condition = std::make_unique<settlement_owner_condition>();
 	} else if (tag == "source_unit") {
 		condition = std::make_unique<source_unit_condition>();
 	} else if (tag == "unique_unit") {
