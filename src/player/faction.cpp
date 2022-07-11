@@ -35,6 +35,7 @@
 #include "fallback_name_generator.h"
 #include "gender.h"
 #include "luacallback.h"
+#include "map/region.h"
 #include "map/site.h"
 #include "name_generator.h"
 #include "player/civilization.h"
@@ -180,6 +181,16 @@ void faction::process_gsml_scope(const gsml_data &scope)
 		for (const std::string &value : values) {
 			const site *settlement = site::get(value);
 			this->core_settlements.push_back(settlement);
+		}
+	} else if (tag == "neutral_building_classes") {
+		for (const std::string &value : values) {
+			const unit_class *building_class = unit_class::get(value);
+			this->neutral_building_classes.push_back(building_class);
+		}
+	} else if (tag == "neutral_target_regions") {
+		for (const std::string &value : values) {
+			const region *region = region::get(value);
+			this->neutral_target_regions.push_back(region);
 		}
 	} else if (tag == "title_names") {
 		faction::process_title_names(this->title_names, scope);

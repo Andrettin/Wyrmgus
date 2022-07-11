@@ -239,6 +239,8 @@ public:
 
 	void clear_delayed_effects();
 
+	void update_neutral_faction_presence();
+
 	results_info *get_results() const
 	{
 		return this->results.get();

@@ -58,6 +58,7 @@
 #include "map/map_presets.h"
 #include "map/map_settings.h"
 #include "map/minimap.h"
+#include "map/region.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "map/terrain_type.h"
@@ -105,6 +106,7 @@
 #include "ui/interface.h"
 #include "ui/resource_icon.h"
 #include "ui/ui.h"
+#include "unit/build_restriction/on_top_build_restriction.h"
 #include "unit/construction.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
@@ -112,12 +114,14 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/assert_util.h"
+#include "util/container_util.h"
 #include "util/date_util.h"
 #include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/random.h"
+#include "util/set_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 #include "util/thread_pool.h"
@@ -558,6 +562,93 @@ void game::clear_delayed_effects()
 	this->unit_delayed_effects.clear();
 }
 
+void game::update_neutral_faction_presence()
+{
+	try {
+		if (this->get_current_campaign() == nullptr) {
+			//only dynamically generate neutral faction buildings in the campaign mode
+			return;
+		}
+
+		const std::vector<const faction *> neutral_factions = vector::shuffled(faction::get_neutral_factions());
+
+		for (const faction *faction : neutral_factions) {
+			assert_throw(is_faction_type_neutral(faction->get_type()));
+
+			CPlayer *faction_player = GetFactionPlayer(faction);
+
+			if (faction_player != nullptr && faction->get_max_neutral_buildings() != 0 && faction_player->NumBuildings >= faction->get_max_neutral_buildings()) {
+				continue;
+			}
+
+			std::vector<std::pair<const unit_type *, const on_top_build_restriction *>> building_types;
+
+			for (const unit_class *building_class : faction->get_neutral_building_classes()) {
+				const unit_type *building_type = faction->get_class_unit_type(building_class);
+
+				if (building_type == nullptr) {
+					continue;
+				}
+
+				const on_top_build_restriction *ontop = OnTopDetails(*building_type, nullptr);
+
+				if (ontop == nullptr) {
+					continue;
+				}
+
+				building_types.push_back({ building_type, ontop });
+			}
+
+			if (building_types.empty()) {
+				continue;
+			}
+
+			//shuffle the vector, so that we don't privilege a particular building type, if there are multiple ones which can target the same building site
+			vector::shuffle(building_types);
+
+			site_set target_site_set;
+
+			for (const region *target_region : faction->get_neutral_target_regions()) {
+				set::merge(target_site_set, target_region->get_sites());
+			}
+
+			const std::vector<const site *> target_sites = vector::shuffled(container::to_vector(target_site_set));
+
+			int placed_buildings = 0;
+
+			for (const site *target_site : target_sites) {
+				const site_game_data *site_game_data = target_site->get_game_data();
+
+				if (site_game_data->get_site_unit() == nullptr) {
+					continue;
+				}
+
+				for (const auto &[building_type, ontop] : building_types) {
+					if (site_game_data->get_site_unit()->Type != ontop->Parent) {
+						continue;
+					}
+
+					//give some random chance of not creating the neutral building
+					if (random::get()->generate(4) != 0) {
+						continue;
+					}
+
+					if (faction_player == nullptr) {
+						faction_player = GetOrAddFactionPlayer(faction);
+					}
+
+					CreateUnit(site_game_data->get_site_unit()->tilePos, *building_type, faction_player, site_game_data->get_site_unit()->MapLayer->ID, false, nullptr, false);
+
+					++placed_buildings;
+					vector::shuffle(building_types);
+					break;
+				}
+
+				if (placed_buildings >= faction->get_max_neutral_buildings()) {
+					break;
+				}
+			}
+		}
 void game::set_results(qunique_ptr<results_info> &&results)
 {
 	this->results = std::move(results);

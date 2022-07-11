@@ -385,6 +385,10 @@ static boost::asio::awaitable<void> GameLogicLoop()
 		if (GameCycle > 0) {
 			game::get()->do_cycle();
 		}
+
+		if ((GameCycle % CYCLES_PER_MINUTE) == 900) {
+			game::get()->update_neutral_faction_presence();
+		}
 		
 		if (preferences::get()->is_autosave_enabled() && !IsNetworkGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_MINUTE * preferences::autosave_minutes)) == 0) {
 			//autosave every X minutes, if the option is enabled

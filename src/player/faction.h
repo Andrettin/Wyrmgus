@@ -52,6 +52,7 @@ class dynasty;
 class faction_history;
 class icon;
 class name_generator;
+class region;
 class resource;
 class site;
 class unit_class;
@@ -88,6 +89,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(bool short_name MEMBER short_name)
 	Q_PROPERTY(bool definite_article MEMBER definite_article)
 	Q_PROPERTY(wyrmgus::deity* holy_order_deity MEMBER holy_order_deity READ get_holy_order_deity)
+	Q_PROPERTY(int max_neutral_buildings MEMBER max_neutral_buildings READ get_max_neutral_buildings)
 
 public:
 	using title_name_map = std::map<government_type, std::map<faction_tier, std::string>>;
@@ -362,6 +364,21 @@ public:
 		return this->core_settlements;
 	}
 
+	const std::vector<const unit_class *> &get_neutral_building_classes() const
+	{
+		return this->neutral_building_classes;
+	}
+
+	const std::vector<const region *> &get_neutral_target_regions() const
+	{
+		return this->neutral_target_regions;
+	}
+
+	int get_max_neutral_buildings() const
+	{
+		return this->max_neutral_buildings;
+	}
+
 signals:
 	void changed();
 
@@ -405,6 +422,9 @@ private:
 	std::unique_ptr<const and_condition> preconditions;
 	std::unique_ptr<const and_condition> conditions;
 	std::vector<const site *> core_settlements; //the core settlements of this faction (required to found it)
+	std::vector<const unit_class *> neutral_building_classes;
+	std::vector<const region *> neutral_target_regions;
+	int max_neutral_buildings = 0;
 public:
 	std::vector<site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
 private:
