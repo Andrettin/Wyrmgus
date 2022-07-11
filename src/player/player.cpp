@@ -947,6 +947,10 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 		player->set_resource(resource::get_all()[WoodCost], 2500);
 		player->set_resource(resource::get_all()[StoneCost], 2500);
 
+		if (game::get()->is_running()) {
+			AiInit(*player);
+		}
+
 		return player;
 	}
 	
