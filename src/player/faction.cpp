@@ -187,6 +187,11 @@ void faction::process_gsml_scope(const gsml_data &scope)
 			const unit_class *building_class = unit_class::get(value);
 			this->neutral_building_classes.push_back(building_class);
 		}
+	} else if (tag == "neutral_target_sites") {
+		for (const std::string &value : values) {
+			const site *site = site::get(value);
+			this->neutral_target_sites.push_back(site);
+		}
 	} else if (tag == "neutral_target_regions") {
 		for (const std::string &value : values) {
 			const region *region = region::get(value);

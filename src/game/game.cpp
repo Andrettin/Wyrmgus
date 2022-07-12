@@ -617,7 +617,7 @@ void game::do_neutral_faction_expansion(const faction *faction)
 	//shuffle the vector, so that we don't privilege a particular building type, if there are multiple ones which can target the same building site
 	vector::shuffle(building_types);
 
-	site_set target_site_set;
+	site_set target_site_set = container::to_set<std::vector<const site *>, site_set>(faction->get_neutral_target_sites());
 
 	for (const region *target_region : faction->get_neutral_target_regions()) {
 		set::merge(target_site_set, target_region->get_sites());

@@ -369,6 +369,11 @@ public:
 		return this->neutral_building_classes;
 	}
 
+	const std::vector<const site *> &get_neutral_target_sites() const
+	{
+		return this->neutral_target_sites;
+	}
+
 	const std::vector<const region *> &get_neutral_target_regions() const
 	{
 		return this->neutral_target_regions;
@@ -428,6 +433,7 @@ private:
 	std::unique_ptr<const and_condition> conditions;
 	std::vector<const site *> core_settlements; //the core settlements of this faction (required to found it)
 	std::vector<const unit_class *> neutral_building_classes;
+	std::vector<const site *> neutral_target_sites;
 	std::vector<const region *> neutral_target_regions;
 	int max_neutral_buildings = 0;
 	std::unique_ptr<const and_condition> neutral_site_conditions;
