@@ -39,13 +39,14 @@ gsml_parser::gsml_parser() : current_property_operator(gsml_operator::none)
 
 gsml_data gsml_parser::parse(const std::filesystem::path &filepath)
 {
-	if (!std::filesystem::exists(filepath)) {
-		throw std::runtime_error("File \"" + filepath.string() + "\" not found.");
-	}
-
 	std::ifstream ifstream(filepath);
 
 	if (!ifstream) {
+		if (!std::filesystem::exists(filepath)) {
+			//give a more specific error message if the file does not exist
+			throw std::runtime_error("File \"" + filepath.string() + "\" not found.");
+		}
+
 		throw std::runtime_error("Failed to open file: " + filepath.string());
 	}
 
