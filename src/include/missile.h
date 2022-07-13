@@ -276,10 +276,10 @@
 
 #include "database/data_entry.h"
 #include "database/data_type.h"
-#include "data_type.h"
 #include "missileconfig.h"
 #include "vec2i.h"
 
+class CConfigData;
 class CGraphic;
 class CUnit;
 class CViewport;
@@ -301,7 +301,7 @@ enum class missile_class;
 enum class tile_flag : uint32_t;
 
 /// Base structure of missile-types
-class missile_type final : public data_entry, public data_type<missile_type>, public CDataType
+class missile_type final : public data_entry, public data_type<missile_type>
 {
 	Q_OBJECT
 
@@ -324,7 +324,7 @@ public:
 	explicit missile_type(const std::string &identifier);
 	~missile_type();
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	void ProcessConfigData(const CConfigData *config_data);
 	virtual void initialize() override;
 	
 	/// load the graphics for a missile type
@@ -419,9 +419,9 @@ private:
 	sound *impact_sound = nullptr; //impact sound for this missile-type
 public:
 	bool CorrectSphashDamage = false;  /// restricts the radius damage depending on land, air, naval
-	bool Flip;                 /// flip image when facing left
+	bool Flip = true;                 /// flip image when facing left
 	bool CanHitOwner = false;          /// missile can hit the owner
-	bool FriendlyFire;         /// missile can't hit own units
+	bool FriendlyFire = true;         /// missile can't hit own units
 	bool AlwaysFire = false;           /// missile will always fire (even if target is dead)
 	bool Pierce = false;               /// missile will hit every unit on his way
 	bool PierceOnce = false;           /// pierce every target only once

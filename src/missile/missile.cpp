@@ -1840,11 +1840,8 @@ void InitMissileTypes()
 
 namespace wyrmgus {
 
-missile_type::missile_type(const std::string &identifier) : data_entry(identifier), CDataType(identifier),
-	//Wyrmgus start
-//	Flip(false), FriendlyFire(false),
-	Flip(true), FriendlyFire(true),
-	//Wyrmgus end
+missile_type::missile_type(const std::string &identifier)
+	: data_entry(identifier),
 	missile_class(missile_class::none),
 	MissileStopFlags(tile_flag::none)
 {

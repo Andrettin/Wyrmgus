@@ -231,11 +231,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				map_template->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "missile_type") {
-			wyrmgus::missile_type *missile_type = wyrmgus::missile_type::get_or_add(ident, nullptr);
-			if (!define_only) {
-				missile_type->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "site") {
 			wyrmgus::site *site = wyrmgus::site::get_or_add(ident, nullptr);
 			if (!define_only) {
