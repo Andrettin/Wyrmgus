@@ -34,7 +34,11 @@ namespace wyrmgus {
 
 bool unit_type_compare::operator()(const unit_type *type, const unit_type *other_type) const
 {
-	if ((type == nullptr || other_type == nullptr) && type != other_type) {
+	if (type == nullptr || other_type == nullptr) {
+		if (type == other_type) {
+			return false;
+		}
+
 		return type == nullptr;
 	}
 
