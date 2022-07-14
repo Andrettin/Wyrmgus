@@ -6282,13 +6282,15 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 	return value;
 }
 
-int CUnit::GetDisplayPlayer() const
+const CPlayer *CUnit::get_display_player() const
 {
 	if (this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->Player != CPlayer::GetThisPlayer()) {
-		return PlayerNumNeutral;
-	} else {
-		return this->RescuedFrom ? this->RescuedFrom->get_index() : this->Player->get_index();
+		return CPlayer::get_neutral_player();
+	} else if (this->RescuedFrom != nullptr) {
+		return this->RescuedFrom;
 	}
+
+	return this->Player;
 }
 
 int CUnit::GetPrice() const

@@ -607,7 +607,7 @@ public:
 	unsigned get_item_slot_quantity(const wyrmgus::item_slot item_slot) const;
 	wyrmgus::item_class GetCurrentWeaponClass() const;
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
-	int GetDisplayPlayer() const;
+	const CPlayer *get_display_player() const;
 	int GetPrice() const;
 
 	const unit_type_map<int> &get_unit_stocks() const

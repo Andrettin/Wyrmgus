@@ -481,7 +481,7 @@ const unit_type *minimap::get_unit_minimap_type(const CUnit *unit) const
 
 uint32_t minimap::get_unit_minimap_color(const CUnit *unit, const unit_type *type, const bool red_phase) const
 {
-	if (unit->GetDisplayPlayer() == PlayerNumNeutral) {
+	if (unit->get_display_player()->is_neutral_player()) {
 		return CVideo::MapRGB(type->get_neutral_minimap_color());
 	} else if (unit->Player == CPlayer::GetThisPlayer() && !CEditor::get()->is_running()) {
 		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
