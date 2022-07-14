@@ -2438,6 +2438,227 @@ void unit_type::map_to_0_ad_template_name(const std::string &str)
 	unit_type::unit_types_by_0_ad_template_name[str] = this;
 }
 
+void unit_type::pack_image_layers(const QString &image_filepath) const
+{
+	assert_throw(!this->get_image_file().empty());
+
+	const QImage main_image(QString::fromStdString(LibraryFileName(path::to_string(this->get_image_file()).c_str())));
+
+	QImage packed_image(main_image.size(), QImage::Format_RGBA8888);
+	packed_image.fill(Qt::transparent);
+
+	const QSize frame_size = this->get_frame_size();
+
+	QPainter painter(&packed_image);
+
+	if (!this->ShadowFile.empty()) {
+		const QImage shadow_image(QString::fromStdString(LibraryFileName(this->ShadowFile.c_str())));
+		painter.drawImage(packed_image.rect(), shadow_image, shadow_image.rect());
+	}
+
+	std::array<QImage, MaxImageLayers> layer_images{};
+
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		const std::string &layer_file = this->LayerFiles[i];
+		if (!layer_file.empty()) {
+			layer_images[i] = QImage(QString::fromStdString(LibraryFileName(layer_file.c_str())));
+		}
+	}
+
+	if (!layer_images[MountImageLayer].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[MountImageLayer], packed_image.rect());
+	}
+
+	assert_throw(packed_image.width() % 5 == 0);
+	assert_throw(packed_image.width() / 5 == frame_size.width());
+	const int direction_rect_width = frame_size.width();
+	const int direction_dying_rect_height = frame_size.height() * 3;
+	const QSize direction_rect_size = QSize(direction_rect_width, packed_image.height() - direction_dying_rect_height);
+
+	const std::map<_directions_, QRect> direction_rects = {
+		//normal rects
+		{ LookingN, QRect(QPoint(direction_rect_width * 0, 0), direction_rect_size) },
+		{ LookingNE, QRect(QPoint(direction_rect_width * 1, 0), direction_rect_size) },
+		{ LookingE, QRect(QPoint(direction_rect_width * 2, 0), direction_rect_size) },
+		{ LookingSE, QRect(QPoint(direction_rect_width * 3, 0), direction_rect_size) },
+		{ LookingS, QRect(QPoint(direction_rect_width * 4, 0), direction_rect_size) },
+		//dying animation rects
+		{ LookingNE, QRect(QPoint(direction_rect_width * 0, direction_rect_size.height()), QSize(direction_rect_width * 3, direction_dying_rect_height)) },
+		{ LookingSE, QRect(QPoint(direction_rect_width * 3, direction_rect_size.height()), QSize(direction_rect_width * 2, direction_dying_rect_height)) }
+	};
+
+	if (!layer_images[BackpackImageLayer].isNull()) {
+		for (const auto &[direction, direction_rect] : direction_rects) {
+			if (direction == LookingS || direction == LookingSE) {
+				painter.drawImage(direction_rect, layer_images[BackpackImageLayer], direction_rect);
+			}
+		}
+	}
+
+	for (const auto &[direction, direction_rect] : direction_rects) {
+		if (
+			direction != LookingS
+			&& !(this->BoolFlag[INVERTEDEASTARMS_INDEX].value && direction == LookingE)
+			&& !(this->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value && direction == LookingSE)
+		) {
+			if (!layer_images[ShieldImageLayer].isNull()) {
+				painter.drawImage(direction_rect, layer_images[ShieldImageLayer], direction_rect);
+			}
+
+			if (!layer_images[LeftArmImageLayer].isNull()) {
+				painter.drawImage(direction_rect, layer_images[LeftArmImageLayer], direction_rect);
+			}
+		}
+	}
+
+	for (const auto &[direction, direction_rect] : direction_rects) {
+		if (
+			direction == LookingN
+			|| (this->BoolFlag[INVERTEDEASTARMS_INDEX].value && direction == LookingE)
+			|| (this->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value && direction == LookingSE)
+		) {
+			if (!layer_images[WeaponImageLayer].isNull()) {
+				painter.drawImage(direction_rect, layer_images[WeaponImageLayer], direction_rect);
+			}
+
+			if (!layer_images[RightArmImageLayer].isNull()) {
+				painter.drawImage(direction_rect, layer_images[RightArmImageLayer], direction_rect);
+			}
+
+			if (!layer_images[RightHandImageLayer].isNull()) {
+				painter.drawImage(direction_rect, layer_images[RightHandImageLayer], direction_rect);
+			}
+		}
+	}
+
+	painter.drawImage(packed_image.rect(), main_image, main_image.rect());
+
+	if (!layer_images[ClothingLeftArmImageLayer].isNull()) {
+		for (const auto &[direction, direction_rect] : direction_rects) {
+			if (direction != LookingS) {
+				painter.drawImage(direction_rect, layer_images[ClothingLeftArmImageLayer], direction_rect);
+			}
+		}
+	}
+
+	if (!layer_images[ClothingRightArmImageLayer].isNull()) {
+		for (const auto &[direction, direction_rect] : direction_rects) {
+			if (
+				direction == LookingN
+				|| (this->BoolFlag[INVERTEDEASTARMS_INDEX].value && direction == LookingE)
+				|| (this->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value && direction == LookingSE)
+			) {
+				painter.drawImage(direction_rect, layer_images[ClothingRightArmImageLayer], direction_rect);
+			}
+		}
+	}
+
+	if (!layer_images[PantsImageLayer].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[PantsImageLayer], packed_image.rect());
+	}
+
+	if (!layer_images[ClothingImageLayer].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[ClothingImageLayer], packed_image.rect());
+	}
+
+	if (!layer_images[BackpackImageLayer].isNull()) {
+		for (const auto &[direction, direction_rect] : direction_rects) {
+			if (direction == LookingE) {
+				painter.drawImage(direction_rect, layer_images[BackpackImageLayer], direction_rect);
+			}
+		}
+	}
+
+	if (!layer_images[HairImageLayer].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[HairImageLayer], packed_image.rect());
+	}
+
+	if (!layer_images[HelmetImageLayer].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[HelmetImageLayer], packed_image.rect());
+	}
+
+	if (!layer_images[BootsImageLayer].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[BootsImageLayer], packed_image.rect());
+	}
+
+	for (const auto &[direction, direction_rect] : direction_rects) {
+		if (
+			direction == LookingS
+			|| (this->BoolFlag[INVERTEDEASTARMS_INDEX].value && direction == LookingE)
+			|| (this->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value && direction == LookingSE)
+		) {
+			if (!layer_images[LeftArmImageLayer].isNull()) {
+				painter.drawImage(direction_rect, layer_images[LeftArmImageLayer], direction_rect);
+			}
+
+			if (!layer_images[ClothingLeftArmImageLayer].isNull()) {
+				painter.drawImage(direction_rect, layer_images[ClothingLeftArmImageLayer], direction_rect);
+			}
+
+			if (!layer_images[ShieldImageLayer].isNull()) {
+				painter.drawImage(direction_rect, layer_images[ShieldImageLayer], direction_rect);
+			}
+		}
+	}
+
+	for (const auto &[direction, direction_rect] : direction_rects) {
+		if (
+			direction != LookingN
+			&& !(this->BoolFlag[INVERTEDEASTARMS_INDEX].value && direction == LookingE)
+			&& !(this->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value && direction == LookingSE)
+		) {
+			if ((direction == LookingS || direction == LookingSE) && !layer_images[RightHandImageLayer].isNull()) {
+				if (!layer_images[RightArmImageLayer].isNull()) {
+					painter.drawImage(direction_rect, layer_images[RightArmImageLayer], direction_rect);
+				}
+
+				if (!layer_images[ClothingRightArmImageLayer].isNull()) {
+					painter.drawImage(direction_rect, layer_images[ClothingRightArmImageLayer], direction_rect);
+				}
+
+				if (!layer_images[WeaponImageLayer].isNull()) {
+					painter.drawImage(direction_rect, layer_images[WeaponImageLayer], direction_rect);
+				}
+
+				if (!layer_images[RightHandImageLayer].isNull()) {
+					painter.drawImage(direction_rect, layer_images[RightHandImageLayer], direction_rect);
+				}
+			} else {
+				if (!layer_images[WeaponImageLayer].isNull()) {
+					painter.drawImage(direction_rect, layer_images[WeaponImageLayer], direction_rect);
+				}
+
+				if (!layer_images[RightArmImageLayer].isNull()) {
+					painter.drawImage(direction_rect, layer_images[RightArmImageLayer], direction_rect);
+				}
+
+				if (!layer_images[RightHandImageLayer].isNull()) {
+					painter.drawImage(direction_rect, layer_images[RightHandImageLayer], direction_rect);
+				}
+
+				if (!layer_images[ClothingRightArmImageLayer].isNull()) {
+					painter.drawImage(direction_rect, layer_images[ClothingRightArmImageLayer], direction_rect);
+				}
+			}
+		}
+	}
+
+	if (!layer_images[BackpackImageLayer].isNull()) {
+		for (const auto &[direction, direction_rect] : direction_rects) {
+			if (direction == LookingN || direction == LookingNE) {
+				painter.drawImage(direction_rect, layer_images[BackpackImageLayer], direction_rect);
+			}
+		}
+	}
+
+	if (!this->LightFile.empty()) {
+		const QImage light_image(QString::fromStdString(LibraryFileName(this->LightFile.c_str())));
+		painter.drawImage(packed_image.rect(), light_image, light_image.rect());
+	}
+
+	packed_image.save(image_filepath);
+}
+
 void resource_info::process_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();

@@ -1118,6 +1118,8 @@ public:
 
 	void map_to_0_ad_template_name(const std::string &str);
 
+	Q_INVOKABLE void pack_image_layers(const QString &image_filepath) const;
+
 signals:
 	void changed();
 
