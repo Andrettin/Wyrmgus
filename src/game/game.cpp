@@ -696,10 +696,6 @@ void game::do_neutral_faction_contraction(const faction *faction)
 			continue;
 		}
 
-		if (random::get()->generate(4) != 0) {
-			continue;
-		}
-
 		if (!faction->get_neutral_site_conditions()->check(building, read_only_context::from_scope(building))) {
 			LetUnitDie(*building);
 		}
