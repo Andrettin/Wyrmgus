@@ -295,7 +295,7 @@ COrder_Resource::~COrder_Resource()
 		if (this->State == SUB_GATHER_RESOURCE) {
 
 			goal->Resource.Active--;
-			assert_throw(goal->Resource.Active >= 0);
+			assert_log(goal->Resource.Active >= 0);
 		}
 	}
 }
