@@ -3025,6 +3025,10 @@ void CUnit::spawn_units(const std::vector<const unit_type *> &spawned_types)
 
 	CUnit *spawned_unit = MakeUnit(*spawned_type, spawned_unit_player);
 	spawned_unit->drop_out_on_side(spawned_unit->Direction, this);
+
+	if (spawned_unit_player != this->Player) {
+		spawned_unit->set_player_from(this->Player);
+	}
 }
 
 int CUnit::get_nearby_spawned_demand(const std::vector<const unit_type *> &spawned_types) const

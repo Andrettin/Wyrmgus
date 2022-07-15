@@ -757,7 +757,13 @@ public:
 
 	void set_player_from(CPlayer *player)
 	{
+		if (player == this->get_player_from()) {
+			return;
+		}
+
 		this->player_from = player;
+
+		this->UpdatePersonalName();
 	}
 
 	bool is_rescued() const;
