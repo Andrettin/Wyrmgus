@@ -2950,7 +2950,30 @@ void CUnit::spawn_units()
 		vector::merge(spawned_units, this->Type->get_neutral_spawned_units());
 	}
 
-	//FIXME: spawn units for minor faction buildings if their settlement has no owner
+	//spawn neutral hostile units for minor faction buildings if their settlement has no owner
+	if (this->Player->has_neutral_faction_type() && this->Type->BoolFlag[BUILDING_INDEX].value && this->get_settlement() != nullptr && this->get_settlement()->get_game_data()->get_owner() == nullptr) {
+		for (const auto &[unit_type, unit_stock] : this->get_unit_stocks()) {
+			if (!unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value) {
+				continue;
+			}
+
+			spawned_units.push_back(unit_type);
+		}
+
+		for (const auto &[unit_class, unit_stock] : this->get_unit_class_stocks()) {
+			const unit_type *unit_type = this->Player->get_class_unit_type(unit_class);
+
+			if (unit_type == nullptr) {
+				continue;
+			}
+
+			if (!unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value) {
+				continue;
+			}
+
+			spawned_units.push_back(unit_type);
+		}
+	}
 
 	if (spawned_units.empty()) {
 		return;
@@ -2996,7 +3019,7 @@ void CUnit::spawn_units(const std::vector<const unit_type *> &spawned_types)
 	}
 
 	const int max_spawned_demand = this->Type->get_max_spawned_demand();
-	const int spawned_demand = this->get_nearby_spawned_demand();
+	const int spawned_demand = this->get_nearby_spawned_demand(spawned_types);
 
 	if (spawned_demand >= max_spawned_demand) {
 		return;
@@ -3004,11 +3027,16 @@ void CUnit::spawn_units(const std::vector<const unit_type *> &spawned_types)
 
 	const unit_type *spawned_type = vector::get_random(weighted_spawned_types);
 
-	CUnit *spawned_unit = MakeUnit(*spawned_type, this->Player);
+	CPlayer *spawned_unit_player = this->Player;
+	if (this->Player->has_neutral_faction_type()) {
+		spawned_unit_player = CPlayer::get_neutral_player();
+	}
+
+	CUnit *spawned_unit = MakeUnit(*spawned_type, spawned_unit_player);
 	spawned_unit->drop_out_on_side(spawned_unit->Direction, this);
 }
 
-int CUnit::get_nearby_spawned_demand() const
+int CUnit::get_nearby_spawned_demand(const std::vector<const unit_type *> &spawned_types) const
 {
 	static constexpr int nearby_spawned_range = 16;
 
@@ -3018,7 +3046,7 @@ int CUnit::get_nearby_spawned_demand() const
 	SelectAroundUnit(*this, nearby_spawned_range, nearby_units, HasSamePlayerAs(*this->Player));
 
 	for (const CUnit *nearby_unit : nearby_units) {
-		if (!vector::contains(this->Type->get_spawned_units(), nearby_unit->Type) && !vector::contains(this->Type->get_neutral_spawned_units(), nearby_unit->Type)) {
+		if (!vector::contains(spawned_types, nearby_unit->Type)) {
 			continue;
 		}
 

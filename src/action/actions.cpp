@@ -628,7 +628,7 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		// 2) Buffs...
 		HandleBuffsEachSecond(unit);
 
-		if (!unit.Type->get_spawned_units().empty() || (!unit.Type->get_neutral_spawned_units().empty() && unit.Player->is_neutral_player())) {
+		if (unit.Type->get_max_spawned_demand() > 0) {
 			unit.spawn_units();
 		}
 	}

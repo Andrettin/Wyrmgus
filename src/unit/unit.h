@@ -335,7 +335,7 @@ public:
 
 	void spawn_units();
 	void spawn_units(const std::vector<const unit_type *> &spawned_types);
-	int get_nearby_spawned_demand() const;
+	int get_nearby_spawned_demand(const std::vector<const unit_type *> &spawned_types) const;
 
 	void ProduceResource(const resource *resource);
 	void sell_resource(const resource *resource, const int player);

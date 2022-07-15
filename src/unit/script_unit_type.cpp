@@ -1185,6 +1185,8 @@ int CclDefineUnitType(lua_State *l)
 			type->SeaUnit = LuaToBoolean(l, -1);
 		*/
 		//Wyrmgus end
+		} else if (!strcmp(value, "NeutralRandomMovementProbability")) {
+			type->neutral_random_movement_probability = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RandomMovementProbability")) {
 			type->random_movement_probability = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RandomMovementDistance")) {
