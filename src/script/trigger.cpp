@@ -346,7 +346,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 		for (size_t j = 0; j != around.size(); ++j) {
 			CUnit &unit = *around[j];
 
-			if (unit.RescuedFrom) { // only rescued units
+			if (unit.is_rescued()) { //only rescued units
 				// Check unit type
 
 				if (unittype == ANY_UNIT

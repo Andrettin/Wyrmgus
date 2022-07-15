@@ -225,8 +225,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.MineLow) {
 		file.printf(" \"mine-low\",");
 	}
-	if (unit.RescuedFrom) {
-		file.printf(" \"rescued-from\", %d,", unit.RescuedFrom->get_index());
+
+	if (unit.get_player_from() != nullptr) {
+		file.printf(" \"player-from\", %d,", unit.get_player_from()->get_index());
 	}
 	
 	//Wyrmgus start

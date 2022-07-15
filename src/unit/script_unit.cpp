@@ -491,8 +491,8 @@ int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "mine-low")) {
 			unit->MineLow = 1;
 			--j;
-		} else if (!strcmp(value, "rescued-from")) {
-			unit->RescuedFrom = CPlayer::Players[LuaToNumber(l, 2, j + 1)].get();
+		} else if (!strcmp(value, "player-from")) {
+			unit->player_from = CPlayer::Players[LuaToNumber(l, 2, j + 1)].get();
 		} else if (!strcmp(value, "seen-by-player")) {
 			const char *s = LuaToString(l, 2, j + 1);
 			unit->Seen.by_player.clear();

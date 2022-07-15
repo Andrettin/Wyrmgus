@@ -750,6 +750,18 @@ public:
 		this->set_unit_class_stock_replenishment_timer(unit_class, this->get_unit_class_stock_replenishment_timer(unit_class) + quantity);
 	}
 
+	CPlayer *get_player_from() const
+	{
+		return this->player_from;
+	}
+
+	void set_player_from(CPlayer *player)
+	{
+		this->player_from = player;
+	}
+
+	bool is_rescued() const;
+
 	int get_resource_step(const resource *resource) const;
 	int GetTotalInsideCount(const CPlayer *player = nullptr, const bool ignore_items = true, const bool ignore_saved_cargo = false, const wyrmgus::unit_type *type = nullptr) const;
 	bool CanAttack(bool count_inside = true) const;
@@ -1094,8 +1106,9 @@ public:
 	unsigned MineLow : 1;        /// This mine got a notification about its resources being low
 	
 	unsigned TeamSelected;  /// unit is selected by a team member.
-	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
-	/// null if the unit was not rescued.
+private:
+	CPlayer *player_from = nullptr; //the original owner of the unit, if it was rescued or hired from a neutral building
+public:
 	/* Seen stuff. */
 	std::array<int, PlayerMax> VisCount;     /// Unit visibility counts
 	struct _seen_stuff_ {

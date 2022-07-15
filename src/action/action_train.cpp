@@ -338,6 +338,11 @@ void COrder_Train::Execute(CUnit &unit)
 			return;
 		}
 
+		if (newUnit->Player != unit.Player) {
+			newUnit->set_player_from(unit.Player);
+			newUnit->UpdatePersonalName();
+		}
+
 		// New unit might supply food
 		UpdateForNewUnit(*newUnit, 0);
 

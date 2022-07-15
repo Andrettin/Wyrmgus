@@ -328,21 +328,6 @@
 **  0 if an animation has just started, it should only be changed
 **  inside of actions.
 **
-**  CUnit::Reset
-**
-**  @todo continue documentation
-**
-**  CUnit::Blink
-**
-**
-**  CUnit::Moving
-**
-**
-**  CUnit::RescuedFrom
-**
-**  Pointer to the original owner of a unit. It will be null if
-**  the unit was not rescued.
-**
 **  CUnit::Orders
 **
 **  Contains all orders of the unit. Slot 0 is always used.
@@ -466,7 +451,7 @@ void CUnit::Init()
 	UnderConstruction = 0;
 	Active = 0;
 	Boarded = 0;
-	RescuedFrom = nullptr;
+	this->player_from = nullptr;
 	this->VisCount.fill(0);
 	this->Seen = _seen_stuff_();
 	this->Variable.clear();
@@ -2918,21 +2903,27 @@ void CUnit::UpdateSoldUnits()
 
 void CUnit::SellUnit(CUnit *sold_unit, int player)
 {
-	this->SoldUnits.erase(std::remove(this->SoldUnits.begin(), this->SoldUnits.end(), sold_unit), this->SoldUnits.end());
+	vector::remove(this->SoldUnits, sold_unit);
+
 	sold_unit->drop_out_on_side(sold_unit->Direction, this);
+
 	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
 		sold_unit->ChangeOwner(*CPlayer::Players[player]);
 	}
+
 	CPlayer::Players[player]->change_resource(defines::get()->get_wealth_resource(), -sold_unit->GetPrice(), true);
+
 	if (CPlayer::Players[player]->AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
 		CPlayer::Players[player]->Ai->Force.
 			remove_dead_units();
 		CPlayer::Players[player]->Ai->Force.Assign(*sold_unit, -1, true);
 	}
+
 	if (sold_unit->get_character() != nullptr) {
 		CPlayer::Players[player]->HeroCooldownTimer = HeroCooldownCycles;
 		sold_unit->Variable[MANA_INDEX].Value = 0; //start off with 0 mana
 	}
+
 	if (IsOnlySelected(*this)) {
 		UI.ButtonPanel.Update();
 	}
@@ -3434,13 +3425,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 
 const wyrmgus::player_color *CUnit::get_player_color() const
 {
-	if (this->RescuedFrom != nullptr) {
-		return this->RescuedFrom->get_player_color();
-	} else if (this->Player != nullptr) {
-		return this->Player->get_player_color();
-	}
-
-	return nullptr;
+	return this->get_display_player()->get_player_color();
 }
 
 const wyrmgus::species *CUnit::get_species() const
@@ -3461,7 +3446,13 @@ const wyrmgus::species *CUnit::get_species() const
 
 const wyrmgus::civilization *CUnit::get_civilization() const
 {
-	return this->Type->get_player_civilization(this->Player);
+	const CPlayer *player = this->Player;
+
+	if (this->get_player_from() != nullptr) {
+		player = this->get_player_from();
+	}
+
+	return this->Type->get_player_civilization(player);
 }
 
 const civilization_base *CUnit::get_civilization_base() const
@@ -3913,7 +3904,11 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	}
 	
 	const civilization *civilization = this->get_civilization();
+
 	const faction *faction = this->Player->get_faction();
+	if (this->get_player_from() != nullptr) {
+		faction = this->get_player_from()->get_faction();
+	}
 	
 	const language *language = civilization ? civilization->get_language() : nullptr;
 
@@ -5563,8 +5558,9 @@ static void ChangePlayerOwner(CPlayer &oldplayer, CPlayer &newplayer)
 		CUnit &unit = oldplayer.GetUnit(i);
 
 		unit.Blink = 5;
-		unit.RescuedFrom = &oldplayer;
+		unit.set_player_from(&oldplayer);
 	}
+
 	// ChangeOwner remove unit from the player: so change the array.
 	while (oldplayer.GetUnitCount() != 0) {
 		CUnit &unit = oldplayer.GetUnit(0);
@@ -5623,7 +5619,9 @@ void RescueUnits()
 							ChangePlayerOwner(*p, *around[i]->Player);
 							break;
 						}
-						unit.RescuedFrom = unit.Player;
+
+						unit.set_player_from(unit.Player);
+
 						//Wyrmgus start
 //						unit.ChangeOwner(*around[i]->Player);
 						unit.ChangeOwner(*around[i]->Player, true);
@@ -6314,8 +6312,8 @@ const CPlayer *CUnit::get_display_player() const
 {
 	if (this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->Player != CPlayer::GetThisPlayer()) {
 		return CPlayer::get_neutral_player();
-	} else if (this->RescuedFrom != nullptr) {
-		return this->RescuedFrom;
+	} else if (this->is_rescued()) {
+		return this->get_player_from();
 	}
 
 	return this->Player;
@@ -6349,6 +6347,23 @@ int CUnit::GetPrice() const
 	}
 	
 	return cost;
+}
+
+bool CUnit::is_rescued() const
+{
+	if (this->get_player_from() == nullptr) {
+		return false;
+	}
+
+	switch (this->get_player_from()->get_type()) {
+		case player_type::rescue_active:
+		case player_type::rescue_passive:
+			break;
+		default:
+			return false;
+	}
+
+	return true;
 }
 
 int CUnit::get_resource_step(const resource *resource) const
