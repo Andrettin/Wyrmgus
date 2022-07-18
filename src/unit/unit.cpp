@@ -2964,6 +2964,10 @@ void CUnit::spawn_units()
 				return true;
 			}
 
+			if (!check_conditions(unit_type, this->Player, false, false)) {
+				return true;
+			}
+
 			return false;
 		});
 
