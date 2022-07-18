@@ -2342,6 +2342,10 @@ bool CPlayer::can_potentially_found_faction(const wyrmgus::faction *faction) con
 	if (this->get_faction() == nullptr) {
 		return false;
 	}
+	
+	if (is_faction_type_neutral(this->get_faction()->get_type()) != is_faction_type_neutral(faction->get_type())) {
+		return false;
+	}
 
 	if (faction->get_civilization() != this->get_civilization()) {
 		if (!vector::contains(this->get_civilization()->get_develops_to(), faction->get_civilization())) {
@@ -2378,6 +2382,32 @@ bool CPlayer::can_potentially_found_faction(const wyrmgus::faction *faction) con
 				return false;
 			}
 			break;
+		case faction_type::minor_tribe:
+			if (this->get_faction()->get_type() != faction_type::minor_tribe) {
+				//neutral factions which aren't already minor tribes can't become minor tribes
+				return false;
+			}
+			break;
+		case faction_type::mercenary_company:
+			if (this->get_faction()->get_type() != faction_type::minor_tribe && this->get_faction()->get_type() != faction_type::mercenary_company) {
+				return false;
+			}
+			break;
+		case faction_type::holy_order:
+			if (this->get_faction()->get_type() != faction_type::holy_order) {
+				return false;
+			}
+			break;
+		case faction_type::notable_house:
+			if (this->get_faction()->get_type() != faction_type::minor_tribe && this->get_faction()->get_type() != faction_type::notable_house) {
+				return false;
+			}
+			break;
+		case faction_type::trading_company:
+			if (this->get_faction()->get_type() != faction_type::trading_company) {
+				return false;
+			}
+			break;
 		default:
 			return false;
 	}
@@ -2400,6 +2430,12 @@ bool CPlayer::can_potentially_found_faction(const wyrmgus::faction *faction) con
 	}
 
 	if (this->get_faction()->get_type() == faction_type::tribe && faction->get_type() == faction_type::polity) {
+		//more advanced faction type
+		return true;
+	}
+
+	if (this->get_faction()->get_type() == faction_type::minor_tribe && (faction->get_type() == faction_type::mercenary_company || faction->get_type() == faction_type::notable_house)) {
+		//more advanced neutral faction type
 		return true;
 	}
 
@@ -2512,8 +2548,33 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 		if (faction->get_conditions() != nullptr && !faction->get_conditions()->check(this, ctx)) {
 			return false;
 		}
+
+		if (is_faction_type_neutral(faction->get_type())) {
+			if (this->NumBuildings > faction->get_max_neutral_buildings()) {
+				return false;
+			}
+
+			//the player cannot own any site which is not a target site for the neutral faction it wants to develop
+			const std::vector<const site *> faction_target_sites = faction->get_all_neutral_target_sites();
+
+			for (const CUnit *unit : this->get_units()) {
+				const site *unit_site = unit->get_site();
+
+				if (unit_site == nullptr) {
+					continue;
+				}
+
+				if (!vector::contains(faction_target_sites, unit_site)) {
+					return false;
+				}
+
+				if (faction->get_neutral_site_conditions() != nullptr && !faction->get_neutral_site_conditions()->check(unit, read_only_context::from_scope(unit))) {
+					return false;
+				}
+			}
+		}
 	}
-	
+
 	return true;
 }
 

@@ -189,33 +189,46 @@ PlayerAi *AiPlayer;             /// Current AI player
 void PlayerAi::check_factions()
 {
 	//check if any factions can be founded, and if so, pick one randomly
-	if (this->Player->get_faction() != nullptr && this->Player->NumTownHalls > 0) {
-		std::vector<const faction *> potential_factions;
-		for (const faction *possible_faction : this->Player->get_potentially_foundable_factions()) {
-			if (!this->Player->can_found_faction(possible_faction)) {
+	if (this->Player->get_faction() == nullptr) {
+		return;
+	}
+
+	if (this->Player->has_neutral_faction_type()) {
+		if (this->Player->NumBuildings <= 0) {
+			return;
+		}
+	} else {
+		if (this->Player->NumTownHalls <= 0) {
+			return;
+		}
+	}
+
+	std::vector<const faction *> potential_factions;
+	for (const faction *possible_faction : this->Player->get_potentially_foundable_factions()) {
+		if (!this->Player->can_found_faction(possible_faction)) {
+			continue;
+		}
+
+		potential_factions.push_back(possible_faction);
+	}
+
+	if (!potential_factions.empty()) {
+		this->Player->set_faction(vector::get_random(potential_factions));
+	}
+
+	if (this->Player->get_dynasty() == nullptr && !this->Player->has_neutral_faction_type()) {
+		//if the AI player has no dynasty, pick one if available
+		std::vector<const dynasty *> potential_dynasties;
+		for (const dynasty *dynasty : this->Player->get_faction()->get_dynasties()) {
+			if (!this->Player->can_choose_dynasty(dynasty)) {
 				continue;
 			}
 
-			potential_factions.push_back(possible_faction);
+			potential_dynasties.push_back(dynasty);
 		}
 
-		if (!potential_factions.empty()) {
-			this->Player->set_faction(vector::get_random(potential_factions));
-		}
-
-		if (this->Player->get_dynasty() == nullptr) { //if the AI player has no dynasty, pick one if available
-			std::vector<const dynasty *> potential_dynasties;
-			for (const dynasty *dynasty : this->Player->get_faction()->get_dynasties()) {
-				if (!this->Player->can_choose_dynasty(dynasty)) {
-					continue;
-				}
-
-				potential_dynasties.push_back(dynasty);
-			}
-
-			if (!potential_dynasties.empty()) {
-				this->Player->set_dynasty(vector::get_random(potential_dynasties));
-			}
+		if (!potential_dynasties.empty()) {
+			this->Player->set_dynasty(vector::get_random(potential_dynasties));
 		}
 	}
 }
