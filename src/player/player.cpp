@@ -2560,6 +2560,10 @@ std::vector<faction *> CPlayer::get_potential_factions() const
 template <bool preconditions_only>
 bool CPlayer::can_choose_dynasty(const wyrmgus::dynasty *dynasty) const
 {
+	if (this->has_neutral_faction_type()) {
+		return false;
+	}
+
 	if (CurrentQuest != nullptr) {
 		return false;
 	}
