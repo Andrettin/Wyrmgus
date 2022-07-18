@@ -3010,18 +3010,19 @@ void CUnit::spawn_units(const std::vector<const unit_type *> &spawned_types)
 	}
 
 	const int max_spawned_demand = this->Type->get_max_spawned_demand();
-	const int spawned_demand = this->get_nearby_spawned_demand(spawned_types);
+
+	CPlayer *spawned_unit_player = this->Player;
+	if (this->Player->has_neutral_faction_type()) {
+		spawned_unit_player = CPlayer::get_neutral_player();
+	}
+
+	const int spawned_demand = this->get_nearby_spawned_demand(spawned_types, spawned_unit_player);
 
 	if (spawned_demand >= max_spawned_demand) {
 		return;
 	}
 
 	const unit_type *spawned_type = vector::get_random(weighted_spawned_types);
-
-	CPlayer *spawned_unit_player = this->Player;
-	if (this->Player->has_neutral_faction_type()) {
-		spawned_unit_player = CPlayer::get_neutral_player();
-	}
 
 	CUnit *spawned_unit = MakeUnit(*spawned_type, spawned_unit_player);
 	spawned_unit->drop_out_on_side(spawned_unit->Direction, this);
@@ -3031,14 +3032,14 @@ void CUnit::spawn_units(const std::vector<const unit_type *> &spawned_types)
 	}
 }
 
-int CUnit::get_nearby_spawned_demand(const std::vector<const unit_type *> &spawned_types) const
+int CUnit::get_nearby_spawned_demand(const std::vector<const unit_type *> &spawned_types, const CPlayer *spawned_unit_player) const
 {
 	static constexpr int nearby_spawned_range = 16;
 
 	int spawned_demand = 0;
 
 	std::vector<CUnit *> nearby_units;
-	SelectAroundUnit(*this, nearby_spawned_range, nearby_units, HasSamePlayerAs(*this->Player));
+	SelectAroundUnit(*this, nearby_spawned_range, nearby_units, HasSamePlayerAs(*spawned_unit_player));
 
 	for (const CUnit *nearby_unit : nearby_units) {
 		if (!vector::contains(spawned_types, nearby_unit->Type)) {
