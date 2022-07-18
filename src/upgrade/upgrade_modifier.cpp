@@ -91,6 +91,8 @@ void upgrade_modifier::process_gsml_property(const gsml_property &property)
 		this->infantry_cost_modifier = std::stoi(value);
 	} else if (key == "cavalry_cost_modifier") {
 		this->cavalry_cost_modifier = std::stoi(value);
+	} else if (key == "convert_to") {
+		this->convert_to = unit_type::get(value);
 	} else {
 		const std::string variable_name = string::snake_case_to_pascal_case(key);
 
