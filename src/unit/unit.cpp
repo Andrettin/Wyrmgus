@@ -2943,12 +2943,10 @@ void CUnit::spawn_units()
 
 	//spawn neutral hostile units for minor faction buildings if their settlement has no owner
 	if (this->Player->has_neutral_faction_type() && this->Type->BoolFlag[BUILDING_INDEX].value && this->get_settlement() != nullptr && this->get_settlement()->get_game_data()->get_owner() == nullptr) {
-		for (const auto &[unit_type, unit_stock] : this->get_unit_stocks()) {
-			if (!unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value) {
-				continue;
-			}
+		std::vector<const unit_type *> stocked_unit_types;
 
-			spawned_units.push_back(unit_type);
+		for (const auto &[unit_type, unit_stock] : this->get_unit_stocks()) {
+			stocked_unit_types.push_back(unit_type);
 		}
 
 		for (const auto &[unit_class, unit_stock] : this->get_unit_class_stocks()) {
@@ -2958,12 +2956,18 @@ void CUnit::spawn_units()
 				continue;
 			}
 
+			stocked_unit_types.push_back(unit_type);
+		}
+
+		std::erase_if(stocked_unit_types, [this](const unit_type *unit_type) {
 			if (!unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value) {
-				continue;
+				return true;
 			}
 
-			spawned_units.push_back(unit_type);
-		}
+			return false;
+		});
+
+		vector::merge(spawned_units, std::move(stocked_unit_types));
 	}
 
 	if (spawned_units.empty()) {
