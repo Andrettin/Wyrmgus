@@ -159,6 +159,8 @@ void map_info::reset()
 	if (QApplication::instance()->thread() != QThread::currentThread()) {
 		this->settings->moveToThread(QApplication::instance()->thread());
 	}
+
+	this->hidden = false;
 }
 
 qunique_ptr<map_info> map_info::duplicate() const

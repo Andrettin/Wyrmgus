@@ -301,7 +301,6 @@ void engine_interface::load_map_infos()
 				}
 
 				this->load_map_info(dir_entry.path());
-
 			}
 		}
 
