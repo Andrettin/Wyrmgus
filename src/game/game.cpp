@@ -652,6 +652,10 @@ void game::do_neutral_faction_expansion(const faction *faction)
 				continue;
 			}
 
+			if (faction->get_neutral_site_spawn_conditions() != nullptr && !faction->get_neutral_site_spawn_conditions()->check(site_game_data->get_site_unit(), read_only_context::from_scope(site_game_data->get_site_unit()))) {
+				continue;
+			}
+
 			if (faction_player == nullptr) {
 				faction_player = GetOrAddFactionPlayer(faction);
 			}
