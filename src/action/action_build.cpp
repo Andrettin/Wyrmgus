@@ -469,7 +469,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	return true;
 }
 
-void COrder_Build::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
+void COrder_Build::ConvertUnitType(const CUnit &unit, const unit_type &newType)
 {
 	Q_UNUSED(unit)
 	

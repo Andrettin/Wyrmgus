@@ -59,7 +59,7 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 	
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, unit_type &newType);
+	void ConvertUnitType(const CUnit &unit, const unit_type &newType);
 	//Wyrmgus end
 
 	virtual void AiUnitKilled(CUnit &unit) override;

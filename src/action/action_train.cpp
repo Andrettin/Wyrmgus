@@ -156,7 +156,7 @@ void COrder_Train::UpdateUnitVariables(CUnit &unit) const
 	//Wyrmgus end
 }
 
-void COrder_Train::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
+void COrder_Train::ConvertUnitType(const CUnit &unit, const unit_type &newType)
 {
 	Q_UNUSED(unit)
 

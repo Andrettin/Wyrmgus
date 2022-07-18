@@ -54,7 +54,7 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType);
+	void ConvertUnitType(const CUnit &unit, const unit_type &newType);
 	const wyrmgus::unit_type &GetUnitType() const { return *Type; }
 	//Wyrmgus end
 
@@ -89,7 +89,7 @@ public:
 	virtual void UpdateUnitVariables(CUnit &unit) const override;
 	
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType);
+	void ConvertUnitType(const CUnit &unit, const unit_type &newType);
 	//Wyrmgus end
 	
 	const wyrmgus::unit_type &GetUnitType() const { return *Type; }

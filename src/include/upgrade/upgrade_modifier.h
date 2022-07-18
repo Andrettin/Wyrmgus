@@ -121,10 +121,10 @@ public:
 	// TODO: pointers or ids would be faster and less memory use
 	int  ChangeUnits[UnitTypeMax];			/// add/remove allowed units
 
-	unit_type *ConvertTo = nullptr;			/// convert to this unit-type.
+	const unit_type *convert_to = nullptr; //convert to this unit type
 
-	const civilization *change_civilization_to = nullptr;	//changes the player's civilization to this one
-	const faction *change_faction_to = nullptr;	//changes the player's faction to this one
+	const civilization *change_civilization_to = nullptr; //changes the player's civilization to this one
+	const faction *change_faction_to = nullptr; //changes the player's faction to this one
 
 private:
 	std::vector<const CUpgrade *> free_upgrades; //upgrades granted for free when this upgrade modifier is applied

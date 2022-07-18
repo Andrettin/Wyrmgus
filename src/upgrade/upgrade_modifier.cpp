@@ -71,7 +71,7 @@ std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate(const CUpgrade *ne
 	modifier->cavalry_cost_modifier = this->cavalry_cost_modifier;
 	memcpy(modifier->ImproveIncomes, this->ImproveIncomes, sizeof(modifier->ImproveIncomes));
 	memcpy(modifier->ChangeUnits, this->ChangeUnits, sizeof(modifier->ChangeUnits));
-	modifier->ConvertTo = this->ConvertTo;
+	modifier->convert_to = this->convert_to;
 	modifier->change_civilization_to = this->change_civilization_to;
 	modifier->change_faction_to = this->change_faction_to;
 	modifier->free_upgrades = this->free_upgrades;
@@ -528,11 +528,11 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 		}
 		//Wyrmgus end
 
-		if (this->ConvertTo != nullptr) {
+		if (this->convert_to != nullptr) {
 			if (multiplier > 0) {
-				ConvertUnitTypeTo(*player, *unit_type, *this->ConvertTo);
+				ConvertUnitTypeTo(*player, *unit_type, *this->convert_to);
 			} else {
-				ConvertUnitTypeTo(*player, *this->ConvertTo, *unit_type);
+				ConvertUnitTypeTo(*player, *this->convert_to, *unit_type);
 			}
 		}
 	}

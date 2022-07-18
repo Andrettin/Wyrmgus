@@ -887,7 +887,7 @@ int CclDefineModifier(lua_State *l)
 			um->unit_types.push_back(unit_type::get(value));
 		} else if (!strcmp(key, "convert-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			um->ConvertTo = unit_type::get(value);
+			um->convert_to = unit_type::get(value);
 		//Wyrmgus start
 		} else if (!strcmp(key, "research-speed")) {
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
@@ -1304,7 +1304,7 @@ int UpgradeIdByIdent(const std::string &ident)
 **  @param src     From this unit-type.
 **  @param dst     To this unit-type.
 */
-void ConvertUnitTypeTo(CPlayer &player, const unit_type &src, unit_type &dst)
+void ConvertUnitTypeTo(CPlayer &player, const unit_type &src, const unit_type &dst)
 {
 	//Wyrmgus start
 	if (player.AiEnabled && GameCycle > 0) {
@@ -1441,11 +1441,11 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const upgrade_modifier *um)
 	unit.UpdateButtonIcons();
 	//Wyrmgus end
 	
-	if (um->ConvertTo) {
+	if (um->convert_to) {
 		//Wyrmgus start
-		//CommandTransformIntoType(unit, *um->ConvertTo);
+		//CommandTransformIntoType(unit, *um->convert_to);
 		if (unit.get_character() == nullptr) { //don't do this for persistent characters
-			CommandTransformIntoType(unit, *um->ConvertTo);
+			CommandTransformIntoType(unit, *um->convert_to);
 		}
 		//Wyrmgus end
 	}

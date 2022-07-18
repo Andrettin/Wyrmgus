@@ -443,7 +443,7 @@ void COrder_TransformInto::Execute(CUnit &unit)
 	this->Finished = true;
 }
 
-void COrder_TransformInto::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
+void COrder_TransformInto::ConvertUnitType(const CUnit &unit, const unit_type &newType)
 {
 	Q_UNUSED(unit)
 
@@ -564,7 +564,7 @@ void COrder_UpgradeTo::UpdateUnitVariables(CUnit &unit) const
 	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->get_index()].get_time_cost();
 }
 
-void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
+void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, const unit_type &newType)
 {
 	const CPlayer &player = *unit.Player;
 	const int oldCost = this->Type->Stats[player.get_index()].get_time_cost();

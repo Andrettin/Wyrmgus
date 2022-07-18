@@ -66,7 +66,7 @@ extern int UpgradeIdByIdent(const std::string &sid);
 /// Apply researched upgrades when map is loading
 extern void ApplyUpgrades();
 
-extern void ConvertUnitTypeTo(CPlayer &player, const unit_type &src, unit_type &dst);
+extern void ConvertUnitTypeTo(CPlayer &player, const unit_type &src, const unit_type &dst);
 
 extern void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier *um); /// Apply upgrade modifier of an individual upgrade
 //Wyrmgus start

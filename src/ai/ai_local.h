@@ -78,7 +78,7 @@ class AiRequestType
 {
 public:
 	unsigned int Count = 0;  /// elements in table
-	unit_type *Type = nullptr;     /// the type
+	const unit_type *Type = nullptr;     /// the type
 	const wyrmgus::landmass *landmass = nullptr; //in which landmass the unit should be created
 };
 
@@ -447,7 +447,7 @@ public:
 	unsigned long LastExplorationGameCycle = 0;	/// When did the last explore occur?
 	unsigned long LastCanNotMoveGameCycle = 0;	/// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;	/// unit-types to build/train request,priority list
-	std::vector<wyrmgus::unit_type *> UpgradeToRequests;		/// Upgrade to unit-type requested and priority list
+	std::vector<const unit_type *> UpgradeToRequests;		/// Upgrade to unit-type requested and priority list
 private:
 	std::vector<const CUpgrade *> research_requests; //upgrades requested and priority list
 public:
