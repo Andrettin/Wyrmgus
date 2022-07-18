@@ -187,7 +187,7 @@ public:
 	void generate_settlement_territories(const int z);
 	wyrmgus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const tile_flag block_flags, const tile_flag same_flags);
 	void process_settlement_territory_tiles(const int z);
-	void calculate_settlement_resource_units();
+	void calculate_settlement_neutral_buildings();
 	void generate_neutral_units(const wyrmgus::unit_type *unit_type, const int quantity, const QPoint &min_pos, const QPoint &max_pos, const bool grouped, const int z);
 	//Wyrmgus end
 

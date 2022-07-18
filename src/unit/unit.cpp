@@ -4316,9 +4316,16 @@ void CUnit::Place(const Vec2i &pos, const int z)
 		}
 
 		if (this->Type->can_produce_a_resource()) {
-			const wyrmgus::tile *tile = this->get_center_tile();
+			const tile *tile = this->get_center_tile();
 			if (tile->get_settlement() != nullptr) {
 				tile->get_settlement()->get_game_data()->add_resource_unit(this);
+			}
+		}
+
+		if (this->Player->has_neutral_faction_type() && this->Type->BoolFlag[BUILDING_INDEX].value) {
+			const tile *tile = this->get_center_tile();
+			if (tile->get_settlement() != nullptr) {
+				tile->get_settlement()->get_game_data()->add_neutral_faction_building(this);
 			}
 		}
 	}
@@ -4764,9 +4771,16 @@ void CUnit::Remove(CUnit *host)
 	}
 
 	if (this->Type->can_produce_a_resource()) {
-		const wyrmgus::tile *tile = this->get_center_tile();
+		const tile *tile = this->get_center_tile();
 		if (tile->get_settlement() != nullptr) {
 			tile->get_settlement()->get_game_data()->remove_resource_unit(this);
+		}
+	}
+
+	if (this->Player->has_neutral_faction_type() && this->Type->BoolFlag[BUILDING_INDEX].value) {
+		const tile *tile = this->get_center_tile();
+		if (tile->get_settlement() != nullptr) {
+			tile->get_settlement()->get_game_data()->remove_neutral_faction_building(this);
 		}
 	}
 

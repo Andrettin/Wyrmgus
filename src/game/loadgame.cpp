@@ -311,5 +311,5 @@ void LoadGame(const std::filesystem::path &filepath)
 		settlement_unit->get_settlement()->get_game_data()->set_owner(settlement_unit->Player);
 	}
 
-	CMap::get()->calculate_settlement_resource_units();
+	CMap::get()->calculate_settlement_neutral_buildings();
 }

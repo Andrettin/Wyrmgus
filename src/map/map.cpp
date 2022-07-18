@@ -1491,7 +1491,7 @@ void PreprocessMap()
 			}
 		}
 
-		CMap::get()->calculate_settlement_resource_units();
+		CMap::get()->calculate_settlement_neutral_buildings();
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error preprocessing the map."));
 	}
@@ -4138,10 +4138,12 @@ void CMap::process_settlement_territory_tiles(const int z)
 	}
 }
 
-void CMap::calculate_settlement_resource_units()
+void CMap::calculate_settlement_neutral_buildings()
 {
 	for (const site *site : site::get_all()) {
-		site->get_game_data()->clear_resource_units();
+		site_game_data *site_game_data = site->get_game_data();
+		site_game_data->clear_neutral_faction_buildings();
+		site_game_data->clear_resource_units();
 	}
 
 	//add resource units to the settlement resource unit lists
@@ -4150,13 +4152,19 @@ void CMap::calculate_settlement_resource_units()
 			continue;
 		}
 
-		if (!unit->Type->can_produce_a_resource()) {
+		const tile *tile = unit->get_center_tile();
+		if (tile->get_settlement() == nullptr) {
 			continue;
 		}
-		
-		const tile *tile = unit->get_center_tile();
-		if (tile->get_settlement() != nullptr) {
-			tile->get_settlement()->get_game_data()->add_resource_unit(unit);
+
+		site_game_data *settlement_game_data = tile->get_settlement()->get_game_data();
+
+		if (unit->Type->can_produce_a_resource()) {
+			settlement_game_data->add_resource_unit(unit);
+		}
+
+		if (unit->Player->has_neutral_faction_type() && unit->Type->BoolFlag[BUILDING_INDEX].value) {
+			settlement_game_data->add_neutral_faction_building(unit);
 		}
 	}
 }
