@@ -115,14 +115,12 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/assert_util.h"
-#include "util/container_util.h"
 #include "util/date_util.h"
 #include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/random.h"
-#include "util/set_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 #include "util/thread_pool.h"
@@ -617,13 +615,7 @@ void game::do_neutral_faction_expansion(const faction *faction)
 	//shuffle the vector, so that we don't privilege a particular building type, if there are multiple ones which can target the same building site
 	vector::shuffle(building_types);
 
-	site_set target_site_set = container::to_set<std::vector<const site *>, site_set>(faction->get_neutral_target_sites());
-
-	for (const region *target_region : faction->get_neutral_target_regions()) {
-		set::merge(target_site_set, target_region->get_sites());
-	}
-
-	const std::vector<const site *> target_sites = vector::shuffled(container::to_vector(target_site_set));
+	const std::vector<const site *> target_sites = vector::shuffled(faction->get_all_neutral_target_sites());
 
 	int placed_buildings = 0;
 

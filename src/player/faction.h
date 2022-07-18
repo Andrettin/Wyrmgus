@@ -379,6 +379,8 @@ public:
 		return this->neutral_target_regions;
 	}
 
+	std::vector<const site *> get_all_neutral_target_sites() const;
+
 	int get_max_neutral_buildings() const
 	{
 		return this->max_neutral_buildings;

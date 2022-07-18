@@ -53,6 +53,7 @@
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
+#include "util/set_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
@@ -672,6 +673,17 @@ std::string faction::get_requirements_string() const
 void faction::remove_dynasty(const wyrmgus::dynasty *dynasty)
 {
 	vector::remove(this->dynasties, dynasty);
+}
+
+std::vector<const site *> faction::get_all_neutral_target_sites() const
+{
+	site_set target_site_set = container::to_set<std::vector<const site *>, site_set>(this->get_neutral_target_sites());
+
+	for (const region *target_region : this->get_neutral_target_regions()) {
+		set::merge(target_site_set, target_region->get_sites());
+	}
+
+	return container::to_vector(std::move(target_site_set));
 }
 
 }
