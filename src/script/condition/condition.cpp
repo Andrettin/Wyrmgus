@@ -38,8 +38,11 @@
 #include "script.h"
 #include "script/condition/age_condition.h"
 #include "script/condition/and_condition.h"
+#include "script/condition/any_neighbor_settlement_neutral_building_owner_condition.h"
+#include "script/condition/any_neighbor_settlement_owner_condition.h"
 #include "script/condition/any_other_player_condition.h"
 #include "script/condition/any_player_condition.h"
+#include "script/condition/any_settlement_neutral_building_owner_condition.h"
 #include "script/condition/any_unit_condition.h"
 #include "script/condition/any_unit_of_class_condition.h"
 #include "script/condition/any_unit_of_type_condition.h"
@@ -184,10 +187,16 @@ std::unique_ptr<const condition> condition::from_gsml_scope(const gsml_data &sco
 
 	if (tag == "and") {
 		condition = std::make_unique<and_condition>();
+	} else if (tag == "any_neighbor_settlement_neutral_building_owner") {
+		condition = std::make_unique<any_neighbor_settlement_neutral_building_owner_condition>();
+	} else if (tag == "any_neighbor_settlement_owner") {
+		condition = std::make_unique<any_neighbor_settlement_owner_condition>();
 	} else if (tag == "any_other_player") {
 		condition = std::make_unique<any_other_player_condition>();
 	} else if (tag == "any_player") {
 		condition = std::make_unique<any_player_condition>();
+	} else if (tag == "any_settlement_neutral_building_owner") {
+		condition = std::make_unique<any_settlement_neutral_building_owner_condition>();
 	} else if (tag == "any_unit") {
 		condition = std::make_unique<any_unit_condition>();
 	} else if (tag == "any_unit_of_class") {

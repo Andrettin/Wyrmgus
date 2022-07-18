@@ -943,8 +943,11 @@ set(wyrmgus_script_HDRS
 set(wyrmgus_script_condition_HDRS
 	src/script/condition/age_condition.h
 	src/script/condition/and_condition.h
+	src/script/condition/any_neighbor_settlement_neutral_building_owner_condition.h
+	src/script/condition/any_neighbor_settlement_owner_condition.h
 	src/script/condition/any_other_player_condition.h
 	src/script/condition/any_player_condition.h
+	src/script/condition/any_settlement_neutral_building_owner_condition.h
 	src/script/condition/any_unit_condition.h
 	src/script/condition/any_unit_of_class_condition.h
 	src/script/condition/any_unit_of_type_condition.h
