@@ -266,7 +266,7 @@ void faction::initialize()
 		}
 	}
 
-	if (is_faction_type_neutral(this->get_type())) {
+	if (this->has_neutral_type()) {
 		faction::neutral_factions.push_back(this);
 	}
 
@@ -397,6 +397,11 @@ std::string faction::get_encyclopedia_text() const
 	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
 
 	return text;
+}
+
+bool faction::has_neutral_type() const
+{
+	return is_faction_type_neutral(this->get_type());
 }
 
 std::string_view faction::get_title_name(const wyrmgus::government_type government_type, const faction_tier tier) const

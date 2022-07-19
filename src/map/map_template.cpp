@@ -1488,7 +1488,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 	if (site != settlement && settlement != nullptr) {
 		const faction *settlement_owner = settlement->get_history()->get_owner();
-		if (settlement_owner != nullptr && site_owner != settlement_owner && (site_owner == nullptr || !is_faction_type_neutral(site_owner->get_type()))) {
+		if (settlement_owner != nullptr && site_owner != settlement_owner && (site_owner == nullptr || !site_owner->has_neutral_type())) {
 			//if the site owner is different from the settlement owner, the latter is non-null, and the site owner is not a neutral faction, then override the site owner with the settlement owner
 			site_owner = settlement_owner;
 		}

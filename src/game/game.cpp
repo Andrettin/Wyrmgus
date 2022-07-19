@@ -582,7 +582,7 @@ void game::update_neutral_faction_presence()
 
 void game::do_neutral_faction_expansion(const faction *faction)
 {
-	assert_throw(is_faction_type_neutral(faction->get_type()));
+	assert_throw(faction->has_neutral_type());
 
 	CPlayer *faction_player = GetFactionPlayer(faction);
 
@@ -667,7 +667,7 @@ void game::do_neutral_faction_expansion(const faction *faction)
 
 void game::do_neutral_faction_contraction(const faction *faction)
 {
-	assert_throw(is_faction_type_neutral(faction->get_type()));
+	assert_throw(faction->has_neutral_type());
 
 	if (faction->get_neutral_site_conditions() == nullptr) {
 		return;

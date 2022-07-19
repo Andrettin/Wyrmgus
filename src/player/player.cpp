@@ -2343,7 +2343,7 @@ bool CPlayer::can_potentially_found_faction(const wyrmgus::faction *faction) con
 		return false;
 	}
 	
-	if (is_faction_type_neutral(this->get_faction()->get_type()) != is_faction_type_neutral(faction->get_type())) {
+	if (this->get_faction()->has_neutral_type() != faction->has_neutral_type()) {
 		return false;
 	}
 
@@ -2549,7 +2549,7 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 			return false;
 		}
 
-		if (is_faction_type_neutral(faction->get_type())) {
+		if (faction->has_neutral_type()) {
 			if (this->NumBuildings > faction->get_max_neutral_buildings()) {
 				return false;
 			}
@@ -5469,20 +5469,13 @@ bool CPlayer::HasContactWith(const CPlayer &player) const
 	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::get()->MapLayers.size() && this->StartMapLayer < (int) CMap::get()->MapLayers.size() && CMap::get()->MapLayers[player.StartMapLayer]->world == CMap::get()->MapLayers[this->StartMapLayer]->world);
 }
 
-/**
-**  Check if the player's faction type is a neutral one
-*/
 bool CPlayer::has_neutral_faction_type() const
 {
-	if (
-		this->get_civilization() != nullptr
-		&& this->get_faction() != nullptr
-		&& (is_faction_type_neutral(this->get_faction()->get_type()))
-	) {
-		return true;
+	if (this->get_civilization() == nullptr || this->get_faction() == nullptr) {
+		return false;
 	}
 
-	return false;
+	return this->get_faction()->has_neutral_type();
 }
 
 /**

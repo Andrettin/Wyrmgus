@@ -168,6 +168,8 @@ public:
 		return this->type;
 	}
 
+	bool has_neutral_type() const;
+
 	const faction *get_parent_faction() const
 	{
 		return this->parent_faction;
