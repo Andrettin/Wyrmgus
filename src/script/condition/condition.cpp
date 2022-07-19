@@ -62,6 +62,7 @@
 #include "script/condition/government_type_condition.h"
 #include "script/condition/location_condition.h"
 #include "script/condition/near_site_condition.h"
+#include "script/condition/nearby_civilization_condition.h"
 #include "script/condition/neutral_player_condition.h"
 #include "script/condition/not_condition.h"
 #include "script/condition/or_condition.h"
@@ -133,6 +134,8 @@ std::unique_ptr<const condition> condition::from_gsml_property(const gsml_proper
 		return std::make_unique<government_type_condition>(value);
 	} else if (key == "near_site") {
 		return std::make_unique<near_site_condition>(value);
+	} else if (key == "nearby_civilization") {
+		return std::make_unique<nearby_civilization_condition>(value);
 	} else if (key == "quest") {
 		return std::make_unique<quest_condition>(value);
 	} else if (key == "random") {
