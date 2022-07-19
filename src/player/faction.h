@@ -98,6 +98,8 @@ public:
 	static constexpr const char *class_identifier = "faction";
 	static constexpr const char *database_folder = "factions";
 
+	static const std::set<std::string> database_dependencies;
+
 	static faction *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		faction *faction = data_type::add(identifier, data_module);
@@ -371,7 +373,7 @@ public:
 		return this->neutral_building_classes;
 	}
 
-	const std::vector<const site *> &get_neutral_target_sites() const
+	const std::vector<site *> &get_neutral_target_sites() const
 	{
 		return this->neutral_target_sites;
 	}
@@ -381,7 +383,7 @@ public:
 		return this->neutral_target_regions;
 	}
 
-	std::vector<const site *> get_all_neutral_target_sites() const;
+	std::vector<site *> get_all_neutral_target_sites() const;
 
 	int get_max_neutral_buildings() const
 	{
@@ -442,13 +444,13 @@ private:
 	std::unique_ptr<const and_condition> conditions;
 	std::vector<const site *> core_settlements; //the core settlements of this faction (required to found it)
 	std::vector<const unit_class *> neutral_building_classes;
-	std::vector<const site *> neutral_target_sites;
+	std::vector<site *> neutral_target_sites;
 	std::vector<const region *> neutral_target_regions;
 	int max_neutral_buildings = 0;
 	std::unique_ptr<const and_condition> neutral_site_conditions;
 	std::unique_ptr<const and_condition> neutral_site_spawn_conditions;
 public:
-	std::vector<site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
+	std::vector<site *> sites; //sites used for this faction if it needs a randomly-generated settlement
 private:
 	std::vector<const dynasty *> dynasties; //which dynasties are available to this faction
 	std::vector<character *> characters;

@@ -317,6 +317,16 @@ public:
 		this->characters.push_back(character);
 	}
 
+	const std::vector<const faction *> &get_neutral_factions() const
+	{
+		return this->neutral_factions;
+	}
+
+	void add_neutral_faction(const faction *faction)
+	{
+		this->neutral_factions.push_back(faction);
+	}
+
 private:
 	wyrmgus::map_template *map_template = nullptr;
 	QPoint pos = QPoint(-1, -1); //position of the site in its map template
@@ -342,6 +352,7 @@ private:
 	std::map<const civilization *, std::string> cultural_names;	/// Names for the site for each different culture/civilization
 	QColor color; //color used to represent the site on the minimap, and to identify its territory on territory images
 	std::vector<character *> characters; //characters which can be recruited at this site
+	std::vector<const faction *> neutral_factions;
 	std::unique_ptr<site_history> history;
 	qunique_ptr<site_game_data> game_data;
 public:

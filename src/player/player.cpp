@@ -2556,7 +2556,7 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 
 			if (game::get()->get_current_campaign() != nullptr) {
 				//the player cannot own any site which is not a target site for the neutral faction it wants to develop
-				const std::vector<const site *> faction_target_sites = faction->get_all_neutral_target_sites();
+				const std::vector<site *> faction_target_sites = faction->get_all_neutral_target_sites();
 
 				for (const CUnit *unit : this->get_units()) {
 					const site *unit_site = unit->get_site();

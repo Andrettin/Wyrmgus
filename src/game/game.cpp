@@ -615,7 +615,7 @@ void game::do_neutral_faction_expansion(const faction *faction)
 	//shuffle the vector, so that we don't privilege a particular building type, if there are multiple ones which can target the same building site
 	vector::shuffle(building_types);
 
-	const std::vector<const site *> target_sites = vector::shuffled(faction->get_all_neutral_target_sites());
+	const std::vector<site *> target_sites = vector::shuffled(faction->get_all_neutral_target_sites());
 
 	int placed_buildings = 0;
 

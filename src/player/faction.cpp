@@ -59,6 +59,9 @@
 
 namespace wyrmgus {
 
+//factions must be initialized after regions, so that they have all their sites, for adding neutral factions to target sites
+const std::set<std::string> faction::database_dependencies = { region::class_identifier };
+
 bool faction::compare_encyclopedia_entries(const faction *lhs, const faction *rhs)
 {
 	const wyrmgus::civilization *lhs_civilization = lhs->get_civilization();
@@ -190,7 +193,7 @@ void faction::process_gsml_scope(const gsml_data &scope)
 		}
 	} else if (tag == "neutral_target_sites") {
 		for (const std::string &value : values) {
-			const site *site = site::get(value);
+			site *site = site::get(value);
 			this->neutral_target_sites.push_back(site);
 		}
 	} else if (tag == "neutral_target_regions") {
@@ -268,6 +271,12 @@ void faction::initialize()
 
 	if (this->has_neutral_type()) {
 		faction::neutral_factions.push_back(this);
+
+		const std::vector<site *> target_sites = this->get_all_neutral_target_sites();
+
+		for (site *site : target_sites) {
+			site->add_neutral_faction(this);
+		}
 	}
 
 	if (this->get_type() == faction_type::tribe) {
@@ -680,9 +689,9 @@ void faction::remove_dynasty(const wyrmgus::dynasty *dynasty)
 	vector::remove(this->dynasties, dynasty);
 }
 
-std::vector<const site *> faction::get_all_neutral_target_sites() const
+std::vector<site *> faction::get_all_neutral_target_sites() const
 {
-	site_set target_site_set = container::to_set<std::vector<const site *>, site_set>(this->get_neutral_target_sites());
+	std::set<site *> target_site_set = container::to_set(this->get_neutral_target_sites());
 
 	for (const region *target_region : this->get_neutral_target_regions()) {
 		set::merge(target_site_set, target_region->get_sites());
