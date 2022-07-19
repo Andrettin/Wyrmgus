@@ -104,6 +104,7 @@ public:
 	char Boots = 0;				/// check if button's item are boots
 	char Arrows = 0;			/// check if button's item are arrows
 	char Regeneration = 0;		/// check if button's item has regeneration
+	char faction = 0; //check if the button represents a faction
 	char FactionUpgrade = 0;	/// check if the button's upgrade is a faction upgrade
 	char FactionCoreSettlements = 0; /// check if the button's faction has core settlements
 	char DynastyUpgrade = 0;	/// check if the button's upgrade is a dynasty upgrade

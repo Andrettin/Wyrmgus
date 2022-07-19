@@ -1865,11 +1865,11 @@ std::string EvalString(const StringDesc *s)
 			} else {
 				return std::string();
 			}
-		case EString_FactionType : // the faction's type
+		case EString_FactionType:
 			faction = s->D.Faction;
 			
 			if (faction != nullptr) {
-				return IdentToName(wyrmgus::faction_type_to_string((**faction).get_type()));
+				return get_faction_type_name((**faction).get_type());
 			} else {
 				return std::string();
 			}

@@ -33,6 +33,7 @@
 #include "economy/resource.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
 #include "player/dynasty.h"
 #include "player/faction.h"
 #include "player/player.h"
@@ -501,12 +502,22 @@ void button::SetTriggerData() const
 			TriggerData.Type = wyrmgus::unit_manager::get()->GetSlotUnit(this->Value).Type;
 			TriggerData.Unit = &wyrmgus::unit_manager::get()->GetSlotUnit(this->Value);
 			break;
-		case ButtonCmd::Faction:
-			TriggerData.faction = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(this->Value);
-			if (TriggerData.faction->get_upgrade() != nullptr) {
-				TriggerData.Upgrade = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(this->Value)->get_upgrade();
+		case ButtonCmd::Faction: {
+			const faction *faction = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(this->Value);
+			TriggerData.faction = faction;
+			if (faction->get_upgrade() != nullptr) {
+				TriggerData.Upgrade = faction->get_upgrade();
 			}
 			break;
+		}
+		case ButtonCmd::PotentialNeutralFaction: {
+			const faction *faction = Selected[0]->get_site()->get_neutral_factions().at(this->Value);
+			TriggerData.faction = faction;
+			if (faction->get_upgrade() != nullptr) {
+				TriggerData.Upgrade = faction->get_upgrade();
+			}
+			break;
+		}
 		case ButtonCmd::Dynasty:
 			TriggerData.dynasty = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[this->Value];
 			TriggerData.Upgrade = TriggerData.dynasty->get_upgrade();
@@ -758,6 +769,8 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 			return "rally_point";
 		case ButtonCmd::Faction:
 			return "faction";
+		case ButtonCmd::PotentialNeutralFaction:
+			return "potential_neutral_faction";
 		case ButtonCmd::Dynasty:
 			return "dynasty";
 		case ButtonCmd::Quest:
@@ -849,6 +862,8 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::RallyPoint;
 	} else if (button_action == "faction") {
 		return ButtonCmd::Faction;
+	} else if (button_action == "potential_neutral_faction") {
+		return ButtonCmd::PotentialNeutralFaction;
 	} else if (button_action == "dynasty") {
 		return ButtonCmd::Dynasty;
 	} else if (button_action == "quest") {
@@ -888,5 +903,19 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 
 bool IsNeutralUsableButtonAction(const ButtonCmd button_action)
 {
-	return button_action == ButtonCmd::Train || button_action == ButtonCmd::TrainClass || button_action == ButtonCmd::CancelTrain || button_action == ButtonCmd::Buy || button_action == ButtonCmd::SellResource || button_action == ButtonCmd::BuyResource || button_action == ButtonCmd::Research || button_action == ButtonCmd::ResearchClass;
+	switch (button_action) {
+		case ButtonCmd::Train:
+		case ButtonCmd::TrainClass:
+		case ButtonCmd::CancelTrain:
+		case ButtonCmd::Buy:
+		case ButtonCmd::SellResource:
+		case ButtonCmd::BuyResource:
+		case ButtonCmd::Research:
+		case ButtonCmd::ResearchClass:
+		case ButtonCmd::PotentialNeutralFaction:
+		case ButtonCmd::Button:
+			return true;
+		default:
+			return false;
+	}
 }

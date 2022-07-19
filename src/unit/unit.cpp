@@ -8478,13 +8478,13 @@ bool CUnit::is_enemy_of(const CPlayer &player) const
 		if (this->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value && player.get_type() != player_type::neutral) {
 			return true;
 		}
+	} else {
+		//Wyrmgus start
+		if (this->Player != &player && player.get_type() != player_type::neutral && !this->Player->has_building_access(&player) && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
+			return true;
+		}
+		//Wyrmgus end
 	}
-
-	//Wyrmgus start
-	if (this->Player != &player && player.get_type() != player_type::neutral && !this->Player->has_building_access(&player) && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
-		return true;
-	}
-	//Wyrmgus end
 	
 	return this->Player->is_enemy_of(player);
 }

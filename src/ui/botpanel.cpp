@@ -416,8 +416,8 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 
-	if (condition->FactionUpgrade != CONDITION_TRUE) {
-		if ((condition->FactionUpgrade == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Faction)) {
+	if (condition->faction != CONDITION_TRUE) {
+		if ((condition->faction == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::PotentialNeutralFaction)) {
 			return false;
 		}
 	}
@@ -439,12 +439,27 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		upgrade = button.get_value_upgrade(Selected[0]);
 	} else if (button.Action == ButtonCmd::Faction && CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button.Value)->get_upgrade() != nullptr) {
 		upgrade = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button.Value)->get_upgrade();
+	} else if (button.Action == ButtonCmd::PotentialNeutralFaction && Selected[0]->get_site()->get_neutral_factions().at(button.Value)->get_upgrade() != nullptr) {
+		upgrade = Selected[0]->get_site()->get_neutral_factions().at(button.Value)->get_upgrade();
 	} else if (button.Action == ButtonCmd::Dynasty && CPlayer::GetThisPlayer()->get_faction()->get_dynasties().at(button.Value)->get_upgrade() != nullptr) {
 		upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button.Value]->get_upgrade();
 	}
-	
+
+	if (condition->FactionUpgrade != CONDITION_TRUE) {
+		if ((condition->FactionUpgrade == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::PotentialNeutralFaction) && upgrade != nullptr)) {
+			return false;
+		}
+	}
+
 	if (condition->UpgradeResearched != CONDITION_TRUE) {
-		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') || (button.Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
+		if (
+			(condition->UpgradeResearched == CONDITION_ONLY)
+			^ (
+				((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R')
+				|| (button.Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)
+				|| (button.Action == ButtonCmd::PotentialNeutralFaction && Selected[0]->Player->get_faction() == Selected[0]->get_site()->get_neutral_factions().at(button.Value))
+			)
+		) {
 			return false;
 		}
 	}
@@ -494,6 +509,9 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				break;
 			case ButtonCmd::Faction:
 				has_requirements_string = has_requirements_string && button.Value != -1 && !CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button.Value)->get_requirements_string().empty();
+				break;
+			case ButtonCmd::PotentialNeutralFaction:
+				has_requirements_string = !Selected.empty() && button.Value != -1 && Selected[0]->get_site() != nullptr && !Selected[0]->get_site()->get_neutral_factions().at(button.Value)->get_requirements_string().empty();
 				break;
 			default:
 				has_requirements_string = false;
@@ -1155,6 +1173,8 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 			button_icon = button_upgrade->get_icon();
 		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button->Value)->get_icon() != nullptr) {
 			button_icon = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button->Value)->get_icon();
+		} else if (button->Action == ButtonCmd::PotentialNeutralFaction && button->Icon.Name.empty() && Selected[0]->get_site() != nullptr && Selected[0]->get_site()->get_neutral_factions().at(button->Value)->get_icon() != nullptr) {
+			button_icon = Selected[0]->get_site()->get_neutral_factions().at(button->Value)->get_icon();
 		} else if (button->Action == ButtonCmd::Dynasty && button->Icon.Name.empty() && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_icon() != nullptr) {
 			button_icon = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_icon();
 		}
@@ -1415,6 +1435,9 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 		case ButtonCmd::Faction:
 			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().size()) && CPlayer::GetThisPlayer()->can_found_faction<true>(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(buttonaction.Value));
 			break;
+		case ButtonCmd::PotentialNeutralFaction:
+			res = Selected[0]->get_site() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(Selected[0]->get_site()->get_neutral_factions().size());
+			break;
 		case ButtonCmd::Dynasty:
 			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) && CPlayer::GetThisPlayer()->can_choose_dynasty<true>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]) && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_icon() != nullptr;
 			if (res) {
@@ -1520,6 +1543,9 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 			break;
 		case ButtonCmd::Faction:
 			res = CPlayer::GetThisPlayer()->can_found_faction(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(buttonaction.Value));
+			break;
+		case ButtonCmd::PotentialNeutralFaction:
+			res = true;
 			break;
 		case ButtonCmd::Dynasty:
 			res = CPlayer::GetThisPlayer()->can_choose_dynasty(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]);
@@ -1777,10 +1803,11 @@ void CButtonPanel::Update()
 	if (GameRunning || GameEstablishing) {
 		unsigned int sold_unit_count = 0;
 		unsigned int potential_faction_count = 0;
+		unsigned int potential_neutral_faction_count = 0;
 		unsigned int potential_dynasty_count = 0;
 
 		for (button *button : button::get_all()) {
-			if (button->Action != ButtonCmd::Faction && button->Action != ButtonCmd::Dynasty && button->Action != ButtonCmd::Buy) {
+			if (button->Action != ButtonCmd::Faction && button->Action != ButtonCmd::PotentialNeutralFaction && button->Action != ButtonCmd::Dynasty && button->Action != ButtonCmd::Buy) {
 				continue;
 			}
 
@@ -1790,62 +1817,94 @@ void CButtonPanel::Update()
 				continue;
 			}
 
-			if (button->Action == ButtonCmd::Faction) {
-				if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_faction_count >= CPlayer::GetThisPlayer()->get_potentially_foundable_factions().size()) {
-					button->Value = -1;
-				} else {
-					const faction *faction = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(potential_faction_count);
-					button->Value = potential_faction_count;
-
-					const government_type player_government_type = CPlayer::GetThisPlayer()->get_government_type();
-					const government_type government_type = faction->is_government_type_valid(player_government_type) ? player_government_type : faction->get_default_government_type();
-					const faction_tier faction_tier = faction->get_nearest_valid_tier(CPlayer::GetThisPlayer()->get_faction_tier());
-
-					const std::string faction_name = faction->get_name(government_type, faction_tier);
-					const bool uses_definite_article = faction->uses_definite_article(government_type);
-
-					button->Hint = "Found ";
-					if (uses_definite_article) {
-						button->Hint += "the ";
-					}
-					button->Hint += faction_name;
-					button->Description = "Changes your faction to ";
-					if (uses_definite_article) {
-						button->Description += "the ";
-					}
-					button->Description += faction_name;
-				}
-				potential_faction_count += 1;
-			} else if (button->Action == ButtonCmd::Dynasty) {
-				if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_dynasty_count >= CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) {
-					button->Value = -1;
-				} else {
-					const dynasty *dynasty = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[potential_dynasty_count];
-					button->Value = potential_dynasty_count;
-					button->Hint = "Choose the ";
-					button->Hint += dynasty->get_name();
-					button->Hint += " Dynasty";
-					button->Description = "Changes your dynasty to the ";
-					button->Description += dynasty->get_name();
-					button->Description += " dynasty";
-				}
-				potential_dynasty_count += 1;
-			} else if (button->Action == ButtonCmd::Buy) {
-				if (sold_unit_count >= unit.SoldUnits.size()) {
-					button->Value = -1;
-				} else {
-					button->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
-					if (unit.SoldUnits[sold_unit_count]->get_character() != nullptr) {
-						button->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->get_full_name();
+			switch (button->Action) {
+				case ButtonCmd::Faction: {
+					if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_faction_count >= CPlayer::GetThisPlayer()->get_potentially_foundable_factions().size()) {
+						button->Value = -1;
 					} else {
-						if (!unit.SoldUnits[sold_unit_count]->Name.empty()) {
-							button->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->get_full_name();
+						const faction *faction = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(potential_faction_count);
+						button->Value = potential_faction_count;
+
+						const government_type player_government_type = CPlayer::GetThisPlayer()->get_government_type();
+						const government_type government_type = faction->is_government_type_valid(player_government_type) ? player_government_type : faction->get_default_government_type();
+						const faction_tier faction_tier = faction->get_nearest_valid_tier(CPlayer::GetThisPlayer()->get_faction_tier());
+
+						const std::string faction_name = faction->get_name(government_type, faction_tier);
+						const bool uses_definite_article = faction->uses_definite_article(government_type);
+
+						button->Hint = "Found ";
+						if (uses_definite_article) {
+							button->Hint += "the ";
+						}
+						button->Hint += faction_name;
+						button->Description = "Changes your faction to ";
+						if (uses_definite_article) {
+							button->Description += "the ";
+						}
+						button->Description += faction_name;
+					}
+
+					++potential_faction_count;
+					break;
+				}
+				case ButtonCmd::PotentialNeutralFaction:
+					if (Selected[0]->get_site() == nullptr || potential_neutral_faction_count >= Selected[0]->get_site()->get_neutral_factions().size()) {
+						button->Value = -1;
+					} else {
+						const faction *faction = Selected[0]->get_site()->get_neutral_factions().at(potential_neutral_faction_count);
+						button->Value = potential_neutral_faction_count;
+
+						const CPlayer *faction_player = GetFactionPlayer(faction);
+
+						const government_type government_type = faction_player ? faction_player->get_government_type() : faction->get_default_government_type();
+						const faction_tier faction_tier = faction_player ? faction_player->get_faction_tier() : faction->get_default_tier();
+
+						const std::string faction_name = faction->get_name(government_type, faction_tier);
+
+						button->Hint = faction_name;
+						button->Description = "The " + faction_name + " can spawn on this site.";
+					}
+
+					potential_neutral_faction_count += 1;
+					break;
+				case ButtonCmd::Dynasty: {
+					if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_dynasty_count >= CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) {
+						button->Value = -1;
+					} else {
+						const dynasty *dynasty = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[potential_dynasty_count];
+						button->Value = potential_dynasty_count;
+						button->Hint = "Choose the ";
+						button->Hint += dynasty->get_name();
+						button->Hint += " Dynasty";
+						button->Description = "Changes your dynasty to the ";
+						button->Description += dynasty->get_name();
+						button->Description += " dynasty";
+					}
+
+					++potential_dynasty_count;
+					break;
+				}
+				case ButtonCmd::Buy: {
+					if (sold_unit_count >= unit.SoldUnits.size()) {
+						button->Value = -1;
+					} else {
+						button->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
+						if (unit.SoldUnits[sold_unit_count]->get_character() != nullptr) {
+							button->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->get_full_name();
 						} else {
-							button->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->get_type_name();
+							if (!unit.SoldUnits[sold_unit_count]->Name.empty()) {
+								button->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->get_full_name();
+							} else {
+								button->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->get_type_name();
+							}
 						}
 					}
+
+					++sold_unit_count;
+					break;
 				}
-				sold_unit_count += 1;
+				default:
+					break;
 			}
 		}
 	}

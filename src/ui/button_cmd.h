@@ -55,6 +55,7 @@ enum class ButtonCmd {
 	UpgradeToClass, //upgrade order (unit class)
 	RallyPoint,		/// set rally point
 	Faction,		/// change faction
+	PotentialNeutralFaction,
 	Dynasty,		/// change dynasty
 	Quest,			/// receive quest
 	Buy,				/// buy item

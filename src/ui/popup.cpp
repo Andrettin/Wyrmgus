@@ -822,6 +822,8 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 			condition->Arrows = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Regeneration")) {
 			condition->Regeneration = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Faction")) {
+			condition->faction = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "FactionUpgrade")) {
 			condition->FactionUpgrade = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "DynastyUpgrade")) {
