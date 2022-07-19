@@ -59,6 +59,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "util/assert_util.h"
+#include "util/string_util.h"
 #include "video/font.h"
 #include "video/font_color.h"
 #include "video/video.h"
@@ -200,9 +201,12 @@ int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
 	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 		TriggerData.resource = wyrmgus::resource::get_all()[resource];
 	}
-	const std::string text = EvalString(this->Text.get());
+	std::string text = EvalString(this->Text.get());
 	button.CleanTriggerData();
 	//Wyrmgus end
+
+	//this is necessary for the width to be calculated correctly
+	string::replace(text, "\t", "    ");
 	
 	//Wyrmgus start
 	/*
