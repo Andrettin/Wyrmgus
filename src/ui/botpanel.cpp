@@ -1094,7 +1094,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 		assert_throw(button->get_pos() == static_cast<int>(i + 1));
 
 		//Wyrmgus start
-		//for neutral units, don't draw buttons that aren't training buttons (in other words, only draw buttons which are usable by neutral buildings)
+		//for neutral units, only draw buttons which are usable by neutral buildings
 		if (
 			!button->is_always_shown()
 			&& Selected[0]->Player != CPlayer::GetThisPlayer()
@@ -1105,6 +1105,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 			continue;
 		}
 		//Wyrmgus end
+
 		bool gray = false;
 		bool cooldownSpell = false;
 		int maxCooldown = 0;

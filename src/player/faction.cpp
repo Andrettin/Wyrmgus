@@ -673,14 +673,6 @@ std::string faction::get_requirements_string() const
 
 	std::string str;
 
-	if (this->get_civilization()->get_conditions() != nullptr) {
-		str += "\n" + this->get_civilization()->get_conditions()->get_conditions_string(1, false);
-	}
-
-	if (this->get_conditions() != nullptr) {
-		str += "\n" + this->get_conditions()->get_conditions_string(1, false);
-	}
-
 	if (this->has_neutral_type()) {
 		if (this->get_neutral_site_conditions() != nullptr) {
 			str += "\n" + this->get_neutral_site_conditions()->get_conditions_string(1, false);
@@ -688,6 +680,14 @@ std::string faction::get_requirements_string() const
 
 		if (this->get_neutral_site_spawn_conditions() != nullptr) {
 			str += "\n" + this->get_neutral_site_spawn_conditions()->get_conditions_string(1, false);
+		}
+	} else {
+		if (this->get_civilization()->get_conditions() != nullptr) {
+			str += "\n" + this->get_civilization()->get_conditions()->get_conditions_string(1, false);
+		}
+
+		if (this->get_conditions() != nullptr) {
+			str += "\n" + this->get_conditions()->get_conditions_string(1, false);
 		}
 	}
 
