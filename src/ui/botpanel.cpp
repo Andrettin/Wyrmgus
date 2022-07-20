@@ -1439,7 +1439,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().size()) && CPlayer::GetThisPlayer()->can_found_faction<true>(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(buttonaction.Value));
 			break;
 		case ButtonCmd::PotentialNeutralFaction:
-			res = game::get()->get_current_campaign() != nullptr && Selected[0]->get_site() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(Selected[0]->get_site()->get_neutral_factions().size());
+			res = game::get()->get_current_campaign() != nullptr && Selected[0]->get_settlement() != nullptr && Selected[0]->get_settlement()->get_game_data()->get_owner() == CPlayer::GetThisPlayer() && Selected[0]->get_site() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(Selected[0]->get_site()->get_neutral_factions().size()) && Selected[0]->get_settlement() != nullptr;
 			break;
 		case ButtonCmd::Dynasty:
 			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) && CPlayer::GetThisPlayer()->can_choose_dynasty<true>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]) && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_icon() != nullptr;
@@ -1547,9 +1547,11 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 		case ButtonCmd::Faction:
 			res = CPlayer::GetThisPlayer()->can_found_faction(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(buttonaction.Value));
 			break;
-		case ButtonCmd::PotentialNeutralFaction:
-			res = Selected[0]->Player->get_faction() != Selected[0]->get_site()->get_neutral_factions().at(buttonaction.Value);
+		case ButtonCmd::PotentialNeutralFaction: {
+			const faction *neutral_faction = Selected[0]->get_site()->get_neutral_factions().at(buttonaction.Value);
+			res = Selected[0]->Player->get_faction() != neutral_faction && (neutral_faction->get_neutral_site_conditions() == nullptr || neutral_faction->get_neutral_site_conditions()->check(Selected[0], read_only_context::from_scope(Selected[0]))) && (neutral_faction->get_neutral_site_spawn_conditions() == nullptr || neutral_faction->get_neutral_site_spawn_conditions()->check(Selected[0], read_only_context::from_scope(Selected[0])));
 			break;
+		}
 		case ButtonCmd::Dynasty:
 			res = CPlayer::GetThisPlayer()->can_choose_dynasty(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]);
 			break;
@@ -2510,6 +2512,9 @@ void CButtonPanel::DoClicked(int button, const Qt::KeyboardModifiers key_modifie
 			break;
 		case ButtonCmd::Faction:
 			DoClicked_Faction(button);
+			break;
+		case ButtonCmd::PotentialNeutralFaction:
+			CPlayer::GetThisPlayer()->Notify(notification_type::yellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("Neutral factions spawn on their own."));
 			break;
 		case ButtonCmd::Quest:
 			DoClicked_Quest(button);
