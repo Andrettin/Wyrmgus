@@ -1167,7 +1167,7 @@ void map_template::apply_subtemplates(const QPoint &template_start_pos, const QP
 	std::vector<map_template *> optional_subtemplates;
 
 	for (map_template *subtemplate : this->get_subtemplates()) {
-		if (!subtemplate->history->is_active()) {
+		if (game::get()->get_current_campaign() != nullptr && !subtemplate->history->is_active()) {
 			continue;
 		}
 
