@@ -499,7 +499,7 @@ public:
 			return find_iterator->second;
 		}
 
-		throw std::runtime_error("No resource amount set for 0 A.D. template \"" + template_name + "\".");
+		return 0;
 	}
 
 	int get_0_ad_water_height_multiplier() const
