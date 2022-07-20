@@ -1199,7 +1199,7 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 
 				//Wyrmgus start
 				//if is accessing a building of another player, set color to that of the person player (i.e. for training buttons)
-				if (CPlayer::GetThisPlayer()->has_building_access(Selected[0]->Player, button->Action)) {
+				if (CPlayer::GetThisPlayer()->has_building_access(Selected[0]->Player, button->Action) && button->Action != ButtonCmd::PotentialNeutralFaction) {
 					player_color = CPlayer::GetThisPlayer()->get_player_color();
 				}
 				//Wyrmgus end
@@ -1235,10 +1235,12 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 
 					label.Draw(pos.x + 46 - wyrmgus::defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string, render_commands);
 				}
-			} else if ( //draw researched technologies (or acquired abilities) grayed
+			} else if (
 				((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass || button->Action == ButtonCmd::Dynasty) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), button_upgrade->ID) == 'R')
 				|| (button->Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::get(button->ValueStr)) == CUpgrade::get(button->ValueStr)->MaxLimit)
+				|| (button->Action == ButtonCmd::PotentialNeutralFaction && Selected[0]->get_site()->get_neutral_factions().at(button->Value) == Selected[0]->Player->get_faction())
 			) {
+				//draw researched technologies (or acquired abilities) grayed
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(*button, ButtonUnderCursor),
 												   pos, str, player_color, border_color, false, true, 100, render_commands);
@@ -1437,7 +1439,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().size()) && CPlayer::GetThisPlayer()->can_found_faction<true>(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(buttonaction.Value));
 			break;
 		case ButtonCmd::PotentialNeutralFaction:
-			res = Selected[0]->get_site() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(Selected[0]->get_site()->get_neutral_factions().size());
+			res = game::get()->get_current_campaign() != nullptr && Selected[0]->get_site() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(Selected[0]->get_site()->get_neutral_factions().size());
 			break;
 		case ButtonCmd::Dynasty:
 			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) && CPlayer::GetThisPlayer()->can_choose_dynasty<true>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]) && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_icon() != nullptr;
@@ -1546,7 +1548,7 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = CPlayer::GetThisPlayer()->can_found_faction(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(buttonaction.Value));
 			break;
 		case ButtonCmd::PotentialNeutralFaction:
-			res = true;
+			res = Selected[0]->Player->get_faction() != Selected[0]->get_site()->get_neutral_factions().at(buttonaction.Value);
 			break;
 		case ButtonCmd::Dynasty:
 			res = CPlayer::GetThisPlayer()->can_choose_dynasty(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]);
