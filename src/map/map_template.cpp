@@ -3499,6 +3499,10 @@ bool map_template::is_dependent_on(const map_template *other_template) const
 		return false;
 	}
 
+	if (other_template == this) {
+		return false;
+	}
+
 	for (const map_template *map_template : this->dependency_templates) {
 		if (map_template == other_template || map_template->is_dependent_on(other_template)) {
 			return true;
