@@ -2644,7 +2644,7 @@ QSize map_template::get_applied_size() const
 
 bool map_template::is_optional_for_campaign(const campaign *campaign) const
 {
-	return this->is_optional() && !campaign->is_required_map_template(this);
+	return this->is_optional() && (campaign == nullptr || !campaign->is_required_map_template(this));
 }
 
 bool map_template::is_pos_usable(const QPoint &pos) const
