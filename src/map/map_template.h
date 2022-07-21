@@ -71,6 +71,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_OBJECT
 
 	Q_PROPERTY(QSize size MEMBER size READ get_size)
+	Q_PROPERTY(int scale_divisor MEMBER scale_divisor READ get_scale_divisor)
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
 	Q_PROPERTY(bool optional MEMBER optional READ is_optional)
 	Q_PROPERTY(bool constructed_only MEMBER constructed_only READ is_constructed_only)
@@ -176,6 +177,11 @@ public:
 	int get_height() const
 	{
 		return this->get_size().height();
+	}
+
+	int get_scale_divisor() const
+	{
+		return this->scale_divisor;
 	}
 
 	const QPoint &get_start_pos() const
@@ -721,6 +727,7 @@ private:
 	std::filesystem::path trade_route_file;
 	std::filesystem::path territory_file;
 	QSize size = QSize(0, 0);
+	int scale_divisor = 1;
 public:
 	int Priority = 100; //the priority of this map template, for the order of application of subtemplates
 private:

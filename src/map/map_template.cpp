@@ -2937,6 +2937,8 @@ void map_template::load_0_ad_terrain_file()
 	this->overlay_terrain_image = QImage(pmp.map_size * pmp_patch::tile_size, pmp.map_size * pmp_patch::tile_size, QImage::Format_RGBA8888);
 	this->overlay_terrain_image.fill(Qt::transparent);
 
+	const int map_scale_divisor = this->get_scale_divisor();
+
 	int patch_x = 0;
 	int patch_y = pmp.map_size - 1;
 	for (const pmp_patch &patch : pmp.patches) {
@@ -3108,7 +3110,7 @@ void map_template::load_0_ad_terrain_file()
 					for (int i = 0; i < quantity; ++i) {
 						auto unit = std::make_unique<map_template_unit>(unit_type, true);
 						unit->set_unit_class(unit_class);
-						unit->set_pos(pos);
+						unit->set_pos(pos / map_scale_divisor);
 						unit->set_player_index(player);
 						if (resource_amount > 0) {
 							unit->set_resource_amount(resource_amount);
@@ -3154,6 +3156,75 @@ void map_template::load_0_ad_terrain_file()
 	std::sort(this->units.begin(), this->units.end(), [](const std::unique_ptr<map_template_unit> &lhs, const std::unique_ptr<map_template_unit> &rhs) {
 		return lhs->is_temporary() == rhs->is_temporary() || lhs->is_temporary();
 	});
+
+	//de-scale the map
+	assert_throw(this->terrain_image.size() == this->overlay_terrain_image.size());
+	if ((this->terrain_image.size() / map_scale_divisor) != this->get_size()) {
+		throw std::runtime_error("The de-scaled size of the 0 A.D. map " + size::to_string((this->terrain_image.size() / map_scale_divisor)) + "is different than that of the map template " + size::to_string(this->get_size())  + ".");
+	}
+
+	QImage new_terrain_image(this->get_size(), QImage::Format_RGBA8888);
+	new_terrain_image.fill(Qt::transparent);
+	QImage new_overlay_terrain_image(this->get_size(), QImage::Format_RGBA8888);
+	new_overlay_terrain_image.fill(Qt::transparent);
+
+	for (int x = 0; x < this->get_width(); ++x) {
+		for (int y = 0; y < this->get_height(); ++y) {
+			const QPoint tile_pos(x, y);
+
+			color_map<int> color_counts;
+			color_map<int> overlay_color_counts;
+
+			for (int x_offset = 0; x_offset < map_scale_divisor; ++x_offset) {
+				for (int y_offset = 0; y_offset < map_scale_divisor; ++y_offset) {
+					const QPoint offset(x_offset, y_offset);
+					const QPoint image_pos = tile_pos * map_scale_divisor + offset;
+					++color_counts[this->terrain_image.pixelColor(image_pos)];
+					++overlay_color_counts[this->overlay_terrain_image.pixelColor(image_pos)];
+				}
+			}
+
+			std::vector<QColor> best_colors;
+			int best_color_count = 0;
+			for (const auto &[color, color_count] : color_counts) {
+				if (color_count > best_color_count) {
+					best_colors.clear();
+					best_color_count = color_count;
+				}
+
+				if (color_count >= best_color_count) {
+					best_colors.push_back(color);
+				}
+			}
+
+			assert_throw(best_color_count > 0);
+			assert_throw(!best_colors.empty());
+			const QColor best_color = best_colors.size() == 1 ? best_colors.front() : vector::get_random(best_colors);
+			new_terrain_image.setPixelColor(tile_pos, best_color);
+
+			std::vector<QColor> best_overlay_colors;
+			int best_overlay_color_count = 0;
+			for (const auto &[color, color_count] : overlay_color_counts) {
+				if (color_count > best_overlay_color_count) {
+					best_overlay_colors.clear();
+					best_overlay_color_count = color_count;
+				}
+
+				if (color_count >= best_overlay_color_count) {
+					best_overlay_colors.push_back(color);
+				}
+			}
+
+			assert_throw(best_overlay_color_count > 0);
+			assert_throw(!best_overlay_colors.empty());
+
+			const QColor best_overlay_color = best_overlay_colors.size() == 1 ? best_overlay_colors.front() : vector::get_random(best_overlay_colors);
+			new_overlay_terrain_image.setPixelColor(tile_pos, best_overlay_color);
+		}
+	}
+
+	this->terrain_image = new_terrain_image;
+	this->overlay_terrain_image = new_overlay_terrain_image;
 }
 
 void map_template::load_freeciv_terrain_file()
