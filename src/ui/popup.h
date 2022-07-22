@@ -107,6 +107,7 @@ public:
 	char faction = 0; //check if the button represents a faction
 	char FactionUpgrade = 0;	/// check if the button's upgrade is a faction upgrade
 	char FactionCoreSettlements = 0; /// check if the button's faction has core settlements
+	char FactionMaxNeutralBuildings = 0;
 	char DynastyUpgrade = 0;	/// check if the button's upgrade is a dynasty upgrade
 	char UpgradeResearched = 0;	/// check if the button's upgrade has already been researched
 	char Ability = 0;			/// check if the button's upgrade is an ability

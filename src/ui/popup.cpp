@@ -834,6 +834,8 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 			condition->DynastyUpgrade = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "FactionCoreSettlements")) {
 			condition->FactionCoreSettlements = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "FactionMaxNeutralBuildings")) {
+			condition->FactionMaxNeutralBuildings = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ResearchedUpgrade")) {
 			condition->ResearchedUpgrade = CUpgrade::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "ResearchedUpgradeClass")) {

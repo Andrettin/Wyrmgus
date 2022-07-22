@@ -172,6 +172,7 @@ enum EString {
 	EString_FactionType,		/// Faction's type
 	EString_FactionRequirementsString,
 	EString_FactionCoreSettlements,	/// Core settlements of the faction
+	EString_FactionMaxNeutralBuildings,
 	EString_ResourceIdent,	/// Resource's ident
 	EString_ResourceName,	/// Resource's name
 	//Wyrmgus end

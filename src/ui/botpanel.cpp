@@ -434,6 +434,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
+	if (condition->FactionMaxNeutralBuildings != CONDITION_TRUE) {
+		if ((condition->FactionMaxNeutralBuildings == CONDITION_ONLY) ^ (button.Action == ButtonCmd::PotentialNeutralFaction && button.Value != -1 && Selected[0]->get_site()->get_neutral_factions().at(button.Value)->get_max_neutral_buildings() > 0)) {
+			return false;
+		}
+	}
+	
 	const CUpgrade *upgrade = nullptr;
 	if (button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility) {
 		upgrade = button.get_value_upgrade(Selected[0]);
@@ -1549,7 +1555,17 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 			break;
 		case ButtonCmd::PotentialNeutralFaction: {
 			const faction *neutral_faction = Selected[0]->get_site()->get_neutral_factions().at(buttonaction.Value);
-			res = Selected[0]->Player->get_faction() != neutral_faction && (neutral_faction->get_neutral_site_conditions() == nullptr || neutral_faction->get_neutral_site_conditions()->check(Selected[0], read_only_context::from_scope(Selected[0]))) && (neutral_faction->get_neutral_site_spawn_conditions() == nullptr || neutral_faction->get_neutral_site_spawn_conditions()->check(Selected[0], read_only_context::from_scope(Selected[0])));
+
+			int neutral_faction_buildings = 0;
+			const CPlayer *neutral_faction_player = GetFactionPlayer(neutral_faction);
+			if (neutral_faction_player != nullptr) {
+				neutral_faction_buildings = neutral_faction_player->NumBuildings;
+			}
+
+			res = Selected[0]->Player->get_faction() != neutral_faction
+				&& (neutral_faction->get_neutral_site_conditions() == nullptr || neutral_faction->get_neutral_site_conditions()->check(Selected[0], read_only_context::from_scope(Selected[0])))
+				&& (neutral_faction->get_neutral_site_spawn_conditions() == nullptr || neutral_faction->get_neutral_site_spawn_conditions()->check(Selected[0], read_only_context::from_scope(Selected[0])))
+				&& (neutral_faction->get_max_neutral_buildings() == 0 || neutral_faction_buildings < neutral_faction->get_max_neutral_buildings());
 			break;
 		}
 		case ButtonCmd::Dynasty:

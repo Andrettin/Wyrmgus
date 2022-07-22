@@ -1263,6 +1263,9 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "FactionCoreSettlements")) {
 			res->e = EString_FactionCoreSettlements;
 			res->D.Faction = CclParseFactionDesc(l);
+		} else if (!strcmp(key, "FactionMaxNeutralBuildings")) {
+			res->e = EString_FactionMaxNeutralBuildings;
+			res->D.Faction = CclParseFactionDesc(l);
 		} else if (!strcmp(key, "ResourceIdent")) {
 			res->e = EString_ResourceIdent;
 			res->D.Resource = CclParseResourceDesc(l);
@@ -1913,6 +1916,20 @@ std::string EvalString(const StringDesc *s)
 			} else {
 				return std::string();
 			}
+		case EString_FactionMaxNeutralBuildings:
+			faction = s->D.Faction;
+			
+			if (faction != nullptr && (*faction) != nullptr && (*faction)->get_max_neutral_buildings() > 0) {
+				int building_count = 0;
+				const CPlayer *faction_player = GetFactionPlayer(*faction);
+				if (faction_player != nullptr) {
+					building_count = faction_player->NumBuildings;
+				}
+
+				return std::to_string(building_count) + "/" + std::to_string((*faction)->get_max_neutral_buildings());
+			}
+
+			return std::string();
 		case EString_ResourceIdent : // resource ident
 			resource = s->D.Resource;
 			if (resource != nullptr) {
@@ -2786,17 +2803,14 @@ static int CclFactionRequirementsString(lua_State *l)
 	return Alias(l, "FactionRequirementsString");
 }
 
-/**
-**  Return equivalent lua table for FactionCoreSettlements.
-**  {"FactionCoreSettlements", {}}
-**
-**  @param l  Lua state.
-**
-**  @return   equivalent lua table.
-*/
 static int CclFactionCoreSettlements(lua_State *l)
 {
 	return Alias(l, "FactionCoreSettlements");
+}
+
+static int CclFactionMaxNeutralBuildings(lua_State *l)
+{
+	return Alias(l, "FactionMaxNeutralBuildings");
 }
 
 static int CclButtonPlayer(lua_State *l)
@@ -3070,6 +3084,7 @@ static void AliasRegister()
 	lua_register(Lua, "FactionType", CclFactionType);
 	lua_register(Lua, "FactionRequirementsString", CclFactionRequirementsString);
 	lua_register(Lua, "FactionCoreSettlements", CclFactionCoreSettlements);
+	lua_register(Lua, "FactionMaxNeutralBuildings", CclFactionMaxNeutralBuildings);
 	lua_register(Lua, "ButtonPlayer", CclButtonPlayer);
 	lua_register(Lua, "ResourceIdent", CclResourceIdent);
 	lua_register(Lua, "ResourceName", CclResourceName);
