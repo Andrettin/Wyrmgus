@@ -654,6 +654,11 @@ void game::do_neutral_faction_expansion(const faction *faction)
 
 			CreateUnit(site_game_data->get_site_unit()->tilePos, *building_type, faction_player, site_game_data->get_site_unit()->MapLayer->ID, false, nullptr, false);
 
+			const site *settlement = site_game_data->get_site_unit()->get_settlement();
+			if (settlement != nullptr && settlement->get_game_data()->get_owner() != nullptr) {
+				settlement->get_game_data()->get_owner()->notify(notification_type::green, site_game_data->get_site_unit()->tilePos, site_game_data->get_site_unit()->MapLayer->ID, "The " + faction->get_name() + " neutral faction has set up operations in " + settlement->get_game_data()->get_current_cultural_name() + "!");
+			}
+
 			++placed_buildings;
 			vector::shuffle(building_types);
 			break;
