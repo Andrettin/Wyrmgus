@@ -179,6 +179,10 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 
 			this->generated_terrains.push_back(std::move(generated_terrain));
 		});
+	} else if (tag == "generated_sites") {
+		for (const std::string &value : values) {
+			this->generated_sites.push_back(site::get(value));
+		}
 	} else if (tag == "generated_neutral_units" || tag == "player_location_generated_neutral_units") {
 		scope.for_each_property([&](const gsml_property &property) {
 			unit_type *unit_type = unit_type::get(property.get_key());
@@ -1303,12 +1307,6 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 
 void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
-	const campaign *current_campaign = game::get()->get_current_campaign();
-	CDate start_date;
-	if (current_campaign != nullptr) {
-		start_date = current_campaign->get_start_date();
-	}
-
 	for (const site *site : this->sites) {
 		const QPoint site_raw_pos = site->get_pos();
 		QPoint site_pos(map_start_pos + site_raw_pos - template_start_pos);
@@ -1361,331 +1359,261 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 
-		try {
-			this->apply_site(site, site_pos, z);
-		} catch (...) {
-			std::throw_with_nested(std::runtime_error("Failed to apply site \"" + site->get_identifier() + "\"."));
+		this->apply_site(site, site_pos, z);
+	}
+
+	for (const site *site : this->generated_sites) {
+		if (site->get_game_data()->is_on_map()) {
+			//already applied
+			continue;
 		}
+
+		const unit_type *base_unit_type = site->get_base_unit_type();
+
+		if (base_unit_type == nullptr) {
+			continue;
+		}
+
+		const QPoint unit_offset = base_unit_type->get_tile_center_pos_offset();
+
+		const QPoint site_pos = CMap::get()->generate_unit_location(base_unit_type, CPlayer::get_neutral_player(), map_start_pos, map_end - QPoint(1, 1), z, site) + unit_offset;
+
+		if (!CMap::get()->Info->IsPointOnMap(site_pos, z)) {
+			continue;
+		}
+
+		this->apply_site(site, site_pos, z);
 	}
 }
 
 void map_template::apply_site(const site *site, const QPoint &site_pos, const int z) const
 {
-	const unit_type *base_unit_type = site->get_base_unit_type();
+	try {
+		const unit_type *base_unit_type = site->get_base_unit_type();
 
-	if (base_unit_type != nullptr && CMap::get()->get_settings()->is_unit_type_disabled(base_unit_type)) {
-		base_unit_type = nullptr;
-	}
-
-	if (base_unit_type != nullptr && base_unit_type->BoolFlag[STAR_INDEX].value && site->get_satellites().empty()) {
-		//do not apply stars which have no satellites
-		return;
-	}
-
-	Vec2i unit_offset(0, 0);
-	if (base_unit_type != nullptr) {
-		unit_offset = (base_unit_type->get_tile_size() - QSize(1, 1)) / 2;
-	}
-
-	site_game_data *site_game_data = site->get_game_data();
-
-	site_game_data->set_map_pos(site_pos);
-	site_game_data->set_map_layer(CMap::get()->MapLayers[z].get());
-
-	const wyrmgus::site *settlement = site->get_settlement() ? site->get_settlement() : CMap::get()->Field(site_pos, z)->get_settlement();
-
-	//it is acceptable sites with geocoordinate to have their positions shifted, e.g. if it was coastal to shift it enough inland to give space for the building to be placed
-	const bool is_position_shift_acceptable = !site->get_geocoordinate().is_null() || !site->get_astrocoordinate().is_null();
-
-	bool first_building = true;
-
-	if (base_unit_type != nullptr) {
-		if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
-			fprintf(stderr, "The site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
+		if (base_unit_type != nullptr && CMap::get()->get_settings()->is_unit_type_disabled(base_unit_type)) {
+			base_unit_type = nullptr;
 		}
 
-		const bool no_bordering_impassable = is_position_shift_acceptable;
-
-		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::get_neutral_player(), z, no_bordering_impassable, settlement);
-
-		this->apply_unit_site_properties(unit, site);
-
-		if (!site->is_settlement()) {
-			first_building = false;
+		if (base_unit_type != nullptr && base_unit_type->BoolFlag[STAR_INDEX].value && site->get_satellites().empty()) {
+			//do not apply stars which have no satellites
+			return;
 		}
 
-		if (site->get_orbit_center() != nullptr && site->get_base_unit_type() != nullptr && site->get_base_unit_type()->BoolFlag[CELESTIAL_BODY_INDEX].value) {
-			CMap::get()->add_orbiting_celestial_body_unit(unit);
+		Vec2i unit_offset(0, 0);
+		if (base_unit_type != nullptr) {
+			unit_offset = (base_unit_type->get_tile_size() - QSize(1, 1)) / 2;
 		}
 
-		if (site->get_mass() != 0 && base_unit_type->get_default_mass() != 0 && site->get_mass() != base_unit_type->get_default_mass() && unit->ResourcesHeld != 0) {
-			//change the unit's resources held depending on the difference between its mass and the default mass of its base unit type
-			const int mass_multiplier = resource::get_mass_multiplier(site->get_mass(), base_unit_type->get_default_mass());
+		site_game_data *site_game_data = site->get_game_data();
 
-			const int resource_quantity = unit->ResourcesHeld * mass_multiplier / 100;
-			unit->SetResourcesHeld(resource_quantity);
-			unit->Variable[GIVERESOURCE_INDEX].Value = resource_quantity;
-			unit->Variable[GIVERESOURCE_INDEX].Max = resource_quantity;
-			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
-		}
+		site_game_data->set_map_pos(site_pos);
+		site_game_data->set_map_layer(CMap::get()->MapLayers[z].get());
 
-		//if the site is a connector, and the destination site has already been applied, establish the connection
-		if (site->get_connection_destination() != nullptr) {
-			CMap::get()->MapLayers[z]->LayerConnectors.push_back(unit);
+		const wyrmgus::site *settlement = site->get_settlement() ? site->get_settlement() : CMap::get()->Field(site_pos, z)->get_settlement();
 
-			wyrmgus::site_game_data *destination_site_game_data = site->get_connection_destination()->get_game_data();
+		//it is acceptable sites with geocoordinate to have their positions shifted, e.g. if it was coastal to shift it enough inland to give space for the building to be placed
+		const bool is_position_shift_acceptable = !site->get_geocoordinate().is_null() || !site->get_astrocoordinate().is_null();
 
-			if (destination_site_game_data->get_site_unit() != nullptr) {
-				destination_site_game_data->get_site_unit()->ConnectingDestination = unit;
-				unit->ConnectingDestination = destination_site_game_data->get_site_unit();
-			}
-		}
-	}
+		bool first_building = true;
 
-	const campaign *current_campaign = game::get()->get_current_campaign();
-	CDate start_date;
-	if (current_campaign != nullptr) {
-		start_date = current_campaign->get_start_date();
-	}
-
-	if (!site->get_satellites().empty()) {
-		int64_t orbit_distance = 0;
-
-		for (const wyrmgus::site *satellite : site->get_satellites()) {
-			const bool is_substantial_celestial_body = satellite->get_base_unit_type()->BoolFlag[BUILDING_INDEX].value;
-
-			if (is_substantial_celestial_body) {
-				this->apply_satellite_site(satellite, orbit_distance);
-			}
-		}
-
-		//apply asteroids later
-		for (const wyrmgus::site *satellite : site->get_satellites()) {
-			const bool is_substantial_celestial_body = satellite->get_base_unit_type()->BoolFlag[BUILDING_INDEX].value;
-
-			if (!is_substantial_celestial_body) {
-				this->apply_satellite_site(satellite, orbit_distance);
-			}
-		}
-	}
-
-	if (current_campaign == nullptr) {
-		return;
-	}
-
-	site_history *site_history = site->get_history();
-
-	const faction *site_owner = site_history->get_owner();
-	if (site_owner == nullptr) {
-		//fall back to the old historical owners functionality
-		for (std::map<CDate, const faction *>::const_reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
-			if (start_date.ContainsDate(owner_iterator->first)) { // set the owner to the latest historical owner given the scenario's start date
-				site_owner = owner_iterator->second;
-				break;
-			}
-		}
-	}
-
-	if (site != settlement && settlement != nullptr) {
-		const faction *settlement_owner = settlement->get_history()->get_owner();
-		if (settlement_owner != nullptr && site_owner != settlement_owner && (site_owner == nullptr || !site_owner->has_neutral_type())) {
-			//if the site owner is different from the settlement owner, the latter is non-null, and the site owner is not a neutral faction, then override the site owner with the settlement owner
-			site_owner = settlement_owner;
-		}
-	}
-
-	if (site_owner == nullptr || site_history->get_building_classes().empty()) {
-		if (site_history->get_neutral_building_type() != nullptr) {
-			CreateUnit(site_game_data->get_map_pos(), *site_history->get_neutral_building_type(), CPlayer::get_neutral_player(), z, true, settlement);
-		}
-	}
-
-	if (site_owner == nullptr) {
-		return;
-	}
-
-	CPlayer *player = GetOrAddFactionPlayer(site_owner);
-
-	if (player == nullptr) {
-		return;
-	}
-
-	bool is_capital = site_owner->get_history()->get_capital() == site;
-	if (!is_capital) {
-		for (int i = ((int) site_owner->HistoricalCapitals.size() - 1); i >= 0; --i) {
-			if (start_date.ContainsDate(site_owner->HistoricalCapitals[i].first) || site_owner->HistoricalCapitals[i].first.Year == 0) {
-				if (site_owner->HistoricalCapitals[i].second == site->Ident) {
-					is_capital = true;
-				}
-				break;
-			}
-		}
-	}
-
-	if ((player->StartPos.x == 0 && player->StartPos.y == 0) || is_capital) {
-		player->SetStartView(site_pos, z);
-	}
-
-	const unit_type *pathway_type = nullptr;
-	if (site_history->get_pathway_class() != nullptr) {
-		pathway_type = site_owner->get_class_unit_type(site_history->get_pathway_class());
-	}
-
-	for (size_t j = 0; j < site->HistoricalBuildings.size(); ++j) {
-		if (
-			start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
-			&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
-		) {
-			const unit_type *unit_type = site_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
-
-			if (unit_type == nullptr) {
-				continue;
+		if (base_unit_type != nullptr) {
+			if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
+				fprintf(stderr, "The site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
 			}
 
-			if (unit_type->get_terrain_type() != nullptr && unit_type->get_terrain_type()->is_pathway()) {
-				pathway_type = unit_type;
-			}
-		}
-	}
+			const bool no_bordering_impassable = is_position_shift_acceptable;
 
-	bool built_ontop = false;
+			CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::get_neutral_player(), z, no_bordering_impassable, settlement);
 
-	for (const unit_class *building_class : site_history->get_building_classes()) {
-		const unit_type *unit_type = site_owner->get_class_unit_type(building_class);
+			this->apply_unit_site_properties(unit, site);
 
-		if (unit_type == nullptr) {
-			continue;
-		}
-
-		if (unit_type->get_terrain_type() != nullptr) {
-			throw std::runtime_error("A terrain type building (e.g. a wall) cannot be applied from the list of historical building classes of a site.");
-		}
-
-		if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_settlement()) {
-			throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a town hall, but isn't set as a settlement one.");
-		}
-
-		const on_top_build_restriction *ontop = OnTopDetails(*unit_type, nullptr);
-		if (ontop != nullptr && ontop->Parent != nullptr) {
-			if (ontop->Parent != base_unit_type) {
-				throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a building (\"" + unit_type->get_identifier() + "\") which requires being built over a \"" + ontop->Parent->get_identifier() + "\", but the site does not have that as its base unit type.");
+			if (!site->is_settlement()) {
+				first_building = false;
 			}
 
-			if (built_ontop) {
-				throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a building (\"" + unit_type->get_identifier() + "\") which requires being built over a \"" + ontop->Parent->get_identifier() + "\", but the site has already been built upon.");
+			if (site->get_orbit_center() != nullptr && site->get_base_unit_type() != nullptr && site->get_base_unit_type()->BoolFlag[CELESTIAL_BODY_INDEX].value) {
+				CMap::get()->add_orbiting_celestial_body_unit(unit);
 			}
 
-			built_ontop = true;
-		}
+			if (site->get_mass() != 0 && base_unit_type->get_default_mass() != 0 && site->get_mass() != base_unit_type->get_default_mass() && unit->ResourcesHeld != 0) {
+				//change the unit's resources held depending on the difference between its mass and the default mass of its base unit type
+				const int mass_multiplier = resource::get_mass_multiplier(site->get_mass(), base_unit_type->get_default_mass());
 
-		const QPoint building_unit_offset = unit_type->get_tile_center_pos_offset();
-		if (!is_position_shift_acceptable && first_building) {
-			if (ontop == nullptr && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
-				throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on " + point::to_string(site->get_pos()) + ", but it cannot be there.");
+				const int resource_quantity = unit->ResourcesHeld * mass_multiplier / 100;
+				unit->SetResourcesHeld(resource_quantity);
+				unit->Variable[GIVERESOURCE_INDEX].Value = resource_quantity;
+				unit->Variable[GIVERESOURCE_INDEX].Max = resource_quantity;
+				unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 			}
-		}
 
-		CUnit *unit = CreateUnit(site_game_data->get_map_pos(), *unit_type, player, z, true, settlement);
+			//if the site is a connector, and the destination site has already been applied, establish the connection
+			if (site->get_connection_destination() != nullptr) {
+				CMap::get()->MapLayers[z]->LayerConnectors.push_back(unit);
 
-		if (first_building) {
-			if (base_unit_type == nullptr && !site->get_name().empty()) {
-				//if one building is representing a site with no base unit type, make it have the site's name
-				unit->Name = site->get_cultural_name(site_owner->get_civilization());
-			}
-			first_building = false;
-		}
+				wyrmgus::site_game_data *destination_site_game_data = site->get_connection_destination()->get_game_data();
 
-		if (unit_type->BoolFlag[TOWNHALL_INDEX].value) {
-			unit->UpdateBuildingSettlementAssignment();
-		}
-
-		if (pathway_type != nullptr) {
-			for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->get_tile_width() + 1; ++x) {
-				for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->get_tile_height() + 1; ++y) {
-					if (!CMap::get()->Info->IsPointOnMap(x, y, unit->MapLayer)) {
-						continue;
-					}
-					tile &mf = *unit->MapLayer->Field(x, y);
-					if (mf.has_flag(tile_flag::building)) {
-						//this is a tile where the building itself is located, continue
-						continue;
-					}
-					const QPoint pathway_pos(x, y);
-					if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit->MapLayer->ID)) {
-						continue;
-					}
-
-					mf.SetTerrain(pathway_type->get_terrain_type());
+				if (destination_site_game_data->get_site_unit() != nullptr) {
+					destination_site_game_data->get_site_unit()->ConnectingDestination = unit;
+					unit->ConnectingDestination = destination_site_game_data->get_site_unit();
 				}
 			}
 		}
-	}
 
-	for (size_t j = 0; j < site->HistoricalBuildings.size(); ++j) {
-		if (
-			start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
-			&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
-		) {
-			const faction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
-			const unit_type *unit_type = nullptr;
+		const campaign *current_campaign = game::get()->get_current_campaign();
+		CDate start_date;
+		if (current_campaign != nullptr) {
+			start_date = current_campaign->get_start_date();
+		}
 
-			if (building_owner) {
-				unit_type = building_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
-			} else {
-				unit_type = site_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
+		if (!site->get_satellites().empty()) {
+			int64_t orbit_distance = 0;
+
+			for (const wyrmgus::site *satellite : site->get_satellites()) {
+				const bool is_substantial_celestial_body = satellite->get_base_unit_type()->BoolFlag[BUILDING_INDEX].value;
+
+				if (is_substantial_celestial_body) {
+					this->apply_satellite_site(satellite, orbit_distance);
+				}
 			}
+
+			//apply asteroids later
+			for (const wyrmgus::site *satellite : site->get_satellites()) {
+				const bool is_substantial_celestial_body = satellite->get_base_unit_type()->BoolFlag[BUILDING_INDEX].value;
+
+				if (!is_substantial_celestial_body) {
+					this->apply_satellite_site(satellite, orbit_distance);
+				}
+			}
+		}
+
+		if (current_campaign == nullptr) {
+			return;
+		}
+
+		site_history *site_history = site->get_history();
+
+		const faction *site_owner = site_history->get_owner();
+		if (site_owner == nullptr) {
+			//fall back to the old historical owners functionality
+			for (std::map<CDate, const faction *>::const_reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
+				if (start_date.ContainsDate(owner_iterator->first)) { // set the owner to the latest historical owner given the scenario's start date
+					site_owner = owner_iterator->second;
+					break;
+				}
+			}
+		}
+
+		if (site != settlement && settlement != nullptr) {
+			const faction *settlement_owner = settlement->get_history()->get_owner();
+			if (settlement_owner != nullptr && site_owner != settlement_owner && (site_owner == nullptr || !site_owner->has_neutral_type())) {
+				//if the site owner is different from the settlement owner, the latter is non-null, and the site owner is not a neutral faction, then override the site owner with the settlement owner
+				site_owner = settlement_owner;
+			}
+		}
+
+		if (site_owner == nullptr || site_history->get_building_classes().empty()) {
+			if (site_history->get_neutral_building_type() != nullptr) {
+				CreateUnit(site_game_data->get_map_pos(), *site_history->get_neutral_building_type(), CPlayer::get_neutral_player(), z, true, settlement);
+			}
+		}
+
+		if (site_owner == nullptr) {
+			return;
+		}
+
+		CPlayer *player = GetOrAddFactionPlayer(site_owner);
+
+		if (player == nullptr) {
+			return;
+		}
+
+		bool is_capital = site_owner->get_history()->get_capital() == site;
+		if (!is_capital) {
+			for (int i = ((int)site_owner->HistoricalCapitals.size() - 1); i >= 0; --i) {
+				if (start_date.ContainsDate(site_owner->HistoricalCapitals[i].first) || site_owner->HistoricalCapitals[i].first.Year == 0) {
+					if (site_owner->HistoricalCapitals[i].second == site->Ident) {
+						is_capital = true;
+					}
+					break;
+				}
+			}
+		}
+
+		if ((player->StartPos.x == 0 && player->StartPos.y == 0) || is_capital) {
+			player->SetStartView(site_pos, z);
+		}
+
+		const unit_type *pathway_type = nullptr;
+		if (site_history->get_pathway_class() != nullptr) {
+			pathway_type = site_owner->get_class_unit_type(site_history->get_pathway_class());
+		}
+
+		for (size_t j = 0; j < site->HistoricalBuildings.size(); ++j) {
+			if (
+				start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
+				&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
+				) {
+				const unit_type *unit_type = site_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
+
+				if (unit_type == nullptr) {
+					continue;
+				}
+
+				if (unit_type->get_terrain_type() != nullptr && unit_type->get_terrain_type()->is_pathway()) {
+					pathway_type = unit_type;
+				}
+			}
+		}
+
+		bool built_ontop = false;
+
+		for (const unit_class *building_class : site_history->get_building_classes()) {
+			const unit_type *unit_type = site_owner->get_class_unit_type(building_class);
 
 			if (unit_type == nullptr) {
 				continue;
 			}
 
 			if (unit_type->get_terrain_type() != nullptr) {
-				continue;
+				throw std::runtime_error("A terrain type building (e.g. a wall) cannot be applied from the list of historical building classes of a site.");
 			}
 
 			if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_settlement()) {
-				fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): site has a town hall, but isn't set as a settlement one.\n", site->Ident.c_str());
-				continue;
+				throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a town hall, but isn't set as a settlement one.");
 			}
 
-			const Vec2i building_unit_offset((unit_type->get_tile_size() - QSize(1, 1)) / 2);
+			const on_top_build_restriction *ontop = OnTopDetails(*unit_type, nullptr);
+			if (ontop != nullptr && ontop->Parent != nullptr) {
+				if (ontop->Parent != base_unit_type) {
+					throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a building (\"" + unit_type->get_identifier() + "\") which requires being built over a \"" + ontop->Parent->get_identifier() + "\", but the site does not have that as its base unit type.");
+				}
+
+				if (built_ontop) {
+					throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a building (\"" + unit_type->get_identifier() + "\") which requires being built over a \"" + ontop->Parent->get_identifier() + "\", but the site has already been built upon.");
+				}
+
+				built_ontop = true;
+			}
+
+			const QPoint building_unit_offset = unit_type->get_tile_center_pos_offset();
 			if (!is_position_shift_acceptable && first_building) {
-				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset + Vec2i(unit_type->get_tile_size() - QSize(1, 1)), z)) {
-					fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->get_identifier().c_str(), site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
+				if (ontop == nullptr && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
+					throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on " + point::to_string(site->get_pos()) + ", but it cannot be there.");
 				}
 			}
 
-			CUnit *unit = nullptr;
-
-			if (building_owner) {
-				CPlayer *building_player = GetOrAddFactionPlayer(building_owner);
-
-				if (!building_player) {
-					continue;
-				}
-
-				if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
-					building_player->SetStartView(site_pos - building_unit_offset, z);
-				}
-
-				unit = CreateUnit(site_pos - building_unit_offset, *unit_type, building_player, z, true, settlement);
-			} else {
-				unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, settlement);
-			}
-
-			if (std::get<3>(site->HistoricalBuildings[j])) {
-				unit->set_unique(std::get<3>(site->HistoricalBuildings[j]));
-			}
+			CUnit *unit = CreateUnit(site_game_data->get_map_pos(), *unit_type, player, z, true, settlement);
 
 			if (first_building) {
-				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && unit->get_unique() == nullptr && (!building_owner || building_owner == site_owner)) {
-					//if one building is representing a minor site, make it have the site's name
+				if (base_unit_type == nullptr && !site->get_name().empty()) {
+					//if one building is representing a site with no base unit type, make it have the site's name
 					unit->Name = site->get_cultural_name(site_owner->get_civilization());
 				}
 				first_building = false;
 			}
 
-			if (unit_type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == site_owner)) {
+			if (unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 				unit->UpdateBuildingSettlementAssignment();
 			}
 
@@ -1700,7 +1628,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 							//this is a tile where the building itself is located, continue
 							continue;
 						}
-						Vec2i pathway_pos(x, y);
+						const QPoint pathway_pos(x, y);
 						if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit->MapLayer->ID)) {
 							continue;
 						}
@@ -1710,77 +1638,170 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 				}
 			}
 		}
-	}
 
-	if (defines::get()->is_population_enabled()) {
-		if (site->is_settlement() && site_owner != nullptr && site_game_data->get_site_unit() != nullptr) {
-			site_game_data->set_default_population_type_population(site_history->get_population());
-			site_history->set_population(0);
-		}
-	} else {
-		int64_t population = site_history->get_population();
+		for (size_t j = 0; j < site->HistoricalBuildings.size(); ++j) {
+			if (
+				start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
+				&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
+				) {
+				const faction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
+				const unit_type *unit_type = nullptr;
 
-		for (auto &[unit_class, group_population] : site_history->get_population_groups()) {
-			population -= group_population;
-
-			this->apply_population_unit(unit_class, group_population, site_game_data->get_map_pos(), z, player, settlement);
-
-			//population that isn't enough to be applied as a unit of its own
-			const int64_t remaining_group_population = group_population % defines::get()->get_population_per_unit();
-			group_population = remaining_group_population;
-		}
-
-		if (population != 0) { //remaining population after subtracting the amount of population specified to belong to particular groups
-			const unit_class *population_class = player->get_default_population_unit_class(base_unit_type ? base_unit_type->get_domain() : unit_domain::land);
-
-			this->apply_population_unit(population_class, population, site_game_data->get_map_pos(), z, player, settlement);
-
-			const int64_t remaining_population = population % defines::get()->get_population_per_unit();
-			population = remaining_population;
-		}
-
-		population = std::max<int64_t>(0, population);
-		site_history->set_population(population);
-	}
-
-	for (size_t j = 0; j < site->HistoricalUnits.size(); ++j) {
-		if (
-			start_date.ContainsDate(std::get<0>(site->HistoricalUnits[j]))
-			&& (!start_date.ContainsDate(std::get<1>(site->HistoricalUnits[j])) || std::get<1>(site->HistoricalUnits[j]).Year == 0)
-			) {
-			int unit_quantity = std::get<3>(site->HistoricalUnits[j]);
-
-			if (unit_quantity > 0) {
-				const unit_type *type = std::get<2>(site->HistoricalUnits[j]);
-				if (type->BoolFlag[ORGANIC_INDEX].value) {
-					//each organic unit represents a certain amount of people
-					unit_quantity = unit_quantity / defines::get()->get_population_per_unit();
+				if (building_owner) {
+					unit_type = building_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
+				} else {
+					unit_type = site_owner->get_class_unit_type(std::get<2>(site->HistoricalBuildings[j]));
 				}
 
-				CPlayer *unit_player = nullptr;
-				const faction *unit_owner = std::get<4>(site->HistoricalUnits[j]);
-				if (unit_owner) {
-					unit_player = GetOrAddFactionPlayer(unit_owner);
-					if (!unit_player) {
+				if (unit_type == nullptr) {
+					continue;
+				}
+
+				if (unit_type->get_terrain_type() != nullptr) {
+					continue;
+				}
+
+				if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_settlement()) {
+					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): site has a town hall, but isn't set as a settlement one.\n", site->Ident.c_str());
+					continue;
+				}
+
+				const Vec2i building_unit_offset((unit_type->get_tile_size() - QSize(1, 1)) / 2);
+				if (!is_position_shift_acceptable && first_building) {
+					if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset, z) && CMap::get()->Info->IsPointOnMap(site_pos - building_unit_offset + Vec2i(unit_type->get_tile_size() - QSize(1, 1)), z)) {
+						fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->get_identifier().c_str(), site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
+					}
+				}
+
+				CUnit *unit = nullptr;
+
+				if (building_owner) {
+					CPlayer *building_player = GetOrAddFactionPlayer(building_owner);
+
+					if (!building_player) {
 						continue;
 					}
-					if (unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
-						unit_player->SetStartView(site_pos, z);
-					}
-				} else {
-					unit_player = player;
-				}
-				const Vec2i historical_unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 
-				for (int k = 0; k < unit_quantity; ++k) {
-					CUnit *unit = CreateUnit(site_pos - historical_unit_offset, *type, unit_player, z, false, settlement);
-					if (!type->BoolFlag[HARVESTER_INDEX].value) { // make non-worker units not have an active AI
-						unit->Active = 0;
-						unit_player->ChangeUnitTypeAiActiveCount(type, -1);
+					if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
+						building_player->SetStartView(site_pos - building_unit_offset, z);
+					}
+
+					unit = CreateUnit(site_pos - building_unit_offset, *unit_type, building_player, z, true, settlement);
+				} else {
+					unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, settlement);
+				}
+
+				if (std::get<3>(site->HistoricalBuildings[j])) {
+					unit->set_unique(std::get<3>(site->HistoricalBuildings[j]));
+				}
+
+				if (first_building) {
+					if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && unit->get_unique() == nullptr && (!building_owner || building_owner == site_owner)) {
+						//if one building is representing a minor site, make it have the site's name
+						unit->Name = site->get_cultural_name(site_owner->get_civilization());
+					}
+					first_building = false;
+				}
+
+				if (unit_type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == site_owner)) {
+					unit->UpdateBuildingSettlementAssignment();
+				}
+
+				if (pathway_type != nullptr) {
+					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->get_tile_width() + 1; ++x) {
+						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->get_tile_height() + 1; ++y) {
+							if (!CMap::get()->Info->IsPointOnMap(x, y, unit->MapLayer)) {
+								continue;
+							}
+							tile &mf = *unit->MapLayer->Field(x, y);
+							if (mf.has_flag(tile_flag::building)) {
+								//this is a tile where the building itself is located, continue
+								continue;
+							}
+							Vec2i pathway_pos(x, y);
+							if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit->MapLayer->ID)) {
+								continue;
+							}
+
+							mf.SetTerrain(pathway_type->get_terrain_type());
+						}
 					}
 				}
 			}
 		}
+
+		if (defines::get()->is_population_enabled()) {
+			if (site->is_settlement() && site_owner != nullptr && site_game_data->get_site_unit() != nullptr) {
+				site_game_data->set_default_population_type_population(site_history->get_population());
+				site_history->set_population(0);
+			}
+		} else {
+			int64_t population = site_history->get_population();
+
+			for (auto &[unit_class, group_population] : site_history->get_population_groups()) {
+				population -= group_population;
+
+				this->apply_population_unit(unit_class, group_population, site_game_data->get_map_pos(), z, player, settlement);
+
+				//population that isn't enough to be applied as a unit of its own
+				const int64_t remaining_group_population = group_population % defines::get()->get_population_per_unit();
+				group_population = remaining_group_population;
+			}
+
+			if (population != 0) { //remaining population after subtracting the amount of population specified to belong to particular groups
+				const unit_class *population_class = player->get_default_population_unit_class(base_unit_type ? base_unit_type->get_domain() : unit_domain::land);
+
+				this->apply_population_unit(population_class, population, site_game_data->get_map_pos(), z, player, settlement);
+
+				const int64_t remaining_population = population % defines::get()->get_population_per_unit();
+				population = remaining_population;
+			}
+
+			population = std::max<int64_t>(0, population);
+			site_history->set_population(population);
+		}
+
+		for (size_t j = 0; j < site->HistoricalUnits.size(); ++j) {
+			if (
+				start_date.ContainsDate(std::get<0>(site->HistoricalUnits[j]))
+				&& (!start_date.ContainsDate(std::get<1>(site->HistoricalUnits[j])) || std::get<1>(site->HistoricalUnits[j]).Year == 0)
+				) {
+				int unit_quantity = std::get<3>(site->HistoricalUnits[j]);
+
+				if (unit_quantity > 0) {
+					const unit_type *type = std::get<2>(site->HistoricalUnits[j]);
+					if (type->BoolFlag[ORGANIC_INDEX].value) {
+						//each organic unit represents a certain amount of people
+						unit_quantity = unit_quantity / defines::get()->get_population_per_unit();
+					}
+
+					CPlayer *unit_player = nullptr;
+					const faction *unit_owner = std::get<4>(site->HistoricalUnits[j]);
+					if (unit_owner) {
+						unit_player = GetOrAddFactionPlayer(unit_owner);
+						if (!unit_player) {
+							continue;
+						}
+						if (unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
+							unit_player->SetStartView(site_pos, z);
+						}
+					} else {
+						unit_player = player;
+					}
+					const Vec2i historical_unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
+
+					for (int k = 0; k < unit_quantity; ++k) {
+						CUnit *unit = CreateUnit(site_pos - historical_unit_offset, *type, unit_player, z, false, settlement);
+						if (!type->BoolFlag[HARVESTER_INDEX].value) { // make non-worker units not have an active AI
+							unit->Active = 0;
+							unit_player->ChangeUnitTypeAiActiveCount(type, -1);
+						}
+					}
+				}
+			}
+		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to apply site \"" + site->get_identifier() + "\"."));
 	}
 }
 

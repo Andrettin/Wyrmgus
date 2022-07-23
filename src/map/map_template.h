@@ -779,6 +779,7 @@ private:
 	bool clear_path_to_other_subtemplates = false; //whether to clear a path to other subtemplates from this subtemplate's clear edge points
 	std::vector<map_template *> subtemplates;
 	std::vector<std::unique_ptr<generated_terrain>> generated_terrains; //terrains generated in the map template
+	std::vector<const site *> generated_sites;
 public:
 	std::vector<std::pair<unit_type *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<unit_type *, int>> PlayerLocationGeneratedNeutralUnits;
