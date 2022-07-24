@@ -697,9 +697,16 @@ void game::do_neutral_faction_contraction(const faction *faction)
 			continue;
 		}
 
-		if (!faction->get_neutral_site_conditions()->check(building, read_only_context::from_scope(building))) {
-			LetUnitDie(*building);
+		if (faction->get_neutral_site_conditions()->check(building, read_only_context::from_scope(building))) {
+			continue;
 		}
+
+		const site *settlement = building->get_settlement();
+		if (settlement != nullptr && settlement->get_game_data()->get_owner() != nullptr) {
+			settlement->get_game_data()->get_owner()->notify(notification_type::green, building->tilePos, building->MapLayer->ID, "The " + faction->get_name() + " neutral faction has abandoned its operations in " + settlement->get_game_data()->get_current_cultural_name() + "!");
+		}
+
+		LetUnitDie(*building);
 	}
 }
 
