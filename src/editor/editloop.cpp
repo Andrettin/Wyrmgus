@@ -2513,6 +2513,8 @@ boost::asio::awaitable<void> EditorMainLoop()
 		co_await WaitEventsOneFrame();
 	}
 
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
+
 	game::get()->clear_results();
 	game::get()->set_running(false); //should use something different instead?
 	CEditor::get()->set_running(false);

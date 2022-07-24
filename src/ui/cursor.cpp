@@ -92,6 +92,16 @@ void cursor::set_current_cursor(cursor *cursor, const bool notify)
 
 	if (notify) {
 		cursor::on_current_cursor_changed();
+	} else {
+		cursor::current_cursor_changed = true;
+	}
+}
+
+void cursor::check_current_cursor_changed()
+{
+	if (cursor::current_cursor_changed) {
+		on_current_cursor_changed();
+		cursor::current_cursor_changed = false;
 	}
 }
 

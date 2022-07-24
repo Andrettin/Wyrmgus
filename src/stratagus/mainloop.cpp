@@ -171,7 +171,7 @@ void DoScrollArea(int state, bool fast, bool isKeyboard, const Qt::KeyboardModif
 
 	vp->Set(vp->MapPos, vp->Offset + offset);
 
-	// This recalulates some values
+	// This recalculates some values
 	HandleMouseMove(CursorScreenPos, key_modifiers);
 }
 
@@ -554,4 +554,6 @@ boost::asio::awaitable<void> GameMainLoop()
 	GodMode = false;
 
 	SetCallbacks(old_callbacks);
+
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 }

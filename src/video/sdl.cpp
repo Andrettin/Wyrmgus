@@ -826,8 +826,6 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 		++SlowFrameCounter;
 	}
 
-	const cursor *old_cursor = cursor::get_current_cursor();
-
 	InputMouseTimeout(*GetCallbacks(), ticks, stored_key_modifiers);
 	InputKeyTimeout(*GetCallbacks(), ticks, stored_key_modifiers);
 	CursorAnimate(ticks);
@@ -929,12 +927,8 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 
 	cursor::set_last_scroll_pos(QPoint(-1, -1));
 
-	const cursor *new_cursor = cursor::get_current_cursor();
-
-	if (old_cursor != new_cursor) {
-		//if the current cursor changed because of mouse events, trigger the necessary updates
-		cursor::on_current_cursor_changed();
-	}
+	//if the current cursor changed because of input events, trigger the necessary updates
+	cursor::check_current_cursor_changed();
 
 	//update the current map viewport top left pixel pos after all mouse input events have been processed, to pool their effects together
 	engine_interface::get()->update_map_view_top_left_pixel_pos();

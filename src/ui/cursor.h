@@ -85,6 +85,7 @@ public:
 	}
 
 	static void set_current_cursor(cursor *cursor, const bool notify);
+	static void check_current_cursor_changed();
 	static void on_current_cursor_changed();
 
 	static const QPoint &get_last_scroll_pos()
@@ -100,6 +101,7 @@ public:
 private:
 	static inline std::map<cursor_type, cursor *> cursors_by_type;
 	static inline cursor *current_cursor = nullptr;
+	static inline bool current_cursor_changed = false;
 	static inline QPoint last_scroll_pos = QPoint(-1, -1); //the last scroll position in this SDL tick if the map has been scrolled via mouse move with the scroll cursor type
 
 public:

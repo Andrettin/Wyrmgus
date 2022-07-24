@@ -1454,7 +1454,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos, const Qt::KeyboardModifiers ke
 	}
 
 	UnitUnderCursor = nullptr;
-	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false);  // Reset
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false);  //reset
 	HandleMouseOn(cursorPos);
 
 	// Restrict mouse to minimap when dragging
@@ -1501,6 +1501,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos, const Qt::KeyboardModifiers ke
 	if (CurrentCursorState == CursorState::Select) {
 		if (CursorOn == cursor_on::map || CursorOn == cursor_on::minimap) {
 			cursor::set_current_cursor(UI.get_cursor(cursor_type::yellow_hair), false);
+
 			if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				if (UnitUnderCursor->Player == CPlayer::GetThisPlayer() ||
 					CPlayer::GetThisPlayer()->is_allied_with(*UnitUnderCursor)) {
