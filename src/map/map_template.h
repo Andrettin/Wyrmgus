@@ -57,6 +57,7 @@ class historical_unit;
 class map_projection;
 class map_template_history;
 class map_template_unit;
+class region;
 class site;
 class terrain_type;
 class tile;
@@ -150,6 +151,7 @@ public:
 	void apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void apply_site(const site *site, const QPoint &site_pos, const int z) const;
 	void apply_satellite_site(const site *site, int64_t &orbit_distance) const;
+	void generate_site(const site *site, const QPoint &map_start_pos, const QPoint &map_end, const int z) const;
 	void apply_population_unit(const unit_class *unit_class, const int population, const QPoint &unit_pos, const int z, CPlayer *player, const site *settlement) const;
 	void apply_remaining_site_populations() const;
 	void ApplyConnectors(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
@@ -780,6 +782,7 @@ private:
 	std::vector<map_template *> subtemplates;
 	std::vector<std::unique_ptr<generated_terrain>> generated_terrains; //terrains generated in the map template
 	std::vector<const site *> generated_sites;
+	std::vector<const region *> generated_site_regions;
 public:
 	std::vector<std::pair<unit_type *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<unit_type *, int>> PlayerLocationGeneratedNeutralUnits;

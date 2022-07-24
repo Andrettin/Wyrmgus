@@ -36,6 +36,7 @@ struct site_compare
 };
 
 using site_set = std::set<const site *, site_compare>;
+using mutable_site_set = std::set<site *, site_compare>;
 
 template <typename T>
 using site_map = std::map<const site *, T, site_compare>;

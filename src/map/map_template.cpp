@@ -51,6 +51,7 @@
 #include "map/map_template_history.h"
 #include "map/map_template_unit.h"
 #include "map/pmp.h"
+#include "map/region.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "map/site_history.h"
@@ -87,6 +88,7 @@
 #include "util/number_util.h"
 #include "util/path_util.h"
 #include "util/point_util.h"
+#include "util/set_util.h"
 #include "util/size_util.h"
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
@@ -182,6 +184,10 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 	} else if (tag == "generated_sites") {
 		for (const std::string &value : values) {
 			this->generated_sites.push_back(site::get(value));
+		}
+	} else if (tag == "generated_site_regions") {
+		for (const std::string &value : values) {
+			this->generated_site_regions.push_back(region::get(value));
 		}
 	} else if (tag == "generated_neutral_units" || tag == "player_location_generated_neutral_units") {
 		scope.for_each_property([&](const gsml_property &property) {
@@ -1362,27 +1368,15 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		this->apply_site(site, site_pos, z);
 	}
 
-	for (const site *site : this->generated_sites) {
-		if (site->get_game_data()->is_on_map()) {
-			//already applied
-			continue;
-		}
+	site_set generated_site_set = container::to_set<std::vector<const site *>, site_set>(this->generated_sites);
+	for (const region *region : this->generated_site_regions) {
+		set::merge(generated_site_set, region->get_sites());
+	}
 
-		const unit_type *base_unit_type = site->get_base_unit_type();
+	const std::vector<const site *> generated_sites = vector::shuffled(container::to_vector(generated_site_set));
 
-		if (base_unit_type == nullptr) {
-			continue;
-		}
-
-		const QPoint unit_offset = base_unit_type->get_tile_center_pos_offset();
-
-		const QPoint site_pos = CMap::get()->generate_unit_location(base_unit_type, CPlayer::get_neutral_player(), map_start_pos, map_end - QPoint(1, 1), z, site) + unit_offset;
-
-		if (!CMap::get()->Info->IsPointOnMap(site_pos, z)) {
-			continue;
-		}
-
-		this->apply_site(site, site_pos, z);
+	for (const site *site : generated_sites) {
+		this->generate_site(site, map_start_pos, map_end, z);
 	}
 }
 
@@ -1890,6 +1884,36 @@ void map_template::apply_satellite_site(const site *satellite, int64_t &orbit_di
 	}
 }
 
+void map_template::generate_site(const site *site, const QPoint &map_start_pos, const QPoint &map_end, const int z) const
+{
+	if (site->get_game_data()->is_on_map()) {
+		//already applied
+		return;
+	}
+
+	for (const std::unique_ptr<map_template_unit> &map_template_unit : this->units) {
+		if (map_template_unit->get_site() == site) {
+			return;
+		}
+	}
+
+	const unit_type *base_unit_type = site->get_base_unit_type();
+
+	if (base_unit_type == nullptr) {
+		return;
+	}
+
+	const QPoint unit_offset = base_unit_type->get_tile_center_pos_offset();
+
+	const QPoint site_pos = CMap::get()->generate_unit_location(base_unit_type, CPlayer::get_neutral_player(), map_start_pos, map_end - QPoint(1, 1), z, site) + unit_offset;
+
+	if (!CMap::get()->Info->IsPointOnMap(site_pos, z)) {
+		return;
+	}
+
+	this->apply_site(site, site_pos, z);
+}
+
 void map_template::apply_population_unit(const unit_class *unit_class, const int population, const QPoint &unit_pos, const int z, CPlayer *player, const site *settlement) const
 {
 	const unit_type *unit_type = player->get_class_unit_type(unit_class);
@@ -2110,8 +2134,15 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			const unit_type *unit_type = map_template_unit->get_type();
 
 			const QPoint unit_pos = map_start_pos + map_template_unit->get_pos() - template_start_pos;
+
+			const site *site = map_template_unit->get_site();
 			const faction *faction = map_template_unit->get_faction();
 			const int player_index = map_template_unit->get_player_index();
+
+			if (site != nullptr && game::get()->get_current_campaign() != nullptr && faction == nullptr && player_index != -1) {
+				this->apply_site(site, unit_pos, z);
+				continue;
+			}
 
 			CPlayer *player = CPlayer::get_neutral_player();
 
@@ -2142,7 +2173,6 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 
 			CUnit *unit = CreateUnit(unit_pos - unit_type->get_tile_center_pos_offset(), *unit_type, player, z, map_template_unit->is_position_adjustment_enabled(), nullptr, true);
 
-			const site *site = map_template_unit->get_site();
 			if (site != nullptr) {
 				this->apply_unit_site_properties(unit, site);
 

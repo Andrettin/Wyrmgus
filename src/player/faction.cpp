@@ -701,7 +701,7 @@ void faction::remove_dynasty(const wyrmgus::dynasty *dynasty)
 
 std::vector<site *> faction::get_all_neutral_target_sites() const
 {
-	std::set<site *> target_site_set = container::to_set(this->get_neutral_target_sites());
+	mutable_site_set target_site_set = container::to_set<std::vector<site *>, mutable_site_set>(this->get_neutral_target_sites());
 
 	for (const region *target_region : this->get_neutral_target_regions()) {
 		set::merge(target_site_set, target_region->get_sites());
