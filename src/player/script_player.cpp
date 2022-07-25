@@ -450,10 +450,10 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				CUpgrade *modifier_upgrade = CUpgrade::get(LuaToString(l, j + 1, k + 1));
+				const CUpgrade *modifier_upgrade = CUpgrade::get(LuaToString(l, j + 1, k + 1));
 				++k;
-				int end_cycle = LuaToNumber(l, j + 1, k + 1);
-				this->Modifiers.push_back(std::pair<CUpgrade *, int>(modifier_upgrade, end_cycle));
+				const int end_cycle = LuaToNumber(l, j + 1, k + 1);
+				this->modifier_last_cycles[modifier_upgrade] = end_cycle;
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "autosell-resources")) {
@@ -2556,11 +2556,6 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "FailQuest")) {
 		wyrmgus::quest *quest = wyrmgus::quest::get(LuaToString(l, 3));
 		p->fail_quest(quest);
-	} else if (!strcmp(data, "AddModifier")) {
-		LuaCheckArgs(l, 4);
-		CUpgrade *modifier_upgrade = CUpgrade::get(LuaToString(l, 3));
-		int cycles = LuaToNumber(l, 4);
-		p->AddModifier(modifier_upgrade, cycles);
 	//Wyrmgus end
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

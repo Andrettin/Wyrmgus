@@ -124,6 +124,7 @@
 #include "util/container_util.h"
 #include "util/event_loop.h"
 #include "util/log_util.h"
+#include "util/map_util.h"
 #include "util/set_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
@@ -837,11 +838,15 @@ void CPlayer::Save(CFile &file) const
 	file.printf("},");
 	
 	file.printf("\n  \"modifiers\", {");
-	for (size_t j = 0; j < p.Modifiers.size(); ++j) {
-		if (j) {
-			file.printf(" ");
+	first = true;
+	for (const auto &[modifier, last_cycle] : this->modifier_last_cycles) {
+		if (first) {
+			first = false;
+		} else {
+			file.printf(", ");
 		}
-		file.printf("\"%s\", %d,", p.Modifiers[j].first->get_identifier().c_str(), p.Modifiers[j].second);
+
+		file.printf("\"%s\", %d", modifier->get_identifier().c_str(), last_cycle);
 	}
 	file.printf("},");
 	//Wyrmgus end
@@ -2959,7 +2964,7 @@ void CPlayer::Clear()
 	this->completed_quests.clear();
 	this->AutosellResources.clear();
 	this->quest_objectives.clear();
-	this->Modifiers.clear();
+	this->modifier_last_cycles.clear();
 	//Wyrmgus end
 	this->AiEnabled = false;
 	this->revealed = false;
@@ -3728,35 +3733,37 @@ void CPlayer::on_resource_gathered(const wyrmgus::resource *resource, const int 
 		this->update_current_quests();
 	}
 }
-
-void CPlayer::AddModifier(CUpgrade *modifier, int cycles)
-{
-	if (this->Allow.Upgrades[modifier->ID] == 'R') {
-		for (size_t i = 0; i < this->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
-			if (this->Modifiers[i].first == modifier) {
-				this->Modifiers[i].second = std::max(this->Modifiers[i].second, (int) (GameCycle + cycles));
-			}
-		}
-	} else {
-		this->Modifiers.push_back(std::pair<CUpgrade *, int>(modifier, GameCycle + cycles));
-		this->acquire_upgrade(modifier);
-	}
-	
-}
-
-void CPlayer::RemoveModifier(CUpgrade *modifier)
-{
-	if (this->Allow.Upgrades[modifier->ID] == 'R') {
-		this->lose_upgrade(modifier);
-		for (size_t i = 0; i < this->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
-			if (this->Modifiers[i].first == modifier) {
-				this->Modifiers.erase(std::remove(this->Modifiers.begin(), this->Modifiers.end(), this->Modifiers[i]), this->Modifiers.end());
-				break;
-			}
-		}
-	}
-}
 //Wyrmgus end
+
+QVariantList CPlayer::get_modifiers_qvariant_list() const
+{
+	return map::to_qvariant_list(this->get_modifier_last_cycles());
+}
+
+void CPlayer::add_modifier(const CUpgrade *modifier, const int cycles)
+{
+	const int last_cycle = GameCycle + cycles;
+
+	if (!this->has_upgrade(modifier)) {
+		this->acquire_upgrade(modifier);
+		this->modifier_last_cycles[modifier] = std::max(this->modifier_last_cycles[modifier], last_cycle);
+	} else {
+		this->modifier_last_cycles[modifier] = last_cycle;
+	}
+
+	emit modifiers_changed();
+}
+
+void CPlayer::remove_modifier(const CUpgrade *modifier)
+{
+	if (this->has_upgrade(modifier)) {
+		this->lose_upgrade(modifier);
+	}
+
+	this->modifier_last_cycles.erase(modifier);
+
+	emit modifiers_changed();
+}
 
 bool CPlayer::at_war() const
 {
@@ -4879,12 +4886,16 @@ void PlayersEachCycle()
 				}
 			}
 
+			std::vector<const CUpgrade *> modifiers_to_remove;
 
-			for (size_t i = 0; i < p->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
-				if ((unsigned long) p->Modifiers[i].second < GameCycle) {
-					p->RemoveModifier(p->Modifiers[i].first); //only remove one modifier per cycle, to prevent too many upgrade changes from happening at the same cycle (for performance reasons)
-					break;
+			for (const auto &[modifier, last_cycle] : p->get_modifier_last_cycles()) {
+				if (GameCycle > last_cycle) {
+					modifiers_to_remove.push_back(modifier);
 				}
+			}
+
+			for (const CUpgrade *modifier : modifiers_to_remove) {
+				p->remove_modifier(modifier);
 			}
 
 			if (p->HeroCooldownTimer) {

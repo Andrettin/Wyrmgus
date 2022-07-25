@@ -33,6 +33,7 @@
 #include "ui/icon.h"
 #include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
+#include "upgrade/upgrade_container.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/qunique_ptr.h"
 #include "vec2i.h"
@@ -121,6 +122,7 @@ class CPlayer final : public QObject
 	Q_PROPERTY(qint64 population READ get_population NOTIFY population_changed)
 	Q_PROPERTY(int trade_cost READ get_trade_cost NOTIFY trade_cost_changed)
 	Q_PROPERTY(QVariantList current_special_resources READ get_current_special_resources_qvariant_list NOTIFY current_special_resources_changed)
+	Q_PROPERTY(QVariantList modifiers READ get_modifiers_qvariant_list NOTIFY modifiers_changed)
 
 public:
 	static constexpr int max_heroes = 4; //maximum heroes per player
@@ -407,8 +409,14 @@ public:
 	void on_unit_destroyed(const CUnit *unit);
 	void on_resource_gathered(const wyrmgus::resource *resource, const int quantity);
 
-	void AddModifier(CUpgrade *modifier, int cycles);
-	void RemoveModifier(CUpgrade *modifier);
+	const upgrade_map<int> &get_modifier_last_cycles() const
+	{
+		return this->modifier_last_cycles;
+	}
+
+	QVariantList get_modifiers_qvariant_list() const;
+	void add_modifier(const CUpgrade *modifier, const int cycles);
+	void remove_modifier(const CUpgrade *modifier);
 
 	bool at_war() const;
 
@@ -1268,6 +1276,7 @@ signals:
 	void resource_children_processing_bonus_string_changed(const int resource_index, const QString &str);
 	void trade_cost_changed();
 	void current_special_resources_changed();
+	void modifiers_changed();
 	void diplomatic_stances_changed();
 	void shared_vision_changed();
 
@@ -1348,8 +1357,8 @@ private:
 	std::vector<wyrmgus::quest *> current_quests;			/// quests being pursued by this player
 	std::vector<const wyrmgus::quest *> completed_quests;	/// quests completed by this player
 	std::vector<std::unique_ptr<wyrmgus::player_quest_objective>> quest_objectives; //objectives of the player's current quests
+	upgrade_map<int> modifier_last_cycles;
 public:
-	std::vector<std::pair<CUpgrade *, int>> Modifiers;						/// Modifiers affecting the player, and until which cycle it should last
 	std::vector<int> AutosellResources;
 	//Wyrmgus end
 
