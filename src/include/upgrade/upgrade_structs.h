@@ -55,6 +55,7 @@ namespace wyrmgus {
 	class faction;
 	class icon;
 	class magic_domain;
+	class resource_icon;
 	class unique_item;
 	class unit_class;
 	class unit_type;
@@ -74,7 +75,8 @@ class CUpgrade final : public detailed_data_entry, public data_type<CUpgrade>
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization NOTIFY changed)
 	Q_PROPERTY(wyrmgus::civilization_group* civilization_group MEMBER civilization_group NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction READ get_faction NOTIFY changed)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon NOTIFY changed)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
+	Q_PROPERTY(wyrmgus::resource_icon* resource_icon MEMBER resource_icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::upgrade_class* upgrade_class READ get_upgrade_class WRITE set_upgrade_class NOTIFY changed)
 	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring)
 	Q_PROPERTY(QString effects_string READ get_effects_string_qstring NOTIFY changed)
@@ -214,9 +216,14 @@ public:
 
 	void set_parent(const CUpgrade *parent_upgrade);
 
-	wyrmgus::icon *get_icon() const
+	const wyrmgus::icon *get_icon() const
 	{
 		return this->icon;
+	}
+
+	const wyrmgus::resource_icon *get_resource_icon() const
+	{
+		return this->resource_icon;
 	}
 
 	wyrmgus::upgrade_class *get_upgrade_class() const
@@ -468,6 +475,7 @@ private:
 	std::string effects_string; //effects string of the upgrade
 	std::string requirements_string; //requirements string of the upgrade
 	wyrmgus::icon *icon = nullptr; //icon to display to the user
+	wyrmgus::resource_icon *resource_icon = nullptr; //resource icon to display on the top bar for modifiers
 	std::string button_key;
 	bool ability = false;
 	bool weapon = false;

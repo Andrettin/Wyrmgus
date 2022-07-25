@@ -561,13 +561,13 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit, std::vector<std::fu
 				}
 				//Wyrmgus end
 				
-				wyrmgus::icon &icon = *order.GetUpgrade().get_icon();
+				const icon *icon = order.GetUpgrade().get_icon();
 				int flag = (ButtonAreaUnderCursor == ButtonAreaResearching
 							&& ButtonUnderCursor == 0) ?
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
 				flag |= IconCommandButton;
-				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.get_player_color(), render_commands);
+				icon->DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.get_player_color(), render_commands);
 			}
 			return true;
 		}

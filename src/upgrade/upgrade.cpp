@@ -427,7 +427,7 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 	if (this->get_name().empty()) {
 		this->set_name(parent_upgrade->get_name());
 	}
-	this->icon = parent_upgrade->get_icon();
+	this->icon = parent_upgrade->icon;
 	this->upgrade_class = parent_upgrade->get_upgrade_class();
 	this->set_description(parent_upgrade->get_description());
 	this->set_quote(parent_upgrade->get_quote());
