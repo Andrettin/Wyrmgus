@@ -31,6 +31,7 @@
 #include "config.h"
 #include "database/database.h"
 #include "script/effect/accept_quest_effect.h"
+#include "script/effect/add_modifier_effect.h"
 #include "script/effect/any_unit_of_class_effect.h"
 #include "script/effect/any_unit_of_type_effect.h"
 #include "script/effect/call_dialogue_effect.h"
@@ -134,7 +135,9 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_scope(const gs
 		effect = std::make_unique<random_list_effect<scope_type>>(scope.get_operator());
 	} else {
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {
-			if (effect_identifier == "any_unit_of_class") {
+			if (effect_identifier == "add_modifier") {
+				effect = std::make_unique<add_modifier_effect>(scope.get_operator());
+			} else if (effect_identifier == "any_unit_of_class") {
 				effect = std::make_unique<any_unit_of_class_effect>(scope.get_operator());
 			} else if (effect_identifier == "any_unit_of_type") {
 				effect = std::make_unique<any_unit_of_type_effect>(scope.get_operator());
