@@ -4889,7 +4889,7 @@ void PlayersEachCycle()
 			std::vector<const CUpgrade *> modifiers_to_remove;
 
 			for (const auto &[modifier, last_cycle] : p->get_modifier_last_cycles()) {
-				if (GameCycle > last_cycle) {
+				if (GameCycle > static_cast<unsigned long>(last_cycle)) {
 					modifiers_to_remove.push_back(modifier);
 				}
 			}
