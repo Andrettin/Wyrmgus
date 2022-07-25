@@ -2909,6 +2909,10 @@ void CUnit::SellUnit(CUnit *sold_unit, CPlayer *player)
 
 	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
 		sold_unit->ChangeOwner(*player);
+
+		if (player != this->Player) {
+			sold_unit->set_player_from(this->Player);
+		}
 	}
 
 	player->change_resource(defines::get()->get_wealth_resource(), -sold_unit->GetPrice(), true);
