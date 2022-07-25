@@ -220,12 +220,12 @@ void COrder_Use::Execute(CUnit &unit)
 				} else if (goal->Work != nullptr) {
 					unit.ReadWork(goal->Work);
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->get_identifier()).c_str());
+						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work).c_str());
 					}
 				} else if (goal->Elixir != nullptr) {
 					unit.ConsumeElixir(goal->Elixir);
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->get_identifier()).c_str());
+						unit.Player->Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir).c_str());
 					}
 				} else if (goal->Type->get_given_resource() != nullptr && goal->ResourcesHeld > 0) {
 					if (unit.Player == CPlayer::GetThisPlayer()) {

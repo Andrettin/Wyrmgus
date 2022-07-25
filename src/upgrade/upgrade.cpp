@@ -337,7 +337,7 @@ std::string CUpgrade::get_encyclopedia_text() const
 	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());
 
 	if (this->is_magic_affix()) {
-		const std::string effects = GetUpgradeEffectsString(this->get_identifier());
+		const std::string effects = GetUpgradeEffectsString(this);
 		if (!effects.empty()) {
 			named_data_entry::concatenate_encyclopedia_text(text, "Effects: " + effects);
 		}
@@ -540,9 +540,9 @@ bool CUpgrade::check_drop_conditions(const CUnit *dropper, const CPlayer *droppe
 	return false;
 }
 
-QString CUpgrade::get_upgrade_effects_qstring() const
+QString CUpgrade::get_upgrade_effects_qstring(bool multiline, unsigned indent) const
 {
-	return QString::fromStdString(GetUpgradeEffectsString(this->get_identifier()));
+	return QString::fromStdString(GetUpgradeEffectsString(this, multiline, indent));
 }
 
 bool CUpgrade::has_researcher_for_civilization(const wyrmgus::civilization *civilization) const
@@ -1767,17 +1767,15 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 }
 
 //Wyrmgus start
-std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool multiline)
+std::string GetUpgradeEffectsString(const CUpgrade *upgrade, const bool multiline, const size_t indent)
 {
-	const CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
-	
 	std::string padding_string = ", ";
 	if (multiline) {
 		padding_string = "\n";
-	}
 
-	if (upgrade == nullptr) {
-		return std::string();
+		if (indent > 0) {
+			padding_string += std::string(indent, '\t');
+		}
 	}
 
 	std::string upgrade_effects_string;
@@ -1826,21 +1824,35 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool multi
 				upgrade_effects_string += GetVariableDisplayName(var);
 
 				bool first_unit_type = true;
-				for (const unit_type *unit_type : unit_type::get_all()) {
+
+				for (const unit_type *unit_type : modifier->get_unit_types()) {
 					if (unit_type->is_template()) {
 						continue;
 					}
 
-					if (modifier->applies_to(unit_type)) {
-						if (!first_unit_type) {
-							upgrade_effects_string += ", ";
-						} else {
-							upgrade_effects_string += " for ";
-							first_unit_type = false;
-						}
-
-						upgrade_effects_string += unit_type->GetNamePlural();
+					if (!first_unit_type) {
+						upgrade_effects_string += ", ";
+					} else {
+						upgrade_effects_string += " for ";
+						first_unit_type = false;
 					}
+
+					upgrade_effects_string += unit_type->GetNamePlural();
+				}
+
+				for (const unit_class *unit_class : modifier->get_unit_classes()) {
+					if (unit_class->get_unit_types().empty()) {
+						continue;
+					}
+
+					if (!first_unit_type) {
+						upgrade_effects_string += ", ";
+					} else {
+						upgrade_effects_string += " for ";
+						first_unit_type = false;
+					}
+
+					upgrade_effects_string += string::get_plural_form(unit_class->get_name());
 				}
 			}
 
@@ -1879,21 +1891,35 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool multi
 			upgrade_effects_string += " Processing";
 
 			bool first_unit_type = true;
-			for (const unit_type *unit_type : unit_type::get_all()) {
+
+			for (const unit_type *unit_type : modifier->get_unit_types()) {
 				if (unit_type->is_template()) {
 					continue;
 				}
 
-				if (modifier->applies_to(unit_type)) {
-					if (!first_unit_type) {
-						upgrade_effects_string += ", ";
-					} else {
-						upgrade_effects_string += " for ";
-						first_unit_type = false;
-					}
-
-					upgrade_effects_string += unit_type->GetNamePlural();
+				if (!first_unit_type) {
+					upgrade_effects_string += ", ";
+				} else {
+					upgrade_effects_string += " for ";
+					first_unit_type = false;
 				}
+
+				upgrade_effects_string += unit_type->GetNamePlural();
+			}
+
+			for (const unit_class *unit_class : modifier->get_unit_classes()) {
+				if (unit_class->get_unit_types().empty()) {
+					continue;
+				}
+
+				if (!first_unit_type) {
+					upgrade_effects_string += ", ";
+				} else {
+					upgrade_effects_string += " for ";
+					first_unit_type = false;
+				}
+
+				upgrade_effects_string += string::get_plural_form(unit_class->get_name());
 			}
 		}
 	}
