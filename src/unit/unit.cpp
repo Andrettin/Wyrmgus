@@ -2901,26 +2901,25 @@ void CUnit::UpdateSoldUnits()
 	}
 }
 
-void CUnit::SellUnit(CUnit *sold_unit, int player)
+void CUnit::SellUnit(CUnit *sold_unit, CPlayer *player)
 {
 	vector::remove(this->SoldUnits, sold_unit);
 
 	sold_unit->drop_out_on_side(sold_unit->Direction, this);
 
 	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
-		sold_unit->ChangeOwner(*CPlayer::Players[player]);
+		sold_unit->ChangeOwner(*player);
 	}
 
-	CPlayer::Players[player]->change_resource(defines::get()->get_wealth_resource(), -sold_unit->GetPrice(), true);
+	player->change_resource(defines::get()->get_wealth_resource(), -sold_unit->GetPrice(), true);
 
-	if (CPlayer::Players[player]->AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
-		CPlayer::Players[player]->Ai->Force.
-			remove_dead_units();
-		CPlayer::Players[player]->Ai->Force.Assign(*sold_unit, -1, true);
+	if (player->AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
+		player->Ai->Force.remove_dead_units();
+		player->Ai->Force.Assign(*sold_unit, -1, true);
 	}
 
 	if (sold_unit->get_character() != nullptr) {
-		CPlayer::Players[player]->HeroCooldownTimer = HeroCooldownCycles;
+		player->HeroCooldownTimer = HeroCooldownCycles;
 		sold_unit->Variable[MANA_INDEX].Value = 0; //start off with 0 mana
 	}
 

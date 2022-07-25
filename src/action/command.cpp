@@ -426,7 +426,7 @@ void CommandBuy(CUnit &unit, CUnit *sold_unit, int player)
 		return;
 	}
 
-	unit.SellUnit(sold_unit, player);
+	unit.SellUnit(sold_unit, CPlayer::Players[player].get());
 }
 
 /**

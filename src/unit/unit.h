@@ -331,7 +331,7 @@ public:
 	void generate_unique(const CUnit *dropper, const CPlayer *dropper_player);
 
 	void UpdateSoldUnits();
-	void SellUnit(CUnit *sold_unit, int player);
+	void SellUnit(CUnit *sold_unit, CPlayer *player);
 
 	void spawn_units();
 	void spawn_units(const std::vector<const unit_type *> &spawned_types);
