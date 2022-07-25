@@ -26,8 +26,7 @@
 
 #pragma once
 
-#include "util/path_util.h"
-#include "util/type_traits.h"
+#include "util/qvariant_util.h"
 
 namespace wyrmgus::container {
 
@@ -51,23 +50,7 @@ inline QVariantList to_qvariant_list(const T &container)
 	QVariantList list;
 
 	for (const typename T::value_type &element : container) {
-		if constexpr (std::is_same_v<typename T::value_type, std::filesystem::path>) {
-			list.append(QVariant::fromValue(path::to_qstring(element)));
-		} else if constexpr (std::is_same_v<typename T::value_type, std::string>) {
-			list.append(QVariant::fromValue(QString::fromStdString(element)));
-		} else if constexpr (std::is_pointer_v<typename T::value_type>) {
-			using mutable_type = std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<typename T::value_type>>>;
-
-			if constexpr (std::is_same_v<typename T::value_type, mutable_type>) {
-				list.append(QVariant::fromValue(element));
-			} else {
-				list.append(QVariant::fromValue(const_cast<mutable_type>(element)));
-			}
-		} else if constexpr (is_specialization_of_v<typename T::value_type, std::unique_ptr>) {
-			list.append(QVariant::fromValue(element.get()));
-		} else {
-			list.append(QVariant::fromValue(element));
-		}
+		list.append(qvariant::from_value<typename T::value_type>(element));
 	}
 
 	return list;
