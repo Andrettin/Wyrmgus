@@ -422,6 +422,10 @@ public:
 
 	bool can_declare_war_on(const CPlayer *other_player) const
 	{
+		if (this->has_neutral_faction_type()) {
+			return false;
+		}
+
 		if (this->is_independent()) {
 			return true;
 		}

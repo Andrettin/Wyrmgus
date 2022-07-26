@@ -250,7 +250,7 @@ void PlayerAi::evaluate_diplomacy()
 	const bool territorial_player = player->NumTownHalls > 0 || player->is_revealed();
 
 	//if we have aren't a territorial player, declare war on the owner of our start tile, if anyone owns it
-	if (!territorial_player) {
+	if (!territorial_player && !player->has_neutral_faction_type()) {
 		const tile *start_tile = CMap::get()->Field(player->StartPos, player->StartMapLayer);
 		CPlayer *tile_owner = start_tile->get_owner();
 
