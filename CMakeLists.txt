@@ -969,6 +969,7 @@ set(wyrmgus_script_condition_HDRS
 	src/script/condition/location_condition.h
 	src/script/condition/near_site_condition.h
 	src/script/condition/nearby_civilization_condition.h
+	src/script/condition/neutral_faction_condition.h
 	src/script/condition/neutral_player_condition.h
 	src/script/condition/not_condition.h
 	src/script/condition/or_condition.h

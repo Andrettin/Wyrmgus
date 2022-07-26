@@ -28,6 +28,7 @@
 
 #include "script/effect/effect.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/assert_util.h"
 #include "util/string_util.h"
 
 namespace wyrmgus {
@@ -63,6 +64,12 @@ public:
 		} else {
 			effect<CPlayer>::process_gsml_property(property);
 		}
+	}
+
+	virtual void check() const override
+	{
+		assert_throw(this->modifier != nullptr);
+		assert_throw(this->cycles != 0);
 	}
 
 	virtual void do_assignment_effect(CPlayer *player) const override
