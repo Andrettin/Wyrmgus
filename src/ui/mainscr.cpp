@@ -61,7 +61,6 @@
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"
 #include "script.h"
-#include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "spell/spell.h"

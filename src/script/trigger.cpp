@@ -39,6 +39,7 @@
 #include "map/map_info.h"
 #include "player/player.h"
 #include "player/player_type.h"
+#include "quest/campaign.h"
 //Wyrmgus start
 #include "quest/quest.h" // for saving quests
 //Wyrmgus end
@@ -623,9 +624,18 @@ void trigger::InitActiveTriggers()
 		if (vector::contains(trigger::DeactivatedTriggers, trigger->get_identifier())) {
 			continue;
 		}
+
 		if (trigger->is_campaign_only() && game::get()->get_current_campaign() == nullptr) {
 			continue;
 		}
+
+		if (game::get()->get_current_campaign() != nullptr && trigger->fires_only_once()) {
+			if (trigger->get_historical_date().isValid() && trigger->get_historical_date() <= game::get()->get_current_campaign()->get_start_date()) {
+				trigger::DeactivatedTriggers.push_back(trigger->get_identifier());
+				continue;
+			}
+		}
+
 		trigger::ActiveTriggers.push_back(trigger);
 	}
 }

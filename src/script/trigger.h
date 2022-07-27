@@ -59,6 +59,7 @@ class trigger final : public data_entry, public data_type<trigger>
 
 	Q_PROPERTY(bool only_once MEMBER only_once READ fires_only_once)
 	Q_PROPERTY(bool campaign_only MEMBER campaign_only READ is_campaign_only)
+	Q_PROPERTY(QDateTime historical_date MEMBER historical_date READ get_historical_date)
 
 public:
 	enum class TriggerType
@@ -95,6 +96,11 @@ public:
 		return this->campaign_only;
 	}
 
+	const QDateTime &get_historical_date() const
+	{
+		return this->historical_date;
+	}
+
 	const std::unique_ptr<condition> &get_preconditions() const
 	{
 		return this->preconditions;
@@ -117,6 +123,7 @@ public:
 private:
 	bool only_once = false; //whether the trigger should occur only once in a game
 	bool campaign_only = false; //whether the trigger should only occur in the campaign mode
+	QDateTime historical_date;
 public:
 	std::unique_ptr<LuaCallback> Conditions;
 	std::unique_ptr<LuaCallback> Effects;
