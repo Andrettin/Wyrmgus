@@ -52,6 +52,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/assert_util.h"
 #include "util/container_util.h"
 #include "util/set_util.h"
 #include "util/string_util.h"
@@ -375,6 +376,14 @@ void faction::check() const
 
 	if (this->get_conditions() != nullptr) {
 		this->get_conditions()->check_validity();
+	}
+
+	for (const auto &[unit_class, unit_type] : this->class_unit_types) {
+		assert_throw(unit_type->get_unit_class() == unit_class);
+	}
+
+	for (const auto &[upgrade_class, upgrade] : this->class_upgrades) {
+		assert_throw(upgrade->get_upgrade_class() == upgrade_class);
 	}
 }
 

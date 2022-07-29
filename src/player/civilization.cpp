@@ -289,7 +289,7 @@ void civilization::check() const
 		this->get_conditions()->check_validity();
 	}
 
-	data_entry::check();
+	civilization_base::check();
 }
 
 std::string civilization::get_encyclopedia_text() const
