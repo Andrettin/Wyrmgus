@@ -458,6 +458,11 @@ static int CalculateDamageStats(const CUnit &attacker, const unit_stats &goal_st
 			}
 		}
 		
+		//add bonus against infantry, if applicable
+		if (attacker.Variable[BONUS_AGAINST_INFANTRY_INDEX].Value > 0 && goal->Type->is_infantry()) {
+			damage_modifier += attacker.Variable[BONUS_AGAINST_INFANTRY_INDEX].Value;
+		}
+		
 		//add bonus against mounted, if applicable
 		if (attacker.Variable[BONUSAGAINSTMOUNTED_INDEX].Value > 0 && goal->Type->BoolFlag[MOUNTED_INDEX].value) {
 			damage_modifier += attacker.Variable[BONUSAGAINSTMOUNTED_INDEX].Value;

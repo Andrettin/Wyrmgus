@@ -251,6 +251,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				case KNOWLEDGEMAGIC_INDEX:
 				case KNOWLEDGEWARFARE_INDEX:
 				case KNOWLEDGEMINING_INDEX:
+				case BONUS_AGAINST_INFANTRY_INDEX:
 				case BONUSAGAINSTMOUNTED_INDEX:
 				case BONUSAGAINSTBUILDINGS_INDEX:
 				case BONUSAGAINSTAIR_INDEX:
@@ -377,6 +378,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				case KNOWLEDGEMAGIC_INDEX:
 				case KNOWLEDGEWARFARE_INDEX:
 				case KNOWLEDGEMINING_INDEX:
+				case BONUS_AGAINST_INFANTRY_INDEX:
 				case BONUSAGAINSTMOUNTED_INDEX:
 				case BONUSAGAINSTBUILDINGS_INDEX:
 				case BONUSAGAINSTAIR_INDEX:
