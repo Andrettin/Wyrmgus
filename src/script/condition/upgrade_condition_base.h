@@ -39,7 +39,7 @@ class upgrade_condition_base : public condition
 public:
 	bool check_upgrade(const civilization *civilization, const CUpgrade *upgrade) const
 	{
-		return upgrade->is_available_for_civilization(civilization);
+		return civilization->get_upgrade() == upgrade || upgrade->is_available_for_civilization(civilization);
 	}
 
 	bool check_upgrade(const CPlayer *player, const CUpgrade *upgrade) const
