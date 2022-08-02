@@ -72,6 +72,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_OBJECT
 
 	Q_PROPERTY(QSize size MEMBER size READ get_size)
+	Q_PROPERTY(int scale_multiplier MEMBER scale_multiplier READ get_scale_multiplier)
 	Q_PROPERTY(int scale_divisor MEMBER scale_divisor READ get_scale_divisor)
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
 	Q_PROPERTY(bool optional MEMBER optional READ is_optional)
@@ -179,6 +180,11 @@ public:
 	int get_height() const
 	{
 		return this->get_size().height();
+	}
+
+	int get_scale_multiplier() const
+	{
+		return this->scale_multiplier;
 	}
 
 	int get_scale_divisor() const
@@ -729,7 +735,8 @@ private:
 	std::filesystem::path trade_route_file;
 	std::filesystem::path territory_file;
 	QSize size = QSize(0, 0);
-	int scale_divisor = 1;
+	int scale_multiplier = 1; //used for Wesnoth maps
+	int scale_divisor = 1; //used for 0 AD maps
 public:
 	int Priority = 100; //the priority of this map template, for the order of application of subtemplates
 private:

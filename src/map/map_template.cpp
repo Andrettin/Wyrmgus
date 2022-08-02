@@ -561,6 +561,9 @@ void map_template::check() const
 	}
 	*/
 
+	assert_throw(this->get_scale_multiplier() >= 1);
+	assert_throw(this->get_scale_divisor() >= 1);
+
 	for (const std::unique_ptr<map_template_unit> &map_template_unit : this->units) {
 		assert_throw(map_template_unit->get_pos().x() < this->get_size().width());
 		assert_throw(map_template_unit->get_pos().y() < this->get_size().height());
@@ -2133,7 +2136,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		for (const std::unique_ptr<map_template_unit> &map_template_unit : this->units) {
 			const unit_type *unit_type = map_template_unit->get_type();
 
-			const QPoint unit_pos = map_start_pos + map_template_unit->get_pos() - template_start_pos;
+			const QPoint unit_pos = map_start_pos + (map_template_unit->get_pos() * this->get_scale_multiplier()) - template_start_pos;
 
 			const site *site = map_template_unit->get_site();
 			const faction *faction = map_template_unit->get_faction();
@@ -2969,6 +2972,50 @@ void map_template::load_wesnoth_terrain_file()
 			}
 		}
 	}
+
+	//scale the map
+	const int map_scale_multiplier = this->get_scale_multiplier();
+
+	if (map_scale_multiplier != 1) {
+		assert_throw(this->terrain_image.size() == this->overlay_terrain_image.size());
+		if ((this->terrain_image.size() * map_scale_multiplier) != this->get_size()) {
+			throw std::runtime_error("The scaled size of the Wesnoth map " + size::to_string((this->terrain_image.size() * map_scale_multiplier)) + "is different than that of the map template " + size::to_string(this->get_size()) + ".");
+		}
+
+		QImage new_terrain_image(this->get_size(), QImage::Format_RGBA8888);
+		new_terrain_image.fill(Qt::transparent);
+		QImage new_overlay_terrain_image(this->get_size(), QImage::Format_RGBA8888);
+		new_overlay_terrain_image.fill(Qt::transparent);
+
+		for (int x = 0; x < this->terrain_image.width(); ++x) {
+			const int column_offset = (x % 2 == 0) ? 0 : -1;
+
+			for (int y = 0; y < this->terrain_image.height(); ++y) {
+				const QPoint base_tile_pos(x, y);
+				const QColor terrain_color = this->terrain_image.pixelColor(base_tile_pos);
+				const QColor overlay_terrain_color = this->overlay_terrain_image.pixelColor(base_tile_pos);
+
+				const QPoint scaled_top_left_tile_pos(x * map_scale_multiplier, y * map_scale_multiplier + column_offset);
+
+				for (int x_offset = 0; x_offset < map_scale_multiplier; ++x_offset) {
+					for (int y_offset = 0; y_offset < map_scale_multiplier; ++y_offset) {
+						const QPoint offset(x_offset, y_offset);
+						const QPoint tile_pos = scaled_top_left_tile_pos + offset;
+
+						if (tile_pos.y() < 0) {
+							continue;
+						}
+
+						new_terrain_image.setPixelColor(tile_pos, terrain_color);
+						new_overlay_terrain_image.setPixelColor(tile_pos, overlay_terrain_color);
+					}
+				}
+			}
+		}
+
+		this->terrain_image = new_terrain_image;
+		this->overlay_terrain_image = new_overlay_terrain_image;
+	}
 }
 
 void map_template::load_0_ad_terrain_file()
@@ -3209,73 +3256,75 @@ void map_template::load_0_ad_terrain_file()
 	});
 
 	//de-scale the map
-	assert_throw(this->terrain_image.size() == this->overlay_terrain_image.size());
-	if ((this->terrain_image.size() / map_scale_divisor) != this->get_size()) {
-		throw std::runtime_error("The de-scaled size of the 0 A.D. map " + size::to_string((this->terrain_image.size() / map_scale_divisor)) + "is different than that of the map template " + size::to_string(this->get_size())  + ".");
-	}
-
-	QImage new_terrain_image(this->get_size(), QImage::Format_RGBA8888);
-	new_terrain_image.fill(Qt::transparent);
-	QImage new_overlay_terrain_image(this->get_size(), QImage::Format_RGBA8888);
-	new_overlay_terrain_image.fill(Qt::transparent);
-
-	for (int x = 0; x < this->get_width(); ++x) {
-		for (int y = 0; y < this->get_height(); ++y) {
-			const QPoint tile_pos(x, y);
-
-			color_map<int> color_counts;
-			color_map<int> overlay_color_counts;
-
-			for (int x_offset = 0; x_offset < map_scale_divisor; ++x_offset) {
-				for (int y_offset = 0; y_offset < map_scale_divisor; ++y_offset) {
-					const QPoint offset(x_offset, y_offset);
-					const QPoint image_pos = tile_pos * map_scale_divisor + offset;
-					++color_counts[this->terrain_image.pixelColor(image_pos)];
-					++overlay_color_counts[this->overlay_terrain_image.pixelColor(image_pos)];
-				}
-			}
-
-			std::vector<QColor> best_colors;
-			int best_color_count = 0;
-			for (const auto &[color, color_count] : color_counts) {
-				if (color_count > best_color_count) {
-					best_colors.clear();
-					best_color_count = color_count;
-				}
-
-				if (color_count >= best_color_count) {
-					best_colors.push_back(color);
-				}
-			}
-
-			assert_throw(best_color_count > 0);
-			assert_throw(!best_colors.empty());
-			const QColor best_color = best_colors.size() == 1 ? best_colors.front() : vector::get_random(best_colors);
-			new_terrain_image.setPixelColor(tile_pos, best_color);
-
-			std::vector<QColor> best_overlay_colors;
-			int best_overlay_color_count = 0;
-			for (const auto &[color, color_count] : overlay_color_counts) {
-				if (color_count > best_overlay_color_count) {
-					best_overlay_colors.clear();
-					best_overlay_color_count = color_count;
-				}
-
-				if (color_count >= best_overlay_color_count) {
-					best_overlay_colors.push_back(color);
-				}
-			}
-
-			assert_throw(best_overlay_color_count > 0);
-			assert_throw(!best_overlay_colors.empty());
-
-			const QColor best_overlay_color = best_overlay_colors.size() == 1 ? best_overlay_colors.front() : vector::get_random(best_overlay_colors);
-			new_overlay_terrain_image.setPixelColor(tile_pos, best_overlay_color);
+	if (map_scale_divisor != 1) {
+		assert_throw(this->terrain_image.size() == this->overlay_terrain_image.size());
+		if ((this->terrain_image.size() / map_scale_divisor) != this->get_size()) {
+			throw std::runtime_error("The de-scaled size of the 0 A.D. map " + size::to_string((this->terrain_image.size() / map_scale_divisor)) + "is different than that of the map template " + size::to_string(this->get_size()) + ".");
 		}
-	}
 
-	this->terrain_image = new_terrain_image;
-	this->overlay_terrain_image = new_overlay_terrain_image;
+		QImage new_terrain_image(this->get_size(), QImage::Format_RGBA8888);
+		new_terrain_image.fill(Qt::transparent);
+		QImage new_overlay_terrain_image(this->get_size(), QImage::Format_RGBA8888);
+		new_overlay_terrain_image.fill(Qt::transparent);
+
+		for (int x = 0; x < this->get_width(); ++x) {
+			for (int y = 0; y < this->get_height(); ++y) {
+				const QPoint tile_pos(x, y);
+
+				color_map<int> color_counts;
+				color_map<int> overlay_color_counts;
+
+				for (int x_offset = 0; x_offset < map_scale_divisor; ++x_offset) {
+					for (int y_offset = 0; y_offset < map_scale_divisor; ++y_offset) {
+						const QPoint offset(x_offset, y_offset);
+						const QPoint image_pos = tile_pos * map_scale_divisor + offset;
+						++color_counts[this->terrain_image.pixelColor(image_pos)];
+						++overlay_color_counts[this->overlay_terrain_image.pixelColor(image_pos)];
+					}
+				}
+
+				std::vector<QColor> best_colors;
+				int best_color_count = 0;
+				for (const auto &[color, color_count] : color_counts) {
+					if (color_count > best_color_count) {
+						best_colors.clear();
+						best_color_count = color_count;
+					}
+
+					if (color_count >= best_color_count) {
+						best_colors.push_back(color);
+					}
+				}
+
+				assert_throw(best_color_count > 0);
+				assert_throw(!best_colors.empty());
+				const QColor best_color = best_colors.size() == 1 ? best_colors.front() : vector::get_random(best_colors);
+				new_terrain_image.setPixelColor(tile_pos, best_color);
+
+				std::vector<QColor> best_overlay_colors;
+				int best_overlay_color_count = 0;
+				for (const auto &[color, color_count] : overlay_color_counts) {
+					if (color_count > best_overlay_color_count) {
+						best_overlay_colors.clear();
+						best_overlay_color_count = color_count;
+					}
+
+					if (color_count >= best_overlay_color_count) {
+						best_overlay_colors.push_back(color);
+					}
+				}
+
+				assert_throw(best_overlay_color_count > 0);
+				assert_throw(!best_overlay_colors.empty());
+
+				const QColor best_overlay_color = best_overlay_colors.size() == 1 ? best_overlay_colors.front() : vector::get_random(best_overlay_colors);
+				new_overlay_terrain_image.setPixelColor(tile_pos, best_overlay_color);
+			}
+		}
+
+		this->terrain_image = new_terrain_image;
+		this->overlay_terrain_image = new_overlay_terrain_image;
+	}
 }
 
 void map_template::load_freeciv_terrain_file()
