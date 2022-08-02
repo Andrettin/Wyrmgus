@@ -75,6 +75,7 @@
 #include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/number_util.h"
+#include "util/path_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
@@ -3149,12 +3150,11 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask, int sortmo
 
 	if (pathtype == 1) {
 		++userdir;
-		std::string dir(parameters::get()->GetUserDirectory());
+		std::filesystem::path dir = parameters::get()->GetUserDirectory();
 		if (!GameName.empty()) {
-			dir += "/";
-			dir += GameName;
+			dir /= GameName;
 		}
-		snprintf(directory, sizeof(directory), "%s/%s", dir.c_str(), userdir);
+		snprintf(directory, sizeof(directory), "%s/%s", path::to_string(dir).c_str(), userdir);
 	} else if (rel) {
 		std::string dir = LibraryFileName(userdir);
 		snprintf(directory, sizeof(directory), "%s", dir.c_str());
@@ -3581,17 +3581,18 @@ void SavePreferences()
 	}
 	blockTableNames.push_back("preferences");
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
-		std::string path = parameters::get()->GetUserDirectory();
+		std::filesystem::path path = parameters::get()->GetUserDirectory();
 
 		if (!GameName.empty()) {
-			path += "/";
-			path += GameName;
+			path /= GameName;
 		}
-		path += "/preferences.lua";
 
-		FILE *fd = fopen(path.c_str(), "w");
+		path /= "preferences.lua";
+
+		const std::string path_str = path::to_string(path);
+		FILE *fd = fopen(path_str.c_str(), "w");
 		if (!fd) {
-			log::log_error("Cannot open file \"" + path + "\" for writing.");
+			log::log_error("Cannot open file \"" + path_str + "\" for writing.");
 			return;
 		}
 

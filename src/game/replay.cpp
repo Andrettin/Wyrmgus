@@ -411,23 +411,20 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	if (!LogFile) {
 		struct stat tmp;
-		std::string path(parameters::get()->GetUserDirectory());
+		std::filesystem::path path = parameters::get()->GetUserDirectory();
 		if (!GameName.empty()) {
-			path += "/";
-			path += GameName;
+			path /= GameName;
 		}
-		path += "/logs";
+		path /= "logs";
 
-		if (stat(path.c_str(), &tmp) < 0) {
-			makedir(path.c_str(), 0777);
+		if (stat(path::to_string(path).c_str(), &tmp) < 0) {
+			makedir(path::to_string(path).c_str(), 0777);
 		}
 
-		path += "/log_of_stratagus_";
-		path += std::to_string(CPlayer::GetThisPlayer()->get_index());
-		path += ".log";
+		path /= "log_of_stratagus_" + std::to_string(CPlayer::GetThisPlayer()->get_index()) + ".log";
 
 		LogFile = std::make_unique<CFile>();
-		if (LogFile->open(path.c_str(), CL_OPEN_WRITE) == -1) {
+		if (LogFile->open(path::to_string(path).c_str(), CL_OPEN_WRITE) == -1) {
 			// don't retry for each command
 			CommandLogDisabled = false;
 			LogFile.reset();
@@ -984,40 +981,40 @@ void MultiPlayerReplayEachCycle()
 */
 int SaveReplay(const std::string &filename)
 {
-	FILE *fd;
-	std::ostringstream logfile;
-	std::string destination;
-	struct stat sb;
-	size_t size;
-
 	if (filename.find_first_of("\\/") != std::string::npos) {
 		fprintf(stderr, "\\ or / not allowed in SaveReplay filename\n");
 		return -1;
 	}
 
-	destination = parameters::get()->GetUserDirectory() + "/" + GameName + "/logs/" + filename;
+	const std::filesystem::path destination = parameters::get()->GetUserDirectory() / GameName / "logs" / path::from_string(filename);
 
-	logfile << parameters::get()->GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << CPlayer::GetThisPlayer()->get_index() << ".log";
+	const std::filesystem::path log_filepath = parameters::get()->GetUserDirectory() / GameName / "logs" / ("log_of_stratagus_" + std::to_string(CPlayer::GetThisPlayer()->get_index()) + ".log");
 
-	if (stat(logfile.str().c_str(), &sb)) {
+	const std::string log_filepath_str = path::to_string(log_filepath);
+
+	struct stat sb;
+	if (stat(log_filepath_str.c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");
 		return -1;
 	}
+
 	auto buf = std::make_unique<char[]>(sb.st_size);
 	if (!buf) {
 		throw std::runtime_error("Out of memory.");
 	}
-	fd = fopen(logfile.str().c_str(), "rb");
+
+	FILE *fd = fopen(log_filepath_str.c_str(), "rb");
 	if (!fd) {
 		fprintf(stderr, "fopen failed\n");
 		return -1;
 	}
-	size = fread(buf.get(), sb.st_size, 1, fd);
+	size_t size = fread(buf.get(), sb.st_size, 1, fd);
 	fclose(fd);
 
-	fd = fopen(destination.c_str(), "wb");
+	const std::string destination_str = path::to_string(destination);
+	fd = fopen(destination_str.c_str(), "wb");
 	if (!fd) {
-		fprintf(stderr, "Can't save to '%s'\n", destination.c_str());
+		fprintf(stderr, "Can't save to '%s'\n", destination_str.c_str());
 		return -1;
 	}
 	fwrite(buf.get(), sb.st_size, size, fd);

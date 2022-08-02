@@ -1379,14 +1379,13 @@ void SaveHeroes()
 	}
 
 	//see if the old heroes.lua save file is present, and if so, delete it
-	std::string path = parameters::get()->GetUserDirectory();
+	std::filesystem::path path = parameters::get()->GetUserDirectory();
 
 	if (!GameName.empty()) {
-		path += "/";
-		path += GameName;
+		path /= GameName;
 	}
-	path += "/";
-	path += "heroes.lua";
+
+	path /= "heroes.lua";
 
 	if (std::filesystem::exists(path)) {
 		std::filesystem::remove(path);

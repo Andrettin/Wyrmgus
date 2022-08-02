@@ -45,14 +45,14 @@ public:
 		return this->test_run;
 	}
 
-	void SetUserDirectory(const std::string &path)
+	void SetUserDirectory(const std::filesystem::path &path)
 	{
-		this->userDirectory = path;
+		this->user_directory = path;
 	}
 
-	const std::string &GetUserDirectory() const
+	const std::filesystem::path &GetUserDirectory() const
 	{
-		return this->userDirectory;
+		return this->user_directory;
 	}
 
 private:
@@ -64,7 +64,7 @@ public:
 	std::string luaScriptArguments;
 private:
 	bool test_run = false;
-	std::string userDirectory;          /// Directory containing user settings and data
+	std::filesystem::path user_directory; //directory containing user settings and data
 };
 
 }

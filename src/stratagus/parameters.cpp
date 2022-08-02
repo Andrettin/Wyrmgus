@@ -33,6 +33,7 @@
 #include "editor.h"
 #include "network/network.h"
 #include "replay.h"
+#include "util/path_util.h"
 #include "video/video.h"
 
 #pragma warning(push, 0)
@@ -150,9 +151,8 @@ void parameters::process()
 
 	option = "u";
 	if (cmd_parser.isSet(option)) {
-		this->SetUserDirectory(cmd_parser.value(option).toStdString());
-	}
-	else {
+		this->SetUserDirectory(path::from_string(cmd_parser.value(option).toStdString()));
+	} else {
 		this->SetDefaultUserDirectory();
 	}
 
@@ -186,26 +186,22 @@ void parameters::process()
 void parameters::SetDefaultUserDirectory()
 {
 #ifdef USE_GAME_DIR
-	this->userDirectory = database::get()->get_root_path().string();
+	this->user_directory = database::get()->get_root_path();
 #elif USE_WIN32
-	userDirectory = getenv("APPDATA");
+	this->user_directory = path::from_string(getenv("APPDATA"));
 #elif __MORPHOS__
-	userDirectory = "home";
+	this->user_directory = path::from_string("home");
 #else
-	userDirectory = getenv("HOME");
+	this->user_directory = path::from_string(getenv("HOME"));
 #endif
-
-	if (!this->userDirectory.empty()) {
-		this->userDirectory += "/";
-	}
 
 #ifdef USE_GAME_DIR
 #elif USE_WIN32
-	userDirectory += "Stratagus";
+	this->user_directory /= "Stratagus";
 #elif defined(USE_MAC)
-	userDirectory += "Library/Stratagus";
+	this->user_directory /= "Library/Stratagus";
 #else
-	userDirectory += ".stratagus";
+	this->user_directory /= ".stratagus";
 #endif
 }
 

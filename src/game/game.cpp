@@ -1700,8 +1700,8 @@ static int CclSetGameName(lua_State *l)
 	}
 
 	if (!GameName.empty()) {
-		std::string path = parameters::get()->GetUserDirectory() + "/" + GameName;
-		makedir(path.c_str(), 0777);
+		const std::filesystem::path path = parameters::get()->GetUserDirectory() / GameName;
+		makedir(path::to_string(path).c_str(), 0777);
 	}
 	return 0;
 }

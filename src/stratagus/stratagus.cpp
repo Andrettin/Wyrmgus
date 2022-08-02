@@ -200,6 +200,7 @@ extern void beos_init(int argc, char **argv);
 #include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
+#include "util/path_util.h"
 #include "util/point_util.h"
 #include "util/thread_pool.h"
 #include "util/util.h"
@@ -367,12 +368,13 @@ static void CleanupOutput()
 
 static void RedirectOutput()
 {
-	std::string path = parameters::get()->GetUserDirectory();
+	const std::filesystem::path path = parameters::get()->GetUserDirectory();
+	const std::string path_str = path::to_string(path);
 
-	makedir(path.c_str(), 0777);
+	makedir(path_str.c_str(), 0777);
 	
-	stdoutFile = path + "\\stdout.txt";
-	stderrFile = path + "\\stderr.txt";
+	stdoutFile = path_str + "\\stdout.txt";
+	stderrFile = path_str + "\\stderr.txt";
 
 	//if the log file is larger than the max log size, delete it before opening it for writing
 	if (std::filesystem::exists(stderrFile) && std::filesystem::file_size(stderrFile) > wyrmgus::log::max_size) {
@@ -449,7 +451,7 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 
 	RedirectOutput();
 
-	makedir(parameters->GetUserDirectory().c_str(), 0777);
+	makedir(path::to_string(parameters->GetUserDirectory()).c_str(), 0777);
 
 	// Init Lua and register lua functions!
 	InitLua();
