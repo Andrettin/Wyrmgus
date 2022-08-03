@@ -63,7 +63,7 @@ static boost::asio::awaitable<int> CheckVersions(const CInitMessage_Hello &msg, 
 			StratagusVersion, msg.Stratagus, hostStr.c_str());
 
 		const CInitMessage_EngineMismatch message;
-		co_await NetworkSendICMessage_Log(socket, host, message);
+		co_await NetworkSendICMessage(socket, host, message);
 		co_return -1;
 	}
 
@@ -78,7 +78,7 @@ static boost::asio::awaitable<int> CheckVersions(const CInitMessage_Hello &msg, 
 			hostStr.c_str());
 
 		const CInitMessage_ProtocolMismatch message;
-		co_await NetworkSendICMessage_Log(socket, host, message);
+		co_await NetworkSendICMessage(socket, host, message);
 		co_return -1;
 	}
 	co_return 0;
@@ -415,9 +415,9 @@ boost::asio::awaitable<void> server::init_game()
 
 			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
 				message.clientIndex = i;
-				co_await NetworkSendICMessage_Log(*this->socket, host, message);
+				co_await NetworkSendICMessage(*this->socket, host, message);
 			} else if (num[Hosts[i].PlyNr] == 2) {
-				co_await NetworkSendICMessage_Log(*this->socket, host, statemsg);
+				co_await NetworkSendICMessage(*this->socket, host, statemsg);
 			}
 		}
 
@@ -485,7 +485,7 @@ boost::asio::awaitable<void> server::init_game()
 	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
 	for (int i = 0; i < HostsCount; ++i) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);
-		co_await NetworkSendICMessage_Log(*this->socket, host, message_go);
+		co_await NetworkSendICMessage(*this->socket, host, message_go);
 	}
 }
 
@@ -515,7 +515,7 @@ boost::asio::awaitable<void> server::Send_GameFull(const CHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGameFull);
 
-	co_await NetworkSendICMessage_Log(*socket, host, message);
+	co_await NetworkSendICMessage(*socket, host, message);
 }
 
 boost::asio::awaitable<void> server::Send_Welcome(const multiplayer_host &host, int index)
@@ -530,7 +530,7 @@ boost::asio::awaitable<void> server::Send_Welcome(const multiplayer_host &host, 
 		}
 	}
 
-	co_await NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
 boost::asio::awaitable<void> server::Send_Resync(const multiplayer_host &host, int hostIndex)
@@ -543,28 +543,28 @@ boost::asio::awaitable<void> server::Send_Resync(const multiplayer_host &host, i
 		}
 	}
 
-	co_await NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
 boost::asio::awaitable<void> server::Send_Map(const multiplayer_host &host)
 {
 	const CInitMessage_Map message(NetworkMapName.c_str(), CMap::get()->Info->MapUID);
 
-	co_await NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
 boost::asio::awaitable<void> server::Send_State(const multiplayer_host &host)
 {
 	const CInitMessage_State message(MessageInit_FromServer, *this->setup);
 
-	co_await NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
 boost::asio::awaitable<void> server::Send_GoodBye(const multiplayer_host &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGoodBye);
 
-	co_await NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
 boost::asio::awaitable<void> server::Update(unsigned long frameCounter)

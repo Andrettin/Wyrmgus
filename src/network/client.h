@@ -192,7 +192,7 @@ private:
 
 }
 
-static constexpr const char *icmsgsubtypenames[] = {
+constexpr const char *icmsgsubtypenames[] = {
 	"Hello",                   // Client Request
 	"Config",                  // Setup message configure clients
 

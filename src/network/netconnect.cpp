@@ -77,19 +77,6 @@ boost::asio::awaitable<void> NetworkSendICMessage(CUDPSocket &socket, const CHos
 	co_await socket.Send(host, buf.get(), msg.Size());
 }
 
-boost::asio::awaitable<void> NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
-{
-	co_await NetworkSendICMessage(socket, host, msg);
-
-#ifdef DEBUG
-	const std::string hostStr = host.toString();
-	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
-		_C_ icmsgsubtypenames[msg.GetSubType()]);
-#endif
-}
-
-// Functions
-
 /**
 **  Parse a setup event. (Command type <= MessageInitEvent)
 **

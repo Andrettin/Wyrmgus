@@ -102,22 +102,6 @@ inline boost::asio::awaitable<void> NetworkSendICMessage(CUDPSocket &socket, con
 [[nodiscard]]
 extern boost::asio::awaitable<void> NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
-template <typename T>
-[[nodiscard]]
-inline boost::asio::awaitable<void> NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const T &msg)
-{
-	co_await NetworkSendICMessage(socket, host, msg);
-
-#ifdef DEBUG
-	const std::string hostStr = host.toString();
-	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
-		_C_ icmsgsubtypenames[msg.GetHeader().GetSubType()]);
-#endif
-}
-
-[[nodiscard]]
-extern boost::asio::awaitable<void> NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
-
 extern int FindHostIndexBy(const CHost &host);
 
 [[nodiscard]]
