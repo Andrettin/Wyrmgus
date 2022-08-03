@@ -1479,10 +1479,10 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		} else {
 #ifdef DEBUG
 			const Vec2i &pos = mine ? mine->tilePos : unit.tilePos;
-			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d] in range %d. Sit and play dumb.\n"
+			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d]. Sit and play dumb.\n"
 					   _C_ unit.Player->get_index() _C_ UnitNumber(unit)
 					   _C_ unit.tilePos.x _C_ unit.tilePos.y
-					   _C_ pos.x _C_ pos.y _C_ range);
+					   _C_ pos.x _C_ pos.y);
 #endif // DEBUG
 			if (depot) {
 				unit.drop_out_on_side(LookingW, depot);

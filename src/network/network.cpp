@@ -300,29 +300,14 @@ static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input
 class CNetworkStat
 {
 public:
-	CNetworkStat() :
-		resentPacketCount(0)
-	{}
-
 	void print() const
 	{
 		DebugPrint("resent: %d packets\n" _C_ resentPacketCount);
 	}
 
 public:
-	unsigned int resentPacketCount;
+	unsigned int resentPacketCount = 0;
 };
-
-static void printStatistic(const CUDPSocket::CStatistic &statistic)
-{
-	DebugPrint("Sent: %d packets %d bytes (max %d bytes).\n"
-			   _C_ statistic.sentPacketsCount _C_ statistic.sentBytesCount
-			   _C_ statistic.biggestSentPacketSize);
-	DebugPrint("Received: %d packets %d bytes (max %d bytes).\n" _C_
-			   statistic.receivedPacketsCount _C_ statistic.receivedBytesCount
-			   _C_ statistic.biggestReceivedPacketSize);
-	DebugPrint("Received: %d error(s).\n" _C_ statistic.receivedErrorCount);
-}
 
 static CNetworkStat NetworkStat;
 #endif
@@ -436,8 +421,6 @@ void ExitNetwork1()
 	}
 
 #ifdef DEBUG
-	printStatistic(NetworkFildes.getStatistic());
-	NetworkFildes.clearStatistic();
 	NetworkStat.print();
 #endif
 
