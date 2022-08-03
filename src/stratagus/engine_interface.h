@@ -318,6 +318,7 @@ signals:
 	void questFailedDialogOpened(QObject *quest, const QString &failure_reason_string);
 	void population_dialog_opened(QObject *settlement_game_data, const QVariantList &population_units);
 	void lua_dialog_open_changed();
+	void error_occurred(const QString &error_message);
 
 private:
 	bool running = false;
