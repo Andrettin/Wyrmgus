@@ -104,8 +104,8 @@ private:
 **  @return        Filtered mask after taking fog into account
 */
 //Wyrmgus start
-//int MapFogFilterFlags(CPlayer &player, const unsigned int index, const tile_flag mask)
-tile_flag MapFogFilterFlags(CPlayer &player, const unsigned int index, const tile_flag mask, int z)
+//int MapFogFilterFlags(const CPlayer &player, const unsigned int index, const tile_flag mask)
+tile_flag MapFogFilterFlags(const CPlayer &player, const unsigned int index, const tile_flag mask, int z)
 //Wyrmgus end
 {
 	tile_flag fogMask = mask;
@@ -118,7 +118,7 @@ tile_flag MapFogFilterFlags(CPlayer &player, const unsigned int index, const til
 	return fogMask;
 }
 
-tile_flag MapFogFilterFlags(CPlayer &player, const Vec2i &pos, const tile_flag mask, const int z)
+tile_flag MapFogFilterFlags(const CPlayer &player, const Vec2i &pos, const tile_flag mask, const int z)
 {
 	if (CMap::get()->Info->IsPointOnMap(pos, z)) {
 		return MapFogFilterFlags(player, CMap::get()->get_pos_index(pos, z), mask, z);

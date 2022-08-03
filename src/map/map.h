@@ -410,8 +410,8 @@ extern void MapUnmarkTileRadarJammer(const CPlayer &player, const unsigned int i
 // in map_fog.c
 //
 /// Filter map flags through fog
-extern tile_flag MapFogFilterFlags(CPlayer &player, const Vec2i &pos, const tile_flag mask, const int z);
-extern tile_flag MapFogFilterFlags(CPlayer &player, const unsigned int index, const tile_flag mask, const int z);
+extern tile_flag MapFogFilterFlags(const CPlayer &player, const Vec2i &pos, const tile_flag mask, const int z);
+extern tile_flag MapFogFilterFlags(const CPlayer &player, const unsigned int index, const tile_flag mask, const int z);
 
 /// Mark a tile for normal sight
 extern void MapMarkTileSight(const CPlayer &player, const unsigned int index, const int z);

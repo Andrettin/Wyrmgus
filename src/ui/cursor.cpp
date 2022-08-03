@@ -339,15 +339,20 @@ void DrawBuildingCursor(std::vector<std::function<void(renderer *)>> &render_com
 			const Vec2i posIt(top_left_tile_pos.x() + w, top_left_tile_pos.y() + h);
 			uint32_t color;
 
+			const tile *tile = UI.CurrentMapLayer->Field(posIt);
+
 			if (f && (ontop ||
 					  CanBuildOn(posIt, MapFogFilterFlags(*CPlayer::GetThisPlayer(), posIt,
 														  mask & ((!Selected.empty() && Selected[0]->tilePos == posIt) ?
 																  ~(tile_flag::land_unit | tile_flag::sea_unit) : static_cast<tile_flag>(-1)), z), z, CPlayer::GetThisPlayer(), CursorBuilding))
-				&& UI.CurrentMapLayer->Field(posIt)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer())) {
+				&& tile->player_info->IsTeamExplored(*CPlayer::GetThisPlayer())
+				&& (tile->get_owner() == nullptr || tile->get_owner() == CPlayer::GetThisPlayer())
+			) {
 				color = ColorGreen;
 			} else {
 				color = ColorRed;
 			}
+
 			Video.FillTransRectangleClip(color, screenPos.x + w * defines::get()->get_scaled_tile_width(),
 										 screenPos.y + h * defines::get()->get_scaled_tile_height(), defines::get()->get_scaled_tile_width(), defines::get()->get_scaled_tile_height(), 95, render_commands);
 		}

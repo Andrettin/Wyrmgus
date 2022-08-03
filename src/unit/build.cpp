@@ -278,6 +278,29 @@ bool CanBuildOn(const QPoint &pos, const tile_flag mask, const int z, const CPla
 */
 CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int real, const bool ignore_exploration, const int z, const bool no_bordering_impassable)
 {
+	const CPlayer *player = nullptr;
+
+	//Wyrmgus start
+//	if (unit && unit->Player->get_type() == player_type::person) {
+	if (unit != nullptr) {
+		//Wyrmgus end
+		player = unit->Player;
+	}
+
+	//check for tile ownership
+	for (int h = 0; h < type.get_tile_height(); ++h) {
+		for (int w = type.get_tile_width(); w--;) {
+			if (!CMap::get()->Info->IsPointOnMap(pos.x() + w, pos.y() + h, z)) {
+				return nullptr;
+			}
+
+			const tile *tile = CMap::get()->Field(pos.x() + w, pos.y() + h, z);
+			if (player != nullptr && tile->get_owner() != nullptr && tile->get_owner() != player) {
+				return nullptr;
+			}
+		}
+	}
+
 	// Terrain Flags don't matter if building on top of a unit.
 	CUnit *ontop = CanBuildHere(unit, type, pos, z, no_bordering_impassable);
 	if (ontop == nullptr) {
@@ -292,23 +315,11 @@ CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const
 		UnmarkUnitFieldFlags(*unit);
 	}
 
-	CPlayer *player = nullptr;
-
-	//Wyrmgus start
-//	if (unit && unit->Player->get_type() == player_type::person) {
-	if (unit) {
-	//Wyrmgus end
-		player = unit->Player;
-	}
 	tile_flag testmask = tile_flag::none;
 	unsigned int index = pos.y() * CMap::get()->Info->MapWidths[z];
 	for (int h = 0; h < type.get_tile_height(); ++h) {
 		for (int w = type.get_tile_width(); w--;) {
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			if (!CMap::get()->Info->IsPointOnMap(pos.x() + w, pos.y() + h, z)) {
-				ontop = nullptr;
-				break;
-			}
 			if (player && !real) {
 				//testmask = MapFogFilterFlags(player, x + w, y + h, type.MovementMask);
 				testmask = MapFogFilterFlags(*player,
@@ -326,11 +337,6 @@ CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const
 //			if (player && !mf.player_info->is_explored(*player)) {
 			if (player && !ignore_exploration && !tile->player_info->IsTeamExplored(*player)) {
 			//Wyrmgus end
-				ontop = nullptr;
-				break;
-			}
-
-			if (player != nullptr && tile->get_owner() != nullptr && tile->get_owner() != player) {
 				ontop = nullptr;
 				break;
 			}
