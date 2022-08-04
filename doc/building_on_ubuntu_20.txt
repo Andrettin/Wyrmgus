@@ -25,6 +25,7 @@ Required disk space: about 1 GiB
 3. Git clone the engine and data:
 
   git clone https://github.com/Andrettin/Wyrmgus.git
+  git clone https://github.com/Andrettin/Wyrmsun.git
   cd Wyrmgus
 
 
