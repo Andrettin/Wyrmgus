@@ -114,6 +114,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(int destroyed_overlay_terrain_decay_threshold MEMBER destroyed_overlay_terrain_decay_threshold READ get_destroyed_overlay_terrain_decay_threshold)
 	Q_PROPERTY(int scaled_tile_width READ get_scaled_tile_width CONSTANT)
 	Q_PROPERTY(int scaled_tile_height READ get_scaled_tile_height CONSTANT)
+	Q_PROPERTY(bool deselect_in_mine MEMBER deselect_in_mine READ is_deselect_in_mine_enabled)
 	Q_PROPERTY(int population_per_unit MEMBER population_per_unit READ get_population_per_unit)
 	Q_PROPERTY(QString default_menu_background_file READ get_default_menu_background_file_qstring NOTIFY changed)
 	Q_PROPERTY(QStringList loading_background_files READ get_loading_background_files_qstring_list NOTIFY changed)
@@ -455,6 +456,11 @@ public:
 		return this->destroyed_overlay_terrain_decay_threshold;
 	}
 
+	bool is_deselect_in_mine_enabled() const
+	{
+		return this->deselect_in_mine;
+	}
+
 	int get_population_per_unit() const
 	{
 		return this->population_per_unit;
@@ -571,6 +577,7 @@ private:
 	std::map<int, int> cycles_per_year_after;
 	int forest_regeneration_threshold = 0;
 	int destroyed_overlay_terrain_decay_threshold = 0;
+	bool deselect_in_mine = true; //deselect workers when they enter a mine
 	int population_per_unit = 0; //the number of people a unit represents
 	std::filesystem::path default_menu_background_file;
 	std::vector<std::filesystem::path> loading_background_files;

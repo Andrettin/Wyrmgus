@@ -1192,7 +1192,6 @@ public:
 	bool IconsShift = false;         /// Shift icons slightly when you press on them
 	bool StereoSound = true;        /// Enables/disables stereo sound effects	
 	bool MineNotifications = false;  /// Show mine is running low/depleted messages
-	bool DeselectInMine = false;     /// Deselect peasants in mines
 	//Wyrmgus start
 	bool SepiaForGrayscale = false;		/// Use a sepia filter for grayscale icons
 	//Wyrmgus end

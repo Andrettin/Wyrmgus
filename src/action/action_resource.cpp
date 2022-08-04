@@ -713,7 +713,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 			this->clear_goal();
 			int selected = unit.Selected;
 			unit.Remove(goal);
-			if (selected && !Preference.DeselectInMine) {
+			if (selected && !defines::get()->is_deselect_in_mine_enabled()) {
 				unit.Removed = 0;
 				SelectUnit(unit);
 				SelectionChanged();
@@ -1314,7 +1314,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	if (unit.Wait) {
 		int selected = unit.Selected;
 		unit.Remove(&goal);
-		if (selected && !Preference.DeselectInMine) {
+		if (selected && !defines::get()->is_deselect_in_mine_enabled()) {
 			unit.Removed = 0;
 			SelectUnit(unit);
 			SelectionChanged();

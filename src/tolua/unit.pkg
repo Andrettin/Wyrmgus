@@ -15,7 +15,6 @@ class CPreference
 	bool IconsShift;
 	bool StereoSound;
 	bool MineNotifications;
-	bool DeselectInMine;
 	//Wyrmgus start
 	bool SepiaForGrayscale;
 	//Wyrmgus end
