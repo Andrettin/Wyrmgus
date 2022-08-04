@@ -1264,7 +1264,6 @@ set(wyrmgus_generic_HDRS
 	src/include/settings.h
 	src/include/stratagus.h
 	src/include/title.h
-	src/include/translate.h
 	src/include/vec2i.h
 	src/include/version.h
 	src/include/viewport.h
@@ -1289,6 +1288,7 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/parameters.h
 	src/stratagus/text_processing_context.h
 	src/stratagus/text_processor.h
+	src/stratagus/translate.h
 	src/pch.h
 )
 
