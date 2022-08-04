@@ -4921,6 +4921,52 @@ void PlayersEachSecond(const int playerIdx)
 	try {
 		const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
 
+		if (!player->is_neutral_player()) {
+			for (const auto &[resource, quantity] : player->get_incomes()) {
+				const wyrmgus::resource *final_resource = resource->get_final_resource();
+				int final_resource_change = quantity * resource->get_final_resource_conversion_rate() / 100;
+
+				if (player->AiEnabled) {
+					switch (GameSettings.Difficulty) {
+					case DifficultyEasy:
+						final_resource_change /= 2;
+						break;
+					case DifficultyHard:
+						final_resource_change *= 4;
+						final_resource_change /= 3;
+						break;
+					case DifficultyBrutal:
+						final_resource_change *= 2;
+						break;
+					default:
+						break;
+					}
+				}
+
+				if (final_resource_change == 0) {
+					continue;
+				}
+
+				const int rest = final_resource_change % 60;
+				final_resource_change /= 60;
+
+				if (rest != 0) {
+					const int abs_rest = std::abs(rest);
+					int seconds_per_rest_resource = 60 / abs_rest;
+					if ((60 % abs_rest) != 0) {
+						seconds_per_rest_resource += 1;
+					}
+
+					if ((GameCycle / CYCLES_PER_SECOND) % seconds_per_rest_resource == 0) {
+						final_resource_change += number::sign(rest);
+					}
+				}
+
+				player->change_resource(final_resource, final_resource_change, true);
+				player->change_resource_total(final_resource, final_resource_change);
+			}
+		}
+
 		if (player->AiEnabled) {
 			AiEachSecond(*player);
 		}
@@ -4962,33 +5008,6 @@ void PlayersEachMinute(const int playerIdx)
 {
 	try {
 		const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
-
-		if (!player->is_neutral_player()) {
-			for (const auto &[resource, quantity] : player->get_incomes()) {
-				const wyrmgus::resource *final_resource = resource->get_final_resource();
-				int final_resource_change = quantity * resource->get_final_resource_conversion_rate() / 100;
-
-				if (player->AiEnabled) {
-					switch (GameSettings.Difficulty) {
-						case DifficultyEasy:
-							final_resource_change /= 2;
-							break;
-						case DifficultyHard:
-							final_resource_change *= 4;
-							final_resource_change /= 3;
-							break;
-						case DifficultyBrutal:
-							final_resource_change *= 2;
-							break;
-						default:
-							break;
-					}
-				}
-
-				player->change_resource(final_resource, final_resource_change, true);
-				player->change_resource_total(final_resource, final_resource_change);
-			}
-		}
 
 		if (player->AiEnabled) {
 			AiEachMinute(*player);
