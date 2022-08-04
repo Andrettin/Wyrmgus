@@ -65,7 +65,7 @@
 #include "time/season_schedule.h"
 #include "time/timeline.h"
 #include "time/time_of_day_schedule.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/ui.h"
 #include "unit/historical_unit.h"
 #include "unit/unit.h"

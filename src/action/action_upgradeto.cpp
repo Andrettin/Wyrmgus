@@ -51,7 +51,7 @@
 #include "script/condition/and_condition.h"
 #include "species/species.h"
 #include "spell/spell.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"

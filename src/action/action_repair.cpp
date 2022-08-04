@@ -46,7 +46,7 @@
 #include "player/player.h"
 #include "script.h"
 #include "sound/sound.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"

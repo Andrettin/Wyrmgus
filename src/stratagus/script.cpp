@@ -62,7 +62,7 @@
 #include "script/trigger.h"
 #include "spell/spell.h"
 #include "time/timeline.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"
 #include "ui/ui.h"

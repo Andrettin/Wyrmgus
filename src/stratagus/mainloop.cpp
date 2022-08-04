@@ -69,7 +69,7 @@
 #include "sound/sound_server.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/interface.h"

@@ -58,7 +58,7 @@
 #include "sound/game_sound_set.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"
 #include "ui/cursor.h"

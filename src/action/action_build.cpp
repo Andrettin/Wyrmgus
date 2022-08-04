@@ -52,7 +52,7 @@
 #include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "script.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/ui.h"
 #include "unit/build_restriction/on_top_build_restriction.h"
 #include "unit/unit.h"

@@ -49,7 +49,7 @@
 #include "script.h"
 #include "sound/sound.h"
 #include "sound/unit_sound_type.h"
-#include "translate.h"
+#include "translator.h"
 #include "unit/construction.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

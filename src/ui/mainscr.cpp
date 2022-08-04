@@ -67,7 +67,7 @@
 #include "time/calendar.h"
 #include "time/season.h"
 #include "time/time_of_day.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"
 #include "ui/button_level.h"

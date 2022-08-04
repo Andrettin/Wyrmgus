@@ -31,7 +31,7 @@
 #include "missileconfig.h"
 
 #include "missile.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/ui.h"
 
 bool MissileConfig::MapMissileNoLog()

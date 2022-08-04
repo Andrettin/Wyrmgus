@@ -57,7 +57,7 @@
 #include "spell/spell.h"
 #include "spell/status_effect.h"
 //Wyrmgus start
-#include "translate.h"
+#include "translator.h"
 //Wyrmgus end
 #include "ui/interface.h"
 #include "ui/ui.h"

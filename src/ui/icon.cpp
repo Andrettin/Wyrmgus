@@ -33,7 +33,7 @@
 #include "menus.h"
 #include "mod.h"
 #include "player/player.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"

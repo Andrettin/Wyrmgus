@@ -53,7 +53,7 @@
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/button.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"

@@ -191,7 +191,7 @@ extern void beos_init(int argc, char **argv);
 #include "time/calendar.h"
 #include "time/timeline.h"
 #include "title.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/interface.h"

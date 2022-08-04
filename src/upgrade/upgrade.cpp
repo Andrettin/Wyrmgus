@@ -68,7 +68,7 @@
 #include "script/factor.h"
 //Wyrmgus start
 #include "settings.h"
-#include "translate.h"
+#include "translator.h"
 //Wyrmgus end
 #include "unit/unit.h"
 #include "unit/unit_find.h"

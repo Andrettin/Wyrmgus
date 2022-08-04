@@ -49,7 +49,7 @@
 #include "player/player.h"
 #include "sound/sound.h"
 #include "title.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/contenttype.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"

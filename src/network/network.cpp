@@ -225,7 +225,7 @@
 #include "replay.h"
 #include "sound/game_sound_set.h"
 #include "sound/sound.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"

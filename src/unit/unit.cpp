@@ -90,7 +90,7 @@
 #include "spell/spell.h"
 #include "spell/status_effect.h"
 #include "time/time_of_day.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"
 #include "ui/interface.h"

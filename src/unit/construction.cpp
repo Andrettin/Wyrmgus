@@ -30,7 +30,7 @@
 
 #include "database/preferences.h"
 #include "script.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/ui.h"
 #include "video/video.h"
 

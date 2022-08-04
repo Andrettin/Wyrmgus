@@ -48,7 +48,7 @@
 #include "sound/sound.h"
 #include "sound/unit_sound_type.h"
 #include "spell/spell.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"

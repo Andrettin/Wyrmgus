@@ -40,7 +40,7 @@
 #include "player/civilization.h"
 #include "player/civilization_group.h"
 #include "player/player.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/cursor_type.h"
 #include "ui/interface.h"
 #include "ui/ui.h"

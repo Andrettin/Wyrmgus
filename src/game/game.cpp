@@ -100,7 +100,7 @@
 #include "sound/sound_server.h"
 #include "spell/spell.h"
 #include "time/calendar.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/button.h"
 #include "ui/cursor.h"
 #include "ui/icon.h"

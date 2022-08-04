@@ -70,7 +70,7 @@
 #include "sound/sound.h"
 #include "sound/unit_sound_type.h"
 #include "spell/spell.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"
 #include "ui/button_level.h"

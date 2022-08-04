@@ -456,7 +456,7 @@ set(wyrmgus_base_SRCS
 	src/stratagus/stratagus.cpp
 	src/stratagus/text_processor.cpp
 	src/stratagus/title.cpp
-	src/stratagus/translate.cpp
+	src/stratagus/translator.cpp
 )
 source_group(wyrmgus FILES ${wyrmgus_base_SRCS})
 
@@ -1288,7 +1288,7 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/parameters.h
 	src/stratagus/text_processing_context.h
 	src/stratagus/text_processor.h
-	src/stratagus/translate.h
+	src/stratagus/translator.h
 	src/pch.h
 )
 

@@ -1,4 +1,4 @@
-$#include "translate.h"
+$#include "translator.h"
 
 extern const char *Translate(const char *str);
 extern void AddTranslation(const char *str1, const char *str2);

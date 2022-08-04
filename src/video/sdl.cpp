@@ -55,7 +55,7 @@
 #include "parameters.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/cursor.h"
 #include "ui/interface.h"
 #include "ui/ui.h"

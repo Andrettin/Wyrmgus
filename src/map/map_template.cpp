@@ -73,7 +73,7 @@
 #include "time/calendar.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
-#include "translate.h"
+#include "translator.h"
 #include "unit/build_restriction/on_top_build_restriction.h"
 #include "unit/historical_unit.h"
 #include "unit/historical_unit_history.h"

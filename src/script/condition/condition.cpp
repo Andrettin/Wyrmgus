@@ -91,7 +91,7 @@
 #include "script/condition/upgrade_class_condition.h"
 #include "script/condition/variation_tag_condition.h"
 #include "script/condition/war_condition.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/button.h"
 #include "ui/interface.h"
 #include "upgrade/upgrade_modifier.h"

@@ -54,7 +54,7 @@
 #include "sound/sound.h"
 #include "spell/spell.h"
 #include "spell/spell_target_type.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_domain.h"

@@ -41,7 +41,7 @@
 #include "script/trigger.h"
 #include "spell/spell.h"
 //Wyrmgus start
-#include "translate.h"
+#include "translator.h"
 //Wyrmgus end
 #include "ui/button.h"
 #include "ui/button_cmd.h"

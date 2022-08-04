@@ -40,7 +40,7 @@
 #include "script.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
-#include "translate.h"
+#include "translator.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"

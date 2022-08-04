@@ -49,7 +49,7 @@
 #include "pathfinder/pathfinder.h"
 #include "player/player.h"
 #include "player/player_color.h"
-#include "translate.h"
+#include "translator.h"
 #include "ui/cursor.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

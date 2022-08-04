@@ -28,7 +28,7 @@
 
 #include "stratagus.h"
 
-#include "translate.h"
+#include "translator.h"
 
 #include "iolib.h"
 

@@ -76,7 +76,7 @@
 #include "time/time_of_day.h"
 #include "time/time_of_day_schedule.h"
 //Wyrmgus start
-#include "translate.h"
+#include "translator.h"
 //Wyrmgus end
 #include "ui/ui.h"
 #include "unit/unit.h"
