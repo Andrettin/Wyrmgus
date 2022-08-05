@@ -274,6 +274,13 @@ const wyrmgus::player_color *dialogue_node::get_player_color(const CUnit *speake
 		return speaker_unit->get_player_color();
 	}
 
+	if (this->speaker_faction != nullptr) {
+		const CPlayer *speaker_player = GetFactionPlayer(this->speaker_faction);
+		if (speaker_player != nullptr) {
+			return speaker_player->get_player_color();
+		}
+	}
+
 	if (this->player_color != nullptr) {
 		return this->player_color;
 	}
