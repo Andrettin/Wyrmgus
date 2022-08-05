@@ -168,10 +168,12 @@ void translator::load_po(const std::filesystem::path &filepath)
 
 }
 
-/**
-**  Translate a string
-*/
 const char *Translate(const char *str)
+{
+	return translator::get()->translate(str);
+}
+
+const std::string &Translate(const std::string &str)
 {
 	return translator::get()->translate(str);
 }

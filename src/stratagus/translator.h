@@ -95,6 +95,7 @@ private:
 
 /// Translate a string
 extern const char *Translate(const char *str);
+extern const std::string &Translate(const std::string &str);
 
 #define _(str) Translate(str)
 #define N_(str) str

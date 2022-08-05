@@ -737,14 +737,14 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 					std::string unit_name;
 					if (UnitUnderCursor->get_unique() != nullptr || UnitUnderCursor->Prefix != nullptr || UnitUnderCursor->Suffix != nullptr || UnitUnderCursor->Work != nullptr || UnitUnderCursor->Spell != nullptr || UnitUnderCursor->get_character() != nullptr) {
 						if (!UnitUnderCursor->Identified) {
-							unit_name = UnitUnderCursor->get_type_name() + " (" + _("Unidentified") + ")";
+							unit_name = _(UnitUnderCursor->get_type_name()) + " (" + _("Unidentified") + ")";
 						} else {
 							unit_name = UnitUnderCursor->get_full_name();
 						}
 					} else if (UnitUnderCursor->get_site() != nullptr && UnitUnderCursor->get_site()->can_use_name_for_site_unit() && !UnitUnderCursor->get_full_name().empty()) {
 						unit_name = UnitUnderCursor->get_full_name() + " (" + UnitUnderCursor->get_type_name() + ")";
 					} else {
-						unit_name = UnitUnderCursor->get_type_name();
+						unit_name = _(UnitUnderCursor->get_type_name());
 					}
 					if (UnitUnderCursor->Player->get_index() != PlayerNumNeutral && !UnitUnderCursor->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
 						unit_name += " (" + UnitUnderCursor->Player->get_name() + ")";
@@ -766,7 +766,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 						wyrmgus::button ba;
 						if (mf.get_terrain_feature() != nullptr) {
 							const wyrmgus::civilization *tile_owner_civilization = mf.get_owner() ? mf.get_owner()->get_civilization() : nullptr;
-							ba.Hint = mf.get_terrain_feature()->get_cultural_name(tile_owner_civilization);
+							ba.Hint = _(mf.get_terrain_feature()->get_cultural_name(tile_owner_civilization));
 						}
 						ba.Action = ButtonCmd::Tile;
 						ba.Value = CMap::get()->get_pos_index(tilePos, UI.CurrentMapLayer->ID);

@@ -1563,9 +1563,9 @@ std::string EvalString(const StringDesc *s)
 				if (!unit->get_full_name().empty() && unit->Identified) {
 					return unit->get_full_name();
 				} else if (!unit->Identified) {
-					return unit->get_type_name() + " (Unidentified)";
+					return _(unit->get_type_name()) + " (" + _("Unidentified") + ")";
 				} else {
-					return unit->get_type_name();
+					return _(unit->get_type_name());
 				}
 				//Wyrmgus end
 			} else { // ERROR.
@@ -1575,14 +1575,14 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitTypeName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && !unit->get_full_name().empty() && ((unit->Prefix == nullptr && unit->Suffix == nullptr && unit->Spell == nullptr) || unit->get_unique() != nullptr || unit->Work != nullptr || unit->Elixir != nullptr)) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
-				return unit->get_type_name();
+				return _(unit->get_type_name());
 			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
 				return std::string();
 			}
 		case EString_UnitTrait : // name of the unit's trait
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->Trait != nullptr) {
-				return _(unit->Trait->get_name().c_str());
+				return _(unit->Trait->get_name());
 			} else {
 				return std::string();
 			}
@@ -1591,7 +1591,7 @@ std::string EvalString(const StringDesc *s)
 			if (unit != nullptr && unit->Spell != nullptr) {
 				std::string spell_description = unit->Spell->get_effects_string();
 				spell_description[0] = tolower(spell_description[0]);
-				return unit->Spell->get_name() + " (" + spell_description + ")";
+				return _(unit->Spell->get_name()) + " (" + spell_description + ")";
 			} else {
 				return std::string();
 			}
@@ -1600,14 +1600,14 @@ std::string EvalString(const StringDesc *s)
 			if (unit != nullptr) {
 				if (unit->get_unique() == nullptr) {
 					if (unit->Work != nullptr) {
-						return unit->Work->get_quote();
+						return _(unit->Work->get_quote());
 					} else if (unit->Elixir != nullptr) {
-						return unit->Elixir->get_quote();
+						return _(unit->Elixir->get_quote());
 					} else {
-						return unit->Type->get_quote();
+						return _(unit->Type->get_quote());
 					}
 				} else {
-					return unit->get_unique()->get_quote();
+					return _(unit->get_unique()->get_quote());
 				}
 			} else {
 				return std::string();
@@ -1654,35 +1654,35 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitEmploymentType:
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->Type->get_employment_type() != nullptr) {
-				return unit->Type->get_employment_type()->get_name();
+				return _(unit->Type->get_employment_type()->get_name());
 			} else {
 				return std::string();
 			}
 		case EString_UnitSettlementName: //name of the unit's settlement
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->get_settlement() != nullptr) {
-				return unit->get_settlement()->get_game_data()->get_current_cultural_name();
+				return _(unit->get_settlement()->get_game_data()->get_current_cultural_name());
 			} else {
 				return std::string();
 			}
 		case EString_UnitSiteName: //name of the unit's site
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->get_site() != nullptr) {
-				return unit->get_site()->get_game_data()->get_current_cultural_name();
+				return _(unit->get_site()->get_game_data()->get_current_cultural_name());
 			} else {
 				return std::string();
 			}
 		case EString_UnitHomeSettlementName:
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->get_home_settlement() != nullptr) {
-				return unit->get_home_settlement()->get_game_data()->get_current_cultural_name();
+				return _(unit->get_home_settlement()->get_game_data()->get_current_cultural_name());
 			} else {
 				return std::string();
 			}
 		case EString_UnitUniqueSet : //name of the unit's unique item set
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->get_unique() != nullptr && unit->get_unique()->get_set() != nullptr) {
-				return unit->get_unique()->get_set()->get_name();
+				return _(unit->get_unique()->get_set()->get_name());
 			} else {
 				return std::string();
 			}
@@ -1701,7 +1701,7 @@ std::string EvalString(const StringDesc *s)
 					if (!item_equipped) {
 						set_items_string += "~<";
 					}
-					set_items_string += set_unique->get_name();
+					set_items_string += _(set_unique->get_name());
 					if (!item_equipped) {
 						set_items_string += "~>";
 					}
@@ -1714,7 +1714,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_TypeName : // name of the unit type
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).get_name();
+				return _((**type).get_name());
 			} else { // ERROR.
 				return std::string();
 			}
@@ -1738,23 +1738,23 @@ std::string EvalString(const StringDesc *s)
 						str[loc + 1] = toupper(str[loc + 1]);
 					}
 				} else if ((**type).get_unit_class() != nullptr) {
-					str = (**type).get_unit_class()->get_name().c_str();
+					str = (**type).get_unit_class()->get_name();
 				}
-				return _(str.c_str());
+				return _(str);
 			} else { // ERROR.
 				return std::string();
 			}
 		case EString_TypeDescription : // name of the unit type's description
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).get_description();
+				return _((**type).get_description());
 			} else { // ERROR.
 				return std::string();
 			}
 		case EString_TypeQuote : // name of the unit type's quote
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).get_quote();
+				return _((**type).get_quote());
 			} else { // ERROR.
 				return std::string();
 			}
@@ -1795,7 +1795,7 @@ std::string EvalString(const StringDesc *s)
 						} else {
 							first = false;
 						}
-						improve_incomes += loop_resource->get_name();
+						improve_incomes += _(loop_resource->get_name());
 						improve_incomes += " Processing Bonus: +";
 						improve_incomes += std::to_string(quantity - loop_resource->get_default_income());
 						improve_incomes += "%";
@@ -1820,7 +1820,7 @@ std::string EvalString(const StringDesc *s)
 					} else {
 						first = false;
 					}
-					luxury_demand += loop_resource->get_name();
+					luxury_demand += _(loop_resource->get_name());
 					luxury_demand += " Demand: ";
 					luxury_demand += std::to_string(quantity);
 				}
@@ -1832,7 +1832,7 @@ std::string EvalString(const StringDesc *s)
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
 				if ((**upgrade).get_civilization() != nullptr) {
-					return (**upgrade).get_civilization()->get_name();
+					return _((**upgrade).get_civilization()->get_name());
 				} else {
 					return std::string();
 				}
@@ -1865,7 +1865,7 @@ std::string EvalString(const StringDesc *s)
 			faction = s->D.Faction;
 			
 			if (faction != nullptr) {
-				return (**faction).get_civilization()->get_name();
+				return _((**faction).get_civilization()->get_name());
 			} else {
 				return std::string();
 			}
@@ -1873,7 +1873,7 @@ std::string EvalString(const StringDesc *s)
 			faction = s->D.Faction;
 			
 			if (faction != nullptr) {
-				return get_faction_type_name((**faction).get_type());
+				return _(get_faction_type_name((**faction).get_type()));
 			} else {
 				return std::string();
 			}
@@ -1907,7 +1907,7 @@ std::string EvalString(const StringDesc *s)
 						settlements_string += "~<";
 					}
 
-					settlements_string += core_settlement_game_data->get_current_cultural_name();
+					settlements_string += _(core_settlement_game_data->get_current_cultural_name());
 
 					if (!has_settlement) {
 						settlements_string += "~>";
@@ -1941,7 +1941,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_ResourceName : // resource ident
 			resource = s->D.Resource;
 			if (resource != nullptr) {
-				return (*resource)->get_name();
+				return _((*resource)->get_name());
 			} else { // ERROR.
 				return std::string();
 			}
@@ -2018,7 +2018,7 @@ std::string EvalString(const StringDesc *s)
 				const tile *tile = *s->D.tile;
 				if (tile != nullptr && tile->get_terrain_feature() != nullptr) {
 					const civilization *tile_owner_civilization = tile->get_owner() ? tile->get_owner()->get_civilization() : nullptr;
-					return tile->get_terrain_feature()->get_cultural_name(tile_owner_civilization);
+					return _(tile->get_terrain_feature()->get_cultural_name(tile_owner_civilization));
 				}
 			}
 
@@ -2028,7 +2028,7 @@ std::string EvalString(const StringDesc *s)
 			if (s->D.tile != nullptr) {
 				const tile *tile = *s->D.tile;
 				if (tile != nullptr && tile->get_world() != nullptr) {
-					return tile->get_world()->get_name();
+					return _(tile->get_world()->get_name());
 				}
 			}
 
