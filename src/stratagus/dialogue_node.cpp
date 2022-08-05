@@ -256,6 +256,10 @@ std::string dialogue_node::get_title_string(const CUnit *speaker_unit) const
 		}
 	}
 
+	if (this->speaker != nullptr) {
+		return this->speaker->get_full_name();
+	}
+
 	return this->title;
 }
 
