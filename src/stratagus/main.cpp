@@ -117,6 +117,8 @@ int main(int argc, char **argv)
 
 		QQmlApplicationEngine engine;
 
+		QObject::connect(translator::get(), &translator::locale_changed, &engine, &QQmlEngine::retranslate, Qt::QueuedConnection);
+
 		qmlRegisterAnonymousType<calendar>("", 1);
 		qmlRegisterAnonymousType<campaign>("", 1);
 		qmlRegisterAnonymousType<CEditor>("", 1);

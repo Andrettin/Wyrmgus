@@ -34,6 +34,8 @@ namespace wyrmgus {
 
 class translator final : public QTranslator, public singleton<translator>
 {
+	Q_OBJECT
+
 public:
 	virtual bool isEmpty() const override
 	{
@@ -86,6 +88,9 @@ private:
 	{
 		this->entries[str1] = str2;
 	}
+
+signals:
+	void locale_changed();
 
 private:
 	std::unordered_map<std::string, std::string> entries;

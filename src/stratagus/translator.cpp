@@ -39,27 +39,27 @@ void translator::set_locale(const std::string &locale_id)
 {
 	this->entries.clear();
 
-	if (locale_id.empty()) {
-		return;
+	if (!locale_id.empty()) {
+		const std::string locale_filename = "wyr-" + locale_id + ".po";
+
+		const std::vector<std::filesystem::path> translations_paths = database::get()->get_translations_paths();
+
+		for (const std::filesystem::path &translations_path : translations_paths) {
+			if (!std::filesystem::exists(translations_path)) {
+				continue;
+			}
+
+			const std::filesystem::path translation_filepath = translations_path / locale_filename;
+
+			if (!std::filesystem::exists(translation_filepath)) {
+				continue;
+			}
+
+			this->load_po(translation_filepath);
+		}
 	}
 
-	const std::string locale_filename = "wyr-" + locale_id + ".po";
-
-	const std::vector<std::filesystem::path> translations_paths = database::get()->get_translations_paths();
-
-	for (const std::filesystem::path &translations_path : translations_paths) {
-		if (!std::filesystem::exists(translations_path)) {
-			continue;
-		}
-
-		const std::filesystem::path translation_filepath = translations_path / locale_filename;
-
-		if (!std::filesystem::exists(translation_filepath)) {
-			continue;
-		}
-
-		this->load_po(translation_filepath);
-	}
+	emit locale_changed();
 }
 
 void translator::load_po(const std::filesystem::path &filepath)
