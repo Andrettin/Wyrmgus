@@ -38,7 +38,9 @@
 #include "sound/game_sound_set.h"
 #include "sound/music.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/assert_util.h"
 #include "util/container_util.h"
+#include "util/map_util.h"
 #include "util/path_util.h"
 #include "util/size_util.h"
 #include "util/string_util.h"
@@ -129,6 +131,10 @@ void defines::process_gsml_scope(const gsml_data &scope)
 	} else if (tag == "0_ad_template_resource_amounts") {
 		scope.for_each_property([&](const gsml_property &property) {
 			this->zero_ad_template_resource_amounts[property.get_key()] = std::stoi(property.get_value());
+		});
+	} else if (tag == "translations") {
+		scope.for_each_property([&](const gsml_property &property) {
+			this->translations[property.get_key()] = property.get_value();
 		});
 	} else {
 		database::process_gsml_scope_for_object(this, scope);
@@ -236,6 +242,23 @@ QStringList defines::get_tips_qstring_list() const
 void defines::remove_tip(const std::string &tip)
 {
 	vector::remove_one(this->tips, tip);
+}
+
+QStringList defines::get_translation_locales_qstring_list() const
+{
+	const std::vector<std::string> locales = map::get_keys(this->translations);
+
+	return container::to_qstring_list(locales);
+}
+
+QString defines::get_translation_name_qstring(const QString &locale_qstr) const
+{
+	const std::string locale_str = locale_qstr.toStdString();
+	const auto find_iterator = this->translations.find(locale_str);
+
+	assert_throw(find_iterator != this->translations.end());
+
+	return QString::fromStdString(find_iterator->second);
 }
 
 }

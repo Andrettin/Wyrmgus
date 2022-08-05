@@ -513,6 +513,9 @@ public:
 		return this->zero_ad_water_height_multiplier;
 	}
 
+	Q_INVOKABLE QStringList get_translation_locales_qstring_list() const;
+	Q_INVOKABLE QString get_translation_name_qstring(const QString &locale_qstr) const;
+
 signals:
 	void changed();
 
@@ -585,6 +588,7 @@ private:
 	std::set<std::string> ignored_0_ad_template_names;
 	std::map<std::string, int> zero_ad_template_resource_amounts;
 	int zero_ad_water_height_multiplier = 0;
+	std::map<std::string, std::string> translations; //translation names mapped to their locales
 };
 
 }
