@@ -35,6 +35,7 @@
 #include "game/difficulty.h"
 #include "sound/music_player.h"
 #include "sound/sound_server.h"
+#include "translator.h"
 #include "ui/cursor.h"
 #include "ui/hotkey_setup.h"
 #include "util/exception_util.h"
@@ -95,6 +96,10 @@ void preferences::save() const
 	const std::filesystem::path preferences_path = preferences::get_path();
 
 	gsml_data data(preferences_path.filename().stem().string());
+
+	if (!this->get_locale().empty()) {
+		data.add_property("locale", "\"" + this->get_locale() + "\"");
+	}
 
 	data.add_property("scale_factor", this->get_scale_factor().to_string());
 	data.add_property("fullscreen", string::from_bool(this->is_fullscreen()));
@@ -158,6 +163,16 @@ void preferences::initialize()
 	}
 
 	this->update_video_sync_speed();
+}
+
+void preferences::set_locale(const std::string &locale)
+{
+	if (locale == this->get_locale()) {
+		return;
+	}
+
+	this->locale = locale;
+	translator::get()->set_locale(locale);
 }
 
 void preferences::set_scale_factor(const centesimal_int &factor)

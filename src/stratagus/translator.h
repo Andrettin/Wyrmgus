@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2005 by Jimmy Salmon
+//      (c) Copyright 2005-2022 by Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,14 +26,75 @@
 
 #pragma once
 
+#include "util/singleton.h"
+
+#include <QTranslator>
+
+namespace wyrmgus {
+
+class translator final : public QTranslator, public singleton<translator>
+{
+public:
+	virtual bool isEmpty() const override
+	{
+		return this->entries.empty();
+	}
+
+	void set_locale(const std::string &locale_id);
+
+	virtual QString translate(const char *context, const char *source_text, const char *disambiguation, const int n) const override
+	{
+		Q_UNUSED(context);
+		Q_UNUSED(disambiguation);
+		Q_UNUSED(n);
+
+		return this->translate(source_text);
+	}
+
+	const std::string &translate(const std::string &source_text) const
+	{
+		try {
+			const auto find_iterator = this->entries.find(source_text);
+			if (find_iterator != this->entries.end()) {
+				return find_iterator->second;
+			}
+
+			return source_text;
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to get translation for string \"" + source_text + "\"."));
+		}
+	}
+
+	const char *translate(const char *source_text) const
+	{
+		try {
+			const auto find_iterator = this->entries.find(source_text);
+			if (find_iterator != this->entries.end()) {
+				return find_iterator->second.c_str();
+			}
+
+			return source_text;
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to get translation for string \"" + std::string(source_text) + "\"."));
+		}
+	}
+
+private:
+	void load_po(const std::filesystem::path &filepath);
+
+	void add_translation(std::string &&str1, std::string &&str2)
+	{
+		this->entries[str1] = str2;
+	}
+
+private:
+	std::unordered_map<std::string, std::string> entries;
+};
+
+}
+
 /// Translate a string
 extern const char *Translate(const char *str);
-/// Add a translation
-extern void AddTranslation(const char *str1, const char *str2);
-/// Load a .po file
-extern void LoadPO(const char *file);
-/// Set the stratagus and game translations
-extern void SetTranslationsFiles(const char *stratagusfile, const char *gamefile);
 
 #define _(str) Translate(str)
 #define N_(str) str

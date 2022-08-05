@@ -57,6 +57,7 @@
 #include "time/season.h"
 #include "time/time_of_day.h"
 #include "time/timeline.h"
+#include "translator.h"
 #include "ui/empty_image_provider.h"
 #include "ui/icon.h"
 #include "ui/icon_image_provider.h"
@@ -93,6 +94,8 @@ int main(int argc, char **argv)
 		app.setApplicationVersion(VERSION);
 		app.setOrganizationName("Wyrmsun");
 		app.setOrganizationDomain("andrettin.github.io");
+
+		QCoreApplication::installTranslator(translator::get());
 
 		qRegisterMetaType<std::vector<wyrmgus::tile_transition>>();
 

@@ -49,6 +49,7 @@ public:
 	static constexpr const char *save_folder = "save";
 	static constexpr const char *shaders_folder = "shaders";
 	static constexpr const char *sounds_folder = "sounds";
+	static constexpr const char *translations_folder = "translations";
 
 	template <typename T>
 	static void process_gsml_data(T *instance, const gsml_data &data)
@@ -294,6 +295,17 @@ public:
 		}
 
 		paths.push_back(database::get_user_maps_path());
+
+		return paths;
+	}
+
+	std::vector<std::filesystem::path> get_translations_paths() const
+	{
+		std::vector<std::filesystem::path> paths = this->get_base_paths();
+
+		for (std::filesystem::path &path : paths) {
+			path /= database::translations_folder;
+		}
 
 		return paths;
 	}
