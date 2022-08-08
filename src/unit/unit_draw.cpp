@@ -987,25 +987,15 @@ static void DrawConstruction(const int player, const construction_frame *cframe,
 	const player_color *player_color = CPlayer::Players[player]->get_player_color();
 
 	if (cframe->get_image_type() == construction_image_type::construction) {
-		const unit_type_variation *variation = unit.GetVariation();
-		if (variation != nullptr && variation->get_construction() != nullptr) {
-			const construction *construction = variation->get_construction();
-			pos.x -= (construction->get_frame_width() * scale_factor).to_int() / 2;
-			pos.y -= (construction->get_frame_height() * scale_factor).to_int() / 2;
-			if (frame < 0) {
-				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day, render_commands);
-			} else {
-				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
-			}
+		const construction *construction = unit.get_construction();
+
+		pos.x -= (construction->get_frame_width() * scale_factor).to_int() / 2;
+		pos.y -= (construction->get_frame_height() * scale_factor).to_int() / 2;
+
+		if (frame < 0) {
+			construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day, render_commands);
 		} else {
-			const construction *construction = type.get_construction();
-			pos.x -= (construction->get_frame_width() * scale_factor).to_int() / 2;
-			pos.y -= (construction->get_frame_height() * scale_factor).to_int() / 2;
-			if (frame < 0) {
-				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day, render_commands);
-			} else {
-				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
-			}
+			construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day, render_commands);
 		}
 	} else {
 		//Wyrmgus start

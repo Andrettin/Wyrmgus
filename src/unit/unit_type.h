@@ -1226,7 +1226,8 @@ public:
 private:
 	unit_type *corpse_type = nullptr; //corpse unit-type
 
-	wyrmgus::construction *construction = nullptr;    /// What is shown in the construction phase
+	wyrmgus::construction *construction = nullptr; //what is shown in the construction phase
+	wyrmgus::construction *on_top_construction = nullptr;
 
 	int repair_hp = 0;				/// Amount of HP per repair
 	resource_map<int> repair_costs;      /// How much it costs to repair

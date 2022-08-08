@@ -7160,12 +7160,19 @@ const wyrmgus::animation_set *CUnit::get_animation_set() const
 
 const wyrmgus::construction *CUnit::get_construction() const
 {
-	const wyrmgus::unit_type_variation *variation = this->GetVariation();
+	const unit_type_variation *variation = this->GetVariation();
 	if (variation != nullptr && variation->get_construction() != nullptr) {
 		return variation->get_construction();
-	} else {
-		return this->Type->get_construction();
 	}
+
+	if (this->Type->get_on_top_construction() != nullptr) {
+		const on_top_build_restriction *on_top = OnTopDetails(*this->Type, nullptr);
+		if (on_top != nullptr) {
+			return this->Type->get_on_top_construction();
+		}
+	}
+
+	return this->Type->get_construction();
 }
 
 const icon *CUnit::get_icon() const

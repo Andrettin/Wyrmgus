@@ -903,7 +903,9 @@ int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "Construction")) {
-			type->construction = wyrmgus::construction::get(LuaToString(l, -1));
+			type->construction = construction::get(LuaToString(l, -1));
+		} else if (!strcmp(value, "OnTopConstruction")) {
+			type->on_top_construction = construction::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DrawLevel")) {
 			type->draw_level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxOnBoard")) {

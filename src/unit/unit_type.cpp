@@ -1566,6 +1566,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->box_size = parent_type->box_size;
 	this->box_offset = parent_type->box_offset;
 	this->construction = parent_type->construction;
+	this->on_top_construction = parent_type->on_top_construction;
 	this->domain = parent_type->domain;
 	this->Missile.Name = parent_type->Missile.Name;
 	this->Missile.Missile = nullptr;
