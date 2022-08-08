@@ -555,7 +555,8 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>
 	Q_PROPERTY(QVariantList traits READ get_traits_qvariant_list NOTIFY changed)
 	Q_PROPERTY(wyrmgus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
 	Q_PROPERTY(int repair_hp MEMBER repair_hp READ get_repair_hp)
-	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
+	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction)
+	Q_PROPERTY(wyrmgus::construction* on_top_construction MEMBER on_top_construction)
 	Q_PROPERTY(wyrmgus::resource* given_resource MEMBER given_resource)
 	Q_PROPERTY(int random_movement_probability MEMBER random_movement_probability READ get_random_movement_probability)
 	Q_PROPERTY(int neutral_random_movement_probability MEMBER neutral_random_movement_probability READ get_neutral_random_movement_probability)
@@ -946,9 +947,14 @@ public:
 		return this->corpse_type;
 	}
 
-	wyrmgus::construction *get_construction() const
+	const wyrmgus::construction *get_construction() const
 	{
 		return this->construction;
+	}
+
+	const wyrmgus::construction *get_on_top_construction() const
+	{
+		return this->on_top_construction;
 	}
 
 	int get_repair_hp() const

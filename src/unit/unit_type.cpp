@@ -1119,30 +1119,6 @@ void unit_type::initialize()
 		RecalculateShownUnits();
 	}
 
-	for (size_t i = 0; i < this->Trains.size(); ++i) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = " + std::to_string(this->Trains[i]->ButtonPos) + ",\n";
-		if (this->Trains[i]->ButtonLevel) {
-			button_definition += "\tLevel = " + this->Trains[i]->ButtonLevel->get_identifier() + ",\n";
-		}
-		button_definition += "\tAction = ";
-		if (this->Trains[i]->BoolFlag[BUILDING_INDEX].value) {
-			button_definition += "\"build\"";
-		} else {
-			button_definition += "\"train-unit\"";
-		}
-		button_definition += ",\n";
-		button_definition += "\tValue = \"" + this->Trains[i]->get_identifier() + "\",\n";
-		if (!this->Trains[i]->ButtonPopup.empty()) {
-			button_definition += "\tPopup = \"" + this->Trains[i]->ButtonPopup + "\",\n";
-		}
-		button_definition += "\tKey = \"" + this->Trains[i]->get_button_key() + "\",\n";
-		button_definition += "\tHint = \"" + this->Trains[i]->ButtonHint + "\",\n";
-		button_definition += "\tForUnit = {\"" + this->get_identifier() + "\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-
 	if (this->CanMove()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 1,\n";
@@ -1673,10 +1649,6 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->affixes = parent_type->affixes;
 	this->traits = parent_type->traits;
 	this->StartingAbilities = parent_type->StartingAbilities;
-	for (size_t i = 0; i < parent_type->Trains.size(); ++i) {
-		this->Trains.push_back(parent_type->Trains[i]);
-		parent_type->Trains[i]->TrainedBy.push_back(this);
-	}
 	this->starting_resources = parent_type->starting_resources;
 
 	if (parent_type->build_restrictions != nullptr) {

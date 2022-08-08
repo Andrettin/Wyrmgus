@@ -927,22 +927,6 @@ int CclDefineUnitType(lua_State *l)
 			type->ButtonHint = LuaToString(l, -1);
 		} else if (!strcmp(value, "ButtonKey")) {
 			type->button_key = LuaToString(l, -1);
-		} else if (!strcmp(value, "Trains")) {
-			type->RemoveButtons(ButtonCmd::Train);
-			type->RemoveButtons(ButtonCmd::Build);
-			for (size_t i = 0; i < type->Trains.size(); ++i) {
-				if (std::find(type->Trains[i]->TrainedBy.begin(), type->Trains[i]->TrainedBy.end(), type) != type->Trains[i]->TrainedBy.end()) {
-					type->Trains[i]->TrainedBy.erase(std::remove(type->Trains[i]->TrainedBy.begin(), type->Trains[i]->TrainedBy.end(), type), type->Trains[i]->TrainedBy.end());
-				}
-			}
-			type->Trains.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				value = LuaToString(l, -1, j + 1);
-				wyrmgus::unit_type *trained_unit = wyrmgus::unit_type::get(value);
-				type->Trains.push_back(trained_unit);
-				trained_unit->TrainedBy.push_back(type);
-			}
 		//Wyrmgus end
 		//Wyrmgus start
 //		} else if (!strcmp(value, "StartingResources")) {
@@ -2301,14 +2285,6 @@ static int CclGetUnitTypeData(lua_State *l)
 		for (size_t i = 1; i <= variation_idents.size(); ++i)
 		{
 			lua_pushstring(l, variation_idents[i-1].c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else if (!strcmp(data, "Trains")) {
-		lua_createtable(l, type->Trains.size(), 0);
-		for (size_t i = 1; i <= type->Trains.size(); ++i)
-		{
-			lua_pushstring(l, type->Trains[i - 1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
