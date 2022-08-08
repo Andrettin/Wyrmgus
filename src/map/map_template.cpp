@@ -1141,6 +1141,92 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 
 	if (!this->IsSubtemplateArea()) {
 		CMap::get()->adjust_territory_irregularities(map_start_pos, map_end - QPoint(1, 1), z);
+
+		if (this->create_starting_mine) {
+			for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
+				if (player->get_type() != player_type::person && player->get_type() != player_type::computer && player->get_type() != player_type::rescue_active) {
+					continue;
+				}
+
+				if (player->StartPos.x < map_start_pos.x() || player->StartPos.y < map_start_pos.y() || player->StartPos.x >= map_end.x() || player->StartPos.y >= map_end.y() || player->StartMapLayer != z) {
+					continue;
+				}
+
+				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
+					continue;
+				}
+
+				//add five workers at the player's starting location
+				if (player->NumTownHalls <= 0) {
+					continue;
+				}
+
+				const unit_type *mine_type = nullptr;
+
+				for (const unit_type *unit_type : unit_type::get_all()) {
+					if (unit_type->get_given_resource() != defines::get()->get_wealth_resource()) {
+						continue;
+					}
+
+					if (!unit_type->BoolFlag[CANHARVEST_INDEX].value) {
+						continue;
+					}
+
+					if (!unit_type->BoolFlag[BUILDING_INDEX].value) {
+						continue;
+					}
+
+					if (unit_type->get_unit_class() == nullptr) {
+						continue;
+					}
+
+					if (unit_type != player->get_class_unit_type(unit_type->get_unit_class())) {
+						continue;
+					}
+
+					const on_top_build_restriction *ontop = OnTopDetails(*unit_type, nullptr);
+
+					if (ontop == nullptr) {
+						continue;
+					}
+
+					if (ontop->Parent->get_given_resource() != defines::get()->get_wealth_resource()) {
+						continue;
+					}
+
+					mine_type = unit_type;
+				}
+
+				if (mine_type == nullptr) {
+					continue;
+				}
+
+				const on_top_build_restriction *ontop = OnTopDetails(*mine_type, nullptr);
+				const unit_type *deposit_type = ontop->Parent;
+
+				const std::vector<CUnit *> &deposits = CPlayer::get_neutral_player()->get_type_units(deposit_type);
+
+				CUnit *best_deposit = nullptr;
+				int best_distance = std::numeric_limits<int>::max();
+
+				for (CUnit *deposit : deposits) {
+					if (deposit->MapLayer->ID != player->StartMapLayer) {
+						continue;
+					}
+
+					const int distance = point::distance_to(player->StartPos, deposit->get_center_tile_pos());
+
+					if (distance < best_distance) {
+						best_deposit = deposit;
+						best_distance = distance;
+					}
+				}
+
+				if (best_deposit != nullptr) {
+					CreateUnit(best_deposit->get_center_tile_pos(), *mine_type, player.get(), best_deposit->MapLayer->ID, false, nullptr, false);
+				}
+			}
+		}
 	}
 
 	//this has to be done at the end, so that it doesn't prevent the application from working properly, due to the map template code thinking that its own area belongs to another map template
