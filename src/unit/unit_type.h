@@ -1161,8 +1161,6 @@ private:
 	std::vector<CUpgrade *> traits; //which traits this unit type can have
 public:
 	std::vector<CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
-	std::vector<unit_type *> Trains;		/// Units trained by this unit
-	std::vector<unit_type *> TrainedBy;		/// Units which can train this unit
 	//Wyrmgus end
 	int Slot = 0;                    /// Type as number
 private:
