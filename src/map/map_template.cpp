@@ -3042,6 +3042,11 @@ void map_template::load_wesnoth_terrain_file()
 
 					const std::string overlay_terrain_string = terrain_string.substr(circumflex_pos + 1, terrain_string.size() - circumflex_pos - 1);
 					overlay_terrain = terrain_type::get_by_wesnoth_string(overlay_terrain_string);
+
+					if (overlay_terrain != nullptr && !overlay_terrain->is_overlay()) {
+						//if the overlay terrain for the Wesnoth tile isn't an overlay terrain in Wyrmsun, then clear the base terrain for the tile, so that e.g. bridges can be set to base terrain and actually clear water
+						terrain = nullptr;
+					}
 				} else {
 					terrain = terrain_type::get_by_wesnoth_string(terrain_string);
 				}
