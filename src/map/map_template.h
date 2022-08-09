@@ -188,6 +188,19 @@ public:
 		return this->scale_multiplier;
 	}
 
+	int get_scale_multiplier_y_offset(const int x) const
+	{
+		if (this->get_scale_multiplier() == 1) {
+			return 0;
+		}
+
+		if (x % 2 != 0) {
+			return -1;
+		}
+
+		return 0;
+	}
+
 	int get_scale_divisor() const
 	{
 		return this->scale_divisor;

@@ -2222,7 +2222,12 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		for (const std::unique_ptr<map_template_unit> &map_template_unit : this->units) {
 			const unit_type *unit_type = map_template_unit->get_type();
 
-			const QPoint unit_pos = map_start_pos + (map_template_unit->get_pos() * this->get_scale_multiplier()) - template_start_pos;
+			QPoint unit_map_template_pos = map_template_unit->get_pos() * this->get_scale_multiplier() + QPoint(0, this->get_scale_multiplier_y_offset(map_template_unit->get_pos().x()));
+			if (unit_map_template_pos.y() < 0) {
+				unit_map_template_pos.setY(0);
+			}
+
+			const QPoint unit_pos = map_start_pos + unit_map_template_pos - template_start_pos;
 
 			const site *site = map_template_unit->get_site();
 			const faction *faction = map_template_unit->get_faction();
@@ -3079,7 +3084,7 @@ void map_template::load_wesnoth_terrain_file()
 		new_overlay_terrain_image.fill(Qt::transparent);
 
 		for (int x = 0; x < this->terrain_image.width(); ++x) {
-			const int column_offset = (x % 2 == 0) ? 0 : -1;
+			const int column_offset = this->get_scale_multiplier_y_offset(x);
 
 			for (int y = 0; y < this->terrain_image.height(); ++y) {
 				const QPoint base_tile_pos(x, y);
