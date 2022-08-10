@@ -60,6 +60,7 @@
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "util/assert_util.h"
 #include "util/event_loop.h"
 #include "util/queue_util.h"
 #include "video/font.h"
@@ -332,8 +333,7 @@ static void do_mouse_warp()
 **  @param callbacks  Callback structure for events.
 **  @param event      SDL event structure pointer.
 */
-[[nodiscard]]
-static boost::asio::awaitable<void> SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Qt::KeyboardModifiers key_modifiers)
+static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event, const Qt::KeyboardModifiers key_modifiers)
 {
 	switch (event.type) {
 		case SDL_MOUSEBUTTONUP:
@@ -351,7 +351,7 @@ static boost::asio::awaitable<void> SdlDoEvent(const EventCallback &callbacks, S
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
 			if (event.key.keysym.sym == SDLK_UNKNOWN) {
-				co_return;
+				return;
 			}
 			break;
 		default:
@@ -427,7 +427,7 @@ static boost::asio::awaitable<void> SdlDoEvent(const EventCallback &callbacks, S
 			break;
 
 		case SDL_QUIT:
-			co_await Exit(0);
+			assert_throw(false);
 			break;
 	}
 
@@ -461,15 +461,15 @@ const EventCallback *GetCallbacks()
 }
 
 [[nodiscard]]
-static boost::asio::awaitable<int> PollEvent()
+static int PollEvent()
 {
 	SDL_Event event;
 	if (SDL_PollEvent(&event)) { // Handle SDL event
-		co_await SdlDoEvent(*GetCallbacks(), event, Qt::KeyboardModifiers());
-		co_return 1;
+		SdlDoEvent(*GetCallbacks(), event, Qt::KeyboardModifiers());
+		return 1;
 	}
 
-	co_return 0;
+	return 0;
 }
 
 static SDL_Keycode qt_key_to_sdl_key(const Qt::Key qt_key)
@@ -888,7 +888,7 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 	}
 
 	for (auto &[sdl_event, modifiers] : sdl_events) {
-		co_await SdlDoEvent(*GetCallbacks(), sdl_event, modifiers);
+		SdlDoEvent(*GetCallbacks(), sdl_event, modifiers);
 	}
 
 	int interrupts = 0;
@@ -906,7 +906,7 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 			NextFrameTicks += FrameTicks;
 		}
 
-		int i = co_await PollEvent();
+		int i = PollEvent();
 
 		// Network
 		size_t s = 0;
