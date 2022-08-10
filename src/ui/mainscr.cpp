@@ -128,7 +128,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y, std::vector<std::func
 	int hBar, hAll;
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	//Wyrmgus start
-	if (Preference.IconsShift && wyrmgus::defines::get()->get_icon_frame_graphics() != nullptr && wyrmgus::defines::get()->get_pressed_icon_frame_graphics() != nullptr) {
+	if (Preference.IconsShift && defines::get()->get_icon_frame_graphics() != nullptr && defines::get()->get_pressed_icon_frame_graphics() != nullptr) {
 //	if (Preference.IconsShift) {
 		hBar = (4 * scale_factor).to_int();
 		hAll = (8 * scale_factor).to_int();
@@ -265,7 +265,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 UStrInt GetComponent(const CUnit &unit, const int index, const VariableAttribute e, const int t)
 {
 	UStrInt val{};
-	const wyrmgus::unit_variable *var = nullptr;
+	const unit_variable *var = nullptr;
 
 	assert_throw(static_cast<unsigned int>(index) < UnitTypeVar.GetNumberVariable());
 	
@@ -354,10 +354,10 @@ UStrInt GetComponent(const CUnit &unit, const int index, const VariableAttribute
 	return val;
 }
 
-UStrInt GetComponent(const wyrmgus::unit_type &type, const int index, const VariableAttribute e, const int t)
+UStrInt GetComponent(const unit_type &type, const int index, const VariableAttribute e, const int t)
 {
 	UStrInt val{};
-	const wyrmgus::unit_variable *var = nullptr;
+	const unit_variable *var = nullptr;
 
 	assert_throw(static_cast<unsigned int>(index) < UnitTypeVar.GetNumberVariable());
 
@@ -487,7 +487,7 @@ static void DrawUnitInfo_Training(const CUnit &unit, std::vector<std::function<v
 			for (size_t i = 0; i < train_counter.size(); ++i) {
 				if (train_counter[i] > 1) {
 					std::string number_string = std::to_string(train_counter[i]);
-					CLabel label(wyrmgus::defines::get()->get_game_font());
+					CLabel label(defines::get()->get_game_font());
 
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
 					label.Draw(pos.x + (46 * preferences::get()->get_scale_factor()).to_int() - defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string, render_commands);
@@ -646,7 +646,7 @@ static void DrawUnitInfo(CUnit &unit, std::vector<std::function<void(renderer *)
 	}
 
 	assert_throw(unit.Type != nullptr);
-	const wyrmgus::unit_type &type = *unit.Type;
+	const unit_type &type = *unit.Type;
 
 	// Draw IconUnit
 	DrawUnitInfo_portrait(unit, render_commands);
@@ -692,7 +692,7 @@ void DrawMapLayerButtons(std::vector<std::function<void(renderer *)>> &render_co
 		if (UI.WorldButtons[i].X != -1) {
 			DrawUIButton(UI.WorldButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerWorld && ButtonUnderCursor == static_cast<int>(i) ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.WorldButtons[i].Clicked || CMap::get()->GetCurrentWorld() == wyrmgus::world::get_all()[i]) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.WorldButtons[i].Clicked || CMap::get()->GetCurrentWorld() == world::get_all()[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.WorldButtons[i].X, UI.WorldButtons[i].Y,
 				UI.WorldButtons[i].Text, render_commands
 			);
@@ -700,7 +700,7 @@ void DrawMapLayerButtons(std::vector<std::function<void(renderer *)>> &render_co
 	}
 }
 
-static std::unique_ptr<wyrmgus::button> get_territory_tooltip_button(const CPlayer *player)
+static std::unique_ptr<button> get_territory_tooltip_button(const CPlayer *player)
 {
 	auto button = std::make_unique<wyrmgus::button>();
 	button->Hint = player->get_full_name();
@@ -750,7 +750,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 						unit_name += " (" + UnitUnderCursor->Player->get_name() + ")";
 					}
 					//hackish way to make the popup appear correctly for the unit under cursor
-					wyrmgus::button ba;
+					button ba;
 					ba.Hint = unit_name;
 					ba.Action = ButtonCmd::Unit;
 					ba.Value = UnitNumber(*UnitUnderCursor);
@@ -763,9 +763,9 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 						tile_center_pos = vp->scaled_map_to_screen_pixel_pos(tile_center_pos);
 
 						//hackish way to make the popup appear correctly for the tile under cursor
-						wyrmgus::button ba;
+						button ba;
 						if (mf.get_terrain_feature() != nullptr) {
-							const wyrmgus::civilization *tile_owner_civilization = mf.get_owner() ? mf.get_owner()->get_civilization() : nullptr;
+							const civilization *tile_owner_civilization = mf.get_owner() ? mf.get_owner()->get_civilization() : nullptr;
 							ba.Hint = _(mf.get_terrain_feature()->get_cultural_name(tile_owner_civilization));
 						}
 						ba.Action = ButtonCmd::Tile;
@@ -784,7 +784,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 	if (Selected.size() == 1) {
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 			//hackish way to make the popup appear correctly for the single selected unit
-			wyrmgus::button ba;
+			button ba;
 			ba.Hint = Selected[0]->GetMessageName();
 			ba.Action = ButtonCmd::Unit;
 			ba.Value = UnitNumber(*Selected[0]);
@@ -815,7 +815,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
 					//hackish way to make the popup appear correctly for the inventory item
-					wyrmgus::button ba;
+					button ba;
 					if (!uins->Name.empty() && uins->Identified) {
 						ba.Hint = uins->Name;
 					} else {
@@ -825,7 +825,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 						}
 					}
 					ba.pos = j;
-					ba.level = wyrmgus::defines::get()->get_inventory_button_level();
+					ba.level = defines::get()->get_inventory_button_level();
 					ba.Action = ButtonCmd::Unit;
 					ba.Value = UnitNumber(*uins);
 					ba.Popup = "popup_item_inventory";
@@ -875,58 +875,58 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 		}
 	}
 		
-	const wyrmgus::time_of_day *time_of_day = UI.SelectedViewport->get_center_tile_time_of_day();
+	const time_of_day *time_of_day = UI.SelectedViewport->get_center_tile_time_of_day();
 	std::shared_ptr<const CGraphic> time_of_day_icon_graphics;
 	if (time_of_day != nullptr) {
 		time_of_day_icon_graphics = time_of_day->get_icon()->get_graphics();
 	}
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-		DrawGenericPopup(wyrmgus::world::get_all()[ButtonUnderCursor]->get_name(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y, render_commands);
+		DrawGenericPopup(world::get_all()[ButtonUnderCursor]->get_name(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y, render_commands);
 	}
 
 	if (CursorOn == cursor_on::minimap) {
 		const QPoint minimap_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 		if (CMap::get()->Info->IsPointOnMap(minimap_tile_pos, UI.CurrentMapLayer->ID)) {
-			const wyrmgus::tile *tile = UI.CurrentMapLayer->Field(minimap_tile_pos);
+			const tile *tile = UI.CurrentMapLayer->Field(minimap_tile_pos);
 
 			if (tile->player_info->IsTeamExplored(*CPlayer::GetThisPlayer())) {
 				//hackish way to make the popup appear correctly
-				std::unique_ptr<wyrmgus::button> button;
+				std::unique_ptr<button> button;
 				const bool is_tile_water = tile->is_water() && !tile->is_river();
 				const bool is_tile_space = tile->is_space();
 				const bool is_tile_non_land = is_tile_water || is_tile_space;
 
 				switch (UI.get_minimap()->get_mode()) {
-					case wyrmgus::minimap_mode::territories:
+					case minimap_mode::territories:
 						if (tile->get_owner() != nullptr && !is_tile_non_land) {
 							button = get_territory_tooltip_button(tile->get_owner());
 						}
 						break;
-					case wyrmgus::minimap_mode::territories_with_non_land:
+					case minimap_mode::territories_with_non_land:
 						if (tile->get_owner() != nullptr) {
 							button = get_territory_tooltip_button(tile->get_owner());
 						}
 						break;
-					case wyrmgus::minimap_mode::realms:
+					case minimap_mode::realms:
 						if (tile->get_realm_owner() != nullptr && !is_tile_non_land) {
 							button = get_territory_tooltip_button(tile->get_realm_owner());
 						}
 						break;
-					case wyrmgus::minimap_mode::realms_with_non_land:
+					case minimap_mode::realms_with_non_land:
 						if (tile->get_realm_owner() != nullptr) {
 							button = get_territory_tooltip_button(tile->get_realm_owner());
 						}
 						break;
-					case wyrmgus::minimap_mode::settlements:
-					case wyrmgus::minimap_mode::settlements_with_non_land:
+					case minimap_mode::settlements:
+					case minimap_mode::settlements_with_non_land:
 					{
-						const wyrmgus::site *settlement = tile->get_settlement();
+						const site *settlement = tile->get_settlement();
 						if (tile->get_settlement() == nullptr) {
 							break;
 						}
 
-						const wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
+						const site_game_data *settlement_game_data = settlement->get_game_data();
 						const CUnit *site_unit = settlement_game_data->get_site_unit();
 
 						if (site_unit == nullptr) {
@@ -937,7 +937,7 @@ void DrawPopups(std::vector<std::function<void(renderer *)>> &render_commands)
 
 						const bool is_same_tile_type_as_settlement = (is_tile_water == (site_center_tile->is_water() && !site_center_tile->is_river()) && is_tile_space == site_center_tile->is_space());
 
-						if (UI.get_minimap()->get_mode() == wyrmgus::minimap_mode::settlements_with_non_land || is_same_tile_type_as_settlement) {
+						if (UI.get_minimap()->get_mode() == minimap_mode::settlements_with_non_land || is_same_tile_type_as_settlement) {
 							button = std::make_unique<wyrmgus::button>();
 							button->Action = ButtonCmd::None;
 							button->Popup = "popup_settlement";
@@ -1141,7 +1141,7 @@ std::string(Messages[z]), render_commands);
 			}
 		}
 
-		for (const wyrmgus::quest *quest : CPlayer::GetThisPlayer()->get_current_quests()) {
+		for (const quest *quest : CPlayer::GetThisPlayer()->get_current_quests()) {
 			if (z == 0) {
 				PushClipping();
 				SetClipping(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int(), Video.Width - 1, Video.Height - 1);
@@ -1154,7 +1154,7 @@ std::string(Messages[z]), render_commands);
 			++z;
 
 			for (const auto &objective : CPlayer::GetThisPlayer()->get_quest_objectives()) {
-				const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
+				const quest_objective *quest_objective = objective->get_quest_objective();
 				if (quest_objective->get_quest() != quest) {
 					continue;
 				}
@@ -1649,7 +1649,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit, std::vector<std::fun
 //		UI.StatusLine.Set(unit.Type->Name);
 		
 		//hackish way to make the popup appear correctly for the single selected unit
-		wyrmgus::button ba;
+		button ba;
 		ba.Hint = unit.GetMessageName();
 		ba.Action = ButtonUnit;
 		ba.Value = UnitNumber(unit);
@@ -1668,7 +1668,7 @@ static void InfoPanel_draw_multiple_selection(std::vector<std::function<void(ren
 	DrawInfoPanelBackground(0, render_commands);
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 		//Wyrmgus start
-//		const wyrmgus::icon &icon = *Selected[i]->Type->Icon.Icon;
+//		const icon &icon = *Selected[i]->Type->Icon.Icon;
 		//Wyrmgus end
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 		//Wyrmgus start
@@ -1682,11 +1682,11 @@ static void InfoPanel_draw_multiple_selection(std::vector<std::function<void(ren
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, render_commands);
 
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
-			const wyrmgus::font_color *text_color = nullptr;
+			const font_color *text_color = nullptr;
 			if (Selected[i]->get_unique() != nullptr || Selected[i]->get_character() != nullptr) {
-				text_color = wyrmgus::defines::get()->get_unique_font_color();
+				text_color = defines::get()->get_unique_font_color();
 			} else if (Selected[i]->Prefix != nullptr || Selected[i]->Suffix != nullptr) {
-				text_color = wyrmgus::defines::get()->get_magic_font_color();
+				text_color = defines::get()->get_magic_font_color();
 			}
 			DrawGenericPopup(Selected[i]->GetMessageName(), UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, text_color, nullptr, render_commands);
 			//Wyrmgus end
