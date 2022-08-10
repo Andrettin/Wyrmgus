@@ -1349,6 +1349,11 @@ bool UnitTypeCanBeAt(const wyrmgus::unit_type &type, const Vec2i &pos, int z)
 				return false;
 			}
 			
+			if (type.BoolFlag[BUILDING_INDEX].value && tile->is_on_trade_route()) {
+				if (type.get_terrain_type() == nullptr || !type.get_terrain_type()->is_pathway()) {
+					return false;
+				}
+			}
 		}
 		index += CMap::get()->Info->MapWidths[z];
 	}
