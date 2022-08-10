@@ -651,6 +651,9 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 					const auto find_iterator = this->terrain_substitutions.find(terrain);
 					if (find_iterator != this->terrain_substitutions.end()) {
 						terrain = find_iterator->second;
+						if (terrain == nullptr) {
+							continue;
+						}
 					}
 				}
 			}
