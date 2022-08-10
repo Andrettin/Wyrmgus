@@ -173,6 +173,13 @@ public:
 		this->stored_input_events.push(std::move(event));
 	}
 
+	void set_cursor_restriction_rect(const QRect &rect)
+	{
+		this->cursor_restriction_rect = rect;
+	}
+
+	void set_cursor_pos(const QPoint &pos);
+
 	Q_INVOKABLE QVariantList get_difficulties() const;
 	Q_INVOKABLE QString get_difficulty_name(const int difficulty_index) const;
 
@@ -325,6 +332,7 @@ private:
 	std::promise<void> map_view_created_promise;
 	std::atomic<bool> waiting_for_interface = false;
 	std::queue<std::unique_ptr<QInputEvent>> stored_input_events;
+	QRect cursor_restriction_rect;
 	QString loading_message; //the loading message to be displayed
 	interface_style *current_interface_style = nullptr;
 	const time_of_day *current_time_of_day = nullptr;

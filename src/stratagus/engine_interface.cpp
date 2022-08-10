@@ -72,6 +72,10 @@
 #include "util/queue_util.h"
 #include "util/qvariant_util.h"
 
+#pragma warning(push, 0)
+#include <QWindow>
+#pragma warning(pop)
+
 namespace wyrmgus {
 
 engine_interface::engine_interface()
@@ -193,6 +197,16 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 		case QEvent::MouseButtonRelease:
 		case QEvent::MouseMove: {
 			const QMouseEvent *mouse_event = static_cast<QMouseEvent *>(event);
+
+			if (mouse_event->type() == QEvent::MouseMove && !this->cursor_restriction_rect.isNull() && !this->cursor_restriction_rect.contains(mouse_event->pos())) {
+				const int clamped_x = std::clamp(mouse_event->pos().x(), this->cursor_restriction_rect.x(), this->cursor_restriction_rect.right());
+				const int clamped_y = std::clamp(mouse_event->pos().y(), this->cursor_restriction_rect.y(), this->cursor_restriction_rect.bottom());
+				const QPoint clamped_pos(clamped_x, clamped_y);
+
+				this->set_cursor_pos(clamped_pos);
+				return true;
+			}
+
 			this->store_input_event(std::make_unique<QMouseEvent>(*mouse_event));
 			return true;
 		}
@@ -200,6 +214,16 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 		case QEvent::HoverLeave:
 		case QEvent::HoverMove: {
 			const QHoverEvent *hover_event = static_cast<QHoverEvent *>(event);
+
+			if (hover_event->type() == QEvent::HoverMove && !this->cursor_restriction_rect.isNull() && !this->cursor_restriction_rect.contains(hover_event->pos())) {
+				const int clamped_x = std::clamp(hover_event->pos().x(), this->cursor_restriction_rect.x(), this->cursor_restriction_rect.right());
+				const int clamped_y = std::clamp(hover_event->pos().y(), this->cursor_restriction_rect.y(), this->cursor_restriction_rect.bottom());
+				const QPoint clamped_pos(clamped_x, clamped_y);
+
+				this->set_cursor_pos(clamped_pos);
+				return true;
+			}
+
 			this->store_input_event(std::make_unique<QHoverEvent>(*hover_event));
 			return true;
 		}
@@ -217,6 +241,21 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 		default:
 			return false;
 	}
+}
+
+void engine_interface::set_cursor_pos(const QPoint &pos)
+{
+	const QWindowList windows = QApplication::topLevelWindows();
+
+	if (windows.empty()) {
+		return;
+	}
+
+	const QWindow *window = windows.at(0);
+
+	const QPoint global_pos = window->mapToGlobal(pos);
+
+	QCursor::setPos(global_pos);
 }
 
 QVariantList engine_interface::get_visible_campaigns() const
