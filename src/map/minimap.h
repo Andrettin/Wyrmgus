@@ -85,6 +85,11 @@ public:
 	QPoint tile_to_texture_pos(const QPoint &tile_pos) const;
 	QPoint tile_to_screen_pos(const QPoint &tile_pos) const;
 
+	QRect get_rect() const
+	{
+		return QRect(this->X, this->Y, this->get_width(), this->get_height());
+	}
+
 	int get_width() const
 	{
 		return this->W;

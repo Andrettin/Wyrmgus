@@ -1552,10 +1552,12 @@ void UIHandleMouseMove(const PixelPos &cursorPos, const Qt::KeyboardModifiers ke
 	}
 
 	if (CursorOn == cursor_on::minimap && (MouseButtons & LeftButton)) {
-		//  Minimap move viewpoint
+		//minimap move viewpoint
 		const Vec2i tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 
 		UI.SelectedViewport->Center(CMap::get()->tile_pos_to_scaled_map_pixel_pos_center(tile_pos));
+
+		engine_interface::get()->set_cursor_restriction_rect(UI.get_minimap()->get_rect());
 
 		//if clicking the minimap made the hovered tile change (e.g. because the minimap is in zoomed mode), then set the cursor's position to that of the old tile pos
 		if (tile_pos != UI.get_minimap()->screen_to_tile_pos(CursorScreenPos)) {
@@ -2691,6 +2693,8 @@ void UIHandleButtonUp(unsigned button, const Qt::KeyboardModifiers key_modifiers
 		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), false);
 		return;
 	}
+
+	engine_interface::get()->set_cursor_restriction_rect(QRect());
 
 	//Wyrmgus start
 //	if ((1 << button) == LeftButton) {
