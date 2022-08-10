@@ -1727,12 +1727,6 @@ static boost::asio::awaitable<void> EditorCallbackKeyDown(unsigned key, unsigned
 			//Wyrmgus end
 			}
 			break;
-		case 'x': // ALT+X, CTRL+X: Exit editor
-			if (!(key_modifiers & (Qt::AltModifier | Qt::ControlModifier))) {
-				break;
-			}
-			co_await Exit(0);
-
 		case 'z':
 			if (key_modifiers & Qt::ControlModifier) {
 				EditorUndoAction();
