@@ -474,7 +474,7 @@ struct EventCallback final
 	void (*MouseExit)() = nullptr;
 
 	/// Callback for key press
-	boost::asio::awaitable<void> (*KeyPressed)(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers) = nullptr;
+	void (*KeyPressed)(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers) = nullptr;
 	/// Callback for key release
 	void (*KeyReleased)(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers) = nullptr;
 	/// Callback for key repeated

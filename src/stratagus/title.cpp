@@ -56,11 +56,10 @@ static void WaitCallbackButtonReleased(unsigned, const Qt::KeyboardModifiers)
 /**
 **  Callback for input.
 */
-[[nodiscard]]
-static boost::asio::awaitable<void> WaitCallbackKeyPressed(unsigned, unsigned, const Qt::KeyboardModifiers)
+static void WaitCallbackKeyPressed(unsigned, unsigned, const Qt::KeyboardModifiers)
 {
 	WaitNoEvent = false;
-	co_return;
+	return;
 }
 
 /**

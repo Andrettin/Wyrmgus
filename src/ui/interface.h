@@ -189,8 +189,7 @@ extern bool HandleKeyModifiersDown(const unsigned keycode);
 extern bool HandleKeyModifiersUp(const unsigned keycode);
 
 /// Called if a key is pressed
-[[nodiscard]]
-extern boost::asio::awaitable<void> HandleKeyDown(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers);
+extern void HandleKeyDown(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers);
 /// Called when a key is released
 
 extern void HandleKeyUp(unsigned keycode, unsigned keychar, const Qt::KeyboardModifiers key_modifiers);
@@ -212,8 +211,7 @@ extern void InputMouseExit(const EventCallback &callbacks, unsigned ticks);
 extern void InputMouseTimeout(const EventCallback &callbacks, unsigned ticks, const Qt::KeyboardModifiers key_modifiers);
 
 /// Called if any key button is pressed down
-[[nodiscard]]
-extern boost::asio::awaitable<void> InputKeyButtonPress(const EventCallback &callbacks, unsigned ticks, unsigned ikey, unsigned ikeychar, const Qt::KeyboardModifiers key_modifiers);
+extern void InputKeyButtonPress(const EventCallback &callbacks, unsigned ticks, unsigned ikey, unsigned ikeychar, const Qt::KeyboardModifiers key_modifiers);
 
 /// Called if any key button is released up
 extern void InputKeyButtonRelease(const EventCallback &callbacks, unsigned ticks, unsigned ikey, unsigned ikeychar, const Qt::KeyboardModifiers key_modifiers);

@@ -419,7 +419,7 @@ static boost::asio::awaitable<void> SdlDoEvent(const EventCallback &callbacks, S
 			break;
 
 		case SDL_KEYDOWN:
-			co_await InputKeyButtonPress(callbacks, SDL_GetTicks(), event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0, key_modifiers);
+			InputKeyButtonPress(callbacks, SDL_GetTicks(), event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0, key_modifiers);
 			break;
 
 		case SDL_KEYUP:

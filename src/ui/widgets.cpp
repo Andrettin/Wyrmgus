@@ -78,8 +78,7 @@ static void MenuHandleMouseMove(const PixelPos &screenPos, const Qt::KeyboardMod
 	HandleCursorMove(&pos.x, &pos.y);
 }
 
-[[nodiscard]]
-static boost::asio::awaitable<void> MenuHandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
+static void MenuHandleKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	Q_UNUSED(keychar)
 	Q_UNUSED(key_modifiers)
@@ -89,7 +88,7 @@ static boost::asio::awaitable<void> MenuHandleKeyDown(unsigned key, unsigned key
 		case SDLK_PRINTSCREEN:
 		case SDLK_F11:
 			Screenshot();
-			co_return;
+			return;
 		default:
 			break;
 	}

@@ -1673,8 +1673,7 @@ static void EditorCallbackButtonDown(unsigned button, const Qt::KeyboardModifier
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-[[nodiscard]]
-static boost::asio::awaitable<void> EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
+static void EditorCallbackKeyDown(unsigned key, unsigned keychar, const Qt::KeyboardModifiers key_modifiers)
 {
 	Q_UNUSED(keychar)
 
@@ -1683,13 +1682,13 @@ static boost::asio::awaitable<void> EditorCallbackKeyDown(unsigned key, unsigned
 		case SDLK_PRINTSCREEN:
 		case SDLK_F11:
 			Screenshot();
-			co_return;
+			return;
 		default:
 			break;
 	}
 
 	if (HandleKeyModifiersDown(key)) {
-		co_return;
+		return;
 	}
 
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
@@ -1723,7 +1722,7 @@ static boost::asio::awaitable<void> EditorCallbackKeyDown(unsigned key, unsigned
 			//Wyrmgus start
 			} else {
 				HandleCommandKey(key, key_modifiers);
-				co_return;
+				return;
 			//Wyrmgus end
 			}
 			break;
@@ -1783,7 +1782,7 @@ static boost::asio::awaitable<void> EditorCallbackKeyDown(unsigned key, unsigned
 		}
 		default:
 			HandleCommandKey(key, key_modifiers);
-			co_return;
+			return;
 	}
 }
 
