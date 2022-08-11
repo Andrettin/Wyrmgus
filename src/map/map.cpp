@@ -384,6 +384,9 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const C
 		} else if (unit_type->get_given_resource() != nullptr && !unit_type->BoolFlag[BUILDING_INDEX].value) {
 			//for non-building resources (i.e. wood piles), place them within a certain distance of player units, to prevent them from blocking the way
 			Select(random_pos - QPoint(4, 4), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::get_neutral_player()));
+		} else if (unit_type == settlement_site_unit_type) {
+			//when generating settlement sites, make them be within a certain distance of each other
+			Select(random_pos - QPoint(16, 16), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(16, 16), table, z, HasSameTypeAs(*settlement_site_unit_type));
 		}
 
 		if (table.empty() && site != nullptr && !site->get_satellites().empty()) {
