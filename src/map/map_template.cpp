@@ -1986,24 +1986,110 @@ void map_template::apply_satellite_site(const site *satellite, int64_t &orbit_di
 
 void map_template::generate_settlements(const QPoint &map_start_pos, const QPoint &map_end, const int z) const
 {
-	std::vector<const site *> settlements_to_generate;
+	std::vector<const site *> generated_settlements;
+	std::vector<const region *> settlement_regions;
 
 	for (const faction *faction : this->generated_factions) {
 		for (const site *settlement : faction->get_core_settlements()) {
-			if (vector::contains(settlements_to_generate, settlement)) {
+			if (vector::contains(generated_settlements, settlement)) {
 				continue;
 			}
 
-			settlements_to_generate.push_back(settlement);
+			generated_settlements.push_back(settlement);
+
+			for (const region *region : settlement->get_regions()) {
+				if (vector::contains(settlement_regions, region)) {
+					continue;
+				}
+
+				settlement_regions.push_back(region);
+			}
 		}
 	}
 
-	CMap::get()->generate_neutral_units(settlement_site_unit_type, settlements_to_generate.size(), map_start_pos, map_end - QPoint(1, 1), false, z);
+	CMap::get()->generate_neutral_units(settlement_site_unit_type, generated_settlements.size(), map_start_pos, map_end - QPoint(1, 1), false, z);
 
 	std::vector<CUnit *> settlement_sites = CPlayer::get_neutral_player()->get_type_units(settlement_site_unit_type);
 
+	std::vector<const site *> placed_settlements;
+
+	std::vector<const site *> settlements_to_generate = generated_settlements;
+
 	while (!settlements_to_generate.empty()) {
-		const site *settlement = vector::take_random(settlements_to_generate);
+		std::vector<const region *> potential_regions;
+		int best_region_settlement_count = std::numeric_limits<int>::max(); //smaller is better
+
+		for (const region *region : settlement_regions) {
+			int region_settlement_count = 0;
+			int region_settlement_to_generate_count = 0;
+
+			for (const site *region_site : region->get_sites()) {
+				if (!region_site->is_settlement()) {
+					continue;
+				}
+
+				if (!vector::contains(generated_settlements, region_site)) {
+					continue;
+				}
+
+				++region_settlement_count;
+
+				if (vector::contains(settlements_to_generate, region_site)) {
+					++region_settlement_to_generate_count;
+				}
+			}
+
+			if (region_settlement_to_generate_count == 0) {
+				//all settlements already generated, the region can't be used anymore
+				continue;
+			}
+
+			if (region_settlement_to_generate_count == region_settlement_count) {
+				//no settlements in the region have been placed, so it can't be used to generate settlements in the same region closer together
+				continue;
+			}
+
+			if (region_settlement_count < best_region_settlement_count) {
+				best_region_settlement_count = region_settlement_count;
+				potential_regions.clear();
+			}
+
+			if (region_settlement_count <= best_region_settlement_count) {
+				potential_regions.push_back(region);
+			}
+		}
+
+		const site *origin_settlement = nullptr;
+		const site *settlement = nullptr;
+
+		if (!potential_regions.empty()) {
+			const region *region = vector::get_random(potential_regions);
+
+			std::vector<const site *> placed_region_settlements;
+			std::vector<const site *> region_settlements_to_generate;
+
+			for (const site *region_site : region->get_sites()) {
+				if (!region_site->is_settlement()) {
+					continue;
+				}
+
+				if (!vector::contains(generated_settlements, region_site)) {
+					continue;
+				}
+
+				if (vector::contains(placed_settlements, region_site)) {
+					placed_region_settlements.push_back(region_site);
+				} else {
+					region_settlements_to_generate.push_back(region_site);
+				}
+			}
+
+			origin_settlement = vector::get_random(placed_region_settlements);
+			settlement = vector::get_random(region_settlements_to_generate);
+			std::erase(settlements_to_generate, settlement);
+		} else {
+			settlement = vector::take_random(settlements_to_generate);
+		}
 
 		std::vector<const faction *> possible_factions;
 		for (const faction *faction : this->generated_factions) {
@@ -2024,14 +2110,13 @@ void map_template::generate_settlements(const QPoint &map_start_pos, const QPoin
 
 		CUnit *settlement_site = nullptr;
 
-		if (faction_player->StartPos.x == 0 && faction_player->StartPos.y == 0) {
+		if (origin_settlement == nullptr) {
 			settlement_site = vector::take_random(settlement_sites);
-			faction_player->SetStartView(settlement_site->get_center_tile_pos(), z);
 		} else {
 			int best_distance = std::numeric_limits<int>::max();
 
 			for (CUnit *loop_settlement_site : settlement_sites) {
-				const int distance = point::distance_to(faction_player->StartPos, loop_settlement_site->get_center_tile_pos());
+				const int distance = point::distance_to(origin_settlement->get_game_data()->get_site_unit()->get_center_tile_pos(), loop_settlement_site->get_center_tile_pos());
 
 				if (distance < best_distance) {
 					settlement_site = loop_settlement_site;
@@ -2046,6 +2131,10 @@ void map_template::generate_settlements(const QPoint &map_start_pos, const QPoin
 
 		assert_throw(settlement_site != nullptr);
 
+		if (faction_player->StartPos.x == 0 && faction_player->StartPos.y == 0) {
+			faction_player->SetStartView(settlement_site->get_center_tile_pos(), z);
+		}
+
 		CUnit *town_hall = CreateUnit(settlement_site->get_center_tile_pos(), *town_hall_type, faction_player, z, true, nullptr);
 
 		apply_unit_site_properties(town_hall, settlement);
@@ -2056,6 +2145,8 @@ void map_template::generate_settlements(const QPoint &map_start_pos, const QPoin
 				town_hall->MapLayer->Field(tile_pos)->set_settlement(settlement);
 			}
 		}
+
+		placed_settlements.push_back(settlement);
 	}
 }
 
