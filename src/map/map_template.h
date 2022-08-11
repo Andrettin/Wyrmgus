@@ -153,6 +153,7 @@ public:
 	void apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void apply_site(const site *site, const QPoint &site_pos, const int z) const;
 	void apply_satellite_site(const site *site, int64_t &orbit_distance) const;
+	void generate_settlements(const QPoint &map_start_pos, const QPoint &map_end, const int z) const;
 	void generate_site(const site *site, const QPoint &map_start_pos, const QPoint &map_end, const int z) const;
 	void apply_population_unit(const unit_class *unit_class, const int population, const QPoint &unit_pos, const int z, CPlayer *player, const site *settlement) const;
 	void apply_remaining_site_populations() const;
@@ -837,6 +838,7 @@ private:
 	std::map<char, std::unique_ptr<character_unit>> character_units;
 	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
 	qunique_ptr<dungeon_generation_settings> dungeon_generation;
+	std::vector<const faction *> generated_factions;
 	std::unique_ptr<map_template_history> history;
 
 	friend int ::CclDefineMapTemplate(lua_State *l);

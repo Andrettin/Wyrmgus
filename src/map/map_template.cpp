@@ -290,6 +290,10 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 		}
 
 		database::process_gsml_data(this->dungeon_generation, scope);
+	} else if (tag == "generated_factions") {
+		for (const std::string &value : values) {
+			this->generated_factions.push_back(faction::get(value));
+		}
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}
@@ -1070,6 +1074,10 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	this->apply_sites(template_start_pos, map_start_pos, map_end, z, true);
 	this->ApplyUnits(template_start_pos, map_start_pos, map_end, z, true);
+
+	if (!this->generated_factions.empty()) {
+		this->generate_settlements(map_start_pos, map_end, z);
+	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		CPlayer *player = CPlayer::Players[i].get();
@@ -1976,6 +1984,81 @@ void map_template::apply_satellite_site(const site *satellite, int64_t &orbit_di
 	}
 }
 
+void map_template::generate_settlements(const QPoint &map_start_pos, const QPoint &map_end, const int z) const
+{
+	std::vector<const site *> settlements_to_generate;
+
+	for (const faction *faction : this->generated_factions) {
+		for (const site *settlement : faction->get_core_settlements()) {
+			if (vector::contains(settlements_to_generate, settlement)) {
+				continue;
+			}
+
+			settlements_to_generate.push_back(settlement);
+		}
+	}
+
+	CMap::get()->generate_neutral_units(settlement_site_unit_type, settlements_to_generate.size(), map_start_pos, map_end - QPoint(1, 1), false, z);
+
+	std::vector<CUnit *> settlement_sites = CPlayer::get_neutral_player()->get_type_units(settlement_site_unit_type);
+
+	while (!settlements_to_generate.empty()) {
+		const site *settlement = vector::take_random(settlements_to_generate);
+
+		std::vector<const faction *> possible_factions;
+		for (const faction *faction : this->generated_factions) {
+			if (vector::contains(faction->get_core_settlements(), settlement)) {
+				possible_factions.push_back(faction);
+			}
+		}
+
+		assert_throw(!possible_factions.empty());
+
+		const faction *faction = vector::take_random(possible_factions);
+
+		const unit_type *town_hall_type = faction->get_class_unit_type(defines::get()->get_town_hall_class());
+
+		assert_throw(town_hall_type != nullptr);
+
+		CPlayer *faction_player = GetOrAddFactionPlayer(faction);
+
+		CUnit *settlement_site = nullptr;
+
+		if (faction_player->StartPos.x == 0 && faction_player->StartPos.y == 0) {
+			settlement_site = vector::take_random(settlement_sites);
+			faction_player->SetStartView(settlement_site->get_center_tile_pos(), z);
+		} else {
+			int best_distance = std::numeric_limits<int>::max();
+
+			for (CUnit *loop_settlement_site : settlement_sites) {
+				const int distance = point::distance_to(faction_player->StartPos, loop_settlement_site->get_center_tile_pos());
+
+				if (distance < best_distance) {
+					settlement_site = loop_settlement_site;
+					best_distance = distance;
+				}
+			}
+
+			if (settlement_site != nullptr) {
+				std::erase(settlement_sites, settlement_site);
+			}
+		}
+
+		assert_throw(settlement_site != nullptr);
+
+		CUnit *town_hall = CreateUnit(settlement_site->get_center_tile_pos(), *town_hall_type, faction_player, z, true, nullptr);
+
+		apply_unit_site_properties(town_hall, settlement);
+
+		for (int x = town_hall->tilePos.x; x < (town_hall->tilePos.x + town_hall->Type->get_tile_width()); ++x) {
+			for (int y = town_hall->tilePos.y; y < (town_hall->tilePos.y + town_hall->Type->get_tile_height()); ++y) {
+				const QPoint tile_pos(x, y);
+				town_hall->MapLayer->Field(tile_pos)->set_settlement(settlement);
+			}
+		}
+	}
+}
+
 void map_template::generate_site(const site *site, const QPoint &map_start_pos, const QPoint &map_end, const int z) const
 {
 	if (site->get_game_data()->is_on_map()) {
@@ -2153,6 +2236,10 @@ void map_template::apply_remaining_site_populations() const
 		}
 
 		site_history *settlement_history = site->get_history();
+
+		if (game_data->get_map_layer() == nullptr) {
+			continue;
+		}
 
 		const QPoint &settlement_pos = game_data->get_map_pos();
 		const int z = game_data->get_map_layer()->ID;
