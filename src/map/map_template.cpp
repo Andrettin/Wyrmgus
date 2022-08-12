@@ -2023,18 +2023,14 @@ void map_template::generate_settlements(const QPoint &map_start_pos, const QPoin
 			int region_settlement_count = 0;
 			int region_settlement_to_generate_count = 0;
 
-			for (const site *region_site : region->get_sites()) {
-				if (!region_site->is_settlement()) {
-					continue;
-				}
-
-				if (!vector::contains(generated_settlements, region_site)) {
+			for (const site *region_settlement : region->get_settlements()) {
+				if (!vector::contains(generated_settlements, region_settlement)) {
 					continue;
 				}
 
 				++region_settlement_count;
 
-				if (vector::contains(settlements_to_generate, region_site)) {
+				if (vector::contains(settlements_to_generate, region_settlement)) {
 					++region_settlement_to_generate_count;
 				}
 			}
@@ -2068,19 +2064,15 @@ void map_template::generate_settlements(const QPoint &map_start_pos, const QPoin
 			std::vector<const site *> placed_region_settlements;
 			std::vector<const site *> region_settlements_to_generate;
 
-			for (const site *region_site : region->get_sites()) {
-				if (!region_site->is_settlement()) {
+			for (const site *region_settlement : region->get_settlements()) {
+				if (!vector::contains(generated_settlements, region_settlement)) {
 					continue;
 				}
 
-				if (!vector::contains(generated_settlements, region_site)) {
-					continue;
-				}
-
-				if (vector::contains(placed_settlements, region_site)) {
-					placed_region_settlements.push_back(region_site);
+				if (vector::contains(placed_settlements, region_settlement)) {
+					placed_region_settlements.push_back(region_settlement);
 				} else {
-					region_settlements_to_generate.push_back(region_site);
+					region_settlements_to_generate.push_back(region_settlement);
 				}
 			}
 

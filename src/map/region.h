@@ -67,6 +67,11 @@ public:
 	void add_site(site *site);
 	void remove_site(site *site);
 
+	const std::vector<const site *> &get_settlements() const
+	{
+		return this->settlements;
+	}
+
 	QVariantList get_superregions_qvariant_list() const;
 
 	Q_INVOKABLE void add_superregion(region *superregion)
@@ -81,7 +86,7 @@ public:
 
 private:
 	std::vector<site *> sites; //sites located in the region
-	std::vector<site *> settlements; //settlements located in the region
+	std::vector<const site *> settlements; //settlements located in the region
 	std::vector<region *> subregions; //subregions of this region
 	std::vector<region *> superregions; //regions for which this region is a subregion
 	std::unique_ptr<region_history> history;
