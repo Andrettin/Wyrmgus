@@ -2352,7 +2352,10 @@ void PlayerAi::check_settlement_construction(const site_set &settlements)
 		const site_game_data *settlement_game_data = settlement->get_game_data();
 
 		CUnit *settlement_unit = settlement_game_data->get_site_unit();
-		assert_throw(settlement_unit != nullptr);
+
+		if (settlement_unit == nullptr) {
+			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" is on the map's settlement list, but has no site unit.");
+		}
 
 		if (!settlement_unit->IsAliveOnMap()) {
 			continue;
