@@ -155,6 +155,7 @@ public:
 	void apply_satellite_site(const site *site, int64_t &orbit_distance) const;
 	void generate_settlements(const int z) const;
 	std::vector<QPoint> generate_settlement_seeds(const int z, const size_t seed_count) const;
+	const site *take_settlement_to_generate(const int z, const std::vector<const site *> &generated_settlements, std::vector<const site *> &settlements_to_generate, const std::vector<const site *> &placed_settlements, const std::vector<const region *> &settlement_regions, const geocoordinate &min_geocoordinate, const geocoordinate &max_geocoordinate, QPoint &near_pos) const;
 	void generate_site(const site *site, const QPoint &map_start_pos, const QPoint &map_end, const int z) const;
 	void apply_population_unit(const unit_class *unit_class, const int population, const QPoint &unit_pos, const int z, CPlayer *player, const site *settlement) const;
 	void apply_remaining_site_populations() const;

@@ -1989,6 +1989,9 @@ void map_template::generate_settlements(const int z) const
 	std::vector<const site *> generated_settlements;
 	std::vector<const region *> settlement_regions;
 
+	geocoordinate min_geocoordinate;
+	geocoordinate max_geocoordinate;
+
 	for (const faction *faction : this->generated_factions) {
 		for (const site *settlement : faction->get_core_settlements()) {
 			if (vector::contains(generated_settlements, settlement)) {
@@ -1996,6 +1999,25 @@ void map_template::generate_settlements(const int z) const
 			}
 
 			generated_settlements.push_back(settlement);
+
+			const geocoordinate &geocoordinate = settlement->get_geocoordinate();
+			if (!geocoordinate.is_null()) {
+				if (geocoordinate.get_longitude() < min_geocoordinate.get_longitude() || min_geocoordinate.get_longitude() == 0) {
+					min_geocoordinate.set_longitude(geocoordinate.get_longitude());
+				}
+
+				if (geocoordinate.get_latitude() < min_geocoordinate.get_latitude() || min_geocoordinate.get_latitude() == 0) {
+					min_geocoordinate.set_latitude(geocoordinate.get_latitude());
+				}
+
+				if (geocoordinate.get_longitude() > max_geocoordinate.get_longitude() || max_geocoordinate.get_longitude() == 0) {
+					max_geocoordinate.set_longitude(geocoordinate.get_longitude());
+				}
+
+				if (geocoordinate.get_latitude() > max_geocoordinate.get_latitude() || max_geocoordinate.get_latitude() == 0) {
+					max_geocoordinate.set_latitude(geocoordinate.get_latitude());
+				}
+			}
 
 			for (const region *region : settlement->get_regions()) {
 				if (vector::contains(settlement_regions, region)) {
@@ -2010,77 +2032,14 @@ void map_template::generate_settlements(const int z) const
 	std::vector<QPoint> settlement_seeds = generate_settlement_seeds(z, generated_settlements.size());
 
 
+	std::vector<const site *> settlements_to_generate = generated_settlements;
+	vector::shuffle(settlements_to_generate);
+
 	std::vector<const site *> placed_settlements;
 
-	std::vector<const site *> settlements_to_generate = generated_settlements;
-
 	while (!settlements_to_generate.empty()) {
-		std::vector<const region *> potential_regions;
-		int best_region_settlement_count = std::numeric_limits<int>::max(); //smaller is better
-
-		for (const region *region : settlement_regions) {
-			int region_settlement_count = 0;
-			int region_settlement_to_generate_count = 0;
-
-			for (const site *region_settlement : region->get_settlements()) {
-				if (!vector::contains(generated_settlements, region_settlement)) {
-					continue;
-				}
-
-				++region_settlement_count;
-
-				if (vector::contains(settlements_to_generate, region_settlement)) {
-					++region_settlement_to_generate_count;
-				}
-			}
-
-			if (region_settlement_to_generate_count == 0) {
-				//all settlements already generated, the region can't be used anymore
-				continue;
-			}
-
-			if (region_settlement_to_generate_count == region_settlement_count) {
-				//no settlements in the region have been placed, so it can't be used to generate settlements in the same region closer together
-				continue;
-			}
-
-			if (region_settlement_count < best_region_settlement_count) {
-				best_region_settlement_count = region_settlement_count;
-				potential_regions.clear();
-			}
-
-			if (region_settlement_count <= best_region_settlement_count) {
-				potential_regions.push_back(region);
-			}
-		}
-
-		const site *origin_settlement = nullptr;
-		const site *settlement = nullptr;
-
-		if (!potential_regions.empty()) {
-			const region *region = vector::get_random(potential_regions);
-
-			std::vector<const site *> placed_region_settlements;
-			std::vector<const site *> region_settlements_to_generate;
-
-			for (const site *region_settlement : region->get_settlements()) {
-				if (!vector::contains(generated_settlements, region_settlement)) {
-					continue;
-				}
-
-				if (vector::contains(placed_settlements, region_settlement)) {
-					placed_region_settlements.push_back(region_settlement);
-				} else {
-					region_settlements_to_generate.push_back(region_settlement);
-				}
-			}
-
-			origin_settlement = vector::get_random(placed_region_settlements);
-			settlement = vector::get_random(region_settlements_to_generate);
-			std::erase(settlements_to_generate, settlement);
-		} else {
-			settlement = vector::take_random(settlements_to_generate);
-		}
+		QPoint near_pos(-1, -1);
+		const site *settlement = this->take_settlement_to_generate(z, generated_settlements, settlements_to_generate, placed_settlements, settlement_regions, min_geocoordinate, max_geocoordinate, near_pos);
 
 		std::vector<const faction *> possible_factions;
 		for (const faction *faction : this->generated_factions) {
@@ -2101,13 +2060,11 @@ void map_template::generate_settlements(const int z) const
 
 		QPoint settlement_seed(-1, -1);
 
-		if (origin_settlement == nullptr) {
-			settlement_seed = vector::take_random(settlement_seeds);
-		} else {
+		if (near_pos != QPoint(-1, -1)) {
 			int best_distance = std::numeric_limits<int>::max();
 
 			for (const QPoint &loop_settlement_seed : settlement_seeds) {
-				const int distance = point::distance_to(origin_settlement->get_game_data()->get_site_unit()->get_center_tile_pos(), loop_settlement_seed);
+				const int distance = point::distance_to(near_pos, loop_settlement_seed);
 
 				if (distance < best_distance) {
 					settlement_seed = loop_settlement_seed;
@@ -2116,6 +2073,8 @@ void map_template::generate_settlements(const int z) const
 			}
 
 			std::erase(settlement_seeds, settlement_seed);
+		} else {
+			settlement_seed = vector::take_random(settlement_seeds);
 		}
 
 		assert_throw(settlement_seed != QPoint(-1, -1));
@@ -2157,7 +2116,7 @@ std::vector<QPoint> map_template::generate_settlement_seeds(const int z, const s
 				//when generating settlement seeds, make them be within a certain distance of each other
 				const int distance = point::distance_to(random_pos, seed);
 
-				if (distance <= 16) {
+				if (distance <= 32) {
 					valid_location = false;
 					break;
 				}
@@ -2173,6 +2132,96 @@ std::vector<QPoint> map_template::generate_settlement_seeds(const int z, const s
 	assert_throw(settlement_seeds.size() == seed_count);
 
 	return settlement_seeds;
+}
+
+const site *map_template::take_settlement_to_generate(const int z, const std::vector<const site *> &generated_settlements, std::vector<const site *> &settlements_to_generate, const std::vector<const site *> &placed_settlements, const std::vector<const region *> &settlement_regions, const geocoordinate &min_geocoordinate, const geocoordinate &max_geocoordinate, QPoint &near_pos) const
+{
+	near_pos = QPoint(-1, -1);
+
+	for (const site *settlement : settlements_to_generate) {
+		if (settlement->get_geocoordinate().is_null()) {
+			continue;
+		}
+
+		const geocoordinate::number_type longitude_size = max_geocoordinate.get_longitude() - min_geocoordinate.get_longitude();
+		const geocoordinate::number_type latitude_size = max_geocoordinate.get_latitude() - min_geocoordinate.get_latitude();
+
+		const int target_x = (settlement->get_geocoordinate().get_longitude().get_value() - min_geocoordinate.get_longitude().get_value()) * CMap::get()->MapLayers[z]->get_width() / longitude_size.get_value();
+		const int target_y = CMap::get()->MapLayers[z]->get_height() - ((settlement->get_geocoordinate().get_latitude().get_value() - min_geocoordinate.get_latitude().get_value()) * CMap::get()->MapLayers[z]->get_height() / latitude_size.get_value()) - 1;
+
+		near_pos = QPoint(target_x, target_y);
+		std::erase(settlements_to_generate, settlement);
+
+		return settlement;
+	}
+
+	std::vector<const region *> potential_regions;
+	int best_region_settlement_count = std::numeric_limits<int>::max(); //smaller is better
+
+	for (const region *region : settlement_regions) {
+		int region_settlement_count = 0;
+		int region_settlement_to_generate_count = 0;
+
+		for (const site *region_settlement : region->get_settlements()) {
+			if (!vector::contains(generated_settlements, region_settlement)) {
+				continue;
+			}
+
+			++region_settlement_count;
+
+			if (vector::contains(settlements_to_generate, region_settlement)) {
+				++region_settlement_to_generate_count;
+			}
+		}
+
+		if (region_settlement_to_generate_count == 0) {
+			//all settlements already generated, the region can't be used anymore
+			continue;
+		}
+
+		if (region_settlement_to_generate_count == region_settlement_count) {
+			//no settlements in the region have been placed, so it can't be used to generate settlements in the same region closer together
+			continue;
+		}
+
+		if (region_settlement_count < best_region_settlement_count) {
+			best_region_settlement_count = region_settlement_count;
+			potential_regions.clear();
+		}
+
+		if (region_settlement_count <= best_region_settlement_count) {
+			potential_regions.push_back(region);
+		}
+	}
+
+	if (!potential_regions.empty()) {
+		const region *region = vector::get_random(potential_regions);
+
+		std::vector<const site *> placed_region_settlements;
+		std::vector<const site *> region_settlements_to_generate;
+
+		for (const site *region_settlement : region->get_settlements()) {
+			if (!vector::contains(generated_settlements, region_settlement)) {
+				continue;
+			}
+
+			if (vector::contains(placed_settlements, region_settlement)) {
+				placed_region_settlements.push_back(region_settlement);
+			} else {
+				region_settlements_to_generate.push_back(region_settlement);
+			}
+		}
+
+		const site *origin_settlement = vector::get_random(placed_region_settlements);
+		near_pos = origin_settlement->get_game_data()->get_site_unit()->get_center_tile_pos();
+
+		const site *settlement = vector::get_random(region_settlements_to_generate);
+		std::erase(settlements_to_generate, settlement);
+
+		return settlement;
+	}
+
+	return vector::take_random(settlements_to_generate);
 }
 
 void map_template::generate_site(const site *site, const QPoint &map_start_pos, const QPoint &map_end, const int z) const
