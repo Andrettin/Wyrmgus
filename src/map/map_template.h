@@ -59,6 +59,7 @@ class map_template_history;
 class map_template_unit;
 class region;
 class site;
+class terrain_feature;
 class terrain_type;
 class tile;
 class tileset;
@@ -120,6 +121,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 
 public:
 	using terrain_character_map_type = std::vector<std::vector<char>>;
+	using zone_variant = std::variant<std::monostate, const site *, const terrain_feature *>;
 
 	static constexpr const char *class_identifier = "map_template";
 	static constexpr const char *database_folder = "map_templates";
@@ -153,10 +155,10 @@ public:
 	void apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void apply_site(const site *site, const QPoint &site_pos, const int z) const;
 	void apply_satellite_site(const site *site, int64_t &orbit_distance) const;
-	void generate_settlements(const int z) const;
-	std::vector<QPoint> generate_settlement_seeds(const int z, const size_t seed_count) const;
-	const site *take_settlement_to_generate(const int z, const std::vector<const site *> &generated_settlements, std::vector<const site *> &settlements_to_generate, const std::vector<const site *> &placed_settlements, const std::vector<const region *> &settlement_regions, const geocoordinate &min_geocoordinate, const geocoordinate &max_geocoordinate, QPoint &near_pos) const;
-	void expand_settlement_territories(std::vector<const site *> &tile_settlements, std::vector<QPoint> &&seeds, const int z) const;
+	void generate_zones(const int z) const;
+	std::vector<QPoint> generate_zone_seeds(const int z, const size_t seed_count) const;
+	zone_variant take_zone_to_generate(const int z, const std::vector<zone_variant> &generated_zones, std::vector<zone_variant> &zones_to_generate, const std::vector<zone_variant> &placed_zones, const std::vector<const region *> &zone_regions, const geocoordinate &min_geocoordinate, const geocoordinate &max_geocoordinate, const std::vector<zone_variant> &tile_zones, const std::vector<QPoint> &zone_seeds, QPoint &near_pos) const;
+	void expand_zones(std::vector<zone_variant> &tile_zones, std::vector<QPoint> &&seeds, const int z) const;
 	void generate_site(const site *site, const QPoint &map_start_pos, const QPoint &map_end, const int z) const;
 	void apply_population_unit(const unit_class *unit_class, const int population, const QPoint &unit_pos, const int z, CPlayer *player, const site *settlement) const;
 	void apply_remaining_site_populations() const;
@@ -842,6 +844,7 @@ private:
 	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
 	qunique_ptr<dungeon_generation_settings> dungeon_generation;
 	std::vector<const faction *> generated_factions;
+	std::vector<const terrain_feature *> generated_terrain_features;
 	std::unique_ptr<map_template_history> history;
 
 	friend int ::CclDefineMapTemplate(lua_State *l);

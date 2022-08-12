@@ -294,6 +294,10 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 		for (const std::string &value : values) {
 			this->generated_factions.push_back(faction::get(value));
 		}
+	} else if (tag == "generated_terrain_features") {
+		for (const std::string &value : values) {
+			this->generated_terrain_features.push_back(terrain_feature::get(value));
+		}
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}
@@ -988,7 +992,12 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		ShowLoadProgress(_("Applying \"%s\" Subtemplates..."), this->get_name().c_str());
 		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false, false);
 	}
-	
+
+	if (!this->IsSubtemplateArea() && !this->generated_factions.empty()) {
+		ShowLoadProgress(_("Generating \"%s\" Zones..."), this->get_name().c_str());
+		this->generate_zones(z);
+	}
+
 	if (!this->IsSubtemplateArea() && this->is_tile_adjustment_enabled()) {
 		ShowLoadProgress(_("Adjusting \"%s\" Map Template Terrain..."), this->get_name().c_str());
 		CMap::get()->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
@@ -1074,10 +1083,6 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	this->apply_sites(template_start_pos, map_start_pos, map_end, z, true);
 	this->ApplyUnits(template_start_pos, map_start_pos, map_end, z, true);
-
-	if (!this->generated_factions.empty()) {
-		this->generate_settlements(z);
-	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		CPlayer *player = CPlayer::Players[i].get();
@@ -1984,21 +1989,21 @@ void map_template::apply_satellite_site(const site *satellite, int64_t &orbit_di
 	}
 }
 
-void map_template::generate_settlements(const int z) const
+void map_template::generate_zones(const int z) const
 {
-	std::vector<const site *> generated_settlements;
-	std::vector<const region *> settlement_regions;
+	std::vector<zone_variant> generated_zones;
+	std::vector<const region *> zone_regions;
 
 	geocoordinate min_geocoordinate;
 	geocoordinate max_geocoordinate;
 
 	for (const faction *faction : this->generated_factions) {
 		for (const site *settlement : faction->get_core_settlements()) {
-			if (vector::contains(generated_settlements, settlement)) {
+			if (vector::contains(generated_zones, zone_variant(settlement))) {
 				continue;
 			}
 
-			generated_settlements.push_back(settlement);
+			generated_zones.push_back(settlement);
 
 			const geocoordinate &geocoordinate = settlement->get_geocoordinate();
 			if (!geocoordinate.is_null()) {
@@ -2018,108 +2023,147 @@ void map_template::generate_settlements(const int z) const
 					max_geocoordinate.set_latitude(geocoordinate.get_latitude());
 				}
 			}
-
-			for (const region *region : settlement->get_regions()) {
-				if (vector::contains(settlement_regions, region)) {
-					continue;
-				}
-
-				settlement_regions.push_back(region);
-			}
 		}
 	}
 
-	std::vector<QPoint> settlement_seeds = generate_settlement_seeds(z, generated_settlements.size());
+	for (const terrain_feature *terrain_feature : this->generated_terrain_features) {
+		if (vector::contains(generated_zones, zone_variant(terrain_feature))) {
+			continue;
+		}
+
+		generated_zones.push_back(terrain_feature);
+	}
+
+	for (const zone_variant &zone : generated_zones) {
+		std::visit([&](auto &&zone_value) {
+			using zone_type = std::decay_t<decltype(zone_value)>;
+
+			if constexpr (!std::is_same_v<zone_type, std::monostate>) {
+				for (const region *region : zone_value->get_regions()) {
+					if (vector::contains(zone_regions, region)) {
+						continue;
+					}
+
+					zone_regions.push_back(region);
+				}
+			}
+		}, zone);
+	}
+
+	std::vector<QPoint> zone_seeds = generate_zone_seeds(z, generated_zones.size());
 
 	CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
 	const QSize &map_size = map_layer->get_size();
 
-	std::vector<const site *> tile_settlements;
-	tile_settlements.resize(map_size.width() * map_size.height(), nullptr);
+	std::vector<zone_variant> tile_zones;
+	tile_zones.resize(map_size.width() * map_size.height(), std::monostate());
 
-	std::vector<const site *> settlements_to_generate = generated_settlements;
-	vector::shuffle(settlements_to_generate);
+	std::vector<zone_variant> zones_to_generate = generated_zones;
+	vector::shuffle(zones_to_generate);
 
-	std::vector<const site *> placed_settlements;
+	std::vector<zone_variant> placed_zones;
 
-	std::vector<QPoint> settlement_expansion_seeds;
+	std::vector<QPoint> zone_expansion_seeds;
 
-	while (!settlements_to_generate.empty()) {
+	while (!zones_to_generate.empty()) {
 		QPoint near_pos(-1, -1);
-		const site *settlement = this->take_settlement_to_generate(z, generated_settlements, settlements_to_generate, placed_settlements, settlement_regions, min_geocoordinate, max_geocoordinate, near_pos);
+		const zone_variant zone = this->take_zone_to_generate(z, generated_zones, zones_to_generate, placed_zones, zone_regions, min_geocoordinate, max_geocoordinate, tile_zones, zone_seeds, near_pos);
 
-		std::vector<const faction *> possible_factions;
-		for (const faction *faction : this->generated_factions) {
-			if (vector::contains(faction->get_core_settlements(), settlement)) {
-				possible_factions.push_back(faction);
+		CPlayer *faction_player = nullptr;
+		const unit_type *town_hall_type = nullptr;
+
+		if (std::holds_alternative<const site *>(zone)) {
+			const site *settlement = std::get<const site *>(zone);
+
+			std::vector<const faction *> possible_factions;
+			for (const faction *faction : this->generated_factions) {
+				if (vector::contains(faction->get_core_settlements(), settlement)) {
+					possible_factions.push_back(faction);
+				}
 			}
+
+			assert_throw(!possible_factions.empty());
+
+			const faction *faction = vector::take_random(possible_factions);
+
+			town_hall_type = faction->get_class_unit_type(defines::get()->get_town_hall_class());
+
+			assert_throw(town_hall_type != nullptr);
+
+			faction_player = GetOrAddFactionPlayer(faction);
 		}
 
-		assert_throw(!possible_factions.empty());
-
-		const faction *faction = vector::take_random(possible_factions);
-
-		const unit_type *town_hall_type = faction->get_class_unit_type(defines::get()->get_town_hall_class());
-
-		assert_throw(town_hall_type != nullptr);
-
-		CPlayer *faction_player = GetOrAddFactionPlayer(faction);
-
-		QPoint settlement_seed(-1, -1);
+		QPoint zone_seed(-1, -1);
 
 		if (near_pos != QPoint(-1, -1)) {
 			int best_distance = std::numeric_limits<int>::max();
 
-			for (const QPoint &loop_settlement_seed : settlement_seeds) {
-				const int distance = point::distance_to(near_pos, loop_settlement_seed);
+			for (const QPoint &loop_zone_seed : zone_seeds) {
+				const int distance = point::distance_to(near_pos, loop_zone_seed);
 
 				if (distance < best_distance) {
-					settlement_seed = loop_settlement_seed;
+					zone_seed = loop_zone_seed;
 					best_distance = distance;
 				}
 			}
 
-			std::erase(settlement_seeds, settlement_seed);
+			std::erase(zone_seeds, zone_seed);
 		} else {
-			settlement_seed = vector::take_random(settlement_seeds);
+			zone_seed = vector::take_random(zone_seeds);
 		}
 
-		assert_throw(settlement_seed != QPoint(-1, -1));
+		assert_throw(zone_seed != QPoint(-1, -1));
 
-		tile_settlements[point::to_index(settlement_seed, map_size)] = settlement;
-		settlement_expansion_seeds.push_back(settlement_seed);
+		tile_zones[point::to_index(zone_seed, map_size)] = zone;
+		zone_expansion_seeds.push_back(zone_seed);
 
-		if (faction_player->StartPos.x == 0 && faction_player->StartPos.y == 0) {
-			faction_player->SetStartView(settlement_seed, z);
-		}
-
-		CUnit *settlement_site = CreateUnit(settlement_seed, *settlement_site_unit_type, CPlayer::get_neutral_player(), z, true, nullptr);
-
-		apply_unit_site_properties(settlement_site, settlement);
-
-		for (int x = settlement_site->tilePos.x; x < (settlement_site->tilePos.x + settlement_site->Type->get_tile_width()); ++x) {
-			for (int y = settlement_site->tilePos.y; y < (settlement_site->tilePos.y + settlement_site->Type->get_tile_height()); ++y) {
-				QPoint tile_pos(x, y);
-				tile_settlements[point::to_index(tile_pos, map_size)] = settlement;
-				settlement_expansion_seeds.push_back(std::move(tile_pos));
+		if (faction_player != nullptr) {
+			if (faction_player->StartPos.x == 0 && faction_player->StartPos.y == 0) {
+				faction_player->SetStartView(zone_seed, z);
 			}
+
+			CUnit *settlement_site = CreateUnit(zone_seed, *settlement_site_unit_type, CPlayer::get_neutral_player(), z, true, nullptr);
+
+			const site *settlement = std::get<const site *>(zone);
+			apply_unit_site_properties(settlement_site, settlement);
+
+			for (int x = settlement_site->tilePos.x; x < (settlement_site->tilePos.x + settlement_site->Type->get_tile_width()); ++x) {
+				for (int y = settlement_site->tilePos.y; y < (settlement_site->tilePos.y + settlement_site->Type->get_tile_height()); ++y) {
+					QPoint tile_pos(x, y);
+					tile_zones[point::to_index(tile_pos, map_size)] = zone;
+					zone_expansion_seeds.push_back(std::move(tile_pos));
+				}
+			}
+
+			CreateUnit(zone_seed, *town_hall_type, faction_player, z, true, nullptr);
 		}
 
-		CreateUnit(settlement_seed, *town_hall_type, faction_player, z, true, nullptr);
-
-		placed_settlements.push_back(settlement);
+		placed_zones.push_back(zone);
 	}
 
-	this->expand_settlement_territories(tile_settlements, std::move(settlement_expansion_seeds), z);
+	this->expand_zones(tile_zones, std::move(zone_expansion_seeds), z);
 
-	for (size_t i = 0; i < tile_settlements.size(); ++i) {
-		const site *settlement = tile_settlements[i];
-		map_layer->Field(i)->set_settlement(settlement);
+	for (size_t i = 0; i < tile_zones.size(); ++i) {
+		const zone_variant zone = tile_zones[i];
+
+		std::visit([&](auto &&zone_value) {
+			using zone_type = std::decay_t<decltype(zone_value)>;
+
+			if constexpr (std::is_same_v<zone_type, const terrain_feature *>) {
+				tile *tile = map_layer->Field(i);
+
+				tile->SetTerrain(zone_value->get_terrain_type());
+				tile->set_terrain_feature(zone_value);
+			}
+		}, zone);
+//		map_layer->Field(i)->set_settlement(settlement);
 	}
 }
 
-std::vector<QPoint> map_template::generate_settlement_seeds(const int z, const size_t seed_count) const
+std::vector<QPoint> map_template::generate_zone_seeds(const int z, const size_t seed_count) const
 {
+	static constexpr int min_zone_seed_distance = 16;
+
 	std::vector<QPoint> potential_positions;
 	potential_positions.reserve(CMap::get()->MapLayers[z]->get_width() * CMap::get()->MapLayers[z]->get_height());
 
@@ -2129,41 +2173,50 @@ std::vector<QPoint> map_template::generate_settlement_seeds(const int z, const s
 		}
 	}
 
-	std::vector<QPoint> settlement_seeds;
-	settlement_seeds.reserve(seed_count);
+	std::vector<QPoint> zone_seeds;
+	zone_seeds.reserve(seed_count);
 
 	for (size_t i = 0; i < seed_count; ++i) {
 		while (!potential_positions.empty()) {
 			QPoint random_pos = vector::take_random(potential_positions);
 
 			bool valid_location = true;
-			for (const QPoint &seed : settlement_seeds) {
-				//when generating settlement seeds, make them be within a certain distance of each other
+			for (const QPoint &seed : zone_seeds) {
+				//when generating zone seeds, make them be within a certain distance of each other
 				const int distance = point::distance_to(random_pos, seed);
 
-				if (distance <= 32) {
+				if (distance < min_zone_seed_distance) {
 					valid_location = false;
 					break;
 				}
 			}
 
 			if (valid_location) {
-				settlement_seeds.push_back(std::move(random_pos));
+				zone_seeds.push_back(std::move(random_pos));
 				break;
 			}
 		}
 	}
 
-	assert_throw(settlement_seeds.size() == seed_count);
+	assert_throw(zone_seeds.size() == seed_count);
 
-	return settlement_seeds;
+	return zone_seeds;
 }
 
-const site *map_template::take_settlement_to_generate(const int z, const std::vector<const site *> &generated_settlements, std::vector<const site *> &settlements_to_generate, const std::vector<const site *> &placed_settlements, const std::vector<const region *> &settlement_regions, const geocoordinate &min_geocoordinate, const geocoordinate &max_geocoordinate, QPoint &near_pos) const
+map_template::zone_variant map_template::take_zone_to_generate(const int z, const std::vector<zone_variant> &generated_zones, std::vector<zone_variant> &zones_to_generate, const std::vector<zone_variant> &placed_zones, const std::vector<const region *> &zone_regions, const geocoordinate &min_geocoordinate, const geocoordinate &max_geocoordinate, const std::vector<zone_variant> &tile_zones, const std::vector<QPoint> &zone_seeds, QPoint &near_pos) const
 {
 	near_pos = QPoint(-1, -1);
 
-	for (const site *settlement : settlements_to_generate) {
+	const CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
+	const QSize &map_size = map_layer->get_size();
+
+	for (const zone_variant zone : zones_to_generate) {
+		if (!std::holds_alternative<const site *>(zone)) {
+			continue;
+		}
+
+		const site *settlement = std::get<const site *>(zone);
+
 		if (settlement->get_geocoordinate().is_null()) {
 			continue;
 		}
@@ -2171,50 +2224,62 @@ const site *map_template::take_settlement_to_generate(const int z, const std::ve
 		const geocoordinate::number_type longitude_size = max_geocoordinate.get_longitude() - min_geocoordinate.get_longitude();
 		const geocoordinate::number_type latitude_size = max_geocoordinate.get_latitude() - min_geocoordinate.get_latitude();
 
-		const int target_x = (settlement->get_geocoordinate().get_longitude().get_value() - min_geocoordinate.get_longitude().get_value()) * CMap::get()->MapLayers[z]->get_width() / longitude_size.get_value();
-		const int target_y = CMap::get()->MapLayers[z]->get_height() - ((settlement->get_geocoordinate().get_latitude().get_value() - min_geocoordinate.get_latitude().get_value()) * CMap::get()->MapLayers[z]->get_height() / latitude_size.get_value()) - 1;
+		const int target_x = (settlement->get_geocoordinate().get_longitude().get_value() - min_geocoordinate.get_longitude().get_value()) * map_size.width() / longitude_size.get_value();
+		const int target_y = map_size.height() - ((settlement->get_geocoordinate().get_latitude().get_value() - min_geocoordinate.get_latitude().get_value()) * map_size.height() / latitude_size.get_value()) - 1;
 
 		near_pos = QPoint(target_x, target_y);
-		std::erase(settlements_to_generate, settlement);
+		std::erase(zones_to_generate, zone);
 
-		return settlement;
+		return zone;
 	}
 
 	std::vector<const region *> potential_regions;
-	int best_region_settlement_count = std::numeric_limits<int>::max(); //smaller is better
+	int best_region_zone_count = std::numeric_limits<int>::max(); //smaller is better
 
-	for (const region *region : settlement_regions) {
-		int region_settlement_count = 0;
-		int region_settlement_to_generate_count = 0;
+	for (const region *region : zone_regions) {
+		int region_zone_count = 0;
+		int region_zone_to_generate_count = 0;
 
 		for (const site *region_settlement : region->get_settlements()) {
-			if (!vector::contains(generated_settlements, region_settlement)) {
+			if (!vector::contains(generated_zones, zone_variant(region_settlement))) {
 				continue;
 			}
 
-			++region_settlement_count;
+			++region_zone_count;
 
-			if (vector::contains(settlements_to_generate, region_settlement)) {
-				++region_settlement_to_generate_count;
+			if (vector::contains(zones_to_generate, zone_variant(region_settlement))) {
+				++region_zone_to_generate_count;
 			}
 		}
 
-		if (region_settlement_to_generate_count == 0) {
-			//all settlements already generated, the region can't be used anymore
+		for (const terrain_feature *region_terrain_feature : region->get_terrain_features()) {
+			if (!vector::contains(generated_zones, zone_variant(region_terrain_feature))) {
+				continue;
+			}
+
+			++region_zone_count;
+
+			if (vector::contains(zones_to_generate, zone_variant(region_terrain_feature))) {
+				++region_zone_to_generate_count;
+			}
+		}
+
+		if (region_zone_to_generate_count == 0) {
+			//all zones already generated, the region can't be used anymore
 			continue;
 		}
 
-		if (region_settlement_to_generate_count == region_settlement_count) {
-			//no settlements in the region have been placed, so it can't be used to generate settlements in the same region closer together
+		if (region_zone_to_generate_count == region_zone_count) {
+			//no zones in the region have been placed, so it can't be used to generate zones in the same region closer together
 			continue;
 		}
 
-		if (region_settlement_count < best_region_settlement_count) {
-			best_region_settlement_count = region_settlement_count;
+		if (region_zone_count < best_region_zone_count) {
+			best_region_zone_count = region_zone_count;
 			potential_regions.clear();
 		}
 
-		if (region_settlement_count <= best_region_settlement_count) {
+		if (region_zone_count <= best_region_zone_count) {
 			potential_regions.push_back(region);
 		}
 	}
@@ -2222,40 +2287,64 @@ const site *map_template::take_settlement_to_generate(const int z, const std::ve
 	if (!potential_regions.empty()) {
 		const region *region = vector::get_random(potential_regions);
 
-		std::vector<const site *> placed_region_settlements;
-		std::vector<const site *> region_settlements_to_generate;
+		std::vector<zone_variant> placed_region_zones;
+		std::vector<zone_variant> region_zones_to_generate;
 
 		for (const site *region_settlement : region->get_settlements()) {
-			if (!vector::contains(generated_settlements, region_settlement)) {
+			if (!vector::contains(generated_zones, zone_variant(region_settlement))) {
 				continue;
 			}
 
-			if (vector::contains(placed_settlements, region_settlement)) {
-				placed_region_settlements.push_back(region_settlement);
+			if (vector::contains(placed_zones, zone_variant(region_settlement))) {
+				placed_region_zones.push_back(region_settlement);
 			} else {
-				region_settlements_to_generate.push_back(region_settlement);
+				region_zones_to_generate.push_back(region_settlement);
 			}
 		}
 
-		const site *origin_settlement = vector::get_random(placed_region_settlements);
-		near_pos = origin_settlement->get_game_data()->get_site_unit()->get_center_tile_pos();
+		for (const terrain_feature *region_terrain_feature : region->get_terrain_features()) {
+			if (!vector::contains(generated_zones, zone_variant(region_terrain_feature))) {
+				continue;
+			}
 
-		const site *settlement = vector::get_random(region_settlements_to_generate);
-		std::erase(settlements_to_generate, settlement);
+			if (vector::contains(placed_zones, zone_variant(region_terrain_feature))) {
+				placed_region_zones.push_back(region_terrain_feature);
+			} else {
+				region_zones_to_generate.push_back(region_terrain_feature);
+			}
+		}
 
-		return settlement;
+		const zone_variant origin_zone = vector::get_random(placed_region_zones);
+
+		if (std::holds_alternative<const site *>(origin_zone)) {
+			near_pos = std::get<const site *>(origin_zone)->get_game_data()->get_site_unit()->get_center_tile_pos();
+		} else {
+			for (const QPoint &zone_seed : zone_seeds) {
+				const zone_variant seed_zone = tile_zones[point::to_index(zone_seed, map_size)];
+
+				if (seed_zone == origin_zone) {
+					near_pos = zone_seed;
+					break;
+				}
+			}
+		}
+
+		zone_variant zone = vector::get_random(region_zones_to_generate);
+		std::erase(zones_to_generate, zone);
+
+		return zone;
 	}
 
-	return vector::take_random(settlements_to_generate);
+	return vector::take_random(zones_to_generate);
 }
 
-void map_template::expand_settlement_territories(std::vector<const site *> &tile_settlements, std::vector<QPoint> &&seeds, const int z) const
+void map_template::expand_zones(std::vector<zone_variant> &tile_zones, std::vector<QPoint> &&seeds, const int z) const
 {
 	const QSize &map_size = CMap::get()->MapLayers[z]->get_size();
 
 	while (!seeds.empty()) {
 		QPoint seed_pos = vector::take_random(seeds);
-		const site *settlement = tile_settlements[point::to_index(seed_pos, map_size)];
+		const zone_variant zone = tile_zones[point::to_index(seed_pos, map_size)];
 
 		std::vector<QPoint> adjacent_positions;
 
@@ -2264,7 +2353,7 @@ void map_template::expand_settlement_territories(std::vector<const site *> &tile
 				return;
 			}
 
-			if (tile_settlements[point::to_index(adjacent_pos, map_size)] != nullptr) {
+			if (!std::holds_alternative<std::monostate>(tile_zones[point::to_index(adjacent_pos, map_size)])) {
 				return;
 			}
 
@@ -2281,7 +2370,7 @@ void map_template::expand_settlement_territories(std::vector<const site *> &tile
 		}
 
 		QPoint adjacent_pos = vector::take_random(adjacent_positions);
-		tile_settlements[point::to_index(adjacent_pos, map_size)] = settlement;
+		tile_zones[point::to_index(adjacent_pos, map_size)] = zone;
 
 		seeds.push_back(std::move(adjacent_pos));
 	}
