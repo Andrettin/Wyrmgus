@@ -166,6 +166,15 @@ inline void for_each_adjacent_until(const QPoint &point, const function_type &fu
 }
 
 template <typename function_type>
+inline void for_each_cardinally_adjacent(const QPoint &point, const function_type &function)
+{
+	function(QPoint(point.x() - 1, point.y()));
+	function(QPoint(point.x() + 1, point.y()));
+	function(QPoint(point.x(), point.y() - 1));
+	function(QPoint(point.x(), point.y() + 1));
+}
+
+template <typename function_type>
 inline std::optional<QPoint> find_adjacent_if(const QPoint &point, const function_type &function)
 {
 	std::optional<QPoint> result;

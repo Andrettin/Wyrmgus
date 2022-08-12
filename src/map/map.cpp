@@ -4108,7 +4108,8 @@ point_set CMap::expand_settlement_territories(std::vector<QPoint> &&seeds, const
 
 		if (adjacent_positions.size() > 0) {
 			if (adjacent_positions.size() > 1) {
-				seeds.push_back(seed_pos); //push the seed back again for another try, since it may be able to generate further terrain in the future
+				//push the seed back again for another try, since it may be able to generate further in the future
+				seeds.push_back(seed_pos);
 			}
 
 			QPoint adjacent_pos = vector::get_random(adjacent_positions);
