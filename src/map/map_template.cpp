@@ -2135,6 +2135,8 @@ void map_template::generate_settlements(const QPoint &map_start_pos, const QPoin
 			faction_player->SetStartView(settlement_site->get_center_tile_pos(), z);
 		}
 
+		CMap::get()->remove_settlement_unit(settlement_site);
+
 		CUnit *town_hall = CreateUnit(settlement_site->get_center_tile_pos(), *town_hall_type, faction_player, z, true, nullptr);
 
 		apply_unit_site_properties(town_hall, settlement);
