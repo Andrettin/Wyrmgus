@@ -28,16 +28,41 @@
 
 #include "map/terrain_feature.h"
 
+#include "map/region.h"
 #include "map/terrain_type.h"
 #include "player/civilization.h"
+#include "util/assert_util.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
 
 void terrain_feature::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+	const gsml_operator gsml_operator = scope.get_operator();
 
 	if (tag == "cultural_names") {
+		scope.for_each_property([&](const gsml_property &property) {
+			const civilization *civilization = civilization::get(property.get_key());
+			this->cultural_names[civilization] = property.get_value();
+		});
+	} else if (tag == "regions") {
+		for (const std::string &value : values) {
+			region *region = region::get(value);
+
+			switch (gsml_operator) {
+				case gsml_operator::assignment:
+				case gsml_operator::addition:
+					this->add_region(region);
+					break;
+				case gsml_operator::subtraction:
+					this->remove_region(region);
+					break;
+				default:
+					assert_throw(false);
+			}
+		}
 		scope.for_each_property([&](const gsml_property &property) {
 			const civilization *civilization = civilization::get(property.get_key());
 			this->cultural_names[civilization] = property.get_value();
@@ -61,6 +86,21 @@ void terrain_feature::set_color(const QColor &color)
 
 	this->color = color;
 	terrain_feature::terrain_features_by_color[color] = this;
+}
+
+void terrain_feature::add_region(region *region)
+{
+	if (!vector::contains(this->regions, region)) {
+		this->regions.push_back(region);
+	}
+
+	region->add_terrain_feature(this);
+}
+
+void terrain_feature::remove_region(region *region)
+{
+	vector::remove(this->regions, region);
+	region->remove_terrain_feature(this);
 }
 
 }

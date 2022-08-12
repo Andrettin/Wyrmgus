@@ -31,6 +31,7 @@
 #include "map/region_history.h"
 #include "map/site.h"
 #include "map/site_history.h"
+#include "map/terrain_feature.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
 
@@ -130,6 +131,16 @@ void region::initialize()
 			this->sites.push_back(site);
 			site->add_region(this);
 		}
+
+		//add terrain features from subregions
+		for (terrain_feature *terrain_feature : subregion->get_terrain_features()) {
+			if (vector::contains(this->terrain_features, terrain_feature)) {
+				continue;
+			}
+
+			this->terrain_features.push_back(terrain_feature);
+			terrain_feature->add_region(this);
+		}
 	}
 
 	for (site *site : this->get_sites()) {
@@ -163,6 +174,20 @@ void region::add_site(site *site)
 void region::remove_site(site *site)
 {
 	vector::remove(this->sites, site);
+}
+
+void region::add_terrain_feature(terrain_feature *terrain_feature)
+{
+	if (vector::contains(this->terrain_features, terrain_feature)) {
+		return;
+	}
+
+	this->terrain_features.push_back(terrain_feature);
+}
+
+void region::remove_terrain_feature(terrain_feature *terrain_feature)
+{
+	vector::remove(this->terrain_features, terrain_feature);
 }
 
 QVariantList region::get_superregions_qvariant_list() const

@@ -37,8 +37,8 @@ extern int CclDefineTerrainFeature(lua_State *l);
 namespace wyrmgus {
 
 class civilization;
+class region;
 class terrain_type;
-class world;
 
 class terrain_feature final : public named_data_entry, public data_type<terrain_feature>
 {
@@ -165,6 +165,14 @@ public:
 		return this->hidden;
 	}
 
+	const std::vector<region *> &get_regions() const
+	{
+		return this->regions;
+	}
+
+	void add_region(region *region);
+	void remove_region(region *region);
+
 private:
 	QColor color;
 	wyrmgus::terrain_type *terrain_type = nullptr;
@@ -174,6 +182,7 @@ private:
 	bool terrain_generation_seed = false;
 	bool hidden = false;
 	std::map<const civilization *, std::string> cultural_names; //names for the terrain feature for each different culture/civilization
+	std::vector<region *> regions; //regions where this terrain feature is located
 
 	friend int ::CclDefineTerrainFeature(lua_State *l);
 };

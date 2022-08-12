@@ -33,6 +33,7 @@ namespace wyrmgus {
 
 class region_history;
 class site;
+class terrain_feature;
 
 class region final : public data_entry, public data_type<region>
 {
@@ -72,6 +73,14 @@ public:
 		return this->settlements;
 	}
 
+	const std::vector<terrain_feature *> &get_terrain_features() const
+	{
+		return this->terrain_features;
+	}
+
+	void add_terrain_feature(terrain_feature *terrain_feature);
+	void remove_terrain_feature(terrain_feature *terrain_feature);
+
 	QVariantList get_superregions_qvariant_list() const;
 
 	Q_INVOKABLE void add_superregion(region *superregion)
@@ -87,6 +96,7 @@ public:
 private:
 	std::vector<site *> sites; //sites located in the region
 	std::vector<const site *> settlements; //settlements located in the region
+	std::vector<terrain_feature *> terrain_features; //terrain features located in the region
 	std::vector<region *> subregions; //subregions of this region
 	std::vector<region *> superregions; //regions for which this region is a subregion
 	std::unique_ptr<region_history> history;
