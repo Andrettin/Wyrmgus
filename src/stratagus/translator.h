@@ -26,11 +26,7 @@
 
 #pragma once
 
-#include <unordered_map>
-
 #include "util/singleton.h"
-
-#include <QTranslator>
 
 namespace wyrmgus {
 

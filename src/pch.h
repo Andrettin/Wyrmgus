@@ -66,6 +66,7 @@
 #include <tuple>
 #include <type_traits>
 #include <typeinfo>
+#include <unordered_map>
 #include <variant>
 #include <vector>
 
@@ -97,6 +98,7 @@
 #include <QThread>
 #include <QTime>
 #include <QTimer>
+#include <QTranslator>
 #include <QVariant>
 #include <QVariantList>
 #pragma warning(pop)
