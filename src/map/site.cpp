@@ -42,7 +42,6 @@
 #include "player/civilization.h"
 #include "player/faction.h"
 #include "player/player_color.h"
-#include "region.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_domain.h"
@@ -548,10 +547,12 @@ QVariantList site::get_regions_qvariant_list() const
 
 void site::add_region(region *region)
 {
-	this->regions.push_back(region);
+	if (!vector::contains(this->regions, region)) {
+		this->regions.push_back(region);
+	}
+
 	region->add_site(this);
 }
-
 
 void site::remove_region(region *region)
 {

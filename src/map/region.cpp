@@ -128,6 +128,7 @@ void region::initialize()
 			}
 
 			this->sites.push_back(site);
+			site->add_region(this);
 		}
 	}
 
@@ -152,6 +153,10 @@ void region::reset_history()
 
 void region::add_site(site *site)
 {
+	if (vector::contains(this->sites, site)) {
+		return;
+	}
+
 	this->sites.push_back(site);
 }
 
