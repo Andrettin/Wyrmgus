@@ -3538,103 +3538,119 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 	const QPoint max_pos = rect.bottomRight();
 
 	//expand seeds
-	vector::process_randomly(seeds, [&](const QPoint &seed_pos) {
-		const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
+	std::vector<QPoint> leftover_seeds;
 
-		const wyrmgus::terrain_type *terrain_type = seed_tile->get_terrain();
-		const wyrmgus::terrain_type *overlay_terrain_type = seed_tile->get_overlay_terrain();
-		const wyrmgus::terrain_feature *terrain_feature = seed_tile->get_terrain_feature();
+	static constexpr int expansion_chance = 50;
 
-		if (overlay_terrain_type != nullptr && overlay_terrain_type->is_constructed()) {
-			overlay_terrain_type = nullptr; //don't expand overlay terrain to tiles with empty terrain if the overlay is a constructed one
-		}
-
-		const std::vector<QPoint> adjacent_positions = point::get_diagonally_adjacent_if(seed_pos, [&](const QPoint &diagonal_pos) {
-			const QPoint vertical_pos(seed_pos.x(), diagonal_pos.y());
-			const QPoint horizontal_pos(diagonal_pos.x(), seed_pos.y());
-
-			if (!this->Info->IsPointOnMap(diagonal_pos, z) || diagonal_pos.x() < min_pos.x() || diagonal_pos.y() < min_pos.y() || diagonal_pos.x() > max_pos.x() || diagonal_pos.y() > max_pos.y()) {
-				return false;
+	while (!seeds.empty()) {
+		vector::process_randomly(seeds, [&](const QPoint &seed_pos) {
+			const int random_number = random::get()->generate(100);
+			if (random_number >= expansion_chance) {
+				leftover_seeds.push_back(seed_pos);
+				return;
 			}
 
-			if ( //must either be able to generate on the tiles, or they must already have the generated terrain type
-				!this->CanTileBePartOfMissingTerrainGeneration(this->Field(diagonal_pos, z), terrain_type, overlay_terrain_type)
-				|| !this->CanTileBePartOfMissingTerrainGeneration(this->Field(vertical_pos, z), terrain_type, overlay_terrain_type)
-				|| !this->CanTileBePartOfMissingTerrainGeneration(this->Field(horizontal_pos, z), terrain_type, overlay_terrain_type)
-			) {
-				return false;
+			const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
+
+			const wyrmgus::terrain_type *terrain_type = seed_tile->get_terrain();
+			const wyrmgus::terrain_type *overlay_terrain_type = seed_tile->get_overlay_terrain();
+			const wyrmgus::terrain_feature *terrain_feature = seed_tile->get_terrain_feature();
+
+			if (overlay_terrain_type != nullptr && overlay_terrain_type->is_constructed()) {
+				overlay_terrain_type = nullptr; //don't expand overlay terrain to tiles with empty terrain if the overlay is a constructed one
 			}
 
-			const wyrmgus::terrain_type *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
-			const wyrmgus::terrain_type *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
-			const wyrmgus::terrain_type *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
+			const std::vector<QPoint> adjacent_positions = point::get_diagonally_adjacent_if(seed_pos, [&](const QPoint &diagonal_pos) {
+				const QPoint vertical_pos(seed_pos.x(), diagonal_pos.y());
+				const QPoint horizontal_pos(diagonal_pos.x(), seed_pos.y());
 
-			if (diagonal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(diagonal_pos, terrain_type, overlay_terrain_type, z)) {
-				return false;
-			}
-			if (vertical_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(vertical_pos, terrain_type, overlay_terrain_type, z)) {
-				return false;
-			}
-			if (horizontal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(horizontal_pos, terrain_type, overlay_terrain_type, z)) {
-				return false;
-			}
-
-			if (diagonal_tile_top_terrain != nullptr && vertical_tile_top_terrain != nullptr && horizontal_tile_top_terrain != nullptr) { //at least one of the tiles being expanded to must have null terrain
-				return false;
-			}
-
-			if (overlay_terrain_type != nullptr) {
-				if (this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, overlay_terrain_type, z)) {
+				if (!this->Info->IsPointOnMap(diagonal_pos, z) || diagonal_pos.x() < min_pos.x() || diagonal_pos.y() < min_pos.y() || diagonal_pos.x() > max_pos.x() || diagonal_pos.y() > max_pos.y()) {
 					return false;
 				}
-			}
 
-			return true;
+				if ( //must either be able to generate on the tiles, or they must already have the generated terrain type
+					!this->CanTileBePartOfMissingTerrainGeneration(this->Field(diagonal_pos, z), terrain_type, overlay_terrain_type)
+					|| !this->CanTileBePartOfMissingTerrainGeneration(this->Field(vertical_pos, z), terrain_type, overlay_terrain_type)
+					|| !this->CanTileBePartOfMissingTerrainGeneration(this->Field(horizontal_pos, z), terrain_type, overlay_terrain_type)
+					) {
+					return false;
+				}
+
+				const wyrmgus::terrain_type *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
+				const wyrmgus::terrain_type *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
+				const wyrmgus::terrain_type *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
+
+				if (diagonal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(diagonal_pos, terrain_type, overlay_terrain_type, z)) {
+					return false;
+				}
+				if (vertical_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(vertical_pos, terrain_type, overlay_terrain_type, z)) {
+					return false;
+				}
+				if (horizontal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(horizontal_pos, terrain_type, overlay_terrain_type, z)) {
+					return false;
+				}
+
+				if (diagonal_tile_top_terrain != nullptr && vertical_tile_top_terrain != nullptr && horizontal_tile_top_terrain != nullptr) { //at least one of the tiles being expanded to must have null terrain
+					return false;
+				}
+
+				if (overlay_terrain_type != nullptr) {
+					if (this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, overlay_terrain_type, z)) {
+						return false;
+					}
+				}
+
+				return true;
+			});
+
+			if (adjacent_positions.size() > 0) {
+				if (adjacent_positions.size() > 1) {
+					seeds.push_back(seed_pos); //push the seed back again for another try, since it may be able to generate further terrain in the future
+				}
+
+				const QPoint &adjacent_pos = vector::get_random(adjacent_positions);
+				const QPoint adjacent_pos_horizontal(adjacent_pos.x(), seed_pos.y());
+				const QPoint adjacent_pos_vertical(seed_pos.x(), adjacent_pos.y());
+
+				if (this->GetTileTopTerrain(adjacent_pos, false, z) == nullptr) {
+					this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
+					if (overlay_terrain_type != nullptr) {
+						this->Field(adjacent_pos, z)->SetTerrain(overlay_terrain_type);
+					}
+					if (terrain_feature != nullptr) {
+						this->Field(adjacent_pos, z)->set_terrain_feature(terrain_feature);
+					}
+					seeds.push_back(adjacent_pos);
+				}
+
+				if (this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) == nullptr) {
+					this->Field(adjacent_pos_horizontal, z)->SetTerrain(terrain_type);
+					if (overlay_terrain_type != nullptr) {
+						this->Field(adjacent_pos_horizontal, z)->SetTerrain(overlay_terrain_type);
+					}
+					if (terrain_feature != nullptr) {
+						this->Field(adjacent_pos_horizontal, z)->set_terrain_feature(terrain_feature);
+					}
+					seeds.push_back(adjacent_pos_horizontal);
+				}
+
+				if (this->GetTileTopTerrain(adjacent_pos_vertical, false, z) == nullptr) {
+					this->Field(adjacent_pos_vertical, z)->SetTerrain(terrain_type);
+					if (overlay_terrain_type != nullptr) {
+						this->Field(adjacent_pos_vertical, z)->SetTerrain(overlay_terrain_type);
+					}
+					if (terrain_feature != nullptr) {
+						this->Field(adjacent_pos_vertical, z)->set_terrain_feature(terrain_feature);
+					}
+					seeds.push_back(adjacent_pos_vertical);
+				}
+			}
 		});
 
-		if (adjacent_positions.size() > 0) {
-			if (adjacent_positions.size() > 1) {
-				seeds.push_back(seed_pos); //push the seed back again for another try, since it may be able to generate further terrain in the future
-			}
-
-			const QPoint &adjacent_pos = vector::get_random(adjacent_positions);
-			const QPoint adjacent_pos_horizontal(adjacent_pos.x(), seed_pos.y());
-			const QPoint adjacent_pos_vertical(seed_pos.x(), adjacent_pos.y());
-
-			if (this->GetTileTopTerrain(adjacent_pos, false, z) == nullptr) {
-				this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
-				if (overlay_terrain_type != nullptr) {
-					this->Field(adjacent_pos, z)->SetTerrain(overlay_terrain_type);
-				}
-				if (terrain_feature != nullptr) {
-					this->Field(adjacent_pos, z)->set_terrain_feature(terrain_feature);
-				}
-				seeds.push_back(adjacent_pos);
-			}
-
-			if (this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) == nullptr) {
-				this->Field(adjacent_pos_horizontal, z)->SetTerrain(terrain_type);
-				if (overlay_terrain_type != nullptr) {
-					this->Field(adjacent_pos_horizontal, z)->SetTerrain(overlay_terrain_type);
-				}
-				if (terrain_feature != nullptr) {
-					this->Field(adjacent_pos_horizontal, z)->set_terrain_feature(terrain_feature);
-				}
-				seeds.push_back(adjacent_pos_horizontal);
-			}
-
-			if (this->GetTileTopTerrain(adjacent_pos_vertical, false, z) == nullptr) {
-				this->Field(adjacent_pos_vertical, z)->SetTerrain(terrain_type);
-				if (overlay_terrain_type != nullptr) {
-					this->Field(adjacent_pos_vertical, z)->SetTerrain(overlay_terrain_type);
-				}
-				if (terrain_feature != nullptr) {
-					this->Field(adjacent_pos_vertical, z)->set_terrain_feature(terrain_feature);
-				}
-				seeds.push_back(adjacent_pos_vertical);
-			}
+		if (!leftover_seeds.empty()) {
+			seeds = std::move(leftover_seeds);
 		}
-	});
+	}
 
 	//set the terrain of the remaining tiles without any to their most-neighbored terrain/overlay terrain pair
 	std::vector<QPoint> remaining_positions;
