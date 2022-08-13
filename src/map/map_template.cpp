@@ -2211,21 +2211,25 @@ map_template::zone_variant map_template::take_zone_to_generate(const int z, cons
 	const QSize &map_size = map_layer->get_size();
 
 	for (const zone_variant zone : zones_to_generate) {
-		if (!std::holds_alternative<const site *>(zone)) {
-			continue;
+		geocoordinate geocoordinate;
+
+		if (std::holds_alternative<const site *>(zone)) {
+			const site *settlement = std::get<const site *>(zone);
+			geocoordinate = settlement->get_geocoordinate();
+		} else if (std::holds_alternative<const terrain_feature *>(zone)) {
+			const terrain_feature *terrain_feature = std::get<const wyrmgus::terrain_feature *>(zone);
+			geocoordinate = terrain_feature->get_geocoordinate();
 		}
 
-		const site *settlement = std::get<const site *>(zone);
-
-		if (settlement->get_geocoordinate().is_null()) {
+		if (geocoordinate.is_null()) {
 			continue;
 		}
 
 		const geocoordinate::number_type longitude_size = max_geocoordinate.get_longitude() - min_geocoordinate.get_longitude();
 		const geocoordinate::number_type latitude_size = max_geocoordinate.get_latitude() - min_geocoordinate.get_latitude();
 
-		const int target_x = (settlement->get_geocoordinate().get_longitude().get_value() - min_geocoordinate.get_longitude().get_value()) * map_size.width() / longitude_size.get_value();
-		const int target_y = map_size.height() - ((settlement->get_geocoordinate().get_latitude().get_value() - min_geocoordinate.get_latitude().get_value()) * map_size.height() / latitude_size.get_value()) - 1;
+		const int target_x = (geocoordinate.get_longitude().get_value() - min_geocoordinate.get_longitude().get_value()) * map_size.width() / longitude_size.get_value();
+		const int target_y = map_size.height() - ((geocoordinate.get_latitude().get_value() - min_geocoordinate.get_latitude().get_value()) * map_size.height() / latitude_size.get_value()) - 1;
 
 		near_pos = QPoint(target_x, target_y);
 		std::erase(zones_to_generate, zone);
