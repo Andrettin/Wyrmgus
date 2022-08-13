@@ -793,6 +793,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
+	const gsml_operator gsml_operator = scope.get_operator();
 
 	if (tag == "subtypes") {
 		for (const std::string &value : values) {
@@ -828,7 +829,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			this->repair_costs[resource] = std::stoi(value);
 		});
 	} else if (tag == "starting_resources") {
-		if (scope.get_operator() == gsml_operator::assignment) {
+		if (gsml_operator == gsml_operator::assignment) {
 			this->starting_resources.clear();
 		}
 
@@ -840,10 +841,18 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			this->WeaponClasses.push_back(string_to_item_class(value));
 		}
 	} else if (tag == "spawned_units") {
+		if (gsml_operator == gsml_operator::assignment) {
+			this->spawned_units.clear();
+		}
+
 		for (const std::string &value : values) {
 			this->spawned_units.push_back(unit_type::get(value));
 		}
 	} else if (tag == "neutral_spawned_units") {
+		if (gsml_operator == gsml_operator::assignment) {
+			this->neutral_spawned_units.clear();
+		}
+
 		for (const std::string &value : values) {
 			this->neutral_spawned_units.push_back(unit_type::get(value));
 		}
@@ -938,7 +947,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			this->DefaultStat.set_unit_class_stock(unit_class, std::stoi(value));
 		});
 	} else if (tag == "build_restrictions") {
-		if (scope.get_operator() == gsml_operator::assignment) {
+		if (gsml_operator == gsml_operator::assignment) {
 			//remove any old restrictions if they are redefined
 			this->build_restrictions = std::make_unique<and_build_restriction>();
 		}
@@ -951,7 +960,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			this->build_restrictions->add_restriction(build_restriction::from_gsml_scope(child_scope));
 		});
 	} else if (tag == "ai_build_restrictions") {
-		if (scope.get_operator() == gsml_operator::assignment) {
+		if (gsml_operator == gsml_operator::assignment) {
 			//remove any old restrictions if they are redefined
 			this->ai_build_restrictions = std::make_unique<and_build_restriction>();
 		}
@@ -964,7 +973,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			this->ai_build_restrictions->add_restriction(build_restriction::from_gsml_scope(child_scope));
 		});
 	} else if (tag == "variations") {
-		if (scope.get_operator() == gsml_operator::assignment) {
+		if (gsml_operator == gsml_operator::assignment) {
 			//remove previously defined variations, if any
 			this->variations.clear();
 
