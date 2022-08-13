@@ -1444,16 +1444,43 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 		for (const upgrade_class *upgrade_class : upgrade_class::get_all()) {
 			const CUpgrade *old_faction_class_upgrade = old_faction->get_class_upgrade(upgrade_class);
 			const CUpgrade *new_faction_class_upgrade = faction->get_class_upgrade(upgrade_class);
-			if (old_faction_class_upgrade != new_faction_class_upgrade) {
-				//if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
-				if (old_faction_class_upgrade != nullptr && this->Allow.Upgrades[old_faction_class_upgrade->ID] == 'R') {
-					this->lose_upgrade(old_faction_class_upgrade);
 
-					if (new_faction_class_upgrade != nullptr) {
-						this->acquire_upgrade(new_faction_class_upgrade);
-					}
+			if (old_faction_class_upgrade == new_faction_class_upgrade) {
+				continue;
+			}
+
+			if (old_faction_class_upgrade == nullptr) {
+				continue;
+			}
+
+			//if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
+			if (this->has_upgrade(old_faction_class_upgrade)) {
+				this->lose_upgrade(old_faction_class_upgrade);
+
+				if (new_faction_class_upgrade != nullptr) {
+					this->acquire_upgrade(new_faction_class_upgrade);
 				}
 			}
+		}
+
+		//convert units of the old faction to the new one
+		for (const unit_class *unit_class : unit_class::get_all()) {
+			const unit_type *old_faction_class_type = old_faction->get_class_unit_type(unit_class);
+			const unit_type *new_faction_class_type = faction->get_class_unit_type(unit_class);
+
+			if (old_faction_class_type == new_faction_class_type) {
+				continue;
+			}
+
+			if (old_faction_class_type == nullptr || new_faction_class_type == nullptr) {
+				continue;
+			}
+
+			if (this->get_type_units(old_faction_class_type).empty()) {
+				continue;
+			}
+
+			ConvertUnitTypeTo(*this, *old_faction_class_type, *new_faction_class_type);
 		}
 	}
 	
