@@ -2210,7 +2210,26 @@ map_template::zone_variant map_template::take_zone_to_generate(const int z, cons
 	const CMapLayer *map_layer = CMap::get()->MapLayers[z].get();
 	const QSize &map_size = map_layer->get_size();
 
-	for (const zone_variant zone : zones_to_generate) {
+	//give priority to water zones when generating in a geocoordinate-based manner
+	std::vector<zone_variant> potential_zones;
+
+	bool water_zone_found = false;
+	for (const zone_variant &zone : zones_to_generate) {
+		if (std::holds_alternative<const terrain_feature *>(zone) && std::get<const terrain_feature *>(zone)->get_terrain_type()->is_water()) {
+			if (!water_zone_found) {
+				water_zone_found = true;
+				potential_zones.clear();
+			}
+		} else {
+			if (water_zone_found) {
+				continue;
+			}
+		}
+
+		potential_zones.push_back(zone);
+	}
+
+	for (const zone_variant zone : potential_zones) {
 		geocoordinate geocoordinate;
 
 		if (std::holds_alternative<const site *>(zone)) {
