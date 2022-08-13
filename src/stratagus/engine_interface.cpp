@@ -728,6 +728,7 @@ map_info *engine_interface::get_map_info() const
 void engine_interface::set_modal_dialog_open_async(const bool value)
 {
 	event_loop::get()->post([this, value]() {
+		this->set_cursor_restriction_rect(QRect());
 		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 		this->modal_dialog_open = value;
 	});
