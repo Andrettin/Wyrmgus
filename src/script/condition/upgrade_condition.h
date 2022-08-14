@@ -49,18 +49,16 @@ public:
 		return this->check_upgrade(civilization, this->upgrade);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
+		Q_UNUSED(ctx);
 
 		return this->check_upgrade(player, this->upgrade);
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
+		Q_UNUSED(ctx);
 
 		return this->check_upgrade(unit, this->upgrade);
 	}

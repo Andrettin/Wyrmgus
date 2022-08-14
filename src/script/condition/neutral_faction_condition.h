@@ -49,10 +49,9 @@ public:
 		assert_throw(this->faction->has_neutral_type());
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
-		Q_UNUSED(ignore_units);
 
 		const CPlayer *neutral_faction_player = GetFactionPlayer(this->faction);
 

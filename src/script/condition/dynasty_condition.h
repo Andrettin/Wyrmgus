@@ -39,10 +39,9 @@ public:
 		this->dynasty = dynasty::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
+		Q_UNUSED(ctx);
 
 		return player->get_dynasty() == this->dynasty;
 	}

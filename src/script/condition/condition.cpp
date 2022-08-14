@@ -280,10 +280,10 @@ void condition::process_gsml_scope(const gsml_data &scope)
 	throw std::runtime_error("Invalid condition scope: \"" + scope.get_tag() + "\".");
 }
 
-bool condition::check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const
+bool condition::check(const CUnit *unit, const read_only_context &ctx) const
 {
 	//conditions check the unit's player by default, but can be overriden in the case of e.g. upgrades (where we want to check individual upgrades for the unit)
-	return this->check(unit->Player, ctx, ignore_units);
+	return this->check(unit->Player, ctx);
 }
 
 void and_condition::ProcessConfigDataSection(const CConfigData *section)

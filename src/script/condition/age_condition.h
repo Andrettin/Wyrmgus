@@ -41,10 +41,9 @@ public:
 		this->age = age::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(ignore_units)
-		Q_UNUSED(ctx)
+		Q_UNUSED(ctx);
 
 		return player->get_age() == this->age;
 	}

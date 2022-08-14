@@ -58,10 +58,9 @@ public:
 		}
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
+		Q_UNUSED(ctx);
 
 		if (this->faction != nullptr) {
 			const CPlayer *faction_player = GetFactionPlayer(this->faction);

@@ -37,16 +37,15 @@ namespace wyrmgus {
 class any_neighbor_settlement_owner_condition final : public scope_condition_base<CPlayer>
 {
 public:
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(player);
 		Q_UNUSED(ctx);
-		Q_UNUSED(ignore_units);
 
 		return false;
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		if (unit->get_settlement() == nullptr) {
 			return false;
@@ -70,7 +69,7 @@ public:
 
 		for (const CPlayer *player : players) {
 			if (player->is_alive() && !player->is_neutral_player()) {
-				if (this->check_scope(player, ctx, ignore_units)) {
+				if (this->check_scope(player, ctx)) {
 					return true;
 				}
 			}

@@ -41,11 +41,10 @@ public:
 		this->month = string_to_month(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player)
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
+		Q_UNUSED(player);
+		Q_UNUSED(ctx);
 
 		if (IsNetworkGame()) {
 			//always false in multiplayer games, to prevent desyncs if the real month changes during a game

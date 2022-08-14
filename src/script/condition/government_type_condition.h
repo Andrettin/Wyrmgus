@@ -54,10 +54,9 @@ public:
 		return this->government_type == government_type;
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
+		Q_UNUSED(ctx);
 
 		return player->get_government_type() == this->government_type;
 	}

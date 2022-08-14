@@ -35,14 +35,14 @@ namespace wyrmgus {
 class any_unit_condition final : public scope_condition_base<CUnit>
 {
 public:
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		for (const CUnit *unit : player->get_units()) {
 			if (unit->IsUnusable()) {
 				continue;
 			}
 
-			if (this->check_scope(unit, ctx, ignore_units)) {
+			if (this->check_scope(unit, ctx)) {
 				return true;
 			}
 		}
@@ -50,9 +50,9 @@ public:
 		return false;
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
 	{
-		return this->check_scope(unit, ctx, ignore_units);
+		return this->check_scope(unit, ctx);
 	}
 
 	virtual std::string get_scope_name() const override

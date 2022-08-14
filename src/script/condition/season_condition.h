@@ -43,18 +43,16 @@ public:
 		this->season = season::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
+		Q_UNUSED(ctx);
 
 		return CMap::get()->MapLayers[player->StartMapLayer]->get_tile_season(player->StartPos) == this->season;
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
+		Q_UNUSED(ctx);
 
 		if (unit->MapLayer == nullptr) {
 			return false;

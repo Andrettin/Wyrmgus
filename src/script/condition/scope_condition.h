@@ -42,7 +42,7 @@ public:
 		return this->get_scope(unit->Player, ctx);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override final
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override final
 	{
 		const scope_type *scope = this->get_scope(player, ctx);
 
@@ -50,10 +50,10 @@ public:
 			return false;
 		}
 
-		return this->check_scope(scope, ctx, ignore_units);
+		return this->check_scope(scope, ctx);
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override final
+	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override final
 	{
 		const scope_type *scope = this->get_scope(unit, ctx);
 
@@ -61,7 +61,7 @@ public:
 			return false;
 		}
 
-		return this->check_scope(scope, ctx, ignore_units);
+		return this->check_scope(scope, ctx);
 	}
 };
 

@@ -40,7 +40,7 @@ public:
 
 	virtual scope_type *get_scope(const upper_scope_type *upper_scope) const
 	{
-		Q_UNUSED(upper_scope)
+		Q_UNUSED(upper_scope);
 
 		return nullptr;
 	}

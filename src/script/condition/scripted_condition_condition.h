@@ -49,14 +49,14 @@ public:
 		return this->scripted_condition->get_conditions()->check(government_type);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		return this->scripted_condition->get_conditions()->check(player, ctx, ignore_units);
+		return this->scripted_condition->get_conditions()->check(player, ctx);
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
 	{
-		return this->scripted_condition->get_conditions()->check(unit, ctx, ignore_units);
+		return this->scripted_condition->get_conditions()->check(unit, ctx);
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override

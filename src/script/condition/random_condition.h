@@ -40,11 +40,10 @@ public:
 		this->chance = decimillesimal_int(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player)
-		Q_UNUSED(ctx)
-		Q_UNUSED(ignore_units)
+		Q_UNUSED(player);
+		Q_UNUSED(ctx);
 
 		const int random_number = random::get()->generate(decimillesimal_int::divisor);
 		return this->chance.get_value() > random_number;

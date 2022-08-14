@@ -75,10 +75,10 @@ public:
 	}
 
 	template <typename scope_type>
-	bool check_internal(const scope_type scope, const read_only_context &ctx, const bool ignore_units) const
+	bool check_internal(const scope_type scope, const read_only_context &ctx) const
 	{
 		for (const auto &condition : this->conditions) {
-			if (condition->check(scope, ctx, ignore_units)) {
+			if (condition->check(scope, ctx)) {
 				return false;
 			}
 		}
@@ -96,14 +96,14 @@ public:
 		return this->check_internal(government_type);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
-		return this->check_internal(player, ctx, ignore_units);
+		return this->check_internal(player, ctx);
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
 	{
-		return this->check_internal(unit, ctx, ignore_units);
+		return this->check_internal(unit, ctx);
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override

@@ -39,19 +39,17 @@ public:
 		this->civilization = civilization::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(player);
 		Q_UNUSED(ctx);
-		Q_UNUSED(ignore_units);
 
 		return false;
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
-		Q_UNUSED(ignore_units);
 
 		if (unit->get_settlement() == nullptr) {
 			return false;

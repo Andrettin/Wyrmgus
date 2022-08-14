@@ -49,6 +49,7 @@ struct context_base
 	player_ptr current_player = nullptr;
 	std::shared_ptr<unit_ref> source_unit;
 	std::shared_ptr<unit_ref> current_unit;
+	bool ignore_units = false;
 };
 
 extern template struct context_base<false>;

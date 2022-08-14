@@ -34,11 +34,11 @@ namespace wyrmgus {
 class any_player_condition final : public scope_condition_base<CPlayer>
 {
 public:
-	bool check(const read_only_context &ctx, const bool ignore_units) const
+	bool check(const read_only_context &ctx) const
 	{
 		for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
 			if (player->is_alive() && !player->is_neutral_player()) {
-				if (this->check_scope(player.get(), ctx, ignore_units)) {
+				if (this->check_scope(player.get(), ctx)) {
 					return true;
 				}
 			}
@@ -47,11 +47,11 @@ public:
 		return false;
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx, const bool ignore_units) const override
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(player)
 
-		return this->check(ctx, ignore_units);
+		return this->check(ctx);
 	}
 
 	virtual std::string get_scope_name() const override
