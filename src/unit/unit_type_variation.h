@@ -32,13 +32,14 @@
 #include "upgrade/upgrade_structs.h" //for the costs enum
 
 class CGraphic;
+class CPlayer;
 class CPlayerColorGraphic;
+class CUnit;
 
 int CclDefineUnitType(lua_State *l);
 
 namespace wyrmgus {
 
-class and_condition;
 class animation_set;
 class construction;
 class season;
@@ -46,6 +47,9 @@ class terrain_type;
 class unit_type;
 class variation_tag;
 enum class item_class;
+
+template <typename scope_type>
+class and_condition;
 
 class unit_type_variation final : public QObject
 {
@@ -167,12 +171,12 @@ public:
 		return this->construction;
 	}
 	
-	const and_condition *get_player_conditions() const
+	const and_condition<CPlayer> *get_player_conditions() const
 	{
 		return this->player_conditions_ptr;
 	}
 
-	const and_condition *get_unit_conditions() const
+	const and_condition<CUnit> *get_unit_conditions() const
 	{
 		return this->unit_conditions_ptr;
 	}
@@ -251,10 +255,10 @@ public:
 	std::map<ButtonCmd, IconConfig> ButtonIcons;				/// icons for button actions
 
 private:
-	std::unique_ptr<const and_condition> player_conditions;
-	const and_condition *player_conditions_ptr = nullptr;
-	std::unique_ptr<const and_condition> unit_conditions;
-	const and_condition *unit_conditions_ptr = nullptr;
+	std::unique_ptr<const and_condition<CPlayer>> player_conditions;
+	const and_condition<CPlayer> *player_conditions_ptr = nullptr;
+	std::unique_ptr<const and_condition<CUnit>> unit_conditions;
+	const and_condition<CUnit> *unit_conditions_ptr = nullptr;
 	std::set<const variation_tag *> tags;
 
 	friend int ::CclDefineUnitType(lua_State *l);

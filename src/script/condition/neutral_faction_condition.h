@@ -35,7 +35,7 @@
 
 namespace wyrmgus {
 
-class neutral_faction_condition final : public condition
+class neutral_faction_condition final : public condition<CPlayer>
 {
 public:
 	explicit neutral_faction_condition(const std::string &value)

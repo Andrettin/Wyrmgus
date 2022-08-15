@@ -32,7 +32,8 @@
 
 namespace wyrmgus {
 
-class character_condition final : public condition
+template <typename scope_type>
+class character_condition final : public condition<scope_type>
 {
 public:
 	explicit character_condition(const std::string &value)
@@ -40,25 +41,22 @@ public:
 		this->character = character::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
-		return player->HasHero(this->character);
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(ctx);
-
-		return unit->get_character() == this->character;
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			return scope->HasHero(this->character);
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			return scope->get_character() == this->character;
+		}
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
 
-		return "Has the " + condition::get_object_string(this->character, links_allowed, this->character->get_full_name()) + " character";
+		return "Has the " + condition<scope_type>::get_object_string(this->character, links_allowed, this->character->get_full_name()) + " character";
 	}
 
 private:

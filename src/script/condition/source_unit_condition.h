@@ -32,12 +32,13 @@
 
 namespace wyrmgus {
 
-class source_unit_condition final : public scope_condition<CUnit>
+template <typename upper_scope_type>
+class source_unit_condition final : public scope_condition<upper_scope_type, CUnit>
 {
 public:
-	virtual const CUnit *get_scope(const CPlayer *player, const read_only_context &ctx) const override
+	virtual const CUnit *get_scope(const upper_scope_type *upper_scope, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player)
+		Q_UNUSED(upper_scope);
 
 		if (ctx.source_unit == nullptr) {
 			return nullptr;

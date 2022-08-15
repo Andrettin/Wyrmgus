@@ -33,20 +33,12 @@
 
 namespace wyrmgus {
 
-class equipment_condition final : public condition
+class equipment_condition final : public condition<CUnit>
 {
 public:
 	explicit equipment_condition(const std::string &value)
 	{
 		this->equipment_type = unit_type::get(value);
-	}
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(player);
-		Q_UNUSED(ctx);
-
-		return true;
 	}
 
 	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
@@ -58,9 +50,9 @@ public:
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
+		Q_UNUSED(indent);
 
-		return condition::get_object_string(this->equipment_type, links_allowed) + " is equipped";
+		return condition<CUnit>::get_object_string(this->equipment_type, links_allowed) + " is equipped";
 	}
 
 private:

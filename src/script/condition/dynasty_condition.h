@@ -31,7 +31,7 @@
 
 namespace wyrmgus {
 
-class dynasty_condition final : public condition
+class dynasty_condition final : public condition<CPlayer>
 {
 public:
 	explicit dynasty_condition(const std::string &value)

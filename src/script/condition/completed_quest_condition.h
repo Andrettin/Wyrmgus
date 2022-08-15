@@ -32,7 +32,7 @@
 
 namespace wyrmgus {
 
-class completed_quest_condition final : public condition
+class completed_quest_condition final : public condition<CPlayer>
 {
 public:
 	explicit completed_quest_condition(const std::string &value)

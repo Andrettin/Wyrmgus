@@ -33,20 +33,12 @@
 
 namespace wyrmgus {
 
-class equipped_condition final : public condition
+class equipped_condition final : public condition<CUnit>
 {
 public:
 	explicit equipped_condition(const std::string &value)
 	{
 		this->equipped = string::to_bool(value);
-	}
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(player);
-		Q_UNUSED(ctx);
-
-		return true;
 	}
 
 	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override

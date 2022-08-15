@@ -33,7 +33,7 @@
 
 namespace wyrmgus {
 
-class age_condition final : public condition
+class age_condition final : public condition<CPlayer>
 {
 public:
 	explicit age_condition(const std::string &value)

@@ -32,28 +32,36 @@
 
 namespace wyrmgus {
 
-scripted_condition::scripted_condition(const std::string &identifier) : data_entry(identifier)
+template <typename scope_type>
+scripted_condition_base<scope_type>::scripted_condition_base()
 {
-	this->conditions = std::make_unique<and_condition>();
+	this->conditions = std::make_unique<and_condition<scope_type>>();
 }
 
-scripted_condition::~scripted_condition()
+template <typename scope_type>
+scripted_condition_base<scope_type>::~scripted_condition_base()
 {
 }
 
-void scripted_condition::process_gsml_property(const gsml_property &property)
+template <typename scope_type>
+void scripted_condition_base<scope_type>::process_gsml_property(const gsml_property &property)
 {
 	this->conditions->process_gsml_property(property);
 }
 
-void scripted_condition::process_gsml_scope(const gsml_data &scope)
+template <typename scope_type>
+void scripted_condition_base<scope_type>::process_gsml_scope(const gsml_data &scope)
 {
 	this->conditions->process_gsml_scope(scope);
 }
 
-void scripted_condition::check() const
+template <typename scope_type>
+void scripted_condition_base<scope_type>::check() const
 {
 	this->get_conditions()->check_validity();
 }
+
+template class scripted_condition_base<CPlayer>;
+template class scripted_condition_base<CUnit>;
 
 }

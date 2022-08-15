@@ -34,7 +34,8 @@
 
 namespace wyrmgus {
 
-class upgrade_condition_base : public condition
+template <typename scope_type> 
+class upgrade_condition_base : public condition<scope_type>
 {
 public:
 	bool check_upgrade(const civilization *civilization, const CUpgrade *upgrade) const
@@ -42,14 +43,13 @@ public:
 		return civilization->get_upgrade() == upgrade || upgrade->is_available_for_civilization(civilization);
 	}
 
-	bool check_upgrade(const CPlayer *player, const CUpgrade *upgrade) const
+	bool check_upgrade(const scope_type *scope, const CUpgrade *upgrade) const
 	{
-		return UpgradeIdAllowed(*player, upgrade->ID) == 'R';
-	}
-
-	bool check_upgrade(const CUnit *unit, const CUpgrade *upgrade) const
-	{
-		return this->check_upgrade(unit->Player, upgrade) || unit->GetIndividualUpgrade(upgrade);
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			return scope->has_upgrade(upgrade);
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			return scope->Player->has_upgrade(upgrade) || scope->GetIndividualUpgrade(upgrade);
+		}
 	}
 };
 

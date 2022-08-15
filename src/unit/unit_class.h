@@ -29,11 +29,15 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
+class CPlayer;
+
 namespace wyrmgus {
 
-class condition;
 class unit_type;
 class upgrade_class;
+
+template <typename scope_type>
+class condition;
 
 class unit_class final : public named_data_entry, public data_type<unit_class>
 {
@@ -110,12 +114,12 @@ public:
 		return this->ship;
 	}
 
-	const std::unique_ptr<condition> &get_preconditions() const
+	const std::unique_ptr<condition<CPlayer>> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	const std::unique_ptr<condition> &get_conditions() const
+	const std::unique_ptr<condition<CPlayer>> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -188,8 +192,8 @@ private:
 	int index = -1;
 	bool town_hall = false; //whether the building class is a settlement head building class, e.g. a town hall or fortress
 	bool ship = false; //whether the unit class is a ship
-	std::unique_ptr<condition> preconditions;
-	std::unique_ptr<condition> conditions;
+	std::unique_ptr<condition<CPlayer>> preconditions;
+	std::unique_ptr<condition<CPlayer>> conditions;
 	std::vector<unit_type *> unit_types;
 	unit_class *tech_tree_parent_unit_class = nullptr;
 	upgrade_class *tech_tree_parent_upgrade_class = nullptr;

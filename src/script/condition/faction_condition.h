@@ -31,7 +31,7 @@
 
 namespace wyrmgus {
 
-class faction_condition final : public condition
+class faction_condition final : public condition<CPlayer>
 {
 public:
 	explicit faction_condition(const std::string &value)
@@ -55,7 +55,7 @@ public:
 	{
 		Q_UNUSED(indent)
 
-		return condition::get_object_string(this->faction, links_allowed) + " faction";
+		return condition<CPlayer>::get_object_string(this->faction, links_allowed) + " faction";
 	}
 
 private:

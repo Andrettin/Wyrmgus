@@ -32,7 +32,7 @@
 
 namespace wyrmgus {
 
-class war_condition final : public condition
+class war_condition final : public condition<CPlayer>
 {
 public:
 	explicit war_condition(const std::string &value)

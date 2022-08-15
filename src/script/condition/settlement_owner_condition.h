@@ -33,20 +33,12 @@
 
 namespace wyrmgus {
 
-class settlement_owner_condition final : public scope_condition<CPlayer>
+class settlement_owner_condition final : public scope_condition<CUnit, CPlayer>
 {
 public:
-	virtual const CPlayer *get_scope(const CPlayer *player, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(player)
-		Q_UNUSED(ctx)
-
-		return nullptr;
-	}
-
 	virtual const CPlayer *get_scope(const CUnit *unit, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(ctx)
+		Q_UNUSED(ctx);
 
 		if (unit->get_settlement() != nullptr) {
 			return unit->get_settlement()->get_game_data()->get_owner();

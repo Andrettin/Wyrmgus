@@ -33,7 +33,8 @@
 
 namespace wyrmgus {
 
-class real_month_condition final : public condition
+template <typename scope_type>
+class real_month_condition final : public condition<scope_type>
 {
 public:
 	explicit real_month_condition(const std::string &value)
@@ -41,9 +42,9 @@ public:
 		this->month = string_to_month(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player);
+		Q_UNUSED(scope);
 		Q_UNUSED(ctx);
 
 		if (IsNetworkGame()) {

@@ -110,7 +110,7 @@ void civilization::process_gsml_scope(const gsml_data &scope)
 			this->ui_fillers.push_back(std::move(filler));
 		});
 	} else if (tag == "conditions") {
-		auto conditions = std::make_unique<and_condition>();
+		auto conditions = std::make_unique<and_condition<CPlayer>>();
 		database::process_gsml_data(conditions, scope);
 		this->conditions = std::move(conditions);
 	} else if (tag == "force_type_weights") {

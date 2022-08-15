@@ -31,7 +31,7 @@
 
 namespace wyrmgus {
 
-class government_type_condition final : public condition
+class government_type_condition final : public condition<CPlayer>
 {
 public:
 	explicit government_type_condition(const std::string &value)

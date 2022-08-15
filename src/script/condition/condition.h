@@ -27,6 +27,7 @@
 #pragma once
 
 #include "script/context.h"
+#include "unit/unit.h"
 
 class CConfigData;
 class CPlayer;
@@ -44,17 +45,18 @@ class unit_type;
 enum class government_type;
 struct read_only_context;
 
+template <typename scope_type>
 class condition
 {
 public:
 	static std::unique_ptr<const condition> from_gsml_property(const gsml_property &property);
 	static std::unique_ptr<const condition> from_gsml_scope(const gsml_data &scope);
 
-	static std::string get_conditions_string(const std::vector<std::unique_ptr<const condition>> &conditions, const size_t indent, const bool links_allowed)
+	static std::string get_conditions_string(const std::vector<std::unique_ptr<const condition<scope_type>>> &conditions, const size_t indent, const bool links_allowed)
 	{
 		std::string conditions_string;
 		bool first = true;
-		for (const std::unique_ptr<const condition> &condition : conditions) {
+		for (const std::unique_ptr<const condition<scope_type>> &condition : conditions) {
 			if (condition->is_hidden()) {
 				continue;
 			}
@@ -86,7 +88,7 @@ public:
 		if (links_allowed) {
 			return object->get_link_string(name_string, true);
 		} else {
-			return condition::get_object_highlighted_name(object, name_string);
+			return condition<scope_type>::get_object_highlighted_name(object, name_string);
 		}
 	}
 
@@ -120,8 +122,7 @@ public:
 		return true;
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const = 0;
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const;
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const = 0;
 
 	//get the condition as a string
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const = 0;
@@ -192,15 +193,25 @@ inline bool check_conditions(const T *target, const CUnit *unit, const bool igno
 		if (!check_special_conditions<precondition>(target, unit, ignore_units)) {
 			return false;
 		}
+
+		if constexpr (precondition) {
+			if (!target->check_unit_preconditions(unit)) {
+				return false;
+			}
+		} else {
+			if (!target->check_unit_conditions(unit)) {
+				return false;
+			}
+		}
 	}
 
 	read_only_context ctx = read_only_context::from_scope(unit);
 	ctx.ignore_units = ignore_units;
 
 	if constexpr (precondition) {
-		return target->get_preconditions() == nullptr || target->get_preconditions()->check(unit, ctx);
+		return target->get_preconditions() == nullptr || target->get_preconditions()->check(unit->Player, ctx);
 	} else {
-		return target->get_conditions() == nullptr || target->get_conditions()->check(unit, ctx);
+		return target->get_conditions() == nullptr || target->get_conditions()->check(unit->Player, ctx);
 	}
 }
 

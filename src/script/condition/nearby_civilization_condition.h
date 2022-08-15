@@ -31,20 +31,12 @@
 
 namespace wyrmgus {
 
-class nearby_civilization_condition final : public condition
+class nearby_civilization_condition final : public condition<CUnit>
 {
 public:
 	explicit nearby_civilization_condition(const std::string &value)
 	{
 		this->civilization = civilization::get(value);
-	}
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(player);
-		Q_UNUSED(ctx);
-
-		return false;
 	}
 
 	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override

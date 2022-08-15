@@ -35,7 +35,6 @@ extern int CclDefineDialogue(lua_State *l);
 
 namespace wyrmgus {
 
-class and_condition;
 class character;
 class dialogue;
 class dialogue_option;
@@ -47,6 +46,9 @@ class player_color;
 class sound;
 class unit_type;
 struct context;
+
+template <typename scope_type>
+class and_condition;
 
 class dialogue_node final
 {
@@ -98,7 +100,7 @@ private:
 	size_t speaker_index = 0;
 	std::string text;
 	const wyrmgus::sound *sound = nullptr;
-	std::unique_ptr<const and_condition> conditions;
+	std::unique_ptr<const and_condition<CPlayer>> conditions;
 public:
 	std::unique_ptr<LuaCallback> Conditions;
 	std::unique_ptr<LuaCallback> ImmediateEffects;

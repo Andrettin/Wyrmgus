@@ -45,7 +45,7 @@ void epithet::process_gsml_scope(const gsml_data &scope)
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "conditions") {
-		this->conditions = std::make_unique<and_condition>();
+		this->conditions = std::make_unique<and_condition<CUnit>>();
 		database::process_gsml_data(this->conditions, scope);
 	} else {
 		data_entry::process_gsml_scope(scope);

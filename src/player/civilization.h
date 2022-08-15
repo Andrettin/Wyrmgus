@@ -33,6 +33,7 @@
 
 class CAiBuildingTemplate;
 class CCurrency;
+class CPlayer;
 class CUpgrade;
 struct lua_State;
 
@@ -41,7 +42,6 @@ extern int CclDefineCivilization(lua_State *l);
 namespace wyrmgus {
 
 class ai_force_template;
-class and_condition;
 class calendar;
 class character;
 class deity;
@@ -56,6 +56,9 @@ enum class character_title;
 enum class faction_tier;
 enum class faction_type;
 enum class government_type;
+
+template <typename scope_type>
+class and_condition;
 
 class civilization final : public civilization_base, public data_type<civilization>
 {
@@ -217,7 +220,7 @@ public:
 		return this->ui_fillers;
 	}
 
-	const std::unique_ptr<const and_condition> &get_conditions() const
+	const std::unique_ptr<const and_condition<CPlayer>> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -283,7 +286,7 @@ public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
 	std::vector<CFiller> ui_fillers;
-	std::unique_ptr<const and_condition> conditions;
+	std::unique_ptr<const and_condition<CPlayer>> conditions;
 	std::vector<faction *> factions;
 	std::vector<character *> characters;
 public:

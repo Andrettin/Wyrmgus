@@ -31,7 +31,8 @@
 
 namespace wyrmgus {
 
-class civilization_condition final : public condition
+template <typename scope_type>
+class civilization_condition final : public condition<scope_type>
 {
 public:
 	explicit civilization_condition(const std::string &value)
@@ -44,25 +45,18 @@ public:
 		return civilization == this->civilization;
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
-		return this->check(player->get_civilization());
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(ctx);
-
-		return this->check(unit->get_civilization());
+		return this->check(scope->get_civilization());
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
+		Q_UNUSED(indent);
 
-		return condition::get_object_string(this->civilization, links_allowed) + " civilization";
+		return condition<scope_type>::get_object_string(this->civilization, links_allowed) + " civilization";
 	}
 
 private:

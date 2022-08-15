@@ -29,10 +29,14 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
+class CPlayer;
+
 namespace wyrmgus {
 
-class condition;
 class resource_icon;
+
+template <typename scope_type>
+class condition;
 
 class age final : public named_data_entry, public data_type<age>
 {
@@ -63,12 +67,12 @@ public:
 		return this->priority;
 	}
 
-	const std::unique_ptr<condition> &get_preconditions() const
+	const std::unique_ptr<condition<CPlayer>> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	const std::unique_ptr<condition> &get_conditions() const
+	const std::unique_ptr<condition<CPlayer>> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -79,8 +83,8 @@ signals:
 private:
 	resource_icon *icon = nullptr;
 	int priority = 0;
-	std::unique_ptr<condition> preconditions;
-	std::unique_ptr<condition> conditions;
+	std::unique_ptr<condition<CPlayer>> preconditions;
+	std::unique_ptr<condition<CPlayer>> conditions;
 };
 
 }

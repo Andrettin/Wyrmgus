@@ -31,7 +31,8 @@
 
 namespace wyrmgus {
 
-class any_player_condition final : public scope_condition_base<CPlayer>
+template <typename upper_scope_type>
+class any_player_condition final : public scope_condition_base<upper_scope_type, CPlayer>
 {
 public:
 	bool check(const read_only_context &ctx) const
@@ -47,9 +48,9 @@ public:
 		return false;
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const upper_scope_type *upper_scope, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player)
+		Q_UNUSED(upper_scope);
 
 		return this->check(ctx);
 	}

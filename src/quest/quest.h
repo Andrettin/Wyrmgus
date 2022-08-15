@@ -37,7 +37,6 @@ extern int CclDefineQuest(lua_State *l);
 
 namespace wyrmgus {
 
-class and_condition;
 class character;
 class civilization;
 class dialogue;
@@ -46,6 +45,9 @@ class player_color;
 class quest_objective;
 class site;
 enum class difficulty;
+
+template <typename scope_type>
+class and_condition;
 
 template <typename scope_type>
 class effect_list;
@@ -153,7 +155,7 @@ public:
 		emit completed_changed();
 	}
 
-	const and_condition *get_conditions() const
+	const and_condition<CPlayer> *get_conditions() const
 	{
 		return this->conditions.get();
 	}
@@ -258,7 +260,7 @@ public:
 	std::unique_ptr<LuaCallback> CompletionEffects;
 	std::unique_ptr<LuaCallback> FailEffects;
 private:
-	std::unique_ptr<and_condition> conditions;
+	std::unique_ptr<and_condition<CPlayer>> conditions;
 	std::unique_ptr<effect_list<CPlayer>> accept_effects;
 	std::unique_ptr<effect_list<CPlayer>> completion_effects;
 	std::unique_ptr<effect_list<CPlayer>> failure_effects;

@@ -35,7 +35,8 @@ namespace wyrmgus {
 
 class season;
 
-class season_condition final : public condition
+template <typename scope_type>
+class season_condition final : public condition<scope_type>
 {
 public:
 	explicit season_condition(const std::string &value)
@@ -43,24 +44,37 @@ public:
 		this->season = season::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	const CMapLayer *get_scope_map_layer(const scope_type *scope) const
 	{
-		Q_UNUSED(ctx);
-
-		return CMap::get()->MapLayers[player->StartMapLayer]->get_tile_season(player->StartPos) == this->season;
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			return CMap::get()->MapLayers[scope->StartMapLayer].get();
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			return scope->MapLayer;
+		}
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
+	QPoint get_scope_tile_pos(const scope_type *scope) const
+	{
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			return scope->StartPos;
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			return scope->get_center_tile_pos();
+		}
+	}
+
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
-		if (unit->MapLayer == nullptr) {
+		const CMapLayer *map_layer = this->get_scope_map_layer(scope);
+
+		if (map_layer == nullptr) {
 			return false;
 		}
 
-		const QPoint center_tile_pos = unit->get_center_tile_pos();
+		const QPoint tile_pos = this->get_scope_tile_pos(scope);
 
-		return unit->MapLayer->get_tile_season(center_tile_pos) == this->season;
+		return map_layer->get_tile_season(tile_pos) == this->season;
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override

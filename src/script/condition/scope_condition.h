@@ -31,31 +31,15 @@
 
 namespace wyrmgus {
 
-template <typename scope_type>
-class scope_condition : public scope_condition_base<scope_type>
+template <typename upper_scope_type, typename scope_type>
+class scope_condition : public scope_condition_base<upper_scope_type, scope_type>
 {
 public:
-	virtual const scope_type *get_scope(const CPlayer *player, const read_only_context &ctx) const = 0;
+	virtual const scope_type *get_scope(const upper_scope_type *upper_scope, const read_only_context &ctx) const = 0;
 
-	virtual const scope_type *get_scope(const CUnit *unit, const read_only_context &ctx) const
+	virtual bool check(const upper_scope_type *upper_scope, const read_only_context &ctx) const override final
 	{
-		return this->get_scope(unit->Player, ctx);
-	}
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override final
-	{
-		const scope_type *scope = this->get_scope(player, ctx);
-
-		if (scope == nullptr) {
-			return false;
-		}
-
-		return this->check_scope(scope, ctx);
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override final
-	{
-		const scope_type *scope = this->get_scope(unit, ctx);
+		const scope_type *scope = this->get_scope(upper_scope, ctx);
 
 		if (scope == nullptr) {
 			return false;

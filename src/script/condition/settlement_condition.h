@@ -32,7 +32,7 @@
 
 namespace wyrmgus {
 
-class settlement_condition final : public condition
+class settlement_condition final : public condition<CPlayer>
 {
 public:
 	settlement_condition() {}

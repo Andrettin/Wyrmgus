@@ -31,12 +31,22 @@
 
 namespace wyrmgus {
 
-class upgrade_class_condition final : public upgrade_condition_base
+template <typename scope_type>
+class upgrade_class_condition final : public upgrade_condition_base<scope_type>
 {
 public:
 	explicit upgrade_class_condition(const std::string &value)
 	{
 		this->upgrade_class = upgrade_class::get(value);
+	}
+
+	const CPlayer *get_scope_player(const scope_type *scope) const
+	{
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			return scope;
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			return scope->Player;
+		}
 	}
 
 	virtual bool check(const civilization *civilization) const override
@@ -50,9 +60,11 @@ public:
 		return this->check_upgrade(civilization, upgrade);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
+
+		const CPlayer *player = this->get_scope_player(scope);
 
 		const CUpgrade *upgrade = player->get_class_upgrade(this->upgrade_class);
 
@@ -60,20 +72,7 @@ public:
 			return false;
 		}
 
-		return this->check_upgrade(player, upgrade);
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(ctx);
-
-		const CUpgrade *upgrade = unit->Player->get_class_upgrade(this->upgrade_class);
-
-		if (upgrade == nullptr) {
-			return false;
-		}
-
-		return this->check_upgrade(unit, upgrade);
+		return this->check_upgrade(scope, upgrade);
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override

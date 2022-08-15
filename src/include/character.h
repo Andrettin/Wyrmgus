@@ -33,6 +33,7 @@
 #include "time/date.h"
 
 class CFile;
+class CPlayer;
 class CProvince;
 class CUnit;
 class CUpgrade;
@@ -44,7 +45,6 @@ extern int CclDefineCharacter(lua_State *l);
 extern int CclDefineCustomHero(lua_State *l);
 
 namespace wyrmgus {
-	class and_condition;
 	class calendar;
 	class character_history;
 	class civilization;
@@ -64,6 +64,9 @@ namespace wyrmgus {
 	class variation_tag;
 	enum class character_title;
 	enum class gender;
+
+	template <typename scope_type>
+	class and_condition;
 }
 
 enum Attributes {
@@ -462,7 +465,7 @@ public:
 		return this->sound_set.get();
 	}
 
-	const and_condition *get_conditions() const
+	const and_condition<CPlayer> *get_conditions() const
 	{
 		return this->conditions.get();
 	}
@@ -537,7 +540,7 @@ private:
 public:
 	std::unique_ptr<LuaCallback> Conditions;
 private:
-	std::unique_ptr<const and_condition> conditions;
+	std::unique_ptr<const and_condition<CPlayer>> conditions;
 	std::map<item_slot, std::vector<const persistent_item *>> equipped_items;
 	bool ai_active = true; //whether the character's AI is active
 public:

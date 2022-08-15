@@ -34,20 +34,12 @@
 
 namespace wyrmgus {
 
-class snowy_terrain_condition final : public condition
+class snowy_terrain_condition final : public condition<CUnit>
 {
 public:
 	explicit snowy_terrain_condition(const std::string &value)
 	{
 		this->value = string::to_bool(value);
-	}
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(player);
-		Q_UNUSED(ctx);
-
-		return true;
 	}
 
 	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override

@@ -32,7 +32,7 @@
 
 namespace wyrmgus {
 
-class any_unit_condition final : public scope_condition_base<CUnit>
+class any_unit_condition final : public scope_condition_base<CPlayer, CUnit>
 {
 public:
 	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
@@ -48,11 +48,6 @@ public:
 		}
 
 		return false;
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
-	{
-		return this->check_scope(unit, ctx);
 	}
 
 	virtual std::string get_scope_name() const override

@@ -31,7 +31,8 @@
 
 namespace wyrmgus {
 
-class unique_can_drop_condition final : public condition
+template <typename scope_type>
+class unique_can_drop_condition final : public condition<scope_type>
 {
 public:
 	explicit unique_can_drop_condition(const std::string &value)
@@ -39,9 +40,9 @@ public:
 		this->unique = unique_item::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player);
+		Q_UNUSED(scope);
 		Q_UNUSED(ctx);
 
 		return this->unique->can_drop();
@@ -51,7 +52,7 @@ public:
 	{
 		Q_UNUSED(indent)
 
-		return "Unique " + condition::get_object_string(this->unique, links_allowed) + " can appear";
+		return "Unique " + condition<scope_type>::get_object_string(this->unique, links_allowed) + " can appear";
 	}
 
 private:

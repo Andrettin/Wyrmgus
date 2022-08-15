@@ -35,6 +35,8 @@
 
 class CAiBuildingTemplate;
 class CCurrency;
+class CPlayer;
+class CUnit;
 class CUpgrade;
 class LuaCallback;
 enum class ButtonCmd;
@@ -44,7 +46,6 @@ extern int CclDefineFaction(lua_State *l);
 namespace wyrmgus {
 
 class ai_force_template;
-class and_condition;
 class character;
 class civilization;
 class deity;
@@ -65,6 +66,9 @@ enum class faction_tier;
 enum class faction_type;
 enum class gender;
 enum class government_type;
+
+template <typename scope_type>
+class and_condition;
 
 class faction final : public detailed_data_entry, public data_type<faction>
 {
@@ -329,12 +333,12 @@ public:
 
 	const std::vector<CFiller> &get_ui_fillers() const;
 
-	const std::unique_ptr<const and_condition> &get_preconditions() const
+	const std::unique_ptr<const and_condition<CPlayer>> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	const std::unique_ptr<const and_condition> &get_conditions() const
+	const std::unique_ptr<const and_condition<CPlayer>> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -390,12 +394,12 @@ public:
 		return this->max_neutral_buildings;
 	}
 
-	const std::unique_ptr<const and_condition> &get_neutral_site_conditions() const
+	const std::unique_ptr<const and_condition<CUnit>> &get_neutral_site_conditions() const
 	{
 		return this->neutral_site_conditions;
 	}
 
-	const std::unique_ptr<const and_condition> &get_neutral_site_spawn_conditions() const
+	const std::unique_ptr<const and_condition<CUnit>> &get_neutral_site_spawn_conditions() const
 	{
 		return this->neutral_site_spawn_conditions;
 	}
@@ -440,15 +444,15 @@ private:
 	unit_class_map<std::unique_ptr<name_generator>> unit_class_name_generators;
 	std::unique_ptr<name_generator> ship_name_generator;
 	std::vector<CFiller> ui_fillers;
-	std::unique_ptr<const and_condition> preconditions;
-	std::unique_ptr<const and_condition> conditions;
+	std::unique_ptr<const and_condition<CPlayer>> preconditions;
+	std::unique_ptr<const and_condition<CPlayer>> conditions;
 	std::vector<const site *> core_settlements; //the core settlements of this faction (required to found it)
 	std::vector<const unit_class *> neutral_building_classes;
 	std::vector<site *> neutral_target_sites;
 	std::vector<const region *> neutral_target_regions;
 	int max_neutral_buildings = 0;
-	std::unique_ptr<const and_condition> neutral_site_conditions;
-	std::unique_ptr<const and_condition> neutral_site_spawn_conditions;
+	std::unique_ptr<const and_condition<CUnit>> neutral_site_conditions;
+	std::unique_ptr<const and_condition<CUnit>> neutral_site_spawn_conditions;
 public:
 	std::vector<site *> sites; //sites used for this faction if it needs a randomly-generated settlement
 private:

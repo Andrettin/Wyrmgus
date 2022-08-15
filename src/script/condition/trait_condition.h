@@ -31,20 +31,12 @@
 
 namespace wyrmgus {
 
-class trait_condition final : public condition
+class trait_condition final : public condition<CUnit>
 {
 public:
 	explicit trait_condition(const std::string &value)
 	{
 		this->trait = CUpgrade::get(value);
-	}
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(player);
-		Q_UNUSED(ctx);
-
-		return true;
 	}
 
 	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
@@ -56,7 +48,7 @@ public:
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
+		Q_UNUSED(indent);
 
 		return condition::get_object_string(this->trait, links_allowed) + " trait";
 	}

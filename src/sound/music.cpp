@@ -76,7 +76,7 @@ void music::process_gsml_scope(const gsml_data &scope)
 			this->submusic.push_back(music::get(value));
 		}
 	} else if (tag == "conditions") {
-		this->conditions = std::make_unique<and_condition>();
+		this->conditions = std::make_unique<and_condition<CPlayer>>();
 		database::process_gsml_data(this->conditions, scope);
 	} else {
 		data_entry::process_gsml_scope(scope);

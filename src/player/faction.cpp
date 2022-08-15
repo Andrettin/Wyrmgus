@@ -203,11 +203,11 @@ void faction::process_gsml_scope(const gsml_data &scope)
 			this->neutral_target_regions.push_back(region);
 		}
 	} else if (tag == "neutral_site_conditions") {
-		auto conditions = std::make_unique<and_condition>();
+		auto conditions = std::make_unique<and_condition<CUnit>>();
 		database::process_gsml_data(conditions, scope);
 		this->neutral_site_conditions = std::move(conditions);
 	} else if (tag == "neutral_site_spawn_conditions") {
-		auto conditions = std::make_unique<and_condition>();
+		auto conditions = std::make_unique<and_condition<CUnit>>();
 		database::process_gsml_data(conditions, scope);
 		this->neutral_site_spawn_conditions = std::move(conditions);
 	} else if (tag == "title_names") {
@@ -224,11 +224,11 @@ void faction::process_gsml_scope(const gsml_data &scope)
 			faction::process_character_title_name_scope(this->character_title_names, child_scope);
 		});
 	} else if (tag == "preconditions") {
-		auto preconditions = std::make_unique<and_condition>();
+		auto preconditions = std::make_unique<and_condition<CPlayer>>();
 		database::process_gsml_data(preconditions, scope);
 		this->preconditions = std::move(preconditions);
 	} else if (tag == "conditions") {
-		auto conditions = std::make_unique<and_condition>();
+		auto conditions = std::make_unique<and_condition<CPlayer>>();
 		database::process_gsml_data(conditions, scope);
 		this->conditions = std::move(conditions);
 	} else if (tag == "force_templates") {

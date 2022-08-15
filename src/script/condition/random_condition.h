@@ -32,7 +32,8 @@
 
 namespace wyrmgus {
 
-class random_condition final : public condition
+template <typename scope_type>
+class random_condition final : public condition<scope_type>
 {
 public:
 	explicit random_condition(const std::string &value)
@@ -40,9 +41,9 @@ public:
 		this->chance = decimillesimal_int(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player);
+		Q_UNUSED(scope);
 		Q_UNUSED(ctx);
 
 		const int random_number = random::get()->generate(decimillesimal_int::divisor);

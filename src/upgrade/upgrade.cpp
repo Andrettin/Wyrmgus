@@ -226,11 +226,17 @@ void CUpgrade::process_gsml_scope(const gsml_data &scope)
 		upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
 		this->modifiers.push_back(std::move(modifier));
 	} else if (tag == "preconditions") {
-		this->preconditions = std::make_unique<and_condition>();
+		this->preconditions = std::make_unique<and_condition<CPlayer>>();
 		database::process_gsml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
-		this->conditions = std::make_unique<and_condition>();
+		this->conditions = std::make_unique<and_condition<CPlayer>>();
 		database::process_gsml_data(this->conditions, scope);
+	} else if (tag == "unit_preconditions") {
+		this->unit_preconditions = std::make_unique<and_condition<CUnit>>();
+		database::process_gsml_data(this->unit_preconditions, scope);
+	} else if (tag == "unit_conditions") {
+		this->unit_conditions = std::make_unique<and_condition<CUnit>>();
+		database::process_gsml_data(this->unit_conditions, scope);
 	} else if (tag == "ai_priority") {
 		this->ai_priority = std::make_unique<factor<CPlayer>>();
 		database::process_gsml_data(this->ai_priority, scope);
@@ -506,6 +512,28 @@ int CUpgrade::get_time_cost() const
 int CUpgrade::get_price() const
 {
 	return resource::get_price(this->get_costs());
+}
+
+bool CUpgrade::check_unit_preconditions(const CUnit *unit) const
+{
+	if (this->unit_preconditions == nullptr) {
+		return true;
+	}
+
+	return this->unit_preconditions->check(unit);
+}
+
+bool CUpgrade::check_unit_conditions(const CUnit *unit) const
+{
+	if (!this->check_unit_preconditions(unit)) {
+		return false;
+	}
+
+	if (this->unit_conditions == nullptr) {
+		return true;
+	}
+
+	return this->unit_conditions->check(unit);
 }
 
 int CUpgrade::calculate_ai_priority(const CPlayer *player) const

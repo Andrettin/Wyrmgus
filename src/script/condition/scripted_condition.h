@@ -29,33 +29,92 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
+class CPlayer;
+class CUnit;
+
 namespace wyrmgus {
 
+template <typename scope_type>
 class and_condition;
 
 //the class for a predefined, reusable scripted condition
-class scripted_condition final : public data_entry, public data_type<scripted_condition>
+template <typename scope_type>
+class scripted_condition_base
 {
-	Q_OBJECT
-
 public:
-	static constexpr const char *class_identifier = "scripted_condition";
-	static constexpr const char *database_folder = "scripted_conditions";
+	explicit scripted_condition_base();
+	~scripted_condition_base();
 
-	explicit scripted_condition(const std::string &identifier);
-	~scripted_condition();
+	void process_gsml_property(const gsml_property &property);
+	void process_gsml_scope(const gsml_data &scope);
+	void check() const;
 
-	virtual void process_gsml_property(const gsml_property &property) override;
-	virtual void process_gsml_scope(const gsml_data &scope) override;
-	virtual void check() const override;
-
-	const and_condition *get_conditions() const
+	const and_condition<scope_type> *get_conditions() const
 	{
 		return this->conditions.get();
 	}
 
 private:
-	std::unique_ptr<and_condition> conditions;
+	std::unique_ptr<and_condition<scope_type>> conditions;
 };
+
+class player_scripted_condition final : public data_entry, public data_type<player_scripted_condition>, public scripted_condition_base<CPlayer>
+{
+	Q_OBJECT
+
+public:
+	static constexpr const char *class_identifier = "player_scripted_condition";
+	static constexpr const char *database_folder = "player_scripted_conditions";
+
+	explicit player_scripted_condition(const std::string &identifier) : data_entry(identifier)
+	{
+	}
+
+	virtual void process_gsml_property(const gsml_property &property) override
+	{
+		scripted_condition_base::process_gsml_property(property);
+	}
+
+	virtual void process_gsml_scope(const gsml_data &scope) override
+	{
+		scripted_condition_base::process_gsml_scope(scope);
+	}
+
+	virtual void check() const override
+	{
+		scripted_condition_base::check();
+	}
+};
+
+class unit_scripted_condition final : public data_entry, public data_type<unit_scripted_condition>, public scripted_condition_base<CUnit>
+{
+	Q_OBJECT
+
+public:
+	static constexpr const char *class_identifier = "unit_scripted_condition";
+	static constexpr const char *database_folder = "unit_scripted_conditions";
+
+	explicit unit_scripted_condition(const std::string &identifier) : data_entry(identifier)
+	{
+	}
+
+	virtual void process_gsml_property(const gsml_property &property) override
+	{
+		scripted_condition_base::process_gsml_property(property);
+	}
+
+	virtual void process_gsml_scope(const gsml_data &scope) override
+	{
+		scripted_condition_base::process_gsml_scope(scope);
+	}
+
+	virtual void check() const override
+	{
+		scripted_condition_base::check();
+	}
+};
+
+extern template class scripted_condition_base<CPlayer>;
+extern template class scripted_condition_base<CUnit>;
 
 }

@@ -29,8 +29,11 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
+class CUnit;
+
 namespace wyrmgus {
 
+template <typename scope_type>
 class condition;
 
 class epithet final : public named_data_entry, public data_type<epithet>
@@ -59,14 +62,14 @@ public:
 		++this->weight;
 	}
 
-	const std::unique_ptr<condition> &get_conditions() const
+	const std::unique_ptr<condition<CUnit>> &get_conditions() const
 	{
 		return this->conditions;
 	}
 
 private:
 	int weight = 1;
-	std::unique_ptr<condition> conditions;
+	std::unique_ptr<condition<CUnit>> conditions;
 };
 
 }

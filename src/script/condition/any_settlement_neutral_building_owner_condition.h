@@ -34,17 +34,9 @@
 
 namespace wyrmgus {
 
-class any_settlement_neutral_building_owner_condition final : public scope_condition_base<CPlayer>
+class any_settlement_neutral_building_owner_condition final : public scope_condition_base<CUnit, CPlayer>
 {
 public:
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(player);
-		Q_UNUSED(ctx);
-
-		return false;
-	}
-
 	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		if (unit->get_settlement() == nullptr) {

@@ -32,7 +32,7 @@
 
 namespace wyrmgus {
 
-class trigger_condition final : public condition
+class trigger_condition final : public condition<CPlayer>
 {
 public:
 	explicit trigger_condition(const std::string &value)

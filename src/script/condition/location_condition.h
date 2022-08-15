@@ -33,7 +33,7 @@
 
 namespace wyrmgus {
 
-class location_condition final : public condition
+class location_condition final : public condition<CUnit>
 {
 public:
 	location_condition()
@@ -70,14 +70,6 @@ public:
 		if (this->map_template == nullptr) {
 			throw std::runtime_error("\"location\" condition has no map template.");
 		}
-	}
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(player);
-		Q_UNUSED(ctx);
-
-		return true;
 	}
 
 	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override

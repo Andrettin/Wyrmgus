@@ -36,7 +36,7 @@
 
 namespace wyrmgus {
 
-class unit_class_condition final : public condition
+class unit_class_condition final : public condition<CPlayer>
 {
 public:
 	unit_class_condition() {}

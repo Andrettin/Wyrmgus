@@ -32,7 +32,8 @@
 
 namespace wyrmgus {
 
-class civilization_group_condition final : public condition
+template <typename scope_type>
+class civilization_group_condition final : public condition<scope_type>
 {
 public:
 	explicit civilization_group_condition(const std::string &value)
@@ -49,22 +50,11 @@ public:
 		return civilization->is_part_of_group(this->group);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
-		if (player->get_civilization() == nullptr) {
-			return false;
-		}
-
-		return this->check(player->get_civilization());
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(ctx);
-
-		return this->check(unit->get_civilization());
+		return this->check(scope->get_civilization());
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override

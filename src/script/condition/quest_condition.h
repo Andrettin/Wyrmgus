@@ -32,7 +32,7 @@
 
 namespace wyrmgus {
 
-class quest_condition final : public condition
+class quest_condition final : public condition<CPlayer>
 {
 public:
 	explicit quest_condition(const std::string &value)

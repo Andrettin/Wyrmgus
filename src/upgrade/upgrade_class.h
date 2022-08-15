@@ -29,15 +29,18 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
+class CPlayer;
 class CUpgrade;
 
 namespace wyrmgus {
 
 class age;
-class condition;
 class unit_class;
 class upgrade_category;
 enum class upgrade_category_rank;
+
+template <typename scope_type>
+class condition;
 
 class upgrade_class final : public named_data_entry, public data_type<upgrade_class>
 {
@@ -88,12 +91,12 @@ public:
 		return this->age;
 	}
 
-	const std::unique_ptr<condition> &get_preconditions() const
+	const std::unique_ptr<condition<CPlayer>> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	const std::unique_ptr<condition> &get_conditions() const
+	const std::unique_ptr<condition<CPlayer>> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -164,8 +167,8 @@ private:
 	int index = -1;
 	upgrade_category *category = nullptr;
 	wyrmgus::age *age = nullptr;
-	std::unique_ptr<condition> preconditions;
-	std::unique_ptr<condition> conditions;
+	std::unique_ptr<condition<CPlayer>> preconditions;
+	std::unique_ptr<condition<CPlayer>> conditions;
 	std::vector<CUpgrade *> upgrades;
 	unit_class *tech_tree_parent_unit_class = nullptr;
 	upgrade_class *tech_tree_parent_upgrade_class = nullptr;

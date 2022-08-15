@@ -50,10 +50,10 @@ void unit_class::process_gsml_scope(const gsml_data &scope)
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "preconditions") {
-		this->preconditions = std::make_unique<and_condition>();
+		this->preconditions = std::make_unique<and_condition<CPlayer>>();
 		database::process_gsml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
-		this->conditions = std::make_unique<and_condition>();
+		this->conditions = std::make_unique<and_condition<CPlayer>>();
 		database::process_gsml_data(this->conditions, scope);
 	} else if (tag == "0_ad_template_names") {
 		for (const std::string &value : values) {

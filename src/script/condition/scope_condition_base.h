@@ -31,8 +31,8 @@
 
 namespace wyrmgus {
 
-template <typename scope_type>
-class scope_condition_base : public condition
+template <typename upper_scope_type, typename scope_type>
+class scope_condition_base : public condition<upper_scope_type>
 {
 public:
 	virtual void process_gsml_property(const gsml_property &property) override
@@ -65,7 +65,7 @@ public:
 	}
 
 private:
-	and_condition conditions;
+	and_condition<scope_type> conditions;
 };
 
 }

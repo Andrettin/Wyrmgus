@@ -41,12 +41,14 @@ extern int CclDefineButton(lua_State *l);
 
 namespace wyrmgus {
 
-class and_condition;
 class button;
 class button_level;
 class resource;
 class unit_class;
 class unit_type;
+
+template <typename scope_type>
+class and_condition;
 
 typedef bool (*button_check_func)(const CUnit &, const button &);
 
@@ -146,12 +148,12 @@ public:
 	int get_key() const;
 	std::string get_hint() const;
 
-	const and_condition *get_preconditions() const
+	const and_condition<CUnit> *get_preconditions() const
 	{
 		return this->preconditions_ptr;
 	}
 
-	const and_condition *get_conditions() const
+	const and_condition<CUnit> *get_conditions() const
 	{
 		return this->conditions_ptr;
 	}
@@ -176,10 +178,10 @@ public:
 	button_check_func Allowed = nullptr;    /// Check if this button is allowed
 	std::vector<std::string> allow_strings; //arguments for allowed
 private:
-	std::unique_ptr<and_condition> preconditions; //conditions for the button to be shown
-	const and_condition *preconditions_ptr = nullptr;
-	std::unique_ptr<and_condition> conditions; //conditions for the button to be usable
-	const and_condition *conditions_ptr = nullptr;
+	std::unique_ptr<and_condition<CUnit>> preconditions; //conditions for the button to be shown
+	const and_condition<CUnit> *preconditions_ptr = nullptr;
+	std::unique_ptr<and_condition<CUnit>> conditions; //conditions for the button to be usable
+	const and_condition<CUnit> *conditions_ptr = nullptr;
 public:
 	std::string UnitMask;       //for which units is it available
 private:

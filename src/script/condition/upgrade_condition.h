@@ -30,7 +30,8 @@
 
 namespace wyrmgus {
 
-class upgrade_condition final : public upgrade_condition_base
+template <typename scope_type>
+class upgrade_condition final : public upgrade_condition_base<scope_type>
 {
 public:
 	upgrade_condition()
@@ -49,25 +50,18 @@ public:
 		return this->check_upgrade(civilization, this->upgrade);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
-		return this->check_upgrade(player, this->upgrade);
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(ctx);
-
-		return this->check_upgrade(unit, this->upgrade);
+		return this->check_upgrade(scope, this->upgrade);
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
 
-		return condition::get_object_string(this->upgrade, links_allowed) + " upgrade";
+		return condition<scope_type>::get_object_string(this->upgrade, links_allowed) + " upgrade";
 	}
 
 private:

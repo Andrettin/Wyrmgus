@@ -61,7 +61,6 @@ namespace wyrmgus {
 	class button_level;
 	class civilization;
 	class civilization_group;
-	class condition;
 	class construction;
 	class employment_type;
 	class faction;
@@ -92,6 +91,9 @@ namespace wyrmgus {
 	enum class status_effect;
 	enum class tile_flag : uint32_t;
 	enum class unit_domain;
+
+	template <typename scope_type>
+	class condition;
 }
 
 constexpr int UnitSides = 8;
@@ -1097,12 +1099,12 @@ public:
 		return this->sound_set.get();
 	}
 
-	const std::unique_ptr<condition> &get_preconditions() const
+	const std::unique_ptr<condition<CPlayer>> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	const std::unique_ptr<condition> &get_conditions() const
+	const std::unique_ptr<condition<CPlayer>> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -1355,8 +1357,8 @@ public:
 	//Wyrmgus end
 
 private:
-	std::unique_ptr<condition> preconditions;
-	std::unique_ptr<condition> conditions;
+	std::unique_ptr<condition<CPlayer>> preconditions;
+	std::unique_ptr<condition<CPlayer>> conditions;
 	bool disabled = false;
 
 	friend int ::CclDefineUnitType(lua_State *l);

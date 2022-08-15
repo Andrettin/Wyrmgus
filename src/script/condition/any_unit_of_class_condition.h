@@ -35,7 +35,7 @@
 
 namespace wyrmgus {
 
-class any_unit_of_class_condition final : public scope_condition_base<CUnit>
+class any_unit_of_class_condition final : public scope_condition_base<CPlayer, CUnit>
 {
 public:
 	virtual void process_gsml_property(const gsml_property &property) override
@@ -72,11 +72,6 @@ public:
 		}
 
 		return false;
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
-	{
-		return this->check_scope(unit, ctx);
 	}
 
 	virtual std::string get_scope_name() const override

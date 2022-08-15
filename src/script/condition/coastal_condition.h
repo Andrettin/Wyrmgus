@@ -32,7 +32,7 @@
 
 namespace wyrmgus {
 
-class coastal_condition final : public condition
+class coastal_condition final : public condition<CPlayer>
 {
 public:
 	explicit coastal_condition(const std::string &value)

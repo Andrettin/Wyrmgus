@@ -80,7 +80,7 @@ public:
 	}
 
 private:
-	and_condition conditions;
+	and_condition<scope_type> conditions;
 	effect_list<scope_type> effects;
 };
 

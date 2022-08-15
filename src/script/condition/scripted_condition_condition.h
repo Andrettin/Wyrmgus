@@ -31,12 +31,22 @@
 
 namespace wyrmgus {
 
-class scripted_condition_condition final : public condition
+template <typename scope_type>
+class scripted_condition_condition final : public condition<scope_type>
 {
 public:
+	static const scripted_condition_base<scope_type> *get_scripted_condition(const std::string &identifier)
+	{
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			return player_scripted_condition::get(identifier);
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			return unit_scripted_condition::get(identifier);
+		}
+	}
+
 	explicit scripted_condition_condition(const std::string &value)
 	{
-		this->scripted_condition = scripted_condition::get(value);
+		this->scripted_condition = scripted_condition_condition::get_scripted_condition(value);
 	}
 
 	virtual bool check(const civilization *civilization) const override
@@ -49,14 +59,9 @@ public:
 		return this->scripted_condition->get_conditions()->check(government_type);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
-		return this->scripted_condition->get_conditions()->check(player, ctx);
-	}
-
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
-	{
-		return this->scripted_condition->get_conditions()->check(unit, ctx);
+		return this->scripted_condition->get_conditions()->check(scope, ctx);
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
@@ -65,7 +70,7 @@ public:
 	}
 
 private:
-	const wyrmgus::scripted_condition *scripted_condition = nullptr;
+	const wyrmgus::scripted_condition_base<scope_type> *scripted_condition = nullptr;
 };
 
 }

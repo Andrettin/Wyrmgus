@@ -33,7 +33,8 @@
 
 namespace wyrmgus {
 
-class time_of_day_condition final : public condition
+template <typename scope_type>
+class time_of_day_condition final : public condition<scope_type>
 {
 public:
 	explicit time_of_day_condition(const std::string &value)
@@ -41,23 +42,38 @@ public:
 		this->time_of_day = time_of_day::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	const CMapLayer *get_scope_map_layer(const scope_type *scope) const
 	{
-		Q_UNUSED(ctx);
-
-		return CMap::get()->MapLayers[player->StartMapLayer]->get_tile_time_of_day(player->StartPos) == this->time_of_day;
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			return CMap::get()->MapLayers[scope->StartMapLayer].get();
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			return scope->MapLayer;
+		}
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
+	QPoint get_scope_tile_pos(const scope_type *scope) const
+	{
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			return scope->StartPos;
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			return scope->get_center_tile_pos();
+		}
+	}
+
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
-		if (unit->MapLayer == nullptr) {
+		const CMapLayer *map_layer = this->get_scope_map_layer(scope);
+
+		if (map_layer == nullptr) {
 			return false;
 		}
 
-		const wyrmgus::time_of_day *unit_time_of_day = unit->get_center_tile_time_of_day();
-		return this->time_of_day == unit_time_of_day;
+		const QPoint tile_pos = this->get_scope_tile_pos(scope);
+
+		const wyrmgus::time_of_day *tile_time_of_day = map_layer->get_tile_time_of_day(tile_pos);
+		return tile_time_of_day == this->time_of_day;
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override

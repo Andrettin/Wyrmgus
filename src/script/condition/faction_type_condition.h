@@ -31,7 +31,7 @@
 
 namespace wyrmgus {
 
-class faction_type_condition final : public condition
+class faction_type_condition final : public condition<CPlayer>
 {
 public:
 	explicit faction_type_condition(const std::string &value)

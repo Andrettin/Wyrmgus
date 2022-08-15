@@ -29,14 +29,17 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 
+class CPlayer;
 class CUpgrade;
 
 namespace wyrmgus {
 
-class and_condition;
 class character;
 class faction;
 class icon;
+
+template <typename scope_type>
+class and_condition;
 
 class dynasty final : public detailed_data_entry, public data_type<dynasty>
 {
@@ -93,12 +96,12 @@ public:
 	Q_INVOKABLE void add_faction(faction *faction);
 	Q_INVOKABLE void remove_faction(faction *faction);
 
-	const std::unique_ptr<and_condition> &get_preconditions() const
+	const std::unique_ptr<and_condition<CPlayer>> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	const std::unique_ptr<and_condition> &get_conditions() const
+	const std::unique_ptr<and_condition<CPlayer>> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -123,8 +126,8 @@ private:
 	CUpgrade *upgrade = nullptr; //dynasty upgrade applied when the dynasty is set
 	wyrmgus::icon *icon = nullptr;
 	std::vector<const faction *> factions; //to which factions is this dynasty available
-	std::unique_ptr<and_condition> preconditions;
-	std::unique_ptr<and_condition> conditions;
+	std::unique_ptr<and_condition<CPlayer>> preconditions;
+	std::unique_ptr<and_condition<CPlayer>> conditions;
 	std::vector<const character *> characters;
 };
 

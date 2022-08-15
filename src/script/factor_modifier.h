@@ -33,9 +33,11 @@ class CUnit;
 
 namespace wyrmgus {
 
-class and_condition;
 class gsml_data;
 class gsml_property;
+
+template <typename scope_type>
+class and_condition;
 
 //a modifier for a factor, e.g. a random chance or weight
 template <typename scope_type>
@@ -64,7 +66,7 @@ public:
 private:
 	centesimal_int factor; //the factor of the modifier itself
 	bool additive = false; //whether the modifier is additive instead of multiplicative
-	std::unique_ptr<and_condition> conditions; //conditions for whether the modifier is to be applied
+	std::unique_ptr<and_condition<scope_type>> conditions; //conditions for whether the modifier is to be applied
 };
 
 extern template class factor_modifier<CPlayer>;

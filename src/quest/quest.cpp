@@ -194,7 +194,7 @@ void quest::process_gsml_scope(const gsml_data &scope)
 			this->objective_strings.push_back(value);
 		}
 	} else if (tag == "conditions") {
-		this->conditions = std::make_unique<and_condition>();
+		this->conditions = std::make_unique<and_condition<CPlayer>>();
 		database::process_gsml_data(this->conditions, scope);
 	} else if (tag == "accept_effects") {
 		this->accept_effects = std::make_unique<effect_list<CPlayer>>();

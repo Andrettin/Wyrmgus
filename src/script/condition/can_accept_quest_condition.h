@@ -32,7 +32,7 @@
 
 namespace wyrmgus {
 
-class can_accept_quest_condition final : public condition
+class can_accept_quest_condition final : public condition<CPlayer>
 {
 public:
 	explicit can_accept_quest_condition(const std::string &value)

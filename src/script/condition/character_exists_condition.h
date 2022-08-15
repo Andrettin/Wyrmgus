@@ -31,7 +31,8 @@
 
 namespace wyrmgus {
 
-class character_exists_condition final : public condition
+template <typename scope_type>
+class character_exists_condition final : public condition<scope_type>
 {
 public:
 	explicit character_exists_condition(const std::string &value)
@@ -39,9 +40,9 @@ public:
 		this->character = character::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player);
+		Q_UNUSED(scope);
 		Q_UNUSED(ctx);
 
 		return this->character->get_unit() != nullptr;
@@ -51,7 +52,7 @@ public:
 	{
 		Q_UNUSED(indent)
 
-		return "Character " + condition::get_object_string(this->character, links_allowed, this->character->get_full_name()) + " exists";
+		return "Character " + condition<scope_type>::get_object_string(this->character, links_allowed, this->character->get_full_name()) + " exists";
 	}
 
 private:

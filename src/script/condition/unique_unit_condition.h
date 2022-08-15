@@ -32,7 +32,8 @@
 
 namespace wyrmgus {
 
-class unique_unit_condition final : public scope_condition<CUnit>
+template <typename upper_scope_type>
+class unique_unit_condition final : public scope_condition<upper_scope_type, CUnit>
 {
 public:
 	virtual void process_gsml_property(const gsml_property &property) override
@@ -43,7 +44,7 @@ public:
 		if (key == "unique") {
 			this->unique = unique_item::get(value);
 		} else {
-			scope_condition::process_gsml_property(property);
+			scope_condition<upper_scope_type, CUnit>::process_gsml_property(property);
 		}
 	}
 
@@ -53,12 +54,12 @@ public:
 			throw std::runtime_error("\"unique_unit\" condition has no unique set for it.");
 		}
 
-		scope_condition::check_validity();
+		scope_condition<upper_scope_type, CUnit>::check_validity();
 	}
 
-	virtual const CUnit *get_scope(const CPlayer *player, const read_only_context &ctx) const override
+	virtual const CUnit *get_scope(const upper_scope_type *upper_scope, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player);
+		Q_UNUSED(upper_scope);
 		Q_UNUSED(ctx);
 
 		return this->unique->get_unit();

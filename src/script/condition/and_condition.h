@@ -30,12 +30,13 @@
 
 namespace wyrmgus {
 
-class and_condition final : public condition
+template <typename scope_type>
+class and_condition final : public condition<scope_type>
 {
 public:
 	and_condition() {}
 
-	explicit and_condition(std::vector<std::unique_ptr<const condition>> &&conditions)
+	explicit and_condition(std::vector<std::unique_ptr<const condition<scope_type>>> &&conditions)
 		: conditions(std::move(conditions))
 	{
 	}
@@ -79,14 +80,14 @@ public:
 		return this->check_internal(government_type);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
-		return this->check_internal(player, ctx);
+		return this->check_internal(scope, ctx);
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
+	bool check(const scope_type *scope) const
 	{
-		return this->check_internal(unit, ctx);
+		return this->check(scope, read_only_context::from_scope(scope));
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
@@ -106,16 +107,16 @@ public:
 
 	std::string get_conditions_string(const size_t indent, const bool links_allowed) const
 	{
-		return condition::get_conditions_string(this->conditions, indent, links_allowed);
+		return condition<scope_type>::get_conditions_string(this->conditions, indent, links_allowed);
 	}
 
-	void add_condition(std::unique_ptr<const condition> &&condition)
+	void add_condition(std::unique_ptr<const condition<scope_type>> &&condition)
 	{
 		this->conditions.push_back(std::move(condition));
 	}
 
 private:
-	std::vector<std::unique_ptr<const condition>> conditions; //the conditions of which all should be true
+	std::vector<std::unique_ptr<const condition<scope_type>>> conditions; //the conditions of which all should be true
 };
 
 }

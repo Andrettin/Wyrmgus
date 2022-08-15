@@ -37,12 +37,14 @@ class LuaCallback;
 struct lua_State;
 
 namespace wyrmgus {
-	class condition;
 	class dynasty;
 	class faction;
 	class resource;
 	class tile;
 	class unit_type;
+
+	template <typename scope_type>
+	class condition;
 
 	template <typename scope_type>
 	class effect;
@@ -101,12 +103,12 @@ public:
 		return this->historical_date;
 	}
 
-	const std::unique_ptr<condition> &get_preconditions() const
+	const std::unique_ptr<condition<CPlayer>> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	const std::unique_ptr<condition> &get_conditions() const
+	const std::unique_ptr<condition<CPlayer>> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -128,8 +130,8 @@ public:
 	std::unique_ptr<LuaCallback> Conditions;
 	std::unique_ptr<LuaCallback> Effects;
 private:
-	std::unique_ptr<condition> preconditions;
-	std::unique_ptr<condition> conditions;
+	std::unique_ptr<condition<CPlayer>> preconditions;
+	std::unique_ptr<condition<CPlayer>> conditions;
 	std::unique_ptr<effect_list<CPlayer>> effects;
 };
 

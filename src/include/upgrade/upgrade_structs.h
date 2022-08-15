@@ -46,7 +46,6 @@ extern int CclDefinePredependency(lua_State *l);
 extern int CclDefineUpgrade(lua_State *l);
 
 namespace wyrmgus {
-	class and_condition;
 	class character;
 	class civilization;
 	class civilization_group;
@@ -63,6 +62,9 @@ namespace wyrmgus {
 	class upgrade_modifier;
 	enum class government_type;
 	enum class item_class;
+
+	template <typename scope_type>
+	class and_condition;
 
 	template <typename T>
 	class factor;
@@ -411,15 +413,18 @@ public:
 
 	int get_price() const;
 
-	const and_condition *get_preconditions() const
+	const and_condition<CPlayer> *get_preconditions() const
 	{
 		return this->preconditions.get();
 	}
 
-	const and_condition *get_conditions() const
+	const and_condition<CPlayer> *get_conditions() const
 	{
 		return this->conditions.get();
 	}
+
+	bool check_unit_preconditions(const CUnit *unit) const;
+	bool check_unit_conditions(const CUnit *unit) const;
 
 	int calculate_ai_priority(const CPlayer *player) const;
 
@@ -517,8 +522,10 @@ public:
 	//Wyrmgus end
 	// TODO: not used by buttons
 private:
-	std::unique_ptr<and_condition> preconditions;
-	std::unique_ptr<and_condition> conditions;
+	std::unique_ptr<and_condition<CPlayer>> preconditions;
+	std::unique_ptr<and_condition<CPlayer>> conditions;
+	std::unique_ptr<and_condition<CUnit>> unit_preconditions;
+	std::unique_ptr<and_condition<CUnit>> unit_conditions; //conditions for the unit to acquire the upgrade as an individual upgrade
 	std::unique_ptr<factor<CPlayer>> ai_priority;
 	const wyrmgus::dynasty *dynasty = nullptr; //the dynasty to which the upgrade pertains, if this is a dynasty upgrade
 	const wyrmgus::deity *deity = nullptr; //the deity to which the upgrade pertains, if this is a deity upgrade

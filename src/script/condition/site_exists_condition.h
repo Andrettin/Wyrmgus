@@ -32,7 +32,8 @@
 
 namespace wyrmgus {
 
-class site_exists_condition final : public condition
+template <typename scope_type>
+class site_exists_condition final : public condition<scope_type>
 {
 public:
 	explicit site_exists_condition(const std::string &value)
@@ -40,9 +41,9 @@ public:
 		this->site = site::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(player);
+		Q_UNUSED(scope);
 		Q_UNUSED(ctx);
 
 		return this->site->get_game_data()->is_on_map();
