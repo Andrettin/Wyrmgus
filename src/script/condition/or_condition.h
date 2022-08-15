@@ -62,8 +62,8 @@ public:
 		}
 	}
 
-	template <typename scope_type>
-	bool check_internal(const scope_type scope) const
+	template <typename checked_scope_type>
+	bool check_internal(const checked_scope_type scope) const
 	{
 		for (const auto &condition : this->conditions) {
 			if (condition->check(scope)) {
@@ -74,8 +74,8 @@ public:
 		return false;
 	}
 
-	template <typename scope_type>
-	bool check_internal(const scope_type scope, const read_only_context &ctx) const
+	template <typename checked_scope_type>
+	bool check_internal(const checked_scope_type scope, const read_only_context &ctx) const
 	{
 		for (const auto &condition : this->conditions) {
 			if (condition->check(scope, ctx)) {
