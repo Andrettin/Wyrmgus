@@ -46,8 +46,8 @@ public:
 	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void check_validity() const override;
 
-	template <typename scope_type>
-	bool check_internal(const scope_type scope) const
+	template <typename checked_scope_type>
+	bool check_internal(const checked_scope_type scope) const
 	{
 		for (const auto &condition : this->conditions) {
 			if (!condition->check(scope)) {
@@ -58,8 +58,8 @@ public:
 		return true;
 	}
 
-	template <typename scope_type>
-	bool check_internal(const scope_type scope, const read_only_context &ctx) const
+	template <typename checked_scope_type>
+	bool check_internal(const checked_scope_type scope, const read_only_context &ctx) const
 	{
 		for (const auto &condition : this->conditions) {
 			if (!condition->check(scope, ctx)) {
