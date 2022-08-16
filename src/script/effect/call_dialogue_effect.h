@@ -61,7 +61,7 @@ public:
 	{
 		CPlayer *player = nullptr;
 
-		context dialogue_ctx;
+		context dialogue_ctx = ctx;
 		dialogue_ctx.source_player = ctx.current_player;
 		dialogue_ctx.source_unit = ctx.current_unit;
 
