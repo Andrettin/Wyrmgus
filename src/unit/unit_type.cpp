@@ -2043,6 +2043,18 @@ std::string unit_type::get_default_name(const CPlayer *player) const
 		return variation->get_type_name();
 	}
 
+	const wyrmgus::civilization *civilization = this->get_civilization();
+	if (civilization != nullptr) {
+		if (civilization != player->get_civilization() && civilization->get_name() != this->get_name() && this->get_species() == nullptr) {
+			return civilization->get_name() + " " + this->get_name();
+		}
+	} else {
+		const wyrmgus::civilization_group *civilization_group = this->get_civilization_group();
+		if (civilization_group != nullptr && (player->get_civilization() == nullptr || !player->get_civilization()->is_part_of_group(civilization_group)) && civilization_group->get_name() != this->get_name() && this->get_species() == nullptr) {
+			return civilization_group->get_name() + " " + this->get_name();
+		}
+	}
+
 	return this->get_name();
 }
 
