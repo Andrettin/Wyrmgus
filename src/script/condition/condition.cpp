@@ -42,6 +42,8 @@
 #include "script/condition/any_neighbor_settlement_owner_condition.h"
 #include "script/condition/any_other_player_condition.h"
 #include "script/condition/any_player_condition.h"
+#include "script/condition/any_settlement_building_condition.h"
+#include "script/condition/any_settlement_center_unit_condition.h"
 #include "script/condition/any_settlement_neutral_building_owner_condition.h"
 #include "script/condition/any_unit_condition.h"
 #include "script/condition/any_unit_of_class_condition.h"
@@ -222,6 +224,8 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_sc
 	if constexpr (std::is_same_v<scope_type, CPlayer>) {
 		if (tag == "any_other_player") {
 			condition = std::make_unique<any_other_player_condition>();
+		} else if (tag == "any_settlement_center_unit") {
+			condition = std::make_unique<any_settlement_center_unit_condition>();
 		} else if (tag == "any_unit") {
 			condition = std::make_unique<any_unit_condition>();
 		} else if (tag == "any_unit_of_class") {
@@ -242,6 +246,8 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_sc
 			condition = std::make_unique<any_neighbor_settlement_neutral_building_owner_condition>();
 		} else if (tag == "any_neighbor_settlement_owner") {
 			condition = std::make_unique<any_neighbor_settlement_owner_condition>();
+		} else if (tag == "any_settlement_building") {
+			condition = std::make_unique<any_settlement_building_condition>();
 		} else if (tag == "any_settlement_neutral_building_owner") {
 			condition = std::make_unique<any_settlement_neutral_building_owner_condition>();
 		} else if (tag == "location") {
