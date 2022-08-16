@@ -31,6 +31,7 @@ namespace wyrmgus {
 enum class trigger_target {
 	player, //checked for each player
 	neutral_player, //checked for the neutral player
+	player_or_neutral_player //checked for each player, including the neutral one
 };
 
 inline trigger_target string_to_trigger_target(const std::string &str)
@@ -39,6 +40,8 @@ inline trigger_target string_to_trigger_target(const std::string &str)
 		return trigger_target::player;
 	} else if (str == "neutral_player") {
 		return trigger_target::neutral_player;
+	} else if (str == "player_or_neutral_player") {
+		return trigger_target::player_or_neutral_player;
 	}
 
 	throw std::runtime_error("Invalid trigger target: \"" + str + "\".");

@@ -565,6 +565,19 @@ void TriggersEachCycle()
 					case trigger_target::neutral_player:
 						potential_target_players.push_back(CPlayer::get_neutral_player());
 						break;
+					case trigger_target::player_or_neutral_player:
+						for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
+							if (player->get_type() == player_type::nobody) {
+								continue;
+							}
+
+							if (!player->is_alive()) {
+								continue;
+							}
+
+							potential_target_players.push_back(player.get());
+						}
+						break;
 				}
 
 				for (CPlayer *player : potential_target_players) {
