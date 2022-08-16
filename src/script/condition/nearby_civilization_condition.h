@@ -55,6 +55,10 @@ public:
 			if (building->Player->get_civilization() == this->civilization) {
 				return true;
 			}
+
+			if (building->Player->is_neutral_player() && building->Type->get_civilization() == this->civilization) {
+				return true;
+			}
 		}
 
 		for (const site *border_settlement : unit->get_settlement()->get_game_data()->get_border_settlements()) {
@@ -66,6 +70,10 @@ public:
 
 			for (const CUnit *building : border_settlement->get_game_data()->get_buildings()) {
 				if (building->Player->get_civilization() == this->civilization) {
+					return true;
+				}
+
+				if (building->Player->is_neutral_player() && building->Type->get_civilization() == this->civilization) {
 					return true;
 				}
 			}
