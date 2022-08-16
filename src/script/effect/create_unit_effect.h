@@ -38,6 +38,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
+#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 
@@ -78,6 +79,10 @@ public:
 			this->map_template = map_template::get(value);
 		} else if (key == "ttl") {
 			this->ttl = std::stoi(value);
+		} else if (key == "use_current_unit_pos") {
+			this->use_current_unit_pos = string::to_bool(value);
+		} else if (key == "use_source_unit_pos") {
+			this->use_source_unit_pos = string::to_bool(value);
 		} else {
 			effect::process_gsml_property(property);
 		}
@@ -123,7 +128,7 @@ public:
 			}
 		}
 
-		const QPoint unit_top_left_pos = this->get_tile_pos(player) - unit_type->get_tile_center_pos_offset();
+		const QPoint unit_top_left_pos = this->get_tile_pos(player, ctx) - unit_type->get_tile_center_pos_offset();
 		const int map_layer = this->get_map_layer_index(player);
 
 		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, player, map_layer);
@@ -164,7 +169,7 @@ public:
 		return this->unit_type;
 	}
 
-	QPoint get_tile_pos(const CPlayer *player) const
+	QPoint get_tile_pos(const CPlayer *player, const context &ctx) const
 	{
 		if (this->site != nullptr) {
 			const site_game_data *site_game_data = this->site->get_game_data();
@@ -178,6 +183,14 @@ public:
 
 		if (this->map_template != nullptr && CMap::get()->is_subtemplate_on_map(this->map_template)) {
 			return this->map_template->pos_to_map_pos(this->pos);
+		}
+
+		if (this->use_current_unit_pos && ctx.current_unit != nullptr) {
+			return ctx.current_unit->get()->get_center_tile_pos();
+		}
+
+		if (this->use_source_unit_pos && ctx.source_unit != nullptr) {
+			return ctx.source_unit->get()->get_center_tile_pos();
 		}
 
 		return player->StartPos;
@@ -210,6 +223,8 @@ private:
 	const wyrmgus::map_template *map_template = nullptr; //the map template where the unit type is to be located, if any
 	QPoint pos = QPoint(-1, -1); //the unit's position in the map template
 	int ttl = 0; //the time to live (in cycles) of the created unit, if any; useful for revealers
+	bool use_current_unit_pos = false;
+	bool use_source_unit_pos = false;
 };
 
 }
