@@ -59,6 +59,7 @@
 #include "script/effect/restore_mana_percent_effect.h"
 #include "script/effect/resource_effect.h"
 #include "script/effect/scripted_effect_effect.h"
+#include "script/effect/set_as_current_effect.h"
 #include "script/effect/unique_effect.h"
 
 namespace wyrmgus {
@@ -104,6 +105,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_property(const
 		return std::make_unique<call_dialogue_effect<scope_type>>(value, effect_operator);
 	} else if (key == "scripted_effect") {
 		return std::make_unique<scripted_effect_effect<scope_type>>(value, effect_operator);
+	} else if (key == "set_as_current") {
+		return std::make_unique<set_as_current_effect<scope_type>>(value, effect_operator);
 	}
 
 	throw std::runtime_error("Invalid property effect: \"" + key + "\".");

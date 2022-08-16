@@ -1039,6 +1039,7 @@ set(wyrmgus_script_effect_HDRS
 	src/script/effect/scope_effect_base.h
 	src/script/effect/scripted_effect.h
 	src/script/effect/scripted_effect_effect.h
+	src/script/effect/set_as_current_effect.h
 	src/script/effect/unique_effect.h
 )
 
