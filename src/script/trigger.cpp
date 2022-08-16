@@ -49,6 +49,7 @@
 #include "script/context.h"
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
+#include "script/trigger_target.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
@@ -544,34 +545,39 @@ void TriggersEachCycle()
 			}
 
 			if (!removed_trigger && current_trigger->get_effects() != nullptr) {
+				std::vector<CPlayer *> potential_target_players;
 				bool triggered = false;
 
-				if (current_trigger->Type == trigger::TriggerType::GlobalTrigger) {
-					if (check_conditions(current_trigger, CPlayer::get_neutral_player())) {
-						triggered = true;
-						context ctx;
-						ctx.current_player = CPlayer::get_neutral_player();
-						current_trigger->get_effects()->do_effects(CPlayer::get_neutral_player(), ctx);
+				switch (current_trigger->get_target()) {
+					case trigger_target::player:
+						for (CPlayer *player : CPlayer::get_non_neutral_players()) {
+							if (player->get_type() == player_type::nobody) {
+								continue;
+							}
+
+							if (!player->is_alive()) {
+								continue;
+							}
+
+							potential_target_players.push_back(player);
+						}
+						break;
+					case trigger_target::neutral_player:
+						potential_target_players.push_back(CPlayer::get_neutral_player());
+						break;
+				}
+
+				for (CPlayer *player : potential_target_players) {
+					if (!check_conditions(current_trigger, player)) {
+						continue;
 					}
-				} else if (current_trigger->Type == trigger::TriggerType::PlayerTrigger) {
-					for (int i = 0; i < PlayerNumNeutral; ++i) {
-						CPlayer *player = CPlayer::Players[i].get();
-						if (player->get_type() == player_type::nobody) {
-							continue;
-						}
-						if (!player->is_alive()) {
-							continue;
-						}
-						if (!check_conditions(current_trigger, player)) {
-							continue;
-						}
-						triggered = true;
-						context ctx;
-						ctx.current_player = player;
-						current_trigger->get_effects()->do_effects(player, ctx);
-						if (current_trigger->fires_only_once()) {
-							break;
-						}
+
+					triggered = true;
+					context ctx;
+					ctx.current_player = player;
+					current_trigger->get_effects()->do_effects(player, ctx);
+					if (current_trigger->fires_only_once()) {
+						break;
 					}
 				}
 
@@ -661,30 +667,13 @@ void trigger::ClearActiveTriggers()
 	//Wyrmgus end
 }
 
-trigger::trigger(const std::string &identifier) : data_entry(identifier)
+trigger::trigger(const std::string &identifier)
+	: data_entry(identifier), target(trigger_target::neutral_player)
 {
 }
 
 trigger::~trigger()
 {
-}
-
-void trigger::process_gsml_property(const gsml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "type") {
-		if (value == "global_trigger") {
-			this->Type = TriggerType::GlobalTrigger;
-		} else if (value == "player_trigger") {
-			this->Type = TriggerType::PlayerTrigger;
-		} else {
-			throw std::runtime_error("Invalid trigger type: \"" + value + "\".");
-		}
-	} else {
-		data_entry::process_gsml_property(property);
-	}
 }
 
 void trigger::process_gsml_scope(const gsml_data &scope)

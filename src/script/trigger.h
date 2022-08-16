@@ -42,6 +42,7 @@ namespace wyrmgus {
 	class resource;
 	class tile;
 	class unit_type;
+	enum class trigger_target;
 
 	template <typename scope_type>
 	class condition;
@@ -59,17 +60,12 @@ class trigger final : public data_entry, public data_type<trigger>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::trigger_target target MEMBER target READ get_target)
 	Q_PROPERTY(bool only_once MEMBER only_once READ fires_only_once)
 	Q_PROPERTY(bool campaign_only MEMBER campaign_only READ is_campaign_only)
 	Q_PROPERTY(QDateTime historical_date MEMBER historical_date READ get_historical_date)
 
 public:
-	enum class TriggerType
-	{
-		GlobalTrigger = 0, //checked once
-		PlayerTrigger //checked for each player
-	};
-
 	static constexpr const char *class_identifier = "trigger";
 	static constexpr const char *database_folder = "triggers";
 
@@ -84,9 +80,18 @@ public:
 	explicit trigger(const std::string &identifier);
 	~trigger();
 	
-	virtual void process_gsml_property(const gsml_property &property) override;
 	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void check() const override;
+
+	trigger_target get_target() const
+	{
+		return this->target;
+	}
+
+	void set_target(const trigger_target target)
+	{
+		this->target = target;
+	}
 
 	bool fires_only_once() const
 	{
@@ -120,7 +125,9 @@ public:
 
 	void add_effect(std::unique_ptr<effect<CPlayer>> &&effect);
 
-	TriggerType Type = TriggerType::GlobalTrigger;
+private:
+	trigger_target target;
+public:
 	bool Local = false;
 private:
 	bool only_once = false; //whether the trigger should occur only once in a game

@@ -36,6 +36,7 @@
 #include "script/context.h"
 #include "script/effect/call_dialogue_effect.h"
 #include "script/trigger.h"
+#include "script/trigger_target.h"
 #include "sound/sound_server.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
@@ -67,7 +68,7 @@ void dialogue::process_gsml_scope(const gsml_data &scope)
 	if (tag == "trigger") {
 		//create the trigger for this dialogue
 		wyrmgus::trigger *trigger = trigger::add(this->get_identifier(), this->get_module());
-		trigger->Type = trigger::TriggerType::PlayerTrigger;
+		trigger->set_target(trigger_target::player);
 		database::process_gsml_data(trigger, scope);
 
 		//add an effect to call this dialogue to the trigger
