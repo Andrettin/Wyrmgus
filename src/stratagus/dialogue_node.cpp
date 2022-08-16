@@ -39,6 +39,7 @@
 #include "player/faction.h"
 #include "player/player.h"
 #include "player/player_color.h"
+#include "player/player_type.h"
 #include "script.h"
 #include "script/condition/and_condition.h"
 #include "script/context.h"
@@ -151,7 +152,7 @@ void dialogue_node::call(CPlayer *player, context &ctx) const
 	}
 
 	if (player != CPlayer::GetThisPlayer()) {
-		if (player->AiEnabled && !this->option_pointers.empty()) {
+		if ((player->AiEnabled || player->get_type() != player_type::person) && !this->option_pointers.empty()) {
 			//AIs will choose a random option
 			const int option_index = static_cast<int>(random::get()->generate(this->option_pointers.size()));
 			this->dialogue->call_node_option_effect(this->get_index(), option_index, player, ctx);
