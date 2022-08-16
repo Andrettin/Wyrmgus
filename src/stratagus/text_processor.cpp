@@ -488,6 +488,11 @@ std::string text_processor::process_unit_tokens(const CUnit *unit, std::queue<st
 
 		bool processed = true;
 		return this->process_site_tokens(settlement, tokens, true, processed);
+	} else if (front_subtoken == "site") {
+		const site *site = unit->get_site();
+
+		bool processed = true;
+		return this->process_site_tokens(site, tokens, true, processed);
 	}
 
 	throw std::runtime_error("Failed to process unit token \"" + front_subtoken + "\".");
