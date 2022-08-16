@@ -938,6 +938,7 @@ set(wyrmgus_script_HDRS
 	src/script/factor.h
 	src/script/factor_modifier.h
 	src/script/trigger.h
+	src/script/trigger_target.h
 )
 
 set(wyrmgus_script_condition_HDRS
