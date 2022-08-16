@@ -149,8 +149,12 @@ public:
 		}
 	}
 
-	virtual std::string get_assignment_string() const override
+	virtual std::string get_assignment_string(const CPlayer *player, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override
 	{
+		Q_UNUSED(player);
+		Q_UNUSED(indent);
+		Q_UNUSED(prefix);
+
 		std::string str = "Receive ";
 		if (this->character != nullptr) {
 			str += "the " + string::highlight(this->character->get_full_name()) + " character";
@@ -169,12 +173,16 @@ public:
 
 			str += " unit";
 		}
-		if (this->site != nullptr) {
-			str += " at " + this->site->get_name();
+
+		const wyrmgus::site *site = this->get_site(ctx);
+		if (site != nullptr) {
+			str += " at " + site->get_name();
 		}
+
 		if (this->ttl != 0) {
 			str += " for " + std::to_string(this->ttl) + " cycles";
 		}
+
 		return str;
 	}
 
@@ -185,6 +193,23 @@ public:
 		}
 
 		return this->unit_type;
+	}
+
+	const site *get_site(const read_only_context &ctx) const
+	{
+		if (this->site != nullptr) {
+			return this->site;
+		}
+
+		if (this->use_current_unit_pos && ctx.current_unit != nullptr && ctx.current_unit->get()->get_site() != nullptr) {
+			return ctx.current_unit->get()->get_site();
+		}
+
+		if (this->use_source_unit_pos && ctx.source_unit != nullptr && ctx.source_unit->get()->get_site() != nullptr) {
+			return ctx.source_unit->get()->get_site();
+		}
+
+		return nullptr;
 	}
 
 	QPoint get_tile_pos(const CPlayer *player, const context &ctx) const

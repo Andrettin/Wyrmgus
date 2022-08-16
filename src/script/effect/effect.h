@@ -102,10 +102,10 @@ public:
 
 	virtual std::string get_assignment_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const
 	{
-		Q_UNUSED(scope)
-		Q_UNUSED(ctx)
-		Q_UNUSED(indent)
-		Q_UNUSED(prefix)
+		Q_UNUSED(scope);
+		Q_UNUSED(ctx);
+		Q_UNUSED(indent);
+		Q_UNUSED(prefix);
 
 		return this->get_assignment_string();
 	}
