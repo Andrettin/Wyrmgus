@@ -36,10 +36,13 @@
 
 namespace wyrmgus {
 
-class unit_class_condition final : public condition<CPlayer>
+template <typename scope_type>
+class unit_class_condition final : public condition<scope_type>
 {
 public:
-	unit_class_condition() {}
+	unit_class_condition()
+	{
+	}
 
 	explicit unit_class_condition(const std::string &value)
 	{
@@ -66,6 +69,12 @@ public:
 	{
 		if (this->unit_class == nullptr) {
 			throw std::runtime_error("\"unit_class\" condition has no unit class.");
+		}
+
+		if constexpr (std::is_same_v<scope_type, CUnit>) {
+			if (this->count != 1 || this->settlement != nullptr) {
+				throw std::runtime_error("\"unit_type\" condition has a count or settlement, despite having a unit as its scope.");
+			}
 		}
 	}
 
@@ -96,70 +105,78 @@ public:
 		return true;
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
-		if (ctx.ignore_units) {
-			return true;
-		}
-
-		const unit_type *unit_type = player->get_class_unit_type(this->unit_class);
-
-		if (unit_type == nullptr) {
-			return this->count == 0;
-		}
-
-		if (this->settlement != nullptr) {
-			if (!player->has_settlement(this->settlement)) {
-				return false;
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			if (ctx.ignore_units) {
+				return true;
 			}
 
-			std::vector<CUnit *> units;
-			FindPlayerUnitsByType(*player, *unit_type, units);
+			const unit_type *unit_type = scope->get_class_unit_type(this->unit_class);
 
-			int counter = 0;
-			for (const CUnit *unit : units) {
-				if (unit->get_settlement() == this->settlement) {
-					counter++;
+			if (unit_type == nullptr) {
+				return this->count == 0;
+			}
 
-					if (counter >= this->count) {
-						return true;
+			if (this->settlement != nullptr) {
+				if (!scope->has_settlement(this->settlement)) {
+					return false;
+				}
+
+				std::vector<CUnit *> units;
+				FindPlayerUnitsByType(*scope, *unit_type, units);
+
+				int counter = 0;
+				for (const CUnit *unit : units) {
+					if (unit->get_settlement() == this->settlement) {
+						counter++;
+
+						if (counter >= this->count) {
+							return true;
+						}
 					}
 				}
-			}
 
-			return false;
-		} else {
-			return player->GetUnitTypeCount(unit_type) >= this->count;
+				return false;
+			} else {
+				return scope->GetUnitTypeCount(unit_type) >= this->count;
+			}
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			return scope->Type->get_unit_class() == this->unit_class;
 		}
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		std::string str;
 
-		if (this->count > 1) {
-			str += std::to_string(this->count) + " ";
-		}
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			if (this->count > 1) {
+				str += std::to_string(this->count) + " ";
+			}
 
-		str += string::highlight(this->unit_class->get_name()) + " class ";
+			str += string::highlight(this->unit_class->get_name()) + " class ";
 
-		const bool is_building = !this->unit_class->get_unit_types().empty() && this->unit_class->get_unit_types().front()->BoolFlag[BUILDING_INDEX].value;
+			const bool is_building = !this->unit_class->get_unit_types().empty() && this->unit_class->get_unit_types().front()->BoolFlag[BUILDING_INDEX].value;
 
-		if (is_building) {
-			str += "building";
-		} else {
-			str += "unit";
-		}
+			if (is_building) {
+				str += "building";
+			} else {
+				str += "unit";
+			}
 
-		if (this->count > 1) {
-			str += "s";
-		}
+			if (this->count > 1) {
+				str += "s";
+			}
 
-		if (this->settlement != nullptr) {
-			str += " in " + settlement->get_name();
+			if (this->settlement != nullptr) {
+				str += " in " + settlement->get_name();
+			}
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			str = string::highlight(this->unit_class->get_name()) + " unit class";
 		}
 
 		return str;

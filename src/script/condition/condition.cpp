@@ -132,6 +132,10 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_pr
 		return std::make_unique<time_of_day_condition<scope_type>>(value);
 	} else if (key == "unique_can_drop") {
 		return std::make_unique<unique_can_drop_condition<scope_type>>(value);
+	} else if (key == "unit_class") {
+		return std::make_unique<unit_class_condition<scope_type>>(value);
+	} else if (key == "unit_type") {
+		return std::make_unique<unit_type_condition<scope_type>>(value);
 	} else if (key == "upgrade") {
 		return std::make_unique<upgrade_condition<scope_type>>(value);
 	} else if (key == "upgrade_class") {
@@ -163,10 +167,6 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_pr
 			return std::make_unique<settlement_condition>(value);
 		} else if (key == "trigger") {
 			return std::make_unique<trigger_condition>(value);
-		} else if (key == "unit_class") {
-			return std::make_unique<unit_class_condition>(value);
-		} else if (key == "unit_type") {
-			return std::make_unique<unit_type_condition>(value);
 		} else if (key == "war") {
 			return std::make_unique<war_condition>(value);
 		}
@@ -231,9 +231,9 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_sc
 		} else if (tag == "settlement") {
 			condition = std::make_unique<settlement_condition>();
 		} else if (tag == "unit_class") {
-			condition = std::make_unique<unit_class_condition>();
+			condition = std::make_unique<unit_class_condition<scope_type>>();
 		} else if (tag == "unit_type") {
-			condition = std::make_unique<unit_type_condition>();
+			condition = std::make_unique<unit_type_condition<scope_type>>();
 		}
 	}
 
@@ -543,7 +543,7 @@ int CclDefineDependency(lua_State *l)
 			
 			if (!strncmp(required, "unit", 4)) {
 				const unit_type *unit_type = unit_type::get(required);
-				condition = new unit_type_condition(unit_type, count > 0 ? count : 1);
+				condition = new unit_type_condition<CPlayer>(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
 				condition = new upgrade_condition<CPlayer>(required);
 			} else {
@@ -629,7 +629,7 @@ int CclDefinePredependency(lua_State *l)
 			
 			if (!strncmp(required, "unit", 4)) {
 				const unit_type *unit_type = unit_type::get(required);
-				condition = new unit_type_condition(unit_type, count > 0 ? count : 1);
+				condition = new unit_type_condition<CPlayer>(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
 				condition = new upgrade_condition<CPlayer>(required);
 			} else {
