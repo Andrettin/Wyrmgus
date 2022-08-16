@@ -67,13 +67,12 @@ void dialogue::process_gsml_scope(const gsml_data &scope)
 	if (tag == "trigger") {
 		//create the trigger for this dialogue
 		wyrmgus::trigger *trigger = trigger::add(this->get_identifier(), this->get_module());
+		trigger->Type = trigger::TriggerType::PlayerTrigger;
 		database::process_gsml_data(trigger, scope);
 
 		//add an effect to call this dialogue to the trigger
 		auto dialogue_effect = std::make_unique<call_dialogue_effect<CPlayer>>(this, gsml_operator::assignment);
 		trigger->add_effect(std::move(dialogue_effect));
-
-		trigger->Type = trigger::TriggerType::PlayerTrigger;
 	} else {
 		auto node = std::make_unique<dialogue_node>(this, static_cast<int>(this->nodes.size()));
 		database::process_gsml_data(node, scope);
