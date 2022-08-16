@@ -60,7 +60,7 @@ public:
 		return ctx.current_player;
 	}
 
-	virtual CPlayer *get_scope(const scope_type *upper_scope, const context &ctx) const override
+	virtual CPlayer *get_scope(const scope_type *upper_scope, context &ctx) const override
 	{
 		Q_UNUSED(upper_scope)
 

@@ -63,18 +63,18 @@ public:
 	{
 	}
 
-	void do_effect(scope_type *scope, const context &ctx) const;
+	void do_effect(scope_type *scope, context &ctx) const;
 
 	virtual void do_assignment_effect(scope_type *scope) const
 	{
-		Q_UNUSED(scope)
+		Q_UNUSED(scope);
 
 		throw std::runtime_error("The assignment operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
 	}
 
-	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const
+	virtual void do_assignment_effect(scope_type *scope, context &ctx) const
 	{
-		Q_UNUSED(ctx)
+		Q_UNUSED(ctx);
 
 		this->do_assignment_effect(scope);
 	}

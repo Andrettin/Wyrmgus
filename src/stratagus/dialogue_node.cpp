@@ -127,7 +127,7 @@ void dialogue_node::check() const
 	}
 }
 
-void dialogue_node::call(CPlayer *player, const context &ctx) const
+void dialogue_node::call(CPlayer *player, context &ctx) const
 {
 	if (this->conditions != nullptr) {
 		if (!this->conditions->check(player, ctx)) {
@@ -200,7 +200,7 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 	}
 }
 
-void dialogue_node::option_effect(const int option_index, CPlayer *player, const context &ctx) const
+void dialogue_node::option_effect(const int option_index, CPlayer *player, context &ctx) const
 {
 	//stop any dialogue sounds (i.e. voice overs) if any are still playing
 	dialogue::stop_sound_channels();

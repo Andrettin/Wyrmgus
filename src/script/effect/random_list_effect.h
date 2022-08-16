@@ -66,7 +66,7 @@ public:
 		return this->weight_factor->calculate(scope);
 	}
 
-	void do_effects(scope_type *scope, const context &ctx) const
+	void do_effects(scope_type *scope, context &ctx) const
 	{
 		this->effects->do_effects(scope, ctx);
 	}
@@ -113,7 +113,7 @@ public:
 		}
 	}
 
-	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
+	virtual void do_assignment_effect(scope_type *scope, context &ctx) const override
 	{
 		const std::vector<const random_list_entry<scope_type> *> weighted_entries = this->get_weighted_entries(scope);
 

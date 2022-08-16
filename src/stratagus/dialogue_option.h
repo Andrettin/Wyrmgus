@@ -79,7 +79,7 @@ public:
 		return this->end_dialogue;
 	}
 
-	void do_effects(CPlayer *player, const context &ctx) const;
+	void do_effects(CPlayer *player, context &ctx) const;
 	std::string get_tooltip(const context &ctx) const;
 
 	void delete_lua_callbacks();

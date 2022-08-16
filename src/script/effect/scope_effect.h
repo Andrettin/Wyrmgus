@@ -52,14 +52,14 @@ public:
 		return this->get_scope(upper_scope);
 	}
 
-	virtual scope_type *get_scope(const upper_scope_type *upper_scope, const context &ctx) const
+	virtual scope_type *get_scope(const upper_scope_type *upper_scope, context &ctx) const
 	{
 		Q_UNUSED(ctx);
 
 		return this->get_scope(upper_scope);
 	}
 
-	virtual void do_assignment_effect(upper_scope_type *upper_scope, const context &ctx) const override final
+	virtual void do_assignment_effect(upper_scope_type *upper_scope, context &ctx) const override final
 	{
 		scope_type *new_scope = this->get_scope(upper_scope, ctx);
 		this->do_scope_effect(new_scope, ctx);

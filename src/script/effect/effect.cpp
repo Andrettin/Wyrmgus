@@ -184,7 +184,7 @@ void effect<scope_type>::process_gsml_scope(const gsml_data &scope)
 }
 
 template <typename scope_type>
-void effect<scope_type>::do_effect(scope_type *scope, const context &ctx) const
+void effect<scope_type>::do_effect(scope_type *scope, context &ctx) const
 {
 	switch (this->effect_operator) {
 		case gsml_operator::assignment:

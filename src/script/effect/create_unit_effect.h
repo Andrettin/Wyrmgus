@@ -109,7 +109,7 @@ public:
 		}
 	}
 
-	virtual void do_assignment_effect(CPlayer *player) const override
+	virtual void do_assignment_effect(CPlayer *player, context &ctx) const override
 	{
 		const wyrmgus::unit_type *unit_type = this->get_unit_type();
 
@@ -130,6 +130,7 @@ public:
 		if (this->character != nullptr) {
 			unit->set_character(this->character);
 		}
+
 		if (this->ttl != 0) {
 			unit->TTL = GameCycle + this->ttl;
 		}

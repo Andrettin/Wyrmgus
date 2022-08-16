@@ -65,7 +65,7 @@ public:
 		this->effects.process_gsml_scope(scope);
 	}
 
-	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
+	virtual void do_assignment_effect(scope_type *scope, context &ctx) const override
 	{
 		const int random_number = random::get()->generate(decimillesimal_int::divisor);
 		if (this->chance.get_value() <= random_number) {

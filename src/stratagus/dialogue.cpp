@@ -111,7 +111,7 @@ void dialogue::map_option(const dialogue_option *option, const std::string &iden
 	this->options_by_identifier[identifier] = option;
 }
 
-void dialogue::call(CPlayer *player, const context &ctx) const
+void dialogue::call(CPlayer *player, context &ctx) const
 {
 	if (this->nodes.empty()) {
 		return;
@@ -120,7 +120,7 @@ void dialogue::call(CPlayer *player, const context &ctx) const
 	this->nodes.front()->call(player, ctx);
 }
 
-void dialogue::call_node(const int node_index, CPlayer *player, const context &ctx) const
+void dialogue::call_node(const int node_index, CPlayer *player, context &ctx) const
 {
 	if (node_index >= static_cast<int>(this->nodes.size())) {
 		return;
@@ -129,7 +129,7 @@ void dialogue::call_node(const int node_index, CPlayer *player, const context &c
 	this->nodes[node_index]->call(player, ctx);
 }
 
-void dialogue::call_node_option_effect(const int node_index, const int option_index, CPlayer *player, const context &ctx) const
+void dialogue::call_node_option_effect(const int node_index, const int option_index, CPlayer *player, context &ctx) const
 {
 	if (node_index >= static_cast<int>(this->nodes.size())) {
 		return;

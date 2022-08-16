@@ -125,7 +125,7 @@ dialogue *dialogue_option::get_dialogue() const
 	return this->node->get_dialogue();
 }
 
-void dialogue_option::do_effects(CPlayer *player, const context &ctx) const
+void dialogue_option::do_effects(CPlayer *player, context &ctx) const
 {
 	if (this->effects != nullptr) {
 		this->effects->do_effects(player, ctx);

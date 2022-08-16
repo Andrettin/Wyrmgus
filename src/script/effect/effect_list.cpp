@@ -65,7 +65,7 @@ void effect_list<scope_type>::check() const
 }
 
 template <typename scope_type>
-void effect_list<scope_type>::do_effects(scope_type *scope, const context &ctx) const
+void effect_list<scope_type>::do_effects(scope_type *scope, context &ctx) const
 {
 	for (const std::unique_ptr<effect<scope_type>> &effect : this->effects) {
 		effect->do_effect(scope, ctx);

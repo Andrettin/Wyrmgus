@@ -55,7 +55,7 @@ public:
 		this->effects.process_gsml_scope(scope);
 	}
 
-	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
+	virtual void do_assignment_effect(scope_type *scope, context &ctx) const override
 	{
 		this->effects.do_effects(scope, ctx);
 	}

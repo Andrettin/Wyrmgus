@@ -70,7 +70,7 @@ public:
 		}
 	}
 
-	virtual void do_assignment_effect(CUnit *unit, const context &ctx) const override
+	virtual void do_assignment_effect(CUnit *unit, context &ctx) const override
 	{
 		if (unit->LevelCheck(this->level)) {
 			this->success_effects.do_effects(unit, ctx);

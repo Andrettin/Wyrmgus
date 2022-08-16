@@ -62,7 +62,7 @@ public:
 		}
 	}
 
-	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
+	virtual void do_assignment_effect(scope_type *scope, context &ctx) const override
 	{
 		if (!this->conditions.check(scope, ctx)) {
 			return;

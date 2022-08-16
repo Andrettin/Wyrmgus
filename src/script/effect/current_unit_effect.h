@@ -61,9 +61,9 @@ public:
 		return ctx.current_unit->get();
 	}
 
-	virtual CUnit *get_scope(const scope_type *upper_scope, const context &ctx) const override
+	virtual CUnit *get_scope(const scope_type *upper_scope, context &ctx) const override
 	{
-		Q_UNUSED(upper_scope)
+		Q_UNUSED(upper_scope);
 
 		if (ctx.current_unit == nullptr) {
 			return nullptr;

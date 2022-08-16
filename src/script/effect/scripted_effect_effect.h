@@ -55,7 +55,7 @@ public:
 		return class_identifier;
 	}
 
-	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
+	virtual void do_assignment_effect(scope_type *scope, context &ctx) const override
 	{
 		this->scripted_effect->get_effects().do_effects(scope, ctx);
 	}

@@ -57,7 +57,7 @@ public:
 		this->effects.check();
 	}
 
-	void do_scope_effect(scope_type *scope, const context &ctx) const
+	void do_scope_effect(scope_type *scope, context &ctx) const
 	{
 		if (scope == nullptr) {
 			return;
@@ -70,8 +70,8 @@ public:
 
 	virtual const scope_type *get_effects_string_scope(const upper_scope_type *upper_scope, const read_only_context &ctx) const
 	{
-		Q_UNUSED(upper_scope)
-		Q_UNUSED(ctx)
+		Q_UNUSED(upper_scope);
+		Q_UNUSED(ctx);
 
 		return nullptr;
 	}
