@@ -4334,10 +4334,10 @@ void CUnit::Place(const Vec2i &pos, const int z)
 			}
 		}
 
-		if (this->Player->has_neutral_faction_type() && this->Type->BoolFlag[BUILDING_INDEX].value) {
+		if (this->Type->BoolFlag[BUILDING_INDEX].value) {
 			const tile *tile = this->get_center_tile();
 			if (tile->get_settlement() != nullptr) {
-				tile->get_settlement()->get_game_data()->add_neutral_faction_building(this);
+				tile->get_settlement()->get_game_data()->add_building(this);
 			}
 		}
 	}
@@ -4789,10 +4789,10 @@ void CUnit::Remove(CUnit *host)
 		}
 	}
 
-	if (this->Player->has_neutral_faction_type() && this->Type->BoolFlag[BUILDING_INDEX].value) {
+	if (this->Type->BoolFlag[BUILDING_INDEX].value) {
 		const tile *tile = this->get_center_tile();
 		if (tile->get_settlement() != nullptr) {
-			tile->get_settlement()->get_game_data()->remove_neutral_faction_building(this);
+			tile->get_settlement()->get_game_data()->remove_building(this);
 		}
 	}
 

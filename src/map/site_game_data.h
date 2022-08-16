@@ -209,24 +209,24 @@ public:
 		this->resource_units.clear();
 	}
 
-	const std::vector<CUnit *> &get_neutral_faction_buildings() const
+	const std::vector<CUnit *> &get_buildings() const
 	{
-		return this->neutral_faction_buildings;
+		return this->buildings;
 	}
 
-	void add_neutral_faction_building(CUnit *unit)
+	void add_building(CUnit *unit)
 	{
-		this->neutral_faction_buildings.push_back(unit);
+		this->buildings.push_back(unit);
 	}
 
-	void remove_neutral_faction_building(const CUnit *unit)
+	void remove_building(const CUnit *unit)
 	{
-		std::erase(this->neutral_faction_buildings, unit);
+		std::erase(this->buildings, unit);
 	}
 
-	void clear_neutral_faction_buildings()
+	void clear_buildings()
 	{
-		this->neutral_faction_buildings.clear();
+		this->buildings.clear();
 	}
 
 	const site_set &get_border_settlements() const
@@ -378,7 +378,7 @@ private:
 	bool coastal = false;
 	resource_map<int> resource_tile_counts; //resource tile counts in the settlement's territory
 	resource_map<std::vector<CUnit *>> resource_units; //resource units in the settlement's territory
-	std::vector<CUnit *> neutral_faction_buildings;
+	std::vector<CUnit *> buildings;
 	site_set border_settlements; //other settlements bordering this one
 	int64_t population = 0;
 	std::vector<qunique_ptr<population_unit>> population_units;

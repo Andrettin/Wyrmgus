@@ -4167,7 +4167,7 @@ void CMap::calculate_settlement_neutral_buildings()
 {
 	for (const site *site : site::get_all()) {
 		site_game_data *site_game_data = site->get_game_data();
-		site_game_data->clear_neutral_faction_buildings();
+		site_game_data->clear_buildings();
 		site_game_data->clear_resource_units();
 	}
 
@@ -4188,8 +4188,8 @@ void CMap::calculate_settlement_neutral_buildings()
 			settlement_game_data->add_resource_unit(unit);
 		}
 
-		if (unit->Player->has_neutral_faction_type() && unit->Type->BoolFlag[BUILDING_INDEX].value) {
-			settlement_game_data->add_neutral_faction_building(unit);
+		if (unit->Type->BoolFlag[BUILDING_INDEX].value) {
+			settlement_game_data->add_building(unit);
 		}
 	}
 }

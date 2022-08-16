@@ -45,7 +45,11 @@ public:
 
 		std::vector<const CPlayer *> players;
 
-		for (const CUnit *building : unit->get_settlement()->get_game_data()->get_neutral_faction_buildings()) {
+		for (const CUnit *building : unit->get_settlement()->get_game_data()->get_buildings()) {
+			if (!building->Player->has_neutral_faction_type()) {
+				continue;
+			}
+
 			if (vector::contains(players, building->Player)) {
 				continue;
 			}

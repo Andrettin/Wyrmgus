@@ -51,7 +51,7 @@ public:
 			return true;
 		}
 
-		for (const CUnit *building : unit->get_settlement()->get_game_data()->get_neutral_faction_buildings()) {
+		for (const CUnit *building : unit->get_settlement()->get_game_data()->get_buildings()) {
 			if (building->Player->get_civilization() == this->civilization) {
 				return true;
 			}
@@ -64,7 +64,7 @@ public:
 				return true;
 			}
 
-			for (const CUnit *building : border_settlement->get_game_data()->get_neutral_faction_buildings()) {
+			for (const CUnit *building : border_settlement->get_game_data()->get_buildings()) {
 				if (building->Player->get_civilization() == this->civilization) {
 					return true;
 				}
