@@ -151,7 +151,6 @@ public:
 
 	virtual std::string get_assignment_string(const CPlayer *player, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override
 	{
-		Q_UNUSED(player);
 		Q_UNUSED(indent);
 		Q_UNUSED(prefix);
 
@@ -168,7 +167,7 @@ public:
 			if (this->unit_class != nullptr) {
 				str += string::highlight(this->unit_class->get_name());
 			} else {
-				str += string::highlight(this->unit_type->get_name());
+				str += string::highlight(this->unit_type->get_name_for_player(player));
 			}
 
 			str += " unit";

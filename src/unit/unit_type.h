@@ -866,7 +866,8 @@ public:
 	const unit_type_variation *GetDefaultVariation(const CPlayer *player, const int image_layer = -1) const;
 	const unit_type_variation *get_variation(const std::set<const variation_tag *> &variation_tags, const int image_layer = -1) const;
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
-	std::string get_default_name(const CPlayer *player) const;
+	const std::string &get_default_name(const CPlayer *player) const;
+	std::string get_name_for_player(const CPlayer *player) const;
 	const std::shared_ptr<CPlayerColorGraphic> &GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
 	const std::string &get_default_button_key(const CPlayer *player) const;
 	bool CanExperienceUpgradeTo(const unit_type *type) const;

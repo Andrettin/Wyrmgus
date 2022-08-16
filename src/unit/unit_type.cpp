@@ -2036,13 +2036,18 @@ std::string unit_type::GetRandomVariationIdent(int image_layer) const
 	return "";
 }
 
-std::string unit_type::get_default_name(const CPlayer *player) const
+const std::string &unit_type::get_default_name(const CPlayer *player) const
 {
 	const unit_type_variation *variation = this->GetDefaultVariation(player);
 	if (variation != nullptr && !variation->get_type_name().empty()) {
 		return variation->get_type_name();
 	}
 
+	return this->get_name();
+}
+
+std::string unit_type::get_name_for_player(const CPlayer *player) const
+{
 	const wyrmgus::civilization *civilization = this->get_civilization();
 	if (civilization != nullptr) {
 		if (civilization != player->get_civilization() && civilization->get_name() != this->get_name() && this->get_species() == nullptr) {
