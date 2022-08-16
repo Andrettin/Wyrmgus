@@ -83,6 +83,8 @@ public:
 			this->use_current_unit_pos = string::to_bool(value);
 		} else if (key == "use_source_unit_pos") {
 			this->use_source_unit_pos = string::to_bool(value);
+		} else if (key == "level") {
+			this->level = std::stoi(value);
 		} else {
 			effect::process_gsml_property(property);
 		}
@@ -132,6 +134,12 @@ public:
 		const int map_layer = this->get_map_layer_index(player);
 
 		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, player, map_layer);
+
+		if (this->level != 0 && this->level > unit->Variable[LEVEL_INDEX].Value) {
+			const int level_increase = this->level - unit->Variable[LEVEL_INDEX].Value;
+			unit->IncreaseLevel(level_increase);
+		}
+
 		if (this->character != nullptr) {
 			unit->set_character(this->character);
 		}
@@ -146,10 +154,20 @@ public:
 		std::string str = "Receive ";
 		if (this->character != nullptr) {
 			str += "the " + string::highlight(this->character->get_full_name()) + " character";
-		} else if (this->unit_class != nullptr) {
-			str += "a " + string::highlight(this->unit_class->get_name()) + " unit";
 		} else {
-			str += "a " + string::highlight(this->unit_type->get_name()) + " unit";
+			str += "a ";
+
+			if (this->level != 0) {
+				str += "level " + std::to_string(this->level) + " ";
+			}
+
+			if (this->unit_class != nullptr) {
+				str += string::highlight(this->unit_class->get_name());
+			} else {
+				str += string::highlight(this->unit_type->get_name());
+			}
+
+			str += " unit";
 		}
 		if (this->site != nullptr) {
 			str += " at " + this->site->get_name();
@@ -225,6 +243,7 @@ private:
 	int ttl = 0; //the time to live (in cycles) of the created unit, if any; useful for revealers
 	bool use_current_unit_pos = false;
 	bool use_source_unit_pos = false;
+	int level = 0;
 };
 
 }
