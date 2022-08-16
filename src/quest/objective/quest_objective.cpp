@@ -202,7 +202,7 @@ std::string quest_objective::get_unit_class_objective_string(const unit_class *u
 
 std::string quest_objective::get_unit_type_objective_string(const unit_type *unit_type, const CPlayer *player, bool &first) const
 {
-	const std::string &unit_type_name = unit_type->GetDefaultName(player);
+	const std::string &unit_type_name = unit_type->get_default_name(player);
 	return this->get_unit_name_objective_string(unit_type_name, unit_type, first);
 }
 

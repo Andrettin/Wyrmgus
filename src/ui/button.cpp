@@ -651,7 +651,7 @@ std::string button::get_hint() const
 				}
 			}
 
-			std::string unit_type_name = unit_type->GetDefaultName(unit->Player);
+			std::string unit_type_name = unit_type->get_default_name(unit->Player);
 			if (show_key && preferences::get()->get_hotkey_setup() == hotkey_setup::default_setup) {
 				button::add_button_key_to_name(unit_type_name, unit_type->get_default_button_key(unit->Player));
 			}

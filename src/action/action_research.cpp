@@ -154,7 +154,7 @@ void COrder_Research::Execute(CUnit &unit)
 		if (upgrade.get_name().empty()) {
 			//Wyrmgus start
 //			player.Notify(notification_type::green, unit.tilePos, _("%s: research complete"), type.Name.c_str());
-			player.Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), type.GetDefaultName(&player).c_str());
+			player.Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), type.get_default_name(&player).c_str());
 			//Wyrmgus end
 		} else {
 			player.Notify(notification_type::green, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.get_name().c_str());

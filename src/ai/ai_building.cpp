@@ -623,7 +623,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, co
    //Wyrmgus end
 			   //Wyrmgus start
 //			   _C_ type.get_identifier().c_str() _C_ type.Name.c_str());
-			   _C_ type.get_identifier().c_str() _C_ type.GetDefaultName(worker.Player).c_str());
+			   _C_ type.get_identifier().c_str() _C_ type.get_default_name(worker.Player).c_str());
 			   //Wyrmgus end
 
 	//Wyrmgus start

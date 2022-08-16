@@ -2036,14 +2036,14 @@ std::string unit_type::GetRandomVariationIdent(int image_layer) const
 	return "";
 }
 
-const std::string &unit_type::GetDefaultName(const CPlayer *player) const
+std::string unit_type::get_default_name(const CPlayer *player) const
 {
 	const unit_type_variation *variation = this->GetDefaultVariation(player);
 	if (variation != nullptr && !variation->get_type_name().empty()) {
 		return variation->get_type_name();
-	} else {
-		return this->get_name();
 	}
+
+	return this->get_name();
 }
 
 const std::shared_ptr<CPlayerColorGraphic> &unit_type::GetDefaultLayerSprite(const CPlayer *player, int image_layer) const

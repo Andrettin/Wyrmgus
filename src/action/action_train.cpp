@@ -266,7 +266,7 @@ void COrder_Train::Execute(CUnit &unit)
 	if (newUnit == nullptr) { // No more memory :/
 		//Wyrmgus start
 //		player.Notify(notification_type::yellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
-		player.Notify(notification_type::yellow, unit.tilePos, _("Unable to train %s"), nType.GetDefaultName(player).c_str());
+		player.Notify(notification_type::yellow, unit.tilePos, _("Unable to train %s"), nType.get_default_name(player).c_str());
 		//Wyrmgus end
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return;
@@ -332,7 +332,7 @@ void COrder_Train::Execute(CUnit &unit)
 		if (newUnit == nullptr) { // No more memory :/
 			//Wyrmgus start
 	//		player.Notify(notification_type::yellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
-			player.Notify(notification_type::yellow, unit.tilePos, unit.MapLayer->ID, _("Unable to train %s"), nType.GetDefaultName(&player).c_str());
+			player.Notify(notification_type::yellow, unit.tilePos, unit.MapLayer->ID, _("Unable to train %s"), nType.get_default_name(&player).c_str());
 			//Wyrmgus end
 			unit.Wait = CYCLES_PER_SECOND / 6;
 			return;
