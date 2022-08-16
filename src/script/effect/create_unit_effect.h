@@ -195,7 +195,7 @@ public:
 		return this->unit_type;
 	}
 
-	const site *get_site(const read_only_context &ctx) const
+	const wyrmgus::site *get_site(const read_only_context &ctx) const
 	{
 		if (this->site != nullptr) {
 			return this->site;
