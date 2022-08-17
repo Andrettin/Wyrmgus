@@ -59,6 +59,7 @@ class map_info final : public QObject
 	Q_PROPERTY(int player_count READ get_player_count CONSTANT)
 	Q_PROPERTY(int person_player_count READ get_person_player_count CONSTANT)
 	Q_PROPERTY(int person_player_index READ get_person_player_index CONSTANT)
+	Q_PROPERTY(std::string map_world MEMBER MapWorld NOTIFY changed)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(QString text READ get_text_qstring CONSTANT)
 
