@@ -56,21 +56,9 @@ public:
 	static CNetworkParameter Instance;
 };
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-extern CUDPSocket NetworkFildes;  /// Network file descriptor
 extern bool NetworkInSync;        /// Network is in sync
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-extern inline bool IsNetworkGame()
-{
-	return NetworkFildes.IsValid();
-}
+extern bool IsNetworkGame();
 
 extern void InitNetwork1();  /// Initialise network
 extern void ExitNetwork1();  /// Cleanup network (port)

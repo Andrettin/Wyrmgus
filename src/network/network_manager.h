@@ -28,6 +28,8 @@
 
 #include "util/singleton.h"
 
+class CUDPSocket;
+
 namespace wyrmgus {
 
 class client;
@@ -45,6 +47,9 @@ class network_manager final : public QObject, public singleton<network_manager>
 	Q_PROPERTY(int connected_player_count READ get_connected_player_count NOTIFY connected_player_count_changed)
 
 public:
+	network_manager();
+	~network_manager();
+
 	client *get_client() const;
 	server *get_server() const;
 
@@ -91,6 +96,11 @@ public:
 
 	void check_players(const multiplayer_setup &setup);
 
+	CUDPSocket *get_file_descriptor() const
+	{
+		return this->file_descriptor.get();
+	}
+
 signals:
 	void server_address_setup_completed(const bool result);
 	void map_info_changed();
@@ -101,6 +111,7 @@ signals:
 private:
 	int connected_player_count = 0;
 	int ready_player_count = 0;
+	std::unique_ptr<CUDPSocket> file_descriptor; //network file descriptor; UDP Socket for communication
 };
 
 }

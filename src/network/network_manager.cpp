@@ -48,6 +48,15 @@
 
 namespace wyrmgus {
 
+network_manager::network_manager()
+{
+	this->file_descriptor = std::make_unique<CUDPSocket>();
+}
+
+network_manager::~network_manager()
+{
+}
+
 client *network_manager::get_client() const
 {
 	return client::get();
@@ -113,7 +122,7 @@ void network_manager::init_client_connect()
 
 		this->reset();
 
-		this->get_client()->Init(preferences::get()->get_local_player_name(), &NetworkFildes, GetTicks());
+		this->get_client()->Init(preferences::get()->get_local_player_name(), this->get_file_descriptor(), GetTicks());
 	});
 }
 
@@ -142,7 +151,7 @@ void network_manager::init_server_connect(const QString &map_filepath_qstr, cons
 
 	emit map_info_changed();
 
-	this->get_server()->init(preferences::get()->get_local_player_name(), &NetworkFildes, open_slots);
+	this->get_server()->init(preferences::get()->get_local_player_name(), this->get_file_descriptor(), open_slots);
 
 	// preset the server (initially always slot 0)
 	Hosts[0].SetName(preferences::get()->get_local_player_name().c_str());

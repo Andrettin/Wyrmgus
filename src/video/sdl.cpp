@@ -52,6 +52,7 @@
 //Wyrmgus end
 #include "map/minimap.h"
 #include "network/network.h"
+#include "network/network_manager.h"
 #include "parameters.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
@@ -911,7 +912,7 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 		// Network
 		size_t s = 0;
 		if (IsNetworkGame()) {
-			s = NetworkFildes.HasDataToRead();
+			s = network_manager::get()->get_file_descriptor()->HasDataToRead();
 			if (s > 0) {
 				co_await NetworkEvent();
 			}

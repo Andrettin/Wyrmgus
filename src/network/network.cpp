@@ -8,9 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name network.cpp - The network. */
-//
-//      (c) Copyright 2000-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
+//      (c) Copyright 2000-2022 by Lutz Sammer, Andreas Arens, Jimmy Salmon
+//      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -189,9 +188,6 @@
 ** ::NetworkCommands()
 ** Network Updates : exec current command, and send commands to other players
 **
-** ::NetworkFildes
-** UDP Socket for communication.
-**
 ** ::NetworkInSync
 ** false when commands of the next gameNetCycle of the other player are not ready.
 **
@@ -219,6 +215,7 @@
 #include "map/map.h"
 #include "network/net_message.h"
 #include "network/netconnect.h"
+#include "network/network_manager.h"
 #include "parameters.h"
 #include "player/player.h"
 #include "player/player_type.h"
@@ -284,8 +281,6 @@ void CNetworkParameter::FixValues()
 
 bool NetworkInSync = true;                 /// Network is in sync
 
-CUDPSocket NetworkFildes;                  /// Network file descriptor
-
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
 static unsigned long NetworkLastCycle[PlayerMax]; /// Last cycle received packet
 
@@ -338,11 +333,11 @@ static boost::asio::awaitable<void> NetworkBroadcast(const CNetworkPacket &packe
 			if (Hosts[i].PlyNr == player) {
 				continue;
 			}
-			co_await NetworkFildes.Send(host, buf.get(), size);
+			co_await network_manager::get()->get_file_descriptor()->Send(host, buf.get(), size);
 		}
 	} else { // client
 		const CHost host(Hosts[HostsCount - 1].Host, Hosts[HostsCount - 1].Port);
-		co_await NetworkFildes.Send(host, buf.get(), size);
+		co_await network_manager::get()->get_file_descriptor()->Send(host, buf.get(), size);
 	}
 }
 
@@ -383,6 +378,11 @@ static boost::asio::awaitable<void> NetworkSendPacket(const std::array<CNetworkC
 	}
 }
 
+bool IsNetworkGame()
+{
+	return network_manager::get()->get_file_descriptor()->IsValid();
+}
+
 //----------------------------------------------------------------------------
 //  API init..
 //----------------------------------------------------------------------------
@@ -398,7 +398,7 @@ void InitNetwork1()
 	const int port = CNetworkParameter::Instance.localPort;
 	const CHost host = CHost::from_port(port);
 
-	if (NetworkFildes.Open(host) == false) {
+	if (network_manager::get()->get_file_descriptor()->Open(host) == false) {
 		fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);
 		return;
 	}
@@ -424,7 +424,7 @@ void ExitNetwork1()
 	NetworkStat.print();
 #endif
 
-	NetworkFildes.Close();
+	network_manager::get()->get_file_descriptor()->Close();
 
 	NetworkInSync = true;
 	NetPlayers = 0;
@@ -840,7 +840,7 @@ boost::asio::awaitable<void> NetworkEvent()
 	size_t len = 0;
 
 	try {
-		len = co_await NetworkFildes.Recv(buf, sizeof(buf), &host);
+		len = co_await network_manager::get()->get_file_descriptor()->Recv(buf, sizeof(buf), &host);
 	} catch (const std::exception &exception) {
 		exception::report(exception);
 		DebugPrint("Server/Client gone?\n");
