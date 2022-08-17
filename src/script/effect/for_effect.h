@@ -59,6 +59,13 @@ public:
 		this->effects.process_gsml_scope(scope);
 	}
 
+	virtual void check() const override
+	{
+		if (this->count <= 1) {
+			throw std::runtime_error("\"for\" effect has a count equal to or smaller than 1.");
+		}
+	}
+
 	virtual void do_assignment_effect(scope_type *scope, context &ctx) const override
 	{
 		for (int i = 0; i < this->count; ++i) {
