@@ -1024,6 +1024,7 @@ set(wyrmgus_script_effect_HDRS
 	src/script/effect/effect.h
 	src/script/effect/effect_list.h
 	src/script/effect/experience_effect.h
+	src/script/effect/for_effect.h
 	src/script/effect/hidden_effect.h
 	src/script/effect/if_effect.h
 	src/script/effect/kill_character_effect.h

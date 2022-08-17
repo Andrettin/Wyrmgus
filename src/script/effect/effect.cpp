@@ -43,6 +43,7 @@
 #include "script/effect/create_unit_effect.h"
 #include "script/effect/delayed_effect.h"
 #include "script/effect/experience_effect.h"
+#include "script/effect/for_effect.h"
 #include "script/effect/hidden_effect.h"
 #include "script/effect/if_effect.h"
 #include "script/effect/kill_character_effect.h"
@@ -128,6 +129,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_scope(const gs
 		effect = std::make_unique<current_unit_effect<scope_type>>(scope.get_operator());
 	} else if (effect_identifier == "delayed") {
 		effect = std::make_unique<delayed_effect<scope_type>>(scope.get_operator());
+	} else if (effect_identifier == "for") {
+		effect = std::make_unique<for_effect<scope_type>>(scope.get_operator());
 	} else if (effect_identifier == "hidden") {
 		effect = std::make_unique<hidden_effect<scope_type>>(scope.get_operator());
 	} else if (effect_identifier == "if") {
