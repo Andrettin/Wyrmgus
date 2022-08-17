@@ -51,8 +51,8 @@ public:
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		const std::string site_name = this->site->get_game_data()->get_current_cultural_name();
 

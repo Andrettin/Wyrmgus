@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,37 +26,42 @@
 
 #pragma once
 
-#include "character.h"
 #include "script/condition/condition.h"
+#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 
+//a boolean scripted condition, checking whether the scope is or belongs to the neutral player
 template <typename scope_type>
-class character_exists_condition final : public condition<scope_type>
+class neutral_condition final : public condition<scope_type>
 {
 public:
-	explicit character_exists_condition(const std::string &value)
+	explicit neutral_condition(const std::string &value)
 	{
-		this->character = character::get(value);
+		this->neutral = string::to_bool(value);
 	}
 
 	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
 	{
-		Q_UNUSED(scope);
 		Q_UNUSED(ctx);
 
-		return this->character->get_unit() != nullptr;
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			return this->neutral == scope->is_neutral_player();
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			return this->neutral == scope->Player->is_neutral_player();
+		}
 	}
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
-		return "Character " + condition<scope_type>::get_object_string(this->character, links_allowed, this->character->get_full_name()) + " exists";
+		return "Is neutral";
 	}
 
 private:
-	const wyrmgus::character *character = nullptr;
+	bool neutral = false;
 };
 
 }

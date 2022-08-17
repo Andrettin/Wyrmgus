@@ -65,6 +65,7 @@
 #include "script/condition/location_condition.h"
 #include "script/condition/near_site_condition.h"
 #include "script/condition/nearby_civilization_condition.h"
+#include "script/condition/neutral_condition.h"
 #include "script/condition/neutral_faction_condition.h"
 #include "script/condition/neutral_player_condition.h"
 #include "script/condition/not_condition.h"
@@ -116,6 +117,8 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_pr
 		return std::make_unique<civilization_condition<scope_type>>(value);
 	} else if (key == "civilization_group") {
 		return std::make_unique<civilization_group_condition<scope_type>>(value);
+	} else if (key == "neutral") {
+		return std::make_unique<neutral_condition<scope_type>>(value);
 	} else if (key == "random") {
 		return std::make_unique<random_condition<scope_type>>(value);
 	} else if (key == "real_day") {
