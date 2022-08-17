@@ -83,6 +83,8 @@ public:
 			this->use_current_unit_pos = string::to_bool(value);
 		} else if (key == "use_source_unit_pos") {
 			this->use_source_unit_pos = string::to_bool(value);
+		} else if (key == "count") {
+			this->count = std::stoi(value);
 		} else if (key == "level") {
 			this->level = std::stoi(value);
 		} else {
@@ -114,6 +116,14 @@ public:
 		if (this->map_template != nullptr && this->pos == QPoint(-1, -1)) {
 			throw std::runtime_error("\"create_unit\" effect has a map template but no position.");
 		}
+
+		if (this->character != nullptr && this->count > 1) {
+			throw std::runtime_error("\"create_unit\" effect has a character and a count greater than 1 at the same time.");
+		}
+
+		if (this->count < 1) {
+			throw std::runtime_error("\"create_unit\" effect has a count smaller than 1.");
+		}
 	}
 
 	virtual void do_assignment_effect(CPlayer *player, context &ctx) const override
@@ -133,19 +143,21 @@ public:
 		const QPoint unit_top_left_pos = this->get_tile_pos(player, ctx) - unit_type->get_tile_center_pos_offset();
 		const int map_layer = this->get_map_layer_index(player);
 
-		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, player, map_layer);
+		for (int i = 0; i < this->count; ++i) {
+			CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, player, map_layer);
 
-		if (this->level != 0 && this->level > unit->Variable[LEVEL_INDEX].Value) {
-			const int level_increase = this->level - unit->Variable[LEVEL_INDEX].Value;
-			unit->IncreaseLevel(level_increase);
-		}
+			if (this->level != 0 && this->level > unit->Variable[LEVEL_INDEX].Value) {
+				const int level_increase = this->level - unit->Variable[LEVEL_INDEX].Value;
+				unit->IncreaseLevel(level_increase);
+			}
 
-		if (this->character != nullptr) {
-			unit->set_character(this->character);
-		}
+			if (this->character != nullptr) {
+				unit->set_character(this->character);
+			}
 
-		if (this->ttl != 0) {
-			unit->TTL = GameCycle + this->ttl;
+			if (this->ttl != 0) {
+				unit->TTL = GameCycle + this->ttl;
+			}
 		}
 	}
 
@@ -158,19 +170,29 @@ public:
 		if (this->character != nullptr) {
 			str += "the " + string::highlight(this->character->get_full_name()) + " character";
 		} else {
-			str += "a ";
+			if (this->count > 1) {
+				str += std::to_string(this->count);
+			} else {
+				str += "a";
+			}
+			str += " ";
 
 			if (this->level != 0) {
 				str += "level " + std::to_string(this->level) + " ";
 			}
 
+			std::string unit_name;
 			if (this->unit_class != nullptr) {
-				str += string::highlight(this->unit_class->get_name());
+				unit_name = this->unit_class->get_name();
 			} else {
-				str += string::highlight(this->unit_type->get_name_for_player(player));
+				unit_name = this->unit_type->get_name_for_player(player);
 			}
+			str += string::highlight(unit_name);
 
 			str += " unit";
+			if (this->count > 1) {
+				str += "s";
+			}
 		}
 
 		const wyrmgus::site *site = this->get_site(ctx);
@@ -267,6 +289,7 @@ private:
 	int ttl = 0; //the time to live (in cycles) of the created unit, if any; useful for revealers
 	bool use_current_unit_pos = false;
 	bool use_source_unit_pos = false;
+	int count = 1;
 	int level = 0;
 };
 
