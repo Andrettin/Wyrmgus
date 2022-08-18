@@ -584,6 +584,13 @@ void COrder_Still::Execute(CUnit &unit)
 	this->current_state = state::standby;
 	this->Finished = (this->Action == UnitAction::Still);
 
+	++this->cycle_count;
+
+	if (this->cycle_count % CYCLES_PER_SECOND != 0) {
+		//only do autocast, auto-attack and etc. once per second
+		return;
+	}
+
 	if (this->Action == UnitAction::StandGround || unit.Removed || unit.CanMove() == false) {
 		if (!unit.get_autocast_spells().empty()) {
 			this->AutoCastStand(unit);

@@ -69,4 +69,5 @@ private:
 
 private:
 	state current_state = state::standby;
+	unsigned cycle_count = 0;
 };
