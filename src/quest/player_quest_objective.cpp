@@ -40,7 +40,14 @@ namespace wyrmgus {
 
 void player_quest_objective::set_counter(const int value)
 {
-	this->counter = std::min(value, this->get_quest_objective()->get_quantity());
+	const int clamped_value = std::min(value, this->get_quest_objective()->get_quantity());
+
+	if (clamped_value == this->counter) {
+		return;
+	}
+
+	this->counter = clamped_value;
+	emit this->get_player()->objective_strings_changed();
 }
 
 void player_quest_objective::update_counter()

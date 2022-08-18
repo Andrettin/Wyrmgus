@@ -122,6 +122,7 @@ class CPlayer final : public QObject
 	Q_PROPERTY(qint64 population READ get_population NOTIFY population_changed)
 	Q_PROPERTY(int trade_cost READ get_trade_cost NOTIFY trade_cost_changed)
 	Q_PROPERTY(QVariantList current_special_resources READ get_current_special_resources_qvariant_list NOTIFY current_special_resources_changed)
+	Q_PROPERTY(QStringList objective_strings READ get_objective_strings NOTIFY objective_strings_changed)
 	Q_PROPERTY(QVariantList modifiers READ get_modifiers_qvariant_list NOTIFY modifiers_changed)
 
 public:
@@ -404,6 +405,7 @@ public:
 	std::pair<bool, std::string> check_quest_failure(const wyrmgus::quest *quest) const;
 	bool has_quest(const wyrmgus::quest *quest) const;
 	bool is_quest_completed(const wyrmgus::quest *quest) const;
+	QStringList get_objective_strings() const;
 
 	void on_unit_built(const CUnit *unit);
 	void on_unit_destroyed(const CUnit *unit);
@@ -1280,6 +1282,7 @@ signals:
 	void resource_children_processing_bonus_string_changed(const int resource_index, const QString &str);
 	void trade_cost_changed();
 	void current_special_resources_changed();
+	void objective_strings_changed() const;
 	void modifiers_changed();
 	void diplomatic_stances_changed();
 	void shared_vision_changed();

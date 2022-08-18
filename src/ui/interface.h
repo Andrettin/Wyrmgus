@@ -261,8 +261,6 @@ extern void CancelBuildingMode();
 
 /// Draw user defined buttons
 extern void DrawUserDefinedButtons(std::vector<std::function<void(renderer *)>> &render_commands);
-/// Draw messages as overlay over of the map
-extern void DrawMessages(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw the map layer buttons
 extern void DrawMapLayerButtons(std::vector<std::function<void(renderer *)>> &render_commands);
 //Wyrmgus start
@@ -284,10 +282,6 @@ extern void SetObjective(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 extern void CenterOnMessage();
 /// Cleanup all messages
 extern void CleanMessages();
-//Wyrmgus start
-/// Cleanup all objectives
-extern void CleanObjectives();
-//Wyrmgus end
 /// show/hide messages
 extern void ToggleShowMessages();
 

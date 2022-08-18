@@ -32,6 +32,7 @@
 #include "ui/ui.h"
 
 #include "database/preferences.h"
+#include "engine_interface.h"
 #include "map/map.h"
 #include "map/map_info.h"
 #include "menus.h"
@@ -1009,7 +1010,7 @@ static int CclAddObjective(lua_State *l)
 static int CclClearObjectives(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	CleanObjectives();
+	engine_interface::get()->clear_objective_strings();
 	return 0;
 }
 //Wyrmgus end

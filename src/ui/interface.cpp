@@ -595,10 +595,6 @@ bool HandleCommandKey(int key, const Qt::KeyboardModifiers key_modifiers)
 	}
 }
 
-#ifdef DEBUG
-extern void ToggleShowBuilListMessages();
-#endif
-
 static void CommandKey_Group(int group, const Qt::KeyboardModifiers key_modifiers)
 {
 	if (key_modifiers & Qt::ShiftModifier) {
@@ -831,17 +827,6 @@ static bool CommandKey(int key, const Qt::KeyboardModifiers key_modifiers)
 			}
 		//Wyrmgus end
 		
-		case 'e': // CTRL+E Turn messages on / off
-			if (key_modifiers & Qt::ControlModifier) {
-				ToggleShowMessages();
-			}
-#ifdef DEBUG
-			else if (key_modifiers & Qt::AltModifier) {
-				ToggleShowBuilListMessages();
-			}
-#endif
-			break;
-
 		case SDLK_TAB: // TAB toggles minimap.
 			if (key_modifiers & Qt::AltModifier) {
 				break;

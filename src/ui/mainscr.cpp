@@ -978,196 +978,20 @@ class MessagesDisplay
 public:
 	MessagesDisplay()
 	{
-#ifdef DEBUG
-		showBuilList = false;
-#endif
 		CleanMessages();
-		//Wyrmgus start
-		CleanObjectives();
-		//Wyrmgus end
 	}
 
-	//Wyrmgus start
-	void AddObjective(const char *msg);
-	//Wyrmgus end
-	void DrawMessages(std::vector<std::function<void(renderer *)>> &render_commands);
 	void CleanMessages();
-	//Wyrmgus start
-	void CleanObjectives();
-	//Wyrmgus end
-	void ToggleShowMessages() { show = !show; }
-#ifdef DEBUG
-	void ToggleShowBuilListMessages() { showBuilList = !showBuilList; }
-#endif
-
-private:
-	//Wyrmgus start
-	char Objectives[OBJECTIVES_MAX][256];         /// Array of objectives
-	int  ObjectivesCount;                       /// Number of objectives
-	//Wyrmgus end
-	bool show = true;
-#ifdef DEBUG
-	bool showBuilList;
-#endif
 };
-
-/**
-**  Draw message(s).
-**
-**  @todo FIXME: make message font configurable.
-*/
-void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	if (show && preferences::get()->is_show_messages_enabled()) {
-		CLabel label(UI.MessageFont);
-
-		const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
-
-		//Wyrmgus start
-		// Draw objectives
-		int z = 0;
-
-		for (int i = 0; i < ObjectivesCount; ++i, ++z) {
-			if (z == 0) {
-				PushClipping();
-				SetClipping(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int(), Video.Width - 1, Video.Height - 1);
-			}
-			/*
-			 * Due parallel drawing we have to force message copy due temp
-			 * std::string(Objectives[i]) creation because
-			 * char * pointer may change during text drawing.
-			 */
-			label.DrawClip(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), std::string(_(Objectives[i])), render_commands);
-			if (z == 0) {
-				PopClipping();
-			}
-		}
-
-		for (const quest *quest : CPlayer::GetThisPlayer()->get_current_quests()) {
-			if (z == 0) {
-				PushClipping();
-				SetClipping(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int(), Video.Width - 1, Video.Height - 1);
-			}
-			label.DrawClip(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), std::string(_(quest->get_name().c_str())), render_commands);
-			if (z == 0) {
-				PopClipping();
-			}
-
-			++z;
-
-			for (const auto &objective : CPlayer::GetThisPlayer()->get_quest_objectives()) {
-				const quest_objective *quest_objective = objective->get_quest_objective();
-				if (quest_objective->get_quest() != quest) {
-					continue;
-				}
-
-				std::string objective_string = "- ";
-				if (!quest_objective->get_objective_string().empty()) {
-					objective_string += quest_objective->get_objective_string();
-				} else {
-					objective_string += quest_objective->generate_objective_string(CPlayer::GetThisPlayer());
-				}
-				if (quest_objective->get_quantity() != 0) {
-					objective_string += " (" + std::to_string(objective->get_counter()) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
-				}
-
-				label.DrawClip(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), objective_string, render_commands);
-				++z;
-			}
-			for (const std::string &objective_string : quest->get_objective_strings()) {
-				label.DrawClip(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int() + z * (UI.MessageFont->Height() + (1 * scale_factor).to_int()), "- " + std::string(_(objective_string.c_str())), render_commands);
-				++z;
-			}
-		}
-		//Wyrmgus end
-	}
-}
-
-//Wyrmgus start
-/**
-**  Adds objective to the stack
-**
-**  @param msg  Objective to add.
-*/
-void MessagesDisplay::AddObjective(const char *msg)
-{
-	char *ptr;
-	char *next;
-	char *message = Objectives[ObjectivesCount];
-	// Split long message into lines
-	if (strlen(msg) >= sizeof(Objectives[0])) {
-		strncpy(message, msg, sizeof(Objectives[0]) - 1);
-		ptr = message + sizeof(Objectives[0]) - 1;
-		*ptr-- = '\0';
-		next = ptr + 1;
-		while (ptr >= message) {
-			if (*ptr == ' ') {
-				*ptr = '\0';
-				next = ptr + 1;
-				break;
-			}
-			--ptr;
-		}
-		if (ptr < message) {
-			ptr = next - 1;
-		}
-	} else {
-		strcpy_s(message, sizeof(Objectives[ObjectivesCount]), msg);
-		next = ptr = message + strlen(message);
-	}
-
-	while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.get_rect().width()) {
-		while (1) {
-			--ptr;
-			if (*ptr == ' ') {
-				*ptr = '\0';
-				next = ptr + 1;
-				break;
-			} else if (ptr == message) {
-				break;
-			}
-		}
-		// No space found, wrap in the middle of a word
-		if (ptr == message) {
-			ptr = next - 1;
-			while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.get_rect().width()) {
-				*--ptr = '\0';
-			}
-			next = ptr + 1;
-			break;
-		}
-	}
-
-	++ObjectivesCount;
-
-	if (strlen(msg) != (size_t)(ptr - message)) {
-		AddObjective(msg + (next - message));
-	}
-}
-//Wyrmgus end
 
 /**
 **  Clean up messages.
 */
 void MessagesDisplay::CleanMessages()
 {
-	//Wyrmgus start
-	ObjectivesCount = 0;
-	//Wyrmgus end
-
 	MessagesEventCount = 0;
 	MessagesEventIndex = 0;
 }
-
-//Wyrmgus start
-/**
-**  Clean up objectives.
-*/
-void MessagesDisplay::CleanObjectives()
-{
-	ObjectivesCount = 0;
-}
-//Wyrmgus end
 
 static MessagesDisplay allmessages;
 
@@ -1179,24 +1003,6 @@ void CleanMessages()
 	allmessages.CleanMessages();
 }
 
-//Wyrmgus start
-/**
-**  Clean messages
-*/
-void CleanObjectives()
-{
-	allmessages.CleanObjectives();
-}
-//Wyrmgus end
-
-/**
-**  Draw messages
-*/
-void DrawMessages(std::vector<std::function<void(renderer *)>> &render_commands)
-{
-	allmessages.DrawMessages(render_commands);
-}
-
 /**
 **  Set message to display.
 **
@@ -1204,7 +1010,7 @@ void DrawMessages(std::vector<std::function<void(renderer *)>> &render_commands)
 */
 void SetMessage(const char *fmt, ...)
 {
-	char temp[512];
+	char temp[512]{};
 	va_list va;
 
 	va_start(va, fmt);
@@ -1261,24 +1067,18 @@ void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...)
 	++MessagesEventCount;
 }
 
-//Wyrmgus start
-/**
-**  Set objective to display.
-**
-**  @param fmt  To be displayed in text overlay.
-*/
 void SetObjective(const char *fmt, ...)
 {
-	char temp[512];
+	char temp[512]{};
 	va_list va;
 
 	va_start(va, fmt);
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
-	allmessages.AddObjective(temp);
+
+	engine_interface::get()->add_objective_string(temp);
 }
-//Wyrmgus end
 
 /**
 **  Goto message origin.
@@ -1296,18 +1096,6 @@ void CenterOnMessage()
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
 }
-
-void ToggleShowMessages()
-{
-	allmessages.ToggleShowMessages();
-}
-
-#ifdef DEBUG
-void ToggleShowBuilListMessages()
-{
-	allmessages.ToggleShowBuilListMessages();
-}
-#endif
 
 /*----------------------------------------------------------------------------
 --  INFO PANEL

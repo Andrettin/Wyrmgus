@@ -129,8 +129,6 @@ class CUserInterface
 
 	CMapArea MapArea;
 
-	font *MessageFont;
-
 	//Wyrmgus start
 	vector<CUIButton> WorldButtons;
 	//Wyrmgus end

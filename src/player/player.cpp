@@ -3045,6 +3045,7 @@ void CPlayer::Clear()
 
 	emit diplomatic_stances_changed();
 	emit shared_vision_changed();
+	emit objective_strings_changed();
 }
 
 
@@ -3485,6 +3486,8 @@ void CPlayer::accept_quest(wyrmgus::quest *quest)
 	this->on_available_quests_changed();
 	
 	this->update_current_quests();
+
+	emit objective_strings_changed();
 }
 
 void CPlayer::complete_quest(quest *quest)
@@ -3569,6 +3572,8 @@ void CPlayer::remove_current_quest(wyrmgus::quest *quest)
 			vector::remove(this->quest_objectives, this->quest_objectives[i]);
 		}
 	}
+
+	emit objective_strings_changed();
 }
 
 bool CPlayer::can_quest_be_available(const wyrmgus::quest *quest) const
@@ -3702,6 +3707,36 @@ bool CPlayer::has_quest(const wyrmgus::quest *quest) const
 bool CPlayer::is_quest_completed(const wyrmgus::quest *quest) const
 {
 	return vector::contains(this->completed_quests, quest);
+}
+
+QStringList CPlayer::get_objective_strings() const
+{
+	QStringList objective_strings;
+
+	for (const quest *quest : this->get_current_quests()) {
+		objective_strings.push_back(QString::fromStdString(quest->get_name()));
+
+		for (const auto &objective : this->get_quest_objectives()) {
+			const quest_objective *quest_objective = objective->get_quest_objective();
+			if (quest_objective->get_quest() != quest) {
+				continue;
+			}
+
+			std::string objective_string = "- ";
+			if (!quest_objective->get_objective_string().empty()) {
+				objective_string += quest_objective->get_objective_string();
+			} else {
+				objective_string += quest_objective->generate_objective_string(CPlayer::GetThisPlayer());
+			}
+			if (quest_objective->get_quantity() != 0) {
+				objective_string += " (" + std::to_string(objective->get_counter()) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
+			}
+
+			objective_strings.push_back(QString::fromStdString(objective_string));
+		}
+	}
+
+	return objective_strings;
 }
 
 void CPlayer::on_unit_built(const CUnit *unit)

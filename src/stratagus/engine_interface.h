@@ -63,6 +63,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(QString user_maps_path READ get_user_maps_path CONSTANT)
 	Q_PROPERTY(QString loading_message READ get_loading_message NOTIFY loading_message_changed)
 	Q_PROPERTY(QStringList game_messages READ get_game_messages NOTIFY game_messages_changed)
+	Q_PROPERTY(QStringList objective_strings READ get_objective_strings NOTIFY objective_strings_changed)
 	Q_PROPERTY(QVariantList custom_heroes READ get_custom_heroes NOTIFY custom_heroes_changed)
 	Q_PROPERTY(int max_map_width READ get_max_map_width CONSTANT)
 	Q_PROPERTY(int max_map_height READ get_max_map_height CONSTANT)
@@ -153,6 +154,25 @@ public:
 	{
 		this->game_messages.removeFirst();
 		emit game_messages_changed();
+	}
+
+	const QStringList &get_objective_strings() const
+	{
+		return this->objective_strings;
+	}
+
+	void add_objective_string(const std::string &objective_str)
+	{
+		const QString objective_qstr = QString::fromStdString(objective_str);
+
+		this->objective_strings.push_back(objective_qstr);
+		emit objective_strings_changed();
+	}
+
+	void clear_objective_strings()
+	{
+		this->objective_strings.clear();
+		emit objective_strings_changed();
 	}
 
 	Q_INVOKABLE void call_lua_command(const QString &command);
@@ -340,6 +360,7 @@ signals:
 	void scale_factor_changed();
 	void loading_message_changed();
 	void game_messages_changed();
+	void objective_strings_changed();
 	void custom_heroes_changed();
 	void this_player_changed();
 	void current_interface_style_changed();
@@ -366,6 +387,7 @@ private:
 	QRect cursor_restriction_rect;
 	QString loading_message; //the loading message to be displayed
 	QStringList game_messages; //in-game messages to be displayed
+	QStringList objective_strings;
 	interface_style *current_interface_style = nullptr;
 	const time_of_day *current_time_of_day = nullptr;
 	const season *current_season = nullptr;

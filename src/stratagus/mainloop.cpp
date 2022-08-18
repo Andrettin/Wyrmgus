@@ -212,7 +212,6 @@ void UpdateDisplay()
 		Video.FillRectangleClip(ColorBlack, 0, 0, Video.ViewportWidth, Video.ViewportHeight, render_commands);
 
 		DrawMapArea(render_commands);
-		DrawMessages(render_commands);
 
 		if (CurrentCursorState == CursorState::Rectangle) {
 			DrawCursor(render_commands);
