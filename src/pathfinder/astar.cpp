@@ -48,6 +48,8 @@
 #include "util/util.h"
 #include "util/vector_util.h"
 
+#include <boost/container/flat_set.hpp>
+
 struct Node {
 	int CostFromStart = 0;  /// Real costs to reach this point
 	short int CostToGoal = 0;     /// Estimated cost to goal
@@ -123,9 +125,9 @@ struct Open final
 		return this->offset < rhs.offset;
 	}
 
-	const Vec2i pos = Vec2i(0, 0);
-	const short int costs = 0; //complete costs to goal
-	const unsigned int offset = 0; //offset into matrix
+	Vec2i pos = Vec2i(0, 0);
+	short int costs = 0; //complete costs to goal
+	unsigned int offset = 0; //offset into matrix
 private:
 	int distance = 0;
 };
@@ -143,7 +145,7 @@ static int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 */
 
 /// The set of Open nodes
-static std::vector<std::set<Open>> OpenSet;
+static std::vector<boost::container::flat_set<Open>> OpenSet;
 
 //Wyrmgus start
 //static std::vector<int> CostMoveToCache;
@@ -249,7 +251,8 @@ static int AStarAddNode(const Vec2i &pos, const int o, const int costs, const in
 */
 static void AStarReplaceNode(const Open *node_ptr, const int z)
 {
-	Open node = std::move(OpenSet[z].extract(*node_ptr).value());
+	const Open node = std::move(*node_ptr);
+	OpenSet[z].erase(*node_ptr);
 
 	// Re-add the node with the new cost
 	AStarAddNode(node.pos, node.offset, node.costs, z);
@@ -951,7 +954,8 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, const int gw, con
 		//Wyrmgus end
 		
 		// Find the best node of from the open set
-		const Open shortest = std::move(OpenSet[z].extract(OpenSet[z].begin()).value());
+		const Open shortest = std::move(*OpenSet[z].begin());
+		OpenSet[z].erase(OpenSet[z].begin());
 		const int x = shortest.pos.x;
 		const int y = shortest.pos.y;
 		const int o = shortest.offset;
