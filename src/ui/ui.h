@@ -392,7 +392,6 @@ public:
 	CViewport Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
 	CMapArea MapArea;                   /// geometry of the whole map area
 	wyrmgus::font *MessageFont = nullptr; /// Font used for messages
-	int MessageScrollSpeed = 5;             /// Scroll speed in seconds for messages
 	
 	CMapLayer *CurrentMapLayer = nullptr;
 	CMapLayer *PreviousMapLayer = nullptr;

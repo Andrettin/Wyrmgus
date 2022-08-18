@@ -403,7 +403,6 @@ static boost::asio::awaitable<void> GameLogicLoop()
 		}
 	}
 
-	UpdateMessages();     // update messages
 	ParticleManager.update(); // handle particles
 	CheckMusicFinished(); // Check for next song
 

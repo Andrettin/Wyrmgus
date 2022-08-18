@@ -261,8 +261,6 @@ extern void CancelBuildingMode();
 
 /// Draw user defined buttons
 extern void DrawUserDefinedButtons(std::vector<std::function<void(renderer *)>> &render_commands);
-/// Update messages
-extern void UpdateMessages();
 /// Draw messages as overlay over of the map
 extern void DrawMessages(std::vector<std::function<void(renderer *)>> &render_commands);
 /// Draw the map layer buttons

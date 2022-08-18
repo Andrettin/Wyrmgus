@@ -130,7 +130,6 @@ class CUserInterface
 	CMapArea MapArea;
 
 	font *MessageFont;
-	int MessageScrollSpeed;
 
 	//Wyrmgus start
 	vector<CUIButton> WorldButtons;

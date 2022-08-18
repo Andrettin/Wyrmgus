@@ -62,6 +62,7 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(QString shaders_path READ get_shaders_path CONSTANT)
 	Q_PROPERTY(QString user_maps_path READ get_user_maps_path CONSTANT)
 	Q_PROPERTY(QString loading_message READ get_loading_message NOTIFY loading_message_changed)
+	Q_PROPERTY(QStringList game_messages READ get_game_messages NOTIFY game_messages_changed)
 	Q_PROPERTY(QVariantList custom_heroes READ get_custom_heroes NOTIFY custom_heroes_changed)
 	Q_PROPERTY(int max_map_width READ get_max_map_width CONSTANT)
 	Q_PROPERTY(int max_map_height READ get_max_map_height CONSTANT)
@@ -77,6 +78,8 @@ class engine_interface final : public QObject, public singleton<engine_interface
 	Q_PROPERTY(bool lua_dialog_open READ is_lua_dialog_open NOTIFY lua_dialog_open_changed)
 
 public:
+	static constexpr int game_message_seconds = 10; //the seconds for which a game message will appear on the screen
+
 	engine_interface();
 	~engine_interface();
 
@@ -123,6 +126,33 @@ public:
 		this->loading_message = loading_message;
 
 		emit loading_message_changed();
+	}
+
+	const QStringList &get_game_messages() const
+	{
+		return this->game_messages;
+	}
+
+	void add_game_message(const std::string &message)
+	{
+		const QString message_qstr = QString::fromStdString(message);
+
+		if (!this->game_messages.empty() && message_qstr == this->game_messages.back()) {
+			return;
+		}
+
+		this->game_messages.push_back(message_qstr);
+		emit game_messages_changed();
+
+		QTimer::singleShot(std::chrono::seconds(engine_interface::game_message_seconds), [this]() {
+			this->pop_game_message();
+		});
+	}
+
+	void pop_game_message()
+	{
+		this->game_messages.removeFirst();
+		emit game_messages_changed();
 	}
 
 	Q_INVOKABLE void call_lua_command(const QString &command);
@@ -309,6 +339,7 @@ signals:
 	void running_changed();
 	void scale_factor_changed();
 	void loading_message_changed();
+	void game_messages_changed();
 	void custom_heroes_changed();
 	void this_player_changed();
 	void current_interface_style_changed();
@@ -334,6 +365,7 @@ private:
 	std::queue<std::unique_ptr<QInputEvent>> stored_input_events;
 	QRect cursor_restriction_rect;
 	QString loading_message; //the loading message to be displayed
+	QStringList game_messages; //in-game messages to be displayed
 	interface_style *current_interface_style = nullptr;
 	const time_of_day *current_time_of_day = nullptr;
 	const season *current_season = nullptr;

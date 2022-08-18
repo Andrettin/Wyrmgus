@@ -976,7 +976,7 @@ static int MessagesEventIndex;                 /// FIXME: docu
 class MessagesDisplay
 {
 public:
-	MessagesDisplay() : show(true)
+	MessagesDisplay()
 	{
 #ifdef DEBUG
 		showBuilList = false;
@@ -987,8 +987,6 @@ public:
 		//Wyrmgus end
 	}
 
-	void UpdateMessages();
-	void AddUniqueMessage(const char *s);
 	//Wyrmgus start
 	void AddObjective(const char *msg);
 	//Wyrmgus end
@@ -1002,61 +1000,16 @@ public:
 	void ToggleShowBuilListMessages() { showBuilList = !showBuilList; }
 #endif
 
-protected:
-	void ShiftMessages();
-	void AddMessage(const char *msg);
-	bool CheckRepeatMessage(const char *msg);
-
 private:
-	char Messages[MESSAGES_MAX][256];         /// Array of messages
-	int  MessagesCount;                       /// Number of messages
-	int  MessagesScrollY;
 	//Wyrmgus start
 	char Objectives[OBJECTIVES_MAX][256];         /// Array of objectives
 	int  ObjectivesCount;                       /// Number of objectives
 	//Wyrmgus end
-	unsigned long MessagesFrameTimeout;       /// Frame to expire message
-	bool show;
+	bool show = true;
 #ifdef DEBUG
 	bool showBuilList;
 #endif
 };
-
-/**
-**  Shift messages array by one.
-*/
-void MessagesDisplay::ShiftMessages()
-{
-	if (MessagesCount) {
-		--MessagesCount;
-		for (int z = 0; z < MessagesCount; ++z) {
-			strcpy_s(Messages[z], sizeof(Messages[z]), Messages[z + 1]);
-		}
-	}
-}
-
-/**
-**  Update messages
-**
-**  @todo FIXME: make scroll speed configurable.
-*/
-void MessagesDisplay::UpdateMessages()
-{
-	if (!MessagesCount) {
-		return;
-	}
-
-	// Scroll/remove old message line
-	const unsigned long ticks = GetTicks();
-	if (MessagesFrameTimeout < ticks) {
-		++MessagesScrollY;
-		if (MessagesScrollY == UI.MessageFont->Height() + (1 * preferences::get()->get_scale_factor()).to_int()) {
-			MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
-			MessagesScrollY = 0;
-			ShiftMessages();
-		}
-	}
-}
 
 /**
 **  Draw message(s).
@@ -1069,57 +1022,6 @@ void MessagesDisplay::DrawMessages(std::vector<std::function<void(renderer *)>> 
 		CLabel label(UI.MessageFont);
 
 		const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
-		// background so the text is easier to read
-		if (MessagesCount) {
-			int textHeight = MessagesCount * (UI.MessageFont->Height() + (1 * scale_factor).to_int());
-			uint32_t color = CVideo::MapRGB(38, 38, 78);
-			//Wyrmgus start
-			/*
-			Video.FillTransRectangleClip(color, UI.MapArea.get_rect().x() + 7, UI.MapArea.get_rect().y() + 7,
-										 UI.MapArea.EndX - UI.MapArea.get_rect().x() - 16,
-										 textHeight - MessagesScrollY + 1, 0x80);
-
-			Video.DrawRectangle(color, UI.MapArea.get_rect().x() + 6, UI.MapArea.get_rect().y() + 6,
-								UI.MapArea.EndX - UI.MapArea.get_rect().x() - 15,
-								textHeight - MessagesScrollY + 2);
-			*/
-			Video.FillTransRectangleClip(color, UI.MapArea.get_rect().x() + (6 * scale_factor).to_int() + 1, UI.MapArea.get_rect().bottom() + ((-16 - 2) * scale_factor).to_int() + 1 - textHeight + MessagesScrollY,
-				UI.MapArea.get_rect().right() - UI.MapArea.get_rect().x() - (16 * scale_factor).to_int(),
-				textHeight + (1 * scale_factor).to_int(), 0x80, render_commands);
-
-			Video.DrawRectangle(color, UI.MapArea.get_rect().x() + (6 * scale_factor).to_int(), UI.MapArea.get_rect().bottom() + ((-16 - 2) * scale_factor).to_int() - textHeight + MessagesScrollY,
-				UI.MapArea.get_rect().right() - UI.MapArea.get_rect().x() - (15 * scale_factor).to_int(),
-				textHeight + (2 * scale_factor).to_int(), render_commands);
-			//Wyrmgus end
-		}
-
-		// Draw message line(s)
-		for (int z = 0; z < MessagesCount; ++z) {
-			if (z == 0) {
-				PushClipping();
-				//Wyrmgus start
-//					SetClipping(UI.MapArea.get_rect().x() + 8, UI.MapArea.get_rect().y() + 8, Video.Width - 1,
-//								Video.Height - 1);
-				SetClipping(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(), UI.MapArea.get_rect().y() + (8 * scale_factor).to_int(), Video.Width - 1, UI.MapArea.get_rect().bottom() - (16 * scale_factor).to_int());
-				//Wyrmgus end
-			}
-			/*
-			 * Due parallel drawing we have to force message copy due temp
-			 * std::string(Messages[z]) creation because
-			 * char * pointer may change during text drawing.
-			 */
-			label.DrawClip(UI.MapArea.get_rect().x() + (8 * scale_factor).to_int(),
-				//Wyrmgus start
-//							   UI.MapArea.get_rect().y() + 8 +
-//							   z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
-UI.MapArea.get_rect().bottom() - (16 * scale_factor).to_int() - (UI.MessageFont->Height() + (1 * scale_factor).to_int()) +
-(z * -1) * (UI.MessageFont->Height() + (1 * scale_factor).to_int()) + MessagesScrollY,
-//Wyrmgus end
-std::string(Messages[z]), render_commands);
-			if (z == 0) {
-				PopClipping();
-			}
-		}
 
 		//Wyrmgus start
 		// Draw objectives
@@ -1179,97 +1081,6 @@ std::string(Messages[z]), render_commands);
 		}
 		//Wyrmgus end
 	}
-}
-
-/**
-**  Adds message to the stack
-**
-**  @param msg  Message to add.
-*/
-void MessagesDisplay::AddMessage(const char *msg)
-{
-	unsigned long ticks = GetTicks();
-
-	if (!MessagesCount) {
-		MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
-	}
-
-	if (MessagesCount == MESSAGES_MAX) {
-		// Out of space to store messages, can't scroll smoothly
-		ShiftMessages();
-		MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
-		MessagesScrollY = 0;
-	}
-	char *ptr;
-	char *next;
-	char *message = Messages[MessagesCount];
-	// Split long message into lines
-	if (strlen(msg) >= sizeof(Messages[0])) {
-		strncpy(message, msg, sizeof(Messages[0]) - 1);
-		ptr = message + sizeof(Messages[0]) - 1;
-		*ptr-- = '\0';
-		next = ptr + 1;
-		while (ptr >= message) {
-			if (*ptr == ' ') {
-				*ptr = '\0';
-				next = ptr + 1;
-				break;
-			}
-			--ptr;
-		}
-		if (ptr < message) {
-			ptr = next - 1;
-		}
-	} else {
-		strcpy_s(message, sizeof(Messages[MessagesCount]), msg);
-		next = ptr = message + strlen(message);
-	}
-
-	while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.get_rect().width()) {
-		while (1) {
-			--ptr;
-			if (*ptr == ' ') {
-				*ptr = '\0';
-				next = ptr + 1;
-				break;
-			} else if (ptr == message) {
-				break;
-			}
-		}
-		// No space found, wrap in the middle of a word
-		if (ptr == message) {
-			ptr = next - 1;
-			while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.get_rect().width()) {
-				*--ptr = '\0';
-			}
-			next = ptr + 1;
-			break;
-		}
-	}
-
-	++MessagesCount;
-
-	if (strlen(msg) != (size_t)(ptr - message)) {
-		AddMessage(msg + (next - message));
-	}
-}
-
-/**
-**  Check if this message repeats
-**
-**  @param msg  Message to check.
-**
-**  @return     true to skip this message
-*/
-bool MessagesDisplay::CheckRepeatMessage(const char *msg)
-{
-	if (MessagesCount < 1) {
-		return false;
-	}
-	if (!strcmp(msg, Messages[MessagesCount - 1])) {
-		return true;
-	}
-	return false;
 }
 
 //Wyrmgus start
@@ -1336,23 +1147,10 @@ void MessagesDisplay::AddObjective(const char *msg)
 //Wyrmgus end
 
 /**
-**  Add a new message to display only if it differs from the preceding one.
-*/
-void MessagesDisplay::AddUniqueMessage(const char *s)
-{
-	if (!CheckRepeatMessage(s)) {
-		AddMessage(s);
-	}
-}
-
-/**
 **  Clean up messages.
 */
 void MessagesDisplay::CleanMessages()
 {
-	MessagesCount = 0;
-	MessagesScrollY = 0;
-	MessagesFrameTimeout = 0;
 	//Wyrmgus start
 	ObjectivesCount = 0;
 	//Wyrmgus end
@@ -1372,14 +1170,6 @@ void MessagesDisplay::CleanObjectives()
 //Wyrmgus end
 
 static MessagesDisplay allmessages;
-
-/**
-**  Update messages
-*/
-void UpdateMessages()
-{
-	allmessages.UpdateMessages();
-}
 
 /**
 **  Clean messages
@@ -1421,7 +1211,8 @@ void SetMessage(const char *fmt, ...)
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
-	allmessages.AddUniqueMessage(temp);
+
+	engine_interface::get()->add_game_message(temp);
 }
 
 /**
@@ -1458,7 +1249,7 @@ void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...)
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
-	allmessages.AddUniqueMessage(temp);
+	engine_interface::get()->add_game_message(temp);
 
 	if (MessagesEventCount == MESSAGES_MAX) {
 		ShiftMessagesEvent();
