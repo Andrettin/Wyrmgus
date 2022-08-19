@@ -52,6 +52,7 @@ class species final : public taxon_base, public data_type<species>
 	Q_PROPERTY(wyrmgus::world* homeworld MEMBER homeworld READ get_homeworld)
 	Q_PROPERTY(bool sapient MEMBER sapient READ is_sapient)
 	Q_PROPERTY(bool asexual MEMBER asexual READ is_asexual)
+	Q_PROPERTY(bool domestic MEMBER domestic READ is_domestic)
 	Q_PROPERTY(wyrmgus::ecological_niche ecological_niche MEMBER ecological_niche READ get_ecological_niche)
 
 public:
@@ -113,6 +114,11 @@ public:
 		return this->asexual;
 	}
 
+	bool is_domestic() const
+	{
+		return this->domestic;
+	}
+
 	wyrmgus::ecological_niche get_ecological_niche() const
 	{
 		return this->ecological_niche;
@@ -152,6 +158,7 @@ private:
 	world *homeworld = nullptr;
 	bool sapient = false;
 	bool asexual = false;
+	bool domestic = false;
 	wyrmgus::ecological_niche ecological_niche;
 	const wyrmgus::unit_type *unit_type = nullptr;
 	std::vector<const terrain_type *> native_terrain_types; //in which terrains does this species live
