@@ -46,7 +46,8 @@ include_directories(
 	src/guichan/include
 	src/guichan/include/guichan
 	src/stratagus
-	src/xbrz/include
+	src/third_party
+	src/third_party/xbrz/include
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -582,7 +583,7 @@ set(video_SRCS
 source_group(video FILES ${video_SRCS})
 
 set(xbrz_SRCS
-	src/xbrz/xbrz.cpp
+	src/third_party/xbrz/xbrz.cpp
 )
 source_group(xbrz FILES ${xbrz_SRCS})
 
@@ -1241,8 +1242,8 @@ set(wyrmgus_video_HDRS
 )
 
 set(wyrmgus_xbrz_HDRS
-	src/xbrz/include/config.h
-	src/xbrz/include/xbrz.h
+	src/third_party/xbrz/include/config.h
+	src/third_party/xbrz/include/xbrz.h
 )
 
 set(wyrmgus_generic_HDRS
