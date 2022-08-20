@@ -44,6 +44,7 @@ class site_history final : public data_entry_history
 	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
 	Q_PROPERTY(wyrmgus::unit_type* neutral_building_type MEMBER neutral_building_type)
 	Q_PROPERTY(wyrmgus::unit_class* pathway_class MEMBER pathway_class)
+	Q_PROPERTY(wyrmgus::unit_class* wall_class MEMBER wall_class)
 	Q_PROPERTY(qint64 population MEMBER population READ get_population)
 
 public:
@@ -75,6 +76,11 @@ public:
 	const unit_class *get_pathway_class() const
 	{
 		return this->pathway_class;
+	}
+
+	const unit_class *get_wall_class() const
+	{
+		return this->wall_class;
 	}
 
 	int64_t get_population() const
@@ -123,6 +129,7 @@ private:
 	std::vector<unit_class *> building_classes; //applied as buildings at scenario start
 	unit_type *neutral_building_type = nullptr; //the building applied on this site at scenario start if it has no owner
 	unit_class *pathway_class = nullptr;
+	unit_class *wall_class = nullptr;
 	int64_t population = 0; //used for creating units at scenario start
 	unit_class_map<int64_t> population_groups; //population size for unit classes
 };

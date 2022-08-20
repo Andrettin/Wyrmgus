@@ -122,6 +122,11 @@ public:
 
 	void process_territory_tile(const tile *tile, const QPoint &tile_pos, const int z);
 
+	const std::vector<QPoint> &get_border_tiles() const
+	{
+		return this->border_tiles;
+	}
+
 	void add_border_tile(const QPoint &tile_pos)
 	{
 		this->border_tiles.push_back(tile_pos);

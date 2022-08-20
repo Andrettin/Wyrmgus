@@ -351,6 +351,8 @@ public:
 
 	void remove_animated_tile(tile *tile);
 
+	void apply_wall_history();
+
 public:
 	bool NoFogOfWar = false;           /// fog of war disabled
 

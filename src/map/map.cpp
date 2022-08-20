@@ -52,6 +52,7 @@
 #include "map/site.h"
 #include "map/site_container.h"
 #include "map/site_game_data.h"
+#include "map/site_history.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -1425,6 +1426,11 @@ void PreprocessMap()
 			if (!CEditor::get()->is_running()) {
 				//settlement territories need to be generated after tile transitions are calculated, so that the coast map field has been set
 				CMap::get()->generate_settlement_territories(z);
+			}
+
+			if (game::get()->get_current_campaign() != nullptr) {
+				//wall history has to be applied after settlement territories have been generated, and settlement game data has been made to initialize the list of border tiles
+				CMap::get()->apply_wall_history();
 			}
 
 			for (int ix = 0; ix < CMap::get()->Info->MapWidths[z]; ++ix) {
@@ -4317,6 +4323,50 @@ void CMap::FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z)
 void CMap::remove_animated_tile(tile *tile)
 {
 	vector::remove(this->animated_tiles, tile);
+}
+
+void CMap::apply_wall_history()
+{
+	if (SaveGameLoading) {
+		return;
+	}
+
+	for (const CUnit *settlement_unit : this->settlement_units) {
+		const site *settlement = settlement_unit->get_settlement();
+
+		assert_throw(settlement != nullptr);
+
+		const site_game_data *settlement_game_data = settlement->get_game_data();
+
+		const CPlayer *settlement_owner = settlement_game_data->get_owner();
+
+		if (settlement_owner == nullptr) {
+			continue;
+		}
+
+		const site_history *settlement_history = settlement->get_history();
+
+		const unit_type *wall_type = nullptr;
+		if (settlement_history->get_wall_class() != nullptr) {
+			wall_type = settlement_owner->get_class_unit_type(settlement_history->get_wall_class());
+		}
+
+		if (wall_type == nullptr) {
+			continue;
+		}
+
+		for (const QPoint &tile_pos : settlement_game_data->get_border_tiles()) {
+			if (!CMap::get()->Info->IsPointOnMap(tile_pos, settlement_unit->MapLayer)) {
+				continue;
+			}
+
+			if (!UnitTypeCanBeAt(*wall_type, tile_pos, settlement_unit->MapLayer->ID)) {
+				continue;
+			}
+
+			this->SetTileTerrain(tile_pos, wall_type->get_terrain_type(), settlement_unit->MapLayer->ID);
+		}
+	}
 }
 
 /**
