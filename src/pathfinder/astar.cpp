@@ -97,6 +97,8 @@ static int AStarGoalY;
 
 static int AStarGoalZ;
 
+static std::vector<std::vector<unsigned>> cached_tiles;
+
 struct Open final
 {
 	explicit Open(const Vec2i &pos, const short int costs, const unsigned int offset)
@@ -182,6 +184,8 @@ void InitAStar()
 		for (int i = 0; i < 9; ++i) {
 			Heading2O[i].push_back(Heading2Y[i] * AStarMapWidth[z]);
 		}
+
+		cached_tiles.emplace_back();
 	}
 }
 
@@ -197,6 +201,7 @@ void FreeAStar()
 	CloseSet.clear();
 	OpenSet.clear();
 	CostMoveToCache.clear();
+	cached_tiles.clear();
 	
 	for (int i = 0; i < 9; ++i) {
 		Heading2O[i].clear();
@@ -220,12 +225,14 @@ static void AStarCleanUp(int z)
 		std::fill(AStarMatrix[z].begin(), AStarMatrix[z].end(), Node());
 		std::fill(cache.begin(), cache.end(), CacheNotSet);
 	} else {
-		for (const int close : CloseSet[z]) {
-			AStarMatrix[z][close].CostFromStart = 0;
-			AStarMatrix[z][close].InGoal = 0;
-			cache[close] = CacheNotSet;
+		for (const unsigned tile_offset : cached_tiles[z]) {
+			AStarMatrix[z][tile_offset].CostFromStart = 0;
+			AStarMatrix[z][tile_offset].InGoal = 0;
+			cache[tile_offset] = CacheNotSet;
 		}
 	}
+
+	cached_tiles[z].clear();
 }
 
 /**
@@ -438,6 +445,7 @@ static int CostMoveTo(unsigned int index, const CUnit *unit, int z)
 	}
 
 	c = CostMoveToCallBack_Default(index, *unit, z);
+	cached_tiles[z].push_back(index);
 
 	return c;
 }
