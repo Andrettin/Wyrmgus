@@ -188,6 +188,14 @@ game::~game()
 {
 }
 
+void game::clear()
+{
+	this->cheat = false;
+	this->clear_delayed_effects();
+	this->posted_functions.clear();
+	engine_interface::get()->clear_objective_strings();
+}
+
 void game::on_started()
 {
 	if (GameCycle == 0) { //so that this doesn't trigger when loading a saved game

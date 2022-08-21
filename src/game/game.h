@@ -67,12 +67,7 @@ public:
 	game();
 	~game();
 
-	void clear()
-	{
-		this->cheat = false;
-		this->clear_delayed_effects();
-		this->posted_functions.clear();
-	}
+	void clear();
 
 	bool is_running() const
 	{
