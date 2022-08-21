@@ -361,8 +361,22 @@ void faction::check() const
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no default tier.");
 	}
 
-	if (this->get_civilization()->is_playable() && (this->get_type() == faction_type::tribe || this->get_type() == faction_type::polity) && this->get_icon() == nullptr) {
-		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" is a tribe or polity belonging to a playable civilization, but has no icon.");
+	if (this->get_civilization()->is_playable() && this->is_playable() && !this->has_neutral_type()) {
+		if (this->get_icon() == nullptr) {
+			throw std::runtime_error("Faction \"" + this->get_identifier() + "\" is playable and non-neutral, but has no icon.");
+		}
+
+		if (this->develops_from.empty() && this->get_develops_to().empty()) {
+			throw std::runtime_error("Faction \"" + this->get_identifier() + "\" is playable and non-neutral, but neither develops from nor to any other faction.");
+		}
+
+		if (this->get_type() == faction_type::tribe && this->get_develops_to().empty()) {
+			throw std::runtime_error("Tribal faction \"" + this->get_identifier() + "\" is playable and non-neutral, but does not develop to any other faction.");
+		}
+
+		if (this->get_type() == faction_type::polity && !this->is_government_type_valid(government_type::tribe) && this->develops_from.empty() && this->get_min_tier() >= faction_tier::duchy) {
+			throw std::runtime_error("Polity faction \"" + this->get_identifier() + "\" is playable, cannot have a tribal government, and has a minimum faction tier of duchy or above, but does not develop from any other faction.");
+		}
 	}
 
 	for (const faction *other_faction : this->get_develops_to()) {
