@@ -1397,7 +1397,8 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 		const wyrmgus::civilization *new_civilization = this->get_civilization();
 		CUpgrade *civilization_upgrade = new_civilization->get_upgrade();
 		if (civilization_upgrade != nullptr && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
-			this->acquire_upgrade(civilization_upgrade);
+			//do not check for age changes when acquiring an upgrade here, as we may not have a faction (and thus no class upgrades) at this point
+			this->acquire_upgrade(civilization_upgrade, false);
 		}
 	}
 
@@ -1976,7 +1977,7 @@ bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) con
 	return false;
 }
 
-void CPlayer::acquire_upgrade(const CUpgrade *upgrade)
+void CPlayer::acquire_upgrade(const CUpgrade *upgrade, const bool check_age)
 {
 	//Wyrmgus start
 	if (!GameRunning && !GameEstablishing) {
@@ -2013,7 +2014,9 @@ void CPlayer::acquire_upgrade(const CUpgrade *upgrade)
 		modifier->apply_to_player(this, 1);
 	}
 
-	this->check_age();
+	if (check_age) {
+		this->check_age();
+	}
 
 	//
 	//  Upgrades could change the buttons displayed.
