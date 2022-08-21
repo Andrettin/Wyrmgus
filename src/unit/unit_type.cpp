@@ -2392,6 +2392,11 @@ bool unit_type::pos_borders_impassable(const QPoint &pos, const int z) const
 		}
 	}
 
+	if (passable_block_count > 1 && impassable.value()) {
+		//if it ends with an impassable tile, then the max passable block count is one
+		return true;
+	}
+
 	return false;
 }
 
