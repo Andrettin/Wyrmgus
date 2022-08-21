@@ -1617,8 +1617,6 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 		}
 	}
 
-	this->update_potentially_foundable_factions();
-
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
 
@@ -1675,8 +1673,6 @@ void CPlayer::set_faction_tier(const wyrmgus::faction_tier tier)
 	if (!game::get()->is_multiplayer()) {
 		this->update_name_from_faction();
 	}
-
-	this->update_potentially_foundable_factions();
 }
 
 void CPlayer::set_government_type(const wyrmgus::government_type government_type)
@@ -2367,154 +2363,6 @@ bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 	}
 
 	return false;
-}
-
-bool CPlayer::can_potentially_found_faction(const wyrmgus::faction *faction) const
-{
-	if (this->get_faction() == nullptr) {
-		return false;
-	}
-	
-	if (this->get_faction()->has_neutral_type() != faction->has_neutral_type()) {
-		return false;
-	}
-
-	if (faction->get_civilization() != this->get_civilization()) {
-		if (!vector::contains(this->get_civilization()->get_develops_to(), faction->get_civilization())) {
-			return false;
-		}
-
-		if (this->get_civilization()->is_playable() && !faction->get_civilization()->is_playable()) {
-			return false;
-		}
-
-		if (faction->get_civilization()->get_conditions() != nullptr && !faction->get_civilization()->get_conditions()->check(this->get_civilization())) {
-			return false;
-		}
-
-		if (faction->get_preconditions() != nullptr && !faction->get_preconditions()->check(this->get_civilization())) {
-			return false;
-		}
-
-		if (faction->get_conditions() != nullptr && !faction->get_conditions()->check(this->get_civilization())) {
-			return false;
-		}
-	}
-
-	switch (faction->get_type()) {
-		case faction_type::tribe:
-			if (this->get_faction()->get_type() == faction_type::polity) {
-				//if we are a polity, we can't become a tribe
-				return false;
-			}
-			break;
-		case faction_type::polity:
-			if (this->get_faction()->get_type() == faction_type::tribe && !faction->is_government_type_valid(government_type::tribe)) {
-				//if the current faction is a tribal one, the target faction must have the tribe government type be valid for them, as otherwise it won't be possible to transition from one into the other
-				return false;
-			}
-			break;
-		case faction_type::minor_tribe:
-			if (this->get_faction()->get_type() != faction_type::minor_tribe) {
-				//neutral factions which aren't already minor tribes can't become minor tribes
-				return false;
-			}
-			break;
-		case faction_type::mercenary_company:
-			if (this->get_faction()->get_type() != faction_type::minor_tribe && this->get_faction()->get_type() != faction_type::mercenary_company) {
-				return false;
-			}
-			break;
-		case faction_type::holy_order:
-			if (this->get_faction()->get_type() != faction_type::holy_order) {
-				return false;
-			}
-			break;
-		case faction_type::notable_house:
-			if (this->get_faction()->get_type() != faction_type::minor_tribe && this->get_faction()->get_type() != faction_type::notable_house) {
-				return false;
-			}
-			break;
-		case faction_type::trading_company:
-			if (this->get_faction()->get_type() != faction_type::trading_company) {
-				return false;
-			}
-			break;
-		default:
-			return false;
-	}
-
-	if (faction->get_max_tier() < this->get_faction()->get_max_tier()) {
-		return false;
-	}
-
-	//in order for a faction to be switchable to, it must be an advancement from the current faction in some way
-	if (vector::contains(this->get_civilization()->get_develops_to(), faction->get_civilization())) {
-		return true;
-	}
-
-	if (faction->get_min_tier() > this->get_faction_tier()) {
-		return true;
-	}
-
-	if (faction->get_max_tier() > this->get_faction()->get_max_tier()) {
-		return true;
-	}
-
-	if (this->get_faction()->get_type() == faction_type::tribe && faction->get_type() == faction_type::polity) {
-		//more advanced faction type
-		return true;
-	}
-
-	if (this->get_faction()->get_type() == faction_type::minor_tribe && (faction->get_type() == faction_type::mercenary_company || faction->get_type() == faction_type::notable_house)) {
-		//more advanced neutral faction type
-		return true;
-	}
-
-	return false;
-}
-
-void CPlayer::update_potentially_foundable_factions()
-{
-	this->potentially_foundable_factions.clear();
-
-	if (this->get_faction() == nullptr) {
-		return;
-	}
-
-	if (this->get_faction_tier() == faction_tier::none) {
-		return;
-	}
-
-	vector::merge(this->potentially_foundable_factions, this->get_civilization()->get_factions());
-
-	for (const civilization *potential_civilization : this->get_civilization()->get_develops_to()) {
-		vector::merge(this->potentially_foundable_factions, potential_civilization->get_factions());
-	}
-
-	std::erase_if(this->potentially_foundable_factions, [this](const wyrmgus::faction *faction) {
-		return !this->can_potentially_found_faction(faction);
-	});
-
-	std::sort(this->potentially_foundable_factions.begin(), this->potentially_foundable_factions.end(), [](const wyrmgus::faction *lhs, const wyrmgus::faction *rhs) {
-		if (lhs->get_civilization() != rhs->get_civilization()) {
-			return lhs->get_civilization()->get_identifier() < rhs->get_civilization()->get_identifier();
-		}
-
-		if (lhs->get_type() != rhs->get_type()) {
-			return lhs->get_type() < rhs->get_type();
-		}
-
-		return lhs->get_identifier() < rhs->get_identifier();
-	});
-
-	if (this->potentially_foundable_factions.size() > button::get_faction_button_count()) {
-		log::log_error("Player of faction \"" + this->get_faction()->get_identifier() + "\" can develop to " + std::to_string(this->potentially_foundable_factions.size()) + " different factions, but there are only buttons for a faction to develop to " + std::to_string(button::get_faction_button_count()) + " different ones.");
-	}
-
-	if (this == CPlayer::GetThisPlayer() && !Selected.empty() && Selected[0]->Type->BoolFlag[TOWNHALL_INDEX].value) {
-		UI.ButtonPanel.Update();
-	}
 }
 
 template <bool preconditions_only>

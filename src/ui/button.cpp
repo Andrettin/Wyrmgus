@@ -503,7 +503,7 @@ void button::SetTriggerData() const
 			TriggerData.Unit = &wyrmgus::unit_manager::get()->GetSlotUnit(this->Value);
 			break;
 		case ButtonCmd::Faction: {
-			const faction *faction = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(this->Value);
+			const faction *faction = CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(this->Value);
 			TriggerData.faction = faction;
 			if (faction->get_upgrade() != nullptr) {
 				TriggerData.Upgrade = faction->get_upgrade();

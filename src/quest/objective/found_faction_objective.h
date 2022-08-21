@@ -66,7 +66,7 @@ public:
 
 	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
 	{
-		if (!player->can_potentially_found_faction(this->faction)) {
+		if (!vector::contains(player->get_faction()->get_develops_to(), this->faction)) {
 			return false;
 		}
 
@@ -78,7 +78,7 @@ public:
 		const wyrmgus::faction *player_faction = player->get_faction();
 
 		if (player_faction != this->faction) {
-			if (!player->can_potentially_found_faction(this->faction)) {
+			if (!vector::contains(player->get_faction()->get_develops_to(), this->faction)) {
 				return std::make_pair(true, "The faction can no longer be founded.");
 			}
 		}

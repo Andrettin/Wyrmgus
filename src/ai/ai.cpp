@@ -204,7 +204,7 @@ void PlayerAi::check_factions()
 	}
 
 	std::vector<const faction *> potential_factions;
-	for (const faction *possible_faction : this->Player->get_potentially_foundable_factions()) {
+	for (const faction *possible_faction : this->Player->get_faction()->get_develops_to()) {
 		if (!this->Player->can_found_faction(possible_faction)) {
 			continue;
 		}

@@ -47,6 +47,7 @@
 #include "player/player.h"
 #include "player/player_color.h"
 #include "script/condition/and_condition.h"
+#include "translator.h"
 #include "ui/button.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
@@ -164,7 +165,13 @@ void faction::process_gsml_scope(const gsml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "class_unit_types") {
+	if (tag == "develops_to") {
+		for (const std::string &value : values) {
+			faction *other_faction = faction::get(value);
+			this->develops_to.push_back(other_faction);
+			other_faction->develops_from.push_back(this);
+		}
+	} else if (tag == "class_unit_types") {
 		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
@@ -358,6 +365,56 @@ void faction::check() const
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" is a tribe or polity belonging to a playable civilization, but has no icon.");
 	}
 
+	for (const faction *other_faction : this->get_develops_to()) {
+		try {
+			assert_throw(this->has_neutral_type() == other_faction->has_neutral_type());
+			assert_throw(other_faction->get_max_tier() >= this->get_max_tier());
+
+			if (other_faction->get_civilization() != this->get_civilization()) {
+				assert_throw(vector::contains(this->get_civilization()->get_develops_to(), other_faction->get_civilization()));
+				assert_throw(other_faction->get_civilization()->is_playable() || !this->get_civilization()->is_playable());
+				assert_throw(other_faction->get_civilization()->get_conditions() == nullptr || other_faction->get_civilization()->get_conditions()->check(this->get_civilization()));
+				assert_throw(other_faction->get_preconditions() == nullptr || other_faction->get_preconditions()->check(this->get_civilization()));
+				assert_throw(other_faction->get_conditions() == nullptr || other_faction->get_conditions()->check(this->get_civilization()));
+			}
+
+			switch (other_faction->get_type()) {
+				case faction_type::tribe:
+					//if we are a polity, we can't become a tribe
+					assert_throw(this->get_type() != faction_type::polity);
+					break;
+				case faction_type::polity:
+					//if the current faction is a tribal one, the target faction must have the tribe government type be valid for them, as otherwise it won't be possible to transition from one into the other
+					assert_throw(this->get_type() != faction_type::tribe || other_faction->is_government_type_valid(government_type::tribe));
+					break;
+				case faction_type::minor_tribe:
+					//neutral factions which aren't already minor tribes can't become minor tribes
+					assert_throw(this->get_type() == faction_type::minor_tribe);
+					break;
+				case faction_type::mercenary_company:
+					assert_throw(this->get_type() == faction_type::minor_tribe || this->get_type() == faction_type::mercenary_company);
+					break;
+				case faction_type::holy_order:
+					assert_throw(this->get_type() == faction_type::holy_order);
+					break;
+				case faction_type::notable_house:
+					assert_throw(this->get_type() == faction_type::minor_tribe || this->get_type() == faction_type::notable_house);
+					break;
+				case faction_type::trading_company:
+					assert_throw(this->get_type() == faction_type::trading_company);
+					break;
+				default:
+					assert_throw(false);
+			}
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Faction \"" + other_faction->get_identifier() + "\" is not a valid target for faction \"" + this->get_identifier() + "\" to develop to."));
+		}
+	}
+
+	if (this->get_develops_to().size() > button::get_faction_button_count()) {
+		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" can develop to " + std::to_string(this->get_develops_to().size()) + " different factions, but there are only buttons for a faction to develop to " + std::to_string(button::get_faction_button_count()) + " different ones.");
+	}
+
 	for (const site *core_settlement : this->get_core_settlements()) {
 		if (!core_settlement->is_settlement()) {
 			throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has site \"" + core_settlement->get_identifier() + "\" set as one of its core settlements, but the latter is not a settlement.");
@@ -410,6 +467,42 @@ std::string faction::get_encyclopedia_text() const
 
 	if (this->get_upgrade() != nullptr) {
 		named_data_entry::concatenate_encyclopedia_text(text, "Effects: " + this->get_upgrade()->get_effects_string());
+	}
+
+	std::vector<const faction *> develops_from = this->develops_from;
+	std::sort(develops_from.begin(), develops_from.end(), named_data_entry::compare_encyclopedia_entries);
+
+	if (!develops_from.empty()) {
+		std::string develops_from_text = _("Develops From");
+		develops_from_text += ": ";
+		for (size_t i = 0; i < develops_from.size(); ++i) {
+			if (i > 0) {
+				develops_from_text += ", ";
+			}
+
+			const faction *faction = develops_from[i];
+			develops_from_text += faction->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, std::move(develops_from_text));
+	}
+
+	std::vector<const faction *> develops_to = this->get_develops_to();
+	std::sort(develops_to.begin(), develops_to.end(), named_data_entry::compare_encyclopedia_entries);
+
+	if (!develops_to.empty()) {
+		std::string develops_to_text = _("Develops To");
+		develops_to_text += ": ";
+		for (size_t i = 0; i < develops_to.size(); ++i) {
+			if (i > 0) {
+				develops_to_text += ", ";
+			}
+
+			const faction *faction = develops_to[i];
+			develops_to_text += faction->get_link_string();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, std::move(develops_to_text));
 	}
 
 	named_data_entry::concatenate_encyclopedia_text(text, detailed_data_entry::get_encyclopedia_text());

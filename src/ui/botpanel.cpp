@@ -429,7 +429,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (game::get()->get_current_campaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button.Value)->get_core_settlements().size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (game::get()->get_current_campaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(button.Value)->get_core_settlements().size() > 0)) {
 			return false;
 		}
 	}
@@ -443,8 +443,8 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	const CUpgrade *upgrade = nullptr;
 	if (button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility) {
 		upgrade = button.get_value_upgrade(Selected[0]);
-	} else if (button.Action == ButtonCmd::Faction && CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button.Value)->get_upgrade() != nullptr) {
-		upgrade = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button.Value)->get_upgrade();
+	} else if (button.Action == ButtonCmd::Faction && CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(button.Value)->get_upgrade() != nullptr) {
+		upgrade = CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(button.Value)->get_upgrade();
 	} else if (button.Action == ButtonCmd::PotentialNeutralFaction && Selected[0]->get_site()->get_neutral_factions().at(button.Value)->get_upgrade() != nullptr) {
 		upgrade = Selected[0]->get_site()->get_neutral_factions().at(button.Value)->get_upgrade();
 	} else if (button.Action == ButtonCmd::Dynasty && CPlayer::GetThisPlayer()->get_faction()->get_dynasties().at(button.Value)->get_upgrade() != nullptr) {
@@ -514,7 +514,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				has_requirements_string = has_requirements_string && upgrade != nullptr && (!upgrade->get_requirements_string().empty() || upgrade->get_conditions() != nullptr);
 				break;
 			case ButtonCmd::Faction:
-				has_requirements_string = has_requirements_string && button.Value != -1 && !CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button.Value)->get_requirements_string().empty();
+				has_requirements_string = has_requirements_string && button.Value != -1 && !CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(button.Value)->get_requirements_string().empty();
 				break;
 			case ButtonCmd::PotentialNeutralFaction:
 				has_requirements_string = !Selected.empty() && button.Value != -1 && Selected[0]->get_site() != nullptr && !Selected[0]->get_site()->get_neutral_factions().at(button.Value)->get_requirements_string().empty();
@@ -1178,8 +1178,8 @@ void CButtonPanel::Draw(std::vector<std::function<void(renderer *)>> &render_com
 			}
 		} else if ((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass) && button->Icon.Name.empty() && button_upgrade->get_icon()) {
 			button_icon = button_upgrade->get_icon();
-		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button->Value)->get_icon() != nullptr) {
-			button_icon = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(button->Value)->get_icon();
+		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(button->Value)->get_icon() != nullptr) {
+			button_icon = CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(button->Value)->get_icon();
 		} else if (button->Action == ButtonCmd::PotentialNeutralFaction && button->Icon.Name.empty() && Selected[0]->get_site() != nullptr && Selected[0]->get_site()->get_neutral_factions().at(button->Value)->get_icon() != nullptr) {
 			button_icon = Selected[0]->get_site()->get_neutral_factions().at(button->Value)->get_icon();
 		} else if (button->Action == ButtonCmd::Dynasty && button->Icon.Name.empty() && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_icon() != nullptr) {
@@ -1442,7 +1442,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = unit.CurrentAction() == UnitAction::Built;
 			break;
 		case ButtonCmd::Faction:
-			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().size()) && CPlayer::GetThisPlayer()->can_found_faction<true>(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(buttonaction.Value));
+			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_faction()->get_develops_to().size()) && CPlayer::GetThisPlayer()->can_found_faction<true>(CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(buttonaction.Value));
 			break;
 		case ButtonCmd::PotentialNeutralFaction:
 			res = game::get()->get_current_campaign() != nullptr && Selected[0]->get_settlement() != nullptr && Selected[0]->get_settlement()->get_game_data()->get_owner() == CPlayer::GetThisPlayer() && Selected[0]->get_site() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(Selected[0]->get_site()->get_neutral_factions().size()) && Selected[0]->get_settlement() != nullptr;
@@ -1551,7 +1551,7 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonCmd::Faction:
-			res = CPlayer::GetThisPlayer()->can_found_faction(CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(buttonaction.Value));
+			res = CPlayer::GetThisPlayer()->can_found_faction(CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(buttonaction.Value));
 			break;
 		case ButtonCmd::PotentialNeutralFaction: {
 			const faction *neutral_faction = Selected[0]->get_site()->get_neutral_factions().at(buttonaction.Value);
@@ -1840,10 +1840,10 @@ void CButtonPanel::Update()
 
 			switch (button->Action) {
 				case ButtonCmd::Faction: {
-					if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_faction_count >= CPlayer::GetThisPlayer()->get_potentially_foundable_factions().size()) {
+					if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_faction_count >= CPlayer::GetThisPlayer()->get_faction()->get_develops_to().size()) {
 						button->Value = -1;
 					} else {
-						const faction *faction = CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(potential_faction_count);
+						const faction *faction = CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(potential_faction_count);
 						button->Value = potential_faction_count;
 
 						const government_type player_government_type = CPlayer::GetThisPlayer()->get_government_type();
@@ -2272,7 +2272,7 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 void CButtonPanel::DoClicked_Faction(int button)
 {
 	const int index = CurrentButtons[button]->Value;
-	SendCommandSetFaction(CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->get_potentially_foundable_factions().at(index));
+	SendCommandSetFaction(CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->get_faction()->get_develops_to().at(index));
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;

@@ -327,15 +327,6 @@ public:
 	bool HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 
-	bool can_potentially_found_faction(const wyrmgus::faction *faction) const;
-
-	const std::vector<const wyrmgus::faction *> &get_potentially_foundable_factions() const
-	{
-		return this->potentially_foundable_factions;
-	}
-
-	void update_potentially_foundable_factions();
-
 	template <bool preconditions_only = false>
 	bool can_found_faction(const wyrmgus::faction *faction) const;
 
@@ -1424,7 +1415,6 @@ public:
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
 
 private:
-	std::vector<const wyrmgus::faction *> potentially_foundable_factions;
 	std::vector<CUnit *> Units; /// units of this player
 	CUnit *last_created_unit = nullptr;
 	player_index_set enemies; //enemies for this player

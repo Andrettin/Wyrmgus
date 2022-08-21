@@ -271,6 +271,11 @@ public:
 		return this->get_titled_name(this->get_default_government_type(), this->get_default_tier());
 	}
 
+	const std::vector<const faction *> &get_develops_to() const
+	{
+		return this->develops_to;
+	}
+
 	int get_force_type_weight(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<ai_force_template>> &get_ai_force_templates(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &GetAiBuildingTemplates() const;
@@ -433,6 +438,8 @@ private:
 	bool definite_article = false; //whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
 	title_name_map title_names;
 	character_title_name_map character_title_names;
+	std::vector<const faction *> develops_from; //from which factions this one can develop
+	std::vector<const faction *> develops_to; //to which faction this one can develop
 public:
 	std::map<ButtonCmd, const wyrmgus::icon *> ButtonIcons;				/// icons for button actions
 private:
