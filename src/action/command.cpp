@@ -939,11 +939,18 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 		return;
 	}
 
+	if (dest.Variable[GARRISONED_GATHERING_INDEX].Value > 0) {
+		if (CanTransport(dest, unit)) {
+			CommandBoard(unit, dest, flush);
+		}
+		return;
+	}
+
 	//Wyrmgus start
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
 
-	std::unique_ptr<COrder> *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
