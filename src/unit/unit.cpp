@@ -6660,6 +6660,10 @@ bool CUnit::can_harvest(const CUnit *dest, const bool only_harvestable) const
 			return false;
 		}
 	}
+
+	if (dest->Variable[GARRISONED_GATHERING_INDEX].Value > 0) {
+		return false;
+	}
 	
 	return true;
 }
