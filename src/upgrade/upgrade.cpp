@@ -2035,6 +2035,7 @@ bool IsBooleanVariable(const int var)
 		case REGENERATIONAURA_INDEX:
 		case HYDRATINGAURA_INDEX:
 		case ETHEREALVISION_INDEX:
+		case GARRISONED_GATHERING_INDEX:
 			return true;
 		default:
 			return false;

@@ -3211,6 +3211,7 @@ std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 			case BONUSAGAINSTAIR_INDEX:
 			case BONUSAGAINSTGIANTS_INDEX:
 			case BONUSAGAINSTDRAGONS_INDEX:
+			case GARRISONED_GATHERING_INDEX:
 				break;
 			case ATTACKRANGE_INDEX:
 				if (unit_type->DefaultStat.Variables[var].Value <= 1) {
