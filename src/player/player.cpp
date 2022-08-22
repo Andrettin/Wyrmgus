@@ -3791,6 +3791,18 @@ void CPlayer::set_income_modifier(const resource *resource, const int quantity)
 		const QString str = QString::fromStdString(this->get_children_processing_bonus_string(final_resource));
 		emit resource_children_processing_bonus_string_changed(final_resource->get_index(), str);
 	}
+
+	for (CUnit *unit : this->get_units()) {
+		if (unit->Variable[GARRISONED_GATHERING_INDEX].Value <= 0) {
+			continue;
+		}
+
+		if (unit->get_given_resource() == nullptr) {
+			continue;
+		}
+
+		unit->update_garrisoned_gathering_income();
+	}
 }
 
 int CPlayer::get_processing_bonus(const resource *resource) const

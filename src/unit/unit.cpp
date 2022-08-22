@@ -3107,7 +3107,7 @@ void CUnit::ProduceResource(const wyrmgus::resource *resource)
 			const std::vector<CUnit *> units_inside = this->get_units_inside();
 
 			for (CUnit *unit : units_inside) {
-				if (unit->get_garrisoned_gathering_harvest_rate(this->get_given_resource()) == 0) {
+				if (unit->get_garrisoned_gathering_rate(this->get_given_resource()) == 0) {
 					unit->drop_out_on_side(LookingW, this);
 				}
 			}
@@ -3929,7 +3929,7 @@ void CUnit::update_garrisoned_gathering_income()
 
 	if (this->BoardCount > 0) {
 		for (const CUnit *garrisoned_unit : this->get_units_inside()) {
-			const int unit_income = garrisoned_unit->get_garrisoned_gathering_harvest_rate(resource);
+			const int unit_income = garrisoned_unit->get_garrisoned_gathering_rate(resource) * this->Player->get_income_modifier(resource) / 100;
 			income += unit_income;
 		}
 	}
@@ -6522,7 +6522,7 @@ int CUnit::get_resource_step(const resource *resource) const
 	return resource_step;
 }
 
-int CUnit::get_garrisoned_gathering_harvest_rate(const resource *resource) const
+int CUnit::get_garrisoned_gathering_rate(const resource *resource) const
 {
 	return this->get_resource_step(resource) * 100;
 }

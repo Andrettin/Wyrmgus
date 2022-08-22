@@ -784,7 +784,7 @@ public:
 	bool is_rescued() const;
 
 	int get_resource_step(const resource *resource) const;
-	int get_garrisoned_gathering_harvest_rate(const resource *resource) const;
+	int get_garrisoned_gathering_rate(const resource *resource) const;
 	int GetTotalInsideCount(const CPlayer *player = nullptr, const bool ignore_items = true, const bool ignore_saved_cargo = false, const wyrmgus::unit_type *type = nullptr) const;
 	bool CanAttack(bool count_inside = true) const;
 	bool IsInCombat() const;
