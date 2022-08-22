@@ -705,6 +705,19 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 
 		unit.UpdateSoldUnits();
+
+		if (unit.get_garrisoned_gathering_income() > 0) {
+			if (!unit.Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
+				const int resource_change = std::min(unit.get_garrisoned_gathering_income(), unit.ResourcesHeld);
+				unit.ChangeResourcesHeld(-resource_change);
+
+				if (unit.ResourcesHeld == 0) {
+					DropOutAll(unit);
+					LetUnitDie(unit);
+				}
+			}
+
+		}
 	}
 }
 //Wyrmgus end
