@@ -8455,12 +8455,15 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	if (!transporter.Type->CanTransport()) {
 		return 0;
 	}
-	if (transporter.CurrentAction() == UnitAction::Built) { // Under construction
+
+	if (transporter.is_under_construction()) { //under construction
 		return 0;
 	}
+
 	if (&transporter == &unit) { // Cannot transporter itself.
 		return 0;
 	}
+
 	//Wyrmgus start
 	/*
 	if (transporter.BoardCount >= transporter.Type->MaxOnBoard) { // full
@@ -8468,7 +8471,8 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	}
 	*/
 	
-	if (transporter.ResourcesHeld > 0 && transporter.CurrentResource) { //cannot transport units if already has cargo
+	if (transporter.ResourcesHeld > 0 && transporter.CurrentResource) {
+		//cannot transport units if already has cargo
 		return 0;
 	}
 	//Wyrmgus end
