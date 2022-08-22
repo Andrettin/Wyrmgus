@@ -3076,9 +3076,13 @@ void CUnit::ProduceResource(const wyrmgus::resource *resource)
 	if (resource_index == this->GivesResource) {
 		return;
 	}
-	
+
+	if (this->Variable[GARRISONED_GATHERING_INDEX].Value > 0 && this->get_given_resource() != nullptr) {
+		this->set_garrisoned_gathering_income(0);
+	}
+
 	const int old_resource = this->GivesResource;
-	
+
 	if (resource != nullptr) {
 		this->GivesResource = resource->get_index();
 		this->ResourcesHeld = 10000;
@@ -3088,7 +3092,7 @@ void CUnit::ProduceResource(const wyrmgus::resource *resource)
 	}
 	
 	if (old_resource != 0) {
-		for (const std::shared_ptr<wyrmgus::unit_ref> &uins_ref : this->Resource.Workers) {
+		for (const std::shared_ptr<unit_ref> &uins_ref : this->Resource.Workers) {
 			CUnit *uins = uins_ref->get();
 			if (uins->Container == this) {
 				uins->CurrentOrder()->Finished = true;
@@ -3096,6 +3100,24 @@ void CUnit::ProduceResource(const wyrmgus::resource *resource)
 			}
 		}
 		this->Resource.Active = 0;
+	}
+
+	if (this->Variable[GARRISONED_GATHERING_INDEX].Value > 0) {
+		if (this->get_given_resource() != nullptr) {
+			const std::vector<CUnit *> units_inside = this->get_units_inside();
+
+			for (CUnit *unit : units_inside) {
+				if (unit->get_garrisoned_gathering_harvest_rate(this->get_given_resource()) == 0) {
+					unit->drop_out_on_side(LookingW, this);
+				}
+			}
+
+			this->update_garrisoned_gathering_income();
+		} else {
+			if (this->has_units_inside()) {
+				DropOutAll(*this);
+			}
+		}
 	}
 }
 
@@ -3877,7 +3899,21 @@ static void RemoveUnitFromContainer(CUnit &unit)
 	//Wyrmgus end
 }
 
-void CUnit::update_garrisoned_gathering()
+void CUnit::set_garrisoned_gathering_income(const int income)
+{
+	const int old_income = this->get_garrisoned_gathering_income();
+
+	if (income == old_income) {
+		return;
+	}
+
+	assert_throw(this->get_given_resource() != nullptr);
+
+	this->garrisoned_gathering_income = income;
+	this->Player->change_income(this->get_given_resource(), income - old_income);
+}
+
+void CUnit::update_garrisoned_gathering_income()
 {
 	if (this->Variable[GARRISONED_GATHERING_INDEX].Value <= 0) {
 		return;
@@ -3889,7 +3925,6 @@ void CUnit::update_garrisoned_gathering()
 		return;
 	}
 
-	const int old_income = this->garrisoned_gathering_income;
 	int income = 0;
 
 	if (this->BoardCount > 0) {
@@ -3899,10 +3934,7 @@ void CUnit::update_garrisoned_gathering()
 		}
 	}
 
-	if (income != old_income) {
-		this->Player->change_income(resource, income - old_income);
-		this->garrisoned_gathering_income = income;
-	}
+	this->set_garrisoned_gathering_income(income);
 }
 
 //Wyrmgus start
@@ -4180,7 +4212,7 @@ void CUnit::on_variable_changed(const int var_index, const int change)
 		case LEATHERGATHERINGBONUS_INDEX:
 		case GEMSGATHERINGBONUS_INDEX:
 			if (this->Container != nullptr && !SaveGameLoading) {
-				this->Container->update_garrisoned_gathering();
+				this->Container->update_garrisoned_gathering_income();
 			}
 			break;
 		default:

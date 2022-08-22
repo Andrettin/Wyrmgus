@@ -209,11 +209,12 @@ public:
 
 	void update_for_transported_units()
 	{
-		this->update_garrisoned_gathering();
+		this->update_garrisoned_gathering_income();
 		this->UpdateContainerAttackRange();
 	}
 
-	void update_garrisoned_gathering();
+	void set_garrisoned_gathering_income(const int income);
+	void update_garrisoned_gathering_income();
 
 	//Wyrmgus start
 	void UpdateContainerAttackRange();
