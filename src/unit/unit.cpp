@@ -8481,6 +8481,12 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 		return 0;
 	}
 
+	if (transporter.Variable[GARRISONED_GATHERING_INDEX].Value > 0) {
+		if (transporter.get_given_resource() == nullptr || unit.Type->get_resource_info(transporter.get_given_resource()) == nullptr) {
+			return 0;
+		}
+	}
+
 	// Can transport only allied unit.
 	// FIXME : should be parametrable.
 	//Wyrmgus start
