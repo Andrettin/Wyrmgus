@@ -104,7 +104,7 @@ void dialogue_option::initialize()
 		const size_t hotkey_pos = this->name.find(highlight_marker);
 		if (hotkey_pos != std::string::npos) {
 			string::replace(this->name, "~!", "");
-			this->hotkey = this->name.at(hotkey_pos);
+			this->hotkey = tolower(this->name.at(hotkey_pos));
 		}
 	}
 }
