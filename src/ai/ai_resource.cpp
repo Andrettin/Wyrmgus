@@ -1537,6 +1537,10 @@ static void AiCollectResources()
 			continue;
 		}
 		
+		if (unit.Removed && unit.CurrentAction() != UnitAction::Resource) {
+			continue;
+		}
+		
 		//Wyrmgus start
 		if (unit.GroupId != 0) {
 			//don't gather/trade with units that are parts of forces
