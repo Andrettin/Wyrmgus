@@ -706,9 +706,20 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 
 		unit.UpdateSoldUnits();
 
-		if (unit.get_garrisoned_gathering_income() > 0) {
+		if (unit.get_garrisoned_gathering_income() > 0 && unit.get_given_resource() != nullptr) {
+			const int resource_change = std::min(unit.get_garrisoned_gathering_income(), unit.ResourcesHeld);
+
+			//increase worker experience
+			int gathered_amount = resource_change;
+			for (CUnit *garrisoned_unit : unit.get_units_inside()) {
+				const int unit_gathered_amount = std::min(gathered_amount, garrisoned_unit->get_garrisoned_gathering_harvest_rate(unit.get_given_resource()));
+				gathered_amount -= unit_gathered_amount;
+
+				const int xp_gained = unit_gathered_amount / CUnit::resource_gathering_experience_divisor;
+				garrisoned_unit->change_experience(xp_gained);
+			}
+
 			if (!unit.Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
-				const int resource_change = std::min(unit.get_garrisoned_gathering_income(), unit.ResourcesHeld);
 				unit.ChangeResourcesHeld(-resource_change);
 
 				if (unit.ResourcesHeld == 0) {
@@ -716,7 +727,6 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 					LetUnitDie(unit);
 				}
 			}
-
 		}
 	}
 }

@@ -1344,7 +1344,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	player.pay_overlord_tax(final_resource, final_resource_change);
 	
 	//give XP to the worker according to how much was gathered
-	const int xp_gained = unit.ResourcesHeld / 20;
+	const int xp_gained = unit.ResourcesHeld / CUnit::resource_gathering_experience_divisor;
 	unit.change_experience(xp_gained);
 
 	if (this->CurrentResource == TradeCost && this->trade_partner != nullptr) {

@@ -3894,7 +3894,7 @@ void CUnit::update_garrisoned_gathering()
 
 	if (this->BoardCount > 0) {
 		for (const CUnit *garrisoned_unit : this->get_units_inside()) {
-			const int unit_income = garrisoned_unit->get_resource_step(resource) * 100;
+			const int unit_income = garrisoned_unit->get_garrisoned_gathering_harvest_rate(resource);
 			income += unit_income;
 		}
 	}
@@ -6488,6 +6488,11 @@ int CUnit::get_resource_step(const resource *resource) const
 	}
 	
 	return resource_step;
+}
+
+int CUnit::get_garrisoned_gathering_harvest_rate(const resource *resource) const
+{
+	return this->get_resource_step(resource) * 100;
 }
 
 int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, const bool ignore_saved_cargo, const unit_type *type) const
