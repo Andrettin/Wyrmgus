@@ -392,6 +392,8 @@ void CUnit::Init()
 
 	this->Resource.Workers.clear();
 	this->Resource.Active = 0;
+
+	this->garrisoned_gathering_income = 0;
 	
 	for (int i = 0; i < static_cast<int>(wyrmgus::item_slot::count); ++i) {
 		this->EquippedItems[i].clear();
@@ -3851,7 +3853,7 @@ void CUnit::AddInContainer(CUnit &host)
 	//Wyrmgus start
 	if (!SaveGameLoading) {
 		//if host has no range by itself, but the unit has range, and the unit can attack from a transporter, change the host's range to the unit's; but don't do this while loading, as it causes a crash (since one unit needs to be loaded before the other, and when this function is processed both won't already have their variables set)
-		host.UpdateContainerAttackRange();
+		host.update_for_transported_units();
 	}
 	//Wyrmgus end
 }
@@ -3863,7 +3865,7 @@ void CUnit::AddInContainer(CUnit &host)
 */
 static void RemoveUnitFromContainer(CUnit &unit)
 {
-	CUnit *host = unit.Container; // transporter which contain unit.
+	CUnit *host = unit.Container; //transporter which containd the unit
 	assert_throw(unit.Container != nullptr);
 	assert_throw(unit.Container->has_units_inside());
 	
@@ -3871,8 +3873,36 @@ static void RemoveUnitFromContainer(CUnit &unit)
 	unit.Container = nullptr;
 	//Wyrmgus start
 	//reset host attack range
-	host->UpdateContainerAttackRange();
+	host->update_for_transported_units();
 	//Wyrmgus end
+}
+
+void CUnit::update_garrisoned_gathering()
+{
+	if (this->Variable[GARRISONED_GATHERING_INDEX].Value <= 0) {
+		return;
+	}
+
+	const resource *resource = this->get_given_resource();
+
+	if (resource == nullptr) {
+		return;
+	}
+
+	const int old_income = this->garrisoned_gathering_income;
+	int income = 0;
+
+	if (this->BoardCount > 0) {
+		for (const CUnit *garrisoned_unit : this->get_units_inside()) {
+			const int unit_income = garrisoned_unit->get_resource_step(resource) * 100;
+			income += unit_income;
+		}
+	}
+
+	if (income != old_income) {
+		this->Player->change_income(resource, income - old_income);
+		this->garrisoned_gathering_income = income;
+	}
 }
 
 //Wyrmgus start
@@ -4135,6 +4165,23 @@ void CUnit::on_variable_changed(const int var_index, const int change)
 		case KNOWLEDGEWARFARE_INDEX:
 		case KNOWLEDGEMINING_INDEX:
 			this->CheckKnowledgeChange(var_index, change);
+			break;
+		case GATHERINGBONUS_INDEX:
+		case COPPERGATHERINGBONUS_INDEX:
+		case SILVERGATHERINGBONUS_INDEX:
+		case GOLDGATHERINGBONUS_INDEX:
+		case IRONGATHERINGBONUS_INDEX:
+		case MITHRILGATHERINGBONUS_INDEX:
+		case LUMBERGATHERINGBONUS_INDEX:
+		case STONEGATHERINGBONUS_INDEX:
+		case COALGATHERINGBONUS_INDEX:
+		case JEWELRYGATHERINGBONUS_INDEX:
+		case FURNITUREGATHERINGBONUS_INDEX:
+		case LEATHERGATHERINGBONUS_INDEX:
+		case GEMSGATHERINGBONUS_INDEX:
+			if (this->Container != nullptr && !SaveGameLoading) {
+				this->Container->update_garrisoned_gathering();
+			}
 			break;
 		default:
 			break;
@@ -4896,6 +4943,10 @@ void UnitLost(CUnit &unit)
 			}
 			
 			player.DecreaseCountsForUnit(&unit);
+
+			if (unit.get_given_resource() != nullptr && unit.get_garrisoned_gathering_income() != 0) {
+				player.change_income(unit.get_given_resource(), -unit.get_garrisoned_gathering_income());
+			}
 			
 			if (unit.Variable[LEVELUP_INDEX].Value > 0) {
 				player.UpdateLevelUpUnits(); //recalculate level-up units, since this unit no longer should be in that vector

@@ -606,6 +606,8 @@ int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "units-boarded-count")) {
 			unit->BoardCount = LuaToNumber(l, 2, j + 1);
+		} else if (!strcmp(value, "garrisoned-gathering-income")) {
+			unit->garrisoned_gathering_income = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "units-contained")) {
 			int subargs;
 			int k;
@@ -978,7 +980,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		unit->Remove(transporter);
 		transporter->BoardCount += unit->Type->BoardSize;
 		unit->Boarded = 1;
-		transporter->UpdateContainerAttackRange();
+		transporter->update_for_transported_units();
 
 		UpdateForNewUnit(*unit, 0);
 

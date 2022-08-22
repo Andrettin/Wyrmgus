@@ -345,6 +345,10 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	file.printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 
+	if (unit.get_garrisoned_gathering_income() != 0) {
+		file.printf(" \"garrisoned-gathering-income\", %d,", unit.get_garrisoned_gathering_income());
+	}
+
 	//Wyrmgus start
 //	if (unit.has_units_inside()) {
 	if (unit.has_units_inside() && !(unit.get_character() != nullptr && unit.HasInventory())) { //don't save items for persistent heroes

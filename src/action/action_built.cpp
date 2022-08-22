@@ -243,11 +243,12 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 			worker->drop_out_on_side(LookingW, &unit);
 
-			// If we can harvest from the new building, do it.
+			//if we can harvest from the new building, do it
 			if (type.get_given_resource() != nullptr && worker->Type->get_resource_info(type.get_given_resource()) != nullptr) {
 				CommandResource(*worker, unit, 0);
 			}
-			// If we can reurn goods to a new depot, do it.
+
+			//if we can return goods to a new depot, do it
 			//Wyrmgus start
 //			if (worker->CurrentResource && worker->ResourcesHeld > 0 && type.CanStore[worker->CurrentResource]) {
 			if (worker->can_return_goods_to(&unit) && worker->ResourcesHeld > 0) {

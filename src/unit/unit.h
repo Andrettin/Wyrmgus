@@ -206,6 +206,14 @@ public:
 
 	std::vector<QPoint> get_tile_positions_in_distance_to(const QSize &target_size, const int min_distance, const int max_distance) const;
 
+	void update_for_transported_units()
+	{
+		this->update_garrisoned_gathering();
+		this->UpdateContainerAttackRange();
+	}
+
+	void update_garrisoned_gathering();
+
 	//Wyrmgus start
 	void UpdateContainerAttackRange();
 	void UpdateXPRequired();
@@ -541,6 +549,11 @@ public:
 	void remove_unit_inside(CUnit *unit)
 	{
 		std::erase(this->units_inside, unit);
+	}
+
+	int get_garrisoned_gathering_income() const
+	{
+		return this->garrisoned_gathering_income;
 	}
 
 	bool has_rally_point() const
@@ -1020,6 +1033,10 @@ public:
 		int Active = 0; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 
+private:
+	int garrisoned_gathering_income = 0;
+
+public:
 	//Wyrmgus start
 	std::vector<CUnit *> EquippedItems[static_cast<int>(wyrmgus::item_slot::count)];	/// Pointer to unit's equipped items, per slot
 	std::vector<CUnit *> SoldUnits;						/// units available for sale at this unit

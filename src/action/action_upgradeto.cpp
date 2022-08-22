@@ -355,8 +355,8 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		} else {
 			MapMarkUnitSight(unit);
 			//Wyrmgus start
-			//if unit has a container, update the container's attack range, as the unit's range may have been changed with the upgrade
-			container->UpdateContainerAttackRange();
+			//if unit has a container, update the container's properties which depend on transported units (e.g. container attack range), as they may have been changed with the upgrade
+			container->update_for_transported_units();
 			//Wyrmgus end
 		}
 	}
