@@ -870,8 +870,14 @@ void CommandDismiss(CUnit &unit, bool salvage)
 			unit.Player->AddCostsFactor(type_costs, unit.Variable[SALVAGEFACTOR_INDEX].Value * unit.Variable[HP_INDEX].Value / unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max));
 		}
 		DebugPrint("Suicide unit ... \n");
+
+		if (unit.has_units_inside()) {
+			DropOutAll(unit);
+		}
+
 		LetUnitDie(unit, true);
 	}
+
 	ClearSavedAction(unit);
 }
 
