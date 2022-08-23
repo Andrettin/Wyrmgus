@@ -491,7 +491,7 @@ extern void MapCclRegister();
 // mixed sources
 //
 /// Save a stratagus map (smp format)
-extern int SaveStratagusMap(const std::string &filename, CMap &map, const int writeTerrain);
+extern int SaveStratagusMap(const std::filesystem::path &filepath, CMap &map, const int writeTerrain);
 
 
 /// Load map presentation

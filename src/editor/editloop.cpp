@@ -72,6 +72,7 @@
 #include "util/assert_util.h"
 #include "util/enum_util.h"
 #include "util/log_util.h"
+#include "util/path_util.h"
 #include "util/point_util.h"
 #include "util/thread_pool.h"
 #include "util/util.h"
@@ -2380,7 +2381,10 @@ boost::asio::awaitable<void> CEditor::Init()
 */
 int EditorSaveMap(const std::string &file)
 {
-	if (SaveStratagusMap(file, *CMap::get(), CEditor::get()->TerrainEditable) == -1) {
+	std::filesystem::path filepath = path::from_string(file);
+	filepath.make_preferred();
+
+	if (SaveStratagusMap(filepath, *CMap::get(), CEditor::get()->TerrainEditable) == -1) {
 		log::log_error("Cannot save map.");
 		return -1;
 	}
