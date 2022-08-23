@@ -33,10 +33,12 @@
 class CAnimation_Die final : public CAnimation
 {
 public:
-	CAnimation_Die() : CAnimation(AnimationDie) {}
+	CAnimation_Die() : CAnimation(AnimationDie)
+	{
+	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Init(const char *s, animation_sequence *sequence);
 
 private:
 	std::string DeathType;

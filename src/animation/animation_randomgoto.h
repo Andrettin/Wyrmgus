@@ -33,12 +33,14 @@
 class CAnimation_RandomGoto final : public CAnimation
 {
 public:
-	CAnimation_RandomGoto() : CAnimation(AnimationRandomGoto) {}
+	CAnimation_RandomGoto() : CAnimation(AnimationRandomGoto)
+	{
+	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
-	virtual void Init(const char *s, lua_State *l) override;
+	virtual void Init(const char *s, animation_sequence *sequence) override;
 
 private:
 	int random = 0;
-	CAnimation *gotoLabel = nullptr;
+	const CAnimation *gotoLabel = nullptr;
 };

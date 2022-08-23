@@ -46,7 +46,9 @@ void CAnimation_RandomRotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 	}
 }
 
-void CAnimation_RandomRotate::Init(const char *s, lua_State *)
+void CAnimation_RandomRotate::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	this->rotate = std::stoi(s);
 }

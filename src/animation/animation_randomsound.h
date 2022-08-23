@@ -34,10 +34,12 @@
 class CAnimation_RandomSound final : public CAnimation
 {
 public:
-	CAnimation_RandomSound() : CAnimation(AnimationRandomSound) {}
+	CAnimation_RandomSound() : CAnimation(AnimationRandomSound)
+	{
+	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
-	virtual void Init(const char *s, lua_State *l) override;
+	virtual void Init(const char *s, animation_sequence *sequence) override;
 
 	void MapSound();
 

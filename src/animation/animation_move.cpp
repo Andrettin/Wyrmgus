@@ -41,7 +41,9 @@ void CAnimation_Move::Action(CUnit &unit, int &move, int /*scale*/) const
 	move = this->move;
 }
 
-void CAnimation_Move::Init(const char *s, lua_State *)
+void CAnimation_Move::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	this->move = std::stoi(s);
 }

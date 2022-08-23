@@ -50,8 +50,10 @@ void CAnimation_RandomSound::Action(CUnit &unit, int &/*move*/, int /*scale*/) c
 /*
 **  s = "Sound1 [SoundN ...]"
 */
-void CAnimation_RandomSound::Init(const char *s, lua_State *)
+void CAnimation_RandomSound::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	const std::string str(s);
 	const size_t len = str.size();
 

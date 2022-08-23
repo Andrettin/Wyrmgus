@@ -48,8 +48,10 @@ void CAnimation_RandomWait::Action(CUnit &unit, int &/*move*/, int /*scale*/) co
 /*
 ** s = "min_wait max_wait"
 */
-void CAnimation_RandomWait::Init(const char *s, lua_State *)
+void CAnimation_RandomWait::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	const std::vector<std::string> str_list = wyrmgus::string::split(s, ' ');
 
 	if (str_list.size() >= 2) {

@@ -44,8 +44,10 @@ void CAnimation_Sound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 	}
 }
 
-void CAnimation_Sound::Init(const char *s, lua_State *)
+void CAnimation_Sound::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	this->sound.Name = s;
 }
 

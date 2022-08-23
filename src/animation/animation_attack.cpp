@@ -40,7 +40,8 @@ void CAnimation_Attack::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 	unit.CurrentOrder()->OnAnimationAttack(unit);
 }
 
-void CAnimation_Attack::Init(const char *s, lua_State *)
+void CAnimation_Attack::Init(const char *s, animation_sequence *sequence)
 {
-	Q_UNUSED(s)
+	Q_UNUSED(s);
+	Q_UNUSED(sequence);
 }

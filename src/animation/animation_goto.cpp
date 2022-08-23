@@ -30,6 +30,7 @@
 
 #include "animation/animation_goto.h"
 
+#include "animation/animation_sequence.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"
 
@@ -40,7 +41,7 @@ void CAnimation_Goto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 	unit.Anim.Anim = this->gotoLabel;
 }
 
-void CAnimation_Goto::Init(const char *s, lua_State *)
+void CAnimation_Goto::Init(const char *s, animation_sequence *sequence)
 {
-	FindLabelLater(&this->gotoLabel, s);
+	sequence->find_label_later(&this->gotoLabel, s);
 }

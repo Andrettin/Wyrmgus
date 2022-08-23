@@ -188,9 +188,6 @@ void animation_set::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	Labels.clear();
-	LabelsLater.clear();
-
 	if (
 		tag == "start"
 		|| tag == "still"
@@ -208,7 +205,6 @@ void animation_set::process_gsml_scope(const gsml_data &scope)
 	) {
 		animation_sequence *animation_sequence = animation_sequence::add(this->get_identifier() + "_" + tag, this->get_module());
 		database::process_gsml_data(animation_sequence, scope);
-		FixLabels();
 
 		this->set_animations(tag, animation_sequence);
 	} else {

@@ -63,9 +63,6 @@
 #include "util/string_util.h"
 #include "util/util.h"
 
-std::vector<LabelsStruct> Labels;
-std::vector<LabelsLaterStruct> LabelsLater;
-
 /*----------------------------------------------------------------------------
 --  Animation
 ----------------------------------------------------------------------------*/
@@ -323,59 +320,11 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 }
 
 /**
-**  Add a label
-*/
-void AddLabel(CAnimation *anim, const std::string &name)
-{
-	LabelsStruct label;
-
-	label.Anim = anim;
-	label.Name = name;
-	Labels.push_back(label);
-}
-
-/**
-**  Find a label
-*/
-static CAnimation *FindLabel(const std::string &name)
-{
-	for (size_t i = 0; i < Labels.size(); ++i) {
-		if (Labels[i].Name == name) {
-			return Labels[i].Anim;
-		}
-	}
-
-	throw std::runtime_error("Label not found: " + name);
-}
-
-/**
-**  Find a label later
-*/
-void FindLabelLater(CAnimation **anim, const std::string &name)
-{
-	LabelsLaterStruct label;
-
-	label.Anim = anim;
-	label.Name = name;
-	LabelsLater.push_back(label);
-}
-
-/**
-**  Fix labels
-*/
-void FixLabels()
-{
-	for (size_t i = 0; i < LabelsLater.size(); ++i) {
-		*LabelsLater[i].Anim = FindLabel(LabelsLater[i].Name);
-	}
-}
-
-/**
 **  Parse an animation frame
 **
 **  @param str  string formated as "animationType extraArgs"
 */
-static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char *str)
+static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char *str, animation_sequence *animation_sequence)
 {
 	const std::string all(str);
 	const size_t len = all.size();
@@ -417,7 +366,7 @@ static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char 
 		anim = std::make_unique<CAnimation_Unbreakable>();
 	} else if (op1 == "label") {
 		anim = std::make_unique<CAnimation_Label>();
-		AddLabel(anim.get(), extraArg);
+		animation_sequence->add_label(anim.get(), extraArg);
 	} else if (op1 == "goto") {
 		anim = std::make_unique<CAnimation_Goto>();
 	} else if (op1 == "random-goto") {
@@ -426,7 +375,7 @@ static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char 
 		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
 	}
 
-	anim->Init(extraArg.c_str(), l);
+	anim->Init(extraArg.c_str(), animation_sequence);
 
 	return anim;
 }
@@ -434,7 +383,7 @@ static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char 
 /**
 **  Parse an animation
 */
-static std::vector<std::unique_ptr<CAnimation>> ParseAnimation(lua_State *l, int idx)
+static const animation_sequence *ParseAnimation(lua_State *l, const int idx, const animation_set *animation_set, const std::string &animation_type_str)
 {
 	if (!lua_istable(l, idx)) {
 		LuaError(l, "incorrect argument");
@@ -446,29 +395,29 @@ static std::vector<std::unique_ptr<CAnimation>> ParseAnimation(lua_State *l, int
 		return {};
 	}
 
-	Labels.clear();
-	LabelsLater.clear();
-
 	const char *str = LuaToString(l, idx, 1);
+
+	animation_sequence *animation_sequence = animation_sequence::add(animation_set->get_identifier() + "_" + string::lowered(animation_type_str), animation_set->get_module());
 
 	std::vector<std::unique_ptr<CAnimation>> animations;
 
-	animations.push_back(ParseAnimationFrame(l, str));
+	animations.push_back(ParseAnimationFrame(l, str, animation_sequence));
 	CAnimation *first_anim = animations.back().get();
 
 	CAnimation *prev = first_anim;
 	for (int j = 1; j < args; ++j) {
 		const char *secondary_str = LuaToString(l, idx, j + 1);
-		std::unique_ptr<CAnimation> anim = ParseAnimationFrame(l, secondary_str);
+		std::unique_ptr<CAnimation> anim = ParseAnimationFrame(l, secondary_str, animation_sequence);
 		prev->set_next(anim.get());
 		prev = anim.get();
 		animations.push_back(std::move(anim));
 	}
 
 	prev->set_next(first_anim);
-	FixLabels();
 
-	return animations;
+	animation_sequence->set_animations(std::move(animations));
+
+	return animation_sequence;
 }
 
 /**
@@ -490,9 +439,7 @@ int CclDefineAnimations(lua_State *l)
 	while (lua_next(l, 2)) {
 		const char *value = LuaToString(l, -2);
 
-		std::vector<std::unique_ptr<CAnimation>> animations = ParseAnimation(l, -1);
-		animation_sequence *animation_sequence = animation_sequence::add(anims->get_identifier() + "_" + string::lowered(value), anims->get_module());
-		animation_sequence->set_animations(std::move(animations));
+		const animation_sequence *animation_sequence = ParseAnimation(l, -1, anims, value);
 		const CAnimation *first_anim = animation_sequence->get_first_animation();
 
 		if (!strcmp(value, "Start")) {

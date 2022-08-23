@@ -33,10 +33,12 @@
 class CAnimation_RandomWait final : public CAnimation
 {
 public:
-	CAnimation_RandomWait() : CAnimation(AnimationRandomWait) {}
+	CAnimation_RandomWait() : CAnimation(AnimationRandomWait)
+	{
+	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
-	virtual void Init(const char *s, lua_State *l) override;
+	virtual void Init(const char *s, animation_sequence *sequence) override;
 
 private:
 	int min_wait = 0;

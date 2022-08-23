@@ -33,10 +33,12 @@
 class CAnimation_Unbreakable final : public CAnimation
 {
 public:
-	CAnimation_Unbreakable() : CAnimation(AnimationUnbreakable), state(0) {}
+	CAnimation_Unbreakable() : CAnimation(AnimationUnbreakable)
+	{
+	}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, animation_sequence *sequence) override;
 
 private:
 	bool state = false;

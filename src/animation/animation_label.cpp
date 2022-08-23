@@ -38,7 +38,8 @@ void CAnimation_Label::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 	assert_throw(unit.Anim.Anim == this);
 }
 
-void CAnimation_Label::Init(const char *s, lua_State *)
+void CAnimation_Label::Init(const char *s, animation_sequence *sequence)
 {
-	Q_UNUSED(s)
+	Q_UNUSED(s);
+	Q_UNUSED(sequence);
 }

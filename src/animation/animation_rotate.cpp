@@ -53,7 +53,9 @@ void CAnimation_Rotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 	UnitRotate(unit, this->rotate);
 }
 
-void CAnimation_Rotate::Init(const char *s, lua_State *)
+void CAnimation_Rotate::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	this->rotate = std::stoi(s);
 }

@@ -33,10 +33,12 @@
 class CAnimation_Move final : public CAnimation
 {
 public:
-	CAnimation_Move() : CAnimation(AnimationMove) {}
+	CAnimation_Move() : CAnimation(AnimationMove)
+	{
+	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
-	virtual void Init(const char *s, lua_State *l) override;
+	virtual void Init(const char *s, animation_sequence *sequence) override;
 
 private:
 	int move = 0;

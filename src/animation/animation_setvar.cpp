@@ -88,8 +88,10 @@ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 /*
 **  s = "var mod value [unitSlot]"
 */
-void CAnimation_SetVar::Init(const char *s, lua_State *)
+void CAnimation_SetVar::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	const std::string str(s);
 	const size_t len = str.size();
 

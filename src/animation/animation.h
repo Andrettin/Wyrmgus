@@ -36,6 +36,10 @@
 class CUnit;
 struct lua_State;
 
+namespace wyrmgus {
+	class animation_sequence;
+}
+
 enum AnimationType {
 	AnimationNone,
 	AnimationFrame,
@@ -79,16 +83,18 @@ class CAnimation
 public:
 	static inline std::vector<CAnimation *> animation_list;
 
-	explicit CAnimation(AnimationType type) : Type(type) {}
+	explicit CAnimation(const AnimationType type) : Type(type)
+	{
+	}
 
 	virtual ~CAnimation() {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const = 0;
 
-	virtual void Init(const char *s, lua_State *l = nullptr)
+	virtual void Init(const char *s, animation_sequence *sequence = nullptr)
 	{
-		Q_UNUSED(s)
-		Q_UNUSED(l)
+		Q_UNUSED(s);
+		Q_UNUSED(sequence);
 	}
 
 	const CAnimation *get_next() const
@@ -110,18 +116,6 @@ private:
 	const CAnimation *next = nullptr;
 };
 
-struct LabelsStruct {
-	CAnimation *Anim = nullptr;
-	std::string Name;
-};
-extern std::vector<LabelsStruct> Labels;
-
-struct LabelsLaterStruct {
-	CAnimation **Anim = nullptr;
-	std::string Name;
-};
-extern std::vector<LabelsLaterStruct> LabelsLater;
-
 extern void AnimationCclRegister();
 
 /// Handle the animation of a unit
@@ -131,7 +125,3 @@ extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 
 extern int ParseAnimInt(const CUnit &unit, const std::string &parseint);
 extern int ParseAnimFlags(const CUnit &unit, const char *parseflag);
-
-extern void AddLabel(CAnimation *anim, const std::string &name);
-extern void FindLabelLater(CAnimation **anim, const std::string &name);
-extern void FixLabels();

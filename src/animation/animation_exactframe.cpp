@@ -39,7 +39,9 @@ void CAnimation_ExactFrame::Action(CUnit &unit, int &/*move*/, int /*scale*/) co
 	unit.Frame = this->frame;
 }
 
-void CAnimation_ExactFrame::Init(const char *s, lua_State *)
+void CAnimation_ExactFrame::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	this->frame = std::stoi(s);
 }

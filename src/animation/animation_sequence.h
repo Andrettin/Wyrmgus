@@ -31,6 +31,18 @@
 
 class CAnimation;
 
+struct LabelsStruct final
+{
+	const CAnimation *Anim = nullptr;
+	std::string Name;
+};
+
+struct LabelsLaterStruct final
+{
+	const CAnimation **Anim = nullptr;
+	std::string Name;
+};
+
 namespace wyrmgus {
 
 class animation_sequence final : public data_entry, public data_type<animation_sequence>
@@ -57,8 +69,15 @@ public:
 		return this->animations.front().get();
 	}
 
+	void add_label(const CAnimation *anim, const std::string &name);
+	const CAnimation *find_label(const std::string &name) const;
+	void find_label_later(const CAnimation **anim, const std::string &name);
+	void fix_labels();
+
 private:
 	std::vector<std::unique_ptr<CAnimation>> animations;
+	std::vector<LabelsStruct> labels;
+	std::vector<LabelsLaterStruct> labels_later;
 };
 
 }

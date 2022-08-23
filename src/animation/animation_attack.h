@@ -38,6 +38,6 @@ public:
 	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
-	virtual void Init(const char *s, lua_State *l) override;
+	virtual void Init(const char *s, animation_sequence *sequence) override;
 
 };

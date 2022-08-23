@@ -30,6 +30,7 @@
 
 #include "animation/animation_randomgoto.h"
 
+#include "animation/animation_sequence.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"
 #include "util/string_util.h"
@@ -47,12 +48,12 @@ void CAnimation_RandomGoto::Action(CUnit &unit, int &/*move*/, int /*scale*/) co
 /*
 **  s : "percent label"
 */
-void CAnimation_RandomGoto::Init(const char *s, lua_State *)
+void CAnimation_RandomGoto::Init(const char *s, animation_sequence *sequence)
 {
 	const std::vector<std::string> str_list = string::split(s, ' ');
 
 	this->random = std::stoi(str_list.at(0));
 
 	const std::string &label = str_list.at(1);
-	FindLabelLater(&this->gotoLabel, label);
+	sequence->find_label_later(&this->gotoLabel, label);
 }

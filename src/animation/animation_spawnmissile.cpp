@@ -141,8 +141,10 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 /*
 **  s = "missileType startX startY destX destY [flag1[.flagN]] [missileoffset]"
 */
-void CAnimation_SpawnMissile::Init(const char *s, lua_State *)
+void CAnimation_SpawnMissile::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	const std::string str(s);
 	const size_t len = str.size();
 

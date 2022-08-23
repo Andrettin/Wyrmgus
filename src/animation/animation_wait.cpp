@@ -54,7 +54,9 @@ void CAnimation_Wait::Action(CUnit &unit, int &/*move*/, int scale) const
 	}
 }
 
-void CAnimation_Wait::Init(const char *s, lua_State *)
+void CAnimation_Wait::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	this->wait = std::stoi(s);
 }

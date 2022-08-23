@@ -41,7 +41,9 @@ void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 	UnitUpdateHeading(unit);
 }
 
-void CAnimation_Frame::Init(const char *s, lua_State *)
+void CAnimation_Frame::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	this->frame = std::stoi(s);
 }

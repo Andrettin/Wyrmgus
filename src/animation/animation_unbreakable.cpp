@@ -41,8 +41,10 @@ void CAnimation_Unbreakable::Action(CUnit &unit, int &/*move*/, int /*scale*/) c
 	unit.Anim.Unbreakable = this->state;
 }
 
-void CAnimation_Unbreakable::Init(const char *s, lua_State *)
+void CAnimation_Unbreakable::Init(const char *s, animation_sequence *sequence)
 {
+	Q_UNUSED(sequence);
+
 	if (!strcmp(s, "begin")) {
 		this->state = true;
 	} else if (!strcmp(s, "end")) {

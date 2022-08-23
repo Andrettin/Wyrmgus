@@ -30,6 +30,7 @@
 
 #include "animation/animation_ifvar.h"
 
+#include "animation/animation_sequence.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"
 #include "util/string_util.h"
@@ -83,8 +84,9 @@ void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 /*
 ** s = "leftOp Op rigthOp gotoLabel"
 */
-void CAnimation_IfVar::Init(const char *s, lua_State *)
+void CAnimation_IfVar::Init(const char *s, animation_sequence *sequence)
 {
+
 	const std::vector<std::string> str_list = wyrmgus::string::split(s, ' ');
 
 	this->leftVar = str_list.at(0);
@@ -133,5 +135,5 @@ void CAnimation_IfVar::Init(const char *s, lua_State *)
 
 	const std::string label = str_list.at(3);
 
-	FindLabelLater(&this->gotoLabel, label);
+	sequence->find_label_later(&this->gotoLabel, label);
 }

@@ -45,10 +45,12 @@ enum SpawnMissile_Flags {
 class CAnimation_SpawnMissile final : public CAnimation
 {
 public:
-	CAnimation_SpawnMissile() : CAnimation(AnimationSpawnMissile) {}
+	CAnimation_SpawnMissile() : CAnimation(AnimationSpawnMissile)
+	{
+	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
-	virtual void Init(const char *s, lua_State *l) override;
+	virtual void Init(const char *s, animation_sequence *sequence) override;
 
 private:
 	std::string missileTypeStr;

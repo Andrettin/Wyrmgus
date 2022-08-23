@@ -38,10 +38,10 @@ public:
 	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
-	virtual void Init(const char *s, lua_State *l) override;
+	virtual void Init(const char *s, animation_sequence *sequence) override;
 
 private:
-	SetVar_ModifyTypes mod;
+	SetVar_ModifyTypes mod = SetVar_ModifyTypes::modSet;
 	std::string var_str;
 	int value = 0;
 };

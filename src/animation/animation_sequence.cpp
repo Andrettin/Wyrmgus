@@ -119,7 +119,7 @@ void animation_sequence::process_gsml_property(const gsml_property &property)
 		anim = std::make_unique<CAnimation_Unbreakable>();
 	} else if (key == "label") {
 		anim = std::make_unique<CAnimation_Label>();
-		AddLabel(anim.get(), value);
+		this->add_label(anim.get(), value);
 	} else if (key == "goto") {
 		anim = std::make_unique<CAnimation_Goto>();
 	} else if (key == "random_goto") {
@@ -131,7 +131,7 @@ void animation_sequence::process_gsml_property(const gsml_property &property)
 
 	assert_throw(anim != nullptr);
 
-	anim->Init(value.c_str(), nullptr);
+	anim->Init(value.c_str(), this);
 
 	if (!this->animations.empty()) {
 		this->animations.back()->set_next(anim.get());
@@ -143,6 +143,8 @@ void animation_sequence::process_gsml_property(const gsml_property &property)
 void animation_sequence::initialize()
 {
 	assert_throw(!this->animations.empty());
+
+	this->fix_labels();
 
 	this->animations.back()->set_next(this->animations.front().get());
 
@@ -166,6 +168,47 @@ void animation_sequence::check() const
 void animation_sequence::set_animations(std::vector<std::unique_ptr<CAnimation>> &&animations)
 {
 	this->animations = std::move(animations);
+}
+
+void animation_sequence::add_label(const CAnimation *anim, const std::string &name)
+{
+	LabelsStruct label;
+
+	label.Anim = anim;
+	label.Name = name;
+
+	this->labels.push_back(std::move(label));
+}
+
+const CAnimation *animation_sequence::find_label(const std::string &name) const
+{
+	for (const LabelsStruct &label : this->labels) {
+		if (label.Name == name) {
+			return label.Anim;
+		}
+	}
+
+	throw std::runtime_error("Label not found: " + name);
+}
+
+void animation_sequence::find_label_later(const CAnimation **anim, const std::string &name)
+{
+	LabelsLaterStruct label;
+
+	label.Anim = anim;
+	label.Name = name;
+
+	this->labels_later.push_back(std::move(label));
+}
+
+void animation_sequence::fix_labels()
+{
+	for (LabelsLaterStruct &label_later : this->labels_later) {
+		*label_later.Anim = this->find_label(label_later.Name);
+	}
+
+	this->labels.clear();
+	this->labels_later.clear();
 }
 
 }

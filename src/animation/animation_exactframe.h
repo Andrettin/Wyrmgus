@@ -33,10 +33,12 @@
 class CAnimation_ExactFrame final : public CAnimation
 {
 public:
-	CAnimation_ExactFrame() : CAnimation(AnimationExactFrame) {}
+	CAnimation_ExactFrame() : CAnimation(AnimationExactFrame)
+	{
+	}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const override;
-	virtual void Init(const char *s, lua_State *l) override;
+	virtual void Init(const char *s, animation_sequence *sequence) override;
 
 	int get_frame() const
 	{
