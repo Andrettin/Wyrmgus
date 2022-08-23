@@ -55,7 +55,8 @@ void map_info::process_gsml_property(const gsml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "settings") {
-		this->settings = map_presets::get(value)->get_settings()->duplicate();
+		this->presets = map_presets::get(value);
+		this->settings = this->presets->get_settings()->duplicate();
 	} else {
 		database::process_gsml_property_for_object(this, property);
 	}
@@ -72,6 +73,8 @@ void map_info::process_gsml_scope(const gsml_data &scope)
 			this->player_types[i] = string_to_player_type(value);
 		}
 	} else if (tag == "settings") {
+		this->presets = nullptr;
+
 		this->settings = make_qunique<map_settings>();
 		if (QApplication::instance()->thread() != QThread::currentThread()) {
 			this->settings->moveToThread(QApplication::instance()->thread());
@@ -160,6 +163,8 @@ void map_info::reset()
 		this->settings->moveToThread(QApplication::instance()->thread());
 	}
 
+	this->presets = nullptr;
+
 	this->hidden = false;
 }
 
@@ -183,6 +188,7 @@ qunique_ptr<map_info> map_info::duplicate() const
 	info->MapUID = this->MapUID;
 	info->MapWorld = this->MapWorld;
 	info->settings = this->settings->duplicate();
+	info->presets = this->presets;
 
 	return info;
 }

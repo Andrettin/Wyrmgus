@@ -41,6 +41,7 @@ namespace wyrmgus {
 
 class gsml_data;
 class gsml_property;
+class map_presets;
 class map_settings;
 enum class player_type;
 
@@ -163,6 +164,11 @@ public:
 
 	void set_settings(qunique_ptr<map_settings> &&settings);
 
+	const map_presets *get_presets() const
+	{
+		return this->presets;
+	}
+
 	bool is_hidden() const
 	{
 		return this->hidden;
@@ -197,6 +203,7 @@ public:
 	std::string MapWorld = "Custom";
 private:
 	qunique_ptr<map_settings> settings;
+	const map_presets *presets = nullptr;
 	bool hidden = false;
 
 	friend int ::CclDefinePlayerTypes(lua_State *l);
