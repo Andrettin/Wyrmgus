@@ -41,6 +41,7 @@ class dialogue;
 class font;
 class font_color;
 class interface_style;
+class map_presets;
 class map_projection;
 class music;
 class player_color;
@@ -116,6 +117,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(int scaled_tile_height READ get_scaled_tile_height CONSTANT)
 	Q_PROPERTY(bool deselect_in_mine MEMBER deselect_in_mine READ is_deselect_in_mine_enabled)
 	Q_PROPERTY(int population_per_unit MEMBER population_per_unit READ get_population_per_unit)
+	Q_PROPERTY(wyrmgus::map_presets* map_editor_default_map_presets MEMBER map_editor_default_map_presets)
 	Q_PROPERTY(QString default_menu_background_file READ get_default_menu_background_file_qstring NOTIFY changed)
 	Q_PROPERTY(QStringList loading_background_files READ get_loading_background_files_qstring_list NOTIFY changed)
 	Q_PROPERTY(QStringList tips READ get_tips_qstring_list NOTIFY changed)
@@ -466,6 +468,11 @@ public:
 		return this->population_per_unit;
 	}
 
+	const map_presets *get_map_editor_default_map_presets() const
+	{
+		return this->map_editor_default_map_presets;
+	}
+
 	QString get_default_menu_background_file_qstring() const;
 	void set_default_menu_background_file(const std::filesystem::path &filepath);
 
@@ -582,6 +589,7 @@ private:
 	int destroyed_overlay_terrain_decay_threshold = 0;
 	bool deselect_in_mine = true; //deselect workers when they enter a mine
 	int population_per_unit = 0; //the number of people a unit represents
+	map_presets *map_editor_default_map_presets = nullptr;
 	std::filesystem::path default_menu_background_file;
 	std::vector<std::filesystem::path> loading_background_files;
 	std::vector<std::string> tips;

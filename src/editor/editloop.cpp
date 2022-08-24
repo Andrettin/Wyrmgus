@@ -2292,8 +2292,9 @@ boost::asio::awaitable<void> CEditor::Init()
 				//Wyrmgus end
 			}
 		}
-		//Wyrmgus start
+
 		GameSettings.Resources = SettingsPresetMapDefault;
+
 		//Wyrmgus start
 //		CreateGame("", &Map);
 		//Wyrmgus end

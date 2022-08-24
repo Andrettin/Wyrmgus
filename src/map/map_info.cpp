@@ -55,8 +55,7 @@ void map_info::process_gsml_property(const gsml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "settings") {
-		this->presets = map_presets::get(value);
-		this->settings = this->presets->get_settings()->duplicate();
+		this->set_presets(map_presets::get(value));
 	} else {
 		database::process_gsml_property_for_object(this, property);
 	}
@@ -246,6 +245,16 @@ int map_info::get_person_player_index() const
 void map_info::set_settings(qunique_ptr<map_settings> &&settings)
 {
 	this->settings = std::move(settings);
+}
+
+void map_info::set_presets(const map_presets *presets)
+{
+	if (presets == this->get_presets()) {
+		return;
+	}
+
+	this->presets = presets;
+	this->settings = this->presets->get_settings()->duplicate();
 }
 
 std::string map_info::get_text() const

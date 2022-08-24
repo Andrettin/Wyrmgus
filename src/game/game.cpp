@@ -1453,6 +1453,8 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 
 	if (current_campaign != nullptr && current_campaign->get_map_presets() != nullptr) {
 		CMap::get()->get_info()->set_settings(current_campaign->get_map_presets()->get_settings()->duplicate());
+	} else if (CEditor::get()->is_running() && CMap::get()->get_info()->get_presets() == nullptr && defines::get()->get_map_editor_default_map_presets() != nullptr) {
+		CMap::get()->get_info()->set_presets(defines::get()->get_map_editor_default_map_presets());
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {

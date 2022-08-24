@@ -169,6 +169,8 @@ public:
 		return this->presets;
 	}
 
+	void set_presets(const map_presets *presets);
+
 	bool is_hidden() const
 	{
 		return this->hidden;
