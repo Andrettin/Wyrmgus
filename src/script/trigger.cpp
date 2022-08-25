@@ -474,6 +474,8 @@ static int CclAddTrigger(lua_State *l)
 		fprintf(stderr, "Trigger \"%s\" has no conditions or no effects.\n", trigger->get_identifier().c_str());
 	}
 
+	trigger->set_campaign_only(false);
+
 	wyrmgus::game::get()->add_local_trigger(std::move(trigger));
 
 	return 0;

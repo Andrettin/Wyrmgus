@@ -103,6 +103,11 @@ public:
 		return this->campaign_only;
 	}
 
+	void set_campaign_only(const bool campaign_only)
+	{
+		this->campaign_only = campaign_only;
+	}
+
 	const QDateTime &get_historical_date() const
 	{
 		return this->historical_date;
@@ -131,7 +136,7 @@ public:
 	bool Local = false;
 private:
 	bool only_once = false; //whether the trigger should occur only once in a game
-	bool campaign_only = false; //whether the trigger should only occur in the campaign mode
+	bool campaign_only = true; //whether the trigger should only occur in the campaign mode
 	QDateTime historical_date;
 public:
 	std::unique_ptr<LuaCallback> Conditions;
