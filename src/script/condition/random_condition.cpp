@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,42 +24,22 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "script/condition/condition.h"
-#include "util/fractional_int.h"
+#include "script/condition/random_condition.h"
+
+#include "util/random.h"
 
 namespace wyrmgus {
 
 template <typename scope_type>
-class random_condition final : public condition<scope_type>
+bool random_condition<scope_type>::check(const scope_type *scope, const read_only_context &ctx) const
 {
-public:
-	explicit random_condition(const decimillesimal_int &chance) : chance(chance)
-	{
-	}
+	Q_UNUSED(scope);
+	Q_UNUSED(ctx);
 
-	explicit random_condition(const std::string &value) : random_condition(decimillesimal_int(value))
-	{
-	}
-
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override;
-
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
-	{
-		Q_UNUSED(indent);
-		Q_UNUSED(links_allowed);
-
-		return std::string();
-	}
-
-	virtual bool is_hidden() const override
-	{
-		return true;
-	}
-
-private:
-	decimillesimal_int chance;
-};
+	const int random_number = random::get()->generate(decimillesimal_int::divisor);
+	return this->chance.get_value() > random_number;
+}
 
 }

@@ -26,34 +26,23 @@
 
 #pragma once
 
-#include "quest/quest.h"
 #include "script/condition/condition.h"
-#include "util/string_util.h"
 
 namespace wyrmgus {
+
+class quest;
 
 class can_accept_quest_condition final : public condition<CPlayer>
 {
 public:
-	explicit can_accept_quest_condition(const std::string &value)
+	explicit can_accept_quest_condition(const wyrmgus::quest *quest) : quest(quest)
 	{
-		this->quest = quest::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(ctx);
+	explicit can_accept_quest_condition(const std::string &value);
 
-		return player->can_accept_quest(this->quest);
-	}
-
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
-	{
-		Q_UNUSED(indent);
-		Q_UNUSED(links_allowed);
-
-		return "Can accept the " + string::highlight(this->quest->get_name()) + " quest";
-	}
+	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override;
+	virtual std::string get_string(const size_t indent, const bool links_allowed) const override;
 
 private:
 	const wyrmgus::quest *quest = nullptr;

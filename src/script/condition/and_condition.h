@@ -34,7 +34,9 @@ template <typename scope_type>
 class and_condition final : public condition<scope_type>
 {
 public:
-	and_condition() {}
+	and_condition()
+	{
+	}
 
 	explicit and_condition(std::vector<std::unique_ptr<const condition<scope_type>>> &&conditions)
 		: conditions(std::move(conditions))
