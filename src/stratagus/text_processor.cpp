@@ -36,6 +36,7 @@
 #include "player/civilization.h"
 #include "player/faction.h"
 #include "player/player.h"
+#include "quest/quest.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_ref.h"
@@ -408,6 +409,14 @@ std::string text_processor::process_player_tokens(const CPlayer *player, std::qu
 		return this->process_faction_tokens(player->get_faction(), tokens);
 	} else if (front_subtoken == "last_created_unit") {
 		return this->process_unit_tokens(player->get_last_created_unit(), tokens);
+	} else if (front_subtoken == "quest_text") {
+		if (subtokens.empty()) {
+			throw std::runtime_error("No quest specified for the player \"quest_text\" token.");
+		}
+
+		const quest *quest = quest::get(queue::take(subtokens));
+
+		return player->get_quest_text(quest);
 	}
 
 	throw std::runtime_error("Failed to process player token \"" + front_subtoken + "\".");

@@ -397,6 +397,7 @@ public:
 	bool has_quest(const wyrmgus::quest *quest) const;
 	bool is_quest_completed(const wyrmgus::quest *quest) const;
 	QStringList get_objective_strings() const;
+	std::string get_quest_text(const quest *quest) const;
 
 	void on_unit_built(const CUnit *unit);
 	void on_unit_destroyed(const CUnit *unit);

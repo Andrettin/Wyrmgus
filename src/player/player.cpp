@@ -3230,13 +3230,6 @@ void CPlayer::update_quest_pool()
 void CPlayer::on_available_quests_changed()
 {
 	if (this == CPlayer::GetThisPlayer()) {
-		read_only_context script_ctx;
-		script_ctx.source_player = this;
-		script_ctx.current_player = this;
-
-		text_processing_context text_processing_ctx(script_ctx);
-		const text_processor text_processor(std::move(text_processing_ctx));
-
 		for (button *button : button::get_all()) {
 			if (button->Action != ButtonCmd::Quest || button->Value >= static_cast<int>(this->available_quests.size())) {
 				continue;
@@ -3245,43 +3238,7 @@ void CPlayer::on_available_quests_changed()
 			const quest *quest = this->available_quests[button->Value];
 			button->Hint = "Quest: " + quest->get_name();
 
-			button->Description = text_processor.process_text(quest->get_description(), true);
-
-			button->Description += "\n \nObjectives:";
-			for (const auto &objective : quest->get_objectives()) {
-				button->Description += "\n- ";
-				if (!objective->get_objective_string().empty()) {
-					button->Description += objective->get_objective_string();
-				} else {
-					button->Description += objective->generate_objective_string(this);
-				}
-			}
-			for (const std::string &objective_string : quest->get_objective_strings()) {
-				button->Description += "\n" + objective_string;
-			}
-			const std::string rewards_string = quest->get_rewards_string(this);
-			if (!rewards_string.empty()) {
-				button->Description += "\n \nRewards:\n" + rewards_string;
-			}
-
-			if (!quest->get_hint().empty()) {
-				button->Description += "\n \nHint: " + text_processor.process_text(quest->get_hint(), true);
-			}
-
-			if (quest->get_highest_completed_difficulty() > difficulty::none) {
-				std::string highest_completed_difficulty;
-				if (quest->get_highest_completed_difficulty() == difficulty::easy) {
-					highest_completed_difficulty = "Easy";
-				} else if (quest->get_highest_completed_difficulty() == difficulty::normal) {
-					highest_completed_difficulty = "Normal";
-				} else if (quest->get_highest_completed_difficulty() == difficulty::hard) {
-					highest_completed_difficulty = "Hard";
-				} else if (quest->get_highest_completed_difficulty() == difficulty::brutal) {
-					highest_completed_difficulty = "Brutal";
-				}
-				button->Description += "\n \nHighest Completed Difficulty: " + highest_completed_difficulty;
-			}
-			
+			button->Description = this->get_quest_text(quest);
 		}
 		
 		if (!Selected.empty() && Selected[0]->Type->BoolFlag[TOWNHALL_INDEX].value) {
@@ -3588,6 +3545,55 @@ QStringList CPlayer::get_objective_strings() const
 	}
 
 	return objective_strings;
+}
+
+std::string CPlayer::get_quest_text(const quest *quest) const
+{
+	read_only_context script_ctx;
+	script_ctx.source_player = this;
+	script_ctx.current_player = this;
+
+	text_processing_context text_processing_ctx(script_ctx);
+	const text_processor text_processor(std::move(text_processing_ctx));
+
+	std::string text = text_processor.process_text(quest->get_description(), true);
+
+	text += "\n\nObjectives:";
+	for (const auto &objective : quest->get_objectives()) {
+		text += "\n- ";
+		if (!objective->get_objective_string().empty()) {
+			text += objective->get_objective_string();
+		} else {
+			text += objective->generate_objective_string(this);
+		}
+	}
+	for (const std::string &objective_string : quest->get_objective_strings()) {
+		text += "\n" + objective_string;
+	}
+	const std::string rewards_string = quest->get_rewards_string(this);
+	if (!rewards_string.empty()) {
+		text += "\n\nRewards:\n" + rewards_string;
+	}
+
+	if (!quest->get_hint().empty()) {
+		text += "\n\nHint: " + text_processor.process_text(quest->get_hint(), true);
+	}
+
+	if (quest->get_highest_completed_difficulty() > difficulty::none) {
+		std::string highest_completed_difficulty;
+		if (quest->get_highest_completed_difficulty() == difficulty::easy) {
+			highest_completed_difficulty = "Easy";
+		} else if (quest->get_highest_completed_difficulty() == difficulty::normal) {
+			highest_completed_difficulty = "Normal";
+		} else if (quest->get_highest_completed_difficulty() == difficulty::hard) {
+			highest_completed_difficulty = "Hard";
+		} else if (quest->get_highest_completed_difficulty() == difficulty::brutal) {
+			highest_completed_difficulty = "Brutal";
+		}
+		text += "\n \nHighest Completed Difficulty: " + highest_completed_difficulty;
+	}
+
+	return text;
 }
 
 void CPlayer::on_unit_built(const CUnit *unit)
