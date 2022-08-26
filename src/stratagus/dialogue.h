@@ -86,6 +86,8 @@ public:
 		throw std::runtime_error("Invalid dialogue node for dialogue \"" + this->get_identifier() + "\": \"" + identifier + "\".");
 	}
 
+	void add_node(std::unique_ptr<dialogue_node> &&node);
+
 	const dialogue_option *get_option(const std::string &identifier) const
 	{
 		const auto find_iterator = this->options_by_identifier.find(identifier);

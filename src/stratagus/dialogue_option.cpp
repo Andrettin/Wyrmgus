@@ -37,11 +37,16 @@
 #include "script/context.h"
 #include "script/effect/effect_list.h"
 #include "text_processor.h"
+#include "util/assert_util.h"
 #include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 
 namespace wyrmgus {
+
+dialogue_option::dialogue_option()
+{
+}
 
 dialogue_option::dialogue_option(const dialogue_node *node) : node(node)
 {
@@ -111,6 +116,8 @@ void dialogue_option::initialize()
 
 void dialogue_option::check() const
 {
+	assert_throw(this->node != nullptr);
+
 	if (this->ends_dialogue() && this->get_next_node() != nullptr) {
 		throw std::runtime_error("Dialogue option is set to end the dialogue at the same time that it has a next node set for it.");
 	}
@@ -123,6 +130,15 @@ void dialogue_option::check() const
 dialogue *dialogue_option::get_dialogue() const
 {
 	return this->node->get_dialogue();
+}
+
+void dialogue_option::add_effect(std::unique_ptr<effect<CPlayer>> &&effect)
+{
+	if (this->effects == nullptr) {
+		this->effects = std::make_unique<effect_list<CPlayer>>();
+	}
+
+	this->effects->add_effect(std::move(effect));
 }
 
 void dialogue_option::do_effects(CPlayer *player, context &ctx) const

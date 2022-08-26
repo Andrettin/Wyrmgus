@@ -41,6 +41,9 @@ class gsml_property;
 struct context;
 
 template <typename scope_type>
+class effect;
+
+template <typename scope_type>
 class effect_list;
 
 class dialogue_option final
@@ -49,6 +52,7 @@ public:
 	static constexpr const char *default_name = "Continue";
 	static constexpr const char *default_hotkey = "c";
 
+	dialogue_option();
 	explicit dialogue_option(const dialogue_node *node);
 	~dialogue_option();
 
@@ -62,12 +66,22 @@ public:
 		return this->name;
 	}
 
+	void set_name(const std::string &name)
+	{
+		this->name = name;
+	}
+
 	const std::string &get_hotkey() const
 	{
 		return this->hotkey;
 	}
 
 	dialogue *get_dialogue() const;
+
+	void set_node(dialogue_node *node)
+	{
+		this->node = node;
+	}
 
 	const dialogue_node *get_next_node() const
 	{
@@ -79,7 +93,9 @@ public:
 		return this->end_dialogue;
 	}
 
+	void add_effect(std::unique_ptr<effect<CPlayer>> &&effect);
 	void do_effects(CPlayer *player, context &ctx) const;
+
 	std::string get_tooltip(const context &ctx) const;
 
 	void delete_lua_callbacks();

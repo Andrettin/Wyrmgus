@@ -53,6 +53,7 @@ class and_condition;
 class dialogue_node final
 {
 public:
+	dialogue_node();
 	explicit dialogue_node(wyrmgus::dialogue *dialogue, const int index);
 	~dialogue_node();
 
@@ -66,25 +67,48 @@ public:
 		return this->dialogue;
 	}
 
+	void set_dialogue(wyrmgus::dialogue *dialogue)
+	{
+		this->dialogue = dialogue;
+	}
+
 	int get_index() const
 	{
 		return this->index;
 	}
 
-	void add_option(std::unique_ptr<dialogue_option> &&option)
+	void set_index(const int index)
 	{
-		this->option_pointers.push_back(option.get());
-		this->options.push_back(std::move(option));
+		this->index = index;
 	}
+
+	void add_option(std::unique_ptr<dialogue_option> &&option);
 
 	void call(CPlayer *player, context &ctx) const;
 	void option_effect(const int option_index, CPlayer *player, context &ctx) const;
 
 	const CUnit *get_speaker_unit() const;
 	std::string get_title_string(const CUnit *speaker_unit) const;
+
+	void set_title(const std::string &title)
+	{
+		this->title = title;
+	}
+
 	const wyrmgus::icon *get_icon(const CUnit *speaker_unit) const;
+
+	void set_icon(const wyrmgus::icon *icon)
+	{
+		this->icon = icon;
+	}
+
 	const wyrmgus::player_color *get_player_color(const CUnit *speaker_unit) const;
 	std::string get_text(const context &ctx) const;
+
+	void set_text(const std::string &text)
+	{
+		this->text = text;
+	}
 
 	void delete_lua_callbacks();
 

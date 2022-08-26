@@ -55,6 +55,10 @@
 
 namespace wyrmgus {
 
+dialogue_node::dialogue_node()
+{
+}
+
 dialogue_node::dialogue_node(wyrmgus::dialogue *dialogue, const int index) : dialogue(dialogue), index(index)
 {
 }
@@ -119,6 +123,9 @@ void dialogue_node::initialize()
 
 void dialogue_node::check() const
 {
+	assert_throw(this->get_dialogue() != nullptr);
+	assert_throw(this->get_index() != -1);
+
 	for (const std::unique_ptr<dialogue_option> &option : this->options) {
 		option->check();
 	}
@@ -126,6 +133,14 @@ void dialogue_node::check() const
 	if (this->conditions != nullptr) {
 		this->conditions->check_validity();
 	}
+}
+
+void dialogue_node::add_option(std::unique_ptr<dialogue_option> &&option)
+{
+	option->set_node(this);
+
+	this->option_pointers.push_back(option.get());
+	this->options.push_back(std::move(option));
 }
 
 void dialogue_node::call(CPlayer *player, context &ctx) const

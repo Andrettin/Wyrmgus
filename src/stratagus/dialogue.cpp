@@ -102,6 +102,13 @@ void dialogue::check() const
 	}
 }
 
+void dialogue::add_node(std::unique_ptr<dialogue_node> &&node)
+{
+	node->set_dialogue(this);
+	node->set_index(static_cast<int>(this->nodes.size()));
+	this->nodes.push_back(std::move(node));
+}
+
 void dialogue::map_option(const dialogue_option *option, const std::string &identifier)
 {
 	if (identifier.empty()) {
