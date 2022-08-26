@@ -98,6 +98,16 @@ public:
 
 	std::string get_tooltip(const context &ctx) const;
 
+	int get_ai_weight() const
+	{
+		return this->ai_weight;
+	}
+
+	void set_ai_weight(const int ai_weight)
+	{
+		this->ai_weight = ai_weight;
+	}
+
 	void delete_lua_callbacks();
 
 private:
@@ -110,6 +120,7 @@ private:
 	std::unique_ptr<effect_list<CPlayer>> effects;
 	std::unique_ptr<LuaCallback> lua_effects;
 	std::string tooltip;
+	int ai_weight = 1;
 
 	friend int ::CclDefineDialogue(lua_State *l);
 };

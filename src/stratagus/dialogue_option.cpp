@@ -73,6 +73,8 @@ void dialogue_option::process_gsml_property(const gsml_property &property)
 		this->end_dialogue = string::to_bool(value);
 	} else if (key == "tooltip") {
 		this->tooltip = value;
+	} else if (key == "ai_weight") {
+		this->ai_weight = std::stoi(value);
 	} else {
 		throw std::runtime_error("Invalid dialogue option property: \"" + key + "\".");
 	}

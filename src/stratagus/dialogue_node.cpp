@@ -169,7 +169,20 @@ void dialogue_node::call(CPlayer *player, context &ctx) const
 	if (player != CPlayer::GetThisPlayer()) {
 		if ((player->AiEnabled || player->get_type() != player_type::person) && !this->option_pointers.empty()) {
 			//AIs will choose a random option
-			const int option_index = static_cast<int>(random::get()->generate(this->option_pointers.size()));
+
+			std::vector<int> option_indexes;
+
+			for (size_t i = 0; i < this->option_pointers.size(); ++i) {
+				const dialogue_option *option = this->option_pointers[i];
+
+				for (int j = 0; j < option->get_ai_weight(); ++j) {
+					option_indexes.push_back(static_cast<int>(i));
+				}
+			}
+
+			assert_throw(!option_indexes.empty());
+
+			const int option_index = vector::get_random(option_indexes);
 			this->dialogue->call_node_option_effect(this->get_index(), option_index, player, ctx);
 		}
 

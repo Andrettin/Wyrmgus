@@ -250,6 +250,7 @@ void quest::initialize()
 
 		auto decline_option = std::make_unique<wyrmgus::dialogue_option>();
 		decline_option->set_name("Decline");
+		decline_option->set_ai_weight(0); //AI players always accept the quests they get
 		dialogue_node->add_option(std::move(decline_option));
 
 		dialogue->add_node(std::move(dialogue_node));

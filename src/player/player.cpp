@@ -3590,7 +3590,7 @@ std::string CPlayer::get_quest_text(const quest *quest) const
 		} else if (quest->get_highest_completed_difficulty() == difficulty::brutal) {
 			highest_completed_difficulty = "Brutal";
 		}
-		text += "\n \nHighest Completed Difficulty: " + highest_completed_difficulty;
+		text += "\n\nHighest Completed Difficulty: " + highest_completed_difficulty;
 	}
 
 	return text;
