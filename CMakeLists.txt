@@ -377,7 +377,9 @@ set(script_condition_SRCS
 source_group(script\\condition FILES ${script_condition_SRCS})
 
 set(script_effect_SRCS
+	src/script/effect/accept_quest_effect.cpp
 	src/script/effect/delayed_effect_instance.cpp
+	src/script/effect/call_dialogue_effect.cpp
 	src/script/effect/effect.cpp
 	src/script/effect/effect_list.cpp
 )

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,50 +24,34 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "script/effect/effect.h"
+#include "script/effect/accept_quest_effect.h"
 
-class CPlayer;
-class CUnit;
+#include "player/player.h"
+#include "quest/quest.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
-class dialogue;
-
-template <typename scope_type>
-class call_dialogue_effect final : public effect<scope_type>
+accept_quest_effect::accept_quest_effect(wyrmgus::quest *quest)
+	: accept_quest_effect(quest, gsml_operator::assignment)
 {
-public:
-	explicit call_dialogue_effect(const wyrmgus::dialogue *dialogue, const gsml_operator effect_operator)
-		: effect<scope_type>(effect_operator), dialogue(dialogue)
-	{
-		this->dialogue = dialogue;
-	}
+}
 
-	explicit call_dialogue_effect(const wyrmgus::dialogue *dialogue);
-	explicit call_dialogue_effect(const std::string &dialogue_identifier, const gsml_operator effect_operator);
+accept_quest_effect::accept_quest_effect(const std::string &quest_identifier, const gsml_operator effect_operator)
+	: accept_quest_effect(quest::get(quest_identifier), effect_operator)
+{
+}
 
-	virtual const std::string &get_class_identifier() const override
-	{
-		static const std::string class_identifier = "call_dialogue";
-		return class_identifier;
-	}
+void accept_quest_effect::do_assignment_effect(CPlayer *player) const
+{
+	player->accept_quest(this->quest);
+}
 
-	virtual void do_assignment_effect(scope_type *scope, context &ctx) const override;
-
-	virtual std::string get_assignment_string() const override;
-
-	virtual bool is_hidden() const override
-	{
-		return true;
-	}
-
-private:
-	const wyrmgus::dialogue *dialogue = nullptr;
-};
-
-extern template class call_dialogue_effect<CPlayer>;
-extern template class call_dialogue_effect<CUnit>;
+std::string accept_quest_effect::get_assignment_string() const
+{
+	return "Receive the " + string::highlight(this->quest->get_name()) + " quest";
+}
 
 }

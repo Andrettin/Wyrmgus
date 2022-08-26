@@ -26,21 +26,22 @@
 
 #pragma once
 
-#include "player/player.h"
-#include "quest/quest.h"
 #include "script/effect/effect.h"
-#include "util/string_util.h"
 
 namespace wyrmgus {
+
+class quest;
 
 class accept_quest_effect final : public effect<CPlayer>
 {
 public:
-	explicit accept_quest_effect(const std::string &quest_identifier, const gsml_operator effect_operator)
-		: effect(effect_operator)
+	explicit accept_quest_effect(wyrmgus::quest *quest, const gsml_operator effect_operator)
+		: effect(effect_operator), quest(quest)
 	{
-		this->quest = quest::get(quest_identifier);
 	}
+
+	explicit accept_quest_effect(wyrmgus::quest *quest);
+	explicit accept_quest_effect(const std::string &quest_identifier, const gsml_operator effect_operator);
 
 	virtual const std::string &get_class_identifier() const override
 	{
@@ -48,15 +49,8 @@ public:
 		return class_identifier;
 	}
 
-	virtual void do_assignment_effect(CPlayer *player) const override
-	{
-		player->accept_quest(this->quest);
-	}
-
-	virtual std::string get_assignment_string() const override
-	{
-		return "Receive the " + string::highlight(this->quest->get_name()) + " quest";
-	}
+	virtual void do_assignment_effect(CPlayer *player) const override;
+	virtual std::string get_assignment_string() const override;
 
 private:
 	wyrmgus::quest *quest = nullptr;

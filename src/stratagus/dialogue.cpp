@@ -72,7 +72,7 @@ void dialogue::process_gsml_scope(const gsml_data &scope)
 		database::process_gsml_data(trigger, scope);
 
 		//add an effect to call this dialogue to the trigger
-		auto dialogue_effect = std::make_unique<call_dialogue_effect<CPlayer>>(this, gsml_operator::assignment);
+		auto dialogue_effect = std::make_unique<call_dialogue_effect<CPlayer>>(this);
 		trigger->add_effect(std::move(dialogue_effect));
 	} else {
 		auto node = std::make_unique<dialogue_node>(this, static_cast<int>(this->nodes.size()));
