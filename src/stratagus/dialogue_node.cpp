@@ -178,8 +178,11 @@ void dialogue_node::call(CPlayer *player, context &ctx) const
 
 	const CUnit *speaker_unit = this->get_speaker_unit();
 
-	const QString title_str = QString::fromStdString(this->get_title_string(speaker_unit));
-	const QString text = QString::fromStdString(this->get_text(ctx));
+	text_processing_context text_ctx(ctx);
+	const text_processor text_processor(std::move(text_ctx));
+
+	const QString title_str = QString::fromStdString(this->get_title_string(speaker_unit, text_processor));
+	const QString text = QString::fromStdString(this->get_text(text_processor));
 
 	const wyrmgus::icon *icon = this->get_icon(speaker_unit);
 
@@ -261,7 +264,7 @@ const CUnit *dialogue_node::get_speaker_unit() const
 	return nullptr;
 }
 
-std::string dialogue_node::get_title_string(const CUnit *speaker_unit) const
+std::string dialogue_node::get_title_string(const CUnit *speaker_unit, const text_processor &text_processor) const
 {
 	if (speaker_unit != nullptr) {
 		std::string unit_name = speaker_unit->get_full_name();
@@ -276,7 +279,16 @@ std::string dialogue_node::get_title_string(const CUnit *speaker_unit) const
 		return this->speaker->get_full_name();
 	}
 
-	return this->title;
+	std::string title;
+
+	try {
+		title = text_processor.process_text(this->title, true);
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		title = this->title;
+	}
+
+	return title;
 }
 
 const wyrmgus::icon *dialogue_node::get_icon(const CUnit *speaker_unit) const
@@ -308,11 +320,8 @@ const wyrmgus::player_color *dialogue_node::get_player_color(const CUnit *speake
 	return defines::get()->get_neutral_player_color();
 }
 
-std::string dialogue_node::get_text(const context &ctx) const
+std::string dialogue_node::get_text(const text_processor &text_processor) const
 {
-	text_processing_context text_ctx(ctx);
-	const text_processor text_processor(std::move(text_ctx));
-
 	std::string text;
 
 	try {

@@ -44,6 +44,7 @@ class gsml_property;
 class icon;
 class player_color;
 class sound;
+class text_processor;
 class unit_type;
 struct context;
 
@@ -88,7 +89,8 @@ public:
 	void option_effect(const int option_index, CPlayer *player, context &ctx) const;
 
 	const CUnit *get_speaker_unit() const;
-	std::string get_title_string(const CUnit *speaker_unit) const;
+
+	std::string get_title_string(const CUnit *speaker_unit, const text_processor &text_processor) const;
 
 	void set_title(const std::string &title)
 	{
@@ -103,7 +105,8 @@ public:
 	}
 
 	const wyrmgus::player_color *get_player_color(const CUnit *speaker_unit) const;
-	std::string get_text(const context &ctx) const;
+
+	std::string get_text(const text_processor &text_processor) const;
 
 	void set_text(const std::string &text)
 	{
