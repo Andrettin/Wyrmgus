@@ -131,6 +131,8 @@ public:
 		return this->conditions;
 	}
 
+	void add_condition(std::unique_ptr<condition<CPlayer>> &&condition);
+
 	const std::unique_ptr<effect_list<CPlayer>> &get_effects() const
 	{
 		return this->effects;

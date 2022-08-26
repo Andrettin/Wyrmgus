@@ -721,6 +721,15 @@ void trigger::check() const
 	}
 }
 
+void trigger::add_condition(std::unique_ptr<condition<CPlayer>> &&condition)
+{
+	if (this->conditions == nullptr) {
+		this->conditions = std::make_unique<and_condition<CPlayer>>();
+	}
+
+	this->conditions->add_condition(std::move(condition));
+}
+
 void trigger::add_effect(std::unique_ptr<effect<CPlayer>> &&effect)
 {
 	if (this->effects == nullptr) {
