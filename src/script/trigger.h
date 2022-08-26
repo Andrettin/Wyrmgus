@@ -45,6 +45,9 @@ namespace wyrmgus {
 	enum class trigger_target;
 
 	template <typename scope_type>
+	class and_condition;
+
+	template <typename scope_type>
 	class condition;
 
 	template <typename scope_type>
@@ -113,12 +116,12 @@ public:
 		return this->historical_date;
 	}
 
-	const std::unique_ptr<condition<CPlayer>> &get_preconditions() const
+	const std::unique_ptr<and_condition<CPlayer>> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	const std::unique_ptr<condition<CPlayer>> &get_conditions() const
+	const std::unique_ptr<and_condition<CPlayer>> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -142,8 +145,8 @@ public:
 	std::unique_ptr<LuaCallback> Conditions;
 	std::unique_ptr<LuaCallback> Effects;
 private:
-	std::unique_ptr<condition<CPlayer>> preconditions;
-	std::unique_ptr<condition<CPlayer>> conditions;
+	std::unique_ptr<and_condition<CPlayer>> preconditions;
+	std::unique_ptr<and_condition<CPlayer>> conditions;
 	std::unique_ptr<effect_list<CPlayer>> effects;
 };
 
