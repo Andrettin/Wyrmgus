@@ -31,6 +31,9 @@
 #include "database/data_module.h"
 #include "database/database.h"
 #include "database/gsml_parser.h"
+#include "dialogue.h"
+#include "dialogue_node.h"
+#include "dialogue_option.h"
 #include "game/difficulty.h"
 #include "game/game.h"
 #include "iocompat.h"
@@ -43,8 +46,14 @@
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "script/condition/and_condition.h"
+#include "script/condition/can_accept_quest_condition.h"
+#include "script/condition/random_condition.h"
 #include "script/context.h"
+#include "script/effect/accept_quest_effect.h"
+#include "script/effect/call_dialogue_effect.h"
 #include "script/effect/effect_list.h"
+#include "script/trigger.h"
+#include "script/trigger_target.h"
 #include "script.h"
 #include "text_processor.h"
 #include "util/exception_util.h"
@@ -214,6 +223,41 @@ void quest::initialize()
 {
 	if (!this->is_hidden() && this->civilization != nullptr && !vector::contains(this->civilization->Quests, this)) {
 		this->civilization->Quests.push_back(this);
+	}
+
+	if (!this->is_hidden() && !this->is_unobtainable()) {
+		//create a trigger and dialogue for the quest
+		wyrmgus::trigger *trigger = trigger::add("quest_" + this->get_identifier(), this->get_module());
+		trigger->set_target(trigger_target::player);
+		trigger->set_only_once(true);
+
+		static const decimillesimal_int random_chance("0.01");
+
+		trigger->add_condition(std::make_unique<random_condition<CPlayer>>(random_chance));
+		trigger->add_condition(std::make_unique<can_accept_quest_condition>(this));
+
+		wyrmgus::dialogue *dialogue = dialogue::add("quest_" + this->get_identifier(), this->get_module());
+
+		auto dialogue_node = std::make_unique<wyrmgus::dialogue_node>();
+		dialogue_node->set_title("Quest: " + this->get_name());
+		dialogue_node->set_text("[player.quest_text:" + this->get_identifier() + "]");
+		dialogue_node->set_icon(this->get_icon());
+
+		auto accept_option = std::make_unique<wyrmgus::dialogue_option>();
+		accept_option->set_name("Accept");
+		accept_option->add_effect(std::make_unique<accept_quest_effect>(this));
+		dialogue_node->add_option(std::move(accept_option));
+
+		auto decline_option = std::make_unique<wyrmgus::dialogue_option>();
+		decline_option->set_name("Decline");
+		dialogue_node->add_option(std::move(decline_option));
+
+		dialogue->add_node(std::move(dialogue_node));
+
+		trigger->add_effect(std::make_unique<call_dialogue_effect<CPlayer>>(dialogue));
+
+		dialogue->initialize();
+		trigger->initialize();
 	}
 
 	data_entry::initialize();
