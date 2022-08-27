@@ -185,7 +185,7 @@ void InitModules()
 	InitUpgrades();
 
 	InitButtons();
-	wyrmgus::trigger::InitActiveTriggers();
+	trigger::InitActiveTriggers();
 
 	InitAiModule();
 

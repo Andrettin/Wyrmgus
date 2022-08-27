@@ -37,32 +37,32 @@ class LuaCallback;
 struct lua_State;
 
 namespace wyrmgus {
-	class dynasty;
-	class faction;
-	class resource;
-	class tile;
-	class unit_type;
-	enum class trigger_target;
 
-	template <typename scope_type>
-	class and_condition;
+class dynasty;
+class faction;
+class resource;
+class tile;
+class unit_type;
+enum class trigger_target;
+enum class trigger_type;
 
-	template <typename scope_type>
-	class condition;
+template <typename scope_type>
+class and_condition;
 
-	template <typename scope_type>
-	class effect;
+template <typename scope_type>
+class condition;
 
-	template <typename scope_type>
-	class effect_list;
-}
+template <typename scope_type>
+class effect;
 
-namespace wyrmgus {
+template <typename scope_type>
+class effect_list;
 
 class trigger final : public data_entry, public data_type<trigger>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::trigger_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::trigger_target target MEMBER target READ get_target)
 	Q_PROPERTY(bool only_once MEMBER only_once READ fires_only_once)
 	Q_PROPERTY(bool campaign_only MEMBER campaign_only READ is_campaign_only)
@@ -85,6 +85,16 @@ public:
 	
 	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void check() const override;
+
+	trigger_type get_type() const
+	{
+		return this->type;
+	}
+
+	void set_type(const trigger_type type)
+	{
+		this->type = type;
+	}
 
 	trigger_target get_target() const
 	{
@@ -136,6 +146,7 @@ public:
 	void add_effect(std::unique_ptr<effect<CPlayer>> &&effect);
 
 private:
+	trigger_type type;
 	trigger_target target;
 public:
 	bool Local = false;

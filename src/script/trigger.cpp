@@ -50,6 +50,7 @@
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
 #include "script/trigger_target.h"
+#include "script/trigger_type.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
@@ -683,7 +684,7 @@ void trigger::ClearActiveTriggers()
 }
 
 trigger::trigger(const std::string &identifier)
-	: data_entry(identifier), target(trigger_target::neutral_player)
+	: data_entry(identifier), type(trigger_type::default_trigger), target(trigger_target::neutral_player)
 {
 }
 
