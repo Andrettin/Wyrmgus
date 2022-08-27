@@ -64,6 +64,7 @@ class trigger final : public data_entry, public data_type<trigger>
 
 	Q_PROPERTY(wyrmgus::trigger_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::trigger_target target MEMBER target READ get_target)
+	Q_PROPERTY(int random_weight MEMBER random_weight READ get_random_weight)
 	Q_PROPERTY(bool only_once MEMBER only_once READ fires_only_once)
 	Q_PROPERTY(bool campaign_only MEMBER campaign_only READ is_campaign_only)
 	Q_PROPERTY(QDateTime historical_date MEMBER historical_date READ get_historical_date)
@@ -104,6 +105,16 @@ public:
 	void set_target(const trigger_target target)
 	{
 		this->target = target;
+	}
+
+	int get_random_weight() const
+	{
+		return this->random_weight;
+	}
+
+	void set_random_weight(const int weight)
+	{
+		this->random_weight = weight;
 	}
 
 	bool fires_only_once() const
@@ -148,6 +159,7 @@ public:
 private:
 	trigger_type type;
 	trigger_target target;
+	int random_weight = 0;
 public:
 	bool Local = false;
 private:
