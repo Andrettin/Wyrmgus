@@ -788,9 +788,11 @@ bool trigger::is_player_valid_target(const CPlayer *player) const
 			return player->is_neutral_player();
 		case trigger_target::player_or_neutral_player:
 			return true;
+		default:
+			assert_throw(false);
 	}
 
-	assert_throw(false);
+	return false;
 }
 
 bool trigger::check_for_player(CPlayer *player) const
