@@ -233,7 +233,7 @@ void quest::initialize()
 	if (!this->is_hidden() && !this->is_unobtainable()) {
 		//create a trigger and dialogue for the quest
 		wyrmgus::trigger *trigger = trigger::add("quest_" + this->get_identifier(), this->get_module());
-		trigger->set_type(trigger_type::minute_pulse);
+		trigger->set_type(trigger_type::half_minute_pulse);
 		trigger->set_target(trigger_target::player);
 		trigger->set_random_weight(100);
 
