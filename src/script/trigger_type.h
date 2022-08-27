@@ -30,6 +30,7 @@ namespace wyrmgus {
 
 enum class trigger_type {
 	default_trigger, //check the trigger in its cycle
+	half_minute_pulse,
 	minute_pulse
 };
 
@@ -37,6 +38,8 @@ inline trigger_type string_to_trigger_type(const std::string &str)
 {
 	if (str == "default") {
 		return trigger_type::default_trigger;
+	} else if (str == "half_minute_pulse") {
+		return trigger_type::half_minute_pulse;
 	} else if (str == "minute_pulse") {
 		return trigger_type::minute_pulse;
 	}

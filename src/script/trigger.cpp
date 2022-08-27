@@ -608,38 +608,18 @@ void TriggersEachCycle()
 			trigger::CurrentTriggerId = 0;
 		}
 
+		if (GameCycle % CYCLES_PER_HALF_MINUTE == 0) {
+			trigger::half_minute_pulse_random_offset = random::get()->generate(CYCLES_PER_HALF_MINUTE);
+		}
+		if ((GameCycle + trigger::half_minute_pulse_random_offset) % CYCLES_PER_HALF_MINUTE == 0) {
+			trigger::check_triggers(trigger_type::half_minute_pulse);
+		}
+
 		if (GameCycle % CYCLES_PER_MINUTE == 0) {
 			trigger::minute_pulse_random_offset = random::get()->generate(CYCLES_PER_MINUTE);
 		}
-
 		if ((GameCycle + trigger::minute_pulse_random_offset) % CYCLES_PER_MINUTE == 0) {
-			//trigger one out of the random triggers for this pulse, for each player
-			for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
-				if (player->get_type() == player_type::nobody) {
-					continue;
-				}
-
-				if (!player->is_alive()) {
-					continue;
-				}
-
-				std::vector<trigger *> triggers = trigger::active_triggers[trigger_type::minute_pulse];
-				for (const trigger *trigger : triggers) {
-					trigger->check_for_player(player.get());
-				}
-
-				std::vector<const trigger *> random_triggers = trigger::active_random_triggers[trigger_type::minute_pulse];
-
-				while (!random_triggers.empty()) {
-					const trigger *trigger = vector::get_random(random_triggers);
-
-					if (trigger->check_for_player(player.get())) {
-						break;
-					}
-
-					std::erase(random_triggers, trigger);
-				}
-			}
+			trigger::check_triggers(trigger_type::minute_pulse);
 		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error executing the per cycle actions for triggers."));
@@ -697,6 +677,7 @@ void trigger::InitActiveTriggers()
 		}
 	}
 
+	trigger::half_minute_pulse_random_offset = random::get()->generate(CYCLES_PER_HALF_MINUTE);
 	trigger::minute_pulse_random_offset = random::get()->generate(CYCLES_PER_MINUTE);
 }
 
@@ -720,6 +701,42 @@ void trigger::ClearActiveTriggers()
 		quest->CurrentCompleted = false;
 	}
 	//Wyrmgus end
+}
+
+void trigger::check_triggers(const trigger_type type)
+{
+	for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
+		if (player->get_type() == player_type::nobody) {
+			continue;
+		}
+
+		if (!player->is_alive()) {
+			continue;
+		}
+
+		trigger::check_triggers_for_player(player.get(), type);
+	}
+}
+
+void trigger::check_triggers_for_player(CPlayer *player, const trigger_type type)
+{
+	std::vector<trigger *> triggers = trigger::active_triggers[type];
+	for (const trigger *trigger : triggers) {
+		trigger->check_for_player(player);
+	}
+
+	//trigger one out of the random triggers for this pulse, for each player
+	std::vector<const trigger *> random_triggers = trigger::active_random_triggers[type];
+
+	while (!random_triggers.empty()) {
+		const trigger *trigger = vector::get_random(random_triggers);
+
+		if (trigger->check_for_player(player)) {
+			break;
+		}
+
+		std::erase(random_triggers, trigger);
+	}
 }
 
 trigger::trigger(const std::string &identifier)

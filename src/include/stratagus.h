@@ -131,6 +131,7 @@ constexpr int FRAMES_PER_SECOND = 30;  // 1/30s
 /// Game cycles per second to simulate (original 30-40)
 constexpr int CYCLES_PER_SECOND = 30;  // 1/30s 0.33ms
 constexpr int CYCLES_PER_MINUTE = (CYCLES_PER_SECOND * 60);
+constexpr int CYCLES_PER_HALF_MINUTE = CYCLES_PER_MINUTE / 2;
 
 constexpr int CYCLES_PER_IN_GAME_HOUR = (CYCLES_PER_SECOND * 10); // every 10 seconds of gameplay = 1 hour for the purposes of in-game date/time
 
