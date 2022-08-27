@@ -128,7 +128,7 @@ class CPlayer final : public QObject
 
 public:
 	static constexpr int max_heroes = 4; //maximum heroes per player
-	static constexpr size_t max_current_quests = 4;
+	static constexpr size_t max_current_quests = 3;
 	static constexpr int base_speed_factor = 100;
 
 	static void SetThisPlayer(CPlayer *player);
