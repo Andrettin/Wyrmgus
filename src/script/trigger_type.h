@@ -30,12 +30,15 @@ namespace wyrmgus {
 
 enum class trigger_type {
 	default_trigger, //check the trigger in its cycle
+	minute_pulse
 };
 
 inline trigger_type string_to_trigger_type(const std::string &str)
 {
 	if (str == "default") {
 		return trigger_type::default_trigger;
+	} else if (str == "minute_pulse") {
+		return trigger_type::minute_pulse;
 	}
 
 	throw std::runtime_error("Invalid trigger type: \"" + str + "\".");

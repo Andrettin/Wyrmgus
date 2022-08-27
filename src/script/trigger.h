@@ -36,6 +36,9 @@ class CUpgrade;
 class LuaCallback;
 struct lua_State;
 
+extern int CclAddTrigger(lua_State *l);
+extern void TriggersEachCycle();
+
 namespace wyrmgus {
 
 class dynasty;
@@ -64,6 +67,7 @@ class trigger final : public data_entry, public data_type<trigger>
 
 	Q_PROPERTY(wyrmgus::trigger_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::trigger_target target MEMBER target READ get_target)
+	Q_PROPERTY(bool random READ is_random WRITE set_random)
 	Q_PROPERTY(int random_weight MEMBER random_weight READ get_random_weight)
 	Q_PROPERTY(bool only_once MEMBER only_once READ fires_only_once)
 	Q_PROPERTY(bool campaign_only MEMBER campaign_only READ is_campaign_only)
@@ -77,10 +81,17 @@ public:
 	static void InitActiveTriggers();	/// Setup triggers
 	static void ClearActiveTriggers();
 
-	static std::vector<trigger *> ActiveTriggers; //triggers that are active for the current game
+private:
+	static inline std::map<trigger_type, std::vector<trigger *>> active_triggers; //triggers that are active for the current game
+	static inline std::map<trigger_type, std::vector<const trigger *>> active_random_triggers;
+
+public:
 	static std::vector<std::string> DeactivatedTriggers;
 	static unsigned int CurrentTriggerId;
+private:
+	static inline int minute_pulse_random_offset = 0;
 
+public:
 	explicit trigger(const std::string &identifier);
 	~trigger();
 	
@@ -105,6 +116,24 @@ public:
 	void set_target(const trigger_target target)
 	{
 		this->target = target;
+	}
+
+	bool is_random() const
+	{
+		return this->get_random_weight() != 0;
+	}
+
+	void set_random(const bool random)
+	{
+		if (random == this->is_random()) {
+			return;
+		}
+
+		if (random) {
+			this->set_random_weight(1);
+		} else {
+			this->set_random_weight(0);
+		}
 	}
 
 	int get_random_weight() const
@@ -156,6 +185,9 @@ public:
 
 	void add_effect(std::unique_ptr<effect<CPlayer>> &&effect);
 
+	bool is_player_valid_target(const CPlayer *player) const;
+	bool check_for_player(CPlayer *player) const;
+
 private:
 	trigger_type type;
 	trigger_target target;
@@ -173,6 +205,9 @@ private:
 	std::unique_ptr<and_condition<CPlayer>> preconditions;
 	std::unique_ptr<and_condition<CPlayer>> conditions;
 	std::unique_ptr<effect_list<CPlayer>> effects;
+
+	friend int ::CclAddTrigger(lua_State *l);
+	friend void ::TriggersEachCycle();
 };
 
 }

@@ -55,6 +55,8 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/random.h"
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
 /// Some data accessible for script during the game.
@@ -62,7 +64,6 @@ TriggerDataType TriggerData;
 
 namespace wyrmgus {
 
-std::vector<trigger *> trigger::ActiveTriggers;
 std::vector<std::string> trigger::DeactivatedTriggers;
 unsigned int trigger::CurrentTriggerId = 0;
 
@@ -448,7 +449,7 @@ void ActionDraw()
 /**
 **  Add a trigger.
 */
-static int CclAddTrigger(lua_State *l)
+int CclAddTrigger(lua_State *l)
 {
 	LuaCheckArgs(l, 3);
 	
@@ -466,7 +467,7 @@ static int CclAddTrigger(lua_State *l)
 	
 	auto trigger = std::make_unique<wyrmgus::trigger>(trigger_ident);
 	trigger->Local = true;
-	wyrmgus::trigger::ActiveTriggers.push_back(trigger.get());
+	trigger::active_triggers[trigger->get_type()].push_back(trigger.get());
 	
 	trigger->Conditions = std::make_unique<LuaCallback>(l, 2);
 	trigger->Effects = std::make_unique<LuaCallback>(l, 3);
@@ -509,7 +510,9 @@ static int CclSetDeactivatedTriggers(lua_State *l)
 void TriggersEachCycle()
 {
 	try {
-		if (trigger::CurrentTriggerId >= trigger::ActiveTriggers.size()) {
+		std::vector<trigger *> &active_triggers = trigger::active_triggers[trigger_type::default_trigger];
+
+		if (trigger::CurrentTriggerId >= active_triggers.size()) {
 			trigger::CurrentTriggerId = 0;
 		}
 
@@ -520,8 +523,8 @@ void TriggersEachCycle()
 		game::get()->process_delayed_effects();
 
 		// go to the next trigger
-		if (trigger::CurrentTriggerId < trigger::ActiveTriggers.size()) {
-			trigger *current_trigger = trigger::ActiveTriggers[trigger::CurrentTriggerId];
+		if (trigger::CurrentTriggerId < active_triggers.size()) {
+			trigger *current_trigger = active_triggers[trigger::CurrentTriggerId];
 
 			bool removed_trigger = false;
 
@@ -535,7 +538,7 @@ void TriggersEachCycle()
 						current_trigger->Effects->run(1);
 						if (current_trigger->Effects->popBoolean() == false) {
 							trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
-							trigger::ActiveTriggers.erase(trigger::ActiveTriggers.begin() + trigger::CurrentTriggerId);
+							active_triggers.erase(active_triggers.begin() + trigger::CurrentTriggerId);
 							removed_trigger = true;
 							if (current_trigger->Local) {
 								game::get()->remove_local_trigger(current_trigger);
@@ -584,22 +587,13 @@ void TriggersEachCycle()
 				}
 
 				for (CPlayer *player : potential_target_players) {
-					if (!check_conditions(current_trigger, player)) {
-						continue;
-					}
-
-					triggered = true;
-					context ctx;
-					ctx.current_player = player;
-					current_trigger->get_effects()->do_effects(player, ctx);
-					if (current_trigger->fires_only_once()) {
+					triggered = current_trigger->check_for_player(player);
+					if (triggered && current_trigger->fires_only_once()) {
 						break;
 					}
 				}
 
 				if (triggered && current_trigger->fires_only_once()) {
-					trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
-					trigger::ActiveTriggers.erase(trigger::ActiveTriggers.begin() + trigger::CurrentTriggerId);
 					removed_trigger = true;
 					if (current_trigger->Local) {
 						game::get()->remove_local_trigger(current_trigger);
@@ -612,6 +606,40 @@ void TriggersEachCycle()
 			}
 		} else {
 			trigger::CurrentTriggerId = 0;
+		}
+
+		if (GameCycle % CYCLES_PER_MINUTE == 0) {
+			trigger::minute_pulse_random_offset = random::get()->generate(CYCLES_PER_MINUTE);
+		}
+
+		if ((GameCycle + trigger::minute_pulse_random_offset) % CYCLES_PER_MINUTE == 0) {
+			//trigger one out of the random triggers for this pulse, for each player
+			for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
+				if (player->get_type() == player_type::nobody) {
+					continue;
+				}
+
+				if (!player->is_alive()) {
+					continue;
+				}
+
+				std::vector<trigger *> triggers = trigger::active_triggers[trigger_type::minute_pulse];
+				for (const trigger *trigger : triggers) {
+					trigger->check_for_player(player.get());
+				}
+
+				std::vector<const trigger *> random_triggers = trigger::active_random_triggers[trigger_type::minute_pulse];
+
+				while (!random_triggers.empty()) {
+					const trigger *trigger = vector::get_random(random_triggers);
+
+					if (trigger->check_for_player(player.get())) {
+						break;
+					}
+
+					std::erase(random_triggers, trigger);
+				}
+			}
 		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error executing the per cycle actions for triggers."));
@@ -658,8 +686,18 @@ void trigger::InitActiveTriggers()
 			}
 		}
 
-		trigger::ActiveTriggers.push_back(trigger);
+		if (trigger->is_random()) {
+			std::vector<const wyrmgus::trigger *> &active_random_triggers = trigger::active_random_triggers[trigger->get_type()];
+
+			for (int i = 0; i < trigger->get_random_weight(); ++i) {
+				active_random_triggers.push_back(trigger);
+			}
+		} else {
+			trigger::active_triggers[trigger->get_type()].push_back(trigger);
+		}
 	}
+
+	trigger::minute_pulse_random_offset = random::get()->generate(CYCLES_PER_MINUTE);
 }
 
 void trigger::ClearActiveTriggers()
@@ -672,8 +710,9 @@ void trigger::ClearActiveTriggers()
 
 	trigger::CurrentTriggerId = 0;
 
-	wyrmgus::game::get()->clear_local_triggers();
-	trigger::ActiveTriggers.clear();
+	game::get()->clear_local_triggers();
+	trigger::active_triggers.clear();
+	trigger::active_random_triggers.clear();
 	trigger::DeactivatedTriggers.clear();
 	
 	//Wyrmgus start
@@ -738,6 +777,49 @@ void trigger::add_effect(std::unique_ptr<effect<CPlayer>> &&effect)
 	}
 
 	this->effects->add_effect(std::move(effect));
+}
+
+bool trigger::is_player_valid_target(const CPlayer *player) const
+{
+	switch (this->get_target()) {
+		case trigger_target::player:
+			return !player->is_neutral_player();
+		case trigger_target::neutral_player:
+			return player->is_neutral_player();
+		case trigger_target::player_or_neutral_player:
+			return true;
+	}
+
+	assert_throw(false);
+}
+
+bool trigger::check_for_player(CPlayer *player) const
+{
+	if (!this->is_player_valid_target(player)) {
+		return false;
+	}
+
+	if (!check_conditions(this, player)) {
+		return false;
+	}
+
+	context ctx;
+	ctx.current_player = player;
+	this->get_effects()->do_effects(player, ctx);
+
+	if (this->fires_only_once()) {
+		trigger::DeactivatedTriggers.push_back(this->get_identifier());
+
+		if (this->is_random()) {
+			std::vector<trigger *> &active_triggers = trigger::active_triggers[this->get_type()];
+			std::erase(active_triggers, this);
+		} else {
+			std::vector<const trigger *> &active_triggers = trigger::active_random_triggers[this->get_type()];
+			std::erase(active_triggers, this);
+		}
+	}
+
+	return true;
 }
 
 }
