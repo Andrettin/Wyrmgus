@@ -76,6 +76,11 @@ public:
 		return this->hotkey;
 	}
 
+	void set_hotkey(const std::string &hotkey)
+	{
+		this->hotkey = hotkey;
+	}
+
 	dialogue *get_dialogue() const;
 
 	void set_node(dialogue_node *node)

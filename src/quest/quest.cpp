@@ -251,11 +251,13 @@ void quest::initialize()
 
 		auto accept_option = std::make_unique<wyrmgus::dialogue_option>();
 		accept_option->set_name("Accept");
+		accept_option->set_hotkey("a");
 		accept_option->add_effect(std::make_unique<accept_quest_effect>(this));
 		dialogue_node->add_option(std::move(accept_option));
 
 		auto decline_option = std::make_unique<wyrmgus::dialogue_option>();
 		decline_option->set_name("Decline");
+		decline_option->set_hotkey("d");
 		decline_option->set_ai_weight(0); //AI players always accept the quests they get
 		decline_option->add_effect(std::make_unique<set_flag_effect>(decline_flag));
 		dialogue_node->add_option(std::move(decline_option));
