@@ -234,7 +234,7 @@ void quest::initialize()
 		wyrmgus::trigger *trigger = trigger::add("quest_" + this->get_identifier(), this->get_module());
 		trigger->set_target(trigger_target::player);
 
-		static const decimillesimal_int random_chance("0.01");
+		static const decimillesimal_int random_chance("0.025");
 
 		const player_flag *decline_flag = player_flag::add("quest_" + this->get_identifier() + "_declined", this->get_module());
 
