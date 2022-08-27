@@ -41,17 +41,21 @@
 #include "luacallback.h"
 #include "parameters.h"
 #include "player/civilization.h"
+#include "player/player_flag.h"
 #include "quest/achievement.h"
 #include "quest/objective/have_settlement_objective.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "script/condition/and_condition.h"
 #include "script/condition/can_accept_quest_condition.h"
+#include "script/condition/has_flag_condition.h"
+#include "script/condition/not_condition.h"
 #include "script/condition/random_condition.h"
 #include "script/context.h"
 #include "script/effect/accept_quest_effect.h"
 #include "script/effect/call_dialogue_effect.h"
 #include "script/effect/effect_list.h"
+#include "script/effect/set_flag_effect.h"
 #include "script/trigger.h"
 #include "script/trigger_target.h"
 #include "script.h"
@@ -229,12 +233,14 @@ void quest::initialize()
 		//create a trigger and dialogue for the quest
 		wyrmgus::trigger *trigger = trigger::add("quest_" + this->get_identifier(), this->get_module());
 		trigger->set_target(trigger_target::player);
-		trigger->set_only_once(true);
 
 		static const decimillesimal_int random_chance("0.01");
 
+		const player_flag *decline_flag = player_flag::add("quest_" + this->get_identifier() + "_declined", this->get_module());
+
 		trigger->add_condition(std::make_unique<random_condition<CPlayer>>(random_chance));
 		trigger->add_condition(std::make_unique<can_accept_quest_condition>(this));
+		trigger->add_condition(std::make_unique<not_condition<CPlayer>>(std::make_unique<has_flag_condition>(decline_flag)));
 
 		wyrmgus::dialogue *dialogue = dialogue::add("quest_" + this->get_identifier(), this->get_module());
 
@@ -251,6 +257,7 @@ void quest::initialize()
 		auto decline_option = std::make_unique<wyrmgus::dialogue_option>();
 		decline_option->set_name("Decline");
 		decline_option->set_ai_weight(0); //AI players always accept the quests they get
+		decline_option->add_effect(std::make_unique<set_flag_effect>(decline_flag));
 		dialogue_node->add_option(std::move(decline_option));
 
 		dialogue->add_node(std::move(dialogue_node));
