@@ -37,6 +37,7 @@
 #include "script/effect/call_dialogue_effect.h"
 #include "script/effect/center_on_site_effect.h"
 #include "script/effect/character_unit_effect.h"
+#include "script/effect/clear_flag_effect.h"
 #include "script/effect/complete_quest_effect.h"
 #include "script/effect/current_player_effect.h"
 #include "script/effect/current_unit_effect.h"
@@ -63,6 +64,7 @@
 #include "script/effect/resource_effect.h"
 #include "script/effect/scripted_effect_effect.h"
 #include "script/effect/set_as_current_effect.h"
+#include "script/effect/set_flag_effect.h"
 #include "script/effect/unique_effect.h"
 
 namespace wyrmgus {
@@ -79,6 +81,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_property(const
 			return std::make_unique<accept_quest_effect>(value, effect_operator);
 		} else if (key == "center_on_site") {
 			return std::make_unique<center_on_site_effect>(value, effect_operator);
+		} else if (key == "clear_flag") {
+			return std::make_unique<clear_flag_effect>(value, effect_operator);
 		} else if (key == "complete_quest") {
 			return std::make_unique<complete_quest_effect>(value, effect_operator);
 		} else if (key == "create_unit") {
@@ -87,6 +91,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_property(const
 			return std::make_unique<kill_character_effect>(value, effect_operator);
 		} else if (key == "remove_character") {
 			return std::make_unique<remove_character_effect>(value, effect_operator);
+		} else if (key == "set_flag") {
+			return std::make_unique<set_flag_effect>(value, effect_operator);
 		} else if (resource::try_get(key) != nullptr) {
 			return std::make_unique<resource_effect>(resource::get(key), value, effect_operator);
 		}

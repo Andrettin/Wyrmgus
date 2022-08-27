@@ -62,6 +62,7 @@
 #include "script/condition/faction_condition.h"
 #include "script/condition/faction_type_condition.h"
 #include "script/condition/government_type_condition.h"
+#include "script/condition/has_flag_condition.h"
 #include "script/condition/location_condition.h"
 #include "script/condition/near_site_condition.h"
 #include "script/condition/nearby_civilization_condition.h"
@@ -164,6 +165,8 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_pr
 			return std::make_unique<faction_type_condition>(value);
 		} else if (key == "government_type") {
 			return std::make_unique<government_type_condition>(value);
+		} else if (key == "has_flag") {
+			return std::make_unique<has_flag_condition>(value);
 		} else if (key == "neutral_faction") {
 			return std::make_unique<neutral_faction_condition>(value);
 		} else if (key == "quest") {

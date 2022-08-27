@@ -374,6 +374,7 @@ source_group(script FILES ${script_SRCS})
 set(script_condition_SRCS
 	src/script/condition/can_accept_quest_condition.cpp
 	src/script/condition/condition.cpp
+	src/script/condition/has_flag_condition.cpp
 	src/script/condition/random_condition.cpp
 	src/script/condition/scripted_condition.cpp
 )
@@ -385,6 +386,7 @@ set(script_effect_SRCS
 	src/script/effect/call_dialogue_effect.cpp
 	src/script/effect/effect.cpp
 	src/script/effect/effect_list.cpp
+	src/script/effect/set_flag_effect.cpp
 )
 source_group(script\\effect FILES ${script_effect_SRCS})
 
@@ -977,6 +979,7 @@ set(wyrmgus_script_condition_HDRS
 	src/script/condition/faction_condition.h
 	src/script/condition/faction_type_condition.h
 	src/script/condition/government_type_condition.h
+	src/script/condition/has_flag_condition.h
 	src/script/condition/location_condition.h
 	src/script/condition/near_site_condition.h
 	src/script/condition/nearby_civilization_condition.h
@@ -1023,6 +1026,7 @@ set(wyrmgus_script_effect_HDRS
 	src/script/effect/call_dialogue_effect.h
 	src/script/effect/center_on_site_effect.h
 	src/script/effect/character_unit_effect.h
+	src/script/effect/clear_flag_effect.h
 	src/script/effect/complete_quest_effect.h
 	src/script/effect/create_unit_effect.h
 	src/script/effect/current_player_effect.h
@@ -1055,6 +1059,7 @@ set(wyrmgus_script_effect_HDRS
 	src/script/effect/scripted_effect.h
 	src/script/effect/scripted_effect_effect.h
 	src/script/effect/set_as_current_effect.h
+	src/script/effect/set_flag_effect.h
 	src/script/effect/unique_effect.h
 )
 
