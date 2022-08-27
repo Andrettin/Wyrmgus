@@ -58,6 +58,7 @@
 #include "script/effect/set_flag_effect.h"
 #include "script/trigger.h"
 #include "script/trigger_target.h"
+#include "script/trigger_type.h"
 #include "script.h"
 #include "text_processor.h"
 #include "util/exception_util.h"
@@ -232,13 +233,12 @@ void quest::initialize()
 	if (!this->is_hidden() && !this->is_unobtainable()) {
 		//create a trigger and dialogue for the quest
 		wyrmgus::trigger *trigger = trigger::add("quest_" + this->get_identifier(), this->get_module());
+		trigger->set_type(trigger_type::minute_pulse);
 		trigger->set_target(trigger_target::player);
-
-		static const decimillesimal_int random_chance("0.025");
+		trigger->set_random_weight(100);
 
 		const player_flag *decline_flag = player_flag::add("quest_" + this->get_identifier() + "_declined", this->get_module());
 
-		trigger->add_condition(std::make_unique<random_condition<CPlayer>>(random_chance));
 		trigger->add_condition(std::make_unique<can_accept_quest_condition>(this));
 		trigger->add_condition(std::make_unique<not_condition<CPlayer>>(std::make_unique<has_flag_condition>(decline_flag)));
 
