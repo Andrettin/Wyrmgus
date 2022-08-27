@@ -57,7 +57,6 @@ enum class ButtonCmd {
 	Faction,		/// change faction
 	PotentialNeutralFaction,
 	Dynasty,		/// change dynasty
-	Quest,			/// receive quest
 	Buy,				/// buy item
 	ProduceResource,	/// produce a resource
 	SellResource,		/// sell a resource

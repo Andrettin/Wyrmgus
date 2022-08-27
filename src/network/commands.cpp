@@ -154,22 +154,6 @@ void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 }
 
 /**
-** Send command: Accept new quest for the unit's player.
-**
-** @param unit    pointer to unit.
-** @param pos     map tile position to move to.
-*/
-void SendCommandQuest(CUnit &unit, wyrmgus::quest *quest)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("quest", &unit, 0, 0, 0, NoUnitP, quest->get_identifier().c_str(), -1);
-		CommandQuest(unit, quest);
-	} else {
-		NetworkSendCommand(MessageCommandQuest, unit, quest->get_index(), 0, NoUnitP, nullptr, 0);
-	}
-}
-
-/**
 ** Send command: Buy an item from a building.
 **
 ** @param unit    pointer to unit.
@@ -1031,11 +1015,6 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 					   CUpgrade::get_all()[arg1]->get_identifier().c_str(), -1);
 			CommandLearnAbility(unit, *CUpgrade::get_all()[arg1]);
 			break;
-		case MessageCommandQuest: {
-			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, wyrmgus::quest::get_all()[arg1]->get_identifier().c_str(), -1);
-			CommandQuest(unit, wyrmgus::quest::get_all()[arg1]);
-			break;
-		}
 		case MessageCommandBuy: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);

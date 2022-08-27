@@ -844,9 +844,6 @@ boost::asio::awaitable<void> StartMap(const std::filesystem::path &filepath, con
 		//Wyrmgus end
 
 		for (CPlayer *player : CPlayer::get_non_neutral_players()) {
-			//update the quest pool for all players
-			player->update_quest_pool();
-
 			//recalculate the military score when starting the game
 			player->calculate_military_score();
 		}

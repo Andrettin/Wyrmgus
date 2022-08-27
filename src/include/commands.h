@@ -74,8 +74,6 @@ extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
 extern void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
 /// Prepare command pick up
 extern void CommandPickUp(CUnit &unit, CUnit &dest, int flush);
-/// Prepare command quest
-extern void CommandQuest(CUnit &unit, wyrmgus::quest *quest);
 /// Prepare command buy
 extern void CommandBuy(CUnit &unit, CUnit *sold_unit, int player);
 /// Prepare command produce resource
@@ -187,8 +185,6 @@ extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush, int z = 0)
 //Wyrmgus start
 /// Send rally point command
 extern void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
-/// Send quest command
-extern void SendCommandQuest(CUnit &unit, wyrmgus::quest *quest);
 /// Send buy command
 extern void SendCommandBuy(CUnit &unit, CUnit *sold_unit, int player);
 /// Send produce resource command

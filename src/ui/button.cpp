@@ -773,8 +773,6 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 			return "potential_neutral_faction";
 		case ButtonCmd::Dynasty:
 			return "dynasty";
-		case ButtonCmd::Quest:
-			return "quest";
 		case ButtonCmd::Buy:
 			return "buy";
 		case ButtonCmd::ProduceResource:
@@ -866,8 +864,6 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::PotentialNeutralFaction;
 	} else if (button_action == "dynasty") {
 		return ButtonCmd::Dynasty;
-	} else if (button_action == "quest") {
-		return ButtonCmd::Quest;
 	} else if (button_action == "buy") {
 		return ButtonCmd::Buy;
 	} else if (button_action == "produce_resource") {

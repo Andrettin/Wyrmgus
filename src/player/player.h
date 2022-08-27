@@ -128,7 +128,6 @@ class CPlayer final : public QObject
 
 public:
 	static constexpr int max_heroes = 4; //maximum heroes per player
-	static constexpr int max_quest_pool = 4;
 	static constexpr size_t max_current_quests = 4;
 	static constexpr int base_speed_factor = 100;
 
@@ -374,24 +373,16 @@ public:
 	void AutosellResource(const int resource);
 	void UpdateLevelUpUnits();
 
-	const std::vector<wyrmgus::quest *> &get_available_quests() const
-	{
-		return this->available_quests;
-	}
-
 	const std::vector<wyrmgus::quest *> &get_current_quests() const
 	{
 		return this->current_quests;
 	}
 
-	void update_quest_pool();
-	void on_available_quests_changed();
 	void update_current_quests();
 	void accept_quest(wyrmgus::quest *quest);
 	void complete_quest(wyrmgus::quest *quest);
 	void fail_quest(wyrmgus::quest *quest, const std::string &failure_reason_string = "");
 	void remove_current_quest(wyrmgus::quest *quest);
-	bool can_quest_be_available(const wyrmgus::quest *quest) const;
 	bool can_accept_quest(const wyrmgus::quest *quest) const;
 	bool check_quest_completion(const wyrmgus::quest *quest) const;
 	std::pair<bool, std::string> check_quest_failure(const wyrmgus::quest *quest) const;
@@ -1368,7 +1359,6 @@ public:
 	std::vector<CUnit *> Heroes;							/// hero units owned by this player
 	std::vector<const wyrmgus::deity *> Deities;			/// deities chosen by this player
 private:
-	std::vector<wyrmgus::quest *> available_quests;			/// quests available to this player
 	std::vector<wyrmgus::quest *> current_quests;			/// quests being pursued by this player
 	std::vector<const wyrmgus::quest *> completed_quests;	/// quests completed by this player
 	std::vector<std::unique_ptr<wyrmgus::player_quest_objective>> quest_objectives; //objectives of the player's current quests

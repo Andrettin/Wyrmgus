@@ -876,8 +876,6 @@ static void DoNextReplay()
 	//Wyrmgus start
 	} else if (!strcmp(action, "rally_point")) {
 		SendCommandRallyPoint(*unit, pos);
-	} else if (!strcmp(action, "quest")) {
-		SendCommandQuest(*unit, wyrmgus::quest::get(val));
 	} else if (!strcmp(action, "buy")) {
 		SendCommandBuy(*unit, dunit, num);
 	} else if (!strcmp(action, "produce_resource")) {

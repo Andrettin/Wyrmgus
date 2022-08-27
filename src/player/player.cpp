@@ -2850,7 +2850,6 @@ void CPlayer::Clear()
 	this->AiActiveUnitsByType.clear();
 	this->last_created_unit = nullptr;
 
-	this->available_quests.clear();
 	this->current_quests.clear();
 	this->completed_quests.clear();
 	this->AutosellResources.clear();
@@ -3193,77 +3192,6 @@ void CPlayer::UpdateLevelUpUnits()
 	}
 }
 
-void CPlayer::update_quest_pool()
-{
-	if (wyrmgus::game::get()->get_current_campaign() == nullptr) { // in-game quests only while playing the campaign mode
-		return;
-	}
-
-	if (this->get_faction() == nullptr) {
-		return;
-	}
-	
-	const bool exausted_available_quests = this->available_quests.empty();
-	
-	this->available_quests.clear();
-	
-	std::vector<wyrmgus::quest *> potential_quests;
-	for (wyrmgus::quest *quest : wyrmgus::quest::get_all()) {
-		if (this->can_quest_be_available(quest)) {
-			potential_quests.push_back(quest);
-		}
-	}
-	
-	for (int i = 0; i < CPlayer::max_quest_pool; ++i) { //fill the quest pool with quests up to the max quantity
-		if (potential_quests.empty()) {
-			break;
-		}
-
-		wyrmgus::quest *quest = wyrmgus::vector::take_random(potential_quests);
-		this->available_quests.push_back(quest);
-	}
-
-	this->on_available_quests_changed();
-
-	// notify the player when new quests are available (but only if the player has already exausted the quests available to him, so that they aren't bothered if they choose not to engage with the quest system)
-	if (this == CPlayer::GetThisPlayer() && GameCycle >= CYCLES_PER_MINUTE && this->available_quests.size() > 0 && exausted_available_quests && this->NumTownHalls > 0 && this->get_current_quests().size() < CPlayer::max_current_quests) {
-		CPlayer::GetThisPlayer()->Notify("%s", _("New quests available"));
-	}
-	
-	if (this->AiEnabled && this->NumTownHalls > 0) { // if is an AI player, accept all quests that it can
-		int available_quest_quantity = this->available_quests.size();
-		for (int i = (available_quest_quantity  - 1); i >= 0; --i) {
-			if (this->get_current_quests().size() >= CPlayer::max_current_quests) {
-				break;
-			}
-
-			if (this->can_accept_quest(this->available_quests[i])) { // something may have changed, so recheck if the player is able to accept the quest
-				this->accept_quest(this->available_quests[i]);
-			}
-		}
-	}
-}
-
-void CPlayer::on_available_quests_changed()
-{
-	if (this == CPlayer::GetThisPlayer()) {
-		for (button *button : button::get_all()) {
-			if (button->Action != ButtonCmd::Quest || button->Value >= static_cast<int>(this->available_quests.size())) {
-				continue;
-			}
-			
-			const quest *quest = this->available_quests[button->Value];
-			button->Hint = "Quest: " + quest->get_name();
-
-			button->Description = this->get_quest_text(quest);
-		}
-		
-		if (!Selected.empty() && Selected[0]->Type->BoolFlag[TOWNHALL_INDEX].value) {
-			UI.ButtonPanel.Update();
-		}
-	}
-}
-
 void CPlayer::update_current_quests()
 {
 	for (const auto &objective : this->get_quest_objectives()) {
@@ -3287,7 +3215,6 @@ void CPlayer::accept_quest(wyrmgus::quest *quest)
 		return;
 	}
 	
-	vector::remove(this->available_quests, quest);
 	this->current_quests.push_back(quest);
 	
 	for (const auto &quest_objective : quest->get_objectives()) {
@@ -3308,8 +3235,6 @@ void CPlayer::accept_quest(wyrmgus::quest *quest)
 		quest->get_accept_effects()->do_effects(this, ctx);
 	}
 
-	this->on_available_quests_changed();
-	
 	this->update_current_quests();
 
 	emit objective_strings_changed();
@@ -3399,15 +3324,6 @@ void CPlayer::remove_current_quest(wyrmgus::quest *quest)
 	}
 
 	emit objective_strings_changed();
-}
-
-bool CPlayer::can_quest_be_available(const wyrmgus::quest *quest) const
-{
-	if (quest->is_hidden() || quest->is_unobtainable()) {
-		return false;
-	}
-
-	return this->can_accept_quest(quest);
 }
 
 bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
@@ -4951,8 +4867,6 @@ void PlayersEachMinute(const int playerIdx)
 				settlement->get_game_data()->do_per_minute_loop();
 			}
 		}
-
-		player->update_quest_pool();
 
 		//we clear the list of recent trade partners here; this happens after the market item pools have been updated, so it's ok to do it here
 		player->clear_recent_trade_partners();

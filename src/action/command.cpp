@@ -400,21 +400,6 @@ void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
 }
 
 /**
-**  Accept new quest for unit's player
-**
-**  @param unit   pointer to unit.
-**  @param quest  quest.
-*/
-void CommandQuest(CUnit &unit, wyrmgus::quest *quest)
-{
-	if (IsUnitValidForNetwork(unit) == false) {
-		return;
-	}
-
-	unit.Player->accept_quest(quest);
-}
-
-/**
 **  Buy an item
 **
 **  @param unit   pointer to unit to buy from.

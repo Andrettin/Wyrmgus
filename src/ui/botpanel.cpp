@@ -1454,9 +1454,6 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 				res = (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->get_time_cost());
 			}
 			break;
-		case ButtonCmd::Quest:
-			res = buttonaction.Value < static_cast<int>(unit.Player->get_available_quests().size()) && unit.Player->get_current_quests().size() < CPlayer::max_current_quests && unit.Player->can_accept_quest(unit.Player->get_available_quests().at(buttonaction.Value));
-			break;
 		case ButtonCmd::Buy:
 			res = (buttonaction.Value != -1) && (&wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value) != nullptr);
 			if (res && wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value).get_character() != nullptr) {
@@ -1582,7 +1579,6 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 		case ButtonCmd::CancelUpgrade:
 		case ButtonCmd::CancelTrain:
 		case ButtonCmd::CancelBuild:
-		case ButtonCmd::Quest:
 		case ButtonCmd::ProduceResource:
 		case ButtonCmd::SellResource:
 		case ButtonCmd::BuyResource:
@@ -2281,18 +2277,6 @@ void CButtonPanel::DoClicked_Faction(int button)
 	}
 }
 
-void CButtonPanel::DoClicked_Quest(int button)
-{
-	const int index = CurrentButtons[button]->Value;
-	SendCommandQuest(*Selected[0], Selected[0]->Player->get_available_quests().at(index));
-	ButtonUnderCursor = -1;
-	OldButtonUnderCursor = -1;
-	LastDrawnButtonPopup = nullptr;
-	if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
-		SelectedUnitChanged();
-	}
-}
-
 void CButtonPanel::DoClicked_Buy(int button)
 {
 	resource_map<int> buy_costs;
@@ -2531,9 +2515,6 @@ void CButtonPanel::DoClicked(int button, const Qt::KeyboardModifiers key_modifie
 			break;
 		case ButtonCmd::PotentialNeutralFaction:
 			CPlayer::GetThisPlayer()->Notify(notification_type::yellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("Neutral factions spawn on their own."));
-			break;
-		case ButtonCmd::Quest:
-			DoClicked_Quest(button);
 			break;
 		case ButtonCmd::Buy:
 			DoClicked_Buy(button);
