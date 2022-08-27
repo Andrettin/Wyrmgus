@@ -3402,7 +3402,11 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 	if (quest->CurrentCompleted) {
 		return false;
 	}
-	
+
+	if (this->get_current_quests().size() >= CPlayer::max_current_quests) {
+		return false;
+	}
+
 	if (vector::contains(this->current_quests, quest) || vector::contains(this->completed_quests, quest)) {
 		return false;
 	}
