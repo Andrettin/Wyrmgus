@@ -45,6 +45,11 @@ public:
 
 	virtual std::string get_string(const size_t indent, const bool links_allowed) const override;
 
+	virtual bool is_hidden() const override
+	{
+		return true;
+	}
+
 private:
 	const player_flag *flag = nullptr;
 };

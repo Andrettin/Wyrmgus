@@ -60,6 +60,11 @@ public:
 		return "Clear the " + string::highlight(this->flag->get_name()) + " flag";
 	}
 
+	virtual bool is_hidden() const override
+	{
+		return true;
+	}
+
 private:
 	const player_flag *flag = nullptr;
 };

@@ -52,6 +52,11 @@ public:
 	virtual void do_assignment_effect(CPlayer *player) const override;
 	virtual std::string get_assignment_string() const override;
 
+	virtual bool is_hidden() const override
+	{
+		return true;
+	}
+
 private:
 	const player_flag *flag = nullptr;
 };
