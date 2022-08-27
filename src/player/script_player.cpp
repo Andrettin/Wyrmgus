@@ -60,6 +60,7 @@
 #include "player/faction_type.h"
 #include "player/government_type.h"
 #include "player/player_color.h"
+#include "player/player_flag.h"
 #include "player/player_type.h"
 #include "player/vassalage_type.h"
 #include "quest/player_quest_objective.h"
@@ -465,6 +466,17 @@ void CPlayer::Load(lua_State *l)
 				const int res = GetResourceIdByName(LuaToString(l, j + 1, k + 1));
 				if (res != -1) {
 					this->AutosellResources.push_back(res);
+				}
+			}
+		} else if (!strcmp(value, "flags")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				const player_flag *flag = player_flag::try_get(LuaToString(l, j + 1, k + 1));
+				if (flag != nullptr) {
+					this->set_flag(flag);
 				}
 			}
 		} else if (!strcmp(value, "timers")) {

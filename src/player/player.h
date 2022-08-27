@@ -30,6 +30,7 @@
 #include "map/landmass_container.h"
 #include "map/site_container.h"
 #include "player/player_container.h"
+#include "player/player_flag_container.h"
 #include "ui/icon.h"
 #include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
@@ -1255,6 +1256,21 @@ public:
 
 	void add_settlement_to_explored_territory(const site *settlement);
 
+	bool has_flag(const player_flag *flag) const
+	{
+		return this->flags.contains(flag);
+	}
+
+	void set_flag(const player_flag *flag)
+	{
+		this->flags.insert(flag);
+	}
+
+	void clear_flag(const player_flag *flag)
+	{
+		this->flags.erase(flag);
+	}
+
 signals:
 	void name_changed();
 	void type_changed();
@@ -1424,6 +1440,7 @@ private:
 	player_index_set mutual_shared_vision; //set of player indexes that this player has mutual shared vision with
 	player_set recent_trade_partners;
 	resource_set current_special_resources; //the special resources currently produced or stored by the player
+	player_flag_set flags;
 
 	friend void CleanPlayers();
 	friend void SetPlayersPalette();

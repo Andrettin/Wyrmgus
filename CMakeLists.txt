@@ -326,6 +326,7 @@ set(player_SRCS
 	src/player/player.cpp
 	src/player/player_color.cpp
 	src/player/player_container.cpp
+	src/player/player_flag_container.cpp
 	src/player/script_player.cpp
 )
 source_group(player FILES ${player_SRCS})
@@ -891,6 +892,8 @@ set(wyrmgus_player_HDRS
 	src/player/player.h
 	src/player/player_color.h
 	src/player/player_container.h
+	src/player/player_flag.h
+	src/player/player_flag_container.h
 	src/player/player_type.h
 	src/player/vassalage_type.h
 )

@@ -81,6 +81,7 @@
 #include "player/faction_history.h"
 #include "player/faction_type.h"
 #include "player/player_color.h"
+#include "player/player_flag.h"
 #include "player/player_type.h"
 #include "player/vassalage_type.h"
 #include "population/population_class.h"
@@ -859,7 +860,19 @@ void CPlayer::Save(CFile &file) const
 		file.printf("\"%s\",", DefaultResourceNames[p.AutosellResources[j]].c_str());
 	}
 	file.printf("},");
-	
+
+	file.printf("\n  \"flags\", {");
+	first = true;
+	for (const player_flag *flag : this->flags) {
+		if (first) {
+			first = false;
+		} else {
+			file.printf(", ");
+		}
+		file.printf("\"%s\"", flag->get_identifier().c_str());
+	}
+	file.printf("},");
+
 	// Allow saved by allow.
 
 	file.printf("\n  \"timers\", {");
@@ -2893,6 +2906,10 @@ void CPlayer::Clear()
 	this->cavalry_cost_modifier = 0;
 
 	this->Allow.Clear();
+
+	this->recent_trade_partners.clear();
+	this->current_special_resources.clear();
+	this->flags.clear();
 
 	emit diplomatic_stances_changed();
 	emit shared_vision_changed();
