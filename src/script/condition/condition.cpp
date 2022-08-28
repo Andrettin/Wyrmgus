@@ -332,6 +332,18 @@ bool condition<scope_type>::check(const scope_type *scope, const read_only_conte
 	switch (this->condition_operator) {
 		case gsml_operator::assignment:
 			return this->check_assignment(scope, ctx);
+		case gsml_operator::equality:
+			return this->check_equality(scope);
+		case gsml_operator::inequality:
+			return this->check_inequality(scope);
+		case gsml_operator::less_than:
+			return this->check_less_than(scope);
+		case gsml_operator::less_than_or_equality:
+			return this->check_less_than_or_equality(scope);
+		case gsml_operator::greater_than:
+			return this->check_greater_than(scope);
+		case gsml_operator::greater_than_or_equality:
+			return this->check_greater_than_or_equality(scope);
 		default:
 			throw std::runtime_error("Invalid condition operator: \"" + std::to_string(static_cast<int>(this->condition_operator)) + "\".");
 	}
@@ -343,6 +355,18 @@ std::string condition<scope_type>::get_string(const size_t indent, const bool li
 	switch (this->condition_operator) {
 		case gsml_operator::assignment:
 			return this->get_assignment_string(indent, links_allowed);
+		case gsml_operator::equality:
+			return this->get_equality_string();
+		case gsml_operator::inequality:
+			return this->get_inequality_string();
+		case gsml_operator::less_than:
+			return this->get_less_than_string();
+		case gsml_operator::less_than_or_equality:
+			return this->get_less_than_or_equality_string();
+		case gsml_operator::greater_than:
+			return this->get_greater_than_string();
+		case gsml_operator::greater_than_or_equality:
+			return this->get_greater_than_or_equality_string();
 		default:
 			throw std::runtime_error("Invalid condition operator: \"" + std::to_string(static_cast<int>(this->condition_operator)) + "\".");
 	}

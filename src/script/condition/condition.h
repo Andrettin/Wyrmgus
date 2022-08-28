@@ -130,8 +130,74 @@ public:
 	bool check(const scope_type *scope, const read_only_context &ctx) const;
 	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const = 0;
 
+	virtual bool check_equality(const scope_type *scope) const
+	{
+		Q_UNUSED(scope);
+
+		throw std::runtime_error("The equality operator is not supported for this condition.");
+	}
+
+	virtual bool check_inequality(const scope_type *scope) const
+	{
+		return !this->check_equality(scope);
+	}
+
+	virtual bool check_less_than(const scope_type *scope) const
+	{
+		Q_UNUSED(scope);
+
+		throw std::runtime_error("The less than operator is not supported for this condition.");
+	}
+
+	virtual bool check_less_than_or_equality(const scope_type *scope) const
+	{
+		return this->check_equality(scope) || this->check_less_than(scope);
+	}
+
+	virtual bool check_greater_than(const scope_type *scope) const
+	{
+		Q_UNUSED(scope);
+
+		throw std::runtime_error("The greater than operator is not supported for this condition.");
+	}
+
+	virtual bool check_greater_than_or_equality(const scope_type *scope) const
+	{
+		return this->check_equality(scope) || this->check_greater_than(scope);
+	}
+
 	std::string get_string(const size_t indent, const bool links_allowed) const;
 	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const = 0;
+
+	virtual std::string get_equality_string() const
+	{
+		throw std::runtime_error("The equality operator is not supported for this condition.");
+	}
+
+	virtual std::string get_inequality_string() const
+	{
+		throw std::runtime_error("The inequality operator is not supported for this condition.");
+	}
+
+	virtual std::string get_less_than_string() const
+	{
+		throw std::runtime_error("The less than operator is not supported for this condition.");
+	}
+
+	virtual std::string get_less_than_or_equality_string() const
+	{
+		throw std::runtime_error("The less than or equality operator is not supported for this condition.");
+	}
+
+	virtual std::string get_greater_than_string() const
+	{
+		throw std::runtime_error("The greater than operator is not supported for this condition.");
+	}
+
+	virtual std::string get_greater_than_or_equality_string() const
+	{
+		throw std::runtime_error("The greater than or equality operator is not supported for this condition.");
+	}
 
 	virtual bool is_hidden() const
 	{
