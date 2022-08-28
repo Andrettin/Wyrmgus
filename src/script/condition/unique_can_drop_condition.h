@@ -35,12 +35,13 @@ template <typename scope_type>
 class unique_can_drop_condition final : public condition<scope_type>
 {
 public:
-	explicit unique_can_drop_condition(const std::string &value)
+	explicit unique_can_drop_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
 	{
 		this->unique = unique_item::get(value);
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(scope);
 		Q_UNUSED(ctx);
@@ -48,9 +49,9 @@ public:
 		return this->unique->can_drop();
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
+		Q_UNUSED(indent);
 
 		return "Unique " + condition<scope_type>::get_object_string(this->unique, links_allowed) + " can appear";
 	}

@@ -36,6 +36,11 @@ namespace wyrmgus {
 class settlement_owner_condition final : public scope_condition<CUnit, CPlayer>
 {
 public:
+	explicit settlement_owner_condition(const gsml_operator condition_operator)
+		: scope_condition(condition_operator)
+	{
+	}
+
 	virtual const CPlayer *get_scope(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);

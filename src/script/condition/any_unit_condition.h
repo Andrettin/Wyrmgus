@@ -35,7 +35,12 @@ namespace wyrmgus {
 class any_unit_condition final : public scope_condition_base<CPlayer, CUnit>
 {
 public:
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	explicit any_unit_condition(const gsml_operator condition_operator)
+		: scope_condition_base(condition_operator)
+	{
+	}
+
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		for (const CUnit *unit : player->get_units()) {
 			if (unit->IsUnusable()) {

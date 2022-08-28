@@ -35,6 +35,11 @@ template <typename upper_scope_type>
 class any_player_condition final : public scope_condition_base<upper_scope_type, CPlayer>
 {
 public:
+	explicit any_player_condition(const gsml_operator condition_operator)
+		: scope_condition_base<upper_scope_type, CPlayer>(condition_operator)
+	{
+	}
+
 	bool check(const read_only_context &ctx) const
 	{
 		for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
@@ -48,7 +53,7 @@ public:
 		return false;
 	}
 
-	virtual bool check(const upper_scope_type *upper_scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const upper_scope_type *upper_scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(upper_scope);
 

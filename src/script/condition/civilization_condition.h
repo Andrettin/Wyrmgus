@@ -35,7 +35,8 @@ template <typename scope_type>
 class civilization_condition final : public condition<scope_type>
 {
 public:
-	explicit civilization_condition(const std::string &value)
+	explicit civilization_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
 	{
 		this->civilization = civilization::get(value);
 	}
@@ -45,14 +46,14 @@ public:
 		return civilization == this->civilization;
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
 		return this->check(scope->get_civilization());
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent);
 

@@ -125,52 +125,53 @@ template <typename scope_type>
 std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_scope(const gsml_data &scope)
 {
 	const std::string &effect_identifier = scope.get_tag();
+	const gsml_operator effect_operator = scope.get_operator();
 	std::unique_ptr<effect> effect;
 
 	if (effect_identifier == "character_unit") {
-		effect = std::make_unique<character_unit_effect<scope_type>>(scope.get_operator());
+		effect = std::make_unique<character_unit_effect<scope_type>>(effect_operator);
 	} else if (effect_identifier == "current_player") {
-		effect = std::make_unique<current_player_effect<scope_type>>(scope.get_operator());
+		effect = std::make_unique<current_player_effect<scope_type>>(effect_operator);
 	} else if (effect_identifier == "current_unit") {
-		effect = std::make_unique<current_unit_effect<scope_type>>(scope.get_operator());
+		effect = std::make_unique<current_unit_effect<scope_type>>(effect_operator);
 	} else if (effect_identifier == "delayed") {
-		effect = std::make_unique<delayed_effect<scope_type>>(scope.get_operator());
+		effect = std::make_unique<delayed_effect<scope_type>>(effect_operator);
 	} else if (effect_identifier == "for") {
-		effect = std::make_unique<for_effect<scope_type>>(scope.get_operator());
+		effect = std::make_unique<for_effect<scope_type>>(effect_operator);
 	} else if (effect_identifier == "hidden") {
-		effect = std::make_unique<hidden_effect<scope_type>>(scope.get_operator());
+		effect = std::make_unique<hidden_effect<scope_type>>(effect_operator);
 	} else if (effect_identifier == "if") {
-		effect = std::make_unique<if_effect<scope_type>>(scope.get_operator());
+		effect = std::make_unique<if_effect<scope_type>>(effect_operator);
 	} else if (effect_identifier == "neutral_player") {
-		effect = std::make_unique<neutral_player_effect<scope_type>>(scope.get_operator());
+		effect = std::make_unique<neutral_player_effect<scope_type>>(effect_operator);
 	} else if (effect_identifier == "random") {
-		effect = std::make_unique<random_effect<scope_type>>(scope.get_operator());
+		effect = std::make_unique<random_effect<scope_type>>(effect_operator);
 	} else if (effect_identifier == "random_list") {
-		effect = std::make_unique<random_list_effect<scope_type>>(scope.get_operator());
+		effect = std::make_unique<random_list_effect<scope_type>>(effect_operator);
 	} else {
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {
 			if (effect_identifier == "add_modifier") {
-				effect = std::make_unique<add_modifier_effect>(scope.get_operator());
+				effect = std::make_unique<add_modifier_effect>(effect_operator);
 			} else if (effect_identifier == "any_unit_of_class") {
-				effect = std::make_unique<any_unit_of_class_effect>(scope.get_operator());
+				effect = std::make_unique<any_unit_of_class_effect>(effect_operator);
 			} else if (effect_identifier == "any_unit_of_type") {
-				effect = std::make_unique<any_unit_of_type_effect>(scope.get_operator());
+				effect = std::make_unique<any_unit_of_type_effect>(effect_operator);
 			} else if (effect_identifier == "create_unit") {
-				effect = std::make_unique<create_unit_effect>(scope.get_operator());
+				effect = std::make_unique<create_unit_effect>(effect_operator);
 			} else if (effect_identifier == "last_created_unit") {
-				effect = std::make_unique<last_created_unit_effect>(scope.get_operator());
+				effect = std::make_unique<last_created_unit_effect>(effect_operator);
 			} else if (effect_identifier == "random_settlement_center_unit") {
-				effect = std::make_unique<random_settlement_center_unit_effect>(scope.get_operator());
+				effect = std::make_unique<random_settlement_center_unit_effect>(effect_operator);
 			} else if (effect_identifier == "random_unit_of_class") {
-				effect = std::make_unique<random_unit_of_class_effect>(scope.get_operator());
+				effect = std::make_unique<random_unit_of_class_effect>(effect_operator);
 			} else if (effect_identifier == "random_unit_of_type") {
-				effect = std::make_unique<random_unit_of_type_effect>(scope.get_operator());
+				effect = std::make_unique<random_unit_of_type_effect>(effect_operator);
 			}
 		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
 			if (effect_identifier == "level_check") {
-				effect = std::make_unique<level_check_effect>(scope.get_operator());
+				effect = std::make_unique<level_check_effect>(effect_operator);
 			} else if (effect_identifier == "random_settlement_building") {
-				effect = std::make_unique<random_settlement_building_effect>(scope.get_operator());
+				effect = std::make_unique<random_settlement_building_effect>(effect_operator);
 			}
 		}
 	}

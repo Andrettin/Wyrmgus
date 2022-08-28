@@ -34,7 +34,8 @@ namespace wyrmgus {
 class faction_condition final : public condition<CPlayer>
 {
 public:
-	explicit faction_condition(const std::string &value)
+	explicit faction_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition(condition_operator)
 	{
 		this->faction = faction::get(value);
 	}
@@ -44,14 +45,14 @@ public:
 		return civilization == this->faction->get_civilization();
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
 		return player->get_faction() == this->faction;
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
 

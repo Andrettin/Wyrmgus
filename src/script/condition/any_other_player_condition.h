@@ -34,7 +34,12 @@ namespace wyrmgus {
 class any_other_player_condition final : public scope_condition_base<CPlayer, CPlayer>
 {
 public:
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	explicit any_other_player_condition(const gsml_operator condition_operator)
+		: scope_condition_base(condition_operator)
+	{
+	}
+
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		for (const qunique_ptr<CPlayer> &scope_player : CPlayer::Players) {
 			if (scope_player.get() != player && scope_player->is_alive() && !scope_player->is_neutral_player()) {

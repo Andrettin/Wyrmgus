@@ -35,9 +35,13 @@ namespace wyrmgus {
 class settlement_condition final : public condition<CPlayer>
 {
 public:
-	settlement_condition() {}
+	explicit settlement_condition(const gsml_operator condition_operator)
+		: condition(condition_operator)
+	{
+	}
 
-	explicit settlement_condition(const std::string &value)
+	explicit settlement_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition(condition_operator)
 	{
 		this->settlement = site::get(value);
 	}
@@ -58,7 +62,7 @@ public:
 		}
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
@@ -78,10 +82,10 @@ public:
 		return player->has_settlement(this->settlement);
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		return "Has the " + string::highlight(this->settlement->get_name()) + " settlement";
 	}

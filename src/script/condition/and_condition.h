@@ -28,20 +28,17 @@
 
 #include "script/condition/condition.h"
 
+class CConfigData;
+
 namespace wyrmgus {
 
 template <typename scope_type>
 class and_condition final : public condition<scope_type>
 {
 public:
-	and_condition()
-	{
-	}
-
-	explicit and_condition(std::vector<std::unique_ptr<const condition<scope_type>>> &&conditions)
-		: conditions(std::move(conditions))
-	{
-	}
+	explicit and_condition();
+	explicit and_condition(const gsml_operator condition_operator);
+	explicit and_condition(std::vector<std::unique_ptr<const condition<scope_type>>> &&conditions);
 
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void process_gsml_property(const gsml_property &property) override;
@@ -82,9 +79,9 @@ public:
 		return this->check_internal(government_type);
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	bool check(const scope_type *scope, const read_only_context &ctx) const
 	{
-		return this->check_internal(scope, ctx);
+		return condition<scope_type>::check(scope, ctx);
 	}
 
 	bool check(const scope_type *scope) const
@@ -92,7 +89,12 @@ public:
 		return this->check(scope, read_only_context::from_scope(scope));
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
+	{
+		return this->check_internal(scope, ctx);
+	}
+
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		if (this->conditions.empty()) {
 			return std::string();

@@ -38,6 +38,11 @@ namespace wyrmgus {
 class any_unit_of_class_condition final : public scope_condition_base<CPlayer, CUnit>
 {
 public:
+	explicit any_unit_of_class_condition(const gsml_operator condition_operator)
+		: scope_condition_base(condition_operator)
+	{
+	}
+
 	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();
@@ -59,7 +64,7 @@ public:
 		scope_condition_base::check_validity();
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		for (const CUnit *unit : player->get_class_units(this->unit_class)) {
 			if (unit->IsUnusable()) {

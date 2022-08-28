@@ -33,7 +33,13 @@
 namespace wyrmgus {
 
 template <typename scope_type>
-bool random_condition<scope_type>::check(const scope_type *scope, const read_only_context &ctx) const
+random_condition<scope_type>::random_condition(const decimillesimal_int &chance, const gsml_operator condition_operator)
+	: condition<scope_type>(condition_operator), chance(chance)
+{
+}
+
+template <typename scope_type>
+bool random_condition<scope_type>::check_assignment(const scope_type *scope, const read_only_context &ctx) const
 {
 	Q_UNUSED(scope);
 	Q_UNUSED(ctx);

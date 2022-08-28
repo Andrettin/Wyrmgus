@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "player/civilization.h"
 #include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "upgrade/upgrade.h"
@@ -38,6 +39,11 @@ template <typename scope_type>
 class upgrade_condition_base : public condition<scope_type>
 {
 public:
+	explicit upgrade_condition_base(const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
+	{
+	}
+
 	bool check_upgrade(const civilization *civilization, const CUpgrade *upgrade) const
 	{
 		return civilization->get_upgrade() == upgrade || upgrade->is_available_for_civilization(civilization);

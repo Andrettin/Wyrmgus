@@ -372,9 +372,12 @@ set(script_SRCS
 source_group(script FILES ${script_SRCS})
 
 set(script_condition_SRCS
+	src/script/condition/and_condition.cpp
 	src/script/condition/can_accept_quest_condition.cpp
 	src/script/condition/condition.cpp
 	src/script/condition/has_flag_condition.cpp
+	src/script/condition/not_condition.cpp
+	src/script/condition/or_condition.cpp
 	src/script/condition/random_condition.cpp
 	src/script/condition/scripted_condition.cpp
 )

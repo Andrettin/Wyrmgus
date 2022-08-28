@@ -35,22 +35,23 @@ namespace wyrmgus {
 class quest_condition final : public condition<CPlayer>
 {
 public:
-	explicit quest_condition(const std::string &value)
+	explicit quest_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition(condition_operator)
 	{
 		this->quest = quest::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
 		return player->has_quest(this->quest);
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		return "Has the " + string::highlight(this->quest->get_name()) + " quest";
 	}

@@ -36,12 +36,13 @@ namespace wyrmgus {
 class variation_tag_condition final : public condition<CUnit>
 {
 public:
-	explicit variation_tag_condition(const std::string &value)
+	explicit variation_tag_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition(condition_operator)
 	{
 		this->variation_tag = variation_tag::get(value);
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
@@ -52,10 +53,10 @@ public:
 		return unit->GetVariation()->has_tag(this->variation_tag);
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		return string::highlight(this->variation_tag->get_name()) + " variation";
 	}

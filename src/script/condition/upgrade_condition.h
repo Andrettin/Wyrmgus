@@ -34,11 +34,13 @@ template <typename scope_type>
 class upgrade_condition final : public upgrade_condition_base<scope_type>
 {
 public:
-	upgrade_condition()
+	explicit upgrade_condition(const gsml_operator condition_operator)
+		: upgrade_condition_base<scope_type>(condition_operator)
 	{
 	}
 
-	explicit upgrade_condition(const std::string &value)
+	explicit upgrade_condition(const std::string &value, const gsml_operator condition_operator)
+		: upgrade_condition_base<scope_type>(condition_operator)
 	{
 		this->upgrade = CUpgrade::get(value);
 	}
@@ -50,16 +52,16 @@ public:
 		return this->check_upgrade(civilization, this->upgrade);
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
 		return this->check_upgrade(scope, this->upgrade);
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
+		Q_UNUSED(indent);
 
 		return condition<scope_type>::get_object_string(this->upgrade, links_allowed) + " upgrade";
 	}

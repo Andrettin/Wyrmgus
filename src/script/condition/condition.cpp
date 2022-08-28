@@ -108,95 +108,96 @@ template <typename scope_type>
 std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_property(const gsml_property &property)
 {
 	const std::string &key = property.get_key();
+	const gsml_operator condition_operator = property.get_operator();
 	const std::string &value = property.get_value();
 
 	if (key == "character") {
-		return std::make_unique<character_condition<scope_type>>(value);
+		return std::make_unique<character_condition<scope_type>>(value, condition_operator);
 	} else if (key == "character_exists") {
-		return std::make_unique<character_exists_condition<scope_type>>(value);
+		return std::make_unique<character_exists_condition<scope_type>>(value, condition_operator);
 	} else if (key == "civilization") {
-		return std::make_unique<civilization_condition<scope_type>>(value);
+		return std::make_unique<civilization_condition<scope_type>>(value, condition_operator);
 	} else if (key == "civilization_group") {
-		return std::make_unique<civilization_group_condition<scope_type>>(value);
+		return std::make_unique<civilization_group_condition<scope_type>>(value, condition_operator);
 	} else if (key == "neutral") {
-		return std::make_unique<neutral_condition<scope_type>>(value);
+		return std::make_unique<neutral_condition<scope_type>>(value, condition_operator);
 	} else if (key == "random") {
-		return std::make_unique<random_condition<scope_type>>(value);
+		return std::make_unique<random_condition<scope_type>>(value, condition_operator);
 	} else if (key == "real_day") {
-		return std::make_unique<real_day_condition<scope_type>>(value);
+		return std::make_unique<real_day_condition<scope_type>>(value, condition_operator);
 	} else if (key == "real_day_of_the_week") {
-		return std::make_unique<real_day_of_the_week_condition<scope_type>>(value);
+		return std::make_unique<real_day_of_the_week_condition<scope_type>>(value, condition_operator);
 	} else if (key == "real_month") {
-		return std::make_unique<real_month_condition<scope_type>>(value);
+		return std::make_unique<real_month_condition<scope_type>>(value, condition_operator);
 	} else if (key == "scripted_condition") {
-		return std::make_unique<scripted_condition_condition<scope_type>>(value);
+		return std::make_unique<scripted_condition_condition<scope_type>>(value, condition_operator);
 	} else if (key == "season") {
-		return std::make_unique<season_condition<scope_type>>(value);
+		return std::make_unique<season_condition<scope_type>>(value, condition_operator);
 	} else if (key == "site_exists") {
-		return std::make_unique<site_exists_condition<scope_type>>(value);
+		return std::make_unique<site_exists_condition<scope_type>>(value, condition_operator);
 	} else if (key == "time_of_day") {
-		return std::make_unique<time_of_day_condition<scope_type>>(value);
+		return std::make_unique<time_of_day_condition<scope_type>>(value, condition_operator);
 	} else if (key == "unique_can_drop") {
-		return std::make_unique<unique_can_drop_condition<scope_type>>(value);
+		return std::make_unique<unique_can_drop_condition<scope_type>>(value, condition_operator);
 	} else if (key == "unit_class") {
-		return std::make_unique<unit_class_condition<scope_type>>(value);
+		return std::make_unique<unit_class_condition<scope_type>>(value, condition_operator);
 	} else if (key == "unit_type") {
-		return std::make_unique<unit_type_condition<scope_type>>(value);
+		return std::make_unique<unit_type_condition<scope_type>>(value, condition_operator);
 	} else if (key == "upgrade") {
-		return std::make_unique<upgrade_condition<scope_type>>(value);
+		return std::make_unique<upgrade_condition<scope_type>>(value, condition_operator);
 	} else if (key == "upgrade_class") {
-		return std::make_unique<upgrade_class_condition<scope_type>>(value);
+		return std::make_unique<upgrade_class_condition<scope_type>>(value, condition_operator);
 	}
 
 	if constexpr (std::is_same_v<scope_type, CPlayer>) {
 		if (key == "age") {
-			return std::make_unique<age_condition>(value);
+			return std::make_unique<age_condition>(value, condition_operator);
 		} else if (key == "can_accept_quest") {
-			return std::make_unique<can_accept_quest_condition>(value);
+			return std::make_unique<can_accept_quest_condition>(value, condition_operator);
 		} else if (key == "coastal") {
-			return std::make_unique<coastal_condition>(value);
+			return std::make_unique<coastal_condition>(value, condition_operator);
 		} else if (key == "completed_quest") {
-			return std::make_unique<completed_quest_condition>(value);
+			return std::make_unique<completed_quest_condition>(value, condition_operator);
 		} else if (key == "dynasty") {
-			return std::make_unique<dynasty_condition>(value);
+			return std::make_unique<dynasty_condition>(value, condition_operator);
 		} else if (key == "faction") {
-			return std::make_unique<faction_condition>(value);
+			return std::make_unique<faction_condition>(value, condition_operator);
 		} else if (key == "faction_type") {
-			return std::make_unique<faction_type_condition>(value);
+			return std::make_unique<faction_type_condition>(value, condition_operator);
 		} else if (key == "government_type") {
-			return std::make_unique<government_type_condition>(value);
+			return std::make_unique<government_type_condition>(value, condition_operator);
 		} else if (key == "has_flag") {
-			return std::make_unique<has_flag_condition>(value);
+			return std::make_unique<has_flag_condition>(value, condition_operator);
 		} else if (key == "neutral_faction") {
-			return std::make_unique<neutral_faction_condition>(value);
+			return std::make_unique<neutral_faction_condition>(value, condition_operator);
 		} else if (key == "quest") {
-			return std::make_unique<quest_condition>(value);
+			return std::make_unique<quest_condition>(value, condition_operator);
 		} else if (key == "settlement") {
-			return std::make_unique<settlement_condition>(value);
+			return std::make_unique<settlement_condition>(value, condition_operator);
 		} else if (key == "trigger") {
-			return std::make_unique<trigger_condition>(value);
+			return std::make_unique<trigger_condition>(value, condition_operator);
 		} else if (key == "war") {
-			return std::make_unique<war_condition>(value);
+			return std::make_unique<war_condition>(value, condition_operator);
 		}
 	}
 
 	if constexpr (std::is_same_v<scope_type, CUnit>) {
 		if (key == "equipment") {
-			return std::make_unique<equipment_condition>(value);
+			return std::make_unique<equipment_condition>(value, condition_operator);
 		} else if (key == "equipped") {
-			return std::make_unique<equipped_condition>(value);
+			return std::make_unique<equipped_condition>(value, condition_operator);
 		} else if (key == "near_site") {
-			return std::make_unique<near_site_condition>(value);
+			return std::make_unique<near_site_condition>(value, condition_operator);
 		} else if (key == "nearby_civilization") {
-			return std::make_unique<nearby_civilization_condition>(value);
+			return std::make_unique<nearby_civilization_condition>(value, condition_operator);
 		} else if (key == "snowy_terrain") {
-			return std::make_unique<snowy_terrain_condition>(value);
+			return std::make_unique<snowy_terrain_condition>(value, condition_operator);
 		} else if (key == "terrain") {
-			return std::make_unique<terrain_condition>(value);
+			return std::make_unique<terrain_condition>(value, condition_operator);
 		} else if (key == "trait") {
-			return std::make_unique<trait_condition>(value);
+			return std::make_unique<trait_condition>(value, condition_operator);
 		} else if (key == "variation_tag") {
-			return std::make_unique<variation_tag_condition>(value);
+			return std::make_unique<variation_tag_condition>(value, condition_operator);
 		}
 	}
 
@@ -207,59 +208,60 @@ template <typename scope_type>
 std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const gsml_operator condition_operator = scope.get_operator();
 	std::unique_ptr<condition<scope_type>> condition;
 
 	if (tag == "and") {
-		condition = std::make_unique<and_condition<scope_type>>();
+		condition = std::make_unique<and_condition<scope_type>>(condition_operator);
 	} else if (tag == "any_player") {
-		condition = std::make_unique<any_player_condition<scope_type>>();
+		condition = std::make_unique<any_player_condition<scope_type>>(condition_operator);
 	} else if (tag == "character_unit") {
-		condition = std::make_unique<character_unit_condition<scope_type>>();
+		condition = std::make_unique<character_unit_condition<scope_type>>(condition_operator);
 	} else if (tag == "or") {
-		condition = std::make_unique<or_condition<scope_type>>();
+		condition = std::make_unique<or_condition<scope_type>>(condition_operator);
 	} else if (tag == "neutral_player") {
-		condition = std::make_unique<neutral_player_condition<scope_type>>();
+		condition = std::make_unique<neutral_player_condition<scope_type>>(condition_operator);
 	} else if (tag == "not") {
-		condition = std::make_unique<not_condition<scope_type>>();
+		condition = std::make_unique<not_condition<scope_type>>(condition_operator);
 	} else if (tag == "source_unit") {
-		condition = std::make_unique<source_unit_condition<scope_type>>();
+		condition = std::make_unique<source_unit_condition<scope_type>>(condition_operator);
 	} else if (tag == "unique_unit") {
-		condition = std::make_unique<unique_unit_condition<scope_type>>();
+		condition = std::make_unique<unique_unit_condition<scope_type>>(condition_operator);
 	}
 
 	if constexpr (std::is_same_v<scope_type, CPlayer>) {
 		if (tag == "any_other_player") {
-			condition = std::make_unique<any_other_player_condition>();
+			condition = std::make_unique<any_other_player_condition>(condition_operator);
 		} else if (tag == "any_settlement_center_unit") {
-			condition = std::make_unique<any_settlement_center_unit_condition>();
+			condition = std::make_unique<any_settlement_center_unit_condition>(condition_operator);
 		} else if (tag == "any_unit") {
-			condition = std::make_unique<any_unit_condition>();
+			condition = std::make_unique<any_unit_condition>(condition_operator);
 		} else if (tag == "any_unit_of_class") {
-			condition = std::make_unique<any_unit_of_class_condition>();
+			condition = std::make_unique<any_unit_of_class_condition>(condition_operator);
 		} else if (tag == "any_unit_of_type") {
-			condition = std::make_unique<any_unit_of_type_condition>();
+			condition = std::make_unique<any_unit_of_type_condition>(condition_operator);
 		} else if (tag == "settlement") {
-			condition = std::make_unique<settlement_condition>();
+			condition = std::make_unique<settlement_condition>(condition_operator);
 		} else if (tag == "unit_class") {
-			condition = std::make_unique<unit_class_condition<scope_type>>();
+			condition = std::make_unique<unit_class_condition<scope_type>>(condition_operator);
 		} else if (tag == "unit_type") {
-			condition = std::make_unique<unit_type_condition<scope_type>>();
+			condition = std::make_unique<unit_type_condition<scope_type>>(condition_operator);
 		}
 	}
 
 	if constexpr (std::is_same_v<scope_type, CUnit>) {
 		if (tag == "any_neighbor_settlement_neutral_building_owner") {
-			condition = std::make_unique<any_neighbor_settlement_neutral_building_owner_condition>();
+			condition = std::make_unique<any_neighbor_settlement_neutral_building_owner_condition>(condition_operator);
 		} else if (tag == "any_neighbor_settlement_owner") {
-			condition = std::make_unique<any_neighbor_settlement_owner_condition>();
+			condition = std::make_unique<any_neighbor_settlement_owner_condition>(condition_operator);
 		} else if (tag == "any_settlement_building") {
-			condition = std::make_unique<any_settlement_building_condition>();
+			condition = std::make_unique<any_settlement_building_condition>(condition_operator);
 		} else if (tag == "any_settlement_neutral_building_owner") {
-			condition = std::make_unique<any_settlement_neutral_building_owner_condition>();
+			condition = std::make_unique<any_settlement_neutral_building_owner_condition>(condition_operator);
 		} else if (tag == "location") {
-			condition = std::make_unique<location_condition>();
+			condition = std::make_unique<location_condition>(condition_operator);
 		} else if (tag == "settlement_owner") {
-			condition = std::make_unique<settlement_owner_condition>();
+			condition = std::make_unique<settlement_owner_condition>(condition_operator);
 		}
 	}
 
@@ -280,6 +282,11 @@ std::string condition<scope_type>::get_object_highlighted_name(const named_data_
 	} else {
 		return string::highlight(object->get_name());
 	}
+}
+
+template <typename scope_type>
+condition<scope_type>::condition(const gsml_operator condition_operator) : condition_operator(condition_operator)
+{
 }
 
 template <typename scope_type>
@@ -318,63 +325,27 @@ void condition<scope_type>::process_gsml_scope(const gsml_data &scope)
 	throw std::runtime_error("Invalid condition scope: \"" + scope.get_tag() + "\".");
 }
 
-template <typename scope_type>
-void and_condition<scope_type>::ProcessConfigDataSection(const CConfigData *section)
-{
-	std::unique_ptr<condition<scope_type>> condition;
-
-	if (section->Tag == "and") {
-		condition = std::make_unique<and_condition<scope_type>>();
-	} else if (section->Tag == "or") {
-		condition = std::make_unique<or_condition<scope_type>>();
-	} else if (section->Tag == "upgrade") {
-		condition = std::make_unique<upgrade_condition<scope_type>>();
-	} else {
-		throw std::runtime_error("Invalid and condition property: \"" + section->Tag + "\".");
-	}
-
-	condition->ProcessConfigData(section);
-
-	this->conditions.push_back(std::move(condition));
-}
 
 template <typename scope_type>
-void and_condition<scope_type>::process_gsml_property(const gsml_property &property)
+bool condition<scope_type>::check(const scope_type *scope, const read_only_context &ctx) const
 {
-	this->conditions.push_back(condition<scope_type>::from_gsml_property(property));
-}
-
-template <typename scope_type>
-void and_condition<scope_type>::process_gsml_scope(const gsml_data &scope)
-{
-	this->conditions.push_back(condition<scope_type>::from_gsml_scope(scope));
-}
-
-template <typename scope_type>
-void and_condition<scope_type>::check_validity() const
-{
-	for (const auto &condition : this->conditions) {
-		condition->check_validity();
+	switch (this->condition_operator) {
+		case gsml_operator::assignment:
+			return this->check_assignment(scope, ctx);
+		default:
+			throw std::runtime_error("Invalid condition operator: \"" + std::to_string(static_cast<int>(this->condition_operator)) + "\".");
 	}
 }
 
 template <typename scope_type>
-void or_condition<scope_type>::ProcessConfigDataSection(const CConfigData *section)
+std::string condition<scope_type>::get_string(const size_t indent, const bool links_allowed) const
 {
-	std::unique_ptr<condition<scope_type>> condition = nullptr;
-
-	if (section->Tag == "and") {
-		condition = std::make_unique<and_condition<scope_type>>();
-	} else if (section->Tag == "or") {
-		condition = std::make_unique<or_condition<scope_type>>();
-	} else if (section->Tag == "upgrade") {
-		condition = std::make_unique<upgrade_condition<scope_type>>();
-	} else {
-		fprintf(stderr, "Invalid or condition property: \"%s\".\n", section->Tag.c_str());
-		return;
+	switch (this->condition_operator) {
+		case gsml_operator::assignment:
+			return this->get_assignment_string(indent, links_allowed);
+		default:
+			throw std::runtime_error("Invalid condition operator: \"" + std::to_string(static_cast<int>(this->condition_operator)) + "\".");
 	}
-	condition->ProcessConfigData(section);
-	this->conditions.push_back(std::move(condition));
 }
 
 template <typename scope_type>
@@ -555,9 +526,9 @@ int CclDefineDependency(lua_State *l)
 			
 			if (!strncmp(required, "unit", 4)) {
 				const unit_type *unit_type = unit_type::get(required);
-				condition = new unit_type_condition<CPlayer>(unit_type, count > 0 ? count : 1);
+				condition = new unit_type_condition<CPlayer>(unit_type, count > 0 ? count : 1, gsml_operator::assignment);
 			} else if (!strncmp(required, "upgrade", 7)) {
-				condition = new upgrade_condition<CPlayer>(required);
+				condition = new upgrade_condition<CPlayer>(required, gsml_operator::assignment);
 			} else {
 				LuaError(l, "Invalid required type for condition: \"%s\"" _C_ required);
 			}
@@ -641,9 +612,9 @@ int CclDefinePredependency(lua_State *l)
 			
 			if (!strncmp(required, "unit", 4)) {
 				const unit_type *unit_type = unit_type::get(required);
-				condition = new unit_type_condition<CPlayer>(unit_type, count > 0 ? count : 1);
+				condition = new unit_type_condition<CPlayer>(unit_type, count > 0 ? count : 1, gsml_operator::assignment);
 			} else if (!strncmp(required, "upgrade", 7)) {
-				condition = new upgrade_condition<CPlayer>(required);
+				condition = new upgrade_condition<CPlayer>(required, gsml_operator::assignment);
 			} else {
 				LuaError(l, "Invalid required type for condition: \"%s\"" _C_ required);
 			}

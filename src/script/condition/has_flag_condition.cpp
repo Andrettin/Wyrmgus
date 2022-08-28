@@ -34,19 +34,24 @@
 
 namespace wyrmgus {
 
-has_flag_condition::has_flag_condition(const std::string &value)
-	: has_flag_condition(player_flag::get(value))
+has_flag_condition::has_flag_condition(const player_flag *flag)
+	: condition(gsml_operator::assignment), flag(flag)
 {
 }
 
-bool has_flag_condition::check(const CPlayer *player, const read_only_context &ctx) const
+has_flag_condition::has_flag_condition(const std::string &value, const gsml_operator condition_operator)
+	: condition(condition_operator), flag(player_flag::get(value))
+{
+}
+
+bool has_flag_condition::check_assignment(const CPlayer *player, const read_only_context &ctx) const
 {
 	Q_UNUSED(ctx);
 
 	return player->has_flag(this->flag);
 }
 
-std::string has_flag_condition::get_string(const size_t indent, const bool links_allowed) const
+std::string has_flag_condition::get_assignment_string(const size_t indent, const bool links_allowed) const
 {
 	Q_UNUSED(indent);
 	Q_UNUSED(links_allowed);

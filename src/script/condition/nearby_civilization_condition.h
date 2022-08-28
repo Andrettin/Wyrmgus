@@ -34,12 +34,13 @@ namespace wyrmgus {
 class nearby_civilization_condition final : public condition<CUnit>
 {
 public:
-	explicit nearby_civilization_condition(const std::string &value)
+	explicit nearby_civilization_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition(condition_operator)
 	{
 		this->civilization = civilization::get(value);
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
@@ -82,7 +83,7 @@ public:
 		return false;
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent);
 

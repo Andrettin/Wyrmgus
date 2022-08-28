@@ -39,7 +39,8 @@ template <typename scope_type>
 class season_condition final : public condition<scope_type>
 {
 public:
-	explicit season_condition(const std::string &value)
+	explicit season_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
 	{
 		this->season = season::get(value);
 	}
@@ -62,7 +63,7 @@ public:
 		}
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
@@ -77,10 +78,10 @@ public:
 		return map_layer->get_tile_season(tile_pos) == this->season;
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		return string::highlight(this->season->get_name()) + " season";
 	}

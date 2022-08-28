@@ -36,12 +36,13 @@ template <typename scope_type>
 class neutral_condition final : public condition<scope_type>
 {
 public:
-	explicit neutral_condition(const std::string &value)
+	explicit neutral_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
 	{
 		this->neutral = string::to_bool(value);
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
@@ -52,7 +53,7 @@ public:
 		}
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent);
 		Q_UNUSED(links_allowed);

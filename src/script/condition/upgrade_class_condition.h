@@ -35,7 +35,8 @@ template <typename scope_type>
 class upgrade_class_condition final : public upgrade_condition_base<scope_type>
 {
 public:
-	explicit upgrade_class_condition(const std::string &value)
+	explicit upgrade_class_condition(const std::string &value, const gsml_operator condition_operator)
+		: upgrade_condition_base<scope_type>(condition_operator)
 	{
 		this->upgrade_class = upgrade_class::get(value);
 	}
@@ -60,7 +61,7 @@ public:
 		return this->check_upgrade(civilization, upgrade);
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
@@ -75,10 +76,10 @@ public:
 		return this->check_upgrade(scope, upgrade);
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		return string::highlight(this->upgrade_class->get_name()) + " class upgrade";
 	}

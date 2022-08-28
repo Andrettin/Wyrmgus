@@ -34,7 +34,12 @@ namespace wyrmgus {
 class any_settlement_center_unit_condition final : public scope_condition_base<CPlayer, CUnit>
 {
 public:
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	explicit any_settlement_center_unit_condition(const gsml_operator condition_operator)
+		: scope_condition_base(condition_operator)
+	{
+	}
+
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		std::vector<CUnit *> settlement_centers = player->get_town_hall_units();
 		vector::merge(settlement_centers, player->get_type_units(settlement_site_unit_type));

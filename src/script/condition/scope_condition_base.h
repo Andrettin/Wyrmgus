@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "database/gsml_operator.h"
 #include "script/condition/and_condition.h"
 #include "script/condition/condition.h"
 
@@ -35,6 +36,11 @@ template <typename upper_scope_type, typename scope_type>
 class scope_condition_base : public condition<upper_scope_type>
 {
 public:
+	explicit scope_condition_base(const gsml_operator condition_operator)
+		: condition<upper_scope_type>(condition_operator)
+	{
+	}
+
 	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		this->conditions.process_gsml_property(property);
@@ -57,7 +63,7 @@ public:
 
 	virtual std::string get_scope_name() const = 0;
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override final
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override final
 	{
 		std::string str = this->get_scope_name() + ":\n";
 		str += this->conditions.get_conditions_string(indent + 1, links_allowed);

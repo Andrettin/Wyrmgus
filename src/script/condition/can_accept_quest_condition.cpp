@@ -28,25 +28,31 @@
 
 #include "script/condition/can_accept_quest_condition.h"
 
+#include "database/gsml_operator.h"
 #include "player/player.h"
 #include "quest/quest.h"
 #include "util/string_util.h"
 
 namespace wyrmgus {
 
-can_accept_quest_condition::can_accept_quest_condition(const std::string &value)
-	: can_accept_quest_condition(quest::get(value))
+can_accept_quest_condition::can_accept_quest_condition(const wyrmgus::quest *quest)
+	: condition(gsml_operator::assignment), quest(quest)
 {
 }
 
-bool can_accept_quest_condition::check(const CPlayer *player, const read_only_context &ctx) const
+can_accept_quest_condition::can_accept_quest_condition(const std::string &value, const gsml_operator condition_operator)
+	: condition(condition_operator), quest(quest::get(value))
+{
+}
+
+bool can_accept_quest_condition::check_assignment(const CPlayer *player, const read_only_context &ctx) const
 {
 	Q_UNUSED(ctx);
 
 	return player->can_accept_quest(this->quest);
 }
 
-std::string can_accept_quest_condition::get_string(const size_t indent, const bool links_allowed) const
+std::string can_accept_quest_condition::get_assignment_string(const size_t indent, const bool links_allowed) const
 {
 	Q_UNUSED(indent);
 	Q_UNUSED(links_allowed);

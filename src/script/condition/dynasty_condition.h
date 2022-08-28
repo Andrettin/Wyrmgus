@@ -34,19 +34,20 @@ namespace wyrmgus {
 class dynasty_condition final : public condition<CPlayer>
 {
 public:
-	explicit dynasty_condition(const std::string &value)
+	explicit dynasty_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition(condition_operator)
 	{
 		this->dynasty = dynasty::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
 		return player->get_dynasty() == this->dynasty;
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent)
 		Q_UNUSED(links_allowed)

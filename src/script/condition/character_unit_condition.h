@@ -35,6 +35,11 @@ template <typename upper_scope_type>
 class character_unit_condition final : public scope_condition<upper_scope_type, CUnit>
 {
 public:
+	explicit character_unit_condition(const gsml_operator condition_operator)
+		: scope_condition<upper_scope_type, CUnit>(condition_operator)
+	{
+	}
+
 	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();

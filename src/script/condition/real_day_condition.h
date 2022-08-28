@@ -35,12 +35,13 @@ template <typename scope_type>
 class real_day_condition final : public condition<scope_type>
 {
 public:
-	explicit real_day_condition(const std::string &value)
+	explicit real_day_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
 	{
 		this->day = std::stoi(value);
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(scope);
 		Q_UNUSED(ctx);
@@ -56,10 +57,10 @@ public:
 		return current_day >= this->day;
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		return "The current real day of the month is " + string::highlight(std::to_string(this->day));
 	}

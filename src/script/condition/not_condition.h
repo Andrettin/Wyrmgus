@@ -34,19 +34,9 @@ template <typename scope_type>
 class not_condition final : public condition<scope_type>
 {
 public:
-	not_condition()
-	{
-	}
-
-	explicit not_condition(std::vector<std::unique_ptr<const condition<scope_type>>> &&conditions)
-		: conditions(std::move(conditions))
-	{
-	}
-
-	explicit not_condition(std::unique_ptr<const condition<scope_type>> &&condition)
-	{
-		this->conditions.push_back(std::move(condition));
-	}
+	explicit not_condition(const gsml_operator condition_operator);
+	explicit not_condition(std::vector<std::unique_ptr<const condition<scope_type>>> &&conditions);
+	explicit not_condition(std::unique_ptr<const condition<scope_type>> &&condition);
 
 	virtual void process_gsml_property(const gsml_property &property) override
 	{
@@ -99,12 +89,12 @@ public:
 		return this->check_internal(government_type);
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		return this->check_internal(scope, ctx);
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		std::string str = "None of:\n";
 		str += condition<scope_type>::get_conditions_string(this->conditions, indent + 1, links_allowed);

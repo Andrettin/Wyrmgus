@@ -39,14 +39,18 @@ template <typename scope_type>
 class unit_type_condition final : public condition<scope_type>
 {
 public:
-	unit_type_condition() {}
-
-	explicit unit_type_condition(const unit_type *unit_type, const int count)
-		: unit_type(unit_type), count(count)
+	explicit unit_type_condition(const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
 	{
 	}
 
-	explicit unit_type_condition(const std::string &value)
+	explicit unit_type_condition(const unit_type *unit_type, const int count, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator), unit_type(unit_type), count(count)
+	{
+	}
+
+	explicit unit_type_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
 	{
 		this->unit_type = unit_type::get(value);
 	}
@@ -93,7 +97,7 @@ public:
 		return true;
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {
 			if (ctx.ignore_units) {
@@ -128,7 +132,7 @@ public:
 		}
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent);
 

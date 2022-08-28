@@ -37,7 +37,8 @@ template <typename scope_type>
 class time_of_day_condition final : public condition<scope_type>
 {
 public:
-	explicit time_of_day_condition(const std::string &value)
+	explicit time_of_day_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
 	{
 		this->time_of_day = time_of_day::get(value);
 	}
@@ -60,7 +61,7 @@ public:
 		}
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
@@ -76,10 +77,10 @@ public:
 		return tile_time_of_day == this->time_of_day;
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		return string::highlight(this->time_of_day->get_name()) + " time of day";
 	}

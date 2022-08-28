@@ -35,17 +35,16 @@ template <typename scope_type>
 class random_condition final : public condition<scope_type>
 {
 public:
-	explicit random_condition(const decimillesimal_int &chance) : chance(chance)
+	explicit random_condition(const decimillesimal_int &chance, const gsml_operator condition_operator);
+
+	explicit random_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator), chance(decimillesimal_int(value))
 	{
 	}
 
-	explicit random_condition(const std::string &value) : random_condition(decimillesimal_int(value))
-	{
-	}
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override;
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override;
-
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent);
 		Q_UNUSED(links_allowed);

@@ -43,6 +43,7 @@ class gsml_property;
 class named_data_entry;
 class unit_type;
 enum class government_type;
+enum class gsml_operator;
 struct read_only_context;
 
 template <typename scope_type>
@@ -94,6 +95,8 @@ public:
 
 	static std::string get_object_highlighted_name(const named_data_entry *object, const std::string &name_string);
 
+	explicit condition(const gsml_operator condition_operator);
+
 	virtual ~condition()
 	{
 	}
@@ -111,26 +114,32 @@ public:
 	virtual bool check(const civilization *civilization) const
 	{
 		//check whether a civilization can, in principle, fulfill the condition
-		Q_UNUSED(civilization)
+		Q_UNUSED(civilization);
+
 		return true;
 	}
 
 	virtual bool check(const government_type government_type) const
 	{
 		//check whether a government type can, in principle, fulfill the condition
-		Q_UNUSED(government_type)
+		Q_UNUSED(government_type);
+
 		return true;
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const = 0;
+	bool check(const scope_type *scope, const read_only_context &ctx) const;
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const = 0;
 
-	//get the condition as a string
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const = 0;
+	std::string get_string(const size_t indent, const bool links_allowed) const;
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const = 0;
 
 	virtual bool is_hidden() const
 	{
 		return false;
 	}
+
+private:
+	gsml_operator condition_operator;
 };
 
 template <bool precondition>

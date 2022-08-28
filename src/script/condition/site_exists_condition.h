@@ -36,12 +36,13 @@ template <typename scope_type>
 class site_exists_condition final : public condition<scope_type>
 {
 public:
-	explicit site_exists_condition(const std::string &value)
+	explicit site_exists_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
 	{
 		this->site = site::get(value);
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(scope);
 		Q_UNUSED(ctx);
@@ -49,10 +50,10 @@ public:
 		return this->site->get_game_data()->is_on_map();
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		return "Site " + string::highlight(this->site->get_game_data()->get_current_cultural_name()) + " is on the map";
 	}

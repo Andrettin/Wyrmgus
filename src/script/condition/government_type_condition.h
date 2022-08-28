@@ -34,7 +34,8 @@ namespace wyrmgus {
 class government_type_condition final : public condition<CPlayer>
 {
 public:
-	explicit government_type_condition(const std::string &value)
+	explicit government_type_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition(condition_operator)
 	{
 		this->government_type = string_to_government_type(value);
 	}
@@ -54,17 +55,17 @@ public:
 		return this->government_type == government_type;
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
 		return player->get_government_type() == this->government_type;
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		return string::highlight(get_government_type_name(this->government_type)) + " government type";
 	}

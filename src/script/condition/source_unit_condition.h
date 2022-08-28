@@ -36,6 +36,11 @@ template <typename upper_scope_type>
 class source_unit_condition final : public scope_condition<upper_scope_type, CUnit>
 {
 public:
+	explicit source_unit_condition(const gsml_operator condition_operator)
+		: scope_condition<upper_scope_type, CUnit>(condition_operator)
+	{
+	}
+
 	virtual const CUnit *get_scope(const upper_scope_type *upper_scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(upper_scope);

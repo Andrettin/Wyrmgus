@@ -35,14 +35,11 @@ class quest;
 class can_accept_quest_condition final : public condition<CPlayer>
 {
 public:
-	explicit can_accept_quest_condition(const wyrmgus::quest *quest) : quest(quest)
-	{
-	}
+	explicit can_accept_quest_condition(const wyrmgus::quest *quest);
+	explicit can_accept_quest_condition(const std::string &value, const gsml_operator condition_operator);
 
-	explicit can_accept_quest_condition(const std::string &value);
-
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override;
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override;
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override;
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override;
 
 private:
 	const wyrmgus::quest *quest = nullptr;

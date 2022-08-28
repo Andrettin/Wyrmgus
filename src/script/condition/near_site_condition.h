@@ -37,19 +37,20 @@ namespace wyrmgus {
 class near_site_condition final : public condition<CUnit>
 {
 public:
-	explicit near_site_condition(const std::string &value)
+	explicit near_site_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition(condition_operator)
 	{
 		this->site = site::get(value);
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
 		return unit->is_near_site(this->site);
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent);
 		Q_UNUSED(links_allowed);

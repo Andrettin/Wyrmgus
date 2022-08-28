@@ -35,15 +35,12 @@ class player_flag;
 class has_flag_condition final : public condition<CPlayer>
 {
 public:
-	explicit has_flag_condition(const player_flag *flag) : flag(flag)
-	{
-	}
+	explicit has_flag_condition(const player_flag *flag);
+	explicit has_flag_condition(const std::string &value, const gsml_operator condition_operator);
 
-	explicit has_flag_condition(const std::string &value);
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override;
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override;
-
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override;
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override;
 
 	virtual bool is_hidden() const override
 	{

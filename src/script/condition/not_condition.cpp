@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,34 +24,29 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "player/player.h"
-#include "script/condition/scope_condition.h"
+#include "script/condition/not_condition.h"
 
 namespace wyrmgus {
 
-template <typename upper_scope_type>
-class neutral_player_condition final : public scope_condition<upper_scope_type, CPlayer>
+template <typename scope_type>
+not_condition<scope_type>::not_condition(const gsml_operator condition_operator)
+	: condition<scope_type>(condition_operator)
 {
-public:
-	explicit neutral_player_condition(const gsml_operator condition_operator)
-		: scope_condition<upper_scope_type, CPlayer>(condition_operator)
-	{
-	}
+}
 
-	virtual const CPlayer *get_scope(const upper_scope_type *upper_scope, const read_only_context &ctx) const override
-	{
-		Q_UNUSED(upper_scope);
-		Q_UNUSED(ctx);
+template <typename scope_type>
+not_condition<scope_type>::not_condition(std::vector<std::unique_ptr<const condition<scope_type>>> &&conditions)
+	: condition<scope_type>(gsml_operator::assignment), conditions(std::move(conditions))
+{
+}
 
-		return CPlayer::get_neutral_player();
-	}
-
-	virtual std::string get_scope_name() const override
-	{
-		return "Neutral player";
-	}
-};
+template <typename scope_type>
+not_condition<scope_type>::not_condition(std::unique_ptr<const condition<scope_type>> &&condition)
+	: condition<scope_type>(gsml_operator::assignment)
+{
+	this->conditions.push_back(std::move(condition));
+}
 
 }

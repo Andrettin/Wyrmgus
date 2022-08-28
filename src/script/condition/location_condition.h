@@ -36,7 +36,8 @@ namespace wyrmgus {
 class location_condition final : public condition<CUnit>
 {
 public:
-	location_condition()
+	explicit location_condition(const gsml_operator condition_operator)
+		: condition(condition_operator)
 	{
 	}
 
@@ -72,7 +73,7 @@ public:
 		}
 	}
 
-	virtual bool check(const CUnit *unit, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
@@ -103,10 +104,10 @@ public:
 		return unit->is_in_tile_rect(QRect(min_map_pos, max_map_pos), unit->MapLayer->ID);
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		std::string str = "Is in ";
 

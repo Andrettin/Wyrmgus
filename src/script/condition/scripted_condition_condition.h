@@ -44,7 +44,8 @@ public:
 		}
 	}
 
-	explicit scripted_condition_condition(const std::string &value)
+	explicit scripted_condition_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition<scope_type>(condition_operator)
 	{
 		this->scripted_condition = scripted_condition_condition::get_scripted_condition(value);
 	}
@@ -59,12 +60,12 @@ public:
 		return this->scripted_condition->get_conditions()->check(government_type);
 	}
 
-	virtual bool check(const scope_type *scope, const read_only_context &ctx) const override
+	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		return this->scripted_condition->get_conditions()->check(scope, ctx);
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		return this->scripted_condition->get_conditions()->get_string(indent, links_allowed);
 	}

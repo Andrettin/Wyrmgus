@@ -34,12 +34,13 @@ namespace wyrmgus {
 class faction_type_condition final : public condition<CPlayer>
 {
 public:
-	explicit faction_type_condition(const std::string &value)
+	explicit faction_type_condition(const std::string &value, const gsml_operator condition_operator)
+		: condition(condition_operator)
 	{
 		this->faction_type = string_to_faction_type(value);
 	}
 
-	virtual bool check(const CPlayer *player, const read_only_context &ctx) const override
+	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);
 
@@ -50,10 +51,10 @@ public:
 		return player->get_faction()->get_type() == this->faction_type;
 	}
 
-	virtual std::string get_string(const size_t indent, const bool links_allowed) const override
+	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
-		Q_UNUSED(indent)
-		Q_UNUSED(links_allowed)
+		Q_UNUSED(indent);
+		Q_UNUSED(links_allowed);
 
 		return string::highlight(get_faction_type_name(this->faction_type)) + " faction type";
 	}
