@@ -1576,7 +1576,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	}
 }
 
-void TraitAcquire(CUnit &unit, CUpgrade *upgrade)
+void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 {
 	if (unit.Trait != nullptr) { //remove previous trait, if any
 		IndividualUpgradeLost(unit, unit.Trait);

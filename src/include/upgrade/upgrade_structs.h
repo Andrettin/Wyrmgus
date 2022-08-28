@@ -91,6 +91,7 @@ class CUpgrade final : public detailed_data_entry, public data_type<CUpgrade>
 	Q_PROPERTY(bool magic_suffix MEMBER magic_suffix READ is_magic_suffix)
 	Q_PROPERTY(int magic_level MEMBER magic_level READ get_magic_level)
 	Q_PROPERTY(wyrmgus::unit_type* item MEMBER item)
+	Q_PROPERTY(int weight MEMBER weight READ get_weight)
 	Q_PROPERTY(wyrmgus::government_type government_type MEMBER government_type READ get_government_type)
 
 public:
@@ -426,6 +427,11 @@ public:
 	bool check_unit_preconditions(const CUnit *unit) const;
 	bool check_unit_conditions(const CUnit *unit) const;
 
+	int get_weight() const
+	{
+		return this->weight;
+	}
+
 	int calculate_ai_priority(const CPlayer *player) const;
 
 	bool check_drop_conditions(const CUnit *dropper, const CPlayer *dropper_player) const;
@@ -526,6 +532,7 @@ private:
 	std::unique_ptr<and_condition<CPlayer>> conditions;
 	std::unique_ptr<and_condition<CUnit>> unit_preconditions;
 	std::unique_ptr<and_condition<CUnit>> unit_conditions; //conditions for the unit to acquire the upgrade as an individual upgrade
+	int weight = 1; //weight for e.g. trait generation
 	std::unique_ptr<factor<CPlayer>> ai_priority;
 	const wyrmgus::dynasty *dynasty = nullptr; //the dynasty to which the upgrade pertains, if this is a dynasty upgrade
 	const wyrmgus::deity *deity = nullptr; //the deity to which the upgrade pertains, if this is a deity upgrade

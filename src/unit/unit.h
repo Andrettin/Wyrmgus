@@ -332,6 +332,7 @@ public:
 	void CheckIdentification();
 	void CheckKnowledgeChange(int variable, int change);
 	void UpdateItemName();
+	void generate_trait();
 	void GenerateDrop();
 	void generate_special_properties(const CUnit *dropper, const CPlayer *dropper_player, const bool allow_unique, const bool sold_item, const bool always_magic);
 	void generate_prefix(const CUnit *dropper, const CPlayer *dropper_player);
@@ -1078,7 +1079,7 @@ private:
 	const wyrmgus::site *site = nullptr; //the site to which the unit belongs, if it is a site unit (not necessarily the same as the settlement, e.g. if the site is a non-major one)
 	const wyrmgus::site *home_settlement = nullptr; //home settlement for the unit, i.e. from where it gets its food
 public:
-	CUpgrade *Trait;	/// Unit's trait
+	const CUpgrade *Trait = nullptr;
 	int Variation;      /// Which of the variations of its unit type this unit has
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has
 	const CUpgrade *Prefix = nullptr;	/// Item unit's prefix

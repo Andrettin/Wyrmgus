@@ -1087,7 +1087,7 @@ void CUnit::apply_character_properties()
 	if (this->get_character()->get_trait() != nullptr) { //set trait
 		TraitAcquire(*this, this->get_character()->get_trait());
 	} else if (!CEditor::get()->is_running() && !this->Type->get_traits().empty()) {
-		TraitAcquire(*this, vector::get_random(this->Type->get_traits()));
+		this->generate_trait();
 	}
 
 	//load worshipped deities
@@ -2357,6 +2357,27 @@ void CUnit::UpdateItemName()
 	}
 }
 
+void CUnit::generate_trait()
+{
+	std::vector<const CUpgrade *> potential_traits;
+
+	for (const CUpgrade *trait : this->Type->get_traits()) {
+		if (trait->check_unit_conditions(this)) {
+			continue;
+		}
+
+		for (int i = 0; i < trait->get_weight(); ++i) {
+			potential_traits.push_back(trait);
+		}
+	}
+
+	if (potential_traits.empty()) {
+		return;
+	}
+
+	TraitAcquire(*this, vector::get_random(potential_traits));
+}
+
 void CUnit::GenerateDrop()
 {
 	bool base_based_mission = false;
@@ -3563,7 +3584,7 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 
 	//generate a trait for the unit, if any are available (only if the editor isn't running)
 	if (!CEditor::get()->is_running() && !unit->Type->get_traits().empty()) {
-		TraitAcquire(*unit, vector::get_random(unit->Type->get_traits()));
+		unit->generate_trait();
 	}
 	
 	for (const CUpgrade *starting_ability : unit->Type->StartingAbilities) {
