@@ -877,6 +877,11 @@ public:
 	bool is_personal_name_valid(const std::string &name, const faction *faction, const gender gender) const;
 	const name_generator *get_name_generator(const wyrmgus::faction *faction, const gender gender) const;
 
+	int get_incremental_cost_modifier() const
+	{
+		return this->incremental_cost_modifier;
+	}
+
 	wyrmgus::item_class get_item_class() const
 	{
 		return this->item_class;
@@ -1191,8 +1196,8 @@ public:
 	int ShadowOffsetX = 0;					/// Shadow horizontal offset
 	int ShadowOffsetY = 0;					/// Shadow vertical offset
 	int TrainQuantity = 0;					/// Quantity to be trained
-	int CostModifier = 0;					/// Cost modifier (cost increase for every unit of this type the player has)
 private:
+	int incremental_cost_modifier = 0; //cost increase for every unit of this type the player has
 	wyrmgus::item_class item_class; //item class (if the unit type is an item)
 	wyrmgus::species *species = nullptr;
 	wyrmgus::terrain_type *terrain_type = nullptr;

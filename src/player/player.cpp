@@ -4411,14 +4411,14 @@ resource_map<int> CPlayer::GetUnitTypeCosts(const unit_type *type, const bool hi
 				cost /= 100;
 			}
 
-			if (type->CostModifier != 0) {
+			if (type->get_incremental_cost_modifier() != 0) {
 				int type_count = this->GetUnitTypeCount(type) + this->GetUnitTypeUnderConstructionCount(type);
 				if (ignore_one) {
 					type_count--;
 				}
 
 				for (int j = 0; j < type_count; ++j) {
-					cost *= 100 + type->CostModifier;
+					cost *= 100 + type->get_incremental_cost_modifier();
 					cost /= 100;
 				}
 			}

@@ -1592,7 +1592,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->DefaultStat.Variables[PRIORITY_INDEX].Max  = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max;
 	this->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
 	this->TrainQuantity = parent_type->TrainQuantity;
-	this->CostModifier = parent_type->CostModifier;
+	this->incremental_cost_modifier = parent_type->incremental_cost_modifier;
 	this->item_class = parent_type->item_class;
 	this->MaxOnBoard = parent_type->MaxOnBoard;
 	this->RepairRange = parent_type->RepairRange;

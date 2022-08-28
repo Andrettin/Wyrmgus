@@ -813,11 +813,11 @@ int CGrandStrategyFaction::GetTroopCostModifier()
 	int modifier = 0;
 	
 	if (this->Ministers[wyrmgus::character_title::ruler] != nullptr) {
-		modifier += this->Ministers[wyrmgus::character_title::ruler]->GetTroopCostModifier();
+		modifier += this->Ministers[character_title::ruler]->GetTroopCostModifier();
 	}
 	
 	if (this->Ministers[wyrmgus::character_title::marshal] != nullptr) {
-		modifier += this->Ministers[wyrmgus::character_title::marshal]->GetTroopCostModifier();
+		modifier += this->Ministers[character_title::marshal]->GetTroopCostModifier();
 	}
 	
 	return modifier;
