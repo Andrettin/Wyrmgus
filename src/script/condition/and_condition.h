@@ -123,4 +123,7 @@ private:
 	std::vector<std::unique_ptr<const condition<scope_type>>> conditions; //the conditions of which all should be true
 };
 
+extern template class and_condition<CPlayer>;
+extern template class and_condition<CUnit>;
+
 }

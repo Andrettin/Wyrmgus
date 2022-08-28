@@ -92,4 +92,7 @@ void and_condition<scope_type>::check_validity() const
 	}
 }
 
+template class and_condition<CPlayer>;
+template class and_condition<CUnit>;
+
 }
