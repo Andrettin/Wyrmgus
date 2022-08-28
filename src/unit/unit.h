@@ -623,7 +623,7 @@ public:
 	wyrmgus::item_class GetCurrentWeaponClass() const;
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
 	const CPlayer *get_display_player() const;
-	int GetPrice() const;
+	int get_price() const;
 
 	const unit_type_map<int> &get_unit_stocks() const
 	{

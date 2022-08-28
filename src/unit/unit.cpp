@@ -2917,7 +2917,7 @@ void CUnit::SellUnit(CUnit *sold_unit, CPlayer *player)
 		}
 	}
 
-	player->change_resource(defines::get()->get_wealth_resource(), -sold_unit->GetPrice(), true);
+	player->change_resource(defines::get()->get_wealth_resource(), -sold_unit->get_price(), true);
 
 	if (player->AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
 		player->Ai->Force.remove_dead_units();
@@ -6432,31 +6432,38 @@ const CPlayer *CUnit::get_display_player() const
 	return this->Player;
 }
 
-int CUnit::GetPrice() const
+int CUnit::get_price() const
 {
-	int cost = this->Type->Stats[this->Player->get_index()].get_price();
+	const unit_stats &stats = this->Type->Stats[this->Player->get_index()];
+
+	int cost = stats.get_price();
 	
 	if (this->Prefix != nullptr) {
 		cost += this->Prefix->get_magic_level() * 1000;
 	}
+
 	if (this->Suffix != nullptr) {
 		cost += this->Suffix->get_magic_level() * 1000;
 	}
+
 	if (this->Spell != nullptr) {
 		cost += 1000;
 	}
+
 	if (this->Work != nullptr) {
-		if (this->Type->get_item_class() == wyrmgus::item_class::book) {
+		if (this->Type->get_item_class() == item_class::book) {
 			cost += 5000;
 		} else {
 			cost += 1000;
 		}
 	}
+
 	if (this->Elixir != nullptr) {
 		cost += this->Elixir->get_magic_level() * 1000;
 	}
+
 	if (this->get_character() != nullptr) {
-		cost += (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->get_index()].Variables[LEVEL_INDEX].Value) * 250;
+		cost += (this->Variable[LEVEL_INDEX].Value - stats.Variables[LEVEL_INDEX].Value) * 250;
 	}
 	
 	return cost;

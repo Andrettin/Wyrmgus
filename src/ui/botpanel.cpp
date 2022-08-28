@@ -886,7 +886,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 		}
 		case ButtonCmd::Buy:
 			Costs[FoodCost] = unit_manager::get()->GetSlotUnit(button.Value).Variable[DEMAND_INDEX].Value;
-			Costs[CopperCost] = unit_manager::get()->GetSlotUnit(button.Value).GetPrice();
+			Costs[CopperCost] = unit_manager::get()->GetSlotUnit(button.Value).get_price();
 			break;
 		default:
 			break;
@@ -2280,7 +2280,7 @@ void CButtonPanel::DoClicked_Faction(int button)
 void CButtonPanel::DoClicked_Buy(int button)
 {
 	resource_map<int> buy_costs;
-	buy_costs[defines::get()->get_wealth_resource()] = unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).GetPrice();
+	buy_costs[defines::get()->get_wealth_resource()] = unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).get_price();
 
 	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->check_limits<false>(*unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type, Selected[0]) == check_limits_result::success) {
 		SendCommandBuy(*Selected[0], &unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value), CPlayer::GetThisPlayer()->get_index());
