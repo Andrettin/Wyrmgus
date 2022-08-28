@@ -95,6 +95,34 @@ inline std::string faction_tier_to_string(const faction_tier tier)
 	throw std::runtime_error("Invalid faction tier: \"" + std::to_string(static_cast<int>(tier)) + "\".");
 }
 
+inline std::string get_faction_tier_name(const faction_tier tier)
+{
+	switch (tier) {
+		case faction_tier::none:
+			return "None";
+		case faction_tier::barony:
+			return "Barony";
+		case faction_tier::viscounty:
+			return "Viscounty";
+		case faction_tier::county:
+			return "County";
+		case faction_tier::marquisate:
+			return "Marquisate";
+		case faction_tier::duchy:
+			return "Duchy";
+		case faction_tier::grand_duchy:
+			return "Grand Duchy";
+		case faction_tier::kingdom:
+			return "Kingdom";
+		case faction_tier::empire:
+			return "Empire";
+		default:
+			break;
+	}
+
+	throw std::runtime_error("Invalid faction tier: \"" + std::to_string(static_cast<int>(tier)) + "\".");
+}
+
 }
 
 Q_DECLARE_METATYPE(wyrmgus::faction_tier)

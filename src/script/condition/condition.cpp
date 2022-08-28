@@ -60,6 +60,7 @@
 #include "script/condition/equipment_condition.h"
 #include "script/condition/equipped_condition.h"
 #include "script/condition/faction_condition.h"
+#include "script/condition/faction_tier_condition.h"
 #include "script/condition/faction_type_condition.h"
 #include "script/condition/government_type_condition.h"
 #include "script/condition/has_flag_condition.h"
@@ -162,6 +163,8 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_pr
 			return std::make_unique<dynasty_condition>(value, condition_operator);
 		} else if (key == "faction") {
 			return std::make_unique<faction_condition>(value, condition_operator);
+		} else if (key == "faction_tier") {
+			return std::make_unique<faction_tier_condition>(value, condition_operator);
 		} else if (key == "faction_type") {
 			return std::make_unique<faction_type_condition>(value, condition_operator);
 		} else if (key == "government_type") {
