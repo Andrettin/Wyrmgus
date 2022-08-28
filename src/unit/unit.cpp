@@ -2362,7 +2362,7 @@ void CUnit::generate_trait()
 	std::vector<const CUpgrade *> potential_traits;
 
 	for (const CUpgrade *trait : this->Type->get_traits()) {
-		if (trait->check_unit_conditions(this)) {
+		if (!trait->check_unit_conditions(this)) {
 			continue;
 		}
 
