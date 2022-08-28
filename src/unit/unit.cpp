@@ -6465,6 +6465,11 @@ int CUnit::get_price() const
 	if (this->get_character() != nullptr) {
 		cost += (this->Variable[LEVEL_INDEX].Value - stats.Variables[LEVEL_INDEX].Value) * 250;
 	}
+
+	if (this->Variable[COST_MODIFIER_INDEX].Value != 0) {
+		cost *= 100 + this->Variable[COST_MODIFIER_INDEX].Value;
+		cost /= 100;
+	}
 	
 	return cost;
 }

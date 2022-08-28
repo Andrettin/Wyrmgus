@@ -4399,11 +4399,12 @@ resource_map<int> CPlayer::GetUnitTypeCosts(const unit_type *type, const bool hi
 		}
 
 		if (resource != defines::get()->get_time_resource()) {
-			int cost_modifier = 0;
+			int cost_modifier = type->Stats[this->get_index()].Variables[COST_MODIFIER_INDEX].Value;
+
 			if (type->is_infantry()) {
-				cost_modifier = this->get_infantry_cost_modifier();
+				cost_modifier += this->get_infantry_cost_modifier();
 			} else if (type->BoolFlag[MOUNTED_INDEX].value) {
-				cost_modifier = this->get_cavalry_cost_modifier();
+				cost_modifier += this->get_cavalry_cost_modifier();
 			}
 
 			if (cost_modifier != 0) {
