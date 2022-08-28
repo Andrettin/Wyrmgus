@@ -105,4 +105,7 @@ private:
 	std::vector<std::unique_ptr<const condition<scope_type>>> conditions; //the conditions of which none should be true
 };
 
+extern template class not_condition<CPlayer>;
+extern template class not_condition<CUnit>;
+
 }

@@ -49,4 +49,7 @@ not_condition<scope_type>::not_condition(std::unique_ptr<const condition<scope_t
 	this->conditions.push_back(std::move(condition));
 }
 
+template class not_condition<CPlayer>;
+template class not_condition<CUnit>;
+
 }
