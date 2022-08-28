@@ -41,6 +41,12 @@ public:
 	{
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "settlement_owner";
+		return class_identifier;
+	}
+
 	virtual const CPlayer *get_scope(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);

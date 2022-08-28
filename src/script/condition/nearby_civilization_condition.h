@@ -40,6 +40,12 @@ public:
 		this->civilization = civilization::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "nearby_civilization";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);

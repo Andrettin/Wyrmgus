@@ -42,6 +42,12 @@ public:
 		this->tier = string_to_faction_tier(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "faction_tier";
+		return class_identifier;
+	}
+
 	virtual void check_validity() const override
 	{
 		if (this->tier == faction_tier::none) {

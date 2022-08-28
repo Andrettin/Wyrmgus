@@ -45,6 +45,12 @@ public:
 		this->season = season::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "season";
+		return class_identifier;
+	}
+
 	const CMapLayer *get_scope_map_layer(const scope_type *scope) const
 	{
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {

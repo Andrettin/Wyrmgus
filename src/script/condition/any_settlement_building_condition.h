@@ -41,6 +41,12 @@ public:
 	{
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "any_settlement_building";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		if (unit->get_settlement() == nullptr) {

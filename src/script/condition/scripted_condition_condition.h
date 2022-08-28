@@ -50,6 +50,12 @@ public:
 		this->scripted_condition = scripted_condition_condition::get_scripted_condition(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "scripted_condition";
+		return class_identifier;
+	}
+
 	virtual bool check(const civilization *civilization) const override
 	{
 		return this->scripted_condition->get_conditions()->check(civilization);

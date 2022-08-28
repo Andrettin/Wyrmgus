@@ -40,6 +40,12 @@ public:
 		this->government_type = string_to_government_type(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "government_type";
+		return class_identifier;
+	}
+
 	virtual bool check(const civilization *civilization) const override
 	{
 		const CUpgrade *upgrade = CUpgrade::get_government_type_upgrade(this->government_type);

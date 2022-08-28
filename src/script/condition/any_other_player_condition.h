@@ -39,6 +39,12 @@ public:
 	{
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "any_other_player";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		for (const qunique_ptr<CPlayer> &scope_player : CPlayer::Players) {

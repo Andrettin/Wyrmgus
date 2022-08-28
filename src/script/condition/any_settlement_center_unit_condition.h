@@ -39,6 +39,12 @@ public:
 	{
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "any_settlement_center_unit";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		std::vector<CUnit *> settlement_centers = player->get_town_hall_units();

@@ -41,6 +41,12 @@ public:
 		this->trigger = trigger::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "trigger";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(player);

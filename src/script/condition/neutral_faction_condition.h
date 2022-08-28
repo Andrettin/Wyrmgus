@@ -44,6 +44,12 @@ public:
 		this->faction = faction::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "neutral_faction";
+		return class_identifier;
+	}
+
 	virtual void check_validity() const override
 	{
 		assert_throw(this->faction != nullptr);

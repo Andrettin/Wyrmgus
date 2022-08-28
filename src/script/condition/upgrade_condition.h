@@ -45,6 +45,12 @@ public:
 		this->upgrade = CUpgrade::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "upgrade";
+		return class_identifier;
+	}
+
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
 
 	virtual bool check(const civilization *civilization) const override

@@ -48,6 +48,12 @@ public:
 		}
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "character";
+		return class_identifier;
+	}
+
 	virtual void check_validity() const override
 	{
 		if (this->character == nullptr && !this->is_character.has_value()) {

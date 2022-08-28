@@ -40,6 +40,12 @@ public:
 	explicit and_condition(const gsml_operator condition_operator);
 	explicit and_condition(std::vector<std::unique_ptr<const condition<scope_type>>> &&conditions);
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "and";
+		return class_identifier;
+	}
+
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void process_gsml_property(const gsml_property &property) override;
 	virtual void process_gsml_scope(const gsml_data &scope) override;

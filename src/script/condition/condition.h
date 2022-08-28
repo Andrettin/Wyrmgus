@@ -101,6 +101,8 @@ public:
 	{
 	}
 
+	virtual const std::string &get_class_identifier() const = 0;
+
 	void ProcessConfigData(const CConfigData *config_data);
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property);
 	virtual void ProcessConfigDataSection(const CConfigData *section);
@@ -134,7 +136,7 @@ public:
 	{
 		Q_UNUSED(scope);
 
-		throw std::runtime_error("The equality operator is not supported for this condition.");
+		throw std::runtime_error("The equality operator is not supported for \"" + this->get_class_identifier() + "\" conditions.");
 	}
 
 	virtual bool check_inequality(const scope_type *scope) const
@@ -146,7 +148,7 @@ public:
 	{
 		Q_UNUSED(scope);
 
-		throw std::runtime_error("The less than operator is not supported for this condition.");
+		throw std::runtime_error("The less than operator is not supported for \"" + this->get_class_identifier() + "\" conditions.");
 	}
 
 	virtual bool check_less_than_or_equality(const scope_type *scope) const
@@ -158,7 +160,7 @@ public:
 	{
 		Q_UNUSED(scope);
 
-		throw std::runtime_error("The greater than operator is not supported for this condition.");
+		throw std::runtime_error("The greater than operator is not supported for \"" + this->get_class_identifier() + "\" conditions.");
 	}
 
 	virtual bool check_greater_than_or_equality(const scope_type *scope) const
@@ -171,32 +173,32 @@ public:
 
 	virtual std::string get_equality_string() const
 	{
-		throw std::runtime_error("The equality operator is not supported for this condition.");
+		throw std::runtime_error("The equality operator is not supported for \"" + this->get_class_identifier() + "\" conditions.");
 	}
 
 	virtual std::string get_inequality_string() const
 	{
-		throw std::runtime_error("The inequality operator is not supported for this condition.");
+		throw std::runtime_error("The inequality operator is not supported for \"" + this->get_class_identifier() + "\" conditions.");
 	}
 
 	virtual std::string get_less_than_string() const
 	{
-		throw std::runtime_error("The less than operator is not supported for this condition.");
+		throw std::runtime_error("The less than operator is not supported for \"" + this->get_class_identifier() + "\" conditions.");
 	}
 
 	virtual std::string get_less_than_or_equality_string() const
 	{
-		throw std::runtime_error("The less than or equality operator is not supported for this condition.");
+		throw std::runtime_error("The less than or equality operator is not supported for \"" + this->get_class_identifier() + "\" conditions.");
 	}
 
 	virtual std::string get_greater_than_string() const
 	{
-		throw std::runtime_error("The greater than operator is not supported for this condition.");
+		throw std::runtime_error("The greater than operator is not supported for \"" + this->get_class_identifier() + "\" conditions.");
 	}
 
 	virtual std::string get_greater_than_or_equality_string() const
 	{
-		throw std::runtime_error("The greater than or equality operator is not supported for this condition.");
+		throw std::runtime_error("The greater than or equality operator is not supported for \"" + this->get_class_identifier() + "\" conditions.");
 	}
 
 	virtual bool is_hidden() const

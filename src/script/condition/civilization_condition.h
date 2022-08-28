@@ -41,6 +41,12 @@ public:
 		this->civilization = civilization::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "civilization";
+		return class_identifier;
+	}
+
 	virtual bool check(const civilization *civilization) const override
 	{
 		return civilization == this->civilization;

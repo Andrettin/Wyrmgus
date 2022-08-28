@@ -51,6 +51,12 @@ public:
 		this->unit_class = unit_class::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "unit_class";
+		return class_identifier;
+	}
+
 	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		const std::string &key = property.get_key();

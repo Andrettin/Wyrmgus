@@ -43,6 +43,12 @@ public:
 		this->value = string::to_bool(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "snowy_terrain";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);

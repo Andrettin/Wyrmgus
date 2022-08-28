@@ -41,6 +41,12 @@ public:
 		this->upgrade_class = upgrade_class::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "upgrade_class";
+		return class_identifier;
+	}
+
 	const CPlayer *get_scope_player(const scope_type *scope) const
 	{
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {

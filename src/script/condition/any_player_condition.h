@@ -40,6 +40,12 @@ public:
 	{
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "any_player";
+		return class_identifier;
+	}
+
 	bool check(const read_only_context &ctx) const
 	{
 		for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {

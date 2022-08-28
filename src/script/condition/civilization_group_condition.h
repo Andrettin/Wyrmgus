@@ -42,6 +42,12 @@ public:
 		this->group = civilization_group::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "civilization_group";
+		return class_identifier;
+	}
+
 	virtual bool check(const civilization *civilization) const override
 	{
 		if (civilization == nullptr) {

@@ -40,6 +40,12 @@ public:
 		this->faction_type = string_to_faction_type(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "faction_type";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);

@@ -38,6 +38,12 @@ public:
 	explicit has_flag_condition(const player_flag *flag);
 	explicit has_flag_condition(const std::string &value, const gsml_operator condition_operator);
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "has_flag";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override;
 
 	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override;

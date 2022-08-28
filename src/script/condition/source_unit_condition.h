@@ -41,6 +41,12 @@ public:
 	{
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "source_unit";
+		return class_identifier;
+	}
+
 	virtual const CUnit *get_scope(const upper_scope_type *upper_scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(upper_scope);

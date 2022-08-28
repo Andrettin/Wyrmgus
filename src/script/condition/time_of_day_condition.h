@@ -43,6 +43,12 @@ public:
 		this->time_of_day = time_of_day::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "time_of_day";
+		return class_identifier;
+	}
+
 	const CMapLayer *get_scope_map_layer(const scope_type *scope) const
 	{
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {

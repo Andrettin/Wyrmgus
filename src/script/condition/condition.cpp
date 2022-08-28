@@ -319,13 +319,13 @@ void condition<scope_type>::ProcessConfigDataSection(const CConfigData *section)
 template <typename scope_type>
 void condition<scope_type>::process_gsml_property(const gsml_property &property)
 {
-	throw std::runtime_error("Invalid condition property: \"" + property.get_key() + "\".");
+	throw std::runtime_error("Invalid \"" + this->get_class_identifier() + "\" condition property: \"" + property.get_key() + "\".");
 }
 
 template <typename scope_type>
 void condition<scope_type>::process_gsml_scope(const gsml_data &scope)
 {
-	throw std::runtime_error("Invalid condition scope: \"" + scope.get_tag() + "\".");
+	throw std::runtime_error("Invalid \"" + this->get_class_identifier() + "\" condition scope: \"" + scope.get_tag() + "\".");
 }
 
 

@@ -42,6 +42,12 @@ public:
 		this->equipment_type = unit_type::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "equipment";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const CUnit *unit, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(ctx);

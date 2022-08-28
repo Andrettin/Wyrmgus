@@ -41,6 +41,12 @@ public:
 		this->character = character::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "character_exists";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const scope_type *scope, const read_only_context &ctx) const override
 	{
 		Q_UNUSED(scope);

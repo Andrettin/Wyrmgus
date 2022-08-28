@@ -40,6 +40,12 @@ public:
 		this->faction = faction::get(value);
 	}
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "faction";
+		return class_identifier;
+	}
+
 	virtual bool check(const civilization *civilization) const override
 	{
 		return civilization == this->faction->get_civilization();

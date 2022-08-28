@@ -38,6 +38,12 @@ public:
 	explicit not_condition(std::vector<std::unique_ptr<const condition<scope_type>>> &&conditions);
 	explicit not_condition(std::unique_ptr<const condition<scope_type>> &&condition);
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "not";
+		return class_identifier;
+	}
+
 	virtual void process_gsml_property(const gsml_property &property) override
 	{
 		this->conditions.push_back(condition<scope_type>::from_gsml_property(property));

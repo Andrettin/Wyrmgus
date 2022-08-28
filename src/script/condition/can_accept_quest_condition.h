@@ -38,6 +38,12 @@ public:
 	explicit can_accept_quest_condition(const wyrmgus::quest *quest);
 	explicit can_accept_quest_condition(const std::string &value, const gsml_operator condition_operator);
 
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "can_accept_quest";
+		return class_identifier;
+	}
+
 	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override;
 	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override;
 
