@@ -49,6 +49,7 @@
 #include "script/context.h"
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
+#include "script/trigger_random_group.h"
 #include "script/trigger_target.h"
 #include "script/trigger_type.h"
 #include "ui/interface.h"
@@ -667,10 +668,16 @@ void trigger::InitActiveTriggers()
 		}
 
 		if (trigger->is_random()) {
-			std::vector<const wyrmgus::trigger *> &active_random_triggers = trigger::active_random_triggers[trigger->get_type()];
+			if (trigger->get_random_group() != nullptr) {
+				for (int i = 0; i < trigger->get_random_weight(); ++i) {
+					trigger->get_random_group()->add_active_trigger(trigger);
+				}
+			} else {
+				std::vector<const wyrmgus::trigger *> &active_random_triggers = trigger::active_random_triggers[trigger->get_type()];
 
-			for (int i = 0; i < trigger->get_random_weight(); ++i) {
-				active_random_triggers.push_back(trigger);
+				for (int i = 0; i < trigger->get_random_weight(); ++i) {
+					active_random_triggers.push_back(trigger);
+				}
 			}
 		} else {
 			trigger::active_triggers[trigger->get_type()].push_back(trigger);
@@ -694,6 +701,11 @@ void trigger::ClearActiveTriggers()
 	game::get()->clear_local_triggers();
 	trigger::active_triggers.clear();
 	trigger::active_random_triggers.clear();
+
+	for (trigger_random_group *random_group : trigger_random_group::get_all()) {
+		random_group->clear_active_triggers();
+	}
+
 	trigger::DeactivatedTriggers.clear();
 	
 	//Wyrmgus start
@@ -726,7 +738,16 @@ void trigger::check_triggers_for_player(CPlayer *player, const trigger_type type
 	}
 
 	//trigger one out of the random triggers for this pulse, for each player
-	std::vector<const trigger *> random_triggers = trigger::active_random_triggers[type];
+	trigger::check_random_triggers_for_player(player, trigger::active_random_triggers[type]);
+
+	for (const trigger_random_group *random_group : trigger_random_group::get_all_of_type(type)) {
+		trigger::check_random_triggers_for_player(player, random_group->get_active_triggers());
+	}
+}
+
+void trigger::check_random_triggers_for_player(CPlayer *player, const std::vector<const trigger *> &triggers)
+{
+	std::vector<const trigger *> random_triggers = triggers;
 
 	while (!random_triggers.empty()) {
 		const trigger *trigger = vector::get_random(random_triggers);
@@ -761,6 +782,21 @@ void trigger::process_gsml_scope(const gsml_data &scope)
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}
+}
+
+void trigger::initialize()
+{
+	if (this->get_random_group() != nullptr) {
+		this->random_group->add_trigger(this);
+
+		if (!this->is_random()) {
+			this->set_random(true);
+		}
+
+		this->set_type(this->get_random_group()->get_type());
+	}
+
+	data_entry::initialize();
 }
 
 void trigger::check() const
@@ -830,10 +866,14 @@ bool trigger::check_for_player(CPlayer *player) const
 		trigger::DeactivatedTriggers.push_back(this->get_identifier());
 
 		if (this->is_random()) {
-			std::vector<trigger *> &active_triggers = trigger::active_triggers[this->get_type()];
-			std::erase(active_triggers, this);
+			if (this->get_random_group() != nullptr) {
+				this->get_random_group()->remove_active_trigger(this);
+			} else {
+				std::vector<const trigger *> &active_triggers = trigger::active_random_triggers[this->get_type()];
+				std::erase(active_triggers, this);
+			}
 		} else {
-			std::vector<const trigger *> &active_triggers = trigger::active_random_triggers[this->get_type()];
+			std::vector<trigger *> &active_triggers = trigger::active_triggers[this->get_type()];
 			std::erase(active_triggers, this);
 		}
 	}

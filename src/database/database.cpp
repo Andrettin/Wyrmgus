@@ -86,6 +86,7 @@
 #include "religion/deity.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"
+#include "script/trigger_random_group.h"
 #include "script/trigger_target.h"
 #include "script/trigger_type.h"
 #include "sound/music_type.h"
@@ -419,6 +420,8 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(time_of_day_schedule::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::timeline*") {
 			new_property_value = QVariant::fromValue(timeline::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::trigger_random_group*") {
+			new_property_value = QVariant::fromValue(trigger_random_group::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::trigger_target") {
 			new_property_value = QVariant::fromValue(string_to_trigger_target(property.get_value()));
 		} else if (property_class_name == "wyrmgus::trigger_type") {

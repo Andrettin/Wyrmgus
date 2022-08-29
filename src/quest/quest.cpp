@@ -57,6 +57,7 @@
 #include "script/effect/effect_list.h"
 #include "script/effect/set_flag_effect.h"
 #include "script/trigger.h"
+#include "script/trigger_random_group.h"
 #include "script/trigger_target.h"
 #include "script/trigger_type.h"
 #include "script.h"
@@ -231,11 +232,13 @@ void quest::initialize()
 	}
 
 	if (!this->is_hidden() && !this->is_unobtainable()) {
+		trigger_random_group *trigger_random_group = trigger_random_group::get_or_add("quest", nullptr);
+		trigger_random_group->set_type(trigger_type::half_minute_pulse);
+
 		//create a trigger and dialogue for the quest
 		wyrmgus::trigger *trigger = trigger::add("quest_" + this->get_identifier(), this->get_module());
-		trigger->set_type(trigger_type::half_minute_pulse);
 		trigger->set_target(trigger_target::player);
-		trigger->set_random_weight(100);
+		trigger->set_random_group(trigger_random_group);
 
 		const player_flag *decline_flag = player_flag::add("quest_" + this->get_identifier() + "_declined", this->get_module());
 

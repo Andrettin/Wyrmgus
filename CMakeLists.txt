@@ -368,6 +368,7 @@ set(script_SRCS
 	src/script/factor.cpp
 	src/script/factor_modifier.cpp
 	src/script/trigger.cpp
+	src/script/trigger_random_group.cpp
 )
 source_group(script FILES ${script_SRCS})
 
@@ -951,6 +952,7 @@ set(wyrmgus_script_HDRS
 	src/script/factor.h
 	src/script/factor_modifier.h
 	src/script/trigger.h
+	src/script/trigger_random_group.h
 	src/script/trigger_target.h
 	src/script/trigger_type.h
 )

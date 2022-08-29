@@ -45,6 +45,7 @@ class dynasty;
 class faction;
 class resource;
 class tile;
+class trigger_random_group;
 class unit_type;
 enum class trigger_target;
 enum class trigger_type;
@@ -67,6 +68,7 @@ class trigger final : public data_entry, public data_type<trigger>
 
 	Q_PROPERTY(wyrmgus::trigger_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::trigger_target target MEMBER target READ get_target)
+	Q_PROPERTY(wyrmgus::trigger_random_group* random_group MEMBER random_group)
 	Q_PROPERTY(bool random READ is_random WRITE set_random)
 	Q_PROPERTY(int random_weight MEMBER random_weight READ get_random_weight)
 	Q_PROPERTY(bool only_once MEMBER only_once READ fires_only_once)
@@ -76,6 +78,7 @@ class trigger final : public data_entry, public data_type<trigger>
 public:
 	static constexpr const char *class_identifier = "trigger";
 	static constexpr const char *database_folder = "triggers";
+	static constexpr int default_random_weight = 100;
 
 	static void clear();
 	static void InitActiveTriggers();	/// Setup triggers
@@ -83,6 +86,7 @@ public:
 
 	static void check_triggers(const trigger_type type);
 	static void check_triggers_for_player(CPlayer *player, const trigger_type type);
+	static void check_random_triggers_for_player(CPlayer *player, const std::vector<const trigger *> &triggers);
 
 private:
 	static inline std::map<trigger_type, std::vector<trigger *>> active_triggers; //triggers that are active for the current game
@@ -100,6 +104,7 @@ public:
 	~trigger();
 	
 	virtual void process_gsml_scope(const gsml_data &scope) override;
+	virtual void initialize() override;
 	virtual void check() const override;
 
 	trigger_type get_type() const
@@ -122,6 +127,16 @@ public:
 		this->target = target;
 	}
 
+	trigger_random_group *get_random_group() const
+	{
+		return this->random_group;
+	}
+
+	void set_random_group(trigger_random_group *random_group)
+	{
+		this->random_group = random_group;
+	}
+
 	bool is_random() const
 	{
 		return this->get_random_weight() != 0;
@@ -134,7 +149,7 @@ public:
 		}
 
 		if (random) {
-			this->set_random_weight(1);
+			this->set_random_weight(trigger::default_random_weight);
 		} else {
 			this->set_random_weight(0);
 		}
@@ -195,6 +210,7 @@ public:
 private:
 	trigger_type type;
 	trigger_target target;
+	trigger_random_group *random_group = nullptr;
 	int random_weight = 0;
 public:
 	bool Local = false;
