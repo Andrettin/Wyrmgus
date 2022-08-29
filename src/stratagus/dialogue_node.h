@@ -106,6 +106,11 @@ public:
 
 	const wyrmgus::player_color *get_player_color(const CUnit *speaker_unit) const;
 
+	void set_player_color(const wyrmgus::player_color *player_color)
+	{
+		this->player_color = player_color;
+	}
+
 	std::string get_text(const text_processor &text_processor) const;
 
 	void set_text(const std::string &text)

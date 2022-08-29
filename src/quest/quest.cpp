@@ -248,6 +248,7 @@ void quest::initialize()
 		dialogue_node->set_title("Quest: " + this->get_name());
 		dialogue_node->set_text("[player.quest_text:" + this->get_identifier() + "]");
 		dialogue_node->set_icon(this->get_icon());
+		dialogue_node->set_player_color(this->get_player_color());
 
 		auto accept_option = std::make_unique<wyrmgus::dialogue_option>();
 		accept_option->set_name("Accept");
