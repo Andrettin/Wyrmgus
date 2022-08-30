@@ -252,9 +252,7 @@ static void PlaceUnits()
 */
 void LoadGame(const std::filesystem::path &filepath)
 {
-	//Wyrmgus start
-	CleanPlayers(); //clean players, as they may not have been cleansed after a scenario
-	//Wyrmgus end
+	CleanPlayers();
 	
 	// log will be enabled if found in the save game
 	CommandLogDisabled = true;

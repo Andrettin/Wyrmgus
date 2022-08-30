@@ -86,7 +86,6 @@ int SaveGame(const std::string &file_url_str)
 boost::asio::awaitable<void> StartSavedGame(const std::filesystem::path &filepath)
 {
 	SaveGameLoading = true;
-	CleanPlayers();
 	LoadGame(filepath);
 
 	co_await StartMap(filepath, false);
