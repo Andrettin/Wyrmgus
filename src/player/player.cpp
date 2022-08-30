@@ -3461,6 +3461,10 @@ QStringList CPlayer::get_objective_strings() const
 	for (const quest *quest : this->get_current_quests()) {
 		objective_strings.push_back(QString::fromStdString(quest->get_name()));
 
+		for (const std::string &objective_string : quest->get_objective_strings()) {
+			objective_strings.push_back(QString::fromStdString("- " + objective_string));
+		}
+
 		for (const auto &objective : this->get_quest_objectives()) {
 			const quest_objective *quest_objective = objective->get_quest_objective();
 			if (quest_objective->get_quest() != quest) {
