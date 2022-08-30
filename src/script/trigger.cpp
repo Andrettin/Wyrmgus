@@ -609,19 +609,8 @@ void TriggersEachCycle()
 			trigger::CurrentTriggerId = 0;
 		}
 
-		if (GameCycle % CYCLES_PER_HALF_MINUTE == 0) {
-			trigger::half_minute_pulse_random_offset = random::get()->generate(CYCLES_PER_HALF_MINUTE);
-		}
-		if ((GameCycle + trigger::half_minute_pulse_random_offset) % CYCLES_PER_HALF_MINUTE == 0) {
-			trigger::check_triggers(trigger_type::half_minute_pulse);
-		}
-
-		if (GameCycle % CYCLES_PER_MINUTE == 0) {
-			trigger::minute_pulse_random_offset = random::get()->generate(CYCLES_PER_MINUTE);
-		}
-		if ((GameCycle + trigger::minute_pulse_random_offset) % CYCLES_PER_MINUTE == 0) {
-			trigger::check_triggers(trigger_type::minute_pulse);
-		}
+		trigger::check_pulse_type(trigger_type::half_minute_pulse);
+		trigger::check_pulse_type(trigger_type::minute_pulse);
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error executing the per cycle actions for triggers."));
 	}
@@ -684,8 +673,8 @@ void trigger::InitActiveTriggers()
 		}
 	}
 
-	trigger::half_minute_pulse_random_offset = random::get()->generate(CYCLES_PER_HALF_MINUTE);
-	trigger::minute_pulse_random_offset = random::get()->generate(CYCLES_PER_MINUTE);
+	trigger::pulse_random_offsets[trigger_type::half_minute_pulse] = trigger::generate_random_offset_for_type(trigger_type::half_minute_pulse);
+	trigger::pulse_random_offsets[trigger_type::minute_pulse] = trigger::generate_random_offset_for_type(trigger_type::minute_pulse);
 }
 
 void trigger::ClearActiveTriggers()
@@ -713,6 +702,19 @@ void trigger::ClearActiveTriggers()
 		quest->CurrentCompleted = false;
 	}
 	//Wyrmgus end
+}
+
+void trigger::check_pulse_type(const trigger_type type)
+{
+	const int pulse_cycles = trigger::get_type_cycles(type);
+
+	if (GameCycle % pulse_cycles == 0) {
+		trigger::pulse_random_offsets[type] = trigger::generate_random_offset_for_type(type);
+	}
+
+	if ((GameCycle + trigger::pulse_random_offsets[type]) % pulse_cycles == 0) {
+		trigger::check_triggers(type);
+	}
 }
 
 void trigger::check_triggers(const trigger_type type)
@@ -758,6 +760,28 @@ void trigger::check_random_triggers_for_player(CPlayer *player, const std::vecto
 
 		std::erase(random_triggers, trigger);
 	}
+}
+
+int trigger::get_type_cycles(const trigger_type type)
+{
+	switch (type) {
+		case trigger_type::half_minute_pulse:
+			return CYCLES_PER_HALF_MINUTE;
+		case trigger_type::minute_pulse:
+			return CYCLES_PER_MINUTE;
+		default:
+			assert_throw(false);
+			break;
+	}
+
+	return 0;
+}
+
+
+int trigger::generate_random_offset_for_type(const trigger_type type)
+{
+	const int cycles = trigger::get_type_cycles(type);
+	return random::get()->generate(cycles);
 }
 
 trigger::trigger(const std::string &identifier)

@@ -84,9 +84,12 @@ public:
 	static void InitActiveTriggers();	/// Setup triggers
 	static void ClearActiveTriggers();
 
+	static void check_pulse_type(const trigger_type type);
 	static void check_triggers(const trigger_type type);
 	static void check_triggers_for_player(CPlayer *player, const trigger_type type);
 	static void check_random_triggers_for_player(CPlayer *player, const std::vector<const trigger *> &triggers);
+	static int get_type_cycles(const trigger_type type);
+	static int generate_random_offset_for_type(const trigger_type type);
 
 private:
 	static inline std::map<trigger_type, std::vector<trigger *>> active_triggers; //triggers that are active for the current game
@@ -96,8 +99,7 @@ public:
 	static std::vector<std::string> DeactivatedTriggers;
 	static unsigned int CurrentTriggerId;
 private:
-	static inline int half_minute_pulse_random_offset = 0;
-	static inline int minute_pulse_random_offset = 0;
+	static inline std::map<trigger_type, int> pulse_random_offsets;
 
 public:
 	explicit trigger(const std::string &identifier);
