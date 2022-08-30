@@ -253,7 +253,7 @@ static void PlaceUnits()
 void LoadGame(const std::filesystem::path &filepath)
 {
 	CleanPlayers();
-	
+
 	// log will be enabled if found in the save game
 	CommandLogDisabled = true;
 	SaveGameLoading = true;

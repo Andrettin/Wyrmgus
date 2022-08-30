@@ -866,6 +866,11 @@ boost::asio::awaitable<void> StartMap(const std::filesystem::path &filepath, con
 
 		Gui->setTop(oldTop);
 		vector::remove(Containers, container);
+
+		if (!load_game_file.empty()) {
+			engine_interface::get()->load_game_deferred(load_game_file);
+			load_game_file.clear();
+		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error running map \"" + path::to_string(filepath) + "\"."));
 	}
