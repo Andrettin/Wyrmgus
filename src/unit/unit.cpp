@@ -880,22 +880,16 @@ void CUnit::Retrain()
 		if (upgrade->is_ability()) {
 			int remove_count = upgrade_count;
 
-			for (const CUpgrade *starting_ability : this->Type->StartingAbilities) {
-				if (starting_ability == upgrade) {
-					remove_count--;
+			for (const CUpgrade *bonus_ability : this->bonus_abilities) {
+				if (bonus_ability == upgrade) {
+					--remove_count;
 				}
 			}
 
 			if (this->get_character() != nullptr) {
 				for (const CUpgrade *base_ability : this->get_character()->get_base_abilities()) {
 					if (base_ability == upgrade) {
-						remove_count--;
-					}
-				}
-
-				for (const CUpgrade *bonus_ability : this->get_character()->get_bonus_abilities()) {
-					if (bonus_ability == upgrade) {
-						remove_count--;
+						--remove_count;
 					}
 				}
 			}
@@ -1100,13 +1094,13 @@ void CUnit::apply_character_properties()
 
 	for (const CUpgrade *ability_upgrade : this->Type->StartingAbilities) {
 		if (check_conditions(ability_upgrade, this)) {
-			IndividualUpgradeAcquire(*this, ability_upgrade);
+			this->add_bonus_ability(ability_upgrade);
 		}
 	}
 
 	for (const CUpgrade *ability_upgrade : this->get_character()->get_bonus_abilities()) {
 		if (check_conditions(ability_upgrade, this)) {
-			IndividualUpgradeAcquire(*this, ability_upgrade);
+			this->add_bonus_ability(ability_upgrade);
 		}
 	}
 
@@ -3589,7 +3583,7 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 	
 	for (const CUpgrade *starting_ability : unit->Type->StartingAbilities) {
 		if (check_conditions(starting_ability, unit)) {
-			IndividualUpgradeAcquire(*unit, starting_ability);
+			unit->add_bonus_ability(starting_ability);
 		}
 	}
 	
@@ -6170,6 +6164,25 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	}
 	
 	return value;
+}
+
+void CUnit::add_bonus_ability(const CUpgrade *ability)
+{
+	assert_throw(ability->is_ability());
+
+	this->bonus_abilities.push_back(ability);
+	IndividualUpgradeAcquire(*this, ability);
+}
+
+void CUnit::remove_bonus_ability(const CUpgrade *ability)
+{
+	assert_throw(ability->is_ability());
+
+	vector::remove_one(this->bonus_abilities, ability);
+
+	if (this->GetIndividualUpgrade(ability) > 0) {
+		IndividualUpgradeLost(*this, ability);
+	}
 }
 
 int CUnit::GetModifiedVariable(const int index, const VariableAttribute variable_type) const

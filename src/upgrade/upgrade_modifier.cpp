@@ -505,9 +505,9 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 			//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 			for (const CUpgrade *ability_upgrade : unit->Type->StartingAbilities) {
 				if (!unit->GetIndividualUpgrade(ability_upgrade) && check_conditions(ability_upgrade, unit)) {
-					IndividualUpgradeAcquire(*unit, ability_upgrade);
+					unit->add_bonus_ability(ability_upgrade);
 				} else if (unit->GetIndividualUpgrade(ability_upgrade) && !check_conditions(ability_upgrade, unit)) {
-					IndividualUpgradeLost(*unit, ability_upgrade);
+					unit->remove_bonus_ability(ability_upgrade);
 				}
 			}
 
@@ -526,6 +526,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 					}
 				}
 			}
+
 			unit->UpdateButtonIcons();
 		}
 		//Wyrmgus end

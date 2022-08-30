@@ -1170,7 +1170,7 @@ private:
 	std::vector<const CUpgrade *> affixes;		/// Affixes which can be generated for this unit type
 	std::vector<CUpgrade *> traits; //which traits this unit type can have
 public:
-	std::vector<CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
+	std::vector<const CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
 	//Wyrmgus end
 	int Slot = 0;                    /// Type as number
 private:

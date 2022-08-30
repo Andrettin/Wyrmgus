@@ -584,6 +584,9 @@ public:
 	int GetIndividualUpgrade(const CUpgrade *upgrade) const;
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
 
+	void add_bonus_ability(const CUpgrade *ability);
+	void remove_bonus_ability(const CUpgrade *ability);
+
 	int get_variable_value(const int var_index) const
 	{
 		return this->Variable[var_index].Value;
@@ -1096,7 +1099,10 @@ public:
 	std::map<ButtonCmd, const wyrmgus::icon *> ButtonIcons;				/// icons for button actions
 	//Wyrmgus end
 	std::map<int, int> IndividualUpgrades;      /// individual upgrades which the unit has (and how many of it the unit has)
+private:
+	std::vector<const CUpgrade *> bonus_abilities;
 
+public:
 	QPoint pixel_offset;         /// pixel image displacement to map position
 	unsigned char Direction; //: 8; /// angle (0-255) unit looking
 	//Wyrmgus start

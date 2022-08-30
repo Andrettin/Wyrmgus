@@ -167,15 +167,28 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	//Wyrmgus end
 	
 	//if the old unit type had a starting ability that the new one doesn't have, remove it; and apply it if the reverse happens
-	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
-		if (upgrade->is_ability()) {
-			if (unit.GetIndividualUpgrade(upgrade) > 0 && vector::contains(oldtype.StartingAbilities, upgrade) && !vector::contains(newtype.StartingAbilities, upgrade)) {
-				IndividualUpgradeLost(unit, upgrade);
-			} else if (unit.GetIndividualUpgrade(upgrade) == 0 && vector::contains(newtype.StartingAbilities, upgrade) && check_conditions(upgrade, &unit)) {
-				IndividualUpgradeAcquire(unit, upgrade);
-			}
+	std::vector<const CUpgrade *> lost_starting_abilities = oldtype.StartingAbilities;
+	std::vector<const CUpgrade *> gained_starting_abilities;
+
+	for (const CUpgrade *ability_upgrade : newtype.StartingAbilities) {
+		const auto find_iterator = std::find(lost_starting_abilities.begin(), lost_starting_abilities.end(), ability_upgrade);
+		if (find_iterator != lost_starting_abilities.end()) {
+			lost_starting_abilities.erase(find_iterator);
+			continue;
 		}
-	}	
+
+		gained_starting_abilities.push_back(ability_upgrade);
+	}
+
+	for (const CUpgrade *ability_upgrade : lost_starting_abilities) {
+		unit.remove_bonus_ability(ability_upgrade);
+	}
+
+	for (const CUpgrade *ability_upgrade : gained_starting_abilities) {
+		if (check_conditions(ability_upgrade, &unit)) {
+			unit.add_bonus_ability(ability_upgrade);
+		}
+	}
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		//Wyrmgus start
