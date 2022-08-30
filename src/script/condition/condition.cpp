@@ -49,6 +49,7 @@
 #include "script/condition/any_unit_of_class_condition.h"
 #include "script/condition/any_unit_of_type_condition.h"
 #include "script/condition/can_accept_quest_condition.h"
+#include "script/condition/can_sustain_unit_type_condition.h"
 #include "script/condition/character_condition.h"
 #include "script/condition/character_exists_condition.h"
 #include "script/condition/character_unit_condition.h"
@@ -155,6 +156,8 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_pr
 			return std::make_unique<age_condition>(value, condition_operator);
 		} else if (key == "can_accept_quest") {
 			return std::make_unique<can_accept_quest_condition>(value, condition_operator);
+		} else if (key == "can_sustain_unit_type") {
+			return std::make_unique<can_sustain_unit_type_condition>(value, condition_operator);
 		} else if (key == "coastal") {
 			return std::make_unique<coastal_condition>(value, condition_operator);
 		} else if (key == "completed_quest") {

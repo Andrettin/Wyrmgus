@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2021-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,24 +26,26 @@
 
 #pragma once
 
-#include "quest/quest.h"
+#include "player/player.h"
 #include "script/condition/condition.h"
-#include "util/string_util.h"
+#include "unit/unit_type.h"
 
 namespace wyrmgus {
 
-class completed_quest_condition final : public condition<CPlayer>
+class quest;
+
+class can_sustain_unit_type_condition final : public condition<CPlayer>
 {
 public:
-	explicit completed_quest_condition(const std::string &value, const gsml_operator condition_operator)
+	explicit can_sustain_unit_type_condition(const std::string &value, const gsml_operator condition_operator)
 		: condition(condition_operator)
 	{
-		this->quest = quest::get(value);
+		this->unit_type = unit_type::get(value);
 	}
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static const std::string class_identifier = "completed_quest";
+		static const std::string class_identifier = "can_sustain_unit_type";
 		return class_identifier;
 	}
 
@@ -51,19 +53,27 @@ public:
 	{
 		Q_UNUSED(ctx);
 
-		return player->is_quest_completed(this->quest);
+		const int unit_demand = this->unit_type->Stats[player->get_index()].Variables[DEMAND_INDEX].Value;
+
+		if (unit_demand > 0) {
+			const int available_supply = player->get_supply() - player->get_demand();
+			if (available_supply < unit_demand) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override
 	{
 		Q_UNUSED(indent);
-		Q_UNUSED(links_allowed);
 
-		return "Completed the " + string::highlight(this->quest->get_name()) + " quest";
+		return "Can sustain the " + condition::get_object_string(this->unit_type, links_allowed) + " unit type";
 	}
 
 private:
-	const wyrmgus::quest *quest = nullptr;
+	const wyrmgus::unit_type *unit_type = nullptr;
 };
 
 }
