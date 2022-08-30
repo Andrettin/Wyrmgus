@@ -37,6 +37,9 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade.h"
+#include "upgrade/upgrade_container.h"
+#include "upgrade/upgrade_structs.h"
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
 
@@ -95,9 +98,15 @@ public:
 	virtual void process_gsml_scope(const gsml_data &scope) override
 	{
 		const std::string &tag = scope.get_tag();
+		const std::vector<std::string> &values = scope.get_values();
 
 		if (tag == "pos") {
 			this->pos = scope.to_point();
+		} else if (tag == "abilities") {
+			for (const std::string &value : values) {
+				const CUpgrade *ability = CUpgrade::get(value);
+				++this->ability_counts[ability];
+			}
 		} else {
 			effect::process_gsml_scope(scope);
 		}
@@ -117,8 +126,12 @@ public:
 			throw std::runtime_error("\"create_unit\" effect has a map template but no position.");
 		}
 
-		if (this->character != nullptr && this->count > 1) {
-			throw std::runtime_error("\"create_unit\" effect has a character and a count greater than 1 at the same time.");
+		if (this->character != nullptr) {
+			if (this->count > 1) {
+				throw std::runtime_error("\"create_unit\" effect has a character and a count greater than 1 at the same time.");
+			}
+
+			assert_throw(this->ability_counts.empty());
 		}
 
 		if (this->count < 1) {
@@ -148,11 +161,25 @@ public:
 
 			if (this->level != 0 && this->level > unit->Variable[LEVEL_INDEX].Value) {
 				const int level_increase = this->level - unit->Variable[LEVEL_INDEX].Value;
-				unit->IncreaseLevel(level_increase);
+				unit->IncreaseLevel(level_increase, false);
 			}
 
 			if (this->character != nullptr) {
 				unit->set_character(this->character);
+			}
+
+			for (const auto &[ability, ability_count] : this->ability_counts) {
+				for (int j = 0; j < ability_count; ++j) {
+					AbilityAcquire(*unit, ability);
+
+					if (unit->Variable[LEVELUP_INDEX].Value <= 0) {
+						break;
+					}
+				}
+
+				if (unit->Variable[LEVELUP_INDEX].Value <= 0) {
+					break;
+				}
 			}
 
 			if (this->ttl != 0) {
@@ -163,7 +190,6 @@ public:
 
 	virtual std::string get_assignment_string(const CPlayer *player, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override
 	{
-		Q_UNUSED(indent);
 		Q_UNUSED(prefix);
 
 		std::string str = "Receive ";
@@ -202,6 +228,18 @@ public:
 
 		if (this->ttl != 0) {
 			str += " for " + std::to_string(this->ttl) + " cycles";
+		}
+
+		if (!this->ability_counts.empty()) {
+			str += "\n" + std::string(indent + 1, '\t') + "Abilities:";
+
+			for (const auto &[ability, ability_count] : this->ability_counts) {
+				str += "\n" + std::string(indent + 2, '\t');
+				str += ability->get_name();
+				if (ability_count > 1) {
+					str += " (x" + std::to_string(ability_count) + ")";
+				}
+			}
 		}
 
 		return str;
@@ -291,6 +329,7 @@ private:
 	bool use_source_unit_pos = false;
 	int count = 1;
 	int level = 0;
+	upgrade_map<int> ability_counts;
 };
 
 }
