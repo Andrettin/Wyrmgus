@@ -35,6 +35,8 @@ class CUpgrade;
 namespace wyrmgus {
 
 class civilization;
+class dialogue_node;
+class dialogue_option;
 class faction;
 class literary_text;
 class named_data_entry;
@@ -58,6 +60,8 @@ public:
 	std::string process_named_data_entry_token(const named_data_entry *data_entry, const std::string &token) const;
 	std::string process_named_data_entry_tokens(const named_data_entry *data_entry, std::queue<std::string> &tokens) const;
 	std::string process_civilization_tokens(const civilization *civilization, std::queue<std::string> &tokens) const;
+	std::string process_dialogue_node_tokens(const dialogue_node *dialogue_node, std::queue<std::string> &tokens) const;
+	std::string process_dialogue_option_tokens(const dialogue_option *dialogue_option, std::queue<std::string> &tokens) const;
 	std::string process_faction_tokens(const faction *faction, std::queue<std::string> &tokens) const;
 	std::string process_literary_text_tokens(const literary_text *literary_text, std::queue<std::string> &tokens) const;
 	std::string process_player_tokens(const CPlayer *player, std::queue<std::string> &tokens) const;

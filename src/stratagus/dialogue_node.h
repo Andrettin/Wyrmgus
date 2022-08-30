@@ -83,6 +83,11 @@ public:
 		this->index = index;
 	}
 
+	const dialogue_option *get_option(const int index) const
+	{
+		return this->options.at(index).get();
+	}
+
 	void add_option(std::unique_ptr<dialogue_option> &&option);
 
 	void call(CPlayer *player, context &ctx) const;

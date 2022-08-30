@@ -155,10 +155,21 @@ void dialogue_option::do_effects(CPlayer *player, context &ctx) const
 	}
 }
 
+std::string dialogue_option::get_effects_string(const read_only_context &ctx) const
+{
+	if (this->effects != nullptr) {
+		return this->effects->get_effects_string(ctx.current_player, ctx);
+	}
+
+	return std::string();
+}
+
 std::string dialogue_option::get_tooltip(const context &ctx) const
 {
 	if (!this->tooltip.empty()) {
 		text_processing_context text_ctx(ctx);
+		text_ctx.dialogue_node = this->node;
+
 		const text_processor text_processor(std::move(text_ctx));
 
 		std::string tooltip;
@@ -174,7 +185,7 @@ std::string dialogue_option::get_tooltip(const context &ctx) const
 	}
 
 	if (this->effects != nullptr) {
-		return this->effects->get_effects_string(ctx.current_player, ctx);
+		return this->get_effects_string(ctx);
 	}
 
 	return std::string();

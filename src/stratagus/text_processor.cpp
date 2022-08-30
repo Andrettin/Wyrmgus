@@ -28,6 +28,8 @@
 
 #include "text_processor.h"
 
+#include "dialogue_node.h"
+#include "dialogue_option.h"
 #include "gender.h"
 #include "language/word.h"
 #include "literary_text.h"
@@ -43,6 +45,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/assert_util.h"
 #include "util/queue_util.h"
 #include "util/string_util.h"
 
@@ -106,6 +109,13 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens, con
 		}
 
 		str = this->process_civilization_tokens(civilization, tokens);
+	} else if (front_subtoken == "dialogue_node") {
+		if (!process_in_game_data) {
+			processed = false;
+			return std::string();
+		}
+
+		str = this->process_dialogue_node_tokens(this->context.dialogue_node, tokens);
 	} else if (front_subtoken == "faction") {
 		const wyrmgus::faction *faction = this->context.faction;
 		if (!subtokens.empty()) {
@@ -300,6 +310,66 @@ std::string text_processor::process_civilization_tokens(const civilization *civi
 	} else {
 		return this->process_named_data_entry_token(civilization, front_subtoken);
 	}
+}
+
+std::string text_processor::process_dialogue_node_tokens(const dialogue_node *dialogue_node, std::queue<std::string> &tokens) const
+{
+	if (dialogue_node == nullptr) {
+		throw std::runtime_error("No dialogue node provided when processing dialogue node tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing dialogue node tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
+
+	if (subtokens.size() > 2) {
+		throw std::runtime_error("There can only be at most 2 subtokens.");
+	}
+
+	const std::string front_subtoken = queue::take(subtokens);
+
+	static const std::string option_token_start = "option_";
+	if (front_subtoken.starts_with(option_token_start)) {
+		const std::string option_index_str = front_subtoken.substr(option_token_start.size());
+		const int option_index = std::stoi(option_index_str) - 1;
+
+		const dialogue_option *dialogue_option = dialogue_node->get_option(option_index);
+
+		return this->process_dialogue_option_tokens(dialogue_option, tokens);
+	}
+
+	throw std::runtime_error("Failed to process dialogue node token \"" + front_subtoken + "\".");
+}
+
+std::string text_processor::process_dialogue_option_tokens(const dialogue_option *dialogue_option, std::queue<std::string> &tokens) const
+{
+	if (dialogue_option == nullptr) {
+		throw std::runtime_error("No dialogue option provided when processing dialogue option tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing dialogue option tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
+
+	if (subtokens.size() > 2) {
+		throw std::runtime_error("There can only be at most 2 subtokens.");
+	}
+
+	const std::string front_subtoken = queue::take(subtokens);
+
+	if (front_subtoken == "effects") {
+		return dialogue_option->get_effects_string(this->context.script_context);
+	}
+
+	throw std::runtime_error("Failed to process dialogue option token \"" + front_subtoken + "\".");
 }
 
 std::string text_processor::process_faction_tokens(const wyrmgus::faction *faction, std::queue<std::string> &tokens) const

@@ -32,6 +32,7 @@ class CPlayer;
 
 namespace wyrmgus {
 
+class dialogue_node;
 class faction;
 
 struct text_processing_context final
@@ -45,6 +46,7 @@ struct text_processing_context final
 	}
 
 	const wyrmgus::faction *faction = nullptr;
+	const wyrmgus::dialogue_node *dialogue_node = nullptr;
 	read_only_context script_context;
 };
 

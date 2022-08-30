@@ -39,6 +39,7 @@ class dialogue_node;
 class gsml_data;
 class gsml_property;
 struct context;
+struct read_only_context;
 
 template <typename scope_type>
 class effect;
@@ -100,6 +101,8 @@ public:
 
 	void add_effect(std::unique_ptr<effect<CPlayer>> &&effect);
 	void do_effects(CPlayer *player, context &ctx) const;
+
+	std::string get_effects_string(const read_only_context &ctx) const;
 
 	std::string get_tooltip(const context &ctx) const;
 

@@ -192,6 +192,7 @@ void dialogue_node::call(CPlayer *player, context &ctx) const
 	const CUnit *speaker_unit = this->get_speaker_unit();
 
 	text_processing_context text_ctx(ctx);
+	text_ctx.dialogue_node = this;
 	const text_processor text_processor(std::move(text_ctx));
 
 	const QString title_str = QString::fromStdString(this->get_title_string(speaker_unit, text_processor));
