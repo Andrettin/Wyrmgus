@@ -41,9 +41,9 @@ class trigger_random_group final : public named_data_entry, public data_type<tri
 	Q_PROPERTY(wyrmgus::trigger_type type MEMBER type READ get_type)
 
 public:
-	static const std::vector<const trigger_random_group *> &get_all_of_type(const trigger_type type)
+	static const std::vector<trigger_random_group *> &get_all_of_type(const trigger_type type)
 	{
-		static std::vector<const trigger_random_group *> empty_vector;
+		static std::vector<trigger_random_group *> empty_vector;
 
 		const auto find_iterator = trigger_random_group::groups_by_type.find(type);
 		if (find_iterator != trigger_random_group::groups_by_type.end()) {
@@ -54,7 +54,7 @@ public:
 	}
 
 private:
-	static inline std::map<trigger_type, std::vector<const trigger_random_group *>> groups_by_type;
+	static inline std::map<trigger_type, std::vector<trigger_random_group *>> groups_by_type;
 
 public:
 	static constexpr const char *class_identifier = "trigger_random_group";
@@ -100,10 +100,18 @@ public:
 		this->active_triggers.clear();
 	}
 
+	int get_random_offset() const
+	{
+		return this->random_offset;
+	}
+
+	void generate_random_offset();
+
 private:
 	trigger_type type;
 	std::vector<const trigger *> triggers;
 	std::vector<const trigger *> active_triggers;
+	int random_offset = 0;
 };
 
 }

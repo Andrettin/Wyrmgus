@@ -675,6 +675,10 @@ void trigger::InitActiveTriggers()
 
 	trigger::pulse_random_offsets[trigger_type::half_minute_pulse] = trigger::generate_random_offset_for_type(trigger_type::half_minute_pulse);
 	trigger::pulse_random_offsets[trigger_type::minute_pulse] = trigger::generate_random_offset_for_type(trigger_type::minute_pulse);
+
+	for (trigger_random_group *random_group : trigger_random_group::get_all()) {
+		random_group->generate_random_offset();
+	}
 }
 
 void trigger::ClearActiveTriggers()
@@ -710,10 +714,32 @@ void trigger::check_pulse_type(const trigger_type type)
 
 	if (GameCycle % pulse_cycles == 0) {
 		trigger::pulse_random_offsets[type] = trigger::generate_random_offset_for_type(type);
+
+		for (trigger_random_group *random_group : trigger_random_group::get_all_of_type(type)) {
+			random_group->generate_random_offset();
+		}
 	}
 
 	if ((GameCycle + trigger::pulse_random_offsets[type]) % pulse_cycles == 0) {
 		trigger::check_triggers(type);
+	}
+
+	for (const trigger_random_group *random_group : trigger_random_group::get_all_of_type(type)) {
+		if ((GameCycle + random_group->get_random_offset()) % pulse_cycles != 0) {
+			continue;
+		}
+
+		for (const qunique_ptr<CPlayer> &player : CPlayer::Players) {
+			if (player->get_type() == player_type::nobody) {
+				continue;
+			}
+
+			if (!player->is_alive()) {
+				continue;
+			}
+
+			trigger::check_random_triggers_for_player(player.get(), random_group->get_active_triggers());
+		}
 	}
 }
 
@@ -741,10 +767,6 @@ void trigger::check_triggers_for_player(CPlayer *player, const trigger_type type
 
 	//trigger one out of the random triggers for this pulse, for each player
 	trigger::check_random_triggers_for_player(player, trigger::active_random_triggers[type]);
-
-	for (const trigger_random_group *random_group : trigger_random_group::get_all_of_type(type)) {
-		trigger::check_random_triggers_for_player(player, random_group->get_active_triggers());
-	}
 }
 
 void trigger::check_random_triggers_for_player(CPlayer *player, const std::vector<const trigger *> &triggers)

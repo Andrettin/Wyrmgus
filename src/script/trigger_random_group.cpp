@@ -28,6 +28,7 @@
 
 #include "script/trigger_random_group.h"
 
+#include "script/trigger.h"
 #include "script/trigger_type.h"
 #include "util/assert_util.h"
 
@@ -48,6 +49,11 @@ void trigger_random_group::initialize()
 void trigger_random_group::check() const
 {
 	assert_throw(this->get_type() != trigger_type::default_trigger);
+}
+
+void trigger_random_group::generate_random_offset()
+{
+	this->random_offset = trigger::generate_random_offset_for_type(this->get_type());
 }
 
 }
