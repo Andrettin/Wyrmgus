@@ -107,6 +107,11 @@ public:
 				const CUpgrade *ability = CUpgrade::get(value);
 				++this->ability_counts[ability];
 			}
+		} else if (tag == "bonus_abilities") {
+			for (const std::string &value : values) {
+				const CUpgrade *ability = CUpgrade::get(value);
+				++this->bonus_ability_counts[ability];
+			}
 		} else {
 			effect::process_gsml_scope(scope);
 		}
@@ -132,6 +137,7 @@ public:
 			}
 
 			assert_throw(this->ability_counts.empty());
+			assert_throw(this->bonus_ability_counts.empty());
 		}
 
 		if (this->count < 1) {
@@ -179,6 +185,12 @@ public:
 
 				if (unit->Variable[LEVELUP_INDEX].Value <= 0) {
 					break;
+				}
+			}
+
+			for (const auto &[ability, ability_count] : this->bonus_ability_counts) {
+				for (int j = 0; j < ability_count; ++j) {
+					unit->add_bonus_ability(ability);
 				}
 			}
 
@@ -234,6 +246,18 @@ public:
 			str += "\n" + std::string(indent + 1, '\t') + "Abilities:";
 
 			for (const auto &[ability, ability_count] : this->ability_counts) {
+				str += "\n" + std::string(indent + 2, '\t');
+				str += ability->get_name();
+				if (ability_count > 1) {
+					str += " (x" + std::to_string(ability_count) + ")";
+				}
+			}
+		}
+
+		if (!this->bonus_ability_counts.empty()) {
+			str += "\n" + std::string(indent + 1, '\t') + "Bonus Abilities:";
+
+			for (const auto &[ability, ability_count] : this->bonus_ability_counts) {
 				str += "\n" + std::string(indent + 2, '\t');
 				str += ability->get_name();
 				if (ability_count > 1) {
@@ -330,6 +354,7 @@ private:
 	int count = 1;
 	int level = 0;
 	upgrade_map<int> ability_counts;
+	upgrade_map<int> bonus_ability_counts;
 };
 
 }
