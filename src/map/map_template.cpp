@@ -1899,6 +1899,10 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 				}
 			}
 		}
+
+		if (is_capital && site->is_settlement() && site->get_game_data()->get_owner() == player) {
+			player->set_capital_settlement(site);
+		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Failed to apply site \"" + site->get_identifier() + "\"."));
 	}

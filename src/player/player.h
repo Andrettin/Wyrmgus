@@ -1247,6 +1247,23 @@ public:
 
 	void add_settlement_to_explored_territory(const site *settlement);
 
+	const site *get_capital_settlement() const
+	{
+		return this->capital_settlement;
+	}
+
+	void set_capital_settlement(const site *settlement)
+	{
+		if (settlement == this->get_capital_settlement()) {
+			return;
+		}
+
+		this->capital_settlement = settlement;
+	}
+
+	QPoint get_main_pos() const;
+	int get_main_map_layer_index() const;
+
 	bool has_flag(const player_flag *flag) const
 	{
 		return this->flags.contains(flag);
@@ -1424,6 +1441,7 @@ public:
 private:
 	std::vector<CUnit *> Units; /// units of this player
 	CUnit *last_created_unit = nullptr;
+	const site *capital_settlement = nullptr;
 	player_index_set enemies; //enemies for this player
 	player_index_set allies; //allies for this player
 	player_index_set shared_vision; //set of player indexes that this player has shared vision with

@@ -647,6 +647,10 @@ void CPlayer::Save(CFile &file) const
 	file.printf(" \"ai-name\", \"%s\",\n", p.AiName.c_str());
 	file.printf("  \"team\", %d,", p.Team);
 
+	if (p.get_capital_settlement() != nullptr) {
+		file.printf(" \"capital-settlement\", \"%s\",", p.get_capital_settlement()->get_identifier().c_str());
+	}
+
 	file.printf(" \"enemy\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
 		file.printf("%c", p.enemies.contains(j) ? 'X' : '_');
@@ -1130,6 +1134,8 @@ void CPlayer::Init(player_type type)
 	this->LostTownHallTimer = 0;
 	this->HeroCooldownTimer = 0;
 	//Wyrmgus end
+
+	this->capital_settlement = nullptr;
 
 	if (CPlayer::Players[NumPlayers]->get_type() == player_type::computer || CPlayer::Players[NumPlayers]->get_type() == player_type::rescue_active) {
 		this->AiEnabled = true;
@@ -2906,6 +2912,8 @@ void CPlayer::Clear()
 
 	this->Allow.Clear();
 
+	this->capital_settlement = nullptr;
+
 	this->recent_trade_partners.clear();
 	this->current_special_resources.clear();
 	this->flags.clear();
@@ -4643,6 +4651,11 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, const bool type_change)
 		}
 
 		if (!SaveGameLoading) {
+			if (type->BoolFlag[TOWNHALL_INDEX].value && this->capital_settlement == nullptr && unit->get_site() != nullptr) {
+				assert_throw(unit->get_site()->is_settlement());
+				this->set_capital_settlement(unit->get_site());
+			}
+
 			this->last_created_unit = unit;
 		}
 	}
@@ -4707,6 +4720,18 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, const bool type_change)
 	if (!type_change) {
 		if (unit->get_character() != nullptr) {
 			this->Heroes.erase(std::remove(this->Heroes.begin(), this->Heroes.end(), unit), this->Heroes.end());
+		}
+
+		if (type->BoolFlag[TOWNHALL_INDEX].value && this->capital_settlement == unit->get_site()) {
+			assert_throw(unit->get_site() != nullptr && unit->get_site()->is_settlement());
+
+			this->set_capital_settlement(nullptr);
+
+			//the unit has already been removed from the player's unit containers, so its settlement won't appear in the player's settlement list
+			const std::vector<const site *> settlements = this->get_settlements();
+			if (!settlements.empty()) {
+				this->set_capital_settlement(settlements.front());
+			}
 		}
 
 		if (unit == this->last_created_unit) {
@@ -5341,7 +5366,7 @@ bool CPlayer::is_tile_explored(const QPoint &tile_pos, const int z) const
 
 bool CPlayer::is_player_capital_explored(const CPlayer *other_player) const
 {
-	return this->is_tile_explored(other_player->StartPos, other_player->StartMapLayer);
+	return this->is_tile_explored(other_player->get_main_pos(), other_player->get_main_map_layer_index());
 }
 
 //Wyrmgus start
@@ -5451,4 +5476,23 @@ void CPlayer::check_special_resource(const resource *resource)
 	} else {
 		this->remove_current_special_resource(resource);
 	}
+}
+
+QPoint CPlayer::get_main_pos() const
+{
+	//get the player's "main" pos, i.e. that of the capital, or failing that, the player's start pos
+	if (this->get_capital_settlement() != nullptr) {
+		return this->get_capital_settlement()->get_game_data()->get_site_unit()->get_center_tile_pos();
+	}
+
+	return this->StartPos;
+}
+
+int CPlayer::get_main_map_layer_index() const
+{
+	if (this->get_capital_settlement() != nullptr) {
+		return this->get_capital_settlement()->get_game_data()->get_site_unit()->MapLayer->ID;
+	}
+
+	return this->StartMapLayer;
 }

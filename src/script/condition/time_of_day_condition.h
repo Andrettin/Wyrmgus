@@ -52,7 +52,7 @@ public:
 	const CMapLayer *get_scope_map_layer(const scope_type *scope) const
 	{
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {
-			return CMap::get()->MapLayers[scope->StartMapLayer].get();
+			return CMap::get()->MapLayers[scope->get_main_map_layer_index()].get();
 		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
 			return scope->MapLayer;
 		}
@@ -61,7 +61,7 @@ public:
 	QPoint get_scope_tile_pos(const scope_type *scope) const
 	{
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {
-			return scope->StartPos;
+			return scope->get_main_pos();
 		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
 			return scope->get_center_tile_pos();
 		}

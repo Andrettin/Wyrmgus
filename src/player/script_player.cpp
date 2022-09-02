@@ -164,6 +164,10 @@ void CPlayer::Load(lua_State *l)
 			this->AiName = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "team")) {
 			this->Team = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "capital-settlement")) {
+			this->capital_settlement = site::get(LuaToString(l, j + 1));
+			assert_throw(this->capital_settlement != nullptr);
+			assert_throw(this->capital_settlement->is_settlement());
 		} else if (!strcmp(value, "enemy")) {
 			value = LuaToString(l, j + 1);
 			for (int i = 0; i < PlayerMax && *value; ++i, ++value) {

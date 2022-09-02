@@ -2144,6 +2144,12 @@ void CUnit::set_site(const wyrmgus::site *site)
 
 	if (site != nullptr) {
 		site->get_game_data()->set_site_unit(this);
+
+		if (!SaveGameLoading) {
+			if (this->Type->BoolFlag[TOWNHALL_INDEX].value && site->is_settlement() && this->Player->get_capital_settlement() == nullptr) {
+				this->Player->set_capital_settlement(site);
+			}
+		}
 	}
 }
 

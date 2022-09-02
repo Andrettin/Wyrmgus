@@ -319,7 +319,7 @@ public:
 			return ctx.source_unit->get()->get_center_tile_pos();
 		}
 
-		return player->StartPos;
+		return player->get_main_pos();
 	}
 
 	int get_map_layer_index(const CPlayer *player) const
@@ -338,7 +338,7 @@ public:
 			return CMap::get()->get_subtemplate_map_layer(this->map_template)->ID;
 		}
 
-		return player->StartMapLayer;
+		return player->get_main_map_layer_index();
 	}
 
 private:
