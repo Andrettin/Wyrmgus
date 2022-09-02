@@ -35,6 +35,7 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "player/faction_type.h"
+#include "script/trigger_type.h"
 #include "sound/game_sound_set.h"
 #include "sound/music.h"
 #include "upgrade/upgrade_structs.h"
@@ -116,9 +117,16 @@ void defines::process_gsml_scope(const gsml_data &scope)
 	} else if (tag == "cycles_per_year_after") {
 		scope.for_each_property([&](const gsml_property &property) {
 			const int threshold = std::stoi(property.get_key());
-			const int seconds = std::stoi(property.get_value());
+			const int cycles = std::stoi(property.get_value());
 
-			this->cycles_per_year_after[threshold] = seconds;
+			this->cycles_per_year_after[threshold] = cycles;
+		});
+	} else if (tag == "trigger_type_none_random_weights") {
+		scope.for_each_property([&](const gsml_property &property) {
+			const trigger_type trigger_type = string_to_trigger_type(property.get_key());
+			const int weight = std::stoi(property.get_value());
+
+			this->trigger_type_none_random_weights[trigger_type] = weight;
 		});
 	} else if (tag == "ignored_wesnoth_terrain_strings") {
 		for (const std::string &value : values) {

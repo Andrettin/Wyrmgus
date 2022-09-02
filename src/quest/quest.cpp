@@ -232,8 +232,12 @@ void quest::initialize()
 	}
 
 	if (!this->is_hidden() && !this->is_unobtainable()) {
-		trigger_random_group *trigger_random_group = trigger_random_group::get_or_add("quest", nullptr);
-		trigger_random_group->set_type(trigger_type::half_minute_pulse);
+		trigger_random_group *trigger_random_group = trigger_random_group::try_get("quest");
+
+		if (trigger_random_group == nullptr) {
+			trigger_random_group = trigger_random_group::add("quest", nullptr);
+			trigger_random_group->set_type(trigger_type::half_minute_pulse);
+		}
 
 		//create a trigger and dialogue for the quest
 		wyrmgus::trigger *trigger = trigger::add("quest_" + this->get_identifier(), this->get_module());

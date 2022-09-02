@@ -29,6 +29,7 @@
 #include "script/trigger.h"
 
 #include "config.h"
+#include "database/defines.h"
 #include "engine_interface.h"
 #include "game/game.h"
 #include "iolib.h"
@@ -673,6 +674,19 @@ void trigger::InitActiveTriggers()
 		}
 	}
 
+	for (const auto &[trigger_type, none_random_weight] : defines::get()->get_trigger_type_none_random_weights()) {
+		std::vector<const wyrmgus::trigger *> &active_random_triggers = trigger::active_random_triggers[trigger_type];
+
+		if (active_random_triggers.empty()) {
+			//trigger type already has no triggers, there's no point then in processing the random weight for no trigger being fired
+			continue;
+		}
+
+		for (int i = 0; i < none_random_weight; ++i) {
+			active_random_triggers.push_back(nullptr);
+		}
+	}
+
 	trigger::pulse_random_offsets[trigger_type::half_minute_pulse] = trigger::generate_random_offset_for_type(trigger_type::half_minute_pulse);
 	trigger::pulse_random_offsets[trigger_type::minute_pulse] = trigger::generate_random_offset_for_type(trigger_type::minute_pulse);
 
@@ -775,6 +789,11 @@ void trigger::check_random_triggers_for_player(CPlayer *player, const std::vecto
 
 	while (!random_triggers.empty()) {
 		const trigger *trigger = vector::get_random(random_triggers);
+
+		if (trigger == nullptr) {
+			//a null trigger represents no trigger happening for the player for this check
+			break;
+		}
 
 		if (trigger->check_for_player(player)) {
 			break;

@@ -58,6 +58,7 @@ class time_of_day_schedule;
 class unit_class;
 enum class faction_type;
 enum class tile_transition_type;
+enum class trigger_type;
 
 class defines final : public QObject, public singleton<defines>
 {
@@ -468,6 +469,11 @@ public:
 		return this->population_per_unit;
 	}
 
+	const std::map<trigger_type, int> get_trigger_type_none_random_weights() const
+	{
+		return this->trigger_type_none_random_weights;
+	}
+
 	const map_presets *get_map_editor_default_map_presets() const
 	{
 		return this->map_editor_default_map_presets;
@@ -589,6 +595,7 @@ private:
 	int destroyed_overlay_terrain_decay_threshold = 0;
 	bool deselect_in_mine = true; //deselect workers when they enter a mine
 	int population_per_unit = 0; //the number of people a unit represents
+	std::map<trigger_type, int> trigger_type_none_random_weights; //the weight for no trigger happening for a given trigger type's random trigger selection
 	map_presets *map_editor_default_map_presets = nullptr;
 	std::filesystem::path default_menu_background_file;
 	std::vector<std::filesystem::path> loading_background_files;
