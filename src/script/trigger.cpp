@@ -50,6 +50,7 @@
 #include "script/context.h"
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
+#include "script/factor.h"
 #include "script/trigger_random_group.h"
 #include "script/trigger_target.h"
 #include "script/trigger_type.h"
@@ -659,15 +660,11 @@ void trigger::InitActiveTriggers()
 
 		if (trigger->is_random()) {
 			if (trigger->get_random_group() != nullptr) {
-				for (int i = 0; i < trigger->get_random_weight(); ++i) {
-					trigger->get_random_group()->add_active_trigger(trigger);
-				}
+				trigger->get_random_group()->add_active_trigger(trigger);
 			} else {
 				std::vector<const wyrmgus::trigger *> &active_random_triggers = trigger::active_random_triggers[trigger->get_type()];
 
-				for (int i = 0; i < trigger->get_random_weight(); ++i) {
-					active_random_triggers.push_back(trigger);
-				}
+				active_random_triggers.push_back(trigger);
 			}
 		} else {
 			trigger::active_triggers[trigger->get_type()].push_back(trigger);
@@ -785,7 +782,20 @@ void trigger::check_triggers_for_player(CPlayer *player, const trigger_type type
 
 void trigger::check_random_triggers_for_player(CPlayer *player, const std::vector<const trigger *> &triggers)
 {
-	std::vector<const trigger *> random_triggers = triggers;
+	std::vector<const trigger *> random_triggers;
+
+	for (const trigger *trigger : triggers) {
+		if (trigger == nullptr) {
+			random_triggers.push_back(trigger);
+			continue;
+		}
+
+		const int weight = trigger->get_random_weight_factor()->calculate(player);
+
+		for (int i = 0; i < weight; ++i) {
+			random_triggers.push_back(trigger);
+		}
+	}
 
 	while (!random_triggers.empty()) {
 		const trigger *trigger = vector::get_random(random_triggers);
@@ -834,11 +844,31 @@ trigger::~trigger()
 {
 }
 
+void trigger::process_gsml_property(const gsml_property &property)
+{
+	const std::string &key = property.get_key();
+	const gsml_operator gsml_operator = property.get_operator();
+	const std::string &value = property.get_value();
+
+	if (key == "random_weight") {
+		if (gsml_operator != gsml_operator::assignment) {
+			throw std::runtime_error("Invalid operator for property \"" + key + "\".");
+		}
+
+		this->set_random_weight(std::stoi(value));
+	} else {
+		data_entry::process_gsml_property(property);
+	}
+}
+
 void trigger::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	if (tag == "effects") {
+	if (tag == "random_weight_factor") {
+		this->random_weight_factor = std::make_unique<factor<CPlayer>>();
+		database::process_gsml_data(this->random_weight_factor, scope);
+	} else if (tag == "effects") {
 		this->effects = std::make_unique<effect_list<CPlayer>>();
 		database::process_gsml_data(this->effects, scope);
 	} else if (tag == "conditions") {
@@ -876,6 +906,15 @@ void trigger::check() const
 
 	if (this->get_effects() != nullptr) {
 		this->get_effects()->check();
+	}
+}
+
+void trigger::set_random_weight(const int weight)
+{
+	if (weight != 0) {
+		this->random_weight_factor = std::make_unique<factor<CPlayer>>(weight);
+	} else {
+		this->random_weight_factor.reset();
 	}
 }
 

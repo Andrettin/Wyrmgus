@@ -39,7 +39,7 @@ class factor_modifier;
 
 //a scripted factor, i.e. a random chance, weight or score
 template <typename scope_type>
-class factor
+class factor final
 {
 public:
 	factor();

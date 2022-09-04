@@ -29,7 +29,6 @@
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
 #include "script/factor.h"
-#include "script/factor_modifier.h"
 #include "util/vector_random_util.h"
 
 namespace wyrmgus {

@@ -62,6 +62,9 @@ class effect;
 template <typename scope_type>
 class effect_list;
 
+template <typename scope_type>
+class factor;
+
 class trigger final : public data_entry, public data_type<trigger>
 {
 	Q_OBJECT
@@ -70,7 +73,6 @@ class trigger final : public data_entry, public data_type<trigger>
 	Q_PROPERTY(wyrmgus::trigger_target target MEMBER target READ get_target)
 	Q_PROPERTY(wyrmgus::trigger_random_group* random_group MEMBER random_group)
 	Q_PROPERTY(bool random READ is_random WRITE set_random)
-	Q_PROPERTY(int random_weight MEMBER random_weight READ get_random_weight)
 	Q_PROPERTY(bool only_once MEMBER only_once READ fires_only_once)
 	Q_PROPERTY(bool campaign_only MEMBER campaign_only READ is_campaign_only)
 	Q_PROPERTY(QDateTime historical_date MEMBER historical_date READ get_historical_date)
@@ -105,6 +107,7 @@ public:
 	explicit trigger(const std::string &identifier);
 	~trigger();
 	
+	virtual void process_gsml_property(const gsml_property &property) override;
 	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
@@ -141,7 +144,7 @@ public:
 
 	bool is_random() const
 	{
-		return this->get_random_weight() != 0;
+		return this->get_random_weight_factor() != nullptr;
 	}
 
 	void set_random(const bool random)
@@ -157,14 +160,11 @@ public:
 		}
 	}
 
-	int get_random_weight() const
-	{
-		return this->random_weight;
-	}
+	void set_random_weight(const int weight);
 
-	void set_random_weight(const int weight)
+	const factor<CPlayer> *get_random_weight_factor() const
 	{
-		this->random_weight = weight;
+		return this->random_weight_factor.get();
 	}
 
 	bool fires_only_once() const
@@ -213,7 +213,7 @@ private:
 	trigger_type type;
 	trigger_target target;
 	trigger_random_group *random_group = nullptr;
-	int random_weight = 0;
+	std::unique_ptr<factor<CPlayer>> random_weight_factor;
 public:
 	bool Local = false;
 private:
