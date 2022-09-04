@@ -3718,12 +3718,20 @@ void CPlayer::set_resource_demand(const resource *resource, const int quantity)
 
 void CPlayer::set_income(const resource *resource, const int quantity)
 {
+	const int old_quantity = this->get_resource(resource);
+
 	if (quantity == 0) {
 		if (this->incomes.contains(resource)) {
 			this->incomes.erase(resource);
 		}
 	} else {
 		this->incomes[resource] = quantity;
+	}
+
+	if (resource->is_special()) {
+		if (old_quantity == 0 || quantity == 0) {
+			this->check_special_resource(resource);
+		}
 	}
 
 	emit income_changed(resource->get_index(), quantity);
