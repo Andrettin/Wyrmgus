@@ -28,22 +28,22 @@
 
 #include "player/player.h"
 #include "script/condition/condition.h"
-#include "unit/unit_type.h"
+#include "unit/unit_class.h"
 
 namespace wyrmgus {
 
-class can_sustain_unit_type_condition final : public condition<CPlayer>
+class can_sustain_unit_class_condition final : public condition<CPlayer>
 {
 public:
-	explicit can_sustain_unit_type_condition(const std::string &value, const gsml_operator condition_operator)
+	explicit can_sustain_unit_class_condition(const std::string &value, const gsml_operator condition_operator)
 		: condition(condition_operator)
 	{
-		this->unit_type = unit_type::get(value);
+		this->unit_class = unit_class::get(value);
 	}
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static const std::string class_identifier = "can_sustain_unit_type";
+		static const std::string class_identifier = "can_sustain_unit_class";
 		return class_identifier;
 	}
 
@@ -51,7 +51,13 @@ public:
 	{
 		Q_UNUSED(ctx);
 
-		const int unit_demand = this->unit_type->Stats[player->get_index()].Variables[DEMAND_INDEX].Value;
+		const unit_type *unit_type = player->get_class_unit_type(this->unit_class);
+
+		if (unit_type == nullptr) {
+			return false;
+		}
+
+		const int unit_demand = unit_type->Stats[player->get_index()].Variables[DEMAND_INDEX].Value;
 
 		if (unit_demand > 0) {
 			const int available_supply = player->get_supply() - player->get_demand();
@@ -67,11 +73,11 @@ public:
 	{
 		Q_UNUSED(indent);
 
-		return "Can sustain the " + condition::get_object_string(this->unit_type, links_allowed) + " unit type";
+		return "Can sustain the " + condition::get_object_string(this->unit_class, links_allowed) + " unit class";
 	}
 
 private:
-	const wyrmgus::unit_type *unit_type = nullptr;
+	const wyrmgus::unit_class *unit_class = nullptr;
 };
 
 }
