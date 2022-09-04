@@ -53,6 +53,8 @@ public:
 		if (this->resource == nullptr) {
 			throw std::runtime_error("\"resource\" condition has no resource.");
 		}
+
+		assert_throw(this->resource->is_final());
 	}
 
 	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override

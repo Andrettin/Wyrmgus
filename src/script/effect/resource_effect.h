@@ -50,6 +50,12 @@ public:
 		return identifier;
 	}
 
+	virtual void check() const override
+	{
+		assert_throw(this->resource != nullptr);
+		assert_throw(this->resource->is_final());
+	}
+
 	virtual void do_assignment_effect(CPlayer *player) const override
 	{
 		player->set_resource(this->resource, this->quantity, resource_storage_type::overall);
