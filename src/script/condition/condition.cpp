@@ -78,6 +78,7 @@
 #include "script/condition/real_day_condition.h"
 #include "script/condition/real_day_of_the_week_condition.h"
 #include "script/condition/real_month_condition.h"
+#include "script/condition/resource_condition.h"
 #include "script/condition/scripted_condition_condition.h"
 #include "script/condition/season_condition.h"
 #include "script/condition/settlement_condition.h"
@@ -184,6 +185,8 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_pr
 			return std::make_unique<trigger_condition>(value, condition_operator);
 		} else if (key == "war") {
 			return std::make_unique<war_condition>(value, condition_operator);
+		} else if (resource::try_get(key) != nullptr) {
+			return std::make_unique<resource_condition>(resource::get(key), value, condition_operator);
 		}
 	}
 
