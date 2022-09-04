@@ -208,10 +208,17 @@ public:
 		if (this->character != nullptr) {
 			str += "the " + string::highlight(this->character->get_full_name()) + " character";
 		} else {
+			std::string unit_name;
+			if (this->unit_class != nullptr) {
+				unit_name = this->unit_class->get_name();
+			} else {
+				unit_name = this->unit_type->get_name_for_player(player);
+			}
+
 			if (this->count > 1) {
 				str += std::to_string(this->count);
 			} else {
-				str += "a";
+				str += string::get_indefinite_article(unit_name);
 			}
 			str += " ";
 
@@ -219,12 +226,6 @@ public:
 				str += "level " + std::to_string(this->level) + " ";
 			}
 
-			std::string unit_name;
-			if (this->unit_class != nullptr) {
-				unit_name = this->unit_class->get_name();
-			} else {
-				unit_name = this->unit_type->get_name_for_player(player);
-			}
 			str += string::highlight(unit_name);
 
 			str += " unit";
