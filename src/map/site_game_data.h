@@ -297,6 +297,8 @@ public:
 	void check_employment_capacities();
 	void check_available_employment();
 
+	void calculate_employment_incomes();
+
 	void sort_population_units();
 
 	const population_type *get_class_population_type(const population_class *population_class) const;
@@ -364,6 +366,27 @@ public:
 
 	int64_t get_employment_workforce(const employment_type *employment_type) const;
 
+	int get_employment_income(const resource *resource) const
+	{
+		const auto find_iterator = this->employment_incomes.find(resource);
+		if (find_iterator != this->employment_incomes.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_employment_income(const resource *resource, const int income)
+	{
+		if (income == 0) {
+			if (this->employment_incomes.contains(resource)) {
+				this->employment_incomes.erase(resource);
+			}
+		} else {
+			this->employment_incomes[resource] = income;
+		}
+	}
+
 	void on_civilization_changed();
 	void on_settlement_building_added(const CUnit *building);
 	void on_settlement_building_removed(const CUnit *building);
@@ -389,6 +412,7 @@ private:
 	std::vector<qunique_ptr<population_unit>> population_units;
 	int housing = 0;
 	employment_type_map<int> employment_capacities;
+	resource_map<int> employment_incomes; //resource incomes happening as a result of employment
 };
 
 }

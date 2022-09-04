@@ -205,8 +205,14 @@ void site_game_data::set_owner(CPlayer *player)
 			if (old_owner != nullptr) {
 				old_owner->change_population(-this->get_population());
 
+				for (const auto &[resource, income] : this->employment_incomes) {
+					old_owner->change_income(resource, -income);
+				}
+
 				old_owner->check_unit_home_settlements();
 			}
+
+			this->employment_incomes.clear();
 
 			if (this->owner != nullptr) {
 				if (this->get_population() != 0) {
@@ -214,6 +220,8 @@ void site_game_data::set_owner(CPlayer *player)
 				} else {
 					this->ensure_minimum_population();
 				}
+
+				this->calculate_employment_incomes();
 
 				if (old_owner != nullptr && old_owner->get_civilization() != this->owner->get_civilization()) {
 					this->on_civilization_changed();
@@ -872,6 +880,8 @@ void site_game_data::do_population_employment()
 	this->check_employment_validity();
 	this->check_employment_capacities();
 	this->check_available_employment();
+
+	this->calculate_employment_incomes();
 }
 
 void site_game_data::check_employment_validity()
@@ -987,6 +997,57 @@ void site_game_data::check_available_employment()
 				break;
 			}
 		}
+	}
+}
+
+void site_game_data::calculate_employment_incomes()
+{
+	if (this->get_owner() == nullptr) {
+		this->employment_incomes.clear();
+		return;
+	}
+
+	resource_map<int> new_incomes = this->employment_incomes;
+	for (auto &[resource, income] : new_incomes) {
+		income = 0;
+	}
+
+	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
+		const employment_type *employment_type = population_unit->get_employment_type();
+
+		if (employment_type == nullptr) {
+			continue;
+		}
+
+		const resource *output_resource = employment_type->get_output_resource();
+
+		if (output_resource == nullptr) {
+			continue;
+		}
+
+		const int production_efficiency = population_unit->get_type()->get_production_efficiency(output_resource);
+
+		const int output = (population_unit->get_population() * production_efficiency / 100 * employment_type->get_output_multiplier()).to_int();
+
+		new_incomes[output_resource] += output;
+
+		const resource *input_resource = employment_type->get_input_resource();
+		if (input_resource != nullptr) {
+			new_incomes[input_resource] -= output;
+		}
+	}
+
+	for (const auto &[resource, income] : new_incomes) {
+		const int old_income = this->get_employment_income(resource);
+		
+		if (income == old_income) {
+			continue;
+		}
+
+		this->set_employment_income(resource, income);
+
+		const int income_change = income - old_income;
+		this->get_owner()->change_income(resource, income_change);
 	}
 }
 
