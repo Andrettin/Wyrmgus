@@ -4846,6 +4846,12 @@ void PlayersEachHalfMinute(const int playerIdx)
 		if (player->AiEnabled) {
 			AiEachHalfMinute(*player);
 		}
+
+		if (!player->is_neutral_player()) {
+			for (const site *settlement : player->get_settlements()) {
+				settlement->get_game_data()->do_per_half_minute_loop();
+			}
+		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error executing the per half minute actions for player " + std::to_string(playerIdx) + "."));
 	}
@@ -4890,12 +4896,6 @@ void PlayersEachMinute(const int playerIdx)
 
 		if (player->AiEnabled) {
 			AiEachMinute(*player);
-		}
-
-		if (!player->is_neutral_player()) {
-			for (const site *settlement : player->get_settlements()) {
-				settlement->get_game_data()->do_per_minute_loop();
-			}
 		}
 
 		//we clear the list of recent trade partners here; this happens after the market item pools have been updated, so it's ok to do it here

@@ -143,7 +143,7 @@ gsml_data site_game_data::to_gsml_data() const
 	return data;
 }
 
-void site_game_data::do_per_minute_loop()
+void site_game_data::do_per_half_minute_loop()
 {
 	if (defines::get()->is_population_enabled() && this->site->is_settlement()) {
 		this->do_population_growth();

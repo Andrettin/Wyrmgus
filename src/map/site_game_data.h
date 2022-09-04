@@ -64,7 +64,7 @@ public:
 
 	gsml_data to_gsml_data() const;
 
-	void do_per_minute_loop();
+	void do_per_half_minute_loop();
 
 	const std::string &get_current_cultural_name() const;
 
