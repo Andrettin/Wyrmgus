@@ -315,6 +315,15 @@ void quest::check() const
 	}
 }
 
+const icon *quest::get_icon() const
+{
+	if (this->icon != nullptr) {
+		return this->icon;
+	}
+
+	return defines::get()->get_default_quest_icon();
+}
+
 std::string quest::get_rewards_string(const CPlayer *player) const
 {
 	if (!this->rewards_string.empty()) {

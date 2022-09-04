@@ -40,6 +40,7 @@ class civilization;
 class dialogue;
 class font;
 class font_color;
+class icon;
 class interface_style;
 class map_presets;
 class map_projection;
@@ -118,6 +119,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(int scaled_tile_height READ get_scaled_tile_height CONSTANT)
 	Q_PROPERTY(bool deselect_in_mine MEMBER deselect_in_mine READ is_deselect_in_mine_enabled)
 	Q_PROPERTY(int population_per_unit MEMBER population_per_unit READ get_population_per_unit)
+	Q_PROPERTY(wyrmgus::icon* default_quest_icon MEMBER default_quest_icon)
 	Q_PROPERTY(wyrmgus::map_presets* map_editor_default_map_presets MEMBER map_editor_default_map_presets)
 	Q_PROPERTY(QString default_menu_background_file READ get_default_menu_background_file_qstring NOTIFY changed)
 	Q_PROPERTY(QStringList loading_background_files READ get_loading_background_files_qstring_list NOTIFY changed)
@@ -474,6 +476,11 @@ public:
 		return this->trigger_type_none_random_weights;
 	}
 
+	const icon *get_default_quest_icon() const
+	{
+		return this->default_quest_icon;
+	}
+
 	const map_presets *get_map_editor_default_map_presets() const
 	{
 		return this->map_editor_default_map_presets;
@@ -596,6 +603,7 @@ private:
 	bool deselect_in_mine = true; //deselect workers when they enter a mine
 	int population_per_unit = 0; //the number of people a unit represents
 	std::map<trigger_type, int> trigger_type_none_random_weights; //the weight for no trigger happening for a given trigger type's random trigger selection
+	icon *default_quest_icon = nullptr;
 	map_presets *map_editor_default_map_presets = nullptr;
 	std::filesystem::path default_menu_background_file;
 	std::vector<std::filesystem::path> loading_background_files;

@@ -100,10 +100,7 @@ public:
 		return this->index;
 	}
 
-	const wyrmgus::icon *get_icon() const
-	{
-		return this->icon;
-	}
+	const wyrmgus::icon *get_icon() const;
 
 	const wyrmgus::player_color *get_player_color() const
 	{
