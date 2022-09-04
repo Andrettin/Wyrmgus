@@ -62,6 +62,7 @@
 #include "script/effect/restore_hp_percent_effect.h"
 #include "script/effect/restore_mana_percent_effect.h"
 #include "script/effect/resource_effect.h"
+#include "script/effect/resource_percent_effect.h"
 #include "script/effect/scripted_effect_effect.h"
 #include "script/effect/set_as_current_effect.h"
 #include "script/effect/set_flag_effect.h"
@@ -77,6 +78,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_property(const
 	const std::string &value = property.get_value();
 
 	if constexpr (std::is_same_v<scope_type, CPlayer>) {
+		static const std::string percent_suffix = "_percent";
+
 		if (key == "accept_quest") {
 			return std::make_unique<accept_quest_effect>(value, effect_operator);
 		} else if (key == "center_on_site") {
@@ -95,6 +98,9 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_property(const
 			return std::make_unique<set_flag_effect>(value, effect_operator);
 		} else if (resource::try_get(key) != nullptr) {
 			return std::make_unique<resource_effect>(resource::get(key), value, effect_operator);
+		} else if (key.ends_with(percent_suffix)) {
+			const resource *resource = resource::get(key.substr(0, key.size() - percent_suffix.size()));
+			return std::make_unique<resource_percent_effect>(resource, value, effect_operator);
 		}
 	} else if constexpr (std::is_same_v<scope_type, CUnit>) {
 		if (key == "experience") {
