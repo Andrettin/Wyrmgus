@@ -4851,6 +4851,31 @@ void PlayersEachHalfMinute(const int playerIdx)
 			for (const site *settlement : player->get_settlements()) {
 				settlement->get_game_data()->do_per_half_minute_loop();
 			}
+
+			for (const auto &[resource, quantity] : player->get_incomes()) {
+				const wyrmgus::resource *final_resource = resource->get_final_resource();
+				int final_resource_change = quantity * resource->get_final_resource_conversion_rate() / 100;
+
+				if (player->AiEnabled) {
+					switch (GameSettings.Difficulty) {
+					case DifficultyEasy:
+						final_resource_change /= 2;
+						break;
+					case DifficultyHard:
+						final_resource_change *= 4;
+						final_resource_change /= 3;
+						break;
+					case DifficultyBrutal:
+						final_resource_change *= 2;
+						break;
+					default:
+						break;
+					}
+				}
+
+				player->change_resource(final_resource, final_resource_change, true);
+				player->change_resource_total(final_resource, final_resource_change);
+			}
 		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error executing the per half minute actions for player " + std::to_string(playerIdx) + "."));
@@ -4866,33 +4891,6 @@ void PlayersEachMinute(const int playerIdx)
 {
 	try {
 		const qunique_ptr<CPlayer> &player = CPlayer::Players[playerIdx];
-
-		if (!player->is_neutral_player()) {
-			for (const auto &[resource, quantity] : player->get_incomes()) {
-				const wyrmgus::resource *final_resource = resource->get_final_resource();
-				int final_resource_change = quantity * resource->get_final_resource_conversion_rate() / 100;
-
-				if (player->AiEnabled) {
-					switch (GameSettings.Difficulty) {
-						case DifficultyEasy:
-							final_resource_change /= 2;
-							break;
-						case DifficultyHard:
-							final_resource_change *= 4;
-							final_resource_change /= 3;
-							break;
-						case DifficultyBrutal:
-							final_resource_change *= 2;
-							break;
-						default:
-							break;
-					}
-				}
-
-				player->change_resource(final_resource, final_resource_change, true);
-				player->change_resource_total(final_resource, final_resource_change);
-			}
-		}
 
 		if (player->AiEnabled) {
 			AiEachMinute(*player);
