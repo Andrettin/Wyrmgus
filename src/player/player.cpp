@@ -5467,11 +5467,27 @@ QVariantList CPlayer::get_current_special_resources_qvariant_list() const
 	return container::to_qvariant_list(this->current_special_resources);
 }
 
-void CPlayer::check_special_resource(const resource *resource)
+bool CPlayer::has_special_resource(const resource *resource) const
 {
 	const int stored_quantity = this->get_resource(resource, resource_storage_type::both);
+	if (stored_quantity > 0) {
+		return true;
+	}
 
-	if (stored_quantity > 0 || this->has_settlement_with_resource_source(resource)) {
+	if (this->get_income(resource) > 0) {
+		return true;
+	}
+
+	if (this->has_settlement_with_resource_source(resource)) {
+		return true;
+	}
+
+	return false;
+}
+
+void CPlayer::check_special_resource(const resource *resource)
+{
+	if (this->has_special_resource(resource)) {
 		this->add_current_special_resource(resource);
 	} else {
 		this->remove_current_special_resource(resource);

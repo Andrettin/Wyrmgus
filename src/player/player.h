@@ -1236,6 +1236,7 @@ public:
 		emit current_special_resources_changed();
 	}
 
+	bool has_special_resource(const resource *resource) const;
 	void check_special_resource(const resource *resource);
 
 	void Init(player_type type);
