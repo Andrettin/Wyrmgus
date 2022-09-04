@@ -201,6 +201,9 @@ void dialogue_node::call(CPlayer *player, context &ctx) const
 	const wyrmgus::icon *icon = this->get_icon(speaker_unit);
 
 	const wyrmgus::player_color *player_color = this->get_player_color(speaker_unit);
+	if (player_color == nullptr) {
+		player_color = player->get_player_color();
+	}
 
 	QStringList options;
 	QStringList option_hotkeys;
@@ -331,7 +334,7 @@ const wyrmgus::player_color *dialogue_node::get_player_color(const CUnit *speake
 		return this->player_color;
 	}
 
-	return defines::get()->get_neutral_player_color();
+	return nullptr;
 }
 
 std::string dialogue_node::get_text(const text_processor &text_processor) const
