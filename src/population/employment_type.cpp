@@ -29,6 +29,7 @@
 #include "population/employment_type.h"
 
 #include "population/population_class.h"
+#include "util/assert_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -44,6 +45,13 @@ void employment_type::process_gsml_scope(const gsml_data &scope)
 		}
 	} else {
 		data_entry::process_gsml_scope(scope);
+	}
+}
+
+void employment_type::check() const
+{
+	if (this->get_output_resource() != nullptr) {
+		assert_throw(this->get_output_multiplier() != 0);
 	}
 }
 

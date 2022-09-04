@@ -28,6 +28,7 @@
 
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
+#include "util/fractional_int.h"
 
 namespace wyrmgus {
 
@@ -38,8 +39,9 @@ class employment_type final : public named_data_entry, public data_type<employme
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::resource* output_resource MEMBER output_resource)
 	Q_PROPERTY(wyrmgus::resource* input_resource MEMBER input_resource)
+	Q_PROPERTY(wyrmgus::resource* output_resource MEMBER output_resource)
+	Q_PROPERTY(wyrmgus::centesimal_int output_multiplier MEMBER output_multiplier)
 
 public:
 	static constexpr const char *class_identifier = "employment_type";
@@ -50,15 +52,21 @@ public:
 	}
 
 	virtual void process_gsml_scope(const gsml_data &scope) override;
+	virtual void check() const override;
+
+	const resource *get_input_resource() const
+	{
+		return this->input_resource;
+	}
 
 	const resource *get_output_resource() const
 	{
 		return this->output_resource;
 	}
 
-	const resource *get_input_resource() const
+	const centesimal_int &get_output_multiplier() const
 	{
-		return this->input_resource;
+		return this->output_multiplier;
 	}
 
 	const std::vector<const population_class *> &get_employees() const
@@ -69,8 +77,9 @@ public:
 	bool can_employ(const population_class *population_class) const;
 
 private:
-	resource *output_resource = nullptr;
 	resource *input_resource = nullptr;
+	resource *output_resource = nullptr;
+	centesimal_int output_multiplier; //output per individual people employed
 	std::vector<const population_class *> employees;
 };
 
