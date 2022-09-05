@@ -32,7 +32,13 @@ class employment_type;
 class gsml_data;
 class gsml_property;
 class population_type;
+class resource;
 struct population_unit_key;
+
+template <int N>
+class fractional_int;
+
+using centesimal_int = fractional_int<2>;
 
 class population_unit final : public QObject
 {
@@ -115,6 +121,10 @@ public:
 	{
 		return this->calculate_growth_quantity(promotion_capacity, true);
 	}
+
+	const resource *get_input_resource() const;
+	const resource *get_output_resource() const;
+	const centesimal_int &get_output_multiplier() const;
 
 signals:
 	void population_changed();

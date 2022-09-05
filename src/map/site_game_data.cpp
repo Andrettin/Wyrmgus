@@ -1013,13 +1013,7 @@ void site_game_data::calculate_employment_incomes()
 	}
 
 	for (const qunique_ptr<population_unit> &population_unit : this->population_units) {
-		const employment_type *employment_type = population_unit->get_employment_type();
-
-		if (employment_type == nullptr) {
-			continue;
-		}
-
-		const resource *output_resource = employment_type->get_output_resource();
+		const resource *output_resource = population_unit->get_output_resource();
 
 		if (output_resource == nullptr) {
 			continue;
@@ -1027,11 +1021,11 @@ void site_game_data::calculate_employment_incomes()
 
 		const int production_efficiency = population_unit->get_type()->get_production_efficiency(output_resource);
 
-		const int output = (population_unit->get_population() * production_efficiency / 100 * employment_type->get_output_multiplier()).to_int();
+		const int output = (population_unit->get_population() * production_efficiency / 100 * population_unit->get_output_multiplier()).to_int();
 
 		new_incomes[output_resource] += output;
 
-		const resource *input_resource = employment_type->get_input_resource();
+		const resource *input_resource = population_unit->get_input_resource();
 		if (input_resource != nullptr) {
 			new_incomes[input_resource] -= output;
 		}

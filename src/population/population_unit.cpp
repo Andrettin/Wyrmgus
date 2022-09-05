@@ -154,4 +154,31 @@ void population_unit::set_population(const int64_t population)
 	emit population_changed();
 }
 
+const resource *population_unit::get_input_resource() const
+{
+	if (this->get_employment_type() != nullptr) {
+		return this->get_employment_type()->get_input_resource();
+	}
+
+	return nullptr;
+}
+
+const resource *population_unit::get_output_resource() const
+{
+	if (this->get_employment_type() != nullptr) {
+		return this->get_employment_type()->get_output_resource();
+	}
+
+	return this->get_type()->get_population_class()->get_unemployed_output_resource();
+}
+
+const centesimal_int &population_unit::get_output_multiplier() const
+{
+	if (this->get_employment_type() != nullptr) {
+		return this->get_employment_type()->get_output_multiplier();
+	}
+
+	return this->get_type()->get_population_class()->get_unemployed_output_multiplier();
+}
+
 }

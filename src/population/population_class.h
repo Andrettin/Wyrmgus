@@ -29,6 +29,7 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 #include "economy/resource_container.h"
+#include "util/fractional_int.h"
 
 namespace wyrmgus {
 
@@ -41,6 +42,8 @@ class population_class final : public named_data_entry, public data_type<populat
 	Q_PROPERTY(wyrmgus::resource_icon* resource_icon MEMBER resource_icon)
 	Q_PROPERTY(bool growable MEMBER growable READ is_growable)
 	Q_PROPERTY(bool unemployment MEMBER unemployment READ can_have_unemployment)
+	Q_PROPERTY(wyrmgus::resource* unemployed_output_resource MEMBER unemployed_output_resource)
+	Q_PROPERTY(wyrmgus::centesimal_int unemployed_output_multiplier MEMBER unemployed_output_multiplier)
 
 public:
 	static constexpr const char *class_identifier = "population_class";
@@ -91,6 +94,16 @@ public:
 		return 100;
 	}
 
+	const resource *get_unemployed_output_resource() const
+	{
+		return this->unemployed_output_resource;
+	}
+
+	const centesimal_int &get_unemployed_output_multiplier() const
+	{
+		return this->unemployed_output_multiplier;
+	}
+
 private:
 	wyrmgus::resource_icon *resource_icon = nullptr;
 	bool growable = false; //whether the population class can grow via population growth; negative growth can still occur even if false however
@@ -98,6 +111,8 @@ private:
 	std::vector<const population_class *> promotion_targets;
 	std::vector<const population_class *> demotion_targets;
 	resource_map<int> production_efficiency_map;
+	resource *unemployed_output_resource = nullptr;
+	centesimal_int unemployed_output_multiplier;
 };
 
 }
