@@ -73,7 +73,6 @@ enum CostType {
 constexpr int FoodCost = MaxCosts;
 constexpr int ScoreCost = MaxCosts + 1;
 constexpr int ManaResCost = MaxCosts + 2;
-constexpr int PopulationCost = MaxCosts + 3;
 
 namespace wyrmgus {
 

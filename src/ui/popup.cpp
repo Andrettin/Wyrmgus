@@ -35,7 +35,6 @@
 #include "item/item_class.h"
 #include "player/faction.h"
 #include "player/player.h"
-#include "population/population_class.h"
 #include "script.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
@@ -322,7 +321,7 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 	wyrmgus::font *font = this->Font ? this->Font : defines::get()->get_small_font();
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
-	for (unsigned int i = 1; i <= PopulationCost; ++i) {
+	for (unsigned int i = 1; i <= ManaResCost; ++i) {
 		if (Costs[i]) {
 			const wyrmgus::resource_icon *icon = nullptr;
 			if (i >= MaxCosts) {
@@ -335,15 +334,6 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 						break;
 					case ManaResCost:
 						continue;
-					case PopulationCost: {
-						const unit_type *unit_type = button.get_value_unit_type(Selected[0]);
-						if (unit_type != nullptr && unit_type->get_population_class() != nullptr) {
-							icon = unit_type->get_population_class()->get_resource_icon();
-						} else {
-							icon = defines::get()->get_population_resource_icon();
-						}
-						break;
-					}
 					default:
 						break;
 				}
@@ -388,7 +378,7 @@ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs)
 	int popupHeight = 0;
 	wyrmgus::font *font = this->Font ? this->Font : defines::get()->get_small_font();
 
-	for (unsigned int i = 1; i <= PopulationCost; ++i) {
+	for (unsigned int i = 1; i <= ManaResCost; ++i) {
 		const wyrmgus::resource_icon *icon = nullptr;
 		if (i >= MaxCosts) {
 			switch (i) {
@@ -401,15 +391,6 @@ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs)
 				case ManaResCost:
 					icon = defines::get()->get_mana_icon();
 					break;
-				case PopulationCost: {
-					const unit_type *unit_type = button.get_value_unit_type(Selected[0]);
-					if (unit_type != nullptr && unit_type->get_population_class() != nullptr) {
-						icon = unit_type->get_population_class()->get_resource_icon();
-					} else {
-						icon = defines::get()->get_population_resource_icon();
-					}
-					break;
-				}
 				default:
 					break;
 			}
@@ -432,7 +413,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
-	for (unsigned int i = 1; i <= PopulationCost; ++i) {
+	for (unsigned int i = 1; i <= ManaResCost; ++i) {
 		if (Costs[i]) {
 			int y_offset = 0;
 
@@ -447,15 +428,6 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned i
 						break;
 					case ManaResCost:
 						continue;
-					case PopulationCost: {
-						const unit_type *unit_type = button.get_value_unit_type(Selected[0]);
-						if (unit_type != nullptr && unit_type->get_population_class() != nullptr) {
-							icon = unit_type->get_population_class()->get_resource_icon();
-						} else {
-							icon = defines::get()->get_population_resource_icon();
-						}
-						break;
-					}
 					default:
 						break;
 				}
@@ -751,8 +723,6 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 			condition->settlement_name = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "SiteName")) {
 			condition->site_name = Ccl2Condition(l, LuaToString(l, -1));
-		} else if (!strcmp(key, "HomeSettlementName")) {
-			condition->home_settlement_name = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "CanActiveHarvest")) {
 			condition->CanActiveHarvest = LuaToBoolean(l, -1);
 		//Wyrmgus end

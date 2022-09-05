@@ -151,7 +151,6 @@ enum EString {
 	EString_UnitEmploymentType,
 	EString_UnitSettlementName,	/// Unit Settlement Name
 	EString_UnitSiteName,	/// Unit Settlement Name
-	EString_UnitHomeSettlementName,
 	EString_UnitUniqueSet,		/// Unit Unique Item Set
 	EString_UnitUniqueSetItems,	/// Unit Unique Item Set Items
 	EString_TypeName,			/// Unit type's name

@@ -406,12 +406,6 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
-	if (condition->home_settlement_name != CONDITION_TRUE) {
-		if ((condition->home_settlement_name == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Unit && unit_manager::get()->GetSlotUnit(button.Value).get_home_settlement() != nullptr)) {
-			return false;
-		}
-	}
-	
 	if (condition->CanActiveHarvest && !(button.Action == ButtonCmd::Unit && Selected.size() > 0 && Selected[0]->can_harvest(&unit_manager::get()->GetSlotUnit(button.Value), false))) {
 		return false;
 	}
@@ -843,7 +837,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 	}
 
 	int popupWidth, popupHeight;
-	std::array<int, PopulationCost + 1> Costs{};
+	std::array<int, ManaResCost + 1> Costs{};
 	Costs.fill(0);
 
 	const unit_type *unit_type = button.get_unit_type();
@@ -879,9 +873,6 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above, std::vec
 			}
 
 			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->get_index()].Variables[DEMAND_INDEX].Value;
-			if (defines::get()->is_population_enabled()) {
-				Costs[PopulationCost] = unit_type->get_population_cost();
-			}
 			break;
 		}
 		case ButtonCmd::Buy:
@@ -2167,11 +2158,11 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 		if (Selected[best_training_place]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
 			CPlayer::GetThisPlayer()->Notify(notification_type::yellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("Unit training queue is full"));
 			return;
-		} else if (CPlayer::GetThisPlayer()->check_limits<true>(*unit_type, Selected[best_training_place]) == check_limits_result::success && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->get_index()].has_hired_unit(unit_type))) {
+		} else if (CPlayer::GetThisPlayer()->check_limits(*unit_type) == check_limits_result::success && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->get_index()].has_hired_unit(unit_type))) {
 			SendCommandTrainUnit(*Selected[best_training_place], *unit_type, CPlayer::GetThisPlayer()->get_index(), FlushCommands);
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
-		} else if (CPlayer::GetThisPlayer()->check_limits<true>(*unit_type, Selected[best_training_place]) == check_limits_result::not_enough_food) {
+		} else if (CPlayer::GetThisPlayer()->check_limits(*unit_type) == check_limits_result::not_enough_food) {
 			if (CPlayer::GetThisPlayer()->get_civilization() != nullptr && CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound() != nullptr) {
 				PlayGameSound(CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound(), MaxSampleVolume);
 			}
@@ -2186,7 +2177,7 @@ void CButtonPanel::DoClicked_UpgradeTo(const std::unique_ptr<wyrmgus::button> &b
 	const wyrmgus::unit_type *unit_type = button->get_value_unit_type(Selected[0]);
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[i]->Player->check_limits<false>(*unit_type, Selected[i]) != check_limits_result::unit_type_limit_reached && !Selected[i]->Player->CheckUnitType(*unit_type)) {
+		if (Selected[i]->Player->check_limits(*unit_type) != check_limits_result::unit_type_limit_reached && !Selected[i]->Player->CheckUnitType(*unit_type)) {
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
 				SendCommandUpgradeTo(*Selected[i], *unit_type, !(key_modifiers & Qt::ShiftModifier));
 				UI.StatusLine.Clear();
@@ -2203,7 +2194,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button, const Qt::KeyboardM
 	// FIXME: store pointer in button table!
 	wyrmgus::unit_type &type = *wyrmgus::unit_type::get_all()[CurrentButtons[button]->Value];
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[0]->Player->GetUnitTotalCount(type) < Selected[0]->Player->Allow.Units[type.Slot] || Selected[0]->Player->check_limits<false>(type, Selected[0]) != check_limits_result::unit_type_limit_reached) { //ugly way to make the check_limits message only appear when it should
+		if (Selected[0]->Player->GetUnitTotalCount(type) < Selected[0]->Player->Allow.Units[type.Slot] || Selected[0]->Player->check_limits(type) != check_limits_result::unit_type_limit_reached) { //ugly way to make the check_limits message only appear when it should
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
 				Selected[i]->Variable[LEVELUP_INDEX].Value -= 1;
 				Selected[i]->Variable[LEVELUP_INDEX].Max = Selected[i]->Variable[LEVELUP_INDEX].Value;
@@ -2282,7 +2273,7 @@ void CButtonPanel::DoClicked_Buy(int button)
 	resource_map<int> buy_costs;
 	buy_costs[defines::get()->get_wealth_resource()] = unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).get_price();
 
-	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->check_limits<false>(*unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type, Selected[0]) == check_limits_result::success) {
+	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->check_limits(*unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type) == check_limits_result::success) {
 		SendCommandBuy(*Selected[0], &unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value), CPlayer::GetThisPlayer()->get_index());
 		ButtonUnderCursor = -1;
 		OldButtonUnderCursor = -1;
@@ -2290,7 +2281,7 @@ void CButtonPanel::DoClicked_Buy(int button)
 		if (IsOnlySelected(*Selected[0])) {
 			SelectedUnitChanged();
 		}
-	} else if (CPlayer::GetThisPlayer()->check_limits<false>(*unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type, Selected[0]) == check_limits_result::not_enough_food) {
+	} else if (CPlayer::GetThisPlayer()->check_limits(*unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type) == check_limits_result::not_enough_food) {
 		if (CPlayer::GetThisPlayer()->get_civilization() != nullptr && CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound() != nullptr) {
 			PlayGameSound(CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound(), MaxSampleVolume);
 		}

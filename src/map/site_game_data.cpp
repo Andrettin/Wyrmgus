@@ -208,8 +208,6 @@ void site_game_data::set_owner(CPlayer *player)
 				for (const auto &[resource, income] : this->employment_incomes) {
 					old_owner->change_income(resource, -income);
 				}
-
-				old_owner->check_unit_home_settlements();
 			}
 
 			this->employment_incomes.clear();
@@ -226,8 +224,6 @@ void site_game_data::set_owner(CPlayer *player)
 				if (old_owner != nullptr && old_owner->get_civilization() != this->owner->get_civilization()) {
 					this->on_civilization_changed();
 				}
-
-				this->owner->check_unit_home_settlements();
 			} else {
 				this->clear_population_units();
 			}

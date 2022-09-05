@@ -1012,9 +1012,9 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 	// Check if enough resources remains? (NETWORK!)
 	// FIXME: wrong if append to message queue!!!
 	//Wyrmgus start
-//	if (unit.Player->check_limits<true>(type, &unit) != check_limits_result::success
+//	if (unit.Player->check_limits(type) != check_limits_result::success
 //		|| unit.Player->CheckUnitType(type)) {
-	if (CPlayer::Players[player]->check_limits<true>(type, &unit) != check_limits_result::success) {
+	if (CPlayer::Players[player]->check_limits(type) != check_limits_result::success) {
 	//Wyrmgus end
 		return;
 	}

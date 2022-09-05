@@ -1259,10 +1259,6 @@ int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "GivesResource")) {
 			const std::string resource_identifier = LuaToString(l, -1);
 			type->given_resource = wyrmgus::resource::get(resource_identifier);
-		} else if (!strcmp(value, "PopulationCost")) {
-			type->population_cost = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "PopulationClass")) {
-			type->population_class = population_class::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "EmploymentType")) {
 			type->employment_type = employment_type::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "EmploymentCapacity")) {

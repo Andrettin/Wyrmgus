@@ -1201,9 +1201,6 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitSiteName")) {
 			res->e = EString_UnitSiteName;
 			res->D.Unit = CclParseUnitDesc(l);
-		} else if (!strcmp(key, "UnitHomeSettlementName")) {
-			res->e = EString_UnitHomeSettlementName;
-			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "UnitUniqueSet")) {
 			res->e = EString_UnitUniqueSet;
 			res->D.Unit = CclParseUnitDesc(l);
@@ -1669,13 +1666,6 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->get_site() != nullptr) {
 				return _(unit->get_site()->get_game_data()->get_current_cultural_name());
-			} else {
-				return std::string();
-			}
-		case EString_UnitHomeSettlementName:
-			unit = EvalUnit(s->D.Unit.get());
-			if (unit != nullptr && unit->get_home_settlement() != nullptr) {
-				return _(unit->get_home_settlement()->get_game_data()->get_current_cultural_name());
 			} else {
 				return std::string();
 			}
@@ -2592,12 +2582,6 @@ static int CclUnitSiteName(lua_State *l)
 	return Alias(l, "UnitSiteName");
 }
 
-static int CclUnitHomeSettlementName(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	return Alias(l, "UnitHomeSettlementName");
-}
-
 /**
 **  Return equivalent lua table for UnitUniqueSet.
 **  {"UnitUniqueSet", {arg1}}
@@ -3063,7 +3047,6 @@ static void AliasRegister()
 	lua_register(Lua, "UnitEmploymentType", CclUnitEmploymentType);
 	lua_register(Lua, "UnitSettlementName", CclUnitSettlementName);
 	lua_register(Lua, "UnitSiteName", CclUnitSiteName);
-	lua_register(Lua, "UnitHomeSettlementName", CclUnitHomeSettlementName);
 	lua_register(Lua, "UnitUniqueSet", CclUnitUniqueSet);
 	lua_register(Lua, "UnitUniqueSetItems", CclUnitUniqueSetItems);
 	lua_register(Lua, "TypeName", CclTypeName);

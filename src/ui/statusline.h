@@ -39,7 +39,7 @@ class CStatusLine final
 public:
 	CStatusLine()
 	{
-		memset(Costs, 0, (PopulationCost + 1) * sizeof(int));
+		memset(Costs, 0, (ManaResCost + 1) * sizeof(int));
 	}
 
 	void Draw(std::vector<std::function<void(renderer *)>> &render_commands);
@@ -55,7 +55,7 @@ public:
 	int TextX = 0;
 	int TextY = 0;
 	wyrmgus::font *Font = nullptr;
-	int Costs[PopulationCost + 1];
+	int Costs[ManaResCost + 1];
 
 private:
 	std::string StatusLine;

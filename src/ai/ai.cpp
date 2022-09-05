@@ -366,7 +366,7 @@ bool PlayerAi::recruit_mercenary(CUnit *mercenary_building, const unit_type *mer
 		return false;
 	}
 
-	if (AiPlayer->Player->check_limits<false>(*mercenary_type, mercenary_building) != check_limits_result::success) {
+	if (AiPlayer->Player->check_limits(*mercenary_type) != check_limits_result::success) {
 		return false;
 	}
 
@@ -501,7 +501,7 @@ static void AiCheckUnits()
 					resource_map<int> buy_costs;
 					buy_costs[defines::get()->get_wealth_resource()] = hero->get_price();
 
-					if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->check_limits<false>(*hero->Type, hero_recruiter) == check_limits_result::success) {
+					if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->check_limits(*hero->Type) == check_limits_result::success) {
 						CommandBuy(*hero_recruiter, hero, AiPlayer->Player->get_index());
 						break;
 					}
@@ -541,7 +541,7 @@ static void AiCheckUnits()
 						resource_map<int> buy_costs;
 						buy_costs[defines::get()->get_wealth_resource()] = mercenary_hero->get_price();
 
-						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->check_limits<false>(*mercenary_hero->Type, mercenary_building) == check_limits_result::success) {
+						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->check_limits(*mercenary_hero->Type) == check_limits_result::success) {
 							CommandBuy(*mercenary_building, mercenary_hero, AiPlayer->Player->get_index());
 							break;
 						}

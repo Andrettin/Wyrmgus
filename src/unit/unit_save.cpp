@@ -166,9 +166,6 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.get_settlement() != nullptr) {
 		file.printf("\"settlement\", \"%s\", ", unit.get_settlement()->get_identifier().c_str());
 	}
-	if (unit.get_home_settlement() != nullptr) {
-		file.printf("\"home_settlement\", \"%s\", ", unit.get_home_settlement()->get_identifier().c_str());
-	}
 	if (unit.Prefix != nullptr) {
 		file.printf("\"prefix\", \"%s\", ", unit.Prefix->get_identifier().c_str());
 	}

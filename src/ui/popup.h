@@ -64,7 +64,6 @@ public:
 	char employment = 0; //check if the button's unit has employment.
 	char settlement_name = 0; //check if the button's unit has a settlement name.
 	char site_name = 0; //check if the button's unit has a site name.
-	char home_settlement_name = 0;
 	bool CanActiveHarvest = false;	/// check if the active unit can harvest the button's unit.
 	//Wyrmgus end
 	ButtonCmd ButtonAction;	/// action type of button

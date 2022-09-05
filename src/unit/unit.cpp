@@ -415,7 +415,6 @@ void CUnit::Init()
 	this->character = nullptr;
 	this->settlement = nullptr;
 	this->site = nullptr;
-	this->home_settlement = nullptr;
 	this->Trait = nullptr;
 	this->Prefix = nullptr;
 	this->Suffix = nullptr;
@@ -545,7 +544,6 @@ void CUnit::Release(const bool final)
 	this->character = nullptr;
 	this->set_settlement(nullptr);
 	this->set_site(nullptr);
-	this->set_home_settlement(nullptr);
 	this->unique = nullptr;
 	this->ConnectingDestination = nullptr;
 	
@@ -2174,66 +2172,6 @@ void CUnit::set_settlement(const wyrmgus::site *settlement)
 	}
 }
 
-void CUnit::set_home_settlement(const wyrmgus::site *settlement)
-{
-	if (!defines::get()->is_population_enabled()) {
-		return;
-	}
-
-	if (settlement == this->get_home_settlement()) {
-		return;
-	}
-
-	this->home_settlement = settlement;
-}
-
-void CUnit::update_home_settlement()
-{
-	if (!this->IsAlive()) {
-		return;
-	}
-
-	if (this->Removed && this->Container == nullptr) {
-		return;
-	}
-
-	if (this->get_character() != nullptr) {
-		this->set_home_settlement(nullptr);
-		return;
-	}
-
-	if (this->get_home_settlement() != nullptr && this->get_home_settlement()->get_game_data()->get_owner() == this->Player) {
-		//a valid home settlement is already assigned
-		return;
-	}
-
-	const int food_cost = this->Type->Stats[this->Player->get_index()].Variables[DEMAND_INDEX].Value;
-
-	if (food_cost == 0) {
-		//only units which have a food cost need to have a home settlement
-		return;
-	}
-
-	//find a new home settlement for the unit
-	const CUnit *best_hall = nullptr;
-	int best_distance = -1;
-
-	for (const CUnit *settlement_unit : this->Player->get_town_hall_units()) {
-		const int distance = this->MapDistanceTo(*settlement_unit);
-
-		if (best_hall == nullptr || distance < best_distance) {
-			best_hall = settlement_unit;
-			best_distance = distance;
-		}
-	}
-
-	if (best_hall != nullptr) {
-		this->set_home_settlement(best_hall->get_settlement());
-	} else {
-		this->set_home_settlement(nullptr);
-	}
-}
-
 void CUnit::update_site_owner()
 {
 	if (this->get_site() == nullptr) {
@@ -3476,10 +3414,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		this->UpdateSoldUnits();
 
 		this->update_site_owner();
-
-		if (defines::get()->is_population_enabled()) {
-			this->update_home_settlement();
-		}
 	}
 	//Wyrmgus end
 }
@@ -4444,10 +4378,6 @@ void CUnit::Place(const Vec2i &pos, const int z)
 	//Wyrmgus end
 
 	if (game::get()->is_running()) {
-		if (defines::get()->is_population_enabled()) {
-			this->update_home_settlement();
-		}
-
 		emit this->MapLayer->unit_added(UnitNumber(*this), this->Type, this->GetVariation(), this->Frame, this->get_player_color(), this->tilePos);
 	}
 }
@@ -5020,10 +4950,6 @@ void UnitLost(CUnit &unit)
 		if (defines::get()->is_population_enabled()) {
 			if (unit.get_settlement() != nullptr) {
 				unit.get_settlement()->get_game_data()->on_settlement_building_removed(&unit);
-			}
-
-			if (unit.get_home_settlement() != nullptr) {
-				unit.set_home_settlement(nullptr);
 			}
 		}
 
@@ -5615,10 +5541,6 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 
 	if (this->get_settlement() == nullptr) {
 		this->UpdateSettlement();
-	}
-
-	if (defines::get()->is_population_enabled() && this->get_home_settlement() == nullptr) {
-		this->update_home_settlement();
 	}
 }
 

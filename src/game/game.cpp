@@ -225,7 +225,6 @@ void game::on_started()
 		}
 
 		unit->UpdateSoldUnits();
-		unit->update_home_settlement();
 	}
 
 	for (size_t z = 0; z < CMap::get()->MapLayers.size(); ++z) {

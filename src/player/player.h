@@ -793,8 +793,6 @@ public:
 		this->set_population(this->get_population() + change);
 	}
 
-	void check_unit_home_settlements();
-
 	int get_score() const
 	{
 		return this->score;
@@ -919,11 +917,7 @@ public:
 	int GetUnitTotalCount(const wyrmgus::unit_type &type) const;
 
 	//check if a new unit of the type wouldn't break any unit limits or supply/demand
-	template <bool check_population>
-	check_limits_result check_limits(const unit_type &type, const CUnit *builder) const;
-
-	//check whether there is enough population available for training a unit of a given type
-	bool check_population_availability(const unit_type &type, const CUnit *builder) const;
+	check_limits_result check_limits(const unit_type &type) const;
 
 	/// Check if enough resources are available for costs
 	int CheckCosts(const resource_map<int> &costs, const bool notify = true) const;
@@ -1455,9 +1449,6 @@ private:
 	friend void SetPlayersPalette();
 	friend int ::CclUnit(lua_State *l);
 };
-
-extern template check_limits_result CPlayer::check_limits<false>(const unit_type &, const CUnit *) const;
-extern template check_limits_result CPlayer::check_limits<true>(const unit_type &, const CUnit *) const;
 
 //Wyrmgus start
 class CAiBuildingTemplate final

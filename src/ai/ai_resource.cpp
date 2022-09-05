@@ -1031,10 +1031,6 @@ static bool AiTrainUnit(const unit_type &type, const unit_type &what, const land
 			continue;
 		}
 
-		if (!AiPlayer->Player->check_population_availability(type, &unit)) {
-			continue;
-		}
-
 		//Wyrmgus start
 //		CommandTrainUnit(unit, what, FlushCommands);
 		CommandTrainUnit(unit, what, AiPlayer->Player->get_index(), FlushCommands);
@@ -1224,7 +1220,7 @@ void AiAddUpgradeToRequest(const unit_type &type)
 		AiPlayer->NeededMask |= resourceNeeded;
 		return;
 	}
-	if (AiPlayer->Player->check_limits<false>(type, nullptr) != check_limits_result::success) {
+	if (AiPlayer->Player->check_limits(type) != check_limits_result::success) {
 		return;
 	}
 	//
@@ -1310,7 +1306,7 @@ static void AiCheckingWork()
 		}
 
 		// Check limits, AI should be broken if reached.
-		if (queuep->Want > queuep->Made && AiPlayer->Player->check_limits<false>(type, nullptr) != check_limits_result::success) {
+		if (queuep->Want > queuep->Made && AiPlayer->Player->check_limits(type) != check_limits_result::success) {
 			continue;
 		}
 

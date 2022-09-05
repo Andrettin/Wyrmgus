@@ -330,8 +330,6 @@ int CclUnit(lua_State *l)
 			}
 		} else if (!strcmp(value, "settlement")) {
 			unit->settlement = site::get(LuaToString(l, 2, j + 1));
-		} else if (!strcmp(value, "home_settlement")) {
-			unit->home_settlement = site::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "trait")) {
 			unit->Trait = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "prefix")) {

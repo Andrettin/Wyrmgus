@@ -210,7 +210,7 @@ void COrder_Train::Execute(CUnit &unit)
 	
 	//Wyrmgus start
 	// Check if enough supply available.
-	const check_limits_result result = player.check_limits<true>(nType, &unit);
+	const check_limits_result result = player.check_limits(nType);
 	if (result != check_limits_result::success) {
 		if (result == check_limits_result::not_enough_food && player.AiEnabled) {
 			AiNeedMoreSupply(player);
@@ -243,7 +243,7 @@ void COrder_Train::Execute(CUnit &unit)
 	// food check should be before changing the ticks
 	/*
 	// Check if enough supply available.
-	const check_limits_result result = player.check_limits<true>(nType, &unit);
+	const check_limits_result result = player.check_limits(nType);
 	if (result != check_limits_result::success) {
 		if (result == check_limits_result::not_enough_food && player.AiEnabled) {
 			AiNeedMoreSupply(*unit.Player);
@@ -373,23 +373,6 @@ void COrder_Train::Execute(CUnit &unit)
 			unit.Player->change_resource(defines::get()->get_wealth_resource(), newUnit->get_price(), true);
 		}
 		//Wyrmgus end
-
-		//subtract population cost
-		if (defines::get()->is_population_enabled()) {
-			if (unit.Player == newUnit->Player && unit.get_settlement() != nullptr && !is_hired && nType.get_population_cost() > 0) {
-				site_game_data *settlement_game_data = unit.get_settlement()->get_game_data();
-
-				const population_type *population_type = settlement_game_data->get_class_population_type(nType.get_population_class());
-
-				assert_log(population_type != nullptr);
-
-				if (population_type != nullptr) {
-					settlement_game_data->change_population_type_population(population_type, -nType.get_population_cost());
-				}
-
-				newUnit->set_home_settlement(unit.get_settlement());
-			}
-		}
 		
 		if (&player == CPlayer::GetThisPlayer()) {
 			PlayUnitSound(newUnit, unit_sound_type::ready);
