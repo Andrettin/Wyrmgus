@@ -48,13 +48,6 @@ void employment_type::process_gsml_scope(const gsml_data &scope)
 	}
 }
 
-void employment_type::check() const
-{
-	if (this->get_output_resource() != nullptr) {
-		assert_throw(this->get_output_multiplier() != 0);
-	}
-}
-
 bool employment_type::can_employ(const population_class *population_class) const
 {
 	if (vector::contains(this->get_employees(), population_class)) {

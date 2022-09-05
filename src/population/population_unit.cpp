@@ -174,11 +174,15 @@ const resource *population_unit::get_output_resource() const
 
 const centesimal_int &population_unit::get_output_multiplier() const
 {
-	if (this->get_employment_type() != nullptr) {
+	if (this->get_employment_type() != nullptr && this->get_employment_type()->get_output_multiplier() != 0) {
 		return this->get_employment_type()->get_output_multiplier();
 	}
 
-	return this->get_type()->get_population_class()->get_unemployed_output_multiplier();
+	if (this->get_type()->get_population_class()->get_unemployed_output_multiplier() != 0) {
+		return this->get_type()->get_population_class()->get_unemployed_output_multiplier();
+	}
+
+	return population_unit::default_output_multiplier;
 }
 
 }

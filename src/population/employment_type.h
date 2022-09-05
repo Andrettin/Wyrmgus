@@ -52,7 +52,6 @@ public:
 	}
 
 	virtual void process_gsml_scope(const gsml_data &scope) override;
-	virtual void check() const override;
 
 	const resource *get_input_resource() const
 	{

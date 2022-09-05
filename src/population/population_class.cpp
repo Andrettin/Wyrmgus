@@ -73,10 +73,6 @@ void population_class::check() const
 			throw std::runtime_error("Population classes \"" + this->get_identifier() + "\" and \"" + demotion_target->get_identifier() + "\" are both set as demotion targets of each other.");
 		}
 	}
-
-	if (this->get_unemployed_output_resource() != nullptr) {
-		assert_throw(this->get_unemployed_output_multiplier() != 0);
-	}
 }
 
 bool population_class::promotes_to(const population_class *other, const bool include_indirectly) const
