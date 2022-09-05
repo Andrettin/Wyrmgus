@@ -185,4 +185,17 @@ const centesimal_int &population_unit::get_output_multiplier() const
 	return population_unit::default_output_multiplier;
 }
 
+void population_unit::calculate_output_quantity()
+{
+	int64_t output = this->get_population();
+
+	const int production_efficiency = this->get_type()->get_production_efficiency(this->get_output_resource());
+	output *= production_efficiency;
+	output /= 100;
+
+	output = (output * this->get_output_multiplier()).to_int();
+
+	this->set_output_quantity(static_cast<int>(output));
+}
+
 }

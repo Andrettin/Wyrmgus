@@ -49,6 +49,7 @@ class population_unit final : public QObject
 	Q_PROPERTY(qint64 population READ get_population NOTIFY population_changed)
 	Q_PROPERTY(wyrmgus::resource* input_resource READ get_input_resource_unconst CONSTANT)
 	Q_PROPERTY(wyrmgus::resource* output_resource READ get_output_resource_unconst CONSTANT)
+	Q_PROPERTY(int output_quantity READ get_output_quantity NOTIFY output_quantity_changed)
 
 public:
 	static constexpr int64_t capacity_growth_divisor = 10;
@@ -147,13 +148,32 @@ private:
 public:
 	const centesimal_int &get_output_multiplier() const;
 
+	int get_output_quantity() const
+	{
+		return this->output_quantity;
+	}
+
+	void set_output_quantity(const int quantity)
+	{
+		if (quantity == this->get_output_quantity()) {
+			return;
+		}
+
+		this->output_quantity = quantity;
+		emit output_quantity_changed();
+	}
+
+	void calculate_output_quantity();
+
 signals:
 	void population_changed();
+	void output_quantity_changed();
 
 private:
 	const population_type *type = nullptr;
 	const wyrmgus::employment_type *employment_type = nullptr;
 	int64_t population = 0;
+	int output_quantity = 0;
 };
 
 }

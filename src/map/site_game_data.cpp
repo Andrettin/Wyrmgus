@@ -1015,9 +1015,8 @@ void site_game_data::calculate_employment_incomes()
 			continue;
 		}
 
-		const int production_efficiency = population_unit->get_type()->get_production_efficiency(output_resource);
-
-		const int output = (population_unit->get_population() * production_efficiency / 100 * population_unit->get_output_multiplier()).to_int();
+		population_unit->calculate_output_quantity();
+		const int output = population_unit->get_output_quantity();
 
 		new_incomes[output_resource] += output;
 
