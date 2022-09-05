@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2021-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,27 +24,18 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#include "stratagus.h"
-
-#include "map/region_history.h"
-
-#include "database/gsml_data.h"
-#include "population/population_class.h"
+#pragma once
 
 namespace wyrmgus {
 
-void region_history::process_gsml_scope(const gsml_data &scope)
-{
-	const std::string &tag = scope.get_tag();
+class population_class;
 
-	if (tag == "population_groups") {
-		scope.for_each_property([&](const gsml_property &property) {
-			const population_class *unit_class = population_class::get(property.get_key());
-			this->population_groups[unit_class] = std::stoll(property.get_value());
-		});
-	} else {
-		data_entry_history::process_gsml_scope(scope);
-	}
-}
+struct population_class_compare final
+{
+	bool operator()(const population_class *lhs, const population_class *rhs) const;
+};
+
+template <typename T>
+using population_class_map = std::map<const population_class *, T, population_class_compare>;
 
 }

@@ -27,7 +27,7 @@
 #pragma once
 
 #include "database/data_entry_history.h"
-#include "unit/unit_class_container.h"
+#include "population/population_class_container.h"
 
 namespace wyrmgus {
 
@@ -47,14 +47,14 @@ public:
 		return this->population;
 	}
 
-	const unit_class_map<int64_t> &get_population_groups() const
+	const population_class_map<int64_t> &get_population_groups() const
 	{
 		return this->population_groups;
 	}
 
 private:
 	int64_t population = 0; //used for creating units at scenario start
-	unit_class_map<int64_t> population_groups; //population size for unit classes
+	population_class_map<int64_t> population_groups; //population size for unit classes
 };
 
 }

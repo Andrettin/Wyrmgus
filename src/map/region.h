@@ -31,6 +31,7 @@
 
 namespace wyrmgus {
 
+class population_class;
 class region_history;
 class site;
 class terrain_feature;
@@ -92,6 +93,10 @@ public:
 	Q_INVOKABLE void remove_superregion(region *superregion);
 
 	bool is_part_of(const region *other_region) const;
+
+	void distribute_population() const;
+	void distribute_population_groups() const;
+	void distribute_population_group(const population_class *population_class, int64_t population) const;
 
 private:
 	std::vector<site *> sites; //sites located in the region

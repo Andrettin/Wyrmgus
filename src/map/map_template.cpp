@@ -68,6 +68,7 @@
 #include "player/faction_type.h"
 #include "player/player.h"
 #include "player/player_type.h"
+#include "population/population_class.h"
 #include "quest/campaign.h"
 #include "settings.h"
 #include "time/calendar.h"
@@ -1831,21 +1832,30 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 		if (defines::get()->is_population_enabled()) {
 			if (site->is_settlement() && site_owner != nullptr && site_game_data->get_site_unit() != nullptr) {
-				site_game_data->set_default_population_type_population(site_history->get_population());
+				int64_t population_to_apply = site_history->get_population();
+
+				for (auto &[population_class, group_population] : site_history->get_population_groups()) {
+					population_to_apply -= group_population;
+
+					const population_type *population_type = site_game_data->get_class_population_type(population_class);
+
+					if (population_type == nullptr) {
+						continue;
+					}
+
+					site_game_data->change_population_type_population(population_type, group_population);
+
+					group_population = 0;
+				}
+
+				if (population_to_apply > 0) {
+					site_game_data->change_default_population_type_population(population_to_apply);
+				}
+
 				site_history->set_population(0);
 			}
 		} else {
 			int64_t population = site_history->get_population();
-
-			for (auto &[unit_class, group_population] : site_history->get_population_groups()) {
-				population -= group_population;
-
-				this->apply_population_unit(unit_class, group_population, site_game_data->get_map_pos(), z, player, settlement);
-
-				//population that isn't enough to be applied as a unit of its own
-				const int64_t remaining_group_population = group_population % defines::get()->get_population_per_unit();
-				group_population = remaining_group_population;
-			}
 
 			if (population != 0) { //remaining population after subtracting the amount of population specified to belong to particular groups
 				const unit_class *population_class = player->get_default_population_unit_class(base_unit_type ? base_unit_type->get_domain() : unit_domain::land);
@@ -2499,7 +2509,6 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 void map_template::apply_remaining_site_populations() const
 {
 	player_map<int64_t> player_populations;
-	player_map<unit_class_map<int64_t>> player_population_groups;
 
 	//add remaining site populations to their respective settlements, or for their owners if they are not the same as the settlement's owner
 	for (const site *site : site::get_all()) {
@@ -2534,14 +2543,10 @@ void map_template::apply_remaining_site_populations() const
 
 		site_history *site_history = site->get_history();
 
-		for (auto &[unit_class, group_population] : site_history->get_population_groups()) {
+		for (auto &[population_class, group_population] : site_history->get_population_groups()) {
 			//remaining group population
 			if (group_population != 0) {
-				if (use_settlement) {
-					settlement_history->change_group_population(unit_class, group_population);
-				} else {
-					player_population_groups[owner][unit_class] += group_population;
-				}
+				settlement_history->change_group_population(population_class, group_population);
 				group_population = 0;
 			}
 		}
@@ -2590,17 +2595,29 @@ void map_template::apply_remaining_site_populations() const
 
 		if (defines::get()->is_population_enabled()) {
 			game_data->change_default_population_type_population(settlement_history->get_population());
-			settlement_history->set_population(0);
-		} else {
-			for (auto &[unit_class, group_population] : settlement_history->get_population_groups()) {
-				//remaining group population
-				if (group_population != 0) {
-					this->apply_population_unit(unit_class, group_population, settlement_pos, z, owner, site);
 
-					group_population = group_population % defines::get()->get_population_per_unit();
+			int64_t population_to_apply = settlement_history->get_population();
+
+			for (auto &[population_class, group_population] : settlement_history->get_population_groups()) {
+				population_to_apply -= group_population;
+
+				const population_type *population_type = game_data->get_class_population_type(population_class);
+
+				if (population_type == nullptr) {
+					continue;
 				}
+
+				game_data->change_population_type_population(population_type, group_population);
+
+				group_population = 0;
 			}
 
+			if (population_to_apply > 0) {
+				game_data->change_default_population_type_population(population_to_apply);
+			}
+
+			settlement_history->set_population(0);
+		} else {
 			//remaining population
 			if (settlement_history->get_population() != 0) {
 				const unit_class *population_class = owner->get_default_population_unit_class(game_data->get_site_unit()->Type->get_domain());
@@ -2612,14 +2629,6 @@ void map_template::apply_remaining_site_populations() const
 		}
 
 		//add the remaining population to remaining population data for the owner
-		for (auto &[unit_class, group_population] : settlement_history->get_population_groups()) {
-			//remaining group population
-			if (group_population != 0) {
-				player_population_groups[owner][unit_class] += group_population;
-				group_population = 0;
-			}
-		}
-
 		//remaining population
 		if (settlement_history->get_population() != 0) {
 			player_populations[owner] += settlement_history->get_population();
@@ -2628,18 +2637,6 @@ void map_template::apply_remaining_site_populations() const
 	}
 
 	if (!defines::get()->is_population_enabled()) {
-		for (auto &[player, population_groups] : player_population_groups) {
-			for (auto &[unit_class, group_population] : population_groups) {
-				this->apply_population_unit(unit_class, group_population, player->StartPos, player->StartMapLayer, player, nullptr);
-
-				group_population %= defines::get()->get_population_per_unit();
-
-				if (group_population != 0) {
-					player_populations[player] += group_population;
-				}
-			}
-		}
-
 		for (const auto &[player, population] : player_populations) {
 			const unit_class *population_class = player->get_default_population_unit_class(unit_domain::land);
 

@@ -60,49 +60,8 @@ void region::load_history_database()
 	});
 
 	for (const region *region : regions) {
-		const region_history *region_history = region->get_history();
-		
-		int64_t population = region_history->get_population();
-
-		if (population == 0) {
-			continue;
-		}
-
-		int unpopulated_site_count = 0;
-
-		//subtract the predefined population of settlements in the region from that of the region
-		for (const site *site : region->get_sites()) {
-			if (!site->can_have_population()) {
-				continue;
-			}
-
-			const site_history *site_history = site->get_history();
-
-			if (site_history->get_population() != 0) {
-				population -= site_history->get_population();
-			} else {
-				++unpopulated_site_count;
-			}
-		}
-
-		if (population <= 0 || unpopulated_site_count == 0) {
-			continue;
-		}
-
-		//apply the remaining population to sites without a predefined population in history
-		const int64_t population_per_site = population / unpopulated_site_count;
-
-		for (const site *site : region->get_sites()) {
-			if (!site->can_have_population()) {
-				continue;
-			}
-
-			site_history *site_history = site->get_history();
-
-			if (site_history->get_population() == 0) {
-				site_history->set_population(population_per_site);
-			}
-		}
+		region->distribute_population();
+		region->distribute_population_groups();
 	}
 }
 
@@ -214,6 +173,109 @@ bool region::is_part_of(const region *other_region) const
 	}
 
 	return false;
+}
+
+void region::distribute_population() const
+{
+	const region_history *region_history = this->get_history();
+
+	int64_t population = region_history->get_population();
+
+	if (population == 0) {
+		return;
+	}
+
+	int unpopulated_site_count = 0;
+
+	//subtract the predefined population of settlements in the region from that of the region
+	for (const site *site : this->get_sites()) {
+		if (!site->can_have_population()) {
+			continue;
+		}
+
+		const site_history *site_history = site->get_history();
+
+		if (site_history->get_population() != 0) {
+			population -= site_history->get_population();
+		} else {
+			++unpopulated_site_count;
+		}
+	}
+
+	if (population <= 0 || unpopulated_site_count == 0) {
+		return;
+	}
+
+	//apply the remaining population to sites without a predefined population in history
+	const int64_t population_per_site = population / unpopulated_site_count;
+
+	for (const site *site : this->get_sites()) {
+		if (!site->can_have_population()) {
+			continue;
+		}
+
+		site_history *site_history = site->get_history();
+
+		if (site_history->get_population() == 0) {
+			site_history->set_population(population_per_site);
+		}
+	}
+}
+
+void region::distribute_population_groups() const
+{
+	const region_history *region_history = this->get_history();
+
+	for (const auto &[population_class, population] : region_history->get_population_groups()) {
+		this->distribute_population_group(population_class, population);
+	}
+}
+
+void region::distribute_population_group(const population_class *population_class, int64_t population) const
+{
+	if (population == 0) {
+		return;
+	}
+
+	int unpopulated_site_count = 0; //sites without population of the specific class
+
+	//subtract the predefined population of settlements in the region from that of the region, for the appropriate population class
+	for (const site *site : this->get_sites()) {
+		if (!site->can_have_population()) {
+			continue;
+		}
+
+		const site_history *site_history = site->get_history();
+
+		const int64_t site_population = site_history->get_group_population(population_class);
+
+		if (site_population != 0) {
+			population -= site_population;
+		} else {
+			++unpopulated_site_count;
+		}
+	}
+
+	if (population <= 0 || unpopulated_site_count == 0) {
+		return;
+	}
+
+	//apply the remaining population to sites without a predefined population for the population class in history
+	const int64_t population_per_site = population / unpopulated_site_count;
+
+	for (const site *site : this->get_sites()) {
+		if (!site->can_have_population()) {
+			continue;
+		}
+
+		site_history *site_history = site->get_history();
+
+		const int64_t site_population = site_history->get_group_population(population_class);
+
+		if (site_population == 0) {
+			site_history->set_group_population(population_class, population_per_site);
+		}
+	}
 }
 
 }

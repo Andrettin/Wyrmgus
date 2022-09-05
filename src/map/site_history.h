@@ -27,7 +27,7 @@
 #pragma once
 
 #include "database/data_entry_history.h"
-#include "unit/unit_class_container.h"
+#include "population/population_class_container.h"
 
 namespace wyrmgus {
 
@@ -98,14 +98,14 @@ public:
 		this->population += change;
 	}
 
-	unit_class_map<int64_t> &get_population_groups()
+	population_class_map<int64_t> &get_population_groups()
 	{
 		return this->population_groups;
 	}
 
-	int64_t get_group_population(const unit_class *unit_class) const
+	int64_t get_group_population(const population_class *population_class) const
 	{
-		const auto find_iterator = this->population_groups.find(unit_class);
+		const auto find_iterator = this->population_groups.find(population_class);
 		if (find_iterator != this->population_groups.end()) {
 			return find_iterator->second;
 		}
@@ -113,14 +113,14 @@ public:
 		return 0;
 	}
 
-	void set_group_population(const unit_class *unit_class, const int64_t population)
+	void set_group_population(const population_class *population_class, const int64_t population)
 	{
-		this->population_groups[unit_class] = population;
+		this->population_groups[population_class] = population;
 	}
 
-	void change_group_population(const unit_class *unit_class, const int64_t change)
+	void change_group_population(const population_class *population_class, const int64_t change)
 	{
-		this->set_group_population(unit_class, this->get_group_population(unit_class) + change);
+		this->set_group_population(population_class, this->get_group_population(population_class) + change);
 	}
 
 private:
@@ -131,7 +131,7 @@ private:
 	unit_class *pathway_class = nullptr;
 	unit_class *wall_class = nullptr;
 	int64_t population = 0; //used for creating units at scenario start
-	unit_class_map<int64_t> population_groups; //population size for unit classes
+	population_class_map<int64_t> population_groups; //population size for population classes
 };
 
 }

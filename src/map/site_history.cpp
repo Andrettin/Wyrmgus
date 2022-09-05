@@ -30,6 +30,7 @@
 
 #include "database/gsml_data.h"
 #include "map/site.h"
+#include "population/population_class.h"
 #include "unit/unit_class.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
@@ -42,8 +43,8 @@ void site_history::process_gsml_scope(const gsml_data &scope)
 
 	if (tag == "population_groups") {
 		scope.for_each_property([&](const gsml_property &property) {
-			const unit_class *unit_class = unit_class::get(property.get_key());
-			this->population_groups[unit_class] = std::stoll(property.get_value());
+			const population_class *population_class = population_class::get(property.get_key());
+			this->population_groups[population_class] = std::stoll(property.get_value());
 		});
 	} else {
 		data_entry_history::process_gsml_scope(scope);

@@ -335,6 +335,7 @@ set(population_SRCS
 	src/population/employment_type.cpp
 	src/population/employment_type_container.cpp
 	src/population/population_class.cpp
+	src/population/population_class_container.cpp
 	src/population/population_type.cpp
 	src/population/population_unit.cpp
 	src/population/population_unit_container.cpp
@@ -908,6 +909,7 @@ set(wyrmgus_population_HDRS
 	src/population/employment_type.h
 	src/population/employment_type_container.h
 	src/population/population_class.h
+	src/population/population_class_container.h
 	src/population/population_type.h
 	src/population/population_unit.h
 	src/population/population_unit_container.h
