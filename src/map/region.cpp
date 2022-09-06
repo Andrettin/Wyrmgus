@@ -44,16 +44,9 @@ void region::load_history_database()
 	std::vector<region *> regions = region::get_all();
 
 	std::sort(regions.begin(), regions.end(), [](const region *lhs, const region *rhs) {
-		//give priority to subregions
-		if (lhs->is_part_of(rhs)) {
-			return true;
-		} else if (rhs->is_part_of(lhs)) {
-			return false;
-		}
-
 		//give priority to smaller regions
-		if (lhs->settlements.size() != rhs->settlements.size()) {
-			return lhs->settlements.size() < rhs->settlements.size();
+		if (lhs->sites.size() != rhs->sites.size()) {
+			return lhs->sites.size() < rhs->sites.size();
 		}
 
 		return lhs->get_identifier() < rhs->get_identifier();
