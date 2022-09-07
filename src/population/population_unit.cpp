@@ -111,6 +111,8 @@ void population_unit::process_gsml_property(const gsml_property &property)
 		this->employment_type = employment_type::get(value);
 	} else if (key == "population") {
 		this->set_population(std::stoll(value));
+	} else if (key == "output_quantity") {
+		this->set_output_quantity(std::stoi(value));
 	} else {
 		throw std::runtime_error("Invalid population unit property: \"" + key + "\".");
 	}
@@ -135,6 +137,10 @@ gsml_data population_unit::to_gsml_data() const
 
 	if (this->get_population() != 0) {
 		data.add_property("population", std::to_string(this->get_population()));
+	}
+
+	if (this->get_output_quantity() != 0) {
+		data.add_property("output_quantity", std::to_string(this->get_output_quantity()));
 	}
 
 	return data;
