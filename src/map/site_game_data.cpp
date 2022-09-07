@@ -88,6 +88,12 @@ void site_game_data::process_gsml_scope(const gsml_data &scope)
 			const std::string &value = property.get_value();
 			this->employment_capacities[employment_type::get(key)] = std::stoi(value);
 		});
+	} else if (tag == "employment_incomes") {
+		scope.for_each_property([&](const gsml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+			this->employment_incomes[resource::get(key)] = std::stoi(value);
+		});
 	} else if (tag == "population_units") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto population_unit = make_qunique<wyrmgus::population_unit>();
@@ -128,6 +134,16 @@ gsml_data site_game_data::to_gsml_data() const
 		}
 
 		data.add_child(std::move(employment_capacities_data));
+	}
+
+	if (!this->employment_incomes.empty()) {
+		gsml_data employment_incomes_data("employment_incomes");
+
+		for (const auto &[resource, income] : this->employment_incomes) {
+			employment_incomes_data.add_property(resource->get_identifier(), std::to_string(income));
+		}
+
+		data.add_child(std::move(employment_incomes_data));
 	}
 
 	if (!this->population_units.empty()) {
