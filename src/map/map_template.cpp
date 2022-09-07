@@ -2594,8 +2594,6 @@ void map_template::apply_remaining_site_populations() const
 		const int z = game_data->get_map_layer()->ID;
 
 		if (defines::get()->is_population_enabled()) {
-			game_data->change_default_population_type_population(settlement_history->get_population());
-
 			int64_t population_to_apply = settlement_history->get_population();
 
 			for (auto &[population_class, group_population] : settlement_history->get_population_groups()) {
