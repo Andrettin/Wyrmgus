@@ -2385,9 +2385,11 @@ static void UIHandleButtonDown_OnButton(const Qt::KeyboardModifiers key_modifier
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			//Wyrmgus start
 //			if (!GameObserve && !game::get()->is_paused() && !GameEstablishing && CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !game::get()->is_paused() && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->has_building_access(Selected[0]))) {
+			if (!GameObserve && !GameEstablishing && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->has_building_access(Selected[0]))) {
 			//Wyrmgus end
-				OldButtonUnderCursor = ButtonUnderCursor;
+				if (!game::get()->is_paused() || (ButtonUnderCursor != -1 && CurrentButtons[ButtonUnderCursor]->is_usable_when_paused())) {
+					OldButtonUnderCursor = ButtonUnderCursor;
+				}
 			}
 		}
 	} else if ((MouseButtons & MiddleButton)) {
@@ -2745,9 +2747,9 @@ void UIHandleButtonUp(unsigned button, const Qt::KeyboardModifiers key_modifiers
 		
 		//Wyrmgus start
 //		if (!GameObserve && !game::get()->is_paused() && !GameEstablishing && Selected.empty() == false && ThisPlayer->IsTeamed(*Selected[0])) {
-		if (!GameObserve && !game::get()->is_paused() && !GameEstablishing && Selected.empty() == false && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->has_building_access(Selected[0]))) {
+		if (!GameObserve && !GameEstablishing && Selected.empty() == false && (CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->has_building_access(Selected[0]))) {
 		//Wyrmgus end
-			if (OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
+			if (OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor && (!game::get()->is_paused() || CurrentButtons[ButtonUnderCursor]->is_usable_when_paused())) {
 				UI.ButtonPanel.DoClicked(ButtonUnderCursor, key_modifiers);
 				OldButtonUnderCursor = -1;
 				return;

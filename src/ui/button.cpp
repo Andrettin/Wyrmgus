@@ -714,6 +714,17 @@ bool button::has_position_based_hotkey() const
 	return false;
 }
 
+bool button::is_usable_when_paused() const
+{
+	switch (this->Action) {
+		case ButtonCmd::Button:
+		case ButtonCmd::ShowPopulation:
+			return true;
+		default:
+			return false;
+	}
+}
+
 }
 
 std::string GetButtonActionNameById(const ButtonCmd button_action)

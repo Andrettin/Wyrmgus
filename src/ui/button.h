@@ -165,6 +165,8 @@ public:
 
 	bool has_position_based_hotkey() const;
 
+	bool is_usable_when_paused() const;
+
 	int pos = 0; //button position in the grid
 	button_level *level = nullptr;		/// requires button level
 private:
