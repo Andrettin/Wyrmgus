@@ -1069,8 +1069,8 @@ int WriteMapSetup(const std::filesystem::path &map_setup_filepath, CMap &map, co
 					f->printf("SetUnitVariable(unit, \"Name\", \"%s\")\n", unit->Name.c_str());
 				}
 			}
-			if (unit->Trait != nullptr) {
-				f->printf("AcquireTrait(unit, \"%s\")\n", unit->Trait->get_identifier().c_str());
+			for (const CUpgrade *trait : unit->get_traits()) {
+				f->printf("AcquireTrait(unit, \"%s\")\n", trait->get_identifier().c_str());
 			}
 			if (unit->Prefix != nullptr) {
 				f->printf("SetUnitVariable(unit, \"Prefix\", \"%s\")\n", unit->Prefix->get_identifier().c_str());

@@ -150,8 +150,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"damage-type\", %d,", unit.DamagedType);
 	file.printf("\"attacked\", %lu,\n ", unit.Attacked);
 	//Wyrmgus start
-	if (unit.Trait != nullptr) {
-		file.printf("\"trait\", \"%s\", ", unit.Trait->get_identifier().c_str());
+	for (const CUpgrade *trait : unit.get_traits()) {
+		file.printf("\"trait\", \"%s\", ", trait->get_identifier().c_str());
 	}
 	file.printf("\"personal-name\", \"%s\", ", unit.Name.c_str());
 	if (unit.get_epithet() != nullptr) {

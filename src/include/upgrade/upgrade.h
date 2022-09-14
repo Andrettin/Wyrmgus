@@ -73,7 +73,6 @@ extern void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_m
 extern void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier *um);
 extern void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, bool save = true);
 extern void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all = false);
-extern void TraitAcquire(CUnit &unit, const CUpgrade *upgrade);
 //Wyrmgus end
 extern void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade); /// Make a unit acquire in individual upgrade
 extern void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all = false); /// Make a unit lose in individual upgrade

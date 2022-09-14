@@ -123,7 +123,7 @@ std::vector<character *> character::get_all_with_custom()
 	return characters;
 }
 
-void character::create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, CUpgrade *trait, const std::string &variation_tag_identifier)
+void character::create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, const std::vector<const CUpgrade *> &traits, const std::string &variation_tag_identifier)
 {
 	std::string identifier = "custom_" + string::lowered(name);
 	if (!surname.empty()) {
@@ -152,7 +152,7 @@ void character::create_custom_hero(const std::string &name, const std::string &s
 	hero->unit_type = unit_type;
 	hero->level = hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
 
-	hero->trait = trait;
+	hero->traits = traits;
 
 	if (!variation_tag_identifier.empty()) {
 		hero->variation_tags.insert(variation_tag::get(variation_tag_identifier));
@@ -219,12 +219,33 @@ character::~character()
 {
 }
 
+void character::process_gsml_property(const gsml_property &property)
+{
+	const std::string &key = property.get_key();
+	const gsml_operator property_operator = property.get_operator();
+	const std::string &value = property.get_value();
+
+	if (key == "trait") {
+		assert_throw(property_operator == gsml_operator::assignment);
+		this->traits.clear();
+		const CUpgrade *trait = CUpgrade::get(value);
+		this->traits.push_back(trait);
+	} else {
+		data_entry::process_gsml_property(property);
+	}
+}
+
 void character::process_gsml_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "variation_tags") {
+	if (tag == "traits") {
+		for (const std::string &value : values) {
+			const CUpgrade *trait = CUpgrade::get(value);
+			this->traits.push_back(trait);
+		}
+	} else if (tag == "variation_tags") {
 		for (const std::string &value : values) {
 			this->variation_tags.insert(variation_tag::get(value));
 		}
@@ -319,9 +340,10 @@ void character::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "hair_variation") {
 			this->variation_tags.insert(variation_tag::get(value));
 		} else if (key == "trait") {
+			this->traits.clear();
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
-				this->trait = upgrade;
+				this->traits.push_back(upgrade);
 			} else {
 				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
@@ -532,10 +554,10 @@ void character::initialize()
 		}
 	}
 
-	if (this->get_trait() == nullptr) {
+	if (this->get_traits().empty()) {
 		//if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
 		if (this->get_unit_type() != nullptr && this->get_unit_type()->get_traits().size() == 1) {
-			this->trait = this->get_unit_type()->get_traits().at(0);
+			this->traits.push_back(this->get_unit_type()->get_traits().at(0));
 		}
 	}
 
@@ -714,8 +736,17 @@ std::string character::get_encyclopedia_text() const
 
 	named_data_entry::concatenate_encyclopedia_text(text, "Level: " + std::to_string(this->get_level()));
 
-	if (this->get_trait() != nullptr) {
-		named_data_entry::concatenate_encyclopedia_text(text, "Trait: " + this->get_trait()->get_name());
+	if (!this->get_traits().empty()) {
+		std::string traits_text;
+		for (const CUpgrade *trait : this->get_traits()) {
+			if (!traits_text.empty()) {
+				traits_text += ", ";
+			}
+
+			traits_text += trait->get_name();
+		}
+
+		named_data_entry::concatenate_encyclopedia_text(text, "Traits: " + traits_text);
 	}
 
 	std::vector<const CUpgrade *> abilities = this->get_abilities();
@@ -845,9 +876,17 @@ void character::save() const
 			fprintf(fd, "\tType = \"%s\",\n", this->get_unit_type()->get_identifier().c_str());
 		}
 		if (this->is_custom()) {
-			if (this->get_trait() != nullptr) {
-				fprintf(fd, "\tTrait = \"%s\",\n", this->get_trait()->get_identifier().c_str());
+			if (!this->get_traits().empty()) {
+				fprintf(fd, "\tTraits = {");
+				for (size_t j = 0; j < this->get_traits().size(); ++j) {
+					fprintf(fd, "\"%s\"", this->get_traits()[j]->get_identifier().c_str());
+					if (j < (this->get_traits().size() - 1)) {
+						fprintf(fd, ", ");
+					}
+				}
+				fprintf(fd, "},\n");
 			}
+
 			if (!this->get_variation_tags().empty()) {
 				fprintf(fd, "\tVariation = \"%s\",\n", (*this->get_variation_tags().begin())->get_identifier().c_str());
 			}
@@ -1255,7 +1294,7 @@ void character::UpdateAttributes()
 		this->Attributes[i] = this->get_unit_type()->DefaultStat.Variables[var].Value;
 		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			if (
-				(this->get_trait() != nullptr && modifier->get_upgrade() == this->get_trait())
+				(vector::contains(this->get_traits(), modifier->get_upgrade()))
 				|| vector::contains(this->abilities, modifier->get_upgrade())
 			) {
 				if (modifier->Modifier.Variables[var].Value != 0) {

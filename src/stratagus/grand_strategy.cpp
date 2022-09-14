@@ -685,7 +685,7 @@ void CGrandStrategyFaction::SetMinister(const wyrmgus::character_title title, st
 				new_minister_message += " has been appointed, ";
 			}
 			new_minister_message += this->Ministers[title]->get_full_name() + "!\\n\\n";
-			new_minister_message += "Type: " + this->Ministers[title]->get_unit_type()->get_name() + "\\n" + "Trait: " + this->Ministers[title]->get_trait()->get_name() + "\\n" +  + "\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
+			new_minister_message += "Type: " + this->Ministers[title]->get_unit_type()->get_name() + "\\n" + "Trait: " + this->Ministers[title]->get_traits().at(0)->get_name() + "\\n" + +"\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
 			new_minister_message += "\") end;";
 			CclCommand(new_minister_message);	
 		}

@@ -28,6 +28,7 @@
 
 #include "script/condition/condition.h"
 #include "unit/unit.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
 
@@ -50,7 +51,7 @@ public:
 	{
 		Q_UNUSED(ctx);
 
-		return unit->Trait == this->trait;
+		return vector::contains(unit->get_traits(), this->trait);
 	}
 
 	virtual std::string get_assignment_string(const size_t indent, const bool links_allowed) const override

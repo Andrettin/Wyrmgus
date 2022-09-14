@@ -132,6 +132,7 @@ public:
 	static constexpr int max_sight_range = 16;
 	static constexpr int aura_range = 6;
 	static constexpr int resource_gathering_experience_divisor = 20;
+	static constexpr int min_traits = 1;
 
 	CUnit();
 	~CUnit();
@@ -324,7 +325,17 @@ public:
 	void CheckIdentification();
 	void CheckKnowledgeChange(int variable, int change);
 	void UpdateItemName();
+
+	const std::vector<const CUpgrade *> &get_traits() const
+	{
+		return this->traits;
+	}
+
+	void generate_traits();
 	void generate_trait();
+	void add_trait(const CUpgrade *trait);
+	void remove_traits();
+
 	void GenerateDrop();
 	void generate_special_properties(const CUnit *dropper, const CPlayer *dropper_player, const bool allow_unique, const bool sold_item, const bool always_magic);
 	void generate_prefix(const CUnit *dropper, const CPlayer *dropper_player);
@@ -1072,8 +1083,8 @@ private:
 	wyrmgus::character *character = nullptr; //character represented by this unit
 	const wyrmgus::site *settlement = nullptr;	//settlement (for if the unit is a town hall or a building associated to a settlement)
 	const wyrmgus::site *site = nullptr; //the site to which the unit belongs, if it is a site unit (not necessarily the same as the settlement, e.g. if the site is a non-major one)
+	std::vector<const CUpgrade *> traits;
 public:
-	const CUpgrade *Trait = nullptr;
 	int Variation;      /// Which of the variations of its unit type this unit has
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has
 	const CUpgrade *Prefix = nullptr;	/// Item unit's prefix

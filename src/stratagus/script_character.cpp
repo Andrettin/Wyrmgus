@@ -111,7 +111,8 @@ int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(trait_ident);
-			character->trait = upgrade;
+			character->traits.clear();
+			character->traits.push_back(upgrade);
 		} else if (!strcmp(value, "BirthDate")) {
 			CclGetDate(l, &character->BirthDate);
 		} else if (!strcmp(value, "StartDate")) {
@@ -451,7 +452,8 @@ int CclDefineCustomHero(lua_State *l)
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(trait_ident);
-			hero->trait = upgrade;
+			hero->traits.clear();
+			hero->traits.push_back(upgrade);
 		} else if (!strcmp(value, "Civilization")) {
 			hero->civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
@@ -721,13 +723,6 @@ static int CclGetCharacterData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
-	} else if (!strcmp(data, "Trait")) {
-		if (character->get_trait() != nullptr) {
-			lua_pushstring(l, character->get_trait()->get_identifier().c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
 	} else if (!strcmp(data, "Deity")) {
 		if (character->get_deity() != nullptr) {
 			lua_pushstring(l, character->get_deity()->get_identifier().c_str());
@@ -832,13 +827,6 @@ static int CclGetCustomHeroData(lua_State *l)
 	} else if (!strcmp(data, "Type")) {
 		if (character->get_unit_type() != nullptr) {
 			lua_pushstring(l, character->get_unit_type()->get_identifier().c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "Trait")) {
-		if (character->get_trait() != nullptr) {
-			lua_pushstring(l, character->get_trait()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

@@ -415,7 +415,7 @@ void CUnit::Init()
 	this->character = nullptr;
 	this->settlement = nullptr;
 	this->site = nullptr;
-	this->Trait = nullptr;
+	this->traits.clear();
 	this->Prefix = nullptr;
 	this->Suffix = nullptr;
 	this->Spell = nullptr;
@@ -1063,7 +1063,7 @@ void CUnit::apply_character_properties()
 	}
 
 	this->IndividualUpgrades.clear(); //reset the individual upgrades and then apply the character's
-	this->Trait = nullptr;
+	this->traits.clear();
 
 	if (this->Type->get_civilization() != nullptr) {
 		CUpgrade *civilization_upgrade = this->Type->get_civilization()->get_upgrade();
@@ -1076,10 +1076,14 @@ void CUnit::apply_character_properties()
 		this->SetIndividualUpgrade(faction_upgrade, 1);
 	}
 
-	if (this->get_character()->get_trait() != nullptr) { //set trait
-		TraitAcquire(*this, this->get_character()->get_trait());
-	} else if (!CEditor::get()->is_running() && !this->Type->get_traits().empty()) {
-		this->generate_trait();
+	this->remove_traits();
+
+	for (const CUpgrade *trait : this->get_character()->get_traits()) {
+		this->add_trait(trait);
+	}
+
+	if (static_cast<int>(this->get_traits().size()) < CUnit::min_traits && !CEditor::get()->is_running() && !this->Type->get_traits().empty()) {
+		this->generate_traits();
 	}
 
 	//load worshipped deities
@@ -2295,11 +2299,28 @@ void CUnit::UpdateItemName()
 	}
 }
 
+void CUnit::generate_traits()
+{
+	const int count = CUnit::min_traits - static_cast<int>(this->get_traits().size());
+
+	if (count <= 0) {
+		return;
+	}
+
+	for (int i = 0; i < count; ++i) {
+		this->generate_trait();
+	}
+}
+
 void CUnit::generate_trait()
 {
 	std::vector<const CUpgrade *> potential_traits;
 
 	for (const CUpgrade *trait : this->Type->get_traits()) {
+		if (vector::contains(this->get_traits(), trait)) {
+			continue;
+		}
+
 		if (!trait->check_unit_conditions(this)) {
 			continue;
 		}
@@ -2313,7 +2334,30 @@ void CUnit::generate_trait()
 		return;
 	}
 
-	TraitAcquire(*this, vector::get_random(potential_traits));
+	this->add_trait(vector::get_random(potential_traits));
+}
+
+void CUnit::add_trait(const CUpgrade *trait)
+{
+	this->traits.push_back(trait);
+
+	IndividualUpgradeAcquire(*this, trait);
+
+	this->update_epithet();
+
+	//upgrades could change the buttons displayed.
+	if (this->Player == CPlayer::GetThisPlayer()) {
+		SelectedUnitChanged();
+	}
+}
+
+void CUnit::remove_traits()
+{
+	for (const CUpgrade *trait : this->get_traits()) {
+		IndividualUpgradeLost(*this, trait);
+	}
+
+	this->traits.clear();
 }
 
 void CUnit::GenerateDrop()
@@ -3516,9 +3560,9 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 		unit->SetIndividualUpgrade(faction_upgrade, 1);
 	}
 
-	//generate a trait for the unit, if any are available (only if the editor isn't running)
+	//generate traits for the unit, if any are available (only if the editor isn't running)
 	if (!CEditor::get()->is_running() && !unit->Type->get_traits().empty()) {
-		unit->generate_trait();
+		unit->generate_traits();
 	}
 	
 	for (const CUpgrade *starting_ability : unit->Type->StartingAbilities) {
@@ -3983,7 +4027,7 @@ void CUnit::update_epithet()
 		return;
 	}
 
-	if (this->Trait == nullptr) {
+	if (this->get_traits().empty()) {
 		//don't assign an epithet before the unit has a trait
 		return;
 	}

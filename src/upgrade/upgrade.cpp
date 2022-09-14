@@ -1061,15 +1061,14 @@ static int CclAcquireTrait(lua_State *l)
 	lua_pushvalue(l, 1);
 	CUnit *unit = &unit_manager::get()->GetSlotUnit(LuaToNumber(l, -1));
 	lua_pop(l, 1);
+
+	unit->remove_traits();
+
 	const std::string ident = LuaToString(l, 2);
 	if (!ident.empty()) {
-		TraitAcquire(*unit, CUpgrade::get(ident));
-	} else {
-		if (unit->Trait != nullptr) { //remove previous trait, if any
-			IndividualUpgradeLost(*unit, unit->Trait);
-		}
-		unit->Trait = nullptr;
+		unit->add_trait(CUpgrade::get(ident));
 	}
+
 	return 0;
 }
 
@@ -1573,26 +1572,6 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	
 	if (lose_all && unit.GetIndividualUpgrade(upgrade) > 0) {
 		AbilityLost(unit, upgrade, lose_all);
-	}
-}
-
-void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
-{
-	if (unit.Trait != nullptr) { //remove previous trait, if any
-		IndividualUpgradeLost(unit, unit.Trait);
-	}
-
-	unit.Trait = upgrade;
-
-	IndividualUpgradeAcquire(unit, upgrade);
-
-	unit.update_epithet();
-
-	//
-	//  Upgrades could change the buttons displayed.
-	//
-	if (unit.Player == CPlayer::GetThisPlayer()) {
-		SelectedUnitChanged();
 	}
 }
 //Wyrmgus end

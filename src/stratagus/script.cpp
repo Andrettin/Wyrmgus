@@ -1174,8 +1174,8 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitTypeName")) {
 			res->e = EString_UnitTypeName;
 			res->D.Unit = CclParseUnitDesc(l);
-		} else if (!strcmp(key, "UnitTrait")) {
-			res->e = EString_UnitTrait;
+		} else if (!strcmp(key, "UnitTraits")) {
+			res->e = EString_UnitTraits;
 			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "UnitSpell")) {
 			res->e = EString_UnitSpell;
@@ -1576,13 +1576,28 @@ std::string EvalString(const StringDesc *s)
 			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
 				return std::string();
 			}
-		case EString_UnitTrait : // name of the unit's trait
+		case EString_UnitTraits: {
 			unit = EvalUnit(s->D.Unit.get());
-			if (unit != nullptr && unit->Trait != nullptr) {
-				return _(unit->Trait->get_name());
-			} else {
+
+			if (unit == nullptr || unit->get_traits().empty()) {
 				return std::string();
 			}
+
+			std::string traits_str;
+
+			bool first = true;
+			for (const CUpgrade *trait : unit->get_traits()) {
+				if (first) {
+					first = false;
+				} else {
+					traits_str += ", ";
+				}
+
+				traits_str += _(trait->get_name());
+			}
+
+			return traits_str;
+		}
 		case EString_UnitSpell : // name of the unit's spell
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->Spell != nullptr) {
@@ -1676,7 +1691,7 @@ std::string EvalString(const StringDesc *s)
 			} else {
 				return std::string();
 			}
-		case EString_UnitUniqueSetItems : // names of the unit's unique item set's items
+		case EString_UnitUniqueSetItems: // names of the unit's unique item set's items
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->get_unique() != nullptr && unit->get_unique()->get_set() != nullptr) {
 				std::string set_items_string;
@@ -2512,18 +2527,10 @@ static int CclUnitTypeName(lua_State *l)
 	return Alias(l, "UnitTypeName");
 }
 
-/**
-**  Return equivalent lua table for UnitTrait.
-**  {"UnitTrait", {arg1}}
-**
-**  @param l  Lua state.
-**
-**  @return   equivalent lua table.
-*/
-static int CclUnitTrait(lua_State *l)
+static int CclUnitTraits(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	return Alias(l, "UnitTrait");
+	return Alias(l, "UnitTraits");
 }
 
 /**
@@ -3038,7 +3045,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitName", CclUnitName);
 	//Wyrmgus start
 	lua_register(Lua, "UnitTypeName", CclUnitTypeName);
-	lua_register(Lua, "UnitTrait", CclUnitTrait);
+	lua_register(Lua, "UnitTraits", CclUnitTraits);
 	lua_register(Lua, "UnitSpell", CclUnitSpell);
 	lua_register(Lua, "UnitQuote", CclUnitQuote);
 	lua_register(Lua, "UnitPopulation", CclUnitPopulation);

@@ -100,7 +100,6 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(int start_year MEMBER start_year READ get_start_year)
 	Q_PROPERTY(int end_year MEMBER end_year READ get_end_year)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
-	Q_PROPERTY(CUpgrade* trait MEMBER trait READ get_trait)
 	Q_PROPERTY(int base_level MEMBER base_level READ get_base_level)
 	Q_PROPERTY(wyrmgus::character* tree_parent READ get_tree_parent_character NOTIFY changed)
 
@@ -149,7 +148,7 @@ public:
 		return nullptr;
 	}
 
-	static void create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, CUpgrade *trait, const std::string &variation_tag_identifier);
+	static void create_custom_hero(const std::string &name, const std::string &surname, wyrmgus::civilization *civilization, wyrmgus::unit_type *unit_type, const std::vector<const CUpgrade *> &traits, const std::string &variation_tag_identifier);
 	static void remove_custom_hero(character *custom_hero);
 
 	static bool is_name_valid_for_custom_hero(const std::string &name);
@@ -162,6 +161,7 @@ public:
 	explicit character(const std::string &identifier);
 	~character();
 	
+	virtual void process_gsml_property(const gsml_property &property) override;
 	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
@@ -243,9 +243,9 @@ public:
 		this->unit_type = const_cast<wyrmgus::unit_type *>(unit_type);
 	}
 
-	CUpgrade *get_trait() const
+	const std::vector<const CUpgrade *> &get_traits() const
 	{
-		return this->trait;
+		return this->traits;
 	}
 
 	const wyrmgus::civilization *get_civilization() const
@@ -530,7 +530,7 @@ private:
 	wyrmgus::icon *icon = nullptr;
 	wyrmgus::icon *heroic_icon = nullptr; //the character's heroic icon (level 3 and upper)
 	wyrmgus::unit_type *unit_type = nullptr;
-	CUpgrade *trait = nullptr;
+	std::vector<const CUpgrade *> traits;
 	character *father = nullptr;
 	character *mother = nullptr;
 	std::vector<character *> children;

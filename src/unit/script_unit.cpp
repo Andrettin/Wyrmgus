@@ -331,7 +331,7 @@ int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "settlement")) {
 			unit->settlement = site::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "trait")) {
-			unit->Trait = CUpgrade::get(LuaToString(l, 2, j + 1));
+			unit->traits.push_back(CUpgrade::get(LuaToString(l, 2, j + 1)));
 		} else if (!strcmp(value, "prefix")) {
 			unit->Prefix = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "suffix")) {
@@ -1756,8 +1756,8 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "TypeName")) {
 		lua_pushstring(l, unit->get_type_name().c_str());
 	} else if (!strcmp(value, "Trait")) {
-		if (unit->Trait != nullptr) {
-			lua_pushstring(l, unit->Trait->get_identifier().c_str());
+		if (!unit->get_traits().empty()) {
+			lua_pushstring(l, unit->get_traits().at(0)->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
