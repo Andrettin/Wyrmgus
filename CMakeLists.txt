@@ -30,6 +30,7 @@
 cmake_minimum_required(VERSION 3.7.0)
 
 project(wyrmgus VERSION 5.4.0)
+
 add_compile_definitions(
 	StratagusMajorVersion=${CMAKE_PROJECT_VERSION_MAJOR}
 	StratagusMinorVersion=${CMAKE_PROJECT_VERSION_MINOR}
@@ -38,9 +39,12 @@ add_compile_definitions(
 
 set(STRATAGUS_VERSION ${CMAKE_PROJECT_VERSION})
 
+add_subdirectory(archimedes)
+
 # Stratagus sources
 
 include_directories(
+	archimedes/src
 	src
 	src/include
 	src/guichan/include
@@ -1228,7 +1232,6 @@ set(wyrmgus_util_HDRS
 	src/util/image_util.h
 	src/util/list_util.h
 	src/util/locale_util.h
-	src/util/log_util.h
 	src/util/map_util.h
 	src/util/number_util.h
 	src/util/path_util.h
@@ -1580,6 +1583,7 @@ set(wyrmgus_LIBS
 	${TOLUA++_LIBRARY}
 	${ZLIB_LIBRARIES}
 	${QT_LIBRARIES}
+	archimedes
 )
 
 if(Boost_FOUND)

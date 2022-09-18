@@ -28,6 +28,12 @@
 
 #pragma once
 
+#include "archimedes.h"
+
+namespace wyrmgus {
+	using namespace archimedes;
+}
+
 //ensure the contents of the PCH will be recognized by IDEs as being included in each .cpp file
 #include "pch.h"
 
