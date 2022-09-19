@@ -31,9 +31,12 @@
 #include "database/gsml_property.h"
 #include "database/gsml_property_visitor.h"
 
+namespace archimedes {
+	class geocoordinate;
+}
+
 namespace wyrmgus {
 
-class geocoordinate;
 class gsml_parser;
 
 //stratagus markup language data

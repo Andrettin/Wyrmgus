@@ -40,7 +40,7 @@ void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color,
 {
 	QPoint previous_pixel_pos(-1, -1);
 	for (const QGeoCoordinate &geocoordinate : geopath.path()) {
-		const QPoint pixel_pos = map_projection->geocoordinate_to_point(wyrmgus::geocoordinate(geocoordinate), georectangle, image.size());
+		const QPoint pixel_pos = map_projection->geocoordinate_to_point(archimedes::geocoordinate(geocoordinate), georectangle, image.size());
 
 		if (pixel_pos.x() >= 0 && pixel_pos.y() >= 0 && pixel_pos.x() < image.width() && pixel_pos.y() < image.height()) {
 			//only write to the image if the position is actually in it, but take the position into account either way for the purpose of getting the previous pixel pos, so that map templates fit together well

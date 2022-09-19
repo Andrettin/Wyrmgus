@@ -26,6 +26,15 @@
 
 #pragma once
 
+namespace archimedes {
+
+template <int N>
+class fractional_int;
+
+using centesimal_int = fractional_int<2>;
+
+}
+
 namespace wyrmgus {
 
 class employment_type;
@@ -34,11 +43,6 @@ class gsml_property;
 class population_type;
 class resource;
 struct population_unit_key;
-
-template <int N>
-class fractional_int;
-
-using centesimal_int = fractional_int<2>;
 
 class population_unit final : public QObject
 {

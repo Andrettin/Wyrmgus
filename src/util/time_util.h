@@ -26,7 +26,7 @@
 
 #pragma once
 
-namespace wyrmgus {
+namespace archimedes {
 	template <int N>
 	class fractional_int;
 

@@ -41,7 +41,7 @@ class employment_type final : public named_data_entry, public data_type<employme
 
 	Q_PROPERTY(wyrmgus::resource* input_resource MEMBER input_resource)
 	Q_PROPERTY(wyrmgus::resource* output_resource MEMBER output_resource)
-	Q_PROPERTY(wyrmgus::centesimal_int output_multiplier MEMBER output_multiplier)
+	Q_PROPERTY(archimedes::centesimal_int output_multiplier MEMBER output_multiplier)
 
 public:
 	static constexpr const char *class_identifier = "employment_type";

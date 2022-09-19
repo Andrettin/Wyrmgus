@@ -43,7 +43,7 @@ class population_class final : public named_data_entry, public data_type<populat
 	Q_PROPERTY(bool growable MEMBER growable READ is_growable)
 	Q_PROPERTY(bool unemployment MEMBER unemployment READ can_have_unemployment)
 	Q_PROPERTY(wyrmgus::resource* unemployed_output_resource MEMBER unemployed_output_resource)
-	Q_PROPERTY(wyrmgus::centesimal_int unemployed_output_multiplier MEMBER unemployed_output_multiplier)
+	Q_PROPERTY(archimedes::centesimal_int unemployed_output_multiplier MEMBER unemployed_output_multiplier)
 
 public:
 	static constexpr const char *class_identifier = "population_class";

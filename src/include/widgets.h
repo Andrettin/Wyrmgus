@@ -44,7 +44,7 @@ void freeGuichan();
 
 void handleInput(const SDL_Event *event);
 
-namespace wyrmgus {
+namespace archimedes {
 	template <int N>
 	class fractional_int;
 

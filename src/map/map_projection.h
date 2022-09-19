@@ -26,13 +26,16 @@
 
 #pragma once
 
+namespace archimedes {
+	class geocoordinate;
+
+	template <int N>
+	class fractional_int;
+}
+
 namespace wyrmgus {
 
-class geocoordinate;
 class georectangle;
-
-template <int N>
-class fractional_int;
 
 class map_projection
 {

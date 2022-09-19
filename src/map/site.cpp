@@ -220,7 +220,7 @@ void site::initialize()
 		lon += this->geocoordinate_reference_site->get_geocoordinate().get_longitude();
 		lat += this->geocoordinate_reference_site->get_geocoordinate().get_latitude();
 
-		this->geocoordinate = wyrmgus::geocoordinate(lon, lat);
+		this->geocoordinate = archimedes::geocoordinate(lon, lat);
 
 		if (!this->geocoordinate.is_valid()) {
 			throw std::runtime_error("The application of a geocoordinate offset to a reference site's geocoordinate resulted in no valid geocoordinate for site \"" + this->get_identifier() + "\".");
@@ -428,7 +428,7 @@ void site::set_distance_from_orbit_center_au(const centesimal_int &distance_au)
 	this->distance_from_orbit_center = astronomy::au_to_gm(distance_au);
 }
 
-QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astrocoordinate, const QSize &reference_subtemplate_applied_size) const
+QPoint site::astrocoordinate_to_relative_pos(const archimedes::geocoordinate &astrocoordinate, const QSize &reference_subtemplate_applied_size) const
 {
 	QPoint direction_pos = astrocoordinate.to_circle_edge_point();
 
@@ -436,7 +436,7 @@ QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astro
 
 	if (!this->orbits_map_template()) {
 		astrodistance_value = this->get_astrodistance().to_int();
-		astrodistance_value = isqrt(astrodistance_value);
+		astrodistance_value = number::sqrt(astrodistance_value);
 		astrodistance_value = (astrodistance_value * this->get_map_template()->get_astrodistance_multiplier()).to_int();
 	}
 
@@ -457,7 +457,7 @@ QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astro
 }
 
 template <bool use_map_pos>
-QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinate) const
+QPoint site::astrocoordinate_to_pos(const archimedes::geocoordinate &astrocoordinate) const
 {
 	const wyrmgus::map_template *reference_subtemplate = this->astrocoordinate_reference_subtemplate;
 	if (reference_subtemplate == nullptr) {
@@ -497,8 +497,8 @@ QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinat
 	return base_pos + relative_pos;
 }
 
-template QPoint site::astrocoordinate_to_pos<false>(const wyrmgus::geocoordinate &) const;
-template QPoint site::astrocoordinate_to_pos<true>(const wyrmgus::geocoordinate &) const;
+template QPoint site::astrocoordinate_to_pos<false>(const archimedes::geocoordinate &) const;
+template QPoint site::astrocoordinate_to_pos<true>(const archimedes::geocoordinate &) const;
 
 const QSize &site::get_size() const
 {

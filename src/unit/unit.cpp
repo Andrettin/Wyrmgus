@@ -8105,7 +8105,7 @@ void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 //Wyrmgus end
 {
 	QPoint pos = target.tilePos - attacker.tilePos;
-	int d = isqrt(pos.x() * pos.x() + pos.y() * pos.y());
+	int d = number::sqrt(pos.x() * pos.x() + pos.y() * pos.y());
 
 	if (!d) {
 		d = 1;
@@ -8426,7 +8426,7 @@ int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 	} else {
 		dy = std::max<int>(0, pos.y - tilePos.y - Type->get_tile_height() + 1);
 	}
-	return isqrt(dy * dy + dx * dx);
+	return number::sqrt(dy * dy + dx * dx);
 }
 
 /**
@@ -8463,7 +8463,7 @@ int MapDistance(const Vec2i &src_size, const Vec2i &pos1, int src_z, const Vec2i
 	} else {
 		dy = std::max<int>(0, pos1.y - pos2.y - dst_size.y + 1);
 	}
-	return isqrt(dy * dy + dx * dx);
+	return number::sqrt(dy * dy + dx * dx);
 }
 
 /**

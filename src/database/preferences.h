@@ -42,7 +42,7 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_OBJECT
 
 	Q_PROPERTY(QString locale READ get_locale_qstring WRITE set_locale_qstring NOTIFY changed)
-	Q_PROPERTY(wyrmgus::centesimal_int scale_factor READ get_scale_factor WRITE set_scale_factor NOTIFY scale_factor_changed)
+	Q_PROPERTY(archimedes::centesimal_int scale_factor READ get_scale_factor WRITE set_scale_factor NOTIFY scale_factor_changed)
 	Q_PROPERTY(QString scale_factor_string READ get_scale_factor_qstring WRITE set_scale_factor_qstring NOTIFY scale_factor_changed)
 	Q_PROPERTY(bool fullscreen READ is_fullscreen WRITE set_fullscreen NOTIFY fullscreen_changed)
 	Q_PROPERTY(QSize window_size READ get_window_size WRITE set_window_size NOTIFY window_size_changed)

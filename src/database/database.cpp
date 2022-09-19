@@ -286,7 +286,7 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(calendar::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::campaign*") {
 			new_property_value = QVariant::fromValue(campaign::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::centesimal_int") {
+		} else if (property_class_name == "archimedes::centesimal_int") {
 			new_property_value = QVariant::fromValue(centesimal_int(property.get_value()));
 		} else if (property_class_name == "wyrmgus::character*") {
 			new_property_value = QVariant::fromValue(character::get(property.get_value()));
@@ -306,9 +306,9 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(cursor::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::cursor_type") {
 			new_property_value = QVariant::fromValue(string_to_cursor_type(property.get_value()));
-		} else if (property_class_name == "wyrmgus::decimal_int") {
+		} else if (property_class_name == "archimedes::decimal_int") {
 			new_property_value = QVariant::fromValue(decimal_int(property.get_value()));
-		} else if (property_class_name == "wyrmgus::decimillesimal_int") {
+		} else if (property_class_name == "archimedes::decimillesimal_int") {
 			new_property_value = QVariant::fromValue(decimillesimal_int(property.get_value()));
 		} else if (property_class_name == "wyrmgus::deity*") {
 			new_property_value = QVariant::fromValue(deity::get(property.get_value()));
@@ -536,7 +536,7 @@ QVariant database::process_gsml_scope_value(const gsml_data &scope, const QMetaP
 		}
 
 		new_property_value = scope.to_size();
-	} else if (property_type_name == "wyrmgus::geocoordinate") {
+	} else if (property_type_name == "archimedes::geocoordinate") {
 		if (scope.get_operator() != gsml_operator::assignment) {
 			throw std::runtime_error("Only the assignment operator is available for geocoordinate properties.");
 		}

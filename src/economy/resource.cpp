@@ -62,9 +62,9 @@ int resource::get_mass_multiplier(const uint64_t mass, const uint64_t base_mass)
 
 	if (mass < base_mass) {
 		mass_multiplier *= 10;
-		mass_multiplier /= static_cast<int>(isqrt(base_mass * 100 / mass));
+		mass_multiplier /= static_cast<int>(number::sqrt(base_mass * 100 / mass));
 	} else {
-		mass_multiplier *= static_cast<int>(isqrt(mass * 100 / base_mass));
+		mass_multiplier *= static_cast<int>(number::sqrt(mass * 100 / base_mass));
 		mass_multiplier /= 10;
 	}
 

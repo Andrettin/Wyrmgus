@@ -28,13 +28,15 @@
 
 #include "util/color_container.h"
 
-namespace wyrmgus {
-	enum class colorization_type;
-
+namespace archimedes {
 	template <int N>
 	class fractional_int;
 
 	using centesimal_int = fractional_int<2>;
+}
+
+namespace wyrmgus {
+	enum class colorization_type;
 }
 
 namespace wyrmgus::image {

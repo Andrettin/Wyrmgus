@@ -517,7 +517,7 @@ public:
 private:
 	int GetMaxOffsetX(int dy, int range) const
 	{
-		return isqrt(square(range + 1) - square(dy) - 1);
+		return number::sqrt(square(range + 1) - square(dy) - 1);
 	}
 
 	// Distance are computed between bottom of unit and top of goal
@@ -835,7 +835,7 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 	}
 
 	const Vec2i diff = goal - startPos;
-	const int distance = isqrt(square(diff.x) + square(diff.y));
+	const int distance = number::sqrt(square(diff.x) + square(diff.y));
 
 	// Within range of destination
 	if (minrange <= distance && distance <= maxrange) {

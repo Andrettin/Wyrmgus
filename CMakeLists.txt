@@ -556,24 +556,14 @@ set(upgrade_SRCS
 source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
-	src/util/angle_util.cpp
-	src/util/assert_util.cpp
-	src/util/astronomy_util.cpp
 	src/util/color_container.cpp
 	src/util/date_util.cpp
 	src/util/event_loop.cpp
-	src/util/exception_util.cpp
 	src/util/geocircle_util.cpp
-	src/util/geocoordinate.cpp
 	src/util/geojson_util.cpp
 	src/util/geopath_util.cpp
 	src/util/geoshape_util.cpp
 	src/util/image_util.cpp
-	src/util/number_util.cpp
-	src/util/point_container.cpp
-	src/util/point_util.cpp
-	src/util/random.cpp
-	src/util/rect_util.cpp
 	src/util/string_conversion_util.cpp
 	src/util/string_util.cpp
 	src/util/thread_pool.cpp
@@ -1210,10 +1200,6 @@ set(wyrmgus_upgrade_HDRS
 )
 
 set(wyrmgus_util_HDRS
-	src/util/angle_util.h
-	src/util/assert_util.h
-	src/util/astronomy_util.h
-	src/util/char_util.h
 	src/util/color_container.h
 	src/util/colorization_type.h
 	src/util/container_random_util.h
@@ -1221,30 +1207,18 @@ set(wyrmgus_util_HDRS
 	src/util/date_util.h
 	src/util/enum_util.h
 	src/util/event_loop.h
-	src/util/exception_util.h
-	src/util/fractional_int.h
 	src/util/geocircle_util.h
-	src/util/geocoordinate.h
 	src/util/geojson_util.h
 	src/util/geopath_util.h
 	src/util/georectangle.h
 	src/util/geoshape_util.h
 	src/util/image_util.h
-	src/util/list_util.h
-	src/util/locale_util.h
 	src/util/map_util.h
-	src/util/number_util.h
 	src/util/path_util.h
-	src/util/point_container.h
 	src/util/point_operators.h
-	src/util/point_util.h
 	src/util/queue_util.h
 	src/util/qunique_ptr.h
 	src/util/qvariant_util.h
-	src/util/random.h
-	src/util/rect_util.h
-	src/util/set_util.h
-	src/util/singleton.h
 	src/util/size_operators.h
 	src/util/size_util.h
 	src/util/string_conversion_util.h
@@ -1252,10 +1226,7 @@ set(wyrmgus_util_HDRS
 	src/util/string_view_util.h
 	src/util/thread_pool.h
 	src/util/time_util.h
-	src/util/type_traits.h
 	src/util/util.h
-	src/util/vector_random_util.h
-	src/util/vector_util.h
 )
 
 set(wyrmgus_video_HDRS
@@ -1637,6 +1608,13 @@ endif()
 if(BEOS)
 	add_definitions(-DUSE_BEOS)
 	set(wyrmgus_SRCS ${wyrmgus_SRCS} ${beos_SRCS})
+endif()
+
+if(MSVC)
+	add_definitions(/FI"stratagus.h")
+else()
+	#GCC/Clang
+	add_definitions(-include stratagus.h)
 endif()
 
 set(CMAKE_CXX_STANDARD 20)

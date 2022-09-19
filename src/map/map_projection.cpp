@@ -60,7 +60,7 @@ map_projection::number_type map_projection::latitude_to_scaled_latitude(const nu
 
 geocoordinate map_projection::geocoordinate_to_scaled_geocoordinate(const geocoordinate &geocoordinate) const
 {
-	return wyrmgus::geocoordinate(geocoordinate.get_longitude(), this->latitude_to_scaled_latitude(geocoordinate.get_latitude()));
+	return archimedes::geocoordinate(geocoordinate.get_longitude(), this->latitude_to_scaled_latitude(geocoordinate.get_latitude()));
 }
 
 map_projection::number_type map_projection::scaled_latitude_to_latitude(const number_type &scaled_lat) const
@@ -137,11 +137,11 @@ QPoint map_projection::geocoordinate_to_point(const geocoordinate &geocoordinate
 	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle, area_size);
 	const latitude lat_per_pixel = this->latitude_per_pixel(georectangle, area_size);
 
-	const wyrmgus::geocoordinate origin_geocoordinate(georectangle.get_min_longitude(), georectangle.get_max_latitude());
-	const wyrmgus::geocoordinate scaled_origin_geocoordinate = this->geocoordinate_to_scaled_geocoordinate(origin_geocoordinate);
+	const archimedes::geocoordinate origin_geocoordinate(georectangle.get_min_longitude(), georectangle.get_max_latitude());
+	const archimedes::geocoordinate scaled_origin_geocoordinate = this->geocoordinate_to_scaled_geocoordinate(origin_geocoordinate);
 	const QPoint geocoordinate_offset = this->geocoordinate_to_point(scaled_origin_geocoordinate, lon_per_pixel, lat_per_pixel);
 
-	const wyrmgus::geocoordinate scaled_geocoordinate = this->geocoordinate_to_scaled_geocoordinate(geocoordinate);
+	const archimedes::geocoordinate scaled_geocoordinate = this->geocoordinate_to_scaled_geocoordinate(geocoordinate);
 	return this->geocoordinate_to_point(scaled_geocoordinate, lon_per_pixel, lat_per_pixel) - geocoordinate_offset;
 }
 

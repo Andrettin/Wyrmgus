@@ -508,7 +508,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	const int miny = std::max(-range, 0 - pos.y);
 	
 	for (int offsety = miny; offsety != 0; ++offsety) {
-		const int offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
+		const int offsetx = number::sqrt(square(range + 1) - square(-offsety) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
 		//Wyrmgus start
 //		const int maxx = std::min(CMap::get()->Info->MapWidth, pos.x + w + offsetx);
@@ -584,7 +584,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	const int maxy = std::min(range, CMap::get()->Info->MapHeights[z] - pos.y - h);
 	//Wyrmgus end
 	for (int offsety = 0; offsety < maxy; ++offsety) {
-		const int offsetx = isqrt(square(range + 1) - square(offsety + 1) - 1);
+		const int offsetx = number::sqrt(square(range + 1) - square(offsety + 1) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
 		//Wyrmgus start
 //		const int maxx = std::min(CMap::get()->Info->MapWidth, pos.x + w + offsetx);

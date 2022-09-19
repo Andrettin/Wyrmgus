@@ -52,7 +52,7 @@ class terrain_feature final : public named_data_entry, public data_type<terrain_
 	Q_PROPERTY(bool minor_river MEMBER minor_river READ is_minor_river)
 	Q_PROPERTY(bool terrain_generation_seed MEMBER terrain_generation_seed READ is_terrain_generation_seed)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
-	Q_PROPERTY(wyrmgus::geocoordinate geocoordinate MEMBER geocoordinate READ get_geocoordinate)
+	Q_PROPERTY(archimedes::geocoordinate geocoordinate MEMBER geocoordinate READ get_geocoordinate)
 
 public:
 	static constexpr const char *class_identifier = "terrain_feature";
@@ -167,7 +167,7 @@ public:
 		return this->hidden;
 	}
 
-	const wyrmgus::geocoordinate &get_geocoordinate() const
+	const archimedes::geocoordinate &get_geocoordinate() const
 	{
 		return this->geocoordinate;
 	}
@@ -188,7 +188,7 @@ private:
 	bool minor_river = false;
 	bool terrain_generation_seed = false;
 	bool hidden = false;
-	wyrmgus::geocoordinate geocoordinate;
+	archimedes::geocoordinate geocoordinate;
 	std::map<const civilization *, std::string> cultural_names; //names for the terrain feature for each different culture/civilization
 	std::vector<region *> regions; //regions where this terrain feature is located
 

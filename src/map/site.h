@@ -62,26 +62,26 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(wyrmgus::map_template* map_template MEMBER map_template)
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
 	Q_PROPERTY(wyrmgus::site* pos_reference_site MEMBER pos_reference_site)
-	Q_PROPERTY(wyrmgus::geocoordinate geocoordinate MEMBER geocoordinate READ get_geocoordinate)
-	Q_PROPERTY(wyrmgus::geocoordinate geocoordinate_offset MEMBER geocoordinate_offset)
+	Q_PROPERTY(archimedes::geocoordinate geocoordinate MEMBER geocoordinate READ get_geocoordinate)
+	Q_PROPERTY(archimedes::geocoordinate geocoordinate_offset MEMBER geocoordinate_offset)
 	Q_PROPERTY(wyrmgus::site* geocoordinate_reference_site MEMBER geocoordinate_reference_site)
 	Q_PROPERTY(int longitude_scale MEMBER longitude_scale)
 	Q_PROPERTY(int latitude_scale MEMBER latitude_scale)
-	Q_PROPERTY(wyrmgus::geocoordinate astrocoordinate MEMBER astrocoordinate READ get_astrocoordinate)
+	Q_PROPERTY(archimedes::geocoordinate astrocoordinate MEMBER astrocoordinate READ get_astrocoordinate)
 	Q_PROPERTY(QTime right_ascension READ get_right_ascension WRITE set_right_ascension)
-	Q_PROPERTY(wyrmgus::decimillesimal_int declination READ get_declination WRITE set_declination)
+	Q_PROPERTY(archimedes::decimillesimal_int declination READ get_declination WRITE set_declination)
 	Q_PROPERTY(bool map_template_orbit MEMBER map_template_orbit READ orbits_map_template)
 	Q_PROPERTY(wyrmgus::map_template* astrocoordinate_reference_subtemplate MEMBER astrocoordinate_reference_subtemplate)
-	Q_PROPERTY(wyrmgus::centesimal_int astrodistance MEMBER astrodistance READ get_astrodistance)
-	Q_PROPERTY(wyrmgus::centesimal_int astrodistance_pc READ get_astrodistance_pc WRITE set_astrodistance_pc)
+	Q_PROPERTY(archimedes::centesimal_int astrodistance MEMBER astrodistance READ get_astrodistance)
+	Q_PROPERTY(archimedes::centesimal_int astrodistance_pc READ get_astrodistance_pc WRITE set_astrodistance_pc)
 	Q_PROPERTY(int astrodistance_additive_modifier MEMBER astrodistance_additive_modifier READ get_astrodistance_additive_modifier)
 	Q_PROPERTY(wyrmgus::site* orbit_center MEMBER orbit_center WRITE set_orbit_center)
 	Q_PROPERTY(int distance_from_orbit_center MEMBER distance_from_orbit_center)
-	Q_PROPERTY(wyrmgus::centesimal_int distance_from_orbit_center_au READ get_distance_from_orbit_center_au WRITE set_distance_from_orbit_center_au)
+	Q_PROPERTY(archimedes::centesimal_int distance_from_orbit_center_au READ get_distance_from_orbit_center_au WRITE set_distance_from_orbit_center_au)
 	Q_PROPERTY(wyrmgus::unit_type* base_unit_type MEMBER base_unit_type)
 	Q_PROPERTY(wyrmgus::site* settlement MEMBER settlement)
 	Q_PROPERTY(quint64 mass MEMBER mass READ get_mass)
-	Q_PROPERTY(wyrmgus::centesimal_int mass_jm READ get_mass_jm WRITE set_mass_jm)
+	Q_PROPERTY(archimedes::centesimal_int mass_jm READ get_mass_jm WRITE set_mass_jm)
 	Q_PROPERTY(wyrmgus::site* connection_destination MEMBER connection_destination)
 	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
@@ -163,12 +163,12 @@ public:
 		return this->pos;
 	}
 
-	const wyrmgus::geocoordinate &get_geocoordinate() const
+	const archimedes::geocoordinate &get_geocoordinate() const
 	{
 		return this->geocoordinate;
 	}
 
-	const wyrmgus::geocoordinate &get_astrocoordinate() const
+	const archimedes::geocoordinate &get_astrocoordinate() const
 	{
 		return this->astrocoordinate;
 	}
@@ -236,10 +236,10 @@ public:
 	centesimal_int get_distance_from_orbit_center_au() const;
 	void set_distance_from_orbit_center_au(const centesimal_int &distance_au);
 
-	QPoint astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astrocoordinate, const QSize &reference_subtemplate_applied_size) const;
+	QPoint astrocoordinate_to_relative_pos(const archimedes::geocoordinate &astrocoordinate, const QSize &reference_subtemplate_applied_size) const;
 
 	template <bool use_map_pos>
-	QPoint astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinate) const;
+	QPoint astrocoordinate_to_pos(const archimedes::geocoordinate &astrocoordinate) const;
 
 	const unit_type *get_base_unit_type() const
 	{
@@ -331,12 +331,12 @@ private:
 	wyrmgus::map_template *map_template = nullptr;
 	QPoint pos = QPoint(-1, -1); //position of the site in its map template
 	site *pos_reference_site = nullptr; //the site's reference position site, used as an offset for its position
-	wyrmgus::geocoordinate geocoordinate; //the site's position as a geocoordinate
-	wyrmgus::geocoordinate geocoordinate_offset;
+	archimedes::geocoordinate geocoordinate; //the site's position as a geocoordinate
+	archimedes::geocoordinate geocoordinate_offset;
 	site *geocoordinate_reference_site = nullptr; //the site's reference geocoordinate site, used as an offset for its geocoordinate
 	int longitude_scale = 100;
 	int latitude_scale = 100;
-	wyrmgus::geocoordinate astrocoordinate; //the site's position as an astrocoordinate
+	archimedes::geocoordinate astrocoordinate; //the site's position as an astrocoordinate
 	bool map_template_orbit = false; //whether this site orbits a map template, with the consequence that a random astrocoordinate is used to apply the site's position when applied to the map
 	wyrmgus::map_template *astrocoordinate_reference_subtemplate = nullptr;
 	centesimal_int astrodistance; //the site's distance from its map template's center (in light-years)
@@ -363,7 +363,7 @@ public:
 	friend int ::CclDefineSite(lua_State *l);
 };
 
-extern template QPoint site::astrocoordinate_to_pos<false>(const wyrmgus::geocoordinate &) const;
-extern template QPoint site::astrocoordinate_to_pos<true>(const wyrmgus::geocoordinate &) const;
+extern template QPoint site::astrocoordinate_to_pos<false>(const archimedes::geocoordinate &) const;
+extern template QPoint site::astrocoordinate_to_pos<true>(const archimedes::geocoordinate &) const;
 
 }

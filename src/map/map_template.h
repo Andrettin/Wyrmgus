@@ -85,8 +85,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QPoint subtemplate_center_pos MEMBER subtemplate_center_pos READ get_subtemplate_center_pos)
 	Q_PROPERTY(QPoint min_subtemplate_pos MEMBER min_subtemplate_pos READ get_min_subtemplate_pos)
 	Q_PROPERTY(QPoint max_subtemplate_pos MEMBER max_subtemplate_pos READ get_max_subtemplate_pos)
-	Q_PROPERTY(wyrmgus::geocoordinate min_subtemplate_geocoordinate MEMBER min_subtemplate_geocoordinate)
-	Q_PROPERTY(wyrmgus::geocoordinate max_subtemplate_geocoordinate MEMBER max_subtemplate_geocoordinate)
+	Q_PROPERTY(archimedes::geocoordinate min_subtemplate_geocoordinate MEMBER min_subtemplate_geocoordinate)
+	Q_PROPERTY(archimedes::geocoordinate max_subtemplate_geocoordinate MEMBER max_subtemplate_geocoordinate)
 	Q_PROPERTY(wyrmgus::world* world MEMBER world)
 	Q_PROPERTY(wyrmgus::tileset* tileset MEMBER tileset)
 	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
@@ -110,14 +110,14 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(bool random_created_settlements MEMBER random_created_settlements)
 	Q_PROPERTY(bool create_starting_mine MEMBER create_starting_mine)
 	Q_PROPERTY(wyrmgus::map_projection* map_projection MEMBER map_projection)
-	Q_PROPERTY(wyrmgus::decimillesimal_int min_longitude READ get_min_longitude WRITE set_min_longitude)
-	Q_PROPERTY(wyrmgus::decimillesimal_int max_longitude READ get_max_longitude WRITE set_max_longitude)
-	Q_PROPERTY(wyrmgus::decimillesimal_int min_latitude READ get_min_latitude WRITE set_min_latitude)
-	Q_PROPERTY(wyrmgus::decimillesimal_int max_latitude READ get_max_latitude WRITE set_max_latitude)
-	Q_PROPERTY(wyrmgus::decimillesimal_int astrodistance_multiplier MEMBER astrodistance_multiplier READ get_astrodistance_multiplier)
+	Q_PROPERTY(archimedes::decimillesimal_int min_longitude READ get_min_longitude WRITE set_min_longitude)
+	Q_PROPERTY(archimedes::decimillesimal_int max_longitude READ get_max_longitude WRITE set_max_longitude)
+	Q_PROPERTY(archimedes::decimillesimal_int min_latitude READ get_min_latitude WRITE set_min_latitude)
+	Q_PROPERTY(archimedes::decimillesimal_int max_latitude READ get_max_latitude WRITE set_max_latitude)
+	Q_PROPERTY(archimedes::decimillesimal_int astrodistance_multiplier MEMBER astrodistance_multiplier READ get_astrodistance_multiplier)
 	Q_PROPERTY(int astrodistance_additive_modifier MEMBER astrodistance_additive_modifier READ get_astrodistance_additive_modifier)
 	Q_PROPERTY(wyrmgus::map_template* default_astrocoordinate_reference_subtemplate MEMBER default_astrocoordinate_reference_subtemplate)
-	Q_PROPERTY(wyrmgus::decimillesimal_int orbit_distance_multiplier MEMBER orbit_distance_multiplier READ get_orbit_distance_multiplier)
+	Q_PROPERTY(archimedes::decimillesimal_int orbit_distance_multiplier MEMBER orbit_distance_multiplier READ get_orbit_distance_multiplier)
 
 public:
 	using terrain_character_map_type = std::vector<std::vector<char>>;
@@ -771,8 +771,8 @@ private:
 	QPoint subtemplate_center_pos = QPoint(-1, -1); //this template's position as a subtemplate in its main template; the position is relative to the subtemplate's center
 	QPoint min_subtemplate_pos = QPoint(-1, -1); //the minimum position this subtemplate can be applied to in its main template
 	QPoint max_subtemplate_pos = QPoint(-1, -1); //the maximum position this subtemplate can be applied to in its main template
-	wyrmgus::geocoordinate min_subtemplate_geocoordinate;
-	wyrmgus::geocoordinate max_subtemplate_geocoordinate;
+	archimedes::geocoordinate min_subtemplate_geocoordinate;
+	archimedes::geocoordinate max_subtemplate_geocoordinate;
 	QPoint start_pos = QPoint(0, 0); //the start position within the map template to be applied when it is used
 	QPoint end_pos = QPoint(-1, -1); //the end position within the map template to be applied when it is used
 private:

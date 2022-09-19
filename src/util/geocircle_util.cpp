@@ -38,7 +38,7 @@ void write_to_image(const QGeoCircle &geocircle, QImage &image, const QColor &co
 {
 	const QGeoCoordinate geocoordinate = geocircle.center();
 
-	const QPoint base_pixel_pos = map_projection->geocoordinate_to_point(wyrmgus::geocoordinate(geocoordinate), georectangle, image.size());
+	const QPoint base_pixel_pos = map_projection->geocoordinate_to_point(archimedes::geocoordinate(geocoordinate), georectangle, image.size());
 
 	//write a 2x2 block so that the point can be expanded from in terrain generation, and so that it won't be removed if the terrain type does not allow single tiles
 	for (int x_offset = 0; x_offset <= 1; ++x_offset) {
