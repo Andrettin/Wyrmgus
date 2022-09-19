@@ -26,8 +26,11 @@
 
 #pragma once
 
-namespace wyrmgus {
+namespace archimedes {
 	class georectangle;
+}
+
+namespace wyrmgus {
 	class map_projection;
 }
 

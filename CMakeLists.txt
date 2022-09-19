@@ -556,17 +556,10 @@ set(upgrade_SRCS
 source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
-	src/util/color_container.cpp
-	src/util/date_util.cpp
-	src/util/event_loop.cpp
 	src/util/geocircle_util.cpp
 	src/util/geopath_util.cpp
 	src/util/geoshape_util.cpp
 	src/util/image_util.cpp
-	src/util/string_conversion_util.cpp
-	src/util/string_util.cpp
-	src/util/thread_pool.cpp
-	src/util/time_util.cpp
 	src/util/util.cpp
 )
 source_group(util FILES ${util_SRCS})
@@ -1199,29 +1192,11 @@ set(wyrmgus_upgrade_HDRS
 )
 
 set(wyrmgus_util_HDRS
-	src/util/color_container.h
 	src/util/colorization_type.h
-	src/util/container_random_util.h
-	src/util/container_util.h
-	src/util/date_util.h
-	src/util/enum_util.h
-	src/util/event_loop.h
 	src/util/geocircle_util.h
 	src/util/geopath_util.h
-	src/util/georectangle.h
 	src/util/geoshape_util.h
 	src/util/image_util.h
-	src/util/map_util.h
-	src/util/path_util.h
-	src/util/queue_util.h
-	src/util/qunique_ptr.h
-	src/util/qvariant_util.h
-	src/util/size_util.h
-	src/util/string_conversion_util.h
-	src/util/string_util.h
-	src/util/string_view_util.h
-	src/util/thread_pool.h
-	src/util/time_util.h
 	src/util/util.h
 )
 

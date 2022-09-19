@@ -28,14 +28,13 @@
 
 namespace archimedes {
 	class geocoordinate;
+	class georectangle;
 
 	template <int N>
 	class fractional_int;
 }
 
 namespace wyrmgus {
-
-class georectangle;
 
 class map_projection
 {
