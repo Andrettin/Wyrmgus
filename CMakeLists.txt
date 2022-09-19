@@ -1213,11 +1213,9 @@ set(wyrmgus_util_HDRS
 	src/util/image_util.h
 	src/util/map_util.h
 	src/util/path_util.h
-	src/util/point_operators.h
 	src/util/queue_util.h
 	src/util/qunique_ptr.h
 	src/util/qvariant_util.h
-	src/util/size_operators.h
 	src/util/size_util.h
 	src/util/string_conversion_util.h
 	src/util/string_util.h
@@ -1295,7 +1293,6 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/text_processing_context.h
 	src/stratagus/text_processor.h
 	src/stratagus/translator.h
-	src/pch.h
 )
 
 source_group(wyrmgus FILES ${wyrmgus_generic_HDRS})
@@ -1822,7 +1819,7 @@ if(WITH_TEST)
 	enable_testing()
 endif()
 
-target_precompile_headers(wyrmgus PRIVATE src/pch.h)
+target_precompile_headers(wyrmgus PRIVATE archimedes/src/pch.h)
 
 if(ENABLE_UNITY_BUILD)
 	set_target_properties(wyrmgus PROPERTIES UNITY_BUILD_MODE GROUP)
