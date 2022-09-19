@@ -360,7 +360,7 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(magic_domain::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::map_presets*") {
 			new_property_value = QVariant::fromValue(map_presets::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::map_projection*") {
+		} else if (property_class_name == "archimedes::map_projection*") {
 			new_property_value = QVariant::fromValue(map_projection::from_string(property.get_value()));
 		} else if (property_class_name == "wyrmgus::map_template*") {
 			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
