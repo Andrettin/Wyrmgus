@@ -560,7 +560,6 @@ set(util_SRCS
 	src/util/date_util.cpp
 	src/util/event_loop.cpp
 	src/util/geocircle_util.cpp
-	src/util/geojson_util.cpp
 	src/util/geopath_util.cpp
 	src/util/geoshape_util.cpp
 	src/util/image_util.cpp
@@ -1208,7 +1207,6 @@ set(wyrmgus_util_HDRS
 	src/util/enum_util.h
 	src/util/event_loop.h
 	src/util/geocircle_util.h
-	src/util/geojson_util.h
 	src/util/geopath_util.h
 	src/util/georectangle.h
 	src/util/geoshape_util.h
@@ -1498,7 +1496,6 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18.0")
 	option(ENABLE_UNITY_BUILD "Use unity builds for compilation" ON)
 endif()
 
-option(WITH_GEOJSON "Compile with support for generating map data from GeoJSON files" OFF)
 option(WITH_TEST "Compile the test project" ON)
 
 # Binary name
@@ -1541,11 +1538,6 @@ set(QT_LIBRARIES
 	Qt5::Qml
 	Qt5::Quick
 )
-
-if(WITH_GEOJSON)
-	add_definitions(-DUSE_GEOJSON)
-	set(QT_LIBRARIES ${QT_LIBRARIES} Qt5::LocationPrivate)
-endif()
 
 set(wyrmgus_LIBS
 	${LUA_LIBRARIES}
