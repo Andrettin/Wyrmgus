@@ -555,9 +555,6 @@ set(upgrade_SRCS
 source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
-	src/util/geocircle_util.cpp
-	src/util/geopath_util.cpp
-	src/util/geoshape_util.cpp
 	src/util/image_util.cpp
 	src/util/util.cpp
 )
@@ -1189,9 +1186,6 @@ set(wyrmgus_upgrade_HDRS
 
 set(wyrmgus_util_HDRS
 	src/util/colorization_type.h
-	src/util/geocircle_util.h
-	src/util/geopath_util.h
-	src/util/geoshape_util.h
 	src/util/image_util.h
 	src/util/util.h
 )
