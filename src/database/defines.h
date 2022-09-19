@@ -33,6 +33,10 @@ class CGraphic;
 class CPlayerColorGraphic;
 class CUpgrade;
 
+namespace archimedes {
+	class map_projection;
+}
+
 namespace wyrmgus {
 
 class button_level;
@@ -43,7 +47,6 @@ class font_color;
 class icon;
 class interface_style;
 class map_presets;
-class map_projection;
 class music;
 class player_color;
 class population_class;

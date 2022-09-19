@@ -43,6 +43,10 @@ struct lua_State;
 
 extern int CclDefineMapTemplate(lua_State *l);
 
+namespace archimedes {
+	class map_projection;
+}
+
 namespace wyrmgus {
 
 class campaign;
@@ -54,7 +58,6 @@ class faction;
 class generated_terrain;
 class historical_location;
 class historical_unit;
-class map_projection;
 class map_template_history;
 class map_template_unit;
 class region;

@@ -230,7 +230,6 @@ set(map_SRCS
 	src/map/map_info.cpp
 	src/map/map_layer.cpp
 	src/map/map_presets.cpp
-	src/map/map_projection.cpp
 	src/map/map_radar.cpp
 	src/map/map_settings.cpp
 	src/map/map_template.cpp
@@ -808,7 +807,6 @@ set(wyrmgus_map_HDRS
 	src/map/character_unit.h
 	src/map/dungeon_generation_settings.h
 	src/map/dungeon_generator.h
-	src/map/equirectangular_map_projection.h
 	src/map/generated_terrain.h
 	src/map/historical_location.h
 	src/map/landmass.h
@@ -818,13 +816,11 @@ set(wyrmgus_map_HDRS
 	src/map/map_info.h
 	src/map/map_layer.h
 	src/map/map_presets.h
-	src/map/map_projection.h
 	src/map/map_settings.h
 	src/map/map_template.h
 	src/map/map_template_container.h
 	src/map/map_template_history.h
 	src/map/map_template_unit.h
-	src/map/mercator_map_projection.h
 	src/map/minimap.h
 	src/map/minimap_mode.h
 	src/map/pmp.h
