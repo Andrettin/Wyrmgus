@@ -28,6 +28,8 @@ jobs:
     container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Set CPU number
         run: echo "THREADS=$(nproc)" >> "$GITHUB_ENV"
       - name: Configure CMake

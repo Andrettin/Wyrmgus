@@ -47,6 +47,8 @@ jobs:
     steps:
       - name: Check code
         uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Get distro info
         run: |
           lsb_id=$(lsb_release -si | tr -d '\n')
