@@ -1335,14 +1335,7 @@ set(game_test_SRCS
 source_group(game FILES ${game_test_SRCS})
 
 set(util_test_SRCS
-	test/util/angle_test.cpp
-	test/util/astronomy_test.cpp
-	test/util/geocoordinate_test.cpp
 	test/util/image_test.cpp
-	test/util/number_test.cpp
-	test/util/random_test.cpp
-	test/util/string_conversion_test.cpp
-	test/util/time_test.cpp
 )
 source_group(util FILES ${util_test_SRCS})
 
