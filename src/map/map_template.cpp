@@ -550,7 +550,7 @@ void map_template::check() const
 	}
 
 	if (this->get_min_longitude() != 0 || this->get_min_latitude() != 0 || this->get_max_longitude() != 0 || this->get_max_latitude() != 0) {
-		const wyrmgus::map_projection *map_projection = this->get_map_projection();
+		const archimedes::map_projection *map_projection = this->get_map_projection();
 
 		map_projection->validate_area(this->get_georectangle(), this->get_size());
 	}
@@ -4798,7 +4798,7 @@ void map_template::save_terrain_image(const std::string &filename, const QImage 
 
 void map_template::create_terrain_image_from_geodata(QImage &image, const terrain_geodata_ptr_map &terrain_data, const std::string &image_checkpoint_save_filename) const
 {
-	const wyrmgus::georectangle &georectangle = this->get_georectangle();
+	const archimedes::georectangle &georectangle = this->get_georectangle();
 
 	for (const auto &kv_pair : terrain_data) {
 		const terrain_type *terrain = nullptr;
@@ -4850,7 +4850,7 @@ void map_template::save_territory_image(const std::string &filename, const site_
 		image.fill(Qt::transparent);
 	}
 
-	const wyrmgus::georectangle georectangle = this->get_georectangle();
+	const archimedes::georectangle georectangle = this->get_georectangle();
 
 	for (const auto &kv_pair : territory_data) {
 		const site *settlement = kv_pair.first;

@@ -112,7 +112,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(bool output_territory_image MEMBER output_territory_image READ outputs_territory_image)
 	Q_PROPERTY(bool random_created_settlements MEMBER random_created_settlements)
 	Q_PROPERTY(bool create_starting_mine MEMBER create_starting_mine)
-	Q_PROPERTY(wyrmgus::map_projection* map_projection MEMBER map_projection)
+	Q_PROPERTY(archimedes::map_projection* map_projection MEMBER map_projection)
 	Q_PROPERTY(archimedes::decimillesimal_int min_longitude READ get_min_longitude WRITE set_min_longitude)
 	Q_PROPERTY(archimedes::decimillesimal_int max_longitude READ get_max_longitude WRITE set_max_longitude)
 	Q_PROPERTY(archimedes::decimillesimal_int min_latitude READ get_min_latitude WRITE set_min_latitude)
@@ -639,7 +639,7 @@ public:
 		return this->units;
 	}
 
-	const wyrmgus::map_projection *get_map_projection() const;
+	const archimedes::map_projection *get_map_projection() const;
 
 	const decimillesimal_int &get_min_longitude() const
 	{
@@ -701,7 +701,7 @@ public:
 		return this->orbit_distance_multiplier;
 	}
 
-	const wyrmgus::georectangle &get_georectangle() const
+	const archimedes::georectangle &get_georectangle() const
 	{
 		return this->georectangle;
 	}
@@ -835,8 +835,8 @@ public:
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
 private:
 	std::vector<std::unique_ptr<map_template_unit>> units;
-	wyrmgus::map_projection *map_projection = nullptr;
-	wyrmgus::georectangle georectangle;
+	archimedes::map_projection *map_projection = nullptr;
+	archimedes::georectangle georectangle;
 	decimillesimal_int astrodistance_multiplier = decimillesimal_int(1);
 	int astrodistance_additive_modifier = 0;
 	map_template *default_astrocoordinate_reference_subtemplate = nullptr;

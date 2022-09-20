@@ -96,7 +96,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::time_of_day* underground_time_of_day MEMBER underground_time_of_day)
 	Q_PROPERTY(wyrmgus::time_of_day_schedule* default_time_of_day_schedule MEMBER default_time_of_day_schedule)
 	Q_PROPERTY(wyrmgus::season_schedule* default_season_schedule MEMBER default_season_schedule)
-	Q_PROPERTY(wyrmgus::map_projection* default_map_projection MEMBER default_map_projection)
+	Q_PROPERTY(archimedes::map_projection* default_map_projection MEMBER default_map_projection)
 	Q_PROPERTY(wyrmgus::terrain_type* ford_terrain_type MEMBER ford_terrain_type)
 	Q_PROPERTY(std::filesystem::path border_image_file MEMBER border_image_file WRITE set_border_image_file)
 	Q_PROPERTY(QSize border_frame_size MEMBER border_frame_size)
