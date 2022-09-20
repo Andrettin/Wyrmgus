@@ -33,14 +33,17 @@ struct lua_State;
 
 extern int CclDefineDialogue(lua_State *l);
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
 class character;
 class dialogue;
 class dialogue_option;
 class faction;
-class gsml_data;
-class gsml_property;
 class icon;
 class player_color;
 class sound;

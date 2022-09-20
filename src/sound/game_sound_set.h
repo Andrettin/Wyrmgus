@@ -29,10 +29,13 @@
 
 #include "util/singleton.h"
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
-class gsml_data;
-class gsml_property;
 class sound;
 
 /**

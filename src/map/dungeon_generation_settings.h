@@ -26,11 +26,14 @@
 
 #pragma once
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
 class character;
-class gsml_data;
-class gsml_property;
 class terrain_type;
 class unit_type;
 

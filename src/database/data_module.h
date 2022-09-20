@@ -26,10 +26,12 @@
 
 #pragma once
 
-namespace wyrmgus {
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
 
-class gsml_data;
-class gsml_property;
+namespace wyrmgus {
 
 class data_module final : public QObject
 {

@@ -28,10 +28,13 @@
 
 class CMapLayer;
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
-class gsml_data;
-class gsml_property;
 class scheduled_season;
 class scheduled_time_of_day;
 class season;

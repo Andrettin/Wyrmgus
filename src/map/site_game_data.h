@@ -35,10 +35,13 @@ class CMapLayer;
 class CPlayer;
 class CUnit;
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
-class gsml_data;
-class gsml_property;
 class landmass;
 class population_class;
 class population_type;

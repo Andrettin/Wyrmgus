@@ -34,11 +34,14 @@ struct lua_State;
 extern int CclDefineCharacter(lua_State *l);
 extern int CclDefineCustomHero(lua_State *l);
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
 class character;
-class gsml_data;
-class gsml_property;
 class spell;
 class unique_item;
 class unit_type;

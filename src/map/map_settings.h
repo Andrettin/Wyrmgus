@@ -30,10 +30,12 @@
 #include "upgrade/upgrade_container.h"
 #include "util/qunique_ptr.h"
 
-namespace wyrmgus {
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
 
-class gsml_data;
-class gsml_property;
+namespace wyrmgus {
 
 class map_settings final : public QObject
 {

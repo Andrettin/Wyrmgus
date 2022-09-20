@@ -37,10 +37,13 @@ extern int CclDefinePlayerTypes(lua_State *l);
 extern int CclPresentMap(lua_State *l);
 extern int CclStratagusMap(lua_State *l);
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
-class gsml_data;
-class gsml_property;
 class map_presets;
 class map_settings;
 enum class player_type;

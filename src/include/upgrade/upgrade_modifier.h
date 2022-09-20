@@ -38,12 +38,15 @@ struct lua_State;
 
 extern int CclDefineModifier(lua_State *l);
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
 class civilization;
 class faction;
-class gsml_data;
-class gsml_property;
 class unit_class;
 class unit_type;
 

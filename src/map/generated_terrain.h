@@ -28,10 +28,13 @@
 
 class CConfigData;
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
-class gsml_data;
-class gsml_property;
 class terrain_type;
 class tile;
 

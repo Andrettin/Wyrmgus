@@ -35,9 +35,12 @@ struct lua_State;
 
 extern int CclStratagusMap(lua_State *l);
 
-namespace wyrmgus {
+namespace archimedes {
 	class gsml_data;
 	class gsml_property;
+}
+
+namespace wyrmgus {
 	class player_color;
 	class scheduled_season;
 	class scheduled_time_of_day;

@@ -34,16 +34,19 @@ class CPlayer;
 class CUnit;
 class CUpgrade;
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+	enum class gsml_operator;
+}
+
 namespace wyrmgus {
 
 class button;
 class civilization;
-class gsml_data;
-class gsml_property;
 class named_data_entry;
 class unit_type;
 enum class government_type;
-enum class gsml_operator;
 struct read_only_context;
 
 template <typename scope_type>

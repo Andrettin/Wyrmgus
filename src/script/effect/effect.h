@@ -29,12 +29,15 @@
 class CPlayer;
 class CUnit;
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+	enum class gsml_operator;
+}
+
 namespace wyrmgus {
 
 class dialogue;
-class gsml_data;
-class gsml_property;
-enum class gsml_operator;
 struct context;
 struct read_only_context;
 

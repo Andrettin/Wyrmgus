@@ -29,11 +29,14 @@
 #include "util/fractional_int.h"
 #include "util/singleton.h"
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
 class campaign;
-class gsml_data;
-class gsml_property;
 enum class difficulty;
 enum class hotkey_setup;
 

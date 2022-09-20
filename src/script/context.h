@@ -29,10 +29,13 @@
 class CPlayer;
 class CUnit;
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
-class gsml_data;
-class gsml_property;
 class unit_ref;
 
 //script context for e.g. events

@@ -31,10 +31,13 @@ struct lua_State;
 extern int CclDefineCivilization(lua_State *l);
 extern int CclDefineFaction(lua_State *l);
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
-class gsml_data;
-class gsml_property;
 class unit_class;
 enum class ai_force_type;
 

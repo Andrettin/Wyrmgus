@@ -78,11 +78,14 @@ class CMapLayer;
 class CUnit;
 class CUnitCache;
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 	class faction;
 	class generated_terrain;
-	class gsml_data;
-	class gsml_property;
 	class landmass;
 	class map_info;
 	class map_settings;

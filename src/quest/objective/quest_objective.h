@@ -34,11 +34,14 @@ struct lua_State;
 
 extern int CclDefineQuest(lua_State *l);
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
 class faction;
-class gsml_data;
-class gsml_property;
 class player_quest_objective;
 class quest;
 class resource;

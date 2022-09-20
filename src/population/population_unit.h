@@ -27,19 +27,18 @@
 #pragma once
 
 namespace archimedes {
+	class gsml_data;
+	class gsml_property;
 
-template <int N>
-class fractional_int;
+	template <int N>
+	class fractional_int;
 
-using centesimal_int = fractional_int<2>;
-
+	using centesimal_int = fractional_int<2>;
 }
 
 namespace wyrmgus {
 
 class employment_type;
-class gsml_data;
-class gsml_property;
 class population_type;
 class resource;
 struct population_unit_key;

@@ -32,12 +32,15 @@ struct lua_State;
 
 extern int CclDefineDialogue(lua_State *l);
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
 class dialogue;
 class dialogue_node;
-class gsml_data;
-class gsml_property;
 struct context;
 struct read_only_context;
 

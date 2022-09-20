@@ -31,10 +31,12 @@
 class CPlayer;
 class CUnit;
 
-namespace wyrmgus {
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
 
-class gsml_data;
-class gsml_property;
+namespace wyrmgus {
 
 template <typename scope_type>
 class and_condition;

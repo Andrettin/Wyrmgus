@@ -31,11 +31,14 @@
 class CPlayer;
 class CUnit;
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
 class dialogue;
-class gsml_data;
-class gsml_property;
 class unit_ref;
 
 template <typename scope_type>

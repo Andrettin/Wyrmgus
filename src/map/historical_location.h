@@ -34,10 +34,13 @@ struct lua_State;
 
 extern int CclDefineCharacter(lua_State *l);
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
-class gsml_data;
-class gsml_property;
 class map_template;
 class site;
 

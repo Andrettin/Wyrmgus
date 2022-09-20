@@ -134,9 +134,6 @@ set(database_SRCS
 	src/database/database.cpp
 	src/database/defines.cpp
 	src/database/detailed_data_entry.cpp
-	src/database/gsml_data.cpp
-	src/database/gsml_parser.cpp
-	src/database/gsml_property.cpp
 	src/database/named_data_entry.cpp
 	src/database/predefines.cpp
 	src/database/preferences.cpp
@@ -756,13 +753,6 @@ set(wyrmgus_database_HDRS
 	src/database/database.h
 	src/database/defines.h
 	src/database/detailed_data_entry.h
-	src/database/gsml_data.h
-	src/database/gsml_data_visitor.h
-	src/database/gsml_element_visitor.h
-	src/database/gsml_operator.h
-	src/database/gsml_parser.h
-	src/database/gsml_property.h
-	src/database/gsml_property_visitor.h
 	src/database/named_data_entry.h
 	src/database/predefines.h
 	src/database/preferences.h

@@ -34,6 +34,8 @@ class CPlayerColorGraphic;
 class CUpgrade;
 
 namespace archimedes {
+	class gsml_data;
+	class gsml_property;
 	class map_projection;
 }
 
@@ -54,8 +56,6 @@ class resource;
 class resource_icon;
 class season;
 class season_schedule;
-class gsml_data;
-class gsml_property;
 class terrain_type;
 class time_of_day;
 class time_of_day_schedule;

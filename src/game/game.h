@@ -33,13 +33,16 @@ class CFile;
 class CPlayer;
 class CUnit;
 
+namespace archimedes {
+	class gsml_data;
+	class gsml_property;
+}
+
 namespace wyrmgus {
 
 class age;
 class campaign;
 class faction;
-class gsml_data;
-class gsml_property;
 class results_info;
 class trigger;
 
