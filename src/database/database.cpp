@@ -287,10 +287,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(decimillesimal_int(property.get_value()));
 		} else if (property_class_name == "wyrmgus::difficulty") {
 			new_property_value = QVariant::fromValue(string_to_difficulty(property.get_value()));
-		} else if (property_class_name == "wyrmgus::ecological_niche") {
-			new_property_value = QVariant::fromValue(string_to_ecological_niche(property.get_value()));
-		} else if (property_class_name == "wyrmgus::geological_era") {
-			new_property_value = QVariant::fromValue(string_to_geological_era(property.get_value()));
 		} else if (property_class_name == "wyrmgus::grammatical_gender") {
 			new_property_value = QVariant::fromValue(string_to_grammatical_gender(property.get_value()));
 		} else if (property_class_name == "wyrmgus::hotkey_setup") {
@@ -309,8 +305,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(string_to_music_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::spell_target_type") {
 			new_property_value = QVariant::fromValue(string_to_spell_target_type(property.get_value()));
-		} else if (property_class_name == "wyrmgus::taxonomic_rank") {
-			new_property_value = QVariant::fromValue(string_to_taxonomic_rank(property.get_value()));
 		} else if (property_class_name == "wyrmgus::trigger_target") {
 			new_property_value = QVariant::fromValue(string_to_trigger_target(property.get_value()));
 		} else if (property_class_name == "wyrmgus::trigger_type") {

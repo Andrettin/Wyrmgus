@@ -24,41 +24,42 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "species/taxonomic_rank.h"
 
 namespace wyrmgus {
 
-enum class taxonomic_rank {
-	none,
-	species,
-	genus,
-	subtribe,
-	tribe,
-	subfamily,
-	family,
-	superfamily,
-	infraorder,
-	suborder,
-	order,
-	infraclass,
-	subclass,
-	class_rank,
-	superclass,
-	infraphylum,
-	subphylum,
-	phylum,
-	superphylum,
-	infrakingdom,
-	subkingdom,
-	kingdom,
-	domain,
-	empire
+template class enum_converter<taxonomic_rank>;
+
+const std::string enum_converter<taxonomic_rank>::property_class_identifier = "wyrmgus::taxonomic_rank";
+
+const std::map<std::string, taxonomic_rank> enum_converter<taxonomic_rank>::string_to_enum_map = {
+	{ "species", taxonomic_rank::species },
+	{ "genus", taxonomic_rank::genus },
+	{ "subtribe", taxonomic_rank::subtribe },
+	{ "tribe", taxonomic_rank::tribe },
+	{ "subfamily", taxonomic_rank::subfamily },
+	{ "family", taxonomic_rank::family },
+	{ "superfamily", taxonomic_rank::superfamily },
+	{ "infraorder", taxonomic_rank::infraorder },
+	{ "suborder", taxonomic_rank::suborder },
+	{ "order", taxonomic_rank::order },
+	{ "infraclass", taxonomic_rank::infraclass },
+	{ "subclass", taxonomic_rank::subclass },
+	{ "class", taxonomic_rank::class_rank },
+	{ "superclass", taxonomic_rank::superclass },
+	{ "infraphylum", taxonomic_rank::infraphylum },
+	{ "subphylum", taxonomic_rank::subphylum },
+	{ "phylum", taxonomic_rank::phylum },
+	{ "superphylum", taxonomic_rank::superphylum },
+	{ "infrakingdom", taxonomic_rank::infrakingdom },
+	{ "subkingdom", taxonomic_rank::subkingdom },
+	{ "kingdom", taxonomic_rank::kingdom },
+	{ "domain", taxonomic_rank::domain },
+	{ "empire", taxonomic_rank::empire }
 };
 
-extern template class enum_converter<taxonomic_rank>;
+const bool enum_converter<taxonomic_rank>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::taxonomic_rank)

@@ -24,23 +24,23 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "species/ecological_niche.h"
 
 namespace wyrmgus {
 
-enum class ecological_niche {
-	none,
-	
-	browser,
-	grazer,
-	predator,
-	scavenger
+template class enum_converter<ecological_niche>;
+
+const std::string enum_converter<ecological_niche>::property_class_identifier = "wyrmgus::ecological_niche";
+
+const std::map<std::string, ecological_niche> enum_converter<ecological_niche>::string_to_enum_map = {
+	{ "browser", ecological_niche::browser },
+	{ "grazer", ecological_niche::grazer },
+	{ "predator", ecological_niche::predator },
+	{ "scavenger", ecological_niche::scavenger }
 };
 
-extern template class enum_converter<ecological_niche>;
+const bool enum_converter<ecological_niche>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::ecological_niche)

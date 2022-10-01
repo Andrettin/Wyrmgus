@@ -3124,7 +3124,7 @@ int CclDefineSpecies(lua_State *l)
 			species->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Era")) {
 			const std::string era_ident = LuaToString(l, -1);
-			species->era = wyrmgus::string_to_geological_era(era_ident);
+			species->era = enum_converter<geological_era>::to_enum(era_ident);
 		} else if (!strcmp(value, "Sapient")) {
 			species->sapient = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Supertaxon") || !strcmp(value, "Genus")) {
@@ -3217,9 +3217,6 @@ static int CclGetSpeciesData(lua_State *l)
 		} else {
 			lua_pushstring(l, "");
 		}
-		return 1;
-	} else if (!strcmp(data, "Era")) {
-		lua_pushstring(l, wyrmgus::geological_era_to_string(species->get_era()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Sapient")) {
 		lua_pushboolean(l, species->is_sapient());

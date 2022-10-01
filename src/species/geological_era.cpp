@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2021-2022 by Andrettin
+//      (c) Copyright 2020-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,23 +24,33 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "species/geological_era.h"
 
 namespace wyrmgus {
 
-enum class ecological_niche {
-	none,
-	
-	browser,
-	grazer,
-	predator,
-	scavenger
+template class enum_converter<geological_era>;
+
+const std::string enum_converter<geological_era>::property_class_identifier = "wyrmgus::geological_era";
+
+const std::map<std::string, geological_era> enum_converter<geological_era>::string_to_enum_map = {
+	{ "devonian", geological_era::devonian },
+	{ "carboniferous", geological_era::carboniferous },
+	{ "permian", geological_era::permian },
+	{ "triassic", geological_era::triassic },
+	{ "jurassic", geological_era::jurassic },
+	{ "cretaceous", geological_era::cretaceous },
+	{ "paleocene", geological_era::paleocene },
+	{ "eocene", geological_era::eocene },
+	{ "oligocene", geological_era::oligocene },
+	{ "eocene", geological_era::eocene },
+	{ "miocene", geological_era::miocene },
+	{ "pliocene", geological_era::pliocene },
+	{ "pleistocene", geological_era::pleistocene },
+	{ "holocene", geological_era::holocene }
 };
 
-extern template class enum_converter<ecological_niche>;
+const bool enum_converter<geological_era>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::ecological_niche)

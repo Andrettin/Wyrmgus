@@ -416,9 +416,12 @@ set(sound_SRCS
 source_group(sound FILES ${sound_SRCS})
 
 set(species_SRCS
+	src/species/ecological_niche.cpp
+	src/species/geological_era.cpp
 	src/species/species.cpp
 	src/species/taxon.cpp
 	src/species/taxon_base.cpp
+	src/species/taxonomic_rank.cpp
 )
 source_group(species FILES ${species_SRCS})
 

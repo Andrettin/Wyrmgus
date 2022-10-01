@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class geological_era {
@@ -45,74 +47,7 @@ enum class geological_era {
 	holocene
 };
 
-inline geological_era string_to_geological_era(const std::string &str)
-{
-	if (str == "devonian") {
-		return geological_era::devonian;
-	} else if (str == "carboniferous") {
-		return geological_era::carboniferous;
-	} else if (str == "permian") {
-		return geological_era::permian;
-	} else if (str == "triassic") {
-		return geological_era::triassic;
-	} else if (str == "jurassic") {
-		return geological_era::jurassic;
-	} else if (str == "cretaceous") {
-		return geological_era::cretaceous;
-	} else if (str == "paleocene") {
-		return geological_era::paleocene;
-	} else if (str == "eocene") {
-		return geological_era::eocene;
-	} else if (str == "oligocene") {
-		return geological_era::oligocene;
-	} else if (str == "miocene") {
-		return geological_era::miocene;
-	} else if (str == "pliocene") {
-		return geological_era::pliocene;
-	} else if (str == "pleistocene") {
-		return geological_era::pleistocene;
-	} else if (str == "holocene") {
-		return geological_era::holocene;
-	}
-
-	throw std::runtime_error("Invalid geological_era: \"" + str + "\".");
-}
-
-inline std::string geological_era_to_string(const geological_era era)
-{
-	switch (era) {
-		case geological_era::devonian:
-			return "devonian";
-		case geological_era::carboniferous:
-			return "carboniferous";
-		case geological_era::permian:
-			return "permian";
-		case geological_era::triassic:
-			return "triassic";
-		case geological_era::jurassic:
-			return "jurassic";
-		case geological_era::cretaceous:
-			return "cretaceous";
-		case geological_era::paleocene:
-			return "paleocene";
-		case geological_era::eocene:
-			return "eocene";
-		case geological_era::oligocene:
-			return "oligocene";
-		case geological_era::miocene:
-			return "miocene";
-		case geological_era::pliocene:
-			return "pliocene";
-		case geological_era::pleistocene:
-			return "pleistocene";
-		case geological_era::holocene:
-			return "holocene";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid geological_era: \"" + std::to_string(static_cast<int>(era)) + "\".");
-}
+extern template class enum_converter<geological_era>;
 
 }
 
