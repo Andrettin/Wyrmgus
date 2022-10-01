@@ -37,7 +37,7 @@ public:
 	explicit faction_type_condition(const std::string &value, const gsml_operator condition_operator)
 		: condition(condition_operator)
 	{
-		this->faction_type = string_to_faction_type(value);
+		this->faction_type = enum_converter<wyrmgus::faction_type>::to_enum(value);
 	}
 
 	virtual const std::string &get_class_identifier() const override

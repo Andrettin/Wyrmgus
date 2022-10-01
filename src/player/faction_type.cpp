@@ -23,69 +23,26 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "player/faction_type.h"
 
 namespace wyrmgus {
 
-enum class faction_type {
-	none,
-	tribe,
-	polity,
-	minor_tribe,
-	notable_house,
-	mercenary_company,
-	holy_order,
-	trading_company,
-	
-	count
+template class enum_converter<faction_type>;
+
+const std::string enum_converter<faction_type>::property_class_identifier = "wyrmgus::faction_type";
+
+const std::map<std::string, faction_type> enum_converter<faction_type>::string_to_enum_map = {
+	{ "none", faction_type::none },
+	{ "tribe", faction_type::tribe },
+	{ "polity", faction_type::polity },
+	{ "minor_tribe", faction_type::minor_tribe },
+	{ "notable_house", faction_type::notable_house },
+	{ "mercenary_company", faction_type::mercenary_company },
+	{ "holy_order", faction_type::holy_order },
+	{ "trading_company", faction_type::trading_company },
 };
 
-extern template class enum_converter<faction_type>;
-
-inline bool is_faction_type_neutral(const faction_type type)
-{
-	switch (type) {
-		case faction_type::minor_tribe:
-		case faction_type::notable_house:
-		case faction_type::mercenary_company:
-		case faction_type::holy_order:
-		case faction_type::trading_company:
-			return true;
-		default:
-			return false;
-	}
 }
-
-inline std::string get_faction_type_name(const faction_type type)
-{
-	switch (type) {
-		case faction_type::none:
-			return "None";
-		case faction_type::tribe:
-			return "Tribe";
-		case faction_type::polity:
-			return "Polity";
-		case faction_type::minor_tribe:
-			return "Minor Tribe";
-		case faction_type::notable_house:
-			return "Notable House";
-		case faction_type::mercenary_company:
-			return "Mercenary Company";
-		case faction_type::holy_order:
-			return "Holy Order";
-		case faction_type::trading_company:
-			return "Trading Company";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid faction type: \"" + std::to_string(static_cast<int>(type)) + "\".");
-}
-
-}
-
-Q_DECLARE_METATYPE(wyrmgus::faction_type)

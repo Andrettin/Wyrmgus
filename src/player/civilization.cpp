@@ -612,7 +612,7 @@ void civilization::process_character_title_name_scope(const gsml_data &scope)
 void civilization::process_character_title_name_scope(const character_title title_type, const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const faction_type faction_type = string_to_faction_type(tag);
+	const faction_type faction_type = enum_converter<wyrmgus::faction_type>::to_enum(tag);
 
 	scope.for_each_child([&](const gsml_data &child_scope) {
 		faction::process_character_title_name_scope(this->character_title_names[title_type][faction_type], child_scope);

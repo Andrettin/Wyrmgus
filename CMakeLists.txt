@@ -323,6 +323,7 @@ set(player_SRCS
 	src/player/dynasty.cpp
 	src/player/faction.cpp
 	src/player/faction_history.cpp
+	src/player/faction_type.cpp
 	src/player/player.cpp
 	src/player/player_color.cpp
 	src/player/player_container.cpp
@@ -346,6 +347,7 @@ source_group(population FILES ${population_SRCS})
 set(quest_SRCS
 	src/quest/achievement.cpp
 	src/quest/campaign.cpp
+	src/quest/objective_type.cpp
 	src/quest/player_quest_objective.cpp
 	src/quest/quest.cpp
 	src/quest/script_quest.cpp

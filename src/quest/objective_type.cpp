@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2015-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -23,69 +23,31 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "quest/objective_type.h"
 
 namespace wyrmgus {
 
-enum class faction_type {
-	none,
-	tribe,
-	polity,
-	minor_tribe,
-	notable_house,
-	mercenary_company,
-	holy_order,
-	trading_company,
-	
-	count
+template class enum_converter<objective_type>;
+
+const std::string enum_converter<objective_type>::property_class_identifier = "wyrmgus::objective_type";
+
+const std::map<std::string, objective_type> enum_converter<objective_type>::string_to_enum_map = {
+	{ "gather_resource", objective_type::gather_resource },
+	{ "have_resource", objective_type::have_resource },
+	{ "build_units", objective_type::build_units },
+	{ "destroy_units", objective_type::destroy_units },
+	{ "research_upgrade", objective_type::research_upgrade },
+	{ "recruit_hero", objective_type::recruit_hero },
+	{ "destroy_hero", objective_type::destroy_hero },
+	{ "hero_must_survive", objective_type::hero_must_survive },
+	{ "destroy_unique", objective_type::destroy_unique },
+	{ "destroy_faction", objective_type::destroy_faction },
+	{ "found_faction", objective_type::found_faction },
+	{ "bring_unit_to_site", objective_type::bring_unit_to_site },
+	{ "have_settlement", objective_type::have_settlement },
 };
 
-extern template class enum_converter<faction_type>;
-
-inline bool is_faction_type_neutral(const faction_type type)
-{
-	switch (type) {
-		case faction_type::minor_tribe:
-		case faction_type::notable_house:
-		case faction_type::mercenary_company:
-		case faction_type::holy_order:
-		case faction_type::trading_company:
-			return true;
-		default:
-			return false;
-	}
 }
-
-inline std::string get_faction_type_name(const faction_type type)
-{
-	switch (type) {
-		case faction_type::none:
-			return "None";
-		case faction_type::tribe:
-			return "Tribe";
-		case faction_type::polity:
-			return "Polity";
-		case faction_type::minor_tribe:
-			return "Minor Tribe";
-		case faction_type::notable_house:
-			return "Notable House";
-		case faction_type::mercenary_company:
-			return "Mercenary Company";
-		case faction_type::holy_order:
-			return "Holy Order";
-		case faction_type::trading_company:
-			return "Trading Company";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid faction type: \"" + std::to_string(static_cast<int>(type)) + "\".");
-}
-
-}
-
-Q_DECLARE_METATYPE(wyrmgus::faction_type)

@@ -109,7 +109,7 @@ void defines::process_gsml_scope(const gsml_data &scope)
 		});
 	} else if (tag == "faction_type_upgrades") {
 		scope.for_each_property([&](const gsml_property &property) {
-			const faction_type faction_type = string_to_faction_type(property.get_key());
+			const faction_type faction_type = enum_converter<wyrmgus::faction_type>::to_enum(property.get_key());
 			const CUpgrade *upgrade = CUpgrade::get(property.get_value());
 
 			this->faction_type_upgrades[faction_type] = upgrade;

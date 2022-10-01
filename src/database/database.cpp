@@ -294,8 +294,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(string_to_ecological_niche(property.get_value()));
 		} else if (property_class_name == "wyrmgus::faction_tier") {
 			new_property_value = QVariant::fromValue(string_to_faction_tier(property.get_value()));
-		} else if (property_class_name == "wyrmgus::faction_type") {
-			new_property_value = QVariant::fromValue(string_to_faction_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::gender") {
 			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
 		} else if (property_class_name == "wyrmgus::geological_era") {

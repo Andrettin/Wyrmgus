@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class objective_type {
@@ -44,73 +46,8 @@ enum class objective_type {
 	have_settlement
 };
 
-inline objective_type string_to_objective_type(const std::string &str)
-{
-	if (str == "gather_resource") {
-		return objective_type::gather_resource;
-	} else if (str == "have_resource") {
-		return objective_type::have_resource;
-	} else if (str == "build_units") {
-		return objective_type::build_units;
-	} else if (str == "destroy_units") {
-		return objective_type::destroy_units;
-	} else if (str == "research_upgrade") {
-		return objective_type::research_upgrade;
-	} else if (str == "recruit_hero") {
-		return objective_type::recruit_hero;
-	} else if (str == "destroy_hero") {
-		return objective_type::destroy_hero;
-	} else if (str == "hero_must_survive") {
-		return objective_type::hero_must_survive;
-	} else if (str == "destroy_unique") {
-		return objective_type::destroy_unique;
-	} else if (str == "destroy_faction") {
-		return objective_type::destroy_faction;
-	} else if (str == "found_faction") {
-		return objective_type::found_faction;
-	} else if (str == "bring_unit_to_site") {
-		return objective_type::bring_unit_to_site;
-	} else if (str == "have_settlement") {
-		return objective_type::have_settlement;
-	}
-
-	throw std::runtime_error("Invalid objective type: \"" + str + "\".");
-}
-
-inline std::string objective_type_to_string(const objective_type objective_type)
-{
-	switch (objective_type) {
-		case objective_type::gather_resource:
-			return "gather_resource";
-		case objective_type::have_resource:
-			return "have_resource";
-		case objective_type::build_units:
-			return "build_units";
-		case objective_type::destroy_units:
-			return "destroy_units";
-		case objective_type::research_upgrade:
-			return "research_upgrade";
-		case objective_type::recruit_hero:
-			return "recruit_hero";
-		case objective_type::destroy_hero:
-			return "destroy_hero";
-		case objective_type::hero_must_survive:
-			return "hero_must_survive";
-		case objective_type::destroy_unique:
-			return "destroy_unique";
-		case objective_type::destroy_faction:
-			return "destroy_faction";
-		case objective_type::found_faction:
-			return "found_faction";
-		case objective_type::bring_unit_to_site:
-			return "bring_unit_to_site";
-		case objective_type::have_settlement:
-			return "have_settlement";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid objective type: \"" + std::to_string(static_cast<int>(objective_type)) + "\".");
-}
+extern template class enum_converter<objective_type>;
 
 }
+
+Q_DECLARE_METATYPE(wyrmgus::objective_type)
