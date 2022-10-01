@@ -24,8 +24,6 @@ private:
 public:
 	static enum_type to_enum(const std::string &str)
 	{
-		static const bool initialized = enum_converter::initialize();
-
 		const auto find_iterator = enum_converter::string_to_enum_map.find(str);
 
 		if (find_iterator != enum_converter::string_to_enum_map.end()) {
@@ -71,7 +69,7 @@ private:
 	static const std::string property_class_identifier;
 	static const std::map<std::string, enum_type> string_to_enum_map; //this should be defined where the enum converter is specialized
 	static inline std::map<enum_type, std::string> enum_to_string_map;
-	static inline bool initialized = enum_converter::initialize();
+	static const bool initialized;
 };
 
 }

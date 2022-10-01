@@ -50,4 +50,6 @@ const std::map<std::string, objective_type> enum_converter<objective_type>::stri
 	{ "have_settlement", objective_type::have_settlement },
 };
 
+const bool enum_converter<objective_type>::initialized = enum_converter::initialize();
+
 }

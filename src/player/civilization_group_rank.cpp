@@ -40,4 +40,6 @@ const std::map<std::string, civilization_group_rank> enum_converter<civilization
 	{ "supergroup", civilization_group_rank::supergroup }
 };
 
+const bool enum_converter<civilization_group_rank>::initialized = enum_converter::initialize();
+
 }

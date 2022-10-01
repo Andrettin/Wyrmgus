@@ -40,4 +40,6 @@ const std::map<std::string, gender> enum_converter<gender>::string_to_enum_map =
 	{ "female", gender::female }
 };
 
+const bool enum_converter<gender>::initialized = enum_converter::initialize();
+
 }

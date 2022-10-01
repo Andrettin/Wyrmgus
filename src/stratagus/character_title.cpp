@@ -41,4 +41,6 @@ const std::map<std::string, character_title> enum_converter<character_title>::st
 	{ "treasurer", character_title::treasurer }
 };
 
+const bool enum_converter<character_title>::initialized = enum_converter::initialize();
+
 }

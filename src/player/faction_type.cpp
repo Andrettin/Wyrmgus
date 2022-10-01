@@ -45,4 +45,6 @@ const std::map<std::string, faction_type> enum_converter<faction_type>::string_t
 	{ "trading_company", faction_type::trading_company }
 };
 
+const bool enum_converter<faction_type>::initialized = enum_converter::initialize();
+
 }

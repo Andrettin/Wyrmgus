@@ -46,4 +46,6 @@ const std::map<std::string, faction_tier> enum_converter<faction_tier>::string_t
 	{ "empire", faction_tier::empire }
 };
 
+const bool enum_converter<faction_tier>::initialized = enum_converter::initialize();
+
 }

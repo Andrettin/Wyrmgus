@@ -42,4 +42,6 @@ const std::map<std::string, government_type> enum_converter<government_type>::st
 	{ "theocracy", government_type::theocracy }
 };
 
+const bool enum_converter<government_type>::initialized = enum_converter::initialize();
+
 }
