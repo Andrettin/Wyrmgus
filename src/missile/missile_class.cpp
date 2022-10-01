@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2021-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,23 +24,37 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "missile/missile_class.h"
 
 namespace wyrmgus {
 
-enum class upgrade_category_rank {
-	none,
-	subcategory,
-	category,
-	supercategory,
+template class enum_converter<missile_class>;
 
-	count
+const std::string enum_converter<missile_class>::property_class_identifier = "wyrmgus::missile_class";
+
+const std::map<std::string, missile_class> enum_converter<missile_class>::string_to_enum_map = {
+	{ "none", missile_class::none },
+	{ "point_to_point", missile_class::point_to_point },
+	{ "point_to_point_with_hit", missile_class::point_to_point_with_hit },
+	{ "point_to_point_cycle_once", missile_class::point_to_point_cycle_once },
+	{ "point_to_point_bounce", missile_class::point_to_point_bounce },
+	{ "stay", missile_class::stay },
+	{ "cycle_once", missile_class::cycle_once },
+	{ "fire", missile_class::fire },
+	{ "hit", missile_class::hit },
+	{ "parabolic", missile_class::parabolic },
+	{ "land_mine", missile_class::land_mine },
+	{ "whirlwind", missile_class::whirlwind },
+	{ "flame_shield", missile_class::flame_shield },
+	{ "death_coil", missile_class::death_coil },
+	{ "tracer", missile_class::tracer },
+	{ "clip_to_target", missile_class::clip_to_target },
+	{ "continuous", missile_class::continuous },
+	{ "straight_fly", missile_class::straight_fly }
 };
 
-extern template class enum_converter<upgrade_category_rank>;
+const bool enum_converter<missile_class>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::upgrade_category_rank)

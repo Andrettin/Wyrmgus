@@ -333,7 +333,7 @@ int CclDefineSpell(lua_State *l)
 			--i;
 		} else if (!strcmp(value, "target")) {
 			value = LuaToString(l, i + 1);
-			spell->target = wyrmgus::string_to_spell_target_type(value);
+			spell->target = enum_converter<spell_target_type>::to_enum(value);
 		} else if (!strcmp(value, "action")) {
 			if (!lua_istable(l, i + 1)) {
 				LuaError(l, "incorrect argument");

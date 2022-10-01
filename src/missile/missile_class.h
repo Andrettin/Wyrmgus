@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 /**
@@ -52,94 +54,7 @@ enum class missile_class {
 	straight_fly //missile flies from x,y to x1,y1 then continues to fly, until incompatible terrain is detected
 };
 
-inline missile_class string_to_missile_class(const std::string &str)
-{
-	if (str == "none") {
-		return missile_class::none;
-	} else if (str == "point_to_point") {
-		return missile_class::point_to_point;
-	} else if (str == "point_to_point_with_hit") {
-		return missile_class::point_to_point_with_hit;
-	} else if (str == "point_to_point_cycle_once") {
-		return missile_class::point_to_point_cycle_once;
-	} else if (str == "point_to_point_bounce") {
-		return missile_class::point_to_point_bounce;
-	} else if (str == "stay") {
-		return missile_class::stay;
-	} else if (str == "cycle_once") {
-		return missile_class::cycle_once;
-	} else if (str == "fire") {
-		return missile_class::fire;
-	} else if (str == "hit") {
-		return missile_class::hit;
-	} else if (str == "parabolic") {
-		return missile_class::parabolic;
-	} else if (str == "land_mine") {
-		return missile_class::land_mine;
-	} else if (str == "whirlwind") {
-		return missile_class::whirlwind;
-	} else if (str == "flame_shield") {
-		return missile_class::flame_shield;
-	} else if (str == "death_coil") {
-		return missile_class::death_coil;
-	} else if (str == "tracer") {
-		return missile_class::tracer;
-	} else if (str == "clip_to_target") {
-		return missile_class::clip_to_target;
-	} else if (str == "continuous") {
-		return missile_class::continuous;
-	} else if (str == "straight_fly") {
-		return missile_class::straight_fly;
-	}
-
-	throw std::runtime_error("Invalid missile class: \"" + str + "\".");
-}
-
-inline std::string missile_class_to_string(const missile_class missile_class)
-{
-	switch (missile_class) {
-		case missile_class::none:
-			return "none";
-		case missile_class::point_to_point:
-			return "point_to_point";
-		case missile_class::point_to_point_with_hit:
-			return "point_to_point_with_hit";
-		case missile_class::point_to_point_cycle_once:
-			return "point_to_point_cycle_once";
-		case missile_class::point_to_point_bounce:
-			return "point_to_point_bounce";
-		case missile_class::stay:
-			return "stay";
-		case missile_class::cycle_once:
-			return "cycle_once";
-		case missile_class::fire:
-			return "fire";
-		case missile_class::hit:
-			return "hit";
-		case missile_class::parabolic:
-			return "parabolic";
-		case missile_class::land_mine:
-			return "land_mine";
-		case missile_class::whirlwind:
-			return "whirlwind";
-		case missile_class::flame_shield:
-			return "flame_shield";
-		case missile_class::death_coil:
-			return "death_coil";
-		case missile_class::tracer:
-			return "tracer";
-		case missile_class::clip_to_target:
-			return "clip_to_target";
-		case missile_class::continuous:
-			return "continuous";
-		case missile_class::straight_fly:
-			return "straight_fly";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid missile class: \"" + std::to_string(static_cast<int>(missile_class)) + "\".");
-}
+extern template class enum_converter<missile_class>;
 
 }
 

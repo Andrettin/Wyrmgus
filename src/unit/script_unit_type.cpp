@@ -1039,7 +1039,7 @@ int CclDefineUnitType(lua_State *l)
 			type->OnInit = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "Domain")) {
 			value = LuaToString(l, -1);
-			type->domain = string_to_unit_domain(value);
+			type->domain = enum_converter<unit_domain>::to_enum(value);
 		} else if (!strcmp(value, "MissileOffsets")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2008,7 +2008,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->DefaultStat.Variables[PRIORITY_INDEX].Value);
 		return 1;
 	} else if (!strcmp(data, "Domain")) {
-		lua_pushstring(l, unit_domain_to_string(type->get_domain()).c_str());
+		lua_pushstring(l, enum_converter<unit_domain>::to_string(type->get_domain()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Corpse")) {
 		if (type->get_corpse_type() != nullptr) {

@@ -773,7 +773,7 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "Identified")) {
 			condition->Identified = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "UnitDomain")) {
-			condition->unit_domain = string_to_unit_domain(LuaToString(l, -1));
+			condition->unit_domain = enum_converter<unit_domain>::to_enum(LuaToString(l, -1));
 		} else if (!strcmp(key, "UnitTypeClass")) {
 			condition->unit_class = unit_class::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "ItemClass")) {

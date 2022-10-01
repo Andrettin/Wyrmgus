@@ -339,7 +339,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				CUnit *goal = mf->UnitCache.find(unit_finder);
 				if (!goal) {
 					//shouldn't happen, mask says there is something on this tile
-					throw std::runtime_error("Error in CostMoveToCallBack_Default: tile " + point::to_string(CMap::get()->get_index_pos(index, z)) + " says there is something impassable in its mask (" + std::to_string(enumeration::to_underlying(flags)) + "), but no appropriate unit could be found on the tile for domain \"" + unit_domain_to_string(unit.Type->get_domain()) + "\" (unit cache size: " + std::to_string(mf->UnitCache.size()) + ").");
+					throw std::runtime_error("Error in CostMoveToCallBack_Default: tile " + point::to_string(CMap::get()->get_index_pos(index, z)) + " says there is something impassable in its mask (" + std::to_string(enumeration::to_underlying(flags)) + "), but no appropriate unit could be found on the tile for domain \"" + enum_converter<unit_domain>::to_string(unit.Type->get_domain()) + "\" (unit cache size: " + std::to_string(mf->UnitCache.size()) + ").");
 				}
 
 				//Wyrmgus start

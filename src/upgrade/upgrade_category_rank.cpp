@@ -24,23 +24,22 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "upgrade/upgrade_category_rank.h"
 
 namespace wyrmgus {
 
-enum class upgrade_category_rank {
-	none,
-	subcategory,
-	category,
-	supercategory,
+template class enum_converter<upgrade_category_rank>;
 
-	count
+const std::string enum_converter<upgrade_category_rank>::property_class_identifier = "wyrmgus::upgrade_category_rank";
+
+const std::map<std::string, upgrade_category_rank> enum_converter<upgrade_category_rank>::string_to_enum_map = {
+	{ "subcategory", upgrade_category_rank::subcategory },
+	{ "category", upgrade_category_rank::category },
+	{ "supercategory", upgrade_category_rank::supercategory }
 };
 
-extern template class enum_converter<upgrade_category_rank>;
+const bool enum_converter<upgrade_category_rank>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::upgrade_category_rank)

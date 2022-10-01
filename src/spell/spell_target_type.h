@@ -8,8 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 1999-2022 by Vladi Belperchinov-Shabanski,
-//                                 Joris Dauphin, Jimmy Salmon and Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class spell_target_type {
@@ -35,34 +36,7 @@ enum class spell_target_type {
 	unit
 };
 
-inline spell_target_type string_to_spell_target_type(const std::string &str)
-{
-	if (str == "self") {
-		return spell_target_type::self;
-	} else if (str == "position") {
-		return spell_target_type::position;
-	} else if (str == "unit") {
-		return spell_target_type::unit;
-	}
-
-	throw std::runtime_error("Invalid spell target type: \"" + str + "\".");
-}
-
-inline std::string spell_target_type_to_string(const spell_target_type tier)
-{
-	switch (tier) {
-		case spell_target_type::self:
-			return "self";
-		case spell_target_type::position:
-			return "position";
-		case spell_target_type::unit:
-			return "unit";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid spell target type: \"" + std::to_string(static_cast<int>(tier)) + "\".");
-}
+extern template class enum_converter<spell_target_type>;
 
 }
 

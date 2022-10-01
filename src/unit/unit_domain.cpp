@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2021-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,23 +24,24 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "unit/unit_domain.h"
 
 namespace wyrmgus {
 
-enum class upgrade_category_rank {
-	none,
-	subcategory,
-	category,
-	supercategory,
+template class enum_converter<unit_domain>;
 
-	count
+const std::string enum_converter<unit_domain>::property_class_identifier = "wyrmgus::unit_domain";
+
+const std::map<std::string, unit_domain> enum_converter<unit_domain>::string_to_enum_map = {
+	{ "land", unit_domain::land },
+	{ "water", unit_domain::water },
+	{ "air", unit_domain::air },
+	{ "air_low", unit_domain::air_low },
+	{ "space", unit_domain::space }
 };
 
-extern template class enum_converter<upgrade_category_rank>;
+const bool enum_converter<unit_domain>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::upgrade_category_rank)

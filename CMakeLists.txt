@@ -259,6 +259,7 @@ source_group(map FILES ${map_SRCS})
 
 set(missile_SRCS
 	src/missile/missile.cpp
+	src/missile/missile_class.cpp
 	src/missile/missile_cliptotarget.cpp
 	src/missile/missile_continuous.cpp
 	src/missile/missile_cycleonce.cpp
@@ -442,6 +443,7 @@ set(spell_SRCS
 	src/spell/spell_polymorph.cpp
 	src/spell/spell_retrain.cpp
 	src/spell/spell_spawnportal.cpp
+	src/spell/spell_target_type.cpp
 	src/spell/spell_teleport.cpp
 )
 source_group(spell FILES ${spell_SRCS})
@@ -533,6 +535,7 @@ set(unit_SRCS
 	src/unit/unit.cpp
 	src/unit/unit_class.cpp
 	src/unit/unit_class_container.cpp
+	src/unit/unit_domain.cpp
 	src/unit/unit_draw.cpp
 	src/unit/unit_find.cpp
 	src/unit/unit_list_model.cpp
@@ -555,6 +558,7 @@ source_group(unit\\build_restriction FILES ${unit_build_restriction_SRCS})
 set(upgrade_SRCS
 	src/upgrade/upgrade.cpp
 	src/upgrade/upgrade_category.cpp
+	src/upgrade/upgrade_category_rank.cpp
 	src/upgrade/upgrade_class.cpp
 	src/upgrade/upgrade_container.cpp
 	src/upgrade/upgrade_modifier.cpp

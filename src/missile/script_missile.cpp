@@ -79,7 +79,7 @@ void missile_type::Load(lua_State *l)
 			this->ChangeMax = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Class")) {
 			const char *class_name = LuaToString(l, -1);
-			this->missile_class = string_to_missile_class(class_name);
+			this->missile_class = enum_converter<wyrmgus::missile_class>::to_enum(class_name);
 		} else if (!strcmp(value, "NumBounces")) {
 			this->NumBounces = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxBounceSize")) {
