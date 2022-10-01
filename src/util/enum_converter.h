@@ -39,7 +39,13 @@ public:
 	{
 		static const bool initialized = enum_converter::initialize_enum_to_string_map();
 
-		throw std::runtime_error("Invalid enum value: \"" + std::to_string(static_cast<std::underlying_type_t<enum_type>>(enum_value)) + "\".");
+		const auto find_iterator = enum_converter::enum_to_string_map.find(enum_value);
+
+		if (find_iterator != enum_converter::enum_to_string_map.end()) {
+			return find_iterator->second;
+		}
+
+		throw std::runtime_error("Invalid enum value: " + std::to_string(static_cast<std::underlying_type_t<enum_type>>(enum_value)) + ".");
 	}
 
 private:
