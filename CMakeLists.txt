@@ -552,6 +552,7 @@ set(upgrade_SRCS
 source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
+	src/util/enum_converter.cpp
 	src/util/image_util.cpp
 	src/util/util.cpp
 )
@@ -1176,6 +1177,7 @@ set(wyrmgus_upgrade_HDRS
 
 set(wyrmgus_util_HDRS
 	src/util/colorization_type.h
+	src/util/enum_converter.h
 	src/util/image_util.h
 	src/util/util.h
 )
