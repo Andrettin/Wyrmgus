@@ -621,7 +621,7 @@ void civilization::process_character_title_name_scope(const character_title titl
 	scope.for_each_property([&](const gsml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
-		const wyrmgus::government_type government_type = string_to_government_type(key);
+		const wyrmgus::government_type government_type = enum_converter<wyrmgus::government_type>::to_enum(key);
 		character_title_names[title_type][faction_type][government_type][faction_tier::none][gender::none] = value;
 	});
 }

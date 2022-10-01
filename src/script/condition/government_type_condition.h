@@ -37,7 +37,7 @@ public:
 	explicit government_type_condition(const std::string &value, const gsml_operator condition_operator)
 		: condition(condition_operator)
 	{
-		this->government_type = string_to_government_type(value);
+		this->government_type = enum_converter<wyrmgus::government_type>::to_enum(value);
 	}
 
 	virtual const std::string &get_class_identifier() const override

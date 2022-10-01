@@ -319,11 +319,14 @@ set(player_SRCS
 	src/player/civilization.cpp
 	src/player/civilization_base.cpp
 	src/player/civilization_group.cpp
+	src/player/civilization_group_rank.cpp
 	src/player/civilization_history.cpp
 	src/player/dynasty.cpp
 	src/player/faction.cpp
 	src/player/faction_history.cpp
+	src/player/faction_tier.cpp
 	src/player/faction_type.cpp
+	src/player/government_type.cpp
 	src/player/player.cpp
 	src/player/player_color.cpp
 	src/player/player_container.cpp

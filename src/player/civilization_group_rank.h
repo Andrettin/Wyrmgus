@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class civilization_group_rank {
@@ -35,34 +37,7 @@ enum class civilization_group_rank {
 	supergroup
 };
 
-inline civilization_group_rank string_to_civilization_group_rank(const std::string &str)
-{
-	if (str == "subgroup") {
-		return civilization_group_rank::subgroup;
-	} else if (str == "group") {
-		return civilization_group_rank::group;
-	} else if (str == "supergroup") {
-		return civilization_group_rank::supergroup;
-	}
-
-	throw std::runtime_error("Invalid civilization group rank: \"" + str + "\".");
-}
-
-inline std::string civilization_group_rank_to_string(const civilization_group_rank rank)
-{
-	switch (rank) {
-		case civilization_group_rank::subgroup:
-			return "subgroup";
-		case civilization_group_rank::group:
-			return "group";
-		case civilization_group_rank::supergroup:
-			return "supergroup";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid civilization group rank: \"" + std::to_string(static_cast<int>(rank)) + "\".");
-}
+extern template class enum_converter<civilization_group_rank>;
 
 }
 

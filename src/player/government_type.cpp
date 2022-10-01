@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2015-2022 by Andrettin
+//      (c) Copyright 2020-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,56 +24,22 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "player/government_type.h"
 
 namespace wyrmgus {
 
-enum class faction_tier {
-	none,
-	barony,
-	viscounty,
-	county,
-	marquisate,
-	duchy,
-	grand_duchy,
-	kingdom,
-	empire,
-	
-	count
+template class enum_converter<government_type>;
+
+const std::string enum_converter<government_type>::property_class_identifier = "wyrmgus::government_type";
+
+const std::map<std::string, government_type> enum_converter<government_type>::string_to_enum_map = {
+	{ "none", government_type::none },
+	{ "tribe", government_type::tribe },
+	{ "monarchy", government_type::monarchy },
+	{ "republic", government_type::republic },
+	{ "theocracy", government_type::theocracy }
 };
 
-extern template class enum_converter<faction_tier>;
-
-inline std::string get_faction_tier_name(const faction_tier tier)
-{
-	switch (tier) {
-		case faction_tier::none:
-			return "None";
-		case faction_tier::barony:
-			return "Barony";
-		case faction_tier::viscounty:
-			return "Viscounty";
-		case faction_tier::county:
-			return "County";
-		case faction_tier::marquisate:
-			return "Marquisate";
-		case faction_tier::duchy:
-			return "Duchy";
-		case faction_tier::grand_duchy:
-			return "Grand Duchy";
-		case faction_tier::kingdom:
-			return "Kingdom";
-		case faction_tier::empire:
-			return "Empire";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid faction tier: \"" + std::to_string(static_cast<int>(tier)) + "\".");
 }
-
-}
-
-Q_DECLARE_METATYPE(wyrmgus::faction_tier)

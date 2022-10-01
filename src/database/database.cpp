@@ -119,6 +119,7 @@
 #include "upgrade/upgrade_category_rank.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/assert_util.h"
 #include "util/colorization_type.h"
 #include "util/geocoordinate.h"
 #include "util/path_util.h"
@@ -276,8 +277,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(std::filesystem::path(property.get_value()));
 		} else if (property_class_name == "archimedes::centesimal_int") {
 			new_property_value = QVariant::fromValue(centesimal_int(property.get_value()));
-		} else if (property_class_name == "wyrmgus::civilization_group_rank") {
-			new_property_value = QVariant::fromValue(string_to_civilization_group_rank(property.get_value()));
 		} else if (property_class_name == "wyrmgus::colorization_type") {
 			new_property_value = QVariant::fromValue(string_to_colorization_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::cursor_type") {
@@ -290,12 +289,8 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(string_to_difficulty(property.get_value()));
 		} else if (property_class_name == "wyrmgus::ecological_niche") {
 			new_property_value = QVariant::fromValue(string_to_ecological_niche(property.get_value()));
-		} else if (property_class_name == "wyrmgus::faction_tier") {
-			new_property_value = QVariant::fromValue(string_to_faction_tier(property.get_value()));
 		} else if (property_class_name == "wyrmgus::geological_era") {
 			new_property_value = QVariant::fromValue(string_to_geological_era(property.get_value()));
-		} else if (property_class_name == "wyrmgus::government_type") {
-			new_property_value = QVariant::fromValue(string_to_government_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::grammatical_gender") {
 			new_property_value = QVariant::fromValue(string_to_grammatical_gender(property.get_value()));
 		} else if (property_class_name == "wyrmgus::hotkey_setup") {
@@ -861,6 +856,13 @@ std::vector<std::pair<std::filesystem::path, const data_module *>> database::get
 	}
 
 	return module_paths;
+}
+
+void database::register_string_to_qvariant_conversion(const std::string &class_name, std::function<QVariant(const std::string &)> &&function)
+{
+	assert_throw(!this->string_to_qvariant_conversion_map.contains(class_name));
+
+	this->string_to_qvariant_conversion_map[class_name] = std::move(function);
 }
 
 }

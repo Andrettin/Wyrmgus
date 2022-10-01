@@ -39,7 +39,7 @@ public:
 	explicit faction_tier_condition(const std::string &value, const gsml_operator condition_operator)
 		: condition(condition_operator)
 	{
-		this->tier = string_to_faction_tier(value);
+		this->tier = enum_converter<faction_tier>::to_enum(value);
 	}
 
 	virtual const std::string &get_class_identifier() const override

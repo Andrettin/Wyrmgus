@@ -373,10 +373,7 @@ public:
 		this->current_module = data_module;
 	}
 
-	void register_string_to_qvariant_conversion(const std::string &class_name, std::function<QVariant(const std::string &)> &&function)
-	{
-		this->string_to_qvariant_conversion_map[class_name] = std::move(function);
-	}
+	void register_string_to_qvariant_conversion(const std::string &class_name, std::function<QVariant(const std::string &)> &&function);
 
 private:
 	std::filesystem::path root_path = std::filesystem::current_path();

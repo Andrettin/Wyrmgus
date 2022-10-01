@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class government_type {
@@ -36,42 +38,7 @@ enum class government_type {
 	theocracy
 };
 
-inline government_type string_to_government_type(const std::string &str)
-{
-	if (str == "none") {
-		return government_type::none;
-	} else if (str == "tribe") {
-		return government_type::tribe;
-	} else if (str == "monarchy") {
-		return government_type::monarchy;
-	} else if (str == "republic") {
-		return government_type::republic;
-	} else if (str == "theocracy") {
-		return government_type::theocracy;
-	}
-
-	throw std::runtime_error("Invalid government type: \"" + str + "\".");
-}
-
-inline std::string government_type_to_string(const government_type government_type)
-{
-	switch (government_type) {
-		case government_type::none:
-			return "none";
-		case government_type::tribe:
-			return "tribe";
-		case government_type::monarchy:
-			return "monarchy";
-		case government_type::republic:
-			return "republic";
-		case government_type::theocracy:
-			return "theocracy";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid government type: \"" + std::to_string(static_cast<int>(government_type)) + "\".");
-}
+extern template class enum_converter<government_type>;
 
 inline std::string get_government_type_name(const government_type government_type)
 {

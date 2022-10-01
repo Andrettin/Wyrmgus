@@ -607,14 +607,17 @@ void CPlayer::Save(CFile &file) const
 	file.printf("Player(%d,\n", this->get_index());
 	//Wyrmgus start
 	file.printf(" \"civilization\", \"%s\",", p.get_civilization()->get_identifier().c_str());
+
 	if (p.get_faction() != nullptr) {
 		file.printf(" \"faction\", \"%s\",", p.get_faction()->get_identifier().c_str());
 	}
+
 	if (p.get_faction_tier() != faction_tier::none) {
-		file.printf(" \"faction-tier\", \"%s\",", faction_tier_to_string(this->get_faction_tier()).c_str());
+		file.printf(" \"faction-tier\", \"%s\",", enum_converter<wyrmgus::faction_tier>::to_string(this->get_faction_tier()).c_str());
 	}
+
 	if (p.get_government_type() != government_type::none) {
-		file.printf(" \"government-type\", \"%s\",", government_type_to_string(this->get_government_type()).c_str());
+		file.printf(" \"government-type\", \"%s\",", enum_converter<wyrmgus::government_type>::to_string(this->get_government_type()).c_str());
 	}
 	if (p.get_dynasty() != nullptr) {
 		file.printf(" \"dynasty\", \"%s\",", p.get_dynasty()->get_identifier().c_str());

@@ -151,9 +151,9 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "faction")) {
 			this->faction = faction::get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "faction-tier")) {
-			this->faction_tier = string_to_faction_tier(LuaToString(l, j + 1));
+			this->faction_tier = enum_converter<wyrmgus::faction_tier>::to_enum(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "government-type")) {
-			this->government_type = string_to_government_type(LuaToString(l, j + 1));
+			this->government_type = enum_converter<wyrmgus::government_type>::to_enum(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "dynasty")) {
 			this->dynasty = dynasty::get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "age")) {
@@ -921,9 +921,9 @@ int CclDefineCivilization(lua_State *l)
 				++k;
 				const wyrmgus::gender gender = enum_converter<wyrmgus::gender>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
-				const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(LuaToString(l, -1, k + 1));
+				const wyrmgus::government_type government_type = enum_converter<wyrmgus::government_type>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
-				const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(LuaToString(l, -1, k + 1));
+				const wyrmgus::faction_tier tier = enum_converter<faction_tier>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
 				civilization->character_title_names[title][wyrmgus::faction_type::none][government_type][tier][gender] = LuaToString(l, -1, k + 1);
 			}
@@ -1439,11 +1439,11 @@ int CclDefineFaction(lua_State *l)
 			faction->color = wyrmgus::player_color::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultTier")) {
 			std::string faction_tier_name = LuaToString(l, -1);
-			const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(faction_tier_name);
+			const wyrmgus::faction_tier tier = enum_converter<faction_tier>::to_enum(faction_tier_name);
 			faction->default_tier = tier;
 		} else if (!strcmp(value, "DefaultGovernmentType")) {
 			std::string government_type_name = LuaToString(l, -1);
-			const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(government_type_name);
+			const wyrmgus::government_type government_type = enum_converter<wyrmgus::government_type>::to_enum(government_type_name);
 			faction->default_government_type = government_type;
 		} else if (!strcmp(value, "DefaultAI")) {
 			faction->default_ai = LuaToString(l, -1);
@@ -1464,9 +1464,9 @@ int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(LuaToString(l, -1, k + 1));
+				const wyrmgus::government_type government_type = enum_converter<wyrmgus::government_type>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
-				const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(LuaToString(l, -1, k + 1));
+				const wyrmgus::faction_tier tier = enum_converter<faction_tier>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
 				faction->title_names[government_type][tier] = LuaToString(l, -1, k + 1);
 			}
@@ -1480,9 +1480,9 @@ int CclDefineFaction(lua_State *l)
 				++k;
 				const wyrmgus::gender gender = enum_converter<wyrmgus::gender>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
-				const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(LuaToString(l, -1, k + 1));
+				const wyrmgus::government_type government_type = enum_converter<wyrmgus::government_type>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
-				const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(LuaToString(l, -1, k + 1));
+				const wyrmgus::faction_tier tier = enum_converter<faction_tier>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
 				faction->character_title_names[title][government_type][tier][gender] = LuaToString(l, -1, k + 1);
 			}
@@ -1610,7 +1610,7 @@ int CclDefineFaction(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string faction_tier_name = LuaToString(l, -1, j + 1);
-				const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(faction_tier_name);
+				const wyrmgus::faction_tier tier = enum_converter<faction_tier>::to_enum(faction_tier_name);
 				if (tier == wyrmgus::faction_tier::none) {
 					LuaError(l, "Faction tier \"%s\" doesn't exist." _C_ faction_tier_name.c_str());
 				}
@@ -1625,7 +1625,7 @@ int CclDefineFaction(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string government_type_name = LuaToString(l, -1, j + 1);
-				const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(government_type_name);
+				const wyrmgus::government_type government_type = enum_converter<wyrmgus::government_type>::to_enum(government_type_name);
 				faction->HistoricalGovernmentTypes[year] = government_type;
 			}
 		} else if (!strcmp(value, "HistoricalDiplomacyStates")) {
