@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class gender {
@@ -36,47 +38,7 @@ enum class gender {
 	count
 };
 
-inline gender try_string_to_gender(const std::string &str)
-{
-	if (str == "none") {
-		return gender::none;
-	} else if (str == "male") {
-		return gender::male;
-	} else if (str == "female") {
-		return gender::female;
-	}
-
-	return gender::none;
-}
-
-inline gender string_to_gender(const std::string &str)
-{
-	if (str == "none") {
-		return gender::none;
-	} else if (str == "male") {
-		return gender::male;
-	} else if (str == "female") {
-		return gender::female;
-	}
-
-	throw std::runtime_error("Invalid gender: \"" + str + "\".");
-}
-
-inline std::string gender_to_string(const gender gender)
-{
-	switch (gender) {
-		case gender::none:
-			return "none";
-		case gender::male:
-			return "male";
-		case gender::female:
-			return "female";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid gender: \"" + std::to_string(static_cast<int>(gender)) + "\".");
-}
+extern template class enum_converter<gender>;
 
 inline std::string get_gender_personal_pronoun(const gender gender)
 {

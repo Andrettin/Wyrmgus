@@ -444,6 +444,7 @@ set(wyrmgus_base_SRCS
 	src/stratagus/age.cpp
 	src/stratagus/character.cpp
 	src/stratagus/character_history.cpp
+	src/stratagus/character_title.cpp
 	src/stratagus/config.cpp
 	src/stratagus/currency.cpp
 	src/stratagus/dialogue.cpp
@@ -453,6 +454,7 @@ set(wyrmgus_base_SRCS
 	src/stratagus/engine_interface.cpp
 	src/stratagus/epithet.cpp
 	src/stratagus/fallback_name_generator.cpp
+	src/stratagus/gender.cpp
 	src/stratagus/gendered_name_generator.cpp
 	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp

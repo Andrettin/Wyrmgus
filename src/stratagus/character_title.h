@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class character_title {
@@ -37,38 +39,7 @@ enum class character_title {
 	treasurer
 };
 
-inline character_title string_to_character_title(const std::string &str)
-{
-	if (str == "ruler") {
-		return character_title::ruler;
-	} else if (str == "chancellor") {
-		return character_title::chancellor;
-	} else if (str == "marshal") {
-		return character_title::marshal;
-	} else if (str == "treasurer") {
-		return character_title::treasurer;
-	}
-
-	throw std::runtime_error("Invalid character title: \"" + str + "\".");
-}
-
-inline std::string character_title_to_string(const character_title tier)
-{
-	switch (tier) {
-		case character_title::ruler:
-			return "ruler";
-		case character_title::chancellor:
-			return "chancellor";
-		case character_title::marshal:
-			return "marshal";
-		case character_title::treasurer:
-			return "treasurer";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid character title: \"" + std::to_string(static_cast<int>(tier)) + "\".");
-}
+extern template class enum_converter<character_title>;
 
 }
 

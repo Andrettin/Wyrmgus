@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2022 by Andrettin
+//      (c) Copyright 2015-2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,23 +26,19 @@
 
 #include "stratagus.h"
 
-#include "player/faction_type.h"
+#include "character_title.h"
 
 namespace wyrmgus {
 
-template class enum_converter<faction_type>;
+template class enum_converter<character_title>;
 
-const std::string enum_converter<faction_type>::property_class_identifier = "wyrmgus::faction_type";
+const std::string enum_converter<character_title>::property_class_identifier = "wyrmgus::character_title";
 
-const std::map<std::string, faction_type> enum_converter<faction_type>::string_to_enum_map = {
-	{ "none", faction_type::none },
-	{ "tribe", faction_type::tribe },
-	{ "polity", faction_type::polity },
-	{ "minor_tribe", faction_type::minor_tribe },
-	{ "notable_house", faction_type::notable_house },
-	{ "mercenary_company", faction_type::mercenary_company },
-	{ "holy_order", faction_type::holy_order },
-	{ "trading_company", faction_type::trading_company }
+const std::map<std::string, character_title> enum_converter<character_title>::string_to_enum_map = {
+	{ "ruler", character_title::ruler },
+	{ "chancellor", character_title::chancellor },
+	{ "marshal", character_title::marshal },
+	{ "treasurer", character_title::treasurer }
 };
 
 }

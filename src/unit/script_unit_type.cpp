@@ -1438,7 +1438,7 @@ int CclDefineUnitType(lua_State *l)
 			type->set_quote(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
 			type->DefaultStat.Variables[GENDER_INDEX].Enable = 1;
-			type->DefaultStat.Variables[GENDER_INDEX].Value = static_cast<int>(wyrmgus::string_to_gender(LuaToString(l, -1)));
+			type->DefaultStat.Variables[GENDER_INDEX].Value = static_cast<int>(enum_converter<gender>::to_enum(LuaToString(l, -1)));
 			type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
 		} else if (!strcmp(value, "Background")) {
 			type->set_background(LuaToString(l, -1));

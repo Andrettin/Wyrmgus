@@ -671,7 +671,7 @@ void CGrandStrategyFaction::SetMinister(const wyrmgus::character_title title, st
 				}
 			}
 		} else {
-			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), character_title_to_string(title).c_str(), this->get_full_name().c_str());
+			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), enum_converter<character_title>::to_string(title).c_str(), this->get_full_name().c_str());
 		}
 		
 		if (this == GrandStrategyGame.PlayerFaction) {
@@ -1338,7 +1338,7 @@ void SetFactionMinister(std::string civilization_name, std::string faction_name,
 	if (civilization) {
 		faction = wyrmgus::faction::get(faction_name)->ID;
 	}
-	const wyrmgus::character_title title = string_to_character_title(title_name);
+	const wyrmgus::character_title title = enum_converter<character_title>::to_enum(title_name);
 	
 	if (faction == -1 || title == wyrmgus::character_title::none) {
 		return;
@@ -1354,7 +1354,7 @@ std::string GetFactionMinister(std::string civilization_name, std::string factio
 	if (civilization) {
 		faction = wyrmgus::faction::get(faction_name)->ID;
 	}
-	const wyrmgus::character_title title = string_to_character_title(title_name);
+	const wyrmgus::character_title title = enum_converter<character_title>::to_enum(title_name);
 	
 	if (faction == -1 || title == wyrmgus::character_title::none) {
 		return "";

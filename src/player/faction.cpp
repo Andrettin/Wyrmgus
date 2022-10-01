@@ -114,7 +114,7 @@ void faction::process_title_name_scope(title_name_map &title_names, const gsml_d
 void faction::process_character_title_name_scope(character_title_name_map &character_title_names, const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const character_title title_type = string_to_character_title(tag);
+	const character_title title_type = enum_converter<character_title>::to_enum(tag);
 
 	scope.for_each_child([&](const gsml_data &child_scope) {
 		faction::process_character_title_name_scope(character_title_names[title_type], child_scope);
@@ -146,7 +146,7 @@ void faction::process_character_title_name_scope(std::map<faction_tier, std::map
 	scope.for_each_property([&](const gsml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
-		const gender gender = string_to_gender(key);
+		const gender gender = enum_converter<wyrmgus::gender>::to_enum(key);
 		character_title_names[faction_tier][gender] = value;
 	});
 }
@@ -223,7 +223,7 @@ void faction::process_gsml_scope(const gsml_data &scope)
 		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
-			const character_title title_type = string_to_character_title(key);
+			const character_title title_type = enum_converter<character_title>::to_enum(key);
 			character_title_names[title_type][government_type::none][faction_tier::none][gender::none] = value;
 		});
 

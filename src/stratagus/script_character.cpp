@@ -140,7 +140,7 @@ int CclDefineCharacter(lua_State *l)
 				character->add_child(child);
 			}
 		} else if (!strcmp(value, "Gender")) {
-			character->gender = wyrmgus::string_to_gender(LuaToString(l, -1));
+			character->gender = enum_converter<gender>::to_enum(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
 			character->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "HeroicIcon")) {
@@ -366,7 +366,7 @@ int CclDefineCharacter(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const wyrmgus::character_title title = string_to_character_title(LuaToString(l, -1, j + 1));
+				const wyrmgus::character_title title = enum_converter<character_title>::to_enum(LuaToString(l, -1, j + 1));
 				if (title == wyrmgus::character_title::none) {
 					LuaError(l, "Character title doesn't exist.");
 				}
@@ -457,7 +457,7 @@ int CclDefineCustomHero(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			hero->civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
-			hero->gender = wyrmgus::string_to_gender(LuaToString(l, -1));
+			hero->gender = enum_converter<gender>::to_enum(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {
 			hero->level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
@@ -711,7 +711,7 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushnumber(l, character->DeathDate.Year);
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, wyrmgus::gender_to_string(character->get_gender()).c_str());
+		lua_pushstring(l, enum_converter<gender>::to_string(character->get_gender()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Level")) {
 		lua_pushnumber(l, character->get_level());
@@ -819,7 +819,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, wyrmgus::gender_to_string(character->get_gender()).c_str());
+		lua_pushstring(l, enum_converter<gender>::to_string(character->get_gender()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Level")) {
 		lua_pushnumber(l, character->get_level());

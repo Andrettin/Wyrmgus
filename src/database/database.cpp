@@ -276,8 +276,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(std::filesystem::path(property.get_value()));
 		} else if (property_class_name == "archimedes::centesimal_int") {
 			new_property_value = QVariant::fromValue(centesimal_int(property.get_value()));
-		} else if (property_class_name == "wyrmgus::character_title") {
-			new_property_value = QVariant::fromValue(string_to_character_title(property.get_value()));
 		} else if (property_class_name == "wyrmgus::civilization_group_rank") {
 			new_property_value = QVariant::fromValue(string_to_civilization_group_rank(property.get_value()));
 		} else if (property_class_name == "wyrmgus::colorization_type") {
@@ -294,8 +292,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(string_to_ecological_niche(property.get_value()));
 		} else if (property_class_name == "wyrmgus::faction_tier") {
 			new_property_value = QVariant::fromValue(string_to_faction_tier(property.get_value()));
-		} else if (property_class_name == "wyrmgus::gender") {
-			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
 		} else if (property_class_name == "wyrmgus::geological_era") {
 			new_property_value = QVariant::fromValue(string_to_geological_era(property.get_value()));
 		} else if (property_class_name == "wyrmgus::government_type") {

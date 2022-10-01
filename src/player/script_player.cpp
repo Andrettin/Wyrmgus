@@ -882,8 +882,7 @@ int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "PersonalNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				wyrmgus::gender gender = wyrmgus::gender::none;
-				gender = wyrmgus::try_string_to_gender(LuaToString(l, -1, j + 1));
+				const gender gender = enum_converter<wyrmgus::gender>::to_enum(LuaToString(l, -1, j + 1));
 				if (gender != wyrmgus::gender::none) {
 					++j;
 				}
@@ -918,9 +917,9 @@ int CclDefineCivilization(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				const wyrmgus::character_title title = string_to_character_title(LuaToString(l, -1, k + 1));
+				const wyrmgus::character_title title = enum_converter<character_title>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
-				const wyrmgus::gender gender = wyrmgus::string_to_gender(LuaToString(l, -1, k + 1));
+				const wyrmgus::gender gender = enum_converter<wyrmgus::gender>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
 				const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(LuaToString(l, -1, k + 1));
 				++k;
@@ -1477,9 +1476,9 @@ int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				const wyrmgus::character_title title = string_to_character_title(LuaToString(l, -1, k + 1));
+				const wyrmgus::character_title title = enum_converter<character_title>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
-				const wyrmgus::gender gender = wyrmgus::string_to_gender(LuaToString(l, -1, k + 1));
+				const wyrmgus::gender gender = enum_converter<wyrmgus::gender>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
 				const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(LuaToString(l, -1, k + 1));
 				++k;
@@ -1764,7 +1763,7 @@ int CclDefineDeity(lua_State *l)
 		} else if (!strcmp(value, "Pantheon")) {
 			deity->pantheon = wyrmgus::pantheon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
-			deity->set_gender(wyrmgus::string_to_gender(LuaToString(l, -1)));
+			deity->set_gender(enum_converter<gender>::to_enum(LuaToString(l, -1)));
 		} else if (!strcmp(value, "Major")) {
 			deity->major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Description")) {
@@ -2398,8 +2397,8 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 4);
 		std::string title_type_ident = LuaToString(l, 3);
 		std::string gender_ident = LuaToString(l, 4);
-		const wyrmgus::character_title title_type_id = string_to_character_title(title_type_ident);
-		const wyrmgus::gender gender = wyrmgus::string_to_gender(gender_ident);
+		const character_title title_type_id = enum_converter<character_title>::to_enum(title_type_ident);
+		const gender gender = enum_converter<wyrmgus::gender>::to_enum(gender_ident);
 		
 		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender).data());
 		return 1;
@@ -2869,7 +2868,7 @@ static int CclGetDeityData(lua_State *l)
 		
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, wyrmgus::gender_to_string(deity->get_gender()).c_str());
+		lua_pushstring(l, enum_converter<gender>::to_string(deity->get_gender()).c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

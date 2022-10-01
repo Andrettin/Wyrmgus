@@ -328,7 +328,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				this->unit_type = unit_type;
 			}
 		} else if (key == "gender") {
-			this->gender = wyrmgus::string_to_gender(value);
+			this->gender = enum_converter<wyrmgus::gender>::to_enum(value);
 		} else if (key == "civilization") {
 			this->civilization = civilization::get(value);
 		} else if (key == "faction") {
@@ -422,7 +422,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "title") {
-					title = string_to_character_title(value);
+					title = enum_converter<character_title>::to_enum(value);
 				} else if (key == "start_date") {
 					value = FindAndReplaceString(value, "_", "-");
 					start_date = CDate::FromString(value);
@@ -863,7 +863,7 @@ void character::save() const
 				fprintf(fd, "\tFamilyName = \"%s\",\n", this->get_surname().c_str());
 			}
 			if (this->get_gender() != gender::none) {
-				fprintf(fd, "\tGender = \"%s\",\n", gender_to_string(this->get_gender()).c_str());
+				fprintf(fd, "\tGender = \"%s\",\n", enum_converter<wyrmgus::gender>::to_string(this->get_gender()).c_str());
 			}
 			if (this->get_civilization()) {
 				fprintf(fd, "\tCivilization = \"%s\",\n", this->get_civilization()->get_identifier().c_str());

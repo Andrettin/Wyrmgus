@@ -602,7 +602,7 @@ std::string_view civilization::get_character_title_name(const character_title ti
 void civilization::process_character_title_name_scope(const gsml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const character_title title_type = string_to_character_title(tag);
+	const character_title title_type = enum_converter<character_title>::to_enum(tag);
 
 	scope.for_each_child([&](const gsml_data &child_scope) {
 		this->process_character_title_name_scope(title_type, child_scope);
