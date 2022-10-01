@@ -40,6 +40,7 @@ class player_color final : public named_data_entry, public data_type<player_colo
 
 public:
 	static constexpr const char *class_identifier = "player_color";
+	static constexpr const char property_class_identifier[] = "wyrmgus::player_color*";
 	static constexpr const char *database_folder = "player_colors";
 
 	explicit player_color(const std::string &identifier) : named_data_entry(identifier)

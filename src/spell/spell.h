@@ -205,6 +205,7 @@ class spell final : public named_data_entry, public data_type<spell>
 
 public:
 	static constexpr const char *class_identifier = "spell";
+	static constexpr const char property_class_identifier[] = "wyrmgus::spell*";
 	static constexpr const char *database_folder = "spells";
 	static constexpr int infinite_range = 0xFFFFFFF;
 

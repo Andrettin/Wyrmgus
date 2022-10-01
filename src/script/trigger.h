@@ -79,6 +79,7 @@ class trigger final : public data_entry, public data_type<trigger>
 
 public:
 	static constexpr const char *class_identifier = "trigger";
+	static constexpr const char property_class_identifier[] = "wyrmgus::trigger*";
 	static constexpr const char *database_folder = "triggers";
 	static constexpr int default_random_weight = 100;
 

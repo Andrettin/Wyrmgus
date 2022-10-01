@@ -41,6 +41,7 @@ class recipe final : public data_entry, public data_type<recipe>
 
 public:
 	static constexpr const char *class_identifier = "recipe";
+	static constexpr const char property_class_identifier[] = "wyrmgus::recipe*";
 	static constexpr const char *database_folder = "recipes";
 
 	explicit recipe(const std::string &identifier) : data_entry(identifier)

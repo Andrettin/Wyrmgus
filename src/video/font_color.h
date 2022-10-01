@@ -39,6 +39,7 @@ class font_color final : public data_entry, public data_type<font_color>
 
 public:
 	static constexpr const char *class_identifier = "font_color";
+	static constexpr const char property_class_identifier[] = "wyrmgus::font_color*";
 	static constexpr const char *database_folder = "font_colors";
 	static constexpr int max_colors = 9;
 

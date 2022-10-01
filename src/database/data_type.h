@@ -47,12 +47,12 @@ template <typename T>
 class data_type : public data_type_base
 {
 public:
-	data_type() {
-		// this check is required for class_initialized variable and,
-		// correspondingly, data_type::initialize_class() call not to
-		// be initialized away
-		if (!class_initialized) {
-			throw std::runtime_error("Never reached");
+	data_type()
+	{
+		//this check is required for class_initialized variable and, correspondingly,
+		//the data_type::initialize_class() call to not to be initialized away
+		if (!data_type::class_initialized) {
+			throw std::runtime_error("Never reached.");
 		}
 	}
 
@@ -344,6 +344,10 @@ private:
 		//initialize the metadata (including database parsing/processing functions) for this data type
 		auto metadata = std::make_unique<data_type_metadata>(T::class_identifier, T::database_dependencies, T::parse_database, T::process_database, T::initialize_all, T::process_all_text, T::check_all, T::clear);
 		database::get()->register_metadata(std::move(metadata));
+
+		database::get()->register_string_to_qvariant_conversion(T::property_class_identifier, [](const std::string &value) {
+			return QVariant::fromValue(T::get(value));
+		});
 
 		return true;
 	}

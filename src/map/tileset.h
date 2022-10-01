@@ -168,6 +168,7 @@ class tileset final : public named_data_entry, public data_type<tileset>
 
 public:
 	static constexpr const char *class_identifier = "tileset";
+	static constexpr const char property_class_identifier[] = "wyrmgus::tileset*";
 	static constexpr const char *database_folder = "tilesets";
 
 	explicit tileset(const std::string &identifier) : named_data_entry(identifier)

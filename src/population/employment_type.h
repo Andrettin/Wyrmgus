@@ -45,6 +45,7 @@ class employment_type final : public named_data_entry, public data_type<employme
 
 public:
 	static constexpr const char *class_identifier = "employment_type";
+	static constexpr const char property_class_identifier[] = "wyrmgus::employment_type*";
 	static constexpr const char *database_folder = "employment_types";
 
 	explicit employment_type(const std::string &identifier) : named_data_entry(identifier)

@@ -39,6 +39,7 @@ class game_concept final : public detailed_data_entry, public data_type<game_con
 
 public:
 	static constexpr const char *class_identifier = "game_concept";
+	static constexpr const char property_class_identifier[] = "wyrmgus::game_concept*";
 	static constexpr const char *database_folder = "game_concepts";
 
 	explicit game_concept(const std::string &identifier) : detailed_data_entry(identifier)

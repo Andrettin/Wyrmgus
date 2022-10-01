@@ -49,7 +49,7 @@ void predefines::load(const std::filesystem::path &data_path)
 
 void predefines::process_gsml_property(const gsml_property &property)
 {
-	database::process_gsml_property_for_object(this, property);
+	database::get()->process_gsml_property_for_object(this, property);
 }
 
 void predefines::process_gsml_scope(const gsml_data &scope)

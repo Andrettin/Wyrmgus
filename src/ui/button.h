@@ -62,6 +62,7 @@ class button final : public data_entry, public data_type<button>
 
 public:
 	static constexpr const char *class_identifier = "button";
+	static constexpr const char property_class_identifier[] = "wyrmgus::button*";
 	static constexpr const char *database_folder = "buttons";
 
 	static void ProcessConfigData(const CConfigData *config_data);

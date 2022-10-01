@@ -56,6 +56,7 @@ class cursor final : public data_entry, public data_type<cursor>
 
 public:
 	static constexpr const char *class_identifier = "cursor";
+	static constexpr const char property_class_identifier[] = "wyrmgus::cursor*";
 	static constexpr const char *database_folder = "cursors";
 
 	static void clear();

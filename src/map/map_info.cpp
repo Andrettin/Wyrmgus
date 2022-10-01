@@ -57,7 +57,7 @@ void map_info::process_gsml_property(const gsml_property &property)
 	if (key == "settings") {
 		this->set_presets(map_presets::get(value));
 	} else {
-		database::process_gsml_property_for_object(this, property);
+		database::get()->process_gsml_property_for_object(this, property);
 	}
 }
 

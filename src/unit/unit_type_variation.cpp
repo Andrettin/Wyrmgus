@@ -78,7 +78,7 @@ void unit_type_variation::process_gsml_property(const gsml_property &property)
 	} else if (key == "resource_max") {
 		this->ResourceMax = std::stoi(value);
 	} else {
-		database::process_gsml_property_for_object(this, property);
+		database::get()->process_gsml_property_for_object(this, property);
 	}
 }
 

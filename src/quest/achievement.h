@@ -63,8 +63,9 @@ class achievement final : public named_data_entry, public data_type<achievement>
 	Q_PROPERTY(wyrmgus::achievement* tree_parent MEMBER tree_parent NOTIFY changed)
 
 public:
-	static constexpr const char *class_identifier = "achievement";
-	static constexpr const char *database_folder = "achievements";
+	static constexpr const char class_identifier[] = "achievement";
+	static constexpr const char property_class_identifier[] = "wyrmgus::achievement*";
+	static constexpr const char database_folder[] = "achievements";
 
 	static std::vector<const achievement *> get_all_visible()
 	{

@@ -71,6 +71,7 @@ class sound final : public data_entry, public data_type<sound>
 
 public:
 	static constexpr const char *class_identifier = "sound";
+	static constexpr const char property_class_identifier[] = "wyrmgus::sound*";
 	static constexpr const char *database_folder = "sounds";
 	static constexpr int max_range = 254;
 	static constexpr int infinite_range = 255; //the range value that makes a sound volume distance independent

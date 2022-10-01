@@ -37,6 +37,7 @@ class player_flag final : public named_data_entry, public data_type<player_flag>
 
 public:
 	static constexpr const char *class_identifier = "player_flag";
+	static constexpr const char property_class_identifier[] = "wyrmgus::player_flag*";
 	static constexpr const char *database_folder = "player_flags";
 
 	explicit player_flag(const std::string &identifier) : named_data_entry(identifier)

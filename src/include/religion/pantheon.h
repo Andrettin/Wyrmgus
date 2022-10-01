@@ -37,6 +37,7 @@ class pantheon final : public detailed_data_entry, public data_type<pantheon>
 
 public:
 	static constexpr const char *class_identifier = "pantheon";
+	static constexpr const char property_class_identifier[] = "wyrmgus::pantheon*";
 	static constexpr const char *database_folder = "pantheons";
 
 	explicit pantheon(const std::string &identifier) : detailed_data_entry(identifier)

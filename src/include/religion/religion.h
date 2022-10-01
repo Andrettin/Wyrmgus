@@ -39,6 +39,7 @@ class religion final : public detailed_data_entry, public data_type<religion>
 
 public:
 	static constexpr const char *class_identifier = "religion";
+	static constexpr const char property_class_identifier[] = "wyrmgus::religion*";
 	static constexpr const char *database_folder = "religions";
 
 	explicit religion(const std::string &identifier) : detailed_data_entry(identifier)

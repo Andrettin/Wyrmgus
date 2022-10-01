@@ -44,6 +44,7 @@ class upgrade_category final : public named_data_entry, public data_type<upgrade
 
 public:
 	static constexpr const char *class_identifier = "upgrade_category";
+	static constexpr const char property_class_identifier[] = "wyrmgus::upgrade_category*";
 	static constexpr const char *database_folder = "upgrade_categories";
 
 	explicit upgrade_category(const std::string &identifier);

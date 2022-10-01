@@ -41,6 +41,7 @@ class season final : public named_data_entry, public data_type<season>
 
 public:
 	static constexpr const char *class_identifier = "season";
+	static constexpr const char property_class_identifier[] = "wyrmgus::season*";
 	static constexpr const char *database_folder = "seasons";
 
 	explicit season(const std::string &identifier) : named_data_entry(identifier)

@@ -57,6 +57,7 @@ class upgrade_class final : public named_data_entry, public data_type<upgrade_cl
 
 public:
 	static constexpr const char *class_identifier = "upgrade_class";
+	static constexpr const char property_class_identifier[] = "wyrmgus::upgrade_class*";
 	static constexpr const char *database_folder = "upgrade_classes";
 
 	static upgrade_class *add(const std::string &identifier, const wyrmgus::data_module *data_module)

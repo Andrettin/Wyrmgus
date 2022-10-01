@@ -45,6 +45,7 @@ class calendar final : public named_data_entry, public data_type<calendar>
 
 public:
 	static constexpr const char *class_identifier = "calendar";
+	static constexpr const char property_class_identifier[] = "wyrmgus::calendar*";
 	static constexpr const char *database_folder = "calendars";
 
 	explicit calendar(const std::string &identifier);

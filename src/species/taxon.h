@@ -50,6 +50,7 @@ class taxon final : public taxon_base, public data_type<taxon>
 
 public:
 	static constexpr const char *class_identifier = "taxon";
+	static constexpr const char property_class_identifier[] = "wyrmgus::taxon*";
 	static constexpr const char *database_folder = "taxons";
 
 	explicit taxon(const std::string &identifier);

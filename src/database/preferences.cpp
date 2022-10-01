@@ -141,7 +141,7 @@ void preferences::process_gsml_property(const gsml_property &property)
 {
 	//use a try-catch for the properties, as the property or its value could no longer exist
 	try {
-		database::process_gsml_property_for_object(this, property);
+		database::get()->process_gsml_property_for_object(this, property);
 	} catch (const std::runtime_error &exception) {
 		exception::report(exception);
 	}

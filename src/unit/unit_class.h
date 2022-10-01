@@ -54,6 +54,7 @@ class unit_class final : public named_data_entry, public data_type<unit_class>
 
 public:
 	static constexpr const char *class_identifier = "unit_class";
+	static constexpr const char property_class_identifier[] = "wyrmgus::unit_class*";
 	static constexpr const char *database_folder = "unit_classes";
 
 	static unit_class *add(const std::string &identifier, const wyrmgus::data_module *data_module)

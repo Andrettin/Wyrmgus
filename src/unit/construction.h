@@ -99,6 +99,7 @@ class construction final : public data_entry, public data_type<construction>
 
 public:
 	static constexpr const char *class_identifier = "construction";
+	static constexpr const char property_class_identifier[] = "wyrmgus::construction*";
 	static constexpr const char *database_folder = "constructions";
 
 	explicit construction(const std::string &identifier) : data_entry(identifier)

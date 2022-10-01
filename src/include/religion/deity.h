@@ -65,6 +65,7 @@ class deity final : public detailed_data_entry, public data_type<deity>
 
 public:
 	static constexpr const char *class_identifier = "deity";
+	static constexpr const char property_class_identifier[] = "wyrmgus::deity*";
 	static constexpr const char *database_folder = "deities";
 	static constexpr int major_deity_domain_max = 3; //major deities can only have up to three domains
 	static constexpr int minor_deity_domain_max = 1; //minor deities can only have one domain

@@ -319,6 +319,7 @@ class missile_type final : public data_entry, public data_type<missile_type>
 
 public:
 	static constexpr const char *class_identifier = "missile_type";
+	static constexpr const char property_class_identifier[] = "wyrmgus::missile_type*";
 	static constexpr const char *database_folder = "missile_types";
 
 	explicit missile_type(const std::string &identifier);

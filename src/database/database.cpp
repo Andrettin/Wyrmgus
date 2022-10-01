@@ -167,7 +167,7 @@ void database::process_gsml_property_for_object(QObject *object, const gsml_prop
 			}
 			return;
 		} else {
-			QVariant new_property_value = database::process_gsml_property_value(property, meta_property, object);
+			QVariant new_property_value = this->process_gsml_property_value(property, meta_property, object);
 			bool success = object->setProperty(property_name, new_property_value);
 			if (!success) {
 				throw std::runtime_error("Failed to set value for property \"" + std::string(property_name) + "\".");
@@ -274,66 +274,28 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(property.get_value());
 		} else if (property_class_name == "std::filesystem::path") {
 			new_property_value = QVariant::fromValue(std::filesystem::path(property.get_value()));
-		} else if (property_class_name == "wyrmgus::achievement*") {
-			new_property_value = QVariant::fromValue(achievement::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::age*") {
-			new_property_value = QVariant::fromValue(age::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::animation_set*") {
-			new_property_value = QVariant::fromValue(animation_set::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::button_level*") {
-			new_property_value = QVariant::fromValue(button_level::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::calendar*") {
-			new_property_value = QVariant::fromValue(calendar::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::campaign*") {
-			new_property_value = QVariant::fromValue(campaign::get(property.get_value()));
 		} else if (property_class_name == "archimedes::centesimal_int") {
 			new_property_value = QVariant::fromValue(centesimal_int(property.get_value()));
-		} else if (property_class_name == "wyrmgus::character*") {
-			new_property_value = QVariant::fromValue(character::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::character_title") {
 			new_property_value = QVariant::fromValue(string_to_character_title(property.get_value()));
-		} else if (property_class_name == "wyrmgus::civilization*") {
-			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::civilization_group*") {
-			new_property_value = QVariant::fromValue(civilization_group::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::civilization_group_rank") {
 			new_property_value = QVariant::fromValue(string_to_civilization_group_rank(property.get_value()));
 		} else if (property_class_name == "wyrmgus::colorization_type") {
 			new_property_value = QVariant::fromValue(string_to_colorization_type(property.get_value()));
-		} else if (property_class_name == "wyrmgus::construction*") {
-			new_property_value = QVariant::fromValue(construction::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::cursor*") {
-			new_property_value = QVariant::fromValue(cursor::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::cursor_type") {
 			new_property_value = QVariant::fromValue(string_to_cursor_type(property.get_value()));
 		} else if (property_class_name == "archimedes::decimal_int") {
 			new_property_value = QVariant::fromValue(decimal_int(property.get_value()));
 		} else if (property_class_name == "archimedes::decimillesimal_int") {
 			new_property_value = QVariant::fromValue(decimillesimal_int(property.get_value()));
-		} else if (property_class_name == "wyrmgus::deity*") {
-			new_property_value = QVariant::fromValue(deity::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::dialogue*") {
-			new_property_value = QVariant::fromValue(dialogue::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::difficulty") {
 			new_property_value = QVariant::fromValue(string_to_difficulty(property.get_value()));
-		} else if (property_class_name == "wyrmgus::dynasty*") {
-			new_property_value = QVariant::fromValue(dynasty::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::ecological_niche") {
 			new_property_value = QVariant::fromValue(string_to_ecological_niche(property.get_value()));
-		} else if (property_class_name == "wyrmgus::employment_type*") {
-			new_property_value = QVariant::fromValue(employment_type::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::epithet*") {
-			new_property_value = QVariant::fromValue(epithet::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::faction*") {
-			new_property_value = QVariant::fromValue(faction::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::faction_tier") {
 			new_property_value = QVariant::fromValue(string_to_faction_tier(property.get_value()));
 		} else if (property_class_name == "wyrmgus::faction_type") {
 			new_property_value = QVariant::fromValue(string_to_faction_type(property.get_value()));
-		} else if (property_class_name == "wyrmgus::font*") {
-			new_property_value = QVariant::fromValue(font::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::font_color*") {
-			new_property_value = QVariant::fromValue(font_color::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::gender") {
 			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
 		} else if (property_class_name == "wyrmgus::geological_era") {
@@ -344,112 +306,39 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(string_to_grammatical_gender(property.get_value()));
 		} else if (property_class_name == "wyrmgus::hotkey_setup") {
 			new_property_value = QVariant::fromValue(string_to_hotkey_setup(property.get_value()));
-		} else if (property_class_name == "wyrmgus::icon*") {
-			new_property_value = QVariant::fromValue(icon::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::interface_style*") {
-			new_property_value = QVariant::fromValue(interface_style::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::item_class") {
 			new_property_value = QVariant::fromValue(string_to_item_class(property.get_value()));
 		} else if (property_class_name == "wyrmgus::item_slot") {
 			new_property_value = QVariant::fromValue(string_to_item_slot(property.get_value()));
-		} else if (property_class_name == "wyrmgus::language*") {
-			new_property_value = QVariant::fromValue(language::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::language_family*") {
-			new_property_value = QVariant::fromValue(language_family::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::magic_domain*") {
-			new_property_value = QVariant::fromValue(magic_domain::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::map_presets*") {
-			new_property_value = QVariant::fromValue(map_presets::get(property.get_value()));
 		} else if (property_class_name == "archimedes::map_projection*") {
 			new_property_value = QVariant::fromValue(map_projection::from_string(property.get_value()));
-		} else if (property_class_name == "wyrmgus::map_template*") {
-			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::missile_class") {
 			new_property_value = QVariant::fromValue(string_to_missile_class(property.get_value()));
-		} else if (property_class_name == "wyrmgus::missile_type*") {
-			new_property_value = QVariant::fromValue(missile_type::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::module*") {
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
 		} else if (property_class_name == "wyrmgus::music_type") {
 			new_property_value = QVariant::fromValue(string_to_music_type(property.get_value()));
-		} else if (property_class_name == "wyrmgus::pantheon*") {
-			new_property_value = QVariant::fromValue(pantheon::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::player_color*") {
-			new_property_value = QVariant::fromValue(player_color::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::population_class*") {
-			new_property_value = QVariant::fromValue(population_class::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::population_type*") {
-			new_property_value = QVariant::fromValue(population_type::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::quest*") {
-			new_property_value = QVariant::fromValue(quest::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::recipe*") {
-			new_property_value = QVariant::fromValue(recipe::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::region*") {
-			new_property_value = QVariant::fromValue(region::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::religion*") {
-			new_property_value = QVariant::fromValue(religion::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::resource*") {
-			new_property_value = QVariant::fromValue(resource::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::resource_icon*") {
-			new_property_value = QVariant::fromValue(resource_icon::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::season_schedule*") {
-			new_property_value = QVariant::fromValue(season_schedule::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::site*") {
-			new_property_value = QVariant::fromValue(site::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::sound*") {
-			new_property_value = QVariant::fromValue(sound::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::species*") {
-			new_property_value = QVariant::fromValue(species::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::spell*") {
-			new_property_value = QVariant::fromValue(spell::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::spell_target_type") {
 			new_property_value = QVariant::fromValue(string_to_spell_target_type(property.get_value()));
-		} else if (property_class_name == "wyrmgus::taxon*") {
-			new_property_value = QVariant::fromValue(taxon::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::taxonomic_rank") {
 			new_property_value = QVariant::fromValue(string_to_taxonomic_rank(property.get_value()));
-		} else if (property_class_name == "wyrmgus::terrain_feature*") {
-			new_property_value = QVariant::fromValue(terrain_feature::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::terrain_type*") {
-			new_property_value = QVariant::fromValue(terrain_type::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::tileset*") {
-			new_property_value = QVariant::fromValue(tileset::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::time_of_day*") {
-			new_property_value = QVariant::fromValue(time_of_day::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::time_of_day_schedule*") {
-			new_property_value = QVariant::fromValue(time_of_day_schedule::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::timeline*") {
-			new_property_value = QVariant::fromValue(timeline::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::trigger_random_group*") {
-			new_property_value = QVariant::fromValue(trigger_random_group::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::trigger_target") {
 			new_property_value = QVariant::fromValue(string_to_trigger_target(property.get_value()));
 		} else if (property_class_name == "wyrmgus::trigger_type") {
 			new_property_value = QVariant::fromValue(string_to_trigger_type(property.get_value()));
-		} else if (property_class_name == "wyrmgus::unique_item*") {
-			new_property_value = QVariant::fromValue(unique_item::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::unit_class*") {
-			new_property_value = QVariant::fromValue(unit_class::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::unit_domain") {
 			new_property_value = QVariant::fromValue(string_to_unit_domain(property.get_value()));
-		} else if (property_class_name == "wyrmgus::unit_type*") {
-			new_property_value = QVariant::fromValue(unit_type::get(property.get_value()));
-		} else if (property_class_name == "CUpgrade*") {
-			new_property_value = QVariant::fromValue(CUpgrade::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::upgrade_category*") {
-			new_property_value = QVariant::fromValue(upgrade_category::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::upgrade_category_rank") {
 			new_property_value = QVariant::fromValue(string_to_upgrade_category_rank(property.get_value()));
-		} else if (property_class_name == "wyrmgus::upgrade_class*") {
-			new_property_value = QVariant::fromValue(upgrade_class::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::word*") {
-			new_property_value = QVariant::fromValue(word::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::word_type") {
 			new_property_value = QVariant::fromValue(string_to_word_type(property.get_value()));
-		} else if (property_class_name == "wyrmgus::world*") {
-			new_property_value = QVariant::fromValue(world::get(property.get_value()));
 		} else {
-			throw std::runtime_error("Unknown type (\"" + property_class_name + "\") for object reference property \"" + std::string(property_name) + "\" (\"" + property_class_name + "\").");
+			const auto find_iterator = this->string_to_qvariant_conversion_map.find(property_class_name);
+			if (find_iterator != this->string_to_qvariant_conversion_map.end()) {
+				new_property_value = find_iterator->second(property.get_value());
+			} else {
+				throw std::runtime_error("Unknown type (\"" + property_class_name + "\") for object reference property \"" + std::string(property_name) + "\" (\"" + property_class_name + "\").");
+			}
 		}
 	} else {
 	throw std::runtime_error("Invalid type for property \"" + std::string(property_name) + "\": \"" + std::string(meta_property.typeName()) + "\".");

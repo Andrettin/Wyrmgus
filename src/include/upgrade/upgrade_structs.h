@@ -96,6 +96,7 @@ class CUpgrade final : public detailed_data_entry, public data_type<CUpgrade>
 
 public:
 	static constexpr const char *class_identifier = "upgrade";
+	static constexpr const char property_class_identifier[] = "CUpgrade*";
 	static constexpr const char *database_folder = "upgrades";
 	static constexpr int default_ai_priority = 100;
 

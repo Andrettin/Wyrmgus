@@ -37,6 +37,7 @@ class resource_icon final : public icon_base, public data_type<resource_icon>
 
 public:
 	static constexpr const char *class_identifier = "resource_icon";
+	static constexpr const char property_class_identifier[] = "wyrmgus::resource_icon*";
 	static constexpr const char *database_folder = "resource_icons";
 	static constexpr QSize size = QSize(14, 14);
 

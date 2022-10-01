@@ -53,6 +53,7 @@ class word final : public named_data_entry, public data_type<word>
 
 public:
 	static constexpr const char *class_identifier = "word";
+	static constexpr const char property_class_identifier[] = "wyrmgus::word*";
 	static constexpr const char *database_folder = "words";
 
 	static bool compare(const word *lhs, const word *rhs);

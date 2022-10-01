@@ -54,6 +54,7 @@ class historical_unit final : public named_data_entry, public data_type<historic
 
 public:
 	static constexpr const char *class_identifier = "historical_unit";
+	static constexpr const char property_class_identifier[] = "wyrmgus::historical_unit*";
 	static constexpr const char *database_folder = "historical_units";
 
 	explicit historical_unit(const std::string &identifier);

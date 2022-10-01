@@ -51,6 +51,7 @@ class animation_sequence final : public data_entry, public data_type<animation_s
 
 public:
 	static constexpr const char *class_identifier = "animation_sequence";
+	static constexpr const char property_class_identifier[] = "wyrmgus::animation_sequence*";
 	static constexpr const char *database_folder = "animation_sequences";
 
 	static void AddAnimationToArray(CAnimation *anim);

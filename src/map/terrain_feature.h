@@ -56,6 +56,7 @@ class terrain_feature final : public named_data_entry, public data_type<terrain_
 
 public:
 	static constexpr const char *class_identifier = "terrain_feature";
+	static constexpr const char property_class_identifier[] = "wyrmgus::terrain_feature*";
 	static constexpr const char *database_folder = "terrain_features";
 
 	static const terrain_feature *get_by_color(const QColor &color)

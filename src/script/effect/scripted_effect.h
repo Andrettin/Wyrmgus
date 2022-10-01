@@ -73,6 +73,7 @@ class player_scripted_effect final : public data_entry, public data_type<player_
 
 public:
 	static constexpr const char *class_identifier = "player_scripted_effect";
+	static constexpr const char property_class_identifier[] = "wyrmgus::player_scripted_effect*";
 	static constexpr const char *database_folder = "player_scripted_effects";
 
 	explicit player_scripted_effect(const std::string &identifier) : data_entry(identifier)
@@ -101,6 +102,7 @@ class unit_scripted_effect final : public data_entry, public data_type<unit_scri
 
 public:
 	static constexpr const char *class_identifier = "unit_scripted_effect";
+	static constexpr const char property_class_identifier[] = "wyrmgus::unit_scripted_effect*";
 	static constexpr const char *database_folder = "unit_scripted_effects";
 
 	explicit unit_scripted_effect(const std::string &identifier) : data_entry(identifier)

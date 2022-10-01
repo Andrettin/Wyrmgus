@@ -75,6 +75,7 @@ class time_of_day_schedule final : public time_period_schedule, public data_type
 
 public:
 	static constexpr const char *class_identifier = "time_of_day_schedule";
+	static constexpr const char property_class_identifier[] = "wyrmgus::time_of_day_schedule*";
 	static constexpr const char *database_folder = "time_of_day_schedules";
 
 	explicit time_of_day_schedule(const std::string &identifier);

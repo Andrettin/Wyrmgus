@@ -64,6 +64,7 @@ class player_scripted_condition final : public data_entry, public data_type<play
 
 public:
 	static constexpr const char *class_identifier = "player_scripted_condition";
+	static constexpr const char property_class_identifier[] = "wyrmgus::player_scripted_condition*";
 	static constexpr const char *database_folder = "player_scripted_conditions";
 
 	explicit player_scripted_condition(const std::string &identifier) : data_entry(identifier)
@@ -92,6 +93,7 @@ class unit_scripted_condition final : public data_entry, public data_type<unit_s
 
 public:
 	static constexpr const char *class_identifier = "unit_scripted_condition";
+	static constexpr const char property_class_identifier[] = "wyrmgus::unit_scripted_condition*";
 	static constexpr const char *database_folder = "unit_scripted_conditions";
 
 	explicit unit_scripted_condition(const std::string &identifier) : data_entry(identifier)

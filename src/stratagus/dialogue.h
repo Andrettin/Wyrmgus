@@ -67,6 +67,7 @@ private:
 
 public:
 	static constexpr const char *class_identifier = "dialogue";
+	static constexpr const char property_class_identifier[] = "wyrmgus::dialogue*";
 	static constexpr const char *database_folder = "dialogues";
 
 	explicit dialogue(const std::string &identifier);

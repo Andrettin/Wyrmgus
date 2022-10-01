@@ -52,6 +52,7 @@ class dynasty final : public detailed_data_entry, public data_type<dynasty>
 
 public:
 	static constexpr const char *class_identifier = "dynasty";
+	static constexpr const char property_class_identifier[] = "wyrmgus::dynasty*";
 	static constexpr const char *database_folder = "dynasties";
 
 	static dynasty *add(const std::string &identifier, const wyrmgus::data_module *data_module)

@@ -47,6 +47,7 @@ class age final : public named_data_entry, public data_type<age>
 
 public:
 	static constexpr const char *class_identifier = "age";
+	static constexpr const char property_class_identifier[] = "wyrmgus::age*";
 	static constexpr const char *database_folder = "ages";
 
 	static void initialize_all();

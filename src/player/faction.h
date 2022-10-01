@@ -100,6 +100,7 @@ public:
 	using character_title_name_map = std::map<character_title, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>;
 
 	static constexpr const char *class_identifier = "faction";
+	static constexpr const char property_class_identifier[] = "wyrmgus::faction*";
 	static constexpr const char *database_folder = "factions";
 
 	static const std::set<std::string> database_dependencies;

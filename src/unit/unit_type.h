@@ -573,6 +573,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>
 
 public:
 	static constexpr const char *class_identifier = "unit_type";
+	static constexpr const char property_class_identifier[] = "wyrmgus::unit_type*";
 	static constexpr const char *database_folder = "unit_types";
 
 	static unit_type *add(const std::string &identifier, const wyrmgus::data_module *data_module)

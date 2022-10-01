@@ -37,6 +37,7 @@ class button_level final : public data_entry, public data_type<button_level>
 
 public:
 	static constexpr const char *class_identifier = "button_level";
+	static constexpr const char property_class_identifier[] = "wyrmgus::button_level*";
 	static constexpr const char *database_folder = "button_levels";
 
 	static button_level *add(const std::string &identifier, const wyrmgus::data_module *data_module)

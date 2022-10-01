@@ -48,6 +48,7 @@ class music final : public data_entry, public data_type<music>
 
 public:
 	static constexpr const char *class_identifier = "music";
+	static constexpr const char property_class_identifier[] = "wyrmgus::music*";
 	static constexpr const char *database_folder = "music";
 
 	static const std::vector<const music *> &get_all_of_type(const music_type type)

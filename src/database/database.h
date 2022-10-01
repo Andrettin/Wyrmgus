@@ -83,8 +83,8 @@ public:
 		database::process_gsml_data(instance.get(), data);
 	}
 
-	static void process_gsml_property_for_object(QObject *object, const gsml_property &property);
-	static QVariant process_gsml_property_value(const gsml_property &property, const QMetaProperty &meta_property, const QObject *object);
+	void process_gsml_property_for_object(QObject *object, const gsml_property &property);
+	QVariant process_gsml_property_value(const gsml_property &property, const QMetaProperty &meta_property, const QObject *object);
 	static void process_gsml_scope_for_object(QObject *object, const gsml_data &scope);
 	static QVariant process_gsml_scope_value(const gsml_data &scope, const QMetaProperty &meta_property);
 	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const gsml_operator gsml_operator, const std::string &value);
@@ -373,6 +373,11 @@ public:
 		this->current_module = data_module;
 	}
 
+	void register_string_to_qvariant_conversion(const std::string &class_name, std::function<QVariant(const std::string &)> &&function)
+	{
+		this->string_to_qvariant_conversion_map[class_name] = std::move(function);
+	}
+
 private:
 	std::filesystem::path root_path = std::filesystem::current_path();
 	std::vector<std::unique_ptr<data_type_metadata>> metadata;
@@ -380,6 +385,7 @@ private:
 	std::map<std::string, data_module *> modules_by_identifier;
 	const data_module *current_module = nullptr; //the module currently being processed
 	bool initialized = false;
+	std::map<std::string, std::function<QVariant(const std::string &)>> string_to_qvariant_conversion_map; //conversions functions from string to QVariant, mapped to the respective class names
 };
 
 }

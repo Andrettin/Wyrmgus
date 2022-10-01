@@ -57,6 +57,7 @@ class species final : public taxon_base, public data_type<species>
 
 public:
 	static constexpr const char *class_identifier = "species";
+	static constexpr const char property_class_identifier[] = "wyrmgus::species*";
 	static constexpr const char *database_folder = "species";
 
 	static std::map<const taxon *, int> get_supertaxon_counts(const std::vector<const species *> &source_species_list, const std::vector<const taxon *> &taxons);

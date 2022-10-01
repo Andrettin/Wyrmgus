@@ -99,6 +99,7 @@ class resource final : public named_data_entry, public data_type<resource>
 
 public:
 	static constexpr const char *class_identifier = "resource";
+	static constexpr const char property_class_identifier[] = "wyrmgus::resource*";
 	static constexpr const char *database_folder = "resources";
 
 	static const std::vector<resource *> &get_main_resources()

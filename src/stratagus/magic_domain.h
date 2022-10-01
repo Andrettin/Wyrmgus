@@ -42,6 +42,7 @@ class magic_domain final : public detailed_data_entry, public data_type<magic_do
 
 public:
 	static constexpr const char *class_identifier = "magic_domain";
+	static constexpr const char property_class_identifier[] = "wyrmgus::magic_domain*";
 	static constexpr const char *database_folder = "magic_domains";
 
 public:

@@ -40,6 +40,7 @@ class timeline final : public named_data_entry, public data_type<timeline>
 
 public:
 	static constexpr const char *class_identifier = "timeline";
+	static constexpr const char property_class_identifier[] = "wyrmgus::timeline*";
 	static constexpr const char *database_folder = "timelines";
 
 	explicit timeline(const std::string &identifier) : named_data_entry(identifier)

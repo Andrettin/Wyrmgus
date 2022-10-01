@@ -52,6 +52,7 @@ class world final : public detailed_data_entry, public data_type<world>
 
 public:
 	static constexpr const char *class_identifier = "world";
+	static constexpr const char property_class_identifier[] = "wyrmgus::world*";
 	static constexpr const char *database_folder = "worlds";
 	static constexpr const char *terrain_map_folder = "terrain";
 	static constexpr const char *territories_map_folder = "territories";

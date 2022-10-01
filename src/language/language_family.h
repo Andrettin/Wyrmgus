@@ -39,6 +39,7 @@ class language_family final : public named_data_entry, public data_type<language
 
 public:
 	static constexpr const char *class_identifier = "language_family";
+	static constexpr const char property_class_identifier[] = "wyrmgus::language_family*";
 	static constexpr const char *database_folder = "language_families";
 
 	explicit language_family(const std::string &identifier) : named_data_entry(identifier)

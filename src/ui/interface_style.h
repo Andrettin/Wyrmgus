@@ -48,6 +48,7 @@ class interface_style final : public data_entry, public data_type<interface_styl
 
 public:
 	static constexpr const char *class_identifier = "interface_style";
+	static constexpr const char property_class_identifier[] = "wyrmgus::interface_style*";
 	static constexpr const char *database_folder = "interface_styles";
 
 	explicit interface_style(const std::string &identifier);

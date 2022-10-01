@@ -41,6 +41,7 @@ class civilization_group final : public civilization_base, public data_type<civi
 
 public:
 	static constexpr const char *class_identifier = "civilization_group";
+	static constexpr const char property_class_identifier[] = "wyrmgus::civilization_group*";
 	static constexpr const char *database_folder = "civilization_groups";
 
 	explicit civilization_group(const std::string &identifier);

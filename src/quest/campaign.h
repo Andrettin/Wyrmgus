@@ -67,6 +67,7 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 
 public:
 	static constexpr const char *class_identifier = "campaign";
+	static constexpr const char property_class_identifier[] = "wyrmgus::campaign*";
 	static constexpr const char *database_folder = "campaigns";
 
 	static void initialize_all();

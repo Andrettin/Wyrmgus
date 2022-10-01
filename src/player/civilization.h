@@ -78,6 +78,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 
 public:
 	static constexpr const char *class_identifier = "civilization";
+	static constexpr const char property_class_identifier[] = "wyrmgus::civilization*";
 	static constexpr const char *database_folder = "civilizations";
 
 	static civilization *add(const std::string &identifier, const wyrmgus::data_module *data_module)

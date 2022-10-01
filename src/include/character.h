@@ -105,6 +105,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 
 public:
 	static constexpr const char *class_identifier = "character";
+	static constexpr const char property_class_identifier[] = "wyrmgus::character*";
 	static constexpr const char *database_folder = "characters";
 
 	static void initialize_all()

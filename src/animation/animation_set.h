@@ -54,6 +54,7 @@ class animation_set final : public data_entry, public data_type<animation_set>
 
 public:
 	static constexpr const char *class_identifier = "animation_set";
+	static constexpr const char property_class_identifier[] = "wyrmgus::animation_set*";
 	static constexpr const char *database_folder = "animation_sets";
 
 	static const std::set<std::string> database_dependencies;

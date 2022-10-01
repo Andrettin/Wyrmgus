@@ -44,6 +44,7 @@ class cheat final : public data_entry, public data_type<cheat>
 
 public:
 	static constexpr const char *class_identifier = "cheat";
+	static constexpr const char property_class_identifier[] = "wyrmgus::cheat*";
 	static constexpr const char *database_folder = "cheats";
 
 	static const cheat *try_get_by_code(const std::string &code)

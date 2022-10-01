@@ -57,6 +57,7 @@ class unique_item final : public detailed_data_entry, public data_type<unique_it
 
 public:
 	static constexpr const char *class_identifier = "unique_item";
+	static constexpr const char property_class_identifier[] = "wyrmgus::unique_item*";
 	static constexpr const char *database_folder = "unique_items";
 
 	static bool compare_encyclopedia_entries(const unique_item *lhs, const unique_item *rhs);

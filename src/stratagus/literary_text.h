@@ -43,6 +43,7 @@ class literary_text final : public named_data_entry, public data_type<literary_t
 
 public:
 	static constexpr const char *class_identifier = "literary_text";
+	static constexpr const char property_class_identifier[] = "wyrmgus::literary_text*";
 	static constexpr const char *database_folder = "literary_texts";
 
 	static bool compare_encyclopedia_entries(const literary_text *lhs, const literary_text *rhs);

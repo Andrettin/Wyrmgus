@@ -81,6 +81,7 @@ class icon final : public icon_base, public data_type<icon>
 
 public:
 	static constexpr const char *class_identifier = "icon";
+	static constexpr const char property_class_identifier[] = "wyrmgus::icon*";
 	static constexpr const char *database_folder = "icons";
 
 	static int get_to_load_count();

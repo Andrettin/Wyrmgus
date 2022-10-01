@@ -47,6 +47,7 @@ class time_of_day final : public named_data_entry, public data_type<time_of_day>
 
 public:
 	static constexpr const char *class_identifier = "time_of_day";
+	static constexpr const char property_class_identifier[] = "wyrmgus::time_of_day*";
 	static constexpr const char *database_folder = "times_of_day";
 
 	static time_of_day *add(const std::string &identifier, const wyrmgus::data_module *data_module)

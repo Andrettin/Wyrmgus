@@ -44,6 +44,7 @@ class epithet final : public named_data_entry, public data_type<epithet>
 
 public:
 	static constexpr const char *class_identifier = "epithet";
+	static constexpr const char property_class_identifier[] = "wyrmgus::epithet*";
 	static constexpr const char *database_folder = "epithets";
 
 	explicit epithet(const std::string &identifier);

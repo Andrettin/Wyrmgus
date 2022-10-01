@@ -58,6 +58,7 @@ private:
 
 public:
 	static constexpr const char *class_identifier = "trigger_random_group";
+	static constexpr const char property_class_identifier[] = "wyrmgus::trigger_random_group*";
 	static constexpr const char *database_folder = "trigger_random_groups";
 
 	explicit trigger_random_group(const std::string &identifier);

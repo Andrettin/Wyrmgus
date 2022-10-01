@@ -127,6 +127,7 @@ public:
 	using zone_variant = std::variant<std::monostate, const site *, const terrain_feature *>;
 
 	static constexpr const char *class_identifier = "map_template";
+	static constexpr const char property_class_identifier[] = "wyrmgus::map_template*";
 	static constexpr const char *database_folder = "map_templates";
 	static constexpr QPoint min_adjacent_template_distance = QPoint(4, 4);
 	static constexpr QPoint max_adjacent_template_distance = QPoint(16, 16);

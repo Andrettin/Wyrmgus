@@ -47,6 +47,7 @@ class population_class final : public named_data_entry, public data_type<populat
 
 public:
 	static constexpr const char *class_identifier = "population_class";
+	static constexpr const char property_class_identifier[] = "wyrmgus::population_class*";
 	static constexpr const char *database_folder = "population_classes";
 
 	explicit population_class(const std::string &identifier) : named_data_entry(identifier)

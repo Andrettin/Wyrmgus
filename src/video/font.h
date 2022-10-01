@@ -46,6 +46,7 @@ class font final : public data_entry, public gcn::Font, public data_type<font>
 
 public:
 	static constexpr const char *class_identifier = "font";
+	static constexpr const char property_class_identifier[] = "wyrmgus::font*";
 	static constexpr const char *database_folder = "fonts";
 
 	//this function is kept since it is still used in tolua++

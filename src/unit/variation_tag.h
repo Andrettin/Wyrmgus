@@ -39,6 +39,7 @@ class variation_tag final : public named_data_entry, public data_type<variation_
 
 public:
 	static constexpr const char *class_identifier = "variation_tag";
+	static constexpr const char property_class_identifier[] = "wyrmgus::variation_tag*";
 	static constexpr const char *database_folder = "variation_tags";
 
 	explicit variation_tag(const std::string &identifier) : named_data_entry(identifier)

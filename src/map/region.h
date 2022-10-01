@@ -44,6 +44,7 @@ class region final : public data_entry, public data_type<region>
 
 public:
 	static constexpr const char *class_identifier = "region";
+	static constexpr const char property_class_identifier[] = "wyrmgus::region*";
 	static constexpr const char *database_folder = "regions";
 
 	static void load_history_database();

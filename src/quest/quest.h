@@ -71,6 +71,7 @@ class quest final : public detailed_data_entry, public data_type<quest>
 
 public:
 	static constexpr const char *class_identifier = "quest";
+	static constexpr const char property_class_identifier[] = "wyrmgus::quest*";
 	static constexpr const char *database_folder = "quests";
 
 	static quest *add(const std::string &identifier, const wyrmgus::data_module *data_module)

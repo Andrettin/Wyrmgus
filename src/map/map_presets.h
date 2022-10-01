@@ -42,6 +42,7 @@ class map_presets final : public data_entry, public data_type<map_presets>
 
 public:
 	static constexpr const char *class_identifier = "map_presets";
+	static constexpr const char property_class_identifier[] = "wyrmgus::map_presets*";
 	static constexpr const char *database_folder = "map_presets";
 
 	explicit map_presets(const std::string &identifier);

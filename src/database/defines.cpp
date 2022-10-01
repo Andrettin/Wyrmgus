@@ -83,7 +83,7 @@ void defines::process_gsml_property(const gsml_property &property)
 	} else if (key == "0_ad_water_height_multiplier") {
 		this->zero_ad_water_height_multiplier = std::stoi(value);
 	} else {
-		database::process_gsml_property_for_object(this, property);
+		database::get()->process_gsml_property_for_object(this, property);
 	}
 }
 
