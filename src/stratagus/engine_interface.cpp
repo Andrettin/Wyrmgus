@@ -82,6 +82,8 @@ engine_interface::engine_interface()
 {
 	connect(preferences::get(), &preferences::scale_factor_changed, this, &engine_interface::scale_factor_changed);
 
+	database::get()->set_workshop_game_id("370070");
+
 	database::get()->register_defines_loading_function([](const std::filesystem::path &path) {
 		defines::get()->load(path);
 	});

@@ -29,6 +29,7 @@
 #include "database/basic_data_entry.h"
 
 namespace archimedes {
+	class data_module;
 	class gsml_data;
 	class gsml_property;
 }
@@ -36,7 +37,6 @@ namespace archimedes {
 namespace wyrmgus {
 
 class data_entry_history;
-class data_module;
 
 //a (de)serializable and identifiable entry to the database
 class data_entry : public basic_data_entry

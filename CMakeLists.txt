@@ -129,13 +129,9 @@ set(database_SRCS
 	src/database/basic_data_entry.cpp
 	src/database/data_entry.cpp
 	src/database/data_entry_history.cpp
-	src/database/data_module.cpp
-	src/database/data_module_container.cpp
-	src/database/database.cpp
 	src/database/defines.cpp
 	src/database/detailed_data_entry.cpp
 	src/database/named_data_entry.cpp
-	src/database/predefines.cpp
 	src/database/preferences.cpp
 )
 source_group(database FILES ${database_SRCS})
@@ -771,15 +767,10 @@ set(wyrmgus_database_HDRS
 	src/database/basic_data_entry.h
 	src/database/data_entry.h
 	src/database/data_entry_history.h
-	src/database/data_module.h
-	src/database/data_module_container.h
 	src/database/data_type.h
-	src/database/data_type_metadata.h
-	src/database/database.h
 	src/database/defines.h
 	src/database/detailed_data_entry.h
 	src/database/named_data_entry.h
-	src/database/predefines.h
 	src/database/preferences.h
 )
 

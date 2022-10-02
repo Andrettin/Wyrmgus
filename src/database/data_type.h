@@ -33,9 +33,11 @@
 #include "database/gsml_operator.h"
 #include "util/qunique_ptr.h"
 
-namespace wyrmgus {
+namespace archimedes {
+	class data_module;
+}
 
-class data_module;
+namespace wyrmgus {
 
 class data_type_base
 {
