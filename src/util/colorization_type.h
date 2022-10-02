@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class colorization_type {
@@ -38,26 +40,7 @@ enum class colorization_type {
 	yellow
 };
 
-inline colorization_type string_to_colorization_type(const std::string &str)
-{
-	if (str == "none") {
-		return colorization_type::none;
-	} else if (str == "blue") {
-		return colorization_type::blue;
-	} else if (str == "gray") {
-		return colorization_type::gray;
-	} else if (str == "green") {
-		return colorization_type::green;
-	} else if (str == "red") {
-		return colorization_type::red;
-	} else if (str == "white") {
-		return colorization_type::white;
-	} else if (str == "yellow") {
-		return colorization_type::yellow;
-	}
-
-	throw std::runtime_error("Invalid colorization type: \"" + str + "\".");
-}
+extern template class enum_converter<colorization_type>;
 
 }
 

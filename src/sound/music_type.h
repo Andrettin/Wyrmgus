@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class music_type {
@@ -38,46 +40,7 @@ enum class music_type {
 	defeat
 };
 
-inline music_type string_to_music_type(const std::string &str)
-{
-	if (str == "menu") {
-		return music_type::menu;
-	} else if (str == "credits") {
-		return music_type::credits;
-	} else if (str == "loading") {
-		return music_type::loading;
-	} else if (str == "map") {
-		return music_type::map;
-	} else if (str == "victory") {
-		return music_type::victory;
-	} else if (str == "defeat") {
-		return music_type::defeat;
-	}
-
-	throw std::runtime_error("Invalid music type: \"" + str + "\".");
-}
-
-inline std::string music_type_to_string(const music_type type)
-{
-	switch (type) {
-		case music_type::menu:
-			return "menu";
-		case music_type::credits:
-			return "credits";
-		case music_type::loading:
-			return "loading";
-		case music_type::map:
-			return "map";
-		case music_type::victory:
-			return "victory";
-		case music_type::defeat:
-			return "defeat";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid music type: \"" + std::to_string(static_cast<int>(type)) + "\".");
-}
+extern template class enum_converter<music_type>;
 
 }
 

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 1998-2022 by Lutz Sammer and Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,34 +24,29 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "sound/music_type.h"
 
 namespace wyrmgus {
 
-enum class cursor_type {
-	point,
-	magnifying_glass,
-	cross,
-	green_hair,
-	yellow_hair,
-	red_hair,
-	scroll,
-	arrow_east,
-	arrow_northeast,
-	arrow_north,
-	arrow_northwest,
-	arrow_west,
-	arrow_southwest,
-	arrow_south,
-	arrow_southeast,
+template class enum_converter<music_type>;
 
-	count
+template <>
+const std::string enum_converter<music_type>::property_class_identifier = "wyrmgus::music_type";
+
+template <>
+const std::map<std::string, music_type> enum_converter<music_type>::string_to_enum_map = {
+	{ "menu", music_type::menu },
+	{ "credits", music_type::credits },
+	{ "loading", music_type::loading },
+	{ "map", music_type::map },
+	{ "victory", music_type::victory },
+	{ "defeat", music_type::defeat }
+
 };
 
-extern template class enum_converter<cursor_type>;
+template <>
+const bool enum_converter<music_type>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::cursor_type)

@@ -277,10 +277,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(std::filesystem::path(property.get_value()));
 		} else if (property_class_name == "archimedes::centesimal_int") {
 			new_property_value = QVariant::fromValue(centesimal_int(property.get_value()));
-		} else if (property_class_name == "wyrmgus::colorization_type") {
-			new_property_value = QVariant::fromValue(string_to_colorization_type(property.get_value()));
-		} else if (property_class_name == "wyrmgus::cursor_type") {
-			new_property_value = QVariant::fromValue(string_to_cursor_type(property.get_value()));
 		} else if (property_class_name == "archimedes::decimal_int") {
 			new_property_value = QVariant::fromValue(decimal_int(property.get_value()));
 		} else if (property_class_name == "archimedes::decimillesimal_int") {
@@ -289,8 +285,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(map_projection::from_string(property.get_value()));
 		} else if (property_class_name == "wyrmgus::module*") {
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
-		} else if (property_class_name == "wyrmgus::music_type") {
-			new_property_value = QVariant::fromValue(string_to_music_type(property.get_value()));
 		} else {
 			const auto find_iterator = this->string_to_qvariant_conversion_map.find(property_class_name);
 			if (find_iterator != this->string_to_qvariant_conversion_map.end()) {

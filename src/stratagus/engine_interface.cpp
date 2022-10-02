@@ -166,7 +166,7 @@ void engine_interface::play_sound(const QString &sound_identifier)
 void engine_interface::play_music(const QString &type_str)
 {
 	try {
-		const music_type type = string_to_music_type(type_str.toStdString());
+		const music_type type = enum_converter<music_type>::to_enum(type_str.toStdString());
 
 		event_loop::get()->post([type]() {
 			music_player::get()->play_music_type(type);

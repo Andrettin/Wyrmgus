@@ -412,6 +412,7 @@ set(sound_SRCS
 	src/sound/music.cpp
 	src/sound/music_player.cpp
 	src/sound/music_sample.cpp
+	src/sound/music_type.cpp
 	src/sound/sample.cpp
 	src/sound/script_sound.cpp
 	src/sound/sound.cpp
@@ -511,6 +512,7 @@ set(ui_SRCS
 	src/ui/checkbox_style.cpp
 	src/ui/contenttype.cpp
 	src/ui/cursor.cpp
+	src/ui/cursor_type.cpp
 	src/ui/hotkey_setup.cpp
 	src/ui/icon.cpp
 	src/ui/icon_base.cpp
@@ -573,6 +575,7 @@ set(upgrade_SRCS
 source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
+	src/util/colorization_type.cpp
 	src/util/enum_converter.cpp
 	src/util/image_util.cpp
 	src/util/util.cpp
