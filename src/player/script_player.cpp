@@ -971,7 +971,7 @@ int CclDefineLanguageWord(lua_State *l)
 			}
 		} else if (!strcmp(value, "Type")) {
 			std::string word_type_name = LuaToString(l, -1);
-			const wyrmgus::word_type word_type = wyrmgus::string_to_word_type(word_type_name);
+			const word_type word_type = enum_converter<wyrmgus::word_type>::to_enum(word_type_name);
 			word->type = word_type;
 		} else if (!strcmp(value, "DerivesFrom")) {
 			if (!lua_istable(l, -1)) {
@@ -980,7 +980,7 @@ int CclDefineLanguageWord(lua_State *l)
 			int j = 0;
 			wyrmgus::language *derives_from_language = wyrmgus::language::get(LuaToString(l, -1, j + 1));
 			++j;
-			const wyrmgus::word_type derives_from_word_type = wyrmgus::string_to_word_type(LuaToString(l, -1, j + 1));
+			const wyrmgus::word_type derives_from_word_type = enum_converter<word_type>::to_enum(LuaToString(l, -1, j + 1));
 			++j;
 			
 			std::vector<std::string> word_meanings;
@@ -1002,7 +1002,7 @@ int CclDefineLanguageWord(lua_State *l)
 				if (etymon != nullptr) {
 					word->set_etymon(etymon);
 				} else {
-					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ derives_from_word.c_str() _C_ derives_from_language->get_identifier().c_str() _C_ wyrmgus::word_type_to_string(derives_from_word_type).c_str());
+					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ derives_from_word.c_str() _C_ derives_from_language->get_identifier().c_str() _C_ enum_converter<word_type>::to_string(derives_from_word_type).c_str());
 				}
 			} else {
 				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->get_identifier().c_str());
@@ -1022,7 +1022,7 @@ int CclDefineLanguageWord(lua_State *l)
 				
 				wyrmgus::language *affix_language = wyrmgus::language::get(LuaToString(l, -1, j + 1)); // should be the same language as that of the word, but needs to be specified since the word's language may not have been set yet
 				++j;
-				const wyrmgus::word_type affix_word_type = wyrmgus::string_to_word_type(LuaToString(l, -1, j + 1));
+				const wyrmgus::word_type affix_word_type = enum_converter<word_type>::to_enum(LuaToString(l, -1, j + 1));
 				++j;
 				
 				std::vector<std::string> word_meanings;
@@ -1044,7 +1044,7 @@ int CclDefineLanguageWord(lua_State *l)
 					if (other_word != nullptr) {
 						word->add_compound_element(other_word);
 					} else {
-						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ affix_word.c_str() _C_ affix_language->get_identifier().c_str() _C_ wyrmgus::word_type_to_string(affix_word_type).c_str());
+						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ affix_word.c_str() _C_ affix_language->get_identifier().c_str() _C_ enum_converter<word_type>::to_string(affix_word_type).c_str());
 					}
 				} else {
 					LuaError(l, "Word \"%s\"'s compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ word->get_identifier().c_str());
@@ -1052,7 +1052,7 @@ int CclDefineLanguageWord(lua_State *l)
 			}
 		} else if (!strcmp(value, "Gender")) {
 			std::string grammatical_gender_name = LuaToString(l, -1);
-			const wyrmgus::grammatical_gender grammatical_gender = wyrmgus::string_to_grammatical_gender(grammatical_gender_name);
+			const grammatical_gender grammatical_gender = enum_converter<wyrmgus::grammatical_gender>::to_enum(grammatical_gender_name);
 			if (grammatical_gender != wyrmgus::grammatical_gender::none) {
 				word->gender = grammatical_gender;
 			} else {
@@ -1924,7 +1924,7 @@ int CclDefineLanguage(lua_State *l)
 				++k;
 				
 				std::string grammatical_gender_name = LuaToString(l, -1, k + 1);
-				const wyrmgus::grammatical_gender grammatical_gender = string_to_grammatical_gender(grammatical_gender_name);
+				const grammatical_gender grammatical_gender = enum_converter<wyrmgus::grammatical_gender>::to_enum(grammatical_gender_name);
 				++k;
 				
 				language->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender] = LuaToString(l, -1, k + 1);

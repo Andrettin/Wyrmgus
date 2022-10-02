@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class grammatical_gender {
@@ -35,38 +37,7 @@ enum class grammatical_gender {
 	neuter
 };
 
-inline grammatical_gender string_to_grammatical_gender(const std::string &str)
-{
-	if (str == "none") {
-		return grammatical_gender::none;
-	} else if (str == "masculine") {
-		return grammatical_gender::masculine;
-	} else if (str == "feminine") {
-		return grammatical_gender::feminine;
-	} else if (str == "neuter") {
-		return grammatical_gender::neuter;
-	}
-
-	throw std::runtime_error("Invalid grammatical gender: \"" + str + "\".");
-}
-
-inline std::string grammatical_gender_to_string(const grammatical_gender gender)
-{
-	switch (gender) {
-		case grammatical_gender::none:
-			return "none";
-		case grammatical_gender::masculine:
-			return "masculine";
-		case grammatical_gender::feminine:
-			return "feminine";
-		case grammatical_gender::neuter:
-			return "neuter";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid grammatical gender: \"" + std::to_string(static_cast<int>(gender)) + "\".");
-}
+extern template class enum_converter<grammatical_gender>;
 
 inline std::string grammatical_gender_to_name(const grammatical_gender gender)
 {

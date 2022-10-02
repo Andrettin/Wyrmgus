@@ -287,8 +287,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(decimillesimal_int(property.get_value()));
 		} else if (property_class_name == "wyrmgus::difficulty") {
 			new_property_value = QVariant::fromValue(string_to_difficulty(property.get_value()));
-		} else if (property_class_name == "wyrmgus::grammatical_gender") {
-			new_property_value = QVariant::fromValue(string_to_grammatical_gender(property.get_value()));
 		} else if (property_class_name == "wyrmgus::hotkey_setup") {
 			new_property_value = QVariant::fromValue(string_to_hotkey_setup(property.get_value()));
 		} else if (property_class_name == "wyrmgus::item_class") {
@@ -305,8 +303,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(string_to_trigger_target(property.get_value()));
 		} else if (property_class_name == "wyrmgus::trigger_type") {
 			new_property_value = QVariant::fromValue(string_to_trigger_type(property.get_value()));
-		} else if (property_class_name == "wyrmgus::word_type") {
-			new_property_value = QVariant::fromValue(string_to_word_type(property.get_value()));
 		} else {
 			const auto find_iterator = this->string_to_qvariant_conversion_map.find(property_class_name);
 			if (find_iterator != this->string_to_qvariant_conversion_map.end()) {

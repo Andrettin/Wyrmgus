@@ -205,9 +205,11 @@ set(item_SRCS
 source_group(item FILES ${item_SRCS})
 
 set(language_SRCS
+	src/language/grammatical_gender.cpp
 	src/language/language.cpp
 	src/language/name_variant.cpp
 	src/language/word.cpp
+	src/language/word_type.cpp
 )
 source_group(language FILES ${language_SRCS})
 

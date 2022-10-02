@@ -24,60 +24,33 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "language/word_type.h"
 
 namespace wyrmgus {
 
-enum class word_type {
-	none = -1,
-	noun,
-	verb,
-	adjective,
-	pronoun,
-	adverb,
-	conjunction,
-	adposition,
-	article,
-	numeral,
-	affix
+template class enum_converter<word_type>;
+
+template <>
+const std::string enum_converter<word_type>::property_class_identifier = "wyrmgus::word_type";
+
+template <>
+const std::map<std::string, word_type> enum_converter<word_type>::string_to_enum_map = {
+	{ "none", word_type::none },
+	{ "noun", word_type::noun },
+	{ "verb", word_type::verb },
+	{ "adjective", word_type::adjective },
+	{ "pronoun", word_type::pronoun },
+	{ "adverb", word_type::adverb },
+	{ "conjunction", word_type::conjunction },
+	{ "adposition", word_type::adposition },
+	{ "article", word_type::article },
+	{ "numeral", word_type::numeral },
+	{ "affix", word_type::affix }
 };
 
-extern template class enum_converter<word_type>;
-
-inline std::string word_type_to_name(const word_type type)
-{
-	switch (type) {
-		case word_type::none:
-			return "None";
-		case word_type::noun:
-			return "Noun";
-		case word_type::verb:
-			return "Verb";
-		case word_type::adjective:
-			return "Adjective";
-		case word_type::pronoun:
-			return "Pronoun";
-		case word_type::adverb:
-			return "Adverb";
-		case word_type::conjunction:
-			return "Conjunction";
-		case word_type::adposition:
-			return "Adposition";
-		case word_type::article:
-			return "Article";
-		case word_type::numeral:
-			return "Numeral";
-		case word_type::affix:
-			return "Affix";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid word type: \"" + std::to_string(static_cast<int>(type)) + "\".");
-}
+template <>
+const bool enum_converter<word_type>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::word_type)
