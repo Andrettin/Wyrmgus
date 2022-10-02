@@ -31,18 +31,13 @@
 #include "database/data_module.h"
 #include "database/data_module_container.h"
 #include "database/data_type_metadata.h"
-#include "database/defines.h"
 #include "database/predefines.h"
 #include "database/gsml_data.h"
 #include "database/gsml_operator.h"
 #include "database/gsml_parser.h"
 #include "database/gsml_property.h"
-#include "engine_interface.h"
 #include "map/map_projection.h"
-#include "quest/achievement.h"
-#include "quest/quest.h"
 #include "util/assert_util.h"
-#include "util/colorization_type.h"
 #include "util/geocoordinate.h"
 #include "util/path_util.h"
 #include "util/qunique_ptr.h"
@@ -545,12 +540,16 @@ void database::load_predefines()
 
 void database::load_defines()
 {
+	if (this->defines_loading_function == nullptr) {
+		return;
+	}
+
 	for (const auto &kv_pair : this->get_data_paths_with_module()) {
 		const std::filesystem::path &path = kv_pair.first;
 		const data_module *data_module = kv_pair.second;
 
 		try {
-			defines::get()->load(path);
+			this->defines_loading_function(path);
 		} catch (...) {
 			if (data_module != nullptr) {
 				std::throw_with_nested(std::runtime_error("Failed to load the defines for the \"" + data_module->get_identifier() + "\" module."));
@@ -593,7 +592,9 @@ void database::load_history()
 
 void database::initialize()
 {
-	defines::get()->initialize();
+	if (this->defines_initialization_function != nullptr) {
+		this->defines_initialization_function();
+	}
 
 	//initialize data entries for each data type
 	for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
@@ -624,10 +625,9 @@ void database::initialize()
 		}
 	}
 
-	quest::load_quest_completion();
-	achievement::load_achievements();
-
-	engine_interface::get()->set_running(true);
+	for (const std::function<void()> &on_initialization_function : this->on_initialization_functions) {
+		on_initialization_function();
+	}
 }
 
 void database::clear()

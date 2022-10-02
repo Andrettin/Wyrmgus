@@ -373,8 +373,23 @@ public:
 		this->current_module = data_module;
 	}
 
+	void register_defines_loading_function(std::function<void(const std::filesystem::path &)> &&function)
+	{
+		this->defines_loading_function = std::move(function);
+	}
+
+	void register_defines_initialization_function(std::function<void()> &&function)
+	{
+		this->defines_initialization_function = std::move(function);
+	}
+
 	void register_string_to_qvariant_conversion(const std::string &class_name, std::function<QVariant(const std::string &)> &&function);
 	void register_list_property_function(const std::string &class_name, std::function<bool(QObject *object, const std::string &, const std::string &)> &&function);
+
+	void register_on_initialization_function(std::function<void()> &&function)
+	{
+		this->on_initialization_functions.push_back(std::move(function));
+	}
 
 private:
 	std::filesystem::path root_path = std::filesystem::current_path();
@@ -383,8 +398,11 @@ private:
 	std::map<std::string, data_module *> modules_by_identifier;
 	const data_module *current_module = nullptr; //the module currently being processed
 	bool initialized = false;
+	std::function<void(const std::filesystem::path &)> defines_loading_function;
+	std::function<void()> defines_initialization_function;
 	std::map<std::string, std::function<QVariant(const std::string &)>> string_to_qvariant_conversion_map; //conversions functions from string to QVariant, mapped to the respective class names
 	std::map<std::string, std::function<bool(QObject *object, const std::string &, const std::string &)>> list_property_function_map;
+	std::vector<std::function<void()>> on_initialization_functions;
 };
 
 }

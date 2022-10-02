@@ -81,6 +81,21 @@ namespace wyrmgus {
 engine_interface::engine_interface()
 {
 	connect(preferences::get(), &preferences::scale_factor_changed, this, &engine_interface::scale_factor_changed);
+
+	database::get()->register_defines_loading_function([](const std::filesystem::path &path) {
+		defines::get()->load(path);
+	});
+
+	database::get()->register_defines_initialization_function([]() {
+		defines::get()->initialize();
+	});
+
+	database::get()->register_on_initialization_function([]() {
+		quest::load_quest_completion();
+		achievement::load_achievements();
+
+		engine_interface::get()->set_running(true);
+	});
 }
 
 engine_interface::~engine_interface()
