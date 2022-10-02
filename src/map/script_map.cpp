@@ -823,7 +823,7 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 			return;
 		}
 
-		database::load_history();
+		database::get()->load_history();
 
 		const campaign *campaign = campaign::get(campaign_ident);
 

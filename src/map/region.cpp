@@ -37,6 +37,11 @@
 
 namespace wyrmgus {
 
+const std::set<std::string> region::history_database_dependencies = {
+	//must be loaded after sites, since it relies on their population data having been loaded first
+	site::class_identifier
+};
+
 void region::load_history_database()
 {
 	data_type::load_history_database();

@@ -40,7 +40,10 @@ class data_module;
 class data_type_base
 {
 public:
+	static constexpr bool history_enabled = false;
+
 	static inline const std::set<std::string> database_dependencies; //the other classes on which this one depends, i.e. after which this class' database can be processed
+	static inline const std::set<std::string> history_database_dependencies;
 };
 
 template <typename T>
@@ -264,16 +267,18 @@ public:
 
 	static void load_history_database()
 	{
-		try {
-			for (T *instance : T::get_all()) {
-				try {
-					instance->load_history();
-				} catch (...) {
-					std::throw_with_nested(std::runtime_error("Error loading history for the " + std::string(T::class_identifier) + " instance \"" + instance->get_identifier() + "\"."));
+		if constexpr (T::history_enabled) {
+			try {
+				for (T *instance : T::get_all()) {
+					try {
+						instance->load_history();
+					} catch (...) {
+						std::throw_with_nested(std::runtime_error("Error loading history for the " + std::string(T::class_identifier) + " instance \"" + instance->get_identifier() + "\"."));
+					}
 				}
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Error loading history for the " + std::string(T::class_identifier) + " class."));
 			}
-		} catch (...) {
-			std::throw_with_nested(std::runtime_error("Error loading history for the " + std::string(T::class_identifier) + " class."));
 		}
 	}
 
@@ -342,7 +347,7 @@ private:
 	static inline bool initialize_class()
 	{
 		//initialize the metadata (including database parsing/processing functions) for this data type
-		auto metadata = std::make_unique<data_type_metadata>(T::class_identifier, T::database_dependencies, T::parse_database, T::process_database, T::initialize_all, T::process_all_text, T::check_all, T::clear);
+		auto metadata = std::make_unique<data_type_metadata>(T::class_identifier, T::database_dependencies, T::history_database_dependencies, T::parse_database, T::process_database, T::initialize_all, T::process_all_text, T::check_all, T::clear, T::load_history_database);
 		database::get()->register_metadata(std::move(metadata));
 
 		database::get()->register_string_to_qvariant_conversion(T::property_class_identifier, [](const std::string &value) {

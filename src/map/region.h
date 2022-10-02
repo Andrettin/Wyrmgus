@@ -43,9 +43,12 @@ class region final : public data_entry, public data_type<region>
 	Q_PROPERTY(std::vector<wyrmgus::region *> superregions READ get_superregions)
 
 public:
-	static constexpr const char *class_identifier = "region";
+	static constexpr const char class_identifier[] = "region";
 	static constexpr const char property_class_identifier[] = "wyrmgus::region*";
-	static constexpr const char *database_folder = "regions";
+	static constexpr const char database_folder[] = "regions";
+	static constexpr bool history_enabled = true;
+
+	static const std::set<std::string> history_database_dependencies;
 
 	static void load_history_database();
 

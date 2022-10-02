@@ -80,6 +80,7 @@ public:
 	static constexpr const char *class_identifier = "civilization";
 	static constexpr const char property_class_identifier[] = "wyrmgus::civilization*";
 	static constexpr const char *database_folder = "civilizations";
+	static constexpr bool history_enabled = true;
 
 	static civilization *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{

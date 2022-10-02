@@ -129,7 +129,7 @@ public:
 
 	void load_predefines();
 	void load_defines();
-	static void load_history();
+	void load_history();
 
 	bool is_initialized() const
 	{

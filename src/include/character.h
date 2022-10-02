@@ -107,6 +107,7 @@ public:
 	static constexpr const char *class_identifier = "character";
 	static constexpr const char property_class_identifier[] = "wyrmgus::character*";
 	static constexpr const char *database_folder = "characters";
+	static constexpr bool history_enabled = true;
 
 	static void initialize_all()
 	{

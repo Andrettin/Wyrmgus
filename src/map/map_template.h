@@ -129,6 +129,7 @@ public:
 	static constexpr const char *class_identifier = "map_template";
 	static constexpr const char property_class_identifier[] = "wyrmgus::map_template*";
 	static constexpr const char *database_folder = "map_templates";
+	static constexpr bool history_enabled = true;
 	static constexpr QPoint min_adjacent_template_distance = QPoint(4, 4);
 	static constexpr QPoint max_adjacent_template_distance = QPoint(16, 16);
 	static constexpr QPoint min_constructed_adjacent_template_distance = QPoint(1, 1);

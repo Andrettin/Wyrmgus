@@ -56,6 +56,7 @@ public:
 	static constexpr const char *class_identifier = "historical_unit";
 	static constexpr const char property_class_identifier[] = "wyrmgus::historical_unit*";
 	static constexpr const char *database_folder = "historical_units";
+	static constexpr bool history_enabled = true;
 
 	explicit historical_unit(const std::string &identifier);
 	~historical_unit();

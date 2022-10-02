@@ -90,6 +90,7 @@ public:
 	static constexpr const char *class_identifier = "site";
 	static constexpr const char property_class_identifier[] = "wyrmgus::site*";
 	static constexpr const char *database_folder = "sites";
+	static constexpr bool history_enabled = true;
 	static constexpr int base_astrodistance_additive_modifier = 8;
 	static constexpr int base_orbit_distance = 2; //the tile space between the orbit center and its first orbiting body
 

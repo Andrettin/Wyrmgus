@@ -102,6 +102,7 @@ public:
 	static constexpr const char *class_identifier = "faction";
 	static constexpr const char property_class_identifier[] = "wyrmgus::faction*";
 	static constexpr const char *database_folder = "factions";
+	static constexpr bool history_enabled = true;
 
 	static const std::set<std::string> database_dependencies;
 

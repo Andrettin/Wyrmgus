@@ -43,6 +43,7 @@ public:
 	static constexpr const char *class_identifier = "civilization_group";
 	static constexpr const char property_class_identifier[] = "wyrmgus::civilization_group*";
 	static constexpr const char *database_folder = "civilization_groups";
+	static constexpr bool history_enabled = true;
 
 	explicit civilization_group(const std::string &identifier);
 

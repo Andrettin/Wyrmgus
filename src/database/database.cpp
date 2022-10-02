@@ -28,7 +28,6 @@
 
 #include "database/database.h"
 
-#include "character.h"
 #include "database/data_module.h"
 #include "database/data_module_container.h"
 #include "database/data_type_metadata.h"
@@ -40,15 +39,8 @@
 #include "database/gsml_property.h"
 #include "engine_interface.h"
 #include "map/map_projection.h"
-#include "map/map_template.h"
-#include "map/region.h"
-#include "map/site.h"
-#include "player/civilization.h"
-#include "player/civilization_group.h"
-#include "player/faction.h"
 #include "quest/achievement.h"
 #include "quest/quest.h"
-#include "unit/historical_unit.h"
 #include "util/assert_util.h"
 #include "util/colorization_type.h"
 #include "util/geocoordinate.h"
@@ -572,14 +564,28 @@ void database::load_defines()
 void database::load_history()
 {
 	try {
-		civilization::load_history_database();
-		civilization_group::load_history_database();
-		faction::load_history_database();
-		site::load_history_database();
-		region::load_history_database(); //must be loaded after sites, since it relies on their population data having been loaded first
-		character::load_history_database();
-		historical_unit::load_history_database();
-		map_template::load_history_database();
+		std::vector<const data_type_metadata *> metadata_list;
+		for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
+			metadata_list.push_back(metadata.get());
+		}
+
+		std::sort(metadata_list.begin(), metadata_list.end(), [](const data_type_metadata *a, const data_type_metadata *b) {
+			if (a->has_history_database_dependency_on(b)) {
+				return false;
+			} else if (b->has_history_database_dependency_on(a)) {
+				return true;
+			}
+
+			if (a->get_history_database_dependency_count() != b->get_history_database_dependency_count()) {
+				return a->get_history_database_dependency_count() < b->get_history_database_dependency_count();
+			}
+
+			return a->get_class_identifier() < b->get_class_identifier();
+		});
+
+		for (const data_type_metadata *metadata : metadata_list) {
+			metadata->get_history_loading_function()();
+		}
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error loading history."));
 	}
