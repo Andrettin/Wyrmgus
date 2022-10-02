@@ -242,7 +242,7 @@ void CUpgrade::process_gsml_scope(const gsml_data &scope)
 		database::process_gsml_data(this->ai_priority, scope);
 	} else if (tag == "affixed_item_classes") {
 		for (const std::string &value : values) {
-			this->affixed_item_classes.insert(string_to_item_class(value));
+			this->affixed_item_classes.insert(enum_converter<item_class>::to_enum(value));
 		}
 	} else if (tag == "incompatible_affixes") {
 		for (const std::string &value : values) {
@@ -762,7 +762,7 @@ int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "UniqueOnly")) {
 			upgrade->UniqueOnly = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Work")) {
-			upgrade->Work = string_to_item_class(LuaToString(l, -1));
+			upgrade->Work = enum_converter<item_class>::to_enum(LuaToString(l, -1));
 		} else if (!strcmp(value, "Item")) {
 			unit_type *item = unit_type::get(LuaToString(l, -1));
 			upgrade->item = item;
@@ -805,7 +805,7 @@ int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const item_class item_class = string_to_item_class(LuaToString(l, -1, j + 1));
+				const item_class item_class = enum_converter<wyrmgus::item_class>::to_enum(LuaToString(l, -1, j + 1));
 				
 				upgrade->affixed_item_classes.insert(item_class);
 			}
@@ -835,7 +835,7 @@ int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				upgrade->WeaponClasses.insert(string_to_item_class(LuaToString(l, -1, j + 1)));
+				upgrade->WeaponClasses.insert(enum_converter<item_class>::to_enum(LuaToString(l, -1, j + 1)));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1228,7 +1228,7 @@ static int CclGetUpgradeData(lua_State *l)
 		} else {
 			LuaCheckArgs(l, 3);
 			const std::string item_class_name = LuaToString(l, 3);
-			const item_class item_class = string_to_item_class(item_class_name);
+			const item_class item_class = enum_converter<wyrmgus::item_class>::to_enum(item_class_name);
 			lua_pushboolean(l, upgrade->is_magic_prefix() && upgrade->has_affixed_item_class(item_class));
 			return 1;
 		}
@@ -1244,7 +1244,7 @@ static int CclGetUpgradeData(lua_State *l)
 		} else {
 			LuaCheckArgs(l, 3);
 			const std::string item_class_name = LuaToString(l, 3);
-			const item_class item_class = string_to_item_class(item_class_name);
+			const item_class item_class = enum_converter<wyrmgus::item_class>::to_enum(item_class_name);
 			lua_pushboolean(l, upgrade->is_magic_suffix() && upgrade->has_affixed_item_class(item_class));
 			return 1;
 		}

@@ -197,6 +197,7 @@ source_group(guichan FILES ${guichan_SRCS})
 
 set(item_SRCS
 	src/item/item_class.cpp
+	src/item/item_slot.cpp
 	src/item/persistent_item.cpp
 	src/item/recipe.cpp
 	src/item/script_item.cpp

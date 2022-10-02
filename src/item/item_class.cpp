@@ -32,6 +32,44 @@
 
 namespace wyrmgus {
 
+template class enum_converter<item_class>;
+
+template <>
+const std::string enum_converter<item_class>::property_class_identifier = "wyrmgus::item_class";
+
+template <>
+const std::map<std::string, item_class> enum_converter<item_class>::string_to_enum_map = {
+	{ "dagger", item_class::dagger },
+	{ "sword", item_class::sword },
+	{ "thrusting_sword", item_class::thrusting_sword },
+	{ "axe", item_class::axe },
+	{ "mace", item_class::mace },
+	{ "spear", item_class::spear },
+	{ "bow", item_class::bow },
+	{ "throwing_axe", item_class::throwing_axe },
+	{ "javelin", item_class::javelin },
+	{ "gun", item_class::gun },
+	{ "shield", item_class::shield },
+	{ "horn", item_class::horn },
+	{ "trinket", item_class::trinket },
+	{ "helmet", item_class::helmet },
+	{ "armor", item_class::armor },
+	{ "cloak", item_class::cloak },
+	{ "gloves", item_class::gloves },
+	{ "belt", item_class::belt },
+	{ "boots", item_class::boots },
+	{ "amulet", item_class::amulet },
+	{ "ring", item_class::ring },
+	{ "arrows", item_class::arrows },
+	{ "food", item_class::food },
+	{ "potion", item_class::potion },
+	{ "scroll", item_class::scroll },
+	{ "book", item_class::book }
+};
+
+template <>
+const bool enum_converter<item_class>::initialized = enum_converter::initialize();
+
 item_slot get_item_class_slot(const item_class item_class)
 {
 	switch (item_class) {

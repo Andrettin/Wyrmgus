@@ -152,9 +152,9 @@ void unit_type_variation::ProcessConfigData(const CConfigData *config_data)
 			const CUpgrade *upgrade = CUpgrade::get(value);
 			this->UpgradesForbidden.push_back(upgrade);
 		} else if (key == "item_class_equipped") {
-			this->item_classes_equipped.insert(string_to_item_class(value));
+			this->item_classes_equipped.insert(enum_converter<item_class>::to_enum(value));
 		} else if (key == "item_class_not_equipped") {
-			this->item_classes_not_equipped.insert(string_to_item_class(value));
+			this->item_classes_not_equipped.insert(enum_converter<item_class>::to_enum(value));
 		} else if (key == "item_equipped") {
 			const wyrmgus::unit_type *unit_type = unit_type::get(value);
 			this->ItemsEquipped.push_back(unit_type);

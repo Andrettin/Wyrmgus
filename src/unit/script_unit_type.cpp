@@ -646,11 +646,11 @@ int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "item-class-equipped")) {
 						const std::string item_class_ident = LuaToString(l, -1, k + 1);
-						const wyrmgus::item_class item_class = wyrmgus::string_to_item_class(item_class_ident);
+						const item_class item_class = enum_converter<wyrmgus::item_class>::to_enum(item_class_ident);
 						variation->item_classes_equipped.insert(item_class);
 					} else if (!strcmp(value, "item-class-not-equipped")) {
 						const std::string item_class_ident = LuaToString(l, -1, k + 1);
-						const wyrmgus::item_class item_class = wyrmgus::string_to_item_class(item_class_ident);
+						const item_class item_class = enum_converter<wyrmgus::item_class>::to_enum(item_class_ident);
 						variation->item_classes_not_equipped.insert(item_class);
 					} else if (!strcmp(value, "item-equipped")) {
 						const std::string type_ident = LuaToString(l, -1, k + 1);
@@ -825,9 +825,9 @@ int CclDefineUnitType(lua_State *l)
 				lua_rawgeti(l, -1, j + 1);
 				const int subargs = lua_rawlen(l, -1);
 				for (int k = 0; k < subargs; ++k) {
-					const wyrmgus::item_slot item_slot = wyrmgus::string_to_item_slot(LuaToString(l, -1, k + 1));
+					const item_slot item_slot = enum_converter<wyrmgus::item_slot>::to_enum(LuaToString(l, -1, k + 1));
 					++k;
-					wyrmgus::unit_type *default_equipment = wyrmgus::unit_type::get(LuaToString(l, -1, k + 1));
+					unit_type *default_equipment = wyrmgus::unit_type::get(LuaToString(l, -1, k + 1));
 					type->DefaultEquipment[item_slot] = default_equipment;
 				}
 				lua_pop(l, 1);
@@ -1498,7 +1498,7 @@ int CclDefineUnitType(lua_State *l)
 				type->StartingAbilities.push_back(CUpgrade::get(ability_ident));
 			}
 		} else if (!strcmp(value, "ItemClass")) {
-			type->item_class = wyrmgus::string_to_item_class(LuaToString(l, -1));
+			type->item_class = enum_converter<item_class>::to_enum(LuaToString(l, -1));
 		} else if (!strcmp(value, "Species")) {
 			type->species = wyrmgus::species::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TerrainType")) {
@@ -1507,7 +1507,7 @@ int CclDefineUnitType(lua_State *l)
 			type->WeaponClasses.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				type->WeaponClasses.push_back(wyrmgus::string_to_item_class(LuaToString(l, -1, j + 1)));
+				type->WeaponClasses.push_back(enum_converter<item_class>::to_enum(LuaToString(l, -1, j + 1)));
 			}
 		//Wyrmgus end
 		} else {
@@ -1856,7 +1856,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Class")) {
 		if (type->get_item_class() != wyrmgus::item_class::none) {
-			lua_pushstring(l, wyrmgus::item_class_to_string(type->get_item_class()).c_str());
+			lua_pushstring(l, enum_converter<item_class>::to_string(type->get_item_class()).c_str());
 		} else if (type->get_unit_class() != nullptr) {
 			lua_pushstring(l, type->get_unit_class()->get_identifier().c_str());
 		} else {
@@ -1967,7 +1967,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ItemClass")) {
 		if (type->get_item_class() != wyrmgus::item_class::none) {
-			lua_pushstring(l, wyrmgus::item_class_to_string(type->get_item_class()).c_str());
+			lua_pushstring(l, enum_converter<item_class>::to_string(type->get_item_class()).c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1975,7 +1975,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "ItemSlot")) {
 		const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(type->get_item_class());
 		if (item_slot != wyrmgus::item_slot::none) {
-			lua_pushstring(l, wyrmgus::item_slot_to_string(item_slot).c_str());
+			lua_pushstring(l, enum_converter<wyrmgus::item_slot>::to_string(item_slot).c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1988,7 +1988,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, type->WeaponClasses.size(), 0);
 		for (size_t i = 1; i <= type->WeaponClasses.size(); ++i)
 		{
-			lua_pushstring(l, wyrmgus::item_class_to_string(type->WeaponClasses[i-1]).c_str());
+			lua_pushstring(l, enum_converter<item_class>::to_string(type->WeaponClasses[i-1]).c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

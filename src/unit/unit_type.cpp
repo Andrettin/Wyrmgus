@@ -838,7 +838,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 		}
 	} else if (tag == "weapon_classes") {
 		for (const std::string &value : values) {
-			this->WeaponClasses.push_back(string_to_item_class(value));
+			this->WeaponClasses.push_back(enum_converter<wyrmgus::item_class>::to_enum(value));
 		}
 	} else if (tag == "spawned_units") {
 		if (gsml_operator == gsml_operator::assignment) {
@@ -869,7 +869,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			const item_slot item_slot = string_to_item_slot(key);
+			const item_slot item_slot = enum_converter<wyrmgus::item_slot>::to_enum(key);
 			unit_type *item = unit_type::get(value);
 			this->DefaultEquipment[item_slot] = item;
 		});

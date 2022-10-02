@@ -305,7 +305,7 @@ void spell::process_gsml_property(const gsml_property &property)
 	} else if (key == "effects_string") {
 		this->effects_string = value;
 	} else if (key == "item_spell") {
-		const int item_class = static_cast<int>(string_to_item_class(value));
+		const int item_class = static_cast<int>(enum_converter<wyrmgus::item_class>::to_enum(value));
 		this->ItemSpell[item_class] = true;
 	} else {
 		data_entry::process_gsml_property(property);

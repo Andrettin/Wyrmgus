@@ -372,7 +372,7 @@ int CclDefineSpell(lua_State *l)
 			spell->dependency_upgrade = CUpgrade::get(value);
 		//Wyrmgus start
 		} else if (!strcmp(value, "item-spell")) {
-			const int item_class = static_cast<int>(wyrmgus::string_to_item_class(LuaToString(l, i + 1)));
+			const int item_class = static_cast<int>(enum_converter<wyrmgus::item_class>::to_enum(LuaToString(l, i + 1)));
 			spell->ItemSpell[item_class] = true;
 		//Wyrmgus end
 		} else {

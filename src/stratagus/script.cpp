@@ -1735,7 +1735,7 @@ std::string EvalString(const StringDesc *s)
 			if (type != nullptr) {
 				std::string str;
 				if ((**type).BoolFlag[ITEM_INDEX].value) {
-					str = wyrmgus::item_class_to_string((**type).get_item_class());
+					str = enum_converter<item_class>::to_string((**type).get_item_class());
 					str[0] = toupper(str[0]);
 					size_t loc;
 					while ((loc = str.find("_")) != std::string::npos) {

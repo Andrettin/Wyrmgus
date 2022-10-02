@@ -24,30 +24,32 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "item/item_slot.h"
 
 namespace wyrmgus {
 
-enum class item_slot {
-	none = -1,
-	weapon,
-	shield,
-	helmet,
-	armor,
-	gloves,
-	boots,
-	belt,
-	amulet,
-	ring,
-	arrows,
+template class enum_converter<item_slot>;
 
-	count
+template <>
+const std::string enum_converter<item_slot>::property_class_identifier = "wyrmgus::item_slot";
+
+template <>
+const std::map<std::string, item_slot> enum_converter<item_slot>::string_to_enum_map = {
+	{ "weapon", item_slot::weapon },
+	{ "shield", item_slot::shield },
+	{ "helmet", item_slot::helmet },
+	{ "armor", item_slot::armor },
+	{ "gloves", item_slot::gloves },
+	{ "boots", item_slot::boots },
+	{ "belt", item_slot::belt },
+	{ "amulet", item_slot::amulet },
+	{ "ring", item_slot::ring },
+	{ "arrows", item_slot::arrows }
 };
 
-extern template class enum_converter<item_slot>;
+template <>
+const bool enum_converter<item_slot>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::item_slot)

@@ -289,10 +289,6 @@ QVariant database::process_gsml_property_value(const gsml_property &property, co
 			new_property_value = QVariant::fromValue(string_to_difficulty(property.get_value()));
 		} else if (property_class_name == "wyrmgus::hotkey_setup") {
 			new_property_value = QVariant::fromValue(string_to_hotkey_setup(property.get_value()));
-		} else if (property_class_name == "wyrmgus::item_class") {
-			new_property_value = QVariant::fromValue(string_to_item_class(property.get_value()));
-		} else if (property_class_name == "wyrmgus::item_slot") {
-			new_property_value = QVariant::fromValue(string_to_item_slot(property.get_value()));
 		} else if (property_class_name == "archimedes::map_projection*") {
 			new_property_value = QVariant::fromValue(map_projection::from_string(property.get_value()));
 		} else if (property_class_name == "wyrmgus::module*") {
