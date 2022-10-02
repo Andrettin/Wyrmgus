@@ -54,7 +54,7 @@ void map_settings::process_gsml_scope(const gsml_data &scope)
 			this->starting_upgrades.insert(CUpgrade::get(value));
 		}
 	} else {
-		database::process_gsml_scope_for_object(this, scope);
+		database::get()->process_gsml_scope_for_object(this, scope);
 	}
 }
 

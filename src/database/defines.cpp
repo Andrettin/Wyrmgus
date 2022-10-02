@@ -145,7 +145,7 @@ void defines::process_gsml_scope(const gsml_data &scope)
 			this->translations[property.get_key()] = property.get_value();
 		});
 	} else {
-		database::process_gsml_scope_for_object(this, scope);
+		database::get()->process_gsml_scope_for_object(this, scope);
 	}
 }
 

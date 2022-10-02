@@ -88,7 +88,7 @@ void dungeon_generation_settings::process_gsml_scope(const gsml_data &scope)
 			this->heroes.push_back(character::get(value));
 		}
 	} else {
-		database::process_gsml_scope_for_object(this, scope);
+		database::get()->process_gsml_scope_for_object(this, scope);
 	}
 }
 

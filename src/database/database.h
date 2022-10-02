@@ -85,9 +85,9 @@ public:
 
 	void process_gsml_property_for_object(QObject *object, const gsml_property &property);
 	QVariant process_gsml_property_value(const gsml_property &property, const QMetaProperty &meta_property, const QObject *object);
-	static void process_gsml_scope_for_object(QObject *object, const gsml_data &scope);
+	void process_gsml_scope_for_object(QObject *object, const gsml_data &scope);
 	static QVariant process_gsml_scope_value(const gsml_data &scope, const QMetaProperty &meta_property);
-	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const gsml_operator gsml_operator, const std::string &value);
+	void modify_list_property_for_object(QObject *object, const std::string &property_name, const gsml_operator gsml_operator, const std::string &value);
 	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const gsml_operator gsml_operator, const gsml_data &scope);
 
 	static std::filesystem::path get_documents_modules_path()
@@ -374,6 +374,7 @@ public:
 	}
 
 	void register_string_to_qvariant_conversion(const std::string &class_name, std::function<QVariant(const std::string &)> &&function);
+	void register_list_property_function(const std::string &class_name, std::function<bool(QObject *object, const std::string &, const std::string &)> &&function);
 
 private:
 	std::filesystem::path root_path = std::filesystem::current_path();
@@ -383,6 +384,7 @@ private:
 	const data_module *current_module = nullptr; //the module currently being processed
 	bool initialized = false;
 	std::map<std::string, std::function<QVariant(const std::string &)>> string_to_qvariant_conversion_map; //conversions functions from string to QVariant, mapped to the respective class names
+	std::map<std::string, std::function<bool(QObject *object, const std::string &, const std::string &)>> list_property_function_map;
 };
 
 }

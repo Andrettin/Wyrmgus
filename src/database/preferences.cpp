@@ -150,7 +150,7 @@ void preferences::process_gsml_property(const gsml_property &property)
 void preferences::process_gsml_scope(const gsml_data &scope)
 {
 	try {
-		database::process_gsml_scope_for_object(this, scope);
+		database::get()->process_gsml_scope_for_object(this, scope);
 	} catch (const std::runtime_error &exception) {
 		exception::report(exception);
 	}

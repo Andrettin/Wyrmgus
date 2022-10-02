@@ -39,7 +39,7 @@ void data_entry_history::process_gsml_property(const gsml_property &property)
 
 void data_entry_history::process_gsml_scope(const gsml_data &scope)
 {
-	database::process_gsml_scope_for_object(this, scope);
+	database::get()->process_gsml_scope_for_object(this, scope);
 }
 
 }

@@ -48,7 +48,7 @@ void data_module::process_gsml_scope(const gsml_data &scope)
 			this->add_dependency(database::get()->get_module(value));
 		}
 	} else {
-		database::process_gsml_scope_for_object(this, scope);
+		database::get()->process_gsml_scope_for_object(this, scope);
 	}
 }
 

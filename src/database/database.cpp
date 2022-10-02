@@ -319,7 +319,7 @@ void database::process_gsml_scope_for_object(QObject *object, const gsml_data &s
 		if (scope.get_operator() == gsml_operator::assignment) {
 			if ((property_type == QVariant::Type::List || property_type == QVariant::Type::StringList || (property_class_name.starts_with("std::vector<") && property_class_name.ends_with(">"))) && !scope.get_values().empty()) {
 				for (const std::string &value : scope.get_values()) {
-					database::modify_list_property_for_object(object, property_name, gsml_operator::addition, value);
+					this->modify_list_property_for_object(object, property_name, gsml_operator::addition, value);
 				}
 				return;
 			} else if (property_type == QVariant::Type::List && scope.has_children()) {
@@ -457,7 +457,12 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_type == QVariant::Type::StringList) {
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::string &, value));
 	} else {
-		throw std::runtime_error("Unknown type for list property \"" + property_name + "\" (in class \"" + class_name + "\").");
+		const auto find_iterator = this->list_property_function_map.find(property_class_name);
+		if (find_iterator != this->list_property_function_map.end()) {
+			success = find_iterator->second(object, method_name, value);
+		} else {
+			throw std::runtime_error("Unknown type for list property \"" + property_name + "\" (in class \"" + class_name + "\").");
+		}
 	}
 
 	if (!success) {
@@ -827,6 +832,13 @@ void database::register_string_to_qvariant_conversion(const std::string &class_n
 	assert_throw(!this->string_to_qvariant_conversion_map.contains(class_name));
 
 	this->string_to_qvariant_conversion_map[class_name] = std::move(function);
+}
+
+void database::register_list_property_function(const std::string &class_name, std::function<bool(QObject *object, const std::string &, const std::string &)> &&function)
+{
+	assert_throw(!this->list_property_function_map.contains(class_name));
+
+	this->list_property_function_map[class_name] = std::move(function);
 }
 
 }
