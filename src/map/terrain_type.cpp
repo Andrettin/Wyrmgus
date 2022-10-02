@@ -512,11 +512,6 @@ bool terrain_type::is_constructed() const
 	return this->is_overlay() && (this->is_wall() || this->has_flag(tile_flag::road) || this->has_flag(tile_flag::railroad));
 }
 
-QVariantList terrain_type::get_base_terrain_types_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_base_terrain_types());
-}
-
 void terrain_type::remove_base_terrain_type(terrain_type *terrain_type)
 {
 	vector::remove(this->base_terrain_types, terrain_type);
@@ -527,19 +522,9 @@ bool terrain_type::is_border_terrain_type(const terrain_type *terrain_type) cons
 	return vector::contains(this->BorderTerrains, terrain_type);
 }
 
-QVariantList terrain_type::get_outer_border_terrain_types_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_outer_border_terrain_types());
-}
-
 void terrain_type::remove_outer_border_terrain_type(terrain_type *terrain_type)
 {
 	vector::remove(this->outer_border_terrain_types, terrain_type);
-}
-
-QVariantList terrain_type::get_inner_border_terrain_types_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_inner_border_terrain_types());
 }
 
 void terrain_type::remove_inner_border_terrain_type(terrain_type *terrain_type)

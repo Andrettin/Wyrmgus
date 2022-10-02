@@ -291,7 +291,7 @@ public:
 	void GenerateMissingDates();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
-	religion *get_religion() const;
+	const religion *get_religion() const;
 	const language *get_language() const;
 	calendar *get_calendar() const;
 

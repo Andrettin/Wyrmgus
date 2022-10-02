@@ -75,7 +75,7 @@ std::string dynasty::get_encyclopedia_text() const
 {
 	std::string text;
 
-	std::vector<const faction *> factions = this->get_factions();
+	std::vector<faction *> factions = this->get_factions();
 	std::sort(factions.begin(), factions.end(), named_data_entry::compare_encyclopedia_entries);
 
 	if (!factions.empty()) {
@@ -113,11 +113,6 @@ void dynasty::set_upgrade(CUpgrade *upgrade)
 
 	this->upgrade = upgrade;
 	upgrade->set_dynasty(this);
-}
-
-QVariantList dynasty::get_factions_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_factions());
 }
 
 void dynasty::add_faction(faction *faction)

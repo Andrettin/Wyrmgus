@@ -59,7 +59,7 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 	Q_PROPERTY(wyrmgus::timeline* timeline MEMBER timeline NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction NOTIFY changed)
 	Q_PROPERTY(wyrmgus::quest* quest MEMBER quest NOTIFY changed)
-	Q_PROPERTY(QVariantList map_templates READ get_map_templates_qvariant_list)
+	Q_PROPERTY(std::vector<wyrmgus::map_template *> map_templates READ get_map_templates)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(bool available READ is_available NOTIFY available_changed)
 	Q_PROPERTY(wyrmgus::map_presets* map_presets MEMBER map_presets NOTIFY changed)
@@ -140,8 +140,6 @@ public:
 	{
 		return this->map_templates;
 	}
-
-	QVariantList get_map_templates_qvariant_list() const;
 
 	Q_INVOKABLE void add_map_template(map_template *map_template)
 	{

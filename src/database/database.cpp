@@ -28,10 +28,7 @@
 
 #include "database/database.h"
 
-#include "age.h"
-#include "animation/animation_set.h"
 #include "character.h"
-#include "character_title.h"
 #include "database/data_module.h"
 #include "database/data_module_container.h"
 #include "database/data_type_metadata.h"
@@ -41,84 +38,17 @@
 #include "database/gsml_operator.h"
 #include "database/gsml_parser.h"
 #include "database/gsml_property.h"
-#include "dialogue.h"
-#include "economy/resource.h"
 #include "engine_interface.h"
-#include "epithet.h"
-#include "game/difficulty.h"
-#include "gender.h"
-#include "item/item_class.h"
-#include "item/item_slot.h"
-#include "item/recipe.h"
-#include "item/unique_item.h"
-#include "language/grammatical_gender.h"
-#include "language/language.h"
-#include "language/language_family.h"
-#include "language/word.h"
-#include "language/word_type.h"
-#include "magic_domain.h"
-#include "map/map_presets.h"
 #include "map/map_projection.h"
 #include "map/map_template.h"
 #include "map/region.h"
 #include "map/site.h"
-#include "map/terrain_feature.h"
-#include "map/terrain_type.h"
-#include "map/tileset.h"
-#include "map/world.h"
-#include "missile/missile_class.h"
-#include "missile.h"
 #include "player/civilization.h"
 #include "player/civilization_group.h"
-#include "player/civilization_group_rank.h"
-#include "player/dynasty.h"
 #include "player/faction.h"
-#include "player/faction_tier.h"
-#include "player/faction_type.h"
-#include "player/government_type.h"
-#include "player/player_color.h"
-#include "population/employment_type.h"
-#include "population/population_class.h"
-#include "population/population_type.h"
 #include "quest/achievement.h"
-#include "quest/campaign.h"
 #include "quest/quest.h"
-#include "religion/deity.h"
-#include "religion/pantheon.h"
-#include "religion/religion.h"
-#include "script/trigger_random_group.h"
-#include "script/trigger_target.h"
-#include "script/trigger_type.h"
-#include "sound/music_type.h"
-#include "sound/sound.h"
-#include "species/ecological_niche.h"
-#include "species/geological_era.h"
-#include "species/species.h"
-#include "species/taxon.h"
-#include "species/taxonomic_rank.h"
-#include "spell/spell.h"
-#include "spell/spell_target_type.h"
-#include "time/calendar.h"
-#include "time/season_schedule.h"
-#include "time/time_of_day.h"
-#include "time/time_of_day_schedule.h"
-#include "time/timeline.h"
-#include "ui/button_level.h"
-#include "ui/cursor.h"
-#include "ui/cursor_type.h"
-#include "ui/hotkey_setup.h"
-#include "ui/icon.h"
-#include "ui/interface_style.h"
-#include "ui/resource_icon.h"
-#include "unit/construction.h"
 #include "unit/historical_unit.h"
-#include "unit/unit_class.h"
-#include "unit/unit_domain.h"
-#include "unit/unit_type.h"
-#include "upgrade/upgrade_category.h"
-#include "upgrade/upgrade_category_rank.h"
-#include "upgrade/upgrade_class.h"
-#include "upgrade/upgrade_structs.h"
 #include "util/assert_util.h"
 #include "util/colorization_type.h"
 #include "util/geocoordinate.h"
@@ -127,8 +57,6 @@
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
 #include "util/thread_pool.h"
-#include "video/font.h"
-#include "video/font_color.h"
 
 namespace wyrmgus {
 
@@ -415,33 +343,9 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 
 	bool success = false;
 
-	if (property_name == "domains") {
-		magic_domain *domain_value = magic_domain::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(magic_domain *, domain_value));
-	} else if (property_name == "factions") {
-		faction *faction_value = faction::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(faction *, faction_value));
-	} else if (property_name == "files") {
+	if (property_name == "files") {
 		const std::filesystem::path filepath(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::filesystem::path &, filepath));
-	} else if (property_name == "map_templates") {
-		map_template *map_template_value = map_template::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(map_template *, map_template_value));
-	} else if (property_name == "regions" || property_name == "superregions") {
-		region *region_value = region::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(region *, region_value));
-	} else if (property_name == "religions") {
-		religion *religion_value = religion::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(religion *, religion_value));
-	} else if (property_name == "terrain_types" || property_name == "base_terrain_types" || property_name == "outer_border_terrain_types" || property_name == "inner_border_terrain_types") {
-		terrain_type *terrain_type_value = terrain_type::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(terrain_type *, terrain_type_value));
-	} else if (property_name == "unit_classes" || property_name == "building_classes") {
-		unit_class *unit_class_value = unit_class::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(unit_class *, unit_class_value));
-	} else if (property_name == "upgrades") {
-		CUpgrade *upgrade_value = CUpgrade::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(CUpgrade *, upgrade_value));
 	} else if (property_type == QVariant::Type::StringList) {
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::string &, value));
 	} else {

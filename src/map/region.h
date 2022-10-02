@@ -40,7 +40,7 @@ class region final : public data_entry, public data_type<region>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QVariantList superregions READ get_superregions_qvariant_list)
+	Q_PROPERTY(std::vector<wyrmgus::region *> superregions READ get_superregions)
 
 public:
 	static constexpr const char *class_identifier = "region";
@@ -83,7 +83,10 @@ public:
 	void add_terrain_feature(terrain_feature *terrain_feature);
 	void remove_terrain_feature(terrain_feature *terrain_feature);
 
-	QVariantList get_superregions_qvariant_list() const;
+	const std::vector<region *> &get_superregions() const
+	{
+		return this->superregions;
+	}
 
 	Q_INVOKABLE void add_superregion(region *superregion)
 	{

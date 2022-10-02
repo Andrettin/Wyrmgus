@@ -41,7 +41,7 @@ class site_history final : public data_entry_history
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::faction* owner MEMBER owner)
-	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
+	Q_PROPERTY(std::vector<const wyrmgus::unit_class *> building_classes READ get_building_classes)
 	Q_PROPERTY(wyrmgus::unit_type* neutral_building_type MEMBER neutral_building_type)
 	Q_PROPERTY(wyrmgus::unit_class* pathway_class MEMBER pathway_class)
 	Q_PROPERTY(wyrmgus::unit_class* wall_class MEMBER wall_class)
@@ -59,14 +59,13 @@ public:
 		return this->owner;
 	}
 
-	const std::vector<unit_class *> &get_building_classes() const
+	const std::vector<const unit_class *> &get_building_classes() const
 	{
 		return this->building_classes;
 	}
 
-	QVariantList get_building_classes_qvariant_list() const;
-	Q_INVOKABLE void add_building_class(unit_class *building_class);
-	Q_INVOKABLE void remove_building_class(unit_class *building_class);
+	Q_INVOKABLE void add_building_class(const unit_class *building_class);
+	Q_INVOKABLE void remove_building_class(const unit_class *building_class);
 
 	const unit_type *get_neutral_building_type() const
 	{
@@ -126,7 +125,7 @@ public:
 private:
 	const wyrmgus::site *site = nullptr;
 	faction *owner = nullptr;
-	std::vector<unit_class *> building_classes; //applied as buildings at scenario start
+	std::vector<const unit_class *> building_classes; //applied as buildings at scenario start
 	unit_type *neutral_building_type = nullptr; //the building applied on this site at scenario start if it has no owner
 	unit_class *pathway_class = nullptr;
 	unit_class *wall_class = nullptr;

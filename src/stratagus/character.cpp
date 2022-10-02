@@ -1048,7 +1048,7 @@ int character::GetAttributeModifier(int attribute) const
 	return this->Attributes[attribute] - 10;
 }
 
-religion *character::get_religion() const
+const religion *character::get_religion() const
 {
 	//get the first religion of the character's first deity, since at present we don't set the religion directly for the character
 	

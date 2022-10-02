@@ -210,11 +210,6 @@ bool campaign::contains_timeline_date(const wyrmgus::timeline *timeline, const Q
 	return this->get_timeline()->contains_timeline_date(timeline, date);
 }
 
-QVariantList campaign::get_map_templates_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_map_templates());
-}
-
 void campaign::remove_map_template(map_template *map_template)
 {
 	vector::remove(this->map_templates, map_template);

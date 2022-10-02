@@ -540,11 +540,6 @@ void site::set_mass_jm(const centesimal_int &mass_jm)
 	this->mass = astronomy::jovian_mass_to_zg(mass_jm);
 }
 
-QVariantList site::get_regions_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_regions());
-}
-
 void site::add_region(region *region)
 {
 	if (!vector::contains(this->regions, region)) {

@@ -83,7 +83,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(quint64 mass MEMBER mass READ get_mass)
 	Q_PROPERTY(archimedes::centesimal_int mass_jm READ get_mass_jm WRITE set_mass_jm)
 	Q_PROPERTY(wyrmgus::site* connection_destination MEMBER connection_destination)
-	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
+	Q_PROPERTY(std::vector<wyrmgus::region *> regions READ get_regions)
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
 
 public:
@@ -283,8 +283,6 @@ public:
 	{
 		return this->regions;
 	}
-
-	QVariantList get_regions_qvariant_list() const;
 
 	Q_INVOKABLE void add_region(region *region);
 	Q_INVOKABLE void remove_region(region *region);

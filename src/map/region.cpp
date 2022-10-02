@@ -142,11 +142,6 @@ void region::remove_terrain_feature(terrain_feature *terrain_feature)
 	vector::remove(this->terrain_features, terrain_feature);
 }
 
-QVariantList region::get_superregions_qvariant_list() const
-{
-	return container::to_qvariant_list(this->superregions);
-}
-
 void region::remove_superregion(region *superregion)
 {
 	vector::remove(this->superregions, superregion);

@@ -47,7 +47,7 @@ class dynasty final : public detailed_data_entry, public data_type<dynasty>
 
 	Q_PROPERTY(CUpgrade* upgrade READ get_upgrade WRITE set_upgrade)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
-	Q_PROPERTY(QVariantList factions READ get_factions_qvariant_list NOTIFY changed)
+	Q_PROPERTY(std::vector<wyrmgus::faction *> factions READ get_factions)
 	Q_PROPERTY(QVariantList dynastic_tree_characters READ get_dynastic_tree_characters NOTIFY changed)
 
 public:
@@ -87,12 +87,10 @@ public:
 		return this->icon;
 	}
 
-	const std::vector<const faction *> &get_factions() const
+	const std::vector<faction *> &get_factions() const
 	{
 		return this->factions;
 	}
-
-	QVariantList get_factions_qvariant_list() const;
 
 	Q_INVOKABLE void add_faction(faction *faction);
 	Q_INVOKABLE void remove_faction(faction *faction);
@@ -126,7 +124,7 @@ private:
 	int index = -1;
 	CUpgrade *upgrade = nullptr; //dynasty upgrade applied when the dynasty is set
 	wyrmgus::icon *icon = nullptr;
-	std::vector<const faction *> factions; //to which factions is this dynasty available
+	std::vector<faction *> factions; //to which factions is this dynasty available
 	std::unique_ptr<and_condition<CPlayer>> preconditions;
 	std::unique_ptr<and_condition<CPlayer>> conditions;
 	std::vector<const character *> characters;

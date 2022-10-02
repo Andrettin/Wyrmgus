@@ -129,7 +129,7 @@ std::string deity::get_encyclopedia_text() const
 
 	named_data_entry::concatenate_encyclopedia_text(text, "Rank: " + std::string(this->is_major() ? "Major" : "Minor"));
 
-	std::vector<magic_domain *> domains = this->get_domains();
+	std::vector<const magic_domain *> domains = this->get_domains();
 	std::sort(domains.begin(), domains.end(), named_data_entry::compare_encyclopedia_entries);
 
 	if (!domains.empty()) {
@@ -278,22 +278,12 @@ void deity::remove_civilization(civilization *civilization)
 	vector::remove(civilization->Deities, this);
 }
 
-QVariantList deity::get_religions_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_religions());
-}
-
-void deity::remove_religion(religion *religion)
+void deity::remove_religion(const religion *religion)
 {
 	vector::remove(this->religions, religion);
 }
 
-QVariantList deity::get_domains_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_domains());
-}
-
-void deity::remove_domain(magic_domain *domain)
+void deity::remove_domain(const magic_domain *domain)
 {
 	vector::remove(this->domains, domain);
 }

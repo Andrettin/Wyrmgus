@@ -51,12 +51,7 @@ void site_history::process_gsml_scope(const gsml_data &scope)
 	}
 }
 
-QVariantList site_history::get_building_classes_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_building_classes());
-}
-
-void site_history::add_building_class(unit_class *building_class)
+void site_history::add_building_class(const unit_class *building_class)
 {
 	if (building_class->is_town_hall()) {
 		if (!this->site->is_settlement()) {
@@ -65,7 +60,7 @@ void site_history::add_building_class(unit_class *building_class)
 
 		//remove other settlement head buildings (there can be only one at a time for a given settlement)
 		for (size_t i = 0; i < this->building_classes.size();) {
-			unit_class *other_building_class = this->building_classes[i];
+			const unit_class *other_building_class = this->building_classes[i];
 
 			if (other_building_class->is_town_hall()) {
 				this->building_classes.erase(this->building_classes.begin() + i);
@@ -78,7 +73,7 @@ void site_history::add_building_class(unit_class *building_class)
 	this->building_classes.push_back(building_class);
 }
 
-void site_history::remove_building_class(unit_class *building_class)
+void site_history::remove_building_class(const unit_class *building_class)
 {
 	if (building_class->is_town_hall()) {
 		if (!vector::contains(this->building_classes, building_class)) {

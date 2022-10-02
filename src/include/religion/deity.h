@@ -60,8 +60,8 @@ class deity final : public detailed_data_entry, public data_type<deity>
 	Q_PROPERTY(wyrmgus::character* mother READ get_mother WRITE set_mother)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade WRITE set_upgrade)
 	Q_PROPERTY(std::vector<wyrmgus::civilization *> civilizations READ get_civilizations)
-	Q_PROPERTY(QVariantList religions READ get_religions_qvariant_list)
-	Q_PROPERTY(QVariantList domains READ get_domains_qvariant_list)
+	Q_PROPERTY(std::vector<const wyrmgus::religion *> religions READ get_religions)
+	Q_PROPERTY(std::vector<const wyrmgus::magic_domain *> domains READ get_domains)
 
 public:
 	static constexpr const char *class_identifier = "deity";
@@ -139,33 +139,29 @@ public:
 	Q_INVOKABLE void add_civilization(civilization *civilization);
 	Q_INVOKABLE void remove_civilization(civilization *civilization);
 
-	const std::vector<religion *> &get_religions() const
+	const std::vector<const religion *> &get_religions() const
 	{
 		return this->religions;
 	}
 
-	QVariantList get_religions_qvariant_list() const;
-
-	Q_INVOKABLE void add_religion(religion *religion)
+	Q_INVOKABLE void add_religion(const religion *religion)
 	{
 		this->religions.push_back(religion);
 	}
 
-	Q_INVOKABLE void remove_religion(religion *religion);
+	Q_INVOKABLE void remove_religion(const religion *religion);
 
-	const std::vector<magic_domain *> &get_domains() const
+	const std::vector<const magic_domain *> &get_domains() const
 	{
 		return this->domains;
 	}
 
-	QVariantList get_domains_qvariant_list() const;
-
-	Q_INVOKABLE void add_domain(magic_domain *domain)
+	Q_INVOKABLE void add_domain(const magic_domain *domain)
 	{
 		this->domains.push_back(domain);
 	}
 
-	Q_INVOKABLE void remove_domain(magic_domain *domain);
+	Q_INVOKABLE void remove_domain(const magic_domain *domain);
 
 	const std::vector<const spell *> &get_spells() const
 	{
@@ -182,11 +178,11 @@ private:
 	world *homeworld = nullptr;
 	CUpgrade *upgrade = nullptr; //the deity's upgrade applied to a player that worships it
 	std::vector<civilization *> civilizations; //civilizations which may worship the deity
-	std::vector<religion *> religions; //religions for which this deity is available
+	std::vector<const religion *> religions; //religions for which this deity is available
 public:
 	std::vector<std::string> Feasts;
 private:
-	std::vector<magic_domain *> domains;
+	std::vector<const magic_domain *> domains;
 	std::vector<const spell *> spells; //abilities linked to this deity
 	std::map<const civilization *, std::string> cultural_names;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 

@@ -66,9 +66,9 @@ class terrain_type final : public named_data_entry, public data_type<terrain_typ
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(wyrmgus::resource* resource MEMBER resource)
 	Q_PROPERTY(int movement_bonus MEMBER movement_bonus READ get_movement_bonus)
-	Q_PROPERTY(QVariantList base_terrain_types READ get_base_terrain_types_qvariant_list)
-	Q_PROPERTY(QVariantList outer_border_terrain_types READ get_outer_border_terrain_types_qvariant_list)
-	Q_PROPERTY(QVariantList inner_border_terrain_types READ get_inner_border_terrain_types_qvariant_list)
+	Q_PROPERTY(std::vector<wyrmgus::terrain_type *> base_terrain_types READ get_base_terrain_types)
+	Q_PROPERTY(std::vector<wyrmgus::terrain_type *> outer_border_terrain_types READ get_outer_border_terrain_types)
+	Q_PROPERTY(std::vector<wyrmgus::terrain_type *> inner_border_terrain_types READ get_inner_border_terrain_types)
 
 public:
 	static constexpr const char *class_identifier = "terrain_type";
@@ -423,8 +423,6 @@ public:
 		return this->base_terrain_types;
 	}
 
-	QVariantList get_base_terrain_types_qvariant_list() const;
-
 	Q_INVOKABLE void add_base_terrain_type(terrain_type *terrain_type)
 	{
 		this->base_terrain_types.push_back(terrain_type);
@@ -438,8 +436,6 @@ public:
 	{
 		return this->outer_border_terrain_types;
 	}
-
-	QVariantList get_outer_border_terrain_types_qvariant_list() const;
 
 	Q_INVOKABLE void add_outer_border_terrain_type(terrain_type *terrain_type)
 	{
@@ -456,8 +452,6 @@ public:
 	{
 		return this->inner_border_terrain_types;
 	}
-
-	QVariantList get_inner_border_terrain_types_qvariant_list() const;
 
 	Q_INVOKABLE void add_inner_border_terrain_type(terrain_type *terrain_type)
 	{
