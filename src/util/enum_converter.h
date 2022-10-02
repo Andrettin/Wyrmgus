@@ -35,8 +35,6 @@ public:
 
 	static const std::string &to_string(const enum_type enum_value)
 	{
-		static const bool initialized = enum_converter::initialize_enum_to_string_map();
-
 		const auto find_iterator = enum_converter::enum_to_string_map.find(enum_value);
 
 		if (find_iterator != enum_converter::enum_to_string_map.end()) {
@@ -49,6 +47,8 @@ public:
 private:
 	static bool initialize()
 	{
+		enum_converter::initialize_enum_to_string_map();
+
 		enum_converter_base::register_string_to_qvariant_conversion(enum_converter::property_class_identifier, [](const std::string &value) {
 			return QVariant::fromValue(enum_converter::to_enum(value));
 		});
@@ -56,13 +56,11 @@ private:
 		return true;
 	}
 
-	static bool initialize_enum_to_string_map()
+	static void initialize_enum_to_string_map()
 	{
 		for (const auto &[enum_str, enum_value] : enum_converter::string_to_enum_map) {
 			enum_converter::enum_to_string_map[enum_value] = enum_str;
 		}
-
-		return true;
 	}
 
 private:
