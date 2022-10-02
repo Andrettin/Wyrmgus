@@ -95,9 +95,9 @@ class CUpgrade final : public detailed_data_entry, public data_type<CUpgrade>
 	Q_PROPERTY(wyrmgus::government_type government_type MEMBER government_type READ get_government_type)
 
 public:
-	static constexpr const char *class_identifier = "upgrade";
+	static constexpr const char class_identifier[] = "CUpgrade";
 	static constexpr const char property_class_identifier[] = "CUpgrade*";
-	static constexpr const char *database_folder = "upgrades";
+	static constexpr const char database_folder[] = "upgrades";
 	static constexpr int default_ai_priority = 100;
 
 	static const CUpgrade *get_government_type_upgrade(const wyrmgus::government_type government_type)

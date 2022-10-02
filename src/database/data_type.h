@@ -349,6 +349,16 @@ private:
 			return QVariant::fromValue(T::get(value));
 		});
 
+		database::get()->register_list_property_function("std::vector<" + std::string(T::property_class_identifier) + ">", [](QObject *object, const std::string &method_name, const std::string &value_str) {
+			T *value = T::get(value_str);
+			return QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, QArgument<T *>((std::string(T::class_identifier) + " *").c_str(), value));
+		});
+
+		database::get()->register_list_property_function("std::vector<const " + std::string(T::property_class_identifier) + ">", [](QObject *object, const std::string &method_name, const std::string &value_str) {
+			const T *value = T::get(value_str);
+			return QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, QArgument<const T *>(("const " + std::string(T::class_identifier) + " *").c_str(), value));
+		});
+
 		return true;
 	}
 
