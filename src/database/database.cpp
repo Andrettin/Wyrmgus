@@ -415,10 +415,7 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 
 	bool success = false;
 
-	if (property_name == "civilizations") {
-		civilization *civilization_value = civilization::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(civilization *, civilization_value));
-	} else if (property_name == "domains") {
+	if (property_name == "domains") {
 		magic_domain *domain_value = magic_domain::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(magic_domain *, domain_value));
 	} else if (property_name == "factions") {

@@ -266,11 +266,6 @@ void deity::set_upgrade(CUpgrade *upgrade)
 	upgrade->set_deity(this);
 }
 
-QVariantList deity::get_civilizations_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_civilizations());
-}
-
 void deity::add_civilization(civilization *civilization)
 {
 	this->civilizations.push_back(civilization);
