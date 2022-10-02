@@ -155,6 +155,7 @@ set(editor_SRCS
 source_group(editor FILES ${editor_SRCS})
 
 set(game_SRCS
+	src/game/difficulty.cpp
 	src/game/game.cpp
 	src/game/loadgame.cpp
 	src/game/player_results_info.cpp
@@ -379,6 +380,8 @@ set(script_SRCS
 	src/script/factor_modifier.cpp
 	src/script/trigger.cpp
 	src/script/trigger_random_group.cpp
+	src/script/trigger_target.cpp
+	src/script/trigger_type.cpp
 )
 source_group(script FILES ${script_SRCS})
 
@@ -508,6 +511,7 @@ set(ui_SRCS
 	src/ui/checkbox_style.cpp
 	src/ui/contenttype.cpp
 	src/ui/cursor.cpp
+	src/ui/hotkey_setup.cpp
 	src/ui/icon.cpp
 	src/ui/icon_base.cpp
 	src/ui/icon_image_provider.cpp

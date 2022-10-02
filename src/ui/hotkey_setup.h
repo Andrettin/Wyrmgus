@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "util/enum_converter.h"
+
 namespace wyrmgus {
 
 enum class hotkey_setup {
@@ -36,34 +38,7 @@ enum class hotkey_setup {
 	count
 };
 
-inline hotkey_setup string_to_hotkey_setup(const std::string &str)
-{
-	if (str == "default") {
-		return hotkey_setup::default_setup;
-	} else if (str == "position_based") {
-		return hotkey_setup::position_based;
-	} else if (str == "position_based_except_commands") {
-		return hotkey_setup::position_based_except_commands;
-	}
-	
-	throw std::runtime_error("Invalid hotkey setup: \"" + str + "\".");
-}
-
-inline std::string hotkey_setup_to_string(const hotkey_setup hotkey_setup)
-{
-	switch (hotkey_setup) {
-		case hotkey_setup::default_setup:
-			return "default";
-		case hotkey_setup::position_based:
-			return "position_based";
-		case hotkey_setup::position_based_except_commands:
-			return "position_based_except_commands";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid hotkey setup: \"" + std::to_string(static_cast<int>(hotkey_setup)) + "\".");
-}
+extern template class enum_converter<hotkey_setup>;
 
 inline std::string get_hotkey_setup_name(const hotkey_setup hotkey_setup)
 {

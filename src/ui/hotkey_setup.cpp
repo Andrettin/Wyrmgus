@@ -24,44 +24,25 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "ui/hotkey_setup.h"
 
 namespace wyrmgus {
 
-enum class difficulty {
-	none,
-	easy,
-	normal,
-	hard,
-	brutal,
+template class enum_converter<hotkey_setup>;
 
-	count
+template <>
+const std::string enum_converter<hotkey_setup>::property_class_identifier = "wyrmgus::hotkey_setup";
+
+template <>
+const std::map<std::string, hotkey_setup> enum_converter<hotkey_setup>::string_to_enum_map = {
+	{ "default", hotkey_setup::default_setup },
+	{ "position_based", hotkey_setup::position_based },
+	{ "position_based_except_commands", hotkey_setup::position_based_except_commands }
 };
 
-extern template class enum_converter<difficulty>;
-
-inline std::string get_difficulty_name(const difficulty difficulty)
-{
-	switch (difficulty) {
-		case difficulty::none:
-			return "None";
-		case difficulty::easy:
-			return "Easy";
-		case difficulty::normal:
-			return "Normal";
-		case difficulty::hard:
-			return "Hard";
-		case difficulty::brutal:
-			return "Brutal";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid difficulty: \"" + std::to_string(static_cast<int>(difficulty)) + "\".");
-}
+template <>
+const bool enum_converter<hotkey_setup>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::difficulty)

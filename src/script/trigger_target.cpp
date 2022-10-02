@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2021-2022 by Andrettin
+//      (c) Copyright 2022 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,44 +24,25 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#pragma once
+#include "stratagus.h"
 
-#include "util/enum_converter.h"
+#include "script/trigger_target.h"
 
 namespace wyrmgus {
 
-enum class difficulty {
-	none,
-	easy,
-	normal,
-	hard,
-	brutal,
+template class enum_converter<trigger_target>;
 
-	count
+template <>
+const std::string enum_converter<trigger_target>::property_class_identifier = "wyrmgus::trigger_target";
+
+template <>
+const std::map<std::string, trigger_target> enum_converter<trigger_target>::string_to_enum_map = {
+	{ "player", trigger_target::player },
+	{ "neutral_player", trigger_target::neutral_player },
+	{ "player_or_neutral_player", trigger_target::player_or_neutral_player }
 };
 
-extern template class enum_converter<difficulty>;
-
-inline std::string get_difficulty_name(const difficulty difficulty)
-{
-	switch (difficulty) {
-		case difficulty::none:
-			return "None";
-		case difficulty::easy:
-			return "Easy";
-		case difficulty::normal:
-			return "Normal";
-		case difficulty::hard:
-			return "Hard";
-		case difficulty::brutal:
-			return "Brutal";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid difficulty: \"" + std::to_string(static_cast<int>(difficulty)) + "\".");
-}
+template <>
+const bool enum_converter<trigger_target>::initialized = enum_converter::initialize();
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::difficulty)

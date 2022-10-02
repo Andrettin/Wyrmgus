@@ -107,7 +107,7 @@ void quest::load_quest_completion_scope(const gsml_data &scope)
 
 		try {
 			quest *quest = quest::get(key);
-			const difficulty difficulty = string_to_difficulty(value);
+			const difficulty difficulty = enum_converter<wyrmgus::difficulty>::to_enum(value);
 
 			quest->set_completed(true);
 
@@ -159,7 +159,7 @@ void quest::save_quest_completion()
 		}
 
 		for (const quest *quest : quests) {
-			quest_scope->add_property(quest->get_identifier(), difficulty_to_string(quest->get_highest_completed_difficulty()));
+			quest_scope->add_property(quest->get_identifier(), enum_converter<difficulty>::to_string(quest->get_highest_completed_difficulty()));
 		}
 	}
 
@@ -446,7 +446,7 @@ void SetQuestCompleted(const std::string &quest_ident, const std::string &diffic
 	
 	quest->set_completed(true);
 
-	const difficulty difficulty = string_to_difficulty(difficulty_str);
+	const difficulty difficulty = enum_converter<wyrmgus::difficulty>::to_enum(difficulty_str);
 	if (difficulty > quest->get_highest_completed_difficulty()) {
 		quest->set_highest_completed_difficulty(difficulty);
 	}

@@ -106,12 +106,12 @@ void preferences::save() const
 	data.add_child(gsml_data::from_size(this->get_window_size(), "window_size"));
 	data.add_property("window_maximized", string::from_bool(this->window_maximized));
 	data.add_property("game_speed", std::to_string(this->get_game_speed()));
-	data.add_property("difficulty", difficulty_to_string(this->get_difficulty()));
+	data.add_property("difficulty", enum_converter<wyrmgus::difficulty>::to_string(this->get_difficulty()));
 	data.add_property("sound_effects_enabled", string::from_bool(this->are_sound_effects_enabled()));
 	data.add_property("sound_effects_volume", std::to_string(this->get_sound_effects_volume()));
 	data.add_property("music_enabled", string::from_bool(this->is_music_enabled()));
 	data.add_property("music_volume", std::to_string(this->get_music_volume()));
-	data.add_property("hotkey_setup", hotkey_setup_to_string(this->get_hotkey_setup()));
+	data.add_property("hotkey_setup", enum_converter<wyrmgus::hotkey_setup>::to_string(this->get_hotkey_setup()));
 	data.add_property("autosave", string::from_bool(this->is_autosave_enabled()));
 	data.add_property("hero_symbol", string::from_bool(this->is_hero_symbol_enabled()));
 	data.add_property("pathlines", string::from_bool(this->are_pathlines_enabled()));

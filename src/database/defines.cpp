@@ -123,7 +123,7 @@ void defines::process_gsml_scope(const gsml_data &scope)
 		});
 	} else if (tag == "trigger_type_none_random_weights") {
 		scope.for_each_property([&](const gsml_property &property) {
-			const trigger_type trigger_type = string_to_trigger_type(property.get_key());
+			const trigger_type trigger_type = enum_converter<wyrmgus::trigger_type>::to_enum(property.get_key());
 			const int weight = std::stoi(property.get_value());
 
 			this->trigger_type_none_random_weights[trigger_type] = weight;
