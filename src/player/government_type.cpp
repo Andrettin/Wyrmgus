@@ -32,8 +32,10 @@ namespace wyrmgus {
 
 template class enum_converter<government_type>;
 
+template <>
 const std::string enum_converter<government_type>::property_class_identifier = "wyrmgus::government_type";
 
+template <>
 const std::map<std::string, government_type> enum_converter<government_type>::string_to_enum_map = {
 	{ "none", government_type::none },
 	{ "tribe", government_type::tribe },
@@ -42,6 +44,7 @@ const std::map<std::string, government_type> enum_converter<government_type>::st
 	{ "theocracy", government_type::theocracy }
 };
 
+template <>
 const bool enum_converter<government_type>::initialized = enum_converter::initialize();
 
 }

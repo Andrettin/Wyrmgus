@@ -32,8 +32,10 @@ namespace wyrmgus {
 
 template class enum_converter<character_title>;
 
+template <>
 const std::string enum_converter<character_title>::property_class_identifier = "wyrmgus::character_title";
 
+template <>
 const std::map<std::string, character_title> enum_converter<character_title>::string_to_enum_map = {
 	{ "ruler", character_title::ruler },
 	{ "chancellor", character_title::chancellor },
@@ -41,6 +43,7 @@ const std::map<std::string, character_title> enum_converter<character_title>::st
 	{ "treasurer", character_title::treasurer }
 };
 
+template <>
 const bool enum_converter<character_title>::initialized = enum_converter::initialize();
 
 }

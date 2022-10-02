@@ -32,8 +32,10 @@ namespace wyrmgus {
 
 template class enum_converter<ecological_niche>;
 
+template <>
 const std::string enum_converter<ecological_niche>::property_class_identifier = "wyrmgus::ecological_niche";
 
+template <>
 const std::map<std::string, ecological_niche> enum_converter<ecological_niche>::string_to_enum_map = {
 	{ "browser", ecological_niche::browser },
 	{ "grazer", ecological_niche::grazer },
@@ -41,6 +43,7 @@ const std::map<std::string, ecological_niche> enum_converter<ecological_niche>::
 	{ "scavenger", ecological_niche::scavenger }
 };
 
+template <>
 const bool enum_converter<ecological_niche>::initialized = enum_converter::initialize();
 
 }

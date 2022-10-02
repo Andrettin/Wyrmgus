@@ -32,8 +32,10 @@ namespace wyrmgus {
 
 template class enum_converter<taxonomic_rank>;
 
+template <>
 const std::string enum_converter<taxonomic_rank>::property_class_identifier = "wyrmgus::taxonomic_rank";
 
+template <>
 const std::map<std::string, taxonomic_rank> enum_converter<taxonomic_rank>::string_to_enum_map = {
 	{ "species", taxonomic_rank::species },
 	{ "genus", taxonomic_rank::genus },
@@ -60,6 +62,7 @@ const std::map<std::string, taxonomic_rank> enum_converter<taxonomic_rank>::stri
 	{ "empire", taxonomic_rank::empire }
 };
 
+template <>
 const bool enum_converter<taxonomic_rank>::initialized = enum_converter::initialize();
 
 }

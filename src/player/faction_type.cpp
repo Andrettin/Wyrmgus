@@ -32,8 +32,10 @@ namespace wyrmgus {
 
 template class enum_converter<faction_type>;
 
+template <>
 const std::string enum_converter<faction_type>::property_class_identifier = "wyrmgus::faction_type";
 
+template <>
 const std::map<std::string, faction_type> enum_converter<faction_type>::string_to_enum_map = {
 	{ "none", faction_type::none },
 	{ "tribe", faction_type::tribe },
@@ -45,6 +47,7 @@ const std::map<std::string, faction_type> enum_converter<faction_type>::string_t
 	{ "trading_company", faction_type::trading_company }
 };
 
+template <>
 const bool enum_converter<faction_type>::initialized = enum_converter::initialize();
 
 }

@@ -32,14 +32,17 @@ namespace wyrmgus {
 
 template class enum_converter<spell_target_type>;
 
+template <>
 const std::string enum_converter<spell_target_type>::property_class_identifier = "wyrmgus::spell_target_type";
 
+template <>
 const std::map<std::string, spell_target_type> enum_converter<spell_target_type>::string_to_enum_map = {
 	{ "self", spell_target_type::self },
 	{ "position", spell_target_type::position },
 	{ "unit", spell_target_type::unit }
 };
 
+template <>
 const bool enum_converter<spell_target_type>::initialized = enum_converter::initialize();
 
 }

@@ -32,8 +32,10 @@ namespace wyrmgus {
 
 template class enum_converter<unit_domain>;
 
+template <>
 const std::string enum_converter<unit_domain>::property_class_identifier = "wyrmgus::unit_domain";
 
+template <>
 const std::map<std::string, unit_domain> enum_converter<unit_domain>::string_to_enum_map = {
 	{ "land", unit_domain::land },
 	{ "water", unit_domain::water },
@@ -42,6 +44,7 @@ const std::map<std::string, unit_domain> enum_converter<unit_domain>::string_to_
 	{ "space", unit_domain::space }
 };
 
+template <>
 const bool enum_converter<unit_domain>::initialized = enum_converter::initialize();
 
 }

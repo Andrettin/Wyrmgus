@@ -32,14 +32,17 @@ namespace wyrmgus {
 
 template class enum_converter<civilization_group_rank>;
 
+template <>
 const std::string enum_converter<civilization_group_rank>::property_class_identifier = "wyrmgus::civilization_group_rank";
 
+template <>
 const std::map<std::string, civilization_group_rank> enum_converter<civilization_group_rank>::string_to_enum_map = {
 	{ "subgroup", civilization_group_rank::subgroup },
 	{ "group", civilization_group_rank::group },
 	{ "supergroup", civilization_group_rank::supergroup }
 };
 
+template <>
 const bool enum_converter<civilization_group_rank>::initialized = enum_converter::initialize();
 
 }

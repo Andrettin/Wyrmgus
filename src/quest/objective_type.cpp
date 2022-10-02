@@ -32,8 +32,10 @@ namespace wyrmgus {
 
 template class enum_converter<objective_type>;
 
+template <>
 const std::string enum_converter<objective_type>::property_class_identifier = "wyrmgus::objective_type";
 
+template <>
 const std::map<std::string, objective_type> enum_converter<objective_type>::string_to_enum_map = {
 	{ "gather_resource", objective_type::gather_resource },
 	{ "have_resource", objective_type::have_resource },
@@ -50,6 +52,7 @@ const std::map<std::string, objective_type> enum_converter<objective_type>::stri
 	{ "have_settlement", objective_type::have_settlement },
 };
 
+template <>
 const bool enum_converter<objective_type>::initialized = enum_converter::initialize();
 
 }

@@ -32,14 +32,17 @@ namespace wyrmgus {
 
 template class enum_converter<upgrade_category_rank>;
 
+template <>
 const std::string enum_converter<upgrade_category_rank>::property_class_identifier = "wyrmgus::upgrade_category_rank";
 
+template <>
 const std::map<std::string, upgrade_category_rank> enum_converter<upgrade_category_rank>::string_to_enum_map = {
 	{ "subcategory", upgrade_category_rank::subcategory },
 	{ "category", upgrade_category_rank::category },
 	{ "supercategory", upgrade_category_rank::supercategory }
 };
 
+template <>
 const bool enum_converter<upgrade_category_rank>::initialized = enum_converter::initialize();
 
 }

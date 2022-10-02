@@ -32,8 +32,10 @@ namespace wyrmgus {
 
 template class enum_converter<geological_era>;
 
+template <>
 const std::string enum_converter<geological_era>::property_class_identifier = "wyrmgus::geological_era";
 
+template <>
 const std::map<std::string, geological_era> enum_converter<geological_era>::string_to_enum_map = {
 	{ "devonian", geological_era::devonian },
 	{ "carboniferous", geological_era::carboniferous },
@@ -51,6 +53,7 @@ const std::map<std::string, geological_era> enum_converter<geological_era>::stri
 	{ "holocene", geological_era::holocene }
 };
 
+template <>
 const bool enum_converter<geological_era>::initialized = enum_converter::initialize();
 
 }

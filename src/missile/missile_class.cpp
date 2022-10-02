@@ -32,8 +32,10 @@ namespace wyrmgus {
 
 template class enum_converter<missile_class>;
 
+template <>
 const std::string enum_converter<missile_class>::property_class_identifier = "wyrmgus::missile_class";
 
+template <>
 const std::map<std::string, missile_class> enum_converter<missile_class>::string_to_enum_map = {
 	{ "none", missile_class::none },
 	{ "point_to_point", missile_class::point_to_point },
@@ -55,6 +57,7 @@ const std::map<std::string, missile_class> enum_converter<missile_class>::string
 	{ "straight_fly", missile_class::straight_fly }
 };
 
+template <>
 const bool enum_converter<missile_class>::initialized = enum_converter::initialize();
 
 }
