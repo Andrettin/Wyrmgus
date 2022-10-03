@@ -209,83 +209,39 @@ std::vector<QVariantList> world::parse_geojson_folder(const std::string_view &fo
 
 terrain_geodata_map world::parse_terrain_geojson_folder() const
 {
-	terrain_geodata_map terrain_data;
-
 	const std::vector<QVariantList> geojson_data_list = this->parse_geojson_folder(world::terrain_map_folder);
 
-	geojson::process_features(geojson_data_list, [&](const QVariantMap &feature) {
-		const QVariantMap properties = feature.value("properties").toMap();
-
-		const terrain_type *terrain = nullptr;
-		const terrain_feature *terrain_feature = nullptr;
-
+	return geojson::create_geodata_map<terrain_geodata_map>(geojson_data_list, [](const QVariantMap &properties) -> terrain_geodata_key {
 		if (properties.contains("terrain_feature")) {
 			const QString terrain_feature_identifier = properties.value("terrain_feature").toString();
-			terrain_feature = terrain_feature::get(terrain_feature_identifier.toStdString());
+			return terrain_feature::get(terrain_feature_identifier.toStdString());
 		} else {
 			const QString terrain_type_identifier = properties.value("terrain_type").toString();
-			terrain = terrain_type::get(terrain_type_identifier.toStdString());
+			return terrain_type::get(terrain_type_identifier.toStdString());
+		}
+	}, [](const terrain_geodata_key &key) {
+		if (std::holds_alternative<const terrain_feature *>(key)) {
+			const terrain_feature *terrain_feature = std::get<const wyrmgus::terrain_feature *>(key);
+			if (terrain_feature != nullptr && terrain_feature->get_geopath_width() != 0) {
+				return terrain_feature->get_geopath_width();
+			}
 		}
 
-		geojson::process_feature_data(feature, [&](const QVariantMap &feature_data) {
-			const QString type_str = feature_data.value("type").toString();
-
-			std::unique_ptr<QGeoShape> geoshape;
-
-			if (type_str == "LineString") {
-				const QGeoPath geopath = feature_data.value("data").value<QGeoPath>();
-				auto geopath_copy = std::make_unique<QGeoPath>(geopath);
-
-				if (terrain_feature != nullptr && terrain_feature->get_geopath_width() != 0) {
-					geopath_copy->setWidth(terrain_feature->get_geopath_width());
-				}
-
-				geoshape = std::move(geopath_copy);
-			} else if (type_str == "Polygon") {
-				const QGeoPolygon geopolygon = feature_data.value("data").value<QGeoPolygon>();
-				geoshape = std::make_unique<QGeoPolygon>(geopolygon);
-			} else if (type_str == "Point") {
-				const QGeoCircle geocircle = feature_data.value("data").value<QGeoCircle>();
-				geoshape = std::make_unique<QGeoCircle>(geocircle);
-			} else {
-				throw std::runtime_error("Invalid GeoJSON feature type string: \"" + type_str.toStdString() + "\".");
-			}
-
-			if (terrain_feature != nullptr) {
-				terrain_data[terrain_feature].push_back(std::move(geoshape));
-			} else {
-				terrain_data[terrain].push_back(std::move(geoshape));
-			}
-		});
+		return -1;
 	});
-
-	return terrain_data;
 }
 
 site_map<std::vector<std::unique_ptr<QGeoShape>>> world::parse_territories_geojson_folder() const
 {
-	site_map<std::vector<std::unique_ptr<QGeoShape>>> territory_data;
+	using territory_geodata_map = site_map<std::vector<std::unique_ptr<QGeoShape>>>;
 
 	const std::vector<QVariantList> geojson_data_list = this->parse_geojson_folder(world::territories_map_folder);
 
-	geojson::process_features(geojson_data_list, [&](const QVariantMap &feature) {
-		const QVariantMap properties = feature.value("properties").toMap();
-
+	return geojson::create_geodata_map<territory_geodata_map>(geojson_data_list, [](const QVariantMap &properties) -> territory_geodata_map::key_type {
 		const QString settlement_identifier = properties.value("settlement").toString();
 		const site *settlement = site::get(settlement_identifier.toStdString());
-
-		for (const QVariant &subfeature_variant : feature.value("data").toList()) {
-			const QVariantMap subfeature_map = subfeature_variant.toMap();
-			std::unique_ptr<QGeoShape> geoshape;
-
-			const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
-			geoshape = std::make_unique<QGeoPolygon>(geopolygon);
-
-			territory_data[settlement].push_back(std::move(geoshape));
-		}
-	});
-
-	return territory_data;
+		return settlement;
+	}, nullptr);
 }
 
 std::vector<const species *> world::get_native_sapient_species() const
