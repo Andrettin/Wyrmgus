@@ -767,7 +767,6 @@ set(wyrmgus_database_HDRS
 	src/database/basic_data_entry.h
 	src/database/data_entry.h
 	src/database/data_entry_history.h
-	src/database/data_type.h
 	src/database/defines.h
 	src/database/detailed_data_entry.h
 	src/database/named_data_entry.h
