@@ -39,8 +39,8 @@ enum class ecological_niche {
 	scavenger
 };
 
-extern template class enum_converter<ecological_niche>;
-
 }
+
+extern template class archimedes::enum_converter<ecological_niche>;
 
 Q_DECLARE_METATYPE(wyrmgus::ecological_niche)

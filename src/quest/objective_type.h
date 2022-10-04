@@ -46,8 +46,8 @@ enum class objective_type {
 	have_settlement
 };
 
-extern template class enum_converter<objective_type>;
-
 }
+
+extern template class archimedes::enum_converter<objective_type>;
 
 Q_DECLARE_METATYPE(wyrmgus::objective_type)

@@ -44,8 +44,6 @@ enum class faction_type {
 	count
 };
 
-extern template class enum_converter<faction_type>;
-
 inline bool is_faction_type_neutral(const faction_type type)
 {
 	switch (type) {
@@ -87,5 +85,7 @@ inline std::string get_faction_type_name(const faction_type type)
 }
 
 }
+
+extern template class archimedes::enum_converter<faction_type>;
 
 Q_DECLARE_METATYPE(wyrmgus::faction_type)

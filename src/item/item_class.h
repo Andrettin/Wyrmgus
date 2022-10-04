@@ -69,8 +69,6 @@ enum class item_class {
 	count
 };
 
-extern template class enum_converter<item_class>;
-
 extern item_slot get_item_class_slot(const item_class item_class);
 
 inline bool is_thrusting_weapon_item_class(const item_class item_class)
@@ -175,5 +173,7 @@ inline std::string get_item_class_name(const item_class item_class)
 }
 
 }
+
+extern template class archimedes::enum_converter<item_class>;
 
 Q_DECLARE_METATYPE(wyrmgus::item_class)

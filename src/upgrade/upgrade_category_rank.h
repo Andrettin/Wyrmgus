@@ -39,8 +39,8 @@ enum class upgrade_category_rank {
 	count
 };
 
-extern template class enum_converter<upgrade_category_rank>;
-
 }
+
+extern template class archimedes::enum_converter<upgrade_category_rank>;
 
 Q_DECLARE_METATYPE(wyrmgus::upgrade_category_rank)

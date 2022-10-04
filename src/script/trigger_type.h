@@ -36,8 +36,8 @@ enum class trigger_type {
 	minute_pulse
 };
 
-extern template class enum_converter<trigger_type>;
-
 }
+
+extern template class archimedes::enum_converter<trigger_type>;
 
 Q_DECLARE_METATYPE(wyrmgus::trigger_type)

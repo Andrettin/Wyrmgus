@@ -37,8 +37,8 @@ enum class civilization_group_rank {
 	supergroup
 };
 
-extern template class enum_converter<civilization_group_rank>;
-
 }
+
+extern template class archimedes::enum_converter<civilization_group_rank>;
 
 Q_DECLARE_METATYPE(wyrmgus::civilization_group_rank)

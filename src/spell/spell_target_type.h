@@ -36,8 +36,8 @@ enum class spell_target_type {
 	unit
 };
 
-extern template class enum_converter<spell_target_type>;
-
 }
+
+extern template class archimedes::enum_converter<spell_target_type>;
 
 Q_DECLARE_METATYPE(wyrmgus::spell_target_type)

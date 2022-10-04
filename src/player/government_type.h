@@ -38,8 +38,6 @@ enum class government_type {
 	theocracy
 };
 
-extern template class enum_converter<government_type>;
-
 inline std::string get_government_type_name(const government_type government_type)
 {
 	switch (government_type) {
@@ -72,5 +70,7 @@ inline bool can_government_type_have_dynasty(const government_type government_ty
 }
 
 }
+
+extern template class archimedes::enum_converter<government_type>;
 
 Q_DECLARE_METATYPE(wyrmgus::government_type)

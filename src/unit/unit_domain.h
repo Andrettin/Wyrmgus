@@ -39,8 +39,8 @@ enum class unit_domain {
 	space  //can move in space, as well as over any other kind of terrain that flying units can
 };
 
-extern template class enum_converter<unit_domain>;
-
 }
+
+extern template class archimedes::enum_converter<unit_domain>;
 
 Q_DECLARE_METATYPE(wyrmgus::unit_domain)

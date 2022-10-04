@@ -38,8 +38,6 @@ enum class gender {
 	count
 };
 
-extern template class enum_converter<gender>;
-
 inline std::string get_gender_personal_pronoun(const gender gender)
 {
 	switch (gender) {
@@ -89,5 +87,7 @@ inline std::string get_gender_oblique_pronoun(const gender gender)
 }
 
 }
+
+extern template class archimedes::enum_converter<gender>;
 
 Q_DECLARE_METATYPE(wyrmgus::gender)

@@ -36,8 +36,8 @@ enum class trigger_target {
 	player_or_neutral_player //checked for each player, including the neutral one
 };
 
-extern template class enum_converter<trigger_target>;
-
 }
+
+extern template class archimedes::enum_converter<trigger_target>;
 
 Q_DECLARE_METATYPE(wyrmgus::trigger_target)

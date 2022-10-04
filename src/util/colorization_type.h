@@ -40,8 +40,8 @@ enum class colorization_type {
 	yellow
 };
 
-extern template class enum_converter<colorization_type>;
-
 }
+
+extern template class archimedes::enum_converter<colorization_type>;
 
 Q_DECLARE_METATYPE(wyrmgus::colorization_type)

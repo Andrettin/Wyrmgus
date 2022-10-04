@@ -47,8 +47,8 @@ enum class geological_era {
 	holocene
 };
 
-extern template class enum_converter<geological_era>;
-
 }
+
+extern template class archimedes::enum_converter<geological_era>;
 
 Q_DECLARE_METATYPE(wyrmgus::geological_era)

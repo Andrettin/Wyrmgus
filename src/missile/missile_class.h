@@ -54,8 +54,8 @@ enum class missile_class {
 	straight_fly //missile flies from x,y to x1,y1 then continues to fly, until incompatible terrain is detected
 };
 
-extern template class enum_converter<missile_class>;
-
 }
+
+extern template class archimedes::enum_converter<missile_class>;
 
 Q_DECLARE_METATYPE(wyrmgus::missile_class)

@@ -57,8 +57,8 @@ enum class taxonomic_rank {
 	empire
 };
 
-extern template class enum_converter<taxonomic_rank>;
-
 }
+
+extern template class archimedes::enum_converter<taxonomic_rank>;
 
 Q_DECLARE_METATYPE(wyrmgus::taxonomic_rank)

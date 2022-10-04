@@ -39,8 +39,8 @@ enum class character_title {
 	treasurer
 };
 
-extern template class enum_converter<character_title>;
-
 }
+
+extern template class archimedes::enum_converter<character_title>;
 
 Q_DECLARE_METATYPE(wyrmgus::character_title)

@@ -40,8 +40,6 @@ enum class difficulty {
 	count
 };
 
-extern template class enum_converter<difficulty>;
-
 inline std::string get_difficulty_name(const difficulty difficulty)
 {
 	switch (difficulty) {
@@ -63,5 +61,7 @@ inline std::string get_difficulty_name(const difficulty difficulty)
 }
 
 }
+
+extern template class archimedes::enum_converter<difficulty>;
 
 Q_DECLARE_METATYPE(wyrmgus::difficulty)
