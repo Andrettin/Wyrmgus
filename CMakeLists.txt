@@ -126,12 +126,8 @@ set(beos_SRCS
 source_group(beos FILES ${beos_SRCS})
 
 set(database_SRCS
-	src/database/basic_data_entry.cpp
-	src/database/data_entry.cpp
-	src/database/data_entry_history.cpp
 	src/database/defines.cpp
 	src/database/detailed_data_entry.cpp
-	src/database/named_data_entry.cpp
 	src/database/preferences.cpp
 )
 source_group(database FILES ${database_SRCS})
@@ -201,15 +197,6 @@ set(item_SRCS
 	src/item/unique_item.cpp
 )
 source_group(item FILES ${item_SRCS})
-
-set(language_SRCS
-	src/language/grammatical_gender.cpp
-	src/language/language.cpp
-	src/language/name_variant.cpp
-	src/language/word.cpp
-	src/language/word_type.cpp
-)
-source_group(language FILES ${language_SRCS})
 
 set(map_SRCS
 	src/map/character_substitution.cpp
@@ -489,14 +476,12 @@ set(wyrmgus_base_SRCS
 source_group(wyrmgus FILES ${wyrmgus_base_SRCS})
 
 set(time_SRCS
-	src/time/calendar.cpp
 	src/time/date.cpp
 	src/time/season.cpp
 	src/time/season_schedule.cpp
 	src/time/time_of_day.cpp
 	src/time/time_of_day_schedule.cpp
 	src/time/time_period_schedule.cpp
-	src/time/timeline.cpp
 )
 source_group(time FILES ${time_SRCS})
 
@@ -572,7 +557,6 @@ source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
 	src/util/colorization_type.cpp
-	src/util/enum_converter.cpp
 	src/util/image_util.cpp
 	src/util/util.cpp
 )
@@ -639,7 +623,6 @@ set(wyrmgus_SRCS
 	${game_SRCS}
 	${guichan_SRCS}
 	${item_SRCS}
-	${language_SRCS}
 	${map_SRCS}
 	${missile_SRCS}
 	${network_SRCS}
@@ -764,12 +747,8 @@ set(wyrmgus_animation_HDRS
 )
 
 set(wyrmgus_database_HDRS
-	src/database/basic_data_entry.h
-	src/database/data_entry.h
-	src/database/data_entry_history.h
 	src/database/defines.h
 	src/database/detailed_data_entry.h
-	src/database/named_data_entry.h
 	src/database/preferences.h
 )
 
@@ -793,15 +772,6 @@ set(wyrmgus_item_HDRS
 	src/item/persistent_item.h
 	src/item/recipe.h
 	src/item/unique_item.h
-)
-
-set(wyrmgus_language_HDRS
-	src/language/grammatical_gender.h
-	src/language/language.h
-	src/language/language_family.h
-	src/language/name_variant.h
-	src/language/word.h
-	src/language/word_type.h
 )
 
 set(wyrmgus_map_HDRS
@@ -1105,16 +1075,12 @@ set(wyrmgus_spell_HDRS
 )
 
 set(wyrmgus_time_HDRS
-	src/time/calendar.h
 	src/time/date.h
-	src/time/day_of_the_week.h
-	src/time/month.h
 	src/time/season.h
 	src/time/season_schedule.h
 	src/time/time_of_day.h
 	src/time/time_of_day_schedule.h
 	src/time/time_period_schedule.h
-	src/time/timeline.h
 )
 
 set(wyrmgus_ui_HDRS
@@ -1191,7 +1157,6 @@ set(wyrmgus_upgrade_HDRS
 
 set(wyrmgus_util_HDRS
 	src/util/colorization_type.h
-	src/util/enum_converter.h
 	src/util/image_util.h
 	src/util/util.h
 )
@@ -1275,7 +1240,6 @@ source_group(economy FILES ${wyrmgus_economy_HDRS})
 source_group(game FILES ${wyrmgus_game_HDRS})
 source_group(guichan FILES ${wyrmgus_guichan_HDRS})
 source_group(item FILES ${wyrmgus_item_HDRS})
-source_group(language FILES ${wyrmgus_language_HDRS})
 source_group(map FILES ${wyrmgus_map_HDRS})
 source_group(missile FILES ${wyrmgus_missile_HDRS})
 source_group(network FILES ${wyrmgus_network_HDRS})
@@ -1310,7 +1274,6 @@ set(wyrmgus_HDRS
 	${wyrmgus_game_HDRS}
 	${wyrmgus_guichan_HDRS}
 	${wyrmgus_item_HDRS}
-	${wyrmgus_language_HDRS}
 	${wyrmgus_map_HDRS}
 	${wyrmgus_missile_HDRS}
 	${wyrmgus_network_HDRS}
@@ -1798,7 +1761,6 @@ if(ENABLE_UNITY_BUILD)
 	set_source_files_properties(${game_SRCS} PROPERTIES UNITY_GROUP "game")
 	set_source_files_properties(${guichan_SRCS} PROPERTIES UNITY_GROUP "guichan")
 	set_source_files_properties(${item_SRCS} PROPERTIES UNITY_GROUP "item")
-	set_source_files_properties(${language_SRCS} PROPERTIES UNITY_GROUP "language")
 	set_source_files_properties(${map_SRCS} PROPERTIES UNITY_GROUP "map")
 	set_source_files_properties(${missile_SRCS} PROPERTIES UNITY_GROUP "missile")
 	set_source_files_properties(${network_SRCS} PROPERTIES UNITY_GROUP "network")

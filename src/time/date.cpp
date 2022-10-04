@@ -43,20 +43,20 @@ CDate CDate::FromString(const std::string &date_str)
 	
 	std::vector<std::string> date_vector = SplitString(date_str, ".");
 	
-	wyrmgus::calendar *calendar = nullptr;
+	calendar *calendar = nullptr;
 	size_t offset = 0;
 	
-	if (date_vector.size() >= 1 && !wyrmgus::string::is_number(date_vector[0])) {
-		calendar = wyrmgus::calendar::try_get(date_vector[0]);
+	if (date_vector.size() >= 1 && !string::is_number(date_vector[0])) {
+		calendar = calendar::try_get(date_vector[0]);
 		if (calendar) {
 			offset += 1;
-		} else if (wyrmgus::timeline::try_get(date_vector[0]) == nullptr) { //is neither a calendar nor a timeline
+		} else if (timeline::try_get(date_vector[0]) == nullptr) { //is neither a calendar nor a timeline
 			fprintf(stderr, "Calendar \"%s\" does not exist.\n", date_vector[0].c_str());
 		}
 	}
 	
 	if (date_vector.size() >= (1 + offset) && !wyrmgus::string::is_number(date_vector[0 + offset])) {
-		wyrmgus::timeline *timeline = wyrmgus::timeline::get(date_vector[0 + offset]);
+		timeline *timeline = timeline::get(date_vector[0 + offset]);
 		if (timeline) {
 			offset += 1;
 		}
@@ -90,7 +90,7 @@ bool CDate::ContainsDate(const CDate &date) const
 	return *this >= date;
 }
 
-CDate CDate::ToBaseCalendar(wyrmgus::calendar *current_calendar) const
+CDate CDate::ToBaseCalendar(calendar *current_calendar) const
 {
 	CDate date;
 	date.Year = this->Year - current_calendar->get_year_offset();
@@ -113,7 +113,7 @@ std::string CDate::ToString() const
 	return date_string;
 }
 
-std::string CDate::ToDisplayString(const wyrmgus::calendar *calendar, const bool year_only) const
+std::string CDate::ToDisplayString(const calendar *calendar, const bool year_only) const
 {
 	std::string display_string;
 	

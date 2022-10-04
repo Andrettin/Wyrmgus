@@ -28,7 +28,7 @@
 
 #include "spell/spell_target_type.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<spell_target_type>;
 

@@ -28,7 +28,7 @@
 
 #include "script/trigger_type.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<trigger_type>;
 

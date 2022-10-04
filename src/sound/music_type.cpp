@@ -28,7 +28,7 @@
 
 #include "sound/music_type.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<music_type>;
 

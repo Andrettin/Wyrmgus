@@ -50,7 +50,7 @@ public:
 
 	static const std::set<std::string> history_database_dependencies;
 
-	static void load_history_database();
+	static void load_history_database(const QDateTime &start_date, const timeline *current_timeline);
 
 	explicit region(const std::string &identifier);
 	virtual ~region() override;

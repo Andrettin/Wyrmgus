@@ -30,7 +30,7 @@
 
 #include "item/item_slot.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<item_class>;
 
@@ -69,6 +69,10 @@ const std::map<std::string, item_class> enum_converter<item_class>::string_to_en
 
 template <>
 const bool enum_converter<item_class>::initialized = enum_converter::initialize();
+
+}
+
+namespace wyrmgus {
 
 item_slot get_item_class_slot(const item_class item_class)
 {

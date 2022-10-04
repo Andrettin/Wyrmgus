@@ -747,11 +747,11 @@ int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "ParentCivilization")) {
 			civilization->parent_civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {
-			wyrmgus::language *language = wyrmgus::language::get(LuaToString(l, -1));
+			language *language = language::get(LuaToString(l, -1));
 			civilization->language = language;
 			language->used_by_civilization_or_faction = true;
 		} else if (!strcmp(value, "Calendar")) {
-			wyrmgus::calendar *calendar = wyrmgus::calendar::get(LuaToString(l, -1));
+			calendar *calendar = calendar::get(LuaToString(l, -1));
 			civilization->calendar = calendar;
 		} else if (!strcmp(value, "Currency")) {
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
@@ -959,7 +959,7 @@ int CclDefineLanguageWord(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Language")) {
-			wyrmgus::language *language = wyrmgus::language::get(LuaToString(l, -1));
+			language *language = language::get(LuaToString(l, -1));
 			word->set_language(language);
 		} else if (!strcmp(value, "Meanings")) {
 			if (!lua_istable(l, -1)) {
@@ -978,7 +978,7 @@ int CclDefineLanguageWord(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			int j = 0;
-			wyrmgus::language *derives_from_language = wyrmgus::language::get(LuaToString(l, -1, j + 1));
+			language *derives_from_language = language::get(LuaToString(l, -1, j + 1));
 			++j;
 			const wyrmgus::word_type derives_from_word_type = enum_converter<word_type>::to_enum(LuaToString(l, -1, j + 1));
 			++j;
@@ -1020,7 +1020,7 @@ int CclDefineLanguageWord(lua_State *l)
 				}
 				++j;
 				
-				wyrmgus::language *affix_language = wyrmgus::language::get(LuaToString(l, -1, j + 1)); // should be the same language as that of the word, but needs to be specified since the word's language may not have been set yet
+				language *affix_language = language::get(LuaToString(l, -1, j + 1)); // should be the same language as that of the word, but needs to be specified since the word's language may not have been set yet
 				++j;
 				const wyrmgus::word_type affix_word_type = enum_converter<word_type>::to_enum(LuaToString(l, -1, j + 1));
 				++j;
@@ -1264,7 +1264,7 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Language")) {
-		const wyrmgus::language *language = civilization->get_language();
+		const language *language = civilization->get_language();
 		if (language != nullptr) {
 			lua_pushstring(l, language->get_identifier().c_str());
 		} else {
@@ -1850,7 +1850,7 @@ int CclDefineLanguage(lua_State *l)
 	}
 
 	const std::string language_ident = LuaToString(l, 1);
-	wyrmgus::language *language = wyrmgus::language::get_or_add(language_ident, nullptr);
+	language *language = language::get_or_add(language_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1859,9 +1859,9 @@ int CclDefineLanguage(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			language->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Family")) {
-			language->family = wyrmgus::language_family::get(LuaToString(l, -1));
+			language->family = language_family::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DialectOf")) {
-			wyrmgus::language *parent_language = wyrmgus::language::get(LuaToString(l, -1));
+			archimedes::language *parent_language = language::get(LuaToString(l, -1));
 			language->DialectOf = parent_language;
 			parent_language->Dialects.push_back(language);
 		} else if (!strcmp(value, "NounEndings")) {
@@ -2630,7 +2630,7 @@ static int CclGetLanguages(lua_State *l)
 	}
 	
 	std::vector<std::string> languages;
-	for (const wyrmgus::language *language : wyrmgus::language::get_all()) {
+	for (const language *language : language::get_all()) {
 		if (!only_used || language->used_by_civilization_or_faction) {
 			languages.push_back(language->get_identifier());
 		}
@@ -2656,7 +2656,7 @@ static int CclGetLanguageData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string language_name = LuaToString(l, 1);
-	const wyrmgus::language *language = wyrmgus::language::get(language_name);
+	const language *language = language::get(language_name);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {

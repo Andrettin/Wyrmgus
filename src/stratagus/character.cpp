@@ -1340,11 +1340,11 @@ void character::add_bonus_ability(const CUpgrade *ability)
 	}
 }
 
-text_processing_context character::get_text_processing_context() const
+std::unique_ptr<text_processor_base> character::create_text_processor() const
 {
 	text_processing_context ctx;
 	ctx.faction = this->get_default_faction();
-	return ctx;
+	return std::make_unique<text_processor>(std::move(ctx));
 }
 
 CUnit *character::get_unit() const

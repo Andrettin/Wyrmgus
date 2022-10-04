@@ -28,7 +28,7 @@
 
 #include "item/item_slot.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<item_slot>;
 

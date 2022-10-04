@@ -823,9 +823,9 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 			return;
 		}
 
-		database::get()->load_history();
-
 		const campaign *campaign = campaign::get(campaign_ident);
+
+		database::get()->load_history(campaign->get_start_date(), campaign->get_timeline());
 
 		for (size_t i = 0; i < campaign->get_map_templates().size(); ++i) {
 			map_template *map_template = campaign->get_map_templates()[i];

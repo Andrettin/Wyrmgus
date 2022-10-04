@@ -54,9 +54,13 @@ struct lua_State;
 
 extern int CclUnit(lua_State *l);
 
+namespace archimedes {
+	class calendar;
+	class language;
+}
+
 namespace wyrmgus {
 	class age;
-	class calendar;
 	class character;
 	class civilization;
 	class civilization_base;
@@ -64,7 +68,6 @@ namespace wyrmgus {
 	class dynasty;
 	class faction;
 	class interface_style;
-	class language;
 	class player_color;
 	class player_quest_objective;
 	class population_class;
@@ -1499,7 +1502,7 @@ class PlayerRace
 {
 public:
 	//Wyrmgus start
-	std::string TranslateName(const std::string &name, const wyrmgus::language *language);
+	std::string TranslateName(const std::string &name, const archimedes::language *language);
 	//Wyrmgus end
 
 public:

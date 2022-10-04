@@ -37,6 +37,7 @@ class CUpgrade;
 namespace archimedes {
 	class gsml_data;
 	class gsml_property;
+	class named_data_entry;
 	enum class gsml_operator;
 }
 
@@ -44,7 +45,6 @@ namespace wyrmgus {
 
 class button;
 class civilization;
-class named_data_entry;
 class unit_type;
 enum class government_type;
 struct read_only_context;

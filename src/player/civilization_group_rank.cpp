@@ -28,7 +28,7 @@
 
 #include "player/civilization_group_rank.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<civilization_group_rank>;
 

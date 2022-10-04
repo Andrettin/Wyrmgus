@@ -28,7 +28,7 @@
 
 #include "ui/cursor_type.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<cursor_type>;
 

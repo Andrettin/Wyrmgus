@@ -28,7 +28,7 @@
 
 #include "quest/objective_type.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<objective_type>;
 

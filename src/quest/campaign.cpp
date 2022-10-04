@@ -199,17 +199,6 @@ bool campaign::is_available() const
 	return true;
 }
 
-bool campaign::contains_timeline_date(const wyrmgus::timeline *timeline, const QDateTime &date) const
-{
-	if (this->get_timeline() == timeline) {
-		return date <= this->get_start_date();
-	} else if (this->get_timeline() == nullptr) {
-		return false;
-	}
-
-	return this->get_timeline()->contains_timeline_date(timeline, date);
-}
-
 void campaign::remove_map_template(map_template *map_template)
 {
 	vector::remove(this->map_templates, map_template);

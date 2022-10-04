@@ -42,9 +42,9 @@ const std::set<std::string> region::history_database_dependencies = {
 	site::class_identifier
 };
 
-void region::load_history_database()
+void region::load_history_database(const QDateTime &start_date, const timeline *current_timeline)
 {
-	data_type::load_history_database();
+	data_type::load_history_database(start_date, current_timeline);
 
 	std::vector<region *> regions = region::get_all();
 

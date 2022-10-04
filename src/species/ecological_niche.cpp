@@ -28,7 +28,7 @@
 
 #include "species/ecological_niche.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<ecological_niche>;
 

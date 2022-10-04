@@ -96,6 +96,8 @@ public:
 	virtual void process_text() override;
 	virtual void check() const override;
 
+	virtual std::unique_ptr<text_processor_base> create_text_processor() const override;
+
 	int get_index() const
 	{
 		return this->index;

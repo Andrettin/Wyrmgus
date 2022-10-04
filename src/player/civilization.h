@@ -39,15 +39,18 @@ struct lua_State;
 
 extern int CclDefineCivilization(lua_State *l);
 
+namespace archimedes {
+	class calendar;
+	class language;
+}
+
 namespace wyrmgus {
 
 class ai_force_template;
-class calendar;
 class character;
 class deity;
 class faction;
 class interface_style;
-class language;
 class quest;
 class resource;
 class site;
@@ -72,7 +75,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(wyrmgus::interface_style* interface_style MEMBER interface_style READ get_interface_style)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
-	Q_PROPERTY(wyrmgus::language* language MEMBER language)
+	Q_PROPERTY(archimedes::language* language MEMBER language)
 	Q_PROPERTY(QString encyclopedia_background_file READ get_encyclopedia_background_file_qstring NOTIFY changed)
 	Q_PROPERTY(int develops_from_count READ get_develops_from_count CONSTANT)
 
@@ -152,12 +155,12 @@ public:
 		return this->upgrade;
 	}
 
-	const wyrmgus::language *get_language() const
+	const archimedes::language *get_language() const
 	{
 		return this->language;
 	}
 
-	wyrmgus::calendar *get_calendar() const;
+	archimedes::calendar *get_calendar() const;
 	CCurrency *GetCurrency() const;
 
 	bool is_visible() const
@@ -267,8 +270,8 @@ private:
 	civilization *parent_civilization = nullptr;
 	wyrmgus::interface_style *interface_style = nullptr; //the civilization's interface style
 	CUpgrade *upgrade = nullptr;
-	wyrmgus::language *language = nullptr;	/// the language used by the civilization
-	wyrmgus::calendar *calendar = nullptr;	/// the calendar used by the civilization
+	archimedes::language *language = nullptr;	/// the language used by the civilization
+	archimedes::calendar *calendar = nullptr;	/// the calendar used by the civilization
 public:
 	CCurrency *Currency = nullptr;	/// the currency used by the civilization
 private:

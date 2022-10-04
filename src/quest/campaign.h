@@ -36,9 +36,13 @@ struct lua_State;
 
 extern int CclDefineCampaign(lua_State *l);
 
+namespace archimedes {
+	class calendar;
+	class timeline;
+}
+
 namespace wyrmgus {
 
-class calendar;
 class faction;
 class icon;
 class map_presets;
@@ -46,7 +50,6 @@ class map_template;
 class player_color;
 class quest;
 class species;
-class timeline;
 
 class campaign final : public detailed_data_entry, public data_type<campaign>, public CDataType
 {
@@ -55,8 +58,8 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color NOTIFY changed)
 	Q_PROPERTY(QDateTime start_date MEMBER start_date READ get_start_date NOTIFY changed)
-	Q_PROPERTY(wyrmgus::calendar* start_date_calendar MEMBER start_date_calendar)
-	Q_PROPERTY(wyrmgus::timeline* timeline MEMBER timeline NOTIFY changed)
+	Q_PROPERTY(archimedes::calendar* start_date_calendar MEMBER start_date_calendar)
+	Q_PROPERTY(archimedes::timeline* timeline MEMBER timeline NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction NOTIFY changed)
 	Q_PROPERTY(wyrmgus::quest* quest MEMBER quest NOTIFY changed)
 	Q_PROPERTY(std::vector<wyrmgus::map_template *> map_templates READ get_map_templates)
@@ -101,7 +104,7 @@ public:
 		return this->start_date;
 	}
 
-	const wyrmgus::timeline *get_timeline() const
+	const archimedes::timeline *get_timeline() const
 	{
 		return this->timeline;
 	}
@@ -128,8 +131,6 @@ public:
 	}
 
 	bool is_available() const;
-
-	bool contains_timeline_date(const wyrmgus::timeline *timeline, const QDateTime &date) const;
 
 	const std::vector<wyrmgus::quest *> &get_required_quests() const
 	{
@@ -185,7 +186,7 @@ private:
 	wyrmgus::player_color *player_color = nullptr; //the player color used for the campaign's icon
 	QDateTime start_date; //the starting date for the campaign
 	calendar *start_date_calendar = nullptr; //the calendar for the start date
-	wyrmgus::timeline *timeline = nullptr; //the timeline in which the campaign is set
+	archimedes::timeline *timeline = nullptr; //the timeline in which the campaign is set
 	bool hidden = false; //whether the campaign is hidden
 	std::vector<wyrmgus::quest *> required_quests;		/// Quests required by the campaign
 	wyrmgus::faction *faction = nullptr;	//which faction the player plays as in the campaign

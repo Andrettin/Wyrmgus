@@ -28,7 +28,7 @@
 
 #include "unit/unit_domain.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<unit_domain>;
 

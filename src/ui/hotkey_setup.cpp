@@ -28,7 +28,7 @@
 
 #include "ui/hotkey_setup.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<hotkey_setup>;
 

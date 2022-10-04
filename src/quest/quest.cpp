@@ -285,8 +285,10 @@ void quest::process_text()
 {
 	//process the hint text for the quest
 	if (!this->hint.empty()) {
-		const text_processor text_processor = this->create_text_processor();
-		this->hint = text_processor.process_text(std::move(this->hint), false);
+		const std::unique_ptr<text_processor_base> text_processor = this->create_text_processor();
+		if (text_processor != nullptr) {
+			this->hint = text_processor->process_text(std::move(this->hint), false);
+		}
 	}
 
 	detailed_data_entry::process_text();
@@ -313,6 +315,12 @@ void quest::check() const
 	for (const std::unique_ptr<quest_objective> &objective : this->get_objectives()) {
 		objective->check();
 	}
+}
+
+std::unique_ptr<text_processor_base> quest::create_text_processor() const
+{
+	text_processing_context ctx;
+	return std::make_unique<text_processor>(std::move(ctx));
 }
 
 const icon *quest::get_icon() const

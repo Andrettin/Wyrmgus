@@ -28,7 +28,7 @@
 
 #include "species/taxonomic_rank.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<taxonomic_rank>;
 

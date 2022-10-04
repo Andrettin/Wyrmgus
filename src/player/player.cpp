@@ -372,7 +372,7 @@ bool NoRescueCheck; //disable rescue check
 /**
 **  "Translate" (that is, adapt) a proper name from one culture (civilization) to another.
 */
-std::string PlayerRace::TranslateName(const std::string &name, const wyrmgus::language *language)
+std::string PlayerRace::TranslateName(const std::string &name, const archimedes::language *language)
 {
 	std::string new_name;
 	

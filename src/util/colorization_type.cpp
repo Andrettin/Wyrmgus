@@ -28,7 +28,7 @@
 
 #include "util/colorization_type.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<colorization_type>;
 

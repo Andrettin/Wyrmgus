@@ -28,7 +28,7 @@
 
 #include "missile/missile_class.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<missile_class>;
 

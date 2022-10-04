@@ -28,7 +28,7 @@
 
 #include "stratagus.h"
 
-namespace wyrmgus {
+namespace archimedes {
 	class calendar;
 	class timeline;
 }
@@ -61,9 +61,9 @@ public:
 	}
 	
 	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
-	CDate ToBaseCalendar(wyrmgus::calendar *current_calendar) const;
+	CDate ToBaseCalendar(calendar *current_calendar) const;
 	std::string ToString() const;
-	std::string ToDisplayString(const wyrmgus::calendar *calendar, const bool year_only = false) const;
+	std::string ToDisplayString(const calendar *calendar, const bool year_only = false) const;
 	
 	int GetYear() const
 	{

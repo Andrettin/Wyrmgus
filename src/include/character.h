@@ -44,8 +44,12 @@ struct lua_State;
 extern int CclDefineCharacter(lua_State *l);
 extern int CclDefineCustomHero(lua_State *l);
 
-namespace wyrmgus {
+namespace archimedes {
 	class calendar;
+	class language;
+}
+
+namespace wyrmgus {
 	class character_history;
 	class civilization;
 	class deity;
@@ -54,7 +58,6 @@ namespace wyrmgus {
 	class faction;
 	class historical_location;
 	class icon;
-	class language;
 	class persistent_item;
 	class quest;
 	class religion;
@@ -472,7 +475,7 @@ public:
 		return this->conditions.get();
 	}
 
-	virtual text_processing_context get_text_processing_context() const override;
+	virtual std::unique_ptr<text_processor_base> create_text_processor() const override;
 
 	CUnit *get_unit() const;
 

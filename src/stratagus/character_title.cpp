@@ -28,7 +28,7 @@
 
 #include "character_title.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<character_title>;
 

@@ -28,7 +28,7 @@
 
 #include "upgrade/upgrade_category_rank.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<upgrade_category_rank>;
 

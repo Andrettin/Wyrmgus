@@ -28,7 +28,7 @@
 
 #include "player/faction_type.h"
 
-namespace wyrmgus {
+namespace archimedes {
 
 template class enum_converter<faction_type>;
 

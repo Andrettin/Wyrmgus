@@ -27,6 +27,7 @@
 #pragma once
 
 #include "text_processing_context.h"
+#include "util/text_processor_base.h"
 
 class CPlayer;
 class CUnit;
@@ -39,26 +40,19 @@ class dialogue_node;
 class dialogue_option;
 class faction;
 class literary_text;
-class named_data_entry;
 class site;
 class unit_class;
 class unit_type;
 class upgrade_class;
-class word;
 
-class text_processor final
+class text_processor final : public text_processor_base
 {
 public:
 	explicit text_processor(text_processing_context &&ctx) : context(std::move(ctx))
 	{
 	}
 
-	std::string process_text(std::string &&text, const bool process_in_game_data) const;
-	std::string process_text(const std::string &text, const bool process_in_game_data) const;
-	std::string process_tokens(std::queue<std::string> &&tokens, const bool process_in_game_data, bool &processed) const;
-	std::string process_string_tokens(std::string &&str, std::queue<std::string> &&tokens) const;
-	std::string process_named_data_entry_token(const named_data_entry *data_entry, const std::string &token) const;
-	std::string process_named_data_entry_tokens(const named_data_entry *data_entry, std::queue<std::string> &tokens) const;
+	virtual std::string process_tokens(std::queue<std::string> &&tokens, const bool process_in_game_data, bool &processed) const override;
 	std::string process_civilization_tokens(const civilization *civilization, std::queue<std::string> &tokens) const;
 	std::string process_dialogue_node_tokens(const dialogue_node *dialogue_node, std::queue<std::string> &tokens) const;
 	std::string process_dialogue_option_tokens(const dialogue_option *dialogue_option, std::queue<std::string> &tokens) const;
@@ -67,8 +61,6 @@ public:
 	std::string process_player_tokens(const CPlayer *player, std::queue<std::string> &tokens) const;
 	std::string process_site_tokens(const site *site, std::queue<std::string> &tokens, const bool process_in_game_data, bool &processed) const;
 	std::string process_unit_tokens(const CUnit *unit, std::queue<std::string> &tokens) const;
-	std::string process_word_tokens(const word *word, std::queue<std::string> &tokens) const;
-	std::string process_word_meaning_tokens(const word *word, std::queue<std::string> &tokens) const;
 
 private:
 	const text_processing_context context;
