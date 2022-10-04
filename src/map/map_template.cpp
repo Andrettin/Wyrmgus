@@ -528,7 +528,7 @@ void map_template::initialize()
 
 		const std::string filename = this->get_identifier() + "_territories.png";
 
-		this->save_territory_image(filename, territory_data);
+		this->save_territory_image(filename, std::move(territory_data));
 	}
 
 	data_entry::initialize();
@@ -4834,37 +4834,31 @@ void map_template::create_terrain_image_from_map(QImage &image, const point_map<
 	}
 }
 
-void map_template::save_territory_image(const std::string &filename, const site_map<std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const
+void map_template::save_territory_image(const std::string &filename, site_map<std::vector<std::unique_ptr<QGeoShape>>> &&territory_data) const
 {
 	const std::filesystem::path &territory_filepath = this->get_territory_file();
 
-	QImage image;
+	QImage base_image;
 	if (!territory_filepath.empty()) {
-		image = QImage(path::to_qstring(territory_filepath));
+		base_image = QImage(path::to_qstring(territory_filepath));
 
-		if (image.size() != this->get_size()) {
+		if (base_image.size() != this->get_size()) {
 			throw std::runtime_error("Invalid territory image size for map template \"" + this->get_identifier() + "\".");
 		}
-	} else {
-		image = QImage(this->get_size(), QImage::Format_RGBA8888);
-		image.fill(Qt::transparent);
 	}
 
-	const archimedes::georectangle georectangle = this->get_georectangle();
+	color_map<std::vector<std::unique_ptr<QGeoShape>>> geodata_map;
 
-	for (const auto &kv_pair : territory_data) {
-		const site *settlement = kv_pair.first;
+	for (auto &[settlement, geoshapes] : territory_data) {
 		const QColor color = settlement->get_color();
 		if (!color.isValid()) {
 			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has no valid color.");
 		}
 
-		for (const auto &geoshape : kv_pair.second) {
-			geoshape::write_to_image(*geoshape, image, color, georectangle, this->get_map_projection(), filename);
-		}
+		vector::merge(geodata_map[color], std::move(geoshapes));
 	}
 
-	image.save(QString::fromStdString(filename));
+	geoshape::write_image(path::from_string(filename), geodata_map, this->get_georectangle(), this->get_size(), this->get_map_projection(), base_image);
 }
 
 void map_template::add_site(const site *site)
