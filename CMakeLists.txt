@@ -1828,9 +1828,9 @@ if (MSVC)
 	endif()
 endif()
 
-target_link_libraries(wyrmgus_main LINK_PUBLIC wyrmgus)
+target_link_libraries(wyrmgus_main PUBLIC wyrmgus)
 if(WITH_TEST)
-	target_link_libraries(wyrmgus_test LINK_PUBLIC wyrmgus)
+	target_link_libraries(wyrmgus_test PUBLIC wyrmgus)
 endif()
 
 ########### next target ###############
