@@ -84,13 +84,7 @@ engine_interface::engine_interface()
 
 	database::get()->set_workshop_game_id("370070");
 
-	database::get()->register_defines_loading_function([](const std::filesystem::path &path) {
-		defines::get()->load(path);
-	});
-
-	database::get()->register_defines_initialization_function([]() {
-		defines::get()->initialize();
-	});
+	database::get()->set_defines(defines::get());
 
 	database::get()->register_on_initialization_function([]() {
 		quest::load_quest_completion();

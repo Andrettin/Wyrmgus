@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "database/defines_base.h"
 #include "util/fractional_int.h"
 #include "util/singleton.h"
 
@@ -34,8 +35,6 @@ class CPlayerColorGraphic;
 class CUpgrade;
 
 namespace archimedes {
-	class gsml_data;
-	class gsml_property;
 	class map_projection;
 }
 
@@ -64,7 +63,7 @@ enum class faction_type;
 enum class tile_transition_type;
 enum class trigger_type;
 
-class defines final : public QObject, public singleton<defines>
+class defines final : public defines_base, public singleton<defines>
 {
 	Q_OBJECT
 
@@ -129,10 +128,9 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(QStringList tips READ get_tips_qstring_list NOTIFY changed)
 
 public:
-	void load(const std::filesystem::path &base_path);
-	void process_gsml_property(const gsml_property &property);
-	void process_gsml_scope(const gsml_data &scope);
-	void initialize();
+	virtual void process_gsml_property(const gsml_property &property) override;
+	virtual void process_gsml_scope(const gsml_data &scope) override;
+	virtual void initialize() override;
 
 	interface_style *get_default_interface_style() const
 	{

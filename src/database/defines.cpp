@@ -30,7 +30,6 @@
 
 #include "database/database.h"
 #include "database/gsml_data.h"
-#include "database/gsml_parser.h"
 #include "database/preferences.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
@@ -49,19 +48,6 @@
 #include "video/video.h"
 
 namespace wyrmgus {
-
-void defines::load(const std::filesystem::path &data_path)
-{
-	std::filesystem::path defines_path(data_path / "defines.txt");
-
-	if (!std::filesystem::exists(defines_path)) {
-		return;
-	}
-
-	gsml_parser parser;
-	const gsml_data data = parser.parse(defines_path);
-	database::process_gsml_data(this, data);
-}
 
 void defines::process_gsml_property(const gsml_property &property)
 {
@@ -83,7 +69,7 @@ void defines::process_gsml_property(const gsml_property &property)
 	} else if (key == "0_ad_water_height_multiplier") {
 		this->zero_ad_water_height_multiplier = std::stoi(value);
 	} else {
-		database::get()->process_gsml_property_for_object(this, property);
+		defines_base::process_gsml_property(property);
 	}
 }
 
@@ -145,7 +131,7 @@ void defines::process_gsml_scope(const gsml_data &scope)
 			this->translations[property.get_key()] = property.get_value();
 		});
 	} else {
-		database::get()->process_gsml_scope_for_object(this, scope);
+		defines_base::process_gsml_scope(scope);
 	}
 }
 
