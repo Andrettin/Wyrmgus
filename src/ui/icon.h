@@ -64,11 +64,14 @@ struct lua_State;
 
 extern int CclDefineIcon(lua_State *l);
 
+namespace archimedes {
+	enum class colorization_type;
+}
+
 namespace wyrmgus {
 
 class player_color;
 class renderer;
-enum class colorization_type;
 
 /// Icon: rectangle image used in menus
 class icon final : public icon_base, public data_type<icon>

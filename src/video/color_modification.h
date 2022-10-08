@@ -28,11 +28,14 @@
 
 #include "util/color_container.h"
 
+namespace archimedes {
+	enum class colorization_type;
+}
+
 namespace wyrmgus {
 
 class player_color;
 class time_of_day;
-enum class colorization_type;
 
 //a color modification to be applied to a texture
 class color_modification final

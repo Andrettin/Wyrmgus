@@ -60,7 +60,6 @@
 #include "video/render_context.h"
 #include "video/renderer.h"
 #include "video/video.h"
-#include "xbrz.h"
 
 std::map<std::string, std::weak_ptr<CGraphic>> CGraphic::graphics_by_filepath;
 std::list<CGraphic *> CGraphic::graphics;

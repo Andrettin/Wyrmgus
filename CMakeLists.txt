@@ -50,8 +50,6 @@ include_directories(
 	src/guichan/include
 	src/guichan/include/guichan
 	src/stratagus
-	src/third_party
-	src/third_party/xbrz/include
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -556,8 +554,6 @@ set(upgrade_SRCS
 source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
-	src/util/colorization_type.cpp
-	src/util/image_util.cpp
 	src/util/util.cpp
 )
 source_group(util FILES ${util_SRCS})
@@ -577,11 +573,6 @@ set(video_SRCS
 	src/video/video.cpp
 )
 source_group(video FILES ${video_SRCS})
-
-set(xbrz_SRCS
-	src/third_party/xbrz/xbrz.cpp
-)
-source_group(xbrz FILES ${xbrz_SRCS})
 
 set(win32_SRCS
 	src/win32/stratagus.rc
@@ -647,7 +638,6 @@ set(wyrmgus_SRCS
 	${upgrade_SRCS}
 	${util_SRCS}
 	${video_SRCS}
-	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
 )
 
@@ -1156,8 +1146,6 @@ set(wyrmgus_upgrade_HDRS
 )
 
 set(wyrmgus_util_HDRS
-	src/util/colorization_type.h
-	src/util/image_util.h
 	src/util/util.h
 )
 
@@ -1170,11 +1158,6 @@ set(wyrmgus_video_HDRS
 	src/video/render_context.h
 	src/video/renderer.h
 	src/video/video.h
-)
-
-set(wyrmgus_xbrz_HDRS
-	src/third_party/xbrz/include/config.h
-	src/third_party/xbrz/include/xbrz.h
 )
 
 set(wyrmgus_generic_HDRS
@@ -1262,7 +1245,6 @@ source_group(unit\\build_restriction FILES ${wyrmgus_unit_build_restriction_HDRS
 source_group(upgrade FILES ${wyrmgus_upgrade_HDRS})
 source_group(util FILES ${wyrmgus_util_HDRS})
 source_group(video FILES ${wyrmgus_video_HDRS})
-source_group(xbrz FILES ${wyrmgus_xbrz_HDRS})
 
 set(wyrmgus_HDRS
 	${wyrmgus_generic_HDRS}
@@ -1296,7 +1278,6 @@ set(wyrmgus_HDRS
 	${wyrmgus_upgrade_HDRS}
 	${wyrmgus_util_HDRS}
 	${wyrmgus_video_HDRS}
-	${wyrmgus_xbrz_HDRS}
 )
 
 set(wyrmgus_main_SRCS
@@ -1784,7 +1765,6 @@ if(ENABLE_UNITY_BUILD)
 	set_source_files_properties(${upgrade_SRCS} PROPERTIES UNITY_GROUP "upgrade")
 	set_source_files_properties(${util_SRCS} PROPERTIES UNITY_GROUP "util")
 	set_source_files_properties(${video_SRCS} PROPERTIES UNITY_GROUP "video")
-	set_source_files_properties(${xbrz_SRCS} PROPERTIES UNITY_GROUP "xbrz")
 	
 	if(WITH_TEST)
 		set_target_properties(wyrmgus_test PROPERTIES UNITY_BUILD_MODE GROUP)

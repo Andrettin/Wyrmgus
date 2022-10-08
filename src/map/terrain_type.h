@@ -36,12 +36,15 @@ struct lua_State;
 
 extern int CclDefineTerrainType(lua_State *l);
 
+namespace archimedes {
+	enum class colorization_type;
+}
+
 namespace wyrmgus {
 
 class resource;
 class season;
 class unit_type;
-enum class colorization_type;
 enum class tile_flag : uint32_t;
 enum class tile_transition_type;
 

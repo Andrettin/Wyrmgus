@@ -54,6 +54,10 @@ extern int CclDefineDependency(lua_State *l);
 extern int CclDefinePredependency(lua_State *l);
 extern int CclDefineUnitType(lua_State *l);
 
+namespace archimedes {
+	enum class colorization_type;
+}
+
 namespace wyrmgus {
 	class and_build_restriction;
 	class animation_set;
@@ -83,7 +87,6 @@ namespace wyrmgus {
 	class variation_tag;
 	class world;
 	enum class can_target_flag;
-	enum class colorization_type;
 	enum class gender;
 	enum class item_class;
 	enum class item_slot;
