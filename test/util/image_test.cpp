@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(scale_image_test)
 	image.fill(Qt::black);
 
 	for (int scale_factor = 2; scale_factor <= 5; ++scale_factor) {
-		const QImage scaled_image = image::scale(image, centesimal_int(scale_factor), [](const size_t factor, const uint32_t *src, uint32_t *tgt, const int src_width, const int src_height) {
+		const QImage scaled_image = image::scale<QImage::Format_RGBA8888>(image, centesimal_int(scale_factor), [](const size_t factor, const uint32_t *src, uint32_t *tgt, const int src_width, const int src_height) {
 			xbrz::scale(factor, src, tgt, src_width, src_height);
 		});
 
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(scale_frame_image_test)
 		const QSize frame_size(72, 72);
 
 		for (int scale_factor = 2; scale_factor <= 5; ++scale_factor) {
-			const QImage scaled_image = co_await image::scale(image, centesimal_int(scale_factor), frame_size, [](const size_t factor, const uint32_t *src, uint32_t *tgt, const int src_width, const int src_height) {
+			const QImage scaled_image = co_await image::scale<QImage::Format_RGBA8888>(image, centesimal_int(scale_factor), frame_size, [](const size_t factor, const uint32_t *src, uint32_t *tgt, const int src_width, const int src_height) {
 				xbrz::scale(factor, src, tgt, src_width, src_height);
 			});
 
