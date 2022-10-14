@@ -28,9 +28,9 @@
 
 #include "ui/button.h"
 
-#include "config.h"
 #include "database/preferences.h"
 #include "economy/resource.h"
+#include "include/config.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"

@@ -53,7 +53,7 @@
 #include "actions.h"
 #include "animation/animation_sequence.h"
 #include "animation/animation_set.h"
-#include "config.h"
+#include "include/config.h"
 #include "player/player.h"
 #include "script.h"
 #include "spell/spell.h"

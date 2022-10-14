@@ -28,10 +28,10 @@
 
 #include "map/terrain_type.h"
 
-#include "config.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "economy/resource.h"
+#include "include/config.h"
 #include "iolib.h"
 #include "map/terrain_feature.h"
 #include "map/tile_flag.h"

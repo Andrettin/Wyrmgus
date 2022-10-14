@@ -29,7 +29,7 @@
 
 #include "spell/spell_action_spawn_missile.h"
 
-#include "config.h"
+#include "include/config.h"
 #include "map/map.h"
 #include "missile/missile_class.h"
 #include "missile.h"

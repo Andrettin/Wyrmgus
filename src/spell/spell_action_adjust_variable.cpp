@@ -32,7 +32,7 @@
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
-#include "config.h"
+#include "include/config.h"
 #include "script.h"
 #include "unit/unit.h"
 #include "util/string_conversion_util.h"

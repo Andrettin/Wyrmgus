@@ -40,13 +40,13 @@
 #include "age.h"
 #include "character.h"
 #include "commands.h"
-#include "config.h"
 #include "database/defines.h"
 //Wyrmgus start
 #include "editor.h"
 #include "game/game.h"
 //Wyrmgus end
 #include "gender.h"
+#include "include/config.h"
 #include "iolib.h"
 #include "item/item_class.h"
 #include "magic_domain.h"

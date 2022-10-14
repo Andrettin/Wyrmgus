@@ -28,7 +28,7 @@
 
 #include "script/condition/and_condition.h"
 
-#include "config.h"
+#include "include/config.h"
 #include "script/condition/or_condition.h"
 #include "script/condition/upgrade_condition.h"
 

@@ -29,7 +29,7 @@
 
 #include "script/condition/condition.h"
 
-#include "config.h"
+#include "include/config.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "player/faction_type.h"

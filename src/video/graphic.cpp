@@ -61,6 +61,8 @@
 #include "video/renderer.h"
 #include "video/video.h"
 
+#include "xbrz/include/xbrz.h"
+
 std::map<std::string, std::weak_ptr<CGraphic>> CGraphic::graphics_by_filepath;
 std::list<CGraphic *> CGraphic::graphics;
 
@@ -752,7 +754,9 @@ QImage CGraphic::create_modified_image(const color_modification &color_modificat
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 	if (scale_factor > 1 && scale_factor != this->custom_scale_factor) {
 		thread_pool::get()->co_spawn_sync([this, &image, &scale_factor]() -> boost::asio::awaitable<void> {
-			image = co_await image::scale(image, scale_factor / this->custom_scale_factor, this->get_loaded_frame_size());
+			image = co_await image::scale(image, scale_factor / this->custom_scale_factor, this->get_loaded_frame_size(), [](const size_t factor, const uint32_t *src, uint32_t *tgt, const int src_width, const int src_height) {
+				xbrz::scale(factor, src, tgt, src_width, src_height);
+			});
 		});
 	}
 

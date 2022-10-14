@@ -29,9 +29,9 @@
 
 #include "upgrade/upgrade_modifier.h"
 
-#include "config.h"
 #include "database/defines.h"
 #include "game/game.h"
+#include "include/config.h"
 #include "map/map.h"
 #include "map/site.h"
 #include "map/site_game_data.h"

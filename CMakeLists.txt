@@ -50,6 +50,8 @@ include_directories(
 	src/guichan/include
 	src/guichan/include/guichan
 	src/stratagus
+	src/third_party
+	src/third_party/xbrz/include
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -579,6 +581,12 @@ set(win32_SRCS
 )
 source_group(win32 FILES ${win32_SRCS})
 
+set(xbrz_SRCS
+	src/third_party/xbrz/xbrz.cpp
+)
+source_group(xbrz FILES ${xbrz_SRCS})
+set_source_files_properties(${xbrz_SRCS} PROPERTIES UNITY_GROUP "xbrz")
+
 set(tolua_FILES
 	src/tolua/ai.pkg
 	src/tolua/campaign.pkg
@@ -638,6 +646,7 @@ set(wyrmgus_SRCS
 	${upgrade_SRCS}
 	${util_SRCS}
 	${video_SRCS}
+	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
 )
 
@@ -1246,6 +1255,12 @@ source_group(upgrade FILES ${wyrmgus_upgrade_HDRS})
 source_group(util FILES ${wyrmgus_util_HDRS})
 source_group(video FILES ${wyrmgus_video_HDRS})
 
+set(xbrz_HDRS
+	src/third_party/xbrz/include/config.h
+	src/third_party/xbrz/include/xbrz.h
+)
+source_group(xbrz FILES ${xbrz_HDRS})
+
 set(wyrmgus_HDRS
 	${wyrmgus_generic_HDRS}
 	${wyrmgus_action_HDRS}
@@ -1278,6 +1293,7 @@ set(wyrmgus_HDRS
 	${wyrmgus_upgrade_HDRS}
 	${wyrmgus_util_HDRS}
 	${wyrmgus_video_HDRS}
+	${xbrz_HDRS}
 )
 
 set(wyrmgus_main_SRCS

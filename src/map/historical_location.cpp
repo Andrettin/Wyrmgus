@@ -28,7 +28,7 @@
 
 #include "map/historical_location.h"
 
-#include "config.h"
+#include "include/config.h"
 #include "map/map.h"
 #include "map/map_template.h"
 #include "map/site.h"

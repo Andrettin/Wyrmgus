@@ -28,9 +28,9 @@
 
 #include "map/generated_terrain.h"
 
-#include "config.h"
 #include "database/gsml_data.h"
 #include "database/gsml_property.h"
+#include "include/config.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "util/string_conversion_util.h"

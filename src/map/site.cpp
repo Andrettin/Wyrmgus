@@ -28,8 +28,8 @@
 
 #include "map/site.h"
 
-#include "config.h"
 #include "database/defines.h"
+#include "include/config.h"
 #include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_layer.h"

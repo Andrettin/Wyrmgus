@@ -30,10 +30,10 @@
 
 #include "character.h"
 #include "character_history.h"
-#include "config.h"
 #include "database/defines.h"
 #include "editor.h"
 #include "game/game.h"
+#include "include/config.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "item/unique_item.h"

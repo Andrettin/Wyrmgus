@@ -29,7 +29,7 @@
 #include "item/persistent_item.h"
 
 #include "character.h"
-#include "config.h"
+#include "include/config.h"
 #include "item/item_slot.h"
 #include "item/unique_item.h"
 #include "spell/spell.h"

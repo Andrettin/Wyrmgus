@@ -33,11 +33,11 @@
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
 #include "animation/animation_set.h"
-#include "config.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "editor.h" //for personal name generation
 #include "game/game.h"
+#include "include/config.h"
 #include "iolib.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"

@@ -28,8 +28,8 @@
 
 #include "script/effect/effect.h"
 
-#include "config.h"
 #include "database/database.h"
+#include "include/config.h"
 #include "script/effect/accept_quest_effect.h"
 #include "script/effect/add_modifier_effect.h"
 #include "script/effect/any_unit_of_class_effect.h"

@@ -28,10 +28,10 @@
 
 #include "script/trigger.h"
 
-#include "config.h"
 #include "database/defines.h"
 #include "engine_interface.h"
 #include "game/game.h"
+#include "include/config.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "luacallback.h"

@@ -30,7 +30,7 @@
 
 #include "color.h"
 
-#include "config.h"
+#include "include/config.h"
 #include "script.h"
 #include "util/util.h"
 

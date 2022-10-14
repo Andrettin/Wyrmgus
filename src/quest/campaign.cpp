@@ -28,9 +28,9 @@
 
 #include "quest/campaign.h"
 
-#include "config.h"
 #include "database/preferences.h"
 #include "game/game.h"
+#include "include/config.h"
 #include "map/map_template.h"
 #include "player/civilization.h"
 #include "player/faction.h"
