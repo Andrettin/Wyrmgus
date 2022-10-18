@@ -169,13 +169,13 @@ extern void beos_init(int argc, char **argv);
 //Wyrmgus end
 #include "database/database.h"
 #include "database/preferences.h"
-#include "direction.h"
 #include "editor.h"
 #include "engine_interface.h"
 #include "game/game.h"
 #include "guichan.h"
 #include "iocompat.h"
 #include "iolib.h"
+#include "map/direction.h"
 #include "map/map.h"
 #include "network/netconnect.h"
 #include "network/network.h"
@@ -530,7 +530,7 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 }
 
 //Wyrmgus start
-direction GetDirectionFromOffset(const int x, const int y)
+archimedes::direction GetDirectionFromOffset(const int x, const int y)
 {
 	if (x < 0 && y == 0) {
 		return direction::west;

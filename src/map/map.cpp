@@ -33,7 +33,6 @@
 #include "database/defines.h"
 #include "database/gsml_parser.h"
 #include "database/preferences.h"
-#include "direction.h"
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
@@ -42,6 +41,7 @@
 #include "game/game.h" // for the SaveGameLoading variable
 //Wyrmgus end
 #include "iolib.h"
+#include "map/direction.h"
 #include "map/generated_terrain.h"
 #include "map/landmass.h"
 #include "map/map_info.h"

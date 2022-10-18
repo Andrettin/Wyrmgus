@@ -1207,7 +1207,6 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/dialogue_node.h
 	src/stratagus/dialogue_node_instance.h
 	src/stratagus/dialogue_option.h
-	src/stratagus/direction.h
 	src/stratagus/engine_interface.h
 	src/stratagus/epithet.h
 	src/stratagus/fallback_name_generator.h

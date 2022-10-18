@@ -29,7 +29,7 @@
 #include "map/dungeon_generator.h"
 
 #include "character.h"
-#include "direction.h"
+#include "map/direction.h"
 #include "map/dungeon_generation_settings.h"
 #include "map/map.h"
 #include "map/terrain_type.h"

@@ -153,9 +153,12 @@ constexpr int DefaultTileMovementCost = 8;
 --  stratagus.cpp
 ----------------------------------------------------------------------------*/
 
+namespace archimedes {
+	enum class direction;
+}
+
 namespace wyrmgus {
 	class renderer;
-	enum class direction;
 }
 
 //Wyrmgus start
@@ -197,7 +200,7 @@ enum TechLevels {
 	CivilizedGunpowderTechLevel
 };
 
-extern wyrmgus::direction GetDirectionFromOffset(const int x, const int y);
+extern archimedes::direction GetDirectionFromOffset(const int x, const int y);
 //Wyrmgus end
 
 extern void load_database(const bool initial_definition);
