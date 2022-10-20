@@ -28,8 +28,8 @@
 
 #include "gendered_name_generator.h"
 
-#include "gender.h"
 #include "name_generator.h"
+#include "util/gender.h"
 
 namespace wyrmgus {
 

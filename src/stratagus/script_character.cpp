@@ -33,7 +33,6 @@
 #include "ai/ai_local.h" //for using AiHelpers
 #include "character_title.h"
 #include "epithet.h"
-#include "gender.h"
 #include "grand_strategy.h"
 #include "item/persistent_item.h"
 #include "item/unique_item.h"
@@ -51,6 +50,7 @@
 #include "unit/unit_type.h"
 #include "unit/variation_tag.h"
 #include "upgrade/upgrade.h"
+#include "util/gender.h"
 #include "util/log_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"

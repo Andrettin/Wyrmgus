@@ -30,7 +30,6 @@
 
 #include "dialogue_node.h"
 #include "dialogue_option.h"
-#include "gender.h"
 #include "language/word.h"
 #include "literary_text.h"
 #include "map/site.h"
@@ -46,6 +45,7 @@
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/assert_util.h"
+#include "util/gender.h"
 #include "util/queue_util.h"
 #include "util/string_util.h"
 

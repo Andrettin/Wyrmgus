@@ -28,10 +28,13 @@
 
 #include "language/name_variant.h"
 
+namespace archimedes {
+	enum class gender;
+}
+
 namespace wyrmgus {
 
 class name_generator;
-enum class gender;
 
 class gendered_name_generator final
 {

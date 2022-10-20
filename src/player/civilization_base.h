@@ -32,6 +32,10 @@
 
 class CUpgrade;
 
+namespace archimedes {
+	enum class gender;
+}
+
 namespace wyrmgus {
 
 class civilization_group;
@@ -51,7 +55,6 @@ class unit_sound_set;
 class unit_type;
 class upgrade_class;
 enum class cursor_type;
-enum class gender;
 
 class civilization_base : public detailed_data_entry
 {

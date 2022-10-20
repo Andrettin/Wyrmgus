@@ -28,8 +28,8 @@
 
 #include "name_generator.h"
 
-#include "gender.h"
 #include "unit/unit_class.h"
+#include "util/gender.h"
 #include "util/vector_util.h"
 #include "util/vector_random_util.h"
 

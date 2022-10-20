@@ -452,7 +452,6 @@ set(wyrmgus_base_SRCS
 	src/stratagus/engine_interface.cpp
 	src/stratagus/epithet.cpp
 	src/stratagus/fallback_name_generator.cpp
-	src/stratagus/gender.cpp
 	src/stratagus/gendered_name_generator.cpp
 	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp
@@ -1211,7 +1210,6 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/epithet.h
 	src/stratagus/fallback_name_generator.h
 	src/stratagus/game_concept.h
-	src/stratagus/gender.h
 	src/stratagus/gendered_name_generator.h
 	src/stratagus/literary_text.h
 	src/stratagus/magic_domain.h

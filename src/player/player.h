@@ -56,6 +56,7 @@ extern int CclUnit(lua_State *l);
 
 namespace archimedes {
 	class calendar;
+	enum class gender;
 	class language;
 }
 
@@ -83,7 +84,6 @@ namespace wyrmgus {
 	enum class character_title;
 	enum class faction_tier;
 	enum class government_type;
-	enum class gender;
 	enum class player_type;
 	enum class resource_storage_type;
 	enum class unit_domain;

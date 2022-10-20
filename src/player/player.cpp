@@ -46,7 +46,6 @@
 #include "game/game.h"
 //Wyrmgus end
 #include "game/difficulty.h"
-#include "gender.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 #include "iocompat.h"
@@ -124,6 +123,7 @@
 #include "util/assert_util.h"
 #include "util/container_util.h"
 #include "util/event_loop.h"
+#include "util/gender.h"
 #include "util/log_util.h"
 #include "util/map_util.h"
 #include "util/set_util.h"

@@ -28,10 +28,10 @@
 
 #include "fallback_name_generator.h"
 
-#include "gender.h"
 #include "gendered_name_generator.h"
 #include "name_generator.h"
 #include "unit/unit_class.h"
+#include "util/gender.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {

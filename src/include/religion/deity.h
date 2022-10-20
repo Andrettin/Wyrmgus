@@ -34,6 +34,10 @@ struct lua_State;
 
 extern int CclDefineDeity(lua_State *l);
 
+namespace archimedes {
+	enum class gender;
+}
+
 namespace wyrmgus {
 
 class character;
@@ -45,7 +49,6 @@ class pantheon;
 class religion;
 class spell;
 class world;
-enum class gender;
 
 class deity final : public detailed_data_entry, public data_type<deity>
 {

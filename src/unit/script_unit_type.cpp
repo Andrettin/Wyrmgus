@@ -35,7 +35,6 @@
 //Wyrmgus end
 #include "editor.h"
 #include "game/game.h"
-#include "gender.h"
 #include "item/item_slot.h"
 #include "item/unique_item.h"
 #include "luacallback.h"
@@ -85,6 +84,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "util/assert_util.h"
+#include "util/gender.h"
 #include "video/font.h"
 #include "video/video.h"
 

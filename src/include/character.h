@@ -47,6 +47,7 @@ extern int CclDefineCustomHero(lua_State *l);
 namespace archimedes {
 	class calendar;
 	class language;
+	enum class gender;
 }
 
 namespace wyrmgus {
@@ -66,7 +67,6 @@ namespace wyrmgus {
 	class unit_type;
 	class variation_tag;
 	enum class character_title;
-	enum class gender;
 
 	template <typename scope_type>
 	class and_condition;

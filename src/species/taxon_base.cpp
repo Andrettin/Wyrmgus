@@ -30,10 +30,10 @@
 
 #include "database/gsml_data.h"
 #include "fallback_name_generator.h"
-#include "gender.h"
 #include "gendered_name_generator.h"
 #include "name_generator.h"
 #include "species/taxon.h"
+#include "util/gender.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {

@@ -30,11 +30,14 @@
 #include "unit/unit_class_container.h"
 #include "util/singleton.h"
 
+namespace archimedes {
+	enum class gender;
+}
+
 namespace wyrmgus {
 
 class gendered_name_generator;
 class name_generator;
-enum class gender;
 
 class fallback_name_generator final : public singleton<fallback_name_generator>
 {

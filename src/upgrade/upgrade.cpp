@@ -45,7 +45,6 @@
 #include "editor.h"
 #include "game/game.h"
 //Wyrmgus end
-#include "gender.h"
 #include "include/config.h"
 #include "iolib.h"
 #include "item/item_class.h"
@@ -87,6 +86,7 @@
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/assert_util.h"
+#include "util/gender.h"
 #include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"

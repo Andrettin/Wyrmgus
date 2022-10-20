@@ -32,9 +32,11 @@
 #include "unit/unit_type_container.h"
 #include "unit/unit_variable.h"
 
-namespace wyrmgus {
+namespace archimedes {
+	enum class gender;
+}
 
-enum class gender;
+namespace wyrmgus {
 
 /**
 **  These are the current stats of a unit. Upgraded or downgraded.

@@ -32,7 +32,6 @@
 #include "character_title.h"
 #include "database/defines.h"
 #include "game/game.h" //for loading screen elements
-#include "gender.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "menus.h"
@@ -53,6 +52,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/gender.h"
 #include "util/util.h"
 #include "video/font.h"	// for grand strategy mode tooltip drawing
 #include "video/video.h"

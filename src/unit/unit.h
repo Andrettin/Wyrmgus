@@ -51,6 +51,10 @@ struct lua_State;
 
 extern int CclUnit(lua_State *l);
 
+namespace archimedes {
+	enum class gender;
+}
+
 namespace wyrmgus {
 	class animation_set;
 	class character;
@@ -74,7 +78,6 @@ namespace wyrmgus {
 	class unit_type;
 	class unit_type_variation;
 	class world;
-	enum class gender;
 	enum class item_class;
 	enum class item_slot;
 	enum class status_effect;

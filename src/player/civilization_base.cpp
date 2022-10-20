@@ -31,7 +31,6 @@
 #include "database/gsml_data.h"
 #include "database/gsml_operator.h"
 #include "fallback_name_generator.h"
-#include "gender.h"
 #include "gendered_name_generator.h"
 #include "name_generator.h"
 #include "player/civilization_group.h"
@@ -45,6 +44,7 @@
 #include "upgrade/upgrade_structs.h"
 #include "util/assert_util.h"
 #include "util/container_util.h"
+#include "util/gender.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {

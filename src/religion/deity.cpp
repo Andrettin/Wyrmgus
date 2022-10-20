@@ -29,7 +29,6 @@
 #include "religion/deity.h"
 
 #include "character.h"
-#include "gender.h"
 #include "magic_domain.h"
 #include "map/world.h"
 #include "player/civilization.h"
@@ -41,6 +40,7 @@
 #include "religion/religion.h"
 #include "upgrade/upgrade.h"
 #include "util/container_util.h"
+#include "util/gender.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 

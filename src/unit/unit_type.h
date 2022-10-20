@@ -56,6 +56,7 @@ extern int CclDefineUnitType(lua_State *l);
 
 namespace archimedes {
 	enum class colorization_type;
+	enum class gender;
 }
 
 namespace wyrmgus {
@@ -87,7 +88,6 @@ namespace wyrmgus {
 	class variation_tag;
 	class world;
 	enum class can_target_flag;
-	enum class gender;
 	enum class item_class;
 	enum class item_slot;
 	enum class status_effect;

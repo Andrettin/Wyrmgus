@@ -43,6 +43,10 @@ enum class ButtonCmd;
 
 extern int CclDefineFaction(lua_State *l);
 
+namespace archimedes {
+	enum class gender;
+}
+
 namespace wyrmgus {
 
 class ai_force_template;
@@ -64,7 +68,6 @@ enum class character_title;
 enum class diplomacy_state;
 enum class faction_tier;
 enum class faction_type;
-enum class gender;
 enum class government_type;
 
 template <typename scope_type>

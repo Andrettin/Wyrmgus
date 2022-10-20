@@ -29,9 +29,11 @@
 #include "language/name_variant.h"
 #include "unit/unit_class_container.h"
 
-namespace wyrmgus {
+namespace archimedes {
+	enum class gender;
+}
 
-enum class gender;
+namespace wyrmgus {
 
 class name_generator final
 {

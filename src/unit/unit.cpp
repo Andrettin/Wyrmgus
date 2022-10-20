@@ -46,7 +46,6 @@
 #include "economy/resource_storage_type.h"
 #include "epithet.h"
 #include "game/game.h"
-#include "gender.h"
 #include "editor.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -105,6 +104,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/assert_util.h"
+#include "util/gender.h"
 #include "util/log_util.h"
 #include "util/point_util.h"
 #include "util/rect_util.h"
