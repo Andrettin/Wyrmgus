@@ -328,7 +328,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				this->unit_type = unit_type;
 			}
 		} else if (key == "gender") {
-			this->gender = enum_converter<wyrmgus::gender>::to_enum(value);
+			this->gender = enum_converter<archimedes::gender>::to_enum(value);
 		} else if (key == "civilization") {
 			this->civilization = civilization::get(value);
 		} else if (key == "faction") {
@@ -863,7 +863,7 @@ void character::save() const
 				fprintf(fd, "\tFamilyName = \"%s\",\n", this->get_surname().c_str());
 			}
 			if (this->get_gender() != gender::none) {
-				fprintf(fd, "\tGender = \"%s\",\n", enum_converter<wyrmgus::gender>::to_string(this->get_gender()).c_str());
+				fprintf(fd, "\tGender = \"%s\",\n", enum_converter<archimedes::gender>::to_string(this->get_gender()).c_str());
 			}
 			if (this->get_civilization()) {
 				fprintf(fd, "\tCivilization = \"%s\",\n", this->get_civilization()->get_identifier().c_str());

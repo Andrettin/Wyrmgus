@@ -882,8 +882,8 @@ int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "PersonalNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				const gender gender = enum_converter<wyrmgus::gender>::to_enum(LuaToString(l, -1, j + 1));
-				if (gender != wyrmgus::gender::none) {
+				const gender gender = enum_converter<archimedes::gender>::to_enum(LuaToString(l, -1, j + 1));
+				if (gender != archimedes::gender::none) {
 					++j;
 				}
 				
@@ -919,7 +919,7 @@ int CclDefineCivilization(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				const wyrmgus::character_title title = enum_converter<character_title>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
-				const wyrmgus::gender gender = enum_converter<wyrmgus::gender>::to_enum(LuaToString(l, -1, k + 1));
+				const archimedes::gender gender = enum_converter<archimedes::gender>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
 				const wyrmgus::government_type government_type = enum_converter<wyrmgus::government_type>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
@@ -1478,7 +1478,7 @@ int CclDefineFaction(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				const wyrmgus::character_title title = enum_converter<character_title>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
-				const wyrmgus::gender gender = enum_converter<wyrmgus::gender>::to_enum(LuaToString(l, -1, k + 1));
+				const archimedes::gender gender = enum_converter<archimedes::gender>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
 				const wyrmgus::government_type government_type = enum_converter<wyrmgus::government_type>::to_enum(LuaToString(l, -1, k + 1));
 				++k;
@@ -2398,7 +2398,7 @@ static int CclGetPlayerData(lua_State *l)
 		std::string title_type_ident = LuaToString(l, 3);
 		std::string gender_ident = LuaToString(l, 4);
 		const character_title title_type_id = enum_converter<character_title>::to_enum(title_type_ident);
-		const gender gender = enum_converter<wyrmgus::gender>::to_enum(gender_ident);
+		const gender gender = enum_converter<archimedes::gender>::to_enum(gender_ident);
 		
 		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender).data());
 		return 1;

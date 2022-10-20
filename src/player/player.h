@@ -344,7 +344,7 @@ public:
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, const bool ignore_lower_ai_priority) const;
 	std::string get_full_name() const;
 	std::string_view get_faction_title_name() const;
-	std::string_view GetCharacterTitleName(const character_title title_type, const wyrmgus::gender gender) const;
+	std::string_view GetCharacterTitleName(const character_title title_type, const archimedes::gender gender) const;
 	std::vector<CUnit *> get_builders(const unit_type *building) const;
 	landmass_set get_builder_landmasses(const unit_type *building) const;
 	std::vector<const CUpgrade *> GetResearchableUpgrades();

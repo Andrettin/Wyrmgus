@@ -107,7 +107,7 @@ void civilization_base::process_gsml_scope(const gsml_data &scope)
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
-			const gender gender = enum_converter<wyrmgus::gender>::to_enum(tag);
+			const gender gender = enum_converter<archimedes::gender>::to_enum(tag);
 
 			this->personal_name_generator->add_names(gender, child_scope.get_values());
 		});
@@ -123,7 +123,7 @@ void civilization_base::process_gsml_scope(const gsml_data &scope)
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
-			const gender gender = enum_converter<wyrmgus::gender>::to_enum(tag);
+			const gender gender = enum_converter<archimedes::gender>::to_enum(tag);
 
 			this->surname_generator->add_names(gender, child_scope.get_values());
 		});

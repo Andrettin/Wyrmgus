@@ -96,7 +96,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(wyrmgus::unit_type* unit_type MEMBER unit_type WRITE set_unit_type)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction NOTIFY changed)
-	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
+	Q_PROPERTY(archimedes::gender gender READ get_gender WRITE set_gender)
 	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
 	Q_PROPERTY(wyrmgus::character* mother READ get_mother WRITE set_mother)
 	Q_PROPERTY(wyrmgus::site* home_settlement MEMBER home_settlement)
@@ -278,12 +278,12 @@ public:
 		return this->get_deity() != nullptr;
 	}
 
-	wyrmgus::gender get_gender() const
+	archimedes::gender get_gender() const
 	{
 		return this->gender;
 	}
 
-	void set_gender(const wyrmgus::gender gender)
+	void set_gender(const archimedes::gender gender)
 	{
 		if (gender == this->get_gender()) {
 			return;
@@ -522,7 +522,7 @@ private:
 	wyrmgus::civilization *civilization = nullptr;	/// Culture to which the character belongs
 	faction *default_faction = nullptr;	//the default faction to which the character belongs
 	const wyrmgus::deity *deity = nullptr; //the deity which the character is (if it is a deity)
-	wyrmgus::gender gender;				/// Character's gender
+	archimedes::gender gender;				/// Character's gender
 	int base_level = 1; //the level that the character starts with
 	int level = 0; //the character's current level
 public:

@@ -2682,7 +2682,7 @@ std::string_view CPlayer::get_faction_title_name() const
 	return faction->get_title_name(government_type, tier);
 }
 
-std::string_view CPlayer::GetCharacterTitleName(const character_title title_type, const wyrmgus::gender gender) const
+std::string_view CPlayer::GetCharacterTitleName(const character_title title_type, const archimedes::gender gender) const
 {
 	if (this->get_faction() == nullptr || title_type == character_title::none || gender == gender::none) {
 		return wyrmgus::string::empty_str;

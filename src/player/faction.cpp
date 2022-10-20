@@ -146,7 +146,7 @@ void faction::process_character_title_name_scope(std::map<faction_tier, std::map
 	scope.for_each_property([&](const gsml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
-		const gender gender = enum_converter<wyrmgus::gender>::to_enum(key);
+		const gender gender = enum_converter<archimedes::gender>::to_enum(key);
 		character_title_names[faction_tier][gender] = value;
 	});
 }

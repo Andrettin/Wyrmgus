@@ -3443,10 +3443,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	//Wyrmgus start
 	if (!SaveGameLoading) {
 		//assign a gender to the unit
-		if (this->get_gender() == wyrmgus::gender::none && this->Type->BoolFlag[ORGANIC_INDEX].value && this->get_species() != nullptr && !this->get_species()->is_asexual()) {
+		if (this->get_gender() == gender::none && this->Type->BoolFlag[ORGANIC_INDEX].value && this->get_species() != nullptr && !this->get_species()->is_asexual()) {
 			//Gender: 0 = Not Set, 1 = Male, 2 = Female
 			this->Variable[GENDER_INDEX].Value = wyrmgus::random::get()->generate(2) + 1;
-			this->Variable[GENDER_INDEX].Max = static_cast<int>(wyrmgus::gender::count) - 1;
+			this->Variable[GENDER_INDEX].Max = static_cast<int>(gender::count) - 1;
 			this->Variable[GENDER_INDEX].Enable = 1;
 		}
 		
@@ -7541,9 +7541,9 @@ bool CUnit::is_in_subtemplate_area(const wyrmgus::map_template *subtemplate) con
 	return false;
 }
 
-wyrmgus::gender CUnit::get_gender() const
+archimedes::gender CUnit::get_gender() const
 {
-	return static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value);
+	return static_cast<archimedes::gender>(this->Variable[GENDER_INDEX].Value);
 }
 
 bool CUnit::is_capturable() const

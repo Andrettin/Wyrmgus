@@ -988,7 +988,7 @@ public:
 	bool is_in_tile_rect(const QRect &tile_rect, int z) const;
 	bool is_in_subtemplate_area(const wyrmgus::map_template *subtemplate) const;
 
-	wyrmgus::gender get_gender() const;
+	archimedes::gender get_gender() const;
 
 	unsigned char get_step_count() const
 	{

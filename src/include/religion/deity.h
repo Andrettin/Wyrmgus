@@ -56,7 +56,7 @@ class deity final : public detailed_data_entry, public data_type<deity>
 
 	Q_PROPERTY(wyrmgus::pantheon* pantheon MEMBER pantheon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::icon* icon READ get_icon WRITE set_icon NOTIFY changed)
-	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
+	Q_PROPERTY(archimedes::gender gender READ get_gender WRITE set_gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(wyrmgus::world* homeworld MEMBER homeworld READ get_homeworld)
 	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
