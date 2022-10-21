@@ -513,7 +513,7 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, const bool overlay, const int
 						adjacent_terrain = nullptr;
 					}
 					if (terrain != adjacent_terrain) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
-						transition_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
+						transition_directions.push_back(offset_to_direction(QPoint(x_offset, y_offset)));
 					}
 				}
 			}
@@ -2626,7 +2626,9 @@ void CMap::calculate_tile_transitions(const QPoint &pos, const bool overlay, con
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
-				const QPoint adjacent_pos(pos.x() + x_offset, pos.y() + y_offset);
+				const QPoint offset_pos(x_offset, y_offset);
+				const QPoint adjacent_pos(pos + offset_pos);
+
 				if (this->Info->IsPointOnMap(adjacent_pos, z)) {
 					const terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
@@ -2634,19 +2636,19 @@ void CMap::calculate_tile_transitions(const QPoint &pos, const bool overlay, con
 					}
 					if (adjacent_terrain && terrain != adjacent_terrain) {
 						if (vector::contains(terrain->get_inner_border_terrain_types(), adjacent_terrain)) {
-							adjacent_terrain_directions[adjacent_terrain->ID].push_back(GetDirectionFromOffset(x_offset, y_offset));
+							adjacent_terrain_directions[adjacent_terrain->ID].push_back(offset_to_direction(offset_pos));
 						} else if (!terrain->is_border_terrain_type(adjacent_terrain)) {
 							//if the two terrain types can't border, look for a third terrain type which can border both, and which treats both as outer border terrains, and then use for transitions between both tiles
 							for (const terrain_type *border_terrain : terrain->BorderTerrains) {
 								if (vector::contains(terrain->get_inner_border_terrain_types(), border_terrain) && vector::contains(adjacent_terrain->get_inner_border_terrain_types(), border_terrain)) {
-									adjacent_terrain_directions[border_terrain->ID].push_back(GetDirectionFromOffset(x_offset, y_offset));
+									adjacent_terrain_directions[border_terrain->ID].push_back(offset_to_direction(offset_pos));
 									break;
 								}
 							}
 						}
 					}
 					if (!adjacent_terrain || (overlay && terrain != adjacent_terrain && !terrain->is_border_terrain_type(adjacent_terrain))) { // happens if terrain is null or if it is an overlay tile which doesn't have a border with this one, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
-						adjacent_terrain_directions[terrain_type::get_all().size()].push_back(GetDirectionFromOffset(x_offset, y_offset));
+						adjacent_terrain_directions[terrain_type::get_all().size()].push_back(offset_to_direction(offset_pos));
 					}
 				}
 			}
@@ -2889,7 +2891,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 				continue;
 			}
 
-			adjacent_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
+			adjacent_directions.push_back(offset_to_direction(QPoint(x_offset, y_offset)));
 		}
 	}
 	

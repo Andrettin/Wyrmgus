@@ -529,31 +529,6 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 	co_await Exit(exit_code);
 }
 
-//Wyrmgus start
-archimedes::direction GetDirectionFromOffset(const int x, const int y)
-{
-	if (x < 0 && y == 0) {
-		return direction::west;
-	} else if (x > 0 && y == 0) {
-		return direction::east;
-	} else if (y < 0 && x == 0) {
-		return direction::north;
-	} else if (y > 0 && x == 0) {
-		return direction::south;
-	} else if (x < 0 && y < 0) {
-		return direction::northwest;
-	} else if (x > 0 && y < 0) {
-		return direction::northeast;
-	} else if (x < 0 && y > 0) {
-		return direction::southwest;
-	} else if (x > 0 && y > 0) {
-		return direction::southeast;
-	}
-
-	throw std::runtime_error("No direction for point " + point::to_string(QPoint(x, y)) + ".");
-}
-//Wyrmgus end
-
 void load_database(const bool initial_definition)
 {
 	thread_pool::get()->co_spawn_sync([initial_definition]() -> boost::asio::awaitable<void> {

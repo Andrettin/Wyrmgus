@@ -199,8 +199,6 @@ enum TechLevels {
 	CivilizedIronTechLevel,
 	CivilizedGunpowderTechLevel
 };
-
-extern archimedes::direction GetDirectionFromOffset(const int x, const int y);
 //Wyrmgus end
 
 extern void load_database(const bool initial_definition);
