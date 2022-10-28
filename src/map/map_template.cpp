@@ -4858,7 +4858,7 @@ void map_template::save_territory_image(const std::string &filename, site_map<st
 		vector::merge(geodata_map[color], std::move(geoshapes));
 	}
 
-	geoshape::write_image(path::from_string(filename), geodata_map, this->get_georectangle(), this->get_size(), this->get_map_projection(), base_image);
+	geoshape::write_image(path::from_string(filename), geodata_map, this->get_georectangle(), this->get_size(), this->get_map_projection(), base_image, 0);
 }
 
 void map_template::add_site(const site *site)
